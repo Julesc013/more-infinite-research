@@ -9,7 +9,7 @@ import unittest
 ROOT = Path(__file__).resolve().parents[1]
 FIXTURE = ROOT / "tests/fixtures/named-science-replacement"
 PROFILES = ROOT / "tests/profiles"
-FREEZE = ROOT / "spec/evidence/current-assets-089e6e25-readback.json"
+FREEZE = ROOT / "spec/evidence/current-assets-071627bb-readback.json"
 PACKS = (
     "automation-science-pack", "logistic-science-pack", "chemical-science-pack",
     "production-science-pack", "military-science-pack", "utility-science-pack",
@@ -190,7 +190,7 @@ class NamedScienceReplacementFixtureTests(unittest.TestCase):
         }, profile["archive_sha256"])
         self.assertIn("CreateOnly comparator", profile["scope"])
 
-    def test_mir5_profile_changes_only_the_frozen_mir_arm_and_matches_corrected_089_assets(self):
+    def test_mir5_profile_changes_only_the_frozen_mir_arm_and_matches_corrected_071_assets(self):
         published = json.loads((PROFILES / "named-science-replacement-published-f210-2123.json").read_text(encoding="utf-8"))
         candidate = json.loads((PROFILES / "named-science-replacement-mir5-f210-2123.json").read_text(encoding="utf-8"))
         freeze = json.loads(FREEZE.read_text(encoding="utf-8"))
@@ -217,10 +217,10 @@ class NamedScienceReplacementFixtureTests(unittest.TestCase):
         self.assertEqual("B6EB9430056ABD384DB00F94929FE7DAC0A37441ACF4BC277946689682628852",
                          published["archive_sha256"]["more-infinite-research_4.7.21003.zip"])
         f210 = next(asset for asset in freeze["assets"] if asset["target"] == "f210")
-        self.assertEqual(("089e6e25c6c28e229d3b28c13b7c2cedaf2b4d0a", "24699ffab82952ce5b3b3a09ef5e8c9ed2c1d43a"),
+        self.assertEqual(("071627bbb5ff37eaf724adb78ba1ece1b139e228", "25442a5bd7838f124952507854426e3b8e868475"),
                          (freeze["source"]["commit"], freeze["source"]["source_tree"]))
-        self.assertEqual(("more-infinite-research_5.0.21000.zip", 553639,
-                          "83CA2487DAD623FCA2D0E9AE80C222782A095FB8F501279A6E1C611714CBE4FE"),
+        self.assertEqual(("more-infinite-research_5.0.21000.zip", 553767,
+                          "4F5BEE023930666FC0F921136A69B59861741BE44C311E03D46347D42018ECBC"),
                          (f210["name"], f210["bytes"], f210["archive_sha256"].upper()))
         self.assertEqual(f210["archive_sha256"].upper(),
                          candidate["archive_sha256"]["more-infinite-research_5.0.21000.zip"])
