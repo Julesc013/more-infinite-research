@@ -7,7 +7,9 @@ It uses only the exact archived closures below:
 | Target | Engine | Space Is Fake | Required companion archives |
 | --- | --- | --- |
 | F200 | 2.0.77 | 1.0.60 (`860F2048A7E6F4C2ECD1A9CECA6ECDD340ECF797773EC582A6E60FFE6F8D87AC`) | cr-commons 1.0.27 (`6F3622AE6270F9B365A9E2E07FA5E07B61B2BBFCAB3A4D930CC410EBDEB63B92`) |
-| F210 | 2.1.23 | 1.0.78 (`3B5F2A381ADF1D9AECF048293E20035963A528720FBDC148CCC2B0418049FF13`) | cr-commons 1.0.33 (`378D3114B09C872358088B33500BC4AB0B9B9EFD9E5650DBEA0E87B5914C29BB`), cr-extras 1.0.01 (`874B204234446EBA9DD333D84569433A11E99D3C001FD853E26B13A01B2CBC82`) |
+| F210 | 2.1.23 | 1.0.78 (`3B5F2A381ADF1D9AECF048293E20035963A528720FBDC148CCC2B0418049FF13`) | cr-commons 1.0.33 (`378D3114B09C872358088B33500BC4AB0B9B9EFD9E5650DBEA0E87B5914C29BB`), cr-extras 1.0.10 (`3AB74877E49FB245E62593B669EB4D5C762207C047CA6F70E4D0CC9B67DF0225`) |
+
+The current F210 selection uses independently filed cr-extras 1.0.10 only to replace the engine-invalid input archive; it has not received a native result or qualification claim. The retained 1.0.01 MIR-absent failure below remains historical adverse evidence with its original archive identity and source references.
 
 SIF's archived `data-updates.lua` removes `space-science-pack` from existing
 technology units. Its `technology.lua` retires the space-science prerequisite.
@@ -213,10 +215,11 @@ protocol. It uses doubles only and never launches Factorio.
 
 ## Upstream-only F210 diagnostic control
 
-`tests/profiles/sif-upstream-f210-2123.json` retains the exact configured
+`tests/profiles/sif-upstream-f210-2123.json` selects the current configured
 candidate's official mods, SIF, cr-commons, cr-extras, observer, hashes and
 default settings. It excludes MIR and the MIR-dependent core/selector mods.
 This isolates the upstream closure without changing or patching any archive.
+The historical 1.0.01 failure is retained verbatim as adverse evidence:
 The raw archive identity remains cr-extras `1.0.01`; Factorio reports its
 runtime version as `1.0.1`.
 
