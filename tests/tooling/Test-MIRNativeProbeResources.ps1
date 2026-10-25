@@ -59,18 +59,25 @@ try {
     $benchmarkRoot=Join-Path $context.root 'benchmark-observation';[IO.Directory]::CreateDirectory($benchmarkRoot)|Out-Null
     $benchmarkSampler=New-MIROwnedProcessMemorySampler -Context benchmark -ExpectedSlots @([pscustomobject]@{phase='benchmark';role='factorio'})
     $benchmarkState=[pscustomobject]@{registration=$null;sample_events=0;exit_events=0}
+    $registerMemorySampler=${function:Register-MIROwnedProcessMemoryProcess}
+    $addMemorySample=${function:Add-MIROwnedProcessMemorySample}
+    $completeMemorySampler=${function:Complete-MIROwnedProcessMemoryProcess}
     $benchmarkSample={
       param($event)
       if($event.natural_exit){throw '[mir5-native-probe-unexpected-sample-exit]'}
+      if($null-eq$benchmarkState.registration){$benchmarkState.registration=& $registerMemorySampler -Sampler $benchmarkSampler -Phase benchmark -Role factorio -Process $event.process}
+      if($null-eq$benchmarkState.registration){throw '[mir5-native-probe-benchmark-registration]'}
+      & $addMemorySample -Sampler $benchmarkSampler
       $benchmarkState.sample_events++
     }.GetNewClosure()
     $benchmarkExit={
       param($event)
       if(-not$event.natural_exit){throw '[mir5-native-probe-missing-natural-exit]'}
+      & $completeMemorySampler -Sampler $benchmarkSampler -Registration $benchmarkState.registration -NaturalExit
       $benchmarkState.exit_events++
     }.GetNewClosure()
     $benchmarkLedger=Join-Path $benchmarkRoot 'resources.jsonl'
-    $benchmarkRun=Invoke-MIR441MonitoredProcess -FilePath $child -Arguments @('-NoProfile','-Command','Start-Sleep -Milliseconds 900') -WorkRoot $benchmarkRoot -LedgerPath $benchmarkLedger -Policy $context.policy -EstimatedPeakBytes 1MB -ExpectedPeakMemoryBytes 1024MB -TimeoutSeconds 20 -SampleMilliseconds 250 -OwnedProcessMemorySampler $benchmarkSampler -OwnedProcessSampleCallback $benchmarkSample -OwnedProcessExitCallback $benchmarkExit
+    $benchmarkRun=Invoke-MIR441MonitoredProcess -FilePath $child -Arguments @('-NoProfile','-Command','Start-Sleep -Milliseconds 900') -WorkRoot $benchmarkRoot -LedgerPath $benchmarkLedger -Policy $context.policy -EstimatedPeakBytes 1MB -ExpectedPeakMemoryBytes 1024MB -TimeoutSeconds 20 -SampleMilliseconds 250 -OwnedProcessSampleCallback $benchmarkSample -OwnedProcessExitCallback $benchmarkExit
     $benchmarkReceipt=Get-MIROwnedProcessMemoryObservationReceipt -Sampler $benchmarkSampler
     Assert-Probe ($benchmarkRun.status-ceq'passed'-and$benchmarkState.sample_events-ge2-and$benchmarkState.exit_events-eq1-and$benchmarkReceipt.status-ceq'complete-observation'-and$benchmarkReceipt.context-ceq'benchmark'-and$benchmarkReceipt.observations.Count-ge2) 'benchmark-natural-exit-observation'
     Assert-Probe (@($benchmarkReceipt.observations|Where-Object {$_.phase-cne'benchmark'-or$_.role-cne'factorio'-or$_.pid-le0-or$_.working_set_bytes-lt0-or$_.private_bytes-lt0}).Count-eq0) 'benchmark-observation-identity'
