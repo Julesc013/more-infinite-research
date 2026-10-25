@@ -353,15 +353,16 @@ def _prepared_inputs(result: dict[str, object]) -> bytes:
 
 class RuntimeBenchmarkAnalysisTests(unittest.TestCase):
     def test_consumes_exact_accepted_r06_capture_and_pilot_payloads(self) -> None:
-        capsule_commit = "1a0fdb3cda6ac33a7ce31971bded92f1040df569"
         capsule_path = "spec/evidence/runtime-active-r06-physical-native-receipts.json.gz"
-        plan_revision = "7dcd6d6df9e02f66e5eb00965a36d08daf54a856"
         plan_path = "spec/evidence/runtime-benchmark-active-plan-r06.json"
 
-        def read_git(revision_path: str) -> bytes:
-            return subprocess.check_output(["git", "show", revision_path], cwd=ROOT)
+        def read_tracked(path: str) -> bytes:
+            # CI checks out this accepted evidence as source, but does not promise
+            # historical object reachability for its original evidence commit.
+            subprocess.check_call(["git", "ls-files", "--error-unmatch", "--", path], cwd=ROOT)
+            return (ROOT / path).read_bytes()
 
-        capsule_bytes = read_git(capsule_commit + ":" + capsule_path)
+        capsule_bytes = read_tracked(capsule_path)
         self.assertEqual(_hash(capsule_bytes), "23466064A3C2E376A93FAFD9D5772038186BF4FB5D993E56953F5B145AD5FE88")
         capsule = json.loads(gzip.decompress(capsule_bytes))
         raw_records = {
@@ -373,7 +374,8 @@ class RuntimeBenchmarkAnalysisTests(unittest.TestCase):
         pilot_bytes = raw_records["original/active-marker-pilots.json"]
         self.assertEqual(_hash(capture_bytes), MODULE.ACTIVE_SEED_CAPTURE_SHA256)
         self.assertEqual(_hash(pilot_bytes), MODULE.MARKER_PILOT_SHA256)
-        plan_bytes = read_git(plan_revision + ":" + plan_path)
+        plan_bytes = read_tracked(plan_path)
+        self.assertEqual(_hash(plan_bytes), "816BA8FE3589967CC456F189F5F3F584289FB553DAFADBB64ACAEF32DD306C4F")
         plan = json.loads(plan_bytes)
         plan_sha = _hash(plan_bytes)
         capture = json.loads(capture_bytes)
