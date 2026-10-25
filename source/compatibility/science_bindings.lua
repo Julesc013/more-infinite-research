@@ -212,7 +212,7 @@ local function pack_prerequisites(target, has_space_age)
     return out
   end
 
-  if target.id == "f017" then
+  if target.id == "f017" or target.id == "f110" then
     add_same_name_prerequisites(out, {
       "logistic-science-pack", "chemical-science-pack", "military-science-pack",
       "production-science-pack", "utility-science-pack", "space-science-pack"
@@ -278,7 +278,17 @@ local function source_contracts(target, has_space_age, mods)
     return out
   end
 
-  for _, pack in ipairs(MODERN_BASE) do put(pack, recipe_unlock(pack, pack)) end
+  for _, pack in ipairs(MODERN_BASE) do
+    if pack == "automation-science-pack"
+      and (target.id == "f017" or target.id == "f100" or target.id == "f110") then
+      -- Base on these three targets ships red science as an initially enabled
+      -- shorthand-result recipe, with no same-named technology. It is a
+      -- direct seed, not a missing native owner.
+      put(pack, initial_recipe(pack))
+    else
+      put(pack, recipe_unlock(pack, pack))
+    end
+  end
   if target.id == "f017" or target.id == "f100" or target.id == "f110" then
     -- 0.17 through 1.1 retain the satellite launch product.  The
     -- same-named technology unlocks the satellite recipe; it does not have a

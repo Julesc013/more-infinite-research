@@ -90,7 +90,7 @@ end
 
 local function recipe_outputs(recipe, pack)
   if type(recipe) ~= "table" then return false end
-  if recipe.result == pack then
+  if recipe.result == pack and (recipe.result_type == nil or recipe.result_type == "item") then
     return recipe.result_count == nil or positive(recipe.result_count)
   end
   return has_positive_item_output(recipe.results, pack)
@@ -107,7 +107,7 @@ end
 
 local function has_direct_self_input(recipe, pack)
   for _, row in ipairs(type(recipe) == "table" and recipe.ingredients or {}) do
-    if named_entry(row) == pack then return true end
+    if type(row) == "table" and (row.type == nil or row.type == "item") and named_entry(row) == pack then return true end
   end
   return false
 end
@@ -693,6 +693,147 @@ local function selected_binding(context)
   return selected
 end
 
+local function no_prerequisites(owner)
+  return owner.prerequisites == nil or (type(owner.prerequisites) == "table" and next(owner.prerequisites) == nil)
+end
+
+local function direct_craft_seed(owner, context, view)
+  if type(owner) ~= "table" or owner.enabled == false
+    or not no_prerequisites(owner) or owner.unit ~= nil then return false end
+  if context.target.id ~= "f200" and context.target.id ~= "f210" then return false end
+  local trigger = owner.research_trigger
+  if type(trigger) ~= "table" or trigger.type ~= "craft-item" then return false end
+  local count = trigger.count == nil and 1 or trigger.count
+  return type(trigger.item) == "string" and trigger.item ~= "" and positive(count) and count % 1 == 0
+    and find_item(context.raw, trigger.item) ~= nil and not view.available[trigger.item]
+end
+
+-- Only already-authored direct seeds may support a new research-owned source.
+-- This does not propagate availability through foreign research or materials.
+local function declared_seed_packs(context, selected, view)
+  local seeds = {}
+  for pack, contract in pairs(selected.source_contracts) do
+    local choices = contract.kind == "alternatives" and contract.alternatives or {contract}
+    for _, choice in ipairs(choices or {}) do
+      local direct = choice.kind == "initial-recipe" or choice.kind == "resource"
+      if choice.kind == "recipe-unlock" then
+        direct = direct_craft_seed((context.raw.technology or {})[choice.owner], context, view)
+      end
+      if direct and validate_source_contract(context.raw, choice, pack) then seeds[pack] = true; break end
+    end
+  end
+  return seeds
+end
+
+local function direct_research_seed(owner, context, view, seeds)
+  if type(owner) ~= "table" or owner.enabled == false
+    or not no_prerequisites(owner) or owner.research_trigger ~= nil then return false end
+  local unit = owner.unit
+  if type(unit) ~= "table" or not positive(unit.count) or unit.count % 1 ~= 0
+    or unit.count_formula ~= nil or not positive(unit.time) or type(unit.ingredients) ~= "table"
+    or #unit.ingredients == 0 then return false end
+  local inputs, count = {}, 0
+  for key, row in pairs(unit.ingredients) do
+    count = count + 1
+    local name, amount = ingredient(row)
+    if type(key) ~= "number" or key < 1 or key % 1 ~= 0 or key > #unit.ingredients
+      or not name or not seeds[name] or amount % 1 ~= 0
+      or (row.type ~= nil and row.type ~= "item") then return false end
+    inputs[key] = {name, amount}
+  end
+  return count == #unit.ingredients and lab_decision(context, view, inputs, {}, {}, "skip").kind == "full"
+end
+
+local function direct_recipe_packs(recipe, wanted)
+  local forms = recipe_forms(recipe)
+  if not forms then return nil end
+  local packs, blocked, initial = nil, {}, true
+  for _, form in ipairs(forms) do
+    local outputs = {}
+    if (form.result_type == nil or form.result_type == "item") and wanted[form.result]
+      and (form.result_count == nil or positive(form.result_count)) then outputs[form.result] = true end
+    for _, row in ipairs(type(form.results) == "table" and form.results or {}) do
+      local name = named_entry(row)
+      if type(row) == "table" and (row.type == nil or row.type == "item") and wanted[name]
+        and positive_product_amount(row) and positive_product_probability(row) then outputs[name] = true end
+    end
+    for _, row in ipairs(type(form.ingredients) == "table" and form.ingredients or {}) do
+      local name = named_entry(row)
+      if type(row) == "table" and (row.type == nil or row.type == "item") and wanted[name] then blocked[name] = true end
+    end
+    if packs == nil then packs = outputs else
+      for pack in pairs(packs) do if not outputs[pack] then packs[pack] = nil end end
+    end
+    initial = initial and form.enabled ~= false
+  end
+  for pack in pairs(blocked) do packs[pack] = nil end
+  return packs, initial
+end
+
+-- The opt-in `all` policy needs one bounded collection for unfamiliar lab
+-- inputs. Admit only direct sources; never traverse foreign prerequisites,
+-- infer factory acquisition, or treat a union of labs as one accepting lab.
+local function bind_fresh_sources(context, selected, view, source)
+  if context.fresh_source_contracts or type(selected.source_contracts) ~= "table" then return end
+  local present, wanted, missing = {}, {}, false
+  for _, row in ipairs(source) do present[row[1]] = true end
+  for _, pack in ipairs(view.all) do
+    if selected.source_contracts[pack] == nil and not selected.official_set[pack] then
+      wanted[pack] = true
+      missing = missing or not present[pack]
+    end
+  end
+  -- An existing foreign ingredient alone never starts collection or acquires
+  -- a new gate. A later family may independently need that pack as an addition.
+  if not missing then return end
+  local chosen, pending = {}, {}
+  local function choose(pack, recipe, owner)
+    local previous = chosen[pack]
+    if previous and previous.owner == nil and owner ~= nil then return end
+    if not previous or (previous.owner ~= nil and owner == nil)
+      or (previous.owner == nil) == (owner == nil) and (recipe < previous.recipe
+        or recipe == previous.recipe and (owner or "") < (previous.owner or "")) then
+      chosen[pack] = {kind = owner and "recipe-unlock" or "initial-recipe", pack = pack, recipe = recipe, owner = owner}
+    end
+  end
+  for name, recipe in pairs(type(context.raw.recipe) == "table" and context.raw.recipe or {}) do
+    context.fresh_recipe_visits = context.fresh_recipe_visits + 1
+    if type(name) == "string" and name ~= "" then
+      local packs, initial = direct_recipe_packs(recipe, wanted)
+      if packs and next(packs) then
+        if initial then for pack in pairs(packs) do choose(pack, name) end else pending[name] = packs end
+      end
+    end
+  end
+  for recipe, packs in pairs(pending) do
+    for pack in pairs(packs) do if chosen[pack] then packs[pack] = nil end end
+    if next(packs) == nil then pending[recipe] = nil end
+  end
+  if next(pending) then
+    local seeds = declared_seed_packs(context, selected, view)
+    for name, owner in pairs(type(context.raw.technology) == "table" and context.raw.technology or {}) do
+      context.fresh_technology_visits = context.fresh_technology_visits + 1
+      if type(name) == "string" and name ~= "" and type(owner) == "table" then
+        local eligible
+        for _, effect in ipairs(type(owner.effects) == "table" and owner.effects or {}) do
+          local packs = type(effect) == "table" and effect.type == "unlock-recipe" and pending[effect.recipe] or nil
+          if packs then
+            if eligible == nil then eligible = direct_craft_seed(owner, context, view)
+              or direct_research_seed(owner, context, view, seeds) end
+            if eligible then for pack in pairs(packs) do choose(pack, effect.recipe, name) end end
+          end
+        end
+      end
+    end
+  end
+  context.fresh_source_contracts = chosen
+  selected.pack_prerequisites = selected.pack_prerequisites or {}
+  for pack, contract in pairs(chosen) do
+    selected.source_contracts[pack] = contract
+    selected.pack_prerequisites[pack] = contract.owner and {contract.owner} or {}
+  end
+end
+
 local function reported_policy(policy, context)
   if policy == POLICY_DEFAULT then return "configured" end
   for _, unresolved_policy in pairs(context.unbound_science_sources or {}) do
@@ -705,7 +846,8 @@ function M.prepare(environment)
   environment = environment or {}
   return {
     raw = environment.raw or {}, options = environment.options or {}, target = environment.target or {}, mods = environment.mods,
-    lab_visits = 0, lab_decisions = {}, mod_progression_unbound = {}, unbound_science_sources = {}
+    lab_visits = 0, lab_decisions = {}, mod_progression_unbound = {}, unbound_science_sources = {},
+    fresh_recipe_visits = 0, fresh_technology_visits = 0
   }
 end
 
@@ -733,6 +875,9 @@ function M.apply(technology, binding, context)
   if not source or #source == 0 then return disable(technology, reason or "missing-science-ingredients") end
   local selected, view = selected_binding(context), collector(context)
   local raw = context.raw
+  if option(context, "mir-science-pack-ingredient-policy", POLICY_DEFAULT) == "all" then
+    bind_fresh_sources(context, selected, view, source)
+  end
 
   local required = copy_list(binding.required_science)
   for _, name in ipairs(required) do
@@ -749,7 +894,14 @@ function M.apply(technology, binding, context)
   ingredients, additions, addition_contracts = exclude_science(
     ingredients, additions, addition_contracts, binding.excluded_science)
   for _, name in ipairs(additions) do
-    local valid, source_reason = validate_source_contract(raw, addition_contracts[name], name)
+    -- Fresh contracts were validated once against this fixed context before
+    -- any publication, including all output forms and the selected seed arm.
+    local valid, source_reason
+    if context.fresh_source_contracts and context.fresh_source_contracts[name] == addition_contracts[name] then
+      valid = true
+    else
+      valid, source_reason = validate_source_contract(raw, addition_contracts[name], name)
+    end
     if not valid then
       return disable(technology, "invalid-science-source:" .. name .. ":" .. tostring(source_reason), source)
     end
