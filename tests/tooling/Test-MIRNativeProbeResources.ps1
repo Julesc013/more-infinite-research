@@ -174,7 +174,10 @@ try {
     Assert-Probe ($probeRun.status-ceq'passed'-and$probeCallbacks.state.sample_events-ge2-and$probeCallbacks.state.exit_events-eq1-and$probeReceipt.status-ceq'complete-observation'-and$probeReceipt.observations.Count-ge2) 'probe-wrapper-benchmark-observation'
     $factorioSampler=New-MIROwnedProcessMemorySampler -Context benchmark -ExpectedSlots @([pscustomobject]@{phase='benchmark';role='factorio'})
     $factorioCallbacks=New-BenchmarkMemoryCallbacks -Sampler $factorioSampler
-    $factorioObservation=Invoke-MIRNativeProbeFactorioProcess -Context $context -FilePath $child -Arguments @('-NoProfile','-Command','Start-Sleep -Milliseconds 900') -TimeoutSeconds 20 -SampleMilliseconds 250 -OwnedProcessSampleCallback $factorioCallbacks.sample -OwnedProcessExitCallback $factorioCallbacks.exit
+    # The direct actor includes registration and memory reads before its first
+    # 250 ms cadence wait. Keep the two-observation assertion but give this
+    # controlled host child enough lifetime on a loaded hosted runner.
+    $factorioObservation=Invoke-MIRNativeProbeFactorioProcess -Context $context -FilePath $child -Arguments @('-NoProfile','-Command','Start-Sleep -Seconds 2') -TimeoutSeconds 20 -SampleMilliseconds 250 -OwnedProcessSampleCallback $factorioCallbacks.sample -OwnedProcessExitCallback $factorioCallbacks.exit
     $factorioReceipt=Get-MIROwnedProcessMemoryObservationReceipt -Sampler $factorioSampler
     Assert-Probe ($factorioObservation.status-ceq'passed'-and$factorioObservation.result.duration_measurement.scope-ceq'direct-native-executable-start-to-exit'-and$factorioCallbacks.state.sample_events-ge2-and$factorioCallbacks.state.exit_events-eq1-and$factorioReceipt.status-ceq'complete-observation'-and$factorioReceipt.observations.Count-ge2) 'factorio-wrapper-benchmark-observation'
     Refuses-Probe {Invoke-MIR441MonitoredProcess -FilePath $child -Arguments @('-NoProfile','-Command','exit 0') -WorkRoot (Join-Path $benchmarkRoot 'invalid-cadence') -LedgerPath (Join-Path $benchmarkRoot 'invalid-cadence/resources.jsonl') -Policy $context.policy -EstimatedPeakBytes 1MB -ExpectedPeakMemoryBytes 64MB -SampleMilliseconds 250} '[mir441-resource-observation-callback-required]'
