@@ -435,6 +435,91 @@ class ProductTargetExtensionTests(unittest.TestCase):
           run('apply','off',true); run('apply','report',false,false)
         ''')
 
+    def test_science_productivity_keeps_dynamic_lab_inputs_in_one_recipe_pass(self):
+        self.lua.execute(r'''
+          local function run(action, reverse)
+            local row=generated('research_science_pack_productivity',{productivity('official-producer',.33)})
+            local recipes={
+              ['official-producer']=recipe({}, {product('item','automation-science-pack')}),
+              ['circular-producer']=recipe({}, {product('item','foreign-pack')},{enabled=false}),
+              ['seeded-producer']=recipe({}, {product('item','foreign-pack')},{enabled=false}),
+              ['ammo-producer']=recipe({}, {product('item','ammo-pack')}),
+              fluid=recipe({}, {product('fluid','foreign-pack')}),
+              unused=recipe({}, {product('item','unused-item')}),
+              denied=recipe({}, {product('item','foreign-pack')},{allow_productivity=false}),
+              hidden=recipe({}, {product('item','foreign-pack')},{hidden=true}),
+              recycling=recipe({}, {product('item','foreign-pack')},{category='recycling'}),
+              zero=recipe({}, {product('item','foreign-pack',{amount=0})}),
+            }
+            local recipe_count=0
+            for _ in pairs(recipes) do recipe_count=recipe_count+1 end
+            local recipe_passes,lab_passes=0,0
+            setmetatable(recipes,{__pairs=function(value)
+              recipe_passes=recipe_passes+1;return next,value,nil end})
+            local raw=raw_with_recipes(recipes)
+            raw.tool={['foreign-pack']={},['automation-science-pack']={}}
+            raw.ammo={['ammo-pack']={}}
+            raw.item={['unused-item']={}}
+            raw.fluid={['fluid-only']={}}
+            local labs={
+              alpha={inputs={'foreign-pack','ammo-pack','automation-science-pack','missing'}},
+              beta={inputs={'foreign-pack','fluid-only',{name='malformed'}}},
+            }
+            local order=reverse and {'beta','alpha'} or {'alpha','beta'}
+            setmetatable(labs,{__pairs=function(value)
+              lab_passes=lab_passes+1
+              local index=0
+              return function() index=index+1;local key=order[index]
+                if key then return key,value[key] end end,value,nil
+            end})
+            raw.lab=labs
+            local result=extension.extend({row}, {
+              streams={research_science_pack_productivity={effect_percent=10}},
+              options={['mir-automatic-productivity-action']=action},
+            },{raw=raw,mods={['space-age']='2.1.23'}})
+            assert(result.extended_effects==3 and #row.effects==4,
+              'science productivity lost real lab-input item producers or admitted an excluded recipe')
+            assert(effect_rows(row.effects)==
+              'change-recipe-productivity:official-producer:0.33000,'..
+              'change-recipe-productivity:ammo-producer:0.10000,'..
+              'change-recipe-productivity:circular-producer:0.10000,'..
+              'change-recipe-productivity:seeded-producer:0.10000')
+            assert(recipe_passes==1 and result.work.recipes==recipe_count,
+              'dynamic science started another recipe pass')
+            assert(lab_passes==1 and result.work.labs==2 and result.work.lab_inputs==7,
+              'lab-input collection repeated or omitted visited work')
+            assert(labs.alpha.inputs[1]=='foreign-pack' and labs.alpha.inputs[2]=='ammo-pack'
+              and labs.beta.inputs[1]=='foreign-pack','lab inputs were mutated')
+            return effect_rows(row.effects)
+          end
+          for _,action in ipairs({'apply','preview','disabled'}) do
+            assert(run(action,false)==run(action,true),'lab insertion order changed output')
+          end
+        ''')
+
+    def test_dynamic_science_inputs_respect_selection_exact_bindings_and_empty_inputs(self):
+        self.lua.execute(r'''
+          local function guarded_raw()
+            return setmetatable(raw_with_recipes({known=recipe({}, {product('item','iron-gear-wheel')})}),{
+              __index=function(_,key) if key=='lab' then error('inactive science inspected labs') end end})
+          end
+          local gear=generated('research_gears',{productivity('known',.2)})
+          local result=extension.extend({gear},{effect_percent=20},{raw=guarded_raw(),mods={}})
+          assert(result.work.labs==0 and result.work.lab_inputs==0)
+          local science=generated('research_science_pack_productivity',{productivity('known',.1)})
+          result=extension.extend({science},{streams={research_science_pack_productivity={effect_percent=10}}},{
+            raw=guarded_raw(),mods={},exact_product_target_families={research_science_pack_productivity=true},
+            exact_product_bindings={{family='research_science_pack_productivity',weight=1,recipes={'known'}}}})
+          assert(#science.effects==1 and result.work.labs==0 and result.work.lab_inputs==0)
+          local raw=raw_with_recipes(setmetatable({},{__pairs=function() error('empty lab rule scanned recipes') end}))
+          raw.lab={one={inputs={'absent','fluid-only','bad-item'}}}
+          raw.fluid={['fluid-only']={}};raw.item={['bad-item']='not-a-prototype'}
+          result=extension.extend({science},{streams={research_science_pack_productivity={effect_percent=10}}},
+            {raw=raw,mods={}})
+          assert(result.rules==0 and result.work.recipes==0 and result.work.labs==1 and result.work.lab_inputs==3,
+            'empty/invalid lab inputs manufactured a rule or lost work counts')
+        ''')
+
     def test_k2_science_card_binding_requires_selected_family_and_complete_markers(self):
         self.lua.execute(r'''
           local function run(mods)
