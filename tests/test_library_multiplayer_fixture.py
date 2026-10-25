@@ -509,11 +509,11 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
           $pairedMir5=Get-Content -LiteralPath $env:MIR_TEST_PAIRED_MIR5_PROFILE -Raw|ConvertFrom-Json -AsHashtable
           $scriptedEffects=Get-Content -LiteralPath $env:MIR_TEST_SCRIPTED_EFFECTS_PROFILE -Raw|ConvertFrom-Json -AsHashtable
           $selected=Assert-MultiplayerFixtureSelection -Selection $f200 -EngineSha256 'D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B' -FixtureCase 'library-multiplayer'
-          if($selected.base -cne '2.0.77'){throw 'F200 selection changed'}
+          if($selected.base -cne '2.0.77' -or $selected.mir -cne '5.0.20000' -or $selected.build_version -ne 84539){throw 'F200 selection changed'}
            $selected=Assert-MultiplayerFixtureSelection -Selection $f200Current -EngineSha256 'D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B' -FixtureCase 'library-multiplayer'
-           if($selected.kind -cne 'mir5-library-multiplayer-current-f200-native-selection'){throw 'current F200 selection changed'}
+           if($selected.kind -cne 'mir5-library-multiplayer-current-f200-native-selection' -or $selected.build_version -ne 84539){throw 'current F200 selection changed'}
           $selected=Assert-MultiplayerFixtureSelection -Selection $f210 -EngineSha256 'FE4A1DA30F322A0D0B8AEB3DF7276332222BAAA143E2352569B723E84B2B9060' -FixtureCase 'library-multiplayer'
-          if($selected.base -cne '2.1.23'){throw 'F210 selection changed'}
+          if($selected.base -cne '2.1.23' -or $selected.mir -cne '5.0.21000' -or $selected.build_version -ne 87750){throw 'F210 selection changed'}
           $selected=Assert-MultiplayerFixtureSelection -Selection $pairedPublished -EngineSha256 'D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B' -FixtureCase 'library-paired-browser'
           if($selected.mir -cne '4.7.20002'){throw 'published paired selection changed'}
           $selected=Assert-MultiplayerFixtureSelection -Selection $pairedMir5 -EngineSha256 'D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B' -FixtureCase 'library-paired-browser'
@@ -565,6 +565,9 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
             check=False,
         )
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        wrapper = WRAPPER.read_text(encoding="utf-8")
+        self.assertIn("build_version=$target.build_version", wrapper)
+        self.assertNotIn("'last-played-version'=@{game_version=$target.base;build_version=84539", wrapper)
 
     def test_f210_closure_uses_the_existing_two_client_lifecycle_and_refuses_drift(self):
         accepted = self.run_case(target="f210")
@@ -672,10 +675,12 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
                          (0, False, .25, False, 2, 1, 0))
 
     def test_native_session_reader_accepts_actual_library_markers_and_rejects_mutations(self):
-        result = self.run_case()
-        self.assertTrue(result["ok"], result["message"])
-        self.assertEqual([marker["stage"] for marker in result["markers"]],
-                         ["ready", "rejoin-ready", "restart-ready", "completed"])
+        results = {target: self.run_case(target=target) for target in ("f200", "f210")}
+        for target, result in results.items():
+            with self.subTest(target=target):
+                self.assertTrue(result["ok"], result["message"])
+                self.assertEqual([marker["stage"] for marker in result["markers"]],
+                                 ["ready", "rejoin-ready", "restart-ready", "completed"])
 
         script = r'''
           $ErrorActionPreference='Stop'; Set-StrictMode -Version Latest
@@ -686,7 +691,7 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
           $allDefinitions=@($ast.FindAll({param($node)
             $node -is [Management.Automation.Language.FunctionDefinitionAst]
           },$true))
-          $names=@('Test-LibraryInteger','Assert-LibraryWitnessBoolean','Assert-LibraryWitnessInteger',
+          $names=@('Test-LibraryInteger','Get-LibraryWitnessTarget','Assert-LibraryWitnessBoolean','Assert-LibraryWitnessInteger',
             'Assert-LibraryLiveRefresh','Get-StageMarker')
           $definitions=@{}
           foreach($name in $names){
@@ -700,9 +705,37 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
           foreach($name in $names){Invoke-Expression $definitions[$name]}
           $fixtureCase='library-multiplayer'
           $markerPrefix='MIR5_LIBRARY_MULTIPLAYER'
-          $markers=@(Get-Content -LiteralPath $env:MIR_TEST_LIBRARY_MARKERS -Raw|ConvertFrom-Json -AsHashtable)
+          $markerSets=Get-Content -LiteralPath $env:MIR_TEST_LIBRARY_MARKERS -Raw|ConvertFrom-Json -AsHashtable
           $expectedJoins=@{ready=0;'rejoin-ready'=2;'restart-ready'=4;completed=6}
-          if($markers.Count -ne 4){throw 'actual fixture markers are incomplete'}
+          $targets=[ordered]@{
+            f200=[ordered]@{engine_sha256='D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B';base='2.0.77';mir='5.0.20000'}
+            f210=[ordered]@{engine_sha256='FE4A1DA30F322A0D0B8AEB3DF7276332222BAAA143E2352569B723E84B2B9060';base='2.1.23';mir='5.0.21000'}
+          }
+          function New-LibraryWitnessSpec([hashtable]$Target){return @{library_witness_target=([ordered]@{engine_sha256=$Target.engine_sha256;base=$Target.base;mir=$Target.mir})}}
+          function Assert-LibraryWitnessTargetRejects([hashtable]$Spec,[string]$Engine,[string]$Name){
+            try{$null=Get-LibraryWitnessTarget $Spec $Engine}catch{return}
+            throw "reader accepted invalid witness target: $Name"
+          }
+          foreach($targetName in @('f200','f210')){
+            $target=$targets[$targetName]
+            $expectedLibraryWitness=Get-LibraryWitnessTarget (New-LibraryWitnessSpec $target) $target.engine_sha256
+            if($expectedLibraryWitness.base -cne $target.base -or $expectedLibraryWitness.mir -cne $target.mir){throw "selected witness target differs: $targetName"}
+            $targetMarkers=@($markerSets[$targetName])
+            if($targetMarkers.Count -ne 4){throw "actual fixture markers are incomplete: $targetName"}
+            foreach($marker in $targetMarkers){
+              $stage=[string]$marker['stage']
+              $line='[MIR5_LIBRARY_MULTIPLAYER] RESULT '+($marker|ConvertTo-Json -Depth 20 -Compress)
+              $accepted=Get-StageMarker $line $stage ([int]$expectedJoins[$stage]) $expectedLibraryWitness
+              if($null -eq $accepted -or $accepted.stage -cne $stage){throw "actual fixture marker rejected: $targetName/$stage"}
+            }
+          }
+          Assert-LibraryWitnessTargetRejects (New-LibraryWitnessSpec $targets.f210) $targets.f200.engine_sha256 'cross-base'
+          $crossMir=New-LibraryWitnessSpec $targets.f210;$crossMir.library_witness_target.mir=$targets.f200.mir
+          Assert-LibraryWitnessTargetRejects $crossMir $targets.f210.engine_sha256 'cross-MIR'
+          Assert-LibraryWitnessTargetRejects (New-LibraryWitnessSpec $targets.f200) ('A'*64) 'unknown-engine'
+          Assert-LibraryWitnessTargetRejects @{} $targets.f200.engine_sha256 'missing-target'
+          $expectedLibraryWitness=Get-LibraryWitnessTarget (New-LibraryWitnessSpec $targets.f200) $targets.f200.engine_sha256
+          $markers=@($markerSets['f200'])
           function ConvertTo-LibraryMarkerLine([hashtable]$Marker){
             return '[MIR5_LIBRARY_MULTIPLAYER] RESULT '+($Marker|ConvertTo-Json -Depth 20 -Compress)
           }
@@ -713,14 +746,14 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
             $stage=[string]$Marker['stage']
             if(-not $expectedJoins.ContainsKey($stage)){throw "unexpected actual fixture stage: $stage"}
             $line=ConvertTo-LibraryMarkerLine $Marker
-            $accepted=Get-StageMarker $line $stage ([int]$expectedJoins[$stage])
+            $accepted=Get-StageMarker $line $stage ([int]$expectedJoins[$stage]) $expectedLibraryWitness
             if($null -eq $accepted -or $accepted.stage -cne $stage){throw "actual fixture marker rejected: $stage"}
           }
           function Assert-LibraryReaderRejects([hashtable]$Marker,[string]$ExpectedStage,[int]$ExpectedJoins,[string]$Name){
             # Construct the candidate marker before validation so construction errors cannot count as rejection.
             $line=ConvertTo-LibraryMarkerLine $Marker
             try{
-              $accepted=Get-StageMarker $line $ExpectedStage $ExpectedJoins
+              $accepted=Get-StageMarker $line $ExpectedStage $ExpectedJoins $expectedLibraryWitness
             }catch{return}
             if($null -ne $accepted){throw "reader accepted invalid marker: $Name"}
           }
@@ -870,7 +903,7 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
         '''
         with tempfile.TemporaryDirectory(prefix="mir5-library-marker-reader-") as work:
             marker_path = Path(work) / "actual-fixture-markers.json"
-            marker_path.write_text(json.dumps(result["markers"]), encoding="utf-8")
+            marker_path.write_text(json.dumps({target: result["markers"] for target, result in results.items()}), encoding="utf-8")
             reader = subprocess.run(
                 ["pwsh", "-NoLogo", "-NoProfile", "-Command", script],
                 capture_output=True, text=True,

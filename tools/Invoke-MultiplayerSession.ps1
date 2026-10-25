@@ -1,4 +1,4 @@
-# Shared guarded process lifecycle for the two explicit private F200 scenarios.
+# Shared guarded process lifecycle for the explicit private Library scenarios.
 # It runs only under the governed native-probe parent. The parent prepares and
 # validates the selected library, configs, and player-data files before calling
 # this script. Spec fields: engine, engine_sha256, archive_library, workroot,
@@ -347,6 +347,20 @@ function Assert-Active {
 function Test-LibraryInteger([object]$Value) {
   return $Value -is [int] -or $Value -is [long]
 }
+function Get-LibraryWitnessTarget([hashtable]$Spec,[string]$EngineSha256) {
+  $targets=@(
+    [ordered]@{engine_sha256='D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B';base='2.0.77';mir='5.0.20000'},
+    [ordered]@{engine_sha256='FE4A1DA30F322A0D0B8AEB3DF7276332222BAAA143E2352569B723E84B2B9060';base='2.1.23';mir='5.0.21000'}
+  )
+  $matches=@($targets|Where-Object {[string]$_.engine_sha256 -ceq $EngineSha256})
+  Assert-Session ($matches.Count -eq 1) 'Library session engine does not admit a witness target'
+  Assert-Session ($Spec.ContainsKey('library_witness_target') -and $Spec.library_witness_target -is [System.Collections.IDictionary]) 'Library session witness target is absent or malformed'
+  $provided=$Spec.library_witness_target
+  Assert-Session ($provided.Count -eq 3 -and $provided.Contains('engine_sha256') -and $provided.Contains('base') -and $provided.Contains('mir') -and $provided.engine_sha256 -is [string] -and $provided.base -is [string] -and $provided.mir -is [string]) 'Library session witness target is absent or malformed'
+  $expected=$matches[0]
+  Assert-Session ($provided.engine_sha256 -ceq [string]$expected.engine_sha256 -and $provided.base -ceq [string]$expected.base -and $provided.mir -ceq [string]$expected.mir) 'Library session witness target differs from validated launch input'
+  return [pscustomobject]$expected
+}
 function Assert-LibraryWitnessBoolean([object]$Witness, [string]$Field, [bool]$Expected, [string]$Stage) {
   $property = $Witness.PSObject.Properties[$Field]
   Assert-Session ($null -ne $property -and $property.Value -is [bool] -and $property.Value -eq $Expected) "$Stage Library witness $Field differs"
@@ -376,7 +390,7 @@ function Assert-LibraryLiveRefresh([object]$Witness, [string]$Stage) {
   Assert-LibraryWitnessBoolean $live 'root_and_query_identity_preserved' $true $Stage
   Assert-LibraryWitnessBoolean $live 'cross_force_view_state_preserved' $true $Stage
 }
-function Get-StageMarker([string]$Text, [string]$Stage, [int]$ExpectedJoins) {
+function Get-StageMarker([string]$Text, [string]$Stage, [int]$ExpectedJoins, [object]$ExpectedLibraryWitness) {
   Assert-Session ($Stage -cin @('ready','rejoin-ready','restart-ready','completed')) "unsupported stage: $Stage"
   $rows = [Collections.Generic.List[object]]::new()
   foreach ($match in [regex]::Matches($Text, ('\['+[regex]::Escape($markerPrefix)+'\] RESULT (\{[^\r\n]+\})'))) {
@@ -388,6 +402,7 @@ function Get-StageMarker([string]$Text, [string]$Stage, [int]$ExpectedJoins) {
   Assert-Session ($rows.Count -eq 1 -and $rows[0].status -ceq 'passed') "stage witness differs: $Stage"
   $witness = $rows[0].witnesses
   if($fixtureCase-ceq'library-multiplayer') {
+    Assert-Session ($null -ne $ExpectedLibraryWitness) "$Stage Library witness target is absent"
     Assert-LibraryWitnessInteger $witness 'actual_join_events' $ExpectedJoins $Stage
     Assert-LibraryWitnessBoolean $witness 'two_connected_clients_required' $true $Stage
     Assert-LibraryWitnessBoolean $witness 'distinct_personal_query_and_selection' $true $Stage
@@ -401,7 +416,7 @@ function Get-StageMarker([string]$Text, [string]$Stage, [int]$ExpectedJoins) {
     }
     $base = $witness.PSObject.Properties['base_version']
     $mir = $witness.PSObject.Properties['mir_version']
-    Assert-Session ($null -ne $base -and $base.Value -is [string] -and $base.Value -ceq '2.0.77' -and $null -ne $mir -and $mir.Value -is [string] -and $mir.Value -ceq '5.0.20000') "$Stage Library witness version differs"
+    Assert-Session ($null -ne $base -and $base.Value -is [string] -and $base.Value -ceq [string]$ExpectedLibraryWitness.base -and $null -ne $mir -and $mir.Value -is [string] -and $mir.Value -ceq [string]$ExpectedLibraryWitness.mir) "$Stage Library witness version differs"
     $liveProperty = $witness.PSObject.Properties['live_refresh']
     Assert-Session ($null -ne $liveProperty -and $liveProperty.Value -is [pscustomobject]) "$Stage Library live refresh is absent or malformed"
     $live = $liveProperty.Value
@@ -564,7 +579,10 @@ foreach ($field in @('engine','engine_sha256','archive_library','workroot','seed
 }
 $engine = Resolve-Existing ([string]$spec.engine) 'Leaf' 'engine'
 Assert-Session ([string]$spec.engine_sha256 -cmatch '^[A-Fa-f0-9]{64}$') 'engine hash is invalid'
-Assert-Session ((Get-SessionHash $engine) -ceq ([string]$spec.engine_sha256).ToUpperInvariant()) 'engine hash differs'
+$engineSha=Get-SessionHash $engine
+Assert-Session ($engineSha -ceq ([string]$spec.engine_sha256).ToUpperInvariant()) 'engine hash differs'
+$libraryWitnessTarget=$null
+if($fixtureCase-ceq'library-multiplayer'){$libraryWitnessTarget=Get-LibraryWitnessTarget $spec $engineSha}
 $library = Resolve-Existing ([string]$spec.archive_library) 'Container' 'archive library'
 $workroot = Resolve-BuildInput ([string]$spec.workroot) 'Container' 'workroot'
 $seed = Resolve-BuildInput ([string]$spec.seed_save) 'Leaf' 'seed save'
@@ -769,9 +787,9 @@ try {
   } else {
 
     $server = Start-Server 'server-initial' $seed
-    [void](Wait-For 'ready marker' { param($ignored) Get-StageMarker (Read-LogText (Join-Path $serverWriteData 'factorio-current.log')) 'ready' 0 })
+    [void](Wait-For 'ready marker' { param($ignored) Get-StageMarker (Read-LogText (Join-Path $serverWriteData 'factorio-current.log')) 'ready' 0 $libraryWitnessTarget })
     $activeClients = Start-Clients 'initial'
-    [void](Wait-For 'rejoin-ready marker' { param($ignored) Get-StageMarker (Read-LogText (Join-Path $serverWriteData 'factorio-current.log')) 'rejoin-ready' 2 })
+    [void](Wait-For 'rejoin-ready marker' { param($ignored) Get-StageMarker (Read-LogText (Join-Path $serverWriteData 'factorio-current.log')) 'rejoin-ready' 2 $libraryWitnessTarget })
     if($fixtureCase-ceq'library-multiplayer') {
       [void](Wait-For 'complete Availability client screenshots' { Find-Screenshots @('availability') })
       [void](Wait-For 'complete initial client screenshots' { Find-Screenshots @('initial') })
@@ -788,7 +806,7 @@ try {
       $server | Add-Member -NotePropertyName memory_observation -NotePropertyValue $registration -Force
     }
     $activeClients = Start-Clients 'rejoin'
-    [void](Wait-For 'restart-ready marker' { param($ignored) Get-StageMarker (Read-LogText (Join-Path $serverWriteData 'factorio-current.log')) 'restart-ready' 4 })
+    [void](Wait-For 'restart-ready marker' { param($ignored) Get-StageMarker (Read-LogText (Join-Path $serverWriteData 'factorio-current.log')) 'restart-ready' 4 $libraryWitnessTarget })
     if($fixtureCase-ceq'library-multiplayer'){[void](Wait-For 'complete rejoin client screenshots' { Find-Screenshots @('rejoin') })}
     [void](Wait-For 'complete restart save' { if (Test-SaveReady $restartSave) { return $true }; return $false })
     $restartHash = Get-SessionHash $restartSave
@@ -805,7 +823,7 @@ try {
       return [regex]::IsMatch($delta, '(?im)Hosting game at|Starting server')
     })
     $activeClients = Start-Clients 'restart'
-    $completed = Wait-For 'completed marker' { param($ignored) Get-StageMarker (Read-LogText (Join-Path $serverWriteData 'factorio-current.log')) 'completed' 6 }
+    $completed = Wait-For 'completed marker' { param($ignored) Get-StageMarker (Read-LogText (Join-Path $serverWriteData 'factorio-current.log')) 'completed' 6 $libraryWitnessTarget }
     Assert-Session ($completed.witnesses.host_restart_observed -eq $true -and $completed.witnesses.on_load_read_only -eq $true) 'completed witness lacks host-reload evidence'
     if($fixtureCase-ceq'library-multiplayer') {
       Assert-Session ($completed.witnesses.availability_terminal_labels_checked -eq $true -and $completed.witnesses.screenshot_calls -eq 10) 'completed witness lacks Availability evidence'
