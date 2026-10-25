@@ -7,24 +7,19 @@ local profiles = {f200 = "k2-base-f200", f210 = "k2-base-f210"}
 local profile = profiles[target.id]
 if profile == nil then error("MIR K2 Base gear binding has no admitted target", 2) end
 
--- F210 consumes this named native recipe and uses this item icon for the
--- generated technology. Retain the captured source shape instead of using
--- unrelated K2, flib, Base, or menu-simulation version strings as a proxy.
-local function equal_stack(actual, expected)
-  return type(actual) == "table" and #actual == 1 and type(actual[1]) == "table"
-    and actual[1].type == expected.type and actual[1].name == expected.name and actual[1].amount == expected.amount
-end
-
+-- The percentage effect consumes this recipe identity and its gear product.
+-- Its ingredients, batch yield, byproducts and item reskins may be changed
+-- by other mods without changing that binding. Keep the authored K2 Asset
+-- icon rather than certifying an unrelated item presentation field.
 local function preflight_f210(raw)
   local recipe = raw.recipe["iron-gear-wheel"]
-  if not equal_stack(recipe and recipe.ingredients, {type = "item", name = "iron-plate", amount = 1})
-      or not equal_stack(recipe and recipe.results, {type = "item", name = "iron-gear-wheel", amount = 1}) then
-    error("MIR F210 K2 gear binding source recipe changed", 2)
+  for _, product in ipairs(type(recipe.results) == "table" and recipe.results or {}) do
+    if type(product) == "table" and (product.type == nil or product.type == "item")
+        and (product.name or product[1]) == "iron-gear-wheel" then
+      return
+    end
   end
-  local item = type(raw.item) == "table" and raw.item["iron-gear-wheel"] or nil
-  if type(item) ~= "table" or item.icon ~= "__Krastorio2Assets__/icons/items/iron-gear-wheel.png" then
-    error("MIR F210 K2 gear binding source icon changed", 2)
-  end
+  error("MIR F210 K2 gear binding recipe has no iron-gear-wheel product", 2)
 end
 
 return {

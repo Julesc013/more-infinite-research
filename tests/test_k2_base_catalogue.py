@@ -698,14 +698,16 @@ class K2BaseCatalogueTests(unittest.TestCase):
             results = {{type = "item", name = "not-an-iron-gear", amount = 1}},
           }}, item = { ["iron-gear-wheel"] = {icon = expected.item_icon} }}
           ok, message = pcall(gears.select, f210_facts.cases[1].mods, changed_recipe)
-          assert(not ok and tostring(message):find("F210 K2 gear binding source recipe changed", 1, true),
+          assert(not ok and tostring(message):find("F210 K2 gear binding recipe has no iron-gear-wheel product", 1, true),
             "K2 binding accepted a changed native gear recipe source")
           local changed_icon = {recipe = { ["iron-gear-wheel"] = {
-            ingredients = expected.ingredients, results = expected.results,
+            ingredients = {{type = "item", name = "tin-plate", amount = 3}},
+            results = {{type = "item", name = "iron-gear-wheel", amount = 2},
+              {type = "item", name = "stone", amount = 1}},
           }}, item = { ["iron-gear-wheel"] = {icon = "__base__/graphics/icons/iron-gear-wheel.png"} }}
           ok, message = pcall(gears.select, f210_facts.cases[1].mods, changed_icon)
-          assert(not ok and tostring(message):find("F210 K2 gear binding source icon changed", 1, true),
-            "K2 binding accepted a changed native gear icon source")
+          assert(ok and message.profile == expected.binding_profile and message.icon == expected.item_icon,
+            "unconsumed recipe inputs/yield/byproducts or an item reskin rejected the gear binding")
         ''')
 
         original = dict(self.f210_facts["cases"][0]["mods"])
