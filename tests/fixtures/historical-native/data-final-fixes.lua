@@ -2,6 +2,35 @@
 -- acceleration validates the selected direct output before changing its cost
 -- and time, and intentionally never changes the observed numeric continuation.
 local target = require("target")
+if target.science_policy == "all" then
+  assert(target.id == "f017" or target.id == "f100" or target.id == "f110",
+    "historical all science target differs")
+
+  local red = assert(data.raw.recipe["automation-science-pack"], "historical initial red recipe is absent")
+  assert(red.enabled ~= false and red.result == "automation-science-pack" and red.results == nil,
+    "historical initial red recipe differs")
+  assert(data.raw.technology["automation-science-pack"] == nil,
+    "historical initial red owner differs")
+
+  local function assert_unit(name, science)
+    local technology = assert(data.raw.technology[name], "historical all science technology is absent")
+    local unit = assert(technology.unit, "historical all science unit is absent")
+    assert(#unit.ingredients == #science, "historical all science ingredient count differs")
+    for index, pack in ipairs(science) do
+      local ingredient = unit.ingredients[index]
+      assert(ingredient[1] == pack and ingredient[2] == 1,
+        "historical all science ingredient differs")
+    end
+    for _, prerequisite in ipairs(technology.prerequisites or {}) do
+      assert(prerequisite ~= "automation-science-pack", "historical initial red prerequisite differs")
+    end
+  end
+
+  assert_unit(target.direct, target.direct_science)
+  assert_unit(target.continuation, target.continuation_science)
+  return
+end
+
 if target.id ~= "f013" and target.id ~= "f014" then return end
 
 local technology = assert(data.raw.technology[target.direct], "missing historical direct probe")

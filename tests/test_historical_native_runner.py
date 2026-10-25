@@ -4,6 +4,7 @@ These checks characterize source composition and runner routing only. They do
 not claim an engine result; the seven exact engines execute the fixture later.
 """
 import argparse
+import hashlib
 import json
 import os
 from pathlib import Path
@@ -16,6 +17,8 @@ import zipfile
 ROOT = Path(__file__).resolve().parents[1]
 FIXTURE = ROOT / "tests/fixtures/historical-native"
 RUNNER = ROOT / "tools/Invoke-NativeFixture.ps1"
+ALL_SCIENCE_METADATA = FIXTURE / "metadata-all-science.json"
+DEFAULT_METADATA_SHA256 = "f9ba6c05cbe2f41e590e5e9f46963dd369d837e80796002716d3e5332884b32f"
 
 
 class HistoricalNativeFixtureControls(unittest.TestCase):
@@ -130,6 +133,138 @@ class HistoricalNativeFixtureControls(unittest.TestCase):
                     ",".join(row.get("continuation_science", [])),
                 )
                 self.assertEqual(actual, wanted)
+
+    def test_all_science_metadata_uses_only_the_three_native_red_recipe_targets(self):
+        default_blob = subprocess.run(
+            ["git", "show", "HEAD:tests/fixtures/historical-native/metadata.json"], cwd=ROOT,
+            capture_output=True, check=True,
+        ).stdout
+        self.assertEqual(hashlib.sha256(default_blob).hexdigest(), DEFAULT_METADATA_SHA256)
+        self.assertTrue(all("science_policy" not in row for row in self.metadata["targets"].values()))
+        alternate = json.loads(ALL_SCIENCE_METADATA.read_text(encoding="utf-8"))
+        self.assertEqual(set(alternate["targets"]), {"f017", "f100", "f110"})
+
+        functions = r'''
+          $ErrorActionPreference='Stop'; Set-StrictMode -Version Latest
+          $tokens=$null;$errors=$null
+          $ast=[Management.Automation.Language.Parser]::ParseFile($env:MIR_TEST_RUNNER,[ref]$tokens,[ref]$errors)
+          if($errors.Count){throw 'runner parse failed'}
+          foreach($name in @('Assert-Fixture','Get-FixtureSha','Get-HistoricalFixtureTarget',
+            'ConvertTo-HistoricalFixtureTargetLiteral')){
+            $node=@($ast.FindAll({param($n) $n -is
+              [Management.Automation.Language.FunctionDefinitionAst] -and $n.Name -ceq $name},$true))
+            if($node.Count -ne 1){throw "helper missing: $name"}
+            Invoke-Expression $node[0].Extent.Text
+          }
+          $default=Get-HistoricalFixtureTarget -Target f017 -MetadataPath $env:MIR_TEST_DEFAULT
+          $rows=@()
+          foreach($target in @('f017','f100','f110')){
+            $selected=Get-HistoricalFixtureTarget -Target $target -MetadataPath $env:MIR_TEST_ALL
+            $rows+=[ordered]@{target=$target;policy=$selected.science_policy;
+              literal=(ConvertTo-HistoricalFixtureTargetLiteral $selected)}
+          }
+          $rejected=$false
+          try{Get-HistoricalFixtureTarget -Target f015 -MetadataPath $env:MIR_TEST_BAD|Out-Null}
+          catch{$rejected=$_.Exception.Message -match 'historical science policy differs'}
+          if(-not $rejected){throw 'all science policy accepted a non-red-recipe target'}
+          [ordered]@{default_literal=(ConvertTo-HistoricalFixtureTargetLiteral $default);rows=$rows}|ConvertTo-Json -Compress
+        '''
+        with tempfile.TemporaryDirectory(prefix="mir5-historical-all-metadata-") as work:
+            bad = json.loads(ALL_SCIENCE_METADATA.read_text(encoding="utf-8"))
+            bad["targets"]["f015"] = bad["targets"].pop("f017")
+            bad_path = Path(work) / "bad.json"
+            bad_path.write_text(json.dumps(bad), encoding="utf-8")
+            result = subprocess.run(
+                ["pwsh", "-NoLogo", "-NoProfile", "-Command", functions], cwd=ROOT,
+                env=dict(os.environ, MIR_TEST_RUNNER=str(RUNNER),
+                         MIR_TEST_DEFAULT=str(FIXTURE / "metadata.json"),
+                         MIR_TEST_ALL=str(ALL_SCIENCE_METADATA), MIR_TEST_BAD=str(bad_path)),
+                text=True, capture_output=True, check=False,
+            )
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        rendered = json.loads(result.stdout)
+        self.assertEqual(rendered["default_literal"], """return {
+  id=\"f017\",
+  mir_version=\"5.0.01700\",
+  direct=\"recipe-prod-research_character_mining_speed-1\",
+  continuation=\"inserter-capacity-bonus-8\",
+  continuation_mode=\"lab\",
+  direct_effect=0.1,
+  queue_api=true,
+  direct_science={\"military-science-pack\",\"utility-science-pack\"},
+  continuation_science={\"automation-science-pack\",\"chemical-science-pack\",\"logistic-science-pack\",\"production-science-pack\",\"utility-science-pack\"},
+}
+""")
+        expected_direct = ("military-science-pack", "utility-science-pack", "automation-science-pack",
+                           "logistic-science-pack", "chemical-science-pack", "production-science-pack",
+                           "space-science-pack")
+        expected_continuation = ("automation-science-pack", "chemical-science-pack", "logistic-science-pack",
+                                 "production-science-pack", "utility-science-pack", "military-science-pack",
+                                 "space-science-pack")
+        for row in rendered["rows"]:
+            with self.subTest(target=row["target"]):
+                self.assertEqual(row["policy"], "all")
+                self.assertIn('science_policy="all",', row["literal"])
+                self.assertIn('direct_science={' + ",".join(f'"{name}"' for name in expected_direct) + '}', row["literal"])
+                self.assertIn('continuation_science={' + ",".join(f'"{name}"' for name in expected_continuation) + '}', row["literal"])
+
+    def test_shared_science_source_emits_the_all_policy_historical_vectors(self):
+        self.lua.globals().player_root = (ROOT / "source").as_posix()
+        self.lua.execute(r'''
+          package.path = player_root .. "/?.lua;" .. player_root .. "/?/init.lua"
+          package.cpath = ""
+          local science = require("research.science")
+          local packs = {
+            "automation-science-pack", "logistic-science-pack", "chemical-science-pack",
+            "production-science-pack", "military-science-pack", "utility-science-pack",
+            "space-science-pack"
+          }
+          function shared_all_vector(id, source)
+            local raw = {tool={}, item={}, recipe={}, technology={}, lab={all={inputs={}}}}
+            for _, pack in ipairs(packs) do
+              raw.tool[pack] = {name=pack}
+              raw.lab.all.inputs[#raw.lab.all.inputs + 1] = pack
+              raw.recipe[pack] = {enabled=false, result=pack}
+              raw.technology[pack] = {effects={{type="unlock-recipe", recipe=pack}}, prerequisites={}}
+            end
+            -- These engines retain the Base initial red recipe rather than a
+            -- same-named owner technology.
+            raw.recipe["automation-science-pack"] = {result="automation-science-pack"}
+            raw.technology["automation-science-pack"] = nil
+            raw.item.satellite = {rocket_launch_product={"space-science-pack", 1000}}
+            raw.technology["space-science-pack"] = {
+              effects={{type="unlock-recipe", recipe="satellite"}}, prerequisites={}
+            }
+            local row = {name="historical-all-policy", enabled=true, prerequisites={},
+              unit={count=1, time=1, ingredients=source}}
+            local report = science.apply(row, {}, science.prepare({raw=raw, target={id=id}, mods={},
+              options={["mir-science-pack-ingredient-policy"]="all"}}))
+            local names, red_gate = {}, false
+            for _, ingredient in ipairs(row.unit.ingredients) do names[#names + 1] = ingredient[1] end
+            for _, prerequisite in ipairs(row.prerequisites) do
+              red_gate = red_gate or prerequisite == "automation-science-pack"
+            end
+            return report.enabled, report.reason, table.concat(names, ","), red_gate
+          end
+        ''')
+        expected = {
+            "direct": "military-science-pack,utility-science-pack,automation-science-pack,logistic-science-pack,chemical-science-pack,production-science-pack,space-science-pack",
+            "continuation": "automation-science-pack,chemical-science-pack,logistic-science-pack,production-science-pack,utility-science-pack,military-science-pack,space-science-pack",
+        }
+        for target in ("f017", "f100", "f110"):
+            for name, source in (
+                ("direct", (("military-science-pack", 1), ("utility-science-pack", 1))),
+                ("continuation", (("automation-science-pack", 1), ("chemical-science-pack", 1),
+                                  ("logistic-science-pack", 1), ("production-science-pack", 1),
+                                  ("utility-science-pack", 1))),
+            ):
+                with self.subTest(target=target, vector=name):
+                    lua_source = self.lua.table_from([self.lua.table_from(item) for item in source])
+                    enabled, reason, actual, red_gate = self.lua.eval("shared_all_vector")(target, lua_source)
+                    self.assertTrue(enabled)
+                    self.assertEqual(reason, "all")
+                    self.assertEqual(actual, expected[name])
+                    self.assertFalse(red_gate)
 
     def test_control_and_on_load_do_not_need_game_or_runtime_active_mods(self):
         self.lua.globals().fixture_root = FIXTURE.as_posix()
@@ -297,18 +432,22 @@ class HistoricalNativeFixtureControls(unittest.TestCase):
         self.lua.globals().settings_updates = (FIXTURE / "settings-updates.lua").as_posix()
         self.lua.execute(r'''
           package.path = fixture_root .. "/?.lua"
-          function install_fixture_target(id)
+          function install_fixture_target(id, science_policy)
             package.loaded["target"] = nil
             package.loaded["target-literal"] = nil
             package.preload["target-literal"] = function() return {
-              id=id, direct="recipe-prod-research_character_mining_speed-1"
+              id=id, science_policy=science_policy,
+              direct="recipe-prod-research_character_mining_speed-1"
             } end
           end
-          function setting_defaults(id, with_continuation)
-            install_fixture_target(id)
+          function setting_defaults(id, with_continuation, science_policy)
+            install_fixture_target(id, science_policy)
             local direct = "research_character_mining_speed"
             data = {raw = {
               ["bool-setting"] = {["ips-enable-" .. direct] = {default_value = false}},
+              ["string-setting"] = { ["mir-science-pack-ingredient-policy"] = {
+                setting_type="startup", allowed_values={"configured", "all"}, default_value="configured"
+              }},
               ["int-setting"] = {
                 ["ips-cost-base-" .. direct] = {default_value = 8000},
                 ["ips-cost-linear-increment-" .. direct] = {default_value = 0},
@@ -349,9 +488,14 @@ class HistoricalNativeFixtureControls(unittest.TestCase):
                   data.raw["int-setting"]["mir-max-level-inserter-capacity-bonus"].default_value,
                   data.raw["int-setting"]["mir-research-time-inserter-capacity-bonus"].default_value,
                   data.raw["int-setting"]["mir-effect-per-level-inserter-capacity-bonus"].default_value,
-                } or false
+                } or false,
+              science_policy = data.raw["string-setting"]["mir-science-pack-ingredient-policy"].default_value,
             }
             return out
+          end
+          function setting_policy_error(id, science_policy)
+            local ok, message = pcall(function() setting_defaults(id, true, science_policy) end)
+            return ok, message
           end
         ''')
         for target, with_continuation, expected_direct in (
@@ -369,6 +513,15 @@ class HistoricalNativeFixtureControls(unittest.TestCase):
                     )
                 else:
                     self.assertFalse(row["continuation"])
+
+        for target in ("f017", "f100", "f110"):
+            with self.subTest(target=target, policy="all"):
+                row = self.lua.eval("setting_defaults")(target, True, "all")
+                self.assertEqual(row["science_policy"], "all")
+        self.assertEqual(self.lua.eval("setting_defaults")("f017", True)["science_policy"], "configured")
+        rejected = self.lua.eval("setting_policy_error")("f015", "all")
+        self.assertFalse(rejected[0])
+        self.assertIn("historical all science target differs", rejected[1])
 
     def test_f013_f014_final_stage_accelerates_only_a_validated_direct_probe(self):
         self.lua.globals().fixture_root = FIXTURE.as_posix()
@@ -415,6 +568,68 @@ class HistoricalNativeFixtureControls(unittest.TestCase):
         untouched = self.lua.eval("accelerate_old")("f015", 8000)
         self.assertTrue(untouched[0])
         self.assertEqual(untouched[2:], (8000, 60, 914489, 60))
+
+    def test_all_science_final_stage_preflights_the_actual_initial_red_surface(self):
+        self.lua.globals().fixture_root = FIXTURE.as_posix()
+        self.lua.globals().final_fixes = (FIXTURE / "data-final-fixes.lua").as_posix()
+        self.lua.execute(r'''
+          package.path = fixture_root .. "/?.lua"
+          local direct_science = {
+            "military-science-pack", "utility-science-pack", "automation-science-pack",
+            "logistic-science-pack", "chemical-science-pack", "production-science-pack",
+            "space-science-pack"
+          }
+          local continuation_science = {
+            "automation-science-pack", "chemical-science-pack", "logistic-science-pack",
+            "production-science-pack", "utility-science-pack", "military-science-pack",
+            "space-science-pack"
+          }
+          function install_all_fixture_target(id)
+            package.loaded["target"] = nil
+            package.loaded["target-literal"] = nil
+            package.preload["target-literal"] = function() return {
+              id=id, science_policy="all", direct="recipe-prod-research_character_mining_speed-1",
+              direct_science=direct_science, continuation="inserter-capacity-bonus-8",
+              continuation_science=continuation_science
+            } end
+          end
+          local function ingredients(names)
+            local out = {}
+            for _, name in ipairs(names) do out[#out + 1] = {name, 1} end
+            return out
+          end
+          function all_science_preflight(id, mutation)
+            install_all_fixture_target(id)
+            local red = {result="automation-science-pack"}
+            local direct = {unit={ingredients=ingredients(direct_science)}, prerequisites={}}
+            local continuation = {unit={ingredients=ingredients(continuation_science)}, prerequisites={}}
+            local technology = {
+              ["recipe-prod-research_character_mining_speed-1"] = direct,
+              ["inserter-capacity-bonus-8"] = continuation,
+            }
+            if mutation == "disabled-red" then red.enabled = false end
+            if mutation == "red-owner" then technology["automation-science-pack"] = {} end
+            if mutation == "wrong-ingredient" then direct.unit.ingredients[3] = {"wrong-pack", 1} end
+            if mutation == "red-prerequisite" then continuation.prerequisites = {"automation-science-pack"} end
+            data = {raw={recipe={ ["automation-science-pack"] = red }, technology=technology}}
+            local ok, message = pcall(function() assert(loadfile(final_fixes, "t", _ENV))() end)
+            return ok, message
+          end
+        ''')
+        for target in ("f017", "f100", "f110"):
+            with self.subTest(target=target):
+                result = self.lua.eval("all_science_preflight")(target, "")
+                self.assertTrue(result[0])
+        for mutation, message in (
+            ("disabled-red", "historical initial red recipe differs"),
+            ("red-owner", "historical initial red owner differs"),
+            ("wrong-ingredient", "historical all science ingredient differs"),
+            ("red-prerequisite", "historical initial red prerequisite differs"),
+        ):
+            with self.subTest(mutation=mutation):
+                result = self.lua.eval("all_science_preflight")("f017", mutation)
+                self.assertFalse(result[0])
+                self.assertIn(message, result[1])
 
     def test_runner_keeps_historical_server_reloads_separate_from_the_modern_benchmark_vector(self):
         source = RUNNER.read_text(encoding="utf-8")
