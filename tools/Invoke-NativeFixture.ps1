@@ -102,6 +102,11 @@ function Get-HistoricalFixtureTarget([string]$Target,[string]$MetadataPath) {
   foreach($field in @('direct','continuation')){
     Assert-Fixture ([string]$selected[$field] -cmatch '^[a-z0-9][a-z0-9_-]*$') "historical target $field is not a literal-safe identifier"
   }
+  $sciencePolicy=''
+  if($selected.ContainsKey('science_policy')){
+    $sciencePolicy=[string]$selected.science_policy
+    Assert-Fixture ($sciencePolicy -ceq 'all' -and $Target -in @('f017','f100','f110')) 'historical science policy differs'
+  }
   $directScience=@($selected.direct_science)
   Assert-Fixture ($directScience.Count -gt 0) 'historical target lacks direct science'
   foreach($name in $directScience){Assert-Fixture ([string]$name -cmatch '^[a-z0-9][a-z0-9_-]*$') 'historical direct science is not a literal-safe identifier'}
@@ -116,7 +121,7 @@ function Get-HistoricalFixtureTarget([string]$Target,[string]$MetadataPath) {
     Assert-Fixture ($continuationScience.Count -gt 0) 'historical lab continuation lacks science'
     foreach($name in $continuationScience){Assert-Fixture ([string]$name -cmatch '^[a-z0-9][a-z0-9_-]*$') 'historical continuation science is not a literal-safe identifier'}
   }
-  [pscustomobject][ordered]@{path=$metadata;sha256=Get-FixtureSha $metadata;name=[string]$value.name;version=[string]$value.version;target=$Target;factorio_version=[string]$selected.factorio_version;minimum_base=[string]$selected.minimum_base;mir_version=[string]$selected.mir_version;definition=$selected}
+  [pscustomobject][ordered]@{path=$metadata;sha256=Get-FixtureSha $metadata;name=[string]$value.name;version=[string]$value.version;target=$Target;factorio_version=[string]$selected.factorio_version;minimum_base=[string]$selected.minimum_base;mir_version=[string]$selected.mir_version;science_policy=$sciencePolicy;definition=$selected}
 }
 function ConvertTo-HistoricalFixtureTargetLiteral($Fixture) {
   $value=$Fixture.definition
@@ -126,6 +131,7 @@ function ConvertTo-HistoricalFixtureTargetLiteral($Fixture) {
   foreach($field in @('mir_version','direct','continuation','continuation_mode')){
     $lines.Add(('  {0}="{1}",' -f $field,[string]$value[$field]))
   }
+  if($Fixture.science_policy -ceq 'all'){$lines.Add('  science_policy="all",')}
   $effect=[double]$value.direct_effect
   $lines.Add(('  direct_effect={0},' -f $effect.ToString('0.################',[Globalization.CultureInfo]::InvariantCulture)))
   if($value.ContainsKey('queue_api') -and [bool]$value.queue_api){$lines.Add('  queue_api=true,')}
