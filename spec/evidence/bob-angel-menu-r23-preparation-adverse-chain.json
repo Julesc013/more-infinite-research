@@ -24,7 +24,7 @@
     "actual_player_source_tree": "25442a5bd7838f124952507854426e3b8e868475",
     "asset_inventory_sha256": "4FD1A20E6C2E3D3F27D6158D60C931333B0E5053926019BD6C59493A9AF88498",
     "current_f200": {
-      "version": "5.0.20002",
+      "version": "5.0.20000",
       "bytes": 553231,
       "sha256": "B67FF048860F2707579CF582C933ED46D7BF52769F5ABE1B0279DDCC2A0323BD"
     },
@@ -98,7 +98,7 @@
     "single_job_result_path": "bob-angel-menu-r23/single-job-result.json",
     "single_job_result_sha256": "D8BC846E6F4821C0AC655A33409D98D3C4FCBFA6D8D5B6AF189E7DB20EDD99C8",
     "worker_failure_sha256": "85130D925C1CF4AC660EB6DC6E6ECE5A15233CB41A2398F2208CF7117397DBD3",
-    "failure_disposition": "The frozen reader expected an older candidate-intent schema and later older receipt shapes after native preparation completed. Timing did not begin."
+    "failure_disposition": "The original frozen reader required candidate-intent schema 1 and refused the actual schema 2 after native preparation completed. The later baseline-dumps and replay-equality-array receipt shapes were identified only by read-only audit of the untouched packet. Timing did not begin."
   },
   "primary_custody": "build/mir5/recovery-historical/bob-angel-menu-comparison-r23/40206608163",
   "limits": [
