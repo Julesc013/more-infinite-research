@@ -12,7 +12,7 @@ if type(mods) == "table" and (prerequisite_target.id == "f200" or prerequisite_t
     and ((type(mods.angelssmelting) == "string" and mods.angelssmelting ~= "")
       or (type(mods.astroponics) == "string" and mods.astroponics ~= ""
         and type(mods["planet-muluna"]) == "string" and mods["planet-muluna"] ~= "")) then
-  require("overrides.prerequisite_repairs").apply(data.raw, mods, prerequisite_target)
+  require("overrides.prerequisite_repairs").apply(data.raw, mods, prerequisite_target, log)
 end
 
 local configuration = require("research.settings")
