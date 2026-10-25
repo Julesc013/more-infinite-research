@@ -698,7 +698,8 @@ try {
     $initialServerLog = Save-PairedBrowserServerPhaseLog (Join-Path $serverWriteData 'factorio-current.log') 'initial'
     $initialText = Read-LogText $initialServerLog
     foreach ($stage in @('ready','first-open','search','refresh','restart-ready')) {
-      [void](Get-PairedBrowserStageMarker $initialText $stage $pairedArm)
+      $phaseMarker = Get-PairedBrowserStageMarker $initialText $stage $pairedArm
+      Assert-Session ($null -ne $phaseMarker) "paired Browser initial phase log lacks $stage stage"
     }
     $initialProfiler = Get-PairedBrowserProfilerMarkers $initialText @('first_open','search','refresh')
     Assert-Session ((Get-SessionHash $restartSave) -ceq $restartHash -and (Get-SessionHash $seed) -ceq $seedHash) 'protected restart or seed save changed before host reload'
@@ -727,7 +728,8 @@ try {
     $restartServerLog = Save-PairedBrowserServerPhaseLog (Join-Path $serverWriteData 'factorio-current.log') 'restart'
     $restartText = Read-LogText $restartServerLog
     foreach ($stage in @('reopen','completed')) {
-      [void](Get-PairedBrowserStageMarker $restartText $stage $pairedArm)
+      $phaseMarker = Get-PairedBrowserStageMarker $restartText $stage $pairedArm
+      Assert-Session ($null -ne $phaseMarker) "paired Browser restart phase log lacks $stage stage"
     }
     $restartProfiler = Get-PairedBrowserProfilerMarkers $restartText @('reopen')
     $result = [ordered]@{

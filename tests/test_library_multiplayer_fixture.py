@@ -1203,7 +1203,7 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
           }
           function Get-PairedBrowserStageMarker {
             param([string]$Text,[string]$Stage,[string]$ExpectedArm)
-            if($Text -notmatch [regex]::Escape("stage=$Stage arm=$ExpectedArm")){throw "missing paired $Stage stage in phase log"}
+            if($Text -notmatch [regex]::Escape("stage=$Stage arm=$ExpectedArm")){return $null}
             return [pscustomobject]@{stage=$Stage}
           }
           function Get-PairedBrowserProfilerMarkers {
@@ -1238,7 +1238,7 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
                 '[MIR5_LIBRARY_PAIRED_BROWSER] stage=ready arm=published',
                 '[MIR5_LIBRARY_PAIRED_BROWSER] stage=first-open arm=published',
                 '[MIR5_LIBRARY_PAIRED_BROWSER] stage=search arm=published',
-                '[MIR5_LIBRARY_PAIRED_BROWSER] stage=refresh arm=published',
+                $(if($script:mode -ceq 'missing-phase') { } else { '[MIR5_LIBRARY_PAIRED_BROWSER] stage=refresh arm=published' }),
                 '[MIR5_LIBRARY_PAIRED_BROWSER] stage=restart-ready arm=published',
                 '[MIR5_LIBRARY_PROFILE] first_open Duration: 1.000000ms',
                 '[MIR5_LIBRARY_PROFILE] search Duration: 1.000000ms',
@@ -1301,7 +1301,8 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
             return $true
           }
           foreach($fixtureCase in @('library-multiplayer','library-paired-browser','scripted-effects-multiplayer')){
-            foreach($script:mode in @('success','cleanup','primary-and-cleanup')){
+            $modes=if($fixtureCase-ceq'library-paired-browser'){@('success','cleanup','primary-and-cleanup','missing-phase')}else{@('success','cleanup','primary-and-cleanup')}
+            foreach($script:mode in $modes){
               $output=Join-Path $env:MIR_TEST_WORK ($fixtureCase+'-'+$script:mode)
               $null=New-Item -ItemType Directory -Path $output
               $script:sessionPath=Join-Path $output 'session.json'
@@ -1361,7 +1362,11 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
                 if(($script:stops.ToArray()|Select-Object -Last 3) -join ',' -cne $expectedTail){throw 'final teardown is not reversed'}
               }else{
                 if($null -eq $caught -or (Test-Path -LiteralPath $sessionPath)){throw 'failed session claimed success'}
-                $expected=if($script:mode -eq 'cleanup'){'late native cleanup failure'}else{'original session failure'}
+                $expected=switch($script:mode){
+                  'cleanup'{'late native cleanup failure'}
+                  'missing-phase'{'paired Browser initial phase log lacks refresh stage'}
+                  default{'original session failure'}
+                }
                 if($caught.Exception.Message -cne $expected){throw 'original session/cleanup failure was replaced'}
                 if($fixtureCase -cin @('library-multiplayer','library-paired-browser') -and ($script:memoryWrites -ne 1 -or -not(Test-Path -LiteralPath $processMemoryObservationPath) -or $script:memoryReasons -notcontains 'native-session-failure')){
                   throw 'failed opt-in session lost its incomplete memory receipt'
