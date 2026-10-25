@@ -1,0 +1,246 @@
+{
+  "schema": 1,
+  "kind": "MIR5SifScienceFa114NativeReadbackV1",
+  "status": "complete-f200-f210-matrix-passed-not-release-acceptance",
+  "derived": true,
+  "release_qualification": false,
+  "native_run": {
+    "run": 40185834442,
+    "url": "https://github.com/Julesc013/mir-native-worker/actions/runs/40185834442",
+    "external_workflow_controller": "5036c30fa5a999b9d6b8c21c437eed6ce5c2aab2",
+    "controller_is_artifact_attested_source": false
+  },
+  "source": {
+    "fixture_commit": "fa1146e9778ecf7fc1b80449a2deec7ee0083ec3",
+    "player_commit": "fa1146e9778ecf7fc1b80449a2deec7ee0083ec3",
+    "player_tree": "41b78703f25bdceb1e05b57d7c725e0f6c9bef2c",
+    "asset_inventory_sha256": "2481424C07F55E86EA16EBA10769B3AB988B6AED47AB35717BA261FBA66BFA2F",
+    "all_result_source_heads_match_fixture_commit": true,
+    "all_result_source_dirty_false": true
+  },
+  "artifact_manifest": {
+    "path": "build/mir5/aero-sif-current-40185834442/artifact-manifest.json",
+    "sha256": "4FEBDE298B1B8630C801EBCE42694B01F345A62269C53AF1681B4102ECE770AA",
+    "declared_members": 329,
+    "verified_members": 329
+  },
+  "raw_git_input_verification": {
+    "commit": "fa1146e9778ecf7fc1b80449a2deec7ee0083ec3",
+    "raw_profile_members_verified": 18,
+    "staged_fixture_members_verified": 52,
+    "all_members_match_raw_git": true,
+    "profile_source_pattern": "tests/profiles/sif-science-retirement-{published-configured|mir5-policy}-{f200-2077|f210-2123}.json",
+    "fixture_source_roots": [
+      "tests/fixtures/sif-science-retirement",
+      "tests/fixtures/active-mods-observer"
+    ]
+  },
+  "targets": {
+    "f210": {
+      "engine": {
+        "base_version": "2.1.23",
+        "file_version": "2.1.23.87750",
+        "sha256": "FE4A1DA30F322A0D0B8AEB3DF7276332222BAAA143E2352569B723E84B2B9060"
+      },
+      "candidate_player": {
+        "version": "5.0.21000",
+        "bytes": 552496,
+        "sha256": "4D5E32CE2E74C65259E5D3E085CE7BE3BC37DC0A739308C6379BF621F7B5BDA1"
+      },
+      "published_player": {
+        "version": "4.7.21002",
+        "bytes": 1463150,
+        "sha256": "A4BB8F47232C689B267EF434F557187A8795C47280FA464169DE917FB579517F"
+      },
+      "observer": {
+        "version": "0.1.0",
+        "sha256": "2E1BE5952D2A4CC5C74A0D149E075D247BA110A3FAE5B6768D3EAEBABCEF989C"
+      },
+      "fixture_versions": {
+        "candidate_core": "0.2.0",
+        "published_core": "0.1.0",
+        "policy_selector": "0.1.0"
+      },
+      "selected_mod_versions": [
+        "base@2.1.23",
+        "cr-commons@1.0.33",
+        "cr-extras@1.0.10",
+        "elevated-rails@2.1.23",
+        "quality@2.1.23",
+        "recycler@2.1.23",
+        "space-age@2.1.23",
+        "space-is-fake@1.0.78"
+      ]
+    },
+    "f200": {
+      "engine": {
+        "base_version": "2.0.77",
+        "file_version": "2.0.77.84539",
+        "sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B"
+      },
+      "candidate_player": {
+        "version": "5.0.20000",
+        "bytes": 551960,
+        "sha256": "76D4D21B12EA8EA939DFFC599EC0746A1D9E13656326CACF5CB4A6D0303EB663"
+      },
+      "published_player": {
+        "version": "4.7.20002",
+        "bytes": 1449338,
+        "sha256": "F3943EB4D69CCDAC41BD9F922AD03A5C78F34F22D8E7FA5A88A7A658AB1010B7"
+      },
+      "observer": {
+        "version": "0.1.0",
+        "sha256": "723D1E7721449FC26040E5E6629416767BDC20AD79CF8723115846DB662A1F87"
+      },
+      "fixture_versions": {
+        "candidate_core": "0.2.0",
+        "published_core": "0.1.0",
+        "policy_selector": "0.1.0"
+      },
+      "selected_mod_versions": [
+        "base@2.0.77",
+        "cr-commons@1.0.27",
+        "elevated-rails@2.0.77",
+        "quality@2.0.77",
+        "space-age@2.0.77",
+        "space-is-fake@1.0.60"
+      ]
+    }
+  },
+  "execution": {
+    "target_execution_order": [
+      "f210",
+      "f200"
+    ],
+    "unrun_targets": [],
+    "result_members_passed": 20,
+    "factorio_process_runs": 30,
+    "admission": "admitted-without-wait",
+    "production_server_settings": {
+      "template": "server-settings.example.json",
+      "template_sha256": "61E85918C477D86D0B347F8BF3E41B43413EC53F284D37F2888F1648FCA0849A",
+      "execution_sha256": "2FB3E97FE934B92B6C4CCC2403A90A16C357BEC9183E9BC7E550822AC57504E4"
+    },
+    "direct_library_controls": {
+      "restored_results": 20,
+      "dependency_payload_bytes_copied": 0,
+      "archive_links_created": 0,
+      "archive_extractions": 0,
+      "owned_archive_names_temporarily_hidden": 0
+    }
+  },
+  "create_only_policy_cases": {
+    "meaning": "These are native CreateOnly/runtime-load observations, not laboratory runs; every witness records fresh candidate rows, no retired Space science/prerequisite and no storage or native-state writes.",
+    "f210": [
+      {"leaf": "c1", "policy": "configured", "result": "f210/c1/result.json", "sha256": "6C0A8C5A5AC9996ABCD2F7BA0DBF0A638818DF492099D511C443721A99B9D51C"},
+      {"leaf": "c2", "policy": "space", "result": "f210/c2/result.json", "sha256": "F83EE4CAC51F7A0007645428AAE060B117778AF638538591365397EF65F58C6A"},
+      {"leaf": "c3", "policy": "space-and-promethium", "result": "f210/c3/result.json", "sha256": "0139344E9B39B38D13DE86D7F20B02D8153F8DFDF80A6EC7D97085AD79FCC6CA"},
+      {"leaf": "c4", "policy": "space-age-progression", "result": "f210/c4/result.json", "sha256": "FBC0431654AD34F14C37B7F1C8E327C01627071E15BA577DDAE80F1C721F76EE"},
+      {"leaf": "c5", "policy": "official-progression", "result": "f210/c5/result.json", "sha256": "25061C9EBCB567CE7F84F1D43E2EB8C2B68D83BE7FCF62D51EB267EA3FDAD835"},
+      {"leaf": "c6", "policy": "mod-progression", "result": "f210/c6/result.json", "sha256": "612F554B501F82AAC94A9A022349D81591304D26DCC8761602E5C9BF4CE811FD"},
+      {"leaf": "c7", "policy": "all-official", "result": "f210/c7/result.json", "sha256": "AF4B02402B76072F96255E20CFA686BDCA88280F26D9E7D74C06AFE5E73FB912"},
+      {"leaf": "c8", "policy": "all", "result": "f210/c8/result.json", "sha256": "497B34C07B1EA8BDAECFBC249B23D54114B9961FDE6263458EA9D136D04605EB"}
+    ],
+    "f200": [
+      {"leaf": "c1", "policy": "configured", "result": "f200/c1/result.json", "sha256": "9FA73E2171FE6BAA637C65CEEA8CF73181EBF31940E1DBF855ACA3F4E4E29D82"},
+      {"leaf": "c2", "policy": "space", "result": "f200/c2/result.json", "sha256": "69195650E693A15287EFAF55329155C0D3803D9163C7557F1FBF8AFB12C88951"},
+      {"leaf": "c3", "policy": "space-and-promethium", "result": "f200/c3/result.json", "sha256": "79E7010C95BA74DB9F82608D9951505A17505384E24B444632C757E715EA5FF2"},
+      {"leaf": "c4", "policy": "space-age-progression", "result": "f200/c4/result.json", "sha256": "987FE546A9486DAC794648FE56CB5F7DC340775B3AE0E10D528545E9A2E11402"},
+      {"leaf": "c5", "policy": "official-progression", "result": "f200/c5/result.json", "sha256": "EAC5213B4F21D22110D503B18233AEE03B2C7E32F7C3D1B0F7363BDDCC3E264D"},
+      {"leaf": "c6", "policy": "mod-progression", "result": "f200/c6/result.json", "sha256": "220B853B89D074C11736A1C822C2F945E4548E34FB1796C7D00514EDC689F846"},
+      {"leaf": "c7", "policy": "all-official", "result": "f200/c7/result.json", "sha256": "0D37AA918D36736D033B9C819EA26F3515F541C74DAEBDDE613E7BD99A94B687"},
+      {"leaf": "c8", "policy": "all", "result": "f200/c8/result.json", "sha256": "99630F3EE6C1051F1C5749347B483A3C42B6C32E70917E790E6D92C9C90FC7A9"}
+    ]
+  },
+  "configured_transitions": {
+    "named_technologies": [
+      "research-speed-7",
+      "weapon-shooting-speed-7"
+    ],
+    "published_input_origin": "Each p arm begins with input_save null, creates and runs its exact published 4.7 player, then writes the save consumed byte-identically by its successor s arm; no pre-existing published save is assumed.",
+    "f210": {
+      "published": {
+        "result": "f210/p/result.json",
+        "sha256": "8FA12C409AD039E4E313EC7FF4C2D0C6D76A76FFE510F37112D59BDE796F6AED",
+        "source_actual_labs": 2,
+        "successor_actual_labs": 0,
+        "output_save_sha256": "ECF0478C1560F654426A2006CBB54AF0F6A635D26633E306C4886AC8F016A2DE"
+      },
+      "successor": {
+        "result": "f210/s/result.json",
+        "sha256": "1AEDF7AFAF489B3DA47F491D16CAC9AFDD03864AFA01415E976D378A4E69AC32",
+        "input_save_sha256": "ECF0478C1560F654426A2006CBB54AF0F6A635D26633E306C4886AC8F016A2DE",
+        "input_save_byte_identical": true,
+        "successor_actual_labs": 2,
+        "physical_consumption_rows": 11
+      }
+    },
+    "f200": {
+      "published": {
+        "result": "f200/p/result.json",
+        "sha256": "3FE20651BDADEDB963A7777F9E7295A7AE3A32FF5D1619C636294B556F2A4D70",
+        "source_actual_labs": 2,
+        "successor_actual_labs": 0,
+        "output_save_sha256": "50CB21DA0AA3A5701BB643B661947669ABB8ACC446413A73FE54B3119F6B8180"
+      },
+      "successor": {
+        "result": "f200/s/result.json",
+        "sha256": "9E2C980F88A431024EFEA87DC4AFA3B729F6D61CB452A97487ED438A978B9CA1",
+        "input_save_sha256": "50CB21DA0AA3A5701BB643B661947669ABB8ACC446413A73FE54B3119F6B8180",
+        "input_save_byte_identical": true,
+        "successor_actual_labs": 2,
+        "physical_consumption_rows": 5
+      }
+    },
+    "partial_progress_preserved": {
+      "research-speed-7": 0.42,
+      "weapon-shooting-speed-7": 0.27
+    },
+    "cold_reloads": {
+      "total": 8,
+      "per_transition_stage": 2,
+      "all_save_byte_identical": true,
+      "all_reload_on_load_read_only": true
+    }
+  },
+  "capsule": {
+    "path": "spec/evidence/sif-science-fa114-native-capsule.zip",
+    "bytes": 98501,
+    "sha256": "7745FBD2412E6F7CC04FD3B5D3140F386FBA304839368FAD36477B8BC8F86361",
+    "original_members": 22,
+    "derived_members": 1,
+    "members": [
+      {"path": "artifact-manifest.json", "bytes": 68885, "sha256": "4FEBDE298B1B8630C801EBCE42694B01F345A62269C53AF1681B4102ECE770AA", "kind": "original"},
+      {"path": "sif-science-retirement-prepare.json", "bytes": 81062, "sha256": "25AF4C6A7E2E1CBA5BEF198C306767DFE3956B7372FC939F52752037AC4DDBF8", "kind": "original"},
+      {"path": "f200/c1/result.json", "bytes": 17712, "sha256": "9FA73E2171FE6BAA637C65CEEA8CF73181EBF31940E1DBF855ACA3F4E4E29D82", "kind": "original"},
+      {"path": "f200/c2/result.json", "bytes": 17675, "sha256": "69195650E693A15287EFAF55329155C0D3803D9163C7557F1FBF8AFB12C88951", "kind": "original"},
+      {"path": "f200/c3/result.json", "bytes": 17808, "sha256": "79E7010C95BA74DB9F82608D9951505A17505384E24B444632C757E715EA5FF2", "kind": "original"},
+      {"path": "f200/c4/result.json", "bytes": 17819, "sha256": "987FE546A9486DAC794648FE56CB5F7DC340775B3AE0E10D528545E9A2E11402", "kind": "original"},
+      {"path": "f200/c5/result.json", "bytes": 17806, "sha256": "EAC5213B4F21D22110D503B18233AEE03B2C7E32F7C3D1B0F7363BDDCC3E264D", "kind": "original"},
+      {"path": "f200/c6/result.json", "bytes": 17763, "sha256": "220B853B89D074C11736A1C822C2F945E4548E34FB1796C7D00514EDC689F846", "kind": "original"},
+      {"path": "f200/c7/result.json", "bytes": 17738, "sha256": "0D37AA918D36736D033B9C819EA26F3515F541C74DAEBDDE613E7BD99A94B687", "kind": "original"},
+      {"path": "f200/c8/result.json", "bytes": 17657, "sha256": "99630F3EE6C1051F1C5749347B483A3C42B6C32E70917E790E6D92C9C90FC7A9", "kind": "original"},
+      {"path": "f200/p/result.json", "bytes": 47935, "sha256": "3FE20651BDADEDB963A7777F9E7295A7AE3A32FF5D1619C636294B556F2A4D70", "kind": "original"},
+      {"path": "f200/s/result.json", "bytes": 42735, "sha256": "9E2C980F88A431024EFEA87DC4AFA3B729F6D61CB452A97487ED438A978B9CA1", "kind": "original"},
+      {"path": "f210/c1/result.json", "bytes": 18584, "sha256": "6C0A8C5A5AC9996ABCD2F7BA0DBF0A638818DF492099D511C443721A99B9D51C", "kind": "original"},
+      {"path": "f210/c2/result.json", "bytes": 18537, "sha256": "F83EE4CAC51F7A0007645428AAE060B117778AF638538591365397EF65F58C6A", "kind": "original"},
+      {"path": "f210/c3/result.json", "bytes": 18672, "sha256": "0139344E9B39B38D13DE86D7F20B02D8153F8DFDF80A6EC7D97085AD79FCC6CA", "kind": "original"},
+      {"path": "f210/c4/result.json", "bytes": 18681, "sha256": "FBC0431654AD34F14C37B7F1C8E327C01627071E15BA577DDAE80F1C721F76EE", "kind": "original"},
+      {"path": "f210/c5/result.json", "bytes": 18670, "sha256": "25061C9EBCB567CE7F84F1D43E2EB8C2B68D83BE7FCF62D51EB267EA3FDAD835", "kind": "original"},
+      {"path": "f210/c6/result.json", "bytes": 18627, "sha256": "612F554B501F82AAC94A9A022349D81591304D26DCC8761602E5C9BF4CE811FD", "kind": "original"},
+      {"path": "f210/c7/result.json", "bytes": 18600, "sha256": "AF4B02402B76072F96255E20CFA686BDCA88280F26D9E7D74C06AFE5E73FB912", "kind": "original"},
+      {"path": "f210/c8/result.json", "bytes": 18519, "sha256": "497B34C07B1EA8BDAECFBC249B23D54114B9961FDE6263458EA9D136D04605EB", "kind": "original"},
+      {"path": "f210/p/result.json", "bytes": 48993, "sha256": "8FA12C409AD039E4E313EC7FF4C2D0C6D76A76FFE510F37112D59BDE796F6AED", "kind": "original"},
+      {"path": "f210/s/result.json", "bytes": 43730, "sha256": "1AEDF7AFAF489B3DA47F491D16CAC9AFDD03864AFA01415E976D378A4E69AC32", "kind": "original"},
+      {"path": "derived/aero-readback.json", "bytes": 2308, "sha256": "AFC8324C68ADC108908E8324AB49A99A37DD98C162E29C508D022B4377872986", "kind": "derived"}
+    ]
+  },
+  "primary_custody": "build/mir5/aero-sif-current-40185834442",
+  "limits": [
+    "This is a new fa114/41b and current 4D5E/76D4 execution. It does not relabel the older source333/1ca selected-F200 result or any earlier F210 external-closure adverse.",
+    "The 16 policy arms are CreateOnly/runtime-load observations, not gameplay or laboratory qualification. The four p/s configured stages are the bounded real-lab/save/reload evidence.",
+    "The external workflow controller is observed provenance only; it is not an artifact-manifest attestation.",
+    "Original configurations, complete logs, saves, player data, archives and other payloads remain in primary custody. The capsule carries only privacy-reviewed original JSON metadata and one labelled derived readback.",
+    "No client, multiplayer, elapsed-time, memory, arbitrary-modpack, publication or release verdict follows."
+  ]
+}
