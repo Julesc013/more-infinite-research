@@ -17,8 +17,8 @@
     {"name": "mir-fixture-mir5-repair-stress-active", "version": "0.1.0", "enabled": true}
   ],
   "archive_sha256": {
-    "more-infinite-research_5.0.21000.zip": "428A789CA03828D2F7F93EC65C49FD3157FD6D547CC569DDA2C0129D6504647A",
+    "more-infinite-research_5.0.21000.zip": "83CA2487DAD623FCA2D0E9AE80C222782A095FB8F501279A6E1C611714CBE4FE",
     "mir-fixture-mir5-active-mods-observer_0.1.0.zip": "2E1BE5952D2A4CC5C74A0D149E075D247BA110A3FAE5B6768D3EAEBABCEF989C"
   },
-  "scope": "Pre-measurement F210 active repair seed only against the frozen 143346 player: after load, exactly 1000 native walls receive one-point damage, 256 eligible friendly walls await passive repair, 744 overflow and foreign/non-wall sentinels remain excluded. The active save and markers are not a native benchmark result."
+  "scope": "Pre-measurement F210 active repair seed only against the frozen 089e6e25 player: after load, exactly 1000 native walls receive one-point damage, 256 eligible friendly walls await passive repair, 744 overflow and foreign/non-wall sentinels remain excluded. The active save and markers are not a native benchmark result."
 }
