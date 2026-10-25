@@ -1412,7 +1412,1056 @@
           "ranking_metric": "Cumulative Portal downloads_count, sorted locally; no per-patch or time-window popularity claim.",
           "version_scope": "Preserve the exact requested query values and original response hashes. Portal compatibility-family filtering does not establish compatibility with the requested engine patch.",
           "recorded_custody": "selected_snapshot_primary_path names the producing checkout custody. It does not assert that the same relative path exists on another machine.",
-          "aero_readback_status": "The three recorded selected snapshots and original response bytes were unavailable in the Aero primary checkout during the 2026-10-26 audit. Original producer custody and a portable exact-hash readback have been requested; no historical source verification is claimed here."
+          "aero_readback_status": "The three recorded selected snapshots and original response bytes were unavailable in the Aero primary checkout during the 2026-10-26 audit. Original producer custody and a portable exact-hash readback have been requested; no historical source verification is claimed here.",
+          "producer_portable_readback": {
+            "path": "spec/evidence/popular-mod-selection-snapshots-r01.json.gz",
+            "sha256": "C21F06E3C145D65F3CDE787219CB7F6A7D10D781EA132F50C21CB806FDF57251",
+            "bytes": 5668178,
+            "files": [
+              {
+                "bytes": 3310019,
+                "path": "portal-compatible-2.1.23.json",
+                "sha256": "CE4D613506A36C6455107DECB91D179BDCAF8244F30722D28B93E09D6B462249"
+              },
+              {
+                "bytes": 27776,
+                "path": "top50-2.1.23.json",
+                "sha256": "C955810846FD29969D542287EFD2A8D54629729CC7D11DEDEF204ACA8C418A71"
+              },
+              {
+                "bytes": 6224519,
+                "path": "portal-compatible-2.0.77.json",
+                "sha256": "7F7A44B5B37201CF8FCAB6A5190420683A412288067215E8203D02C56D3E999C"
+              },
+              {
+                "bytes": 27762,
+                "path": "top50-2.0.77.json",
+                "sha256": "5679B7291FEDB21E31A004512E1C0684331958AED9B472C4EA3190D0FADAEFCE"
+              },
+              {
+                "bytes": 4774533,
+                "path": "portal-compatible-1.1.110.json",
+                "sha256": "A8689F5D78D88B450EC797672A0A8148D5432F461DA0F3F117C73E12137D59FA"
+              },
+              {
+                "bytes": 27780,
+                "path": "top50-1.1.110.json",
+                "sha256": "CA50F28B277882E50D2580ABA22B44AF0E724C8528D9C48211B1011EF070BC26"
+              }
+            ],
+            "scope": "Producer rehashes all six exact original/selected records and recomputes all three rankings from the original anonymous API responses with zero discrepancies. Portable bytes now permit Aero independent readback; its earlier unavailable-custody observation remains preserved."
+          }
+        },
+        "ranked_f210_individual_inputs": {
+          "status": "inputs-pinned-native-gameplay-migrations-unqualified",
+          "root_count": 50,
+          "metadata_admitted_mode_count": 99,
+          "scope": "Use exact available local versions, which may predate the Portal latest_release. Include mandatory archived dependencies and omit unselected recommended providers. Actual native engine admission remains required, including archived factorio_version2.0 records in the2.1 library.",
+          "records": [
+            {
+              "rank": 1,
+              "root": "alien-biomes",
+              "root_version": "0.8.0",
+              "portal_latest_at_snapshot": "0.8.0",
+              "mode": "base",
+              "metadata_issues": [],
+              "profile_disposition": "reuse-exact-existing-input",
+              "profile": "tests/profiles/popular-alien-biomes-base-f210-2123.json"
+            },
+            {
+              "rank": 1,
+              "root": "alien-biomes",
+              "root_version": "0.8.0",
+              "portal_latest_at_snapshot": "0.8.0",
+              "mode": "space-age",
+              "metadata_issues": [],
+              "profile_disposition": "reuse-exact-existing-input",
+              "profile": "tests/profiles/popular-alien-biomes-space-age-f210-2123.json"
+            },
+            {
+              "rank": 2,
+              "root": "informatron",
+              "root_version": "0.5.0",
+              "portal_latest_at_snapshot": "0.5.0",
+              "mode": "base",
+              "metadata_issues": [],
+              "profile_disposition": "reuse-exact-existing-input",
+              "profile": "tests/profiles/popular-informatron-base-f210-2123.json"
+            },
+            {
+              "rank": 2,
+              "root": "informatron",
+              "root_version": "0.5.0",
+              "portal_latest_at_snapshot": "0.5.0",
+              "mode": "space-age",
+              "metadata_issues": [],
+              "profile_disposition": "reuse-exact-existing-input",
+              "profile": "tests/profiles/popular-informatron-space-age-f210-2123.json"
+            },
+            {
+              "rank": 3,
+              "root": "jetpack",
+              "root_version": "0.5.1",
+              "portal_latest_at_snapshot": "0.5.1",
+              "mode": "base",
+              "metadata_issues": [],
+              "profile_disposition": "reuse-exact-existing-input",
+              "profile": "tests/profiles/popular-jetpack-base-f210-2123.json"
+            },
+            {
+              "rank": 3,
+              "root": "jetpack",
+              "root_version": "0.5.1",
+              "portal_latest_at_snapshot": "0.5.1",
+              "mode": "space-age",
+              "metadata_issues": [],
+              "profile_disposition": "reuse-exact-existing-input",
+              "profile": "tests/profiles/popular-jetpack-space-age-f210-2123.json"
+            },
+            {
+              "rank": 4,
+              "root": "aai-containers",
+              "root_version": "0.4.0",
+              "portal_latest_at_snapshot": "0.4.0",
+              "mode": "base",
+              "metadata_issues": [],
+              "profile_disposition": "reuse-exact-existing-input",
+              "profile": "tests/profiles/popular-aai-containers-base-f210-2123.json"
+            },
+            {
+              "rank": 4,
+              "root": "aai-containers",
+              "root_version": "0.4.0",
+              "portal_latest_at_snapshot": "0.4.0",
+              "mode": "space-age",
+              "metadata_issues": [],
+              "profile_disposition": "reuse-exact-existing-input",
+              "profile": "tests/profiles/popular-aai-containers-space-age-f210-2123.json"
+            },
+            {
+              "rank": 5,
+              "root": "aai-industry",
+              "root_version": "0.7.5",
+              "portal_latest_at_snapshot": "0.7.5",
+              "mode": "base",
+              "metadata_issues": [],
+              "profile_disposition": "reuse-exact-existing-input",
+              "profile": "tests/profiles/aai-industry-base-f210-2123.json"
+            },
+            {
+              "rank": 5,
+              "root": "aai-industry",
+              "root_version": "0.7.5",
+              "portal_latest_at_snapshot": "0.7.5",
+              "mode": "space-age",
+              "metadata_issues": [],
+              "profile_disposition": "reuse-exact-existing-input",
+              "profile": "tests/profiles/aai-industry-space-age-f210-2123.json"
+            },
+            {
+              "rank": 6,
+              "root": "aai-signal-transmission",
+              "root_version": "0.6.0",
+              "portal_latest_at_snapshot": "0.6.0",
+              "mode": "base",
+              "metadata_issues": [],
+              "profile_disposition": "reuse-exact-existing-input",
+              "profile": "tests/profiles/popular-aai-signal-transmission-base-f210-2123.json"
+            },
+            {
+              "rank": 6,
+              "root": "aai-signal-transmission",
+              "root_version": "0.6.0",
+              "portal_latest_at_snapshot": "0.6.0",
+              "mode": "space-age",
+              "metadata_issues": [],
+              "profile_disposition": "reuse-exact-existing-input",
+              "profile": "tests/profiles/popular-aai-signal-transmission-space-age-f210-2123.json"
+            },
+            {
+              "rank": 7,
+              "root": "shield-projector",
+              "root_version": "0.3.0",
+              "portal_latest_at_snapshot": "0.3.0",
+              "mode": "base",
+              "metadata_issues": [],
+              "profile_disposition": "reuse-exact-existing-input",
+              "profile": "tests/profiles/popular-shield-projector-base-f210-2123.json"
+            },
+            {
+              "rank": 7,
+              "root": "shield-projector",
+              "root_version": "0.3.0",
+              "portal_latest_at_snapshot": "0.3.0",
+              "mode": "space-age",
+              "metadata_issues": [],
+              "profile_disposition": "reuse-exact-existing-input",
+              "profile": "tests/profiles/popular-shield-projector-space-age-f210-2123.json"
+            },
+            {
+              "rank": 8,
+              "root": "robot_attrition",
+              "root_version": "0.7.0",
+              "portal_latest_at_snapshot": "0.7.0",
+              "mode": "base",
+              "metadata_issues": [],
+              "profile_disposition": "reuse-exact-existing-input",
+              "profile": "tests/profiles/popular-robot-attrition-base-f210-2123.json"
+            },
+            {
+              "rank": 8,
+              "root": "robot_attrition",
+              "root_version": "0.7.0",
+              "portal_latest_at_snapshot": "0.7.0",
+              "mode": "space-age",
+              "metadata_issues": [],
+              "profile_disposition": "reuse-exact-existing-input",
+              "profile": "tests/profiles/popular-robot-attrition-space-age-f210-2123.json"
+            },
+            {
+              "rank": 9,
+              "root": "helmod",
+              "root_version": "2.3.3",
+              "portal_latest_at_snapshot": "2.3.6",
+              "mode": "base",
+              "metadata_issues": [],
+              "profile_disposition": "new-exact-input",
+              "profile": "tests/profiles/popular-helmod-base-f210-2123.json"
+            },
+            {
+              "rank": 9,
+              "root": "helmod",
+              "root_version": "2.3.3",
+              "portal_latest_at_snapshot": "2.3.6",
+              "mode": "space-age",
+              "metadata_issues": [],
+              "profile_disposition": "new-exact-input",
+              "profile": "tests/profiles/popular-helmod-space-age-f210-2123.json"
+            },
+            {
+              "rank": 10,
+              "root": "space-exploration",
+              "root_version": "0.7.63",
+              "portal_latest_at_snapshot": "0.7.63",
+              "mode": "base",
+              "metadata_issues": [],
+              "profile_disposition": "reuse-exact-existing-input",
+              "profile": "tests/profiles/space-exploration-base-f210-2123.json"
+            },
+            {
+              "rank": 10,
+              "root": "space-exploration",
+              "root_version": "0.7.63",
+              "portal_latest_at_snapshot": "0.7.63",
+              "mode": "space-age",
+              "metadata_issues": [
+                {
+                  "conflict": "! space-age",
+                  "consumer": "space-exploration"
+                }
+              ]
+            },
+            {
+              "rank": 11,
+              "root": "even-distribution",
+              "root_version": "2.1.0",
+              "portal_latest_at_snapshot": "2.1.0",
+              "mode": "base",
+              "metadata_issues": [],
+              "profile_disposition": "reuse-exact-existing-input",
+              "profile": "tests/profiles/popular-even-distribution-base-f210-2123.json"
+            },
+            {
+              "rank": 11,
+              "root": "even-distribution",
+              "root_version": "2.1.0",
+              "portal_latest_at_snapshot": "2.1.0",
+              "mode": "space-age",
+              "metadata_issues": [],
+              "profile_disposition": "reuse-exact-existing-input",
+              "profile": "tests/profiles/popular-even-distribution-space-age-f210-2123.json"
+            },
+            {
+              "rank": 12,
+              "root": "bullet-trails",
+              "root_version": "0.8.0",
+              "portal_latest_at_snapshot": "0.8.0",
+              "mode": "base",
+              "metadata_issues": [],
+              "profile_disposition": "reuse-exact-existing-input",
+              "profile": "tests/profiles/popular-bullet-trails-base-f210-2123.json"
+            },
+            {
+              "rank": 12,
+              "root": "bullet-trails",
+              "root_version": "0.8.0",
+              "portal_latest_at_snapshot": "0.8.0",
+              "mode": "space-age",
+              "metadata_issues": [],
+              "profile_disposition": "reuse-exact-existing-input",
+              "profile": "tests/profiles/popular-bullet-trails-space-age-f210-2123.json"
+            },
+            {
+              "rank": 13,
+              "root": "RateCalculator",
+              "root_version": "3.4.1",
+              "portal_latest_at_snapshot": "3.4.2",
+              "mode": "base",
+              "metadata_issues": [],
+              "profile_disposition": "new-exact-input",
+              "profile": "tests/profiles/popular-ratecalculator-base-f210-2123.json"
+            },
+            {
+              "rank": 13,
+              "root": "RateCalculator",
+              "root_version": "3.4.1",
+              "portal_latest_at_snapshot": "3.4.2",
+              "mode": "space-age",
+              "metadata_issues": [],
+              "profile_disposition": "new-exact-input",
+              "profile": "tests/profiles/popular-ratecalculator-space-age-f210-2123.json"
+            },
+            {
+              "rank": 14,
+              "root": "bobinserters",
+              "root_version": "3.0.0",
+              "portal_latest_at_snapshot": "3.0.0",
+              "mode": "base",
+              "metadata_issues": [],
+              "profile_disposition": "reuse-exact-existing-input",
+              "profile": "tests/profiles/popular-bobinserters-base-f210-2123.json"
+            },
+            {
+              "rank": 14,
+              "root": "bobinserters",
+              "root_version": "3.0.0",
+              "portal_latest_at_snapshot": "3.0.0",
+              "mode": "space-age",
+              "metadata_issues": [],
+              "profile_disposition": "reuse-exact-existing-input",
+              "profile": "tests/profiles/popular-bobinserters-space-age-f210-2123.json"
+            },
+            {
+              "rank": 15,
+              "root": "Krastorio2",
+              "root_version": "2.1.4",
+              "portal_latest_at_snapshot": "2.1.4",
+              "mode": "base",
+              "metadata_issues": [],
+              "profile_disposition": "reuse-exact-existing-input",
+              "profile": "tests/profiles/popular-krastorio2-base-f210-2123.json"
+            },
+            {
+              "rank": 15,
+              "root": "Krastorio2",
+              "root_version": "2.1.4",
+              "portal_latest_at_snapshot": "2.1.4",
+              "mode": "space-age",
+              "metadata_issues": [],
+              "profile_disposition": "reuse-exact-existing-input",
+              "profile": "tests/profiles/popular-krastorio2-space-age-f210-2123.json"
+            },
+            {
+              "rank": 16,
+              "root": "AutoDeconstruct",
+              "root_version": "1.1.2",
+              "portal_latest_at_snapshot": "1.1.2",
+              "mode": "base",
+              "metadata_issues": [],
+              "profile_disposition": "reuse-exact-existing-input",
+              "profile": "tests/profiles/popular-autodeconstruct-base-f210-2123.json"
+            },
+            {
+              "rank": 16,
+              "root": "AutoDeconstruct",
+              "root_version": "1.1.2",
+              "portal_latest_at_snapshot": "1.1.2",
+              "mode": "space-age",
+              "metadata_issues": [],
+              "profile_disposition": "reuse-exact-existing-input",
+              "profile": "tests/profiles/popular-autodeconstruct-space-age-f210-2123.json"
+            },
+            {
+              "rank": 17,
+              "root": "FNEI",
+              "root_version": "0.4.7",
+              "portal_latest_at_snapshot": "0.4.7",
+              "mode": "base",
+              "metadata_issues": [],
+              "profile_disposition": "reuse-exact-existing-input",
+              "profile": "tests/profiles/popular-fnei-base-f210-2123.json"
+            },
+            {
+              "rank": 17,
+              "root": "FNEI",
+              "root_version": "0.4.7",
+              "portal_latest_at_snapshot": "0.4.7",
+              "mode": "space-age",
+              "metadata_issues": [],
+              "profile_disposition": "reuse-exact-existing-input",
+              "profile": "tests/profiles/popular-fnei-space-age-f210-2123.json"
+            },
+            {
+              "rank": 18,
+              "root": "combat-mechanics-overhaul",
+              "root_version": "0.8.0",
+              "portal_latest_at_snapshot": "0.8.0",
+              "mode": "base",
+              "metadata_issues": [],
+              "profile_disposition": "reuse-exact-existing-input",
+              "profile": "tests/profiles/popular-combat-mechanics-overhaul-base-f210-2123.json"
+            },
+            {
+              "rank": 18,
+              "root": "combat-mechanics-overhaul",
+              "root_version": "0.8.0",
+              "portal_latest_at_snapshot": "0.8.0",
+              "mode": "space-age",
+              "metadata_issues": [],
+              "profile_disposition": "reuse-exact-existing-input",
+              "profile": "tests/profiles/popular-combat-mechanics-overhaul-space-age-f210-2123.json"
+            },
+            {
+              "rank": 19,
+              "root": "Milestones",
+              "root_version": "1.5.2",
+              "portal_latest_at_snapshot": "1.5.2",
+              "mode": "base",
+              "metadata_issues": [],
+              "profile_disposition": "reuse-exact-existing-input",
+              "profile": "tests/profiles/popular-milestones-base-f210-2123.json"
+            },
+            {
+              "rank": 19,
+              "root": "Milestones",
+              "root_version": "1.5.2",
+              "portal_latest_at_snapshot": "1.5.2",
+              "mode": "space-age",
+              "metadata_issues": [],
+              "profile_disposition": "reuse-exact-existing-input",
+              "profile": "tests/profiles/popular-milestones-space-age-f210-2123.json"
+            },
+            {
+              "rank": 20,
+              "root": "textplates",
+              "root_version": "0.8.0",
+              "portal_latest_at_snapshot": "0.8.0",
+              "mode": "base",
+              "metadata_issues": [],
+              "profile_disposition": "reuse-exact-existing-input",
+              "profile": "tests/profiles/popular-textplates-base-f210-2123.json"
+            },
+            {
+              "rank": 20,
+              "root": "textplates",
+              "root_version": "0.8.0",
+              "portal_latest_at_snapshot": "0.8.0",
+              "mode": "space-age",
+              "metadata_issues": [],
+              "profile_disposition": "reuse-exact-existing-input",
+              "profile": "tests/profiles/popular-textplates-space-age-f210-2123.json"
+            },
+            {
+              "rank": 21,
+              "root": "boblogistics",
+              "root_version": "3.0.1",
+              "portal_latest_at_snapshot": "3.0.2",
+              "mode": "base",
+              "metadata_issues": [],
+              "profile_disposition": "new-exact-input",
+              "profile": "tests/profiles/popular-boblogistics-base-f210-2123.json"
+            },
+            {
+              "rank": 21,
+              "root": "boblogistics",
+              "root_version": "3.0.1",
+              "portal_latest_at_snapshot": "3.0.2",
+              "mode": "space-age",
+              "metadata_issues": [],
+              "profile_disposition": "new-exact-input",
+              "profile": "tests/profiles/popular-boblogistics-space-age-f210-2123.json"
+            },
+            {
+              "rank": 22,
+              "root": "factoryplanner",
+              "root_version": "2.1.13",
+              "portal_latest_at_snapshot": "2.1.21",
+              "mode": "base",
+              "metadata_issues": [],
+              "profile_disposition": "new-exact-input",
+              "profile": "tests/profiles/popular-factoryplanner-base-f210-2123.json"
+            },
+            {
+              "rank": 22,
+              "root": "factoryplanner",
+              "root_version": "2.1.13",
+              "portal_latest_at_snapshot": "2.1.21",
+              "mode": "space-age",
+              "metadata_issues": [],
+              "profile_disposition": "new-exact-input",
+              "profile": "tests/profiles/popular-factoryplanner-space-age-f210-2123.json"
+            },
+            {
+              "rank": 23,
+              "root": "DiscoScience",
+              "root_version": "2.1.0",
+              "portal_latest_at_snapshot": "2.1.0",
+              "mode": "base",
+              "metadata_issues": [],
+              "profile_disposition": "reuse-exact-existing-input",
+              "profile": "tests/profiles/popular-discoscience-base-f210-2123.json"
+            },
+            {
+              "rank": 23,
+              "root": "DiscoScience",
+              "root_version": "2.1.0",
+              "portal_latest_at_snapshot": "2.1.0",
+              "mode": "space-age",
+              "metadata_issues": [],
+              "profile_disposition": "reuse-exact-existing-input",
+              "profile": "tests/profiles/popular-discoscience-space-age-f210-2123.json"
+            },
+            {
+              "rank": 24,
+              "root": "grappling-gun",
+              "root_version": "0.5.0",
+              "portal_latest_at_snapshot": "0.5.0",
+              "mode": "base",
+              "metadata_issues": [],
+              "profile_disposition": "reuse-exact-existing-input",
+              "profile": "tests/profiles/popular-grappling-gun-base-f210-2123.json"
+            },
+            {
+              "rank": 24,
+              "root": "grappling-gun",
+              "root_version": "0.5.0",
+              "portal_latest_at_snapshot": "0.5.0",
+              "mode": "space-age",
+              "metadata_issues": [],
+              "profile_disposition": "reuse-exact-existing-input",
+              "profile": "tests/profiles/popular-grappling-gun-space-age-f210-2123.json"
+            },
+            {
+              "rank": 25,
+              "root": "bobpower",
+              "root_version": "3.0.0",
+              "portal_latest_at_snapshot": "3.0.1",
+              "mode": "base",
+              "metadata_issues": [],
+              "profile_disposition": "new-exact-input",
+              "profile": "tests/profiles/popular-bobpower-base-f210-2123.json"
+            },
+            {
+              "rank": 25,
+              "root": "bobpower",
+              "root_version": "3.0.0",
+              "portal_latest_at_snapshot": "3.0.1",
+              "mode": "space-age",
+              "metadata_issues": [],
+              "profile_disposition": "new-exact-input",
+              "profile": "tests/profiles/popular-bobpower-space-age-f210-2123.json"
+            },
+            {
+              "rank": 26,
+              "root": "bobwarfare",
+              "root_version": "3.0.1",
+              "portal_latest_at_snapshot": "3.0.2",
+              "mode": "base",
+              "metadata_issues": [],
+              "profile_disposition": "new-exact-input",
+              "profile": "tests/profiles/popular-bobwarfare-base-f210-2123.json"
+            },
+            {
+              "rank": 26,
+              "root": "bobwarfare",
+              "root_version": "3.0.1",
+              "portal_latest_at_snapshot": "3.0.2",
+              "mode": "space-age",
+              "metadata_issues": [],
+              "profile_disposition": "new-exact-input",
+              "profile": "tests/profiles/popular-bobwarfare-space-age-f210-2123.json"
+            },
+            {
+              "rank": 27,
+              "root": "Waterfill_v17",
+              "root_version": "2.1.1",
+              "portal_latest_at_snapshot": "2.1.2",
+              "mode": "base",
+              "metadata_issues": [],
+              "profile_disposition": "new-exact-input",
+              "profile": "tests/profiles/popular-waterfill-v17-base-f210-2123.json"
+            },
+            {
+              "rank": 27,
+              "root": "Waterfill_v17",
+              "root_version": "2.1.1",
+              "portal_latest_at_snapshot": "2.1.2",
+              "mode": "space-age",
+              "metadata_issues": [],
+              "profile_disposition": "new-exact-input",
+              "profile": "tests/profiles/popular-waterfill-v17-space-age-f210-2123.json"
+            },
+            {
+              "rank": 28,
+              "root": "bobassembly",
+              "root_version": "3.0.1",
+              "portal_latest_at_snapshot": "3.0.2",
+              "mode": "base",
+              "metadata_issues": [],
+              "profile_disposition": "new-exact-input",
+              "profile": "tests/profiles/popular-bobassembly-base-f210-2123.json"
+            },
+            {
+              "rank": 28,
+              "root": "bobassembly",
+              "root_version": "3.0.1",
+              "portal_latest_at_snapshot": "3.0.2",
+              "mode": "space-age",
+              "metadata_issues": [],
+              "profile_disposition": "new-exact-input",
+              "profile": "tests/profiles/popular-bobassembly-space-age-f210-2123.json"
+            },
+            {
+              "rank": 29,
+              "root": "bobmining",
+              "root_version": "3.0.1",
+              "portal_latest_at_snapshot": "3.0.2",
+              "mode": "base",
+              "metadata_issues": [],
+              "profile_disposition": "new-exact-input",
+              "profile": "tests/profiles/popular-bobmining-base-f210-2123.json"
+            },
+            {
+              "rank": 29,
+              "root": "bobmining",
+              "root_version": "3.0.1",
+              "portal_latest_at_snapshot": "3.0.2",
+              "mode": "space-age",
+              "metadata_issues": [],
+              "profile_disposition": "new-exact-input",
+              "profile": "tests/profiles/popular-bobmining-space-age-f210-2123.json"
+            },
+            {
+              "rank": 30,
+              "root": "equipment-gantry",
+              "root_version": "0.3.0",
+              "portal_latest_at_snapshot": "0.3.0",
+              "mode": "base",
+              "metadata_issues": [],
+              "profile_disposition": "reuse-exact-existing-input",
+              "profile": "tests/profiles/popular-equipment-gantry-base-f210-2123.json"
+            },
+            {
+              "rank": 30,
+              "root": "equipment-gantry",
+              "root_version": "0.3.0",
+              "portal_latest_at_snapshot": "0.3.0",
+              "mode": "space-age",
+              "metadata_issues": [],
+              "profile_disposition": "reuse-exact-existing-input",
+              "profile": "tests/profiles/popular-equipment-gantry-space-age-f210-2123.json"
+            },
+            {
+              "rank": 31,
+              "root": "bobores",
+              "root_version": "3.0.0",
+              "portal_latest_at_snapshot": "3.0.0",
+              "mode": "base",
+              "metadata_issues": [],
+              "profile_disposition": "reuse-exact-existing-input",
+              "profile": "tests/profiles/popular-bobores-base-f210-2123.json"
+            },
+            {
+              "rank": 31,
+              "root": "bobores",
+              "root_version": "3.0.0",
+              "portal_latest_at_snapshot": "3.0.0",
+              "mode": "space-age",
+              "metadata_issues": [],
+              "profile_disposition": "reuse-exact-existing-input",
+              "profile": "tests/profiles/popular-bobores-space-age-f210-2123.json"
+            },
+            {
+              "rank": 32,
+              "root": "VehicleSnap",
+              "root_version": "2.0.4",
+              "portal_latest_at_snapshot": "2.0.4",
+              "mode": "base",
+              "metadata_issues": [],
+              "profile_disposition": "reuse-exact-existing-input",
+              "profile": "tests/profiles/popular-vehiclesnap-base-f210-2123.json"
+            },
+            {
+              "rank": 32,
+              "root": "VehicleSnap",
+              "root_version": "2.0.4",
+              "portal_latest_at_snapshot": "2.0.4",
+              "mode": "space-age",
+              "metadata_issues": [],
+              "profile_disposition": "reuse-exact-existing-input",
+              "profile": "tests/profiles/popular-vehiclesnap-space-age-f210-2123.json"
+            },
+            {
+              "rank": 33,
+              "root": "bobplates",
+              "root_version": "3.0.2",
+              "portal_latest_at_snapshot": "3.0.2",
+              "mode": "base",
+              "metadata_issues": [],
+              "profile_disposition": "reuse-exact-existing-input",
+              "profile": "tests/profiles/popular-bobplates-base-f210-2123.json"
+            },
+            {
+              "rank": 33,
+              "root": "bobplates",
+              "root_version": "3.0.2",
+              "portal_latest_at_snapshot": "3.0.2",
+              "mode": "space-age",
+              "metadata_issues": [],
+              "profile_disposition": "reuse-exact-existing-input",
+              "profile": "tests/profiles/popular-bobplates-space-age-f210-2123.json"
+            },
+            {
+              "rank": 34,
+              "root": "squeak-through-2",
+              "root_version": "0.2.0",
+              "portal_latest_at_snapshot": "0.2.1",
+              "mode": "base",
+              "metadata_issues": [],
+              "profile_disposition": "new-exact-input",
+              "profile": "tests/profiles/popular-squeak-through-2-base-f210-2123.json"
+            },
+            {
+              "rank": 34,
+              "root": "squeak-through-2",
+              "root_version": "0.2.0",
+              "portal_latest_at_snapshot": "0.2.1",
+              "mode": "space-age",
+              "metadata_issues": [],
+              "profile_disposition": "new-exact-input",
+              "profile": "tests/profiles/popular-squeak-through-2-space-age-f210-2123.json"
+            },
+            {
+              "rank": 35,
+              "root": "LogisticTrainNetwork",
+              "root_version": "3.1.0",
+              "portal_latest_at_snapshot": "3.4.1",
+              "mode": "base",
+              "metadata_issues": [],
+              "profile_disposition": "new-exact-input",
+              "profile": "tests/profiles/popular-logistictrainnetwork-base-f210-2123.json"
+            },
+            {
+              "rank": 35,
+              "root": "LogisticTrainNetwork",
+              "root_version": "3.1.0",
+              "portal_latest_at_snapshot": "3.4.1",
+              "mode": "space-age",
+              "metadata_issues": [],
+              "profile_disposition": "new-exact-input",
+              "profile": "tests/profiles/popular-logistictrainnetwork-space-age-f210-2123.json"
+            },
+            {
+              "rank": 36,
+              "root": "bobenemies",
+              "root_version": "3.0.0",
+              "portal_latest_at_snapshot": "3.0.1",
+              "mode": "base",
+              "metadata_issues": [],
+              "profile_disposition": "new-exact-input",
+              "profile": "tests/profiles/popular-bobenemies-base-f210-2123.json"
+            },
+            {
+              "rank": 36,
+              "root": "bobenemies",
+              "root_version": "3.0.0",
+              "portal_latest_at_snapshot": "3.0.1",
+              "mode": "space-age",
+              "metadata_issues": [],
+              "profile_disposition": "new-exact-input",
+              "profile": "tests/profiles/popular-bobenemies-space-age-f210-2123.json"
+            },
+            {
+              "rank": 37,
+              "root": "cargo-ships",
+              "root_version": "2.1.8",
+              "portal_latest_at_snapshot": "2.1.8",
+              "mode": "base",
+              "metadata_issues": [],
+              "profile_disposition": "new-exact-input",
+              "profile": "tests/profiles/popular-cargo-ships-base-f210-2123.json"
+            },
+            {
+              "rank": 37,
+              "root": "cargo-ships",
+              "root_version": "2.1.8",
+              "portal_latest_at_snapshot": "2.1.8",
+              "mode": "space-age",
+              "metadata_issues": [],
+              "profile_disposition": "new-exact-input",
+              "profile": "tests/profiles/popular-cargo-ships-space-age-f210-2123.json"
+            },
+            {
+              "rank": 38,
+              "root": "Todo-List",
+              "root_version": "19.15.3",
+              "portal_latest_at_snapshot": "19.15.3",
+              "mode": "base",
+              "metadata_issues": [],
+              "profile_disposition": "reuse-exact-existing-input",
+              "profile": "tests/profiles/popular-todo-list-base-f210-2123.json"
+            },
+            {
+              "rank": 38,
+              "root": "Todo-List",
+              "root_version": "19.15.3",
+              "portal_latest_at_snapshot": "19.15.3",
+              "mode": "space-age",
+              "metadata_issues": [],
+              "profile_disposition": "reuse-exact-existing-input",
+              "profile": "tests/profiles/popular-todo-list-space-age-f210-2123.json"
+            },
+            {
+              "rank": 39,
+              "root": "bobelectronics",
+              "root_version": "3.0.1",
+              "portal_latest_at_snapshot": "3.0.1",
+              "mode": "base",
+              "metadata_issues": [],
+              "profile_disposition": "reuse-exact-existing-input",
+              "profile": "tests/profiles/popular-bobelectronics-base-f210-2123.json"
+            },
+            {
+              "rank": 39,
+              "root": "bobelectronics",
+              "root_version": "3.0.1",
+              "portal_latest_at_snapshot": "3.0.1",
+              "mode": "space-age",
+              "metadata_issues": [],
+              "profile_disposition": "reuse-exact-existing-input",
+              "profile": "tests/profiles/popular-bobelectronics-space-age-f210-2123.json"
+            },
+            {
+              "rank": 40,
+              "root": "bobmodules",
+              "root_version": "3.0.1",
+              "portal_latest_at_snapshot": "3.0.1",
+              "mode": "base",
+              "metadata_issues": [],
+              "profile_disposition": "reuse-exact-existing-input",
+              "profile": "tests/profiles/popular-bobmodules-base-f210-2123.json"
+            },
+            {
+              "rank": 40,
+              "root": "bobmodules",
+              "root_version": "3.0.1",
+              "portal_latest_at_snapshot": "3.0.1",
+              "mode": "space-age",
+              "metadata_issues": [],
+              "profile_disposition": "reuse-exact-existing-input",
+              "profile": "tests/profiles/popular-bobmodules-space-age-f210-2123.json"
+            },
+            {
+              "rank": 41,
+              "root": "bobtech",
+              "root_version": "3.0.0",
+              "portal_latest_at_snapshot": "3.0.0",
+              "mode": "base",
+              "metadata_issues": [],
+              "profile_disposition": "reuse-exact-existing-input",
+              "profile": "tests/profiles/popular-bobtech-base-f210-2123.json"
+            },
+            {
+              "rank": 41,
+              "root": "bobtech",
+              "root_version": "3.0.0",
+              "portal_latest_at_snapshot": "3.0.0",
+              "mode": "space-age",
+              "metadata_issues": [],
+              "profile_disposition": "reuse-exact-existing-input",
+              "profile": "tests/profiles/popular-bobtech-space-age-f210-2123.json"
+            },
+            {
+              "rank": 42,
+              "root": "bobequipment",
+              "root_version": "3.0.0",
+              "portal_latest_at_snapshot": "3.0.0",
+              "mode": "base",
+              "metadata_issues": [],
+              "profile_disposition": "reuse-exact-existing-input",
+              "profile": "tests/profiles/popular-bobequipment-base-f210-2123.json"
+            },
+            {
+              "rank": 42,
+              "root": "bobequipment",
+              "root_version": "3.0.0",
+              "portal_latest_at_snapshot": "3.0.0",
+              "mode": "space-age",
+              "metadata_issues": [],
+              "profile_disposition": "reuse-exact-existing-input",
+              "profile": "tests/profiles/popular-bobequipment-space-age-f210-2123.json"
+            },
+            {
+              "rank": 43,
+              "root": "aai-vehicles-ironclad",
+              "root_version": "0.8.0",
+              "portal_latest_at_snapshot": "0.8.0",
+              "mode": "base",
+              "metadata_issues": [],
+              "profile_disposition": "reuse-exact-existing-input",
+              "profile": "tests/profiles/popular-aai-vehicles-ironclad-base-f210-2123.json"
+            },
+            {
+              "rank": 43,
+              "root": "aai-vehicles-ironclad",
+              "root_version": "0.8.0",
+              "portal_latest_at_snapshot": "0.8.0",
+              "mode": "space-age",
+              "metadata_issues": [],
+              "profile_disposition": "reuse-exact-existing-input",
+              "profile": "tests/profiles/popular-aai-vehicles-ironclad-space-age-f210-2123.json"
+            },
+            {
+              "rank": 44,
+              "root": "FluidMustFlow",
+              "root_version": "1.5.0",
+              "portal_latest_at_snapshot": "1.5.1",
+              "mode": "base",
+              "metadata_issues": [],
+              "profile_disposition": "new-exact-input",
+              "profile": "tests/profiles/popular-fluidmustflow-base-f210-2123.json"
+            },
+            {
+              "rank": 44,
+              "root": "FluidMustFlow",
+              "root_version": "1.5.0",
+              "portal_latest_at_snapshot": "1.5.1",
+              "mode": "space-age",
+              "metadata_issues": [],
+              "profile_disposition": "new-exact-input",
+              "profile": "tests/profiles/popular-fluidmustflow-space-age-f210-2123.json"
+            },
+            {
+              "rank": 45,
+              "root": "bobrevamp",
+              "root_version": "3.0.0",
+              "portal_latest_at_snapshot": "3.0.1",
+              "mode": "base",
+              "metadata_issues": [],
+              "profile_disposition": "new-exact-input",
+              "profile": "tests/profiles/popular-bobrevamp-base-f210-2123.json"
+            },
+            {
+              "rank": 45,
+              "root": "bobrevamp",
+              "root_version": "3.0.0",
+              "portal_latest_at_snapshot": "3.0.1",
+              "mode": "space-age",
+              "metadata_issues": [],
+              "profile_disposition": "new-exact-input",
+              "profile": "tests/profiles/popular-bobrevamp-space-age-f210-2123.json"
+            },
+            {
+              "rank": 46,
+              "root": "far-reach",
+              "root_version": "2.1.0",
+              "portal_latest_at_snapshot": "2.1.0",
+              "mode": "base",
+              "metadata_issues": [],
+              "profile_disposition": "reuse-exact-existing-input",
+              "profile": "tests/profiles/popular-far-reach-base-f210-2123.json"
+            },
+            {
+              "rank": 46,
+              "root": "far-reach",
+              "root_version": "2.1.0",
+              "portal_latest_at_snapshot": "2.1.0",
+              "mode": "space-age",
+              "metadata_issues": [],
+              "profile_disposition": "reuse-exact-existing-input",
+              "profile": "tests/profiles/popular-far-reach-space-age-f210-2123.json"
+            },
+            {
+              "rank": 47,
+              "root": "Warehousing",
+              "root_version": "1.1.0",
+              "portal_latest_at_snapshot": "1.1.0",
+              "mode": "base",
+              "metadata_issues": [],
+              "profile_disposition": "reuse-exact-existing-input",
+              "profile": "tests/profiles/popular-warehousing-base-f210-2123.json"
+            },
+            {
+              "rank": 47,
+              "root": "Warehousing",
+              "root_version": "1.1.0",
+              "portal_latest_at_snapshot": "1.1.0",
+              "mode": "space-age",
+              "metadata_issues": [],
+              "profile_disposition": "reuse-exact-existing-input",
+              "profile": "tests/profiles/popular-warehousing-space-age-f210-2123.json"
+            },
+            {
+              "rank": 48,
+              "root": "BottleneckLite",
+              "root_version": "1.4.1",
+              "portal_latest_at_snapshot": "1.4.1",
+              "mode": "base",
+              "metadata_issues": [],
+              "profile_disposition": "reuse-exact-existing-input",
+              "profile": "tests/profiles/popular-bottlenecklite-base-f210-2123.json"
+            },
+            {
+              "rank": 48,
+              "root": "BottleneckLite",
+              "root_version": "1.4.1",
+              "portal_latest_at_snapshot": "1.4.1",
+              "mode": "space-age",
+              "metadata_issues": [],
+              "profile_disposition": "reuse-exact-existing-input",
+              "profile": "tests/profiles/popular-bottlenecklite-space-age-f210-2123.json"
+            },
+            {
+              "rank": 49,
+              "root": "Power Armor MK3",
+              "root_version": "2.1.08",
+              "portal_latest_at_snapshot": "2.1.09",
+              "mode": "base",
+              "metadata_issues": [],
+              "profile_disposition": "new-exact-input",
+              "profile": "tests/profiles/popular-power-armor-mk3-base-f210-2123.json"
+            },
+            {
+              "rank": 49,
+              "root": "Power Armor MK3",
+              "root_version": "2.1.08",
+              "portal_latest_at_snapshot": "2.1.09",
+              "mode": "space-age",
+              "metadata_issues": [],
+              "profile_disposition": "new-exact-input",
+              "profile": "tests/profiles/popular-power-armor-mk3-space-age-f210-2123.json"
+            },
+            {
+              "rank": 50,
+              "root": "angelsrefining",
+              "root_version": "2.1.2",
+              "portal_latest_at_snapshot": "2.1.3",
+              "mode": "base",
+              "metadata_issues": [],
+              "profile_disposition": "new-exact-input",
+              "profile": "tests/profiles/popular-angelsrefining-base-f210-2123.json"
+            },
+            {
+              "rank": 50,
+              "root": "angelsrefining",
+              "root_version": "2.1.2",
+              "portal_latest_at_snapshot": "2.1.3",
+              "mode": "space-age",
+              "metadata_issues": [],
+              "profile_disposition": "new-exact-input",
+              "profile": "tests/profiles/popular-angelsrefining-space-age-f210-2123.json"
+            }
+          ]
         }
       }
     },
