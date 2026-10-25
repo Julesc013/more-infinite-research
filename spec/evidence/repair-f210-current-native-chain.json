@@ -1,0 +1,157 @@
+{
+  "schema": 1,
+  "kind": "MIR5RepairF210CurrentNativeChainV1",
+  "status": "both-exact-source-physical-queue-arms-and-cold-reloads-passed",
+  "source_commit": "04c2684be262509ef6bb312e1dd0c60d9e11cc74",
+  "controller_commit": "17d726a44e8baa7c066ce7c8328a0c94660ce289",
+  "run": 40163749124,
+  "url": "https://github.com/Julesc013/mir-native-worker/actions/runs/40163749124",
+  "task": "repair-stress-f210",
+  "engine": {
+    "version": "2.1.23",
+    "sha256": "FE4A1DA30F322A0D0B8AEB3DF7276332222BAAA143E2352569B723E84B2B9060"
+  },
+  "manifest_sha256": "C59D873493E03257D08D19AF2CC44D7ADEF719995407CA5BADBF5EDC4CB138A8",
+  "original_members_verified": 63,
+  "witnesses": {
+    "total_eligible_walls": 1000,
+    "first_capacity_walls": 256,
+    "eligible_overflow_walls": 744,
+    "first_capacity_player_walls": 128,
+    "first_capacity_reciprocal_friend_walls": 128,
+    "quiet_ticks": 600,
+    "service_ticks": 60,
+    "repair_amount": 1,
+    "maximum_observed_repairs_per_service": 8,
+    "initial_first_repair_observed_tick": 601,
+    "initial_first_repair_service_tick": 600,
+    "reactivation_first_repair_observed_tick": 3121,
+    "reactivation_first_repair_service_tick": 3120,
+    "reactivation_count": 8,
+    "overflow_unchanged": true,
+    "nonfriendly_unchanged": true,
+    "nonwall_unchanged": true,
+    "native_damage_api": "LuaEntity.damage",
+    "native_damage_type": "electric",
+    "performance_qualified": false,
+    "runtime_elapsed_qualified": false
+  },
+  "arms": [
+    {
+      "arm": "published",
+      "player_sha256": "A4BB8F47232C689B267EF434F557187A8795C47280FA464169DE917FB579517F",
+      "native_result_sha256": "47640DDAC13E2C38BA6FA55C026FF98E05009717C5F6037ED12F37CDA947C0A6",
+      "completed_save_sha256": "AC2C06835DB7402F259148661C38283771CB7C0F6B667784E2678F4B52FD3C94",
+      "cold_reloads": 2,
+      "controls_restored": true,
+      "actual_observer_archive_sha256": "566CA4AE4EF5F1C8C2B43AE59D0ADFB9E15D61499F4723ED3F58222E606E62CB"
+    },
+    {
+      "arm": "mir5",
+      "player_sha256": "C8E0C570213F41CA8C816A29D1556FD40A36896D31ED56B07856652B2DE7F32A",
+      "native_result_sha256": "F7ED214C3C15556A7653C7EAE3CF488644375CC1A03D1E353763D5BFD31927FD",
+      "completed_save_sha256": "F8FBB4EC1C05CD0BCDED69927BD72F02D452727404174CE51682CA76191BF4D9",
+      "cold_reloads": 2,
+      "controls_restored": true,
+      "actual_observer_archive_sha256": "566CA4AE4EF5F1C8C2B43AE59D0ADFB9E15D61499F4723ED3F58222E606E62CB"
+    }
+  ],
+  "native_stage_log_markers_verified": 6,
+  "cold_reloads_verified": 4,
+  "primary_custody": "build/mir5/recovery-historical/repair-stress/40163749124",
+  "independent_readback_sha256": "A714335FF929C5CE68D33D67515B2A5D460A163BED378B1EF0211DE076784345",
+  "portable_capsule": {
+    "path": "repair-f210-current-native-capsule.zip",
+    "sha256": "6D2680483398D4C65F25F69312DD20C4924408DC073C7AB9E1F56B13861FCCF4",
+    "bytes": 29121,
+    "members": [
+      {
+        "path": "adverse-artifact-manifest.json",
+        "bytes": 1060,
+        "sha256": "D2400EDC15FC60465E32F91E038F9D349C580E0354EE4B962CA4572D1C688E68",
+        "custody": "exact original artifact bytes"
+      },
+      {
+        "path": "candidate-player-record.json",
+        "bytes": 33496,
+        "sha256": "BC0DA2781B31B3D90DC73CB03D7A0D70DA4D20314852A028D046BA767512ACE1",
+        "custody": "exact original artifact bytes"
+      },
+      {
+        "path": "fixture-members.json",
+        "bytes": 2697,
+        "sha256": "48FDB99B90AEB25767B99D6920BBB52CE532576B2C1EBB8B1EF3D8C356DC0F03",
+        "custody": "exact original artifact bytes"
+      },
+      {
+        "path": "independent-readback.json",
+        "bytes": 12356,
+        "sha256": "A714335FF929C5CE68D33D67515B2A5D460A163BED378B1EF0211DE076784345",
+        "custody": "explicitly derived native markers and CLI failure readback"
+      },
+      {
+        "path": "mir5-native-result.json",
+        "bytes": 46841,
+        "sha256": "F7ED214C3C15556A7653C7EAE3CF488644375CC1A03D1E353763D5BFD31927FD",
+        "custody": "exact original artifact bytes"
+      },
+      {
+        "path": "passed-artifact-manifest.json",
+        "bytes": 10705,
+        "sha256": "C59D873493E03257D08D19AF2CC44D7ADEF719995407CA5BADBF5EDC4CB138A8",
+        "custody": "exact original artifact bytes"
+      },
+      {
+        "path": "published-native-result.json",
+        "bytes": 47020,
+        "sha256": "47640DDAC13E2C38BA6FA55C026FF98E05009717C5F6037ED12F37CDA947C0A6",
+        "custody": "exact original artifact bytes"
+      },
+      {
+        "path": "published-reference.json",
+        "bytes": 184,
+        "sha256": "FDBA17615DD74DCCD4592259DB2151BF432338693EFF3E5CCC3729CE54A58561",
+        "custody": "exact original artifact bytes"
+      },
+      {
+        "path": "fixture-source-readback.json",
+        "bytes": 2521,
+        "sha256": "9FECF490B12E06018B1E139B4AACCB762EE8CC5B5102A8FB85B47EB4DF8AC647",
+        "custody": "explicitly derived raw-Git fixture and decoded observer payload readback"
+      }
+    ]
+  },
+  "earlier_adverse": {
+    "run_id": 40162899940,
+    "controller": "72039ff9b0dba2dea45514191a19d7e11c6cb460",
+    "manifest_sha256": "D2400EDC15FC60465E32F91E038F9D349C580E0354EE4B962CA4572D1C688E68",
+    "original_members_verified": 7,
+    "worker_transcript_sha256": "814FB292205992627824358DC1F4D54C8F8C8E9DEF2DD20380007831754B3310",
+    "failed_workflow_log_sha256": "F0FB5E3642DE230CAD5A853609F90CFDED3CE72AF5EAB06F0DC295A458DC49F5",
+    "exception": "Retired tools/mir5/Invoke-PrototypeCapture.ps1 command is unavailable before any engine launch; no fixture or product result.",
+    "url": "https://github.com/Julesc013/mir-native-worker/actions/runs/40162899940",
+    "primary_custody": "build/mir5/recovery-historical/repair-stress/40162899940",
+    "classification": "pre-engine routing failure, not a native or player failure",
+    "correction_original_commit": "31bf16fbedb07b8c9e2a833af3d215cf1a4b5de3",
+    "correction_accepted_commit": "17d726a44e8baa7c066ce7c8328a0c94660ce289",
+    "cli_failure_log_source": "gh run view 40162899940 --repo Julesc013/mir-native-worker --log-failed; local UTF-8 CLI rendering, not an original artifact member"
+  },
+  "native_execution": true,
+  "release_qualification": false,
+  "limits": [
+    "Two disposable current2.1.23 worlds establish physical repair eligibility, queue capacity, bounded services, reactivation and protected sentinels.",
+    "Reload markers carry original workload counters and check read-only load; they are not repeated1000-wall workloads.",
+    "No elapsed-time, memory non-regression, long-running stress, removal/readdition, multiplayer or final release verdict follows.",
+    "All63 original passing members and seven earlier adverse members are independently rehashed and retained with original saves/full logs/configurations in primary custody.",
+    "The portable capsule contains seven exact original JSON receipts plus two explicitly derived native-marker/CLI-failure and raw-Git fixture readbacks. Container-only observer differences do not relabel the actual566 consumed archive as2E1."
+  ],
+  "staged_raw_git_members_verified": 8,
+  "observer_container_disposition": {
+    "actual_consumed_archive_sha256": "566CA4AE4EF5F1C8C2B43AE59D0ADFB9E15D61499F4723ED3F58222E606E62CB",
+    "canonical_later_archive_sha256": "2E1BE5952D2A4CC5C74A0D149E075D247BA110A3FAE5B6768D3EAEBABCEF989C",
+    "decoded_members_equal_raw_git": true,
+    "member_count": 2,
+    "archive_entry_order_equal": false,
+    "scope": "Decoded observer payload equivalence only; original consumed archive identity remains566, not2E1."
+  }
+}
