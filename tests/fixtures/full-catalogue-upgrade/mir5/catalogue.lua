@@ -3,6 +3,13 @@
 -- source and it deliberately enumerates identities rather than discovering
 -- technology or recipe families at runtime.
 return {
+  target = {
+    id = "f200",
+    version = "2.0.77",
+    published_mir = "4.7.20002",
+    mir5 = "5.0.20000",
+    space_age_closure = {"elevated-rails", "quality", "space-age"},
+  },
   force_fields = {"train_braking_force_bonus", "inserter_stack_size_bonus", "bulk_inserter_capacity_bonus", "laboratory_speed_modifier", "worker_robots_storage_bonus", "manual_crafting_speed_modifier", "manual_mining_speed_modifier", "character_reach_distance_bonus", "character_build_distance_bonus", "character_resource_reach_distance_bonus", "character_item_drop_distance_bonus", "character_running_speed_modifier", "character_inventory_slots_bonus", "character_trash_slot_count", "worker_robots_battery_modifier"},
   base = {
     public = {
