@@ -1,0 +1,771 @@
+{
+  "schema": 1,
+  "kind": "MIR5RuntimeR06ObservationAnalysisChainV1",
+  "status": "complete-within-predeclared-active-runtime-limits",
+  "scope": "Exact F210 repair/agriculture active benchmark; no retained-UI-memory, arbitrary-modpack or release verdict.",
+  "claims": {
+    "bootstrap": false,
+    "equivalence_claim": false,
+    "native_execution": true,
+    "performance_comparison": true,
+    "performance_measurement": true,
+    "release_qualification": false,
+    "universal_performance_claim": false
+  },
+  "identity": {
+    "candidate_archive_sha256": "4F5BEE023930666FC0F921136A69B59861741BE44C311E03D46347D42018ECBC",
+    "candidate_inventory_sha256": "4FD1A20E6C2E3D3F27D6158D60C931333B0E5053926019BD6C59493A9AF88498",
+    "candidate_source": "b2cf4c2dac43727e2e93cb90b861d2301f7778cd",
+    "candidate_source_tree": "25442a5bd7838f124952507854426e3b8e868475",
+    "engine": {
+      "sha256": "FE4A1DA30F322A0D0B8AEB3DF7276332222BAAA143E2352569B723E84B2B9060",
+      "version": "2.1.23"
+    },
+    "published_archive_sha256": "A4BB8F47232C689B267EF434F557187A8795C47280FA464169DE917FB579517F"
+  },
+  "execution": {
+    "kind": "direct-frozen-controller",
+    "host": "BLACKGLASS-WIN1",
+    "private_controller": {
+      "revision": "48bfd4d5d3ecb0ba3b65a5c3c41c84bdbfded72a",
+      "path": "Invoke-RuntimeBenchmark.ps1",
+      "raw_git_sha256": "7F82F4EBEDADC95FFB81DE0CE90B75719D47E2C44FEA0148761E1252AADC3EF5",
+      "executed_sha256": "7F82F4EBEDADC95FFB81DE0CE90B75719D47E2C44FEA0148761E1252AADC3EF5",
+      "executed_matches_raw_git": true
+    },
+    "plan": {
+      "path": "spec/evidence/runtime-benchmark-active-plan-r06.json",
+      "source_revision": "7dcd6d6df9e02f66e5eb00965a36d08daf54a856",
+      "sha256": "816BA8FE3589967CC456F189F5F3F584289FB553DAFADBB64ACAEF32DD306C4F",
+      "source_checkout_reference": "7dcd6d6df9e02f66e5eb00965a36d08daf54a856"
+    },
+    "observations": 68,
+    "warmups": 16,
+    "scored": 52,
+    "library_controls_restored": true,
+    "physical_witnesses": "Each scheduled load retains its strict start/complete marker; source seed lab counts are carried witnesses, not new lab completions in each benchmark.",
+    "primary_custody": {
+      "original_output_root": "D:/Projects/Factorio/more-infinite-research/build/tmp/runtime-active-r06-scheduled-r02",
+      "primary_custody_root": "D:/Projects/Factorio/more-infinite-research/build/mir5/recovery/runtime-active-r06-scheduled-r02",
+      "member_count": 593,
+      "total_member_bytes": 70186986,
+      "canonical_member_digest_sha256": "C105DAB95AF441BA30BBF4ABD0C6140568A9B6B27D3F120CB594C16D41120CAA",
+      "missing_count": 0,
+      "mismatch_count": 0,
+      "observed_result": {
+        "path": "runtime-benchmark-active-observed.json",
+        "sha256": "F231BD7AB5167101DDD0215D05B0CF397338F3CEBC236795D89FC0B42EF3B2F3",
+        "bytes": 1433478,
+        "observation_count": 68,
+        "status": "observed-not-performance-accepted"
+      },
+      "prepared_input_result": {
+        "path": "runtime-benchmark-active-prepared.json",
+        "sha256": "6AA7DB73F8D55729FF928D7EC5BEF0F9DFBA2EA5B3C407E1574E01B24D533E93"
+      },
+      "controls_after_terminal": {
+        "factorio_process_count": 0,
+        "direct_library_lock_exclusive": true,
+        "native_library_lock_exclusive": true,
+        "all_68_library_control_restorations": "restored-direct-library-controls"
+      }
+    }
+  },
+  "analysis": {
+    "original_reader_commit": "e61cf59d12eb11b19a8c5cf5b0a0fe08b7a7f57d",
+    "original_reader_sha256": "EE401F144875872EC095BB03C5E0D096B73825760CBC407B3CB0E6723FB6C39C",
+    "hardened_reader_dev_commit": "60962b168c67ef8ff5ddb20c41cb7ac344de8b03",
+    "hardened_reader_raw_git_sha256": "7541969592B8C27DDBC9A9CFCB5B2F717555B2DC2CDB406A00FACDD3DFAE0AB5",
+    "hardened_reader_result": "Byte-identical analysis8838D3D7 against the retained rawF231BD7A; no native rerun, threshold or arithmetic change.",
+    "verdict": {
+      "memory_rule": "each candidate median <= published median + max(10 percent of published median, 64 MiB)",
+      "status": "within-predeclared-limits",
+      "time_rule": "candidate median <= published median + max(10 percent of published median, 0.25 ms/tick)"
+    },
+    "schedule": [
+      {
+        "arm": "published",
+        "block": null,
+        "id": "repair-warmup-published-1",
+        "ordinal": 1,
+        "phase": "warmup",
+        "scenario": "repair-active",
+        "tier": 0
+      },
+      {
+        "arm": "published",
+        "block": null,
+        "id": "repair-warmup-published-2",
+        "ordinal": 2,
+        "phase": "warmup",
+        "scenario": "repair-active",
+        "tier": 0
+      },
+      {
+        "arm": "candidate",
+        "block": null,
+        "id": "repair-warmup-candidate-1",
+        "ordinal": 3,
+        "phase": "warmup",
+        "scenario": "repair-active",
+        "tier": 0
+      },
+      {
+        "arm": "candidate",
+        "block": null,
+        "id": "repair-warmup-candidate-2",
+        "ordinal": 4,
+        "phase": "warmup",
+        "scenario": "repair-active",
+        "tier": 0
+      },
+      {
+        "arm": "published",
+        "block": 1,
+        "id": "repair-b1-1-published",
+        "ordinal": 5,
+        "phase": "scored",
+        "scenario": "repair-active",
+        "tier": 0
+      },
+      {
+        "arm": "candidate",
+        "block": 1,
+        "id": "repair-b1-2-candidate",
+        "ordinal": 6,
+        "phase": "scored",
+        "scenario": "repair-active",
+        "tier": 0
+      },
+      {
+        "arm": "candidate",
+        "block": 2,
+        "id": "repair-b2-1-candidate",
+        "ordinal": 7,
+        "phase": "scored",
+        "scenario": "repair-active",
+        "tier": 0
+      },
+      {
+        "arm": "published",
+        "block": 2,
+        "id": "repair-b2-2-published",
+        "ordinal": 8,
+        "phase": "scored",
+        "scenario": "repair-active",
+        "tier": 0
+      },
+      {
+        "arm": "published",
+        "block": 3,
+        "id": "repair-b3-1-published",
+        "ordinal": 9,
+        "phase": "scored",
+        "scenario": "repair-active",
+        "tier": 0
+      },
+      {
+        "arm": "candidate",
+        "block": 3,
+        "id": "repair-b3-2-candidate",
+        "ordinal": 10,
+        "phase": "scored",
+        "scenario": "repair-active",
+        "tier": 0
+      },
+      {
+        "arm": "candidate",
+        "block": 4,
+        "id": "repair-b4-1-candidate",
+        "ordinal": 11,
+        "phase": "scored",
+        "scenario": "repair-active",
+        "tier": 0
+      },
+      {
+        "arm": "published",
+        "block": 4,
+        "id": "repair-b4-2-published",
+        "ordinal": 12,
+        "phase": "scored",
+        "scenario": "repair-active",
+        "tier": 0
+      },
+      {
+        "arm": "published",
+        "block": 5,
+        "id": "repair-b5-1-published",
+        "ordinal": 13,
+        "phase": "scored",
+        "scenario": "repair-active",
+        "tier": 0
+      },
+      {
+        "arm": "candidate",
+        "block": 5,
+        "id": "repair-b5-2-candidate",
+        "ordinal": 14,
+        "phase": "scored",
+        "scenario": "repair-active",
+        "tier": 0
+      },
+      {
+        "arm": "candidate",
+        "block": 6,
+        "id": "repair-b6-1-candidate",
+        "ordinal": 15,
+        "phase": "scored",
+        "scenario": "repair-active",
+        "tier": 0
+      },
+      {
+        "arm": "published",
+        "block": 6,
+        "id": "repair-b6-2-published",
+        "ordinal": 16,
+        "phase": "scored",
+        "scenario": "repair-active",
+        "tier": 0
+      },
+      {
+        "arm": "published",
+        "block": 7,
+        "id": "repair-b7-1-published",
+        "ordinal": 17,
+        "phase": "scored",
+        "scenario": "repair-active",
+        "tier": 0
+      },
+      {
+        "arm": "candidate",
+        "block": 7,
+        "id": "repair-b7-2-candidate",
+        "ordinal": 18,
+        "phase": "scored",
+        "scenario": "repair-active",
+        "tier": 0
+      },
+      {
+        "arm": "candidate",
+        "block": 8,
+        "id": "repair-b8-1-candidate",
+        "ordinal": 19,
+        "phase": "scored",
+        "scenario": "repair-active",
+        "tier": 0
+      },
+      {
+        "arm": "published",
+        "block": 8,
+        "id": "repair-b8-2-published",
+        "ordinal": 20,
+        "phase": "scored",
+        "scenario": "repair-active",
+        "tier": 0
+      },
+      {
+        "arm": "published",
+        "block": null,
+        "id": "agriculture-1-warmup-published-1",
+        "ordinal": 21,
+        "phase": "warmup",
+        "scenario": "agriculture-active",
+        "tier": 1
+      },
+      {
+        "arm": "published",
+        "block": null,
+        "id": "agriculture-1-warmup-published-2",
+        "ordinal": 22,
+        "phase": "warmup",
+        "scenario": "agriculture-active",
+        "tier": 1
+      },
+      {
+        "arm": "candidate-defaults",
+        "block": null,
+        "id": "agriculture-1-warmup-candidate-defaults-1",
+        "ordinal": 23,
+        "phase": "warmup",
+        "scenario": "agriculture-active",
+        "tier": 1
+      },
+      {
+        "arm": "candidate-defaults",
+        "block": null,
+        "id": "agriculture-1-warmup-candidate-defaults-2",
+        "ordinal": 24,
+        "phase": "warmup",
+        "scenario": "agriculture-active",
+        "tier": 1
+      },
+      {
+        "arm": "published",
+        "block": 1,
+        "id": "agriculture-1-b1-1-published",
+        "ordinal": 25,
+        "phase": "scored",
+        "scenario": "agriculture-active",
+        "tier": 1
+      },
+      {
+        "arm": "candidate-defaults",
+        "block": 1,
+        "id": "agriculture-1-b1-2-candidate-defaults",
+        "ordinal": 26,
+        "phase": "scored",
+        "scenario": "agriculture-active",
+        "tier": 1
+      },
+      {
+        "arm": "candidate-defaults",
+        "block": 2,
+        "id": "agriculture-1-b2-1-candidate-defaults",
+        "ordinal": 27,
+        "phase": "scored",
+        "scenario": "agriculture-active",
+        "tier": 1
+      },
+      {
+        "arm": "published",
+        "block": 2,
+        "id": "agriculture-1-b2-2-published",
+        "ordinal": 28,
+        "phase": "scored",
+        "scenario": "agriculture-active",
+        "tier": 1
+      },
+      {
+        "arm": "published",
+        "block": 3,
+        "id": "agriculture-1-b3-1-published",
+        "ordinal": 29,
+        "phase": "scored",
+        "scenario": "agriculture-active",
+        "tier": 1
+      },
+      {
+        "arm": "candidate-defaults",
+        "block": 3,
+        "id": "agriculture-1-b3-2-candidate-defaults",
+        "ordinal": 30,
+        "phase": "scored",
+        "scenario": "agriculture-active",
+        "tier": 1
+      },
+      {
+        "arm": "candidate-defaults",
+        "block": 4,
+        "id": "agriculture-1-b4-1-candidate-defaults",
+        "ordinal": 31,
+        "phase": "scored",
+        "scenario": "agriculture-active",
+        "tier": 1
+      },
+      {
+        "arm": "published",
+        "block": 4,
+        "id": "agriculture-1-b4-2-published",
+        "ordinal": 32,
+        "phase": "scored",
+        "scenario": "agriculture-active",
+        "tier": 1
+      },
+      {
+        "arm": "published",
+        "block": 5,
+        "id": "agriculture-1-b5-1-published",
+        "ordinal": 33,
+        "phase": "scored",
+        "scenario": "agriculture-active",
+        "tier": 1
+      },
+      {
+        "arm": "candidate-defaults",
+        "block": 5,
+        "id": "agriculture-1-b5-2-candidate-defaults",
+        "ordinal": 34,
+        "phase": "scored",
+        "scenario": "agriculture-active",
+        "tier": 1
+      },
+      {
+        "arm": "candidate-defaults",
+        "block": 6,
+        "id": "agriculture-1-b6-1-candidate-defaults",
+        "ordinal": 35,
+        "phase": "scored",
+        "scenario": "agriculture-active",
+        "tier": 1
+      },
+      {
+        "arm": "published",
+        "block": 6,
+        "id": "agriculture-1-b6-2-published",
+        "ordinal": 36,
+        "phase": "scored",
+        "scenario": "agriculture-active",
+        "tier": 1
+      },
+      {
+        "arm": "published",
+        "block": null,
+        "id": "agriculture-32-warmup-published-1",
+        "ordinal": 37,
+        "phase": "warmup",
+        "scenario": "agriculture-active",
+        "tier": 32
+      },
+      {
+        "arm": "published",
+        "block": null,
+        "id": "agriculture-32-warmup-published-2",
+        "ordinal": 38,
+        "phase": "warmup",
+        "scenario": "agriculture-active",
+        "tier": 32
+      },
+      {
+        "arm": "candidate-defaults",
+        "block": null,
+        "id": "agriculture-32-warmup-candidate-defaults-1",
+        "ordinal": 39,
+        "phase": "warmup",
+        "scenario": "agriculture-active",
+        "tier": 32
+      },
+      {
+        "arm": "candidate-defaults",
+        "block": null,
+        "id": "agriculture-32-warmup-candidate-defaults-2",
+        "ordinal": 40,
+        "phase": "warmup",
+        "scenario": "agriculture-active",
+        "tier": 32
+      },
+      {
+        "arm": "published",
+        "block": 1,
+        "id": "agriculture-32-b1-1-published",
+        "ordinal": 41,
+        "phase": "scored",
+        "scenario": "agriculture-active",
+        "tier": 32
+      },
+      {
+        "arm": "candidate-defaults",
+        "block": 1,
+        "id": "agriculture-32-b1-2-candidate-defaults",
+        "ordinal": 42,
+        "phase": "scored",
+        "scenario": "agriculture-active",
+        "tier": 32
+      },
+      {
+        "arm": "candidate-defaults",
+        "block": 2,
+        "id": "agriculture-32-b2-1-candidate-defaults",
+        "ordinal": 43,
+        "phase": "scored",
+        "scenario": "agriculture-active",
+        "tier": 32
+      },
+      {
+        "arm": "published",
+        "block": 2,
+        "id": "agriculture-32-b2-2-published",
+        "ordinal": 44,
+        "phase": "scored",
+        "scenario": "agriculture-active",
+        "tier": 32
+      },
+      {
+        "arm": "published",
+        "block": 3,
+        "id": "agriculture-32-b3-1-published",
+        "ordinal": 45,
+        "phase": "scored",
+        "scenario": "agriculture-active",
+        "tier": 32
+      },
+      {
+        "arm": "candidate-defaults",
+        "block": 3,
+        "id": "agriculture-32-b3-2-candidate-defaults",
+        "ordinal": 46,
+        "phase": "scored",
+        "scenario": "agriculture-active",
+        "tier": 32
+      },
+      {
+        "arm": "candidate-defaults",
+        "block": 4,
+        "id": "agriculture-32-b4-1-candidate-defaults",
+        "ordinal": 47,
+        "phase": "scored",
+        "scenario": "agriculture-active",
+        "tier": 32
+      },
+      {
+        "arm": "published",
+        "block": 4,
+        "id": "agriculture-32-b4-2-published",
+        "ordinal": 48,
+        "phase": "scored",
+        "scenario": "agriculture-active",
+        "tier": 32
+      },
+      {
+        "arm": "published",
+        "block": 5,
+        "id": "agriculture-32-b5-1-published",
+        "ordinal": 49,
+        "phase": "scored",
+        "scenario": "agriculture-active",
+        "tier": 32
+      },
+      {
+        "arm": "candidate-defaults",
+        "block": 5,
+        "id": "agriculture-32-b5-2-candidate-defaults",
+        "ordinal": 50,
+        "phase": "scored",
+        "scenario": "agriculture-active",
+        "tier": 32
+      },
+      {
+        "arm": "candidate-defaults",
+        "block": 6,
+        "id": "agriculture-32-b6-1-candidate-defaults",
+        "ordinal": 51,
+        "phase": "scored",
+        "scenario": "agriculture-active",
+        "tier": 32
+      },
+      {
+        "arm": "published",
+        "block": 6,
+        "id": "agriculture-32-b6-2-published",
+        "ordinal": 52,
+        "phase": "scored",
+        "scenario": "agriculture-active",
+        "tier": 32
+      },
+      {
+        "arm": "published",
+        "block": null,
+        "id": "agriculture-128-warmup-published-1",
+        "ordinal": 53,
+        "phase": "warmup",
+        "scenario": "agriculture-active",
+        "tier": 128
+      },
+      {
+        "arm": "published",
+        "block": null,
+        "id": "agriculture-128-warmup-published-2",
+        "ordinal": 54,
+        "phase": "warmup",
+        "scenario": "agriculture-active",
+        "tier": 128
+      },
+      {
+        "arm": "candidate-defaults",
+        "block": null,
+        "id": "agriculture-128-warmup-candidate-defaults-1",
+        "ordinal": 55,
+        "phase": "warmup",
+        "scenario": "agriculture-active",
+        "tier": 128
+      },
+      {
+        "arm": "candidate-defaults",
+        "block": null,
+        "id": "agriculture-128-warmup-candidate-defaults-2",
+        "ordinal": 56,
+        "phase": "warmup",
+        "scenario": "agriculture-active",
+        "tier": 128
+      },
+      {
+        "arm": "published",
+        "block": 1,
+        "id": "agriculture-128-b1-1-published",
+        "ordinal": 57,
+        "phase": "scored",
+        "scenario": "agriculture-active",
+        "tier": 128
+      },
+      {
+        "arm": "candidate-defaults",
+        "block": 1,
+        "id": "agriculture-128-b1-2-candidate-defaults",
+        "ordinal": 58,
+        "phase": "scored",
+        "scenario": "agriculture-active",
+        "tier": 128
+      },
+      {
+        "arm": "candidate-defaults",
+        "block": 2,
+        "id": "agriculture-128-b2-1-candidate-defaults",
+        "ordinal": 59,
+        "phase": "scored",
+        "scenario": "agriculture-active",
+        "tier": 128
+      },
+      {
+        "arm": "published",
+        "block": 2,
+        "id": "agriculture-128-b2-2-published",
+        "ordinal": 60,
+        "phase": "scored",
+        "scenario": "agriculture-active",
+        "tier": 128
+      },
+      {
+        "arm": "published",
+        "block": 3,
+        "id": "agriculture-128-b3-1-published",
+        "ordinal": 61,
+        "phase": "scored",
+        "scenario": "agriculture-active",
+        "tier": 128
+      },
+      {
+        "arm": "candidate-defaults",
+        "block": 3,
+        "id": "agriculture-128-b3-2-candidate-defaults",
+        "ordinal": 62,
+        "phase": "scored",
+        "scenario": "agriculture-active",
+        "tier": 128
+      },
+      {
+        "arm": "candidate-defaults",
+        "block": 4,
+        "id": "agriculture-128-b4-1-candidate-defaults",
+        "ordinal": 63,
+        "phase": "scored",
+        "scenario": "agriculture-active",
+        "tier": 128
+      },
+      {
+        "arm": "published",
+        "block": 4,
+        "id": "agriculture-128-b4-2-published",
+        "ordinal": 64,
+        "phase": "scored",
+        "scenario": "agriculture-active",
+        "tier": 128
+      },
+      {
+        "arm": "published",
+        "block": 5,
+        "id": "agriculture-128-b5-1-published",
+        "ordinal": 65,
+        "phase": "scored",
+        "scenario": "agriculture-active",
+        "tier": 128
+      },
+      {
+        "arm": "candidate-defaults",
+        "block": 5,
+        "id": "agriculture-128-b5-2-candidate-defaults",
+        "ordinal": 66,
+        "phase": "scored",
+        "scenario": "agriculture-active",
+        "tier": 128
+      },
+      {
+        "arm": "candidate-defaults",
+        "block": 6,
+        "id": "agriculture-128-b6-1-candidate-defaults",
+        "ordinal": 67,
+        "phase": "scored",
+        "scenario": "agriculture-active",
+        "tier": 128
+      },
+      {
+        "arm": "published",
+        "block": 6,
+        "id": "agriculture-128-b6-2-published",
+        "ordinal": 68,
+        "phase": "scored",
+        "scenario": "agriculture-active",
+        "tier": 128
+      }
+    ],
+    "independent_readback": "A separate standard-library recomputation matches all sample counts, minima/medians/maxima, 16 limits, paired differences and descriptive128-minus1 results with zero discrepancies."
+  },
+  "adverse_disposition": "Retain zero-native CRLF/controller and Config-string preparation refusals in primary custody and both reader refusals in this capsule. Post-data plan-label and path-representation reader fixes were selected before scored comparative outcomes were inspected; unscored metadata was inspected for path diagnosis. Aero later hardened receipt admission without viewing the scored campaign.",
+  "prerequisite_chain": "spec/evidence/runtime-active-r06-physical-native-chain.json",
+  "portable_receipts": {
+    "path": "spec/evidence/runtime-active-r06-observation-analysis-receipts.json.gz",
+    "bytes": 329993,
+    "sha256": "7DCC75B907377193FF08C88C3BD6A26469FB7D00031B3E454AC9142B14EB4CEE",
+    "files": [
+      {
+        "bytes": 1433478,
+        "path": "original/runtime-benchmark-active-observed.json",
+        "role": "original-native-result",
+        "sha256": "F231BD7AB5167101DDD0215D05B0CF397338F3CEBC236795D89FC0B42EF3B2F3"
+      },
+      {
+        "bytes": 302957,
+        "path": "original/runtime-benchmark-active-prepared.json",
+        "role": "original-prepared-input-sidecar",
+        "sha256": "6AA7DB73F8D55729FF928D7EC5BEF0F9DFBA2EA5B3C407E1574E01B24D533E93"
+      },
+      {
+        "bytes": 17997,
+        "path": "original/runtime-benchmark-active-plan-r06.json",
+        "role": "exact-frozen-plan",
+        "sha256": "816BA8FE3589967CC456F189F5F3F584289FB553DAFADBB64ACAEF32DD306C4F"
+      },
+      {
+        "bytes": 41065,
+        "path": "derived/analysis-result.json",
+        "role": "derived-frozen-analysis",
+        "sha256": "8838D3D71129876B44598B2800DDC2271F0CA326F38A5E5FEDBC554577333A43"
+      },
+      {
+        "bytes": 24859,
+        "path": "derived/independent-readback.json",
+        "role": "derived-independent-standard-library-readback",
+        "sha256": "503D8AAE8DFF594E5F97850684C0D67CB71A85502A7908906728E2BBFB9B66CC"
+      },
+      {
+        "bytes": 814,
+        "path": "derived/reader-selection.json",
+        "role": "derived-reader-selection",
+        "sha256": "6A73F341C9B1906ACB02BF6CEBF5613E3DF96BD5FA9F488E468845FAE38800B6"
+      },
+      {
+        "bytes": 2562,
+        "path": "derived/primary-custody-readback.json",
+        "role": "derived-primary-custody-readback",
+        "sha256": "AD1E4B56ACE8F744FEFBE463A5351B3E8EA1A0A0C614E4EF8F5394E4A69133E9"
+      },
+      {
+        "bytes": 978,
+        "path": "adverse/analysis-refusal-efd3-r01.json",
+        "role": "retained-reader-adverse",
+        "sha256": "440DF5A62A216ADEEF019846C5B4474C47900C2375588D0702A839862A030D88"
+      },
+      {
+        "bytes": 1071,
+        "path": "adverse/analysis-refusal-3a29691b-r01.json",
+        "role": "retained-reader-adverse",
+        "sha256": "1F0643FD662C12826F65C13BF13BD62955D3037EDCD410C8C6AB9516E7F4F544"
+      }
+    ]
+  },
+  "limitations": [
+    "Warmups, active-save capture, and marker pilots are admitted as custody and workload prerequisites, not scored benchmark observations.",
+    "The 128-minus-1 section is descriptive; percentage values are omitted unless the matching published increment is finite and strictly positive.",
+    "The operating-system root peak and sampled working/private maxima are evaluated separately; sampled values are not instantaneous proven peaks.",
+    "Full native logs, saved games and process outputs remain in the named primary custody; this portable capsule carries exact safe JSON only.",
+    "These measurements do not establish zero overhead, immunity to engine/mod crashes or whole-product release acceptance."
+  ]
+}
