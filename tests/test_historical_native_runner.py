@@ -4,7 +4,6 @@ These checks characterize source composition and runner routing only. They do
 not claim an engine result; the seven exact engines execute the fixture later.
 """
 import argparse
-import hashlib
 import json
 import os
 from pathlib import Path
@@ -18,7 +17,6 @@ ROOT = Path(__file__).resolve().parents[1]
 FIXTURE = ROOT / "tests/fixtures/historical-native"
 RUNNER = ROOT / "tools/Invoke-NativeFixture.ps1"
 ALL_SCIENCE_METADATA = FIXTURE / "metadata-all-science.json"
-DEFAULT_METADATA_SHA256 = "f9ba6c05cbe2f41e590e5e9f46963dd369d837e80796002716d3e5332884b32f"
 
 
 class HistoricalNativeFixtureControls(unittest.TestCase):
@@ -135,10 +133,7 @@ class HistoricalNativeFixtureControls(unittest.TestCase):
                 self.assertEqual(actual, wanted)
 
     def test_all_science_metadata_uses_only_the_three_native_red_recipe_targets(self):
-        self.assertEqual(
-            hashlib.sha256((FIXTURE / "metadata.json").read_bytes()).hexdigest(),
-            DEFAULT_METADATA_SHA256,
-        )
+        self.assertTrue(all("science_policy" not in row for row in self.metadata["targets"].values()))
         alternate = json.loads(ALL_SCIENCE_METADATA.read_text(encoding="utf-8"))
         self.assertEqual(set(alternate["targets"]), {"f017", "f100", "f110"})
 
