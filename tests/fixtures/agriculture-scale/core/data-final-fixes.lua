@@ -3,6 +3,7 @@ local PAIRED = "mir-fixture-mir5-agriculture-scale-paired"
 local CANDIDATE = "mir-fixture-mir5-agriculture-scale-arm-candidate"
 local DEFAULTS = "mir-fixture-mir5-agriculture-scale-arm-candidate-defaults"
 local PUBLISHED = "mir-fixture-mir5-agriculture-scale-arm-published"
+local ACTIVE = "mir-fixture-mir5-agriculture-scale-active"
 
 local candidate_science = {
   "automation-science-pack", "logistic-science-pack", "chemical-science-pack",
@@ -22,6 +23,8 @@ local published_science = {
 
 local function descriptor()
   local paired = mods and mods[PAIRED] == "0.1.0"
+  local active = mods and mods[ACTIVE]
+  assert(active == nil or active == "0.1.0", "agriculture active fixture selector version differs")
   local candidate = mods and mods[CANDIDATE] == "0.1.0"
   local defaults = mods and mods[DEFAULTS] == "0.1.0"
   local published = mods and mods[PUBLISHED] == "0.1.0"
@@ -30,16 +33,17 @@ local function descriptor()
       "agriculture paired fixture requires exactly one arm selector")
     if candidate then
       return {name = "candidate-mir5", science = candidate_science,
-        requires_not_disabled = true, paired = true}
+        requires_not_disabled = true, paired = true, active = active ~= nil}
     end
     if defaults then
       return {name = "candidate-defaults-mir5", science = published_science,
-        requires_enabled_omission = true, paired = true}
+        requires_enabled_omission = true, paired = true, active = active ~= nil}
     end
     return {name = "published-4.7.21002", science = published_science,
-      requires_enabled_omission = true, paired = true}
+      requires_enabled_omission = true, paired = true, active = active ~= nil}
   end
-  assert(not candidate and not defaults and not published, "agriculture arm selector requires the paired selector")
+  assert(not candidate and not defaults and not published and active == nil,
+    "agriculture arm selector requires the paired selector")
   return {name = "candidate-mir5", science = candidate_science,
     requires_not_disabled = true, paired = false}
 end
@@ -101,6 +105,9 @@ if arm.paired then
       "agriculture paired fixture cannot combine a scale tier selector")
   end
   assert(selectors <= 1, "agriculture matched fixture requires one tier selector")
+  if arm.active then
+    assert(selectors == 1, "agriculture active fixture requires exactly one matched tier selector")
+  end
   if selectors == 0 then
     assert(tier == 1, "agriculture paired fixture requires the fixed single-tower tier")
     assert(arm.name ~= "candidate-defaults-mir5", "agriculture Defaults arm requires a matched tier selector")

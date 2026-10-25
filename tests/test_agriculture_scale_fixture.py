@@ -20,6 +20,13 @@ PROFILES = {
     32: ROOT / "tests/profiles/agriculture-scale-32-f210-2123.json",
     128: ROOT / "tests/profiles/agriculture-scale-128-f210-2123.json",
 }
+ACTIVE_PROFILES = {
+    arm: {
+        tier: ROOT / "tests/profiles" / f"agriculture-active-matched-{arm}-{tier}-f210-2123.json"
+        for tier in (1, 32, 128)
+    }
+    for arm in ("candidate-defaults", "published")
+}
 SCIENCE = [
     "automation-science-pack", "logistic-science-pack", "chemical-science-pack",
     "production-science-pack", "agricultural-science-pack", "electromagnetic-science-pack",
@@ -71,7 +78,7 @@ class AgricultureScaleFixtureTests(unittest.TestCase):
         self.lua.globals().published_arm_settings = (FIXTURE / "arm-published" / "settings-updates.lua").as_posix()
         self.lua.globals().defaults_arm_settings = (FIXTURE / "arm-candidate-defaults" / "settings-updates.lua").as_posix()
         self.lua.execute(r'''
-          function scale_data(selector_path, opponent, arm, matched_tier)
+          function scale_data(selector_path, opponent, arm, matched_tier, active_seed)
             arm = arm or "legacy"
             local candidate_science = {
               "automation-science-pack", "logistic-science-pack", "chemical-science-pack",
@@ -124,6 +131,9 @@ class AgricultureScaleFixtureTests(unittest.TestCase):
             end
             if matched_tier then
               active["mir-fixture-mir5-agriculture-scale-matched-tier-" .. matched_tier] = "0.1.0"
+            end
+            if active_seed then
+              active["mir-fixture-mir5-agriculture-scale-active"] = "0.1.0"
             end
             if opponent == "mixed-legacy-tier" then
               active["mir-fixture-mir5-agriculture-scale-tier-1"] = "0.1.0"
@@ -201,7 +211,7 @@ class AgricultureScaleFixtureTests(unittest.TestCase):
             return {ok=ok,message=tostring(result),reads=reads,callbacks=callbacks}
           end
 
-          function scale_runtime(path, tier, opponent, arm, matched)
+          function scale_runtime(path, tier, opponent, arm, matched, active_seed)
             arm = arm or "legacy"
             local candidate_packs = {
               "automation-science-pack", "logistic-science-pack", "chemical-science-pack",
@@ -215,7 +225,7 @@ class AgricultureScaleFixtureTests(unittest.TestCase):
               "cryogenic-science-pack"
             }
             local packs = (arm == "published" or arm == "candidate-defaults") and published_packs or candidate_packs
-            local callbacks, reports, saves = {events={}}, {}, 0
+            local callbacks, reports, saves, save_names = {events={}}, {}, 0, {}
             local player, foreign
             local player_agriculture = {
               valid=true, name="recipe-prod-research_agricultural_growth_speed-1",
@@ -248,7 +258,7 @@ class AgricultureScaleFixtureTests(unittest.TestCase):
               assert(kind == 1)
               return lab_inventory
             end
-            local towers, chests, next_unit = {}, {}, 100
+            local towers, chests, next_unit, seed_inserts = {}, {}, 100, 0
             local surface = {generated=0, tile_count=0}
             surface.get_property=function(name) assert(name == "pressure"); return 1000 end
             surface.request_to_generate_chunks=function(center, radius)
@@ -263,6 +273,7 @@ class AgricultureScaleFixtureTests(unittest.TestCase):
                 local input = {}
                 input.insert=function(seed)
                   assert(seed.name == "yumako-seed" and seed.count == 1)
+                  seed_inserts = seed_inserts + 1
                   return 1
                 end
                 local tower={valid=true,name=row.name,force=row.force,unit_number=next_unit,energy=0}
@@ -303,6 +314,9 @@ class AgricultureScaleFixtureTests(unittest.TestCase):
             end
             if matched then
               active["mir-fixture-mir5-agriculture-scale-matched-tier-" .. tostring(tier)]="0.1.0"
+            end
+            if active_seed then
+              active["mir-fixture-mir5-agriculture-scale-active"]="0.1.0"
             end
             if opponent == "mixed-legacy-tier" then
               active["mir-fixture-mir5-agriculture-scale-tier-1"]="0.1.0"
@@ -363,7 +377,10 @@ class AgricultureScaleFixtureTests(unittest.TestCase):
                 env.game.forces[2]=foreign
                 return foreign
               end,
-              server_save=function(name) assert(name == "mir5-native-complete"); saves=saves+1 end
+              server_save=function(name)
+                saves=saves+1
+                save_names[#save_names+1]=name
+              end
             }
             if opponent == "settings-policy" then
               env.settings.startup["mir-science-pack-ingredient-policy"].value = "all-official"
@@ -393,6 +410,27 @@ class AgricultureScaleFixtureTests(unittest.TestCase):
             for _, name in ipairs(packs) do lab_inventory.counts[name]=14 end
 
             local state=env.storage.mir5_agriculture_scale
+            if active_seed then
+              if opponent == "active-early-event" then
+                local tower=towers[1]
+                local plant={valid=true,name="yumako-tree",force={index=3,name="neutral"},
+                  prototype={growth_ticks=18000},tick_grown=env.game.tick+math.floor(18000/(1.01^2))}
+                local result, failure=pcall(callbacks.events[3],
+                  {tower=tower,plant=plant,seed={name="yumako-seed"},tick=env.game.tick})
+                return {ok=result,message=tostring(failure),state=state,reports=reports,saves=saves,
+                  save_names=save_names,seed_inserts=seed_inserts}
+              end
+              env.game.tick=60
+              ok,message=pcall(callbacks.events[1])
+              if not ok then return {ok=false,message=tostring(message),state=state} end
+              if state.phase ~= "active-pending" or seed_inserts ~= 0 then
+                return {ok=false,message="active fixture wrote seeds before load",state=state}
+              end
+              ok,message=pcall(callbacks.load)
+              if not ok then return {ok=false,message=tostring(message),state=state} end
+              ok,message=pcall(callbacks.events[1])
+              if not ok then return {ok=false,message=tostring(message),state=state} end
+            end
             if opponent == "bad-state" then
               state.phase="complete"
               local tower=towers[1]
@@ -445,7 +483,7 @@ class AgricultureScaleFixtureTests(unittest.TestCase):
             env.storage=original_storage
             return {
               ok=ok,message=tostring(message),state=durable,reports=reports,saves=saves,towers=towers,
-              chests=chests,surface=surface,player=player,foreign=foreign
+              save_names=save_names,seed_inserts=seed_inserts,chests=chests,surface=surface,player=player,foreign=foreign
             }
           end
         ''')
@@ -765,6 +803,37 @@ class AgricultureScaleFixtureTests(unittest.TestCase):
                         expected_archives["more-infinite-research_4.7.21002.zip"] = PUBLISHED_ARCHIVE_SHA
                     self.assertEqual(expected_archives, profile["archive_sha256"])
 
+        active_info = json.loads((FIXTURE / "active" / "info.json").read_text())
+        self.assertEqual(
+            ("mir-fixture-mir5-agriculture-scale-active", "0.1.0", "2.1"),
+            (active_info["name"], active_info["version"], active_info["factorio_version"]),
+        )
+        self.assertEqual([
+            "base = 2.1.23", "mir-fixture-mir5-agriculture-scale-paired >= 0.1.0",
+        ], active_info["dependencies"])
+        for tier in (1, 32, 128):
+            for arm, version, archive in (
+                ("candidate-defaults", "5.0.21000", "4D5E32CE2E74C65259E5D3E085CE7BE3BC37DC0A739308C6379BF621F7B5BDA1"),
+                ("published", "4.7.21002", PUBLISHED_ARCHIVE_SHA),
+            ):
+                with self.subTest(active_tier=tier, active_arm=arm):
+                    profile = json.loads(ACTIVE_PROFILES[arm][tier].read_text())
+                    self.assertEqual("mir5-active-agriculture-native-selection", profile["kind"])
+                    self.assertEqual({"version": "2.1.23", "sha256": ENGINE_SHA}, profile["engine"])
+                    self.assertEqual("Defaults", profile["settings_mode"])
+                    self.assertEqual([
+                        ("base", "2.1.23"), ("elevated-rails", "2.1.23"), ("quality", "2.1.23"),
+                        ("recycler", "2.1.23"), ("space-age", "2.1.23"),
+                        ("more-infinite-research", version), ("mir-fixture-mir5-agriculture-scale", "0.1.0"),
+                        ("mir-fixture-mir5-agriculture-scale-paired", "0.1.0"),
+                        (f"mir-fixture-mir5-agriculture-scale-arm-{arm}", "0.1.0"),
+                        (f"mir-fixture-mir5-agriculture-scale-matched-tier-{tier}", "0.1.0"),
+                        ("mir-fixture-mir5-agriculture-scale-active", "0.1.0"),
+                        ("mir-fixture-mir5-active-mods-observer", "0.1.0"),
+                    ], [(row["name"], row["version"]) for row in profile["mods"]])
+                    self.assertEqual(archive, profile["archive_sha256"]
+                                     [f"more-infinite-research_{version}.zip"])
+
     def test_matched_defaults_data_preflight_keeps_seven_captured_packs_and_product_defaults(self):
         run = self.lua.eval("scale_data")
         for tier in (1, 32, 128):
@@ -805,6 +874,14 @@ class AgricultureScaleFixtureTests(unittest.TestCase):
         self.assertFalse(no_tier["ok"])
         self.assertIn("requires a matched tier selector", no_tier["message"])
 
+        active = plain(run(selector, "", "candidate-defaults", 1, True))
+        self.assertTrue(active["ok"], active["message"])
+        self.assertEqual(1, active["selected_tier"])
+        active_without_tier = plain(run((FIXTURE / "paired" / "settings-updates.lua").as_posix(), "",
+                                        "candidate-defaults", None, True))
+        self.assertFalse(active_without_tier["ok"])
+        self.assertIn("active fixture requires exactly one matched tier selector", active_without_tier["message"])
+
     def test_matched_defaults_runtime_shares_two_lab_levels_native_growth_spoilage_and_read_only_load(self):
         run = self.lua.eval("scale_runtime")
         for tier in (1, 32, 128):
@@ -836,6 +913,35 @@ class AgricultureScaleFixtureTests(unittest.TestCase):
             with self.subTest(opponent=opponent):
                 result = run(str(CORE / "control.lua"), 1, opponent, "candidate-defaults", True)
                 self.assertFalse(result["ok"])
+
+    def test_active_matched_profiles_defer_real_seed_events_until_after_load(self):
+        run = self.lua.eval("scale_runtime")
+        for tier in (1, 32, 128):
+            for arm in ("candidate-defaults", "published"):
+                with self.subTest(tier=tier, arm=arm):
+                    result = run(str(CORE / "control.lua"), tier, "", arm, True, True)
+                    self.assertTrue(result["ok"], result["message"])
+                    self.assertEqual(2, result["saves"])
+                    self.assertEqual(["mir5-native-active", "mir5-native-complete"],
+                                     [result["save_names"][index]
+                                      for index in range(1, len(result["save_names"]) + 1)])
+                    self.assertEqual(2 * tier, result["seed_inserts"])
+                    self.assertEqual(2 * tier, result["state"]["planted_events"])
+                    reports = list(plain(result["reports"]).values())
+                    self.assertEqual(["prepared", "start", "complete", "initial", "reload"],
+                                     [row["stage"] for row in reports])
+                    self.assertEqual(0, reports[1]["witnesses"]["native_planting_events"]["observed"])
+                    self.assertEqual(2 * tier,
+                                     reports[2]["witnesses"]["native_planting_events"]["observed"])
+                    self.assertTrue(reports[1]["witnesses"]["pending_physical_work"])
+                    self.assertFalse(reports[2]["witnesses"]["pending_physical_work"])
+
+        early = run(str(CORE / "control.lua"), 1, "active-early-event", "candidate-defaults", True, True)
+        self.assertFalse(early["ok"])
+        self.assertIn("outside planting state", early["message"])
+        unpaired = run(str(CORE / "control.lua"), 1, "", "legacy", False, True)
+        self.assertFalse(unpaired["ok"])
+        self.assertIn("requires the paired selector", unpaired["message"])
 
     def test_exact_f210_api_declares_the_fixture_runtime_surface(self):
         api_path = f210_runtime_api_path()

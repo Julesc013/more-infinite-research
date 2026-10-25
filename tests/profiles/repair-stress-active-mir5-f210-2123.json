@@ -1,0 +1,24 @@
+{
+  "schema": 1,
+  "kind": "mir5-active-repair-stress-f210-native-selection",
+  "target": "f210",
+  "factorio_line": "2.1",
+  "engine": {"version": "2.1.23", "sha256": "FE4A1DA30F322A0D0B8AEB3DF7276332222BAAA143E2352569B723E84B2B9060"},
+  "settings_mode": "Defaults",
+  "mods": [
+    {"name": "base", "version": "2.1.23", "enabled": true},
+    {"name": "elevated-rails", "version": "2.1.23", "enabled": true},
+    {"name": "quality", "version": "2.1.23", "enabled": true},
+    {"name": "recycler", "version": "2.1.23", "enabled": true},
+    {"name": "space-age", "version": "2.1.23", "enabled": true},
+    {"name": "mir-fixture-mir5-active-mods-observer", "version": "0.1.0", "enabled": true},
+    {"name": "more-infinite-research", "version": "5.0.21000", "enabled": true},
+    {"name": "mir-fixture-mir5-repair-stress", "version": "0.2.0", "enabled": true},
+    {"name": "mir-fixture-mir5-repair-stress-active", "version": "0.1.0", "enabled": true}
+  ],
+  "archive_sha256": {
+    "more-infinite-research_5.0.21000.zip": "4D5E32CE2E74C65259E5D3E085CE7BE3BC37DC0A739308C6379BF621F7B5BDA1",
+    "mir-fixture-mir5-active-mods-observer_0.1.0.zip": "2E1BE5952D2A4CC5C74A0D149E075D247BA110A3FAE5B6768D3EAEBABCEF989C"
+  },
+  "scope": "Pre-measurement F210 active repair seed only against the frozen fa114 player: after load, exactly 1000 native walls receive one-point damage, 256 eligible friendly walls await passive repair, 744 overflow and foreign/non-wall sentinels remain excluded. The active save and markers are not a native benchmark result."
+}

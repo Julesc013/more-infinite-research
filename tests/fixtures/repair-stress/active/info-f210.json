@@ -1,0 +1,12 @@
+{
+  "name": "mir-fixture-mir5-repair-stress-active",
+  "version": "0.1.0",
+  "title": "MIR F210 active passive-repair selector",
+  "author": "MIR maintainers",
+  "description": "Selects the shared F210 repair fixture's pre-measurement active queue save; it contains no player mutation.",
+  "factorio_version": "2.1",
+  "dependencies": [
+    "base = 2.1.23",
+    "mir-fixture-mir5-repair-stress >= 0.1.0"
+  ]
+}
