@@ -36,23 +36,6 @@ end
 
 local BASE = require("compatibility.modern_catalogue.base")
 
--- This published F200 Base identity is also a required F210 Base continuity
--- row.  Keep one authored tuple so its pre-Space-Age effects, settings family,
--- and prototype ID cannot diverge across the supported recipe-productivity
--- targets.
-local BASE_SCIENCE_PACK_PRODUCTIVITY = {
-  key="research_science_pack_productivity", family="research_science_pack_productivity", kind="productivity",
-  science="science_automation_logistic_chemical_production_military_utility", prerequisites={},
-  effects={{recipe="automation-science-pack",scale=1},{recipe="chemical-science-pack",scale=1},
-    {recipe="logistic-science-pack",scale=1},{recipe="military-science-pack",scale=1},
-    {recipe="production-science-pack",scale=1},{recipe="utility-science-pack",scale=1}},
-  icon="__base__/graphics/technology/space-science-pack.png", icon_size=256,
-  overlay="__core__/graphics/icons/technology/constants/constant-recipe-productivity.png",
-  localised_name={"technology-name.more-infinite-research.research_science_pack_productivity"},
-  localised_description={"technology-description.more-infinite-research.recipe_productivity"},
-  order="p[research_science_pack_productivity]",
-}
-
 local SCIENCE = {
   science_automation_logistic = {"automation-science-pack", "logistic-science-pack"},
   science_automation_logistic_chemical = {"automation-science-pack", "logistic-science-pack", "chemical-science-pack"},
@@ -611,7 +594,21 @@ function M.select(active_mods)
   local replacement_product_target_families, excluded_product_target_recipes = {}, {}
   if M.is_k2_base(active_mods) then profile = "k2-base-f200" end
   if (target.id == "f200" or target.id == "f210") and not active_space_age(active_mods) then
-    definitions[#definitions + 1] = copy(BASE_SCIENCE_PACK_PRODUCTIVITY)
+    -- This published F200 Base identity is also the required F210 Base
+    -- continuity correction. Keep the single lazy authored tuple so its
+    -- pre-Space-Age effects, settings family, and prototype ID stay identical.
+    definitions[#definitions + 1] = {
+      key="research_science_pack_productivity", family="research_science_pack_productivity", kind="productivity",
+      science="science_automation_logistic_chemical_production_military_utility", prerequisites={},
+      effects={{recipe="automation-science-pack",scale=1},{recipe="chemical-science-pack",scale=1},
+        {recipe="logistic-science-pack",scale=1},{recipe="military-science-pack",scale=1},
+        {recipe="production-science-pack",scale=1},{recipe="utility-science-pack",scale=1}},
+      icon="__base__/graphics/technology/space-science-pack.png", icon_size=256,
+      overlay="__core__/graphics/icons/technology/constants/constant-recipe-productivity.png",
+      localised_name={"technology-name.more-infinite-research.research_science_pack_productivity"},
+      localised_description={"technology-description.more-infinite-research.recipe_productivity"},
+      order="p[research_science_pack_productivity]",
+    }
   end
   if active_space_age(active_mods) then
     local delta
