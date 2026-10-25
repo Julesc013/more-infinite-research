@@ -394,6 +394,15 @@
       "status": "partial",
       "resolved_records": [
         {
+          "id": "r06-active-repair-agriculture-time-memory",
+          "source": [
+            "source/runtime/passive_repair.lua",
+            "source/runtime/agriculture.lua"
+          ],
+          "evidence": "spec/evidence/runtime-active-r06-observation-analysis-chain.json",
+          "scope": "Exact F2102.1.23 on Black Glass compares published4.7.21002 A4BB8F47 with B2/4F5BEE02 at player tree25442a5b. All68 scheduled observations complete, including16 warmups and52 scored observations across active repair and agriculture1/32/128 tiers. All four groups meet the predeclared time and four memory-measure limits; strict start/complete physical witnesses and direct-library restoration pass. Independent standard-library recomputation and Aero hardened-reader replay retain byte-identical analysis8838D3D7. This resolves only that declared active time/memory campaign; mod removal/readdition, retained UI memory, graphical latency, final-candidate applicability and release acceptance remain open."
+        },
+        {
           "id": "matched-defaults-agriculture-native-scale",
           "source": [
             "tests/fixtures/agriculture-scale/core/control.lua",
@@ -442,7 +451,7 @@
       ],
       "remaining_implementation": [],
       "remaining_qualification": [
-        "Run removal/readdition, matched elapsed/memory stress and final-package rate/lifecycle cases; the six named Defaults agriculture scale cases, repair queue capacity stress and combined physical multiplayer restart pass at their separate recorded sources."
+        "Run removal/readdition and final-package rate/lifecycle cases; establish reviewed applicability of the accepted B2 R06 active time/memory result to final player inputs rather than relabelling its execution. The six named Defaults agriculture scale cases, repair queue capacity stress and combined physical multiplayer restart retain their separate recorded sources."
       ]
     },
     {
