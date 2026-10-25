@@ -108,6 +108,7 @@ class LibraryPairedBrowserFixtureTests(unittest.TestCase):
 
           function paired_browser_runtime(path, arm, opponent)
             local callbacks, markers, profiler_labels, screenshots, saves, calls, joins = {events = {}}, {}, {}, {}, {}, {}, {}
+            local action_ticks = {}
             local gear = "recipe-prod-research_gears-1"
             local mining = "recipe-prod-research_mining_drill-1"
             local force = {
@@ -210,6 +211,7 @@ class LibraryPairedBrowserFixtureTests(unittest.TestCase):
               local player = players[player_index]
               if player == nil then return false end
               calls[#calls+1]={player=player_index, query=options.search, selected=options.selected, tab=options.tab, sort=options.sort}
+              action_ticks[#action_ticks+1]=env.game.tick
               if opponent == "remote-false" then return false end
               if opponent == "native-mutation" then force.recipes["iron-gear-wheel"].productivity_bonus=.1 end
               render_public(player, options)
@@ -269,13 +271,26 @@ class LibraryPairedBrowserFixtureTests(unittest.TestCase):
             if not ok then return {ok=false,message=message,markers=markers,load_writes=load_writes} end
             local ready_markers_after_tick=#markers
 
+            local readiness = {}
+            if opponent == "late-initial-locale" or opponent == "duplicate-locales" then de.locale="en" end
+            if opponent == "unsupported-locale" then de.locale="fr" end
             en.connected=true
             ok, message=invoke(callbacks.events[1],{player_index=1})
             if not ok then return {ok=false,message=message,markers=markers} end
+            if opponent == "staggered-joins" then env.game.tick=31 end
             de.connected=true
             ok, message=invoke(callbacks.events[1],{player_index=2})
             if not ok then return {ok=false,message=message,markers=markers} end
-            for _, tick in ipairs({60,120,180,240}) do
+            local initial_ready_tick=env.game.tick+120
+            local initial_probes=opponent == "staggered-joins" and {32,121,150} or {2,120}
+            for _, tick in ipairs(initial_probes) do
+              env.game.tick=tick
+              ok,message=invoke(callbacks.events[2],{tick=tick})
+              if not ok then return {ok=false,message=message,markers=markers,calls=calls} end
+            end
+            readiness[#readiness+1]={phase="initial",calls=#calls,screenshots=#screenshots}
+            if opponent == "late-initial-locale" then de.locale="de" end
+            for _, tick in ipairs({initial_ready_tick,initial_ready_tick+60,initial_ready_tick+120,initial_ready_tick+180}) do
               env.game.tick=tick
               ok,message=invoke(callbacks.events[2],{tick=tick})
               if not ok then return {ok=false,message=message,markers=markers,calls=calls} end
@@ -287,6 +302,10 @@ class LibraryPairedBrowserFixtureTests(unittest.TestCase):
               if not ok then return {ok=false,message=message,markers=markers} end
               de.connected=true
               ok,message=invoke(callbacks.events[1],{player_index=2})
+              if ok then
+                env.game.tick=env.game.tick+120
+                ok,message=invoke(callbacks.events[2],{tick=env.game.tick})
+              end
               return {ok=ok,message=message,markers=markers}
             end
             ok,message=register_control()
@@ -295,17 +314,34 @@ class LibraryPairedBrowserFixtureTests(unittest.TestCase):
             if not ok then return {ok=false,message=message,markers=markers,load_writes=load_writes} end
             if env.storage["mir5_library_paired_browser"] ~= durable then return {ok=false,message="on_load replaced fixture state",markers=markers} end
             en.connected=false; de.connected=false
+            if opponent == "late-restart-locale" then de.locale="en" end
             en.connected=true
             ok,message=invoke(callbacks.events[1],{player_index=1})
             if not ok then return {ok=false,message=message,markers=markers,load_writes=load_writes} end
+            local first_restart_join_tick=env.game.tick
+            if opponent == "staggered-joins" then env.game.tick=env.game.tick+30 end
             de.connected=true
             ok,message=invoke(callbacks.events[1],{player_index=2})
             if not ok then return {ok=false,message=message,markers=markers,load_writes=load_writes} end
-            env.game.tick=300
-            ok,message=invoke(callbacks.events[2],{tick=300})
+            local restart_ready_tick=env.game.tick+120
+            local restart_probes=opponent == "staggered-joins"
+              and {env.game.tick+1,first_restart_join_tick+120,restart_ready_tick-1}
+              or {env.game.tick+1,restart_ready_tick-1}
+            for _, tick in ipairs(restart_probes) do
+              env.game.tick=tick
+              ok,message=invoke(callbacks.events[2],{tick=tick})
+              if not ok then return {ok=false,message=message,markers=markers,calls=calls} end
+            end
+            readiness[#readiness+1]={phase="restart",calls=#calls,screenshots=#screenshots}
+            if opponent == "late-restart-locale" then de.locale="de" end
+            for _, tick in ipairs({restart_ready_tick,restart_ready_tick+60}) do
+              env.game.tick=tick
+              ok,message=invoke(callbacks.events[2],{tick=tick})
+              if not ok then return {ok=false,message=message,markers=markers,calls=calls} end
+            end
             return {
               ok=ok,message=message,markers=markers,profiler_labels=profiler_labels,screenshots=screenshots,
-              saves=saves,calls=calls,joins=joins,load_writes=load_writes,
+              saves=saves,calls=calls,joins=joins,load_writes=load_writes,readiness=readiness,action_ticks=action_ticks,
               ready_markers_before_tick=ready_markers_before_tick,
               ready_markers_after_tick=ready_markers_after_tick,
               state=env.storage["mir5_library_paired_browser"]
@@ -453,6 +489,30 @@ class LibraryPairedBrowserFixtureTests(unittest.TestCase):
                         parsed, _ = profile_reader._parse_marker(role, marker)
                         self.assertEqual(parsed, action)
 
+    def test_native_locale_may_settle_after_initial_and_cold_restart_joins(self):
+        for arm in ARMS:
+            for opponent in ("late-initial-locale", "late-restart-locale"):
+                with self.subTest(arm=arm, opponent=opponent):
+                    result = self.runtime_result(arm, opponent)
+                    self.assertTrue(result["ok"], result["message"])
+                    self.assertEqual(result["readiness"], [
+                        {"phase": "initial", "calls": 0, "screenshots": 0},
+                        {"phase": "restart", "calls": 6, "screenshots": 6},
+                    ])
+                    self.assertEqual(len(result["screenshots"]), 8)
+                    self.assertEqual(result["profiler_labels"], list(profile_reader.ACTIONS))
+
+    def test_readiness_waits_for_the_latest_join_on_initial_and_cold_restart(self):
+        for arm in ARMS:
+            with self.subTest(arm=arm):
+                result = self.runtime_result(arm, "staggered-joins")
+                self.assertTrue(result["ok"], result["message"])
+                self.assertEqual(result["readiness"], [
+                    {"phase": "initial", "calls": 0, "screenshots": 0},
+                    {"phase": "restart", "calls": 6, "screenshots": 6},
+                ])
+                self.assertEqual(result["action_ticks"], [151,151,211,211,271,271,481,481])
+
     def test_runtime_rejects_malformed_closure_seed_public_call_shape_and_restart_boundary(self):
         cases = (
             ("wrong-closure", "fixture active-mod closure differs"),
@@ -462,6 +522,8 @@ class LibraryPairedBrowserFixtureTests(unittest.TestCase):
             ("bad-shape", "public browser detail differs"),
             ("native-mutation", "public Browser actions mutated named native research, queue, or recipes"),
             ("bad-join-name", "fixture join identity or ordinal differs"),
+            ("duplicate-locales", "fixture clients have duplicate locales"),
+            ("unsupported-locale", "fixture requires exact en and de clients"),
             ("no-cold-load", "reopen requires the requested cold host restart"),
         )
         for arm in ARMS:

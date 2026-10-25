@@ -10,6 +10,7 @@ local ROOT = "mir_research_browser"
 local RESTART_SAVE = "mir5-library-paired-browser-restart"
 local FINAL_SAVE = "mir5-native-complete"
 local CAPTURE_DELAY = 60
+local CLIENT_SETTLE_TICKS = 120
 local MAX_QUEUE = 8
 
 local GEAR = "recipe-prod-research_gears-1"
@@ -348,6 +349,9 @@ local function record_join(state, event)
     fail("fixture join identity or ordinal differs")
   end
   state.join_events = ordinal
+  -- The native locale can still be the default during the join event.
+  -- Wait outside the profiled actions, then validate both actual locales.
+  state.clients_ready_tick = game.tick + CLIENT_SETTLE_TICKS
   log("[MIR5_LIBRARY_PAIRED_BROWSER_JOIN] " .. player.name .. " " .. ordinal)
 end
 
@@ -382,22 +386,26 @@ script.on_event(defines.events.on_player_joined_game, function(event)
   if type(state) ~= "table" or state.schema ~= 1 then fail("fixture state is absent") end
   emit_pending_ready(state)
   record_join(state, event)
-  if state.phase == "awaiting-clients" then
-    start_initial(state)
-  elseif state.phase == "awaiting-cold-restart" then
-    local players = connected_players()
-    if players == nil then return end
-    if not loaded_for_restart then fail("reopen requires the requested cold host restart") end
-    if players.en.force.index ~= state.force_index then fail("rejoined clients changed the observed native force") end
-    assert_snapshot(state, players.en.force)
-    run_action(state, "reopen", players)
-  end
 end)
 
 script.on_event(defines.events.on_tick, function()
   local state = storage[KEY]
   if type(state) ~= "table" or state.schema ~= 1 then return end
   emit_pending_ready(state)
+  if state.phase == "awaiting-clients" or state.phase == "awaiting-cold-restart" then
+    if state.clients_ready_tick == nil or game.tick < state.clients_ready_tick then return end
+    if state.phase == "awaiting-clients" then
+      start_initial(state)
+    else
+      local players = connected_players()
+      if players == nil then return end
+      if not loaded_for_restart then fail("reopen requires the requested cold host restart") end
+      if players.en.force.index ~= state.force_index then fail("rejoined clients changed the observed native force") end
+      assert_snapshot(state, players.en.force)
+      run_action(state, "reopen", players)
+    end
+    return
+  end
   if state.capture_after_tick == nil or game.tick < state.capture_after_tick then return end
   local players = connected_players()
   if players == nil then return end

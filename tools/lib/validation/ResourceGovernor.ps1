@@ -204,19 +204,44 @@ function Get-MIR441OwnedProcessTree {
   # Query only direct children of processes we have already established as
   # owned.  A full Win32_Process snapshot retained every machine process on
   # each watchdog sample even when the governed process had no children.
-  $ids=[Collections.Generic.HashSet[int]]::new();$owned=[Collections.Generic.List[int]]::new();$pending=[Collections.Generic.Queue[int]]::new()
+  $ids=[Collections.Generic.HashSet[int]]::new();$owned=[Collections.Generic.List[int]]::new();$pending=[Collections.Generic.Queue[int]]::new();$createdUtcById=[Collections.Generic.Dictionary[int,datetime]]::new()
   $rootId=[int]$Process.Id;[void]$ids.Add($rootId);$owned.Add($rootId);$pending.Enqueue($rootId)
   while($pending.Count){
     $parentId=$pending.Dequeue()
     foreach($row in @(Get-CimInstance -ClassName Win32_Process -Filter ("ParentProcessId=$parentId") -ErrorAction Stop)){
       $childId=[int]$row.ProcessId
-      if($row.CreationDate-and$row.CreationDate.ToUniversalTime()-ge$StartedUtc-and$ids.Add($childId)){
-        $owned.Add($childId);$pending.Enqueue($childId)
+      $createdUtc=$null
+      if($row.CreationDate){$createdUtc=$row.CreationDate.ToUniversalTime()}
+      if($null-ne$createdUtc-and$createdUtc-ge$StartedUtc-and$ids.Add($childId)){
+        [void]$createdUtcById.Add($childId,$createdUtc);$owned.Add($childId);$pending.Enqueue($childId)
       }
     }
   }
   [int64]$working=0;[int64]$private=0;$children=@()
-  foreach($id in $owned){try{$p=Get-Process -Id $id -ErrorAction Stop;$working+=$p.WorkingSet64;$private+=$p.PrivateMemorySize64;if($id-ne$rootId){$children+=[pscustomobject]@{id=$p.Id;started_utc=$p.StartTime.ToUniversalTime()}};$p.Dispose()}catch [Microsoft.PowerShell.Commands.ProcessCommandException]{}}
+  foreach($id in $owned){
+    $p=$null
+    try{
+      $p=Get-Process -Id $id -ErrorAction Stop
+      if($id-ne$rootId){
+        if($p.HasExited){continue}
+        $childStarted=$p.StartTime
+        if($null-eq$childStarted){
+          if($p.HasExited){continue}
+          throw '[mir441-owned-child-identity]'
+        }
+        $childStartedUtc=$childStarted.ToUniversalTime();$capturedStartedUtc=$createdUtcById[$id]
+        # Win32_Process CreationDate is microsecond precision.  Bind only at
+        # that common precision, while retaining the complete process value.
+        [int64]$childTicks=$childStartedUtc.Ticks;[int64]$capturedTicks=$capturedStartedUtc.Ticks
+        if(($childTicks-($childTicks%10))-ne($capturedTicks-($capturedTicks%10))){throw '[mir441-owned-child-identity]'}
+      }
+      $working+=$p.WorkingSet64;$private+=$p.PrivateMemorySize64
+      if($id-ne$rootId){$children+=[pscustomobject]@{id=$p.Id;started_utc=$childStartedUtc}}
+    }catch [Microsoft.PowerShell.Commands.ProcessCommandException]{}catch [InvalidOperationException]{
+      if($null-ne$p-and$p.HasExited){continue}
+      throw
+    }finally{if($null-ne$p){$p.Dispose()}}
+  }
   return [pscustomobject]@{working_set_bytes=$working;private_bytes=$private;children=$children}
 }
 
@@ -224,7 +249,20 @@ function Stop-MIR441OwnedProcess {
   param([Diagnostics.Process]$Process,[object[]]$Children=@())
   if($null-ne$Process-and-not$Process.HasExited){[void]$Process.CloseMainWindow();if(-not$Process.WaitForExit(200)){$Process.Kill($true);[void]$Process.WaitForExit(3000)}}
   foreach($child in $Children){
-    try{$p=Get-Process -Id $child.id -ErrorAction Stop;if($p.StartTime.ToUniversalTime()-eq$child.started_utc){$p.Kill($true);[void]$p.WaitForExit(3000)};$p.Dispose()}catch [Microsoft.PowerShell.Commands.ProcessCommandException]{}
+    $p=$null
+    try{
+      $p=Get-Process -Id $child.id -ErrorAction Stop
+      if($p.HasExited){continue}
+      $childStarted=$p.StartTime
+      if($null-eq$childStarted){
+        if($p.HasExited){continue}
+        throw '[mir441-owned-child-identity]'
+      }
+      if($childStarted.ToUniversalTime()-eq$child.started_utc){$p.Kill($true);[void]$p.WaitForExit(3000)}
+    }catch [Microsoft.PowerShell.Commands.ProcessCommandException]{}catch [InvalidOperationException]{
+      if($null-ne$p-and$p.HasExited){continue}
+      throw
+    }finally{if($null-ne$p){$p.Dispose()}}
   }
 }
 
