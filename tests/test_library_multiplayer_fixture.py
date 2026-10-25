@@ -16,6 +16,7 @@ CONTROL = FIXTURE / "control.lua"
 F200_PROFILE = ROOT / "tests/profiles/library-multiplayer-f200-2077.json"
 CURRENT_F200_PROFILE = ROOT / "tests/profiles/library-multiplayer-current-f200-2077.json"
 F210_PROFILE = ROOT / "tests/profiles/library-multiplayer-f210-2123.json"
+F210_API_CONSUMERS_PROFILE = ROOT / "tests/profiles/library-api-consumers-f210-2123.json"
 PAIRED_PUBLISHED_PROFILE = ROOT / "tests/profiles/library-paired-browser-published-f200-2077.json"
 PAIRED_MIR5_PROFILE = ROOT / "tests/profiles/library-paired-browser-mir5-f200-2077.json"
 SCRIPTED_EFFECTS_PROFILE = ROOT / "tests/profiles/scripted-effects-multiplayer-f200-sa-2077.json"
@@ -322,8 +323,24 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
               if force.current_research then fire(4,{research=force.current_research,last_research=current}) end
               return true
             end
+            local active_mods={base=base_version,["more-infinite-research"]=mir_version,["mir-fixture-mir5-library-multiplayer"]="0.1.0",["mir-fixture-mir5-active-mods-observer"]="0.1.0"}
+            if opponent=="f210-api-consumers" then
+              active_mods["mir-fixture-mir5-api-alpha"]="0.1.0"
+              active_mods["mir-fixture-mir5-api-beta"]="0.1.0"
+            elseif opponent=="f210-api-alpha-only" then
+              active_mods["mir-fixture-mir5-api-alpha"]="0.1.0"
+            elseif opponent=="f210-api-beta-only" then
+              active_mods["mir-fixture-mir5-api-beta"]="0.1.0"
+            elseif opponent=="f210-api-alpha-wrong-version" then
+              active_mods["mir-fixture-mir5-api-alpha"]="0.1.1"
+              active_mods["mir-fixture-mir5-api-beta"]="0.1.0"
+            elseif opponent=="f210-api-beta-production" then
+              active_mods["mir-fixture-mir5-api-alpha"]="0.1.0"
+              active_mods["mir-fixture-mir5-api-beta"]="0.1.0"
+              active_mods["mir-fixture-mir5-api-beta-production"]="0.1.0"
+            end
             local environment={
-              script={active_mods={base=base_version,["more-infinite-research"]=mir_version,["mir-fixture-mir5-library-multiplayer"]="0.1.0",["mir-fixture-mir5-active-mods-observer"]="0.1.0"},
+              script={active_mods=active_mods,
                 on_init=function(callback)callbacks.init=callback end,on_load=function(callback)callbacks.load=callback end,
                 on_event=function(event,callback)callbacks.events[event]=callback end},
               defines={events={on_tick=1,on_player_joined_game=2,on_player_locale_changed=3,on_research_started=4,
@@ -493,6 +510,67 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
                 self.assertEqual(info["dependencies"], [base_dependency, f"more-infinite-research = {mir}"])
                 self.assertNotIn("space-age", {entry["name"] for entry in profile["mods"]})
 
+    def test_f210_api_client_profile_binds_the_freeze_and_exact_six_mod_closure(self):
+        profile = json.loads(F210_API_CONSUMERS_PROFILE.read_text(encoding="utf-8"))
+        self.assertEqual(profile["kind"], "mir5-library-api-consumers-f210-native-selection")
+        self.assertEqual((profile["target"], profile["factorio_line"], profile["settings_mode"]),
+                         ("f210", "2.1", "Defaults"))
+        self.assertEqual(profile["engine"], {
+            "version": "2.1.23",
+            "sha256": "FE4A1DA30F322A0D0B8AEB3DF7276332222BAAA143E2352569B723E84B2B9060",
+        })
+        self.assertEqual([(row["name"], row["version"], row["enabled"]) for row in profile["mods"]], [
+            ("base", "2.1.23", True),
+            ("mir-fixture-mir5-active-mods-observer", "0.1.0", True),
+            ("more-infinite-research", "5.0.21000", True),
+            ("mir-fixture-mir5-library-multiplayer", "0.1.0", True),
+            ("mir-fixture-mir5-api-alpha", "0.1.0", True),
+            ("mir-fixture-mir5-api-beta", "0.1.0", True),
+        ])
+        self.assertEqual(profile["archive_sha256"], {
+            "mir-fixture-mir5-active-mods-observer_0.1.0.zip":
+                "2E1BE5952D2A4CC5C74A0D149E075D247BA110A3FAE5B6768D3EAEBABCEF989C",
+            "more-infinite-research_5.0.21000.zip":
+                "428A789CA03828D2F7F93EC65C49FD3157FD6D547CC569DDA2C0129D6504647A",
+        })
+        self.assertNotIn("mir-fixture-mir5-api-beta-production", {row["name"] for row in profile["mods"]})
+
+    def test_multiplayer_wrapper_admits_only_the_frozen_complete_api_client_profile(self):
+        script = r'''
+          $ErrorActionPreference='Stop'; Set-StrictMode -Version Latest
+          $tokens=$null;$errors=$null
+          $ast=[Management.Automation.Language.Parser]::ParseFile($env:MIR_TEST_WRAPPER,[ref]$tokens,[ref]$errors)
+          if($errors.Count){throw $errors[0].Message}
+          function Assert-Session([bool]$Condition,[string]$Message){if(-not $Condition){throw $Message}}
+          $node=@($ast.FindAll({param($candidate)
+            $candidate -is [Management.Automation.Language.FunctionDefinitionAst] -and $candidate.Name -ceq 'Assert-MultiplayerFixtureSelection'
+          },$true))
+          if($node.Count-ne1){throw 'selection function is absent or ambiguous'}
+          Invoke-Expression $node[0].Extent.Text
+          function Read-Profile {Get-Content -LiteralPath $env:MIR_TEST_API_CLIENT_PROFILE -Raw|ConvertFrom-Json -AsHashtable}
+          $engine='FE4A1DA30F322A0D0B8AEB3DF7276332222BAAA143E2352569B723E84B2B9060'
+          $selected=Assert-MultiplayerFixtureSelection -Selection (Read-Profile) -EngineSha256 $engine -FixtureCase 'library-multiplayer'
+          if($selected.kind-cne'mir5-library-api-consumers-f210-native-selection'-or$selected.api_client_consumers-ne$true){throw 'combined API client target differs'}
+          function Assert-Rejected([string]$Name,[scriptblock]$Mutate){
+            $selection=Read-Profile;&$Mutate $selection
+            try{$null=Assert-MultiplayerFixtureSelection -Selection $selection -EngineSha256 $engine -FixtureCase 'library-multiplayer'}catch{return}
+            throw "combined API client profile accepted opponent: $Name"
+          }
+          Assert-Rejected 'alpha missing' {param($s)$s['mods']=@($s['mods']|Where-Object {$_.name-cne'mir-fixture-mir5-api-alpha'})}
+          Assert-Rejected 'beta missing' {param($s)$s['mods']=@($s['mods']|Where-Object {$_.name-cne'mir-fixture-mir5-api-beta'})}
+          Assert-Rejected 'alpha wrong version' {param($s)@($s['mods']|Where-Object {$_.name-ceq'mir-fixture-mir5-api-alpha'})[0]['version']='0.1.1'}
+          Assert-Rejected 'beta production extra' {param($s)$s['mods']=@($s['mods'])+@([ordered]@{name='mir-fixture-mir5-api-beta-production';version='0.1.0';enabled=$true})}
+          Assert-Rejected 'wrong frozen MIR archive' {param($s)$s['archive_sha256']['more-infinite-research_5.0.21000.zip']='A'*64}
+        '''
+        result = subprocess.run(
+            ["pwsh", "-NoLogo", "-NoProfile", "-Command", script],
+            capture_output=True, text=True,
+            env=dict(os.environ, MIR_TEST_WRAPPER=str(WRAPPER),
+                     MIR_TEST_API_CLIENT_PROFILE=str(F210_API_CONSUMERS_PROFILE)),
+            check=False,
+        )
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+
     def test_multiplayer_wrapper_admits_only_the_exact_case_bound_profiles(self):
         script = r'''
           $tokens=$null;$errors=$null
@@ -579,6 +657,17 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
         wrong_base = self.run_case("unsupported-target-base", target="f210")
         self.assertFalse(wrong_base["ok"])
         self.assertIn("unsupported native Library target base", wrong_base["message"])
+
+    def test_f210_api_consumer_closure_requires_both_exact_independent_consumers(self):
+        accepted = self.run_case("f210-api-consumers", target="f210")
+        self.assertTrue(accepted["ok"], accepted["message"])
+        self.assertEqual((accepted["phase"], accepted["join_events"]), ("completed", 6))
+        for opponent in ("f210-api-alpha-only", "f210-api-beta-only", "f210-api-alpha-wrong-version",
+                         "f210-api-beta-production"):
+            with self.subTest(opponent=opponent):
+                rejected = self.run_case(opponent, target="f210")
+                self.assertFalse(rejected["ok"])
+                self.assertIn("unexpected non-base F210 multiplayer closure", rejected["message"])
 
     def test_two_real_client_join_rejoin_and_restart_state_machine(self):
         result = self.run_case()
@@ -1355,10 +1444,11 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
           if($nodes.Count-ne1){throw 'actual client starter missing or ambiguous'}
           Invoke-Expression $nodes[0].Extent.Text
           $clients=@(
-            @{name='MIR5English';locale='en';config='en.ini';port=1001;ordinal=1},
-            @{name='MIR5Deutsch';locale='de';config='de.ini';port=1002;ordinal=2}
+            @{name='MIR5English';locale='en';config='en.ini';port=1001;ordinal=1;write_data='client-en'},
+            @{name='MIR5Deutsch';locale='de';config='de.ini';port=1002;ordinal=2;write_data='client-de'}
           )
           $library='unused';$serverPort=1000;$clientGraphics=@();$serverWriteData='unused'
+          $apiClientConsumers=$false;$apiClientLoadMarkers=[Collections.Generic.List[object]]::new()
           function Start-Native([string]$Name,$NativeArguments){
             $index=$script:launches.Count
             $script:launches.Add($Name);$script:order.Add('start')
@@ -1407,6 +1497,96 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
             ["pwsh", "-NoLogo", "-NoProfile", "-Command", script],
             capture_output=True, text=True,
             env=dict(os.environ, MIR_TEST_SESSION=str(SESSION)), check=False)
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+
+    def test_api_client_mode_requires_exact_new_load_markers_for_each_join_phase(self):
+        script = r'''
+          $ErrorActionPreference='Stop'; Set-StrictMode -Version Latest
+          $tokens=$null; $errors=$null
+          $ast=[Management.Automation.Language.Parser]::ParseFile($env:MIR_TEST_SESSION,[ref]$tokens,[ref]$errors)
+          if($errors.Count){throw 'session parse failed'}
+          $allDefinitions=@($ast.FindAll({param($node)
+            $node -is [Management.Automation.Language.FunctionDefinitionAst]
+          },$true))
+          $names=@('Test-LibraryInteger','Test-ApiClientNumber','Assert-ApiClientLoadMarker',
+            'Get-ApiClientLoadMarkers','Get-ClientLogDelta','Start-Clients')
+          function Assert-Session([bool]$Condition,[string]$Message){if(-not $Condition){throw $Message}}
+          foreach($name in $names){
+            $node=@($allDefinitions|Where-Object {$_.Name-ceq$name})
+            if($node.Count-ne1){throw "missing or ambiguous API client definition: $name"}
+            Invoke-Expression $node[0].Extent.Text
+          }
+          $clients=@(
+            [pscustomobject]@{name='MIR5English';locale='en';config='en.ini';port=1001;write_data='client-en'},
+            [pscustomobject]@{name='MIR5Deutsch';locale='de';config='de.ini';port=1002;write_data='client-de'}
+          )
+          $library='unused';$serverPort=1000;$clientGraphics=@();$serverWriteData='server'
+          $fixtureCase='library-multiplayer';$markerPrefix='MIR5_LIBRARY_MULTIPLAYER';$apiClientConsumers=$true
+          function New-ApiLine([string]$Name,[bool]$Researched,[string]$Stage='load'){
+            $row=[ordered]@{stage=$Stage;tick=100;reload_researched=$Researched;reload_level=1;reload_manual_crafting_speed_modifier=.05}
+            '['+$Name+'] RESULT '+($row|ConvertTo-Json -Compress)+"`n"
+          }
+          function Read-LogText([string]$Path){
+            if($Path -like '*server*'){return $script:serverLog}
+            if($Path -like '*client-en*'){return $script:clientLogs['en']}
+            if($Path -like '*client-de*'){return $script:clientLogs['de']}
+            throw 'unexpected client log path'
+          }
+          function Start-Native([string]$Name,$NativeArguments){
+            $parts=$Name.Split('-');$phase=$parts[1];$locale=$parts[2]
+            $join=@{initial=1;rejoin=2;restart=3}[$phase]
+            $player=if($locale-ceq'en'){'MIR5English'}else{'MIR5Deutsch'}
+            $script:serverLog+="[$markerPrefix`_JOIN] $player $join`n"
+            $alpha=New-ApiLine 'MIR5_API_ALPHA' $true
+            $beta=New-ApiLine 'MIR5_API_BETA' $false
+            switch($script:opponent){
+              'absent-beta' {$beta=''}
+              'duplicate-alpha' {$alpha+=$alpha}
+              'wrong-stage' {$alpha=New-ApiLine 'MIR5_API_ALPHA' $true 'configuration'}
+              'wrong-researched' {$beta=New-ApiLine 'MIR5_API_BETA' $true}
+              'wrong-shape' {$beta='[MIR5_API_BETA] RESULT {"stage":"load","tick":100,"reload_level":1,"reload_manual_crafting_speed_modifier":0.05}' + "`n"}
+            }
+            $next=$alpha+$beta
+            if($phase-ceq'rejoin'){$script:clientLogs[$locale]+=$next}else{$script:clientLogs[$locale]=$next}
+            [pscustomobject]@{name=$Name}
+          }
+          function Wait-For([string]$Description,[scriptblock]$Predicate){
+            $value=&$Predicate
+            if($null-eq$value-or$value-eq$false){throw "predicate did not produce $Description"}
+            return $value
+          }
+          function Invoke-ApiClientCase([string]$Opponent,[bool]$ExpectPass){
+            $script:opponent=$Opponent;$script:serverLog='';$script:clientLogs=@{en='';de=''}
+            $script:apiClientLoadMarkers=[Collections.Generic.List[object]]::new()
+            $failure=$null
+            try{
+              foreach($phase in @('initial','rejoin','restart')){
+                $actors=@(Start-Clients $phase)
+                if($actors.Count-ne2){throw "lost client actors for $phase"}
+              }
+            }catch{$failure=$_.Exception.Message}
+            if($ExpectPass){
+              if($null-ne$failure){throw $failure}
+              $rows=@($script:apiClientLoadMarkers)
+              if($rows.Count-ne6){throw 'API client reader did not retain six per-client phase records'}
+              $actual=@($rows|ForEach-Object { $_.phase+'/'+$_.client }|Sort-Object)-join ','
+              $expected=@('initial/MIR5Deutsch','initial/MIR5English','rejoin/MIR5Deutsch','rejoin/MIR5English','restart/MIR5Deutsch','restart/MIR5English')-join ','
+              if($actual-cne$expected){throw 'API client phase/client records differ'}
+              foreach($row in $rows){
+                if($row.MIR5_API_ALPHA.reload_researched-ne$true-or$row.MIR5_API_BETA.reload_researched-ne$false){throw 'API client researched state differs'}
+              }
+            }elseif($null-eq$failure){throw "API client reader accepted opponent: $Opponent"}
+          }
+          Invoke-ApiClientCase 'valid' $true
+          foreach($opponent in @('absent-beta','duplicate-alpha','wrong-stage','wrong-researched','wrong-shape')){
+            Invoke-ApiClientCase $opponent $false
+          }
+        '''
+        result = subprocess.run(
+            ["pwsh", "-NoLogo", "-NoProfile", "-Command", script],
+            capture_output=True, text=True,
+            env=dict(os.environ, MIR_TEST_SESSION=str(SESSION)), check=False,
+        )
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
 
     def test_paired_browser_session_is_explicit_and_keeps_existing_ten_capture_path(self):
@@ -1643,6 +1823,7 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
               $processMemoryObservationPath=if($fixtureCase -cin @('library-multiplayer','library-paired-browser')){Join-Path $output 'process-memory-observations.json'}else{$null}
               $serverWriteData=$output;$workroot=$output;$engine='unused';$seed='seed';$restartSave='restart';$finalSave='final'
               $seedHash=('a'*64);$clientGraphics=@();$rconPort=1;$rconPassword='not-a-real-password';$pairedArm='published'
+              $apiClientConsumers=$false;$apiClientLoadMarkers=[Collections.Generic.List[object]]::new()
               $clients=@([pscustomobject]@{name='MIR5English';locale='en';port=2;config='en.ini';write_data='en'},
                 [pscustomobject]@{name='MIR5Deutsch';locale='de';port=3;config='de.ini';write_data='de'})
               $caught=$null
