@@ -450,7 +450,20 @@ class ForeignResearchPreservationTests(unittest.TestCase):
           end})
           local original_effects, original_unit = foreign.effects,foreign.unit
           settings,mods,data,helpers,log={startup=defaults()},{},environment,nil,function() end
-          assert(dofile(data_final_path) == nil and environment.writes == 1 and #environment.emitted == 73)
+          assert(dofile(data_final_path) == nil and environment.writes == 1 and #environment.emitted == 74)
+          local science_pack_productivity
+          for _, row in ipairs(environment.emitted) do
+            if row.name == "recipe-prod-research_science_pack_productivity-1" then
+              science_pack_productivity = row
+            end
+          end
+          local science_recipes = {"automation-science-pack", "chemical-science-pack", "logistic-science-pack",
+            "military-science-pack", "production-science-pack", "utility-science-pack"}
+          assert(science_pack_productivity and #science_pack_productivity.effects == #science_recipes)
+          for index, recipe in ipairs(science_recipes) do
+            local effect = science_pack_productivity.effects[index]
+            assert(effect.type == "change-recipe-productivity" and effect.recipe == recipe and effect.change == .1)
+          end
           foreign_output, foreign_recipes = environment.emitted, environment.raw.recipe
           assert(environment.raw.technology[foreign.name] == foreign)
           assert(foreign.effects == original_effects and foreign.effects[1] == foreign_effect
@@ -465,7 +478,7 @@ class ForeignResearchPreservationTests(unittest.TestCase):
             actual,
             {str(name) for name in host.lua.globals().foreign_recipes.keys()},
         )
-        self.assertEqual(len(public), 53)
+        self.assertEqual(len(public), 54)
 
 
 if __name__ == "__main__":
