@@ -82,6 +82,19 @@
     "raw_stdout_retained": true,
     "engine_reported_time_per_tick_required": true
   },
+  "benchmark_stdout_grammar": {
+    "source": "Exact F200/F210 native benchmark stdout observed in the retained fixture reloads.",
+    "required_lines": [
+      "^\\s*Performed 25000 updates in (?<total_ms>[0-9]+(?:\\.[0-9]+)?) ms\\s*$",
+      "^\\s*avg: (?<average_ms_per_tick>[0-9]+(?:\\.[0-9]+)?) ms, min: (?<minimum_ms_per_tick>[0-9]+(?:\\.[0-9]+)?) ms, max: (?<maximum_ms_per_tick>[0-9]+(?:\\.[0-9]+)?) ms\\s*$"
+    ],
+    "refusal": "Require exactly one matching Performed line with exactly 25000 updates and exactly one matching avg/min/max line. Every parsed value must be finite, nonnegative milliseconds; duplicate, absent, malformed, nonfinite or unit-changed lines are adverse rather than samples.",
+    "prohibited_substitutes": [
+      "headless save creation duration",
+      "host wall-clock around preparation",
+      "fixture gameplay ticks outside --benchmark"
+    ]
+  },
   "process_memory_observation": {
     "context": "benchmark",
     "expected_slot": {
@@ -127,6 +140,16 @@
       "relative_fraction": 0.1,
       "absolute_bytes": 67108864
     },
+    "agriculture_within_arm_increment_128_minus_1": {
+      "metrics": [
+        "engine_reported_average_ms_per_tick",
+        "operating_system_peak_working_set_bytes",
+        "maximum_sampled_working_set_bytes",
+        "maximum_sampled_private_bytes"
+      ],
+      "rule": "Report candidate and published 128-minus-1 raw differences separately. A percentage comparison is permitted only when the matching published incremental denominator is finite and strictly positive; otherwise report raw differences only, with no percentage or inferred non-regression conclusion from noise.",
+      "scope": "This within-arm comparison supplements, and does not replace, direct published-versus-candidate limits at each tier."
+    },
     "report": [
       "all raw observations",
       "paired block differences",
@@ -148,6 +171,10 @@
           "profile_git_path": "tests/profiles/repair-stress-published-f200-2077.json",
           "profile_sha256": "C199E2C964933B7889C5F51BE55329BB1C6614EC4271E74238FE799E3CE86CCF",
           "player_sha256": "F3943EB4D69CCDAC41BD9F922AD03A5C78F34F22D8E7FA5A88A7A658AB1010B7",
+          "fixture_archives": {
+            "mir-fixture-mir5-active-mods-observer_0.1.0.zip": "723D1E7721449FC26040E5E6629416767BDC20AD79CF8723115846DB662A1F87",
+            "mir-fixture-mir5-repair-stress_0.1.0.zip": "1D7FA319F300001A5102E2CBECB0F5C87140C9A87ED81126C6D46DD04A3898BC"
+          },
           "seed": {
             "kind": "completed-idle-repair-stress-save",
             "sha256": "6E3F09432C9DC8E44AC10A20E894F36BB581D5DC3272554E5922650B87AFAE39",
@@ -169,6 +196,10 @@
           "profile_git_path": "tests/profiles/repair-stress-mir5-f200-2077.json",
           "profile_sha256": "CA8B6CF3305934AE173860BE003617E5D0D252FBCE4E8E2BF3ADEB36C46441A8",
           "player_sha256": "2BBDBA9A0B816AC383CEA116CDF86D587BC34EFF7E1C5ACE2583F1DA98F9E842",
+          "fixture_archives": {
+            "mir-fixture-mir5-active-mods-observer_0.1.0.zip": "723D1E7721449FC26040E5E6629416767BDC20AD79CF8723115846DB662A1F87",
+            "mir-fixture-mir5-repair-stress_0.2.0.zip": "CCF0876C20B457F48FCEC6C05BA7E967CC00DA67147AA2D1BC7D61FD20178B64"
+          },
           "seed": {
             "kind": "completed-idle-repair-stress-save",
             "sha256": "2ECDFDEC6FBEBC04D7896120C58268FFC2887651A26221C8B8E44C508D943014",
@@ -378,6 +409,13 @@
           "profile_git_path": "tests/profiles/agriculture-matched-published-1-f210-2123.json",
           "profile_sha256": "A3B49326426C0A71DAF74DB99CD6766E84809AA31D32EEE5F09F4DEB83E7ED78",
           "player_sha256": "A4BB8F47232C689B267EF434F557187A8795C47280FA464169DE917FB579517F",
+          "fixture_archives": {
+            "mir-fixture-mir5-agriculture-scale_0.1.0.zip": "F4AD345E496976423EF351DA31F2CD9C2D249DE37FF4DC05E4B44F7B27BEA207",
+            "mir-fixture-mir5-active-mods-observer_0.1.0.zip": "2E1BE5952D2A4CC5C74A0D149E075D247BA110A3FAE5B6768D3EAEBABCEF989C",
+            "mir-fixture-mir5-agriculture-scale-paired_0.1.0.zip": "05D17B49A9C0C5112F601B5295C748E55B5F9AAA29E9829D589997B0DDC3D422",
+            "mir-fixture-mir5-agriculture-scale-arm-published_0.1.0.zip": "DC1F532220977C1F36B32874ED4006F34285484C217491D291626C3DAD5A7056",
+            "mir-fixture-mir5-agriculture-scale-matched-tier-1_0.1.0.zip": "176564869AD1210F281D5C211EDC551BFAEE979959B44C57D56006BBCFEA0349"
+          },
           "seed": {
             "kind": "completed-native-crop-steady-state-save",
             "sha256": "6CE32472D47414AE773D5F7936FCC4C89777914F49F60E10649F90BACC79CCFA",
@@ -399,6 +437,13 @@
           "profile_git_path": "tests/profiles/agriculture-matched-candidate-defaults-1-f210-2123.json",
           "profile_sha256": "020B5E35B16AED0F3C84D3CD4AE5F9DDA4354A12146FDFF5ACEB7E13B9B8AA9C",
           "player_sha256": "AF65E765FB095489A2EA3F7BCD2A4471C46687F8BB12CC4762C98AC98829E987",
+          "fixture_archives": {
+            "mir-fixture-mir5-agriculture-scale_0.1.0.zip": "F4AD345E496976423EF351DA31F2CD9C2D249DE37FF4DC05E4B44F7B27BEA207",
+            "mir-fixture-mir5-active-mods-observer_0.1.0.zip": "2E1BE5952D2A4CC5C74A0D149E075D247BA110A3FAE5B6768D3EAEBABCEF989C",
+            "mir-fixture-mir5-agriculture-scale-paired_0.1.0.zip": "05D17B49A9C0C5112F601B5295C748E55B5F9AAA29E9829D589997B0DDC3D422",
+            "mir-fixture-mir5-agriculture-scale-arm-candidate-defaults_0.1.0.zip": "8F1BCD0378E71A3CC9DF21AF1344AC6B88B64294A90DA03044BE7F7DC5A1EB12",
+            "mir-fixture-mir5-agriculture-scale-matched-tier-1_0.1.0.zip": "176564869AD1210F281D5C211EDC551BFAEE979959B44C57D56006BBCFEA0349"
+          },
           "seed": {
             "kind": "completed-native-crop-steady-state-save",
             "sha256": "6001AC493AA54AC76952FCD465ACFEABB43B18CF87D2309BF1CF64667BB84C42",
@@ -420,6 +465,13 @@
           "profile_git_path": "tests/profiles/agriculture-matched-published-32-f210-2123.json",
           "profile_sha256": "6F176DAC38EFEC9F4B6EB60CFF27C4D76C2E5E2E75628E48BF149CE37E4EAF93",
           "player_sha256": "A4BB8F47232C689B267EF434F557187A8795C47280FA464169DE917FB579517F",
+          "fixture_archives": {
+            "mir-fixture-mir5-agriculture-scale_0.1.0.zip": "F4AD345E496976423EF351DA31F2CD9C2D249DE37FF4DC05E4B44F7B27BEA207",
+            "mir-fixture-mir5-active-mods-observer_0.1.0.zip": "2E1BE5952D2A4CC5C74A0D149E075D247BA110A3FAE5B6768D3EAEBABCEF989C",
+            "mir-fixture-mir5-agriculture-scale-paired_0.1.0.zip": "05D17B49A9C0C5112F601B5295C748E55B5F9AAA29E9829D589997B0DDC3D422",
+            "mir-fixture-mir5-agriculture-scale-arm-published_0.1.0.zip": "DC1F532220977C1F36B32874ED4006F34285484C217491D291626C3DAD5A7056",
+            "mir-fixture-mir5-agriculture-scale-matched-tier-32_0.1.0.zip": "736075D6F4A64CBD3E8C0369D307BB55BD400A6610B804DD02B5C87452A87688"
+          },
           "seed": {
             "kind": "completed-native-crop-steady-state-save",
             "sha256": "9F8F8469B9D354D504B2BC47DE7DDEA9B249463972AE9E70FC67421BE10A9B98",
@@ -441,6 +493,13 @@
           "profile_git_path": "tests/profiles/agriculture-matched-candidate-defaults-32-f210-2123.json",
           "profile_sha256": "8E363EB0FEB951083AB8D9E0A0511F9D5B18326947E1E73999FB5CA3C4F88339",
           "player_sha256": "AF65E765FB095489A2EA3F7BCD2A4471C46687F8BB12CC4762C98AC98829E987",
+          "fixture_archives": {
+            "mir-fixture-mir5-agriculture-scale_0.1.0.zip": "F4AD345E496976423EF351DA31F2CD9C2D249DE37FF4DC05E4B44F7B27BEA207",
+            "mir-fixture-mir5-active-mods-observer_0.1.0.zip": "2E1BE5952D2A4CC5C74A0D149E075D247BA110A3FAE5B6768D3EAEBABCEF989C",
+            "mir-fixture-mir5-agriculture-scale-paired_0.1.0.zip": "05D17B49A9C0C5112F601B5295C748E55B5F9AAA29E9829D589997B0DDC3D422",
+            "mir-fixture-mir5-agriculture-scale-arm-candidate-defaults_0.1.0.zip": "8F1BCD0378E71A3CC9DF21AF1344AC6B88B64294A90DA03044BE7F7DC5A1EB12",
+            "mir-fixture-mir5-agriculture-scale-matched-tier-32_0.1.0.zip": "736075D6F4A64CBD3E8C0369D307BB55BD400A6610B804DD02B5C87452A87688"
+          },
           "seed": {
             "kind": "completed-native-crop-steady-state-save",
             "sha256": "8C76D33B271CFD793784A2D6A9F71327F8AB70974CBCB274CF914555B6AB2EE4",
@@ -462,6 +521,13 @@
           "profile_git_path": "tests/profiles/agriculture-matched-published-128-f210-2123.json",
           "profile_sha256": "9656AB744408C016655570A3085345B05B826DCA6909170AFC2DDB796747D161",
           "player_sha256": "A4BB8F47232C689B267EF434F557187A8795C47280FA464169DE917FB579517F",
+          "fixture_archives": {
+            "mir-fixture-mir5-agriculture-scale_0.1.0.zip": "F4AD345E496976423EF351DA31F2CD9C2D249DE37FF4DC05E4B44F7B27BEA207",
+            "mir-fixture-mir5-active-mods-observer_0.1.0.zip": "2E1BE5952D2A4CC5C74A0D149E075D247BA110A3FAE5B6768D3EAEBABCEF989C",
+            "mir-fixture-mir5-agriculture-scale-paired_0.1.0.zip": "05D17B49A9C0C5112F601B5295C748E55B5F9AAA29E9829D589997B0DDC3D422",
+            "mir-fixture-mir5-agriculture-scale-arm-published_0.1.0.zip": "DC1F532220977C1F36B32874ED4006F34285484C217491D291626C3DAD5A7056",
+            "mir-fixture-mir5-agriculture-scale-matched-tier-128_0.1.0.zip": "C97B2F698E34DB8A15C22CF13A02879AF792446E615C510E979EAADF23E50BF3"
+          },
           "seed": {
             "kind": "completed-native-crop-steady-state-save",
             "sha256": "5E1955F9E03D4819AE2065205B39F26767D79E8DB2F668176447C976B53B7CC3",
@@ -483,6 +549,13 @@
           "profile_git_path": "tests/profiles/agriculture-matched-candidate-defaults-128-f210-2123.json",
           "profile_sha256": "C0D9F8991C551F01A04A2FD96E1A39ECFBAE6FF4695B3CE372ADD700DD745E02",
           "player_sha256": "AF65E765FB095489A2EA3F7BCD2A4471C46687F8BB12CC4762C98AC98829E987",
+          "fixture_archives": {
+            "mir-fixture-mir5-agriculture-scale_0.1.0.zip": "F4AD345E496976423EF351DA31F2CD9C2D249DE37FF4DC05E4B44F7B27BEA207",
+            "mir-fixture-mir5-active-mods-observer_0.1.0.zip": "2E1BE5952D2A4CC5C74A0D149E075D247BA110A3FAE5B6768D3EAEBABCEF989C",
+            "mir-fixture-mir5-agriculture-scale-paired_0.1.0.zip": "05D17B49A9C0C5112F601B5295C748E55B5F9AAA29E9829D589997B0DDC3D422",
+            "mir-fixture-mir5-agriculture-scale-arm-candidate-defaults_0.1.0.zip": "8F1BCD0378E71A3CC9DF21AF1344AC6B88B64294A90DA03044BE7F7DC5A1EB12",
+            "mir-fixture-mir5-agriculture-scale-matched-tier-128_0.1.0.zip": "C97B2F698E34DB8A15C22CF13A02879AF792446E615C510E979EAADF23E50BF3"
+          },
           "seed": {
             "kind": "completed-native-crop-steady-state-save",
             "sha256": "F156ACBE9FAFA59F2E7D4C9EAFBC43EE906798FF86771F1ACFBD12A888024016",
