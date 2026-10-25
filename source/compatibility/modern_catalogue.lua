@@ -662,6 +662,19 @@ function M.select(active_mods)
     })
     profile = "bob-warfare-f200"
   end
+  -- The independently captured AAI Base/Space Age intersection changes only
+  -- these two authored presentations. Keep it separate from SE/K2 semantics.
+  if target.id == "f210" and active_mods["aai-industry"] ~= nil then
+    for _, definition in ipairs(definitions) do
+      if definition.key == "research_engine" then
+        definition.icon = "__aai-industry__/graphics/technology/multi-cylinder-engine.png"
+        definition.icon_size = 256
+      elseif definition.key == "research_electric_engine" then
+        definition.icon = "__aai-industry__/graphics/technology/electric-engine.png"
+        definition.icon_size = 256
+      end
+    end
+  end
   return {profile = profile, definitions = supported_definitions(definitions), continuations = M.continuations(active_mods),
     native_owners = M.native_owners(active_mods), recipe_patches = recipe_patches,
     k2_imersite = k2so and k2so.imersite or false, bob_angel = bob_angel, bob_core = bob_core,
