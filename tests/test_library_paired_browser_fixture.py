@@ -295,6 +295,19 @@ class LibraryPairedBrowserFixtureTests(unittest.TestCase):
               ok,message=invoke(callbacks.events[2],{tick=tick})
               if not ok then return {ok=false,message=message,markers=markers,calls=calls} end
             end
+            local restart_wait
+            if opponent == "delayed-host-stop" then
+              local before=saved_state_fingerprint(original_storage)
+              local save_tick=env.game.tick
+              for _, offset in ipairs({1,60,240,600}) do
+                env.game.tick=save_tick+offset
+                ok,message=invoke(callbacks.events[2],{tick=env.game.tick})
+                if not ok then return {ok=false,message=message,markers=markers,calls=calls} end
+              end
+              restart_wait={phase=durable.phase,joins=durable.join_events,
+                calls=#calls,screenshots=#screenshots,
+                saved_state_unchanged=saved_state_fingerprint(original_storage)==before}
+            end
             if opponent == "no-cold-load" then
               en.connected=false; de.connected=false
               en.connected=true
@@ -341,7 +354,7 @@ class LibraryPairedBrowserFixtureTests(unittest.TestCase):
             end
             return {
               ok=ok,message=message,markers=markers,profiler_labels=profiler_labels,screenshots=screenshots,
-              saves=saves,calls=calls,joins=joins,load_writes=load_writes,readiness=readiness,action_ticks=action_ticks,
+              saves=saves,calls=calls,joins=joins,load_writes=load_writes,readiness=readiness,action_ticks=action_ticks,restart_wait=restart_wait,
               ready_markers_before_tick=ready_markers_before_tick,
               ready_markers_after_tick=ready_markers_after_tick,
               state=env.storage["mir5_library_paired_browser"]
@@ -512,6 +525,20 @@ class LibraryPairedBrowserFixtureTests(unittest.TestCase):
                     {"phase": "restart", "calls": 6, "screenshots": 6},
                 ])
                 self.assertEqual(result["action_ticks"], [151,151,211,211,271,271,481,481])
+
+    def test_restart_ready_waits_without_actions_until_the_host_actually_restarts(self):
+        for arm in ARMS:
+            with self.subTest(arm=arm):
+                result = self.runtime_result(arm, "delayed-host-stop")
+                self.assertTrue(result["ok"], result["message"])
+                self.assertEqual(result["restart_wait"], {
+                    "phase": "awaiting-cold-restart", "joins": 2,
+                    "calls": 6, "screenshots": 6, "saved_state_unchanged": True,
+                })
+                self.assertEqual(result["profiler_labels"], list(profile_reader.ACTIONS))
+                self.assertEqual(len(result["screenshots"]), 8)
+                self.assertEqual(result["state"]["join_events"], 4)
+                self.assertEqual(result["load_writes"], 0)
 
     def test_runtime_rejects_malformed_closure_seed_public_call_shape_and_restart_boundary(self):
         cases = (
