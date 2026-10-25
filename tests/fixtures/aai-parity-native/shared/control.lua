@@ -234,7 +234,6 @@ end
 local function source_init()
   local space = check_closure()
   local force = game.forces.player
-  force.research_queue_enabled = true
   game.speed = 16 -- Disposable physical fixture only; no timing claim.
   assert_lab_chain(force)
   local burner = create_burner_lab(force)

@@ -172,12 +172,15 @@ class AaiParityNativeControls(unittest.TestCase):
                   __index=function(target,key)
                     if key=="research_queue" then return queued end
                     if key=="current_research" then return current end
-                    return rawget(target,key)
+                    local result=rawget(target,key)
+                    if result==nil then error("unknown LuaForce field read: "..key) end
+                    return result
                   end,
                   __newindex=function(target,key,value)
                     if key=="research_queue" then queued=value or {};current=queued[1]
                     elseif key=="current_research" then current=value
-                    else rawset(target,key,value) end
+                    elseif key=="add_research" then rawset(target,key,value)
+                    else error("unknown LuaForce field write: "..key) end
                   end,
                 })
                 local function technology(name, researched, level)
