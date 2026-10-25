@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
-"""Analyze one frozen R23 or R24 responsive-menu observation receipt.
+"""Analyze one frozen R23, R24 or R25 responsive-menu observation receipt.
 
-This reader is deliberately narrow. It accepts the two fixed experiment
+This reader is deliberately narrow. It accepts the three fixed experiment
 cohorts, preserves their raw observations, and produces an
 endpoint-only menu analysis.  It does not prepare archives, launch Factorio,
 or make a release, runtime, UI-fidelity, or memory verdict.
@@ -36,6 +36,8 @@ COHORTS = {
                          "raw_path": "spec/evidence/bob-angel-menu-plan-r23.json", "result_kind": KIND},
     "MIR5ResponsiveMenuR24AnalysisPlanV1": {"id": "r24", "blocks": 64, "critical": T95_N64_DF63,
                          "raw_path": "spec/evidence/bob-angel-menu-plan-r24.json", "result_kind": "MIR5ResponsiveMenuR24AnalysisV1"},
+    "MIR5ResponsiveMenuR25AnalysisPlanV1": {"id": "r25", "blocks": 64, "critical": T95_N64_DF63,
+                         "raw_path": "spec/evidence/bob-angel-menu-plan-r25.json", "result_kind": "MIR5ResponsiveMenuR25AnalysisV1"},
 }
 
 

@@ -36,6 +36,43 @@ def assert_powershell_parses(path: Path) -> None:
     )
 
 
+def prototype_capture_output_budget_binder_cases() -> dict:
+    """Call the real capture entry point without admitting an engine process."""
+    missing_factorio = ROOT / "build/tmp/capture-budget-binder/missing-factorio.exe"
+    missing_profile = ROOT / "build/tmp/capture-budget-binder/missing-profile.json"
+    output_root = ROOT / "build/tmp/capture-budget-binder/output"
+    common = [
+        "pwsh",
+        "-NoProfile",
+        "-File",
+        str(PROTOTYPE_CAPTURE),
+        "-ArchiveLibrary",
+        str(ROOT),
+        "-FactorioBin",
+        str(missing_factorio),
+        "-ProfilePath",
+        str(missing_profile),
+        "-OutputRoot",
+        str(output_root),
+        "-RepoRoot",
+        str(ROOT),
+    ]
+
+    def invoke(limit: int) -> dict:
+        result = subprocess.run(
+            [*common, "-MaxNewOutputMiB", str(limit)],
+            cwd=ROOT,
+            text=True,
+            capture_output=True,
+        )
+        return {
+            "returncode": result.returncode,
+            "output": result.stdout + result.stderr,
+        }
+
+    return {"eight_gib": invoke(8192), "over_limit": invoke(8193)}
+
+
 def native_fixture_observer_guard_cases() -> dict:
     """Execute the wrapper's isolated observer-binding helper, never its runner."""
     escaped = str(NATIVE_FIXTURE).replace("'", "''")
@@ -362,6 +399,18 @@ class CaptureControlTests(unittest.TestCase):
             "-LatestInvocation -ActiveModsObserver $activeModsObserverName",
             native_fixture,
         )
+
+    def test_prototype_capture_accepts_the_declared_eight_gib_output_budget_only(self):
+        cases = prototype_capture_output_budget_binder_cases()
+
+        self.assertNotEqual(cases["eight_gib"]["returncode"], 0)
+        self.assertNotIn("maximum allowed range", cases["eight_gib"]["output"])
+        self.assertIn("missing-factorio.exe", cases["eight_gib"]["output"])
+
+        self.assertNotEqual(cases["over_limit"]["returncode"], 0)
+        self.assertIn("MaxNewOutputMiB", cases["over_limit"]["output"])
+        self.assertIn("maximum allowed range", cases["over_limit"]["output"])
+        self.assertNotIn("missing-factorio.exe", cases["over_limit"]["output"])
 
     def test_native_fixture_active_seed_mode_is_finite_and_deferred(self):
         source = NATIVE_FIXTURE.read_text(encoding="utf-8")
