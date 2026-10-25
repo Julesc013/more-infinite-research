@@ -4,6 +4,13 @@
   "status": "both-exact-source-physical-queue-arms-and-cold-reloads-passed",
   "source_commit": "04c2684be262509ef6bb312e1dd0c60d9e11cc74",
   "controller_commit": "17d726a44e8baa7c066ce7c8328a0c94660ce289",
+  "controller_provenance": {
+    "kind": "external-github-actions-run-head",
+    "artifact_attested": false,
+    "source": "https://api.github.com/repos/Julesc013/mir-native-worker/actions/runs/40163749124",
+    "field": "head_sha",
+    "scope": "The external workflow record supplies controller_commit; the native artifact separately records executed public harness, probe and governor hashes."
+  },
   "run": 40163749124,
   "url": "https://github.com/Julesc013/mir-native-worker/actions/runs/40163749124",
   "task": "repair-stress-f210",
@@ -79,6 +86,7 @@
       },
       {
         "path": "fixture-members.json",
+        "source_path": "gameplay-fixture-members.json",
         "bytes": 2697,
         "sha256": "48FDB99B90AEB25767B99D6920BBB52CE532576B2C1EBB8B1EF3D8C356DC0F03",
         "custody": "exact original artifact bytes"
@@ -124,6 +132,13 @@
   "earlier_adverse": {
     "run_id": 40162899940,
     "controller": "72039ff9b0dba2dea45514191a19d7e11c6cb460",
+    "controller_provenance": {
+      "kind": "external-github-actions-run-head",
+      "artifact_attested": false,
+      "source": "https://api.github.com/repos/Julesc013/mir-native-worker/actions/runs/40162899940",
+      "field": "head_sha",
+      "scope": "The external workflow record supplies controller; the retained seven-member artifact separately records the pre-engine routing refusal."
+    },
     "manifest_sha256": "D2400EDC15FC60465E32F91E038F9D349C580E0354EE4B962CA4572D1C688E68",
     "original_members_verified": 7,
     "worker_transcript_sha256": "814FB292205992627824358DC1F4D54C8F8C8E9DEF2DD20380007831754B3310",
