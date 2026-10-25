@@ -417,9 +417,12 @@ class HistoricalNativeFixtureControls(unittest.TestCase):
                   end
                   assert(#powered == 1 and powered[1] == expected, "fixture lab power budget differs")
                 end
-                direct.researched, force.manual_mining_speed_modifier, force.current_research = true, actual_effect, nil
                 local state = global.mir5_historical_native
                 only_powered(state.direct_lab)
+                callbacks[defines.events.on_tick]()
+                assert(state.phase == "direct" and force.current_research == direct)
+                only_powered(state.direct_lab)
+                direct.researched, force.manual_mining_speed_modifier, force.current_research = true, actual_effect, nil
                 callbacks[defines.events.on_research_finished]({research=direct})
                 assert(state.phase == "direct-consumption-pending")
                 assert(state.direct_lab.energy == 0 and state.continuation_lab.energy == 0)
@@ -437,6 +440,9 @@ class HistoricalNativeFixtureControls(unittest.TestCase):
                 assert(state.direct_lab.energy == 0)
 
                 local continuation_input = state.continuation_lab.get_inventory(defines.inventory.lab_input)
+                callbacks[defines.events.on_tick]()
+                assert(state.phase == "continuation" and force.current_research == continuation)
+                only_powered(state.continuation_lab)
                 continuation.researched, force.stack_inserter_capacity_bonus, force.current_research = true,
                   actual_continuation_effect or 1, nil
                 callbacks[defines.events.on_research_finished]({research=continuation})
