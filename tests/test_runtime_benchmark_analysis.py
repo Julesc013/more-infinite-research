@@ -78,9 +78,9 @@ def _plan() -> dict[str, object]:
         },
         "comparison_rules": {
             "candidate_time_per_tick_limit": {"relative_fraction": 0.1, "absolute_milliseconds_per_tick": 0.25},
-            "candidate_memory_limits": {"relative_fraction": 0.1, "absolute_bytes": 64 * 1024 * 1024, "metrics": list(MODULE.METRICS[1:])},
+            "candidate_memory_limits": {"relative_fraction": 0.1, "absolute_bytes": 64 * 1024 * 1024, "metrics": ["operating_system_peak_working_set_bytes", "maximum_sampled_working_set_bytes", "maximum_sampled_private_bytes"]},
             "agriculture_within_arm_increment_128_minus_1": {
-                "metrics": list(MODULE.METRICS),
+                "metrics": ["engine_reported_average_ms_per_tick", "operating_system_peak_working_set_bytes", "maximum_sampled_working_set_bytes", "maximum_sampled_private_bytes"],
                 "rule": "Report candidate and published 128-minus-1 raw differences separately. A percentage comparison is permitted only when the matching published incremental denominator is finite and strictly positive; otherwise report raw differences only, with no percentage or inferred non-regression conclusion from noise.",
             },
         },
@@ -270,7 +270,7 @@ def _observation(plan: dict[str, object], schedule: dict[str, object], captures:
             "source_path": capture["active_seed"]["path"],
             "source_sha256": capture["active_seed"]["sha256"],
             "owned_leaf": "fresh-owned-active-seed.zip",
-            "owned_path": f"D:/owned/{schedule['id']}/fresh-owned-active-seed.zip",
+            "owned_path": f"D:/owned/{schedule['id']}/input/fresh-owned-active-seed.zip",
             "owned_sha256": capture["active_seed"]["sha256"],
             "bytes": capture["active_seed"]["bytes"],
         },
@@ -283,7 +283,7 @@ def _observation(plan: dict[str, object], schedule: dict[str, object], captures:
         "command": ["--benchmark", "<fresh-owned-active-seed.zip>", "--benchmark-ticks", "25000", "--benchmark-runs", "1", "--benchmark-sanitize"],
         "timing": {"updates": 25000, "total_milliseconds": value * 25000, "average_milliseconds_per_tick": value, "minimum_milliseconds_per_tick": value - 0.1, "maximum_milliseconds_per_tick": value + 0.1},
         "native_process": {
-            "stdout": f"{schedule['id']}/factorio-current.log",
+            "stdout": "process-1.stdout.txt",
             "stdout_sha256": "A" * 64,
             "resource_ledger": f"{schedule['id']}/resource-ledger.json",
             "duration_seconds": 2.0,
@@ -296,9 +296,9 @@ def _observation(plan: dict[str, object], schedule: dict[str, object], captures:
         "physical_markers": {
             "start": _marker(str(active["kind"]), "start", "pending", _pilot_witness(active, False)),
             "complete": _marker(str(active["kind"]), "complete", "passed", _pilot_witness(active, True)),
-            "fixture_log": f"{schedule['id']}/fixture.log",
+            "fixture_log": f"D:/owned/{schedule['id']}/write-data/factorio-current.log",
             "fixture_log_sha256": "D" * 64,
-            "stdout": f"{schedule['id']}/factorio-current.log",
+            "stdout": f"D:/owned/{schedule['id']}/process-1.stdout.txt",
             "stdout_sha256": "A" * 64,
         },
         "library_control_restoration": {"status": "restored-direct-library-controls", "profile_sha256": profile["sha256"], "dependency_payload_bytes_copied": 0, "archive_links_created": 0, "archive_extractions": 0, "selected": []},
@@ -352,6 +352,18 @@ def _prepared_inputs(result: dict[str, object]) -> bytes:
 
 
 class RuntimeBenchmarkAnalysisTests(unittest.TestCase):
+    def test_accepts_exact_frozen_r06_plan_metric_labels(self) -> None:
+        payload = (ROOT / "spec/evidence/runtime-benchmark-active-plan-r06.json").read_bytes()
+        self.assertEqual(_hash(payload), "816BA8FE3589967CC456F189F5F3F584289FB553DAFADBB64ACAEF32DD306C4F")
+        plan = json.loads(payload)
+        contract = MODULE._validate_plan(plan)
+        self.assertEqual(len(contract["profiles"]), 8)
+        self.assertEqual(len(contract["helpers"]), 12)
+        wrong_label = copy.deepcopy(plan)
+        wrong_label["comparison_rules"]["agriculture_within_arm_increment_128_minus_1"]["metrics"][0] = "engine_reported_average_milliseconds_per_tick"
+        with self.assertRaisesRegex(MODULE.RuntimeBenchmarkAnalysisError, "agriculture increment metrics"):
+            MODULE._validate_plan(wrong_label)
+
     def test_consumes_exact_accepted_r06_capture_and_pilot_payloads(self) -> None:
         capsule_path = "spec/evidence/runtime-active-r06-physical-native-receipts.json.gz"
         plan_path = "spec/evidence/runtime-benchmark-active-plan-r06.json"
@@ -434,6 +446,11 @@ class RuntimeBenchmarkAnalysisTests(unittest.TestCase):
             "flat-prepared-planting": lambda item: item["active_seed_capture"]["record"]["captures"][2]["prepared_marker"]["witnesses"].__setitem__("native_planting_events", 0),
             "pilot-complete-witness": lambda item: item["unscored_marker_pilot"]["record"]["observations"][0]["complete_marker"]["witnesses"].__setitem__("initial_changed", 1),
             "sample-complete-witness": lambda item: item["observations"][0]["physical_markers"]["complete"]["witnesses"].__setitem__("initial_changed", 1),
+            "cross-sample-stdout": lambda item: item["observations"][0]["physical_markers"].__setitem__("stdout", "D:/owned/another-sample/process-1.stdout.txt"),
+            "relative-physical-stdout": lambda item: item["observations"][0]["physical_markers"].__setitem__("stdout", "process-1.stdout.txt"),
+            "escaped-native-stdout": lambda item: item["observations"][0]["native_process"].__setitem__("stdout", "../process-1.stdout.txt"),
+            "cross-sample-fixture-log": lambda item: item["observations"][0]["physical_markers"].__setitem__("fixture_log", "D:/owned/another-sample/write-data/factorio-current.log"),
+            "cross-sample-owned-seed": lambda item: item["observations"][0]["seed"].__setitem__("owned_path", "D:/owned/another-sample/input/fresh-owned-active-seed.zip"),
             "nonrestored-library": lambda item: item["observations"][0]["library_control_restoration"].__setitem__("status", "not-restored"),
             "wrong-engine": lambda item: item["observations"][0]["engine"].__setitem__("sha256", "0" * 64),
             "nonfinite-timing": lambda item: item["observations"][0]["timing"].__setitem__("average_milliseconds_per_tick", float("nan")),

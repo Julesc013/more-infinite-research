@@ -13,7 +13,7 @@ import argparse
 import hashlib
 import json
 import math
-from pathlib import Path
+from pathlib import Path, PureWindowsPath
 import re
 import statistics
 import sys
@@ -310,7 +310,8 @@ def _validate_plan(plan: dict[str, Any]) -> dict[str, Any]:
     _same(_integer(memory_rule.get("absolute_bytes"), "memory absolute allowance"), 64 * 1024 * 1024, "memory absolute allowance")
     _same(_array(memory_rule.get("metrics"), "memory metrics"), list(METRICS[1:]), "memory metrics")
     increment_rule = _mapping(rules.get("agriculture_within_arm_increment_128_minus_1"), "agriculture increment rule")
-    _same(_array(increment_rule.get("metrics"), "agriculture increment metrics"), list(METRICS), "agriculture increment metrics")
+    # D6 names this metric with "ms"; observed/result fields spell out the unit.
+    _same(_array(increment_rule.get("metrics"), "agriculture increment metrics"), ["engine_reported_average_ms_per_tick", *METRICS[1:]], "agriculture increment metrics")
     _same(
         _string(increment_rule.get("rule"), "agriculture increment rule text"),
         "Report candidate and published 128-minus-1 raw differences separately. A percentage comparison is permitted only when the matching published incremental denominator is finite and strictly positive; otherwise report raw differences only, with no percentage or inferred non-regression conclusion from noise.",
@@ -571,14 +572,19 @@ def _validate_process_memory(value: Any, native: dict[str, Any]) -> None:
     _same(_integer(native.get("maximum_sampled_private_bytes"), "sampled private maximum", minimum=0), maximum_private, "sampled private maximum")
 
 
-def _validate_physical_markers(value: Any, schedule: dict[str, Any], native: dict[str, Any]) -> None:
+def _validate_physical_markers(value: Any, schedule: dict[str, Any], native: dict[str, Any], owned_seed_path: str) -> None:
     physical = _mapping(value, "physical markers")
     kind = "repair-stress" if schedule["scenario"] == "repair-active" else "agriculture-scale"
     start = _marker(physical.get("start"), "sample start marker", kind, "start", "pending")
     complete = _marker(physical.get("complete"), "sample complete marker", kind, "complete", "passed")
-    _string(physical.get("fixture_log"), "sample fixture log path")
+    owned_seed = PureWindowsPath(owned_seed_path)
+    if not owned_seed.is_absolute() or ".." in owned_seed.parts or owned_seed.parts[-3:] != (schedule["id"], "input", "fresh-owned-active-seed.zip"):
+        raise RuntimeBenchmarkAnalysisError("owned seed path is outside its scheduled sample")
+    sample_root = owned_seed.parent.parent
+    _same(PureWindowsPath(_string(physical.get("fixture_log"), "sample fixture log path")), sample_root / "write-data" / "factorio-current.log", "sample fixture log path")
     _sha256(physical.get("fixture_log_sha256"), "sample fixture log SHA-256")
-    _same(_string(physical.get("stdout"), "sample physical stdout path"), _string(native.get("stdout"), "native stdout path"), "sample physical stdout path")
+    _same(_string(native.get("stdout"), "native stdout path"), "process-1.stdout.txt", "native stdout leaf")
+    _same(PureWindowsPath(_string(physical.get("stdout"), "sample physical stdout path")), sample_root / "process-1.stdout.txt", "sample physical stdout path")
     _expect_hash(physical.get("stdout_sha256"), native.get("stdout_sha256"), "sample physical stdout SHA-256")
     if kind == "repair-stress":
         for witnesses, expected_changed, expected_pending in ((start, 0, True), (complete, 256, False)):
@@ -670,7 +676,7 @@ def _validate_sample(
     if operating_peak < working:
         raise RuntimeBenchmarkAnalysisError("OS peak working set is below sampled working set")
     _validate_process_memory(row.get("process_memory"), native)
-    _validate_physical_markers(row.get("physical_markers"), schedule, native)
+    _validate_physical_markers(row.get("physical_markers"), schedule, native, seed["owned_path"])
     restoration = _mapping(row.get("library_control_restoration"), "library control restoration")
     _same(_string(restoration.get("status"), "library restoration status"), "restored-direct-library-controls", "library restoration status")
     _expect_hash(restoration.get("profile_sha256"), expected_profile["sha256"], "library restoration profile SHA-256")
