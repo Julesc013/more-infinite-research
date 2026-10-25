@@ -254,12 +254,6 @@ class F200F210CatalogueUpgradeFixtureTests(unittest.TestCase):
             successor.configuration(); gear.level=gear.level+1; gear.saved_progress=0; player.recipes["iron-gear-wheel"].productivity_bonus=.2
             successor.events[1]{research=gear}; successor.events[2]()
             local paused, state=game.forces[2],storage.mir5_full_catalogue_upgrade
-            if mutate_snapshot then
-              state.source_snapshot.technologies["recipe-prod-research_science_pack_productivity-1"].level = state.source_snapshot.technologies["recipe-prod-research_science_pack_productivity-1"].level + 1
-              successor.load()
-              local ok, message = pcall(successor.events[2])
-              return {ok=ok, message=tostring(message)}
-            end
             local function copy(value, seen)
               if type(value) ~= "table" then return value end
               seen = seen or {}
@@ -277,6 +271,13 @@ class F200F210CatalogueUpgradeFixtureTests(unittest.TestCase):
               for key, value in pairs(left) do if not same(value, right[key], seen) then return false end end
               for key, _ in pairs(right) do if left[key] == nil then return false end end
               return true
+            end
+            if mutate_snapshot then
+              local expected_snapshot, expected_state = copy(state.source_snapshot), copy(state)
+              player.technologies["recipe-prod-research_science_pack_productivity-1"].level = player.technologies["recipe-prod-research_science_pack_productivity-1"].level + 1
+              successor.load()
+              local ok, message = pcall(successor.events[2])
+              return {ok=ok, message=tostring(message), source_snapshot_read_only=same(expected_snapshot, state.source_snapshot), state_read_only=same(expected_state, state)}
             end
             local function native_view()
               return {gear_level=gear.level, gear_saved=gear.saved_progress,
@@ -309,6 +310,7 @@ class F200F210CatalogueUpgradeFixtureTests(unittest.TestCase):
         drift = py(self.lua.eval("run_cross_callbacks")(True))
         self.assertFalse(drift["ok"])
         self.assertIn("successor cold reload technology state changed", drift["message"])
+        self.assertEqual((True, True), (drift["source_snapshot_read_only"], drift["state_read_only"]))
 
     def test_cross_fixture_staging_is_explicit_and_does_not_import_player_source(self):
         info = json.loads(CROSS.joinpath("info.json").read_text(encoding="utf-8"))
