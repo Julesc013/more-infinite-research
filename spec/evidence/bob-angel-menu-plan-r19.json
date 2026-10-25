@@ -1,0 +1,171 @@
+{
+  "schema": 1,
+  "kind": "MIR5PredeclaredResponsiveMenuExperimentV1",
+  "status": "frozen-before-execution-not-a-result",
+  "host": "BLACKGLASS-WIN1",
+  "engine": {
+    "version": "2.0.77",
+    "sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B"
+  },
+  "profile": "tests/profiles/bob-angel-f200-2077.json",
+  "profile_checkout_sha256": "A2F235B7CE1F18968E1D7D7913362694EA1916095852C1673300C68BA26DDE90",
+  "profile_git_blob_sha256": "A2F235B7CE1F18968E1D7D7913362694EA1916095852C1673300C68BA26DDE90",
+  "published": {
+    "version": "4.7.20002",
+    "sha256": "F3943EB4D69CCDAC41BD9F922AD03A5C78F34F22D8E7FA5A88A7A658AB1010B7"
+  },
+  "candidate": {
+    "source_reference": "1ca97dc4981444d742118febf822461a03481e90",
+    "source_tree": "ebfa50354994bd586e6965e91db44127e3625880",
+    "sha256": "38DD584C7830630E30760A1DF29F884E49858A302C48243C8BF788EC616FDC9E",
+    "bytes": 550213,
+    "scope": "Complete applicable canonical F200 player with the accepted Aero914 science correction outside the Generator. Default/exact paths perform no new recipe collection. Fresh complete intended-output/default equality remains required, as do separate save/client/runtime and release verdicts. This is the existing predeclared high-cost F200 comparison; current F210 native qualification retains scheduling priority.",
+    "asset_inventory_sha256": "86C52911FD8017AFE5A8A504A79C9B58069D8FA5498E5AE477E1BD3C09D3D522",
+    "asset_root": "D:/Projects/Factorio/mir5-current-assets-1ca97dc4-r01"
+  },
+  "ordinary_config_sha256": "DA9A92AB9047EBD9F9640B34DC9EF6C084801DF85B8F75B1A490E786F40DD510",
+  "player_data_sha256": "B2BF04AD4E46C306BB9CFB2BFACF549307FD1E611B760C79F68080D79AC532A9",
+  "native_preparation": {
+    "status": "required-not-executed",
+    "scope": "Capture this exact candidate and compare complete data/settings output against the original independent no-MIR capture plus the complete148-record r03 intent. Use existing strict compare_candidate with explicitly hash-verified paired full-document-equivalent CRLF/LF profile files; do not rewrite any original receipt or inventory. Separately rebuild the diagnostic published4.7 replay with pinned canonical tools and verify complete published/replay equality before timing. Reuse any earlier native observation only if every exact consumed engine, archive, settings, profile document and helper input remains trusted and unchanged; changed replay archive bytes require fresh replay capture.",
+    "prior_observations": "spec/evidence/bob-angel-menu-preparation-and-adverse-chain.json",
+    "independent_intent": "spec/inventory/bob-angel-f200-intent-r03.json",
+    "independent_intent_sha256": "1D200906E8996F4049009EE6761E73C88FFC70824BC838496786A32EF927207C",
+    "intent_review": "spec/evidence/bob-angel-original-baseline-readback.json",
+    "independent_baseline": {
+      "run_url": "https://github.com/Julesc013/mir-native-worker/actions/runs/39974658753",
+      "artifact_id": 12510707253,
+      "artifact_manifest_sha256": "5CDAC2104AA1A138195169C3E8A45B9B49BD7ED107FC0882721F8F9C522E8CED",
+      "verified_members": 13,
+      "original_result_sha256": "48444A48A0AFA05AC1C493BC2A1BBAB4328A96D566FDE083406ABA6D737DB563",
+      "original_source_reference": "98f139f62db7dd1b143b37723f587141ce4060d0",
+      "original_profile_sha256": "93EA20609F3EACDA4C8C1ABFCB5168BD82E89937A62824A2EB4140478262BE78",
+      "current_profile_sha256": "A2F235B7CE1F18968E1D7D7913362694EA1916095852C1673300C68BA26DDE90",
+      "full_inventory_receipt_equality": true,
+      "complete_profile_document_equality": true,
+      "reviewed_data_records": 27,
+      "reviewed_settings_records": 121
+    },
+    "published_replay_contract": "The replay reproduces the exact published4.7 output/patches, not the MIR5 candidate. Its diagnostic gap and candidate-versus-published improvement are reported separately. Candidate settings dispositions do not silently redefine the published replay workload."
+  },
+  "endpoint": "Process start to observed response to a harmless ordinary main-menu action",
+  "arms": [
+    "control-without-mir",
+    "published-4.7",
+    "replay",
+    "candidate-mir5"
+  ],
+  "design": {
+    "warmups_per_arm": 1,
+    "same_version_aa_observations": 2,
+    "counterbalanced_blocks": 8,
+    "primary_observations_per_arm": 8,
+    "extensions": "None. Preserve every refusal/error/adverse observation; any changed-input run requires a separately identified plan."
+  },
+  "tolerances": {
+    "aa_absolute_seconds": 0.5,
+    "aa_relative_percent": 5,
+    "aa_rule": "Absolute A/A difference must not exceed max(0.5 seconds, 5 percent of their mean).",
+    "control_regression_seconds": 0.5,
+    "control_rule": "Mean late-cycle control startup must not exceed mean early-cycle control startup by more than 0.5 seconds. Report every sample and spread.",
+    "minimum_mir_added_time_reduction_percent": 50,
+    "improvement_rule": "Use paired block differences against the same control, report direct and incremental differences, sample spread and uncertainty. A nonpositive or unresolved baseline increment supports no percentage claim."
+  },
+  "preconditions": [
+    "The original independent baseline must retain exact full receipt equality with its inventory; both explicit profile files must match their original recorded hashes and their complete JSON documents must be equal. Fresh current-candidate complete r03 equality and separate complete published/replay equality precede timings. No baseline envelope waiver or relabelling of old executions.",
+    "Existing archive library only, no dependency copies or engine updates, exclusive native custody and unchanged resource admission.",
+    "No other heavy jobs during timed launches; one shared cache policy and the same ordinary configuration and credential-free engine-created player data for all arms.",
+    "A fresh owned-window control diagnostic on the current Black Glass desktop must reach the observed settings response under the existing ownership and obstruction guards. A failed or refused diagnostic is not a timing sample.",
+    "Verify the new candidate native default output against its independent reference before timed execution; retain the configuration-change foreign-enable adverse observation separately and make no save-acceptance claim from timings."
+  ],
+  "limitations": [
+    "This is an engineering comparison, not final release qualification or a second-machine comparison.",
+    "Save, Library latency, runtime stress and retained/peak memory non-regression require their separate endpoints."
+  ],
+  "previous_plan": "spec/evidence/bob-angel-menu-plan-r18.json",
+  "changed_inputs": [
+    "Advance exact player source to1ca97dc/player treeebfa5035. The complete nine-edition freeze and primary readback are independently verified; F200 is38DD584C/550213 bytes at `D:/Projects/Factorio/mir5-current-assets-1ca97dc4-r01`, inventory file86C52911. No earlier player result is relabelled.",
+    "Reverify all fourteen raw-Git helper hashes at1ca97dc; every listed helper byte hash is unchanged from R18. Ownership, obstruction, native resource admission and process cleanup predicates are retained.",
+    "Retain the complete dependency-valid Bob/Angel profile, original independent148-record intent, published4.7 archive, all four arms,38 launches,A/A0.5 seconds and5 percent,control0.5 seconds,50 percent MIR-added improvement objective,cache policy,ordinary configuration and resource reserves.",
+    "Require fresh current candidate/default intent equality, complete published/replay equality and a successful current owned-window control diagnostic before timing. The separate d94 untimed owned-menu response demonstrates its exact limited scope only; it does not supply a timing sample or establish the cause of earlier occlusion.",
+    "Preserve every earlier preparation failure and refusal under its original identity. R18 remains zero accepted timing samples. This new declaration has zero native preparation results and zero timing samples."
+  ],
+  "resources": {
+    "expected_peak_memory_mib": 6144,
+    "maximum_new_output_mib": 2048,
+    "per_launch_timeout_seconds": 300,
+    "worker_timeout_minutes": 45,
+    "governor_reserves_changed": false
+  },
+  "observer_source_reference": "1ca97dc4981444d742118febf822461a03481e90",
+  "observer_git_blobs": [
+    {
+      "path": "tools/lib/validation/responsive-menu/OwnedMenuWindow.ps1",
+      "sha256": "554324FF12A7EAC51DAA5438B48CE79A10FC095E546844127F02590A7772ED43"
+    },
+    {
+      "path": "tools/lib/validation/responsive-menu/Invoke-MIRResponsiveMenuActor.ps1",
+      "sha256": "DC4816352962EC14ED443E5865F71FF3F2A989B47DCF4F45916048F1B5A55D55"
+    },
+    {
+      "path": "tools/lib/validation/responsive-menu/MenuObservation.ps1",
+      "sha256": "8423C41478F7AB329E7A385BBD13BB39490E42FB4F98B1D53AA508B583DEC2EC"
+    },
+    {
+      "path": "tools/Invoke-MenuComparison.ps1",
+      "sha256": "FF54EB89F9496F583838395E3DC2C4482A98B53C4C2558C20013748F9D258A78"
+    }
+  ],
+  "adverse_evidence": "spec/evidence/bob-angel-menu-preparation-and-adverse-chain.json",
+  "shared_harness_source_reference": "1ca97dc4981444d742118febf822461a03481e90",
+  "shared_harness_git_blobs": [
+    {
+      "path": "tools/lib/validation/NativeProbeCommon.ps1",
+      "sha256": "CC8462A39DE12D0746C8F985D1F86F761CF3EF261B4FA551CFFD092F76D64D71"
+    },
+    {
+      "path": "tools/lib/validation/NativeProbeResources.ps1",
+      "sha256": "2826EF1D491615C10B39F6D05C6BDEE5D4317EB10BBA753AD0BA159ED95B9311"
+    },
+    {
+      "path": "tools/lib/validation/ResourceGovernor.ps1",
+      "sha256": "50E5172BF9836B2742A9857F7A0F86DFF3E5FD6C40A4E149F42334A199302A6E"
+    },
+    {
+      "path": "tools/lib/validation/ImmutableInputStaging.ps1",
+      "sha256": "B5FBFAC8537B08F9790BD3EE8ACEAAB38EE5CBB8EF005E67E8375DE568BBC12C"
+    },
+    {
+      "path": "tools/lib/validation/DirectLibraryStartupMeasurement.ps1",
+      "sha256": "101059A821E31FE5AC8959F7863BFA376317DA0DB3D9778653F149A16BFC82A1"
+    },
+    {
+      "path": "tools/lib/validation/ResponsiveMenuRecord.ps1",
+      "sha256": "7F74EF416DC4C06B85B3479C02DEF13837F9D69420BBE2F88ADAFB8E5E18DFFB"
+    },
+    {
+      "path": "tools/lib/compatibility/LibraryActivation.ps1",
+      "sha256": "ED699BB77F4325E7967DC3B6E692D9796BF378BD9251B6D87146AFFF87181315"
+    },
+    {
+      "path": "tools/lib/compatibility/ModPortal.ps1",
+      "sha256": "A16344F66A9124C0792614AAD83702603D4C0AD4FE977392C73710B745E74B08"
+    },
+    {
+      "path": "tools/lib/workspace/RepoPaths.ps1",
+      "sha256": "E9080D02C67E79A488F7093010BDF125301152D527D3662D526D21A466CC97A0"
+    },
+    {
+      "path": "tools/Invoke-PrototypeCapture.ps1",
+      "sha256": "34E513C43EFEB5CAC93843CA9AA9CD5E70E385825BD8C155783C3542A3E8FB07"
+    }
+  ],
+  "prior_predeclaration_commit": "aebd5460ad2ca8420b9f839b2233a738585156a7",
+  "preparation_or_timing_started_for_prior_revision": true,
+  "prior_revision_observation": {
+    "scope": "R16 first no-MIR control capture launched one Factorio2.0.77 process, then failed because write-data/script-output did not exist. Candidate, published/replay, window and timing phases never began; timing_samples_started is0.",
+    "native_adverse": "spec/evidence/bob-angel-menu-r16-preparation-adverse-chain.json",
+    "offline_custody": "build/mir5/recovery/menu-r16-planonly-r01",
+    "earlier_r12_adverse": "spec/evidence/bob-angel-menu-r12-preparation-adverse-chain.json"
+  }
+}
