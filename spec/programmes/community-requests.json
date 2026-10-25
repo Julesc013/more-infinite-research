@@ -4482,10 +4482,12 @@
           "source/api/v1/data.lua"
         ],
         "evidence": [
-          "spec/evidence/api-canonical-native-chain.json"
+          "spec/evidence/api-canonical-native-chain.json",
+          "spec/evidence/aero-startup-slices-native-chain.json"
         ],
         "limitations": [
-          "Run 40096782298 is a representative science-admission observation only. It does not instantiate Space-Lab-Research-61, its provider, effect owner, foreign research state or protected save, so it cannot qualify the original report."
+          "Run 40096782298 is a representative science-admission observation only. It does not instantiate Space-Lab-Research-61, its provider, effect owner, foreign research state or protected save, so it cannot qualify the original report.",
+          "Run 40111662910 adds a separate representative F210 2.1.23 CreateOnly startup observation at source f5223e1fb755a0fe3669551a51cc08f207b7e1df with player D48CC28AC0C70B12D105FE935D33DC95EF2B5F27149F735FCA7EBBDF9177F0F4. Fixture-defined Space-Lab-Research-61 and pending -62 remain beside ordinary MIR gear research while the named foreign-pack recipe is absent; controls are restored. It does not identify the reporter's provider or closure, reproduce the reported provider/effect-owner failure, preserve earned foreign research from a protected save, or qualify labs, migration, reloads, multiplayer, performance or release."
         ]
       },
       "qualification": [],
