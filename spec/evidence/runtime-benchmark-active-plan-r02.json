@@ -90,6 +90,15 @@
     "repair": {
       "control_path": "tests/fixtures/repair-stress/control.lua",
       "control_sha256": "521D75CBE29B65257E02921B13A3DFF227FE291F9406F6F41F366D4750AF86C7",
+      "fixture_source_members": [
+        {"source": "tests/fixtures/repair-stress/control.lua", "fixture": "repair-stress", "member": "control.lua", "sha256": "521D75CBE29B65257E02921B13A3DFF227FE291F9406F6F41F366D4750AF86C7"},
+        {"source": "tests/fixtures/repair-stress/settings-updates.lua", "fixture": "repair-stress", "member": "settings-updates.lua", "sha256": "169544957E9FD810B04FFFBF87313B9C992760CA45B2A2F91BA87111948B9C51"},
+        {"source": "tests/fixtures/repair-stress/published/info-f210.json", "fixture": "repair-published", "member": "info.json", "sha256": "487AA0537E3B1878F612638F5CA1C2389B97C6A902D14A915DF03D5D85CF20BA"},
+        {"source": "tests/fixtures/repair-stress/mir5/info-f210.json", "fixture": "repair-candidate", "member": "info.json", "sha256": "A8795707F4E806065D017A738B49C61743BA0C7CEDD2C62C4843595AAD16D143"},
+        {"source": "tests/fixtures/repair-stress/active/info-f210.json", "fixture": "repair-active", "member": "info.json", "sha256": "237F1EA1FF11F762D957F3F2CCF522740C5D5745EC1D34775D36B84C85B9D4AF"},
+        {"source": "tests/fixtures/active-mods-observer/info.json", "fixture": "active-mods-observer", "member": "info.json", "sha256": "C37A55C4776F1B4DABA7E4D5C98CF22FD0E978A461D3E6FD8A95E238B97908BD"},
+        {"source": "tests/fixtures/active-mods-observer/data-final-fixes.lua", "fixture": "active-mods-observer", "member": "data-final-fixes.lua", "sha256": "89D364F0033A7EE036998E6C29A3558099C25AD2707CB24914790C49FB21555C"}
+      ],
       "profiles": [
         {"path": "tests/profiles/repair-stress-active-published-f210-2123.json", "sha256": "AC354044B9BB57D2BA8A747185292B0E4790C0C308D3F5A32D423B975CE630C9"},
         {"path": "tests/profiles/repair-stress-active-mir5-f210-2123.json", "sha256": "30844456D7CFC5F737B270A578FA1911C621947C9532451C610ECFA900388D9C"}
