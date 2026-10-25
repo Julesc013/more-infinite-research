@@ -24,9 +24,9 @@ class SdkTests(unittest.TestCase):
     def test_native_optional_absence_observer_checks_exact_read_only_closure(self):
         path = ROOT / 'tests/fixtures/api-optional-absence/control.lua'
         self.lua.execute(r'''
-          function optional_absence_observer(path, opponent)
+          function optional_absence_observer(path, base_version, opponent)
             local callback, report
-            local active = {base='2.0.77', ['mir-fixture-mir5-api-beta']='0.1.0',
+            local active = {base=base_version, ['mir-fixture-mir5-api-beta']='0.1.0',
               ['mir-fixture-mir5-api-optional-absence']='0.1.0',
               ['mir-fixture-mir5-active-mods-observer']='0.1.0'}
             local interface, technology, productivity = nil, nil, 0
@@ -54,16 +54,34 @@ class SdkTests(unittest.TestCase):
             return {ok=ok,message=message,report=report}
           end
         ''')
-        for opponent in ('', 'mir', 'consumer', 'interface', 'technology', 'effect'):
-            with self.subTest(opponent=opponent):
-                result = self.lua.eval('optional_absence_observer')(path.as_posix(), opponent)
-                self.assertEqual(not opponent, result['ok'], result['message'])
-                if not opponent:
-                    self.assertFalse(result['report']['mir_present'])
-                    self.assertEqual(0, result['report']['cable_productivity_bonus'])
-        profile = json.loads((ROOT / 'tests/profiles/api-optional-absence-f200-2077.json').read_text())
-        self.assertEqual(4, len(profile['mods']))
-        self.assertNotIn('more-infinite-research', {row['name'] for row in profile['mods']})
+        for base_version in ('2.0.77', '2.1.23'):
+            for opponent in ('', 'base', 'mir', 'consumer', 'interface', 'technology', 'effect'):
+                with self.subTest(base_version=base_version, opponent=opponent):
+                    observed_base = '2.1.22' if opponent == 'base' else base_version
+                    result = self.lua.eval('optional_absence_observer')(path.as_posix(), observed_base, opponent)
+                    self.assertEqual(not opponent, result['ok'], result['message'])
+                    if not opponent:
+                        self.assertFalse(result['report']['mir_present'])
+                        self.assertEqual(0, result['report']['cable_productivity_bonus'])
+        f200_profile = json.loads((ROOT / 'tests/profiles/api-optional-absence-f200-2077.json').read_text())
+        f210_profile = json.loads((ROOT / 'tests/profiles/api-optional-absence-f210-2123.json').read_text())
+        for profile, target, base_version, observer_sha256 in (
+            (f200_profile, 'f200', '2.0.77', '723D1E7721449FC26040E5E6629416767BDC20AD79CF8723115846DB662A1F87'),
+            (f210_profile, 'f210', '2.1.23', '2E1BE5952D2A4CC5C74A0D149E075D247BA110A3FAE5B6768D3EAEBABCEF989C'),
+        ):
+            with self.subTest(profile=target):
+                self.assertEqual(target, profile['target'])
+                self.assertEqual(4, len(profile['mods']))
+                self.assertEqual(base_version, profile['mods'][0]['version'])
+                self.assertNotIn('more-infinite-research', {row['name'] for row in profile['mods']})
+                self.assertEqual(observer_sha256, profile['archive_sha256']['mir-fixture-mir5-active-mods-observer_0.1.0.zip'])
+        f210_info = json.loads((ROOT / 'tests/fixtures/api-optional-absence/info-f210.json').read_text())
+        self.assertEqual('2.1', f210_info['factorio_version'])
+        self.assertEqual([
+            'base >= 2.1.23',
+            'mir-fixture-mir5-api-beta = 0.1.0',
+            'mir-fixture-mir5-active-mods-observer = 0.1.0',
+        ], f210_info['dependencies'])
 
     def setUp(self):
         self.lua = LuaRuntime(unpack_returned_tuples=True)

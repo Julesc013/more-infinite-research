@@ -1,0 +1,12 @@
+{
+  "name": "mir-fixture-mir5-api-optional-absence",
+  "version": "0.1.0",
+  "title": "MIR optional API absence observer",
+  "author": "MIR maintainers",
+  "factorio_version": "2.1",
+  "dependencies": [
+    "base >= 2.1.23",
+    "mir-fixture-mir5-api-beta = 0.1.0",
+    "mir-fixture-mir5-active-mods-observer = 0.1.0"
+  ]
+}
