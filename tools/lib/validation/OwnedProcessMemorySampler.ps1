@@ -6,6 +6,25 @@ $script:MIROwnedProcessMemoryMaximumObservations = 12000
 $script:MIROwnedProcessMemoryMaximumOutputBytes = 8MB
 $script:MIROwnedProcessMemoryPhases = @('initial', 'rejoin', 'restart')
 $script:MIROwnedProcessMemoryRoles = @('server', 'client-en', 'client-de')
+$script:MIROwnedProcessMemoryBenchmarkPhase = 'benchmark'
+$script:MIROwnedProcessMemoryBenchmarkRole = 'factorio'
+
+function Get-MIROwnedProcessMemoryAllowedSlots {
+  param([Parameter(Mandatory)][ValidateSet('multiplayer', 'benchmark')][string]$Context)
+  if ($Context -ceq 'benchmark') {
+    return @([pscustomobject][ordered]@{
+      phase = $script:MIROwnedProcessMemoryBenchmarkPhase
+      role = $script:MIROwnedProcessMemoryBenchmarkRole
+    })
+  }
+  return @(
+    foreach ($phase in $script:MIROwnedProcessMemoryPhases) {
+      foreach ($role in $script:MIROwnedProcessMemoryRoles) {
+        [pscustomobject][ordered]@{ phase = $phase; role = $role }
+      }
+    }
+  )
+}
 
 function Set-MIROwnedProcessMemoryIncomplete {
   param([Parameter(Mandatory)]$Sampler,[Parameter(Mandatory)][string]$Reason)
@@ -21,13 +40,18 @@ function Set-MIROwnedProcessMemoryNextDue {
 }
 
 function New-MIROwnedProcessMemorySampler {
-  param([Parameter(Mandatory)][object[]]$ExpectedSlots)
-  if ($ExpectedSlots.Count -lt 1 -or $ExpectedSlots.Count -gt 9) { throw '[mir5-owned-process-memory-slot-count]' }
+  param(
+    [Parameter(Mandatory)][object[]]$ExpectedSlots,
+    [ValidateSet('multiplayer', 'benchmark')][string]$Context = 'multiplayer'
+  )
+  $allowedSlots = @(Get-MIROwnedProcessMemoryAllowedSlots -Context $Context)
+  $maximumSlots = $allowedSlots.Count
+  if ($ExpectedSlots.Count -lt 1 -or $ExpectedSlots.Count -gt $maximumSlots) { throw '[mir5-owned-process-memory-slot-count]' }
   $expected = [Collections.Generic.Dictionary[string, object]]::new([StringComparer]::Ordinal)
   foreach ($slot in $ExpectedSlots) {
     $phase = [string]$slot.phase
     $role = [string]$slot.role
-    if ($phase -notin $script:MIROwnedProcessMemoryPhases -or $role -notin $script:MIROwnedProcessMemoryRoles) {
+    if (-not @($allowedSlots | Where-Object { $_.phase -ceq $phase -and $_.role -ceq $role }).Count) {
       throw '[mir5-owned-process-memory-slot]'
     }
     $key = "$phase/$role"
@@ -35,7 +59,7 @@ function New-MIROwnedProcessMemorySampler {
     $expected.Add($key, [pscustomobject][ordered]@{ phase=$phase; role=$role })
   }
   $clock = [Diagnostics.Stopwatch]::StartNew()
-  [pscustomobject]@{
+  $sampler = [ordered]@{
     kind = 'MIR5OwnedProcessMemoryObservationV1'
     target_interval_milliseconds = $script:MIROwnedProcessMemoryIntervalMilliseconds
     maximum_duration_seconds = $script:MIROwnedProcessMemoryMaximumDurationSeconds
@@ -51,13 +75,17 @@ function New-MIROwnedProcessMemorySampler {
     next_due_monotonic_milliseconds = 0.0
     cycle = 0
   }
+  if ($Context -ceq 'benchmark') {
+    $sampler.context = 'benchmark'
+  }
+  return [pscustomobject]$sampler
 }
 
 function Register-MIROwnedProcessMemoryProcess {
   param(
     [Parameter(Mandatory)]$Sampler,
-    [Parameter(Mandatory)][ValidateSet('initial', 'rejoin', 'restart')][string]$Phase,
-    [Parameter(Mandatory)][ValidateSet('server', 'client-en', 'client-de')][string]$Role,
+    [Parameter(Mandatory)][ValidateSet('initial', 'rejoin', 'restart', 'benchmark')][string]$Phase,
+    [Parameter(Mandatory)][ValidateSet('server', 'client-en', 'client-de', 'factorio')][string]$Role,
     [Parameter(Mandatory)][Diagnostics.Process]$Process
   )
   $key = "$Phase/$Role"
@@ -126,13 +154,15 @@ function Add-MIROwnedProcessMemorySample {
 }
 
 function Complete-MIROwnedProcessMemoryProcess {
-  param([Parameter(Mandatory)]$Sampler,$Registration)
+  param([Parameter(Mandatory)]$Sampler,$Registration,[switch]$NaturalExit)
   if ($null -eq $Registration -or $Sampler.closed -or $Registration.closed) { return }
   if (-not $Sampler.registrations.ContainsKey("$($Registration.phase)/$($Registration.role)")) {
     Set-MIROwnedProcessMemoryIncomplete -Sampler $Sampler -Reason 'completion-contract'
     return
   }
-  Add-MIROwnedProcessMemorySample -Sampler $Sampler
+  if (-not $NaturalExit) {
+    Add-MIROwnedProcessMemorySample -Sampler $Sampler
+  }
   $Registration.closed = $true
   if ([int]$Registration.observation_count -lt 1) {
     Set-MIROwnedProcessMemoryIncomplete -Sampler $Sampler -Reason 'missing-process-observation'
@@ -171,6 +201,9 @@ function Get-MIROwnedProcessMemoryObservationReceipt {
     maximum_serialized_bytes = [int64]$script:MIROwnedProcessMemoryMaximumOutputBytes
     observations = @($Sampler.observations)
     incomplete_reasons = @($Sampler.incomplete_reasons)
+  }
+  if ($null -ne $Sampler.PSObject.Properties['context'] -and $Sampler.context -ceq 'benchmark') {
+    $receipt.context = 'benchmark'
   }
   $bytes = ConvertTo-MIROwnedProcessMemoryObservationBytes -Receipt $receipt
   if ($bytes.Length -gt [int64]$script:MIROwnedProcessMemoryMaximumOutputBytes) {
