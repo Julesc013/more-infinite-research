@@ -5,7 +5,7 @@ applies_to: "MIR replacement development"
 audience: developer
 doc_type: how-to
 owner: mir-maintainers
-last_reviewed: 2026-10-25
+last_reviewed: 2026-10-26
 supersedes: []
 superseded_by: []
 source_of_truth_for:
@@ -66,6 +66,14 @@ Follow [verification](../spec/verification.md). Run cheap affected checks first,
 The ATAN, K2, automatic-family and BobTech controls read their historical selectors, profile/qualification source and automatic-family logs from published commit `bd9774f323b6eb1561c1d9ff0c91ecc3f7acd1d1`, checking each original captured SHA256. The named prerequisite-repair control additionally reads its published 4.7.3 source baseline at `8643cc91bc915e008556a5315dbb0a743247e7ab`, checking both recorded blob IDs. They do not require editable MIR4 source or historical files in the current tree. A shallow checkout needs `git fetch --no-tags --depth=1 origin bd9774f323b6eb1561c1d9ff0c91ecc3f7acd1d1` and `git fetch --no-tags --depth=1 origin 8643cc91bc915e008556a5315dbb0a743247e7ab` before those controls; the hosted workflow performs both exact fetches. The readers have no network or current-file fallback. Current MIR5 settings/catalogue assertions continue to read current source.
 
 A test correction needs independent evidence. A resource refusal is not a pass, fail or timing sample. A path-only rename still needs package member equality and final-layout smoke, because import and package mistakes are real defects.
+
+## Isolated client launches
+
+Reuse the selected engine by its exact executable path. Keep each client's ordinary `config.ini`, `write-data`, logs and saves beneath that assignment's existing `build/tmp` output root; keep verified dependency archives in the engine-family direct `testmods` library. Each client needs a separate writable directory, not a second game installation or a `TestProfiles` directory inside Steam. The existing native harness generates these configurations and owns their restoration/custody.
+
+`--config` selects a normal `config.ini`, whose `[path]` section supplies explicit `read-data` and `write-data` paths; it does not select an alternate `config-path.cfg` or disable Steamworks. Leave the installed `config-path.cfg`, Steam Cloud settings, normal profile and Steam depot untouched. The installed `use-system-read-write-data-directories` option controls default data paths, not Steam authentication. See the official [command-line options](https://wiki.factorio.com/Command_line_parameters) and [application-directory guide](https://wiki.factorio.com/Application_directory).
+
+Factorio's [developer explanation for2.1](https://forums.factorio.com/viewtopic.php?t=131164) says the Steam build uses Steam Cloud player data while the non-Steam build uses local data. The retained exact2.1.23 client attempts in [progress](progress.md) independently observe failed Steam initialization with Steam closed and one Cloud-backed identity with Steam available. Path isolation therefore does not establish two distinct client identities. Keep the strict multiplayer oracles and require a supported exact-engine route before another full attempt; headless results do not substitute for graphical clients.
 
 ## Contribution completion
 
