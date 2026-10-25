@@ -44,6 +44,8 @@
       {"path": "tools/lib/validation/ResourceGovernor.ps1", "sha256": "50E5172BF9836B2742A9857F7A0F86DFF3E5FD6C40A4E149F42334A199302A6E"},
       {"path": "tools/lib/validation/OwnedProcessMemorySampler.ps1", "sha256": "8786DC06671A7B6ED6F48BD211275C4DA783F65BBB0FCDCE5562104BC3B28124"},
       {"path": "tools/lib/validation/ImmutableInputStaging.ps1", "sha256": "B5FBFAC8537B08F9790BD3EE8ACEAAB38EE5CBB8EF005E67E8375DE568BBC12C"},
+      {"path": "tools/lib/validation/DirectLibraryStartupMeasurement.ps1", "sha256": "101059A821E31FE5AC8959F7863BFA376317DA0DB3D9778653F149A16BFC82A1"},
+      {"path": "tools/lib/validation/ResponsiveMenuRecord.ps1", "sha256": "7F74EF416DC4C06B85B3479C02DEF13837F9D69420BBE2F88ADAFB8E5E18DFFB"},
       {"path": "tools/lib/compatibility/LibraryActivation.ps1", "sha256": "123A2241B895B57217AA969A677FF21BBFB268FE55E9734287883B4D6AE25099"},
       {"path": "tools/lib/workspace/RepoPaths.ps1", "sha256": "E9080D02C67E79A488F7093010BDF125301152D527D3662D526D21A466CC97A0"},
       {"path": "tools/lib/compatibility/ModPortal.ps1", "sha256": "A16344F66A9124C0792614AAD83702603D4C0AD4FE977392C73710B745E74B08"}
