@@ -44,6 +44,7 @@ MAX_PLAN_BYTES = 1024 * 1024
 # The result normally stores far less, but this bound does not reject the
 # declared worst-case inline observation representation.
 MAX_RESULT_BYTES = 68 * 8 * 1024 * 1024 + 1024 * 1024
+MAX_PREPARED_INPUTS_BYTES = 2 * 1024 * 1024
 SHA256 = re.compile(r"^[A-F0-9]{64}$")
 METRICS = (
     "engine_reported_average_milliseconds_per_tick",
@@ -94,6 +95,23 @@ def _read_json(path: Path, maximum: int, label: str) -> tuple[dict[str, Any], st
     if not isinstance(value, dict):
         raise RuntimeBenchmarkAnalysisError(f"{label} must be an object")
     return value, hashlib.sha256(payload).hexdigest().upper()
+
+
+def _validate_prepared_inputs_sidecar(result_path: Path, result: dict[str, Any]) -> None:
+    leaf = _string(result.get("prepared_inputs_path"), "prepared inputs path")
+    _same(leaf, "runtime-benchmark-active-prepared.json", "prepared inputs path")
+    result_parent = result_path.resolve().parent
+    sidecar_path = (result_parent / leaf).resolve()
+    if sidecar_path.parent != result_parent:
+        raise RuntimeBenchmarkAnalysisError("prepared inputs path escapes the raw result directory")
+    sidecar, sidecar_sha256 = _read_json(sidecar_path, MAX_PREPARED_INPUTS_BYTES, "prepared inputs sidecar")
+    _expect_hash(sidecar_sha256, result.get("prepared_inputs_sha256"), "prepared inputs sidecar SHA-256")
+    _same(_integer(sidecar.get("schema"), "prepared inputs sidecar schema"), 1, "prepared inputs sidecar schema")
+    _same(_string(sidecar.get("kind"), "prepared inputs sidecar kind"), "MIR5ActiveRuntimeBenchmarkPreparedInputsV1", "prepared inputs sidecar kind")
+    _same(_string(sidecar.get("status"), "prepared inputs sidecar status"), "validated-accepted-active-inputs-no-new-native", "prepared inputs sidecar status")
+    _same(_integer(sidecar.get("native_launches"), "prepared inputs sidecar native launches"), 0, "prepared inputs sidecar native launches")
+    _same(_boolean(sidecar.get("performance_qualification"), "prepared inputs sidecar performance flag"), False, "prepared inputs sidecar performance flag")
+    _same(_boolean(sidecar.get("release_qualification"), "prepared inputs sidecar release flag"), False, "prepared inputs sidecar release flag")
 
 
 def _mapping(value: Any, label: str) -> dict[str, Any]:
@@ -932,6 +950,7 @@ def main(argv: list[str] | None = None) -> int:
         result, result_sha256 = _read_json(arguments.result, MAX_RESULT_BYTES, "raw result")
         _expect_hash(plan_sha256, expected_plan_sha256, "raw plan SHA-256")
         _expect_hash(result_sha256, expected_result_sha256, "raw result SHA-256")
+        _validate_prepared_inputs_sidecar(arguments.result, result)
         _write_output(arguments.output, analyze(plan, plan_sha256, result, result_sha256))
     except RuntimeBenchmarkAnalysisError as error:
         print(f"[mir5-runtime-benchmark-analysis-refused] {error}", file=sys.stderr)

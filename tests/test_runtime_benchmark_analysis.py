@@ -334,6 +334,17 @@ def _result(plan: dict[str, object]) -> tuple[dict[str, object], str]:
     return result, plan_sha
 
 
+def _prepared_inputs(result: dict[str, object]) -> bytes:
+    return _encode({
+        "schema": 1,
+        "kind": "MIR5ActiveRuntimeBenchmarkPreparedInputsV1",
+        "status": "validated-accepted-active-inputs-no-new-native",
+        "native_launches": 0,
+        "performance_qualification": False,
+        "release_qualification": False,
+    })
+
+
 class RuntimeBenchmarkAnalysisTests(unittest.TestCase):
     def test_consumes_exact_accepted_r06_capture_and_pilot_payloads(self) -> None:
         capsule_commit = "1a0fdb3cda6ac33a7ce31971bded92f1040df569"
@@ -377,6 +388,7 @@ class RuntimeBenchmarkAnalysisTests(unittest.TestCase):
             "record": pilot,
         }
         MODULE._validate_pilot_reference(pilot_reference, plan_sha, capture_reference, captures)
+        MODULE._validate_process_memory(pilot["observations"][0]["native_result"]["process_memory"], pilot["observations"][0]["native_result"]["native_process"])
 
     def test_complete_r06_result_reports_known_medians_and_increment_rules(self) -> None:
         plan = _plan()
@@ -435,9 +447,12 @@ class RuntimeBenchmarkAnalysisTests(unittest.TestCase):
             result_path = root / "result.json"
             output_path = root / "analysis.json"
             plan_bytes = _encode(plan)
+            prepared_bytes = _prepared_inputs(result)
+            result["prepared_inputs_sha256"] = _hash(prepared_bytes)
             result_bytes = _encode(result)
             plan_path.write_bytes(plan_bytes)
             result_path.write_bytes(result_bytes)
+            (root / "runtime-benchmark-active-prepared.json").write_bytes(prepared_bytes)
             success = subprocess.run(
                 [sys.executable, str(TOOL_PATH), "--raw-plan", str(plan_path), "--expected-plan-sha256", _hash(plan_bytes), "--result", str(result_path), "--expected-result-sha256", _hash(result_bytes), "--output", str(output_path)],
                 cwd=ROOT,
@@ -457,6 +472,16 @@ class RuntimeBenchmarkAnalysisTests(unittest.TestCase):
                 )
                 self.assertEqual(failed.returncode, 1)
                 self.assertIn("mir5-runtime-benchmark-analysis-refused", failed.stderr)
+            (root / "runtime-benchmark-active-prepared.json").write_bytes(b"{}\n")
+            invalid_sidecar = subprocess.run(
+                [sys.executable, str(TOOL_PATH), "--raw-plan", str(plan_path), "--expected-plan-sha256", _hash(plan_bytes), "--result", str(result_path), "--expected-result-sha256", _hash(result_bytes), "--output", str(root / "invalid-sidecar.json")],
+                cwd=ROOT,
+                text=True,
+                capture_output=True,
+                check=False,
+            )
+            self.assertEqual(invalid_sidecar.returncode, 1)
+            self.assertIn("prepared inputs sidecar SHA-256 differs", invalid_sidecar.stderr)
 
 
 if __name__ == "__main__":
