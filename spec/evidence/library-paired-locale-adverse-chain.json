@@ -1,0 +1,84 @@
+{
+  "schema": 1,
+  "kind": "MIR5LibraryPairedLocaleAdverseChainV1",
+  "status": "failed-initial-native-join-before-browser-actions",
+  "run": 40153949668,
+  "run_url": "https://github.com/Julesc013/mir-native-worker/actions/runs/40153949668",
+  "source": "9ffc43aea16fa6c188f726e99bd855e5b473dd72",
+  "controller_commit": "6cf408c0ad35436b9384a02d7d409c785b8b3ae0",
+  "engine": {
+    "path": "D:\\Games\\Factorio\\2.0\\bin\\x64\\factorio.exe",
+    "version": "2.0.77",
+    "sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B"
+  },
+  "candidate_sha256": "2BBDBA9A0B816AC383CEA116CDF86D587BC34EFF7E1C5ACE2583F1DA98F9E842",
+  "published_sha256": "F3943EB4D69CCDAC41BD9F922AD03A5C78F34F22D8E7FA5A88A7A658AB1010B7",
+  "manifest": {
+    "members_verified": 209,
+    "sha256": "56FE63B852CD4D5FFB4F42F074B925DE00FCBB6907E52296AB63219C02E51D63"
+  },
+  "native_preparation": {
+    "processes": 1,
+    "status": "passed-private-native-runtime-load-only",
+    "exit_code": 0,
+    "seed_sha256": "30128A9AAB514818FAD7B4E1AAD01C718C4DCDB9E2A1DF834A8C0108BB721A0E"
+  },
+  "session": {
+    "status": "failed",
+    "monitored_process_records": 1,
+    "process_record_status": "interrupted",
+    "actual_initial_client_phase_logs": [
+      "en",
+      "de"
+    ],
+    "failure": "[mir441-process-exit] 1",
+    "completed_browser_actions": 0
+  },
+  "observed_failure": {
+    "schema": 1,
+    "kind": "MIR5PairedLocaleFailureObservationV1",
+    "derived": true,
+    "derivation": "Only the fixture exception line and exact client locale assignments are copied from the independently verified original files. Full logs/configurations remain private.",
+    "error": {
+      "path": "phase-server-initial.stdout.log",
+      "original_sha256": "7ECDC9C78CFFA17C27D406C1A2A774BDE6BF59A265371D08BEAE5EC846D9B34A",
+      "line_number": 219,
+      "exact_line": "__mir-fixture-mir5-library-paired-browser__/control.lua:71: [mir5-library-paired-browser] fixture clients have duplicate locales"
+    },
+    "locales": [
+      {
+        "path": "client-en.ini",
+        "original_sha256": "11D7A3A3D184371E01A1445AA7B52CCE0B465EF622765B1FDC85446E70BCA58E",
+        "line_number": 6,
+        "exact_line": "locale=en"
+      },
+      {
+        "path": "client-de.ini",
+        "original_sha256": "2FDA95A2970B561E54CE6FD8C9E67FE7A32B998F6990A44FC229F924ECF85F69",
+        "line_number": 6,
+        "exact_line": "locale=de"
+      }
+    ]
+  },
+  "controls_restored": true,
+  "raw_evidence": {
+    "path": "spec/evidence/library-paired-locale-adverse-receipts.json.gz",
+    "exact_original_members": 4,
+    "derived_members": 1,
+    "gzip_bytes": 25923,
+    "gzip_sha256": "3FA7BFEB6F3C0828D25D8D5B1D79E9AACFA5B8B32628DE101D36309BE5D16726",
+    "uncompressed_bytes": 138144,
+    "uncompressed_sha256": "D0E69C16949D045ED6CC6432869CAF4FC19CEE7320EE23C6BB7127A07B105E75"
+  },
+  "required_correction": "Accepted Aero906 defers the first Browser action until a fixed tick interval after the latest join, then still requires two unique actual en/de locales. Its affected native retry remains separate.",
+  "independent_readback": {
+    "reviewer": "root",
+    "original_members_verified": 209
+  },
+  "limits": [
+    "The native initial server and both client phase logs exist, but there is no completed paired session, action, screenshot or profiler comparison. Do not count the one interrupted monitored process record as the total number of Factorio children.",
+    "The earlier sharing and profile-kind failures retain their distinct identities. Locale configuration is proved; the cause of transient native locale readiness is not inferred from configuration alone."
+  ],
+  "performance_qualification": false,
+  "release_qualification": false
+}
