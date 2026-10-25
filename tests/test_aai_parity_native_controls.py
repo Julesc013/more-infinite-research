@@ -311,6 +311,7 @@ class AaiParityNativeControls(unittest.TestCase):
             with self.subTest(stage=stage):
                 self.assertEqual(("mir-fixture-mir5-aai-parity-native", fixture_version, "2.1"),
                                  (info["name"], info["version"], info["factorio_version"]))
+                self.assertEqual("MIR maintainers", info["author"])
                 self.assertIn("aai-industry = 0.7.5", info["dependencies"])
                 self.assertIn(f"more-infinite-research = {mir_version}", info["dependencies"])
                 self.assertIn("? space-age = 2.1.23", info["dependencies"])
