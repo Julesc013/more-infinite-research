@@ -8,6 +8,7 @@ import argparse
 import json
 from pathlib import Path
 import sys
+import tempfile
 import unittest
 
 
@@ -57,6 +58,7 @@ class LibraryPairedBrowserFixtureTests(unittest.TestCase):
     def setUp(self):
         self.lua = LuaRuntime(unpack_returned_tuples=True)
         self.lua.globals().control_path = CONTROL.as_posix()
+        self.lua.globals().saved_state_fingerprint = lambda value: json.dumps(plain(value), sort_keys=True)
         self.lua.globals().settings_path = SETTINGS.as_posix()
         self.lua.globals().published_selector = (ARMS["published"]["selector"] / "settings-updates.lua").as_posix()
         self.lua.globals().mir5_selector = (ARMS["mir5"]["selector"] / "settings-updates.lua").as_posix()
@@ -244,12 +246,16 @@ class LibraryPairedBrowserFixtureTests(unittest.TestCase):
             local durable, original_storage = env.storage["mir5_library_paired_browser"], env.storage
             local load_writes=0
             local function invoke_load_read_only()
+              local before = saved_state_fingerprint(original_storage)
               env.storage=setmetatable({}, {
                 __index=function(_, key) return original_storage[key] end,
                 __newindex=function() load_writes=load_writes+1; error("on_load wrote fixture storage") end
               })
               local loaded_ok, loaded_message=invoke(callbacks.load)
               env.storage=original_storage
+              if loaded_ok and saved_state_fingerprint(original_storage) ~= before then
+                return false, "on_load changed nested fixture storage"
+              end
               return loaded_ok, loaded_message
             end
             ok, message=register_control()
@@ -313,6 +319,23 @@ class LibraryPairedBrowserFixtureTests(unittest.TestCase):
 
     def runtime_result(self, arm, opponent=None):
         return plain(self.lua.globals().paired_browser_runtime(self.lua.globals().control_path, arm, opponent))
+
+    def test_load_guard_rejects_nested_saved_state_writes_on_both_loads(self):
+        original = CONTROL.read_text(encoding="utf-8")
+        anchor = "script.on_load(function()"
+        self.assertEqual(original.count(anchor), 1)
+        for phase in ("awaiting-clients", "awaiting-cold-restart"):
+            mutated = original.replace(anchor, anchor + (
+                '\n  if storage[KEY].phase == "' + phase + '" then '
+                'storage[KEY].unused_probe = {nested = true} end'))
+            with tempfile.TemporaryDirectory(prefix="mir5-paired-load-") as work:
+                path = Path(work) / "control.lua"
+                path.write_text(mutated, encoding="utf-8")
+                for arm in ARMS:
+                    with self.subTest(arm=arm, phase=phase):
+                        result = plain(self.lua.globals().paired_browser_runtime(path.as_posix(), arm, None))
+                        self.assertFalse(result["ok"])
+                        self.assertIn("on_load changed nested fixture storage", result["message"])
 
     def test_profiles_select_exactly_one_f200_public_arm(self):
         root_info = json.loads((FIXTURE / "info.json").read_text(encoding="utf-8"))
