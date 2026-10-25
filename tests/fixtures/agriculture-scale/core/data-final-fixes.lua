@@ -1,6 +1,7 @@
 local AGRICULTURE = "recipe-prod-research_agricultural_growth_speed-1"
 local PAIRED = "mir-fixture-mir5-agriculture-scale-paired"
 local CANDIDATE = "mir-fixture-mir5-agriculture-scale-arm-candidate"
+local DEFAULTS = "mir-fixture-mir5-agriculture-scale-arm-candidate-defaults"
 local PUBLISHED = "mir-fixture-mir5-agriculture-scale-arm-published"
 
 local candidate_science = {
@@ -22,17 +23,23 @@ local published_science = {
 local function descriptor()
   local paired = mods and mods[PAIRED] == "0.1.0"
   local candidate = mods and mods[CANDIDATE] == "0.1.0"
+  local defaults = mods and mods[DEFAULTS] == "0.1.0"
   local published = mods and mods[PUBLISHED] == "0.1.0"
   if paired then
-    assert(candidate ~= published, "agriculture paired fixture requires exactly one arm selector")
+    assert((candidate and 1 or 0) + (defaults and 1 or 0) + (published and 1 or 0) == 1,
+      "agriculture paired fixture requires exactly one arm selector")
     if candidate then
       return {name = "candidate-mir5", science = candidate_science,
         requires_not_disabled = true, paired = true}
     end
+    if defaults then
+      return {name = "candidate-defaults-mir5", science = published_science,
+        requires_enabled_omission = true, paired = true}
+    end
     return {name = "published-4.7.21002", science = published_science,
       requires_enabled_omission = true, paired = true}
   end
-  assert(not candidate and not published, "agriculture arm selector requires the paired selector")
+  assert(not candidate and not defaults and not published, "agriculture arm selector requires the paired selector")
   return {name = "candidate-mir5", science = candidate_science,
     requires_not_disabled = true, paired = false}
 end
@@ -83,7 +90,28 @@ local tier_setting = assert(settings.startup["mir5-agriculture-scale-tier"],
 local tier = tier_setting.value
 assert(tier == 1 or tier == 32 or tier == 128, "agriculture scale tier is not an authored fixed tier")
 if arm.paired then
-  assert(tier == 1, "agriculture paired fixture requires the fixed single-tower tier")
+  local selectors = 0
+  for _, value in ipairs({1, 32, 128}) do
+    if mods["mir-fixture-mir5-agriculture-scale-matched-tier-" .. value] ~= nil then
+      assert(mods["mir-fixture-mir5-agriculture-scale-matched-tier-" .. value] == "0.1.0"
+        and tier == value, "agriculture matched tier selector differs")
+      selectors = selectors + 1
+    end
+    assert(mods["mir-fixture-mir5-agriculture-scale-tier-" .. value] == nil,
+      "agriculture paired fixture cannot combine a scale tier selector")
+  end
+  assert(selectors <= 1, "agriculture matched fixture requires one tier selector")
+  if selectors == 0 then
+    assert(tier == 1, "agriculture paired fixture requires the fixed single-tower tier")
+    assert(arm.name ~= "candidate-defaults-mir5", "agriculture Defaults arm requires a matched tier selector")
+  else
+    assert(arm.name ~= "candidate-mir5", "agriculture matched tiers require Defaults or published arm")
+  end
+else
+  for _, value in ipairs({1, 32, 128}) do
+    assert(not mods or mods["mir-fixture-mir5-agriculture-scale-matched-tier-" .. value] == nil,
+      "agriculture matched tier selector requires a paired arm")
+  end
 end
 
 assert(agriculture.level == 1 and agriculture.max_level == "infinite" and agriculture.upgrade == true,
@@ -92,7 +120,7 @@ if arm.requires_not_disabled then
   assert(agriculture.enabled ~= false, "agriculture candidate arm must not be disabled")
 else
   assert(agriculture.enabled == nil and agriculture.hidden == nil,
-    "agriculture published arm requires captured raw enabled/hidden omission")
+    "agriculture " .. arm.name .. " arm requires captured raw enabled/hidden omission")
 end
 assert(agriculture.unit and agriculture.unit.count_formula == "40000*1.5^(L-1)"
   and agriculture.unit.count == nil and agriculture.unit.time == 90,
@@ -103,12 +131,18 @@ assert(#(agriculture.effects or {}) == 1 and agriculture.effects[1].type == "not
   and agriculture.effects[1].effect_description[2] == "1",
   "agriculture scale agricultural effect contract differs")
 assert_exact_science(agriculture.unit.ingredients, arm.science, arm.name .. " science vector")
-if arm.name == "published-4.7.21002" then
+if arm.requires_enabled_omission then
   assert_exact_prerequisites(agriculture.prerequisites, published_science,
     arm.name .. " prerequisite vector")
 else
   assert_string_prerequisites(agriculture.prerequisites, arm.name .. " prerequisite")
   assert_candidate_promethium_gate(agriculture.prerequisites)
+end
+
+if arm.name == "candidate-defaults-mir5" then
+  assert(settings.startup["mir-science-pack-ingredient-policy"].value == "configured"
+    and settings.startup["ips-require-space-gate"].value == false,
+    "agriculture Defaults science settings differ")
 end
 
 local yumako = assert(data.raw.capsule and data.raw.capsule.yumako,
