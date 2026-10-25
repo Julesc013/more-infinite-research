@@ -1,4 +1,4 @@
-"""Host controls for the private F200/F210 two-client Library fixture, not native evidence."""
+"""Host controls for the private legacy-F200/current-F200/F210 two-client Library fixture, not native evidence."""
 import argparse
 import gzip
 import hashlib
@@ -14,6 +14,7 @@ ROOT = Path(__file__).resolve().parents[1]
 FIXTURE = ROOT / "tests/fixtures/library-multiplayer"
 CONTROL = FIXTURE / "control.lua"
 F200_PROFILE = ROOT / "tests/profiles/library-multiplayer-f200-2077.json"
+CURRENT_F200_PROFILE = ROOT / "tests/profiles/library-multiplayer-current-f200-2077.json"
 F210_PROFILE = ROOT / "tests/profiles/library-multiplayer-f210-2123.json"
 WRAPPER = ROOT / "tools/Invoke-MultiplayerFixture.ps1"
 SESSION = ROOT / "tools/Invoke-MultiplayerSession.ps1"
@@ -455,21 +456,25 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
         self.lua.globals().target = target
         return plain(self.lua.eval("run_library_multiplayer_fixture(control_path,opponent,target)"))
 
-    def test_profiles_and_fixture_metadata_pin_the_two_finite_base_closures(self):
+    def test_profiles_and_fixture_metadata_pin_the_three_finite_base_closures(self):
         cases = (
             (F200_PROFILE, FIXTURE / "info.json", "f200", "2.0", "2.0.77",
              "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B",
-             "5.0.20000", "2.0", "base >= 2.0.77", "723D1E7721449FC26040E5E6629416767BDC20AD79CF8723115846DB662A1F87"),
+             "5.0.20000", "mir5-library-multiplayer-f200-native-selection", "2.0", "base >= 2.0.77", "723D1E7721449FC26040E5E6629416767BDC20AD79CF8723115846DB662A1F87"),
+            (CURRENT_F200_PROFILE, FIXTURE / "info.json", "f200", "2.0", "2.0.77",
+             "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B",
+             "5.0.20000", "mir5-library-multiplayer-current-f200-native-selection", "2.0", "base >= 2.0.77", "723D1E7721449FC26040E5E6629416767BDC20AD79CF8723115846DB662A1F87"),
             (F210_PROFILE, FIXTURE / "info-f210.json", "f210", "2.1", "2.1.23",
              "FE4A1DA30F322A0D0B8AEB3DF7276332222BAAA143E2352569B723E84B2B9060",
-             "5.0.21000", "2.1", "base >= 2.1.23", "2E1BE5952D2A4CC5C74A0D149E075D247BA110A3FAE5B6768D3EAEBABCEF989C"),
+             "5.0.21000", "mir5-library-multiplayer-f210-native-selection", "2.1", "base >= 2.1.23", "2E1BE5952D2A4CC5C74A0D149E075D247BA110A3FAE5B6768D3EAEBABCEF989C"),
         )
-        for profile_path, info_path, target, line, base, engine_sha, mir, fixture_line, base_dependency, observer_sha in cases:
+        for profile_path, info_path, target, line, base, engine_sha, mir, kind, fixture_line, base_dependency, observer_sha in cases:
             with self.subTest(target=target):
                 profile = json.loads(profile_path.read_text(encoding="utf-8"))
                 info = json.loads(info_path.read_text(encoding="utf-8"))
                 self.assertEqual((profile["target"], profile["factorio_line"], profile["engine"]["version"]),
                                  (target, line, base))
+                self.assertEqual(profile["kind"], kind)
                 self.assertEqual(profile["engine"]["sha256"], engine_sha)
                 self.assertEqual(profile["mods"], [
                     {"name": "base", "version": base, "enabled": True},
@@ -485,7 +490,7 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
                 self.assertEqual(info["dependencies"], [base_dependency, f"more-infinite-research = {mir}"])
                 self.assertNotIn("space-age", {entry["name"] for entry in profile["mods"]})
 
-    def test_multiplayer_wrapper_admits_only_the_two_exact_functional_profiles(self):
+    def test_multiplayer_wrapper_admits_only_the_three_exact_functional_profiles(self):
         script = r'''
           $tokens=$null;$errors=$null
           $ast=[Management.Automation.Language.Parser]::ParseFile($env:MIR_TEST_WRAPPER,[ref]$tokens,[ref]$errors)
@@ -495,9 +500,12 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
           if($node.Count -ne 1){throw 'selection function is absent or ambiguous'}
           Invoke-Expression $node[0].Extent.Text
           $f200=Get-Content -LiteralPath $env:MIR_TEST_F200_PROFILE -Raw|ConvertFrom-Json -AsHashtable
+           $f200Current=Get-Content -LiteralPath $env:MIR_TEST_CURRENT_F200_PROFILE -Raw|ConvertFrom-Json -AsHashtable
           $f210=Get-Content -LiteralPath $env:MIR_TEST_F210_PROFILE -Raw|ConvertFrom-Json -AsHashtable
           $selected=Assert-MultiplayerFixtureSelection -Selection $f200 -EngineSha256 'D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B' -FixtureCase 'library-multiplayer'
           if($selected.base -cne '2.0.77'){throw 'F200 selection changed'}
+           $selected=Assert-MultiplayerFixtureSelection -Selection $f200Current -EngineSha256 'D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B' -FixtureCase 'library-multiplayer'
+           if($selected.kind -cne 'mir5-library-multiplayer-current-f200-native-selection'){throw 'current F200 selection changed'}
           $selected=Assert-MultiplayerFixtureSelection -Selection $f210 -EngineSha256 'FE4A1DA30F322A0D0B8AEB3DF7276332222BAAA143E2352569B723E84B2B9060' -FixtureCase 'library-multiplayer'
           if($selected.base -cne '2.1.23'){throw 'F210 selection changed'}
           function Assert-Rejected([string]$Name,[string]$ProfilePath,[string]$Engine,[string]$Case,[scriptblock]$Mutate){
@@ -519,7 +527,9 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
             capture_output=True,
             text=True,
             env=dict(os.environ, MIR_TEST_WRAPPER=str(WRAPPER),
-                     MIR_TEST_F200_PROFILE=str(F200_PROFILE), MIR_TEST_F210_PROFILE=str(F210_PROFILE)),
+                     MIR_TEST_F200_PROFILE=str(F200_PROFILE),
+                     MIR_TEST_CURRENT_F200_PROFILE=str(CURRENT_F200_PROFILE),
+                     MIR_TEST_F210_PROFILE=str(F210_PROFILE)),
             check=False,
         )
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)

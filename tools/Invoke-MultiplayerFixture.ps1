@@ -32,19 +32,29 @@ function Assert-MultiplayerFixtureSelection {
   # two-client harness admits.  The F210 row remains base-only: Space Age or
   # any other companion is not an implicit dependency of this fixture.
   $targets=[ordered]@{
-    f200=[ordered]@{
+    'f200-legacy'=[ordered]@{
+      target='f200'
       kind='mir5-library-multiplayer-f200-native-selection';factorio_line='2.0';base='2.0.77'
       engine_sha256='D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B';mir='5.0.20000'
       observer_sha256='723D1E7721449FC26040E5E6629416767BDC20AD79CF8723115846DB662A1F87'
     }
+    'f200-current'=[ordered]@{
+      target='f200'
+      kind='mir5-library-multiplayer-current-f200-native-selection';factorio_line='2.0';base='2.0.77'
+      engine_sha256='D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B';mir='5.0.20000'
+      observer_sha256='723D1E7721449FC26040E5E6629416767BDC20AD79CF8723115846DB662A1F87'
+    }
     f210=[ordered]@{
+      target='f210'
       kind='mir5-library-multiplayer-f210-native-selection';factorio_line='2.1';base='2.1.23'
       engine_sha256='FE4A1DA30F322A0D0B8AEB3DF7276332222BAAA143E2352569B723E84B2B9060';mir='5.0.21000'
       observer_sha256='2E1BE5952D2A4CC5C74A0D149E075D247BA110A3FAE5B6768D3EAEBABCEF989C'
     }
   }
-  Assert-Session ($Selection.Contains('target') -and $Selection['target'] -is [string] -and $targets.Contains([string]$Selection['target'])) 'requires an admitted F200 or F210 Library fixture target'
-  $target=$targets[[string]$Selection['target']]
+  Assert-Session ($Selection.Contains('target') -and $Selection['target'] -is [string] -and $Selection.Contains('kind') -and $Selection['kind'] -is [string]) 'requires an admitted F200 or F210 Library fixture target'
+  $matches=@($targets.Values|Where-Object { $_.target -ceq [string]$Selection['target'] -and $_.kind -ceq [string]$Selection['kind'] })
+  Assert-Session ($matches.Count -eq 1) 'requires an admitted F200 or F210 Library fixture target'
+  $target=$matches[0]
   Assert-Session (($Selection['schema'] -is [int] -or $Selection['schema'] -is [long]) -and [int64]$Selection['schema'] -eq 1 -and $Selection['kind'] -ceq $target.kind -and $Selection['factorio_line'] -ceq $target.factorio_line -and $Selection['settings_mode'] -ceq 'Defaults') 'Library fixture profile identity differs'
   Assert-Session ($Selection.Contains('engine') -and $Selection['engine'] -is [System.Collections.IDictionary]) 'Library fixture profile engine is absent'
   $engine=$Selection['engine']
