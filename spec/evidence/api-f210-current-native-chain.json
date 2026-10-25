@@ -6,6 +6,13 @@
   "source_commit": "04c2684be262509ef6bb312e1dd0c60d9e11cc74",
   "player_source_tree": "df9ab048fd16fe6411ea0311bd616521f9453329",
   "controller_commit": "72039ff9b0dba2dea45514191a19d7e11c6cb460",
+  "controller_provenance": {
+    "kind": "external-github-actions-run-head",
+    "artifact_attested": false,
+    "source": "https://api.github.com/repos/Julesc013/mir-native-worker/actions/runs/40163191155",
+    "field": "head_sha",
+    "scope": "The external workflow record supplies controller_commit; the native artifact separately records executed public harness, probe and governor hashes."
+  },
   "run": 40163191155,
   "url": "https://github.com/Julesc013/mir-native-worker/actions/runs/40163191155",
   "task": "api-consumers-f210-canonical",
