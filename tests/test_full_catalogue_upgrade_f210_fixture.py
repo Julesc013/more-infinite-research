@@ -244,6 +244,90 @@ class FullCatalogueUpgradeF210FixtureTests(unittest.TestCase):
                 else:
                     self.assertIsNotNone(result["callbacks"]["configuration"])
 
+    def test_shared_lab_toggles_use_writable_script_disable(self):
+        control = (SHARED / "control.lua").read_text(encoding="utf-8")
+        enabled = "entity.disabled_by_script, entity.energy = false, 1000000000"
+        frozen = "entity.disabled_by_script, entity.energy = true, 0"
+        self.assertEqual(1, control.count(enabled))
+        self.assertEqual(1, control.count(frozen))
+        self.assertNotIn("entity.active, entity.energy", control)
+        self.lua.globals().f210_catalogue_path = (SHARED / "f210-catalogue.lua").as_posix()
+        self.lua.execute("""
+          function load_lab_toggle_functions(control_source)
+            local callbacks = {events={}}
+            local env = {
+              script={on_init=function(fn) callbacks.init=fn end, on_load=function(fn) callbacks.load=fn end,
+                on_configuration_changed=function(fn) callbacks.configuration=fn end,
+                on_event=function(event, fn) callbacks.events[event]=fn end,
+                active_mods={base="2.1.23", ["more-infinite-research"]="5.0.21000",
+                  ["mir-fixture-mir5-full-catalogue-upgrade"]="0.2.0"}},
+              defines={events={on_research_finished=1,on_tick=2},inventory={lab_input=1}},
+            }
+            env.require=function(name)
+              assert(name == "__mir-fixture-mir5-full-catalogue-upgrade__/catalogue")
+              return assert(loadfile(f210_catalogue_path, "t", env))()
+            end
+            env._G=env
+            setmetatable(env,{__index=_G})
+            return assert(load(control_source .. "\\nreturn {fill=fill, freeze=freeze}", "fixture-control", "t", env))()
+          end
+          function exercise_lab_toggle(functions)
+            local function call(name)
+              local assignments, events = {}, {}
+              local inventory = {
+                clear=function() events[#events + 1]="clear" end,
+                insert=function(spec)
+                  events[#events + 1]="insert:" .. spec.name .. ":" .. spec.count
+                  return spec.count
+                end,
+              }
+              local entity = setmetatable({}, {
+                __index=function(_, key)
+                  if key == "valid" then return true end
+                  if key == "get_inventory" then
+                    return function(kind)
+                      assert(kind == 1)
+                      return inventory
+                    end
+                  end
+                  return assignments[key]
+                end,
+                __newindex=function(_, key, value)
+                  if key == "active" then error("LuaEntity.active is read-only") end
+                  assert(key == "disabled_by_script" or key == "energy")
+                  assignments[key]=value
+                end,
+              })
+              local state = {lab=entity}
+              local technology = {research_unit_ingredients={{name="automation-science-pack"}, {name="logistic-science-pack"}}}
+              local ok, message
+              if name == "fill" then
+                ok, message = pcall(function() functions.fill(state, technology) end)
+              else
+                ok, message = pcall(function() functions.freeze(state) end)
+              end
+              return {ok=ok, message=tostring(message), assignments=assignments, events=events}
+            end
+            return {fill=call("fill"), freeze=call("freeze")}
+          end
+        """)
+        actual = py(self.lua.eval("exercise_lab_toggle")(self.lua.eval("load_lab_toggle_functions")(control)))
+        self.assertTrue(actual["fill"]["ok"], actual["fill"]["message"])
+        self.assertEqual({"disabled_by_script": False, "energy": 1000000000}, actual["fill"]["assignments"])
+        self.assertEqual(["clear", "insert:automation-science-pack:64", "insert:logistic-science-pack:64"], actual["fill"]["events"])
+        self.assertTrue(actual["freeze"]["ok"], actual["freeze"]["message"])
+        self.assertEqual({"disabled_by_script": True, "energy": 0}, actual["freeze"]["assignments"])
+        self.assertEqual(["clear"], actual["freeze"]["events"])
+        legacy = control.replace(enabled, "entity.active, entity.energy = true, 1000000000").replace(
+            frozen, "entity.active, entity.energy = false, 0"
+        )
+        self.assertNotEqual(control, legacy)
+        rejected = py(self.lua.eval("exercise_lab_toggle")(self.lua.eval("load_lab_toggle_functions")(legacy)))
+        for phase in ("fill", "freeze"):
+            with self.subTest(phase=phase):
+                self.assertFalse(rejected[phase]["ok"])
+                self.assertIn("LuaEntity.active is read-only", rejected[phase]["message"])
+
     def test_f210_runtime_force_schema_when_local_api_is_available(self):
         runtime_api = f210_runtime_api_path()
         if runtime_api is None:
@@ -256,6 +340,10 @@ class FullCatalogueUpgradeF210FixtureTests(unittest.TestCase):
         self.assertTrue(fixture_fields <= set(fields))
         self.assertEqual(("double", "double"), (fields["max_cargo_bay_unloading_distance"]["read_type"], fields["max_cargo_bay_unloading_distance"]["write_type"]))
         self.assertEqual(("uint32", "uint32"), (fields["cargo_landing_pad_limit"]["read_type"], fields["cargo_landing_pad_limit"]["write_type"]))
+        lua_entity = next(row for row in document["classes"] if row["name"] == "LuaEntity")
+        entity_fields = {row["name"]: row for row in lua_entity["attributes"]}
+        self.assertEqual(("boolean", None), (entity_fields["active"]["read_type"], entity_fields["active"].get("write_type")))
+        self.assertEqual(("boolean", "boolean"), (entity_fields["disabled_by_script"]["read_type"], entity_fields["disabled_by_script"]["write_type"]))
 
     def test_profiles_and_shared_staging_contract_are_explicit(self):
         for stage, mir, fixture in (("published-4.7", "4.7.21002", "0.1.0"), ("mir5", "5.0.21000", "0.2.0")):

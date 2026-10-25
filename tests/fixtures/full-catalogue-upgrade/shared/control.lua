@@ -167,11 +167,11 @@ local function fill(state, value)
   for _, ingredient in ipairs(value.research_unit_ingredients) do
     if inventory.insert{name=ingredient.name, count=64} ~= 64 then fail("could not insert science: " .. ingredient.name) end
   end
-  entity.active, entity.energy = true, 1000000000
+  entity.disabled_by_script, entity.energy = false, 1000000000
 end
 local function freeze(state)
   local entity, inventory = lab(state)
-  entity.active, entity.energy = false, 0
+  entity.disabled_by_script, entity.energy = true, 0
   inventory.clear()
 end
 local function marker(stage, state, plan, profile_name)
