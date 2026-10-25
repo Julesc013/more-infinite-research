@@ -1,0 +1,13 @@
+{
+  "name": "mir-fixture-mir5-agriculture-scale-arm-candidate-defaults",
+  "version": "0.1.0",
+  "title": "MIR agriculture candidate Defaults arm",
+  "author": "MIR maintainers",
+  "description": "Selects independently captured MIR 5 Defaults without changing player startup settings.",
+  "factorio_version": "2.1",
+  "dependencies": [
+    "base = 2.1.23",
+    "more-infinite-research = 5.0.21000",
+    "mir-fixture-mir5-agriculture-scale-paired >= 0.1.0"
+  ]
+}

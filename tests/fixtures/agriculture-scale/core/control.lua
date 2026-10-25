@@ -2,6 +2,7 @@ local KEY = "mir5_agriculture_scale"
 local AGRICULTURE = "recipe-prod-research_agricultural_growth_speed-1"
 local PAIRED = "mir-fixture-mir5-agriculture-scale-paired"
 local CANDIDATE = "mir-fixture-mir5-agriculture-scale-arm-candidate"
+local DEFAULTS = "mir-fixture-mir5-agriculture-scale-arm-candidate-defaults"
 local PUBLISHED = "mir-fixture-mir5-agriculture-scale-arm-published"
 local CANDIDATE_SCIENCE = {
   "automation-science-pack", "logistic-science-pack", "chemical-science-pack",
@@ -18,6 +19,7 @@ local PUBLISHED_SCIENCE = {
 }
 local ARMS = {
   ["candidate-mir5"] = {name = "candidate-mir5", version = "5.0.21000", science = CANDIDATE_SCIENCE},
+  ["candidate-defaults-mir5"] = {name = "candidate-defaults-mir5", version = "5.0.21000", science = PUBLISHED_SCIENCE},
   ["published-4.7.21002"] = {name = "published-4.7.21002", version = "4.7.21002", science = PUBLISHED_SCIENCE}
 }
 local TIERS = { [1] = true, [32] = true, [128] = true }
@@ -56,16 +58,41 @@ end
 local function selected_arm(value)
   local paired = script.active_mods[PAIRED] == "0.1.0"
   local candidate = script.active_mods[CANDIDATE] == "0.1.0"
+  local defaults = script.active_mods[DEFAULTS] == "0.1.0"
   local published = script.active_mods[PUBLISHED] == "0.1.0"
   if paired then
-    if candidate == published then fail("paired agriculture fixture requires exactly one arm selector") end
-    if value ~= 1 then fail("paired agriculture fixture requires the fixed single-tower tier") end
+    if (candidate and 1 or 0) + (defaults and 1 or 0) + (published and 1 or 0) ~= 1 then
+      fail("paired agriculture fixture requires exactly one arm selector")
+    end
+    local selectors = 0
+    for _, selected in ipairs({1, 32, 128}) do
+      local name = "mir-fixture-mir5-agriculture-scale-matched-tier-" .. selected
+      if script.active_mods[name] ~= nil then
+        if script.active_mods[name] ~= "0.1.0" or value ~= selected then
+          fail("agriculture matched tier selector differs")
+        end
+        selectors = selectors + 1
+      end
+    end
+    if selectors > 1 then fail("agriculture matched fixture requires one tier selector") end
+    if selectors == 0 then
+      if value ~= 1 then fail("paired agriculture fixture requires the fixed single-tower tier") end
+      if defaults then fail("agriculture Defaults arm requires a matched tier selector") end
+    elseif candidate then
+      fail("agriculture matched tiers require Defaults or published arm")
+    end
     for _, name in pairs(SELECTOR_FOR_TIER) do
       if script.active_mods[name] ~= nil then fail("paired agriculture fixture cannot combine a scale tier selector") end
     end
-    return candidate and ARMS["candidate-mir5"] or ARMS["published-4.7.21002"], true
+    return ARMS[candidate and "candidate-mir5" or defaults and "candidate-defaults-mir5"
+      or "published-4.7.21002"], true
   end
-  if candidate or published then fail("agriculture arm selector requires the paired selector") end
+  if candidate or defaults or published then fail("agriculture arm selector requires the paired selector") end
+  for _, selected in ipairs({1, 32, 128}) do
+    if script.active_mods["mir-fixture-mir5-agriculture-scale-matched-tier-" .. selected] ~= nil then
+      fail("agriculture matched tier selector requires a paired arm")
+    end
+  end
   local expected = SELECTOR_FOR_TIER[value]
   if script.active_mods[expected] ~= "0.1.0" then fail("selected agriculture scale tier lacks its selector") end
   for other, name in pairs(SELECTOR_FOR_TIER) do
@@ -93,8 +120,8 @@ local function assert_startup_contract(arm)
   end
   if arm.name == "published-4.7.21002" then return end
   local expected = {
-    ["mir-science-pack-ingredient-policy"] = "all-official",
-    ["ips-require-space-gate"] = true,
+    ["mir-science-pack-ingredient-policy"] = arm.name == "candidate-defaults-mir5" and "configured" or "all-official",
+    ["ips-require-space-gate"] = arm.name ~= "candidate-defaults-mir5",
     ["ips-enable-research_agricultural_growth_speed"] = true,
     ["ips-cost-base-research_agricultural_growth_speed"] = 40000,
     ["ips-cost-linear-increment-research_agricultural_growth_speed"] = 0,
@@ -354,6 +381,8 @@ local function marker(stage, state)
       -- paired descriptor makes clear that only the candidate arm is all-official.
       all_official_science = state_arm(state).science,
       science_contract = {arm = state.arm, packs = state_arm(state).science},
+      defaults_prototype_contract = state.arm == "candidate-defaults-mir5"
+        and "independently-matched-36CCE250-EE77416C" or "not-selected",
       nominal_nonperishable_science_consumed_each = AGRICULTURE_LEVELS,
       agricultural_science_physical_consumption = state.lab_consumption
         and state.lab_consumption["agricultural-science-pack"],
