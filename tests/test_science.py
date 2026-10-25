@@ -176,9 +176,14 @@ class ScienceTests(unittest.TestCase):
           assert(f110.source_contracts["automation-science-pack"].kind == "initial-recipe")
           assert(f110.pack_prerequisites["automation-science-pack"] == nil)
           assert(same(f110.pack_prerequisites["space-science-pack"], {"space-science-pack"}))
+          assert(bindings.select({id="f200"}, {}).source_contracts["automation-science-pack"].direct_recipe_replacement)
+          assert(bindings.select({id="f210"}, {}).source_contracts["automation-science-pack"].direct_recipe_replacement)
+          assert(not f110.source_contracts["logistic-science-pack"].direct_recipe_replacement)
           local space = bindings.select({id="f210"}, {["space-age"]="2.1.23"})
           assert(space.end_game.pack == "promethium-science-pack" and space.end_game.prerequisites[1] == "promethium-science-pack")
           assert(#space.official == 12 and space.progression["promethium-science-pack"][12] == "promethium-science-pack")
+          assert(space.source_contracts["electromagnetic-science-pack"].direct_recipe_replacement
+            and space.source_contracts["promethium-science-pack"].direct_recipe_replacement)
 
           local unknown = bindings.select({id="unreviewed-target"}, {})
           assert(#unknown.official == 0 and unknown.space == nil and unknown.end_game == nil)
@@ -1009,6 +1014,154 @@ class ScienceTests(unittest.TestCase):
           raw.resource["dmrsa-tenemut"].minable.results[1] = {type="item", name="dmrsa-tenemut", amount=1}
           raw.resource["dmrsa-tenemut"].minable.required_fluid = "sulfuric-acid"
           assert(not science.validate_source_contract(raw, resource))
+        ''')
+
+    def test_opted_named_science_sources_use_only_a_direct_replacement_after_failure(self):
+        self.lua.execute(r'''
+          local PACK = "automation-science-pack"
+          local CIRCULAR_RECIPE, SEEDED_RECIPE = "a-circular-red-replacement", "z-seeded-red-replacement"
+          local CIRCULAR_OWNER, SEEDED_OWNER = "a-circular-red-owner", "z-seeded-red-owner"
+          local function count(values)
+            local total = 0
+            for _ in pairs(values) do total = total + 1 end
+            return total
+          end
+          local function has(values, wanted)
+            for _, value in ipairs(values or {}) do if value == wanted then return true end end
+            return false
+          end
+          local function amount(values, wanted)
+            for _, value in ipairs(values or {}) do if value[1] == wanted then return value[2] end end
+            return nil
+          end
+          local function raw_world()
+            local selected = bindings.select({id="f210"}, {})
+            local raw = raw_with(selected.official, {whole=selected.official})
+            install_sources(raw, false, "f210")
+            raw.item["iron-plate"] = {name="iron-plate"}
+            raw.technology["authored-gate"] = {}
+            return raw
+          end
+          local function add_replacements(raw, reversed)
+            local function circular()
+              raw.recipe[CIRCULAR_RECIPE] = {enabled=false, ingredients={{"iron-plate",1}},
+                results={{type="item",name=PACK,amount=1}}}
+              raw.technology[CIRCULAR_OWNER] = {prerequisites={}, unit={count=1,time=1,
+                ingredients={{PACK,1}}}, effects={{type="unlock-recipe",recipe=CIRCULAR_RECIPE}}}
+            end
+            local function seeded()
+              raw.recipe[SEEDED_RECIPE] = {enabled=false, ingredients={{"iron-plate",1}},
+                results={{type="item",name=PACK,amount=1}}}
+              raw.technology[SEEDED_OWNER] = {prerequisites={}, research_trigger={type="craft-item",
+                item="iron-plate",count=1}, effects={{type="unlock-recipe",recipe=SEEDED_RECIPE}}}
+            end
+            if reversed then seeded(); circular() else circular(); seeded() end
+          end
+          local function failed(raw, kind)
+            if kind == "missing" then raw.recipe[PACK] = nil
+            else raw.recipe[PACK] = {enabled=false, results={{type="fluid",name=PACK,amount=1}}} end
+          end
+          local function run(kind, reversed, policy, count_rows)
+            local raw = raw_world()
+            failed(raw, kind); add_replacements(raw, reversed)
+            local rows = {}
+            for index = 1, count_rows or 1 do rows[index] = technology({{"chemical-science-pack",7}}, {"authored-gate"}) end
+            local reports, context = science.apply_family(rows, nil, {raw=raw,target={id="f210"},options={
+              ["mir-science-pack-ingredient-policy"]=policy}})
+            for _, row in ipairs(rows) do
+              assert(row.enabled and amount(row.unit.ingredients,"chemical-science-pack")==7)
+              assert(amount(row.unit.ingredients,PACK)==1 and has(row.prerequisites,SEEDED_OWNER))
+              assert(has(row.prerequisites,"authored-gate") and not has(row.prerequisites,PACK))
+            end
+            assert(#reports==#rows and reports[1].reason==policy)
+            assert(context.direct_replacement_recipe_visits==count(raw.recipe)
+              and context.direct_replacement_technology_visits==count(raw.technology),
+              "failed named source did not make exactly one bounded direct-source pass")
+            return names(rows[1].unit.ingredients), table.concat(rows[1].prerequisites,",")
+          end
+          for _, policy in ipairs({"all", "all-official"}) do
+            local forward = {run("missing",false,policy,19)}
+            local reversed = {run("invalid",true,policy,19)}
+            assert(forward[1]==reversed[1] and forward[2]==reversed[2],
+              "canonical failure kind or producer insertion order changed selected replacement")
+          end
+
+          local raw = raw_world()
+          failed(raw,"missing"); add_replacements(raw,false)
+          raw.recipe[SEEDED_RECIPE].enabled = true
+          raw.technology[SEEDED_OWNER].enabled = false
+          local row = technology({{"chemical-science-pack",7}}, {"authored-gate"})
+          local context = science.prepare({raw=raw,target={id="f210"},options={
+            ["mir-science-pack-ingredient-policy"]="all-official"}})
+          local result = science.apply(row, {}, context)
+          assert(result.enabled and amount(row.unit.ingredients,PACK)==1
+            and not has(row.prerequisites,PACK) and not has(row.prerequisites,SEEDED_OWNER)
+            and context.direct_replacement_recipe_visits==count(raw.recipe)
+            and context.direct_replacement_technology_visits==0,
+            "an initially enabled direct replacement did not retain its gate-free source")
+
+          local space = bindings.select({id="f210"}, {["space-age"]="2.1.23"})
+          raw = raw_with(space.official, {whole=space.official})
+          install_sources(raw, true, "f210")
+          raw.item["iron-plate"] = {name="iron-plate"}
+          raw.technology["authored-gate"] = {}
+          raw.recipe["promethium-science-pack"] = nil
+          raw.recipe["z-promethium-replacement"] = {enabled=false, ingredients={{"iron-plate",1}},
+            results={{type="item",name="promethium-science-pack",amount=1}}}
+          raw.technology["z-promethium-seed"] = {prerequisites={}, research_trigger={type="craft-item",
+            item="iron-plate",count=1}, effects={{type="unlock-recipe",recipe="z-promethium-replacement"}}}
+          row = technology({{"automation-science-pack",7}}, {"authored-gate"})
+          context = science.prepare({raw=raw,target={id="f210"},mods={["space-age"]="2.1.23"},options={
+            ["ips-require-space-gate"]=true}})
+          result = science.apply(row, {}, context)
+          assert(result.enabled and has(row.prerequisites,"authored-gate")
+            and has(row.prerequisites,"z-promethium-seed") and not has(row.prerequisites,"promethium-science-pack")
+            and context.direct_replacement_recipe_visits==count(raw.recipe),
+            "a selected end-game source retained the failed canonical gate")
+
+          raw = raw_world()
+          add_replacements(raw, false)
+          row = technology({{"chemical-science-pack",7}}, {"authored-gate"})
+          context = science.prepare({raw=raw,target={id="f210"},options={
+            ["mir-science-pack-ingredient-policy"]="all-official"}})
+          result = science.apply(row, {}, context)
+          assert(result.enabled and has(row.prerequisites,PACK) and not has(row.prerequisites,SEEDED_OWNER)
+            and context.direct_replacement_recipe_visits==0 and context.direct_replacement_technology_visits==0,
+            "a healthy canonical source did not retain preference without a replacement scan")
+
+          raw = raw_world(); failed(raw,"missing"); add_replacements(raw,false)
+          raw.technology[SEEDED_OWNER].enabled = false
+          row = technology({{"chemical-science-pack",7}}, {"authored-gate"})
+          context = science.prepare({raw=raw,target={id="f210"},options={
+            ["mir-science-pack-ingredient-policy"]="all-official"}})
+          result = science.apply(row, {}, context)
+          assert(not result.enabled and result.reason=="invalid-science-source:"..PACK..":missing-recipe:"..PACK
+            and same(row.prerequisites,{"authored-gate"}),
+            "an unseeded replacement fabricated a source or rewrote authored gates")
+
+          raw = raw_world(); failed(raw,"missing"); add_replacements(raw,false)
+          row = technology({{PACK,7}}, {"authored-gate"})
+          context = science.prepare({raw=raw,target={id="f210"},options={}})
+          result = science.apply(row, {}, context)
+          assert(result.enabled and result.reason=="configured" and amount(row.unit.ingredients,PACK)==7
+            and same(row.prerequisites,{"authored-gate"}) and context.direct_replacement_recipe_visits==0,
+            "configured policy inferred a replacement gate or scanned named sources")
+
+          raw = raw_with({"chemical-science-pack","logistic-science-pack"},
+            {whole={"chemical-science-pack","logistic-science-pack"}})
+          install_sources(raw, false, "f017")
+          raw.item["iron-plate"] = {name="iron-plate"}
+          raw.recipe["logistic-science-pack"] = nil
+          raw.recipe["f017-replacement"] = {enabled=false, results={{type="item",name="logistic-science-pack",amount=1}}}
+          raw.technology["f017-replacement-owner"] = {prerequisites={}, research_trigger={type="craft-item",
+            item="iron-plate",count=1}, effects={{type="unlock-recipe",recipe="f017-replacement"}}}
+          row = technology({{"chemical-science-pack",7}})
+          context = science.prepare({raw=raw,target={id="f017"},options={
+            ["mir-science-pack-ingredient-policy"]="all-official"}})
+          result = science.apply(row, {}, context)
+          assert(not result.enabled and result.reason=="invalid-science-source:logistic-science-pack:missing-recipe:logistic-science-pack"
+            and context.direct_replacement_recipe_visits==0,
+            "an unopted historical source fell through to direct replacement discovery")
         ''')
 
     def test_exact_k2so_phase_binding_normalizes_selected_policy_and_preserves_a_phase_trigger(self):
