@@ -2,8 +2,12 @@
 -- seeding, remote call, gameplay effect or later save qualification is claimed.
 local function fail(message) error("[mir5-api-optional-absence] " .. message) end
 script.on_init(function()
+  local base_version = script.active_mods.base
+  if base_version ~= "2.0.77" and base_version ~= "2.1.23" then
+    fail("unexpected base version")
+  end
   local expected = {
-    base="2.0.77", ["mir-fixture-mir5-api-beta"]="0.1.0",
+    base=base_version, ["mir-fixture-mir5-api-beta"]="0.1.0",
     ["mir-fixture-mir5-api-optional-absence"]="0.1.0",
     ["mir-fixture-mir5-active-mods-observer"]="0.1.0",
   }
