@@ -11,7 +11,7 @@ param(
   [string]$ActiveModsObserver = '',
   [ValidateRange(30,600)][int]$TimeoutSeconds = 240,
   [ValidateRange(64,8192)][int]$ExpectedPeakMemoryMiB = 1024,
-  [ValidateRange(16,2048)][int]$MaxNewOutputMiB = 512,
+  [ValidateRange(16,8192)][int]$MaxNewOutputMiB = 512,
   [ValidateRange(0,60)][int]$AdmissionWaitSeconds = 30,
   [string]$RepoRoot = (Resolve-Path -LiteralPath (Join-Path $PSScriptRoot '..')).Path
 )
