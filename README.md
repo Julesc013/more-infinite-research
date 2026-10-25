@@ -97,7 +97,7 @@ For MIR 3 saves, follow [Upgrading from MIR 3 to MIR 4](https://github.com/Jules
 
 ## Repository and branches
 
-The MIR 4 source tree contains five maturity classes:
+The historical MIR 4 source tree used five maturity classes:
 
 - **stable** — authorized player compiler, emitter, runtime, migration, and admitted target behavior;
 - **preview** — separately packaged developer interfaces with versioned schemas and conformance tests;
@@ -105,24 +105,24 @@ The MIR 4 source tree contains five maturity classes:
 - **experimental** — bounded private work with no public support authority;
 - **omitted** — intentionally absent from a target or release artifact.
 
-Code existence never promotes maturity. The stable player ZIP contains only admitted Factorio package files. Developer SDK, MEP, API, Inspector, ProcessIR, evidence, and release tooling stay outside player packages; separately released preview assets retain their own maturity and support scope. See [Extension Protocol](docs/api.md), [Support](SUPPORT.md), and the [release runbook](docs/development.md#github-publication-after-acceptance).
+Code existence never promotes maturity. Player ZIPs contain only admitted Factorio package files. The MIR 5 candidate includes its public data module `__more-infinite-research__.api.v1.data` and runtime interface `more-infinite-research.api.v1`; API stability still requires the remaining qualification. The optional Lua SDK, consumer examples, conformance tests, evidence and release tooling stay outside player packages. Historical MEP, API, Inspector and ProcessIR preview assets retain their original maturity and support scope; they are not MIR 5 dependencies. See the [MIR API guide](docs/api.md), [Support](SUPPORT.md), and the [release runbook](docs/development.md#github-publication-after-acceptance).
 
-`dev` is the MIR 4 integration authority. Short-lived branches merge to protected `dev` through passing aggregate verification. `main` is the published stable line: player releases arrive through exact sealed-candidate promotion, while bounded documentation and repository-governance corrections use protected PRs under the branch policy. Historical target branches are custody references, not alternative MIR 4 authoring roots.
+`dev` is the MIR 5 integration branch. Short-lived branches merge to protected `dev` through review and passing required checks. `main` remains the published stable line until the replacement meets its acceptance conditions and its exact qualified tree is promoted. The `legacy` branch preserves MIR 3; historical tags and target branches are custody references, not alternate editable source roots. See the [repository contract](spec/repository.md) and [development workflow](docs/development.md).
 
-Editable player code lives in the single package-shaped `source` tree. Shared behavior uses its package path directly; exact target differences live under narrowly scoped `source/adapters`, package presentation inputs under `source/presentation`, and lifecycle generators under `source/generation`. Factorio 1 targets use the same shared implementation with explicit base-version and disabled-runtime-capability adapters—there is no parallel Factorio 1 source tree. `targets` contains only target identity, policy, and composition records—not second source copies. The repository root is not a player package; its retained MIR 3 files are historical compatibility inputs. The canonical materializer produces standalone target packages below `build/packages`.
+Editable player code lives in the single package-shaped `source` tree. The [Generator](source/research/generator.lua) builds detached technologies from authored research and approved compatibility bindings; [data-final-fixes](source/data-final-fixes.lua) performs the local-family publication and independent override steps. Runtime effects and the Research Library remain separate. Narrow target differences use `source/platform` and `source/adapters`, presentation uses `source/presentation`, and the public API uses `source/api/v1`. Historical engines select their actual supported capabilities from that shared implementation, with no parallel Factorio 1 source tree. `targets` contains identity and composition records, not editable mod copies. The repository root is not a player package. [tools/package.py](tools/package.py) materializes a selected edition; [tools/release.py](tools/release.py) freezes all nine distributions into a new explicit output directory. These build operations establish package identity, not native qualification.
 
 The primary checkout is the normal handoff location: final published ZIPs belong in `dist`, with their release notes and upload text available alongside them. External custody archives retain original evidence; they do not replace delivery into the working checkout. Temporary worktrees need an explicit completion or preservation disposition. Read [Contributing](CONTRIBUTING.md), [Governance](GOVERNANCE.md), and [Project continuity](docs/progress.md) before changing authorities or release state.
 
 ## Stable player plane reference
 
-The following generated pipeline, settings, and research catalog describe the shared implementation used by the F210/F200 targets. Individual rows still depend on the active game content and settings. F110/F100 are composed from the explicitly bounded Factorio 1 compatibility implementation and omit effects and Space Age features unavailable on those engines; their package README and target definitions state the supported subset. Shadow and preview implementations do not replace player behavior by code existence alone.
+The following generated pipeline, settings, and research catalog retain the historical MIR 4 F210/F200 implementation reference. They are baseline context for preservation, not instructions to restore its compiler or regenerate MIR 5 from its command DAG. Individual research rows still depend on active content and settings. Historical F110/F100 packages use their bounded Factorio 1 capabilities and omit unavailable effects and Space Age features; their target definitions and release records retain that scope. MIR 5 uses the shared source and actual edition capabilities described above. Shadow and preview implementations do not replace player behavior by code existence alone.
 
 ### How it works
 
-More Infinite Research mutates and generates prototypes in **`data-final-fixes.lua`**:
+The retained MIR 4 pipeline mutated and generated prototypes in **`data-final-fixes.lua`**. The current MIR 5 construction path is the Generator and entry point linked above:
 
 <!-- BEGIN GENERATED MIR PIPELINE -->
-This package-excluded reference is generated from `source/prototypes/mir/pipeline/commands.lua`; run `./scripts/Update-MIRPipelineDocumentation.ps1` after changing the command DAG.
+This package-excluded historical reference was generated from [the pinned MIR 4 commands](https://github.com/Julesc013/more-infinite-research/blob/c9d5febda9230111f29ece9d97a0f224fbc07528/source/prototypes/mir/pipeline/commands.lua). Its [pinned update script](https://github.com/Julesc013/more-infinite-research/blob/c9d5febda9230111f29ece9d97a0f224fbc07528/scripts/Update-MIRPipelineDocumentation.ps1) belongs to that historical checkout; it is not a current MIR 5 build step.
 
 | Phase | Command | Kind | Implementation | Depends on |
 | ---: | --- | --- | --- | --- |
