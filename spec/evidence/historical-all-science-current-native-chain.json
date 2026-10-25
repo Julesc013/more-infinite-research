@@ -1,0 +1,327 @@
+{
+  "schema": 1,
+  "kind": "MIR5HistoricalAllScienceNativeReadbackV1",
+  "derived": true,
+  "status": "three-exact-historical-engines-passed-not-release-acceptance",
+  "release_qualification": false,
+  "run": {
+    "id": 40187069542,
+    "url": "https://github.com/Julesc013/mir-native-worker/actions/runs/40187069542",
+    "workflow_conclusion": "success",
+    "controller_commit": "bccdf387b8fada164fcfe7cf4d9d807961e9e2a8",
+    "manifest": {
+      "sha256": "CF03137280F447E8DEBAE85A500094E16D0589D9C6AD59E0DB01D147295F5C72",
+      "verified_members": 222,
+      "bytes": 8853771
+    }
+  },
+  "fixture_harness_source_commit": "4c0376f5b8e38cde2aacc1fb520712a81f3e7a41",
+  "fixture_source_player_tree": "41b78703f25bdceb1e05b57d7c725e0f6c9bef2c",
+  "original_player_source_commit": "1ca97dc4981444d742118febf822461a03481e90",
+  "original_player_source_tree": "ebfa50354994bd586e6965e91db44127e3625880",
+  "original_inventory_sha256": "86C52911FD8017AFE5A8A504A79C9B58069D8FA5498E5AE477E1BD3C09D3D522",
+  "actual_lab_completions": 6,
+  "actual_cold_reloads": 6,
+  "stages": [
+    {
+      "target": "f017",
+      "engine_version": "0.17.79",
+      "engine_sha256": "E699D376D100A428B95243507FDBB39C372921577C6D7593203EDF07CAA12D06",
+      "player_sha256": "04777CDDF04B57FF97E94E4CC3B9C8C721C7AFA66D5500F92E74D0C4E02D8EB3",
+      "current_fa114_archive_byte_identical": true,
+      "fixture_sha256": "1761A22FFE84963C22280EC6D5B8F7BF64C993CB9429E086DC5FD72BB4BDFD00",
+      "fixture_members_equal_git_after_CRLF_normalization": [
+        "control.lua",
+        "settings-updates.lua",
+        "data-final-fixes.lua",
+        "target.lua"
+      ],
+      "receipt_sha256": "37519B619D2E83FD2EF2607AC431C72910FDFC4EFD785E643FFB45C49F681234",
+      "completed_save_sha256": "7B05E25252DA7A5EC309E003E9D39E07765DD73A1484636D0DACA4C77CA45407",
+      "native_logs": [
+        {
+          "path": "production.factorio.log",
+          "sha256": "53566529D8959EFAAA6E0D0562C6601AB13F31D88DEAD1EE6CEFCB735D6FB891",
+          "stage": "initial",
+          "additional_same_process_markers_not_counted_as_cold_reloads": 0
+        },
+        {
+          "path": "reload-1.factorio.log",
+          "sha256": "8F78CEAFB0E6A4254371288B5EE8A40E42014B0852C7DC7BE8AAEA3AD486A7B7",
+          "stage": "reload",
+          "additional_same_process_markers_not_counted_as_cold_reloads": 0
+        },
+        {
+          "path": "reload-2.factorio.log",
+          "sha256": "3BE5702989C364BE564BAF625CD556C864E1F001E815947F95E2D63B0BA5AC7D",
+          "stage": "reload",
+          "additional_same_process_markers_not_counted_as_cold_reloads": 0
+        }
+      ],
+      "cold_reloads": 2,
+      "library_controls_restored": true,
+      "initial": {
+        "case": "historical-native",
+        "stage": "initial",
+        "status": "passed",
+        "target": "f017",
+        "direct": "recipe-prod-research_character_mining_speed-1",
+        "direct_lab_completions": 1,
+        "direct_mining_bonus": 0.1,
+        "continuation": "inserter-capacity-bonus-8",
+        "continuation_witness": "lab-completed",
+        "continuation_lab_completions": 1,
+        "two_cold_reload_witness": false,
+        "on_load_read_only": false
+      },
+      "unit_count": 1,
+      "unit_energy_ticks": 60,
+      "unit_observation_create_log_sha256": "DBE1B18C54DF373D11F5708240D6EB1B3F6581F227B32FBEAEBFFC099FB69B9D",
+      "lab_pack_initial_count": 32,
+      "consumption": {
+        "direct_lab_event": {
+          "military-science-pack": 31,
+          "utility-science-pack": 31,
+          "automation-science-pack": 31,
+          "logistic-science-pack": 31,
+          "chemical-science-pack": 31,
+          "production-science-pack": 31,
+          "space-science-pack": 31
+        },
+        "direct_lab_next_tick": {
+          "military-science-pack": 31,
+          "utility-science-pack": 31,
+          "automation-science-pack": 31,
+          "logistic-science-pack": 31,
+          "chemical-science-pack": 31,
+          "production-science-pack": 31,
+          "space-science-pack": 31
+        },
+        "continuation_lab_event": {
+          "automation-science-pack": 31,
+          "chemical-science-pack": 31,
+          "logistic-science-pack": 31,
+          "production-science-pack": 31,
+          "utility-science-pack": 31,
+          "military-science-pack": 31,
+          "space-science-pack": 31
+        },
+        "continuation_lab_next_tick": {
+          "automation-science-pack": 31,
+          "chemical-science-pack": 31,
+          "logistic-science-pack": 31,
+          "production-science-pack": 31,
+          "utility-science-pack": 31,
+          "military-science-pack": 31,
+          "space-science-pack": 31
+        }
+      }
+    },
+    {
+      "target": "f100",
+      "engine_version": "1.0.0",
+      "engine_sha256": "99F1CE207A04296EF7D797E4A98AA98DDE4F02EE653C9DF736AC33A676FD4F70",
+      "player_sha256": "1AF8CF9B83FE17AEEC35218F21AFD5CE5E77ADACD9FC6D6C61FC0D4BB7431A37",
+      "current_fa114_archive_byte_identical": true,
+      "fixture_sha256": "CDC49F7A390D05D3192BEB9392F52B4389AFF6C9F65AA62DE0FA3491665B65BE",
+      "fixture_members_equal_git_after_CRLF_normalization": [
+        "control.lua",
+        "settings-updates.lua",
+        "data-final-fixes.lua",
+        "target.lua"
+      ],
+      "receipt_sha256": "593B17F25A00C735E3BB6C153B90C8EECD60578171F7D41341E82F31A01A8BD4",
+      "completed_save_sha256": "5393BD6C21B89AA6219381BC87A640ADDFBF803A7355E04CDDEE8B93F70DF181",
+      "native_logs": [
+        {
+          "path": "production.factorio.log",
+          "sha256": "7DA4D5E122DCA65E6E6F7E5716DDA2B75FEC8BE6DD1DEDCDF2A744767D4E0C9A",
+          "stage": "initial",
+          "additional_same_process_markers_not_counted_as_cold_reloads": 0
+        },
+        {
+          "path": "reload-1.factorio.log",
+          "sha256": "5DFA5D0ADA04C28C18E468C2151572C64DD1293339E0EBF09C7DDE9568A886A5",
+          "stage": "reload",
+          "additional_same_process_markers_not_counted_as_cold_reloads": 0
+        },
+        {
+          "path": "reload-2.factorio.log",
+          "sha256": "F12FCD2E3F499B97E9C774E3288024F569AF678B509F44B3A873D7427B81B55C",
+          "stage": "reload",
+          "additional_same_process_markers_not_counted_as_cold_reloads": 0
+        }
+      ],
+      "cold_reloads": 2,
+      "library_controls_restored": true,
+      "initial": {
+        "case": "historical-native",
+        "stage": "initial",
+        "status": "passed",
+        "target": "f100",
+        "direct": "recipe-prod-research_character_mining_speed-1",
+        "direct_lab_completions": 1,
+        "direct_mining_bonus": 0.1,
+        "continuation": "inserter-capacity-bonus-8",
+        "continuation_witness": "lab-completed",
+        "continuation_lab_completions": 1,
+        "two_cold_reload_witness": false,
+        "on_load_read_only": false
+      },
+      "unit_count": 1,
+      "unit_energy_ticks": 60,
+      "unit_observation_create_log_sha256": "A871862C8DD13E6B121017AD937FA97DE398332BA21EE824351A5D62BD118593",
+      "lab_pack_initial_count": 32,
+      "consumption": {
+        "direct_lab_event": {
+          "military-science-pack": 31,
+          "utility-science-pack": 31,
+          "automation-science-pack": 31,
+          "logistic-science-pack": 31,
+          "chemical-science-pack": 31,
+          "production-science-pack": 31,
+          "space-science-pack": 31
+        },
+        "direct_lab_next_tick": {
+          "military-science-pack": 31,
+          "utility-science-pack": 31,
+          "automation-science-pack": 31,
+          "logistic-science-pack": 31,
+          "chemical-science-pack": 31,
+          "production-science-pack": 31,
+          "space-science-pack": 31
+        },
+        "continuation_lab_event": {
+          "automation-science-pack": 31,
+          "chemical-science-pack": 31,
+          "logistic-science-pack": 31,
+          "production-science-pack": 31,
+          "utility-science-pack": 31,
+          "military-science-pack": 31,
+          "space-science-pack": 31
+        },
+        "continuation_lab_next_tick": {
+          "automation-science-pack": 31,
+          "chemical-science-pack": 31,
+          "logistic-science-pack": 31,
+          "production-science-pack": 31,
+          "utility-science-pack": 31,
+          "military-science-pack": 31,
+          "space-science-pack": 31
+        }
+      }
+    },
+    {
+      "target": "f110",
+      "engine_version": "1.1.110",
+      "engine_sha256": "B7B4B834FCA2E32AFA9D3476EB42CC09B02F1205BE97F688DC6FC6ACE7BA8FE1",
+      "player_sha256": "9FAD85CB25A2741254AD897BCB671CBEE21ADC96DD99D86DFB30B34D9A3B1FAB",
+      "current_fa114_archive_byte_identical": true,
+      "fixture_sha256": "F6E252D4F173812953E160758BEB12BDFF618281444A0A151DCE4D5A635CC7D7",
+      "fixture_members_equal_git_after_CRLF_normalization": [
+        "control.lua",
+        "settings-updates.lua",
+        "data-final-fixes.lua",
+        "target.lua"
+      ],
+      "receipt_sha256": "A0143832AFB24080C7E99E2F26F349A72D5E7AE802EFE2E9E3C8556613DAA403",
+      "completed_save_sha256": "785B8E5E2347087BCC6E7797CB9E2B9B1F70E52A87E94E09CED829EFA3C84E13",
+      "native_logs": [
+        {
+          "path": "production.factorio.log",
+          "sha256": "CF79D4C449ACE4151CD72D8840B8B1935E00CCCDA41E269C5576EEB56FBF61BC",
+          "stage": "initial",
+          "additional_same_process_markers_not_counted_as_cold_reloads": 0
+        },
+        {
+          "path": "reload-1.factorio.log",
+          "sha256": "866C11AF083F37AB407F1E258C1D23F0E24F6B6DA6CD5BEBE9477976C1A920BF",
+          "stage": "reload",
+          "additional_same_process_markers_not_counted_as_cold_reloads": 0
+        },
+        {
+          "path": "reload-2.factorio.log",
+          "sha256": "6C2713155A1791B50CE6FD215814003F519C60E50FF161CC6067C2A3D1BB689F",
+          "stage": "reload",
+          "additional_same_process_markers_not_counted_as_cold_reloads": 0
+        }
+      ],
+      "cold_reloads": 2,
+      "library_controls_restored": true,
+      "initial": {
+        "case": "historical-native",
+        "stage": "initial",
+        "status": "passed",
+        "target": "f110",
+        "direct": "recipe-prod-research_character_mining_speed-1",
+        "direct_lab_completions": 1,
+        "direct_mining_bonus": 0.1,
+        "continuation": "inserter-capacity-bonus-8",
+        "continuation_witness": "lab-completed",
+        "continuation_lab_completions": 1,
+        "two_cold_reload_witness": false,
+        "on_load_read_only": false
+      },
+      "unit_count": 1,
+      "unit_energy_ticks": 60,
+      "unit_observation_create_log_sha256": "826435FFCF95340621820A6F3635DADFCE19A36735767B2AB740B4E0EBB43968",
+      "lab_pack_initial_count": 32,
+      "consumption": {
+        "direct_lab_event": {
+          "military-science-pack": 31,
+          "utility-science-pack": 31,
+          "automation-science-pack": 31,
+          "logistic-science-pack": 31,
+          "chemical-science-pack": 31,
+          "production-science-pack": 31,
+          "space-science-pack": 31
+        },
+        "direct_lab_next_tick": {
+          "military-science-pack": 31,
+          "utility-science-pack": 31,
+          "automation-science-pack": 31,
+          "logistic-science-pack": 31,
+          "chemical-science-pack": 31,
+          "production-science-pack": 31,
+          "space-science-pack": 31
+        },
+        "continuation_lab_event": {
+          "automation-science-pack": 31,
+          "chemical-science-pack": 31,
+          "logistic-science-pack": 31,
+          "production-science-pack": 31,
+          "utility-science-pack": 31,
+          "military-science-pack": 31,
+          "space-science-pack": 31
+        },
+        "continuation_lab_next_tick": {
+          "automation-science-pack": 31,
+          "chemical-science-pack": 31,
+          "logistic-science-pack": 31,
+          "production-science-pack": 31,
+          "utility-science-pack": 31,
+          "military-science-pack": 31,
+          "space-science-pack": 31
+        }
+      }
+    }
+  ],
+  "preserved_adverse_runs": [
+    {
+      "id": 40178948847,
+      "manifest_sha256": "F2CEA9BC486AC87E7272ADA8CD3B5DA1352C673710E49A411815CB745DB39ECF",
+      "scope": "F017 only; event readback still32; strict consumption refused"
+    },
+    {
+      "id": 40182229022,
+      "manifest_sha256": "719300A460A51E9E3622915290647E7AF17E98C35435604B943142CF020302C7",
+      "scope": "F017 only; event and next callback still32; strict consumption refused"
+    }
+  ],
+  "limits": [
+    "Results retain original1ca/ebfa player provenance. Reuse for fa114 is supported only by exact unchanged historical ZIP hashes, not a relabelled execution.",
+    "Published MIR4 was absent in these direct candidate worlds. Default-policy, predecessor transitions and other engine families have separate evidence.",
+    "The two stocked labs were isolated by power and completed research disabled before a strictly later ordinary-tick readback. Every designated lab consumed all seven packs; no oracle was relaxed.",
+    "No elapsed-time, memory, client, multiplayer or release verdict follows. Complete originals remain in primary build/mir5/recovery-historical/historical-all-science/40187069542."
+  ]
+}
