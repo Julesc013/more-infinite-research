@@ -682,7 +682,7 @@
         "maintainer_direction_date": "2026-10-26",
         "authority": "Existing COMP-03/VER-03 and explicit maintainer direction to test popular individual mods, valid combinations, historical failures and migrations; this is a qualification expansion inside the existing continuity inventory, not a second request ledger.",
         "priority": "Factorio2.1.23 first; select exact supported earlier engines where an upstream release requires them. Preserve all nine edition obligations.",
-        "selection": "Top50 returned non-internal Portal mods by downloads_count for each of2.1.23,2.0.77,1.1.110, excluding MIR itself, plus every named family and retained incident regardless of rank. Archive metadata and actual engine admission still decide each exact executable profile.",
+        "selection": "Locally select the top50 non-internal Portal roots by cumulative downloads_count from each requested version compatibility-family response (2.1.23,2.0.77,1.1.110), excluding MIR itself, then add every named family and retained incident regardless of rank. The API responses are not pre-sorted top lists. Exact archive metadata and native engine admission decide each executable profile; a requested patch filter is not exact-patch support evidence.",
         "popularity_sources": [
           {
             "engine_filter": "2.1.23",
@@ -1407,6 +1407,12 @@
           "adoption_primary_path": "build/mir5/recovery/popular-mod-coverage-audit-r01/popular-missing-archive-library-adoption.json",
           "adoption_sha256": "9DD4704BDF01F112A6D875FFA8C4E8D484C6CC59B86D2482BC6F4E00D79B3CAD",
           "scope": "Archive availability only; exact profile dependency/engine admission and all native axes remain required."
+        },
+        "popularity_source_interpretation": {
+          "ranking_metric": "Cumulative Portal downloads_count, sorted locally; no per-patch or time-window popularity claim.",
+          "version_scope": "Preserve the exact requested query values and original response hashes. Portal compatibility-family filtering does not establish compatibility with the requested engine patch.",
+          "recorded_custody": "selected_snapshot_primary_path names the producing checkout custody. It does not assert that the same relative path exists on another machine.",
+          "aero_readback_status": "The three recorded selected snapshots and original response bytes were unavailable in the Aero primary checkout during the 2026-10-26 audit. Original producer custody and a portable exact-hash readback have been requested; no historical source verification is claimed here."
         }
       }
     },
