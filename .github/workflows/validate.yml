@@ -23,11 +23,13 @@ jobs:
       plan_sha256: ${{ steps.bind.outputs.plan_sha256 }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
-      - name: Fetch the exact published historical oracle
+      - name: Fetch exact published historical sources
         shell: pwsh
         run: |
           git fetch --no-tags --depth=1 origin bd9774f323b6eb1561c1d9ff0c91ecc3f7acd1d1
           if ($LASTEXITCODE -ne 0) { throw 'Exact published historical oracle fetch failed.' }
+          git fetch --no-tags --depth=1 origin 8643cc91bc915e008556a5315dbb0a743247e7ab
+          if ($LASTEXITCODE -ne 0) { throw 'Exact published 4.7.3 repair-source fetch failed.' }
       - id: bind
         name: Bind the exact ordered host-control plan
         shell: pwsh
@@ -92,11 +94,13 @@ jobs:
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
-      - name: Fetch the exact published historical oracle
+      - name: Fetch exact published historical sources
         shell: pwsh
         run: |
           git fetch --no-tags --depth=1 origin bd9774f323b6eb1561c1d9ff0c91ecc3f7acd1d1
           if ($LASTEXITCODE -ne 0) { throw 'Exact published historical oracle fetch failed.' }
+          git fetch --no-tags --depth=1 origin 8643cc91bc915e008556a5315dbb0a743247e7ab
+          if ($LASTEXITCODE -ne 0) { throw 'Exact published 4.7.3 repair-source fetch failed.' }
       - name: Restore the bound host-control plan
         uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
         with:
