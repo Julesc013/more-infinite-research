@@ -55,9 +55,90 @@ $ErrorActionPreference='Stop'
   Assert-Probe ([bool]$state.context-and[bool]$state.common) 'import-current-commands'
   Assert-Probe ((-not[bool]$state.legacy_reader)-and(-not[bool]$state.bootstrap)-and(-not[bool]$state.package_authority)-and(-not[bool]$state.materializer)) 'import-legacy-commands'
 }
+function Assert-OwnedChildExitRace {
+  $scriptPath=Join-Path $root 'owned-child-exit-race.ps1'
+  $governor=Join-Path $repo 'tools/lib/validation/ResourceGovernor.ps1'
+  $body=@'
+param([Parameter(Mandatory)][string]$Governor)
+$ErrorActionPreference='Stop'
+Set-StrictMode -Version Latest
+. $Governor
+function Assert-Race([bool]$Condition,[string]$Message){if(-not$Condition){throw "[mir441-owned-child-race] $Message"}}
+$root=[Diagnostics.Process]::GetCurrentProcess()
+$global:raceExpectedStart=[datetime]::new(2026,10,25,0,0,0,[DateTimeKind]::Utc).AddTicks(2)
+$global:raceCimCreation=$global:raceExpectedStart.AddTicks(-2)
+$global:raceState=[ordered]@{mode='stable';created=0;disposed=0;kills=0}
+$expectedStart=$global:raceExpectedStart
+$state=$global:raceState
+function New-RaceProcess([int]$Id,[string]$Mode){
+  $process=[pscustomobject]@{Id=$Id;WorkingSet64=[int64]11;PrivateMemorySize64=[int64]7;mode=$Mode;exit_checks=0}
+  $process|Add-Member -MemberType ScriptProperty -Name HasExited -Value {
+    $this.exit_checks++
+    if($this.mode -in @('null-race','invalid-race')){return $this.exit_checks -gt 1}
+    return $this.mode -in @('null-exited','invalid-exited')
+  }
+  $process|Add-Member -MemberType ScriptProperty -Name StartTime -Value {
+    if($this.mode -in @('invalid-race','invalid-live','invalid-exited')){throw [InvalidOperationException]::new('simulated unavailable StartTime')}
+    if($this.mode -in @('null-race','null-live','null-exited')){return $null}
+    if($this.mode-ceq'replacement-live'){return $global:raceExpectedStart.AddSeconds(1)}
+    return $global:raceExpectedStart
+  }
+  $process|Add-Member -MemberType ScriptMethod -Name Kill -Value {param([bool]$Tree)$global:raceState.kills++}
+  $process|Add-Member -MemberType ScriptMethod -Name WaitForExit -Value {param([int]$Milliseconds)return $true}
+  $process|Add-Member -MemberType ScriptMethod -Name Dispose -Value {$global:raceState.disposed++}
+  $global:raceState.created++
+  return $process
+}
+function Get-CimInstance {
+  [CmdletBinding()]param([string]$ClassName,[string]$Filter)
+  if($Filter -ceq ('ParentProcessId='+$root.Id)){return [pscustomobject]@{ProcessId=424242;CreationDate=$global:raceCimCreation}}
+}
+function Get-Process {
+  [CmdletBinding()]param([int]$Id)
+  if($Id-eq$root.Id){return New-RaceProcess $Id 'root'}
+  if($Id-eq424242){return New-RaceProcess $Id $global:raceState.mode}
+  throw [Microsoft.PowerShell.Commands.ProcessCommandException]::new('simulated missing process')
+}
+$started=$expectedStart.AddMinutes(-1)
+foreach($mode in @('null-race','invalid-race')){
+  $state.mode=$mode;$beforeDisposed=[int]$state.disposed
+  $tree=Get-MIR441OwnedProcessTree -Process $root -StartedUtc $started
+  Assert-Race ($tree.children.Count-eq0-and$state.disposed-eq($beforeDisposed+2)) "exited $mode child was not skipped and disposed"
+  $beforeDisposed=[int]$state.disposed
+  Stop-MIR441OwnedProcess -Process $null -Children @([pscustomobject]@{id=424242;started_utc=$expectedStart})
+  Assert-Race ($state.kills-eq0-and$state.disposed-eq($beforeDisposed+1)) "exited $mode child was killed or leaked"
+}
+foreach($mode in @('null-live','invalid-live')){
+  $state.mode=$mode;$state.kills=0;$beforeDisposed=[int]$state.disposed;$raceFailure=''
+  try{Get-MIR441OwnedProcessTree -Process $root -StartedUtc $started|Out-Null}catch{$raceFailure=$_.Exception.Message}
+  Assert-Race ($raceFailure.Length-gt0-and$state.disposed-eq($beforeDisposed+2)) "live $mode child was accepted or leaked"
+  $beforeDisposed=[int]$state.disposed;$raceFailure=''
+  try{Stop-MIR441OwnedProcess -Process $null -Children @([pscustomobject]@{id=424242;started_utc=$expectedStart})}catch{$raceFailure=$_.Exception.Message}
+  Assert-Race ($raceFailure.Length-gt0-and$state.kills-eq0-and$state.disposed-eq($beforeDisposed+1)) "live $mode child was killed, accepted, or leaked"
+}
+$state.mode='replacement-live';$state.kills=0;$beforeDisposed=[int]$state.disposed;$raceFailure=''
+try{Get-MIR441OwnedProcessTree -Process $root -StartedUtc $started|Out-Null}catch{$raceFailure=$_.Exception.Message}
+Assert-Race ($raceFailure.Contains('[mir441-owned-child-identity]')-and$state.kills-eq0-and$state.disposed-eq($beforeDisposed+2)) 'replacement PID child was accepted, killable, or leaked'
+$state.mode='stable';$state.kills=0
+$tree=Get-MIR441OwnedProcessTree -Process $root -StartedUtc $started
+Assert-Race ($tree.children.Count-eq1-and$tree.children[0].id-eq424242-and$tree.children[0].started_utc-eq$expectedStart) 'stable child identity was not retained'
+Stop-MIR441OwnedProcess -Process $null -Children $tree.children
+Assert-Race ($state.kills-eq1) 'matching child identity was not killed'
+$state.kills=0
+Stop-MIR441OwnedProcess -Process $null -Children @([pscustomobject]@{id=424242;started_utc=$expectedStart.AddSeconds(1)})
+Assert-Race ($state.kills-eq0) 'mismatched child identity was killed'
+Assert-Race ($state.disposed-eq$state.created) 'an acquired child process handle was not disposed'
+Write-Output 'PASS owned child exit race'
+'@
+  [IO.File]::WriteAllText($scriptPath,$body,[Text.UTF8Encoding]::new($false))
+  $output=@(& (Get-Command pwsh -ErrorAction Stop).Source -NoProfile -File $scriptPath -Governor $governor 2>&1)
+  Assert-Probe ($LASTEXITCODE-eq0) 'owned-child-exit-race'
+  Assert-Probe (($output-join"`n").Contains('PASS owned child exit race')) 'owned-child-exit-race-output'
+}
 try {
   [IO.Directory]::CreateDirectory($root)|Out-Null
   Assert-ImportBoundary
+  Assert-OwnedChildExitRace
   Refuses-Probe {New-MIRNativeProbeResourceContext -RepoRoot $repo -OutputRoot (Join-Path $root 'zero') -ExpectedPeakMemoryMiB 0} '[mir441-resource-peak-budget-required]'
   $occupied=Join-Path $root 'occupied';[IO.Directory]::CreateDirectory($occupied)|Out-Null;[IO.File]::WriteAllText((Join-Path $occupied 'row'),'x')
   Refuses-Probe {New-MIRNativeProbeResourceContext -RepoRoot $repo -OutputRoot $occupied -ExpectedPeakMemoryMiB 64 -UseExactOutputRoot} '[mir-native-probe-exact-output-not-empty]'
