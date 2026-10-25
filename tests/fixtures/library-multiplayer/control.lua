@@ -702,12 +702,29 @@ local function closure()
   local allowed = {base=script.active_mods.base, ["more-infinite-research"]=target.mir_version,
     ["mir-fixture-mir5-active-mods-observer"]="0.1.0",
     ["mir-fixture-mir5-library-multiplayer"]="0.1.0"}
-  for name, version in pairs(script.active_mods) do
-    if allowed[name] ~= version then fail("unexpected non-base " .. target.label .. " multiplayer closure: " .. tostring(name)) end
+  local closures = {allowed}
+  if target.label == "F210" then
+    closures[#closures + 1] = {
+      base=script.active_mods.base, ["more-infinite-research"]=target.mir_version,
+      ["mir-fixture-mir5-active-mods-observer"]="0.1.0",
+      ["mir-fixture-mir5-library-multiplayer"]="0.1.0",
+      ["mir-fixture-mir5-api-alpha"]="0.1.0",
+      ["mir-fixture-mir5-api-beta"]="0.1.0",
+    }
   end
-  for name, version in pairs(allowed) do
-    if script.active_mods[name] ~= version then fail("required multiplayer closure member is absent: " .. name) end
+  for _, candidate in ipairs(closures) do
+    local matches = true
+    for name, version in pairs(script.active_mods) do
+      if candidate[name] ~= version then matches = false; break end
+    end
+    if matches then
+      for name, version in pairs(candidate) do
+        if script.active_mods[name] ~= version then matches = false; break end
+      end
+    end
+    if matches then return end
   end
+  fail("unexpected non-base " .. target.label .. " multiplayer closure")
 end
 
 script.on_init(function()
