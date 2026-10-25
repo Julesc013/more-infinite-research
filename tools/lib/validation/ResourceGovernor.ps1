@@ -265,6 +265,9 @@ function Invoke-MIR441MonitoredProcess {
   if ($SampleMilliseconds -eq 250 -and $null -eq $OwnedProcessSampleCallback) { throw '[mir441-resource-observation-callback-required]' }
   if ($SampleMilliseconds -eq 0 -and $null -ne $OwnedProcessSampleCallback) { throw '[mir441-resource-observation-cadence-required]' }
   if ($null -ne $OwnedProcessExitCallback -and $null -eq $OwnedProcessSampleCallback) { throw '[mir441-resource-observation-exit-callback-requires-sample]' }
+  # Benchmark observations close on natural exit; live marker endpoints keep
+  # the existing completion-predicate path without observation callbacks.
+  if ($null -ne $CompletionPredicate -and $null -ne $OwnedProcessSampleCallback) { throw '[mir441-resource-observation-completion-predicate]' }
   $work=Resolve-MIR441RecoveryScratchPath -Path $WorkRoot;$ledger=Resolve-MIR441RecoveryScratchPath -Path $LedgerPath
   foreach($path in @($ledger,$StdoutPath,$StderrPath)|Where-Object {$_}){
     $resolved=Resolve-MIR441RecoveryScratchPath -Path $path
