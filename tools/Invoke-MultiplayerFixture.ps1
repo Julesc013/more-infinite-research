@@ -8,7 +8,8 @@ param(
   [Parameter(Mandatory)][ValidatePattern('^[A-Fa-f0-9]{64}$')][string]$ExpectedMIRArchiveSha256,
   [Parameter(Mandatory)][string]$OutputRoot,
   [ValidateSet('library-multiplayer','library-paired-browser','scripted-effects-multiplayer')][string]$FixtureCase='library-multiplayer',
-  # The lower value is calibrated solely for the bounded F200 Library session.
+  # The lower value admits only the bounded functional F200/F210 Library
+  # sessions.  Its F210 use is conservative admission, not a measured peak.
   # Other multiplayer fixtures retain the existing 8 GiB process-tree ceiling.
   [ValidateSet(7168,8192)][int]$SessionExpectedPeakMemoryMiB=8192,
   [switch]$CollectProcessMemoryObservations,
@@ -21,14 +22,59 @@ $repo=(Resolve-Path -LiteralPath $RepoRoot).Path
 function Assert-Session([bool]$Condition,[string]$Message) {
   if(-not $Condition){throw "[mir5-multiplayer-fixture] $Message"}
 }
+function Assert-MultiplayerFixtureSelection {
+  param(
+    [Parameter(Mandatory)][System.Collections.IDictionary]$Selection,
+    [Parameter(Mandatory)][string]$EngineSha256,
+    [Parameter(Mandatory)][string]$FixtureCase
+  )
+  # These are the only native Library multiplayer selections that this shared
+  # two-client harness admits.  The F210 row remains base-only: Space Age or
+  # any other companion is not an implicit dependency of this fixture.
+  $targets=[ordered]@{
+    f200=[ordered]@{
+      kind='mir5-library-multiplayer-f200-native-selection';factorio_line='2.0';base='2.0.77'
+      engine_sha256='D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B';mir='5.0.20000'
+      observer_sha256='723D1E7721449FC26040E5E6629416767BDC20AD79CF8723115846DB662A1F87'
+    }
+    f210=[ordered]@{
+      kind='mir5-library-multiplayer-f210-native-selection';factorio_line='2.1';base='2.1.23'
+      engine_sha256='FE4A1DA30F322A0D0B8AEB3DF7276332222BAAA143E2352569B723E84B2B9060';mir='5.0.21000'
+      observer_sha256='2E1BE5952D2A4CC5C74A0D149E075D247BA110A3FAE5B6768D3EAEBABCEF989C'
+    }
+  }
+  Assert-Session ($Selection.Contains('target') -and $Selection['target'] -is [string] -and $targets.Contains([string]$Selection['target'])) 'requires an admitted F200 or F210 Library fixture target'
+  $target=$targets[[string]$Selection['target']]
+  Assert-Session (($Selection['schema'] -is [int] -or $Selection['schema'] -is [long]) -and [int64]$Selection['schema'] -eq 1 -and $Selection['kind'] -ceq $target.kind -and $Selection['factorio_line'] -ceq $target.factorio_line -and $Selection['settings_mode'] -ceq 'Defaults') 'Library fixture profile identity differs'
+  Assert-Session ($Selection.Contains('engine') -and $Selection['engine'] -is [System.Collections.IDictionary]) 'Library fixture profile engine is absent'
+  $engine=$Selection['engine']
+  Assert-Session ($engine.Count -eq 2 -and $engine['version'] -ceq $target.base -and $engine['sha256'] -ceq $target.engine_sha256 -and $EngineSha256 -ceq $target.engine_sha256) 'Library fixture engine differs'
+  Assert-Session ($Selection.Contains('mods') -and @($Selection['mods']).Count -eq 4) 'Library fixture mod closure count differs'
+  $mods=[Collections.Generic.List[string]]::new()
+  foreach($mod in @($Selection['mods'])){
+    Assert-Session ($mod -is [System.Collections.IDictionary] -and $mod.Count -eq 3 -and $mod['name'] -is [string] -and $mod['version'] -is [string] -and $mod['enabled'] -is [bool] -and $mod['enabled'] -eq $true) 'Library fixture mod row differs'
+    [void]$mods.Add(([string]$mod['name'])+'@'+([string]$mod['version']))
+  }
+  $expectedMods=@(
+    ('base@'+$target.base),
+    'mir-fixture-mir5-active-mods-observer@0.1.0',
+    ('more-infinite-research@'+$target.mir),
+    'mir-fixture-mir5-library-multiplayer@0.1.0'
+  )
+  Assert-Session ((@($mods|Sort-Object)-join '|') -ceq (@($expectedMods|Sort-Object)-join '|')) 'Library fixture mod closure differs'
+  Assert-Session ($Selection.Contains('archive_sha256') -and $Selection['archive_sha256'] -is [System.Collections.IDictionary]) 'Library fixture archive binding is absent'
+  $archives=$Selection['archive_sha256'];$observer='mir-fixture-mir5-active-mods-observer_0.1.0.zip'
+  Assert-Session ($archives.Count -eq 1 -and $archives.Contains($observer) -and $archives[$observer] -ceq $target.observer_sha256) 'Library fixture observer archive differs'
+  Assert-Session ($FixtureCase -ceq 'library-multiplayer' -or $target.base -ceq '2.0.77') 'only F200 admits non-functional Library fixture cases'
+  return [pscustomobject]$target
+}
 $output=Resolve-MIR441RecoveryScratchPath -Path $OutputRoot
 Assert-Session (-not(Test-Path -LiteralPath $output) -or @(Get-ChildItem -LiteralPath $output -Force).Count -eq 0) 'output is not empty'
 $engine=(Resolve-Path -LiteralPath $FactorioBin).Path
 $library=(Resolve-Path -LiteralPath $ArchiveLibrary).Path
 $profile=(Resolve-Path -LiteralPath $ProfilePath).Path
 $selection=Get-Content -LiteralPath $profile -Raw|ConvertFrom-Json -AsHashtable
-Assert-Session ($selection.target -ceq 'f200' -and $selection.engine.version -ceq '2.0.77') 'requires the exact F200 fixture'
-Assert-Session ((Get-FileHash -LiteralPath $engine).Hash -ceq $selection.engine.sha256) 'engine hash differs'
+$target=Assert-MultiplayerFixtureSelection -Selection $selection -EngineSha256 (Get-FileHash -LiteralPath $engine).Hash -FixtureCase $FixtureCase
 Assert-Session ($FixtureCase -ceq 'library-multiplayer' -or $SessionExpectedPeakMemoryMiB -eq 8192) 'only the functional Library session may use the calibrated peak override'
 $engineData=Join-Path (Get-Item -LiteralPath $engine).Directory.Parent.Parent.FullName 'data'
 $preparation=Join-Path $output 'preparation'
@@ -88,7 +134,7 @@ try {
     [IO.File]::WriteAllText($config,$text,[Text.UTF8Encoding]::new($false))
     $name=if($locale -ceq 'en'){'MIR5English'}else{'MIR5Deutsch'}
     # Isolated disposable identities contain no online token or personal data.
-    $player=@{'service-username'=$name;'service-token'='';'last-played-version'=@{game_version='2.0.77';build_version=84539;build_mode='full';platform='win64'}}
+    $player=@{'service-username'=$name;'service-token'='';'last-played-version'=@{game_version=$target.base;build_version=84539;build_mode='full';platform='win64'}}
     [IO.File]::WriteAllText((Join-Path $write 'player-data.json'),($player|ConvertTo-Json -Depth 5),[Text.UTF8Encoding]::new($false))
     $clients+=@{name=$name;locale=$locale;config=$config;write_data=$write;port=$udpPorts[$clientIndex]};$clientIndex++
   }

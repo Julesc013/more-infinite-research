@@ -485,6 +485,45 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
                 self.assertEqual(info["dependencies"], [base_dependency, f"more-infinite-research = {mir}"])
                 self.assertNotIn("space-age", {entry["name"] for entry in profile["mods"]})
 
+    def test_multiplayer_wrapper_admits_only_the_two_exact_functional_profiles(self):
+        script = r'''
+          $tokens=$null;$errors=$null
+          $ast=[Management.Automation.Language.Parser]::ParseFile($env:MIR_TEST_WRAPPER,[ref]$tokens,[ref]$errors)
+          if($errors.Count){throw $errors[0].Message}
+          function Assert-Session([bool]$Condition,[string]$Message){if(-not $Condition){throw $Message}}
+          $node=@($ast.FindAll({param($candidate) $candidate -is [Management.Automation.Language.FunctionDefinitionAst] -and $candidate.Name -ceq 'Assert-MultiplayerFixtureSelection'},$true))
+          if($node.Count -ne 1){throw 'selection function is absent or ambiguous'}
+          Invoke-Expression $node[0].Extent.Text
+          $f200=Get-Content -LiteralPath $env:MIR_TEST_F200_PROFILE -Raw|ConvertFrom-Json -AsHashtable
+          $f210=Get-Content -LiteralPath $env:MIR_TEST_F210_PROFILE -Raw|ConvertFrom-Json -AsHashtable
+          $selected=Assert-MultiplayerFixtureSelection -Selection $f200 -EngineSha256 'D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B' -FixtureCase 'library-multiplayer'
+          if($selected.base -cne '2.0.77'){throw 'F200 selection changed'}
+          $selected=Assert-MultiplayerFixtureSelection -Selection $f210 -EngineSha256 'FE4A1DA30F322A0D0B8AEB3DF7276332222BAAA143E2352569B723E84B2B9060' -FixtureCase 'library-multiplayer'
+          if($selected.base -cne '2.1.23'){throw 'F210 selection changed'}
+          function Assert-Rejected([string]$Name,[string]$ProfilePath,[string]$Engine,[string]$Case,[scriptblock]$Mutate){
+            $selection=Get-Content -LiteralPath $ProfilePath -Raw|ConvertFrom-Json -AsHashtable
+            & $Mutate $selection
+            $accepted=$false
+            try{$null=Assert-MultiplayerFixtureSelection -Selection $selection -EngineSha256 $Engine -FixtureCase $Case;$accepted=$true}catch{}
+            if($accepted){throw ('selection accepted opponent: '+$Name)}
+          }
+          Assert-Rejected 'wrong-engine' $env:MIR_TEST_F200_PROFILE ('A'*64) 'library-multiplayer' {param($s)}
+          Assert-Rejected 'wrong-mir' $env:MIR_TEST_F210_PROFILE 'FE4A1DA30F322A0D0B8AEB3DF7276332222BAAA143E2352569B723E84B2B9060' 'library-multiplayer' {param($s)$s['mods'][2]['version']='5.0.21001'}
+          Assert-Rejected 'extra-space-age' $env:MIR_TEST_F210_PROFILE 'FE4A1DA30F322A0D0B8AEB3DF7276332222BAAA143E2352569B723E84B2B9060' 'library-multiplayer' {param($s)$s['mods']=@($s['mods'])+@([ordered]@{name='space-age';version='2.1.23';enabled=$true})}
+          Assert-Rejected 'untyped-enabled' $env:MIR_TEST_F210_PROFILE 'FE4A1DA30F322A0D0B8AEB3DF7276332222BAAA143E2352569B723E84B2B9060' 'library-multiplayer' {param($s)$s['mods'][0]['enabled']='true'}
+          Assert-Rejected 'wrong-observer' $env:MIR_TEST_F210_PROFILE 'FE4A1DA30F322A0D0B8AEB3DF7276332222BAAA143E2352569B723E84B2B9060' 'library-multiplayer' {param($s)$s['archive_sha256']['mir-fixture-mir5-active-mods-observer_0.1.0.zip']='A'*64}
+          Assert-Rejected 'f210-paired' $env:MIR_TEST_F210_PROFILE 'FE4A1DA30F322A0D0B8AEB3DF7276332222BAAA143E2352569B723E84B2B9060' 'library-paired-browser' {param($s)}
+        '''
+        result = subprocess.run(
+            ["pwsh", "-NoLogo", "-NoProfile", "-Command", script],
+            capture_output=True,
+            text=True,
+            env=dict(os.environ, MIR_TEST_WRAPPER=str(WRAPPER),
+                     MIR_TEST_F200_PROFILE=str(F200_PROFILE), MIR_TEST_F210_PROFILE=str(F210_PROFILE)),
+            check=False,
+        )
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+
     def test_f210_closure_uses_the_existing_two_client_lifecycle_and_refuses_drift(self):
         accepted = self.run_case(target="f210")
         self.assertTrue(accepted["ok"], accepted["message"])
