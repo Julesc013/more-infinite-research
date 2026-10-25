@@ -29,6 +29,40 @@ class FreshScienceTransitionFixtureTests(unittest.TestCase):
               untouched=data.raw["int-setting"].untouched.default_value}
           end
 
+          function run_transition_final(path, opponent)
+            local TARGET = "recipe-prod-research_science_pack_productivity-1"
+            local SEEDED = "mir473-seeded-planetary-owner"
+            local CIRCULAR = "mir473-circular-planetary-owner"
+            local packs = {"automation-science-pack", "logistic-science-pack", "chemical-science-pack",
+              "production-science-pack", "military-science-pack", "utility-science-pack", "space-science-pack",
+              "agricultural-science-pack", "metallurgic-science-pack", "electromagnetic-science-pack",
+              "cryogenic-science-pack", "promethium-science-pack", "planetary-data"}
+            local ingredients, prerequisites = {}, {}
+            for index, name in ipairs(packs) do ingredients[index] = {name=name, amount=1} end
+            for index = 1, 12 do prerequisites[index] = packs[index] end
+            prerequisites[13] = SEEDED
+            local effects = {
+              {type="change-recipe-productivity", recipe="a-mir473-circular-planetary-data", change=.1},
+              {type="change-recipe-productivity", recipe="z-mir473-seeded-planetary-data", change=.1},
+            }
+            local row = {type="technology", name=TARGET, level=1, upgrade=true, max_level="infinite",
+              prerequisites=prerequisites, effects=effects,
+              unit={count_formula="1*2^(L-1)", time=1, ingredients=ingredients}}
+            local untouched = {name="unrelated-technology", prerequisites={"unrelated-gate"}}
+            if opponent == "missing-gate" then table.remove(row.prerequisites, 13)
+            elseif opponent == "circular-gate" then row.prerequisites[13] = CIRCULAR
+            elseif opponent == "wrong-growth" then row.unit.count_formula = "1*3^(L-1)"
+            elseif opponent == "zero-input" then row.unit.ingredients[13].amount = 0
+            elseif opponent == "fluid-input" then row.unit.ingredients[13].type = "fluid"
+            elseif opponent == "wrong-effect" then row.effects[1].change = .02
+            end
+            data = {raw={technology={[TARGET]=row, [untouched.name]=untouched}}}
+            local ok, message = pcall(dofile, path)
+            return {ok=ok, message=tostring(message), prerequisites=row.prerequisites,
+              formula=row.unit.count_formula, time=row.unit.time, effects=row.effects,
+              untouched_prerequisites=untouched.prerequisites}
+          end
+
           function run_transition_control(path, opponent)
             local TARGET = "recipe-prod-research_science_pack_productivity-1"
             local A = "a-mir473-circular-planetary-data"
@@ -74,8 +108,13 @@ class FreshScienceTransitionFixtureTests(unittest.TestCase):
               end,
               is_empty=function() return empty end,
             }
-            local lab = {name="biolab", valid=true, active=false, energy=0,
+            local lab_values = {name="biolab", valid=true, energy=0,
               get_inventory=function() return inventory end}
+            local lab = setmetatable({}, {__index=lab_values, __newindex=function(_, key, value)
+              if key == "energy" then lab_values.energy = value
+              elseif key == "active" then error("fixture wrote readonly lab.active")
+              else error("fixture wrote readonly lab field: " .. tostring(key)) end
+            end})
             game = {tick=100, forces={player=force}, surfaces={{create_entity=function(spec)
               assert(spec.name == "biolab" and spec.force == force)
               calls.created = calls.created + 1
@@ -130,7 +169,7 @@ class FreshScienceTransitionFixtureTests(unittest.TestCase):
             local reload_ok, reload_message = pcall(callbacks.events[1])
             return {loaded=true, source_ok=true, source_tick_ok=true, configuration_ok=true, successor_ok=successor_ok,
               reload_ok=reload_ok, message=tostring(reload_message), calls=calls, saves=saves, markers=markers,
-              phase=storage.mir5_fresh_science_transition.phase, lab_active=lab.active, lab_energy=lab.energy,
+              phase=storage.mir5_fresh_science_transition.phase, lab_energy=lab.energy,
               source_labs=storage.mir5_fresh_science_transition.source_labs,
               successor_labs=storage.mir5_fresh_science_transition.successor_labs}
           end
@@ -184,6 +223,31 @@ class FreshScienceTransitionFixtureTests(unittest.TestCase):
             profile.pop("scope")
         self.assertEqual(*profiles)
 
+    def test_data_final_preflights_all_real_gates_then_clears_only_the_fixture_witness(self):
+        path = (FIXTURE / "data-final-fixes.lua").as_posix()
+        expected = (
+            "automation-science-pack", "logistic-science-pack", "chemical-science-pack",
+            "production-science-pack", "military-science-pack", "utility-science-pack",
+            "space-science-pack", "agricultural-science-pack", "metallurgic-science-pack",
+            "electromagnetic-science-pack", "cryogenic-science-pack", "promethium-science-pack",
+            "mir473-seeded-planetary-owner",
+        )
+        good = self.lua.eval("run_transition_final")(path, "")
+        self.assertTrue(good["ok"], good["message"])
+        self.assertEqual(0, len(good["prerequisites"]))
+        self.assertEqual(("unrelated-gate",), tuple(good["untouched_prerequisites"][index] for index in (1,)))
+        self.assertEqual(("1*2^(L-1)", 1), (good["formula"], good["time"]))
+        self.assertEqual((.1, .1), tuple(good["effects"][index]["change"] for index in (1, 2)))
+        for opponent in ("missing-gate", "circular-gate", "wrong-growth", "zero-input", "fluid-input", "wrong-effect"):
+            with self.subTest(opponent=opponent):
+                result = self.lua.eval("run_transition_final")(path, opponent)
+                self.assertFalse(result["ok"])
+                # The sole mutation is after every preflight; failed shapes
+                # retain their supplied, nonempty gate witness.
+                self.assertEqual(12 if opponent == "missing-gate" else 13, len(result["prerequisites"]))
+                if opponent not in ("missing-gate", "circular-gate"):
+                    self.assertEqual(expected, tuple(result["prerequisites"][index] for index in range(1, 14)))
+
     def test_control_uses_actual_source_and_successor_lab_events_then_read_only_reload(self):
         result = self.lua.eval("run_transition_control")((FIXTURE / "control.lua").as_posix(), "")
         self.assertTrue(result["loaded"], result["message"])
@@ -199,7 +263,9 @@ class FreshScienceTransitionFixtureTests(unittest.TestCase):
                          tuple(result["saves"][index] for index in (1, 2)))
         self.assertEqual(("initial", "initial", "reload"),
                          tuple(result["markers"][index]["stage"] for index in (1, 2, 3)))
-        self.assertEqual((False, 0), (result["lab_active"], result["lab_energy"]))
+        # The proxy refuses a LuaEntity.active write; F210 permits only the
+        # actual energy/inventory fixture setup and teardown path.
+        self.assertEqual(0, result["lab_energy"])
         self.assertEqual(0.2, result["markers"][2]["witnesses"]["circular_recipe_productivity"])
         self.assertTrue(result["markers"][3]["witnesses"]["on_load_read_only"])
 
