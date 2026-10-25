@@ -140,6 +140,19 @@ end
 -- a provider or its ownership preference changes. They are explicit authored
 -- rows, independent of whether the provider is currently installed.
 require("research.native_credit_definitions").append(technologies, data.raw, values, require("platform.target"))
+
+local function finite_effect_number(value)
+  return type(value) == "number" and value == value and value > -math.huge and value < math.huge
+end
+
+local function removable_missing_recipe_productivity_effect(effect)
+  return type(effect) == "table" and effect.type == "change-recipe-productivity"
+    and type(effect.recipe) == "string" and effect.recipe ~= ""
+    and finite_effect_number(effect.change)
+    and (effect.modifier == nil or finite_effect_number(effect.modifier))
+    and data.raw.recipe[effect.recipe] == nil
+end
+
 -- A foreign data-updates stage may remove an authored recipe while retaining
 -- its product through other producers. Keep the collected replacement effects
 -- and compact only missing targets out of our detached emission. This visits
@@ -149,7 +162,7 @@ for _, technology in ipairs(technologies) do
   local count = #effects
   for index = 1, count do
     local effect = effects[index]
-    if effect.type ~= "change-recipe-productivity" or data.raw.recipe[effect.recipe] then
+    if not removable_missing_recipe_productivity_effect(effect) then
       retained = retained + 1
       if retained ~= index then effects[retained] = effect end
     elseif values.options["mir-debug-recipe-matches"] == true and type(log) == "function" then

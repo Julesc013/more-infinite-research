@@ -766,6 +766,38 @@ class GeneratorTests(unittest.TestCase):
             and foreign.effects[1].change == .7, 'foreign technology was changed')
         ''')
 
+    def test_data_final_keeps_malformed_missing_effects_for_generator_preflight(self):
+        self.lua.execute('''
+          local function refuse(effect, expected)
+            local original = modern.technologies
+            modern.technologies = function(selection, values)
+              local rows = original(selection, values)
+              for _, row in ipairs(rows) do
+                if row.name == 'recipe-prod-research_engine-1' then
+                  row.effects[#row.effects + 1] = effect
+                  return rows
+                end
+              end
+              error('missing owned engine row')
+            end
+            settings, mods, data, helpers, log = {startup=defaults()}, {}, full_world({}), nil, function() end
+            local ok, message = pcall(dofile, data_final_path)
+            modern.technologies = original
+            assert(not ok and tostring(message):find(expected, 1, true), tostring(message))
+            assert(data.writes == 0, 'malformed owned effect reached publication')
+          end
+
+          refuse({}, 'has an invalid effect')
+          refuse({type='change-recipe-productivity', recipe='', change=.1}, 'missing recipe effect target')
+          refuse({type='change-recipe-productivity', recipe=7, change=.1}, 'missing recipe effect target')
+          refuse({type='change-recipe-productivity', recipe='missing-valid-string-target', change=0/0},
+            'missing recipe effect target')
+          refuse({type='change-recipe-productivity', recipe='missing-valid-string-target', change='invalid'},
+            'missing recipe effect target')
+          refuse({type='change-recipe-productivity', recipe='missing-valid-string-target', change=.1, modifier=0/0},
+            'has a nonfinite modifier')
+        ''')
+
     def test_science_policy_is_applied_to_the_whole_owned_catalogue_before_publication(self):
         self.lua.execute('''
           settings, mods, helpers, log = {startup=defaults()}, {}, nil, function() end
