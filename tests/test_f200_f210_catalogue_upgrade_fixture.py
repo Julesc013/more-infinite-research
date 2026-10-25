@@ -312,6 +312,39 @@ class F200F210CatalogueUpgradeFixtureTests(unittest.TestCase):
         self.assertIn("successor cold reload technology state changed", drift["message"])
         self.assertEqual((True, True), (drift["source_snapshot_read_only"], drift["state_read_only"]))
 
+    def test_cross_profiles_pin_exact_predecessor_and_corrected_successor(self):
+        profiles = ROOT / "tests/profiles"
+        source = json.loads((profiles / "full-catalogue-cross-f200-f210-published-f200-2077.json").read_text(encoding="utf-8"))
+        target = json.loads((profiles / "full-catalogue-cross-f200-f210-mir5-f210-2123.json").read_text(encoding="utf-8"))
+        freeze = json.loads((ROOT / "spec/evidence/current-assets-8aec3e68-readback.json").read_text(encoding="utf-8"))
+        observer = "mir-fixture-mir5-active-mods-observer"
+        fixture = "mir-fixture-mir5-full-catalogue-upgrade"
+        for profile, edition, version, mir, fixture_version, engine_sha in (
+            (source, "f200", "2.0.77", "4.7.20003", "0.2.1", "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B"),
+            (target, "f210", "2.1.23", "5.0.21000", "0.3.0", "FE4A1DA30F322A0D0B8AEB3DF7276332222BAAA143E2352569B723E84B2B9060"),
+        ):
+            self.assertEqual((1, "mir5-full-catalogue-cross-game-upgrade", edition, version[:3], "Defaults"),
+                             (profile["schema"], profile["kind"], profile["target"], profile["factorio_line"], profile["settings_mode"]))
+            self.assertEqual({"version": version, "sha256": engine_sha}, profile["engine"])
+            self.assertEqual({"base": version, observer: "0.1.0", "more-infinite-research": mir, fixture: fixture_version},
+                             {row["name"]: row["version"] for row in profile["mods"]})
+            self.assertEqual(4, len(profile["mods"]))
+            self.assertTrue(all(row["enabled"] is True for row in profile["mods"]))
+        self.assertEqual({
+            observer + "_0.1.0.zip": "723D1E7721449FC26040E5E6629416767BDC20AD79CF8723115846DB662A1F87",
+            "more-infinite-research_4.7.20003.zip": "FBBA844DD04011A12BB6DA885745B0733AD37FAB181EAAD9EE4346B9B0D32647",
+        }, source["archive_sha256"])
+        current = next(row for row in freeze["assets"] if row["target"] == "f210")
+        self.assertEqual(("8aec3e68e5179ff88765e08efbb82035e64a3212", "697fb2bf789ff906796874853ea0b73520e6ccdc"),
+                         (freeze["source"]["commit"], freeze["source"]["source_tree"]))
+        self.assertEqual(("more-infinite-research_5.0.21000.zip", 553802,
+                          "1D9E99F6BC23FD109045E0C2D3F6C2ACCBE0D65BE5C10C317E5E36E9EDD9304E"),
+                         (current["name"], current["bytes"], current["archive_sha256"].upper()))
+        self.assertEqual({observer + "_0.1.0.zip": "2E1BE5952D2A4CC5C74A0D149E075D247BA110A3FAE5B6768D3EAEBABCEF989C",
+                          current["name"]: current["archive_sha256"].upper()}, target["archive_sha256"])
+        self.assertFalse(freeze["native_execution"])
+        self.assertFalse(freeze["release_qualification"])
+
     def test_cross_fixture_staging_is_explicit_and_does_not_import_player_source(self):
         info = json.loads(CROSS.joinpath("info.json").read_text(encoding="utf-8"))
         self.assertEqual(("mir-fixture-mir5-full-catalogue-upgrade", "0.3.0", "2.1"), (info["name"], info["version"], info["factorio_version"]))
