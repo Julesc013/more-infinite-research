@@ -1582,6 +1582,12 @@ class ScienceTests(unittest.TestCase):
             local row = {unit={ingredients={{type="item", name=PACK, amount=1}}},
               prerequisites={SEEDED}, effects={{type="change-recipe-productivity", recipe="iron-gear-wheel", change=0.2}}}
             data.raw.technology["recipe-prod-research_fixture-1"] = row
+            -- Minimal companion for the producer-effect oracle; the row above
+            -- remains the isolated retained-ingredient/positive-effect witness.
+            data.raw.technology["recipe-prod-research_science_pack_productivity-1"] = {effects={
+              {type="change-recipe-productivity",recipe="a-mir473-circular-planetary-data",change=0.1},
+              {type="change-recipe-productivity",recipe="z-mir473-seeded-planetary-data",change=0.1}
+            }}
             data.raw.technology["automation-science-pack"] = {prerequisites={}}
             return row
           end
@@ -1601,6 +1607,12 @@ class ScienceTests(unittest.TestCase):
             }
           end), "actual fixture confused a legitimate scripted effect with removed productivity")
           for _, mutate in ipairs({
+            function(row) table.remove(data.raw.technology["recipe-prod-research_science_pack_productivity-1"].effects) end,
+            function(row) data.raw.technology["recipe-prod-research_science_pack_productivity-1"].effects[1].change = 0.02 end,
+            function(row)
+              local effects=data.raw.technology["recipe-prod-research_science_pack_productivity-1"].effects
+              effects[#effects+1]=deep_copy(effects[1])
+            end,
             function(row) row.unit.ingredients[1].amount = 0 end,
             function(row) row.unit.ingredients[1].type = "fluid" end,
             function(row) row.prerequisites = {"automation-science-pack"} end,
