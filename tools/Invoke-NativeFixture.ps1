@@ -533,15 +533,21 @@ try{
     }else{
       $server=Join-Path $resources.root 'server-settings.json'
       $record.server_settings=New-ModernFixtureServerSettings $server $engineData
+      $activeSaveComplete=${function:Test-HistoricalFixtureSaveComplete}
       $activeCompletion={
         if(-not(Test-Path -LiteralPath $live -PathType Leaf)){return $false}
         $stream=[IO.File]::Open($live,[IO.FileMode]::Open,[IO.FileAccess]::Read,[IO.FileShare]::ReadWrite)
         $reader=[IO.StreamReader]::new($stream)
         try{$text=$reader.ReadToEnd()}finally{$reader.Dispose();$stream.Dispose()}
-        Assert-FixtureLog $text
+        if([regex]::IsMatch($text,'(?im)^\s*\d+[.]\d+\s+Error\b|^Error while running event\b|\bException at tick\b|\bnon-recoverable error\b|^stack traceback:$')){throw 'fatal native active preparation diagnostic'}
         if(-not(Test-Path -LiteralPath $activeSave -PathType Leaf)){return $false}
-        try {Read-ActiveFixtureMarker $text 'agriculture-scale' 'prepared'|Out-Null} catch {return $false}
-        return $text.Contains('Saving finished') -and (Test-HistoricalFixtureSaveComplete $activeSave)
+        try {
+          $markers=@([regex]::Matches($text,'\[MIR5_RUNTIME_ACTIVE\] (\{[^\r\n]+\})') | ForEach-Object {$_.Groups[1].Value | ConvertFrom-Json} | Where-Object {
+            [string]$_.kind -ceq 'agriculture-scale' -and [string]$_.stage -ceq 'prepared'
+          })
+        } catch {return $false}
+        if($markers.Count -ne 1 -or [string]$markers[0].status -cne 'pending'){return $false}
+        return $text.Contains('Saving finished') -and (& $activeSaveComplete $activeSave)
       }.GetNewClosure()
       $record.active_preparation=Invoke-FixtureStage 'active-prepare' @('--server-settings',$server,'--bind','127.0.0.1','--start-server',$seed) $activeCompletion
       $record.active_preparation.marker=Read-ActiveFixtureMarker ([IO.File]::ReadAllText($record.active_preparation.log)) 'agriculture-scale' 'prepared'
