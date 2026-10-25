@@ -228,17 +228,43 @@ function Stop-MIR441OwnedProcess {
   }
 }
 
+function Invoke-MIR441OwnedProcessObservation {
+  param(
+    [scriptblock]$Callback,
+    [Parameter(Mandatory)][Diagnostics.Process]$Process,
+    [Parameter(Mandatory)][datetime]$StartedUtc,
+    [Parameter(Mandatory)][Diagnostics.Stopwatch]$Timer,
+    [switch]$NaturalExit
+  )
+  if ($null -eq $Callback) { return }
+  $event = [pscustomobject][ordered]@{
+    process = $Process
+    pid = [int]$Process.Id
+    started_utc = $StartedUtc.ToString('o')
+    elapsed_monotonic_milliseconds = [Math]::Round([double]$Timer.Elapsed.TotalMilliseconds, 3)
+    natural_exit = [bool]$NaturalExit
+  }
+  $output = @(& $Callback $event)
+  if ($output.Count -ne 0) { throw '[mir441-resource-observation-callback-output]' }
+}
+
 function Invoke-MIR441MonitoredProcess {
   param(
     [Parameter(Mandatory)][string]$FilePath,[Parameter(Mandatory)][string[]]$Arguments,
     [Parameter(Mandatory)][string]$WorkRoot,[Parameter(Mandatory)][string]$LedgerPath,[Parameter(Mandatory)]$Policy,
     [int64]$EstimatedPeakBytes=0,[int64]$ExpectedPeakMemoryBytes=0,
     [ValidateRange(1,5)][int]$SampleSeconds=1,[ValidateRange(1,86400)][int]$TimeoutSeconds=900,
+    [ValidateSet(0,250)][int]$SampleMilliseconds=0,
+    [scriptblock]$OwnedProcessSampleCallback=$null,
+    [scriptblock]$OwnedProcessExitCallback=$null,
     [string]$StdoutPath='',[string]$StderrPath='',[switch]$AllowNonZeroExit,
     [switch]$FactorioSteamIdentity,
     $PreStartAdmissionWait=$null,
     [scriptblock]$CompletionPredicate=$null
   )
+  if ($SampleMilliseconds -eq 250 -and $null -eq $OwnedProcessSampleCallback) { throw '[mir441-resource-observation-callback-required]' }
+  if ($SampleMilliseconds -eq 0 -and $null -ne $OwnedProcessSampleCallback) { throw '[mir441-resource-observation-cadence-required]' }
+  if ($null -ne $OwnedProcessExitCallback -and $null -eq $OwnedProcessSampleCallback) { throw '[mir441-resource-observation-exit-callback-requires-sample]' }
   $work=Resolve-MIR441RecoveryScratchPath -Path $WorkRoot;$ledger=Resolve-MIR441RecoveryScratchPath -Path $LedgerPath
   foreach($path in @($ledger,$StdoutPath,$StderrPath)|Where-Object {$_}){
     $resolved=Resolve-MIR441RecoveryScratchPath -Path $path
@@ -290,14 +316,19 @@ function Invoke-MIR441MonitoredProcess {
       if($tree.working_set_bytes-gt$ExpectedPeakMemoryBytes-or$tree.private_bytes-gt$ExpectedPeakMemoryBytes){throw '[mir441-resource-process-budget]'}
       $usage=Get-MIR441TreeUsage -Path $work;if(-not$usage.complete){throw '[mir441-resource-output-scan-incomplete]'}
       if($usage.bytes-$before.bytes-gt$EstimatedPeakBytes){throw '[mir441-resource-output-budget]'}
-      if($process.HasExited){break}
+      if($process.HasExited){
+        Invoke-MIR441OwnedProcessObservation -Callback $OwnedProcessExitCallback -Process $process -StartedUtc $started -Timer $timer -NaturalExit
+        break
+      }
       if($timer.Elapsed.TotalSeconds-ge$TimeoutSeconds){$timedOut=$true;throw '[mir441-process-timeout]'}
       if($null-ne$CompletionPredicate){
         $decision=@(& $CompletionPredicate)
         if($decision.Count-ne1-or$decision[0]-isnot[bool]){throw '[mir441-process-completion-predicate-invalid]'}
         if($decision[0]){$completionObserved=$true;break}
       }
-      [void]$process.WaitForExit($SampleSeconds*1000)
+      Invoke-MIR441OwnedProcessObservation -Callback $OwnedProcessSampleCallback -Process $process -StartedUtc $started -Timer $timer
+      $waitMilliseconds=if($SampleMilliseconds -eq 250){250}else{$SampleSeconds*1000}
+      [void]$process.WaitForExit($waitMilliseconds)
     }
     Stop-MIR441OwnedProcess -Process $process -Children $children
     foreach($copy in $copies){$null=$copy.GetAwaiter().GetResult()}
