@@ -499,11 +499,11 @@ class BootstrapTests(unittest.TestCase):
           package.loaded["research.catalogue"] = nil
           local catalogue = require("research.catalogue")
           local first, second = catalogue.declared(), catalogue.declared()
-          assert(#first == 53 and #second == 53)
-          local seen, continuations = {}, 0
+          assert(#first == 54 and #second == 54)
+          local seen, by_id, continuations = {}, {}, 0
           for _, row in ipairs(first) do
             assert(type(row.id) == "string" and seen[row.id] == nil)
-            seen[row.id] = true
+            seen[row.id], by_id[row.id] = true, row
             assert(row.ownership_kind == "authored_generated"
               and type(row.family) == "string" and type(row.cap_setting) == "string")
             assert(type(row.legacy_binding) == "table")
@@ -516,6 +516,11 @@ class BootstrapTests(unittest.TestCase):
             end
           end
           assert(continuations == 6 and seen["recipe-prod-research_gears-1"])
+          local science = by_id["recipe-prod-research_science_pack_productivity-1"]
+          assert(science and science.family == "research_science_pack_productivity"
+            and science.setting == "ips-enable-research_science_pack_productivity"
+            and science.cap_setting == "ips-max-level-research_science_pack_productivity"
+            and #science.settings == 7)
           first[1].settings[1] = "foreign"
           assert(second[1].settings[1] == "ips-enable-research_gears")
 

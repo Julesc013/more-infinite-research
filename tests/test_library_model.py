@@ -107,12 +107,17 @@ class LibraryModelTests(unittest.TestCase):
           for _, row in ipairs(first) do first_by_id[row.id], families[row.family] = row, true end
           for _, row in ipairs(second) do second_by_id[row.id] = row end
           local gear = first_by_id["recipe-prod-research_gears-1"]
-          assert(#first == 53 and gear and gear.family == "research_gears" and gear.recipe == "iron-gear-wheel")
+          local science = first_by_id["recipe-prod-research_science_pack_productivity-1"]
+          assert(#first == 54 and gear and gear.family == "research_gears" and gear.recipe == "iron-gear-wheel")
           assert(families.research_gears and families["braking-force"])
           assert(first_by_id["braking-force-8"].cap_setting == "mir-max-level-braking-force")
           assert(not families.research_agricultural_growth_speed and not families.research_spoilage_preservation)
           assert(gear.cap_setting == "ips-max-level-research_gears")
           assert(#gear.settings == 7 and gear.settings[1] == "ips-enable-research_gears")
+          assert(science and science.family == "research_science_pack_productivity"
+            and science.setting == "ips-enable-research_science_pack_productivity"
+            and science.cap_setting == "ips-max-level-research_science_pack_productivity"
+            and #science.settings == 7)
           gear.settings[1] = "foreign"; gear.id = "foreign"
           assert(second_by_id["recipe-prod-research_gears-1"]
             and second_by_id["recipe-prod-research_gears-1"].settings[1] == "ips-enable-research_gears")
