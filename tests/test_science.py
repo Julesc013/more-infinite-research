@@ -1034,10 +1034,11 @@ class ScienceTests(unittest.TestCase):
             for _, value in ipairs(values or {}) do if value[1] == wanted then return value[2] end end
             return nil
           end
-          local function raw_world()
-            local selected = bindings.select({id="f210"}, {})
+          local function raw_world(target)
+            target = target or "f210"
+            local selected = bindings.select({id=target}, {})
             local raw = raw_with(selected.official, {whole=selected.official})
-            install_sources(raw, false, "f210")
+            install_sources(raw, false, target)
             raw.item["iron-plate"] = {name="iron-plate"}
             raw.technology["authored-gate"] = {}
             return raw
@@ -1061,12 +1062,12 @@ class ScienceTests(unittest.TestCase):
             if kind == "missing" then raw.recipe[PACK] = nil
             else raw.recipe[PACK] = {enabled=false, results={{type="fluid",name=PACK,amount=1}}} end
           end
-          local function run(kind, reversed, policy, count_rows)
-            local raw = raw_world()
+          local function run(target, kind, reversed, policy, count_rows)
+            local raw = raw_world(target)
             failed(raw, kind); add_replacements(raw, reversed)
             local rows = {}
             for index = 1, count_rows or 1 do rows[index] = technology({{"chemical-science-pack",7}}, {"authored-gate"}) end
-            local reports, context = science.apply_family(rows, nil, {raw=raw,target={id="f210"},options={
+            local reports, context = science.apply_family(rows, nil, {raw=raw,target={id=target},options={
               ["mir-science-pack-ingredient-policy"]=policy}})
             for _, row in ipairs(rows) do
               assert(row.enabled and amount(row.unit.ingredients,"chemical-science-pack")==7)
@@ -1079,11 +1080,13 @@ class ScienceTests(unittest.TestCase):
               "failed named source did not make exactly one bounded direct-source pass")
             return names(rows[1].unit.ingredients), table.concat(rows[1].prerequisites,",")
           end
-          for _, policy in ipairs({"all", "all-official"}) do
-            local forward = {run("missing",false,policy,19)}
-            local reversed = {run("invalid",true,policy,19)}
-            assert(forward[1]==reversed[1] and forward[2]==reversed[2],
-              "canonical failure kind or producer insertion order changed selected replacement")
+          for _, target in ipairs({"f200", "f210"}) do
+            for _, policy in ipairs({"all", "all-official"}) do
+              local forward = {run(target,"missing",false,policy,19)}
+              local reversed = {run(target,"invalid",true,policy,19)}
+              assert(forward[1]==reversed[1] and forward[2]==reversed[2],
+                target .. " canonical failure kind or producer insertion order changed selected replacement")
+            end
           end
 
           local raw = raw_world()
