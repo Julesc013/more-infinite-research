@@ -140,6 +140,27 @@ end
 -- a provider or its ownership preference changes. They are explicit authored
 -- rows, independent of whether the provider is currently installed.
 require("research.native_credit_definitions").append(technologies, data.raw, values, require("platform.target"))
+-- A foreign data-updates stage may remove an authored recipe while retaining
+-- its product through other producers. Keep the collected replacement effects
+-- and compact only missing targets out of our detached emission. This visits
+-- the finite owned effect vectors, never foreign technologies or recipe trees.
+for _, technology in ipairs(technologies) do
+  local effects, retained = technology.effects or {}, 0
+  local count = #effects
+  for index = 1, count do
+    local effect = effects[index]
+    if effect.type ~= "change-recipe-productivity" or data.raw.recipe[effect.recipe] then
+      retained = retained + 1
+      if retained ~= index then effects[retained] = effect end
+    elseif values.options["mir-debug-recipe-matches"] == true and type(log) == "function" then
+      log("[more-infinite-research] withheld missing recipe target family=" .. technology.name .. " recipe=" .. effect.recipe)
+    end
+  end
+  for index = count, retained + 1, -1 do effects[index] = nil end
+  -- Preserve historical identities and leave existing empty carriers as authored.
+  if count > 0 and retained == 0 then technology.enabled = false end
+end
+
 generator.install(technologies, data)
 if modern then
   modern.apply_native_owner_patches(native_owner_patches)

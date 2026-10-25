@@ -691,6 +691,81 @@ class GeneratorTests(unittest.TestCase):
             "native-owner failure applied an earlier owner patch")
         ''')
 
+    def test_complete_data_final_accepts_named_science_replacement_without_dangling_effects(self):
+        self.lua.globals().named_replacement_fixture = (
+            ROOT / "tests/fixtures/named-science-replacement").as_posix()
+        self.lua.execute('''
+          mods = {['space-age']='2.1.23'}
+          package.loaded["research.settings"] = nil
+          local startup = {}
+          for _, spec in ipairs(require("research.settings").prototypes()) do
+            startup[spec.name] = {value=spec.default_value}
+          end
+          startup["mir-science-pack-ingredient-policy"].value = "all"
+          settings, data, helpers, log = {startup=startup}, full_world(mods), nil, function() end
+          data.raw.item['iron-plate'] = {type='item', name='iron-plate'}
+          table.deepcopy = function(value)
+            if type(value) ~= "table" then return value end
+            local out = {}; for key, child in pairs(value) do out[key] = table.deepcopy(child) end
+            return out
+          end
+          function data:extend(rows)
+            self.writes = self.writes + 1; self.emitted = rows
+            for _, row in ipairs(rows) do
+              self.raw[row.type] = self.raw[row.type] or {}
+              assert(self.raw[row.type][row.name] == nil, "duplicate publication")
+              self.raw[row.type][row.name] = row
+            end
+          end
+          dofile(named_replacement_fixture .. "/data-updates.lua")
+          data.writes, data.emitted = 0, nil
+          local ok, message = pcall(dofile, data_final_path)
+          assert(ok, tostring(message))
+          assert(data.writes == 1, "catalogue was not published once")
+          dofile(named_replacement_fixture .. "/data-final-fixes.lua")
+          local science = data.raw.technology['recipe-prod-research_science_pack_productivity-1']
+          assert(science and science.enabled ~= false and #science.effects == 13)
+          local recipes = {}
+          for _, row in ipairs(data.emitted) do
+            for _, effect in ipairs(row.effects or {}) do
+              if effect.type == 'change-recipe-productivity' then
+                assert(data.raw.recipe[effect.recipe], 'dangling recipe effect ' .. effect.recipe)
+              end
+            end
+          end
+          for _, effect in ipairs(science.effects) do
+            recipes[effect.recipe] = true
+            assert(effect.change == .1, 'replacement changed authored productivity')
+          end
+          assert(not recipes['electromagnetic-science-pack'])
+          assert(recipes['a-mir473-circular-electromagnetic-science']
+            and recipes['z-mir473-seeded-electromagnetic-science'])
+        ''')
+
+    def test_missing_last_recipe_keeps_disabled_owned_identity(self):
+        self.lua.execute('''
+          settings, mods, helpers, log = {startup=defaults()}, {}, nil, function() end
+          data = full_world(mods)
+          data.raw.recipe['engine-unit'] = nil
+          local foreign = {enabled=true, effects={{type='change-recipe-productivity',
+            recipe='foreign-missing-recipe', change=.7}}}
+          data.raw.technology['unrelated-foreign-research'] = foreign
+          local ok, message = pcall(dofile, data_final_path)
+          assert(ok, tostring(message))
+          assert(data.writes == 1)
+          local found = false
+          for _, row in ipairs(data.emitted) do
+            if row.name == 'recipe-prod-research_engine-1' then
+              found = true
+              assert(row.enabled == false and #row.effects == 0,
+                'missing target dropped its historical identity or left empty research enabled')
+            end
+          end
+          assert(found and data.raw.technology['unrelated-foreign-research'] == foreign)
+          assert(foreign.enabled and foreign.effects[1].recipe == 'foreign-missing-recipe'
+            and foreign.effects[1].change == .7, 'foreign technology was changed')
+        ''')
+
     def test_science_policy_is_applied_to_the_whole_owned_catalogue_before_publication(self):
         self.lua.execute('''
           settings, mods, helpers, log = {startup=defaults()}, {}, nil, function() end
