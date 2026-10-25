@@ -7,8 +7,8 @@
   "native_run": {
     "run": 40185834442,
     "url": "https://github.com/Julesc013/mir-native-worker/actions/runs/40185834442",
-    "external_workflow_controller": "5036c30fa5a999b9d6b8c21c437eed6ce5c2aab2",
-    "controller_is_artifact_attested_source": false
+    "controller_commit_recorded_in_preparation": "5036c30fa5a999b9d6b8c21c437eed6ce5c2aab2",
+    "controller_code_bytes_attested_by_artifact": false
   },
   "source": {
     "fixture_commit": "fa1146e9778ecf7fc1b80449a2deec7ee0083ec3",
@@ -130,7 +130,7 @@
     }
   },
   "create_only_policy_cases": {
-    "meaning": "These are native CreateOnly/runtime-load observations, not laboratory runs; every witness records fresh candidate rows, no retired Space science/prerequisite and no storage or native-state writes.",
+    "meaning": "These are native CreateOnly/runtime-load observations, not laboratory runs; every fixture-observer witness records fresh candidate rows, no retired Space science/prerequisite and no storage or native-state writes. Those observer fields are not a global bootstrap audit.",
     "f210": [
       {"leaf": "c1", "policy": "configured", "result": "f210/c1/result.json", "sha256": "6C0A8C5A5AC9996ABCD2F7BA0DBF0A638818DF492099D511C443721A99B9D51C"},
       {"leaf": "c2", "policy": "space", "result": "f210/c2/result.json", "sha256": "F83EE4CAC51F7A0007645428AAE060B117778AF638538591365397EF65F58C6A"},
@@ -239,7 +239,7 @@
   "limits": [
     "This is a new fa114/41b and current 4D5E/76D4 execution. It does not relabel the older source333/1ca selected-F200 result or any earlier F210 external-closure adverse.",
     "The 16 policy arms are CreateOnly/runtime-load observations, not gameplay or laboratory qualification. The four p/s configured stages are the bounded real-lab/save/reload evidence.",
-    "The external workflow controller is observed provenance only; it is not an artifact-manifest attestation.",
+    "The external workflow head matches the controller_commit recorded in the manifest-hashed preparation JSON; the artifact does not cryptographically attest executed controller or code bytes.",
     "Original configurations, complete logs, saves, player data, archives and other payloads remain in primary custody. The capsule carries only privacy-reviewed original JSON metadata and one labelled derived readback.",
     "No client, multiplayer, elapsed-time, memory, arbitrary-modpack, publication or release verdict follows."
   ]
