@@ -32,6 +32,7 @@ $controls = @(
   [ordered]@{path='tests/test_atan_productivity.py';lua=$true},
   [ordered]@{path='tests/test_atan_gameplay_fixture.py';lua=$true},
   [ordered]@{path='tests/test_full_catalogue_upgrade_fixture.py';lua=$true},
+  [ordered]@{path='tests/test_full_catalogue_upgrade_f210_fixture.py';lua=$true},
   [ordered]@{path='tests/test_fixed_provider_removal_control_fixture.py';lua=$true},
   [ordered]@{path='tests/test_automatic_families.py';lua=$true},
   [ordered]@{path='tests/test_competing_productivity.py';lua=$true},
