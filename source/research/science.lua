@@ -775,6 +775,55 @@ local function direct_recipe_packs(recipe, wanted)
   return packs, initial
 end
 
+-- The two admitted direct-source paths differ only in which packs authorize a
+-- pass and where they cache the result. Keep their recipe/owner selection
+-- identical: every accepted candidate remains a flat direct seed, and a
+-- canonical name can never decide the tie-break.
+local function collect_direct_sources(context, selected, view, wanted, recipe_visits, technology_visits)
+  local chosen, pending = {}, {}
+  local function choose(pack, recipe, owner)
+    local previous = chosen[pack]
+    if previous and previous.owner == nil and owner ~= nil then return end
+    if not previous or (previous.owner ~= nil and owner == nil)
+      or (previous.owner == nil) == (owner == nil) and (recipe < previous.recipe
+        or recipe == previous.recipe and (owner or "") < (previous.owner or "")) then
+      chosen[pack] = {kind = owner and "recipe-unlock" or "initial-recipe", pack = pack,
+        recipe = recipe, owner = owner}
+    end
+  end
+  for name, recipe in pairs(type(context.raw.recipe) == "table" and context.raw.recipe or {}) do
+    context[recipe_visits] = context[recipe_visits] + 1
+    if type(name) == "string" and name ~= "" then
+      local packs, initial = direct_recipe_packs(recipe, wanted)
+      if packs and next(packs) then
+        if initial then for pack in pairs(packs) do choose(pack, name) end else pending[name] = packs end
+      end
+    end
+  end
+  for recipe, packs in pairs(pending) do
+    for pack in pairs(packs) do if chosen[pack] then packs[pack] = nil end end
+    if next(packs) == nil then pending[recipe] = nil end
+  end
+  if next(pending) then
+    local seeds = declared_seed_packs(context, selected, view)
+    for name, owner in pairs(type(context.raw.technology) == "table" and context.raw.technology or {}) do
+      context[technology_visits] = context[technology_visits] + 1
+      if type(name) == "string" and name ~= "" and type(owner) == "table" then
+        local eligible
+        for _, effect in ipairs(type(owner.effects) == "table" and owner.effects or {}) do
+          local packs = type(effect) == "table" and effect.type == "unlock-recipe" and pending[effect.recipe] or nil
+          if packs then
+            if eligible == nil then eligible = direct_craft_seed(owner, context, view)
+              or direct_research_seed(owner, context, view, seeds) end
+            if eligible then for pack in pairs(packs) do choose(pack, effect.recipe, name) end end
+          end
+        end
+      end
+    end
+  end
+  return chosen
+end
+
 -- The opt-in `all` policy needs one bounded collection for unfamiliar lab
 -- inputs. Admit only direct sources; never traverse foreign prerequisites,
 -- infer factory acquisition, or treat a union of labs as one accepting lab.
@@ -791,46 +840,8 @@ local function bind_fresh_sources(context, selected, view, source)
   -- An existing foreign ingredient alone never starts collection or acquires
   -- a new gate. A later family may independently need that pack as an addition.
   if not missing then return end
-  local chosen, pending = {}, {}
-  local function choose(pack, recipe, owner)
-    local previous = chosen[pack]
-    if previous and previous.owner == nil and owner ~= nil then return end
-    if not previous or (previous.owner ~= nil and owner == nil)
-      or (previous.owner == nil) == (owner == nil) and (recipe < previous.recipe
-        or recipe == previous.recipe and (owner or "") < (previous.owner or "")) then
-      chosen[pack] = {kind = owner and "recipe-unlock" or "initial-recipe", pack = pack, recipe = recipe, owner = owner}
-    end
-  end
-  for name, recipe in pairs(type(context.raw.recipe) == "table" and context.raw.recipe or {}) do
-    context.fresh_recipe_visits = context.fresh_recipe_visits + 1
-    if type(name) == "string" and name ~= "" then
-      local packs, initial = direct_recipe_packs(recipe, wanted)
-      if packs and next(packs) then
-        if initial then for pack in pairs(packs) do choose(pack, name) end else pending[name] = packs end
-      end
-    end
-  end
-  for recipe, packs in pairs(pending) do
-    for pack in pairs(packs) do if chosen[pack] then packs[pack] = nil end end
-    if next(packs) == nil then pending[recipe] = nil end
-  end
-  if next(pending) then
-    local seeds = declared_seed_packs(context, selected, view)
-    for name, owner in pairs(type(context.raw.technology) == "table" and context.raw.technology or {}) do
-      context.fresh_technology_visits = context.fresh_technology_visits + 1
-      if type(name) == "string" and name ~= "" and type(owner) == "table" then
-        local eligible
-        for _, effect in ipairs(type(owner.effects) == "table" and owner.effects or {}) do
-          local packs = type(effect) == "table" and effect.type == "unlock-recipe" and pending[effect.recipe] or nil
-          if packs then
-            if eligible == nil then eligible = direct_craft_seed(owner, context, view)
-              or direct_research_seed(owner, context, view, seeds) end
-            if eligible then for pack in pairs(packs) do choose(pack, effect.recipe, name) end end
-          end
-        end
-      end
-    end
-  end
+  local chosen = collect_direct_sources(context, selected, view, wanted,
+    "fresh_recipe_visits", "fresh_technology_visits")
   context.fresh_source_contracts = chosen
   selected.pack_prerequisites = selected.pack_prerequisites or {}
   for pack, contract in pairs(chosen) do
@@ -857,48 +868,8 @@ local function collect_direct_replacements(context, selected, view)
   end
   if next(wanted) == nil then return end
 
-  local chosen, pending = {}, {}
-  local function choose(pack, recipe, owner)
-    local previous = chosen[pack]
-    if previous and previous.owner == nil and owner ~= nil then return end
-    if not previous or (previous.owner ~= nil and owner == nil)
-      or (previous.owner == nil) == (owner == nil) and (recipe < previous.recipe
-        or recipe == previous.recipe and (owner or "") < (previous.owner or "")) then
-      chosen[pack] = {kind = owner and "recipe-unlock" or "initial-recipe", pack = pack,
-        recipe = recipe, owner = owner}
-    end
-  end
-  for name, recipe in pairs(type(context.raw.recipe) == "table" and context.raw.recipe or {}) do
-    context.direct_replacement_recipe_visits = context.direct_replacement_recipe_visits + 1
-    if type(name) == "string" and name ~= "" then
-      local packs, initial = direct_recipe_packs(recipe, wanted)
-      if packs and next(packs) then
-        if initial then for pack in pairs(packs) do choose(pack, name) end else pending[name] = packs end
-      end
-    end
-  end
-  for recipe, packs in pairs(pending) do
-    for pack in pairs(packs) do if chosen[pack] then packs[pack] = nil end end
-    if next(packs) == nil then pending[recipe] = nil end
-  end
-  if next(pending) then
-    local seeds = declared_seed_packs(context, selected, view)
-    for name, owner in pairs(type(context.raw.technology) == "table" and context.raw.technology or {}) do
-      context.direct_replacement_technology_visits = context.direct_replacement_technology_visits + 1
-      if type(name) == "string" and name ~= "" and type(owner) == "table" then
-        local eligible
-        for _, effect in ipairs(type(owner.effects) == "table" and owner.effects or {}) do
-          local packs = type(effect) == "table" and effect.type == "unlock-recipe" and pending[effect.recipe] or nil
-          if packs then
-            if eligible == nil then eligible = direct_craft_seed(owner, context, view)
-              or direct_research_seed(owner, context, view, seeds) end
-            if eligible then for pack in pairs(packs) do choose(pack, effect.recipe, name) end end
-          end
-        end
-      end
-    end
-  end
-  context.direct_replacement_sources = chosen
+  context.direct_replacement_sources = collect_direct_sources(context, selected, view, wanted,
+    "direct_replacement_recipe_visits", "direct_replacement_technology_visits")
 end
 
 local function direct_replacement_contract(context, selected, view, pack, contract)
