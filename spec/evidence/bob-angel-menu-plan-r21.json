@@ -84,7 +84,7 @@
   ],
   "previous_plan": "spec/evidence/bob-angel-menu-plan-r20.json",
   "changed_inputs": [
-    "Advance the R20 candidate fromfa1146e9/player tree41b78703 to5658246a/player treeb1d04b99 before any R21 native preparation or timing. F200 isB42BAEB8/552716 bytes with inventory77DBB02D at D:/Projects/Factorio/mir5-current-assets-5658246a-r01. Exact nine-edition rebuild/readback is retained; seven historical ZIPs are unchanged.",
+    "Advance the R20 candidate fromfa1146e9/player tree41b78703 to5658246a/player treeb1d04b99 before any R21 native preparation or timing. F200 isB42BAEB8/552716 bytes with inventory77DBB02D at D:/Projects/Factorio/mir5-current-assets-5658246a-r01. Exact nine-edition rebuild/readback is retained; all nine archives change only compatibility/science_bindings.lua and research/science.lua and are756bytes larger than the preceding freeze.",
     "The accepted current source restores the bounded published4.7.3 named direct-recipe replacement. This changes candidate source/package identity only; it does not alter the Bob/Angel profile, independent intent, arms, endpoint, cache policy, resource reserves, or measurement thresholds.",
     "All fourteen raw-Git helpers at565 are byte-identical to R20's fa114 helper records. No measurement, ownership, obstruction, governor or cleanup predicate changes.",
     "Preserve complete Bob/Angel selection, independent148-record intent, published archive, four arms,38 launches, A/A0.5 seconds and5 percent, control0.5 seconds,50 percent MIR-added-time improvement objective, cache/configuration and resources. Fresh complete candidate/default and published/replay equality plus current owned-window diagnostic still precede timings.",
@@ -163,9 +163,22 @@
   "prior_predeclaration_commit": "6eaa7ccc8c70605917da4d2b3c1cfcb93ea181a9",
   "preparation_or_timing_started_for_prior_revision": true,
   "prior_revision_observation": {
-    "scope": "R20 plan revision6eaa7ccc completed the four native preparation data arms and its owned-menu diagnostic at run40193047957, then the controller refused before Invoke-MenuComparison when its executed CRLF health-script SHA256 differed from the raw-Git LF hash. The recorded CRLF bytes normalize from raw Git without a BOM. The run starts zero timing samples; it is not a stale-controller, prototype, or timing failure and is not R21 evidence.",
+    "scope": "R20 plan revision6eaa7ccc completed the four native preparation data arms and its owned-menu diagnostic at run40193047957, then the controller refused before Invoke-MenuComparison when its executed CRLF health-script SHA256 differed from the raw-Git LF hash. Exact LF-to-CRLF bytes without a BOM reproduce the recorded executed workspace hash; raw-Git and executed byte identities remain separate. The run starts zero timing samples; it is not a stale-controller, prototype, or timing failure and is not R21 evidence.",
     "offline_custody": "build/mir5/aero-menu-r20-40193047957-review.json",
-    "native_adverse": "spec/evidence/bob-angel-menu-preparation-and-adverse-chain.json",
+    "r20_run_url": "https://github.com/Julesc013/mir-native-worker/actions/runs/40193047957",
+    "r20_artifact": {
+      "manifest_sha256": "CFF46C22EA55E67551AC8E90DF0CE4858743BA56DFD79F9C2B5676AE5B06D5C8",
+      "verified_members": 111,
+      "transport_bytes": 38691632,
+      "transport_sha256": "B147B98D067A2577E2A1DCFCE38EB2B43F2980A0120D4A7544574DE7055F5ED2",
+      "timing_samples_started": 0
+    },
+    "r20_health_script_byte_attestation": {
+      "raw_git_sha256": "D610BE142BF948C2CE5C5BAE4FE29822D84C75114EC5A7BF0A9D6F719CB7CDE1",
+      "executed_crlf_sha256": "1419A9965FD53D6CECEBD2CAB419B7756B0177D5A3503A1BC362AE37275A5CE5",
+      "execution_reproduction": "Exact raw LF bytes converted to CRLF without a BOM reproduce the executed workspace SHA256; neither identity is substituted for the other."
+    },
+    "earlier_native_adverse": "spec/evidence/bob-angel-menu-preparation-and-adverse-chain.json",
     "earlier_r12_adverse": "spec/evidence/bob-angel-menu-r12-preparation-adverse-chain.json"
   }
 }
