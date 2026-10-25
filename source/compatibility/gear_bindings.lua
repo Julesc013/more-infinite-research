@@ -26,6 +26,10 @@ local function checked_copy(binding, raw)
     end
     recipes[index] = name
   end
+  if binding.preflight ~= nil then
+    if type(binding.preflight) ~= "function" then error("MIR gear binding has an invalid native preflight", 2) end
+    binding.preflight(raw)
+  end
   return {profile = binding.profile, icon = binding.icon, recipes = recipes}
 end
 
