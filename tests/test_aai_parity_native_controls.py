@@ -4,18 +4,14 @@ from __future__ import annotations
 
 from copy import deepcopy
 from pathlib import Path
+import argparse
 import json
-import os
 import sys
 import unittest
 
 
 ROOT = Path(__file__).resolve().parents[1]
 FIXTURE = ROOT / "tests" / "fixtures" / "aai-parity-native"
-RUNTIME_CANDIDATES = (
-    os.environ.get("MIR5_LUA_RUNTIME"),
-    "D:/Projects/Factorio/more-infinite-research/build/tmp/mir421-lua-runtime",
-)
 BASE_SCIENCE = [
     ["automation-science-pack", 1],
     ["logistic-science-pack", 1],
@@ -53,13 +49,6 @@ def py(value):
             return [py(value[key]) for key in range(1, max(keys) + 1)]
         return {key: py(value[key]) for key in keys}
     return value
-
-
-def runtime_dir():
-    for candidate in RUNTIME_CANDIDATES:
-        if candidate and Path(candidate).is_dir():
-            return Path(candidate)
-    raise RuntimeError("pinned Lua runtime is unavailable")
 
 
 def raw_fixture():
@@ -100,7 +89,7 @@ def raw_fixture():
 class AaiParityNativeControls(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        sys.path.insert(0, str(runtime_dir()))
+        sys.path.insert(0, str(LUA_RUNTIME_DIR.resolve(strict=True)))
         from lupa.lua52 import LuaRuntime
 
         cls.LuaRuntime = LuaRuntime
@@ -208,9 +197,14 @@ class AaiParityNativeControls(unittest.TestCase):
               end
               local player=force(1)
               local surface={}
+              local electric_lab_creations=0
               function surface.find_entities_filtered() return {} end
               function surface.create_entity(spec)
                 if spec.name=="burner-lab" or spec.name=="lab" then
+                  if spec.name=="lab" then
+                    electric_lab_creations=electric_lab_creations+1
+                    assert(electric_lab_creations==1,"successor tried to place a lab over the source lab")
+                  end
                   local input,fuel=inventory(),inventory()
                   return {valid=true,energy=0,get_inventory=function(slot) assert(slot==1);return input end,get_fuel_inventory=function()return fuel end}
                 end
@@ -219,14 +213,22 @@ class AaiParityNativeControls(unittest.TestCase):
                 local entity={valid=true,fluidbox={}}
                 entity.get_inventory=function(slot) if slot==3 then return input elseif slot==4 then return output end error("unexpected assembler slot") end
                 entity.get_module_inventory=function() return nil end
-                entity.set_recipe=function(name) assert(name=="electric-engine-unit");return true end
+                entity.set_recipe=function(name) assert(name=="electric-engine-unit");return {} end
+                entity.get_recipe=function() return {name="electric-engine-unit"} end
+                local pending, delay=0,0
                 return setmetatable(entity,{__index=function(_,key)
                   if key=="energy" then return 0 end
                 end,__newindex=function(target,key,value)
                   if key=="energy" and input.get_item_count("steel-plate")>=20 then
                     input.counts["steel-plate"],input.counts["electronic-circuit"],input.counts["electric-motor"]=0,0,0
                     local amount=player.recipes["electric-engine-unit"].productivity_bonus==0 and 10 or 11
-                    output.counts["electric-engine-unit"]=(output.counts["electric-engine-unit"] or 0)+amount
+                    output.counts["electric-engine-unit"]=(output.counts["electric-engine-unit"] or 0)+amount-1
+                    pending,delay=1,1
+                  elseif key=="energy" and pending>0 then
+                    if delay>0 then delay=delay-1 else
+                      output.counts["electric-engine-unit"]=output.counts["electric-engine-unit"]+pending
+                      pending=0
+                    end
                   elseif key~="energy" then rawset(target,key,value) end
                 end})
               end
@@ -266,12 +268,18 @@ class AaiParityNativeControls(unittest.TestCase):
                 assert(pcall(callbacks.events[2]))
               end
               assert(pcall(callbacks.events[2]))
+              assert(storage.mir5_aai_parity_native.phase=="physical-before",
+                "empty inputs were mistaken for the last completed craft")
+              assert(player.current_research==nil)
+              assert(pcall(callbacks.events[2]))
               assert(player.current_research and player.current_research.name=="recipe-prod-research_electric_engine-1")
               local owner=player.technologies["recipe-prod-research_electric_engine-1"]
               owner.level=2;player.recipes["electric-engine-unit"].productivity_bonus=.1;player.current_research=nil;player.research_queue={}
               assert(pcall(callbacks.events[1],{by_script=false,research=owner}))
-              assert(pcall(callbacks.events[2]));assert(pcall(callbacks.events[2]))
+              assert(pcall(callbacks.events[2]));assert(pcall(callbacks.events[2]));assert(pcall(callbacks.events[2]))
               local state=storage.mir5_aai_parity_native
+              assert(state.burner_lab.active==false and state.electric_lab.active==false,
+                "published queued progress was left under a powered active lab")
               local source={phase=state.phase,aai=state.aai_finished,mir=state.mir_labs,before=state.before_output,after=state.after_output,queue=player.research_progress,saves=saves,markers=markers}
               local successor={events={}}
               local current={base="2.1.23",["aai-industry"]="0.7.5",["more-infinite-research"]="5.0.21000",["mir-fixture-mir5-aai-parity-native"]="0.2.0"}
@@ -390,5 +398,11 @@ class AaiParityNativeControls(unittest.TestCase):
 
 
 if __name__ == "__main__":
-    parser = unittest.main
-    parser()
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--lua-runtime-dir", type=Path, required=True)
+    arguments = parser.parse_args()
+    LUA_RUNTIME_DIR = arguments.lua_runtime_dir
+    result = unittest.TextTestRunner(verbosity=2).run(
+        unittest.defaultTestLoader.loadTestsFromTestCase(AaiParityNativeControls)
+    )
+    sys.exit(0 if result.wasSuccessful() else 1)

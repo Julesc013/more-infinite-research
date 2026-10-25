@@ -6,6 +6,8 @@ The published `0.1.0` stage validates the independently retained AAI and publish
 
 It physically crafts ten `electric-engine-unit` batches before and after the first actual MIR completion in an unmoduled, unbeaconed `assembling-machine-2`. The exact raw recipe remains lubricant 40, steel plate 2, electronic circuit 4, electric motor 2, ten seconds, and one base result. The post-research batch is expected to emit eleven units under the retained `+0.10` effect; native execution remains required to establish that engine witness.
 
+The disposable world runs at game speed16 without a timing claim. Physical completion waits for the final craft's actual output after inputs are consumed. The source freezes both labs before recording42-percent work, and the successor reuses the preserved electric lab. The accumulated21 physical items remain checked after migration and each reload. Run host controls with the explicit pinned `--lua-runtime-dir`; no machine-local path is a fallback.
+
 The source save records player queued work at 42 percent and a distinct paused force at 27 percent. The `0.2.0` successor must load the immutable published save, preserve both witnesses, finish the queued MIR level in a real lab, and save. The runner then requires two cold reloads; `on_load` only snapshots and reads durable state.
 
 Root-owned profiles and a controller must supply the exact Base or complete Space Age closure, AAI/MIR/observer archives, immutable source-save hand-off, and both reloads. This fixture does not claim a Base-to-Space-Age migration, downgrade, AAI add/remove behavior, clients, performance, or release acceptance.

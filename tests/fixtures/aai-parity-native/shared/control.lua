@@ -116,7 +116,11 @@ local function start_physical_batch(state, after_research)
   if entity == nil then
     entity = game.surfaces[1].create_entity{name="assembling-machine-2", position={6, 0}, force=force}
     if entity == nil or entity.valid == false then fail("could not create electric-engine assembler") end
-    if entity.set_recipe("electric-engine-unit") ~= true then fail("could not select electric-engine recipe") end
+    local removed = entity.set_recipe("electric-engine-unit")
+    local selected = entity.get_recipe()
+    if type(removed) ~= "table" or next(removed) ~= nil or selected == nil or selected.name ~= "electric-engine-unit" then
+      fail("could not select electric-engine recipe without displaced items")
+    end
     state.machine = entity
   end
   assert_no_beacon_or_modules(entity)
@@ -144,10 +148,12 @@ local function physical_batch_finished(state)
   end
   local output = inventory(entity, defines.inventory.assembling_machine_output, "assembler output")
   local produced = output.get_item_count("electric-engine-unit") - state.production.before
-  if produced ~= state.production.expected then
+  -- Ingredients leave the input inventory when the last craft starts. Wait
+  -- for its real output instead of rejecting that normal in-flight state.
+  if produced > state.production.expected then
     fail("physical electric-engine output differs: " .. tostring(produced) .. " expected " .. tostring(state.production.expected))
   end
-  return true
+  return produced == state.production.expected
 end
 
 local function assert_owner(force, expected_level, expected_bonus)
@@ -206,6 +212,10 @@ local function assert_snapshot(state, successor)
   end
   local paused = game.forces[state.paused_index]
   if paused == nil or not close(technology(paused, OWNER).saved_progress, .27) then fail("paused AAI source witness differs") end
+  if not state.machine or not state.machine.valid
+      or inventory(state.machine, defines.inventory.assembling_machine_output, "saved assembler output").get_item_count("electric-engine-unit") ~= 21 then
+    fail("saved physical electric-engine output differs")
+  end
 end
 
 local function marker(stage, state)
@@ -224,6 +234,8 @@ end
 local function source_init()
   local space = check_closure()
   local force = game.forces.player
+  force.research_queue_enabled = true
+  game.speed = 16 -- Disposable physical fixture only; no timing claim.
   assert_lab_chain(force)
   local burner = create_burner_lab(force)
   storage[KEY] = {phase="aai-progression", profile=space and "space-age" or "base", space=space, burner_lab=burner,
@@ -272,6 +284,8 @@ local function source_tick()
   elseif state.phase == "physical-after" then
     if physical_batch_finished(state) then
       state.after_output = state.production.expected
+      state.burner_lab.active, state.burner_lab.energy = false, 0
+      state.electric_lab.active, state.electric_lab.energy = false, 0
       state.paused_index = queue_witness(force, technology(force, OWNER))
       state.source_snapshot = snapshot(state)
       state.phase = "source-complete"
@@ -287,7 +301,9 @@ local function successor_config()
   check_closure()
   assert_snapshot(state, false)
   local force = game.forces.player
-  state.electric_lab = create_electric_lab(force, state.space)
+  if not state.electric_lab or not state.electric_lab.valid then fail("source electric lab was lost") end
+  state.electric_lab.active = true
+  state.electric_lab.energy = LAB_ENERGY
   state.phase, state.deadline, state.successor_labs = "successor-research", game.tick + DEADLINE_TICKS, 0
 end
 
