@@ -1510,7 +1510,13 @@
           {
             "from": "2.0.77",
             "to": "2.1.23",
-            "status": "unrun-requires-supported-save-route-and-exact-profile"
+            "status": "exact-4.7.20003-source-and-corrected-F210-successor-prepared-native-unrun",
+            "profiles": [
+              "tests/profiles/full-catalogue-cross-f200-f210-published-f200-2077.json",
+              "tests/profiles/full-catalogue-cross-f200-f210-mir5-f210-2123.json"
+            ],
+            "fixture_code_commit": "3664d87b8e732be037bdb65167c13ee9d62f0a59",
+            "scope": "Prepared direct published4.7.20003 F200 Base to MIR5 F210 Base route only; this does not qualify MIR5-to-MIR5 game updates, other closures or any native save migration."
           }
         ],
         "official_mod_save_transitions_required": [
@@ -1911,9 +1917,9 @@
     "scope": "Reconcile this named science-binding delta explicitly. Older broad comparisons retain their exact predecessor/package/source scope; reuse requires a reviewed unaffected-input argument, not relabelling as4.7.3 execution."
   },
   "current_candidate": {
-    "source": "b2cf4c2dac43727e2e93cb90b861d2301f7778cd",
-    "player_tree": "25442a5bd7838f124952507854426e3b8e868475",
-    "offline_package_evidence": "spec/evidence/current-assets-b2cf4c2d-readback.json",
+    "source": "8aec3e68e5179ff88765e08efbb82035e64a3212",
+    "player_tree": "697fb2bf789ff906796874853ea0b73520e6ccdc",
+    "offline_package_evidence": "spec/evidence/current-assets-8aec3e68-readback.json",
     "native_qualification_complete": false,
     "release_qualification": false
   },
