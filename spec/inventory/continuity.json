@@ -128,10 +128,15 @@
         {
           "id": "compiler-profile-compatibility-alias",
           "source": [
-            "source/prototypes/mir/settings/compiler_profile.lua",
             "source/research/historical_settings.lua"
           ],
-          "scope": "MIR4 accepts full and classic but normalizes both to full, so MIR5 preserves the hidden saved startup identity without a second output mode."
+          "scope": "MIR4 accepts full and classic but normalizes both to full, so MIR5 preserves the hidden saved startup identity without a second output mode.",
+          "historical_source": {
+            "commit": "84bd157ad7b63b7d171fac2311bf30de70429c11",
+            "paths": [
+              "source/prototypes/mir/settings/compiler_profile.lua"
+            ]
+          }
         },
         {
           "id": "explicit-safe-legacy-selector-boundaries",
@@ -140,7 +145,8 @@
             "source/research/product_target_extension.lua"
           ],
           "evidence": "docs/compatibility/README.md",
-          "scope": "Automatic preview has no compiler-created identities and reports withheld structural fallbacks; inactive DLC artwork falls back safely while mir-use-installed-space-age-icons remains registered."
+          "scope": "Automatic preview has no compiler-created identities and reports withheld structural fallbacks; inactive DLC artwork falls back safely while mir-use-installed-space-age-icons remains registered.",
+          "evidence_revision": "64dc47502206e9055c7f9012d7937fe89d404b84"
         }
       ],
       "test_subjects": [
@@ -466,10 +472,15 @@
         {
           "id": "historical-availability-internal-representation",
           "source": [
-            "source/prototypes/mir/runtime/research_browser_mir_provider.lua",
             "source/presentation/library_model.lua"
           ],
-          "scope": "Historical skip/excluded compiler-plan rows were terminal UI metadata, not earned technology identities. MIR5 retains native disabled-ID views and bounded authored absence facts; previews and unadmitted families do not become delivered technologies merely by appearing in the old ledger."
+          "scope": "Historical skip/excluded compiler-plan rows were terminal UI metadata, not earned technology identities. MIR5 retains native disabled-ID views and bounded authored absence facts; previews and unadmitted families do not become delivered technologies merely by appearing in the old ledger.",
+          "historical_source": {
+            "commit": "84bd157ad7b63b7d171fac2311bf30de70429c11",
+            "paths": [
+              "source/prototypes/mir/runtime/research_browser_mir_provider.lua"
+            ]
+          }
         },
         {
           "id": "current-rendered-client-carrier-regression",
@@ -560,12 +571,16 @@
         },
         {
           "id": "conditional-py-armor-obligation",
-          "source": [
-            "source/prototypes/streams/productivity.lua",
-            "source/prototypes/mir/streams/registry.lua",
-            "source/prototypes/mir/planner/stream_compiler/qualify.lua"
-          ],
-          "scope": "Pinned published4.7 F200/F210 production retains conditional Py and armor emission. Py identity_state=stable-unreleased is metadata, not an emission gate:28 heads/continuations could emit when actual route/ownership/science/lab gates pass. No absence of a current test profile erases this obligation. Existing PowerArmorMK3 outputs do not match the historical armor-item patterns, so it is not a positive armor oracle. Exact native bindings remain open; MIR5 never imports these historical modules."
+          "source": [],
+          "scope": "Pinned published4.7 F200/F210 production retains conditional Py and armor emission. Py identity_state=stable-unreleased is metadata, not an emission gate:28 heads/continuations could emit when actual route/ownership/science/lab gates pass. No absence of a current test profile erases this obligation. Existing PowerArmorMK3 outputs do not match the historical armor-item patterns, so it is not a positive armor oracle. Exact native bindings remain open; MIR5 never imports these historical modules.",
+          "historical_source": {
+            "commit": "84bd157ad7b63b7d171fac2311bf30de70429c11",
+            "paths": [
+              "source/prototypes/streams/productivity.lua",
+              "source/prototypes/mir/streams/registry.lua",
+              "source/prototypes/mir/planner/stream_compiler/qualify.lua"
+            ]
+          }
         },
         {
           "id": "known-profile-transition-guards",
@@ -687,7 +702,7 @@
         {
           "id": "frozen-target-record-layout-prerequisite",
           "source": [
-            "tools/mir5/package.py",
+            "tools/package.py",
             "tests/test_package.py"
           ],
           "scope": "Temporary-Git staged/canonical layouts of the complete current player tree produce identical member hashes and ZIP bytes for all nine editions, preserving codec, exact patch floors, adapters, exclusions and migration filenames. Unsafe and dirty selected records reject before output. This is not the actual reviewed repository cutover or final-layout native qualification."
@@ -992,10 +1007,13 @@
         {
           "id": "active-provider-artwork-boundary",
           "source": [
-            "source/locale",
-            "docs/compatibility/README.md"
+            "source/locale"
           ],
-          "scope": "Inactive Space Age artwork is deliberately not probed; the saved icon setting remains registered and Base uses a safe fallback."
+          "scope": "Inactive Space Age artwork is deliberately not probed; the saved icon setting remains registered and Base uses a safe fallback.",
+          "historical_documentation": {
+            "commit": "64dc47502206e9055c7f9012d7937fe89d404b84",
+            "path": "docs/compatibility/README.md"
+          }
         },
         {
           "id": "complete-published-player-presentation",
@@ -1003,7 +1021,7 @@
             "source/LICENSE",
             "source/thumbnail.png",
             "source/presentation/changelog",
-            "tools/mir5/package.py"
+            "tools/package.py"
           ],
           "evidence": "spec/inventory/package-presentation-472.json",
           "scope": "License, thumbnail and all nine complete changelog histories are byte-recovered from checksum-verified published4.7.2 ZIPs. Packaging adds the shared5.0 entry with the correct target codec and ships only the selected root changelog. Twelve package controls include all-nine staged/canonical member and ZIP identity. Final native/package publication remains pending."
@@ -1082,5 +1100,5 @@
     "native_qualification_complete": false,
     "release_qualification": false
   },
-  "reference_path_policy": "Source and evidence lookup pointers below use the verified canonical layout. Historical execution identities and scopes remain in their unchanged named receipts; a current lookup path does not relabel an old native result."
+  "reference_path_policy": "Current source lookup pointers below use existing canonical paths. Removed MIR4 implementation locators are pinned under historical_source to the original recovery baseline; removed documentation pointers retain an explicit evidence_revision or historical_documentation commit. These source/doc lookups do not relabel historical execution identities or native scopes."
 }
