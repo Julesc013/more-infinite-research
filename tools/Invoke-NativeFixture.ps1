@@ -20,6 +20,12 @@ param(
   [ValidateSet('','published','mir5')][string]$HistoricalTransitionStage='',
   [string]$HistoricalTransitionFixtureMetadataPath='',
   [switch]$CreateOnly,
+  # Active runtime seeds are earned by the selected fixture before the
+  # benchmark loads the save.  This is deliberately narrower than CreateOnly:
+  # agriculture must complete its two real labs before the pending planting
+  # save exists, while repair must stop before its first post-load damage.
+  [switch]$ActiveSeedOnly,
+  [ValidateSet('','repair-stress','agriculture-scale')][string]$ActiveSeedKind='',
   [switch]$MIRAbsent,
   [string]$InputSavePath='',
   [string]$ExpectedInputSaveSha256='',
@@ -43,6 +49,15 @@ function Assert-FixtureLog([string]$Text) {
 function Read-FixtureResult([string]$Text,[string]$Stage) {
   $rows=@([regex]::Matches($Text,'\[MIR5_NATIVE_FIXTURE\] RESULT (\{[^\r\n]+\})') | ForEach-Object {$_.Groups[1].Value | ConvertFrom-Json} | Where-Object {$_.case -ceq $CaseName -and $_.stage -ceq $Stage})
   Assert-Fixture ($rows.Count -eq 1 -and $rows[0].status -ceq 'passed') "missing unique passed $Stage witness for $CaseName"
+  $rows[0]
+}
+function Read-ActiveFixtureMarker([string]$Text,[string]$Kind,[string]$Stage) {
+  Assert-Fixture ($Kind -in @('repair-stress','agriculture-scale') -and $Stage -in @('prepared','start','complete')) 'active fixture marker selector differs'
+  $rows=@([regex]::Matches($Text,'\[MIR5_RUNTIME_ACTIVE\] (\{[^\r\n]+\})') | ForEach-Object {$_.Groups[1].Value | ConvertFrom-Json} | Where-Object {
+    [string]$_.kind -ceq $Kind -and [string]$_.stage -ceq $Stage
+  })
+  $expectedStatus=if($Stage -ceq 'complete'){'passed'}else{'pending'}
+  Assert-Fixture ($rows.Count -eq 1 -and [string]$rows[0].status -ceq $expectedStatus) "missing unique active $Stage witness for $Kind"
   $rows[0]
 }
 function Test-HistoricalFixtureSaveComplete([string]$Path) {
@@ -85,6 +100,19 @@ function Get-FixtureActiveModsObserver([string]$Name,[object[]]$ProfileRows,[obj
   Assert-Fixture ([string]$profileMatches[0].version -ceq [string]$source.version) 'ActiveModsObserver selected version differs from verified FixtureSources input'
   Assert-Fixture ([string]$source.sha256 -cmatch '^[a-fA-F0-9]{64}$') 'ActiveModsObserver verified archive hash is invalid'
   [ordered]@{name=[string]$source.name;version=[string]$source.version;source=[string]$source.source;archive=[string]$source.archive;sha256=[string]$source.sha256}
+}
+function Assert-ActiveFixtureSelection([string]$Kind,[object[]]$ProfileRows,[object[]]$MirRows) {
+  Assert-Fixture ($Kind -in @('repair-stress','agriculture-scale')) 'active seed kind differs'
+  Assert-Fixture ($MirRows.Count -eq 1) 'active seed MIR role differs'
+  $selector=if($Kind -ceq 'repair-stress'){'mir-fixture-mir5-repair-stress-active'}else{'mir-fixture-mir5-agriculture-scale-active'}
+  $selected=@($ProfileRows | Where-Object {[string]$_.name -ceq $selector -and [bool]$_.enabled})
+  Assert-Fixture ($selected.Count -eq 1 -and [string]$selected[0].version -ceq '0.1.0') 'active seed selector differs'
+  $baseFixture=if($Kind -ceq 'repair-stress'){'mir-fixture-mir5-repair-stress'}else{'mir-fixture-mir5-agriculture-scale'}
+  $expectedBaseVersion=if($Kind -ceq 'repair-stress'){
+    if([string]$MirRows[0].version -ceq '4.7.21002'){'0.1.0'}elseif([string]$MirRows[0].version -ceq '5.0.21000'){'0.2.0'}else{''}
+  }else{'0.1.0'}
+  Assert-Fixture (-not [string]::IsNullOrWhiteSpace($expectedBaseVersion)) 'active repair MIR role is unsupported'
+  Assert-Fixture (@($ProfileRows | Where-Object {[string]$_.name -ceq $baseFixture -and [bool]$_.enabled -and [string]$_.version -ceq $expectedBaseVersion}).Count -eq 1) 'active seed base fixture differs'
 }
 function Get-HistoricalFixtureTarget([string]$Target,[string]$MetadataPath) {
   $allowed=@('f013','f014','f015','f016','f017','f100','f110')
@@ -286,6 +314,20 @@ function New-HistoricalFixtureServerSettings([string]$Path,[string]$EngineData,[
   else{$arguments+=@('--bind','127.0.0.1')}
   [pscustomobject][ordered]@{path=$Path;sha256=Get-FixtureSha $Path;visibility=$settings.visibility;auto_pause=$false;arguments=$arguments}
 }
+function New-ModernFixtureServerSettings([string]$Path,[string]$EngineData) {
+  $template=Join-Path $EngineData 'server-settings.example.json'
+  $settings=Get-Content -LiteralPath $template -Raw | ConvertFrom-Json -AsHashtable
+  $settings.name='MIR private native fixture'
+  $settings.description=''
+  $settings.visibility=@{public=$false;lan=$false}
+  $settings.username='';$settings.password='';$settings.token='';$settings.game_password=''
+  $settings.require_user_verification=$false
+  $settings.auto_pause=$false
+  $settings.autosave_interval=0
+  $settings.max_players=1
+  [IO.File]::WriteAllText($Path,($settings | ConvertTo-Json -Depth 10),[Text.UTF8Encoding]::new($false))
+  [pscustomobject][ordered]@{template=$template;template_sha256=Get-FixtureSha $template;path=$Path;sha256=Get-FixtureSha $Path}
+}
 function Invoke-FixtureStage([string]$Name,[string[]]$StageArguments,[scriptblock]$Completion=$null) {
   $live=Join-Path $writeData 'factorio-current.log'
   if(Test-Path -LiteralPath $live){Remove-Item -LiteralPath $live}
@@ -318,6 +360,14 @@ $engineData=Join-Path (Get-Item -LiteralPath $engine).Directory.Parent.Parent.Fu
 $historical=-not [string]::IsNullOrWhiteSpace($HistoricalTarget)
 $historicalTransition=-not [string]::IsNullOrWhiteSpace($HistoricalTransitionStage)
 $historicalFixture=$null
+$activeSeed=[bool]$ActiveSeedOnly
+if($activeSeed){
+  Assert-Fixture ($ActiveSeedKind -in @('repair-stress','agriculture-scale')) 'active seed kind differs'
+  Assert-Fixture (-not $historical -and -not $historicalTransition -and -not $CreateOnly -and -not $MIRAbsent) 'active seed requires a modern installed-MIR fixture run'
+  Assert-Fixture (-not $InputSavePath -and -not $ExpectedInputSaveSha256) 'active seed must begin from its own fresh fixture save'
+  $expectedCase=if($ActiveSeedKind -ceq 'repair-stress'){'repair-stress-active'}else{'agriculture-scale-active'}
+  Assert-Fixture ($CaseName -ceq $expectedCase) 'active seed case differs'
+}
 if($historicalTransition){
   Assert-Fixture $historical 'historical transition requires a historical target'
   Assert-Fixture (-not $CreateOnly -and -not $MIRAbsent) 'historical transition requires an installed MIR predecessor or successor'
@@ -347,7 +397,7 @@ if($historicalTransition){
 }
 $inputSave=$null
 if($InputSavePath -or $ExpectedInputSaveSha256){
-  Assert-Fixture (-not $CreateOnly -and -not $MIRAbsent -and $InputSavePath -and $ExpectedInputSaveSha256 -cmatch '^[a-fA-F0-9]{64}$') 'an input save requires a full fixture run and exact hash'
+  Assert-Fixture (-not $CreateOnly -and -not $activeSeed -and -not $MIRAbsent -and $InputSavePath -and $ExpectedInputSaveSha256 -cmatch '^[a-fA-F0-9]{64}$') 'an input save requires a full fixture run and exact hash'
   $inputSave=(Resolve-Path -LiteralPath $InputSavePath).Path
   Assert-Fixture ((Test-Path -LiteralPath $inputSave -PathType Leaf) -and [IO.Path]::GetExtension($inputSave) -ceq '.zip') 'input save is not a ZIP file'
   Assert-Fixture ((Get-FixtureSha $inputSave) -ceq $ExpectedInputSaveSha256.ToUpperInvariant()) 'input save hash differs'
@@ -377,6 +427,7 @@ if($MIRAbsent){
     }
   }
 }
+if($activeSeed){Assert-ActiveFixtureSelection $ActiveSeedKind $rows $mirRows}
 $fixtureInputs=@();$fixtureBindings=@()
 if($historical){
   $source=(Resolve-Path -LiteralPath $FixtureSources[0]).Path
@@ -418,7 +469,7 @@ $record=[ordered]@{
   historical_target=if($historical){@{id=$historicalFixture.target;metadata_path=$historicalFixture.path;metadata_sha256=$historicalFixture.sha256;factorio_version=$historicalFixture.factorio_version;minimum_base=$historicalFixture.minimum_base;mir_version=$historicalFixture.mir_version}}else{$null}
   historical_transition=if($historicalTransition){@{stage=$HistoricalTransitionStage;published_archive_sha256=[string]$historicalFixture.definition.published_archive_sha256;predecessor_mir_version=[string]$historicalFixture.definition.published_mir_version;successor_mir_version=[string]$historicalFixture.definition.mir_version}}else{$null}
   mir_archive=if($MIRAbsent){$null}else{@{path=$mir[0].path;sha256=$ExpectedMIRArchiveSha256.ToUpperInvariant()}}
-  observation=if($CreateOnly){'native-create-runtime-load-only'}else{'native-fixture-production-and-two-cold-reloads'}
+  observation=if($CreateOnly){'native-create-runtime-load-only'}elseif($activeSeed){'native-active-save-preparation-only'}else{'native-fixture-production-and-two-cold-reloads'}
   input_save=if($inputSave){@{path=$inputSave;sha256=$ExpectedInputSaveSha256.ToUpperInvariant()}}else{$null}
   release_qualification=$false
 }
@@ -469,9 +520,32 @@ try{
     Assert-Fixture (Test-Path -LiteralPath $seed -PathType Leaf) 'seed save absent'
   }
   $record.seed_sha256=Get-FixtureSha $seed
-  if(-not $CreateOnly){
-  $complete=Join-Path $writeData 'saves/mir5-native-complete.zip'
   $live=Join-Path $writeData 'factorio-current.log'
+  if($activeSeed){
+    $activeSave=Join-Path $writeData 'saves/mir5-native-active.zip'
+    if($ActiveSeedKind -ceq 'repair-stress'){
+      $record.active_preparation=@{stage='create';marker=(Read-ActiveFixtureMarker ([IO.File]::ReadAllText($record.create.log)) 'repair-stress' 'prepared')}
+    }else{
+      $server=Join-Path $resources.root 'server-settings.json'
+      $record.server_settings=New-ModernFixtureServerSettings $server $engineData
+      $activeCompletion={
+        if(-not(Test-Path -LiteralPath $live -PathType Leaf)){return $false}
+        $stream=[IO.File]::Open($live,[IO.FileMode]::Open,[IO.FileAccess]::Read,[IO.FileShare]::ReadWrite)
+        $reader=[IO.StreamReader]::new($stream)
+        try{$text=$reader.ReadToEnd()}finally{$reader.Dispose();$stream.Dispose()}
+        Assert-FixtureLog $text
+        if(-not(Test-Path -LiteralPath $activeSave -PathType Leaf)){return $false}
+        try {Read-ActiveFixtureMarker $text 'agriculture-scale' 'prepared'|Out-Null} catch {return $false}
+        return $text.Contains('Saving finished') -and (Test-HistoricalFixtureSaveComplete $activeSave)
+      }.GetNewClosure()
+      $record.active_preparation=Invoke-FixtureStage 'active-prepare' @('--server-settings',$server,'--bind','127.0.0.1','--start-server',$seed) $activeCompletion
+      $record.active_preparation.marker=Read-ActiveFixtureMarker ([IO.File]::ReadAllText($record.active_preparation.log)) 'agriculture-scale' 'prepared'
+    }
+    Assert-Fixture ((Test-Path -LiteralPath $activeSave -PathType Leaf) -and (Test-HistoricalFixtureSaveComplete $activeSave)) 'active fixture save is absent or not closed'
+    $record.active_seed=[ordered]@{path=$activeSave;sha256=Get-FixtureSha $activeSave;marker_stage='prepared';kind=$ActiveSeedKind;physical_work='deferred until the benchmark loads this exact active save';preparation_outside_timed_benchmark=$true}
+    $record.status='passed-private-native-active-seed-preparation'
+  }elseif(-not $CreateOnly){
+  $complete=Join-Path $writeData 'saves/mir5-native-complete.zip'
   $historicalSaveComplete=${function:Test-HistoricalFixtureSaveComplete}
   $completion={
     if(-not(Test-Path -LiteralPath $live -PathType Leaf)){return $false}
@@ -491,18 +565,7 @@ try{
     $record.historical_server_mode='start-server-two-cold-reloads'
   }else{
     $server=Join-Path $resources.root 'server-settings.json'
-    $serverTemplate=Join-Path $engineData 'server-settings.example.json'
-    $serverSettings=Get-Content -LiteralPath $serverTemplate -Raw | ConvertFrom-Json -AsHashtable
-    $serverSettings.name='MIR private native fixture'
-    $serverSettings.description=''
-    $serverSettings.visibility=@{public=$false;lan=$false}
-    $serverSettings.username='';$serverSettings.password='';$serverSettings.token='';$serverSettings.game_password=''
-    $serverSettings.require_user_verification=$false
-    $serverSettings.auto_pause=$false
-    $serverSettings.autosave_interval=0
-    $serverSettings.max_players=1
-    [IO.File]::WriteAllText($server,($serverSettings | ConvertTo-Json -Depth 10),[Text.UTF8Encoding]::new($false))
-    $record.server_settings=@{template=$serverTemplate;template_sha256=Get-FixtureSha $serverTemplate;path=$server;sha256=Get-FixtureSha $server}
+    $record.server_settings=New-ModernFixtureServerSettings $server $engineData
     $record.production=Invoke-FixtureStage 'production' @('--server-settings',$server,'--bind','127.0.0.1','--start-server',$seed) $completion
   }
   $record.production.consumers=Read-ConsumerResults ([IO.File]::ReadAllText($record.production.log)) $ProductionConsumerStage

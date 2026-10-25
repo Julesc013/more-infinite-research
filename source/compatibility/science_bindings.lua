@@ -234,10 +234,11 @@ end
 -- every possible producer: a binding checks only the named source it carries.
 -- Configured ingredients retain their published vector without consulting
 -- this table.
-local function recipe_unlock(pack, owner, prerequisites, trigger)
+local function recipe_unlock(pack, owner, prerequisites, trigger, direct_replacement)
   return {
     kind = "recipe-unlock", pack = pack, recipe = pack, owner = owner,
-    owner_prerequisites = prerequisites, owner_trigger = trigger
+    owner_prerequisites = prerequisites, owner_trigger = trigger,
+    direct_recipe_replacement = direct_replacement == true or nil
   }
 end
 
@@ -248,6 +249,10 @@ end
 local function source_contracts(target, has_space_age, mods)
   local out = {}
   local function put(pack, contract) out[pack] = contract end
+  -- Published 4.7.3 allowed a directly established replacement only for its
+  -- current named recipe sources. Keep that exception opt-in and target
+  -- scoped; older exact bindings still reject a missing named recipe.
+  local direct_replacement = target.id == "f200" or target.id == "f210"
 
   if target.id == "f013" or target.id == "f014" then
     put("science-pack-1", initial_recipe("science-pack-1"))
@@ -286,7 +291,7 @@ local function source_contracts(target, has_space_age, mods)
       -- direct seed, not a missing native owner.
       put(pack, initial_recipe(pack))
     else
-      put(pack, recipe_unlock(pack, pack))
+      put(pack, recipe_unlock(pack, pack, nil, nil, direct_replacement))
     end
   end
   if target.id == "f017" or target.id == "f100" or target.id == "f110" then
@@ -308,16 +313,16 @@ local function source_contracts(target, has_space_age, mods)
     -- Space Age replaces the Base satellite trigger with an explicit recipe
     -- unlock after the asteroid-collector trigger.
     put("space-science-pack", recipe_unlock("space-science-pack", "space-science-pack",
-      {"space-platform"}, {type = "build-entity", entity = "asteroid-collector"}))
-    for _, pack in ipairs(SPACE_AGE) do put(pack, recipe_unlock(pack, pack)) end
+      {"space-platform"}, {type = "build-entity", entity = "asteroid-collector"}, direct_replacement))
+    for _, pack in ipairs(SPACE_AGE) do put(pack, recipe_unlock(pack, pack, nil, nil, direct_replacement)) end
     put("cryogenic-science-pack", recipe_unlock("cryogenic-science-pack", "cryogenic-science-pack",
-      {"cryogenic-plant"}, {type = "craft-item", item = "cryogenic-plant"}))
+      {"cryogenic-plant"}, {type = "craft-item", item = "cryogenic-plant"}, direct_replacement))
     -- A mod may replace this native trigger with an ordinary research unit
     -- (including resource-sourced foreign science). Preserve its named gate;
     -- this does not certify the foreign pack's transitive researchability.
     out["cryogenic-science-pack"].owner_unit_alternative = true
     put("promethium-science-pack", recipe_unlock("promethium-science-pack", "promethium-science-pack",
-      promethium_owner_prerequisites(target, mods)))
+      promethium_owner_prerequisites(target, mods), nil, direct_replacement))
   end
   return out
 end
