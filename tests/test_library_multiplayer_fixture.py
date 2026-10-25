@@ -1189,10 +1189,33 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
           if($nodes.Count -ne 1){throw 'session execution tail missing or ambiguous'}
           $execute=[scriptblock]::Create($text.Substring($nodes[0].Extent.StartOffset))
           function Assert-Session([bool]$Condition,[string]$Message){if(-not$Condition){throw $Message}}
-          function Get-SessionHash([string]$Path){return ('a'*64)}
-          function Read-LogText([string]$Path){return ''}
-          function Get-PairedBrowserStageMarker {param([string]$Text,[string]$Stage,[string]$ExpectedArm) return [pscustomobject]@{stage=$Stage}}
-          function Get-PairedBrowserProfilerMarkers {param([string]$Text,[string[]]$ExpectedActions) return @($ExpectedActions|ForEach-Object {[pscustomobject]@{action=$_;raw_line='marker'}})}
+          function Get-SessionHash([string]$Path){
+            if(Test-Path -LiteralPath $Path){return (Get-FileHash -LiteralPath $Path -Algorithm SHA256).Hash.ToUpperInvariant()}
+            return ('a'*64)
+          }
+          function Read-LogText([string]$Path){if(Test-Path -LiteralPath $Path){return [IO.File]::ReadAllText($Path,[Text.UTF8Encoding]::new($false))};return ''}
+          function Save-PairedBrowserServerPhaseLog([string]$Source,[string]$Phase){
+            if(-not(Test-Path -LiteralPath $Source -PathType Leaf)){throw 'paired Browser phase log source is absent'}
+            $destination=Join-Path $workroot ("paired-browser-server-$Phase.factorio-current.log")
+            if(Test-Path -LiteralPath $destination){throw 'paired Browser phase log snapshot already exists'}
+            [IO.File]::Copy($Source,$destination,$false)
+            return $destination
+          }
+          function Get-PairedBrowserStageMarker {
+            param([string]$Text,[string]$Stage,[string]$ExpectedArm)
+            if($Text -notmatch [regex]::Escape("stage=$Stage arm=$ExpectedArm")){throw "missing paired $Stage stage in phase log"}
+            return [pscustomobject]@{stage=$Stage}
+          }
+          function Get-PairedBrowserProfilerMarkers {
+            param([string]$Text,[string[]]$ExpectedActions)
+            $rows=@()
+            foreach($action in $ExpectedActions){
+              $matches=@([regex]::Matches($Text,[regex]::Escape("[MIR5_LIBRARY_PROFILE] $action ")))
+              if($matches.Count-ne1){throw "profiler action $action differs in phase log"}
+              $rows += [pscustomobject]@{action=$action;raw_line=$matches[0].Value.TrimEnd()}
+            }
+            return @($rows)
+          }
           function Find-Screenshots([string[]]$Stages){
             $count=if($Stages.Count-eq4){8}else{6}
             return [pscustomobject]@{files=@(1..$count|ForEach-Object {Join-Path $output ("paired-capture-"+$_.ToString()+'.png')})}
@@ -1209,6 +1232,27 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
           function Close-ProcessMemoryObservation {param($Record)}
           function Register-MIROwnedProcessMemoryProcess {param($Sampler,$Phase,$Role,$Process) return $null}
           function Start-Server([string]$Name,[string]$Save){
+            $live=Join-Path $serverWriteData 'factorio-current.log'
+            $text=if($Name-ceq'server-initial'){
+              @(
+                '[MIR5_LIBRARY_PAIRED_BROWSER] stage=ready arm=published',
+                '[MIR5_LIBRARY_PAIRED_BROWSER] stage=first-open arm=published',
+                '[MIR5_LIBRARY_PAIRED_BROWSER] stage=search arm=published',
+                '[MIR5_LIBRARY_PAIRED_BROWSER] stage=refresh arm=published',
+                '[MIR5_LIBRARY_PAIRED_BROWSER] stage=restart-ready arm=published',
+                '[MIR5_LIBRARY_PROFILE] first_open Duration: 1.000000ms',
+                '[MIR5_LIBRARY_PROFILE] search Duration: 1.000000ms',
+                '[MIR5_LIBRARY_PROFILE] refresh Duration: 1.000000ms'
+              ) -join "`n"
+            }else{
+              @(
+                'Hosting game at 127.0.0.1',
+                '[MIR5_LIBRARY_PAIRED_BROWSER] stage=reopen arm=published',
+                '[MIR5_LIBRARY_PAIRED_BROWSER] stage=completed arm=published',
+                '[MIR5_LIBRARY_PROFILE] reopen Duration: 1.000000ms'
+              ) -join "`n"
+            }
+            [IO.File]::WriteAllText($live,$text+"`n",[Text.UTF8Encoding]::new($false))
             $record=[pscustomobject]@{name=$Name;closed=$false;process=$null}
             $script:records.Add($record);return $record
           }
@@ -1216,7 +1260,11 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
             if($script:mode -eq 'primary-and-cleanup' -and $Phase -eq 'initial'){
               throw 'original session failure'
             }
+            $ordinal=if($Phase-ceq'initial'){0}else{2}
             foreach($locale in @('en','de')){
+              $ordinal++
+              $name=if($locale-ceq'en'){'MIR5English'}else{'MIR5Deutsch'}
+              [IO.File]::AppendAllText((Join-Path $serverWriteData 'factorio-current.log'),"[MIR5_LIBRARY_PAIRED_BROWSER_JOIN] $name $ordinal`n",[Text.UTF8Encoding]::new($false))
               $record=[pscustomobject]@{name="client-$Phase-$locale";closed=$false}
               $script:records.Add($record);$record
             }
@@ -1229,6 +1277,9 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
               throw 'server stopped before its live clients'
             }
             $Record.closed=$true
+            if($Record.name -like 'server-*'){
+              [IO.File]::AppendAllText((Join-Path $serverWriteData 'factorio-current.log'),("shutdown $($Record.name)`n"),[Text.UTF8Encoding]::new($false))
+            }
             if(($script:mode -eq 'cleanup' -and $Record.name -eq 'client-restart-de') -or
                 ($script:mode -eq 'primary-and-cleanup' -and $Record.name -eq 'server-initial')){
               throw 'late native cleanup failure'
@@ -1260,10 +1311,10 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
               $script:memoryWrites=0;$script:memoryReasons.Clear()
               $processMemorySampler=if($fixtureCase -cin @('library-multiplayer','library-paired-browser')){[pscustomobject]@{}}else{$null}
               $processMemoryObservationPath=if($fixtureCase -cin @('library-multiplayer','library-paired-browser')){Join-Path $output 'process-memory-observations.json'}else{$null}
-              $serverWriteData=$output;$engine='unused';$seed='seed';$restartSave='restart';$finalSave='final'
+              $serverWriteData=$output;$workroot=$output;$engine='unused';$seed='seed';$restartSave='restart';$finalSave='final'
               $seedHash=('a'*64);$clientGraphics=@();$rconPort=1;$rconPassword='not-a-real-password';$pairedArm='published'
-              $clients=@([pscustomobject]@{name='en';locale='en';port=2;config='en.ini';write_data='en'},
-                [pscustomobject]@{name='de';locale='de';port=3;config='de.ini';write_data='de'})
+              $clients=@([pscustomobject]@{name='MIR5English';locale='en';port=2;config='en.ini';write_data='en'},
+                [pscustomobject]@{name='MIR5Deutsch';locale='de';port=3;config='de.ini';write_data='de'})
               $caught=$null
               try{& $execute|Out-Null}catch{$caught=$_}
               if(@($script:records|Where-Object {-not $_.closed}).Count){throw 'cleanup abandoned owned records'}
@@ -1281,11 +1332,33 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
                 if($receipt.screenshots.Count -ne $expectedCaptures){
                   throw 'successful teardown lost a required capture'
                 }
-                if($fixtureCase -ceq 'library-paired-browser' -and ($receipt.kind -cne 'MIR5LibraryPairedBrowserSessionV1' -or $receipt.paired_arm -cne 'published' -or @($receipt.profiler_observations.markers).Count -ne 4)){
-                  throw 'successful paired Browser session lost its protocol evidence'
+                if($fixtureCase -ceq 'library-paired-browser'){
+                  $phaseObservations=@($receipt.profiler_observations)
+                  if($receipt.kind -cne 'MIR5LibraryPairedBrowserSessionV1' -or $receipt.paired_arm -cne 'published' -or $phaseObservations.Count-ne2){
+                    throw 'successful paired Browser session lost its phase protocol evidence'
+                  }
+                  $initial=$phaseObservations|Where-Object {$_.phase-ceq'initial'}
+                  $restart=$phaseObservations|Where-Object {$_.phase-ceq'restart'}
+                  if(@($initial).Count-ne1 -or @($restart).Count-ne1 -or @($initial.markers).Count-ne3 -or @($restart.markers).Count-ne1){
+                    throw 'paired Browser profiler phase/action counts differ'
+                  }
+                  foreach($phase in @($initial,$restart)){
+                    if($phase.role-cne'server' -or -not(Test-Path -LiteralPath $phase.log_path) -or $phase.log_sha256-cne(Get-SessionHash $phase.log_path)){
+                      throw 'paired Browser retained phase log provenance differs'
+                    }
+                  }
+                  $initialText=Get-Content -LiteralPath $initial.log_path -Raw
+                  $restartText=Get-Content -LiteralPath $restart.log_path -Raw
+                  if($initialText-notmatch'first_open' -or $initialText-notmatch'shutdown server-initial' -or $initialText-match'reopen' -or $restartText-notmatch'reopen' -or $restartText-notmatch'shutdown server-restart' -or $restartText-match'first_open'){
+                    throw 'paired Browser phase snapshots did not survive a replaced server log'
+                  }
                 }
-                if(($script:stops.ToArray()|Select-Object -Last 3) -join ',' -cne
-                    'client-restart-de,client-restart-en,server-restart'){throw 'final teardown is not reversed'}
+                $expectedTail=if($fixtureCase-ceq'library-paired-browser'){
+                  'client-restart-en,client-restart-de,server-restart'
+                }else{
+                  'client-restart-de,client-restart-en,server-restart'
+                }
+                if(($script:stops.ToArray()|Select-Object -Last 3) -join ',' -cne $expectedTail){throw 'final teardown is not reversed'}
               }else{
                 if($null -eq $caught -or (Test-Path -LiteralPath $sessionPath)){throw 'failed session claimed success'}
                 $expected=if($script:mode -eq 'cleanup'){'late native cleanup failure'}else{'original session failure'}

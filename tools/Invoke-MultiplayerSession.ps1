@@ -225,6 +225,19 @@ function Read-LogText([string]$Path) {
   if ($null -eq $text) { return '' }
   return $text
 }
+function Save-PairedBrowserServerPhaseLog([string]$Source, [ValidateSet('initial','restart')][string]$Phase) {
+  $sourcePath = Resolve-BuildInput $Source 'Leaf' "paired Browser $Phase server log"
+  $sourceItem = Get-Item -LiteralPath $sourcePath
+  $maximumBytes = 8MB
+  Assert-Session ($sourceItem.Length -le $maximumBytes) "paired Browser $Phase server log exceeds 8 MiB"
+  $destination = Resolve-BuildOutput (Join-Path $workroot ("paired-browser-server-" + $Phase + ".factorio-current.log")) "paired Browser $Phase server log snapshot"
+  Assert-Session (-not (Test-Path -LiteralPath $destination)) "paired Browser $Phase server log snapshot already exists"
+  Copy-Item -LiteralPath $sourcePath -Destination $destination -ErrorAction Stop
+  $copied = Resolve-BuildInput $destination 'Leaf' "paired Browser $Phase server log snapshot"
+  Assert-Session ((Get-Item -LiteralPath $copied).Length -eq $sourceItem.Length) "paired Browser $Phase server log snapshot length differs"
+  Assert-Session ((Get-SessionHash $copied) -ceq (Get-SessionHash $sourcePath)) "paired Browser $Phase server log snapshot hash differs"
+  return $copied
+}
 function Write-RconInt32([IO.Stream]$Stream, [int]$Value) {
   $bytes = [BitConverter]::GetBytes($Value)
   if (-not [BitConverter]::IsLittleEndian) { [Array]::Reverse($bytes) }
@@ -673,7 +686,6 @@ try {
     foreach ($stage in @('first-open','search','refresh')) {
       [void](Wait-For ("paired Browser $stage marker") { param($ignored) Get-PairedBrowserStageMarker (Read-LogText (Join-Path $serverWriteData 'factorio-current.log')) $stage $pairedArm })
     }
-    $initialProfiler = Get-PairedBrowserProfilerMarkers (Read-LogText (Join-Path $serverWriteData 'factorio-current.log')) @('first_open','search','refresh')
     [void](Wait-For 'paired Browser initial client screenshots' { Find-Screenshots @('first-open','search','refresh') })
     [void](Wait-For 'paired Browser restart-ready marker' { param($ignored) Get-PairedBrowserStageMarker (Read-LogText (Join-Path $serverWriteData 'factorio-current.log')) 'restart-ready' $pairedArm })
     [void](Wait-For 'paired Browser restart save' { if (Test-SaveReady $restartSave) { return $true }; return $false })
@@ -683,8 +695,14 @@ try {
     $activeClients = @()
     Stop-Record $server
     $server = $null
+    $initialServerLog = Save-PairedBrowserServerPhaseLog (Join-Path $serverWriteData 'factorio-current.log') 'initial'
+    $initialText = Read-LogText $initialServerLog
+    foreach ($stage in @('ready','first-open','search','refresh','restart-ready')) {
+      [void](Get-PairedBrowserStageMarker $initialText $stage $pairedArm)
+    }
+    $initialProfiler = Get-PairedBrowserProfilerMarkers $initialText @('first_open','search','refresh')
     Assert-Session ((Get-SessionHash $restartSave) -ceq $restartHash -and (Get-SessionHash $seed) -ceq $seedHash) 'protected restart or seed save changed before host reload'
-    $beforeRestartServerLog = Read-LogText (Join-Path $serverWriteData 'factorio-current.log')
+    $beforeRestartServerLog = $initialText
     $server = Start-Server 'server-restart' $restartSave
     [void](Wait-For 'paired Browser restarted server listener log' {
       $current = Read-LogText (Join-Path $serverWriteData 'factorio-current.log')
@@ -695,7 +713,6 @@ try {
     $activeClients = Start-Clients 'restart'
     [void](Wait-For 'paired Browser reopen marker' { param($ignored) Get-PairedBrowserStageMarker (Read-LogText (Join-Path $serverWriteData 'factorio-current.log')) 'reopen' $pairedArm })
     $completed = Wait-For 'paired Browser completed marker' { param($ignored) Get-PairedBrowserStageMarker (Read-LogText (Join-Path $serverWriteData 'factorio-current.log')) 'completed' $pairedArm }
-    $pairedProfiler = Get-PairedBrowserProfilerMarkers (Read-LogText (Join-Path $serverWriteData 'factorio-current.log')) @('first_open','search','refresh','reopen')
     $captures = Wait-For 'paired Browser final save and client screenshots' {
       $screens = Find-Screenshots @('first-open','search','refresh','reopen')
       if ((Test-SaveReady $finalSave) -and $null -ne $screens) { return $screens }
@@ -703,11 +720,24 @@ try {
     }
     $screenshots = @($captures.files)
     Assert-Session ($screenshots.Count -eq 8) 'paired Browser final screenshot inventory differs'
+    foreach ($client in $activeClients) { Stop-Record $client }
+    $activeClients = @()
+    Stop-Record $server
+    $server = $null
+    $restartServerLog = Save-PairedBrowserServerPhaseLog (Join-Path $serverWriteData 'factorio-current.log') 'restart'
+    $restartText = Read-LogText $restartServerLog
+    foreach ($stage in @('reopen','completed')) {
+      [void](Get-PairedBrowserStageMarker $restartText $stage $pairedArm)
+    }
+    $restartProfiler = Get-PairedBrowserProfilerMarkers $restartText @('reopen')
     $result = [ordered]@{
       schema=1;kind='MIR5LibraryPairedBrowserSessionV1';case=$fixtureCase;status='passed-private-two-client-session';paired_arm=$pairedArm
       engine_sha256=(Get-SessionHash $engine);seed_sha256=$seedHash;restart_save_sha256=$restartHash;final_save_sha256=(Get-SessionHash $finalSave)
       markers=@('ready','first-open','search','refresh','restart-ready','reopen','completed')
-      profiler_observations=[ordered]@{role='server';log_path=(Join-Path $serverWriteData 'factorio-current.log');log_sha256=(Get-SessionHash (Join-Path $serverWriteData 'factorio-current.log'));markers=@($pairedProfiler)}
+      profiler_observations=@(
+        [ordered]@{phase='initial';role='server';log_path=$initialServerLog;log_sha256=(Get-SessionHash $initialServerLog);markers=@($initialProfiler)}
+        [ordered]@{phase='restart';role='server';log_path=$restartServerLog;log_sha256=(Get-SessionHash $restartServerLog);markers=@($restartProfiler)}
+      )
       clients=@($clients | ForEach-Object {[ordered]@{name=$_.name;locale=$_.locale;port=$_.port;config=$_.config;write_data=$_.write_data}})
       client_graphics_arguments=$clientGraphics
       screenshots=@($screenshots | ForEach-Object {[ordered]@{path=$_;sha256=(Get-SessionHash $_);width=1280;height=720}})
