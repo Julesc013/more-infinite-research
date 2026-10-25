@@ -132,13 +132,6 @@ def _expect_hash(actual: Any, expected: Any, label: str) -> None:
         raise MenuAnalysisError(f"{label} does not match the frozen R23 identity")
 
 
-def _matches_declared_relative_path(actual: Any, declared: Any, label: str) -> None:
-    observed = _string(actual, label).replace("\\", "/")
-    expected = _string(declared, f"{label} declared").replace("\\", "/")
-    if observed != expected and not observed.endswith("/" + expected):
-        raise MenuAnalysisError(f"{label} does not match the frozen R23 profile path")
-
-
 def _expected_schedule(schedule: dict[str, Any]) -> list[dict[str, Any]]:
     arms = [_string(value, "analysis schedule arm") for value in _array(schedule.get("arms"), "analysis schedule arms")]
     if arms != ["control-without-mir", "published-4.7", "replay", "candidate-mir5"]:
@@ -206,10 +199,19 @@ def _validate_analysis_plan(plan: dict[str, Any]) -> list[dict[str, Any]]:
     if result_contract.get("library_controls_restored") is not True:
         raise MenuAnalysisError("analysis must require restored library controls")
     identity = _mapping(plan.get("identity"), "analysis identity")
-    _sha256(_mapping(identity.get("engine"), "analysis engine").get("sha256"), "analysis engine SHA-256")
-    _sha256(_mapping(identity.get("profile"), "analysis profile").get("sha256"), "analysis profile SHA-256")
-    _sha256(_mapping(identity.get("published"), "analysis published").get("sha256"), "analysis published SHA-256")
+    engine = _mapping(identity.get("engine"), "analysis engine")
+    _string(engine.get("version"), "analysis engine version")
+    _sha256(engine.get("sha256"), "analysis engine SHA-256")
+    profile = _mapping(identity.get("profile"), "analysis profile")
+    _string(profile.get("path"), "analysis profile path")
+    _sha256(profile.get("sha256"), "analysis profile SHA-256")
+    published = _mapping(identity.get("published"), "analysis published")
+    for key in ("name", "version", "root", "factorio_version"):
+        _string(published.get(key), f"analysis published {key}")
+    _sha256(published.get("sha256"), "analysis published SHA-256")
     candidate = _mapping(identity.get("candidate"), "analysis candidate")
+    for key in ("name", "version", "root", "factorio_version"):
+        _string(candidate.get(key), f"analysis candidate {key}")
     _sha256(candidate.get("sha256"), "analysis candidate SHA-256")
     if _integer(candidate.get("bytes"), "analysis candidate bytes") <= 0:
         raise MenuAnalysisError("analysis candidate bytes must be positive")
@@ -266,6 +268,14 @@ def _validate_raw_plan(raw_plan: dict[str, Any], analysis_plan: dict[str, Any], 
     _same(_number(tolerance.get("minimum_mir_added_time_reduction_percent"), "raw plan objective percent"), _number(expected_tolerance.get("minimum_mir_added_time_reduction_percent"), "analysis objective percent"), "raw plan objective percent")
 
 
+def _result_timeout_seconds(raw_plan: dict[str, Any]) -> float:
+    resources = _mapping(raw_plan.get("resources"), "raw plan resources")
+    timeout = _number(resources.get("per_launch_timeout_seconds"), "raw plan per-launch timeout seconds", positive=True)
+    if timeout > 3_600:
+        raise MenuAnalysisError("raw plan per-launch timeout seconds exceeds bounded R23 contract")
+    return timeout
+
+
 def _validate_identity(result: dict[str, Any], analysis_plan: dict[str, Any]) -> dict[str, Any]:
     identity = _mapping(analysis_plan.get("identity"), "analysis identity")
     inputs = _mapping(result.get("inputs"), "result inputs")
@@ -275,7 +285,11 @@ def _validate_identity(result: dict[str, Any], analysis_plan: dict[str, Any]) ->
     _expect_hash(factorio.get("sha256"), expected_engine.get("sha256"), "result Factorio SHA-256")
     profile = _mapping(inputs.get("profile"), "result profile")
     expected_profile = _mapping(identity.get("profile"), "analysis profile")
-    _matches_declared_relative_path(profile.get("path"), expected_profile.get("path"), "result profile path")
+    # The runner copies the canonical profile to an owned execution
+    # `selection.json`.  The raw plan binds its canonical repository path;
+    # the result binds only this typed, non-empty execution locator plus the
+    # exact canonical profile hash, rather than inventing a source suffix.
+    _string(profile.get("path"), "result profile execution locator")
     _expect_hash(profile.get("sha256"), expected_profile.get("sha256"), "result profile SHA-256")
     published = _mapping(inputs.get("published"), "result published archive")
     expected_published = _mapping(identity.get("published"), "analysis published archive")
@@ -311,7 +325,7 @@ def _validate_identity(result: dict[str, Any], analysis_plan: dict[str, Any]) ->
     }
 
 
-def _validate_result(result: dict[str, Any], analysis_plan: dict[str, Any], expected_schedule: list[dict[str, Any]]) -> tuple[dict[int, dict[str, float]], list[float], dict[str, Any]]:
+def _validate_result(result: dict[str, Any], analysis_plan: dict[str, Any], expected_schedule: list[dict[str, Any]], timeout_seconds: float) -> tuple[dict[int, dict[str, float]], list[float], dict[str, Any]]:
     contract = _mapping(analysis_plan.get("result_contract"), "analysis result contract")
     _same(_integer(result.get("schema"), "result schema"), _integer(contract.get("schema"), "result contract schema"), "result schema")
     _same(_string(result.get("kind"), "result kind"), _string(contract.get("kind"), "result contract kind"), "result kind")
@@ -331,13 +345,12 @@ def _validate_result(result: dict[str, Any], analysis_plan: dict[str, Any], expe
     policy = _mapping(plan.get("tolerance_policy"), "result tolerance policy")
     expected_tolerance = _mapping(analysis_plan.get("tolerance_policy"), "analysis tolerance policy")
     policy_checks = {
-        "aa_absolute_tolerance_seconds": "aa_absolute_seconds",
-        "aa_relative_tolerance_percent": "aa_relative_percent",
         "control_regression_tolerance_seconds": "control_regression_seconds",
         "minimum_mir_added_time_reduction_percent": "minimum_mir_added_time_reduction_percent",
     }
     for actual_key, expected_key in policy_checks.items():
         _same(_number(policy.get(actual_key), f"result tolerance {actual_key}"), _number(expected_tolerance.get(expected_key), f"analysis tolerance {expected_key}"), f"result tolerance {actual_key}")
+    _same(_string(policy.get("status"), "result tolerance policy status"), "declared-before-execution", "result tolerance policy status")
     aa_policy = _mapping(policy.get("same_version_aa_pilot"), "result same-version AA policy")
     _same(_string(aa_policy.get("arm"), "result same-version AA arm"), "published-4.7", "result same-version AA arm")
     _same(_integer(aa_policy.get("observations"), "result same-version AA observations"), 2, "result same-version AA observations")
@@ -367,11 +380,21 @@ def _validate_result(result: dict[str, Any], analysis_plan: dict[str, Any], expe
             raise MenuAnalysisError(f"duplicate result label: {expected['label']}")
         labels.add(expected["label"])
         observation = _mapping(sample.get("observation"), f"result observation {expected['label']}")
-        _same(_string(observation.get("status"), f"result observation status {expected['label']}"), OBSERVATION_STATUS, f"result observation status {expected['label']}")
+        _same(_string(observation.get("label"), f"result observation label {expected['label']}"), expected["label"], f"result observation label {expected['label']}")
         _same(_string(observation.get("endpoint_class"), f"result observation endpoint {expected['label']}"), ENDPOINT, f"result observation endpoint {expected['label']}")
         elapsed = _number(observation.get("elapsed_seconds"), f"result elapsed seconds {expected['label']}", positive=True)
-        _number(observation.get("clock_frequency"), f"result clock frequency {expected['label']}", positive=True)
-        if _integer(observation.get("process_id"), f"result process ID {expected['label']}") <= 0:
+        if elapsed > timeout_seconds:
+            raise MenuAnalysisError(f"result elapsed seconds {expected['label']} exceed the frozen per-launch timeout")
+        menu_response = _mapping(observation.get("menu_response"), f"result menu response {expected['label']}")
+        _same(_string(menu_response.get("status"), f"result menu response status {expected['label']}"), OBSERVATION_STATUS, f"result menu response status {expected['label']}")
+        _same(_string(menu_response.get("endpoint_class"), f"result menu response endpoint {expected['label']}"), ENDPOINT, f"result menu response endpoint {expected['label']}")
+        response_elapsed = _number(menu_response.get("elapsed_seconds"), f"result menu response elapsed seconds {expected['label']}", positive=True)
+        if response_elapsed > timeout_seconds:
+            raise MenuAnalysisError(f"result menu response elapsed seconds {expected['label']} exceed the frozen per-launch timeout")
+        if not math.isclose(elapsed, response_elapsed, rel_tol=0.0, abs_tol=1e-12):
+            raise MenuAnalysisError(f"result elapsed seconds {expected['label']} do not match the validated menu response")
+        _number(menu_response.get("clock_frequency"), f"result menu response clock frequency {expected['label']}", positive=True)
+        if _integer(menu_response.get("process_id"), f"result menu response process ID {expected['label']}") <= 0:
             raise MenuAnalysisError(f"result process ID {expected['label']} must be positive")
         if expected["phase"] == "aa-pilot":
             aa.append(elapsed)
@@ -425,10 +448,12 @@ def _four_value_summary(values: Iterable[float]) -> dict[str, Any]:
     }
 
 
-def analyze(analysis_plan: dict[str, Any], raw_plan: dict[str, Any], raw_plan_sha256: str, result: dict[str, Any], result_sha256: str) -> dict[str, Any]:
+def analyze(analysis_plan: dict[str, Any], analysis_plan_sha256: str, raw_plan: dict[str, Any], raw_plan_sha256: str, result: dict[str, Any], result_sha256: str) -> dict[str, Any]:
+    analysis_plan_sha256 = _sha256(analysis_plan_sha256, "analysis plan SHA-256")
+    result_sha256 = _sha256(result_sha256, "raw result SHA-256")
     expected_schedule = _validate_analysis_plan(analysis_plan)
     _validate_raw_plan(raw_plan, analysis_plan, raw_plan_sha256)
-    blocks, aa, identity = _validate_result(result, analysis_plan, expected_schedule)
+    blocks, aa, identity = _validate_result(result, analysis_plan, expected_schedule, _result_timeout_seconds(raw_plan))
     tolerance = _mapping(analysis_plan.get("tolerance_policy"), "analysis tolerance policy")
     analysis = _mapping(analysis_plan.get("analysis"), "analysis settings")
 
@@ -515,6 +540,7 @@ def analyze(analysis_plan: dict[str, Any], raw_plan: dict[str, Any], raw_plan_sh
         "status": "analyzed-frozen-r23-raw-observations",
         "analysis_plan": {
             "kind": analysis_plan["kind"],
+            "sha256": analysis_plan_sha256,
             "raw_plan_path": analysis_plan["raw_plan"]["path"],
             "raw_plan_sha256": raw_plan_sha256,
             "analysis_plan_identity": {
@@ -603,6 +629,7 @@ def _write_output(path: Path, document: dict[str, Any]) -> None:
 def parse_arguments(argv: list[str]) -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--analysis-plan", required=True, type=Path)
+    parser.add_argument("--expected-analysis-plan-sha256", required=True)
     parser.add_argument("--raw-plan", required=True, type=Path)
     parser.add_argument("--result", required=True, type=Path)
     parser.add_argument("--expected-result-sha256", required=True)
@@ -614,11 +641,12 @@ def main(argv: list[str] | None = None) -> int:
     arguments = parse_arguments(sys.argv[1:] if argv is None else argv)
     try:
         expected_result_sha256 = _sha256(arguments.expected_result_sha256, "expected result SHA-256")
-        analysis_plan, _ = _read_json(arguments.analysis_plan, MAX_ANALYSIS_PLAN_BYTES, "analysis plan")
+        analysis_plan, analysis_plan_sha256 = _read_json(arguments.analysis_plan, MAX_ANALYSIS_PLAN_BYTES, "analysis plan")
+        _expect_hash(analysis_plan_sha256, _sha256(arguments.expected_analysis_plan_sha256, "expected analysis plan SHA-256"), "analysis plan SHA-256")
         raw_plan, raw_plan_sha256 = _read_json(arguments.raw_plan, MAX_RAW_PLAN_BYTES, "raw plan")
         result, result_sha256 = _read_json(arguments.result, MAX_RESULT_BYTES, "raw result")
         _expect_hash(result_sha256, expected_result_sha256, "raw result SHA-256")
-        output = analyze(analysis_plan, raw_plan, raw_plan_sha256, result, result_sha256)
+        output = analyze(analysis_plan, analysis_plan_sha256, raw_plan, raw_plan_sha256, result, result_sha256)
         _write_output(arguments.output, output)
     except MenuAnalysisError as error:
         print(f"[mir5-menu-analysis-refused] {error}", file=sys.stderr)

@@ -57,14 +57,14 @@ def _raw_plan(plan: dict[str, object]) -> dict[str, object]:
             "control_regression_seconds": plan["tolerance_policy"]["control_regression_seconds"],
             "minimum_mir_added_time_reduction_percent": plan["tolerance_policy"]["minimum_mir_added_time_reduction_percent"],
         },
+        "resources": {"per_launch_timeout_seconds": 300},
     }
 
 
 def _execution_tolerance(plan: dict[str, object]) -> dict[str, object]:
     tolerance = plan["tolerance_policy"]
     return {
-        "aa_absolute_tolerance_seconds": tolerance["aa_absolute_seconds"],
-        "aa_relative_tolerance_percent": tolerance["aa_relative_percent"],
+        "status": "declared-before-execution",
         "control_regression_tolerance_seconds": tolerance["control_regression_seconds"],
         "minimum_mir_added_time_reduction_percent": tolerance["minimum_mir_added_time_reduction_percent"],
         "same_version_aa_pilot": {
@@ -96,7 +96,7 @@ def _result(
     identity = plan["identity"]
     inputs = {
         "factorio": {"base_version": identity["engine"]["version"], "sha256": identity["engine"]["sha256"]},
-        "profile": {"path": identity["profile"]["path"], "sha256": identity["profile"]["sha256"]},
+        "profile": {"path": "D:/MIR-owned-run/selection.json", "sha256": identity["profile"]["sha256"]},
         "published": copy.deepcopy(identity["published"]),
         "replay": {
             "name": identity["published"]["name"],
@@ -128,11 +128,16 @@ def _result(
             {
                 "plan": copy.deepcopy(row),
                 "observation": {
-                    "status": "validated-recorded-menu-interaction-response",
+                    "label": row["label"],
                     "endpoint_class": "ordinary-responsive-menu",
                     "elapsed_seconds": elapsed,
-                    "clock_frequency": 1_000_000,
-                    "process_id": row["ordinal"],
+                    "menu_response": {
+                        "status": "validated-recorded-menu-interaction-response",
+                        "endpoint_class": "ordinary-responsive-menu",
+                        "elapsed_seconds": elapsed,
+                        "clock_frequency": 1_000_000,
+                        "process_id": row["ordinal"],
+                    },
                 },
             }
         )
@@ -166,7 +171,7 @@ class MenuComparisonAnalysisTests(unittest.TestCase):
     def test_hand_computed_paired_result_supports_fifty_percent_objective(self) -> None:
         plan, raw, raw_hash = _prepared()
         result = _result(plan)
-        output = ANALYZER.analyze(plan, raw, raw_hash, result, "B" * 64)
+        output = ANALYZER.analyze(plan, "A" * 64, raw, raw_hash, result, "B" * 64)
         self.assertEqual(output["summaries"]["published_added_time_d4_seconds"]["arithmetic_mean_seconds"], 2.0)
         self.assertEqual(output["summaries"]["candidate_added_time_d5_seconds"]["arithmetic_mean_seconds"], 1.0)
         self.assertEqual(output["summaries"]["direct_candidate_minus_published_seconds"]["arithmetic_mean_seconds"], -1.0)
@@ -176,12 +181,13 @@ class MenuComparisonAnalysisTests(unittest.TestCase):
 
     def test_zero_or_uncertain_published_increment_refuses_percentage_claim(self) -> None:
         plan, raw, raw_hash = _prepared()
-        zero = ANALYZER.analyze(plan, raw, raw_hash, _result(plan, published_offsets=[0.0] * 8), "C" * 64)
+        zero = ANALYZER.analyze(plan, "A" * 64, raw, raw_hash, _result(plan, published_offsets=[0.0] * 8), "C" * 64)
         self.assertIsNone(zero["objective"]["reduction_percent"])
         self.assertEqual(zero["objective"]["status"], "unresolved-nonpositive-or-uncertain-published-increment")
         plan, raw, raw_hash = _prepared()
         uncertain = ANALYZER.analyze(
             plan,
+            "A" * 64,
             raw,
             raw_hash,
             _result(plan, published_offsets=[2.0, -1.0, 2.0, -1.0, 2.0, -1.0, 2.0, -1.0]),
@@ -192,11 +198,11 @@ class MenuComparisonAnalysisTests(unittest.TestCase):
 
     def test_aa_and_control_drift_remain_explicit_adverse_observations(self) -> None:
         plan, raw, raw_hash = _prepared()
-        aa = ANALYZER.analyze(plan, raw, raw_hash, _result(plan, aa=(10.0, 12.0)), "E" * 64)
+        aa = ANALYZER.analyze(plan, "A" * 64, raw, raw_hash, _result(plan, aa=(10.0, 12.0)), "E" * 64)
         self.assertEqual(aa["same_version_aa"]["status"], "adverse-outside-predeclared-tolerance")
         self.assertIn("same-version-aa-outside-predeclared-tolerance", aa["menu_verdict"]["adverse_or_unresolved"])
         plan, raw, raw_hash = _prepared()
-        drift = ANALYZER.analyze(plan, raw, raw_hash, _result(plan, controls=[10.0] * 4 + [11.0] * 4), "F" * 64)
+        drift = ANALYZER.analyze(plan, "A" * 64, raw, raw_hash, _result(plan, controls=[10.0] * 4 + [11.0] * 4), "F" * 64)
         self.assertEqual(drift["control_drift"]["late_minus_early_seconds"], 1.0)
         self.assertEqual(drift["control_drift"]["status"], "adverse-outside-predeclared-tolerance")
         self.assertIn("late-control-drift-outside-predeclared-tolerance", drift["menu_verdict"]["adverse_or_unresolved"])
@@ -206,15 +212,53 @@ class MenuComparisonAnalysisTests(unittest.TestCase):
         bad_elapsed = _result(plan)
         bad_elapsed["samples"][6]["observation"]["elapsed_seconds"] = 0.0
         with self.assertRaisesRegex(ANALYZER.MenuAnalysisError, "must be positive"):
-            ANALYZER.analyze(plan, raw, raw_hash, bad_elapsed, "1" * 64)
+            ANALYZER.analyze(plan, "A" * 64, raw, raw_hash, bad_elapsed, "1" * 64)
+        over_timeout = _result(plan)
+        over_timeout["samples"][6]["observation"]["elapsed_seconds"] = 301.0
+        over_timeout["samples"][6]["observation"]["menu_response"]["elapsed_seconds"] = 301.0
+        with self.assertRaisesRegex(ANALYZER.MenuAnalysisError, "exceed the frozen per-launch timeout"):
+            ANALYZER.analyze(plan, "A" * 64, raw, raw_hash, over_timeout, "1" * 64)
         bad_label = _result(plan)
         bad_label["samples"][7]["plan"]["label"] = bad_label["samples"][6]["plan"]["label"]
         with self.assertRaisesRegex(ANALYZER.MenuAnalysisError, "schedule row"):
-            ANALYZER.analyze(plan, raw, raw_hash, bad_label, "2" * 64)
+            ANALYZER.analyze(plan, "A" * 64, raw, raw_hash, bad_label, "2" * 64)
         bad_identity = _result(plan)
         bad_identity["inputs"]["candidate"]["sha256"] = "0" * 64
         with self.assertRaisesRegex(ANALYZER.MenuAnalysisError, "candidate SHA-256"):
-            ANALYZER.analyze(plan, raw, raw_hash, bad_identity, "3" * 64)
+            ANALYZER.analyze(plan, "A" * 64, raw, raw_hash, bad_identity, "3" * 64)
+
+    def test_missing_nested_response_nonfinite_duplicate_policy_and_plan_hash_refuse(self) -> None:
+        plan, raw, raw_hash = _prepared()
+        missing_response = _result(plan)
+        del missing_response["samples"][6]["observation"]["menu_response"]
+        with self.assertRaisesRegex(ANALYZER.MenuAnalysisError, "menu response"):
+            ANALYZER.analyze(plan, "A" * 64, raw, raw_hash, missing_response, "4" * 64)
+        nonfinite = _result(plan)
+        nonfinite["samples"][6]["observation"]["elapsed_seconds"] = float("nan")
+        with self.assertRaisesRegex(ANALYZER.MenuAnalysisError, "must be finite"):
+            ANALYZER.analyze(plan, "A" * 64, raw, raw_hash, nonfinite, "5" * 64)
+        duplicate = _result(plan)
+        duplicate["samples"][7]["plan"]["label"] = duplicate["samples"][6]["plan"]["label"]
+        with self.assertRaisesRegex(ANALYZER.MenuAnalysisError, "schedule row"):
+            ANALYZER.analyze(plan, "A" * 64, raw, raw_hash, duplicate, "6" * 64)
+        bad_policy = _result(plan)
+        bad_policy["plan"]["tolerance_policy"]["same_version_aa_pilot"]["relative_tolerance_percent"] = 4.0
+        with self.assertRaisesRegex(ANALYZER.MenuAnalysisError, "same-version AA relative"):
+            ANALYZER.analyze(plan, "A" * 64, raw, raw_hash, bad_policy, "7" * 64)
+        with self.assertRaisesRegex(ANALYZER.MenuAnalysisError, "raw plan SHA-256"):
+            ANALYZER.analyze(plan, "A" * 64, raw, "0" * 64, _result(plan), "8" * 64)
+
+    def test_strict_json_reader_rejects_duplicate_keys_and_nonfinite_constants(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            duplicate = root / "duplicate.json"
+            duplicate.write_text('{"schema":1,"schema":2}', encoding="utf-8")
+            with self.assertRaisesRegex(ANALYZER.MenuAnalysisError, "duplicate JSON key"):
+                ANALYZER._read_json(duplicate, 1024, "synthetic duplicate")
+            nonfinite = root / "nonfinite.json"
+            nonfinite.write_text('{"value":NaN}', encoding="utf-8")
+            with self.assertRaisesRegex(ANALYZER.MenuAnalysisError, "non-finite JSON constant"):
+                ANALYZER._read_json(nonfinite, 1024, "synthetic nonfinite")
 
     def test_cli_binds_expected_raw_result_hash_before_writing_output(self) -> None:
         plan, raw, _ = _prepared()
@@ -236,6 +280,21 @@ class MenuComparisonAnalysisTests(unittest.TestCase):
                 ANALYZER.main(
                     [
                         "--analysis-plan", str(analysis_path),
+                        "--expected-analysis-plan-sha256", "0" * 64,
+                        "--raw-plan", str(raw_path),
+                        "--result", str(result_path),
+                        "--expected-result-sha256", _sha256(result_bytes),
+                        "--output", str(output_path),
+                    ]
+                ),
+                1,
+            )
+            self.assertFalse(output_path.exists())
+            self.assertEqual(
+                ANALYZER.main(
+                    [
+                        "--analysis-plan", str(analysis_path),
+                        "--expected-analysis-plan-sha256", _sha256(_encoded(plan)),
                         "--raw-plan", str(raw_path),
                         "--result", str(result_path),
                         "--expected-result-sha256", "0" * 64,
@@ -249,6 +308,7 @@ class MenuComparisonAnalysisTests(unittest.TestCase):
                 ANALYZER.main(
                     [
                         "--analysis-plan", str(analysis_path),
+                        "--expected-analysis-plan-sha256", _sha256(_encoded(plan)),
                         "--raw-plan", str(raw_path),
                         "--result", str(result_path),
                         "--expected-result-sha256", _sha256(result_bytes),
