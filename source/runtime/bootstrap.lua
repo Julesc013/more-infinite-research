@@ -320,7 +320,7 @@ local function on_configuration_changed(event)
   -- The first published-MIR4 preference transition has no durable old setting.
   -- This preflight must run before any lifecycle reconciler can write a level,
   -- ownership record, queue state, or disablement flag.
-  if native_credits and target.id == "f200" then
+  if native_credits then
     native_credits.preflight_legacy_preference_transition(event, relevant_competing_provider_transition(event))
   end
   reconcile_imersite()
