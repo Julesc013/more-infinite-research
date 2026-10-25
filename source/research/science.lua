@@ -671,10 +671,15 @@ end
 -- supplements only science ingredients that this policy actually appended,
 -- using a target-specific binding rather than reintroducing the retired
 -- recipe/unlock discovery service.
-local function policy_prerequisites(raw, selected, additions)
+local function policy_prerequisites(raw, selected, additions, context)
   local out, seen = {}, {}
   for _, pack in ipairs(additions or {}) do
-    for _, prerequisite in ipairs((selected.pack_prerequisites or {})[pack] or {}) do
+    local replacement = context and context.direct_replacement_sources
+      and context.direct_replacement_sources[pack]
+    local prerequisites
+    if replacement then prerequisites = replacement.owner and {replacement.owner} or {}
+    else prerequisites = (selected.pack_prerequisites or {})[pack] or {} end
+    for _, prerequisite in ipairs(prerequisites) do
       if not technology_exists(raw, prerequisite) then
         return nil, "missing-science-prerequisite:" .. pack .. ":" .. prerequisite
       end
@@ -770,6 +775,55 @@ local function direct_recipe_packs(recipe, wanted)
   return packs, initial
 end
 
+-- The two admitted direct-source paths differ only in which packs authorize a
+-- pass and where they cache the result. Keep their recipe/owner selection
+-- identical: every accepted candidate remains a flat direct seed, and a
+-- canonical name can never decide the tie-break.
+local function collect_direct_sources(context, selected, view, wanted, recipe_visits, technology_visits)
+  local chosen, pending = {}, {}
+  local function choose(pack, recipe, owner)
+    local previous = chosen[pack]
+    if previous and previous.owner == nil and owner ~= nil then return end
+    if not previous or (previous.owner ~= nil and owner == nil)
+      or (previous.owner == nil) == (owner == nil) and (recipe < previous.recipe
+        or recipe == previous.recipe and (owner or "") < (previous.owner or "")) then
+      chosen[pack] = {kind = owner and "recipe-unlock" or "initial-recipe", pack = pack,
+        recipe = recipe, owner = owner}
+    end
+  end
+  for name, recipe in pairs(type(context.raw.recipe) == "table" and context.raw.recipe or {}) do
+    context[recipe_visits] = context[recipe_visits] + 1
+    if type(name) == "string" and name ~= "" then
+      local packs, initial = direct_recipe_packs(recipe, wanted)
+      if packs and next(packs) then
+        if initial then for pack in pairs(packs) do choose(pack, name) end else pending[name] = packs end
+      end
+    end
+  end
+  for recipe, packs in pairs(pending) do
+    for pack in pairs(packs) do if chosen[pack] then packs[pack] = nil end end
+    if next(packs) == nil then pending[recipe] = nil end
+  end
+  if next(pending) then
+    local seeds = declared_seed_packs(context, selected, view)
+    for name, owner in pairs(type(context.raw.technology) == "table" and context.raw.technology or {}) do
+      context[technology_visits] = context[technology_visits] + 1
+      if type(name) == "string" and name ~= "" and type(owner) == "table" then
+        local eligible
+        for _, effect in ipairs(type(owner.effects) == "table" and owner.effects or {}) do
+          local packs = type(effect) == "table" and effect.type == "unlock-recipe" and pending[effect.recipe] or nil
+          if packs then
+            if eligible == nil then eligible = direct_craft_seed(owner, context, view)
+              or direct_research_seed(owner, context, view, seeds) end
+            if eligible then for pack in pairs(packs) do choose(pack, effect.recipe, name) end end
+          end
+        end
+      end
+    end
+  end
+  return chosen
+end
+
 -- The opt-in `all` policy needs one bounded collection for unfamiliar lab
 -- inputs. Admit only direct sources; never traverse foreign prerequisites,
 -- infer factory acquisition, or treat a union of labs as one accepting lab.
@@ -786,52 +840,43 @@ local function bind_fresh_sources(context, selected, view, source)
   -- An existing foreign ingredient alone never starts collection or acquires
   -- a new gate. A later family may independently need that pack as an addition.
   if not missing then return end
-  local chosen, pending = {}, {}
-  local function choose(pack, recipe, owner)
-    local previous = chosen[pack]
-    if previous and previous.owner == nil and owner ~= nil then return end
-    if not previous or (previous.owner ~= nil and owner == nil)
-      or (previous.owner == nil) == (owner == nil) and (recipe < previous.recipe
-        or recipe == previous.recipe and (owner or "") < (previous.owner or "")) then
-      chosen[pack] = {kind = owner and "recipe-unlock" or "initial-recipe", pack = pack, recipe = recipe, owner = owner}
-    end
-  end
-  for name, recipe in pairs(type(context.raw.recipe) == "table" and context.raw.recipe or {}) do
-    context.fresh_recipe_visits = context.fresh_recipe_visits + 1
-    if type(name) == "string" and name ~= "" then
-      local packs, initial = direct_recipe_packs(recipe, wanted)
-      if packs and next(packs) then
-        if initial then for pack in pairs(packs) do choose(pack, name) end else pending[name] = packs end
-      end
-    end
-  end
-  for recipe, packs in pairs(pending) do
-    for pack in pairs(packs) do if chosen[pack] then packs[pack] = nil end end
-    if next(packs) == nil then pending[recipe] = nil end
-  end
-  if next(pending) then
-    local seeds = declared_seed_packs(context, selected, view)
-    for name, owner in pairs(type(context.raw.technology) == "table" and context.raw.technology or {}) do
-      context.fresh_technology_visits = context.fresh_technology_visits + 1
-      if type(name) == "string" and name ~= "" and type(owner) == "table" then
-        local eligible
-        for _, effect in ipairs(type(owner.effects) == "table" and owner.effects or {}) do
-          local packs = type(effect) == "table" and effect.type == "unlock-recipe" and pending[effect.recipe] or nil
-          if packs then
-            if eligible == nil then eligible = direct_craft_seed(owner, context, view)
-              or direct_research_seed(owner, context, view, seeds) end
-            if eligible then for pack in pairs(packs) do choose(pack, effect.recipe, name) end end
-          end
-        end
-      end
-    end
-  end
+  local chosen = collect_direct_sources(context, selected, view, wanted,
+    "fresh_recipe_visits", "fresh_technology_visits")
   context.fresh_source_contracts = chosen
   selected.pack_prerequisites = selected.pack_prerequisites or {}
   for pack, contract in pairs(chosen) do
     selected.source_contracts[pack] = contract
     selected.pack_prerequisites[pack] = contract.owner and {contract.owner} or {}
   end
+end
+
+-- The published 4.7.3 repair allowed one direct replacement only after an
+-- opted-in current named recipe source failed. Inspect that finite selected
+-- set once for this data-stage context; this is distinct from the `all`
+-- policy's unfamiliar-input collection above and never broadens a healthy
+-- or unopted source contract.
+local function collect_direct_replacements(context, selected, view)
+  if context.direct_replacement_scanned then return end
+  context.direct_replacement_scanned = true
+  context.direct_replacement_sources = {}
+  local wanted = {}
+  for pack, contract in pairs(type(selected.source_contracts) == "table" and selected.source_contracts or {}) do
+    if type(contract) == "table" and contract.direct_recipe_replacement == true then
+      local valid = validate_source_contract(context.raw, contract, pack)
+      if not valid then wanted[pack] = true end
+    end
+  end
+  if next(wanted) == nil then return end
+
+  context.direct_replacement_sources = collect_direct_sources(context, selected, view, wanted,
+    "direct_replacement_recipe_visits", "direct_replacement_technology_visits")
+end
+
+local function direct_replacement_contract(context, selected, view, pack, contract)
+  if type(contract) ~= "table" or contract.direct_recipe_replacement ~= true then return contract end
+  if validate_source_contract(context.raw, contract, pack) then return contract end
+  collect_direct_replacements(context, selected, view)
+  return context.direct_replacement_sources[pack] or contract
 end
 
 local function reported_policy(policy, context)
@@ -847,7 +892,8 @@ function M.prepare(environment)
   return {
     raw = environment.raw or {}, options = environment.options or {}, target = environment.target or {}, mods = environment.mods,
     lab_visits = 0, lab_decisions = {}, mod_progression_unbound = {}, unbound_science_sources = {},
-    fresh_recipe_visits = 0, fresh_technology_visits = 0
+    fresh_recipe_visits = 0, fresh_technology_visits = 0,
+    direct_replacement_recipe_visits = 0, direct_replacement_technology_visits = 0
   }
 end
 
@@ -884,6 +930,7 @@ function M.apply(technology, binding, context)
     if not item_exists(raw, name) then return disable(technology, "missing-required-science:" .. name, source) end
     if name == "cryogenic-science-pack" then
       local contract = type(selected.source_contracts) == "table" and selected.source_contracts[name] or nil
+      contract = direct_replacement_contract(context, selected, view, name, contract)
       local valid, source_reason = validate_source_contract(raw, contract, name)
       if not valid then
         return disable(technology, "invalid-required-science-source:" .. name .. ":" .. tostring(source_reason), source)
@@ -894,6 +941,8 @@ function M.apply(technology, binding, context)
   ingredients, additions, addition_contracts = exclude_science(
     ingredients, additions, addition_contracts, binding.excluded_science)
   for _, name in ipairs(additions) do
+    addition_contracts[name] = direct_replacement_contract(
+      context, selected, view, name, addition_contracts[name])
     -- Fresh contracts were validated once against this fixed context before
     -- any publication, including all output forms and the selected seed arm.
     local valid, source_reason
@@ -932,7 +981,7 @@ function M.apply(technology, binding, context)
     if not found then return disable(technology, "missing-phase-science", ingredients) end
   end
 
-  local policy_prereqs, prerequisite_reason = policy_prerequisites(raw, selected, additions)
+  local policy_prereqs, prerequisite_reason = policy_prerequisites(raw, selected, additions, context)
   if not policy_prereqs then return disable(technology, prerequisite_reason, source) end
   -- A named compatibility binding may retire an already authored prerequisite.
   -- Filter that local source list only; later explicit policy/gate additions
@@ -943,16 +992,23 @@ function M.apply(technology, binding, context)
     if not gate then return disable(technology, "missing-end-game-gate", ingredients, prerequisites) end
     if not item_exists(raw, gate.pack) then return disable(technology, "missing-end-game-science:" .. gate.pack, ingredients, prerequisites) end
     local contract = type(selected.source_contracts) == "table" and selected.source_contracts[gate.pack] or nil
+    contract = direct_replacement_contract(context, selected, view, gate.pack, contract)
     local valid, source_reason = validate_source_contract(raw, contract, gate.pack)
     if not valid then
       return disable(technology, "invalid-end-game-science-source:" .. gate.pack .. ":" .. tostring(source_reason), ingredients, prerequisites)
     end
-    for _, name in ipairs(gate.prerequisites) do
+    local gate_prerequisites
+    if context.direct_replacement_sources and context.direct_replacement_sources[gate.pack] == contract then
+      gate_prerequisites = contract.owner and {contract.owner} or {}
+    else
+      gate_prerequisites = gate.prerequisites
+    end
+    for _, name in ipairs(gate_prerequisites) do
       if not technology_exists(raw, name) then
         return disable(technology, "missing-end-game-gate-prerequisite:" .. name, ingredients, prerequisites)
       end
     end
-    prerequisites = merge_prerequisites(prerequisites, gate.prerequisites)
+    prerequisites = merge_prerequisites(prerequisites, gate_prerequisites)
   end
 
   local lab_policy = option(context, "mir-lab-incompatibility-policy", LAB_DEFAULT)
