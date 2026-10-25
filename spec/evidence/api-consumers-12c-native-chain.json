@@ -1,0 +1,242 @@
+{
+  "schema": 1,
+  "kind": "MIR5API12cNativeConsumersReadbackV1",
+  "status": "exact-scenarios-passed-not-release-acceptance",
+  "derived": true,
+  "source_commit": "12c5d21fd7466299e7c3c7e316f2bae693145c20",
+  "player_tree": "e5044b712537c0a2f3edec71d935ddea4b994964",
+  "external_workflow_controller": "76437b0257c10e8016bdccfa356035fe49f4b5d5",
+  "controller_is_artifact_attested_source": false,
+  "cases": [
+    {
+      "target": "f200",
+      "run": 40180277041,
+      "run_url": "https://github.com/Julesc013/mir-native-worker/actions/runs/40180277041",
+      "manifest_members_verified": 46,
+      "manifest_sha256": "A63EE0C466531FD031AE7F2203E748F28CE728F7E99E11644C3CBE81B1E1A94B",
+      "engine_version": "2.0.77",
+      "engine_sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B",
+      "player_sha256": "87C0D71391B66B6BE608E1F0E9B2D638BA762CCF0D26CFE3F74BEC680B97A444",
+      "result_sha256": "0AAB6474E66F9D8C8BCDA42299313A42339B6CEE8C16D7012C2820A8CCF14544",
+      "completed_save_sha256": "96765301BD621DCB2A830003799B2A278336E419B611E70CC2D04506D991B49E",
+      "raw_profile": "tests/profiles/api-consumers-f200-2077.json",
+      "raw_profile_sha256": "1240337881A48BF7EB2E7917ADB35712C562C77D6A98736953EB7A1958607591",
+      "raw_fixture_members_checked": 12,
+      "execution_tools": [
+        {
+          "path": "tools/Invoke-NativeFixture.ps1",
+          "git_sha256": "2C9E0470ED0C6B79F3EA65AD31508B35E6616C013353BDAFC145B172FF988418",
+          "recorded_execution_sha256": "B175866B461AB9B2AA048074F759B0942DC585B630CA6EA81E56BFC0DBEB4105",
+          "execution_line_endings": "CRLF"
+        },
+        {
+          "path": "tools/lib/validation/NativeProbeResources.ps1",
+          "git_sha256": "2826EF1D491615C10B39F6D05C6BDEE5D4317EB10BBA753AD0BA159ED95B9311",
+          "recorded_execution_sha256": "AC2B5C4F648F8A03D878FF209DAD97C7C2834519E2F4A7E9E07973DDBED14F83",
+          "execution_line_endings": "CRLF"
+        },
+        {
+          "path": "tools/lib/validation/ResourceGovernor.ps1",
+          "git_sha256": "50E5172BF9836B2742A9857F7A0F86DFF3E5FD6C40A4E149F42334A199302A6E",
+          "recorded_execution_sha256": "7426C9F38BA3D20F031B9CCBF8EB6B8FEF8C0532A5DF38D56E7FC1FE0B10A1F4",
+          "execution_line_endings": "CRLF"
+        }
+      ],
+      "actual_process_log_markers": [
+        {
+          "stage": "create",
+          "path": "api-consumers-canonical\\native\\create.factorio.log",
+          "sha256": "39F4E770BC9796482B54B769325A747BD6C87BE42C6602AADA20ABA3BBDCB3BE",
+          "consumers": [
+            "MIR5_API_ALPHA",
+            "MIR5_API_BETA"
+          ],
+          "has_physical_witness": false
+        },
+        {
+          "stage": "production",
+          "path": "api-consumers-canonical\\native\\production.factorio.log",
+          "sha256": "6DBD81E96C618F36F2354B49D28AAD7D86447D5AEF9DA59C56E1E67A35F9FB43",
+          "consumers": [
+            "MIR5_API_ALPHA",
+            "MIR5_API_BETA"
+          ],
+          "has_physical_witness": true
+        },
+        {
+          "stage": "reload-1",
+          "path": "api-consumers-canonical\\native\\reload-1.factorio.log",
+          "sha256": "15E138ECB80529BC2E08F9BF7DBB328C10B1A641BE4C2037AA651BBA39324C44",
+          "consumers": [
+            "MIR5_API_ALPHA",
+            "MIR5_API_BETA"
+          ],
+          "has_physical_witness": true
+        },
+        {
+          "stage": "reload-2",
+          "path": "api-consumers-canonical\\native\\reload-2.factorio.log",
+          "sha256": "B3E4F8B5F6CB77BCD09B5D268EC05D3467EE1B803FDF195BBD39DBEF11454D2F",
+          "consumers": [
+            "MIR5_API_ALPHA",
+            "MIR5_API_BETA"
+          ],
+          "has_physical_witness": true
+        }
+      ],
+      "source_custody": "build/mir5/aero-api-f200-40180277041"
+    },
+    {
+      "target": "f210",
+      "run": 40180070564,
+      "run_url": "https://github.com/Julesc013/mir-native-worker/actions/runs/40180070564",
+      "manifest_members_verified": 45,
+      "manifest_sha256": "8671A0CFDCCEA2F4E6CC5A3FB8CE3261A41A59396DA6E68EF9C3697A1831E809",
+      "engine_version": "2.1.23",
+      "engine_sha256": "FE4A1DA30F322A0D0B8AEB3DF7276332222BAAA143E2352569B723E84B2B9060",
+      "player_sha256": "4806BF2B9675DE2C4AE471D6C4F42F6ECE9CEFF68256562346026F086A7A8605",
+      "result_sha256": "ED03517E469223EB6FF04E459A553991EB2F3DA6BEDAF0E13D099BE9EAF56791",
+      "completed_save_sha256": "BB6DBA7D4F2CFB148FA563D0CC98CB113BA9799CE44D41A98942F1FFD0D331B6",
+      "raw_profile": "tests/profiles/api-consumers-f210-2123.json",
+      "raw_profile_sha256": "4E78C9DC5D745847916D628B87ADDF3E97D3B16B306B61D811FCC9B67BAD1350",
+      "raw_fixture_members_checked": 12,
+      "execution_tools": [
+        {
+          "path": "tools/Invoke-NativeFixture.ps1",
+          "git_sha256": "2C9E0470ED0C6B79F3EA65AD31508B35E6616C013353BDAFC145B172FF988418",
+          "recorded_execution_sha256": "B175866B461AB9B2AA048074F759B0942DC585B630CA6EA81E56BFC0DBEB4105",
+          "execution_line_endings": "CRLF"
+        },
+        {
+          "path": "tools/lib/validation/NativeProbeResources.ps1",
+          "git_sha256": "2826EF1D491615C10B39F6D05C6BDEE5D4317EB10BBA753AD0BA159ED95B9311",
+          "recorded_execution_sha256": "AC2B5C4F648F8A03D878FF209DAD97C7C2834519E2F4A7E9E07973DDBED14F83",
+          "execution_line_endings": "CRLF"
+        },
+        {
+          "path": "tools/lib/validation/ResourceGovernor.ps1",
+          "git_sha256": "50E5172BF9836B2742A9857F7A0F86DFF3E5FD6C40A4E149F42334A199302A6E",
+          "recorded_execution_sha256": "7426C9F38BA3D20F031B9CCBF8EB6B8FEF8C0532A5DF38D56E7FC1FE0B10A1F4",
+          "execution_line_endings": "CRLF"
+        }
+      ],
+      "actual_process_log_markers": [
+        {
+          "stage": "create",
+          "path": "api-consumers-f210-canonical\\native\\create.factorio.log",
+          "sha256": "3B41F098DDF1EA1934223203C298555D99B002A43271E6672D0987333B0B6486",
+          "consumers": [
+            "MIR5_API_ALPHA",
+            "MIR5_API_BETA"
+          ],
+          "has_physical_witness": false
+        },
+        {
+          "stage": "production",
+          "path": "api-consumers-f210-canonical\\native\\production.factorio.log",
+          "sha256": "8A53B4B3DB6C47D51B533A670274046008FE3CA4A47D9EC64A8201C56902D17C",
+          "consumers": [
+            "MIR5_API_ALPHA",
+            "MIR5_API_BETA"
+          ],
+          "has_physical_witness": true
+        },
+        {
+          "stage": "reload-1",
+          "path": "api-consumers-f210-canonical\\native\\reload-1.factorio.log",
+          "sha256": "AD28DBDD16A35E278189009E1ABA2A57697E5B332334537B42E1AB393A672EC9",
+          "consumers": [
+            "MIR5_API_ALPHA",
+            "MIR5_API_BETA"
+          ],
+          "has_physical_witness": true
+        },
+        {
+          "stage": "reload-2",
+          "path": "api-consumers-f210-canonical\\native\\reload-2.factorio.log",
+          "sha256": "69F9A87D7428B66982BD69025E9071D376762EB18CE95ED71C42A9623F9A6F98",
+          "consumers": [
+            "MIR5_API_ALPHA",
+            "MIR5_API_BETA"
+          ],
+          "has_physical_witness": true
+        }
+      ],
+      "source_custody": "build/mir5/aero-api-f210-40180070564"
+    }
+  ],
+  "physical_witness_per_target": {
+    "baseline_plates": 100,
+    "researched_plates": 100,
+    "baseline_cables": 200,
+    "researched_cables": 202,
+    "recipe_productivity_change": 0.01,
+    "assembler_modules_empty": true,
+    "beacon_entities_created": false,
+    "research_completed_by_native_setter": true,
+    "laboratory_research_used": false
+  },
+  "completed_save_cold_reloads": 4,
+  "capsule": {
+    "path": "spec/evidence/api-consumers-12c-native-capsule.zip",
+    "sha256": "5378DF8AA3D3E381B9D2D36F265AD13781EA4CD939FFD874B1FA7917ACBAC86C",
+    "members": [
+      {
+        "path": "derived/aero-readback.json",
+        "bytes": 22932,
+        "sha256": "415ABE1F07D00705EDECA07E60FDE587F9AB7BEDDE230155EE37247155F40C8A"
+      },
+      {
+        "path": "f200/api-canonical-outcome.json",
+        "bytes": 1433,
+        "sha256": "71C49EC076FA9BE7E9BB041F43EEE5B5E5B0918097B297B9C3322D1E7B5CB188"
+      },
+      {
+        "path": "f200/artifact-manifest.json",
+        "bytes": 9032,
+        "sha256": "A63EE0C466531FD031AE7F2203E748F28CE728F7E99E11644C3CBE81B1E1A94B"
+      },
+      {
+        "path": "f200/fixture-members.json",
+        "bytes": 6547,
+        "sha256": "14B7733025CF72E4331544DB70BE46B111D338E05B7A806707CC438D3C98EFEC"
+      },
+      {
+        "path": "f200/result.json",
+        "bytes": 48994,
+        "sha256": "0AAB6474E66F9D8C8BCDA42299313A42339B6CEE8C16D7012C2820A8CCF14544"
+      },
+      {
+        "path": "f210/api-canonical-outcome.json",
+        "bytes": 1458,
+        "sha256": "123E4CF2EC0C737CCE09D89DE64C6F2879309C69B3C08D7C2E42E261214228FB"
+      },
+      {
+        "path": "f210/artifact-manifest.json",
+        "bytes": 9059,
+        "sha256": "8671A0CFDCCEA2F4E6CC5A3FB8CE3261A41A59396DA6E68EF9C3697A1831E809"
+      },
+      {
+        "path": "f210/fixture-members.json",
+        "bytes": 6577,
+        "sha256": "CC173F021BF5B807C6EA673264DDE91657AB77C3267BDA0F3FAB402C8DAC3A5A"
+      },
+      {
+        "path": "f210/result.json",
+        "bytes": 49226,
+        "sha256": "ED03517E469223EB6FF04E459A553991EB2F3DA6BEDAF0E13D099BE9EAF56791"
+      }
+    ]
+  },
+  "limitations": [
+    "These runs retain original 12c/e504 package identities 87C0 and 4806. They are not relabelled as fa114/41b or current 76D4/4D5E runs.",
+    "Both consumers execute actual native initialization/load queries; Alpha uses data-stage family publication and Beta uses late final-fixes productivity publication.",
+    "Research completion uses explicit native setters. There is no actual-lab completion claim in these API production cases.",
+    "Each target has one production process and two separate read-only cold reloads with unchanged completed saves. Repeated reload markers are not new production workloads.",
+    "Execution-tool hashes are the exact CRLF checkout bytes recorded by the native runner; the derived proof also records their raw Git hashes.",
+    "The canonical library observer bytes are reused after raw-member conformance; staged repacked observer ZIPs are not claimed as the launched observer.",
+    "The external controller commit is observed workflow provenance, not a field attested by the artifact manifest.",
+    "The capsule retains eight exact original JSON files and one labelled derived readback. Complete logs, configurations, saves and ZIP payloads remain in primary custody.",
+    "Optional absence, other target capabilities, genuine clients, final-package qualification, API 1.0 stability, performance and publication remain separate."
+  ]
+}
