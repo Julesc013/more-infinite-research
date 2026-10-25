@@ -27,6 +27,8 @@ class ScienceTests(unittest.TestCase):
     def setUp(self):
         self.lua = LuaRuntime(unpack_returned_tuples=True)
         self.lua.globals().player_root = PLAYER.as_posix()
+        self.lua.globals().fresh_science_fixture = (
+            ROOT / "tests/fixtures/fresh-science-sources").as_posix()
         self.lua.execute(r'''
           package.path = player_root .. "/?.lua;" .. player_root .. "/?/init.lua"
           package.cpath = ""
@@ -69,7 +71,16 @@ class ScienceTests(unittest.TestCase):
               else raw.item.satellite.rocket_launch_product = {"space-science-pack",1000} end
               return raw
             end
-            for _, pack in ipairs(base) do source_recipe(raw, pack, false); source_owner(raw, pack, pack) end
+            local initial_red = target == "f017" or target == "f100" or target == "f110"
+            for _, pack in ipairs(base) do
+              if pack == "automation-science-pack" and initial_red then
+                -- Installed Base 0.17/1.0/1.1 has an initially enabled
+                -- shorthand-result red recipe and no red technology.
+                source_recipe(raw, pack, nil)
+              else
+                source_recipe(raw, pack, false); source_owner(raw, pack, pack)
+              end
+            end
             if space_age then
               source_recipe(raw, "space-science-pack", false)
               source_owner(raw, "space-science-pack", "space-science-pack",
@@ -153,11 +164,17 @@ class ScienceTests(unittest.TestCase):
           assert(middle.end_game.pack == "space-science-pack" and middle.end_game.prerequisites[1] == "rocket-silo")
           local f017 = bindings.select({id="f017"}, {})
           assert(f017.end_game.prerequisites[1] == "space-science-pack")
+          assert(f017.source_contracts["automation-science-pack"].kind == "initial-recipe")
+          assert(f017.pack_prerequisites["automation-science-pack"] == nil)
           assert(same(f017.pack_prerequisites["space-science-pack"], {"space-science-pack"}))
           local f100 = bindings.select({id="f100"}, {})
+          assert(f100.source_contracts["automation-science-pack"].kind == "initial-recipe")
+          assert(f100.pack_prerequisites["automation-science-pack"] == nil)
           assert(f100.pack_prerequisites["logistic-science-pack"] == nil)
           assert(same(f100.pack_prerequisites["space-science-pack"], {"space-science-pack"}))
           local f110 = bindings.select({id="f110"}, {})
+          assert(f110.source_contracts["automation-science-pack"].kind == "initial-recipe")
+          assert(f110.pack_prerequisites["automation-science-pack"] == nil)
           assert(same(f110.pack_prerequisites["space-science-pack"], {"space-science-pack"}))
           local space = bindings.select({id="f210"}, {["space-age"]="2.1.23"})
           assert(space.end_game.pack == "promethium-science-pack" and space.end_game.prerequisites[1] == "promethium-science-pack")
@@ -165,6 +182,58 @@ class ScienceTests(unittest.TestCase):
 
           local unknown = bindings.select({id="unreviewed-target"}, {})
           assert(#unknown.official == 0 and unknown.space == nil and unknown.end_game == nil)
+        ''')
+
+    def test_red_science_contracts_cover_every_target_and_seed_legacy_fresh_owner_units(self):
+        self.lua.execute(r'''
+          local initial = {
+            f013="science-pack-1", f014="science-pack-1", f015="science-pack-1", f016="science-pack-1",
+            f017="automation-science-pack", f100="automation-science-pack", f110="automation-science-pack"
+          }
+          for id, pack in pairs(initial) do
+            local selected = bindings.select({id=id}, {})
+            local contract = selected.source_contracts[pack]
+            assert(contract.kind == "initial-recipe" and contract.recipe == pack, id .. " red source")
+            assert(selected.pack_prerequisites[pack] == nil, id .. " red prerequisite")
+          end
+          for _, id in ipairs({"f200", "f210"}) do
+            local selected = bindings.select({id=id}, {})
+            local contract = selected.source_contracts["automation-science-pack"]
+            assert(contract.kind == "recipe-unlock" and contract.owner == "automation-science-pack", id .. " native red owner")
+            assert(same(selected.pack_prerequisites["automation-science-pack"], {"automation-science-pack"}),
+              id .. " native red prerequisite")
+          end
+
+          local function has(values, wanted)
+            for _, value in ipairs(values or {}) do if value == wanted then return true end end
+            return false
+          end
+          local function amount(rows, wanted)
+            for _, row in ipairs(rows or {}) do if row[1] == wanted then return row[2] end end
+            return nil
+          end
+          for _, id in ipairs({"f017", "f100", "f110"}) do
+            local selected = bindings.select({id=id}, {})
+            local fresh, owner = "fresh-unit-seed", "fresh-unit-seed-owner"
+            local packs, inputs = {fresh}, {fresh}
+            for _, name in ipairs(selected.official) do
+              packs[#packs + 1], inputs[#inputs + 1] = name, name
+            end
+            local raw = raw_with(packs, {all=inputs})
+            install_sources(raw, false, id)
+            assert(raw.technology["automation-science-pack"] == nil, id .. " created a nonexistent red owner")
+            raw.recipe[fresh] = {enabled=false, results={{type="item", name=fresh, amount=1}}}
+            raw.technology[owner] = {prerequisites={}, effects={{type="unlock-recipe", recipe=fresh}},
+              unit={count=1, time=1, ingredients={{"automation-science-pack", 1}}}}
+            local row = technology({{"chemical-science-pack", 9}}, {})
+            local result = science.apply(row, {}, science.prepare({raw=raw, target={id=id},
+              options={ ["mir-science-pack-ingredient-policy"]="all" }}))
+            assert(result.enabled and result.reason == "all", id .. " disabled an authored non-red row")
+            assert(amount(row.unit.ingredients, "automation-science-pack") == 1, id .. " omitted initial red")
+            assert(amount(row.unit.ingredients, fresh) == 1, id .. " rejected fresh unit seed")
+            assert(has(row.prerequisites, owner), id .. " omitted fresh owner")
+            assert(not has(row.prerequisites, "automation-science-pack"), id .. " added nonexistent red gate")
+          end
         ''')
 
     def test_policies_preserve_existing_order_amounts_and_append_only_missing_packs(self):
@@ -1119,6 +1188,390 @@ class ScienceTests(unittest.TestCase):
           local reports, context = science.apply_family(rows, bindings, {raw=raw, target={id="f210"}, options={}})
           assert(context.lab_visits == 3 and #reports == 75)
           for _, row in ipairs(rows) do assert(names(row.unit.ingredients) == "A:1,B:1") end
+        ''')
+
+    def test_family_all_policy_binds_the_published_fresh_trigger_seed_once_and_deterministically(self):
+        self.lua.execute(r'''
+          -- This is the published 4.7.3 planetary-data reproducer shape: the
+          -- first recipe/owner is circular, while the later disabled recipe is
+          -- independently seeded by a craft-item trigger.  The test calls the
+          -- real family path with no injected compatibility binding.
+          local selected = bindings.select({id="f200"}, {})
+          local official, pack, foreign = selected.official, "planetary-data", "foreign-lab-card"
+          local circular_recipe, seeded_recipe = "a-circular-planetary-data", "z-seeded-planetary-data"
+          local circular_owner, seeded_owner = "circular-planetary-owner", "seeded-planetary-owner"
+
+          local function count(values)
+            local total = 0
+            for _ in pairs(values) do total = total + 1 end
+            return total
+          end
+          local function has(values, wanted)
+            for _, value in ipairs(values or {}) do if value == wanted then return true end end
+            return false
+          end
+          local function amount(rows, wanted)
+            for _, row in ipairs(rows or {}) do
+              if row[1] == wanted then return row[2] end
+            end
+            return nil
+          end
+          local function source_ingredients()
+            local rows = {{foreign, 17}}
+            for index, name in ipairs(official) do rows[#rows + 1] = {name, index + 2} end
+            return rows
+          end
+          local function foreign_fingerprint(raw)
+            local circular = raw.recipe[circular_recipe]
+            local seeded = raw.recipe[seeded_recipe]
+            local circular_technology = raw.technology[circular_owner]
+            local seeded_technology = raw.technology[seeded_owner]
+            return table.concat({
+              raw.tool[pack].name,
+              tostring(circular.enabled), circular.ingredients[1][1], tostring(circular.results[1].amount),
+              tostring(seeded.enabled), seeded.ingredients[1][1], tostring(seeded.results[1].amount),
+              circular_technology.unit.ingredients[1][1], tostring(#circular_technology.prerequisites),
+              seeded_technology.research_trigger.type, seeded_technology.research_trigger.item,
+              tostring(seeded_technology.research_trigger.count), tostring(#seeded_technology.prerequisites)
+            }, "|")
+          end
+          local function make_raw(reversed, unrelated)
+            local packs, inputs = {foreign, pack}, {foreign, pack}
+            for _, name in ipairs(official) do packs[#packs + 1] = name; inputs[#inputs + 1] = name end
+            local raw = raw_with(packs, {all = inputs})
+            install_sources(raw, false, "f200")
+            local automation_clone = {}
+            for key, value in pairs(raw.tool["automation-science-pack"]) do automation_clone[key] = value end
+            automation_clone.name = pack
+            raw.tool[pack] = automation_clone
+            raw.item["iron-plate"] = {name="iron-plate"}
+            local function circular()
+              raw.recipe[circular_recipe] = {enabled=false, ingredients={{"iron-plate", 1}},
+                results={{type="item", name=pack, amount=1}}}
+              raw.technology[circular_owner] = {unit={count=1, time=1, ingredients={{pack, 1}}},
+                prerequisites={}, effects={{type="unlock-recipe", recipe=circular_recipe}}}
+            end
+            local function seeded()
+              raw.recipe[seeded_recipe] = {enabled=false, ingredients={{"iron-plate", 1}},
+                results={{type="item", name=pack, amount=1}}}
+              raw.technology[seeded_owner] = {prerequisites={},
+                research_trigger={type="craft-item", item="iron-plate", count=1},
+                effects={{type="unlock-recipe", recipe=seeded_recipe}}}
+            end
+            if reversed then seeded(); circular() else circular(); seeded() end
+            if unrelated then
+              raw.recipe["middle-unrelated-recipe"] = {enabled=false, ingredients={{"iron-plate", 1}},
+                results={{type="item", name="unrelated-output", amount=1}}}
+            end
+            return raw
+          end
+          local function owned(index)
+            local row = technology(source_ingredients(), {})
+            row.name = "recipe-prod-fresh-science-" .. index
+            row.effects = {{type="change-recipe-productivity", recipe="iron-gear-wheel", change=0.25}}
+            return row
+          end
+          local function run(reversed, unrelated)
+            local raw = make_raw(reversed, unrelated)
+            local before = foreign_fingerprint(raw)
+            local rows = {}
+            for index = 1, 37 do rows[index] = owned(index) end
+            local reports, context = science.apply_family(rows, nil, {
+              raw=raw, target={id="f200"}, options={ ["mir-science-pack-ingredient-policy"]="all" }
+            })
+            assert(not has(selected.official, pack), "a fresh input became an official science role")
+            for _, row in ipairs(rows) do
+              assert(amount(row.unit.ingredients, foreign) == 17, "existing foreign amount changed")
+              for index, name in ipairs(official) do
+                assert(amount(row.unit.ingredients, name) == index + 2, "official amount changed: " .. name)
+              end
+              assert(amount(row.unit.ingredients, pack) == 1, "fresh seed was not appended once")
+              assert(same(row.prerequisites, {seeded_owner}), "only the independently seeded owner may gate fresh science")
+              assert(row.effects[1].type == "change-recipe-productivity" and row.effects[1].change > 0,
+                "owned positive effect changed")
+            end
+            assert(#reports == #rows and reports[1].enabled and reports[1].reason == "all")
+            assert(foreign_fingerprint(raw) == before, "fresh binding mutated foreign raw prototypes")
+            return {
+              ingredients=names(rows[1].unit.ingredients), prerequisites=table.concat(rows[1].prerequisites, ","),
+              recipe_visits=context.fresh_recipe_visits, technology_visits=context.fresh_technology_visits,
+              expected_recipe_visits=count(raw.recipe), expected_technology_visits=count(raw.technology)
+            }
+          end
+
+          local forward = run(false, false)
+          local reversed = run(true, false)
+          local unrelated = run(false, true)
+          assert(forward.ingredients == reversed.ingredients and forward.prerequisites == reversed.prerequisites,
+            "producer insertion order changed the fresh binding")
+          assert(forward.ingredients == unrelated.ingredients and forward.prerequisites == unrelated.prerequisites,
+            "an unrelated producer changed the fresh binding")
+          for _, result in ipairs({forward, reversed, unrelated}) do
+            assert(result.recipe_visits == result.expected_recipe_visits,
+              "fresh recipes were not enumerated exactly once for the family")
+            assert(result.technology_visits == result.expected_technology_visits,
+              "fresh technologies were not enumerated exactly once for the family")
+          end
+        ''')
+
+    def test_fresh_all_policy_rejects_unseeded_forms_and_skips_raw_enumeration_without_unknown_inputs(self):
+        self.lua.execute(r'''
+          local selected = bindings.select({id="f200"}, {})
+          local official, pack, foreign = selected.official, "planetary-data", "foreign-lab-card"
+          local circular_recipe, seeded_recipe = "a-circular-planetary-data", "z-seeded-planetary-data"
+          local circular_owner, seeded_owner = "circular-planetary-owner", "seeded-planetary-owner"
+
+          local function count(values)
+            local total = 0
+            for _ in pairs(values) do total = total + 1 end
+            return total
+          end
+          local function amount(rows, wanted)
+            for _, row in ipairs(rows or {}) do if row[1] == wanted then return row[2] end end
+            return nil
+          end
+          local function source_ingredients()
+            local rows = {{foreign, 17}}
+            for index, name in ipairs(official) do rows[#rows + 1] = {name, index + 2} end
+            return rows
+          end
+          local function owned(index, include_foreign)
+            local rows = include_foreign and source_ingredients() or {}
+            if not include_foreign then
+              for item_index, name in ipairs(official) do rows[#rows + 1] = {name, item_index + 2} end
+            end
+            local row = technology(rows, {})
+            row.name = "recipe-prod-fresh-variant-" .. index
+            return row
+          end
+          local function signature(raw)
+            local a, z = raw.recipe[circular_recipe], raw.recipe[seeded_recipe]
+            local c, s = raw.technology[circular_owner], raw.technology[seeded_owner]
+            local z_result = z and z.results and z.results[1]
+            return table.concat({
+              raw.tool[pack].name, tostring(a.enabled), tostring(a.results[1].type), tostring(a.results[1].amount),
+              tostring(z and z.enabled), tostring(z_result and z_result.type), tostring(z_result and z_result.amount),
+              tostring(z and z.result), tostring(z and z.result_type),
+              tostring(c.unit.ingredients[1][1]), tostring(c.enabled), tostring(s and s.enabled),
+              tostring(s and s.research_trigger and s.research_trigger.item),
+              tostring(s and s.research_trigger and s.research_trigger.count),
+              tostring(s and s.unit and s.unit.ingredients[1][1]), tostring(raw.item["iron-plate"] ~= nil)
+            }, "|")
+          end
+          local function insert(raw, reversed, first, second)
+            if reversed then second(); first() else first(); second() end
+          end
+          local function variant_raw(kind, reversed)
+            local packs, inputs = {foreign, pack}, {foreign, pack}
+            for _, name in ipairs(official) do packs[#packs + 1] = name; inputs[#inputs + 1] = name end
+            local raw = raw_with(packs, {all=inputs})
+            install_sources(raw, false, "f200")
+            local automation_clone = {}
+            for key, value in pairs(raw.tool["automation-science-pack"]) do automation_clone[key] = value end
+            automation_clone.name = pack
+            raw.tool[pack] = automation_clone
+            raw.item["iron-plate"] = {name="iron-plate"}
+            local function circular()
+              raw.recipe[circular_recipe] = {enabled=false, ingredients={{"iron-plate", 1}},
+                results={{type="item", name=pack, amount=1}}}
+              raw.technology[circular_owner] = {prerequisites={}, unit={count=1, time=1, ingredients={{pack, 1}}},
+                effects={{type="unlock-recipe", recipe=circular_recipe}}}
+            end
+            local function seeded_recipe_row()
+              raw.recipe[seeded_recipe] = {enabled=kind == "initial", ingredients={{"iron-plate", 1}},
+                results={{type="item", name=pack, amount=1}}}
+              if kind == "zero" then raw.recipe[seeded_recipe].results[1].amount = 0 end
+              if kind == "fluid" then raw.recipe[seeded_recipe].results[1].type = "fluid" end
+              if kind == "shorthandfluid" then
+                raw.recipe[seeded_recipe].enabled = true
+                raw.recipe[seeded_recipe].results = nil
+                raw.recipe[seeded_recipe].result = pack
+                raw.recipe[seeded_recipe].result_type = "fluid"
+              end
+            end
+            insert(raw, reversed, circular, seeded_recipe_row)
+            if kind ~= "initial" and kind ~= "noowner" then
+              raw.technology[seeded_owner] = {prerequisites={}, effects={{type="unlock-recipe", recipe=seeded_recipe}},
+                research_trigger={type="craft-item", item="iron-plate", count=1}}
+              if kind == "disabled" then raw.technology[seeded_owner].enabled = false end
+              if kind == "circular" then
+                raw.technology[seeded_owner].research_trigger = nil
+                raw.technology[seeded_owner].unit = {count=1, time=1, ingredients={{pack, 1}}}
+              end
+              if kind == "research" then
+                -- A finite owner unit is accepted only through this already
+                -- declared craft-seeded automation source, which the shared
+                -- lab can use.  Merely enabling its recipe is not a seed.
+                raw.technology["automation-science-pack"].research_trigger = {
+                  type="craft-item", item="iron-plate", count=1
+                }
+                raw.technology[seeded_owner].research_trigger = nil
+                raw.technology[seeded_owner].unit = {count=1, time=1,
+                  ingredients={{"automation-science-pack", 1}}}
+              end
+              if kind == "formula" then
+                raw.technology["automation-science-pack"].research_trigger = {
+                  type="craft-item", item="iron-plate", count=1
+                }
+                raw.technology[seeded_owner].research_trigger = nil
+                raw.technology[seeded_owner].unit = {count_formula="2", time=1,
+                  ingredients={{"automation-science-pack", 1}}}
+              end
+              if kind == "falsecount" then raw.technology[seeded_owner].research_trigger.count = false end
+              if kind == "emptytriggeritem" then raw.technology[seeded_owner].research_trigger.item = "" end
+              if kind == "missing" then raw.item["iron-plate"] = nil end
+            end
+            if kind == "numerickey" then
+              local malformed = raw.recipe[seeded_recipe]
+              raw.recipe[seeded_recipe] = nil
+              malformed.name = seeded_recipe
+              raw.recipe[17] = malformed
+            end
+            return raw
+          end
+
+          local expected = {
+            initial={added=true, prerequisite=""},
+            research={added=true, prerequisite=seeded_owner},
+            noowner={added=false, prerequisite=""}, disabled={added=false, prerequisite=""},
+            circular={added=false, prerequisite=""}, zero={added=false, prerequisite=""},
+            fluid={added=false, prerequisite=""}, missing={added=false, prerequisite=""},
+            formula={added=false, prerequisite=""}, falsecount={added=false, prerequisite=""},
+            shorthandfluid={added=false, prerequisite=""}, emptytriggeritem={added=false, prerequisite=""},
+            numerickey={added=false, prerequisite=""}
+          }
+          local variants = {"initial", "research", "noowner", "disabled", "circular", "zero", "fluid", "missing", "formula", "falsecount", "shorthandfluid", "emptytriggeritem", "numerickey"}
+          for _, reversed in ipairs({false, true}) do
+            for _, kind in ipairs(variants) do
+              local want = expected[kind]
+              local raw = variant_raw(kind, reversed)
+              local before = signature(raw)
+              local rows = {}
+              for index = 1, 13 do rows[index] = owned(index, true) end
+              local reports, context = science.apply_family(rows, nil, {
+                raw=raw, target={id="f200"}, options={ ["mir-science-pack-ingredient-policy"]="all" }
+              })
+              for _, row in ipairs(rows) do
+                assert(amount(row.unit.ingredients, foreign) == 17, "foreign input changed: " .. kind)
+                assert((amount(row.unit.ingredients, pack) == 1) == want.added, "fresh variant changed: " .. kind)
+                assert(table.concat(row.prerequisites, ",") == want.prerequisite,
+                  "fresh owner prerequisites differ: " .. kind)
+              end
+              assert((reports[1].reason == "all") == want.added, "unbound variant was reported as bound: " .. kind)
+              assert(signature(raw) == before, "variant mutated foreign raw: " .. kind)
+              assert(context.fresh_recipe_visits == count(raw.recipe)
+                and context.fresh_technology_visits == (kind == "initial" and 0 or count(raw.technology)),
+                "fresh enumeration was not bounded to one pass: " .. kind)
+            end
+          end
+
+          -- No all-policy fresh search is justified when every accepted lab
+          -- input is already a target-approved official pack.
+          for _, options in ipairs({{}, {["mir-science-pack-ingredient-policy"]="all-official"},
+              {["mir-science-pack-ingredient-policy"]="all"}}) do
+            local raw = raw_with(official, {all=official})
+            install_sources(raw, false, "f200")
+            local rows = {}
+            for index = 1, 19 do rows[index] = owned(index, false) end
+            local reports, context = science.apply_family(rows, nil, {raw=raw, target={id="f200"}, options=options})
+            assert(#reports == #rows and reports[1].enabled)
+            assert(context.fresh_recipe_visits == 0 and context.fresh_technology_visits == 0,
+              "known-only policy enumerated foreign source tables")
+          end
+
+          -- A current owned row which already carries its unfamiliar input
+          -- does not search.  If a later family row needs that same input,
+          -- the fixed context scans once and then reuses its unbound result.
+          local raw = raw_with({foreign}, {all={foreign}})
+          for _, name in ipairs(official) do
+            raw.tool[name] = {name=name}
+            raw.lab.all.inputs[#raw.lab.all.inputs + 1] = name
+            raw.recipe[name] = {enabled=false, results={{type="item", name=name, amount=1}}}
+            raw.technology[name] = {effects={{type="unlock-recipe", recipe=name}}}
+          end
+          local carried = owned(1, true)
+          local later, final = owned(2, false), owned(3, false)
+          local reports, context = science.apply_family({carried, later, final}, nil, {
+            raw=raw, target={id="f200"}, options={ ["mir-science-pack-ingredient-policy"]="all" }
+          })
+          assert(reports[1].reason == "all" and reports[2].reason == "all-unbound-sources"
+            and reports[3].reason == "all-unbound-sources")
+          assert(amount(carried.unit.ingredients, foreign) == 17 and amount(later.unit.ingredients, foreign) == nil)
+          assert(context.fresh_recipe_visits == count(raw.recipe) and context.fresh_technology_visits == 0,
+            "later missing unfamiliar input did not trigger one bounded recipe-only scan")
+        ''')
+
+    def test_fresh_science_fixture_executes_its_actual_data_stage_predicate(self):
+        fixture = ROOT / "tests/fixtures/fresh-science-sources"
+        info = json.loads((fixture / "info.json").read_text(encoding="utf-8"))
+        self.assertEqual(info["factorio_version"], "2.1")
+        self.assertEqual(info["dependencies"], [
+            "base >= 2.1.23", "more-infinite-research >= 4.7.21003",
+        ])
+        self.lua.execute(r'''
+          local PACK = "planetary-data"
+          local CIRCULAR = "mir473-circular-planetary-owner"
+          local SEEDED = "mir473-seeded-planetary-owner"
+          local function fixture(name) return fresh_science_fixture .. "/" .. name end
+          local function deep_copy(value, seen)
+            if type(value) ~= "table" then return value end
+            seen = seen or {}
+            if seen[value] then return seen[value] end
+            local copy = {}
+            seen[value] = copy
+            for key, member in pairs(value) do copy[deep_copy(key, seen)] = deep_copy(member, seen) end
+            return copy
+          end
+          local function staged()
+            data = {raw={item={}, tool={
+              ["automation-science-pack"]={type="tool", name="automation-science-pack", stack_size=200}
+            }, lab={one={inputs={"automation-science-pack"}}, two={inputs={"automation-science-pack"}}},
+              recipe={}, technology={}, ["string-setting"]={
+                ["mir-science-pack-ingredient-policy"]={default_value="configured"}
+              }}}
+            function data:extend(rows)
+              for _, row in ipairs(rows) do
+                self.raw[row.type] = self.raw[row.type] or {}
+                self.raw[row.type][row.name] = row
+              end
+            end
+            table.deepcopy = deep_copy
+            dofile(fixture("settings-updates.lua"))
+            assert(data.raw["string-setting"]["mir-science-pack-ingredient-policy"].default_value == "all")
+            dofile(fixture("data-updates.lua"))
+            assert(data.raw.tool[PACK] and data.raw.tool[PACK].stack_size == 200)
+            for _, lab in pairs(data.raw.lab) do assert(lab.inputs[#lab.inputs] == PACK) end
+            local row = {unit={ingredients={{type="item", name=PACK, amount=1}}},
+              prerequisites={SEEDED}, effects={{type="change-recipe-productivity", recipe="iron-gear-wheel", change=0.2}}}
+            data.raw.technology["recipe-prod-research_fixture-1"] = row
+            data.raw.technology["automation-science-pack"] = {prerequisites={}}
+            return row
+          end
+          local function evaluate(mutate)
+            local row = staged()
+            if mutate then mutate(row) end
+            return pcall(dofile, fixture("data-final-fixes.lua"))
+          end
+          local ok = evaluate()
+          assert(ok, "actual fixture rejected the typed positive data-stage shape")
+          assert(evaluate(function(row) row.prerequisites = {"automation-science-pack", SEEDED} end),
+            "actual fixture rejected the retained authored official gate")
+          assert(evaluate(function(row)
+            data.raw.technology["recipe-prod-research_spoilage_preservation-1"] = {
+              unit={ingredients={{PACK,1}}}, prerequisites={SEEDED},
+              effects={{type="nothing",effect_description={"fixture-scripted-effect"}}}
+            }
+          end), "actual fixture confused a legitimate scripted effect with removed productivity")
+          for _, mutate in ipairs({
+            function(row) row.unit.ingredients[1].amount = 0 end,
+            function(row) row.unit.ingredients[1].type = "fluid" end,
+            function(row) row.prerequisites = {"automation-science-pack"} end,
+            function(row) row.prerequisites = {CIRCULAR} end,
+            function(row) row.effects = {{type="change-recipe-productivity", recipe="iron-gear-wheel", change=0}} end
+          }) do
+            local accepted = evaluate(mutate)
+            assert(not accepted, "actual fixture accepted a zero/fluid/wrong-gate/opposing-effect shape")
+          end
         ''')
 
 

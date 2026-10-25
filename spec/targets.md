@@ -20,7 +20,7 @@ source_of_truth_for:
 
 The maintainer's 2026-10-25 direction makes **Factorio 2.1.23 stable (F210)** the primary MIR5 design, implementation, qualification and release target. Design new behavior against its actual native APIs and capabilities. Keep the small deterministic Generator and shared semantic implementations, with narrowly selected adapters for earlier engines.
 
-The earlier MIR4 engine families retain **best-effort builds and support** for their delivered subsets, using the same nine-edition version encoding and stable mod/technology/migration identities. Qualify them with available exact-engine evidence and state remaining gaps by edition. F210 acceptance takes priority over further earlier-engine campaigns; existing historical receipts retain their real inputs and verdicts. The primary F210 package still requires its exact native, upgrade/save/client, performance and delivery evidence.
+The earlier MIR4 engine families retain **best-effort builds and support** for their delivered subsets, using the same nine-edition version encoding and stable mod/technology/migration identities. Keep common feature behavior, setting identities and meanings, and presentation consistent where native capabilities permit; isolate engine differences in the selected adapters. Qualify F200 for2.0.77 and the seven historical editions with available exact-engine evidence, stating remaining gaps by edition. F210 acceptance takes priority over further earlier-engine campaigns; existing historical receipts retain their real inputs and verdicts. The primary F210 package still requires its exact native, upgrade/save/client, performance and delivery evidence.
 
 ## Baseline targets, not new qualification
 
