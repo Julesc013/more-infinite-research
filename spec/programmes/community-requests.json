@@ -54,6 +54,41 @@
       "schema": 1,
       "sources": [
         {
+          "id": "P-SCI-WEB-2026-10-25",
+          "title": "Public Crash after update thread follow-up",
+          "url": "https://mods.factorio.com/mod/more-infinite-research/discussion/6ad37dc9edf876883c832c02",
+          "observed_on": "2026-10-25",
+          "basis": "Cached public page confirms the earlier space-science and automation ambiguity reports retained from the maintainer paste. It is not a fresh complete capture of the later Driku replies; relative ages are not absolute dates."
+        },
+        {
+          "id": "P-SCI-CRYO-2026-10-25",
+          "title": "Public Error loading mods on 2.1.23 report",
+          "url": "https://mods.factorio.com/mod/more-infinite-research/discussion/6ad79fcdf560f49854f1b624",
+          "observed_on": "2026-10-25",
+          "basis": "Cached public thread names cryogenic-science-pack unresolved approved dependencies and the reported 2.1.23 engine. The later maintainer request to try4.7 is not reporter confirmation, an archive identity or MIR5 qualification."
+        },
+        {
+          "id": "P-ANGEL-SILVER-2026-10-25",
+          "title": "Public disabled Angel silver prerequisite report",
+          "url": "https://mods.factorio.com/mod/more-infinite-research/discussion/6ad33b18698cbdddab2f4493",
+          "observed_on": "2026-10-25",
+          "basis": "Cached public thread identifies the disabled silver prerequisite on modules and a maintainer4.5.2 repair claim. Published4.7.3 source separately retains that guarded repair; neither establishes its MIR5 port or exact reporter qualification."
+        },
+        {
+          "id": "P-TRUE-NUKES-2026-10-25",
+          "title": "Public True Nukes Continued crash report",
+          "url": "https://mods.factorio.com/mod/more-infinite-research/discussion/6ad0f799032bb672e99b49cc",
+          "observed_on": "2026-10-25",
+          "basis": "Public reporter links the crash to enabling True Nukes and mentions its nuclear-test research. No exact error, engine, archive, mod version or closure is supplied; the maintainer acknowledgement is not a fix receipt."
+        },
+        {
+          "id": "P-MP-JOIN-2026-10-25",
+          "title": "Public multiplayer join failure after an update",
+          "url": "https://mods.factorio.com/mod/more-infinite-research/discussion/6ad043552eba030bbe7b9999",
+          "observed_on": "2026-10-25",
+          "basis": "Cached thread reports a second player failing to join after an update and links an external screenshot. The screenshot was inaccessible through the web capture. The maintainer4.4.1 fix claim is retained as history, not MIR5 multiplayer qualification."
+        },
+        {
           "id": "P-SCI-OWNER-2026-10-23",
           "title": "Maintainer-supplied Tr1ckY_Fate Error loading mod report",
           "url": "https://mods.factorio.com/mod/more-infinite-research/discussion/6adaf0f625d5abdc6c80cdf0",
@@ -380,7 +415,7 @@
     },
     "document_authority": "Proposed brief accepted as task scope; technical assertions require exact independent evidence."
   },
-  "request_count": 85,
+  "request_count": 87,
   "requests": [
     {
       "id": "UI-01",
@@ -4395,7 +4430,10 @@
         "Close only with named exact-source/package/engine/mod/settings evidence; release comments, disabled-mod anecdotes and static tests alone do not establish a fix."
       ],
       "source_ids": [
-        "P-SCI-2026-10-23"
+        "P-SCI-2026-10-23",
+        "P-SCI-WEB-2026-10-25",
+        "P-SCI-CRYO-2026-10-25",
+        "P-ANGEL-SILVER-2026-10-25"
       ],
       "feature_group": "science-integration-regressions",
       "status": "requested-not-qualified",
@@ -4453,7 +4491,23 @@
           "Complete original log, save and captured final prototypes",
           "Confirmed minimal reproduction"
         ],
-        "disposition": "Open intake only; no implementation or native qualification performed."
+        "disposition": "Open intake only; no implementation or native qualification performed.",
+        "verified_public_followups": [
+          {
+            "source_id": "P-SCI-WEB-2026-10-25",
+            "scope": "Original thread URL recovered; cached page covers the earlier reports only. Preserve all later maintainer-pasted recurrence evidence unchanged."
+          },
+          {
+            "source_id": "P-SCI-CRYO-2026-10-25",
+            "signature": "unresolved-approved-pack-dependencies:cryogenic-science-pack",
+            "scope": "Additional pack-binding failure subject under this original ID. Reported engine2.1.23; exact MIR hash, provider/closure and confirmation after the requested4.7 update remain unknown. The separate representative cryogenic native chain is not this reporter reproduction."
+          },
+          {
+            "source_id": "P-ANGEL-SILVER-2026-10-25",
+            "published_source": "8643cc91bc915e008556a5315dbb0a743247e7ab:source/prototypes/mir/compatibility/repairs/angels_smelting.lua",
+            "scope": "The public workaround is now independently read, and published4.7.3 retains the guarded repair. Carry the useful repair into MIR5 as admitted override code; do not infer current implementation or native acceptance from the old release claim."
+          }
+        ]
       }
     },
     {
@@ -4528,6 +4582,92 @@
           "reporter_provider_confirmed": false
         },
         "disposition": "Open report intake; matching thread and published guard source identified, but no verified provider, root cause, corrected native execution or save qualification yet."
+      }
+    },
+    {
+      "id": "COMP-TRUE-NUKES-01",
+      "title": "Crash reported when enabling True Nukes Continued",
+      "requesters": [
+        "spideyboy6",
+        "Julesc013"
+      ],
+      "decision": "retain-open-for-mir5-regression-and-community-continuity",
+      "mechanism": "Recover the actual nuclear-test research failure before attributing it to MIR",
+      "proposed_scope": "Retain the reported foreign trigger/test research alongside ordinary MIR research",
+      "rationale": "A published crash report remains an obligation even when its original configuration is incomplete; neither an old maintainer acknowledgement nor the replacement architecture proves resolution.",
+      "implementation": "Recover exact engine, MIR/True Nukes archives, dependency closure, settings and original stack. Distinguish upstream failure from MIR admission or presentation before implementing a bounded correction.",
+      "acceptance": [
+        "Identify the actual reported technology and its native research unit or trigger; preserve its identity/effects rather than inventing a science owner or deleting it.",
+        "Use a dependency-valid exact reproducer plus independent ordinary/foreign research opponents and preserve earned state when an upgrade is implicated.",
+        "Keep the report open until named exact-input native evidence supports closure; a general trigger fixture or architecture change alone is not reporter qualification."
+      ],
+      "source_ids": [
+        "P-TRUE-NUKES-2026-10-25"
+      ],
+      "feature_group": "compatibility-regressions",
+      "status": "requested-not-qualified",
+      "mir5_route_disposition": {
+        "state": "reported-inputs-incomplete-not-reporter-qualified",
+        "current_source": [],
+        "evidence": [],
+        "limitations": [
+          "No exact reporter reproduction or MIR5 fix is claimed by this intake. Existing representative/native lifecycle evidence retains its own scope and identity."
+        ]
+      },
+      "qualification": [],
+      "reported_evidence": {
+        "source_id": "P-TRUE-NUKES-2026-10-25",
+        "observation": "Reporter attributes a crash to enabling True Nukes and its nuclear-test research; no precise signature or configuration was supplied.",
+        "missing": [
+          "Original error/stack",
+          "Exact engine and both mod archive hashes/versions",
+          "Complete dependency/settings closure",
+          "Reproducer or affected save"
+        ]
+      }
+    },
+    {
+      "id": "MP-JOIN-01",
+      "title": "Multiplayer join failure reported after a MIR update",
+      "requesters": [
+        "deafmints",
+        "Julesc013"
+      ],
+      "decision": "retain-open-for-mir5-regression-and-community-continuity",
+      "mechanism": "Retain the original join failure and historical4.4.1 fix claim as a distinct continuity obligation",
+      "proposed_scope": "Real second-client join/rejoin and host-restart safety for the complete MIR5 package",
+      "rationale": "A published crash report remains an obligation even when its original configuration is incomplete; neither an old maintainer acknowledgement nor the replacement architecture proves resolution.",
+      "implementation": "Recover the screenshot error and exact historical closure if available; qualify actual distinct-client lifecycle and saved state on supported current packages without executing forbidden game access during on_load.",
+      "acceptance": [
+        "Preserve the original update/join report and distinguish a maintainer4.4.1 fix claim from a reproduced or current-qualified result.",
+        "Verify genuine second-client join, rejoin, host save/restart and read-only on_load behavior while preserving earned research and owned runtime state.",
+        "Name exact source/package/engine/mod/settings/save and client evidence; missing original inputs keep exact reporter closure unresolved."
+      ],
+      "source_ids": [
+        "P-MP-JOIN-2026-10-25"
+      ],
+      "feature_group": "runtime-and-multiplayer-regressions",
+      "status": "requested-not-qualified",
+      "mir5_route_disposition": {
+        "state": "reported-inputs-incomplete-not-reporter-qualified",
+        "current_source": [],
+        "evidence": [],
+        "limitations": [
+          "No exact reporter reproduction or MIR5 fix is claimed by this intake. Existing representative/native lifecycle evidence retains its own scope and identity."
+        ]
+      },
+      "qualification": [],
+      "reported_evidence": {
+        "source_id": "P-MP-JOIN-2026-10-25",
+        "screenshot_url": "https://i.imgur.com/Blc0VpG.png",
+        "historical_maintainer_claim": "A maintainer reply attributes a fix to4.4.1; this is not an independently observed result.",
+        "capture_limit": "Linked screenshot could not be read by the current web capture; no error signature is inferred.",
+        "missing": [
+          "Readable original error/stack",
+          "Exact engine and before/after MIR archive identities",
+          "Complete mod/settings closure",
+          "Affected save and actual client versions"
+        ]
       }
     }
   ]
