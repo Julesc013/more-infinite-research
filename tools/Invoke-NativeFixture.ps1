@@ -512,9 +512,14 @@ try{
     Assert-Fixture ((Get-FixtureSha ([string]$actualObserver.path)) -ceq [string]$activeModsObserverBinding.sha256) 'ActiveModsObserver activation archive differs from verified FixtureSources input'
     $record.active_mods_observer=[ordered]@{name=[string]$actualObserver.name;version=[string]$actualObserver.version;source=[string]$activeModsObserverBinding.source;archive=[string]$actualObserver.path;sha256=Get-FixtureSha ([string]$actualObserver.path)}
   }
+  $activeSave=if($activeSeed){Join-Path $writeData 'saves/mir5-native-active.zip'}else{$null}
   $seed=$inputSave
   if(-not $seed){
-    $seed=Join-Path $writeData 'saves/seed.zip'
+    # `game.server_save` does not write from Factorio's single-player
+    # --create context.  Repair's active preparation therefore earns its
+    # sole closed pending save directly at the active-save destination.
+    # Agriculture still creates seed.zip and has its existing server stage.
+    $seed=if($activeSeed -and $ActiveSeedKind -ceq 'repair-stress'){$activeSave}else{Join-Path $writeData 'saves/seed.zip'}
     $record.create=Invoke-FixtureStage 'create' @('--create',$seed)
     $record.create.consumers=Read-ConsumerResults ([IO.File]::ReadAllText($record.create.log)) 'init'
     Assert-Fixture (Test-Path -LiteralPath $seed -PathType Leaf) 'seed save absent'
@@ -522,8 +527,8 @@ try{
   $record.seed_sha256=Get-FixtureSha $seed
   $live=Join-Path $writeData 'factorio-current.log'
   if($activeSeed){
-    $activeSave=Join-Path $writeData 'saves/mir5-native-active.zip'
     if($ActiveSeedKind -ceq 'repair-stress'){
+      Assert-Fixture ($seed -ceq $activeSave) 'active repair create save target differs'
       $record.active_preparation=@{stage='create';marker=(Read-ActiveFixtureMarker ([IO.File]::ReadAllText($record.create.log)) 'repair-stress' 'prepared')}
     }else{
       $server=Join-Path $resources.root 'server-settings.json'
