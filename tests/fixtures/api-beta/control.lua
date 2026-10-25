@@ -77,9 +77,14 @@ local function emit_pending()
   local force = player_force()
   local status, code = call("get_research", force.index, technology_name)
   if code ~= nil or status == nil then fail("tick query differs") end
+  local native = force.technologies[technology_name]
+  if native == nil or status.researched ~= native.researched then
+    fail("tick research status differs")
+  end
   local row = pending_stage
   row.tick = game.tick
   row.reload_level = status.level
+  row.reload_researched = status.researched
   row.reload_manual_crafting_speed_modifier = force.manual_crafting_speed_modifier
   log("[MIR5_API_BETA] RESULT " .. helpers.table_to_json(row))
   pending_stage = nil
