@@ -30,8 +30,23 @@ def _encoded(document: object) -> bytes:
     return json.dumps(document, indent=2, sort_keys=True).encode("utf-8") + b"\n"
 
 
-def _analysis_plan() -> dict[str, object]:
-    return json.loads(SPEC_PATH.read_text(encoding="utf-8"))
+def _analysis_plan(cohort: str = "r23") -> dict[str, object]:
+    plan = json.loads(SPEC_PATH.read_text(encoding="utf-8"))
+    if cohort == "r24":
+        plan["kind"] = "MIR5ResponsiveMenuR24AnalysisPlanV1"
+        plan["raw_plan"]["path"] = "spec/evidence/bob-angel-menu-plan-r24.json"
+        plan["schedule"]["total_rows"] = 262
+        plan["schedule"]["counterbalanced_blocks"] = 64
+        plan["schedule"]["latin_rotations"] *= 8
+        plan["analysis"]["scored_blocks"] = list(range(1, 65))
+        plan["analysis"]["early_control_blocks"] = list(range(1, 33))
+        plan["analysis"]["late_control_blocks"] = list(range(33, 65))
+        plan["analysis"]["student_t_95_two_sided"] = 1.9983405425207416
+        plan["analysis"]["student_t_degrees_of_freedom"] = 63
+        plan["analysis"]["assumption"] = "The 64 paired blocks are treated as independent and roughly symmetric."
+    else:
+        assert cohort == "r23"
+    return plan
 
 
 def _raw_plan(plan: dict[str, object]) -> dict[str, object]:
@@ -60,6 +75,9 @@ def _raw_plan(plan: dict[str, object]) -> dict[str, object]:
             "minimum_mir_added_time_reduction_percent": plan["tolerance_policy"]["minimum_mir_added_time_reduction_percent"],
         },
         "resources": {"per_launch_timeout_seconds": 300},
+        "design": {"warmups_per_arm": 1, "same_version_aa_observations": 2,
+                   "counterbalanced_blocks": plan["schedule"]["counterbalanced_blocks"],
+                   "primary_observations_per_arm": plan["schedule"]["counterbalanced_blocks"]},
     }
 
 
@@ -75,8 +93,8 @@ def _execution_tolerance(plan: dict[str, object]) -> dict[str, object]:
             "absolute_tolerance_seconds": tolerance["aa_absolute_seconds"],
             "relative_tolerance_percent": tolerance["aa_relative_percent"],
         },
-        "primary_samples_per_arm": 8,
-        "counterbalanced_blocks": 8,
+        "primary_samples_per_arm": plan["schedule"]["counterbalanced_blocks"],
+        "counterbalanced_blocks": plan["schedule"]["counterbalanced_blocks"],
     }
 
 
@@ -90,11 +108,12 @@ def _result(
     aa: tuple[float, float] = (12.0, 12.1),
 ) -> dict[str, object]:
     expected = ANALYZER._expected_schedule(plan["schedule"])
-    controls = controls or [10.0] * 8
-    published_offsets = published_offsets or [2.0] * 8
-    candidate_offsets = candidate_offsets or [1.0] * 8
-    replay_offsets = replay_offsets or [1.5] * 8
-    assert len(controls) == len(published_offsets) == len(candidate_offsets) == len(replay_offsets) == 8
+    count = plan["schedule"]["counterbalanced_blocks"]
+    controls = controls or [10.0] * count
+    published_offsets = published_offsets or [2.0] * count
+    candidate_offsets = candidate_offsets or [1.0] * count
+    replay_offsets = replay_offsets or [1.5] * count
+    assert len(controls) == len(published_offsets) == len(candidate_offsets) == len(replay_offsets) == count
     identity = plan["identity"]
     inputs = {
         "factorio": {"base_version": identity["engine"]["version"], "sha256": identity["engine"]["sha256"]},
@@ -161,8 +180,8 @@ def _result(
     }
 
 
-def _prepared() -> tuple[dict[str, object], dict[str, object], str]:
-    plan = _analysis_plan()
+def _prepared(cohort: str = "r23") -> tuple[dict[str, object], dict[str, object], str]:
+    plan = _analysis_plan(cohort)
     raw = _raw_plan(plan)
     raw_hash = _sha256(_encoded(raw))
     plan["raw_plan"]["sha256"] = raw_hash
@@ -170,6 +189,54 @@ def _prepared() -> tuple[dict[str, object], dict[str, object], str]:
 
 
 class MenuComparisonAnalysisTests(unittest.TestCase):
+    def test_fixed_r24_uses_all_sixty_four_blocks_and_its_own_interval(self) -> None:
+        import math
+        import statistics
+        plan, raw, raw_hash = _prepared("r24")
+        d4 = [1.0, 3.0] * 32
+        d5 = [0.25, 0.75] * 32
+        result = _result(plan, published_offsets=d4, candidate_offsets=d5)
+        self.assertEqual(len(result["samples"]), 262)
+        output = ANALYZER.analyze(plan, "A" * 64, raw, raw_hash, result, "B" * 64)
+        self.assertEqual(output["kind"], "MIR5ResponsiveMenuR24AnalysisV1")
+        self.assertEqual(output["inference"]["n"], 64)
+        self.assertEqual(output["inference"]["degrees_of_freedom"], 63)
+        self.assertEqual(output["control_drift"]["early_blocks"], list(range(1, 33)))
+        self.assertEqual(output["control_drift"]["late_blocks"], list(range(33, 65)))
+        self.assertEqual(len(output["paired_blocks"]), 64)
+        summary = output["summaries"]["published_added_time_d4_seconds"]
+        self.assertEqual(summary["arithmetic_mean_seconds"], 2.0)
+        expected_sd = statistics.stdev(d4)
+        self.assertAlmostEqual(expected_sd ** 2, 64.0 / 63.0)
+        self.assertAlmostEqual(summary["sample_standard_deviation_seconds"], expected_sd)
+        half_width = 1.9983405425207416 * expected_sd / math.sqrt(64)
+        self.assertAlmostEqual(summary["student_t_95_mean_interval_seconds"]["lower"], 2.0 - half_width)
+        self.assertAlmostEqual(summary["student_t_95_mean_interval_seconds"]["upper"], 2.0 + half_width)
+        self.assertEqual(output["objective"]["reduction_percent"], 75.0)
+        self.assertEqual(output["menu_verdict"]["status"], "analysis-complete-objective-supported")
+        self.assertFalse(output["claims"]["release_qualification"])
+
+    def test_cohorts_cannot_exchange_schedule_grouping_or_degrees_of_freedom(self) -> None:
+        plan, raw, raw_hash = _prepared("r24")
+        bad = copy.deepcopy(plan)
+        bad["schedule"]["counterbalanced_blocks"] = 8
+        with self.assertRaises(ANALYZER.MenuAnalysisError):
+            ANALYZER.analyze(bad, "A" * 64, raw, raw_hash, _result(plan), "B" * 64)
+        for key, value in (("student_t_degrees_of_freedom", 7),
+                           ("student_t_95_two_sided", 2.3646242510102993),
+                           ("early_control_blocks", [1, 2, 3, 4])):
+            bad = copy.deepcopy(plan)
+            bad["analysis"][key] = value
+            with self.subTest(field=key), self.assertRaises(ANALYZER.MenuAnalysisError):
+                ANALYZER.analyze(bad, "A" * 64, raw, raw_hash, _result(plan), "B" * 64)
+        result = _result(plan)
+        result["samples"].pop()
+        with self.assertRaisesRegex(ANALYZER.MenuAnalysisError, "262 samples"):
+            ANALYZER.analyze(plan, "A" * 64, raw, raw_hash, result, "B" * 64)
+        old_plan, old_raw, old_hash = _prepared()
+        with self.assertRaises(ANALYZER.MenuAnalysisError):
+            ANALYZER.analyze(old_plan, "A" * 64, old_raw, old_hash, _result(plan), "B" * 64)
+
     def test_hand_computed_paired_result_supports_fifty_percent_objective(self) -> None:
         plan, raw, raw_hash = _prepared()
         result = _result(plan)

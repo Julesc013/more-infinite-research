@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
-"""Analyze one frozen R23 responsive-menu observation receipt.
+"""Analyze one frozen R23 or R24 responsive-menu observation receipt.
 
-This reader is deliberately narrow.  It accepts only the predeclared R23
-schedule and identities, preserves the raw observations, and produces an
+This reader is deliberately narrow. It accepts the two fixed experiment
+cohorts, preserves their raw observations, and produces an
 endpoint-only menu analysis.  It does not prepare archives, launch Factorio,
 or make a release, runtime, UI-fidelity, or memory verdict.
 """
@@ -29,10 +29,18 @@ MAX_RAW_PLAN_BYTES = 512 * 1024
 MAX_RESULT_BYTES = 32 * 1024 * 1024
 SHA256 = re.compile(r"^[A-F0-9]{64}$")
 T95_N8_DF7 = 2.3646242510102993
+# InverseCDF[StudentTDistribution[63], 39/40] = 1.99834054252074158.
+T95_N64_DF63 = 1.9983405425207416
+COHORTS = {
+    ANALYSIS_PLAN_KIND: {"id": "r23", "blocks": 8, "critical": T95_N8_DF7,
+                         "raw_path": "spec/evidence/bob-angel-menu-plan-r23.json", "result_kind": KIND},
+    "MIR5ResponsiveMenuR24AnalysisPlanV1": {"id": "r24", "blocks": 64, "critical": T95_N64_DF63,
+                         "raw_path": "spec/evidence/bob-angel-menu-plan-r24.json", "result_kind": "MIR5ResponsiveMenuR24AnalysisV1"},
+}
 
 
 class MenuAnalysisError(ValueError):
-    """A supplied plan or observation is not admissible for R23 analysis."""
+    """A supplied plan or observation is not admissible for a fixed menu cohort."""
 
 
 def _reject_duplicate_object(pairs: list[tuple[str, Any]]) -> dict[str, Any]:
@@ -92,6 +100,13 @@ def _string(value: Any, label: str) -> str:
     return value
 
 
+def _cohort(plan: dict[str, Any]) -> dict[str, Any]:
+    kind = _string(plan.get("kind"), "analysis plan kind")
+    if kind not in COHORTS:
+        raise MenuAnalysisError("analysis plan must identify the fixed R23 or R24 cohort")
+    return COHORTS[kind]
+
+
 def _integer(value: Any, label: str) -> int:
     if isinstance(value, bool) or not isinstance(value, int):
         raise MenuAnalysisError(f"{label} must be an integer")
@@ -117,7 +132,7 @@ def _boolean(value: Any, label: str) -> bool:
 
 def _same(actual: Any, expected: Any, label: str) -> None:
     if actual != expected:
-        raise MenuAnalysisError(f"{label} does not match the frozen R23 contract")
+        raise MenuAnalysisError(f"{label} does not match the frozen menu contract")
 
 
 def _sha256(value: Any, label: str) -> str:
@@ -129,25 +144,26 @@ def _sha256(value: Any, label: str) -> str:
 
 def _expect_hash(actual: Any, expected: Any, label: str) -> None:
     if _sha256(actual, label) != _sha256(expected, f"{label} expected"):
-        raise MenuAnalysisError(f"{label} does not match the frozen R23 identity")
+        raise MenuAnalysisError(f"{label} does not match the frozen menu identity")
 
 
 def _expected_schedule(schedule: dict[str, Any]) -> list[dict[str, Any]]:
     arms = [_string(value, "analysis schedule arm") for value in _array(schedule.get("arms"), "analysis schedule arms")]
     if arms != ["control-without-mir", "published-4.7", "replay", "candidate-mir5"]:
-        raise MenuAnalysisError("analysis schedule arms are not the frozen R23 arms")
+        raise MenuAnalysisError("analysis schedule arms are not the frozen menu arms")
     warmups = [_string(value, "analysis warmup arm") for value in _array(schedule.get("warmups"), "analysis warmups")]
     if warmups != arms:
-        raise MenuAnalysisError("analysis warmup order is not the frozen R23 order")
+        raise MenuAnalysisError("analysis warmup order is not the frozen menu order")
     if _string(schedule.get("same_version_aa_arm"), "analysis AA arm") != "published-4.7":
-        raise MenuAnalysisError("analysis AA arm is not the frozen R23 arm")
+        raise MenuAnalysisError("analysis AA arm is not the frozen menu arm")
     if _integer(schedule.get("same_version_aa_observations"), "analysis AA observations") != 2:
-        raise MenuAnalysisError("analysis AA count is not the frozen R23 count")
-    if _integer(schedule.get("counterbalanced_blocks"), "analysis block count") != 8:
-        raise MenuAnalysisError("analysis block count is not the frozen R23 count")
+        raise MenuAnalysisError("analysis AA count is not the frozen menu count")
+    count = _integer(schedule.get("counterbalanced_blocks"), "analysis block count")
+    if count not in (8, 64):
+        raise MenuAnalysisError("analysis block count must be the fixed 8 or 64")
     rotations = _array(schedule.get("latin_rotations"), "analysis Latin rotations")
-    if len(rotations) != 8:
-        raise MenuAnalysisError("analysis Latin rotations must have eight blocks")
+    if len(rotations) != count:
+        raise MenuAnalysisError("analysis Latin rotations must match the declared block count")
 
     rows: list[dict[str, Any]] = []
 
@@ -170,21 +186,23 @@ def _expected_schedule(schedule: dict[str, Any]) -> list[dict[str, Any]]:
         add("aa-pilot", "published-4.7", 0, position)
     for block, raw_rotation in enumerate(rotations, start=1):
         rotation = [_string(value, f"analysis Latin rotation {block}") for value in _array(raw_rotation, f"analysis Latin rotation {block}")]
-        if len(rotation) != 4 or set(rotation) != set(arms):
-            raise MenuAnalysisError(f"analysis Latin rotation {block} is not a four-arm permutation")
+        shift = (block - 1) % 4
+        if rotation != arms[shift:] + arms[:shift]:
+            raise MenuAnalysisError(f"analysis Latin rotation {block} does not match the fixed four-row cycle")
         for position, arm in enumerate(rotation, start=1):
             add("counterbalanced-comparison", arm, block, position)
-    if len(rows) != 38 or _integer(schedule.get("total_rows"), "analysis total rows") != 38:
-        raise MenuAnalysisError("analysis schedule must produce exactly 38 rows")
+    if len(rows) != 6 + 4 * count or _integer(schedule.get("total_rows"), "analysis total rows") != len(rows):
+        raise MenuAnalysisError("analysis schedule must produce exactly six unscored rows plus four per block")
     return rows
 
 
 def _validate_analysis_plan(plan: dict[str, Any]) -> list[dict[str, Any]]:
     _same(_integer(plan.get("schema"), "analysis plan schema"), 1, "analysis plan schema")
-    _same(_string(plan.get("kind"), "analysis plan kind"), ANALYSIS_PLAN_KIND, "analysis plan kind")
+    cohort = _cohort(plan)
+    count = cohort["blocks"]
     _same(_string(plan.get("status"), "analysis plan status"), "frozen-before-result-inspection", "analysis plan status")
     raw_plan = _mapping(plan.get("raw_plan"), "analysis raw plan")
-    _same(_string(raw_plan.get("path"), "analysis raw plan path"), "spec/evidence/bob-angel-menu-plan-r23.json", "analysis raw plan path")
+    _same(_string(raw_plan.get("path"), "analysis raw plan path"), cohort["raw_path"], "analysis raw plan path")
     _same(_integer(raw_plan.get("schema"), "analysis raw plan schema"), 1, "analysis raw plan schema")
     _same(_string(raw_plan.get("kind"), "analysis raw plan kind"), RAW_PLAN_KIND, "analysis raw plan kind")
     _sha256(raw_plan.get("sha256"), "analysis raw plan SHA-256")
@@ -224,15 +242,17 @@ def _validate_analysis_plan(plan: dict[str, Any]) -> list[dict[str, Any]]:
     _same(_number(tolerance.get("control_regression_seconds"), "analysis control drift seconds", positive=True), 0.5, "analysis control drift seconds")
     _same(_number(tolerance.get("minimum_mir_added_time_reduction_percent"), "analysis objective percent", positive=True), 50.0, "analysis objective percent")
     analysis = _mapping(plan.get("analysis"), "analysis settings")
-    if _array(analysis.get("scored_blocks"), "analysis scored blocks") != list(range(1, 9)):
-        raise MenuAnalysisError("analysis scored blocks are not the frozen R23 blocks")
-    if _array(analysis.get("early_control_blocks"), "analysis early control blocks") != [1, 2, 3, 4]:
-        raise MenuAnalysisError("analysis early control blocks are not the frozen R23 blocks")
-    if _array(analysis.get("late_control_blocks"), "analysis late control blocks") != [5, 6, 7, 8]:
-        raise MenuAnalysisError("analysis late control blocks are not the frozen R23 blocks")
-    _same(_number(analysis.get("student_t_95_two_sided"), "analysis Student-t critical value", positive=True), T95_N8_DF7, "analysis Student-t critical value")
-    _same(_integer(analysis.get("student_t_degrees_of_freedom"), "analysis Student-t degrees of freedom"), 7, "analysis Student-t degrees of freedom")
-    return _expected_schedule(_mapping(plan.get("schedule"), "analysis schedule"))
+    for key, expected in (("scored_blocks", list(range(1, count + 1))),
+                          ("early_control_blocks", list(range(1, count // 2 + 1))),
+                          ("late_control_blocks", list(range(count // 2 + 1, count + 1)))):
+        actual = _array(analysis.get(key), "analysis " + key)
+        if any(type(value) is not int for value in actual) or actual != expected:
+            raise MenuAnalysisError("analysis " + key + " does not match its fixed cohort")
+    _same(_number(analysis.get("student_t_95_two_sided"), "analysis Student-t critical value", positive=True), cohort["critical"], "analysis Student-t critical value")
+    _same(_integer(analysis.get("student_t_degrees_of_freedom"), "analysis Student-t degrees of freedom"), count - 1, "analysis Student-t degrees of freedom")
+    schedule = _mapping(plan.get("schedule"), "analysis schedule")
+    _same(_integer(schedule.get("counterbalanced_blocks"), "analysis block count"), count, "analysis cohort block count")
+    return _expected_schedule(schedule)
 
 
 def _validate_raw_plan(raw_plan: dict[str, Any], analysis_plan: dict[str, Any], raw_plan_sha256: str) -> None:
@@ -240,6 +260,11 @@ def _validate_raw_plan(raw_plan: dict[str, Any], analysis_plan: dict[str, Any], 
     _expect_hash(raw_plan_sha256, expected.get("sha256"), "raw plan SHA-256")
     _same(_integer(raw_plan.get("schema"), "raw plan schema"), 1, "raw plan schema")
     _same(_string(raw_plan.get("kind"), "raw plan kind"), RAW_PLAN_KIND, "raw plan kind")
+    count = _cohort(analysis_plan)["blocks"]
+    design = _mapping(raw_plan.get("design"), "raw plan design")
+    for key, expected in (("warmups_per_arm", 1), ("same_version_aa_observations", 2),
+                          ("counterbalanced_blocks", count), ("primary_observations_per_arm", count)):
+        _same(_integer(design.get(key), "raw plan design " + key), expected, "raw plan design " + key)
     identity = _mapping(analysis_plan.get("identity"), "analysis identity")
     engine = _mapping(raw_plan.get("engine"), "raw plan engine")
     expected_engine = _mapping(identity.get("engine"), "analysis engine")
@@ -356,14 +381,15 @@ def _validate_result(result: dict[str, Any], analysis_plan: dict[str, Any], expe
     _same(_integer(aa_policy.get("observations"), "result same-version AA observations"), 2, "result same-version AA observations")
     _same(_number(aa_policy.get("absolute_tolerance_seconds"), "result same-version AA absolute seconds"), _number(expected_tolerance.get("aa_absolute_seconds"), "analysis AA absolute seconds"), "result same-version AA absolute seconds")
     _same(_number(aa_policy.get("relative_tolerance_percent"), "result same-version AA relative percent"), _number(expected_tolerance.get("aa_relative_percent"), "analysis AA relative percent"), "result same-version AA relative percent")
-    _same(_integer(policy.get("primary_samples_per_arm"), "result primary samples per arm"), 8, "result primary samples per arm")
-    _same(_integer(policy.get("counterbalanced_blocks"), "result counterbalanced blocks"), 8, "result counterbalanced blocks")
+    count = _cohort(analysis_plan)["blocks"]
+    _same(_integer(policy.get("primary_samples_per_arm"), "result primary samples per arm"), count, "result primary samples per arm")
+    _same(_integer(policy.get("counterbalanced_blocks"), "result counterbalanced blocks"), count, "result counterbalanced blocks")
     plan_rows = _array(plan.get("samples"), "result execution plan samples")
     if len(plan_rows) != len(expected_schedule):
-        raise MenuAnalysisError("result execution plan does not contain 38 rows")
+        raise MenuAnalysisError(f"result execution plan does not contain {len(expected_schedule)} rows")
     observations = _array(result.get("samples"), "result samples")
     if len(observations) != len(expected_schedule):
-        raise MenuAnalysisError("result does not contain exactly 38 samples")
+        raise MenuAnalysisError(f"result does not contain exactly {len(expected_schedule)} samples")
     identity = _validate_identity(result, analysis_plan)
     blocks: dict[int, dict[str, float]] = {}
     aa: list[float] = []
@@ -375,7 +401,7 @@ def _validate_result(result: dict[str, Any], analysis_plan: dict[str, Any], expe
         for key in ("ordinal", "phase", "arm", "block", "position", "label"):
             actual = observed_plan.get(key)
             if actual != expected[key] or row.get(key) != expected[key]:
-                raise MenuAnalysisError(f"result schedule row {index + 1} does not match frozen R23 {key}")
+                raise MenuAnalysisError(f"result schedule row {index + 1} does not match frozen menu {key}")
         if expected["label"] in labels:
             raise MenuAnalysisError(f"duplicate result label: {expected['label']}")
         labels.add(expected["label"])
@@ -407,22 +433,22 @@ def _validate_result(result: dict[str, Any], analysis_plan: dict[str, Any], expe
     if len(aa) != 2:
         raise MenuAnalysisError("result does not contain exactly two same-version AA observations")
     expected_arms = {"control-without-mir", "published-4.7", "replay", "candidate-mir5"}
-    if set(blocks) != set(range(1, 9)):
-        raise MenuAnalysisError("result does not contain exactly eight counterbalanced blocks")
+    if set(blocks) != set(range(1, count + 1)):
+        raise MenuAnalysisError("result does not contain its exact declared counterbalanced blocks")
     for block, by_arm in blocks.items():
         if set(by_arm) != expected_arms:
-            raise MenuAnalysisError(f"result block {block} does not contain every R23 arm exactly once")
+            raise MenuAnalysisError(f"result block {block} does not contain every menu arm exactly once")
     return blocks, aa, identity
 
 
-def _summary(values: Iterable[float]) -> dict[str, Any]:
+def _summary(values: Iterable[float], count: int, critical: float) -> dict[str, Any]:
     numbers = list(values)
-    if len(numbers) != 8:
-        raise MenuAnalysisError("paired R23 summaries require exactly eight values")
+    if count not in (8, 64) or len(numbers) != count:
+        raise MenuAnalysisError("paired menu summaries require the exact fixed-cohort count")
     mean = sum(numbers) / len(numbers)
     variance = sum((value - mean) ** 2 for value in numbers) / (len(numbers) - 1)
     standard_deviation = math.sqrt(variance)
-    half_width = T95_N8_DF7 * standard_deviation / math.sqrt(len(numbers))
+    half_width = critical * standard_deviation / math.sqrt(len(numbers))
     return {
         "n": len(numbers),
         "arithmetic_mean_seconds": mean,
@@ -433,10 +459,10 @@ def _summary(values: Iterable[float]) -> dict[str, Any]:
     }
 
 
-def _four_value_summary(values: Iterable[float]) -> dict[str, Any]:
+def _control_half_summary(values: Iterable[float], count: int) -> dict[str, Any]:
     numbers = list(values)
-    if len(numbers) != 4:
-        raise MenuAnalysisError("R23 early/late controls require four values per cycle")
+    if count not in (4, 32) or len(numbers) != count:
+        raise MenuAnalysisError("early/late controls require half the fixed-cohort count")
     mean = sum(numbers) / len(numbers)
     variance = sum((value - mean) ** 2 for value in numbers) / (len(numbers) - 1)
     return {
@@ -452,6 +478,8 @@ def analyze(analysis_plan: dict[str, Any], analysis_plan_sha256: str, raw_plan: 
     analysis_plan_sha256 = _sha256(analysis_plan_sha256, "analysis plan SHA-256")
     result_sha256 = _sha256(result_sha256, "raw result SHA-256")
     expected_schedule = _validate_analysis_plan(analysis_plan)
+    cohort = _cohort(analysis_plan)
+    count, critical = cohort["blocks"], cohort["critical"]
     _validate_raw_plan(raw_plan, analysis_plan, raw_plan_sha256)
     blocks, aa, identity = _validate_result(result, analysis_plan, expected_schedule, _result_timeout_seconds(raw_plan))
     tolerance = _mapping(analysis_plan.get("tolerance_policy"), "analysis tolerance policy")
@@ -463,7 +491,7 @@ def analyze(analysis_plan: dict[str, Any], analysis_plan_sha256: str, raw_plan: 
     direct_values: list[float] = []
     replay_gap_values: list[float] = []
     q_values: list[float] = []
-    for block in range(1, 9):
+    for block in range(1, count + 1):
         values = blocks[block]
         control = values["control-without-mir"]
         published = values["published-4.7"]
@@ -493,20 +521,20 @@ def analyze(analysis_plan: dict[str, Any], analysis_plan_sha256: str, raw_plan: 
                 "q_candidate_minus_half_published_increment_seconds": q,
             }
         )
-    d4 = _summary(d4_values)
-    d5 = _summary(d5_values)
-    direct = _summary(direct_values)
-    replay_gap = _summary(replay_gap_values)
-    q = _summary(q_values)
+    d4 = _summary(d4_values, count, critical)
+    d5 = _summary(d5_values, count, critical)
+    direct = _summary(direct_values, count, critical)
+    replay_gap = _summary(replay_gap_values, count, critical)
+    q = _summary(q_values, count, critical)
 
     aa_difference = abs(aa[0] - aa[1])
     aa_mean = sum(aa) / 2.0
     aa_limit = max(_number(tolerance.get("aa_absolute_seconds"), "analysis AA absolute seconds"), aa_mean * _number(tolerance.get("aa_relative_percent"), "analysis AA relative percent") / 100.0)
     aa_ok = aa_difference <= aa_limit
-    early = [blocks[index]["control-without-mir"] for index in range(1, 5)]
-    late = [blocks[index]["control-without-mir"] for index in range(5, 9)]
-    early_summary = _four_value_summary(early)
-    late_summary = _four_value_summary(late)
+    early = [blocks[index]["control-without-mir"] for index in range(1, count // 2 + 1)]
+    late = [blocks[index]["control-without-mir"] for index in range(count // 2 + 1, count + 1)]
+    early_summary = _control_half_summary(early, count // 2)
+    late_summary = _control_half_summary(late, count // 2)
     control_drift = late_summary["arithmetic_mean_seconds"] - early_summary["arithmetic_mean_seconds"]
     control_ok = control_drift <= _number(tolerance.get("control_regression_seconds"), "analysis control regression seconds")
     denominator_supported = d4["arithmetic_mean_seconds"] > 0 and d4["student_t_95_mean_interval_seconds"]["lower"] > 0
@@ -536,8 +564,8 @@ def analyze(analysis_plan: dict[str, Any], analysis_plan_sha256: str, raw_plan: 
 
     return {
         "schema": 1,
-        "kind": KIND,
-        "status": "analyzed-frozen-r23-raw-observations",
+        "kind": cohort["result_kind"],
+        "status": f"analyzed-frozen-{cohort['id']}-raw-observations",
         "analysis_plan": {
             "kind": analysis_plan["kind"],
             "sha256": analysis_plan_sha256,
@@ -560,8 +588,8 @@ def analyze(analysis_plan: dict[str, Any], analysis_plan_sha256: str, raw_plan: 
             "status": "within-predeclared-tolerance" if aa_ok else "adverse-outside-predeclared-tolerance",
         },
         "control_drift": {
-            "early_blocks": [1, 2, 3, 4],
-            "late_blocks": [5, 6, 7, 8],
+            "early_blocks": list(range(1, count // 2 + 1)),
+            "late_blocks": list(range(count // 2 + 1, count + 1)),
             "early": early_summary,
             "late": late_summary,
             "late_minus_early_seconds": control_drift,
@@ -590,8 +618,8 @@ def analyze(analysis_plan: dict[str, Any], analysis_plan_sha256: str, raw_plan: 
         },
         "inference": {
             "method": "arithmetic paired-block summaries with two-sided Student-t 95-percent mean intervals",
-            "n": 8,
-            "degrees_of_freedom": 7,
+            "n": count,
+            "degrees_of_freedom": count - 1,
             "critical_value": analysis["student_t_95_two_sided"],
             "assumption": analysis["assumption"],
             "bootstrap": "not used",
