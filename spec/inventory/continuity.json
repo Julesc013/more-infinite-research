@@ -379,6 +379,15 @@
       "status": "partial",
       "resolved_records": [
         {
+          "id": "matched-defaults-agriculture-native-scale",
+          "source": [
+            "tests/fixtures/agriculture-scale/core/control.lua",
+            "source/runtime/agriculture.lua"
+          ],
+          "evidence": "spec/evidence/agriculture-matched-defaults-native-chain.json",
+          "scope": "Exact F2102.1.23 Defaults published4.7.21002 and candidateAF65 at fixture sourcea6ce2367 each pass1/32/128 towers per force, seven captured science packs, two actual lab levels,2N native planting events, trained17645 versus foreign18000 growth ticks, native spoilage baseline and two unchanged-byte cold reloads. Root verifies266 members and18 actual stage-log markers, counting12 unique lab completions and644 planting events. Ordinary tuning, elapsed/memory performance, mod removal/readdition and final coherent release remain unqualified."
+        },
+        {
           "id": "native-repair-capacity-stress",
           "evidence": "spec/mir5/evidence/repair-stress-native-chain.json",
           "scope": "Exact F2002.0.77 Base published4.7.2 and MIR5 each receive1000 native electric-damaged eligible walls:256 admitted evenly across player/friend,744 overflow unchanged,8 repairs per60ticks after quiet600. Redamage of8 drained entries reactivates; foreign/nonwall exclusions and save/two reloads pass. All66 members verified. No elapsed/memory or agriculture scaling claim."
@@ -409,7 +418,7 @@
       ],
       "remaining_implementation": [],
       "remaining_qualification": [
-        "Run removal/readdition, agriculture entity scaling and final-package rate/lifecycle cases; repair queue capacity stress and combined physical multiplayer restart pass at their recorded sources."
+        "Run removal/readdition, matched elapsed/memory stress and final-package rate/lifecycle cases; the six named Defaults agriculture scale cases, repair queue capacity stress and combined physical multiplayer restart pass at their separate recorded sources."
       ]
     },
     {
