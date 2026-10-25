@@ -76,19 +76,22 @@
     "repair": {
       "control_path": "tests/fixtures/repair-stress/control.lua",
       "control_sha256": "521D75CBE29B65257E02921B13A3DFF227FE291F9406F6F41F366D4750AF86C7",
-      "profiles": ["tests/profiles/repair-stress-active-published-f210-2123.json", "tests/profiles/repair-stress-active-mir5-f210-2123.json"],
+      "profiles": [
+        {"path": "tests/profiles/repair-stress-active-published-f210-2123.json", "sha256": "AC354044B9BB57D2BA8A747185292B0E4790C0C308D3F5A32D423B975CE630C9"},
+        {"path": "tests/profiles/repair-stress-active-mir5-f210-2123.json", "sha256": "16A2A57DDF263143132983E4721BF6383D790E93F2D6004EE94FB276806B68F3"}
+      ],
       "required_markers": ["prepared", "start", "complete"]
     },
     "agriculture": {
       "control_path": "tests/fixtures/agriculture-scale/core/control.lua",
       "control_sha256": "A77890C76B13D622B9990274EEB28577767C1A776B9F773EDB9A5C31727F6816",
       "profiles": [
-        "tests/profiles/agriculture-active-matched-published-1-f210-2123.json",
-        "tests/profiles/agriculture-active-matched-candidate-defaults-1-f210-2123.json",
-        "tests/profiles/agriculture-active-matched-published-32-f210-2123.json",
-        "tests/profiles/agriculture-active-matched-candidate-defaults-32-f210-2123.json",
-        "tests/profiles/agriculture-active-matched-published-128-f210-2123.json",
-        "tests/profiles/agriculture-active-matched-candidate-defaults-128-f210-2123.json"
+        {"path": "tests/profiles/agriculture-active-matched-published-1-f210-2123.json", "sha256": "8E7403F4B3E625103F6D88706F6B2AE1118F367D8F31A363CD4C44369624D2A6"},
+        {"path": "tests/profiles/agriculture-active-matched-candidate-defaults-1-f210-2123.json", "sha256": "924790EE180265E7EA0F1A768BD10F32D672812272BEA81191BC46B994BEE0C7"},
+        {"path": "tests/profiles/agriculture-active-matched-published-32-f210-2123.json", "sha256": "53F0786047DFCCACD6D8A1626E9116003B7250C3E273BFA46F557641163508EE"},
+        {"path": "tests/profiles/agriculture-active-matched-candidate-defaults-32-f210-2123.json", "sha256": "9D3274CF1A2CBF44993B2D301DBCD188BB5BDAFB50F89137FC21AC8A759BBF44"},
+        {"path": "tests/profiles/agriculture-active-matched-published-128-f210-2123.json", "sha256": "FCE250D18B0FB75122425EBCFBCE592518466459BB3B6365B3155ED62AC6FDCF"},
+        {"path": "tests/profiles/agriculture-active-matched-candidate-defaults-128-f210-2123.json", "sha256": "7FF93BF107EEDEFD19C1932A88766543A36141A48AA1E58F4407ECD3278CCE95"}
       ],
       "required_markers": ["prepared", "start", "complete"]
     }
