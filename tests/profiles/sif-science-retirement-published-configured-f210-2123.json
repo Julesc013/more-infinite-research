@@ -41,7 +41,7 @@
     },
     {
       "name": "cr-extras",
-      "version": "1.0.01",
+      "version": "1.0.10",
       "enabled": true
     },
     {
@@ -74,7 +74,7 @@
     "space-is-fake_1.0.78.zip": "3B5F2A381ADF1D9AECF048293E20035963A528720FBDC148CCC2B0418049FF13",
     "cr-commons_1.0.33.zip": "378D3114B09C872358088B33500BC4AB0B9B9EFD9E5650DBEA0E87B5914C29BB",
     "mir-fixture-mir5-active-mods-observer_0.1.0.zip": "2E1BE5952D2A4CC5C74A0D149E075D247BA110A3FAE5B6768D3EAEBABCEF989C",
-    "cr-extras_1.0.01.zip": "874B204234446EBA9DD333D84569433A11E99D3C001FD853E26B13A01B2CBC82"
+    "cr-extras_1.0.10.zip": "3AB74877E49FB245E62593B669EB4D5C762207C047CA6F70E4D0CC9B67DF0225"
   },
   "scope": "Private F210 published 4.7 configured-policy SIF predecessor: two actual named continuation labs, durable source state, and cold reloads before the MIR5 configured successor."
 }
