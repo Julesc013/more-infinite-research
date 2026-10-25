@@ -377,7 +377,11 @@ function Assert-MIRLibraryActivation {
       $parent=Get-CimInstance Win32_Process -Filter "ProcessId=$($process.Id)"
       if($owned.Count-ne1-or$owned[0].HasExited-or$owned[0].StartTime-ne$process.StartTime-or$parent.ParentProcessId-ne$PID){throw '[mir-library-unowned-process]'}
     }
-  }else{Assert-MIRLibraryIdle}
+  }else{
+    # Serial stages retain the lock while a completed engine disappears from
+    # process enumeration. Never exempt or terminate an observable client.
+    Assert-MIRLibraryIdle -WaitMilliseconds 3000
+  }
   $current=@(Get-MIRLibraryInventory -LibraryDirectory $Activation.library -EngineDataDirectory $Activation.engine_data)
   $signature={param($rows) @($rows|Sort-Object path|ForEach-Object {$_.path+'|'+$_.identity+'|'+$_.version}) -join "`n"}
   if((& $signature $current) -cne (& $signature $Activation.inventory)){throw '[mir-library-inventory-changed]'}
