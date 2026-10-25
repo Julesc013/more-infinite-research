@@ -10,6 +10,8 @@ universal-performance, equivalence, or bootstrap claim.
 from __future__ import annotations
 
 import argparse
+import base64
+import gzip
 import hashlib
 import json
 import math
@@ -27,6 +29,7 @@ SAMPLE_KIND = "MIR5RuntimeBenchmarkSampleV1"
 CAPTURE_KIND = "MIR5RuntimeBenchmarkActiveSeedCaptureV1"
 PILOT_KIND = "MIR5RuntimeBenchmarkActiveMarkerPilotV1"
 PLAN_PATH = "spec/evidence/runtime-benchmark-active-plan-r06.json"
+PLAN_SHA256 = "816BA8FE3589967CC456F189F5F3F584289FB553DAFADBB64ACAEF32DD306C4F"
 PLAN_REVISION = "7dcd6d6df9e02f66e5eb00965a36d08daf54a856"
 PLAN_SOURCE = "8c078dbad90e0236c9e9fa777f6d776e03b48401"
 PLAN_TREE = "0dd2670887647b1794b29a25773147f86f564662"
@@ -39,7 +42,10 @@ INVENTORY_SHA256 = "4FD1A20E6C2E3D3F27D6158D60C931333B0E5053926019BD6C59493A9AF8
 INVENTORY_CONTENT_SHA256 = "D84635E67886182989AA958024CAF619F0E832CC47A3BF0533BA047C42F0E7D5"
 ACTIVE_SEED_CAPTURE_SHA256 = "883DF556BEB4D845929CD9FDAEA867FD01DAB72952CD70A849C17310249C28DB"
 MARKER_PILOT_SHA256 = "89329DE94C32E1C9A5C0EDE13AE112C008172FFBB7E13928C203BA1974E50A47"
+ACTIVE_PREREQUISITES_CAPSULE = "spec/evidence/runtime-active-r06-physical-native-receipts.json.gz"
+ACTIVE_PREREQUISITES_CAPSULE_SHA256 = "23466064A3C2E376A93FAFD9D5772038186BF4FB5D993E56953F5B145AD5FE88"
 MAX_PLAN_BYTES = 1024 * 1024
+MAX_ACTIVE_PREREQUISITES_CAPSULE_BYTES = 128 * 1024
 # R06 permits a bounded 8 MiB serialized memory receipt per one of 68 samples.
 # The result normally stores far less, but this bound does not reject the
 # declared worst-case inline observation representation.
@@ -97,6 +103,51 @@ def _read_json(path: Path, maximum: int, label: str) -> tuple[dict[str, Any], st
     return value, hashlib.sha256(payload).hexdigest().upper()
 
 
+def _frozen_active_prerequisites() -> tuple[dict[str, Any], dict[str, Any]]:
+    """Read the accepted R06 non-scored prerequisites that bind sample closure."""
+    capsule_path = Path(__file__).resolve().parents[1] / ACTIVE_PREREQUISITES_CAPSULE
+    payload = _read_bounded(capsule_path, MAX_ACTIVE_PREREQUISITES_CAPSULE_BYTES, "active prerequisite capsule")
+    _expect_hash(hashlib.sha256(payload).hexdigest().upper(), ACTIVE_PREREQUISITES_CAPSULE_SHA256, "active prerequisite capsule SHA-256")
+    try:
+        capsule = json.loads(
+            gzip.decompress(payload).decode("utf-8"),
+            object_pairs_hook=_reject_duplicate_object,
+            parse_constant=_reject_nonfinite_constant,
+        )
+    except (OSError, UnicodeDecodeError, json.JSONDecodeError) as error:
+        raise RuntimeBenchmarkAnalysisError("active prerequisite capsule is not strict gzip JSON") from error
+    files = _array(_mapping(capsule, "active prerequisite capsule").get("files"), "active prerequisite files")
+    expected = {
+        "original/active-seed-captures.json": ACTIVE_SEED_CAPTURE_SHA256,
+        "original/active-marker-pilots.json": MARKER_PILOT_SHA256,
+    }
+    records: dict[str, dict[str, Any]] = {}
+    for entry in files:
+        row = _mapping(entry, "active prerequisite file")
+        path = _string(row.get("path"), "active prerequisite path")
+        if path not in expected:
+            continue
+        try:
+            decoded = base64.b64decode(_string(row.get("base64"), "active prerequisite base64"), validate=True)
+        except ValueError as error:
+            raise RuntimeBenchmarkAnalysisError("active prerequisite base64 is invalid") from error
+        _same(_integer(row.get("bytes"), "active prerequisite bytes", minimum=1), len(decoded), "active prerequisite bytes")
+        _expect_hash(row.get("sha256"), expected[path], "active prerequisite entry SHA-256")
+        _expect_hash(hashlib.sha256(decoded).hexdigest().upper(), expected[path], "active prerequisite payload SHA-256")
+        try:
+            record = json.loads(
+                decoded.decode("utf-8"),
+                object_pairs_hook=_reject_duplicate_object,
+                parse_constant=_reject_nonfinite_constant,
+            )
+        except (UnicodeDecodeError, json.JSONDecodeError) as error:
+            raise RuntimeBenchmarkAnalysisError("active prerequisite payload is not strict JSON") from error
+        records[path] = _mapping(record, "active prerequisite record")
+    if set(records) != set(expected):
+        raise RuntimeBenchmarkAnalysisError("active prerequisite payload closure differs")
+    return records["original/active-seed-captures.json"], records["original/active-marker-pilots.json"]
+
+
 def _same_json(actual: Any, expected: Any, label: str) -> None:
     if json.dumps(actual, sort_keys=True, separators=(",", ":"), allow_nan=False) != json.dumps(expected, sort_keys=True, separators=(",", ":"), allow_nan=False):
         raise RuntimeBenchmarkAnalysisError(label + " differs from the raw result")
@@ -119,6 +170,20 @@ def _validate_prepared_inputs_sidecar(result_path: Path, result: dict[str, Any])
     _same(_boolean(sidecar.get("release_qualification"), "prepared inputs sidecar release flag"), False, "prepared inputs sidecar release flag")
     for key in ("plan", "private_controller", "raw_helper_source", "active_seed_capture", "unscored_marker_pilot", "schedule"):
         _same_json(sidecar.get(key), result.get(key), "prepared inputs sidecar " + key)
+    frozen_capture, _ = _frozen_active_prerequisites()
+    expected_bindings = _active_binding_contracts(frozen_capture)
+    bindings = _mapping(sidecar.get("bindings"), "prepared inputs sidecar bindings")
+    if set(bindings) != set(expected_bindings):
+        raise RuntimeBenchmarkAnalysisError("prepared inputs sidecar binding ids differ")
+    for identifier, expected in expected_bindings.items():
+        binding = _mapping(bindings.get(identifier), "prepared inputs sidecar binding")
+        profile = _mapping(binding.get("profile"), "prepared inputs sidecar binding profile")
+        _expect_hash(profile.get("sha256"), expected["profile_sha256"], "prepared inputs sidecar binding profile SHA-256")
+        if _archive_closure(binding.get("archives"), "prepared inputs sidecar binding archives") != expected["archives"]:
+            raise RuntimeBenchmarkAnalysisError("prepared inputs sidecar binding archive closure differs")
+        seed = _mapping(binding.get("seed"), "prepared inputs sidecar binding seed")
+        _expect_hash(seed.get("sha256"), expected["seed_sha256"], "prepared inputs sidecar binding seed SHA-256")
+        _same(_integer(seed.get("bytes"), "prepared inputs sidecar binding seed bytes", minimum=1), expected["seed_bytes"], "prepared inputs sidecar binding seed bytes")
 
 
 def _mapping(value: Any, label: str) -> dict[str, Any]:
@@ -234,7 +299,8 @@ def _staged_profile_path(value: Any, expected_relative: str, label: str) -> None
         raise RuntimeBenchmarkAnalysisError(label + " differs from the staged fixed profile")
 
 
-def _validate_plan(plan: dict[str, Any]) -> dict[str, Any]:
+def _validate_plan(plan: dict[str, Any], plan_sha256: str) -> dict[str, Any]:
+    _expect_hash(plan_sha256, PLAN_SHA256, "raw R06 plan SHA-256")
     _same(_integer(plan.get("schema"), "plan schema"), 1, "plan schema")
     _same(_string(plan.get("kind"), "plan kind"), PLAN_KIND, "plan kind")
     _same(
@@ -435,13 +501,19 @@ def _validate_prepared_witness(witnesses: dict[str, Any], row: dict[str, Any]) -
     _same(_boolean(witnesses.get("pending_physical_work"), "prepared pending physical work"), True, "prepared pending physical work")
 
 
-def _validate_capture_reference(value: Any, plan_sha256: str, profiles: dict[tuple[str, int, str], dict[str, str]]) -> dict[str, dict[str, Any]]:
+def _validate_capture_reference(
+    value: Any,
+    plan_sha256: str,
+    profiles: dict[tuple[str, int, str], dict[str, str]],
+    frozen_record: dict[str, Any],
+) -> dict[str, dict[str, Any]]:
     reference = _mapping(value, "active seed capture reference")
     _string(reference.get("path"), "active seed capture path")
     _expect_hash(reference.get("sha256"), ACTIVE_SEED_CAPTURE_SHA256, "active seed capture SHA-256")
     _same(_string(reference.get("kind"), "active seed capture kind"), CAPTURE_KIND, "active seed capture kind")
     _same(_string(reference.get("status"), "active seed capture status"), "prepared-active-saves-not-a-benchmark-result", "active seed capture status")
     record = _mapping(reference.get("record"), "active seed capture record")
+    _same_json(record, frozen_record, "active seed capture record")
     _same(_integer(record.get("schema"), "active seed capture schema"), 1, "active seed capture schema")
     _same(_string(record.get("kind"), "capture record kind"), CAPTURE_KIND, "capture record kind")
     _same(_string(record.get("status"), "capture record status"), "prepared-active-saves-not-a-benchmark-result", "capture record status")
@@ -486,13 +558,20 @@ def _validate_capture_reference(value: Any, plan_sha256: str, profiles: dict[tup
     return by_id
 
 
-def _validate_pilot_reference(value: Any, plan_sha256: str, capture_reference: dict[str, Any], captures: dict[str, dict[str, Any]]) -> None:
+def _validate_pilot_reference(
+    value: Any,
+    plan_sha256: str,
+    capture_reference: dict[str, Any],
+    captures: dict[str, dict[str, Any]],
+    frozen_record: dict[str, Any],
+) -> dict[str, dict[str, Any]]:
     reference = _mapping(value, "marker pilot reference")
     _string(reference.get("path"), "marker pilot path")
     _expect_hash(reference.get("sha256"), MARKER_PILOT_SHA256, "marker pilot SHA-256")
     _same(_string(reference.get("kind"), "marker pilot kind"), PILOT_KIND, "marker pilot kind")
     _same(_string(reference.get("status"), "marker pilot status"), "complete-unscored-not-a-performance-result", "marker pilot status")
     record = _mapping(reference.get("record"), "marker pilot record")
+    _same_json(record, frozen_record, "marker pilot record")
     _same(_integer(record.get("schema"), "marker pilot schema"), 1, "marker pilot schema")
     _same(_string(record.get("kind"), "marker pilot record kind"), PILOT_KIND, "marker pilot record kind")
     _same(_string(record.get("status"), "marker pilot record status"), "complete-unscored-not-a-performance-result", "marker pilot record status")
@@ -546,6 +625,10 @@ def _validate_pilot_reference(value: Any, plan_sha256: str, capture_reference: d
                 _same(_boolean(witnesses.get("pending_physical_work"), "agriculture pilot pending work"), pending, "agriculture pilot pending work")
         _string(row.get("stdout"), "marker pilot stdout path")
         _sha256(row.get("stdout_sha256"), "marker pilot stdout SHA-256")
+    return {
+        active["id"]: _mapping(pilots[active["id"]].get("native_result"), "marker pilot native result")
+        for active in _active_rows()
+    }
 
 
 def _validate_process_memory(value: Any, native: dict[str, Any]) -> None:
@@ -558,18 +641,87 @@ def _validate_process_memory(value: Any, native: dict[str, Any]) -> None:
         raise RuntimeBenchmarkAnalysisError("process memory observation count differs")
     maximum_working = 0
     maximum_private = 0
+    identity: tuple[int, str] | None = None
     for entry in rows:
         row = _mapping(entry, "process memory row")
         _same(_string(row.get("phase"), "process memory phase"), "benchmark", "process memory phase")
         _same(_string(row.get("role"), "process memory role"), "factorio", "process memory role")
-        _integer(row.get("pid"), "process memory PID", minimum=1)
-        _string(row.get("start_utc"), "process memory start time")
+        current_identity = (
+            _integer(row.get("pid"), "process memory PID", minimum=1),
+            _string(row.get("start_utc"), "process memory start time"),
+        )
+        if identity is None:
+            identity = current_identity
+        elif identity != current_identity:
+            raise RuntimeBenchmarkAnalysisError("process memory identity differs")
         working = _integer(row.get("working_set_bytes"), "process memory working bytes", minimum=0)
         private = _integer(row.get("private_bytes"), "process memory private bytes", minimum=0)
         maximum_working = max(maximum_working, working)
         maximum_private = max(maximum_private, private)
     _same(_integer(native.get("maximum_sampled_working_set_bytes"), "sampled working maximum", minimum=0), maximum_working, "sampled working maximum")
     _same(_integer(native.get("maximum_sampled_private_bytes"), "sampled private maximum", minimum=0), maximum_private, "sampled private maximum")
+
+
+def _archive_closure(value: Any, label: str) -> dict[str, str]:
+    archives = _mapping(value, label)
+    closure: dict[str, str] = {}
+    for leaf, digest in archives.items():
+        name = _string(leaf, label + " leaf")
+        if "/" in name or "\\" in name or name in closure:
+            raise RuntimeBenchmarkAnalysisError(label + " leaf differs")
+        closure[name] = _sha256(digest, label + " SHA-256")
+    if not closure:
+        raise RuntimeBenchmarkAnalysisError(label + " is empty")
+    return closure
+
+
+def _active_binding_contracts(capture_record: dict[str, Any]) -> dict[str, dict[str, Any]]:
+    """Derive the producer's scheduled binding fields from pinned seed capture."""
+    contracts: dict[str, dict[str, Any]] = {}
+    for entry in _array(capture_record.get("captures"), "active binding captures"):
+        row = _mapping(entry, "active binding capture")
+        identifier = _string(row.get("id"), "active binding id")
+        if identifier in contracts:
+            raise RuntimeBenchmarkAnalysisError("active binding id duplicates")
+        profile = _mapping(row.get("profile"), "active binding profile")
+        selection = _mapping(profile.get("selection"), "active binding profile selection")
+        archives = _archive_closure(selection.get("archive_sha256"), "active binding profile archives")
+        for fixture in _array(row.get("fixtures"), "active binding fixtures"):
+            fixture_row = _mapping(fixture, "active binding fixture")
+            leaf = PureWindowsPath(_string(fixture_row.get("archive"), "active binding fixture archive")).name
+            if not leaf:
+                raise RuntimeBenchmarkAnalysisError("active binding fixture archive leaf differs")
+            digest = _sha256(fixture_row.get("sha256"), "active binding fixture SHA-256")
+            if leaf in archives and archives[leaf] != digest:
+                raise RuntimeBenchmarkAnalysisError("active binding fixture archive conflicts")
+            archives[leaf] = digest
+        seed = _mapping(row.get("active_seed"), "active binding seed")
+        contracts[identifier] = {
+            "profile_sha256": _sha256(profile.get("sha256"), "active binding profile SHA-256"),
+            "archives": archives,
+            "seed_sha256": _sha256(seed.get("sha256"), "active binding seed SHA-256"),
+            "seed_bytes": _integer(seed.get("bytes"), "active binding seed bytes", minimum=1),
+        }
+    expected_ids = {row["id"] for row in _active_rows()}
+    if set(contracts) != expected_ids:
+        raise RuntimeBenchmarkAnalysisError("active binding ids differ")
+    return contracts
+
+
+def _selected_closure(value: Any, label: str) -> list[tuple[str, str, bool, str]]:
+    selected = _array(value, label)
+    closure: list[tuple[str, str, bool, str]] = []
+    identities: set[tuple[str, str]] = set()
+    for entry in selected:
+        row = _mapping(entry, label + " entry")
+        identity = (_string(row.get("name"), label + " name"), _string(row.get("version"), label + " version"))
+        if identity in identities:
+            raise RuntimeBenchmarkAnalysisError(label + " identity duplicates")
+        identities.add(identity)
+        closure.append((*identity, _boolean(row.get("builtin"), label + " builtin"), _sha256(row.get("sha256"), label + " SHA-256")))
+    if not closure:
+        raise RuntimeBenchmarkAnalysisError(label + " is empty")
+    return sorted(closure)
 
 
 def _validate_physical_markers(value: Any, schedule: dict[str, Any], native: dict[str, Any], owned_seed_path: str) -> None:
@@ -614,6 +766,7 @@ def _validate_sample(
     schedule: dict[str, Any],
     profiles: dict[tuple[str, int, str], dict[str, str]],
     captures: dict[str, dict[str, Any]],
+    pilot_native: dict[str, dict[str, Any]],
 ) -> dict[str, float]:
     row = _mapping(sample, "benchmark observation")
     _same(_string(row.get("kind"), "observation kind"), SAMPLE_KIND, "observation kind")
@@ -630,7 +783,7 @@ def _validate_sample(
     profile = _mapping(row.get("profile"), "observation profile")
     _staged_profile_path(profile.get("path"), expected_profile["path"], "observation profile path")
     _expect_hash(profile.get("sha256"), expected_profile["sha256"], "observation profile SHA-256")
-    archives = _mapping(row.get("archives"), "observation archives")
+    archives = _archive_closure(row.get("archives"), "observation archives")
     selected_leaf = "more-infinite-research_4.7.21002.zip" if schedule["arm"] == "published" else "more-infinite-research_5.0.21000.zip"
     selected_hash = PUBLISHED_SHA256 if schedule["arm"] == "published" else CANDIDATE_SHA256
     _expect_hash(archives.get(selected_leaf), selected_hash, "observation player archive SHA-256")
@@ -638,6 +791,9 @@ def _validate_sample(
     _string(seed.get("source_path"), "seed source path")
     seed_hash = _sha256(seed.get("source_sha256"), "seed source SHA-256")
     capture_id = "repair-" + schedule["arm"] if schedule["scenario"] == "repair-active" else f"agriculture-{schedule['arm']}-{schedule['tier']}"
+    expected_pilot = pilot_native[capture_id]
+    if archives != _archive_closure(expected_pilot.get("archives"), "marker pilot archives"):
+        raise RuntimeBenchmarkAnalysisError("observation archive closure differs")
     capture_seed = _mapping(captures[capture_id].get("active_seed"), "capture active seed")
     _expect_hash(seed_hash, capture_seed.get("sha256"), "seed source SHA-256")
     _string(seed.get("owned_path"), "owned seed path")
@@ -682,7 +838,9 @@ def _validate_sample(
     _expect_hash(restoration.get("profile_sha256"), expected_profile["sha256"], "library restoration profile SHA-256")
     for key in ("dependency_payload_bytes_copied", "archive_links_created", "archive_extractions"):
         _same(_integer(restoration.get(key), "library restoration " + key, minimum=0), 0, "library restoration " + key)
-    _array(restoration.get("selected"), "library restoration selected archives")
+    expected_restoration = _mapping(expected_pilot.get("library_control_restoration"), "marker pilot library restoration")
+    if _selected_closure(restoration.get("selected"), "library restoration selected archives") != _selected_closure(expected_restoration.get("selected"), "marker pilot selected archives"):
+        raise RuntimeBenchmarkAnalysisError("library restoration selected closure differs")
     _same(_boolean(row.get("performance_acceptance"), "observation performance flag"), False, "observation performance flag")
     _same(_boolean(row.get("release_qualification"), "observation release flag"), False, "observation release flag")
     return {
@@ -737,7 +895,8 @@ def _increment(one: list[float], one_twenty_eight: list[float], published_increm
 
 
 def analyze(plan: dict[str, Any], plan_sha256: str, result: dict[str, Any], result_sha256: str) -> dict[str, Any]:
-    contract = _validate_plan(plan)
+    contract = _validate_plan(plan, plan_sha256)
+    frozen_capture, frozen_pilot = _frozen_active_prerequisites()
     _same(_integer(result.get("schema"), "result schema"), 1, "result schema")
     _same(_string(result.get("kind"), "result kind"), RESULT_KIND, "result kind")
     _same(_string(result.get("status"), "result status"), "observed-not-performance-accepted", "result status")
@@ -782,8 +941,8 @@ def analyze(plan: dict[str, Any], plan_sha256: str, result: dict[str, Any], resu
     _sha256(result.get("prepared_inputs_sha256"), "prepared inputs SHA-256")
     capture_reference = _mapping(result.get("active_seed_capture"), "active seed capture reference")
     pilot_reference = _mapping(result.get("unscored_marker_pilot"), "marker pilot reference")
-    captures = _validate_capture_reference(capture_reference, plan_sha256, contract["profiles"])
-    _validate_pilot_reference(pilot_reference, plan_sha256, capture_reference, captures)
+    captures = _validate_capture_reference(capture_reference, plan_sha256, contract["profiles"], frozen_capture)
+    pilot_native = _validate_pilot_reference(pilot_reference, plan_sha256, capture_reference, captures, frozen_pilot)
     schedule_rows = _validate_schedule(result.get("schedule"))
     observations = _array(result.get("observations"), "benchmark observations")
     if len(observations) != 68:
@@ -801,7 +960,7 @@ def analyze(plan: dict[str, Any], plan_sha256: str, result: dict[str, Any], resu
     scored_rows: dict[str, dict[str, float]] = {}
     schedule_output: list[dict[str, Any]] = []
     for schedule in schedule_rows:
-        metrics = _validate_sample(by_id[schedule["id"]], schedule, contract["profiles"], captures)
+        metrics = _validate_sample(by_id[schedule["id"]], schedule, contract["profiles"], captures, pilot_native)
         schedule_output.append(schedule)
         if schedule["phase"] == "scored":
             key = (schedule["scenario"], schedule["tier"], schedule["arm"])
@@ -959,6 +1118,7 @@ def main(argv: list[str] | None = None) -> int:
     try:
         expected_plan_sha256 = _sha256(arguments.expected_plan_sha256, "expected plan SHA-256")
         expected_result_sha256 = _sha256(arguments.expected_result_sha256, "expected result SHA-256")
+        _expect_hash(expected_plan_sha256, PLAN_SHA256, "expected R06 plan SHA-256")
         plan, plan_sha256 = _read_json(arguments.raw_plan, MAX_PLAN_BYTES, "raw plan")
         result, result_sha256 = _read_json(arguments.result, MAX_RESULT_BYTES, "raw result")
         _expect_hash(plan_sha256, expected_plan_sha256, "raw plan SHA-256")
