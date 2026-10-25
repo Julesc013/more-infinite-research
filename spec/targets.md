@@ -16,6 +16,8 @@ source_of_truth_for:
 
 `TGT-01` — One shared source, small actual engine adapters, one selected adapter per distribution. Do not retain parallel complete modern/legacy products. Historical editions keep their own delivered capability subsets; unsupported modifiers/UI cannot be manufactured by a generic runtime shim.
 
+F210 is the primary MIR 5 design target: Factorio 2.1 with minimum base 2.1.23. Build F200 for 2.0.77 and the seven historical editions from the same shared implementation. Keep common feature behavior, setting identities and meanings, and presentation consistent; isolate unavoidable engine differences in the selected capability adapters. Exact-engine qualification remains separate for each edition.
+
 ## Baseline targets, not new qualification
 
 The previous release records identify these nine target editions. Their identifiers/version encoding are retained until an explicitly tested change replaces them. These are **baseline test floors**, not fresh replacement acceptance or an installed-engine inventory.
