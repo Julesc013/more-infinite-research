@@ -5,7 +5,7 @@ applies_to: "MIR replacement development"
 audience: developer
 doc_type: specification
 owner: mir-maintainers
-last_reviewed: 2026-10-22
+last_reviewed: 2026-10-25
 supersedes: []
 superseded_by: []
 source_of_truth_for:
@@ -16,7 +16,11 @@ source_of_truth_for:
 
 `TGT-01` — One shared source, small actual engine adapters, one selected adapter per distribution. Do not retain parallel complete modern/legacy products. Historical editions keep their own delivered capability subsets; unsupported modifiers/UI cannot be manufactured by a generic runtime shim.
 
-F210 is the primary MIR 5 design target: Factorio 2.1 with minimum base 2.1.23. Build F200 for 2.0.77 and the seven historical editions from the same shared implementation. Keep common feature behavior, setting identities and meanings, and presentation consistent; isolate unavoidable engine differences in the selected capability adapters. Exact-engine qualification remains separate for each edition.
+## Primary target and earlier editions
+
+The maintainer's 2026-10-25 direction makes **Factorio 2.1.23 stable (F210)** the primary MIR5 design, implementation, qualification and release target. Design new behavior against its actual native APIs and capabilities. Keep the small deterministic Generator and shared semantic implementations, with narrowly selected adapters for earlier engines.
+
+The earlier MIR4 engine families retain **best-effort builds and support** for their delivered subsets, using the same nine-edition version encoding and stable mod/technology/migration identities. Keep common feature behavior, setting identities and meanings, and presentation consistent where native capabilities permit; isolate engine differences in the selected adapters. Qualify F200 for2.0.77 and the seven historical editions with available exact-engine evidence, stating remaining gaps by edition. F210 acceptance takes priority over further earlier-engine campaigns; existing historical receipts retain their real inputs and verdicts. The primary F210 package still requires its exact native, upgrade/save/client, performance and delivery evidence.
 
 ## Baseline targets, not new qualification
 
