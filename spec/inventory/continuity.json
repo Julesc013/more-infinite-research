@@ -674,7 +674,7 @@
       "remaining_qualification": [
         "Finish affected mixed/dynamic earned MIR overlap boundaries; composed fixed true/false/true and the independent fixed-provider removal/readdition controls already pass.",
         "Observe remaining exact admitted integrations and setting interactions; Bob/Angel physical125%/400% recipe-cap output is already qualified at its recorded source.",
-        "Complete the explicit named/popular individual and dependency-valid combined profile campaign above. New AAI inputs are pinned; BZ, SE, K2SE and IR still have no active profile, and their native outcomes remain unqualified.",
+        "Complete the explicit named/popular individual and dependency-valid combined campaign above. Current F210 input profiles now pin AAI, six BZ components and combinations, full Py, K2/SE/K2SE, full Bob/Angel and IR4; input availability does not qualify native, gameplay or migration outcomes.",
         "Complete full-suite Py and broad Bob/Angel coverage separately from the existing narrow selections, with actual useful effects and migration/state outcomes."
       ],
       "qualification_campaign": {
@@ -1186,41 +1186,74 @@
           {
             "family": "AAI",
             "tracked_profiles": [
+              "tests/profiles/aai-bob-angel-bz-available-six-base-f210-2123.json",
+              "tests/profiles/aai-bob-angel-bz-available-six-space-age-f210-2123.json",
+              "tests/profiles/aai-bz-available-six-base-f210-2123.json",
+              "tests/profiles/aai-bz-available-six-space-age-f210-2123.json",
               "tests/profiles/aai-industry-base-f210-2123.json",
-              "tests/profiles/aai-industry-space-age-f210-2123.json"
+              "tests/profiles/aai-industry-space-age-f210-2123.json",
+              "tests/profiles/k2se-base-f210-2123.json",
+              "tests/profiles/k2se-bz-available-six-base-f210-2123.json",
+              "tests/profiles/space-exploration-base-f210-2123.json"
             ],
             "current_candidate_verdict": "not-established-for-full-family",
-            "coverage_gap": "New exact AAI Industry0.7.5 Base/Space Age input profiles are pinned; no native result exists yet. Complete the individual Industry and admitted full AAI-suite axes."
+            "coverage_gap": "New exact AAI Industry0.7.5 Base/Space Age input profiles are pinned; no native result exists yet. Complete the individual Industry and admitted full AAI-suite axes.",
+            "current_data_observation": {
+              "source_commit": "7767026b540211a680c058cb30ab656d42e96ba8",
+              "engine": "2.1.23",
+              "archives": "AAI0.7.5 DFB734B8, publishedB6EB and currentB2/4F5",
+              "outcome": "Six Base/SpaceAge upstream/published/current data captures exit0 with restored controls. Gameplay/physical/migrations/clients remain open.",
+              "primary_root": "build/mir5/recovery-historical/aai-industry-f210/local-7767026-r01",
+              "canonical_manifest_sha256": "5554BB47B41907F20F4F33746C74C900AB3B349D24C88B5084B093F04A38432E"
+            }
           },
           {
             "family": "BZ",
-            "tracked_profiles": [],
+            "tracked_profiles": [
+              "tests/profiles/aai-bob-angel-bz-available-six-base-f210-2123.json",
+              "tests/profiles/aai-bob-angel-bz-available-six-space-age-f210-2123.json",
+              "tests/profiles/aai-bz-available-six-base-f210-2123.json",
+              "tests/profiles/aai-bz-available-six-space-age-f210-2123.json",
+              "tests/profiles/bz-available-six-base-f210-2123.json",
+              "tests/profiles/bz-available-six-space-age-f210-2123.json",
+              "tests/profiles/bzcarbon-base-f210-2123.json",
+              "tests/profiles/bzcarbon-space-age-f210-2123.json",
+              "tests/profiles/bzlead-base-f210-2123.json",
+              "tests/profiles/bzlead-space-age-f210-2123.json",
+              "tests/profiles/bzsilicon-base-f210-2123.json",
+              "tests/profiles/bzsilicon-space-age-f210-2123.json",
+              "tests/profiles/bztin-base-f210-2123.json",
+              "tests/profiles/bztin-space-age-f210-2123.json",
+              "tests/profiles/bztitanium-base-f210-2123.json",
+              "tests/profiles/bztitanium-space-age-f210-2123.json",
+              "tests/profiles/bzzirconium-base-f210-2123.json",
+              "tests/profiles/bzzirconium-space-age-f210-2123.json",
+              "tests/profiles/k2se-bz-available-six-base-f210-2123.json"
+            ],
             "current_candidate_verdict": "not-established-for-full-family",
-            "coverage_gap": "No active profile or native chain; qualify component mods individually and the complete admitted BZ suite."
+            "coverage_gap": "Current F210 input profiles now pin the available exact individual/combined or full-suite closures; native, research/physical, migration and client outcomes remain to be established per selected profile. Older named receipts retain their original scopes."
           },
           {
             "family": "Py",
             "tracked_profiles": [
               "tests/profiles/py-alienlife-hightech-f200-2077.json",
-              "tests/profiles/py-coal-f200-2077.json"
+              "tests/profiles/py-coal-f200-2077.json",
+              "tests/profiles/py-suite-base-f210-2123.json",
+              "tests/profiles/py-suite-space-age-f210-2123.json",
+              "tests/profiles/py-suite-with-productivity-base-f210-2123.json",
+              "tests/profiles/py-suite-with-productivity-space-age-f210-2123.json"
             ],
             "current_candidate_verdict": "not-established-for-full-family",
-            "coverage_gap": "Only two F200 selections exist; retained named data/gameplay receipts do not qualify the complete Py suite or current F210."
+            "coverage_gap": "Current F210 input profiles now pin the available exact individual/combined or full-suite closures; native, research/physical, migration and client outcomes remain to be established per selected profile. Older named receipts retain their original scopes."
           },
           {
             "family": "K2",
             "tracked_profiles": [
               "tests/profiles/k2-base-continuations-f200.json",
               "tests/profiles/k2-base-f200-2077.json",
-              "tests/profiles/k2-imersite-transition-direct-f210.json",
-              "tests/profiles/k2-imersite-transition-mir5-f210.json",
-              "tests/profiles/k2-imersite-transition-predecessor-4.6-f210.json",
-              "tests/profiles/k2-imersite-transition-published-4.7-f210.json",
-              "tests/profiles/k2so-f210-2123.json",
-              "tests/profiles/k2so-observed-f210-2123.json",
-              "tests/profiles/materials-k2so-f210.json",
-              "tests/profiles/worker-caps-k2so-f210.json",
-              "tests/profiles/worker-caps-relaxed-k2so-f210.json"
+              "tests/profiles/k2-base-f210-2123.json",
+              "tests/profiles/k2se-base-f210-2123.json",
+              "tests/profiles/k2se-bz-available-six-base-f210-2123.json"
             ],
             "current_candidate_verdict": "not-established-for-full-family",
             "coverage_gap": "Retain exact K2 Base evidence separately from K2SO; current-package and transition applicability remains incomplete."
@@ -1228,10 +1261,6 @@
           {
             "family": "K2SO",
             "tracked_profiles": [
-              "tests/profiles/k2-imersite-transition-direct-f210.json",
-              "tests/profiles/k2-imersite-transition-mir5-f210.json",
-              "tests/profiles/k2-imersite-transition-predecessor-4.6-f210.json",
-              "tests/profiles/k2-imersite-transition-published-4.7-f210.json",
               "tests/profiles/k2so-f210-2123.json",
               "tests/profiles/k2so-observed-f210-2123.json",
               "tests/profiles/materials-k2so-f210.json",
@@ -1243,19 +1272,28 @@
           },
           {
             "family": "SE",
-            "tracked_profiles": [],
+            "tracked_profiles": [
+              "tests/profiles/k2se-base-f210-2123.json",
+              "tests/profiles/k2se-bz-available-six-base-f210-2123.json",
+              "tests/profiles/space-exploration-base-f210-2123.json"
+            ],
             "current_candidate_verdict": "not-established-for-full-family",
-            "coverage_gap": "No active profile or native chain."
+            "coverage_gap": "Current F210 input profiles now pin the available exact individual/combined or full-suite closures; native, research/physical, migration and client outcomes remain to be established per selected profile. Older named receipts retain their original scopes."
           },
           {
             "family": "K2SE",
-            "tracked_profiles": [],
+            "tracked_profiles": [
+              "tests/profiles/k2se-base-f210-2123.json",
+              "tests/profiles/k2se-bz-available-six-base-f210-2123.json"
+            ],
             "current_candidate_verdict": "not-established-for-full-family",
-            "coverage_gap": "No active combined K2 and Space Exploration profile or native chain; K2SO evidence supplies no substitute."
+            "coverage_gap": "Current F210 input profiles now pin the available exact individual/combined or full-suite closures; native, research/physical, migration and client outcomes remain to be established per selected profile. Older named receipts retain their original scopes."
           },
           {
             "family": "Bob",
             "tracked_profiles": [
+              "tests/profiles/aai-bob-angel-bz-available-six-base-f210-2123.json",
+              "tests/profiles/aai-bob-angel-bz-available-six-space-age-f210-2123.json",
               "tests/profiles/armor-bobwarfare-f200-2077.json",
               "tests/profiles/bob-angel-continuity-effect1-cap40-f200.json",
               "tests/profiles/bob-angel-continuity-effect3-cap2-f200.json",
@@ -1263,38 +1301,51 @@
               "tests/profiles/bob-angel-continuity-published-4.7-f200.json",
               "tests/profiles/bob-angel-default-cap-f200-2077.json",
               "tests/profiles/bob-angel-f200-2077.json",
+              "tests/profiles/bob-angel-full-base-f210-2123.json",
+              "tests/profiles/bob-angel-full-space-age-f210-2123.json",
               "tests/profiles/bob-angel-prototype-cap125-f200.json",
               "tests/profiles/bob-angel-prototype-cap400-f200.json",
               "tests/profiles/bob-angel-published-reset-control-f200.json",
               "tests/profiles/bob-core-f210-2123.json",
               "tests/profiles/bob-core-gameplay-f210-2123.json",
+              "tests/profiles/bob-full-base-f210-2123.json",
+              "tests/profiles/bob-full-space-age-f210-2123.json",
               "tests/profiles/bob-tech-f210-2123.json"
             ],
             "current_candidate_verdict": "not-established-for-full-family",
-            "coverage_gap": "Bob core, BobTech and Bob/Angel are distinct selections; they do not qualify the whole suite individually or every combined profile."
+            "coverage_gap": "Current F210 input profiles now pin the available exact individual/combined or full-suite closures; native, research/physical, migration and client outcomes remain to be established per selected profile. Older named receipts retain their original scopes."
           },
           {
             "family": "Angel",
             "tracked_profiles": [
+              "tests/profiles/aai-bob-angel-bz-available-six-base-f210-2123.json",
+              "tests/profiles/aai-bob-angel-bz-available-six-space-age-f210-2123.json",
+              "tests/profiles/angel-full-base-f210-2123.json",
+              "tests/profiles/angel-full-space-age-f210-2123.json",
               "tests/profiles/bob-angel-continuity-effect1-cap40-f200.json",
               "tests/profiles/bob-angel-continuity-effect3-cap2-f200.json",
               "tests/profiles/bob-angel-continuity-f200.json",
               "tests/profiles/bob-angel-continuity-published-4.7-f200.json",
               "tests/profiles/bob-angel-default-cap-f200-2077.json",
               "tests/profiles/bob-angel-f200-2077.json",
+              "tests/profiles/bob-angel-full-base-f210-2123.json",
+              "tests/profiles/bob-angel-full-space-age-f210-2123.json",
               "tests/profiles/bob-angel-prototype-cap125-f200.json",
               "tests/profiles/bob-angel-prototype-cap400-f200.json",
               "tests/profiles/bob-angel-published-reset-control-f200.json",
               "tests/profiles/bob-tech-f210-2123.json"
             ],
             "current_candidate_verdict": "not-established-for-full-family",
-            "coverage_gap": "Retain exact combined Bob/Angel evidence; no independent complete Angel or arbitrary mixed-profile verdict follows."
+            "coverage_gap": "Current F210 input profiles now pin the available exact individual/combined or full-suite closures; native, research/physical, migration and client outcomes remain to be established per selected profile. Older named receipts retain their original scopes."
           },
           {
             "family": "IR3/IR4",
-            "tracked_profiles": [],
+            "tracked_profiles": [
+              "tests/profiles/ir4-base-f210-2123.json",
+              "tests/profiles/ir4-space-age-f210-2123.json"
+            ],
             "current_candidate_verdict": "not-established-for-full-family",
-            "coverage_gap": "No active profile or native chain; determine actual engine/dependency compatibility before qualification."
+            "coverage_gap": "Current F210 input profiles now pin the available exact individual/combined or full-suite closures; native, research/physical, migration and client outcomes remain to be established per selected profile. Older named receipts retain their original scopes."
           }
         ],
         "combined_profiles_required": [
@@ -1345,7 +1396,18 @@
           "Affected client/join/rejoin/restart/UI and resource/stress observations; startup alone does not qualify those axes."
         ],
         "historical_incident_rule": "Every original request/incident and existing exact regression pack remains mandatory regardless of popularity. Preserve original IDs/decisions/receipts, including science failures, True Nukes, multiplayer join, optional-DLC artwork, K2 Imersite/carriers, Py foreign resets, Bob/Angel prerequisite/cap cases and mixed productivity providers. Unknown reporter inputs remain explicit missing inputs.",
-        "evidence_rule": "A tracked profile or available archive is not a native pass. Keep exact old evidence under its original identities, map consumed-input applicability, and record each unrun or failed axis visibly. Upstream incompatibility requires exact evidence and an explicit disposition; it is not a successful migration or a MIR completeness claim."
+        "evidence_rule": "A tracked profile or available archive is not a native pass. Keep exact old evidence under its original identities, map consumed-input applicability, and record each unrun or failed axis visibly. Upstream incompatibility requires exact evidence and an explicit disposition; it is not a successful migration or a MIR completeness claim.",
+        "local_popular_input_availability": {
+          "status": "all-selected-top50-root-candidates-locally-available-after-seven-official-downloads",
+          "engines": [
+            "2.1.23",
+            "2.0.77",
+            "1.1.110"
+          ],
+          "adoption_primary_path": "build/mir5/recovery/popular-mod-coverage-audit-r01/popular-missing-archive-library-adoption.json",
+          "adoption_sha256": "9DD4704BDF01F112A6D875FFA8C4E8D484C6CC59B86D2482BC6F4E00D79B3CAD",
+          "scope": "Archive availability only; exact profile dependency/engine admission and all native axes remain required."
+        }
       }
     },
     {
