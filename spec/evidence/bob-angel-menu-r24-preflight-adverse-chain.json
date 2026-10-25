@@ -1,0 +1,79 @@
+{
+  "schema": 1,
+  "kind": "MIR5BobAngelMenuR24PreCaptureAdverseChainV1",
+  "status": "failed-before-first-native-capture-or-timing",
+  "run_url": "https://github.com/Julesc013/mir-native-worker/actions/runs/40221047016",
+  "private_controller_reference": "7a983b2906748fda35020b1047a25bb859b61641",
+  "public_source_reference": "1ab5cf97f4d1c6593fcde0600c420cf195f947f1",
+  "player_tree": "25442a5bd7838f124952507854426e3b8e868475",
+  "raw_plan": {
+    "source_reference": "a6fd208fe17909225b78112a77d97d1160047b19",
+    "path": "spec/evidence/bob-angel-menu-plan-r24.json",
+    "sha256": "31E6FE88F890414EED00059885CB31948582EB642BE830157B6B000C84FE4235"
+  },
+  "analysis_protocol": {
+    "source_reference": "6df662a0c666539e23ef27bc48962de2408c9d1f",
+    "path": "spec/evidence/bob-angel-menu-r24-analysis-plan-r01.json",
+    "sha256": "A282D00634D3BE2D3EFF371E1F47CC24D05D6F8CC5EDE376C30EF457A6774E81"
+  },
+  "candidate": {
+    "f200_sha256": "B67FF048860F2707579CF582C933ED46D7BF52769F5ABE1B0279DDCC2A0323BD",
+    "bytes": 553231,
+    "inventory_file_sha256": "325F6E6E202E02CEF606959C6EFEB2C2FEDD0E13F4BC2ACA15EA188A851A5AAC"
+  },
+  "failure": {
+    "phase": "first-prototype-capture-parameter-binding",
+    "message": "Cannot validate argument on parameter 'MaxNewOutputMiB'. The 8192 argument is greater than the maximum allowed range of 2048. Supply an argument that is less than or equal to 2048 and then try the command again.",
+    "native_captures": 0,
+    "timing_samples": 0,
+    "factorio_processes_after_terminal": 0,
+    "retry_started": false
+  },
+  "primary_custody": {
+    "root": "build/mir5/recovery/menu-r24-40221047016/black-glass-bob-angel-menu-comparison-r24-40221047016-1",
+    "members_verified": 40,
+    "artifact_manifest_sha256": "C43A2480E9ABF2618EA3E4A6DE7C21E5C4F28161BD2B2F2D6F93061FF0CC5FE1"
+  },
+  "portable_receipts": {
+    "path": "spec/evidence/bob-angel-menu-r24-preflight-adverse-receipts.json.gz",
+    "bytes": 6137,
+    "sha256": "D4D3D1F4FD3E9DC48F6AA140C51168674E1A666B0C9F4C31F0045A3930FCE2E0",
+    "files": [
+      {
+        "path": "original/artifact-manifest.json",
+        "bytes": 7951,
+        "sha256": "C43A2480E9ABF2618EA3E4A6DE7C21E5C4F28161BD2B2F2D6F93061FF0CC5FE1"
+      },
+      {
+        "path": "original/bob-angel-menu-r24/preparation/preparation-result.json",
+        "bytes": 1686,
+        "sha256": "CF67C6AE870D5AD84014432F1C842402FD4FB9A623FFAE801B8128C5FB13EF6A"
+      },
+      {
+        "path": "original/bob-angel-menu-r24/single-job-result.json",
+        "bytes": 1026,
+        "sha256": "9D1C4FAE99A3D3AA37550950FE4B0A6517EDB8556B66C7B4B1289F3EFD251891"
+      },
+      {
+        "path": "original/worker-failure.json",
+        "bytes": 383,
+        "sha256": "819AA009B31F0791F246245BF583A9AAE43FE7928DCD95EC43A597142D16AD47"
+      }
+    ]
+  },
+  "repair": {
+    "pull_request": "https://github.com/Julesc013/more-infinite-research/pull/995",
+    "source_reference": "ac46526d08bfc1c799231dd520374df08a1bfa0e",
+    "path": "tools/Invoke-PrototypeCapture.ps1",
+    "previous_sha256": "34E513C43EFEB5CAC93843CA9AA9CD5E70E385825BD8C155783C3542A3E8FB07",
+    "sha256": "75B74DB6ACD81E016F10DF34C178563F3BF922901BCF8A7F49A32372B984864F",
+    "scope": "Align only MaxNewOutputMiB validator upper bound with the already qualified8192MiB resource/governor bound;512MiB default and every resource reserve/ownership/admission guard remain unchanged. No cap or waiver of the declared8GiB request.",
+    "actual_no_engine_controls": "8192 passes binding and reaches the ordinary missing-Factorio guard;8193 refuses before body input resolution. All15 capture controls and four required public checks pass."
+  },
+  "claims": {
+    "native_execution": false,
+    "performance_measurement": false,
+    "performance_comparison": false,
+    "release_qualification": false
+  }
+}

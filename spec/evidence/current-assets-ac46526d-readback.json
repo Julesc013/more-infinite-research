@@ -1,0 +1,78 @@
+{
+  "schema": 1,
+  "kind": "MIR5R25OfflineAssetReadbackV1",
+  "source_reference": "ac46526d08bfc1c799231dd520374df08a1bfa0e",
+  "source_tree": "25442a5bd7838f124952507854426e3b8e868475",
+  "asset_root": "D:/Projects/Factorio/mir5-current-assets-ac46526d-r01",
+  "primary_copy": "D:/Projects/Factorio/more-infinite-research/build/mir5/assets/ac46526d-r01",
+  "inventory_file_sha256": "F63C36D4CD9D4E241A548D818F83E921518CE19CD726469A9A5A4855F132EF33",
+  "inventory_content_sha256": "A98DB62921F7537F0D4AC0E4FB8345C10983B2EEEBC2B9C297EF6060D2DC01D2",
+  "offline_rebuild_verification": "python tools/release.py --source source --output D:/Projects/Factorio/mir5-current-assets-ac46526d-r01 --verify completed with exit code 0",
+  "assets": [
+    {
+      "name": "more-infinite-research_5.0.01300.zip",
+      "bytes": 347271,
+      "sha256": "3C12694E1BBF1B23D1D09B19652725546A72099C81684556BB9272CC62CCDB91",
+      "byte_identical_to_b2": true
+    },
+    {
+      "name": "more-infinite-research_5.0.01400.zip",
+      "bytes": 347271,
+      "sha256": "37C007DC19F3337CE952495F0EE045F8ED70016016E704F977DAEE439F27F86A",
+      "byte_identical_to_b2": true
+    },
+    {
+      "name": "more-infinite-research_5.0.01500.zip",
+      "bytes": 347231,
+      "sha256": "9D048E07F0C1A87E36C5E725331315E23055FDC44C53343437EBF7D2BAC3B309",
+      "byte_identical_to_b2": true
+    },
+    {
+      "name": "more-infinite-research_5.0.01600.zip",
+      "bytes": 347222,
+      "sha256": "A1A01C00928B8F641215B3211D2150509CEDA91086404225B36D253EAE218176",
+      "byte_identical_to_b2": true
+    },
+    {
+      "name": "more-infinite-research_5.0.01700.zip",
+      "bytes": 347111,
+      "sha256": "D37BF4A1C52A4E14CC4746FD021BCFE20F6868BEC76B662B9C72C0471E56E555",
+      "byte_identical_to_b2": true
+    },
+    {
+      "name": "more-infinite-research_5.0.10000.zip",
+      "bytes": 360903,
+      "sha256": "F440EB67BDED09D91B16F4F9CEBDD01FCFE3D16B9E368A167F932294381F88F6",
+      "byte_identical_to_b2": true
+    },
+    {
+      "name": "more-infinite-research_5.0.11000.zip",
+      "bytes": 360900,
+      "sha256": "D846237B678C4D34BDFD46F2EAA503893E5C8DB74653C0512E465144DB807A41",
+      "byte_identical_to_b2": true
+    },
+    {
+      "name": "more-infinite-research_5.0.20000.zip",
+      "bytes": 553231,
+      "sha256": "B67FF048860F2707579CF582C933ED46D7BF52769F5ABE1B0279DDCC2A0323BD",
+      "byte_identical_to_b2": true
+    },
+    {
+      "name": "more-infinite-research_5.0.21000.zip",
+      "bytes": 553767,
+      "sha256": "4F5BEE023930666FC0F921136A69B59861741BE44C311E03D46347D42018ECBC",
+      "byte_identical_to_b2": true
+    }
+  ],
+  "primary_files_verified": 11,
+  "raw_menu_helpers_checked": 14,
+  "changed_raw_menu_helpers": [
+    {
+      "path": "tools/Invoke-PrototypeCapture.ps1",
+      "previous_sha256": "34E513C43EFEB5CAC93843CA9AA9CD5E70E385825BD8C155783C3542A3E8FB07",
+      "sha256": "75B74DB6ACD81E016F10DF34C178563F3BF922901BCF8A7F49A32372B984864F"
+    }
+  ],
+  "native_execution": false,
+  "release_qualification": false
+}

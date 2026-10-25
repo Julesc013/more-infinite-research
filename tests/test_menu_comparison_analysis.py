@@ -32,9 +32,9 @@ def _encoded(document: object) -> bytes:
 
 def _analysis_plan(cohort: str = "r23") -> dict[str, object]:
     plan = json.loads(SPEC_PATH.read_text(encoding="utf-8"))
-    if cohort == "r24":
-        plan["kind"] = "MIR5ResponsiveMenuR24AnalysisPlanV1"
-        plan["raw_plan"]["path"] = "spec/evidence/bob-angel-menu-plan-r24.json"
+    if cohort in ("r24", "r25"):
+        plan["kind"] = f"MIR5ResponsiveMenu{cohort.upper()}AnalysisPlanV1"
+        plan["raw_plan"]["path"] = f"spec/evidence/bob-angel-menu-plan-{cohort}.json"
         plan["schedule"]["total_rows"] = 262
         plan["schedule"]["counterbalanced_blocks"] = 64
         plan["schedule"]["latin_rotations"] *= 8
@@ -189,6 +189,19 @@ def _prepared(cohort: str = "r23") -> tuple[dict[str, object], dict[str, object]
 
 
 class MenuComparisonAnalysisTests(unittest.TestCase):
+    def test_r25_preserves_the_fixed_large_schedule_with_a_distinct_plan_identity(self) -> None:
+        plan, raw, raw_hash = _prepared("r25")
+        result = _result(plan)
+        output = ANALYZER.analyze(plan, "A" * 64, raw, raw_hash, result, "B" * 64)
+        self.assertEqual(output["kind"], "MIR5ResponsiveMenuR25AnalysisV1")
+        self.assertEqual(output["inference"]["n"], 64)
+        self.assertEqual(output["inference"]["degrees_of_freedom"], 63)
+        self.assertEqual(len(output["paired_blocks"]), 64)
+        wrong = copy.deepcopy(plan)
+        wrong["raw_plan"]["path"] = "spec/evidence/bob-angel-menu-plan-r24.json"
+        with self.assertRaises(ANALYZER.MenuAnalysisError):
+            ANALYZER.analyze(wrong, "A" * 64, raw, raw_hash, result, "B" * 64)
+
     def test_fixed_r24_uses_all_sixty_four_blocks_and_its_own_interval(self) -> None:
         import math
         import statistics
