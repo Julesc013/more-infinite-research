@@ -72,6 +72,42 @@ $cases | ConvertTo-Json -Compress -Depth 6
     return json.loads(result.stdout)
 
 
+def native_fixture_active_marker_guard_cases() -> dict:
+    """Exercise only the finite active-marker reader, never Factorio."""
+    escaped = str(NATIVE_FIXTURE).replace("'", "''")
+    command = rf"""
+$tokens=$null;$errors=$null
+$ast=[System.Management.Automation.Language.Parser]::ParseFile('{escaped}',[ref]$tokens,[ref]$errors)
+if($errors.Count){{throw ($errors | ForEach-Object {{$_.ToString()}})}}
+$definition=@($ast.Find({{param($node) $node -is [System.Management.Automation.Language.FunctionDefinitionAst] -and $node.Name -ceq 'Read-ActiveFixtureMarker'}},$true))
+if($definition.Count -ne 1){{throw 'active marker helper missing or ambiguous'}}
+function Assert-Fixture([bool]$Condition,[string]$Message) {{if(-not$Condition){{throw "[mir5-native-fixture] $Message"}}}}
+. ([scriptblock]::Create($definition[0].Extent.Text))
+function Invoke-ActiveCase([string]$Text,[string]$Kind,[string]$Stage) {{
+  try {{[ordered]@{{valid=$true;value=(Read-ActiveFixtureMarker $Text $Kind $Stage)}}}}
+  catch {{[ordered]@{{valid=$false;message=$_.Exception.Message}}}}
+}}
+$prepared='[MIR5_RUNTIME_ACTIVE] {{"kind":"repair-stress","stage":"prepared","status":"pending"}}'
+$complete='[MIR5_RUNTIME_ACTIVE] {{"kind":"repair-stress","stage":"complete","status":"passed"}}'
+$cases=[ordered]@{{
+  positive=(Invoke-ActiveCase $prepared 'repair-stress' 'prepared')
+  duplicate=(Invoke-ActiveCase ($prepared+"`n"+$prepared) 'repair-stress' 'prepared')
+  wrong_kind=(Invoke-ActiveCase $prepared 'agriculture-scale' 'prepared')
+  wrong_status=(Invoke-ActiveCase $complete 'repair-stress' 'prepared')
+  unsupported_stage=(Invoke-ActiveCase $prepared 'repair-stress' 'other')
+}}
+$cases | ConvertTo-Json -Compress -Depth 6
+"""
+    result = subprocess.run(
+        ["pwsh", "-NoProfile", "-Command", command],
+        cwd=ROOT,
+        check=True,
+        text=True,
+        capture_output=True,
+    )
+    return json.loads(result.stdout)
+
+
 class CaptureControlTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
@@ -182,6 +218,31 @@ class CaptureControlTests(unittest.TestCase):
             "-LatestInvocation -ActiveModsObserver $activeModsObserverName",
             native_fixture,
         )
+
+    def test_native_fixture_active_seed_mode_is_finite_and_deferred(self):
+        source = NATIVE_FIXTURE.read_text(encoding="utf-8")
+        self.assertIn("[switch]$ActiveSeedOnly", source)
+        self.assertIn(
+            "[ValidateSet('','repair-stress','agriculture-scale')][string]$ActiveSeedKind=''",
+            source,
+        )
+        self.assertIn("active seed requires a modern installed-MIR fixture run", source)
+        self.assertIn("active seed must begin from its own fresh fixture save", source)
+        self.assertIn("passed-private-native-active-seed-preparation", source)
+        self.assertIn(
+            "physical_work='deferred until the benchmark loads this exact active save'",
+            source,
+        )
+        self.assertIn("Read-ActiveFixtureMarker $text 'agriculture-scale' 'prepared'", source)
+
+    def test_native_fixture_active_marker_reader_rejects_wrong_or_ambiguous_markers(self):
+        cases = native_fixture_active_marker_guard_cases()
+        self.assertTrue(cases["positive"]["valid"])
+        self.assertEqual(cases["positive"]["value"]["stage"], "prepared")
+        for name in ("duplicate", "wrong_kind", "wrong_status", "unsupported_stage"):
+            with self.subTest(name=name):
+                self.assertFalse(cases[name]["valid"])
+                self.assertIn("active", cases[name]["message"])
 
     def test_native_fixture_observer_binding_rejects_missing_unselected_and_unverified_inputs(self):
         cases = native_fixture_observer_guard_cases()
