@@ -76,7 +76,7 @@ class DiagnosticsTests(unittest.TestCase):
           assert(first[1] == "[more-infinite-research] automatic-productivity preview: no automatic research identities; structural-fallback bindings withheld")
           assert(first[2] == "[more-infinite-research] recipe-targets report start")
           assert(first[3]:find("structural%-fallbacks=withheld action=preview selected%-families=1", 1) ~= nil)
-          assert(first[4] == "[more-infinite-research] recipe-targets work recipes=1 products=1 ingredients=0 matches=1 modules=0")
+          assert(first[4] == "[more-infinite-research] recipe-targets work recipes=1 products=1 ingredients=0 matches=1 modules=0 labs=0 lab-inputs=0")
           assert(first[5] == "[more-infinite-research] recipe-target match family=research_gears recipe=modded-gear-producer product=item:iron-gear-wheel weight=1 disposition=added")
           assert(first[6] == "[more-infinite-research] recipe-targets report end")
 

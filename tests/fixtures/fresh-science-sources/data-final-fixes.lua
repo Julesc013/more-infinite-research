@@ -42,6 +42,18 @@ end
 -- effects. Preserve the published witness: retained science plus positive
 -- productivity somewhere in that retained research, not on every prefix row.
 assert(retained > 0 and effects > 0, "fresh science research or positive effects were removed")
+local science = data.raw.technology["recipe-prod-research_science_pack_productivity-1"]
+assert(science, "science-pack productivity identity was removed")
+for _, recipe in ipairs({"a-mir473-circular-planetary-data", "z-mir473-seeded-planetary-data"}) do
+  local count = 0
+  for _, effect in ipairs(science.effects or {}) do
+    if effect.type == "change-recipe-productivity" and effect.recipe == recipe then
+      assert(effect.change == 0.1, "fresh science producer productivity changed")
+      count = count + 1
+    end
+  end
+  assert(count == 1, "fresh science producer productivity was omitted or duplicated")
+end
 local circular = data.raw.technology[CIRCULAR]
 assert(circular and circular.unit and circular.unit.ingredients[1][1] == PACK
   and circular.unit.ingredients[1][2] == 1 and #(circular.prerequisites or {}) == 0

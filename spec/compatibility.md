@@ -24,6 +24,8 @@ source_of_truth_for:
 
 `COMP-02` — A collector may select targets; it must not invent technology identities, science, prerequisites or family meaning. It lives outside the Generator. A public API call does not trigger global collection. Repeated calls cannot silently initiate repeated world passes. Scope any reusable result to the data-stage phase in which its inputs are valid; later foreign prototype edits invalidate that assumption. Prefer one explicit integration point over a generic invalidation system.
 
+The retained science-pack productivity family includes every current lab input that resolves to a concrete ItemPrototype, independently of the research-ingredient policy. When that authored family is selected and not explicitly replaced by an exact profile binding, collect and locally sort/deduplicate those input names once, then add one typed-item rule at the family's normal weight to the existing recipe pass. Preserve static-rule precedence, disabled producer eligibility and the collector's yield/type/productivity-denial/recycling safeguards. This selects producer effects without examining foreign research owners or inventing progression; an absent or exact-bound family does not inspect labs.
+
 Do not silently shrink old product-based targeting to one vanilla recipe. Conversely, a shared output name does not prove arbitrary recycler/catalyst economics safe. Preserve relevant quantity, type, probability, ignored-productivity and excluded-return semantics. Where an obligation cannot be expressed safely in the allowed mechanisms, record the exact conflict and withhold the affected completeness claim.
 
 ## Activation and load order

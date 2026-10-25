@@ -12,6 +12,14 @@ local item_types = {
   "upgrade-item", "spidertron-remote", "rail-planner", "space-platform-starter-pack"
 }
 
+-- Named membership only: lab inputs can use any concrete ItemPrototype class.
+function M.item_exists(raw, name)
+  for _, kind in ipairs(item_types) do
+    if type(raw[kind]) == "table" and type(raw[kind][name]) == "table" then return true end
+  end
+  return false
+end
+
 local function finite(value)
   return type(value) == "number" and value == value
     and value ~= math.huge and value ~= -math.huge
