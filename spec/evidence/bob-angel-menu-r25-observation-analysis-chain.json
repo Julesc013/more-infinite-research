@@ -1,0 +1,427 @@
+{
+  "schema": 1,
+  "kind": "MIR5BobAngelMenuR25ObservationAnalysisChainV1",
+  "status": "completed-native-observation-menu-objective-supported",
+  "scope": "ordinary responsive-menu endpoint only on the exact F200 Bob/Angel workload",
+  "claims": {
+    "native_execution": true,
+    "performance_measurement": true,
+    "performance_comparison": true,
+    "responsive_menu_objective_supported": true,
+    "performance_qualification": false,
+    "runtime_qualification": false,
+    "memory_qualification": false,
+    "ui_fidelity_qualification": false,
+    "save_qualification": false,
+    "release_qualification": false
+  },
+  "execution": {
+    "workflow_run_id": 40224600684,
+    "workflow_url": "https://github.com/Julesc013/mir-native-worker/actions/runs/40224600684",
+    "workflow_disposition_at_custody": "The job is terminal cancelled after native execute and output-hash steps passed; upload was still reported in progress at terminal readback. No cause is inferred and no native retry is performed. Complete local outputs and independently verified primary custody survive this transport adverse.",
+    "execution_kind": "official-frozen-workflow",
+    "controller_commit": "220a97f1438103d85df239bfc65f8722189c4d02",
+    "controller_ref": "test/coherent-b2-menu-r25-r01",
+    "source_reference": "ac46526d08bfc1c799231dd520374df08a1bfa0e",
+    "source_tree": "25442a5bd7838f124952507854426e3b8e868475",
+    "trusted_branch": "feat/mir5-stress-qualification-r05",
+    "host": "BLACKGLASS-WIN1",
+    "engine": {
+      "path": "D:\\Games\\Factorio\\2.0\\bin\\x64\\factorio.exe",
+      "sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B",
+      "file_version": "2.0.77.84539",
+      "product_version": "2.0.77",
+      "base_version": "2.0.77"
+    },
+    "profile": {
+      "path": "tests/profiles/bob-angel-f200-2077.json",
+      "sha256": "A2F235B7CE1F18968E1D7D7913362694EA1916095852C1673300C68BA26DDE90"
+    },
+    "candidate": {
+      "version": "5.0.20000",
+      "sha256": "B67FF048860F2707579CF582C933ED46D7BF52769F5ABE1B0279DDCC2A0323BD",
+      "bytes": 553231,
+      "asset_inventory_sha256": "F63C36D4CD9D4E241A548D818F83E921518CE19CD726469A9A5A4855F132EF33"
+    },
+    "published": {
+      "version": "4.7.20002",
+      "sha256": "F3943EB4D69CCDAC41BD9F922AD03A5C78F34F22D8E7FA5A88A7A658AB1010B7",
+      "bytes": 1449338
+    },
+    "replay": {
+      "version": "4.7.20002",
+      "sha256": "392E2350C5F0B0292F9D58F1E23B74DA95300940F415C75FCC45E46D8F27D3C9",
+      "bytes": 1490466
+    },
+    "raw_result": {
+      "path": "original/bob-angel-menu-r25/preparation/s/build/tmp/r25-menu-comparison/result.json",
+      "bytes": 2332341,
+      "sha256": "DF00F89D26F82024B7024F2C9FF1CBB687506EC9FBF8395B6621D058ABA30325"
+    },
+    "library_controls_restored": true,
+    "factorio_processes_after_completion": 0,
+    "workflow_job_status": "completed",
+    "workflow_job_conclusion": "cancelled",
+    "transport_readback": {
+      "path": "derived/workflow-transport-readback.json",
+      "bytes": 1244,
+      "sha256": "9F62EAFC9E90A1E1223039642525541DBA80ECD3376A9D766B90D74D69740205"
+    }
+  },
+  "native_preparation": {
+    "fresh_captures": 4,
+    "preparation": {
+      "path": "original/bob-angel-menu-r25/preparation/preparation-result.json",
+      "bytes": 1761,
+      "sha256": "E43EE08EB2694265990B558549193D70D831462ECFFE00A613342E0D090E5624"
+    },
+    "packet": {
+      "path": "original/bob-angel-menu-r25/preparation/native-preparation-packet.json",
+      "bytes": 6950,
+      "sha256": "38B23ED3A4211292A19277BC19C8051BB07EE4F3CECD04CFBAA89F31CE929186"
+    },
+    "captures": [
+      {
+        "path": "original/bob-angel-menu-r25/preparation/s/build/tmp/captures/control/result.json",
+        "bytes": 21729,
+        "sha256": "3E2DADE760854F54846F8E1F978D64DF9AEB6A318E9DBBFDC4CAE62DDCD15C15"
+      },
+      {
+        "path": "original/bob-angel-menu-r25/preparation/s/build/tmp/captures/published/result.json",
+        "bytes": 22894,
+        "sha256": "5248ADA5A7B90AAEFBBBCD8EAD21F1DA0A9F23B2DF4B8737451D87B0BA63B498"
+      },
+      {
+        "path": "original/bob-angel-menu-r25/preparation/s/build/tmp/captures/replay/result.json",
+        "bytes": 22885,
+        "sha256": "7F156975F4CD3B1F016F5EABF6A46A0A30830816AFCD63CB351F4F17D2E67AB5"
+      },
+      {
+        "path": "original/bob-angel-menu-r25/preparation/s/build/tmp/captures/candidate/result.json",
+        "bytes": 22892,
+        "sha256": "732AAE55F326368CB1EA85E0F219689ADB13B308293328D86AF1593C04CEF428"
+      }
+    ],
+    "candidate_intent": {
+      "path": "original/bob-angel-menu-r25/preparation/candidate-intent.json",
+      "bytes": 13802,
+      "sha256": "0420CD2518239C9ED67BC3D5A59127F358386300D9922532B5524269E30EF5F3"
+    },
+    "candidate_intent_status": "equal-intended-native-output",
+    "replay_equality": {
+      "path": "original/bob-angel-menu-r25/preparation/replay-equality.json",
+      "bytes": 10980,
+      "sha256": "CB32D64C114F035F6C5629D1F1E547FAC8D1A053B9C7CD9F7E78058C64334209"
+    },
+    "replay_status": "equal-complete-native-output",
+    "independent_expected_records": 148,
+    "owned_menu_diagnostic": {
+      "path": "original/bob-angel-menu-r25/preparation/s/build/tmp/owned-window/result.json",
+      "bytes": 7022,
+      "sha256": "7AE23DC4265059EEB7F84E9B3C358FDD33E8BC5C309A8AB2EFD230CC9C5045D8"
+    },
+    "single_job_receipt": {
+      "path": "original/bob-angel-menu-r25/single-job-result.json",
+      "bytes": 1149,
+      "sha256": "12A86892E56393FE7F605E43FE3ECAD42A62FC3C5A4F05007CE263FBC0514CEE"
+    }
+  },
+  "frozen_protocol": {
+    "frozen_before_execution": true,
+    "raw_plan": {
+      "source_reference": "d8199ebfd93e9028d0bc09bc140665b97f6f5902",
+      "path": "spec/evidence/bob-angel-menu-plan-r25.json",
+      "sha256": "ECFFAF41D9B64B98F034AB0ECCB17C66D8287C6268D25EF10398B30F67401484",
+      "portable_record": "original/frozen-raw-plan.json"
+    },
+    "analysis_plan": {
+      "source_reference": "099ad200e2a2500319dd8267d556e438ddd62bfa",
+      "path": "spec/evidence/bob-angel-menu-r25-analysis-plan-r01.json",
+      "sha256": "422BDBF9A2690AF36BC5FD29A97F0204B856BFBDFF44C21588AB30944F29F2FC",
+      "portable_record": "original/frozen-analysis-plan.json"
+    },
+    "analyzer": {
+      "source_reference": "d8199ebfd93e9028d0bc09bc140665b97f6f5902",
+      "path": "tools/analyze_menu_comparison.py",
+      "sha256": "6E896BDE32C0E878A6C5F51192DFE3CABE343004C3001726B36EDECA152354A5"
+    },
+    "analysis_result": {
+      "path": "derived/frozen-analysis-result.json",
+      "bytes": 42093,
+      "sha256": "B020BE7D159B565F1179849E8E7D4ADEE947BF5500DE9F25DC5CE12201021637"
+    },
+    "inference": {
+      "assumption": "The64 paired blocks are treated as independent and roughly symmetric for this Student-t interval. Serial/cache/desktop variation can violate that assumption; fixed counterbalancing and the control drift diagnostic do not prove independence. Report all observations and sample spread. This experiment makes no bootstrap or equivalence inference and does not pool the earlier R23 samples.",
+      "bootstrap": "not used",
+      "critical_value": 1.9983405425207417,
+      "degrees_of_freedom": 63,
+      "method": "arithmetic paired-block summaries with two-sided Student-t 95-percent mean intervals",
+      "n": 64,
+      "replay_gap": "diagnostic only; no threshold is imposed"
+    }
+  },
+  "schedule_and_controls": {
+    "total_records": 262,
+    "excluded_warmups": 4,
+    "excluded_same_version_aa_records": 2,
+    "scored_counterbalanced_blocks": 64,
+    "scored_records_per_arm": 64,
+    "arms": [
+      "control-without-mir",
+      "published-4.7",
+      "replay",
+      "candidate-mir5"
+    ],
+    "same_version_aa": {
+      "observations_seconds": [
+        13.7388764,
+        13.4912447
+      ],
+      "arithmetic_mean_seconds": 13.615060549999999,
+      "absolute_difference_seconds": 0.24763170000000123,
+      "relative_difference_fraction": 0.018188071884851165,
+      "allowed_difference_seconds": 0.6807530275,
+      "status": "within-predeclared-tolerance"
+    },
+    "control_drift": {
+      "early": {
+        "n": 32,
+        "arithmetic_mean_seconds": 11.750592734375,
+        "sample_standard_deviation_seconds": 0.6999840651705357,
+        "minimum_seconds": 11.0040538,
+        "maximum_seconds": 14.2381324
+      },
+      "late": {
+        "n": 32,
+        "arithmetic_mean_seconds": 11.599436959375,
+        "sample_standard_deviation_seconds": 0.4986956178913843,
+        "minimum_seconds": 10.9978137,
+        "maximum_seconds": 13.3833523
+      },
+      "late_minus_early_seconds": -0.15115577499999944,
+      "allowed_seconds": 0.5,
+      "status": "within-predeclared-tolerance"
+    }
+  },
+  "independent_recomputation": {
+    "record": {
+      "path": "derived/independent-analysis-readback.json",
+      "bytes": 6230,
+      "sha256": "57BC415A50F8D07C66C01C290BFCCE9EBA0396332CABAFED8736D38DA2FF351B"
+    },
+    "method": {
+      "implementation": "Python standard-library json/hashlib/math/statistics only; the frozen analyzer was not imported or executed",
+      "student_t_95_two_sided_critical_df63": 1.9983405425207417,
+      "paired_block_assumption": "64 paired blocks treated as independent and roughly symmetric; serial/cache/desktop variation can violate that assumption"
+    },
+    "schedule_validation": {
+      "total_rows": 262,
+      "warmup_rows": 4,
+      "same_version_aa_rows": 2,
+      "counterbalanced_blocks": 64,
+      "scored_rows_per_arm": 64,
+      "latin_rotations": 4,
+      "exact_fixed_schedule_and_order": true,
+      "all_elapsed_values_finite_positive_and_menu_response_matched": true
+    },
+    "all_checked_outputs_match": true,
+    "discrepancies": []
+  },
+  "paired_seconds": {
+    "candidate_added_time_d5_seconds": {
+      "arithmetic_mean_seconds": 0.13862235000000014,
+      "maximum_seconds": 3.9936124,
+      "minimum_seconds": -2.7776370000000004,
+      "n": 64,
+      "sample_standard_deviation_seconds": 0.9496417907359721,
+      "student_t_95_mean_interval_seconds": {
+        "lower": -0.09859111141246124,
+        "upper": 0.37583581141246153
+      }
+    },
+    "candidate_replay_gap_seconds": {
+      "arithmetic_mean_seconds": 0.022279110937500124,
+      "maximum_seconds": 4.1501672,
+      "minimum_seconds": -2.429117700000001,
+      "n": 64,
+      "sample_standard_deviation_seconds": 1.0128369021846166,
+      "student_t_95_mean_interval_seconds": {
+        "lower": -0.23072001963707917,
+        "upper": 0.2752782415120794
+      }
+    },
+    "direct_candidate_minus_published_seconds": {
+      "arithmetic_mean_seconds": -1.2894388578125,
+      "maximum_seconds": 3.1586678,
+      "minimum_seconds": -4.2808309,
+      "n": 64,
+      "sample_standard_deviation_seconds": 1.0745861701486314,
+      "student_t_95_mean_interval_seconds": {
+        "lower": -1.5578624965925127,
+        "upper": -1.0210152190324873
+      }
+    },
+    "published_added_time_d4_seconds": {
+      "arithmetic_mean_seconds": 1.4280612078125001,
+      "maximum_seconds": 4.5584015,
+      "minimum_seconds": -0.3988632999999986,
+      "n": 64,
+      "sample_standard_deviation_seconds": 0.8815659895874516,
+      "student_t_95_mean_interval_seconds": {
+        "lower": 1.2078525755749974,
+        "upper": 1.6482698400500029
+      }
+    },
+    "q_candidate_minus_half_published_increment_seconds": {
+      "arithmetic_mean_seconds": -0.57540825390625,
+      "maximum_seconds": 3.5761401,
+      "minimum_seconds": -2.6399232500000007,
+      "n": 64,
+      "sample_standard_deviation_seconds": 0.9132293443566835,
+      "student_t_95_mean_interval_seconds": {
+        "lower": -0.8035261568371994,
+        "upper": -0.3472903509753005
+      }
+    }
+  },
+  "outcome": {
+    "denominator_status": "positive-with-positive-95-percent-lower-bound",
+    "minimum_reduction_percent": 50,
+    "q_95_percent_upper_seconds": -0.3472903509753005,
+    "reduction_percent": 90.29296858974683,
+    "status": "credible-at-least-50-percent"
+  },
+  "primary_custody": {
+    "root": "build/mir5/recovery/menu-r25-40224600684-r01",
+    "manifest": {
+      "path": "original/artifact-manifest.json",
+      "bytes": 802281,
+      "sha256": "C561AFB2712F81D277EF26DD3FDBDACE4EC96F96E7B0E3DE2A4B4D3DB2D66F99"
+    },
+    "members_verified": 3065,
+    "member_bytes_verified": 7457516433,
+    "readback": {
+      "path": "derived/primary-custody-readback.json",
+      "bytes": 1315,
+      "sha256": "EDA46F406CFE35D12010984A37AFF2872446B5D0FD5700D3E3B7F063388CFD1D"
+    },
+    "missing": 0,
+    "mismatch": 0,
+    "unsafe_relative_paths": 0
+  },
+  "portable_receipts": {
+    "path": "spec/evidence/bob-angel-menu-r25-observation-analysis-receipts.json.gz",
+    "bytes": 690016,
+    "sha256": "6A951732111B23E518D2459EDF19F34C01F3DBBD3AD6EA9716E45905E1D0689E",
+    "files": [
+      {
+        "path": "original/artifact-manifest.json",
+        "bytes": 802281,
+        "sha256": "C561AFB2712F81D277EF26DD3FDBDACE4EC96F96E7B0E3DE2A4B4D3DB2D66F99"
+      },
+      {
+        "path": "original/bob-angel-menu-r25/preparation/preparation-result.json",
+        "bytes": 1761,
+        "sha256": "E43EE08EB2694265990B558549193D70D831462ECFFE00A613342E0D090E5624"
+      },
+      {
+        "path": "original/bob-angel-menu-r25/preparation/native-preparation-packet.json",
+        "bytes": 6950,
+        "sha256": "38B23ED3A4211292A19277BC19C8051BB07EE4F3CECD04CFBAA89F31CE929186"
+      },
+      {
+        "path": "original/bob-angel-menu-r25/preparation/candidate-intent.json",
+        "bytes": 13802,
+        "sha256": "0420CD2518239C9ED67BC3D5A59127F358386300D9922532B5524269E30EF5F3"
+      },
+      {
+        "path": "original/bob-angel-menu-r25/preparation/replay-equality.json",
+        "bytes": 10980,
+        "sha256": "CB32D64C114F035F6C5629D1F1E547FAC8D1A053B9C7CD9F7E78058C64334209"
+      },
+      {
+        "path": "original/bob-angel-menu-r25/preparation/s/build/tmp/captures/control/result.json",
+        "bytes": 21729,
+        "sha256": "3E2DADE760854F54846F8E1F978D64DF9AEB6A318E9DBBFDC4CAE62DDCD15C15"
+      },
+      {
+        "path": "original/bob-angel-menu-r25/preparation/s/build/tmp/captures/published/result.json",
+        "bytes": 22894,
+        "sha256": "5248ADA5A7B90AAEFBBBCD8EAD21F1DA0A9F23B2DF4B8737451D87B0BA63B498"
+      },
+      {
+        "path": "original/bob-angel-menu-r25/preparation/s/build/tmp/captures/replay/result.json",
+        "bytes": 22885,
+        "sha256": "7F156975F4CD3B1F016F5EABF6A46A0A30830816AFCD63CB351F4F17D2E67AB5"
+      },
+      {
+        "path": "original/bob-angel-menu-r25/preparation/s/build/tmp/captures/candidate/result.json",
+        "bytes": 22892,
+        "sha256": "732AAE55F326368CB1EA85E0F219689ADB13B308293328D86AF1593C04CEF428"
+      },
+      {
+        "path": "original/bob-angel-menu-r25/preparation/s/build/tmp/owned-window/result.json",
+        "bytes": 7022,
+        "sha256": "7AE23DC4265059EEB7F84E9B3C358FDD33E8BC5C309A8AB2EFD230CC9C5045D8"
+      },
+      {
+        "path": "original/bob-angel-menu-r25/single-job-result.json",
+        "bytes": 1149,
+        "sha256": "12A86892E56393FE7F605E43FE3ECAD42A62FC3C5A4F05007CE263FBC0514CEE"
+      },
+      {
+        "path": "original/bob-angel-menu-r25/preparation/s/build/tmp/r25-menu-comparison/result.json",
+        "bytes": 2332341,
+        "sha256": "DF00F89D26F82024B7024F2C9FF1CBB687506EC9FBF8395B6621D058ABA30325"
+      },
+      {
+        "path": "original/frozen-raw-plan.json",
+        "bytes": 12613,
+        "sha256": "ECFFAF41D9B64B98F034AB0ECCB17C66D8287C6268D25EF10398B30F67401484"
+      },
+      {
+        "path": "original/frozen-analysis-plan.json",
+        "bytes": 14734,
+        "sha256": "422BDBF9A2690AF36BC5FD29A97F0204B856BFBDFF44C21588AB30944F29F2FC"
+      },
+      {
+        "path": "derived/frozen-analysis-result.json",
+        "bytes": 42093,
+        "sha256": "B020BE7D159B565F1179849E8E7D4ADEE947BF5500DE9F25DC5CE12201021637"
+      },
+      {
+        "path": "derived/independent-analysis-readback.json",
+        "bytes": 6230,
+        "sha256": "57BC415A50F8D07C66C01C290BFCCE9EBA0396332CABAFED8736D38DA2FF351B"
+      },
+      {
+        "path": "derived/primary-custody-readback.json",
+        "bytes": 1315,
+        "sha256": "EDA46F406CFE35D12010984A37AFF2872446B5D0FD5700D3E3B7F063388CFD1D"
+      },
+      {
+        "path": "derived/workflow-transport-readback.json",
+        "bytes": 1244,
+        "sha256": "9F62EAFC9E90A1E1223039642525541DBA80ECD3376A9D766B90D74D69740205"
+      }
+    ]
+  },
+  "retained_prior_results": [
+    {
+      "path": "spec/evidence/bob-angel-menu-r23-observation-analysis-chain.json",
+      "disposition": "R23 remains complete and inconclusive; none of its38 samples is pooled with or relabelled as R25."
+    },
+    {
+      "path": "spec/evidence/bob-angel-menu-r24-preflight-adverse-chain.json",
+      "disposition": "R24 retains its zero-native parameter-binding refusal; R25 is its separately frozen actual successor."
+    }
+  ],
+  "limits": [
+    "The90.29296858974683-percent figure is a point estimate of less MIR-added time after the matched no-MIR baseline, not90-percent less total startup time.",
+    "The50-percent objective follows the predeclared positive published-added-time lower bound and nonpositive transformed-q upper bound, under the stated paired-block Student-t assumption.",
+    "The candidate-added-time interval spans zero; this does not establish zero overhead, negative cost or equivalence. Candidate-minus-replay is diagnostic only.",
+    "All64 scored blocks and all excluded warmup/A/A observations remain available. No extension, early stopping, sample pooling, changed threshold or selected later cohort is used.",
+    "The result is exact2.0.77 on one Black Glass host/profile. It is not an F210 measurement, second-machine result, release verdict, universal no-lag guarantee, or evidence for runtime, peak/retained memory, saves, UI latency/fidelity or multiplayer.",
+    "The original workflow is cancelled during artifact transport after native completion; this chain does not describe it as a successful overall workflow or claim a complete hosted artifact upload."
+  ]
+}
