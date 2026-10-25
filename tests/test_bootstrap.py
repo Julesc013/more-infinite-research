@@ -437,6 +437,43 @@ class BootstrapTests(unittest.TestCase):
             "unrelated F210 transition acquired competing-provider refusal")
         ''')
 
+    def test_f210_current_productivity_provider_preflights_without_a_mod_change(self):
+        self.lua.execute('''
+          install_modules(false, false, false, true)
+          install_runtime(nil, {ProductivityResearch='2.1.0'})
+          package.preload["platform.target"] = function()
+            return {id="f210", recipe_productivity=true}
+          end
+          package.preload["runtime.competing_productivity"] = function()
+            error("F210 loaded the F200 competing-productivity adapter")
+          end
+          CREDIT_PREFLIGHT_ERROR = "ambiguous legacy preference"
+          load_control()
+
+          local changed = {mod_startup_settings_changed=true,
+            mod_changes={['more-infinite-research']={old_version='4.7.20003', new_version='5.0.21000'}}}
+          local ok, message = pcall(handlers.configuration, changed)
+          assert(not ok and tostring(message):find("ambiguous legacy preference", 1, true))
+          assert(credit_calls.preflight == 1 and credit_calls.last_preflight_event == changed
+            and credit_calls.last_preflight_provider_relevant == true)
+          assert(lifecycle_calls.configuration == nil and credit_calls.on_configuration_changed == nil
+            and library_calls.configuration == nil,
+            "current F210 provider allowed configuration writes before preflight refusal")
+
+          CREDIT_PREFLIGHT_ERROR = nil
+          install_modules(false, false, false, true)
+          install_runtime(nil, {unrelated='1.0.0'})
+          package.preload["platform.target"] = function()
+            return {id="f210", recipe_productivity=true}
+          end
+          load_control()
+          assert(pcall(handlers.configuration, changed))
+          assert(credit_calls.preflight == 1 and credit_calls.last_preflight_provider_relevant == false
+            and lifecycle_calls.configuration == changed and credit_calls.on_configuration_changed == 1
+            and library_calls.configuration == changed,
+            "unrelated current F210 mod acquired competing-provider relevance")
+        ''')
+
     def test_unlimited_scripted_effects_register_and_route_force_lifecycle_events(self):
         self.lua.execute('''
           scripted_calls = {}
