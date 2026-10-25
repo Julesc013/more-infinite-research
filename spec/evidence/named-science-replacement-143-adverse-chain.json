@@ -1,0 +1,75 @@
+{
+  "schema": 1,
+  "kind": "MIR5NamedScienceReplacement143AdverseChainV1",
+  "status": "published-create-only-pass-current143-startup-adverse",
+  "native_execution": true,
+  "release_qualification": false,
+  "run": {
+    "id": 40198978389,
+    "url": "https://github.com/Julesc013/mir-native-worker/actions/runs/40198978389",
+    "workflow_conclusion": "failure",
+    "frozen_controller_ref": "test/current143-r21-named-r01",
+    "controller_commit": "683bc6a8e6429dddaf6072afd5fa16c6ada2459e"
+  },
+  "inputs": {
+    "fixture_source_commit": "ed4858f43cb7dda5b0d62f2d9c7f6e0749219108",
+    "actual_player_source": "143346ecfd520d47791cbd2c1a4e5ca8f5f60165",
+    "actual_player_source_tree": "b1d04b99e1988d76de2ea09f869020dc986982a6",
+    "equivalent_accepted_player_source": "5658246a7b8ea213d84496c420042c2ea9ad2eaa",
+    "equivalent_repository_tree": "c08053b39fa4caff9d00414585024e77bdc9ee42",
+    "asset_inventory_sha256": "BF9095183E6E8D253C79220A69F94E87245A550D5BFB664982506465946207E0",
+    "current_f210": {
+      "version": "5.0.21000",
+      "bytes": 553252,
+      "sha256": "428A789CA03828D2F7F93EC65C49FD3157FD6D547CC569DDA2C0129D6504647A"
+    },
+    "published_f210": {
+      "version": "4.7.21003",
+      "sha256": "B6EB9430056ABD384DB00F94929FE7DAC0A37441ACF4BC277946689682628852"
+    },
+    "engine": {
+      "version": "2.1.23",
+      "sha256": "FE4A1DA30F322A0D0B8AEB3DF7276332222BAAA143E2352569B723E84B2B9060"
+    },
+    "active_mods_observer_sha256": "2E1BE5952D2A4CC5C74A0D149E075D247BA110A3FAE5B6768D3EAEBABCEF989C"
+  },
+  "artifact_manifest": {
+    "path": "build/mir5/recovery-historical/named-science-replacement-f210/40198978389/artifact-manifest.json",
+    "sha256": "D9BA8CA66C792208B81E4AA6A8D8AFC0FDE40D42129E240743AD3BF0695A500A",
+    "members": 31,
+    "verified_members": 31,
+    "file_set": "All declared member paths, byte counts, and hashes match; artifact-manifest.json is the expected self-excluded file."
+  },
+  "published_stage": {
+    "status": "passed-private-native-runtime-load-only",
+    "result_path": "named-science-replacement-f210-canonical/native/published/result.json",
+    "result_sha256": "9466592FFB52E600E58647C5CD8B57A9D8E6855858666E5E001D2762D14D774E",
+    "marker": {
+      "target": "recipe-prod-research_gears-1",
+      "seeded_owner": "z-mir473-seeded-electromagnetic-owner",
+      "stage": "data-final"
+    },
+    "direct_library_controls_restored": true
+  },
+  "current_stage": {
+    "status": "failed",
+    "result_path": "named-science-replacement-f210-canonical/native/mir5/result.json",
+    "result_sha256": "F8BAF62DD9E764B7BBCF70BA3E7301092178B46C0A352AD8C590A7CA70CB2F4E",
+    "failure": "[mir441-process-exit] 1",
+    "first_engine_error": "MIR technology preflight: recipe-prod-research_science_pack_productivity-1 has a missing recipe effect target",
+    "failure_phase": "MIR5 data-final startup before the fixture marker",
+    "direct_library_controls_restored": true
+  },
+  "r21_timing": {
+    "status": "not-started",
+    "timing_samples": 0,
+    "reason": "The current143/428 CreateOnly startup adverse is retained for repair and review before any R21 timing assignment."
+  },
+  "primary_custody": "build/mir5/recovery-historical/named-science-replacement-f210/40198978389",
+  "limits": [
+    "The published B6EB CreateOnly stage proves only its named-science data-stage marker under the recorded engine, fixture, observer, and profile inputs.",
+    "The current143/428 stage reached engine data-final loading but failed before its fixture marker; it establishes no current named-science pass.",
+    "The accepted565 source is recorded only as a checked repository-tree and player-byte equivalence bridge to the actual143 asset input; this chain does not relabel either identity.",
+    "No gameplay, real laboratory, save, reload, client, timing, performance, catalogue parity, or release result follows."
+  ]
+}
