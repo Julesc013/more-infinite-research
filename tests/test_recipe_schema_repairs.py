@@ -107,7 +107,20 @@ class RecipeSchemaRepairTests(unittest.TestCase):
                   environment.raw.recipe["atan-ash-seperation"] = recipe
                   settings,mods,data,helpers,log={startup=defaults()},{base="2.1.23"},environment,nil,function() end
                   if selected then mods["atan-ash"]="2.2.1" else mods["atan-ash"]="2.2.2" end
-                  assert(dofile(data_final_path) == nil and environment.writes == 1 and #environment.emitted == 73)
+                  assert(dofile(data_final_path) == nil and environment.writes == 1 and #environment.emitted == 74)
+                  local science_pack_productivity
+                  for _, row in ipairs(environment.emitted) do
+                    if row.name == "recipe-prod-research_science_pack_productivity-1" then
+                      science_pack_productivity = row
+                    end
+                  end
+                  local science_recipes = {"automation-science-pack", "chemical-science-pack", "logistic-science-pack",
+                    "military-science-pack", "production-science-pack", "utility-science-pack"}
+                  assert(science_pack_productivity and #science_pack_productivity.effects == #science_recipes)
+                  for index, recipe_name in ipairs(science_recipes) do
+                    local effect = science_pack_productivity.effects[index]
+                    assert(effect.type == "change-recipe-productivity" and effect.recipe == recipe_name and effect.change == .1)
+                  end
                   schema_output, schema_recipes = environment.emitted, environment.raw.recipe
                   if selected then
                     assert(package.loaded["overrides.recipe_schema"] and recipe.category == nil)
@@ -125,7 +138,7 @@ class RecipeSchemaRepairTests(unittest.TestCase):
                     actual,
                     {str(name) for name in host.lua.globals().schema_recipes.keys()},
                 )
-                self.assertEqual(len(public), 53)
+                self.assertEqual(len(public), 54)
 
 
 if __name__ == "__main__":
