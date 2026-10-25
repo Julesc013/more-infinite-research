@@ -1,0 +1,54 @@
+{
+  "schema": 1,
+  "kind": "MIR5LibraryPairedProfileAdverseChainV1",
+  "status": "failed-after-one-create-before-client-session",
+  "run": 40152995859,
+  "run_url": "https://github.com/Julesc013/mir-native-worker/actions/runs/40152995859",
+  "source": "9ffc43aea16fa6c188f726e99bd855e5b473dd72",
+  "controller_commit": "8baa81f41e2fc54d16b5ad17532bf69e4fd33583",
+  "engine": {
+    "path": "D:\\Games\\Factorio\\2.0\\bin\\x64\\factorio.exe",
+    "version": "2.0.77",
+    "sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B"
+  },
+  "candidate_sha256": "2BBDBA9A0B816AC383CEA116CDF86D587BC34EFF7E1C5ACE2583F1DA98F9E842",
+  "published_sha256": "F3943EB4D69CCDAC41BD9F922AD03A5C78F34F22D8E7FA5A88A7A658AB1010B7",
+  "manifest": {
+    "members_verified": 36,
+    "sha256": "5096E35AA50BFED2DA88B590FEE8F0CE623320A8D1AD1ED132705D0CDBA21359"
+  },
+  "native_preparation": {
+    "processes": 1,
+    "status": "passed-private-native-runtime-load-only",
+    "exit_code": 0,
+    "seed_sha256": "58944D58A591E99D4C4559A24492B030B112E3531CA7DB835D1931B4252E8AAF",
+    "controls_restored": true
+  },
+  "paired_session_processes": 0,
+  "controls_restored": true,
+  "observed_failure": {
+    "message": "[mir5-multiplayer-fixture] paired browser profile kind differs",
+    "phase": "public profile kind guard after published seed creation",
+    "classification": "The private controller changes the valid public selection kind to an invented private kind rejected by the unchanged public harness."
+  },
+  "required_correction": "Retain the public profile kind while injecting private hashes. Execute the actual frozen public kind/arm/version guard against both derived profiles and opposing inputs before a separately recorded native retry.",
+  "raw_evidence": {
+    "path": "spec/evidence/library-paired-profile-adverse-receipts.json.gz",
+    "exact_original_members": 4,
+    "gzip_bytes": 15236,
+    "gzip_sha256": "9221F42C2D867405AD4CB521D7F68DE535CF989788B4E2A988999400C00CF854",
+    "uncompressed_bytes": 75861,
+    "uncompressed_sha256": "DF38C89A4CFF8A01E1882B0A2A96D9FFDBBD6BFE7A16ACA1F16165A96D78082B"
+  },
+  "independent_readback": {
+    "reviewer": "root",
+    "status": "passed",
+    "original_members_verified": 36
+  },
+  "limits": [
+    "One native published seed-creation process passed; zero paired server/client processes ran. Do not classify this as zero Factorio executions or as a client/browser pass.",
+    "The original sharing-error adverse remains separate. No screenshot, profiler, process-memory comparison, timing, performance or release qualification follows."
+  ],
+  "performance_qualification": false,
+  "release_qualification": false
+}

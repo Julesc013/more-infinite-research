@@ -1,0 +1,61 @@
+{
+  "schema": 1,
+  "kind": "MIR5LibraryPairedControllerAdverseChainV1",
+  "status": "failed-before-native-session",
+  "run": 40151963096,
+  "run_url": "https://github.com/Julesc013/mir-native-worker/actions/runs/40151963096",
+  "source": "9ffc43aea16fa6c188f726e99bd855e5b473dd72",
+  "controller_commit": "2d5546ddd4b3364f08b39a70cc6dd586ac531531",
+  "engine": {
+    "path": "D:\\Games\\Factorio\\2.0\\bin\\x64\\factorio.exe",
+    "version": "2.0.77",
+    "sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B"
+  },
+  "candidate_sha256": "2BBDBA9A0B816AC383CEA116CDF86D587BC34EFF7E1C5ACE2583F1DA98F9E842",
+  "published_sha256": "F3943EB4D69CCDAC41BD9F922AD03A5C78F34F22D8E7FA5A88A7A658AB1010B7",
+  "manifest": {
+    "members_verified": 20,
+    "sha256": "0973D981A49F2863DD2195962EDAB2CAD940FA1DC5B1200FE0C38F5B09AC9F4B"
+  },
+  "native_sessions": 0,
+  "controls_restored": true,
+  "observed_failure": {
+    "message": "Exception calling \"Copy\" with \"3\" argument(s): \"The process cannot access the file 'D:\\Projects\\Factorio\\testmods\\2.0\\more-infinite-research_4.7.20002.zip' because it is being used by another process.\"",
+    "phase": "published archive admission before Factorio",
+    "classification": "Same-path File.Copy failure reproduced by the actual installer in an isolated host control; the Windows message alone does not establish a foreign process lock."
+  },
+  "correction": {
+    "aero_archive_pr": 57,
+    "aero_archive_commit": "ec3e524569e3a595dc7db28a2c2650a97f111c58",
+    "aero_screenshot_pr": 56,
+    "aero_screenshot_commit": "e961deb2de4288a1d6dd3b782c775481da44af4a",
+    "reuse_pr": 58,
+    "reuse_head": "f3f41acfda04c1059140b2e1211bccde25b4dfda",
+    "accepted_controller": "8baa81f41e2fc54d16b5ad17532bf69e4fd33583",
+    "original_commits_preserved": true,
+    "native_retry_required": true
+  },
+  "raw_evidence": {
+    "path": "spec/evidence/library-paired-controller-adverse-receipts.json.gz",
+    "exact_original_members": 7,
+    "gzip_bytes": 8575,
+    "gzip_sha256": "FA4A11B3F179C628A5963FB867EF3F03E0F304D1BC4C13947CF14DA0E23FF42D",
+    "uncompressed_bytes": 33304,
+    "uncompressed_sha256": "9F95DBEAC63A470F6720B6DC21EC4FA11AE2D678510BEC07C7F8EB0D3E1A9947"
+  },
+  "independent_readback": {
+    "reviewer": "root",
+    "status": "passed",
+    "original_members_verified": 20,
+    "three_prepared_fixture_archive_members_equal_raw_git": true,
+    "all_staged_fixture_and_observer_sources_equal_raw_git": true,
+    "profile_bytes_equal_raw_git": true
+  },
+  "limits": [
+    "This pre-engine failure establishes no paired Library/client, screenshot, profiler, memory, timing or release result.",
+    "The accepted controller borrows an identical source/destination after hash admission, reuses separate-path identical bytes without writes, and checks actual screenshot PNG files/hashes. These host corrections require a separately recorded native retry.",
+    "Earlier functional Library results retain their exact player and harness identities."
+  ],
+  "performance_qualification": false,
+  "release_qualification": false
+}

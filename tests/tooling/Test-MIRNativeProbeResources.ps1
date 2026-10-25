@@ -99,6 +99,18 @@ try {
     Refuses-Probe {Invoke-MIR441MonitoredProcess -FilePath $child -Arguments @('-NoProfile','-Command','exit 0') -WorkRoot (Join-Path $benchmarkRoot 'invalid-cadence') -LedgerPath (Join-Path $benchmarkRoot 'invalid-cadence/resources.jsonl') -Policy $context.policy -EstimatedPeakBytes 1MB -ExpectedPeakMemoryBytes 64MB -SampleMilliseconds 250} '[mir441-resource-observation-callback-required]'
     Refuses-Probe {Invoke-MIR441MonitoredProcess -FilePath $child -Arguments @('-NoProfile','-Command','exit 0') -WorkRoot (Join-Path $benchmarkRoot 'invalid-callback') -LedgerPath (Join-Path $benchmarkRoot 'invalid-callback/resources.jsonl') -Policy $context.policy -EstimatedPeakBytes 1MB -ExpectedPeakMemoryBytes 64MB -OwnedProcessSampleCallback {param($event)}} '[mir441-resource-observation-cadence-required]'
     Refuses-Probe {Invoke-MIR441MonitoredProcess -FilePath $child -Arguments @('-NoProfile','-Command','exit 0') -WorkRoot (Join-Path $benchmarkRoot 'invalid-interval') -LedgerPath (Join-Path $benchmarkRoot 'invalid-interval/resources.jsonl') -Policy $context.policy -EstimatedPeakBytes 1MB -ExpectedPeakMemoryBytes 64MB -SampleMilliseconds 500 -OwnedProcessSampleCallback {param($event)}} 'SampleMilliseconds'
+    foreach($mode in @('immediate','after-sample')){
+      $unsupportedRoot=Join-Path $benchmarkRoot ('completion-'+$mode)
+      $unsupportedState=[pscustomobject]@{samples=0;exits=0;predicates=0}
+      $predicate={
+        $unsupportedState.predicates++
+        return $mode -ceq 'immediate' -or $unsupportedState.samples -gt 0
+      }.GetNewClosure()
+      Refuses-Probe {
+        Invoke-MIR441MonitoredProcess -FilePath $child -Arguments @('-NoProfile','-Command','Start-Sleep -Seconds 5') -WorkRoot $unsupportedRoot -LedgerPath (Join-Path $unsupportedRoot 'resources.jsonl') -Policy $context.policy -EstimatedPeakBytes 1MB -ExpectedPeakMemoryBytes 1024MB -TimeoutSeconds 20 -SampleMilliseconds 250 -CompletionPredicate $predicate -OwnedProcessSampleCallback {param($event)$unsupportedState.samples++} -OwnedProcessExitCallback {param($event)$unsupportedState.exits++}
+      } '[mir441-resource-observation-completion-predicate]'
+      Assert-Probe (-not(Test-Path -LiteralPath $unsupportedRoot) -and $unsupportedState.samples -eq 0 -and $unsupportedState.exits -eq 0 -and $unsupportedState.predicates -eq 0) ('benchmark-completion-preflight-'+$mode)
+    }
     Refuses-Probe {Invoke-MIRNativeProbeProcess -Context $context -FilePath $child -Arguments @('-NoProfile','-Command','exit 0') -SampleMilliseconds 500} 'SampleMilliseconds'
     Refuses-Probe {Invoke-MIRNativeProbeFactorioProcess -Context $context -FilePath $child -Arguments @('-NoProfile','-Command','exit 0') -SampleMilliseconds 500} 'SampleMilliseconds'
     $callbackFailureRoot=Join-Path $benchmarkRoot 'callback-failure';[IO.Directory]::CreateDirectory($callbackFailureRoot)|Out-Null
