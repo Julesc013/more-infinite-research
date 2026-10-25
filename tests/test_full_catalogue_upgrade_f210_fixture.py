@@ -164,12 +164,12 @@ class FullCatalogueUpgradeF210FixtureTests(unittest.TestCase):
         result = self.lua.eval("run_data")((F210 / "mir5/data-final-fixes.lua").as_posix(), (SHARED / "data-final-fixes.lua").as_posix(), (F210 / "mir5/catalogue.lua").as_posix(), (SHARED / "f210-catalogue.lua").as_posix(), lua(self.lua, {"technology": {"recipe-prod-research_gears-1": gear}}), lua(self.lua, {"base": "2.1.23", "more-infinite-research": "5.0.21000", "mir-fixture-mir5-full-catalogue-upgrade": "0.2.0"}))
         self.assertFalse(result["ok"])
         self.assertIn("workload differs", str(result["message"]))
-        self.assertEqual(61, gear["unit"]["time"])
+        self.assertEqual(61, py(result["raw"])["technology"]["recipe-prod-research_gears-1"]["unit"]["time"])
         gear = {"max_level": "infinite", "unit": {"count_formula": "8000*2^(L-1)", "time": 60}, "effects": [{"type": "change-recipe-productivity", "recipe": "casting-iron-gear-wheel", "change": .1}, {"type": "change-recipe-productivity", "recipe": "iron-gear-wheel", "change": .1}]}
         result = self.lua.eval("run_data")((F210 / "published-4.7/data-final-fixes.lua").as_posix(), (SHARED / "data-final-fixes.lua").as_posix(), (F210 / "published-4.7/catalogue.lua").as_posix(), (SHARED / "f210-catalogue.lua").as_posix(), lua(self.lua, {"technology": {"recipe-prod-research_gears-1": gear}}), lua(self.lua, {"base": "2.1.23", "elevated-rails": "2.1.23", "quality": "2.1.23", "space-age": "2.1.23", "more-infinite-research": "4.7.21002", "mir-fixture-mir5-full-catalogue-upgrade": "0.1.0"}))
         self.assertFalse(result["ok"])
         self.assertIn("Space Age closure differs", str(result["message"]))
-        self.assertEqual(60, gear["unit"]["time"])
+        self.assertEqual(60, py(result["raw"])["technology"]["recipe-prod-research_gears-1"]["unit"]["time"])
 
     def test_shared_control_registers_f210_stages_without_runtime_reads(self):
         for stage in ("published-4.7", "mir5"):
@@ -250,12 +250,25 @@ class FullCatalogueUpgradeF210FixtureTests(unittest.TestCase):
         for profile in ("base", "space-age"):
             for stage, mir, fixture, archive in (("published-4.7", "4.7.21002", "0.1.0", PUBLISHED), ("mir5", "5.0.21000", "0.2.0", CANDIDATE)):
                 data = json.loads((PROFILES / f"full-catalogue-upgrade-{stage}-{profile}-f210-2123.json").read_text(encoding="utf-8"))
-                mods = {row["name"]: row["version"] for row in data["mods"]}
+                expected_mods = [
+                    {"name": "base", "version": "2.1.23", "enabled": True},
+                ]
+                if profile == "space-age":
+                    expected_mods.extend([
+                        {"name": "elevated-rails", "version": "2.1.23", "enabled": True},
+                        {"name": "quality", "version": "2.1.23", "enabled": True},
+                        {"name": "recycler", "version": "2.1.23", "enabled": True},
+                        {"name": "space-age", "version": "2.1.23", "enabled": True},
+                    ])
+                expected_mods.extend([
+                    {"name": "mir-fixture-mir5-active-mods-observer", "version": "0.1.0", "enabled": True},
+                    {"name": "more-infinite-research", "version": mir, "enabled": True},
+                    {"name": "mir-fixture-mir5-full-catalogue-upgrade", "version": fixture, "enabled": True},
+                ])
                 with self.subTest(profile=profile, stage=stage):
-                    self.assertEqual(("f210", "2.1", "2.1.23"), (data["target"], data["factorio_line"], data["engine"]["version"]))
-                    self.assertEqual((mir, fixture), (mods["more-infinite-research"], mods["mir-fixture-mir5-full-catalogue-upgrade"]))
-                    self.assertEqual(profile == "space-age", "space-age" in mods)
-                    self.assertEqual(profile == "space-age", "recycler" in mods)
+                    self.assertEqual(("f210", "2.1"), (data["target"], data["factorio_line"]))
+                    self.assertEqual({"version": "2.1.23", "sha256": "FE4A1DA30F322A0D0B8AEB3DF7276332222BAAA143E2352569B723E84B2B9060"}, data["engine"])
+                    self.assertEqual(expected_mods, data["mods"])
                     self.assertEqual({"mir-fixture-mir5-active-mods-observer_0.1.0.zip": OBSERVER, f"more-infinite-research_{mir}.zip": archive}, data["archive_sha256"])
         self.assertEqual((F210 / "published-4.7/control.lua").read_bytes(), (F210 / "mir5/control.lua").read_bytes())
         self.assertEqual((F210 / "published-4.7/data-final-fixes.lua").read_bytes(), (F210 / "mir5/data-final-fixes.lua").read_bytes())
