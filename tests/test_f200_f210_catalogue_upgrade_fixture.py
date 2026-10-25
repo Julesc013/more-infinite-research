@@ -157,6 +157,11 @@ class F200F210CatalogueUpgradeFixtureTests(unittest.TestCase):
         source_actual = py(source_result["raw"])
         self.assertEqual(science, source_actual["technology"][SCIENCE])
         self.assertEqual((None, "1", 1), tuple(source_actual["technology"]["recipe-prod-research_gears-1"]["unit"].get(key) for key in ("count", "count_formula", "time")))
+        source_before = copy.deepcopy(raw)
+        wrong_source = self.lua.eval("run_cross_data")(F200_CROSS.joinpath("data-final-fixes.lua").as_posix(), F200_CROSS.joinpath("catalogue.lua").as_posix(), lua(self.lua, copy.deepcopy(raw)), lua(self.lua, {**source_mods, "more-infinite-research": "4.7.20002"}))
+        self.assertFalse(wrong_source["ok"])
+        self.assertIn("cross source closure differs", str(wrong_source["message"]))
+        self.assertEqual(source_before, py(wrong_source["raw"]))
 
     def test_callbacks_preserve_f200_state_through_successor_and_cold_reload(self):
         for name, path in {
