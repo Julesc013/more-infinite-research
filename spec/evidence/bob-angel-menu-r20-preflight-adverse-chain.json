@@ -26,7 +26,7 @@
     }
   ],
   "first_attempt_scope": "Trusted dev ancestry refusal before execution; source was preserved on approved stress branch. Zero native captures.",
-  "second_attempt_scope": "Four native data-stage captures, complete equality checks and owned-window diagnostic finished. The later packet reader rejected a stale health-script hash before any timing launch.",
+  "second_attempt_scope": "Four native data-stage captures, complete equality checks and owned-window diagnostic finished. The later packet reader compared the executed CRLF health-script hash against the distinct canonical raw-Git LF hash and refused before any timing launch.",
   "native_preparation_receipt_sha256": "CE80146975E886D9821184D011F94C837BDAB31E161447B6CD73354C2FB63198",
   "captures": [
     {
@@ -74,7 +74,11 @@
     "declared_sha256": "1419A9965FD53D6CECEBD2CAB419B7756B0177D5A3503A1BC362AE37275A5CE5",
     "actual_raw_git_sha256": "D610BE142BF948C2CE5C5BAE4FE29822D84C75114EC5A7BF0A9D6F719CB7CDE1",
     "accepted_private_fix": "77cccc206d8cf9e16e5fa76d754103592ba0d15d",
-    "original_fix_commit": "984891737d5e7e0fcb408a8607c2ae538509ca4e"
+    "original_fix_commit": "984891737d5e7e0fcb408a8607c2ae538509ca4e",
+    "declared_hash_byte_form": "Observed public-workspace execution bytes: UTF-8 without BOM, CRLF.",
+    "actual_raw_git_byte_form": "Canonical declared-source Git blob bytes: UTF-8 without BOM, LF.",
+    "exact_lf_to_crlf_reproduces_declared_hash": true,
+    "diagnosis": "The consumer compared the executed checkout hash with the canonical Git hash; source-script staleness is not established."
   },
   "accepted_timing_samples": 0,
   "performance_qualification": false,
