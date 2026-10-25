@@ -961,6 +961,7 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
             $allSlots=@(foreach($phase in @('initial','rejoin','restart')){foreach($role in @('server','client-en','client-de')){[pscustomobject]@{phase=$phase;role=$role}}})
             $bounded=New-MIROwnedProcessMemorySampler -ExpectedSlots $allSlots
             if($bounded.expected_slots.Count -ne 9 -or $bounded.target_interval_milliseconds -ne 250 -or $bounded.maximum_duration_seconds -ne 900 -or $bounded.maximum_observations -ne 12000 -or $bounded.maximum_serialized_bytes -ne 8MB){throw 'sampler bounds differ'}
+            if($null -ne $bounded.PSObject.Properties['context']){throw 'default sampler shape changed'}
             $rejected=$false;try{New-MIROwnedProcessMemorySampler -ExpectedSlots @($allSlots + $slot)|Out-Null}catch{$rejected=$true}
             if(-not$rejected){throw 'sampler accepted more than the nine owned slots'}
             $sampler=New-MIROwnedProcessMemorySampler -ExpectedSlots $slot
@@ -975,8 +976,25 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
             $receiptPath=[IO.Path]::GetTempFileName();Remove-Item -LiteralPath $receiptPath -Force
             $receipt=Write-MIROwnedProcessMemoryObservationReceipt -Sampler $sampler -Path $receiptPath
             $receiptBytes=[IO.File]::ReadAllBytes($receiptPath)
-            if($receipt.status -cne 'complete-observation' -or $receipt.performance_acceptance -ne $false -or $receipt.observations.Count -lt 2 -or $receiptBytes.Length -gt 8MB -or $receiptBytes.Length -ne (ConvertTo-MIROwnedProcessMemoryObservationBytes -Receipt $receipt).Length){throw 'sampler did not write its exact bounded non-acceptance observation'}
+            if($receipt.status -cne 'complete-observation' -or $receipt.performance_acceptance -ne $false -or $receipt.observations.Count -lt 2 -or $receipt.PSObject.Properties['context'] -ne $null -or $receiptBytes.Length -gt 8MB -or $receiptBytes.Length -ne (ConvertTo-MIROwnedProcessMemoryObservationBytes -Receipt $receipt).Length){throw 'sampler did not write its exact bounded non-acceptance observation'}
             Remove-Item -LiteralPath $receiptPath -Force
+
+            $benchmarkSlot=@([pscustomobject]@{phase='benchmark';role='factorio'})
+            $benchmark=New-MIROwnedProcessMemorySampler -Context benchmark -ExpectedSlots $benchmarkSlot
+            if($benchmark.context -cne 'benchmark' -or $benchmark.expected_slots.Count -ne 1){throw 'benchmark sampler did not use its sole declared slot'}
+            foreach($invalid in @(
+              @([pscustomobject]@{phase='initial';role='server'}),
+              @($benchmarkSlot + [pscustomobject]@{phase='benchmark';role='factorio'}),
+              @([pscustomobject]@{phase='benchmark';role='server'})
+            )){
+              $invalidRejected=$false;try{New-MIROwnedProcessMemorySampler -Context benchmark -ExpectedSlots $invalid|Out-Null}catch{$invalidRejected=$true}
+              if(-not$invalidRejected){throw 'benchmark sampler accepted an unbounded slot shape'}
+            }
+            $benchmarkRegistration=Register-MIROwnedProcessMemoryProcess -Sampler $benchmark -Phase benchmark -Role factorio -Process $child
+            Add-MIROwnedProcessMemorySample -Sampler $benchmark
+            Complete-MIROwnedProcessMemoryProcess -Sampler $benchmark -Registration $benchmarkRegistration
+            $benchmarkReceipt=Get-MIROwnedProcessMemoryObservationReceipt -Sampler $benchmark
+            if($benchmarkReceipt.status -cne 'complete-observation' -or $benchmarkReceipt.context -cne 'benchmark' -or $benchmarkReceipt.observations.Count -ne 1 -or $benchmarkReceipt.observations[0].phase -cne 'benchmark' -or $benchmarkReceipt.observations[0].role -cne 'factorio'){throw 'benchmark sampler receipt was not narrowly identified'}
 
             $identity=New-MIROwnedProcessMemorySampler -ExpectedSlots $slot
             $identityRegistration=Register-MIROwnedProcessMemoryProcess -Sampler $identity -Phase initial -Role server -Process $child
