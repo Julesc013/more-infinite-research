@@ -1,0 +1,142 @@
+{
+  "schema": 1,
+  "kind": "MIR5RepairCurrentNativeChainV1",
+  "status": "passed-two-native-queue-bound-cases-not-performance",
+  "run": 40147383321,
+  "run_url": "https://github.com/Julesc013/mir-native-worker/actions/runs/40147383321",
+  "controller_commit": "39603fa185abc74d2d34a4b0e8a31d4bf54c2cd4",
+  "fixture_source": "a6ce2367f8a7ebca4d18d60591f5bf6afca453fb",
+  "player_source_tree": "01f9d36ebe269c7ba9c6e3a52dca547a39eb8a16",
+  "engine": {
+    "version": "2.0.77",
+    "sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B"
+  },
+  "case_name": "repair-stress",
+  "harness": {
+    "path": "tools/Invoke-NativeFixture.ps1",
+    "sha256": "672188E8CCC75007487206161235BFE777EF6C2D87722CA446992151BC46696B",
+    "native_probe_sha256": "1FD149D41F101A14379266A8D25609D01F4369A1DE7967C629E5EDD56D3764A9",
+    "governor_sha256": "4EF08081AF9F9AF9D658BCC388AE0CE6E01A053FA091E3607ADFA72265895E28"
+  },
+  "cases": [
+    {
+      "arm": "published",
+      "distribution_version": "4.7.20002",
+      "native_result_path": "gameplay/published/result.json",
+      "native_result_sha256": "85E3E2974C278B9C3D3A2D7B44AC6A512F875599BE5429230E314608D693CE2A",
+      "player_sha256": "F3943EB4D69CCDAC41BD9F922AD03A5C78F34F22D8E7FA5A88A7A658AB1010B7",
+      "profile_git_path": "tests/profiles/repair-stress-published-f200-2077.json",
+      "profile_sha256": "C199E2C964933B7889C5F51BE55329BB1C6614EC4271E74238FE799E3CE86CCF",
+      "seed_sha256": "37BABD187479B06748C883A697A0396EB99FB2ECFA6E66A53EA57D957BDD0007",
+      "completed_save_sha256": "6E3F09432C9DC8E44AC10A20E894F36BB581D5DC3272554E5922650B87AFAE39",
+      "cold_reloads": 2,
+      "completed_save_byte_identical": true,
+      "library_controls_restored": true,
+      "witnesses": {
+        "mode": "published-4.7.20002",
+        "total_eligible_walls": 1000,
+        "first_capacity_walls": 256,
+        "eligible_overflow_walls": 744,
+        "first_capacity_player_walls": 128,
+        "first_capacity_reciprocal_friend_walls": 128,
+        "quiet_ticks": 600,
+        "service_ticks": 60,
+        "repair_amount": 1,
+        "maximum_observed_repairs_per_service": 8,
+        "initial_first_repair_observed_tick": 601,
+        "initial_first_repair_service_tick": 600,
+        "reactivation_first_repair_observed_tick": 3121,
+        "reactivation_first_repair_service_tick": 3120,
+        "reactivation_count": 8,
+        "overflow_unchanged": true,
+        "nonfriendly_unchanged": true,
+        "nonwall_unchanged": true,
+        "native_damage_api": "LuaEntity.damage",
+        "native_damage_type": "electric",
+        "on_load_read_only": false,
+        "performance_qualified": false,
+        "runtime_elapsed_qualified": false,
+        "scope": "disposable-f200-passive-repair-queue-bound-only"
+      }
+    },
+    {
+      "arm": "mir5",
+      "distribution_version": "5.0.20000",
+      "native_result_path": "gameplay/mir5/result.json",
+      "native_result_sha256": "1D1A5708CEE47E59D961F90F277DC1F50765610D79C273125FB3973331A5DA6B",
+      "player_sha256": "2BBDBA9A0B816AC383CEA116CDF86D587BC34EFF7E1C5ACE2583F1DA98F9E842",
+      "profile_git_path": "tests/profiles/repair-stress-mir5-f200-2077.json",
+      "profile_sha256": "CA8B6CF3305934AE173860BE003617E5D0D252FBCE4E8E2BF3ADEB36C46441A8",
+      "seed_sha256": "E185DB27D72E816701B574093114CF2EF260493D3C4E0C0E4DDA6541CEA037FD",
+      "completed_save_sha256": "2ECDFDEC6FBEBC04D7896120C58268FFC2887651A26221C8B8E44C508D943014",
+      "cold_reloads": 2,
+      "completed_save_byte_identical": true,
+      "library_controls_restored": true,
+      "witnesses": {
+        "mode": "mir5-5.0.20000",
+        "total_eligible_walls": 1000,
+        "first_capacity_walls": 256,
+        "eligible_overflow_walls": 744,
+        "first_capacity_player_walls": 128,
+        "first_capacity_reciprocal_friend_walls": 128,
+        "quiet_ticks": 600,
+        "service_ticks": 60,
+        "repair_amount": 1,
+        "maximum_observed_repairs_per_service": 8,
+        "initial_first_repair_observed_tick": 601,
+        "initial_first_repair_service_tick": 600,
+        "reactivation_first_repair_observed_tick": 3121,
+        "reactivation_first_repair_service_tick": 3120,
+        "reactivation_count": 8,
+        "overflow_unchanged": true,
+        "nonfriendly_unchanged": true,
+        "nonwall_unchanged": true,
+        "native_damage_api": "LuaEntity.damage",
+        "native_damage_type": "electric",
+        "on_load_read_only": false,
+        "performance_qualified": false,
+        "runtime_elapsed_qualified": false,
+        "scope": "disposable-f200-passive-repair-queue-bound-only"
+      }
+    }
+  ],
+  "custody": {
+    "primary_path": "build/mir5/recovery-historical/repair-stress/40147383321/black-glass-repair-stress-40147383321-1",
+    "manifest_members_verified": 66,
+    "workflow_manifest_sha256": "3CADB2C5BB74AF85018E757A3C754F18E840950FD111D3AEC26D218B51B1446D",
+    "manifest_payload_bytes": 4252539
+  },
+  "raw_evidence": {
+    "path": "spec/evidence/repair-stress-current-a6-native-receipts.json.gz",
+    "members": 6,
+    "uncompressed_bytes": 153330,
+    "uncompressed_sha256": "0ACBDF91AC1E9A8C7D632A9C2BB595FF4AF938E0D4C775322547A03D1DF13865",
+    "gzip_bytes": 25382,
+    "gzip_sha256": "085F8F9F6CF5DC0B8DB1AACE5D037075BDD2344ACF1054D7A3C43886BF83B952"
+  },
+  "independent_readback": {
+    "reviewers": [
+      "root",
+      "bob_core_fixture_guards"
+    ],
+    "result": "passed",
+    "raw_native_markers_verified": 6,
+    "actual_loaded_mod_logs_verified": 8,
+    "native_processes": 8,
+    "cold_reloads": 4,
+    "seed_and_completed_save_hashes_verified": true,
+    "fixture_source_and_profile_hashes_verified": true
+  },
+  "previous_execution": {
+    "run": 40049722069,
+    "evidence": "spec/evidence/repair-stress-native-chain.json",
+    "disposition": "Preserved under original source/package identities; not relabelled as current."
+  },
+  "limits": [
+    "Each arm repairs its 256 admitted walls and eight reactivated entries; 744 eligible overflow walls remain unrepaired. This does not establish that all 1000 walls healed.",
+    "This fresh disposable Base F200 queue/lifecycle comparison does not establish migration, client, removal/readdition, agriculture, long-run memory or elapsed-performance acceptance.",
+    "No menu, Library, arbitrary-modpack or final coherent release qualification follows."
+  ],
+  "performance_qualification": false,
+  "release_qualification": false
+}

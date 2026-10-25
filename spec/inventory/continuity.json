@@ -388,6 +388,15 @@
           "scope": "Exact F2102.1.23 Defaults published4.7.21002 and candidateAF65 at fixture sourcea6ce2367 each pass1/32/128 towers per force, seven captured science packs, two actual lab levels,2N native planting events, trained17645 versus foreign18000 growth ticks, native spoilage baseline and two unchanged-byte cold reloads. Root verifies266 members and18 actual stage-log markers, counting12 unique lab completions and644 planting events. Ordinary tuning, elapsed/memory performance, mod removal/readdition and final coherent release remain unqualified."
         },
         {
+          "id": "current-native-repair-capacity-stress",
+          "source": [
+            "tests/fixtures/repair-stress/control.lua",
+            "source/runtime/passive_repair.lua"
+          ],
+          "evidence": "spec/evidence/repair-stress-current-a6-native-chain.json",
+          "scope": "Run40147383321 at exact sourcea6ce2367/F2002.0.77 compares candidate2BBDBA9A and published4.7.20002 F3943EB4. Each arm admits256 of1000 native-damaged eligible walls, split128 player/128 reciprocal friend;744 overflow remains unchanged. Eight repairs per60ticks after600 quiet ticks, eight reactivation repairs, foreign/nonwall exclusions and two unchanged-byte cold reloads pass. All66 artifact members, six raw native markers and eight loaded-mod logs are independently verified. No elapsed/memory, mod removal/readdition or final coherent release verdict."
+        },
+        {
           "id": "native-repair-capacity-stress",
           "evidence": "spec/mir5/evidence/repair-stress-native-chain.json",
           "scope": "Exact F2002.0.77 Base published4.7.2 and MIR5 each receive1000 native electric-damaged eligible walls:256 admitted evenly across player/friend,744 overflow unchanged,8 repairs per60ticks after quiet600. Redamage of8 drained entries reactivates; foreign/nonwall exclusions and save/two reloads pass. All66 members verified. No elapsed/memory or agriculture scaling claim."
