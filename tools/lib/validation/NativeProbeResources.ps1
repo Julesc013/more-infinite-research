@@ -10,7 +10,7 @@ function New-MIRNativeProbeResourceContext {
     [Parameter(Mandatory)][string]$RepoRoot,
     [Parameter(Mandatory)][string]$OutputRoot,
     [ValidateRange(0,8192)][int]$ExpectedPeakMemoryMiB=0,
-    [ValidateRange(1,2048)][int]$MaxNewOutputMiB=120,
+    [ValidateRange(1,8192)][int]$MaxNewOutputMiB=120,
     [switch]$UseExactOutputRoot
   )
   $path=if([IO.Path]::IsPathRooted($OutputRoot)) { $OutputRoot } else { Join-Path $RepoRoot $OutputRoot }

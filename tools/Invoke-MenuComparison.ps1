@@ -25,7 +25,8 @@ param(
   [string]$ActiveModsObserver = '',
   [ValidateRange(1,300)][int]$TimeoutSeconds = 300,
   [ValidateRange(1,8192)][int]$ExpectedPeakMemoryMiB = 2048,
-  [ValidateRange(1,2048)][int]$MaxNewOutputMiB = 512,
+  [ValidateRange(1,8192)][int]$MaxNewOutputMiB = 512,
+  [ValidateSet(8,64)][int]$CounterbalancedBlocks = 8,
   [ValidateRange(0,300)][int]$AdmissionWaitSeconds = 0,
   [ValidateRange(0,5000)][int]$LibraryIdleWaitMilliseconds = 5000,
   [double]$AaAbsoluteToleranceSeconds = 0,
@@ -65,8 +66,8 @@ function Get-MIR5MenuComparisonPolicy {
     }
     control_regression_tolerance_seconds = $numeric.control_regression_tolerance_seconds
     minimum_mir_added_time_reduction_percent = $numeric.minimum_mir_added_time_reduction_percent
-    primary_samples_per_arm = 8
-    counterbalanced_blocks = 8
+    primary_samples_per_arm = [int]$CounterbalancedBlocks
+    counterbalanced_blocks = [int]$CounterbalancedBlocks
     extension_policy = 'none; a refusal, error, or future extension requires a separately frozen plan and does not replace a declared sample'
     interpretation = 'The runner records raw observations only. A separately reviewed analysis applies these declared tolerances and never treats a non-significant result as equivalence.'
   }
@@ -99,21 +100,18 @@ function New-MIR5MenuComparisonPlan {
   }
   $specifications.Add([ordered]@{phase='aa-pilot';arm='published-4.7';block=0;position=1})
   $specifications.Add([ordered]@{phase='aa-pilot';arm='published-4.7';block=0;position=2})
-  # Two complete Latin-square cycles retain the same fixed position balance
-  # while providing eight primary observations per arm.
-  $rotations = @(
-    @('control-without-mir', 'published-4.7', 'replay', 'candidate-mir5'),
-    @('published-4.7', 'replay', 'candidate-mir5', 'control-without-mir'),
-    @('replay', 'candidate-mir5', 'control-without-mir', 'published-4.7'),
-    @('candidate-mir5', 'control-without-mir', 'published-4.7', 'replay'),
+  # Repeat only this fixed four-row Latin cycle. With the default eight blocks
+  # it produces the exact two-cycle R23 schedule; 64 blocks is sixteen cycles.
+  $latinCycle = @(
     @('control-without-mir', 'published-4.7', 'replay', 'candidate-mir5'),
     @('published-4.7', 'replay', 'candidate-mir5', 'control-without-mir'),
     @('replay', 'candidate-mir5', 'control-without-mir', 'published-4.7'),
     @('candidate-mir5', 'control-without-mir', 'published-4.7', 'replay')
   )
-  for($block = 1; $block -le $rotations.Count; $block++) {
-    for($index = 0; $index -lt $rotations[$block - 1].Count; $index++) {
-      $specifications.Add([ordered]@{phase='counterbalanced-comparison';arm=$rotations[$block - 1][$index];block=$block;position=$index+1})
+  for($block = 1; $block -le $CounterbalancedBlocks; $block++) {
+    $rotation = $latinCycle[($block - 1) % $latinCycle.Count]
+    for($index = 0; $index -lt $rotation.Count; $index++) {
+      $specifications.Add([ordered]@{phase='counterbalanced-comparison';arm=$rotation[$index];block=$block;position=$index+1})
     }
   }
   $rows = [Collections.Generic.List[object]]::new()
