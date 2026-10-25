@@ -689,12 +689,21 @@ local function run_restart(state, english, german)
   state.capture_after_tick = game.tick + 60
 end
 
+local TARGETS = {
+  ["2.0.77"] = {label="F200", mir_version="5.0.20000"},
+  ["2.1.23"] = {label="F210", mir_version="5.0.21000"},
+}
+
 local function closure()
-  local allowed = {base="2.0.77", ["more-infinite-research"]="5.0.20000",
+  local target = TARGETS[script.active_mods.base]
+  if target == nil then
+    fail("unsupported native Library target base " .. tostring(script.active_mods.base))
+  end
+  local allowed = {base=script.active_mods.base, ["more-infinite-research"]=target.mir_version,
     ["mir-fixture-mir5-active-mods-observer"]="0.1.0",
     ["mir-fixture-mir5-library-multiplayer"]="0.1.0"}
   for name, version in pairs(script.active_mods) do
-    if allowed[name] ~= version then fail("unexpected non-base F200 multiplayer closure: " .. tostring(name)) end
+    if allowed[name] ~= version then fail("unexpected non-base " .. target.label .. " multiplayer closure: " .. tostring(name)) end
   end
   for name, version in pairs(allowed) do
     if script.active_mods[name] ~= version then fail("required multiplayer closure member is absent: " .. name) end

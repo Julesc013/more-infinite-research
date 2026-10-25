@@ -1,6 +1,8 @@
 # Library multiplayer fixture protocol
 
-Start this fresh F200 world, then connect exactly two real clients whose actual `LuaPlayer.locale` values report `en` and `de`. Initial unchanged locales do not require a locale-change event. Wait for the `rejoin-ready` marker, disconnect and reconnect both clients, then wait for `restart-ready` and the requested `mir5-library-multiplayer-restart` save. Restart the host from that save, reconnect both clients again, and wait for `completed` plus `mir5-native-complete`.
+Start this fresh selected F200 or F210 base-only world, then connect exactly two real clients whose actual `LuaPlayer.locale` values report `en` and `de`. Initial unchanged locales do not require a locale-change event. Wait for the `rejoin-ready` marker, disconnect and reconnect both clients, then wait for `restart-ready` and the requested `mir5-library-multiplayer-restart` save. Restart the host from that save, reconnect both clients again, and wait for `completed` plus `mir5-native-complete`.
+
+The shared control has exactly two admitted native closures: F200 base2.0.77/MIR5.0.20000 and F210 base2.1.23/MIR5.0.21000. The F210 selector is base-only; it does not enable Space Age. Its 7168 MiB combined session ceiling is a conservative resource-admission budget of one 2048 MiB owned server, two 2048 MiB owned GUI clients, and 1024 MiB watchdog/fixture reserve. It is neither a measured peak nor a performance or native-acceptance result.
 
 The four latency observations are emitted directly to each executing process's native log as `[MIR5_LIBRARY_PROFILE] first_open`, `search`, `refresh` and `reopen`, followed by the engine-rendered profiler. Saved state and JSON witnesses contain only deterministic completion flags for those labels. Read the actual native log records to qualify timings; flags, profiler object identities and host mocks are not measured latency. No profiler value selects a gameplay or fixture-state transition.
 

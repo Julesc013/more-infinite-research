@@ -1,4 +1,4 @@
-"""Host controls for the private F200 two-client Library fixture, not native evidence."""
+"""Host controls for the private legacy-F200/current-F200/F210 two-client Library fixture, not native evidence."""
 import argparse
 import gzip
 import hashlib
@@ -13,7 +13,9 @@ import unittest
 ROOT = Path(__file__).resolve().parents[1]
 FIXTURE = ROOT / "tests/fixtures/library-multiplayer"
 CONTROL = FIXTURE / "control.lua"
-PROFILE = ROOT / "tests/profiles/library-multiplayer-f200-2077.json"
+F200_PROFILE = ROOT / "tests/profiles/library-multiplayer-f200-2077.json"
+CURRENT_F200_PROFILE = ROOT / "tests/profiles/library-multiplayer-current-f200-2077.json"
+F210_PROFILE = ROOT / "tests/profiles/library-multiplayer-f210-2123.json"
 WRAPPER = ROOT / "tools/Invoke-MultiplayerFixture.ps1"
 SESSION = ROOT / "tools/Invoke-MultiplayerSession.ps1"
 SAMPLER = ROOT / "tools/lib/validation/OwnedProcessMemorySampler.ps1"
@@ -42,7 +44,7 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
         self.lua = LuaRuntime(unpack_returned_tuples=True)
         self.lua.globals().control_path = CONTROL.as_posix()
         self.lua.execute(r'''
-          function run_library_multiplayer_fixture(path, opponent)
+          function run_library_multiplayer_fixture(path, opponent, target)
             local ROOT_NAME="mir_research_browser"
             local FILTERS="mir_library_filters"
             local QUERY="mir_library_query"
@@ -62,6 +64,15 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
               {name=gear_packs[1],amount=1},{name=gear_packs[2],amount=1},
               {name=gear_packs[3],amount=1},{name=gear_packs[4],amount=1},
             }
+            local targets={
+              f200={base="2.0.77",mir="5.0.20000"},
+              f210={base="2.1.23",mir="5.0.21000"},
+            }
+            local selected=targets[target or "f200"]
+            assert(selected,"unknown fixture target")
+            local base_version,mir_version=selected.base,selected.mir
+            if opponent=="f210-wrong-mir-version" then mir_version="5.0.21001"
+            elseif opponent=="unsupported-target-base" then base_version="2.1.24" end
             local players, markers, screenshots, saves, lab_diagnostics = {}, {}, {}, {}, {}
             local force={valid=true,index=1,name="player",technologies={},recipes={},research_queue={},research_progress=0,research_enabled=true}
             for _,name in ipairs({gear,mining}) do
@@ -309,7 +320,7 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
               return true
             end
             local environment={
-              script={active_mods={base="2.0.77",["more-infinite-research"]="5.0.20000",["mir-fixture-mir5-library-multiplayer"]="0.1.0",["mir-fixture-mir5-active-mods-observer"]="0.1.0"},
+              script={active_mods={base=base_version,["more-infinite-research"]=mir_version,["mir-fixture-mir5-library-multiplayer"]="0.1.0",["mir-fixture-mir5-active-mods-observer"]="0.1.0"},
                 on_init=function(callback)callbacks.init=callback end,on_load=function(callback)callbacks.load=callback end,
                 on_event=function(event,callback)callbacks.events[event]=callback end},
               defines={events={on_tick=1,on_player_joined_game=2,on_player_locale_changed=3,on_research_started=4,
@@ -440,28 +451,99 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
           end
         ''')
 
-    def run_case(self, opponent=None):
+    def run_case(self, opponent=None, target="f200"):
         self.lua.globals().opponent = opponent
-        return plain(self.lua.eval("run_library_multiplayer_fixture(control_path,opponent)"))
+        self.lua.globals().target = target
+        return plain(self.lua.eval("run_library_multiplayer_fixture(control_path,opponent,target)"))
 
-    def test_profile_and_fixture_pin_the_base_only_f200_closure(self):
-        profile = json.loads(PROFILE.read_text(encoding="utf-8"))
-        info = json.loads((FIXTURE / "info.json").read_text(encoding="utf-8"))
-        self.assertEqual((profile["target"], profile["factorio_line"], profile["engine"]["version"]), ("f200", "2.0", "2.0.77"))
-        self.assertEqual(profile["engine"]["sha256"], "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B")
-        self.assertEqual(profile["mods"], [
-            {"name": "base", "version": "2.0.77", "enabled": True},
-            {"name": "mir-fixture-mir5-active-mods-observer", "version": "0.1.0", "enabled": True},
-            {"name": "more-infinite-research", "version": "5.0.20000", "enabled": True},
-            {"name": "mir-fixture-mir5-library-multiplayer", "version": "0.1.0", "enabled": True},
-        ])
-        self.assertEqual(profile["archive_sha256"], {
-            "mir-fixture-mir5-active-mods-observer_0.1.0.zip":
-                "723D1E7721449FC26040E5E6629416767BDC20AD79CF8723115846DB662A1F87"
-        })
-        self.assertEqual((info["name"], info["version"], info["factorio_version"]),
-                         ("mir-fixture-mir5-library-multiplayer", "0.1.0", "2.0"))
-        self.assertEqual(info["dependencies"], ["base >= 2.0.77", "more-infinite-research = 5.0.20000"])
+    def test_profiles_and_fixture_metadata_pin_the_three_finite_base_closures(self):
+        cases = (
+            (F200_PROFILE, FIXTURE / "info.json", "f200", "2.0", "2.0.77",
+             "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B",
+             "5.0.20000", "mir5-library-multiplayer-f200-native-selection", "2.0", "base >= 2.0.77", "723D1E7721449FC26040E5E6629416767BDC20AD79CF8723115846DB662A1F87"),
+            (CURRENT_F200_PROFILE, FIXTURE / "info.json", "f200", "2.0", "2.0.77",
+             "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B",
+             "5.0.20000", "mir5-library-multiplayer-current-f200-native-selection", "2.0", "base >= 2.0.77", "723D1E7721449FC26040E5E6629416767BDC20AD79CF8723115846DB662A1F87"),
+            (F210_PROFILE, FIXTURE / "info-f210.json", "f210", "2.1", "2.1.23",
+             "FE4A1DA30F322A0D0B8AEB3DF7276332222BAAA143E2352569B723E84B2B9060",
+             "5.0.21000", "mir5-library-multiplayer-f210-native-selection", "2.1", "base >= 2.1.23", "2E1BE5952D2A4CC5C74A0D149E075D247BA110A3FAE5B6768D3EAEBABCEF989C"),
+        )
+        for profile_path, info_path, target, line, base, engine_sha, mir, kind, fixture_line, base_dependency, observer_sha in cases:
+            with self.subTest(target=target):
+                profile = json.loads(profile_path.read_text(encoding="utf-8"))
+                info = json.loads(info_path.read_text(encoding="utf-8"))
+                self.assertEqual((profile["target"], profile["factorio_line"], profile["engine"]["version"]),
+                                 (target, line, base))
+                self.assertEqual(profile["kind"], kind)
+                self.assertEqual(profile["engine"]["sha256"], engine_sha)
+                self.assertEqual(profile["mods"], [
+                    {"name": "base", "version": base, "enabled": True},
+                    {"name": "mir-fixture-mir5-active-mods-observer", "version": "0.1.0", "enabled": True},
+                    {"name": "more-infinite-research", "version": mir, "enabled": True},
+                    {"name": "mir-fixture-mir5-library-multiplayer", "version": "0.1.0", "enabled": True},
+                ])
+                self.assertEqual(profile["archive_sha256"], {
+                    "mir-fixture-mir5-active-mods-observer_0.1.0.zip": observer_sha
+                })
+                self.assertEqual((info["name"], info["version"], info["factorio_version"]),
+                                 ("mir-fixture-mir5-library-multiplayer", "0.1.0", fixture_line))
+                self.assertEqual(info["dependencies"], [base_dependency, f"more-infinite-research = {mir}"])
+                self.assertNotIn("space-age", {entry["name"] for entry in profile["mods"]})
+
+    def test_multiplayer_wrapper_admits_only_the_three_exact_functional_profiles(self):
+        script = r'''
+          $tokens=$null;$errors=$null
+          $ast=[Management.Automation.Language.Parser]::ParseFile($env:MIR_TEST_WRAPPER,[ref]$tokens,[ref]$errors)
+          if($errors.Count){throw $errors[0].Message}
+          function Assert-Session([bool]$Condition,[string]$Message){if(-not $Condition){throw $Message}}
+          $node=@($ast.FindAll({param($candidate) $candidate -is [Management.Automation.Language.FunctionDefinitionAst] -and $candidate.Name -ceq 'Assert-MultiplayerFixtureSelection'},$true))
+          if($node.Count -ne 1){throw 'selection function is absent or ambiguous'}
+          Invoke-Expression $node[0].Extent.Text
+          $f200=Get-Content -LiteralPath $env:MIR_TEST_F200_PROFILE -Raw|ConvertFrom-Json -AsHashtable
+           $f200Current=Get-Content -LiteralPath $env:MIR_TEST_CURRENT_F200_PROFILE -Raw|ConvertFrom-Json -AsHashtable
+          $f210=Get-Content -LiteralPath $env:MIR_TEST_F210_PROFILE -Raw|ConvertFrom-Json -AsHashtable
+          $selected=Assert-MultiplayerFixtureSelection -Selection $f200 -EngineSha256 'D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B' -FixtureCase 'library-multiplayer'
+          if($selected.base -cne '2.0.77'){throw 'F200 selection changed'}
+           $selected=Assert-MultiplayerFixtureSelection -Selection $f200Current -EngineSha256 'D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B' -FixtureCase 'library-multiplayer'
+           if($selected.kind -cne 'mir5-library-multiplayer-current-f200-native-selection'){throw 'current F200 selection changed'}
+          $selected=Assert-MultiplayerFixtureSelection -Selection $f210 -EngineSha256 'FE4A1DA30F322A0D0B8AEB3DF7276332222BAAA143E2352569B723E84B2B9060' -FixtureCase 'library-multiplayer'
+          if($selected.base -cne '2.1.23'){throw 'F210 selection changed'}
+          function Assert-Rejected([string]$Name,[string]$ProfilePath,[string]$Engine,[string]$Case,[scriptblock]$Mutate){
+            $selection=Get-Content -LiteralPath $ProfilePath -Raw|ConvertFrom-Json -AsHashtable
+            & $Mutate $selection
+            $accepted=$false
+            try{$null=Assert-MultiplayerFixtureSelection -Selection $selection -EngineSha256 $Engine -FixtureCase $Case;$accepted=$true}catch{}
+            if($accepted){throw ('selection accepted opponent: '+$Name)}
+          }
+          Assert-Rejected 'wrong-engine' $env:MIR_TEST_F200_PROFILE ('A'*64) 'library-multiplayer' {param($s)}
+          Assert-Rejected 'wrong-mir' $env:MIR_TEST_F210_PROFILE 'FE4A1DA30F322A0D0B8AEB3DF7276332222BAAA143E2352569B723E84B2B9060' 'library-multiplayer' {param($s)$s['mods'][2]['version']='5.0.21001'}
+          Assert-Rejected 'extra-space-age' $env:MIR_TEST_F210_PROFILE 'FE4A1DA30F322A0D0B8AEB3DF7276332222BAAA143E2352569B723E84B2B9060' 'library-multiplayer' {param($s)$s['mods']=@($s['mods'])+@([ordered]@{name='space-age';version='2.1.23';enabled=$true})}
+          Assert-Rejected 'untyped-enabled' $env:MIR_TEST_F210_PROFILE 'FE4A1DA30F322A0D0B8AEB3DF7276332222BAAA143E2352569B723E84B2B9060' 'library-multiplayer' {param($s)$s['mods'][0]['enabled']='true'}
+          Assert-Rejected 'wrong-observer' $env:MIR_TEST_F210_PROFILE 'FE4A1DA30F322A0D0B8AEB3DF7276332222BAAA143E2352569B723E84B2B9060' 'library-multiplayer' {param($s)$s['archive_sha256']['mir-fixture-mir5-active-mods-observer_0.1.0.zip']='A'*64}
+          Assert-Rejected 'f210-paired' $env:MIR_TEST_F210_PROFILE 'FE4A1DA30F322A0D0B8AEB3DF7276332222BAAA143E2352569B723E84B2B9060' 'library-paired-browser' {param($s)}
+        '''
+        result = subprocess.run(
+            ["pwsh", "-NoLogo", "-NoProfile", "-Command", script],
+            capture_output=True,
+            text=True,
+            env=dict(os.environ, MIR_TEST_WRAPPER=str(WRAPPER),
+                     MIR_TEST_F200_PROFILE=str(F200_PROFILE),
+                     MIR_TEST_CURRENT_F200_PROFILE=str(CURRENT_F200_PROFILE),
+                     MIR_TEST_F210_PROFILE=str(F210_PROFILE)),
+            check=False,
+        )
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+
+    def test_f210_closure_uses_the_existing_two_client_lifecycle_and_refuses_drift(self):
+        accepted = self.run_case(target="f210")
+        self.assertTrue(accepted["ok"], accepted["message"])
+        self.assertEqual((accepted["phase"], accepted["join_events"]), ("completed", 6))
+        wrong_mir = self.run_case("f210-wrong-mir-version", target="f210")
+        self.assertFalse(wrong_mir["ok"])
+        self.assertIn("unexpected non-base F210 multiplayer closure", wrong_mir["message"])
+        wrong_base = self.run_case("unsupported-target-base", target="f210")
+        self.assertFalse(wrong_base["ok"])
+        self.assertIn("unsupported native Library target base", wrong_base["message"])
 
     def test_two_real_client_join_rejoin_and_restart_state_machine(self):
         result = self.run_case()
@@ -1582,7 +1664,7 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
 
         self.assertEqual(calibration["profile"]["path"], "tests/profiles/library-multiplayer-f200-2077.json")
         self.assertEqual(
-            hashlib.sha256(PROFILE.read_bytes()).hexdigest().upper(),
+            hashlib.sha256(F200_PROFILE.read_bytes()).hexdigest().upper(),
             calibration["profile"]["sha256"],
         )
         self.assertEqual(calibration["engine"]["sha256"], "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B")
