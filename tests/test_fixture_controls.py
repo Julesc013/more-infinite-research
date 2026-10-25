@@ -392,6 +392,36 @@ class FixtureControlHostStageTests(unittest.TestCase):
             ],
         )
 
+    def test_primary_f210_consumers_select_both_existing_independent_consumers(self):
+        for fixture in ("api-alpha", "api-beta", "api-beta-production"):
+            with self.subTest(fixture=fixture):
+                info = json.loads((ROOT / "tests/fixtures" / fixture / "info.json").read_bytes())
+                self.assertEqual(info["name"], f"mir-fixture-mir5-{fixture}")
+                self.assertEqual(info["version"], "0.1.0")
+                self.assertEqual(info["factorio_version"], "2.1")
+                self.assertIn("base >= 2.1.23", info["dependencies"])
+                self.assertTrue(any("5.0.21000" in dependency for dependency in info["dependencies"]))
+        profile = json.loads((ROOT / "tests/profiles/api-consumers-f210-2123.json").read_bytes())
+        self.assertEqual(profile["target"], "f210")
+        self.assertEqual(profile["factorio_line"], "2.1")
+        self.assertEqual(profile["engine"], {
+            "version": "2.1.23",
+            "sha256": "FE4A1DA30F322A0D0B8AEB3DF7276332222BAAA143E2352569B723E84B2B9060",
+        })
+        self.assertEqual(profile["settings_mode"], "Defaults")
+        self.assertEqual([(row["name"], row["version"], row["enabled"]) for row in profile["mods"]], [
+            ("base", "2.1.23", True),
+            ("mir-fixture-mir5-active-mods-observer", "0.1.0", True),
+            ("more-infinite-research", "5.0.21000", True),
+            ("mir-fixture-mir5-api-alpha", "0.1.0", True),
+            ("mir-fixture-mir5-api-beta", "0.1.0", True),
+            ("mir-fixture-mir5-api-beta-production", "0.1.0", True),
+        ])
+        self.assertEqual(profile["archive_sha256"], {
+            "mir-fixture-mir5-active-mods-observer_0.1.0.zip":
+                "2E1BE5952D2A4CC5C74A0D149E075D247BA110A3FAE5B6768D3EAEBABCEF989C",
+        })
+
     def test_alpha_accepts_float32_native_effect_without_mutating_beta(self):
         self.lua.globals().fixture_control = self.control("api-alpha")
         actual_float32 = 0.05000000074505806
