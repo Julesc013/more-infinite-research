@@ -86,6 +86,71 @@ $replay=Invoke-MIR5MenuComparisonSample -PlanRow ([pscustomobject]@{{arm='replay
 
 
 class MenuComparisonTests(unittest.TestCase):
+    def test_occlusion_reports_only_process_relation_and_rejects_every_other_root(self):
+        command = r'''
+. ./tools/lib/validation/responsive-menu/OwnedMenuWindow.ps1
+$tokens=$null;$errors=$null
+$ast=[System.Management.Automation.Language.Parser]::ParseFile((Resolve-Path ./tools/lib/validation/responsive-menu/OwnedMenuWindow.ps1),[ref]$tokens,[ref]$errors)
+if($errors.Count){throw 'window helper parse failure'}
+$native=@($ast.FindAll({param($node) $node -is [System.Management.Automation.Language.StringConstantExpressionAst] -and $node.Value.Contains('public static class MIROwnedMenuNative')},$true))
+if($native.Count-ne1){throw 'window native boundary absent or ambiguous'}
+$declaration='[DllImport("user32.dll")] public static extern uint GetWindowThreadProcessId(IntPtr h, out uint pid);'
+$double=@'
+public static uint FixtureCandidatePid = 1234;
+  public static uint FixtureThread = 1;
+  public static int FixtureIdentityReads = 0;
+  public static uint GetWindowThreadProcessId(IntPtr h, out uint pid) {
+    FixtureIdentityReads++;
+    pid = FixtureCandidatePid;
+    return FixtureThread;
+  }
+'@
+if(-not$native[0].Value.Contains($declaration)){throw 'native identity seam differs'}
+# Compile the real equality/status helper, doubling only the Win32 lookup.
+Add-Type -TypeDefinition $native[0].Value.Replace($declaration,$double)
+$script:probeIndex=0;$script:coveredProbe=-1;$script:hitRoot=[IntPtr]43
+function Get-MIROwnedMenuPointRoot {
+  param([int]$X,[int]$Y)
+  $index=$script:probeIndex;$script:probeIndex++
+  if($index-eq$script:coveredProbe){return $script:hitRoot}
+  return [IntPtr]42
+}
+$records=@()
+foreach($covered in @(0,4)){
+  foreach($case in @(
+    @{pid=1234;thread=1;root=43;hit='other-window';relation='owned-process'},
+    @{pid=4321;thread=1;root=43;hit='other-window';relation='other-process'},
+    @{pid=1234;thread=0;root=43;hit='other-window';relation='unresolved'},
+    @{pid=0;thread=1;root=43;hit='other-window';relation='unresolved'},
+    @{pid=4321;thread=1;root=0;hit='no-window';relation='unresolved'}
+  )){
+    $script:probeIndex=0;$script:coveredProbe=$covered;$script:hitRoot=[IntPtr]$case.root
+    [MIROwnedMenuNative]::FixtureCandidatePid=$case.pid
+    [MIROwnedMenuNative]::FixtureThread=$case.thread
+    [MIROwnedMenuNative]::FixtureIdentityReads=0
+    $record=Get-MIROwnedMenuOcclusion -Handle ([IntPtr]42) -OwnedProcessId 1234 -X 0 -Y 0 -Width 2560 -Height 1440
+    if($null-eq$record-or$record.probe_index-ne$covered-or$record.hit-cne$case.hit-or$record.hit_process_relation-cne$case.relation){throw 'covered window accepted or misclassified'}
+    if(($record.Keys-join',')-cne'probe_index,probe_x,probe_y,owned_x,owned_y,owned_width,owned_height,hit,hit_process_relation'){throw 'diagnostic exposes fields beyond own geometry and category'}
+    $expectedReads=if($case.root-eq0){0}else{1}
+    if([MIROwnedMenuNative]::FixtureIdentityReads-ne$expectedReads){throw 'unexpected identity lookup'}
+    $records+=$record
+  }
+}
+$script:probeIndex=0;$script:coveredProbe=-1
+[MIROwnedMenuNative]::FixtureIdentityReads=0
+$clear=Get-MIROwnedMenuOcclusion -Handle ([IntPtr]42) -OwnedProcessId 1234 -X 0 -Y 0 -Width 2560 -Height 1440
+if($null-ne$clear-or[MIROwnedMenuNative]::FixtureIdentityReads-ne0){throw 'clear window changed or queried another process'}
+[ordered]@{covered_rejections=$records.Count;clear_window_unchanged=$true;native_execution=$false}|ConvertTo-Json -Compress
+'''
+        completed = subprocess.run(
+            ["pwsh", "-NoProfile", "-Command", command], cwd=ROOT,
+            text=True, capture_output=True, check=True,
+        )
+        result = json.loads(completed.stdout)
+        self.assertEqual(result["covered_rejections"], 10)
+        self.assertTrue(result["clear_window_unchanged"])
+        self.assertFalse(result["native_execution"])
+
     def test_fixed_four_arm_two_cycle_plan_keeps_warmups_aa_pilot_and_latin_square(self):
         record = invoke_as_json(f"-PlanOnly {DECLARED_POLICY}")
         self.assertEqual(record["status"], "planned-not-executed")

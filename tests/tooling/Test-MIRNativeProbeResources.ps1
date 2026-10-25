@@ -10,6 +10,28 @@ $root=Join-Path $repo ('build/tmp/mir5-native-probe-controls-'+[guid]::NewGuid()
 $checks=0
 function Assert-Probe([bool]$Condition,[string]$Code){if(-not$Condition){throw "[mir5-native-probe-$Code]"};$script:checks++}
 function Refuses-Probe([scriptblock]$Action,[string]$Expected){$actual='';try{&$Action|Out-Null}catch{$actual=$_.Exception.Message};Assert-Probe ($actual.Contains($Expected)) "refusal-$Expected"}
+function New-BenchmarkMemoryCallbacks {
+  param([Parameter(Mandatory)]$Sampler)
+  $state=[pscustomobject]@{registration=$null;sample_events=0;exit_events=0}
+  $registerMemorySampler=${function:Register-MIROwnedProcessMemoryProcess}
+  $addMemorySample=${function:Add-MIROwnedProcessMemorySample}
+  $completeMemorySampler=${function:Complete-MIROwnedProcessMemoryProcess}
+  $sample={
+    param($event)
+    if($event.natural_exit){throw '[mir5-native-probe-unexpected-sample-exit]'}
+    if($null-eq$state.registration){$state.registration=& $registerMemorySampler -Sampler $Sampler -Phase benchmark -Role factorio -Process $event.process}
+    if($null-eq$state.registration){throw '[mir5-native-probe-benchmark-registration]'}
+    & $addMemorySample -Sampler $Sampler
+    $state.sample_events++
+  }.GetNewClosure()
+  $exit={
+    param($event)
+    if(-not$event.natural_exit){throw '[mir5-native-probe-missing-natural-exit]'}
+    & $completeMemorySampler -Sampler $Sampler -Registration $state.registration -NaturalExit
+    $state.exit_events++
+  }.GetNewClosure()
+  return [pscustomobject]@{state=$state;sample=$sample;exit=$exit}
+}
 function Assert-ImportBoundary {
   $scriptPath=Join-Path $root 'import-boundary.ps1'
   $native=Join-Path $repo 'tools/lib/validation/NativeProbeResources.ps1'
@@ -139,29 +161,22 @@ try {
     Assert-Probe ($null-eq$runRecord.result.PSObject.Properties['sample_milliseconds']) 'default-governor-result-shape'
     $benchmarkRoot=Join-Path $context.root 'benchmark-observation';[IO.Directory]::CreateDirectory($benchmarkRoot)|Out-Null
     $benchmarkSampler=New-MIROwnedProcessMemorySampler -Context benchmark -ExpectedSlots @([pscustomobject]@{phase='benchmark';role='factorio'})
-    $benchmarkState=[pscustomobject]@{registration=$null;sample_events=0;exit_events=0}
-    $registerMemorySampler=${function:Register-MIROwnedProcessMemoryProcess}
-    $addMemorySample=${function:Add-MIROwnedProcessMemorySample}
-    $completeMemorySampler=${function:Complete-MIROwnedProcessMemoryProcess}
-    $benchmarkSample={
-      param($event)
-      if($event.natural_exit){throw '[mir5-native-probe-unexpected-sample-exit]'}
-      if($null-eq$benchmarkState.registration){$benchmarkState.registration=& $registerMemorySampler -Sampler $benchmarkSampler -Phase benchmark -Role factorio -Process $event.process}
-      if($null-eq$benchmarkState.registration){throw '[mir5-native-probe-benchmark-registration]'}
-      & $addMemorySample -Sampler $benchmarkSampler
-      $benchmarkState.sample_events++
-    }.GetNewClosure()
-    $benchmarkExit={
-      param($event)
-      if(-not$event.natural_exit){throw '[mir5-native-probe-missing-natural-exit]'}
-      & $completeMemorySampler -Sampler $benchmarkSampler -Registration $benchmarkState.registration -NaturalExit
-      $benchmarkState.exit_events++
-    }.GetNewClosure()
+    $benchmarkCallbacks=New-BenchmarkMemoryCallbacks -Sampler $benchmarkSampler
     $benchmarkLedger=Join-Path $benchmarkRoot 'resources.jsonl'
-    $benchmarkRun=Invoke-MIR441MonitoredProcess -FilePath $child -Arguments @('-NoProfile','-Command','Start-Sleep -Milliseconds 900') -WorkRoot $benchmarkRoot -LedgerPath $benchmarkLedger -Policy $context.policy -EstimatedPeakBytes 1MB -ExpectedPeakMemoryBytes 1024MB -TimeoutSeconds 20 -SampleMilliseconds 250 -OwnedProcessSampleCallback $benchmarkSample -OwnedProcessExitCallback $benchmarkExit
+    $benchmarkRun=Invoke-MIR441MonitoredProcess -FilePath $child -Arguments @('-NoProfile','-Command','Start-Sleep -Milliseconds 900') -WorkRoot $benchmarkRoot -LedgerPath $benchmarkLedger -Policy $context.policy -EstimatedPeakBytes 1MB -ExpectedPeakMemoryBytes 1024MB -TimeoutSeconds 20 -SampleMilliseconds 250 -OwnedProcessSampleCallback $benchmarkCallbacks.sample -OwnedProcessExitCallback $benchmarkCallbacks.exit
     $benchmarkReceipt=Get-MIROwnedProcessMemoryObservationReceipt -Sampler $benchmarkSampler
-    Assert-Probe ($benchmarkRun.status-ceq'passed'-and$benchmarkState.sample_events-ge2-and$benchmarkState.exit_events-eq1-and$benchmarkReceipt.status-ceq'complete-observation'-and$benchmarkReceipt.context-ceq'benchmark'-and$benchmarkReceipt.observations.Count-ge2) 'benchmark-natural-exit-observation'
+    Assert-Probe ($benchmarkRun.status-ceq'passed'-and$benchmarkCallbacks.state.sample_events-ge2-and$benchmarkCallbacks.state.exit_events-eq1-and$benchmarkReceipt.status-ceq'complete-observation'-and$benchmarkReceipt.context-ceq'benchmark'-and$benchmarkReceipt.observations.Count-ge2) 'benchmark-natural-exit-observation'
     Assert-Probe (@($benchmarkReceipt.observations|Where-Object {$_.phase-cne'benchmark'-or$_.role-cne'factorio'-or$_.pid-le0-or$_.working_set_bytes-lt0-or$_.private_bytes-lt0}).Count-eq0) 'benchmark-observation-identity'
+    $probeSampler=New-MIROwnedProcessMemorySampler -Context benchmark -ExpectedSlots @([pscustomobject]@{phase='benchmark';role='factorio'})
+    $probeCallbacks=New-BenchmarkMemoryCallbacks -Sampler $probeSampler
+    $probeRun=Invoke-MIRNativeProbeProcess -Context $context -FilePath $child -Arguments @('-NoProfile','-Command','Start-Sleep -Milliseconds 900') -TimeoutSeconds 20 -SampleMilliseconds 250 -OwnedProcessSampleCallback $probeCallbacks.sample -OwnedProcessExitCallback $probeCallbacks.exit
+    $probeReceipt=Get-MIROwnedProcessMemoryObservationReceipt -Sampler $probeSampler
+    Assert-Probe ($probeRun.status-ceq'passed'-and$probeCallbacks.state.sample_events-ge2-and$probeCallbacks.state.exit_events-eq1-and$probeReceipt.status-ceq'complete-observation'-and$probeReceipt.observations.Count-ge2) 'probe-wrapper-benchmark-observation'
+    $factorioSampler=New-MIROwnedProcessMemorySampler -Context benchmark -ExpectedSlots @([pscustomobject]@{phase='benchmark';role='factorio'})
+    $factorioCallbacks=New-BenchmarkMemoryCallbacks -Sampler $factorioSampler
+    $factorioObservation=Invoke-MIRNativeProbeFactorioProcess -Context $context -FilePath $child -Arguments @('-NoProfile','-Command','Start-Sleep -Milliseconds 900') -TimeoutSeconds 20 -SampleMilliseconds 250 -OwnedProcessSampleCallback $factorioCallbacks.sample -OwnedProcessExitCallback $factorioCallbacks.exit
+    $factorioReceipt=Get-MIROwnedProcessMemoryObservationReceipt -Sampler $factorioSampler
+    Assert-Probe ($factorioObservation.status-ceq'passed'-and$factorioObservation.result.duration_measurement.scope-ceq'direct-native-executable-start-to-exit'-and$factorioCallbacks.state.sample_events-ge2-and$factorioCallbacks.state.exit_events-eq1-and$factorioReceipt.status-ceq'complete-observation'-and$factorioReceipt.observations.Count-ge2) 'factorio-wrapper-benchmark-observation'
     Refuses-Probe {Invoke-MIR441MonitoredProcess -FilePath $child -Arguments @('-NoProfile','-Command','exit 0') -WorkRoot (Join-Path $benchmarkRoot 'invalid-cadence') -LedgerPath (Join-Path $benchmarkRoot 'invalid-cadence/resources.jsonl') -Policy $context.policy -EstimatedPeakBytes 1MB -ExpectedPeakMemoryBytes 64MB -SampleMilliseconds 250} '[mir441-resource-observation-callback-required]'
     Refuses-Probe {Invoke-MIR441MonitoredProcess -FilePath $child -Arguments @('-NoProfile','-Command','exit 0') -WorkRoot (Join-Path $benchmarkRoot 'invalid-callback') -LedgerPath (Join-Path $benchmarkRoot 'invalid-callback/resources.jsonl') -Policy $context.policy -EstimatedPeakBytes 1MB -ExpectedPeakMemoryBytes 64MB -OwnedProcessSampleCallback {param($event)}} '[mir441-resource-observation-cadence-required]'
     Refuses-Probe {Invoke-MIR441MonitoredProcess -FilePath $child -Arguments @('-NoProfile','-Command','exit 0') -WorkRoot (Join-Path $benchmarkRoot 'invalid-interval') -LedgerPath (Join-Path $benchmarkRoot 'invalid-interval/resources.jsonl') -Policy $context.policy -EstimatedPeakBytes 1MB -ExpectedPeakMemoryBytes 64MB -SampleMilliseconds 500 -OwnedProcessSampleCallback {param($event)}} 'SampleMilliseconds'
@@ -177,6 +192,8 @@ try {
       } '[mir441-resource-observation-completion-predicate]'
       Assert-Probe (-not(Test-Path -LiteralPath $unsupportedRoot) -and $unsupportedState.samples -eq 0 -and $unsupportedState.exits -eq 0 -and $unsupportedState.predicates -eq 0) ('benchmark-completion-preflight-'+$mode)
     }
+    Refuses-Probe {Invoke-MIRNativeProbeProcess -Context $context -FilePath $child -Arguments @('-NoProfile','-Command','exit 0') -SampleMilliseconds 500} 'SampleMilliseconds'
+    Refuses-Probe {Invoke-MIRNativeProbeFactorioProcess -Context $context -FilePath $child -Arguments @('-NoProfile','-Command','exit 0') -SampleMilliseconds 500} 'SampleMilliseconds'
     $callbackFailureRoot=Join-Path $benchmarkRoot 'callback-failure';[IO.Directory]::CreateDirectory($callbackFailureRoot)|Out-Null
     $callbackState=[pscustomobject]@{pid=0}
     $callbackError=''

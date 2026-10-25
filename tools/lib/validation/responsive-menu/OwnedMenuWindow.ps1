@@ -17,6 +17,13 @@ public static class MIROwnedMenuNative {
   [DllImport("user32.dll")] public static extern bool IsWindowVisible(IntPtr h);
   [DllImport("user32.dll")] public static extern bool IsIconic(IntPtr h);
   [DllImport("user32.dll")] public static extern uint GetWindowThreadProcessId(IntPtr h, out uint pid);
+  public static bool TrySameOwnedProcess(IntPtr h, uint ownedPid, out bool sameProcess) {
+    sameProcess = false;
+    uint candidatePid;
+    if (GetWindowThreadProcessId(h, out candidatePid) == 0 || candidatePid == 0) return false;
+    sameProcess = candidatePid == ownedPid;
+    return true;
+  }
   [DllImport("user32.dll")] public static extern bool GetClientRect(IntPtr h, out Rect r);
   [DllImport("user32.dll")] public static extern bool ClientToScreen(IntPtr h, ref Point p);
   [DllImport("user32.dll")] public static extern IntPtr GetForegroundWindow();
@@ -99,7 +106,7 @@ function Get-MIROwnedMenuPointRoot {
 }
 
 function Get-MIROwnedMenuOcclusion {
-  param([Parameter(Mandatory)][IntPtr]$Handle,[Parameter(Mandatory)][int]$X,[Parameter(Mandatory)][int]$Y,[Parameter(Mandatory)][int]$Width,[Parameter(Mandatory)][int]$Height)
+  param([Parameter(Mandatory)][IntPtr]$Handle,[Parameter(Mandatory)][uint32]$OwnedProcessId,[Parameter(Mandatory)][int]$X,[Parameter(Mandatory)][int]$Y,[Parameter(Mandatory)][int]$Width,[Parameter(Mandatory)][int]$Height)
   $probeIndex=0
   foreach ($offset in @(@(1,1),@(($Width-2),1),@(1,($Height-2)),@(($Width-2),($Height-2)),@([int]($Width/2),[int]($Height/2)))) {
     $probeX=$X+$offset[0]; $probeY=$Y+$offset[1]
@@ -107,11 +114,21 @@ function Get-MIROwnedMenuOcclusion {
     if ($root -ne $Handle) {
       # Record only our own geometry and a hit-test category. Never collect
       # foreign window identities, titles, text or pixels for this diagnostic.
-      return [ordered]@{probe_index=$probeIndex;probe_x=$probeX;probe_y=$probeY;owned_x=$X;owned_y=$Y;owned_width=$Width;owned_height=$Height;hit=$(if($root-eq[IntPtr]::Zero){'no-window'}else{'other-window'})}
+      $relation=if($root-eq[IntPtr]::Zero){'unresolved'}else{Get-MIROwnedMenuHitProcessRelation -Handle $root -OwnedProcessId $OwnedProcessId}
+      return [ordered]@{probe_index=$probeIndex;probe_x=$probeX;probe_y=$probeY;owned_x=$X;owned_y=$Y;owned_width=$Width;owned_height=$Height;hit=$(if($root-eq[IntPtr]::Zero){'no-window'}else{'other-window'});hit_process_relation=$relation}
     }
     $probeIndex++
   }
   return $null
+}
+
+function Get-MIROwnedMenuHitProcessRelation {
+  param([Parameter(Mandatory)][IntPtr]$Handle,[Parameter(Mandatory)][uint32]$OwnedProcessId)
+  # The native boundary exposes only success and equality, never another PID.
+  [bool]$sameProcess=$false
+  if (-not [MIROwnedMenuNative]::TrySameOwnedProcess($Handle,$OwnedProcessId,[ref]$sameProcess)) { return 'unresolved' }
+  if ($sameProcess) { return 'owned-process' }
+  return 'other-process'
 }
 
 function Set-MIROwnedMenuForegroundHandle {
@@ -169,7 +186,7 @@ function Get-MIROwnedMenuWindow {
   $screen = [Windows.Forms.SystemInformation]::VirtualScreen
   if ($point.X -lt $screen.Left -or $point.Y -lt $screen.Top -or $point.X + $width -gt $screen.Right -or $point.Y + $height -gt $screen.Bottom) { Add-MIROwnedMenuRejection -Diagnostics $Diagnostics -Name 'offscreen'; return $null }
   # Reject covered capture regions, including a foreign always-on-top window.
-  $occlusion=Get-MIROwnedMenuOcclusion -Handle $handle -X $point.X -Y $point.Y -Width $width -Height $height
+  $occlusion=Get-MIROwnedMenuOcclusion -Handle $handle -OwnedProcessId $Process.Id -X $point.X -Y $point.Y -Width $width -Height $height
   if ($null-ne$occlusion) {
     if ($null-ne$Diagnostics) { $Diagnostics.last_occlusion=$occlusion }
     Add-MIROwnedMenuRejection -Diagnostics $Diagnostics -Name 'occluded'
