@@ -4,7 +4,7 @@
 local FIXTURE = "mir-fixture-mir5-full-catalogue-upgrade"
 local PLAN = require("__mir-fixture-mir5-full-catalogue-upgrade__/catalogue")
 local TARGET = PLAN.target
-local SOURCE = mods[FIXTURE] == "0.1.0"
+local SOURCE = mods[FIXTURE] == "0.1.0" or mods[FIXTURE] == "0.2.1"
 local STAGE = SOURCE and "published-4.7" or "mir5"
 local MIR = mods["more-infinite-research"]
 local function fail(message) error("[mir5-full-catalogue-upgrade] " .. message) end
