@@ -5,6 +5,7 @@ import json
 from pathlib import Path
 from historical_sources import read_published_source
 from repository_paths import reference_path
+import subprocess
 import sys
 import unittest
 
@@ -16,12 +17,18 @@ from native_credit_oracle import (
 
 ROOT = Path(__file__).resolve().parents[1]
 FACTS_PATH = ROOT / "tests/fixtures/k2-base-f200-captured-facts.json"
+F210_FACTS_PATH = ROOT / "tests/fixtures/k2-f210-captured-facts.json"
 sys.path.insert(0, str(ROOT / "tools"))
 import compare_k2_base
 
 
 def _sha256(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest().upper()
+
+
+def _git_blob_sha256(relative: str) -> str:
+    data = subprocess.check_output(["git", "-C", str(ROOT), "show", "HEAD:" + relative], stderr=subprocess.PIPE)
+    return hashlib.sha256(data).hexdigest().upper()
 
 
 def _lua_value(lua, value):
@@ -51,6 +58,7 @@ class K2BaseCatalogueTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.facts = json.loads(FACTS_PATH.read_text(encoding="utf-8"))
+        cls.f210_facts = json.loads(F210_FACTS_PATH.read_text(encoding="utf-8"))
         profile = reference_path(cls.facts["profile"])
         if _sha256(profile) != cls.facts["profile_sha256"]:
             raise AssertionError(f"hash-locked K2 Base input changed: {profile}")
@@ -73,6 +81,19 @@ class K2BaseCatalogueTests(unittest.TestCase):
             source = cls.facts["catalogue_evidence"]
             if _sha256(reference_path(source[f"{name}_path"])) != source[f"{name}_sha256"]:
                 raise AssertionError(f"catalogue evidence changed: {source[f'{name}_path']}")
+        if cls.f210_facts["engine"] != {
+                "target": "f210", "version": "2.1.23",
+                "sha256": "FE4A1DA30F322A0D0B8AEB3DF7276332222BAAA143E2352569B723E84B2B9060"}:
+            raise AssertionError("F210 K2 facts have an unexpected engine identity")
+        for case in cls.f210_facts["cases"]:
+            profile = reference_path(case["profile"])
+            if _git_blob_sha256(case["profile"]) != case["profile_sha256"]:
+                raise AssertionError(f"hash-locked F210 K2 input changed: {profile}")
+            selected = {row["name"]: row["version"] for row in json.loads(profile.read_text(encoding="utf-8"))["mods"]
+                        if row["enabled"]}
+            for name, version in case["mods"].items():
+                if selected.get(name) != version:
+                    raise AssertionError(f"F210 K2 input differs: {case['id']}:{name}")
 
     @staticmethod
     def _recipe_products(recipe):
@@ -197,6 +218,46 @@ class K2BaseCatalogueTests(unittest.TestCase):
                 "unit": {"count": previous["count"], "time": previous["time"]},
             }
         return raw
+
+    def _f210_pipeline_raw(self, case):
+        """Portable F210 K2 input: retained general rows plus captured K2 facts."""
+        raw = self._captured_raw_subset()
+        gear = self.f210_facts["gear"]
+        raw["recipe"][gear["recipe"]] = {
+            "ingredients": gear["ingredients"],
+            "results": gear["results"],
+        }
+        raw["item"]["iron-gear-wheel"] = {"icon": gear["item_icon"]}
+        science = self.f210_facts["science_and_lab_facts"][case["id"]]
+        for name, value in science["technologies"].items():
+            raw["technology"][name] = value
+        raw["lab"]["kr-advanced-lab"] = {"inputs": science["advanced_lab_inputs"]}
+        return raw
+
+    def _run_f210_pipeline(self, case, active_mods=None):
+        profile = json.loads(reference_path(case["profile"]).read_text(encoding="utf-8"))
+        mods = active_mods or {row["name"]: row["version"] for row in profile["mods"] if row["enabled"]}
+        self.lua.globals().captured_raw = _lua_value(self.lua, self._f210_pipeline_raw(case))
+        self.lua.globals().captured_mods = _lua_value(self.lua, mods)
+        self.lua.execute(r'''
+          f210()
+          mods = captured_mods
+          settings = {startup = {}}
+          helpers = {}
+          log = function() end
+          emitted = {}
+          data = {raw = captured_raw}
+          function data:extend(rows)
+            for _, row in ipairs(rows) do
+              assert(type(self.raw[row.type]) == "table", "unknown output type " .. tostring(row.type))
+              assert(self.raw[row.type][row.name] == nil, "duplicate data:extend output " .. row.name)
+              self.raw[row.type][row.name] = row
+              emitted[#emitted + 1] = row.name
+            end
+          end
+          assert(loadfile(player_root .. "/data-final-fixes.lua"))()
+        ''')
+        return _plain(self.lua.globals().data.raw), mods
 
     def setUp(self):
         self.lua = LuaRuntime(unpack_returned_tuples=True)
@@ -544,23 +605,158 @@ class K2BaseCatalogueTests(unittest.TestCase):
           local missing_assets = {Krastorio2="2.0.19"}
           assert(not catalogue.is_k2_base(missing_assets))
 
-          f210()
-          assert(not catalogue.is_k2_base(base))
-          local ok, message = pcall(gears.select, base, raw)
-          assert(not ok and tostring(message):find("unsupported partial K2SO selection", 1, true))
-          mods = base
-          package.loaded["research.catalogue"] = nil
-          assert(#require("research.catalogue").declared() == 1, "F210 K2 Base must not admit modern rows")
-
           f200()
           local standalone = {["Krastorio2-spaced-out"]="2.0.19", Krastorio2Assets="2.0.5", ["k2so-assets"]="1.0.0"}
           assert(not catalogue.is_k2_base(standalone) and not catalogue.is_k2so(standalone))
-          ok, message = pcall(gears.select, standalone, raw)
+          local ok, message = pcall(gears.select, standalone, raw)
           assert(not ok and tostring(message):find("unsupported partial K2SO selection", 1, true))
           mods = standalone
           package.loaded["research.catalogue"] = nil
           assert(#require("research.catalogue").declared() == 1, "standalone F200 K2SO must remain unadmitted")
         ''')
+
+    def test_f210_k2_and_k2se_bind_the_exact_captured_core_without_k2so(self):
+        self.lua.globals().f210_facts = _lua_value(self.lua, self.f210_facts)
+        self.lua.execute(r'''
+          f210()
+          local catalogue = require("compatibility.modern_catalogue")
+          local gears = require("compatibility.gear_bindings")
+          local expected = f210_facts.gear
+          local raw = {recipe = {["iron-gear-wheel"] = {
+            ingredients = expected.ingredients, results = expected.results,
+          }}, item = {["iron-gear-wheel"] = {icon = expected.item_icon}}}
+          for _, case in ipairs(f210_facts.cases) do
+            local active = case.mods
+            assert(catalogue.is_k2_base(active) and not catalogue.is_k2so(active),
+              "captured K2 selector was not admitted: " .. case.id)
+            local binding = gears.select(active, raw)
+            assert(binding.profile == expected.binding_profile and binding.icon == expected.item_icon
+              and #binding.recipes == 1 and binding.recipes[1] == expected.recipe,
+              "captured K2 gear binding differs: " .. case.id)
+            local selection = catalogue.select(active)
+            assert(selection.profile == expected.binding_profile and #selection.definitions > 0
+              and #selection.continuations > 0 and selection.k2_imersite == false,
+              "captured K2 catalogue selection differs: " .. case.id)
+            for _, continuation in ipairs(selection.continuations) do
+              if continuation.key == "laser_shooting_speed" or continuation.key == "weapon_shooting_speed" then
+                for _, effect in ipairs(continuation.effects or {}) do
+                  assert(effect.ammo_category ~= "kr-impulse-rifle" and effect.ammo_category ~= "kr-pistol"
+                    and effect.ammo_category ~= "kr-anti-materiel-rifle-ammo"
+                    and effect.ammo_category ~= "kr-railgun-shell" and effect.ammo_category ~= "kr-turret-missile"
+                    and effect.ammo_category ~= "kr-heavy-rocket",
+                    "F210 K2 selected retained F200 continuation overrides: " .. case.id)
+                end
+              end
+            end
+            local science_continuity = false
+            for _, definition in ipairs(selection.definitions) do
+              if definition.key == "research_science_pack_productivity" then science_continuity = true end
+            end
+            assert(science_continuity, "F210 Base science continuity was not retained: " .. case.id)
+            mods = active
+            package.loaded["research.catalogue"] = nil
+            local declared, found = require("research.catalogue").declared(), false
+            for _, row in ipairs(declared) do
+              if row.id == "recipe-prod-research_gears-1" then found = true end
+            end
+            assert(found, "K2 runtime catalogue omitted the enabled gear row: " .. case.id)
+          end
+
+          local base = f210_facts.cases[1].mods
+          local altered = {}
+          for key, value in pairs(base) do altered[key] = value end
+          altered.base = "2.1.24"
+          altered.flib = "0.17.3"
+          altered.Krastorio2MenuSimulations = "2.1.1"
+          assert(catalogue.is_k2_base(altered),
+            "unconsumed Base/flib/menu-simulation version drift rejected the same K2 source")
+          local shifted = gears.select(altered, raw)
+          assert(shifted.profile == expected.binding_profile and shifted.icon == expected.item_icon,
+            "unconsumed version drift changed the K2 gear binding")
+          altered = {}
+          for key, value in pairs(base) do altered[key] = value end
+          altered.Krastorio2MenuSimulations = nil
+          assert(catalogue.is_k2_base(altered), "unconsumed K2 menu dependency changed selector admission")
+          altered.Krastorio2Assets = nil
+          assert(not catalogue.is_k2_base(altered), "missing consumed K2 asset source admitted")
+          altered = {}
+          for key, value in pairs(base) do altered[key] = value end
+          altered["space-age"] = "2.1.23"
+          assert(not catalogue.is_k2_base(altered), "Space Age K2 base tuple admitted")
+          altered = {}
+          for key, value in pairs(base) do altered[key] = value end
+          altered["Krastorio2-spaced-out"] = "2.0.19"
+          local ok, message = pcall(gears.select, altered, raw)
+          assert(not ok and tostring(message):find("unsupported partial K2SO selection", 1, true),
+            "partial K2SO tuple selected an F210 fallback")
+          ok, message = pcall(gears.select, f210_facts.cases[1].mods, {recipe = {}})
+          assert(not ok and tostring(message):find("missing required recipe iron%-gear%-wheel"),
+            "K2 binding accepted an absent captured gear recipe")
+
+          local changed_recipe = {recipe = { ["iron-gear-wheel"] = {
+            ingredients = {{type = "item", name = "iron-plate", amount = 1}},
+            results = {{type = "item", name = "not-an-iron-gear", amount = 1}},
+          }}, item = { ["iron-gear-wheel"] = {icon = expected.item_icon} }}
+          ok, message = pcall(gears.select, f210_facts.cases[1].mods, changed_recipe)
+          assert(not ok and tostring(message):find("F210 K2 gear binding recipe has no iron-gear-wheel product", 1, true),
+            "K2 binding accepted a changed native gear recipe source")
+          local changed_icon = {recipe = { ["iron-gear-wheel"] = {
+            ingredients = {{type = "item", name = "tin-plate", amount = 3}},
+            results = {{type = "item", name = "iron-gear-wheel", amount = 2},
+              {type = "item", name = "stone", amount = 1}},
+          }}, item = { ["iron-gear-wheel"] = {icon = "__base__/graphics/icons/iron-gear-wheel.png"} }}
+          ok, message = pcall(gears.select, f210_facts.cases[1].mods, changed_icon)
+          assert(ok and message.profile == expected.binding_profile and message.icon == expected.item_icon,
+            "unconsumed recipe inputs/yield/byproducts or an item reskin rejected the gear binding")
+        ''')
+
+        original = dict(self.f210_facts["cases"][0]["mods"])
+        shifted = dict(original, base="2.1.24", flib="0.17.3", Krastorio2MenuSimulations="2.1.1")
+        expected_output, _ = self._run_f210_pipeline(self.f210_facts["cases"][0], original)
+        shifted_output, _ = self._run_f210_pipeline(self.f210_facts["cases"][0], shifted)
+        self.assertEqual(expected_output["technology"]["recipe-prod-research_gears-1"],
+                         shifted_output["technology"]["recipe-prod-research_gears-1"])
+
+    def test_f210_captured_raw_rows_match_the_portable_facts_when_custody_is_present(self):
+        checked = 0
+        gear = self.f210_facts["gear"]
+        for case in self.f210_facts["cases"]:
+            raw_path = ROOT / case["raw"]["path"]
+            if not raw_path.is_file():
+                continue
+            checked += 1
+            raw = json.loads(raw_path.read_text(encoding="utf-8"))
+            with self.subTest(case=case["id"]):
+                self.assertEqual(case["raw"]["sha256"], _sha256(raw_path))
+                self.assertEqual(gear["ingredients"], raw["recipe"][gear["recipe"]]["ingredients"])
+                self.assertEqual(gear["results"], raw["recipe"][gear["recipe"]]["results"])
+                self.assertEqual(gear["item_icon"], raw["item"]["iron-gear-wheel"]["icon"])
+                facts = self.f210_facts["science_and_lab_facts"][case["id"]]
+                for name, expected in facts["technologies"].items():
+                    actual = raw["technology"][name]
+                    self.assertEqual(expected["prerequisites"], actual["prerequisites"])
+                    self.assertEqual(expected["unit"], actual["unit"])
+                self.assertEqual(facts["advanced_lab_inputs"], raw["lab"]["kr-advanced-lab"]["inputs"])
+        if checked == 0:
+            self.skipTest("retained F210 K2 raw custody is not materialized in this worktree")
+
+    def test_f210_k2_pipeline_keeps_actual_science_and_lab_prerequisites_enabled(self):
+        gear = self.f210_facts["gear"]
+        owner_science = self.f210_facts["owner_science"]
+        for case in self.f210_facts["cases"]:
+            actual, _ = self._run_f210_pipeline(case)
+            facts = self.f210_facts["science_and_lab_facts"][case["id"]]
+            with self.subTest(case=case["id"]):
+                self.assertEqual(gear["ingredients"], actual["recipe"][gear["recipe"]]["ingredients"])
+                self.assertEqual(gear["results"], actual["recipe"][gear["recipe"]]["results"])
+                for name, expected in facts["technologies"].items():
+                    self.assertEqual(expected, actual["technology"][name])
+                lab_inputs = set(actual["lab"]["kr-advanced-lab"]["inputs"])
+                self.assertTrue(set(owner_science).issubset(lab_inputs))
+                generated = actual["technology"]["recipe-prod-research_gears-1"]
+                self.assertNotEqual(False, generated.get("enabled"))
+                self.assertEqual(owner_science, [row[0] for row in generated["unit"]["ingredients"]])
+                self.assertEqual(owner_science, generated["prerequisites"])
 
 
 if __name__ == "__main__":

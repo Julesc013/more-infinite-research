@@ -388,14 +388,23 @@ local function active_space_age(active_mods)
   return type(active_mods) == "table" and active_mods["space-age"] ~= nil
 end
 
--- K2 Base is a separate F200-only admission.  It uses the ordinary authored
--- catalogue and must never be inferred from the K2SO tuple.
+-- K2 Base has a retained F200 admission and two independently captured F210
+-- inputs: ordinary K2 Base and K2 plus Space Exploration. Both F210 inputs
+-- share the named K2 and K2 Assets sources; neither is a K2SO tuple or a
+-- Space Age profile. Version strings are not consumed by this selector: the
+-- named recipe and icon source are preflighted at data stage instead.
 function M.is_k2_base(active_mods)
-  return target.id == "f200" and type(active_mods) == "table"
-    and active_mods.Krastorio2 ~= nil and active_mods.Krastorio2Assets ~= nil
-    and active_mods["Krastorio2-spaced-out"] == nil
-    and active_mods["k2so-assets"] == nil
-    and not active_space_age(active_mods)
+  if type(active_mods) ~= "table" or active_space_age(active_mods)
+      or active_mods["Krastorio2-spaced-out"] ~= nil or active_mods["k2so-assets"] ~= nil then
+    return false
+  end
+  if target.id == "f200" then
+    return active_mods.Krastorio2 ~= nil and active_mods.Krastorio2Assets ~= nil
+  end
+  if target.id == "f210" then
+    return active_mods.Krastorio2 ~= nil and active_mods.Krastorio2Assets ~= nil
+  end
+  return false
 end
 
 -- K2SO is an exact delivered tuple, not a broad Krastorio assumption. Keep
@@ -592,7 +601,8 @@ function M.select(active_mods)
   local required_product_targets, additional_product_bindings, exact_product_target_families = nil, nil, {}
   local exact_product_bindings = nil
   local replacement_product_target_families, excluded_product_target_recipes = {}, {}
-  if M.is_k2_base(active_mods) then profile = "k2-base-f200" end
+  local k2_base = M.is_k2_base(active_mods)
+  if k2_base then profile = target.id == "f200" and "k2-base-f200" or "k2-base-f210" end
   if (target.id == "f200" or target.id == "f210") and not active_space_age(active_mods) then
     -- This published F200 Base identity is also the required F210 Base
     -- continuity correction. Keep the single lazy authored tuple so its
@@ -616,7 +626,7 @@ function M.select(active_mods)
     for index = 1, #delta.recipe_patches do recipe_patches[index] = delta.recipe_patches[index] end
     profile = "space-age"
   end
-  if M.is_k2_base(active_mods) then
+  if k2_base and target.id == "f200" then
     apply_k2_base(definitions)
   end
   if M.is_k2so(active_mods) then
@@ -707,7 +717,10 @@ function M.continuations(active_mods)
       overrides[key] = value
     end
   end
-  if M.is_k2_base(active_mods) then
+  -- k2_base.lua contains retained F200 presentation and ammunition-category
+  -- substitutions. The F210 K2 admissions use the ordinary authored
+  -- continuation rows; do not transport the historical F200 overrides.
+  if M.is_k2_base(active_mods) and target.id == "f200" then
     for key, value in pairs(require("compatibility.modern_catalogue.k2_base").continuation_overrides or {}) do
       overrides[key] = value
     end
