@@ -63,6 +63,7 @@ class HostControlsTests(unittest.TestCase):
             "tests/test_atan_gameplay_fixture.py",
             "tests/test_full_catalogue_upgrade_fixture.py",
             "tests/test_full_catalogue_upgrade_f210_fixture.py",
+            "tests/test_f200_f210_catalogue_upgrade_fixture.py",
             "tests/test_fixed_provider_removal_control_fixture.py",
             "tests/test_automatic_families.py",
             "tests/test_competing_productivity.py",
