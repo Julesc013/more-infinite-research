@@ -1,0 +1,83 @@
+{
+  "schema": 1,
+  "kind": "mir5-independent-mod-f210-native-reference-selection",
+  "target": "f210",
+  "factorio_line": "2.1",
+  "engine": {
+    "version": "2.1.23",
+    "sha256": "FE4A1DA30F322A0D0B8AEB3DF7276332222BAAA143E2352569B723E84B2B9060"
+  },
+  "settings_mode": "Defaults",
+  "mods": [
+    {
+      "name": "base",
+      "version": "2.1.23",
+      "enabled": true
+    },
+    {
+      "name": "elevated-rails",
+      "version": "2.1.23",
+      "enabled": true
+    },
+    {
+      "name": "quality",
+      "version": "2.1.23",
+      "enabled": true
+    },
+    {
+      "name": "recycler",
+      "version": "2.1.23",
+      "enabled": true
+    },
+    {
+      "name": "space-age",
+      "version": "2.1.23",
+      "enabled": true
+    },
+    {
+      "name": "bzcarbon",
+      "version": "2.0.23",
+      "enabled": true
+    },
+    {
+      "name": "bzlead",
+      "version": "2.0.29",
+      "enabled": true
+    },
+    {
+      "name": "bzsilicon",
+      "version": "2.0.19",
+      "enabled": true
+    },
+    {
+      "name": "bztin",
+      "version": "2.1.16",
+      "enabled": true
+    },
+    {
+      "name": "bztitanium",
+      "version": "2.0.27",
+      "enabled": true
+    },
+    {
+      "name": "bzzirconium",
+      "version": "2.1.14",
+      "enabled": true
+    },
+    {
+      "name": "mir-fixture-mir5-active-mods-observer",
+      "version": "0.1.0",
+      "enabled": true
+    }
+  ],
+  "archive_sha256": {
+    "bzcarbon_2.0.23.zip": "97FD7DEFC9B7A3CD7ED4BE5E9180CA69576536E17A207FE62B8FE39C886AA19F",
+    "bzlead_2.0.29.zip": "956DF1AC308AF33C4FDE8F9B2B94AE9D79AA7B350FA76E15D98709C904ED77FB",
+    "bzsilicon_2.0.19.zip": "D405B90C531C478F6F48D954751AA487A61CAF59DC09FDDF87BFD371FFE4DE40",
+    "bztin_2.1.16.zip": "EAC78322C9EDAD0E618245F0602B7CA7479E91690FCAC4B3BC2B3D2C4ADFE4DE",
+    "bztitanium_2.0.27.zip": "074D430BC67A3A19DFD2D6DF47CA44952F4DB5AE2DED208F9F555607FFE4C94B",
+    "bzzirconium_2.1.14.zip": "CC2B262CD4C042198317BF8BD2982D10BFFB9A736DB3A8B7137ED1922138080E",
+    "mir-fixture-mir5-active-mods-observer_0.1.0.zip": "2E1BE5952D2A4CC5C74A0D149E075D247BA110A3FAE5B6768D3EAEBABCEF989C"
+  },
+  "scope": "Exact bz-available-six space-age input for separate upstream/published4.7.3/current data/settings captures. Available-six BZ is not a full BZ suite. SE explicitly excludes Space Age; its recommended menu-simulations provider is omitted and no menu claim follows. These inputs establish no native, gameplay, physical, migration, client or support verdict."
+}
