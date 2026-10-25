@@ -1,7 +1,7 @@
--- Disposable F200 native queue-bound passive-repair fixture.  It observes
--- physical walls only; it never reads or writes MIR's saved runtime state.
+-- Disposable native queue-bound passive-repair fixture for the explicitly
+-- selected F200 or F210 profile.  It observes physical walls only; it never
+-- reads or writes MIR's saved runtime state.
 local KEY = "mir5_repair_stress"
-local CASE = "repair-stress"
 local SAVE = "mir5-native-complete"
 local FIXTURE = "mir-fixture-mir5-repair-stress"
 local FRIENDLY = "mir5-repair-stress-friendly"
@@ -14,9 +14,8 @@ local BUDGET = 8
 local QUIET_TICKS = 600
 local SERVICE_TICKS = 60
 local REPAIR_AMOUNT = 1
--- F200 stone-wall declares no electric resistance.  A native one-point
--- electric hit therefore supplies a one-service repair witness without
--- relying on physical resistance ordering.
+-- The native hit itself is the witness: each selected target must report an
+-- exact one-point electric health reduction before repair observation starts.
 local DAMAGE_AMOUNT = 1
 local DAMAGE_TYPE = "electric"
 local REACTIVATE_COUNT = 8
@@ -31,13 +30,19 @@ local function valid(value) return value ~= nil and value.valid ~= false end
 
 local function mode()
   local active = script.active_mods
-  if active.base ~= "2.0.77" or active["space-age"] ~= nil then
-    fail("fixture requires base-only Factorio 2.0.77")
+  local f200 = active.base == "2.0.77" and active["space-age"] == nil
+  local f210 = active.base == "2.1.23" and active["elevated-rails"] == "2.1.23"
+    and active.quality == "2.1.23" and active.recycler == "2.1.23"
+    and active["space-age"] == "2.1.23"
+  if not f200 and not f210 then
+    fail("fixture requires exact F200 Base 2.0.77 or F210 2.1.23 official closure")
   end
   local mir, fixture = active["more-infinite-research"], active[FIXTURE]
-  if mir == "4.7.20002" and fixture == "0.1.0" then return "published-4.7.20002" end
-  if mir == "5.0.20000" and fixture == "0.2.0" then return "mir5-5.0.20000" end
-  fail("fixture requires published 4.7.20002/0.1.0 or MIR5 5.0.20000/0.2.0")
+  if f200 and mir == "4.7.20002" and fixture == "0.1.0" then return "published-4.7.20002", "repair-stress" end
+  if f200 and mir == "5.0.20000" and fixture == "0.2.0" then return "mir5-5.0.20000", "repair-stress" end
+  if f210 and mir == "4.7.21002" and fixture == "0.1.0" then return "f210-published-4.7.21002", "repair-stress-f210" end
+  if f210 and mir == "5.0.21000" and fixture == "0.2.0" then return "f210-mir5-5.0.21000", "repair-stress-f210" end
+  fail("fixture requires target-matched published or MIR5 identity")
 end
 
 local function health(entity, label)
@@ -157,7 +162,7 @@ end
 
 local function marker(stage, state)
   log("[MIR5_NATIVE_FIXTURE] RESULT " .. helpers.table_to_json({
-    stage = stage, case = CASE, status = "passed",
+    stage = stage, case = state.case, status = "passed",
     qualification = "native-runner-readback-required",
     witnesses = {
       mode = state.mode,
@@ -183,7 +188,9 @@ local function marker(stage, state)
       on_load_read_only = stage == "reload",
       performance_qualified = false,
       runtime_elapsed_qualified = false,
-      scope = "disposable-f200-passive-repair-queue-bound-only"
+      scope = state.case == "repair-stress-f210"
+        and "disposable-f210-passive-repair-queue-bound-only"
+        or "disposable-f200-passive-repair-queue-bound-only"
     }
   }))
 end
@@ -213,7 +220,7 @@ local function redamage_drained_queue(state)
 end
 
 script.on_init(function()
-  local selected = mode()
+  local selected, selected_case = mode()
   if settings.startup["mir-enable-passive-repair"] == nil
       or settings.startup["mir-enable-passive-repair"].value ~= true then
     fail("passive-repair runtime setting is not enabled")
@@ -260,7 +267,7 @@ script.on_init(function()
   local nonwall_health, nonwall_maximum = damage_sentinel(nonwall_entity, "non-wall sentinel")
 
   storage[KEY] = {
-    phase = "await-initial", mode = selected, eligible = eligible, foreign_walls = foreign_walls,
+    phase = "await-initial", mode = selected, case = selected_case, eligible = eligible, foreign_walls = foreign_walls,
     nonwall = {entity = nonwall_entity, damaged_health = nonwall_health, maximum = nonwall_maximum},
     player_primary = player_primary, friendly_primary = friendly_primary, damage_tick = game.tick,
     initial_record = {changed = 0, services = 0, maximum_batch = 0},
@@ -274,7 +281,7 @@ script.on_load(function()
     -- This callback reads fixture-owned scalar facts only.  Native entities
     -- and durable storage are checked on the first game-available tick.
     loaded_snapshot = {
-      mode = state.mode, initial_changed = state.initial_record and state.initial_record.changed,
+      mode = state.mode, case = state.case, initial_changed = state.initial_record and state.initial_record.changed,
       reactivation_changed = state.reactivation_record and state.reactivation_record.changed,
       initial_service = state.initial_record and state.initial_record.first_service_tick,
       reactivation_service = state.reactivation_record and state.reactivation_record.first_service_tick
@@ -313,7 +320,7 @@ script.on_event(defines.events.on_tick, function()
 
   if state.phase == "completed" then
     if loaded_snapshot and not reload_logged then
-      if loaded_snapshot.mode ~= state.mode or loaded_snapshot.initial_changed ~= state.initial_record.changed
+      if loaded_snapshot.mode ~= state.mode or loaded_snapshot.case ~= state.case or loaded_snapshot.initial_changed ~= state.initial_record.changed
           or loaded_snapshot.reactivation_changed ~= state.reactivation_record.changed
           or loaded_snapshot.initial_service ~= state.initial_record.first_service_tick
           or loaded_snapshot.reactivation_service ~= state.reactivation_record.first_service_tick then
