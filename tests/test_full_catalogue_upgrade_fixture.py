@@ -9,6 +9,7 @@ ROOT = Path(__file__).resolve().parents[1]
 FIXTURE = ROOT / "tests/fixtures/full-catalogue-upgrade"
 PROFILES = ROOT / "tests/profiles"
 ORACLE = ROOT / "spec/inventory/modern-f200-470.json"
+SHARED = FIXTURE / "shared"
 F200_RUNTIME_API_CANDIDATES = (
     os.environ.get("MIR_F200_RUNTIME_API"),
     "D:/Games/Factorio/2.0/doc-html/runtime-api.json",
@@ -78,23 +79,40 @@ class FullCatalogueUpgradeFixtureTests(unittest.TestCase):
         self.assertEqual({"recipe-prod-research_agricultural_growth_speed-1", "recipe-prod-research_spoilage_preservation-1"}, set(self.plan["space_age"]["scripted"]))
 
     def test_stage_data_guard_accelerates_exact_gear_only(self):
-        self.lua.execute("function run_data(path, raw, mods) data={raw=raw}; _G.mods=mods; local ok, message=pcall(function() assert(loadfile(path))() end); return {ok=ok,message=tostring(message),raw=raw} end")
+        self.lua.execute("""
+          function run_data(path, common, catalogue, raw, mods)
+            local env = {data={raw=raw}, mods=mods}
+            env.require = function(name)
+              if name == "__mir-fixture-mir5-full-catalogue-upgrade__/fixture_data_final" then
+                return assert(loadfile(common, "t", env))()
+              end
+              if name == "__mir-fixture-mir5-full-catalogue-upgrade__/catalogue" then
+                return assert(loadfile(catalogue, "t", env))()
+              end
+              error("unexpected fixture module: " .. tostring(name))
+            end
+            setmetatable(env, {__index=_G})
+            local ok, message = pcall(function() assert(loadfile(path, "t", env))() end)
+            return {ok=ok, message=tostring(message), raw=raw}
+          end
+        """)
         for stage, mir in (("published-4.7", "4.7.20002"), ("mir5", "5.0.20000")):
             for space in (False, True):
                 effects = [{"type":"change-recipe-productivity", "recipe":"iron-gear-wheel", "change":.1}]
                 if space: effects.insert(0, {"type":"change-recipe-productivity", "recipe":"casting-iron-gear-wheel", "change":.1})
                 gear = {"max_level":"infinite", "unit":{"count_formula":"8000*2^(L-1)", "time":60}, "effects":effects}
                 raw = {"technology":{"recipe-prod-research_gears-1":gear}, "unchanged":{"value":17}}
-                mods = {"base":"2.0.77", "more-infinite-research":mir}
+                mods = {"base":"2.0.77", "more-infinite-research":mir,
+                        "mir-fixture-mir5-full-catalogue-upgrade":"0.1.0" if stage == "published-4.7" else "0.2.0"}
                 if space: mods.update({"space-age":"2.0.77", "elevated-rails":"2.0.77", "quality":"2.0.77"})
                 with self.subTest(stage=stage, space=space):
-                    result = self.lua.eval("run_data")((FIXTURE / stage / "data-final-fixes.lua").as_posix(), lua(self.lua, raw), lua(self.lua, mods))
+                    result = self.lua.eval("run_data")((FIXTURE / stage / "data-final-fixes.lua").as_posix(), (SHARED / "data-final-fixes.lua").as_posix(), (FIXTURE / stage / "catalogue.lua").as_posix(), lua(self.lua, raw), lua(self.lua, mods))
                     self.assertTrue(result["ok"], result["message"])
                     actual = py(result["raw"])["technology"]["recipe-prod-research_gears-1"]["unit"]
                     self.assertEqual((None, "1", 1), (actual.get("count"), actual["count_formula"], actual["time"]))
                     self.assertEqual(17, py(result["raw"])["unchanged"]["value"])
         gear = {"max_level":"infinite", "unit":{"count_formula":"8000*2^(L-1)", "time":61}, "effects":[{"type":"change-recipe-productivity", "recipe":"iron-gear-wheel", "change":.1}]}
-        result = self.lua.eval("run_data")((FIXTURE / "mir5/data-final-fixes.lua").as_posix(), lua(self.lua, {"technology":{"recipe-prod-research_gears-1":gear}}), lua(self.lua, {"base":"2.0.77", "more-infinite-research":"5.0.20000"}))
+        result = self.lua.eval("run_data")((FIXTURE / "mir5/data-final-fixes.lua").as_posix(), (SHARED / "data-final-fixes.lua").as_posix(), (FIXTURE / "mir5/catalogue.lua").as_posix(), lua(self.lua, {"technology":{"recipe-prod-research_gears-1":gear}}), lua(self.lua, {"base":"2.0.77", "more-infinite-research":"5.0.20000", "mir-fixture-mir5-full-catalogue-upgrade":"0.2.0"}))
         self.assertFalse(result["ok"]); self.assertIn("workload differs", str(result["message"])); self.assertEqual(61, gear["unit"]["time"])
 
     def test_controls_register_without_game_or_storage_reads(self):
@@ -102,19 +120,26 @@ class FullCatalogueUpgradeFixtureTests(unittest.TestCase):
             with self.subTest(stage=stage):
                 self.lua.globals().control_path = (FIXTURE / stage / "control.lua").as_posix()
                 self.lua.globals().catalogue_path = (FIXTURE / stage / "catalogue.lua").as_posix()
+                self.lua.globals().common_control_path = (SHARED / "control.lua").as_posix()
+                self.lua.globals().source_stage = stage == "published-4.7"
                 self.lua.execute("""
                   function parse_full_catalogue_control()
                     local callbacks, forbidden = {events={}}, {}
                     local env = {
-                      require=function(name)
-                        assert(name == "__mir-fixture-mir5-full-catalogue-upgrade__/catalogue")
-                        return assert(loadfile(catalogue_path, "t", _G))()
-                      end,
                       script={on_init=function(fn) callbacks.init=fn end, on_load=function(fn) callbacks.load=fn end,
                         on_configuration_changed=function(fn) callbacks.configuration=fn end,
-                        on_event=function(event, fn) callbacks.events[event]=fn end},
+                        on_event=function(event, fn) callbacks.events[event]=fn end,
+                        active_mods={base="2.0.77", ["more-infinite-research"]=source_stage and "4.7.20002" or "5.0.20000",
+                          ["mir-fixture-mir5-full-catalogue-upgrade"]=source_stage and "0.1.0" or "0.2.0"}},
                       defines={events={on_research_finished=1,on_tick=2},inventory={lab_input=1}},
                     }
+                    env.require=function(name)
+                        if name == "__mir-fixture-mir5-full-catalogue-upgrade__/fixture_control" then
+                          return assert(loadfile(common_control_path, "t", env))()
+                        end
+                        assert(name == "__mir-fixture-mir5-full-catalogue-upgrade__/catalogue")
+                        return assert(loadfile(catalogue_path, "t", env))()
+                      end
                     env._G=env
                     setmetatable(env,{__index=function(_,key)
                       if key == "game" or key == "storage" then forbidden[key]=true; return nil end
@@ -165,8 +190,8 @@ class FullCatalogueUpgradeFixtureTests(unittest.TestCase):
             self.assertNotIn("__more-infinite-research__", text)
             self.assertNotIn('require("research.', text)
             self.assertNotIn('require("compatibility.', text)
-        source = (FIXTURE / "published-4.7/control.lua").read_text(encoding="utf-8")
-        successor = (FIXTURE / "mir5/control.lua").read_text(encoding="utf-8")
+        source = (SHARED / "control.lua").read_text(encoding="utf-8")
+        successor = source
         for text in (source, successor):
             self.assertIn('local SAVE = "mir5-native-complete"', text)
             self.assertIn("script.on_load(function()", text)

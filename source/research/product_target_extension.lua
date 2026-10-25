@@ -38,7 +38,8 @@ local function emit_diagnostics(write, report)
     .. " products=" .. tostring(work.products)
     .. " ingredients=" .. tostring(work.ingredients)
     .. " matches=" .. tostring(work.matches)
-    .. " modules=" .. tostring(work.modules or 0))
+    .. " modules=" .. tostring(work.modules or 0)
+    .. " labs=" .. tostring(work.labs or 0) .. " lab-inputs=" .. tostring(work.lab_inputs or 0))
   for _, match in ipairs(report.matches or {}) do
     write("[more-infinite-research] recipe-target match family=" .. match.family
       .. " recipe=" .. match.recipe
@@ -139,6 +140,32 @@ local function verify_required_targets(result, required)
   end
 end
 
+-- Preserve the authored science family's dynamic lab-input targets. This
+-- collects only typed products; the existing recipe pass still selects every
+-- producer and applies its ordinary yield, denial and recycling safeguards.
+local function lab_science_binding(raw)
+  local names, seen, lab_count, input_count = {}, {}, 0, 0
+  local collector = require("compatibility.product_targets")
+  for _, lab in pairs(raw and raw.lab or {}) do
+    lab_count = lab_count + 1
+    if type(lab) == "table" and type(lab.inputs) == "table" then
+      for _, name in ipairs(lab.inputs) do
+        input_count = input_count + 1
+        if type(name) == "string" and name ~= "" and not seen[name] then
+          seen[name] = true
+          if collector.item_exists(raw, name) then names[#names + 1] = name end
+        end
+      end
+    end
+  end
+  if #names == 0 then return nil, lab_count, input_count end
+  table.sort(names)
+  local products = {}
+  for index, name in ipairs(names) do products[index] = {type="item", name=name} end
+  return {family="research_science_pack_productivity", weight=1,
+    reject_explicit_productivity_denial=true, products=products}, lab_count, input_count
+end
+
 function M.extend(technologies, values, context)
   context = context or {}
   local exact_families = selected_family_set(context.exact_product_target_families, "exact product target families")
@@ -168,7 +195,7 @@ function M.extend(technologies, values, context)
   local automatic = false
   local report = {extended_effects=0, families=0, rules=0, selected_families=count,
     structural_fallbacks=automatic, action=action,
-    work={recipes=0, products=0, ingredients=0, matches=0, modules=0}}
+    work={recipes=0, products=0, ingredients=0, matches=0, modules=0, labs=0, lab_inputs=0}}
   emit_preview_disposition(values, context)
   if count == 0 then
     emit_diagnostics(write, report)
@@ -192,6 +219,12 @@ function M.extend(technologies, values, context)
   end
   admit(bindings.base.bindings)
   if context.mods and context.mods["space-age"] then admit(bindings.space_age.bindings) end
+  local lab_count, input_count = 0, 0
+  if selected.research_science_pack_productivity and not exact_families.research_science_pack_productivity then
+    local rule
+    rule, lab_count, input_count = lab_science_binding(context.raw)
+    if rule then admit({rule}) end
+  end
   if context.additional_product_bindings ~= nil then
     if type(context.additional_product_bindings) ~= "table" then
       error("MIR selected product bindings are malformed", 2)
@@ -215,6 +248,7 @@ function M.extend(technologies, values, context)
     admit(module_rules)
   end
   report.rules = #rules
+  report.work.labs, report.work.lab_inputs = lab_count, input_count
   if #rules == 0 then
     emit_diagnostics(write, report)
     return report
@@ -225,6 +259,7 @@ function M.extend(technologies, values, context)
   verify_required_targets(result, required_targets)
   report.work = result.work
   report.work.modules = module_count
+  report.work.labs, report.work.lab_inputs = lab_count, input_count
   local dispositions = write and {} or nil
   for family, rows in pairs(result.by_family) do
     local technology = selected[family]
