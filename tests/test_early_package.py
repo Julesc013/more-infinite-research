@@ -28,24 +28,6 @@ class EarlyPackageTests(unittest.TestCase):
             repository = Path(temporary)
             source = repository / "source"
             shutil.copytree(ROOT / "source", source)
-            adapter = source / "adapters/early/data.lua"
-            if not adapter.exists():
-                adapter.parent.mkdir(parents=True, exist_ok=True)
-                (adapter.parent / "definitions.lua").write_text("return {}\n", encoding="utf-8")
-                generator = source / "research/generator.lua"
-                generator.parent.mkdir(parents=True, exist_ok=True)
-                generator.write_text("return {}\n", encoding="utf-8")
-                adapter.write_text(
-                    "local definitions = require(\"adapters.early.definitions\")\n"
-                    "local generator = require(\"research.generator\")\n"
-                    "local M = {}\n"
-                    "function M.apply(target)\n"
-                    "  assert(target.id and target.reduced == true and target.research_levels == false and target.recipe_productivity == false)\n"
-                    "  data:extend({})\n"
-                    "end\n"
-                    "return M\n",
-                    encoding="utf-8",
-                )
             record = repository / EARLY_RECORD
             record.parent.mkdir(parents=True)
             shutil.copyfile(ROOT / EARLY_RECORD, record)
@@ -90,6 +72,7 @@ class EarlyPackageTests(unittest.TestCase):
                         target_lua = archive.read(root + "/platform/target.lua")
                         entrypoint = archive.read(root + "/data.lua")
                         changelog = archive.read(root + "/changelog.txt")
+                        locale = archive.read(root + "/locale/en/more-infinite-research.cfg")
                     self.assertEqual(names, [
                         root + "/LICENSE",
                         root + "/adapters/early/data.lua",
@@ -97,6 +80,7 @@ class EarlyPackageTests(unittest.TestCase):
                         root + "/changelog.txt",
                         root + "/data.lua",
                         root + "/info.json",
+                        root + "/locale/en/more-infinite-research.cfg",
                         root + "/platform/target.lua",
                         root + "/research/generator.lua",
                         root + "/thumbnail.png",
@@ -104,6 +88,9 @@ class EarlyPackageTests(unittest.TestCase):
                     self.assertEqual(info, {
                         "name": "more-infinite-research",
                         "version": "5.0." + target[1:] + "00",
+                        "title": "More Infinite Research",
+                        "author": "Julesc013",
+                        "description": pack.EARLY_DESCRIPTION,
                         "factorio_version": selected["factorio_version"],
                         "dependencies": ["base >= " + selected["minimum_base"]],
                     })
@@ -123,9 +110,17 @@ class EarlyPackageTests(unittest.TestCase):
                     self.assertNotIn(b"@DISTRIBUTION_VERSION@", changelog)
                     self.assertEqual(changelog.count(
                         b"Version: 5.0." + target[1:].encode("ascii") + b"00"), 1)
+                    self.assertEqual(locale, (source / pack.EARLY_LOCALE_SOURCE).read_bytes())
+                    self.assertIn(
+                        ("mir-" + {
+                            "f006": "rocket-damage-1",
+                            "f012": "logistic-trash-slots-1",
+                        }.get(target, "gun-turret-damage-1") + "=").encode("ascii"),
+                        locale,
+                    )
                     self.assertFalse(any(any(token in name for token in (
                         "/settings.lua", "/control.lua", "/data-final-fixes.lua", "/migrations/", "/runtime/", "/api/",
-                        "/presentation/", "/CHANGELOG.md", "/tools/"
+                        "/presentation/", "/CHANGELOG.md", "/tools/", "/adapters/early/locale/"
                     )) for name in names))
 
     def test_early_selection_is_explicit_and_refuses_wrong_target_shapes_before_output(self):
@@ -158,6 +153,21 @@ class EarlyPackageTests(unittest.TestCase):
                     target_record=EARLY_RECORD,
                 )
             self.assertFalse((repository / "dirty-record.zip").exists())
+
+    def test_missing_early_adapter_or_locale_refuses_before_output(self):
+        for relative, message in (
+            ("adapters/early/definitions.lua", "missing source dependency"),
+            (pack.EARLY_LOCALE_SOURCE, "missing player asset"),
+        ):
+            with self.subTest(relative=relative), self._early_repository() as (repository, source, _):
+                (source / relative).unlink()
+                self._git(repository, "add", "-A")
+                self._git(repository, "commit", "-qm", "remove early package input")
+                revision = self._git(repository, "rev-parse", "HEAD").decode().strip()
+                output = repository / ("missing-" + Path(relative).name + ".zip")
+                with self.assertRaisesRegex(ValueError, message):
+                    pack.build(source, output, revision=revision, target="f006", target_record=EARLY_RECORD)
+                self.assertFalse(output.exists())
 
 
 if __name__ == "__main__":

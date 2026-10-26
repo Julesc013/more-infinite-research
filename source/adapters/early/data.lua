@@ -1,7 +1,6 @@
 -- The early target package has only a data-stage finite technology surface.
 -- It intentionally has no startup settings, runtime control, migrations, or
--- infinite continuation definitions because those APIs did not exist across
--- the admitted 0.6–0.12 engines.
+-- unproven runtime adapters or infinite continuation definitions.
 local definitions = require("adapters.early.definitions")
 local generator = require("research.generator")
 
