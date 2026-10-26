@@ -31,8 +31,8 @@
     }
   ],
   "archive_sha256": {
-    "mir-fixture-mir5-active-mods-observer_0.1.0.zip": "2E1BE5952D2A4CC5C74A0D149E075D247BA110A3FAE5B6768D3EAEBABCEF989C",
-    "more-infinite-research_5.0.21000.zip": "CE1165CAC174EDA4800EBECAAEF29FC2E071B2E7160CD98F799FE21C2F151F9B"
+    "mir-fixture-mir5-active-mods-observer_0.1.0.zip": "A15A7D628D66953D2E0C4D4FA288F47CBF9C5678327C7EB3D23ADB5DC78331C0",
+    "more-infinite-research_5.0.21000.zip": "C563CB5B96C9E64CB3373BDB60CF5C8B7D3C97E93EADB8F924443C703CDC024D"
   },
-  "scope": "Exactea41cbc6 F210 Base successor on2.1.23 for an immutable save from published4.7.20003 Base on2.0.77. Use cross-from-f200 fixture v0.3.0 and the existing InputSavePath/ExpectedInputSaveSha256 handoff; retain levels/effects/queue42-percent/paused27-percent, one successor gear lab and two cold reloads. Input pin only; no native pass."
+  "scope": "Exact1c90ceb7 F210 Base successor on2.1.23 for the protected published4.7.20003 Base2.0.77 save. Use unchanged cross-from-f200 fixture0.3.0 and the existing InputSavePath/ExpectedInputSaveSha256 handoff; retain levels/effects/queue42-percent/paused27-percent, one successor gear lab and two cold reloads. Bind the actual A15 observer container directly. Earlier CE116 attempts stopped before engine launch and remain preserved under their original profile/source. Input pin only; no native pass."
 }
