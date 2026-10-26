@@ -388,18 +388,18 @@ local function active_space_age(active_mods)
   return type(active_mods) == "table" and active_mods["space-age"] ~= nil
 end
 
--- K2 Base has a retained F200 admission and two independently captured F210
--- inputs: ordinary K2 Base and K2 plus Space Exploration. Both F210 inputs
--- share the named K2 and K2 Assets sources; neither is a K2SO tuple or a
--- Space Age profile. Version strings are not consumed by this selector: the
+-- K2 without Spaced Out has a retained F200 Base admission and captured F210
+-- Base, Space Exploration and Space Age inputs. They share the named K2 and
+-- K2 Assets sources. Version strings are not consumed by this selector: the
 -- named recipe and icon source are preflighted at data stage instead.
 function M.is_k2_base(active_mods)
-  if type(active_mods) ~= "table" or active_space_age(active_mods)
+  if type(active_mods) ~= "table"
       or active_mods["Krastorio2-spaced-out"] ~= nil or active_mods["k2so-assets"] ~= nil then
     return false
   end
   if target.id == "f200" then
-    return active_mods.Krastorio2 ~= nil and active_mods.Krastorio2Assets ~= nil
+    return not active_space_age(active_mods)
+      and active_mods.Krastorio2 ~= nil and active_mods.Krastorio2Assets ~= nil
   end
   if target.id == "f210" then
     return active_mods.Krastorio2 ~= nil and active_mods.Krastorio2Assets ~= nil
@@ -740,7 +740,10 @@ function M.select(active_mods)
   end
   return {profile = profile, definitions = supported_definitions(definitions), continuations = M.continuations(active_mods),
     native_owners = M.native_owners(active_mods), recipe_patches = recipe_patches,
-    k2_imersite = k2so and k2so.imersite or false, bob_angel = bob_angel, bob_core = bob_core,
+    k2_imersite = k2so and k2so.imersite or false,
+    k2_imersite_carriers = target.id == "f210" and k2_base,
+    bob_angel = bob_angel, bob_core = bob_core,
+    bob_native_continuations = M.retains_bob_native_continuations(active_mods),
     py_coal = py.coal, py_hightech = py.hightech, bob_warfare = bob_warfare,
     required_product_targets = required_product_targets, additional_product_bindings = additional_product_bindings,
     exact_product_bindings = exact_product_bindings,

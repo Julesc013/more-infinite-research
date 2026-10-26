@@ -22,6 +22,13 @@ function M.select(active_mods, raw)
     error("MIR scripted-effect binding requires the data-stage mods table", 2)
   end
   local k2so = has_mod(active_mods, "Krastorio2") or has_mod(active_mods, "Krastorio2-spaced-out")
+  -- Native F210 K2 now supports Space Age without the separate Spaced Out
+  -- provider. Its ordinary binding still checks the actual native fields.
+  if k2so and require("compatibility.modern_catalogue").is_k2_base(active_mods) then
+    has_mod(active_mods, "Krastorio2")
+    has_mod(active_mods, "Krastorio2Assets")
+    k2so = false
+  end
   if k2so then
     for index = 1, #K2SO_MODS do
       if not has_mod(active_mods, K2SO_MODS[index]) then
