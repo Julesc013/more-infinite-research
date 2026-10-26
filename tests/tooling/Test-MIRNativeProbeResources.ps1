@@ -203,9 +203,26 @@ try {
     Assert-Probe (@($benchmarkReceipt.observations|Where-Object {$_.phase-cne'benchmark'-or$_.role-cne'factorio'-or$_.pid-le0-or$_.working_set_bytes-lt0-or$_.private_bytes-lt0}).Count-eq0) 'benchmark-observation-identity'
     $probeSampler=New-MIROwnedProcessMemorySampler -Context benchmark -ExpectedSlots @([pscustomobject]@{phase='benchmark';role='factorio'})
     $probeCallbacks=New-BenchmarkMemoryCallbacks -Sampler $probeSampler
-    $probeRun=Invoke-MIRNativeProbeProcess -Context $context -FilePath $child -Arguments @('-NoProfile','-Command','Start-Sleep -Milliseconds 900') -TimeoutSeconds 20 -SampleMilliseconds 250 -OwnedProcessSampleCallback $probeCallbacks.sample -OwnedProcessExitCallback $probeCallbacks.exit
+    # As with the direct Factorio actor below, allow the controlled child to
+    # survive loaded-host resource scans before the first 250 ms cadence wait.
+    # Short-lived process exit races have their own opposing control above.
+    $probeRun=Invoke-MIRNativeProbeProcess -Context $context -FilePath $child -Arguments @('-NoProfile','-Command','Start-Sleep -Seconds 2') -TimeoutSeconds 20 -SampleMilliseconds 250 -OwnedProcessSampleCallback $probeCallbacks.sample -OwnedProcessExitCallback $probeCallbacks.exit
     $probeReceipt=Get-MIROwnedProcessMemoryObservationReceipt -Sampler $probeSampler
-    Assert-Probe ($probeRun.status-ceq'passed'-and$probeCallbacks.state.sample_events-ge2-and$probeCallbacks.state.exit_events-eq1-and$probeReceipt.status-ceq'complete-observation'-and$probeReceipt.observations.Count-ge2) 'probe-wrapper-benchmark-observation'
+    $probeObservationPassed=($probeRun.status-ceq'passed'-and$probeCallbacks.state.sample_events-ge2-and$probeCallbacks.state.exit_events-eq1-and$probeReceipt.status-ceq'complete-observation'-and$probeReceipt.observations.Count-ge2)
+    if(-not$probeObservationPassed){
+      # Keep the failed CI observation visible even when finally removes its
+      # disposable context. Emit only bounded statuses/counts and fixed reasons.
+      $probeObservationDiagnostic=[ordered]@{
+        run_status=$probeRun.status
+        sample_events=$probeCallbacks.state.sample_events
+        exit_events=$probeCallbacks.state.exit_events
+        receipt_status=$probeReceipt.status
+        observation_count=$probeReceipt.observations.Count
+        incomplete_reasons=@($probeReceipt.incomplete_reasons|Select-Object -First 8)
+      }
+      Write-Host ('[mir5-native-probe-observation-details] '+($probeObservationDiagnostic|ConvertTo-Json -Compress))
+    }
+    Assert-Probe $probeObservationPassed 'probe-wrapper-benchmark-observation'
     $factorioSampler=New-MIROwnedProcessMemorySampler -Context benchmark -ExpectedSlots @([pscustomobject]@{phase='benchmark';role='factorio'})
     $factorioCallbacks=New-BenchmarkMemoryCallbacks -Sampler $factorioSampler
     # The direct actor includes registration and memory reads before its first
