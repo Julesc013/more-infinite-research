@@ -1,0 +1,12 @@
+{
+  "name": "mir-fixture-mir5-f110-f200-transition",
+  "version": "0.2.0",
+  "title": "MIR F110 save to F200 transition successor",
+  "author": "MIR maintainers",
+  "description": "Disposable F110 save observation under MIR5 F200 Base.",
+  "factorio_version": "2.0",
+  "dependencies": [
+    "base = 2.0.77",
+    "more-infinite-research = 5.0.20000"
+  ]
+}

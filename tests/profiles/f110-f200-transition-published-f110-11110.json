@@ -1,0 +1,20 @@
+{
+  "schema": 1,
+  "kind": "mir5-f110-f200-transition-source",
+  "target": "f110",
+  "factorio_line": "1.1",
+  "engine": {
+    "version": "1.1.110",
+    "sha256": "B7B4B834FCA2E32AFA9D3476EB42CC09B02F1205BE97F688DC6FC6ACE7BA8FE1"
+  },
+  "settings_mode": "Defaults",
+  "mods": [
+    {"name": "base", "version": "1.1.110", "enabled": true},
+    {"name": "more-infinite-research", "version": "4.7.11003", "enabled": true},
+    {"name": "mir-fixture-mir5-f110-f200-transition", "version": "0.1.0", "enabled": true}
+  ],
+  "archive_sha256": {
+    "more-infinite-research_4.7.11003.zip": "66C127D8BFC1919FA88F19D2D9B3047316A1B90401CAA05A6D05979B7A099D1E"
+  },
+  "scope": "Exact published F110 4.7.11003 source for a separately pinned F200 input-save hand-off. No native pass."
+}

@@ -42,6 +42,7 @@ class HostControlsTests(unittest.TestCase):
             "tests/test_historical_continuations.py",
             "tests/test_historical_native_runner.py",
             "tests/test_historical_transition_fixture.py",
+            "tests/test_f110_f200_transition_fixture.py",
             "tests/test_modern_targets.py",
             "tests/test_k2_base_catalogue.py",
             "tests/test_space_exploration_catalogue.py",
@@ -128,6 +129,7 @@ class HostControlsTests(unittest.TestCase):
             "tests/test_properties.py",
             "tests/test_replay.py",
             "tests/test_library_profile_reader.py",
+            "tests/test_f110_f200_runner.py",
             "tests/test_package.py",
             "tests/test_release.py",
             "tests/test_compose_replay.py",
@@ -141,7 +143,7 @@ class HostControlsTests(unittest.TestCase):
             "tests/test_host_controls.py",
             "tools/check_repository.py",
         ])
-        self.assertEqual(len(paths), 103)
+        self.assertEqual(len(paths), 105)
         self.assertEqual(len(set(paths)), len(paths))
         self.assertEqual(paths[-1], "tools/check_repository.py")
         self.assertIn("tests/test_sdk.py", paths)
