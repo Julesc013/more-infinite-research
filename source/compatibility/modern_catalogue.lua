@@ -37,6 +37,9 @@ end
 local BASE = require("compatibility.modern_catalogue.base")
 
 local SCIENCE = {
+  science_bob_base_logistics = {"automation-science-pack", "logistic-science-pack", "chemical-science-pack", "utility-science-pack", "bob-advanced-logistic-science-pack"},
+  science_bob_base_research_speed = {"automation-science-pack", "logistic-science-pack", "chemical-science-pack", "production-science-pack", "utility-science-pack", "military-science-pack", "bob-advanced-logistic-science-pack"},
+  science_bob_base_alien_research = {"bob-alien-science-pack", "bob-alien-science-pack-blue", "bob-alien-science-pack-green", "bob-alien-science-pack-orange", "bob-alien-science-pack-purple", "bob-alien-science-pack-red", "bob-alien-science-pack-yellow", "bob-science-pack-gold"},
   science_automation_logistic = {"automation-science-pack", "logistic-science-pack"},
   science_automation_logistic_chemical = {"automation-science-pack", "logistic-science-pack", "chemical-science-pack"},
   science_automation_logistic_chemical_agricultural = {"automation-science-pack", "logistic-science-pack", "chemical-science-pack", "agricultural-science-pack"},
@@ -670,7 +673,7 @@ function M.science_ingredients(key, amounts)
   return out
 end
 
-function M.select(active_mods)
+function M.select(active_mods, raw)
   local definitions = copy_definitions(BASE.definitions)
   local recipe_patches = {}
   local profile, k2so = "base", nil
@@ -784,7 +787,9 @@ function M.select(active_mods)
       end
     end
   end
-  return {profile = profile, definitions = supported_definitions(definitions), continuations = M.continuations(active_mods),
+  return {profile = profile, definitions = supported_definitions(definitions), continuations = M.continuations(active_mods, raw),
+    bob_tech_progression = target.id == "f210" and type(active_mods) == "table" and active_mods.bobtech ~= nil
+      and require("compatibility.modern_catalogue.bob_tech_progression").select(active_mods) or nil,
     native_owners = M.native_owners(active_mods), recipe_patches = recipe_patches,
     k2_imersite = k2so and k2so.imersite or false,
     k2_imersite_carriers = target.id == "f210" and k2_base,
@@ -834,7 +839,7 @@ local function merge_continuation_fields(destination, source, known_ids)
   end
 end
 
-function M.continuations(active_mods)
+function M.continuations(active_mods, raw)
   local rows = copy(CONTINUATIONS)
   if M.is_bob_angel(active_mods) then
     local science = require("compatibility.modern_catalogue.bob_angel").science
@@ -874,6 +879,11 @@ function M.continuations(active_mods)
   end
   if M.is_bob_core(active_mods) then
     for key, value in pairs(require("compatibility.modern_catalogue.bob_core").continuation_overrides or {}) do
+      overrides[key] = value
+    end
+  end
+  if target.id == "f210" and type(active_mods) == "table" and active_mods.bobtech ~= nil then
+    for key, value in pairs(require("compatibility.modern_catalogue.bob_tech_progression").continuation_overrides(active_mods, raw)) do
       overrides[key] = value
     end
   end

@@ -59,6 +59,7 @@ class HostControlsTests(unittest.TestCase):
             "tests/test_bob_plates_f210_materials.py",
             "tests/test_bob_plates_f210_pipeline.py",
             "tests/test_bob_plates_full_base_f210_pipeline.py",
+            "tests/test_bob_tech_progression_f210_pipeline.py",
             "tests/test_bob_core_progression.py",
             "tests/test_bob_core_gameplay_fixture.py",
             "tests/test_override_interactions_fixture.py",
@@ -152,7 +153,7 @@ class HostControlsTests(unittest.TestCase):
             "tests/test_host_controls.py",
             "tools/check_repository.py",
         ])
-        self.assertEqual(len(paths), 114)
+        self.assertEqual(len(paths), 115)
         self.assertEqual(len(set(paths)), len(paths))
         self.assertEqual(paths[-1], "tools/check_repository.py")
         self.assertIn("tests/test_sdk.py", paths)

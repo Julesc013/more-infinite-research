@@ -730,6 +730,24 @@
             "spec/evidence/broad-ecosystem-f210-public-audits-readback-r01.json"
           ],
           "scope": "PR1063 centrally publishes31 sparse Base/16 sparse Space Age rows through one Generator publication and declares visible settings/finite runtime cap routes. b911a7813 adds proven full-Bob Base admission; no C563 native result is relabelled for later source. Broad parity, physical output, migrations and clients remain open."
+        },
+        {
+          "id": "f210-bob-plates-central-host-wiring",
+          "source": [
+            "source/compatibility/bob_plates_profile.lua",
+            "source/compatibility/bob_plates_materials.lua",
+            "source/compatibility/modern_catalogue.lua",
+            "source/data-final-fixes.lua",
+            "source/research/catalogue.lua",
+            "source/research/settings.lua",
+            "source/research/bob_plates_materials.lua"
+          ],
+          "evidence": [
+            "tests/fixtures/bob-plates-f210-captured-facts.json.gz",
+            "tests/fixtures/bob-plates-f210-upstream-context.json.gz",
+            "tests/test_bob_plates_f210_pipeline.py"
+          ],
+          "scope": "Accepted PR1063/source head9ceb272c centrally wires the finite F210 Bob Plates body through one shared profile. Seven host pipeline controls cover31 Base and16 Space Age row comparisons against independently captured published expectations, tuning, disabled-lead identity and bounded recipe-cap metadata. The host plan has113 controls and all four CI checks pass. This is source/host wiring only; freeze the current package and qualify native research/effects plus protected save/reload behavior separately."
         }
       ],
       "test_subjects": [
@@ -737,13 +755,14 @@
         "production"
       ],
       "remaining_implementation": [
-        "Reconcile the remaining named Angel/BobTech/Ironclad and full-suite semantic differences from the exact EA41/C563 public audits. The central Bob Plates31 Base/16 Space Age construction is accepted at PR1063; full-Bob Base31-row admission is integrated at b911a7813 with affected host controls, pending combined CI and changed-package native qualification."
+        "Reconcile the remaining named Angel/BobTech/Ironclad and full-suite semantic differences from the exact EA41/C563 public audits. The central Bob Plates31 Base/16 Space Age construction is accepted at PR1063; full-Bob Base31-row admission is accepted at Dev935a38e14/player tree31e5a218d with all114 host commands passing CI40276747586; changed-package native qualification remains open."
       ],
       "remaining_qualification": [
         "Finish affected mixed/dynamic earned MIR overlap boundaries; composed fixed true/false/true and the independent fixed-provider removal/readdition controls already pass.",
         "Observe remaining exact admitted integrations and setting interactions; Bob/Angel physical125%/400% recipe-cap output is already qualified at its recorded source.",
         "Complete the explicit named/popular individual and dependency-valid combined campaign above. Current F210 input profiles now pin AAI, six BZ components and combinations, full Py, K2/SE/K2SE, full Bob/Angel and IR4; input availability does not qualify native, gameplay or migration outcomes.",
-        "Complete full-suite Py and broad Bob/Angel coverage separately from the existing narrow selections, with actual useful effects and migration/state outcomes."
+        "Complete full-suite Py and broad Bob/Angel coverage separately from the existing narrow selections, with actual useful effects and migration/state outcomes.",
+        "Freeze current accepted player tree31e5a218d or its reviewed successor, then qualify the centrally emitted F210 Bob Plates individual Base/Space Age and full-Bob Base routes with exact new-package research/effect and protected save/reload witnesses. C563 does not contain these fixes."
       ],
       "qualification_campaign": {
         "status": "required-broad-coverage-incomplete",
