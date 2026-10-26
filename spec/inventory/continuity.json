@@ -2563,7 +2563,23 @@
           {
             "from": "1.1.110",
             "to": "2.0.77",
-            "status": "unrun-requires-supported-save-route-and-exact-profile"
+            "status": "unrun-requires-supported-save-route-and-exact-profile",
+            "required_native_witness": {
+              "technology": "inserter-capacity-bonus-8",
+              "source_effects": [
+                {"type": "inserter-stack-size-bonus", "modifier": 2},
+                {"type": "stack-inserter-capacity-bonus", "modifier": 4}
+              ],
+              "successor_effects": [
+                {"type": "inserter-stack-size-bonus", "modifier": 2},
+                {"type": "bulk-inserter-capacity-bonus", "modifier": 4}
+              ],
+              "facts": [
+                "tests/fixtures/historical-continuation-native-oracle.json",
+                "spec/inventory/modern-f200-470.json"
+              ],
+              "scope": "The tracked F110 historical capture and F200 published catalogue establish an actual engine effect-token replacement, not a missing MIR identity or a new native pass. Preserve earned source levels and the same technology ID, observe the expected F200 effective bulk-inserter contribution, save the candidate and verify two cold reloads. Do not restore the unsupported 1.1 effect token on2.0 or relabel same-engine MIR upgrades as this game-version transition."
+            }
           },
           {
             "from": "2.0.77",
