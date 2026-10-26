@@ -714,6 +714,22 @@
             "tests/fixtures/bob-core-f210-captured-facts.json"
           ],
           "scope": "The admitted F200 Bob/Angel, F210 BobTech/Angel and F210 no-Angel Bob-core closures now account for all 31 captured material absences through finite Availability rows. BA-06 Silver, BA-10 Zinc, BA-12 Brass and BA-15 Cobalt Steel are withheld in all three closures; no recovered compiler-plan declaration is a new route. A different exact admitted profile must provide its own captured route before a binding can be authored."
+        },
+        {
+          "id": "bob-plates-f210-central-emission-and-runtime-declarations",
+          "source": [
+            "source/compatibility/bob_plates_profile.lua",
+            "source/compatibility/bob_plates_materials.lua",
+            "source/research/bob_plates_materials.lua",
+            "source/research/catalogue.lua"
+          ],
+          "evidence": [
+            "tests/test_bob_plates_f210_pipeline.py",
+            "tests/test_bob_plates_full_base_f210_pipeline.py",
+            "spec/evidence/broad-ecosystem-f210-c563-native-chain-r01.json",
+            "spec/evidence/broad-ecosystem-f210-public-audits-readback-r01.json"
+          ],
+          "scope": "PR1063 centrally publishes31 sparse Base/16 sparse Space Age rows through one Generator publication and declares visible settings/finite runtime cap routes. b911a7813 adds proven full-Bob Base admission; no C563 native result is relabelled for later source. Broad parity, physical output, migrations and clients remain open."
         }
       ],
       "test_subjects": [
@@ -721,7 +737,7 @@
         "production"
       ],
       "remaining_implementation": [
-        "Centrally wire and emit the accepted finite Bob Plates constructors (31 Base and16 Space Age bodies at PR1059/Dev38dc957c8) through the F210 catalogue/publication path. Their captured facts and detached-body validation are retained, but no emitted package, native outcome or release qualification follows until that integration passes."
+        "Reconcile the remaining named Angel/BobTech/Ironclad and full-suite semantic differences from the exact EA41/C563 public audits. The central Bob Plates31 Base/16 Space Age construction is accepted at PR1063; full-Bob Base31-row admission is integrated at b911a7813 with affected host controls, pending combined CI and changed-package native qualification."
       ],
       "remaining_qualification": [
         "Finish affected mixed/dynamic earned MIR overlap boundaries; composed fixed true/false/true and the independent fixed-provider removal/readdition controls already pass.",

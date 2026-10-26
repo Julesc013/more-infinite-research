@@ -346,11 +346,16 @@ class BobPlatesF210MaterialsTests(unittest.TestCase):
         lua.globals().minimal_values = _lua_value(lua, {"streams": {}})
         lua.globals().empty_raw = _lua_value(lua, {})
         lua.globals().inactive_mods = _lua_value(lua, {"base": "2.1.23", "boblibrary": "3.0.1", "bobores": "3.0.0"})
-        lua.globals().conflicted_mods = _lua_value(lua, {
-            "base": "2.1.23", "boblibrary": "3.0.1", "bobores": "3.0.0", "bobplates": "3.0.2", "bobtech": "1.0.0"
-        })
         self.assertEqual({}, _plain(lua.execute("return bob_plates.technologies(minimal_values, empty_raw, inactive_mods)")))
-        self.assertEqual({}, _plain(lua.execute("return bob_plates.technologies(minimal_values, empty_raw, conflicted_mods)")))
+        # q005 proves that BobTech alone is not a competing material owner.
+        # Keep laziness for the actual Core overlap and Angel's separate routes.
+        for conflict in ({"space-age": "2.1.23", "bobelectronics": "3.0.0", "bobtech": "3.0.1"},
+                         {"angelssmelting": "2.1.1"}):
+            with self.subTest(conflict=conflict):
+                lua.globals().conflicted_mods = _lua_value(lua, {
+                    "base": "2.1.23", "boblibrary": "3.0.1", "bobores": "3.0.0", "bobplates": "3.0.2", **conflict
+                })
+                self.assertEqual({}, _plain(lua.execute("return bob_plates.technologies(minimal_values, empty_raw, conflicted_mods)")))
 
 
 if __name__ == "__main__":

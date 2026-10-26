@@ -1,0 +1,112 @@
+{
+  "schema": 1,
+  "kind": "MIR5FullCatalogueF200F210C563NativeChainV1",
+  "status": "passed-exact-native-save-hop",
+  "execution_source": "702bbc70ebd7c2a6e3b3c95ff84d4c95cb012967",
+  "frozen_package_source": "1c90ceb7f0096fa6ccbcb9fc369fae699889c866",
+  "player_tree": "9e669e6ffea27dda3f9f17dfb2873daf23a8e187",
+  "engine": {
+    "path": "D:\\Games\\Steam\\steamapps\\common\\Factorio\\bin\\x64\\factorio.exe",
+    "sha256": "FE4A1DA30F322A0D0B8AEB3DF7276332222BAAA143E2352569B723E84B2B9060",
+    "file_version": "2.1.23.87750",
+    "product_version": "2.1.23",
+    "base_version": "2.1.23"
+  },
+  "candidate_archive_sha256": "C563CB5B96C9E64CB3373BDB60CF5C8B7D3C97E93EADB8F924443C703CDC024D",
+  "fixture": [
+    {
+      "source": "C:\\Users\\Jules\\AppData\\Local\\MIRWorker\\source-worktrees\\cross-c563-702-r01\\build\\tmp\\full-catalogue-cross-c563-r02.fixture-inputs\\fixture-sources\\mir-fixture-mir5-full-catalogue-upgrade",
+      "archive": "D:\\Projects\\Factorio\\testmods\\2.1\\mir-fixture-mir5-full-catalogue-upgrade_0.3.0.zip",
+      "sha256": "F1DD5D7571295EF4FBFB5AE361DCF123121A81A4143A78B7C51B901980B324C6"
+    },
+    {
+      "source": "C:\\Users\\Jules\\AppData\\Local\\MIRWorker\\source-worktrees\\cross-c563-702-r01\\build\\tmp\\full-catalogue-cross-c563-r02.fixture-inputs\\fixture-sources\\observer-f210",
+      "archive": "D:\\Projects\\Factorio\\testmods\\2.1\\mir-fixture-mir5-active-mods-observer_0.1.0.zip",
+      "sha256": "A15A7D628D66953D2E0C4D4FA288F47CBF9C5678327C7EB3D23ADB5DC78331C0"
+    }
+  ],
+  "input_save": {
+    "sha256": "9D391DB311DA3C82E43648FAE5E6FE9C08D00F0592880B3160F35EE822FECA09",
+    "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\mir5\\recovery-historical\\published-source-saves-da93-r01\\source-output-c125-r03\\full-catalogue-f200-cross\\write-data\\saves\\mir5-native-complete.zip"
+  },
+  "predecessor": {
+    "engine": "2.0.77",
+    "mir": "4.7.20003",
+    "archive_sha256": "FBBA844DD04011A12BB6DA885745B0733AD37FAB181EAAD9EE4346B9B0D32647"
+  },
+  "witnesses": {
+    "public_rows": 54,
+    "level_backed_rows": 54,
+    "native_owner_rows": 0,
+    "scripted_rows_not_seeded": 0,
+    "zero_credit_rows": 20,
+    "source_gear_lab": 1,
+    "successor_gear_lab": 1,
+    "queued_progress": 0.42000000000000004,
+    "paused_progress": 0.27,
+    "save_name": "mir5-native-complete",
+    "on_load_read_only": false
+  },
+  "reloads": [
+    {
+      "status": "passed",
+      "save_sha256": "1C0BC8335E91B70E01744A7DCF8ABD2915ACD7E457C4B5F7D168E11FDD4D22FA",
+      "save_byte_identical": true,
+      "witnesses": {
+        "public_rows": 54,
+        "level_backed_rows": 54,
+        "native_owner_rows": 0,
+        "scripted_rows_not_seeded": 0,
+        "zero_credit_rows": 20,
+        "source_gear_lab": 1,
+        "successor_gear_lab": 1,
+        "queued_progress": 0.42000000000000004,
+        "paused_progress": 0.27,
+        "save_name": "mir5-native-complete",
+        "on_load_read_only": true
+      }
+    },
+    {
+      "status": "passed",
+      "save_sha256": "1C0BC8335E91B70E01744A7DCF8ABD2915ACD7E457C4B5F7D168E11FDD4D22FA",
+      "save_byte_identical": true,
+      "witnesses": {
+        "public_rows": 54,
+        "level_backed_rows": 54,
+        "native_owner_rows": 0,
+        "scripted_rows_not_seeded": 0,
+        "zero_credit_rows": 20,
+        "source_gear_lab": 1,
+        "successor_gear_lab": 1,
+        "queued_progress": 0.42000000000000004,
+        "paused_progress": 0.27,
+        "save_name": "mir5-native-complete",
+        "on_load_read_only": true
+      }
+    }
+  ],
+  "input_save_unchanged": true,
+  "controls_restored": true,
+  "receipts": {
+    "path": "spec/evidence/full-catalogue-f200-f210-c563-native-receipts-r01.json.gz",
+    "sha256": "0FF0B7493DEB3551F3E8C33C2738DFDD8E24B50BFF419AA93E4181BA5910FC4B",
+    "bytes": 71007,
+    "exact_records": 36,
+    "roundtrip_verified": true
+  },
+  "adverse_preserved": {
+    "path": "build/mir5/recovery-historical/full-catalogue-cross-f200-f210-c563-r01",
+    "native_execution": false,
+    "reason": "Prior caller staged fixture inputs in native output; exact-output admission refused before Factorio."
+  },
+  "claims": {
+    "native_execution": true,
+    "exact_base_save_hop": true,
+    "all_engine_hops": false,
+    "dlc_transitions": false,
+    "multiplayer": false,
+    "performance": false,
+    "release_qualification": false
+  },
+  "limitations": "One Base 2.0.77 published-MIR to 2.1.23 C563 transition only; seeded catalogue state plus actual source/successor gear lab, queue/paused state and two cold reloads. No blanket physical-output or all-modpack claim."
+}

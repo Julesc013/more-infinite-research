@@ -7,6 +7,7 @@ local profile_selector = require("compatibility.bob_plates_profile")
 
 local M = {}
 
+
 local function fail(message) error("MIR5 F210 Bob Plates material catalogue: " .. message, 3) end
 
 local function finite(value)

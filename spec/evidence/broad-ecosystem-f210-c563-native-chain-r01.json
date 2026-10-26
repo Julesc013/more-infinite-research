@@ -1,0 +1,415 @@
+{
+  "schema": 1,
+  "kind": "MIR5BroadEcosystemF210C563NativeChainV1",
+  "status": "completed-twelve-candidate-startups-pass",
+  "execution_source": "13283e85115ac460380b872a20242dffa71d5d6c",
+  "player_tree": "9e669e6ffea27dda3f9f17dfb2873daf23a8e187",
+  "frozen_package_source": "1c90ceb7f0096fa6ccbcb9fc369fae699889c866",
+  "engine": {
+    "version": "2.1.23",
+    "sha256": "FE4A1DA30F322A0D0B8AEB3DF7276332222BAAA143E2352569B723E84B2B9060"
+  },
+  "candidate_archive_sha256": "C563CB5B96C9E64CB3373BDB60CF5C8B7D3C97E93EADB8F924443C703CDC024D",
+  "published_archive_sha256": "B6EB9430056ABD384DB00F94929FE7DAC0A37441ACF4BC277946689682628852",
+  "observer_archive_sha256": "A15A7D628D66953D2E0C4D4FA288F47CBF9C5678327C7EB3D23ADB5DC78331C0",
+  "claims": {
+    "native_execution": true,
+    "startup_qualification": true,
+    "public_parity": false,
+    "gameplay": false,
+    "save_migration": false,
+    "multiplayer": false,
+    "performance": false,
+    "release_qualification": false
+  },
+  "summary": {
+    "cases": 12,
+    "native_launches": 36,
+    "counts": {
+      "upstream:completed-data-stage-observation-only": 12,
+      "published:completed-data-stage-observation-only": 11,
+      "candidate:completed-data-stage-observation-only": 12,
+      "published:failed": 1
+    },
+    "published_q062_adverse": "Published K2 with Space Age fails; candidate continues and loads.",
+    "prior_ea41_candidate_failures": "All seven retained startup failures pass under C563; original failures remain unchanged."
+  },
+  "custody": {
+    "primary_root": "build/mir5/recovery-historical/broad-ecosystem-f210-1c90-r04",
+    "independently_rehashed_members": 323,
+    "independently_rehashed_bytes": 1568656124,
+    "source_output_manifest": {
+      "path": "C:/Users/Jules/AppData/Local/MIRWorker/source-worktrees/broad-ecosystem-1c90-r04/build/tmp/broad-ecosystem-1c90-r04-native-r01",
+      "member_count": 323,
+      "manifest_sha256": "396FC8BB266BC0D892A7D64E3D2F93CA454F1232AF581EED88BAF29A8209D689"
+    },
+    "terminal_controls": {
+      "factorio_processes": 0,
+      "active_profile_marker_exists": false,
+      "recovery_marker_exists": false,
+      "mod_list_sha256": "48C46678CC8369DB15CC12CDFB23309EB076DC4433B76E9426083D0074BCCC91",
+      "mod_settings_sha256": "667897C514B66298A1E400058B65EA14EB36322D88864B98AE38E4C9B81387BC"
+    }
+  },
+  "limits": {
+    "case_count": 12,
+    "maximum_launches": 36,
+    "sequential_only": true,
+    "maximum_runtime_seconds": 1800,
+    "maximum_new_output_mib": 6144,
+    "note": "Thirty-minute aggregate cap including admission/preparation, one active engine, six-GiB aggregate output; no performance inference."
+  },
+  "resources_per_launch": {
+    "timeout_seconds": 240,
+    "expected_peak_memory_mib": 4096,
+    "max_new_output_mib": 512,
+    "admission_wait_seconds": 30,
+    "heavy_expected_peak_memory_mib": 8192
+  },
+  "receipts": {
+    "path": "spec/evidence/broad-ecosystem-f210-c563-native-receipts-r01.json.gz",
+    "sha256": "3F3953B6B566641815FDD6BCC810683089870ACEF758DBFEF75C99650EB5713E",
+    "bytes": 644197,
+    "exact_records": 76,
+    "roundtrip_verified": true
+  },
+  "cases": [
+    {
+      "id": "q001",
+      "profile": "tests/profiles/py-suite-base-f210-2123.json",
+      "profile_sha256": "3706BBD447A445ECD072FA6E13B7453BF1C566092D19E88AB933E3FF178938AF",
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "6272B0ACD89CCF824575D856609AC07B52A7255D17FAC007FE71F5234679D251",
+          "controls_restored": true,
+          "native_execution": true
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "CE6E18C1E82A8C7E49AB29E83DEB2E089F6C95863F5952C6454D629F5910766B",
+          "controls_restored": true,
+          "native_execution": true
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "00B882EED2B4D7F08DE5618DEA7889781088001C2571AF1B39490CD5EACFDB26",
+          "controls_restored": true,
+          "native_execution": true
+        }
+      ]
+    },
+    {
+      "id": "q003",
+      "profile": "tests/profiles/py-suite-with-productivity-base-f210-2123.json",
+      "profile_sha256": "BCA125D265CBA75527ACDCCC109B98AC032DB16E7363A268AC6822EAC9B55355",
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "8BC18176A15609AD8C15D102E872CDC71236214B53AB44A1B554810E6CC19E02",
+          "controls_restored": true,
+          "native_execution": true
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "5EA299FD77B151DA3BE161CC34D5FCE99DB970C498897EC6C0581AC1F255D566",
+          "controls_restored": true,
+          "native_execution": true
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "516347858934C45D8D5932EEEBF0528BD71744C6A35A7E692D37EDA72E58B4F0",
+          "controls_restored": true,
+          "native_execution": true
+        }
+      ]
+    },
+    {
+      "id": "q005",
+      "profile": "tests/profiles/bob-full-base-f210-2123.json",
+      "profile_sha256": "A5017E19A99B8240D8671DD9D88F03F055492C7E764159DB167221568FD90AA7",
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "F4225D5898019EB61A078B63378DB4C529B6FA6CA29109D4205EDEC81B930BC1",
+          "controls_restored": true,
+          "native_execution": true
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "2AAF8E6831993B6303A30E5EE32026B6C090C77C3D6EB8D0653B3CDEE5B27696",
+          "controls_restored": true,
+          "native_execution": true
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "515891A35768C93BC323B7CB68C8415DDC99BD26F3D5F604651EB68B64B19B43",
+          "controls_restored": true,
+          "native_execution": true
+        }
+      ]
+    },
+    {
+      "id": "q006",
+      "profile": "tests/profiles/bob-full-space-age-f210-2123.json",
+      "profile_sha256": "47A538A60B8B9446FA525B5FEFE2E7C2AA4D32C357BE45276748FC2F28C9A1D4",
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "0DDBE3715C0AE618C803985FCFB94E6871739D0F866B9B8CF63F677FCF376AB6",
+          "controls_restored": true,
+          "native_execution": true
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "10457D03E6ABFE06D2D44C2DFD3BD1B613AE5582BAFE7EF08FD5ED06F183A27C",
+          "controls_restored": true,
+          "native_execution": true
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "B11168ED70A957B4B8178D022A12787768F87A96A59980C48D893B9D1F41B5B6",
+          "controls_restored": true,
+          "native_execution": true
+        }
+      ]
+    },
+    {
+      "id": "q007",
+      "profile": "tests/profiles/angel-full-base-f210-2123.json",
+      "profile_sha256": "ADFE6B262232E7C296BA591BFBA5812B62B2E45761A78F1E9588D141B7AABF00",
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "E42C6B6CB1E90B633367B8CF73C61A91DF3D5C3434536BA41B20BD0CE7E8191A",
+          "controls_restored": true,
+          "native_execution": true
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "643A4EA15855CDF8FD5FDF8C45F366A8CB3F471EE972D7E80F88DC031071E3A0",
+          "controls_restored": true,
+          "native_execution": true
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "43E23C66ACE4A23264BD5D1470CFBE551E3B7C14A0A06DC4CD44F50ABFF9B6BF",
+          "controls_restored": true,
+          "native_execution": true
+        }
+      ]
+    },
+    {
+      "id": "q008",
+      "profile": "tests/profiles/angel-full-space-age-f210-2123.json",
+      "profile_sha256": "4CAD1401B56D8BE7B09B9CC2EAB045773FC4DE9C11C37BF283A51C3E11758B49",
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "01CB0E564309D1FDA289AB41722993F3EEC324E0464D20BBA3BC098C95FC4D07",
+          "controls_restored": true,
+          "native_execution": true
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "F7756B6CDC06130764099504DF62D9AFF7A1C76F8E8B8DD2CCFAC61225F7783B",
+          "controls_restored": true,
+          "native_execution": true
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "04F1EFC0D73099E612805419B81802CA8B0A02CDAF330B8D324529CB1EB39BB8",
+          "controls_restored": true,
+          "native_execution": true
+        }
+      ]
+    },
+    {
+      "id": "q009",
+      "profile": "tests/profiles/bob-angel-full-base-f210-2123.json",
+      "profile_sha256": "760945672E7D5F03BEBE25CA477A68C95D54AA359C62D34AE69D55BF9161372F",
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "C5D5F65FC0412D88A5A6CAFD1E439214D87CDE451D1BA1586A4CB0FB4CB22E1E",
+          "controls_restored": true,
+          "native_execution": true
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "C34FEA8FE3FD291167FC78622FF3B9892F6843C91F6AF59D055E3EDA9717898E",
+          "controls_restored": true,
+          "native_execution": true
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "E199D381ACE6C9AC451A7D59F12518693839E2DAE13E635475AB0E9D31AF7B99",
+          "controls_restored": true,
+          "native_execution": true
+        }
+      ]
+    },
+    {
+      "id": "q010",
+      "profile": "tests/profiles/bob-angel-full-space-age-f210-2123.json",
+      "profile_sha256": "79C589FDFC329CDCE8C204ABD4E939E60759792ACF4A9C7CEF8D326A5CC124B1",
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "17DEC8EB28C63818458414D338116F5172608EF0CFA8ED90445EACD642CF547C",
+          "controls_restored": true,
+          "native_execution": true
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "688BF167F8CA500DB9FA65240B1A16EA2D735141BF5233F807BE77C3958C1C38",
+          "controls_restored": true,
+          "native_execution": true
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "58C177843BE7EB1401C061D3C2327FB92D7872493DFC09B212737DC695D9DD13",
+          "controls_restored": true,
+          "native_execution": true
+        }
+      ]
+    },
+    {
+      "id": "q013",
+      "profile": "tests/profiles/k2se-base-f210-2123.json",
+      "profile_sha256": "FA586BDDE8C0914BB536CDE19909C56762CE009459366730BC9C36CCAF389B16",
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "6F737A42134C19496BA8D8320718FB2804CF127A33E5834F024078E857A00D99",
+          "controls_restored": true,
+          "native_execution": true
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "28B2C637A08095195B7D3F3A9890BFD769C7C48C1590E3D1D789808488988311",
+          "controls_restored": true,
+          "native_execution": true
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "E57BDA10B89F19358F70735748E0A02A5BD8A1234AC4AB5C46AE200FB4E15E41",
+          "controls_restored": true,
+          "native_execution": true
+        }
+      ]
+    },
+    {
+      "id": "q062",
+      "profile": "tests/profiles/popular-krastorio2-space-age-f210-2123.json",
+      "profile_sha256": "616AF92086506996F0C934CEED2076E5EBB5975A9C6FF2A9C0E26AB2DB0EC215",
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "E0F54B526B9BBAD3886F42BCB534B16F2BC89557BD650A2AE357155469649FA0",
+          "controls_restored": true,
+          "native_execution": true
+        },
+        {
+          "arm": "published",
+          "status": "failed",
+          "result_sha256": "25B886FF4C0D5240459070CDF63A537929D074819110FC71DD9F2007F33A3359",
+          "controls_restored": true,
+          "native_execution": true
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "C35B7A917432496545683B4ACB435E3A5DAB8E25D6E8ABACB9916BB57A9FA76B",
+          "controls_restored": true,
+          "native_execution": true
+        }
+      ]
+    },
+    {
+      "id": "q073",
+      "profile": "tests/profiles/popular-boblogistics-base-f210-2123.json",
+      "profile_sha256": "BCABC502848BE49ECD6B33C3AA45BFEBA3BC59750D94342249D0ADD2D4AC0CFD",
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "443499B84E72AA911949C746547DE9BFF29C08EEBE3E8B51D6C4D42BEEAA2A2C",
+          "controls_restored": true,
+          "native_execution": true
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "B5BB2250E100F73CFF7F2DF7EB3FF2BC57EE0959899D199C9EBE2C157969974B",
+          "controls_restored": true,
+          "native_execution": true
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "5DB9645097C6FCE04CEB5EA5055CA17C4E85FEBA789D5C5CD3F618A2C2A89D67",
+          "controls_restored": true,
+          "native_execution": true
+        }
+      ]
+    },
+    {
+      "id": "q074",
+      "profile": "tests/profiles/popular-boblogistics-space-age-f210-2123.json",
+      "profile_sha256": "338D799BE5FD4FA9E70CCD8577926D3ECDDDEB9E143DD6F874D24E416E329B16",
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "171888BA29363169F6C8E946BCF70F65746031324AEA21C9EEA7E93851DB7FDE",
+          "controls_restored": true,
+          "native_execution": true
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "A5FF4EA49BD7C786CDFA366F8003C0D66484351855E4BE1B315EEF34ED1C2205",
+          "controls_restored": true,
+          "native_execution": true
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "61DD30525232A8E18B061768A1B24E51BA0C903C28BF7AE6CB3C6651178E247A",
+          "controls_restored": true,
+          "native_execution": true
+        }
+      ]
+    }
+  ],
+  "remaining": "Later Warfare/Bob Plates changes are outside C563. Per-row parity, gameplay, physical effects, migrations, clients and final-package qualification remain required."
+}
