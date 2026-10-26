@@ -234,6 +234,12 @@ class BobAngelF210PipelineTests(unittest.TestCase):
              "Bob advanced science route"),
             ("space_age", lambda raw: raw["technology"]["steel-plate-productivity"]["effects"].pop(0),
              "steel-plate-productivity existing effect"),
+            ("space_age", lambda raw: raw["technology"]["steel-plate-productivity"]["effects"].append(
+                deepcopy(raw["technology"]["steel-plate-productivity"]["effects"][0])),
+             "steel-plate-productivity existing effect"),
+            ("space_age", lambda raw: raw["technology"]["steel-plate-productivity"]["effects"].append(
+                {"type": "change-recipe-productivity", "recipe": "angels-plate-steel", "change": 0.1}),
+             "steel-plate-productivity already owns Angel steel"),
         )
         for case, mutate, expected in scenarios:
             with self.subTest(case=case, expected=expected):
@@ -242,6 +248,41 @@ class BobAngelF210PipelineTests(unittest.TestCase):
                 lua = self.stage(case, raw=raw, expect_failure=True)
                 self.assertIn(expected, str(lua.globals().message))
                 self.assertEqual(0, lua.globals().technology_publications)
+
+    def test_consumed_recipe_fields_accept_unconsumed_flags_and_reject_invalid_science_output(self):
+        enabled = deepcopy(self.context["cases"]["base"]["raw"])
+        enabled["recipe"]["angels-solid-sulfur"]["enabled"] = True
+        lua = self.stage("base", raw=enabled)
+        self.assertIn("recipe-prod-research_sulfur-1", self._rows(lua))
+
+        default_output = deepcopy(self.context["cases"]["base"]["raw"])
+        science = default_output["recipe"]["bob-advanced-logistic-science-pack"]
+        science["allow_productivity"] = False
+        science["results"][0].pop("amount")
+        lua = self.stage("base", raw=default_output)
+        self.assertIn("research-speed-7", self._rows(lua))
+
+        for bad in (0, float("nan"), float("inf")):
+            with self.subTest(probability=repr(bad)):
+                raw = deepcopy(self.context["cases"]["base"]["raw"])
+                raw["recipe"]["bob-advanced-logistic-science-pack"]["results"][0]["probability"] = bad
+                lua = self.stage("base", raw=raw, expect_failure=True)
+                self.assertIn("bob-advanced-logistic-science-pack", str(lua.globals().message))
+                self.assertEqual(0, lua.globals().technology_publications)
+
+    def test_space_age_steel_accepts_foreign_effect_order_but_preserves_named_owner_boundary(self):
+        raw = deepcopy(self.context["cases"]["space_age"]["raw"])
+        effects = raw["technology"]["steel-plate-productivity"]["effects"]
+        raw["technology"]["steel-plate-productivity"]["effects"] = [
+            {"type": "nothing", "effect_description": "foreign-but-retained"}, effects[1], effects[0]
+        ]
+        rows = self._rows(self.stage("space_age", raw=raw))
+        steel = rows["steel-plate-productivity"]
+        self.assertEqual("foreign-but-retained", steel["effects"][0]["effect_description"])
+        self.assertEqual(
+            {"steel-plate", "casting-steel", "angels-plate-steel", "angels-plate-steel-2"},
+            {effect.get("recipe") for effect in steel["effects"] if effect.get("recipe") is not None},
+        )
 
     def test_space_age_productivity_denied_breeding_and_acid_routes_are_admitted_as_captured(self):
         raw = self.context["cases"]["space_age"]["raw"]

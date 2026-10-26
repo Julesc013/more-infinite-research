@@ -1,5 +1,5 @@
 -- Literal F210 Bob+Angel delta from the independent q009/q010 upstream and
--- published 4.7.2 captures.  Selection and prototype publication belong to
+-- published 4.7.3 captures.  Selection and prototype publication belong to
 -- the root-owned catalogue; this file only supplies finite data and checks
 -- the named raw fields that data consumes.  It never discovers a route or
 -- changes a prototype during preflight.
@@ -37,9 +37,35 @@ end
 local function has_result(recipe, expected_type, expected_name, expected_amount)
   for _, row in ipairs(type(recipe) == "table" and recipe.results or {}) do
     if type(row) == "table" and (row.type or "item") == expected_type and row.name == expected_name
-        and (expected_amount == nil or row.amount == expected_amount) then return true end
+        and (expected_amount == nil or row.amount == expected_amount) then
+      return true
+    end
   end
   return false
+end
+
+local function positive_science_result(recipe, name)
+  local found = false
+  for _, row in ipairs(type(recipe) == "table" and recipe.results or {}) do
+    if type(row) == "table" and (row.type or "item") == "item" and row.name == name then
+      local amount = row.amount
+      if amount == nil then amount = 1 end
+      local probability = row.independent_probability
+      if probability == nil then probability = row.probability end
+      local shared = row.shared_probability
+      if found or row.independent_probability ~= nil and row.probability ~= nil
+          or type(amount) ~= "number" or amount ~= amount or amount <= 0 or amount >= math.huge
+          or (probability ~= nil and (type(probability) ~= "number" or probability ~= probability
+            or probability <= 0 or probability > 1))
+          or (shared ~= nil and (type(shared) ~= "table" or type(shared.min) ~= "number"
+            or type(shared.max) ~= "number" or shared.min ~= shared.min or shared.max ~= shared.max
+            or shared.min < 0 or shared.max > 1 or shared.min >= shared.max)) then
+        return false
+      end
+      found = true
+    end
+  end
+  return found
 end
 
 local function owns_unlock(owner, recipe)
@@ -231,8 +257,7 @@ end
 
 local function require_recipe(raw, name, expected_type, expected_name, expected_amount, callback)
   local recipe = raw.recipe[name]
-  if type(recipe) ~= "table" or recipe.enabled ~= false
-      or not has_result(recipe, expected_type, expected_name, expected_amount) then
+  if type(recipe) ~= "table" or not has_result(recipe, expected_type, expected_name, expected_amount) then
     fail("named route changed: " .. name, callback)
   end
   return recipe
@@ -259,8 +284,8 @@ local function require_science_inputs(raw, profile, callback)
   if type(gardens) ~= "table" or gardens.enabled == false then fail("angels-gardens changed", callback) end
   local pack = "bob-advanced-logistic-science-pack"
   local recipe = require_recipe(raw, pack, "item", pack, nil, callback)
-  if recipe.allow_productivity ~= true or not owns_unlock(raw.technology[pack], pack) then
-    fail("Bob advanced science route changed", callback)
+  if not positive_science_result(recipe, pack) or not owns_unlock(raw.technology[pack], pack) then
+    fail("Bob advanced science route changed: " .. pack, callback)
   end
 end
 
@@ -330,19 +355,19 @@ local function require_native_steel(raw, callback)
       or not same_ingredients(steel.unit.ingredients, expected.ingredients) then
     fail("steel-plate-productivity changed", callback)
   end
-  local existing = {"steel-plate", "casting-steel"}
-  for index, recipe in ipairs(existing) do
-    local effect = steel.effects and steel.effects[index]
-    if type(effect) ~= "table" or effect.type ~= "change-recipe-productivity" or effect.recipe ~= recipe
-        or effect.change ~= expected.effect_change then
-      fail("steel-plate-productivity existing effect changed: " .. recipe, callback)
-    end
-  end
-  for index = 3, #(steel.effects or {}) do
-    local effect = steel.effects[index]
-    if type(effect) == "table" and (effect.recipe == "angels-plate-steel" or effect.recipe == "angels-plate-steel-2") then
+  local required, seen = { ["steel-plate"]=true, ["casting-steel"]=true }, {}
+  for _, effect in ipairs(type(steel.effects) == "table" and steel.effects or {}) do
+    if type(effect) == "table" and required[effect.recipe] then
+      if seen[effect.recipe] or effect.type ~= "change-recipe-productivity" or effect.change ~= expected.effect_change then
+        fail("steel-plate-productivity existing effect changed: " .. effect.recipe, callback)
+      end
+      seen[effect.recipe] = true
+    elseif type(effect) == "table" and (effect.recipe == "angels-plate-steel" or effect.recipe == "angels-plate-steel-2") then
       fail("steel-plate-productivity already owns Angel steel", callback)
     end
+  end
+  for recipe in pairs(required) do
+    if not seen[recipe] then fail("steel-plate-productivity existing effect changed: " .. recipe, callback) end
   end
   require_recipe(raw, "angels-plate-steel", "item", "steel-plate", 4, callback)
   require_recipe(raw, "angels-plate-steel-2", "item", "steel-plate", 4, callback)
