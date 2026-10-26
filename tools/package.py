@@ -326,8 +326,8 @@ def members(source, version=None, committed_files=None, target=None, editions=No
         else:
             committed_files = select_edition(committed_files, info, target, editions)
         # Published 4.7.3 shipped the K2 Imersite rename only in its F210
-        # edition.  Preserve that migration-name history for the other eight
-        # selected player packages without narrowing generic fixture archives.
+        # edition.  Preserve that migration-name history for every other selected
+        # player package without narrowing generic fixture archives.
         if selected_record != EARLY_TARGET_RECORD and target != "f210":
             committed_files.pop(F210_ONLY_MIGRATION, None)
         # F018/F100 retain the legacy laser continuation identity.  The

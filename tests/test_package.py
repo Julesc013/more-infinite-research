@@ -67,19 +67,28 @@ class PackageTests(unittest.TestCase):
         for target, family, minimum in [
             ("f013", "0.13", "0.13.20"), ("f014", "0.14", "0.14.23"),
             ("f015", "0.15", "0.15.40"), ("f016", "0.16", "0.16.51"),
-            ("f017", "0.17", "0.17.79"), ("f100", "1.0", "1.0.0"),
+            ("f017", "0.17", "0.17.79"), ("f018", "0.18", "0.18.47"), ("f100", "1.0", "1.0.0"),
             ("f110", "1.1", "1.1.110"), ("f200", "2.0", "2.0.77"), ("f210", "2.1", "2.1.23"),
         ]:
             with self.subTest(target=target):
                 info, rows = pack.members(source, target=target)
                 files = dict(rows)
-                expected_dependencies = [*dependencies[target]]
+                expected_dependencies = ([*dependencies[target]] if target in dependencies
+                                         else ["base >= " + minimum])
                 if target in ("f200", "f210"):
                     # The retained 4.7 inventory predates this MIR5 ordering
                     # correction. Current modern packages must run after SIF
                     # when it is active, so their final-stage source checks
                     # see SIF's authored promethium owner.
                     self.assertNotIn(sif_ordering, dependencies[target])
+                    if target == "f210":
+                        # The retained 4.7.0 receipt records its prior 2.1.18
+                        # optional floors. Current F210 metadata binds both
+                        # official engine-coupled dependencies to 2.1.23.
+                        expected_dependencies = [
+                            dependency.replace(" >= 2.1.18", " >= 2.1.23")
+                            for dependency in expected_dependencies
+                        ]
                     expected_dependencies.append(sif_ordering)
                 self.assertEqual(info["factorio_version"], family)
                 self.assertEqual(info["dependencies"], expected_dependencies)
@@ -97,6 +106,25 @@ class PackageTests(unittest.TestCase):
                 self.assertEqual(any(path.startswith("adapters/") for path in files), reduced)
                 self.assertIn("api/v1/data.lua", files)
                 self.assertIn("api/v1/runtime.lua", files)
+                if target == "f018":
+                    for literal in (
+                        'id = "f018"', 'factorio_version = "0.18"', 'minimum_base = "0.18.47"',
+                        "reduced = true", "research_levels = true", "recipe_productivity = false",
+                        'recipe_probability = "probability"', "productivity_ignores_stats = false",
+                        "receiver_limits = false", "cargo_research = false",
+                    ):
+                        self.assertIn(literal.encode(), files["platform/target.lua"])
+                    self.assertEqual(
+                        {name: files[name] for name in pack.ENTRYPOINTS},
+                        {
+                            "data.lua": b'require("adapters.reduced.data").apply()\n',
+                            "settings.lua": b'require("adapters.reduced.settings").apply()\n',
+                            "data-final-fixes.lua": b'require("adapters.reduced.data-final-fixes").apply()\n',
+                            "control.lua": b'require("adapters.reduced.control").apply()\n',
+                        },
+                    )
+                    self.assertNotIn("data-updates.lua", files)
+                    self.assertNotIn("presentation/library.lua", files)
                 expected_migrations = dict(PUBLISHED_473_SHARED_MIGRATION_SHA256)
                 if target == "f210":
                     expected_migrations[F210_ONLY_MIGRATION] = PUBLISHED_473_F210_MIGRATION_SHA256
@@ -138,9 +166,19 @@ class PackageTests(unittest.TestCase):
                                        target_record=pack.EARLY_TARGET_RECORD)
                 self.assertFalse(any(path.startswith("migrations/") for path, _ in rows))
 
+    def test_f210_engine_coupled_optional_minima_match_the_selected_base_floor(self):
+        editions, _ = pack.read_editions(ROOT / "source")
+        minimum = editions["f210"]["minimum_base"]
+        source_info = json.loads((ROOT / "source/info.json").read_text())
+        _, rows = pack.members(ROOT / "source", target="f210")
+        packaged_info = json.loads(dict(rows)["info.json"])
+        expected = {"? recycler >= " + minimum, "? space-age >= " + minimum}
+        for info in (source_info, packaged_info):
+            self.assertTrue(expected.issubset(info["dependencies"]))
+
     def test_unimplemented_unknown_and_arbitrary_edition_versions_refuse_before_output(self):
         with tempfile.TemporaryDirectory() as temporary:
-            for target in ("f018", "../f210"):
+            for target in ("f005", "../f210"):
                 output = Path(temporary) / target.replace("/", "_") / "more-infinite-research_5.0.20000.zip"
                 with self.assertRaises(ValueError):
                     pack.build(ROOT / "source", output, target=target)
@@ -216,7 +254,7 @@ class PackageTests(unittest.TestCase):
             canonical_commit = self._write_layout_repository(
                 canonical_repository, Path("source"), Path("targets/editions.json"))
             editions = json.loads((ROOT / pack.TARGET_RECORD).read_bytes())["targets"]
-            self.assertEqual(set(editions), {"f013", "f014", "f015", "f016", "f017", "f100", "f110", "f200", "f210"})
+            self.assertEqual(set(editions), {"f013", "f014", "f015", "f016", "f017", "f018", "f100", "f110", "f200", "f210"})
             for target_id, edition in editions.items():
                 with self.subTest(target=target_id):
                     version = "5.0." + target_id[1:] + "00"

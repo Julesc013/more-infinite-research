@@ -17,6 +17,8 @@ SPEC.loader.exec_module(release)
 
 
 class ReleaseTests(unittest.TestCase):
+    NORMAL_TARGETS = ("f013", "f014", "f015", "f016", "f017", "f018", "f100", "f110", "f200", "f210")
+
     @staticmethod
     def _git(repository, *arguments):
         return subprocess.check_output(["git", "-C", str(repository), *arguments])
@@ -51,7 +53,7 @@ class ReleaseTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             release.verify(source, output)
 
-    def test_freeze_builds_nine_canonical_archives_and_repeats_across_roots(self):
+    def test_freeze_builds_ten_canonical_archives_and_repeats_across_roots(self):
         with tempfile.TemporaryDirectory() as temporary:
             temporary = Path(temporary)
             first_repository = temporary / "first-repository"
@@ -59,14 +61,21 @@ class ReleaseTests(unittest.TestCase):
             first_source, commit = self._repository(first_repository)
             first_output = temporary / "first-output"
             inventory = release.freeze(first_source, first_output, revision=commit)
-            expected = {release._archive_name(target) for target in release.TARGETS}
+            self.assertEqual(release.TARGETS, self.NORMAL_TARGETS)
+            expected = {release._archive_name(target) for target in self.NORMAL_TARGETS}
             self.assertEqual({path.name for path in first_output.iterdir()},
                              expected | {release.SUMS_NAME, release.INVENTORY_NAME})
             self.assertEqual(inventory["kind"], release.KIND)
             self.assertEqual(inventory["release"], {
                 "source_version": "5.0.0", "source_label": "source5.0.0",
                 "tag": "v5.0.0", "title": "MIR 5.0.0"})
-            self.assertEqual([asset["target"] for asset in inventory["assets"]], list(release.TARGETS))
+            self.assertEqual([asset["target"] for asset in inventory["assets"]], list(self.NORMAL_TARGETS))
+            self.assertEqual(len(inventory["assets"]), 10)
+            f018 = next(asset for asset in inventory["assets"] if asset["target"] == "f018")
+            self.assertEqual(
+                {key: f018[key] for key in ("version", "factorio_version", "minimum_base")},
+                {"version": "5.0.01800", "factorio_version": "0.18", "minimum_base": "0.18.47"},
+            )
             for asset in inventory["assets"]:
                 with self.subTest(target=asset["target"]), zipfile.ZipFile(first_output / asset["name"]) as archive:
                     self.assertEqual(archive.namelist()[0], asset["root"] + "/" + asset["members"][0]["path"])
@@ -99,11 +108,12 @@ class ReleaseTests(unittest.TestCase):
                 revision=commit,
                 early_target_record=release.package.EARLY_TARGET_RECORD,
             )
-            expected = ({release._archive_name(target) for target in release.TARGETS}
+            self.assertEqual(release.TARGETS, self.NORMAL_TARGETS)
+            expected = ({release._archive_name(target) for target in self.NORMAL_TARGETS}
                         | {release._archive_name(target) for target in release.EARLY_TARGETS}
                         | {release.SUMS_NAME, release.EARLY_SUMS_NAME, release.INVENTORY_NAME})
             self.assertEqual({path.name for path in frozen.iterdir()}, expected)
-            self.assertEqual([asset["target"] for asset in inventory["assets"]], list(release.TARGETS))
+            self.assertEqual([asset["target"] for asset in inventory["assets"]], list(self.NORMAL_TARGETS))
             cohort = inventory["early_cohort"]
             self.assertEqual(cohort["kind"], release.EARLY_COHORT_KIND)
             self.assertEqual(cohort["qualification"], release.EARLY_QUALIFICATION)

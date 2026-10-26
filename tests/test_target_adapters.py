@@ -1,11 +1,17 @@
 """Pure controls for selected-target API capabilities and reduced stage adapters."""
 import argparse
+import importlib.util
 from pathlib import Path
 import sys
+import tempfile
 import unittest
+import zipfile
 
 ROOT = Path(__file__).resolve().parents[1]
 DATA_API = "__more-infinite-research__.api.v1.data"
+PACKAGE_SPEC = importlib.util.spec_from_file_location("mir_f018_package", ROOT / "tools/package.py")
+pack = importlib.util.module_from_spec(PACKAGE_SPEC)
+PACKAGE_SPEC.loader.exec_module(pack)
 
 
 class TargetAdapterTests(unittest.TestCase):
@@ -211,6 +217,63 @@ class TargetAdapterTests(unittest.TestCase):
           end
           assert(continuations == 6)
         ''')
+
+    def test_selected_f018_package_runs_the_actual_reduced_stages(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            temporary = Path(temporary)
+            archive = temporary / "more-infinite-research_5.0.01800.zip"
+            pack.build(ROOT / "source", archive, target="f018")
+            with zipfile.ZipFile(archive) as package:
+                package.extractall(temporary)
+            self.lua.globals().player_root = (temporary / "more-infinite-research_5.0.01800").as_posix()
+            self.lua.execute(r'''
+              package.path = player_root .. "/?.lua;" .. player_root .. "/?/init.lua"
+              package.loaded["platform.target"] = nil
+              package.preload["platform.target"] = nil
+              local target = require("platform.target")
+              assert(target.id == "f018" and target.factorio_version == "0.18"
+                and target.minimum_base == "0.18.47" and target.reduced
+                and target.research_levels and not target.recipe_productivity)
+
+              data = {rows={}}
+              function data:extend(rows) self.rows = rows end
+              assert(loadfile(player_root .. "/data.lua"))()
+              assert(package.loaded["presentation.library"] == nil and package.loaded["runtime.bootstrap"] == nil)
+
+              data = {rows={}}
+              function data:extend(rows) self.rows = rows end
+              assert(loadfile(player_root .. "/settings.lua"))()
+              assert(#data.rows == 127)
+
+              data, settings = historical_stage("f018"), {startup={}}
+              data.raw.technology["tank"] = nil
+              assert(data.raw.technology.tanks ~= nil)
+              assert(loadfile(player_root .. "/data-final-fixes.lua"))()
+              assert(data.writes == 1)
+
+              local direct = {
+                "recipe-prod-research_character_crafting_speed-1",
+                "recipe-prod-research_character_mining_speed-1",
+                "recipe-prod-research_character_reach-1",
+                "recipe-prod-research_character_walking_speed-1",
+                "recipe-prod-research_inventory_capacity-1",
+                "recipe-prod-research_cannon_shooting_speed-1",
+                "recipe-prod-research_rocket_shooting_speed-1",
+                "recipe-prod-research_electric_shooting_speed-1",
+                "recipe-prod-research_flamethrower_shooting_speed-1",
+                "recipe-prod-research_lab_productivity-1",
+                "recipe-prod-research_robot_battery-1",
+              }
+              for _, name in ipairs(direct) do assert(data.raw.technology[name], name) end
+              local continuations = {
+                "braking-force-8", "inserter-capacity-bonus-8", "research-speed-7",
+                "weapon-shooting-speed-7", "worker-robots-storage-4", "laser-turret-speed-8",
+              }
+              for _, name in ipairs(continuations) do assert(data.raw.technology[name], name) end
+              local laser = data.raw.technology["laser-turret-speed-8"]
+              assert(laser.effects[1].type == "gun-speed" and laser.effects[1].ammo_category == "laser-turret")
+              assert(data.raw.technology["laser-shooting-speed-8"] == nil)
+            ''')
 
     def test_reduced_control_registers_only_the_unified_api(self):
         self.lua.execute(r'''

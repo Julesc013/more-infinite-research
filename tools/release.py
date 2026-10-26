@@ -20,7 +20,7 @@ PACKAGE_SPEC.loader.exec_module(package)
 KIND = "MIR5ReleaseAssetInventoryV1"
 INVENTORY_NAME = KIND + ".json"
 SUMS_NAME = "SHA256SUMS.txt"
-TARGETS = ("f013", "f014", "f015", "f016", "f017", "f100", "f110", "f200", "f210")
+TARGETS = ("f013", "f014", "f015", "f016", "f017", "f018", "f100", "f110", "f200", "f210")
 EARLY_COHORT_KIND = "MIR5EarlyBestEffortAssetCohortV1"
 EARLY_SUMS_NAME = "SHA256SUMS-early.txt"
 EARLY_TARGETS = ("f006", "f007", "f008", "f009", "f010", "f011", "f012")
@@ -110,7 +110,7 @@ def _target_identity(source, repository, commit, target_record):
     except (UnicodeDecodeError, json.JSONDecodeError, KeyError, TypeError) as error:
         raise ValueError("Frozen target record is invalid") from error
     if set(editions) != set(TARGETS):
-        raise ValueError("Frozen target record must declare exactly the nine MIR editions")
+        raise ValueError("Frozen target record must declare exactly the ten retained MIR editions")
     for target in TARGETS:
         edition = editions[target]
         if not isinstance(edition, dict) or not edition.get("source_available"):
