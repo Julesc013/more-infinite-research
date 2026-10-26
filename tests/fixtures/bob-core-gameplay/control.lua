@@ -121,11 +121,6 @@ local function matching_entries(actual, expected, label)
   for index, value in ipairs(actual) do
     local name = entry_name(value)
     local wanted_row = wanted[name]
-    local ignored_by_productivity
-    if type(value) == "table" then
-      ignored_by_productivity = value.ignored_by_productivity
-      if ignored_by_productivity == nil then ignored_by_productivity = value.ignored_by_stats end
-    end
     if type(value) ~= "table" or wanted_row == nil or seen[name]
         or (value.type or "item") ~= wanted_row.type or entry_amount(value) ~= wanted_row.amount
         or value.temperature ~= wanted_row.temperature
@@ -135,7 +130,8 @@ local function matching_entries(actual, expected, label)
         or (value.probability ~= nil and value.probability ~= 1)
         or (value.independent_probability ~= nil and value.independent_probability ~= 1)
         or (value.extra_count_fraction ~= nil and value.extra_count_fraction ~= 0)
-        or (ignored_by_productivity ~= nil and ignored_by_productivity ~= 0) then
+        or (value.ignored_by_productivity ~= nil and value.ignored_by_productivity ~= 0)
+        or (value.ignored_by_stats ~= nil and value.ignored_by_stats ~= 0) then
       fail(label .. " changed at " .. tostring(index) .. ": actual="
         .. tostring(type(value) == "table" and entry_name(value)) .. "/"
         .. tostring(type(value) == "table" and entry_amount(value)))

@@ -126,11 +126,6 @@ local function assert_entries(actual, expected, label)
   assert(type(actual) == "table" and #actual == #expected, label .. " count changed")
   for index, wanted in ipairs(expected) do
     local value = actual[index]
-    local ignored_by_productivity
-    if type(value) == "table" then
-      ignored_by_productivity = value.ignored_by_productivity
-      if ignored_by_productivity == nil then ignored_by_productivity = value.ignored_by_stats end
-    end
     assert(type(value) == "table" and (value.type or "item") == wanted.type
       and entry_name(value) == wanted.name and entry_amount(value) == wanted.amount
       and value.temperature == wanted.temperature
@@ -140,7 +135,8 @@ local function assert_entries(actual, expected, label)
       and (value.probability == nil or value.probability == 1)
       and (value.independent_probability == nil or value.independent_probability == 1)
       and (value.extra_count_fraction == nil or value.extra_count_fraction == 0)
-      and (ignored_by_productivity == nil or ignored_by_productivity == 0),
+      and (value.ignored_by_productivity == nil or value.ignored_by_productivity == 0)
+      and (value.ignored_by_stats == nil or value.ignored_by_stats == 0),
       label .. " changed at " .. tostring(index))
   end
 end

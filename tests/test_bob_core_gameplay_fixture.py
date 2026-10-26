@@ -381,6 +381,8 @@ class BobCoreGameplayFixtureTests(unittest.TestCase):
             .__setitem__("ignored_by_productivity", 1),
             "alloy-ignored-by-stats-default": lambda raw: raw["recipe"]["bob-bronze-alloy"]["results"][0]
             .__setitem__("ignored_by_stats", 1),
+            "alloy-co-present-productivity-and-stats": lambda raw: raw["recipe"]["bob-bronze-alloy"]["results"][0]
+            .update({"ignored_by_productivity": 0, "ignored_by_stats": 1}),
             "alloy-owner": lambda raw: raw["technology"]["bob-zinc-processing"]["effects"].__setitem__(0, {
                 "type": "unlock-recipe", "recipe": "wrong-route"}),
             "alloy-machine": lambda raw: raw["assembling-machine"][SOURCE_MACHINE].__setitem__("crafting_speed", 3),
@@ -392,6 +394,8 @@ class BobCoreGameplayFixtureTests(unittest.TestCase):
                 "type": "fluid", "name": "molten-copper", "amount": 19}),
             "metallurgy-machine": lambda raw: raw["assembling-machine"][SOURCE_METALLURGY_MACHINE]
             ["effect_receiver"]["base_effect"].__setitem__("productivity", .4),
+            "metallurgy-fluid-capacity": lambda raw: raw["assembling-machine"][SOURCE_METALLURGY_MACHINE]
+            ["fluid_boxes"][2].__setitem__("volume", 99),
         }
         for name, mutate in mutations.items():
             with self.subTest(mutation=name):
@@ -454,6 +458,7 @@ class BobCoreGameplayFixtureTests(unittest.TestCase):
                 ("ignored-by-productivity:bob-bronze-alloy", "native alloy result changed"),
                 ("ignored-by-productivity:bob-copper-tungsten-alloy", "native alloy result changed"),
                 ("ignored-by-stats:bob-copper-tungsten-alloy", "native alloy result changed"),
+                ("co-present-productivity-and-stats:bob-copper-tungsten-alloy", "native alloy result changed"),
                 ("changed-category:bob-copper-tungsten-alloy", "native alloy categories changed")):
             with self.subTest(opponent=opponent):
                 self.lua.globals().opponent = opponent
@@ -544,12 +549,16 @@ class BobCoreGameplayFixtureTests(unittest.TestCase):
                     local products = route.results
                     if route.recipe == target and (kind == "independent-probability"
                         or kind == "extra-count-fraction" or kind == "ignored-by-productivity"
-                        or kind == "ignored-by-stats") then
+                        or kind == "ignored-by-stats" or kind == "co-present-productivity-and-stats") then
                       products = copy_products(route.results)
                       if kind == "independent-probability" then products[1].independent_probability = .5 end
                       if kind == "extra-count-fraction" then products[1].extra_count_fraction = .25 end
                       if kind == "ignored-by-productivity" then products[1].ignored_by_productivity = 1 end
                       if kind == "ignored-by-stats" then products[1].ignored_by_stats = 1 end
+                      if kind == "co-present-productivity-and-stats" then
+                        products[1].ignored_by_productivity = 0
+                        products[1].ignored_by_stats = 1
+                      end
                     end
                     local categories = route.categories
                     if route.recipe == target and kind == "changed-category" then categories = {"wrong-category"} end
