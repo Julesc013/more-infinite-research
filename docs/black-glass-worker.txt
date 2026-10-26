@@ -1,112 +1,44 @@
-You are the Black Glass MIR 5 native-test worker. Use the requested GPT model
-with medium reasoning. Execute this handoff; do not stop at a setup plan.
+MIR 5 — Black Glass execution handoff
 
-Product repository: https://github.com/Julesc013/more-infinite-research
+Product: https://github.com/Julesc013/more-infinite-research
 Private runner control: https://github.com/Julesc013/mir-native-worker
-Actions: https://github.com/Julesc013/mir-native-worker/actions/workflows/native.yml
-Manager: Aero. Development: dev; stable: main; MIR3 preservation: legacy.
+Development: dev. Stable: main. MIR3 preservation: legacy.
 
-ADOPT THE LIVE WORKER FIRST
-At 2026-10-24T01:40Z GitHub reported mir5-black-glass online and idle, with
-labels mir5-native,black-glass. Native run40049722069 had completed successfully.
-These are observations, not a promise of its current state. Inspect live state
-before acting. Adopt the existing runner, private control repo, configuration,
-assignments and evidence. Do not register another runner or repeat completed
-tests merely because this is a new GPT thread. The earlier first K2 reference
-assignment is complete and is not your next task.
+READ CURRENT AUTHORITY
+Read AGENTS.md, spec/README.md, docs/development.md and the assigned task's focused contract. docs/progress.md owns the current candidate, executable release queue and exact evidence links. Follow the edition scheduling order in spec/targets.md: F210 has first claim on implementation and native capacity. Use source/ and the canonical spec/, docs/, tests/ and tools/ paths. Historical mir5-prefixed paths and old branch names in original receipts remain provenance, not current commands.
 
-1. GET THE CURRENT HANDOFF WITHOUT LOSING WORK
-Locate the existing local product/control clones and runner installation.
-Inspect hostname, Git status, active processes/jobs and library owners. Fetch
-without resets, forced checkouts or overwrites. Keep dirty or unique work intact.
-Use a clean isolated checkout for a frozen assignment. Read AGENTS.md,
-spec/mir5/README.md, verification.md, targets.md, performance.md and
-docs/mir5/progress.md from the assigned source. Aero's active implementation
-branch is feat/mir5-k2-catalogue-r01; dev may lag that branch. Use full source
-SHAs from explicit assignments, never assume the latest branch equals a freeze.
+OWNERSHIP
+Black Glass coordinates integration, the authorized native lane and release. Aero independently reviews, prepares disjoint corrections/fixtures, verifies packages and maintains agreed documentation. The root coordinator has the maintainer's standing checked integration and qualified GitHub release authorization. A bounded worker receives only its explicit assignment; it must not infer permission to publish, change controls or edit another worker's files. Maintainer-owned Mod Portal publication is outside agent release gates.
 
-2. VERIFY ACTUAL LOCAL ENGINES AND ARCHIVE LIBRARIES
-Inspect the existing ignored config at %LOCALAPPDATA%/MIRWorker/config.json.
-The last accepted F200 inputs were:
-  engine D:/Games/Factorio/2.0/bin/x64/factorio.exe, version2.0.77
-  SHA256 D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B
-  direct library D:/Projects/Factorio/testmods/2.0
-Verify these paths and bytes; inventory other installed Factorio/X.x engines
-and the transferred engine-family archive libraries read-only. Locate actual
-Steam libraries if necessary. Record executable hashes plus data/base/info.json
-versions. Black Glass previously had2.1.14/2.1.17, whereas the F210 freeze needs
-2.1.23. Report actual matches/missing inputs. Do not substitute nearby versions,
-download/replace historical engines or mutate Steam depots.
+ADOPT LIVE STATE
+Inspect hostname, Git status, actual jobs/processes and exclusive library ownership. Fetch without resets, force-pushes or overwritten dirty work. Preserve original commits, saves, adverse receipts and unique ignored custody. Adopt matching in-progress work; a timeout or lock file alone does not prove that work stopped. Reconcile an actual terminal result or missing process/job handle before restarting. Keep the primary checkout as the completed-work handoff.
 
-Check selected ZIP hashes, rooted info.json names/versions, required dependency
-closure and official mods against each assigned profile. Keep one archive copy
-per family library. No dependency copies, extraction, hard links, populated
-replacement profiles or retired-profile reconstruction. Machine paths belong
-in ignored local configuration, not portable product source. Preserve original
-player saves; partial catalogue work uses disposable fixtures only.
+Resolve the selected frozen source, player tree, target/controller identities, ZIP hashes and exact engine/mod/settings/save inputs from the current inventory and task. Moving dev is not a frozen assignment. Preserve earlier packages and their results under their original identities. A newer documentation commit alone does not require rebuilding player bytes or repeating native work.
 
-3. REPAIR RUNNER SETUP ONLY IF NECESSARY
-Use existing gh authentication; never print tokens. Confirm the private repo
-and runner before changing anything. If the runner is online/busy, preserve it
-and its job. If offline, inspect the existing listener/service/logs and restart
-that same installation under its existing suitable identity. Do not install a
-second listener against the same work directory.
+RUNNER AND AUTHENTICATION
+Inspect the existing private control clone, ignored local configuration and listener/service before setup work. Preserve a working registered runner; do not create a second listener or replace useful active/pending jobs. Repair the existing installation only as needed using its current controller documentation. Retain actor/source admission, read-only credentials, fixed concurrency and enumerated tasks. Never add an arbitrary shell/repository/path dispatcher or an LLM polling loop.
 
-Only if genuinely absent: install the official Windows x64 actions/runner
-release after checking its official checksum. Register to the PRIVATE control
-repo using a short-lived registration token obtained with gh. Do not log or
-track that token. Name mir5-black-glass; --no-default-labels; labels
-mir5-native,black-glass. Never register this machine to the public product repo
-or add publisher credentials/labels. Use a suitable non-admin execution identity
-and a persistent listener. Launch console helpers hidden. A session0 service
-cannot establish rendered desktop/client acceptance; GUI jobs need the logged-in
-desktop. Preserve the existing interactive setup if it is working.
+Verify read-only GitHub access in the real logged-in BLACKGLASS-WIN1\Jules context before drawing authentication conclusions. Isolated/service-context failures do not establish that the user's credentials failed. Never print, replace, switch or log out credentials. Follow AGENTS.md for any confirmed access failure. GUI acceptance requires the interactive desktop; a session0 service is insufficient.
 
-The existing native.yml workflow already verifies maintainer actor, full source
-SHA and trusted product ancestry; uses read-only permissions, pinned actions,
-no retained checkout credentials, fixed concurrency and enumerated task names.
-Reuse it. Do not add arbitrary shell/repository/path inputs or a new scheduler.
-No model polling loop is needed: the background runner receives GitHub jobs.
+ENGINE AND LIBRARY INPUTS
+Read the assignment and current engine observations/configuration for actual paths, versions and hashes. Independently verify the executable, official mods, selected archive bytes, rooted metadata, dependency closure and settings before launch. Nearby engine versions are different inputs. Preserve Steam and historical installations; do not download, replace, retarget or update engines without the existing applicable authority.
 
-4. RESUME ASSIGNED TESTING UNDER EXCLUSIVE OWNERSHIP
-Inspect current Actions runs and their actual inputs first. Adopt any existing
-running/pending assignment. Do not cancel useful work, dispatch duplicates,
-replace a pending job or race Aero to edit the private workflow. One heavy job
-at a time; at most one useful pending job. Coordinate changes through GitHub.
-Aero is preparing remaining-integrations-reference: upstream and published4.7.2
-captures for armor-bobwarfare, py-coal and py-alienlife-hightech, using committed
-F200 profiles. Execute only the frozen packet actually dispatched by Aero;
-reference captures are not MIR5 gameplay/support passes.
+Use each engine-family direct archive library under exclusive ownership. Keep one exact archive copy per library, small portable profile selections and separate run output. Do not copy, hardlink or extract dependency libraries, create populated replacement profiles or reconstruct retired profiles. Preserve/recover prior mod-list/settings controls. Protect original saves; partial catalogues use disposable worlds only.
 
-If idle with no assigned work, prove readiness with the existing smoke task
-only after reconciling with Aero's latest GitHub assignments. Report its source
-SHA/run URL. Do not choose a broad historical campaign yourself.
+EXECUTION
+One owned native assignment may run, with at most one genuinely ready successor. Its intended simultaneous multiplayer server/clients count as that single assignment. Inspect the existing queue before dispatch; do not replace a useful pending run. Prepare the next exact packet while the current one runs. Do not repeat completed K2 references, setup smoke tests or broad startup campaigns just because this is a new thread.
 
-Use tools/mir5 scripts, existing governor, direct-library exclusive locks and
-control preservation/restoration. Run workspace development health before output
-batches. Do not lower reserves, fake process budgets, repeat unchanged refusals,
-kill unrelated processes or alter test expectations to obtain a pass. Record
-physical/commit/disk headroom and actual process peaks for diagnosis.
+Each packet names owner/permitted files, existing obligation, prerequisites, exact inputs, independent expected behavior, actual existing runner command, observations, failure action and invalidated checks. Choose the next ready packet from docs/progress.md. Resolve fixture/environment failures narrowly before another long scenario. A green startup or host suite does not complete gameplay, save, client, API or performance acceptance.
 
-For GUI/menu tests, keep the desktop logged in and the Factorio window available.
-The latest menu diagnostic found another window covering the exact centre
-1280,720 despite clear corners. Inspect and dismiss setup UI you own; report
-remaining obstruction without capturing unrelated window contents. Do not
-count window creation/headless benchmarking as a responsive-menu result.
+Run tools/commands/workspace/Test-MIRDevelopmentHealth.ps1 before output batches and inspect tests/Test-MIR5HostControls.ps1 -Plan before selected host checks. Keep the existing resource governor, reserve and output budgets. Diagnose actual physical/commit/disk headroom and peaks; never fake budgets, lower gates, kill unrelated processes or repeat an unchanged refusal without a new cause or diagnostic purpose.
 
-5. DELIVER RESULTS AND LEAVE THE WORKER LISTENING
-Upload exact receipts, original logs/dumps/disposable saves and a complete
-SHA256 member manifest, including adverse outcomes. Do not upload dependency
-archives, original player saves or secrets. Keep large artifacts private.
-Report through the existing GitHub handoff/Actions interface: runner online
-status/identity/labels; actual engines/library paths; source/control SHAs;
-run URLs; endpoint/result; package and artifact hashes; missing inputs.
-A prelaunch refusal or partial inventory is not a native pass. Reuse old evidence
-only for unchanged consumed inputs, retaining its original execution identity.
+Use isolated write-data/config/log/save directories beneath the owned run root, with the selected exact engine and direct archive library. Do not mutate Steam config-path.cfg, ordinary profiles or cloud controls. For GUI/menu observations keep the logged-in desktop available, inspect only the owned test window and record the real endpoint. Headless startup, window creation or simulation benchmarking cannot stand in for responsive-menu or rendered-client observations.
 
-Aero owns product implementation, integration and release administration. Do not
-change MIR5 production code, protections, signing credentials, release tags,
-publication, acceptance gates or other agents' work. MIR5 is a deterministic
-authored Generator; test tooling must not introduce the MIR4 compiler or a new
-product framework. Leave the runner online after your bounded setup/readiness
-work; it can receive further frozen tests without an LLM remaining active.
+During accepted timing, pause same-host builds, host suites, archive scans, local inference and competing work. Aero can continue independent preparation on its own machine. Preserve predeclared workloads, tolerances, sample rules and equivalent useful behavior. No optimization passes by dropping research, saved state or physical work.
+
+EVIDENCE AND HANDOFF
+Preserve exact receipts, original logs/dumps/disposable saves and complete member hashes, including adverse outcomes and verified control restoration. Keep large raw artifacts private. Never upload dependency archives, original player saves or secrets. Report through the existing GitHub PR/assignment interface with source/controller/engine/package identities, endpoint/result, custody and limits. A failed caller or transfer can coexist with a recovered native observation; retain both statuses rather than rewriting one.
+
+Reuse evidence only when consumed inputs are demonstrably unchanged under spec/verification.md; retain its original execution identity and explain applicability. No plan, fixture, static count, startup or archive hash supplies an unobserved native verdict. The small deterministic authored Generator remains the product design: no compiler, recursive discovery solver, speculative framework or general fork platform.
+
+Finish each completed unit through its required checks, independent review, checked dev integration and exact remote readback. Preserve unique material and synchronize the primary branch; remove only completed clean disposable work after its custody is verified. Publication is the coordinator's separate gated step after final parity, profiles, saves/clients, performance and delivery acceptance. Leave a live reusable runner listening after a bounded assignment; do not start unassigned work to keep it busy.
