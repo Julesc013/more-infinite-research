@@ -12,14 +12,7 @@ local standalone_identity_setting = {
   default_value = false,
   hidden = true,
 }
-if type(data.extend) == "function" then
-  data:extend({standalone_identity_setting})
-else
-  -- The focused fixture host model deliberately exposes only data.raw.  Keep
-  -- its setting representation equivalent to the shipped data:extend call.
-  data.raw["bool-setting"] = data.raw["bool-setting"] or {}
-  data.raw["bool-setting"][standalone_identity_setting.name] = standalone_identity_setting
-end
+data:extend({standalone_identity_setting})
 
 local values = {
   ["ips-cost-base-research_gears"] = {type="int-setting", initial=8000, value=1},

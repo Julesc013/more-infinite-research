@@ -243,6 +243,47 @@ function Remove-StandaloneIdentityFixtureArchive {
     if(Test-Path -LiteralPath $lockPath){[IO.File]::Delete($lockPath)}
   }
 }
+function Invoke-MultiplayerFixturePreparation {
+  param(
+    [Parameter(Mandatory)][string]$ArchiveLibrary,
+    [Parameter(Mandatory)][string]$FactorioBin,
+    [Parameter(Mandatory)][string]$ProfilePath,
+    [Parameter(Mandatory)][string[]]$FixtureSources,
+    [Parameter(Mandatory)][string]$ExpectedMIRArchiveSha256,
+    [Parameter(Mandatory)][string]$FixtureCase,
+    [Parameter(Mandatory)][string]$PreparationRoot,
+    [Parameter(Mandatory)][string]$RepoRoot,
+    [switch]$StandaloneIdentityDiscovery,
+    $DiscoveryFixture,
+    [scriptblock]$CreateOnlyInvoker
+  )
+  # A staged discovery fixture remains installed only after every CreateOnly
+  # receipt and byte binding has been accepted.  Any malformed/missing receipt
+  # exits through this one cleanup finally before the caller can start a host.
+  $install=$null;$completed=$false
+  try {
+    if($StandaloneIdentityDiscovery){$install=Install-StandaloneIdentityFixtureArchive -Library $ArchiveLibrary -Fixture $DiscoveryFixture}
+    $nativeArguments=@{
+      ArchiveLibrary=$ArchiveLibrary;FactorioBin=$FactorioBin;ProfilePath=$ProfilePath;FixtureSources=$FixtureSources
+      ExpectedMIRArchiveSha256=$ExpectedMIRArchiveSha256;ActiveModsObserver='mir-fixture-mir5-active-mods-observer'
+      CaseName=$FixtureCase;OutputRoot=$PreparationRoot;CreateOnly=$true;ExpectedPeakMemoryMiB=4096;TimeoutSeconds=180;RepoRoot=$RepoRoot
+    }
+    if($null-ne$CreateOnlyInvoker){& $CreateOnlyInvoker $nativeArguments|Out-Null}
+    else{& (Join-Path $PSScriptRoot 'Invoke-NativeFixture.ps1') @nativeArguments|Out-Null}
+    $prepared=Get-Content -LiteralPath (Join-Path $PreparationRoot 'result.json') -Raw|ConvertFrom-Json
+    Assert-Session ($prepared.status -ceq 'passed-private-native-runtime-load-only') 'native world preparation failed'
+    if($StandaloneIdentityDiscovery){
+      $actualFixture=@($prepared.fixtures|Where-Object {[IO.Path]::GetFileName([string]$_.archive) -ceq 'mir-fixture-mir5-library-multiplayer_0.1.1.zip'})
+      Assert-Session ($actualFixture.Count-eq1 -and [string]$actualFixture[0].source -ceq [string]$DiscoveryFixture.source -and [string]$actualFixture[0].sha256 -ceq [string]$DiscoveryFixture.sha256) 'standalone identity discovery fixture bytes differ from its profile binding'
+    }
+    $seed=Join-Path $PreparationRoot 'write-data/saves/seed.zip'
+    Assert-Session ((Get-FileHash -LiteralPath $seed).Hash -ceq $prepared.seed_sha256) 'prepared seed differs'
+    $completed=$true
+    return [pscustomobject]@{prepared=$prepared;seed=$seed;install=$install}
+  } finally {
+    if(-not $completed -and $null-ne$install){Remove-StandaloneIdentityFixtureArchive -Install $install}
+  }
+}
 $output=Resolve-MIR441RecoveryScratchPath -Path $OutputRoot
 Assert-Session (-not(Test-Path -LiteralPath $output) -or @(Get-ChildItem -LiteralPath $output -Force).Count -eq 0) 'output is not empty'
 $engine=(Resolve-Path -LiteralPath $FactorioBin).Path
@@ -287,21 +328,8 @@ Assert-Session (-not $StandaloneIdentityDiscovery -or ($FixtureCase -ceq 'librar
 Assert-Session (-not $StandaloneIdentityDiscovery -or $ExpectedMIRArchiveSha256.ToUpperInvariant() -ceq [string]$target.mir_archive_sha256) 'standalone identity discovery MIR archive differs'
 $engineData=Join-Path (Get-Item -LiteralPath $engine).Directory.Parent.Parent.FullName 'data'
 $preparation=Join-Path $output 'preparation'
-try{
-  if($StandaloneIdentityDiscovery){$discoveryInstall=Install-StandaloneIdentityFixtureArchive -Library $library -Fixture $discoveryFixture}
-  & (Join-Path $PSScriptRoot 'Invoke-NativeFixture.ps1') -ArchiveLibrary $library -FactorioBin $engine -ProfilePath $profile -FixtureSources $fixtureSourcesForRun -ExpectedMIRArchiveSha256 $ExpectedMIRArchiveSha256 -ActiveModsObserver 'mir-fixture-mir5-active-mods-observer' -CaseName $FixtureCase -OutputRoot $preparation -CreateOnly -ExpectedPeakMemoryMiB 4096 -TimeoutSeconds 180 -RepoRoot $repo | Out-Null
-}catch{
-  if($null-ne$discoveryInstall){try{Remove-StandaloneIdentityFixtureArchive -Install $discoveryInstall}catch{Write-Warning 'standalone identity discovery archive requires recovery'}}
-  throw
-}
-$prepared=Get-Content -LiteralPath (Join-Path $preparation 'result.json') -Raw|ConvertFrom-Json
-Assert-Session ($prepared.status -ceq 'passed-private-native-runtime-load-only') 'native world preparation failed'
-if($StandaloneIdentityDiscovery){
-  $actualFixture=@($prepared.fixtures|Where-Object {[IO.Path]::GetFileName([string]$_.archive) -ceq 'mir-fixture-mir5-library-multiplayer_0.1.1.zip'})
-  Assert-Session ($actualFixture.Count-eq1 -and [string]$actualFixture[0].source -ceq [string]$discoveryFixture.source -and [string]$actualFixture[0].sha256 -ceq [string]$selection.archive_sha256['mir-fixture-mir5-library-multiplayer_0.1.1.zip']) 'standalone identity discovery fixture bytes differ from its profile binding'
-}
-$seed=Join-Path $preparation 'write-data/saves/seed.zip'
-Assert-Session ((Get-FileHash -LiteralPath $seed).Hash -ceq $prepared.seed_sha256) 'prepared seed differs'
+$preparationResult=Invoke-MultiplayerFixturePreparation -ArchiveLibrary $library -FactorioBin $engine -ProfilePath $profile -FixtureSources $fixtureSourcesForRun -ExpectedMIRArchiveSha256 $ExpectedMIRArchiveSha256 -FixtureCase $FixtureCase -PreparationRoot $preparation -RepoRoot $repo -StandaloneIdentityDiscovery:$StandaloneIdentityDiscovery -DiscoveryFixture $discoveryFixture
+$prepared=$preparationResult.prepared;$seed=[string]$preparationResult.seed;$discoveryInstall=$preparationResult.install
 $activation=$null;$resources=$null;$failure=$null
 $record=[ordered]@{
   kind=$(if($StandaloneIdentityDiscovery){'MIR5StandaloneIdentityDiscoveryNativeResultV1'}else{switch($FixtureCase){'library-multiplayer'{'MIR5LibraryMultiplayerNativeResultV1'};'library-paired-browser'{'MIR5LibraryPairedBrowserNativeResultV1'};default{'MIR5ScriptedEffectsMultiplayerNativeResultV1'}}});case=$FixtureCase;status='started';source_head=$prepared.source_head

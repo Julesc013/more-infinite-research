@@ -464,17 +464,20 @@ function Get-StandaloneIdentityDiscoveryMarker([string]$Text) {
   $row=$rows[0]
   Assert-Session ($row.case -ceq 'library-multiplayer' -and $row.stage -ceq 'identity-discovery' -and $row.status -ceq 'passed') 'standalone identity discovery marker identity differs'
   Assert-Session ((Test-LibraryInteger $row.ticks_after_last_join) -and [int64]$row.ticks_after_last_join -ge 120) 'standalone identity discovery wait differs'
-  foreach($field in @('two_connected_clients_required','distinct_personal_query_and_selection','stop_before_initial_gui')){
+  foreach($field in @('two_connected_clients_required','stop_before_initial_gui')){
     $property=$row.PSObject.Properties[$field]
     Assert-Session ($null-ne$property -and $property.Value -is [bool] -and $property.Value-eq$true) "standalone identity discovery $field differs"
   }
+  $personalStateChecked=$row.PSObject.Properties['personal_state_checked']
+  Assert-Session ($null-ne$personalStateChecked -and $personalStateChecked.Value -is [bool] -and $personalStateChecked.Value-eq$false) 'standalone identity discovery incorrectly claims a personal-state check'
   Assert-Session ((Test-LibraryInteger $row.shared_force_index) -and [int64]$row.shared_force_index -gt 0) 'standalone identity discovery force differs'
   Assert-Session ((Test-LibraryInteger $row.screenshot_calls) -and [int64]$row.screenshot_calls -eq 0) 'standalone identity discovery took a screenshot'
   $players=@($row.players)
   Assert-Session ($players.Count-eq2) 'standalone identity discovery player count differs'
   $indices=@();$names=@();$locales=@();$forces=@()
   foreach($player in $players){
-    Assert-Session ((Test-LibraryInteger $player.index) -and [int64]$player.index -gt 0 -and $player.name -is [string] -and $player.name -cmatch '^[A-Za-z0-9_-]+$' -and $player.locale -in @('en','de') -and (Test-LibraryInteger $player.force_index)) 'standalone identity discovery player shape differs'
+    $nameBytes=if($player.name -is [string]){[Text.UTF8Encoding]::new($false).GetByteCount([string]$player.name)}else{0}
+    Assert-Session ((Test-LibraryInteger $player.index) -and [int64]$player.index -gt 0 -and $player.name -is [string] -and $nameBytes -ge 1 -and $nameBytes -le 256 -and $player.name -notmatch '[\r\n]' -and $player.locale -in @('en','de') -and (Test-LibraryInteger $player.force_index)) 'standalone identity discovery player shape differs'
     $indices+=[int64]$player.index;$names+=[string]$player.name;$locales+=[string]$player.locale;$forces+=[int64]$player.force_index
   }
   Assert-Session ((@($indices|Select-Object -Unique)).Count-eq2 -and (@($names|Select-Object -Unique)).Count-eq2 -and ((@($locales|Sort-Object)-join ',') -ceq 'de,en') -and (@($forces|Select-Object -Unique).Count-eq1)) 'standalone identity discovery players are not distinct shared-force en/de clients'
@@ -821,10 +824,12 @@ function Start-Clients([string]$Phase) {
       $actualName=Wait-For ("standalone native join of "+$client.locale) {
         $current=Read-LogText (Join-Path $serverWriteData 'factorio-current.log')
         $delta=if($current.StartsWith($serverLogBefore,[StringComparison]::Ordinal)){$current.Substring($serverLogBefore.Length)}else{$current}
-        $matches=[regex]::Matches($delta,('\['+[regex]::Escape($markerPrefix)+'_JOIN\] ([A-Za-z0-9_-]+) '+$expectedJoin+'(?:\r?\n|$)'))
+        $matches=[regex]::Matches($delta,('(?m)\['+[regex]::Escape($markerPrefix)+'_JOIN\]\s+([^\r\n]{1,256}?)\s+'+[regex]::Escape([string]$expectedJoin)+'\s*$'))
         if($matches.Count-eq0){return $false}
         Assert-Session ($matches.Count-eq1) 'standalone identity discovery join marker is ambiguous'
-        return [string]$matches[0].Groups[1].Value
+        $actualName=[string]$matches[0].Groups[1].Value.Trim()
+        Assert-Session ([Text.UTF8Encoding]::new($false).GetByteCount($actualName) -ge 1) 'standalone identity discovery join name is empty'
+        return $actualName
       }
       $client['actual_name']=[string]$actualName
     }else{

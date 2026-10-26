@@ -522,7 +522,10 @@ local function record_standalone_identity_discovery(state, english, german)
     status = "passed",
     ticks_after_last_join = game.tick - latest_join,
     two_connected_clients_required = true,
-    distinct_personal_query_and_selection = true,
+    -- The environmental probe establishes a real two-client, shared-force
+    -- session only.  It deliberately stops before the normal personal-query
+    -- and GUI-selection assertions begin.
+    personal_state_checked = false,
     shared_force_index = state.force_index,
     screenshot_calls = state.screenshot_calls,
     stop_before_initial_gui = true,

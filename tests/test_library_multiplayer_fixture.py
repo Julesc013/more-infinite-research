@@ -766,6 +766,39 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
             )
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
 
+    def test_standalone_identity_bad_preparation_result_removes_only_the_owned_archive(self):
+        script = r'''
+          $ErrorActionPreference='Stop'; Set-StrictMode -Version Latest
+          $tokens=$null;$errors=$null
+          $ast=[Management.Automation.Language.Parser]::ParseFile($env:MIR_TEST_WRAPPER,[ref]$tokens,[ref]$errors)
+          if($errors.Count){throw $errors[0].Message}
+          function Assert-Session([bool]$Condition,[string]$Message){if(-not$Condition){throw $Message}}
+          $node=@($ast.FindAll({param($candidate) $candidate -is [Management.Automation.Language.FunctionDefinitionAst] -and $candidate.Name -ceq 'Invoke-MultiplayerFixturePreparation'},$true))
+          if($node.Count-ne1){throw 'preparation cleanup function is absent or ambiguous'}
+          Invoke-Expression $node[0].Extent.Text
+          $script:installed=0;$script:removed=0
+          function Install-StandaloneIdentityFixtureArchive {param($Library,$Fixture)$script:installed++;[pscustomobject]@{path='owned-0.1.1.zip';sha256=$Fixture.sha256;removed=$false}}
+          function Remove-StandaloneIdentityFixtureArchive {param($Install)$script:removed++;if($Install.path-ne'owned-0.1.1.zip' -or $Install.removed){throw 'cleanup targeted an unexpected archive'};$Install.removed=$true}
+          $root=Join-Path $env:MIR_TEST_WORK 'bad-preparation';$null=New-Item -ItemType Directory -Path $root
+          $rejected=$false
+          try {
+            Invoke-MultiplayerFixturePreparation -ArchiveLibrary 'library' -FactorioBin 'engine' -ProfilePath 'profile' -FixtureSources @('fixture') -ExpectedMIRArchiveSha256 ('A'*64) -FixtureCase 'library-multiplayer' -PreparationRoot (Join-Path $root 'preparation') -RepoRoot 'repo' -StandaloneIdentityDiscovery -DiscoveryFixture ([pscustomobject]@{source='staged';archive='owned';sha256=('B'*64)}) -CreateOnlyInvoker {
+              param($NativeArguments)
+              if(-not$NativeArguments.CreateOnly -or $NativeArguments.ActiveModsObserver-cne'mir-fixture-mir5-active-mods-observer'){throw 'mock did not receive the actual CreateOnly contract'}
+              $null=New-Item -ItemType Directory -Path $NativeArguments.OutputRoot
+              [IO.File]::WriteAllText((Join-Path $NativeArguments.OutputRoot 'result.json'),'{"status":"bad-preparation-result"}',[Text.UTF8Encoding]::new($false))
+            }|Out-Null
+          } catch {$rejected=$true}
+          if(-not$rejected -or $script:installed-ne1 -or $script:removed-ne1){throw 'bad preparation result did not clean up its single owned discovery archive'}
+          'PASS standalone identity bad preparation cleanup'
+        '''
+        with tempfile.TemporaryDirectory(prefix="mir5-identity-cleanup-") as work:
+            result = subprocess.run(
+                ["pwsh", "-NoLogo", "-NoProfile", "-Command", script], capture_output=True, text=True,
+                env=dict(os.environ, MIR_TEST_WRAPPER=str(WRAPPER), MIR_TEST_WORK=work), check=False,
+            )
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+
     def test_standalone_identity_discovery_stops_after_the_real_pair_before_gui_work(self):
         result = self.run_case("standalone-identity-discovery", target="f210")
         self.assertTrue(result["ok"], result.get("message"))
@@ -777,6 +810,7 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
         self.assertEqual(marker["stage"], "identity-discovery")
         self.assertEqual(marker["status"], "passed")
         self.assertEqual(marker["ticks_after_last_join"], 120)
+        self.assertFalse(marker["personal_state_checked"])
         self.assertTrue(marker["stop_before_initial_gui"])
         self.assertEqual(marker["screenshot_calls"], 0)
         self.assertEqual(
@@ -799,10 +833,10 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
           }
           function New-Marker {
             [ordered]@{case='library-multiplayer';stage='identity-discovery';status='passed';ticks_after_last_join=120
-              two_connected_clients_required=$true;distinct_personal_query_and_selection=$true;stop_before_initial_gui=$true
+              two_connected_clients_required=$true;personal_state_checked=$false;stop_before_initial_gui=$true
               shared_force_index=1;screenshot_calls=0;players=@(
-                [ordered]@{index=1;name='ActualEnglish';locale='en';force_index=1},
-                [ordered]@{index=2;name='ActualDeutsch';locale='de';force_index=1}
+                [ordered]@{index=1;name='Actual English!?';locale='en';force_index=1},
+                [ordered]@{index=2;name='Deutsch 名';locale='de';force_index=1}
               )}
           }
           $line='[MIR5_LIBRARY_STANDALONE_IDENTITY] '+((New-Marker)|ConvertTo-Json -Depth 8 -Compress)
@@ -812,6 +846,7 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
             {param($row)$row.screenshot_calls=1},
             {param($row)$row.players[1].force_index=2},
             {param($row)$row.players[1].name=$row.players[0].name},
+            {param($row)$row.personal_state_checked=$true},
             {param($row)$row.stop_before_initial_gui=$false}
           )){
             $row=New-Marker;&$mutate $row
@@ -1306,17 +1341,26 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
             },
             ["double-setting"]={
               ["ips-cost-growth-research_gears"]={setting_type="startup",default_value=2},
-            }
+            },
+            ["bool-setting"]={}
           }}
+          function data:extend(rows)
+            assert(type(rows)=="table" and #rows==1, "fixture must use one native prototype row")
+            local prototype=rows[1]
+            assert(type(prototype)=="table" and prototype.type=="bool-setting" and prototype.name=="mir5-library-standalone-identity-discovery", "unexpected discovery prototype")
+            assert(self.raw[prototype.type] and self.raw[prototype.type][prototype.name]==nil, "duplicate discovery prototype")
+            self.raw[prototype.type][prototype.name]=prototype
+          end
           assert(loadfile(updates_path))()
           return {
             base=data.raw["int-setting"]["ips-cost-base-research_gears"].default_value,
             increment=data.raw["int-setting"]["ips-cost-linear-increment-research_gears"].default_value,
             growth=data.raw["double-setting"]["ips-cost-growth-research_gears"].default_value,
             time=data.raw["int-setting"]["ips-research-time-research_gears"].default_value,
+            discovery=data.raw["bool-setting"]["mir5-library-standalone-identity-discovery"].default_value,
           }
         """))
-        self.assertEqual(values, {"base": 1, "increment": 0, "growth": 1, "time": 1})
+        self.assertEqual(values, {"base": 1, "increment": 0, "growth": 1, "time": 1, "discovery": False})
         wrong_default = plain(self.lua.execute(r"""
           data = {raw={
             ["int-setting"]={
@@ -1326,8 +1370,16 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
             },
             ["double-setting"]={
               ["ips-cost-growth-research_gears"]={setting_type="startup",default_value=2},
-            }
+            },
+            ["bool-setting"]={}
           }}
+          function data:extend(rows)
+            assert(type(rows)=="table" and #rows==1, "fixture must use one native prototype row")
+            local prototype=rows[1]
+            assert(type(prototype)=="table" and prototype.type=="bool-setting" and prototype.name=="mir5-library-standalone-identity-discovery", "unexpected discovery prototype")
+            assert(self.raw[prototype.type] and self.raw[prototype.type][prototype.name]==nil, "duplicate discovery prototype")
+            self.raw[prototype.type][prototype.name]=prototype
+          end
           local ok, message = pcall(function() assert(loadfile(updates_path))() end)
           return {ok=ok, message=tostring(message), defaults={
             base=data.raw["int-setting"]["ips-cost-base-research_gears"].default_value,
@@ -1340,11 +1392,37 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
         self.assertIn("unexpected Library refresh fixture setting ips-cost-base-research_gears", wrong_default["message"])
         self.assertEqual(wrong_default["defaults"], {"base": 7999, "increment": 0, "growth": 2, "time": 60})
         missing = self.lua.execute(r"""
-          data = {raw={ ["int-setting"]={}, ["double-setting"]={} }}
+          data = {raw={ ["int-setting"]={}, ["double-setting"]={}, ["bool-setting"]={} }}
+          function data:extend(rows)
+            assert(type(rows)=="table" and #rows==1, "fixture must use one native prototype row")
+            local prototype=rows[1]
+            assert(self.raw[prototype.type] and self.raw[prototype.type][prototype.name]==nil, "duplicate discovery prototype")
+            self.raw[prototype.type][prototype.name]=prototype
+          end
           return pcall(function() assert(loadfile(updates_path))() end)
         """)
         self.assertFalse(missing[0])
         self.assertIn("unexpected Library refresh fixture setting", missing[1])
+        duplicate = self.lua.execute(r"""
+          data = {raw={
+            ["int-setting"]={
+              ["ips-cost-base-research_gears"]={setting_type="startup",default_value=8000},
+              ["ips-cost-linear-increment-research_gears"]={setting_type="startup",default_value=0},
+              ["ips-research-time-research_gears"]={setting_type="startup",default_value=60},
+            },
+            ["double-setting"]={ ["ips-cost-growth-research_gears"]={setting_type="startup",default_value=2} },
+            ["bool-setting"]={ ["mir5-library-standalone-identity-discovery"]={type="bool-setting"} }
+          }}
+          function data:extend(rows)
+            assert(type(rows)=="table" and #rows==1, "fixture must use one native prototype row")
+            local prototype=rows[1]
+            assert(self.raw[prototype.type] and self.raw[prototype.type][prototype.name]==nil, "duplicate discovery prototype")
+            self.raw[prototype.type][prototype.name]=prototype
+          end
+          return pcall(function() assert(loadfile(updates_path))() end)
+        """)
+        self.assertFalse(duplicate[0])
+        self.assertIn("duplicate discovery prototype", duplicate[1])
 
     def test_opt_in_owned_process_memory_sampler_is_bounded_identity_checked_and_read_only(self):
         script = r'''
