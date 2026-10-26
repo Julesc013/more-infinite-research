@@ -18,10 +18,10 @@ Every change must identify its maturity: stable, preview, shadow, experimental, 
 
 - Compatibility policy describes decisions; it never mutates prototypes.
 - Only the admitted emitter creates or mutates generated technologies.
-- Every generated technology has a stable stream manifest row.
+- Every generated technology has a stable authored identity and checked native definition. Preserve published manifest facts where historical continuity depends on them; MIR5 does not recreate the retired compiler's global stream registry.
 - Every public compatibility claim names fixture or exact load-check evidence.
 - Target behavior needs an explicit disposition and target-local proof.
-- Changes to authorities must update their machine-readable manifests.
+- Update each fact's owning source, specification or target record and its affected checks. Do not restore retired generated MIR4 assurance manifests as new current dependencies.
 
 See [Governance](GOVERNANCE.md), [Extension Protocol](docs/api.md), and [the module boundaries](docs/architecture.md).
 
@@ -33,7 +33,7 @@ See [Governance](GOVERNANCE.md), [Extension Protocol](docs/api.md), and [the mod
 4. Materialize or inspect the exact verification plan.
 5. Run the selected narrow checks, then the broader profile required by the risk.
 6. Update the current spec/docs/target records together; preserve pinned historical generated receipts without editing them.
-7. Open a PR, wait for the aggregate evidence gate, merge, and read back the protected branch.
+7. Open a PR, complete required branch checks and affected qualification, merge, and read back the protected branch.
 
 Current MIR5 commands are in [Development](docs/development.md). Inspect the explicit host plan before running the selected controls:
 
