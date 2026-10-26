@@ -714,20 +714,37 @@
             "tests/fixtures/bob-core-f210-captured-facts.json"
           ],
           "scope": "The admitted F200 Bob/Angel, F210 BobTech/Angel and F210 no-Angel Bob-core closures now account for all 31 captured material absences through finite Availability rows. BA-06 Silver, BA-10 Zinc, BA-12 Brass and BA-15 Cobalt Steel are withheld in all three closures; no recovered compiler-plan declaration is a new route. A different exact admitted profile must provide its own captured route before a binding can be authored."
+        },
+        {
+          "id": "f210-bob-plates-central-host-wiring",
+          "source": [
+            "source/compatibility/bob_plates_profile.lua",
+            "source/compatibility/bob_plates_materials.lua",
+            "source/compatibility/modern_catalogue.lua",
+            "source/data-final-fixes.lua",
+            "source/research/catalogue.lua",
+            "source/research/settings.lua",
+            "source/research/bob_plates_materials.lua"
+          ],
+          "evidence": [
+            "tests/fixtures/bob-plates-f210-captured-facts.json.gz",
+            "tests/fixtures/bob-plates-f210-upstream-context.json.gz",
+            "tests/test_bob_plates_f210_pipeline.py"
+          ],
+          "scope": "Accepted PR1063/source head9ceb272c centrally wires the finite F210 Bob Plates body through one shared profile. Seven host pipeline controls cover31 Base and16 Space Age row comparisons against independently captured published expectations, tuning, disabled-lead identity and bounded recipe-cap metadata. The host plan has113 controls and all four CI checks pass. This is source/host wiring only; freeze the current package and qualify native research/effects plus protected save/reload behavior separately."
         }
       ],
       "test_subjects": [
         "compatibility",
         "production"
       ],
-      "remaining_implementation": [
-        "Centrally wire and emit the accepted finite Bob Plates constructors (31 Base and16 Space Age bodies at PR1059/Dev38dc957c8) through the F210 catalogue/publication path. Their captured facts and detached-body validation are retained, but no emitted package, native outcome or release qualification follows until that integration passes."
-      ],
+      "remaining_implementation": [],
       "remaining_qualification": [
         "Finish affected mixed/dynamic earned MIR overlap boundaries; composed fixed true/false/true and the independent fixed-provider removal/readdition controls already pass.",
         "Observe remaining exact admitted integrations and setting interactions; Bob/Angel physical125%/400% recipe-cap output is already qualified at its recorded source.",
         "Complete the explicit named/popular individual and dependency-valid combined campaign above. Current F210 input profiles now pin AAI, six BZ components and combinations, full Py, K2/SE/K2SE, full Bob/Angel and IR4; input availability does not qualify native, gameplay or migration outcomes.",
-        "Complete full-suite Py and broad Bob/Angel coverage separately from the existing narrow selections, with actual useful effects and migration/state outcomes."
+        "Complete full-suite Py and broad Bob/Angel coverage separately from the existing narrow selections, with actual useful effects and migration/state outcomes.",
+        "Freeze current Devc906b7c7/player treea74d599 packages, then qualify the centrally emitted F210 Bob Plates Base/Space Age routes with exact current-package native research/effect and protected save/reload witnesses."
       ],
       "qualification_campaign": {
         "status": "required-broad-coverage-incomplete",
