@@ -317,6 +317,7 @@ class F200F210CatalogueUpgradeFixtureTests(unittest.TestCase):
         source = json.loads((profiles / "full-catalogue-cross-f200-f210-published-f200-2077.json").read_text(encoding="utf-8"))
         target = json.loads((profiles / "full-catalogue-cross-f200-f210-mir5-f210-2123.json").read_text(encoding="utf-8"))
         freeze = json.loads((ROOT / "spec/evidence/current-assets-ea41cbc6-readback.json").read_text(encoding="utf-8"))
+        retained = json.loads((ROOT / "spec/evidence/current-assets-8aec3e68-readback.json").read_text(encoding="utf-8"))
         observer = "mir-fixture-mir5-active-mods-observer"
         fixture = "mir-fixture-mir5-full-catalogue-upgrade"
         for profile, edition, version, mir, fixture_version, engine_sha in (
@@ -334,16 +335,23 @@ class F200F210CatalogueUpgradeFixtureTests(unittest.TestCase):
             observer + "_0.1.0.zip": "723D1E7721449FC26040E5E6629416767BDC20AD79CF8723115846DB662A1F87",
             "more-infinite-research_4.7.20003.zip": "FBBA844DD04011A12BB6DA885745B0733AD37FAB181EAAD9EE4346B9B0D32647",
         }, source["archive_sha256"])
-        current = next(row for row in freeze["assets"] if row["target"] == "f210")
+        current = next(row for row in freeze["files"] if row["name"] == "more-infinite-research_5.0.21000.zip")
         self.assertEqual(("ea41cbc6d27626283db9d8bbf6211b2171b6e36a", "a807f775c18189e9bc1a276d91346c6b75fd31eb"),
                          (freeze["source"]["commit"], freeze["source"]["source_tree"]))
         self.assertEqual(("more-infinite-research_5.0.21000.zip", 564337,
                           "CE1165CAC174EDA4800EBECAAEF29FC2E071B2E7160CD98F799FE21C2F151F9B"),
-                         (current["name"], current["bytes"], current["archive_sha256"].upper()))
+                         (current["name"], current["bytes"], current["sha256"].upper()))
         self.assertEqual({observer + "_0.1.0.zip": "2E1BE5952D2A4CC5C74A0D149E075D247BA110A3FAE5B6768D3EAEBABCEF989C",
-                          current["name"]: current["archive_sha256"].upper()}, target["archive_sha256"])
-        self.assertFalse(freeze["native_execution"])
-        self.assertFalse(freeze["release_qualification"])
+                          current["name"]: current["sha256"].upper()}, target["archive_sha256"])
+        self.assertEqual("rebuilt-verified-not-native-qualified", freeze["status"])
+        self.assertFalse(freeze["claims"]["native_qualification"])
+        self.assertFalse(freeze["claims"]["release_qualification"])
+        retained_current = next(row for row in retained["assets"] if row["target"] == "f210")
+        self.assertEqual(("8aec3e68e5179ff88765e08efbb82035e64a3212", "697fb2bf789ff906796874853ea0b73520e6ccdc"),
+                         (retained["source"]["commit"], retained["source"]["source_tree"]))
+        self.assertEqual(("more-infinite-research_5.0.21000.zip", 553802,
+                          "1D9E99F6BC23FD109045E0C2D3F6C2ACCBE0D65BE5C10C317E5E36E9EDD9304E"),
+                         (retained_current["name"], retained_current["bytes"], retained_current["archive_sha256"].upper()))
 
     def test_cross_fixture_staging_is_explicit_and_does_not_import_player_source(self):
         info = json.loads(CROSS.joinpath("info.json").read_text(encoding="utf-8"))
