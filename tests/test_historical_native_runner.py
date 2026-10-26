@@ -191,7 +191,7 @@ class HistoricalNativeFixtureControls(unittest.TestCase):
         self.assertIn('continuation_gun_speed_ammo="laser-turret",', selected["literal"])
         self.assertIn("continuation_effect_delta=0.01,", selected["literal"])
 
-    def test_all_science_metadata_uses_only_the_three_native_red_recipe_targets(self):
+    def test_all_science_metadata_uses_only_the_four_native_red_recipe_targets(self):
         default_blob = subprocess.run(
             ["git", "show", "HEAD:tests/fixtures/historical-native/metadata.json"], cwd=ROOT,
             capture_output=True, check=True,
@@ -199,7 +199,7 @@ class HistoricalNativeFixtureControls(unittest.TestCase):
         self.assertEqual(hashlib.sha256(default_blob).hexdigest(), DEFAULT_METADATA_SHA256)
         self.assertTrue(all("science_policy" not in row for row in self.metadata["targets"].values()))
         alternate = json.loads(ALL_SCIENCE_METADATA.read_text(encoding="utf-8"))
-        self.assertEqual(set(alternate["targets"]), {"f017", "f100", "f110"})
+        self.assertEqual(set(alternate["targets"]), {"f017", "f018", "f100", "f110"})
 
         functions = r'''
           $ErrorActionPreference='Stop'; Set-StrictMode -Version Latest
@@ -215,20 +215,23 @@ class HistoricalNativeFixtureControls(unittest.TestCase):
           }
           $default=Get-HistoricalFixtureTarget -Target f017 -MetadataPath $env:MIR_TEST_DEFAULT
           $rows=@()
-          foreach($target in @('f017','f100','f110')){
+          foreach($target in @('f017','f018','f100','f110')){
             $selected=Get-HistoricalFixtureTarget -Target $target -MetadataPath $env:MIR_TEST_ALL
             $rows+=[ordered]@{target=$target;policy=$selected.science_policy;
               literal=(ConvertTo-HistoricalFixtureTargetLiteral $selected)}
           }
-          $rejected=$false
-          try{Get-HistoricalFixtureTarget -Target f015 -MetadataPath $env:MIR_TEST_BAD|Out-Null}
-          catch{$rejected=$_.Exception.Message -match 'historical science policy differs'}
-          if(-not $rejected){throw 'all science policy accepted a non-red-recipe target'}
+          foreach($target in @('f013','f014','f015','f016')){
+            $rejected=$false
+            try{Get-HistoricalFixtureTarget -Target $target -MetadataPath $env:MIR_TEST_BAD|Out-Null}
+            catch{$rejected=$_.Exception.Message -match 'historical science policy differs'}
+            if(-not $rejected){throw "all science policy accepted non-red-recipe target: $target"}
+          }
           [ordered]@{default_literal=(ConvertTo-HistoricalFixtureTargetLiteral $default);rows=$rows}|ConvertTo-Json -Compress
         '''
         with tempfile.TemporaryDirectory(prefix="mir5-historical-all-metadata-") as work:
             bad = json.loads(ALL_SCIENCE_METADATA.read_text(encoding="utf-8"))
-            bad["targets"]["f015"] = bad["targets"].pop("f017")
+            for target in ("f013", "f014", "f015", "f016"):
+                bad["targets"][target] = bad["targets"]["f018"]
             bad_path = Path(work) / "bad.json"
             bad_path.write_text(json.dumps(bad), encoding="utf-8")
             result = subprocess.run(
@@ -258,12 +261,20 @@ class HistoricalNativeFixtureControls(unittest.TestCase):
         expected_continuation = ("automation-science-pack", "chemical-science-pack", "logistic-science-pack",
                                  "production-science-pack", "utility-science-pack", "military-science-pack",
                                  "space-science-pack")
+        expected_f018_continuation = ("automation-science-pack", "chemical-science-pack", "logistic-science-pack",
+                                      "military-science-pack", "utility-science-pack", "production-science-pack",
+                                      "space-science-pack")
         for row in rendered["rows"]:
             with self.subTest(target=row["target"]):
                 self.assertEqual(row["policy"], "all")
                 self.assertIn('science_policy="all",', row["literal"])
                 self.assertIn('direct_science={' + ",".join(f'"{name}"' for name in expected_direct) + '}', row["literal"])
-                self.assertIn('continuation_science={' + ",".join(f'"{name}"' for name in expected_continuation) + '}', row["literal"])
+                expected = expected_f018_continuation if row["target"] == "f018" else expected_continuation
+                self.assertIn('continuation_science={' + ",".join(f'"{name}"' for name in expected) + '}', row["literal"])
+                if row["target"] == "f018":
+                    self.assertIn('continuation="laser-turret-speed-8",', row["literal"])
+                    self.assertIn('continuation_gun_speed_ammo="laser-turret",', row["literal"])
+                    self.assertIn("continuation_effect_delta=0.01,", row["literal"])
 
     def test_shared_science_source_emits_the_all_policy_historical_vectors(self):
         self.lua.globals().player_root = (ROOT / "source").as_posix()
@@ -307,14 +318,20 @@ class HistoricalNativeFixtureControls(unittest.TestCase):
         expected = {
             "direct": "military-science-pack,utility-science-pack,automation-science-pack,logistic-science-pack,chemical-science-pack,production-science-pack,space-science-pack",
             "continuation": "automation-science-pack,chemical-science-pack,logistic-science-pack,production-science-pack,utility-science-pack,military-science-pack,space-science-pack",
+            "f018_continuation": "automation-science-pack,chemical-science-pack,logistic-science-pack,military-science-pack,utility-science-pack,production-science-pack,space-science-pack",
         }
-        for target in ("f017", "f100", "f110"):
-            for name, source in (
+        for target in ("f017", "f018", "f100", "f110"):
+            vectors = [
                 ("direct", (("military-science-pack", 1), ("utility-science-pack", 1))),
                 ("continuation", (("automation-science-pack", 1), ("chemical-science-pack", 1),
                                   ("logistic-science-pack", 1), ("production-science-pack", 1),
                                   ("utility-science-pack", 1))),
-            ):
+            ]
+            if target == "f018":
+                vectors[1] = ("f018_continuation", (("automation-science-pack", 1),
+                              ("chemical-science-pack", 1), ("logistic-science-pack", 1),
+                              ("military-science-pack", 1), ("utility-science-pack", 1)))
+            for name, source in vectors:
                 with self.subTest(target=target, vector=name):
                     lua_source = self.lua.table_from([self.lua.table_from(item) for item in source])
                     enabled, reason, actual, red_gate = self.lua.eval("shared_all_vector")(target, lua_source)
@@ -365,7 +382,7 @@ class HistoricalNativeFixtureControls(unittest.TestCase):
 
           function exercise_direct_completion(id, expected_effect, actual_effect, missing_direct_pack, missing_continuation_pack,
               restored_lab, actual_continuation_effect, direct_unit_count, direct_unit_energy,
-              continuation_unit_count, continuation_unit_energy)
+              continuation_unit_count, continuation_unit_energy, science_policy)
             local ok, value = pcall(function()
               package.loaded["target"] = nil
               package.loaded["target-literal"] = nil
@@ -391,15 +408,24 @@ class HistoricalNativeFixtureControls(unittest.TestCase):
                   }
                 end
                 if id == "f018" then
+                  local direct_science = {"military-science-pack", "utility-science-pack"}
+                  local continuation_science = {"automation-science-pack", "chemical-science-pack",
+                    "logistic-science-pack", "military-science-pack", "utility-science-pack"}
+                  if science_policy == "all" then
+                    direct_science = {"military-science-pack", "utility-science-pack", "automation-science-pack",
+                      "logistic-science-pack", "chemical-science-pack", "production-science-pack", "space-science-pack"}
+                    continuation_science = {"automation-science-pack", "chemical-science-pack", "logistic-science-pack",
+                      "military-science-pack", "utility-science-pack", "production-science-pack", "space-science-pack"}
+                  end
                   return {
-                    id=id, mir_version="5.0.01800", direct="recipe-prod-research_character_mining_speed-1",
+                    id=id, mir_version="5.0.01800", science_policy=science_policy,
+                    direct="recipe-prod-research_character_mining_speed-1",
                     direct_effect=expected_effect,
-                    direct_science={"military-science-pack", "utility-science-pack"},
+                    direct_science=direct_science,
                     continuation="laser-turret-speed-8", continuation_mode="lab",
                     continuation_settings_family="laser-shooting-speed",
                     continuation_gun_speed_ammo="laser-turret", continuation_effect_delta=0.01,
-                    continuation_science={"automation-science-pack", "chemical-science-pack",
-                      "logistic-science-pack", "military-science-pack", "utility-science-pack"},
+                    continuation_science=continuation_science,
                     queue_api=true,
                   }
                 end
@@ -477,7 +503,7 @@ class HistoricalNativeFixtureControls(unittest.TestCase):
               callbacks.init()
 
               local direct_input = global.mir5_historical_native.direct_lab.get_inventory(defines.inventory.lab_input)
-              if id == "f017" then
+              if id == "f017" or (id == "f018" and science_policy == "all") then
                 local function only_powered(expected)
                   local powered = {}
                   for _, lab in ipairs(created) do
@@ -516,8 +542,12 @@ class HistoricalNativeFixtureControls(unittest.TestCase):
                 callbacks[defines.events.on_tick]()
                 assert(state.phase == "continuation" and force.current_research == continuation)
                 only_powered(state.continuation_lab)
-                continuation.researched, force.stack_inserter_capacity_bonus, force.current_research = true,
-                  actual_continuation_effect or 1, nil
+                continuation.researched, force.current_research = true, nil
+                if id == "f018" then
+                  gun_speed["laser-turret"] = actual_continuation_effect or 0.01
+                else
+                  force.stack_inserter_capacity_bonus = actual_continuation_effect or 1
+                end
                 callbacks[defines.events.on_research_finished]({research=continuation})
                 assert(state.phase == "continuation-consumption-pending")
                 assert(state.direct_lab.energy == 0 and state.continuation_lab.energy == 0)
@@ -541,7 +571,9 @@ class HistoricalNativeFixtureControls(unittest.TestCase):
                 game.tick = 3
                 callbacks[defines.events.on_tick]()
                 return {phase=state.phase, saved=state.saved == true, modifier=force.manual_mining_speed_modifier,
-                  stack_bonus=force.stack_inserter_capacity_bonus, direct_event=state.direct_event_counts["military-science-pack"],
+                  stack_bonus=force.stack_inserter_capacity_bonus,
+                  continuation_effect=id == "f018" and gun_speed["laser-turret"] or force.stack_inserter_capacity_bonus,
+                  direct_event=state.direct_event_counts["military-science-pack"],
                   direct_next=state.direct_next_tick_counts["military-science-pack"],
                   continuation_event=state.continuation_event_counts["automation-science-pack"],
                   continuation_next=state.continuation_next_tick_counts["automation-science-pack"],
@@ -624,6 +656,39 @@ class HistoricalNativeFixtureControls(unittest.TestCase):
         self.assertIn('"stage":"reload"', all_science[1]["final_marker"])
         self.assertIn("direct_unit count=1,energy=60", all_science[1]["direct_unit_marker"])
         self.assertIn("continuation_unit count=1,energy=60", all_science[1]["continuation_unit_marker"])
+
+        f018_all_science = self.lua.eval("exercise_direct_completion")(
+            "f018", 0.10, 0.10, None, None, None, None, None, None, None, None, "all"
+        )
+        self.assertTrue(f018_all_science[0])
+        self.assertEqual(
+            (f018_all_science[1]["phase"], f018_all_science[1]["saved"], f018_all_science[1]["modifier"],
+             f018_all_science[1]["continuation_effect"], f018_all_science[1]["direct_event"],
+             f018_all_science[1]["direct_next"], f018_all_science[1]["continuation_event"],
+             f018_all_science[1]["continuation_next"], f018_all_science[1]["saves"]),
+            ("complete", True, 0.10, 0.01, 32, 31, 32, 31, 1),
+        )
+        self.assertIn('"stage":"reload"', f018_all_science[1]["final_marker"])
+        self.assertIn("direct_unit count=1,energy=60", f018_all_science[1]["direct_unit_marker"])
+        self.assertIn("continuation_unit count=1,energy=60", f018_all_science[1]["continuation_unit_marker"])
+
+        missing_f018_all_direct = self.lua.eval("exercise_direct_completion")(
+            "f018", 0.10, 0.10, "space-science-pack", None, None, None, None, None, None, None, "all"
+        )
+        self.assertFalse(missing_f018_all_direct[0])
+        self.assertIn("real direct lab did not consume space-science-pack", missing_f018_all_direct[1])
+
+        missing_f018_all_continuation = self.lua.eval("exercise_direct_completion")(
+            "f018", 0.10, 0.10, None, "production-science-pack", None, None, None, None, None, None, "all"
+        )
+        self.assertFalse(missing_f018_all_continuation[0])
+        self.assertIn("real continuation lab did not consume production-science-pack", missing_f018_all_continuation[1])
+
+        wrong_f018_all_continuation_effect = self.lua.eval("exercise_direct_completion")(
+            "f018", 0.10, 0.10, None, None, None, 0.005, None, None, None, None, "all"
+        )
+        self.assertFalse(wrong_f018_all_continuation_effect[0])
+        self.assertIn("generated native effect", wrong_f018_all_continuation_effect[1])
 
         missing_all_science = self.lua.eval("exercise_direct_completion")(
             "f017", 0.10, 0.10, "military-science-pack"
@@ -762,7 +827,7 @@ class HistoricalNativeFixtureControls(unittest.TestCase):
                 else:
                     self.assertFalse(row["continuation"])
 
-        for target in ("f017", "f100", "f110"):
+        for target in ("f017", "f018", "f100", "f110"):
             with self.subTest(target=target, policy="all"):
                 row = self.lua.eval("setting_defaults")(target, True, "all")
                 self.assertEqual(row["science_policy"], "all")
@@ -773,9 +838,6 @@ class HistoricalNativeFixtureControls(unittest.TestCase):
         rejected = self.lua.eval("setting_policy_error")("f015", "all")
         self.assertFalse(rejected[0])
         self.assertIn("historical all science target differs", rejected[1])
-        rejected_f018 = self.lua.eval("setting_policy_error")("f018", "all")
-        self.assertFalse(rejected_f018[0])
-        self.assertIn("historical all science target differs", rejected_f018[1])
 
     def test_f013_f014_final_stage_accelerates_only_a_validated_direct_probe(self):
         self.lua.globals().fixture_root = FIXTURE.as_posix()
@@ -838,14 +900,22 @@ class HistoricalNativeFixtureControls(unittest.TestCase):
             "production-science-pack", "utility-science-pack", "military-science-pack",
             "space-science-pack"
           }
+          local f018_continuation_science = {
+            "automation-science-pack", "chemical-science-pack", "logistic-science-pack",
+            "military-science-pack", "utility-science-pack", "production-science-pack",
+            "space-science-pack"
+          }
           function install_all_fixture_target(id)
             package.loaded["target"] = nil
             package.loaded["target-literal"] = nil
-            package.preload["target-literal"] = function() return {
-              id=id, science_policy="all", direct="recipe-prod-research_character_mining_speed-1",
-              direct_science=direct_science, continuation="inserter-capacity-bonus-8",
-              continuation_science=continuation_science
-            } end
+            package.preload["target-literal"] = function()
+              return {
+                id=id, science_policy="all", direct="recipe-prod-research_character_mining_speed-1",
+                direct_science=direct_science,
+                continuation=id == "f018" and "laser-turret-speed-8" or "inserter-capacity-bonus-8",
+                continuation_science=id == "f018" and f018_continuation_science or continuation_science
+              }
+            end
           end
           local function ingredients(names)
             local out = {}
@@ -854,23 +924,26 @@ class HistoricalNativeFixtureControls(unittest.TestCase):
           end
           function all_science_preflight(id, mutation)
             install_all_fixture_target(id)
+            local continuation_name = id == "f018" and "laser-turret-speed-8" or "inserter-capacity-bonus-8"
+            local selected_continuation_science = id == "f018" and f018_continuation_science or continuation_science
             local red = {result="automation-science-pack"}
             local direct = {unit={ingredients=ingredients(direct_science)}, prerequisites={}}
-            local continuation = {unit={ingredients=ingredients(continuation_science)}, prerequisites={}}
+            local continuation = {unit={ingredients=ingredients(selected_continuation_science)}, prerequisites={}}
             local technology = {
               ["recipe-prod-research_character_mining_speed-1"] = direct,
-              ["inserter-capacity-bonus-8"] = continuation,
+              [continuation_name] = continuation,
             }
             if mutation == "disabled-red" then red.enabled = false end
             if mutation == "red-owner" then technology["automation-science-pack"] = {} end
             if mutation == "wrong-ingredient" then direct.unit.ingredients[3] = {"wrong-pack", 1} end
+            if mutation == "missing-ingredient" then table.remove(continuation.unit.ingredients) end
             if mutation == "red-prerequisite" then continuation.prerequisites = {"automation-science-pack"} end
             data = {raw={recipe={ ["automation-science-pack"] = red }, technology=technology}}
             local ok, message = pcall(function() assert(loadfile(final_fixes, "t", _ENV))() end)
             return ok, message
           end
         ''')
-        for target in ("f017", "f100", "f110"):
+        for target in ("f017", "f018", "f100", "f110"):
             with self.subTest(target=target):
                 result = self.lua.eval("all_science_preflight")(target, "")
                 self.assertTrue(result[0])
@@ -878,10 +951,11 @@ class HistoricalNativeFixtureControls(unittest.TestCase):
             ("disabled-red", "historical initial red recipe differs"),
             ("red-owner", "historical initial red owner differs"),
             ("wrong-ingredient", "historical all science ingredient differs"),
+            ("missing-ingredient", "historical all science ingredient count differs"),
             ("red-prerequisite", "historical initial red prerequisite differs"),
         ):
             with self.subTest(mutation=mutation):
-                result = self.lua.eval("all_science_preflight")("f017", mutation)
+                result = self.lua.eval("all_science_preflight")("f018", mutation)
                 self.assertFalse(result[0])
                 self.assertIn(message, result[1])
 

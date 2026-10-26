@@ -3,7 +3,7 @@
 -- and time, and intentionally never changes the observed numeric continuation.
 local target = require("target")
 if target.science_policy == "all" then
-  assert(target.id == "f017" or target.id == "f100" or target.id == "f110",
+  assert(target.id == "f017" or target.id == "f018" or target.id == "f100" or target.id == "f110",
     "historical all science target differs")
 
   local red = assert(data.raw.recipe["automation-science-pack"], "historical initial red recipe is absent")
