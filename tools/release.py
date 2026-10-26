@@ -21,6 +21,10 @@ KIND = "MIR5ReleaseAssetInventoryV1"
 INVENTORY_NAME = KIND + ".json"
 SUMS_NAME = "SHA256SUMS.txt"
 TARGETS = ("f013", "f014", "f015", "f016", "f017", "f100", "f110", "f200", "f210")
+EARLY_COHORT_KIND = "MIR5EarlyBestEffortAssetCohortV1"
+EARLY_SUMS_NAME = "SHA256SUMS-early.txt"
+EARLY_TARGETS = ("f006", "f007", "f008", "f009", "f010", "f011", "f012")
+EARLY_QUALIFICATION = "best-effort-early-data-only-distributions-not-native-qualified"
 MOD_NAME = "more-infinite-research"
 SOURCE_VERSION = "5.0.0"
 SOURCE_DISTRIBUTION_VERSION = "5.0.21000"
@@ -120,6 +124,40 @@ def _target_identity(source, repository, commit, target_record):
     }
 
 
+def _early_target_identity(source, repository, commit, target_record):
+    relative, raw = package.checked_target_record(source, target_record, commit)
+    if relative != package.EARLY_TARGET_RECORD:
+        raise ValueError("Early cohort requires the exact early target record")
+    entry = _git(repository, "ls-tree", commit, "--", relative)
+    try:
+        metadata, name = entry.split("\t", 1)
+        _, kind, blob = metadata.split()
+        record = json.loads(raw.decode("utf-8"))
+        editions = record["targets"]
+    except (UnicodeDecodeError, json.JSONDecodeError, KeyError, TypeError, ValueError) as error:
+        raise ValueError("Frozen early target record is invalid") from error
+    if kind != "blob" or name != relative:
+        raise ValueError("Frozen early target record has no ordinary tracked identity")
+    if (not isinstance(record, dict) or not isinstance(editions, dict)
+            or record.get("schema") != 1 or record.get("qualification") != EARLY_QUALIFICATION
+            or set(editions) != set(EARLY_TARGETS)):
+        raise ValueError("Frozen early target record has an invalid cohort")
+    for target in EARLY_TARGETS:
+        edition = editions[target]
+        if (not isinstance(edition, dict)
+                or set(edition) != {"factorio_version", "minimum_base", "source_available", "delivery"}
+                or edition.get("source_available") is not True
+                or edition.get("delivery") not in {"extract-to-folder", "zip"}
+                or not isinstance(edition.get("factorio_version"), str)
+                or not isinstance(edition.get("minimum_base"), str)):
+            raise ValueError("Frozen early target record has an invalid edition: " + target)
+    return editions, {
+        "path": relative,
+        "blob": blob,
+        "sha256": digest(raw),
+    }
+
+
 def _version(target):
     return "5.0." + target[1:] + "00"
 
@@ -173,12 +211,21 @@ def _asset(record, target, edition):
     }
 
 
+def _early_asset(record, target, edition):
+    if (record.get("kind") != "early-data-only-package-members-not-gameplay-qualification"
+            or record.get("delivery") != edition["delivery"]):
+        raise ValueError("Packager returned an unexpected early MIR asset cohort")
+    asset = _asset(record, target, edition)
+    asset["delivery"] = edition["delivery"]
+    return asset
+
+
 def _sums(assets):
     return "".join(asset["archive_sha256"] + " *" + asset["name"] + "\n" for asset in assets).encode("ascii")
 
 
-def _body(source, target_record, controller, assets, sums):
-    return {
+def _body(source, target_record, controller, assets, sums, early_cohort=None):
+    body = {
         "schema": 1,
         "kind": KIND,
         "release": {
@@ -193,6 +240,9 @@ def _body(source, target_record, controller, assets, sums):
         "assets": assets,
         "checksums": {"name": SUMS_NAME, "sha256": digest(sums), "bytes": len(sums)},
     }
+    if early_cohort is not None:
+        body["early_cohort"] = early_cohort
+    return body
 
 
 def _inventory_bytes(body):
@@ -216,10 +266,45 @@ def _new_output(source, output):
     return output
 
 
-def freeze(source, output, revision="HEAD", target_record=package.TARGET_RECORD):
-    """Build all nine committed player packages into one new, offline-only directory."""
+def _early_cohort_body(target_record, assets, sums):
+    return {
+        "kind": EARLY_COHORT_KIND,
+        "qualification": EARLY_QUALIFICATION,
+        "target_record": target_record,
+        "assets": assets,
+        "checksums": {"name": EARLY_SUMS_NAME, "sha256": digest(sums), "bytes": len(sums)},
+    }
+
+
+def _preflight_early_cohort(source, commit, target_record, editions):
+    _, files = package.git_source(source, commit, include_early_locale=True)
+    for target in EARLY_TARGETS:
+        package.members(source, committed_files=files, target=target, editions=editions,
+                        target_record=target_record["path"])
+
+
+def _build_early_cohort(source, output, commit, target_record, editions):
+    assets = []
+    for target in EARLY_TARGETS:
+        record = package.build(source, output / _archive_name(target), revision=commit,
+                               target=target, target_record=target_record["path"])
+        assets.append(_early_asset(record, target, editions[target]))
+    if len({asset["target"] for asset in assets}) != len(EARLY_TARGETS):
+        raise ValueError("Expected early release assets are not unique")
+    sums = _sums(assets)
+    (output / EARLY_SUMS_NAME).write_bytes(sums)
+    return _early_cohort_body(target_record, assets, sums)
+
+
+def freeze(source, output, revision="HEAD", target_record=package.TARGET_RECORD, early_target_record=None):
+    """Freeze retained packages and an explicitly selected best-effort early cohort."""
     source, repository, _, source_identity = _source_identity(Path(source), revision)
     editions, target_identity = _target_identity(source, repository, source_identity["commit"], target_record)
+    early_editions, early_identity = (None, None)
+    if early_target_record is not None:
+        early_editions, early_identity = _early_target_identity(
+            source, repository, source_identity["commit"], early_target_record)
+        _preflight_early_cohort(source, source_identity["commit"], early_identity, early_editions)
     controller = _controller_identity()
     output = _new_output(source, output)
     assets = []
@@ -229,9 +314,12 @@ def freeze(source, output, revision="HEAD", target_record=package.TARGET_RECORD)
         assets.append(_asset(record, target, editions[target]))
     sums = _sums(assets)
     (output / SUMS_NAME).write_bytes(sums)
-    body = _body(source_identity, target_identity, controller, assets, sums)
+    early_cohort = (None if early_identity is None else _build_early_cohort(
+        source, output, source_identity["commit"], early_identity, early_editions))
+    body = _body(source_identity, target_identity, controller, assets, sums, early_cohort)
     (output / INVENTORY_NAME).write_bytes(_inventory_bytes(body))
-    return verify(source, output, target_record=target_identity["path"])
+    return verify(source, output, target_record=target_identity["path"],
+                  early_target_record=(None if early_identity is None else early_identity["path"]))
 
 
 def _read_inventory(output):
@@ -249,7 +337,7 @@ def _read_inventory(output):
     return inventory
 
 
-def verify(source, output, target_record=None):
+def verify(source, output, target_record=None, early_target_record=None):
     """Verify an offline inventory against committed source and exact rebuilt packages."""
     source = Path(source)
     output = Path(output)
@@ -258,9 +346,14 @@ def verify(source, output, target_record=None):
     frozen_source = inventory.get("source")
     frozen_record = inventory.get("target_record")
     frozen_controller = inventory.get("controller")
+    frozen_early = inventory.get("early_cohort")
     if (not isinstance(release, dict) or not isinstance(frozen_source, dict)
             or not isinstance(frozen_record, dict) or not isinstance(frozen_controller, dict)):
         raise ValueError("Release inventory is structurally invalid")
+    if (frozen_early is not None
+            and (not isinstance(frozen_early, dict)
+                 or not isinstance(frozen_early.get("target_record"), dict))):
+        raise ValueError("Release inventory has an invalid early cohort")
     if release != {"source_version": SOURCE_VERSION, "source_label": SOURCE_LABEL,
                    "tag": RELEASE_TAG, "title": RELEASE_TITLE}:
         raise ValueError("Release title, tag, or source version differs")
@@ -269,14 +362,29 @@ def verify(source, output, target_record=None):
     record_path = frozen_record.get("path")
     if target_record is not None and package.target_record_path(target_record) != record_path:
         raise ValueError("Selected target record differs from the frozen inventory")
+    if early_target_record is not None:
+        if (frozen_early is None
+                or package.target_record_path(early_target_record)
+                != frozen_early.get("target_record", {}).get("path")):
+            raise ValueError("Selected early target record differs from the frozen inventory")
     try:
         source, repository, _, source_identity = _source_identity(source, frozen_source["commit"])
         editions, target_identity = _target_identity(source, repository, source_identity["commit"], record_path)
-    except (KeyError, TypeError, subprocess.CalledProcessError) as error:
+        early_editions, early_identity = (None, None)
+        if frozen_early is not None:
+            early_path = frozen_early.get("target_record", {}).get("path")
+            early_editions, early_identity = _early_target_identity(
+                source, repository, source_identity["commit"], early_path)
+    except (KeyError, TypeError, ValueError, subprocess.CalledProcessError) as error:
         raise ValueError("Frozen source or target record cannot be resolved") from error
     if frozen_source != source_identity or frozen_record != target_identity:
         raise ValueError("Frozen source or target record identity differs")
+    if frozen_early is not None:
+        if frozen_early.get("target_record") != early_identity:
+            raise ValueError("Frozen early target record identity differs")
     expected_files = {_archive_name(target) for target in TARGETS} | {SUMS_NAME, INVENTORY_NAME}
+    if frozen_early is not None:
+        expected_files |= {_archive_name(target) for target in EARLY_TARGETS} | {EARLY_SUMS_NAME}
     try:
         actual_files = {path.name for path in output.iterdir()}
     except OSError as error:
@@ -296,12 +404,29 @@ def verify(source, output, target_record=None):
             if actual.read_bytes() != (temporary / name).read_bytes():
                 raise ValueError("Archive bytes differ from the frozen source: " + name)
             expected_assets.append(_asset(expected_record, target, editions[target]))
+        expected_early = None
+        if frozen_early is not None:
+            early_assets = []
+            for target in EARLY_TARGETS:
+                name = _archive_name(target)
+                expected_record = package.build(source, temporary / name, revision=source_identity["commit"],
+                                                target=target, target_record=early_identity["path"])
+                actual = output / name
+                if actual.read_bytes() != (temporary / name).read_bytes():
+                    raise ValueError("Archive bytes differ from the frozen source: " + name)
+                early_assets.append(_early_asset(expected_record, target, early_editions[target]))
+            if len({asset["target"] for asset in early_assets}) != len(EARLY_TARGETS):
+                raise ValueError("Expected early release assets are not unique")
+            early_sums = _sums(early_assets)
+            if (output / EARLY_SUMS_NAME).read_bytes() != early_sums:
+                raise ValueError("Early checksum asset differs from the frozen archives")
+            expected_early = _early_cohort_body(early_identity, early_assets, early_sums)
     if len({asset["target"] for asset in expected_assets}) != len(TARGETS):
         raise ValueError("Expected release assets are not unique")
     sums = _sums(expected_assets)
     if (output / SUMS_NAME).read_bytes() != sums:
         raise ValueError("Checksum asset differs from the frozen archives")
-    expected = _body(source_identity, target_identity, frozen_controller, expected_assets, sums)
+    expected = _body(source_identity, target_identity, frozen_controller, expected_assets, sums, expected_early)
     if inventory != expected:
         raise ValueError("Release inventory differs from frozen source or assets")
     return json.loads(_inventory_bytes(expected).decode("utf-8"))
@@ -313,10 +438,12 @@ def main():
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--revision", default="HEAD", help="Committed source revision to freeze")
     parser.add_argument("--target-record", default=package.TARGET_RECORD)
+    parser.add_argument("--early-target-record",
+                        help="Opt in to the exact F006-F012 best-effort data-only cohort")
     parser.add_argument("--verify", action="store_true", help="Verify an existing offline inventory without building output")
     args = parser.parse_args()
-    result = (verify(args.source, args.output, args.target_record) if args.verify
-              else freeze(args.source, args.output, args.revision, args.target_record))
+    result = (verify(args.source, args.output, args.target_record, args.early_target_record) if args.verify
+              else freeze(args.source, args.output, args.revision, args.target_record, args.early_target_record))
     print(json.dumps(result, indent=2, sort_keys=True))
 
 
