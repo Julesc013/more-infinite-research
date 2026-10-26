@@ -1,8 +1,9 @@
 """Independent F210 K2+Assets+Space Age data-final admission control.
 
 The small context is projected only from the successful upstream q062 capture.
-Its q013 carrier rows are a separate published migration expectation; neither
-record is a MIR5 native qualification result.
+Its q013 carrier rows are a separate published migration expectation. The
+published missing automation.png icon is repaired to the actual Base asset;
+neither record is a MIR5 native qualification result.
 """
 
 import argparse
@@ -118,6 +119,15 @@ class K2NativeSpaceAgeTests(unittest.TestCase):
         ''')
         return lua
 
+    def expected_legacy_carriers(self):
+        rows = deepcopy(self.context["q013_published_imersite_carriers"]["technologies"])
+        for row in rows.values():
+            self.assertEqual("__base__/graphics/technology/automation.png", row["icon"])
+            # Exact 2.1.23 Base has automation-1.png, not automation.png. A
+            # headless prototype dump does not validate texture existence.
+            row["icon"] = "__base__/graphics/technology/automation-1.png"
+        return rows
+
     def _technology_rows(self, lua):
         return _plain(lua.globals().emitted).get("technology", {})
 
@@ -190,7 +200,7 @@ class K2NativeSpaceAgeTests(unittest.TestCase):
         rows = self._technology_rows(lua)
         self.assertTrue(CARRIERS.issubset(rows))
         self.assertFalse(PUBLIC_IMERSITE & set(rows))
-        expected = self.context["q013_published_imersite_carriers"]["technologies"]
+        expected = self.expected_legacy_carriers()
         for name in CARRIERS:
             self.assertEqual(expected[name], rows[name], name)
         self.assertIn("recipe-prod-research_agricultural_growth_speed-1", rows)
@@ -240,7 +250,7 @@ class K2NativeSpaceAgeTests(unittest.TestCase):
         self.assertFalse(selection["k2_imersite"])
         self.assertTrue(selection["k2_imersite_carriers"])
         self.assertEqual(
-            self.context["q013_published_imersite_carriers"]["technologies"],
+            self.expected_legacy_carriers(),
             {name: rows[name] for name in CARRIERS},
         )
 
