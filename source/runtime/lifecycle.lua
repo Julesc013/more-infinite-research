@@ -109,6 +109,12 @@ end
 -- predecessor storage. F200 alone had the published settings-derived V3
 -- native-worker transport; all other targets retain transported V3 admission.
 local LEGACY_ALLOWLIST = legacy_caps.allowlist(DECLARATIONS, platform_target.id)
+local PUBLISHED_F200_M4_VERSIONS = {
+  ["4.7.20000"] = true,
+  ["4.7.20001"] = true,
+  ["4.7.20002"] = true,
+  ["4.7.20003"] = true
+}
 
 -- Recipe caps are immutable for one loaded control profile. Resolve only the
 -- exact authored routes once through Factorio 2.0's `prototypes.recipe`; do
@@ -425,7 +431,15 @@ local function reconcile_all(clean_stale_forces, selected_owners)
   if current then discard_empty_state(current) end
 end
 
-local function legacy_candidates(force, worker_name)
+local function direct_f200_to_f210_transition(event)
+  if platform_target.id ~= "f210" or type(event) ~= "table" then return false end
+  local changes = event.mod_changes
+  local change = type(changes) == "table" and changes["more-infinite-research"] or nil
+  return type(change) == "table" and PUBLISHED_F200_M4_VERSIONS[change.old_version] == true
+    and change.new_version == platform_target.distribution_version
+end
+
+local function legacy_candidates(force, worker_name, direct_f200_hop)
   local candidates = {}
   for index = 1, #ORDERED_DECLARATIONS do
     local row = ORDERED_DECLARATIONS[index]
@@ -438,13 +452,17 @@ local function legacy_candidates(force, worker_name)
       end
     end
     if admitted then
-      candidates[#candidates + 1] = {
-        name = row.id,
-        setting = row.cap_setting,
-        source = row.source,
-        operation = row.operation,
-        admitted = true
-      }
+      local candidate
+      if direct_f200_hop then
+        candidate = legacy_caps.f200_direct_hop_candidate(row.declaration)
+      else
+        candidate = {name = row.id, setting = row.cap_setting,
+          source = row.source, operation = row.operation}
+      end
+      if candidate then
+        candidate.admitted = true
+        candidates[#candidates + 1] = candidate
+      end
     end
   end
   if worker_name then
@@ -487,7 +505,7 @@ end
 -- This is the sole reader of the published bucket. It is deliberately called
 -- only by on_configuration_changed: initialization and load never transport
 -- historical cap rights into a new save.
-local function import_legacy_caps_on_configuration()
+local function import_legacy_caps_on_configuration(event)
   local mir = storage.mir
   local legacy_bucket = type(mir) == "table" and mir.maximum_level_control or nil
   if legacy_bucket == nil then return nil end
@@ -498,6 +516,16 @@ local function import_legacy_caps_on_configuration()
   -- Preserve this marker even when no candidate is currently admitted or the
   -- old bucket is malformed. A reused force index must never re-open import.
   current.legacy_caps_checked = true
+
+  -- An old cap bucket cannot report which engine wrote it.  Only this exact
+  -- package-change event permits current F210 rows to use the separately
+  -- constructed F200 predecessor tuple; ordinary/malformed/no-event F210
+  -- imports remain on the transported-only allowlist.
+  local direct_f200_hop = direct_f200_to_f210_transition(event)
+  -- The one-time marker above keeps this exceptional construction out of
+  -- ordinary control parsing, cold loads and subsequent configurations.
+  local allowlist = direct_f200_hop and legacy_caps.f200_direct_hop_allowlist(DECLARATIONS)
+    or LEGACY_ALLOWLIST
 
   local selected_owners = {}
   if not game or not game.forces then return selected_owners end
@@ -511,7 +539,7 @@ local function import_legacy_caps_on_configuration()
       local _, admitted = full_limits_for(force, true, owner, true)
       local owned = discard_unbound_ownership(force, current.owned_disabled, admitted, owner)
       local rows = legacy_caps.import_for_force(legacy_bucket, force,
-        legacy_candidates(force, owner), owned, LEGACY_ALLOWLIST)
+        legacy_candidates(force, owner, direct_f200_hop), owned, allowlist)
       merge_legacy_rows(current.owned_disabled, force.index, rows)
     end
   end
@@ -553,8 +581,8 @@ function M.on_init()
   reconcile_all(false)
 end
 
-function M.on_configuration_changed()
-  reconcile_all(true, import_legacy_caps_on_configuration())
+function M.on_configuration_changed(event)
+  reconcile_all(true, import_legacy_caps_on_configuration(event))
 end
 
 function M.on_force_created(event)
