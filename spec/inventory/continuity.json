@@ -720,7 +720,9 @@
         "compatibility",
         "production"
       ],
-      "remaining_implementation": [],
+      "remaining_implementation": [
+        "Centrally wire and emit the accepted finite Bob Plates constructors (31 Base and16 Space Age bodies at PR1059/Dev38dc957c8) through the F210 catalogue/publication path. Their captured facts and detached-body validation are retained, but no emitted package, native outcome or release qualification follows until that integration passes."
+      ],
       "remaining_qualification": [
         "Finish affected mixed/dynamic earned MIR overlap boundaries; composed fixed true/false/true and the independent fixed-provider removal/readdition controls already pass.",
         "Observe remaining exact admitted integrations and setting interactions; Bob/Angel physical125%/400% recipe-cap output is already qualified at its recorded source.",
