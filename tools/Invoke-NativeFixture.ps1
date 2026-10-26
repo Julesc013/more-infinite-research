@@ -46,6 +46,26 @@ function Assert-Fixture([bool]$Condition,[string]$Message) {
 function Get-FixtureSha([string]$Path) {
   (Get-FileHash -LiteralPath $Path -Algorithm SHA256).Hash.ToUpperInvariant()
 }
+function Assert-DeclaredFixtureInputs([Collections.IDictionary]$ProfileDefinition,$EngineIdentity,[Collections.IDictionary]$ArchiveHashes) {
+  if($ProfileDefinition.Contains('engine')){
+    $declared=$ProfileDefinition['engine']
+    Assert-Fixture ($declared -is [Collections.IDictionary] -and $declared.Contains('version') -and $declared.Contains('sha256') -and
+      $declared['version'] -is [string] -and $declared['sha256'] -is [string] -and [string]$declared['sha256'] -cmatch '^[a-fA-F0-9]{64}$') 'profile engine metadata differs'
+    Assert-Fixture ([string]$declared['version'] -ceq [string]$EngineIdentity.base_version) 'profile engine base differs'
+    Assert-Fixture ([string]$declared['sha256'] -ceq [string]$EngineIdentity.sha256) 'profile engine hash differs'
+  }
+  if($ProfileDefinition.Contains('archive_sha256')){
+    $declared=$ProfileDefinition['archive_sha256']
+    Assert-Fixture ($declared -is [Collections.IDictionary]) 'profile archive metadata differs'
+    foreach($name in $ArchiveHashes.Keys){
+      if($declared.Contains($name)){
+        $expected=$declared[$name]
+        Assert-Fixture ($expected -is [string] -and [string]$expected -cmatch '^[a-fA-F0-9]{64}$') "profile selected archive hash is malformed: $name"
+        Assert-Fixture ([string]$expected -ceq [string]$ArchiveHashes[$name]) "profile selected archive hash differs: $name"
+      }
+    }
+  }
+}
 function Assert-FixtureLog([string]$Text) {
   Assert-Fixture (-not [regex]::IsMatch($Text,'(?im)^\s*\d+[.]\d+\s+Error\b|^Error while running event\b|\bException at tick\b|\bnon-recoverable error\b|^stack traceback:$')) 'fatal native diagnostic'
 }
@@ -569,6 +589,9 @@ if($f110PublishedCrossSource){
   Assert-Fixture ($fixtureBindings.Count -eq 1 -and [string]$fixtureBindings[0].name -ceq $f110CrossSourceFixture.name -and [string]$fixtureBindings[0].version -ceq $f110CrossSourceFixture.version -and [string]$fixtureBindings[0].source -ceq $f110CrossSourceFixture.source) 'F110 published cross source fixture selection differs'
 }
 $activeModsObserverBinding=Get-FixtureActiveModsObserver -Name $activeModsObserverName -ProfileRows $rows -FixtureInputs $fixtureBindings
+$engineIdentity=Get-MIRDirectLibraryStartupEngineIdentity -FactorioBin $engine -EngineDataDirectory $engineData
+$archiveHashes=Get-MIRDirectLibraryStartupArchiveHashes -LibraryDirectory $library -EngineDataDirectory $engineData -BaseRows $rows -MirArchive $null
+Assert-DeclaredFixtureInputs -ProfileDefinition $profileDefinition -EngineIdentity $engineIdentity -ArchiveHashes $archiveHashes
 & (Join-Path $repo 'tools/commands/workspace/Test-MIRDevelopmentHealth.ps1') -MaxScanSeconds 2 -MaxEntriesPerRoot 500 | Out-Host
 $resources=$null;$activation=$null;$failure=$null
 $record=[ordered]@{
@@ -578,7 +601,7 @@ $record=[ordered]@{
   harness_sha256=Get-FixtureSha $PSCommandPath
   native_probe_sha256=Get-FixtureSha (Join-Path $repo 'tools/lib/validation/NativeProbeResources.ps1')
   governor_sha256=Get-FixtureSha (Join-Path $repo 'tools/lib/validation/ResourceGovernor.ps1')
-  engine=Get-MIRDirectLibraryStartupEngineIdentity -FactorioBin $engine -EngineDataDirectory $engineData
+  engine=$engineIdentity
   profile=@{path=$profile;sha256=Get-FixtureSha $profile};fixtures=$fixtureInputs
   historical_target=if($historical){@{id=$historicalFixture.target;metadata_path=$historicalFixture.path;metadata_sha256=$historicalFixture.sha256;factorio_version=$historicalFixture.factorio_version;minimum_base=$historicalFixture.minimum_base;mir_version=$historicalFixture.mir_version}}else{$null}
   historical_transition=if($historicalTransition){@{stage=$HistoricalTransitionStage;published_archive_sha256=[string]$historicalFixture.definition.published_archive_sha256;predecessor_mir_version=[string]$historicalFixture.definition.published_mir_version;successor_mir_version=[string]$historicalFixture.definition.mir_version}}else{$null}
@@ -605,8 +628,7 @@ try{
   }else{
     New-MIRDirectLibraryStartupConfig -Path $config -EngineDataDirectory $engineData -WriteDataDirectory $writeData
   }
-  $hashes=Get-MIRDirectLibraryStartupArchiveHashes -LibraryDirectory $library -EngineDataDirectory $engineData -BaseRows $rows -MirArchive $null
-  $activationArguments=@{LibraryDirectory=$library;EngineDataDirectory=$engineData;ProfilePath=$profile;ArchiveHashes=$hashes;SettingsMode='Defaults'}
+  $activationArguments=@{LibraryDirectory=$library;EngineDataDirectory=$engineData;ProfilePath=$profile;ArchiveHashes=$archiveHashes;SettingsMode='Defaults'}
   # F013--F016 inspect every owned archive name before applying mod-list.json.
   # Preserve single-version external libraries. Coexisting owned versions
   # use the existing checkout-local selector and identity/hash restoration.

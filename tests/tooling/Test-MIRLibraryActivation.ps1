@@ -9,11 +9,43 @@ $root=Join-Path $repo ('build/tmp/mir5-library-activation-controls-'+[guid]::New
 $checks=0
 function Assert-Library([bool]$Condition,[string]$Code){if(-not$Condition){throw "[mir5-library-$Code]"};$script:checks++}
 function Refuses-Library([scriptblock]$Action,[string]$Expected){$actual='';try{&$Action|Out-Null}catch{$actual=$_.Exception.Message};Assert-Library ($actual.Contains($Expected)) "refusal-$Expected"}
-function New-TestArchive([string]$Library,[string]$Name,[string]$Version,[string]$FactorioVersion='2.1'){
+function New-TestArchive([string]$Library,[string]$Name,[string]$Version,[string]$FactorioVersion='2.1',[string]$SourceDirectory='',[string]$Payload=''){
   $path=Join-Path $Library ($Name+'_'+$Version+'.zip')
   $zip=[IO.Compression.ZipFile]::Open($path,[IO.Compression.ZipArchiveMode]::Create)
-  try{$entry=$zip.CreateEntry($Name+'_'+$Version+'/info.json');$writer=[IO.StreamWriter]::new($entry.Open());try{$writer.Write((@{name=$Name;version=$Version;factorio_version=$FactorioVersion;dependencies=@('base')}|ConvertTo-Json -Compress))}finally{$writer.Dispose()}}finally{$zip.Dispose()}
+  try{
+    if($SourceDirectory){
+      foreach($file in @(Get-ChildItem -LiteralPath $SourceDirectory -Recurse -File)){
+        $relative=[IO.Path]::GetRelativePath($SourceDirectory,$file.FullName).Replace('\','/')
+        $entry=$zip.CreateEntry($Name+'_'+$Version+'/'+$relative)
+        $destination=$entry.Open();$source=[IO.File]::OpenRead($file.FullName)
+        try{$source.CopyTo($destination)}finally{$source.Dispose();$destination.Dispose()}
+      }
+    }else{
+      $entry=$zip.CreateEntry($Name+'_'+$Version+'/info.json');$writer=[IO.StreamWriter]::new($entry.Open());try{$writer.Write((@{name=$Name;version=$Version;factorio_version=$FactorioVersion;dependencies=@('base')}|ConvertTo-Json -Compress))}finally{$writer.Dispose()}
+      if($Payload){$entry=$zip.CreateEntry($Name+'_'+$Version+'/data.lua');$writer=[IO.StreamWriter]::new($entry.Open());try{$writer.Write($Payload)}finally{$writer.Dispose()}}
+    }
+  }finally{$zip.Dispose()}
   return $path
+}
+function New-NativeFixturePreflightPrefix([string]$Runner,[string]$Path){
+  $sourceBytes=[IO.File]::ReadAllBytes($Runner);$source=[Text.UTF8Encoding]::new($false,$true).GetString($sourceBytes)
+  $boundary="& (Join-Path `$repo 'tools/commands/workspace/Test-MIRDevelopmentHealth.ps1') -MaxScanSeconds 2 -MaxEntriesPerRoot 500 | Out-Host"
+  $offset=$source.IndexOf($boundary,[StringComparison]::Ordinal)
+  Assert-Library ($offset -gt 0) 'native-fixture-preflight-boundary'
+  $prefix=[Text.UTF8Encoding]::new($false).GetBytes($source.Substring(0,$offset))
+  Assert-Library ($prefix.Length -le $sourceBytes.Length -and [Convert]::ToHexString($prefix) -ceq [Convert]::ToHexString([byte[]]$sourceBytes[0..($prefix.Length-1)])) 'native-fixture-preflight-source-bytes'
+  [IO.File]::WriteAllBytes($Path,$prefix+[Text.UTF8Encoding]::new($false).GetBytes("`nreturn`n"))
+  $written=[IO.File]::ReadAllBytes($Path)
+  Assert-Library ([Convert]::ToHexString([byte[]]$written[0..($prefix.Length-1)]) -ceq [Convert]::ToHexString($prefix)) 'native-fixture-preflight-prefix-bytes'
+}
+function New-NativeFixturePreflightFromText([string]$Source,[string]$Path){
+  $boundary="& (Join-Path `$repo 'tools/commands/workspace/Test-MIRDevelopmentHealth.ps1') -MaxScanSeconds 2 -MaxEntriesPerRoot 500 | Out-Host"
+  $offset=$Source.IndexOf($boundary,[StringComparison]::Ordinal)
+  Assert-Library ($offset -gt 0) 'native-fixture-preflight-old-boundary'
+  [IO.File]::WriteAllText($Path,$Source.Substring(0,$offset)+"`nreturn`n",[Text.UTF8Encoding]::new($false))
+}
+function Assert-NativeFixturePreflightControlsAbsent([string]$Library,[string]$Output){
+  Assert-Library (-not(Test-Path -LiteralPath $Output) -and -not(Test-Path -LiteralPath (Join-Path $Library 'mod-list.json')) -and -not(Test-Path -LiteralPath (Join-Path $Library 'mod-settings.dat')) -and -not(Test-Path -LiteralPath (Join-Path $Library '.mir-active-profile.json'))) 'native-fixture-preflight-no-controls'
 }
 try {
   Assert-Library (-not[bool](Get-Command New-MIRCompatUserDataDir -ErrorAction SilentlyContinue)) 'no-compatibility-runner'
@@ -105,6 +137,66 @@ try {
   }
   Assert-Library ($completion.owned_archive_names_temporarily_hidden-eq1-and@(Get-ChildItem -LiteralPath $legacy -Filter '*.mir-hidden-*').Count-eq0-and-not(Test-Path -LiteralPath (Join-Path $legacy '.mir-active-profile.json'))) 'legacy-owned-selection-restored'
   Assert-Library ((Get-Content -Raw -LiteralPath (Join-Path $legacy 'mod-list.json'))-ceq$originalList-and([IO.File]::ReadAllBytes((Join-Path $legacy 'mod-settings.dat'))-join',')-ceq($originalSettings-join',')) 'legacy-controls-restored'
+  # Execute the real normal fixture-runner preflight through its existing
+  # health boundary. The temporary prefix is byte-identical source up to that
+  # boundary and returns before resource admission, control writes, or any
+  # native process can begin.
+  $preflightRoot=Join-Path $root 'native-fixture-preflight';$preflightLibrary=Join-Path $preflightRoot 'library';$preflightData=Join-Path $preflightRoot 'engine/data';$preflightOutput=Join-Path $preflightRoot 'output';$preflightProfile=Join-Path $preflightRoot 'profile.json';$fixtureSource=Join-Path $preflightRoot 'fixture-source'
+  foreach($path in @($preflightLibrary,(Join-Path $preflightData 'base'),(Join-Path $preflightRoot 'engine/bin/x64'),$fixtureSource)){[IO.Directory]::CreateDirectory($path)|Out-Null}
+  [IO.File]::WriteAllText((Join-Path $preflightData 'base/info.json'),'{"name":"base","version":"2.1.23","dependencies":[]}',[Text.UTF8Encoding]::new($false))
+  $fixtureInfo=@{name='mir-fixture-preflight';version='0.1.0';factorio_version='2.1';dependencies=@('base')}|ConvertTo-Json -Compress
+  [IO.File]::WriteAllText((Join-Path $fixtureSource 'info.json'),$fixtureInfo,[Text.UTF8Encoding]::new($false));[IO.File]::WriteAllText((Join-Path $fixtureSource 'data.lua'),'-- bounded runner preflight fixture',[Text.UTF8Encoding]::new($false))
+  $preflightDependency=New-TestArchive -Library $preflightLibrary -Name 'controlled' -Version '1.0.0'
+  $preflightMir=New-TestArchive -Library $preflightLibrary -Name 'more-infinite-research' -Version '5.0.21000'
+  $preflightFixture=New-TestArchive -Library $preflightLibrary -Name 'mir-fixture-preflight' -Version '0.1.0' -SourceDirectory $fixtureSource
+  $preflightEngine=Join-Path $preflightRoot 'engine/bin/x64/factorio.exe';[IO.File]::WriteAllText($preflightEngine,'fixture preflight engine',[Text.UTF8Encoding]::new($false))
+  $engineSha=Get-MIRImmutableInputSha256 $preflightEngine;$dependencyName=[IO.Path]::GetFileName($preflightDependency);$mirSha=Get-MIRImmutableInputSha256 $preflightMir
+  $preflightMods=@(@{name='base';version='2.1.23';enabled=$true},@{name='controlled';version='1.0.0';enabled=$true},@{name='more-infinite-research';version='5.0.21000';enabled=$true},@{name='mir-fixture-preflight';version='0.1.0';enabled=$true})
+  function New-PreflightProfile([AllowNull()]$Engine,[AllowNull()]$ArchiveHashes){
+    $value=[ordered]@{mods=$preflightMods}
+    if($null-ne$Engine){$value.engine=$Engine}
+    if($null-ne$ArchiveHashes){$value.archive_sha256=$ArchiveHashes}
+    return $value
+  }
+  function Set-PreflightProfile($Value){[IO.File]::WriteAllText($preflightProfile,($Value|ConvertTo-Json -Depth 8),[Text.UTF8Encoding]::new($false))}
+  $runner=Join-Path $repo 'tools/Invoke-NativeFixture.ps1';$preflightRunner=Join-Path $preflightRoot 'Invoke-NativeFixture-preflight.ps1';New-NativeFixturePreflightPrefix -Runner $runner -Path $preflightRunner
+  $runnerArguments=@{ArchiveLibrary=$preflightLibrary;FactorioBin=$preflightEngine;ProfilePath=$preflightProfile;FixtureSources=@($fixtureSource);ExpectedMIRArchiveSha256=$mirSha;CaseName='declared-input-preflight';OutputRoot=$preflightOutput;AdmissionWaitSeconds=0;RepoRoot=$repo}
+  $validEngine=@{version='2.1.23';sha256=$engineSha};$removedPin=('A'*64 -join '')
+  Set-PreflightProfile (New-PreflightProfile -Engine $validEngine -ArchiveHashes @{($dependencyName)=(Get-MIRImmutableInputSha256 $preflightDependency);'removed-provider_9.9.9.zip'=$removedPin;'more-infinite-research_4.7.21003.zip'=$removedPin})
+  & $preflightRunner @runnerArguments
+  Assert-NativeFixturePreflightControlsAbsent -Library $preflightLibrary -Output $preflightOutput
+  Set-PreflightProfile (New-PreflightProfile -Engine $validEngine -ArchiveHashes @{'removed-provider_9.9.9.zip'=$removedPin;'more-infinite-research_4.7.21003.zip'=$removedPin})
+  & $preflightRunner @runnerArguments
+  Assert-NativeFixturePreflightControlsAbsent -Library $preflightLibrary -Output $preflightOutput
+  Set-PreflightProfile (New-PreflightProfile -Engine $null -ArchiveHashes $null)
+  & $preflightRunner @runnerArguments
+  Assert-NativeFixturePreflightControlsAbsent -Library $preflightLibrary -Output $preflightOutput
+  Set-PreflightProfile (New-PreflightProfile -Engine @{version='2.1.22';sha256=$engineSha} -ArchiveHashes @{})
+  Refuses-Library {& $preflightRunner @runnerArguments} '[mir5-native-fixture] profile engine base differs'
+  Assert-NativeFixturePreflightControlsAbsent -Library $preflightLibrary -Output $preflightOutput
+  Set-PreflightProfile (New-PreflightProfile -Engine @{version='2.1.23';sha256=('0'*64 -join '')} -ArchiveHashes @{})
+  Refuses-Library {& $preflightRunner @runnerArguments} '[mir5-native-fixture] profile engine hash differs'
+  Assert-NativeFixturePreflightControlsAbsent -Library $preflightLibrary -Output $preflightOutput
+  Set-PreflightProfile (New-PreflightProfile -Engine '2.1.23' -ArchiveHashes @{})
+  Refuses-Library {& $preflightRunner @runnerArguments} '[mir5-native-fixture] profile engine metadata differs'
+  Assert-NativeFixturePreflightControlsAbsent -Library $preflightLibrary -Output $preflightOutput
+  $wrongSelected=@{($dependencyName)=('0'*64 -join '')}
+  Set-PreflightProfile (New-PreflightProfile -Engine $validEngine -ArchiveHashes $wrongSelected)
+  $oldRunner=(& git -C $repo show 'f8045e56b97d67af485e48721e3f2e7e3bf00694:tools/Invoke-NativeFixture.ps1') -join "`n";$oldPreflightRunner=Join-Path $preflightRoot 'Invoke-NativeFixture-original-preflight.ps1';New-NativeFixturePreflightFromText -Source $oldRunner -Path $oldPreflightRunner
+  & $oldPreflightRunner @runnerArguments
+  Assert-Library $true 'native-fixture-original-preflight-admits-wrong-selected-pin'
+  Assert-NativeFixturePreflightControlsAbsent -Library $preflightLibrary -Output $preflightOutput
+  Refuses-Library {& $preflightRunner @runnerArguments} '[mir5-native-fixture] profile selected archive hash differs'
+  Assert-NativeFixturePreflightControlsAbsent -Library $preflightLibrary -Output $preflightOutput
+  Set-PreflightProfile (New-PreflightProfile -Engine $validEngine -ArchiveHashes @{($dependencyName)='not-a-sha'})
+  Refuses-Library {& $preflightRunner @runnerArguments} '[mir5-native-fixture] profile selected archive hash is malformed'
+  Assert-NativeFixturePreflightControlsAbsent -Library $preflightLibrary -Output $preflightOutput
+  Set-PreflightProfile (New-PreflightProfile -Engine $validEngine -ArchiveHashes @{($dependencyName)=(Get-MIRImmutableInputSha256 $preflightDependency)})
+  $capturedHashes=Get-MIRDirectLibraryStartupArchiveHashes -LibraryDirectory $preflightLibrary -EngineDataDirectory $preflightData -BaseRows $preflightMods -MirArchive $null
+  Remove-Item -LiteralPath $preflightDependency -Force
+  $preflightDependency=New-TestArchive -Library $preflightLibrary -Name 'controlled' -Version '1.0.0' -Payload '-- same-version repack'
+  Refuses-Library {Start-MIRLibraryActivation -LibraryDirectory $preflightLibrary -EngineDataDirectory $preflightData -ProfilePath $preflightProfile -ArchiveHashes $capturedHashes -SettingsMode Defaults} '[mir-library-hash-mismatch]'
+  Assert-NativeFixturePreflightControlsAbsent -Library $preflightLibrary -Output $preflightOutput
   [pscustomobject]@{status='passed';checks=$checks;native_execution=$false;package_materialization=$false}|ConvertTo-Json -Compress
 } finally {
   if(Test-Path -LiteralPath $root){Remove-MIR441ContainedTree -AdmittedRoot (Join-Path $repo 'build/tmp') -Path $root}
