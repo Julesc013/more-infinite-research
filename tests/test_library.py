@@ -168,7 +168,9 @@ class LibraryTests(unittest.TestCase):
                 assert(spec.selected_tab_index == nil, "MIR must select a tab only after add_tab entries exist")
               end
               local element = gui_container(value)
-              for key, field in pairs(spec) do element[key] = field end
+              for key, field in pairs(spec) do
+                if key == "style" then element.style_name = field else element[key] = field end
+              end
               value._children[#value._children + 1] = element
               if element.name then value[element.name] = element end
               element.destroy = function()
@@ -569,6 +571,52 @@ class LibraryTests(unittest.TestCase):
           assert(root.location.x == 17 and root.location.y == 29 and root.force_auto_center_calls == nil,
             "a saved drag location must win over native force_auto_center")
           ''')
+
+    def test_explicit_open_restores_native_close_target_and_owned_drag_handle(self):
+        self.lua.execute(r'''
+          boot()
+          local foreign = {valid=true, name="foreign-window"}
+          player.opened = foreign
+          local root = library.open(player, {query="gear"})
+          assert(player.opened == root, "Esc/E cannot close a Library absent from native opened")
+          local title = root["mir_library_title"]
+          assert(title and title["mir_library_title_label"].caption[1] == "mir-browser.title")
+          assert(title["mir_library_title_label"].style_name == "frame_title")
+          local drag = title["mir_library_drag"]
+          assert(drag and drag.type == "empty-widget" and drag.style_name == "draggable_space_header")
+          assert(drag.parent == title and drag.drag_target == root,
+            "the draggable widget must be a child of its owned screen frame")
+          assert(drag.style.horizontally_stretchable and drag.style.maximal_height == 24)
+          root.location = {x=91,y=44}
+          library.on_gui_location_changed({player_index=1,element=root})
+          -- Native Esc/E emits on_gui_closed for player.opened. Keep the
+          -- actual close handler/ownership checks in the path under test.
+          library.on_gui_closed({player_index=1,element=player.opened})
+          assert(not root.valid and player.gui.screen["mir_research_browser"] == nil)
+          assert(storage.mir_library.players[1].query == "gear"
+            and storage.mir_library.players[1].location.x == 91)
+          local reopened = library.open(player)
+          assert(player.opened == reopened and reopened ~= root and reopened.location.y == 44)
+          assert(foreign.valid, "opening/closing the Library destroyed a foreign GUI")
+        ''')
+
+    def test_background_library_refresh_does_not_take_native_focus(self):
+        self.lua.execute(r'''
+          boot()
+          local root = library.open(player)
+          assert(player.opened == root)
+          local foreign = {valid=true, name="foreign-window"}
+          player.opened = foreign
+          library.on_native_state_changed({force=player.force})
+          library.on_native_refresh_tick()
+          assert(player.opened == foreign and player.gui.screen["mir_research_browser"] == root,
+            "native research refresh took focus from another GUI")
+          local request = player.translation_requests[1]
+          library.on_string_translated({player_index=1,id=request.id,translated=true,result="Translated gear"})
+          assert(player.opened == foreign, "translation refresh took focus from another GUI")
+          assert(library.open(player) == root and player.opened == root,
+            "an explicit reopen must select the existing owned frame")
+        ''')
 
     def test_fractional_display_scale_writes_only_int32_gui_dimensions(self):
         self.lua.execute(r'''
