@@ -148,6 +148,45 @@ class AngelF210PipelineTests(unittest.TestCase):
             if emitted.get(name, raw["technology"].get(name)) is not None
         }
 
+    def _assert_prepublication_refusal(self, case, raw, expected):
+        """Run the real stages and retain the no-publication boundary."""
+        context = self.context["cases"][case]
+        lua = LuaRuntime(unpack_returned_tuples=True)
+        lua.globals().player_root = SOURCE_ROOT.as_posix()
+        lua.globals().captured_raw = _lua_value(lua, raw)
+        lua.globals().active_mods = _lua_value(lua, context["selection"])
+        ok, error, writes = lua.execute(r'''
+          package.path = player_root .. "/?.lua;" .. player_root .. "/?/init.lua"
+          package.cpath = ""
+          mods, script, helpers, log = active_mods, nil, {}, function() end
+          local target = require("platform.target")
+          target.id, target.factorio_version, target.minimum_base = "f210", "2.1", "2.1.23"
+          target.distribution_version, target.cargo_research = "5.0.21000", true
+          target.recipe_probability, target.receiver_limits, target.productivity_ignores_stats = "independent_probability", true, true
+          data = {raw = captured_raw}; setting_rows, technology_writes = {}, 0
+          function data:extend(rows)
+            for _, row in ipairs(rows) do
+              self.raw[row.type] = self.raw[row.type] or {}
+              assert(self.raw[row.type][row.name] == nil, "duplicate " .. row.type .. ":" .. row.name)
+              self.raw[row.type][row.name] = row
+              if row.setting_type == "startup" then setting_rows[row.name] = row end
+              if row.type == "technology" then technology_writes = technology_writes + 1 end
+            end
+          end
+          assert(loadfile(player_root .. "/settings.lua"))()
+          local startup = {}
+          for name, row in pairs(setting_rows) do startup[name] = {value = row.default_value} end
+          settings = {startup = startup}
+          local ok, error = pcall(function()
+            assert(loadfile(player_root .. "/data.lua"))()
+            assert(loadfile(player_root .. "/data-final-fixes.lua"))()
+          end)
+          return ok, tostring(error), technology_writes
+        ''')
+        self.assertFalse(ok)
+        self.assertIn(expected, error)
+        self.assertEqual(0, writes)
+
     def test_context_is_bounded_upstream_only_and_binds_exact_r04_inputs(self):
         self.assertLessEqual(CONTEXT_PATH.stat().st_size, MAX_CONTEXT_BYTES)
         self.assertEqual(F210_SHA256, self.context["r04"]["engine_sha256"])
@@ -270,6 +309,92 @@ class AngelF210PipelineTests(unittest.TestCase):
             _technology_contract(steel),
         )
 
+    def test_space_age_native_steel_nondefault_tuple_preserves_unowned_fields(self):
+        raw = deepcopy(self.context["cases"]["space_age"]["raw"])
+        steel_input = raw["technology"]["steel-plate-productivity"]
+        steel_input["effects"].append({
+            "type": "change-recipe-productivity",
+            "recipe": "unrelated-valid-steel-route",
+            "change": 0.1,
+        })
+        upstream_unit = deepcopy(steel_input["unit"])
+        upstream_icons = deepcopy(steel_input["icons"])
+        upstream_prerequisites = deepcopy(steel_input["prerequisites"])
+        configured = self._actual_rows(self.stage("space_age", {
+            "ips-cost-base-research_steel": 250,
+            "ips-cost-linear-increment-research_steel": 3,
+            "ips-cost-growth-research_steel": 1.5,
+            "ips-research-time-research_steel": 45,
+            "ips-effect-per-level-research_steel": 25,
+        }, raw_override=raw), "space_age")["steel-plate-productivity"]
+        self.assertEqual("(250+3*(L-1))*1.5^(L-1)", configured["unit"]["count_formula"])
+        self.assertEqual(45, configured["unit"]["time"])
+        self.assertEqual(upstream_unit["ingredients"], configured["unit"]["ingredients"])
+        self.assertEqual(upstream_icons, configured["icons"])
+        self.assertEqual(upstream_prerequisites, configured["prerequisites"])
+        changes = {effect["recipe"]: effect["change"] for effect in configured["effects"]}
+        self.assertEqual(0.25, changes.pop("steel-plate"))
+        self.assertEqual(0.25, changes.pop("casting-steel"))
+        self.assertEqual(0.25, changes.pop("angels-plate-steel"))
+        self.assertEqual(0.25, changes.pop("angels-plate-steel-2"))
+        self.assertEqual({"unrelated-valid-steel-route": 0.1}, changes)
+
+    def test_disabled_native_steel_preserves_the_existing_owner_identity_and_effects(self):
+        upstream = deepcopy(self.context["cases"]["space_age"]["raw"]["technology"]["steel-plate-productivity"])
+        disabled = self._actual_rows(self.stage("space_age", {
+            "ips-enable-research_steel": False,
+        }), "space_age")["steel-plate-productivity"]
+        self.assertEqual(upstream["name"], disabled["name"])
+        self.assertEqual(upstream["unit"], disabled["unit"])
+        self.assertEqual(upstream["icons"], disabled["icons"])
+        self.assertEqual(upstream["prerequisites"], disabled["prerequisites"])
+        self.assertEqual(upstream["effects"], disabled["effects"])
+
+    def test_unexpected_preexisting_angel_steel_effect_refuses_before_publication(self):
+        raw = deepcopy(self.context["cases"]["space_age"]["raw"])
+        raw["technology"]["steel-plate-productivity"]["effects"].append({
+            "type": "change-recipe-productivity",
+            "recipe": "angels-plate-steel",
+            "change": 0.1,
+        })
+        self._assert_prepublication_refusal(
+            "space_age", raw, "missing or duplicate effect for angels-plate-steel"
+        )
+
+    def test_runtime_native_admission_and_base_aluminium_settings_expose_exact_routes(self):
+        space_declared = {
+            row["id"]: row for row in _plain(self.stage("space_age").globals().declared)
+        }
+        native = space_declared["steel-plate-productivity"]
+        self.assertEqual("nativeowner", native["ownership_kind"])
+        self.assertEqual("steel-plate-productivity", native["native_owner_identity"])
+        self.assertEqual("change-recipe-productivity", native["native_admission"]["effect_type"])
+        self.assertEqual(
+            ["steel-plate", "casting-steel", "angels-plate-steel", "angels-plate-steel-2"],
+            native["native_admission"]["recipes"],
+        )
+
+        base = self.stage("base")
+        base_declared = {
+            row["id"]: row for row in _plain(base.globals().declared)
+        }
+        settings = _plain(base.globals().setting_rows)
+        for name, progression in (
+            ("recipe-prod-research_material_aluminium-1", 1),
+            ("recipe-prod-research_material_aluminium-4", 4),
+        ):
+            with self.subTest(name=name):
+                row = base_declared[name]
+                self.assertEqual("research_material_aluminium", row["family"])
+                self.assertEqual(progression, row["progression"])
+                self.assertEqual("ips-enable-research_material_aluminium", row["setting"])
+                self.assertEqual("ips-max-level-research_material_aluminium", row["cap_setting"])
+                self.assertEqual(["angels-plate-aluminium", "angels-plate-aluminium-2"],
+                                 row["productivity_recipes"])
+                for setting in row["settings"]:
+                    self.assertIn(setting, settings)
+                    self.assertFalse(settings[setting].get("hidden", False), setting)
+
     def test_named_route_or_native_owner_drift_refuses_before_technology_publication(self):
         for case, mutate, expected in (
             ("base", lambda raw: raw["recipe"].pop("angels-plate-aluminium"), "angels-plate-aluminium changed"),
@@ -279,42 +404,7 @@ class AngelF210PipelineTests(unittest.TestCase):
             with self.subTest(case=case):
                 raw = deepcopy(self.context["cases"][case]["raw"])
                 mutate(raw)
-                context = self.context["cases"][case]
-                lua = LuaRuntime(unpack_returned_tuples=True)
-                lua.globals().player_root = SOURCE_ROOT.as_posix()
-                lua.globals().captured_raw = _lua_value(lua, raw)
-                lua.globals().active_mods = _lua_value(lua, context["selection"])
-                ok, error, writes = lua.execute(r'''
-                  package.path = player_root .. "/?.lua;" .. player_root .. "/?/init.lua"
-                  package.cpath = ""
-                  mods, script, helpers, log = active_mods, nil, {}, function() end
-                  local target = require("platform.target")
-                  target.id, target.factorio_version, target.minimum_base = "f210", "2.1", "2.1.23"
-                  target.distribution_version, target.cargo_research = "5.0.21000", true
-                  target.recipe_probability, target.receiver_limits, target.productivity_ignores_stats = "independent_probability", true, true
-                  data = {raw = captured_raw}; setting_rows, technology_writes = {}, 0
-                  function data:extend(rows)
-                    for _, row in ipairs(rows) do
-                      self.raw[row.type] = self.raw[row.type] or {}
-                      assert(self.raw[row.type][row.name] == nil, "duplicate " .. row.type .. ":" .. row.name)
-                      self.raw[row.type][row.name] = row
-                      if row.setting_type == "startup" then setting_rows[row.name] = row end
-                      if row.type == "technology" then technology_writes = technology_writes + 1 end
-                    end
-                  end
-                  assert(loadfile(player_root .. "/settings.lua"))()
-                  local startup = {}
-                  for name, row in pairs(setting_rows) do startup[name] = {value = row.default_value} end
-                  settings = {startup = startup}
-                  local ok, error = pcall(function()
-                    assert(loadfile(player_root .. "/data.lua"))()
-                    assert(loadfile(player_root .. "/data-final-fixes.lua"))()
-                  end)
-                  return ok, tostring(error), technology_writes
-                ''')
-                self.assertFalse(ok)
-                self.assertIn(expected, error)
-                self.assertEqual(0, writes)
+                self._assert_prepublication_refusal(case, raw, expected)
 
     def test_inactive_selection_is_lazy_and_does_not_need_angel_routes(self):
         raw = deepcopy(self.context["cases"]["base"]["raw"])
