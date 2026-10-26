@@ -13,8 +13,15 @@ local function names(actual, expected, label)
   end
 end
 
-assert(mods.base == "2.0.77" and mods["more-infinite-research"] == "5.0.20000"
-  and mods["space-age"] == nil, "unexpected F200 successor fixture closure")
+local fixture = mods["mir-fixture-mir5-f200-legacy-cap"]
+local f200 = mods.base == "2.0.77" and mods["more-infinite-research"] == "5.0.20000" and fixture == "0.2.0"
+local f210 = mods.base == "2.1.23" and mods["more-infinite-research"] == "5.0.21000" and fixture == "0.5.0"
+assert((f200 or f210) and mods["space-age"] == nil, "unexpected F200/F210 successor fixture closure")
+if f210 then
+  for _, name in ipairs({"elevated-rails", "quality", "recycler"}) do
+    assert(mods[name] == nil, "F210 Base successor carries Space Age companion: " .. name)
+  end
+end
 local technology = assert(data.raw.technology[NAME], "successor gear technology is absent")
 assert(technology.type == "technology" and technology.name == NAME and technology.level == 1
   and technology.upgrade == true and technology.max_level == "infinite"
