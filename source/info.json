@@ -12,13 +12,13 @@
     "(?) bobtech",
     "(?) elevated-rails",
     "(?) angelssmelting",
-    "? recycler >= 2.1.18",
+    "? recycler >= 2.1.23",
     "(?) quality",
     "(?) Krastorio2",
     "(?) Krastorio2-spaced-out",
     "(?) pypostprocessing",
     "(?) space-exploration",
-    "? space-age >= 2.1.18",
+    "? space-age >= 2.1.23",
     "? space-is-fake"
   ]
 }
