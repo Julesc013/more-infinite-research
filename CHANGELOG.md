@@ -62,6 +62,11 @@ This is the authoritative product changelog. Each MIR 1–3 master release appea
 - Bind independently established direct recipe alternatives for unfamiliar lab inputs, including planetary-data with no same-name recipe.
 - Preserve selected science amounts and the actual seed owner's prerequisites; reject disabled, zero-output and unseeded cyclic alternatives.
 
+### Historical qualification scope
+
+- The published nine-edition upgrade and two-cold-reload observation retained 67 researches and 199 positive recipe-productivity effects; it covered F210 Base and the pinned K2 2.1.4/K2 Spaced Out 2.0.19 load, not the reporter's full QoL set.
+- No new performance or multiplayer conclusion was recorded.
+
 ### Info
 
 - Target package from source 4.7.3.
@@ -82,6 +87,11 @@ This is the authoritative product changelog. Each MIR 1–3 master release appea
 
 - Preserve unambiguous native science sources and their unlock gates when acyclic transitive factory dependencies are unknown.
 - Keep strict diagnostics, missing-source rejection and cyclic-reference rejection; never remove selected cryogenic science to suppress startup errors.
+- Do not let optional late or recycling producers veto an otherwise acyclic native science declaration.
+
+### Historical qualification limits
+
+- The small native reproducer represented the reported failure shape, not the reporters' complete mod configurations; no new performance or multiplayer conclusion was recorded.
 
 ### Info
 
@@ -104,6 +114,11 @@ This is the authoritative product changelog. Each MIR 1–3 master release appea
 - Match foreign infinite technology effects before qualifying their science; retain qualification of matching owners.
 - Bind independently seeded replacement recipes for declared named science sources when the named recipe is absent.
 - Distinguish missing science unlocks from rejected unlock candidates and retain their rejection reasons.
+
+### Historical qualification scope
+
+- All nine editions passed focused packaged-Lua controls and exact-engine loading; the eight editions from F013 through F200 recorded 4.7.0 upgrades with two cold reloads, while F210 retained its earlier Base and Space Age scope rather than establishing a generalized new result.
+- Reporter mod closures were unavailable, and this release made no new performance claim.
 
 ### Info
 
@@ -136,6 +151,11 @@ This is the authoritative product changelog. Each MIR 1–3 master release appea
 - [F210] Add finite Imersite levels 1-3 and a level 4+ powder continuation for K2 2.1.4 with K2SO 2.0.19.
 - [F210] Preserve separate native crystal ownership and saved research state through the Imersite migration.
 - [F210] Apply Gunmetal/Invar structural continuation mappings for Bob/Angel with BobsTech.
+
+### Historical qualification scope
+
+- Four earned Imersite levels changed 300 ore into 324 powder and 324 sand versus the 300/300 control; the Gunmetal/Invar staged queues and 42% next-level progress survived two cold reloads.
+- Five matched no-MIR headless blocks observed 16.7% to 37.5% MIR-added reductions in named cases; they were not ordinary-menu measurements and did not prove the 50% menu-overhead target.
 
 ### Info
 
@@ -183,6 +203,11 @@ This is the authoritative product changelog. Each MIR 1–3 master release appea
 - [F200] Check actual recipe outputs, permissions, ownership and progression through the shared material bindings.
 - [F200] Apply Gold wire productivity to its gilded copper cable output; retain Tin's established Automation science policy.
 
+### Historical qualification scope
+
+- The F200 Bob/Angel-without-BobTech observation covered four material families, eight staged technologies and eighteen effect entries across nine recipes; four earned levels produced 108 plates from 100 and 432 gilded cables from 400, with saved next-level investment surviving both reloads.
+- Three-run headless-creation medians were mixed and slower in named Base and Bob/Angel cases; no general speedup, ordinary-menu result or 10% target pass was claimed.
+
 ## [4.5.2]
 
 ### Info
@@ -201,6 +226,15 @@ This is the authoritative product changelog. Each MIR 1–3 master release appea
 - Bind each prepared design once after effect sanitation.
 - Use the common qualifier while retaining target-specific science diagnostics.
 
+### Compatibility
+
+- Retain the released worker-speed cap, Dark Matter Replicators Reborn, Library, multiplayer and mining-drill manufacturing corrections.
+
+### Historical qualification scope
+
+- Twenty-two upgrades from published 4.5.1 and corrected 4.4.2 plus ten fresh-load scenarios were recorded with two cold reloads; the exact F210 package also had one graphical localhost join, rejoin, restart and Library-search observation, not two-client coverage.
+- Matched Galore headless medians varied in both directions, so the release made no whole-run speedup or ordinary-menu claim.
+
 ## [4.5.1]
 
 ### Info
@@ -210,6 +244,10 @@ This is the authoritative product changelog. Each MIR 1–3 master release appea
 ### Bugfixes
 
 - Preserve native Promethium science binding and validated direct science alternatives.
+
+### Historical qualification limits
+
+- Controlled source tests reproduced the reported science errors, but not reporters' complete modpacks; native migration, reload and client acceptance remained unfinished and no new performance timing was recorded.
 
 ## [4.5.0]
 
@@ -225,6 +263,15 @@ This is the authoritative product changelog. Each MIR 1–3 master release appea
 
 - Avoid preparing unused provider diagnostics and copying detailed publication evidence during normal startup.
 - Reuse prepared graph nodes and avoid an unnecessary ordinary-table sort.
+
+### Compatibility
+
+- Retain the single research catalogue and authoritative emitter; the release made no deliberate Classic support cull.
+
+### Historical qualification limits
+
+- The F200 Angel disabled-silver reproduction and Base-upgrade observation were scoped, with its first cold reload interrupted by the memory guard; final F210 Space Age and broader client qualification remained unfinished.
+- Earlier development-byte headless comparisons were modest and mixed, not final-package or ordinary-menu timings.
 
 ## [4.4.2]
 
@@ -252,6 +299,14 @@ This is the authoritative product changelog. Each MIR 1–3 master release appea
 - [F016] Retain published Factorio 0.16 science progression prerequisites through checked declarations.
 - [F015] Recognize Factorio 0.15 satellite launch results and retain approved science progression prerequisites.
 
+### Historical qualification scope
+
+- Native F200 Base and F210 Space Age exercised the worker-speed cap from 0 to 10 to 0 and retained earned bonuses plus 42% progress; focused F200/F210 predecessor upgrades each used two cold reloads.
+
+### Historical qualification limits
+
+- The original nuclear-test report and full reporter modpack remained unreplicated; no all-engine client, hardware-independent loading or general performance guarantee was claimed.
+
 ## [4.4.1]
 
 ### Info
@@ -262,17 +317,54 @@ This is the authoritative product changelog. Each MIR 1–3 master release appea
 
 - Prevent multiplayer join failures caused by a load-only on_tick event registration.
 
+### Historical qualification limits
+
+- The release retained its construction-manifest wrapper failure while separately verifying all nine archive payloads; fresh native multiplayer/client and broader save/engine qualification were deferred.
+
 ## [4.4.0]
+
+### Changes
+
+- Use the unified approved catalogue, declared binder and single-emitter path, including the associated Library import repair.
+- Retain current package, binding and compatibility corrections without restoring a separate production compiler path.
 
 ### Info
 
 - Target package from source 4.4.0.
 
+### Compatibility
+
+- A focused F200 Secretas 1.0.33 plus Pretty Frozeta 0.1.0 finite continuation passed; the original reporter save, F210 Secretas 1.0.37 incompatibility and reported mining-yield/core-drill behavior stayed outside that scope.
+- A focused F200 manufacturing observation measured drill-recipe productivity only; it did not establish ore yield, Space Exploration or client behavior.
+
+### Historical qualification scope
+
+- The release recorded F200 Base and Galore/Space Age direct 4.2.2 and immediate 4.3.0 upgrades, F110 Base and F210 Space Age observations; the F200 paths used four actors and two cold reloads, not an all-scenario result.
+- Matched F200 Galore/Space Age headless creation observed 12.1377% and 11.4527% improvements against published 4.3.0, while remaining 38–39% above the no-MIR arm; this was not ordinary-menu, reporter-profile or client qualification.
+
+### Historical qualification limits
+
+- This emergency unsigned, partially qualified R05 release did not claim protected-main promotion, a technical seal, broad native upgrade/fresh/Library/client coverage, or the 10% performance destination.
+
 ## [4.3.0]
+
+### Changes
+
+- Keep Full as the default 4.2.2-compatible profile while making Classic an explicit reduced option that does not preserve investment in omitted research.
+- Prepare route data once, retain typed recipe indexes and viable alternatives, and stop unnecessary Research Library translation maintenance.
 
 ### Info
 
 - Target package from source 4.3.0.
+
+### Historical qualification scope
+
+- Published 4.2.2 upgrades on Base F200, Base F210 and Space Age F210 recorded definitions, saved investment, effects, queues, fractional progress and two cold reloads; zero row differences in named Galore and Bob/Angel captures did not prove modded-save migration.
+- Matched headless create-and-save observations ranged from 4.98% to 59.47% shorter total runs in named profiles, not ordinary-menu, reporter-environment or first-Library-use qualification.
+
+### Historical qualification limits
+
+- Full retained no deliberate support cull, but unresolved integrations, wider modded-save and client/multiplayer acceptance remained follow-up work; no universal loading-time guarantee was claimed.
 
 ## [4.2.2]
 
@@ -317,6 +409,10 @@ This is the authoritative product changelog. Each MIR 1–3 master release appea
 - [F015] Use 4.2.01502 for source 4.2.2. The final 02 identifies the source patch, not a packaging retry.
 - [F014] Use 4.2.01402 for source 4.2.2. The final 02 identifies the source patch, not a packaging retry.
 - [F013] Use 4.2.01302 for source 4.2.2. The final 02 identifies the source patch, not a packaging retry.
+
+### Upgrade limits
+
+- Upgrade directly from 4.2.0 or 4.2.1 to the matching 4.2.2 target package; a 4.2.1 resave after removals cannot recreate erased science-productivity levels or bonuses, so preserve backups and load a copy directly with 4.2.2 rather than removing MIR or guessing lost state.
 
 ## [4.2.1]
 
@@ -375,6 +471,10 @@ This is the authoritative product changelog. Each MIR 1–3 master release appea
 - [F015] Use 4.2.01501 for source 4.2.1. The final 01 identifies the source patch, not a packaging retry.
 - [F014] Use 4.2.01401 for source 4.2.1. The final 01 identifies the source patch, not a packaging retry.
 - [F013] Use 4.2.01301 for source 4.2.1. The final 01 identifies the source patch, not a packaging retry.
+
+### Superseded advisory
+
+- This release was superseded by 4.2.2 after reported unexpected technology removals on upgrade; existing saves should not be upgraded through 4.2.1, and an affected save should be preserved without resaving before following the direct 4.2.2 backup-recovery guidance.
 
 ## [4.2.0]
 
