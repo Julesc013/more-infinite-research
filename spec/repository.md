@@ -32,7 +32,7 @@ Use front matter for docs during coexistence with the existing documentation con
 
 No unrelated refactor, new framework, dependency or public method because it seems future-proof. A new abstraction needs an actual second use or a concrete safety boundary. One author does not silently weaken the oracle or release threshold to make their patch pass. Architecture/API/continuity changes get independent review.
 
-After a bounded batch return source/package identities, observed behavior/tests, performance only where measured, remaining gaps and the next smallest action. Do not continue the whole rewrite merely because another improvement is possible. No broad promise of unattended work or evidence from model agreement.
+After a bounded batch return source/package identities, observed behavior/tests, performance only where measured, remaining gaps and the next smallest action. Assigned workers stop at their bounded ownership; the maintainer-authorized release coordinator continues the active replacement goal. Optional improvements do not expand a worker assignment. No evidence from model agreement or unobserved execution.
 
 ## Portable build/test operations
 
