@@ -97,6 +97,20 @@
           "id": "bob-angel-physical-prototype-caps",
           "evidence": "spec/evidence/bob-angel-physical-caps-chain.json",
           "scope": "Two cap stages each complete five actual material labs and1000 native alloy crafts; output and native bar prove125% limiting and128% after relaxation, save/two reloads. This is not other-owner or final-package coverage."
+        },
+        {
+          "id": "f210-bob-native-owner-retention-host-contract",
+          "source": [
+            "source/compatibility/bob_native_continuations.lua",
+            "source/compatibility/modern_catalogue.lua",
+            "source/data-final-fixes.lua"
+          ],
+          "evidence": [
+            "tests/fixtures/bob-logistics-f210-native-continuation-facts.json",
+            "tests/test_bob_native_inserter.py",
+            "tests/test_generator.py"
+          ],
+          "scope": "Accepted PR1036/1042/1043 source and host controls retain the two named F210 Bob Logistics infinite owners and setting identities, omit only duplicate MIR continuations, and require one selected read-only preflight before publication. A fresh nine-edition freeze and focused native retry are required; EA41 failures remain recorded and no gameplay, save, performance or release result is claimed."
         }
       ],
       "test_subjects": [
@@ -564,6 +578,20 @@
             "spec/evidence/historical-transition-017-100-110-chain.json"
           ],
           "scope": "All seven bounded published4.7.2 predecessor profiles preserve earned mining effects/save/two reloads; F015+ actual successor labs, F017+ queued42% work. Not complete catalogue or final-source acceptance."
+        },
+        {
+          "id": "published-target-specific-migration-membership",
+          "source": [
+            "source/migrations/more-infinite-research_2.0.5.json",
+            "source/migrations/more-infinite-research_2.1.0.json",
+            "source/migrations/more-infinite-research_4.7.0.json",
+            "tools/package.py"
+          ],
+          "evidence": [
+            "spec/inventory/targets-baseline.json",
+            "tests/test_package.py"
+          ],
+          "scope": "Published4.7.3 membership retains2.0.5 SHA07A2759B963321A87B1047029AE426C7B2784033BC7C4F899D2640C037C5EEE2 and2.1.0 SHAF427B215D77BC86608010ADC1D0D1A1C98BE61F0D7140EF716D77E46DAB8092D on every target, while4.7.0 SHA0980B0B6F1675F6827A8E4151F778143EA74C9C6C3440CC2318129DBCE63C379 is F210-only. PR1040 restores that target selection without changing source JSON filenames or bytes; a new controller-bound nine-edition inventory/freeze is required and this records no native harm or migration pass."
         }
       ],
       "test_subjects": [
