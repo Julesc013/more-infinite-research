@@ -118,7 +118,7 @@ end
 -- captured material rows.  It deliberately stays outside the F200
 -- no-BobTech material selector and does not reconstruct other Bob/Angel
 -- routes from the installed prototype world.
-if require("compatibility.bob_tech_profile").applies(mods) then
+if modern_selection and modern_selection.bob_tech_materials then
   local materials = require("compatibility.bob_tech_materials").technologies(values, data.raw, mods)
   for index = 1, #materials do technologies[#technologies + 1] = materials[index] end
 end

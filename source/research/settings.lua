@@ -12,7 +12,8 @@ local active_mods = script and script.active_mods or mods or {}
 local space_age_active = type(active_mods) == "table" and active_mods["space-age"] ~= nil
 local k2so_active = modern_catalogue.is_k2so(active_mods)
 local bob_angel_active = modern_catalogue.is_bob_angel(active_mods)
-local bob_tech_active = require("compatibility.bob_tech_profile").applies(active_mods)
+local bob_angel_f210_profile = modern_catalogue.bob_angel_f210_profile(active_mods)
+local bob_tech_active = bob_angel_f210_profile == nil and require("compatibility.bob_tech_profile").applies(active_mods)
 local bob_core_active = require("compatibility.bob_core_profile").applies(active_mods)
 local bob_plates_selector = require("compatibility.bob_plates_profile")
 local bob_plates_visible = bob_plates_selector.visible_families(bob_plates_selector.select(active_mods))
@@ -77,6 +78,9 @@ for _, historical_stream in ipairs(historical.streams) do
       if bob_plates_visible[historical_stream.key] then field.hidden = nil end
       if angel_f210_profile == "base" and (historical_stream.key == "research_breeding"
           or historical_stream.key == "research_material_aluminium") then field.hidden = nil end
+      if bob_angel_f210_profile == "base" and (historical_stream.key == "research_breeding"
+          or historical_stream.key == "research_lithium" or historical_stream.key == "research_tungsten"
+          or historical_stream.key == "research_material_copper_tungsten") then field.hidden = nil end
       if py_profile.setting_visible(historical_stream.key, active_mods) then field.hidden = nil end
       if atan_active and (historical_stream.key == "research_air_scrubbing_clean_filter"
         or historical_stream.key == "research_ash_separation") then field.hidden = nil end
