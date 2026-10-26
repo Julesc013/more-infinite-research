@@ -54,7 +54,12 @@ def py(value):
 def raw_fixture():
     technologies = {
         "burner-mechanics": {
+            "research_trigger": {"type": "craft-item", "item": "iron-plate", "count": 10},
             "effects": [{"type": "unlock-recipe", "recipe": "burner-lab"}],
+        },
+        "automation-science-pack": {
+            "research_trigger": {"type": "craft-item", "item": "burner-lab"},
+            "prerequisites": ["burner-mechanics"],
         },
         "recipe-prod-research_electric_engine-1": {
             "max_level": "infinite",
@@ -71,6 +76,17 @@ def raw_fixture():
     return {
         "technology": technologies,
         "recipe": {
+            "burner-lab": {
+                "categories": ["crafting"],
+                "enabled": True,
+                "energy_required": 0.5,
+                "ingredients": [
+                    {"type": "item", "name": "motor", "amount": 10},
+                    {"type": "item", "name": "copper-plate", "amount": 10},
+                    {"type": "item", "name": "stone-brick", "amount": 5},
+                ],
+                "results": [{"type": "item", "name": "burner-lab", "amount": 1}],
+            },
             "electric-engine-unit": {
                 "energy_required": 10,
                 "ingredients": [
@@ -128,7 +144,7 @@ class AaiParityNativeControls(unittest.TestCase):
               local env = {
                 script={active_mods=mods,on_init=function(fn) callbacks.init=fn end,on_load=function(fn) callbacks.load=fn end,
                   on_configuration_changed=function(fn) callbacks.configuration=fn end,on_event=function(event,fn) callbacks.events[event]=fn end},
-                defines={events={on_research_finished=1,on_tick=2},inventory={lab_input=1, fuel=2, assembling_machine_input=3, assembling_machine_output=4}},
+                defines={events={on_research_finished=1,on_tick=2},inventory={lab_input=1, fuel=2, crafter_input=3, crafter_output=4}},
                 mods=mods,
               }
               env.require = function(name)
@@ -188,11 +204,11 @@ class AaiParityNativeControls(unittest.TestCase):
                   value.technologies[name]=row
                   return row
                 end
-                technology("burner-mechanics",true); technology("automation-science-pack",true)
+                technology("burner-mechanics",false); technology("automation-science-pack",false)
                 for _,name in ipairs({"fuel-processing","sand-processing","electricity","electronics","glass-processing","electric-lab"}) do technology(name,false) end
                 for _,name in ipairs({"logistic-science-pack","chemical-science-pack","production-science-pack"}) do technology(name,false) end
                 technology("recipe-prod-research_electric_engine-1",false,1)
-                value.recipes["burner-lab"]={valid=true,name="burner-lab",enabled=true}
+                value.recipes["burner-lab"]={valid=true,name="burner-lab",enabled=false}
                 value.recipes["lab"]={valid=true,name="lab",enabled=false}
                 value.recipes["electric-engine-unit"]={valid=true,name="electric-engine-unit",productivity_bonus=0}
                 value.add_research=function(row) value.research_queue={row}; return true end
@@ -200,7 +216,7 @@ class AaiParityNativeControls(unittest.TestCase):
               end
               local player=force(1)
               local surface={}
-              local electric_lab_creations=0
+              local electric_lab_creations, bootstrap_crafts=0,{}
               function surface.find_entities_filtered() return {} end
               function surface.create_entity(spec)
                 if spec.name=="burner-lab" or spec.name=="lab" then
@@ -210,6 +226,36 @@ class AaiParityNativeControls(unittest.TestCase):
                   end
                   local input,fuel=inventory(),inventory()
                   return {valid=true,energy=0,get_inventory=function(slot) assert(slot==1);return input end,get_fuel_inventory=function()return fuel end}
+                end
+                if spec.name=="stone-furnace" then
+                  local input,output,fuel=inventory(),inventory(),inventory()
+                  local entity={valid=true}
+                  entity.get_inventory=function(slot) if slot==3 then return input elseif slot==4 then return output end error("unexpected furnace slot") end
+                  entity.get_fuel_inventory=function()return fuel end
+                  return setmetatable(entity,{__index=function(_,key) if key=="energy" then return 0 end end,
+                    __newindex=function(target,key,value)
+                      if key=="energy" and input.get_item_count("iron-ore")==10 and output.get_item_count("iron-plate")==0 then
+                        input.counts["iron-ore"]=0;output.counts["iron-plate"]=10;bootstrap_crafts.iron=10
+                        player.technologies["burner-mechanics"].researched=true;player.recipes["burner-lab"].enabled=true
+                      elseif key~="energy" then rawset(target,key,value) end
+                    end})
+                end
+                if spec.name=="burner-assembling-machine" then
+                  local input,output,fuel=inventory(),inventory(),inventory()
+                  local entity={valid=true}
+                  entity.get_inventory=function(slot) if slot==3 then return input elseif slot==4 then return output end error("unexpected burner assembler slot") end
+                  entity.get_fuel_inventory=function()return fuel end
+                  entity.set_recipe=function(name) assert(name=="burner-lab");return {} end
+                  entity.get_recipe=function() return {name="burner-lab"} end
+                  return setmetatable(entity,{__index=function(_,key) if key=="energy" then return 0 end end,
+                    __newindex=function(target,key,value)
+                      if key=="energy" and input.get_item_count("motor")==10 and input.get_item_count("copper-plate")==10
+                          and input.get_item_count("stone-brick")==5 and output.get_item_count("burner-lab")==0 then
+                        input.counts["motor"],input.counts["copper-plate"],input.counts["stone-brick"]=0,0,0
+                        output.counts["burner-lab"]=1;bootstrap_crafts.burner_lab=1
+                        player.technologies["automation-science-pack"].researched=true
+                      elseif key~="energy" then rawset(target,key,value) end
+                    end})
                 end
                 assert(spec.name=="assembling-machine-2")
                 local input,output=inventory(),inventory()
@@ -244,7 +290,7 @@ class AaiParityNativeControls(unittest.TestCase):
                 local env={
                   script={active_mods=active,on_init=function(fn)target_callbacks.init=fn end,on_load=function(fn)target_callbacks.load=fn end,
                     on_configuration_changed=function(fn)target_callbacks.configuration=fn end,on_event=function(event,fn)target_callbacks.events[event]=fn end},
-                  defines={events={on_research_finished=1,on_tick=2},inventory={lab_input=1,fuel=2,assembling_machine_input=3,assembling_machine_output=4}},
+                  defines={events={on_research_finished=1,on_tick=2},inventory={lab_input=1,fuel=2,crafter_input=3,crafter_output=4}},
                   game=game,storage=storage,mods=active,helpers={table_to_json=function()return "{}" end},log=function(value)
                     assert(value:match("^%[MIR5_NATIVE_FIXTURE%] RESULT "));markers=markers+1 end,
                 }
@@ -262,6 +308,13 @@ class AaiParityNativeControls(unittest.TestCase):
               local published={base="2.1.23",["aai-industry"]="0.7.5",["more-infinite-research"]="4.7.21003",["mir-fixture-mir5-aai-parity-native"]="0.1.0"}
               environment("published-4.7",published,callbacks)
               assert(pcall(callbacks.init))
+              assert(pcall(callbacks.events[2]))
+              assert(storage.mir5_aai_parity_native.phase=="bootstrap-burner-lab")
+              assert(player.technologies["burner-mechanics"].researched==true and player.recipes["burner-lab"].enabled==true)
+              assert(pcall(callbacks.events[2]))
+              assert(storage.mir5_aai_parity_native.phase=="aai-progression")
+              assert(player.technologies["automation-science-pack"].researched==true)
+              assert(bootstrap_crafts.iron==10 and bootstrap_crafts.burner_lab==1)
               assert(pcall(callbacks.events[2]))
               for _,name in ipairs({"fuel-processing","sand-processing","electricity","electronics","glass-processing","electric-lab"}) do
                 assert(player.current_research and player.current_research.name==name)
@@ -291,7 +344,8 @@ class AaiParityNativeControls(unittest.TestCase):
               owner.level=3;player.recipes["electric-engine-unit"].productivity_bonus=.2;player.current_research=nil;player.research_queue={}
               assert(pcall(successor.events[1],{by_script=false,research=owner}))
               assert(pcall(successor.events[2]));assert(pcall(successor.load));assert(pcall(successor.events[2]))
-              return {source=source,phase=state.phase,successor_labs=state.successor_labs,saves=saves,markers=markers}
+              return {source=source,phase=state.phase,successor_labs=state.successor_labs,saves=saves,markers=markers,
+                bootstrap_iron=bootstrap_crafts.iron,bootstrap_burner_lab=bootstrap_crafts.burner_lab}
             end
             '''
         )
@@ -345,6 +399,10 @@ class AaiParityNativeControls(unittest.TestCase):
             "aai-count": lambda raw: raw["technology"]["electronics"]["unit"].__setitem__("count", 31),
             "mir-effect": lambda raw: raw["technology"]["recipe-prod-research_electric_engine-1"]["effects"][0].__setitem__("change", 0.2),
             "recipe-fluid": lambda raw: raw["recipe"]["electric-engine-unit"]["ingredients"][0].__setitem__("amount", 39),
+            "burner-trigger": lambda raw: raw["technology"]["burner-mechanics"]["research_trigger"].__setitem__("count", 9),
+            "automation-trigger": lambda raw: raw["technology"]["automation-science-pack"]["research_trigger"].__setitem__("item", "iron-plate"),
+            "burner-recipe": lambda raw: raw["recipe"]["burner-lab"]["ingredients"][0].__setitem__("amount", 9),
+            "burner-recipe-category": lambda raw: raw["recipe"]["burner-lab"]["categories"].__setitem__(0, "smelting"),
             "wrong-closure": lambda raw: raw,
         }
         for name, mutate in opponents.items():
@@ -383,6 +441,13 @@ class AaiParityNativeControls(unittest.TestCase):
         self.assertIn('local AAI_PLAN = {"fuel-processing", "sand-processing", "electricity", "electronics", "glass-processing", "electric-lab"}', source)
         self.assertIn('event.by_script ~= false', source)
         self.assertIn('source_setup_external_science_prerequisites=true', source)
+        self.assertIn('phase="bootstrap-iron"', source)
+        self.assertIn('craft-item trigger did not complete after native iron production', source)
+        self.assertIn('craft-item trigger did not complete after native burner-lab production', source)
+        self.assertIn('defines.inventory.crafter_input', source)
+        self.assertIn('defines.inventory.crafter_output', source)
+        self.assertNotIn('assembling_machine_input', source)
+        self.assertNotIn('assembling_machine_output', source)
         self.assertIn('state.aai_finished ~= #AAI_PLAN', source)
         self.assertIn('physical_before_output=state.before_output', source)
         self.assertIn('physical_after_output=state.after_output', source)
@@ -399,6 +464,7 @@ class AaiParityNativeControls(unittest.TestCase):
                           result["source"]["saves"], result["source"]["markers"]))
         self.assertEqual(("successor-complete", 1, 2, 3),
                          (result["phase"], result["successor_labs"], result["saves"], result["markers"]))
+        self.assertEqual((10, 1), (result["bootstrap_iron"], result["bootstrap_burner_lab"]))
 
 
 if __name__ == "__main__":

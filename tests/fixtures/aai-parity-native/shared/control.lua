@@ -15,6 +15,11 @@ local MIR_PACKS = 64
 local PHYSICAL_BATCHES = 10
 local LAB_ENERGY = 100000000
 local DEADLINE_TICKS = 180000
+local STARTING_IRON = 10
+local BURNER_LAB_MOTORS = 10
+local BURNER_LAB_COPPER = 10
+local BURNER_LAB_BRICKS = 5
+local BOOTSTRAP_FUEL = 16
 local loaded, reported = nil, false
 
 local function fail(message) error("[mir5-aai-parity-native] " .. message) end
@@ -90,6 +95,46 @@ local function create_burner_lab(force)
   return entity
 end
 
+local function create_starting_furnace(force)
+  local entity = game.surfaces[1].create_entity{name="stone-furnace", position={-6, 0}, force=force}
+  if entity == nil or entity.valid == false then fail("could not create AAI starting furnace") end
+  local input = inventory(entity, defines.inventory.crafter_input, "starting furnace input")
+  local output = inventory(entity, defines.inventory.crafter_output, "starting furnace output")
+  local fuel = entity.get_fuel_inventory and entity.get_fuel_inventory()
+  if fuel == nil or fuel.insert{name="coal", count=BOOTSTRAP_FUEL} ~= BOOTSTRAP_FUEL then
+    fail("AAI starting furnace rejected fuel")
+  end
+  if input.insert{name="iron-ore", count=STARTING_IRON} ~= STARTING_IRON or output.get_item_count("iron-plate") ~= 0 then
+    fail("AAI starting furnace rejected exact iron input")
+  end
+  entity.energy = LAB_ENERGY
+  return entity
+end
+
+local function create_starting_burner_assembler(force)
+  local entity = game.surfaces[1].create_entity{name="burner-assembling-machine", position={-3, 0}, force=force}
+  if entity == nil or entity.valid == false then fail("could not create AAI starting burner assembler") end
+  entity.set_recipe("burner-lab")
+  local selected = entity.get_recipe()
+  if selected == nil or selected.name ~= "burner-lab" then
+    fail("could not select AAI burner-lab recipe")
+  end
+  local input = inventory(entity, defines.inventory.crafter_input, "starting burner assembler input")
+  local output = inventory(entity, defines.inventory.crafter_output, "starting burner assembler output")
+  local fuel = entity.get_fuel_inventory and entity.get_fuel_inventory()
+  if fuel == nil or fuel.insert{name="coal", count=BOOTSTRAP_FUEL} ~= BOOTSTRAP_FUEL then
+    fail("AAI starting burner assembler rejected fuel")
+  end
+  if input.insert{name="motor", count=BURNER_LAB_MOTORS} ~= BURNER_LAB_MOTORS
+      or input.insert{name="copper-plate", count=BURNER_LAB_COPPER} ~= BURNER_LAB_COPPER
+      or input.insert{name="stone-brick", count=BURNER_LAB_BRICKS} ~= BURNER_LAB_BRICKS
+      or output.get_item_count("burner-lab") ~= 0 then
+    fail("AAI starting burner assembler rejected exact burner-lab inputs")
+  end
+  entity.energy = LAB_ENERGY
+  return entity
+end
+
 local function create_electric_lab(force, space)
   if recipe(force, "lab").enabled ~= true then fail("AAI electric lab technology did not unlock lab recipe") end
   local entity = game.surfaces[1].create_entity{name="lab", position={3, 0}, force=force}
@@ -116,16 +161,16 @@ local function start_physical_batch(state, after_research)
   if entity == nil then
     entity = game.surfaces[1].create_entity{name="assembling-machine-2", position={6, 0}, force=force}
     if entity == nil or entity.valid == false then fail("could not create electric-engine assembler") end
-    local removed = entity.set_recipe("electric-engine-unit")
+    entity.set_recipe("electric-engine-unit")
     local selected = entity.get_recipe()
-    if type(removed) ~= "table" or next(removed) ~= nil or selected == nil or selected.name ~= "electric-engine-unit" then
-      fail("could not select electric-engine recipe without displaced items")
+    if selected == nil or selected.name ~= "electric-engine-unit" then
+      fail("could not select electric-engine recipe")
     end
     state.machine = entity
   end
   assert_no_beacon_or_modules(entity)
-  local input = inventory(entity, defines.inventory.assembling_machine_input, "assembler input")
-  local output = inventory(entity, defines.inventory.assembling_machine_output, "assembler output")
+  local input = inventory(entity, defines.inventory.crafter_input, "assembler input")
+  local output = inventory(entity, defines.inventory.crafter_output, "assembler output")
   local expected = after_research and (PHYSICAL_BATCHES + 1) or PHYSICAL_BATCHES
   local before = output.get_item_count("electric-engine-unit")
   if input.insert{name="steel-plate", count=PHYSICAL_BATCHES * 2} ~= PHYSICAL_BATCHES * 2
@@ -142,11 +187,11 @@ local function physical_batch_finished(state)
   local entity = state.machine
   if entity == nil or entity.valid == false then fail("physical assembler was removed") end
   entity.energy = LAB_ENERGY
-  local input = inventory(entity, defines.inventory.assembling_machine_input, "assembler input")
+  local input = inventory(entity, defines.inventory.crafter_input, "assembler input")
   if input.get_item_count("steel-plate") ~= 0 or input.get_item_count("electronic-circuit") ~= 0 or input.get_item_count("electric-motor") ~= 0 then
     return false
   end
-  local output = inventory(entity, defines.inventory.assembling_machine_output, "assembler output")
+  local output = inventory(entity, defines.inventory.crafter_output, "assembler output")
   local produced = output.get_item_count("electric-engine-unit") - state.production.before
   -- Ingredients leave the input inventory when the last craft starts. Wait
   -- for its real output instead of rejecting that normal in-flight state.
@@ -213,7 +258,7 @@ local function assert_snapshot(state, successor)
   local paused = game.forces[state.paused_index]
   if paused == nil or not close(technology(paused, OWNER).saved_progress, .27) then fail("paused AAI source witness differs") end
   if not state.machine or not state.machine.valid
-      or inventory(state.machine, defines.inventory.assembling_machine_output, "saved assembler output").get_item_count("electric-engine-unit") ~= 21 then
+      or inventory(state.machine, defines.inventory.crafter_output, "saved assembler output").get_item_count("electric-engine-unit") ~= 21 then
     fail("saved physical electric-engine output differs")
   end
 end
@@ -235,9 +280,8 @@ local function source_init()
   local space = check_closure()
   local force = game.forces.player
   game.speed = 16 -- Disposable physical fixture only; no timing claim.
-  assert_lab_chain(force)
-  local burner = create_burner_lab(force)
-  storage[KEY] = {phase="aai-progression", profile=space and "space-age" or "base", space=space, burner_lab=burner,
+  storage[KEY] = {phase="bootstrap-iron", profile=space and "space-age" or "base", space=space,
+    starting_furnace=create_starting_furnace(force),
     aai_next=1, aai_finished=0, mir_labs=0, deadline=game.tick + DEADLINE_TICKS}
 end
 
@@ -257,7 +301,43 @@ local function source_tick()
   end
   if game.tick > state.deadline then fail("AAI native parity fixture exceeded deadline") end
   local force = game.forces.player
-  if state.phase == "aai-progression" then
+  if state.phase == "bootstrap-iron" then
+    local furnace = state.starting_furnace
+    if furnace == nil or furnace.valid == false then fail("AAI starting furnace was removed") end
+    furnace.energy = LAB_ENERGY
+    local input = inventory(furnace, defines.inventory.crafter_input, "starting furnace input")
+    local output = inventory(furnace, defines.inventory.crafter_output, "starting furnace output")
+    local iron = output.get_item_count("iron-plate")
+    if iron > STARTING_IRON then fail("AAI starting furnace produced excess iron") end
+    if iron == STARTING_IRON then
+      if input.get_item_count("iron-ore") ~= 0 then fail("AAI starting furnace did not consume iron") end
+      if technology(force, "burner-mechanics").researched ~= true then
+        fail("AAI burner-mechanics craft-item trigger did not complete after native iron production")
+      end
+      if recipe(force, "burner-lab").enabled ~= true then fail("AAI burner-mechanics did not unlock burner lab") end
+      state.starting_assembler = create_starting_burner_assembler(force)
+      state.phase = "bootstrap-burner-lab"
+    end
+  elseif state.phase == "bootstrap-burner-lab" then
+    local assembler = state.starting_assembler
+    if assembler == nil or assembler.valid == false then fail("AAI starting burner assembler was removed") end
+    assembler.energy = LAB_ENERGY
+    local input = inventory(assembler, defines.inventory.crafter_input, "starting burner assembler input")
+    local output = inventory(assembler, defines.inventory.crafter_output, "starting burner assembler output")
+    local labs = output.get_item_count("burner-lab")
+    if labs > 1 then fail("AAI starting burner assembler produced excess burner labs") end
+    if labs == 1 then
+      if input.get_item_count("motor") ~= 0 or input.get_item_count("copper-plate") ~= 0 or input.get_item_count("stone-brick") ~= 0 then
+        fail("AAI starting burner assembler did not consume burner-lab inputs")
+      end
+      if technology(force, "automation-science-pack").researched ~= true then
+        fail("AAI automation-science-pack craft-item trigger did not complete after native burner-lab production")
+      end
+      assert_lab_chain(force)
+      state.burner_lab = create_burner_lab(force)
+      state.phase = "aai-progression"
+    end
+  elseif state.phase == "aai-progression" then
     state.burner_lab.energy = LAB_ENERGY
     if state.aai_finished == #AAI_PLAN then
       state.electric_lab = create_electric_lab(force, state.space)
