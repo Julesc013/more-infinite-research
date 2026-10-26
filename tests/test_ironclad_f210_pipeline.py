@@ -13,6 +13,8 @@ import unittest
 ROOT = Path(__file__).resolve().parents[1]
 SOURCE = ROOT / "source"
 CONTEXT = ROOT / "tests/fixtures/ironclad-f210-upstream-context.json.gz"
+F200_INPUTS = ROOT / "tests/fixtures/bob-angel-f200-catalogue-inputs.json"
+F200_PROFILE = ROOT / "tests/profiles/bob-angel-f200-2077.json"
 ENGINE = "FE4A1DA30F322A0D0B8AEB3DF7276332222BAAA143E2352569B723E84B2B9060"
 B6 = "B6EB9430056ABD384DB00F94929FE7DAC0A37441ACF4BC277946689682628852"
 sys.path.insert(0, str(ROOT / "tests"))
@@ -35,27 +37,35 @@ class IroncladF210PipelineTests(unittest.TestCase):
             raise AssertionError("Ironclad independently captured context changed")
         cls.context = json.loads(gzip.decompress(CONTEXT.read_bytes()))
 
-    def lua(self):
+    def lua(self, target_id="f210"):
         lua = LuaRuntime(unpack_returned_tuples=True)
         lua.globals().player_root = SOURCE.as_posix()
+        lua.globals().selected_target = target_id
         lua.execute(r'''
           package.path = player_root .. "/?.lua;" .. player_root .. "/?/init.lua"
           package.cpath = ""
           local target = require("platform.target")
-          target.id, target.factorio_version, target.minimum_base = "f210", "2.1", "2.1.23"
-          target.distribution_version, target.cargo_research = "5.0.21000", true
-          target.recipe_probability, target.receiver_limits, target.productivity_ignores_stats = "independent_probability", true, true
+          if selected_target == "f210" then
+            target.id, target.factorio_version, target.minimum_base = "f210", "2.1", "2.1.23"
+            target.distribution_version, target.cargo_research = "5.0.21000", true
+            target.recipe_probability, target.receiver_limits, target.productivity_ignores_stats = "independent_probability", true, true
+          elseif selected_target == "f200" then
+            target.id, target.factorio_version, target.minimum_base = "f200", "2.0", "2.0.77"
+            target.distribution_version, target.cargo_research = "5.0.20000", false
+            target.recipe_probability, target.receiver_limits, target.productivity_ignores_stats = "probability", false, true
+          else
+            error("unsupported Ironclad test target")
+          end
         ''')
         return lua
 
-    def stage(self, case_id, startup=None, mutate=None):
-        case = self.context["cases"][case_id]
-        raw = deepcopy(case["raw"])
+    def stage_raw(self, raw, active_mods, target_id, startup=None, mutate=None):
+        raw = deepcopy(raw)
         if mutate is not None:
             mutate(raw)
-        lua = self.lua()
+        lua = self.lua(target_id)
         lua.globals().captured_raw = _lua_value(lua, raw)
-        lua.globals().active_mods = _lua_value(lua, deepcopy(case["selection"]))
+        lua.globals().active_mods = _lua_value(lua, deepcopy(active_mods))
         lua.globals().startup_values = _lua_value(lua, startup or {})
         lua.execute(r'''
           mods, script, helpers, log = active_mods, nil, {}, function() end
@@ -86,6 +96,10 @@ class IroncladF210PipelineTests(unittest.TestCase):
           outcome, message = pcall(function() assert(loadfile(player_root .. "/data-final-fixes.lua"))() end)
         ''')
         return lua
+
+    def stage(self, case_id, startup=None, mutate=None):
+        case = self.context["cases"][case_id]
+        return self.stage_raw(case["raw"], case["selection"], "f210", startup, mutate)
 
     def test_context_pins_independent_upstream_b6_and_provider_facts(self):
         self.assertEqual("MIR5IroncladF210UpstreamContextV1", self.context["schema"])
@@ -150,6 +164,42 @@ class IroncladF210PipelineTests(unittest.TestCase):
                 row = _plain(lua.globals().emitted)["weapon-shooting-speed-7"]
                 native = self.context["cases"]["q117"]["raw"]["technology"]["weapon-shooting-speed-6"]["effects"]
                 self.assertEqual(native, row["effects"])
+
+    def test_f200_real_bob_angel_raw_final_stage_preserves_native_categories_outside_default_overlap(self):
+        """The helper applies to both modern engines; exercise F200 through final data stage."""
+        inputs = json.loads(F200_INPUTS.read_text(encoding="utf-8"))
+        profile = json.loads(F200_PROFILE.read_text(encoding="utf-8"))
+        mods = {row["name"]: row["version"] for row in profile["mods"] if row["enabled"]}
+        native = inputs["raw"]["technology"]["weapon-shooting-speed-6"]["effects"]
+        native_by_category = {effect.get("ammo_category"): effect.get("modifier") for effect in native
+                              if effect.get("type") == "gun-speed"}
+        self.assertTrue({"bullet", "shotgun-shell", "cannon-shell", "rocket"}.issubset(native_by_category))
+        self.assertEqual(0.4, native_by_category["bullet"])
+        self.assertEqual(0.4, native_by_category["shotgun-shell"])
+
+        default = self.stage_raw(inputs["raw"], mods, "f200")
+        self.assertTrue(default.globals().outcome, str(default.globals().message))
+        default_effects = {effect.get("ammo_category"): effect.get("modifier") for effect in
+                           _plain(default.globals().emitted)["weapon-shooting-speed-7"]["effects"]
+                           if effect.get("type") == "gun-speed"}
+        self.assertEqual(0.4, default_effects["bullet"])
+        self.assertEqual(0.4, default_effects["shotgun-shell"])
+        self.assertNotIn("cannon-shell", default_effects)
+        self.assertNotIn("rocket", default_effects)
+
+        for startup in (
+            {"mir-adjust-vanilla-weapon-speed-techs": {"value": "off"}},
+            {"ips-enable-research_rocket_shooting_speed": {"value": False},
+             "ips-enable-research_cannon_shooting_speed": {"value": False}},
+        ):
+            with self.subTest(startup=startup):
+                lua = self.stage_raw(inputs["raw"], mods, "f200", startup)
+                self.assertTrue(lua.globals().outcome, str(lua.globals().message))
+                effects = {effect.get("ammo_category"): effect.get("modifier") for effect in
+                           _plain(lua.globals().emitted)["weapon-shooting-speed-7"]["effects"]
+                           if effect.get("type") == "gun-speed"}
+                for category in ("bullet", "shotgun-shell", "cannon-shell", "rocket"):
+                    self.assertEqual(native_by_category[category], effects[category])
 
     def test_missing_category_or_changed_native_mortar_refuses_before_publication(self):
         def missing_category(raw):
