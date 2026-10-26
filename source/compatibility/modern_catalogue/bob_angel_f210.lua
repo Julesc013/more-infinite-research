@@ -73,7 +73,7 @@ local function owns_unlock(owner, recipe)
   for _, effect in ipairs(type(owner) == "table" and owner.effects or {}) do
     if type(effect) == "table" and effect.type == "unlock-recipe" and effect.recipe == recipe then count = count + 1 end
   end
-  return count == 1
+  return count > 0
 end
 
 local function legacy_addition(key)
@@ -357,12 +357,13 @@ local function require_native_steel(raw, callback)
   end
   local required, seen = { ["steel-plate"]=true, ["casting-steel"]=true }, {}
   for _, effect in ipairs(type(steel.effects) == "table" and steel.effects or {}) do
-    if type(effect) == "table" and required[effect.recipe] then
-      if seen[effect.recipe] or effect.type ~= "change-recipe-productivity" or effect.change ~= expected.effect_change then
+    if type(effect) == "table" and effect.type == "change-recipe-productivity" and required[effect.recipe] then
+      if seen[effect.recipe] or effect.change ~= expected.effect_change then
         fail("steel-plate-productivity existing effect changed: " .. effect.recipe, callback)
       end
       seen[effect.recipe] = true
-    elseif type(effect) == "table" and (effect.recipe == "angels-plate-steel" or effect.recipe == "angels-plate-steel-2") then
+    elseif type(effect) == "table" and effect.type == "change-recipe-productivity"
+        and (effect.recipe == "angels-plate-steel" or effect.recipe == "angels-plate-steel-2") then
       fail("steel-plate-productivity already owns Angel steel", callback)
     end
   end

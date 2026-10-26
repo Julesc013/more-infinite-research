@@ -334,8 +334,9 @@ class BobAngelF210PipelineTests(unittest.TestCase):
           local pure={}; for k,v in pairs(mods_for_test) do pure[k]=v end; pure.bobplates=nil
           local bob={}; for k,v in pairs(mods_for_test) do bob[k]=v end; bob.angelssmelting=nil
           local core={}; for k,v in pairs(mods_for_test) do core[k]=v end; core.angelssmelting=nil
+          local pure_selected,bob_selected,core_selected=profile.select(pure),profile.select(bob),profile.select(core)
           target.id="f200"; local legacy=profile.select(mods_for_test)
-          return selected,first,second,profile.select(pure),profile.select(bob),profile.select(core),legacy
+          return selected,first,second,pure_selected,bob_selected,core_selected,legacy
         ''')
         self.assertEqual("base", profile)
         self.assertNotEqual(first["additions"][1]["effects"][1]["recipe"],
@@ -344,6 +345,33 @@ class BobAngelF210PipelineTests(unittest.TestCase):
         self.assertIsNone(full_bob)
         self.assertIsNone(core)
         self.assertIsNone(f200)
+
+    def test_asset_only_mods_and_equivalent_unlocks_do_not_disable_the_combined_profile(self):
+        for case in ("base", "space_age"):
+            source = self.context["cases"][case]
+            active = deepcopy(source["selection"])
+            active["Krastorio2Assets"] = "2.0.0"
+            active["k2so-assets"] = "2.0.0"
+            raw = deepcopy(source["raw"])
+            owner_name = "lithium-processing" if case == "space_age" else "bob-lithium-processing"
+            owner = raw["technology"][owner_name]
+            owner["effects"].append(next(deepcopy(effect) for effect in owner["effects"]
+                                         if effect.get("type") == "unlock-recipe" and effect.get("recipe") == "lithium-plate"))
+            lua = self.stage(case, raw=raw, mods=active)
+            emitted = _plain(lua.globals().emitted)
+            for name, expected in source["expected"].items():
+                self.assertEqual(_contract(expected), _contract(emitted[name]))
+
+    def test_native_steel_preserves_foreign_unlocks_that_share_recipe_names(self):
+        raw = deepcopy(self.context["cases"]["space_age"]["raw"])
+        foreign = [
+            {"type": "unlock-recipe", "recipe": "casting-steel"},
+            {"type": "unlock-recipe", "recipe": "angels-plate-steel-2"},
+        ]
+        raw["technology"]["steel-plate-productivity"]["effects"] = foreign + raw["technology"]["steel-plate-productivity"]["effects"]
+        lua = self.stage("space_age", raw=raw)
+        row = _plain(lua.globals().data.raw.technology["steel-plate-productivity"])
+        self.assertEqual(foreign, row["effects"][:2])
 
 
 if __name__ == "__main__":

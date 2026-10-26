@@ -17,7 +17,7 @@ local REQUIRED = {
 -- with the q009/q010 Bob+Angel facts.  This is not a general compatibility
 -- classifier or a version fingerprint.
 local INCOMPATIBLE = {
-  "Krastorio2", "Krastorio2Assets", "Krastorio2-spaced-out", "k2so-assets",
+  "Krastorio2", "Krastorio2-spaced-out",
   "pycoalprocessing", "pyalienlife", "pyhightech", "space-exploration",
 }
 
