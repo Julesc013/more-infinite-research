@@ -100,7 +100,7 @@ class ComposeReplayTests(unittest.TestCase):
         return members
 
     def test_explicit_f200_and_f210_hotfix_replays_keep_complete_archive_identity(self):
-        for version in ("4.7.20002", "4.7.21002"):
+        for version in ("4.7.20002", "4.7.21002", "4.7.20003", "4.7.21003"):
             with self.subTest(version=version), tempfile.TemporaryDirectory() as temporary:
                 root = Path(temporary)
                 filename = f"{composer.MOD_NAME}_{version}.zip"
@@ -141,9 +141,11 @@ class ComposeReplayTests(unittest.TestCase):
             with self.assertRaisesRegex(composer.ComposeReplayError, "info.json does not retain"):
                 composer.compose_replay(archive, expected_sha, replay, output, version)
             self.assertFalse(output.exists())
-            with self.assertRaisesRegex(composer.ComposeReplayError, "unsupported published diagnostic"):
-                composer.compose_replay(archive, expected_sha, replay, output, "5.0.20000")
-            self.assertFalse(output.exists())
+            for unsupported in ("5.0.20000", "4.7.20004", "4.7.21004"):
+                with self.subTest(unsupported=unsupported), self.assertRaisesRegex(
+                        composer.ComposeReplayError, "unsupported published diagnostic"):
+                    composer.compose_replay(archive, expected_sha, replay, output, unsupported)
+                self.assertFalse(output.exists())
 
     def _compose(self, root: Path) -> tuple[Path, Path, Path, dict[str, bytes]]:
         archive = root / composer.PUBLISHED_ARCHIVE_NAME
