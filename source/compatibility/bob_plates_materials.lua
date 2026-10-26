@@ -37,6 +37,14 @@ local function shared_probability_matches(actual, expected)
     and actual.shared_probability.min == 0 and actual.shared_probability.max == 1)
 end
 
+local function amount_ranges_match(actual, expected, product)
+  -- F210 loads an ItemProduct range only when its fixed amount is absent.  The
+  -- captured routes have fixed amounts, so native range spelling is inert.
+  if product and expected.amount ~= nil then return true end
+  return expected_or_default(actual, expected, "amount_min", nil)
+    and expected_or_default(actual, expected, "amount_max", nil)
+end
+
 local function ignored_counts_match(actual, expected, product)
   if expected.ignored_by_productivity ~= nil then
     return actual.ignored_by_productivity == expected.ignored_by_productivity
@@ -50,8 +58,7 @@ end
 local function exact_entry(actual, expected, product)
   if type(actual) ~= "table" or type(expected) ~= "table" then return false end
   for key, wanted in pairs(expected) do if actual[key] ~= wanted then return false end end
-  return expected_or_default(actual, expected, "amount_min", nil)
-    and expected_or_default(actual, expected, "amount_max", nil)
+  return amount_ranges_match(actual, expected, product)
     and expected_or_default(actual, expected, "probability", 1)
     and expected_or_default(actual, expected, "independent_probability", 1)
     and shared_probability_matches(actual, expected)
@@ -59,6 +66,7 @@ local function exact_entry(actual, expected, product)
     and expected_or_default(actual, expected, "catalyst_amount", 0)
     and expected_or_default(actual, expected, "minimum_temperature", nil)
     and expected_or_default(actual, expected, "maximum_temperature", nil)
+    and expected_or_default(actual, expected, "temperature", nil)
     and ignored_counts_match(actual, expected, product)
 end
 

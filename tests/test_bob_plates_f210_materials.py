@@ -239,6 +239,9 @@ class BobPlatesF210MaterialsTests(unittest.TestCase):
     def test_product_route_semantics_keep_native_defaults_but_refuse_unrepresented_drift(self):
         defaulted = self.raw_from_context("q097")
         defaulted["recipe"]["carbon"]["results"][0].update({
+            # F210 only loads product ranges when fixed amount is absent.
+            "amount_min": 0,
+            "amount_max": 99,
             "probability": 1,
             "independent_probability": 1,
             "shared_probability": {"min": 0, "max": 1},
@@ -261,8 +264,8 @@ class BobPlatesF210MaterialsTests(unittest.TestCase):
         ))
 
         for key, value in (
-            ("amount_min", 1), ("amount_max", 2), ("probability", .5),
-            ("independent_probability", .5), ("shared_probability", {"min": 0, "max": .5}),
+            ("probability", .5), ("independent_probability", .5),
+            ("shared_probability", {"min": 0, "max": .5}),
             ("extra_count_fraction", .5), ("catalyst_amount", 1),
             ("extra_count_fraction", False), ("ignored_by_productivity", 1),
             ("ignored_by_productivity", False), ("ignored_by_stats", 1),
@@ -286,6 +289,23 @@ class BobPlatesF210MaterialsTests(unittest.TestCase):
 
         changed = self.raw_from_context("q097")
         changed["recipe"]["carbon"]["ingredients"][0]["minimum_temperature"] = 1
+        lua = self.lua()
+        lua.globals().captured_raw = _lua_value(lua, changed)
+        lua.globals().captured_values = _lua_value(lua, _stream_values(
+            definition["key"] for definition in _plain(lua.globals().bob_plates_data.material_definitions("base"))
+        ))
+        lua.globals().captured_mods = _lua_value(
+            lua, _mod_map(self.facts["cases"]["q097"]["profile"]["selection_without_mir"])
+        )
+        ok, error = lua.execute(r'''
+          return pcall(function() return bob_plates.technologies(captured_values, captured_raw, captured_mods) end)
+        ''')
+        self.assertFalse(ok)
+        self.assertIn("carbon changed", error)
+
+        changed = self.raw_from_context("q097")
+        self.assertEqual({"type": "fluid", "name": "water", "amount": 5}, changed["recipe"]["carbon"]["ingredients"][0])
+        changed["recipe"]["carbon"]["ingredients"][0]["temperature"] = 100
         lua = self.lua()
         lua.globals().captured_raw = _lua_value(lua, changed)
         lua.globals().captured_values = _lua_value(lua, _stream_values(
