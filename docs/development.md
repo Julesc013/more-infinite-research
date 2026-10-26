@@ -59,10 +59,13 @@ After accepted MIR5.0.0 publication and verified local delivery, continue with5.
 
 For a local replacement build, keep the official mod name `more-infinite-research`. Factorio selects one enabled version of a named mod, so this is an upgrade-style replacement of the installed MIR rather than a side-by-side installation. That identity deliberately keeps the packaged `__more-infinite-research__` imports, existing settings, technologies, migration history and draft API consumers pointed at the local build.
 
-Create a normal branch in a clone, make the bounded source change, and build a selected ordinary edition from the working tree into a new directory outside the checkout:
+For MIR5 development, start from dev: main remains the published release until qualified promotion. A local build needs the existing Python packager, not release credentials or Factorio archives. Clone, branch from dev, make the bounded source change, and build a selected ordinary edition into a new directory outside the checkout:
 
 ```powershell
-git checkout -b fix/my-bounded-change
+git clone https://github.com/Julesc013/more-infinite-research.git
+cd more-infinite-research
+git switch dev
+git switch -c fix/my-bounded-change
 python tools/package.py --source source --target f210 --output ../mir-local/more-infinite-research_5.0.21000.zip
 ```
 
@@ -74,7 +77,7 @@ python tools/package.py --source source --version 5.0.21001 --output ../mir-loca
 
 `--version` and `--target` are intentionally mutually exclusive. To change a selected edition's local version or ordinary presentation metadata, edit the working-tree `source/info.json` while retaining the official name, then use `--target`; the target packager derives the selected edition's version, Factorio line and minimum Base dependency from that source codec and the tracked target record. Do not use `tools/release.py` for this: it freezes the canonical ten-edition release identity and rejects a private product version/name. The F006–F012 best-effort data-only path separately regenerates its finite metadata, so it is not a private-branding path.
 
-Before sharing a proposed change upstream, inspect the plan, run the narrow affected controls and repository checks, commit the bounded branch, push it and open a normal pull request. A local package, passing host control or successful load is not a release, compatibility or native acceptance claim. Keep original saves and use a disposable profile for local experiments.
+Before sharing a proposed change upstream, inspect the plan, run the narrow affected controls and repository checks, and commit the bounded change. Create your own GitHub fork when ready to contribute, add its URL as a separate remote, push the feature branch there and open a PR targeting official dev. Keep personal version/branding edits out of an unrelated upstream fix. Official repository push permission is unnecessary for a local build or contribution. A local package, passing host control or successful load is not release, compatibility or native acceptance. Keep original saves and use a disposable profile for experiments.
 
 For a companion or extension, prefer the documented draft MIR API/SDK surface and declare the official dependency; do not copy MIR merely to call its data or runtime interface. API maturity remains draft until its independent-consumer and native/client gates pass, so the companion must check the documented version/capability boundary and handle optional absence.
 
