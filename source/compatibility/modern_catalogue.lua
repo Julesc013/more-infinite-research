@@ -565,15 +565,46 @@ local function apply_py_coal(definitions)
   return selected, copy(delta.coal_replacement_families), copy(delta.coal_excluded_recipes)
 end
 
-local function append_py_hightech(definitions)
+local function append_py_hightech(definitions, active_mods)
   local delta = require("compatibility.modern_catalogue.py")
   local selected, known = apply_py_profile(definitions, delta, true)
   for _, definition in ipairs(delta.definitions()) do
     if known[definition.key] then error("MIR duplicate Py HighTech catalogue key " .. definition.key, 3) end
     selected[#selected + 1], known[definition.key] = copy(definition), true
   end
-  return selected, delta.required_targets(), delta.product_bindings(), copy(delta.hightech_replacement_families),
-    copy(delta.hightech_excluded_recipes)
+  local required = delta.required_targets()
+  local replacement, excluded = copy(delta.hightech_replacement_families), copy(delta.hightech_excluded_recipes)
+  local exact_bindings, exact_families = {}, {}
+  if target.id == "f210" then
+    local current = require("compatibility.modern_catalogue.py_f210")
+    for _, definition in ipairs(current.additions) do
+      if known[definition.key] then error("MIR duplicate F210 Py catalogue key " .. definition.key, 3) end
+      selected[#selected + 1], known[definition.key] = copy(definition), definition
+    end
+    for family, changed in pairs(current.retained_disabled_identities) do
+      local definition = known[family]
+      if type(definition) ~= "table" then error("MIR missing retained F210 Py identity " .. family, 3) end
+      for field, value in pairs(changed) do definition[field] = copy(value) end
+    end
+    for _, recipe in ipairs(current.breeding_required_target_additions) do
+      required.research_breeding[#required.research_breeding + 1] = recipe
+    end
+    local targets = copy(current.exact_product_targets)
+    if active_mods[current.py_productivity.mod] ~= nil then
+      for family, recipes in pairs(current.py_productivity.exact_product_targets) do targets[family] = copy(recipes) end
+    end
+    local families = {}
+    for family in pairs(targets) do families[#families + 1] = family end
+    table.sort(families)
+    for _, family in ipairs(families) do
+      local recipes = targets[family]
+      exact_families[family], replacement[family], excluded[family] = true, true, nil
+      required[family] = copy(recipes)
+      exact_bindings[#exact_bindings + 1] = {family=family, weight=1, recipes=copy(recipes),
+        include_recycling=true, allow_shared_input_output=true, reject_explicit_productivity_denial=true}
+    end
+  end
+  return selected, required, delta.product_bindings(), replacement, excluded, exact_bindings, exact_families
 end
 
 local function append_bob_warfare(definitions)
@@ -686,8 +717,9 @@ function M.select(active_mods)
   end
   if py.hightech then
     definitions, required_product_targets, additional_product_bindings,
-      replacement_product_target_families, excluded_product_target_recipes = append_py_hightech(definitions)
-    profile = "py-hightech-f200"
+      replacement_product_target_families, excluded_product_target_recipes,
+      exact_product_bindings, exact_product_target_families = append_py_hightech(definitions, active_mods)
+    profile = "py-hightech-" .. target.id
   end
   if bob_warfare then
     local delta = append_bob_warfare(definitions)

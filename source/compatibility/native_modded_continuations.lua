@@ -1,8 +1,9 @@
--- Explicit F200 continuations retained from the captured Bob Warfare and Py
+-- Explicit modern continuations retained from the captured Bob Warfare and Py
 -- profiles.  This is a selection/binding adapter: it neither discovers
 -- technologies nor writes to data.raw.  The modern catalogue owns the base
 -- continuation declarations and merges these field maps by native tail id.
 local M = {}
+local target = require("platform.target")
 
 local COAL_SCIENCE = "science_py_coal"
 local HIGHTECH_SCIENCE = "science_py_hightech"
@@ -146,6 +147,22 @@ function M.continuation_overrides(active_mods)
   local out = {}
   if selected.coal then merge(out, coal_overrides()) end
   if selected.hightech then merge(out, hightech_overrides()) end
+  if selected.hightech and target.id == "f210" then
+    for _, fact in pairs(require("compatibility.modern_catalogue.py_f210").continuation_native_facts) do
+      local row = out[fact.id]
+      row.inheritance, row.order = copy_amounts(fact.inheritance), fact.order
+      if fact.presentation then
+        row.icon_size, row.icons = fact.presentation.icon_size, {}
+        for index, icon in ipairs(fact.presentation.icons) do
+          local copied = {}
+          for field, value in pairs(icon) do
+            copied[field] = type(value) == "table" and copy_amounts(value) or value
+          end
+          row.icons[index] = copied
+        end
+      end
+    end
+  end
   if bob_warfare_active(active_mods) then merge(out, bob_warfare_overrides()) end
   return out
 end
@@ -273,7 +290,19 @@ local function same_effects(actual, expected)
   return true
 end
 
-local function same_research_speed_icons(actual)
+local function same_research_speed_icons(actual, expected)
+  if expected then
+    if type(actual) ~= "table" or #actual ~= #expected then return false end
+    for index, wanted in ipairs(expected) do
+      local found = actual[index]
+      if type(found) ~= "table" or found.icon ~= wanted.icon or found.icon_size ~= wanted.icon_size
+          or found.scale ~= wanted.scale or not same_names(found.shift or {}, wanted.shift or {}) then return false end
+      for field in pairs(found) do
+        if field ~= "icon" and field ~= "icon_size" and field ~= "scale" and field ~= "shift" then return false end
+      end
+    end
+    return true
+  end
   if type(actual) ~= "table" or #actual ~= 4 then return false end
   local first, border, lab, overlay = actual[1], actual[2], actual[3], actual[4]
   local function only(row, allowed)
@@ -332,6 +361,10 @@ local function preflight_bindings(profile, bindings, raw)
     if expected.check_icons and (predecessor.icon_size ~= 128 or not same_research_speed_icons(predecessor.icons)) then
       fail(profile, binding_row.tail, "predecessor icon changed")
     end
+    if expected.icons and (predecessor.icon_size ~= 128
+        or not same_research_speed_icons(predecessor.icons, expected.icons)) then
+      fail(profile, binding_row.tail, "predecessor icon changed")
+    end
   end
 end
 
@@ -340,7 +373,24 @@ end
 function M.preflight(active_mods, raw)
   local selected = py_selection(active_mods)
   if selected.coal then preflight_bindings("py-coal", COAL_BINDINGS, raw) end
-  if selected.hightech then preflight_bindings("py-alienlife-hightech", HIGHTECH_BINDINGS, raw) end
+  if selected.hightech then
+    local bindings = HIGHTECH_BINDINGS
+    if target.id == "f210" then
+      local facts = require("compatibility.modern_catalogue.py_f210").continuation_native_facts
+      local keys = {}
+      for key in pairs(facts) do keys[#keys + 1] = key end
+      table.sort(keys)
+      bindings = {}
+      for _, key in ipairs(keys) do
+        local fact = facts[key]
+        local predecessor = copy_amounts(fact.predecessor)
+        predecessor.order = fact.order
+        if fact.presentation then predecessor.icons = fact.presentation.icons end
+        bindings[#bindings + 1] = {tail=fact.id, previous=fact.previous, predecessor=predecessor}
+      end
+    end
+    preflight_bindings("py-alienlife-hightech", bindings, raw)
+  end
   if bob_warfare_active(active_mods) then preflight_bindings("bobwarfare", BOB_BINDINGS, raw) end
   return true
 end

@@ -107,6 +107,7 @@ class PackTests(unittest.TestCase):
                 "compatibility/py_profile.lua",
                 "compatibility/modern_catalogue/bob_warfare.lua",
                 "compatibility/modern_catalogue/py.lua",
+                "compatibility/modern_catalogue/py_f210.lua",
                 "compatibility/native_modded_continuations.lua",
                 "compatibility/atan_profile.lua",
                 "compatibility/modern_catalogue/space_age.lua",
