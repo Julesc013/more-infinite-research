@@ -887,6 +887,87 @@ local function reported_policy(policy, context)
   return policy
 end
 
+-- Keep the opt-in data-stage report flat and local to the submitted owned
+-- technology. It deliberately records no publication, ownership, or later
+-- foreign-finalizer result.
+local function diagnostic_escape(value)
+  local text = tostring(value)
+  text = string.gsub(text, "\\", "\\\\")
+  text = string.gsub(text, "\r", "\\r")
+  text = string.gsub(text, "\n", "\\n")
+  text = string.gsub(text, "\t", "\\t")
+  text = string.gsub(text, " ", "\\s")
+  text = string.gsub(text, "=", "\\=")
+  text = string.gsub(text, ",", "\\,")
+  return string.gsub(text, ":", "\\:")
+end
+
+local function diagnostic_science(rows)
+  if type(rows) ~= "table" then return "none" end
+  local values = {}
+  for _, row in ipairs(rows) do
+    local name, amount = type(row) == "table" and (row.name or row[1]) or nil,
+      type(row) == "table" and (row.amount or row[2]) or nil
+    if type(name) ~= "string" or name == "" or type(amount) ~= "number" or amount ~= amount
+        or amount < 1 or amount == math.huge or amount == -math.huge then
+      return "invalid"
+    end
+    values[#values + 1] = diagnostic_escape(name) .. ":" .. diagnostic_escape(amount)
+  end
+  return #values > 0 and table.concat(values, ",") or "none"
+end
+
+local function diagnostic_prerequisites(rows)
+  if type(rows) ~= "table" then return "none" end
+  local values = {}
+  for _, name in ipairs(rows) do
+    if type(name) ~= "string" or name == "" then return "invalid" end
+    values[#values + 1] = diagnostic_escape(name)
+  end
+  return #values > 0 and table.concat(values, ",") or "none"
+end
+
+local function diagnostic_icon(technology)
+  if type(technology.icon) == "string" and technology.icon ~= "" then
+    return diagnostic_escape(technology.icon)
+  end
+  for _, icon in ipairs(type(technology.icons) == "table" and technology.icons or {}) do
+    if type(icon) == "table" and type(icon.icon) == "string" and icon.icon ~= "" then
+      return diagnostic_escape(icon.icon)
+    end
+  end
+  return "none"
+end
+
+local function diagnostic_lab_outcome(report)
+  local reason = report.reason
+  if reason == "lab-reduced" then return "reduced" end
+  local incompatible = type(reason) == "string" and reason:match("^lab%-incompatible%-(.+)$") or nil
+  if incompatible then return "incompatible-" .. diagnostic_escape(incompatible) end
+  if reason == "preserved-carrier" then return "preserved" end
+  if type(reason) == "string" and (reason:match("^missing") or reason:match("^invalid")
+      or reason == "k2-phase-empty" or reason == "empty-science-selection") then
+    return "not-evaluated"
+  end
+  return "full"
+end
+
+local function diagnostic_line(technology, report)
+  local unit = type(technology.unit) == "table" and technology.unit or {}
+  local ingredients = report.ingredients ~= nil and report.ingredients or unit.ingredients
+  local prerequisites = report.prerequisites ~= nil and report.prerequisites or technology.prerequisites
+  local effect_count = 0
+  for _ in ipairs(type(technology.effects) == "table" and technology.effects or {}) do effect_count = effect_count + 1 end
+  return "[more-infinite-research] " .. technology.name .. ": "
+    .. (report.enabled and "available" or "disabled") .. " (" .. tostring(report.reason or "unknown") .. ")"
+    .. " science=" .. diagnostic_science(ingredients)
+    .. " prerequisites=" .. diagnostic_prerequisites(prerequisites)
+    .. " effects=" .. tostring(effect_count)
+    .. " science_outcome=" .. diagnostic_escape(report.reason or "unknown")
+    .. " lab_outcome=" .. diagnostic_lab_outcome(report)
+    .. " icon=" .. diagnostic_icon(technology)
+end
+
 function M.prepare(environment)
   environment = environment or {}
   return {
@@ -1048,8 +1129,7 @@ function M.apply_family(rows, family_bindings, environment)
     local report = M.apply(row, binding, context)
     reports[index] = report
     if context.options["mir-debug-generation-report"] == true and type(environment.log) == "function" then
-      environment.log("[more-infinite-research] " .. row.name .. ": "
-        .. (report.enabled and "available" or "disabled") .. " (" .. report.reason .. ")")
+      environment.log(diagnostic_line(row, report))
     end
   end
   return reports, context
