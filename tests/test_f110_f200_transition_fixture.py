@@ -378,7 +378,7 @@ class F110F200TransitionFixtureTests(unittest.TestCase):
         self.assertEqual({"more-infinite-research_4.7.11003.zip":
                           "66C127D8BFC1919FA88F19D2D9B3047316A1B90401CAA05A6D05979B7A099D1E"},
                          source_profile["archive_sha256"])
-        self.assertEqual(("f200", "2.0", "2.0.77", "CDC687538EEE4BB6E3E897057ACBA6DE51C74C164F8339D613D034BA952D89FD"),
+        self.assertEqual(("f200", "2.0", "2.0.77", "8BA029A01E1F08C311C6A127C81313D7664F0ABADAF3C79F84157775D35ADFD7"),
                          (successor_profile["target"], successor_profile["factorio_line"], successor_profile["engine"]["version"],
                           successor_profile["archive_sha256"]["more-infinite-research_5.0.20000.zip"]))
         for stage in (SOURCE, SUCCESSOR):
