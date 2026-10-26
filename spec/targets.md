@@ -5,7 +5,7 @@ applies_to: "MIR replacement development"
 audience: developer
 doc_type: specification
 owner: mir-maintainers
-last_reviewed: 2026-10-26
+last_reviewed: 2026-10-27
 supersedes: []
 superseded_by: []
 source_of_truth_for:
@@ -18,7 +18,21 @@ source_of_truth_for:
 
 ## Primary target and earlier editions
 
-The maintainer's 2026-10-25 direction makes **Factorio 2.1 with minimum base 2.1.23 (F210)** the primary MIR5 design target and gives its implementation and qualification scheduling priority. Design new behavior against its actual native APIs and capabilities. Keep the small deterministic Generator and shared semantic implementations, with narrowly selected adapters for earlier engines.
+The maintainer's 2026-10-27 clarification sets this implementation and qualification scheduling order. Targets in one row share priority.
+
+| Priority | Editions |
+|---|---|
+| 1 — Primary | F210, Factorio 2.1.23 |
+| 2 — Secondary | F200, Factorio 2.0.77 |
+| 3 — Tertiary | F110 and F100 |
+| 4 | F018 through F013 |
+| 5 | F012 through F006 |
+| 6 | F005 through F003 |
+| 7 | F002 and F001 |
+
+MIR5 completion takes precedence over speculative additions. Parity, useful support for current mods and technologies, performance, stability and compatibility drive the remaining work. Maintainability and future expansion guide the shared source, authored definitions, narrow adapters and supported API; they do not require a new general framework. Design primarily against F210's actual native APIs and capabilities, keeping the small deterministic Generator.
+
+Choose the next ready task using this order. Independent lower-priority preparation may proceed while a higher-priority assignment runs or awaits indispensable inputs, provided it does not delay that assignment or compete for its resources. Scheduling priority does not change edition scope, supported capability subsets or release acceptance.
 
 Build F200 for 2.0.77 and eight historical normal editions, including selected F018/0.18.47, from the same shared implementation, retaining their delivered capability subsets, the existing edition version encoding and stable mod/technology/migration identities. Keep common feature behavior, setting identities and meanings, and presentation consistent where native capabilities permit; isolate engine differences in the selected adapters. Run final current-package and affected native checks for every delivered target subset before release, reusing exact unchanged evidence under its original inputs and verdicts. Earlier normal editions retain their actual capability subsets; F006–F012 remain separately labelled best-effort builds. F210 priority does not authorize an unqualified normal edition or silently narrow the release scope. State unresolved gaps by edition; all applicable native, upgrade/save/client, performance and delivery requirements remain binding.
 
