@@ -351,9 +351,18 @@ function Get-LibraryWitnessTarget([hashtable]$Spec,[string]$EngineSha256) {
   $targets=@(
     [ordered]@{engine_sha256='D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B';base='2.0.77';mir='5.0.20000'},
     [ordered]@{engine_sha256='FE4A1DA30F322A0D0B8AEB3DF7276332222BAAA143E2352569B723E84B2B9060';base='2.1.23';mir='5.0.21000'},
+    [ordered]@{engine_sha256='8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38';base='2.1.23';mir='5.0.21000';standalone_identity_discovery=$false},
     [ordered]@{engine_sha256='8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38';base='2.1.23';mir='5.0.21000';standalone_identity_discovery=$true}
   )
-  $matches=@($targets|Where-Object {[string]$_.engine_sha256 -ceq $EngineSha256})
+  $requestedStandaloneIdentityDiscovery=$false
+  if($Spec.ContainsKey('standalone_identity_discovery')){
+    Assert-Session ($Spec.standalone_identity_discovery -is [bool] -and $Spec.standalone_identity_discovery) 'Library session standalone identity witness mode is malformed'
+    $requestedStandaloneIdentityDiscovery=$true
+  }
+  $matches=@($targets|Where-Object {
+    $targetStandaloneIdentityDiscovery=($_.Contains('standalone_identity_discovery') -and $_.standalone_identity_discovery -eq $true)
+    [string]$_.engine_sha256 -ceq $EngineSha256 -and $targetStandaloneIdentityDiscovery -eq $requestedStandaloneIdentityDiscovery
+  })
   Assert-Session ($matches.Count -eq 1) 'Library session engine does not admit a witness target'
   Assert-Session ($Spec.ContainsKey('library_witness_target') -and $Spec.library_witness_target -is [System.Collections.IDictionary]) 'Library session witness target is absent or malformed'
   $provided=$Spec.library_witness_target
@@ -361,6 +370,10 @@ function Get-LibraryWitnessTarget([hashtable]$Spec,[string]$EngineSha256) {
   $expected=$matches[0]
   Assert-Session ($provided.engine_sha256 -ceq [string]$expected.engine_sha256 -and $provided.base -ceq [string]$expected.base -and $provided.mir -ceq [string]$expected.mir) 'Library session witness target differs from validated launch input'
   return [pscustomobject]$expected
+}
+function Assert-LibraryWitnessIdentityMode([bool]$StandaloneIdentityDiscovery,[object]$LibraryWitnessTarget) {
+  $identityTarget=$LibraryWitnessTarget.PSObject.Properties['standalone_identity_discovery']
+  Assert-Session ($StandaloneIdentityDiscovery -eq ($null-ne$identityTarget -and $identityTarget.Value -eq $true)) 'Library session target and standalone identity mode differ'
 }
 function Assert-LibraryWitnessBoolean([object]$Witness, [string]$Field, [bool]$Expected, [string]$Stage) {
   $property = $Witness.PSObject.Properties[$Field]
@@ -680,8 +693,7 @@ Assert-Session (-not $standaloneIdentityDiscovery -or $engineSha -ceq [string]$i
 $libraryWitnessTarget=$null
 if($fixtureCase-ceq'library-multiplayer'){$libraryWitnessTarget=Get-LibraryWitnessTarget $spec $engineSha}
 if($fixtureCase-ceq'library-multiplayer'){
-  $identityTarget=($libraryWitnessTarget.PSObject.Properties['standalone_identity_discovery'])
-  Assert-Session ($standaloneIdentityDiscovery -eq ($null-ne$identityTarget -and $identityTarget.Value -eq $true)) 'Library session target and standalone identity mode differ'
+  Assert-LibraryWitnessIdentityMode $standaloneIdentityDiscovery $libraryWitnessTarget
 }
 Assert-Session (-not $apiClientConsumers -or ($libraryWitnessTarget.base -ceq '2.1.23' -and $libraryWitnessTarget.mir -ceq '5.0.21000')) 'API client consumer target differs'
 $library = Resolve-Existing ([string]$spec.archive_library) 'Container' 'archive library'
