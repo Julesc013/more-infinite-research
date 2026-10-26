@@ -52,6 +52,8 @@ class HostControlsTests(unittest.TestCase):
             "tests/test_aai_parity_native_controls.py",
             "tests/test_bob_angel_materials.py",
             "tests/test_bob_angel_catalogue.py",
+            "tests/test_angel_f210_catalogue.py",
+            "tests/test_angel_f210_pipeline.py",
             "tests/test_bob_tech_materials.py",
             "tests/test_bob_tech_gameplay_fixture.py",
             "tests/test_bob_core_materials.py",
@@ -153,7 +155,7 @@ class HostControlsTests(unittest.TestCase):
             "tests/test_host_controls.py",
             "tools/check_repository.py",
         ])
-        self.assertEqual(len(paths), 115)
+        self.assertEqual(len(paths), 117)
         self.assertEqual(len(set(paths)), len(paths))
         self.assertEqual(paths[-1], "tools/check_repository.py")
         self.assertIn("tests/test_sdk.py", paths)

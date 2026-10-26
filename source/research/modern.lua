@@ -240,6 +240,18 @@ function M.technologies(selection, values)
     local carriers = imersite_state_carriers(require_stream(values, "research_material_imersite"), true)
     for index = 1, #carriers do out[#out + 1] = carriers[index] end
   end
+  if selection.angel_materials and #selection.angel_materials > 0 then
+    local stages = require("research.material_stages")
+    for _, definition in ipairs(selection.angel_materials) do
+      local stream = require_stream(values, definition.key)
+      for _, stage in ipairs({definition.early, definition.continuation}) do
+        local technology = stages.technology(definition, stage, stream,
+          function(message) error("MIR F210 Angel material " .. message, 3) end)
+        if stage.first_level then technology.localised_description = stages.continuation_description(definition, stream) end
+        out[#out + 1] = technology
+      end
+    end
+  end
   return out
 end
 
@@ -251,9 +263,9 @@ local function configured(stream, field)
   return type(stream.configured) == "table" and stream.configured[field] == true
 end
 
-local function planned_owner_change(stream)
+local function planned_owner_change(stream, definition)
   if stream.enabled ~= true then return false end
-  return configured(stream, "base_cost") or configured(stream, "linear_increment")
+  return definition.append_recipes ~= nil or configured(stream, "base_cost") or configured(stream, "linear_increment")
     or configured(stream, "growth_factor") or configured(stream, "effect_percent")
     or (configured(stream, "research_time") and stream.research_time > 0)
 end
@@ -262,6 +274,8 @@ local function named_owner_effects(owner, definition)
   local expected, admission = definition.expected, definition.admission
   if type(owner.effects) ~= "table" then owner_error(definition, "missing effects") end
   local found = {}
+  local appended = {}
+  for _, recipe in ipairs(definition.append_recipes or {}) do appended[recipe] = true end
   for index = 1, #admission.recipes do found[admission.recipes[index]] = 0 end
   for _, effect in ipairs(owner.effects) do
     if effect.type == admission.effect_type and found[effect.recipe] ~= nil then
@@ -273,7 +287,8 @@ local function named_owner_effects(owner, definition)
   end
   for index = 1, #admission.recipes do
     local recipe = admission.recipes[index]
-    if found[recipe] ~= 1 then owner_error(definition, "missing or duplicate effect for " .. recipe) end
+    local expected_count = appended[recipe] and 0 or 1
+    if found[recipe] ~= expected_count then owner_error(definition, "missing or duplicate effect for " .. recipe) end
   end
 end
 
@@ -308,12 +323,17 @@ local function owner_unit_plan(owner, definition, stream)
 end
 
 local function owner_effect_plan(owner, definition, stream)
-  if not configured(stream, "effect_percent") then return nil end
-  local effects, replacement = copy(owner.effects), stream.effect_percent / 100
+  local configured_effect = configured(stream, "effect_percent")
+  if not configured_effect and definition.append_recipes == nil then return nil end
+  local effects = copy(owner.effects)
+  local replacement = configured_effect and stream.effect_percent / 100 or definition.expected.effect_change
   local admitted = {}
   for index = 1, #definition.admission.recipes do admitted[definition.admission.recipes[index]] = true end
   for _, effect in ipairs(effects) do
     if effect.type == definition.admission.effect_type and admitted[effect.recipe] then effect.change = replacement end
+  end
+  for _, recipe in ipairs(definition.append_recipes or {}) do
+    effects[#effects + 1] = {type=definition.admission.effect_type, recipe=recipe, change=replacement}
   end
   return effects
 end
@@ -330,7 +350,7 @@ function M.preflight_native_owner_patches(selection, raw, values)
   for index = 1, #selection.native_owners do
     local definition = selection.native_owners[index]
     local stream = require_stream(values, definition.family)
-    if planned_owner_change(stream) then
+    if planned_owner_change(stream, definition) then
       local owner = raw.technology[definition.id]
       preflight_owner(owner, definition)
       patches[#patches + 1] = {
@@ -408,10 +428,18 @@ function M.apply_weapon_speed_overlap(selection, outputs, values)
   end
 end
 
-function M.preflight_recipe_patches(selection, raw)
+local function preflight_patch_recipe_names(selection, raw)
   if type(selection) ~= "table" or type(raw) ~= "table" or type(raw.recipe) ~= "table" then
     error("MIR modern recipe patch preflight requires data.raw.recipe", 2)
   end
+  for index = 1, #selection.recipe_patches do
+    local name = selection.recipe_patches[index]
+    if type(raw.recipe[name]) ~= "table" then error("MIR modern catalogue missing required recipe " .. name, 2) end
+  end
+end
+
+function M.preflight_recipe_patches(selection, raw)
+  preflight_patch_recipe_names(selection, raw)
   -- The exact Bob Core progression adds one named science route.  Keep its
   -- raw item/recipe/owner checks in this existing all-before-write preflight
   -- rather than exposing a general adapter callback mechanism.
@@ -424,15 +452,15 @@ function M.preflight_recipe_patches(selection, raw)
   elseif selection.bob_core_progression == true then
     require("compatibility.modern_catalogue.bob_core").preflight(raw)
   end
-  for index = 1, #selection.recipe_patches do
-    local name = selection.recipe_patches[index]
-    local recipe = raw.recipe[name]
-    if type(recipe) ~= "table" then error("MIR modern catalogue missing required recipe " .. name, 2) end
+  if selection.angel_f210_profile ~= nil then
+    require("compatibility.modern_catalogue.angel_f210").preflight(raw, selection.angel_f210_profile)
   end
 end
 
 function M.apply_recipe_patches(selection, raw)
-  M.preflight_recipe_patches(selection, raw)
+  -- Owner/science admission precedes publication. At this point admitted
+  -- native-owner patches may already have changed their owned fields.
+  preflight_patch_recipe_names(selection, raw)
   for index = 1, #selection.recipe_patches do raw.recipe[selection.recipe_patches[index]].allow_productivity = true end
 end
 
