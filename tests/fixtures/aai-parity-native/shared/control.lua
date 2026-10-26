@@ -10,7 +10,10 @@ local SAVE = "mir5-native-complete"
 local OWNER = "recipe-prod-research_electric_engine-1"
 local AAI_PLAN = {"fuel-processing", "sand-processing", "electricity", "electronics", "glass-processing", "electric-lab"}
 local BASE_SCIENCE = {"automation-science-pack", "logistic-science-pack", "chemical-science-pack", "production-science-pack"}
-local AAI_PACKS = 256
+-- A burner lab's one automation-science slot is capped by the published
+-- stack size (200). Thirty-two packs cover the six accelerated one-unit AAI
+-- technologies without treating a partial inventory insertion as success.
+local AAI_PACKS = 32
 local MIR_PACKS = 64
 local PHYSICAL_BATCHES = 10
 local LAB_ENERGY = 100000000

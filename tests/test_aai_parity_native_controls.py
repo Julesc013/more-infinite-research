@@ -104,6 +104,9 @@ def raw_fixture():
                 "results": [{"type": "item", "name": "electric-engine-unit", "amount": 1}],
             },
         },
+        "tool": {
+            "automation-science-pack": {"stack_size": 200},
+        },
         "unrelated": {"preserved": True},
     }
 
@@ -179,10 +182,15 @@ class AaiParityNativeControls(unittest.TestCase):
             function run_same_closure_protocol()
               local markers, saves = 0, 0
               local storage, callbacks = {}, {events={}}
-              local function inventory()
+              local function inventory(stack_capacity)
                 local counts = {}
                 return {
-                  insert=function(stack) counts[stack.name]=(counts[stack.name] or 0)+stack.count; return stack.count end,
+                  insert=function(stack)
+                    local existing=counts[stack.name] or 0
+                    local accepted=math.min(stack.count, (stack_capacity or math.huge)-existing)
+                    counts[stack.name]=existing+accepted
+                    return accepted
+                  end,
                   get_item_count=function(name) return counts[name] or 0 end,
                   get_contents=function() return counts end,
                   counts=counts,
@@ -230,7 +238,7 @@ class AaiParityNativeControls(unittest.TestCase):
                     electric_lab_creations=electric_lab_creations+1
                     assert(electric_lab_creations==1,"successor tried to place a lab over the source lab")
                   end
-                  local input,fuel=inventory(),inventory()
+                  local input,fuel=inventory(200),inventory()
                   return {valid=true,energy=0,get_inventory=function(slot) assert(slot==1);return input end,get_fuel_inventory=function()return fuel end}
                 end
                 if spec.name=="stone-furnace" then
@@ -410,6 +418,7 @@ class AaiParityNativeControls(unittest.TestCase):
             "burner-recipe": lambda raw: raw["recipe"]["burner-lab"]["ingredients"][0].__setitem__("amount", 9),
             "burner-recipe-category": lambda raw: raw["recipe"]["burner-lab"]["categories"].__setitem__(0, "smelting"),
             "iron-plate-recipe": lambda raw: raw["recipe"]["iron-plate"].__setitem__("energy_required", 4),
+            "automation-stack-size": lambda raw: raw["tool"]["automation-science-pack"].__setitem__("stack_size", 199),
             "wrong-closure": lambda raw: raw,
         }
         for name, mutate in opponents.items():
@@ -451,6 +460,7 @@ class AaiParityNativeControls(unittest.TestCase):
         self.assertIn('phase="bootstrap-iron"', source)
         self.assertIn('craft-item trigger did not complete after native iron production', source)
         self.assertIn('craft-item trigger did not complete after native burner-lab production', source)
+        self.assertIn('local AAI_PACKS = 32', source)
         self.assertIn('defines.inventory.crafter_input', source)
         self.assertIn('defines.inventory.crafter_output', source)
         self.assertNotIn('assembling_machine_input', source)
