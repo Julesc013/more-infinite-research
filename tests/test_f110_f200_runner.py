@@ -120,6 +120,40 @@ class F110F200RunnerControls(unittest.TestCase):
             result = _run_powershell(script, env)
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
 
+    def test_ast_extracted_preflight_accepts_the_actual_fixture_profile_composition(self):
+        """The real staged metadata, rather than only a hand-written double, binds this route."""
+        with tempfile.TemporaryDirectory(prefix="mir5-f110-cross-actual-composition-") as work:
+            engine_data = Path(work) / "engine" / "data"
+            (engine_data / "base").mkdir(parents=True)
+            (engine_data / "base" / "info.json").write_text(json.dumps({"version": "1.1.110"}), encoding="utf-8")
+            engine = Path(work) / "factorio.exe"
+            engine.write_bytes(b"host-only engine identity")
+            script = r'''
+              $ErrorActionPreference='Stop';Set-StrictMode -Version Latest
+              $tokens=$null;$errors=$null
+              $ast=[Management.Automation.Language.Parser]::ParseFile($env:MIR_TEST_RUNNER,[ref]$tokens,[ref]$errors)
+              if($errors.Count){throw 'runner parse failed'}
+              foreach($name in @('Assert-Fixture','Get-FixtureSha','Get-F110PublishedCrossSourceFixture')){
+                $node=@($ast.FindAll({param($n) $n -is [Management.Automation.Language.FunctionDefinitionAst] -and $n.Name -ceq $name},$true))
+                if($node.Count -ne 1){throw "helper missing: $name"}
+                Invoke-Expression $node[0].Extent.Text
+              }
+              # A synthetic executable cannot have the pinned F110 digest. The
+              # helper's real file read is isolated here; profile and fixture
+              # metadata still come directly from this checkout.
+              function Get-FixtureSha([string]$Path){return $env:MIR_TEST_ENGINE_SHA}
+              $profile=Get-Content -LiteralPath $env:MIR_TEST_PROFILE -Raw|ConvertFrom-Json -AsHashtable
+              $result=Get-F110PublishedCrossSourceFixture -Repo $env:MIR_TEST_REPO -ProfileDefinition $profile -ProfileRows @($profile.mods) -Sources @($env:MIR_TEST_SOURCE) -EngineData $env:MIR_TEST_ENGINE_DATA -Engine $env:MIR_TEST_ENGINE -ExpectedMIRSha256 $env:MIR_TEST_MIR_SHA -Case 'f110-f200-transition' -Historical:$false -HistoricalTransition:$false -Create:$false -Absent:$false -Active:$false -ActiveKind '' -InputSave '' -InputSaveSha256 '' -Observer '' -Markers @() -HistoricalTarget '' -HistoricalMetadata '' -TransitionStage '' -TransitionMetadata '' -ExpectedEngineSha256 $env:MIR_TEST_ENGINE_SHA
+              if($result.source -cne (Resolve-Path -LiteralPath $env:MIR_TEST_SOURCE).Path){throw 'actual source refused'}
+            '''
+            env = dict(os.environ, MIR_TEST_RUNNER=str(RUNNER), MIR_TEST_REPO=str(ROOT),
+                       MIR_TEST_PROFILE=str(ROOT / "tests/profiles/f110-f200-transition-published-f110-11110.json"),
+                       MIR_TEST_SOURCE=str(ROOT / "tests/fixtures/f110-f200-transition/f110/published-4.7.3"),
+                       MIR_TEST_ENGINE_DATA=str(engine_data), MIR_TEST_ENGINE=str(engine),
+                       MIR_TEST_ENGINE_SHA=ENGINE_SHA, MIR_TEST_MIR_SHA=MIR_SHA)
+            result = _run_powershell(script, env)
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+
     def test_generic_fixture_byte_verifier_remains_the_cross_source_archive_guard(self):
         source = RUNNER.read_text(encoding="utf-8")
         self.assertIn("Assert-MIRLibraryFixtureArchive -Archive $archive -SourceDirectory $source", source)

@@ -39,6 +39,15 @@ def lua(runtime, value):
 
 
 class F110F200TransitionFixtureTests(unittest.TestCase):
+    def f110_effects(self):
+        direct = json.loads((ROOT / "tests/fixtures/historical-direct-native-oracle.json").read_text(encoding="utf-8"))
+        continuations = json.loads((ROOT / "tests/fixtures/historical-continuation-native-oracle.json").read_text(encoding="utf-8"))
+        rows = next(row for row in direct["captures"] if row["target"] == "f110")["technologies"]
+        rows += next(row for row in continuations["captures"] if row["target"] == "f110")["technologies"]
+        return {row["id"]: [{key: effect[key] for key in ("type", "modifier", "ammo_category") if key in effect}
+                            for _, effect in sorted(row["definition"]["effects"].items(), key=lambda item: int(item[0]))]
+                for row in rows}
+
     def load_catalogue(self, path):
         return py(self.lua.execute(f"return assert(loadfile({path.as_posix()!r}))()"))
 
@@ -142,6 +151,9 @@ class F110F200TransitionFixtureTests(unittest.TestCase):
                 self.assertEqual(before, py(rejected["raw"]))
 
     def test_callbacks_preserve_17_rows_and_translate_only_capacity_token(self):
+        effects = self.f110_effects()
+        self.assertEqual(17, len(effects))
+        self.lua.globals().source_effects = lua(self.lua, effects)
         paths = {
             "source_control_path": SOURCE / "control.lua", "source_catalogue_path": SOURCE / "catalogue.lua",
             "successor_control_path": SUCCESSOR / "control.lua", "successor_catalogue_path": SUCCESSOR / "catalogue.lua",
@@ -150,7 +162,7 @@ class F110F200TransitionFixtureTests(unittest.TestCase):
         for name, path in paths.items():
             self.lua.globals()[name] = path.as_posix()
         self.lua.execute(r'''
-          function f110_f200_callbacks(mutate_capacity, omit_row)
+          function f110_f200_callbacks(mutate_capacity, omit_row, mutate_effect)
             local function read_plan(path)
               return assert(loadfile(path))()
             end
@@ -177,8 +189,15 @@ class F110F200TransitionFixtureTests(unittest.TestCase):
                   values[key]=item
                   if key == "research_queue" then values.current_research=item[1] end
                 end})
+              local function copy_effects(effects)
+                local copy={}
+                for index,effect in pairs(effects) do
+                  copy[index]={type=effect.type,modifier=effect.modifier,ammo_category=effect.ammo_category}
+                end
+                return copy
+              end
               local function technology(name)
-                local row={valid=true,name=name,force=value,prototype={level=1,max_level=4294967295},
+                local row={valid=true,name=name,force=value,prototype={level=1,max_level=4294967295,effects=copy_effects(source_effects[name] or {})},
                   level=1,researched=false,enabled=true,visible_when_disabled=false,prerequisites={}}
                 fields[name]=row
                 return setmetatable({}, {__index=function(_,key)
@@ -212,6 +231,9 @@ class F110F200TransitionFixtureTests(unittest.TestCase):
                 values.engine="f200";values.research_queue_enabled=nil;values.stack_inserter_capacity_bonus=nil
                 values.bulk_inserter_capacity_bonus=values.bulk_inserter_capacity_bonus or 4
                 for name,row in pairs(fields) do row.saved_progress=saved[name] or 0 end
+                for _,effect in pairs(fields[source_plan.continuation].prototype.effects) do
+                  if effect.type == "stack-inserter-capacity-bonus" then effect.type="bulk-inserter-capacity-bonus" end
+                end
               end
               values.enable_all_prototypes=function() end
               values.reset_technology_effects=function()
@@ -274,6 +296,9 @@ class F110F200TransitionFixtureTests(unittest.TestCase):
             local state=legacy.mir5_f110_f200_transition
             if mutate_capacity then player.bulk_inserter_capacity_bonus=3 end
             for _,item in pairs(game.forces) do item._migrate_to_f200() end
+            if mutate_effect then
+              game.forces.player.technologies["recipe-prod-research_character_walking_speed-1"].prototype.effects[1].modifier=.04
+            end
             local successor=load_stage(successor_control_path,successor_catalogue_path,
               {base="2.0.77",["more-infinite-research"]="5.0.20000",["mir-fixture-mir5-f110-f200-transition"]="0.2.0"},true)
             ok,message=pcall(successor.configuration)
@@ -306,6 +331,10 @@ class F110F200TransitionFixtureTests(unittest.TestCase):
         missing = py(self.lua.eval("f110_f200_callbacks")(False, True))
         self.assertFalse(missing["ok"])
         self.assertIn("missing required technology", missing["message"])
+        wrong_effect = py(self.lua.eval("f110_f200_callbacks")(False, False, True))
+        self.assertFalse(wrong_effect["ok"])
+        self.assertIn("retained technology state differs", wrong_effect["message"])
+        self.assertEqual("source-complete", wrong_effect["state"]["phase"])
 
     def test_profiles_and_stage_aliases_bind_only_declared_inputs(self):
         source_profile = json.loads((ROOT / "tests/profiles/f110-f200-transition-published-f110-11110.json").read_text(encoding="utf-8"))

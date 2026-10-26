@@ -75,6 +75,48 @@ local function queue_enabled(force)
   return true
 end
 
+local function effect_vector(value)
+  local effects = value.prototype and value.prototype.effects
+  if type(effects) ~= "table" then fail("retained technology effects are absent: " .. value.name) end
+  local out = {}
+  for _, effect in pairs(effects) do
+    if type(effect) ~= "table" or type(effect.type) ~= "string" or type(effect.modifier) ~= "number" then
+      fail("retained technology effect shape differs: " .. value.name)
+    end
+    local type_name = effect.type
+    -- This is the only F110/F200 effect-token translation in the retained
+    -- catalogue. The values remain independently observed as 2/4 below.
+    if plan.stage == SUCCESSOR and value.name == plan.continuation
+        and type_name == "bulk-inserter-capacity-bonus" then
+      type_name = "stack-inserter-capacity-bonus"
+    end
+    local row = {type=type_name, modifier=effect.modifier}
+    if effect.ammo_category ~= nil then
+      if type(effect.ammo_category) ~= "string" then fail("retained ammo category differs: " .. value.name) end
+      row.ammo_category = effect.ammo_category
+    end
+    out[#out + 1] = row
+  end
+  table.sort(out, function(left, right)
+    local left_key = left.type .. "\0" .. tostring(left.ammo_category or "") .. "\0" .. tostring(left.modifier)
+    local right_key = right.type .. "\0" .. tostring(right.ammo_category or "") .. "\0" .. tostring(right.modifier)
+    return left_key < right_key
+  end)
+  return out
+end
+
+local function same_effects(actual, expected)
+  if type(actual) ~= "table" or type(expected) ~= "table" or #actual ~= #expected then return false end
+  for index, wanted in ipairs(expected) do
+    local observed = actual[index]
+    if type(observed) ~= "table" or observed.type ~= wanted.type
+        or observed.ammo_category ~= wanted.ammo_category or not close(observed.modifier, wanted.modifier) then
+      return false
+    end
+  end
+  return true
+end
+
 local function check_closure()
   local mods = script.active_mods
   if plan.stage == SOURCE then
@@ -119,7 +161,7 @@ local function status(force, name)
   local value = technology(force, name)
   return {level=value.level, researched=value.researched, enabled=value.enabled,
     visible=value.visible_when_disabled, saved=saved_progress(force, value),
-    maximum=value.prototype and value.prototype.max_level}
+    maximum=value.prototype and value.prototype.max_level, effects=effect_vector(value)}
 end
 
 local function snapshot(force)
@@ -132,7 +174,8 @@ local function same_status(actual, expected, label)
   if type(actual) ~= "table" or type(expected) ~= "table"
       or actual.level ~= expected.level or actual.researched ~= expected.researched
       or actual.enabled ~= expected.enabled or actual.visible ~= expected.visible
-      or actual.maximum ~= expected.maximum or not same_saved_progress(actual.saved, expected.saved) then
+      or actual.maximum ~= expected.maximum or not same_saved_progress(actual.saved, expected.saved)
+      or not same_effects(actual.effects, expected.effects) then
     fail(label .. " retained technology state differs")
   end
 end
@@ -145,7 +188,7 @@ local function assert_snapshot(force, expected, label, successor)
       if type(wanted) ~= "table" or actual.level ~= wanted.level + 1
           or actual.researched ~= wanted.researched or actual.enabled ~= wanted.enabled
           or actual.visible ~= wanted.visible or actual.maximum ~= wanted.maximum
-          or not same_saved_progress(actual.saved, nil) then
+          or not same_saved_progress(actual.saved, nil) or not same_effects(actual.effects, wanted.effects) then
         fail(label .. " successor direct state differs")
       end
     else
