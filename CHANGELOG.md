@@ -64,7 +64,8 @@ This is the authoritative product changelog. Each MIR 1–3 master release appea
 
 ### Historical qualification scope
 
-- The published nine-edition upgrade and two-cold-reload observation retained 67 researches and 199 positive recipe-productivity effects; it covered F210 Base and the pinned K2 2.1.4/K2 Spaced Out 2.0.19 load, not the reporter's full QoL set.
+- All nine editions had the recorded upgrade and two-cold-reload observation; the separate F210 load/save scope covered Base and the pinned K2 2.1.4/K2 Spaced Out 2.0.19 combination.
+- The separate multi-producer fixture retained67 researches and199 positive recipe-productivity effects; it did not reproduce the reporter's full QoL set.
 - No new performance or multiplayer conclusion was recorded.
 
 ### Info
@@ -155,7 +156,7 @@ This is the authoritative product changelog. Each MIR 1–3 master release appea
 ### Historical qualification scope
 
 - Four earned Imersite levels changed 300 ore into 324 powder and 324 sand versus the 300/300 control; the Gunmetal/Invar staged queues and 42% next-level progress survived two cold reloads.
-- Five matched no-MIR headless blocks observed 16.7% to 37.5% MIR-added reductions in named cases; they were not ordinary-menu measurements and did not prove the 50% menu-overhead target.
+- Five balanced headless blocks per profile, including no-MIR controls, observed16.7% to37.5% MIR-added reductions in named cases; they were not ordinary-menu measurements and did not prove the50% menu-overhead target.
 
 ### Info
 
@@ -326,7 +327,7 @@ This is the authoritative product changelog. Each MIR 1–3 master release appea
 ### Changes
 
 - Use the unified approved catalogue, declared binder and single-emitter path, including the associated Library import repair.
-- Retain current package, binding and compatibility corrections without restoring a separate production compiler path.
+- Retain package, binding and compatibility corrections, separate retired developer-only characterization, and update package presentation and fixture controls.
 
 ### Info
 
