@@ -1378,6 +1378,13 @@ class GeneratorTests(unittest.TestCase):
           assert(package.loaded[body] == nil)
           package.preload[body] = nil
 
+          local adapter = require(body)
+          local original_preflight, preflight_calls = adapter.preflight, 0
+          adapter.preflight = function(raw)
+            preflight_calls = preflight_calls + 1
+            return original_preflight(raw)
+          end
+
           mods = {base="2.1.23", boblogistics="3.0.2"}
           settings, data = {startup=defaults()}, full_world(mods)
           assert(settings.startup["mir-enable-inserter-capacity-bonus"] ~= nil
@@ -1393,6 +1400,7 @@ class GeneratorTests(unittest.TestCase):
           assert(not emitted["inserter-capacity-bonus-8"] and not emitted["worker-robots-storage-4"]
             and emitted["braking-force-8"] and emitted["research-speed-7"],
             "native retention changed unrelated continuations")
+          assert(preflight_calls == 1, "valid Bob selection must preflight exactly once")
         ''')
         self.assertEqual(native, plain_lua(self.lua.globals().bob_native_row))
         self.assertEqual(worker_native, plain_lua(self.lua.globals().bob_worker_native_row))
