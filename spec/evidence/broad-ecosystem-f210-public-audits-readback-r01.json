@@ -1,0 +1,135 @@
+{
+  "schema": 1,
+  "kind": "MIR5BroadEcosystemF210PublicAuditsReadbackV1",
+  "status": "read-only-comparison-not-current-parity-acceptance",
+  "claims": {
+    "new_native_execution": false,
+    "current_player_qualification": false,
+    "release_qualification": false
+  },
+  "reports": [
+    {
+      "cohort": "ea41",
+      "path": "spec/evidence/broad-ecosystem-f210-ea41-public-audit-r01.json.gz",
+      "compressed_sha256": "F9F25C7012CCE588A2761B55E96903C626467C75181C34411970880C65F950A4",
+      "raw_sha256": "46F68B01CB92D0CEEDB26FDFE64F6BE32F30E1CF9F09E52AF6B1EA87A9A9503D",
+      "raw_bytes": 5179009,
+      "compressed_bytes": 216468,
+      "source": "build/mir5/recovery/broad-ea41-public-audit-r01/broad-ea41-public-audit.json",
+      "scope": {
+        "observation_only": true,
+        "candidate_source_scope": "EA41 / CE116 completed broad prototype-capture observations only; later source changes are not relabeled by this audit.",
+        "no_native_execution": true,
+        "no_performance_or_release_claim": true,
+        "comparison_rule": "Published is the observed public comparison arm; upstream classifies whether its row was retained, added, or changed. This audit does not derive an expectation from candidate output."
+      },
+      "plan": {
+        "path": "spec/evidence/broad-ecosystem-f210-ea41-plan-r03.json",
+        "working_sha256": "66CB6D051D60CDEC177B7456E971346052FE3BD64BBC29756C81075110A46F82",
+        "git_blob_sha1": "103a921b35a9a880ed4c838ed38905f78df75083",
+        "git_blob_sha256": "66CB6D051D60CDEC177B7456E971346052FE3BD64BBC29756C81075110A46F82",
+        "source": {
+          "commit": "ea41cbc6d27626283db9d8bbf6211b2171b6e36a",
+          "profile_commit": "ea41cbc6d27626283db9d8bbf6211b2171b6e36a",
+          "player_tree": "a807f775c18189e9bc1a276d91346c6b75fd31eb"
+        },
+        "engine": {
+          "factorio_version": "2.1.23",
+          "sha256": "FE4A1DA30F322A0D0B8AEB3DF7276332222BAAA143E2352569B723E84B2B9060"
+        },
+        "published": {
+          "version": "4.7.21003",
+          "sha256": "B6EB9430056ABD384DB00F94929FE7DAC0A37441ACF4BC277946689682628852",
+          "bytes": 1463293
+        },
+        "candidate": {
+          "version": "5.0.21000",
+          "sha256": "CE1165CAC174EDA4800EBECAAEF29FC2E071B2E7160CD98F799FE21C2F151F9B",
+          "bytes": 564337,
+          "inventory_sha256": "83180778A0BC6053C3ED0481C7CAAB97EF021755D6E3458FC0DC40CDD799EDBB"
+        },
+        "observer_runtime_container": {
+          "sha256": "A15A7D628D66953D2E0C4D4FA288F47CBF9C5678327C7EB3D23ADB5DC78331C0",
+          "bytes": 835,
+          "canonical_profile_sha256": "2E1BE5952D2A4CC5C74A0D149E075D247BA110A3FAE5B6768D3EAEBABCEF989C",
+          "canonical_profile_bytes": 834,
+          "raw_members": [
+            {
+              "path": "mir-fixture-mir5-active-mods-observer_0.1.0/data-final-fixes.lua",
+              "bytes": 477,
+              "sha256": "89D364F0033A7EE036998E6C29A3558099C25AD2707CB24914790C49FB21555C"
+            },
+            {
+              "path": "mir-fixture-mir5-active-mods-observer_0.1.0/info.json",
+              "bytes": 231,
+              "sha256": "C37A55C4776F1B4DABA7E4D5C98CF22FD0E978A461D3E6FD8A95E238B97908BD"
+            }
+          ],
+          "raw_members_equal": true,
+          "reason": "Exact raw members are identical; only ZIP compression differs. The original profiles/BB86 plan are preserved; the loaded A15 container is now explicitly bound."
+        }
+      },
+      "summary": {
+        "planned_cases_in_range": 132,
+        "compared_complete_triplets": 111,
+        "skipped_incomplete_triplets": 21,
+        "cases_with_observed_public_candidate_difference": 21
+      }
+    },
+    {
+      "cohort": "c563",
+      "path": "spec/evidence/broad-ecosystem-f210-c563-public-audit-r01.json.gz",
+      "compressed_sha256": "C45ECFDB2B98293174A7E1AC82F2DA9D3B590B4D6F9E31AE00FBD3FF425EF5D3",
+      "raw_sha256": "E3A153699C9BFAD72E09CAD799BA440C4B3552DAD4C094BA3D3933F6320059B6",
+      "raw_bytes": 1321696,
+      "compressed_bytes": 56056,
+      "source": "build/mir5/recovery/broad-c563-public-audit-r01/broad-c563-public-audit.json",
+      "scope": {
+        "observation_only": true,
+        "candidate_scope": "C563 r04 only; later accepted Warfare, shared material-route, and Bob Plates source is not relabeled by this audit.",
+        "published_is_comparison_arm": true,
+        "candidate_never_oracle": true,
+        "no_native_execution": true,
+        "no_performance_or_release_claim": true
+      },
+      "plan": {
+        "path": "spec/evidence/broad-ecosystem-f210-1c90-plan-r04.json",
+        "sha256": "524425A246135ECAA957A472D1E70B87D96F21CD2164887E78D8CC0ED9693E85",
+        "source": {
+          "commit": "13283e85115ac460380b872a20242dffa71d5d6c",
+          "profile_commit": "13283e85115ac460380b872a20242dffa71d5d6c",
+          "player_tree": "9e669e6ffea27dda3f9f17dfb2873daf23a8e187",
+          "frozen_package_source_commit": "1c90ceb7f0096fa6ccbcb9fc369fae699889c866"
+        },
+        "engine": {
+          "factorio_version": "2.1.23",
+          "sha256": "FE4A1DA30F322A0D0B8AEB3DF7276332222BAAA143E2352569B723E84B2B9060"
+        },
+        "inputs": {
+          "active_mods_observer_sha256": "A15A7D628D66953D2E0C4D4FA288F47CBF9C5678327C7EB3D23ADB5DC78331C0",
+          "published": {
+            "version": "4.7.21003",
+            "sha256": "B6EB9430056ABD384DB00F94929FE7DAC0A37441ACF4BC277946689682628852",
+            "bytes": 1463293
+          },
+          "candidate": {
+            "version": "5.0.21000",
+            "sha256": "C563CB5B96C9E64CB3373BDB60CF5C8B7D3C97E93EADB8F924443C703CDC024D",
+            "bytes": 568598,
+            "inventory_sha256": "951066760A1C1372AE9FD16B11BEE7CF11D10FC44A87E85A7DD70FABD765CA8E",
+            "primary_custody": "build/mir5/assets/1c90ceb7-r01/more-infinite-research_5.0.21000.zip"
+          }
+        }
+      },
+      "summary": {
+        "planned_cases": 12,
+        "compared_complete_triplets": 11,
+        "skipped_incomplete_or_refused_triplets": 1,
+        "retained_failed_published_cases": [
+          "q062"
+        ]
+      }
+    }
+  ],
+  "limits": "Row occurrences across cases are not unique bugs. Frozen EA41/C563 differences do not relabel later source fixes as native passes; upstream/published failures remain excluded explicitly."
+}
