@@ -258,13 +258,11 @@ def computed_material_families() -> set[str]:
     return families
 
 
-def retained_projection(sections: dict[str, dict[str, str]], language: str) -> dict[str, str]:
+def retained_projection(sections: dict[str, dict[str, str]]) -> dict[str, str]:
     projection: dict[str, str] = {}
     for section, keys in B6_RETAINED_KEYS.items():
         for key in keys:
             projection[f"{section}.{key}"] = sections[section][key]
-    for full_key, value in CURRENT_TRANSLATION_OVERRIDES.get(language, {}).items():
-        projection[full_key] = value
     return projection
 
 
@@ -284,7 +282,9 @@ class LocaleCatalogueTests(unittest.TestCase):
         for path in locale_paths:
             language = path.parent.name
             sections = parse_cfg(path)
-            projection = retained_projection(sections, language)
+            projection = retained_projection(sections)
+            for full_key, expected in CURRENT_TRANSLATION_OVERRIDES.get(language, {}).items():
+                self.assertEqual(projection[full_key], expected, f"{language}: {full_key}")
             actual = hashlib.sha256(
                 json.dumps(projection, ensure_ascii=False, sort_keys=True, separators=(",", ":")).encode("utf-8")
             ).hexdigest().upper()
