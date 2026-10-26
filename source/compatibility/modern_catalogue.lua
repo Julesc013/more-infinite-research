@@ -37,6 +37,9 @@ end
 local BASE = require("compatibility.modern_catalogue.base")
 
 local SCIENCE = {
+  science_bob_base_logistics = {"automation-science-pack", "logistic-science-pack", "chemical-science-pack", "utility-science-pack", "bob-advanced-logistic-science-pack"},
+  science_bob_base_research_speed = {"automation-science-pack", "logistic-science-pack", "chemical-science-pack", "production-science-pack", "utility-science-pack", "military-science-pack", "bob-advanced-logistic-science-pack"},
+  science_bob_base_alien_research = {"bob-alien-science-pack", "bob-alien-science-pack-blue", "bob-alien-science-pack-green", "bob-alien-science-pack-orange", "bob-alien-science-pack-purple", "bob-alien-science-pack-red", "bob-alien-science-pack-yellow", "bob-science-pack-gold"},
   science_automation_logistic = {"automation-science-pack", "logistic-science-pack"},
   science_automation_logistic_chemical = {"automation-science-pack", "logistic-science-pack", "chemical-science-pack"},
   science_automation_logistic_chemical_agricultural = {"automation-science-pack", "logistic-science-pack", "chemical-science-pack", "agricultural-science-pack"},
@@ -518,6 +521,25 @@ function M.is_bob_core(active_mods)
   return require("compatibility.bob_core_profile").applies(active_mods)
 end
 
+function M.angel_f210_profile(active_mods)
+  if target.id ~= "f210" then return nil end
+  return require("compatibility.angel_f210_profile").select(active_mods)
+end
+
+function M.angel_material_definitions(active_mods)
+  if M.angel_f210_profile(active_mods) ~= "base" then return {} end
+  local definitions = copy(require("compatibility.modern_catalogue.angel_f210").base.material_stages)
+  for _, definition in ipairs(definitions) do
+    definition.productivity_ceiling, definition.routes = 3, {}
+    definition.continuation.show_levels_info, definition.continuation.visible_when_disabled = false, true
+    for index, effect in ipairs(definition.effects) do definition.routes[index] = {recipe=effect.recipe} end
+    for _, stage in ipairs({definition.early, definition.continuation}) do
+      stage.science = M.science_names(stage.science)
+    end
+  end
+  return definitions
+end
+
 local function apply_bob_angel(definitions)
   local delta = require("compatibility.modern_catalogue.bob_angel")
   for _, definition in ipairs(delta.additions) do definitions[#definitions + 1] = copy(definition) end
@@ -636,6 +658,10 @@ function M.science_names(key)
       vector = require("compatibility.modern_catalogue.k2_space_exploration").science[key]
     elseif key:match("^science_se_") then
       vector = require("compatibility.modern_catalogue.space_exploration").science[key]
+    elseif key == "science_automation_logistic_chemical_production_military_utility_angel"
+        or key == "science_automation_logistic_chemical_utility"
+        or key == "science_all_space_age_angel" or key == "science_all_space_age_angel_research" then
+      vector = require("compatibility.modern_catalogue.angel_f210").science[key]
     end
   end
   if type(vector) ~= "table" then error("MIR unknown authored science vector " .. tostring(key), 2) end
@@ -670,12 +696,14 @@ function M.science_ingredients(key, amounts)
   return out
 end
 
-function M.select(active_mods)
+function M.select(active_mods, raw)
   local definitions = copy_definitions(BASE.definitions)
   local recipe_patches = {}
   local profile, k2so = "base", nil
   local py = require("compatibility.py_profile").select(active_mods)
   local bob_warfare = require("compatibility.bob_warfare_profile").applies(active_mods)
+  local bob_plates = require("compatibility.bob_plates_profile").select(active_mods)
+  local angel_f210 = M.angel_f210_profile(active_mods)
   local required_product_targets, additional_product_bindings, exact_product_target_families = nil, nil, {}
   local exact_product_bindings = nil
   local replacement_product_target_families, excluded_product_target_recipes = {}, {}
@@ -725,6 +753,15 @@ function M.select(active_mods)
       exact_product_bindings, exact_product_target_families = append_py_hightech(definitions, active_mods)
     profile = "py-hightech-" .. target.id
   end
+  if bob_plates then
+    local known = {}
+    for _, definition in ipairs(definitions) do known[definition.key] = true end
+    for _, definition in ipairs(require("research.bob_plates_materials").product_definitions(bob_plates)) do
+      if known[definition.key] then error("MIR duplicate Bob Plates catalogue key " .. definition.key, 2) end
+      definitions[#definitions + 1], known[definition.key] = definition, true
+    end
+    profile = "bob-plates-" .. bob_plates .. "-f210"
+  end
   if bob_warfare then
     local delta = append_bob_warfare(definitions, active_mods)
     exact_product_target_families.research_armor_components = true
@@ -739,7 +776,14 @@ function M.select(active_mods)
       research_bullets=true,
       research_rockets=true,
     })
-    profile = "bob-warfare-f200"
+    profile = "bob-warfare-" .. target.id
+  end
+  if angel_f210 then
+    local delta = require("compatibility.modern_catalogue.angel_f210")[angel_f210 == "space-age" and "space_age" or angel_f210]
+    apply_authored_definitions(definitions, delta)
+    for family in pairs(delta.definition_overrides or {}) do exact_product_target_families[family] = true end
+    for _, addition in ipairs(delta.additions or {}) do exact_product_target_families[addition.family] = true end
+    profile = "angel-" .. angel_f210 .. "-f210"
   end
   local se, k2se = space_exploration_deltas(active_mods)
   if se then
@@ -774,11 +818,14 @@ function M.select(active_mods)
       end
     end
   end
-  return {profile = profile, definitions = supported_definitions(definitions), continuations = M.continuations(active_mods),
+  return {profile = profile, definitions = supported_definitions(definitions), continuations = M.continuations(active_mods, raw),
+    bob_tech_progression = target.id == "f210" and type(active_mods) == "table" and active_mods.bobtech ~= nil
+      and require("compatibility.modern_catalogue.bob_tech_progression").select(active_mods) or nil,
     native_owners = M.native_owners(active_mods), recipe_patches = recipe_patches,
     k2_imersite = k2so and k2so.imersite or false,
     k2_imersite_carriers = target.id == "f210" and k2_base,
-    bob_angel = bob_angel, bob_core = bob_core,
+    bob_angel = bob_angel, bob_core = bob_core, bob_plates_profile = bob_plates,
+    angel_f210_profile = angel_f210, angel_materials = M.angel_material_definitions(active_mods),
     bob_native_continuations = M.retains_bob_native_continuations(active_mods),
     py_coal = py.coal, py_hightech = py.hightech, bob_warfare = bob_warfare,
     required_product_targets = required_product_targets, additional_product_bindings = additional_product_bindings,
@@ -824,7 +871,7 @@ local function merge_continuation_fields(destination, source, known_ids)
   end
 end
 
-function M.continuations(active_mods)
+function M.continuations(active_mods, raw)
   local rows = copy(CONTINUATIONS)
   if M.is_bob_angel(active_mods) then
     local science = require("compatibility.modern_catalogue.bob_angel").science
@@ -867,6 +914,19 @@ function M.continuations(active_mods)
       overrides[key] = value
     end
   end
+  if target.id == "f210" and type(active_mods) == "table" and active_mods.bobtech ~= nil then
+    for key, value in pairs(require("compatibility.modern_catalogue.bob_tech_progression").continuation_overrides(active_mods, raw)) do
+      overrides[key] = value
+    end
+  end
+  local angel_f210 = M.angel_f210_profile(active_mods)
+  if angel_f210 then
+    local delta = require("compatibility.modern_catalogue.angel_f210")[angel_f210 == "space-age" and "space_age" or angel_f210]
+    for key, value in pairs(delta.continuation_overrides or {}) do
+      overrides[key] = copy(value)
+      overrides[key].exact_prerequisites = true
+    end
+  end
   local adapter = native_modded_continuations(active_mods)
   if adapter then
     local known_ids = {}
@@ -895,7 +955,17 @@ end
 function M.native_owners(active_mods)
   if M.is_k2so(active_mods) then return copy(require("compatibility.modern_catalogue.k2so").native_owners) end
   if not active_space_age(active_mods) then return {} end
-  return copy(require("compatibility.modern_catalogue.space_age").native_owners)
+  local owners = copy(require("compatibility.modern_catalogue.space_age").native_owners)
+  if M.angel_f210_profile(active_mods) == "space-age" then
+    local recipes = require("compatibility.modern_catalogue.angel_f210").space_age.native_owners.research_steel.expected.recipes
+    for _, owner in ipairs(owners) do
+      if owner.family == "research_steel" then
+        owner.append_recipes = {recipes[3], recipes[4]}
+        owner.admission.recipes = copy(recipes)
+      end
+    end
+  end
+  return owners
 end
 
 return M

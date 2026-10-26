@@ -22,6 +22,7 @@ local bob_tech_profile = require("compatibility.bob_tech_profile")
 local bob_tech_active = bob_tech_profile.applies(active_mods)
 local bob_core_profile = require("compatibility.bob_core_profile")
 local bob_core_active = bob_core_profile.applies(active_mods)
+local bob_plates_profile = require("compatibility.bob_plates_profile").select(active_mods)
 
 local function copy(value, seen)
   if type(value) ~= "table" then return value end
@@ -120,10 +121,9 @@ local function bob_tech_rows()
   return rows
 end
 
-local function bob_core_rows()
-  if not bob_core_active then return {} end
+local function material_rows(definitions)
   local rows = {}
-  for _, definition in ipairs(require("research.bob_core_materials")) do
+  for _, definition in ipairs(definitions) do
     for _, stage in ipairs({definition.early, definition.continuation}) do
       local row = generated_row(stage.id, definition.key, stage.order,
         "description.productivity-bonus", definition.routes[1].recipe)
@@ -134,6 +134,16 @@ local function bob_core_rows()
     end
   end
   return rows
+end
+
+local function bob_core_rows()
+  if not bob_core_active then return {} end
+  return material_rows(require("research.bob_core_materials"))
+end
+
+local function bob_plates_rows()
+  if bob_plates_profile == nil then return {} end
+  return material_rows(require("research.bob_plates_materials").material_definitions(bob_plates_profile))
 end
 
 local function py_material_rows()
@@ -154,6 +164,8 @@ local function static_rows()
     "technology-name.more-infinite-research.research_gears", "iron-gear-wheel")}
   for _, row in ipairs(bob_tech_rows()) do rows[#rows + 1] = row end
   for _, row in ipairs(bob_core_rows()) do rows[#rows + 1] = row end
+  for _, row in ipairs(bob_plates_rows()) do rows[#rows + 1] = row end
+  for _, row in ipairs(material_rows(modern_catalogue.angel_material_definitions(active_mods))) do rows[#rows + 1] = row end
   local selected
   if ordinary_profile or k2_base_profile or k2so_profile then selected = modern_catalogue.select(active_mods) end
   if not selected then
