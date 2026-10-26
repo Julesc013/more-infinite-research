@@ -690,7 +690,10 @@ class K2BaseCatalogueTests(unittest.TestCase):
           altered = {}
           for key, value in pairs(base) do altered[key] = value end
           altered["space-age"] = "2.1.23"
-          assert(not catalogue.is_k2_base(altered), "Space Age K2 base tuple admitted")
+          assert(catalogue.is_k2_base(altered) and not catalogue.is_k2so(altered),
+            "native F210 K2 with Space Age was mistaken for Spaced Out")
+          assert(gears.select(altered, raw).profile == expected.binding_profile,
+            "native F210 K2 Space Age changed the named gear binding")
           altered = {}
           for key, value in pairs(base) do altered[key] = value end
           altered["Krastorio2-spaced-out"] = "2.0.19"

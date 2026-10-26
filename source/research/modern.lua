@@ -124,6 +124,29 @@ end
 -- K2SO's published Imersite stream has a finite public stage, an independent
 -- late formula, and two hidden state carriers. It is a named historical shape,
 -- not a generic finite-stage engine.
+local function imersite_state_carriers(stream, legacy)
+  local contract, carriers = require("research.k2_imersite"), {}
+  for index, carrier in ipairs(contract.carriers) do
+    local early = carrier.kind == "early"
+    local stage = early and contract.early or contract.continuation
+    local formula = early and productivity.cost(stream.base_cost, stream.linear_increment, stream.growth_factor)
+      or imersite_continuation_formula(stream, contract.continuation.first_level)
+    local science = early and "science_automation_logistic_chemical_production" or "science_production_space"
+    carriers[index] = {
+      type = "technology", name = carrier.id,
+      icon = legacy and "__base__/graphics/technology/automation.png" or "__base__/graphics/technology/automation-1.png",
+      icon_size = 256,
+      localised_name = {"technology-name.more-infinite-research.recipe_productivity"},
+      localised_description = {"technology-description.more-infinite-research.recipe_productivity"},
+      level = stage.first_level, upgrade = false, hidden = true, enabled = true, max_level = "infinite",
+      order = "zz[mir-migration-state]", prerequisites = {}, effects = {imersite_effect(stream)},
+      unit = {count_formula = formula, time = stream.research_time,
+        ingredients = legacy and {{"automation-science-pack", 1}} or catalogue.science_ingredients(science)},
+    }
+  end
+  return carriers
+end
+
 local function k2_imersite_technologies(values)
   local contract = require("research.k2_imersite")
   local stream = require_stream(values, contract.stream)
@@ -155,21 +178,7 @@ local function k2_imersite_technologies(values)
       time = stream.research_time, ingredients = catalogue.science_ingredients(continuation_science)},
   }
   if stream.enabled == false then early.enabled, continuation.enabled = false, false end
-  local carriers = {}
-  for index, carrier in ipairs(contract.carriers) do
-    local stage, science, formula = carrier.kind == "early" and contract.early or contract.continuation,
-      carrier.kind == "early" and early_science or continuation_science,
-      carrier.kind == "early" and productivity.cost(stream.base_cost, stream.linear_increment, stream.growth_factor)
-        or imersite_continuation_formula(stream, contract.continuation.first_level)
-    carriers[index] = {
-      type = "technology", name = carrier.id, icon = "__base__/graphics/technology/automation-1.png", icon_size = 256,
-      localised_name = {"technology-name.more-infinite-research.recipe_productivity"},
-      localised_description = {"technology-description.more-infinite-research.recipe_productivity"},
-      level = stage.first_level, upgrade = false, hidden = true, enabled = true, max_level = "infinite",
-      order = "zz[mir-migration-state]", prerequisites = {}, effects = {imersite_effect(stream)},
-      unit = {count_formula = formula, time = stream.research_time, ingredients = catalogue.science_ingredients(science)},
-    }
-  end
+  local carriers = imersite_state_carriers(stream, false)
   return {early, continuation, carriers[1], carriers[2]}
 end
 
@@ -227,6 +236,9 @@ function M.technologies(selection, values)
   if selection.k2_imersite then
     local staged = k2_imersite_technologies(values)
     for index = 1, #staged do out[#out + 1] = staged[index] end
+  elseif selection.k2_imersite_carriers then
+    local carriers = imersite_state_carriers(require_stream(values, "research_material_imersite"), true)
+    for index = 1, #carriers do out[#out + 1] = carriers[index] end
   end
   return out
 end

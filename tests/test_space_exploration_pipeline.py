@@ -119,8 +119,13 @@ class SpaceExplorationPipelineTests(unittest.TestCase):
             if case == "se"
             else boundary["k2se_pre_engine_equality_check"]["prerequisites"]
         )
-        public = {name: row for name, row in emitted.items() if not name.startswith("mir-native-credit-")}
+        legacy_names = {"mir-k2-imersite-staged-state-1", "mir-k2-imersite-continuation-state-4"}
+        legacy = {name: row for name, row in emitted.items() if name in legacy_names}
+        public = {name: row for name, row in emitted.items()
+                  if not name.startswith("mir-native-credit-") and name not in legacy_names}
         carriers = {name: row for name, row in emitted.items() if name.startswith("mir-native-credit-")}
+        self.assertEqual(legacy_names if case == "k2se" else set(), set(legacy), case)
+        self.assertTrue(all(row["hidden"] is True and row["enabled"] is True for row in legacy.values()))
         self.assertEqual(set(public), set(expected), case)
         self.assertEqual(20, len(carriers), case)
         self.assertTrue(all(row.get("hidden") is True and row.get("enabled") is False for row in carriers.values()))
