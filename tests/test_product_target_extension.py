@@ -369,6 +369,39 @@ class ProductTargetExtensionTests(unittest.TestCase):
           assert(result.extended_effects == 1 and row.effects[2].recipe == 'fish')
         ''')
 
+    def test_carbon_recipe_name_does_not_admit_a_repurposed_angel_product(self):
+        self.lua.execute(r'''
+          local function run(carbon_recipe)
+            local carbon=generated('research_carbon', {
+              productivity('burnt-spoilage',.05),productivity('coal-synthesis',.02)})
+            local raw=raw_with_recipes({
+              carbon=carbon_recipe,
+              ['burnt-spoilage']=recipe({}, {product('item','carbon')}),
+              ['coal-synthesis']=recipe({}, {product('item','coal')})})
+            raw.technology={}
+            local before=frozen_copy(raw)
+            local result=extension.extend({carbon}, {streams={research_carbon={effect_percent=10}}}, {
+              raw=raw,mods={['space-age']='2.1.23'}})
+            assert(frozen_copy(raw)==before)
+            return effect_rows(carbon.effects),result
+          end
+          -- Independent q010 upstream/B6 oracle: Angel's hidden carbon recipe
+          -- makes angels-solid-carbon, while B6 keeps only these two effects.
+          local expected='change-recipe-productivity:burnt-spoilage:0.05000,' ..
+            'change-recipe-productivity:coal-synthesis:0.02000'
+          local actual,result=run(recipe({}, {product('item','angels-solid-carbon',{amount=2})},
+            {hidden=true,enabled=false,allow_productivity=false,allow_decomposition=false}))
+          assert(actual==expected,actual)
+          assert(result.extended_effects==0)
+          assert(run(recipe({}, {product('item','angels-solid-carbon',{amount=2})}))==expected)
+          -- A genuine positive item-carbon producer still joins the family;
+          -- a fluid homonym or zero-yield result never does.
+          actual=run(recipe({}, {product('item','carbon')}, {enabled=false}))
+          assert(actual==expected..',change-recipe-productivity:carbon:0.10000',actual)
+          assert(run(recipe({}, {product('fluid','carbon')}))==expected)
+          assert(run(recipe({}, {product('item','carbon',{amount=0})}))==expected)
+        ''')
+
     def test_native_asteroid_and_scrap_owners_prevent_only_new_duplicate_targets(self):
         self.lua.execute(r'''
           local carbon=generated('research_carbon',{productivity('known',.33)})

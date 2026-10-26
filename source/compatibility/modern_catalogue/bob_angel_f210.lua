@@ -224,6 +224,9 @@ M.space_age = {
   additions={}, material_stages={},
   definition_overrides={
     research_breeding=angel_override("space_age", "research_breeding"),
+    -- q010 repurposes carbon to angels-solid-carbon. Preserve B6's exact
+    -- two-route vector rather than granting the ordinary item-carbon bonus.
+    research_carbon={effects={effect("burnt-spoilage", 0.5), effect("coal-synthesis", 0.2)}},
     research_lubricant_productivity=angel_override("space_age", "research_lubricant_productivity"),
     research_oil_processing_productivity=angel_override("space_age", "research_oil_processing_productivity"),
     research_sulfur=angel_override("space_age", "research_sulfur"),

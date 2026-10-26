@@ -38,6 +38,8 @@ Version: @DISTRIBUTION_VERSION@
 
   Bugfixes:
 
+    - Preserve the combined Factorio 2.1 Bob/Angel Space Age carbon effect vector when its recipe named carbon produces Angel carbon
+      instead of the ordinary carbon item.
     - Keep retired space science and its prerequisite out of the two base level-seven continuations when Space Is Fake is active,
       including expanded science policies; preserve the full remaining science vector and explicit progression requirements.
     - Restrict public data declarations to checked native fields and MIR-owned presentation before publication.

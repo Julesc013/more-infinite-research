@@ -203,6 +203,18 @@ class BobAngelF210PipelineTests(unittest.TestCase):
         for rows in (base_rows, space_rows):
             self.assertNotIn("recipe-prod-research_material_aluminium-1", rows)
 
+    def test_carbon_keeps_published_products_when_angel_repurposes_the_recipe(self):
+        raw = self.context["cases"]["space_age"]["raw"]
+        self.assertEqual([{"type": "item", "name": "angels-solid-carbon", "amount": 2}],
+                         raw["recipe"]["carbon"]["results"])
+        self.assertFalse(raw["recipe"]["carbon"]["allow_productivity"])
+        row = self._rows(self.stage("space_age"))["recipe-prod-research_carbon-1"]
+        # Exact B6 q010 effect vector, independently retained in A8935196…C3C1.
+        self.assertEqual([
+            {"type": "change-recipe-productivity", "recipe": "burnt-spoilage", "change": 0.05},
+            {"type": "change-recipe-productivity", "recipe": "coal-synthesis", "change": 0.02},
+        ], row["effects"])
+
     def test_configured_and_disabled_streams_preserve_named_boundaries(self):
         base_default = self._rows(self.stage("base"))
         base_configured = self._rows(self.stage("base", {
