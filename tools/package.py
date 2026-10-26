@@ -30,7 +30,6 @@ def admitted(relative):
             or path.suffix == ".lua"
             or (len(path.parts) == 2 and path.parts[0] == "migrations" and path.suffix == ".json")
             or (relative.startswith("locale/") and path.suffix == ".cfg")
-            or re.fullmatch(r"presentation/changelog/(?:current|f[0-9]{3})[.]txt", relative) is not None
             or (relative.startswith("graphics/") and path.suffix.lower() in {".png", ".jpg", ".ogg"}))
 
 
@@ -148,18 +147,16 @@ def read_editions(source, revision=None, target_record=TARGET_RECORD):
     return record["targets"], digest(data)
 
 
-def player_presentation(files, info, target):
-    current = "presentation/changelog/current.txt"
-    history = "presentation/changelog/" + target + ".txt"
-    for required in ("LICENSE", "thumbnail.png", current, history):
+def player_presentation(files, info):
+    for required in ("LICENSE", "thumbnail.png", "changelog.txt"):
         if not files.get(required):
             raise ValueError("Selected edition has missing player presentation: " + required)
-    entry = files[current]
+    entry = files["changelog.txt"]
     token = b"@DISTRIBUTION_VERSION@"
     if entry.count(token) != 1:
         raise ValueError("Current changelog needs exactly one distribution-version token")
     out = {name: raw for name, raw in files.items() if not name.startswith("presentation/changelog/")}
-    out["changelog.txt"] = entry.replace(token, info["version"].encode("ascii")) + files[history]
+    out["changelog.txt"] = entry.replace(token, info["version"].encode("ascii"))
     return out
 
 
@@ -228,7 +225,7 @@ def select_edition(files, info, target, editions):
     # never ships another edition's unused compiler, GUI or runtime body.
     closure = require_closure(files, [*ENTRYPOINTS, "api/v1/data.lua", "api/v1/runtime.lua", "platform/target.lua"])
     selected_files = {name: data for name, data in files.items() if not name.endswith(".lua") or name in closure}
-    return player_presentation(selected_files, info, target)
+    return player_presentation(selected_files, info)
 
 
 def select_early_edition(files, info, target, editions):
@@ -262,8 +259,6 @@ def select_early_edition(files, info, target, editions):
         "factorio_version": selected["factorio_version"],
         "dependencies": ["base >= " + selected["minimum_base"]],
     })
-    if "LICENSE" not in files:
-        raise ValueError("Selected early edition has no LICENSE")
     files = dict(files)
     fields = (
         "-- Selected early data-only target; native qualification is held outside player source.\n"
@@ -280,7 +275,9 @@ def select_early_edition(files, info, target, editions):
     selected_files = {name: files[name] for name in closure}
     selected_files["info.json"] = files["info.json"]
     selected_files["LICENSE"] = files["LICENSE"]
-    return selected_files
+    selected_files["thumbnail.png"] = files["thumbnail.png"]
+    selected_files["changelog.txt"] = files["changelog.txt"]
+    return player_presentation(selected_files, info)
 
 
 def members(source, version=None, committed_files=None, target=None, editions=None,
@@ -319,11 +316,11 @@ def members(source, version=None, committed_files=None, target=None, editions=No
         # selected player packages without narrowing generic fixture archives.
         if selected_record != EARLY_TARGET_RECORD and target != "f210":
             committed_files.pop(F210_ONLY_MIGRATION, None)
-    elif "presentation/changelog/current.txt" in committed_files:
+    elif "changelog.txt" in committed_files:
         encoded = info["version"].rsplit(".", 1)[-1]
         if not re.fullmatch(r"[0-9]{5}", encoded):
             raise ValueError("Player presentation requires a distribution codec")
-        committed_files = player_presentation(committed_files, info, "f" + encoded[:3])
+        committed_files = player_presentation(committed_files, info)
     rows = []
     for relative, contents in sorted(committed_files.items()):
         if admitted(relative):

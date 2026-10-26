@@ -89,14 +89,17 @@ class EarlyPackageTests(unittest.TestCase):
                         info = json.loads(archive.read(root + "/info.json"))
                         target_lua = archive.read(root + "/platform/target.lua")
                         entrypoint = archive.read(root + "/data.lua")
+                        changelog = archive.read(root + "/changelog.txt")
                     self.assertEqual(names, [
                         root + "/LICENSE",
                         root + "/adapters/early/data.lua",
                         root + "/adapters/early/definitions.lua",
+                        root + "/changelog.txt",
                         root + "/data.lua",
                         root + "/info.json",
                         root + "/platform/target.lua",
                         root + "/research/generator.lua",
+                        root + "/thumbnail.png",
                     ])
                     self.assertEqual(info, {
                         "name": "more-infinite-research",
@@ -117,8 +120,12 @@ class EarlyPackageTests(unittest.TestCase):
                         entrypoint,
                         b'require("adapters.early.data").apply(require("platform.target"))\n',
                     )
+                    self.assertNotIn(b"@DISTRIBUTION_VERSION@", changelog)
+                    self.assertEqual(changelog.count(
+                        b"Version: 5.0." + target[1:].encode("ascii") + b"00"), 1)
                     self.assertFalse(any(any(token in name for token in (
-                        "/settings.lua", "/control.lua", "/data-final-fixes.lua", "/migrations/", "/runtime/", "/api/"
+                        "/settings.lua", "/control.lua", "/data-final-fixes.lua", "/migrations/", "/runtime/", "/api/",
+                        "/presentation/", "/CHANGELOG.md", "/tools/"
                     )) for name in names))
 
     def test_early_selection_is_explicit_and_refuses_wrong_target_shapes_before_output(self):
