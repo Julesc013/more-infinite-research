@@ -165,6 +165,7 @@ local function static_rows()
   for _, row in ipairs(bob_tech_rows()) do rows[#rows + 1] = row end
   for _, row in ipairs(bob_core_rows()) do rows[#rows + 1] = row end
   for _, row in ipairs(bob_plates_rows()) do rows[#rows + 1] = row end
+  for _, row in ipairs(material_rows(modern_catalogue.angel_material_definitions(active_mods))) do rows[#rows + 1] = row end
   local selected
   if ordinary_profile or k2_base_profile or k2so_profile then selected = modern_catalogue.select(active_mods) end
   if not selected then

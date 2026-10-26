@@ -44,6 +44,14 @@ local function continuation_cost(stream, stage, fail)
   }, stage.first_level, stage.predecessor_count, stage.previous_count)
 end
 
+function M.continuation_description(definition, stream)
+  local useful = math.ceil(definition.productivity_ceiling * 100 / stream.effect_percent)
+  local limit = stream.max_level > 0 and math.min(stream.max_level, useful) or useful
+  return {"", {"technology-description.more-infinite-research.recipe_productivity"}, "\n",
+    {"mod-setting-name.ips-max-level-stream", {"", {"description.productivity-bonus"}, ": ",
+      {"item-name." .. definition.item}}}, ": ", tostring(limit)}
+end
+
 function M.technology(definition, stage, stream, fail)
   local output = {
     type = "technology",
