@@ -1,5 +1,10 @@
 /.gitattributes text eol=lf
 
+# Current package/release controller bytes are inventory-bound. Keep their
+# checkout form equal to the tracked LF blobs under every core.autocrlf mode.
+tools/package.py text eol=lf
+tools/release.py text eol=lf
+
 # MIR 5 evidence and custody indexes retain their exact authored bytes.
 spec/evidence/*.json -text -eol whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
 # Preserve the raw-hash portable extraction, including its authored CRLF.
