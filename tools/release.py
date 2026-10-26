@@ -297,7 +297,7 @@ def _build_early_cohort(source, output, commit, target_record, editions):
 
 
 def freeze(source, output, revision="HEAD", target_record=package.TARGET_RECORD, early_target_record=None):
-    """Build all nine committed player packages into one new, offline-only directory."""
+    """Freeze retained packages and an explicitly selected best-effort early cohort."""
     source, repository, _, source_identity = _source_identity(Path(source), revision)
     editions, target_identity = _target_identity(source, repository, source_identity["commit"], target_record)
     early_editions, early_identity = (None, None)
