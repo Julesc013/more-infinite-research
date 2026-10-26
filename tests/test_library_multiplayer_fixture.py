@@ -766,6 +766,36 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
             )
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
 
+    def test_standalone_identity_fixture_sources_require_the_canonical_observer_once(self):
+        script = r'''
+          $ErrorActionPreference='Stop'; Set-StrictMode -Version Latest
+          $tokens=$null;$errors=$null
+          $ast=[Management.Automation.Language.Parser]::ParseFile($env:MIR_TEST_WRAPPER,[ref]$tokens,[ref]$errors)
+          if($errors.Count){throw $errors[0].Message}
+          function Assert-Session([bool]$Condition,[string]$Message){if(-not$Condition){throw $Message}}
+          $node=@($ast.FindAll({param($candidate) $candidate -is [Management.Automation.Language.FunctionDefinitionAst] -and $candidate.Name -ceq 'Get-StandaloneIdentityFixtureSources'},$true))
+          if($node.Count-ne1){throw 'discovery fixture-source binder is absent or ambiguous'}
+          Invoke-Expression $node[0].Extent.Text
+          $repo=$env:MIR_TEST_REPO
+          $library=Join-Path $repo 'tests/fixtures/library-multiplayer'
+          $observer=Join-Path $repo 'tests/fixtures/active-mods-observer'
+          $accepted=@(Get-StandaloneIdentityFixtureSources -Sources @($library) -LibraryFixtureSource $library -StagedLibraryFixtureSource $library -RepoRoot $repo)
+          if($accepted.Count-ne2 -or $accepted[0]-ine$library -or $accepted[1]-ine$observer){throw 'canonical observer was not appended exactly once'}
+          function Assert-Rejects([string]$Name,[scriptblock]$Block){$rejected=$false;try{&$Block}catch{$rejected=$true};if(-not$rejected){throw "discovery observer source accepted opponent: $Name"}}
+          $missingRepo=Join-Path $env:MIR_TEST_WORK 'missing-repository';$null=New-Item -ItemType Directory -Path (Join-Path $missingRepo 'tests/fixtures') -Force
+          Assert-Rejects 'missing canonical observer' {Get-StandaloneIdentityFixtureSources -Sources @($library) -LibraryFixtureSource $library -StagedLibraryFixtureSource $library -RepoRoot $missingRepo|Out-Null}
+          $wrong=Join-Path $env:MIR_TEST_WORK 'wrong-observer';Copy-Item -LiteralPath $observer -Destination $wrong -Recurse
+          Assert-Rejects 'wrong observer source' {Get-StandaloneIdentityFixtureSources -Sources @($library,$wrong) -LibraryFixtureSource $library -StagedLibraryFixtureSource $library -RepoRoot $repo|Out-Null}
+          Assert-Rejects 'duplicate observer source' {Get-StandaloneIdentityFixtureSources -Sources @($library,$observer,$observer) -LibraryFixtureSource $library -StagedLibraryFixtureSource $library -RepoRoot $repo|Out-Null}
+          'PASS standalone identity canonical observer source binding'
+        '''
+        with tempfile.TemporaryDirectory(prefix="mir5-identity-observer-") as work:
+            result = subprocess.run(
+                ["pwsh", "-NoLogo", "-NoProfile", "-Command", script], capture_output=True, text=True,
+                env=dict(os.environ, MIR_TEST_WRAPPER=str(WRAPPER), MIR_TEST_REPO=str(ROOT), MIR_TEST_WORK=work), check=False,
+            )
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+
     def test_standalone_identity_bad_preparation_result_removes_only_the_owned_archive(self):
         script = r'''
           $ErrorActionPreference='Stop'; Set-StrictMode -Version Latest

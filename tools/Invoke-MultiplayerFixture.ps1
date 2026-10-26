@@ -215,6 +215,37 @@ function New-StandaloneIdentityFixtureStage {
   Assert-MIRLibraryFixtureArchive -Archive $archive -SourceDirectory $fixture.source
   return [pscustomobject]@{source=$fixture.source;archive=$archive;sha256=(Get-FileHash -LiteralPath $archive -Algorithm SHA256).Hash.ToUpperInvariant()}
 }
+function Get-StandaloneIdentityFixtureSources {
+  param(
+    [Parameter(Mandatory)][string[]]$Sources,
+    [Parameter(Mandatory)][string]$LibraryFixtureSource,
+    [Parameter(Mandatory)][string]$StagedLibraryFixtureSource,
+    [Parameter(Mandatory)][string]$RepoRoot
+  )
+  $canonicalObserver=(Resolve-Path -LiteralPath (Join-Path $RepoRoot 'tests/fixtures/active-mods-observer')).Path
+  $canonicalInfo=Get-Content -LiteralPath (Join-Path $canonicalObserver 'info.json') -Raw|ConvertFrom-Json -AsHashtable
+  Assert-Session ([string]$canonicalInfo.name-ceq'mir-fixture-mir5-active-mods-observer' -and [string]$canonicalInfo.version-ceq'0.1.0' -and [string]$canonicalInfo.factorio_version-ceq'2.1') 'standalone identity discovery canonical observer source differs'
+  $library=(Resolve-Path -LiteralPath $LibraryFixtureSource).Path
+  $staged=(Resolve-Path -LiteralPath $StagedLibraryFixtureSource).Path
+  $result=[Collections.Generic.List[string]]::new();$libraryCount=0;$observerCount=0
+  foreach($candidate in $Sources){
+    $source=(Resolve-Path -LiteralPath $candidate).Path
+    $info=Get-Content -LiteralPath (Join-Path $source 'info.json') -Raw|ConvertFrom-Json -AsHashtable
+    if([string]$info.name-ceq'mir-fixture-mir5-library-multiplayer'){
+      Assert-Session ($source-ieq$library) 'standalone identity discovery Library source differs from its canonical template'
+      $libraryCount++;$result.Add($staged)
+    }elseif([string]$info.name-ceq'mir-fixture-mir5-active-mods-observer'){
+      Assert-Session ($source-ieq$canonicalObserver) 'standalone identity discovery observer source differs from its canonical source'
+      $observerCount++;$result.Add($canonicalObserver)
+    }else{$result.Add($source)}
+  }
+  Assert-Session ($libraryCount-eq1) 'standalone identity discovery requires one canonical Library fixture source'
+  Assert-Session ($observerCount -le 1) 'standalone identity discovery observer source is duplicated'
+  if($observerCount-eq0){$result.Add($canonicalObserver)}
+  $actualObserver=@($result|Where-Object {$_-ieq$canonicalObserver})
+  Assert-Session ($actualObserver.Count-eq1) 'standalone identity discovery requires one verified canonical observer source'
+  return @($result.ToArray())
+}
 function Install-StandaloneIdentityFixtureArchive {
   param([Parameter(Mandatory)][string]$Library,[Parameter(Mandatory)]$Fixture)
   Assert-MIRLibraryIdle -WaitMilliseconds 3000
@@ -298,12 +329,7 @@ if($StandaloneIdentityDiscovery){
   # A15 and the staged 0.1.1 fixture; it never relabels the FE4/2E profile.
   $null=Assert-MultiplayerFixtureSelection -Selection $selection -EngineSha256 'FE4A1DA30F322A0D0B8AEB3DF7276332222BAAA143E2352569B723E84B2B9060' -FixtureCase 'library-multiplayer'
   $discoveryFixture=New-StandaloneIdentityFixtureStage -Sources $FixtureSources -OutputRoot $output
-  $fixtureSourcesForRun=@(foreach($candidate in $FixtureSources){
-    $source=(Resolve-Path -LiteralPath $candidate).Path
-    $infoPath=Join-Path $source 'info.json'
-    $info=if(Test-Path -LiteralPath $infoPath -PathType Leaf){Get-Content -LiteralPath $infoPath -Raw|ConvertFrom-Json -AsHashtable}else{$null}
-    if($null-ne$info-and [string]$info.name-ceq'mir-fixture-mir5-library-multiplayer'){$discoveryFixture.source}else{$source}
-  })
+  $fixtureSourcesForRun=Get-StandaloneIdentityFixtureSources -Sources $FixtureSources -LibraryFixtureSource (Join-Path $repo 'tests/fixtures/library-multiplayer') -StagedLibraryFixtureSource $discoveryFixture.source -RepoRoot $repo
   $selection=[ordered]@{
     schema=1;kind='mir5-library-standalone-identity-discovery-f210-selection';target='standalone-identity-discovery';factorio_line='2.1';settings_mode='Defaults'
     engine=[ordered]@{version='2.1.23';sha256='8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38'}
