@@ -134,7 +134,7 @@ local function imersite_state_carriers(stream, legacy)
     local science = early and "science_automation_logistic_chemical_production" or "science_production_space"
     carriers[index] = {
       type = "technology", name = carrier.id,
-      icon = legacy and "__base__/graphics/technology/automation.png" or "__base__/graphics/technology/automation-1.png",
+      icon = "__base__/graphics/technology/automation-1.png",
       icon_size = 256,
       localised_name = {"technology-name.more-infinite-research.recipe_productivity"},
       localised_description = {"technology-description.more-infinite-research.recipe_productivity"},
