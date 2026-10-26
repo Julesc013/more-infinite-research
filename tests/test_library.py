@@ -387,7 +387,8 @@ class LibraryTests(unittest.TestCase):
           assert(native_handlers.events[1] == nil and native_ticks[1] == nil and root.valid)
           player.connected = true
           native_handlers.events[12]({player_index=1})
-          assert(type(native_handlers.events[1]) == "function")
+          assert(storage.mir_library.players[1].open == true
+            and type(native_handlers.events[1]) == "function")
           root.destroy()
           local foreign_root = screen.add{type="frame",name="mir_research_browser"}
           native_handlers.events[5]({research=gear})
@@ -395,6 +396,38 @@ class LibraryTests(unittest.TestCase):
           assert(native_ticks[1] == nil and native_handlers.events[1] == nil)
           assert(storage.mir_library.translations.working == nil,
             "lost owned frame retained its working cache")
+        ''')
+
+    def test_join_without_an_owned_root_retires_open_view_subscriptions_but_keeps_issued_translation_ids(self):
+        self.lua.execute(r'''
+          boot_native_events()
+          local root = open_routed()
+          native_handlers.events[1]({research=gear})
+          local state, view = storage, storage.mir_library.players[1]
+          local ledger = state.mir_library.translations
+          local issued = ledger.active[1].pending[1].request_id
+          local requests, available_game = #player.translation_requests, game
+          assert(view.open and view.refresh_pending and library.subscription_needs())
+
+          -- Loading reconnects only local references. It must not consume the
+          -- issued native ID or touch a game/GUI object.
+          game = nil
+          route_native_events(true)
+          native_handlers.load()
+          assert(storage == state and storage.mir_library.players[1] == view
+            and ledger.active[1].pending[1].request_id == issued
+            and view.open and view.refresh_pending)
+          game = available_game
+
+          root.destroy()
+          native_handlers.events[12]({player_index=1})
+          local open, pending = library.native_subscription_needs()
+          assert(not open and not pending and not view.open and not view.refresh_pending)
+          assert(native_handlers.events[1] == nil and native_ticks[1] == nil)
+          assert(#player.translation_requests == requests and player.gui.screen["mir_research_browser"] == nil)
+          assert(ledger.active[1] ~= nil and ledger.active[1].pending[1].request_id == issued
+            and library.subscription_needs(), "issued IDs remain for bounded expiry cleanup")
+          assert(type(native_ticks[61]) == "function")
         ''')
 
     def test_pending_view_refresh_retires_translation_work_after_the_owned_root_disappears(self):

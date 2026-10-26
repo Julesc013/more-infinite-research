@@ -1732,6 +1732,8 @@ function M.on_player_joined_game(event)
     -- player's tagged Library is actually open and connected.
     render(player, view_for(event.player_index), nil, true)
   else
+    local view = state and state.players[event.player_index]
+    if type(view) == "table" then view.open, view.refresh_pending = false, false end
     discard_translation_cache(event.player_index)
   end
 end
