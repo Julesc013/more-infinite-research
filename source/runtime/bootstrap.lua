@@ -40,9 +40,9 @@ if type(active_mods) == "table" and (active_mods.ExpandedProductivityResearch ~=
 end
 
 -- A removed provider is absent from script.active_mods by the time the
--- configuration callback runs. Keep this list aligned with the exact
--- F200 runtime adapters so the legacy migration guard can distinguish that
--- meaningful removal from an ordinary Base startup-setting change.
+-- configuration callback runs. Keep this finite list aligned with the exact
+-- F200 runtime adapters; it also recognizes a current F210 provider without
+-- importing the F200 adapter.
 local COMPETING_PROVIDER_IDS = {
   ExpandedProductivityResearch = true,
   ["plates-n-circuit-productivity"] = true,
@@ -55,6 +55,11 @@ local COMPETING_PROVIDER_IDS = {
 
 local function relevant_competing_provider_transition(event)
   if competing_productivity ~= nil then return true end
+  if type(active_mods) == "table" then
+    for name in pairs(COMPETING_PROVIDER_IDS) do
+      if active_mods[name] ~= nil then return true end
+    end
+  end
   local changes = event and event.mod_changes
   if type(changes) ~= "table" then return false end
   for name in pairs(COMPETING_PROVIDER_IDS) do
@@ -320,7 +325,7 @@ local function on_configuration_changed(event)
   -- The first published-MIR4 preference transition has no durable old setting.
   -- This preflight must run before any lifecycle reconciler can write a level,
   -- ownership record, queue state, or disablement flag.
-  if native_credits and target.id == "f200" then
+  if native_credits then
     native_credits.preflight_legacy_preference_transition(event, relevant_competing_provider_transition(event))
   end
   reconcile_imersite()
