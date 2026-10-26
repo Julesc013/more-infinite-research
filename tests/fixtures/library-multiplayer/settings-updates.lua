@@ -1,6 +1,19 @@
 -- Disposable native-fixture acceleration only.  It leaves the authored gear
 -- identity, prerequisites, effect and unlimited progression untouched so real
 -- laboratory completions remain observable within the multiplayer deadline.
+-- The ordinary Library fixture stays on its qualified GUI/rejoin path.  The
+-- standalone identity discovery harness stages this one setting as true in a
+-- separately hashed, temporary fixture archive; it then stops after the
+-- actual 120-tick two-client predicate and before any GUI or research action.
+local standalone_identity_setting = {
+  type = "bool-setting",
+  name = "mir5-library-standalone-identity-discovery",
+  setting_type = "startup",
+  default_value = false,
+  hidden = true,
+}
+data:extend({standalone_identity_setting})
+
 local values = {
   ["ips-cost-base-research_gears"] = {type="int-setting", initial=8000, value=1},
   ["ips-cost-linear-increment-research_gears"] = {type="int-setting", initial=0, value=0},
