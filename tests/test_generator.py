@@ -1385,8 +1385,12 @@ class GeneratorTests(unittest.TestCase):
             "retaining an upstream owner deleted its historical setting")
           data.raw.technology["inserter-capacity-bonus-8"] = bob_native_row
           data.raw.technology["bob-infinite-worker-robots-storage-4"] = bob_worker_native_row
+          local guard, checks = require(body), 0
+          local preflight = guard.preflight
+          guard.preflight = function(raw) checks = checks + 1; return preflight(raw) end
           assert(loadfile(data_final_path))()
-          assert(data.writes == 1 and data.raw.technology["inserter-capacity-bonus-8"] == bob_native_row)
+          assert(checks == 1 and data.writes == 1
+            and data.raw.technology["inserter-capacity-bonus-8"] == bob_native_row)
           local emitted = {}
           for _, row in ipairs(data.emitted) do emitted[row.name] = true end
           assert(data.raw.technology["bob-infinite-worker-robots-storage-4"] == bob_worker_native_row)
