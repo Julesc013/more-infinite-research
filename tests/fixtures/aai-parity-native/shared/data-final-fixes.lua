@@ -55,6 +55,13 @@ local function technology(name)
   return value
 end
 
+local function has_unlock(value, expected, label)
+  for _, effect in ipairs(value.effects or {}) do
+    if effect.type == "unlock-recipe" and effect.recipe == expected then return end
+  end
+  fail(label .. " unlock differs")
+end
+
 local function assert_aai_stage(name, prerequisites, count, time)
   local value = technology(name)
   exact_names(value.prerequisites or {}, prerequisites, name .. " prerequisites")
@@ -78,6 +85,11 @@ local aai = {
 
 local burner = technology("burner-mechanics")
 if burner.unit ~= nil then fail("burner mechanics is no longer an AAI starting technology") end
+local burner_trigger = burner.research_trigger
+if type(burner_trigger) ~= "table" or burner_trigger.type ~= "craft-item" or burner_trigger.item ~= "iron-plate"
+    or burner_trigger.count ~= 10 then
+  fail("burner mechanics craft trigger differs")
+end
 local burner_effects = burner.effects or {}
 if #burner_effects < 1 then fail("burner mechanics lacks recipe effects") end
 local has_burner_lab = false
@@ -85,6 +97,51 @@ for _, effect in ipairs(burner_effects) do
   if effect.type == "unlock-recipe" and effect.recipe == "burner-lab" then has_burner_lab = true end
 end
 if not has_burner_lab then fail("burner mechanics no longer unlocks burner lab") end
+
+local automation = technology("automation-science-pack")
+local automation_trigger = automation.research_trigger
+if type(automation_trigger) ~= "table" or automation_trigger.type ~= "craft-item" or automation_trigger.item ~= "burner-lab"
+    or automation_trigger.count ~= nil then
+  fail("automation science craft trigger differs")
+end
+exact_names(automation.prerequisites or {}, {"burner-mechanics"}, "automation science prerequisites")
+
+local burner_lab_recipe = data.raw.recipe and data.raw.recipe["burner-lab"]
+if type(burner_lab_recipe) ~= "table" or burner_lab_recipe.enabled ~= false or burner_lab_recipe.energy_required ~= .5 then
+  fail("burner lab recipe time differs")
+end
+exact_names(burner_lab_recipe.categories or {}, {"crafting"}, "burner lab recipe categories")
+exact_ingredients(burner_lab_recipe.ingredients, {
+  {type="item", name="motor", amount=10},
+  {type="item", name="copper-plate", amount=10},
+  {type="item", name="stone-brick", amount=5},
+}, "burner lab recipe ingredients")
+exact_ingredients(burner_lab_recipe.results, {{type="item", name="burner-lab", amount=1}}, "burner lab recipe result")
+
+local iron_plate_recipe = data.raw.recipe and data.raw.recipe["iron-plate"]
+if type(iron_plate_recipe) ~= "table" or iron_plate_recipe.energy_required ~= 3.2 then
+  fail("iron plate recipe time differs")
+end
+exact_names(iron_plate_recipe.categories or {}, {"smelting"}, "iron plate recipe categories")
+exact_ingredients(iron_plate_recipe.ingredients, {{type="item", name="iron-ore", amount=1}}, "iron plate recipe ingredients")
+exact_ingredients(iron_plate_recipe.results, {{type="item", name="iron-plate", amount=1}}, "iron plate recipe result")
+
+local automation_science = data.raw.item and data.raw.item["automation-science-pack"]
+if type(automation_science) ~= "table" or automation_science.stack_size ~= 200 then
+  fail("automation science stack capacity differs")
+end
+
+-- The physical electric-engine witness is not counted as AAI or MIR lab
+-- research.  It uses this exact shipped prerequisite chain as explicit world
+-- setup, so any changed unlock relation refuses before fixture acceleration.
+local advanced_oil = technology("advanced-oil-processing")
+exact_names(advanced_oil.prerequisites or {}, {"chemical-science-pack"}, "advanced oil prerequisites")
+local lubricant = technology("lubricant")
+exact_names(lubricant.prerequisites or {}, {"advanced-oil-processing"}, "lubricant prerequisites")
+has_unlock(lubricant, "lubricant", "lubricant")
+local electric_engine = technology("electric-engine")
+exact_names(electric_engine.prerequisites or {}, {"lubricant"}, "electric engine prerequisites")
+has_unlock(electric_engine, "electric-engine-unit", "electric engine")
 
 local owner = technology("recipe-prod-research_electric_engine-1")
 local science = {
@@ -110,7 +167,7 @@ if type(effect) ~= "table" or effect.type ~= "change-recipe-productivity" or eff
 end
 
 local recipe = data.raw.recipe and data.raw.recipe["electric-engine-unit"]
-if type(recipe) ~= "table" or recipe.energy_required ~= 10 then fail("electric engine recipe time differs") end
+if type(recipe) ~= "table" or recipe.enabled ~= false or recipe.energy_required ~= 10 then fail("electric engine recipe state differs") end
 exact_ingredients(recipe.ingredients, {
   {type="fluid", name="lubricant", amount=40},
   {type="item", name="steel-plate", amount=2},
