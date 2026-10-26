@@ -413,6 +413,12 @@ function M.is_space_exploration(active_mods)
     and active_mods["Krastorio2-spaced-out"] == nil and active_mods["k2so-assets"] == nil
 end
 
+-- Bob Logistics authors these named infinite native tails in its data stage.
+-- Its ownership does not depend on the rest of the Bob/Angel selection.
+function M.retains_bob_native_continuations(active_mods)
+  return target.id == "f210" and type(active_mods) == "table" and active_mods.boblogistics ~= nil
+end
+
 local function space_exploration_deltas(active_mods)
   if not M.is_space_exploration(active_mods) then return nil end
   local base = require("compatibility.modern_catalogue.space_exploration")
@@ -834,6 +840,15 @@ function M.continuations(active_mods)
     if changed then for key, value in pairs(changed) do row[key] = copy(value) end end
     changed = overrides_by_id[row.id]
     if changed then for key, value in pairs(changed) do row[key] = copy(value) end end
+  end
+  if M.retains_bob_native_continuations(active_mods) then
+    local retained = {}
+    for _, row in ipairs(rows) do
+      if row.id ~= "inserter-capacity-bonus-8" and row.id ~= "worker-robots-storage-4" then
+        retained[#retained + 1] = row
+      end
+    end
+    return retained
   end
   return rows
 end

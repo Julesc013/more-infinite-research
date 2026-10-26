@@ -30,6 +30,7 @@ $controls = @(
   [ordered]@{path='tests/test_override_interactions_fixture.py';lua=$true},
   [ordered]@{path='tests/test_armor_py_catalogue.py';lua=$true},
   [ordered]@{path='tests/test_native_modded_continuations.py';lua=$true},
+  [ordered]@{path='tests/test_bob_native_inserter.py';lua=$true},
   [ordered]@{path='tests/test_integration_catalogue_upgrade_fixture.py';lua=$true},
   [ordered]@{path='tests/test_bob_angel_native_fixture.py';lua=$true},
   [ordered]@{path='tests/test_bob_angel_prototype_caps.py';lua=$true},
