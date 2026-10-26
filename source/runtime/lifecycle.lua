@@ -450,6 +450,13 @@ local function legacy_candidates(force, worker_name, direct_f200_hop)
       else
         admitted = native_owner_admitted(force, row)
       end
+    elseif row.ownership_kind == "authored_generated"
+        and authored_generated_prototype_disabled(force, row) ~= nil then
+      -- A user-disabled family retains this authored identity with a disabled
+      -- prototype. Keep only an already-proven V3 cap right until a later
+      -- enabled configuration can reconcile it; science/lab policy-disabled
+      -- rows remain in the enabled branch and are not deferred here.
+      admitted = true
     end
     if admitted then
       local candidate

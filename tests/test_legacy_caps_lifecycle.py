@@ -391,6 +391,89 @@ class LegacyCapsLifecycleTests(unittest.TestCase):
             "direct F200 bridge accepted a mismatched current F210 native worker")
         ''')
 
+    def test_disabled_f200_family_defers_a_proven_cap_right_until_reenabled_and_relaxed(self):
+        self.lua.execute('''
+          local item = technology(gear_name)
+          item.enabled, item.visible_when_disabled, item.prototype.enabled = false, true, false
+          local f, old = force(1, {[gear_name] = item}), f200_gear_legacy(1, 2)
+
+          -- The disabled startup setting produces a retained, disabled data
+          -- prototype. The prior V3 row proves MIR, rather than a foreign
+          -- actor, performed the force-level disablement.
+          boot({[1] = f}, old, nil, {target_id = "f200", enabled = false, limit = 2})
+          lifecycle.on_configuration_changed()
+          local saved = storage.mir_caps
+          local retained = saved.owned_disabled[1][gear_name]
+          assert(saved.legacy_caps_checked and retained.disabled
+            and retained.visible_when_disabled == false)
+          assert(not item.enabled and item.visible_when_disabled and item.prototype.enabled == false
+            and old.disabled_by_cap[1][gear_name].enabled_before_cap)
+
+          -- Re-enabling the family alone must retain the proven disablement
+          -- while its configured cap remains below the earned level.
+          item.prototype.enabled = true
+          boot({[1] = f}, old, saved, {target_id = "f200", enabled = true, limit = 2})
+          lifecycle.on_configuration_changed()
+          assert(not item.enabled and item.visible_when_disabled
+            and saved.owned_disabled[1][gear_name].disabled)
+
+          boot({[1] = f}, old, saved, {target_id = "f200", enabled = true, limit = 40})
+          lifecycle.on_configuration_changed()
+          assert(item.enabled and not item.visible_when_disabled and item.level == 3
+            and saved.legacy_caps_checked and next(saved.owned_disabled) == nil)
+        ''')
+
+    def test_disabled_f200_direct_hop_defers_the_exact_right_until_f210_reenable(self):
+        self.lua.execute('''
+          local item = technology(gear_name)
+          item.enabled, item.visible_when_disabled, item.prototype.enabled = false, true, false
+          local f, old = force(1, {[gear_name] = item}), f200_gear_legacy(1, 2)
+
+          boot({[1] = f}, old, nil, {target_id = "f210", enabled = false, limit = 2})
+          lifecycle.on_configuration_changed(f200_to_f210_event())
+          local saved = storage.mir_caps
+          assert(saved.legacy_caps_checked and saved.owned_disabled[1][gear_name].disabled
+            and not item.enabled and item.prototype.enabled == false)
+
+          item.prototype.enabled = true
+          boot({[1] = f}, old, saved, {target_id = "f210", enabled = true, limit = 40})
+          lifecycle.on_configuration_changed()
+          assert(item.enabled and not item.visible_when_disabled and item.level == 3
+            and saved.legacy_caps_checked and next(saved.owned_disabled) == nil)
+        ''')
+
+    def test_disabled_family_never_defers_a_missing_or_unowned_legacy_disablement(self):
+        self.lua.execute('''
+          local function assert_foreign_disablement_is_retained(old, label)
+            local item = technology(gear_name)
+            item.enabled, item.visible_when_disabled, item.prototype.enabled = false, true, false
+            local f = force(1, {[gear_name] = item})
+            boot({[1] = f}, old, nil, {target_id = "f200", enabled = false, limit = 2})
+            lifecycle.on_configuration_changed()
+            local saved = storage.mir_caps
+            local record = saved.owned_disabled[1] and saved.owned_disabled[1][gear_name]
+            assert(type(record) ~= "table" or record.disabled ~= true,
+              label .. " gained a MIR enablement right while disabled")
+
+            item.prototype.enabled = true
+            boot({[1] = f}, old, saved, {target_id = "f200", enabled = true, limit = 40})
+            lifecycle.on_configuration_changed()
+            -- Visibility is independently owned by the validated old V3 row;
+            -- only force enablement remains unavailable without the proof.
+            assert(not item.enabled and not item.visible_when_disabled
+              and saved.legacy_caps_checked and saved.owned_disabled[1] == nil,
+              label .. " enabled a foreign or unproven disablement after re-enable")
+          end
+
+          local missing = f200_gear_legacy(1, 2)
+          missing.disabled_by_cap[1][gear_name] = nil
+          assert_foreign_disablement_is_retained(missing, "missing V3 disablement")
+
+          local unowned = f200_gear_legacy(1, 2)
+          unowned.unowned_disabled_by_cap[1][gear_name] = true
+          assert_foreign_disablement_is_retained(unowned, "unowned V3 disablement")
+        ''')
+
     def test_f200_mir5_finite_cap_ledger_restores_on_later_f210_relaxation(self):
         self.lua.execute('''
           local item = technology(gear_name)
