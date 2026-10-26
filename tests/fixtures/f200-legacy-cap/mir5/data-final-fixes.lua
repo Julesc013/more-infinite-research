@@ -15,7 +15,8 @@ end
 
 local fixture = mods["mir-fixture-mir5-f200-legacy-cap"]
 local f200 = mods.base == "2.0.77" and mods["more-infinite-research"] == "5.0.20000" and fixture == "0.2.0"
-local f210 = mods.base == "2.1.23" and mods["more-infinite-research"] == "5.0.21000" and fixture == "0.5.0"
+local f210 = mods.base == "2.1.23" and mods["more-infinite-research"] == "5.0.21000"
+  and (fixture == "0.5.0" or fixture == "0.6.0" or fixture == "0.7.0")
 assert((f200 or f210) and mods["space-age"] == nil, "unexpected F200/F210 successor fixture closure")
 if f210 then
   for _, name in ipairs({"elevated-rails", "quality", "recycler"}) do
