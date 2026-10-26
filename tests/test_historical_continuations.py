@@ -126,7 +126,7 @@ class HistoricalContinuationTests(unittest.TestCase):
 
     def test_selected_targets_preserve_exact_observed_subsets(self):
         self.lua.execute(r'''
-          local counts = {f013=2, f014=2, f015=4, f016=4, f017=5, f100=5, f110=6}
+          local counts = {f013=2, f014=2, f015=4, f016=4, f017=5, f018=6, f100=5, f110=6}
           for target, count in pairs(counts) do
             local contract = contracts.for_target(target)
             assert(#contract.rows == count, target)
@@ -143,6 +143,10 @@ class HistoricalContinuationTests(unittest.TestCase):
             local rows = constructor.technologies(target, values_for(target), raw_for(target))
             assert(by_name(rows, "weapon-shooting-speed-7") and by_name(rows, "laser-shooting-speed-8") == nil)
           end
+          local f018 = constructor.technologies("f018", values_for("f018"), raw_for("f018"))
+          local laser = by_name(f018, "laser-turret-speed-8")
+          assert(laser and laser.effects[1].ammo_category == "laser-turret")
+          assert(by_name(f018, "laser-shooting-speed-8") == nil and by_name(f018, "worker-robots-speed-6") == nil)
           local f110 = constructor.technologies("f110", values_for("f110"), raw_for("f110"))
           assert(by_name(f110, "laser-shooting-speed-8") and by_name(f110, "worker-robots-speed-6") == nil)
         ''')
@@ -200,6 +204,15 @@ class HistoricalContinuationTests(unittest.TestCase):
           rows = constructor.technologies("f017", values, raw)
           research = by_name(rows, "research-speed-7")
           assert(research.enabled == nil and research.max_level == 7)
+
+          values = values_for("f018", {
+            ["mir-enable-laser-shooting-speed"]={value=false},
+            ["mir-effect-per-level-laser-shooting-speed"]={value=75},
+          })
+          rows = constructor.technologies("f018", values, raw_for("f018"))
+          local laser = by_name(rows, "laser-turret-speed-8")
+          assert(laser.enabled == false and laser.effects[1].ammo_category == "laser-turret"
+            and laser.effects[1].modifier == .75)
         ''')
 
     def test_named_preflight_rejects_foreign_or_infinite_sources_before_output(self):
@@ -223,6 +236,12 @@ class HistoricalContinuationTests(unittest.TestCase):
           raw.technology["research-speed-7"] = {max_level="infinite"}
           ok, message = pcall(constructor.technologies, "f017", values_for("f017"), raw)
           assert(not ok and string.find(message, "identity is already owned: research-speed-7", 1, true))
+
+          raw = raw_for("f018")
+          raw.technology["laser-turret-speed-7"].unit.count = 451
+          ok, message = pcall(constructor.technologies, "f018", values_for("f018"), raw)
+          assert(not ok and string.find(message,
+            "unexpected source costs for laser-turret-speed-8", 1, true))
         ''')
 
     def test_outputs_are_detached_and_use_only_named_source_rows(self):
