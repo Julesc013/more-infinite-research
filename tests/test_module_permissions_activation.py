@@ -124,6 +124,9 @@ class ModulePermissionsActivationTests(unittest.TestCase):
             end, is_k2so = function(active_mods)
               assert(active_mods == mods)
               return false
+            end, retains_bob_native_continuations = function(active_mods)
+              assert(active_mods == mods)
+              return false
             end, select = function(active_mods)
               assert(active_mods == mods)
               return {definitions = {}, continuations = {}, recipe_patches = {}}
