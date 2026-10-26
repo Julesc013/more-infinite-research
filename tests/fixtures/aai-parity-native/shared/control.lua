@@ -1,7 +1,8 @@
 -- The source stage earns the finite AAI laboratory chain and one MIR level in
 -- real labs.  It seeds only the explicit non-AAI science-pack prerequisites
--- needed to make the isolated MIR owner researchable; those assignments are
--- recorded as setup and are never reported as lab completions.
+-- and the documented electric-engine unlock chain needed by its isolated
+-- physical witness; those assignments are recorded as setup and are never
+-- reported as lab completions.
 local KEY = "mir5_aai_parity_native"
 local FIXTURE = "mir-fixture-mir5-aai-parity-native"
 local PLAN = require("__mir-fixture-mir5-aai-parity-native__/catalogue")
