@@ -253,13 +253,13 @@ class F110F200TransitionFixtureTests(unittest.TestCase):
               get_item_count=function(name)return contents[name] or 0 end,
             }
             local function lab()
-              local entity={valid=true,energy=0}
+              local entity={valid=true,active=true,energy=0}
               entity.get_inventory=function(slot) assert(slot == 1);return inventory end
               return entity
             end
             local player=force(1,"f110")
             if omit_row then player.technologies[source_plan.continuation]=nil end
-            local game={tick=0,forces={player=player},surfaces={[1]={create_entity=function()return lab()end}}}
+            local game={tick=0,tick_paused=false,speed=1,forces={player=player},surfaces={[1]={create_entity=function()return lab()end}}}
             function game.create_force()
               next_force_index=next_force_index+1
               local item=force(next_force_index,"f110");game.forces[next_force_index]=item;return item
@@ -322,9 +322,29 @@ class F110F200TransitionFixtureTests(unittest.TestCase):
                          (result["phase"], result["source"], result["successor"], result["rows"], result["save"]))
         self.assertEqual((2, 4, "braking-force-1", False, .27),
                          (result["stack"], result["bulk"], result["current"], result["foreign"], result["paused"]))
-        self.assertEqual(4, len(result["logs"]))
-        self.assertTrue(all('"case":"f110-f200-transition"' in row for row in result["logs"]))
-        self.assertTrue(any('"stage":"reload"' in row and '"on_load_read_only":true' in row for row in result["logs"]))
+        fixture_results = [row for row in result["logs"] if row.startswith("[MIR5_NATIVE_FIXTURE] RESULT ")]
+        diagnostics = [row for row in result["logs"] if row.startswith("[MIR5_F110_SOURCE_DIAGNOSTIC] ")]
+        self.assertEqual(4, len(fixture_results))
+        self.assertTrue(all('"case":"f110-f200-transition"' in row for row in fixture_results))
+        self.assertTrue(any('"stage":"reload"' in row and '"on_load_read_only":true' in row for row in fixture_results))
+        self.assertEqual(2, len(diagnostics))
+        self.assertIn('"checkpoint":"init"', diagnostics[0])
+        self.assertIn('"checkpoint":"first-tick"', diagnostics[1])
+        for row in diagnostics:
+            self.assertIn('"tick_paused":false', row)
+            self.assertIn('"game_speed":1', row)
+            self.assertIn('"phase":"await-source-lab"', row)
+            self.assertIn('"queue_enabled":true', row)
+            self.assertIn('"queue_length":1', row)
+            self.assertIn(f'"current_research":"{DIRECT}"', row)
+            self.assertIn('"direct_enabled":true', row)
+            self.assertIn('"direct_researched":false', row)
+            self.assertIn('"lab_valid":true', row)
+            self.assertIn('"lab_active":true', row)
+        self.assertIn('"direct_level":1', diagnostics[0])
+        self.assertIn('"source_direct_labs":0', diagnostics[0])
+        self.assertIn('"direct_level":2', diagnostics[1])
+        self.assertIn('"source_direct_labs":1', diagnostics[1])
         wrong_capacity = py(self.lua.eval("f110_f200_callbacks")(True, False))
         self.assertFalse(wrong_capacity["ok"])
         self.assertIn("F200 bulk inserter effects differ", wrong_capacity["message"])

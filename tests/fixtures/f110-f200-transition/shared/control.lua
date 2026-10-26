@@ -345,6 +345,45 @@ local function marker(stage, state)
     .. "\"on_load_read_only\":" .. tostring(stage == "reload") .. "}")
 end
 
+local source_first_tick_diagnostic_logged = false
+
+local function json_boolean(value)
+  if value == nil then return "null" end
+  return tostring(value == true)
+end
+
+local function source_diagnostic(checkpoint, state)
+  local force = game.forces.player
+  local direct = technology(force, plan.direct)
+  local queue = force.research_queue or {}
+  local lab = state.lab
+  local paused_ok, paused = pcall(function() return game.tick_paused end)
+  local speed_ok, speed = pcall(function() return game.speed end)
+  local active_ok, active = pcall(function()
+    if lab == nil or lab.valid ~= true then return nil end
+    return lab.active
+  end)
+  local paused_value = nil
+  if paused_ok then paused_value = paused end
+  local active_value = nil
+  if active_ok then active_value = active end
+  log("[MIR5_F110_SOURCE_DIAGNOSTIC] {"
+    .. "\"checkpoint\":\"" .. checkpoint .. "\","
+    .. "\"tick\":" .. tostring(game.tick) .. ","
+    .. "\"tick_paused\":" .. json_boolean(paused_value) .. ","
+    .. "\"game_speed\":" .. (speed_ok and type(speed) == "number" and tostring(speed) or "null") .. ","
+    .. "\"phase\":\"" .. tostring(state.phase) .. "\","
+    .. "\"queue_enabled\":" .. json_boolean(queue_enabled(force)) .. ","
+    .. "\"queue_length\":" .. tostring(#queue) .. ","
+    .. "\"current_research\":" .. (current_name(force) and "\"" .. current_name(force) .. "\"" or "null") .. ","
+    .. "\"direct_enabled\":" .. json_boolean(direct.enabled) .. ","
+    .. "\"direct_researched\":" .. json_boolean(direct.researched) .. ","
+    .. "\"direct_level\":" .. tostring(direct.level) .. ","
+    .. "\"lab_valid\":" .. json_boolean(lab ~= nil and lab.valid == true) .. ","
+    .. "\"lab_active\":" .. json_boolean(active_value) .. ","
+    .. "\"source_direct_labs\":" .. tostring(state.source_direct_labs or 0) .. "}")
+end
+
 local function source_init()
   check_closure(); assert_rows()
   if read_state() ~= nil then fail("source state already exists") end
@@ -361,6 +400,7 @@ local function source_init()
   if force.add_research(direct) ~= true or current_name(force) ~= plan.direct then
     fail("could not queue source mining lab")
   end
+  source_diagnostic("init", state)
 end
 
 local function finish_source(state)
@@ -387,6 +427,10 @@ end
 local function source_tick()
   local state = read_state()
   if type(state) ~= "table" then fail("source state is absent") end
+  if not source_first_tick_diagnostic_logged then
+    source_first_tick_diagnostic_logged = true
+    source_diagnostic("first-tick", state)
+  end
   if state.phase == "source-complete" then
     assert_snapshot(game.forces.player, state.player_snapshot, "source reload", false)
     assert_queue(game.forces.player, state.player_queue, "source reload")
