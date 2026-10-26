@@ -696,6 +696,8 @@ class BobCoreGameplayFixtureTests(unittest.TestCase):
                 ("physical-machine:bob-invar-alloy", "physical-after native alloy machine state differs"),
                 ("physical-machine:bob-nitinol-alloy", "physical-after native alloy machine state differs"),
                 ("physical-machine:bob-copper-tungsten-alloy", "physical-after native alloy machine state differs"),
+                ("physical-storage:bob-copper-tungsten-alloy",
+                 "native metallurgy fluid machine differs; before={<not-observed>}; after={recipe=bob-copper-tungsten-alloy,fluids_count=0,capacities=[]}"),
                 ("physical-fluid:bob-copper-tungsten-alloy", "native alloy fluid input was not clean")):
             with self.subTest(opponent=opponent):
                 self.lua.globals().opponent = opponent
@@ -741,6 +743,7 @@ class BobCoreGameplayFixtureTests(unittest.TestCase):
                       productivity_bonus=route.inherent_productivity + .08,
                       fluids_count=route.category == "metallurgy" and 4 or 0,
                       prototype={name=route.machine,crafting_categories={[route.category]=true}},
+                      get_recipe=function() return {name=route.recipe} end,
                       get_inventory=function(index)
                         if index == 1 then return input end
                         if index == 2 then return output end
@@ -837,6 +840,7 @@ class BobCoreGameplayFixtureTests(unittest.TestCase):
                   if opponent == "lost-tail" then player.technologies[spec[3].tail].level = 4 end
                   if kind == "physical-output" then state.physical["physical-after"][target].output = 0 end
                   if kind == "physical-machine" then machines[target].bonus_progress = 0 end
+                  if kind == "physical-storage" then machines[target].fluids_count = 0 end
                   if kind == "physical-fluid" then machines[target].fluids["molten-copper"] = 1 end
                   local tick_ok, tick_message = pcall(callbacks.events[1])
                   return {load_ok=load_ok,load_message=tostring(load_message),on_load_read_only=on_load_read_only,

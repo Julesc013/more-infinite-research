@@ -289,7 +289,8 @@ local function assert_route_fluid_machine(machine, route, label, before)
       or machine.get_fluid_capacity(1) ~= 1000 or machine.get_fluid_capacity(2) ~= 1000
       or machine.get_fluid_capacity(3) ~= 100 or machine.get_fluid_capacity(4) ~= 100
       or type(machine.get_fluid_count) ~= "function" or type(machine.insert_fluid) ~= "function" then
-    fail(label .. " native metallurgy fluid machine differs; before={" .. before
+    local observed_before = type(before) == "string" and before or "<not-observed>"
+    fail(label .. " native metallurgy fluid machine differs; before={" .. observed_before
       .. "}; after={" .. fluid_storage_observation(machine) .. "}")
   end
 end
