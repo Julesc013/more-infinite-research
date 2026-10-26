@@ -14,7 +14,7 @@
     {"name": "mir-fixture-mir5-f110-f200-transition", "version": "0.2.0", "enabled": true}
   ],
   "archive_sha256": {
-    "more-infinite-research_5.0.20000.zip": "CDC687538EEE4BB6E3E897057ACBA6DE51C74C164F8339D613D034BA952D89FD"
+    "more-infinite-research_5.0.20000.zip": "8BA029A01E1F08C311C6A127C81313D7664F0ABADAF3C79F84157775D35ADFD7"
   },
-  "scope": "EA41 frozen F200 successor input for the published F110 source save. It requires rebind to the next accepted F200 package before native execution; no current-native claim."
+  "scope": "Prepared, unrun F200 successor bound to accepted a1fd431b/playerd4051e53, archive8BA029A0/601159 bytes, for the protected published F110 r05 source save. Earlier EA41 inputs and original failures remain preserved separately. Native execution, successor research/state and two cold reloads remain required; this input pin grants no transition or release result."
 }
