@@ -84,12 +84,18 @@ class BobNativeInserterTests(unittest.TestCase):
           package.path = player_root .. "/?.lua;" .. player_root .. "/?/init.lua"
           package.cpath = ""
         ''')
-        self.adapter = self.lua.execute('return require("compatibility.bob_native_inserter")')
+        self.adapter = self.lua.execute('return require("compatibility.bob_native_continuations")')
 
-    def raw(self, owner=None):
-        if owner is None:
-            owner = deepcopy(self.facts["native_technology"])
-        return _lua_value(self.lua, {"technology": {owner["name"]: owner}})
+    def owners(self):
+        return [
+            deepcopy(self.facts["native_technology"]),
+            deepcopy(self.facts["worker_storage_native_technology"]),
+        ]
+
+    def raw(self, owners=None):
+        if owners is None:
+            owners = self.owners()
+        return _lua_value(self.lua, {"technology": {owner["name"]: owner for owner in owners}})
 
     def test_captured_native_owner_and_mir4_skip_are_exactly_bound(self):
         owner = self.facts["native_technology"]
@@ -105,7 +111,27 @@ class BobNativeInserterTests(unittest.TestCase):
         self.assertEqual("boblogistics/prototypes/technology-inserter.lua",
                          self.facts["native_owner"]["source_member"])
         self.assertTrue(self.facts["native_owner"]["unconditionally_authored"])
+        worker = self.facts["worker_storage_native_technology"]
+        self.assertEqual("bob-infinite-worker-robots-storage-4", worker["name"])
+        self.assertEqual("infinite", worker["max_level"])
+        self.assertEqual([{"type": "worker-robot-storage", "modifier": 1}], worker["effects"])
+        self.assertEqual("boblogistics/data.lua:58", self.facts["worker_storage_native_owner"]["data_entrypoint"])
+        self.assertEqual("boblogistics/prototypes/technology-logistics.lua",
+                         self.facts["worker_storage_native_owner"]["source_member"])
+        self.assertEqual(
+            {"inserter_capacity_bonus": "inserter-capacity-bonus-8",
+             "worker_robots_storage": "bob-infinite-worker-robots-storage-4"},
+            self.facts["native_technologies"],
+        )
+        self.assertEqual(
+            ["inserter-capacity-bonus-8", "bob-infinite-worker-robots-storage-4"],
+            _plain(self.adapter["native_technologies"]),
+        )
         self.assertEqual("already_infinite", self.facts["published_mir4_source_fact"]["already_infinite_disposition"])
+        self.assertEqual("competing_infinite_kept",
+                         self.facts["published_mir4_worker_storage_owner_fact"]["owner_disposition"])
+        self.assertEqual("worker-robots-storage-3",
+                         self.facts["published_mir4_worker_storage_owner_fact"]["base_prerequisite"])
         self.assertEqual(3, len(self.facts["capture_provenance"]))
         self.assertEqual(
             {"q005-bob-full-base", "q006-bob-full-space-age", "q009-bob-angel-full-base"},
@@ -125,6 +151,8 @@ class BobNativeInserterTests(unittest.TestCase):
             })
         self.assertTrue(all(record["upstream_published_native_owner_equal"]
                             for record in self.facts["capture_provenance"]))
+        self.assertTrue(all(record["upstream_published_worker_storage_owner_equal"]
+                            for record in self.facts["capture_provenance"]))
 
     def test_preflight_accepts_the_exact_native_owner_without_mutation(self):
         raw = self.raw()
@@ -139,27 +167,32 @@ class BobNativeInserterTests(unittest.TestCase):
             self.adapter["preflight"](no_technology)
         self.assertEqual(before_no_technology, _plain(no_technology))
 
-        missing = _lua_value(self.lua, {"technology": {}})
-        before_missing = _plain(missing)
-        with self.assertRaisesRegex(Exception, "missing inserter-capacity-bonus-8"):
-            self.adapter["preflight"](missing)
-        self.assertEqual(before_missing, _plain(missing))
+        for name in self.adapter["native_technologies"].values():
+            with self.subTest(owner=name):
+                missing_owners = self.owners()
+                missing_owners = [owner for owner in missing_owners if owner["name"] != name]
+                missing = self.raw(missing_owners)
+                before_missing = _plain(missing)
+                with self.assertRaisesRegex(Exception, f"missing {name}"):
+                    self.adapter["preflight"](missing)
+                self.assertEqual(before_missing, _plain(missing))
 
-        finite_owner = deepcopy(self.facts["native_technology"])
-        finite_owner["max_level"] = 8
-        finite = self.raw(finite_owner)
-        before_finite = _plain(finite)
-        with self.assertRaisesRegex(Exception, "requires infinite inserter-capacity-bonus-8"):
-            self.adapter["preflight"](finite)
-        self.assertEqual(before_finite, _plain(finite))
+                finite_owners = self.owners()
+                next(owner for owner in finite_owners if owner["name"] == name)["max_level"] = 8
+                finite = self.raw(finite_owners)
+                before_finite = _plain(finite)
+                with self.assertRaisesRegex(Exception, f"requires infinite {name}"):
+                    self.adapter["preflight"](finite)
+                self.assertEqual(before_finite, _plain(finite))
 
     def test_preflight_tolerates_unconsumed_native_fields_without_mutation(self):
-        changed = deepcopy(self.facts["native_technology"])
-        changed["icons"] = [{"icon": "__reskin__/alternate.png", "icon_size": 64}]
-        changed["effects"] = [{"type": "inserter-stack-size-bonus", "modifier": 999}]
-        changed["prerequisites"] = ["foreign-prerequisite"]
-        changed["unit"] = {"count_formula": "foreign", "time": 1, "ingredients": [["foreign-pack", 9]]}
-        changed["foreign_unconsumed_marker"] = {"nested": [1, 2, 3]}
+        changed = self.owners()
+        for owner in changed:
+            owner["icons"] = [{"icon": "__reskin__/alternate.png", "icon_size": 64}]
+            owner["effects"] = [{"type": "foreign-effect", "modifier": 999}]
+            owner["prerequisites"] = ["foreign-prerequisite"]
+            owner["unit"] = {"count_formula": "foreign", "time": 1, "ingredients": [["foreign-pack", 9]]}
+            owner["foreign_unconsumed_marker"] = {"nested": [1, 2, 3]}
         raw = self.raw(changed)
         before = _plain(raw)
         self.assertTrue(self.adapter["preflight"](raw))
