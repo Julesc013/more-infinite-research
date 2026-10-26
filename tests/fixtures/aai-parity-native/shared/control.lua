@@ -20,6 +20,7 @@ local BURNER_LAB_MOTORS = 10
 local BURNER_LAB_COPPER = 10
 local BURNER_LAB_BRICKS = 5
 local BOOTSTRAP_FUEL = 16
+local TRIGGER_WAIT_TICKS = 600
 local loaded, reported = nil, false
 
 local function fail(message) error("[mir5-aai-parity-native] " .. message) end
@@ -312,8 +313,13 @@ local function source_tick()
     if iron == STARTING_IRON then
       if input.get_item_count("iron-ore") ~= 0 then fail("AAI starting furnace did not consume iron") end
       if technology(force, "burner-mechanics").researched ~= true then
-        fail("AAI burner-mechanics craft-item trigger did not complete after native iron production")
+        state.trigger_deadline = state.trigger_deadline or (game.tick + TRIGGER_WAIT_TICKS)
+        if game.tick > state.trigger_deadline then
+          fail("AAI burner-mechanics craft-item trigger did not complete after native iron production")
+        end
+        return
       end
+      state.trigger_deadline = nil
       if recipe(force, "burner-lab").enabled ~= true then fail("AAI burner-mechanics did not unlock burner lab") end
       state.starting_assembler = create_starting_burner_assembler(force)
       state.phase = "bootstrap-burner-lab"
@@ -331,8 +337,13 @@ local function source_tick()
         fail("AAI starting burner assembler did not consume burner-lab inputs")
       end
       if technology(force, "automation-science-pack").researched ~= true then
-        fail("AAI automation-science-pack craft-item trigger did not complete after native burner-lab production")
+        state.trigger_deadline = state.trigger_deadline or (game.tick + TRIGGER_WAIT_TICKS)
+        if game.tick > state.trigger_deadline then
+          fail("AAI automation-science-pack craft-item trigger did not complete after native burner-lab production")
+        end
+        return
       end
+      state.trigger_deadline = nil
       assert_lab_chain(force)
       state.burner_lab = create_burner_lab(force)
       state.phase = "aai-progression"

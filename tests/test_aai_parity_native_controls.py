@@ -78,7 +78,7 @@ def raw_fixture():
         "recipe": {
             "burner-lab": {
                 "categories": ["crafting"],
-                "enabled": True,
+                "enabled": False,
                 "energy_required": 0.5,
                 "ingredients": [
                     {"type": "item", "name": "motor", "amount": 10},
@@ -86,6 +86,12 @@ def raw_fixture():
                     {"type": "item", "name": "stone-brick", "amount": 5},
                 ],
                 "results": [{"type": "item", "name": "burner-lab", "amount": 1}],
+            },
+            "iron-plate": {
+                "categories": ["smelting"],
+                "energy_required": 3.2,
+                "ingredients": [{"type": "item", "name": "iron-ore", "amount": 1}],
+                "results": [{"type": "item", "name": "iron-plate", "amount": 1}],
             },
             "electric-engine-unit": {
                 "energy_required": 10,
@@ -403,6 +409,7 @@ class AaiParityNativeControls(unittest.TestCase):
             "automation-trigger": lambda raw: raw["technology"]["automation-science-pack"]["research_trigger"].__setitem__("item", "iron-plate"),
             "burner-recipe": lambda raw: raw["recipe"]["burner-lab"]["ingredients"][0].__setitem__("amount", 9),
             "burner-recipe-category": lambda raw: raw["recipe"]["burner-lab"]["categories"].__setitem__(0, "smelting"),
+            "iron-plate-recipe": lambda raw: raw["recipe"]["iron-plate"].__setitem__("energy_required", 4),
             "wrong-closure": lambda raw: raw,
         }
         for name, mutate in opponents.items():

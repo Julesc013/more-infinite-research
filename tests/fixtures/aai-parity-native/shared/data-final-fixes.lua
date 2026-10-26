@@ -100,7 +100,7 @@ end
 exact_names(automation.prerequisites or {}, {"burner-mechanics"}, "automation science prerequisites")
 
 local burner_lab_recipe = data.raw.recipe and data.raw.recipe["burner-lab"]
-if type(burner_lab_recipe) ~= "table" or burner_lab_recipe.enabled ~= true or burner_lab_recipe.energy_required ~= .5 then
+if type(burner_lab_recipe) ~= "table" or burner_lab_recipe.enabled ~= false or burner_lab_recipe.energy_required ~= .5 then
   fail("burner lab recipe time differs")
 end
 exact_names(burner_lab_recipe.categories or {}, {"crafting"}, "burner lab recipe categories")
@@ -110,6 +110,14 @@ exact_ingredients(burner_lab_recipe.ingredients, {
   {type="item", name="stone-brick", amount=5},
 }, "burner lab recipe ingredients")
 exact_ingredients(burner_lab_recipe.results, {{type="item", name="burner-lab", amount=1}}, "burner lab recipe result")
+
+local iron_plate_recipe = data.raw.recipe and data.raw.recipe["iron-plate"]
+if type(iron_plate_recipe) ~= "table" or iron_plate_recipe.energy_required ~= 3.2 then
+  fail("iron plate recipe time differs")
+end
+exact_names(iron_plate_recipe.categories or {}, {"smelting"}, "iron plate recipe categories")
+exact_ingredients(iron_plate_recipe.ingredients, {{type="item", name="iron-ore", amount=1}}, "iron plate recipe ingredients")
+exact_ingredients(iron_plate_recipe.results, {{type="item", name="iron-plate", amount=1}}, "iron plate recipe result")
 
 local owner = technology("recipe-prod-research_electric_engine-1")
 local science = {
