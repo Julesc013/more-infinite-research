@@ -12,10 +12,24 @@
     "version": "3.0.2",
     "archive": "boblogistics_3.0.2.zip",
     "archive_sha256": "ADAEFF77E0C489C80AC83950BDDC5F7DE0230FEEEC5E29772AC1C2FA8175F339",
-    "source_member": "boblogistics_3.0.2/prototypes/technology-inserter.lua",
+    "source_member": "boblogistics/prototypes/technology-inserter.lua",
     "source_lines": "285-324",
-    "data_entrypoint": "boblogistics_3.0.2/data.lua:59",
+    "data_entrypoint": "boblogistics/data.lua:59",
     "unconditionally_authored": true
+  },
+  "worker_storage_native_owner": {
+    "mod": "boblogistics",
+    "version": "3.0.2",
+    "archive": "boblogistics_3.0.2.zip",
+    "archive_sha256": "ADAEFF77E0C489C80AC83950BDDC5F7DE0230FEEEC5E29772AC1C2FA8175F339",
+    "source_member": "boblogistics/prototypes/technology-logistics.lua",
+    "source_lines": "153-186",
+    "data_entrypoint": "boblogistics/data.lua:58",
+    "unconditionally_authored": true
+  },
+  "native_technologies": {
+    "inserter_capacity_bonus": "inserter-capacity-bonus-8",
+    "worker_robots_storage": "bob-infinite-worker-robots-storage-4"
   },
   "native_technology": {
     "type": "technology",
@@ -58,6 +72,48 @@
     "max_level": "infinite",
     "upgrade": true
   },
+  "worker_storage_native_technology": {
+    "type": "technology",
+    "name": "bob-infinite-worker-robots-storage-4",
+    "icons": [
+      {
+        "icon": "__base__/graphics/technology/worker-robots-storage.png",
+        "icon_size": 256
+      },
+      {
+        "icon": "__core__/graphics/icons/technology/constants/constant-capacity.png",
+        "icon_size": 128,
+        "scale": 0.5,
+        "shift": [50, 50],
+        "floating": true
+      }
+    ],
+    "effects": [
+      {"type": "worker-robot-storage", "modifier": 1}
+    ],
+    "prerequisites": [
+      "worker-robots-storage-3",
+      "space-science-pack"
+    ],
+    "unit": {
+      "count_formula": "2^(L-4)*800",
+      "time": 60,
+      "ingredients": [
+        ["automation-science-pack", 1],
+        ["logistic-science-pack", 1],
+        ["chemical-science-pack", 1],
+        ["production-science-pack", 1],
+        ["utility-science-pack", 1],
+        ["space-science-pack", 1],
+        ["bob-advanced-logistic-science-pack", 1]
+      ]
+    },
+    "max_level": "infinite",
+    "upgrade": true,
+    "order": "c-k-g-d",
+    "localised_name": ["technology-name.worker-robots-storage"],
+    "localised_description": ["technology-description.worker-robots-storage"]
+  },
   "capture_provenance": [
     {
       "id": "q005-bob-full-base",
@@ -75,7 +131,8 @@
         "mir_archive": "more-infinite-research_4.7.21003.zip",
         "mir_archive_sha256": "B6EB9430056ABD384DB00F94929FE7DAC0A37441ACF4BC277946689682628852"
       },
-      "upstream_published_native_owner_equal": true
+      "upstream_published_native_owner_equal": true,
+      "upstream_published_worker_storage_owner_equal": true
     },
     {
       "id": "q006-bob-full-space-age",
@@ -93,7 +150,8 @@
         "mir_archive": "more-infinite-research_4.7.21003.zip",
         "mir_archive_sha256": "B6EB9430056ABD384DB00F94929FE7DAC0A37441ACF4BC277946689682628852"
       },
-      "upstream_published_native_owner_equal": true
+      "upstream_published_native_owner_equal": true,
+      "upstream_published_worker_storage_owner_equal": true
     },
     {
       "id": "q009-bob-angel-full-base",
@@ -111,7 +169,8 @@
         "mir_archive": "more-infinite-research_4.7.21003.zip",
         "mir_archive_sha256": "B6EB9430056ABD384DB00F94929FE7DAC0A37441ACF4BC277946689682628852"
       },
-      "upstream_published_native_owner_equal": true
+      "upstream_published_native_owner_equal": true,
+      "upstream_published_worker_storage_owner_equal": true
     }
   ],
   "published_mir4_source_fact": {
@@ -121,6 +180,16 @@
     "discovery_member": "prototypes/mir/planner/base_continuations/discover.lua",
     "already_infinite_disposition": "already_infinite",
     "meaning": "The published planner skipped construction when the named continuation already had an infinite native owner; its scaling path did not run."
+  },
+  "published_mir4_worker_storage_owner_fact": {
+    "mir_archive": "more-infinite-research_4.7.21003.zip",
+    "mir_archive_sha256": "B6EB9430056ABD384DB00F94929FE7DAC0A37441ACF4BC277946689682628852",
+    "planner_member": "more-infinite-research_4.7.21003/prototypes/mir/planner/base_continuations/plan.lua",
+    "discovery_member": "more-infinite-research_4.7.21003/prototypes/mir/planner/base_continuations/discover.lua",
+    "base_prerequisite": "worker-robots-storage-3",
+    "owner_disposition": "competing_infinite_kept",
+    "lookup": "discover.find_any_infinite_extension(base_technology_name, new_name)",
+    "meaning": "The legacy planner retained the differently named Bob infinite owner through its exact base prerequisite rather than emitting worker-robots-storage-4."
   },
   "release_qualification": false
 }
