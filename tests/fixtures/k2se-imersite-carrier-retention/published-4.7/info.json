@@ -1,0 +1,14 @@
+{
+  "name": "mir-fixture-mir5-k2se-imersite-carrier-retention",
+  "version": "0.1.0",
+  "title": "MIR5 K2SE Imersite carrier source fixture",
+  "author": "MIR tests",
+  "factorio_version": "2.1",
+  "dependencies": [
+    "base >= 2.1.0",
+    "Krastorio2 >= 2.1.4",
+    "space-exploration >= 0.7.63",
+    "! Krastorio2-spaced-out",
+    "more-infinite-research = 4.7.21003"
+  ]
+}

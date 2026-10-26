@@ -316,7 +316,7 @@ class F200F210CatalogueUpgradeFixtureTests(unittest.TestCase):
         profiles = ROOT / "tests/profiles"
         source = json.loads((profiles / "full-catalogue-cross-f200-f210-published-f200-2077.json").read_text(encoding="utf-8"))
         target = json.loads((profiles / "full-catalogue-cross-f200-f210-mir5-f210-2123.json").read_text(encoding="utf-8"))
-        freeze = json.loads((ROOT / "spec/evidence/current-assets-ea41cbc6-readback.json").read_text(encoding="utf-8"))
+        freeze = json.loads((ROOT / "spec/evidence/current-assets-1c90ceb7-readback.json").read_text(encoding="utf-8"))
         retained = json.loads((ROOT / "spec/evidence/current-assets-8aec3e68-readback.json").read_text(encoding="utf-8"))
         observer = "mir-fixture-mir5-active-mods-observer"
         fixture = "mir-fixture-mir5-full-catalogue-upgrade"
@@ -336,12 +336,12 @@ class F200F210CatalogueUpgradeFixtureTests(unittest.TestCase):
             "more-infinite-research_4.7.20003.zip": "FBBA844DD04011A12BB6DA885745B0733AD37FAB181EAAD9EE4346B9B0D32647",
         }, source["archive_sha256"])
         current = next(row for row in freeze["files"] if row["name"] == "more-infinite-research_5.0.21000.zip")
-        self.assertEqual(("ea41cbc6d27626283db9d8bbf6211b2171b6e36a", "a807f775c18189e9bc1a276d91346c6b75fd31eb"),
+        self.assertEqual(("1c90ceb7f0096fa6ccbcb9fc369fae699889c866", "9e669e6ffea27dda3f9f17dfb2873daf23a8e187"),
                          (freeze["source"]["commit"], freeze["source"]["source_tree"]))
-        self.assertEqual(("more-infinite-research_5.0.21000.zip", 564337,
-                          "CE1165CAC174EDA4800EBECAAEF29FC2E071B2E7160CD98F799FE21C2F151F9B"),
+        self.assertEqual(("more-infinite-research_5.0.21000.zip", 568598,
+                          "C563CB5B96C9E64CB3373BDB60CF5C8B7D3C97E93EADB8F924443C703CDC024D"),
                          (current["name"], current["bytes"], current["sha256"].upper()))
-        self.assertEqual({observer + "_0.1.0.zip": "2E1BE5952D2A4CC5C74A0D149E075D247BA110A3FAE5B6768D3EAEBABCEF989C",
+        self.assertEqual({observer + "_0.1.0.zip": "A15A7D628D66953D2E0C4D4FA288F47CBF9C5678327C7EB3D23ADB5DC78331C0",
                           current["name"]: current["sha256"].upper()}, target["archive_sha256"])
         self.assertEqual("rebuilt-verified-not-native-qualified", freeze["status"])
         self.assertFalse(freeze["claims"]["native_qualification"])
