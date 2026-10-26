@@ -10,9 +10,11 @@ import subprocess
 import zipfile
 
 TARGET_RECORD = "targets/editions.json"
+EARLY_TARGET_RECORD = "targets/early-editions.json"
 REQUIRE = re.compile(r'''\brequire\s*\(\s*["']([^"']+)["']\s*\)''')
 ENTRYPOINTS = ("data.lua", "settings.lua", "data-final-fixes.lua", "control.lua")
 F210_ONLY_MIGRATION = "migrations/more-infinite-research_4.7.0.json"
+EARLY_TARGET_IDS = frozenset({"f006", "f007", "f008", "f009", "f010", "f011", "f012"})
 
 
 def digest(data):
@@ -161,6 +163,26 @@ def player_presentation(files, info, target):
     return out
 
 
+def require_closure(files, pending):
+    """Resolve exact Lua imports from explicit entrypoints only."""
+    closure = set()
+    while pending:
+        relative = pending.pop()
+        if relative in closure:
+            continue
+        if relative not in files:
+            raise ValueError("Selected edition has a missing source dependency: " + relative)
+        closure.add(relative)
+        for module in REQUIRE.findall(files[relative].decode("utf-8")):
+            if module.startswith("__more-infinite-research__/"):
+                module = module[len("__more-infinite-research__/"):]
+            dependency = module.replace(".", "/") + ".lua"
+            if ".." in dependency or dependency.startswith("/"):
+                raise ValueError("Invalid player module dependency")
+            pending.append(dependency)
+    return closure
+
+
 def select_edition(files, info, target, editions):
     if info.get("name") != "more-infinite-research" or target not in editions:
         raise ValueError("Select a declared MIR player edition")
@@ -204,24 +226,61 @@ def select_edition(files, info, target, editions):
 
     # Follow the actual selected stage/public API imports. A reduced package
     # never ships another edition's unused compiler, GUI or runtime body.
-    pending = [*ENTRYPOINTS, "api/v1/data.lua", "api/v1/runtime.lua", "platform/target.lua"]
-    closure = set()
-    while pending:
-        relative = pending.pop()
-        if relative in closure:
-            continue
-        if relative not in files:
-            raise ValueError("Selected edition has a missing source dependency: " + relative)
-        closure.add(relative)
-        for module in REQUIRE.findall(files[relative].decode("utf-8")):
-            if module.startswith("__more-infinite-research__/"):
-                module = module[len("__more-infinite-research__/"):]
-            dependency = module.replace(".", "/") + ".lua"
-            if ".." in dependency or dependency.startswith("/"):
-                raise ValueError("Invalid player module dependency")
-            pending.append(dependency)
+    closure = require_closure(files, [*ENTRYPOINTS, "api/v1/data.lua", "api/v1/runtime.lua", "platform/target.lua"])
     selected_files = {name: data for name, data in files.items() if not name.endswith(".lua") or name in closure}
     return player_presentation(selected_files, info, target)
+
+
+def select_early_edition(files, info, target, editions):
+    """Materialize the intentionally data-only F006--F012 compatibility package."""
+    if info.get("name") != "more-infinite-research" or target not in EARLY_TARGET_IDS:
+        raise ValueError("Select a declared early MIR player edition")
+    selected = editions.get(target)
+    required = {"factorio_version", "minimum_base", "source_available", "delivery"}
+    if not isinstance(selected, dict) or set(selected) != required:
+        raise ValueError("Invalid early target metadata: " + target)
+    if selected["source_available"] is not True:
+        raise ValueError("Early edition source adaptation remains incomplete: " + target)
+    if selected["delivery"] not in {"extract-to-folder", "zip"}:
+        raise ValueError("Invalid early delivery mode: " + target)
+    if not re.fullmatch(r"0[.]\d+", selected["factorio_version"]):
+        raise ValueError("Invalid early Factorio line: " + target)
+    if not re.fullmatch(r"\d+[.]\d+[.]\d+", selected["minimum_base"]):
+        raise ValueError("Invalid early base minimum: " + target)
+    if selected["factorio_version"] != "0." + str(int(target[1:])):
+        raise ValueError("Early target and Factorio line differ: " + target)
+
+    version = info.get("version")
+    match = re.fullmatch(r"(\d+)[.](\d+)[.](\d{5})", version if isinstance(version, str) else "")
+    if match is None:
+        raise ValueError("Source version does not use the declared distribution codec")
+    patch = int(match.group(3)) % 100
+    info.clear()
+    info.update({
+        "name": "more-infinite-research",
+        "version": match.group(1) + "." + match.group(2) + "." + str(int(target[1:]) * 100 + patch).zfill(5),
+        "factorio_version": selected["factorio_version"],
+        "dependencies": ["base >= " + selected["minimum_base"]],
+    })
+    if "LICENSE" not in files:
+        raise ValueError("Selected early edition has no LICENSE")
+    files = dict(files)
+    fields = (
+        "-- Selected early data-only target; native qualification is held outside player source.\n"
+        "return {\n"
+        "  id = " + json.dumps(target) + ",\n"
+        "  reduced = true,\n"
+        "  research_levels = false,\n"
+        "  recipe_productivity = false\n"
+        "}\n"
+    )
+    files["platform/target.lua"] = fields.encode("utf-8")
+    files["data.lua"] = b'require("adapters.early.data").apply(require("platform.target"))\n'
+    closure = require_closure(files, ["data.lua", "platform/target.lua"])
+    selected_files = {name: files[name] for name in closure}
+    selected_files["info.json"] = files["info.json"]
+    selected_files["LICENSE"] = files["LICENSE"]
+    return selected_files
 
 
 def members(source, version=None, committed_files=None, target=None, editions=None,
@@ -251,11 +310,14 @@ def members(source, version=None, committed_files=None, target=None, editions=No
             raise ValueError("Selected player editions derive their version from the source codec")
         if editions is None:
             editions, _ = read_editions(source, target_record=selected_record)
-        committed_files = select_edition(committed_files, info, target, editions)
+        if selected_record == EARLY_TARGET_RECORD:
+            committed_files = select_early_edition(committed_files, info, target, editions)
+        else:
+            committed_files = select_edition(committed_files, info, target, editions)
         # Published 4.7.3 shipped the K2 Imersite rename only in its F210
         # edition.  Preserve that migration-name history for the other eight
         # selected player packages without narrowing generic fixture archives.
-        if target != "f210":
+        if selected_record != EARLY_TARGET_RECORD and target != "f210":
             committed_files.pop(F210_ONLY_MIGRATION, None)
     elif "presentation/changelog/current.txt" in committed_files:
         encoded = info["version"].rsplit(".", 1)[-1]
@@ -287,7 +349,8 @@ def build(source, output, version=None, revision=None, target=None, target_recor
     info, rows = members(source, version, files, target, editions, record_path or TARGET_RECORD)
     root = f"{info['name']}_{info['version']}"
     expected_name = root + ".zip"
-    if output.name != expected_name:
+    early = record_path == EARLY_TARGET_RECORD
+    if not early and output.name != expected_name:
         raise ValueError(f"Archive must be named {expected_name}")
     if output.exists():
         raise FileExistsError(f"Preserve existing package: {output}")
@@ -300,11 +363,13 @@ def build(source, output, version=None, revision=None, target=None, target_recor
             member.compress_type = zipfile.ZIP_DEFLATED
             archive.writestr(member, contents, compresslevel=9)
     return {
-        "kind": "native-package-members-not-gameplay-qualification",
+        "kind": ("early-data-only-package-members-not-gameplay-qualification"
+                 if early else "native-package-members-not-gameplay-qualification"),
         "source_root": str(source), "archive": str(output.resolve()),
         "source_commit": commit,
         "target": target, "target_record": record_path, "edition_record_sha256": editions_sha,
         "name": info["name"], "version": info["version"],
+        **({"delivery": editions[target]["delivery"]} if early else {}),
         "sha256": digest(output.read_bytes()), "bytes": output.stat().st_size,
         "members": [{"path": relative, "sha256": digest(contents), "bytes": len(contents)} for relative, contents in rows],
     }
