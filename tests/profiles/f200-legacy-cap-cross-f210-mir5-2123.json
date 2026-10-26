@@ -1,0 +1,22 @@
+{
+  "schema": 1,
+  "kind": "mir5-f200-f210-positive-cap-cross-successor",
+  "target": "f210",
+  "factorio_line": "2.1",
+  "engine": {
+    "version": "2.1.23",
+    "sha256": "FE4A1DA30F322A0D0B8AEB3DF7276332222BAAA143E2352569B723E84B2B9060"
+  },
+  "settings_mode": "Defaults",
+  "mods": [
+    {"name": "base", "version": "2.1.23", "enabled": true},
+    {"name": "mir-fixture-mir5-active-mods-observer", "version": "0.1.0", "enabled": true},
+    {"name": "more-infinite-research", "version": "5.0.21000", "enabled": true},
+    {"name": "mir-fixture-mir5-f200-legacy-cap", "version": "0.5.0", "enabled": true}
+  ],
+  "archive_sha256": {
+    "mir-fixture-mir5-active-mods-observer_0.1.0.zip": "2E1BE5952D2A4CC5C74A0D149E075D247BA110A3FAE5B6768D3EAEBABCEF989C",
+    "more-infinite-research_5.0.21000.zip": "CE1165CAC174EDA4800EBECAAEF29FC2E071B2E7160CD98F799FE21C2F151F9B"
+  },
+  "scope": "Exact ea41cbc6 F210 Base successor for the protected published 4.7.20003 F200 Base positive-cap save on 2.0.77. Compose the existing cross-from-f200 v0.5.0 stage with the retained source save through InputSavePath/ExpectedInputSaveSha256; preserve source two labs, cap 2-to-40 relaxation, 27-percent player work, disabled foreign gear, 42-percent foreign queue, one successor lab and two cold reloads. Input pin only; no native pass."
+}

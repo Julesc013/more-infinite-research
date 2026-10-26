@@ -32,7 +32,7 @@
   ],
   "archive_sha256": {
     "mir-fixture-mir5-active-mods-observer_0.1.0.zip": "2E1BE5952D2A4CC5C74A0D149E075D247BA110A3FAE5B6768D3EAEBABCEF989C",
-    "more-infinite-research_5.0.21000.zip": "1D9E99F6BC23FD109045E0C2D3F6C2ACCBE0D65BE5C10C317E5E36E9EDD9304E"
+    "more-infinite-research_5.0.21000.zip": "CE1165CAC174EDA4800EBECAAEF29FC2E071B2E7160CD98F799FE21C2F151F9B"
   },
-  "scope": "Exact8aec3e68 F210 Base successor on2.1.23 for an immutable save from published4.7.20003 Base on2.0.77. Use cross-from-f200 fixture v0.3.0 and the existing InputSavePath/ExpectedInputSaveSha256 handoff; retain levels/effects/queue42-percent/paused27-percent, one successor gear lab and two cold reloads. Input pin only; no native pass."
+  "scope": "Exactea41cbc6 F210 Base successor on2.1.23 for an immutable save from published4.7.20003 Base on2.0.77. Use cross-from-f200 fixture v0.3.0 and the existing InputSavePath/ExpectedInputSaveSha256 handoff; retain levels/effects/queue42-percent/paused27-percent, one successor gear lab and two cold reloads. Input pin only; no native pass."
 }
