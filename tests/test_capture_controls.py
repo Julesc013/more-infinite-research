@@ -4,6 +4,9 @@ These controls execute the asset-only fixture in isolated Lua 5.2 and parse
 the PowerShell wrappers. They never build a ZIP or launch Factorio.
 """
 import argparse
+import base64
+import gzip
+import hashlib
 import json
 from pathlib import Path
 import subprocess
@@ -290,6 +293,32 @@ try {{
 
 
 class CaptureControlTests(unittest.TestCase):
+    def test_broad_native_receipts_preserve_failures_and_data_only_scope(self):
+        payload = (ROOT / "spec/evidence/broad-ecosystem-f210-b2-native-receipts.json.gz").read_bytes()
+        self.assertEqual(hashlib.sha256(payload).hexdigest().upper(),
+                         "EEABA91C8F39C7348084F987A314999D246C77CDE38AFBE78EAF563AD5124E4A")
+        capsule = json.loads(gzip.decompress(payload))
+        files = {}
+        for row in capsule["files"]:
+            value = base64.b64decode(row["base64"], validate=True)
+            self.assertEqual(len(value), row["bytes"])
+            self.assertEqual(hashlib.sha256(value).hexdigest().upper(), row["sha256"])
+            self.assertNotIn(row["path"], files)
+            files[row["path"]] = json.loads(value)
+        self.assertEqual(len(files), 75)
+        native = [value for name, value in files.items() if name.endswith("/result.json")]
+        self.assertEqual(len(native), 64)
+        self.assertEqual(sum(row["status"] == "completed-data-stage-observation-only" for row in native), 41)
+        self.assertEqual(sum(row["status"] == "failed" for row in native), 23)
+        self.assertTrue(all(row["library_controls_restored"] for row in native))
+        chain = json.loads((ROOT / "spec/evidence/broad-ecosystem-f210-b2-native-chain.json").read_bytes())
+        for key in ("full_mod_parity", "research_qualification", "physical_qualification",
+                    "save_qualification", "client_qualification", "performance_qualification", "release_qualification"):
+            self.assertFalse(chain["claims"][key])
+        comparison = files["root-independent-broad-data-readback-r01.json"]["three_arm_public_technology_comparisons"]
+        self.assertEqual(sum(not row["unresolved_full_row_differences"] for row in comparison), 11)
+        self.assertEqual(len(next(row for row in comparison if row["id"] == "c01")["unresolved_full_row_differences"]), 31)
+
     @classmethod
     def setUpClass(cls):
         cls.lua = LuaRuntime(unpack_returned_tuples=True)

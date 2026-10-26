@@ -1,0 +1,1210 @@
+{
+  "schema": 1,
+  "kind": "MIR5BroadEcosystemF210B2NativeChainV1",
+  "status": "completed-mixed-data-stage-outcomes-not-full-mod-parity",
+  "source_commit": "5c51ed46d1762b4fca7480f05a057482bbbedb0a",
+  "player_tree": "25442a5bd7838f124952507854426e3b8e868475",
+  "engine": {
+    "version": "2.1.23",
+    "sha256": "FE4A1DA30F322A0D0B8AEB3DF7276332222BAAA143E2352569B723E84B2B9060"
+  },
+  "candidate_archive_sha256": "4F5BEE023930666FC0F921136A69B59861741BE44C311E03D46347D42018ECBC",
+  "published_archive_sha256": "B6EB9430056ABD384DB00F94929FE7DAC0A37441ACF4BC277946689682628852",
+  "claims": {
+    "native_execution": true,
+    "data_stage_observation": true,
+    "full_mod_parity": false,
+    "research_qualification": false,
+    "physical_qualification": false,
+    "save_qualification": false,
+    "client_qualification": false,
+    "performance_qualification": false,
+    "release_qualification": false
+  },
+  "schedule": {
+    "planned_profiles": 34,
+    "maximum_native_slots": 102,
+    "actual_native_results": 64,
+    "completed_data_stage_results": 41,
+    "failed_native_results": 23,
+    "upstream_valid_profiles": 15,
+    "upstream_failed_profiles": 19,
+    "upstream_failure_rule": "Skip that profile's two MIR arms only after actual restored native upstream failure; no MIR verdict inferred.",
+    "limits": {
+      "maximum_native_slots": 102,
+      "maximum_cohort_seconds": 7200,
+      "maximum_output_mib": 16384,
+      "actual_native_slots": 64,
+      "r04_elapsed_seconds_carried_into_r05": 173.1167692,
+      "r04_output_bytes_carried_into_r05": 215937638
+    }
+  },
+  "cases": [
+    {
+      "id": "c01",
+      "profile": "tests/profiles/space-exploration-base-f210-2123.json",
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "controls_restored": true,
+          "result_sha256": "A2DE9DBD6274E500B5C9DE76E6AEFEA9154BC473CE761A74999EE1FEDEFF4DDD"
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "controls_restored": true,
+          "result_sha256": "25FAB6AD10C0C5E36733EC24EBB151DC864D5EDA90EE6492B80C49BB203511FB"
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "controls_restored": true,
+          "result_sha256": "B82C58F0F5C0DFCC614AE50F455663D243EBECEED30596695AE16DE531DB6DD8"
+        }
+      ],
+      "disposition": null
+    },
+    {
+      "id": "c02",
+      "profile": "tests/profiles/k2-base-f210-2123.json",
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "controls_restored": true,
+          "result_sha256": "0E8A0796D060960623763DD7962414A38216E58204E33DC2C7F9B205BD62774E"
+        },
+        {
+          "arm": "published",
+          "status": "failed",
+          "controls_restored": true,
+          "result_sha256": "FCDCA483EBD3D603049C649DF243087B524EA52D71435169CE0E7CD5A663BA90",
+          "failure": "[mir441-process-exit] 1",
+          "diagnostic": "1.375 Error Util.cpp:81: Failed to load mod \"more-infinite-research\": __more-infinite-research__/data-final-fixes.lua:2: ...infinite-research__/prototypes/mir/pipeline/commands.lua:255: ...infinite-research__/prototypes/mir/pipeline/commands.lua:74: .../pipeline/compiler_orchestrator/context_construction.lua:82: ...s/mir/capabilities/science_integration/science_packs.lua:35: MIR approved science binding is unresolved: automation-science-pack (unresolved-approved-pack-dependencies:automation-science-pack). No research was removed and the former solver will not be invoked."
+        },
+        {
+          "arm": "candidate",
+          "status": "failed",
+          "controls_restored": true,
+          "result_sha256": "10B64E5AFCE940104534B65C96ADE7F2A58AA7403D65B2D823D36F83276C531F",
+          "failure": "[mir441-process-exit] 1",
+          "diagnostic": "1.154 Error Util.cpp:81: Failed to load mod \"more-infinite-research\": __more-infinite-research__/data-final-fixes.lua:27: MIR gear binding has an unsupported partial K2SO selection"
+        }
+      ],
+      "disposition": "candidate-adverse-next-independent-profile"
+    },
+    {
+      "id": "c03",
+      "profile": "tests/profiles/k2se-base-f210-2123.json",
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "controls_restored": true,
+          "result_sha256": "C273BAE307CCD03C65F291BCF2F8CF51587496E96A769412A102C7CCF3DF1116"
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "controls_restored": true,
+          "result_sha256": "6514C9B2929EE965A8E94EEE224B367262B97BA6B1DDC04F08515A0A25E0B612"
+        },
+        {
+          "arm": "candidate",
+          "status": "failed",
+          "controls_restored": true,
+          "result_sha256": "185D04DA55257A547024D38CC67A643D01E446FF3A2F455C9E696EAA85FD4421",
+          "failure": "[mir441-process-exit] 1",
+          "diagnostic": "1.770 Error Util.cpp:81: Failed to load mod \"more-infinite-research\": __more-infinite-research__/data-final-fixes.lua:27: MIR gear binding has an unsupported partial K2SO selection"
+        }
+      ],
+      "disposition": "candidate-adverse-next-independent-profile"
+    },
+    {
+      "id": "c04",
+      "profile": "tests/profiles/k2se-bz-available-six-base-f210-2123.json",
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "failed",
+          "controls_restored": true,
+          "result_sha256": "2BD7FCDB81623DF33323C7EDAB425ADFE90A8A7FB69EFB8D40392C35584097DA",
+          "failure": "[mir441-process-exit] 1",
+          "diagnostic": "1.540 Error Util.cpp:81: Failed to load mod \"bzsilicon\": __bzsilicon__/recipes/silicon-vulcanite.lua:16: attempt to index global 'recipe' (a nil value)"
+        }
+      ],
+      "disposition": "upstream-non-engine-adverse"
+    },
+    {
+      "id": "c05",
+      "profile": "tests/profiles/py-suite-base-f210-2123.json",
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "failed",
+          "controls_restored": true,
+          "result_sha256": "D3180B40FA906C34C832CAEBBC70EF4AA24A712ECF6ACAECADCD4C7ED8847E68",
+          "failure": "[mir441-process-exit] 1",
+          "diagnostic": "13.745 Error Util.cpp:81: Error while loading item prototype \"wood\" (item): ItemPrototype::fuel_category was removed. Please use ItemPrototype::fuel_categories."
+        }
+      ],
+      "disposition": "upstream-engine-adverse-skip-mir-arms"
+    },
+    {
+      "id": "c06",
+      "profile": "tests/profiles/py-suite-space-age-f210-2123.json",
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "failed",
+          "controls_restored": true,
+          "result_sha256": "880E58CEB4D0E45DA03AF640FAE5C6C9CA509CA0D7470CD1BF45AEB25A059918",
+          "failure": "[mir441-process-exit] 1",
+          "diagnostic": "1.680 Error Util.cpp:81: Failed to load mod \"pypostprocessing\": __pypostprocessing__/data.lua:16:"
+        }
+      ],
+      "disposition": "upstream-engine-adverse-skip-mir-arms"
+    },
+    {
+      "id": "c07",
+      "profile": "tests/profiles/py-suite-with-productivity-base-f210-2123.json",
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "failed",
+          "controls_restored": true,
+          "result_sha256": "BFDCF3619854D99E851F42B37C7E77C146EF09FC768C6ADE723022B51CFF576B",
+          "failure": "[mir441-process-exit] 1",
+          "diagnostic": "11.778 Error Util.cpp:81: Error while loading item prototype \"wood\" (item): ItemPrototype::fuel_category was removed. Please use ItemPrototype::fuel_categories."
+        }
+      ],
+      "disposition": "upstream-engine-adverse-skip-mir-arms"
+    },
+    {
+      "id": "c08",
+      "profile": "tests/profiles/py-suite-with-productivity-space-age-f210-2123.json",
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "failed",
+          "controls_restored": true,
+          "result_sha256": "DE0073E81CE96CB260C6E0BA106A35A9DF65ABCB310AB52492890311AA34BA93",
+          "failure": "[mir441-process-exit] 1",
+          "diagnostic": "1.674 Error Util.cpp:81: Failed to load mod \"pypostprocessing\": __pypostprocessing__/data.lua:16:"
+        }
+      ],
+      "disposition": "upstream-engine-adverse-skip-mir-arms"
+    },
+    {
+      "id": "c09",
+      "profile": "tests/profiles/bob-full-base-f210-2123.json",
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "failed",
+          "controls_restored": true,
+          "result_sha256": "534D5B72A0A20BC36E676047F5DB372591CE1FFEFE76645D9C57037B2A9C02C9",
+          "failure": "[mir441-process-exit] 1",
+          "diagnostic": "1.744 Error Util.cpp:81: Error while loading item prototype \"bob-seedling\" (item): ItemPrototype::fuel_category was removed. Please use ItemPrototype::fuel_categories."
+        }
+      ],
+      "disposition": "upstream-engine-adverse-skip-mir-arms"
+    },
+    {
+      "id": "c10",
+      "profile": "tests/profiles/bob-full-space-age-f210-2123.json",
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "failed",
+          "controls_restored": true,
+          "result_sha256": "B4DEC0740282F58ED271031A69D1952ED8057AD6331CE152C3F2CC218BEC2653",
+          "failure": "[mir441-process-exit] 1",
+          "diagnostic": "2.363 Error Util.cpp:81: Error while loading item prototype \"bob-seedling\" (item): ItemPrototype::fuel_category was removed. Please use ItemPrototype::fuel_categories."
+        }
+      ],
+      "disposition": "upstream-engine-adverse-skip-mir-arms"
+    },
+    {
+      "id": "c11",
+      "profile": "tests/profiles/angel-full-base-f210-2123.json",
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "failed",
+          "controls_restored": true,
+          "result_sha256": "2AF466B559359DCCDD12838AC206151EB2510BDA01B637A077D9913620DE5986",
+          "failure": "[mir441-process-exit] 1",
+          "diagnostic": "1.504 Error Util.cpp:81: Error while loading item prototype \"angels-cellulose-fiber\" (item): ItemPrototype::fuel_category was removed. Please use ItemPrototype::fuel_categories."
+        }
+      ],
+      "disposition": "upstream-engine-adverse-skip-mir-arms"
+    },
+    {
+      "id": "c12",
+      "profile": "tests/profiles/angel-full-space-age-f210-2123.json",
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "failed",
+          "controls_restored": true,
+          "result_sha256": "40DA6431507E06CE78EA62A1D501638E6332076C8EC61C1A85AB1948F1E7C323",
+          "failure": "[mir441-process-exit] 1",
+          "diagnostic": "1.930 Error Util.cpp:81: Error while loading item prototype \"angels-cellulose-fiber\" (item): ItemPrototype::fuel_category was removed. Please use ItemPrototype::fuel_categories."
+        }
+      ],
+      "disposition": "upstream-engine-adverse-skip-mir-arms"
+    },
+    {
+      "id": "c13",
+      "profile": "tests/profiles/bob-angel-full-base-f210-2123.json",
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "failed",
+          "controls_restored": true,
+          "result_sha256": "C063EBF393EFE52B0EA7B3112035E554E3597850A2B5A15571691D70F4F1EF31",
+          "failure": "[mir441-process-exit] 1",
+          "diagnostic": "2.551 Error Util.cpp:81: Error while loading item prototype \"bob-seedling\" (item): ItemPrototype::fuel_category was removed. Please use ItemPrototype::fuel_categories."
+        }
+      ],
+      "disposition": "upstream-engine-adverse-skip-mir-arms"
+    },
+    {
+      "id": "c14",
+      "profile": "tests/profiles/bob-angel-full-space-age-f210-2123.json",
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "failed",
+          "controls_restored": true,
+          "result_sha256": "54729A122E8AAEA552ED5B2D5EE89E96BD846CB65888ADB3F8A29FFD45D1A36C",
+          "failure": "[mir441-process-exit] 1",
+          "diagnostic": "3.404 Error Util.cpp:81: Error while loading item prototype \"bob-seedling\" (item): ItemPrototype::fuel_category was removed. Please use ItemPrototype::fuel_categories."
+        }
+      ],
+      "disposition": "upstream-engine-adverse-skip-mir-arms"
+    },
+    {
+      "id": "c15",
+      "profile": "tests/profiles/ir4-base-f210-2123.json",
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "failed",
+          "controls_restored": true,
+          "result_sha256": "56785F37CD3F2A62FED0C6D4A2AEEC9B4E7EB33984326E451FA608DBC3632C2E",
+          "failure": "[mir441-process-exit] 1",
+          "diagnostic": "52.876 Error Util.cpp:81: Error while loading item prototype \"ir4-steam-cell\" (item): ItemPrototype::fuel_category was removed. Please use ItemPrototype::fuel_categories."
+        }
+      ],
+      "disposition": "upstream-engine-adverse-skip-mir-arms"
+    },
+    {
+      "id": "c16",
+      "profile": "tests/profiles/ir4-space-age-f210-2123.json",
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "failed",
+          "controls_restored": true,
+          "result_sha256": "9D4418FD9524FB01BEA998200DF8850D57AE34D52C68543E463126CB7490E917",
+          "failure": "[mir441-process-exit] 1",
+          "diagnostic": "93.107 Error Util.cpp:81: Error while loading item prototype \"ir4-steam-cell\" (item): ItemPrototype::fuel_category was removed. Please use ItemPrototype::fuel_categories."
+        }
+      ],
+      "disposition": "upstream-engine-adverse-skip-mir-arms"
+    },
+    {
+      "id": "c17",
+      "profile": "tests/profiles/aai-bz-available-six-base-f210-2123.json",
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "controls_restored": true,
+          "result_sha256": "3BAC6EEC7BC79EB3BE05A7AA731F11472BF2FD1840FAC4B454C4C7E02085B831"
+        },
+        {
+          "arm": "published",
+          "status": "failed",
+          "controls_restored": true,
+          "result_sha256": "D23376C83A88E8998F7B7540397248FDB88A75732DE19999484E9E1D7000F97E",
+          "failure": "[mir441-process-exit] 1",
+          "diagnostic": "1.299 Error Util.cpp:81: Failed to load mod \"more-infinite-research\": __more-infinite-research__/data-final-fixes.lua:2: ...infinite-research__/prototypes/mir/pipeline/commands.lua:255: ...infinite-research__/prototypes/mir/pipeline/commands.lua:74: .../pipeline/compiler_orchestrator/context_construction.lua:82: ...s/mir/capabilities/science_integration/science_packs.lua:35: MIR approved science binding is unresolved: chemical-science-pack (rejected-approved-pack-unlock:chemical-science-pack:chemical-science-pack=technology-cycle-mir32-f3fa73f7). No research was removed and the former solver will not be invoked."
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "controls_restored": true,
+          "result_sha256": "B3B7BB92422C3A2E4B2AB79F571F5EA2F04D33791575B70DA95C3D6B34E0DF83"
+        }
+      ],
+      "disposition": "published-adverse-candidate-continued"
+    },
+    {
+      "id": "c18",
+      "profile": "tests/profiles/aai-bz-available-six-space-age-f210-2123.json",
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "failed",
+          "controls_restored": true,
+          "result_sha256": "429C4705145F7F06D39D8F2D13DC31E7C2A5C300ECDE7C38B532BE0ABD2D724D",
+          "failure": "[mir441-process-exit] 1",
+          "diagnostic": "1.641 Error Util.cpp:81: Error while loading item prototype \"razorgrass\" (item): ItemPrototype::fuel_category was removed. Please use ItemPrototype::fuel_categories."
+        }
+      ],
+      "disposition": "upstream-engine-adverse-skip-mir-arms"
+    },
+    {
+      "id": "c19",
+      "profile": "tests/profiles/aai-bob-angel-bz-available-six-base-f210-2123.json",
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "failed",
+          "controls_restored": true,
+          "result_sha256": "BC743ACB11EBCFA226E4E51B03C2F8B21FF35B1206BB5BFB2FD7C009219DB753",
+          "failure": "[mir441-process-exit] 1",
+          "diagnostic": "2.880 Error Util.cpp:81: Error while loading item prototype \"bob-seedling\" (item): ItemPrototype::fuel_category was removed. Please use ItemPrototype::fuel_categories."
+        }
+      ],
+      "disposition": "upstream-engine-adverse-skip-mir-arms"
+    },
+    {
+      "id": "c20",
+      "profile": "tests/profiles/aai-bob-angel-bz-available-six-space-age-f210-2123.json",
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "failed",
+          "controls_restored": true,
+          "result_sha256": "DF4478916392EC51E21C68FB23CEA354324DB31FC530FB89559C82B8A98F644D",
+          "failure": "[mir441-process-exit] 1",
+          "diagnostic": "3.986 Error Util.cpp:81: Error while loading item prototype \"bob-seedling\" (item): ItemPrototype::fuel_category was removed. Please use ItemPrototype::fuel_categories."
+        }
+      ],
+      "disposition": "upstream-engine-adverse-skip-mir-arms"
+    },
+    {
+      "id": "c21",
+      "profile": "tests/profiles/bz-available-six-base-f210-2123.json",
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "controls_restored": true,
+          "result_sha256": "23709936A69562A624F7A0E387EB543A08F9036D3C920381458F11949AA033C0"
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "controls_restored": true,
+          "result_sha256": "FBEE5F593F3EF68C45B0A59D8FE746EC90E455DDB4344FD899A7778AB0941909"
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "controls_restored": true,
+          "result_sha256": "DE7AD3CE7A36669A99C90A250A8CD1B1978AA7BDF9910031266EAA24E2AC048B"
+        }
+      ],
+      "disposition": null
+    },
+    {
+      "id": "c22",
+      "profile": "tests/profiles/bz-available-six-space-age-f210-2123.json",
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "failed",
+          "controls_restored": true,
+          "result_sha256": "6CF0A062BAE518FE1280849E3C5DE09FB718767A9CFAD20BACC6FC2D488C7097",
+          "failure": "[mir441-process-exit] 1",
+          "diagnostic": "1.536 Error Util.cpp:81: Error while loading item prototype \"razorgrass\" (item): ItemPrototype::fuel_category was removed. Please use ItemPrototype::fuel_categories."
+        }
+      ],
+      "disposition": "upstream-engine-adverse-skip-mir-arms"
+    },
+    {
+      "id": "c23",
+      "profile": "tests/profiles/bzcarbon-base-f210-2123.json",
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "controls_restored": true,
+          "result_sha256": "292D50C4C3540790471379A1CF15107558353876E4BB12B640347276BEC447A0"
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "controls_restored": true,
+          "result_sha256": "0538B6140D893729143357A1465AB7FCBE26E3E71C701F655169E5FF7BFC1801"
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "controls_restored": true,
+          "result_sha256": "DDC68EC7C9D511E15CB910475C0856F17494B41232FC7F18E3488FEACDEE4DFC"
+        }
+      ],
+      "disposition": null
+    },
+    {
+      "id": "c24",
+      "profile": "tests/profiles/bzcarbon-space-age-f210-2123.json",
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "controls_restored": true,
+          "result_sha256": "2E3E23B50F195148DCCA1CB93A77DCDB0F466BA5F0590F8441BEEA5072F543FF"
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "controls_restored": true,
+          "result_sha256": "69F30585381F09EB88669A07B879935B1E5CFA0F0F36E66AF75FF608887E4D12"
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "controls_restored": true,
+          "result_sha256": "2248443BDEDE62C263632CDB92C497CC6696FEF92AD7AFB97611AF29E3E369E6"
+        }
+      ],
+      "disposition": null
+    },
+    {
+      "id": "c25",
+      "profile": "tests/profiles/bzlead-base-f210-2123.json",
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "controls_restored": true,
+          "result_sha256": "675AB16EC79687ED6CF55556FAA08BE13F3E8B4E63747F4ECEB29A7222EB83FA"
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "controls_restored": true,
+          "result_sha256": "ACCF08BE9743501D05D96C4CB5C3FEF9B995A97AAB962EB5CC63299B810D8200"
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "controls_restored": true,
+          "result_sha256": "AC49865AE917DF98BE8168F1AD237B9D85AD7FDE927FB884CB56235E2C3CD314"
+        }
+      ],
+      "disposition": null
+    },
+    {
+      "id": "c26",
+      "profile": "tests/profiles/bzlead-space-age-f210-2123.json",
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "controls_restored": true,
+          "result_sha256": "9F8C09CECBFE15242E0FC7C21FBA6A92EB055D046AA356DBD7608A9C6032A612"
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "controls_restored": true,
+          "result_sha256": "39E19D27985E3EC00EC9BB895BBD4A3A981D8AF0B5005CACC39FE0C1CD5695A5"
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "controls_restored": true,
+          "result_sha256": "21F7BC01F65B293FA9D4FBF50DEA15109B51550C5A3916B5B61BCBBBB19252FA"
+        }
+      ],
+      "disposition": null
+    },
+    {
+      "id": "c27",
+      "profile": "tests/profiles/bzsilicon-base-f210-2123.json",
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "controls_restored": true,
+          "result_sha256": "D3B06062DD256542F7B6D873C3F2C113EB280F555EBCADB4466D21D42CFDC946"
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "controls_restored": true,
+          "result_sha256": "AAD43AD548C332F812DC9954B360B2B8C7C6E1F7776621A81BD3FFB2D17179FE"
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "controls_restored": true,
+          "result_sha256": "06612C7ADB58E80C9A65597E07CEDEEE8C593E8DEC04AB3EF6408268CABE6A66"
+        }
+      ],
+      "disposition": null
+    },
+    {
+      "id": "c28",
+      "profile": "tests/profiles/bzsilicon-space-age-f210-2123.json",
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "failed",
+          "controls_restored": true,
+          "result_sha256": "1F396CF41649CA10F9D3B3BFD985D1D9CF38EAA50BCC03118940FA23B4843A3B",
+          "failure": "[mir441-process-exit] 1",
+          "diagnostic": "1.342 Error Util.cpp:81: Error while loading item prototype \"razorgrass\" (item): ItemPrototype::fuel_category was removed. Please use ItemPrototype::fuel_categories."
+        }
+      ],
+      "disposition": "upstream-engine-adverse-skip-mir-arms"
+    },
+    {
+      "id": "c29",
+      "profile": "tests/profiles/bztin-base-f210-2123.json",
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "controls_restored": true,
+          "result_sha256": "F1551E5C5ADAA795EFE70B5AABB95DC59AF3CA9333250DC729BCC35A0A941AA3"
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "controls_restored": true,
+          "result_sha256": "8FBED6FD967B462CBD18965781D6ADE69224D2EAAA17B1EBF0CEEDEA274184B2"
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "controls_restored": true,
+          "result_sha256": "F125B3B7169605FFD3B3CC84D0EA15F724D75C2308AE434CCFC6E2BE508385F3"
+        }
+      ],
+      "disposition": null
+    },
+    {
+      "id": "c30",
+      "profile": "tests/profiles/bztin-space-age-f210-2123.json",
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "failed",
+          "controls_restored": true,
+          "result_sha256": "141D86D55911B182EA0A4656134FBF1C8FC644981337BA73E49F5A90B50351AF",
+          "failure": "[mir441-process-exit] 1",
+          "diagnostic": "1.329 Error Util.cpp:81: Error while loading item prototype \"jellyskin\" (item): ItemPrototype::fuel_category was removed. Please use ItemPrototype::fuel_categories."
+        }
+      ],
+      "disposition": "upstream-engine-adverse-skip-mir-arms"
+    },
+    {
+      "id": "c31",
+      "profile": "tests/profiles/bztitanium-base-f210-2123.json",
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "controls_restored": true,
+          "result_sha256": "0A7EFE913A41B10EAF48B6672D0BC18C89532E9FD01A940B1328E89FFE675A09"
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "controls_restored": true,
+          "result_sha256": "372A05F95392A24B1ACAE68AA31F6A08C5B4A3BFD5AEAE68D329BDD2735D5C94"
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "controls_restored": true,
+          "result_sha256": "FD5A112D1E799B79E1CCF36FD0A3A5FB1A7D988E90C290974D0D9C4DBB4F3C51"
+        }
+      ],
+      "disposition": null
+    },
+    {
+      "id": "c32",
+      "profile": "tests/profiles/bztitanium-space-age-f210-2123.json",
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "controls_restored": true,
+          "result_sha256": "CF9F4A16443F19463ED3913C6C36153D3595AE964EA509C20D9D078694C26109"
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "controls_restored": true,
+          "result_sha256": "447AE0F4DD090971585C1BEE5752FC7773B3E827D73F31FD87E0C59F46EC9AE9"
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "controls_restored": true,
+          "result_sha256": "7576D902F27A33701F1388CF1E2292B32B5CDCE158E17423DB130B4667552685"
+        }
+      ],
+      "disposition": null
+    },
+    {
+      "id": "c33",
+      "profile": "tests/profiles/bzzirconium-base-f210-2123.json",
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "controls_restored": true,
+          "result_sha256": "492DCE6ACAC2D92F329D0B7F67F8589B133FA4EAE5247AA7338CE2E82D78154E"
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "controls_restored": true,
+          "result_sha256": "A6A6EE6C1E9A176C019A4E9ED96CF674430C2FDF0AB6B9C0728AA6371804AE0F"
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "controls_restored": true,
+          "result_sha256": "3EFAC52DE5C88DBAB88F326A9409E373A2EC995C5F8B243FA4C970031524113D"
+        }
+      ],
+      "disposition": null
+    },
+    {
+      "id": "c34",
+      "profile": "tests/profiles/bzzirconium-space-age-f210-2123.json",
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "controls_restored": true,
+          "result_sha256": "E34C540257347C10C9B431EF55457EDF259907B09F6D999403DCC2BEC156C9B2"
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "controls_restored": true,
+          "result_sha256": "2CA5EF56D2DF7CA0E651C13478A82EAE1F1CA87BEC9FA006DA2D8A6DDB323B0F"
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "controls_restored": true,
+          "result_sha256": "E7F39707AA9089DC38A04B0639D0DCCA76CA0593C153C4E703DC5C864A511C94"
+        }
+      ],
+      "disposition": null
+    }
+  ],
+  "independent_public_technology_comparison": {
+    "three_arm_cases": 12,
+    "zero_public_row_difference_cases": [
+      "c21",
+      "c23",
+      "c24",
+      "c25",
+      "c26",
+      "c27",
+      "c29",
+      "c31",
+      "c32",
+      "c33",
+      "c34"
+    ],
+    "unresolved_space_exploration_case": "c01",
+    "unresolved_space_exploration_rows": 31,
+    "details_record": "root-independent-broad-data-readback-r01.json",
+    "private_carriers": "Hidden disabled signed carrier prototypes are separately validated and listed, not represented as effect-free or measured earned state.",
+    "meaning": "An exact technology-row match is data-stage evidence only. It is not actual lab, production, save migration, client or complete mod support."
+  },
+  "custody": {
+    "primary_root": "build/mir5/recovery-historical/broad-ecosystem-f210-r01",
+    "verified_members": 557,
+    "verified_bytes": 928146484,
+    "flat_member_manifest_sha256": "3BB7547EC7A16422936FEE4276A5D6A3231F450629FA33E41EB89FE9C332D664",
+    "root_reverification_record": "root-independent-broad-custody-carriers-r01.json"
+  },
+  "adverse_history": [
+    "Three separate pre-engine controller empty-output counter refusals preserve their original preflight records; they contribute no native result.",
+    "Original r04 stops after c04 because the wrapper threw on engine exit and left process=null; the reader misclassified the already-restored upstream native failure. Retain its original stopped receipt and every native arm.",
+    "The r05 successor binds the same frozen source, plan and inputs, starts at c05 without replaying c01-c04, and carries original cohort time/output/native-slot accounting. Its stricter reader requires owned native error evidence and restored controls.",
+    "Every23 actual native failure remains in the capsule. Newer local source fixes and downloaded mod versions do not relabel these results."
+  ],
+  "portable_receipts": {
+    "path": "spec/evidence/broad-ecosystem-f210-b2-native-receipts.json.gz",
+    "bytes": 300615,
+    "sha256": "EEABA91C8F39C7348084F987A314999D246C77CDE38AFBE78EAF563AD5124E4A",
+    "files": [
+      {
+        "bytes": 5048,
+        "path": "broad-ecosystem-f210-capture-plan-r01.json",
+        "role": "original-frozen-plan",
+        "sha256": "FAB8FDD746EB61FCC6D0C7F531C7490A459EE9B452B397EF5F54480B1911238D"
+      },
+      {
+        "bytes": 10942,
+        "path": "batch-5c51-r01/batch-preflight.json",
+        "role": "retained-preengine-preflight",
+        "sha256": "FE3ECD17CB77E2AE0B852313845259012E0C6C4CBF0A020C098E755DDF17A0DF"
+      },
+      {
+        "bytes": 10942,
+        "path": "batch-5c51-r02/batch-preflight.json",
+        "role": "retained-preengine-preflight",
+        "sha256": "F0A125B532BD45EDDEF378A9E48E9211FB70AE3C0CCD8E5FDF77F079202C8791"
+      },
+      {
+        "bytes": 10942,
+        "path": "batch-5c51-r03/batch-preflight.json",
+        "role": "retained-preengine-preflight",
+        "sha256": "89D450E393E503FA292142E9A14E8ADE6C3614FF8166E0A353AAB4BA9593483F"
+      },
+      {
+        "bytes": 10942,
+        "path": "batch-5c51-r04/batch-preflight.json",
+        "role": "original-batch-receipt",
+        "sha256": "86E8693484409E74EBBA72FD049CC1FF7B142378BC6233D5F8F165CA4C1ED578"
+      },
+      {
+        "bytes": 27489,
+        "path": "batch-5c51-r04/batch-result.json",
+        "role": "original-batch-receipt",
+        "sha256": "C63E9ACC19E1736CF1226CC4DBCDC65A748F4F66CEF5314B39D33CA13AA658AD"
+      },
+      {
+        "bytes": 25491,
+        "path": "batch-5c51-r04/c01-candidate/result.json",
+        "role": "original-native-result",
+        "sha256": "B82C58F0F5C0DFCC614AE50F455663D243EBECEED30596695AE16DE531DB6DD8"
+      },
+      {
+        "bytes": 25493,
+        "path": "batch-5c51-r04/c01-published/result.json",
+        "role": "original-native-result",
+        "sha256": "25FAB6AD10C0C5E36733EC24EBB151DC864D5EDA90EE6492B80C49BB203511FB"
+      },
+      {
+        "bytes": 24334,
+        "path": "batch-5c51-r04/c01-upstream/result.json",
+        "role": "original-native-result",
+        "sha256": "A2DE9DBD6274E500B5C9DE76E6AEFEA9154BC473CE761A74999EE1FEDEFF4DDD"
+      },
+      {
+        "bytes": 10365,
+        "path": "batch-5c51-r04/c02-candidate/result.json",
+        "role": "original-native-result",
+        "sha256": "10B64E5AFCE940104534B65C96ADE7F2A58AA7403D65B2D823D36F83276C531F"
+      },
+      {
+        "bytes": 10366,
+        "path": "batch-5c51-r04/c02-published/result.json",
+        "role": "original-native-result",
+        "sha256": "FCDCA483EBD3D603049C649DF243087B524EA52D71435169CE0E7CD5A663BA90"
+      },
+      {
+        "bytes": 15449,
+        "path": "batch-5c51-r04/c02-upstream/result.json",
+        "role": "original-native-result",
+        "sha256": "0E8A0796D060960623763DD7962414A38216E58204E33DC2C7F9B205BD62774E"
+      },
+      {
+        "bytes": 22527,
+        "path": "batch-5c51-r04/c03-candidate/result.json",
+        "role": "original-native-result",
+        "sha256": "185D04DA55257A547024D38CC67A643D01E446FF3A2F455C9E696EAA85FD4421"
+      },
+      {
+        "bytes": 29327,
+        "path": "batch-5c51-r04/c03-published/result.json",
+        "role": "original-native-result",
+        "sha256": "6514C9B2929EE965A8E94EEE224B367262B97BA6B1DDC04F08515A0A25E0B612"
+      },
+      {
+        "bytes": 28168,
+        "path": "batch-5c51-r04/c03-upstream/result.json",
+        "role": "original-native-result",
+        "sha256": "C273BAE307CCD03C65F291BCF2F8CF51587496E96A769412A102C7CCF3DF1116"
+      },
+      {
+        "bytes": 25671,
+        "path": "batch-5c51-r04/c04-upstream/result.json",
+        "role": "original-native-result",
+        "sha256": "2BD7FCDB81623DF33323C7EDAB425ADFE90A8A7FB69EFB8D40392C35584097DA"
+      },
+      {
+        "bytes": 11408,
+        "path": "batch-5c51-r05/batch-preflight.json",
+        "role": "original-batch-receipt",
+        "sha256": "649EFF876AC771AB71574E71B001B2C90BECB46B6AD7290DB153EE43018F8122"
+      },
+      {
+        "bytes": 151140,
+        "path": "batch-5c51-r05/batch-result.json",
+        "role": "original-batch-receipt",
+        "sha256": "289FFCA732D5A31FA20A2DBEACB3459A1A46A97682F78B15C7A842FF1580B1F7"
+      },
+      {
+        "bytes": 20513,
+        "path": "batch-5c51-r05/c05-upstream/result.json",
+        "role": "original-native-result",
+        "sha256": "D3180B40FA906C34C832CAEBBC70EF4AA24A712ECF6ACAECADCD4C7ED8847E68"
+      },
+      {
+        "bytes": 23460,
+        "path": "batch-5c51-r05/c06-upstream/result.json",
+        "role": "original-native-result",
+        "sha256": "880E58CEB4D0E45DA03AF640FAE5C6C9CA509CA0D7470CD1BF45AEB25A059918"
+      },
+      {
+        "bytes": 21266,
+        "path": "batch-5c51-r05/c07-upstream/result.json",
+        "role": "original-native-result",
+        "sha256": "BFDCF3619854D99E851F42B37C7E77C146EF09FC768C6ADE723022B51CFF576B"
+      },
+      {
+        "bytes": 24213,
+        "path": "batch-5c51-r05/c08-upstream/result.json",
+        "role": "original-native-result",
+        "sha256": "DE0073E81CE96CB260C6E0BA106A35A9DF65ABCB310AB52492890311AA34BA93"
+      },
+      {
+        "bytes": 17706,
+        "path": "batch-5c51-r05/c09-upstream/result.json",
+        "role": "original-native-result",
+        "sha256": "534D5B72A0A20BC36E676047F5DB372591CE1FFEFE76645D9C57037B2A9C02C9"
+      },
+      {
+        "bytes": 20653,
+        "path": "batch-5c51-r05/c10-upstream/result.json",
+        "role": "original-native-result",
+        "sha256": "B4DEC0740282F58ED271031A69D1952ED8057AD6331CE152C3F2CC218BEC2653"
+      },
+      {
+        "bytes": 16463,
+        "path": "batch-5c51-r05/c11-upstream/result.json",
+        "role": "original-native-result",
+        "sha256": "2AF466B559359DCCDD12838AC206151EB2510BDA01B637A077D9913620DE5986"
+      },
+      {
+        "bytes": 19410,
+        "path": "batch-5c51-r05/c12-upstream/result.json",
+        "role": "original-native-result",
+        "sha256": "40DA6431507E06CE78EA62A1D501638E6332076C8EC61C1A85AB1948F1E7C323"
+      },
+      {
+        "bytes": 28611,
+        "path": "batch-5c51-r05/c13-upstream/result.json",
+        "role": "original-native-result",
+        "sha256": "C063EBF393EFE52B0EA7B3112035E554E3597850A2B5A15571691D70F4F1EF31"
+      },
+      {
+        "bytes": 31558,
+        "path": "batch-5c51-r05/c14-upstream/result.json",
+        "role": "original-native-result",
+        "sha256": "54729A122E8AAEA552ED5B2D5EE89E96BD846CB65888ADB3F8A29FFD45D1A36C"
+      },
+      {
+        "bytes": 6322,
+        "path": "batch-5c51-r05/c15-upstream/result.json",
+        "role": "original-native-result",
+        "sha256": "56785F37CD3F2A62FED0C6D4A2AEEC9B4E7EB33984326E451FA608DBC3632C2E"
+      },
+      {
+        "bytes": 9269,
+        "path": "batch-5c51-r05/c16-upstream/result.json",
+        "role": "original-native-result",
+        "sha256": "9D4418FD9524FB01BEA998200DF8850D57AE34D52C68543E463126CB7490E917"
+      },
+      {
+        "bytes": 17913,
+        "path": "batch-5c51-r05/c17-candidate/result.json",
+        "role": "original-native-result",
+        "sha256": "B3B7BB92422C3A2E4B2AB79F571F5EA2F04D33791575B70DA95C3D6B34E0DF83"
+      },
+      {
+        "bytes": 11653,
+        "path": "batch-5c51-r05/c17-published/result.json",
+        "role": "original-native-result",
+        "sha256": "D23376C83A88E8998F7B7540397248FDB88A75732DE19999484E9E1D7000F97E"
+      },
+      {
+        "bytes": 16755,
+        "path": "batch-5c51-r05/c17-upstream/result.json",
+        "role": "original-native-result",
+        "sha256": "3BAC6EEC7BC79EB3BE05A7AA731F11472BF2FD1840FAC4B454C4C7E02085B831"
+      },
+      {
+        "bytes": 13484,
+        "path": "batch-5c51-r05/c18-upstream/result.json",
+        "role": "original-native-result",
+        "sha256": "429C4705145F7F06D39D8F2D13DC31E7C2A5C300ECDE7C38B532BE0ABD2D724D"
+      },
+      {
+        "bytes": 33590,
+        "path": "batch-5c51-r05/c19-upstream/result.json",
+        "role": "original-native-result",
+        "sha256": "BC743ACB11EBCFA226E4E51B03C2F8B21FF35B1206BB5BFB2FD7C009219DB753"
+      },
+      {
+        "bytes": 36537,
+        "path": "batch-5c51-r05/c20-upstream/result.json",
+        "role": "original-native-result",
+        "sha256": "DF4478916392EC51E21C68FB23CEA354324DB31FC530FB89559C82B8A98F644D"
+      },
+      {
+        "bytes": 17158,
+        "path": "batch-5c51-r05/c21-candidate/result.json",
+        "role": "original-native-result",
+        "sha256": "DE7AD3CE7A36669A99C90A250A8CD1B1978AA7BDF9910031266EAA24E2AC048B"
+      },
+      {
+        "bytes": 17163,
+        "path": "batch-5c51-r05/c21-published/result.json",
+        "role": "original-native-result",
+        "sha256": "FBEE5F593F3EF68C45B0A59D8FE746EC90E455DDB4344FD899A7778AB0941909"
+      },
+      {
+        "bytes": 16003,
+        "path": "batch-5c51-r05/c21-upstream/result.json",
+        "role": "original-native-result",
+        "sha256": "23709936A69562A624F7A0E387EB543A08F9036D3C920381458F11949AA033C0"
+      },
+      {
+        "bytes": 12759,
+        "path": "batch-5c51-r05/c22-upstream/result.json",
+        "role": "original-native-result",
+        "sha256": "6CF0A062BAE518FE1280849E3C5DE09FB718767A9CFAD20BACC6FC2D488C7097"
+      },
+      {
+        "bytes": 13496,
+        "path": "batch-5c51-r05/c23-candidate/result.json",
+        "role": "original-native-result",
+        "sha256": "DDC68EC7C9D511E15CB910475C0856F17494B41232FC7F18E3488FEACDEE4DFC"
+      },
+      {
+        "bytes": 13498,
+        "path": "batch-5c51-r05/c23-published/result.json",
+        "role": "original-native-result",
+        "sha256": "0538B6140D893729143357A1465AB7FCBE26E3E71C701F655169E5FF7BFC1801"
+      },
+      {
+        "bytes": 12336,
+        "path": "batch-5c51-r05/c23-upstream/result.json",
+        "role": "original-native-result",
+        "sha256": "292D50C4C3540790471379A1CF15107558353876E4BB12B640347276BEC447A0"
+      },
+      {
+        "bytes": 16543,
+        "path": "batch-5c51-r05/c24-candidate/result.json",
+        "role": "original-native-result",
+        "sha256": "2248443BDEDE62C263632CDB92C497CC6696FEF92AD7AFB97611AF29E3E369E6"
+      },
+      {
+        "bytes": 16547,
+        "path": "batch-5c51-r05/c24-published/result.json",
+        "role": "original-native-result",
+        "sha256": "69F30585381F09EB88669A07B879935B1E5CFA0F0F36E66AF75FF608887E4D12"
+      },
+      {
+        "bytes": 15387,
+        "path": "batch-5c51-r05/c24-upstream/result.json",
+        "role": "original-native-result",
+        "sha256": "2E3E23B50F195148DCCA1CB93A77DCDB0F466BA5F0590F8441BEEA5072F543FF"
+      },
+      {
+        "bytes": 13482,
+        "path": "batch-5c51-r05/c25-candidate/result.json",
+        "role": "original-native-result",
+        "sha256": "AC49865AE917DF98BE8168F1AD237B9D85AD7FDE927FB884CB56235E2C3CD314"
+      },
+      {
+        "bytes": 13484,
+        "path": "batch-5c51-r05/c25-published/result.json",
+        "role": "original-native-result",
+        "sha256": "ACCF08BE9743501D05D96C4CB5C3FEF9B995A97AAB962EB5CC63299B810D8200"
+      },
+      {
+        "bytes": 12323,
+        "path": "batch-5c51-r05/c25-upstream/result.json",
+        "role": "original-native-result",
+        "sha256": "675AB16EC79687ED6CF55556FAA08BE13F3E8B4E63747F4ECEB29A7222EB83FA"
+      },
+      {
+        "bytes": 16531,
+        "path": "batch-5c51-r05/c26-candidate/result.json",
+        "role": "original-native-result",
+        "sha256": "21F7BC01F65B293FA9D4FBF50DEA15109B51550C5A3916B5B61BCBBBB19252FA"
+      },
+      {
+        "bytes": 16531,
+        "path": "batch-5c51-r05/c26-published/result.json",
+        "role": "original-native-result",
+        "sha256": "39E19D27985E3EC00EC9BB895BBD4A3A981D8AF0B5005CACC39FE0C1CD5695A5"
+      },
+      {
+        "bytes": 15372,
+        "path": "batch-5c51-r05/c26-upstream/result.json",
+        "role": "original-native-result",
+        "sha256": "9F8C09CECBFE15242E0FC7C21FBA6A92EB055D046AA356DBD7608A9C6032A612"
+      },
+      {
+        "bytes": 13504,
+        "path": "batch-5c51-r05/c27-candidate/result.json",
+        "role": "original-native-result",
+        "sha256": "06612C7ADB58E80C9A65597E07CEDEEE8C593E8DEC04AB3EF6408268CABE6A66"
+      },
+      {
+        "bytes": 13503,
+        "path": "batch-5c51-r05/c27-published/result.json",
+        "role": "original-native-result",
+        "sha256": "AAD43AD548C332F812DC9954B360B2B8C7C6E1F7776621A81BD3FFB2D17179FE"
+      },
+      {
+        "bytes": 12343,
+        "path": "batch-5c51-r05/c27-upstream/result.json",
+        "role": "original-native-result",
+        "sha256": "D3B06062DD256542F7B6D873C3F2C113EB280F555EBCADB4466D21D42CFDC946"
+      },
+      {
+        "bytes": 9222,
+        "path": "batch-5c51-r05/c28-upstream/result.json",
+        "role": "original-native-result",
+        "sha256": "1F396CF41649CA10F9D3B3BFD985D1D9CF38EAA50BCC03118940FA23B4843A3B"
+      },
+      {
+        "bytes": 13471,
+        "path": "batch-5c51-r05/c29-candidate/result.json",
+        "role": "original-native-result",
+        "sha256": "F125B3B7169605FFD3B3CC84D0EA15F724D75C2308AE434CCFC6E2BE508385F3"
+      },
+      {
+        "bytes": 13477,
+        "path": "batch-5c51-r05/c29-published/result.json",
+        "role": "original-native-result",
+        "sha256": "8FBED6FD967B462CBD18965781D6ADE69224D2EAAA17B1EBF0CEEDEA274184B2"
+      },
+      {
+        "bytes": 12316,
+        "path": "batch-5c51-r05/c29-upstream/result.json",
+        "role": "original-native-result",
+        "sha256": "F1551E5C5ADAA795EFE70B5AABB95DC59AF3CA9333250DC729BCC35A0A941AA3"
+      },
+      {
+        "bytes": 9197,
+        "path": "batch-5c51-r05/c30-upstream/result.json",
+        "role": "original-native-result",
+        "sha256": "141D86D55911B182EA0A4656134FBF1C8FC644981337BA73E49F5A90B50351AF"
+      },
+      {
+        "bytes": 13510,
+        "path": "batch-5c51-r05/c31-candidate/result.json",
+        "role": "original-native-result",
+        "sha256": "FD5A112D1E799B79E1CCF36FD0A3A5FB1A7D988E90C290974D0D9C4DBB4F3C51"
+      },
+      {
+        "bytes": 13512,
+        "path": "batch-5c51-r05/c31-published/result.json",
+        "role": "original-native-result",
+        "sha256": "372A05F95392A24B1ACAE68AA31F6A08C5B4A3BFD5AEAE68D329BDD2735D5C94"
+      },
+      {
+        "bytes": 12352,
+        "path": "batch-5c51-r05/c31-upstream/result.json",
+        "role": "original-native-result",
+        "sha256": "0A7EFE913A41B10EAF48B6672D0BC18C89532E9FD01A940B1328E89FFE675A09"
+      },
+      {
+        "bytes": 16559,
+        "path": "batch-5c51-r05/c32-candidate/result.json",
+        "role": "original-native-result",
+        "sha256": "7576D902F27A33701F1388CF1E2292B32B5CDCE158E17423DB130B4667552685"
+      },
+      {
+        "bytes": 16561,
+        "path": "batch-5c51-r05/c32-published/result.json",
+        "role": "original-native-result",
+        "sha256": "447AE0F4DD090971585C1BEE5752FC7773B3E827D73F31FD87E0C59F46EC9AE9"
+      },
+      {
+        "bytes": 15401,
+        "path": "batch-5c51-r05/c32-upstream/result.json",
+        "role": "original-native-result",
+        "sha256": "CF9F4A16443F19463ED3913C6C36153D3595AE964EA509C20D9D078694C26109"
+      },
+      {
+        "bytes": 13517,
+        "path": "batch-5c51-r05/c33-candidate/result.json",
+        "role": "original-native-result",
+        "sha256": "3EFAC52DE5C88DBAB88F326A9409E373A2EC995C5F8B243FA4C970031524113D"
+      },
+      {
+        "bytes": 13517,
+        "path": "batch-5c51-r05/c33-published/result.json",
+        "role": "original-native-result",
+        "sha256": "A6A6EE6C1E9A176C019A4E9ED96CF674430C2FDF0AB6B9C0728AA6371804AE0F"
+      },
+      {
+        "bytes": 12359,
+        "path": "batch-5c51-r05/c33-upstream/result.json",
+        "role": "original-native-result",
+        "sha256": "492DCE6ACAC2D92F329D0B7F67F8589B133FA4EAE5247AA7338CE2E82D78154E"
+      },
+      {
+        "bytes": 16566,
+        "path": "batch-5c51-r05/c34-candidate/result.json",
+        "role": "original-native-result",
+        "sha256": "E7F39707AA9089DC38A04B0639D0DCCA76CA0593C153C4E703DC5C864A511C94"
+      },
+      {
+        "bytes": 16568,
+        "path": "batch-5c51-r05/c34-published/result.json",
+        "role": "original-native-result",
+        "sha256": "2CA5EF56D2DF7CA0E651C13478A82EAE1F1CA87BEC9FA006DA2D8A6DDB323B0F"
+      },
+      {
+        "bytes": 15405,
+        "path": "batch-5c51-r05/c34-upstream/result.json",
+        "role": "original-native-result",
+        "sha256": "E34C540257347C10C9B431EF55457EDF259907B09F6D999403DCC2BEC156C9B2"
+      },
+      {
+        "bytes": 1718,
+        "path": "broad-ecosystem-f210-custody-readback-r01.json",
+        "role": "derived-readback",
+        "sha256": "991C5DA71DA690F637EEF70E77C405D0C065AFA62951C33743BDE629284757C9"
+      },
+      {
+        "bytes": 220852,
+        "path": "root-independent-broad-data-readback-r01.json",
+        "role": "derived-readback",
+        "sha256": "C1EE47D04A638400BE8AA675C986B51972520CAAFC2029B48BE874C6FFB88A7B"
+      },
+      {
+        "bytes": 114533,
+        "path": "root-independent-broad-custody-carriers-r01.json",
+        "role": "derived-readback",
+        "sha256": "51DDF337889DCBE82B06C4AF363E522E35FB2044A8716553BC6B2648340F61E2"
+      }
+    ]
+  },
+  "limitations": [
+    "This is data-stage/settings/prototype observation only, not research, physical, save, migration, client, performance, or release evidence.",
+    "An upstream engine adverse skips only that case's MIR arms; published and candidate results are never inferred from an upstream failure.",
+    "The original r04 classifier stop and its c01-c04 receipts remain discoverable beside the resumed r05 receipt.",
+    "The75-record capsule contains exact safe JSON; full original prototype/settings dumps, engine logs, stdout/stderr, configs and resource observations remain in primary custody.",
+    "The original r04 controller hash5135B2F0 and final r05 hash8AEC23EF are retained by receipts; earlier wrapper source bytes are not included in this JSON capsule."
+  ]
+}
