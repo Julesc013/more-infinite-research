@@ -207,7 +207,7 @@ class CompetingEprNativeFixtureTests(unittest.TestCase):
             local input=inventory()
             local lab={valid=true,disabled_by_script=false,energy=0}
             setmetatable(lab,{
-              __index=function(entity,key)if key=="active" then return entity.disabled_by_script~=true end end,
+              __index=function(entity,key)if key=="active" then return entity.aggregate_inactive~=true and entity.disabled_by_script~=true end end,
               __newindex=function(entity,key,value)if key=="active" then error("LuaEntity.active is read-only") end;rawset(entity,key,value)end,
             })
             function lab.get_inventory(index)assert(index==1);return input end
@@ -257,6 +257,7 @@ class CompetingEprNativeFixtureTests(unittest.TestCase):
               log=function(value)assert(value:match("^%[MIR5_NATIVE_FIXTURE%] RESULT "));markers=markers+1 end}
             env._G=env;setmetatable(env,{__index=function(_,key)return _G[key]end})
             local chunk,message=loadfile(path,"t",env);assert(chunk,message);local ok,result=pcall(chunk);if not ok then return {ok=false,message=tostring(result)}end
+            if opponent=="aggregate-inactive" then lab.aggregate_inactive=true end
             ok,result=pcall(c.init);if not ok then return {ok=false,message=tostring(result)}end
             local tail=player.technologies["epr_iron-gear-wheel-productivity-5"]
             player.current_research=nil;player.research_queue={};tail.level=6;player.recipes['iron-gear-wheel'].productivity_bonus=.5
@@ -374,6 +375,7 @@ class CompetingEprNativeFixtureTests(unittest.TestCase):
             "probe-researched": "unrelated braking probe was already researched",
             "wrong-tail-bonus": "two native EPR labs EPR tail state differs",
             "unfrozen": "source lab was not frozen before cap configuration",
+            "aggregate-inactive": "real player lab cannot consume native science",
         }
         for opponent, phrase in opponents.items():
             with self.subTest(opponent=opponent):

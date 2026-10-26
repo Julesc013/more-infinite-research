@@ -159,7 +159,7 @@ function dynamic_source_flow(path, provider, target_name, predecessor_name, targ
     return value
   end
   local input=inventory();local lab={valid=true,disabled_by_script=false,energy=0}
-  setmetatable(lab,{__index=function(entity,key)if key=="active"then return entity.disabled_by_script~=true end end,__newindex=function(entity,key,value)if key=="active"then error("LuaEntity.active is read-only")end;rawset(entity,key,value)end})
+  setmetatable(lab,{__index=function(entity,key)if key=="active"then return entity.aggregate_inactive~=true and entity.disabled_by_script~=true end end,__newindex=function(entity,key,value)if key=="active"then error("LuaEntity.active is read-only")end;rawset(entity,key,value)end})
   function lab.get_inventory(index)assert(index==1);return input end
   local function make_force(name,index)
     local force={name=name,index=index,valid=true,technologies={},recipes={[recipe_name]={productivity_bonus=0}},research_progress=0,_queue={}}
@@ -205,6 +205,7 @@ function dynamic_source_flow(path, provider, target_name, predecessor_name, targ
   local diagnostics={};local storage={};local env={script={active_mods=active,on_init=function(f)callbacks.init=f end,on_configuration_changed=function(f)callbacks.changed=f end,on_load=function(f)callbacks.load=f end,on_event=function(e,f)callbacks.events[e]=f end},defines={events={on_tick=1,on_research_finished=2},inventory={lab_input=1}},game=game,storage=storage,settings={startup={["mir-prefer-this-mod-for-competing-techs"]={value=false}}},helpers={table_to_json=function(value)if value.status=="passed"then assert(value.stage=="initial"or value.stage=="reload") else assert(value.provider and value.target and value.levels)end;return "{}"end},log=function(value)if value:match("^%[MIR5_NATIVE_FIXTURE%] RESULT ")then markers=markers+1 elseif value:match("^%[MIR5_DYNAMIC_INITIAL_LEVELS%] ")then diagnostics[#diagnostics+1]=value else error("unexpected fixture log")end end}
   env._G=env;setmetatable(env,{__index=function(_,key)return _G[key]end})
   local chunk,message=loadfile(path,"t",env);assert(chunk,message);local ok,result=pcall(chunk);if not ok then return {ok=false,message=tostring(result)}end
+  if opponent=="aggregate-inactive"then lab.aggregate_inactive=true end
   ok,result=pcall(callbacks.init);if not ok then return {ok=false,message=tostring(result)}end
   local target=player.technologies[target_name]
   local expected_level=target.prototype.level+1
@@ -378,6 +379,7 @@ end
             ("pr", pr, "added-prerequisite", "captured target direct prerequisite count changed"),
             ("ce", ce, "probe-researched", "unrelated probe was researched"),
             ("pr", pr, "wrong-effect", "native target completion/effect differs"),
+            ("ce", ce, "aggregate-inactive", "lab cannot consume native science"),
         )
         for provider, target, opponent, phrase in opponents:
             with self.subTest(provider=provider, opponent=opponent):

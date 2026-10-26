@@ -199,7 +199,7 @@ local function fill(lab, config)
     if input.insert{name=item, count=4} ~= 4 then fail("could not insert native science " .. item) end
   end
   lab.energy = 1000000000
-  if lab.disabled_by_script == true or lab.energy <= 0 then fail("lab cannot consume native science") end
+  if lab.active == false or lab.energy <= 0 then fail("lab cannot consume native science") end
 end
 local function freeze(state)
   state.lab.disabled_by_script, state.lab.energy = true, 0

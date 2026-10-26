@@ -107,7 +107,7 @@ local function power_lab(state)
   local lab = state.lab
   if lab == nil or lab.valid == false then fail("real player lab is absent") end
   lab.energy = LAB_ENERGY
-  if lab.energy <= 0 or lab.disabled_by_script == true then fail("real player lab cannot consume native science") end
+  if lab.energy <= 0 or lab.active == false then fail("real player lab cannot consume native science") end
   return inventory(state)
 end
 local function fill(value)
