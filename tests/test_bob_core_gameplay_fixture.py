@@ -490,11 +490,16 @@ class BobCoreGameplayFixtureTests(unittest.TestCase):
                     local fluids = {}
                     local machine = {
                       valid=true,crafting_progress=0,bonus_progress=0,productivity_bonus=route.inherent_productivity,
-                      fluids_count=route.category == "metallurgy" and 4 or 0,
                       prototype={name=route.machine,crafting_categories={[route.category]=true}},
                     }
                     machine.set_recipe = function(name) machine.selected = {name=name}; return {} end
                     machine.get_recipe = function() return machine.selected end
+                    setmetatable(machine, {__index=function(_, key)
+                      if key == "fluids_count" then
+                        if route.category == "metallurgy" and machine.selected then return 4 end
+                        return 0
+                      end
+                    end})
                     machine.get_inventory = function(index)
                       if index == 1 then return input end
                       if index == 2 then return output end
@@ -508,6 +513,9 @@ class BobCoreGameplayFixtureTests(unittest.TestCase):
                     end
                     machine.get_fluid_count = function(name) return fluids[name] or 0 end
                     machine.get_fluid_capacity = function(index)
+                      if index < 1 or index > machine.fluids_count then
+                        error("fluid capacity requested outside exposed storage")
+                      end
                       return index <= 2 and 1000 or 100
                     end
                     machine.fluids = fluids
@@ -594,6 +602,15 @@ class BobCoreGameplayFixtureTests(unittest.TestCase):
                   assert(pcall(chunk))
                   assert(pcall(callbacks.init))
                   local state = environment.storage.mir5_bob_core_gameplay
+                  local old_foundry = alloy_machine(alloys[#alloys])
+                  local original_guard_ok, original_guard_message = pcall(function()
+                    if type(old_foundry.fluids_count) ~= "number" or old_foundry.fluids_count ~= 4
+                        or type(old_foundry.get_fluid_capacity) ~= "function"
+                        or old_foundry.get_fluid_capacity(1) ~= 1000 or old_foundry.get_fluid_capacity(2) ~= 1000
+                        or old_foundry.get_fluid_capacity(3) ~= 100 or old_foundry.get_fluid_capacity(4) ~= 100 then
+                      error("original pre-selection fluid guard refused")
+                    end
+                  end)
                   local function remaining_inputs(production)
                     for _, ingredient in ipairs(production.route.ingredients) do
                       if production.remaining[ingredient.name] ~= 0 then return true end
@@ -641,6 +658,7 @@ class BobCoreGameplayFixtureTests(unittest.TestCase):
                     first_ok=first_ok,first_message=tostring(first_message),
                     phase=state.phase,alloy_index=state.alloy_index,alloy_count=#alloys,
                     started=started,physical=state.physical,lab_automation=lab_input.get_item_count("automation-science-pack"),
+                    original_guard_ok=original_guard_ok,original_guard_message=tostring(original_guard_message),
                   }
                 ''')
                 if opponent:
@@ -648,6 +666,8 @@ class BobCoreGameplayFixtureTests(unittest.TestCase):
                     self.assertIn(expected, result["first_message"])
                 else:
                     self.assertTrue(result["first_ok"], result["first_message"])
+                    self.assertFalse(result["original_guard_ok"])
+                    self.assertIn("original pre-selection fluid guard refused", result["original_guard_message"])
                     self.assertEqual(("researching", 1, len(ALLOY_ROUTES), 0, INITIAL_PACKS),
                                      (result["phase"], result["alloy_index"], result["alloy_count"],
                                       result["started"], result["lab_automation"]))
@@ -845,6 +865,13 @@ class BobCoreGameplayFixtureTests(unittest.TestCase):
         self.assertNotIn("force.research_queue =", source)
         self.assertNotIn("early.level =", source)
         self.assertNotIn("tail.level =", source)
+        begin_alloy = source.index("local function begin_alloy")
+        before = source.index("local fluid_before = route_has_fluid(route)", begin_alloy)
+        selected = source.index("local selected = machine.get_recipe()", begin_alloy)
+        runtime = source.index("assert_route_fluid_machine(machine, route, phase .. \" \" .. route.recipe, fluid_before)", begin_alloy)
+        self.assertLess(before, selected)
+        self.assertLess(selected, runtime)
+        self.assertIn("count <= 16", source)
 
 
 if __name__ == "__main__":
