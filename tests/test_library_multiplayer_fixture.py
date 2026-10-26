@@ -752,11 +752,29 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
           },$true))
           if($loops.Count-ne1){throw 'client player-data writer loop is absent or ambiguous'}
           $loopText=$loops[0].Extent.Text
+          $nameModes=@($ast.FindAll({param($candidate)
+            $candidate -is [Management.Automation.Language.AssignmentStatementAst] -and
+            $candidate.Left.Extent.Text -ceq '$standaloneClientNames'
+          },$true))
+          if($nameModes.Count-ne1){throw 'client player-data name-mode assignment is absent or ambiguous'}
+          $nameModeText=$nameModes[0].Extent.Text
+          $sessionTokens=$null;$sessionErrors=$null
+          $sessionAst=[Management.Automation.Language.Parser]::ParseFile($env:MIR_TEST_SESSION,[ref]$sessionTokens,[ref]$sessionErrors)
+          if($sessionErrors.Count){throw $sessionErrors[0].Message}
+          $sessionNameChecks=@($sessionAst.FindAll({param($candidate)
+            $candidate -is [Management.Automation.Language.IfStatementAst] -and
+            $candidate.Extent.Text.Contains('standalone identity discovery client labels differ') -and
+            $candidate.Extent.Text.Contains('two client identities must be MIR5English and MIR5Deutsch')
+          },$true))
+          if($sessionNameChecks.Count-ne1){throw 'session client identity assertion is absent or ambiguous'}
+          $sessionNameCheck=$sessionNameChecks[0].Extent.Text
           function Invoke-ClientPlayerDataWriter([bool]$Discovery,[bool]$StandaloneF210,[string]$Label){
             $root=Join-Path $env:MIR_TEST_WORK $Label;$null=New-Item -ItemType Directory -Path $root
             $resources=[pscustomobject]@{root=$root};$engineData='isolated-engine-data'
             $target=[pscustomobject]@{base='2.1.23';build_version=87750;standalone_f210=$StandaloneF210}
-            $StandaloneIdentityDiscovery=$Discovery;$standaloneClientNames=($StandaloneIdentityDiscovery -or $target.standalone_f210 -eq $true);$udpPorts=@(41000,41001,41002);$clientIndex=1;$clients=@()
+            $StandaloneIdentityDiscovery=$Discovery;$standaloneF210=$StandaloneF210
+            Invoke-Expression $nameModeText
+            $udpPorts=@(41000,41001,41002);$clientIndex=1;$clients=@()
             function New-MIRDirectLibraryStartupConfig {
               param([string]$Path,[string]$EngineDataDirectory,[string]$WriteDataDirectory,[switch]$Graphics)
               [IO.File]::WriteAllText($Path,"[path]`nread-data=$EngineDataDirectory`nwrite-data=$WriteDataDirectory`n[general]`nlocale=en`n",[Text.UTF8Encoding]::new($false))
@@ -783,15 +801,28 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
               if($config -notmatch ('(?m)^write-data='+[regex]::Escape([string]$client.write_data)+'$')){throw "config write-data differs: $index"}
             }
           }
+          function Assert-GeneratedSessionIdentity([object]$Route,[bool]$Discovery,[bool]$Expected){
+            function Assert-Session([bool]$Condition,[string]$Message){if(-not $Condition){throw $Message}}
+            $names=[Collections.Generic.List[string]]::new()
+            foreach($client in @($Route.clients)){$null=$names.Add([string]$client.name)}
+            $standaloneIdentityDiscovery=$Discovery
+            $accepted=$true
+            try{Invoke-Expression $sessionNameCheck}catch{$accepted=$false}
+            if($accepted-ne$Expected){throw "actual session identity assertion differs: discovery=$Discovery expected=$Expected"}
+          }
           Assert-Route (Invoke-ClientPlayerDataWriter $true $false 'discovery') @('standalone-en','standalone-de')
-          Assert-Route (Invoke-ClientPlayerDataWriter $false $true 'standalone-normal') @('standalone-en','standalone-de')
+          $normalStandalone=Invoke-ClientPlayerDataWriter $false $true 'standalone-normal'
+          Assert-Route $normalStandalone @('MIR5English','MIR5Deutsch')
           Assert-Route (Invoke-ClientPlayerDataWriter $false $false 'functional') @('MIR5English','MIR5Deutsch')
+          Assert-GeneratedSessionIdentity $normalStandalone $false $true
+          Assert-GeneratedSessionIdentity (Invoke-ClientPlayerDataWriter $true $false 'discovery-session') $true $true
+          Assert-GeneratedSessionIdentity (Invoke-ClientPlayerDataWriter $true $false 'wrong-normal-session') $false $false
         '''
         with tempfile.TemporaryDirectory(prefix="mir5-identity-player-data-") as work:
             result = subprocess.run(
                 ["pwsh", "-NoLogo", "-NoProfile", "-Command", script],
                 capture_output=True, text=True,
-                env=dict(os.environ, MIR_TEST_WRAPPER=str(WRAPPER), MIR_TEST_WORK=work), check=False,
+                env=dict(os.environ, MIR_TEST_WRAPPER=str(WRAPPER), MIR_TEST_SESSION=str(SESSION), MIR_TEST_WORK=work), check=False,
             )
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
 
