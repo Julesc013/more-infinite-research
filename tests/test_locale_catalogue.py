@@ -333,4 +333,3 @@ class LocaleCatalogueTests(unittest.TestCase):
             parse_cfg_text("[technology-name]\nkey=first\nkey=second\n", "synthetic")
 if __name__ == "__main__":
     unittest.main()
-
