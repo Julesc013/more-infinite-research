@@ -138,6 +138,7 @@ class BobPlatesF210PipelineTests(unittest.TestCase):
           settings = {startup = startup}
           assert(loadfile(player_root .. "/data.lua"))()
           assert(loadfile(player_root .. "/data-final-fixes.lua"))()
+          declared = require("research.catalogue").declared()
         ''')
         return lua
 
@@ -204,6 +205,77 @@ class BobPlatesF210PipelineTests(unittest.TestCase):
         self.assertEqual(45, early["unit"]["time"])
         self.assertEqual([0.03], [effect["change"] for effect in tail["effects"]])
         self.assertEqual(default["recipe-prod-research_material_tin-1"], configured["recipe-prod-research_material_tin-1"])
+
+    def test_restored_rows_have_runtime_cap_routes_and_visible_historical_settings(self):
+        prefixes = ("ips-enable-", "ips-cost-base-", "ips-cost-linear-increment-",
+                    "ips-cost-growth-", "ips-max-level-", "ips-research-time-", "ips-effect-per-level-")
+        for case in ("q097", "q098"):
+            with self.subTest(case=case):
+                lua = self.stage(case)
+                # Exercise control parsing, where Library/cap metadata is cached,
+                # with a fresh module rather than a data-stage require result.
+                lua.execute('''
+                  script = {active_mods = mods}
+                  package.loaded["research.catalogue"] = nil
+                  runtime_declared = require("research.catalogue").declared()
+                ''')
+                declared = _plain(lua.globals().runtime_declared)
+                settings_rows = _plain(lua.globals().setting_rows)
+                for name, published in self._expected_rows(case).items():
+                    matches = [row for row in declared if row["id"] == name]
+                    self.assertEqual(1, len(matches), name)
+                    row = matches[0]
+                    family = name.removeprefix("recipe-prod-").rsplit("-", 1)[0]
+                    self.assertEqual(family, row["family"], name)
+                    self.assertEqual("ips-enable-" + family, row["setting"], name)
+                    self.assertEqual("ips-max-level-" + family, row["cap_setting"], name)
+                    self.assertEqual(list(prefix + family for prefix in prefixes), row["settings"], name)
+                    self.assertEqual(published.get("level", 1), row["progression"], name)
+                    for setting in row["settings"]:
+                        self.assertIn(setting, settings_rows, name)
+                        self.assertFalse(settings_rows[setting].get("hidden", False), setting)
+                    if "_material_" in name:
+                        self.assertEqual(3, row["productivity_ceiling"], name)
+                        self.assertEqual([effect["recipe"] for effect in published["effects"]],
+                                         row["productivity_recipes"], name)
+    def test_disabled_material_keeps_the_exact_identity(self):
+        default = self._restored_rows(self.stage("q097"), "q097")
+        disabled = self._restored_rows(self.stage("q097", {
+            "ips-enable-research_material_lead": False,
+        }), "q097")
+        self.assertEqual(set(default), set(disabled))
+        for name in ("recipe-prod-research_material_lead-1", "recipe-prod-research_material_lead-4"):
+            with self.subTest(name=name):
+                self.assertEqual(default[name]["name"], disabled[name]["name"])
+                self.assertEqual(default[name]["prerequisites"], disabled[name]["prerequisites"])
+                self.assertEqual(default[name]["effects"], disabled[name]["effects"])
+                self.assertEqual(default[name]["unit"], disabled[name]["unit"])
+                self.assertFalse(disabled[name]["enabled"])
+        self.assertEqual(default["recipe-prod-research_material_tin-1"], disabled["recipe-prod-research_material_tin-1"])
+
+    def test_runtime_descriptors_name_every_published_identity_and_bounded_lead_routes(self):
+        for case, expected_count in (("q097", 31), ("q098", 16)):
+            with self.subTest(case=case):
+                rows = _plain(self.stage(case).globals().declared)
+                declared = {row["id"]: row for row in rows}
+                expected = self._expected_rows(case)
+                self.assertEqual(len(rows), len(declared))
+                self.assertEqual(expected_count, len(expected))
+                self.assertEqual(set(expected), set(expected) & set(declared))
+
+        declared = {row["id"]: row for row in _plain(self.stage("q097").globals().declared)}
+        for identifier, progression in (
+            ("recipe-prod-research_material_lead-1", 1),
+            ("recipe-prod-research_material_lead-4", 4),
+        ):
+            with self.subTest(identifier=identifier):
+                descriptor = declared[identifier]
+                self.assertEqual("research_material_lead", descriptor["family"])
+                self.assertEqual(progression, descriptor["progression"])
+                self.assertEqual("ips-enable-research_material_lead", descriptor["setting"])
+                self.assertEqual("ips-max-level-research_material_lead", descriptor["cap_setting"])
+                self.assertEqual(3, descriptor["productivity_ceiling"])
+                self.assertEqual(["bob-lead-plate", "bob-lead-plate-2"], descriptor["productivity_recipes"])
 
     def test_inactive_sparse_selection_is_lazy_and_does_not_require_named_bob_plates_routes(self):
         raw = deepcopy(self.context["cases"]["q097"]["raw"])
