@@ -74,8 +74,10 @@ class ScienceTests(unittest.TestCase):
             local initial_red = target == "f017" or target == "f018" or target == "f100" or target == "f110"
             for _, pack in ipairs(base) do
               if pack == "automation-science-pack" and initial_red then
-                -- Installed Base 0.17/0.18/1.0/1.1 has an initially enabled
-                -- shorthand-result red recipe and no red technology.
+                -- Installed Base 0.17/1.0/1.1 and pinned Wube factorio-data
+                -- v0.18.47 dbda8f9d23a8e3c14c1be8e992d79cde70d5a7ad:
+                -- base/prototypes/recipe/demo-recipe.lua define an initially
+                -- enabled shorthand-result red recipe and no red technology.
                 source_recipe(raw, pack, nil)
               else
                 source_recipe(raw, pack, false); source_owner(raw, pack, pack)
