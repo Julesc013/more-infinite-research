@@ -1239,7 +1239,7 @@ local function create_frame(player, view)
   local screen = player.gui and player.gui.screen
   if not valid(screen) then return nil end
   local frame = add(screen, {
-    type = "frame", name = ROOT, direction = "vertical", caption = {"mir-browser.title"},
+    type = "frame", name = ROOT, direction = "vertical",
     tags = {[ROOT_TAG] = true}
   })
   local resolution, scale = player.display_resolution, player.display_scale
@@ -1252,6 +1252,13 @@ local function create_frame(player, view)
   end
   if view.location then frame.location = view.location
   elseif type(frame.force_auto_center) == "function" then frame.force_auto_center() end
+
+  local title = add(frame, {type = "flow", name = PREFIX .. "title", direction = "horizontal"})
+  add(title, {type = "label", name = PREFIX .. "title_label", caption = {"mir-browser.title"}, style = "frame_title"})
+  local drag = add(title, {type = "empty-widget", name = PREFIX .. "drag", style = "draggable_space_header"})
+  drag.style.horizontally_stretchable = true
+  drag.style.height = 24
+  drag.drag_target = frame
 
   local pairs_per_row = width >= 800 and 2 or 1
   local filters = add(frame, {type = "table", name = PREFIX .. "filters", column_count = 2 * pairs_per_row})
@@ -1428,7 +1435,11 @@ function M.open(player, options)
     view.page = 1
   end
   if reset_page then view.scroll = 1 end
-  return render(player, view)
+  local frame = render(player, view)
+  -- Factorio routes Esc/E to this target. Only an explicit open may claim
+  -- focus; translation/native refreshes must not displace another GUI.
+  if valid(frame) and player.opened ~= frame then player.opened = frame end
+  return frame
 end
 
 function M.close(player)
