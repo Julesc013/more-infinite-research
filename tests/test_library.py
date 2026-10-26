@@ -911,7 +911,27 @@ class LibraryTests(unittest.TestCase):
           root.destroy()
           library.on_string_translated({player_index = 1, id = current,
             translated = true, result = "rootless label"})
+          local view = storage.mir_library.players[1]
+          local open, pending = library.native_subscription_needs()
           assert(player.gui.screen["mir_research_browser"] == nil and library.subscription_needs() == false)
+          assert(view.open == false and view.refresh_pending == false and not open and not pending,
+            "late rootless callback retained a native Library subscription")
+        ''')
+
+    def test_vanished_root_locale_and_force_invalidations_retire_native_view_flags(self):
+        self.lua.execute('''
+          boot()
+          library.open(player)
+          local root = player.gui.screen["mir_research_browser"]
+          root.destroy()
+          library.on_player_locale_changed({player_index = 1})
+          library.on_player_changed_force({player_index = 1})
+          local view = storage.mir_library.players[1]
+          local open, pending = library.native_subscription_needs()
+          assert(view.open == false and view.refresh_pending == false and not open and not pending,
+            "rootless locale or force invalidation retained a native Library subscription")
+          assert(#player.translation_requests == 1 and library.subscription_needs(),
+            "invalidating a vanished root released its durable native request")
         ''')
 
     def test_malformed_translation_sidecar_and_active_window_are_preserved_without_new_requests(self):
@@ -1196,6 +1216,46 @@ class LibraryTests(unittest.TestCase):
           library.on_translation_maintenance({tick = 1800})
           assert(#player.translation_requests == 1 and library.subscription_needs())
         ''')
+
+    def test_retired_translation_callbacks_resume_an_open_reused_player_without_publishing_old_labels(self):
+        self.lua.execute('''
+          boot()
+          library.open(player, {family = "all"})
+          local old_gear, old_foreign = player.translation_requests[1].id, player.translation_requests[2].id
+          library.on_player_removed({player_index = 1})
+          assert(storage.mir_library.players[1] == nil and library.subscription_needs())
+
+          screen = gui_container(nil)
+          player = {
+            valid = true, index = 1, locale = "en", connected = true, gui = {screen = screen},
+            force = {index = 1, technologies = {[gear.name] = gear, [foreign.name] = foreign},
+              research_queue = {}, current_research = nil},
+            translation_requests = {}, next_translation_id = 100
+          }
+          player.set_shortcut_toggled = function() end
+          player.request_translation = function(localised)
+            player.next_translation_id = player.next_translation_id + 1
+            local request = {id = player.next_translation_id, localised = localised}
+            player.translation_requests[#player.translation_requests + 1] = request
+            return request.id
+          end
+          library.open(player)
+          local root = player.gui.screen["mir_research_browser"]
+          assert(#player.translation_requests == 0 and root ~= nil,
+            "reused index issued while retired native IDs remained")
+
+          library.on_string_translated({player_index = 1, id = old_gear,
+            translated = true, result = "old player gear"})
+          assert(#player.translation_requests == 0
+            and research_content(root)["mir_library_results"].items[1] == "Iron gear wheel productivity")
+          library.on_string_translated({player_index = 1, id = old_foreign,
+            translated = true, result = "old player foreign"})
+          assert(#player.translation_requests == 1 and player.translation_requests[1].id == 101,
+            "last retired callback did not resume the already open replacement player")
+          assert(research_content(root)["mir_library_results"].items[1] == "Iron gear wheel productivity",
+            "retired callback published into the replacement player's view")
+        ''')
+
     def test_status_filter_persists_read_only_queue_context_and_cap_explanation(self):
         self.lua.execute('''
           boot()

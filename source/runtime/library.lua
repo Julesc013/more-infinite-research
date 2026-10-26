@@ -1677,11 +1677,31 @@ local function update_durable_entry(bucket, group, index, entry, pending)
   end
 end
 
+local function clear_unrooted_view(index)
+  local state = existing_state()
+  local view = state and state.players[index]
+  if type(view) == "table" then view.open, view.refresh_pending = false, false end
+end
+
+local function resume_open_retired_view(index)
+  local state = existing_state()
+  local view = state and state.players[index]
+  local player = player_for(index)
+  if type(view) == "table" and view.open == true and valid(player)
+      and player.connected == true and valid(owned_root(player)) then
+    render(player, view, nil, true)
+  end
+end
+
 local function invalidate_open_translation(index)
   local record = translation_caches[index]
   if record then discard_translation_cache(index) end
   local player = player_for(index)
-  if player and valid(owned_root(player)) then render(player, view_for(index), nil, true) end
+  if valid(player) and player.connected == true and valid(owned_root(player)) then
+    render(player, view_for(index), nil, true)
+  else
+    clear_unrooted_view(index)
+  end
 end
 
 function M.on_string_translated(event)
@@ -1693,6 +1713,7 @@ function M.on_string_translated(event)
     -- The frame can disappear without our close callback. Retain only the
     -- durable issued window; callbacks then release it without a hidden view.
     discard_translation_cache(index)
+    clear_unrooted_view(index)
     record = nil
   end
   if record then
@@ -1730,7 +1751,10 @@ function M.on_string_translated(event)
     local entry = ledger[group][index]
     if entry then
       local released, pending = release_durable_request(entry, event.id)
-      if released then update_durable_entry(ledger, group, index, entry, pending) end
+      if released then
+        update_durable_entry(ledger, group, index, entry, pending)
+        if group == "retired" and ledger.retired[index] == nil then resume_open_retired_view(index) end
+      end
       return
     end
   end
@@ -1871,6 +1895,7 @@ function M.on_translation_maintenance(event)
     elseif record and record.ledger == ledger then
       -- A closed, disconnected, or externally destroyed root retains no local
       -- labels/catalogue. Its persisted issued window is expiry-only.
+      clear_unrooted_view(index)
       discard_translation_cache(index)
       local durable = ledger.active[index]
       if durable then
@@ -1890,12 +1915,7 @@ function M.on_translation_maintenance(event)
     -- issued ID. Once the retained window has drained, an already open owned
     -- view may resume normally; a closed or disconnected player remains
     -- expiry-only and receives no hidden render or dispatch.
-    if ledger.retired[index] == nil and translation_caches[index] == nil then
-      local player = player_for(index)
-      if player and player.connected == true and valid(owned_root(player)) then
-        render(player, view_for(index), nil, true)
-      end
-    end
+    if ledger.retired[index] == nil and translation_caches[index] == nil then resume_open_retired_view(index) end
   end
 end
 
