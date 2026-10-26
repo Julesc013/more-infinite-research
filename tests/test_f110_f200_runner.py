@@ -9,6 +9,7 @@ import hashlib
 import json
 import os
 from pathlib import Path
+import shutil
 import subprocess
 import tempfile
 import unittest
@@ -31,16 +32,35 @@ def _run_powershell(script: str, env: dict[str, str]) -> subprocess.CompletedPro
 
 class F110F200RunnerControls(unittest.TestCase):
     def _fixture_source(self, root: Path) -> Path:
-        source = root / "tests" / "fixtures" / "f110-f200-transition" / "f110" / "published-4.7.3"
-        source.mkdir(parents=True)
-        (source / "info.json").write_text(json.dumps({
+        canonical = root / "tests" / "fixtures" / "f110-f200-transition" / "f110" / "published-4.7.3"
+        shared = root / "tests" / "fixtures" / "f110-f200-transition" / "shared"
+        canonical.mkdir(parents=True)
+        shared.mkdir(parents=True)
+        (canonical / "info.json").write_text(json.dumps({
             "name": FIXTURE,
             "version": "0.1.0",
             "factorio_version": "1.1",
             "dependencies": ["base >= 1.1.110", "more-infinite-research = 4.7.11003"],
         }), encoding="utf-8")
-        (source / "control.lua").write_text("-- owned source bytes\n", encoding="utf-8")
+        for name in ("catalogue.lua", "control.lua", "data-final-fixes.lua", "settings-updates.lua"):
+            (canonical / name).write_text(f"-- canonical {name}\n", encoding="utf-8")
+        (shared / "control.lua").write_text("-- shared control bytes\n", encoding="utf-8")
+        (shared / "data-final-fixes.lua").write_text("-- shared data bytes\n", encoding="utf-8")
+        source = root / "build" / "f110-composed"
+        source.mkdir(parents=True)
+        for name in ("catalogue.lua", "control.lua", "data-final-fixes.lua", "info.json", "settings-updates.lua"):
+            shutil.copyfile(canonical / name, source / name)
+        shutil.copyfile(shared / "control.lua", source / "fixture_control.lua")
+        shutil.copyfile(shared / "data-final-fixes.lua", source / "fixture_data_final.lua")
         return source
+
+    def _compose_actual_fixture_source(self, source: Path) -> None:
+        canonical = ROOT / "tests" / "fixtures" / "f110-f200-transition" / "f110" / "published-4.7.3"
+        shared = ROOT / "tests" / "fixtures" / "f110-f200-transition" / "shared"
+        for name in ("catalogue.lua", "control.lua", "data-final-fixes.lua", "info.json", "settings-updates.lua"):
+            shutil.copyfile(canonical / name, source / name)
+        shutil.copyfile(shared / "control.lua", source / "fixture_control.lua")
+        shutil.copyfile(shared / "data-final-fixes.lua", source / "fixture_data_final.lua")
 
     def test_ast_extracted_preflight_accepts_only_the_fixed_source_closure(self):
         with tempfile.TemporaryDirectory(prefix="mir5-f110-cross-runner-") as work:
@@ -73,7 +93,7 @@ class F110F200RunnerControls(unittest.TestCase):
               $tokens=$null;$errors=$null
               $ast=[Management.Automation.Language.Parser]::ParseFile($env:MIR_TEST_RUNNER,[ref]$tokens,[ref]$errors)
               if($errors.Count){throw 'runner parse failed'}
-              foreach($name in @('Assert-Fixture','Get-FixtureSha','Get-F110PublishedCrossSourceFixture')){
+              foreach($name in @('Assert-Fixture','Get-FixtureSha','Test-F110PublishedCrossSourceRelativePath','Get-F110PublishedCrossSourceFixture')){
                 $node=@($ast.FindAll({param($n) $n -is [Management.Automation.Language.FunctionDefinitionAst] -and $n.Name -ceq $name},$true))
                 if($node.Count -ne 1){throw "helper missing: $name"}
                 Invoke-Expression $node[0].Extent.Text
@@ -88,6 +108,10 @@ class F110F200RunnerControls(unittest.TestCase):
               }
               $result=Get-F110PublishedCrossSourceFixture @base
               if($result.name -cne 'mir-fixture-mir5-f110-f200-transition' -or $result.version -cne '0.1.0'){throw 'good source refused'}
+              foreach($rooted in @('D:\outside-f110-composed','\mocked-rooted')){
+                if(Test-F110PublishedCrossSourceRelativePath $rooted){throw ('rooted relative path accepted: '+$rooted)}
+              }
+              if(-not(Test-F110PublishedCrossSourceRelativePath ('build'+[IO.Path]::DirectorySeparatorChar+'f110-composed'))){throw 'relative composed path refused'}
               $opponents=@(
                 @{name='case';patch=@{Case='historical-native'};message='case differs'},
                 @{name='active';patch=@{Active=$true};message='fresh installed-MIR source run'},
@@ -103,13 +127,41 @@ class F110F200RunnerControls(unittest.TestCase):
                 try{Get-F110PublishedCrossSourceFixture @args|Out-Null}catch{$refused=$_.Exception.Message.Contains($opponent.message)}
                 if(-not $refused){throw ('opponent accepted: '+$opponent.name)}
               }
+              function Expect-ComposedSourceRefusal([string]$Name,[string]$Message,[hashtable]$Arguments=$base){
+                $refused=$false
+                try{Get-F110PublishedCrossSourceFixture @Arguments|Out-Null}catch{$refused=$_.Exception.Message.Contains($Message)}
+                if(-not $refused){throw ('composed source opponent accepted: '+$Name)}
+              }
+              $canonical=Join-Path $env:MIR_TEST_REPO 'tests/fixtures/f110-f200-transition/f110/published-4.7.3'
+              $shared=Join-Path $env:MIR_TEST_REPO 'tests/fixtures/f110-f200-transition/shared'
+              $alias=Join-Path $env:MIR_TEST_SOURCE 'fixture_control.lua'
+              Remove-Item -LiteralPath $alias
+              Expect-ComposedSourceRefusal 'missing-alias' 'stage members differ'
+              Copy-Item -LiteralPath (Join-Path $shared 'control.lua') -Destination $alias -Force
+              [IO.File]::AppendAllText($alias,'changed')
+              Expect-ComposedSourceRefusal 'changed-alias' 'stage member differs: fixture_control.lua'
+              Copy-Item -LiteralPath (Join-Path $shared 'control.lua') -Destination $alias -Force
+              $wrapper=Join-Path $env:MIR_TEST_SOURCE 'control.lua'
+              [IO.File]::AppendAllText($wrapper,'changed')
+              Expect-ComposedSourceRefusal 'wrong-wrapper' 'stage member differs: control.lua'
+              Copy-Item -LiteralPath (Join-Path $canonical 'control.lua') -Destination $wrapper -Force
+              $extra=Join-Path $env:MIR_TEST_SOURCE 'unexpected.lua'
+              [IO.File]::WriteAllText($extra,'extra')
+              Expect-ComposedSourceRefusal 'extra-member' 'stage members differ'
+              Remove-Item -LiteralPath $extra
+              $outside=Join-Path (Split-Path -Parent $env:MIR_TEST_REPO) 'outside-f110-composed'
+              Copy-Item -LiteralPath $env:MIR_TEST_SOURCE -Destination $outside -Recurse
+              $outsideArgs=@{};foreach($key in $base.Keys){$outsideArgs[$key]=$base[$key]};$outsideArgs.Sources=@($outside)
+              Expect-ComposedSourceRefusal 'outside-checkout' 'must remain inside executing checkout' $outsideArgs
+              Remove-Item -LiteralPath $outside -Recurse -Force
               $profile.mods[1].version='4.7.11002'
               $refused=$false;try{Get-F110PublishedCrossSourceFixture @base|Out-Null}catch{$refused=$_.Exception.Message.Contains('profile differs')}
               if(-not $refused){throw 'wrong three-mod profile accepted'}
               $profile.mods[1].version='4.7.11003'
               $infoPath=Join-Path $env:MIR_TEST_SOURCE 'info.json'
               $info=Get-Content -LiteralPath $infoPath -Raw|ConvertFrom-Json -AsHashtable
-              $info.dependencies=@('base >= 1.1.110');$info|ConvertTo-Json -Depth 8|Set-Content -LiteralPath $infoPath
+              $info.dependencies=@('base >= 1.1.110')
+              foreach($path in @($infoPath,(Join-Path $canonical 'info.json'))){$info|ConvertTo-Json -Depth 8|Set-Content -LiteralPath $path}
               $refused=$false;try{Get-F110PublishedCrossSourceFixture @base|Out-Null}catch{$refused=$_.Exception.Message.Contains('fixture dependencies differ')}
               if(-not $refused){throw 'wrong fixture dependencies accepted'}
             '''
@@ -121,8 +173,15 @@ class F110F200RunnerControls(unittest.TestCase):
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
 
     def test_ast_extracted_preflight_accepts_the_actual_fixture_profile_composition(self):
-        """The real staged metadata, rather than only a hand-written double, binds this route."""
-        with tempfile.TemporaryDirectory(prefix="mir5-f110-cross-actual-composition-") as work:
+        """The caller-composed seven-file stage is bound to real tracked bytes."""
+        with tempfile.TemporaryDirectory(prefix=".mir5-f110-composed-", dir=ROOT) as composed_work, \
+                tempfile.TemporaryDirectory(prefix="mir5-f110-cross-actual-composition-") as work:
+            source = Path(composed_work)
+            self._compose_actual_fixture_source(source)
+            archive = Path(work) / f"{FIXTURE}_0.1.0.zip"
+            with zipfile.ZipFile(archive, "w") as output:
+                for member in sorted(source.iterdir()):
+                    output.writestr(f"{FIXTURE}_0.1.0/{member.name}", member.read_bytes())
             engine_data = Path(work) / "engine" / "data"
             (engine_data / "base").mkdir(parents=True)
             (engine_data / "base" / "info.json").write_text(json.dumps({"version": "1.1.110"}), encoding="utf-8")
@@ -133,22 +192,27 @@ class F110F200RunnerControls(unittest.TestCase):
               $tokens=$null;$errors=$null
               $ast=[Management.Automation.Language.Parser]::ParseFile($env:MIR_TEST_RUNNER,[ref]$tokens,[ref]$errors)
               if($errors.Count){throw 'runner parse failed'}
-              foreach($name in @('Assert-Fixture','Get-FixtureSha','Get-F110PublishedCrossSourceFixture')){
+              foreach($name in @('Assert-Fixture','Get-FixtureSha','Test-F110PublishedCrossSourceRelativePath','Get-F110PublishedCrossSourceFixture')){
                 $node=@($ast.FindAll({param($n) $n -is [Management.Automation.Language.FunctionDefinitionAst] -and $n.Name -ceq $name},$true))
                 if($node.Count -ne 1){throw "helper missing: $name"}
                 Invoke-Expression $node[0].Extent.Text
               }
-              # A synthetic executable cannot have the pinned F110 digest. The
-              # helper's real file read is isolated here; profile and fixture
-              # metadata still come directly from this checkout.
-              function Get-FixtureSha([string]$Path){return $env:MIR_TEST_ENGINE_SHA}
+              # A synthetic executable cannot have the pinned F110 digest.
+              # All composed fixture members still hash through the real helper.
+              function Get-FixtureSha([string]$Path){
+                if([IO.Path]::GetFullPath($Path) -ceq [IO.Path]::GetFullPath($env:MIR_TEST_ENGINE)){return $env:MIR_TEST_ENGINE_SHA}
+                return (Get-FileHash -LiteralPath $Path -Algorithm SHA256).Hash.ToUpperInvariant()
+              }
               $profile=Get-Content -LiteralPath $env:MIR_TEST_PROFILE -Raw|ConvertFrom-Json -AsHashtable
               $result=Get-F110PublishedCrossSourceFixture -Repo $env:MIR_TEST_REPO -ProfileDefinition $profile -ProfileRows @($profile.mods) -Sources @($env:MIR_TEST_SOURCE) -EngineData $env:MIR_TEST_ENGINE_DATA -Engine $env:MIR_TEST_ENGINE -ExpectedMIRSha256 $env:MIR_TEST_MIR_SHA -Case 'f110-f200-transition' -Historical:$false -HistoricalTransition:$false -Create:$false -Absent:$false -Active:$false -ActiveKind '' -InputSave '' -InputSaveSha256 '' -Observer '' -Markers @() -HistoricalTarget '' -HistoricalMetadata '' -TransitionStage '' -TransitionMetadata '' -ExpectedEngineSha256 $env:MIR_TEST_ENGINE_SHA
               if($result.source -cne (Resolve-Path -LiteralPath $env:MIR_TEST_SOURCE).Path){throw 'actual source refused'}
+              . (Join-Path $env:MIR_TEST_REPO 'tools/lib/validation/ImmutableInputStaging.ps1')
+              . (Join-Path $env:MIR_TEST_REPO 'tools/lib/compatibility/LibraryActivation.ps1')
+              Assert-MIRLibraryFixtureArchive -Archive $env:MIR_TEST_ARCHIVE -SourceDirectory $env:MIR_TEST_SOURCE
             '''
             env = dict(os.environ, MIR_TEST_RUNNER=str(RUNNER), MIR_TEST_REPO=str(ROOT),
                        MIR_TEST_PROFILE=str(ROOT / "tests/profiles/f110-f200-transition-published-f110-11110.json"),
-                       MIR_TEST_SOURCE=str(ROOT / "tests/fixtures/f110-f200-transition/f110/published-4.7.3"),
+                       MIR_TEST_SOURCE=str(source), MIR_TEST_ARCHIVE=str(archive),
                        MIR_TEST_ENGINE_DATA=str(engine_data), MIR_TEST_ENGINE=str(engine),
                        MIR_TEST_ENGINE_SHA=ENGINE_SHA, MIR_TEST_MIR_SHA=MIR_SHA)
             result = _run_powershell(script, env)
