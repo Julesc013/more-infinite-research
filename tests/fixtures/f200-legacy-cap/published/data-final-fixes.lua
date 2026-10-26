@@ -14,8 +14,10 @@ local function names(actual, expected, label)
   end
 end
 
-assert(mods.base == "2.0.77" and mods["more-infinite-research"] == "4.7.20002"
-  and mods["space-age"] == nil, "unexpected F200 published fixture closure")
+local fixture = mods["mir-fixture-mir5-f200-legacy-cap"]
+local published = (mods.base == "2.0.77" and mods["more-infinite-research"] == "4.7.20002" and fixture == "0.1.0")
+  or (mods.base == "2.0.77" and mods["more-infinite-research"] == "4.7.20003" and fixture == "0.4.0")
+assert(published and mods["space-age"] == nil, "unexpected F200 published fixture closure")
 local technology = assert(data.raw.technology[NAME], "published gear technology is absent")
 assert(technology.type == "technology" and technology.name == NAME and technology.level == 1
   and technology.upgrade == true and technology.max_level == "infinite"
