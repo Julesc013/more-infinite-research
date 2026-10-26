@@ -845,10 +845,7 @@ return {
       icon = "__base__/graphics/icons/electric-mining-drill.png",
       icon_size = 64,
       overlay = "__core__/graphics/icons/technology/constants/constant-recipe-productivity.png",
-      localised_name = {
-        "technology-name.more-infinite-research.research_mining_drill",
-        {"item-name.electric-mining-drill"},
-      },
+      localised_name = {"technology-name.more-infinite-research.research_mining_drill"},
       localised_description = {"technology-description.more-infinite-research.recipe_productivity"},
       order = "p[research_mining_drill]",
       tuning = {
@@ -1278,10 +1275,7 @@ return {
       icon = "__base__/graphics/technology/gate.png",
       icon_size = 256,
       overlay = "__core__/graphics/icons/technology/constants/constant-recipe-productivity.png",
-      localised_name = {
-        "technology-name.more-infinite-research.research_walls",
-        {"item-name.stone-wall"},
-      },
+      localised_name = {"technology-name.more-infinite-research.research_walls"},
       localised_description = {"technology-description.more-infinite-research.recipe_productivity"},
       order = "p[research_walls]",
       tuning = {
