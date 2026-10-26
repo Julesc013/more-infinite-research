@@ -171,7 +171,7 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
               if opponent=="foreign-force-gui" then en.gui.screen[ROOT_NAME]={valid=true,type="frame",visible=true} end
               return foreign
             end
-            game.create_profiler=function(stopped)
+            local function create_profiler(stopped)
               next_profiler=next_profiler+1
               local result={valid=true,stopped=stopped,ordinal=next_profiler}
               result.restart=function() result.running=true end
@@ -190,6 +190,9 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
               assert(last_screenshot_tick~=nil and game.tick-last_screenshot_tick>=60,"save overlapped pending GUI captures")
               saves[#saves+1]=name
             end
+            setmetatable(game,{__index=function(_,name)
+              if name=="create_profiler" then error("removed game.create_profiler API was accessed") end
+            end})
             local function native_style()
               local values={}
               return setmetatable({}, {
@@ -353,7 +356,7 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
                 if value.science_counts then lab_diagnostics[#lab_diagnostics+1]=value
                 else markers[#markers+1]=value end
                 return "{}"
-              end},
+              end,create_profiler=create_profiler},
               log=function(value)
                 if type(value)=="table" then
                   assert(value[1]=="" and value[2]=="[MIR5_LIBRARY_PROFILE] " and value[4]==" ")
@@ -752,11 +755,29 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
           },$true))
           if($loops.Count-ne1){throw 'client player-data writer loop is absent or ambiguous'}
           $loopText=$loops[0].Extent.Text
+          $nameModes=@($ast.FindAll({param($candidate)
+            $candidate -is [Management.Automation.Language.AssignmentStatementAst] -and
+            $candidate.Left.Extent.Text -ceq '$standaloneClientNames'
+          },$true))
+          if($nameModes.Count-ne1){throw 'client player-data name-mode assignment is absent or ambiguous'}
+          $nameModeText=$nameModes[0].Extent.Text
+          $sessionTokens=$null;$sessionErrors=$null
+          $sessionAst=[Management.Automation.Language.Parser]::ParseFile($env:MIR_TEST_SESSION,[ref]$sessionTokens,[ref]$sessionErrors)
+          if($sessionErrors.Count){throw $sessionErrors[0].Message}
+          $sessionNameChecks=@($sessionAst.FindAll({param($candidate)
+            $candidate -is [Management.Automation.Language.IfStatementAst] -and
+            $candidate.Extent.Text.Contains('standalone identity discovery client labels differ') -and
+            $candidate.Extent.Text.Contains('two client identities must be MIR5English and MIR5Deutsch')
+          },$true))
+          if($sessionNameChecks.Count-ne1){throw 'session client identity assertion is absent or ambiguous'}
+          $sessionNameCheck=$sessionNameChecks[0].Extent.Text
           function Invoke-ClientPlayerDataWriter([bool]$Discovery,[bool]$StandaloneF210,[string]$Label){
             $root=Join-Path $env:MIR_TEST_WORK $Label;$null=New-Item -ItemType Directory -Path $root
             $resources=[pscustomobject]@{root=$root};$engineData='isolated-engine-data'
             $target=[pscustomobject]@{base='2.1.23';build_version=87750;standalone_f210=$StandaloneF210}
-            $StandaloneIdentityDiscovery=$Discovery;$standaloneClientNames=($StandaloneIdentityDiscovery -or $target.standalone_f210 -eq $true);$udpPorts=@(41000,41001,41002);$clientIndex=1;$clients=@()
+            $StandaloneIdentityDiscovery=$Discovery;$standaloneF210=$StandaloneF210
+            Invoke-Expression $nameModeText
+            $udpPorts=@(41000,41001,41002);$clientIndex=1;$clients=@()
             function New-MIRDirectLibraryStartupConfig {
               param([string]$Path,[string]$EngineDataDirectory,[string]$WriteDataDirectory,[switch]$Graphics)
               [IO.File]::WriteAllText($Path,"[path]`nread-data=$EngineDataDirectory`nwrite-data=$WriteDataDirectory`n[general]`nlocale=en`n",[Text.UTF8Encoding]::new($false))
@@ -783,15 +804,28 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
               if($config -notmatch ('(?m)^write-data='+[regex]::Escape([string]$client.write_data)+'$')){throw "config write-data differs: $index"}
             }
           }
+          function Assert-GeneratedSessionIdentity([object]$Route,[bool]$Discovery,[bool]$Expected){
+            function Assert-Session([bool]$Condition,[string]$Message){if(-not $Condition){throw $Message}}
+            $names=[Collections.Generic.List[string]]::new()
+            foreach($client in @($Route.clients)){$null=$names.Add([string]$client.name)}
+            $standaloneIdentityDiscovery=$Discovery
+            $accepted=$true
+            try{Invoke-Expression $sessionNameCheck}catch{$accepted=$false}
+            if($accepted-ne$Expected){throw "actual session identity assertion differs: discovery=$Discovery expected=$Expected"}
+          }
           Assert-Route (Invoke-ClientPlayerDataWriter $true $false 'discovery') @('standalone-en','standalone-de')
-          Assert-Route (Invoke-ClientPlayerDataWriter $false $true 'standalone-normal') @('standalone-en','standalone-de')
+          $normalStandalone=Invoke-ClientPlayerDataWriter $false $true 'standalone-normal'
+          Assert-Route $normalStandalone @('MIR5English','MIR5Deutsch')
           Assert-Route (Invoke-ClientPlayerDataWriter $false $false 'functional') @('MIR5English','MIR5Deutsch')
+          Assert-GeneratedSessionIdentity $normalStandalone $false $true
+          Assert-GeneratedSessionIdentity (Invoke-ClientPlayerDataWriter $true $false 'discovery-session') $true $true
+          Assert-GeneratedSessionIdentity (Invoke-ClientPlayerDataWriter $true $false 'wrong-normal-session') $false $false
         '''
         with tempfile.TemporaryDirectory(prefix="mir5-identity-player-data-") as work:
             result = subprocess.run(
                 ["pwsh", "-NoLogo", "-NoProfile", "-Command", script],
                 capture_output=True, text=True,
-                env=dict(os.environ, MIR_TEST_WRAPPER=str(WRAPPER), MIR_TEST_WORK=work), check=False,
+                env=dict(os.environ, MIR_TEST_WRAPPER=str(WRAPPER), MIR_TEST_SESSION=str(SESSION), MIR_TEST_WORK=work), check=False,
             )
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
 
@@ -1301,7 +1335,7 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
           $allDefinitions=@($ast.FindAll({param($node)
             $node -is [Management.Automation.Language.FunctionDefinitionAst]
           },$true))
-          $names=@('Test-LibraryInteger','Get-LibraryWitnessTarget','Assert-LibraryWitnessBoolean','Assert-LibraryWitnessInteger',
+          $names=@('Test-LibraryInteger','Get-LibraryWitnessTarget','Assert-LibraryWitnessIdentityMode','Assert-LibraryWitnessBoolean','Assert-LibraryWitnessInteger',
             'Assert-LibraryLiveRefresh','Get-StageMarker')
           $definitions=@{}
           foreach($name in $names){
@@ -1320,16 +1354,39 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
           $targets=[ordered]@{
             f200=[ordered]@{engine_sha256='D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B';base='2.0.77';mir='5.0.20000'}
             f210=[ordered]@{engine_sha256='FE4A1DA30F322A0D0B8AEB3DF7276332222BAAA143E2352569B723E84B2B9060';base='2.1.23';mir='5.0.21000'}
+            standalone_normal=[ordered]@{engine_sha256='8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38';base='2.1.23';mir='5.0.21000';standalone_identity_discovery=$false}
+            standalone_discovery=[ordered]@{engine_sha256='8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38';base='2.1.23';mir='5.0.21000';standalone_identity_discovery=$true}
           }
-          function New-LibraryWitnessSpec([hashtable]$Target){return @{library_witness_target=([ordered]@{engine_sha256=$Target.engine_sha256;base=$Target.base;mir=$Target.mir})}}
+          function New-LibraryWitnessSpec([hashtable]$Target){
+            $spec=@{library_witness_target=([ordered]@{engine_sha256=$Target.engine_sha256;base=$Target.base;mir=$Target.mir})}
+            if($Target.Contains('standalone_identity_discovery') -and $Target.standalone_identity_discovery){$spec.standalone_identity_discovery=$true}
+            return $spec
+          }
           function Assert-LibraryWitnessTargetRejects([hashtable]$Spec,[string]$Engine,[string]$Name){
             try{$null=Get-LibraryWitnessTarget $Spec $Engine}catch{return}
             throw "reader accepted invalid witness target: $Name"
           }
+          function Assert-LibraryWitnessModeRejects([bool]$ActualMode,[object]$Target,[string]$Name){
+            try{Assert-LibraryWitnessIdentityMode $ActualMode $Target}catch{return}
+            throw "reader accepted wrong standalone identity mode: $Name"
+          }
+          $normalStandalone=Get-LibraryWitnessTarget (New-LibraryWitnessSpec $targets.standalone_normal) $targets.standalone_normal.engine_sha256
+          Assert-LibraryWitnessBoolean $normalStandalone 'standalone_identity_discovery' $false 'normal standalone target'
+          Assert-LibraryWitnessIdentityMode $false $normalStandalone
+          $discoveryStandalone=Get-LibraryWitnessTarget (New-LibraryWitnessSpec $targets.standalone_discovery) $targets.standalone_discovery.engine_sha256
+          Assert-LibraryWitnessBoolean $discoveryStandalone 'standalone_identity_discovery' $true 'discovery standalone target'
+          Assert-LibraryWitnessIdentityMode $true $discoveryStandalone
+          Assert-LibraryWitnessModeRejects $true $normalStandalone 'normal target with discovery mode'
+          Assert-LibraryWitnessModeRejects $false $discoveryStandalone 'discovery target with normal mode'
+          $malformedStandalone=New-LibraryWitnessSpec $targets.standalone_normal;$malformedStandalone.standalone_identity_discovery='true'
+          Assert-LibraryWitnessTargetRejects $malformedStandalone $targets.standalone_normal.engine_sha256 'malformed standalone mode'
+          $explicitFalseStandalone=New-LibraryWitnessSpec $targets.standalone_normal;$explicitFalseStandalone.standalone_identity_discovery=$false
+          Assert-LibraryWitnessTargetRejects $explicitFalseStandalone $targets.standalone_normal.engine_sha256 'explicit false standalone mode'
           foreach($targetName in @('f200','f210')){
             $target=$targets[$targetName]
             $expectedLibraryWitness=Get-LibraryWitnessTarget (New-LibraryWitnessSpec $target) $target.engine_sha256
             if($expectedLibraryWitness.base -cne $target.base -or $expectedLibraryWitness.mir -cne $target.mir){throw "selected witness target differs: $targetName"}
+            Assert-LibraryWitnessIdentityMode $false $expectedLibraryWitness
             $targetMarkers=@($markerSets[$targetName])
             if($targetMarkers.Count -ne 4){throw "actual fixture markers are incomplete: $targetName"}
             foreach($marker in $targetMarkers){
@@ -1632,7 +1689,8 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
         self.assertIn("event.by_script ~= false", source)
         self.assertIn("state.native_initial_guard", source)
         self.assertIn("state.native_after_lab", source)
-        self.assertIn("game.create_profiler(true)", source)
+        self.assertIn("helpers.create_profiler(true)", source)
+        self.assertNotIn("game.create_profiler", source)
         self.assertIn("rendering_pending_external_png_readback=true", source)
         self.assertNotIn("game.create_player", source)
         self.assertNotIn("require(", source)
