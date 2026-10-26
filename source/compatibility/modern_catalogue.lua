@@ -607,14 +607,18 @@ local function append_py_hightech(definitions, active_mods)
   return selected, required, delta.product_bindings(), replacement, excluded, exact_bindings, exact_families
 end
 
-local function append_bob_warfare(definitions)
+local function append_bob_warfare(definitions, active_mods)
   local delta = require("compatibility.modern_catalogue.bob_warfare")
   for _, definition in ipairs(definitions) do
     if definition.key == delta.definition.key then
       error("MIR duplicate Bob Warfare catalogue key " .. delta.definition.key, 3)
     end
   end
-  definitions[#definitions + 1] = copy(delta.definition)
+  local definition = copy(delta.definition)
+  if active_space_age(active_mods) then
+    definition.science = "science_automation_logistic_chemical_production_military_metallurgic_space"
+  end
+  definitions[#definitions + 1] = definition
   return delta
 end
 
@@ -722,7 +726,7 @@ function M.select(active_mods)
     profile = "py-hightech-" .. target.id
   end
   if bob_warfare then
-    local delta = append_bob_warfare(definitions)
+    local delta = append_bob_warfare(definitions, active_mods)
     exact_product_target_families.research_armor_components = true
     exact_product_bindings = delta.product_bindings()
     -- Bob Warfare's captured bullets and rockets add named recipes to the
