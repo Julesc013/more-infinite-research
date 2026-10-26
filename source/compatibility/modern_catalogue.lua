@@ -676,6 +676,7 @@ function M.select(active_mods)
   local profile, k2so = "base", nil
   local py = require("compatibility.py_profile").select(active_mods)
   local bob_warfare = require("compatibility.bob_warfare_profile").applies(active_mods)
+  local bob_plates = require("compatibility.bob_plates_profile").select(active_mods)
   local required_product_targets, additional_product_bindings, exact_product_target_families = nil, nil, {}
   local exact_product_bindings = nil
   local replacement_product_target_families, excluded_product_target_recipes = {}, {}
@@ -725,6 +726,15 @@ function M.select(active_mods)
       exact_product_bindings, exact_product_target_families = append_py_hightech(definitions, active_mods)
     profile = "py-hightech-" .. target.id
   end
+  if bob_plates then
+    local known = {}
+    for _, definition in ipairs(definitions) do known[definition.key] = true end
+    for _, definition in ipairs(require("research.bob_plates_materials").product_definitions(bob_plates)) do
+      if known[definition.key] then error("MIR duplicate Bob Plates catalogue key " .. definition.key, 2) end
+      definitions[#definitions + 1], known[definition.key] = definition, true
+    end
+    profile = "bob-plates-" .. bob_plates .. "-f210"
+  end
   if bob_warfare then
     local delta = append_bob_warfare(definitions, active_mods)
     exact_product_target_families.research_armor_components = true
@@ -739,7 +749,7 @@ function M.select(active_mods)
       research_bullets=true,
       research_rockets=true,
     })
-    profile = "bob-warfare-f200"
+    profile = "bob-warfare-" .. target.id
   end
   local se, k2se = space_exploration_deltas(active_mods)
   if se then
@@ -778,7 +788,7 @@ function M.select(active_mods)
     native_owners = M.native_owners(active_mods), recipe_patches = recipe_patches,
     k2_imersite = k2so and k2so.imersite or false,
     k2_imersite_carriers = target.id == "f210" and k2_base,
-    bob_angel = bob_angel, bob_core = bob_core,
+    bob_angel = bob_angel, bob_core = bob_core, bob_plates_profile = bob_plates,
     bob_native_continuations = M.retains_bob_native_continuations(active_mods),
     py_coal = py.coal, py_hightech = py.hightech, bob_warfare = bob_warfare,
     required_product_targets = required_product_targets, additional_product_bindings = additional_product_bindings,
