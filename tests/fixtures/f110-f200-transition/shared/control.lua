@@ -68,6 +68,13 @@ local function current_name(force)
   return value and value.name or nil
 end
 
+local function queue_enabled(force)
+  -- F110 exposes the queue opt-in. F200's native queue is always available
+  -- and has no research_queue_enabled member to inspect.
+  if plan.stage == SOURCE then return force.research_queue_enabled end
+  return true
+end
+
 local function check_closure()
   local mods = script.active_mods
   if plan.stage == SOURCE then
@@ -151,7 +158,7 @@ local function queue_snapshot(force)
   local queue = {}
   for index, value in ipairs(force.research_queue or {}) do queue[index] = value.name end
   return {current=current_name(force), queue=queue, progress=force.research_progress,
-    enabled=force.research_queue_enabled}
+    enabled=queue_enabled(force)}
 end
 
 local function assert_queue(force, expected, label)

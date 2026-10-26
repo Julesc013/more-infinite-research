@@ -164,8 +164,16 @@ class F110F200TransitionFixtureTests(unittest.TestCase):
                 bulk_inserter_capacity_bonus=engine == "f200" and 0 or nil,engine=engine}
               local saved, fields={},{ }
               local value={}
-              setmetatable(value,{__index=function(_,key)return values[key] end,
+              setmetatable(value,{__index=function(_,key)
+                  if key == "research_queue_enabled" and values.engine == "f200" then
+                    error("F200 LuaForce has no research_queue_enabled")
+                  end
+                  return values[key]
+                end,
                 __newindex=function(_,key,item)
+                  if key == "research_queue_enabled" and values.engine == "f200" then
+                    error("F200 LuaForce has no research_queue_enabled")
+                  end
                   values[key]=item
                   if key == "research_queue" then values.current_research=item[1] end
                 end})
@@ -201,7 +209,7 @@ class F110F200TransitionFixtureTests(unittest.TestCase):
                 saved[item.name]=progress
               end
               values._migrate_to_f200=function()
-                values.engine="f200";values.stack_inserter_capacity_bonus=nil
+                values.engine="f200";values.research_queue_enabled=nil;values.stack_inserter_capacity_bonus=nil
                 values.bulk_inserter_capacity_bonus=values.bulk_inserter_capacity_bonus or 4
                 for name,row in pairs(fields) do row.saved_progress=saved[name] or 0 end
               end
