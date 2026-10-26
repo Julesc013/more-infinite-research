@@ -93,7 +93,7 @@ class F110F200RunnerControls(unittest.TestCase):
               $tokens=$null;$errors=$null
               $ast=[Management.Automation.Language.Parser]::ParseFile($env:MIR_TEST_RUNNER,[ref]$tokens,[ref]$errors)
               if($errors.Count){throw 'runner parse failed'}
-              foreach($name in @('Assert-Fixture','Get-FixtureSha','Get-F110PublishedCrossSourceFixture')){
+              foreach($name in @('Assert-Fixture','Get-FixtureSha','Test-F110PublishedCrossSourceRelativePath','Get-F110PublishedCrossSourceFixture')){
                 $node=@($ast.FindAll({param($n) $n -is [Management.Automation.Language.FunctionDefinitionAst] -and $n.Name -ceq $name},$true))
                 if($node.Count -ne 1){throw "helper missing: $name"}
                 Invoke-Expression $node[0].Extent.Text
@@ -108,6 +108,10 @@ class F110F200RunnerControls(unittest.TestCase):
               }
               $result=Get-F110PublishedCrossSourceFixture @base
               if($result.name -cne 'mir-fixture-mir5-f110-f200-transition' -or $result.version -cne '0.1.0'){throw 'good source refused'}
+              foreach($rooted in @('D:\outside-f110-composed','\mocked-rooted')){
+                if(Test-F110PublishedCrossSourceRelativePath $rooted){throw ('rooted relative path accepted: '+$rooted)}
+              }
+              if(-not(Test-F110PublishedCrossSourceRelativePath ('build'+[IO.Path]::DirectorySeparatorChar+'f110-composed'))){throw 'relative composed path refused'}
               $opponents=@(
                 @{name='case';patch=@{Case='historical-native'};message='case differs'},
                 @{name='active';patch=@{Active=$true};message='fresh installed-MIR source run'},
@@ -188,7 +192,7 @@ class F110F200RunnerControls(unittest.TestCase):
               $tokens=$null;$errors=$null
               $ast=[Management.Automation.Language.Parser]::ParseFile($env:MIR_TEST_RUNNER,[ref]$tokens,[ref]$errors)
               if($errors.Count){throw 'runner parse failed'}
-              foreach($name in @('Assert-Fixture','Get-FixtureSha','Get-F110PublishedCrossSourceFixture')){
+              foreach($name in @('Assert-Fixture','Get-FixtureSha','Test-F110PublishedCrossSourceRelativePath','Get-F110PublishedCrossSourceFixture')){
                 $node=@($ast.FindAll({param($n) $n -is [Management.Automation.Language.FunctionDefinitionAst] -and $n.Name -ceq $name},$true))
                 if($node.Count -ne 1){throw "helper missing: $name"}
                 Invoke-Expression $node[0].Extent.Text

@@ -49,6 +49,17 @@ function Get-FixtureSha([string]$Path) {
 function Assert-FixtureLog([string]$Text) {
   Assert-Fixture (-not [regex]::IsMatch($Text,'(?im)^\s*\d+[.]\d+\s+Error\b|^Error while running event\b|\bException at tick\b|\bnon-recoverable error\b|^stack traceback:$')) 'fatal native diagnostic'
 }
+function Test-F110PublishedCrossSourceRelativePath([string]$Path) {
+  return (
+    $Path -cne '..' -and
+    -not $Path.StartsWith('..'+[IO.Path]::DirectorySeparatorChar) -and
+    $Path -cnotmatch '^[A-Za-z]:' -and
+    -not $Path.StartsWith('\') -and
+    -not $Path.StartsWith('/') -and
+    -not [IO.Path]::IsPathRooted($Path) -and
+    -not [IO.Path]::IsPathFullyQualified($Path)
+  )
+}
 function Get-F110PublishedCrossSourceFixture([string]$Repo,[hashtable]$ProfileDefinition,[object[]]$ProfileRows,[string[]]$Sources,[string]$EngineData,[string]$Engine,[string]$ExpectedMIRSha256,[string]$Case,[bool]$Historical,[bool]$HistoricalTransition,[bool]$Create,[bool]$Absent,[bool]$Active,[string]$ActiveKind,[string]$InputSave,[string]$InputSaveSha256,[string]$Observer,[object[]]$Markers,[string]$HistoricalTarget,[string]$HistoricalMetadata,[string]$TransitionStage,[string]$TransitionMetadata,[string]$ExpectedEngineSha256='B7B4B834FCA2E32AFA9D3476EB42CC09B02F1205BE97F688DC6FC6ACE7BA8FE1') {
   Assert-Fixture (-not $Historical -and -not $HistoricalTransition -and -not $Create -and -not $Absent -and -not $Active) 'F110 published cross source permits only a fresh installed-MIR source run'
   Assert-Fixture ([string]::IsNullOrWhiteSpace($ActiveKind) -and [string]::IsNullOrWhiteSpace($InputSave) -and [string]::IsNullOrWhiteSpace($InputSaveSha256)) 'F110 published cross source does not accept active or input-save modes'
@@ -69,7 +80,7 @@ function Get-F110PublishedCrossSourceFixture([string]$Repo,[hashtable]$ProfileDe
   $repoRoot=(Resolve-Path -LiteralPath $Repo).Path
   $source=(Resolve-Path -LiteralPath $Sources[0]).Path
   $sourceRelative=[IO.Path]::GetRelativePath($repoRoot,$source)
-  Assert-Fixture ($sourceRelative -cne '..' -and -not $sourceRelative.StartsWith('..'+[IO.Path]::DirectorySeparatorChar)) 'F110 published cross source fixture must remain inside executing checkout'
+  Assert-Fixture (Test-F110PublishedCrossSourceRelativePath $sourceRelative) 'F110 published cross source fixture must remain inside executing checkout'
   $canonical=Join-Path $repoRoot 'tests/fixtures/f110-f200-transition/f110/published-4.7.3'
   $shared=Join-Path $repoRoot 'tests/fixtures/f110-f200-transition/shared'
   $authoritative=[ordered]@{
@@ -90,12 +101,12 @@ function Get-F110PublishedCrossSourceFixture([string]$Repo,[hashtable]$ProfileDe
     $actualPath=Join-Path $source $relative
     $resolvedActual=(Resolve-Path -LiteralPath $actualPath).Path
     $actualRelative=[IO.Path]::GetRelativePath($source,$resolvedActual)
-    Assert-Fixture ($actualRelative -cne '..' -and -not $actualRelative.StartsWith('..'+[IO.Path]::DirectorySeparatorChar)) "F110 published cross source stage member leaves composition: $relative"
+    Assert-Fixture (Test-F110PublishedCrossSourceRelativePath $actualRelative) "F110 published cross source stage member leaves composition: $relative"
     $expectedPath=$authoritative[$relative]
     Assert-Fixture (Test-Path -LiteralPath $expectedPath -PathType Leaf) "F110 published cross source authoritative member missing: $relative"
     $resolvedExpected=(Resolve-Path -LiteralPath $expectedPath).Path
     $expectedRelative=[IO.Path]::GetRelativePath($repoRoot,$resolvedExpected)
-    Assert-Fixture ($expectedRelative -cne '..' -and -not $expectedRelative.StartsWith('..'+[IO.Path]::DirectorySeparatorChar)) "F110 published cross source authoritative member leaves checkout: $relative"
+    Assert-Fixture (Test-F110PublishedCrossSourceRelativePath $expectedRelative) "F110 published cross source authoritative member leaves checkout: $relative"
     Assert-Fixture ((Get-FixtureSha $resolvedActual) -ceq (Get-FixtureSha $resolvedExpected)) "F110 published cross source stage member differs: $relative"
   }
   $info=Get-Content -LiteralPath (Join-Path $source 'info.json') -Raw|ConvertFrom-Json -AsHashtable
