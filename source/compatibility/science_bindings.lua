@@ -32,8 +32,15 @@ local SIF_F210_PROMETHIUM_OWNER_PREREQUISITES = {
 
 local KNOWN_TARGETS = {
   f013 = true, f014 = true, f015 = true, f016 = true, f017 = true,
-  f100 = true, f110 = true, f200 = true, f210 = true
+  f018 = true, f100 = true, f110 = true, f200 = true, f210 = true
 }
+
+-- Base 0.17, 0.18, 1.0 and 1.1 ship red science as an initially enabled
+-- shorthand-result recipe, and retain the singular satellite launch-product
+-- source for white science. These are finite Base source facts, not a
+-- version-derived source-acquisition rule.
+local INITIAL_RED_TARGETS = {f017 = true, f018 = true, f100 = true, f110 = true}
+local SATELLITE_SOURCE_TARGETS = {f017 = true, f018 = true, f100 = true, f110 = true}
 
 -- The delivered K2SO normalization was an exact science-phase contract.  It
 -- is intentionally not inferred from a Krastorio marker: another revision
@@ -212,7 +219,7 @@ local function pack_prerequisites(target, has_space_age)
     return out
   end
 
-  if target.id == "f017" or target.id == "f110" then
+  if target.id == "f017" or target.id == "f018" or target.id == "f110" then
     add_same_name_prerequisites(out, {
       "logistic-science-pack", "chemical-science-pack", "military-science-pack",
       "production-science-pack", "utility-science-pack", "space-science-pack"
@@ -284,9 +291,8 @@ local function source_contracts(target, has_space_age, mods)
   end
 
   for _, pack in ipairs(MODERN_BASE) do
-    if pack == "automation-science-pack"
-      and (target.id == "f017" or target.id == "f100" or target.id == "f110") then
-      -- Base on these three targets ships red science as an initially enabled
+    if pack == "automation-science-pack" and INITIAL_RED_TARGETS[target.id] then
+      -- Base on these targets ships red science as an initially enabled
       -- shorthand-result recipe, with no same-named technology. It is a
       -- direct seed, not a missing native owner.
       put(pack, initial_recipe(pack))
@@ -294,8 +300,8 @@ local function source_contracts(target, has_space_age, mods)
       put(pack, recipe_unlock(pack, pack, nil, nil, direct_replacement))
     end
   end
-  if target.id == "f017" or target.id == "f100" or target.id == "f110" then
-    -- 0.17 through 1.1 retain the satellite launch product.  The
+  if SATELLITE_SOURCE_TARGETS[target.id] then
+    -- 0.17, 0.18, 1.0 and 1.1 retain the satellite launch product. The
     -- same-named technology unlocks the satellite recipe; it does not have a
     -- 2.0 research trigger.  See the respective base technology/item rows.
     put("space-science-pack", {
