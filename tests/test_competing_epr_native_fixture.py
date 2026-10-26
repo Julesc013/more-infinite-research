@@ -102,7 +102,7 @@ class CompetingEprNativeFixtureTests(unittest.TestCase):
               return value
             end
             local input=inventory()
-            local lab={valid=true,active=false,energy=0}
+            local lab={valid=true,disabled_by_script=true,energy=0}
             function lab.get_inventory(index)assert(index==1);return input end
             local function tech(name, force, level)
               return {name=name,valid=true,force=force,level=level or 5,researched=false,enabled=true,
@@ -205,7 +205,11 @@ class CompetingEprNativeFixtureTests(unittest.TestCase):
               return value
             end
             local input=inventory()
-            local lab={valid=true,active=true,energy=0}
+            local lab={valid=true,disabled_by_script=false,energy=0}
+            setmetatable(lab,{
+              __index=function(entity,key)if key=="active" then return entity.disabled_by_script~=true end end,
+              __newindex=function(entity,key,value)if key=="active" then error("LuaEntity.active is read-only") end;rawset(entity,key,value)end,
+            })
             function lab.get_inventory(index)assert(index==1);return input end
             local function tech(name, force, level)
               return {name=name,valid=true,force=force,level=level or 5,researched=false,enabled=true,visible_when_disabled=false,saved_progress=0,
@@ -264,12 +268,12 @@ class CompetingEprNativeFixtureTests(unittest.TestCase):
             -- mock's raw field so its narrow metamethod models that native setter.
             player.research_queue=nil;player.current_research=nil
             game.tick=game.tick+1;ok,result=pcall(c.events[1]);if not ok then return {ok=false,message=tostring(result)}end
-            if opponent=="unfrozen" then lab.active=true end
+            if opponent=="unfrozen" then lab.disabled_by_script=false end
             for _=1,2 do ok,result=pcall(c.load);if not ok then return {ok=false,message=tostring(result)}end;game.tick=game.tick+1;ok,result=pcall(c.events[1]);if not ok then return {ok=false,message=tostring(result)}end end
             local state=storage.mir5_competing_epr
             return {ok=true,message="",phase=state.phase,labs=state.actual_lab_completions,next=tail.level,bonus=player.recipes['iron-gear-wheel'].productivity_bonus,
               tail_saved=tail.saved_progress,probe_saved=player.technologies["braking-force-1"].saved_progress,
-              current_progress=player.research_progress,lab_active=lab.active,lab_energy=lab.energy,markers=markers,saves=saves}
+              current_progress=player.research_progress,lab_disabled_by_script=lab.disabled_by_script,lab_energy=lab.energy,markers=markers,saves=saves}
           end
         ''')
 
@@ -350,7 +354,7 @@ class CompetingEprNativeFixtureTests(unittest.TestCase):
         source = (FIXTURE / "published" / "control.lua").read_text(encoding="utf-8")
         self.assertIn("await-second-queue", source)
         self.assertIn("two-native-epr-tail-labs", source)
-        self.assertIn("state.lab.active = false", source)
+        self.assertIn("state.lab.disabled_by_script = true", source)
         self.assertIn("input.clear()", source)
         self.assertIn("technology(player, TAIL).saved_progress = 0.27", source)
         self.assertIn("probe.saved_progress = 0.42", source)
@@ -363,7 +367,7 @@ class CompetingEprNativeFixtureTests(unittest.TestCase):
         self.assertEqual(("source-completed", 2, 7, .6, 0, .42, .27),
                          (result["phase"], result["labs"], result["next"], result["bonus"], result["tail_saved"],
                           result["probe_saved"], result["current_progress"]))
-        self.assertFalse(result["lab_active"])
+        self.assertTrue(result["lab_disabled_by_script"])
         self.assertEqual(0, result["lab_energy"])
         self.assertEqual((3, 1), (result["markers"], result["saves"]))
         opponents = {

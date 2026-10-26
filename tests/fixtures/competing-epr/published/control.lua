@@ -107,7 +107,7 @@ local function power_lab(state)
   local lab = state.lab
   if lab == nil or lab.valid == false then fail("real player lab is absent") end
   lab.energy = LAB_ENERGY
-  if lab.energy <= 0 or lab.active == false then fail("real player lab cannot consume native science") end
+  if lab.energy <= 0 or lab.disabled_by_script == true then fail("real player lab cannot consume native science") end
   return inventory(state)
 end
 local function fill(value)
@@ -130,7 +130,7 @@ local function assert_acceleration(value)
 end
 local function assert_frozen(state)
   local value = inventory(state)
-  if state.lab.active ~= false or state.lab.energy ~= 0 then fail("source lab was not frozen before cap configuration") end
+  if state.lab.disabled_by_script ~= true or state.lab.energy ~= 0 then fail("source lab was not frozen before cap configuration") end
   for _, item in ipairs(SCIENCE) do
     if value.get_item_count(item) ~= 0 then fail("source lab retained input after freeze: " .. item) end
   end
@@ -295,7 +295,7 @@ script.on_event(defines.events.on_tick, function()
     assert_tail(now, {level=7, researched=false, enabled=true, visible=false, maximum=UINT32_MAX,
       bonus=state.player_start_bonus + 0.2, saved_progress=0}, "two native EPR labs")
     local input = inventory(state)
-    state.lab.active = false
+    state.lab.disabled_by_script = true
     state.lab.energy = 0
     input.clear()
     local probe = technology(player, PROBE)

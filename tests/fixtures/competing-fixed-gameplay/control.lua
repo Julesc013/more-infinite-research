@@ -206,19 +206,19 @@ local function fill(lab, value)
     if inserted ~= 100 then fail("lab did not receive science: " .. ingredient.name) end
   end
   lab.energy = 1000000000
-  lab.active = true
+  lab.disabled_by_script = false
 end
 local function freeze(state)
   local lab = state.lab
   if lab == nil or lab.valid == false then fail("source lab is absent") end
-  lab.active, lab.energy = false, 0
+  lab.disabled_by_script, lab.energy = true, 0
   local input = lab.get_inventory(defines.inventory.lab_input)
   if input == nil then fail("source lab input is absent") end
   input.clear()
 end
 local function assert_frozen(state, providers_present)
   local lab = state.lab
-  if lab == nil or lab.valid == false or lab.active ~= false or lab.energy ~= 0 then fail("source lab was not frozen") end
+  if lab == nil or lab.valid == false or lab.disabled_by_script ~= true or lab.energy ~= 0 then fail("source lab was not frozen") end
   local input = lab.get_inventory(defines.inventory.lab_input)
   if input == nil then fail("source lab input is absent") end
   if providers_present ~= false then

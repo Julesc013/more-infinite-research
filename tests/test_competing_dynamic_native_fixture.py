@@ -158,7 +158,8 @@ function dynamic_source_flow(path, provider, target_name, predecessor_name, targ
     function value.clear()value.items={}end
     return value
   end
-  local input=inventory();local lab={valid=true,active=true,energy=0}
+  local input=inventory();local lab={valid=true,disabled_by_script=false,energy=0}
+  setmetatable(lab,{__index=function(entity,key)if key=="active"then return entity.disabled_by_script~=true end end,__newindex=function(entity,key,value)if key=="active"then error("LuaEntity.active is read-only")end;rawset(entity,key,value)end})
   function lab.get_inventory(index)assert(index==1);return input end
   local function make_force(name,index)
     local force={name=name,index=index,valid=true,technologies={},recipes={[recipe_name]={productivity_bonus=0}},research_progress=0,_queue={}}
@@ -212,12 +213,12 @@ function dynamic_source_flow(path, provider, target_name, predecessor_name, targ
   game.tick=game.tick+1;ok,result=pcall(callbacks.events[1]);if not ok then return {ok=false,message=tostring(result)}end
   for _=1,2 do ok,result=pcall(callbacks.load);if not ok then return {ok=false,message=tostring(result)}end;game.tick=game.tick+1;ok,result=pcall(callbacks.events[1]);if not ok then return {ok=false,message=tostring(result)}end end
   local state=storage.mir5_competing_dynamic_gameplay
-  return {ok=true,message="",phase=state.phase,labs=state.actual_lab_completions,level=target.level,bonus=player.recipes[recipe_name].productivity_bonus,target_saved=target.saved_progress,current=player.current_research and player.current_research.name or false,current_progress=player.research_progress,probe_saved=player.technologies["braking-force-1"].saved_progress,foreign_disabled=foreign.technologies[target_name].enabled==false,detached_saved=detached.technologies[target_name].saved_progress,lab_active=lab.active,lab_energy=lab.energy,markers=markers,saves=saves,predecessor_calls=predecessor_calls,initial_levels=state.initial_levels,diagnostics=diagnostics}
+  return {ok=true,message="",phase=state.phase,labs=state.actual_lab_completions,level=target.level,bonus=player.recipes[recipe_name].productivity_bonus,target_saved=target.saved_progress,current=player.current_research and player.current_research.name or false,current_progress=player.research_progress,probe_saved=player.technologies["braking-force-1"].saved_progress,foreign_disabled=foreign.technologies[target_name].enabled==false,detached_saved=detached.technologies[target_name].saved_progress,lab_disabled_by_script=lab.disabled_by_script,lab_energy=lab.energy,markers=markers,saves=saves,predecessor_calls=predecessor_calls,initial_levels=state.initial_levels,diagnostics=diagnostics}
 end
 function dynamic_successor_flow(path, provider, target_name, recipe_name, science, ids, initial_levels, fixture, preference, opponent)
   local callbacks,markers,saves={events={}},0,0
   local function inventory()local value={items={}};function value.get_item_count(name)return value.items[name]or 0 end;function value.clear()value.items={}end;return value end
-  local input=inventory();local lab={valid=true,active=false,energy=0};function lab.get_inventory(index)assert(index==1);return input end
+  local input=inventory();local lab={valid=true,disabled_by_script=true,energy=0};function lab.get_inventory(index)assert(index==1);return input end
   local function force(name,index)
     local value={name=name,index=index,valid=true,technologies={},recipes={[recipe_name]={productivity_bonus=.1}},research_progress=0,_queue={}}
     setmetatable(value,{__index=function(item,key)if key=="research_queue"then return rawget(item,"_queue")end end,__newindex=function(item,key,row)if key=="research_queue"then rawset(item,"_queue",row or {});local current=row and row[1]or nil;rawset(item,"current_research",current);if current then rawset(item,"research_progress",current.saved_progress or 0);current.saved_progress=0 else rawset(item,"research_progress",0)end else rawset(item,key,row)end end})
@@ -360,8 +361,8 @@ end
             with self.subTest(provider=provider):
                 result = run(str(FIXTURE / "control.lua"), provider, target["target"], target["predecessor"], lua_value(self.lua, target["prerequisites"]), target["recipe"], lua_value(self.lua, target["science"]), lua_value(self.lua, self.provider_ids(fact_key)), lua_value(self.lua, self.native_initial_levels[fact_key]), "")
                 self.assertTrue(result["ok"], result["message"])
-                self.assertEqual(("source-completed", 1, target["initial_level"] + 1, .1, 0, target["target"], .27, .42, .27, False, 0, 3, 1),
-                                 (result["phase"], result["labs"], result["level"], result["bonus"], result["target_saved"], result["current"], result["current_progress"], result["probe_saved"], result["detached_saved"], result["lab_active"], result["lab_energy"], result["markers"], result["saves"]))
+                self.assertEqual(("source-completed", 1, target["initial_level"] + 1, .1, 0, target["target"], .27, .42, .27, True, 0, 3, 1),
+                                 (result["phase"], result["labs"], result["level"], result["bonus"], result["target_saved"], result["current"], result["current_progress"], result["probe_saved"], result["detached_saved"], result["lab_disabled_by_script"], result["lab_energy"], result["markers"], result["saves"]))
                 self.assertTrue(result["foreign_disabled"])
                 self.assertEqual(18 if provider == "ce" else 4, result["predecessor_calls"])
                 self.assertEqual(

@@ -7,6 +7,7 @@ import unittest
 
 ROOT = Path(__file__).resolve().parents[1]
 PLAYER = ROOT / "source"
+FIXTURE = ROOT / "tests" / "fixtures" / "native-credit-control" / "control.lua"
 
 
 class NativeCreditRuntimeTests(unittest.TestCase):
@@ -414,6 +415,11 @@ class NativeCreditRuntimeTests(unittest.TestCase):
         self.assertNotIn("pairs(force.technologies)", source)
         self.assertNotIn("pairs(prototypes", source)
         self.assertIn("prototype.hidden ~= true", source)
+
+    def test_private_native_credit_fixture_uses_supported_script_disablement(self):
+        source = FIXTURE.read_text(encoding="utf-8")
+        self.assertIn("lab.disabled_by_script", source)
+        self.assertNotRegex(source, r"\blab\.active\s*=")
 
 
 if __name__ == "__main__":

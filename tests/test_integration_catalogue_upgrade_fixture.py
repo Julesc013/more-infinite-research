@@ -352,7 +352,7 @@ class IntegrationCatalogueUpgradeFixtureTests(unittest.TestCase):
             local state = {phase="source-complete", profile=identifier, paused_index=4, foreign_index=foreign_index,
               source_snapshot=snapshot(player, plan, force_fields), paused_snapshot=snapshot(paused, plan, force_fields),
               foreign_snapshot=foreign_snapshot, player_queue={current=false, queue={}, progress=0},
-              lab={valid=true, active=false, energy=0, get_inventory=function(kind) assert(kind == 1); return inventory end}}
+              lab={valid=true, disabled_by_script=true, energy=0, get_inventory=function(kind) assert(kind == 1); return inventory end}}
             env.storage=setmetatable({}, {
               __index=function(_, key)
                 if key == "mir5_integration_catalogue_upgrade" then return state end

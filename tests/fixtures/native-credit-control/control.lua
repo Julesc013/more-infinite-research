@@ -97,12 +97,12 @@ local function fill(lab, value)
     local inserted = inventory.insert{name = ingredient.name, count = 100}
     if inserted ~= 100 then fail("lab could not receive science: " .. ingredient.name) end
   end
-  lab.energy, lab.active = 1000000000, true
+  lab.energy, lab.disabled_by_script = 1000000000, false
 end
 
 local function freeze(lab)
   if lab == nil or lab.valid == false then fail("native lab is absent") end
-  lab.active, lab.energy = false, 0
+  lab.disabled_by_script, lab.energy = true, 0
   local inventory = lab.get_inventory(defines.inventory.lab_input)
   if inventory == nil then fail("lab input is absent while freezing") end
   inventory.clear()

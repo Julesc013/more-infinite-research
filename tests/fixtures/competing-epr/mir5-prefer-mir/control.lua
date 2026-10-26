@@ -89,7 +89,7 @@ local function assert_acceleration(value)
 end
 local function assert_frozen(state)
   local lab = state.lab
-  if lab == nil or lab.valid == false or lab.active ~= false or lab.energy ~= 0 then
+  if lab == nil or lab.valid == false or lab.disabled_by_script ~= true or lab.energy ~= 0 then
     fail("source lab was not frozen before MIR5 preference handling")
   end
   local input = lab.get_inventory(defines.inventory.lab_input)

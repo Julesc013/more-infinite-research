@@ -110,7 +110,7 @@ function legacy_fixture_flow(path, source_preference, opponent, source_mir)
     function values.get_item_count(name) return values.items[name]or 0 end
     return values
   end
-  local input=inventory();local lab={valid=true,active=false,energy=0}
+  local input=inventory();local lab={valid=true,disabled_by_script=true,energy=0}
   function lab.get_inventory(_) return input end
   local function research(force,name)
     return {name=name,valid=true,force=force,level=1,researched=false,enabled=true,visible_when_disabled=false,saved_progress=0,
