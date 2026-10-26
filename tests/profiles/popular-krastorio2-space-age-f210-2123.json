@@ -65,7 +65,7 @@
     "Krastorio2Assets_2.1.0.zip": "39EF950EC8B21A40357DD0240EF8389501EE75CCA82717F2773B98554DA46E29",
     "Krastorio2MenuSimulations_2.1.0.zip": "3A485B449B356DC4B3EB4233DE4E803B3A001259FBC251BDC9F9D9120B3C53A7",
     "flib_0.17.2.zip": "0A48C15DC0FC6C13BB3FE8293BA6CB35A07F3B0F37D37ACB50AB30E32E8E019D",
-    "mir-fixture-mir5-active-mods-observer_0.1.0.zip": "2E1BE5952D2A4CC5C74A0D149E075D247BA110A3FAE5B6768D3EAEBABCEF989C"
+    "mir-fixture-mir5-active-mods-observer_0.1.0.zip": "A15A7D628D66953D2E0C4D4FA288F47CBF9C5678327C7EB3D23ADB5DC78331C0"
   },
-  "scope": "Exact Krastorio2 ranked-root space-age input. Mandatory archived dependencies only; recommended providers are not automatically selected. Input metadata is not native engine admission, gameplay, save, client or support acceptance."
+  "scope": "Exact Krastorio2 ranked-root space-age input. Mandatory archived dependencies only; recommended providers are not automatically selected. Input metadata is not native engine admission, gameplay, save, client or support acceptance. The current observer binding names the exact A15 runtime container used in the completed EA41 sweep; prior canonical 2E1 container and identical member hashes remain in its r03 amendment."
 }
