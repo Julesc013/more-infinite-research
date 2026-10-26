@@ -350,7 +350,8 @@ function Test-LibraryInteger([object]$Value) {
 function Get-LibraryWitnessTarget([hashtable]$Spec,[string]$EngineSha256) {
   $targets=@(
     [ordered]@{engine_sha256='D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B';base='2.0.77';mir='5.0.20000'},
-    [ordered]@{engine_sha256='FE4A1DA30F322A0D0B8AEB3DF7276332222BAAA143E2352569B723E84B2B9060';base='2.1.23';mir='5.0.21000'}
+    [ordered]@{engine_sha256='FE4A1DA30F322A0D0B8AEB3DF7276332222BAAA143E2352569B723E84B2B9060';base='2.1.23';mir='5.0.21000'},
+    [ordered]@{engine_sha256='8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38';base='2.1.23';mir='5.0.21000';standalone_identity_discovery=$true}
   )
   $matches=@($targets|Where-Object {[string]$_.engine_sha256 -ceq $EngineSha256})
   Assert-Session ($matches.Count -eq 1) 'Library session engine does not admit a witness target'
@@ -451,6 +452,37 @@ function Get-StageMarker([string]$Text, [string]$Stage, [int]$ExpectedJoins, [ob
     }
   }
   return $rows[0]
+}
+function Get-StandaloneIdentityDiscoveryMarker([string]$Text) {
+  $rows=[Collections.Generic.List[object]]::new()
+  foreach($match in [regex]::Matches($Text,'\[MIR5_LIBRARY_STANDALONE_IDENTITY\] (\{[^\r\n]+\})')){
+    try{$row=$match.Groups[1].Value|ConvertFrom-Json}catch{continue}
+    $rows.Add($row)
+  }
+  if($rows.Count-eq0){return $null}
+  Assert-Session ($rows.Count-eq1) 'standalone identity discovery marker is duplicated'
+  $row=$rows[0]
+  Assert-Session ($row.case -ceq 'library-multiplayer' -and $row.stage -ceq 'identity-discovery' -and $row.status -ceq 'passed') 'standalone identity discovery marker identity differs'
+  Assert-Session ((Test-LibraryInteger $row.ticks_after_last_join) -and [int64]$row.ticks_after_last_join -ge 120) 'standalone identity discovery wait differs'
+  foreach($field in @('two_connected_clients_required','stop_before_initial_gui')){
+    $property=$row.PSObject.Properties[$field]
+    Assert-Session ($null-ne$property -and $property.Value -is [bool] -and $property.Value-eq$true) "standalone identity discovery $field differs"
+  }
+  $personalStateChecked=$row.PSObject.Properties['personal_state_checked']
+  Assert-Session ($null-ne$personalStateChecked -and $personalStateChecked.Value -is [bool] -and $personalStateChecked.Value-eq$false) 'standalone identity discovery incorrectly claims a personal-state check'
+  Assert-Session ((Test-LibraryInteger $row.shared_force_index) -and [int64]$row.shared_force_index -gt 0) 'standalone identity discovery force differs'
+  Assert-Session ((Test-LibraryInteger $row.screenshot_calls) -and [int64]$row.screenshot_calls -eq 0) 'standalone identity discovery took a screenshot'
+  $players=@($row.players)
+  Assert-Session ($players.Count-eq2) 'standalone identity discovery player count differs'
+  $indices=@();$names=@();$locales=@();$forces=@()
+  foreach($player in $players){
+    $nameBytes=if($player.name -is [string]){[Text.UTF8Encoding]::new($false).GetByteCount([string]$player.name)}else{0}
+    Assert-Session ((Test-LibraryInteger $player.index) -and [int64]$player.index -gt 0 -and $player.name -is [string] -and $nameBytes -ge 1 -and $nameBytes -le 256 -and $player.name -notmatch '[\r\n]' -and $player.locale -in @('en','de') -and (Test-LibraryInteger $player.force_index)) 'standalone identity discovery player shape differs'
+    $indices+=[int64]$player.index;$names+=[string]$player.name;$locales+=[string]$player.locale;$forces+=[int64]$player.force_index
+  }
+  Assert-Session ((@($indices|Select-Object -Unique)).Count-eq2 -and (@($names|Select-Object -Unique)).Count-eq2 -and ((@($locales|Sort-Object)-join ',') -ceq 'de,en') -and (@($forces|Select-Object -Unique).Count-eq1)) 'standalone identity discovery players are not distinct shared-force en/de clients'
+  Assert-Session ([int64]$forces[0] -eq [int64]$row.shared_force_index) 'standalone identity discovery shared force differs'
+  return $row
 }
 function Test-ApiClientNumber([object]$Value) {
   return $Value -is [int] -or $Value -is [long] -or $Value -is [double]
@@ -611,6 +643,24 @@ $specPath = Resolve-BuildInput $SpecPath 'Leaf' 'session spec'
 $spec = Get-Content -LiteralPath $specPath -Raw | ConvertFrom-Json -AsHashtable
 $fixtureCase=if($spec.ContainsKey('case')){[string]$spec.case}else{'library-multiplayer'}
 Assert-Session ($fixtureCase-cin@('library-multiplayer','library-paired-browser','scripted-effects-multiplayer')) 'unsupported multiplayer fixture case'
+$standaloneIdentityDiscovery=$false
+if($spec.ContainsKey('standalone_identity_discovery')){
+  Assert-Session ($fixtureCase-ceq'library-multiplayer' -and $spec.standalone_identity_discovery -is [bool] -and $spec.standalone_identity_discovery) 'standalone identity discovery mode differs'
+  Assert-Session ($spec.ContainsKey('identity_discovery') -and $spec.identity_discovery -is [System.Collections.IDictionary]) 'standalone identity discovery binding is absent'
+  $identityBinding=$spec.identity_discovery
+  $expectedIdentity=[ordered]@{
+    engine_sha256='8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38'
+    mir_archive_sha256='C563CB5B96C9E64CB3373BDB60CF5C8B7D3C97E93EADB8F924443C703CDC024D'
+    observer_archive_sha256='A15A7D628D66953D2E0C4D4FA288F47CBF9C5678327C7EB3D23ADB5DC78331C0'
+    fixture_version='0.1.1';environmental_only=$true
+  }
+  Assert-Session ($identityBinding.Count-eq($expectedIdentity.Count+1)) 'standalone identity discovery binding shape differs'
+  foreach($entry in $expectedIdentity.GetEnumerator()){
+    Assert-Session ($identityBinding.Contains($entry.Key) -and $identityBinding[$entry.Key].GetType() -eq $entry.Value.GetType() -and $identityBinding[$entry.Key] -ceq $entry.Value) "standalone identity discovery binding differs: $($entry.Key)"
+  }
+  Assert-Session ($identityBinding.Contains('join_budget_seconds') -and (Test-LibraryInteger $identityBinding.join_budget_seconds) -and [int64]$identityBinding.join_budget_seconds -eq 180) 'standalone identity discovery binding differs: join_budget_seconds'
+  $standaloneIdentityDiscovery=$true
+}
 $apiClientConsumers=$false
 if($spec.ContainsKey('api_client_consumers')){
   Assert-Session ($fixtureCase-ceq'library-multiplayer' -and $spec.api_client_consumers -is [bool] -and $spec.api_client_consumers) 'API client consumer mode differs'
@@ -626,8 +676,13 @@ $engine = Resolve-Existing ([string]$spec.engine) 'Leaf' 'engine'
 Assert-Session ([string]$spec.engine_sha256 -cmatch '^[A-Fa-f0-9]{64}$') 'engine hash is invalid'
 $engineSha=Get-SessionHash $engine
 Assert-Session ($engineSha -ceq ([string]$spec.engine_sha256).ToUpperInvariant()) 'engine hash differs'
+Assert-Session (-not $standaloneIdentityDiscovery -or $engineSha -ceq [string]$identityBinding.engine_sha256) 'standalone identity discovery engine differs'
 $libraryWitnessTarget=$null
 if($fixtureCase-ceq'library-multiplayer'){$libraryWitnessTarget=Get-LibraryWitnessTarget $spec $engineSha}
+if($fixtureCase-ceq'library-multiplayer'){
+  $identityTarget=($libraryWitnessTarget.PSObject.Properties['standalone_identity_discovery'])
+  Assert-Session ($standaloneIdentityDiscovery -eq ($null-ne$identityTarget -and $identityTarget.Value -eq $true)) 'Library session target and standalone identity mode differ'
+}
 Assert-Session (-not $apiClientConsumers -or ($libraryWitnessTarget.base -ceq '2.1.23' -and $libraryWitnessTarget.mir -ceq '5.0.21000')) 'API client consumer target differs'
 $library = Resolve-Existing ([string]$spec.archive_library) 'Container' 'archive library'
 $workroot = Resolve-BuildInput ([string]$spec.workroot) 'Container' 'workroot'
@@ -665,7 +720,11 @@ foreach ($client in $clients) {
   $null = $ports.Add([int]$client.port)
 }
 Assert-Session (($clients.locale | Sort-Object) -join ',' -ceq 'de,en') 'two client locales must be en and de'
-Assert-Session ((@($names | Sort-Object) -join ',') -ceq 'MIR5Deutsch,MIR5English') 'two client identities must be MIR5English and MIR5Deutsch'
+if($standaloneIdentityDiscovery){
+  Assert-Session ((@($names | Sort-Object) -join ',') -ceq 'standalone-de,standalone-en') 'standalone identity discovery client labels differ'
+}else{
+  Assert-Session ((@($names | Sort-Object) -join ',') -ceq 'MIR5Deutsch,MIR5English') 'two client identities must be MIR5English and MIR5Deutsch'
+}
 $pairedArm=$null
 if($fixtureCase -ceq 'library-paired-browser'){
   Assert-Session ($spec.ContainsKey('paired_arm') -and $spec.paired_arm -is [string] -and $spec.paired_arm -cin @('published','mir5')) 'paired Browser session arm differs'
@@ -676,7 +735,7 @@ $finalSave = Resolve-BuildOutput (Join-Path $serverWriteData 'saves/mir5-native-
 $sessionPath = Resolve-BuildOutput (Join-Path $workroot 'session.json') 'session output'
 $screenshotPatterns = [Collections.Generic.List[object]]::new()
 $patterns = @($spec.expected_screenshots | ForEach-Object { Resolve-BuildOutput ([string]$_) 'expected screenshot pattern' })
-if($fixtureCase-ceq'library-multiplayer') {
+if($fixtureCase-ceq'library-multiplayer' -and -not $standaloneIdentityDiscovery) {
  Assert-Session ($patterns.Count -eq 10 -and (@($patterns | Select-Object -Unique)).Count -eq 10) 'session requires ten distinct screenshot patterns'
  foreach ($client in $clients) {
   $root = [IO.Path]::GetFullPath((Join-Path $client.write_data 'script-output/mir5-library-multiplayer'))
@@ -698,6 +757,8 @@ if($fixtureCase-ceq'library-multiplayer') {
   Assert-Session ((@($stages | Sort-Object) -join ',') -ceq 'availability,initial,rejoin,restart,settled') "client $($client.name) screenshot stages differ"
  }
  Assert-Session ($screenshotPatterns.Count -eq 10) 'screenshot patterns do not map exactly to the two clients'
+} elseif($fixtureCase-ceq'library-multiplayer') {
+ Assert-Session ($patterns.Count-eq0) 'standalone identity discovery must not stage GUI screenshots'
 } elseif($fixtureCase-ceq'library-paired-browser') {
   Assert-Session ($patterns.Count -eq 8 -and (@($patterns | Select-Object -Unique)).Count -eq 8) 'paired Browser session requires eight distinct screenshot patterns'
   foreach ($client in $clients) {
@@ -738,28 +799,46 @@ if ($collectProcessMemoryObservations) {
 $records = [Collections.Generic.List[object]]::new()
 $apiClientLoadMarkers = [Collections.Generic.List[object]]::new()
 $liveLogs = @((Join-Path $serverWriteData 'factorio-current.log')) + @($clients | ForEach-Object { Join-Path $_.write_data 'factorio-current.log' })
-$deadline = [DateTime]::UtcNow.AddSeconds(900)
+$deadline = [DateTime]::UtcNow.AddSeconds($(if($standaloneIdentityDiscovery){180}else{900}))
 $server = $null; $activeClients = @()
 $baseServer = @('--config',$serverConfig,'--mod-directory',$library,'--disable-audio','--no-log-rotation','--rcon-bind',('127.0.0.1:' + [string]$rconPort),'--rcon-password',$rconPassword)
 function Start-Server([string]$Name, [string]$Save) {
   Start-Native $Name ($baseServer + @('--start-server',$Save,'--server-settings',$serverSettings,'--bind','127.0.0.1','--port',[string]$serverPort))
 }
 function Start-Clients([string]$Phase) {
+  $discovery=$false
+  $mode=Get-Variable -Name standaloneIdentityDiscovery -ValueOnly -ErrorAction SilentlyContinue
+  if($null-ne$mode){$discovery=[bool]$mode}
   $expectedJoin=switch -CaseSensitive ($Phase){initial{1};rejoin{2};restart{3};default{throw 'unknown client phase'}}
   $started=[Collections.Generic.List[object]]::new()
   $clientLogBaselines=@{}
   foreach($client in $clients){
     $clientLogPath=Join-Path $client.write_data 'factorio-current.log'
     $clientLogBaselines[[string]$client.name]=Read-LogText $clientLogPath
+    $serverLogBefore=Read-LogText (Join-Path $serverWriteData 'factorio-current.log')
     $actor=Start-Native ("client-$Phase-$($client.locale)") (@('--config',$client.config,'--mod-directory',$library,'--disable-audio','--no-log-rotation','--window-size','1280x720','--mp-connect',('127.0.0.1:'+ $serverPort),'--port',[string]$client.port)+$clientGraphics)
     $started.Add($actor)
     # Each native startup writes the shared library's settings cache. Wait
     # until the first real join proves those startup writes finished before
     # starting another client; archive/settings custody stays one exclusive job.
-    $joined='\['+[regex]::Escape($markerPrefix)+'_JOIN\] '+[regex]::Escape([string]$client.name)+' '+$expectedJoin+'(?:\r?\n|$)'
-    [void](Wait-For ("native join of "+$client.name) {
-      return [regex]::IsMatch((Read-LogText (Join-Path $serverWriteData 'factorio-current.log')),$joined)
-    })
+    if($discovery){
+      $actualName=Wait-For ("standalone native join of "+$client.locale) {
+        $current=Read-LogText (Join-Path $serverWriteData 'factorio-current.log')
+        $delta=if($current.StartsWith($serverLogBefore,[StringComparison]::Ordinal)){$current.Substring($serverLogBefore.Length)}else{$current}
+        $matches=[regex]::Matches($delta,('(?m)\['+[regex]::Escape($markerPrefix)+'_JOIN\]\s+([^\r\n]{1,256}?)\s+'+[regex]::Escape([string]$expectedJoin)+'\s*$'))
+        if($matches.Count-eq0){return $false}
+        Assert-Session ($matches.Count-eq1) 'standalone identity discovery join marker is ambiguous'
+        $actualName=[string]$matches[0].Groups[1].Value.Trim()
+        Assert-Session ([Text.UTF8Encoding]::new($false).GetByteCount($actualName) -ge 1) 'standalone identity discovery join name is empty'
+        return $actualName
+      }
+      $client['actual_name']=[string]$actualName
+    }else{
+      $joined='\['+[regex]::Escape($markerPrefix)+'_JOIN\] '+[regex]::Escape([string]$client.name)+' '+$expectedJoin+'(?:\r?\n|$)'
+      [void](Wait-For ("native join of "+$client.name) {
+        return [regex]::IsMatch((Read-LogText (Join-Path $serverWriteData 'factorio-current.log')),$joined)
+      })
+    }
     # The paired fixture counts all joins; the functional fixtures count per player.
     if($fixtureCase -ceq 'library-paired-browser'){$expectedJoin++}
   }
@@ -779,6 +858,9 @@ function Start-Clients([string]$Phase) {
 $sessionFailure = $null
 $result = $null
 try {
+  $discovery=$false
+  $mode=Get-Variable -Name standaloneIdentityDiscovery -ValueOnly -ErrorAction SilentlyContinue
+  if($null-ne$mode){$discovery=[bool]$mode}
   if ($fixtureCase -ceq 'library-paired-browser') {
     $server = Start-Server 'server-initial' $seed
     [void](Wait-For 'paired Browser ready marker' { param($ignored) Get-PairedBrowserStageMarker (Read-LogText (Join-Path $serverWriteData 'factorio-current.log')) 'ready' $pairedArm })
@@ -849,6 +931,21 @@ try {
     $server = Start-Server 'server-initial' $seed
     [void](Wait-For 'ready marker' { param($ignored) Get-StageMarker (Read-LogText (Join-Path $serverWriteData 'factorio-current.log')) 'ready' 0 $libraryWitnessTarget })
     $activeClients = Start-Clients 'initial'
+    if($discovery){
+      $identity=Wait-For 'standalone identity discovery marker' { param($ignored) Get-StandaloneIdentityDiscoveryMarker (Read-LogText (Join-Path $serverWriteData 'factorio-current.log')) }
+      $actualByLocale=@{}
+      foreach($player in @($identity.players)){$actualByLocale[[string]$player.locale]=$player}
+      foreach($client in $clients){
+        Assert-Session ($client.Contains('actual_name') -and [string]$client.actual_name -ceq [string]$actualByLocale[[string]$client.locale].name) 'standalone identity discovery client name differs from the server predicate'
+      }
+      $result=[ordered]@{
+        schema=1;kind='MIR5StandaloneIdentityDiscoverySessionV1';case=$fixtureCase;status='passed-private-standalone-identity-discovery'
+        environmental_only=$true;performance_acceptance=$false;release_qualification=$false;engine_sha256=(Get-SessionHash $engine);seed_sha256=$seedHash
+        identity_discovery=$identity
+        clients=@($clients|ForEach-Object {[ordered]@{label=$_.name;actual_name=$_.actual_name;locale=$_.locale;port=$_.port;config=$_.config;config_sha256=(Get-SessionHash $_.config);write_data=$_.write_data;player_data_sha256=(Get-SessionHash (Join-Path $_.write_data 'player-data.json'))}})
+        screenshots=@();rejoin_attempted=$false;research_attempted=$false;host_restart_attempted=$false
+      }
+    }else{
     [void](Wait-For 'rejoin-ready marker' { param($ignored) Get-StageMarker (Read-LogText (Join-Path $serverWriteData 'factorio-current.log')) 'rejoin-ready' 2 $libraryWitnessTarget })
     if($fixtureCase-ceq'library-multiplayer') {
       [void](Wait-For 'complete Availability client screenshots' { Find-Screenshots @('availability') })
@@ -914,6 +1011,7 @@ try {
       screenshots=@($screenshots | ForEach-Object {[ordered]@{path=$_;sha256=(Get-SessionHash $_);width=1280;height=720}})
     }
     if($apiClientConsumers){$result.api_client_load_markers=@($apiClientLoadMarkers)}
+    }
   }
 }
 catch { $sessionFailure = $_ }
