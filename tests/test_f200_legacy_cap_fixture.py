@@ -20,6 +20,9 @@ PUBLISHED_PROFILE = ROOT / "tests/profiles/f200-legacy-cap-published-4.7-2077.js
 MIR5_PROFILE = ROOT / "tests/profiles/f200-legacy-cap-mir5-2077.json"
 PUBLISHED_RELAXED_PROFILE = ROOT / "tests/profiles/f200-legacy-cap-published-relaxed-control-4.7-2077.json"
 CROSS_SOURCE_PROFILE = ROOT / "tests/profiles/f200-legacy-cap-cross-f200-published-4.7.3-2077.json"
+F210_DISABLED_PROFILE = ROOT / "tests/profiles/f200-legacy-cap-cross-disabled-f210-mir5-2123.json"
+F210_REENABLED_PROFILE = ROOT / "tests/profiles/f200-legacy-cap-cross-reenabled-f210-mir5-2123.json"
+EA41_READBACK = ROOT / "spec/evidence/current-assets-ea41cbc6-readback.json"
 PUBLISHED_CONTROL_INFO = FIXTURE / "published-control-info.json"
 F200_CROSS = FIXTURE / "f200/cross-to-f210"
 F210_CROSS = FIXTURE / "f210/cross-from-f200"
@@ -454,6 +457,72 @@ class F200LegacyCapFixtureTests(unittest.TestCase):
                 self.assertEqual((None, "1", 1),
                                  (result["row"]["unit"]["count"], result["row"]["unit"]["count_formula"],
                                   result["row"]["unit"]["time"]))
+
+    def test_cross_engine_disabled_and_reenabled_profiles_bind_the_exact_three_stage_inputs(self):
+        source = json.loads(CROSS_SOURCE_PROFILE.read_text(encoding="utf-8"))
+        disabled = json.loads(F210_DISABLED_PROFILE.read_text(encoding="utf-8"))
+        reenabled = json.loads(F210_REENABLED_PROFILE.read_text(encoding="utf-8"))
+        readback = json.loads(EA41_READBACK.read_text(encoding="utf-8"))
+
+        self.assertEqual(
+            ("mir5-f200-f210-positive-cap-cross-source", "f200", "2.0", "2.0.77",
+             "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B", "Defaults"),
+            (source["kind"], source["target"], source["factorio_line"], source["engine"]["version"],
+             source["engine"]["sha256"], source["settings_mode"]),
+        )
+        self.assertEqual(
+            [("base", "2.0.77", True), ("mir-fixture-mir5-active-mods-observer", "0.1.0", True),
+             ("more-infinite-research", "4.7.20003", True), (NAME, "0.4.0", True)],
+            [(row["name"], row["version"], row["enabled"]) for row in source["mods"]],
+        )
+        self.assertEqual({
+            "mir-fixture-mir5-active-mods-observer_0.1.0.zip": "723D1E7721449FC26040E5E6629416767BDC20AD79CF8723115846DB662A1F87",
+            "more-infinite-research_4.7.20003.zip": "FBBA844DD04011A12BB6DA885745B0733AD37FAB181EAAD9EE4346B9B0D32647",
+        }, source["archive_sha256"])
+        self.assertIn("Input binding only; no native pass.", source["scope"])
+
+        self.assertEqual(("ea41cbc6d27626283db9d8bbf6211b2171b6e36a", "5.0.21000"),
+                         (readback["source"]["commit"], readback["source"]["source_distribution_version"]))
+        f210_asset = next(row for row in readback["files"] if row["name"] == "more-infinite-research_5.0.21000.zip")
+        self.assertEqual((564337, "CE1165CAC174EDA4800EBECAAEF29FC2E071B2E7160CD98F799FE21C2F151F9B"),
+                         (f210_asset["bytes"], f210_asset["sha256"]))
+        self.assertFalse(readback["claims"]["native_qualification"])
+
+        expected_info = [
+            "base = 2.1.23", "? elevated-rails = 2.1.23", "? quality = 2.1.23", "? recycler = 2.1.23",
+            "? space-age = 2.1.23", "more-infinite-research = 5.0.21000",
+        ]
+        for profile, stage, version, kind, labs, stage_name, predecessor in (
+            (disabled, F210_DISABLED, "0.6.0", "mir5-f200-f210-positive-cap-cross-disabled-intermediate",
+             "zero disabled-stage labs", "f210/disabled-after-f200 v0.6.0", None),
+            (reenabled, F210_REENABLED, "0.7.0", "mir5-f200-f210-positive-cap-cross-reenabled-successor",
+             "one re-enabled-stage lab", "f210/reenabled-after-f200 v0.7.0", "disabled v0.6.0 intermediate"),
+        ):
+            with self.subTest(profile=profile["kind"]):
+                self.assertEqual({"schema", "kind", "target", "factorio_line", "engine", "settings_mode", "mods", "archive_sha256", "scope"}, set(profile))
+                self.assertEqual((1, kind, "f210", "2.1", "2.1.23",
+                                  "FE4A1DA30F322A0D0B8AEB3DF7276332222BAAA143E2352569B723E84B2B9060", "Defaults"),
+                                 (profile["schema"], profile["kind"], profile["target"], profile["factorio_line"],
+                                  profile["engine"]["version"], profile["engine"]["sha256"], profile["settings_mode"]))
+                self.assertEqual(
+                    [("base", "2.1.23", True), ("mir-fixture-mir5-active-mods-observer", "0.1.0", True),
+                     ("more-infinite-research", "5.0.21000", True), (NAME, version, True)],
+                    [(row["name"], row["version"], row["enabled"]) for row in profile["mods"]],
+                )
+                self.assertEqual({
+                    "mir-fixture-mir5-active-mods-observer_0.1.0.zip": "2E1BE5952D2A4CC5C74A0D149E075D247BA110A3FAE5B6768D3EAEBABCEF989C",
+                    "more-infinite-research_5.0.21000.zip": f210_asset["sha256"],
+                }, profile["archive_sha256"])
+                self.assertIn(CROSS_SOURCE_PROFILE.name, profile["scope"])
+                self.assertIn("InputSavePath/ExpectedInputSaveSha256", profile["scope"])
+                self.assertIn(labs, profile["scope"])
+                self.assertIn(stage_name, profile["scope"])
+                if predecessor is not None:
+                    self.assertIn(predecessor, profile["scope"])
+                self.assertIn("no native pass", profile["scope"])
+                info = json.loads((stage / "info.json").read_text(encoding="utf-8"))
+                self.assertEqual((NAME, version, "2.1", expected_info),
+                                 (info["name"], info["version"], info["factorio_version"], info["dependencies"]))
 
     def test_independent_base_oracle_preflight_precedes_the_only_count_time_mutation(self):
         for directory, mir, fixture in (("published", "4.7.20002", "0.1.0"), ("mir5", "5.0.20000", "0.2.0")):
