@@ -31,6 +31,7 @@ This is the authoritative product changelog. Each MIR 1–3 master release appea
 
 ### Bugfixes
 
+- Retain science amounts, prerequisites, effect counts, lab outcomes and icon sources in opt-in generation diagnostics.
 - Keep retired space science and its prerequisite out of the two base level-seven continuations when Space Is Fake is active, including expanded science policies; preserve the full remaining science vector and explicit progression requirements.
 - Restrict public data declarations to checked native fields and MIR-owned presentation before publication.
 - Accept Factorio's default recipe productivity ceiling when BobTech and Angel omit the optional raw field.
