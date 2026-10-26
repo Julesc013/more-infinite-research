@@ -129,13 +129,26 @@ class LibraryTests(unittest.TestCase):
 
           function gui_style()
             local values = {}
+            local function assert_int32(key, value)
+              assert(type(value) == "number" and value == math.floor(value)
+                and value >= -2147483648 and value <= 2147483647,
+                "LuaStyle." .. key .. " requires an int32")
+            end
             return setmetatable({}, {
               __index = function(_, key) return values[key] end,
               __newindex = function(_, key, value)
                 if key == "width" then
+                  assert_int32(key, value)
                   -- LuaStyle.width writes both bounds. Keep this host double
-                  -- aligned with the native 2.0 GUI contract.
+                  -- aligned with the native F200/F210 GUI contract.
                   values.minimal_width, values.maximal_width = value, value
+                elseif key == "height" then
+                  assert_int32(key, value)
+                  values.minimal_height, values.maximal_height = value, value
+                elseif key == "minimal_width" or key == "maximal_width"
+                    or key == "minimal_height" or key == "maximal_height" then
+                  assert_int32(key, value)
+                  values[key] = value
                 else
                   values[key] = value
                 end
@@ -145,7 +158,11 @@ class LibraryTests(unittest.TestCase):
 
           function gui_container(parent)
             local value = {valid = true, parent = parent, _parent = parent, _children = {}, style = gui_style()}
-            value.auto_center = function() value.auto_centered = true end
+            value.auto_center = true
+            value.force_auto_center = function()
+              assert(value.auto_center == true, "native force_auto_center requires an auto-centering frame")
+              value.force_auto_center_calls = (value.force_auto_center_calls or 0) + 1
+            end
             value.add = function(spec)
               if spec.type == "tabbed-pane" and spec.name == "mir_library_tabs" then
                 assert(spec.selected_tab_index == nil, "MIR must select a tab only after add_tab entries exist")
@@ -522,15 +539,16 @@ class LibraryTests(unittest.TestCase):
           end
           local root = library.open(player,{selected=gear.name,query="gear"})
           local root_width = root.style.maximal_width
-          assert(root.style.minimal_width == root_width and root_width <= 1280/1.25 and root.style.height <= 720/1.25)
-          assert(root.auto_centered == true)
+          assert(root.style.minimal_width == root_width and root_width <= 1280/1.25
+            and root.style.maximal_height <= 720/1.25)
+          assert(root.auto_center == true and root.force_auto_center_calls == 1)
           local filters = root["mir_library_filters"]
           assert(filters.type == "table" and filters.column_count == 4)
           local family_style = filters["mir_library_family"].style
           assert(family_style.minimal_width == family_style.maximal_width and family_style.maximal_width <= 280)
           local content = research_content(root)
           assert(content.type == "scroll-pane" and content.horizontal_scroll_policy == "never")
-          assert(content.style.height < root.style.height and content.style.maximal_width < root_width)
+          assert(content.style.maximal_height < root.style.maximal_height and content.style.maximal_width < root_width)
           local detail = content["mir_library_detail"]
           assert(detail.style.minimal_width == content.style.maximal_width
             and detail.style.maximal_width == content.style.maximal_width)
@@ -542,10 +560,34 @@ class LibraryTests(unittest.TestCase):
           assert(content["mir_library_detail"]["mir_library_effect_1"].caption[2] == "10")
           assert(filters["mir_library_family_label"].caption[1] == "mir-browser.filter-scope")
           library.close(player)
+          storage.mir_library.players[1].location = {x=17,y=29}
           player.display_resolution, player.display_scale = {width=1280,height=720}, 2
           root = library.open(player,{selected=gear.name})
           assert(root["mir_library_filters"].column_count == 2)
-          assert(root.style.minimal_width == root.style.maximal_width and root.style.maximal_width <= 640 and root.style.height <= 360)
+          assert(root.style.minimal_width == root.style.maximal_width and root.style.maximal_width <= 640
+            and root.style.maximal_height <= 360)
+          assert(root.location.x == 17 and root.location.y == 29 and root.force_auto_center_calls == nil,
+            "a saved drag location must win over native force_auto_center")
+          ''')
+
+    def test_fractional_display_scale_writes_only_int32_gui_dimensions(self):
+        self.lua.execute(r'''
+          boot()
+          -- 1042 / 1.25 - 32 is 801.6, and the two-column control calculation
+          -- is fractional again. The native LuaStyle setters take int32 only.
+          player.display_resolution, player.display_scale = {width=1042,height=768}, 1.25
+          local root = library.open(player,{selected=gear.name})
+          assert(root.style.minimal_width == 801 and root.style.maximal_width == 801)
+          assert(root.style.minimal_height == 582 and root.style.maximal_height == 582)
+          assert(root.force_auto_center_calls == 1)
+          local filters = root["mir_library_filters"]
+          local family = filters["mir_library_family"]
+          assert(family.style.minimal_width == 225 and family.style.maximal_width == 225)
+          local tabs = root["mir_library_tabs"]
+          assert(tabs.style.maximal_width == 769)
+          local content = research_content(root)
+          assert(content.style.minimal_width == 753 and content.style.maximal_width == 753)
+          assert(content.style.minimal_height == 352 and content.style.maximal_height == 352)
         ''')
 
     def test_pure_prototype_constructor_preserves_published_shortcut_identity(self):
