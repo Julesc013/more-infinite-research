@@ -215,11 +215,55 @@ function New-StandaloneIdentityFixtureStage {
   Assert-MIRLibraryFixtureArchive -Archive $archive -SourceDirectory $fixture.source
   return [pscustomobject]@{source=$fixture.source;archive=$archive;sha256=(Get-FileHash -LiteralPath $archive -Algorithm SHA256).Hash.ToUpperInvariant()}
 }
+function New-StandaloneIdentityObserverSourceProjection {
+  param(
+    [Parameter(Mandatory)][string]$RepoRoot,
+    [Parameter(Mandatory)][string]$ArchiveLibrary,
+    [Parameter(Mandatory)][string]$OutputRoot,
+    [Parameter(Mandatory)][ValidatePattern('^[A-Fa-f0-9]{64}$')][string]$ExpectedArchiveSha256
+  )
+  # info-f200.json is alternate-engine packaging metadata.  The immutable F210
+  # A15 container intentionally consists only of its two 2.1 runtime members.
+  $canonical=(Resolve-Path -LiteralPath (Join-Path $RepoRoot 'tests/fixtures/active-mods-observer')).Path
+  $canonicalFiles=@(Get-ChildItem -LiteralPath $canonical -Recurse -File|Sort-Object FullName)
+  $canonicalNames=@($canonicalFiles|ForEach-Object {[IO.Path]::GetRelativePath($canonical,$_.FullName).Replace('\','/')})
+  $expectedCanonical=@('data-final-fixes.lua','info-f200.json','info.json')
+  Assert-Session ($canonicalNames.Count-eq$expectedCanonical.Count-and ((@($canonicalNames|Sort-Object)-join '|')-ceq(@($expectedCanonical|Sort-Object)-join '|'))) 'standalone identity discovery canonical observer source members differ'
+  $info=Get-Content -LiteralPath (Join-Path $canonical 'info.json') -Raw|ConvertFrom-Json -AsHashtable
+  $f200Info=Get-Content -LiteralPath (Join-Path $canonical 'info-f200.json') -Raw|ConvertFrom-Json -AsHashtable
+  Assert-Session ([string]$info.name-ceq'mir-fixture-mir5-active-mods-observer' -and [string]$info.version-ceq'0.1.0' -and [string]$info.factorio_version-ceq'2.1') 'standalone identity discovery canonical F210 observer metadata differs'
+  Assert-Session ([string]$f200Info.name-ceq[string]$info.name -and [string]$f200Info.version-ceq[string]$info.version -and [string]$f200Info.factorio_version-ceq'2.0') 'standalone identity discovery alternate F200 observer metadata differs'
+  $archive=Join-Path (Resolve-Path -LiteralPath $ArchiveLibrary).Path 'mir-fixture-mir5-active-mods-observer_0.1.0.zip'
+  Assert-Session ((Get-FileHash -LiteralPath $archive -Algorithm SHA256).Hash.ToUpperInvariant()-ceq$ExpectedArchiveSha256.ToUpperInvariant()) 'standalone identity discovery A15 observer archive differs'
+  $runtimeNames=@('data-final-fixes.lua','info.json');$prefix=$info.name+'_'+$info.version+'/'
+  $zip=[IO.Compression.ZipFile]::OpenRead($archive)
+  try {
+    $entryNames=@($zip.Entries|ForEach-Object {$_.FullName})
+    $expectedEntries=@($runtimeNames|ForEach-Object {$prefix+$_})
+    Assert-Session ($entryNames.Count-eq$expectedEntries.Count-and ((@($entryNames|Sort-Object)-join '|')-ceq(@($expectedEntries|Sort-Object)-join '|'))) 'standalone identity discovery A15 observer archive members differ'
+    foreach($name in $runtimeNames){
+      $source=Join-Path $canonical $name;$entry=$zip.GetEntry($prefix+$name)
+      Assert-Session ($null-ne$entry-and $entry.Length-eq(Get-Item -LiteralPath $source).Length) "standalone identity discovery A15 observer member differs: $name"
+      $stream=$entry.Open();try{$entryHash=[Convert]::ToHexString([Security.Cryptography.SHA256]::HashData($stream))}finally{$stream.Dispose()}
+      Assert-Session ($entryHash-ceq(Get-FileHash -LiteralPath $source -Algorithm SHA256).Hash.ToUpperInvariant()) "standalone identity discovery A15 observer bytes differ: $name"
+    }
+  } finally {$zip.Dispose()}
+  $stage=Join-Path $OutputRoot 'standalone-identity-observer-source'
+  Assert-Session (-not(Test-Path -LiteralPath $stage)) 'standalone identity discovery observer source stage already exists'
+  $null=New-Item -ItemType Directory -Path $stage
+  foreach($name in $runtimeNames){[IO.File]::Copy((Join-Path $canonical $name),(Join-Path $stage $name),$false)}
+  $stageNames=@(Get-ChildItem -LiteralPath $stage -Recurse -File|ForEach-Object {[IO.Path]::GetRelativePath($stage,$_.FullName).Replace('\','/')})
+  Assert-Session ($stageNames.Count-eq$runtimeNames.Count-and ((@($stageNames|Sort-Object)-join '|')-ceq(@($runtimeNames|Sort-Object)-join '|'))) 'standalone identity discovery observer projection members differ'
+  foreach($name in $runtimeNames){Assert-Session ((Get-FileHash -LiteralPath (Join-Path $stage $name) -Algorithm SHA256).Hash.ToUpperInvariant()-ceq(Get-FileHash -LiteralPath (Join-Path $canonical $name) -Algorithm SHA256).Hash.ToUpperInvariant()) "standalone identity discovery observer projection bytes differ: $name"}
+  Assert-MIRLibraryFixtureArchive -Archive $archive -SourceDirectory $stage
+  return [pscustomobject]@{source=$stage;canonical_source=$canonical;archive=$archive;sha256=$ExpectedArchiveSha256.ToUpperInvariant();members=@($runtimeNames|ForEach-Object {[ordered]@{path=$_;sha256=(Get-FileHash -LiteralPath (Join-Path $stage $_) -Algorithm SHA256).Hash.ToUpperInvariant()}});alternate_metadata='info-f200.json'}
+}
 function Get-StandaloneIdentityFixtureSources {
   param(
     [Parameter(Mandatory)][string[]]$Sources,
     [Parameter(Mandatory)][string]$LibraryFixtureSource,
     [Parameter(Mandatory)][string]$StagedLibraryFixtureSource,
+    [Parameter(Mandatory)][string]$StagedObserverSource,
     [Parameter(Mandatory)][string]$RepoRoot
   )
   $canonicalObserver=(Resolve-Path -LiteralPath (Join-Path $RepoRoot 'tests/fixtures/active-mods-observer')).Path
@@ -236,13 +280,14 @@ function Get-StandaloneIdentityFixtureSources {
       $libraryCount++;$result.Add($staged)
     }elseif([string]$info.name-ceq'mir-fixture-mir5-active-mods-observer'){
       Assert-Session ($source-ieq$canonicalObserver) 'standalone identity discovery observer source differs from its canonical source'
-      $observerCount++;$result.Add($canonicalObserver)
+      $observerCount++;$result.Add((Resolve-Path -LiteralPath $StagedObserverSource).Path)
     }else{$result.Add($source)}
   }
   Assert-Session ($libraryCount-eq1) 'standalone identity discovery requires one canonical Library fixture source'
   Assert-Session ($observerCount -le 1) 'standalone identity discovery observer source is duplicated'
-  if($observerCount-eq0){$result.Add($canonicalObserver)}
-  $actualObserver=@($result|Where-Object {$_-ieq$canonicalObserver})
+  $stagedObserver=(Resolve-Path -LiteralPath $StagedObserverSource).Path
+  if($observerCount-eq0){$result.Add($stagedObserver)}
+  $actualObserver=@($result|Where-Object {$_-ieq$stagedObserver})
   Assert-Session ($actualObserver.Count-eq1) 'standalone identity discovery requires one verified canonical observer source'
   return @($result.ToArray())
 }
@@ -329,7 +374,8 @@ if($StandaloneIdentityDiscovery){
   # A15 and the staged 0.1.1 fixture; it never relabels the FE4/2E profile.
   $null=Assert-MultiplayerFixtureSelection -Selection $selection -EngineSha256 'FE4A1DA30F322A0D0B8AEB3DF7276332222BAAA143E2352569B723E84B2B9060' -FixtureCase 'library-multiplayer'
   $discoveryFixture=New-StandaloneIdentityFixtureStage -Sources $FixtureSources -OutputRoot $output
-  $fixtureSourcesForRun=Get-StandaloneIdentityFixtureSources -Sources $FixtureSources -LibraryFixtureSource (Join-Path $repo 'tests/fixtures/library-multiplayer') -StagedLibraryFixtureSource $discoveryFixture.source -RepoRoot $repo
+  $discoveryObserver=New-StandaloneIdentityObserverSourceProjection -RepoRoot $repo -ArchiveLibrary $library -OutputRoot $output -ExpectedArchiveSha256 'A15A7D628D66953D2E0C4D4FA288F47CBF9C5678327C7EB3D23ADB5DC78331C0'
+  $fixtureSourcesForRun=Get-StandaloneIdentityFixtureSources -Sources $FixtureSources -LibraryFixtureSource (Join-Path $repo 'tests/fixtures/library-multiplayer') -StagedLibraryFixtureSource $discoveryFixture.source -StagedObserverSource $discoveryObserver.source -RepoRoot $repo
   $selection=[ordered]@{
     schema=1;kind='mir5-library-standalone-identity-discovery-f210-selection';target='standalone-identity-discovery';factorio_line='2.1';settings_mode='Defaults'
     engine=[ordered]@{version='2.1.23';sha256='8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38'}
@@ -361,7 +407,7 @@ $record=[ordered]@{
   kind=$(if($StandaloneIdentityDiscovery){'MIR5StandaloneIdentityDiscoveryNativeResultV1'}else{switch($FixtureCase){'library-multiplayer'{'MIR5LibraryMultiplayerNativeResultV1'};'library-paired-browser'{'MIR5LibraryPairedBrowserNativeResultV1'};default{'MIR5ScriptedEffectsMultiplayerNativeResultV1'}}});case=$FixtureCase;status='started';source_head=$prepared.source_head
   engine=$prepared.engine;profile=$prepared.profile;fixtures=$prepared.fixtures;mir_archive=$prepared.mir_archive
   preparation=$prepared;session_expected_peak_memory_mib=$SessionExpectedPeakMemoryMiB;release_qualification=$false;visual_review=$false
-  standalone_identity_discovery=if($StandaloneIdentityDiscovery){[ordered]@{fixture_source=$discoveryFixture.source;fixture_archive_sha256=[string]$selection.archive_sha256['mir-fixture-mir5-library-multiplayer_0.1.1.zip'];environmental_only=$true}}else{$null}
+  standalone_identity_discovery=if($StandaloneIdentityDiscovery){[ordered]@{fixture_source=$discoveryFixture.source;fixture_archive_sha256=[string]$selection.archive_sha256['mir-fixture-mir5-library-multiplayer_0.1.1.zip'];observer_source=$discoveryObserver.source;observer_canonical_source=$discoveryObserver.canonical_source;observer_archive_sha256=$discoveryObserver.sha256;observer_members=$discoveryObserver.members;observer_alternate_metadata=$discoveryObserver.alternate_metadata;environmental_only=$true}}else{$null}
   harness_sha256=(Get-FileHash -LiteralPath $PSCommandPath -Algorithm SHA256).Hash
 }
 try {

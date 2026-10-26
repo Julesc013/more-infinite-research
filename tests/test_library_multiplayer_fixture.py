@@ -779,20 +779,58 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
           $repo=$env:MIR_TEST_REPO
           $library=Join-Path $repo 'tests/fixtures/library-multiplayer'
           $observer=Join-Path $repo 'tests/fixtures/active-mods-observer'
-          $accepted=@(Get-StandaloneIdentityFixtureSources -Sources @($library) -LibraryFixtureSource $library -StagedLibraryFixtureSource $library -RepoRoot $repo)
+          $accepted=@(Get-StandaloneIdentityFixtureSources -Sources @($library) -LibraryFixtureSource $library -StagedLibraryFixtureSource $library -StagedObserverSource $observer -RepoRoot $repo)
           if($accepted.Count-ne2 -or $accepted[0]-ine$library -or $accepted[1]-ine$observer){throw 'canonical observer was not appended exactly once'}
           function Assert-Rejects([string]$Name,[scriptblock]$Block){$rejected=$false;try{&$Block}catch{$rejected=$true};if(-not$rejected){throw "discovery observer source accepted opponent: $Name"}}
           $missingRepo=Join-Path $env:MIR_TEST_WORK 'missing-repository';$null=New-Item -ItemType Directory -Path (Join-Path $missingRepo 'tests/fixtures') -Force
-          Assert-Rejects 'missing canonical observer' {Get-StandaloneIdentityFixtureSources -Sources @($library) -LibraryFixtureSource $library -StagedLibraryFixtureSource $library -RepoRoot $missingRepo|Out-Null}
+          Assert-Rejects 'missing canonical observer' {Get-StandaloneIdentityFixtureSources -Sources @($library) -LibraryFixtureSource $library -StagedLibraryFixtureSource $library -StagedObserverSource $observer -RepoRoot $missingRepo|Out-Null}
           $wrong=Join-Path $env:MIR_TEST_WORK 'wrong-observer';Copy-Item -LiteralPath $observer -Destination $wrong -Recurse
-          Assert-Rejects 'wrong observer source' {Get-StandaloneIdentityFixtureSources -Sources @($library,$wrong) -LibraryFixtureSource $library -StagedLibraryFixtureSource $library -RepoRoot $repo|Out-Null}
-          Assert-Rejects 'duplicate observer source' {Get-StandaloneIdentityFixtureSources -Sources @($library,$observer,$observer) -LibraryFixtureSource $library -StagedLibraryFixtureSource $library -RepoRoot $repo|Out-Null}
+          Assert-Rejects 'wrong observer source' {Get-StandaloneIdentityFixtureSources -Sources @($library,$wrong) -LibraryFixtureSource $library -StagedLibraryFixtureSource $library -StagedObserverSource $observer -RepoRoot $repo|Out-Null}
+          Assert-Rejects 'duplicate observer source' {Get-StandaloneIdentityFixtureSources -Sources @($library,$observer,$observer) -LibraryFixtureSource $library -StagedLibraryFixtureSource $library -StagedObserverSource $observer -RepoRoot $repo|Out-Null}
           'PASS standalone identity canonical observer source binding'
         '''
         with tempfile.TemporaryDirectory(prefix="mir5-identity-observer-") as work:
             result = subprocess.run(
                 ["pwsh", "-NoLogo", "-NoProfile", "-Command", script], capture_output=True, text=True,
                 env=dict(os.environ, MIR_TEST_WRAPPER=str(WRAPPER), MIR_TEST_REPO=str(ROOT), MIR_TEST_WORK=work), check=False,
+            )
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+
+    def test_standalone_identity_observer_projection_is_the_exact_a15_member_set(self):
+        script = r'''
+          $ErrorActionPreference='Stop'; Set-StrictMode -Version Latest
+          $tokens=$null;$errors=$null
+          $ast=[Management.Automation.Language.Parser]::ParseFile($env:MIR_TEST_WRAPPER,[ref]$tokens,[ref]$errors)
+          if($errors.Count){throw $errors[0].Message}
+          function Assert-Session([bool]$Condition,[string]$Message){if(-not$Condition){throw $Message}}
+          function Assert-MIRLibraryFixtureArchive([string]$Archive,[string]$SourceDirectory){
+            $names=@(Get-ChildItem -LiteralPath $SourceDirectory -Recurse -File|ForEach-Object {[IO.Path]::GetRelativePath($SourceDirectory,$_.FullName).Replace('\','/')}|Sort-Object)
+            if(($names-join'|')-cne'data-final-fixes.lua|info.json'){throw 'projection is not the exact two-member source'}
+          }
+          $node=@($ast.FindAll({param($candidate) $candidate -is [Management.Automation.Language.FunctionDefinitionAst] -and $candidate.Name -ceq 'New-StandaloneIdentityObserverSourceProjection'},$true))
+          if($node.Count-ne1){throw 'observer projection function is absent or ambiguous'}
+          Invoke-Expression $node[0].Extent.Text
+          $repo=$env:MIR_TEST_REPO;$library=$env:MIR_TEST_LIBRARY;$hash='A15A7D628D66953D2E0C4D4FA288F47CBF9C5678327C7EB3D23ADB5DC78331C0'
+          $positiveRoot=Join-Path $env:MIR_TEST_WORK 'positive';$null=New-Item -ItemType Directory -Path $positiveRoot
+          $projection=New-StandaloneIdentityObserverSourceProjection -RepoRoot $repo -ArchiveLibrary $library -OutputRoot $positiveRoot -ExpectedArchiveSha256 $hash
+          if($projection.sha256-cne$hash -or $projection.alternate_metadata-cne'info-f200.json' -or $projection.members.Count-ne2){throw 'projection lost exact A15 identity facts'}
+          function Assert-Rejects([string]$Name,[scriptblock]$Block){$rejected=$false;try{&$Block}catch{$rejected=$true};if(-not$rejected){throw "observer projection accepted opponent: $Name"}}
+          $changedRepo=Join-Path $env:MIR_TEST_WORK 'changed-repo';$changedSource=Join-Path $changedRepo 'tests/fixtures/active-mods-observer';$null=New-Item -ItemType Directory -Path (Split-Path -Parent $changedSource) -Force;Copy-Item -LiteralPath (Join-Path $repo 'tests/fixtures/active-mods-observer') -Destination $changedSource -Recurse
+          [IO.File]::AppendAllText((Join-Path $changedSource 'data-final-fixes.lua'),'-- altered',[Text.UTF8Encoding]::new($false))
+          Assert-Rejects 'altered canonical member' {New-StandaloneIdentityObserverSourceProjection -RepoRoot $changedRepo -ArchiveLibrary $library -OutputRoot (Join-Path $env:MIR_TEST_WORK 'changed-output') -ExpectedArchiveSha256 $hash|Out-Null}
+          $missingRepo=Join-Path $env:MIR_TEST_WORK 'missing-repo';$missingSource=Join-Path $missingRepo 'tests/fixtures/active-mods-observer';$null=New-Item -ItemType Directory -Path (Split-Path -Parent $missingSource) -Force;Copy-Item -LiteralPath (Join-Path $repo 'tests/fixtures/active-mods-observer') -Destination $missingSource -Recurse;Remove-Item -LiteralPath (Join-Path $missingSource 'data-final-fixes.lua') -Force
+          Assert-Rejects 'missing canonical member' {New-StandaloneIdentityObserverSourceProjection -RepoRoot $missingRepo -ArchiveLibrary $library -OutputRoot (Join-Path $env:MIR_TEST_WORK 'missing-output') -ExpectedArchiveSha256 $hash|Out-Null}
+          $extraLibrary=Join-Path $env:MIR_TEST_WORK 'extra-library';$null=New-Item -ItemType Directory -Path $extraLibrary;$extraArchive=Join-Path $extraLibrary 'mir-fixture-mir5-active-mods-observer_0.1.0.zip';Copy-Item -LiteralPath (Join-Path $library 'mir-fixture-mir5-active-mods-observer_0.1.0.zip') -Destination $extraArchive
+          $zip=[IO.Compression.ZipFile]::Open($extraArchive,[IO.Compression.ZipArchiveMode]::Update);try{$writer=[IO.StreamWriter]::new($zip.CreateEntry('mir-fixture-mir5-active-mods-observer_0.1.0/unexpected.lua').Open());try{$writer.Write('-- unexpected')}finally{$writer.Dispose()}}finally{$zip.Dispose()}
+          $extraHash=(Get-FileHash -LiteralPath $extraArchive -Algorithm SHA256).Hash
+          Assert-Rejects 'extra archive member' {New-StandaloneIdentityObserverSourceProjection -RepoRoot $repo -ArchiveLibrary $extraLibrary -OutputRoot (Join-Path $env:MIR_TEST_WORK 'extra-output') -ExpectedArchiveSha256 $extraHash|Out-Null}
+          'PASS standalone identity observer projection members'
+        '''
+        with tempfile.TemporaryDirectory(prefix="mir5-identity-observer-projection-") as work:
+            result = subprocess.run(
+                ["pwsh", "-NoLogo", "-NoProfile", "-Command", script], capture_output=True, text=True,
+                env=dict(os.environ, MIR_TEST_WRAPPER=str(WRAPPER), MIR_TEST_REPO=str(ROOT),
+                         MIR_TEST_LIBRARY=r"D:\Projects\Factorio\testmods\2.1", MIR_TEST_WORK=work), check=False,
             )
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
 
