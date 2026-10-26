@@ -447,7 +447,10 @@ if($standaloneF210){
   $canonicalLibrary=Join-Path $repo 'tests/fixtures/library-multiplayer'
   $fixtureSourcesForRun=Get-StandaloneIdentityFixtureSources -Sources $FixtureSources -LibraryFixtureSource $canonicalLibrary -StagedLibraryFixtureSource $standaloneLibraryFixture.source -StagedObserverSource $standaloneObserver.source -RepoRoot $repo
 }
-$standaloneClientNames=($StandaloneIdentityDiscovery -or $standaloneF210)
+# The normal standalone target remains the ordinary two-client Library
+# contract.  Only the explicitly environmental discovery route needs its
+# distinct synthetic labels.
+$standaloneClientNames=$StandaloneIdentityDiscovery
 Assert-Session ($FixtureCase -ceq 'library-multiplayer' -or $SessionExpectedPeakMemoryMiB -eq 8192) 'only the functional Library session may use the calibrated peak override'
 Assert-Session (-not $StandaloneIdentityDiscovery -or ($FixtureCase -ceq 'library-multiplayer' -and $SessionExpectedPeakMemoryMiB -eq 7168 -and -not $CollectProcessMemoryObservations)) 'standalone identity discovery differs from its bounded Library-only contract'
 Assert-Session (-not $StandaloneIdentityDiscovery -or $ExpectedMIRArchiveSha256.ToUpperInvariant() -ceq [string]$target.mir_archive_sha256) 'standalone identity discovery MIR archive differs'
@@ -508,8 +511,8 @@ try {
     [IO.File]::WriteAllText($config,$text,[Text.UTF8Encoding]::new($false))
     $name=if($standaloneClientNames){'standalone-'+$locale}elseif($locale -ceq 'en'){'MIR5English'}else{'MIR5Deutsch'}
     # Isolated disposable identities contain no online token or personal data.
-    # Discovery still needs the same bounded synthetic name for the server's
-    # actual join marker; only its token and write-data remain isolated.
+    # Discovery alone uses the bounded synthetic label for its actual join
+    # marker; every route still keeps its token and write-data isolated.
     $player=@{'service-username'=$name;'service-token'='';'last-played-version'=@{game_version=$target.base;build_version=$target.build_version;build_mode='full';platform='win64'}}
     [IO.File]::WriteAllText((Join-Path $write 'player-data.json'),($player|ConvertTo-Json -Depth 5),[Text.UTF8Encoding]::new($false))
     $clients+=@{name=$name;locale=$locale;config=$config;write_data=$write;port=$udpPorts[$clientIndex]};$clientIndex++

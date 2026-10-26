@@ -284,7 +284,7 @@ end
 local function run_action(state, label, players)
   local views = VIEWS[label]
   if views == nil then fail("unrecognized paired Browser action") end
-  local profiler = game.create_profiler(true)
+  local profiler = helpers.create_profiler(true)
   profiler.restart()
   open(players.en, views.en)
   open(players.de, views.de)
