@@ -4447,7 +4447,56 @@
           "source/api/v1/data.lua"
         ],
         "evidence": [
-          "spec/evidence/api-canonical-native-chain.json"
+          "spec/evidence/api-canonical-native-chain.json",
+          "spec/evidence/broad-ecosystem-f210-ea41-native-chain-r01.json"
+        ],
+        "native_observations": [
+          {
+            "id": "ea41-b6eb-broad-f210-data-stage-signatures",
+            "source_commit": "ea41cbc6d27626283db9d8bbf6211b2171b6e36a",
+            "engine": {
+              "version": "2.1.23",
+              "sha256": "FE4A1DA30F322A0D0B8AEB3DF7276332222BAAA143E2352569B723E84B2B9060"
+            },
+            "published_archive_sha256": "B6EB9430056ABD384DB00F94929FE7DAC0A37441ACF4BC277946689682628852",
+            "candidate_archive_sha256": "CE1165CAC174EDA4800EBECAAEF29FC2E071B2E7160CD98F799FE21C2F151F9B",
+            "evidence": "spec/evidence/broad-ecosystem-f210-ea41-native-chain-r01.json",
+            "cases": [
+              {
+                "id": "q012",
+                "profile": "tests/profiles/k2-base-f210-2123.json",
+                "profile_sha256": "54B7E64C6AB1DB8345EC407B74B67C423AF51779A3D9104C40ACD9D523B34CC2",
+                "input_signature_sha256": "D529FC657054BD41125FED0AAB0B060BA1A182A876E570617C0A838159EBEFF1",
+                "published_signature": "unresolved-approved-pack-dependencies:automation-science-pack",
+                "candidate_status": "completed-data-stage-observation-only"
+              },
+              {
+                "id": "q017",
+                "profile": "tests/profiles/aai-bz-available-six-base-f210-2123.json",
+                "profile_sha256": "B8B8B5471E87307025C3E354DB4A08C7252DEBE3C47BE87E80ED9212B24651D8",
+                "input_signature_sha256": "867B5CB8939157074EDBF4089E8EE6BE85B5432CC4509A00D132E1C9F9E20A0B",
+                "published_signature": "rejected-approved-pack-unlock:chemical-science-pack:chemical-science-pack=technology-cycle-mir32-f3fa73f7",
+                "candidate_status": "completed-data-stage-observation-only"
+              },
+              {
+                "id": "q061",
+                "profile": "tests/profiles/popular-krastorio2-base-f210-2123.json",
+                "profile_sha256": "12CA669CE9BD332DEE14331A36F7675E3460CD70A2EBAA6F088AE329C4A27439",
+                "input_signature_sha256": "D26FCA52453985C8AEC8046A37CF533999406F8E7016056C1D8648F4EA001A29",
+                "published_signature": "unresolved-approved-pack-dependencies:automation-science-pack",
+                "candidate_status": "completed-data-stage-observation-only"
+              },
+              {
+                "id": "q062",
+                "profile": "tests/profiles/popular-krastorio2-space-age-f210-2123.json",
+                "profile_sha256": "E8D2FC2D9C2BF8820E306DDC4EED984377A75CEBDCF95E56AF2EC84B05339BC4",
+                "input_signature_sha256": "814C312A01CB0C6AE89D3FD8BB9C63D9DB4B3EE2284CFAE7EA746BCDEA1C82A1",
+                "published_signature": "unresolved-approved-pack-dependencies:automation-science-pack",
+                "candidate_status": "failed-unsupported-partial-k2so-selection"
+              }
+            ],
+            "scope": "These are distinct published B6EB F210 data-stage observations with restored direct-library controls. Candidate CE116 completed q012, q017 and q061, while q062 stopped at the unsupported partial K2SO selector. The automation and chemical signatures are not a shared confirmed root cause, and none is a reporter closure or current C563/later-player native, startup, progression, migration/reload, save, effect or release qualification."
+          }
         ],
         "limitations": [
           "Run 40096782298 observes a representative ambiguous automation-science unlock plus an explicit space-science API declaration. It is not the reporter profile, does not establish either reported root cause and does not qualify startup, progression, upgrade or reload for the original report."
