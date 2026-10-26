@@ -1362,6 +1362,53 @@ class GeneratorTests(unittest.TestCase):
             }
             self.assertEqual(actual, intended_setting_rows(profile), profile["id"])
 
+    def test_bob_native_infinite_owner_is_preserved_before_one_publication(self):
+        facts = json.loads((ROOT / "tests/fixtures/bob-logistics-f210-native-continuation-facts.json").read_bytes())
+        native = facts["native_technology"]
+        worker_native = facts["worker_storage_native_technology"]
+        self.lua.globals().bob_native_row = lua_table(self.lua, native)
+        self.lua.globals().bob_worker_native_row = lua_table(self.lua, worker_native)
+        self.lua.execute('''
+          local body = "compatibility.bob_native_continuations"
+          package.loaded[body] = nil
+          package.preload[body] = function() error("inactive Bob owner preflight loaded") end
+          mods = {base="2.1.23"}
+          settings, data, helpers, log = {startup=defaults()}, full_world(mods), nil, function() end
+          assert(loadfile(data_final_path))()
+          assert(package.loaded[body] == nil)
+          package.preload[body] = nil
+
+          mods = {base="2.1.23", boblogistics="3.0.2"}
+          settings, data = {startup=defaults()}, full_world(mods)
+          assert(settings.startup["mir-enable-inserter-capacity-bonus"] ~= nil
+            and settings.startup["mir-enable-worker-robots-storage"] ~= nil,
+            "retaining an upstream owner deleted its historical setting")
+          data.raw.technology["inserter-capacity-bonus-8"] = bob_native_row
+          data.raw.technology["bob-infinite-worker-robots-storage-4"] = bob_worker_native_row
+          assert(loadfile(data_final_path))()
+          assert(data.writes == 1 and data.raw.technology["inserter-capacity-bonus-8"] == bob_native_row)
+          local emitted = {}
+          for _, row in ipairs(data.emitted) do emitted[row.name] = true end
+          assert(data.raw.technology["bob-infinite-worker-robots-storage-4"] == bob_worker_native_row)
+          assert(not emitted["inserter-capacity-bonus-8"] and not emitted["worker-robots-storage-4"]
+            and emitted["braking-force-8"] and emitted["research-speed-7"],
+            "native retention changed unrelated continuations")
+        ''')
+        self.assertEqual(native, plain_lua(self.lua.globals().bob_native_row))
+        self.assertEqual(worker_native, plain_lua(self.lua.globals().bob_worker_native_row))
+        for victim in ("inserter-capacity-bonus-8", "bob-infinite-worker-robots-storage-4"):
+            for finite in (False, True):
+                self.lua.globals().finite_bob_owner = finite
+                self.lua.globals().bob_owner_victim = victim
+                self.lua.execute('''
+                  data = full_world(mods)
+                  data.raw.technology["inserter-capacity-bonus-8"] = bob_native_row
+                  data.raw.technology["bob-infinite-worker-robots-storage-4"] = bob_worker_native_row
+                  data.raw.technology[bob_owner_victim] = finite_bob_owner and {max_level=8} or nil
+                  local ok = pcall(dofile, data_final_path)
+                  assert(not ok and data.writes == 0, "invalid native owner reached publication")
+                ''')
+
     def test_data_final_full_published_technology_output_matches_oracle(self):
         expected_profiles = {
             profile["id"]: {
