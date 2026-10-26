@@ -109,11 +109,6 @@ end
 -- predecessor storage. F200 alone had the published settings-derived V3
 -- native-worker transport; all other targets retain transported V3 admission.
 local LEGACY_ALLOWLIST = legacy_caps.allowlist(DECLARATIONS, platform_target.id)
--- F210 normally accepts only transported V3 rows.  This second immutable map
--- is selected only for a documented direct published-F200 configuration
--- transition below; predecessor storage can never choose it by itself.
-local F200_DIRECT_HOP_ALLOWLIST = platform_target.id == "f210"
-  and legacy_caps.f200_direct_hop_allowlist(DECLARATIONS) or nil
 local PUBLISHED_F200_M4_VERSIONS = {
   ["4.7.20000"] = true,
   ["4.7.20001"] = true,
@@ -457,12 +452,13 @@ local function legacy_candidates(force, worker_name, direct_f200_hop)
       end
     end
     if admitted then
-      local candidate = direct_f200_hop and legacy_caps.f200_direct_hop_candidate(row.declaration) or {
-        name = row.id,
-        setting = row.cap_setting,
-        source = row.source,
-        operation = row.operation
-      }
+      local candidate
+      if direct_f200_hop then
+        candidate = legacy_caps.f200_direct_hop_candidate(row.declaration)
+      else
+        candidate = {name = row.id, setting = row.cap_setting,
+          source = row.source, operation = row.operation}
+      end
       if candidate then
         candidate.admitted = true
         candidates[#candidates + 1] = candidate
@@ -526,7 +522,10 @@ local function import_legacy_caps_on_configuration(event)
   -- constructed F200 predecessor tuple; ordinary/malformed/no-event F210
   -- imports remain on the transported-only allowlist.
   local direct_f200_hop = direct_f200_to_f210_transition(event)
-  local allowlist = direct_f200_hop and F200_DIRECT_HOP_ALLOWLIST or LEGACY_ALLOWLIST
+  -- The one-time marker above keeps this exceptional construction out of
+  -- ordinary control parsing, cold loads and subsequent configurations.
+  local allowlist = direct_f200_hop and legacy_caps.f200_direct_hop_allowlist(DECLARATIONS)
+    or LEGACY_ALLOWLIST
 
   local selected_owners = {}
   if not game or not game.forces then return selected_owners end

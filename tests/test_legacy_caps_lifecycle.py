@@ -284,6 +284,37 @@ class LegacyCapsLifecycleTests(unittest.TestCase):
             "F210 accepted an F200 settings-derived restoration right")
         ''')
 
+    def test_f200_hop_map_is_built_only_for_its_first_exact_configuration(self):
+        self.lua.execute('''
+          local legacy = require("runtime.legacy_caps")
+          local construct, calls = legacy.f200_direct_hop_allowlist, 0
+          legacy.f200_direct_hop_allowlist = function(...)
+            calls = calls + 1
+            return construct(...)
+          end
+          boot({}, nil, nil, {target_id = "f210"})
+          assert(calls == 0, "ordinary F210 parsing constructed a predecessor map")
+          lifecycle.on_configuration_changed()
+          assert(calls == 0, "fresh F210 configuration constructed a predecessor map")
+
+          local old = f200_gear_legacy(1, 2)
+          local function predecessor()
+            local item = technology(gear_name)
+            item.level, item.enabled, item.visible_when_disabled = 3, false, true
+            boot({[1] = force(1, {[gear_name] = item})}, old, nil,
+              {target_id = "f210", limit = 40})
+          end
+          predecessor()
+          assert(calls == 0)
+          lifecycle.on_configuration_changed()
+          assert(calls == 0, "unproven F210 configuration constructed a predecessor map")
+          predecessor()
+          lifecycle.on_configuration_changed(f200_to_f210_event())
+          assert(calls == 1, "exact F200 transition did not construct its one predecessor map")
+          lifecycle.on_configuration_changed(f200_to_f210_event())
+          assert(calls == 1, "completed F200 import reconstructed its predecessor map")
+        ''')
+
     def test_direct_f200_to_f210_event_restores_only_the_proven_owned_right(self):
         self.lua.execute('''
           local player, foreign = technology(gear_name), technology(gear_name)

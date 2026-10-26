@@ -160,6 +160,10 @@ class LegacyCapsTests(unittest.TestCase):
           -- constructed from a current authored F210 successor.  Selecting it
           -- is lifecycle's event-gated responsibility; generic F210 remains
           -- transported-only below.
+          assert(legacy.f200_direct_hop_candidate({id = "foreign-native-owner",
+            cap_setting = "ips-max-level-foreign", ownership_kind = "nativeowner",
+            legacy_binding = {source = "generated-stream", operation = "emit"}}) == nil,
+            "a native owner gained the generated predecessor tuple")
           rows, facts = legacy.import_for_force(old, f, {f200}, nil, F200_DIRECT_HOP_ALLOWLIST)
           assert(rows[f200.name].disabled and facts.decisions[1].outcome == "owned_disable_imported")
           local foreign = candidate("foreign-generated", "ips-max-level-foreign",
