@@ -31,6 +31,8 @@ This is the authoritative product changelog. Each MIR 1–3 master release appea
 
 ### Bugfixes
 
+- Restore omitted research names and descriptions across the shipped locales while preserving existing translations.
+- Add missing titles for hidden Imersite state and unavailable material explanations.
 - Preserve the combined Factorio 2.1 Bob/Angel Space Age carbon effect vector when its recipe named carbon produces Angel carbon instead of the ordinary carbon item.
 - Retain science amounts, prerequisites, effect counts, lab outcomes and icon sources in opt-in generation diagnostics.
 - Keep retired space science and its prerequisite out of the two base level-seven continuations when Space Is Fake is active, including expanded science policies; preserve the full remaining science vector and explicit progression requirements.
