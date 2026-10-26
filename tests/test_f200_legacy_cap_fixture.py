@@ -15,10 +15,14 @@ import unittest
 ROOT = Path(__file__).resolve().parents[1]
 FIXTURE = ROOT / "tests/fixtures/f200-legacy-cap"
 ORACLE = ROOT / "spec/inventory/modern-f200-470.json"
+F210_ORACLE = ROOT / "spec/inventory/modern-f210-470.json"
 PUBLISHED_PROFILE = ROOT / "tests/profiles/f200-legacy-cap-published-4.7-2077.json"
 MIR5_PROFILE = ROOT / "tests/profiles/f200-legacy-cap-mir5-2077.json"
 PUBLISHED_RELAXED_PROFILE = ROOT / "tests/profiles/f200-legacy-cap-published-relaxed-control-4.7-2077.json"
+CROSS_SOURCE_PROFILE = ROOT / "tests/profiles/f200-legacy-cap-cross-f200-published-4.7.3-2077.json"
 PUBLISHED_CONTROL_INFO = FIXTURE / "published-control-info.json"
+F200_CROSS = FIXTURE / "f200/cross-to-f210"
+F210_CROSS = FIXTURE / "f210/cross-from-f200"
 NAME = "mir-fixture-mir5-f200-legacy-cap"
 GEAR = "recipe-prod-research_gears-1"
 SCIENCE = ("automation-science-pack", "logistic-science-pack",
@@ -56,29 +60,55 @@ class F200LegacyCapFixtureTests(unittest.TestCase):
         row = next(item["row"] for item in oracle["profiles"][0]["published_output"]["data"]["additions"]
                    if item["name"] == GEAR)
         cls.oracle_row = deepcopy(row)
+        f210_oracle = json.loads(F210_ORACLE.read_text(encoding="utf-8"))
+        f210_row = next(item["row"] for item in f210_oracle["profiles"][0]["published_output"]["data"]["additions"]
+                        if item["name"] == GEAR)
+        cls.f210_oracle_row = deepcopy(f210_row)
         # The fixture selects the historical 1% setting before data-final.
         cls.oracle_row["effects"][0]["change"] = .01
+        cls.f210_oracle_row["effects"][0]["change"] = .01
 
     def setUp(self):
         self.lua = LuaRuntime(unpack_returned_tuples=True)
         self.lua.execute(r'''
-          function legacy_cap_data(path, mir, row)
+          function legacy_cap_data(path, data_alias, base, mir, fixture, row, companions)
             local raw={technology={[row.name]=row},["double-setting"]={},["int-setting"]={}}
             raw["double-setting"]["ips-effect-per-level-research_gears"]={default_value=10}
             raw["int-setting"]["ips-max-level-research_gears"]={default_value=0}
-            local env={mods={base="2.0.77",["more-infinite-research"]=mir},data={raw=raw}}
+            local mods={base=base,["more-infinite-research"]=mir,["mir-fixture-mir5-f200-legacy-cap"]=fixture}
+            for name,value in pairs(companions or {}) do mods[name]=value end
+            local env={mods=mods,data={raw=raw}}
+            env.require=function(name)
+              assert(name=="__mir-fixture-mir5-f200-legacy-cap__/fixture_data_final" and data_alias)
+              return assert(loadfile(data_alias,"t",env))()
+            end
             env._G=env;setmetatable(env,{__index=function(_,key)return _G[key]end})
             local chunk,message=loadfile(path,"t",env);assert(chunk,message)
             local ok,result=pcall(chunk)
             return {ok=ok,message=tostring(result),row=row,raw=raw}
           end
 
-          function legacy_cap_parse(path, mir, fixture)
+          function legacy_cap_settings(path)
+            local raw={["double-setting"]={ ["ips-effect-per-level-research_gears"]={default_value=10}},
+              ["int-setting"]={ ["ips-max-level-research_gears"]={default_value=0}}}
+            local env={data={raw=raw}}
+            env._G=env;setmetatable(env,{__index=function(_,key)return _G[key]end})
+            local chunk,message=loadfile(path,"t",env);assert(chunk,message)
+            local ok,result=pcall(chunk)
+            return {ok=ok,message=tostring(result),effect=raw["double-setting"]["ips-effect-per-level-research_gears"].default_value,
+              cap=raw["int-setting"]["ips-max-level-research_gears"].default_value}
+          end
+
+          function legacy_cap_parse(path, base, mir, fixture, control_alias)
             local callbacks,reads={events={}},{}
-            local env={script={active_mods={base="2.0.77",["more-infinite-research"]=mir,["mir-fixture-mir5-f200-legacy-cap"]=fixture},
+            local env={script={active_mods={base=base,["more-infinite-research"]=mir,["mir-fixture-mir5-f200-legacy-cap"]=fixture},
               on_init=function(f)callbacks.init=f end,on_configuration_changed=function(f)callbacks.changed=f end,
               on_load=function(f)callbacks.load=f end,on_event=function(e,f)callbacks.events[e]=f end},
               defines={events={on_tick=1,on_research_finished=2},inventory={lab_input=1}}}
+            env.require=function(name)
+              assert(name=="__mir-fixture-mir5-f200-legacy-cap__/fixture_control" and control_alias)
+              return assert(loadfile(control_alias,"t",env))()
+            end
             env._G=env;setmetatable(env,{__index=function(_,key)
               if key=="game" or key=="storage" or key=="settings"then reads[key]=(reads[key]or 0)+1 end
               return _G[key]
@@ -87,7 +117,8 @@ class F200LegacyCapFixtureTests(unittest.TestCase):
             return {ok=ok,message=tostring(result),callbacks=callbacks,reads=reads}
           end
 
-          function legacy_cap_flow(source_path, destination_path, opponent, destination_mir, destination_fixture)
+          function legacy_cap_flow(source_path, destination_path, opponent, options)
+            options=options or {}
             local callbacks,markers,diagnostics,saves={events={}},0,0,0
             local GEAR="recipe-prod-research_gears-1"
             local science={"automation-science-pack","logistic-science-pack","chemical-science-pack","production-science-pack"}
@@ -169,9 +200,9 @@ class F200LegacyCapFixtureTests(unittest.TestCase):
                 ["mir-settings-profile-import"]={value=""},
               }}
             end
-            local function load_control(path,mir,version,settings_values)
+            local function load_control(path,base,mir,version,settings_values,control_alias)
               local c={events={}}
-              local env={script={active_mods={base="2.0.77",["more-infinite-research"]=mir,["mir-fixture-mir5-f200-legacy-cap"]=version},
+              local env={script={active_mods={base=base,["more-infinite-research"]=mir,["mir-fixture-mir5-f200-legacy-cap"]=version},
                 on_init=function(f)c.init=f end,on_configuration_changed=function(f)c.changed=f end,on_load=function(f)c.load=f end,
                 on_event=function(e,f)c.events[e]=f end},defines={events={on_tick=1,on_research_finished=2},inventory={lab_input=1}},
                 game=game,storage=storage,settings=settings_values,prototypes={item=item_prototypes},helpers={table_to_json=function(row)
@@ -187,6 +218,10 @@ class F200LegacyCapFixtureTests(unittest.TestCase):
                   if row:match("^%[MIR5_NATIVE_FIXTURE%] RESULT ") then markers=markers+1
                   else assert(row:match("^%[MIR5_NATIVE_FIXTURE%] DIAGNOSTIC "));diagnostics=diagnostics+1 end
                 end}
+              env.require=function(name)
+                assert(name=="__mir-fixture-mir5-f200-legacy-cap__/fixture_control" and control_alias)
+                return assert(loadfile(control_alias,"t",env))()
+              end
               env._G=env;setmetatable(env,{__index=function(_,key)return _G[key]end})
               local chunk,message=loadfile(path,"t",env);assert(chunk,message);local ok,result=pcall(chunk)
               return ok and c or nil,tostring(result)
@@ -205,7 +240,13 @@ class F200LegacyCapFixtureTests(unittest.TestCase):
               for _,science_name in ipairs(science)do input.consume(science_name,consumed_units or 1) end
               return invoke(control,"finished",{research=player.technologies[GEAR]})
             end
-            local source,message=load_control(source_path,"4.7.20002","0.1.0",startup(2));if not source then return {ok=false,message=message}end
+            local source_mir=options.source_mir or "4.7.20002"
+            local source_fixture=options.source_fixture or "0.1.0"
+            local source_base=options.source_base or "2.0.77"
+            local destination_mir=options.destination_mir or "5.0.20000"
+            local destination_fixture=options.destination_fixture or "0.2.0"
+            local destination_base=options.destination_base or "2.0.77"
+            local source,message=load_control(source_path,source_base,source_mir,source_fixture,startup(2),options.source_control_alias);if not source then return {ok=false,message=message}end
             -- The independently observed published on_init owns visibility
             -- before the dependent fixture's init, even below the cap.
             player.technologies[GEAR].visible_when_disabled=true
@@ -226,8 +267,7 @@ class F200LegacyCapFixtureTests(unittest.TestCase):
             elseif opponent=="lab-count" then state.actual_lab_completions=1 end
             -- This is the candidate lifecycle result under test, not a fixture write.
             if opponent~="stale-enable" then player.technologies[GEAR].enabled=true;player.technologies[GEAR].visible_when_disabled=true end
-            local destination_mir=destination_mir or "5.0.20000";local destination_fixture=destination_fixture or "0.2.0"
-            local destination,message=load_control(destination_path,destination_mir,destination_fixture,startup(40));if not destination then return {ok=false,message=message}end
+            local destination,message=load_control(destination_path,destination_base,destination_mir,destination_fixture,startup(40),options.destination_control_alias);if not destination then return {ok=false,message=message}end
             -- Native upgrade loads the old fixture state before configuration_changed.
             ok,result=invoke(destination,"load");if not ok then return {ok=false,message=result}end
             ok,result=invoke(destination,"changed");if not ok then return {ok=false,message=result}end
@@ -247,12 +287,32 @@ class F200LegacyCapFixtureTests(unittest.TestCase):
               science_before=state.destination_science_units_before[science[1]],science_after=state.destination_science_units_after[science[1]],
               consumed_units=state.destination_science_accounting.consumed_units,remaining_ticks=state.destination_science_accounting.remaining_ticks,
               processing_ticks=state.destination_processing_ticks,elapsed_ticks=state.destination_elapsed_ticks,current_progress=state.destination_science_accounting.progress,foreign_progress=foreign.research_progress,foreign_enabled=foreign.technologies[GEAR].enabled,
+              source_mir=source_mir,destination_mir=destination_mir,source_base=source_base,destination_base=destination_base,
               markers=markers,diagnostics=diagnostics,saves=saves}
           end
         ''')
 
     def row(self):
         return lua_value(self.lua, deepcopy(self.oracle_row))
+
+    def f210_row(self):
+        return lua_value(self.lua, deepcopy(self.f210_oracle_row))
+
+    def data_result(self, path, base, mir, fixture, row, data_alias=None, companions=None):
+        return self.lua.eval("legacy_cap_data")(str(path), str(data_alias) if data_alias else None,
+                                                 base, mir, fixture, row,
+                                                 lua_value(self.lua, companions or {}))
+
+    def settings_result(self, path):
+        return self.lua.eval("legacy_cap_settings")(str(path))
+
+    def parse_result(self, path, base, mir, fixture, control_alias=None):
+        return self.lua.eval("legacy_cap_parse")(str(path), base, mir, fixture,
+                                                  str(control_alias) if control_alias else None)
+
+    def flow_result(self, source_path, destination_path, opponent="", options=None):
+        return self.lua.eval("legacy_cap_flow")(str(source_path), str(destination_path), opponent,
+                                                 lua_value(self.lua, options or {}))
 
     def test_profiles_use_base_f200_observer_and_explicit_fixture_versions(self):
         for path, mir, version in ((PUBLISHED_PROFILE, "4.7.20002", "0.1.0"),
@@ -273,13 +333,76 @@ class F200LegacyCapFixtureTests(unittest.TestCase):
                     self.assertEqual("F3943EB4D69CCDAC41BD9F922AD03A5C78F34F22D8E7FA5A88A7A658AB1010B7",
                                      profile["archive_sha256"]["more-infinite-research_4.7.20002.zip"])
 
+    def test_cross_engine_source_profile_and_thin_stage_wrappers_pin_only_the_published_input(self):
+        profile = json.loads(CROSS_SOURCE_PROFILE.read_text(encoding="utf-8"))
+        self.assertEqual((1, "mir5-f200-f210-positive-cap-cross-source", "f200", "2.0", "Defaults"),
+                         (profile["schema"], profile["kind"], profile["target"], profile["factorio_line"], profile["settings_mode"]))
+        self.assertEqual({"version": "2.0.77", "sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B"},
+                         profile["engine"])
+        self.assertEqual({"base": "2.0.77", "mir-fixture-mir5-active-mods-observer": "0.1.0",
+                          "more-infinite-research": "4.7.20003", NAME: "0.4.0"},
+                         {row["name"]: row["version"] for row in profile["mods"]})
+        self.assertEqual({
+            "mir-fixture-mir5-active-mods-observer_0.1.0.zip": "723D1E7721449FC26040E5E6629416767BDC20AD79CF8723115846DB662A1F87",
+            "more-infinite-research_4.7.20003.zip": "FBBA844DD04011A12BB6DA885745B0733AD37FAB181EAAD9EE4346B9B0D32647",
+        }, profile["archive_sha256"])
+        self.assertIn("Input binding only; no native pass.", profile["scope"])
+
+        source_info = json.loads(F200_CROSS.joinpath("info.json").read_text(encoding="utf-8"))
+        successor_info = json.loads(F210_CROSS.joinpath("info.json").read_text(encoding="utf-8"))
+        self.assertEqual((NAME, "0.4.0", "2.0"), (source_info["name"], source_info["version"], source_info["factorio_version"]))
+        self.assertEqual(["base = 2.0.77", "more-infinite-research = 4.7.20003"], source_info["dependencies"])
+        self.assertEqual((NAME, "0.5.0", "2.1"), (successor_info["name"], successor_info["version"], successor_info["factorio_version"]))
+        self.assertEqual("base = 2.1.23", successor_info["dependencies"][0])
+        self.assertEqual("more-infinite-research = 5.0.21000", successor_info["dependencies"][-1])
+        self.assertEqual({"? elevated-rails = 2.1.23", "? quality = 2.1.23", "? recycler = 2.1.23", "? space-age = 2.1.23"},
+                         set(successor_info["dependencies"][1:-1]))
+        for stage in (F200_CROSS, F210_CROSS):
+            self.assertEqual('require("__mir-fixture-mir5-f200-legacy-cap__/fixture_control")\n',
+                             stage.joinpath("control.lua").read_text(encoding="utf-8"))
+            self.assertEqual('require("__mir-fixture-mir5-f200-legacy-cap__/fixture_data_final")\n',
+                             stage.joinpath("data-final-fixes.lua").read_text(encoding="utf-8"))
+        self.assertEqual((True, 1, 2), tuple(self.settings_result(F200_CROSS / "settings-updates.lua")[field]
+                                             for field in ("ok", "effect", "cap")))
+        self.assertEqual((True, 1, 40), tuple(self.settings_result(F210_CROSS / "settings-updates.lua")[field]
+                                              for field in ("ok", "effect", "cap")))
+
+    def test_cross_engine_stage_guards_preflight_independent_f200_and_f210_gear_rows(self):
+        source_row = self.row()
+        source_row["visible_when_disabled"] = True
+        source = self.data_result(F200_CROSS / "data-final-fixes.lua", "2.0.77", "4.7.20003", "0.4.0", source_row,
+                                  data_alias=FIXTURE / "published/data-final-fixes.lua")
+        self.assertTrue(source["ok"], source["message"])
+        self.assertEqual((None, "1", 1), (source["row"]["unit"]["count"], source["row"]["unit"]["count_formula"], source["row"]["unit"]["time"]))
+
+        successor_row = self.f210_row()
+        successor = self.data_result(F210_CROSS / "data-final-fixes.lua", "2.1.23", "5.0.21000", "0.5.0", successor_row,
+                                     data_alias=FIXTURE / "mir5/data-final-fixes.lua")
+        self.assertTrue(successor["ok"], successor["message"])
+        self.assertEqual((None, "1", 1), (successor["row"]["unit"]["count"], successor["row"]["unit"]["count_formula"], successor["row"]["unit"]["time"]))
+        self.assertEqual(.01, successor["row"]["effects"][1]["change"])
+
+        bad_effect = self.f210_row()
+        bad_effect["effects"][1]["change"] = .02
+        rejected = self.data_result(F210_CROSS / "data-final-fixes.lua", "2.1.23", "5.0.21000", "0.5.0", bad_effect,
+                                    data_alias=FIXTURE / "mir5/data-final-fixes.lua")
+        self.assertFalse(rejected["ok"])
+        self.assertIn("1% fixture-selected effect changed", rejected["message"])
+        self.assertEqual(("8000*2^(L-1)", 60), (rejected["row"]["unit"]["count_formula"], rejected["row"]["unit"]["time"]))
+
+        companion = self.data_result(F210_CROSS / "data-final-fixes.lua", "2.1.23", "5.0.21000", "0.5.0", self.f210_row(),
+                                     data_alias=FIXTURE / "mir5/data-final-fixes.lua", companions={"quality": "2.1.23"})
+        self.assertFalse(companion["ok"])
+        self.assertIn("F210 Base successor carries Space Age companion", companion["message"])
+        self.assertEqual(("8000*2^(L-1)", 60), (companion["row"]["unit"]["count_formula"], companion["row"]["unit"]["time"]))
+
     def test_independent_base_oracle_preflight_precedes_the_only_count_time_mutation(self):
-        for directory, mir in (("published", "4.7.20002"), ("mir5", "5.0.20000")):
+        for directory, mir, fixture in (("published", "4.7.20002", "0.1.0"), ("mir5", "5.0.20000", "0.2.0")):
             with self.subTest(directory=directory):
                 row = self.row()
                 if directory == "published":
                     row["visible_when_disabled"] = True
-                result = self.lua.eval("legacy_cap_data")(str(FIXTURE / directory / "data-final-fixes.lua"), mir, row)
+                result = self.data_result(FIXTURE / directory / "data-final-fixes.lua", "2.0.77", mir, fixture, row)
                 self.assertTrue(result["ok"], result["message"])
                 unit = result["row"]["unit"]
                 self.assertIsNone(unit["count"])
@@ -288,19 +411,19 @@ class F200LegacyCapFixtureTests(unittest.TestCase):
         bad = self.row()
         bad["visible_when_disabled"] = True
         bad["effects"][1]["change"] = .02
-        result = self.lua.eval("legacy_cap_data")(str(FIXTURE / "published" / "data-final-fixes.lua"), "4.7.20002", bad)
+        result = self.data_result(FIXTURE / "published" / "data-final-fixes.lua", "2.0.77", "4.7.20002", "0.1.0", bad)
         self.assertFalse(result["ok"])
         self.assertIn("1% fixture-selected effect changed", result["message"])
         self.assertIsNone(result["row"]["unit"]["count"])
         self.assertEqual("8000*2^(L-1)", result["row"]["unit"]["count_formula"])
         self.assertEqual(60, result["row"]["unit"]["time"])
         wrong_published = self.row()
-        result = self.lua.eval("legacy_cap_data")(str(FIXTURE / "published" / "data-final-fixes.lua"), "4.7.20002", wrong_published)
+        result = self.data_result(FIXTURE / "published" / "data-final-fixes.lua", "2.0.77", "4.7.20002", "0.1.0", wrong_published)
         self.assertFalse(result["ok"])
         self.assertIn("cap presentation changed", result["message"])
         wrong_mir5 = self.row()
         wrong_mir5["visible_when_disabled"] = True
-        result = self.lua.eval("legacy_cap_data")(str(FIXTURE / "mir5" / "data-final-fixes.lua"), "5.0.20000", wrong_mir5)
+        result = self.data_result(FIXTURE / "mir5" / "data-final-fixes.lua", "2.0.77", "5.0.20000", "0.2.0", wrong_mir5)
         self.assertFalse(result["ok"])
         self.assertIn("fresh presentation changed", result["message"])
 
@@ -317,7 +440,7 @@ class F200LegacyCapFixtureTests(unittest.TestCase):
     def test_controls_parse_without_game_or_storage_access_and_never_write_source_player_presentation(self):
         for directory, mir, version in (("published", "4.7.20002", "0.1.0"), ("mir5", "5.0.20000", "0.2.0")):
             with self.subTest(directory=directory):
-                result = self.lua.eval("legacy_cap_parse")(str(FIXTURE / directory / "control.lua"), mir, version)
+                result = self.parse_result(FIXTURE / directory / "control.lua", "2.0.77", mir, version)
                 self.assertTrue(result["ok"], result["message"])
                 self.assertEqual({}, plain(result["reads"]))
                 self.assertIsNotNone(result["callbacks"]["load"])
@@ -336,9 +459,48 @@ class F200LegacyCapFixtureTests(unittest.TestCase):
             self.assertNotIn("game.", body, f"{directory} on_load touched LuaGameScript")
             self.assertNotRegex(body, r"storage\s*\[.*?\]\s*=", f"{directory} on_load wrote fixture storage")
 
+    def test_cross_engine_wrappers_bind_retained_callbacks_and_preserved_cap_witness(self):
+        source = self.parse_result(F200_CROSS / "control.lua", "2.0.77", "4.7.20003", "0.4.0",
+                                   FIXTURE / "published/control.lua")
+        successor = self.parse_result(F210_CROSS / "control.lua", "2.1.23", "5.0.21000", "0.5.0",
+                                      FIXTURE / "mir5/control.lua")
+        for stage, result in (("source", source), ("successor", successor)):
+            with self.subTest(stage=stage):
+                self.assertTrue(result["ok"], result["message"])
+                self.assertEqual({}, plain(result["reads"]))
+                self.assertIsNotNone(result["callbacks"]["load"])
+                self.assertIsNotNone(result["callbacks"]["events"][1])
+                self.assertIsNotNone(result["callbacks"]["events"][2])
+
+        options = {
+            "source_base": "2.0.77", "source_mir": "4.7.20003", "source_fixture": "0.4.0",
+            "destination_base": "2.1.23", "destination_mir": "5.0.21000", "destination_fixture": "0.5.0",
+            "source_control_alias": str(FIXTURE / "published/control.lua"),
+            "destination_control_alias": str(FIXTURE / "mir5/control.lua"),
+        }
+        result = self.flow_result(F200_CROSS / "control.lua", F210_CROSS / "control.lua", "", options)
+        self.assertTrue(result["ok"], result["message"])
+        self.assertEqual(("2.0.77", "4.7.20003", "2.1.23", "5.0.21000"),
+                         (result["source_base"], result["source_mir"], result["destination_base"], result["destination_mir"]))
+        self.assertEqual(("completed", 2, 1, 4, .03),
+                         (result["phase"], result["source_labs"], result["destination_labs"], result["player_level"], result["bonus"]))
+        self.assertTrue(result["player_enabled"])
+        self.assertTrue(result["player_visible"])
+        self.assertEqual((.42, False, 2), (result["foreign_progress"], result["foreign_enabled"], result["saves"]))
+        self.assertEqual((44, 44, 44), (result["remaining_ticks"], result["processing_ticks"], result["elapsed_ticks"]))
+
+        for opponent, phrase in {
+            "stale-enable": "MIR5 F210 cross-engine restored player native gear state differs",
+            "foreign-queue": "foreign queue or progress changed",
+            "saved-progress": "MIR5 F210 cross-engine restored player saved progress differs",
+        }.items():
+            with self.subTest(opponent=opponent):
+                rejected = self.flow_result(F200_CROSS / "control.lua", F210_CROSS / "control.lua", opponent, options)
+                self.assertFalse(rejected["ok"])
+                self.assertIn(phrase, rejected["message"])
+
     def test_two_real_source_labs_restore_positive_cap_then_one_real_successor_lab_and_reload(self):
-        result = self.lua.eval("legacy_cap_flow")(str(FIXTURE / "published" / "control.lua"),
-                                                   str(FIXTURE / "mir5" / "control.lua"), "")
+        result = self.flow_result(FIXTURE / "published" / "control.lua", FIXTURE / "mir5" / "control.lua")
         self.assertTrue(result["ok"], result["message"])
         self.assertEqual("completed", result["phase"])
         self.assertEqual((2, 1), (result["source_labs"], result["destination_labs"]))
@@ -357,17 +519,16 @@ class F200LegacyCapFixtureTests(unittest.TestCase):
         self.assertEqual((6, 1, 2), (result["markers"], result["diagnostics"], result["saves"]))
 
     def test_exact_processing_ticks_accept_a_distinct_raw_event_elapsed(self):
-        result = self.lua.eval("legacy_cap_flow")(str(FIXTURE / "published" / "control.lua"),
-                                                   str(FIXTURE / "mir5" / "control.lua"), "raw-elapsed-offset")
+        result = self.flow_result(FIXTURE / "published" / "control.lua", FIXTURE / "mir5" / "control.lua",
+                                  "raw-elapsed-offset")
         self.assertTrue(result["ok"], result["message"])
         self.assertEqual((44, 44, 45),
                          (result["remaining_ticks"], result["processing_ticks"], result["elapsed_ticks"]))
         self.assertEqual(1, result["diagnostics"])
 
     def test_published_relaxation_uses_the_same_tick_accounting_without_claiming_mir5_runtime(self):
-        result = self.lua.eval("legacy_cap_flow")(str(FIXTURE / "published" / "control.lua"),
-                                                   str(FIXTURE / "mir5" / "control.lua"), "",
-                                                   "4.7.20002", "0.3.0")
+        result = self.flow_result(FIXTURE / "published" / "control.lua", FIXTURE / "mir5" / "control.lua", "",
+                                  {"destination_mir": "4.7.20002", "destination_fixture": "0.3.0"})
         self.assertTrue(result["ok"], result["message"])
         self.assertEqual((2, 1, 44), (result["source_labs"], result["destination_labs"], result["remaining_ticks"]))
         self.assertAlmostEqual(44 / 60, result["consumed_units"], places=6)
@@ -386,8 +547,7 @@ class F200LegacyCapFixtureTests(unittest.TestCase):
         }
         for opponent, phrase in opponents.items():
             with self.subTest(opponent=opponent):
-                result = self.lua.eval("legacy_cap_flow")(str(FIXTURE / "published" / "control.lua"),
-                                                           str(FIXTURE / "mir5" / "control.lua"), opponent)
+                result = self.flow_result(FIXTURE / "published" / "control.lua", FIXTURE / "mir5" / "control.lua", opponent)
                 self.assertFalse(result["ok"])
                 self.assertIn(phrase, result["message"])
                 if opponent == "consumption-overshoot":

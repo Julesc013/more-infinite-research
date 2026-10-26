@@ -1,5 +1,6 @@
 local KEY = "mir5_f200_legacy_cap"
 local CASE = "f200-positive-legacy-cap"
+local CROSS_ENGINE_SOURCE_CASE = "f200-f210-positive-legacy-cap-source"
 local SAVE = "mir5-native-complete"
 local FIXTURE = "mir-fixture-mir5-f200-legacy-cap"
 local GEAR = "recipe-prod-research_gears-1"
@@ -20,6 +21,19 @@ local loaded_snapshot, reload_logged = nil, false
 local function fail(message) error("[mir5-f200-legacy-cap-source] " .. message) end
 local function close(actual, expected)
   return type(actual) == "number" and math.abs(actual - expected) <= 0.000001
+end
+
+local function source_mode()
+  local base = script.active_mods.base
+  local mir = script.active_mods["more-infinite-research"]
+  local fixture = script.active_mods[FIXTURE]
+  if base == "2.0.77" and mir == "4.7.20002" and fixture == "0.1.0" then
+    return {case = CASE}
+  end
+  if base == "2.0.77" and mir == "4.7.20003" and fixture == "0.4.0" then
+    return {case = CROSS_ENGINE_SOURCE_CASE}
+  end
+  fail("source requires published F200 4.7.20002 fixture 0.1.0 or 4.7.20003 fixture 0.4.0")
 end
 
 local function technology(force, name)
@@ -153,7 +167,7 @@ end
 local function marker(stage, state)
   local player = status(game.forces.player)
   log("[MIR5_NATIVE_FIXTURE] RESULT " .. helpers.table_to_json({
-    stage = stage, case = CASE, status = "passed",
+    stage = stage, case = state.source_case, status = "passed",
     qualification = "native-runner-readback-required",
     witnesses = {
       source_mir = state.source_mir, actual_lab_completions = state.actual_lab_completions,
@@ -168,10 +182,7 @@ local function marker(stage, state)
 end
 
 script.on_init(function()
-  if script.active_mods.base ~= "2.0.77" or script.active_mods["more-infinite-research"] ~= "4.7.20002"
-      or script.active_mods[FIXTURE] ~= "0.1.0" then
-    fail("source requires published MIR 4.7.20002 and fixture 0.1.0 on Factorio 2.0.77")
-  end
+  local mode = source_mode()
   if storage[KEY] ~= nil then fail("source fixture storage already exists") end
   local startup = settings.startup
   if startup["ips-max-level-research_gears"].value ~= 2
@@ -212,7 +223,7 @@ script.on_init(function()
   local state = {
     phase = "await-first-lab", source_mir = script.active_mods["more-infinite-research"],
     fixture_version = script.active_mods[FIXTURE], actual_lab_completions = 0,
-    milestone = "unstarted", foreign_force_index = foreign.index, foreign_queue = foreign_queue,
+    source_case = mode.case, milestone = "unstarted", foreign_force_index = foreign.index, foreign_queue = foreign_queue,
     lab = player_lab, deadline_tick = game.tick + DEADLINE,
   }
   storage[KEY] = state

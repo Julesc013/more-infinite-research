@@ -1,6 +1,7 @@
 local KEY = "mir5_f200_legacy_cap"
 local MIR5_CASE = "f200-positive-legacy-cap"
 local PUBLISHED_RELAXED_CASE = "published-relaxed-control"
+local CROSS_ENGINE_CASE = "f200-f210-positive-legacy-cap"
 local SAVE = "mir5-native-complete"
 local FIXTURE = "mir-fixture-mir5-f200-legacy-cap"
 local GEAR = "recipe-prod-research_gears-1"
@@ -126,15 +127,18 @@ local function assert_acceleration(value)
 end
 
 local function destination_mode()
-  if script.active_mods.base ~= "2.0.77" then fail("successor requires Factorio 2.0.77") end
+  local base = script.active_mods.base
   local mir, fixture = script.active_mods["more-infinite-research"], script.active_mods[FIXTURE]
-  if mir == "5.0.20000" and fixture == "0.2.0" then
-    return {case = MIR5_CASE, label = "MIR5"}
+  if base == "2.0.77" and mir == "5.0.20000" and fixture == "0.2.0" then
+    return {case = MIR5_CASE, label = "MIR5", source_mir = "4.7.20002", source_fixture = "0.1.0"}
   end
-  if mir == "4.7.20002" and fixture == "0.3.0" then
-    return {case = PUBLISHED_RELAXED_CASE, label = "published relaxed"}
+  if base == "2.0.77" and mir == "4.7.20002" and fixture == "0.3.0" then
+    return {case = PUBLISHED_RELAXED_CASE, label = "published relaxed", source_mir = "4.7.20002", source_fixture = "0.1.0"}
   end
-  fail("successor requires MIR 5.0.20000 fixture 0.2.0 or published MIR 4.7.20002 fixture 0.3.0")
+  if base == "2.1.23" and mir == "5.0.21000" and fixture == "0.5.0" then
+    return {case = CROSS_ENGINE_CASE, label = "MIR5 F210 cross-engine", source_mir = "4.7.20003", source_fixture = "0.4.0"}
+  end
+  fail("successor requires the exact F200 MIR5/published fixture or F210 5.0.21000 cross-engine fixture")
 end
 
 local function expected_science_consumption(force, value, lab_entity, saved_progress)
@@ -176,8 +180,8 @@ local function expected_science_consumption(force, value, lab_entity, saved_prog
     consumed_units = consumed_units}
 end
 
-local function assert_source_witness(state)
-  if state.source_mir ~= "4.7.20002" or state.fixture_version ~= "0.1.0"
+local function assert_source_witness(state, mode)
+  if state.source_mir ~= mode.source_mir or state.fixture_version ~= mode.source_fixture
       or state.actual_lab_completions ~= 2 or state.milestone ~= "actual2labs"
       or type(state.foreign_queue) ~= "table" or type(state.player_cap) ~= "table"
       or not close(state.player_cap.saved_progress, 0.27) then
@@ -185,8 +189,9 @@ local function assert_source_witness(state)
   end
 end
 
-local function assert_restored(state, label)
-  assert_source_witness(state)
+local function assert_restored(state, mode)
+  assert_source_witness(state, mode)
+  local label = mode.label
   local player = status(game.forces.player)
   -- Preserve the actual value captured by the published controller after its
   -- data-final presentation patch, rather than inventing a false predecessor.
@@ -279,7 +284,7 @@ script.on_configuration_changed(function()
     fail("successor fixture settings are not the verified positive-cap relaxation")
   end
   local state = storage[KEY]
-  assert_restored(state, mode.label) -- required before this fixture queues any successor lab work.
+  assert_restored(state, mode) -- required before this fixture queues any successor lab work.
   local inventory = lab(state)
   local before_units = {}
   for _, item in ipairs(SCIENCE) do
