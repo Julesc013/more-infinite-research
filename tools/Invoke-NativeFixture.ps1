@@ -201,7 +201,7 @@ function Get-HistoricalFixtureTarget([string]$Target,[string]$MetadataPath) {
   $sciencePolicy=''
   if($selected.ContainsKey('science_policy')){
     $sciencePolicy=[string]$selected.science_policy
-    Assert-Fixture ($sciencePolicy -ceq 'all' -and $Target -in @('f017','f100','f110')) 'historical science policy differs'
+    Assert-Fixture ($sciencePolicy -ceq 'all' -and $Target -in @('f017','f018','f100','f110')) 'historical science policy differs'
   }
   $directScience=@($selected.direct_science)
   Assert-Fixture ($directScience.Count -gt 0) 'historical target lacks direct science'
@@ -222,8 +222,14 @@ function Get-HistoricalFixtureTarget([string]$Target,[string]$MetadataPath) {
     Assert-Fixture ([string]$selected.direct -ceq 'recipe-prod-research_character_mining_speed-1' -and [double]$selected.direct_effect -eq 0.1) 'F018 historical direct contract differs'
     Assert-Fixture ([string]$selected.continuation -ceq 'laser-turret-speed-8' -and [string]$selected.continuation_mode -ceq 'lab') 'F018 historical continuation differs'
     Assert-Fixture ([string]$selected.continuation_settings_family -ceq 'laser-shooting-speed' -and [string]$selected.continuation_gun_speed_ammo -ceq 'laser-turret' -and [double]$selected.continuation_effect_delta -eq 0.01) 'F018 historical continuation effect differs'
-    Assert-Fixture ((@($selected.direct_science) -join "`n") -ceq ('military-science-pack' + "`n" + 'utility-science-pack')) 'F018 historical direct science differs'
-    Assert-Fixture ((@($selected.continuation_science) -join "`n") -ceq ('automation-science-pack' + "`n" + 'chemical-science-pack' + "`n" + 'logistic-science-pack' + "`n" + 'military-science-pack' + "`n" + 'utility-science-pack')) 'F018 historical continuation science differs'
+    $expectedF018DirectScience=if($sciencePolicy -ceq 'all'){
+      @('military-science-pack','utility-science-pack','automation-science-pack','logistic-science-pack','chemical-science-pack','production-science-pack','space-science-pack')
+    }else{@('military-science-pack','utility-science-pack')}
+    $expectedF018ContinuationScience=if($sciencePolicy -ceq 'all'){
+      @('automation-science-pack','chemical-science-pack','logistic-science-pack','military-science-pack','utility-science-pack','production-science-pack','space-science-pack')
+    }else{@('automation-science-pack','chemical-science-pack','logistic-science-pack','military-science-pack','utility-science-pack')}
+    Assert-Fixture ((@($selected.direct_science) -join "`n") -ceq ($expectedF018DirectScience -join "`n")) 'F018 historical direct science differs'
+    Assert-Fixture ((@($selected.continuation_science) -join "`n") -ceq ($expectedF018ContinuationScience -join "`n")) 'F018 historical continuation science differs'
   }
   [pscustomobject][ordered]@{path=$metadata;sha256=Get-FixtureSha $metadata;name=[string]$value.name;version=[string]$value.version;target=$Target;factorio_version=[string]$selected.factorio_version;minimum_base=[string]$selected.minimum_base;mir_version=[string]$selected.mir_version;science_policy=$sciencePolicy;definition=$selected}
 }
