@@ -125,6 +125,11 @@ if require("compatibility.bob_core_profile").applies(mods) then
   for index = 1, #materials do technologies[#technologies + 1] = materials[index] end
 end
 
+if modern_selection and modern_selection.bob_plates_profile then
+  local materials = require("compatibility.bob_plates_materials").technologies(values, data.raw, mods)
+  for index = 1, #materials do technologies[#technologies + 1] = materials[index] end
+end
+
 -- One lab/science view serves this complete owned catalogue. Native owners
 -- and foreign research are outside this detached publication boundary.
 require("research.science").apply_family(technologies, nil, {

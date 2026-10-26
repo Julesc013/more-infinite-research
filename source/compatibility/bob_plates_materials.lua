@@ -3,12 +3,9 @@
 local definitions = require("research.bob_plates_materials")
 local stages = require("research.material_stages")
 local material_routes = require("compatibility.material_routes")
-local target = require("platform.target")
+local profile_selector = require("compatibility.bob_plates_profile")
 
 local M = {}
-
-local REQUIRED = {"base", "boblibrary", "bobores", "bobplates"}
-local OWNERSHIP_CONFLICTS = {"bobelectronics", "bobtech", "angelssmelting"}
 
 local function fail(message) error("MIR5 F210 Bob Plates material catalogue: " .. message, 3) end
 
@@ -16,15 +13,7 @@ local function finite(value)
   return type(value) == "number" and value == value and value > -math.huge and value < math.huge
 end
 
-function M.select(active_mods)
-  if target.id ~= "f210" or target.factorio_version ~= "2.1" or target.minimum_base ~= "2.1.23"
-      or type(active_mods) ~= "table" then return nil end
-  for _, name in ipairs(REQUIRED) do if active_mods[name] == nil then return nil end end
-  for _, name in ipairs(OWNERSHIP_CONFLICTS) do if active_mods[name] ~= nil then return nil end end
-  return active_mods["space-age"] ~= nil and "space-age" or "base"
-end
-
-function M.applies(active_mods) return M.select(active_mods) ~= nil end
+M.select, M.applies = profile_selector.select, profile_selector.applies
 
 local function expected_or_default(actual, expected, key, default)
   if expected[key] ~= nil then return actual[key] == expected[key] end
