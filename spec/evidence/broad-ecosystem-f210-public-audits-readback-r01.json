@@ -131,5 +131,50 @@
       }
     }
   ],
+  "independent_aggregate_readback": {
+    "algorithm": "Decode each exact gzip report, select only cases classified compared-complete-three-arm-observation, rebuild each reported public-name union from public_differences[].published and public_differences[].candidate, and classify every union name as missing, added, or different by the embedded old-published/new-candidate JSON. A case contributes once to the any-difference count when its union has at least one such row delta. Equal rows and incomplete/refused cases are not inferred or counted.",
+    "source_inputs": [
+      {
+        "cohort": "ea41",
+        "path": "spec/evidence/broad-ecosystem-f210-ea41-public-audit-r01.json.gz",
+        "compressed_sha256": "F9F25C7012CCE588A2761B55E96903C626467C75181C34411970880C65F950A4",
+        "raw_sha256": "46F68B01CB92D0CEEDB26FDFE64F6BE32F30E1CF9F09E52AF6B1EA87A9A9503D"
+      },
+      {
+        "cohort": "c563",
+        "path": "spec/evidence/broad-ecosystem-f210-c563-public-audit-r01.json.gz",
+        "compressed_sha256": "C45ECFDB2B98293174A7E1AC82F2DA9D3B590B4D6F9E31AE00FBD3FF425EF5D3",
+        "raw_sha256": "E3A153699C9BFAD72E09CAD799BA440C4B3552DAD4C094BA3D3933F6320059B6"
+      }
+    ],
+    "ea41": {
+      "compared_complete_triplets": 111,
+      "cases_with_any_observed_public_candidate_difference": 67,
+      "recorded_public_row_deltas": {
+        "candidate_missing_published": 60,
+        "candidate_added_over_published": 66,
+        "candidate_different_from_published": 139,
+        "total": 265
+      },
+      "original_summary_field": {
+        "field": "cases_with_observed_public_candidate_difference",
+        "value": 21,
+        "interpretation": "This unchanged source-report field is the original priority-analysis summary, not the aggregate count across all completed cases."
+      },
+      "priority_unresolved_public_differences_length": 21
+    },
+    "c563": {
+      "compared_complete_triplets": 11,
+      "cases_with_any_observed_public_candidate_difference": 10,
+      "recorded_public_row_deltas": {
+        "candidate_missing_published": 43,
+        "candidate_added_over_published": 35,
+        "candidate_different_from_published": 105,
+        "total": 183
+      },
+      "priority_unresolved_public_differences_length": 8
+    },
+    "limits": "Counts are recorded row occurrences across frozen comparison cases, not unique bugs, cause classifications, harmlessness findings, current-parity results, native execution, or release qualification."
+  },
   "limits": "Row occurrences across cases are not unique bugs. Frozen EA41/C563 differences do not relabel later source fixes as native passes; upstream/published failures remain excluded explicitly."
 }
