@@ -1,0 +1,36 @@
+{
+  "schema": 1,
+  "kind": "mir5-early-engine-f006-f012-inventory",
+  "scope": "Installed-engine and preserved-museum-source facts used by the finite data-only F006-F012 adapter. This is not native qualification or a release claim.",
+  "adapter_boundary": {
+    "entrypoint": "adapters.early.data",
+    "target_fields": ["id", "reduced", "research_levels", "recipe_productivity"],
+    "fixed_defaults": true,
+    "omits": ["settings.lua", "control.lua", "data-final-fixes.lua", "migrations", "infinite technologies", "runtime API"]
+  },
+  "museum_tags": [
+    {"target":"f006","tag":"0.6.0","commit":"12a5683c2aaed745f35e1261b437930a9a1476bc","data_lua_blob":"3523512df7098cc43c03dea530f6291ae72d879f","config_lua_blob":"75417bd3bc7c794ba3ed7bec63c2c9bf402f61bc","info_json_blob":"1267d6514bb2764a54ea3f73c83423d903c7084d","factorio_version":"0.6","minimum_base":"0.6.4","default_rows":14},
+    {"target":"f007","tag":"0.7.0","commit":"cb2991e3ea67b0413076c0e6d0dacf29d7f784b6","data_lua_blob":"c3c3f2c2944d26697ba287267ea209b4b207ff09","config_lua_blob":"8dd97e9cc7c56647cd69421d443563bff42ee303","info_json_blob":"3bfe8f0a6079228e3d4636c30973ab2ffb1c553f","factorio_version":"0.7","minimum_base":"0.7.5","default_rows":22},
+    {"target":"f008","tag":"0.8.0","commit":"080fa92ea38b4b40156f26429bc7cba54948aef0","data_lua_blob":"c3c3f2c2944d26697ba287267ea209b4b207ff09","config_lua_blob":"8dd97e9cc7c56647cd69421d443563bff42ee303","info_json_blob":"089f7460bd53b8d4d9ec709975ea51fa4e296910","factorio_version":"0.8","minimum_base":"0.8.8","default_rows":22},
+    {"target":"f009","tag":"0.9.0","commit":"9325e744f1dd36baa33372dab6e7d9528ccfbab8","data_lua_blob":"c3c3f2c2944d26697ba287267ea209b4b207ff09","config_lua_blob":"8dd97e9cc7c56647cd69421d443563bff42ee303","info_json_blob":"b3588574a657f98dd62be3962f9977e6fe7110fa","factorio_version":"0.9","minimum_base":"0.9.8","default_rows":22},
+    {"target":"f010","tag":"0.10.0","commit":"3377f835243c0cf9e7d2c2e76641c2c471341975","data_lua_blob":"c3c3f2c2944d26697ba287267ea209b4b207ff09","config_lua_blob":"8dd97e9cc7c56647cd69421d443563bff42ee303","info_json_blob":"8efe2da7787ef720a7d6a5e306a9961b40f75362","factorio_version":"0.10","minimum_base":"0.10.12","default_rows":22},
+    {"target":"f011","tag":"0.11.0","commit":"679774c94bafdaa4d5432b793b8684ee4e43c257","data_lua_blob":"c3c3f2c2944d26697ba287267ea209b4b207ff09","config_lua_blob":"8dd97e9cc7c56647cd69421d443563bff42ee303","info_json_blob":"22fb051a9e4c045cee415b8b5ca5b8ccac88c242","factorio_version":"0.11","minimum_base":"0.11.22","default_rows":22},
+    {"target":"f012","tag":"0.12.0","commit":"82a349bd8137abe21145b321be4edb1e43e1e9e1","data_lua_blob":"3ab5d5bfec219f6badb6d3947b406a7fd74820ea","config_lua_blob":"e384f5945ea3f8d12e2171a0155431e70ebc77a5","info_json_blob":"3b6325f90d866ee64870b134aff1c85217c6d625","factorio_version":"0.12","minimum_base":"0.12.35","default_rows":26}
+  ],
+  "installed_engines": [
+    {"target":"f006","locator":"D:/Programs/Factorio/0.6","base_info":"data/base/info.json","base_info_sha256":"65110C8507B75D298437431E00D441C61F75080E5CA956B87C3AD3191F7839C3","base_version":"0.6.4","executable":"bin/x64/Factorio.exe","executable_sha256":"8D2F7208503B88A578FE558184C87092830554FEC5AB66BCD57CBAE2F0E5A1FB","data_updates":false,"data_final_fixes":false,"mod_distribution":"extract-to-folder"},
+    {"target":"f007","locator":"D:/Programs/Factorio/0.7","base_info":"data/base/info.json","base_info_sha256":"9FEE95859E2625782C73B52DDB647345829D3F4A17087214C00835E386A1250F","base_version":"0.7.5","executable":"bin/x64/Factorio.exe","executable_sha256":"EA52123915ECFB14658591876327490B094996ADE64D837929765147C4556FE8","data_updates":false,"data_final_fixes":false,"mod_distribution":"extract-to-folder"},
+    {"target":"f008","locator":"D:/Programs/Factorio/0.8","base_info":"data/base/info.json","base_info_sha256":"551FC5139979BDEACF672F827B7D176C7B1E7FF0806157A2919BD02295E1CD74","base_version":"0.8.8","executable":"bin/x64/Factorio.exe","executable_sha256":"A4226859DA746314A59D49937444F37A64828A7ABEC46AB3FC05E836C3F4C096","data_updates":false,"data_final_fixes":false,"mod_distribution":"extract-to-folder"},
+    {"target":"f009","locator":"D:/Programs/Factorio/0.9","base_info":"data/base/info.json","base_info_sha256":"00D82A696B0954C54B20F481990E354A753E3B624D1BECD2F4A0DF2A2E4BA7B5","base_version":"0.9.8","executable":"bin/x64/Factorio.exe","executable_sha256":"B76D1F8058C8EB4D3F2A0B14F5DD87356B8E1068F37F85306A834AAFA611FE23","data_updates":false,"data_final_fixes":false,"mod_distribution":"zip-eligibility-unqualified"},
+    {"target":"f010","locator":"D:/Programs/Factorio/0.10","base_info":"data/base/info.json","base_info_sha256":"20104D621F98557F70FFE508EDAA5A981C6167D2C5A0D86E6A5F66022D2BAE42","base_version":"0.10.12","executable":"bin/x64/Factorio.exe","executable_sha256":"7D8C1D11A86603C8462D1B58A1D174C83132A89E0F524BE4C0DCA97FFC1FEBB1","data_updates":false,"data_final_fixes":false,"mod_distribution":"zip-eligibility-unqualified"},
+    {"target":"f011","locator":"D:/Programs/Factorio/0.11","base_info":"data/base/info.json","base_info_sha256":"6574EF466B0D179CE5B9B2A2BC4DDA130C46CFEA5D16B63ADF4643F96F40FEB8","base_version":"0.11.22","executable":"bin/x64/Factorio.exe","executable_sha256":"968A6B8EDA5244F41AFB8249C7DE004C644BA4692DD38DF5BC00F26F1CE2E085","data_updates":true,"data_final_fixes":true,"mod_distribution":"zip-eligibility-unqualified"},
+    {"target":"f012","locator":"D:/Programs/Factorio/0.12","base_info":"data/base/info.json","base_info_sha256":"4D7AF39F07C4809A060972E54FC6006DFE98DA4109452F9216A138ED2F15A8EE","base_version":"0.12.35","executable":"bin/x64/Factorio.exe","executable_sha256":"AEC54627B873E4636FC2254293F01D73401CB652F373CEEE2DABEAD2B09EB774","data_updates":true,"data_final_fixes":true,"mod_distribution":"zip-eligibility-unqualified"}
+  ],
+  "shared_data_contract": {
+    "loader":"data.lua uses require and data:extend in all seven installed engines",
+    "technology_shape":"finite technology with scalar icon, one native effect, prerequisites, unit.count, unit.time, and ordered science-pack ingredients",
+    "science":["science-pack-1","science-pack-2","science-pack-3","alien-science-pack"],
+    "museum_families":{"f006":["inserter-capacity","rocket-shooting-speed","rocket-damage"],"f007_to_f011":["inserter-capacity","gun-turret-damage","bullet-shooting-speed","bullet-damage","toolbelt"],"f012":["inserter-capacity","gun-turret-damage","bullet-shooting-speed","bullet-damage","toolbelt","logistic-trash-slots"]}
+  },
+  "native_qualification": false
+}

@@ -39,6 +39,8 @@ Maintain the [existing community request ledger](../spec/programmes/community-re
 
 ## Work in small vertical slices
 
+The additional F001–F012 request is a separate best-effort GitHub delivery obligation under the [target contract](../spec/targets.md#additional-historical-editions), with F013–F210 retaining release priority. Buildable extra editions receive explicit feature/installation/qualification limits; unavailable inputs do not become invented support or implicit release blockers. The separate [early target record](../targets/early-editions.json) selects only the actual finite data adapter. F018 has an explicit unresolved disposition too.
+
 Prioritize Factorio 2.1.23 for MIR5 design, implementation and qualification, following the [primary-target decision](../spec/targets.md#primary-target-and-earlier-editions). Preserve all nine editions through the same capability-based source and version encoding, with common feature, setting and presentation semantics wherever native capabilities permit. F210 scheduling priority does not waive final current-package and affected native checks for every delivered target subset. Reuse exact unchanged evidence under its original identity and state remaining gaps by edition; an unqualified edition remains an open release obligation.
 
 Make a native family work end to end, then exercise a different native effect, a staged/native-owner integration and stateful caps/runtime. Keep partial packages off production saves. A successful tiny package is not a full-product migration or performance claim.
@@ -52,6 +54,12 @@ Black Glass owns the current integration branch, the sole native-test lane and r
 Push each reviewable unit promptly. Commit bodies and PR descriptions record the concrete defect or outcome, changed behavior, independent expected result, actual commands and results, exact source/package identities where applicable, and remaining limitations. Finish required checks and merge completed units into `dev` while later qualification continues. Merge updated `dev` into an already published work branch when needed; preserve the commit identities that Aero reviews and native workers consume. Keep frozen-input custody branches reachable until their jobs and evidence readback finish.
 
 After accepted MIR5.0.0 publication and verified local delivery, continue with5.0.1 bug fixes, measured performance improvements and further stress qualification. Use actual review findings and observed failures to select that work. This follow-up authorization does not waive any5.0.0 acceptance gate or permit an untested release.
+
+## Changelog ownership and formatting
+
+Edit the root [CHANGELOG.md](../CHANGELOG.md) as the single authored release history. Keep each Markdown paragraph or bullet on one logical line and use editor soft wrapping; aim for short readable sentences rather than manually wrapping repository prose. Retain the selected MIR1–3 master releases once, all MIR4 and later source releases, and edition-specific historical scope. Reduced backport logs are not separate master release entries.
+
+Run `python -B tools/changelog.py --write` after an edit. The small formatter writes the tracked [source/changelog.txt](../source/changelog.txt) projection with Factorio separators, indentation and132-character lines. Its only distribution-version placeholder belongs to the current release; the packager replaces it with the selected edition version. Check freshness with `python -B tools/changelog.py`; never hand-edit the projection. Commit both files together. The [reconciliation inventory](../spec/inventory/changelog-history.json) preserves the exact prior history fingerprints and recovery sources; it is outside player packages.
 
 ## Before creating an abstraction
 

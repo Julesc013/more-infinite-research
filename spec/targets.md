@@ -5,7 +5,7 @@ applies_to: "MIR replacement development"
 audience: developer
 doc_type: specification
 owner: mir-maintainers
-last_reviewed: 2026-10-25
+last_reviewed: 2026-10-26
 supersedes: []
 superseded_by: []
 source_of_truth_for:
@@ -56,10 +56,22 @@ A pure directory cutover must produce identical package **member paths and bytes
 
 `TGT-04` — Promote accepted development through `dev` then `main` using the existing permissions and required checks. This specification does not authorize changing branch protection, signing, release immutability settings or credentials. Preserve prior releases and provenance; repository cleanup must not rewrite tags.
 
-Use title `MIR MAJOR.MINOR.PATCH`, exact tested patch labels without `+`, nine applicable player ZIPs plus useful checksum/signature files, and no redundant downloads table. Keep bundles, upload instructions and developer artifacts out of public player downloads unless expressly requested. Preserve full history in packaged changelogs. Verify anonymous downloads and local delivery by bytes. Agent-managed publication is GitHub-only for all releases; the maintainer handles Mod Portal publication, credentials and readback, which are not agent completion gates.
+Use title `MIR MAJOR.MINOR.PATCH`, exact tested patch labels without `+`, the nine retained player ZIPs and any buildable explicitly labelled best-effort historical editions, plus useful checksum/signature files. Keep bundles, upload instructions and developer artifacts out of public player downloads unless expressly requested. Preserve full master history in packaged changelogs. Verify anonymous downloads and local delivery by bytes. Agent-managed publication is GitHub-only for all releases; the maintainer handles Mod Portal publication, credentials and readback, which are not agent completion gates.
 
 Cryptographic identity and successful CI do not prove gameplay correctness. Release requires the separate parity, native/migration and performance outcomes in [Verification](verification.md).
 
 ## Reproducible source is not a wall-clock promise
 
 `TGT-05` — Apply the package boundary in [Determinism](determinism.md). Compare member bytes independently from ZIP headers/compression. Keep rendered diagrams and optional diagram tooling out of player packages. The operating-system/runtime needed by developer tools does not determine which historical Factorio editions the mod supports.
+
+## Additional historical editions
+
+`TGT-06` — The maintainer's 2026-10-26 decision requests best-effort GitHub distributions for F001–F012 on each MIR release, ideally ready for5.0.0, while retaining F013–F210 implementation and qualification priority. These extras do not become Mod Portal obligations or silently expand the mandatory native matrix. Include honestly buildable artifacts with their exact feature subset, installation format, checks and missing qualification; do not manufacture invalid or empty ZIPs to fill target names. Qualified, built-but-unqualified and unresolved targets have distinct release labels. Preserve the same shared source and codec.
+
+The requested engine patches are0.1.2,0.2.10,0.3.2,0.4.1,0.5.3,0.6.4,0.7.5,0.8.8,0.9.8,0.10.12,0.11.22 and0.12.35. F001/F002 have no evidenced standalone mod-loader contract; [0.3.0 introduced standalone mods](https://www.factorio.com/blog/post/factorio-030-released). F003–F005 have credible mod loading but lack supplied exact engine/prototype inputs and remain unresolved. No current native result establishes them. The installed-engine and preserved museum-tag facts for F006–F012 support a fixed-default finite, data-only adapter; they do not establish settings, runtime API, Library, migration or native-infinite parity. The opt-in target record keeps these builds outside the retained nine-edition freeze verdict.
+
+Factorio0.18.47 is also visible in the [official history](https://wiki.factorio.com/Version_history/0.18.0). It was explicitly excluded from the inherited target baseline, has no installed engine input here and remains an unresolved additional-edition obligation under the request for every minor line. F100 packaging does not prove that a1.0-marked mod loads in0.18. Recover its actual constraints before admitting an F018 build; do not silently claim or omit it from the disposition.
+
+## Shared release history
+
+`TGT-07` — [CHANGELOG.md](../CHANGELOG.md) is the sole authored product history: the selected27 MIR1–3 master releases, then every MIR4 and MIR5 source release. Retain historical scope and unique corrections without repeating reduced backport release logs. Do not invent release dates. The small formatter projects this Markdown into [source/changelog.txt](../source/changelog.txt), with native separators, indentation, unique version sections and valid continuation lines. Only the leading current-release version is substituted by the packager. Every distribution receives the same complete master history; its presence does not claim that a historical edition existed in an earlier MIR release. The [reconciliation inventory](inventory/changelog-history.json) preserves original input identities.
