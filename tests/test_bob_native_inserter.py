@@ -101,6 +101,9 @@ class BobNativeInserterTests(unittest.TestCase):
         )
         self.assertEqual([1, 3], [effect["modifier"] for effect in owner["effects"]])
         self.assertEqual("boblogistics_3.0.2.zip", self.facts["native_owner"]["archive"])
+        self.assertEqual("boblogistics/data.lua:59", self.facts["native_owner"]["data_entrypoint"])
+        self.assertEqual("boblogistics/prototypes/technology-inserter.lua",
+                         self.facts["native_owner"]["source_member"])
         self.assertTrue(self.facts["native_owner"]["unconditionally_authored"])
         self.assertEqual("already_infinite", self.facts["published_mir4_source_fact"]["already_infinite_disposition"])
         self.assertEqual(3, len(self.facts["capture_provenance"]))

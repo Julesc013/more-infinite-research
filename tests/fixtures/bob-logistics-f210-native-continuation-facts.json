@@ -12,9 +12,9 @@
     "version": "3.0.2",
     "archive": "boblogistics_3.0.2.zip",
     "archive_sha256": "ADAEFF77E0C489C80AC83950BDDC5F7DE0230FEEEC5E29772AC1C2FA8175F339",
-    "source_member": "boblogistics_3.0.2/prototypes/technology-inserter.lua",
+    "source_member": "boblogistics/prototypes/technology-inserter.lua",
     "source_lines": "285-324",
-    "data_entrypoint": "boblogistics_3.0.2/data.lua:59",
+    "data_entrypoint": "boblogistics/data.lua:59",
     "unconditionally_authored": true
   },
   "native_technology": {
