@@ -269,6 +269,8 @@ end
             with self.subTest(forbidden=forbidden):
                 self.assertNotIn(forbidden, source)
         self.assertNotRegex(source, r"(?:event\.plant|state\.plant)\.tick_grown\s*=")
+        self.assertIn("lab.energy, lab.disabled_by_script = 100000000, false", source)
+        self.assertNotRegex(source, r"\blab\.active\s*=")
         self.assertIn("state.plant, state.remaining_growth, state.spoiled = nil, nil, false", source)
         self.assertIn("game.difficulty_settings.spoil_time_modifier = 3", source)
         self.assertIn("disabled.  The next configuration callback must observe and rebase it", source)

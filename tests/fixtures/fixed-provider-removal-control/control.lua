@@ -99,19 +99,19 @@ local function fill(lab,value)
   for _, ingredient in ipairs(value.research_unit_ingredients) do
     if inventory.insert{name=ingredient.name,count=100}~=100 then fail('lab science insertion failed: '..ingredient.name) end
   end
-  lab.active=true;lab.energy=1000000000
+  lab.disabled_by_script=false;lab.energy=1000000000
 end
 local function freeze(state)
   local lab=state.lab
   if lab==nil or lab.valid==false then fail('fixture biolab is absent') end
-  lab.active=false;lab.energy=0
+  lab.disabled_by_script=true;lab.energy=0
   local inventory=lab.get_inventory(defines.inventory.lab_input)
   if inventory==nil then fail('lab input is absent') end
   inventory.clear()
 end
 local function assert_frozen(state)
   local lab=state.lab
-  if lab==nil or lab.valid==false or lab.active~=false or lab.energy~=0 then fail('fixture lab was not frozen') end
+  if lab==nil or lab.valid==false or lab.disabled_by_script~=true or lab.energy~=0 then fail('fixture lab was not frozen') end
 end
 local function queue_native(force,current,tail,progress,label)
   local current_value,tail_value=technology(force,current),technology(force,tail)

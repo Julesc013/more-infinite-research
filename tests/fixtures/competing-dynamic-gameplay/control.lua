@@ -202,7 +202,7 @@ local function fill(lab, config)
   if lab.active == false or lab.energy <= 0 then fail("lab cannot consume native science") end
 end
 local function freeze(state)
-  state.lab.active, state.lab.energy = false, 0
+  state.lab.disabled_by_script, state.lab.energy = true, 0
   inventory(state.lab).clear()
 end
 local function snapshot_player(state, config)
@@ -211,7 +211,7 @@ local function snapshot_player(state, config)
 end
 local function assert_frozen(state, config)
   local lab = state.lab
-  if lab == nil or lab.valid == false or lab.active ~= false or lab.energy ~= 0 then
+  if lab == nil or lab.valid == false or lab.disabled_by_script ~= true or lab.energy ~= 0 then
     fail("source lab was not frozen before successor preference")
   end
   local input = inventory(lab)

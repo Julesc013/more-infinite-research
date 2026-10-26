@@ -504,6 +504,18 @@
           ],
           "evidence": "spec/evidence/host-controls-5874000-chain.json",
           "scope": "The complete host observation covers 22 authored omission explanations across the two Angel closures, effective setting precedence and direct emitted-ID suppression. The no-Angel Bob-core unit adds nine separately grounded explanations: all 31 captured material omissions now have finite profile-specific Availability rows. None is native rendering qualification or a reconstructed compiler ledger; another row requires its own exact admitted profile and native terminal disposition."
+        },
+        {
+          "id": "native-library-interaction-and-retired-request-host-corrections",
+          "source": [
+            "source/runtime/library.lua"
+          ],
+          "evidence": "tests/test_library.py",
+          "implementation_commits": [
+            "f4abc849a27032cf4232488a26f0dd6d0e0f9c6f",
+            "60d10b53ae56ee1865d4003ba65d87843671b820"
+          ],
+          "scope": "Accepted PR1026 restores the published native Esc/E opened target and descendant drag handle only on explicit open, preserving other GUI focus during background refresh. Accepted PR1027 retires vanished-root subscription flags and resumes an already-open connected replacement view only after its final retired translation request drains. Both exact reviewed heads pass four required checks;54 combined Library host controls pass at60d10b53. These are implementation/host observations, not native keyboard, drag, rendering or client qualification."
         }
       ],
       "test_subjects": [
@@ -513,7 +525,8 @@
       "remaining_implementation": [],
       "remaining_qualification": [
         "Run numeric UI timing, affected runtime interaction and final-candidate stress cases; second-host coverage is optional and must be reported if obtained.",
-        "Observe the named Space Age native lab explanation in a rendered client; Base absence rows are already observed. Preserve inherited locale fallback limitations."
+        "Observe the named Space Age native lab explanation in a rendered client; Base absence rows are already observed. Preserve inherited locale fallback limitations.",
+        "Qualify the accepted1026/1027 Library corrections on the final coherent F200/F210 player packages: actual Esc/E close and dragging/location retention, foreign GUI focus during asynchronous refresh, vanished-root subscription retirement and removed-player translation resumption. Preserve earlier client receipts at their original inputs."
       ]
     },
     {

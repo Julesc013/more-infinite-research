@@ -152,6 +152,8 @@ end
         source=(FIXTURE/'control.lua').read_text(encoding='utf-8')
         for witness in ('mir5-fixed-provider-removal-engine-observer','electric-circuit-productivity','basic-plate-productivity','REMOVAL_OBSERVATION','braking-force-1','laser-shooting-speed-1','mir-native-credit-research_breeding-fish-breeding-positive'):
             self.assertIn(witness,source)
+        self.assertIn('lab.disabled_by_script=true',source)
+        self.assertNotRegex(source,r'\blab\.active\s*=')
         self.assertNotIn('storage.mir_native_credits',source);self.assertNotIn('force.reset_technology_effects',source)
         load_body=source.split('script.on_load(function()',1)[1].split('script.on_event(defines.events.on_tick',1)[0]
         self.assertNotIn('game.',load_body)

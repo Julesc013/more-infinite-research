@@ -158,6 +158,8 @@ class AtanGameplayFixtureTests(unittest.TestCase):
         self.assertIn('game.server_save(SAVE)', control)
         self.assertIn('script.on_load(function()', control)
         self.assertIn('marker("reload"', control)
+        self.assertIn("disabled_by_script", control)
+        self.assertNotRegex(control, r"(?:lab|state\.lab)\.active\s*=")
         self.assertNotIn("productivity_bonus =", control)
         self.assertNotIn("reset_technology_effects", control)
 
@@ -177,21 +179,30 @@ class AtanGameplayFixtureTests(unittest.TestCase):
             local player = {}
             game = {forces={player=player}}
             local lab = {
-              valid=true, active=true, energy=100,
+              valid=true, disabled_by_script=false, energy=100,
               get_inventory=function() return {clear=function() end} end,
             }
+            setmetatable(lab, {
+              __index=function(entity, key)
+                if key == "active" then return entity.disabled_by_script ~= true end
+              end,
+              __newindex=function(entity, key, value)
+                if key == "active" then error("LuaEntity.active is read-only") end
+                rawset(entity, key, value)
+              end,
+            })
             local state = {phase="await-ash-lab", lab=lab, actual_lab_completions=1}
             storage["mir5_atan_gameplay"] = state
             assert(loadfile(control_path))()
             callbacks.events[defines.events.on_research_finished]({research={force=player, name="recipe-prod-research_ash_separation-1"}})
-            return state.phase, state.actual_lab_completions, state.queue, lab.active, lab.energy
+            return state.phase, state.actual_lab_completions, state.queue, lab.disabled_by_script, lab.energy
           end
         ''')
-        phase, completions, queue, active, energy = self.lua.eval("exercise_ash_event")()
+        phase, completions, queue, disabled_by_script, energy = self.lua.eval("exercise_ash_event")()
         self.assertEqual("await-completed-observation", phase)
         self.assertEqual(2, completions)
         self.assertIsNone(queue, "the finished ash technology must not be accepted as the pending probe")
-        self.assertFalse(active)
+        self.assertTrue(disabled_by_script)
         self.assertEqual(0, energy)
 
 

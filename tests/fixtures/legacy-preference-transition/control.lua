@@ -117,19 +117,19 @@ local function fill(lab, value)
   for _, ingredient in ipairs(value.research_unit_ingredients) do
     if input.insert{name=ingredient.name, count=20} ~= 20 then fail("lab science insertion differs") end
   end
-  lab.energy, lab.active = 1000000000, true
+  lab.energy, lab.disabled_by_script = 1000000000, false
 end
 local function freeze(state)
   local lab = state.lab
   if lab == nil or lab.valid == false then fail("fixture lab is absent") end
-  lab.active, lab.energy = false, 0
+  lab.disabled_by_script, lab.energy = true, 0
   local input = lab.get_inventory(defines.inventory.lab_input)
   if input == nil then fail("fixture lab input is absent") end
   input.clear()
 end
 local function assert_frozen(state)
   local lab = state.lab
-  if lab == nil or lab.valid == false or lab.active ~= false or lab.energy ~= 0 then
+  if lab == nil or lab.valid == false or lab.disabled_by_script ~= true or lab.energy ~= 0 then
     fail("fixture lab was not frozen")
   end
   local input = lab.get_inventory(defines.inventory.lab_input)
