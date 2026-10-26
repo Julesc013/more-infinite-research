@@ -60,6 +60,7 @@ class HostControlsTests(unittest.TestCase):
             "tests/test_override_interactions_fixture.py",
             "tests/test_armor_py_catalogue.py",
             "tests/test_py_f210_catalogue.py",
+            "tests/test_py_f210_pipeline.py",
             "tests/test_native_modded_continuations.py",
             "tests/test_bob_native_inserter.py",
             "tests/test_integration_catalogue_upgrade_fixture.py",
@@ -145,7 +146,7 @@ class HostControlsTests(unittest.TestCase):
             "tests/test_host_controls.py",
             "tools/check_repository.py",
         ])
-        self.assertEqual(len(paths), 107)
+        self.assertEqual(len(paths), 108)
         self.assertEqual(len(set(paths)), len(paths))
         self.assertEqual(paths[-1], "tools/check_repository.py")
         self.assertIn("tests/test_sdk.py", paths)
