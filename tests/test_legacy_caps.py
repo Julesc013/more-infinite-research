@@ -34,6 +34,17 @@ class LegacyCapsTests(unittest.TestCase):
                 target = "f200", policy_transport = "settings-derived-v3",
                 ownership_kind = "settings-derived-v3"}}
           }, "f200")
+          F200_DIRECT_HOP_ALLOWLIST = legacy.f200_direct_hop_allowlist({
+            {id = "recipe-prod-research_gears-1", cap_setting = "ips-max-level-research_gears",
+              ownership_kind = "authored_generated",
+              legacy_binding = {source = "generated-stream", operation = "emit"}},
+            {id = "braking-force-8", cap_setting = "mir-max-level-braking-force",
+              ownership_kind = "authored_generated",
+              legacy_binding = {source = "base-continuation", operation = "emit_base_extension"}},
+            {id = "foreign-generated", cap_setting = "ips-max-level-foreign",
+              ownership_kind = "authored_generated",
+              legacy_binding = {source = "generated-stream", operation = "foreign-operation"}}
+          })
           F200_WORKER_ALLOWLIST = legacy.allowlist({}, "f200")
           F210_WORKER_ALLOWLIST = legacy.allowlist({}, "f210")
           local raw_import_for_force = legacy.import_for_force
@@ -144,6 +155,17 @@ class LegacyCapsTests(unittest.TestCase):
           local rows, facts = legacy.import_for_force(old, f, {f200}, nil, F200_ALLOWLIST)
           assert(rows[f200.name].disabled and rows[f200.name].visible_when_disabled == false)
           assert(facts.decisions[1].outcome == "owned_disable_imported")
+
+          -- The direct-hop map is deliberately a separate exact F200 tuple
+          -- constructed from a current authored F210 successor.  Selecting it
+          -- is lifecycle's event-gated responsibility; generic F210 remains
+          -- transported-only below.
+          rows, facts = legacy.import_for_force(old, f, {f200}, nil, F200_DIRECT_HOP_ALLOWLIST)
+          assert(rows[f200.name].disabled and facts.decisions[1].outcome == "owned_disable_imported")
+          local foreign = candidate("foreign-generated", "ips-max-level-foreign",
+            "generated-stream", "runtime-settings-transport")
+          rows, facts = legacy.import_for_force(old, f, {foreign}, nil, F200_DIRECT_HOP_ALLOWLIST)
+          assert(rows[f200.name] == nil and facts.decisions[1].outcome == "candidate_not_admitted")
 
           -- F210's archive-backed `emit` admission cannot accept the F200
           -- policy form merely because the name and setting happen to match.

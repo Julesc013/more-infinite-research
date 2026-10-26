@@ -110,6 +110,51 @@ function M.allowlist(declarations, target_id)
   return allowed
 end
 
+-- A direct F200 -> F210 hop is the one exceptional reader of the published
+-- settings-derived tuple on a modern target.  It is not a general F210
+-- allowlist: lifecycle still has to establish the exact configuration event
+-- before it can select this map.  Build the old tuple only from a current
+-- authored generated row whose modern operation is the known successor of
+-- F200's runtime-settings transport.  Native owners are deliberately absent
+-- here; the exact worker tails remain the fixed entries appended by allowlist.
+function M.f200_direct_hop_candidate(declaration)
+  local binding = type(declaration) == "table" and declaration.legacy_binding or nil
+  local source = type(binding) == "table" and binding.source or nil
+  local operation = type(binding) == "table" and binding.operation or nil
+  if type(declaration) == "table" and declaration.ownership_kind == "authored_generated"
+      and bounded_string(declaration.id) and bounded_string(declaration.cap_setting)
+      and ((source == "generated-stream" and operation == "emit")
+        or (source == "base-continuation" and operation == "emit_base_extension")) then
+    return {name = declaration.id, setting = declaration.cap_setting, source = source,
+      operation = "runtime-settings-transport"}
+  end
+  return nil
+end
+
+function M.f200_direct_hop_allowlist(declarations)
+  if type(declarations) ~= "table" then
+    error("MIR legacy caps declarations must be a table", 2)
+  end
+  local predecessors = {}
+  for index = 1, #declarations do
+    local candidate = M.f200_direct_hop_candidate(declarations[index])
+    if candidate then
+      predecessors[#predecessors + 1] = {
+        id = candidate.name,
+        cap_setting = candidate.setting,
+        legacy_binding = {
+          source = candidate.source,
+          operation = candidate.operation,
+          target = "f200",
+          policy_transport = SETTINGS_DERIVED_KIND,
+          ownership_kind = SETTINGS_DERIVED_KIND
+        }
+      }
+    end
+  end
+  return M.allowlist(predecessors, "f200")
+end
+
 local function admitted_candidate(candidate, allowed)
   if not (type(candidate) == "table" and candidate.admitted == true
     and bounded_string(candidate.name) and bounded_string(candidate.setting)
@@ -168,7 +213,8 @@ end
 local function persisted_key(candidate, authority)
   if authority.policy_transport == SETTINGS_DERIVED_KIND then
     -- Historical ownership_key used tostring(policy.technology), hence the
-    -- literal "nil" for this producer. Never accept this key on F210.
+    -- literal "nil" for this producer. Ordinary F210 admission never accepts
+    -- this key; lifecycle selects the separate exact-event bridge explicitly.
     return table.concat({"nil", candidate.setting, candidate.source, candidate.operation}, "\0")
   end
   return exact_key(candidate)

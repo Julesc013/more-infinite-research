@@ -160,6 +160,10 @@ class LegacyCapsLifecycleTests(unittest.TestCase):
             package.loaded["runtime.lifecycle"] = nil
             lifecycle = require("runtime.lifecycle")
           end
+          function f200_to_f210_event(old_version, new_version)
+            return {mod_changes = {['more-infinite-research'] = {
+              old_version = old_version or "4.7.20003", new_version = new_version or "5.0.21000"}}}
+          end
         ''')
 
     def test_k2_historical_worker_right_is_bound_to_the_admitted_native_effect(self):
@@ -266,9 +270,9 @@ class LegacyCapsLifecycleTests(unittest.TestCase):
             and old.unique.keep and old.disabled_by_cap[1][gear_name].cap == 2,
             "F200 import changed predecessor evidence or left stale ownership")
 
-          -- The same old bucket is not a valid predecessor on F210, where
-          -- the current named gear declaration has the transported `emit`
-          -- identity instead.
+          -- The same old bucket is not a valid predecessor on ordinary F210,
+          -- where the current named gear declaration has transported `emit`
+          -- identity.  A direct cross-engine event is required separately.
           local f210 = technology(gear_name)
           f210.level, f210.enabled, f210.visible_when_disabled = 3, false, true
           local f210_force = force(1, {[gear_name] = f210})
@@ -278,6 +282,110 @@ class LegacyCapsLifecycleTests(unittest.TestCase):
             and storage.mir_caps.legacy_caps_checked
             and storage.mir_caps.owned_disabled[1] == nil,
             "F210 accepted an F200 settings-derived restoration right")
+        ''')
+
+    def test_direct_f200_to_f210_event_restores_only_the_proven_owned_right(self):
+        self.lua.execute('''
+          local player, foreign = technology(gear_name), technology(gear_name)
+          player.level, player.researched = 3, false
+          player.enabled, player.visible_when_disabled = false, true
+          foreign.level, foreign.researched = 3, false
+          foreign.enabled, foreign.visible_when_disabled = false, false
+          local player_force = force(1, {[gear_name] = player})
+          player_force.research_queue, player_force.current_research, player_force.research_progress =
+            {player}, player, .42
+          local foreign_force = force(2, {[gear_name] = foreign})
+          local old = f200_gear_legacy(1, 2)
+          boot({[1] = player_force, [2] = foreign_force}, old, nil,
+            {target_id = "f210", limit = 40})
+          lifecycle.on_configuration_changed(f200_to_f210_event())
+          assert(player.enabled and not player.visible_when_disabled and player.level == 3
+            and player.researched == false, "exact direct F200 event missed its owned cap restoration")
+          assert(player_force.research_queue[1] == player and player_force.current_research == player
+            and player_force.research_progress == .42,
+            "direct F200 restoration rewrote a valid queue or progress")
+          assert(not foreign.enabled and not foreign.visible_when_disabled and foreign.level == 3,
+            "direct F200 restoration claimed the foreign force's disablement")
+          assert(storage.mir_caps.legacy_caps_checked and next(storage.mir_caps.owned_disabled) == nil
+            and old.disabled_by_cap[1][gear_name].enabled_before_cap,
+            "direct F200 restoration changed predecessor evidence or kept ownership")
+
+          -- Current MIR5 ownership, including a tombstone, remains ahead of
+          -- the exceptional predecessor reader.
+          local retained = technology(gear_name)
+          retained.level, retained.enabled, retained.visible_when_disabled = 3, false, true
+          local current = {schema = 1, owned_disabled = {[1] = {[gear_name] = false}}}
+          boot({[1] = force(1, {[gear_name] = retained})}, old, current,
+            {target_id = "f210", limit = 40})
+          lifecycle.on_configuration_changed(f200_to_f210_event())
+          assert(not retained.enabled and retained.visible_when_disabled
+            and current.owned_disabled[1][gear_name] == false and current.legacy_caps_checked,
+            "direct F200 import displaced an existing MIR5 ownership decision")
+        ''')
+
+    def test_f200_to_f210_bridge_refuses_missing_wrong_or_malformed_event(self):
+        self.lua.execute('''
+          local old = f200_gear_legacy(1, 2)
+          local function refused(event, index)
+            local item = technology(gear_name)
+            item.level, item.enabled, item.visible_when_disabled = 3, false, true
+            boot({[1] = force(1, {[gear_name] = item})}, old, nil,
+              {target_id = "f210", limit = 40})
+            lifecycle.on_configuration_changed(event)
+            assert(not item.enabled and item.visible_when_disabled
+              and storage.mir_caps.legacy_caps_checked and storage.mir_caps.owned_disabled[1] == nil,
+              "F210 bridge admitted non-exact event " .. index)
+          end
+          refused(nil, 1)
+          refused(f200_to_f210_event("4.7.21003", "5.0.21000"), 2)
+          refused(f200_to_f210_event("4.7.20003", "5.0.21001"), 3)
+          refused({mod_changes = {['more-infinite-research'] = {
+            old_version = "4.7.20003", new_version = false}}}, 4)
+          refused({mod_changes = {['more-infinite-research'] = false}}, 5)
+        ''')
+
+    def test_f200_to_f210_bridge_revalidates_the_current_native_worker_tail(self):
+        self.lua.execute('''
+          local name = "worker-robots-speed-6"
+          local invalid = worker(name)
+          invalid.level, invalid.researched = 3, false
+          invalid.enabled, invalid.visible_when_disabled = false, true
+          invalid.prototype.effects[1].modifier = .66
+          local old = f200_worker_legacy(1, 2, name)
+          boot({[1] = force(1, {[name] = invalid})}, old, nil,
+            {target_id = "f210", worker_limit = 40})
+          lifecycle.on_configuration_changed(f200_to_f210_event())
+          assert(not invalid.enabled and invalid.visible_when_disabled and invalid.level == 3
+            and storage.mir_caps.legacy_caps_checked and storage.mir_caps.owned_disabled[1] == nil,
+            "direct F200 bridge accepted a mismatched current F210 native worker")
+        ''')
+
+    def test_f200_mir5_finite_cap_ledger_restores_on_later_f210_relaxation(self):
+        self.lua.execute('''
+          local item = technology(gear_name)
+          item.level, item.researched = 3, false
+          item.enabled, item.visible_when_disabled = false, true
+          local f = force(1, {[gear_name] = item})
+          local old = f200_gear_legacy(1, 2)
+          boot({[1] = f}, old, nil, {target_id = "f200", limit = 2})
+          lifecycle.on_configuration_changed()
+          local saved = storage.mir_caps
+          assert(saved.legacy_caps_checked and saved.owned_disabled[1][gear_name].disabled
+            and saved.owned_disabled[1][gear_name].visible_when_disabled == false
+            and not item.enabled and item.visible_when_disabled,
+            "F200 MIR5 finite cap did not retain its proven ownership ledger")
+
+          -- This route does not reread the F200 bucket: it restores only the
+          -- current MIR5 record after current F210 prototype admission.
+          boot({[1] = f}, old, saved, {target_id = "f210", limit = 40})
+          lifecycle.on_configuration_changed()
+          assert(item.enabled and not item.visible_when_disabled and item.level == 3
+            and item.researched == false and saved.legacy_caps_checked
+            and next(saved.owned_disabled) == nil,
+            "F200 MIR5 ownership ledger was not restored by its F210 successor")
+          assert(old.disabled_by_cap[1][gear_name].enabled_before_cap
+            and old.visibility_by_cap[1][gear_name].value == false,
+            "later F210 reconciliation altered the F200 predecessor bucket")
         ''')
 
     def test_f200_settings_derived_worker_right_restores_only_the_exact_native_tail(self):
