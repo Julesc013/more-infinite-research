@@ -741,6 +741,7 @@ function M.select(active_mods)
   return {profile = profile, definitions = supported_definitions(definitions), continuations = M.continuations(active_mods),
     native_owners = M.native_owners(active_mods), recipe_patches = recipe_patches,
     k2_imersite = k2so and k2so.imersite or false, bob_angel = bob_angel, bob_core = bob_core,
+    bob_native_continuations = M.retains_bob_native_continuations(active_mods),
     py_coal = py.coal, py_hightech = py.hightech, bob_warfare = bob_warfare,
     required_product_targets = required_product_targets, additional_product_bindings = additional_product_bindings,
     exact_product_bindings = exact_product_bindings,

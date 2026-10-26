@@ -40,10 +40,10 @@ local modern_catalogue = require("compatibility.modern_catalogue")
 local modern, modern_selection, native_owner_patches
 if ordinary_profile or modern_catalogue.is_k2_base(mods) or modern_catalogue.is_k2so(mods) then
   modern = require("research.modern")
-  if modern_catalogue.retains_bob_native_continuations(mods) then
+  modern_selection = modern_catalogue.select(mods)
+  if modern_selection.bob_native_continuations then
     require("compatibility.bob_native_continuations").preflight(data.raw)
   end
-  modern_selection = modern_catalogue.select(mods)
   if mods["atan-air-scrubbing"] or mods["atan-ash"] then
     local definitions = require("compatibility.atan_productivity").select(mods, data.raw)
     for _, definition in ipairs(definitions) do
