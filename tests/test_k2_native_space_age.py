@@ -121,6 +121,14 @@ class K2NativeSpaceAgeTests(unittest.TestCase):
     def _technology_rows(self, lua):
         return _plain(lua.globals().emitted).get("technology", {})
 
+    def _current_carrier_expectation(self):
+        captured = self.context["q013_published_imersite_carriers"]["technologies"]
+        expected = deepcopy(captured)
+        for name in CARRIERS:
+            self.assertEqual("__base__/graphics/technology/automation.png", captured[name]["icon"], name)
+            expected[name]["icon"] = "__base__/graphics/technology/automation-1.png"
+        return expected
+
     def direct_modern_rows(self, mods, startup=None):
         """Exercise the K2+SE selector without substituting its raw pipeline.
 
@@ -190,7 +198,7 @@ class K2NativeSpaceAgeTests(unittest.TestCase):
         rows = self._technology_rows(lua)
         self.assertTrue(CARRIERS.issubset(rows))
         self.assertFalse(PUBLIC_IMERSITE & set(rows))
-        expected = self.context["q013_published_imersite_carriers"]["technologies"]
+        expected = self._current_carrier_expectation()
         for name in CARRIERS:
             self.assertEqual(expected[name], rows[name], name)
         self.assertIn("recipe-prod-research_agricultural_growth_speed-1", rows)
@@ -240,7 +248,7 @@ class K2NativeSpaceAgeTests(unittest.TestCase):
         self.assertFalse(selection["k2_imersite"])
         self.assertTrue(selection["k2_imersite_carriers"])
         self.assertEqual(
-            self.context["q013_published_imersite_carriers"]["technologies"],
+            self._current_carrier_expectation(),
             {name: rows[name] for name in CARRIERS},
         )
 
