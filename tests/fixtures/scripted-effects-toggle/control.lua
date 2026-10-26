@@ -106,7 +106,7 @@ end
 local function power_lab(lab)
   local input = lab and lab.valid and lab.get_inventory(defines.inventory.lab_input)
   if input == nil then fail("fixture lab input is absent") end
-  lab.energy, lab.active = 100000000, true
+  lab.energy, lab.disabled_by_script = 100000000, false
 end
 
 local function start_research(state, name)

@@ -110,12 +110,12 @@ local function fill(lab, value)
     local inserted = inventory.insert{name=ingredient.name, count=100}
     if inserted ~= 100 then fail("lab did not receive science: " .. ingredient.name) end
   end
-  lab.energy, lab.active = 1000000000, true
+  lab.energy, lab.disabled_by_script = 1000000000, false
 end
 
 local function freeze(lab)
   if lab == nil or lab.valid == false then fail("lab is absent") end
-  lab.active, lab.energy = false, 0
+  lab.disabled_by_script, lab.energy = true, 0
   local inventory = lab.get_inventory(defines.inventory.lab_input)
   if inventory == nil then fail("lab input is absent while freezing") end
   inventory.clear()
@@ -142,7 +142,7 @@ local function assert_completed(state, label)
   assert_technology(player, ASH, 2, label)
   assert_effects(player, selected, 0.05, 0.05, label)
   assert_probe_queue(player, state.queue, label)
-  if state.lab == nil or state.lab.valid == false or state.lab.active ~= false or state.lab.energy ~= 0 then
+  if state.lab == nil or state.lab.valid == false or state.lab.disabled_by_script ~= true or state.lab.energy ~= 0 then
     fail(label .. " completed lab state differs")
   end
 end

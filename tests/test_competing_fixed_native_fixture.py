@@ -117,7 +117,7 @@ function fixed_successor(path, fixture, stage, opponent)
   local breeding="recipe-prod-research_breeding-1"
   local full_bioflux="recipe-prod-research_bioflux-1"
   local function inventory() local value={}; function value.get_item_count(_) return 0 end; function value.insert(stack) return stack.count end; function value.clear() end; return value end
-  local lab={valid=true,active=false,energy=0}; function lab.get_inventory(_) return inventory() end
+  local lab={valid=true,disabled_by_script=true,energy=0}; function lab.get_inventory(_) return inventory() end
   local function queue(force, entries)
     rawset(force,"_queue",entries or {}); local current=entries and entries[1] or nil; rawset(force,"current_research",current)
     if current then rawset(force,"research_progress",current.saved_progress or 0); current.saved_progress=0 else rawset(force,"research_progress",0) end
@@ -220,7 +220,7 @@ function fixed_provider_removal_readdition(path, opponent)
   local ids={"basic-plate-productivity","electric-circuit-productivity","advanced-circuit-productivity","automation-science-productivity-4","logistic-science-productivity-4","military-science-productivity-4","chemical-science-productivity-4","production-science-productivity-4","utility-science-productivity-4","space-science-productivity-4","metallurgic-science-productivity-4","electromagnetic-science-productivity-4","agricultural-science-productivity-4","cryogenic-science-productivity-4","promethium-science-productivity-4","bioflux-productivity","fish-breeding-productivity"}
   local breeding,full_bioflux="recipe-prod-research_breeding-1","recipe-prod-research_bioflux-1"
   local function inventory() local value={}; function value.get_item_count(_) return 0 end; function value.insert(stack) return stack.count end; function value.clear() end; return value end
-  local lab={valid=true,active=false,energy=0}; function lab.get_inventory(_) return inventory() end
+  local lab={valid=true,disabled_by_script=true,energy=0}; function lab.get_inventory(_) return inventory() end
   local function queue(force, entries)
     rawset(force,"_queue",entries or {}); local current=entries and entries[1] or nil; rawset(force,"current_research",current)
     if current then rawset(force,"research_progress",current.saved_progress or 0); current.saved_progress=0 else rawset(force,"research_progress",0) end

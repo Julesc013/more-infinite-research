@@ -23,6 +23,8 @@ CROSS_SOURCE_PROFILE = ROOT / "tests/profiles/f200-legacy-cap-cross-f200-publish
 PUBLISHED_CONTROL_INFO = FIXTURE / "published-control-info.json"
 F200_CROSS = FIXTURE / "f200/cross-to-f210"
 F210_CROSS = FIXTURE / "f210/cross-from-f200"
+F210_DISABLED = FIXTURE / "f210/disabled-after-f200"
+F210_REENABLED = FIXTURE / "f210/reenabled-after-f200"
 NAME = "mir-fixture-mir5-f200-legacy-cap"
 GEAR = "recipe-prod-research_gears-1"
 SCIENCE = ("automation-science-pack", "logistic-science-pack",
@@ -89,13 +91,13 @@ class F200LegacyCapFixtureTests(unittest.TestCase):
           end
 
           function legacy_cap_settings(path)
-            local raw={["double-setting"]={ ["ips-effect-per-level-research_gears"]={default_value=10}},
+            local raw={["bool-setting"]={ ["ips-enable-research_gears"]={default_value=true}},["double-setting"]={ ["ips-effect-per-level-research_gears"]={default_value=10}},
               ["int-setting"]={ ["ips-max-level-research_gears"]={default_value=0}}}
             local env={data={raw=raw}}
             env._G=env;setmetatable(env,{__index=function(_,key)return _G[key]end})
             local chunk,message=loadfile(path,"t",env);assert(chunk,message)
             local ok,result=pcall(chunk)
-            return {ok=ok,message=tostring(result),effect=raw["double-setting"]["ips-effect-per-level-research_gears"].default_value,
+            return {ok=ok,message=tostring(result),enabled=raw["bool-setting"]["ips-enable-research_gears"].default_value,effect=raw["double-setting"]["ips-effect-per-level-research_gears"].default_value,
               cap=raw["int-setting"]["ips-max-level-research_gears"].default_value}
           end
 
@@ -194,11 +196,19 @@ class F200LegacyCapFixtureTests(unittest.TestCase):
             function game.create_force(name)foreign=force(name,2);game.forces[name]=foreign;game.forces[2]=foreign;return foreign end
             function game.server_save(name)assert(name=="mir5-native-complete");saves=saves+1 end
             local storage={}
-            local function startup(cap)
+            local function startup(cap, enabled)
               return {startup={
+                ["ips-enable-research_gears"]={value=enabled ~= false},
                 ["ips-max-level-research_gears"]={value=cap},["ips-effect-per-level-research_gears"]={value=1},
                 ["mir-settings-profile-import"]={value=""},
               }}
+            end
+            local function rejected(message)
+              local state=storage.mir5_f200_legacy_cap or {}
+              return {ok=false,message=message,queue_entries=#player.research_queue,
+                destination_labs=state.destination_lab_completions or 0,
+                disabled_intermediate_observed=state.disabled_stage_observed == true,
+                disabled_destination_labs=state.disabled_stage_destination_lab_completions or 0}
             end
             local function load_control(path,base,mir,version,settings_values,control_alias)
               local c={events={}}
@@ -267,22 +277,48 @@ class F200LegacyCapFixtureTests(unittest.TestCase):
             elseif opponent=="foreign-queue" then foreign.research_progress=.41
             elseif opponent=="saved-progress" then player.technologies[GEAR].saved_progress=.26
             elseif opponent=="lab-count" then state.actual_lab_completions=1 end
+            local three_stage=options.disabled_path~=nil or options.reenabled_path~=nil
+            if three_stage and (options.disabled_path==nil or options.reenabled_path==nil) then
+              return rejected("three-stage flow requires both F210 successors")
+            end
+            if three_stage and opponent~="skip-intermediate" then
+              local disabled,message=load_control(options.disabled_path,options.disabled_base or "2.1.23",
+                options.disabled_mir or "5.0.21000",options.disabled_fixture or "0.6.0",startup(40,opponent=="wrong-disabled-setting"),options.disabled_control_alias)
+              if not disabled then return rejected(message) end
+              ok,result=invoke(disabled,"load");if not ok then return rejected(result) end
+              ok,result=invoke(disabled,"changed");if not ok then return rejected(result) end
+              ok,result=tick(disabled);if not ok then return rejected(result) end
+              for reload=1,2 do
+                ok,result=invoke(disabled,"load");if not ok then return rejected(result) end
+                if opponent=="disabled-reload-drift" and reload==1 then player.technologies[GEAR].saved_progress=.26 end
+                ok,result=tick(disabled);if not ok then return rejected(result) end
+              end
+            end
             -- This is the candidate lifecycle result under test, not a fixture write.
-            if opponent~="stale-enable" then player.technologies[GEAR].enabled=true;player.technologies[GEAR].visible_when_disabled=true end
-            local destination,message=load_control(destination_path,destination_base,destination_mir,destination_fixture,startup(40),options.destination_control_alias);if not destination then return {ok=false,message=message}end
+            if opponent~="stale-enable" and opponent~="old-disabled-right" then
+              player.technologies[GEAR].enabled=true;player.technologies[GEAR].visible_when_disabled=true
+            end
+            if three_stage then
+              destination_path=options.reenabled_path
+              destination_base=options.reenabled_base or "2.1.23"
+              destination_mir=options.reenabled_mir or "5.0.21000"
+              destination_fixture=options.reenabled_fixture or "0.7.0"
+              options.destination_control_alias=options.reenabled_control_alias
+            end
+            local destination,message=load_control(destination_path,destination_base,destination_mir,destination_fixture,startup(40,opponent~="wrong-reenabled-setting"),options.destination_control_alias);if not destination then return {ok=false,message=message}end
             -- Native upgrade loads the old fixture state before configuration_changed.
-            ok,result=invoke(destination,"load");if not ok then return {ok=false,message=result}end
-            ok,result=invoke(destination,"changed");if not ok then return {ok=false,message=result}end
+            ok,result=invoke(destination,"load");if not ok then return rejected(result) end
+            ok,result=invoke(destination,"changed");if not ok then return rejected(result) end
             local consumed_units=state.destination_science_accounting.consumed_units
             local processing_ticks=state.destination_science_accounting.remaining_ticks
             if opponent=="wrong-tick-span" then processing_ticks=processing_ticks-1 end
             if opponent=="raw-elapsed-offset" then game.tick=game.tick+1 end
-            for _=1,processing_ticks do ok,result=tick(destination);if not ok then return {ok=false,message=result}end end
+            for _=1,processing_ticks do ok,result=tick(destination);if not ok then return rejected(result) end end
             if opponent=="consumption-overshoot" then consumed_units=consumed_units+1/60 end
-            ok,result=complete_player(destination,4,.03,consumed_units);if not ok then return {ok=false,message=result}end
+            ok,result=complete_player(destination,4,.03,consumed_units);if not ok then return rejected(result) end
             if opponent=="duplicate-lab"then state.destination_lab_completions=2 end
-            ok,result=tick(destination);if not ok then return {ok=false,message=result}end
-            for _=1,2 do ok,result=invoke(destination,"load");if not ok then return {ok=false,message=result}end;ok,result=tick(destination);if not ok then return {ok=false,message=result}end end
+            ok,result=tick(destination);if not ok then return rejected(result) end
+            for _=1,2 do ok,result=invoke(destination,"load");if not ok then return rejected(result) end;ok,result=tick(destination);if not ok then return rejected(result) end end
             return {ok=true,message="",phase=state.phase,source_labs=state.actual_lab_completions,destination_labs=state.destination_lab_completions,
               player_level=player.technologies[GEAR].level,bonus=player.recipes['iron-gear-wheel'].productivity_bonus,
               player_enabled=player.technologies[GEAR].enabled,player_visible=player.technologies[GEAR].visible_when_disabled,
@@ -290,7 +326,9 @@ class F200LegacyCapFixtureTests(unittest.TestCase):
               consumed_units=state.destination_science_accounting.consumed_units,remaining_ticks=state.destination_science_accounting.remaining_ticks,
               processing_ticks=state.destination_processing_ticks,elapsed_ticks=state.destination_elapsed_ticks,current_progress=state.destination_science_accounting.progress,foreign_progress=foreign.research_progress,foreign_enabled=foreign.technologies[GEAR].enabled,
               source_mir=source_mir,destination_mir=destination_mir,source_base=source_base,destination_base=destination_base,
-              source_case=state.source_case,marker_cases=marker_cases,markers=markers,diagnostics=diagnostics,saves=saves}
+              source_case=state.source_case,marker_cases=marker_cases,markers=markers,diagnostics=diagnostics,saves=saves,
+              disabled_intermediate_observed=state.disabled_stage_observed == true,
+              disabled_destination_labs=state.disabled_stage_destination_lab_completions or 0}
           end
         ''')
 
@@ -352,6 +390,8 @@ class F200LegacyCapFixtureTests(unittest.TestCase):
 
         source_info = json.loads(F200_CROSS.joinpath("info.json").read_text(encoding="utf-8"))
         successor_info = json.loads(F210_CROSS.joinpath("info.json").read_text(encoding="utf-8"))
+        disabled_info = json.loads(F210_DISABLED.joinpath("info.json").read_text(encoding="utf-8"))
+        reenabled_info = json.loads(F210_REENABLED.joinpath("info.json").read_text(encoding="utf-8"))
         self.assertEqual((NAME, "0.4.0", "2.0"), (source_info["name"], source_info["version"], source_info["factorio_version"]))
         self.assertEqual(["base = 2.0.77", "more-infinite-research = 4.7.20003"], source_info["dependencies"])
         self.assertEqual((NAME, "0.5.0", "2.1"), (successor_info["name"], successor_info["version"], successor_info["factorio_version"]))
@@ -359,7 +399,12 @@ class F200LegacyCapFixtureTests(unittest.TestCase):
         self.assertEqual("more-infinite-research = 5.0.21000", successor_info["dependencies"][-1])
         self.assertEqual({"? elevated-rails = 2.1.23", "? quality = 2.1.23", "? recycler = 2.1.23", "? space-age = 2.1.23"},
                          set(successor_info["dependencies"][1:-1]))
-        for stage in (F200_CROSS, F210_CROSS):
+        for stage, version in ((F210_DISABLED, "0.6.0"), (F210_REENABLED, "0.7.0")):
+            with self.subTest(stage=stage.name):
+                info = disabled_info if stage == F210_DISABLED else reenabled_info
+                self.assertEqual((NAME, version, "2.1"), (info["name"], info["version"], info["factorio_version"]))
+                self.assertEqual(successor_info["dependencies"], info["dependencies"])
+        for stage in (F200_CROSS, F210_CROSS, F210_DISABLED, F210_REENABLED):
             self.assertEqual('require("__mir-fixture-mir5-f200-legacy-cap__/fixture_control")\n',
                              stage.joinpath("control.lua").read_text(encoding="utf-8"))
             self.assertEqual('require("__mir-fixture-mir5-f200-legacy-cap__/fixture_data_final")\n',
@@ -368,6 +413,9 @@ class F200LegacyCapFixtureTests(unittest.TestCase):
                                              for field in ("ok", "effect", "cap")))
         self.assertEqual((True, 1, 40), tuple(self.settings_result(F210_CROSS / "settings-updates.lua")[field]
                                               for field in ("ok", "effect", "cap")))
+        for stage, enabled in ((F210_DISABLED, False), (F210_REENABLED, True)):
+            self.assertEqual((True, enabled, 1, 40), tuple(self.settings_result(stage / "settings-updates.lua")[field]
+                                                           for field in ("ok", "enabled", "effect", "cap")))
 
     def test_cross_engine_stage_guards_preflight_independent_f200_and_f210_gear_rows(self):
         source_row = self.row()
@@ -397,6 +445,15 @@ class F200LegacyCapFixtureTests(unittest.TestCase):
         self.assertFalse(companion["ok"])
         self.assertIn("F210 Base successor carries Space Age companion", companion["message"])
         self.assertEqual(("8000*2^(L-1)", 60), (companion["row"]["unit"]["count_formula"], companion["row"]["unit"]["time"]))
+
+        for stage, version in ((F210_DISABLED, "0.6.0"), (F210_REENABLED, "0.7.0")):
+            with self.subTest(stage=stage.name):
+                result = self.data_result(stage / "data-final-fixes.lua", "2.1.23", "5.0.21000", version,
+                                          self.f210_row(), data_alias=FIXTURE / "mir5/data-final-fixes.lua")
+                self.assertTrue(result["ok"], result["message"])
+                self.assertEqual((None, "1", 1),
+                                 (result["row"]["unit"]["count"], result["row"]["unit"]["count_formula"],
+                                  result["row"]["unit"]["time"]))
 
     def test_independent_base_oracle_preflight_precedes_the_only_count_time_mutation(self):
         for directory, mir, fixture in (("published", "4.7.20002", "0.1.0"), ("mir5", "5.0.20000", "0.2.0")):
@@ -507,6 +564,58 @@ class F200LegacyCapFixtureTests(unittest.TestCase):
                 rejected = self.flow_result(F200_CROSS / "control.lua", F210_CROSS / "control.lua", opponent, options)
                 self.assertFalse(rejected["ok"])
                 self.assertIn(phrase, rejected["message"])
+
+    def test_cross_engine_disabled_intermediate_requires_the_observed_stage_before_reenabling_only_owned_gear(self):
+        options = {
+            "source_base": "2.0.77", "source_mir": "4.7.20003", "source_fixture": "0.4.0",
+            "source_control_alias": str(FIXTURE / "published/control.lua"),
+            "disabled_path": str(F210_DISABLED / "control.lua"), "disabled_base": "2.1.23", "disabled_mir": "5.0.21000",
+            "disabled_fixture": "0.6.0", "disabled_control_alias": str(FIXTURE / "mir5/control.lua"),
+            "reenabled_path": str(F210_REENABLED / "control.lua"), "reenabled_base": "2.1.23", "reenabled_mir": "5.0.21000",
+            "reenabled_fixture": "0.7.0", "reenabled_control_alias": str(FIXTURE / "mir5/control.lua"),
+        }
+        for stage, version in ((F210_DISABLED, "0.6.0"), (F210_REENABLED, "0.7.0")):
+            with self.subTest(parse=stage.name):
+                parsed = self.parse_result(stage / "control.lua", "2.1.23", "5.0.21000", version,
+                                           FIXTURE / "mir5/control.lua")
+                self.assertTrue(parsed["ok"], parsed["message"])
+                self.assertEqual({}, plain(parsed["reads"]))
+
+        result = self.flow_result(F200_CROSS / "control.lua", F210_REENABLED / "control.lua", "", options)
+        self.assertTrue(result["ok"], result["message"])
+        self.assertTrue(result["disabled_intermediate_observed"])
+        self.assertEqual(0, result["disabled_destination_labs"])
+        self.assertEqual(("completed", 2, 1, 4, .03),
+                         (result["phase"], result["source_labs"], result["destination_labs"],
+                          result["player_level"], result["bonus"]))
+        self.assertTrue(result["player_enabled"])
+        self.assertTrue(result["player_visible"])
+        self.assertEqual((.27, .42, False),
+                         (result["current_progress"], result["foreign_progress"], result["foreign_enabled"]))
+        self.assertEqual((9, 1, 3), (result["markers"], result["diagnostics"], result["saves"]))
+        self.assertEqual(
+            ["f200-f210-positive-legacy-cap-source"] * 3
+            + ["f200-f210-positive-legacy-cap-disabled"] * 3
+            + ["f200-f210-positive-legacy-cap-reenabled"] * 3,
+            plain(result["marker_cases"]),
+        )
+
+        opponents = {
+            "old-disabled-right": ("MIR5 F210 re-enabled cross-engine restored player native gear state differs", True),
+            "skip-intermediate": ("required disabled intermediate witness is absent or malformed", False),
+            "foreign-queue": ("foreign queue or progress changed", False),
+            "saved-progress": ("MIR5 F210 disabled intermediate player saved progress differs", False),
+            "disabled-reload-drift": ("disabled intermediate player saved progress differs", True),
+            "wrong-disabled-setting": ("disabled intermediate did not retain the disabled owned family setting", False),
+            "wrong-reenabled-setting": ("re-enabled successor did not retain the owned family setting", True),
+        }
+        for opponent, (phrase, observed) in opponents.items():
+            with self.subTest(opponent=opponent):
+                rejected = self.flow_result(F200_CROSS / "control.lua", F210_REENABLED / "control.lua", opponent, options)
+                self.assertFalse(rejected["ok"])
+                self.assertIn(phrase, rejected["message"])
+                self.assertEqual(observed, rejected["disabled_intermediate_observed"])
+                self.assertEqual((0, 0), (rejected["queue_entries"], rejected["destination_labs"]))
 
     def test_published_completed_v010_source_save_uses_only_the_exact_old_case_fallback_on_cold_reload(self):
         result = self.flow_result(FIXTURE / "published" / "control.lua", FIXTURE / "mir5" / "control.lua", "",
