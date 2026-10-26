@@ -32,7 +32,10 @@ assert(data.raw["int-setting"]["ips-max-level-" .. direct]).default_value = 1
 assert(data.raw["int-setting"]["ips-research-time-" .. direct]).default_value = 1
 assert(data.raw["double-setting"]["ips-effect-per-level-" .. direct]).default_value = 10
 
-local base = "inserter-capacity-bonus"
+-- F018's admitted finite tail is the published laser-turret-speed-8 row.
+-- Earlier fixture targets retain their inserter witness and do not gain a
+-- source-specific setting branch.
+local base = target.continuation_settings_family or "inserter-capacity-bonus"
 local enabled = data.raw["bool-setting"]["mir-enable-" .. base]
 if enabled then
   enabled.default_value = true

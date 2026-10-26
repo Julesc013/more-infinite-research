@@ -183,7 +183,7 @@ function Assert-ActiveFixtureSelection([string]$Kind,[object[]]$ProfileRows,[obj
   Assert-Fixture (@($ProfileRows | Where-Object {[string]$_.name -ceq $baseFixture -and [bool]$_.enabled -and [string]$_.version -ceq $expectedBaseVersion}).Count -eq 1) 'active seed base fixture differs'
 }
 function Get-HistoricalFixtureTarget([string]$Target,[string]$MetadataPath) {
-  $allowed=@('f013','f014','f015','f016','f017','f100','f110')
+  $allowed=@('f013','f014','f015','f016','f017','f018','f100','f110')
   Assert-Fixture ($Target -in $allowed) 'historical target is unsupported'
   $metadata=(Resolve-Path -LiteralPath $MetadataPath).Path
   $value=Get-Content -LiteralPath $metadata -Raw|ConvertFrom-Json -AsHashtable
@@ -194,7 +194,7 @@ function Get-HistoricalFixtureTarget([string]$Target,[string]$MetadataPath) {
   foreach($field in @('factorio_version','minimum_base','mir_version','direct','direct_effect','continuation','continuation_mode')){
     Assert-Fixture ($selected.ContainsKey($field) -and -not [string]::IsNullOrWhiteSpace([string]$selected[$field])) "historical fixture target lacks $field"
   }
-  Assert-Fixture ($Target -cmatch '^f(?:013|014|015|016|017|100|110)$') 'historical target literal identity differs'
+  Assert-Fixture ($Target -cmatch '^f(?:013|014|015|016|017|018|100|110)$') 'historical target literal identity differs'
   foreach($field in @('direct','continuation')){
     Assert-Fixture ([string]$selected[$field] -cmatch '^[a-z0-9][a-z0-9_-]*$') "historical target $field is not a literal-safe identifier"
   }
@@ -217,6 +217,14 @@ function Get-HistoricalFixtureTarget([string]$Target,[string]$MetadataPath) {
     Assert-Fixture ($continuationScience.Count -gt 0) 'historical lab continuation lacks science'
     foreach($name in $continuationScience){Assert-Fixture ([string]$name -cmatch '^[a-z0-9][a-z0-9_-]*$') 'historical continuation science is not a literal-safe identifier'}
   }
+  if($Target -ceq 'f018'){
+    Assert-Fixture ([string]$selected.factorio_version -ceq '0.18' -and [string]$selected.minimum_base -ceq '0.18.47' -and [string]$selected.mir_version -ceq '5.0.01800') 'F018 historical target identity differs'
+    Assert-Fixture ([string]$selected.direct -ceq 'recipe-prod-research_character_mining_speed-1' -and [double]$selected.direct_effect -eq 0.1) 'F018 historical direct contract differs'
+    Assert-Fixture ([string]$selected.continuation -ceq 'laser-turret-speed-8' -and [string]$selected.continuation_mode -ceq 'lab') 'F018 historical continuation differs'
+    Assert-Fixture ([string]$selected.continuation_settings_family -ceq 'laser-shooting-speed' -and [string]$selected.continuation_gun_speed_ammo -ceq 'laser-turret' -and [double]$selected.continuation_effect_delta -eq 0.01) 'F018 historical continuation effect differs'
+    Assert-Fixture ((@($selected.direct_science) -join "`n") -ceq ('military-science-pack' + "`n" + 'utility-science-pack')) 'F018 historical direct science differs'
+    Assert-Fixture ((@($selected.continuation_science) -join "`n") -ceq ('automation-science-pack' + "`n" + 'chemical-science-pack' + "`n" + 'logistic-science-pack' + "`n" + 'military-science-pack' + "`n" + 'utility-science-pack')) 'F018 historical continuation science differs'
+  }
   [pscustomobject][ordered]@{path=$metadata;sha256=Get-FixtureSha $metadata;name=[string]$value.name;version=[string]$value.version;target=$Target;factorio_version=[string]$selected.factorio_version;minimum_base=[string]$selected.minimum_base;mir_version=[string]$selected.mir_version;science_policy=$sciencePolicy;definition=$selected}
 }
 function ConvertTo-HistoricalFixtureTargetLiteral($Fixture) {
@@ -231,6 +239,17 @@ function ConvertTo-HistoricalFixtureTargetLiteral($Fixture) {
   $effect=[double]$value.direct_effect
   $lines.Add(('  direct_effect={0},' -f $effect.ToString('0.################',[Globalization.CultureInfo]::InvariantCulture)))
   if($value.ContainsKey('queue_api') -and [bool]$value.queue_api){$lines.Add('  queue_api=true,')}
+  foreach($field in @('continuation_settings_family','continuation_gun_speed_ammo')){
+    if($value.ContainsKey($field)){
+      Assert-Fixture ([string]$value[$field] -cmatch '^[a-z0-9][a-z0-9_-]*$') "historical target $field is not a literal-safe identifier"
+      $lines.Add(('  {0}="{1}",' -f $field,[string]$value[$field]))
+    }
+  }
+  if($value.ContainsKey('continuation_effect_delta')){
+    $continuationEffect=[double]$value.continuation_effect_delta
+    Assert-Fixture ($continuationEffect -gt 0 -and $continuationEffect -le 1) 'historical continuation effect differs'
+    $lines.Add(('  continuation_effect_delta={0},' -f $continuationEffect.ToString('0.################',[Globalization.CultureInfo]::InvariantCulture)))
+  }
   $directScience=@($value.direct_science|ForEach-Object {'"'+[string]$_+'"'})
   $lines.Add(('  direct_science={0},' -f ('{'+($directScience -join ',')+'}')))
   if([string]$value.continuation_mode -ceq 'numeric-witness'){
@@ -364,7 +383,7 @@ function Assert-HistoricalTransitionFixtureArchive([string]$Archive,[string]$Sou
   } finally {$zip.Dispose()}
 }
 function New-HistoricalFixtureServerSettings([string]$Path,[string]$EngineData,[string]$FactorioVersion) {
-  Assert-Fixture ($FactorioVersion -in @('0.13','0.14','0.15','0.16','0.17','1.0','1.1')) 'historical server target differs'
+  Assert-Fixture ($FactorioVersion -in @('0.13','0.14','0.15','0.16','0.17','0.18','1.0','1.1')) 'historical server target differs'
   $settings=Get-Content -LiteralPath (Join-Path $EngineData 'server-settings.example.json') -Raw | ConvertFrom-Json -AsHashtable
   $settings.name='MIR private historical fixture'
   $settings.description=''
