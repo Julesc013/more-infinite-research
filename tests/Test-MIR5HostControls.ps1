@@ -115,6 +115,7 @@ $controls = @(
   [ordered]@{path='tests/test_settings_commands.py';lua=$true},
   [ordered]@{path='tests/test_properties.py';lua=$true},
   [ordered]@{path='tests/test_replay.py';lua=$true},
+  [ordered]@{path='tests/test_locale_catalogue.py';lua=$false},
   [ordered]@{path='tests/test_library_profile_reader.py';lua=$false},
   [ordered]@{path='tests/test_f110_f200_runner.py';lua=$false},
   [ordered]@{path='tests/test_package.py';lua=$false},

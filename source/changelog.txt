@@ -38,6 +38,8 @@ Version: @DISTRIBUTION_VERSION@
 
   Bugfixes:
 
+    - Restore omitted research names and descriptions across the shipped locales while preserving existing translations.
+    - Add missing titles for hidden Imersite state and unavailable material explanations.
     - Preserve the combined Factorio 2.1 Bob/Angel Space Age carbon effect vector when its recipe named carbon produces Angel carbon
       instead of the ordinary carbon item.
     - Retain science amounts, prerequisites, effect counts, lab outcomes and icon sources in opt-in generation diagnostics.

@@ -144,6 +144,7 @@ class HostControlsTests(unittest.TestCase):
             "tests/test_settings_commands.py",
             "tests/test_properties.py",
             "tests/test_replay.py",
+            "tests/test_locale_catalogue.py",
             "tests/test_library_profile_reader.py",
             "tests/test_f110_f200_runner.py",
             "tests/test_package.py",
@@ -177,10 +178,11 @@ class HostControlsTests(unittest.TestCase):
         self.assertIn("tests/test_scripted_effects_lifecycle.py", paths)
         self.assertIn("tests/test_settings_profile.py", paths)
         self.assertIn("tests/test_settings_commands.py", paths)
+        self.assertIn("tests/test_locale_catalogue.py", paths)
         self.assertIn("tests/test_host_controls.py", paths)
         self.assertFalse(any("test_cutover.py" in path or "test_adoption.py" in path for path in paths))
         self.assertTrue(all(set(row) == {"path", "lua"} for row in controls))
-        first_python_only = paths.index("tests/test_library_profile_reader.py")
+        first_python_only = paths.index("tests/test_locale_catalogue.py")
         self.assertTrue(all(row["lua"] for row in controls[:first_python_only]))
         self.assertTrue(all(not row["lua"] for row in controls[first_python_only:]))
 
