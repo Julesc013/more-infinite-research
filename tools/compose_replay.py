@@ -28,7 +28,7 @@ PUBLISHED_ARCHIVE_NAME = "more-infinite-research_4.7.21000.zip"
 ARCHIVE_ROOT = "more-infinite-research_4.7.21000"
 MOD_NAME = "more-infinite-research"
 MOD_VERSION = "4.7.21000"
-PUBLISHED_VERSIONS = tuple(f"4.7.{family}{patch:02d}" for family in (200, 210) for patch in range(3))
+PUBLISHED_VERSIONS = tuple(f"4.7.{family}{patch:02d}" for family in (200, 210) for patch in range(4))
 STAGE_ENTRYPOINTS = (
     "data.lua",
     "data-updates.lua",
