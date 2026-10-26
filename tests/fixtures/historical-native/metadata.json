@@ -44,6 +44,15 @@
       "continuation": "inserter-capacity-bonus-8", "continuation_mode": "lab",
       "continuation_science": ["automation-science-pack", "chemical-science-pack", "logistic-science-pack", "production-science-pack", "utility-science-pack"]
     },
+    "f018": {
+      "factorio_version": "0.18", "minimum_base": "0.18.47", "mir_version": "5.0.01800", "queue_api": true,
+      "direct": "recipe-prod-research_character_mining_speed-1",
+      "direct_effect": 0.10,
+      "direct_science": ["military-science-pack", "utility-science-pack"],
+      "continuation": "laser-turret-speed-8", "continuation_mode": "lab",
+      "continuation_settings_family": "laser-shooting-speed", "continuation_gun_speed_ammo": "laser-turret", "continuation_effect_delta": 0.01,
+      "continuation_science": ["automation-science-pack", "chemical-science-pack", "logistic-science-pack", "military-science-pack", "utility-science-pack"]
+    },
     "f100": {
       "factorio_version": "1.0", "minimum_base": "1.0.0", "mir_version": "5.0.10000", "queue_api": true,
       "direct": "recipe-prod-research_character_mining_speed-1",

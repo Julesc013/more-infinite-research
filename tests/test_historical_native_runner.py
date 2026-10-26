@@ -1,7 +1,7 @@
 """Pure host controls for the target-parameterized historical native fixture.
 
 These checks characterize source composition and runner routing only. They do
-not claim an engine result; the seven exact engines execute the fixture later.
+not claim an engine result; the eight exact engines execute the fixture later.
 """
 import argparse
 import hashlib
@@ -18,7 +18,7 @@ ROOT = Path(__file__).resolve().parents[1]
 FIXTURE = ROOT / "tests/fixtures/historical-native"
 RUNNER = ROOT / "tools/Invoke-NativeFixture.ps1"
 ALL_SCIENCE_METADATA = FIXTURE / "metadata-all-science.json"
-DEFAULT_METADATA_SHA256 = "f9ba6c05cbe2f41e590e5e9f46963dd369d837e80796002716d3e5332884b32f"
+DEFAULT_METADATA_SHA256 = "1fb15c0f79d19cc40912eb7010842d4e5c81f0986cd9d383307c03b4419bcd0a"
 
 
 class HistoricalNativeFixtureControls(unittest.TestCase):
@@ -40,7 +40,7 @@ class HistoricalNativeFixtureControls(unittest.TestCase):
           },$true))
           if($nodes.Count -ne 1){throw 'owned-version selector missing or ambiguous'}
           $select=[scriptblock]::Create($nodes[0].Extent.Text)
-          foreach($id in @('f013','f014','f015','f016','f017','f100','f110')){
+          foreach($id in @('f013','f014','f015','f016','f017','f018','f100','f110')){
             foreach($transition in @($false,$true)){
              foreach($coexisting in @($false,$true)){
               $historical=$true; $historicalTransition=$transition
@@ -73,13 +73,14 @@ class HistoricalNativeFixtureControls(unittest.TestCase):
             env=dict(os.environ, MIR_TEST_RUNNER=str(RUNNER)), check=False)
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
 
-    def test_all_seven_profiles_select_only_exact_base_mir_and_shared_fixture(self):
+    def test_all_eight_profiles_select_only_exact_base_mir_and_shared_fixture(self):
         expected = {
             "f013": ("0.13.20", "5.0.01300"),
             "f014": ("0.14.23", "5.0.01400"),
             "f015": ("0.15.40", "5.0.01500"),
             "f016": ("0.16.51", "5.0.01600"),
             "f017": ("0.17.79", "5.0.01700"),
+            "f018": ("0.18.47", "5.0.01800"),
             "f100": ("1.0.0", "5.0.10000"),
             "f110": ("1.1.110", "5.0.11000"),
         }
@@ -113,6 +114,10 @@ class HistoricalNativeFixtureControls(unittest.TestCase):
                 "lab", None, None, 0.10, True, "military-science-pack,utility-science-pack",
                 "automation-science-pack,chemical-science-pack,logistic-science-pack,production-science-pack,utility-science-pack",
             ),
+            "f018": (
+                "lab", None, None, 0.10, True, "military-science-pack,utility-science-pack",
+                "automation-science-pack,chemical-science-pack,logistic-science-pack,military-science-pack,utility-science-pack",
+            ),
             "f100": (
                 "lab", None, None, 0.10, True, "military-science-pack,utility-science-pack",
                 "automation-science-pack,chemical-science-pack,logistic-science-pack,production-science-pack,utility-science-pack",
@@ -126,13 +131,65 @@ class HistoricalNativeFixtureControls(unittest.TestCase):
             with self.subTest(target=target):
                 row = self.metadata["targets"][target]
                 self.assertEqual(row["direct"], "recipe-prod-research_character_mining_speed-1")
-                self.assertEqual(row["continuation"], "inserter-capacity-bonus-8")
+                self.assertEqual(
+                    row["continuation"],
+                    "laser-turret-speed-8" if target == "f018" else "inserter-capacity-bonus-8",
+                )
+                if target == "f018":
+                    self.assertEqual(row["continuation_settings_family"], "laser-shooting-speed")
+                    self.assertEqual(row["continuation_gun_speed_ammo"], "laser-turret")
+                    self.assertEqual(row["continuation_effect_delta"], 0.01)
                 actual = (
                     row["continuation_mode"], row.get("continuation_count"), row.get("continuation_energy_ticks"),
                     row["direct_effect"], row.get("queue_api", False), ",".join(row["direct_science"]),
                     ",".join(row.get("continuation_science", [])),
                 )
                 self.assertEqual(actual, wanted)
+
+    def test_f018_runner_binds_the_named_laser_tail_and_refuses_the_4_7_transition_protocol(self):
+        script = r'''
+          $ErrorActionPreference='Stop'; Set-StrictMode -Version Latest
+          $tokens=$null;$errors=$null
+          $ast=[Management.Automation.Language.Parser]::ParseFile($env:MIR_TEST_RUNNER,[ref]$tokens,[ref]$errors)
+          if($errors.Count){throw 'runner parse failed'}
+          foreach($name in @('Assert-Fixture','Get-FixtureSha','Get-HistoricalFixtureTarget',
+            'ConvertTo-HistoricalFixtureTargetLiteral','Get-HistoricalTransitionFixtureTarget')){
+            $node=@($ast.FindAll({param($n) $n -is [Management.Automation.Language.FunctionDefinitionAst] -and $n.Name -ceq $name},$true))
+            if($node.Count -ne 1){throw "helper missing: $name"}
+            Invoke-Expression $node[0].Extent.Text
+          }
+          $selected=Get-HistoricalFixtureTarget -Target f018 -MetadataPath $env:MIR_TEST_DEFAULT
+          $bad=Get-Content -LiteralPath $env:MIR_TEST_DEFAULT -Raw|ConvertFrom-Json -AsHashtable
+          $bad.targets.f018.continuation='inserter-capacity-bonus-8'
+          $bad|ConvertTo-Json -Depth 20|Set-Content -LiteralPath $env:MIR_TEST_BAD -NoNewline
+          $badRejected=$false
+          try{Get-HistoricalFixtureTarget -Target f018 -MetadataPath $env:MIR_TEST_BAD|Out-Null}
+          catch{$badRejected=$_.Exception.Message -match 'F018 historical continuation differs'}
+          $transitionRejected=$false
+          try{Get-HistoricalTransitionFixtureTarget -Target f018 -MetadataPath $env:MIR_TEST_BAD -Stage published|Out-Null}
+          catch{$transitionRejected=$_.Exception.Message -match 'historical transition target is unsupported'}
+          if(-not $badRejected -or -not $transitionRejected){throw 'F018 admission boundary differs'}
+          [ordered]@{literal=(ConvertTo-HistoricalFixtureTargetLiteral $selected);target=$selected.target;
+            factorio_version=$selected.factorio_version;minimum_base=$selected.minimum_base;mir_version=$selected.mir_version}|ConvertTo-Json -Compress
+        '''
+        with tempfile.TemporaryDirectory(prefix="mir5-f018-native-admission-") as work:
+            bad_path = Path(work) / "bad-f018.json"
+            result = subprocess.run(
+                ["pwsh", "-NoLogo", "-NoProfile", "-Command", script], cwd=ROOT,
+                env=dict(os.environ, MIR_TEST_RUNNER=str(RUNNER),
+                         MIR_TEST_DEFAULT=str(FIXTURE / "metadata.json"), MIR_TEST_BAD=str(bad_path)),
+                text=True, capture_output=True, check=False,
+            )
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        selected = json.loads(result.stdout)
+        self.assertEqual(
+            (selected["target"], selected["factorio_version"], selected["minimum_base"], selected["mir_version"]),
+            ("f018", "0.18", "0.18.47", "5.0.01800"),
+        )
+        self.assertIn('continuation="laser-turret-speed-8",', selected["literal"])
+        self.assertIn('continuation_settings_family="laser-shooting-speed",', selected["literal"])
+        self.assertIn('continuation_gun_speed_ammo="laser-turret",', selected["literal"])
+        self.assertIn("continuation_effect_delta=0.01,", selected["literal"])
 
     def test_all_science_metadata_uses_only_the_three_native_red_recipe_targets(self):
         default_blob = subprocess.run(
@@ -292,7 +349,7 @@ class HistoricalNativeFixtureControls(unittest.TestCase):
           defines = {inventory={lab_input=1}, events={on_research_finished=2, on_tick=3}}
           global = {mir5_historical_native={
             phase="complete", direct_finished=1, continuation_finished=0,
-            before_mining=0, before_stack_bonus=0,
+            before_mining=0, before_continuation_effect=0,
           }}
           log=function() end
           assert(loadfile(fixture_root .. "/control.lua", "t", _ENV))()
@@ -333,6 +390,19 @@ class HistoricalNativeFixtureControls(unittest.TestCase):
                     queue_api=true,
                   }
                 end
+                if id == "f018" then
+                  return {
+                    id=id, mir_version="5.0.01800", direct="recipe-prod-research_character_mining_speed-1",
+                    direct_effect=expected_effect,
+                    direct_science={"military-science-pack", "utility-science-pack"},
+                    continuation="laser-turret-speed-8", continuation_mode="lab",
+                    continuation_settings_family="laser-shooting-speed",
+                    continuation_gun_speed_ammo="laser-turret", continuation_effect_delta=0.01,
+                    continuation_science={"automation-science-pack", "chemical-science-pack",
+                      "logistic-science-pack", "military-science-pack", "utility-science-pack"},
+                    queue_api=true,
+                  }
+                end
                 return {
                   id=id, mir_version="5.0.01500", direct="recipe-prod-research_character_mining_speed-1",
                   direct_effect=expected_effect,
@@ -361,6 +431,8 @@ class HistoricalNativeFixtureControls(unittest.TestCase):
                 end,
               }
               local force = {manual_mining_speed_modifier=0, stack_inserter_capacity_bonus=0, technologies={}}
+              local gun_speed = {}
+              force.get_gun_speed_modifier = function(category) return gun_speed[category] or 0 end
               local current_research
               setmetatable(force, {
                 __index=function(_, key)
@@ -375,9 +447,10 @@ class HistoricalNativeFixtureControls(unittest.TestCase):
               })
               local direct = {name="recipe-prod-research_character_mining_speed-1", force=force,
                 prerequisites={}, enabled=true, researched=false}
-              local continuation = {name="inserter-capacity-bonus-8", force=force, prerequisites={}, enabled=true,
+              local continuation = {name=id == "f018" and "laser-turret-speed-8" or "inserter-capacity-bonus-8",
+                force=force, prerequisites={}, enabled=true,
                 researched=false, research_unit_count=914489, research_unit_energy=3600}
-              if id == "f017" then
+              if id == "f017" or id == "f018" then
                 direct.research_unit_count = direct_unit_count == nil and 1 or direct_unit_count
                 direct.research_unit_energy = direct_unit_energy == nil and 60 or direct_unit_energy
                 continuation.research_unit_count = continuation_unit_count == nil and 1 or continuation_unit_count
@@ -492,8 +565,13 @@ class HistoricalNativeFixtureControls(unittest.TestCase):
               assert(force.current_research == continuation)
               local continuation_input = global.mir5_historical_native.continuation_lab.get_inventory(defines.inventory.lab_input)
               for _, pack in ipairs(package.loaded.target.continuation_science) do continuation_input.consume(pack, 1) end
-              continuation.researched, force.stack_inserter_capacity_bonus, force.current_research = true,
-                actual_continuation_effect or 1, nil
+              continuation.researched = true
+              if id == "f018" then
+                gun_speed["laser-turret"] = actual_continuation_effect or 0.01
+              else
+                force.stack_inserter_capacity_bonus = actual_continuation_effect or 1
+              end
+              force.current_research = nil
               callbacks[defines.events.on_research_finished]({research=continuation})
               game.tick = 2
               callbacks[defines.events.on_tick]()
@@ -517,6 +595,19 @@ class HistoricalNativeFixtureControls(unittest.TestCase):
             (later[1]["phase"], later[1]["saved"], later[1]["modifier"], later[1]["energy"]),
             ("complete", True, 0.10, 3600),
         )
+
+        f018 = self.lua.eval("exercise_direct_completion")("f018", 0.10, 0.10)
+        self.assertTrue(f018[0])
+        self.assertEqual(
+            (f018[1]["phase"], f018[1]["saved"], f018[1]["modifier"], f018[1]["energy"]),
+            ("complete", True, 0.10, 60),
+        )
+
+        wrong_f018_continuation_effect = self.lua.eval("exercise_direct_completion")(
+            "f018", 0.10, 0.10, None, None, None, 0.005
+        )
+        self.assertFalse(wrong_f018_continuation_effect[0])
+        self.assertIn("generated native effect", wrong_f018_continuation_effect[1])
 
         wrong_old = self.lua.eval("exercise_direct_completion")("f013", 0.05, 0.10)
         self.assertFalse(wrong_old[0])
@@ -554,7 +645,7 @@ class HistoricalNativeFixtureControls(unittest.TestCase):
             "f017", 0.10, 0.10, None, None, None, 0.5
         )
         self.assertFalse(wrong_all_science_continuation_effect[0])
-        self.assertIn("inserter effect", wrong_all_science_continuation_effect[1])
+        self.assertIn("generated native effect", wrong_all_science_continuation_effect[1])
 
         restored_direct_after_snapshot = self.lua.eval("exercise_direct_completion")(
             "f017", 0.10, 0.10, None, None, "direct"
@@ -589,14 +680,17 @@ class HistoricalNativeFixtureControls(unittest.TestCase):
           function install_fixture_target(id, science_policy)
             package.loaded["target"] = nil
             package.loaded["target-literal"] = nil
-            package.preload["target-literal"] = function() return {
-              id=id, science_policy=science_policy,
-              direct="recipe-prod-research_character_mining_speed-1"
-            } end
+            package.preload["target-literal"] = function()
+              local target = {id=id, science_policy=science_policy,
+                direct="recipe-prod-research_character_mining_speed-1"}
+              if id == "f018" then target.continuation_settings_family = "laser-shooting-speed" end
+              return target
+            end
           end
           function setting_defaults(id, with_continuation, science_policy)
             install_fixture_target(id, science_policy)
             local direct = "research_character_mining_speed"
+            local base = id == "f018" and "laser-shooting-speed" or "inserter-capacity-bonus"
             data = {raw = {
               ["bool-setting"] = {["ips-enable-" .. direct] = {default_value = false}},
               ["string-setting"] = { ["mir-science-pack-ingredient-policy"] = {
@@ -614,13 +708,13 @@ class HistoricalNativeFixtureControls(unittest.TestCase):
               },
             }}
             if with_continuation then
-              data.raw["bool-setting"]["mir-enable-inserter-capacity-bonus"] = {default_value = false}
-              data.raw["int-setting"]["mir-cost-base-inserter-capacity-bonus"] = {default_value = 200}
-              data.raw["int-setting"]["mir-cost-linear-increment-inserter-capacity-bonus"] = {default_value = 0}
-              data.raw["int-setting"]["mir-max-level-inserter-capacity-bonus"] = {default_value = 0}
-              data.raw["int-setting"]["mir-research-time-inserter-capacity-bonus"] = {default_value = 60}
-              data.raw["double-setting"]["mir-cost-growth-inserter-capacity-bonus"] = {default_value = 3.333333333333}
-              data.raw["int-setting"]["mir-effect-per-level-inserter-capacity-bonus"] = {default_value = 4}
+              data.raw["bool-setting"]["mir-enable-" .. base] = {default_value = false}
+              data.raw["int-setting"]["mir-cost-base-" .. base] = {default_value = 200}
+              data.raw["int-setting"]["mir-cost-linear-increment-" .. base] = {default_value = 0}
+              data.raw["int-setting"]["mir-max-level-" .. base] = {default_value = 0}
+              data.raw["int-setting"]["mir-research-time-" .. base] = {default_value = 60}
+              data.raw["double-setting"]["mir-cost-growth-" .. base] = {default_value = 3.333333333333}
+              data.raw["int-setting"]["mir-effect-per-level-" .. base] = {default_value = 4}
             end
             assert(loadfile(settings_updates, "t", _ENV))()
             local out = {
@@ -633,15 +727,15 @@ class HistoricalNativeFixtureControls(unittest.TestCase):
                 data.raw["int-setting"]["ips-research-time-" .. direct].default_value,
                 data.raw["double-setting"]["ips-effect-per-level-" .. direct].default_value,
               },
-              continuation = data.raw["bool-setting"]["mir-enable-inserter-capacity-bonus"]
+              continuation = data.raw["bool-setting"]["mir-enable-" .. base]
                 and {
-                  data.raw["bool-setting"]["mir-enable-inserter-capacity-bonus"].default_value,
-                  data.raw["int-setting"]["mir-cost-base-inserter-capacity-bonus"].default_value,
-                  data.raw["int-setting"]["mir-cost-linear-increment-inserter-capacity-bonus"].default_value,
-                  data.raw["double-setting"]["mir-cost-growth-inserter-capacity-bonus"].default_value,
-                  data.raw["int-setting"]["mir-max-level-inserter-capacity-bonus"].default_value,
-                  data.raw["int-setting"]["mir-research-time-inserter-capacity-bonus"].default_value,
-                  data.raw["int-setting"]["mir-effect-per-level-inserter-capacity-bonus"].default_value,
+                  data.raw["bool-setting"]["mir-enable-" .. base].default_value,
+                  data.raw["int-setting"]["mir-cost-base-" .. base].default_value,
+                  data.raw["int-setting"]["mir-cost-linear-increment-" .. base].default_value,
+                  data.raw["double-setting"]["mir-cost-growth-" .. base].default_value,
+                  data.raw["int-setting"]["mir-max-level-" .. base].default_value,
+                  data.raw["int-setting"]["mir-research-time-" .. base].default_value,
+                  data.raw["int-setting"]["mir-effect-per-level-" .. base].default_value,
                 } or false,
               science_policy = data.raw["string-setting"]["mir-science-pack-ingredient-policy"].default_value,
             }
@@ -672,10 +766,16 @@ class HistoricalNativeFixtureControls(unittest.TestCase):
             with self.subTest(target=target, policy="all"):
                 row = self.lua.eval("setting_defaults")(target, True, "all")
                 self.assertEqual(row["science_policy"], "all")
+        f018 = self.lua.eval("setting_defaults")("f018", True)
+        self.assertEqual(tuple(f018["direct"][index] for index in range(1, 8)), (True, 1, 0, 1, 1, 1, 10))
+        self.assertEqual(tuple(f018["continuation"][index] for index in range(1, 8)), (True, 1, 0, 1, 8, 1, 1))
         self.assertEqual(self.lua.eval("setting_defaults")("f017", True)["science_policy"], "configured")
         rejected = self.lua.eval("setting_policy_error")("f015", "all")
         self.assertFalse(rejected[0])
         self.assertIn("historical all science target differs", rejected[1])
+        rejected_f018 = self.lua.eval("setting_policy_error")("f018", "all")
+        self.assertFalse(rejected_f018[0])
+        self.assertIn("historical all science target differs", rejected_f018[1])
 
     def test_f013_f014_final_stage_accelerates_only_a_validated_direct_probe(self):
         self.lua.globals().fixture_root = FIXTURE.as_posix()
@@ -815,7 +915,7 @@ class HistoricalNativeFixtureControls(unittest.TestCase):
             if(@($node).Count -ne 1){throw 'function missing'}
             Invoke-Expression $node[0].Extent.Text
           }
-          foreach($version in @('0.13','0.14','0.15','0.16','0.17','1.0','1.1')){
+          foreach($version in @('0.13','0.14','0.15','0.16','0.17','0.18','1.0','1.1')){
             $engine=Join-Path $env:MIR_TEST_TEMP $version
             [IO.Directory]::CreateDirectory($engine)|Out-Null
             # Exact relevant shapes of the historical engine-owned examples.
