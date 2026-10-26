@@ -182,7 +182,10 @@ local function start_physical_batch(state, after_research)
       or input.insert{name="electric-motor", count=PHYSICAL_BATCHES * 2} ~= PHYSICAL_BATCHES * 2 then
     fail("assembler rejected exact electric-engine inputs")
   end
-  entity.fluidbox[1] = {name="lubricant", amount=PHYSICAL_BATCHES * 40}
+  local lubricant = PHYSICAL_BATCHES * 40
+  if entity.insert_fluid{name="lubricant", amount=lubricant} ~= lubricant then
+    fail("assembler rejected exact lubricant input")
+  end
   entity.energy = LAB_ENERGY
   state.production = {after_research=after_research, before=before, expected=expected}
 end

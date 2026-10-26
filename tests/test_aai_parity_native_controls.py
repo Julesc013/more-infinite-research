@@ -196,6 +196,23 @@ class AaiParityNativeControls(unittest.TestCase):
                   counts=counts,
                 }
               end
+              local function strict_entity(fields, on_energy)
+                return setmetatable(fields, {
+                  __index=function(target, key)
+                    if key=="energy" then return 0 end
+                    local result=rawget(target,key)
+                    if result==nil then error("unknown LuaEntity field read: "..key) end
+                    return result
+                  end,
+                  __newindex=function(target,key,value)
+                    if key=="energy" then
+                      if on_energy then on_energy(target,value) end
+                      return
+                    end
+                    error("unknown LuaEntity field write: "..key)
+                  end,
+                })
+              end
               local function force(index)
                 local queued,current={},nil
                 local value=setmetatable({index=index, technologies={}, recipes={}, research_progress=0},{
@@ -239,20 +256,19 @@ class AaiParityNativeControls(unittest.TestCase):
                     assert(electric_lab_creations==1,"successor tried to place a lab over the source lab")
                   end
                   local input,fuel=inventory(200),inventory()
-                  return {valid=true,energy=0,get_inventory=function(slot) assert(slot==1);return input end,get_fuel_inventory=function()return fuel end}
+                  return strict_entity({valid=true,active=true,get_inventory=function(slot) assert(slot==1);return input end,get_fuel_inventory=function()return fuel end})
                 end
                 if spec.name=="stone-furnace" then
                   local input,output,fuel=inventory(),inventory(),inventory()
                   local entity={valid=true}
                   entity.get_inventory=function(slot) if slot==3 then return input elseif slot==4 then return output end error("unexpected furnace slot") end
                   entity.get_fuel_inventory=function()return fuel end
-                  return setmetatable(entity,{__index=function(_,key) if key=="energy" then return 0 end end,
-                    __newindex=function(target,key,value)
-                      if key=="energy" and input.get_item_count("iron-ore")==10 and output.get_item_count("iron-plate")==0 then
+                  return strict_entity(entity,function(_,value)
+                      if input.get_item_count("iron-ore")==10 and output.get_item_count("iron-plate")==0 then
                         input.counts["iron-ore"]=0;output.counts["iron-plate"]=10;bootstrap_crafts.iron=10
                         player.technologies["burner-mechanics"].researched=true;player.recipes["burner-lab"].enabled=true
-                      elseif key~="energy" then rawset(target,key,value) end
-                    end})
+                      end
+                    end)
                 end
                 if spec.name=="burner-assembling-machine" then
                   local input,output,fuel=inventory(),inventory(),inventory()
@@ -261,39 +277,43 @@ class AaiParityNativeControls(unittest.TestCase):
                   entity.get_fuel_inventory=function()return fuel end
                   entity.set_recipe=function(name) assert(name=="burner-lab");return {} end
                   entity.get_recipe=function() return {name="burner-lab"} end
-                  return setmetatable(entity,{__index=function(_,key) if key=="energy" then return 0 end end,
-                    __newindex=function(target,key,value)
-                      if key=="energy" and input.get_item_count("motor")==10 and input.get_item_count("copper-plate")==10
+                  return strict_entity(entity,function(_,value)
+                      if input.get_item_count("motor")==10 and input.get_item_count("copper-plate")==10
                           and input.get_item_count("stone-brick")==5 and output.get_item_count("burner-lab")==0 then
                         input.counts["motor"],input.counts["copper-plate"],input.counts["stone-brick"]=0,0,0
                         output.counts["burner-lab"]=1;bootstrap_crafts.burner_lab=1
                         player.technologies["automation-science-pack"].researched=true
-                      elseif key~="energy" then rawset(target,key,value) end
-                    end})
+                      end
+                    end)
                 end
                 assert(spec.name=="assembling-machine-2")
                 local input,output=inventory(),inventory()
-                local entity={valid=true,fluidbox={}}
+                local fluids={}
+                local entity={valid=true}
                 entity.get_inventory=function(slot) if slot==3 then return input elseif slot==4 then return output end error("unexpected assembler slot") end
                 entity.get_module_inventory=function() return nil end
                 entity.set_recipe=function(name) assert(name=="electric-engine-unit");return {} end
                 entity.get_recipe=function() return {name="electric-engine-unit"} end
+                entity.insert_fluid=function(stack)
+                  assert(stack.name=="lubricant" and stack.amount==400,"unexpected LuaEntity.insert_fluid input")
+                  fluids[stack.name]=(fluids[stack.name] or 0)+stack.amount
+                  return stack.amount
+                end
                 local pending, delay=0,0
-                return setmetatable(entity,{__index=function(_,key)
-                  if key=="energy" then return 0 end
-                end,__newindex=function(target,key,value)
-                  if key=="energy" and input.get_item_count("steel-plate")>=20 then
+                return strict_entity(entity,function(_,value)
+                  if input.get_item_count("steel-plate")>=20 and (fluids["lubricant"] or 0)>=400 then
                     input.counts["steel-plate"],input.counts["electronic-circuit"],input.counts["electric-motor"]=0,0,0
+                    fluids["lubricant"]=0
                     local amount=player.recipes["electric-engine-unit"].productivity_bonus==0 and 10 or 11
                     output.counts["electric-engine-unit"]=(output.counts["electric-engine-unit"] or 0)+amount-1
                     pending,delay=1,1
-                  elseif key=="energy" and pending>0 then
+                  elseif pending>0 then
                     if delay>0 then delay=delay-1 else
                       output.counts["electric-engine-unit"]=output.counts["electric-engine-unit"]+pending
                       pending=0
                     end
-                  elseif key~="energy" then rawset(target,key,value) end
-                end})
+                  end
+                end)
               end
               local game={tick=0,forces={player=player,[1]=player},surfaces={[1]=surface}}
               function game.create_force()
@@ -461,6 +481,8 @@ class AaiParityNativeControls(unittest.TestCase):
         self.assertIn('craft-item trigger did not complete after native iron production', source)
         self.assertIn('craft-item trigger did not complete after native burner-lab production', source)
         self.assertIn('local AAI_PACKS = 32', source)
+        self.assertIn('entity.insert_fluid{name="lubricant", amount=lubricant}', source)
+        self.assertNotIn('fluidbox', source)
         self.assertIn('defines.inventory.crafter_input', source)
         self.assertIn('defines.inventory.crafter_output', source)
         self.assertNotIn('assembling_machine_input', source)
