@@ -268,6 +268,17 @@ The maintainer's target remains **30 October 2026, 22:56 AEDT**. Retained checkp
 
 At checkpoints report exact integrated commit/player tree, active/pending native assignment, newly resolved material differences, blocking failures/missing inputs, next executable action/owner and forecast. Test/commit/audit-occurrence totals are not a completion percentage. A missed final-byte checkpoint requires a specific revised forecast, not compressed save/client checks.
 
+Use these operational checkpoints to expose schedule risk; they are forecasts against the same acceptance gates, not new test thresholds or a restarted release window. Budget the remaining queue from observed scenario durations/repetitions, preparation/review time and failure allowance.
+
+| Checkpoint (AEDT) | Expected position, or exact no-go/blocker |
+|---|---|
+| 27 October10:56 | Current candidate/queue reconciled, corrected-batch native results arriving, client path complete or narrowed to a specific failure. |
+| 27 October22:56 | Material deltas tied to fixes/dispositions, affected parity advancing, F018 route progressing, remaining run budget grounded in observations. |
+| 28 October22:56 | Required transition/client work substantially closed; remaining primary performance results and final blocker corrections identified. |
+| 29 October10:56 | Intended final player freeze; subsequent source changes need a demonstrated blocker and affected requalification. |
+| 29 October22:56 | Existing stable-candidate checkpoint: no unresolved required save/startup/synchronization/performance blocker. |
+| 30 October22:56 | Qualified GitHub release, anonymous downloads and local delivery, or explicit no-go naming unmet gates. |
+
 ### Machine responsibilities and work limits
 
 | Responsibility | Aero15X | Black Glass |
@@ -281,6 +292,8 @@ At checkpoints report exact integrated commit/player tree, active/pending native
 Keep explicit file ownership, current agent-capacity limits, one active and one pending native assignment, and exclusive direct-library ownership. Planned packets are not dispatched jobs. Do not introduce another machine handoff scheme or competing workload during accepted timings. Handoff through exact GitHub commits/PRs; branch names alone do not identify test inputs. Routine reviewed dev integration needs no repeated permission; protections/checks remain binding.
 
 Each unit names observable outcome, existing requirement/incident IDs, exact inputs, permitted files, independent expectation, simplest bounded change, actual commands, stop condition and native limits. Finish commit/push/checks/review/merge/readback. Native workers stop at their assigned boundary; the coordinator selects the next ready packet.
+
+The next assigned packet also names prerequisites, current state/evidence, expected observations, failure classification/next action and checks invalidated by its change. Put those fields in the existing task/PR, not a new schema. Use current job timestamps to distinguish pre-engine delay, useful execution, repeated input churn, idle native time without a ready successor and review/merge waiting; CPU utilization and command/PR totals do not establish throughput.
 
 ### Dependency route
 
@@ -327,10 +340,14 @@ Preparation is parallel, heavy execution serial under its owner. Combine asserti
 
 ### D — Freeze and decide evidence applicability
 
+The [accepted a1fd431b freeze](../spec/evidence/current-assets-a1fd431b-readback.json) already supplies the current ten-normal/seven-early asset set. Adopt those exact bytes and its controller identity; do not rebuild or restart qualification merely because this plan changes. The following steps apply to its verification/applicability and any genuinely changed next candidate.
+
 1. Settle source, relevant settings/default data, master projection, controllers and target records before a heavy candidate run. Run repository/diff/package controls and required CI on committed inputs; independently review ownership/migration/API/engine changes.
 2. Freeze one full commit into a new outside output directory using the existing adapter and early selector. Include ten normal editions plus labelled F006–F012. F001–F005 lack exact loader/schema inputs; no empty/false placeholders.
 3. Aero independently verifies inventory, member paths/bytes, root/info/version/changelog, migration membership, licenses, closure and excluded private/developer files. Retain source/controller/runtime/compression identity and ZIP hashes; accepted package custody must reach primary checkout.
 4. For old evidence compare consumed source/package members, engine/official mods, upstream bytes, settings, save, fixture/controller, scenario and endpoint. Reuse only demonstrably unchanged trusted inputs under their original execution. Shared/uncertain effects widen checks. Changelog-only changes need parser/package/identity review and final smoke, ordinarily not every physical test.
+
+The [later historical all-science pass](../spec/evidence/historical-all-science-current-native-chain.json) supersedes the earlier F017 consumption failures only for its exact0.17.79/1.0.0/1.1.110 candidate-only cases. Preserve both observations, review their applicability to current bytes, and keep predecessor transitions distinct. Do not rerun an entire old campaign merely to clear an adverse already resolved under those scoped inputs.
 5. A freeze is not acceptance. Keep failed artifacts/observations. Corrections create new exact inputs with affected checks; never overwrite assets, pool samples, rename results or silently rebuild during publication.
 
 ### E — Qualify current catalogues and profiles
