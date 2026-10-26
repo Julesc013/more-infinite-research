@@ -11,7 +11,7 @@
   "mods": [
     {
       "name": "FluidMustFlow",
-      "version": "1.5.0",
+      "version": "1.5.1",
       "enabled": true
     },
     {
@@ -46,8 +46,8 @@
     }
   ],
   "archive_sha256": {
-    "FluidMustFlow_1.5.0.zip": "B6B5C37F6AA38E49265A464F122FD1D8E1C88D27D50645339F894BFCBC0249EC",
+    "FluidMustFlow_1.5.1.zip": "81FA3FF0A9502EDD105FBB9DD57F4BF05242E5A19F1B3539E99EA109958510C2",
     "mir-fixture-mir5-active-mods-observer_0.1.0.zip": "2E1BE5952D2A4CC5C74A0D149E075D247BA110A3FAE5B6768D3EAEBABCEF989C"
   },
-  "scope": "Exact FluidMustFlow ranked-root space-age input. Mandatory archived dependencies only; recommended providers are not automatically selected. Input metadata is not native engine admission, gameplay, save, client or support acceptance."
+  "scope": "Exact FluidMustFlow ranked-root space-age input. Mandatory archived dependencies only; recommended providers are not automatically selected. Input metadata is not native engine admission, gameplay, save, client or support acceptance. Refreshed with the 2026-10-26 officially downloaded F210 archives; prior cohort remains bound to its original Git source and hashes."
 }

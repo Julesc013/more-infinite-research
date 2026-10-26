@@ -21,7 +21,7 @@
     },
     {
       "name": "bobpower",
-      "version": "3.0.0",
+      "version": "3.0.1",
       "enabled": true
     },
     {
@@ -31,9 +31,9 @@
     }
   ],
   "archive_sha256": {
-    "bobpower_3.0.0.zip": "C33C7B521BEC061ADF695A14BF3A218259FC0548B5F5AB512E74ECEAEDA39831",
     "boblibrary_3.0.1.zip": "3DD83A195E120BAECC51A43B0B3EB965C0D419A09883F9DAA018B3921C12D51B",
+    "bobpower_3.0.1.zip": "09F8AFA883C614DB2CA8F8CC5CAC803DEE384D009F79A26A25F9B9968A60C02A",
     "mir-fixture-mir5-active-mods-observer_0.1.0.zip": "2E1BE5952D2A4CC5C74A0D149E075D247BA110A3FAE5B6768D3EAEBABCEF989C"
   },
-  "scope": "Exact bobpower ranked-root base input. Mandatory archived dependencies only; recommended providers are not automatically selected. Input metadata is not native engine admission, gameplay, save, client or support acceptance."
+  "scope": "Exact bobpower ranked-root base input. Mandatory archived dependencies only; recommended providers are not automatically selected. Input metadata is not native engine admission, gameplay, save, client or support acceptance. Refreshed with the 2026-10-26 officially downloaded F210 archives; prior cohort remains bound to its original Git source and hashes."
 }

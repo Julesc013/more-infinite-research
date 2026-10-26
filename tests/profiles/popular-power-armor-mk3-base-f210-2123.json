@@ -11,7 +11,7 @@
   "mods": [
     {
       "name": "Power Armor MK3",
-      "version": "2.1.08",
+      "version": "2.1.09",
       "enabled": true
     },
     {
@@ -26,8 +26,8 @@
     }
   ],
   "archive_sha256": {
-    "Power Armor MK3_2.1.08.zip": "66E6D14A4D9DDC86DA3B4EA3A72FC8517E8DFBFCAAE4F0E2029970775759A039",
+    "Power Armor MK3_2.1.09.zip": "4A7E0837AFD18A0A20B9382989537E1352514218518CA24D5E87520E4DE95851",
     "mir-fixture-mir5-active-mods-observer_0.1.0.zip": "2E1BE5952D2A4CC5C74A0D149E075D247BA110A3FAE5B6768D3EAEBABCEF989C"
   },
-  "scope": "Exact Power Armor MK3 ranked-root base input. Mandatory archived dependencies only; recommended providers are not automatically selected. Input metadata is not native engine admission, gameplay, save, client or support acceptance."
+  "scope": "Exact Power Armor MK3 ranked-root base input. Mandatory archived dependencies only; recommended providers are not automatically selected. Input metadata is not native engine admission, gameplay, save, client or support acceptance. Refreshed with the 2026-10-26 officially downloaded F210 archives; prior cohort remains bound to its original Git source and hashes."
 }

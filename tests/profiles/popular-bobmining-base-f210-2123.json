@@ -21,7 +21,7 @@
     },
     {
       "name": "bobmining",
-      "version": "3.0.1",
+      "version": "3.0.2",
       "enabled": true
     },
     {
@@ -31,9 +31,9 @@
     }
   ],
   "archive_sha256": {
-    "bobmining_3.0.1.zip": "72A35D11999701998109BD54BD2D454733E9BDFA426319EA866CCF4AD4297A15",
     "boblibrary_3.0.1.zip": "3DD83A195E120BAECC51A43B0B3EB965C0D419A09883F9DAA018B3921C12D51B",
+    "bobmining_3.0.2.zip": "7F1B8BB34264E12EF9F0BE9427B672D37556A425D93D618B5341C90543C5822E",
     "mir-fixture-mir5-active-mods-observer_0.1.0.zip": "2E1BE5952D2A4CC5C74A0D149E075D247BA110A3FAE5B6768D3EAEBABCEF989C"
   },
-  "scope": "Exact bobmining ranked-root base input. Mandatory archived dependencies only; recommended providers are not automatically selected. Input metadata is not native engine admission, gameplay, save, client or support acceptance."
+  "scope": "Exact bobmining ranked-root base input. Mandatory archived dependencies only; recommended providers are not automatically selected. Input metadata is not native engine admission, gameplay, save, client or support acceptance. Refreshed with the 2026-10-26 officially downloaded F210 archives; prior cohort remains bound to its original Git source and hashes."
 }

@@ -21,13 +21,13 @@
     },
     {
       "name": "squeak-through-2",
-      "version": "0.2.0",
+      "version": "0.2.1",
       "enabled": true
     }
   ],
   "archive_sha256": {
-    "squeak-through-2_0.2.0.zip": "7EF00210057732E592495C0F2E09FE0397B7EFF121EB60969A1FDD9DCD9C68E0",
-    "mir-fixture-mir5-active-mods-observer_0.1.0.zip": "2E1BE5952D2A4CC5C74A0D149E075D247BA110A3FAE5B6768D3EAEBABCEF989C"
+    "mir-fixture-mir5-active-mods-observer_0.1.0.zip": "2E1BE5952D2A4CC5C74A0D149E075D247BA110A3FAE5B6768D3EAEBABCEF989C",
+    "squeak-through-2_0.2.1.zip": "25E76ABDD3B948321502B79C19F6A167F64AE07068DF121F57B6875EEE162A5F"
   },
-  "scope": "Exact squeak-through-2 ranked-root base input. Mandatory archived dependencies only; recommended providers are not automatically selected. Input metadata is not native engine admission, gameplay, save, client or support acceptance."
+  "scope": "Exact squeak-through-2 ranked-root base input. Mandatory archived dependencies only; recommended providers are not automatically selected. Input metadata is not native engine admission, gameplay, save, client or support acceptance. Refreshed with the 2026-10-26 officially downloaded F210 archives; prior cohort remains bound to its original Git source and hashes."
 }

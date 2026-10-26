@@ -21,7 +21,7 @@
     },
     {
       "name": "helmod",
-      "version": "2.3.3",
+      "version": "2.3.6",
       "enabled": true
     },
     {
@@ -46,8 +46,8 @@
     }
   ],
   "archive_sha256": {
-    "helmod_2.3.3.zip": "A7AE44BCB8A741FEEFCD11891BF83E0D85697C1A163C232C556804E55D141E3D",
+    "helmod_2.3.6.zip": "351868C1F37D53C1AF758DD753A6348FE55A839E23AA355E8A4B261EEFB840CD",
     "mir-fixture-mir5-active-mods-observer_0.1.0.zip": "2E1BE5952D2A4CC5C74A0D149E075D247BA110A3FAE5B6768D3EAEBABCEF989C"
   },
-  "scope": "Exact helmod ranked-root space-age input. Mandatory archived dependencies only; recommended providers are not automatically selected. Input metadata is not native engine admission, gameplay, save, client or support acceptance."
+  "scope": "Exact helmod ranked-root space-age input. Mandatory archived dependencies only; recommended providers are not automatically selected. Input metadata is not native engine admission, gameplay, save, client or support acceptance. Refreshed with the 2026-10-26 officially downloaded F210 archives; prior cohort remains bound to its original Git source and hashes."
 }
