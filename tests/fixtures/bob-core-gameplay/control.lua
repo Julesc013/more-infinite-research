@@ -265,14 +265,33 @@ local function alloy_inventories(machine, route, label)
   return input, output
 end
 
-local function assert_route_fluid_machine(machine, route, label)
+local function fluid_storage_observation(machine)
+  local selected = machine.get_recipe()
+  local recipe = selected and selected.name or "<none>"
+  local count = machine.fluids_count
+  local capacities = {}
+  if type(count) == "number" and count >= 0 and count == math.floor(count)
+      and count <= 16 and type(machine.get_fluid_capacity) == "function" then
+    for index = 1, count do
+      capacities[#capacities + 1] = tostring(machine.get_fluid_capacity(index))
+    end
+  else
+    capacities[1] = "<not-queried>"
+  end
+  return "recipe=" .. tostring(recipe) .. ",fluids_count=" .. tostring(count)
+    .. ",capacities=[" .. table.concat(capacities, ",") .. "]"
+end
+
+local function assert_route_fluid_machine(machine, route, label, before)
   if not route_has_fluid(route) then return end
   if type(machine.fluids_count) ~= "number" or machine.fluids_count ~= 4
       or type(machine.get_fluid_capacity) ~= "function"
       or machine.get_fluid_capacity(1) ~= 1000 or machine.get_fluid_capacity(2) ~= 1000
       or machine.get_fluid_capacity(3) ~= 100 or machine.get_fluid_capacity(4) ~= 100
       or type(machine.get_fluid_count) ~= "function" or type(machine.insert_fluid) ~= "function" then
-    fail(label .. " native metallurgy fluid machine differs")
+    local observed_before = type(before) == "string" and before or "<not-observed>"
+    fail(label .. " native metallurgy fluid machine differs; before={" .. observed_before
+      .. "}; after={" .. fluid_storage_observation(machine) .. "}")
   end
 end
 
@@ -323,7 +342,7 @@ local function begin_alloy(state, phase)
   assert_alloy_route(game.forces.player, route, expected_bonus, phase .. " " .. route.recipe)
   local machine = state.alloy_machines[route.recipe]
   local input, output = alloy_inventories(machine, route, phase .. " " .. route.recipe)
-  assert_route_fluid_machine(machine, route, phase .. " " .. route.recipe)
+  local fluid_before = route_has_fluid(route) and fluid_storage_observation(machine) or "<not-applicable>"
   if not input.is_empty() or not output.is_empty() or machine.crafting_progress ~= 0
       or not near(machine.bonus_progress, 0) then
     fail(phase .. " " .. route.recipe .. " native alloy machine was not clean")
@@ -334,6 +353,7 @@ local function begin_alloy(state, phase)
   if not selected or selected.name ~= route.recipe then
     fail(phase .. " " .. route.recipe .. " could not select native alloy recipe")
   end
+  assert_route_fluid_machine(machine, route, phase .. " " .. route.recipe, fluid_before)
   local baseline_crafts = ALLOY_CRAFTS * route.inherent_productivity
   local minimum_bonus = phase == "physical-before" and baseline_crafts
     or baseline_crafts + ALLOY_MIN_BONUS_CRAFTS
