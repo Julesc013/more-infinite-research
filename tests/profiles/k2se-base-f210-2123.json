@@ -146,8 +146,8 @@
     "Krastorio2_2.1.4.zip": "9E5A56AC52BA0DD96A2D9FFBEFB8B242270EC946159D3DBED77B24B3C1C7147E",
     "Krastorio2Assets_2.1.0.zip": "39EF950EC8B21A40357DD0240EF8389501EE75CCA82717F2773B98554DA46E29",
     "Krastorio2MenuSimulations_2.1.0.zip": "3A485B449B356DC4B3EB4233DE4E803B3A001259FBC251BDC9F9D9120B3C53A7",
-    "mir-fixture-mir5-active-mods-observer_0.1.0.zip": "2E1BE5952D2A4CC5C74A0D149E075D247BA110A3FAE5B6768D3EAEBABCEF989C",
+    "mir-fixture-mir5-active-mods-observer_0.1.0.zip": "A15A7D628D66953D2E0C4D4FA288F47CBF9C5678327C7EB3D23ADB5DC78331C0",
     "space-exploration-postprocess_0.7.7.zip": "E23462598A34CAC81DB6420C443AC92EB7F5C295616A1192C90F2DE19D54312D"
   },
-  "scope": "Exact k2se base input for separate upstream/published4.7.3/current data/settings captures. Available-six BZ is not a full BZ suite. SE explicitly excludes Space Age; its recommended menu-simulations provider is omitted and no menu claim follows. These inputs establish no native, gameplay, physical, migration, client or support verdict."
+  "scope": "Exact k2se base input for separate upstream/published4.7.3/current data/settings captures. Available-six BZ is not a full BZ suite. SE explicitly excludes Space Age; its recommended menu-simulations provider is omitted and no menu claim follows. These inputs establish no native, gameplay, physical, migration, client or support verdict. The current observer binding names the exact A15 runtime container used in the completed EA41 sweep; prior canonical 2E1 container and identical member hashes remain in its r03 amendment."
 }
