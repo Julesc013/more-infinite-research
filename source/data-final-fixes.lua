@@ -40,7 +40,7 @@ local modern_catalogue = require("compatibility.modern_catalogue")
 local modern, modern_selection, native_owner_patches
 if ordinary_profile or modern_catalogue.is_k2_base(mods) or modern_catalogue.is_k2so(mods) then
   modern = require("research.modern")
-  modern_selection = modern_catalogue.select(mods)
+  modern_selection = modern_catalogue.select(mods, data.raw)
   if modern_selection.bob_native_continuations then
     require("compatibility.bob_native_continuations").preflight(data.raw)
   end

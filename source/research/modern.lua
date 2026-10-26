@@ -415,10 +415,14 @@ function M.preflight_recipe_patches(selection, raw)
   -- The exact Bob Core progression adds one named science route.  Keep its
   -- raw item/recipe/owner checks in this existing all-before-write preflight
   -- rather than exposing a general adapter callback mechanism.
-  if selection.bob_core_progression == true then
-    require("compatibility.modern_catalogue.bob_core").preflight(raw)
-  elseif selection.bob_core_progression ~= false and selection.bob_core_progression ~= nil then
+  if selection.bob_core_progression ~= true and selection.bob_core_progression ~= false
+      and selection.bob_core_progression ~= nil then
     error("MIR modern catalogue has invalid Bob Core progression selection", 2)
+  end
+  if selection.bob_tech_progression ~= nil then
+    require("compatibility.modern_catalogue.bob_tech_progression").preflight(raw, selection.bob_tech_progression)
+  elseif selection.bob_core_progression == true then
+    require("compatibility.modern_catalogue.bob_core").preflight(raw)
   end
   for index = 1, #selection.recipe_patches do
     local name = selection.recipe_patches[index]

@@ -98,7 +98,7 @@ class F110F200TransitionFixtureTests(unittest.TestCase):
         raw = {"technology": {DIRECT: {
             "name": DIRECT, "level": 1, "upgrade": True, "max_level": "infinite", "enabled": True,
             "unit": {"count_formula": "8000*2^(L-1)", "time": 60,
-                     "ingredients": [["military-science-pack", 1], ["utility-science-pack", 1]]},
+                     "ingredients": [["utility-science-pack", 1], ["military-science-pack", 1]]},
             "effects": [{"type": "character-mining-speed", "modifier": .05}],
         }}, "sentinel": {"value": 17}}
         mods = {"base": "1.1.110", "more-infinite-research": "4.7.11003",
@@ -113,7 +113,7 @@ class F110F200TransitionFixtureTests(unittest.TestCase):
         for label, altered, altered_mods in (
             ("effect", {**raw["technology"][DIRECT], "effects": [{"type": "character-mining-speed", "modifier": .1}]}, mods),
             ("science", {**raw["technology"][DIRECT], "unit": {"count_formula": "8000*2^(L-1)", "time": 60,
-                        "ingredients": [["utility-science-pack", 1], ["military-science-pack", 1]]}}, mods),
+                        "ingredients": [["military-science-pack", 1], ["utility-science-pack", 1]]}}, mods),
             ("closure", raw["technology"][DIRECT], {**mods, "more-infinite-research": "4.7.11002"}),
         ):
             candidate = copy.deepcopy(raw)
@@ -253,13 +253,13 @@ class F110F200TransitionFixtureTests(unittest.TestCase):
               get_item_count=function(name)return contents[name] or 0 end,
             }
             local function lab()
-              local entity={valid=true,energy=0}
+              local entity={valid=true,active=true,energy=0}
               entity.get_inventory=function(slot) assert(slot == 1);return inventory end
               return entity
             end
             local player=force(1,"f110")
             if omit_row then player.technologies[source_plan.continuation]=nil end
-            local game={tick=0,forces={player=player},surfaces={[1]={create_entity=function()return lab()end}}}
+            local game={tick=0,tick_paused=false,speed=1,forces={player=player},surfaces={[1]={create_entity=function()return lab()end}}}
             function game.create_force()
               next_force_index=next_force_index+1
               local item=force(next_force_index,"f110");game.forces[next_force_index]=item;return item
@@ -287,6 +287,9 @@ class F110F200TransitionFixtureTests(unittest.TestCase):
               {base="1.1.110",["more-infinite-research"]="4.7.11003",["mir-fixture-mir5-f110-f200-transition"]="0.1.0"},false)
             local ok,message=pcall(function()
               source.init()
+              local source_state=legacy.mir5_f110_f200_transition
+              source_state.lab.energy=0;source.events[2]()
+              source_state.source_energized=source_state.lab.energy
               local direct=player.technologies[source_plan.direct]
               direct.level=2;player.manual_mining_speed_modifier=.05
               source.events[1]{research=direct};source.events[2]()
@@ -303,6 +306,7 @@ class F110F200TransitionFixtureTests(unittest.TestCase):
               {base="2.0.77",["more-infinite-research"]="5.0.20000",["mir-fixture-mir5-f110-f200-transition"]="0.2.0"},true)
             ok,message=pcall(successor.configuration)
             if not ok then return {ok=false,message=tostring(message),logs=logs,state=state} end
+            state.lab.energy=0;successor.events[2]();state.successor_energized=state.lab.energy
             direct.level=3;direct.saved_progress=0;player.manual_mining_speed_modifier=.1
             player.research_queue={player.technologies[source_plan.probe]};player.research_progress=0
             successor.events[1]{research=direct};successor.events[2]()
@@ -313,7 +317,8 @@ class F110F200TransitionFixtureTests(unittest.TestCase):
               rows=state.seeded_catalogue_rows,save=game.saved,logs=logs,before=before,
               stack=player.inserter_stack_size_bonus,bulk=player.bulk_inserter_capacity_bonus,
               current=player.current_research and player.current_research.name,foreign=game.forces[state.foreign_index].technologies[source_plan.direct].enabled,
-              paused=game.forces[state.suspended_index].technologies[source_plan.direct].saved_progress}
+              paused=game.forces[state.suspended_index].technologies[source_plan.direct].saved_progress,
+              source_energy=state.source_energized,successor_energy=state.successor_energized}
           end
         ''')
         result = py(self.lua.eval("f110_f200_callbacks")(False, False))
@@ -322,9 +327,33 @@ class F110F200TransitionFixtureTests(unittest.TestCase):
                          (result["phase"], result["source"], result["successor"], result["rows"], result["save"]))
         self.assertEqual((2, 4, "braking-force-1", False, .27),
                          (result["stack"], result["bulk"], result["current"], result["foreign"], result["paused"]))
-        self.assertEqual(4, len(result["logs"]))
-        self.assertTrue(all('"case":"f110-f200-transition"' in row for row in result["logs"]))
-        self.assertTrue(any('"stage":"reload"' in row and '"on_load_read_only":true' in row for row in result["logs"]))
+        self.assertEqual((100000000, 100000000), (result["source_energy"], result["successor_energy"]))
+        fixture_results = [row for row in result["logs"] if row.startswith("[MIR5_NATIVE_FIXTURE] RESULT ")]
+        diagnostics = [row for row in result["logs"] if row.startswith("[MIR5_F110_SOURCE_DIAGNOSTIC] ")]
+        self.assertEqual(4, len(fixture_results))
+        self.assertTrue(all('"case":"f110-f200-transition"' in row for row in fixture_results))
+        self.assertTrue(any('"stage":"reload"' in row and '"on_load_read_only":true' in row for row in fixture_results))
+        self.assertEqual(2, len(diagnostics))
+        self.assertIn('"checkpoint":"init"', diagnostics[0])
+        self.assertIn('"checkpoint":"first-tick"', diagnostics[1])
+        for row in diagnostics:
+            self.assertIn('"tick_paused":false', row)
+            self.assertIn('"game_speed":1', row)
+            self.assertIn('"phase":"await-source-lab"', row)
+            self.assertIn('"queue_enabled":true', row)
+            self.assertIn('"queue_length":1', row)
+            self.assertIn(f'"current_research":"{DIRECT}"', row)
+            self.assertIn('"research_progress":0', row)
+            self.assertIn('"direct_enabled":true', row)
+            self.assertIn('"direct_researched":false', row)
+            self.assertIn('"lab_valid":true', row)
+            self.assertIn('"lab_active":true', row)
+        self.assertIn('"lab_energy":100000000', diagnostics[0])
+        self.assertIn('"lab_energy":0', diagnostics[1])
+        self.assertIn('"direct_level":1', diagnostics[0])
+        self.assertIn('"source_direct_labs":0', diagnostics[0])
+        self.assertIn('"direct_level":1', diagnostics[1])
+        self.assertIn('"source_direct_labs":0', diagnostics[1])
         wrong_capacity = py(self.lua.eval("f110_f200_callbacks")(True, False))
         self.assertFalse(wrong_capacity["ok"])
         self.assertIn("F200 bulk inserter effects differ", wrong_capacity["message"])
