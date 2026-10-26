@@ -343,6 +343,34 @@
       ]
     }
   },
+  "independent_aero_rebuild": {
+    "original_readback_sha256": "0DA0D7E485E4B9E1F87AB78210CBC73A1BD0C77134F3AF88FCF37F36B5521620",
+    "source": {
+      "commit": "a1fd431bd25e646f801e68a8ad00a8abb49ee094",
+      "source_tree": "d4051e5396d9b6389bdd2c680093cffd5752d09a"
+    },
+    "controller_and_runtime_match_original_record": true,
+    "release_verify": "passed",
+    "output": {
+      "normal_archives": 10,
+      "best_effort_early_archives": 7,
+      "checksum_files": 2,
+      "total_files": 20,
+      "inventory_sha256": "13BC272F0043CEAD86A19676286FA471A5239E75DAD6726E7A1807BB7C5795D9",
+      "primary_custody": "build/mir5/assets/a1fd431b-r01",
+      "all_recorded_bytes_and_hashes_match": true
+    },
+    "claims": {
+      "independent_rebuild": true,
+      "primary_copy_hash_readback": true,
+      "native_qualification": false,
+      "gameplay_qualification": false,
+      "migration_qualification": false,
+      "client_qualification": false,
+      "performance_qualification": false,
+      "release_qualification": false
+    }
+  },
   "limits": [
     "Offline composition and byte verification only; no native, gameplay, migration, client, timing, memory or release acceptance follows.",
     "F018 is a newly selected normal edition. Its engine, predecessor and forward-save qualification remain open.",
