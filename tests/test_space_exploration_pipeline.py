@@ -159,11 +159,22 @@ class SpaceExplorationPipelineTests(unittest.TestCase):
                 for nested in value:
                     visit(nested)
 
-        for case in self.context["cases"].values():
-            visit(case["raw"])
-            self.assertTrue(case["raw"]["recipe"])
-            self.assertTrue(case["raw"]["lab"])
-            self.assertTrue(case["raw"]["technology"])
+        for name, case in self.context["cases"].items():
+            with self.subTest(case=name):
+                raw = case["raw"]
+                visit(raw)
+                self.assertEqual(case["projection_counts"], {kind: len(rows) for kind, rows in raw.items()})
+                self.assertTrue(raw["recipe"])
+                self.assertTrue(raw["lab"])
+                self.assertTrue(raw["technology"])
+                # Science/technology requests also name intentionally absent
+                # Space Age subjects in these Base-only upstream captures.
+                for field in ("required_product_recipe_names", "required_science_item_names", "required_technology_names"):
+                    requested = case[field]
+                    self.assertEqual(len(requested), len(set(requested)), field)
+                    self.assertTrue(all(isinstance(value, str) and value for value in requested), field)
+                self.assertFalse(set(case["required_product_recipe_names"]) - raw["recipe"].keys(),
+                                 "projected context lost a required product recipe")
 
     def test_se_full_data_final_publication_matches_all_55_independent_rows(self):
         self.assert_pipeline_rows("se")
@@ -177,6 +188,14 @@ class SpaceExplorationPipelineTests(unittest.TestCase):
         frozen = boundary["frozen_b2_c01_pre_engine"]
         k2se = boundary["k2se_pre_engine_equality_check"]
         native = boundary["native_write_data_readbacks"]
+
+        for case in ("se", "k2se"):
+            self.assertEqual(self.facts["captures"][case]["source_data_raw_dump_sha256"],
+                             native[case]["published_data_raw_dump_sha256"], case)
+        self.assertNotEqual(native["se"]["published_data_raw_dump_sha256"],
+                            native["se"]["candidate_data_raw_dump_sha256"])
+        self.assertEqual(self.context["cases"]["se"]["source_data_raw_dump_sha256"],
+                         frozen["upstream_data_raw_dump_sha256"])
 
         self.assertEqual("MIR5SpaceExplorationF210PrerequisiteBoundaryV1", boundary["schema"])
         self.assertEqual("required", boundary["new_package_native_prerequisite_check"])
