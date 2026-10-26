@@ -40,8 +40,7 @@ function M.applies(active)
   if target.minimum_base ~= "2.1.23" then
     fail_transition("target minimum base is " .. tostring(target.minimum_base) .. ", expected 2.1.23")
   end
-  if active.Krastorio2 ~= nil or active.Krastorio2Assets ~= nil
-      or active["Krastorio2-spaced-out"] ~= nil or active["k2so-assets"] ~= nil then
+  if active.Krastorio2 ~= nil or active["Krastorio2-spaced-out"] ~= nil then
     fail_transition("captured BobTech closure has an unsupported Krastorio selection")
   end
   return true

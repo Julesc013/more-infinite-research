@@ -291,6 +291,9 @@ class BobCoreMaterialTests(unittest.TestCase):
         changed = dict(self.facts["required_mods"])
         changed["bobtech"] = "newer"
         self.assertEqual(baseline, _plain(self.rows(active_mods=_lua_value(self.lua, changed))))
+        assets_only = dict(self.facts["required_mods"])
+        assets_only.update({"Krastorio2Assets": "2.1.0", "k2so-assets": "1.0.7"})
+        self.assertEqual(baseline, _plain(self.rows(active_mods=_lua_value(self.lua, assets_only))))
         partial = dict(self.facts["required_mods"])
         del partial["bobtech"]
         self.assertEqual(0, len(self.rows(active_mods=_lua_value(self.lua, partial))))
@@ -367,6 +370,11 @@ class BobCoreMaterialTests(unittest.TestCase):
         omitted = _plain(availability["rows"](self.lua.globals().core_mods, target, empty_force, "material", effective))
         self.assertEqual(self.facts["withheld_families"], [row["family"] for row in omitted])
         self.assertTrue(all(row["reason"] == "not-available-in-bob-core-profile" for row in omitted))
+        asset_mods = dict(self.facts["required_mods"])
+        asset_mods.update({"Krastorio2Assets": "2.1.0", "k2so-assets": "1.0.7"})
+        self.assertEqual(omitted, _plain(availability["rows"](
+            _lua_value(self.lua, asset_mods), target, empty_force, "material", effective
+        )))
         angel_mods = dict(self.facts["required_mods"])
         angel_mods["angelssmelting"] = "present"
         self.assertEqual(0, len(availability["rows"](

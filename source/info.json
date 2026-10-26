@@ -7,6 +7,7 @@
   "factorio_version": "2.1",
   "dependencies": [
     "base >= 2.1.23",
+    "(?) aai-vehicles-ironclad",
     "(?) bobelectronics",
     "(?) bobtech",
     "(?) elevated-rails",

@@ -600,7 +600,7 @@ class K2BaseCatalogueTests(unittest.TestCase):
 
           local partials = {
             {Krastorio2="2.0.19", Krastorio2Assets="2.0.5", ["Krastorio2-spaced-out"]="2.0.19"},
-            {Krastorio2="2.0.19", Krastorio2Assets="2.0.5", ["k2so-assets"]="1.0.0"},
+            {Krastorio2="2.0.19", ["Krastorio2-spaced-out"]="2.0.19", ["k2so-assets"]="1.0.0"},
           }
           for _, partial in ipairs(partials) do
             assert(not catalogue.is_k2_base(partial) and not catalogue.is_k2so(partial))
@@ -613,6 +613,13 @@ class K2BaseCatalogueTests(unittest.TestCase):
           end
           local missing_assets = {Krastorio2="2.0.19"}
           assert(not catalogue.is_k2_base(missing_assets))
+
+          -- Asset archives have no data-stage providers on their own.  They
+          -- must not activate K2SO or turn an ordinary selection into a
+          -- partial-core refusal.
+          local assets_only = {Krastorio2Assets="2.0.5", ["k2so-assets"]="1.0.0"}
+          assert(not catalogue.is_k2_base(assets_only) and not catalogue.is_k2so(assets_only))
+          assert(gears.select(assets_only, raw).profile == "vanilla-f210")
 
           f200()
           local standalone = {["Krastorio2-spaced-out"]="2.0.19", Krastorio2Assets="2.0.5", ["k2so-assets"]="1.0.0"}

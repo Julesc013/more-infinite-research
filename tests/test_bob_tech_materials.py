@@ -295,8 +295,16 @@ class BobTechMaterialTests(unittest.TestCase):
         for marker in self.facts["forbidden_markers"]:
             mods = dict(self.facts["required_mods"])
             mods[marker] = "present"
-            with self.assertRaisesRegex(Exception, "unsupported F210 BobTech saved-profile transition"):
-                self.rows(active_mods=_lua_value(self.lua, mods))
+            if marker in ("Krastorio2Assets", "k2so-assets"):
+                # Keep the captured historical marker list unchanged. The
+                # actual asset archives contain no overhaul entrypoints and
+                # do not change this named recipe/owner contract.
+                self.assertEqual(baseline, _plain(self.rows(active_mods=_lua_value(self.lua, mods))))
+                with self.assertRaisesRegex(Exception, "angels-plate-invar changed"):
+                    self.rows(raw=wrong_io, active_mods=_lua_value(self.lua, mods))
+            else:
+                with self.assertRaisesRegex(Exception, "unsupported F210 BobTech saved-profile transition"):
+                    self.rows(active_mods=_lua_value(self.lua, mods))
 
         partial = dict(self.facts["required_mods"])
         del partial["angelssmelting"]
@@ -447,7 +455,7 @@ class BobTechMaterialTests(unittest.TestCase):
           package.preload["compatibility.modern_catalogue"] = function()
             return {is_k2_base=function() return false end, is_k2so=function() return false end,
               retains_bob_native_continuations=function() return false end,
-              select=function() return {bob_angel=false, definitions={}, continuations={}} end}
+              select=function() return {bob_angel=false, bob_tech_materials=true, definitions={}, continuations={}} end}
           end
           package.preload["research.modern"] = function()
             return {preflight_recipe_patches=function() end, preflight_native_owner_patches=function() return {} end,

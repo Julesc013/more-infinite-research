@@ -73,12 +73,12 @@ class SpaceExplorationPipelineTests(unittest.TestCase):
             if cls.context["cases"][case].get("source_data_raw_dump_sha256") != expected_hash:
                 raise AssertionError(f"{case} upstream raw provenance changed")
 
-    def stage(self, case, startup=None):
+    def stage(self, case, startup=None, mods=None):
         context = self.context["cases"][case]
         lua = LuaRuntime(unpack_returned_tuples=True)
         lua.globals().player_root = SOURCE_ROOT.as_posix()
         lua.globals().captured_raw = _lua_value(lua, deepcopy(context["raw"]))
-        lua.globals().active_mods = _lua_value(lua, context["selection"])
+        lua.globals().active_mods = _lua_value(lua, deepcopy(context["selection"] if mods is None else mods))
         lua.globals().startup_values = _lua_value(lua, startup or {})
         lua.execute(r'''
           package.path = player_root .. "/?.lua;" .. player_root .. "/?/init.lua"
@@ -108,6 +108,12 @@ class SpaceExplorationPipelineTests(unittest.TestCase):
           assert(loadfile(player_root .. "/data-final-fixes.lua"))()
         ''')
         return lua
+
+    def test_asset_only_k2_archives_do_not_deactivate_space_exploration(self):
+        baseline = _plain(self.stage("se").globals().emitted)
+        active = deepcopy(self.context["cases"]["se"]["selection"])
+        active.update({"Krastorio2Assets": "2.1.0", "k2so-assets": "1.0.7"})
+        self.assertEqual(baseline, _plain(self.stage("se", mods=active).globals().emitted))
 
     def assert_pipeline_rows(self, case):
         lua = self.stage(case)

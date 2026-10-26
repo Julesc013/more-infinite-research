@@ -2,7 +2,8 @@
 -- An inactive profile never constructs its mapping table or preflights recipes.
 local M = {}
 
-local K2SO_MODS = {"Krastorio2", "Krastorio2-spaced-out", "Krastorio2Assets", "k2so-assets"}
+local K2SO_CORE_MODS = {"Krastorio2", "Krastorio2-spaced-out"}
+local K2SO_ASSET_MODS = {"Krastorio2Assets", "k2so-assets"}
 local modern_catalogue = require("compatibility.modern_catalogue")
 
 local function has_mod(mods, name)
@@ -46,8 +47,8 @@ function M.select(mods, raw)
     return checked_copy(require("compatibility.gear_bindings.k2_base"), raw)
   end
   local k2so = false
-  for index = 1, #K2SO_MODS do
-    local present = has_mod(mods, K2SO_MODS[index])
+  for index = 1, #K2SO_CORE_MODS do
+    local present = has_mod(mods, K2SO_CORE_MODS[index])
     if index == 1 then k2so = present elseif present ~= k2so then
       error("MIR gear binding has an unsupported partial K2SO selection", 2)
     end
@@ -55,6 +56,11 @@ function M.select(mods, raw)
   if k2so then
     if not space_age then
       error("MIR gear binding has an unsupported partial K2SO selection", 2)
+    end
+    for index = 1, #K2SO_ASSET_MODS do
+      if not has_mod(mods, K2SO_ASSET_MODS[index]) then
+        error("MIR gear binding has an unsupported partial K2SO selection", 2)
+      end
     end
     return checked_copy(require("compatibility.gear_bindings.k2so"), raw)
   end
