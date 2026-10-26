@@ -395,7 +395,7 @@ local function assert_availability(player)
 end
 
 local function measure(state, label, callback)
-  local profiler = game.create_profiler(true)
+  local profiler = helpers.create_profiler(true)
   profiler.restart()
   callback()
   profiler.stop()

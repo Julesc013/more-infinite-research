@@ -171,7 +171,7 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
               if opponent=="foreign-force-gui" then en.gui.screen[ROOT_NAME]={valid=true,type="frame",visible=true} end
               return foreign
             end
-            game.create_profiler=function(stopped)
+            local function create_profiler(stopped)
               next_profiler=next_profiler+1
               local result={valid=true,stopped=stopped,ordinal=next_profiler}
               result.restart=function() result.running=true end
@@ -190,6 +190,9 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
               assert(last_screenshot_tick~=nil and game.tick-last_screenshot_tick>=60,"save overlapped pending GUI captures")
               saves[#saves+1]=name
             end
+            setmetatable(game,{__index=function(_,name)
+              if name=="create_profiler" then error("removed game.create_profiler API was accessed") end
+            end})
             local function native_style()
               local values={}
               return setmetatable({}, {
@@ -353,7 +356,7 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
                 if value.science_counts then lab_diagnostics[#lab_diagnostics+1]=value
                 else markers[#markers+1]=value end
                 return "{}"
-              end},
+              end,create_profiler=create_profiler},
               log=function(value)
                 if type(value)=="table" then
                   assert(value[1]=="" and value[2]=="[MIR5_LIBRARY_PROFILE] " and value[4]==" ")
@@ -1632,7 +1635,8 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
         self.assertIn("event.by_script ~= false", source)
         self.assertIn("state.native_initial_guard", source)
         self.assertIn("state.native_after_lab", source)
-        self.assertIn("game.create_profiler(true)", source)
+        self.assertIn("helpers.create_profiler(true)", source)
+        self.assertNotIn("game.create_profiler", source)
         self.assertIn("rendering_pending_external_png_readback=true", source)
         self.assertNotIn("game.create_player", source)
         self.assertNotIn("require(", source)
