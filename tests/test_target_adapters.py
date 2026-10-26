@@ -200,6 +200,24 @@ class TargetAdapterTests(unittest.TestCase):
           assert(continuations == 6)
         ''')
 
+    def test_reduced_final_fixes_retains_f018_laser_identity_through_f100(self):
+        self.lua.execute(r'''
+          data, settings = historical_stage("f100"), {startup={}}
+          local adapter = load_adapter("data-final-fixes", target("f100", true, false))
+          adapter.apply()
+          local laser = data.raw.technology["laser-turret-speed-8"]
+          assert(data.writes == 1 and laser and laser.level == 8 and laser.max_level == "infinite")
+          assert(laser.effects[1].ammo_category == "laser-turret")
+          assert(laser.unit.count_formula == "1*(1025.15625*1.5^(L-8))")
+          assert(data.raw.technology["laser-shooting-speed-8"] == nil)
+          local continuations = 0
+          for _, name in ipairs({"braking-force-8", "inserter-capacity-bonus-8", "research-speed-7",
+              "weapon-shooting-speed-7", "worker-robots-storage-4", "laser-turret-speed-8"}) do
+            if data.raw.technology[name] then continuations = continuations + 1 end
+          end
+          assert(continuations == 6)
+        ''')
+
     def test_selected_f018_package_runs_the_actual_reduced_stages(self):
         with tempfile.TemporaryDirectory() as temporary:
             temporary = Path(temporary)

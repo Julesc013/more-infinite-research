@@ -192,7 +192,17 @@ function M.for_target(target)
       previous="laser-turret-speed-6", ammo_category="laser-turret",
     })
   end
-  if target == "f100" then return later_target("f100") end
+  if target == "f100" then
+    -- The portable F100 characterization records only its five captured
+    -- continuations.  Retain this separately named F018-origin identity
+    -- until the F110 rename boundary.  It is deliberately not a claim about
+    -- that old F100 capture's emitted surface; native saved-state
+    -- qualification remains separate.
+    return later_target("f100", {
+      id="laser-turret-speed-8", predecessor="laser-turret-speed-7",
+      previous="laser-turret-speed-6", ammo_category="laser-turret",
+    })
+  end
   if target == "f110" then
     return later_target("f110", {
       id="laser-shooting-speed-8", predecessor="laser-shooting-speed-7",
