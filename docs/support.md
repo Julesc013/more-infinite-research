@@ -26,7 +26,7 @@ An ecosystem name is not a test result. Support records should identify exact Fa
 
 Factorio **2.1 with minimum base 2.1.23 (F210)** is the primary design target. The normal editions retain their actual capability subsets and the existing version encoding, composed from shared source and narrow adapters. Every delivered edition requires final current-package and affected native qualification; records distinguish each edition's observed results and remaining gaps. Primary-target priority does not qualify an earlier edition or remove its release obligations.
 
-The [tracked edition record](../targets/editions.json) selects one self-contained player ZIP for each engine family. The following are selected baseline engine minimums; they do not announce completed final-package acceptance. F018/0.18.47 is newly selected, with source/build integration complete and configured-science, forward-continuity and exact-engine qualification still pending. Select the same engine family when upgrading, rather than install another target's ZIP because its distribution number is larger.
+The [tracked edition record](../targets/editions.json) selects one self-contained player ZIP for each engine family. The following are selected baseline engine minimums; they do not announce completed final-package acceptance. F018/0.18.47 is newly selected, with its source/build port integrated; actual all-science, forward-continuity and exact-engine/save qualification remain pending. Select the same engine family when upgrading, rather than install another target's ZIP because its distribution number is larger.
 
 | Target | Factorio family | Minimum base | MIR5 distribution |
 |---|---|---|---|
@@ -47,7 +47,7 @@ Modern targets expose recipe productivity and the Research Library. Expansion re
 
 The separately selected [early-edition record](../targets/early-editions.json) builds F006/0.6.4, F007/0.7.5, F008/0.8.8, F009/0.9.8, F010/0.10.12, F011/0.11.22 and F012/0.12.35. These are data-only fixed finite research subsets recovered from the museum releases, with14/22/22/22/22/22/26 technologies respectively. They have no startup settings, runtime API, Library or migrations, and have not passed current native or save qualification. They are best-effort GitHub artifacts outside the normal-edition native acceptance claim. F006–F008 transport ZIPs require extraction into the engine mods folder; do not infer direct ZIP loading. Preserve original saves and installation files.
 
-F001/0.1.2 and F002/0.2.10 lack an evidenced standalone-mod format. F003/0.3.2, F004/0.4.1 and F005/0.5.3 lack supplied exact engine/prototype inputs, so no build or native pass is claimed. F018/0.18.47 was excluded from the inherited baseline but is now selected as a normal edition, with configured-science, forward-continuity and native qualification pending. Missing editions are recorded explicitly instead of filled with empty packages. The [target contract](../spec/targets.md#additional-historical-editions) owns these limits and their release disposition.
+F001/0.1.2 and F002/0.2.10 lack an evidenced standalone-mod format. F003/0.3.2, F004/0.4.1 and F005/0.5.3 lack supplied exact engine/prototype inputs, so no build or native pass is claimed. F018/0.18.47 was excluded from the inherited baseline but is now selected as a normal edition, with source/build integration complete and actual native/forward-save qualification pending. Missing editions are recorded explicitly instead of filled with empty packages. The [target contract](../spec/targets.md#additional-historical-editions) owns these limits and their release disposition.
 
 ## First upgrade
 
@@ -58,6 +58,12 @@ The candidate refuses a first published F2004.7 upgrade when earned overlapping 
 A cap below earned research limits future work without erasing earned levels. MIR restores only disablement it owns; another mod's configuration callback can independently reset technology state. Hidden migration carriers preserve named historical investments and must not be removed as cosmetic clutter. The retained [recovery guidance](../README.md#save-compatibility) and original incident records remain relevant to previously resaved factories: restoring a missing definition cannot reconstruct history already erased from a save.
 
 Use the Research Library shortcut on modern targets to inspect research, queues, settings and availability. Its search/filter and language preferences belong to each player. Queue actions use native research behavior; the Library is not a second research planner. Startup settings take effect on the appropriate restart, and exporting a settings profile does not silently change the active game configuration.
+
+## Recovery from the 4.2.1 incident
+
+This procedure retains the historical4.2.2 hotfix scope. It is not a MIR5 upgrade pass and does not change current edition requirements.
+
+> **Upgrade and recovery:** Use the [4.2.2 hotfix](https://github.com/Julesc013/more-infinite-research/releases/tag/v4.2.2) directly from 4.2.0 or 4.2.1; do not install 4.2.1 as an intermediate step. Preserve original saves and pre-update backups. If you already saved after 4.2.1 removed research, restored definitions cannot recreate erased levels or bonuses: load a copy of your pre-update backup directly with 4.2.2 to retain that history. A whole backup returns the factory to its saved point. Do not remove MIR or downgrade an already-resaved factory as an assumed recovery. See [issue #621](https://github.com/Julesc013/more-infinite-research/issues/621) and the [hotfix notes](https://github.com/Julesc013/more-infinite-research/releases/download/v4.2.2/release-notes.md) for the tested scope and remaining limits.
 
 ## Safe diagnosis
 
