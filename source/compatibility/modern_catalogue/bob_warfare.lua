@@ -1,4 +1,4 @@
--- Exact F200 Bob Warfare armor component binding.  The historical selector
+-- Shared modern Bob Warfare armor component binding. The historical selector
 -- has two item-pattern groups: plating receives the configured 5% and armor
 -- plate receives 2% (the .4 setting ratio).  The named Bob mech row proves
 -- the latter path without collapsing the retained broad family to one item.
@@ -9,6 +9,7 @@
 -- incompatible Base rules.  `product_bindings` below stays a pair of broad,
 -- one-pass collector rules and preserves every matching armor/plating route.
 local M = {}
+local target = require("platform.target")
 
 M.definition = {
   key="research_armor_components", family="research_armor_components", kind="productivity",
@@ -58,13 +59,17 @@ local function ordinary(rows, expected, product)
   return true
 end
 
-function M.preflight(raw)
+function M.preflight(raw, active_mods)
   if type(raw) ~= "table" or type(raw.item) ~= "table" or type(raw.recipe) ~= "table"
       or type(raw.technology) ~= "table" then
     error("MIR F200 Bob Warfare raw prototypes are unavailable", 2)
   end
   local item, recipe, owner = raw.item["bob-mech-armor-plate"], raw.recipe["bob-mech-armor-plate"],
     raw.technology["bob-tankotron"]
+  -- Bob Plates replaces only the second armor ingredient and adds its named
+  -- processing prerequisite. Science and effect meaning remain shared.
+  local plates = target.id == "f210" and type(active_mods) == "table" and active_mods.bobplates ~= nil
+  local material = plates and "tungsten-carbide" or "steel-plate"
   -- The research uses its authored Base icon, not this item's artwork.
   -- Reskins do not change the named typed product or its recipe/owner binding.
   if type(item) ~= "table" then
@@ -74,7 +79,7 @@ function M.preflight(raw)
       or recipe.allow_productivity ~= true
       or recipe.maximum_productivity ~= nil
       or not ordinary(recipe.ingredients, {{type="item",name="low-density-structure",amount=5},
-        {type="item",name="steel-plate",amount=2}})
+        {type="item",name=material,amount=2}})
       or not ordinary(recipe.results, {{type="item",name="bob-mech-armor-plate",amount=1}}, true) then
     error("MIR F200 Bob Warfare armor route changed", 2)
   end
@@ -82,8 +87,9 @@ function M.preflight(raw)
       or not ordinary(owner.unit and owner.unit.ingredients, {{type="item",name="automation-science-pack",amount=1},
         {type="item",name="logistic-science-pack",amount=1},{type="item",name="military-science-pack",amount=1},
         {type="item",name="chemical-science-pack",amount=1},{type="item",name="production-science-pack",amount=1}})
-      or type(owner.prerequisites) ~= "table" or #owner.prerequisites ~= 2
-      or owner.prerequisites[1] ~= "bob-walking-vehicle" or owner.prerequisites[2] ~= "tank" then
+      or type(owner.prerequisites) ~= "table" or #owner.prerequisites ~= (plates and 3 or 2)
+      or owner.prerequisites[1] ~= "bob-walking-vehicle" or owner.prerequisites[2] ~= "tank"
+      or (plates and owner.prerequisites[3] ~= "bob-tungsten-processing") then
     error("MIR F200 Bob Warfare armor owner changed", 2)
   end
   local count = 0
