@@ -16,6 +16,7 @@ CONTROL = FIXTURE / "control.lua"
 F200_PROFILE = ROOT / "tests/profiles/library-multiplayer-f200-2077.json"
 CURRENT_F200_PROFILE = ROOT / "tests/profiles/library-multiplayer-current-f200-2077.json"
 F210_PROFILE = ROOT / "tests/profiles/library-multiplayer-f210-2123.json"
+STANDALONE_F210_PROFILE = ROOT / "tests/profiles/library-multiplayer-standalone-f210-2123.json"
 F210_API_CONSUMERS_PROFILE = ROOT / "tests/profiles/library-api-consumers-f210-2123.json"
 PAIRED_PUBLISHED_PROFILE = ROOT / "tests/profiles/library-paired-browser-published-f200-2077.json"
 PAIRED_MIR5_PROFILE = ROOT / "tests/profiles/library-paired-browser-mir5-f200-2077.json"
@@ -485,7 +486,7 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
         self.lua.globals().target = target
         return plain(self.lua.eval("run_library_multiplayer_fixture(control_path,opponent,target)"))
 
-    def test_profiles_and_fixture_metadata_pin_the_three_finite_base_closures(self):
+    def test_profiles_and_fixture_metadata_pin_the_four_finite_base_closures(self):
         cases = (
             (F200_PROFILE, FIXTURE / "info.json", "f200", "2.0", "2.0.77",
              "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B",
@@ -496,6 +497,9 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
             (F210_PROFILE, FIXTURE / "info-f210.json", "f210", "2.1", "2.1.23",
              "FE4A1DA30F322A0D0B8AEB3DF7276332222BAAA143E2352569B723E84B2B9060",
              "5.0.21000", "mir5-library-multiplayer-f210-native-selection", "2.1", "base >= 2.1.23", "2E1BE5952D2A4CC5C74A0D149E075D247BA110A3FAE5B6768D3EAEBABCEF989C"),
+            (STANDALONE_F210_PROFILE, FIXTURE / "info-f210.json", "f210-standalone", "2.1", "2.1.23",
+             "8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38",
+             "5.0.21000", "mir5-library-multiplayer-standalone-f210-native-selection", "2.1", "base >= 2.1.23", "A15A7D628D66953D2E0C4D4FA288F47CBF9C5678327C7EB3D23ADB5DC78331C0"),
         )
         for profile_path, info_path, target, line, base, engine_sha, mir, kind, fixture_line, base_dependency, observer_sha in cases:
             with self.subTest(target=target):
@@ -592,6 +596,7 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
           $f200=Get-Content -LiteralPath $env:MIR_TEST_F200_PROFILE -Raw|ConvertFrom-Json -AsHashtable
            $f200Current=Get-Content -LiteralPath $env:MIR_TEST_CURRENT_F200_PROFILE -Raw|ConvertFrom-Json -AsHashtable
           $f210=Get-Content -LiteralPath $env:MIR_TEST_F210_PROFILE -Raw|ConvertFrom-Json -AsHashtable
+          $standaloneF210=Get-Content -LiteralPath $env:MIR_TEST_STANDALONE_F210_PROFILE -Raw|ConvertFrom-Json -AsHashtable
           $pairedPublished=Get-Content -LiteralPath $env:MIR_TEST_PAIRED_PUBLISHED_PROFILE -Raw|ConvertFrom-Json -AsHashtable
           $pairedMir5=Get-Content -LiteralPath $env:MIR_TEST_PAIRED_MIR5_PROFILE -Raw|ConvertFrom-Json -AsHashtable
           $scriptedEffects=Get-Content -LiteralPath $env:MIR_TEST_SCRIPTED_EFFECTS_PROFILE -Raw|ConvertFrom-Json -AsHashtable
@@ -601,6 +606,8 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
            if($selected.kind -cne 'mir5-library-multiplayer-current-f200-native-selection' -or $selected.build_version -ne 84539){throw 'current F200 selection changed'}
           $selected=Assert-MultiplayerFixtureSelection -Selection $f210 -EngineSha256 'FE4A1DA30F322A0D0B8AEB3DF7276332222BAAA143E2352569B723E84B2B9060' -FixtureCase 'library-multiplayer'
           if($selected.base -cne '2.1.23' -or $selected.mir -cne '5.0.21000' -or $selected.build_version -ne 87750){throw 'F210 selection changed'}
+          $selected=Assert-MultiplayerFixtureSelection -Selection $standaloneF210 -EngineSha256 '8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38' -FixtureCase 'library-multiplayer'
+          if($selected.kind -cne 'mir5-library-multiplayer-standalone-f210-native-selection' -or $selected.standalone_f210-ne$true -or $selected.observer_sha256-cne'A15A7D628D66953D2E0C4D4FA288F47CBF9C5678327C7EB3D23ADB5DC78331C0'){throw 'standalone F210 selection changed'}
           $selected=Assert-MultiplayerFixtureSelection -Selection $pairedPublished -EngineSha256 'D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B' -FixtureCase 'library-paired-browser'
           if($selected.mir -cne '4.7.20002'){throw 'published paired selection changed'}
           $selected=Assert-MultiplayerFixtureSelection -Selection $pairedMir5 -EngineSha256 'D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B' -FixtureCase 'library-paired-browser'
@@ -628,6 +635,8 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
           }
           Assert-Rejected 'wrong-engine' $env:MIR_TEST_F200_PROFILE ('A'*64) 'library-multiplayer' {param($s)}
           Assert-Rejected 'wrong-mir' $env:MIR_TEST_F210_PROFILE 'FE4A1DA30F322A0D0B8AEB3DF7276332222BAAA143E2352569B723E84B2B9060' 'library-multiplayer' {param($s)$s['mods'][2]['version']='5.0.21001'}
+          Assert-Rejected 'standalone-wrong-engine' $env:MIR_TEST_STANDALONE_F210_PROFILE '8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38' 'library-multiplayer' {param($s)$s['engine']['sha256']='A'*64}
+          Assert-Rejected 'standalone-wrong-observer' $env:MIR_TEST_STANDALONE_F210_PROFILE '8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38' 'library-multiplayer' {param($s)$s['archive_sha256']['mir-fixture-mir5-active-mods-observer_0.1.0.zip']='A'*64}
           Assert-Rejected 'extra-space-age' $env:MIR_TEST_F210_PROFILE 'FE4A1DA30F322A0D0B8AEB3DF7276332222BAAA143E2352569B723E84B2B9060' 'library-multiplayer' {param($s)$s['mods']=@($s['mods'])+@([ordered]@{name='space-age';version='2.1.23';enabled=$true})}
           Assert-Rejected 'untyped-enabled' $env:MIR_TEST_F210_PROFILE 'FE4A1DA30F322A0D0B8AEB3DF7276332222BAAA143E2352569B723E84B2B9060' 'library-multiplayer' {param($s)$s['mods'][0]['enabled']='true'}
           Assert-Rejected 'wrong-observer' $env:MIR_TEST_F210_PROFILE 'FE4A1DA30F322A0D0B8AEB3DF7276332222BAAA143E2352569B723E84B2B9060' 'library-multiplayer' {param($s)$s['archive_sha256']['mir-fixture-mir5-active-mods-observer_0.1.0.zip']='A'*64}
@@ -646,6 +655,7 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
                      MIR_TEST_F200_PROFILE=str(F200_PROFILE),
                      MIR_TEST_CURRENT_F200_PROFILE=str(CURRENT_F200_PROFILE),
                      MIR_TEST_F210_PROFILE=str(F210_PROFILE),
+                     MIR_TEST_STANDALONE_F210_PROFILE=str(STANDALONE_F210_PROFILE),
                      MIR_TEST_PAIRED_PUBLISHED_PROFILE=str(PAIRED_PUBLISHED_PROFILE),
                      MIR_TEST_PAIRED_MIR5_PROFILE=str(PAIRED_MIR5_PROFILE),
                      MIR_TEST_SCRIPTED_EFFECTS_PROFILE=str(SCRIPTED_EFFECTS_PROFILE)),
@@ -742,11 +752,11 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
           },$true))
           if($loops.Count-ne1){throw 'client player-data writer loop is absent or ambiguous'}
           $loopText=$loops[0].Extent.Text
-          function Invoke-ClientPlayerDataWriter([bool]$Discovery,[string]$Label){
+          function Invoke-ClientPlayerDataWriter([bool]$Discovery,[bool]$StandaloneF210,[string]$Label){
             $root=Join-Path $env:MIR_TEST_WORK $Label;$null=New-Item -ItemType Directory -Path $root
             $resources=[pscustomobject]@{root=$root};$engineData='isolated-engine-data'
-            $target=[pscustomobject]@{base='2.1.23';build_version=87750}
-            $StandaloneIdentityDiscovery=$Discovery;$udpPorts=@(41000,41001,41002);$clientIndex=1;$clients=@()
+            $target=[pscustomobject]@{base='2.1.23';build_version=87750;standalone_f210=$StandaloneF210}
+            $StandaloneIdentityDiscovery=$Discovery;$standaloneClientNames=($StandaloneIdentityDiscovery -or $target.standalone_f210 -eq $true);$udpPorts=@(41000,41001,41002);$clientIndex=1;$clients=@()
             function New-MIRDirectLibraryStartupConfig {
               param([string]$Path,[string]$EngineDataDirectory,[string]$WriteDataDirectory,[switch]$Graphics)
               [IO.File]::WriteAllText($Path,"[path]`nread-data=$EngineDataDirectory`nwrite-data=$WriteDataDirectory`n[general]`nlocale=en`n",[Text.UTF8Encoding]::new($false))
@@ -773,14 +783,112 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
               if($config -notmatch ('(?m)^write-data='+[regex]::Escape([string]$client.write_data)+'$')){throw "config write-data differs: $index"}
             }
           }
-          Assert-Route (Invoke-ClientPlayerDataWriter $true 'discovery') @('standalone-en','standalone-de')
-          Assert-Route (Invoke-ClientPlayerDataWriter $false 'functional') @('MIR5English','MIR5Deutsch')
+          Assert-Route (Invoke-ClientPlayerDataWriter $true $false 'discovery') @('standalone-en','standalone-de')
+          Assert-Route (Invoke-ClientPlayerDataWriter $false $true 'standalone-normal') @('standalone-en','standalone-de')
+          Assert-Route (Invoke-ClientPlayerDataWriter $false $false 'functional') @('MIR5English','MIR5Deutsch')
         '''
         with tempfile.TemporaryDirectory(prefix="mir5-identity-player-data-") as work:
             result = subprocess.run(
                 ["pwsh", "-NoLogo", "-NoProfile", "-Command", script],
                 capture_output=True, text=True,
                 env=dict(os.environ, MIR_TEST_WRAPPER=str(WRAPPER), MIR_TEST_WORK=work), check=False,
+            )
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+
+    def test_standalone_normal_route_projects_a15_and_never_requests_steam_identity(self):
+        script = r'''
+          $ErrorActionPreference='Stop'; Set-StrictMode -Version Latest
+          $tokens=$null;$errors=$null
+          $ast=[Management.Automation.Language.Parser]::ParseFile($env:MIR_TEST_WRAPPER,[ref]$tokens,[ref]$errors)
+          if($errors.Count){throw $errors[0].Message}
+          $projection=@($ast.FindAll({param($candidate) $candidate -is [Management.Automation.Language.IfStatementAst] -and $candidate.Extent.Text.Contains('New-StandaloneIdentityObserverSourceProjection') -and $candidate.Extent.Text.Contains('$standaloneF210')},$true))
+          if($projection.Count-ne1){throw 'standalone normal observer projection route is absent or ambiguous'}
+          $fixtureProjection=@($ast.FindAll({param($candidate) $candidate -is [Management.Automation.Language.IfStatementAst] -and $candidate.Extent.Text.Contains('New-StandaloneF210LibraryFixtureSourceProjection') -and $candidate.Extent.Text.Contains('StagedLibraryFixtureSource $standaloneLibraryFixture.source')},$true))
+          if($fixtureProjection.Count-ne1){throw 'standalone normal F210 fixture projection route is absent or ambiguous'}
+          $steam=@($ast.FindAll({param($candidate) $candidate -is [Management.Automation.Language.IfStatementAst] -and $candidate.Extent.Text.Contains('FactorioSteamIdentity')},$true))
+          if($steam.Count-ne1){throw 'Steam identity launch gate is absent or ambiguous'}
+          function Assert-SteamGate([bool]$Discovery,[bool]$Standalone,[bool]$Expected){
+            $StandaloneIdentityDiscovery=$Discovery;$standaloneF210=$Standalone;$processArguments=@{}
+            Invoke-Expression $steam[0].Extent.Text
+            if($processArguments.ContainsKey('FactorioSteamIdentity')-ne$Expected){throw "Steam identity gate differs: discovery=$Discovery standalone=$Standalone"}
+          }
+          Assert-SteamGate $false $false $true
+          Assert-SteamGate $true $false $false
+          Assert-SteamGate $false $true $false
+          'PASS standalone normal route and Steam identity gate'
+        '''
+        result = subprocess.run(
+            ["pwsh", "-NoLogo", "-NoProfile", "-Command", script], capture_output=True, text=True,
+            env=dict(os.environ, MIR_TEST_WRAPPER=str(WRAPPER)), check=False,
+        )
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+
+    def test_standalone_f210_normal_preparation_projects_the_runtime_fixture_through_the_real_archive_guard(self):
+        script = r'''
+          $ErrorActionPreference='Stop'; Set-StrictMode -Version Latest
+          function Get-MIRImmutableInputSha256([string]$Path){(Get-FileHash -LiteralPath $Path -Algorithm SHA256).Hash.ToUpperInvariant()}
+          . $env:MIR_TEST_LIBRARY_ACTIVATION
+          $tokens=$null;$errors=$null
+          $ast=[Management.Automation.Language.Parser]::ParseFile($env:MIR_TEST_WRAPPER,[ref]$tokens,[ref]$errors)
+          if($errors.Count){throw $errors[0].Message}
+          function Assert-Session([bool]$Condition,[string]$Message){if(-not$Condition){throw $Message}}
+          foreach($name in @('New-StandaloneF210LibraryFixtureSourceProjection','New-StandaloneIdentityObserverSourceProjection','Get-StandaloneIdentityFixtureSources','Invoke-MultiplayerFixturePreparation')){
+            $node=@($ast.FindAll({param($candidate) $candidate -is [Management.Automation.Language.FunctionDefinitionAst] -and $candidate.Name -ceq $name},$true))
+            if($node.Count-ne1){throw "standalone normal function is absent or ambiguous: $name"}
+            Invoke-Expression $node[0].Extent.Text
+          }
+          function New-SourceArchive([string]$Library,[string]$Source,[string[]]$Members){
+            $info=Get-Content -LiteralPath (Join-Path $Source 'info.json') -Raw|ConvertFrom-Json -AsHashtable
+            $archive=Join-Path $Library ($info.name+'_'+$info.version+'.zip')
+            $stream=[IO.File]::Open($archive,[IO.FileMode]::CreateNew,[IO.FileAccess]::Write,[IO.FileShare]::None)
+            try{
+              $zip=[IO.Compression.ZipArchive]::new($stream,[IO.Compression.ZipArchiveMode]::Create,$false)
+              try{foreach($name in $Members){$entry=$zip.CreateEntry($info.name+'_'+$info.version+'/'+$name,[IO.Compression.CompressionLevel]::Optimal);$entryStream=$entry.Open();$input=[IO.File]::OpenRead((Join-Path $Source $name));try{$input.CopyTo($entryStream)}finally{$input.Dispose();$entryStream.Dispose()}}}finally{$zip.Dispose()}
+            }finally{$stream.Dispose()}
+            return $archive
+          }
+          function Invoke-ActualNormalPreparation([string]$Library,[string[]]$Sources,[string]$Root){
+            Invoke-MultiplayerFixturePreparation -ArchiveLibrary $Library -FactorioBin 'engine' -ProfilePath 'profile' -FixtureSources $Sources -ExpectedMIRArchiveSha256 ('A'*64) -FixtureCase 'library-multiplayer' -PreparationRoot (Join-Path $Root 'preparation') -RepoRoot $env:MIR_TEST_REPO -CreateOnlyInvoker {
+              param($NativeArguments)
+              foreach($source in @($NativeArguments.FixtureSources)){
+                $info=Get-Content -LiteralPath (Join-Path $source 'info.json') -Raw|ConvertFrom-Json -AsHashtable
+                Assert-MIRLibraryFixtureArchive -Archive (Join-Path $NativeArguments.ArchiveLibrary ($info.name+'_'+$info.version+'.zip')) -SourceDirectory $source
+              }
+              $null=New-Item -ItemType Directory -Path (Join-Path $NativeArguments.OutputRoot 'write-data/saves') -Force
+              $seed=Join-Path $NativeArguments.OutputRoot 'write-data/saves/seed.zip';[IO.File]::WriteAllBytes($seed,[byte[]]@(1,2,3))
+              [IO.File]::WriteAllText((Join-Path $NativeArguments.OutputRoot 'result.json'),([ordered]@{status='passed-private-native-runtime-load-only';seed_sha256=(Get-FileHash -LiteralPath $seed -Algorithm SHA256).Hash}|ConvertTo-Json),[Text.UTF8Encoding]::new($false))
+            }
+          }
+          function Assert-PreparationRejects([string]$Name,[string]$Library,[string]$Source,[string]$Root){
+            $rejected=$false;try{Invoke-ActualNormalPreparation -Library $Library -Sources @($Source) -Root $Root|Out-Null}catch{$rejected=$true};if(-not$rejected){throw "actual normal preparation accepted opponent: $Name"}
+          }
+          $root=$env:MIR_TEST_WORK;$repo=$env:MIR_TEST_REPO;$library=Join-Path $root 'library';$null=New-Item -ItemType Directory -Path $library
+          $normal=New-StandaloneF210LibraryFixtureSourceProjection -RepoRoot $repo -OutputRoot (Join-Path $root 'normal-output')
+          $normalInfo=Get-Content -LiteralPath (Join-Path $normal.source 'info.json') -Raw|ConvertFrom-Json -AsHashtable
+          if($normal.members.Count-ne3 -or $normal.source_metadata-cne'info-f210.json' -or ((@($normal.excluded_canonical_members)-join'|')-cne'README.md|info.json') -or [string]$normalInfo.factorio_version-cne'2.1' -or ((@($normalInfo.dependencies)-join'|')-cne'base >= 2.1.23|more-infinite-research = 5.0.21000')){throw 'normal F210 projection metadata differs'}
+          $fixtureArchive=New-SourceArchive -Library $library -Source $normal.source -Members @('control.lua','info.json','settings-updates.lua')
+          $canonicalObserver=Join-Path $repo 'tests/fixtures/active-mods-observer';$observerArchive=New-SourceArchive -Library $library -Source $canonicalObserver -Members @('data-final-fixes.lua','info.json')
+          $observerHash=(Get-FileHash -LiteralPath $observerArchive -Algorithm SHA256).Hash
+          $observer=New-StandaloneIdentityObserverSourceProjection -RepoRoot $repo -ArchiveLibrary $library -OutputRoot (Join-Path $root 'observer-output') -ExpectedArchiveSha256 $observerHash
+          $canonicalLibrary=Join-Path $repo 'tests/fixtures/library-multiplayer'
+          $sources=@(Get-StandaloneIdentityFixtureSources -Sources @($canonicalLibrary,$canonicalObserver) -LibraryFixtureSource $canonicalLibrary -StagedLibraryFixtureSource $normal.source -StagedObserverSource $observer.source -RepoRoot $repo)
+          $prepared=Invoke-ActualNormalPreparation -Library $library -Sources $sources -Root (Join-Path $root 'positive')
+          if($prepared.prepared.status-cne'passed-private-native-runtime-load-only' -or $sources.Count-ne2 -or $sources[0]-ine$normal.source -or $sources[1]-ine$observer.source){throw 'actual normal preparation did not retain the two exact projections'}
+          $missingLibrary=Join-Path $root 'missing-library';$null=New-Item -ItemType Directory -Path $missingLibrary;New-SourceArchive -Library $missingLibrary -Source $normal.source -Members @('control.lua','info.json')|Out-Null
+          Assert-PreparationRejects 'missing runtime member' $missingLibrary $normal.source (Join-Path $root 'missing')
+          $changedSource=Join-Path $root 'changed-source';Copy-Item -LiteralPath $normal.source -Destination $changedSource -Recurse;[IO.File]::AppendAllText((Join-Path $changedSource 'control.lua'),'-- changed',[Text.UTF8Encoding]::new($false))
+          $changedLibrary=Join-Path $root 'changed-library';$null=New-Item -ItemType Directory -Path $changedLibrary;New-SourceArchive -Library $changedLibrary -Source $normal.source -Members @('control.lua','info.json','settings-updates.lua')|Out-Null
+          Assert-PreparationRejects 'changed runtime Lua' $changedLibrary $changedSource (Join-Path $root 'changed')
+          $wrongRepo=Join-Path $root 'wrong-target-repo';$wrongFixture=Join-Path $wrongRepo 'tests/fixtures/library-multiplayer';$null=New-Item -ItemType Directory -Path (Split-Path -Parent $wrongFixture) -Force;Copy-Item -LiteralPath $canonicalLibrary -Destination $wrongFixture -Recurse
+          $wrongInfo=Get-Content -LiteralPath (Join-Path $wrongFixture 'info-f210.json') -Raw|ConvertFrom-Json -AsHashtable;$wrongInfo.factorio_version='2.0';[IO.File]::WriteAllText((Join-Path $wrongFixture 'info-f210.json'),($wrongInfo|ConvertTo-Json -Depth 8)+[Environment]::NewLine,[Text.UTF8Encoding]::new($false))
+          $wrongRejected=$false;try{New-StandaloneF210LibraryFixtureSourceProjection -RepoRoot $wrongRepo -OutputRoot (Join-Path $root 'wrong-output')|Out-Null}catch{$wrongRejected=$true};if(-not$wrongRejected){throw 'F200 fixture metadata was accepted for standalone F210 projection'}
+          'PASS actual normal standalone F210 preparation and projection opponents'
+        '''
+        with tempfile.TemporaryDirectory(prefix="mir5-standalone-normal-preparation-") as work:
+            result = subprocess.run(
+                ["pwsh", "-NoLogo", "-NoProfile", "-Command", script], capture_output=True, text=True,
+                env=dict(os.environ, MIR_TEST_WRAPPER=str(WRAPPER), MIR_TEST_REPO=str(ROOT), MIR_TEST_WORK=work,
+                         MIR_TEST_LIBRARY_ACTIVATION=str(ROOT / "tools/lib/compatibility/LibraryActivation.ps1")), check=False,
             )
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
 
