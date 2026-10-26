@@ -164,10 +164,22 @@ local function assert_published_cap(state)
   return player
 end
 
+local function marker_case(state)
+  if state.source_case == CASE or state.source_case == CROSS_ENGINE_SOURCE_CASE then
+    return state.source_case
+  end
+  if state.source_case == nil and state.source_mir == "4.7.20002" and state.fixture_version == "0.1.0" then
+    -- Completed published fixture saves predate source_case.  This exact
+    -- tuple is the old stage's immutable identity; do not infer it elsewhere.
+    return CASE
+  end
+  fail("source case witness is absent or malformed")
+end
+
 local function marker(stage, state)
   local player = status(game.forces.player)
   log("[MIR5_NATIVE_FIXTURE] RESULT " .. helpers.table_to_json({
-    stage = stage, case = state.source_case, status = "passed",
+    stage = stage, case = marker_case(state), status = "passed",
     qualification = "native-runner-readback-required",
     witnesses = {
       source_mir = state.source_mir, actual_lab_completions = state.actual_lab_completions,

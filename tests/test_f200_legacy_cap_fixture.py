@@ -119,7 +119,7 @@ class F200LegacyCapFixtureTests(unittest.TestCase):
 
           function legacy_cap_flow(source_path, destination_path, opponent, options)
             options=options or {}
-            local callbacks,markers,diagnostics,saves={events={}},0,0,0
+            local callbacks,markers,diagnostics,saves,marker_cases={events={}},0,0,0,{}
             local GEAR="recipe-prod-research_gears-1"
             local science={"automation-science-pack","logistic-science-pack","chemical-science-pack","production-science-pack"}
             local function inventory()
@@ -206,7 +206,8 @@ class F200LegacyCapFixtureTests(unittest.TestCase):
                 on_init=function(f)c.init=f end,on_configuration_changed=function(f)c.changed=f end,on_load=function(f)c.load=f end,
                 on_event=function(e,f)c.events[e]=f end},defines={events={on_tick=1,on_research_finished=2},inventory={lab_input=1}},
                 game=game,storage=storage,settings=settings_values,prototypes={item=item_prototypes},helpers={table_to_json=function(row)
-                  if row.status=="passed" then assert(row.stage=="initial" or row.stage=="reload")
+                  if row.status=="passed" then
+                    assert(row.stage=="initial" or row.stage=="reload");marker_cases[#marker_cases+1]=row.case
                   else
                     assert(row.stage=="finish-before-assertion");assert(type(row.research_start_tick)=="number")
                     assert(type(row.research_finished_tick)=="number");assert(type(row.raw_elapsed_ticks)=="number")
@@ -257,9 +258,10 @@ class F200LegacyCapFixtureTests(unittest.TestCase):
             ok,result=complete_player(source,3,.02,1);if not ok then return {ok=false,message=result}end
             player.technologies[GEAR].enabled=false;player.technologies[GEAR].visible_when_disabled=true
             ok,result=tick(source);if not ok then return {ok=false,message=result}end
+            local state=storage.mir5_f200_legacy_cap
+            if options.omit_source_case then state.source_case=nil end
             -- Two cold-source reload markers; on_load itself must only rebuild local witnesses.
             for _=1,2 do ok,result=invoke(source,"load");if not ok then return {ok=false,message=result}end;ok,result=tick(source);if not ok then return {ok=false,message=result}end end
-            local state=storage.mir5_f200_legacy_cap
             if opponent=="stale-enable" then player.technologies[GEAR].enabled=false
             elseif opponent=="native-level" then player.technologies[GEAR].level=2
             elseif opponent=="foreign-queue" then foreign.research_progress=.41
@@ -288,7 +290,7 @@ class F200LegacyCapFixtureTests(unittest.TestCase):
               consumed_units=state.destination_science_accounting.consumed_units,remaining_ticks=state.destination_science_accounting.remaining_ticks,
               processing_ticks=state.destination_processing_ticks,elapsed_ticks=state.destination_elapsed_ticks,current_progress=state.destination_science_accounting.progress,foreign_progress=foreign.research_progress,foreign_enabled=foreign.technologies[GEAR].enabled,
               source_mir=source_mir,destination_mir=destination_mir,source_base=source_base,destination_base=destination_base,
-              markers=markers,diagnostics=diagnostics,saves=saves}
+              source_case=state.source_case,marker_cases=marker_cases,markers=markers,diagnostics=diagnostics,saves=saves}
           end
         ''')
 
@@ -488,6 +490,13 @@ class F200LegacyCapFixtureTests(unittest.TestCase):
         self.assertTrue(result["player_visible"])
         self.assertEqual((.42, False, 2), (result["foreign_progress"], result["foreign_enabled"], result["saves"]))
         self.assertEqual((44, 44, 44), (result["remaining_ticks"], result["processing_ticks"], result["elapsed_ticks"]))
+        self.assertEqual(["f200-f210-positive-legacy-cap-source"] * 3 + ["f200-f210-positive-legacy-cap"] * 3,
+                         plain(result["marker_cases"]))
+
+        missing_case = self.flow_result(F200_CROSS / "control.lua", F210_CROSS / "control.lua", "",
+                                        {**options, "omit_source_case": True})
+        self.assertFalse(missing_case["ok"])
+        self.assertIn("source case witness is absent or malformed", missing_case["message"])
 
         for opponent, phrase in {
             "stale-enable": "MIR5 F210 cross-engine restored player native gear state differs",
@@ -498,6 +507,14 @@ class F200LegacyCapFixtureTests(unittest.TestCase):
                 rejected = self.flow_result(F200_CROSS / "control.lua", F210_CROSS / "control.lua", opponent, options)
                 self.assertFalse(rejected["ok"])
                 self.assertIn(phrase, rejected["message"])
+
+    def test_published_completed_v010_source_save_uses_only_the_exact_old_case_fallback_on_cold_reload(self):
+        result = self.flow_result(FIXTURE / "published" / "control.lua", FIXTURE / "mir5" / "control.lua", "",
+                                  {"omit_source_case": True})
+        self.assertTrue(result["ok"], result["message"])
+        self.assertIsNone(result["source_case"])
+        self.assertEqual(["f200-positive-legacy-cap"] * 6, plain(result["marker_cases"]))
+        self.assertEqual((2, 1, 2), (result["source_labs"], result["destination_labs"], result["saves"]))
 
     def test_two_real_source_labs_restore_positive_cap_then_one_real_successor_lab_and_reload(self):
         result = self.flow_result(FIXTURE / "published" / "control.lua", FIXTURE / "mir5" / "control.lua")
