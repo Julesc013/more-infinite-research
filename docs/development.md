@@ -55,6 +55,31 @@ Push each reviewable unit promptly. Commit bodies and PR descriptions record the
 
 After accepted MIR5.0.0 publication and verified local delivery, continue with5.0.1 bug fixes, measured performance improvements and further stress qualification. Use actual review findings and observed failures to select that work. This follow-up authorization does not waive any5.0.0 acceptance gate or permit an untested release.
 
+## Local development builds, upstream changes and advanced forks
+
+For a local replacement build, keep the official mod name `more-infinite-research`. Factorio selects one enabled version of a named mod, so this is an upgrade-style replacement of the installed MIR rather than a side-by-side installation. That identity deliberately keeps the packaged `__more-infinite-research__` imports, existing settings, technologies, migration history and draft API consumers pointed at the local build.
+
+Create a normal branch in a clone, make the bounded source change, and build a selected ordinary edition from the working tree into a new directory outside the checkout:
+
+```powershell
+git checkout -b fix/my-bounded-change
+python tools/package.py --source source --target f210 --output ../mir-local/more-infinite-research_5.0.21000.zip
+```
+
+`--target` selects an implemented edition and derives its numeric version from `source/info.json`; it is not native qualification. For a one-off same-name package without target adaptation, use a valid five-digit distribution version and a matching output filename:
+
+```powershell
+python tools/package.py --source source --version 5.0.21001 --output ../mir-local/more-infinite-research_5.0.21001.zip
+```
+
+`--version` and `--target` are intentionally mutually exclusive. To change a selected edition's local version or ordinary presentation metadata, edit the working-tree `source/info.json` while retaining the official name, then use `--target`; the target packager derives the selected edition's version, Factorio line and minimum Base dependency from that source codec and the tracked target record. Do not use `tools/release.py` for this: it freezes the canonical ten-edition release identity and rejects a private product version/name. The F006–F012 best-effort data-only path separately regenerates its finite metadata, so it is not a private-branding path.
+
+Before sharing a proposed change upstream, inspect the plan, run the narrow affected controls and repository checks, commit the bounded branch, push it and open a normal pull request. A local package, passing host control or successful load is not a release, compatibility or native acceptance claim. Keep original saves and use a disposable profile for local experiments.
+
+For a companion or extension, prefer the documented draft MIR API/SDK surface and declare the official dependency; do not copy MIR merely to call its data or runtime interface. API maturity remains draft until its independent-consumer and native/client gates pass, so the companion must check the documented version/capability boundary and handle optional absence.
+
+An advanced renamed fork is a separate product-design task, not a metadata-only build option. Before attempting it, audit its own absolute `__more-infinite-research__` imports, API/browser/settings interfaces, settings and generated technology identities, locale/shortcut/command names, `mod_changes` and active-mod references, native ownership/override/aggregate-contribution behavior, migration policy and every external consumer. Keep Base and upstream-mod recipe/prototype IDs intact; decide explicitly which fork-owned identities change and how effects interact when both products load. Factorio already gives each mod its own `storage`/legacy `global` Lua state, so do not apply a blanket storage rename. Likewise, preserve or deliberately replace only the fork's own migration history after a save-compatibility decision. A renamed fork needs its own exact package, load, API-consumer, save and coexistence evidence; it inherits none from the official package.
+
 ## Changelog ownership and formatting
 
 Edit the root [CHANGELOG.md](../CHANGELOG.md) as the single authored release history. Keep each Markdown paragraph or bullet on one logical line and use editor soft wrapping; aim for short readable sentences rather than manually wrapping repository prose. Retain the selected MIR1–3 master releases once, all MIR4 and later source releases, and edition-specific historical scope. Reduced backport logs are not separate master release entries.
