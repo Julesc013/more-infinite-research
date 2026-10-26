@@ -18,8 +18,9 @@ local ordinary_profile = type(active_mods) == "table" and active_mods.Krastorio2
   and active_mods["k2so-assets"] == nil
 local k2_base_profile = modern_catalogue.is_k2_base(active_mods)
 local k2so_profile = modern_catalogue.is_k2so(active_mods)
+local bob_angel_f210_profile = modern_catalogue.bob_angel_f210_profile(active_mods)
 local bob_tech_profile = require("compatibility.bob_tech_profile")
-local bob_tech_active = bob_tech_profile.applies(active_mods)
+local bob_tech_active = bob_angel_f210_profile == nil and bob_tech_profile.applies(active_mods)
 local bob_core_profile = require("compatibility.bob_core_profile")
 local bob_core_active = bob_core_profile.applies(active_mods)
 local bob_plates_profile = require("compatibility.bob_plates_profile").select(active_mods)
@@ -225,6 +226,12 @@ local function static_rows()
         rows[#rows + 1] = row
       end
     end
+  end
+  -- The combined F210 Base capture owns exactly the two copper-tungsten
+  -- stages.  Its selection is separate from the F200 Bob/Angel material
+  -- bundle and returns no rows for Space Age.
+  if selected.bob_angel_f210_materials then
+    for _, row in ipairs(material_rows(selected.bob_angel_f210_materials)) do rows[#rows + 1] = row end
   end
   if selected.py_coal then
     for _, row in ipairs(py_material_rows()) do rows[#rows + 1] = row end
