@@ -454,8 +454,9 @@ try {
     [IO.File]::WriteAllText($config,$text,[Text.UTF8Encoding]::new($false))
     $name=if($StandaloneIdentityDiscovery){'standalone-'+$locale}elseif($locale -ceq 'en'){'MIR5English'}else{'MIR5Deutsch'}
     # Isolated disposable identities contain no online token or personal data.
-    $player=@{'service-token'='';'last-played-version'=@{game_version=$target.base;build_version=$target.build_version;build_mode='full';platform='win64'}}
-    if(-not $StandaloneIdentityDiscovery){$player['service-username']=$name}
+    # Discovery still needs the same bounded synthetic name for the server's
+    # actual join marker; only its token and write-data remain isolated.
+    $player=@{'service-username'=$name;'service-token'='';'last-played-version'=@{game_version=$target.base;build_version=$target.build_version;build_mode='full';platform='win64'}}
     [IO.File]::WriteAllText((Join-Path $write 'player-data.json'),($player|ConvertTo-Json -Depth 5),[Text.UTF8Encoding]::new($false))
     $clients+=@{name=$name;locale=$locale;config=$config;write_data=$write;port=$udpPorts[$clientIndex]};$clientIndex++
   }
