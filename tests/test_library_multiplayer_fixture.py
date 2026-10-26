@@ -1301,7 +1301,7 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
           $allDefinitions=@($ast.FindAll({param($node)
             $node -is [Management.Automation.Language.FunctionDefinitionAst]
           },$true))
-          $names=@('Test-LibraryInteger','Get-LibraryWitnessTarget','Assert-LibraryWitnessBoolean','Assert-LibraryWitnessInteger',
+          $names=@('Test-LibraryInteger','Get-LibraryWitnessTarget','Assert-LibraryWitnessIdentityMode','Assert-LibraryWitnessBoolean','Assert-LibraryWitnessInteger',
             'Assert-LibraryLiveRefresh','Get-StageMarker')
           $definitions=@{}
           foreach($name in $names){
@@ -1320,16 +1320,39 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
           $targets=[ordered]@{
             f200=[ordered]@{engine_sha256='D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B';base='2.0.77';mir='5.0.20000'}
             f210=[ordered]@{engine_sha256='FE4A1DA30F322A0D0B8AEB3DF7276332222BAAA143E2352569B723E84B2B9060';base='2.1.23';mir='5.0.21000'}
+            standalone_normal=[ordered]@{engine_sha256='8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38';base='2.1.23';mir='5.0.21000';standalone_identity_discovery=$false}
+            standalone_discovery=[ordered]@{engine_sha256='8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38';base='2.1.23';mir='5.0.21000';standalone_identity_discovery=$true}
           }
-          function New-LibraryWitnessSpec([hashtable]$Target){return @{library_witness_target=([ordered]@{engine_sha256=$Target.engine_sha256;base=$Target.base;mir=$Target.mir})}}
+          function New-LibraryWitnessSpec([hashtable]$Target){
+            $spec=@{library_witness_target=([ordered]@{engine_sha256=$Target.engine_sha256;base=$Target.base;mir=$Target.mir})}
+            if($Target.Contains('standalone_identity_discovery') -and $Target.standalone_identity_discovery){$spec.standalone_identity_discovery=$true}
+            return $spec
+          }
           function Assert-LibraryWitnessTargetRejects([hashtable]$Spec,[string]$Engine,[string]$Name){
             try{$null=Get-LibraryWitnessTarget $Spec $Engine}catch{return}
             throw "reader accepted invalid witness target: $Name"
           }
+          function Assert-LibraryWitnessModeRejects([bool]$ActualMode,[object]$Target,[string]$Name){
+            try{Assert-LibraryWitnessIdentityMode $ActualMode $Target}catch{return}
+            throw "reader accepted wrong standalone identity mode: $Name"
+          }
+          $normalStandalone=Get-LibraryWitnessTarget (New-LibraryWitnessSpec $targets.standalone_normal) $targets.standalone_normal.engine_sha256
+          Assert-LibraryWitnessBoolean $normalStandalone 'standalone_identity_discovery' $false 'normal standalone target'
+          Assert-LibraryWitnessIdentityMode $false $normalStandalone
+          $discoveryStandalone=Get-LibraryWitnessTarget (New-LibraryWitnessSpec $targets.standalone_discovery) $targets.standalone_discovery.engine_sha256
+          Assert-LibraryWitnessBoolean $discoveryStandalone 'standalone_identity_discovery' $true 'discovery standalone target'
+          Assert-LibraryWitnessIdentityMode $true $discoveryStandalone
+          Assert-LibraryWitnessModeRejects $true $normalStandalone 'normal target with discovery mode'
+          Assert-LibraryWitnessModeRejects $false $discoveryStandalone 'discovery target with normal mode'
+          $malformedStandalone=New-LibraryWitnessSpec $targets.standalone_normal;$malformedStandalone.standalone_identity_discovery='true'
+          Assert-LibraryWitnessTargetRejects $malformedStandalone $targets.standalone_normal.engine_sha256 'malformed standalone mode'
+          $explicitFalseStandalone=New-LibraryWitnessSpec $targets.standalone_normal;$explicitFalseStandalone.standalone_identity_discovery=$false
+          Assert-LibraryWitnessTargetRejects $explicitFalseStandalone $targets.standalone_normal.engine_sha256 'explicit false standalone mode'
           foreach($targetName in @('f200','f210')){
             $target=$targets[$targetName]
             $expectedLibraryWitness=Get-LibraryWitnessTarget (New-LibraryWitnessSpec $target) $target.engine_sha256
             if($expectedLibraryWitness.base -cne $target.base -or $expectedLibraryWitness.mir -cne $target.mir){throw "selected witness target differs: $targetName"}
+            Assert-LibraryWitnessIdentityMode $false $expectedLibraryWitness
             $targetMarkers=@($markerSets[$targetName])
             if($targetMarkers.Count -ne 4){throw "actual fixture markers are incomplete: $targetName"}
             foreach($marker in $targetMarkers){
