@@ -14,7 +14,8 @@ local ALLOY_CRAFTS = 100
 local ALLOY_EARNED_BONUS = 0.08
 local ALLOY_MIN_BONUS_CRAFTS = 7
 local ALLOY_MAX_BONUS_CRAFTS = 8
-local FIXTURE_MACHINE = "mir5-bob-core-alloy-witness-furnace"
+local MIXING_FIXTURE_MACHINE = "mir5-bob-core-alloy-witness-furnace"
+local METALLURGY_FIXTURE_MACHINE = "mir5-bob-core-alloy-witness-foundry"
 local loaded, reported
 
 local REQUIRED = {
@@ -33,18 +34,39 @@ local FAMILIES = {
 }
 
 -- The finite physical witness is independently fixed from the F210 no-Angel
--- captured routes and the exact bobplates_3.0.2 archive. It is not a route
--- collector and does not claim physical coverage for the other five families.
+-- captured routes and the exact bobplates_3.0.2 archive. Copper Tungsten is
+-- the Space Age metallurgy/fluid branch, not the archive's non-SA mixing/item
+-- branch. This is not a route collector and does not claim full Bob coverage.
 local ALLOYS = {
   {
-    recipe="bob-bronze-alloy", category="bob-mixing-furnace", energy=16,
+    recipe="bob-bronze-alloy", machine=MIXING_FIXTURE_MACHINE,
+    category="bob-mixing-furnace", energy=16, inherent_productivity=0,
     ingredients={{type="item", name="copper-plate", amount=3}, {type="item", name="bob-tin-plate", amount=2}},
     result={type="item", name="bob-bronze-alloy", amount=5},
   },
   {
-    recipe="bob-gunmetal-alloy", category="bob-mixing-furnace", energy=32,
+    recipe="bob-gunmetal-alloy", machine=MIXING_FIXTURE_MACHINE,
+    category="bob-mixing-furnace", energy=32, inherent_productivity=0,
     ingredients={{type="item", name="copper-plate", amount=8}, {type="item", name="bob-tin-plate", amount=1}, {type="item", name="bob-zinc-plate", amount=1}},
     result={type="item", name="bob-gunmetal-alloy", amount=10},
+  },
+  {
+    recipe="bob-invar-alloy", machine=MIXING_FIXTURE_MACHINE,
+    category="bob-mixing-furnace", energy=16, inherent_productivity=0,
+    ingredients={{type="item", name="bob-nickel-plate", amount=2}, {type="item", name="iron-plate", amount=3}},
+    result={type="item", name="bob-invar-alloy", amount=5},
+  },
+  {
+    recipe="bob-nitinol-alloy", machine=MIXING_FIXTURE_MACHINE,
+    category="bob-mixing-furnace", energy=16, inherent_productivity=0,
+    ingredients={{type="item", name="bob-nickel-plate", amount=3}, {type="item", name="bob-titanium-plate", amount=2}},
+    result={type="item", name="bob-nitinol-alloy", amount=5},
+  },
+  {
+    recipe="bob-copper-tungsten-alloy", machine=METALLURGY_FIXTURE_MACHINE,
+    category="metallurgy", energy=16, inherent_productivity=0.5,
+    ingredients={{type="item", name="bob-powdered-tungsten", amount=3}, {type="fluid", name="molten-copper", amount=20}},
+    result={type="item", name="bob-copper-tungsten-alloy", amount=5},
   },
 }
 local ALLOY_BY_RECIPE = {}
@@ -101,11 +123,15 @@ local function matching_entries(actual, expected, label)
     local wanted_row = wanted[name]
     if type(value) ~= "table" or wanted_row == nil or seen[name]
         or (value.type or "item") ~= wanted_row.type or entry_amount(value) ~= wanted_row.amount
+        or value.temperature ~= wanted_row.temperature
+        or value.minimum_temperature ~= wanted_row.minimum_temperature
+        or value.maximum_temperature ~= wanted_row.maximum_temperature
         or value.amount_min ~= nil or value.amount_max ~= nil
         or (value.probability ~= nil and value.probability ~= 1)
         or (value.independent_probability ~= nil and value.independent_probability ~= 1)
         or (value.extra_count_fraction ~= nil and value.extra_count_fraction ~= 0)
-        or (value.ignored_by_productivity ~= nil and value.ignored_by_productivity ~= 0) then
+        or (value.ignored_by_productivity ~= nil and value.ignored_by_productivity ~= 0)
+        or (value.ignored_by_stats ~= nil and value.ignored_by_stats ~= 0) then
       fail(label .. " changed at " .. tostring(index) .. ": actual="
         .. tostring(type(value) == "table" and entry_name(value)) .. "/"
         .. tostring(type(value) == "table" and entry_amount(value)))
@@ -217,11 +243,18 @@ local function assert_alloy_route(force, route, expected_bonus, label)
   return recipe
 end
 
-local function alloy_inventories(machine, label)
+local function route_has_fluid(route)
+  for _, ingredient in ipairs(route.ingredients) do
+    if ingredient.type == "fluid" then return true end
+  end
+  return false
+end
+
+local function alloy_inventories(machine, route, label)
   if not machine or machine.valid == false or not machine.prototype
-      or machine.prototype.name ~= FIXTURE_MACHINE
+      or machine.prototype.name ~= route.machine
       or type(machine.prototype.crafting_categories) ~= "table"
-      or machine.prototype.crafting_categories["bob-mixing-furnace"] ~= true then
+      or machine.prototype.crafting_categories[route.category] ~= true then
     fail(label .. " native alloy machine differs")
   end
   local input = machine.get_inventory(defines.inventory.crafter_input)
@@ -232,12 +265,31 @@ local function alloy_inventories(machine, label)
   return input, output
 end
 
+local function assert_route_fluid_machine(machine, route, label)
+  if not route_has_fluid(route) then return end
+  if type(machine.fluids_count) ~= "number" or machine.fluids_count ~= 4
+      or type(machine.get_fluid_capacity) ~= "function"
+      or machine.get_fluid_capacity(1) ~= 1000 or machine.get_fluid_capacity(2) ~= 1000
+      or machine.get_fluid_capacity(3) ~= 100 or machine.get_fluid_capacity(4) ~= 100
+      or type(machine.get_fluid_count) ~= "function" or type(machine.insert_fluid) ~= "function" then
+    fail(label .. " native metallurgy fluid machine differs")
+  end
+end
+
+local function assert_empty_route_fluids(machine, route, label)
+  for _, ingredient in ipairs(route.ingredients) do
+    if ingredient.type == "fluid" and machine.get_fluid_count(ingredient.name) ~= 0 then
+      fail(label .. " native alloy fluid input was not clean")
+    end
+  end
+end
+
 local function setup_alloy_machines(force)
   local surface = game.surfaces[1]
   local out = {}
   for index, route in ipairs(ALLOYS) do
     local machine = surface and surface.create_entity{
-      name=FIXTURE_MACHINE, position={4 + index * 4, 0}, force=force,
+      name=route.machine, position={4 + index * 6, 0}, force=force,
     }
     if not machine or machine.valid == false then fail("could not create native alloy machine: " .. route.recipe) end
     out[route.recipe] = machine
@@ -245,13 +297,18 @@ local function setup_alloy_machines(force)
   return out
 end
 
-local function refill_alloy(production, input, label)
+local function refill_alloy(production, input, machine, label)
   for _, ingredient in ipairs(production.route.ingredients) do
     local remaining = production.remaining[ingredient.name]
     if remaining > 0 then
-      local inserted = input.insert{name=ingredient.name, count=remaining}
+      local inserted
+      if ingredient.type == "fluid" then
+        inserted = machine.insert_fluid{name=ingredient.name, amount=remaining}
+      else
+        inserted = input.insert{name=ingredient.name, count=remaining}
+      end
       if type(inserted) ~= "number" or inserted < 0 or inserted > remaining then
-        fail(label .. " alloy input insertion differs: " .. ingredient.name)
+        fail(label .. " alloy input insertion differs: " .. ingredient.type .. "/" .. ingredient.name)
       end
       production.remaining[ingredient.name] = remaining - inserted
       production.inserted[ingredient.name] = production.inserted[ingredient.name] + inserted
@@ -265,18 +322,23 @@ local function begin_alloy(state, phase)
   local expected_bonus = phase == "physical-before" and 0 or ALLOY_EARNED_BONUS
   assert_alloy_route(game.forces.player, route, expected_bonus, phase .. " " .. route.recipe)
   local machine = state.alloy_machines[route.recipe]
-  local input, output = alloy_inventories(machine, phase .. " " .. route.recipe)
+  local input, output = alloy_inventories(machine, route, phase .. " " .. route.recipe)
+  assert_route_fluid_machine(machine, route, phase .. " " .. route.recipe)
   if not input.is_empty() or not output.is_empty() or machine.crafting_progress ~= 0
       or not near(machine.bonus_progress, 0) then
     fail(phase .. " " .. route.recipe .. " native alloy machine was not clean")
   end
+  assert_empty_route_fluids(machine, route, phase .. " " .. route.recipe)
   machine.set_recipe(route.recipe)
   local selected = machine.get_recipe()
   if not selected or selected.name ~= route.recipe then
     fail(phase .. " " .. route.recipe .. " could not select native alloy recipe")
   end
-  local minimum_bonus = phase == "physical-before" and 0 or ALLOY_MIN_BONUS_CRAFTS
-  local maximum_bonus = phase == "physical-before" and 0 or ALLOY_MAX_BONUS_CRAFTS
+  local baseline_crafts = ALLOY_CRAFTS * route.inherent_productivity
+  local minimum_bonus = phase == "physical-before" and baseline_crafts
+    or baseline_crafts + ALLOY_MIN_BONUS_CRAFTS
+  local maximum_bonus = phase == "physical-before" and baseline_crafts
+    or baseline_crafts + ALLOY_MAX_BONUS_CRAFTS
   local production = {
     phase=phase, route=route, recipe=route.recipe, earned=expected_bonus,
     minimum_bonus=minimum_bonus, maximum_bonus=maximum_bonus,
@@ -287,7 +349,7 @@ local function begin_alloy(state, phase)
     production.inserted[ingredient.name] = 0
   end
   state.alloy = production
-  refill_alloy(production, input, phase .. " " .. route.recipe)
+  refill_alloy(production, input, machine, phase .. " " .. route.recipe)
 end
 
 local function tick_alloy(state)
@@ -298,9 +360,10 @@ local function tick_alloy(state)
   local label = production.phase .. " " .. route.recipe
   assert_alloy_route(game.forces.player, route, production.earned, label)
   local machine = state.alloy_machines[route.recipe]
-  local input, output = alloy_inventories(machine, label)
+  local input, output = alloy_inventories(machine, route, label)
+  assert_route_fluid_machine(machine, route, label)
   machine.energy = ALLOY_ENERGY
-  refill_alloy(production, input, label)
+  refill_alloy(production, input, machine, label)
   local made = output.get_item_count(route.result.name)
   if made > 0 then
     if output.remove{name=route.result.name, count=made} ~= made then
@@ -309,7 +372,9 @@ local function tick_alloy(state)
     production.output = production.output + made
   end
   for _, ingredient in ipairs(route.ingredients) do
-    if production.remaining[ingredient.name] ~= 0 or input.get_item_count(ingredient.name) ~= 0 then return false end
+    local actual = ingredient.type == "fluid" and machine.get_fluid_count(ingredient.name)
+      or input.get_item_count(ingredient.name)
+    if production.remaining[ingredient.name] ~= 0 or actual ~= 0 then return false end
     if production.inserted[ingredient.name] ~= ingredient.amount * ALLOY_CRAFTS then
       fail(label .. " alloy input count differs: " .. ingredient.name)
     end
@@ -321,13 +386,17 @@ local function tick_alloy(state)
       or bonus_crafts < production.minimum_bonus or bonus_crafts > production.maximum_bonus then
     fail(label .. " native alloy output differs: " .. tostring(production.output))
   end
-  local expected_progress = ALLOY_CRAFTS * production.earned - bonus_crafts
+  local expected_progress = ALLOY_CRAFTS * (route.inherent_productivity + production.earned) - bonus_crafts
   if expected_progress < -0.0001 or expected_progress > 1.0001
       or not near_progress(machine.bonus_progress, expected_progress) then
     fail(label .. " native alloy productivity progress differs")
   end
   production.bonus_crafts = bonus_crafts
   production.native_bonus_progress = machine.bonus_progress
+  production.machine_productivity_bonus = machine.productivity_bonus
+  if type(production.machine_productivity_bonus) ~= "number" then
+    fail(label .. " native alloy productivity observation differs")
+  end
   production.finished = true
   return true
 end
@@ -338,24 +407,39 @@ local function assert_physical_phase(state, phase, observe_machine)
   for _, route in ipairs(ALLOYS) do
     local record = records[route.recipe]
     if type(record) ~= "table" then fail(phase .. " alloy record is absent: " .. route.recipe) end
-    local base = route.result.amount * ALLOY_CRAFTS
-    local minimum = phase == "physical-before" and base or route.result.amount * (ALLOY_CRAFTS + ALLOY_MIN_BONUS_CRAFTS)
-    local maximum = phase == "physical-before" and base or route.result.amount * (ALLOY_CRAFTS + ALLOY_MAX_BONUS_CRAFTS)
+    local baseline_crafts = ALLOY_CRAFTS * route.inherent_productivity
+    local minimum_bonus = phase == "physical-before" and baseline_crafts
+      or baseline_crafts + ALLOY_MIN_BONUS_CRAFTS
+    local maximum_bonus = phase == "physical-before" and baseline_crafts
+      or baseline_crafts + ALLOY_MAX_BONUS_CRAFTS
+    local minimum = route.result.amount * (ALLOY_CRAFTS + minimum_bonus)
+    local maximum = route.result.amount * (ALLOY_CRAFTS + maximum_bonus)
     if record.output < minimum or record.output > maximum
-        or record.bonus_crafts < (phase == "physical-before" and 0 or ALLOY_MIN_BONUS_CRAFTS)
-        or record.bonus_crafts > (phase == "physical-before" and 0 or ALLOY_MAX_BONUS_CRAFTS)
-        or type(record.native_bonus_progress) ~= "number" then
+        or record.bonus_crafts < minimum_bonus or record.bonus_crafts > maximum_bonus
+        or type(record.native_bonus_progress) ~= "number"
+        or type(record.machine_productivity_bonus) ~= "number" then
       fail(phase .. " alloy record differs: " .. route.recipe)
+    end
+    if phase == "physical-after" then
+      local before = state.physical["physical-before"][route.recipe]
+      local incremental = before and record.bonus_crafts - before.bonus_crafts
+      if type(incremental) ~= "number" or incremental < ALLOY_MIN_BONUS_CRAFTS
+          or incremental > ALLOY_MAX_BONUS_CRAFTS then
+        fail(phase .. " alloy earned productivity differs: " .. route.recipe)
+      end
     end
     if observe_machine then
       local expected_bonus = phase == "physical-before" and 0 or ALLOY_EARNED_BONUS
       assert_alloy_route(game.forces.player, route, expected_bonus, phase .. " " .. route.recipe)
       local machine = state.alloy_machines and state.alloy_machines[route.recipe]
-      local input, output = alloy_inventories(machine, phase .. " " .. route.recipe)
+      local input, output = alloy_inventories(machine, route, phase .. " " .. route.recipe)
+      assert_route_fluid_machine(machine, route, phase .. " " .. route.recipe)
       if not input.is_empty() or not output.is_empty() or machine.crafting_progress ~= 0
-          or not near_progress(machine.bonus_progress, record.native_bonus_progress) then
+          or not near_progress(machine.bonus_progress, record.native_bonus_progress)
+          or not near(machine.productivity_bonus, record.machine_productivity_bonus) then
         fail(phase .. " native alloy machine state differs: " .. route.recipe)
       end
+      assert_empty_route_fluids(machine, route, phase .. " " .. route.recipe)
     end
   end
 end
@@ -367,6 +451,7 @@ local function advance_alloy(state, phase)
   state.physical[phase][production.recipe] = {
     output=production.output, bonus_crafts=production.bonus_crafts,
     native_bonus_progress=production.native_bonus_progress,
+    machine_productivity_bonus=production.machine_productivity_bonus,
   }
   state.alloy = nil
   state.alloy_index = state.alloy_index + 1
@@ -418,9 +503,11 @@ local function marker(stage, state)
       finite_levels_completed_by_lab=21, continuation_levels_completed_by_lab=7,
       science_consumed=CONSUMPTION, native_recipe_productivity_per_route=0.08,
       native_effect_per_completed_level=EFFECT, fixture_accelerates_count_and_time=true,
-      physical_alloy_witness=true, physical_routes={"bob-bronze-alloy", "bob-gunmetal-alloy"},
+      physical_alloy_witness=true, physical_routes={"bob-bronze-alloy", "bob-gunmetal-alloy", "bob-invar-alloy", "bob-nitinol-alloy", "bob-copper-tungsten-alloy"},
       physical_crafts_per_route=ALLOY_CRAFTS,
       physical_before_mir_productivity=true, physical_after_mir_productivity=true,
+      physical_mixing_routes=4, physical_metallurgy_fluid_routes=1,
+      physical_foundry_inherent_productivity=0.5,
       ordinary_tuning_qualified=false, candidate_full_catalogue_comparison_required=true,
       on_load_read_only=stage == "reload", foreign_force_witness_not_claimed=true,
     },
