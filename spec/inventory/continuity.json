@@ -4074,7 +4074,7 @@
               "disposition": "representative-observed-not-reporter-qualified"
             }
           ],
-          "scope": "Each listed original request carries an additive mir5_route_disposition with its finite canonical source mapping, named evidence and limitations. Historical native evidence remains at its recorded identity unless a record expressly says otherwise; source mapping does not assert final-package qualification. SCI-UNLOCK-01 and SCI-RESEARCH-01 are representative observations only. SIF-01 additionally records current all-eight-policy native emission and both configured predecessor/save/two-reload chains in its original ledger row; no client, performance or release verdict follows. ECO-PLANETS and other unmatched retained requests retain their original decisions/statuses without inferred coverage.",
+          "scope": "Each listed original request carries an additive mir5_route_disposition with its finite canonical source mapping, named evidence and limitations. Historical native evidence remains at its recorded identity unless a record expressly says otherwise; source mapping does not assert final-package qualification. SCI-RESEARCH-01 has only its representative observation; SCI-UNLOCK-01 also retains distinct EA41/B6EB F210 data-stage observations, none of which is a reporter reproduction or qualification. SIF-01 additionally records current all-eight-policy native emission and both configured predecessor/save/two-reload chains in its original ledger row; no client, performance or release verdict follows. ECO-PLANETS and other unmatched retained requests retain their original decisions/statuses without inferred coverage.",
           "evidence": [
             "spec/evidence/k2so-material-native-chain.json",
             "spec/evidence/bob-angel-materials-lab-native-chain.json",
@@ -4083,6 +4083,7 @@
             "spec/evidence/library-multiplayer-current-chain.json",
             "spec/evidence/repair-stress-native-chain.json",
             "spec/evidence/api-canonical-native-chain.json",
+            "spec/evidence/broad-ecosystem-f210-ea41-native-chain-r01.json",
             "spec/evidence/sif-science-fa114-native-chain.json"
           ]
         },
