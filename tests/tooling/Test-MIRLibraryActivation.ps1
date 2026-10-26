@@ -38,18 +38,18 @@ function New-NativeFixturePreflightPrefix([string]$Runner,[string]$Path){
   $written=[IO.File]::ReadAllBytes($Path)
   Assert-Library ([Convert]::ToHexString([byte[]]$written[0..($prefix.Length-1)]) -ceq [Convert]::ToHexString($prefix)) 'native-fixture-preflight-prefix-bytes'
 }
-function New-NativeFixturePreflightValidationRemoval([string]$Prefix,[string]$Path){
+function New-NativeFixtureControlledPreEnforcementOpponent([string]$Prefix,[string]$Path){
   $tokens=$null;$errors=$null
   $ast=[System.Management.Automation.Language.Parser]::ParseFile($Prefix,[ref]$tokens,[ref]$errors)
-  Assert-Library ($errors.Count-eq0) 'native-fixture-preflight-mutation-parse'
+  Assert-Library ($errors.Count-eq0) 'native-fixture-controlled-pre-enforcement-parse'
   $calls=@($ast.FindAll({param($node) $node -is [System.Management.Automation.Language.CommandAst] -and $node.GetCommandName() -ceq 'Assert-DeclaredFixtureInputs'},$true))
-  Assert-Library ($calls.Count-eq1-and$calls[0].Extent.Text-ceq'Assert-DeclaredFixtureInputs -ProfileDefinition $profileDefinition -EngineIdentity $engineIdentity -ArchiveHashes $archiveHashes') 'native-fixture-preflight-mutation-call'
+  Assert-Library ($calls.Count-eq1-and$calls[0].Extent.Text-ceq'Assert-DeclaredFixtureInputs -ProfileDefinition $profileDefinition -EngineIdentity $engineIdentity -ArchiveHashes $archiveHashes') 'native-fixture-controlled-pre-enforcement-call'
   $source=[IO.File]::ReadAllText($Prefix,[Text.UTF8Encoding]::new($false,$true));$call=$calls[0]
   $mutated=$source.Remove($call.Extent.StartOffset,$call.Extent.EndOffset-$call.Extent.StartOffset)
-  Assert-Library ($mutated.Contains('function Assert-DeclaredFixtureInputs')) 'native-fixture-preflight-mutation-definition'
+  Assert-Library ($mutated.Contains('function Assert-DeclaredFixtureInputs')) 'native-fixture-controlled-pre-enforcement-definition'
   [IO.File]::WriteAllText($Path,$mutated,[Text.UTF8Encoding]::new($false))
   $tokens=$null;$errors=$null;$mutatedAst=[System.Management.Automation.Language.Parser]::ParseFile($Path,[ref]$tokens,[ref]$errors)
-  Assert-Library ($errors.Count-eq0-and@($mutatedAst.FindAll({param($node) $node -is [System.Management.Automation.Language.CommandAst] -and $node.GetCommandName() -ceq 'Assert-DeclaredFixtureInputs'},$true)).Count-eq0) 'native-fixture-preflight-mutation-only-call'
+  Assert-Library ($errors.Count-eq0-and@($mutatedAst.FindAll({param($node) $node -is [System.Management.Automation.Language.CommandAst] -and $node.GetCommandName() -ceq 'Assert-DeclaredFixtureInputs'},$true)).Count-eq0) 'native-fixture-controlled-pre-enforcement-only-call'
 }
 function Assert-NativeFixturePreflightControlsAbsent([string]$Library,[string]$Output){
   Assert-Library (-not(Test-Path -LiteralPath $Output) -and -not(Test-Path -LiteralPath (Join-Path $Library 'mod-list.json')) -and -not(Test-Path -LiteralPath (Join-Path $Library 'mod-settings.dat')) -and -not(Test-Path -LiteralPath (Join-Path $Library '.mir-active-profile.json'))) 'native-fixture-preflight-no-controls'
@@ -189,14 +189,20 @@ try {
   Assert-NativeFixturePreflightControlsAbsent -Library $preflightLibrary -Output $preflightOutput
   $wrongSelected=@{($dependencyName)=('0'*64 -join '')}
   Set-PreflightProfile (New-PreflightProfile -Engine $validEngine -ArchiveHashes $wrongSelected)
-  $mutatedPreflightRunner=Join-Path $preflightRoot 'Invoke-NativeFixture-validation-removal-preflight.ps1';New-NativeFixturePreflightValidationRemoval -Prefix $preflightRunner -Path $mutatedPreflightRunner
-  & $mutatedPreflightRunner @runnerArguments
-  Assert-Library $true 'native-fixture-validation-removal-admits-wrong-selected-pin'
+  # This is a controlled pre-enforcement opponent derived from this exact
+  # runner prefix: it removes only the one new assertion call, never obtains
+  # an old Git object, and still returns before health, controls, or launch.
+  $controlledPreEnforcementRunner=Join-Path $preflightRoot 'Invoke-NativeFixture-controlled-pre-enforcement-preflight.ps1';New-NativeFixtureControlledPreEnforcementOpponent -Prefix $preflightRunner -Path $controlledPreEnforcementRunner
+  & $controlledPreEnforcementRunner @runnerArguments
+  Assert-Library $true 'native-fixture-controlled-pre-enforcement-admits-wrong-selected-pin'
   Assert-NativeFixturePreflightControlsAbsent -Library $preflightLibrary -Output $preflightOutput
   Refuses-Library {& $preflightRunner @runnerArguments} '[mir5-native-fixture] profile selected archive hash differs'
   Assert-NativeFixturePreflightControlsAbsent -Library $preflightLibrary -Output $preflightOutput
   Set-PreflightProfile (New-PreflightProfile -Engine $validEngine -ArchiveHashes @{($dependencyName)='not-a-sha'})
   Refuses-Library {& $preflightRunner @runnerArguments} '[mir5-native-fixture] profile selected archive hash is malformed'
+  Assert-NativeFixturePreflightControlsAbsent -Library $preflightLibrary -Output $preflightOutput
+  Set-PreflightProfile (New-PreflightProfile -Engine $validEngine -ArchiveHashes 'not-an-archive-map')
+  Refuses-Library {& $preflightRunner @runnerArguments} '[mir5-native-fixture] profile archive metadata differs'
   Assert-NativeFixturePreflightControlsAbsent -Library $preflightLibrary -Output $preflightOutput
   Set-PreflightProfile (New-PreflightProfile -Engine $validEngine -ArchiveHashes @{($dependencyName)=(Get-MIRImmutableInputSha256 $preflightDependency)})
   $capturedHashes=Get-MIRDirectLibraryStartupArchiveHashes -LibraryDirectory $preflightLibrary -EngineDataDirectory $preflightData -BaseRows $preflightMods -MirArchive $null
