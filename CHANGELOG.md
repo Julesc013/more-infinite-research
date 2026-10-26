@@ -19,6 +19,9 @@ This is the authoritative product changelog. Each MIR 1–3 master release appea
 - Retain authored Armor, Py, ATAN, Bob/Angel and K2 bindings for their admitted engine and mod profiles.
 - Restore fourteen Tin, Lead, Bronze, Gunmetal, Invar, Nitinol and Copper Tungsten technologies for the Factorio 2.1 Bob-core profile without Angel mods.
 - Restore five Tin, Gunmetal and Invar native material stages for the Factorio 2.1 BobTech and Angel profile.
+- Restore the published31 Base and16 Space Age Bob Plates rows through the complete settings-to-publication path, with separate sparse and full-Bob admission.
+- Preserve the named BobTech advanced and alien science vectors for the admitted native continuations.
+- Restore the omitted F210 Angel catalogue and native Steel coverage through explicit bindings.
 - Preserve separate finite and infinite material stages, native recipe ownership and hidden Imersite migration carriers where supported.
 - Keep two historical runtime interfaces available; unconsumed developer previews do not become player APIs.
 
@@ -50,6 +53,7 @@ This is the authoritative product changelog. Each MIR 1–3 master release appea
 - Supply nine retained target editions from one player-source tree; additional earlier editions are best-effort GitHub distributions as their adapters become buildable.
 - Exact engine minimums and available features depend on the selected target; Factorio 2.1 requires base 2.1.23.
 - Use one shared master changelog for all editions; historical entries retain their original release and engine scope.
+- Offer optional fixed finite F006–F012 builds from the shared source, with readable museum research names and explicit best-effort limits; current native and save qualification is absent.
 
 ## [4.7.3]
 

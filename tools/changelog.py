@@ -42,10 +42,14 @@ def entries(text):
         raise ValueError("Missing or duplicate changelog versions")
     if versions != sorted(versions, key=lambda v: tuple(map(int, v.split("."))), reverse=True):
         raise ValueError("Changelog releases must be in descending source-version order")
+    if any(v == "0.0.0" or any(int(part) > 65535 for part in v.split(".")) for v in versions):
+        raise ValueError("Changelog version exceeds Factorio's numeric range")
     if any(entry["date"] == "Unreleased" for entry in result[1:]):
         raise ValueError("Only the current changelog entry may be unreleased")
     if any(not entry["sections"] or any(not section["items"] for section in entry["sections"]) for entry in result):
         raise ValueError("Empty changelog release or section")
+    if any(len({section["name"] for section in entry["sections"]}) != len(entry["sections"]) for entry in result):
+        raise ValueError("Repeated changelog category")
     return result
 
 
@@ -60,11 +64,28 @@ def factorio(text, source_version):
             lines.append("Date: " + record["date"])
         for section in record["sections"]:
             lines.extend(["", "  " + section["name"] + ":", ""])
+            # Factorio has entries and continuations, not nested Markdown lists.
+            # Keep each parent and its details together as one complete entry.
+            paragraphs = []
             for item in section["items"]:
-                prefix = " " * (4 + 2 * item["depth"])
-                lines.extend(textwrap.wrap(item["text"], width=132, initial_indent=prefix + "- ",
-                                           subsequent_indent=prefix + "  ", break_long_words=False,
-                                           break_on_hyphens=False, replace_whitespace=False))
+                if item["depth"] == 0:
+                    paragraphs.append(item["text"])
+                else:
+                    paragraphs[-1] += " " + item["text"]
+            seen = set()
+            for paragraph in paragraphs:
+                # Its parser also rejects duplicate individual continuation
+                # lines. Reflow an affected entry without changing any words.
+                for width in range(132, 79, -1):
+                    wrapped = textwrap.wrap(paragraph, width=width, initial_indent="    - ",
+                                            subsequent_indent="      ", break_long_words=False,
+                                            break_on_hyphens=False, replace_whitespace=False)
+                    if len(set(wrapped)) == len(wrapped) and not seen.intersection(wrapped):
+                        break
+                else:
+                    raise ValueError("Repeated Factorio changelog entry/continuation in " + record["version"])
+                seen.update(wrapped)
+                lines.extend(wrapped)
         lines.append("")
     output = "\n".join(lines).rstrip() + "\n"
     if max(map(len, output.splitlines())) > 132:

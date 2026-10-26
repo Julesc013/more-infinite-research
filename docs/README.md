@@ -22,6 +22,7 @@ This is the MIR5 implementation and qualification documentation. Authored resear
 | Editable/rendered diagrams | [Diagram index](diagrams/README.md) |
 | Why this design and what was changed | [Design summary](design.md) |
 | Implement a bounded change | [Development](development.md) |
+| Read or maintain the complete release history | [Changelog](../CHANGELOG.md) and [formatting workflow](development.md#changelog-ownership-and-formatting) |
 | Use the implemented candidate integration | [API guide](api.md) and [SDK](../sdk/README.md) |
 | Understand support and safe upgrades | [Support](support.md) |
 | Find normative requirements | [Specification index](../spec/README.md) |

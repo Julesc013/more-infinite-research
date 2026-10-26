@@ -42,6 +42,12 @@ The [tracked edition record](../targets/editions.json) selects one self-containe
 
 Modern targets expose recipe productivity and the Research Library. Expansion research requires its actual official mods and available science/labs. Historical editions retain their supported direct-effect subset; they do not acquire modern recipe productivity, Library or expansion capabilities. F013/F014 lack the later numeric infinite-level readback, and F013–F016 lack native research queues. The [research and settings reference](../README.md#research-catalog) retains the complete authored catalogue detail; exact profile admissions and omissions are named in the qualification records.
 
+## Additional best-effort historical builds
+
+The separately selected [early-edition record](../targets/early-editions.json) builds F006/0.6.4, F007/0.7.5, F008/0.8.8, F009/0.9.8, F010/0.10.12, F011/0.11.22 and F012/0.12.35. These are data-only fixed finite research subsets recovered from the museum releases, with14/22/22/22/22/22/26 technologies respectively. They have no startup settings, runtime API, Library or migrations, and have not passed current native or save qualification. They are best-effort GitHub artifacts rather than additions to the nine-edition native acceptance claim. F006–F008 transport ZIPs require extraction into the engine mods folder; do not infer direct ZIP loading. Preserve original saves and installation files.
+
+F001/0.1.2 and F002/0.2.10 lack an evidenced standalone-mod format. F003/0.3.2, F004/0.4.1 and F005/0.5.3 lack supplied exact engine/prototype inputs, so no build or native pass is claimed. F018/0.18.47 was excluded from the inherited baseline and also remains unresolved. Missing editions are recorded explicitly instead of filled with empty packages. The [target contract](../spec/targets.md#additional-historical-editions) owns these limits and their release disposition.
+
 ## First upgrade
 
 Keep the original save, its pre-update backup, the selected mod archives and startup settings. Test a copy with the matching edition first. Preserve inherited settings for the first load; configuration changes and productivity-provider changes have separate transition requirements. Load, inspect earned research and bonuses, inspect current/queued or suspended work, save under a new name and cold-reload that copy before adopting it.

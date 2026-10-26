@@ -47,7 +47,8 @@ class ChangelogTests(unittest.TestCase):
     def test_formatting_keeps_words_nested_bullets_and_unknown_dates(self):
         text = "# Changelog\n\n## [5.0.1] - Unreleased\n\n### Changes\n\n- " + "long words " * 30 + "\n  - Child.\n\n## [5.0.0]\n\n### Fixes\n\n- Prior.\n"
         output = changelog.factorio(text, "5.0.1")
-        self.assertIn("      - Child.\n", output)
+        self.assertIn("Child.", output)
+        self.assertFalse(any(line.startswith("        ") for line in output.splitlines()))
         self.assertEqual(" ".join(output.split()).count("long words"), 30)
         self.assertNotIn("Date:", output)
         self.assertIn("Version: 5.0.0", output)
@@ -59,6 +60,21 @@ class ChangelogTests(unittest.TestCase):
                 changelog.factorio(bad, "5.0.0")
         with self.assertRaisesRegex(ValueError, "differs"):
             changelog.factorio(base, "5.0.1")
+
+    def test_factorio_entries_and_continuations_are_unique_per_category(self):
+        version = category = None
+        seen = set()
+        for line in changelog.rendered().splitlines():
+            if line.startswith("Version: "):
+                version = line
+            elif line.startswith("  ") and not line.startswith("   "):
+                category = line
+                seen = set()
+            elif line.startswith("    "):
+                with self.subTest(version=version, category=category, line=line):
+                    self.assertNotIn(line, seen)
+                    self.assertTrue(line.startswith("    - ") or (line.startswith("      ") and not line.startswith("       ")))
+                seen.add(line)
 
 
 if __name__ == "__main__":

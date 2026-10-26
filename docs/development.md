@@ -39,6 +39,8 @@ Maintain the [existing community request ledger](../spec/programmes/community-re
 
 ## Work in small vertical slices
 
+The additional F001–F012 request is a separate best-effort GitHub delivery obligation under the [target contract](../spec/targets.md#additional-historical-editions), with F013–F210 retaining release priority. Buildable extra editions receive explicit feature/installation/qualification limits; unavailable inputs do not become invented support or implicit release blockers. The separate [early target record](../targets/early-editions.json) selects only the actual finite data adapter. F018 has an explicit unresolved disposition too.
+
 Prioritize Factorio 2.1.23 for MIR5 design, implementation and qualification, following the [primary-target decision](../spec/targets.md#primary-target-and-earlier-editions). Preserve all nine editions through the same capability-based source and version encoding, with common feature, setting and presentation semantics wherever native capabilities permit. F210 scheduling priority does not waive final current-package and affected native checks for every delivered target subset. Reuse exact unchanged evidence under its original identity and state remaining gaps by edition; an unqualified edition remains an open release obligation.
 
 Make a native family work end to end, then exercise a different native effect, a staged/native-owner integration and stateful caps/runtime. Keep partial packages off production saves. A successful tiny package is not a full-product migration or performance claim.

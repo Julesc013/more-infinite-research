@@ -101,7 +101,7 @@ def validate_inline_markdown_links(text, visit):
 
 
 def component_files():
-    files = []
+    files = list(ROOT.glob("*.md"))
     for root in COMPONENT_ROOTS:
         directory = ROOT / root
         refuse_links(directory)
