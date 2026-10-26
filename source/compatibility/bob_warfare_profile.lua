@@ -12,8 +12,7 @@ function M.applies(active)
   if f200 and active["space-age"] ~= nil then
     error("MIR unsupported F200 Bob Warfare saved-profile transition: Space Age changes the captured armor binding", 2)
   end
-  if active.Krastorio2 ~= nil or active.Krastorio2Assets ~= nil
-      or active["Krastorio2-spaced-out"] ~= nil or active["k2so-assets"] ~= nil then
+  if active.Krastorio2 ~= nil or active["Krastorio2-spaced-out"] ~= nil then
     error("MIR unsupported " .. target.id:upper() .. " Bob Warfare saved-profile transition: Krastorio changes the captured armor binding", 2)
   end
   return true

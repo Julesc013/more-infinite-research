@@ -14,8 +14,7 @@ function M.gear_id() return GEAR_ID end
 local active_mods = script and script.active_mods or mods or {}
 local space_age_active = type(active_mods) == "table" and active_mods["space-age"] ~= nil
 local ordinary_profile = type(active_mods) == "table" and active_mods.Krastorio2 == nil
-  and active_mods["Krastorio2-spaced-out"] == nil and active_mods.Krastorio2Assets == nil
-  and active_mods["k2so-assets"] == nil
+  and active_mods["Krastorio2-spaced-out"] == nil
 local k2_base_profile = modern_catalogue.is_k2_base(active_mods)
 local k2so_profile = modern_catalogue.is_k2so(active_mods)
 local bob_angel_f210_profile = modern_catalogue.bob_angel_f210_profile(active_mods)

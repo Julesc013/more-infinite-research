@@ -349,6 +349,7 @@ class BobAngelF210PipelineTests(unittest.TestCase):
     def test_asset_only_mods_and_equivalent_unlocks_do_not_disable_the_combined_profile(self):
         for case in ("base", "space_age"):
             source = self.context["cases"][case]
+            baseline = self.stage(case)
             active = deepcopy(source["selection"])
             active["Krastorio2Assets"] = "2.0.0"
             active["k2so-assets"] = "2.0.0"
@@ -358,9 +359,39 @@ class BobAngelF210PipelineTests(unittest.TestCase):
             owner["effects"].append(next(deepcopy(effect) for effect in owner["effects"]
                                          if effect.get("type") == "unlock-recipe" and effect.get("recipe") == "lithium-plate"))
             lua = self.stage(case, raw=raw, mods=active)
-            emitted = _plain(lua.globals().emitted)
-            for name, expected in source["expected"].items():
-                self.assertEqual(_contract(expected), _contract(emitted[name]))
+            rows = self._rows(lua)
+            for name, expected in self._expected(case).items():
+                self.assertEqual(_contract(expected), _contract(rows[name]))
+            self.assertEqual(_plain(baseline.globals().settings_rows), _plain(lua.globals().settings_rows))
+            self.assertEqual(_plain(baseline.globals().declared_runtime), _plain(lua.globals().declared_runtime))
+
+    def test_asset_only_mods_do_not_deactivate_other_provider_profiles(self):
+        lua = LuaRuntime(unpack_returned_tuples=True)
+        lua.globals().player_root = SOURCE_ROOT.as_posix()
+        core, tech, warfare, py = lua.execute(r'''
+          package.path=player_root.."/?.lua;"..player_root.."/?/init.lua"; package.cpath=""
+          local target=require("platform.target")
+          target.id,target.factorio_version,target.minimum_base="f210","2.1","2.1.23"
+          local assets={Krastorio2Assets="2.1.0",["k2so-assets"]="1.0.7"}
+          local function copy(source)
+            local out={}; for key,value in pairs(source) do out[key]=value end
+            for key,value in pairs(assets) do out[key]=value end
+            return out
+          end
+          local core=copy({base="2.1.23",["space-age"]="2.1.23",boblibrary="3",bobores="1",bobplates="1",bobelectronics="1",bobtech="1"})
+          local tech=copy({base="2.1.23",["space-age"]="2.1.23",boblibrary="3",bobores="1",bobplates="1",bobelectronics="1",bobtech="1",
+            angelsrefining="1",angelsrefininggraphics="1",angelspetrochem="1",angelspetrochemgraphics="1",angelssmelting="1",angelssmeltinggraphics="1"})
+          local warfare=copy({bobwarfare="1"})
+          local py=copy({pycoalprocessing="1",pyalienlife="1",pyhightech="1"})
+          return require("compatibility.bob_core_profile").applies(core),
+            require("compatibility.bob_tech_profile").applies(tech),
+            require("compatibility.bob_warfare_profile").applies(warfare),
+            require("compatibility.py_profile").select(py)
+        ''')
+        self.assertTrue(core)
+        self.assertTrue(tech)
+        self.assertTrue(warfare)
+        self.assertEqual({"coal": False, "hightech": True}, _plain(py))
 
     def test_native_steel_preserves_foreign_unlocks_that_share_recipe_names(self):
         raw = deepcopy(self.context["cases"]["space_age"]["raw"])

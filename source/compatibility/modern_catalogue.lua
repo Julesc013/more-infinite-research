@@ -402,7 +402,7 @@ end
 -- named recipe and icon source are preflighted at data stage instead.
 function M.is_k2_base(active_mods)
   if type(active_mods) ~= "table"
-      or active_mods["Krastorio2-spaced-out"] ~= nil or active_mods["k2so-assets"] ~= nil then
+      or active_mods["Krastorio2-spaced-out"] ~= nil then
     return false
   end
   if target.id == "f200" then
@@ -418,7 +418,7 @@ end
 function M.is_space_exploration(active_mods)
   return target.id == "f210" and type(active_mods) == "table"
     and active_mods["space-exploration"] ~= nil and not active_space_age(active_mods)
-    and active_mods["Krastorio2-spaced-out"] == nil and active_mods["k2so-assets"] == nil
+    and active_mods["Krastorio2-spaced-out"] == nil
 end
 
 -- Bob Logistics authors these named infinite native tails in its data stage.

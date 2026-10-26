@@ -14,7 +14,7 @@ local ANGEL = {
 }
 
 local UNSUPPORTED = {
-  "Krastorio2", "Krastorio2Assets", "Krastorio2-spaced-out", "k2so-assets",
+  "Krastorio2", "Krastorio2-spaced-out",
   "pycoalprocessing", "pyalienlife", "pyhightech",
 }
 

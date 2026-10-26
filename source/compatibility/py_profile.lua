@@ -39,8 +39,7 @@ local function supported_base(active, hightech)
   if active["space-age"] ~= nil then
     error("MIR unsupported " .. label .. " Py saved-profile transition: Space Age changes the captured science binding", 2)
   end
-  if active.Krastorio2 ~= nil or active.Krastorio2Assets ~= nil
-      or active["Krastorio2-spaced-out"] ~= nil or active["k2so-assets"] ~= nil then
+  if active.Krastorio2 ~= nil or active["Krastorio2-spaced-out"] ~= nil then
     error("MIR unsupported " .. label .. " Py saved-profile transition: Krastorio changes the captured science binding", 2)
   end
   return true
