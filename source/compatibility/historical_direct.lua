@@ -1,4 +1,4 @@
--- Exact, reduced direct-research contracts for the seven released historical
+-- Exact, reduced direct-research contracts for the eight released historical
 -- target lines. A target body is constructed only when selected; inactive
 -- target maps are never materialised at data stage.
 local direct = require("research.native_direct_definitions")
@@ -131,6 +131,11 @@ local function f017()
     settings=selected(all), emitted=later_rows("tanks")}
 end
 
+local function f018()
+  return {id="f018", factorio_line="0.18", numeric_cost=false, scalar_icon=false, visible_when_disabled=false,
+    settings=selected(all), emitted=later_rows("tanks")}
+end
+
 local function f100()
   return {id="f100", factorio_line="1.0", numeric_cost=false, scalar_icon=false, visible_when_disabled=false,
     settings=selected(all), emitted=later_rows("tanks")}
@@ -147,6 +152,7 @@ function M.for_target(target)
   if target == "f015" then return f015() end
   if target == "f016" then return f016() end
   if target == "f017" then return f017() end
+  if target == "f018" then return f018() end
   if target == "f100" then return f100() end
   if target == "f110" then return f110() end
   error("MIR historical direct target is not supported: " .. tostring(target), 2)
