@@ -3720,7 +3720,7 @@
     {
       "id": "CONT-13",
       "category": "targets",
-      "subject": "All nine target editions and their actual delivered subsets",
+      "subject": "All normal target editions and their actual subsets, including selected F018",
       "status": "partial",
       "resolved_records": [
         {
@@ -3757,6 +3757,55 @@
             "docs/support.md"
           ],
           "scope": "Maintainer direction2026-10-25: Factorio2.1 with minimum base2.1.23 is the primary design target and has implementation/qualification scheduling priority. All nine delivered editions retain their capability subsets, common feature/settings/presentation semantics, shared source, narrow adapters and existing version encoding. Final current-package and affected native qualification remain required for every delivered target subset. This records target priority, not new native qualification."
+        },
+        {
+          "id": "f100-f110-published-reduced-boundary-readback",
+          "source": [
+            "source/adapters/reduced/control.lua",
+            "source/adapters/reduced/data.lua",
+            "source/research/historical_direct_settings.lua"
+          ],
+          "published_source": "8643cc91bc915e008556a5315dbb0a743247e7ab",
+          "comparison_source": "78289d530a4a9e52543e42c0fb65b55a39256ba8",
+          "published_inputs": [
+            {
+              "target": "f100",
+              "archive": "more-infinite-research_4.7.10003.zip",
+              "sha256": "C04F3543EBF99D2B76B2C9193EA0886381B7CDDF2F2C1610310E7961B24BE0E1",
+              "members": [
+                {
+                  "member": "more-infinite-research_4.7.10003/prototypes/mir/platform/factorio/target_profiles.lua",
+                  "sha256": "F28121BAE32DD120AE2ACB18842228046A9EF447FAA89A49E42DDDF620B03AB9"
+                },
+                {
+                  "member": "more-infinite-research_4.7.10003/prototypes/mir/stage/control.lua",
+                  "sha256": "AF3934244889FFBDA6B44A425240279D78EEDB093E1601D3C981B1FF832915B5"
+                }
+              ]
+            },
+            {
+              "target": "f110",
+              "archive": "more-infinite-research_4.7.11003.zip",
+              "sha256": "66C127D8BFC1919FA88F19D2D9B3047316A1B90401CAA05A6D05979B7A099D1E",
+              "members": [
+                {
+                  "member": "more-infinite-research_4.7.11003/prototypes/mir/platform/factorio/target_profiles.lua",
+                  "sha256": "F28121BAE32DD120AE2ACB18842228046A9EF447FAA89A49E42DDDF620B03AB9"
+                },
+                {
+                  "member": "more-infinite-research_4.7.11003/prototypes/mir/stage/control.lua",
+                  "sha256": "AF3934244889FFBDA6B44A425240279D78EEDB093E1601D3C981B1FF832915B5"
+                }
+              ]
+            }
+          ],
+          "scope": "Independent source/ZIP and host setting-name audit only, not a native result. Published F100/F110 settings stages each emit the same127 ordered regular setting names as the current historical descriptors; this observation does not assert complete default/bound parity.",
+          "findings": [
+            "Published settings_profiles, research_library, module_permissions and scripted_techs are target-gated off; physically shared files do not establish a supported runtime feature. The old control registers settings export/import and scripted runtime only under those true gates.",
+            "Neither F100 nor F110 package contained the Library or passive repair implementation selected for the modern targets. Current reduced adapters preserve that supported boundary.",
+            "The old packages have no unified more-infinite-research.api interface. Current v1 query API is additive; exact native API/client qualification remains pending."
+          ],
+          "limits": "No new gameplay, native/save/client/performance or all-target parity pass. F018 inherits the reduced implementation but still needs its own exact-engine and predecessor continuity qualification. CONT-13 remains partial."
         }
       ],
       "test_subjects": [

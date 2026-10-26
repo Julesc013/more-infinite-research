@@ -114,11 +114,19 @@ local function assert_numeric_continuation()
   end
 end
 
+local function continuation_effect(force)
+  if target.continuation_gun_speed_ammo ~= nil then
+    return force.get_gun_speed_modifier(target.continuation_gun_speed_ammo)
+  end
+  return force.stack_inserter_capacity_bonus
+end
+
 local function assert_lab_continuation(state)
   local force = game.forces.player
   local value = technology(force, target.continuation)
-  if not value.researched or not close(force.stack_inserter_capacity_bonus, state.before_stack_bonus + 1) then
-    fail("real continuation lab completion did not retain its generated inserter effect")
+  local expected_delta = target.continuation_effect_delta or 1
+  if not value.researched or not close(continuation_effect(force), state.before_continuation_effect + expected_delta) then
+    fail("real continuation lab completion did not retain its generated native effect")
   end
   local counts = capture_lab_packs(state.continuation_lab, target.continuation_science)
   for _, name in ipairs(target.continuation_science) do
@@ -207,7 +215,7 @@ local function initialize()
     phase="direct", direct_lab=direct_lab, direct_lab_initial=direct_initial,
     continuation_lab=continuation_lab, continuation_lab_initial=continuation_initial,
     before_mining=force.manual_mining_speed_modifier,
-    before_stack_bonus=force.stack_inserter_capacity_bonus, direct_finished=0, continuation_finished=0,
+    before_continuation_effect=continuation_effect(force), direct_finished=0, continuation_finished=0,
     deadline=game.tick + DEADLINE_TICKS,
   }
   power_direct_lab(global[KEY])
@@ -267,7 +275,7 @@ script.on_load(function()
     direct_finished=state.direct_finished,
     continuation_finished=state.continuation_finished,
     before_mining=state.before_mining,
-    before_stack_bonus=state.before_stack_bonus,
+    before_continuation_effect=state.before_continuation_effect,
   } or nil
   reported = false
 end)
@@ -319,7 +327,7 @@ script.on_event(defines.events.on_tick, function()
     if state.direct_finished ~= loaded.direct_finished
         or state.continuation_finished ~= loaded.continuation_finished
         or state.before_mining ~= loaded.before_mining
-        or state.before_stack_bonus ~= loaded.before_stack_bonus then
+        or state.before_continuation_effect ~= loaded.before_continuation_effect then
       fail("on_load changed durable historical research witnesses")
     end
     assert_complete(state)

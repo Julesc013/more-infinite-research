@@ -24,6 +24,8 @@ This is the authoritative product changelog. Each MIR 1–3 master release appea
 - Restore the omitted F210 Angel catalogue and native Steel coverage through explicit bindings.
 - Restore the combined Factorio 2.1 Bob/Angel breeding, material and native Steel bindings, including the published braking and laser continuation science and prerequisites.
 - Preserve Ironclad mortar shooting speed and native weapon categories when their dedicated streams are disabled or overlap removal is off.
+- Restore F210 Bob sulfur and sulfuric-acid research through the complete settings-to-publication path.
+- Add the Factorio 0.18.47 direct-effect research and legacy laser continuation using the shared historical adapter.
 - Preserve separate finite and infinite material stages, native recipe ownership and hidden Imersite migration carriers where supported.
 - Keep two historical runtime interfaces available; unconsumed developer previews do not become player APIs.
 
@@ -53,7 +55,7 @@ This is the authoritative product changelog. Each MIR 1–3 master release appea
 
 ### Info
 
-- Supply nine retained target editions from one player-source tree; additional earlier editions are best-effort GitHub distributions as their adapters become buildable.
+- Supply ten normal target editions from one player-source tree, including Factorio 0.18.47; additional earlier editions are best-effort GitHub distributions as their adapters become buildable.
 - Exact engine minimums and available features depend on the selected target; Factorio 2.1 requires base 2.1.23.
 - Use one shared master changelog for all editions; historical entries retain their original release and engine scope.
 - Offer optional fixed finite F006–F012 builds from the shared source, with readable museum research names and explicit best-effort limits; current native and save qualification is absent.

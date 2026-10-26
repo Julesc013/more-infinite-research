@@ -4,7 +4,7 @@ Read [spec/README.md](spec/README.md) and the task-specific contract. [docs/deve
 
 ## Source and architecture
 
-- `source/` is the sole canonical editable player source. Compose the nine retained editions and separately labelled best-effort historical builds from shared components and narrow capability adapters. Do not create whole-version source copies.
+- `source/` is the sole canonical editable player source. Compose the normal editions, including selected F018, and separately labelled best-effort historical builds from shared components and narrow capability adapters. Do not create whole-version source copies.
 - Use authored native technologies and the small deterministic Generator: finite local preflight, stable manifest rows and one publication. No discovery solver, fixed-point planner or recursive technology/recipe traversal. Necessary bounded recipe collection stays outside the Generator. Compatibility policy never mutates prototypes; admitted emission code alone owns generated technology mutation.
 - Preserve technology/settings/API identities, published migration filenames, original request IDs/text/decisions, license notices and complete target histories. Retain the full authored README, including badges, catalogue, settings, examples and troubleshooting.
 - Keep docs, fixtures, tests, tools, SDK, guidance, CI, build and dist outside player ZIPs. No preview or developer tool gains mutation, release or support authority merely by existing.

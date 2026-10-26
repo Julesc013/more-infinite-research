@@ -42,7 +42,8 @@ Record direct, staged, refused and unresolved routes against their exact inputs 
 | First4.7 upgrade with changed startup settings and an earned known productivity overlap | Refuse when the former preference is unknowable; use the unchanged-settings first upgrade and saved/reloaded MIR5 intermediate before a later preference/provider change. The exact4.7.2 two-step record above does not qualify every4.7.3 closure. |
 | Add/remove Space Age or a productivity provider | Require the named admitted route and separate native evidence for that closure. Preserve original saves; neither ordinary reloads nor an unrelated successful profile establishes this axis. |
 | Remove MIR/provider, save, then readd | Absence cannot execute that mod's preservation code. Do not promise reconstruction of levels/state already discarded by the engine; use an original backup or an explicitly qualified bridge. |
-| F001–F012 or F018 additions | Build/loader feasibility and native save continuity remain separately recorded best-effort obligations. No new direct-save-hop promise follows from a build. |
+| F018/0.18.47 normal edition | Recover its actual historical predecessor and shared subset, then qualify its admitted native/save route. It is a normal release obligation; an F100 test is not an F018 pass. |
+| F001–F012 additions | Build/loader feasibility and native save continuity remain separately recorded best-effort obligations. No direct-save-hop promise follows from a build. |
 
 For a refused or unqualified upgrade, retain the original save and its matching archives/settings, test only a copy, and use a named qualified intermediate route when one exists. Do not recommend a downgrade or a remove-save-readd cycle as an inferred inverse migration.
 
