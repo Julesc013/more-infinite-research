@@ -39,6 +39,7 @@ $controls = @(
   [ordered]@{path='tests/test_override_interactions_fixture.py';lua=$true},
   [ordered]@{path='tests/test_armor_py_catalogue.py';lua=$true},
   [ordered]@{path='tests/test_bob_warfare_f210_pipeline.py';lua=$true},
+  [ordered]@{path='tests/test_bob_productivity_f210_pipeline.py';lua=$true},
   [ordered]@{path='tests/test_py_f210_catalogue.py';lua=$true},
   [ordered]@{path='tests/test_py_f210_pipeline.py';lua=$true},
   [ordered]@{path='tests/test_native_modded_continuations.py';lua=$true},
