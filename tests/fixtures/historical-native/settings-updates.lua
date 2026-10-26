@@ -5,10 +5,10 @@ local target = require("target")
 if target.id == "f013" or target.id == "f014" then return end
 
 -- The additive historical all-policy fixture uses the shipped startup setting
--- only for the three Base lines whose initial red recipe is independently
+-- only for the four Base lines whose initial red recipe is independently
 -- preflighted below. The ordinary historical fixture retains Defaults.
 if target.science_policy ~= nil then
-  assert(target.science_policy == "all" and (target.id == "f017" or target.id == "f100" or target.id == "f110"),
+  assert(target.science_policy == "all" and (target.id == "f017" or target.id == "f018" or target.id == "f100" or target.id == "f110"),
     "historical all science target differs")
   local policy = assert(data.raw["string-setting"]["mir-science-pack-ingredient-policy"],
     "historical all science setting is absent")
