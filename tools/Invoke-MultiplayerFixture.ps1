@@ -63,6 +63,15 @@ function Assert-MultiplayerFixtureSelection {
       optional_archives=@('more-infinite-research_5.0.21000.zip','mir-fixture-mir5-library-multiplayer_0.1.0.zip')
     }
     [ordered]@{
+      fixture_case='library-multiplayer';target='f210-standalone'
+      kind='mir5-library-multiplayer-standalone-f210-native-selection';factorio_line='2.1';base='2.1.23'
+      engine_sha256='8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38';mir='5.0.21000';build_version=87750
+      observer_sha256='A15A7D628D66953D2E0C4D4FA288F47CBF9C5678327C7EB3D23ADB5DC78331C0'
+      fixture_mods=@('mir-fixture-mir5-library-multiplayer@0.1.0')
+      optional_archives=@('more-infinite-research_5.0.21000.zip','mir-fixture-mir5-library-multiplayer_0.1.0.zip')
+      standalone_f210=$true
+    }
+    [ordered]@{
       fixture_case='library-multiplayer';target='standalone-identity-discovery'
       kind='mir5-library-standalone-identity-discovery-f210-selection';factorio_line='2.1';base='2.1.23'
       engine_sha256='8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38';mir='5.0.21000';build_version=87750
@@ -368,6 +377,7 @@ $templateProfile=(Resolve-Path -LiteralPath $ProfilePath).Path
 $profile=$templateProfile
 $selection=Get-Content -LiteralPath $profile -Raw|ConvertFrom-Json -AsHashtable
 $discoveryFixture=$null;$discoveryInstall=$null;$fixtureSourcesForRun=@($FixtureSources)
+$standaloneObserver=$null
 if($StandaloneIdentityDiscovery){
   # The checked-in functional profile is a template only.  The actual
   # environmental packet is assembled below from the standalone engine, C563,
@@ -395,6 +405,16 @@ if($StandaloneIdentityDiscovery){
   [IO.File]::WriteAllText($profile,($selection|ConvertTo-Json -Depth 8)+[Environment]::NewLine,[Text.UTF8Encoding]::new($false))
 }
 $target=Assert-MultiplayerFixtureSelection -Selection $selection -EngineSha256 (Get-FileHash -LiteralPath $engine).Hash -FixtureCase $FixtureCase -StandaloneIdentityDiscovery:$StandaloneIdentityDiscovery
+$standaloneF210=($target.PSObject.Properties['standalone_f210'] -and $target.standalone_f210 -eq $true)
+if($standaloneF210){
+  # The normal standalone route keeps the original 0.1.0 Library fixture and
+  # ordinary client lifecycle.  Its qualified A15 observer ZIP is a strict
+  # two-member projection of the same canonical source, not a second 2E1 ZIP.
+  $standaloneObserver=New-StandaloneIdentityObserverSourceProjection -RepoRoot $repo -ArchiveLibrary $library -OutputRoot $output -ExpectedArchiveSha256 ([string]$target.observer_sha256)
+  $canonicalLibrary=Join-Path $repo 'tests/fixtures/library-multiplayer'
+  $fixtureSourcesForRun=Get-StandaloneIdentityFixtureSources -Sources $FixtureSources -LibraryFixtureSource $canonicalLibrary -StagedLibraryFixtureSource $canonicalLibrary -StagedObserverSource $standaloneObserver.source -RepoRoot $repo
+}
+$standaloneClientNames=($StandaloneIdentityDiscovery -or $standaloneF210)
 Assert-Session ($FixtureCase -ceq 'library-multiplayer' -or $SessionExpectedPeakMemoryMiB -eq 8192) 'only the functional Library session may use the calibrated peak override'
 Assert-Session (-not $StandaloneIdentityDiscovery -or ($FixtureCase -ceq 'library-multiplayer' -and $SessionExpectedPeakMemoryMiB -eq 7168 -and -not $CollectProcessMemoryObservations)) 'standalone identity discovery differs from its bounded Library-only contract'
 Assert-Session (-not $StandaloneIdentityDiscovery -or $ExpectedMIRArchiveSha256.ToUpperInvariant() -ceq [string]$target.mir_archive_sha256) 'standalone identity discovery MIR archive differs'
@@ -408,6 +428,7 @@ $record=[ordered]@{
   engine=$prepared.engine;profile=$prepared.profile;fixtures=$prepared.fixtures;mir_archive=$prepared.mir_archive
   preparation=$prepared;session_expected_peak_memory_mib=$SessionExpectedPeakMemoryMiB;release_qualification=$false;visual_review=$false
   standalone_identity_discovery=if($StandaloneIdentityDiscovery){[ordered]@{fixture_source=$discoveryFixture.source;fixture_archive_sha256=[string]$selection.archive_sha256['mir-fixture-mir5-library-multiplayer_0.1.1.zip'];observer_source=$discoveryObserver.source;observer_canonical_source=$discoveryObserver.canonical_source;observer_archive_sha256=$discoveryObserver.sha256;observer_members=$discoveryObserver.members;observer_alternate_metadata=$discoveryObserver.alternate_metadata;environmental_only=$true}}else{$null}
+  standalone_f210=if($standaloneF210){[ordered]@{observer_source=$standaloneObserver.source;observer_canonical_source=$standaloneObserver.canonical_source;observer_archive_sha256=$standaloneObserver.sha256;observer_members=$standaloneObserver.members;observer_alternate_metadata=$standaloneObserver.alternate_metadata;steam_identity=$false}}else{$null}
   harness_sha256=(Get-FileHash -LiteralPath $PSCommandPath -Algorithm SHA256).Hash
 }
 try {
@@ -452,7 +473,7 @@ try {
     New-MIRDirectLibraryStartupConfig -Path $config -EngineDataDirectory $engineData -WriteDataDirectory $write -Graphics
     $text=[IO.File]::ReadAllText($config).Replace('locale=en',('locale='+$locale))
     [IO.File]::WriteAllText($config,$text,[Text.UTF8Encoding]::new($false))
-    $name=if($StandaloneIdentityDiscovery){'standalone-'+$locale}elseif($locale -ceq 'en'){'MIR5English'}else{'MIR5Deutsch'}
+    $name=if($standaloneClientNames){'standalone-'+$locale}elseif($locale -ceq 'en'){'MIR5English'}else{'MIR5Deutsch'}
     # Isolated disposable identities contain no online token or personal data.
     # Discovery still needs the same bounded synthetic name for the server's
     # actual join marker; only its token and write-data remain isolated.
@@ -510,7 +531,7 @@ try {
   $pwsh=(Get-Command pwsh -ErrorAction Stop).Source
   $sessionArguments=@('-NoLogo','-NoProfile','-File',(Join-Path $PSScriptRoot 'Invoke-MultiplayerSession.ps1'),'-SpecPath',$specPath)
   $processArguments=@{Context=$resources;FilePath=$pwsh;Arguments=$sessionArguments;TimeoutSeconds=$(if($StandaloneIdentityDiscovery){220}else{1000})}
-  if(-not $StandaloneIdentityDiscovery){$processArguments.FactorioSteamIdentity=$true}
+  if(-not $StandaloneIdentityDiscovery -and -not $standaloneF210){$processArguments.FactorioSteamIdentity=$true}
   $record.process=Invoke-MIRNativeProbeProcess @processArguments
   $session=Get-Content -LiteralPath (Join-Path $resources.root 'session.json') -Raw|ConvertFrom-Json
   Assert-Session ($session.status -ceq $(if($StandaloneIdentityDiscovery){'passed-private-standalone-identity-discovery'}else{'passed-private-two-client-session'})) 'native client session did not pass'
