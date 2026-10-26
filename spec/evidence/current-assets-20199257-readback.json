@@ -281,6 +281,43 @@
       ]
     }
   },
+  "independent_aero_rebuild": {
+    "original_readback_sha256": "7BB27A2A16EE0D728F6ED0686D3E028CFFC1CAE13885ECA35E309D5354477039",
+    "source": {
+      "commit": "20199257df89dc0fb76e7c86478d7a906def14e3",
+      "source_tree": "2a8972193520001cb559962e5675309d5fda523c"
+    },
+    "controller_and_runtime_match_original_record": true,
+    "release_verify": "passed",
+    "output": {
+      "normal_archives": 10,
+      "best_effort_early_archives": 7,
+      "checksum_files": 2,
+      "total_files": 20,
+      "total_bytes": 5381991,
+      "inventory_sha256": "FA16D705DA797C2BCCB2A8D033D7D1F203CD7E0D5F1BE6DBAA470FE963D61B6B",
+      "primary_custody": "build/mir5/assets/20199257-r01",
+      "all_recorded_bytes_and_hashes_match": true
+    },
+    "claims": {
+      "independent_rebuild": true,
+      "primary_copy_hash_readback": true,
+      "native_qualification": false,
+      "gameplay_qualification": false,
+      "migration_qualification": false,
+      "client_qualification": false,
+      "performance_qualification": false,
+      "release_qualification": false
+    },
+    "independent_member_inspection": {
+      "archives": 17,
+      "root_info_filename_and_current_changelog_version_match": true,
+      "duplicate_or_private_developer_members": false,
+      "normal_member_differences_match_original_record": true,
+      "best_effort_early_changes": "changelog-only-in-all-seven",
+      "native_qualification": false
+    }
+  },
   "limits": [
     "Offline composition and byte verification only; no native, gameplay, migration, client, timing, memory or release acceptance follows.",
     "F018 is a newly selected normal edition. Its engine, predecessor and forward-save qualification remain open.",
