@@ -14,6 +14,8 @@ EARLY_TARGET_RECORD = "targets/early-editions.json"
 REQUIRE = re.compile(r'''\brequire\s*\(\s*["']([^"']+)["']\s*\)''')
 ENTRYPOINTS = ("data.lua", "settings.lua", "data-final-fixes.lua", "control.lua")
 F210_ONLY_MIGRATION = "migrations/more-infinite-research_4.7.0.json"
+F110_PLUS_MIGRATION = "migrations/more-infinite-research_5.0.11000.json"
+F110_PLUS_MIGRATION_TARGETS = frozenset({"f110", "f200", "f210"})
 EARLY_TARGET_IDS = frozenset({"f006", "f007", "f008", "f009", "f010", "f011", "f012"})
 EARLY_LOCALE_SOURCE = "adapters/early/locale/en/more-infinite-research.cfg"
 EARLY_LOCALE_OUTPUT = "locale/en/more-infinite-research.cfg"
@@ -328,6 +330,11 @@ def members(source, version=None, committed_files=None, target=None, editions=No
         # player package without narrowing generic fixture archives.
         if selected_record != EARLY_TARGET_RECORD and target != "f210":
             committed_files.pop(F210_ONLY_MIGRATION, None)
+        # F018/F100 retain the legacy laser continuation identity.  The
+        # canonical rename starts at F110 and remains in later normal targets;
+        # early packages are data-only and have no migration members.
+        if selected_record != EARLY_TARGET_RECORD and target not in F110_PLUS_MIGRATION_TARGETS:
+            committed_files.pop(F110_PLUS_MIGRATION, None)
     elif "changelog.txt" in committed_files:
         encoded = info["version"].rsplit(".", 1)[-1]
         if not re.fullmatch(r"[0-9]{5}", encoded):
