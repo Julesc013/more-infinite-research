@@ -195,7 +195,13 @@ class LibraryPairedBrowserFixtureTests(unittest.TestCase):
               defines={events={on_player_joined_game=1,on_tick=2}},
               settings={startup={["mir5-library-paired-browser-arm"]={value=arm}}},
               storage={},
-              helpers={table_to_json=function(row) markers[#markers+1]=row; return "fixture-marker" end},
+              helpers={
+                table_to_json=function(row) markers[#markers+1]=row; return "fixture-marker" end,
+                create_profiler=function(stopped)
+                  if stopped ~= true then error("helpers.create_profiler must receive true") end
+                  return {restart=function() end, stop=function() end}
+                end
+              },
               remote={interfaces={["more-infinite-research-browser"]={open=true}}},
               log=function(value)
                 if type(value) == "table" and value[2] == "[MIR5_LIBRARY_PROFILE] " then
@@ -219,12 +225,12 @@ class LibraryPairedBrowserFixtureTests(unittest.TestCase):
             end
             env.game={
               players=players, tick=0,
-              create_profiler=function()
-                return {restart=function() end, stop=function() end}
-              end,
               take_screenshot=function(row) screenshots[#screenshots+1]=row end,
               server_save=function(name) saves[#saves+1]=name end
             }
+            setmetatable(env.game,{__index=function(_, key)
+              if key == "create_profiler" then error("removed game.create_profiler API was accessed") end
+            end})
             env._G=env
             setmetatable(env,{__index=function(_, key) return _G[key] end})
             local function invoke(callback, event)
@@ -501,6 +507,15 @@ class LibraryPairedBrowserFixtureTests(unittest.TestCase):
                         marker = f"{profile_reader.MARKER}{action} {rendered}"
                         parsed, _ = profile_reader._parse_marker(role, marker)
                         self.assertEqual(parsed, action)
+
+    def test_profiler_uses_helpers_and_never_the_removed_game_member(self):
+        source = CONTROL.read_text(encoding="utf-8")
+        self.assertIn("helpers.create_profiler(true)", source)
+        self.assertNotIn("game.create_profiler", source)
+        for arm in ARMS:
+            with self.subTest(arm=arm):
+                result = self.runtime_result(arm)
+                self.assertTrue(result["ok"], result["message"])
 
     def test_native_locale_may_settle_after_initial_and_cold_restart_joins(self):
         for arm in ARMS:
