@@ -27,9 +27,14 @@ def _sha256(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest().upper()
 
 
-def _git_blob_sha256(relative: str) -> str:
-    data = subprocess.check_output(["git", "-C", str(ROOT), "show", "HEAD:" + relative], stderr=subprocess.PIPE)
-    return hashlib.sha256(data).hexdigest().upper()
+def _captured_f210_profile(relative: str, expected_sha256: str) -> bytes:
+    # These native captures belong to the immutable 5c51 input selection.
+    # Current profiles may legitimately rebind their observer/package inputs.
+    revision = "5c51ed46d1762b4fca7480f05a057482bbbedb0a"
+    data = subprocess.check_output(["git", "-C", str(ROOT), "show", revision + ":" + relative], stderr=subprocess.PIPE)
+    if hashlib.sha256(data).hexdigest().upper() != expected_sha256:
+        raise AssertionError(f"captured F210 K2 profile changed: {revision}:{relative}")
+    return data
 
 
 def _lua_value(lua, value):
@@ -87,10 +92,8 @@ class K2BaseCatalogueTests(unittest.TestCase):
                 "sha256": "FE4A1DA30F322A0D0B8AEB3DF7276332222BAAA143E2352569B723E84B2B9060"}:
             raise AssertionError("F210 K2 facts have an unexpected engine identity")
         for case in cls.f210_facts["cases"]:
-            profile = reference_path(case["profile"])
-            if _git_blob_sha256(case["profile"]) != case["profile_sha256"]:
-                raise AssertionError(f"hash-locked F210 K2 input changed: {profile}")
-            selected = {row["name"]: row["version"] for row in json.loads(profile.read_text(encoding="utf-8"))["mods"]
+            profile_bytes = _captured_f210_profile(case["profile"], case["profile_sha256"])
+            selected = {row["name"]: row["version"] for row in json.loads(profile_bytes)["mods"]
                         if row["enabled"]}
             for name, version in case["mods"].items():
                 if selected.get(name) != version:

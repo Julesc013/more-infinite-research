@@ -30,6 +30,8 @@ jobs:
           if ($LASTEXITCODE -ne 0) { throw 'Exact published historical oracle fetch failed.' }
           git fetch --no-tags --depth=1 origin 8643cc91bc915e008556a5315dbb0a743247e7ab
           if ($LASTEXITCODE -ne 0) { throw 'Exact published 4.7.3 repair-source fetch failed.' }
+          git fetch --no-tags --depth=1 origin 5c51ed46d1762b4fca7480f05a057482bbbedb0a
+          if ($LASTEXITCODE -ne 0) { throw 'Exact captured F210 K2 profile-source fetch failed.' }
       - id: bind
         name: Bind the exact ordered host-control plan
         shell: pwsh
@@ -101,6 +103,8 @@ jobs:
           if ($LASTEXITCODE -ne 0) { throw 'Exact published historical oracle fetch failed.' }
           git fetch --no-tags --depth=1 origin 8643cc91bc915e008556a5315dbb0a743247e7ab
           if ($LASTEXITCODE -ne 0) { throw 'Exact published 4.7.3 repair-source fetch failed.' }
+          git fetch --no-tags --depth=1 origin 5c51ed46d1762b4fca7480f05a057482bbbedb0a
+          if ($LASTEXITCODE -ne 0) { throw 'Exact captured F210 K2 profile-source fetch failed.' }
       - name: Restore the bound host-control plan
         uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
         with:
