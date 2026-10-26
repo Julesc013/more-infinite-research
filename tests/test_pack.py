@@ -107,6 +107,7 @@ class PackTests(unittest.TestCase):
                 "compatibility/bob_tech_profile.lua",
                 "compatibility/bob_core_profile.lua",
                 "compatibility/bob_plates_profile.lua",
+                "compatibility/bob_productivity.lua",
                 "research/bob_plates_materials.lua",
                 "research/bob_core_materials.lua",
                 "compatibility/bob_warfare_profile.lua",
