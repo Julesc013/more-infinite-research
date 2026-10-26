@@ -323,7 +323,8 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
               if force.current_research then fire(4,{research=force.current_research,last_research=current}) end
               return true
             end
-            local active_mods={base=base_version,["more-infinite-research"]=mir_version,["mir-fixture-mir5-library-multiplayer"]="0.1.0",["mir-fixture-mir5-active-mods-observer"]="0.1.0"}
+            local discovery=opponent=="standalone-identity-discovery"
+            local active_mods={base=base_version,["more-infinite-research"]=mir_version,["mir-fixture-mir5-library-multiplayer"]=(discovery and "0.1.1" or "0.1.0"),["mir-fixture-mir5-active-mods-observer"]="0.1.0"}
             if opponent=="f210-api-consumers" then
               active_mods["mir-fixture-mir5-api-alpha"]="0.1.0"
               active_mods["mir-fixture-mir5-api-beta"]="0.1.0"
@@ -346,6 +347,7 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
               defines={events={on_tick=1,on_player_joined_game=2,on_player_locale_changed=3,on_research_started=4,
                 on_research_finished=6,on_research_cancelled=7,on_force_created=8},inventory={lab_input=1}},
               game=game,storage=storage,remote=remote,
+              settings={startup={ ["mir5-library-standalone-identity-discovery"]={value=discovery} }},
               helpers={table_to_json=function(value)
                 if value.science_counts then lab_diagnostics[#lab_diagnostics+1]=value
                 else markers[#markers+1]=value end
@@ -362,6 +364,7 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
                   assert(value:match("^%[MIR5_LIBRARY_MULTIPLAYER%] RESULT ")
                     or value:match("^%[MIR5_LIBRARY_MULTIPLAYER_JOIN%] ")
                     or value:match("^%[MIR5_LIBRARY_MULTIPLAYER_LOCALE%] ")
+                    or value:match("^%[MIR5_LIBRARY_STANDALONE_IDENTITY%] ")
                     or value:match("^%[MIR5_LIBRARY_LAB_DIAGNOSTIC%] "))
                 end
               end,
@@ -393,6 +396,12 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
             end
             game.tick=game.tick+120
             ok,result=call(callbacks.events[1]);if not ok then return {ok=false,message=result} end
+            if discovery then
+              if storage[key].phase~="standalone-identity-discovery-complete" then
+                return {ok=false,message="identity discovery did not stop after the pair predicate"}
+              end
+              return {ok=true,phase=storage[key].phase,markers=markers,screenshots=screenshots,open_calls=open_calls}
+            end
             if storage[key].phase~="capturing-availability" then return {ok=false,message="Availability capture did not retain the terminal view"} end
             game.tick=game.tick+59
             ok,result=call(callbacks.events[1]);if not ok then return {ok=false,message=result} end
@@ -657,6 +666,166 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
         wrong_base = self.run_case("unsupported-target-base", target="f210")
         self.assertFalse(wrong_base["ok"])
         self.assertIn("unsupported native Library target base", wrong_base["message"])
+
+    def test_standalone_identity_discovery_selection_is_opt_in_and_exactly_bound(self):
+        selection = {
+            "schema": 1,
+            "kind": "mir5-library-standalone-identity-discovery-f210-selection",
+            "target": "standalone-identity-discovery",
+            "factorio_line": "2.1",
+            "settings_mode": "Defaults",
+            "engine": {
+                "version": "2.1.23",
+                "sha256": "8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38",
+            },
+            "mods": [
+                {"name": "base", "version": "2.1.23", "enabled": True},
+                {"name": "mir-fixture-mir5-active-mods-observer", "version": "0.1.0", "enabled": True},
+                {"name": "more-infinite-research", "version": "5.0.21000", "enabled": True},
+                {"name": "mir-fixture-mir5-library-multiplayer", "version": "0.1.1", "enabled": True},
+            ],
+            "archive_sha256": {
+                "mir-fixture-mir5-active-mods-observer_0.1.0.zip": "A15A7D628D66953D2E0C4D4FA288F47CBF9C5678327C7EB3D23ADB5DC78331C0",
+                "more-infinite-research_5.0.21000.zip": "C563CB5B96C9E64CB3373BDB60CF5C8B7D3C97E93EADB8F924443C703CDC024D",
+                "mir-fixture-mir5-library-multiplayer_0.1.1.zip": "F" * 64,
+            },
+        }
+        script = r'''
+          $ErrorActionPreference='Stop'; Set-StrictMode -Version Latest
+          $tokens=$null;$errors=$null
+          $ast=[Management.Automation.Language.Parser]::ParseFile($env:MIR_TEST_WRAPPER,[ref]$tokens,[ref]$errors)
+          if($errors.Count){throw $errors[0].Message}
+          function Assert-Session([bool]$Condition,[string]$Message){if(-not $Condition){throw $Message}}
+          $node=@($ast.FindAll({param($candidate) $candidate -is [Management.Automation.Language.FunctionDefinitionAst] -and $candidate.Name -ceq 'Assert-MultiplayerFixtureSelection'},$true))
+          if($node.Count-ne1){throw 'discovery selection function is absent or ambiguous'}
+          Invoke-Expression $node[0].Extent.Text
+          function Read-Discovery {Get-Content -LiteralPath $env:MIR_TEST_DISCOVERY_PROFILE -Raw|ConvertFrom-Json -AsHashtable}
+          $engine='8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38'
+          $selected=Assert-MultiplayerFixtureSelection -Selection (Read-Discovery) -EngineSha256 $engine -FixtureCase 'library-multiplayer' -StandaloneIdentityDiscovery
+          if($selected.target-cne'standalone-identity-discovery' -or $selected.observer_sha256-cne'A15A7D628D66953D2E0C4D4FA288F47CBF9C5678327C7EB3D23ADB5DC78331C0'){throw 'discovery target differs'}
+          function Assert-Rejected([string]$Name,[switch]$WithoutFlag,[scriptblock]$Mutate){
+            $candidate=Read-Discovery;&$Mutate $candidate
+            try{
+              if($WithoutFlag){$null=Assert-MultiplayerFixtureSelection -Selection $candidate -EngineSha256 $engine -FixtureCase 'library-multiplayer'}
+              else{$null=Assert-MultiplayerFixtureSelection -Selection $candidate -EngineSha256 $engine -FixtureCase 'library-multiplayer' -StandaloneIdentityDiscovery}
+            }catch{return}
+            throw "discovery selection accepted opponent: $Name"
+          }
+          Assert-Rejected 'default-route-isolation' -WithoutFlag {}
+          Assert-Rejected 'wrong-engine' {$args[0]['engine']['sha256']='A'*64}
+          Assert-Rejected 'wrong-mir-archive' {$args[0]['archive_sha256']['more-infinite-research_5.0.21000.zip']='A'*64}
+          Assert-Rejected 'wrong-observer' {$args[0]['archive_sha256']['mir-fixture-mir5-active-mods-observer_0.1.0.zip']='A'*64}
+          Assert-Rejected 'missing-fixture-archive' {$args[0]['archive_sha256'].Remove('mir-fixture-mir5-library-multiplayer_0.1.1.zip')}
+          Assert-Rejected 'wrong-fixture-version' {$args[0]['mods'][3]['version']='0.1.0'}
+        '''
+        with tempfile.TemporaryDirectory(prefix="mir5-standalone-identity-") as work:
+            profile = Path(work) / "selection.json"
+            profile.write_text(json.dumps(selection), encoding="utf-8")
+            result = subprocess.run(
+                ["pwsh", "-NoLogo", "-NoProfile", "-Command", script],
+                capture_output=True, text=True,
+                env=dict(os.environ, MIR_TEST_WRAPPER=str(WRAPPER), MIR_TEST_DISCOVERY_PROFILE=str(profile)),
+                check=False,
+            )
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+
+    def test_standalone_identity_fixture_stage_enables_only_its_hash_bound_hidden_setting(self):
+        script = r'''
+          $ErrorActionPreference='Stop'; Set-StrictMode -Version Latest
+          $tokens=$null;$errors=$null
+          $ast=[Management.Automation.Language.Parser]::ParseFile($env:MIR_TEST_WRAPPER,[ref]$tokens,[ref]$errors)
+          if($errors.Count){throw $errors[0].Message}
+          function Assert-Session([bool]$Condition,[string]$Message){if(-not $Condition){throw $Message}}
+          function Assert-MIRLibraryFixtureArchive([string]$Archive,[string]$SourceDirectory){
+            if(-not(Test-Path -LiteralPath $Archive -PathType Leaf)){throw 'fixture archive is absent'}
+            $zip=[IO.Compression.ZipFile]::OpenRead($Archive)
+            try{
+              $prefix='mir-fixture-mir5-library-multiplayer_0.1.1/'
+              $required=@('info.json','control.lua','settings-updates.lua','README.md')
+              foreach($name in $required){if($null-eq$zip.GetEntry($prefix+$name)){throw "fixture archive member absent: $name"}}
+            }finally{$zip.Dispose()}
+          }
+          foreach($name in @('Assert-StandaloneIdentityFixtureSource','New-StandaloneIdentityFixtureStage')){
+            $node=@($ast.FindAll({param($candidate) $candidate -is [Management.Automation.Language.FunctionDefinitionAst] -and $candidate.Name -ceq $name},$true))
+            if($node.Count-ne1){throw "staging function is absent or ambiguous: $name"}
+            Invoke-Expression $node[0].Extent.Text
+          }
+          $stage=New-StandaloneIdentityFixtureStage -Sources @($env:MIR_TEST_LIBRARY_FIXTURE) -OutputRoot $env:MIR_TEST_STAGE_ROOT
+          $info=Get-Content -LiteralPath (Join-Path $stage.source 'info.json') -Raw|ConvertFrom-Json -AsHashtable
+          $settings=Get-Content -LiteralPath (Join-Path $stage.source 'settings-updates.lua') -Raw
+          if($info.version-cne'0.1.1' -or $info.factorio_version-cne'2.1' -or $settings-notmatch'(?s)mir5-library-standalone-identity-discovery.*?default_value\s*=\s*true'){throw 'staged fixture does not bind the discovery-only setting'}
+          if((Get-FileHash -LiteralPath $stage.archive -Algorithm SHA256).Hash.ToUpperInvariant()-cne$stage.sha256){throw 'staged fixture archive hash differs'}
+        '''
+        with tempfile.TemporaryDirectory(prefix="mir5-identity-stage-") as work:
+            result = subprocess.run(
+                ["pwsh", "-NoLogo", "-NoProfile", "-Command", script],
+                capture_output=True, text=True,
+                env=dict(os.environ, MIR_TEST_WRAPPER=str(WRAPPER), MIR_TEST_LIBRARY_FIXTURE=str(FIXTURE),
+                         MIR_TEST_STAGE_ROOT=str(Path(work) / "output")),
+                check=False,
+            )
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+
+    def test_standalone_identity_discovery_stops_after_the_real_pair_before_gui_work(self):
+        result = self.run_case("standalone-identity-discovery", target="f210")
+        self.assertTrue(result["ok"], result.get("message"))
+        self.assertEqual(result["phase"], "standalone-identity-discovery-complete")
+        self.assertFalse(result["screenshots"])
+        self.assertEqual(result["open_calls"], 0)
+        self.assertEqual(len(result["markers"]), 2)
+        marker = next(item for item in result["markers"] if item["stage"] == "identity-discovery")
+        self.assertEqual(marker["stage"], "identity-discovery")
+        self.assertEqual(marker["status"], "passed")
+        self.assertEqual(marker["ticks_after_last_join"], 120)
+        self.assertTrue(marker["stop_before_initial_gui"])
+        self.assertEqual(marker["screenshot_calls"], 0)
+        self.assertEqual(
+            [(item["index"], item["locale"], item["force_index"]) for item in marker["players"]],
+            [(1, "en", 1), (2, "de", 1)],
+        )
+        self.assertEqual(len({item["name"] for item in marker["players"]}), 2)
+
+    def test_standalone_identity_discovery_reader_requires_the_real_pair_and_zero_gui_work(self):
+        script = r'''
+          $ErrorActionPreference='Stop'; Set-StrictMode -Version Latest
+          $tokens=$null;$errors=$null
+          $ast=[Management.Automation.Language.Parser]::ParseFile($env:MIR_TEST_SESSION,[ref]$tokens,[ref]$errors)
+          if($errors.Count){throw $errors[0].Message}
+          function Assert-Session([bool]$Condition,[string]$Message){if(-not $Condition){throw $Message}}
+          foreach($name in @('Test-LibraryInteger','Get-StandaloneIdentityDiscoveryMarker')){
+            $node=@($ast.FindAll({param($candidate) $candidate -is [Management.Automation.Language.FunctionDefinitionAst] -and $candidate.Name -ceq $name},$true))
+            if($node.Count-ne1){throw "identity discovery reader is absent or ambiguous: $name"}
+            Invoke-Expression $node[0].Extent.Text
+          }
+          function New-Marker {
+            [ordered]@{case='library-multiplayer';stage='identity-discovery';status='passed';ticks_after_last_join=120
+              two_connected_clients_required=$true;distinct_personal_query_and_selection=$true;stop_before_initial_gui=$true
+              shared_force_index=1;screenshot_calls=0;players=@(
+                [ordered]@{index=1;name='ActualEnglish';locale='en';force_index=1},
+                [ordered]@{index=2;name='ActualDeutsch';locale='de';force_index=1}
+              )}
+          }
+          $line='[MIR5_LIBRARY_STANDALONE_IDENTITY] '+((New-Marker)|ConvertTo-Json -Depth 8 -Compress)
+          $accepted=Get-StandaloneIdentityDiscoveryMarker $line
+          if($accepted.players.Count-ne2 -or $accepted.screenshot_calls-ne0){throw 'identity marker lost accepted bounded facts'}
+          foreach($mutate in @(
+            {param($row)$row.screenshot_calls=1},
+            {param($row)$row.players[1].force_index=2},
+            {param($row)$row.players[1].name=$row.players[0].name},
+            {param($row)$row.stop_before_initial_gui=$false}
+          )){
+            $row=New-Marker;&$mutate $row
+            $candidate='[MIR5_LIBRARY_STANDALONE_IDENTITY] '+($row|ConvertTo-Json -Depth 8 -Compress)
+            $rejected=$false;try{$null=Get-StandaloneIdentityDiscoveryMarker $candidate}catch{$rejected=$true}
+            if(-not$rejected){throw 'identity marker accepted a discovery opponent'}
+          }
+        '''
+        result = subprocess.run(
+            ["pwsh", "-NoLogo", "-NoProfile", "-Command", script],
+            capture_output=True, text=True,
+            env=dict(os.environ, MIR_TEST_SESSION=str(SESSION)), check=False,
+        )
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
 
     def test_f210_api_consumer_closure_requires_both_exact_independent_consumers(self):
         accepted = self.run_case("f210-api-consumers", target="f210")

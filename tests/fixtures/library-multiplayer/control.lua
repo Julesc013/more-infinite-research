@@ -509,6 +509,31 @@ local function pair(state, expected_joins)
   return by_locale.en, by_locale.de
 end
 
+local function standalone_identity_discovery()
+  local setting = settings.startup["mir5-library-standalone-identity-discovery"]
+  return setting ~= nil and setting.value == true
+end
+
+local function record_standalone_identity_discovery(state, english, german)
+  local latest_join = math.max(state.clients[english.index].join_tick, state.clients[german.index].join_tick)
+  log("[MIR5_LIBRARY_STANDALONE_IDENTITY] " .. helpers.table_to_json({
+    case = CASE,
+    stage = "identity-discovery",
+    status = "passed",
+    ticks_after_last_join = game.tick - latest_join,
+    two_connected_clients_required = true,
+    distinct_personal_query_and_selection = true,
+    shared_force_index = state.force_index,
+    screenshot_calls = state.screenshot_calls,
+    stop_before_initial_gui = true,
+    players = {
+      {index = english.index, name = english.name, locale = english.locale, force_index = english.force.index},
+      {index = german.index, name = german.name, locale = german.locale, force_index = german.force.index},
+    },
+  }))
+  state.phase = "standalone-identity-discovery-complete"
+end
+
 local function run_initial(state, english, german)
   open_availability(english)
   open_availability(german)
@@ -699,15 +724,20 @@ local function closure()
   if target == nil then
     fail("unsupported native Library target base " .. tostring(script.active_mods.base))
   end
+  -- The ordinary qualified fixture remains 0.1.0.  The standalone identity
+  -- probe stages a separately hashed 0.1.1 copy whose only semantic delta is
+  -- its hidden startup flag; accepting either here keeps the fixture closure
+  -- explicit instead of treating a staged archive as an unbound extra mod.
+  local fixture_version = standalone_identity_discovery() and "0.1.1" or "0.1.0"
   local allowed = {base=script.active_mods.base, ["more-infinite-research"]=target.mir_version,
     ["mir-fixture-mir5-active-mods-observer"]="0.1.0",
-    ["mir-fixture-mir5-library-multiplayer"]="0.1.0"}
+    ["mir-fixture-mir5-library-multiplayer"]=fixture_version}
   local closures = {allowed}
   if target.label == "F210" then
     closures[#closures + 1] = {
       base=script.active_mods.base, ["more-infinite-research"]=target.mir_version,
       ["mir-fixture-mir5-active-mods-observer"]="0.1.0",
-      ["mir-fixture-mir5-library-multiplayer"]="0.1.0",
+      ["mir-fixture-mir5-library-multiplayer"]=fixture_version,
       ["mir-fixture-mir5-api-alpha"]="0.1.0",
       ["mir-fixture-mir5-api-beta"]="0.1.0",
     }
@@ -831,7 +861,13 @@ script.on_event(defines.events.on_tick, function()
     -- loads it, so expose readiness again without changing durable state.
     if not ready_logged then marker("ready", state);ready_logged = true end
     local english, german = pair(state, 1)
-    if english and german then run_initial(state, english, german) end
+    if english and german then
+      if standalone_identity_discovery() then
+        record_standalone_identity_discovery(state, english, german)
+        return
+      end
+      run_initial(state, english, german)
+    end
   elseif state.phase == "capturing-availability" and game.tick >= state.capture_after_tick then
     local english, german = pair(state, 1)
     if english and german then
