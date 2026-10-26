@@ -65,6 +65,12 @@ local function finite_number(value)
   return type(value) == "number" and value == value and value > -math.huge and value < math.huge
 end
 
+-- LuaStyle dimensions are int32. Retain the existing upper/lower layout
+-- bounds while making display-scale division safe for the native setters.
+local function style_pixels(value)
+  return math.max(1, math.floor(value))
+end
+
 local function valid(value)
   return value ~= nil and value.valid ~= false
 end
@@ -1238,14 +1244,14 @@ local function create_frame(player, view)
   })
   local resolution, scale = player.display_resolution, player.display_scale
   scale = type(scale) == "number" and scale > 0 and scale or 1
-  local width = math.min(1000, math.max(1, (resolution and resolution.width or 1280) / scale - 32))
-  local height = math.min(800, math.max(1, (resolution and resolution.height or 720) / scale - 32))
+  local width = style_pixels(math.min(1000, math.max(1, (resolution and resolution.width or 1280) / scale - 32)))
+  local height = style_pixels(math.min(800, math.max(1, (resolution and resolution.height or 720) / scale - 32)))
   if frame.style then
     frame.style.width, frame.style.height = width, height
     frame.style.maximal_width = width
   end
   if view.location then frame.location = view.location
-  elseif type(frame.auto_center) == "function" then frame.auto_center() end
+  elseif type(frame.force_auto_center) == "function" then frame.force_auto_center() end
 
   local pairs_per_row = width >= 800 and 2 or 1
   local filters = add(frame, {type = "table", name = PREFIX .. "filters", column_count = 2 * pairs_per_row})
@@ -1270,21 +1276,25 @@ local function create_frame(player, view)
     {"mir-browser.order-progression"}, {"mir-browser.order-native"},
     {"mir-browser.order-name-asc"}, {"mir-browser.order-name-desc"}
   }, selected_index = SORT_INDEX[view.sort] or 1})
+  local control_width = style_pixels(math.min(280, math.max(100, width / pairs_per_row - 175)))
   for _, field in ipairs({"query", "family", "visibility", "mode", "status", "sort"}) do
     local control = filters[PREFIX .. field]
-    if control.style then control.style.width = math.min(280, math.max(100, width / pairs_per_row - 175)) end
+    if control.style then control.style.width = control_width end
   end
   local tabs = add(frame, {type = "tabbed-pane", name = PREFIX .. "tabs"})
-  if tabs.style then tabs.style.maximal_width = math.max(1, width - 32) end
+  local tabs_width = style_pixels(math.max(1, width - 32))
+  if tabs.style then tabs.style.maximal_width = tabs_width end
+  local content_width = style_pixels(math.max(1, width - 48))
+  local content_height = style_pixels(math.max(1, height - (pairs_per_row == 2 and 230 or 350)))
   for _, tab_name in ipairs(TABS) do
     local tab = add(tabs, {type = "tab", name = PREFIX .. "tab_" .. tab_name,
       caption = {"mir-browser." .. (tab_name == "queue" and "queue-tab" or tab_name)}})
     local content = add(tabs, {type = "scroll-pane", name = PREFIX .. tab_name .. "_content",
       horizontal_scroll_policy = "never", vertical_scroll_policy = "auto"})
     if content.style then
-      content.style.width = math.max(1, width - 48)
-      content.style.maximal_width = math.max(1, width - 48)
-      content.style.height = math.max(1, height - (pairs_per_row == 2 and 230 or 350))
+      content.style.width = content_width
+      content.style.maximal_width = content_width
+      content.style.height = content_height
     end
     tabs.add_tab(tab, content)
   end
