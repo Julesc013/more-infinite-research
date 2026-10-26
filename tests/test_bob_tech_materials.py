@@ -446,6 +446,7 @@ class BobTechMaterialTests(unittest.TestCase):
           end
           package.preload["compatibility.modern_catalogue"] = function()
             return {is_k2_base=function() return false end, is_k2so=function() return false end,
+              retains_bob_native_continuations=function() return false end,
               select=function() return {bob_angel=false, definitions={}, continuations={}} end}
           end
           package.preload["research.modern"] = function()
