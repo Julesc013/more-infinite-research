@@ -2,6 +2,7 @@
 
 import argparse
 from copy import deepcopy
+import gzip
 import json
 from pathlib import Path
 import sys
@@ -11,6 +12,7 @@ import unittest
 ROOT = Path(__file__).resolve().parents[1]
 SOURCE_ROOT = ROOT / "source"
 CONTEXT_PATH = ROOT / "tests/fixtures/bob-productivity-f210-upstream-context.json"
+PIPELINE_CONTEXT_PATH = ROOT / "tests/fixtures/bob-warfare-f210-upstream-context.json.gz"
 F210_SHA256 = "FE4A1DA30F322A0D0B8AEB3DF7276332222BAAA143E2352569B723E84B2B9060"
 
 
@@ -43,6 +45,9 @@ class BobProductivityF210PipelineTests(unittest.TestCase):
         cls.context = json.loads(CONTEXT_PATH.read_text(encoding="utf-8"))
         if cls.context.get("schema") != "MIR5BobProductivityF210UpstreamContextV1":
             raise AssertionError("Bob productivity context schema changed")
+        cls.pipeline_context = json.loads(gzip.decompress(PIPELINE_CONTEXT_PATH.read_bytes()))
+        if cls.pipeline_context.get("schema") != "MIR5BobWarfareF210PipelineContextV1":
+            raise AssertionError("Bob productivity pipeline context schema changed")
 
     def lua(self):
         lua = LuaRuntime(unpack_returned_tuples=True)
@@ -105,6 +110,61 @@ class BobProductivityF210PipelineTests(unittest.TestCase):
         }))
         return _plain(rows_lua), expected, flags
 
+    def _pipeline_case(self, name):
+        return self.pipeline_context["cases"]["q006" if name == "space_age" else "q005"]
+
+    def _stage_pipeline(self, name, startup=None, mutate=None):
+        case = self._pipeline_case(name)
+        raw = deepcopy(case["raw"])
+        if mutate is not None:
+            mutate(raw)
+        lua = self.lua()
+        lua.globals().captured_raw = _lua_value(lua, raw)
+        lua.globals().active_mods = _lua_value(lua, deepcopy(case["selection"]))
+        lua.globals().startup_values = _lua_value(lua, startup or {})
+        lua.execute(r'''
+          mods, script, helpers, log = active_mods, nil, {}, function() end
+          settings = {startup = startup_values}
+          data = {raw = captured_raw}
+          emitted, technology_publications = {}, 0
+          function data:extend(rows)
+            local wrote_technology = false
+            for _, row in ipairs(rows) do
+              self.raw[row.type] = self.raw[row.type] or {}
+              assert(self.raw[row.type][row.name] == nil, "duplicate " .. row.type .. ":" .. row.name)
+              self.raw[row.type][row.name] = row
+              if row.type == "technology" then
+                emitted[row.name] = row
+                wrote_technology = true
+              end
+            end
+            if wrote_technology then technology_publications = technology_publications + 1 end
+          end
+          assert(loadfile(player_root .. "/settings.lua"))()
+          for _, spec in ipairs(require("research.settings").prototypes()) do
+            if settings.startup[spec.name] == nil then settings.startup[spec.name] = {value = spec.default_value} end
+          end
+          assert(loadfile(player_root .. "/data.lua"))()
+          emitted, technology_publications = {}, 0
+          outcome, message = pcall(function() assert(loadfile(player_root .. "/data-final-fixes.lua"))() end)
+        ''')
+        return lua
+
+    @staticmethod
+    def _technology_vector(row):
+        return {
+            "unit": row["unit"],
+            "prerequisites": row.get("prerequisites", []),
+            "effects": row.get("effects", []),
+        }
+
+    def _catalogue_selection(self, name):
+        case = self._pipeline_case(name)
+        lua = self.lua()
+        lua.globals().captured_raw = _lua_value(lua, deepcopy(case["raw"]))
+        lua.globals().active_mods = _lua_value(lua, deepcopy(case["selection"]))
+        return _plain(lua.execute('return require("compatibility.modern_catalogue").select(active_mods, captured_raw)'))
+
     def test_context_binds_independent_q005_q006_inputs_and_b6_oracle(self):
         self.assertEqual(F210_SHA256, self.context["scope"]["engine"]["sha256"])
         self.assertFalse(self.context["scope"]["claims"]["candidate_raw_used"])
@@ -150,6 +210,70 @@ class BobProductivityF210PipelineTests(unittest.TestCase):
                     self.assertEqual(published["effects"], observed[technology_name]["effects"])
                     self.assertNotIn("sulfur", [row["recipe"] for row in observed[technology_name]["effects"]])
                     self.assertNotIn("sulfuric-acid", [row["recipe"] for row in observed[technology_name]["effects"]])
+
+    def test_full_settings_data_final_pipeline_matches_independent_q005_q006_b6_vectors(self):
+        for name in ("base", "space_age"):
+            with self.subTest(name=name):
+                case = self.case(name)
+                pipeline = self._pipeline_case(name)
+                self.assertEqual(case["capture"]["upstream_raw_sha256"], pipeline["provenance"]["upstream"]["raw_sha256"])
+                self.assertEqual(case["capture"]["published_raw_sha256"], pipeline["provenance"]["published"]["raw_sha256"])
+                lua = self._stage_pipeline(name)
+                self.assertTrue(lua.globals().outcome, str(lua.globals().message))
+                emitted = _plain(lua.globals().emitted)
+                for technology_name, expected in case["published_rows"].items():
+                    self.assertIn(technology_name, emitted)
+                    self.assertEqual(self._technology_vector(expected), self._technology_vector(emitted[technology_name]))
+                self.assertEqual(1, lua.globals().technology_publications)
+
+                selected = self._catalogue_selection(name)
+                self.assertEqual(name.replace("_", "-"), selected["bob_productivity"])
+                self.assertTrue(selected["replacement_product_target_families"]["research_sulfur"])
+                self.assertTrue(selected["replacement_product_target_families"]["research_sulfuric_acid_productivity"])
+
+    def test_sparse_bob_angel_and_f200_boundaries_do_not_select_the_f210_replacement_profile(self):
+        lua = self.lua()
+        module = self._module(lua)
+        self.assertIsNone(module["select"](_lua_value(lua, {"base": "2.1.23", "bobplates": "3.0.2"})))
+        angel = deepcopy(self.case("base")["selection"])
+        angel["angelssmelting"] = "2.1.1"
+        self.assertIsNone(module["select"](_lua_value(lua, angel)))
+
+        lua.execute('local target = require("platform.target"); target.id, target.factorio_version, target.minimum_base = "f200", "2.0", "2.0.77"')
+        self.assertIsNone(module["select"](_lua_value(lua, self.case("base")["selection"])))
+
+    def test_full_pipeline_configured_percent_and_disabled_streams_preserve_the_declared_boundary(self):
+        configured = {
+            "ips-effect-per-level-research_sulfur": {"value": 25},
+            "ips-effect-per-level-research_sulfuric_acid_productivity": {"value": 25},
+        }
+        lua = self._stage_pipeline("space_age", configured)
+        self.assertTrue(lua.globals().outcome, str(lua.globals().message))
+        emitted = _plain(lua.globals().emitted)
+        for technology_name in self.case("space_age")["published_rows"]:
+            self.assertEqual([0.25] * len(emitted[technology_name]["effects"]),
+                             [effect["change"] for effect in emitted[technology_name]["effects"]])
+
+        disabled = {
+            "ips-enable-research_sulfur": {"value": False},
+            "ips-enable-research_sulfuric_acid_productivity": {"value": False},
+        }
+        lua = self._stage_pipeline("base", disabled)
+        self.assertTrue(lua.globals().outcome, str(lua.globals().message))
+        emitted = _plain(lua.globals().emitted)
+        for technology_name, expected in self.case("base")["published_rows"].items():
+            self.assertIn(technology_name, emitted)
+            self.assertFalse(emitted[technology_name]["enabled"])
+            self.assertEqual(expected["effects"], emitted[technology_name]["effects"])
+
+    def test_full_pipeline_named_route_drift_refuses_before_any_technology_publication(self):
+        def mutate(raw):
+            raw["recipe"].pop("bob-sulfuric-acid-3")
+
+        lua = self._stage_pipeline("base", mutate=mutate)
+        self.assertFalse(lua.globals().outcome)
+        self.assertIn("MIR Bob productivity route changed: bob-sulfuric-acid-3", str(lua.globals().message))
+        self.assertEqual(0, lua.globals().technology_publications)
 
     def test_nondefault_stream_percent_scales_only_the_independent_b6_routes(self):
         for name in ("base", "space_age"):
