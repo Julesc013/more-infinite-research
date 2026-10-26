@@ -106,7 +106,7 @@ local M = {
     bindings = {
       {family = "research_artificial_soil", weight = 1, item_patterns = {"^artificial%-.+%-soil$"}},
       {family = "research_artificial_soil", weight = 0.5, item_patterns = {"^overgrowth%-.+%-soil$"}},
-      {family = "research_carbon", weight = 1, products = {{type = "item", name = "carbon"}}, recipes = {"carbonic-asteroid-crushing", "advanced-carbonic-asteroid-crushing", "carbon"}, exclude_recipe_patterns = {"^burnt%-spoilage$"}, retained_owners = {"asteroid-productivity"}},
+      {family = "research_carbon", weight = 1, products = {{type = "item", name = "carbon"}}, recipes = {"carbonic-asteroid-crushing", "advanced-carbonic-asteroid-crushing"}, exclude_recipe_patterns = {"^burnt%-spoilage$"}, retained_owners = {"asteroid-productivity"}},
       {family = "research_carbon", weight = 0.5, recipes = {"burnt-spoilage"}, retained_owners = {"asteroid-productivity"}},
       {family = "research_carbon", weight = 0.2, recipes = {"coal-synthesis"}, retained_owners = {"asteroid-productivity"}},
       {family = "research_ice", weight = 1, products = {{type = "item", name = "ice"}}, recipes = {"oxide-asteroid-crushing", "advanced-oxide-asteroid-crushing"}, retained_owners = {"asteroid-productivity", "scrap-recycling-productivity"}},
