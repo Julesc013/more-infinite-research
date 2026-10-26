@@ -1,0 +1,288 @@
+{
+  "kind": "MIR5A1fdKnownCohortPublicTechnologyAuditReadbackV1",
+  "scope": "Read-only comparison of exact captured a1fd/upstream/published B6 prototypes and settings; no new native execution or final-current-package qualification.",
+  "capsule": {
+    "path": "broad-a1fd-public-technology-audit.json.gz",
+    "sha256": "59C0F4708A373C14EA893DF0582E1FE1DC559BE43DBDECA56D1450D37398257B",
+    "bytes": 96538
+  },
+  "summary": {
+    "compared_complete_triplets": 9,
+    "requested_cases": 10,
+    "retained_failed_published_cases": [
+      "q062"
+    ],
+    "skipped_cases": [
+      "q062"
+    ]
+  },
+  "cases": [
+    {
+      "id": "q001",
+      "classification": "compared-complete-three-arm-observation",
+      "technology_counts": {
+        "added": 1,
+        "different": 0,
+        "effect_order_only": 0,
+        "exact": 1004,
+        "missing": 0,
+        "presentation_or_order_only": 0,
+        "public_surface_rows": 1005,
+        "semantic": 0
+      },
+      "settings_counts": {
+        "added": 0,
+        "mir_or_ips_identities": 889,
+        "missing": 0,
+        "published_identities_retained_by_candidate": 908,
+        "same_identity_byte_equal_rows": 19,
+        "same_identity_metadata_different_rows": 889,
+        "surface_identities": 908
+      },
+      "setting_metadata_field_counts": {
+        "maximum_value": 123,
+        "targets": 889
+      }
+    },
+    {
+      "id": "q003",
+      "classification": "compared-complete-three-arm-observation",
+      "technology_counts": {
+        "added": 1,
+        "different": 0,
+        "effect_order_only": 0,
+        "exact": 1012,
+        "missing": 0,
+        "presentation_or_order_only": 0,
+        "public_surface_rows": 1013,
+        "semantic": 0
+      },
+      "settings_counts": {
+        "added": 0,
+        "mir_or_ips_identities": 889,
+        "missing": 0,
+        "published_identities_retained_by_candidate": 911,
+        "same_identity_byte_equal_rows": 22,
+        "same_identity_metadata_different_rows": 889,
+        "surface_identities": 911
+      },
+      "setting_metadata_field_counts": {
+        "maximum_value": 123,
+        "targets": 889
+      }
+    },
+    {
+      "id": "q005",
+      "classification": "compared-complete-three-arm-observation",
+      "technology_counts": {
+        "added": 3,
+        "different": 6,
+        "effect_order_only": 3,
+        "exact": 666,
+        "missing": 0,
+        "presentation_or_order_only": 3,
+        "public_surface_rows": 675,
+        "semantic": 0
+      },
+      "settings_counts": {
+        "added": 0,
+        "mir_or_ips_identities": 889,
+        "missing": 0,
+        "published_identities_retained_by_candidate": 1020,
+        "same_identity_byte_equal_rows": 131,
+        "same_identity_metadata_different_rows": 889,
+        "surface_identities": 1020
+      },
+      "setting_metadata_field_counts": {
+        "hidden": 35,
+        "maximum_value": 123,
+        "targets": 889
+      }
+    },
+    {
+      "id": "q006",
+      "classification": "compared-complete-three-arm-observation",
+      "technology_counts": {
+        "added": 11,
+        "different": 7,
+        "effect_order_only": 5,
+        "exact": 739,
+        "missing": 0,
+        "presentation_or_order_only": 2,
+        "public_surface_rows": 757,
+        "semantic": 0
+      },
+      "settings_counts": {
+        "added": 0,
+        "mir_or_ips_identities": 889,
+        "missing": 0,
+        "published_identities_retained_by_candidate": 1022,
+        "same_identity_byte_equal_rows": 133,
+        "same_identity_metadata_different_rows": 889,
+        "surface_identities": 1022
+      },
+      "setting_metadata_field_counts": {
+        "maximum_value": 123,
+        "targets": 889
+      }
+    },
+    {
+      "id": "q007",
+      "classification": "compared-complete-three-arm-observation",
+      "technology_counts": {
+        "added": 4,
+        "different": 9,
+        "effect_order_only": 5,
+        "exact": 515,
+        "missing": 0,
+        "presentation_or_order_only": 4,
+        "public_surface_rows": 528,
+        "semantic": 0
+      },
+      "settings_counts": {
+        "added": 0,
+        "mir_or_ips_identities": 889,
+        "missing": 0,
+        "published_identities_retained_by_candidate": 914,
+        "same_identity_byte_equal_rows": 25,
+        "same_identity_metadata_different_rows": 889,
+        "surface_identities": 914
+      },
+      "setting_metadata_field_counts": {
+        "hidden": 133,
+        "localised_description": 28,
+        "localised_name": 28,
+        "maximum_value": 123,
+        "targets": 889
+      }
+    },
+    {
+      "id": "q008",
+      "classification": "compared-complete-three-arm-observation",
+      "technology_counts": {
+        "added": 1,
+        "different": 9,
+        "effect_order_only": 5,
+        "exact": 613,
+        "missing": 0,
+        "presentation_or_order_only": 4,
+        "public_surface_rows": 623,
+        "semantic": 0
+      },
+      "settings_counts": {
+        "added": 0,
+        "mir_or_ips_identities": 889,
+        "missing": 0,
+        "published_identities_retained_by_candidate": 914,
+        "same_identity_byte_equal_rows": 25,
+        "same_identity_metadata_different_rows": 889,
+        "surface_identities": 914
+      },
+      "setting_metadata_field_counts": {
+        "hidden": 140,
+        "localised_description": 28,
+        "localised_name": 28,
+        "maximum_value": 123,
+        "targets": 889
+      }
+    },
+    {
+      "id": "q013",
+      "classification": "compared-complete-three-arm-observation",
+      "technology_counts": {
+        "added": 0,
+        "different": 0,
+        "effect_order_only": 0,
+        "exact": 817,
+        "missing": 0,
+        "presentation_or_order_only": 0,
+        "public_surface_rows": 817,
+        "semantic": 0
+      },
+      "settings_counts": {
+        "added": 0,
+        "mir_or_ips_identities": 889,
+        "missing": 0,
+        "published_identities_retained_by_candidate": 1002,
+        "same_identity_byte_equal_rows": 113,
+        "same_identity_metadata_different_rows": 889,
+        "surface_identities": 1002
+      },
+      "setting_metadata_field_counts": {
+        "hidden": 42,
+        "maximum_value": 123,
+        "targets": 889
+      }
+    },
+    {
+      "id": "q062",
+      "classification": "skipped-incomplete-or-refused-triplet",
+      "technology_counts": null,
+      "settings_counts": null,
+      "setting_metadata_field_counts": null
+    },
+    {
+      "id": "q073",
+      "classification": "compared-complete-three-arm-observation",
+      "technology_counts": {
+        "added": 1,
+        "different": 2,
+        "effect_order_only": 1,
+        "exact": 294,
+        "missing": 0,
+        "presentation_or_order_only": 1,
+        "public_surface_rows": 297,
+        "semantic": 0
+      },
+      "settings_counts": {
+        "added": 0,
+        "mir_or_ips_identities": 889,
+        "missing": 0,
+        "published_identities_retained_by_candidate": 909,
+        "same_identity_byte_equal_rows": 20,
+        "same_identity_metadata_different_rows": 889,
+        "surface_identities": 909
+      },
+      "setting_metadata_field_counts": {
+        "maximum_value": 123,
+        "targets": 889
+      }
+    },
+    {
+      "id": "q074",
+      "classification": "compared-complete-three-arm-observation",
+      "technology_counts": {
+        "added": 0,
+        "different": 1,
+        "effect_order_only": 0,
+        "exact": 394,
+        "missing": 0,
+        "presentation_or_order_only": 1,
+        "public_surface_rows": 395,
+        "semantic": 0
+      },
+      "settings_counts": {
+        "added": 0,
+        "mir_or_ips_identities": 889,
+        "missing": 0,
+        "published_identities_retained_by_candidate": 909,
+        "same_identity_byte_equal_rows": 20,
+        "same_identity_metadata_different_rows": 889,
+        "surface_identities": 909
+      },
+      "setting_metadata_field_counts": {
+        "maximum_value": 123,
+        "targets": 889
+      }
+    }
+  ],
+  "observations": [
+    "Nine complete triplets have no missing published public technology and no changed existing effect membership/payload, unit or prerequisites under the declared semantic comparison. Order/presentation differences remain explicit.",
+    "All22 candidate additions are absent from both original upstream and B6; none is claimed to be an upstream-retained same-ID row. Applicability/progression and physical qualification remain separate work.",
+    "q006 adds five level1/4 material pairs plus science-pack, not eight pairs.",
+    "All published setting identities remain present across the full settings surface. MIR-owned ips and mir namespaces are both counted.",
+    "All123 changed bound rows per compared case are the growth-factor maximum1000 adopted in spec/settings.md. Type, default and minimum are unchanged; retired planner targets metadata is removed. Visibility/localisation differences are retained separately.",
+    "q062 retains its original failed B6 arm and is excluded from complete-triplet parity. Private carriers and native credits are separately counted; no bonus correctness follows from excluding them."
+  ],
+  "limits": "These observations are scoped to a1fd and the named inputs. They neither relabel the later201992 freeze nor establish gameplay, saves, clients, performance, arbitrary combinations or release acceptance."
+}
