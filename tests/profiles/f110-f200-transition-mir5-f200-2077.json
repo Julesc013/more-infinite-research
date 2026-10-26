@@ -1,0 +1,20 @@
+{
+  "schema": 1,
+  "kind": "mir5-f110-f200-transition-successor",
+  "target": "f200",
+  "factorio_line": "2.0",
+  "engine": {
+    "version": "2.0.77",
+    "sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B"
+  },
+  "settings_mode": "Defaults",
+  "mods": [
+    {"name": "base", "version": "2.0.77", "enabled": true},
+    {"name": "more-infinite-research", "version": "5.0.20000", "enabled": true},
+    {"name": "mir-fixture-mir5-f110-f200-transition", "version": "0.2.0", "enabled": true}
+  ],
+  "archive_sha256": {
+    "more-infinite-research_5.0.20000.zip": "CDC687538EEE4BB6E3E897057ACBA6DE51C74C164F8339D613D034BA952D89FD"
+  },
+  "scope": "EA41 frozen F200 successor input for the published F110 source save. It requires rebind to the next accepted F200 package before native execution; no current-native claim."
+}
