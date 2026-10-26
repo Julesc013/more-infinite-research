@@ -22,7 +22,11 @@ function M.continuation_overrides(active, raw)
   local profile = M.select(active)
   if profile == nil then return {} end
   if profile == "space-age" then
-    return require("compatibility.modern_catalogue.bob_core").continuation_overrides
+    local overrides = {}
+    for key, fields in pairs(require("compatibility.modern_catalogue.bob_core").continuation_overrides) do
+      overrides[key] = {science=fields.science}
+    end
+    return overrides
   end
   local overrides = {
     braking_force = {science="science_bob_base_logistics"},
@@ -39,6 +43,19 @@ function M.continuation_overrides(active, raw)
 end
 
 local function fail(message) error("MIR F210 BobTech progression " .. message, 3) end
+
+local function positive_probability(product)
+  if product.probability ~= nil and product.independent_probability ~= nil then return false end
+  local probability = product.independent_probability
+  if probability == nil then probability = product.probability end
+  if probability ~= nil and (type(probability) ~= "number" or probability ~= probability
+      or probability <= 0 or probability > 1) then return false end
+  local shared = product.shared_probability
+  return shared == nil or (type(shared) == "table"
+    and type(shared.min) == "number" and type(shared.max) == "number"
+    and shared.min == shared.min and shared.max == shared.max
+    and shared.min >= 0 and shared.max <= 1 and shared.min < shared.max)
+end
 
 function M.preflight(raw, profile)
   if profile ~= "base" and profile ~= "space-age" then fail("profile is invalid") end
@@ -63,7 +80,7 @@ function M.preflight(raw, profile)
     local found = false
     for _, product in ipairs(recipe.results or {}) do
       if product.type == "item" and product.name == name and type(product.amount) == "number"
-          and product.amount > 0 and product.amount < math.huge then found = true end
+          and product.amount > 0 and product.amount < math.huge and positive_probability(product) then found = true end
     end
     if not found then fail("named alien science output changed: " .. name) end
   end
