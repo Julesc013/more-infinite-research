@@ -289,11 +289,14 @@ class AaiParityNativeControls(unittest.TestCase):
                 assert(spec.name=="assembling-machine-2")
                 local input,output=inventory(),inventory()
                 local fluids={}
-                local entity={valid=true}
+                local entity={valid=true,status="assembling"}
                 entity.get_inventory=function(slot) if slot==3 then return input elseif slot==4 then return output end error("unexpected assembler slot") end
                 entity.get_module_inventory=function() return nil end
                 entity.set_recipe=function(name) assert(name=="electric-engine-unit");return {} end
                 entity.get_recipe=function() return {name="electric-engine-unit"} end
+                entity.get_fluid_count=function(name) return fluids[name] or 0 end
+                entity.get_fluid_contents=function() return fluids end
+                entity.get_fluid_capacity=function(index) assert(index==1);return 1000 end
                 entity.insert_fluid=function(stack)
                   assert(stack.name=="lubricant" and stack.amount==400,"unexpected LuaEntity.insert_fluid input")
                   fluids[stack.name]=(fluids[stack.name] or 0)+stack.amount
@@ -326,7 +329,9 @@ class AaiParityNativeControls(unittest.TestCase):
                     on_configuration_changed=function(fn)target_callbacks.configuration=fn end,on_event=function(event,fn)target_callbacks.events[event]=fn end},
                   defines={events={on_research_finished=1,on_tick=2},inventory={lab_input=1,fuel=2,crafter_input=3,crafter_output=4}},
                   game=game,storage=storage,mods=active,helpers={table_to_json=function()return "{}" end},log=function(value)
-                    assert(value:match("^%[MIR5_NATIVE_FIXTURE%] RESULT "));markers=markers+1 end,
+                    if value:match("^%[MIR5_NATIVE_FIXTURE%] RESULT ") then markers=markers+1
+                    else assert(value:match("^%[MIR5_AAI_FLUID%] ")) end
+                  end,
                 }
                 env.require=function(name)
                   if name=="__mir-fixture-mir5-aai-parity-native__/fixture_control" then return assert(loadfile(fixture.."/shared/control.lua","t",env))() end
@@ -362,11 +367,12 @@ class AaiParityNativeControls(unittest.TestCase):
                 "empty inputs were mistaken for the last completed craft")
               assert(player.current_research==nil)
               assert(pcall(callbacks.events[2]))
+              assert(pcall(callbacks.events[2]))
               assert(player.current_research and player.current_research.name=="recipe-prod-research_electric_engine-1")
               local owner=player.technologies["recipe-prod-research_electric_engine-1"]
               owner.level=2;player.recipes["electric-engine-unit"].productivity_bonus=.1;player.current_research=nil;player.research_queue={}
               assert(pcall(callbacks.events[1],{by_script=false,research=owner}))
-              assert(pcall(callbacks.events[2]));assert(pcall(callbacks.events[2]));assert(pcall(callbacks.events[2]))
+              assert(pcall(callbacks.events[2]));assert(pcall(callbacks.events[2]));assert(pcall(callbacks.events[2]));assert(pcall(callbacks.events[2]))
               local state=storage.mir5_aai_parity_native
               assert(state.burner_lab.active==false and state.electric_lab.active==false,
                 "published queued progress was left under a powered active lab")
@@ -482,6 +488,9 @@ class AaiParityNativeControls(unittest.TestCase):
         self.assertIn('craft-item trigger did not complete after native burner-lab production', source)
         self.assertIn('local AAI_PACKS = 32', source)
         self.assertIn('entity.insert_fluid{name="lubricant", amount=lubricant}', source)
+        self.assertIn('entity.get_fluid_count("lubricant")', source)
+        self.assertIn('entity.get_fluid_contents()', source)
+        self.assertIn('entity.get_fluid_capacity(1)', source)
         self.assertNotIn('fluidbox', source)
         self.assertIn('defines.inventory.crafter_input', source)
         self.assertIn('defines.inventory.crafter_output', source)

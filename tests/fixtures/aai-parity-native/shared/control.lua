@@ -159,6 +159,24 @@ local function assert_no_beacon_or_modules(entity)
   if modules ~= nil and next(modules.get_contents()) ~= nil then fail("physical recipe witness permits modules") end
 end
 
+local function fluid_observation(entity, selected)
+  local count = entity.get_fluid_count("lubricant")
+  return {
+    recipe_name=selected and selected.name or nil,
+    recipe_enabled=selected and selected.enabled == true or false,
+    entity_status=tostring(entity.status),
+    lubricant_count=count,
+    fluids=entity.get_fluid_contents(),
+    lubricant_capacity=count >= 1 and entity.get_fluid_capacity(1) or nil,
+  }
+end
+
+local function fluid_marker(stage, observation, inserted)
+  log("[MIR5_AAI_FLUID] " .. helpers.table_to_json({
+    case="aai-parity-native", stage=stage, observation=observation, inserted=inserted,
+  }))
+end
+
 local function start_physical_batch(state, after_research)
   local force = game.forces.player
   local entity = state.machine
@@ -182,17 +200,33 @@ local function start_physical_batch(state, after_research)
       or input.insert{name="electric-motor", count=PHYSICAL_BATCHES * 2} ~= PHYSICAL_BATCHES * 2 then
     fail("assembler rejected exact electric-engine inputs")
   end
-  local lubricant = PHYSICAL_BATCHES * 40
-  if entity.insert_fluid{name="lubricant", amount=lubricant} ~= lubricant then
-    fail("assembler rejected exact lubricant input")
-  end
-  entity.energy = LAB_ENERGY
-  state.production = {after_research=after_research, before=before, expected=expected}
+  local selection = fluid_observation(entity, selected)
+  fluid_marker("recipe-selection", selection, nil)
+  state.production = {
+    after_research=after_research, before=before, expected=expected,
+    fluid_pending=true, fluid_selection=selection,
+  }
 end
 
 local function physical_batch_finished(state)
   local entity = state.machine
   if entity == nil or entity.valid == false then fail("physical assembler was removed") end
+  if state.production.fluid_pending then
+    local before_insert = fluid_observation(entity, entity.get_recipe())
+    fluid_marker("next-update-before-insert", before_insert, nil)
+    local lubricant = PHYSICAL_BATCHES * 40
+    local inserted = entity.insert_fluid{name="lubricant", amount=lubricant}
+    local after_insert = fluid_observation(entity, entity.get_recipe())
+    fluid_marker("deferred-insert", after_insert, inserted)
+    state.production.fluid_pending, state.production.fluid_before_insert, state.production.fluid_after_insert, state.production.fluid_inserted = false, before_insert, after_insert, inserted
+    if inserted ~= lubricant then
+      fail("assembler rejected exact lubricant input: inserted=" .. tostring(inserted)
+        .. " selection_count=" .. tostring(state.production.fluid_selection.lubricant_count)
+        .. " next_count=" .. tostring(before_insert.lubricant_count))
+    end
+    entity.energy = LAB_ENERGY
+    return false
+  end
   entity.energy = LAB_ENERGY
   local input = inventory(entity, defines.inventory.crafter_input, "assembler input")
   if input.get_item_count("steel-plate") ~= 0 or input.get_item_count("electronic-circuit") ~= 0 or input.get_item_count("electric-motor") ~= 0 then
