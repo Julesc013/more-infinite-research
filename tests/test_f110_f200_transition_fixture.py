@@ -98,7 +98,7 @@ class F110F200TransitionFixtureTests(unittest.TestCase):
         raw = {"technology": {DIRECT: {
             "name": DIRECT, "level": 1, "upgrade": True, "max_level": "infinite", "enabled": True,
             "unit": {"count_formula": "8000*2^(L-1)", "time": 60,
-                     "ingredients": [["military-science-pack", 1], ["utility-science-pack", 1]]},
+                     "ingredients": [["utility-science-pack", 1], ["military-science-pack", 1]]},
             "effects": [{"type": "character-mining-speed", "modifier": .05}],
         }}, "sentinel": {"value": 17}}
         mods = {"base": "1.1.110", "more-infinite-research": "4.7.11003",
@@ -113,7 +113,7 @@ class F110F200TransitionFixtureTests(unittest.TestCase):
         for label, altered, altered_mods in (
             ("effect", {**raw["technology"][DIRECT], "effects": [{"type": "character-mining-speed", "modifier": .1}]}, mods),
             ("science", {**raw["technology"][DIRECT], "unit": {"count_formula": "8000*2^(L-1)", "time": 60,
-                        "ingredients": [["utility-science-pack", 1], ["military-science-pack", 1]]}}, mods),
+                        "ingredients": [["military-science-pack", 1], ["utility-science-pack", 1]]}}, mods),
             ("closure", raw["technology"][DIRECT], {**mods, "more-infinite-research": "4.7.11002"}),
         ):
             candidate = copy.deepcopy(raw)
