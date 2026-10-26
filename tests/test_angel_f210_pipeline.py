@@ -204,7 +204,11 @@ class AngelF210PipelineTests(unittest.TestCase):
         breeding = configured["recipe-prod-research_breeding-1"]
         self.assertEqual("250*3^(L-1)", breeding["unit"]["count_formula"])
         self.assertEqual(45, breeding["unit"]["time"])
-        self.assertEqual([0.25], [effect["change"] for effect in breeding["effects"]])
+        expected_effects = self._expected_rows("base")["recipe-prod-research_breeding-1"]["effects"]
+        self.assertEqual([effect["recipe"] for effect in expected_effects],
+                         [effect["recipe"] for effect in breeding["effects"]])
+        self.assertEqual([0.25] * len(expected_effects),
+                         [effect["change"] for effect in breeding["effects"]])
         self.assertEqual(default["recipe-prod-research_lubricant_productivity-1"],
                          configured["recipe-prod-research_lubricant_productivity-1"])
 
@@ -240,6 +244,11 @@ class AngelF210PipelineTests(unittest.TestCase):
         self.assertIn("angels-token-bio", [ingredient[0] for ingredient in science["unit"]["ingredients"]])
         steel = rows["steel-plate-productivity"]
         upstream_steel = self.context["cases"]["space_age"]["raw"]["technology"]["steel-plate-productivity"]
+        exception = self.context["projection_rules"]["full_native_owner_exceptions"]
+        self.assertEqual(1, len(exception))
+        self.assertEqual("steel-plate-productivity", exception[0]["name"])
+        upstream_canonical = json.dumps(upstream_steel, sort_keys=True, separators=(",", ":")).encode("utf-8")
+        self.assertEqual(exception[0]["source_row_sha256"], hashlib.sha256(upstream_canonical).hexdigest().upper())
         # The Space Age native owner exists before MIR.  B6 retains its unit,
         # prerequisites and existing effects while appending exactly the two
         # Angel steel routes; this is an in-place native-owner patch, never a
