@@ -171,9 +171,9 @@ local function fluid_observation(entity, selected)
   }
 end
 
-local function fluid_marker(stage, observation, inserted)
+local function fluid_marker(stage, observation, inserted, provided)
   log("[MIR5_AAI_FLUID] " .. helpers.table_to_json({
-    case="aai-parity-native", stage=stage, observation=observation, inserted=inserted,
+    case="aai-parity-native", stage=stage, observation=observation, inserted=inserted, provided=provided,
   }))
 end
 
@@ -184,12 +184,10 @@ local function start_physical_batch(state, after_research)
     entity = game.surfaces[1].create_entity{name="assembling-machine-2", position={6, 0}, force=force}
     if entity == nil or entity.valid == false then fail("could not create electric-engine assembler") end
     entity.set_recipe("electric-engine-unit")
-    local selected = entity.get_recipe()
-    if selected == nil or selected.name ~= "electric-engine-unit" then
-      fail("could not select electric-engine recipe")
-    end
     state.machine = entity
   end
+  local selected = entity.get_recipe()
+  if selected == nil or selected.name ~= "electric-engine-unit" then fail("could not select electric-engine recipe") end
   assert_no_beacon_or_modules(entity)
   local input = inventory(entity, defines.inventory.crafter_input, "assembler input")
   local output = inventory(entity, defines.inventory.crafter_output, "assembler output")
@@ -201,31 +199,32 @@ local function start_physical_batch(state, after_research)
     fail("assembler rejected exact electric-engine inputs")
   end
   local selection = fluid_observation(entity, selected)
-  fluid_marker("recipe-selection", selection, nil)
+  local lubricant = PHYSICAL_BATCHES * 40
+  fluid_marker("recipe-selection", selection, nil, 0)
   state.production = {
     after_research=after_research, before=before, expected=expected,
-    fluid_pending=true, fluid_selection=selection,
+    fluid_target=lubricant, fluid_provided=0, fluid_selection=selection,
   }
 end
 
 local function physical_batch_finished(state)
   local entity = state.machine
   if entity == nil or entity.valid == false then fail("physical assembler was removed") end
-  if state.production.fluid_pending then
+  local production = state.production
+  if type(production) ~= "table" then fail("physical production state is absent") end
+  local remaining = production.fluid_target - production.fluid_provided
+  if remaining < 0 then fail("physical lubricant total exceeds target") end
+  if remaining > 0 then
     local before_insert = fluid_observation(entity, entity.get_recipe())
-    fluid_marker("next-update-before-insert", before_insert, nil)
-    local lubricant = PHYSICAL_BATCHES * 40
-    local inserted = entity.insert_fluid{name="lubricant", amount=lubricant}
-    local after_insert = fluid_observation(entity, entity.get_recipe())
-    fluid_marker("deferred-insert", after_insert, inserted)
-    state.production.fluid_pending, state.production.fluid_before_insert, state.production.fluid_after_insert, state.production.fluid_inserted = false, before_insert, after_insert, inserted
-    if inserted ~= lubricant then
-      fail("assembler rejected exact lubricant input: inserted=" .. tostring(inserted)
-        .. " selection_count=" .. tostring(state.production.fluid_selection.lubricant_count)
-        .. " next_count=" .. tostring(before_insert.lubricant_count))
+    fluid_marker("next-update-before-insert", before_insert, nil, production.fluid_provided)
+    local inserted = entity.insert_fluid{name="lubricant", amount=remaining}
+    if type(inserted) ~= "number" or inserted ~= inserted or inserted == math.huge or inserted == -math.huge
+        or inserted < 0 or inserted > remaining then
+      fail("assembler returned invalid lubricant insertion amount: " .. tostring(inserted))
     end
-    entity.energy = LAB_ENERGY
-    return false
+    production.fluid_provided = production.fluid_provided + inserted
+    local after_insert = fluid_observation(entity, entity.get_recipe())
+    fluid_marker("fluid-feed", after_insert, inserted, production.fluid_provided)
   end
   entity.energy = LAB_ENERGY
   local input = inventory(entity, defines.inventory.crafter_input, "assembler input")
@@ -233,13 +232,21 @@ local function physical_batch_finished(state)
     return false
   end
   local output = inventory(entity, defines.inventory.crafter_output, "assembler output")
-  local produced = output.get_item_count("electric-engine-unit") - state.production.before
+  local produced = output.get_item_count("electric-engine-unit") - production.before
   -- Ingredients leave the input inventory when the last craft starts. Wait
   -- for its real output instead of rejecting that normal in-flight state.
-  if produced > state.production.expected then
-    fail("physical electric-engine output differs: " .. tostring(produced) .. " expected " .. tostring(state.production.expected))
+  if produced > production.expected then
+    fail("physical electric-engine output differs: " .. tostring(produced) .. " expected " .. tostring(production.expected))
   end
-  return produced == state.production.expected
+  if produced ~= production.expected then return false end
+  if production.fluid_provided ~= production.fluid_target then
+    fail("physical lubricant total differs: " .. tostring(production.fluid_provided) .. " expected " .. tostring(production.fluid_target))
+  end
+  local final_fluids = entity.get_fluid_contents()
+  if entity.get_fluid_count("lubricant") ~= 0 or next(final_fluids) ~= nil then
+    fail("physical lubricant contents remain after production")
+  end
+  return true
 end
 
 local function assert_owner(force, expected_level, expected_bonus)

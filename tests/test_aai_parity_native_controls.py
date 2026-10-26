@@ -247,7 +247,7 @@ class AaiParityNativeControls(unittest.TestCase):
               end
               local player=force(1)
               local surface={}
-              local electric_lab_creations, bootstrap_crafts=0,{}
+              local electric_lab_creations, bootstrap_crafts, physical_crafts=0,{},0
               function surface.find_entities_filtered() return {} end
               function surface.create_entity(spec)
                 if spec.name=="burner-lab" or spec.name=="lab" then
@@ -296,20 +296,27 @@ class AaiParityNativeControls(unittest.TestCase):
                 entity.get_recipe=function() return {name="electric-engine-unit"} end
                 entity.get_fluid_count=function(name) return fluids[name] or 0 end
                 entity.get_fluid_contents=function() return fluids end
-                entity.get_fluid_capacity=function(index) assert(index==1);return 1000 end
+                entity.get_fluid_capacity=function(index) assert(index==1);return 160 end
                 entity.insert_fluid=function(stack)
-                  assert(stack.name=="lubricant" and stack.amount==400,"unexpected LuaEntity.insert_fluid input")
-                  fluids[stack.name]=(fluids[stack.name] or 0)+stack.amount
-                  return stack.amount
+                  assert(stack.name=="lubricant" and type(stack.amount)=="number" and stack.amount>0,"unexpected LuaEntity.insert_fluid input")
+                  local admitted=math.min(stack.amount,160-(fluids[stack.name] or 0))
+                  fluids[stack.name]=(fluids[stack.name] or 0)+admitted
+                  return admitted
                 end
-                local pending, delay=0,0
+                local pending, delay, batch_crafts=0,0,0
                 return strict_entity(entity,function(_,value)
-                  if input.get_item_count("steel-plate")>=20 and (fluids["lubricant"] or 0)>=400 then
-                    input.counts["steel-plate"],input.counts["electronic-circuit"],input.counts["electric-motor"]=0,0,0
-                    fluids["lubricant"]=0
+                  if batch_crafts==10 and pending==0 and input.get_item_count("steel-plate")>=20 then batch_crafts=0 end
+                  if input.get_item_count("steel-plate")>=2 and input.get_item_count("electronic-circuit")>=4
+                      and input.get_item_count("electric-motor")>=2 and (fluids["lubricant"] or 0)>=40 then
+                    input.counts["steel-plate"]=input.counts["steel-plate"]-2
+                    input.counts["electronic-circuit"]=input.counts["electronic-circuit"]-4
+                    input.counts["electric-motor"]=input.counts["electric-motor"]-2
+                    fluids["lubricant"]=fluids["lubricant"]-40
+                    if fluids["lubricant"]==0 then fluids["lubricant"]=nil end
+                    batch_crafts,physical_crafts=batch_crafts+1,physical_crafts+1
                     local amount=player.recipes["electric-engine-unit"].productivity_bonus==0 and 10 or 11
-                    output.counts["electric-engine-unit"]=(output.counts["electric-engine-unit"] or 0)+amount-1
-                    pending,delay=1,1
+                    if batch_crafts<10 then output.counts["electric-engine-unit"]=(output.counts["electric-engine-unit"] or 0)+1
+                    else pending,delay=amount-(batch_crafts-1),1 end
                   elseif pending>0 then
                     if delay>0 then delay=delay-1 else
                       output.counts["electric-engine-unit"]=output.counts["electric-engine-unit"]+pending
@@ -366,14 +373,22 @@ class AaiParityNativeControls(unittest.TestCase):
               assert(storage.mir5_aai_parity_native.phase=="physical-before",
                 "empty inputs were mistaken for the last completed craft")
               assert(player.current_research==nil)
-              assert(pcall(callbacks.events[2]))
-              assert(pcall(callbacks.events[2]))
+              for _=1,16 do
+                assert(pcall(callbacks.events[2]))
+                if player.current_research then break end
+              end
               assert(player.current_research and player.current_research.name=="recipe-prod-research_electric_engine-1")
+              assert(physical_crafts==10)
               local owner=player.technologies["recipe-prod-research_electric_engine-1"]
               owner.level=2;player.recipes["electric-engine-unit"].productivity_bonus=.1;player.current_research=nil;player.research_queue={}
               assert(pcall(callbacks.events[1],{by_script=false,research=owner}))
-              assert(pcall(callbacks.events[2]));assert(pcall(callbacks.events[2]));assert(pcall(callbacks.events[2]));assert(pcall(callbacks.events[2]))
+              for _=1,16 do
+                assert(pcall(callbacks.events[2]))
+                if storage.mir5_aai_parity_native.phase=="source-complete" then break end
+              end
               local state=storage.mir5_aai_parity_native
+              assert(state.phase=="source-complete" and physical_crafts==20)
+              assert(state.production.fluid_target==400 and state.production.fluid_provided==400)
               assert(state.burner_lab.active==false and state.electric_lab.active==false,
                 "published queued progress was left under a powered active lab")
               local source={phase=state.phase,aai=state.aai_finished,mir=state.mir_labs,before=state.before_output,after=state.after_output,queue=player.research_progress,saves=saves,markers=markers}
@@ -487,7 +502,9 @@ class AaiParityNativeControls(unittest.TestCase):
         self.assertIn('craft-item trigger did not complete after native iron production', source)
         self.assertIn('craft-item trigger did not complete after native burner-lab production', source)
         self.assertIn('local AAI_PACKS = 32', source)
-        self.assertIn('entity.insert_fluid{name="lubricant", amount=lubricant}', source)
+        self.assertIn('entity.insert_fluid{name="lubricant", amount=remaining}', source)
+        self.assertIn('production.fluid_provided = production.fluid_provided + inserted', source)
+        self.assertIn('physical lubricant contents remain after production', source)
         self.assertIn('entity.get_fluid_count("lubricant")', source)
         self.assertIn('entity.get_fluid_contents()', source)
         self.assertIn('entity.get_fluid_capacity(1)', source)
