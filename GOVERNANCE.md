@@ -10,7 +10,7 @@ MIR uses the adopted specification, explicit maintainer decisions, shared source
 - One candidate has an exact source, asset inventory and explicit acceptance record.
 - One mutation has an explicit owner, bounded preflight and independently checked resulting behavior.
 - One proposition plus exact input set has one proof identity.
-- Each retained stable edition has its required independent qualification; additional best-effort historical artifacts carry their actual build status and missing native qualification explicitly.
+- Each retained stable edition requires its applicable independent qualification; additional best-effort historical artifacts carry their actual build status and missing native qualification explicitly.
 
 The authored native-technology implementation and small Generator are the current player authority. The canonical source cutover is implemented; final current-package, consumer and native qualification remain release obligations. Preview, shadow, experimental and omitted components cannot self-promote. The [target contract](spec/targets.md) owns the distinction between retained edition acceptance and separately labelled best-effort artifacts.
 
