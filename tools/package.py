@@ -15,6 +15,10 @@ REQUIRE = re.compile(r'''\brequire\s*\(\s*["']([^"']+)["']\s*\)''')
 ENTRYPOINTS = ("data.lua", "settings.lua", "data-final-fixes.lua", "control.lua")
 F210_ONLY_MIGRATION = "migrations/more-infinite-research_4.7.0.json"
 EARLY_TARGET_IDS = frozenset({"f006", "f007", "f008", "f009", "f010", "f011", "f012"})
+EARLY_LOCALE_SOURCE = "adapters/early/locale/en/more-infinite-research.cfg"
+EARLY_LOCALE_OUTPUT = "locale/en/more-infinite-research.cfg"
+EARLY_DESCRIPTION = ("Adds fixed finite default continuations of selected research bonus lines for museum "
+                     "Factorio releases; it has no configurable startup settings.")
 
 
 def digest(data):
@@ -105,7 +109,7 @@ def checked_target_record(source, target_record, revision=None):
         ["git", "-C", str(repository), "show", commit + ":" + relative])
 
 
-def git_source(source, revision):
+def git_source(source, revision, include_early_locale=False):
     def git(*arguments):
         return subprocess.check_output(["git", "-C", str(source), *arguments])
     source, repository = git_repository(source)
@@ -121,7 +125,7 @@ def git_source(source, revision):
         if kind != b"blob" or mode not in (b"100644", b"100755") or not name.startswith(prefix):
             raise ValueError("Committed package source must contain ordinary files only")
         relative_name = name[len(prefix):]
-        if admitted(relative_name):
+        if admitted(relative_name) or (include_early_locale and relative_name == EARLY_LOCALE_SOURCE):
             records.append((relative_name, oid))
     if not any(name == "info.json" for name, _ in records):
         raise ValueError("Selected committed source has no info.json")
@@ -256,6 +260,9 @@ def select_early_edition(files, info, target, editions):
     info.update({
         "name": "more-infinite-research",
         "version": match.group(1) + "." + match.group(2) + "." + str(int(target[1:]) * 100 + patch).zfill(5),
+        "title": "More Infinite Research",
+        "author": "Julesc013",
+        "description": EARLY_DESCRIPTION,
         "factorio_version": selected["factorio_version"],
         "dependencies": ["base >= " + selected["minimum_base"]],
     })
@@ -273,10 +280,14 @@ def select_early_edition(files, info, target, editions):
     files["data.lua"] = b'require("adapters.early.data").apply(require("platform.target"))\n'
     closure = require_closure(files, ["data.lua", "platform/target.lua"])
     selected_files = {name: files[name] for name in closure}
+    for required in ("info.json", "LICENSE", "thumbnail.png", "changelog.txt", EARLY_LOCALE_SOURCE):
+        if required not in files:
+            raise ValueError("Selected early edition has missing player asset: " + required)
     selected_files["info.json"] = files["info.json"]
     selected_files["LICENSE"] = files["LICENSE"]
     selected_files["thumbnail.png"] = files["thumbnail.png"]
     selected_files["changelog.txt"] = files["changelog.txt"]
+    selected_files[EARLY_LOCALE_OUTPUT] = files[EARLY_LOCALE_SOURCE]
     return player_presentation(selected_files, info)
 
 
@@ -287,11 +298,12 @@ def members(source, version=None, committed_files=None, target=None, editions=No
         raise ValueError("Target record selection requires a declared target")
     if committed_files is None:
         committed_files = {}
+        include_early_locale = target is not None and selected_record == EARLY_TARGET_RECORD
         for path in sorted(source.rglob("*")):
             if path.is_symlink():
                 raise ValueError(f"Linked source is not admitted: {path}")
             relative = path.relative_to(source).as_posix()
-            if path.is_file() and admitted(relative):
+            if path.is_file() and (admitted(relative) or (include_early_locale and relative == EARLY_LOCALE_SOURCE)):
                 committed_files[relative] = path.read_bytes()
     if "info.json" not in committed_files:
         raise ValueError("Selected source has no info.json")
@@ -339,14 +351,15 @@ def build(source, output, version=None, revision=None, target=None, target_recor
     source = source.resolve(strict=True)
     if not source.is_dir() or source.is_symlink():
         raise ValueError("Select an ordinary existing source root")
-    commit, files = git_source(source, revision) if revision is not None else (None, None)
+    early = target is not None and selected_record == EARLY_TARGET_RECORD
+    commit, files = (git_source(source, revision, include_early_locale=early)
+                     if revision is not None else (None, None))
     record_path = selected_record if target is not None else None
     editions, editions_sha = (read_editions(source, commit, record_path)
                               if target is not None else (None, None))
     info, rows = members(source, version, files, target, editions, record_path or TARGET_RECORD)
     root = f"{info['name']}_{info['version']}"
     expected_name = root + ".zip"
-    early = record_path == EARLY_TARGET_RECORD
     if not early and output.name != expected_name:
         raise ValueError(f"Archive must be named {expected_name}")
     if output.exists():
