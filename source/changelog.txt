@@ -26,6 +26,10 @@ Version: @DISTRIBUTION_VERSION@
       sparse and full-Bob admission.
     - Preserve the named BobTech advanced and alien science vectors for the admitted native continuations.
     - Restore the omitted F210 Angel catalogue and native Steel coverage through explicit bindings.
+    - Restore the combined Factorio 2.1 Bob/Angel breeding, material and native Steel bindings, including the published braking and
+      laser continuation science and prerequisites.
+    - Preserve Ironclad mortar shooting speed and native weapon categories when their dedicated streams are disabled or overlap
+      removal is off.
     - Preserve separate finite and infinite material stages, native recipe ownership and hidden Imersite migration carriers where
       supported.
     - Keep two historical runtime interfaces available; unconsumed developer previews do not become player APIs.
@@ -37,6 +41,7 @@ Version: @DISTRIBUTION_VERSION@
     - Restrict public data declarations to checked native fields and MIR-owned presentation before publication.
     - Accept Factorio's default recipe productivity ceiling when BobTech and Angel omit the optional raw field.
     - Accept an explicit native 300% recipe ceiling as equivalent to omission in Factorio 2.0 Bob/Angel bindings.
+    - Keep graphics-only Krastorio asset mods from selecting an absent overhaul or suppressing unrelated compatibility bindings.
     - Apply the existing growth-factor ceiling of 1000 to native setting bounds, preserving defaults and zero inheritance.
     - Keep the first-upgrade preference safeguard when upgrading an earned Factorio 2.0 save from MIR 4.7.3.
     - Refresh relevant open Research Library views after native research, queue and force events without changing research state.

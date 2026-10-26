@@ -1015,7 +1015,7 @@ function M.continuations(active_mods, raw)
       [bob_angel_f210 == "space-age" and "space_age" or "base"]
     for key, value in pairs(delta.continuation_overrides or {}) do
       overrides[key] = copy(value)
-      overrides[key].exact_prerequisites = true
+      if value.prerequisites ~= nil then overrides[key].exact_prerequisites = true end
     end
   end
   local adapter = native_modded_continuations(active_mods)

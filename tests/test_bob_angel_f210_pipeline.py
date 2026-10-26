@@ -166,6 +166,24 @@ class BobAngelF210PipelineTests(unittest.TestCase):
                 self.assertIn("bobrevamp", source["selection"])
                 self.assertIn("bobtech", source["selection"])
                 self.assertIn("angelssmelting", source["selection"])
+                # These are the actual MIR continuations, not the unchanged
+                # finite upstream level-7 inputs that the first projection used.
+                correction = self.context["projection_correction"]
+                self.assertEqual("948706da28a350ad83cf5c1be016bced4ae4dbd1", correction["prior_context_commit"])
+                self.assertEqual("F5A6130BAD696A130CDBD717918377CDCEF1A518D7E465FE9D0E33202F65E9F4",
+                                 correction["prior_context_sha256"])
+                for family in ("braking-force", "laser-shooting-speed"):
+                    name = family + "-8"
+                    row = self._expected(case)[name]
+                    self.assertNotIn(family + "-7", self._expected(case))
+                    self.assertNotIn(name, source["raw"]["technology"])
+                    self.assertEqual("infinite", row["max_level"])
+                    self.assertEqual(8, row["level"])
+                    binding = correction["rows"][case][name]
+                    self.assertEqual(family + "-7", binding["replaces_expected_id"])
+                    self.assertEqual(CAPTURE_HASHES[case]["published_raw"], binding["published_raw_sha256"])
+                    self.assertEqual(binding["row_sha256"], hashlib.sha256(
+                        json.dumps(row, sort_keys=True, separators=(",", ":")).encode()).hexdigest().upper())
         self.assertNotIn("space-age", self.context["cases"]["base"]["selection"])
         self.assertIn("space-age", self.context["cases"]["space_age"]["selection"])
 

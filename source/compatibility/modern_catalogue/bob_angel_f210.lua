@@ -188,11 +188,11 @@ M.science = {
   },
   science_bob_angel_space_braking = {
     "automation-science-pack", "logistic-science-pack", "chemical-science-pack", "utility-science-pack",
-    "bob-advanced-logistic-science-pack",
+    "bob-advanced-logistic-science-pack", "space-science-pack",
   },
   science_bob_angel_space_laser = {
     "automation-science-pack", "logistic-science-pack", "chemical-science-pack", "military-science-pack",
-    "utility-science-pack",
+    "utility-science-pack", "space-science-pack",
   },
 }
 
