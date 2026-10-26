@@ -2,6 +2,8 @@ local KEY = "mir5_f200_legacy_cap"
 local MIR5_CASE = "f200-positive-legacy-cap"
 local PUBLISHED_RELAXED_CASE = "published-relaxed-control"
 local CROSS_ENGINE_CASE = "f200-f210-positive-legacy-cap"
+local CROSS_ENGINE_DISABLED_CASE = "f200-f210-positive-legacy-cap-disabled"
+local CROSS_ENGINE_REENABLED_CASE = "f200-f210-positive-legacy-cap-reenabled"
 local SAVE = "mir5-native-complete"
 local FIXTURE = "mir-fixture-mir5-f200-legacy-cap"
 local GEAR = "recipe-prod-research_gears-1"
@@ -138,7 +140,15 @@ local function destination_mode()
   if base == "2.1.23" and mir == "5.0.21000" and fixture == "0.5.0" then
     return {case = CROSS_ENGINE_CASE, label = "MIR5 F210 cross-engine", source_mir = "4.7.20003", source_fixture = "0.4.0"}
   end
-  fail("successor requires the exact F200 MIR5/published fixture or F210 5.0.21000 cross-engine fixture")
+  if base == "2.1.23" and mir == "5.0.21000" and fixture == "0.6.0" then
+    return {case = CROSS_ENGINE_DISABLED_CASE, label = "MIR5 F210 disabled intermediate",
+      source_mir = "4.7.20003", source_fixture = "0.4.0", disabled_intermediate = true}
+  end
+  if base == "2.1.23" and mir == "5.0.21000" and fixture == "0.7.0" then
+    return {case = CROSS_ENGINE_REENABLED_CASE, label = "MIR5 F210 re-enabled cross-engine",
+      source_mir = "4.7.20003", source_fixture = "0.4.0", reenabled = true}
+  end
+  fail("successor requires the exact F200 MIR5/published fixture or F210 5.0.21000 cross-engine stage")
 end
 
 local function expected_science_consumption(force, value, lab_entity, saved_progress)
@@ -202,6 +212,44 @@ local function assert_restored(state, mode)
   return player
 end
 
+local function assert_disabled_intermediate(state, mode)
+  assert_source_witness(state, mode)
+  local player = status(game.forces.player)
+  assert_status(player, {level = 3, researched = false, enabled = false, visible = true,
+    maximum = UINT32_MAX, bonus = 0.02, saved_progress = 0.27}, mode.label .. " player")
+  if game.forces.player.current_research ~= nil or #game.forces.player.research_queue ~= 0 then
+    fail("disabled intermediate queued successor research")
+  end
+  if state.destination_lab_completions ~= nil or state.destination_science_accounting ~= nil then
+    fail("disabled intermediate retained successor lab work")
+  end
+  assert_foreign(game.forces[state.foreign_force_index], state.foreign_queue)
+  assert_acceleration(technology(game.forces.player, GEAR))
+  return player
+end
+
+local function assert_disabled_stage_witness(state, mode)
+  assert_source_witness(state, mode)
+  if state.phase ~= "disabled-intermediate-completed"
+      or state.disabled_stage_case ~= CROSS_ENGINE_DISABLED_CASE
+      or state.disabled_stage_fixture ~= "0.6.0"
+      or state.disabled_stage_observed ~= true
+      or type(state.disabled_stage_player) ~= "table"
+      or type(state.disabled_stage_foreign) ~= "table"
+      or state.disabled_stage_destination_lab_completions ~= 0
+      or state.disabled_stage_queue_entries ~= 0 then
+    fail("required disabled intermediate witness is absent or malformed")
+  end
+  assert_status(state.disabled_stage_player, {level = 3, researched = false, enabled = false, visible = true,
+    maximum = UINT32_MAX, bonus = 0.02, saved_progress = 0.27}, "disabled intermediate saved player")
+  if state.disabled_stage_foreign.current ~= state.foreign_queue.current
+      or #state.disabled_stage_foreign.queue ~= #state.foreign_queue.queue
+      or state.disabled_stage_foreign.queue[1] ~= state.foreign_queue.queue[1]
+      or not close(state.disabled_stage_foreign.progress, state.foreign_queue.progress) then
+    fail("disabled intermediate foreign witness differs")
+  end
+end
+
 local function assert_completed(state, label)
   if state.destination_lab_completions ~= 1 then fail("successor did not finish exactly one further lab level") end
   local player = status(game.forces.player)
@@ -258,6 +306,25 @@ local function marker(stage, state)
   }))
 end
 
+local function disabled_marker(stage, state)
+  local player = status(game.forces.player)
+  log("[MIR5_NATIVE_FIXTURE] RESULT " .. helpers.table_to_json({
+    stage = stage, case = state.disabled_stage_case, status = "passed",
+    qualification = "native-runner-readback-required",
+    witnesses = {
+      source_mir = state.source_mir, destination_mir = script.active_mods["more-infinite-research"],
+      source_actual_lab_completions = state.actual_lab_completions,
+      destination_actual_lab_completions = state.disabled_stage_destination_lab_completions,
+      disabled_intermediate_observed = state.disabled_stage_observed,
+      next_level = player.level, productivity_bonus = player.bonus,
+      player_enabled = player.enabled, player_visible_when_disabled = player.visible,
+      saved_progress = player.saved_progress, foreign_queue_progress = state.foreign_queue.progress,
+      foreign_disabled = status(game.forces[state.foreign_force_index]).enabled == false,
+      on_load_read_only = stage == "reload",
+    },
+  }))
+end
+
 local function finish_diagnostic(state, accounting)
   local observed = {}
   local inventory = lab(state)
@@ -283,7 +350,28 @@ script.on_configuration_changed(function()
       or startup["mir-settings-profile-import"].value ~= "" then
     fail("successor fixture settings are not the verified positive-cap relaxation")
   end
+  if mode.disabled_intermediate and startup["ips-enable-research_gears"].value ~= false then
+    fail("disabled intermediate did not retain the disabled owned family setting")
+  end
+  if mode.reenabled and startup["ips-enable-research_gears"].value ~= true then
+    fail("re-enabled successor did not retain the owned family setting")
+  end
   local state = storage[KEY]
+  if mode.disabled_intermediate then
+    local player = assert_disabled_intermediate(state, mode)
+    state.disabled_stage_case = mode.case
+    state.disabled_stage_fixture = script.active_mods[FIXTURE]
+    state.disabled_stage_player = copy_status(player)
+    state.disabled_stage_foreign = copy_queue(state.foreign_queue)
+    state.disabled_stage_destination_lab_completions = 0
+    state.disabled_stage_queue_entries = #game.forces.player.research_queue
+    state.disabled_stage_observed = true
+    state.phase = "disabled-intermediate-completed"
+    disabled_marker("initial", state)
+    game.server_save(SAVE)
+    return
+  end
+  if mode.reenabled then assert_disabled_stage_witness(state, mode) end
   assert_restored(state, mode) -- required before this fixture queues any successor lab work.
   local inventory = lab(state)
   local before_units = {}
@@ -341,6 +429,11 @@ script.on_load(function()
     -- is read from fixture-owned durable state and checked on the next tick.
     loaded_snapshot = {player = copy_status(state.successor_player), foreign = copy_queue(state.foreign_queue),
       source = state.actual_lab_completions, destination = state.destination_lab_completions}
+  elseif type(state) == "table" and state.phase == "disabled-intermediate-completed"
+      and type(state.disabled_stage_player) == "table" and type(state.disabled_stage_foreign) == "table" then
+    loaded_snapshot = {disabled = true, player = copy_status(state.disabled_stage_player),
+      foreign = copy_queue(state.disabled_stage_foreign), source = state.actual_lab_completions,
+      destination = state.disabled_stage_destination_lab_completions}
   else
     loaded_snapshot = nil
   end
@@ -360,6 +453,22 @@ script.on_event(defines.events.on_tick, function()
         fail("cold reload changed recorded lab completions")
       end
       marker("reload", state)
+      reload_logged = true
+    end
+    return
+  end
+  if state.phase == "disabled-intermediate-completed" then
+    if loaded_snapshot and loaded_snapshot.disabled and not reload_logged then
+      local mode = destination_mode()
+      if not mode.disabled_intermediate then fail("disabled intermediate loaded under the wrong successor stage") end
+      local player = assert_disabled_intermediate(state, mode)
+      assert_status(player, loaded_snapshot.player, "disabled intermediate cold reload player")
+      assert_foreign(game.forces[state.foreign_force_index], loaded_snapshot.foreign)
+      if state.actual_lab_completions ~= loaded_snapshot.source
+          or state.disabled_stage_destination_lab_completions ~= loaded_snapshot.destination then
+        fail("disabled intermediate cold reload changed lab completions")
+      end
+      disabled_marker("reload", state)
       reload_logged = true
     end
     return
