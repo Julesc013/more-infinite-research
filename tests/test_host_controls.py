@@ -68,6 +68,7 @@ class HostControlsTests(unittest.TestCase):
             "tests/test_armor_py_catalogue.py",
             "tests/test_bob_warfare_f210_pipeline.py",
             "tests/test_bob_productivity_f210_pipeline.py",
+            "tests/test_ironclad_f210_pipeline.py",
             "tests/test_py_f210_catalogue.py",
             "tests/test_py_f210_pipeline.py",
             "tests/test_native_modded_continuations.py",
@@ -156,7 +157,7 @@ class HostControlsTests(unittest.TestCase):
             "tests/test_host_controls.py",
             "tools/check_repository.py",
         ])
-        self.assertEqual(len(paths), 118)
+        self.assertEqual(len(paths), 119)
         self.assertEqual(len(set(paths)), len(paths))
         self.assertEqual(paths[-1], "tools/check_repository.py")
         self.assertIn("tests/test_sdk.py", paths)

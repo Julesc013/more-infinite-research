@@ -4,6 +4,11 @@
 local M = {}
 local target = require("platform.target")
 
+function M.is_ironclad(active_mods)
+  return target.id == "f210" and type(active_mods) == "table"
+    and active_mods["aai-vehicles-ironclad"] ~= nil
+end
+
 -- These two native modifiers were added in the selected 2.1 engine family.
 -- Their absence on 2.0 is an actual capability boundary, not a disabled row.
 function M.supports_family(key)
@@ -836,6 +841,7 @@ function M.select(active_mods, raw)
     bob_native_continuations = M.retains_bob_native_continuations(active_mods),
     py_coal = py.coal, py_hightech = py.hightech, bob_warfare = bob_warfare,
     bob_productivity = bob_productivity,
+    ironclad = M.is_ironclad(active_mods),
     required_product_targets = required_product_targets, additional_product_bindings = additional_product_bindings,
     exact_product_bindings = exact_product_bindings,
     exact_product_target_families = exact_product_target_families,
@@ -876,6 +882,33 @@ local function merge_continuation_fields(destination, source, known_ids)
     local changed = destination[id] or {}
     for key, value in pairs(fields) do changed[key] = copy(value) end
     destination[id] = changed
+  end
+end
+
+-- These two declared native categories remain in the generic continuation
+-- when their dedicated MIR stream is disabled or overlap adjustment is off.
+-- Read only its one named predecessor; no technology discovery is involved.
+local function append_native_weapon_categories(row, raw)
+  if row.id ~= "weapon-shooting-speed-7" or type(raw) ~= "table"
+      or type(raw.technology) ~= "table" then return end
+  local predecessor = raw.technology["weapon-shooting-speed-6"]
+  if type(predecessor) ~= "table" or type(predecessor.effects) ~= "table" then return end
+  local declared, consumed = {}, {}
+  for _, effect in ipairs(row.effects) do
+    if type(effect.ammo_category) == "string" then declared[effect.ammo_category] = true end
+  end
+  for _, effect in ipairs(predecessor.effects) do
+    if type(effect) == "table" and effect.type == "gun-speed"
+        and (effect.ammo_category == "cannon-shell" or effect.ammo_category == "rocket")
+        and not declared[effect.ammo_category] then
+      if consumed[effect.ammo_category] or type(effect.modifier) ~= "number"
+          or effect.modifier ~= effect.modifier or effect.modifier < 0 or effect.modifier == math.huge then
+        error("MIR native weapon continuation has invalid " .. effect.ammo_category .. " bonus", 2)
+      end
+      consumed[effect.ammo_category] = true
+      row.effects[#row.effects + 1] = {type = "gun-speed", ammo_category = effect.ammo_category,
+        scale = effect.modifier / 0.4}
+    end
   end
 end
 
@@ -947,6 +980,10 @@ function M.continuations(active_mods, raw)
     if changed then for key, value in pairs(changed) do row[key] = copy(value) end end
     changed = overrides_by_id[row.id]
     if changed then for key, value in pairs(changed) do row[key] = copy(value) end end
+    append_native_weapon_categories(row, raw)
+    if row.id == "weapon-shooting-speed-7" and M.is_ironclad(active_mods) then
+      row.effects[#row.effects + 1] = require("compatibility.ironclad").continuation_effect()
+    end
   end
   if M.retains_bob_native_continuations(active_mods) then
     local retained = {}
