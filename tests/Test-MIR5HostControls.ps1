@@ -16,6 +16,7 @@ $controls = @(
   [ordered]@{path='tests/test_modern_targets.py';lua=$true},
   [ordered]@{path='tests/test_k2_base_catalogue.py';lua=$true},
   [ordered]@{path='tests/test_space_exploration_catalogue.py';lua=$true},
+  [ordered]@{path='tests/test_space_exploration_pipeline.py';lua=$true},
   [ordered]@{path='tests/test_k2_base_native_fixture.py';lua=$true},
   [ordered]@{path='tests/test_aai_parity_native_controls.py';lua=$true},
   [ordered]@{path='tests/test_bob_angel_materials.py';lua=$true},
