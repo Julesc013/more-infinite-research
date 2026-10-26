@@ -1,6 +1,7 @@
 """Hash-locked F200 Krastorio 2 Base catalogue admission; no native result claimed."""
 import argparse
 import hashlib
+import gzip
 import json
 from pathlib import Path
 from historical_sources import read_published_source
@@ -221,6 +222,11 @@ class K2BaseCatalogueTests(unittest.TestCase):
 
     def _f210_pipeline_raw(self, case):
         """Portable F210 K2 input: retained general rows plus captured K2 facts."""
+        if case["mods"].get("space-exploration"):
+            # The SE catalogue has its own complete upstream-only context.
+            # The older K2Base subset cannot represent its exact recipe vectors.
+            with gzip.open(ROOT / "tests/fixtures/space-exploration-f210-upstream-context.json.gz", "rt", encoding="utf-8") as stream:
+                return json.load(stream)["cases"]["k2se"]["raw"]
         raw = self._captured_raw_subset()
         gear = self.f210_facts["gear"]
         raw["recipe"][gear["recipe"]] = {
@@ -634,11 +640,13 @@ class K2BaseCatalogueTests(unittest.TestCase):
               and #binding.recipes == 1 and binding.recipes[1] == expected.recipe,
               "captured K2 gear binding differs: " .. case.id)
             local selection = catalogue.select(active)
-            assert(selection.profile == expected.binding_profile and #selection.definitions > 0
+            local expected_profile = active["space-exploration"] and "k2-space-exploration-f210" or expected.binding_profile
+            assert(selection.profile == expected_profile and #selection.definitions > 0
               and #selection.continuations > 0 and selection.k2_imersite == false,
               "captured K2 catalogue selection differs: " .. case.id)
             for _, continuation in ipairs(selection.continuations) do
-              if continuation.key == "laser_shooting_speed" or continuation.key == "weapon_shooting_speed" then
+              if not active["space-exploration"]
+                and (continuation.key == "laser_shooting_speed" or continuation.key == "weapon_shooting_speed") then
                 for _, effect in ipairs(continuation.effects or {}) do
                   assert(effect.ammo_category ~= "kr-impulse-rifle" and effect.ammo_category ~= "kr-pistol"
                     and effect.ammo_category ~= "kr-anti-materiel-rifle-ammo"
@@ -744,13 +752,16 @@ class K2BaseCatalogueTests(unittest.TestCase):
         gear = self.f210_facts["gear"]
         owner_science = self.f210_facts["owner_science"]
         for case in self.f210_facts["cases"]:
+            before = self._f210_pipeline_raw(case)
             actual, _ = self._run_f210_pipeline(case)
             facts = self.f210_facts["science_and_lab_facts"][case["id"]]
             with self.subTest(case=case["id"]):
                 self.assertEqual(gear["ingredients"], actual["recipe"][gear["recipe"]]["ingredients"])
                 self.assertEqual(gear["results"], actual["recipe"][gear["recipe"]]["results"])
                 for name, expected in facts["technologies"].items():
-                    self.assertEqual(expected, actual["technology"][name])
+                    self.assertEqual(before["technology"][name], actual["technology"][name])
+                    for field, value in expected.items():
+                        self.assertEqual(value, actual["technology"][name][field], (name, field))
                 lab_inputs = set(actual["lab"]["kr-advanced-lab"]["inputs"])
                 self.assertTrue(set(owner_science).issubset(lab_inputs))
                 generated = actual["technology"]["recipe-prod-research_gears-1"]

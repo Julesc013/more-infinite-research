@@ -473,6 +473,16 @@ class GeneratorTests(unittest.TestCase):
           assert(environment.writes == 0, "active binding wrote before named preflight")
         ''')
 
+    def test_aai_f210_presentations_match_both_published_native_captures(self):
+        facts = json.loads((ROOT / "tests/fixtures/aai-presentation-f210-captured-facts.json").read_bytes())
+        for active_mods in ({"aai-industry": "0.7.5"},
+                            {"aai-industry": "0.7.5", "space-age": "2.1.23"}):
+            self.lua.globals().aai_mods = lua_table(self.lua, active_mods)
+            rows = self.lua.eval("function() return modern.technologies(modern_catalogue.select(aai_mods), config.resolve(defaults())) end")()
+            actual = {row["name"]: plain_lua(row) for row in rows.values()}
+            for name, expected in facts["icons"].items():
+                self.assertEqual(actual[name]["icons"], expected)
+
     def test_full_modern_catalogue_is_lazy_bounded_and_declares_exact_owners(self):
         self.lua.execute('''
           -- Base construction must not require the inactive Space Age body.

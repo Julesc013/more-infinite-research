@@ -407,6 +407,36 @@ function M.is_k2_base(active_mods)
   return false
 end
 
+function M.is_space_exploration(active_mods)
+  return target.id == "f210" and type(active_mods) == "table"
+    and active_mods["space-exploration"] ~= nil and not active_space_age(active_mods)
+    and active_mods["Krastorio2-spaced-out"] == nil and active_mods["k2so-assets"] == nil
+end
+
+local function space_exploration_deltas(active_mods)
+  if not M.is_space_exploration(active_mods) then return nil end
+  local base = require("compatibility.modern_catalogue.space_exploration")
+  local extra = M.is_k2_base(active_mods)
+    and require("compatibility.modern_catalogue.k2_space_exploration") or nil
+  return base, extra
+end
+
+local function apply_authored_definitions(definitions, delta)
+  local by_key = {}
+  for _, definition in ipairs(definitions) do by_key[definition.key] = definition end
+  for key, fields in pairs(delta.definition_overrides or {}) do
+    local definition = assert(by_key[key], "MIR authored profile lacks definition " .. key)
+    for field, value in pairs(fields) do definition[field] = copy(value) end
+    if fields.prerequisites ~= nil then definition.exact_prerequisites = true end
+  end
+  for _, addition in ipairs(delta.additions or {}) do
+    assert(by_key[addition.key] == nil, "MIR authored profile duplicates definition " .. addition.key)
+    local definition = copy(addition)
+    definition.exact_prerequisites = true
+    definitions[#definitions + 1], by_key[definition.key] = definition, definition
+  end
+end
+
 -- K2SO is an exact delivered tuple, not a broad Krastorio assumption. Keep
 -- this gate here so inactive profiles never construct the K2SO body.
 function M.is_k2so(active_mods)
@@ -560,6 +590,13 @@ end
 
 function M.science_names(key)
   local vector = SCIENCE[key]
+  if vector == nil and type(key) == "string" then
+    if key:match("^science_se_k2_") then
+      vector = require("compatibility.modern_catalogue.k2_space_exploration").science[key]
+    elseif key:match("^science_se_") then
+      vector = require("compatibility.modern_catalogue.space_exploration").science[key]
+    end
+  end
   if type(vector) ~= "table" then error("MIR unknown authored science vector " .. tostring(key), 2) end
   local out = {}
   for index = 1, #vector do out[index] = vector[index] end
@@ -662,6 +699,39 @@ function M.select(active_mods)
     })
     profile = "bob-warfare-f200"
   end
+  local se, k2se = space_exploration_deltas(active_mods)
+  if se then
+    exact_product_bindings, required_product_targets = {}, {}
+    local function apply(delta)
+      apply_authored_definitions(definitions, delta)
+      local kept = {}
+      for _, binding in ipairs(exact_product_bindings) do
+        if not delta.exact_product_target_families[binding.family] then kept[#kept + 1] = binding end
+      end
+      for _, binding in ipairs(delta.exact_product_bindings or {}) do kept[#kept + 1] = copy(binding) end
+      exact_product_bindings = kept
+      for family, recipes in pairs(delta.required_product_targets or {}) do required_product_targets[family] = copy(recipes) end
+      copy_true_fields(exact_product_target_families, delta.exact_product_target_families or {})
+      copy_true_fields(replacement_product_target_families, delta.replacement_product_target_families or {})
+      copy_true_fields(excluded_product_target_recipes, delta.excluded_product_target_recipes or {})
+    end
+    apply(se)
+    if k2se then apply(k2se) end
+    profile = k2se and "k2-space-exploration-f210" or "space-exploration-f210"
+  end
+  -- The independently captured AAI Base/Space Age intersection changes only
+  -- these two authored presentations. Keep it separate from SE/K2 semantics.
+  if target.id == "f210" and active_mods["aai-industry"] ~= nil then
+    for _, definition in ipairs(definitions) do
+      if definition.key == "research_engine" then
+        definition.icon = "__aai-industry__/graphics/technology/multi-cylinder-engine.png"
+        definition.icon_size = 256
+      elseif definition.key == "research_electric_engine" then
+        definition.icon = "__aai-industry__/graphics/technology/electric-engine.png"
+        definition.icon_size = 256
+      end
+    end
+  end
   return {profile = profile, definitions = supported_definitions(definitions), continuations = M.continuations(active_mods),
     native_owners = M.native_owners(active_mods), recipe_patches = recipe_patches,
     k2_imersite = k2so and k2so.imersite or false, bob_angel = bob_angel, bob_core = bob_core,
@@ -679,6 +749,10 @@ end
 -- admitted native owner there; it only adds its own authored stream settings.
 function M.setting_definitions(active_mods)
   local definitions = copy_definitions(BASE.definitions)
+  local se = space_exploration_deltas(active_mods)
+  if se then
+    for _, definition in ipairs(se.additions or {}) do definitions[#definitions + 1] = copy(definition) end
+  end
   if active_space_age(active_mods) then
     local delta = require("compatibility.modern_catalogue.space_age")
     for index = 1, #delta.additions do definitions[#definitions + 1] = copy(delta.additions[index]) end
@@ -712,6 +786,19 @@ function M.continuations(active_mods)
     for _, row in ipairs(rows) do row.science = assert(science[row.science]) end
   end
   local overrides, overrides_by_id = {}, {}
+  local se, k2se = space_exploration_deltas(active_mods)
+  if se then
+    for key, fields in pairs(se.continuation_overrides or {}) do overrides[key] = copy(fields) end
+    if k2se then
+      for key, fields in pairs(k2se.continuation_overrides or {}) do
+        overrides[key] = overrides[key] or {}
+        for field, value in pairs(fields) do overrides[key][field] = copy(value) end
+      end
+    end
+    for _, fields in pairs(overrides) do
+      if fields.prerequisites ~= nil then fields.exact_prerequisites = true end
+    end
+  end
   if active_space_age(active_mods) then
     for key, value in pairs(require("compatibility.modern_catalogue.space_age").continuation_overrides or {}) do
       overrides[key] = value

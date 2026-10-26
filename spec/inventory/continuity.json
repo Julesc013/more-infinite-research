@@ -2471,6 +2471,1157 @@
               "profile": "tests/profiles/popular-angelsrefining-space-age-f210-2123.json"
             }
           ]
+        },
+        "current_f210_archive_refresh": {
+          "status": "44-exact-selections-refreshed-native-qualification-pending",
+          "date": "2026-10-26",
+          "prior_input_source_commit": "6dbbceedc192390210a8fb4325a84f5b3844d0aa",
+          "scope": "31 official Portal archives verified and moved under exclusive ownership into the existing F210 direct library. All44 refreshed selections pass finite archived required/optional version and conflict checks. This updates executable inputs, not the dated popularity ranking or the exact5c51/B2 results. New native admission, useful effects, research, state and save/client axes remain unrun.",
+          "prior_cohort": "spec/evidence/broad-ecosystem-f210-b2-native-chain.json",
+          "native_qualification": false,
+          "profiles": [
+            {
+              "profile": "tests/profiles/aai-bob-angel-bz-available-six-base-f210-2123.json",
+              "sha256": "71CC2A696754AAC4B4D6AAE45114694ED9725BA43914CF8670E0D3D47E9CC8F3",
+              "changes": [
+                {
+                  "name": "bobgreenhouse",
+                  "old": "3.0.0",
+                  "new": "3.0.1"
+                },
+                {
+                  "name": "bobpower",
+                  "old": "3.0.0",
+                  "new": "3.0.1"
+                },
+                {
+                  "name": "bobrevamp",
+                  "old": "3.0.0",
+                  "new": "3.0.1"
+                },
+                {
+                  "name": "angelsbioprocessing",
+                  "old": "2.1.1",
+                  "new": "2.1.2"
+                },
+                {
+                  "name": "bobenemies",
+                  "old": "3.0.0",
+                  "new": "3.0.1"
+                },
+                {
+                  "name": "boblogistics",
+                  "old": "3.0.1",
+                  "new": "3.0.2"
+                },
+                {
+                  "name": "bobmining",
+                  "old": "3.0.1",
+                  "new": "3.0.2"
+                },
+                {
+                  "name": "angelsrefining",
+                  "old": "2.1.2",
+                  "new": "2.1.3"
+                },
+                {
+                  "name": "bobwarfare",
+                  "old": "3.0.1",
+                  "new": "3.0.2"
+                },
+                {
+                  "name": "bobassembly",
+                  "old": "3.0.1",
+                  "new": "3.0.2"
+                }
+              ]
+            },
+            {
+              "profile": "tests/profiles/aai-bob-angel-bz-available-six-space-age-f210-2123.json",
+              "sha256": "28A54F1A1021DD2132443BFE91FF3350A19506865CB261E55B95C985FBAFFC3A",
+              "changes": [
+                {
+                  "name": "bobgreenhouse",
+                  "old": "3.0.0",
+                  "new": "3.0.1"
+                },
+                {
+                  "name": "bobpower",
+                  "old": "3.0.0",
+                  "new": "3.0.1"
+                },
+                {
+                  "name": "bobrevamp",
+                  "old": "3.0.0",
+                  "new": "3.0.1"
+                },
+                {
+                  "name": "angelsbioprocessing",
+                  "old": "2.1.1",
+                  "new": "2.1.2"
+                },
+                {
+                  "name": "bobenemies",
+                  "old": "3.0.0",
+                  "new": "3.0.1"
+                },
+                {
+                  "name": "boblogistics",
+                  "old": "3.0.1",
+                  "new": "3.0.2"
+                },
+                {
+                  "name": "bobmining",
+                  "old": "3.0.1",
+                  "new": "3.0.2"
+                },
+                {
+                  "name": "angelsrefining",
+                  "old": "2.1.2",
+                  "new": "2.1.3"
+                },
+                {
+                  "name": "bobwarfare",
+                  "old": "3.0.1",
+                  "new": "3.0.2"
+                },
+                {
+                  "name": "bobassembly",
+                  "old": "3.0.1",
+                  "new": "3.0.2"
+                }
+              ]
+            },
+            {
+              "profile": "tests/profiles/angel-full-base-f210-2123.json",
+              "sha256": "9A10E9C4F326E0BBE6B3E370B49CA15B9B6DDD397D808BBB13BB520D82EFC995",
+              "changes": [
+                {
+                  "name": "angelsbioprocessing",
+                  "old": "2.1.1",
+                  "new": "2.1.2"
+                },
+                {
+                  "name": "angelsrefining",
+                  "old": "2.1.2",
+                  "new": "2.1.3"
+                }
+              ]
+            },
+            {
+              "profile": "tests/profiles/angel-full-space-age-f210-2123.json",
+              "sha256": "B1F97004AE75E8C95297A7BEE17F6568813CF9DF2F3B302194E92DBAE2E6368D",
+              "changes": [
+                {
+                  "name": "angelsbioprocessing",
+                  "old": "2.1.1",
+                  "new": "2.1.2"
+                },
+                {
+                  "name": "angelsrefining",
+                  "old": "2.1.2",
+                  "new": "2.1.3"
+                }
+              ]
+            },
+            {
+              "profile": "tests/profiles/bob-angel-full-base-f210-2123.json",
+              "sha256": "3AC0B9CBB82F0FA030AE4BAB910E1CBE1617B0873BD33A6348B17B82709285EB",
+              "changes": [
+                {
+                  "name": "bobgreenhouse",
+                  "old": "3.0.0",
+                  "new": "3.0.1"
+                },
+                {
+                  "name": "bobpower",
+                  "old": "3.0.0",
+                  "new": "3.0.1"
+                },
+                {
+                  "name": "bobrevamp",
+                  "old": "3.0.0",
+                  "new": "3.0.1"
+                },
+                {
+                  "name": "angelsbioprocessing",
+                  "old": "2.1.1",
+                  "new": "2.1.2"
+                },
+                {
+                  "name": "bobenemies",
+                  "old": "3.0.0",
+                  "new": "3.0.1"
+                },
+                {
+                  "name": "boblogistics",
+                  "old": "3.0.1",
+                  "new": "3.0.2"
+                },
+                {
+                  "name": "bobmining",
+                  "old": "3.0.1",
+                  "new": "3.0.2"
+                },
+                {
+                  "name": "angelsrefining",
+                  "old": "2.1.2",
+                  "new": "2.1.3"
+                },
+                {
+                  "name": "bobwarfare",
+                  "old": "3.0.1",
+                  "new": "3.0.2"
+                },
+                {
+                  "name": "bobassembly",
+                  "old": "3.0.1",
+                  "new": "3.0.2"
+                }
+              ]
+            },
+            {
+              "profile": "tests/profiles/bob-angel-full-space-age-f210-2123.json",
+              "sha256": "83C36305768623BB6B50AFE24AA6857C014B6C6DF871DD8E24E97EBD0153FCE3",
+              "changes": [
+                {
+                  "name": "bobgreenhouse",
+                  "old": "3.0.0",
+                  "new": "3.0.1"
+                },
+                {
+                  "name": "bobpower",
+                  "old": "3.0.0",
+                  "new": "3.0.1"
+                },
+                {
+                  "name": "bobrevamp",
+                  "old": "3.0.0",
+                  "new": "3.0.1"
+                },
+                {
+                  "name": "angelsbioprocessing",
+                  "old": "2.1.1",
+                  "new": "2.1.2"
+                },
+                {
+                  "name": "bobenemies",
+                  "old": "3.0.0",
+                  "new": "3.0.1"
+                },
+                {
+                  "name": "boblogistics",
+                  "old": "3.0.1",
+                  "new": "3.0.2"
+                },
+                {
+                  "name": "bobmining",
+                  "old": "3.0.1",
+                  "new": "3.0.2"
+                },
+                {
+                  "name": "angelsrefining",
+                  "old": "2.1.2",
+                  "new": "2.1.3"
+                },
+                {
+                  "name": "bobwarfare",
+                  "old": "3.0.1",
+                  "new": "3.0.2"
+                },
+                {
+                  "name": "bobassembly",
+                  "old": "3.0.1",
+                  "new": "3.0.2"
+                }
+              ]
+            },
+            {
+              "profile": "tests/profiles/bob-full-base-f210-2123.json",
+              "sha256": "61165C045E1D23AD7437E0D7E4B4925B8B95491BF6C8651BEA2E25622F12834E",
+              "changes": [
+                {
+                  "name": "bobgreenhouse",
+                  "old": "3.0.0",
+                  "new": "3.0.1"
+                },
+                {
+                  "name": "bobpower",
+                  "old": "3.0.0",
+                  "new": "3.0.1"
+                },
+                {
+                  "name": "bobrevamp",
+                  "old": "3.0.0",
+                  "new": "3.0.1"
+                },
+                {
+                  "name": "bobenemies",
+                  "old": "3.0.0",
+                  "new": "3.0.1"
+                },
+                {
+                  "name": "boblogistics",
+                  "old": "3.0.1",
+                  "new": "3.0.2"
+                },
+                {
+                  "name": "bobmining",
+                  "old": "3.0.1",
+                  "new": "3.0.2"
+                },
+                {
+                  "name": "bobwarfare",
+                  "old": "3.0.1",
+                  "new": "3.0.2"
+                },
+                {
+                  "name": "bobassembly",
+                  "old": "3.0.1",
+                  "new": "3.0.2"
+                }
+              ]
+            },
+            {
+              "profile": "tests/profiles/bob-full-space-age-f210-2123.json",
+              "sha256": "B9354B36838446C4B44ADF752A9B5CEC127BD687299CE708DD957497268D4989",
+              "changes": [
+                {
+                  "name": "bobgreenhouse",
+                  "old": "3.0.0",
+                  "new": "3.0.1"
+                },
+                {
+                  "name": "bobpower",
+                  "old": "3.0.0",
+                  "new": "3.0.1"
+                },
+                {
+                  "name": "bobrevamp",
+                  "old": "3.0.0",
+                  "new": "3.0.1"
+                },
+                {
+                  "name": "bobenemies",
+                  "old": "3.0.0",
+                  "new": "3.0.1"
+                },
+                {
+                  "name": "boblogistics",
+                  "old": "3.0.1",
+                  "new": "3.0.2"
+                },
+                {
+                  "name": "bobmining",
+                  "old": "3.0.1",
+                  "new": "3.0.2"
+                },
+                {
+                  "name": "bobwarfare",
+                  "old": "3.0.1",
+                  "new": "3.0.2"
+                },
+                {
+                  "name": "bobassembly",
+                  "old": "3.0.1",
+                  "new": "3.0.2"
+                }
+              ]
+            },
+            {
+              "profile": "tests/profiles/popular-angelsrefining-base-f210-2123.json",
+              "sha256": "763BB1A357FB0EB9B8B60D440865976BAF4754C596781EA733C98D5A1B1963E6",
+              "changes": [
+                {
+                  "name": "angelsrefining",
+                  "old": "2.1.2",
+                  "new": "2.1.3"
+                }
+              ]
+            },
+            {
+              "profile": "tests/profiles/popular-angelsrefining-space-age-f210-2123.json",
+              "sha256": "282A54F7E20F037565541C40DBA3DFAAFAD689BF2430F14D35C88611C8DCE974",
+              "changes": [
+                {
+                  "name": "angelsrefining",
+                  "old": "2.1.2",
+                  "new": "2.1.3"
+                }
+              ]
+            },
+            {
+              "profile": "tests/profiles/popular-bobassembly-base-f210-2123.json",
+              "sha256": "307596C4C1A7D3389437092E403E31227628B96C48FCB43C348F821F549F7D68",
+              "changes": [
+                {
+                  "name": "bobassembly",
+                  "old": "3.0.1",
+                  "new": "3.0.2"
+                }
+              ]
+            },
+            {
+              "profile": "tests/profiles/popular-bobassembly-space-age-f210-2123.json",
+              "sha256": "375DF286BA12530646191BF3D2B0898642EF54CE3A3EE9112031EA7F7175DA8E",
+              "changes": [
+                {
+                  "name": "bobassembly",
+                  "old": "3.0.1",
+                  "new": "3.0.2"
+                }
+              ]
+            },
+            {
+              "profile": "tests/profiles/popular-bobenemies-base-f210-2123.json",
+              "sha256": "8134E0527CD7CB3EBB4E460A3E98591F79CECACA7DF2B53DE904FDCF9764A73B",
+              "changes": [
+                {
+                  "name": "bobenemies",
+                  "old": "3.0.0",
+                  "new": "3.0.1"
+                }
+              ]
+            },
+            {
+              "profile": "tests/profiles/popular-bobenemies-space-age-f210-2123.json",
+              "sha256": "4497DBE1C82F7268AE8843273A3AE20B0E08E4BDE0EF0DC62EF3746FC92A442C",
+              "changes": [
+                {
+                  "name": "bobenemies",
+                  "old": "3.0.0",
+                  "new": "3.0.1"
+                }
+              ]
+            },
+            {
+              "profile": "tests/profiles/popular-boblogistics-base-f210-2123.json",
+              "sha256": "01F051B23E875D2FDF2AB3D452F66EA4D55CACEF6E2D0F35CC982EC6A77262A9",
+              "changes": [
+                {
+                  "name": "boblogistics",
+                  "old": "3.0.1",
+                  "new": "3.0.2"
+                }
+              ]
+            },
+            {
+              "profile": "tests/profiles/popular-boblogistics-space-age-f210-2123.json",
+              "sha256": "DA84F573F2A719DC40A81BBD01504C8CDC725B61C44CFC7577091E4AB87909B7",
+              "changes": [
+                {
+                  "name": "boblogistics",
+                  "old": "3.0.1",
+                  "new": "3.0.2"
+                }
+              ]
+            },
+            {
+              "profile": "tests/profiles/popular-bobmining-base-f210-2123.json",
+              "sha256": "C9C0591456C38B8EEF0A65F131F9B43083AF42B56515077B1D5C760AEE6BA88C",
+              "changes": [
+                {
+                  "name": "bobmining",
+                  "old": "3.0.1",
+                  "new": "3.0.2"
+                }
+              ]
+            },
+            {
+              "profile": "tests/profiles/popular-bobmining-space-age-f210-2123.json",
+              "sha256": "B1A880E2A5F456DC15FCDDE237A2F9C8355095A045438622D99750D481F1DC5B",
+              "changes": [
+                {
+                  "name": "bobmining",
+                  "old": "3.0.1",
+                  "new": "3.0.2"
+                }
+              ]
+            },
+            {
+              "profile": "tests/profiles/popular-bobpower-base-f210-2123.json",
+              "sha256": "A54CD80D2D5DE58EE37755B6707C026B067477E8F7CF7C28FDCFFA296E694ECE",
+              "changes": [
+                {
+                  "name": "bobpower",
+                  "old": "3.0.0",
+                  "new": "3.0.1"
+                }
+              ]
+            },
+            {
+              "profile": "tests/profiles/popular-bobpower-space-age-f210-2123.json",
+              "sha256": "29BEE073AD6457434FEA841BD843E6B469B14D2CBB98948D6EAA289C78943FA5",
+              "changes": [
+                {
+                  "name": "bobpower",
+                  "old": "3.0.0",
+                  "new": "3.0.1"
+                }
+              ]
+            },
+            {
+              "profile": "tests/profiles/popular-bobrevamp-base-f210-2123.json",
+              "sha256": "662C0D2CE743FBC3F20DE8B5A786D3E16024BD707C61EB7DC18BB4975B46C867",
+              "changes": [
+                {
+                  "name": "bobrevamp",
+                  "old": "3.0.0",
+                  "new": "3.0.1"
+                }
+              ]
+            },
+            {
+              "profile": "tests/profiles/popular-bobrevamp-space-age-f210-2123.json",
+              "sha256": "8F7AEC601B1031D717FFD2D4740D8D02D498E997AE99B5B79778A1A9D7C8E71F",
+              "changes": [
+                {
+                  "name": "bobrevamp",
+                  "old": "3.0.0",
+                  "new": "3.0.1"
+                }
+              ]
+            },
+            {
+              "profile": "tests/profiles/popular-bobwarfare-base-f210-2123.json",
+              "sha256": "55C2704323B74795623FE865B9EFEC469E1E32F913C8AFA92BCBC00290410522",
+              "changes": [
+                {
+                  "name": "bobwarfare",
+                  "old": "3.0.1",
+                  "new": "3.0.2"
+                }
+              ]
+            },
+            {
+              "profile": "tests/profiles/popular-bobwarfare-space-age-f210-2123.json",
+              "sha256": "DDF98B3E1D5D8CD89A5D566BED2793A28AE463A916A790D1C54ACE245D38B64F",
+              "changes": [
+                {
+                  "name": "bobwarfare",
+                  "old": "3.0.1",
+                  "new": "3.0.2"
+                }
+              ]
+            },
+            {
+              "profile": "tests/profiles/popular-factoryplanner-base-f210-2123.json",
+              "sha256": "C50D6D02B34BFC8BB5001D807B5B4FEC274715830275D02D3B979B245E741933",
+              "changes": [
+                {
+                  "name": "factoryplanner",
+                  "old": "2.1.13",
+                  "new": "2.1.21"
+                }
+              ]
+            },
+            {
+              "profile": "tests/profiles/popular-factoryplanner-space-age-f210-2123.json",
+              "sha256": "446FEB39E99DD668722C5A3B57714CD2CBBD73FEF91773D046143CB6DA656B2E",
+              "changes": [
+                {
+                  "name": "factoryplanner",
+                  "old": "2.1.13",
+                  "new": "2.1.21"
+                }
+              ]
+            },
+            {
+              "profile": "tests/profiles/popular-fluidmustflow-base-f210-2123.json",
+              "sha256": "F0AE70EDC92787CDFB5B75D74487F9583BA650993D79E9D7C287B5067654B04F",
+              "changes": [
+                {
+                  "name": "FluidMustFlow",
+                  "old": "1.5.0",
+                  "new": "1.5.1"
+                }
+              ]
+            },
+            {
+              "profile": "tests/profiles/popular-fluidmustflow-space-age-f210-2123.json",
+              "sha256": "1EC71A479B916C60EBAF79C1CFBFF28D93B42558CC9E604C00B1F169C3C9E553",
+              "changes": [
+                {
+                  "name": "FluidMustFlow",
+                  "old": "1.5.0",
+                  "new": "1.5.1"
+                }
+              ]
+            },
+            {
+              "profile": "tests/profiles/popular-helmod-base-f210-2123.json",
+              "sha256": "8DDB37C739315577EE96D2A11BC68989B8688AB6FD93BA3B617625831A64081C",
+              "changes": [
+                {
+                  "name": "helmod",
+                  "old": "2.3.3",
+                  "new": "2.3.6"
+                }
+              ]
+            },
+            {
+              "profile": "tests/profiles/popular-helmod-space-age-f210-2123.json",
+              "sha256": "97472DA931B4EB892006229364E74E857548A15BDF987562F70536B52CC407A8",
+              "changes": [
+                {
+                  "name": "helmod",
+                  "old": "2.3.3",
+                  "new": "2.3.6"
+                }
+              ]
+            },
+            {
+              "profile": "tests/profiles/popular-logistictrainnetwork-base-f210-2123.json",
+              "sha256": "E85020DE3DE035D12FCA8DF79E3E891598B3840CB74D1F26329010AF9B4B27A3",
+              "changes": [
+                {
+                  "name": "LogisticTrainNetwork",
+                  "old": "3.1.0",
+                  "new": "3.4.1"
+                }
+              ]
+            },
+            {
+              "profile": "tests/profiles/popular-logistictrainnetwork-space-age-f210-2123.json",
+              "sha256": "41044E2849B9E7464A146FA47E806D3C1B98A8DAAA04C20561115D5ED8990782",
+              "changes": [
+                {
+                  "name": "LogisticTrainNetwork",
+                  "old": "3.1.0",
+                  "new": "3.4.1"
+                }
+              ]
+            },
+            {
+              "profile": "tests/profiles/popular-power-armor-mk3-base-f210-2123.json",
+              "sha256": "16959B9331C8266FC967650AD586C0BF2526AC2B83B09E8FD56F8F4125456EA5",
+              "changes": [
+                {
+                  "name": "Power Armor MK3",
+                  "old": "2.1.08",
+                  "new": "2.1.09"
+                }
+              ]
+            },
+            {
+              "profile": "tests/profiles/popular-power-armor-mk3-space-age-f210-2123.json",
+              "sha256": "7337C3C16D0AE917FDCEB9C3103CFC90E1226BF1CBC65BB3FC4A692826722D96",
+              "changes": [
+                {
+                  "name": "Power Armor MK3",
+                  "old": "2.1.08",
+                  "new": "2.1.09"
+                }
+              ]
+            },
+            {
+              "profile": "tests/profiles/popular-ratecalculator-base-f210-2123.json",
+              "sha256": "A415DBB8EA5F531671633289C749EDA48D694494D3F15D76230B38B279842376",
+              "changes": [
+                {
+                  "name": "RateCalculator",
+                  "old": "3.4.1",
+                  "new": "3.4.2"
+                }
+              ]
+            },
+            {
+              "profile": "tests/profiles/popular-ratecalculator-space-age-f210-2123.json",
+              "sha256": "9785A8816C9A2186246226BD12BDF0087D8F5E893CCE66107F71B8DA0FA1CFF5",
+              "changes": [
+                {
+                  "name": "RateCalculator",
+                  "old": "3.4.1",
+                  "new": "3.4.2"
+                }
+              ]
+            },
+            {
+              "profile": "tests/profiles/popular-squeak-through-2-base-f210-2123.json",
+              "sha256": "21201E46FAF719CDBB4FDC32D0927262DFA40B012DEC3D0C19762DB2B72AACE7",
+              "changes": [
+                {
+                  "name": "squeak-through-2",
+                  "old": "0.2.0",
+                  "new": "0.2.1"
+                }
+              ]
+            },
+            {
+              "profile": "tests/profiles/popular-squeak-through-2-space-age-f210-2123.json",
+              "sha256": "67D69F348448A5D1D499DBB278BEEFCF3FD255C36CD1BC37DFC6499D1476E3DF",
+              "changes": [
+                {
+                  "name": "squeak-through-2",
+                  "old": "0.2.0",
+                  "new": "0.2.1"
+                }
+              ]
+            },
+            {
+              "profile": "tests/profiles/popular-waterfill-v17-base-f210-2123.json",
+              "sha256": "0275A00FFD08E2B5F9B1C1571BC2BC9A6080555905CF553D78532E7681F3D35B",
+              "changes": [
+                {
+                  "name": "Waterfill_v17",
+                  "old": "2.1.1",
+                  "new": "2.1.2"
+                }
+              ]
+            },
+            {
+              "profile": "tests/profiles/popular-waterfill-v17-space-age-f210-2123.json",
+              "sha256": "0D75AD10286F2B16873634ED9BA7FE7C6CB09A864F309A85979337165843F3E9",
+              "changes": [
+                {
+                  "name": "Waterfill_v17",
+                  "old": "2.1.1",
+                  "new": "2.1.2"
+                }
+              ]
+            },
+            {
+              "profile": "tests/profiles/py-suite-base-f210-2123.json",
+              "sha256": "E3A5A48EF7894589222CDFC81C1FDA56E474836ABC43C529180DC8F2758A387A",
+              "changes": [
+                {
+                  "name": "pyhightech",
+                  "old": "3.1.3",
+                  "new": "3.1.5"
+                },
+                {
+                  "name": "pycoalprocessing",
+                  "old": "3.1.4",
+                  "new": "3.1.8"
+                },
+                {
+                  "name": "pyindustry",
+                  "old": "3.1.3",
+                  "new": "3.1.6"
+                },
+                {
+                  "name": "pypostprocessing",
+                  "old": "3.1.3",
+                  "new": "3.1.7"
+                },
+                {
+                  "name": "pyfusionenergygraphics",
+                  "old": "3.1.0",
+                  "new": "3.1.1"
+                },
+                {
+                  "name": "pyalternativeenergy",
+                  "old": "3.2.6",
+                  "new": "3.2.11"
+                },
+                {
+                  "name": "pycoalprocessinggraphics",
+                  "old": "3.1.0",
+                  "new": "3.1.1"
+                },
+                {
+                  "name": "pyfusionenergy",
+                  "old": "3.1.3",
+                  "new": "3.1.6"
+                },
+                {
+                  "name": "pyrawores",
+                  "old": "3.1.3",
+                  "new": "3.1.4"
+                },
+                {
+                  "name": "pyalienlifegraphics",
+                  "old": "3.1.0",
+                  "new": "3.1.1"
+                },
+                {
+                  "name": "pyhightechgraphics",
+                  "old": "3.1.0",
+                  "new": "3.1.1"
+                },
+                {
+                  "name": "pyalienlife",
+                  "old": "3.1.5",
+                  "new": "3.1.8"
+                },
+                {
+                  "name": "pypetroleumhandling",
+                  "old": "3.1.2",
+                  "new": "3.1.3"
+                }
+              ]
+            },
+            {
+              "profile": "tests/profiles/py-suite-space-age-f210-2123.json",
+              "sha256": "859FBAB6053AE4F37B2E793B9C08E073FC79C77DC391071EA30A22E8488E3DC2",
+              "changes": [
+                {
+                  "name": "pyhightech",
+                  "old": "3.1.3",
+                  "new": "3.1.5"
+                },
+                {
+                  "name": "pycoalprocessing",
+                  "old": "3.1.4",
+                  "new": "3.1.8"
+                },
+                {
+                  "name": "pyindustry",
+                  "old": "3.1.3",
+                  "new": "3.1.6"
+                },
+                {
+                  "name": "pypostprocessing",
+                  "old": "3.1.3",
+                  "new": "3.1.7"
+                },
+                {
+                  "name": "pyfusionenergygraphics",
+                  "old": "3.1.0",
+                  "new": "3.1.1"
+                },
+                {
+                  "name": "pyalternativeenergy",
+                  "old": "3.2.6",
+                  "new": "3.2.11"
+                },
+                {
+                  "name": "pycoalprocessinggraphics",
+                  "old": "3.1.0",
+                  "new": "3.1.1"
+                },
+                {
+                  "name": "pyfusionenergy",
+                  "old": "3.1.3",
+                  "new": "3.1.6"
+                },
+                {
+                  "name": "pyrawores",
+                  "old": "3.1.3",
+                  "new": "3.1.4"
+                },
+                {
+                  "name": "pyalienlifegraphics",
+                  "old": "3.1.0",
+                  "new": "3.1.1"
+                },
+                {
+                  "name": "pyhightechgraphics",
+                  "old": "3.1.0",
+                  "new": "3.1.1"
+                },
+                {
+                  "name": "pyalienlife",
+                  "old": "3.1.5",
+                  "new": "3.1.8"
+                },
+                {
+                  "name": "pypetroleumhandling",
+                  "old": "3.1.2",
+                  "new": "3.1.3"
+                }
+              ]
+            },
+            {
+              "profile": "tests/profiles/py-suite-with-productivity-base-f210-2123.json",
+              "sha256": "8FF5241AD54D508A749A5622DA45DF2D59B79B1B3E646EE1F37BD91C7BB47069",
+              "changes": [
+                {
+                  "name": "pyhightech",
+                  "old": "3.1.3",
+                  "new": "3.1.5"
+                },
+                {
+                  "name": "pycoalprocessing",
+                  "old": "3.1.4",
+                  "new": "3.1.8"
+                },
+                {
+                  "name": "pyindustry",
+                  "old": "3.1.3",
+                  "new": "3.1.6"
+                },
+                {
+                  "name": "pypostprocessing",
+                  "old": "3.1.3",
+                  "new": "3.1.7"
+                },
+                {
+                  "name": "pyfusionenergygraphics",
+                  "old": "3.1.0",
+                  "new": "3.1.1"
+                },
+                {
+                  "name": "pyalternativeenergy",
+                  "old": "3.2.6",
+                  "new": "3.2.11"
+                },
+                {
+                  "name": "pycoalprocessinggraphics",
+                  "old": "3.1.0",
+                  "new": "3.1.1"
+                },
+                {
+                  "name": "pyfusionenergy",
+                  "old": "3.1.3",
+                  "new": "3.1.6"
+                },
+                {
+                  "name": "pyrawores",
+                  "old": "3.1.3",
+                  "new": "3.1.4"
+                },
+                {
+                  "name": "pyalienlifegraphics",
+                  "old": "3.1.0",
+                  "new": "3.1.1"
+                },
+                {
+                  "name": "pyhightechgraphics",
+                  "old": "3.1.0",
+                  "new": "3.1.1"
+                },
+                {
+                  "name": "pyalienlife",
+                  "old": "3.1.5",
+                  "new": "3.1.8"
+                },
+                {
+                  "name": "pypetroleumhandling",
+                  "old": "3.1.2",
+                  "new": "3.1.3"
+                }
+              ]
+            },
+            {
+              "profile": "tests/profiles/py-suite-with-productivity-space-age-f210-2123.json",
+              "sha256": "D480AFB9DFECC923B52E5BCF12893E9683028F9D58435906DBEE7C3FE87CC02C",
+              "changes": [
+                {
+                  "name": "pyhightech",
+                  "old": "3.1.3",
+                  "new": "3.1.5"
+                },
+                {
+                  "name": "pycoalprocessing",
+                  "old": "3.1.4",
+                  "new": "3.1.8"
+                },
+                {
+                  "name": "pyindustry",
+                  "old": "3.1.3",
+                  "new": "3.1.6"
+                },
+                {
+                  "name": "pypostprocessing",
+                  "old": "3.1.3",
+                  "new": "3.1.7"
+                },
+                {
+                  "name": "pyfusionenergygraphics",
+                  "old": "3.1.0",
+                  "new": "3.1.1"
+                },
+                {
+                  "name": "pyalternativeenergy",
+                  "old": "3.2.6",
+                  "new": "3.2.11"
+                },
+                {
+                  "name": "pycoalprocessinggraphics",
+                  "old": "3.1.0",
+                  "new": "3.1.1"
+                },
+                {
+                  "name": "pyfusionenergy",
+                  "old": "3.1.3",
+                  "new": "3.1.6"
+                },
+                {
+                  "name": "pyrawores",
+                  "old": "3.1.3",
+                  "new": "3.1.4"
+                },
+                {
+                  "name": "pyalienlifegraphics",
+                  "old": "3.1.0",
+                  "new": "3.1.1"
+                },
+                {
+                  "name": "pyhightechgraphics",
+                  "old": "3.1.0",
+                  "new": "3.1.1"
+                },
+                {
+                  "name": "pyalienlife",
+                  "old": "3.1.5",
+                  "new": "3.1.8"
+                },
+                {
+                  "name": "pypetroleumhandling",
+                  "old": "3.1.2",
+                  "new": "3.1.3"
+                }
+              ]
+            }
+          ],
+          "official_archive_inputs": [
+            {
+              "file_name": "angelsbioprocessing_2.1.2.zip",
+              "bytes": 168063,
+              "sha256": "DBD4A5DACB27771449150D00E8A67202CA8AE7F58E43A3FACBEBEAD1E38D0AFA"
+            },
+            {
+              "file_name": "angelsrefining_2.1.3.zip",
+              "bytes": 524658,
+              "sha256": "1695975EB9BB9B08AC00E8C337BBBE7B043E74D6A48B99E9F3771EF8B1BA0EBF"
+            },
+            {
+              "file_name": "bobassembly_3.0.2.zip",
+              "bytes": 29149750,
+              "sha256": "872E973046FEFB716E899F74AB70A74E1811122B28074C454D7EFCB09A4A3AE7"
+            },
+            {
+              "file_name": "bobenemies_3.0.1.zip",
+              "bytes": 1311696,
+              "sha256": "4B1A939F53B1A1AEC54026A2408D453DBBB6901D7DD3644DA890AC781E2211BD"
+            },
+            {
+              "file_name": "bobgreenhouse_3.0.1.zip",
+              "bytes": 299030,
+              "sha256": "B0F107A8CDA879E2F3F974AAA592C9F3AC1DCA5DB34019558CE6999F49EE42C3"
+            },
+            {
+              "file_name": "boblogistics_3.0.2.zip",
+              "bytes": 21920972,
+              "sha256": "ADAEFF77E0C489C80AC83950BDDC5F7DE0230FEEEC5E29772AC1C2FA8175F339"
+            },
+            {
+              "file_name": "bobmining_3.0.2.zip",
+              "bytes": 3555698,
+              "sha256": "7F1B8BB34264E12EF9F0BE9427B672D37556A425D93D618B5341C90543C5822E"
+            },
+            {
+              "file_name": "bobpower_3.0.1.zip",
+              "bytes": 3039102,
+              "sha256": "09F8AFA883C614DB2CA8F8CC5CAC803DEE384D009F79A26A25F9B9968A60C02A"
+            },
+            {
+              "file_name": "bobrevamp_3.0.1.zip",
+              "bytes": 289591,
+              "sha256": "BE2D0EEA2DE65CF32218107EB1DB679BF0B826599C89C4E2892F60B234405F5F"
+            },
+            {
+              "file_name": "bobwarfare_3.0.2.zip",
+              "bytes": 4501114,
+              "sha256": "535CFECE8A712650959FA172290A43E9DBC290BA4F3CD21B9CC6DE621726A0EA"
+            },
+            {
+              "file_name": "factoryplanner_2.1.21.zip",
+              "bytes": 721658,
+              "sha256": "C9B280099B2018A09B755501F458489896CD35F79442B7C32877F3034E8F19BF"
+            },
+            {
+              "file_name": "FluidMustFlow_1.5.1.zip",
+              "bytes": 2422214,
+              "sha256": "81FA3FF0A9502EDD105FBB9DD57F4BF05242E5A19F1B3539E99EA109958510C2"
+            },
+            {
+              "file_name": "helmod_2.3.6.zip",
+              "bytes": 3576306,
+              "sha256": "351868C1F37D53C1AF758DD753A6348FE55A839E23AA355E8A4B261EEFB840CD"
+            },
+            {
+              "file_name": "LogisticTrainNetwork_3.4.1.zip",
+              "bytes": 529308,
+              "sha256": "D4F9299C45B86BCBC56C4B18552F541A9C42D0FC39B9ECBC2CC8C88BF7E8F573"
+            },
+            {
+              "file_name": "Power Armor MK3_2.1.09.zip",
+              "bytes": 884981,
+              "sha256": "4A7E0837AFD18A0A20B9382989537E1352514218518CA24D5E87520E4DE95851"
+            },
+            {
+              "file_name": "pyalienlife_3.1.8.zip",
+              "bytes": 1795985,
+              "sha256": "2B5E59ABD509BD0A15E61F45293B72311860DCBEC61BE006AF483720F5EB33EF"
+            },
+            {
+              "file_name": "pyalternativeenergy_3.2.11.zip",
+              "bytes": 638880,
+              "sha256": "A170E450D534BB525E5F2F67056E24CBB0C53A12E8BF53903E04C417C8D5F315"
+            },
+            {
+              "file_name": "pycoalprocessing_3.1.8.zip",
+              "bytes": 405419,
+              "sha256": "32FA7E5428B1BAB8C0E0B34E330F72CBA65568592CB80E9E476160CA7DC461E1"
+            },
+            {
+              "file_name": "pyfusionenergy_3.1.6.zip",
+              "bytes": 252523,
+              "sha256": "D58D609E58263067D0F27CD3EE005F737C207236426C3B91231D8DCD044E6E67"
+            },
+            {
+              "file_name": "pyhightech_3.1.5.zip",
+              "bytes": 284533,
+              "sha256": "DE2062A89102A41117A167EAF3C28516784564C7BBA5FE77E08875B42FAA5DA0"
+            },
+            {
+              "file_name": "pyindustry_3.1.6.zip",
+              "bytes": 197083,
+              "sha256": "CA1FE4E7C7916167352634BED28FDB45A18A4CEE6D31A6EFF3DDD660ADF55F8C"
+            },
+            {
+              "file_name": "pypetroleumhandling_3.1.3.zip",
+              "bytes": 319784,
+              "sha256": "5C372C4C16FA9ADE8DB109B767A4C051E626A5D07BAFCD2EA615450217FEBBB0"
+            },
+            {
+              "file_name": "pypostprocessing_3.1.7.zip",
+              "bytes": 156371,
+              "sha256": "B25E42A4B9DB50CF44749C11CA09A5591A42206C13200F7DB91604E3DD901124"
+            },
+            {
+              "file_name": "pyrawores_3.1.4.zip",
+              "bytes": 372282,
+              "sha256": "075182D84347CE9CDC85B51E83AE6DA566329F193CFB45919EED432F3C2FE3C9"
+            },
+            {
+              "file_name": "RateCalculator_3.4.2.zip",
+              "bytes": 92033,
+              "sha256": "9B92849A4D95EC25910000748CBCACE2171098BDB3BEDC96C267F727FC7775B5"
+            },
+            {
+              "file_name": "squeak-through-2_0.2.1.zip",
+              "bytes": 50423,
+              "sha256": "25E76ABDD3B948321502B79C19F6A167F64AE07068DF121F57B6875EEE162A5F"
+            },
+            {
+              "file_name": "Waterfill_v17_2.1.2.zip",
+              "bytes": 67489,
+              "sha256": "2AA40BDC629679343364BC9D760A473A20B74EEE2B5BECE10FE4503D88EA52C4"
+            },
+            {
+              "file_name": "pyalienlifegraphics_3.1.1.zip",
+              "bytes": 122204351,
+              "sha256": "BC85C6D47ED1ECBF60106DD15C411F809BF5899F0D2CFE64412C243FC07A41B2"
+            },
+            {
+              "file_name": "pycoalprocessinggraphics_3.1.1.zip",
+              "bytes": 65689892,
+              "sha256": "DE35F60B1767FAE6261F483AE22E2720BE733667C6A056D2704A5C7C528540B4"
+            },
+            {
+              "file_name": "pyfusionenergygraphics_3.1.1.zip",
+              "bytes": 45471856,
+              "sha256": "CFCFFAB7CD077E269E8424DD5E08DA54EEDCE772CD43CC5D1E44B43488180C82"
+            },
+            {
+              "file_name": "pyhightechgraphics_3.1.1.zip",
+              "bytes": 106728110,
+              "sha256": "7DC3C18C365B9724E3F61173A49D180559AFFDA0C01D817CD41DBB29FFA0918C"
+            }
+          ]
         }
       }
     },
@@ -2567,12 +3718,24 @@
             "required_native_witness": {
               "technology": "inserter-capacity-bonus-8",
               "source_effects": [
-                {"type": "inserter-stack-size-bonus", "modifier": 2},
-                {"type": "stack-inserter-capacity-bonus", "modifier": 4}
+                {
+                  "type": "inserter-stack-size-bonus",
+                  "modifier": 2
+                },
+                {
+                  "type": "stack-inserter-capacity-bonus",
+                  "modifier": 4
+                }
               ],
               "successor_effects": [
-                {"type": "inserter-stack-size-bonus", "modifier": 2},
-                {"type": "bulk-inserter-capacity-bonus", "modifier": 4}
+                {
+                  "type": "inserter-stack-size-bonus",
+                  "modifier": 2
+                },
+                {
+                  "type": "bulk-inserter-capacity-bonus",
+                  "modifier": 4
+                }
               ],
               "facts": [
                 "tests/fixtures/historical-continuation-native-oracle.json",

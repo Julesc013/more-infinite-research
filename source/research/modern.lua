@@ -38,6 +38,7 @@ local function append_unique(out, seen, names)
 end
 
 local function generated_prerequisites(definition)
+  if definition.exact_prerequisites then return copy(definition.prerequisites or {}) end
   local out, seen = {}, {}
   append_unique(out, seen, catalogue.science_names(definition.science))
   append_unique(out, seen, definition.prerequisites or {})
@@ -45,6 +46,7 @@ local function generated_prerequisites(definition)
 end
 
 local function continuation_prerequisites(definition)
+  if definition.exact_prerequisites then return copy(definition.prerequisites or {}) end
   local out, seen = {}, {}
   append_unique(out, seen, definition.prerequisites or {})
   append_unique(out, seen, catalogue.science_names(definition.science))

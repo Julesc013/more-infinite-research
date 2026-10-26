@@ -16,7 +16,7 @@
     },
     {
       "name": "bobenemies",
-      "version": "3.0.0",
+      "version": "3.0.1",
       "enabled": true
     },
     {
@@ -51,9 +51,9 @@
     }
   ],
   "archive_sha256": {
-    "bobenemies_3.0.0.zip": "7477D5C37D2945B7280AB43AB50A375535E87D23B44B19995DA10E0EDB7514DE",
+    "bobenemies_3.0.1.zip": "4B1A939F53B1A1AEC54026A2408D453DBBB6901D7DD3644DA890AC781E2211BD",
     "boblibrary_3.0.1.zip": "3DD83A195E120BAECC51A43B0B3EB965C0D419A09883F9DAA018B3921C12D51B",
     "mir-fixture-mir5-active-mods-observer_0.1.0.zip": "2E1BE5952D2A4CC5C74A0D149E075D247BA110A3FAE5B6768D3EAEBABCEF989C"
   },
-  "scope": "Exact bobenemies ranked-root space-age input. Mandatory archived dependencies only; recommended providers are not automatically selected. Input metadata is not native engine admission, gameplay, save, client or support acceptance."
+  "scope": "Exact bobenemies ranked-root space-age input. Mandatory archived dependencies only; recommended providers are not automatically selected. Input metadata is not native engine admission, gameplay, save, client or support acceptance. Refreshed with the 2026-10-26 officially downloaded F210 archives; prior cohort remains bound to its original Git source and hashes."
 }
