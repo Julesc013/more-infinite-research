@@ -1,6 +1,7 @@
 {
   "name": "mir-fixture-mir5-aai-parity-native",
   "version": "0.1.0",
+  "author": "MIR maintainers",
   "title": "MIR5 AAI parity native published stage",
   "factorio_version": "2.1",
   "description": "Disposable published AAI Industry same-closure research, physical-output, and save witness.",
