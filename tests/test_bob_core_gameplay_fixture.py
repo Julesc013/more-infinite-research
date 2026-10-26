@@ -31,7 +31,10 @@ ALLOY_ROUTES = (
     {
         "recipe": "bob-bronze-alloy",
         "owner": "bob-alloy-processing",
+        "machine": "mir5-bob-core-alloy-witness-furnace",
+        "inherent_productivity": 0,
         "energy": 16,
+        "category": "bob-mixing-furnace",
         "categories": ["bob-mixing-furnace"],
         "ingredients": [
             {"type": "item", "name": "copper-plate", "amount": 3},
@@ -42,7 +45,10 @@ ALLOY_ROUTES = (
     {
         "recipe": "bob-gunmetal-alloy",
         "owner": "bob-zinc-processing",
+        "machine": "mir5-bob-core-alloy-witness-furnace",
+        "inherent_productivity": 0,
         "energy": 32,
+        "category": "bob-mixing-furnace",
         "categories": ["bob-mixing-furnace"],
         "ingredients": [
             {"type": "item", "name": "copper-plate", "amount": 8},
@@ -51,9 +57,53 @@ ALLOY_ROUTES = (
         ],
         "results": [{"type": "item", "name": "bob-gunmetal-alloy", "amount": 10}],
     },
+    {
+        "recipe": "bob-invar-alloy",
+        "owner": "bob-invar-processing",
+        "machine": "mir5-bob-core-alloy-witness-furnace",
+        "inherent_productivity": 0,
+        "energy": 16,
+        "category": "bob-mixing-furnace",
+        "categories": ["bob-mixing-furnace"],
+        "ingredients": [
+            {"type": "item", "name": "bob-nickel-plate", "amount": 2},
+            {"type": "item", "name": "iron-plate", "amount": 3},
+        ],
+        "results": [{"type": "item", "name": "bob-invar-alloy", "amount": 5}],
+    },
+    {
+        "recipe": "bob-nitinol-alloy",
+        "owner": "bob-nitinol-processing",
+        "machine": "mir5-bob-core-alloy-witness-furnace",
+        "inherent_productivity": 0,
+        "energy": 16,
+        "category": "bob-mixing-furnace",
+        "categories": ["bob-mixing-furnace"],
+        "ingredients": [
+            {"type": "item", "name": "bob-nickel-plate", "amount": 3},
+            {"type": "item", "name": "bob-titanium-plate", "amount": 2},
+        ],
+        "results": [{"type": "item", "name": "bob-nitinol-alloy", "amount": 5}],
+    },
+    {
+        "recipe": "bob-copper-tungsten-alloy",
+        "owner": "bob-tungsten-processing",
+        "machine": "mir5-bob-core-alloy-witness-foundry",
+        "inherent_productivity": .5,
+        "energy": 16,
+        "category": "metallurgy",
+        "categories": ["metallurgy"],
+        "ingredients": [
+            {"type": "item", "name": "bob-powdered-tungsten", "amount": 3},
+            {"type": "fluid", "name": "molten-copper", "amount": 20},
+        ],
+        "results": [{"type": "item", "name": "bob-copper-tungsten-alloy", "amount": 5}],
+    },
 )
 SOURCE_MACHINE = "bob-electric-mixing-furnace"
 FIXTURE_MACHINE = "mir5-bob-core-alloy-witness-furnace"
+SOURCE_METALLURGY_MACHINE = "foundry"
+FIXTURE_METALLURGY_MACHINE = "mir5-bob-core-alloy-witness-foundry"
 ALLOY_CRAFTS = 100
 
 
@@ -124,6 +174,23 @@ def fixture_raw(facts):
                 "crafting_categories": ["smelting", "bob-mixing-furnace"],
                 "minable": {"result": SOURCE_MACHINE},
                 "next_upgrade": "other-mixing-furnace",
+            },
+            SOURCE_METALLURGY_MACHINE: {
+                "type": "assembling-machine",
+                "name": SOURCE_METALLURGY_MACHINE,
+                "crafting_speed": 4,
+                "module_slots": 4,
+                "crafting_categories": ["metallurgy"],
+                "effect_receiver": {"base_effect": {"productivity": .5}},
+                "fluid_boxes_off_when_no_fluid_recipe": True,
+                "fluid_boxes": [
+                    {"production_type": "input", "volume": 1000},
+                    {"production_type": "input", "volume": 1000},
+                    {"production_type": "output", "volume": 100},
+                    {"production_type": "output", "volume": 100},
+                ],
+                "minable": {"result": SOURCE_METALLURGY_MACHINE},
+                "next_upgrade": "other-foundry",
             },
         },
     }
@@ -250,6 +317,21 @@ class BobCoreGameplayFixtureTests(unittest.TestCase):
         self.assertEqual((200, 0, None, None),
                          (fixture["crafting_speed"], fixture["module_slots"],
                           fixture["minable"], fixture["next_upgrade"]))
+        metallurgy_source = self.lua.globals().data["raw"]["assembling-machine"][SOURCE_METALLURGY_MACHINE]
+        metallurgy_fixture = self.lua.globals().data["raw"]["assembling-machine"][FIXTURE_METALLURGY_MACHINE]
+        self.assertEqual((4, 4, ["metallurgy"], .5, True),
+                         (metallurgy_source["crafting_speed"], metallurgy_source["module_slots"],
+                          [metallurgy_source["crafting_categories"][1]],
+                          metallurgy_source["effect_receiver"]["base_effect"]["productivity"],
+                          metallurgy_source["fluid_boxes_off_when_no_fluid_recipe"]))
+        self.assertEqual([(1000, "input"), (1000, "input"), (100, "output"), (100, "output")], [
+            (metallurgy_source["fluid_boxes"][index]["volume"],
+             metallurgy_source["fluid_boxes"][index]["production_type"])
+            for index in range(1, 5)])
+        self.assertEqual((200, 0, None, None, .5),
+                         (metallurgy_fixture["crafting_speed"], metallurgy_fixture["module_slots"],
+                          metallurgy_fixture["minable"], metallurgy_fixture["next_upgrade"],
+                          metallurgy_fixture["effect_receiver"]["base_effect"]["productivity"]))
         for route in ALLOY_ROUTES:
             recipe = self.lua.globals().data["raw"]["recipe"][route["recipe"]]
             self.assertEqual(route["ingredients"], [
@@ -285,6 +367,7 @@ class BobCoreGameplayFixtureTests(unittest.TestCase):
                         self.assertEqual(family[stage_name]["count_formula"], row["unit"]["count_formula"])
                         self.assertEqual(30, row["unit"]["time"])
                 self.assertIsNone(self.lua.globals().data["raw"]["assembling-machine"][FIXTURE_MACHINE])
+                self.assertIsNone(self.lua.globals().data["raw"]["assembling-machine"][FIXTURE_METALLURGY_MACHINE])
 
     def test_data_preflight_refuses_captured_alloy_or_machine_drift_before_any_acceleration(self):
         mutations = {
@@ -301,6 +384,14 @@ class BobCoreGameplayFixtureTests(unittest.TestCase):
             "alloy-owner": lambda raw: raw["technology"]["bob-zinc-processing"]["effects"].__setitem__(0, {
                 "type": "unlock-recipe", "recipe": "wrong-route"}),
             "alloy-machine": lambda raw: raw["assembling-machine"][SOURCE_MACHINE].__setitem__("crafting_speed", 3),
+            "invar-input": lambda raw: raw["recipe"]["bob-invar-alloy"]["ingredients"].__setitem__(1, {
+                "type": "item", "name": "iron-plate", "amount": 4}),
+            "nitinol-owner": lambda raw: raw["technology"]["bob-nitinol-processing"]["effects"].__setitem__(0, {
+                "type": "unlock-recipe", "recipe": "wrong-route"}),
+            "copper-tungsten-fluid": lambda raw: raw["recipe"]["bob-copper-tungsten-alloy"]["ingredients"].__setitem__(1, {
+                "type": "fluid", "name": "molten-copper", "amount": 19}),
+            "metallurgy-machine": lambda raw: raw["assembling-machine"][SOURCE_METALLURGY_MACHINE]
+            ["effect_receiver"]["base_effect"].__setitem__("productivity", .4),
         }
         for name, mutate in mutations.items():
             with self.subTest(mutation=name):
@@ -314,6 +405,7 @@ class BobCoreGameplayFixtureTests(unittest.TestCase):
                         self.assertIsNone(row["unit"]["count"])
                         self.assertEqual(family[stage_name]["count_formula"], row["unit"]["count_formula"])
                 self.assertIsNone(self.lua.globals().data["raw"]["assembling-machine"][FIXTURE_MACHINE])
+                self.assertIsNone(self.lua.globals().data["raw"]["assembling-machine"][FIXTURE_METALLURGY_MACHINE])
 
     def test_control_registration_is_read_only(self):
         result = self.lua.execute(r'''
@@ -351,10 +443,18 @@ class BobCoreGameplayFixtureTests(unittest.TestCase):
         self.lua.globals().alloys = lua_value(self.lua, list(ALLOY_ROUTES))
         for opponent, expected in (
                 ("", ""),
-                ("wrong-output", "native alloy output differs"),
-                ("independent-probability", "native alloy result changed"),
-                ("extra-count-fraction", "native alloy result changed"),
-                ("ignored-by-productivity", "native alloy result changed")):
+                ("wrong-output:bob-bronze-alloy", "native alloy output differs"),
+                ("wrong-output:bob-invar-alloy", "native alloy output differs"),
+                ("wrong-output:bob-nitinol-alloy", "native alloy output differs"),
+                ("wrong-output:bob-copper-tungsten-alloy", "native alloy output differs"),
+                ("independent-probability:bob-bronze-alloy", "native alloy result changed"),
+                ("independent-probability:bob-invar-alloy", "native alloy result changed"),
+                ("extra-count-fraction:bob-bronze-alloy", "native alloy result changed"),
+                ("extra-count-fraction:bob-nitinol-alloy", "native alloy result changed"),
+                ("ignored-by-productivity:bob-bronze-alloy", "native alloy result changed"),
+                ("ignored-by-productivity:bob-copper-tungsten-alloy", "native alloy result changed"),
+                ("ignored-by-stats:bob-copper-tungsten-alloy", "native alloy result changed"),
+                ("changed-category:bob-copper-tungsten-alloy", "native alloy categories changed")):
             with self.subTest(opponent=opponent):
                 self.lua.globals().opponent = opponent
                 result = self.lua.execute(r'''
@@ -379,11 +479,14 @@ class BobCoreGameplayFixtureTests(unittest.TestCase):
                       is_empty=function() for _, count in pairs(contents) do if count ~= 0 then return false end end return true end,
                     }
                   end
-                  local function alloy_machine()
+                  local kind, target = opponent:match("^([^:]+):(.+)$")
+                  local function alloy_machine(route)
                     local input, output, modules = inventory(), inventory(), inventory()
+                    local fluids = {}
                     local machine = {
-                      valid=true,crafting_progress=0,bonus_progress=0,
-                      prototype={name="mir5-bob-core-alloy-witness-furnace",crafting_categories={['bob-mixing-furnace']=true}},
+                      valid=true,crafting_progress=0,bonus_progress=0,productivity_bonus=route.inherent_productivity,
+                      fluids_count=route.category == "metallurgy" and 4 or 0,
+                      prototype={name=route.machine,crafting_categories={[route.category]=true}},
                     }
                     machine.set_recipe = function(name) machine.selected = {name=name}; return {} end
                     machine.get_recipe = function() return machine.selected end
@@ -392,6 +495,17 @@ class BobCoreGameplayFixtureTests(unittest.TestCase):
                       if index == 2 then return output end
                       if index == 3 then return modules end
                     end
+                    machine.insert_fluid = function(fluid)
+                      local capacity = 1000
+                      local inserted = math.min(capacity - (fluids[fluid.name] or 0), fluid.amount)
+                      fluids[fluid.name] = (fluids[fluid.name] or 0) + inserted
+                      return inserted
+                    end
+                    machine.get_fluid_count = function(name) return fluids[name] or 0 end
+                    machine.get_fluid_capacity = function(index)
+                      return index <= 2 and 1000 or 100
+                    end
+                    machine.fluids = fluids
                     return machine
                   end
                   local player = {
@@ -428,22 +542,32 @@ class BobCoreGameplayFixtureTests(unittest.TestCase):
                   local proto_recipes = {}
                   for _, route in ipairs(alloys) do
                     local products = route.results
-                    if route.recipe == "bob-bronze-alloy" and opponent ~= "" and opponent ~= "wrong-output" then
+                    if route.recipe == target and (kind == "independent-probability"
+                        or kind == "extra-count-fraction" or kind == "ignored-by-productivity"
+                        or kind == "ignored-by-stats") then
                       products = copy_products(route.results)
-                      if opponent == "independent-probability" then products[1].independent_probability = .5 end
-                      if opponent == "extra-count-fraction" then products[1].extra_count_fraction = .25 end
-                      if opponent == "ignored-by-productivity" then products[1].ignored_by_productivity = 1 end
+                      if kind == "independent-probability" then products[1].independent_probability = .5 end
+                      if kind == "extra-count-fraction" then products[1].extra_count_fraction = .25 end
+                      if kind == "ignored-by-productivity" then products[1].ignored_by_productivity = 1 end
+                      if kind == "ignored-by-stats" then products[1].ignored_by_stats = 1 end
                     end
+                    local categories = route.categories
+                    if route.recipe == target and kind == "changed-category" then categories = {"wrong-category"} end
                     proto_recipes[route.recipe] = {
                       name=route.recipe,energy=route.energy,maximum_productivity=3,
-                      categories=route.categories,ingredients=route.ingredients,products=products,
+                      categories=categories,ingredients=route.ingredients,products=products,
                     }
                   end
                   local lab_input = inventory()
                   local lab = {valid=true,get_inventory=function(index) assert(index == 4); return lab_input end}
                   local surface = {create_entity=function(parameters)
                     if parameters.name == "lab" then return lab end
-                    local machine = alloy_machine()
+                    local route
+                    for _, candidate in ipairs(alloys) do
+                      if candidate.machine == parameters.name then route = candidate break end
+                    end
+                    assert(route, "unknown fixture machine")
+                    local machine = alloy_machine(route)
                     machines[parameters.name .. tostring(parameters.position[1])] = machine
                     return machine
                   end}
@@ -461,31 +585,53 @@ class BobCoreGameplayFixtureTests(unittest.TestCase):
                   assert(pcall(chunk))
                   assert(pcall(callbacks.init))
                   local state = environment.storage.mir5_bob_core_gameplay
-                  local function finish_named_route(wrong)
-                    assert(pcall(callbacks.events[1]))
+                  local function remaining_inputs(production)
+                    for _, ingredient in ipairs(production.route.ingredients) do
+                      if production.remaining[ingredient.name] ~= 0 then return true end
+                    end
+                    return false
+                  end
+                  local function finish_named_route()
                     local production = state.alloy
-                    local machine = state.alloy_machines[production.recipe]
-                    local input = machine.get_inventory(1)
-                    local output = machine.get_inventory(2)
-                    for _, ingredient in ipairs(production.route.ingredients) do input.contents[ingredient.name] = 0 end
-                    local amount = production.route.result.amount * 100
-                    if wrong then amount = amount - production.route.result.amount end
-                    output.contents[production.route.result.name] = amount
-                    return pcall(callbacks.events[1])
+                    if not production then
+                      local started_ok, started_message = pcall(callbacks.events[1])
+                      if not started_ok then return false, started_message end
+                      production = state.alloy
+                    end
+                    local recipe = production and production.recipe
+                    if not recipe then return false, "alloy route did not start" end
+                    for _ = 1, 4 do
+                      local machine = state.alloy_machines[recipe]
+                      local input = machine.get_inventory(1)
+                      local output = machine.get_inventory(2)
+                      for _, ingredient in ipairs(production.route.ingredients) do
+                        if ingredient.type == "fluid" then machine.fluids[ingredient.name] = 0
+                        else input.contents[ingredient.name] = 0 end
+                      end
+                      if not remaining_inputs(production) and output.get_item_count(production.route.result.name) == 0 then
+                        local inherent_productivity = production.route.inherent_productivity or 0
+                        local amount = production.route.result.amount * (100 + inherent_productivity * 100)
+                        if kind == "wrong-output" and target == production.recipe then
+                          amount = amount - production.route.result.amount
+                        end
+                        output.contents[production.route.result.name] = amount
+                      end
+                      local tick_ok, tick_message = pcall(callbacks.events[1])
+                      if not tick_ok then return false, tick_message end
+                      if state.alloy == nil or state.alloy.recipe ~= recipe then return true, tick_message end
+                      production = state.alloy
+                    end
+                    return false, "alloy route did not finish"
                   end
-                  local stochastic = opponent == "independent-probability" or opponent == "extra-count-fraction"
-                    or opponent == "ignored-by-productivity"
                   local first_ok, first_message
-                  if stochastic then
-                    first_ok, first_message = pcall(callbacks.events[1])
-                  else
-                    first_ok, first_message = finish_named_route(opponent == "wrong-output")
+                  for index = 1, #alloys do
+                    first_ok, first_message = finish_named_route()
+                    if not first_ok then break end
                   end
-                  local second_ok, second_message = true, ""
-                  if first_ok and opponent == "" then second_ok, second_message = finish_named_route(false) end
                   return {
-                    first_ok=first_ok,first_message=tostring(first_message),second_ok=second_ok,second_message=tostring(second_message),
-                    phase=state.phase,started=started,physical=state.physical,lab_automation=lab_input.get_item_count("automation-science-pack"),
+                    first_ok=first_ok,first_message=tostring(first_message),
+                    phase=state.phase,alloy_index=state.alloy_index,alloy_count=#alloys,
+                    started=started,physical=state.physical,lab_automation=lab_input.get_item_count("automation-science-pack"),
                   }
                 ''')
                 if opponent:
@@ -493,12 +639,14 @@ class BobCoreGameplayFixtureTests(unittest.TestCase):
                     self.assertIn(expected, result["first_message"])
                 else:
                     self.assertTrue(result["first_ok"], result["first_message"])
-                    self.assertTrue(result["second_ok"], result["second_message"])
-                    self.assertEqual(("researching", 0, INITIAL_PACKS),
-                                     (result["phase"], result["started"], result["lab_automation"]))
+                    self.assertEqual(("researching", 1, len(ALLOY_ROUTES), 0, INITIAL_PACKS),
+                                     (result["phase"], result["alloy_index"], result["alloy_count"],
+                                      result["started"], result["lab_automation"]))
                     for route in ALLOY_ROUTES:
                         record = result["physical"]["physical-before"][route["recipe"]]
-                        self.assertEqual((route["results"][0]["amount"] * ALLOY_CRAFTS, 0, 0),
+                        expected_bonus = ALLOY_CRAFTS * route["inherent_productivity"]
+                        self.assertEqual((route["results"][0]["amount"] * (ALLOY_CRAFTS + expected_bonus),
+                                          expected_bonus, 0),
                                          (record["output"], record["bonus_crafts"], record["native_bonus_progress"]))
 
     def test_saved_witness_is_read_only_and_rejects_lost_lab_or_physical_state(self):
@@ -511,12 +659,20 @@ class BobCoreGameplayFixtureTests(unittest.TestCase):
                 ("lost-bonus", "native recipe productivity differs"),
                 ("science", "science consumption differs"),
                 ("lost-tail", "earned finite-three/tail-four"),
-                ("physical-output", "physical-after alloy record differs"),
-                ("physical-machine", "physical-after native alloy machine state differs")):
+                ("physical-output:bob-bronze-alloy", "physical-after alloy record differs"),
+                ("physical-output:bob-invar-alloy", "physical-after alloy record differs"),
+                ("physical-output:bob-nitinol-alloy", "physical-after alloy record differs"),
+                ("physical-output:bob-copper-tungsten-alloy", "physical-after alloy record differs"),
+                ("physical-machine:bob-bronze-alloy", "physical-after native alloy machine state differs"),
+                ("physical-machine:bob-invar-alloy", "physical-after native alloy machine state differs"),
+                ("physical-machine:bob-nitinol-alloy", "physical-after native alloy machine state differs"),
+                ("physical-machine:bob-copper-tungsten-alloy", "physical-after native alloy machine state differs"),
+                ("physical-fluid:bob-copper-tungsten-alloy", "native alloy fluid input was not clean")):
             with self.subTest(opponent=opponent):
                 self.lua.globals().opponent = opponent
                 result = self.lua.execute(r'''
                   local callbacks, markers = {events={}}, 0
+                  local kind, target = opponent:match("^([^:]+):(.+)$")
                   local active = {
                     base="2.1.23", ["space-age"]="2.1.23", boblibrary="3.0.1", bobores="3.0.0",
                     bobplates="3.0.2", bobelectronics="3.0.1", bobtech="3.0.0",
@@ -550,14 +706,25 @@ class BobCoreGameplayFixtureTests(unittest.TestCase):
                       categories=route.categories,ingredients=route.ingredients,products=route.results,
                     }
                     local input, output, modules = inventory({}), inventory({}), inventory({})
+                    local fluids = {}
                     machines[route.recipe] = {
                       valid=true,energy=index == 1 and 17 or 29,crafting_progress=0,bonus_progress=1,
-                      prototype={name="mir5-bob-core-alloy-witness-furnace",crafting_categories={['bob-mixing-furnace']=true}},
+                      productivity_bonus=route.inherent_productivity + .08,
+                      fluids_count=route.category == "metallurgy" and 4 or 0,
+                      prototype={name=route.machine,crafting_categories={[route.category]=true}},
                       get_inventory=function(index)
                         if index == 1 then return input end
                         if index == 2 then return output end
                         if index == 3 then return modules end
                       end,
+                      get_fluid_count=function(name) return fluids[name] or 0 end,
+                      get_fluid_capacity=function(index) return index <= 2 and 1000 or 100 end,
+                      insert_fluid=function(fluid)
+                        local inserted = math.min(1000 - (fluids[fluid.name] or 0), fluid.amount)
+                        fluids[fluid.name] = (fluids[fluid.name] or 0) + inserted
+                        return inserted
+                      end,
+                      fluids=fluids,
                     }
                   end
                   local remaining = {}
@@ -575,11 +742,14 @@ class BobCoreGameplayFixtureTests(unittest.TestCase):
                   end
                   local physical = {["physical-before"]={}, ["physical-after"]={}}
                   for _, route in ipairs(alloys) do
+                    local baseline = route.inherent_productivity * 100
                     physical["physical-before"][route.recipe] = {
-                      output=route.results[1].amount * 100, bonus_crafts=0, native_bonus_progress=0,
+                      output=route.results[1].amount * (100 + baseline), bonus_crafts=baseline,
+                      native_bonus_progress=0, machine_productivity_bonus=route.inherent_productivity,
                     }
                     physical["physical-after"][route.recipe] = {
-                      output=route.results[1].amount * 107, bonus_crafts=7, native_bonus_progress=1,
+                      output=route.results[1].amount * (100 + baseline + 7), bonus_crafts=baseline + 7,
+                      native_bonus_progress=1, machine_productivity_bonus=route.inherent_productivity + .08,
                     }
                   end
                   local state = {
@@ -596,7 +766,14 @@ class BobCoreGameplayFixtureTests(unittest.TestCase):
                     helpers={table_to_json=function(value)
                       assert(value.case == "bob-core-gameplay" and value.stage == "reload"
                         and value.witnesses.actual_lab_completions == 28
-                        and value.witnesses.physical_alloy_witness == true)
+                        and value.witnesses.physical_alloy_witness == true
+                        and value.witnesses.physical_mixing_routes == 4
+                        and value.witnesses.physical_metallurgy_fluid_routes == 1
+                        and value.witnesses.physical_foundry_inherent_productivity == .5)
+                      assert(#value.witnesses.physical_routes == #alloys)
+                      for index, route in ipairs(alloys) do
+                        assert(value.witnesses.physical_routes[index] == route.recipe)
+                      end
                       return "{}"
                     end},
                     log=function(value) assert(value:match("^%[MIR5_NATIVE_FIXTURE%] RESULT ")); markers=markers+1 end,
@@ -606,8 +783,11 @@ class BobCoreGameplayFixtureTests(unittest.TestCase):
                   local chunk = assert(loadfile(control_fixture, "t", environment))
                   assert(pcall(chunk))
                   local saved = {phase=state.phase,next=state.next,finished=state.finished,events=state.events,
-                    output=state.physical["physical-after"][alloys[1].recipe].output,energies={}}
-                  for _, route in ipairs(alloys) do saved.energies[route.recipe] = machines[route.recipe].energy end
+                    outputs={},energies={}}
+                  for _, route in ipairs(alloys) do
+                    saved.outputs[route.recipe] = state.physical["physical-after"][route.recipe].output
+                    saved.energies[route.recipe] = machines[route.recipe].energy
+                  end
                   local function sentinel_energies_unchanged()
                     for _, route in ipairs(alloys) do
                       if machines[route.recipe].energy ~= saved.energies[route.recipe] then return false end
@@ -617,14 +797,18 @@ class BobCoreGameplayFixtureTests(unittest.TestCase):
                   local load_ok, load_message = pcall(callbacks.load)
                   local on_load_read_only = state.phase == saved.phase and state.next == saved.next
                     and state.finished == saved.finished and state.events == saved.events
-                    and state.physical["physical-after"][alloys[1].recipe].output == saved.output
                     and sentinel_energies_unchanged()
+                  for _, route in ipairs(alloys) do
+                    on_load_read_only = on_load_read_only
+                      and state.physical["physical-after"][route.recipe].output == saved.outputs[route.recipe]
+                  end
                   if opponent == "lost-earned" then player.technologies[spec[1].early].level = 2 end
                   if opponent == "lost-bonus" then player.recipes[spec[2].recipes[1]].productivity_bonus = .06 end
                   if opponent == "science" then remaining["metallurgic-science-pack"] = remaining["metallurgic-science-pack"] + 1 end
                   if opponent == "lost-tail" then player.technologies[spec[3].tail].level = 4 end
-                  if opponent == "physical-output" then state.physical["physical-after"][alloys[1].recipe].output = 0 end
-                  if opponent == "physical-machine" then machines[alloys[1].recipe].bonus_progress = 0 end
+                  if kind == "physical-output" then state.physical["physical-after"][target].output = 0 end
+                  if kind == "physical-machine" then machines[target].bonus_progress = 0 end
+                  if kind == "physical-fluid" then machines[target].fluids["molten-copper"] = 1 end
                   local tick_ok, tick_message = pcall(callbacks.events[1])
                   return {load_ok=load_ok,load_message=tostring(load_message),on_load_read_only=on_load_read_only,
                     completed_observer_read_only=sentinel_energies_unchanged(),tick_ok=tick_ok,

@@ -1,5 +1,5 @@
 -- Private F210 Bob-core gameplay preflight. The fourteen named MIR rows and
--- two physical alloy routes are independently captured published 4.7.2
+-- five physical alloy routes are independently captured published 4.7.2
 -- facts for the exact no-Angel Bob closure. Only research count/time and a
 -- fixture-owned clone of the named native machine are accelerated.
 local families = {
@@ -62,26 +62,54 @@ local families = {
   },
 }
 
--- These two rows are a deliberately finite physical-output witness. Their
+-- These five rows are a deliberately finite physical-output witness. Their
 -- inputs/results and owners are in bob-core-f210-captured-facts.json; their
--- categories, native times, and machine are from the exact bobplates_3.0.2
--- archive (SHA256 0C9A...B691862D), read without using candidate output.
+-- categories and native times are checked against the exact bobplates_3.0.2
+-- archive (SHA256 0C9A...B691862D), without using candidate output. Space
+-- Age changes Copper Tungsten from its archive's mixing/item branch into the
+-- captured metallurgy/molten-copper branch, so it uses a separate foundry
+-- clone whose inherent productivity is preserved below.
 local physical_routes = {
   {
-    recipe="bob-bronze-alloy", owner="bob-alloy-processing", energy=16,
+    recipe="bob-bronze-alloy", owner="bob-alloy-processing", energy=16, machine="mixing",
+    inherent_productivity=0,
     categories={"bob-mixing-furnace"},
     ingredients={{type="item", name="copper-plate", amount=3}, {type="item", name="bob-tin-plate", amount=2}},
     results={{type="item", name="bob-bronze-alloy", amount=5}},
   },
   {
-    recipe="bob-gunmetal-alloy", owner="bob-zinc-processing", energy=32,
+    recipe="bob-gunmetal-alloy", owner="bob-zinc-processing", energy=32, machine="mixing",
+    inherent_productivity=0,
     categories={"bob-mixing-furnace"},
     ingredients={{type="item", name="copper-plate", amount=8}, {type="item", name="bob-tin-plate", amount=1}, {type="item", name="bob-zinc-plate", amount=1}},
     results={{type="item", name="bob-gunmetal-alloy", amount=10}},
   },
+  {
+    recipe="bob-invar-alloy", owner="bob-invar-processing", energy=16, machine="mixing",
+    inherent_productivity=0,
+    categories={"bob-mixing-furnace"},
+    ingredients={{type="item", name="bob-nickel-plate", amount=2}, {type="item", name="iron-plate", amount=3}},
+    results={{type="item", name="bob-invar-alloy", amount=5}},
+  },
+  {
+    recipe="bob-nitinol-alloy", owner="bob-nitinol-processing", energy=16, machine="mixing",
+    inherent_productivity=0,
+    categories={"bob-mixing-furnace"},
+    ingredients={{type="item", name="bob-nickel-plate", amount=3}, {type="item", name="bob-titanium-plate", amount=2}},
+    results={{type="item", name="bob-nitinol-alloy", amount=5}},
+  },
+  {
+    recipe="bob-copper-tungsten-alloy", owner="bob-tungsten-processing", energy=16, machine="metallurgy",
+    inherent_productivity=0.5,
+    categories={"metallurgy"},
+    ingredients={{type="item", name="bob-powdered-tungsten", amount=3}, {type="fluid", name="molten-copper", amount=20}},
+    results={{type="item", name="bob-copper-tungsten-alloy", amount=5}},
+  },
 }
-local SOURCE_MACHINE = "bob-electric-mixing-furnace"
-local FIXTURE_MACHINE = "mir5-bob-core-alloy-witness-furnace"
+local MIXING_SOURCE_MACHINE = "bob-electric-mixing-furnace"
+local MIXING_FIXTURE_MACHINE = "mir5-bob-core-alloy-witness-furnace"
+local METALLURGY_SOURCE_MACHINE = "foundry"
+local METALLURGY_FIXTURE_MACHINE = "mir5-bob-core-alloy-witness-foundry"
 local FIXTURE_SPEED = 200
 
 local function assert_names(actual, expected, label)
@@ -105,6 +133,9 @@ local function assert_entries(actual, expected, label)
     end
     assert(type(value) == "table" and (value.type or "item") == wanted.type
       and entry_name(value) == wanted.name and entry_amount(value) == wanted.amount
+      and value.temperature == wanted.temperature
+      and value.minimum_temperature == wanted.minimum_temperature
+      and value.maximum_temperature == wanted.maximum_temperature
       and value.amount_min == nil and value.amount_max == nil
       and (value.probability == nil or value.probability == 1)
       and (value.independent_probability == nil or value.independent_probability == 1)
@@ -137,20 +168,50 @@ local function assert_physical_route(raw, route)
   assert_owner(raw, route)
 end
 
-local function assert_machine(raw)
-  local source = assert(raw["assembling-machine"][SOURCE_MACHINE], "captured alloy machine is absent")
-  assert(source.type == "assembling-machine" and source.name == SOURCE_MACHINE
-    and source.crafting_speed == 2 and source.module_slots == 2,
-    "captured alloy machine identity changed")
-  assert_names(source.crafting_categories, {"smelting", "bob-mixing-furnace"},
-    "captured alloy machine categories")
+local function fixture_clone(source, name)
   local fixture = table.deepcopy(source)
-  fixture.name = FIXTURE_MACHINE
+  fixture.name = name
   fixture.minable = nil
   fixture.next_upgrade = nil
   fixture.crafting_speed = FIXTURE_SPEED
   fixture.module_slots = 0
   return fixture
+end
+
+local function assert_mixing_machine(raw)
+  local source = assert(raw["assembling-machine"][MIXING_SOURCE_MACHINE], "captured alloy machine is absent")
+  assert(source.type == "assembling-machine" and source.name == MIXING_SOURCE_MACHINE
+    and source.crafting_speed == 2 and source.module_slots == 2,
+    "captured alloy machine identity changed")
+  assert_names(source.crafting_categories, {"smelting", "bob-mixing-furnace"},
+    "captured alloy machine categories")
+  return fixture_clone(source, MIXING_FIXTURE_MACHINE)
+end
+
+local function assert_metallurgy_machine(raw)
+  local source = assert(raw["assembling-machine"][METALLURGY_SOURCE_MACHINE], "captured metallurgy machine is absent")
+  assert(source.type == "assembling-machine" and source.name == METALLURGY_SOURCE_MACHINE
+    and source.crafting_speed == 4 and source.module_slots == 4
+    and source.fluid_boxes_off_when_no_fluid_recipe == true,
+    "captured metallurgy machine identity changed")
+  assert_names(source.crafting_categories, {"metallurgy"}, "captured metallurgy machine categories")
+  local receiver = source.effect_receiver
+  assert(type(receiver) == "table" and type(receiver.base_effect) == "table"
+    and receiver.base_effect.productivity == 0.5,
+    "captured metallurgy machine productivity changed")
+  local fluid_boxes = source.fluid_boxes
+  assert(type(fluid_boxes) == "table" and #fluid_boxes == 4,
+    "captured metallurgy machine fluid boxes changed")
+  for index, expected in ipairs({
+    {production_type="input", volume=1000}, {production_type="input", volume=1000},
+    {production_type="output", volume=100}, {production_type="output", volume=100},
+  }) do
+    local fluid_box = fluid_boxes[index]
+    assert(type(fluid_box) == "table" and fluid_box.production_type == expected.production_type
+      and fluid_box.volume == expected.volume,
+      "captured metallurgy machine fluid box changed at " .. tostring(index))
+  end
+  return fixture_clone(source, METALLURGY_FIXTURE_MACHINE)
 end
 
 local function assert_stage(family, stage, finite)
@@ -195,10 +256,11 @@ for _, family in ipairs(families) do
   rows[#rows + 1] = assert_stage(family, family.early, true)
   rows[#rows + 1] = assert_stage(family, family.tail, false)
 end
-local fixture_machine = assert_machine(raw)
+local mixing_fixture_machine = assert_mixing_machine(raw)
+local metallurgy_fixture_machine = assert_metallurgy_machine(raw)
 -- Every preflight above has passed. The clone only shortens this disposable
 -- witness; it leaves named upstream recipes and ordinary player tuning intact.
-data:extend({fixture_machine})
+data:extend({mixing_fixture_machine, metallurgy_fixture_machine})
 for _, value in ipairs(rows) do
   value.unit.count_formula, value.unit.count, value.unit.time = nil, 1, 1
 end
