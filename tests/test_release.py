@@ -31,6 +31,8 @@ class ReleaseTests(unittest.TestCase):
         record = root / release.package.TARGET_RECORD
         record.parent.mkdir(parents=True, exist_ok=True)
         shutil.copyfile(ROOT / release.package.TARGET_RECORD, record)
+        shutil.copyfile(ROOT / release.package.EARLY_TARGET_RECORD,
+                        root / release.package.EARLY_TARGET_RECORD)
         cls._git(root, "add", ".")
         cls._git(root, "commit", "-qm", "frozen player source")
         return root / "source", cls._git(root, "rev-parse", "HEAD").decode().strip()
@@ -83,6 +85,84 @@ class ReleaseTests(unittest.TestCase):
             self.assertEqual(inventory["controller"], release._controller_identity())
             for name in expected | {release.SUMS_NAME}:
                 self.assertEqual((first_output / name).read_bytes(), (second_output / name).read_bytes())
+
+    def test_opt_in_early_cohort_binds_exact_best_effort_assets_and_delivery(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            temporary = Path(temporary)
+            repository = temporary / "repository"
+            repository.mkdir()
+            source, commit = self._repository(repository)
+            frozen = temporary / "frozen"
+            inventory = release.freeze(
+                source,
+                frozen,
+                revision=commit,
+                early_target_record=release.package.EARLY_TARGET_RECORD,
+            )
+            expected = ({release._archive_name(target) for target in release.TARGETS}
+                        | {release._archive_name(target) for target in release.EARLY_TARGETS}
+                        | {release.SUMS_NAME, release.EARLY_SUMS_NAME, release.INVENTORY_NAME})
+            self.assertEqual({path.name for path in frozen.iterdir()}, expected)
+            self.assertEqual([asset["target"] for asset in inventory["assets"]], list(release.TARGETS))
+            cohort = inventory["early_cohort"]
+            self.assertEqual(cohort["kind"], release.EARLY_COHORT_KIND)
+            self.assertEqual(cohort["qualification"], release.EARLY_QUALIFICATION)
+            self.assertEqual(cohort["target_record"]["path"], release.package.EARLY_TARGET_RECORD)
+            self.assertEqual([asset["target"] for asset in cohort["assets"]], list(release.EARLY_TARGETS))
+            self.assertEqual(
+                {asset["target"]: asset["delivery"] for asset in cohort["assets"]},
+                {"f006": "extract-to-folder", "f007": "extract-to-folder", "f008": "extract-to-folder",
+                 "f009": "zip", "f010": "zip", "f011": "zip", "f012": "zip"},
+            )
+            for asset in cohort["assets"]:
+                with self.subTest(target=asset["target"]), zipfile.ZipFile(frozen / asset["name"]) as archive:
+                    info = json.loads(archive.read(asset["root"] + "/info.json"))
+                    self.assertEqual(asset["name"], release._archive_name(asset["target"]))
+                    self.assertEqual(info["version"], asset["version"])
+                    self.assertEqual(info["dependencies"][0], "base >= " + asset["minimum_base"])
+            self.assertEqual(release.verify(source, frozen), inventory)
+            self.assertEqual(
+                release.verify(source, frozen, early_target_record=release.package.EARLY_TARGET_RECORD),
+                inventory,
+            )
+
+    def test_early_cohort_refuses_wrong_record_missing_asset_and_changed_delivery(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            temporary = Path(temporary)
+            repository = temporary / "repository"
+            repository.mkdir()
+            source, commit = self._repository(repository)
+            wrong = temporary / "wrong-record"
+            with self.assertRaisesRegex(ValueError, "early target record"):
+                release.freeze(source, wrong, revision=commit, target_record=release.package.TARGET_RECORD,
+                               early_target_record=release.package.TARGET_RECORD)
+            self.assertFalse(wrong.exists())
+
+            broken_repository = temporary / "broken-repository"
+            broken_repository.mkdir()
+            broken_source, _ = self._repository(broken_repository)
+            (broken_source / "adapters/early/definitions.lua").unlink()
+            self._git(broken_repository, "add", "-A")
+            self._git(broken_repository, "commit", "-qm", "remove early adapter dependency")
+            broken_commit = self._git(broken_repository, "rev-parse", "HEAD").decode().strip()
+            broken = temporary / "broken-adapter"
+            with self.assertRaisesRegex(ValueError, "missing source dependency"):
+                release.freeze(broken_source, broken, revision=broken_commit,
+                               early_target_record=release.package.EARLY_TARGET_RECORD)
+            self.assertFalse(broken.exists())
+
+            frozen = temporary / "frozen"
+            release.freeze(source, frozen, revision=commit,
+                           early_target_record=release.package.EARLY_TARGET_RECORD)
+            for name, mutate in {
+                "missing": lambda output: (output / release._archive_name("f006")).unlink(),
+                "delivery": lambda output: self._change_early_delivery(output),
+            }.items():
+                with self.subTest(name=name):
+                    output = temporary / ("early-" + name)
+                    shutil.copytree(frozen, output)
+                    mutate(output)
+                    self._assert_refused(source, output)
 
     def test_verification_rejects_missing_extra_changed_and_duplicate_assets(self):
         with tempfile.TemporaryDirectory() as temporary:
@@ -210,6 +290,12 @@ class ReleaseTests(unittest.TestCase):
     def _duplicate_asset(output):
         body = ReleaseTests._body(output)
         body["assets"].append(copy.deepcopy(body["assets"][0]))
+        ReleaseTests._write_body(output, body)
+
+    @staticmethod
+    def _change_early_delivery(output):
+        body = ReleaseTests._body(output)
+        body["early_cohort"]["assets"][0]["delivery"] = "zip"
         ReleaseTests._write_body(output, body)
 
     @staticmethod
