@@ -803,6 +803,8 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
           if($errors.Count){throw $errors[0].Message}
           $projection=@($ast.FindAll({param($candidate) $candidate -is [Management.Automation.Language.IfStatementAst] -and $candidate.Extent.Text.Contains('New-StandaloneIdentityObserverSourceProjection') -and $candidate.Extent.Text.Contains('$standaloneF210')},$true))
           if($projection.Count-ne1){throw 'standalone normal observer projection route is absent or ambiguous'}
+          $fixtureProjection=@($ast.FindAll({param($candidate) $candidate -is [Management.Automation.Language.IfStatementAst] -and $candidate.Extent.Text.Contains('New-StandaloneF210LibraryFixtureSourceProjection') -and $candidate.Extent.Text.Contains('StagedLibraryFixtureSource $standaloneLibraryFixture.source')},$true))
+          if($fixtureProjection.Count-ne1){throw 'standalone normal F210 fixture projection route is absent or ambiguous'}
           $steam=@($ast.FindAll({param($candidate) $candidate -is [Management.Automation.Language.IfStatementAst] -and $candidate.Extent.Text.Contains('FactorioSteamIdentity')},$true))
           if($steam.Count-ne1){throw 'Steam identity launch gate is absent or ambiguous'}
           function Assert-SteamGate([bool]$Discovery,[bool]$Standalone,[bool]$Expected){
@@ -819,6 +821,75 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
             ["pwsh", "-NoLogo", "-NoProfile", "-Command", script], capture_output=True, text=True,
             env=dict(os.environ, MIR_TEST_WRAPPER=str(WRAPPER)), check=False,
         )
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+
+    def test_standalone_f210_normal_preparation_projects_the_runtime_fixture_through_the_real_archive_guard(self):
+        script = r'''
+          $ErrorActionPreference='Stop'; Set-StrictMode -Version Latest
+          function Get-MIRImmutableInputSha256([string]$Path){(Get-FileHash -LiteralPath $Path -Algorithm SHA256).Hash.ToUpperInvariant()}
+          . $env:MIR_TEST_LIBRARY_ACTIVATION
+          $tokens=$null;$errors=$null
+          $ast=[Management.Automation.Language.Parser]::ParseFile($env:MIR_TEST_WRAPPER,[ref]$tokens,[ref]$errors)
+          if($errors.Count){throw $errors[0].Message}
+          function Assert-Session([bool]$Condition,[string]$Message){if(-not$Condition){throw $Message}}
+          foreach($name in @('New-StandaloneF210LibraryFixtureSourceProjection','New-StandaloneIdentityObserverSourceProjection','Get-StandaloneIdentityFixtureSources','Invoke-MultiplayerFixturePreparation')){
+            $node=@($ast.FindAll({param($candidate) $candidate -is [Management.Automation.Language.FunctionDefinitionAst] -and $candidate.Name -ceq $name},$true))
+            if($node.Count-ne1){throw "standalone normal function is absent or ambiguous: $name"}
+            Invoke-Expression $node[0].Extent.Text
+          }
+          function New-SourceArchive([string]$Library,[string]$Source,[string[]]$Members){
+            $info=Get-Content -LiteralPath (Join-Path $Source 'info.json') -Raw|ConvertFrom-Json -AsHashtable
+            $archive=Join-Path $Library ($info.name+'_'+$info.version+'.zip')
+            $stream=[IO.File]::Open($archive,[IO.FileMode]::CreateNew,[IO.FileAccess]::Write,[IO.FileShare]::None)
+            try{
+              $zip=[IO.Compression.ZipArchive]::new($stream,[IO.Compression.ZipArchiveMode]::Create,$false)
+              try{foreach($name in $Members){$entry=$zip.CreateEntry($info.name+'_'+$info.version+'/'+$name,[IO.Compression.CompressionLevel]::Optimal);$entryStream=$entry.Open();$input=[IO.File]::OpenRead((Join-Path $Source $name));try{$input.CopyTo($entryStream)}finally{$input.Dispose();$entryStream.Dispose()}}}finally{$zip.Dispose()}
+            }finally{$stream.Dispose()}
+            return $archive
+          }
+          function Invoke-ActualNormalPreparation([string]$Library,[string[]]$Sources,[string]$Root){
+            Invoke-MultiplayerFixturePreparation -ArchiveLibrary $Library -FactorioBin 'engine' -ProfilePath 'profile' -FixtureSources $Sources -ExpectedMIRArchiveSha256 ('A'*64) -FixtureCase 'library-multiplayer' -PreparationRoot (Join-Path $Root 'preparation') -RepoRoot $env:MIR_TEST_REPO -CreateOnlyInvoker {
+              param($NativeArguments)
+              foreach($source in @($NativeArguments.FixtureSources)){
+                $info=Get-Content -LiteralPath (Join-Path $source 'info.json') -Raw|ConvertFrom-Json -AsHashtable
+                Assert-MIRLibraryFixtureArchive -Archive (Join-Path $NativeArguments.ArchiveLibrary ($info.name+'_'+$info.version+'.zip')) -SourceDirectory $source
+              }
+              $null=New-Item -ItemType Directory -Path (Join-Path $NativeArguments.OutputRoot 'write-data/saves') -Force
+              $seed=Join-Path $NativeArguments.OutputRoot 'write-data/saves/seed.zip';[IO.File]::WriteAllBytes($seed,[byte[]]@(1,2,3))
+              [IO.File]::WriteAllText((Join-Path $NativeArguments.OutputRoot 'result.json'),([ordered]@{status='passed-private-native-runtime-load-only';seed_sha256=(Get-FileHash -LiteralPath $seed -Algorithm SHA256).Hash}|ConvertTo-Json),[Text.UTF8Encoding]::new($false))
+            }
+          }
+          function Assert-PreparationRejects([string]$Name,[string]$Library,[string]$Source,[string]$Root){
+            $rejected=$false;try{Invoke-ActualNormalPreparation -Library $Library -Sources @($Source) -Root $Root|Out-Null}catch{$rejected=$true};if(-not$rejected){throw "actual normal preparation accepted opponent: $Name"}
+          }
+          $root=$env:MIR_TEST_WORK;$repo=$env:MIR_TEST_REPO;$library=Join-Path $root 'library';$null=New-Item -ItemType Directory -Path $library
+          $normal=New-StandaloneF210LibraryFixtureSourceProjection -RepoRoot $repo -OutputRoot (Join-Path $root 'normal-output')
+          $normalInfo=Get-Content -LiteralPath (Join-Path $normal.source 'info.json') -Raw|ConvertFrom-Json -AsHashtable
+          if($normal.members.Count-ne3 -or $normal.source_metadata-cne'info-f210.json' -or ((@($normal.excluded_canonical_members)-join'|')-cne'README.md|info.json') -or [string]$normalInfo.factorio_version-cne'2.1' -or ((@($normalInfo.dependencies)-join'|')-cne'base >= 2.1.23|more-infinite-research = 5.0.21000')){throw 'normal F210 projection metadata differs'}
+          $fixtureArchive=New-SourceArchive -Library $library -Source $normal.source -Members @('control.lua','info.json','settings-updates.lua')
+          $canonicalObserver=Join-Path $repo 'tests/fixtures/active-mods-observer';$observerArchive=New-SourceArchive -Library $library -Source $canonicalObserver -Members @('data-final-fixes.lua','info.json')
+          $observerHash=(Get-FileHash -LiteralPath $observerArchive -Algorithm SHA256).Hash
+          $observer=New-StandaloneIdentityObserverSourceProjection -RepoRoot $repo -ArchiveLibrary $library -OutputRoot (Join-Path $root 'observer-output') -ExpectedArchiveSha256 $observerHash
+          $canonicalLibrary=Join-Path $repo 'tests/fixtures/library-multiplayer'
+          $sources=@(Get-StandaloneIdentityFixtureSources -Sources @($canonicalLibrary,$canonicalObserver) -LibraryFixtureSource $canonicalLibrary -StagedLibraryFixtureSource $normal.source -StagedObserverSource $observer.source -RepoRoot $repo)
+          $prepared=Invoke-ActualNormalPreparation -Library $library -Sources $sources -Root (Join-Path $root 'positive')
+          if($prepared.prepared.status-cne'passed-private-native-runtime-load-only' -or $sources.Count-ne2 -or $sources[0]-ine$normal.source -or $sources[1]-ine$observer.source){throw 'actual normal preparation did not retain the two exact projections'}
+          $missingLibrary=Join-Path $root 'missing-library';$null=New-Item -ItemType Directory -Path $missingLibrary;New-SourceArchive -Library $missingLibrary -Source $normal.source -Members @('control.lua','info.json')|Out-Null
+          Assert-PreparationRejects 'missing runtime member' $missingLibrary $normal.source (Join-Path $root 'missing')
+          $changedSource=Join-Path $root 'changed-source';Copy-Item -LiteralPath $normal.source -Destination $changedSource -Recurse;[IO.File]::AppendAllText((Join-Path $changedSource 'control.lua'),'-- changed',[Text.UTF8Encoding]::new($false))
+          $changedLibrary=Join-Path $root 'changed-library';$null=New-Item -ItemType Directory -Path $changedLibrary;New-SourceArchive -Library $changedLibrary -Source $normal.source -Members @('control.lua','info.json','settings-updates.lua')|Out-Null
+          Assert-PreparationRejects 'changed runtime Lua' $changedLibrary $changedSource (Join-Path $root 'changed')
+          $wrongRepo=Join-Path $root 'wrong-target-repo';$wrongFixture=Join-Path $wrongRepo 'tests/fixtures/library-multiplayer';$null=New-Item -ItemType Directory -Path (Split-Path -Parent $wrongFixture) -Force;Copy-Item -LiteralPath $canonicalLibrary -Destination $wrongFixture -Recurse
+          $wrongInfo=Get-Content -LiteralPath (Join-Path $wrongFixture 'info-f210.json') -Raw|ConvertFrom-Json -AsHashtable;$wrongInfo.factorio_version='2.0';[IO.File]::WriteAllText((Join-Path $wrongFixture 'info-f210.json'),($wrongInfo|ConvertTo-Json -Depth 8)+[Environment]::NewLine,[Text.UTF8Encoding]::new($false))
+          $wrongRejected=$false;try{New-StandaloneF210LibraryFixtureSourceProjection -RepoRoot $wrongRepo -OutputRoot (Join-Path $root 'wrong-output')|Out-Null}catch{$wrongRejected=$true};if(-not$wrongRejected){throw 'F200 fixture metadata was accepted for standalone F210 projection'}
+          'PASS actual normal standalone F210 preparation and projection opponents'
+        '''
+        with tempfile.TemporaryDirectory(prefix="mir5-standalone-normal-preparation-") as work:
+            result = subprocess.run(
+                ["pwsh", "-NoLogo", "-NoProfile", "-Command", script], capture_output=True, text=True,
+                env=dict(os.environ, MIR_TEST_WRAPPER=str(WRAPPER), MIR_TEST_REPO=str(ROOT), MIR_TEST_WORK=work,
+                         MIR_TEST_LIBRARY_ACTIVATION=str(ROOT / "tools/lib/compatibility/LibraryActivation.ps1")), check=False,
+            )
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
 
     def test_standalone_identity_fixture_stage_enables_only_its_hash_bound_hidden_setting(self):
