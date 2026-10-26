@@ -703,6 +703,7 @@ function M.select(active_mods, raw)
   local py = require("compatibility.py_profile").select(active_mods)
   local bob_warfare = require("compatibility.bob_warfare_profile").applies(active_mods)
   local bob_plates = require("compatibility.bob_plates_profile").select(active_mods)
+  local bob_productivity = require("compatibility.bob_productivity").select(active_mods)
   local angel_f210 = M.angel_f210_profile(active_mods)
   local required_product_targets, additional_product_bindings, exact_product_target_families = nil, nil, {}
   local exact_product_bindings = nil
@@ -778,6 +779,10 @@ function M.select(active_mods, raw)
     })
     profile = "bob-warfare-" .. target.id
   end
+  if bob_productivity then
+    copy_true_fields(replacement_product_target_families,
+      require("compatibility.bob_productivity").replacement_product_target_families(active_mods))
+  end
   if angel_f210 then
     local delta = require("compatibility.modern_catalogue.angel_f210")[angel_f210 == "space-age" and "space_age" or angel_f210]
     apply_authored_definitions(definitions, delta)
@@ -828,6 +833,7 @@ function M.select(active_mods, raw)
     angel_f210_profile = angel_f210, angel_materials = M.angel_material_definitions(active_mods),
     bob_native_continuations = M.retains_bob_native_continuations(active_mods),
     py_coal = py.coal, py_hightech = py.hightech, bob_warfare = bob_warfare,
+    bob_productivity = bob_productivity,
     required_product_targets = required_product_targets, additional_product_bindings = additional_product_bindings,
     exact_product_bindings = exact_product_bindings,
     exact_product_target_families = exact_product_target_families,
