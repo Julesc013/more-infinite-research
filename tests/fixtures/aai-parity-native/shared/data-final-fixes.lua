@@ -55,6 +55,13 @@ local function technology(name)
   return value
 end
 
+local function has_unlock(value, expected, label)
+  for _, effect in ipairs(value.effects or {}) do
+    if effect.type == "unlock-recipe" and effect.recipe == expected then return end
+  end
+  fail(label .. " unlock differs")
+end
+
 local function assert_aai_stage(name, prerequisites, count, time)
   local value = technology(name)
   exact_names(value.prerequisites or {}, prerequisites, name .. " prerequisites")
@@ -124,6 +131,18 @@ if type(automation_science) ~= "table" or automation_science.stack_size ~= 200 t
   fail("automation science stack capacity differs")
 end
 
+-- The physical electric-engine witness is not counted as AAI or MIR lab
+-- research.  It uses this exact shipped prerequisite chain as explicit world
+-- setup, so any changed unlock relation refuses before fixture acceleration.
+local advanced_oil = technology("advanced-oil-processing")
+exact_names(advanced_oil.prerequisites or {}, {"chemical-science-pack"}, "advanced oil prerequisites")
+local lubricant = technology("lubricant")
+exact_names(lubricant.prerequisites or {}, {"advanced-oil-processing"}, "lubricant prerequisites")
+has_unlock(lubricant, "lubricant", "lubricant")
+local electric_engine = technology("electric-engine")
+exact_names(electric_engine.prerequisites or {}, {"lubricant"}, "electric engine prerequisites")
+has_unlock(electric_engine, "electric-engine-unit", "electric engine")
+
 local owner = technology("recipe-prod-research_electric_engine-1")
 local science = {
   {type="item", name="automation-science-pack", amount=1},
@@ -148,7 +167,7 @@ if type(effect) ~= "table" or effect.type ~= "change-recipe-productivity" or eff
 end
 
 local recipe = data.raw.recipe and data.raw.recipe["electric-engine-unit"]
-if type(recipe) ~= "table" or recipe.energy_required ~= 10 then fail("electric engine recipe time differs") end
+if type(recipe) ~= "table" or recipe.enabled ~= false or recipe.energy_required ~= 10 then fail("electric engine recipe state differs") end
 exact_ingredients(recipe.ingredients, {
   {type="fluid", name="lubricant", amount=40},
   {type="item", name="steel-plate", amount=2},

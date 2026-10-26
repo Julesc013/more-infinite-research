@@ -10,6 +10,7 @@ local SAVE = "mir5-native-complete"
 local OWNER = "recipe-prod-research_electric_engine-1"
 local AAI_PLAN = {"fuel-processing", "sand-processing", "electricity", "electronics", "glass-processing", "electric-lab"}
 local BASE_SCIENCE = {"automation-science-pack", "logistic-science-pack", "chemical-science-pack", "production-science-pack"}
+local EXTERNAL_ELECTRIC_ENGINE_PREREQUISITES = {"advanced-oil-processing", "lubricant", "electric-engine"}
 -- A burner lab's one automation-science slot is capped by the published
 -- stack size (200). Thirty-two packs cover the six accelerated one-unit AAI
 -- technologies without treating a partial inventory insertion as success.
@@ -215,16 +216,15 @@ local function physical_batch_finished(state)
   local remaining = production.fluid_target - production.fluid_provided
   if remaining < 0 then fail("physical lubricant total exceeds target") end
   if remaining > 0 then
-    local before_insert = fluid_observation(entity, entity.get_recipe())
-    fluid_marker("next-update-before-insert", before_insert, nil, production.fluid_provided)
     local inserted = entity.insert_fluid{name="lubricant", amount=remaining}
     if type(inserted) ~= "number" or inserted ~= inserted or inserted == math.huge or inserted == -math.huge
         or inserted < 0 or inserted > remaining then
       fail("assembler returned invalid lubricant insertion amount: " .. tostring(inserted))
     end
     production.fluid_provided = production.fluid_provided + inserted
-    local after_insert = fluid_observation(entity, entity.get_recipe())
-    fluid_marker("fluid-feed", after_insert, inserted, production.fluid_provided)
+    if inserted > 0 then
+      fluid_marker("fluid-feed", fluid_observation(entity, entity.get_recipe()), inserted, production.fluid_provided)
+    end
   end
   entity.energy = LAB_ENERGY
   local input = inventory(entity, defines.inventory.crafter_input, "assembler input")
@@ -291,6 +291,13 @@ local function assert_snapshot(state, successor)
   if type(saved) ~= "table" then fail("source snapshot is absent") end
   local force = game.forces.player
   local owner = technology(force, OWNER)
+  local setup = state.external_prerequisite_setup
+  if type(setup) ~= "table" or type(setup.electric_engine) ~= "table" then
+    fail("external electric-engine prerequisite setup is absent")
+  end
+  for index, name in ipairs(EXTERNAL_ELECTRIC_ENGINE_PREREQUISITES) do
+    if setup.electric_engine[index] ~= name then fail("external electric-engine prerequisite setup differs") end
+  end
   if state.aai_finished ~= #AAI_PLAN or state.mir_labs ~= 1 or saved.aai_labs ~= #AAI_PLAN or saved.mir_labs ~= 1
       or saved.owner_level ~= 2 or not close(saved.owner_bonus, .1) or saved.before_output ~= 10 or saved.after_output ~= 11 then
     fail("source AAI or physical witness differs")
@@ -319,6 +326,8 @@ local function marker(stage, state)
       mir_actual_lab_completions=state.mir_labs, physical_before_output=state.before_output,
       physical_after_output=state.after_output, physical_batch_count=PHYSICAL_BATCHES,
       source_queue_progress=.42, paused_progress=.27, source_setup_external_science_prerequisites=true,
+      source_setup_external_electric_engine_prerequisites=state.external_prerequisite_setup ~= nil,
+      external_electric_engine_prerequisites=state.external_prerequisite_setup and state.external_prerequisite_setup.electric_engine,
       on_load_read_only=stage == "reload", base_space_age_transition_not_claimed=true,
     },
   }))
@@ -336,8 +345,14 @@ end
 local function setup_mir_prerequisites(force, space)
   local names = science(space)
   for _, name in ipairs(names) do technology(force, name).researched = true end
-  -- These named science technologies are explicit setup only. The AAI chain
-  -- and MIR owner completion are counted only through native lab events.
+  for _, name in ipairs(EXTERNAL_ELECTRIC_ENGINE_PREREQUISITES) do technology(force, name).researched = true end
+  if recipe(force, "electric-engine-unit").enabled ~= true then
+    fail("scripted electric-engine prerequisite setup did not unlock physical recipe")
+  end
+  -- These science and electric-engine prerequisite assignments are explicit
+  -- external world setup only. The AAI chain and MIR owner completion are
+  -- counted only through native lab events.
+  return {science=names, electric_engine=EXTERNAL_ELECTRIC_ENGINE_PREREQUISITES}
 end
 
 local function source_tick()
@@ -399,7 +414,7 @@ local function source_tick()
     state.burner_lab.energy = LAB_ENERGY
     if state.aai_finished == #AAI_PLAN then
       state.electric_lab = create_electric_lab(force, state.space)
-      setup_mir_prerequisites(force, state.space)
+      state.external_prerequisite_setup = setup_mir_prerequisites(force, state.space)
       start_physical_batch(state, false)
       state.phase = "physical-before"
       return

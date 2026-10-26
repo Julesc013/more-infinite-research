@@ -67,6 +67,17 @@ def raw_fixture():
             "unit": {"count_formula": "8000*2^(L-1)", "time": 60, "ingredients": deepcopy(BASE_SCIENCE)},
             "effects": [{"type": "change-recipe-productivity", "recipe": "electric-engine-unit", "change": 0.1}],
         },
+        "advanced-oil-processing": {
+            "prerequisites": ["chemical-science-pack"],
+        },
+        "lubricant": {
+            "prerequisites": ["advanced-oil-processing"],
+            "effects": [{"type": "unlock-recipe", "recipe": "lubricant"}],
+        },
+        "electric-engine": {
+            "prerequisites": ["lubricant"],
+            "effects": [{"type": "unlock-recipe", "recipe": "electric-engine-unit"}],
+        },
     }
     for name, (prerequisites, count, time) in AAI.items():
         technologies[name] = {
@@ -94,6 +105,7 @@ def raw_fixture():
                 "results": [{"type": "item", "name": "iron-plate", "amount": 1}],
             },
             "electric-engine-unit": {
+                "enabled": False,
                 "energy_required": 10,
                 "ingredients": [
                     {"type": "fluid", "name": "lubricant", "amount": 40},
@@ -230,18 +242,37 @@ class AaiParityNativeControls(unittest.TestCase):
                     else error("unknown LuaForce field write: "..key) end
                   end,
                 })
+                local prerequisite={ ["advanced-oil-processing"]="chemical-science-pack", lubricant="advanced-oil-processing", ["electric-engine"]="lubricant" }
                 local function technology(name, researched, level)
-                  local row={valid=true,name=name,force=value,researched=researched or false,level=level or 1,enabled=true}
+                  local researched_state=researched or false
+                  local row=setmetatable({valid=true,name=name,force=value,level=level or 1,enabled=true},{
+                    __index=function(target,key)
+                      if key=="researched" then return researched_state end
+                      return rawget(target,key)
+                    end,
+                    __newindex=function(target,key,next)
+                      if key~="researched" then rawset(target,key,next);return end
+                      if type(next)~="boolean" then error("research state differs") end
+                      local required=prerequisite[name]
+                      if next and required and value.technologies[required].researched~=true then error("prerequisite ordering differs: "..name) end
+                      researched_state=next
+                      if name=="electric-engine" and next then
+                        assert(value.recipes["electric-engine-unit"] and value.recipes["electric-engine-unit"].enabled==false)
+                        value.recipes["electric-engine-unit"].enabled=true
+                      end
+                    end,
+                  })
                   value.technologies[name]=row
                   return row
                 end
                 technology("burner-mechanics",false); technology("automation-science-pack",false)
                 for _,name in ipairs({"fuel-processing","sand-processing","electricity","electronics","glass-processing","electric-lab"}) do technology(name,false) end
                 for _,name in ipairs({"logistic-science-pack","chemical-science-pack","production-science-pack"}) do technology(name,false) end
+                for _,name in ipairs({"advanced-oil-processing","lubricant","electric-engine"}) do technology(name,false) end
                 technology("recipe-prod-research_electric_engine-1",false,1)
                 value.recipes["burner-lab"]={valid=true,name="burner-lab",enabled=false}
                 value.recipes["lab"]={valid=true,name="lab",enabled=false}
-                value.recipes["electric-engine-unit"]={valid=true,name="electric-engine-unit",productivity_bonus=0}
+                value.recipes["electric-engine-unit"]={valid=true,name="electric-engine-unit",enabled=false,productivity_bonus=0}
                 value.add_research=function(row) value.research_queue={row}; return true end
                 return value
               end
@@ -293,7 +324,7 @@ class AaiParityNativeControls(unittest.TestCase):
                 entity.get_inventory=function(slot) if slot==3 then return input elseif slot==4 then return output end error("unexpected assembler slot") end
                 entity.get_module_inventory=function() return nil end
                 entity.set_recipe=function(name) assert(name=="electric-engine-unit");return {} end
-                entity.get_recipe=function() return {name="electric-engine-unit"} end
+                entity.get_recipe=function() return {name="electric-engine-unit",enabled=player.recipes["electric-engine-unit"].enabled} end
                 entity.get_fluid_count=function(name) return fluids[name] or 0 end
                 entity.get_fluid_contents=function() return fluids end
                 entity.get_fluid_capacity=function(index) assert(index==1);return 160 end
@@ -307,7 +338,8 @@ class AaiParityNativeControls(unittest.TestCase):
                 return strict_entity(entity,function(_,value)
                   if batch_crafts==10 and pending==0 and input.get_item_count("steel-plate")>=20 then batch_crafts=0 end
                   if input.get_item_count("steel-plate")>=2 and input.get_item_count("electronic-circuit")>=4
-                      and input.get_item_count("electric-motor")>=2 and (fluids["lubricant"] or 0)>=40 then
+                      and input.get_item_count("electric-motor")>=2 and (fluids["lubricant"] or 0)>=40
+                      and player.recipes["electric-engine-unit"].enabled==true then
                     input.counts["steel-plate"]=input.counts["steel-plate"]-2
                     input.counts["electronic-circuit"]=input.counts["electronic-circuit"]-4
                     input.counts["electric-motor"]=input.counts["electric-motor"]-2
@@ -379,6 +411,8 @@ class AaiParityNativeControls(unittest.TestCase):
               end
               assert(player.current_research and player.current_research.name=="recipe-prod-research_electric_engine-1")
               assert(physical_crafts==10)
+              assert(player.technologies["advanced-oil-processing"].researched and player.technologies.lubricant.researched
+                and player.technologies["electric-engine"].researched and player.recipes["electric-engine-unit"].enabled)
               local owner=player.technologies["recipe-prod-research_electric_engine-1"]
               owner.level=2;player.recipes["electric-engine-unit"].productivity_bonus=.1;player.current_research=nil;player.research_queue={}
               assert(pcall(callbacks.events[1],{by_script=false,research=owner}))
@@ -460,6 +494,9 @@ class AaiParityNativeControls(unittest.TestCase):
             "burner-recipe-category": lambda raw: raw["recipe"]["burner-lab"]["categories"].__setitem__(0, "smelting"),
             "iron-plate-recipe": lambda raw: raw["recipe"]["iron-plate"].__setitem__("energy_required", 4),
             "automation-stack-size": lambda raw: raw["item"]["automation-science-pack"].__setitem__("stack_size", 199),
+            "electric-engine-prerequisite": lambda raw: raw["technology"]["electric-engine"].__setitem__("prerequisites", ["chemical-science-pack"]),
+            "electric-engine-unlock": lambda raw: raw["technology"]["electric-engine"]["effects"][0].__setitem__("recipe", "engine-unit"),
+            "electric-engine-recipe-enabled": lambda raw: raw["recipe"]["electric-engine-unit"].__setitem__("enabled", True),
             "wrong-closure": lambda raw: raw,
         }
         for name, mutate in opponents.items():
@@ -498,6 +535,8 @@ class AaiParityNativeControls(unittest.TestCase):
         self.assertIn('local AAI_PLAN = {"fuel-processing", "sand-processing", "electricity", "electronics", "glass-processing", "electric-lab"}', source)
         self.assertIn('event.by_script ~= false', source)
         self.assertIn('source_setup_external_science_prerequisites=true', source)
+        self.assertIn('source_setup_external_electric_engine_prerequisites=state.external_prerequisite_setup ~= nil', source)
+        self.assertIn('local EXTERNAL_ELECTRIC_ENGINE_PREREQUISITES = {"advanced-oil-processing", "lubricant", "electric-engine"}', source)
         self.assertIn('phase="bootstrap-iron"', source)
         self.assertIn('craft-item trigger did not complete after native iron production', source)
         self.assertIn('craft-item trigger did not complete after native burner-lab production', source)
@@ -517,6 +556,7 @@ class AaiParityNativeControls(unittest.TestCase):
         self.assertIn('physical_before_output=state.before_output', source)
         self.assertIn('physical_after_output=state.after_output', source)
         self.assertNotIn('enable_all_prototypes', source)
+        self.assertNotIn('script.raise_event', source)
         self.assertNotIn('technology(force, AAI_PLAN[state.aai_next]).researched = true', source)
         self.assertIn('game.server_save(SAVE)', source)
         self.assertIn('on_load_read_only=stage == "reload"', source)
