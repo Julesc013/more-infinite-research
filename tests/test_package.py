@@ -70,6 +70,13 @@ class PackageTests(unittest.TestCase):
                 info, rows = pack.members(source, target=target)
                 files = dict(rows)
                 expected_dependencies = [*dependencies[target]]
+                if target == "f210":
+                    # The named mortar binding consumes Ironclad's final
+                    # native predecessor edits. Preserve the historical
+                    # inventory and assert this new ordering explicitly.
+                    ironclad_ordering = "(?) aai-vehicles-ironclad"
+                    self.assertNotIn(ironclad_ordering, dependencies[target])
+                    expected_dependencies.insert(1, ironclad_ordering)
                 if target in ("f200", "f210"):
                     # The retained 4.7 inventory predates this MIR5 ordering
                     # correction. Current modern packages must run after SIF
