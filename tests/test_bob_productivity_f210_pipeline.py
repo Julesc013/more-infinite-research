@@ -242,6 +242,22 @@ class BobProductivityF210PipelineTests(unittest.TestCase):
         lua.execute('local target = require("platform.target"); target.id, target.factorio_version, target.minimum_base = "f200", "2.0", "2.0.77"')
         self.assertIsNone(module["select"](_lua_value(lua, self.case("base")["selection"])))
 
+        # A non-selected profile must not load its data preflight module at
+        # all. The packager's static closure still includes the pure module.
+        for target_id in ("f200", "f210"):
+            isolated = self.lua()
+            isolated.globals().selected_target = target_id
+            loaded = isolated.execute(r'''
+              local target = require("platform.target")
+              target.id = selected_target
+              if selected_target == "f200" then
+                target.factorio_version, target.minimum_base, target.cargo_research = "2.0", "2.0.77", false
+              end
+              require("compatibility.modern_catalogue").select({base = target.minimum_base})
+              return package.loaded["compatibility.bob_productivity"]
+            ''')
+            self.assertIsNone(loaded)
+
     def test_full_pipeline_configured_percent_and_disabled_streams_preserve_the_declared_boundary(self):
         configured = {
             "ips-effect-per-level-research_sulfur": {"value": 25},

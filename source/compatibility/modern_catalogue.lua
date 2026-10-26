@@ -703,7 +703,9 @@ function M.select(active_mods, raw)
   local py = require("compatibility.py_profile").select(active_mods)
   local bob_warfare = require("compatibility.bob_warfare_profile").applies(active_mods)
   local bob_plates = require("compatibility.bob_plates_profile").select(active_mods)
-  local bob_productivity = require("compatibility.bob_productivity").select(active_mods)
+  local bob_productivity = target.id == "f210" and type(active_mods) == "table"
+    and active_mods.bobplates ~= nil and active_mods.bobrevamp ~= nil
+    and require("compatibility.bob_productivity").select(active_mods) or nil
   local angel_f210 = M.angel_f210_profile(active_mods)
   local required_product_targets, additional_product_bindings, exact_product_target_families = nil, nil, {}
   local exact_product_bindings = nil
