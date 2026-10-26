@@ -71,10 +71,10 @@ class ScienceTests(unittest.TestCase):
               else raw.item.satellite.rocket_launch_product = {"space-science-pack",1000} end
               return raw
             end
-            local initial_red = target == "f017" or target == "f100" or target == "f110"
+            local initial_red = target == "f017" or target == "f018" or target == "f100" or target == "f110"
             for _, pack in ipairs(base) do
               if pack == "automation-science-pack" and initial_red then
-                -- Installed Base 0.17/1.0/1.1 has an initially enabled
+                -- Installed Base 0.17/0.18/1.0/1.1 has an initially enabled
                 -- shorthand-result red recipe and no red technology.
                 source_recipe(raw, pack, nil)
               else
@@ -101,7 +101,7 @@ class ScienceTests(unittest.TestCase):
                 promethium_prerequisites)
               raw.technology["biter-egg-handling"] = {}
               raw.technology[promethium_prerequisites[2]] = {}
-            elseif target == "f017" or target == "f100" or target == "f110" then
+            elseif target == "f017" or target == "f018" or target == "f100" or target == "f110" then
               raw.technology["space-science-pack"] = {name="space-science-pack",
                 effects={{type="unlock-recipe", recipe="satellite"}}}
               raw.item.satellite = {name="satellite", rocket_launch_product={"space-science-pack",1000}}
@@ -167,6 +167,12 @@ class ScienceTests(unittest.TestCase):
           assert(f017.source_contracts["automation-science-pack"].kind == "initial-recipe")
           assert(f017.pack_prerequisites["automation-science-pack"] == nil)
           assert(same(f017.pack_prerequisites["space-science-pack"], {"space-science-pack"}))
+          local f018 = bindings.select({id="f018"}, {})
+          assert(same(f018.official, {"automation-science-pack", "logistic-science-pack", "chemical-science-pack",
+            "production-science-pack", "military-science-pack", "utility-science-pack", "space-science-pack"}))
+          assert(f018.source_contracts["automation-science-pack"].kind == "initial-recipe")
+          assert(same(f018.pack_prerequisites["logistic-science-pack"], {"logistic-science-pack"}))
+          assert(same(f018.pack_prerequisites["space-science-pack"], {"space-science-pack"}))
           local f100 = bindings.select({id="f100"}, {})
           assert(f100.source_contracts["automation-science-pack"].kind == "initial-recipe")
           assert(f100.pack_prerequisites["automation-science-pack"] == nil)
@@ -193,7 +199,7 @@ class ScienceTests(unittest.TestCase):
         self.lua.execute(r'''
           local initial = {
             f013="science-pack-1", f014="science-pack-1", f015="science-pack-1", f016="science-pack-1",
-            f017="automation-science-pack", f100="automation-science-pack", f110="automation-science-pack"
+            f017="automation-science-pack", f018="automation-science-pack", f100="automation-science-pack", f110="automation-science-pack"
           }
           for id, pack in pairs(initial) do
             local selected = bindings.select({id=id}, {})
@@ -217,7 +223,7 @@ class ScienceTests(unittest.TestCase):
             for _, row in ipairs(rows or {}) do if row[1] == wanted then return row[2] end end
             return nil
           end
-          for _, id in ipairs({"f017", "f100", "f110"}) do
+          for _, id in ipairs({"f017", "f018", "f100", "f110"}) do
             local selected = bindings.select({id=id}, {})
             local fresh, owner = "fresh-unit-seed", "fresh-unit-seed-owner"
             local packs, inputs = {fresh}, {fresh}
@@ -946,9 +952,9 @@ class ScienceTests(unittest.TestCase):
           assert(not science.validate_source_contract(raw, unlocked))
         ''')
 
-    def test_f017_through_f110_keep_satellite_launch_sources_without_a_research_trigger(self):
+    def test_f017_f018_f100_and_f110_keep_satellite_launch_sources_without_a_research_trigger(self):
         self.lua.execute(r'''
-          for _, id in ipairs({"f017", "f100", "f110"}) do
+          for _, id in ipairs({"f017", "f018", "f100", "f110"}) do
             local selected = bindings.select({id=id}, {})
             assert(selected.source_contracts["space-science-pack"].kind == "satellite-launch-product")
             local raw = raw_with({"A", "space-science-pack"}, {lab={"A", "space-science-pack"}})
@@ -963,6 +969,66 @@ class ScienceTests(unittest.TestCase):
               options={ ["mir-science-pack-ingredient-policy"]="space" }}))
             assert(not result.enabled and result.reason == "invalid-science-source:space-science-pack:payload-output:satellite", id)
           end
+        ''')
+
+    def test_f018_science_policy_consumes_pinned_initial_owner_and_satellite_contracts(self):
+        self.lua.execute(r'''
+          local selected = bindings.select({id="f018"}, {})
+          local regular = {"logistic-science-pack", "chemical-science-pack", "military-science-pack",
+            "production-science-pack", "utility-science-pack"}
+          assert(selected.source_contracts["automation-science-pack"].kind == "initial-recipe")
+          for _, pack in ipairs(regular) do
+            local contract = selected.source_contracts[pack]
+            assert(contract.kind == "recipe-unlock" and contract.recipe == pack and contract.owner == pack, pack)
+            assert(same(selected.pack_prerequisites[pack], {pack}), pack .. " prerequisite")
+          end
+          local space = selected.source_contracts["space-science-pack"]
+          assert(space.kind == "satellite-launch-product" and space.payload == "satellite"
+            and space.owner == "space-science-pack" and space.owner_recipe == "satellite")
+
+          local raw = raw_with(selected.official, {whole=selected.official})
+          install_sources(raw, false, "f018")
+          local default_row = technology({{"automation-science-pack", 7}, {"military-science-pack", 9}}, {"authored"})
+          local result = science.apply(default_row, {}, science.prepare({raw=raw, target={id="f018"}, options={}}))
+          assert(result.enabled and result.reason == "configured")
+          assert(names(default_row.unit.ingredients) == "automation-science-pack:7,military-science-pack:9")
+          assert(same(default_row.prerequisites, {"authored"}))
+
+          local configured_row = technology({{"automation-science-pack", 3}}, {"configured-anchor"})
+          result = science.apply(configured_row, {}, science.prepare({raw=raw, target={id="f018"},
+            options={ ["mir-science-pack-ingredient-policy"]="configured" }}))
+          assert(result.enabled and result.reason == "configured")
+          assert(names(configured_row.unit.ingredients) == "automation-science-pack:3")
+          assert(same(configured_row.prerequisites, {"configured-anchor"}))
+
+          local all_row = technology({{"automation-science-pack", 5}}, {"all-anchor"})
+          result = science.apply(all_row, {}, science.prepare({raw=raw, target={id="f018"},
+            options={ ["mir-science-pack-ingredient-policy"]="all" }}))
+          assert(result.enabled and result.reason == "all")
+          assert(names(all_row.unit.ingredients) == "automation-science-pack:5,logistic-science-pack:1,chemical-science-pack:1,production-science-pack:1,military-science-pack:1,utility-science-pack:1,space-science-pack:1")
+          assert(same(all_row.prerequisites, {"all-anchor", "logistic-science-pack", "chemical-science-pack",
+            "production-science-pack", "military-science-pack", "utility-science-pack", "space-science-pack"}))
+
+          local bad_owner = raw_with(selected.official, {whole=selected.official})
+          install_sources(bad_owner, false, "f018")
+          bad_owner.technology["utility-science-pack"].effects = {}
+          local owner_row = technology({{"automation-science-pack", 5}}, {"owner-anchor"})
+          result = science.apply(owner_row, {}, science.prepare({raw=bad_owner, target={id="f018"},
+            options={ ["mir-science-pack-ingredient-policy"]="all" }}))
+          assert(not result.enabled and result.reason ==
+            "invalid-science-source:utility-science-pack:missing-owner-unlock:utility-science-pack")
+          assert(names(owner_row.unit.ingredients) == "automation-science-pack:5" and same(owner_row.prerequisites, {"owner-anchor"}))
+
+          local bad_satellite = raw_with(selected.official, {whole=selected.official})
+          install_sources(bad_satellite, false, "f018")
+          bad_satellite.item.satellite.rocket_launch_product = {"space-science-pack", 0}
+          local satellite_row = technology({{"automation-science-pack", 5}}, {"satellite-anchor"})
+          result = science.apply(satellite_row, {}, science.prepare({raw=bad_satellite, target={id="f018"},
+            options={ ["mir-science-pack-ingredient-policy"]="all" }}))
+          assert(not result.enabled and result.reason ==
+            "invalid-science-source:space-science-pack:payload-output:satellite")
+          assert(names(satellite_row.unit.ingredients) == "automation-science-pack:5"
+            and same(satellite_row.prerequisites, {"satellite-anchor"}))
         ''')
 
     def test_finite_alternatives_and_declared_resources_do_not_search_or_seed_cycles(self):
