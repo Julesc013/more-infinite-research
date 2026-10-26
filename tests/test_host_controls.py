@@ -38,6 +38,7 @@ class HostControlsTests(unittest.TestCase):
         paths = [row["path"] for row in controls]
         self.assertEqual(paths, [
             "tests/test_generator.py",
+            "tests/test_early_target_adapter.py",
             "tests/test_historical_direct.py",
             "tests/test_historical_continuations.py",
             "tests/test_historical_native_runner.py",
@@ -145,6 +146,8 @@ class HostControlsTests(unittest.TestCase):
             "tests/test_library_profile_reader.py",
             "tests/test_f110_f200_runner.py",
             "tests/test_package.py",
+            "tests/test_early_package.py",
+            "tests/test_changelog.py",
             "tests/test_release.py",
             "tests/test_compose_replay.py",
             "tests/test_compare_captures.py",
@@ -157,7 +160,6 @@ class HostControlsTests(unittest.TestCase):
             "tests/test_host_controls.py",
             "tools/check_repository.py",
         ])
-        self.assertEqual(len(paths), 119)
         self.assertEqual(len(set(paths)), len(paths))
         self.assertEqual(paths[-1], "tools/check_repository.py")
         self.assertIn("tests/test_sdk.py", paths)

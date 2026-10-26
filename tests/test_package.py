@@ -160,7 +160,7 @@ class PackageTests(unittest.TestCase):
                 file.write_text("return {}\n")
             (source / "info.json").write_text(json.dumps({"name":"more-infinite-research",
                 "version":"5.0.21000","factorio_version":"2.1","dependencies":["base >= 2.1.23"]}))
-            for name in ("LICENSE", "thumbnail.png", "presentation/changelog/current.txt", "presentation/changelog/f210.txt"):
+            for name in ("LICENSE", "thumbnail.png", "changelog.txt"):
                 destination = source / name
                 destination.parent.mkdir(parents=True, exist_ok=True)
                 shutil.copyfile(ROOT / "source" / name, destination)
@@ -245,7 +245,7 @@ class PackageTests(unittest.TestCase):
                         pack.build(source, output, revision=commit, target="f200", target_record=value)
                     self.assertFalse(output.exists())
 
-    def test_every_edition_keeps_its_complete_published_history_and_player_assets(self):
+    def test_every_edition_gets_the_complete_master_history_and_preserves_player_assets(self):
         source = ROOT / "source"
         recovered = json.loads((ROOT / "spec/inventory/package-presentation-472.json").read_bytes())
         self.assertEqual(recovered["sums_sha256"], "5DF0282024F4CA376CBA56E6E848F8512D768E1520D47E1C6AD257567BC561A9")
@@ -257,47 +257,45 @@ class PackageTests(unittest.TestCase):
         latest_records = {record["target"]: record for record in latest["records"]}
         self.assertEqual(len(latest["records"]), 9)
         self.assertEqual(set(latest_records), {record["target"] for record in recovered["records"]})
-        entry = (source / "presentation/changelog/current.txt").read_bytes()
+        entry = (source / "changelog.txt").read_bytes()
         self.assertLessEqual(max(map(len, entry.splitlines())), 132)
+        masters = json.loads((ROOT / "spec/inventory/changelog-history.json").read_bytes())
+        prior = {row["target"]: row for row in masters["prior_edition_histories"]}
         for record in recovered["records"]:
             with self.subTest(target=record["target"]):
                 info, rows = pack.members(source, target=record["target"])
                 files = dict(rows)
-                historical_path = Path(record["source"])
-                self.assertEqual(
-                    historical_path.as_posix(),
-                    f"source/mir5/presentation/changelog/{record['target']}.txt")
-                history = (source / historical_path.relative_to("source/mir5")).read_bytes()
                 current = latest_records[record["target"]]
-                self.assertEqual(current["source"], f"source/presentation/changelog/{record['target']}.txt")
-                self.assertEqual(len(history), current["bytes"])
-                self.assertEqual(hashlib.sha256(history).hexdigest().upper(), current["history_sha256"])
+                self.assertEqual(prior[record["target"]]["path"], current["source"])
+                self.assertEqual(prior[record["target"]]["bytes"], current["bytes"])
+                self.assertEqual(prior[record["target"]]["sha256"], current["history_sha256"])
                 self.assertEqual(current["previous_history_bytes"], record["bytes"])
                 self.assertEqual(current["previous_history_sha256"], record["history_sha256"])
-                self.assertGreater(len(history), record["bytes"])
-                previous = history[-record["bytes"]:]
-                prefix = history[:-record["bytes"]]
-                self.assertEqual(hashlib.sha256(previous).hexdigest().upper(), record["history_sha256"])
-                self.assertEqual(len(prefix), current["added_prefix_bytes"])
-                self.assertEqual(hashlib.sha256(prefix).hexdigest().upper(), current["added_prefix_sha256"])
-                self.assertTrue(prefix.startswith(
-                    ("-" * 99 + "\nVersion: 4.7." + record["target"][1:] + "03\n").encode()))
                 self.assertEqual(current["license_sha256"], record["license_sha256"])
-                self.assertEqual(files["changelog.txt"], entry.replace(b"@DISTRIBUTION_VERSION@", info["version"].encode()) + history)
+                self.assertEqual(files["changelog.txt"], entry.replace(b"@DISTRIBUTION_VERSION@", info["version"].encode()))
+                self.assertTrue(files["changelog.txt"].startswith(
+                    ("-" * 99 + "\nVersion: " + info["version"] + "\n").encode()))
+                self.assertEqual(files["changelog.txt"].count(b"Version: 1.0.0\n"), 1)
+                self.assertNotIn(b"Version: 1.9.5\n", files["changelog.txt"])
                 self.assertEqual(hashlib.sha256(files["LICENSE"]).hexdigest().upper(), record["license_sha256"])
                 self.assertEqual(files["thumbnail.png"], (source / "thumbnail.png").read_bytes())
                 self.assertFalse(any(name.startswith("presentation/changelog/") for name in files))
 
-    def test_missing_selected_history_or_asset_is_not_a_partial_player_package(self):
+    def test_missing_shared_history_or_asset_is_not_a_partial_player_package(self):
         source = ROOT / "source"
         files = {path.relative_to(source).as_posix(): path.read_bytes()
                  for path in source.rglob("*") if path.is_file() and pack.admitted(path.relative_to(source).as_posix())}
-        for required in ("LICENSE", "thumbnail.png", "presentation/changelog/current.txt", "presentation/changelog/f200.txt"):
+        for required in ("LICENSE", "thumbnail.png", "changelog.txt"):
             with self.subTest(missing=required):
                 broken = dict(files)
                 del broken[required]
                 with self.assertRaisesRegex(ValueError, "missing player presentation"):
                     pack.members(source, committed_files=broken, target="f200")
+
+        for corrupt in (b"Version: 5.0.0\n", files["changelog.txt"] * 2):
+            broken = dict(files, **{"changelog.txt": corrupt})
+            with self.assertRaisesRegex(ValueError, "exactly one"):
+                pack.members(source, committed_files=broken, target="f200")
 
     def test_committed_build_ignores_dirty_untracked_and_line_ending_worktree_bytes(self):
         with tempfile.TemporaryDirectory() as temporary:

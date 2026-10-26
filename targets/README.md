@@ -10,4 +10,6 @@ F200 shares the modern implementation while selecting native `probability`, reta
 
 `tools/package.py --target f015` selects the reduced stage adapters, their actual Lua import closure and target metadata, and derives `5.0.01500` from source `5.0.21000`. A committed build binds the edition record at the same revision as player source. Source-only composition checks do not establish gameplay, upgrades or a release claim.
 
-At cutover this directory becomes `targets/`. Native player member paths remain unchanged.
+The canonical cutover is complete: this is `targets/`, selecting capability metadata rather than alternate editable player trees.
+
+[early-editions.json](early-editions.json) is a separate opt-in composition record for best-effort F006–F012. Use `python tools/package.py --source source --revision <full-commit> --target f006 --target-record targets/early-editions.json --output more-infinite-research_5.0.00600.zip` with a new output path. These editions emit14/22/22/22/22/22/26 finite default rows respectively and omit startup settings, runtime/API, Library and migrations. F006–F008 archives require extraction into the engine's mod folder; their direct ZIP loading is unproven. F009–F012 ZIP eligibility is source-evidenced but still lacks current native qualification. All extras need explicit best-effort release labels. F001–F005 and the previously excluded F018 remain unresolved under the [additional-edition contract](../spec/targets.md#additional-historical-editions); the nine-edition freeze does not claim them.
