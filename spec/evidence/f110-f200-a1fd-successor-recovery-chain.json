@@ -1,0 +1,283 @@
+{
+  "kind": "MIR5F110F200A1fdRecoveredNativeChainV1",
+  "source_chain": "f110-f200-published-source-r05-native-chain.json",
+  "scope": "One exact published F110 to MIR5 F200 Base successor, actual successor lab, retained seeded rows and two cold reloads; not all transitions or final-release acceptance.",
+  "disposition": "Native fixture passed; outer wrapper adverse preserved. Recovery independently verifies all original primary members, native originals, native result/log witnesses, protected source save and matching before/after controls.",
+  "wrapper_cause": "The wrapper required top-level library_controls_restored, absent in this runner. The actual library_control_restoration.status is restored-direct-library-controls; direct byte states also match.",
+  "primary_custody": "build/mir5/recovery-historical/f110-f200-a1fd-successor-r01",
+  "custody_readback_sha256": "322C7AECDBFDE711A87F874CA0995C7AEC79C4EC6CD464B7FEBA1AD5171CD07B",
+  "readback": {
+    "schema": 1,
+    "kind": "MIR5F110F200SuccessorCustodyReadbackV1",
+    "scope": "read-only verification of an existing F110-to-F200 fixture execution; it does not alter the original terminal disposition",
+    "original_terminal": {
+      "path": "terminal.json",
+      "sha256": "E57F09327CC383739DF80D6BD4A2BD004AB19F2C3B3D0E417D7424618EC7CE2A",
+      "status": "adverse",
+      "failure": "[broad-f210-r04] native controls did not restore"
+    },
+    "native_result": {
+      "path": "native-output/result.json",
+      "sha256": "EDEF6D3A1CE2DBDAF32024007553486073648EC37C0520CA47EA6A601D8A2158",
+      "status": "passed-private-native-fixture",
+      "source_head": "a1fd431bd25e646f801e68a8ad00a8abb49ee094",
+      "source_dirty": false,
+      "engine_sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B",
+      "mir_archive_sha256": "8BA029A01E1F08C311C6A127C81313D7664F0ABADAF3C79F84157775D35ADFD7",
+      "input_save_sha256": "D524AA78440F242B179A1E9BC40BF89B87C1A66E99F64C14D3250DEAEBB69253",
+      "result_library_controls_restored_field_present": false,
+      "actual_library_control_restoration": {
+        "status": "restored-direct-library-controls",
+        "profile_sha256": "118702D87FB229D6C1095477922C97AF1F820E9190BF80D621E5CFA3E1357E9E",
+        "dependency_payload_bytes_copied": 0,
+        "archive_links_created": 0,
+        "archive_extractions": 0,
+        "owned_archive_names_temporarily_hidden": 0
+      }
+    },
+    "protected_published_f110_source_save": {
+      "path": "../f110-f200-transition-published-f110-source-r05/native-output/write-data/saves/mir5-native-complete.zip",
+      "bytes": 821571,
+      "sha256": "D524AA78440F242B179A1E9BC40BF89B87C1A66E99F64C14D3250DEAEBB69253"
+    },
+    "actual_successor_save": {
+      "path": "native-output/write-data/saves/mir5-native-complete.zip",
+      "bytes": 823240,
+      "sha256": "BCA9CC55A35A936EDEA6ECD463F9A257E2B78772A882E90825C17874A0C80C42",
+      "two_cold_reloads_byte_identical": true
+    },
+    "before_after_direct_library_controls": {
+      "before": {
+        "mod_list_json": {
+          "exists": true,
+          "bytes": 50354,
+          "sha256": "9A4983B5929B116BCD5909E9B75E6EEB9B79A881637A583E4EC2504E9FA57073"
+        },
+        "mod_settings_dat": {
+          "exists": false,
+          "bytes": null,
+          "sha256": null
+        },
+        "active_profile_marker": {
+          "exists": false,
+          "bytes": null,
+          "sha256": null
+        },
+        "mir_archive": {
+          "exists": true,
+          "bytes": 553231,
+          "sha256": "B67FF048860F2707579CF582C933ED46D7BF52769F5ABE1B0279DDCC2A0323BD"
+        },
+        "owned_fixture_archive": {
+          "exists": false,
+          "bytes": null,
+          "sha256": null
+        }
+      },
+      "after": {
+        "mod_list_json": {
+          "exists": true,
+          "bytes": 50354,
+          "sha256": "9A4983B5929B116BCD5909E9B75E6EEB9B79A881637A583E4EC2504E9FA57073"
+        },
+        "mod_settings_dat": {
+          "exists": false,
+          "bytes": null,
+          "sha256": null
+        },
+        "active_profile_marker": {
+          "exists": false,
+          "bytes": null,
+          "sha256": null
+        },
+        "mir_archive": {
+          "exists": true,
+          "bytes": 553231,
+          "sha256": "B67FF048860F2707579CF582C933ED46D7BF52769F5ABE1B0279DDCC2A0323BD"
+        },
+        "owned_fixture_archive": {
+          "exists": false,
+          "bytes": null,
+          "sha256": null
+        }
+      },
+      "actual_byte_state_equal": true,
+      "factorio_process_count_after": 0
+    },
+    "native_fixture_witnesses": {
+      "initial": {
+        "log": "native-output/production.factorio.log",
+        "log_sha256": "2EBA754567EE9F7B10CDCED4BD2E868340FE9482D03E3EBCF70C2D178B20E881",
+        "line": 89,
+        "source_direct_lab_completions": 1,
+        "successor_direct_lab_completions": 1,
+        "seeded_catalogue_rows": 16,
+        "retained_catalogue_rows": 17,
+        "queued_progress": 0.42,
+        "suspended_progress": 0.27,
+        "foreign_disabled": true,
+        "inserter_stack_size_bonus": 2,
+        "bulk_inserter_capacity_bonus": 4
+      },
+      "saved_successor": {
+        "log": "native-output/production.factorio.log",
+        "line": 90
+      },
+      "reload_1": {
+        "log": "native-output/reload-1.factorio.log",
+        "log_sha256": "47A7CBAF5599C9DE303E0151F4BA310F79B1C54D84976B322C9CBD59B4564ED6",
+        "line": 74,
+        "status": "passed",
+        "on_load_read_only": true
+      },
+      "reload_2": {
+        "log": "native-output/reload-2.factorio.log",
+        "log_sha256": "3552C2B1BE9398820BAB62E78031D7952E277529EF9E290DC044D9F244AD3ACA",
+        "line": 74,
+        "status": "passed",
+        "on_load_read_only": true
+      }
+    },
+    "recovery_members": [
+      {
+        "path": "fixture/candidate-adoption/candidate-adoption.json",
+        "bytes": 840,
+        "sha256": "5AF4AB6CBF22BD9212F8F39D93307468CEFA93B2059DFE917DE9D3D52F0C93D9",
+        "native_original": false
+      },
+      {
+        "path": "mir/candidate-adoption/candidate-adoption.json",
+        "bytes": 1170,
+        "sha256": "74F9CD9528A3393D2C1F4C7992BD7FDE7A83E432BAAA7EECC29FA5452FA53A66",
+        "native_original": false
+      },
+      {
+        "path": "native-output/config.ini",
+        "bytes": 269,
+        "sha256": "C6D7951B80B08EA845ED02D03444117FAF83A52A1D63BD53EAAAAEC6C6D382D6",
+        "native_original": true
+      },
+      {
+        "path": "native-output/process-1.resources.jsonl",
+        "bytes": 4462,
+        "sha256": "A87120322AA26FF07C1DBE43D1A6EB015372BDBF5EF7757E7ADE76BE3456D464",
+        "native_original": true
+      },
+      {
+        "path": "native-output/process-1.stderr.txt",
+        "bytes": 0,
+        "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+        "native_original": true
+      },
+      {
+        "path": "native-output/process-1.stdout.txt",
+        "bytes": 9832,
+        "sha256": "F4A5DF2D80EF85E80A436263F6AE650DDFB85E4073F7DD09040BADD260FA8D85",
+        "native_original": true
+      },
+      {
+        "path": "native-output/process-2.resources.jsonl",
+        "bytes": 2008,
+        "sha256": "15FC8EDA33A727FB7CB1E38DE5702E21DD215055E9D5F57FADB2FF43F7D8AFA7",
+        "native_original": true
+      },
+      {
+        "path": "native-output/process-2.stderr.txt",
+        "bytes": 0,
+        "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+        "native_original": true
+      },
+      {
+        "path": "native-output/process-2.stdout.txt",
+        "bytes": 106,
+        "sha256": "46F28BFBA3B43251A1C4651BF7E87BE8EEE822F33C0C577F34836760D6BF04FA",
+        "native_original": true
+      },
+      {
+        "path": "native-output/process-3.resources.jsonl",
+        "bytes": 2008,
+        "sha256": "A375A7F64186D46B636CAF020B85C260795A3CB9BBE2C4110DEB87DCB761BEB9",
+        "native_original": true
+      },
+      {
+        "path": "native-output/process-3.stderr.txt",
+        "bytes": 0,
+        "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+        "native_original": true
+      },
+      {
+        "path": "native-output/process-3.stdout.txt",
+        "bytes": 106,
+        "sha256": "04F659E74277429A0421A303A110D1440E328603657D74128F325FE1EEC76442",
+        "native_original": true
+      },
+      {
+        "path": "native-output/production.factorio.log",
+        "bytes": 9740,
+        "sha256": "2EBA754567EE9F7B10CDCED4BD2E868340FE9482D03E3EBCF70C2D178B20E881",
+        "native_original": true
+      },
+      {
+        "path": "native-output/reload-1.factorio.log",
+        "bytes": 7351,
+        "sha256": "47A7CBAF5599C9DE303E0151F4BA310F79B1C54D84976B322C9CBD59B4564ED6",
+        "native_original": true
+      },
+      {
+        "path": "native-output/reload-2.factorio.log",
+        "bytes": 7351,
+        "sha256": "3552C2B1BE9398820BAB62E78031D7952E277529EF9E290DC044D9F244AD3ACA",
+        "native_original": true
+      },
+      {
+        "path": "native-output/result.json",
+        "bytes": 32786,
+        "sha256": "EDEF6D3A1CE2DBDAF32024007553486073648EC37C0520CA47EA6A601D8A2158",
+        "native_original": true
+      },
+      {
+        "path": "native-output/server-settings.json",
+        "bytes": 3679,
+        "sha256": "5B4C546FFCA63E1AEC8F67FFA5C32F3108CBC334DFA5AB1C5E2C212005639610",
+        "native_original": true
+      },
+      {
+        "path": "native-output/write-data/factorio-current.log",
+        "bytes": 7351,
+        "sha256": "3552C2B1BE9398820BAB62E78031D7952E277529EF9E290DC044D9F244AD3ACA",
+        "native_original": true
+      },
+      {
+        "path": "native-output/write-data/player-data.json",
+        "bytes": 10851,
+        "sha256": "B2BF04AD4E46C306BB9CFB2BFACF549307FD1E611B760C79F68080D79AC532A9",
+        "native_original": true
+      },
+      {
+        "path": "native-output/write-data/saves/mir5-native-complete.zip",
+        "bytes": 823240,
+        "sha256": "BCA9CC55A35A936EDEA6ECD463F9A257E2B78772A882E90825C17874A0C80C42",
+        "native_original": true
+      },
+      {
+        "path": "preflight.json",
+        "bytes": 4029,
+        "sha256": "4C40D0BA58C5EB2E573C2B02B5FAC8C8B6DC49FDF3659C528B648A90734A1CAA",
+        "native_original": false
+      },
+      {
+        "path": "terminal.json",
+        "bytes": 38827,
+        "sha256": "E57F09327CC383739DF80D6BD4A2BD004AB19F2C3B3D0E417D7424618EC7CE2A",
+        "native_original": false
+      }
+    ],
+    "verification": {
+      "recovery_member_count_before_this_readback": 22,
+      "native_output_member_count": 18,
+      "all_18_native_output_members_present_in_original_output": true,
+      "all_18_native_output_member_hashes_match_original_output": true,
+      "conclusion": "The original wrapper terminal remains adverse because it expected a top-level library_controls_restored field absent from the native result. This readback records the distinct actual runner restoration field and direct before/after control equality without changing that original disposition."
+    }
+  }
+}

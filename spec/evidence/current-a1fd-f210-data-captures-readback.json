@@ -1,0 +1,237 @@
+{
+  "kind": "MIR5A1fdF210DataCaptureReadbackV1",
+  "source_head": "a1fd431bd25e646f801e68a8ad00a8abb49ee094",
+  "engine_sha256": "FE4A1DA30F322A0D0B8AEB3DF7276332222BAAA143E2352569B723E84B2B9060",
+  "mir_archive_sha256": "6088CD88D4FD06DE01D71C8A1C3C7D32A55A55BE073C0888A84B2AC0C8C467D7",
+  "scope": "Nine exact data/settings-stage captures only; no gameplay, save, client, performance or release verdict.",
+  "cases": [
+    {
+      "case": "q009",
+      "profile": "bob-angel-full-base-f210-2123.json",
+      "profile_sha256": "760945672E7D5F03BEBE25CA477A68C95D54AA359C62D34AE69D55BF9161372F",
+      "status": "completed-data-stage-observation-only",
+      "result_sha256": "706D6A6ABFCC6C4000A93B08DEEF3FABE31B720EC01AFB3B38CD4CA5CC31DDB8",
+      "terminal_sha256": "3B7B2A512A088362E84A9CF7377E77E190270469A7FD5C3099F79C4B435DCBA2",
+      "dumps": {
+        "data_raw": {
+          "path": "write-data/script-output/data-raw-dump.json",
+          "bytes": 47743461,
+          "sha256": "3FFEDF8203431A0F1D47FD2D4F3CD9DC2066B76F851A1E3E201DC89B5D991F35"
+        },
+        "mod_settings": {
+          "path": "write-data/script-output/mod-settings-dump.json",
+          "bytes": 789442,
+          "sha256": "379EAADE0CEE80C493098BC97559BA37950500F1B478B173FF0235A7BA291704"
+        }
+      },
+      "native_members_verified": 9,
+      "primary_custody": "build/mir5/recovery-historical/a1fd-q009-native-r01",
+      "library_controls_restored": true,
+      "prior_mir_restoration": "original-C563-restored"
+    },
+    {
+      "case": "q010",
+      "profile": "bob-angel-full-space-age-f210-2123.json",
+      "profile_sha256": "79C589FDFC329CDCE8C204ABD4E939E60759792ACF4A9C7CEF8D326A5CC124B1",
+      "status": "completed-data-stage-observation-only",
+      "result_sha256": "2C4AC5DD7915AE5D03BBFB285AF6EC85006813DD0FB01EA200D4B96BB9C3D49E",
+      "terminal_sha256": "A9C5AC812ED41D03C10F3B6503959B438A95DDAAE3BC867C171160C17918BAF7",
+      "dumps": {
+        "data_raw": {
+          "path": "write-data/script-output/data-raw-dump.json",
+          "bytes": 67502730,
+          "sha256": "3232879B3EF32FCAB36D405D0A00F89AF9219A83DB77BAAD5870F1BEB6064293"
+        },
+        "mod_settings": {
+          "path": "write-data/script-output/mod-settings-dump.json",
+          "bytes": 787011,
+          "sha256": "B951E976DEE9027361778707786C6AD4397210D3E91903314A3A2F60DEF7A162"
+        }
+      },
+      "native_members_verified": 9,
+      "primary_custody": "build/mir5/recovery-historical/a1fd-q010-native-r01",
+      "library_controls_restored": true,
+      "prior_mir_restoration": "original-C563-restored"
+    },
+    {
+      "case": "q005",
+      "profile": "bob-full-base-f210-2123.json",
+      "profile_sha256": "A5017E19A99B8240D8671DD9D88F03F055492C7E764159DB167221568FD90AA7",
+      "status": "completed-data-stage-observation-only",
+      "result_sha256": "8AB401D4C52DAC51729911FAE7FCA77D387183CE11E78E6B053DE61CBF3AEA87",
+      "terminal_sha256": "D6D897AF9EA50B65E02BE95BF10ED681EF9DB9228334417A9B578B9620EA70AE",
+      "dumps": {
+        "data_raw": {
+          "path": "write-data/script-output/data-raw-dump.json",
+          "bytes": 36325782,
+          "sha256": "854D53513E5122085F2F31AFABC4DD203ACE976A32109456C4FBAF636DAB7E19"
+        },
+        "mod_settings": {
+          "path": "write-data/script-output/mod-settings-dump.json",
+          "bytes": 779542,
+          "sha256": "FCF4389991BF23EB9D9B3CD971921FB4DDB26839E38BE6D0276B5AB7766B89A1"
+        }
+      },
+      "native_members_verified": 9,
+      "primary_custody": "build/mir5/recovery-historical/a1fd-q005-native-r01",
+      "library_controls_restored": true,
+      "prior_mir_restoration": "original-C563-restored"
+    },
+    {
+      "case": "q006",
+      "profile": "bob-full-space-age-f210-2123.json",
+      "profile_sha256": "47A538A60B8B9446FA525B5FEFE2E7C2AA4D32C357BE45276748FC2F28C9A1D4",
+      "status": "completed-data-stage-observation-only",
+      "result_sha256": "D62E0A4711D2502FACAC3FA82BD856C0C05657DEA07B0C24B1FF967D3F8D6DA6",
+      "terminal_sha256": "912DB7A544EC57A8279EA0279B0DFBCE83B8D3939A3D83402AB004F9F09680D8",
+      "dumps": {
+        "data_raw": {
+          "path": "write-data/script-output/data-raw-dump.json",
+          "bytes": 54180366,
+          "sha256": "E0E1F9AA55B3E6C5C5B0330CAD8E9A84F169BD96FE8FCA0B7F95E88EA6CC41B7"
+        },
+        "mod_settings": {
+          "path": "write-data/script-output/mod-settings-dump.json",
+          "bytes": 776854,
+          "sha256": "DE3A4C64980D4355CC5848024581CCC8C8AD953F59E675CB4EBBCBB9315C6C4E"
+        }
+      },
+      "native_members_verified": 9,
+      "primary_custody": "build/mir5/recovery-historical/a1fd-q006-native-r01",
+      "library_controls_restored": true,
+      "prior_mir_restoration": "original-C563-restored"
+    },
+    {
+      "case": "q007",
+      "profile": "angel-full-base-f210-2123.json",
+      "profile_sha256": "ADFE6B262232E7C296BA591BFBA5812B62B2E45761A78F1E9588D141B7AABF00",
+      "status": "completed-data-stage-observation-only",
+      "result_sha256": "EB25B8AE3D02E28C1481439FB46C91EE2B5C209D3AEF19048351E721E22729B6",
+      "terminal_sha256": "9E1BE6578694953F6B396034AB83C2C1CB7C0F5A58780495495F98614E2ACB69",
+      "dumps": {
+        "data_raw": {
+          "path": "write-data/script-output/data-raw-dump.json",
+          "bytes": 25433175,
+          "sha256": "AC868BE88FB15126254C7562E75D2C064F2B7334B07D7C542DFE033CED8F58C9"
+        },
+        "mod_settings": {
+          "path": "write-data/script-output/mod-settings-dump.json",
+          "bytes": 759589,
+          "sha256": "78D76198E03DF1320F048E7C57DA1ABAD71B72D2430BB9C9DDC90E69580370DF"
+        }
+      },
+      "native_members_verified": 9,
+      "primary_custody": "build/mir5/recovery-historical/a1fd-q007-native-r01",
+      "library_controls_restored": true,
+      "prior_mir_restoration": "original-C563-restored"
+    },
+    {
+      "case": "q008",
+      "profile": "angel-full-space-age-f210-2123.json",
+      "profile_sha256": "4CAD1401B56D8BE7B09B9CC2EAB045773FC4DE9C11C37BF283A51C3E11758B49",
+      "status": "completed-data-stage-observation-only",
+      "result_sha256": "F5E7040B2D7BE34E1E28F23BFBB146C661104ACC71F8A0DB6E2ADDDB3FF889D5",
+      "terminal_sha256": "FEA9F5263EA0426EFBBA1AA9AD2F5AAF6FFE0DF28302C31ECC5F8ABD636E7D49",
+      "dumps": {
+        "data_raw": {
+          "path": "write-data/script-output/data-raw-dump.json",
+          "bytes": 43069211,
+          "sha256": "05C0E18C92C0E4F97A2853804A7CBA025C3BC2383F2FCEB159AAEECEDF43B941"
+        },
+        "mod_settings": {
+          "path": "write-data/script-output/mod-settings-dump.json",
+          "bytes": 756355,
+          "sha256": "823F889F59CE855DC2264C5C8F8213CA6A75153ECE88B15310161BF91019978B"
+        }
+      },
+      "native_members_verified": 9,
+      "primary_custody": "build/mir5/recovery-historical/a1fd-q008-native-r01",
+      "library_controls_restored": true,
+      "prior_mir_restoration": "original-C563-restored"
+    },
+    {
+      "case": "q013",
+      "profile": "k2se-base-f210-2123.json",
+      "profile_sha256": "FA586BDDE8C0914BB536CDE19909C56762CE009459366730BC9C36CCAF389B16",
+      "status": "completed-data-stage-observation-only",
+      "result_sha256": "EEBB6A59469E38C071547E3105E0FDD4A74BDB262F9077A78C2A035AF04664F5",
+      "terminal_sha256": "EA6C257D58314671A9EE8674D05528460A9E3AF7FF967BC7DF1C9DEA01F58421",
+      "dumps": {
+        "data_raw": {
+          "path": "write-data/script-output/data-raw-dump.json",
+          "bytes": 41930235,
+          "sha256": "EED228211153A44DDD5ABB8CDD63BA9B272B48B4F4C1C75861419A860A7923E6"
+        },
+        "mod_settings": {
+          "path": "write-data/script-output/mod-settings-dump.json",
+          "bytes": 783992,
+          "sha256": "66960ABCFD7CF45350A7F88794C6B6EBBA8F294BEEEE71E9F6903EF12DA9492A"
+        }
+      },
+      "native_members_verified": 9,
+      "primary_custody": "build/mir5/recovery-historical/a1fd-q013-native-r01",
+      "library_controls_restored": true,
+      "prior_mir_restoration": "original-C563-restored"
+    },
+    {
+      "case": "q062",
+      "profile": "popular-krastorio2-space-age-f210-2123.json",
+      "profile_sha256": "616AF92086506996F0C934CEED2076E5EBB5975A9C6FF2A9C0E26AB2DB0EC215",
+      "status": "completed-data-stage-observation-only",
+      "result_sha256": "D31D637862EE3BA14F1A0B2AF7FA53CBE0C3517B321F27C879AA1AB01CDE2893",
+      "terminal_sha256": "FC39D4EA771C1933068B0208875DEFA0CA6642D6147E51A463F50A577ADBEA7D",
+      "dumps": {
+        "data_raw": {
+          "path": "write-data/script-output/data-raw-dump.json",
+          "bytes": 34096387,
+          "sha256": "CAB34F73BFD1D616B5613CE619014D25DC3ADC9C989EA57374DAABB25478B667"
+        },
+        "mod_settings": {
+          "path": "write-data/script-output/mod-settings-dump.json",
+          "bytes": 752891,
+          "sha256": "BEBF4A6F043D5F72614750890018045664967FCFDDEBB927CCBCA20D96DF0212"
+        }
+      },
+      "native_members_verified": 9,
+      "primary_custody": "build/mir5/recovery-historical/a1fd-q062-native-r01",
+      "library_controls_restored": true,
+      "prior_mir_restoration": "original-C563-restored"
+    },
+    {
+      "case": "q001",
+      "profile": "py-suite-base-f210-2123.json",
+      "profile_sha256": "3706BBD447A445ECD072FA6E13B7453BF1C566092D19E88AB933E3FF178938AF",
+      "status": "completed-data-stage-observation-only",
+      "result_sha256": "51C09A2AE71832E6D54AF6EA31E2F83CD867C80C4C3C3F10D63BBD68C8C4257F",
+      "terminal_sha256": "A88468F79AC68F02071AAA188844622098641A2E2135616B6D76292311710420",
+      "dumps": {
+        "data_raw": {
+          "path": "write-data/script-output/data-raw-dump.json",
+          "bytes": 63294932,
+          "sha256": "BDB5B6679816F7959DDB88F7B60BC868B20BDB72E2ECAFEFE915CF027F04420A"
+        },
+        "mod_settings": {
+          "path": "write-data/script-output/mod-settings-dump.json",
+          "bytes": 755706,
+          "sha256": "5B8FC836FA901C60E37AF67A08EDB8264FC48CB7C0264532C3CE9D5BE6BE6FE8"
+        }
+      },
+      "native_members_verified": 9,
+      "primary_custody": "build/mir5/recovery-historical/a1fd-q001-native-r01",
+      "library_controls_restored": true,
+      "prior_mir_restoration": "original-C563-restored"
+    }
+  ],
+  "held_unrun": [
+    "q003",
+    "q073",
+    "q074"
+  ],
+  "held_reason": "The serial continuation budget could not admit another full 240-second case; no launches or outcomes are invented.",
+  "material_finding": {
+    "case": "q010",
+    "technology": "recipe-prod-research_carbon-1",
+    "finding": "The inherited static carbon effect incorrectly targets a hidden recipe producing angels-solid-carbon. Original receipt is retained; PR1102 is a source correction requiring affected native qualification.",
+    "published_b6_raw_sha256": "A8935196FBF9A58DA01BB26EFD739CE74941DB2885C6A1514E9379F64A33C3C1"
+  }
+}
