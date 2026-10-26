@@ -729,7 +729,7 @@
             "spec/evidence/broad-ecosystem-f210-c563-native-chain-r01.json",
             "spec/evidence/broad-ecosystem-f210-public-audits-readback-r01.json"
           ],
-          "scope": "PR1063 centrally publishes31 sparse Base/16 sparse Space Age rows through one Generator publication and declares visible settings/finite runtime cap routes. b911a7813 adds proven full-Bob Base admission; no C563 native result is relabelled for later source. Broad parity, physical output, migrations and clients remain open."
+          "scope": "PR1063 centrally publishes31 sparse Base/16 sparse Space Age rows through one Generator publication and declares visible settings/finite runtime cap routes. Accepted PR1067 adds proven full-Bob Base admission with the same Bob Plates source bytes as b911a7813; all four required checks pass for its114-command plan at originala9a05905. No C563 native result is relabelled for later source. Broad parity, physical output, migrations and clients remain open."
         },
         {
           "id": "f210-bob-plates-central-host-wiring",
@@ -755,7 +755,7 @@
         "production"
       ],
       "remaining_implementation": [
-        "Reconcile the remaining named Angel/BobTech/Ironclad and full-suite semantic differences from the exact EA41/C563 public audits. The central Bob Plates31 Base/16 Space Age construction is accepted at PR1063; full-Bob Base31-row admission is accepted at Dev935a38e14/player tree31e5a218d with all114 host commands passing CI40276747586; changed-package native qualification remains open."
+        "Reconcile the remaining named Angel/BobTech/Ironclad and full-suite semantic differences from the exact EA41/C563 public audits. The central Bob Plates31 Base/16 Space Age construction is accepted at PR1063; full-Bob Base31-row admission is accepted at PR1067 with all four required114-command checks green. Changed-package native qualification remains pending."
       ],
       "remaining_qualification": [
         "Finish affected mixed/dynamic earned MIR overlap boundaries; composed fixed true/false/true and the independent fixed-provider removal/readdition controls already pass.",
