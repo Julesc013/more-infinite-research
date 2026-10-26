@@ -1,0 +1,22 @@
+{
+  "schema": 1,
+  "kind": "mir5-f200-f210-positive-cap-cross-reenabled-successor",
+  "target": "f210",
+  "factorio_line": "2.1",
+  "engine": {
+    "version": "2.1.23",
+    "sha256": "FE4A1DA30F322A0D0B8AEB3DF7276332222BAAA143E2352569B723E84B2B9060"
+  },
+  "settings_mode": "Defaults",
+  "mods": [
+    {"name": "base", "version": "2.1.23", "enabled": true},
+    {"name": "mir-fixture-mir5-active-mods-observer", "version": "0.1.0", "enabled": true},
+    {"name": "more-infinite-research", "version": "5.0.21000", "enabled": true},
+    {"name": "mir-fixture-mir5-f200-legacy-cap", "version": "0.7.0", "enabled": true}
+  ],
+  "archive_sha256": {
+    "mir-fixture-mir5-active-mods-observer_0.1.0.zip": "2E1BE5952D2A4CC5C74A0D149E075D247BA110A3FAE5B6768D3EAEBABCEF989C",
+    "more-infinite-research_5.0.21000.zip": "CE1165CAC174EDA4800EBECAAEF29FC2E071B2E7160CD98F799FE21C2F151F9B"
+  },
+  "scope": "Exact ea41cbc6 F210 Base re-enabled successor after the required disabled v0.6.0 intermediate from the protected published 4.7.20003 F200 Base source profile f200-legacy-cap-cross-f200-published-4.7.3-2077.json. Compose f210/reenabled-after-f200 v0.7.0 with the disabled-stage save through InputSavePath/ExpectedInputSaveSha256 once native creation supplies its immutable digest; restore only owned gear, retain 27-percent work and the disabled foreign 42-percent queue, complete one re-enabled-stage lab, save, and cold-reload twice. Prepared input only; no native pass or current-release claim."
+}
