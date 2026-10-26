@@ -26,15 +26,45 @@ end
 
 function M.applies(active_mods) return M.select(active_mods) ~= nil end
 
-local function exact_entry(actual, expected)
-  if type(actual) ~= "table" or type(expected) ~= "table" then return false end
-  for key, wanted in pairs(expected) do if actual[key] ~= wanted then return false end end
-  return true
+local function expected_or_default(actual, expected, key, default)
+  if expected[key] ~= nil then return actual[key] == expected[key] end
+  return actual[key] == nil or actual[key] == default
 end
 
-local function exact_rows(actual, expected)
+local function shared_probability_matches(actual, expected)
+  if expected.shared_probability ~= nil then return actual.shared_probability == expected.shared_probability end
+  return actual.shared_probability == nil or (type(actual.shared_probability) == "table"
+    and actual.shared_probability.min == 0 and actual.shared_probability.max == 1)
+end
+
+local function ignored_counts_match(actual, expected, product)
+  if expected.ignored_by_productivity ~= nil then
+    return actual.ignored_by_productivity == expected.ignored_by_productivity
+      and expected_or_default(actual, expected, "ignored_by_stats", 0)
+  end
+  local effective = actual.ignored_by_productivity
+  if product and effective == nil then effective = actual.ignored_by_stats end
+  return effective == nil or effective == 0
+end
+
+local function exact_entry(actual, expected, product)
+  if type(actual) ~= "table" or type(expected) ~= "table" then return false end
+  for key, wanted in pairs(expected) do if actual[key] ~= wanted then return false end end
+  return expected_or_default(actual, expected, "amount_min", nil)
+    and expected_or_default(actual, expected, "amount_max", nil)
+    and expected_or_default(actual, expected, "probability", 1)
+    and expected_or_default(actual, expected, "independent_probability", 1)
+    and shared_probability_matches(actual, expected)
+    and expected_or_default(actual, expected, "extra_count_fraction", 0)
+    and expected_or_default(actual, expected, "catalyst_amount", 0)
+    and expected_or_default(actual, expected, "minimum_temperature", nil)
+    and expected_or_default(actual, expected, "maximum_temperature", nil)
+    and ignored_counts_match(actual, expected, product)
+end
+
+local function exact_rows(actual, expected, product)
   if type(actual) ~= "table" or #actual ~= #expected then return false end
-  for index, wanted in ipairs(expected) do if not exact_entry(actual[index], wanted) then return false end end
+  for index, wanted in ipairs(expected) do if not exact_entry(actual[index], wanted, product) then return false end end
   return true
 end
 
@@ -62,7 +92,7 @@ local function validate_product_route(raw, route)
   if type(recipe) ~= "table" or recipe.enabled ~= route.enabled or recipe.hidden == true
       or not product_allow_productivity_matches(recipe.allow_productivity, route.allow_productivity)
       or not (route.maximum_productivity == "omitted" and (recipe.maximum_productivity == nil or recipe.maximum_productivity == 3))
-      or not exact_rows(recipe.ingredients, route.ingredients) or not exact_rows(recipe.results, route.results)
+      or not exact_rows(recipe.ingredients, route.ingredients, false) or not exact_rows(recipe.results, route.results, true)
       or not product_owner_unlocks(raw, route) then
     fail(route.recipe .. " changed")
   end
