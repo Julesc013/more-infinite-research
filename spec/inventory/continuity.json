@@ -1447,6 +1447,20 @@
         ],
         "historical_incident_rule": "Every original request/incident and existing exact regression pack remains mandatory regardless of popularity. Preserve original IDs/decisions/receipts, including science failures, True Nukes, multiplayer join, optional-DLC artwork, K2 Imersite/carriers, Py foreign resets, Bob/Angel prerequisite/cap cases and mixed productivity providers. Unknown reporter inputs remain explicit missing inputs.",
         "evidence_rule": "A tracked profile or available archive is not a native pass. Keep exact old evidence under its original identities, map consumed-input applicability, and record each unrun or failed axis visibly. Upstream incompatibility requires exact evidence and an explicit disposition; it is not a successful migration or a MIR completeness claim.",
+        "completed_ea41_startup_sweep": {
+          "evidence": "spec/evidence/broad-ecosystem-f210-ea41-native-chain-r01.json",
+          "source": "ea41cbc6d27626283db9d8bbf6211b2171b6e36a",
+          "engine": "2.1.23",
+          "planned_selections": 132,
+          "actual_native_launches": 374,
+          "completed_data_stage_observations": 352,
+          "failed_native_observations": 22,
+          "candidate_loaded": 114,
+          "candidate_failed": 7,
+          "mir_arms_unrun_after_upstream_failure": 22,
+          "all_controls_restored": true,
+          "scope": "Data-stage startup observations only. Preserve eleven upstream failures, four published MIR failures and seven candidate failures; none is relabelled by later source corrections. Relevant row/effect reconciliation, actual research/physical outputs, saves, game-version/DLC transitions, clients and final-package qualification remain separate open axes."
+        },
         "local_popular_input_availability": {
           "status": "all-selected-top50-root-candidates-locally-available-after-seven-official-downloads",
           "engines": [
