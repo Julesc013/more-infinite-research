@@ -104,7 +104,7 @@ def raw_fixture():
                 "results": [{"type": "item", "name": "electric-engine-unit", "amount": 1}],
             },
         },
-        "tool": {
+        "item": {
             "automation-science-pack": {"stack_size": 200},
         },
         "unrelated": {"preserved": True},
@@ -418,7 +418,7 @@ class AaiParityNativeControls(unittest.TestCase):
             "burner-recipe": lambda raw: raw["recipe"]["burner-lab"]["ingredients"][0].__setitem__("amount", 9),
             "burner-recipe-category": lambda raw: raw["recipe"]["burner-lab"]["categories"].__setitem__(0, "smelting"),
             "iron-plate-recipe": lambda raw: raw["recipe"]["iron-plate"].__setitem__("energy_required", 4),
-            "automation-stack-size": lambda raw: raw["tool"]["automation-science-pack"].__setitem__("stack_size", 199),
+            "automation-stack-size": lambda raw: raw["item"]["automation-science-pack"].__setitem__("stack_size", 199),
             "wrong-closure": lambda raw: raw,
         }
         for name, mutate in opponents.items():

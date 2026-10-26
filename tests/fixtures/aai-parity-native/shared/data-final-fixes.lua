@@ -119,7 +119,7 @@ exact_names(iron_plate_recipe.categories or {}, {"smelting"}, "iron plate recipe
 exact_ingredients(iron_plate_recipe.ingredients, {{type="item", name="iron-ore", amount=1}}, "iron plate recipe ingredients")
 exact_ingredients(iron_plate_recipe.results, {{type="item", name="iron-plate", amount=1}}, "iron plate recipe result")
 
-local automation_science = data.raw.tool and data.raw.tool["automation-science-pack"]
+local automation_science = data.raw.item and data.raw.item["automation-science-pack"]
 if type(automation_science) ~= "table" or automation_science.stack_size ~= 200 then
   fail("automation science stack capacity differs")
 end
