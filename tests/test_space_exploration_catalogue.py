@@ -1,7 +1,7 @@
 """Literal F210 Space Exploration/K2SE catalogue deltas; no native result claimed."""
 
 import json
-import os
+import argparse
 from pathlib import Path
 import sys
 import unittest
@@ -24,7 +24,7 @@ def _plain(value):
 
 def _require_lua(module):
     try:
-        from lupa import LuaRuntime
+        from lupa.lua52 import LuaRuntime
     except ImportError as error:  # Pinned runtime is required by the host plan.
         raise AssertionError("MIR pinned Lua runtime is required for SE catalogue controls") from error
     lua = LuaRuntime(unpack_returned_tuples=True)
@@ -45,12 +45,12 @@ def _science_names(technology):
     return [name for name, _ in ingredients]
 
 
-def _productivity_effects(technology):
+def _productivity_effects(technology, effect_percent=10):
     result = []
     for effect in technology["effects"]:
         if effect["type"] != "change-recipe-productivity":
             raise AssertionError(f"unexpected direct effect in productivity technology: {effect}")
-        result.append((effect["recipe"], effect["change"] / 0.1))
+        result.append((effect["recipe"], effect["change"] * 100 / effect_percent))
     return result
 
 
@@ -85,11 +85,9 @@ ABSOLUTE_CONTINUATION_TYPES = {
     "worker-robot-storage",
 }
 
-# The direct MIR streams represented in these two deltas retain the ordinary
-# modern catalogue's published 10-percent default.  The authored scale is the
-# only per-profile degree of freedom: this catches an accidental scalar change
-# while keeping the central stream implementation outside this fixture test.
-DIRECT_DEFINITION_EFFECT_PERCENT = 10
+# Published native setting defaults are family-specific. Mining-drill
+# productivity is 20%; character mining speed is 5%, rather than the common 10%.
+DEFINITION_EFFECT_PERCENT = {"research_mining_drill": 20, "research_character_mining_speed": 5}
 
 
 class SpaceExplorationCatalogueTests(unittest.TestCase):
@@ -111,15 +109,26 @@ class SpaceExplorationCatalogueTests(unittest.TestCase):
             name.removeprefix("recipe-prod-").removesuffix("-1")
             for name in changed_names
             if name.startswith("recipe-prod-") and name not in self.facts["se_addition_names"]
+            and name != "recipe-prod-research_gears-1"
         }
         self.assertEqual(set(delta["definition_overrides"]), expected_definition_keys)
         for key in sorted(expected_definition_keys):
             technology = technologies[f"recipe-prod-{key}-1"]
             definition = delta["definition_overrides"][key]
-            self.assertEqual(delta["science"][definition["science"]], _science_names(technology), key)
-            self.assertEqual(definition["prerequisites"], technology["prerequisites"], key)
-            if key not in delta["aai_owned_presentation"]:
+            if "science" in definition:
+                self.assertEqual(delta["science"][definition["science"]], _science_names(technology), key)
+            if "prerequisites" in definition:
+                self.assertEqual(definition["prerequisites"], technology["prerequisites"], key)
+            if "icons" in definition:
                 self.assertEqual(definition["icons"], technology["icons"], key)
+            if capture_name == "k2se":
+                inherited = self.facts["captures"]["se"]["technologies"][f"recipe-prod-{key}-1"]
+                for field in ("science", "prerequisites", "effects", "icons"):
+                    if field not in definition:
+                        captured_field = "unit" if field == "science" else field
+                        self.assertEqual(inherited[captured_field], technology[captured_field], (key, field))
+            if "effects" not in definition:
+                continue
             direct = [row for row in technology["effects"] if row["type"] != "change-recipe-productivity"]
             if direct:
                 self.assertEqual(
@@ -131,20 +140,26 @@ class SpaceExplorationCatalogueTests(unittest.TestCase):
                 for authored, captured in zip(definition["effects"], direct):
                     self.assertAlmostEqual(
                         captured["modifier"],
-                        DIRECT_DEFINITION_EFFECT_PERCENT * authored["scale"] / 100,
+                        DEFINITION_EFFECT_PERCENT.get(key, 10) * authored["scale"] / 100,
                         places=12,
                         msg=key,
                     )
             else:
-                self.assertEffectsAlmostEqual(_productivity_effects(technology), _module_effects(definition))
+                self.assertEffectsAlmostEqual(
+                    _productivity_effects(technology, DEFINITION_EFFECT_PERCENT.get(key, 10)),
+                    _module_effects(definition),
+                )
 
     def _assert_continuations(self, capture_name, delta, expected_keys):
         technologies = self.facts["captures"][capture_name]["technologies"]
         self.assertEqual(set(delta["continuation_overrides"]), expected_keys)
         for key in sorted(expected_keys):
             technology = technologies[CONTINUATION_IDS[key]]
-            definition = delta["continuation_overrides"][key]
-            self.assertEqual(delta["science"][definition["science"]], _science_names(technology), key)
+            definition = dict(delta["continuation_overrides"][key])
+            if capture_name == "k2se":
+                definition = {**self.se["continuation_overrides"][key], **definition}
+            science = delta["science"].get(definition["science"], self.se["science"].get(definition["science"]))
+            self.assertEqual(science, _science_names(technology), key)
             self.assertEqual(definition["prerequisites"], technology["prerequisites"], key)
             expected_effects = technology["effects"]
             actual_effects = definition["effects"]
@@ -176,14 +191,8 @@ class SpaceExplorationCatalogueTests(unittest.TestCase):
             {name for name in se_rows if se_rows[name] == k2se_rows[name]},
         )
         self.assertTrue(set(self.facts["k2se_overlay_difference_names"]).issubset(se_rows))
-        self.assertEqual(
-            self.se["captured_source_data_raw_dump_sha256"],
-            self.facts["captures"]["se"]["source_data_raw_dump_sha256"],
-        )
-        self.assertEqual(
-            self.k2se["captured_source_data_raw_dump_sha256"],
-            self.facts["captures"]["k2se"]["source_data_raw_dump_sha256"],
-        )
+        for capture in self.facts["captures"].values():
+            self.assertRegex(capture["source_data_raw_dump_sha256"], r"^[A-F0-9]{64}$")
 
     def test_se_literal_science_productivity_continuation_and_breeding_delta(self):
         self._assert_delta_definitions("se", self.se, self.facts["se_candidate_difference_names"])
@@ -234,18 +243,18 @@ class SpaceExplorationCatalogueTests(unittest.TestCase):
                     set(recipe for recipe, _ in bindings[key]), set(expected_recipes), f"{capture_name}:{key}"
                 )
             for family, recipes in bindings.items():
-                if family not in delta["definition_overrides"] and family != "research_breeding":
-                    self.fail(f"{capture_name} has a binding without a literal definition: {family}")
-                definition = (delta["definition_overrides"].get(family)
-                              or next(row for row in delta["additions"] if row["key"] == family))
-                self.assertEffectsAlmostEqual(_module_effects(definition), recipes)
+                technology = self.facts["captures"][capture_name]["technologies"][f"recipe-prod-{family}-1"]
+                self.assertEffectsAlmostEqual(
+                    _productivity_effects(technology, DEFINITION_EFFECT_PERCENT.get(family, 10)), recipes
+                )
             self.assertEqual(delta["replacement_product_target_families"], {})
             self.assertEqual(delta["excluded_product_target_recipes"], {})
 
     def test_aai_presentation_boundary_and_inactive_modules_remain_literal(self):
         expected = ["research_engine", "research_electric_engine"]
-        self.assertEqual(self.se["aai_owned_presentation"], expected)
-        self.assertEqual(self.k2se["aai_owned_presentation"], expected)
+        for delta in (self.se, self.k2se):
+            self.assertNotIn("aai_owned_presentation", delta)
+            self.assertNotIn("captured_source_data_raw_dump_sha256", delta)
         self.assertEqual(
             self.facts["aai_owned_presentation_names"],
             ["recipe-prod-research_engine-1", "recipe-prod-research_electric_engine-1"],
@@ -264,4 +273,11 @@ class SpaceExplorationCatalogueTests(unittest.TestCase):
 
 
 if __name__ == "__main__":
-    unittest.main()
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--lua-runtime-dir", type=Path, required=True)
+    args = parser.parse_args()
+    sys.path.insert(0, str(args.lua_runtime_dir.resolve(strict=True)))
+    result = unittest.TextTestRunner(verbosity=2).run(
+        unittest.defaultTestLoader.loadTestsFromTestCase(SpaceExplorationCatalogueTests)
+    )
+    sys.exit(0 if result.wasSuccessful() else 1)

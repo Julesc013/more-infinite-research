@@ -19,7 +19,6 @@ local function exact_binding(family, weight, recipes)
 end
 
 return {
-  captured_source_data_raw_dump_sha256 = "73695D9B21DFC6D93E86A884B47113A118E91A9CB82726222D10730978CEBBAE",
   science = {
     science_se_braking_force = {
       "automation-science-pack",
@@ -301,7 +300,7 @@ return {
       prerequisites = {
         "production-science-pack"
       },
-      effects = {effect("splitter"), effect("transport-belt"), effect("underground-belt"), effect("fast-splitter", 0.5), effect("fast-transport-belt", 0.5), effect("fast-underground-belt", 0.5), effect("express-splitter", 0.19999999999999998), effect("express-transport-belt", 0.19999999999999998), effect("express-underground-belt", 0.19999999999999998), effect("se-deep-space-splitter-black", 0.049999999999999996), effect("se-deep-space-splitter-blue", 0.049999999999999996), effect("se-deep-space-splitter-cyan", 0.049999999999999996), effect("se-deep-space-splitter-green", 0.049999999999999996), effect("se-deep-space-splitter-magenta", 0.049999999999999996), effect("se-deep-space-splitter-red", 0.049999999999999996), effect("se-deep-space-splitter-white", 0.049999999999999996), effect("se-deep-space-splitter-yellow", 0.049999999999999996), effect("se-deep-space-transport-belt-black", 0.049999999999999996), effect("se-deep-space-transport-belt-blue", 0.049999999999999996), effect("se-deep-space-transport-belt-cyan", 0.049999999999999996), effect("se-deep-space-transport-belt-green", 0.049999999999999996), effect("se-deep-space-transport-belt-magenta", 0.049999999999999996), effect("se-deep-space-transport-belt-red", 0.049999999999999996), effect("se-deep-space-transport-belt-white", 0.049999999999999996), effect("se-deep-space-transport-belt-yellow", 0.049999999999999996), effect("se-deep-space-underground-belt-black", 0.049999999999999996), effect("se-deep-space-underground-belt-blue", 0.049999999999999996), effect("se-deep-space-underground-belt-cyan", 0.049999999999999996), effect("se-deep-space-underground-belt-green", 0.049999999999999996), effect("se-deep-space-underground-belt-magenta", 0.049999999999999996), effect("se-deep-space-underground-belt-red", 0.049999999999999996), effect("se-deep-space-underground-belt-white", 0.049999999999999996), effect("se-deep-space-underground-belt-yellow", 0.049999999999999996), effect("se-space-splitter", 0.049999999999999996), effect("se-space-transport-belt", 0.049999999999999996), effect("se-space-underground-belt", 0.049999999999999996)},
+      effects = {effect("splitter"), effect("transport-belt"), effect("underground-belt"), effect("fast-splitter", 0.5), effect("fast-transport-belt", 0.5), effect("fast-underground-belt", 0.5), effect("express-splitter", 0.2), effect("express-transport-belt", 0.2), effect("express-underground-belt", 0.2), effect("se-deep-space-splitter-black", 0.05), effect("se-deep-space-splitter-blue", 0.05), effect("se-deep-space-splitter-cyan", 0.05), effect("se-deep-space-splitter-green", 0.05), effect("se-deep-space-splitter-magenta", 0.05), effect("se-deep-space-splitter-red", 0.05), effect("se-deep-space-splitter-white", 0.05), effect("se-deep-space-splitter-yellow", 0.05), effect("se-deep-space-transport-belt-black", 0.05), effect("se-deep-space-transport-belt-blue", 0.05), effect("se-deep-space-transport-belt-cyan", 0.05), effect("se-deep-space-transport-belt-green", 0.05), effect("se-deep-space-transport-belt-magenta", 0.05), effect("se-deep-space-transport-belt-red", 0.05), effect("se-deep-space-transport-belt-white", 0.05), effect("se-deep-space-transport-belt-yellow", 0.05), effect("se-deep-space-underground-belt-black", 0.05), effect("se-deep-space-underground-belt-blue", 0.05), effect("se-deep-space-underground-belt-cyan", 0.05), effect("se-deep-space-underground-belt-green", 0.05), effect("se-deep-space-underground-belt-magenta", 0.05), effect("se-deep-space-underground-belt-red", 0.05), effect("se-deep-space-underground-belt-white", 0.05), effect("se-deep-space-underground-belt-yellow", 0.05), effect("se-space-splitter", 0.05), effect("se-space-transport-belt", 0.05), effect("se-space-underground-belt", 0.05)},
       icons = {
         {
           icon = "__base__/graphics/technology/logistics-1.png",
@@ -325,7 +324,7 @@ return {
         "production-science-pack",
         "military-science-pack"
       },
-      effects = {effect("firearm-magazine"), effect("shotgun-shell"), effect("piercing-rounds-magazine", 0.5), effect("piercing-shotgun-shell", 0.5), effect("uranium-rounds-magazine", 0.19999999999999998)},
+      effects = {effect("firearm-magazine"), effect("shotgun-shell"), effect("piercing-rounds-magazine", 0.5), effect("piercing-shotgun-shell", 0.5), effect("uranium-rounds-magazine", 0.2)},
       icons = {
         {
           icon = "__base__/graphics/technology/military.png",
@@ -348,7 +347,7 @@ return {
       prerequisites = {
         "production-science-pack"
       },
-      effects = {effect("se-recycle-radar"), effect("stone-brick"), effect("concrete", 0.5), effect("hazard-concrete", 0.5), effect("se-recycle-big-electric-pole", 0.5), effect("refined-concrete", 0.19999999999999998), effect("refined-hazard-concrete", 0.19999999999999998)},
+      effects = {effect("se-recycle-radar"), effect("stone-brick"), effect("concrete", 0.5), effect("hazard-concrete", 0.5), effect("se-recycle-big-electric-pole", 0.5), effect("refined-concrete", 0.2), effect("refined-hazard-concrete", 0.2)},
       icons = {
         {
           icon = "__base__/graphics/technology/concrete.png",
@@ -394,7 +393,7 @@ return {
       prerequisites = {
         "production-science-pack"
       },
-      effects = {effect("accumulator"), effect("se-space-capsule-scorched-scrapping"), effect("se-space-capsule-scrapping"), effect("solar-panel"), effect("se-space-accumulator", 0.5), effect("se-space-solar-panel", 0.5), effect("se-space-accumulator-2", 0.19999999999999998), effect("se-space-solar-panel-2", 0.19999999999999998), effect("se-space-solar-panel-3", 0.09999999999999999)},
+      effects = {effect("accumulator"), effect("se-space-capsule-scorched-scrapping"), effect("se-space-capsule-scrapping"), effect("solar-panel"), effect("se-space-accumulator", 0.5), effect("se-space-solar-panel", 0.5), effect("se-space-accumulator-2", 0.2), effect("se-space-solar-panel-2", 0.2), effect("se-space-solar-panel-3", 0.1)},
       icons = {
         {
           icon = "__base__/graphics/technology/electric-energy-acumulators.png",
@@ -527,7 +526,7 @@ return {
         "production-science-pack",
         "military-science-pack"
       },
-      effects = {effect("cannon-shell"), effect("explosive-cannon-shell", 0.5), effect("explosive-uranium-cannon-shell", 0.19999999999999998), effect("uranium-cannon-shell", 0.19999999999999998), effect("artillery-shell", 0.09999999999999999), effect("se-railgun-ammo", 0.09999999999999999)},
+      effects = {effect("cannon-shell"), effect("explosive-cannon-shell", 0.5), effect("explosive-uranium-cannon-shell", 0.2), effect("uranium-cannon-shell", 0.2), effect("artillery-shell", 0.1), effect("se-railgun-ammo", 0.1)},
       icons = {
         {
           icon = "__base__/graphics/icons/cannon-shell.png",
@@ -550,7 +549,7 @@ return {
       prerequisites = {
         "production-science-pack"
       },
-      effects = {effect("burner-inserter"), effect("inserter"), effect("fast-inserter", 0.5), effect("long-handed-inserter", 0.5), effect("bulk-inserter", 0.19999999999999998)},
+      effects = {effect("burner-inserter"), effect("inserter"), effect("fast-inserter", 0.5), effect("long-handed-inserter", 0.5), effect("bulk-inserter", 0.2)},
       icons = {
         {
           icon = "__base__/graphics/technology/fast-inserter.png",
@@ -1092,12 +1091,12 @@ return {
       "fast-transport-belt",
       "fast-underground-belt"
     }),
-    exact_binding("research_belts", 0.19999999999999998, {
+    exact_binding("research_belts", 0.2, {
       "express-splitter",
       "express-transport-belt",
       "express-underground-belt"
     }),
-    exact_binding("research_belts", 0.049999999999999996, {
+    exact_binding("research_belts", 0.05, {
       "se-deep-space-splitter-black",
       "se-deep-space-splitter-blue",
       "se-deep-space-splitter-cyan",
@@ -1139,7 +1138,7 @@ return {
       "piercing-rounds-magazine",
       "piercing-shotgun-shell"
     }),
-    exact_binding("research_bullets", 0.19999999999999998, {
+    exact_binding("research_bullets", 0.2, {
       "uranium-rounds-magazine"
     }),
     exact_binding("research_concrete", 1.0, {
@@ -1151,7 +1150,7 @@ return {
       "hazard-concrete",
       "se-recycle-big-electric-pole"
     }),
-    exact_binding("research_concrete", 0.19999999999999998, {
+    exact_binding("research_concrete", 0.2, {
       "refined-concrete",
       "refined-hazard-concrete"
     }),
@@ -1171,11 +1170,11 @@ return {
       "se-space-accumulator",
       "se-space-solar-panel"
     }),
-    exact_binding("research_electric_energy", 0.19999999999999998, {
+    exact_binding("research_electric_energy", 0.2, {
       "se-space-accumulator-2",
       "se-space-solar-panel-2"
     }),
-    exact_binding("research_electric_energy", 0.09999999999999999, {
+    exact_binding("research_electric_energy", 0.1, {
       "se-space-solar-panel-3"
     }),
     exact_binding("research_electric_engine", 1.0, {
@@ -1200,11 +1199,11 @@ return {
     exact_binding("research_heavy_ammo", 0.5, {
       "explosive-cannon-shell"
     }),
-    exact_binding("research_heavy_ammo", 0.19999999999999998, {
+    exact_binding("research_heavy_ammo", 0.2, {
       "explosive-uranium-cannon-shell",
       "uranium-cannon-shell"
     }),
-    exact_binding("research_heavy_ammo", 0.09999999999999999, {
+    exact_binding("research_heavy_ammo", 0.1, {
       "artillery-shell",
       "se-railgun-ammo"
     }),
@@ -1216,7 +1215,7 @@ return {
       "fast-inserter",
       "long-handed-inserter"
     }),
-    exact_binding("research_inserters", 0.19999999999999998, {
+    exact_binding("research_inserters", 0.2, {
       "bulk-inserter"
     }),
     exact_binding("research_iron", 1.0, {
@@ -1289,5 +1288,4 @@ return {
   replacement_product_target_families = {},
   excluded_product_target_recipes = {},
   -- AAI controls the two engine icons; keep those cross-profile facts separate.
-  aai_owned_presentation = {"research_engine", "research_electric_engine"},
 }
