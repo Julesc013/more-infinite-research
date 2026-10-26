@@ -31,9 +31,9 @@ else
 end
 local technologies = {gear}
 
--- K2 Base admission is grounded in a hash-locked no-MIR F200 capture. That
--- source fact does not constitute native MIR5 K2 Base qualification. It is a
--- narrow no-Space-Age admission and never imports the K2SO profile body.
+-- K2 without Spaced Out has captured F200 Base and F210 Base/Space Age inputs.
+-- Named native fields are preflighted here; those source facts do not qualify
+-- a new MIR5 package. This route never imports the K2SO profile body.
 local ordinary_profile = type(mods) == "table" and mods.Krastorio2 == nil
   and mods["Krastorio2-spaced-out"] == nil and mods.Krastorio2Assets == nil and mods["k2so-assets"] == nil
 local modern_catalogue = require("compatibility.modern_catalogue")
