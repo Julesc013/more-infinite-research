@@ -77,6 +77,14 @@ class PackageTests(unittest.TestCase):
                     # when it is active, so their final-stage source checks
                     # see SIF's authored promethium owner.
                     self.assertNotIn(sif_ordering, dependencies[target])
+                    if target == "f210":
+                        # The retained 4.7.0 receipt records its prior 2.1.18
+                        # optional floors. Current F210 metadata binds both
+                        # official engine-coupled dependencies to 2.1.23.
+                        expected_dependencies = [
+                            dependency.replace(" >= 2.1.18", " >= 2.1.23")
+                            for dependency in expected_dependencies
+                        ]
                     expected_dependencies.append(sif_ordering)
                 self.assertEqual(info["factorio_version"], family)
                 self.assertEqual(info["dependencies"], expected_dependencies)
@@ -141,6 +149,16 @@ class PackageTests(unittest.TestCase):
                                      {path: value for path, value in unfiltered.items() if path != F210_ONLY_MIGRATION})
                 for name in files:
                     self.assertFalse(name.startswith(("source/", "targets/", "tests/", "spec/")))
+
+    def test_f210_engine_coupled_optional_minima_match_the_selected_base_floor(self):
+        editions, _ = pack.read_editions(ROOT / "source")
+        minimum = editions["f210"]["minimum_base"]
+        source_info = json.loads((ROOT / "source/info.json").read_text())
+        _, rows = pack.members(ROOT / "source", target="f210")
+        packaged_info = json.loads(dict(rows)["info.json"])
+        expected = {"? recycler >= " + minimum, "? space-age >= " + minimum}
+        for info in (source_info, packaged_info):
+            self.assertTrue(expected.issubset(info["dependencies"]))
 
     def test_unimplemented_unknown_and_arbitrary_edition_versions_refuse_before_output(self):
         with tempfile.TemporaryDirectory() as temporary:
