@@ -1,0 +1,171 @@
+{
+  "schema": 1,
+  "kind": "MIR5StandaloneF210Library201992NativeChainV1",
+  "status": "functional-two-client-pass-rendering-locale-regression-open",
+  "player_source_commit": "20199257df89dc0fb76e7c86478d7a906def14e3",
+  "player_source_tree": "2a8972193520001cb559962e5675309d5fda523c",
+  "player_sha256": "0D4C19C6A2C9FED241B77A9752132BA452D7357B8B86B1AA6CA7DB7372CD0FE6",
+  "engine": {
+    "sha256": "8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38",
+    "file_version": "2.1.23.87750",
+    "product_version": "2.1.23",
+    "base_version": "2.1.23"
+  },
+  "profile_sha256": "55DE734C9E376EE65DF127F0A9B42C7B3DE884C323C6DBA49CF2C774ECB40E03",
+  "fixtures": [
+    {
+      "sha256": "32788E1C795F356CFDB39A0AE8C52D6C567DA8A20CAA05C25A55D1FE5B735692",
+      "name": "mir-fixture-mir5-library-multiplayer_0.1.0.zip"
+    },
+    {
+      "sha256": "A15A7D628D66953D2E0C4D4FA288F47CBF9C5678327C7EB3D23ADB5DC78331C0",
+      "name": "mir-fixture-mir5-active-mods-observer_0.1.0.zip"
+    }
+  ],
+  "runs": [
+    {
+      "ordinal": 1,
+      "manifest": {
+        "path": "build/mir5/recovery-historical/library-standalone-current-r01/primary-custody-manifest-r02.json",
+        "sha256": "4534D4CB99D726A027E39CFF985FB72D49B3F7BF7C2B7FDCF48AAFBCA4F6149D"
+      },
+      "original_and_primary_members_verified": 25,
+      "bytes": 996265,
+      "mismatches": [],
+      "controller_commit": "f9bc2801f4f70e432193095e200754983cca4142",
+      "status": "failed-pre-session-session-contract-refusal",
+      "terminal": {
+        "path": "build/mir5/recovery-historical/library-standalone-current-r01/terminal-r01.json",
+        "sha256": "4D57C4B9BBF14CBCD6132169D550DD0C64CD19E901F44BB8DB359387E6C27E8D"
+      },
+      "claim": "Preserved adverse; not relabelled as a pass."
+    },
+    {
+      "ordinal": 2,
+      "manifest": {
+        "path": "build/mir5/recovery-historical/library-standalone-current-r02/primary-custody-manifest-r02.json",
+        "sha256": "21FC5479D19DED577A0D748BFDD4D8BFF055655307CBAECDF460B52A609790B1"
+      },
+      "original_and_primary_members_verified": 25,
+      "bytes": 959059,
+      "mismatches": [],
+      "controller_commit": "f8bb9b64c1cf465c25425781c05e3201fc9d9e00",
+      "status": "failed-pre-session-client-identity-contract-refusal",
+      "terminal": {
+        "path": "build/mir5/recovery-historical/library-standalone-current-r02/terminal-r02.json",
+        "sha256": "D3CA2A9D29A6FED9C467336E682FF87B0A2B95BFF527DEF33E1F375AAC65ECC8"
+      },
+      "claim": "Preserved adverse; not relabelled as a pass."
+    },
+    {
+      "ordinal": 3,
+      "manifest": {
+        "path": "build/mir5/recovery-historical/library-standalone-current-r03/primary-custody-manifest-r03.json",
+        "sha256": "95DD2AE2276527C3CD0B9C239AFB0D0C21C5349096D41735BBFD65867E34C1C2"
+      },
+      "original_and_primary_members_verified": 143,
+      "bytes": 11114876,
+      "mismatches": [],
+      "controller_commit": "6c77bf7eabfa357923d34e2d2e3459748de74e6b",
+      "status": "failed-runtime-fixture-api",
+      "terminal": {
+        "path": "build/mir5/recovery-historical/library-standalone-current-r03/terminal-r03.json",
+        "sha256": "692F550CEEF3CF81D3EA8FCC67AAEF24CF99DC3DA1A06B2049B39A79B85F446C"
+      },
+      "claim": "Preserved adverse; not relabelled as a pass."
+    },
+    {
+      "ordinal": 4,
+      "manifest": {
+        "path": "build/mir5/recovery-historical/library-standalone-current-r04/primary-custody-manifest-r04.json",
+        "sha256": "CB130084C4D8E44F636113ECDFAA0B0E373ECBE59E266C95C3B44FE008896F91"
+      },
+      "original_and_primary_members_verified": 216,
+      "bytes": 17893819,
+      "mismatches": [],
+      "controller_commit": "be52120cde09cc4d544abea3645fa7f2dc25e1dc",
+      "status": "passed-private-two-client-fixture",
+      "result_sha256": "67DAE03DD57B45B635AE50BFDEA1C03636B55BB87239CD449C1096383225355F",
+      "session_sha256": "91C540B4C52B6667EBB2D161411B083C4C402BB3408B279EE2828F1EB934ED00"
+    }
+  ],
+  "native_completed_witness": {
+    "case": "library-multiplayer",
+    "stage": "completed",
+    "status": "passed",
+    "witnesses": {
+      "base_version": "2.1.23",
+      "mir_version": "5.0.21000",
+      "actual_join_events": 6,
+      "screenshot_calls": 10,
+      "initial_settled_without_reopen": true,
+      "initial_settle_ticks": 60,
+      "first_open": true,
+      "search": true,
+      "refresh": true,
+      "reopen": true,
+      "measurement_output": "native-localised-profiler-log",
+      "timing_values_stored": false,
+      "two_connected_clients_required": true,
+      "locales_required": [
+        "en",
+        "de"
+      ],
+      "distinct_personal_query_and_selection": true,
+      "initial_native_snapshot_immutable": true,
+      "live_refresh": {
+        "real_lab_completions": 2,
+        "native_laboratory_completion_by_script": false,
+        "native_research_started_events": 3,
+        "queue_lengths_observed": [
+          2,
+          1,
+          0
+        ],
+        "native_research_cancelled_events": 1,
+        "native_foreign_force_created_events": 1,
+        "gear_level": 3,
+        "gear_productivity": 0.2,
+        "science_consumed_per_named_pack": 2,
+        "fixture_accelerates_gear_count_and_time_only": true,
+        "ordinary_tuning_qualified": false,
+        "root_and_query_identity_preserved": true,
+        "cross_force_view_state_preserved": true
+      },
+      "availability_terminal_labels_checked": true,
+      "host_restart_observed": true,
+      "on_load_read_only": true,
+      "rendering_pending_external_png_readback": true,
+      "screenshot_requests_are_not_headless_rendering_proof": true
+    }
+  },
+  "save_hashes": {
+    "seed_sha256": "A5772D4DD3213C897C459CA23CB3633593247B006B4E2DD70E50411CE3754B16",
+    "restart_save_sha256": "225CC91447A379A7DDA894438C3C4D2A3FA264BFC6A54F17FABD831BC959D0A2",
+    "final_save_sha256": "27E2934DA658918A362850C5A10EAE977FC1F3D5702F9D5E8789260AF2914AD6"
+  },
+  "input_save_byte_identical": true,
+  "controls_and_owned_archives_restored": true,
+  "visual_review": {
+    "method": "Root manually inspected all ten native 1280x720 PNGs; screenshot hashes independently checked.",
+    "status": "not-accepted-missing-catalogue-locale-port",
+    "finding": "German initial, settled, rejoin and restart views show raw recipe-prod-research_mining_drill-1. The active catalogue references technology-name.more-infinite-research.research_mining_drill, absent from all current locales but present in exact published B6. This is a player locale port defect, not repaired by the fixture profiler correction.",
+    "english_limit": "English initial and settled views are obscured by native achievement notifications; rejoin and restart are clear.",
+    "layout_limit": "No obvious outer-frame clipping observed in these ten views. This is not small-screen, long-text, full-locale or complete presentation acceptance.",
+    "original_runner_visual_review_flag_preserved": false
+  },
+  "raw_receipts": {
+    "path": "spec/evidence/library-standalone-f210-201992-native-receipts.json.gz",
+    "gzip_bytes": 41556,
+    "gzip_sha256": "DB6C5BA2F1A48C8AC220C030A78401D3A4AF8907C9C76205D39CEFD6D1459727",
+    "uncompressed_sha256": "F1E5D7C57E919FDA5CE51D3AB58849F7CF8BF9C160EDB12A9EB3857FEF41E769",
+    "members": 11
+  },
+  "limits": [
+    "Exact Base-only functional Library scenario; not full Space Age or modpack client coverage.",
+    "Two actual accelerated lab completions and queue/cancel/foreign-force observations do not qualify ordinary research tuning.",
+    "The resource admission budget and incidental process observations are not scored performance acceptance.",
+    "No universal crash, lag or compatibility guarantee; no final-current-package or release verdict.",
+    "Retain r01/r02 contract refusals and r03 excluded-fixture API failure under their original identities."
+  ]
+}
