@@ -287,6 +287,9 @@ class F110F200TransitionFixtureTests(unittest.TestCase):
               {base="1.1.110",["more-infinite-research"]="4.7.11003",["mir-fixture-mir5-f110-f200-transition"]="0.1.0"},false)
             local ok,message=pcall(function()
               source.init()
+              local source_state=legacy.mir5_f110_f200_transition
+              source_state.lab.energy=0;source.events[2]()
+              source_state.source_energized=source_state.lab.energy
               local direct=player.technologies[source_plan.direct]
               direct.level=2;player.manual_mining_speed_modifier=.05
               source.events[1]{research=direct};source.events[2]()
@@ -303,6 +306,7 @@ class F110F200TransitionFixtureTests(unittest.TestCase):
               {base="2.0.77",["more-infinite-research"]="5.0.20000",["mir-fixture-mir5-f110-f200-transition"]="0.2.0"},true)
             ok,message=pcall(successor.configuration)
             if not ok then return {ok=false,message=tostring(message),logs=logs,state=state} end
+            state.lab.energy=0;successor.events[2]();state.successor_energized=state.lab.energy
             direct.level=3;direct.saved_progress=0;player.manual_mining_speed_modifier=.1
             player.research_queue={player.technologies[source_plan.probe]};player.research_progress=0
             successor.events[1]{research=direct};successor.events[2]()
@@ -313,7 +317,8 @@ class F110F200TransitionFixtureTests(unittest.TestCase):
               rows=state.seeded_catalogue_rows,save=game.saved,logs=logs,before=before,
               stack=player.inserter_stack_size_bonus,bulk=player.bulk_inserter_capacity_bonus,
               current=player.current_research and player.current_research.name,foreign=game.forces[state.foreign_index].technologies[source_plan.direct].enabled,
-              paused=game.forces[state.suspended_index].technologies[source_plan.direct].saved_progress}
+              paused=game.forces[state.suspended_index].technologies[source_plan.direct].saved_progress,
+              source_energy=state.source_energized,successor_energy=state.successor_energized}
           end
         ''')
         result = py(self.lua.eval("f110_f200_callbacks")(False, False))
@@ -322,6 +327,7 @@ class F110F200TransitionFixtureTests(unittest.TestCase):
                          (result["phase"], result["source"], result["successor"], result["rows"], result["save"]))
         self.assertEqual((2, 4, "braking-force-1", False, .27),
                          (result["stack"], result["bulk"], result["current"], result["foreign"], result["paused"]))
+        self.assertEqual((100000000, 100000000), (result["source_energy"], result["successor_energy"]))
         fixture_results = [row for row in result["logs"] if row.startswith("[MIR5_NATIVE_FIXTURE] RESULT ")]
         diagnostics = [row for row in result["logs"] if row.startswith("[MIR5_F110_SOURCE_DIAGNOSTIC] ")]
         self.assertEqual(4, len(fixture_results))
@@ -337,14 +343,17 @@ class F110F200TransitionFixtureTests(unittest.TestCase):
             self.assertIn('"queue_enabled":true', row)
             self.assertIn('"queue_length":1', row)
             self.assertIn(f'"current_research":"{DIRECT}"', row)
+            self.assertIn('"research_progress":0', row)
             self.assertIn('"direct_enabled":true', row)
             self.assertIn('"direct_researched":false', row)
             self.assertIn('"lab_valid":true', row)
             self.assertIn('"lab_active":true', row)
+        self.assertIn('"lab_energy":100000000', diagnostics[0])
+        self.assertIn('"lab_energy":0', diagnostics[1])
         self.assertIn('"direct_level":1', diagnostics[0])
         self.assertIn('"source_direct_labs":0', diagnostics[0])
-        self.assertIn('"direct_level":2', diagnostics[1])
-        self.assertIn('"source_direct_labs":1', diagnostics[1])
+        self.assertIn('"direct_level":1', diagnostics[1])
+        self.assertIn('"source_direct_labs":0', diagnostics[1])
         wrong_capacity = py(self.lua.eval("f110_f200_callbacks")(True, False))
         self.assertFalse(wrong_capacity["ok"])
         self.assertIn("F200 bulk inserter effects differ", wrong_capacity["message"])

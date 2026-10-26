@@ -245,6 +245,12 @@ local function fill_lab(state, value)
   entity.energy = 100000000
 end
 
+local function energize_lab(state)
+  local entity = state.lab
+  if entity == nil or entity.valid == false then fail("real mining lab disappeared") end
+  entity.energy = 100000000
+end
+
 local function freeze_lab(state)
   local entity = state.lab
   if entity == nil or entity.valid == false then fail("real mining lab disappeared") end
@@ -359,6 +365,7 @@ local function source_diagnostic(checkpoint, state)
   local lab = state.lab
   local paused_ok, paused = pcall(function() return game.tick_paused end)
   local speed_ok, speed = pcall(function() return game.speed end)
+  local progress_ok, progress = pcall(function() return force.research_progress end)
   local active_ok, active = pcall(function()
     if lab == nil or lab.valid ~= true then return nil end
     return lab.active
@@ -367,6 +374,12 @@ local function source_diagnostic(checkpoint, state)
   if paused_ok then paused_value = paused end
   local active_value = nil
   if active_ok then active_value = active end
+  local lab_energy_ok, lab_energy = pcall(function()
+    if lab == nil or lab.valid ~= true then return nil end
+    return lab.energy
+  end)
+  local lab_energy_value = nil
+  if lab_energy_ok then lab_energy_value = lab_energy end
   log("[MIR5_F110_SOURCE_DIAGNOSTIC] {"
     .. "\"checkpoint\":\"" .. checkpoint .. "\","
     .. "\"tick\":" .. tostring(game.tick) .. ","
@@ -376,11 +389,13 @@ local function source_diagnostic(checkpoint, state)
     .. "\"queue_enabled\":" .. json_boolean(queue_enabled(force)) .. ","
     .. "\"queue_length\":" .. tostring(#queue) .. ","
     .. "\"current_research\":" .. (current_name(force) and "\"" .. current_name(force) .. "\"" or "null") .. ","
+    .. "\"research_progress\":" .. (progress_ok and type(progress) == "number" and tostring(progress) or "null") .. ","
     .. "\"direct_enabled\":" .. json_boolean(direct.enabled) .. ","
     .. "\"direct_researched\":" .. json_boolean(direct.researched) .. ","
     .. "\"direct_level\":" .. tostring(direct.level) .. ","
     .. "\"lab_valid\":" .. json_boolean(lab ~= nil and lab.valid == true) .. ","
     .. "\"lab_active\":" .. json_boolean(active_value) .. ","
+    .. "\"lab_energy\":" .. (type(lab_energy_value) == "number" and tostring(lab_energy_value) or "null") .. ","
     .. "\"source_direct_labs\":" .. tostring(state.source_direct_labs or 0) .. "}")
 end
 
@@ -438,6 +453,7 @@ local function source_tick()
     if loaded and not reload_reported then marker("reload", state); reload_reported = true end
     return
   end
+  if state.phase == "await-source-lab" then energize_lab(state) end
   if game.tick > state.deadline then fail("source mining lab missed deadline") end
   if state.phase == "await-source-lab" and state.source_direct_labs == 1 then finish_source(state) end
 end
@@ -485,6 +501,7 @@ local function successor_tick()
     if loaded and not reload_reported then marker("reload", state); reload_reported = true end
     return
   end
+  if state.phase == "await-successor-lab" then energize_lab(state) end
   if game.tick > state.deadline then fail("successor mining lab missed deadline") end
   if state.phase == "await-successor-lab" and state.successor_direct_labs == 1 then finish_successor(state) end
 end
