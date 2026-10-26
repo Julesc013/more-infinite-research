@@ -60,6 +60,9 @@ if ordinary_profile or modern_catalogue.is_k2_base(mods) or modern_catalogue.is_
   if modern_selection.bob_warfare then
     require("compatibility.modern_catalogue.bob_warfare").preflight(data.raw, mods)
   end
+  if modern_selection.bob_productivity then
+    require("compatibility.bob_productivity").preflight(data.raw, mods)
+  end
   if modern_selection.py_coal or modern_selection.py_hightech or modern_selection.bob_warfare then
     require("compatibility.native_modded_continuations").preflight(mods, data.raw)
   end

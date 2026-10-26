@@ -129,7 +129,7 @@ class HistoricalDirectTests(unittest.TestCase):
         self.lua.execute(r'''
           local expected = {
             f013={7, 9, 63}, f014={7, 9, 63}, f015={9, 10, 120}, f016={10, 11, 127},
-            f017={11, 11, 127}, f100={11, 11, 127}, f110={11, 11, 127},
+            f017={11, 11, 127}, f018={11, 11, 127}, f100={11, 11, 127}, f110={11, 11, 127},
           }
           for target, counts in pairs(expected) do
             local contract = contracts.for_target(target)
@@ -152,6 +152,14 @@ class HistoricalDirectTests(unittest.TestCase):
           local cannon
           for _, row in ipairs(f110.emitted) do if row.key == "research_cannon_shooting_speed" then cannon = row end end
           assert(cannon and cannon.prerequisites[#cannon.prerequisites] == "tank")
+
+          -- Factorio 0.18.47 retains the plural `tanks` technology identity
+          -- and lacks the 1.1 constant-overlay presentation surface.
+          local f018 = contracts.for_target("f018")
+          cannon = nil
+          for _, row in ipairs(f018.emitted) do if row.key == "research_cannon_shooting_speed" then cannon = row end end
+          assert(f018.factorio_line == "0.18" and f018.constant_overlay == nil)
+          assert(cannon and cannon.prerequisites[#cannon.prerequisites] == "tanks")
         ''')
 
     def test_historical_settings_keep_exact_names_defaults_and_time_sentinel(self):
@@ -326,6 +334,9 @@ class HistoricalDirectTests(unittest.TestCase):
           local f017 = constructor.technologies("f017", nil, raw_for("f017"))
           assert(f017[1].visible_when_disabled == false)
 
+          local f018 = constructor.technologies("f018", nil, raw_for("f018"))
+          assert(f018[1].visible_when_disabled == false and f018[1].icons[2] == nil)
+
           local f110 = constructor.technologies("f110", nil, raw_for("f110"))
           local overlay = f110[1].icons[2]
           assert(overlay.icon == "__core__/graphics/icons/technology/constants/constant-speed.png")
@@ -357,6 +368,11 @@ class HistoricalDirectTests(unittest.TestCase):
           raw.technology["rocketry"] = nil
           local ok, message = pcall(constructor.technologies, "f017", nil, raw)
           assert(not ok and string.find(message, "requires technology rocketry", 1, true))
+
+          raw = raw_for("f018")
+          raw.technology["tanks"] = nil
+          ok, message = pcall(constructor.technologies, "f018", nil, raw)
+          assert(not ok and string.find(message, "requires technology tanks", 1, true))
 
           raw = raw_for("f017")
           -- A foreign technology with a Space Age-only name cannot replace

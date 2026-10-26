@@ -1,4 +1,4 @@
--- Exact, reduced base-continuation contracts for the seven released
+-- Exact, reduced base-continuation contracts for the eight released
 -- historical target lines.  Each selected body is constructed on demand:
 -- target selection never turns a broad native-chain discovery pass into an
 -- implicit feature.
@@ -100,7 +100,19 @@ local function pre_017_rows()
   }
 end
 
-local function later_rows(include_laser)
+local function laser_row(spec)
+  return row(spec.id, "laser-shooting-speed", 8, spec.predecessor, spec.previous, {450, 350}, {
+    {type="gun-speed", ammo_category=spec.ammo_category, scale=1},
+  }, {
+    {"automation-science-pack", 1}, {"chemical-science-pack", 1}, {"logistic-science-pack", 1},
+    {"military-science-pack", 1}, {"utility-science-pack", 1},
+  }, {
+    "chemical-science-pack", spec.previous, spec.predecessor,
+    "logistic-science-pack", "military-science-pack", "utility-science-pack",
+  }, "e-n-n")
+end
+
+local function later_rows(laser)
   local standard_science = {
     {"automation-science-pack", 1}, {"chemical-science-pack", 1}, {"logistic-science-pack", 1},
     {"production-science-pack", 1}, {"utility-science-pack", 1},
@@ -141,18 +153,7 @@ local function later_rows(include_laser)
       "worker-robots-storage-2", "worker-robots-storage-3",
     }),
   }
-  if include_laser then
-    rows[#rows + 1] = row("laser-shooting-speed-8", "laser-shooting-speed", 8,
-      "laser-shooting-speed-7", "laser-shooting-speed-6", {450, 350}, {
-        {type="gun-speed", ammo_category="laser", scale=1},
-      }, {
-        {"automation-science-pack", 1}, {"chemical-science-pack", 1}, {"logistic-science-pack", 1},
-        {"military-science-pack", 1}, {"utility-science-pack", 1},
-      }, {
-        "chemical-science-pack", "laser-shooting-speed-6", "laser-shooting-speed-7",
-        "logistic-science-pack", "military-science-pack", "utility-science-pack",
-      }, "e-n-n")
-  end
+  if laser then rows[#rows + 1] = laser_row(laser) end
   return rows
 end
 
@@ -184,9 +185,20 @@ function M.for_target(target)
   if target == "f014" then return numeric_target("f014") end
   if target == "f015" then return pre_017_target("f015") end
   if target == "f016" then return pre_017_target("f016") end
-  if target == "f017" then return later_target("f017", false) end
-  if target == "f100" then return later_target("f100", false) end
-  if target == "f110" then return later_target("f110", true) end
+  if target == "f017" then return later_target("f017") end
+  if target == "f018" then
+    return later_target("f018", {
+      id="laser-turret-speed-8", predecessor="laser-turret-speed-7",
+      previous="laser-turret-speed-6", ammo_category="laser-turret",
+    })
+  end
+  if target == "f100" then return later_target("f100") end
+  if target == "f110" then
+    return later_target("f110", {
+      id="laser-shooting-speed-8", predecessor="laser-shooting-speed-7",
+      previous="laser-shooting-speed-6", ammo_category="laser",
+    })
+  end
   error("MIR historical continuation target is not supported: " .. tostring(target), 2)
 end
 
