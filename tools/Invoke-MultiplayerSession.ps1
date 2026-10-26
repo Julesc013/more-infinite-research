@@ -652,12 +652,13 @@ if($spec.ContainsKey('standalone_identity_discovery')){
     engine_sha256='8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38'
     mir_archive_sha256='C563CB5B96C9E64CB3373BDB60CF5C8B7D3C97E93EADB8F924443C703CDC024D'
     observer_archive_sha256='A15A7D628D66953D2E0C4D4FA288F47CBF9C5678327C7EB3D23ADB5DC78331C0'
-    fixture_version='0.1.1';join_budget_seconds=180;environmental_only=$true
+    fixture_version='0.1.1';environmental_only=$true
   }
-  Assert-Session ($identityBinding.Count-eq$expectedIdentity.Count) 'standalone identity discovery binding shape differs'
+  Assert-Session ($identityBinding.Count-eq($expectedIdentity.Count+1)) 'standalone identity discovery binding shape differs'
   foreach($entry in $expectedIdentity.GetEnumerator()){
     Assert-Session ($identityBinding.Contains($entry.Key) -and $identityBinding[$entry.Key].GetType() -eq $entry.Value.GetType() -and $identityBinding[$entry.Key] -ceq $entry.Value) "standalone identity discovery binding differs: $($entry.Key)"
   }
+  Assert-Session ($identityBinding.Contains('join_budget_seconds') -and (Test-LibraryInteger $identityBinding.join_budget_seconds) -and [int64]$identityBinding.join_budget_seconds -eq 180) 'standalone identity discovery binding differs: join_budget_seconds'
   $standaloneIdentityDiscovery=$true
 }
 $apiClientConsumers=$false

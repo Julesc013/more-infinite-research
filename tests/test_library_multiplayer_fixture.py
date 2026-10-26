@@ -930,6 +930,76 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
         )
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
 
+    def test_standalone_identity_discovery_binding_accepts_json_integer_roundtrip_only(self):
+        script = r'''
+          $ErrorActionPreference='Stop'; Set-StrictMode -Version Latest
+          $tokens=$null;$errors=$null
+          $ast=[Management.Automation.Language.Parser]::ParseFile($env:MIR_TEST_SESSION,[ref]$tokens,[ref]$errors)
+          if($errors.Count){throw $errors[0].Message}
+          function Assert-Session([bool]$Condition,[string]$Message){if(-not $Condition){throw $Message}}
+          foreach($name in @('Test-LibraryInteger')){
+            $node=@($ast.FindAll({param($candidate) $candidate -is [Management.Automation.Language.FunctionDefinitionAst] -and $candidate.Name -ceq $name},$true))
+            if($node.Count-ne1){throw "identity discovery reader is absent or ambiguous: $name"}
+            Invoke-Expression $node[0].Extent.Text
+          }
+          $binding=@($ast.FindAll({param($candidate)
+            $candidate -is [Management.Automation.Language.IfStatementAst] -and
+            $candidate.Extent.Text.Contains('standalone identity discovery binding is absent')
+          },$true))
+          if($binding.Count-ne1){throw 'identity discovery binding reader is absent or ambiguous'}
+          $bindingText=$binding[0].Extent.Text
+          $wrapperSpec=[ordered]@{
+            standalone_identity_discovery=$true
+            identity_discovery=[ordered]@{
+              engine_sha256='8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38'
+              mir_archive_sha256='C563CB5B96C9E64CB3373BDB60CF5C8B7D3C97E93EADB8F924443C703CDC024D'
+              observer_archive_sha256='A15A7D628D66953D2E0C4D4FA288F47CBF9C5678327C7EB3D23ADB5DC78331C0'
+              fixture_version='0.1.1';join_budget_seconds=180;environmental_only=$true
+            }
+          }
+          function New-BindingSpec {
+            (($wrapperSpec|ConvertTo-Json -Depth 8 -Compress)|ConvertFrom-Json -AsHashtable)
+          }
+          function Invoke-BindingReader([hashtable]$Candidate){
+            $fixtureCase='library-multiplayer'
+            $spec=$Candidate
+            $standaloneIdentityDiscovery=$false
+            $identityBinding=$null
+            Invoke-Expression $bindingText
+            return [pscustomobject]@{standalone=$standaloneIdentityDiscovery;binding=$identityBinding}
+          }
+          $acceptedSpec=New-BindingSpec
+          if($acceptedSpec.identity_discovery.join_budget_seconds -isnot [long]){throw 'actual JSON roundtrip did not use Int64 budget'}
+          $accepted=Invoke-BindingReader $acceptedSpec
+          if(-not $accepted.standalone -or $accepted.binding.join_budget_seconds -ne 180){throw 'actual JSON identity binding was not admitted'}
+          foreach($field in @('engine_sha256','mir_archive_sha256','observer_archive_sha256','fixture_version','environmental_only')){
+            if($accepted.binding[$field].GetType()-ne$acceptedSpec.identity_discovery[$field].GetType()){throw "identity field type changed: $field"}
+          }
+          $mutations=@(
+            @{field='engine_sha256';value='0'*64},
+            @{field='fixture_version';value='0.1.2'},
+            @{field='environmental_only';value=$false},
+            @{field='join_budget_seconds';value=$true},
+            @{field='join_budget_seconds';value='180'},
+            @{field='join_budget_seconds';value=180.5},
+            @{field='join_budget_seconds';value=[double]::NaN},
+            @{field='join_budget_seconds';value=[double]::PositiveInfinity},
+            @{field='join_budget_seconds';value=181}
+          )
+          foreach($mutation in $mutations){
+            $candidate=New-BindingSpec
+            $candidate.identity_discovery[$mutation.field]=$mutation.value
+            $rejected=$false;try{$null=Invoke-BindingReader $candidate}catch{$rejected=$true}
+            if(-not$rejected){throw "identity binding accepted invalid $($mutation.field)"}
+          }
+        '''
+        result = subprocess.run(
+            ["pwsh", "-NoLogo", "-NoProfile", "-Command", script],
+            capture_output=True, text=True,
+            env=dict(os.environ, MIR_TEST_SESSION=str(SESSION)), check=False,
+        )
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+
     def test_f210_api_consumer_closure_requires_both_exact_independent_consumers(self):
         accepted = self.run_case("f210-api-consumers", target="f210")
         self.assertTrue(accepted["ok"], accepted["message"])
