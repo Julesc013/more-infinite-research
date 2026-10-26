@@ -23,6 +23,7 @@ CROSS_SOURCE_PROFILE = ROOT / "tests/profiles/f200-legacy-cap-cross-f200-publish
 F210_DISABLED_PROFILE = ROOT / "tests/profiles/f200-legacy-cap-cross-disabled-f210-mir5-2123.json"
 F210_REENABLED_PROFILE = ROOT / "tests/profiles/f200-legacy-cap-cross-reenabled-f210-mir5-2123.json"
 EA41_READBACK = ROOT / "spec/evidence/current-assets-ea41cbc6-readback.json"
+CROSS_SUCCESSOR_PROFILE = ROOT / "tests/profiles/f200-legacy-cap-cross-f210-mir5-2123.json"
 PUBLISHED_CONTROL_INFO = FIXTURE / "published-control-info.json"
 F200_CROSS = FIXTURE / "f200/cross-to-f210"
 F210_CROSS = FIXTURE / "f210/cross-from-f200"
@@ -378,6 +379,7 @@ class F200LegacyCapFixtureTests(unittest.TestCase):
 
     def test_cross_engine_source_profile_and_thin_stage_wrappers_pin_only_the_published_input(self):
         profile = json.loads(CROSS_SOURCE_PROFILE.read_text(encoding="utf-8"))
+        successor_profile = json.loads(CROSS_SUCCESSOR_PROFILE.read_text(encoding="utf-8"))
         self.assertEqual((1, "mir5-f200-f210-positive-cap-cross-source", "f200", "2.0", "Defaults"),
                          (profile["schema"], profile["kind"], profile["target"], profile["factorio_line"], profile["settings_mode"]))
         self.assertEqual({"version": "2.0.77", "sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B"},
@@ -390,6 +392,20 @@ class F200LegacyCapFixtureTests(unittest.TestCase):
             "more-infinite-research_4.7.20003.zip": "FBBA844DD04011A12BB6DA885745B0733AD37FAB181EAAD9EE4346B9B0D32647",
         }, profile["archive_sha256"])
         self.assertIn("Input binding only; no native pass.", profile["scope"])
+        self.assertEqual((1, "mir5-f200-f210-positive-cap-cross-successor", "f210", "2.1", "Defaults"),
+                         (successor_profile["schema"], successor_profile["kind"], successor_profile["target"],
+                          successor_profile["factorio_line"], successor_profile["settings_mode"]))
+        self.assertEqual({"version": "2.1.23", "sha256": "FE4A1DA30F322A0D0B8AEB3DF7276332222BAAA143E2352569B723E84B2B9060"},
+                         successor_profile["engine"])
+        self.assertEqual({"base": "2.1.23", "mir-fixture-mir5-active-mods-observer": "0.1.0",
+                          "more-infinite-research": "5.0.21000", NAME: "0.5.0"},
+                         {row["name"]: row["version"] for row in successor_profile["mods"]})
+        self.assertTrue(all(row["enabled"] is True for row in successor_profile["mods"]))
+        self.assertEqual({
+            "mir-fixture-mir5-active-mods-observer_0.1.0.zip": "2E1BE5952D2A4CC5C74A0D149E075D247BA110A3FAE5B6768D3EAEBABCEF989C",
+            "more-infinite-research_5.0.21000.zip": "CE1165CAC174EDA4800EBECAAEF29FC2E071B2E7160CD98F799FE21C2F151F9B",
+        }, successor_profile["archive_sha256"])
+        self.assertIn("Input pin only; no native pass.", successor_profile["scope"])
 
         source_info = json.loads(F200_CROSS.joinpath("info.json").read_text(encoding="utf-8"))
         successor_info = json.loads(F210_CROSS.joinpath("info.json").read_text(encoding="utf-8"))
