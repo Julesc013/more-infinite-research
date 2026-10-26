@@ -331,8 +331,6 @@ class LocaleCatalogueTests(unittest.TestCase):
     def test_parser_refuses_duplicate_or_conflicting_locale_keys(self) -> None:
         with self.assertRaisesRegex(ValueError, "duplicate locale key"):
             parse_cfg_text("[technology-name]\nkey=first\nkey=second\n", "synthetic")
-
-
 if __name__ == "__main__":
     unittest.main()
 
