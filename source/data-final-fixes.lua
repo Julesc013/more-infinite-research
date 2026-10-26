@@ -35,7 +35,7 @@ local technologies = {gear}
 -- Named native fields are preflighted here; those source facts do not qualify
 -- a new MIR5 package. This route never imports the K2SO profile body.
 local ordinary_profile = type(mods) == "table" and mods.Krastorio2 == nil
-  and mods["Krastorio2-spaced-out"] == nil and mods.Krastorio2Assets == nil and mods["k2so-assets"] == nil
+  and mods["Krastorio2-spaced-out"] == nil
 local modern_catalogue = require("compatibility.modern_catalogue")
 local modern, modern_selection, native_owner_patches
 if ordinary_profile or modern_catalogue.is_k2_base(mods) or modern_catalogue.is_k2so(mods) then
@@ -62,6 +62,9 @@ if ordinary_profile or modern_catalogue.is_k2_base(mods) or modern_catalogue.is_
   end
   if modern_selection.bob_productivity then
     require("compatibility.bob_productivity").preflight(data.raw, mods)
+  end
+  if modern_selection.ironclad then
+    require("compatibility.ironclad").preflight(data.raw)
   end
   if modern_selection.py_coal or modern_selection.py_hightech or modern_selection.bob_warfare then
     require("compatibility.native_modded_continuations").preflight(mods, data.raw)
@@ -115,7 +118,7 @@ end
 -- captured material rows.  It deliberately stays outside the F200
 -- no-BobTech material selector and does not reconstruct other Bob/Angel
 -- routes from the installed prototype world.
-if require("compatibility.bob_tech_profile").applies(mods) then
+if modern_selection and modern_selection.bob_tech_materials then
   local materials = require("compatibility.bob_tech_materials").technologies(values, data.raw, mods)
   for index = 1, #materials do technologies[#technologies + 1] = materials[index] end
 end

@@ -17,13 +17,17 @@ spec.loader.exec_module(pack)
 
 # `targets-baseline.json` records the historical membership and the nine local
 # published 4.7.3 archives confirm these exact payload hashes.  The common
-# migrations shipped everywhere; the Imersite rename was F210-only.
+# migrations shipped everywhere; the Imersite rename was F210-only.  The
+# current F110+ bridge is deliberately a new, separately bound member.
 PUBLISHED_473_SHARED_MIGRATION_SHA256 = {
     "migrations/more-infinite-research_2.0.5.json": "07A2759B963321A87B1047029AE426C7B2784033BC7C4F899D2640C037C5EEE2",
     "migrations/more-infinite-research_2.1.0.json": "F427B215D77BC86608010ADC1D0D1A1C98BE61F0D7140EF716D77E46DAB8092D",
 }
 F210_ONLY_MIGRATION = "migrations/more-infinite-research_4.7.0.json"
 PUBLISHED_473_F210_MIGRATION_SHA256 = "0980B0B6F1675F6827A8E4151F778143EA74C9C6C3440CC2318129DBCE63C379"
+F110_PLUS_MIGRATION = "migrations/more-infinite-research_5.0.11000.json"
+F110_PLUS_MIGRATION_SHA256 = "C26C6B21D777F3C20410C9C9ECDAFFE8ADF8DDDEAE556FE8B044146CEC40117D"
+F110_PLUS_MIGRATION_TARGETS = {"f110", "f200", "f210"}
 
 
 class PackageTests(unittest.TestCase):
@@ -71,6 +75,13 @@ class PackageTests(unittest.TestCase):
                 files = dict(rows)
                 expected_dependencies = ([*dependencies[target]] if target in dependencies
                                          else ["base >= " + minimum])
+                if target == "f210":
+                    # The named mortar binding consumes Ironclad's final
+                    # native predecessor edits. Preserve the historical
+                    # inventory and assert this new ordering explicitly.
+                    ironclad_ordering = "(?) aai-vehicles-ironclad"
+                    self.assertNotIn(ironclad_ordering, dependencies[target])
+                    expected_dependencies.insert(1, ironclad_ordering)
                 if target in ("f200", "f210"):
                     # The retained 4.7 inventory predates this MIR5 ordering
                     # correction. Current modern packages must run after SIF
@@ -124,14 +135,15 @@ class PackageTests(unittest.TestCase):
                 expected_migrations = dict(PUBLISHED_473_SHARED_MIGRATION_SHA256)
                 if target == "f210":
                     expected_migrations[F210_ONLY_MIGRATION] = PUBLISHED_473_F210_MIGRATION_SHA256
+                if target in F110_PLUS_MIGRATION_TARGETS:
+                    expected_migrations[F110_PLUS_MIGRATION] = F110_PLUS_MIGRATION_SHA256
                 actual_migrations = {path for path in files if path.startswith("migrations/")}
                 self.assertEqual(actual_migrations, set(expected_migrations))
                 for path, expected_sha256 in expected_migrations.items():
                     self.assertEqual(hashlib.sha256(files[path]).hexdigest().upper(), expected_sha256)
 
-                # Target selection may remove the one published F210-only
-                # migration, but must otherwise preserve the selected player
-                # artifact byte-for-byte.
+                # Target selection removes only engine-inapplicable migration
+                # members; all retained player members remain byte-identical.
                 source_files = {
                     path.relative_to(source).as_posix(): path.read_bytes()
                     for path in source.rglob("*")
@@ -141,14 +153,25 @@ class PackageTests(unittest.TestCase):
                 unfiltered_info = json.loads(source_files["info.json"])
                 unfiltered = pack.select_edition(source_files, unfiltered_info, target, editions)
                 unfiltered["info.json"] = (json.dumps(unfiltered_info, ensure_ascii=False, indent=2) + "\n").encode("utf-8")
-                if target == "f210":
-                    self.assertEqual(files, unfiltered)
-                else:
-                    self.assertEqual(set(unfiltered) - set(files), {F210_ONLY_MIGRATION})
-                    self.assertEqual({path: value for path, value in files.items() if path != F210_ONLY_MIGRATION},
-                                     {path: value for path, value in unfiltered.items() if path != F210_ONLY_MIGRATION})
+                excluded = set()
+                if target != "f210":
+                    excluded.add(F210_ONLY_MIGRATION)
+                if target not in F110_PLUS_MIGRATION_TARGETS:
+                    excluded.add(F110_PLUS_MIGRATION)
+                self.assertEqual(set(unfiltered) - set(files), excluded)
+                self.assertEqual({path: value for path, value in files.items() if path not in excluded},
+                                 {path: value for path, value in unfiltered.items() if path not in excluded})
                 for name in files:
                     self.assertFalse(name.startswith(("source/", "targets/", "tests/", "spec/")))
+
+    def test_early_target_selection_excludes_all_normal_migration_members(self):
+        source = ROOT / "source"
+        editions, _ = pack.read_editions(source, target_record=pack.EARLY_TARGET_RECORD)
+        for target in sorted(editions):
+            with self.subTest(target=target):
+                _, rows = pack.members(source, target=target, editions=editions,
+                                       target_record=pack.EARLY_TARGET_RECORD)
+                self.assertFalse(any(path.startswith("migrations/") for path, _ in rows))
 
     def test_f210_engine_coupled_optional_minima_match_the_selected_base_floor(self):
         editions, _ = pack.read_editions(ROOT / "source")

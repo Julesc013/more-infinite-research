@@ -240,13 +240,20 @@ function M.technologies(selection, values)
     local carriers = imersite_state_carriers(require_stream(values, "research_material_imersite"), true)
     for index = 1, #carriers do out[#out + 1] = carriers[index] end
   end
-  if selection.angel_materials and #selection.angel_materials > 0 then
+  local material_definitions = selection.angel_materials
+  if selection.bob_angel_f210_materials and #selection.bob_angel_f210_materials > 0 then
+    if material_definitions and #material_definitions > 0 then
+      error("MIR combined Bob/Angel cannot compose pure Angel material stages", 2)
+    end
+    material_definitions = selection.bob_angel_f210_materials
+  end
+  if material_definitions and #material_definitions > 0 then
     local stages = require("research.material_stages")
-    for _, definition in ipairs(selection.angel_materials) do
+    for _, definition in ipairs(material_definitions) do
       local stream = require_stream(values, definition.key)
       for _, stage in ipairs({definition.early, definition.continuation}) do
         local technology = stages.technology(definition, stage, stream,
-          function(message) error("MIR F210 Angel material " .. message, 3) end)
+          function(message) error("MIR F210 material stage " .. message, 3) end)
         if stage.first_level then technology.localised_description = stages.continuation_description(definition, stream) end
         out[#out + 1] = technology
       end
@@ -454,6 +461,9 @@ function M.preflight_recipe_patches(selection, raw)
   end
   if selection.angel_f210_profile ~= nil then
     require("compatibility.modern_catalogue.angel_f210").preflight(raw, selection.angel_f210_profile)
+  end
+  if selection.bob_angel_f210_profile ~= nil then
+    require("compatibility.modern_catalogue.bob_angel_f210").preflight(raw, selection.bob_angel_f210_profile)
   end
 end
 

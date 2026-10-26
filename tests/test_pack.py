@@ -10,6 +10,7 @@ ROOT = Path(__file__).resolve().parents[1]
 PLAYER = ROOT / "source"
 IMPORT = re.compile(r"require\s*\(\s*[\"']([^\"']+)[\"']\s*\)")
 PACKAGE_PREFIX = "__more-infinite-research__/"
+F110_PLUS_MIGRATION = "migrations/more-infinite-research_5.0.11000.json"
 
 
 def load_module(name, relative):
@@ -73,7 +74,7 @@ class PackTests(unittest.TestCase):
         self.assertEqual(
             {path for path in admitted if path.startswith("migrations/")},
             {"migrations/more-infinite-research_2.0.5.json", "migrations/more-infinite-research_2.1.0.json",
-             "migrations/more-infinite-research_4.7.0.json"},
+             "migrations/more-infinite-research_4.7.0.json", F110_PLUS_MIGRATION},
         )
         self.assertNotIn("README.md", admitted)
         standalone = {"info.json", "LICENSE", "LICENSE.txt", "changelog.txt"}
@@ -108,6 +109,9 @@ class PackTests(unittest.TestCase):
                 "compatibility/bob_core_profile.lua",
                 "compatibility/bob_plates_profile.lua",
                 "compatibility/bob_productivity.lua",
+                "compatibility/ironclad.lua",
+                "compatibility/bob_angel_f210_profile.lua",
+                "compatibility/modern_catalogue/bob_angel_f210.lua",
                 "research/bob_plates_materials.lua",
                 "research/bob_core_materials.lua",
                 "compatibility/bob_warfare_profile.lua",

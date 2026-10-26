@@ -33,7 +33,7 @@ local F210_BOB_CORE_REQUIRED = {
 local F210_BOB_CORE_EXCLUDED = {
   "angelsbioprocessing", "angelsbioprocessinggraphics", "angelsrefining", "angelsrefininggraphics",
   "angelspetrochem", "angelspetrochemgraphics", "angelssmelting", "angelssmeltinggraphics",
-  "Krastorio2", "Krastorio2Assets", "Krastorio2-spaced-out", "k2so-assets",
+  "Krastorio2", "Krastorio2-spaced-out",
   "pycoalprocessing", "pyalienlife", "pyhightech",
 }
 
@@ -140,8 +140,7 @@ local function is_f210_bobtech_angel(active_mods, target)
       or target.minimum_base ~= "2.1.23" or not has_every(active_mods, F210_BOBTECH_ANGEL_REQUIRED) then
     return false
   end
-  return active_mods.Krastorio2 == nil and active_mods.Krastorio2Assets == nil
-    and active_mods["Krastorio2-spaced-out"] == nil and active_mods["k2so-assets"] == nil
+  return active_mods.Krastorio2 == nil and active_mods["Krastorio2-spaced-out"] == nil
 end
 
 local function is_f210_bob_core(active_mods, target)

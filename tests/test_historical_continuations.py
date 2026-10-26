@@ -76,9 +76,9 @@ class HistoricalContinuationTests(unittest.TestCase):
             return nil
           end
 
-          function assert_projection(target, expected)
+          function assert_projection(target, expected, permitted_extra)
             local actual = constructor.technologies(target, values_for(target), raw_for(target))
-            local count = 0
+            local count, extras = 0, 0
             for id, wanted in pairs(expected) do
               local technology = by_name(actual, id)
               assert(technology, "missing historical continuation " .. id)
@@ -106,7 +106,18 @@ class HistoricalContinuationTests(unittest.TestCase):
                 "visibility differs for " .. id)
               count = count + 1
             end
-            assert(count == #actual, "historical continuation surface differs")
+            for _, technology in ipairs(actual) do
+              if expected[technology.name] == nil then
+                assert(technology.name == permitted_extra, "historical continuation surface differs")
+                extras = extras + 1
+              end
+            end
+            if permitted_extra == nil then
+              assert(extras == 0 and count == #actual, "historical continuation surface differs")
+            else
+              assert(extras == 1 and count + extras == #actual,
+                "historical continuation surface differs")
+            end
           end
         ''')
 
@@ -124,9 +135,9 @@ class HistoricalContinuationTests(unittest.TestCase):
     def _native_array(value):
         return [item for _, item in sorted(value.items(), key=lambda pair: int(pair[0]))]
 
-    def test_selected_targets_preserve_exact_observed_subsets(self):
+    def test_selected_targets_preserve_historical_subsets_and_explicit_f018_forward_bridge(self):
         self.lua.execute(r'''
-          local counts = {f013=2, f014=2, f015=4, f016=4, f017=5, f018=6, f100=5, f110=6}
+          local counts = {f013=2, f014=2, f015=4, f016=4, f017=5, f018=6, f100=6, f110=6}
           for target, count in pairs(counts) do
             local contract = contracts.for_target(target)
             assert(#contract.rows == count, target)
@@ -139,7 +150,7 @@ class HistoricalContinuationTests(unittest.TestCase):
             local rows = constructor.technologies(target, values_for(target), raw_for(target))
             assert(by_name(rows, "weapon-shooting-speed-7") == nil and by_name(rows, "laser-shooting-speed-8") == nil)
           end
-          for _, target in ipairs({"f017", "f100"}) do
+          for _, target in ipairs({"f017"}) do
             local rows = constructor.technologies(target, values_for(target), raw_for(target))
             assert(by_name(rows, "weapon-shooting-speed-7") and by_name(rows, "laser-shooting-speed-8") == nil)
           end
@@ -147,9 +158,54 @@ class HistoricalContinuationTests(unittest.TestCase):
           local laser = by_name(f018, "laser-turret-speed-8")
           assert(laser and laser.effects[1].ammo_category == "laser-turret")
           assert(by_name(f018, "laser-shooting-speed-8") == nil and by_name(f018, "worker-robots-speed-6") == nil)
+          local f100 = constructor.technologies("f100", values_for("f100"), raw_for("f100"))
+          laser = by_name(f100, "laser-turret-speed-8")
+          assert(laser and laser.effects[1].ammo_category == "laser-turret")
+          assert(by_name(f100, "laser-shooting-speed-8") == nil and by_name(f100, "worker-robots-speed-6") == nil)
           local f110 = constructor.technologies("f110", values_for("f110"), raw_for("f110"))
           assert(by_name(f110, "laser-shooting-speed-8") and by_name(f110, "worker-robots-speed-6") == nil)
         ''')
+
+    def test_f018_forward_laser_bridge_keeps_f100_source_costs_settings_and_canonical_f110_boundary(self):
+        """This is current F018 save continuity intent, not the old F100 capture."""
+        self.lua.execute(r'''
+          local startup = {
+            ["mir-max-level-laser-shooting-speed"]={value=8},
+            ["mir-effect-per-level-laser-shooting-speed"]={value=75},
+            ["mir-research-time-laser-shooting-speed"]={value=0},
+          }
+          local raw = raw_for("f100")
+          local laser = by_name(constructor.technologies("f100", values_for("f100", startup), raw),
+            "laser-turret-speed-8")
+          assert(laser and laser.level == 8 and laser.upgrade and laser.max_level == 8)
+          assert(laser.unit.count_formula == "1*(1025.15625*1.5^(L-8))" and laser.unit.time == 60)
+          assert(same(laser.unit.ingredients, {
+            {"automation-science-pack", 1}, {"chemical-science-pack", 1}, {"logistic-science-pack", 1},
+            {"military-science-pack", 1}, {"utility-science-pack", 1},
+          }))
+          assert(#laser.effects == 1 and laser.effects[1].type == "gun-speed"
+            and laser.effects[1].ammo_category == "laser-turret" and laser.effects[1].modifier == .75)
+          assert(same(laser.prerequisites, {
+            "chemical-science-pack", "laser-turret-speed-6", "laser-turret-speed-7",
+            "logistic-science-pack", "military-science-pack", "utility-science-pack",
+          }))
+
+          local retained = by_name(constructor.technologies("f100", values_for("f100", {
+            ["mir-max-level-laser-shooting-speed"]={value=7},
+          }), raw_for("f100")), "laser-turret-speed-8")
+          assert(retained.enabled == false and retained.max_level == "infinite")
+
+          local canonical = by_name(constructor.technologies("f110", values_for("f110"), raw_for("f110")),
+            "laser-shooting-speed-8")
+          assert(canonical and canonical.effects[1].ammo_category == "laser"
+            and by_name(constructor.technologies("f110", values_for("f110"), raw_for("f110")),
+              "laser-turret-speed-8") == nil)
+        ''')
+
+    def test_f110_laser_bridge_migration_has_only_the_owned_legacy_mapping(self):
+        migration = PLAYER / "migrations/more-infinite-research_5.0.11000.json"
+        self.assertEqual({"technology": [["laser-turret-speed-8", "laser-shooting-speed-8"]]},
+                         json.loads(migration.read_text(encoding="utf-8")))
 
     def test_settings_preserve_disabled_identities_finite_caps_and_historical_formula(self):
         self.lua.execute(r'''
@@ -242,6 +298,11 @@ class HistoricalContinuationTests(unittest.TestCase):
           ok, message = pcall(constructor.technologies, "f018", values_for("f018"), raw)
           assert(not ok and string.find(message,
             "unexpected source costs for laser-turret-speed-8", 1, true))
+
+          raw = raw_for("f100")
+          raw.technology["laser-turret-speed-7"] = nil
+          ok, message = pcall(constructor.technologies, "f100", values_for("f100"), raw)
+          assert(not ok and string.find(message, "requires technology laser-turret-speed-7", 1, true))
         ''')
 
     def test_outputs_are_detached_and_use_only_named_source_rows(self):
@@ -282,11 +343,17 @@ class HistoricalContinuationTests(unittest.TestCase):
         self.lua.execute(r'''
           for _, target in ipairs({"f013", "f014", "f015", "f016", "f017", "f100", "f110"}) do
             for _, row in ipairs(contracts.for_target(target).rows) do
-              local fact = admission_facts[row.id]
-              assert(fact and row.predecessor == fact.predecessor.id and row.previous == fact.previous.id)
-              assert(row.expected_predecessor_count == fact.predecessor.unit_count)
-              assert(row.expected_previous_count == fact.previous.unit_count and row.order == fact.predecessor.order)
-              assert(fact.raw_max_level == "omitted-native-finite-default")
+              -- The portable F100 capture has five observed continuations.
+              -- Its new legacy laser row is checked above as explicit F018
+              -- forward-preservation intent, never relabelled historical
+              -- native evidence.
+              if not (target == "f100" and row.id == "laser-turret-speed-8") then
+                local fact = admission_facts[row.id]
+                assert(fact and row.predecessor == fact.predecessor.id and row.previous == fact.previous.id)
+                assert(row.expected_predecessor_count == fact.predecessor.unit_count)
+                assert(row.expected_previous_count == fact.previous.unit_count and row.order == fact.predecessor.order)
+                assert(fact.raw_max_level == "omitted-native-finite-default")
+              end
             end
           end
         ''')
@@ -326,7 +393,8 @@ class HistoricalContinuationTests(unittest.TestCase):
                     else:
                         expected[identifier]["unit_count_formula"] = definition["unit_count_formula"]
                 self.lua.globals().native_expected = self._to_lua(expected)
-                self.lua.execute(f'assert_projection("{target}", native_expected)')
+                permitted_extra = ', "laser-turret-speed-8"' if target == "f100" else ""
+                self.lua.execute(f'assert_projection("{target}", native_expected{permitted_extra})')
 
 
 if __name__ == "__main__":
