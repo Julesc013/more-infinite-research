@@ -38,11 +38,18 @@ function New-NativeFixturePreflightPrefix([string]$Runner,[string]$Path){
   $written=[IO.File]::ReadAllBytes($Path)
   Assert-Library ([Convert]::ToHexString([byte[]]$written[0..($prefix.Length-1)]) -ceq [Convert]::ToHexString($prefix)) 'native-fixture-preflight-prefix-bytes'
 }
-function New-NativeFixturePreflightFromText([string]$Source,[string]$Path){
-  $boundary="& (Join-Path `$repo 'tools/commands/workspace/Test-MIRDevelopmentHealth.ps1') -MaxScanSeconds 2 -MaxEntriesPerRoot 500 | Out-Host"
-  $offset=$Source.IndexOf($boundary,[StringComparison]::Ordinal)
-  Assert-Library ($offset -gt 0) 'native-fixture-preflight-old-boundary'
-  [IO.File]::WriteAllText($Path,$Source.Substring(0,$offset)+"`nreturn`n",[Text.UTF8Encoding]::new($false))
+function New-NativeFixturePreflightValidationRemoval([string]$Prefix,[string]$Path){
+  $tokens=$null;$errors=$null
+  $ast=[System.Management.Automation.Language.Parser]::ParseFile($Prefix,[ref]$tokens,[ref]$errors)
+  Assert-Library ($errors.Count-eq0) 'native-fixture-preflight-mutation-parse'
+  $calls=@($ast.FindAll({param($node) $node -is [System.Management.Automation.Language.CommandAst] -and $node.GetCommandName() -ceq 'Assert-DeclaredFixtureInputs'},$true))
+  Assert-Library ($calls.Count-eq1-and$calls[0].Extent.Text-ceq'Assert-DeclaredFixtureInputs -ProfileDefinition $profileDefinition -EngineIdentity $engineIdentity -ArchiveHashes $archiveHashes') 'native-fixture-preflight-mutation-call'
+  $source=[IO.File]::ReadAllText($Prefix,[Text.UTF8Encoding]::new($false,$true));$call=$calls[0]
+  $mutated=$source.Remove($call.Extent.StartOffset,$call.Extent.EndOffset-$call.Extent.StartOffset)
+  Assert-Library ($mutated.Contains('function Assert-DeclaredFixtureInputs')) 'native-fixture-preflight-mutation-definition'
+  [IO.File]::WriteAllText($Path,$mutated,[Text.UTF8Encoding]::new($false))
+  $tokens=$null;$errors=$null;$mutatedAst=[System.Management.Automation.Language.Parser]::ParseFile($Path,[ref]$tokens,[ref]$errors)
+  Assert-Library ($errors.Count-eq0-and@($mutatedAst.FindAll({param($node) $node -is [System.Management.Automation.Language.CommandAst] -and $node.GetCommandName() -ceq 'Assert-DeclaredFixtureInputs'},$true)).Count-eq0) 'native-fixture-preflight-mutation-only-call'
 }
 function Assert-NativeFixturePreflightControlsAbsent([string]$Library,[string]$Output){
   Assert-Library (-not(Test-Path -LiteralPath $Output) -and -not(Test-Path -LiteralPath (Join-Path $Library 'mod-list.json')) -and -not(Test-Path -LiteralPath (Join-Path $Library 'mod-settings.dat')) -and -not(Test-Path -LiteralPath (Join-Path $Library '.mir-active-profile.json'))) 'native-fixture-preflight-no-controls'
@@ -182,9 +189,9 @@ try {
   Assert-NativeFixturePreflightControlsAbsent -Library $preflightLibrary -Output $preflightOutput
   $wrongSelected=@{($dependencyName)=('0'*64 -join '')}
   Set-PreflightProfile (New-PreflightProfile -Engine $validEngine -ArchiveHashes $wrongSelected)
-  $oldRunner=(& git -C $repo show 'f8045e56b97d67af485e48721e3f2e7e3bf00694:tools/Invoke-NativeFixture.ps1') -join "`n";$oldPreflightRunner=Join-Path $preflightRoot 'Invoke-NativeFixture-original-preflight.ps1';New-NativeFixturePreflightFromText -Source $oldRunner -Path $oldPreflightRunner
-  & $oldPreflightRunner @runnerArguments
-  Assert-Library $true 'native-fixture-original-preflight-admits-wrong-selected-pin'
+  $mutatedPreflightRunner=Join-Path $preflightRoot 'Invoke-NativeFixture-validation-removal-preflight.ps1';New-NativeFixturePreflightValidationRemoval -Prefix $preflightRunner -Path $mutatedPreflightRunner
+  & $mutatedPreflightRunner @runnerArguments
+  Assert-Library $true 'native-fixture-validation-removal-admits-wrong-selected-pin'
   Assert-NativeFixturePreflightControlsAbsent -Library $preflightLibrary -Output $preflightOutput
   Refuses-Library {& $preflightRunner @runnerArguments} '[mir5-native-fixture] profile selected archive hash differs'
   Assert-NativeFixturePreflightControlsAbsent -Library $preflightLibrary -Output $preflightOutput
