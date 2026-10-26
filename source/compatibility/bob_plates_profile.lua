@@ -3,13 +3,20 @@
 local target = require("platform.target")
 local M = {}
 local REQUIRED = {"base", "boblibrary", "bobores", "bobplates"}
-local OWNERSHIP_CONFLICTS = {"bobelectronics", "bobtech", "angelssmelting"}
+local ANGEL_OWNERSHIP_CONFLICT = "angelssmelting"
+
+local function overlaps_bob_core(active)
+  -- Bob Core is the separately authored F210 Space Age material owner.  The
+  -- full Bob Base capture has bobelectronics and bobtech but no Space Age, so
+  -- those names alone do not select or conflict with Bob Core.
+  return active["space-age"] ~= nil and active.bobelectronics ~= nil and active.bobtech ~= nil
+end
 
 function M.select(active)
   if target.id ~= "f210" or target.factorio_version ~= "2.1" or target.minimum_base ~= "2.1.23"
       or type(active) ~= "table" then return nil end
   for _, name in ipairs(REQUIRED) do if active[name] == nil then return nil end end
-  for _, name in ipairs(OWNERSHIP_CONFLICTS) do if active[name] ~= nil then return nil end end
+  if active[ANGEL_OWNERSHIP_CONFLICT] ~= nil or overlaps_bob_core(active) then return nil end
   return active["space-age"] ~= nil and "space-age" or "base"
 end
 
