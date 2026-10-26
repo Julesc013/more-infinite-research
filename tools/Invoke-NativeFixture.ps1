@@ -66,9 +66,38 @@ function Get-F110PublishedCrossSourceFixture([string]$Repo,[hashtable]$ProfileDe
   Assert-Fixture ([string]$base.version -ceq '1.1.110') 'F110 published cross source base differs'
   Assert-Fixture ((Get-FixtureSha $Engine) -ceq $ExpectedEngineSha256) 'F110 published cross source executable differs'
   Assert-Fixture ($Sources.Count -eq 1) 'F110 published cross source requires one fixture source'
+  $repoRoot=(Resolve-Path -LiteralPath $Repo).Path
   $source=(Resolve-Path -LiteralPath $Sources[0]).Path
-  $expectedSource=(Resolve-Path -LiteralPath (Join-Path $Repo 'tests/fixtures/f110-f200-transition/f110/published-4.7.3')).Path
-  Assert-Fixture ($source -ceq $expectedSource) 'F110 published cross source fixture path differs'
+  $sourceRelative=[IO.Path]::GetRelativePath($repoRoot,$source)
+  Assert-Fixture ($sourceRelative -cne '..' -and -not $sourceRelative.StartsWith('..'+[IO.Path]::DirectorySeparatorChar)) 'F110 published cross source fixture must remain inside executing checkout'
+  $canonical=Join-Path $repoRoot 'tests/fixtures/f110-f200-transition/f110/published-4.7.3'
+  $shared=Join-Path $repoRoot 'tests/fixtures/f110-f200-transition/shared'
+  $authoritative=[ordered]@{
+    'catalogue.lua'=Join-Path $canonical 'catalogue.lua'
+    'control.lua'=Join-Path $canonical 'control.lua'
+    'data-final-fixes.lua'=Join-Path $canonical 'data-final-fixes.lua'
+    'info.json'=Join-Path $canonical 'info.json'
+    'settings-updates.lua'=Join-Path $canonical 'settings-updates.lua'
+    'fixture_control.lua'=Join-Path $shared 'control.lua'
+    'fixture_data_final.lua'=Join-Path $shared 'data-final-fixes.lua'
+  }
+  $files=@(Get-ChildItem -LiteralPath $source -Recurse -File -Force)
+  $directories=@(Get-ChildItem -LiteralPath $source -Recurse -Directory -Force)
+  $actual=@($files|ForEach-Object {[IO.Path]::GetRelativePath($source,$_.FullName).Replace('\','/')}|Sort-Object)
+  $expected=@($authoritative.Keys|Sort-Object)
+  Assert-Fixture ($directories.Count -eq 0 -and $actual.Count -eq $expected.Count -and (($actual -join "`n") -ceq ($expected -join "`n"))) 'F110 published cross source stage members differ'
+  foreach($relative in $expected){
+    $actualPath=Join-Path $source $relative
+    $resolvedActual=(Resolve-Path -LiteralPath $actualPath).Path
+    $actualRelative=[IO.Path]::GetRelativePath($source,$resolvedActual)
+    Assert-Fixture ($actualRelative -cne '..' -and -not $actualRelative.StartsWith('..'+[IO.Path]::DirectorySeparatorChar)) "F110 published cross source stage member leaves composition: $relative"
+    $expectedPath=$authoritative[$relative]
+    Assert-Fixture (Test-Path -LiteralPath $expectedPath -PathType Leaf) "F110 published cross source authoritative member missing: $relative"
+    $resolvedExpected=(Resolve-Path -LiteralPath $expectedPath).Path
+    $expectedRelative=[IO.Path]::GetRelativePath($repoRoot,$resolvedExpected)
+    Assert-Fixture ($expectedRelative -cne '..' -and -not $expectedRelative.StartsWith('..'+[IO.Path]::DirectorySeparatorChar)) "F110 published cross source authoritative member leaves checkout: $relative"
+    Assert-Fixture ((Get-FixtureSha $resolvedActual) -ceq (Get-FixtureSha $resolvedExpected)) "F110 published cross source stage member differs: $relative"
+  }
   $info=Get-Content -LiteralPath (Join-Path $source 'info.json') -Raw|ConvertFrom-Json -AsHashtable
   Assert-Fixture ([string]$info.name -ceq 'mir-fixture-mir5-f110-f200-transition' -and [string]$info.version -ceq '0.1.0' -and [string]$info.factorio_version -ceq '1.1') 'F110 published cross source fixture identity differs'
   Assert-Fixture ((@($info.dependencies) -join "`n") -ceq (('base >= 1.1.110','more-infinite-research = 4.7.11003') -join "`n")) 'F110 published cross source fixture dependencies differ'
