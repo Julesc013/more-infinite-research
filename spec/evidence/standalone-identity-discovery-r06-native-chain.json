@@ -1,0 +1,107 @@
+{
+  "kind": "MIR5StandaloneIdentityDiscoveryR06NativeChainV1",
+  "scope": "environmental identity discovery only; not a product, gameplay, personal-state, GUI, rejoin, research, or release qualification",
+  "independent_primary_member_comparison": {
+    "members": 197,
+    "bytes": 8644364,
+    "mismatches": [],
+    "readback_sha256": "254DE0B59D5E954D447FE3723B41138C4A9802512BF29704E6D58DDCD5CE5972"
+  },
+  "primary_custody": "build/mir5/recovery-historical/standalone-identity-discovery-r06",
+  "readback": {
+    "schema": 1,
+    "kind": "MIR5StandaloneIdentityDiscoveryR06CustodyReadbackV1",
+    "scope": "environmental identity discovery only; not a product, gameplay, personal-state, GUI, rejoin, research, or release qualification",
+    "controller": {
+      "commit": "26ddc01474a220a6f548868bd5d3f3362310738f",
+      "tree": "c505e64a8bab1fd20556ba0252d4f3fa16bcc1d8",
+      "worktree": "D:/Projects/Factorio/mir5-standalone-26dd-r06",
+      "clean": true
+    },
+    "inputs": {
+      "engine": {
+        "path": "D:/Games/Factorio/2.1/bin/x64/factorio.exe",
+        "version": "2.1.23.87750",
+        "sha256": "8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38"
+      },
+      "mir_archive": {
+        "sha256": "C563CB5B96C9E64CB3373BDB60CF5C8B7D3C97E93EADB8F924443C703CDC024D",
+        "bytes": 568598
+      },
+      "observer_archive": {
+        "sha256": "A15A7D628D66953D2E0C4D4FA288F47CBF9C5678327C7EB3D23ADB5DC78331C0",
+        "bytes": 835
+      },
+      "profile_sha256": "270DC6F7D8AC30DDC94CB6114394347DFD68377968FDDC9E51DEAD4CC3C6D6DC",
+      "fixture_case": "library-multiplayer",
+      "session_expected_peak_memory_mib": 7168,
+      "create_only_timeout_seconds": 180,
+      "session_join_budget_seconds": 180,
+      "pair_wait_ticks": 120
+    },
+    "results": {
+      "preparation": {
+        "path": "native-output/preparation/result.json",
+        "sha256": "58D62C8E392219E86A10E5A5AC5186245EDEA7D698A93C7809778AD744B176A6",
+        "status": "passed-private-native-runtime-load-only"
+      },
+      "session": {
+        "path": "native-output/session/result.json",
+        "sha256": "748FBD6D91F1B7A33A0DE528940C7B888821E1C3535766D69373980EBF87E99D",
+        "status": "passed-private-standalone-identity-discovery-fixture",
+        "environmental_only": true,
+        "actual_pair": [
+          {
+            "index": 1,
+            "name": "standalone-en",
+            "locale": "en",
+            "force_index": 1
+          },
+          {
+            "index": 2,
+            "name": "standalone-de",
+            "locale": "de",
+            "force_index": 1
+          }
+        ],
+        "ticks_after_last_join": 120,
+        "shared_force_index": 1,
+        "personal_state_checked": false,
+        "stop_before_initial_gui": true,
+        "screenshot_calls": 0,
+        "rejoin_attempted": false,
+        "host_restart_attempted": false,
+        "research_attempted": false,
+        "performance_acceptance": false
+      }
+    },
+    "custody": {
+      "source_output": "D:/Projects/Factorio/mir5-standalone-26dd-r06/build/tmp/standalone-identity-discovery-r06",
+      "primary_copy": "D:/Projects/Factorio/more-infinite-research/build/mir5/recovery-historical/standalone-identity-discovery-r06/native-output",
+      "member_count": 197,
+      "total_bytes": 8644364,
+      "source_member_manifest_sha256": "69545D6C0CB82D4D0EE422D77562D9CC9F8732B3EB92B0B43DB70318B1342945",
+      "primary_member_manifest_sha256": "69545D6C0CB82D4D0EE422D77562D9CC9F8732B3EB92B0B43DB70318B1342945",
+      "mismatches": []
+    },
+    "restoration_readback": {
+      "idle_assertion": "passed",
+      "factorio_processes_after": 0,
+      "mir_archive_sha256": "C563CB5B96C9E64CB3373BDB60CF5C8B7D3C97E93EADB8F924443C703CDC024D",
+      "observer_archive_sha256": "A15A7D628D66953D2E0C4D4FA288F47CBF9C5678327C7EB3D23ADB5DC78331C0",
+      "discovery_fixture_archive_present": false,
+      "mod_list_sha256": "48C46678CC8369DB15CC12CDFB23309EB076DC4433B76E9426083D0074BCCC91",
+      "mod_settings_sha256": "667897C514B66298A1E400058B65EA14EB36322D88864B98AE38E4C9B81387BC",
+      "active_marker_present": false,
+      "discovery_lock_present": false,
+      "native_result_restoration_status": "restored-direct-library-controls"
+    },
+    "prior_environmental_adverses": [
+      "standalone-identity-discovery-r01",
+      "standalone-identity-discovery-r02",
+      "standalone-identity-discovery-r03",
+      "standalone-identity-discovery-r04",
+      "standalone-identity-discovery-r05"
+    ]
+  }
+}
