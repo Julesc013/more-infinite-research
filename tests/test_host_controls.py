@@ -101,6 +101,7 @@ class HostControlsTests(unittest.TestCase):
             "tests/test_f200_legacy_worker_fixture.py",
             "tests/test_k2_imersite_migration.py",
             "tests/test_k2_imersite_transition_fixture.py",
+            "tests/test_k2se_imersite_carrier_fixture.py",
             "tests/test_api.py",
             "tests/test_runtime_api.py",
             "tests/test_sdk.py",

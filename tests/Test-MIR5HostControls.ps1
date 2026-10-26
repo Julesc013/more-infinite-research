@@ -72,6 +72,7 @@ $controls = @(
   [ordered]@{path='tests/test_f200_legacy_worker_fixture.py';lua=$true},
   [ordered]@{path='tests/test_k2_imersite_migration.py';lua=$true},
   [ordered]@{path='tests/test_k2_imersite_transition_fixture.py';lua=$true},
+  [ordered]@{path='tests/test_k2se_imersite_carrier_fixture.py';lua=$true},
   [ordered]@{path='tests/test_api.py';lua=$true},
   [ordered]@{path='tests/test_runtime_api.py';lua=$true},
   [ordered]@{path='tests/test_sdk.py';lua=$true},
