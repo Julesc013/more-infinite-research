@@ -1,0 +1,164 @@
+{
+  "kind": "MIR5A1fdRemainderAndCorrectedCarbonNativeChainV1",
+  "cases": [
+    {
+      "case": "q003",
+      "source_head": "a1fd431bd25e646f801e68a8ad00a8abb49ee094",
+      "engine_sha256": "FE4A1DA30F322A0D0B8AEB3DF7276332222BAAA143E2352569B723E84B2B9060",
+      "mir_archive_sha256": "6088CD88D4FD06DE01D71C8A1C3C7D32A55A55BE073C0888A84B2AC0C8C467D7",
+      "profile_sha256": "BCA125D265CBA75527ACDCCC109B98AC032DB16E7363A268AC6822EAC9B55355",
+      "result_sha256": "0CA7046B47FAE2359F5ED19C6604808E72260D23D948E56952F588CE7365324D",
+      "terminal_sha256": "085C6A03A9BFC22D7D1AAA28B13BCB6FC60D79E4DBB9BDE48A1A922BA5076203",
+      "dumps": {
+        "data_raw": {
+          "path": "write-data/script-output/data-raw-dump.json",
+          "bytes": 63325522,
+          "sha256": "D64209AC08D71FDF05A9F78FD55B21C90D35D3C4206000807A5054B28C8EAFD0"
+        },
+        "mod_settings": {
+          "path": "write-data/script-output/mod-settings-dump.json",
+          "bytes": 756248,
+          "sha256": "43DD17128F3E4A0D862E86DEDEF4AE44EC53E3007E00180B7741D2839BD22FE0"
+        }
+      },
+      "native_members_verified": 9,
+      "primary_custody": "build/mir5/recovery-historical/a1fd-q003-native-r01",
+      "scope": "data/settings-stage endpoint only",
+      "library_controls_restored": true,
+      "original_mir_restored": "original-C563-restored"
+    },
+    {
+      "case": "q073",
+      "source_head": "a1fd431bd25e646f801e68a8ad00a8abb49ee094",
+      "engine_sha256": "FE4A1DA30F322A0D0B8AEB3DF7276332222BAAA143E2352569B723E84B2B9060",
+      "mir_archive_sha256": "6088CD88D4FD06DE01D71C8A1C3C7D32A55A55BE073C0888A84B2AC0C8C467D7",
+      "profile_sha256": "BCABC502848BE49ECD6B33C3AA45BFEBA3BC59750D94342249D0ADD2D4AC0CFD",
+      "result_sha256": "1EFCC517F8D939777B29B71EB5351FDA04081A338D11F95C22A45D3B56F22F81",
+      "terminal_sha256": "A72DE6F2441CC4537AD9B3DAD4FFD01546280D24E85F3F68DDF01907403C5F5C",
+      "dumps": {
+        "data_raw": {
+          "path": "write-data/script-output/data-raw-dump.json",
+          "bytes": 15792878,
+          "sha256": "71C4896A7B1142A4B47347F9D008B8A7F6D244590892DC207582A6107CC72E55"
+        },
+        "mod_settings": {
+          "path": "write-data/script-output/mod-settings-dump.json",
+          "bytes": 758296,
+          "sha256": "26D29ECCCCD53B5D48ADFAB6DCBCEEA9FB3436EE150CE7E468A784F0B4522532"
+        }
+      },
+      "native_members_verified": 9,
+      "primary_custody": "build/mir5/recovery-historical/a1fd-q073-native-r01",
+      "scope": "data/settings-stage endpoint only",
+      "library_controls_restored": true,
+      "original_mir_restored": "original-C563-restored"
+    },
+    {
+      "case": "q074",
+      "source_head": "a1fd431bd25e646f801e68a8ad00a8abb49ee094",
+      "engine_sha256": "FE4A1DA30F322A0D0B8AEB3DF7276332222BAAA143E2352569B723E84B2B9060",
+      "mir_archive_sha256": "6088CD88D4FD06DE01D71C8A1C3C7D32A55A55BE073C0888A84B2AC0C8C467D7",
+      "profile_sha256": "338D799BE5FD4FA9E70CCD8577926D3ECDDDEB9E143DD6F874D24E416E329B16",
+      "result_sha256": "4CDFC0296F7CBFFEB8E0104AAE2BE3A4CE46B65088D6CEA365574AB1E8B2F1EB",
+      "terminal_sha256": "CC305C5B2E2A6542493AFEEED0751F115FFE64CF41DB7F48B9C72434D0977CA3",
+      "dumps": {
+        "data_raw": {
+          "path": "write-data/script-output/data-raw-dump.json",
+          "bytes": 31940558,
+          "sha256": "50297A7E26F7CBD188FA522F343C96F4B07BA5C0A6B06E1CA40AF316D868E315"
+        },
+        "mod_settings": {
+          "path": "write-data/script-output/mod-settings-dump.json",
+          "bytes": 754908,
+          "sha256": "A00960FA2019069228A9CBDA5FF682911BEC8C10610993913DE25887C0E02C99"
+        }
+      },
+      "native_members_verified": 9,
+      "primary_custody": "build/mir5/recovery-historical/a1fd-q074-native-r01",
+      "scope": "data/settings-stage endpoint only",
+      "library_controls_restored": true,
+      "original_mir_restored": "original-C563-restored"
+    },
+    {
+      "case": "q010",
+      "source_head": "20199257df89dc0fb76e7c86478d7a906def14e3",
+      "engine_sha256": "FE4A1DA30F322A0D0B8AEB3DF7276332222BAAA143E2352569B723E84B2B9060",
+      "mir_archive_sha256": "0D4C19C6A2C9FED241B77A9752132BA452D7357B8B86B1AA6CA7DB7372CD0FE6",
+      "profile_sha256": "79C589FDFC329CDCE8C204ABD4E939E60759792ACF4A9C7CEF8D326A5CC124B1",
+      "result_sha256": "E2E09027E579A9DE6A25109BD20C08BFF73C9DF9A418B85581E108A8D360EFC8",
+      "terminal_sha256": "3700066CC4AE7566EF7F9801D228A1C632FFD2753F92F081285DB388EB9D1DB7",
+      "dumps": {
+        "data_raw": {
+          "path": "write-data/script-output/data-raw-dump.json",
+          "bytes": 67502598,
+          "sha256": "7312D8FA75EEABB8E6D5018A75F95267268BE1ABF8EBBFD1F8F185AFC09434DD"
+        },
+        "mod_settings": {
+          "path": "write-data/script-output/mod-settings-dump.json",
+          "bytes": 787011,
+          "sha256": "B951E976DEE9027361778707786C6AD4397210D3E91903314A3A2F60DEF7A162"
+        }
+      },
+      "native_members_verified": 9,
+      "primary_custody": "build/mir5/recovery-historical/201992-q010-native-r01",
+      "scope": "data/settings-stage endpoint only",
+      "library_controls_restored": true,
+      "original_mir_restored": "original-C563-restored"
+    }
+  ],
+  "prior_cutoff_record": "current-a1fd-f210-data-captures-readback.json",
+  "scope": "The three held a1fd cases finish that exact twelve-case data-stage cohort. Only q010 is rerun on 201992 to check the affected correction. These endpoints grant no gameplay, save, client, timing, memory or release acceptance.",
+  "carbon_comparison": {
+    "published_b6_raw_sha256": "A8935196FBF9A58DA01BB26EFD739CE74941DB2885C6A1514E9379F64A33C3C1",
+    "corrected_raw_sha256": "7312D8FA75EEABB8E6D5018A75F95267268BE1ABF8EBBFD1F8F185AFC09434DD",
+    "technology": "recipe-prod-research_carbon-1",
+    "effects": [
+      {
+        "type": "change-recipe-productivity",
+        "recipe": "burnt-spoilage",
+        "change": 0.05
+      },
+      {
+        "type": "change-recipe-productivity",
+        "recipe": "coal-synthesis",
+        "change": 0.02
+      }
+    ],
+    "matches_published_exactly": true,
+    "other_projected_published_rows_compared": [
+      "braking-force-8",
+      "laser-shooting-speed-8",
+      "recipe-prod-research_breeding-1",
+      "recipe-prod-research_lithium-1",
+      "recipe-prod-research_lubricant_productivity-1",
+      "recipe-prod-research_oil_processing_productivity-1",
+      "recipe-prod-research_sulfur-1",
+      "recipe-prod-research_sulfuric_acid_productivity-1",
+      "recipe-prod-research_tungsten-1",
+      "research-speed-7",
+      "steel-plate-productivity"
+    ],
+    "comparison_fields": [
+      "type",
+      "name",
+      "icon",
+      "icon_size",
+      "icons",
+      "localised_name",
+      "localised_description",
+      "level",
+      "upgrade",
+      "max_level",
+      "order",
+      "enabled",
+      "hidden",
+      "visible_when_disabled",
+      "show_levels_info",
+      "prerequisites",
+      "effects",
+      "unit"
+    ],
+    "all_projected_contracts_equal": true,
+    "limits": "The projected published rows are a bounded independent oracle, not the full catalogue or a disposition of every extra current row."
+  }
+}
