@@ -437,8 +437,14 @@ local function source_tick()
   elseif state.phase == "physical-after" then
     if physical_batch_finished(state) then
       state.after_output = state.production.expected
-      state.burner_lab.active, state.burner_lab.energy = false, 0
-      state.electric_lab.active, state.electric_lab.energy = false, 0
+      -- LuaEntity.active became read-only in the shipped 2.1 API.  Freeze
+      -- the source labs through the supported script-disable state and empty
+      -- their buffers before keeping the queued-progress witness in the save.
+      state.burner_lab.disabled_by_script, state.burner_lab.energy = true, 0
+      state.electric_lab.disabled_by_script, state.electric_lab.energy = true, 0
+      if state.burner_lab.disabled_by_script ~= true or state.electric_lab.disabled_by_script ~= true then
+        fail("source AAI labs did not accept script disable")
+      end
       state.paused_index = queue_witness(force, technology(force, OWNER))
       state.source_snapshot = snapshot(state)
       state.phase = "source-complete"
@@ -455,7 +461,8 @@ local function successor_config()
   assert_snapshot(state, false)
   local force = game.forces.player
   if not state.electric_lab or not state.electric_lab.valid then fail("source electric lab was lost") end
-  state.electric_lab.active = true
+  state.electric_lab.disabled_by_script = false
+  if state.electric_lab.disabled_by_script ~= false then fail("successor AAI lab did not clear script disable") end
   state.electric_lab.energy = LAB_ENERGY
   state.phase, state.deadline, state.successor_labs = "successor-research", game.tick + DEADLINE_TICKS, 0
 end

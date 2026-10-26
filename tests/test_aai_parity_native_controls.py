@@ -209,9 +209,12 @@ class AaiParityNativeControls(unittest.TestCase):
                 }
               end
               local function strict_entity(fields, on_energy)
+                local disabled_by_script=false
                 return setmetatable(fields, {
                   __index=function(target, key)
                     if key=="energy" then return 0 end
+                    if key=="active" then return not disabled_by_script end
+                    if key=="disabled_by_script" then return disabled_by_script end
                     local result=rawget(target,key)
                     if result==nil then error("unknown LuaEntity field read: "..key) end
                     return result
@@ -221,10 +224,22 @@ class AaiParityNativeControls(unittest.TestCase):
                       if on_energy then on_energy(target,value) end
                       return
                     end
+                    if key=="disabled_by_script" then
+                      assert(type(value)=="boolean","LuaEntity.disabled_by_script requires boolean")
+                      disabled_by_script=value
+                      return
+                    end
+                    if key=="active" then error("LuaEntity.active is read only") end
                     error("unknown LuaEntity field write: "..key)
                   end,
                 })
               end
+              local active_setter_probe=strict_entity({valid=true})
+              local active_setter_ok,active_setter_error=pcall(function() active_setter_probe.active=false end)
+              assert(active_setter_ok==false and tostring(active_setter_error):match("LuaEntity.active is read only"))
+              assert(active_setter_probe.disabled_by_script==false)
+              active_setter_probe.disabled_by_script=true
+              assert(active_setter_probe.disabled_by_script==true)
               local function force(index)
                 local queued,current={},nil
                 local value=setmetatable({index=index, technologies={}, recipes={}, research_progress=0},{
@@ -287,7 +302,7 @@ class AaiParityNativeControls(unittest.TestCase):
                     assert(electric_lab_creations==1,"successor tried to place a lab over the source lab")
                   end
                   local input,fuel=inventory(200),inventory()
-                  return strict_entity({valid=true,active=true,get_inventory=function(slot) assert(slot==1);return input end,get_fuel_inventory=function()return fuel end})
+                  return strict_entity({valid=true,get_inventory=function(slot) assert(slot==1);return input end,get_fuel_inventory=function()return fuel end})
                 end
                 if spec.name=="stone-furnace" then
                   local input,output,fuel=inventory(),inventory(),inventory()
@@ -423,13 +438,15 @@ class AaiParityNativeControls(unittest.TestCase):
               local state=storage.mir5_aai_parity_native
               assert(state.phase=="source-complete" and physical_crafts==20)
               assert(state.production.fluid_target==400 and state.production.fluid_provided==400)
-              assert(state.burner_lab.active==false and state.electric_lab.active==false,
-                "published queued progress was left under a powered active lab")
+              assert(state.burner_lab.disabled_by_script==true and state.electric_lab.disabled_by_script==true,
+                "published queued progress was left under a script-enabled lab")
               local source={phase=state.phase,aai=state.aai_finished,mir=state.mir_labs,before=state.before_output,after=state.after_output,queue=player.research_progress,saves=saves,markers=markers}
               local successor={events={}}
               local current={base="2.1.23",["aai-industry"]="0.7.5",["more-infinite-research"]="5.0.21000",["mir-fixture-mir5-aai-parity-native"]="0.2.0"}
               environment("mir5",current,successor)
               assert(pcall(successor.configuration))
+              assert(state.burner_lab.disabled_by_script==true and state.electric_lab.disabled_by_script==false,
+                "successor did not retain burner pause and re-enable source electric lab")
               owner.level=3;player.recipes["electric-engine-unit"].productivity_bonus=.2;player.current_research=nil;player.research_queue={}
               assert(pcall(successor.events[1],{by_script=false,research=owner}))
               assert(pcall(successor.events[2]));assert(pcall(successor.load));assert(pcall(successor.events[2]))
