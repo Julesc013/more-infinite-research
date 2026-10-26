@@ -53,6 +53,12 @@ Push each reviewable unit promptly. Commit bodies and PR descriptions record the
 
 After accepted MIR5.0.0 publication and verified local delivery, continue with5.0.1 bug fixes, measured performance improvements and further stress qualification. Use actual review findings and observed failures to select that work. This follow-up authorization does not waive any5.0.0 acceptance gate or permit an untested release.
 
+## Changelog ownership and formatting
+
+Edit the root [CHANGELOG.md](../CHANGELOG.md) as the single authored release history. Keep each Markdown paragraph or bullet on one logical line and use editor soft wrapping; aim for short readable sentences rather than manually wrapping repository prose. Retain the selected MIR1–3 master releases once, all MIR4 and later source releases, and edition-specific historical scope. Reduced backport logs are not separate master release entries.
+
+Run `python -B tools/changelog.py --write` after an edit. The small formatter writes the tracked [source/changelog.txt](../source/changelog.txt) projection with Factorio separators, indentation and132-character lines. Its only distribution-version placeholder belongs to the current release; the packager replaces it with the selected edition version. Check freshness with `python -B tools/changelog.py`; never hand-edit the projection. Commit both files together. The [reconciliation inventory](../spec/inventory/changelog-history.json) preserves the exact prior history fingerprints and recovery sources; it is outside player packages.
+
 ## Before creating an abstraction
 
 Show the real repeated code or concrete safety boundary, why native Factorio behavior is insufficient, what new state it retains, and which tests protect its removal/replacement. Do not create an adapter for an imagined future engine or an API function without a consumer.

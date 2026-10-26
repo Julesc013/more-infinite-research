@@ -123,14 +123,6 @@ local function stream_for(values, definition)
   return stream
 end
 
-local function continuation_description(definition, stream)
-  local useful = math.ceil(definition.productivity_ceiling * 100 / stream.effect_percent)
-  local limit = stream.max_level > 0 and math.min(stream.max_level, useful) or useful
-  return {"", {"technology-description.more-infinite-research.recipe_productivity"}, "\n",
-    {"mod-setting-name.ips-max-level-stream", {"", {"description.productivity-bonus"}, ": ",
-      {"item-name." .. definition.item}}}, ": ", tostring(limit)}
-end
-
 function M.preflight(raw, active_mods)
   local profile = M.select(active_mods)
   if profile == nil then return nil end
@@ -156,7 +148,7 @@ function M.technologies(values, raw, active_mods)
     local stream = stream_for(values, definition)
     output[#output + 1] = stages.technology(definition, definition.early, stream, fail)
     local continuation = stages.technology(definition, definition.continuation, stream, fail)
-    continuation.localised_description = continuation_description(definition, stream)
+    continuation.localised_description = stages.continuation_description(definition, stream)
     output[#output + 1] = continuation
   end
   return output

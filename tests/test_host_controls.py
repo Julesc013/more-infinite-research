@@ -52,6 +52,8 @@ class HostControlsTests(unittest.TestCase):
             "tests/test_aai_parity_native_controls.py",
             "tests/test_bob_angel_materials.py",
             "tests/test_bob_angel_catalogue.py",
+            "tests/test_angel_f210_catalogue.py",
+            "tests/test_angel_f210_pipeline.py",
             "tests/test_bob_tech_materials.py",
             "tests/test_bob_tech_gameplay_fixture.py",
             "tests/test_bob_core_materials.py",
@@ -141,6 +143,7 @@ class HostControlsTests(unittest.TestCase):
             "tests/test_library_profile_reader.py",
             "tests/test_f110_f200_runner.py",
             "tests/test_package.py",
+            "tests/test_changelog.py",
             "tests/test_release.py",
             "tests/test_compose_replay.py",
             "tests/test_compare_captures.py",
@@ -153,7 +156,7 @@ class HostControlsTests(unittest.TestCase):
             "tests/test_host_controls.py",
             "tools/check_repository.py",
         ])
-        self.assertEqual(len(paths), 115)
+        self.assertEqual(len(paths), 118)
         self.assertEqual(len(set(paths)), len(paths))
         self.assertEqual(paths[-1], "tools/check_repository.py")
         self.assertIn("tests/test_sdk.py", paths)

@@ -1,0 +1,335 @@
+{
+  "schema": 1,
+  "decision_date": "2026-10-26",
+  "authority": "Maintainer selected master MIR1–3 release list, all MIR4 and later source releases; no reduced backport log duplication. CHANGELOG.md owns authored content; source/changelog.txt is its generated Factorio projection.",
+  "input_revision": "b92e8124d2968e197fdbf3058d18d4b50f9c6b21",
+  "prior_repository_changelog": {
+    "path": "CHANGELOG.md",
+    "revision": "b92e8124d2968e197fdbf3058d18d4b50f9c6b21",
+    "bytes": 30359,
+    "sha256": "36E5D6182B12700F66C21E1028F9FDA946BE373B829AC582AAB1A771AAC05422",
+    "disposition": "All 4.0.0 and 4.1.0 bullets retained under Repository categories."
+  },
+  "master_mir1_3": {
+    "release_tag": "3.2.11",
+    "revision": "e3d787deb35ff30157bb2013fa1cc745a445e629",
+    "path": "changelog.txt",
+    "bytes": 78252,
+    "sha256": "26C3119272C8A368FF1B506635DBE8DC13C3965050FB57C965BA30AA1F0AB0CF",
+    "selected_versions": [
+      "1.0.0",
+      "1.1.0",
+      "1.1.5",
+      "1.2.0",
+      "1.2.5",
+      "1.2.9",
+      "2.0.0",
+      "2.0.5",
+      "2.1.0",
+      "2.1.5",
+      "2.2.0",
+      "2.3.0",
+      "3.0.0",
+      "3.0.5",
+      "3.1.0",
+      "3.1.1",
+      "3.1.2",
+      "3.1.5",
+      "3.1.9",
+      "3.2.0",
+      "3.2.1",
+      "3.2.2",
+      "3.2.3",
+      "3.2.5",
+      "3.2.9",
+      "3.2.10",
+      "3.2.11"
+    ],
+    "entry_semantics": [
+      {
+        "version": "1.0.0",
+        "sha256": "AD3A4D9DED0B1C1FDB3EE07DCEA59DED39F85B1D78E078C3589CAFC501AB2D40"
+      },
+      {
+        "version": "1.1.0",
+        "sha256": "2863D65E4D3A36939A8BB7FA327DD76007CFEE900A72FFE9C52F799A83A0F636"
+      },
+      {
+        "version": "1.1.5",
+        "sha256": "DB3CFDDB7BD5E51BA697A6A08E9BA5F8B23C7C2060CB79BB8F36768E0543571C"
+      },
+      {
+        "version": "1.2.0",
+        "sha256": "C24227CCAA530099995E09C431DA4FCC61F89F5D257BD04E141B374E5ECF3E66"
+      },
+      {
+        "version": "1.2.5",
+        "sha256": "F463B30FB3E0236D32C71C280DCF61AD0B4445A834CF00CA839E9D9021F43E06"
+      },
+      {
+        "version": "1.2.9",
+        "sha256": "2043D146DDDC12421F755557436124D6929615A270C0808C5548FC770A07FA24"
+      },
+      {
+        "version": "2.0.0",
+        "sha256": "9D1FC7E0047188DDBB39E19950EB90F3161A86FBAB5F77BCC2DFCC23941850F1"
+      },
+      {
+        "version": "2.0.5",
+        "sha256": "BE9EC9FF6621C7DE2F84F0D4740710766E50D004F6F9C2F4FCCAB709D4CB4032"
+      },
+      {
+        "version": "2.1.0",
+        "sha256": "6AC9BF8BBDE545AABA8551131F7763579AE64F9537BB2EA945272040BA614888"
+      },
+      {
+        "version": "2.1.5",
+        "sha256": "EE021B3131A67F052B56EF44F4F49972A86A95B7EAD483D32840F6BE68E67D3F"
+      },
+      {
+        "version": "2.2.0",
+        "sha256": "D59249D27983AFC159A11EA45409FC9A3F4BEAD6E0CB0475F26370400CB1731D"
+      },
+      {
+        "version": "2.3.0",
+        "sha256": "3E3789AA93828515F29A48D9EA9014A8D9CB2615036CAD6438BB3F41CD6CC67F"
+      },
+      {
+        "version": "3.0.0",
+        "sha256": "9ED3E854EB55BDF4BFEB02F73049218973DF8CAD86EAF2A21D14FA6EBD4D7048"
+      },
+      {
+        "version": "3.0.5",
+        "sha256": "FE8A2ABE7979D64FE22F1E517F8CE825F59BF91595630A2F772785C2636F21A7"
+      },
+      {
+        "version": "3.1.0",
+        "sha256": "EAE5CC000FD1299FA44F87489B36D609643AE5FCEF9B8F3825E8822B51BB9CEC"
+      },
+      {
+        "version": "3.1.1",
+        "sha256": "E8A627547480436C00E6E6BCC52EB1848731DDD662B9A9A8200494F86A46DF40"
+      },
+      {
+        "version": "3.1.2",
+        "sha256": "06539217F7139A8D10909D261EA5B100B31A2D1E32B9CA71A4AE2B685E68ABC2"
+      },
+      {
+        "version": "3.1.5",
+        "sha256": "0CFC70A717B42D14BDFD81FEDE01A985F6BDC150D0A547B206AC694288354967"
+      },
+      {
+        "version": "3.1.9",
+        "sha256": "7AE2BB21742BD8E7E1FB19B6FB958C8151C05FAC0D09EA92ACAF6F9BC93A15A7"
+      },
+      {
+        "version": "3.2.0",
+        "sha256": "023DA59DC62D62019CF769577ED55652EC4C2C91B95E642D677E8C62F334FCB7"
+      },
+      {
+        "version": "3.2.1",
+        "sha256": "006BCB7AC764622F307208780DFCA8FECE2D8F524F0162540623F63933D6AE07"
+      },
+      {
+        "version": "3.2.2",
+        "sha256": "368DCE8A24243982F6D1129DAE4CF6ACC0D85379AB058A6E0576FC511539F0F8"
+      },
+      {
+        "version": "3.2.3",
+        "sha256": "A148C7728424B8251BF9778EE60E258FECC1E637DA761F2DD67DD5E6CFBD3901"
+      },
+      {
+        "version": "3.2.5",
+        "sha256": "11131B3D2AEF69B9775E4A92FFEFD94D61AE8BBE07C2B06FA66703BCCEC1F016"
+      },
+      {
+        "version": "3.2.9",
+        "sha256": "C1270B902E6A292C09F07CB5D6231BA653286631A4F1943F4706E40C17D47468"
+      },
+      {
+        "version": "3.2.10",
+        "sha256": "884CBFEDFF6B65972C91C955959A3AF70AD2FF6128A7433ABA524B470D9FEB80"
+      },
+      {
+        "version": "3.2.11",
+        "sha256": "ACC39032B09544E5BCD806D344B12F0DFBCC40BDEB14039639119621F237DAA6"
+      }
+    ]
+  },
+  "prior_edition_histories": [
+    {
+      "target": "f210",
+      "path": "source/presentation/changelog/f210.txt",
+      "revision": "b92e8124d2968e197fdbf3058d18d4b50f9c6b21",
+      "bytes": 91947,
+      "sha256": "632D06CD60EBE7863155B62660D397870E10B174A6C3C1A765C1BAF8A75F3DA3"
+    },
+    {
+      "target": "f200",
+      "path": "source/presentation/changelog/f200.txt",
+      "revision": "b92e8124d2968e197fdbf3058d18d4b50f9c6b21",
+      "bytes": 90262,
+      "sha256": "EC19CBC5486A6CAB8E251683BEA7C26A0969B427CB9635989254BC2B2C16379B"
+    },
+    {
+      "target": "f110",
+      "path": "source/presentation/changelog/f110.txt",
+      "revision": "b92e8124d2968e197fdbf3058d18d4b50f9c6b21",
+      "bytes": 59365,
+      "sha256": "B7515285913A3D4626CD91CE086720F9D5D05F1F4E52CBA95A81BE8EE3C9B1A0"
+    },
+    {
+      "target": "f100",
+      "path": "source/presentation/changelog/f100.txt",
+      "revision": "b92e8124d2968e197fdbf3058d18d4b50f9c6b21",
+      "bytes": 59373,
+      "sha256": "63447A7867E5B73F32A141B4225F339C8C980A5CB251D65465EA8CA3629D5790"
+    },
+    {
+      "target": "f017",
+      "path": "source/presentation/changelog/f017.txt",
+      "revision": "b92e8124d2968e197fdbf3058d18d4b50f9c6b21",
+      "bytes": 7311,
+      "sha256": "5AA7D5CFE7B6A9D39D8B3AD68C864EB754FB5C6EFC6D76B2275641CF91D3E23C"
+    },
+    {
+      "target": "f016",
+      "path": "source/presentation/changelog/f016.txt",
+      "revision": "b92e8124d2968e197fdbf3058d18d4b50f9c6b21",
+      "bytes": 7661,
+      "sha256": "02ECCA24026817F8E2A05D7B8B9A9F850907AB07B5CBA02DE7AB0CCA33F39578"
+    },
+    {
+      "target": "f015",
+      "path": "source/presentation/changelog/f015.txt",
+      "revision": "b92e8124d2968e197fdbf3058d18d4b50f9c6b21",
+      "bytes": 7670,
+      "sha256": "33077833F2E988390AFB104D90CC18C9C1D279AF0508120D1E9249E58B1190F3"
+    },
+    {
+      "target": "f014",
+      "path": "source/presentation/changelog/f014.txt",
+      "revision": "b92e8124d2968e197fdbf3058d18d4b50f9c6b21",
+      "bytes": 7779,
+      "sha256": "CBDD44BE8605C1CC3AAF48B9CFCDFE9F3FC09758ADA6542B1ABFC713E93F803A"
+    },
+    {
+      "target": "f013",
+      "path": "source/presentation/changelog/f013.txt",
+      "revision": "b92e8124d2968e197fdbf3058d18d4b50f9c6b21",
+      "bytes": 7779,
+      "sha256": "6E2ACFAD9C3681EE9C6D7DF84DE0B7A1CB4FE9041B96D3B765B442BEF3F82F8A"
+    }
+  ],
+  "mir4_source_versions": [
+    "4.0.0",
+    "4.1.0",
+    "4.2.0",
+    "4.2.1",
+    "4.2.2",
+    "4.3.0",
+    "4.4.0",
+    "4.4.1",
+    "4.4.2",
+    "4.5.0",
+    "4.5.1",
+    "4.5.2",
+    "4.6.0",
+    "4.7.0",
+    "4.7.1",
+    "4.7.2",
+    "4.7.3"
+  ],
+  "mir4_tags": [
+    {
+      "version": "4.0.0",
+      "tag": "v4.0.0",
+      "revision": "5ca449820bdfa5595ca03686f32c74904c46daf3"
+    },
+    {
+      "version": "4.1.0",
+      "tag": "v4.1.0",
+      "revision": "3562377b520cccb071b97b3968946eae7024c950"
+    },
+    {
+      "version": "4.2.0",
+      "tag": "v4.2.0-stable",
+      "revision": "6d19c874ea7d026d297865b96aa1b2b0916e9e61"
+    },
+    {
+      "version": "4.2.1",
+      "tag": "v4.2.1",
+      "revision": "27c4777c27b3287f18df02e200235a1870bac465"
+    },
+    {
+      "version": "4.2.2",
+      "tag": "v4.2.2",
+      "revision": "44fb1439ecb960e36fd79dccbec7eac902d6eb5e"
+    },
+    {
+      "version": "4.3.0",
+      "tag": "v4.3.0",
+      "revision": "0e2703d7b545b97a2bdb308a02d84857288b6dc1"
+    },
+    {
+      "version": "4.4.0",
+      "tag": "v4.4.0",
+      "revision": "72b5c72eab810baf74c9a785ac4ebbc0d438c94a"
+    },
+    {
+      "version": "4.4.1",
+      "tag": "v4.4.1",
+      "revision": "2a41ffaf2756b6ef6b250a3cfed5903e6a5085c6"
+    },
+    {
+      "version": "4.4.2",
+      "tag": "v4.4.2",
+      "revision": "fe385332f778e1c79a0ad930140fe6e4defdb17a"
+    },
+    {
+      "version": "4.5.0",
+      "tag": "v4.5.0",
+      "revision": "3096e89a044d705828cbcda93ac05bd877535d12"
+    },
+    {
+      "version": "4.5.1",
+      "tag": "v4.5.1",
+      "revision": "69c297f9bca974f4280158781aa97a9678d0fcd4"
+    },
+    {
+      "version": "4.5.2",
+      "tag": "v4.5.2",
+      "revision": "8e4de4be0f24a3da514ad39179d5ce254459788d"
+    },
+    {
+      "version": "4.6.0",
+      "tag": "v4.6.0",
+      "revision": "9d6a9de1d77ca526da78428f8de52d5c61f9f55b"
+    },
+    {
+      "version": "4.7.0",
+      "tag": "v4.7.0",
+      "revision": "84bd157ad7b63b7d171fac2311bf30de70429c11"
+    },
+    {
+      "version": "4.7.1",
+      "tag": "v4.7.1",
+      "revision": "8911ab8f9ad4a7c8764444148183a4dfa137ed7d"
+    },
+    {
+      "version": "4.7.2",
+      "tag": "v4.7.2",
+      "revision": "bd9774f323b6eb1561c1d9ff0c91ecc3f7acd1d1"
+    },
+    {
+      "version": "4.7.3",
+      "tag": "v4.7.3",
+      "revision": "8643cc91bc915e008556a5315dbb0a743247e7ab"
+    }
+  ],
+  "limits": [
+    "Reconciliation of already tracked release text; no new gameplay, save, engine or release qualification.",
+    "Missing historical dates stay absent; commit timestamps are not substituted for publication dates.",
+    "MIR4 repeated bullets are deduplicated by category and complete nested bullet group; edition-specific groups retain explicit F-code scope."
+  ]
+}

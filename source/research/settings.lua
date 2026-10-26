@@ -16,6 +16,7 @@ local bob_tech_active = require("compatibility.bob_tech_profile").applies(active
 local bob_core_active = require("compatibility.bob_core_profile").applies(active_mods)
 local bob_plates_selector = require("compatibility.bob_plates_profile")
 local bob_plates_visible = bob_plates_selector.visible_families(bob_plates_selector.select(active_mods))
+local angel_f210_profile = modern_catalogue.angel_f210_profile(active_mods)
 local py_profile = require("compatibility.py_profile")
 local atan_active = (active_mods["atan-air-scrubbing"] or active_mods["atan-ash"])
   and require("compatibility.atan_profile").select(active_mods, require("platform.target")) ~= nil
@@ -74,6 +75,8 @@ for _, historical_stream in ipairs(historical.streams) do
         field.hidden = nil
       end
       if bob_plates_visible[historical_stream.key] then field.hidden = nil end
+      if angel_f210_profile == "base" and (historical_stream.key == "research_breeding"
+          or historical_stream.key == "research_material_aluminium") then field.hidden = nil end
       if py_profile.setting_visible(historical_stream.key, active_mods) then field.hidden = nil end
       if atan_active and (historical_stream.key == "research_air_scrubbing_clean_filter"
         or historical_stream.key == "research_ash_separation") then field.hidden = nil end
