@@ -18,7 +18,7 @@ source_of_truth_for:
 
 **Live integration authority:** `origin/dev` and its exact Git tree. Resolve it with `git rev-parse origin/dev` and `git rev-parse origin/dev:source`; do not treat an older checkpoint below as the current source. Accepted [PR1082](https://github.com/Julesc013/more-infinite-research/pull/1082), checked sourcea1fd431b and Dev5667a6c1/playerd4051e53, integrates the combined Bob/Angel, Ironclad and asset-only activation corrections, with all123 host commands and the other required checks passing. It also retains accepted [PR1090](https://github.com/Julesc013/more-infinite-research/pull/1090) finite F018 science contracts and [PR1087](https://github.com/Julesc013/more-infinite-research/pull/1087) forward laser continuity. Their host results do not qualify native behavior. The [ordered worklist](#ordered-remaining-work) owns remaining release work; exact historical receipts below retain their original inputs.
 
-The maintainer added best-effort F001–F012 GitHub editions on26 October while retaining F013–F210 qualification priority, then selected F018/0.18.47 as a normal build/release edition. Accepted [PR1077](https://github.com/Julesc013/more-infinite-research/pull/1077) supplies shared master-changelog rendering and opt-in F006–F012 finite composition; [PR1078](https://github.com/Julesc013/more-infinite-research/pull/1078) reconciles complete MIR4 GitHub release text, [PR1079](https://github.com/Julesc013/more-infinite-research/pull/1079) aligns root guidance, and [PR1080](https://github.com/Julesc013/more-infinite-research/pull/1080) integrates the separately labelled early release cohort. F018 research and normal ten-edition packaging are merged through [PR1081](https://github.com/Julesc013/more-infinite-research/pull/1081) and [PR1085](https://github.com/Julesc013/more-infinite-research/pull/1085) at59e0956c; finite science bindings and the F100 legacy-laser/F110 rename bridge are now checked through PR1090/1087; actual native/save qualification remains pending. The [master history inventory](../spec/inventory/changelog-history.json) retains27 selected MIR1–3 releases,17 MIR4 source releases and original root4.0/4.1 details. Required host checks for these integrated units pass; they do not establish final-package/native acceptance or publication.
+The maintainer added best-effort F001–F012 GitHub editions on26 October while retaining F013–F210 qualification priority, then selected F018/0.18.47 as a normal build/release edition. Accepted [PR1077](https://github.com/Julesc013/more-infinite-research/pull/1077) supplies shared master-changelog rendering and opt-in F006–F012 finite composition; [PR1078](https://github.com/Julesc013/more-infinite-research/pull/1078) reconciles complete MIR4 GitHub release text, [PR1079](https://github.com/Julesc013/more-infinite-research/pull/1079) aligns root guidance, and [PR1080](https://github.com/Julesc013/more-infinite-research/pull/1080) integrates the separately labelled early release cohort. F018 research and normal ten-edition packaging are merged through [PR1081](https://github.com/Julesc013/more-infinite-research/pull/1081) and [PR1085](https://github.com/Julesc013/more-infinite-research/pull/1085) at59e0956c. Finite science bindings are integrated through PR1090 and the F100 legacy-laser/F110 rename bridge through PR1087; F018 all-policy fixture admission and actual native/save qualification remain pending. The [master history inventory](../spec/inventory/changelog-history.json) retains27 selected MIR1–3 releases,17 MIR4 source releases and original root4.0/4.1 details. Required host checks for these integrated units pass; they do not establish final-package/native acceptance or publication.
 
 ## Retained implementation and native observations
 
@@ -260,20 +260,190 @@ For each exact profile, distinguish upstream control, startup/data, actual resea
 
 ## Ordered remaining work
 
-The maintainer's release-qualification target is **30 October 2026, 22:56 AEDT**. This target changes scheduling, not acceptance. Checkpoints are26 October 10:56 AEDT for a classified client blocker,26 October 22:56 AEDT for accepted startup observations, and29 October 22:56 AEDT for stable final player bytes without unresolved save/startup/synchronization/performance blockers. Report a missed checkpoint immediately; do not move the target or waive a gate.
+This is the single resumable completion plan. Focused specifications own requirements; the existing continuity inventory, request ledger and exact evidence chains own their facts. These packets schedule those obligations, not a second status registry or new framework. Update this section when ownership, the critical path or a release blocker changes. Historical observations retain their original source and verdict.
 
-| Priority and owner | Next concrete action | Required outcome |
+### Target, checkpoints and reporting
+
+The maintainer's target remains **30 October 2026, 22:56 AEDT**. Retained checkpoints are26 October10:56 for client-blocker classification,26 October22:56 for accepted startup observations, and29 October22:56 for stable final player bytes without unresolved save/startup/synchronization/performance blockers. Report actual outcomes or a missed checkpoint; do not retrospectively pass it, move the deadline or waive acceptance. This is a conditional schedule, not a promise that remaining native work fits a fixed number of hours.
+
+At checkpoints report exact integrated commit/player tree, active/pending native assignment, newly resolved material differences, blocking failures/missing inputs, next executable action/owner and forecast. Test/commit/audit-occurrence totals are not a completion percentage. A missed final-byte checkpoint requires a specific revised forecast, not compressed save/client checks.
+
+### Machine responsibilities and work limits
+
+| Responsibility | Aero15X | Black Glass |
 |---|---|---|
-| 1 — Black Glass: graphical/client | Retain the exact F200fa114/76D4 six joins and ten captures. The standalone official update now passes through2.1.23 with Base and Space Age, executable8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38. All nine incremental stages have exact pre/post CRC verification; r06 isolated version/help probes pass without Steamworks initialization. Primary `build/mir5/recovery/standalone-f210-update-plan-r01/application-r06-custody-readback.json` binds147 members and every resumed instruction receipt; earlier stale-instruction and backup-helper refusals remain separate. Fresh full Steam comparison verifies all20850 files/5356919405 bytes unchanged. Steam is already on experimental and currently2.1.23, while standalone stays pinned for stable qualification. Prepare a bounded standalone two-client identity discovery before the full current F210 client suite. | Actual two-client initial/rejoin/restart, rendered views and applicable API-client observations on exact qualified inputs. Engine readiness and identity discovery alone are not MIR product acceptance. |
-| 2 — Black Glass: performance | R25 full custody and independent analysis now support its exact F200 responsive-menu objective; preserve its cancelled-upload transport adverse, R23 inconclusive result and R24 zero-native refusal. The r06 eight seeds/eight pilots and actual68 scheduled launches now complete; accepted PR1000 reader and independent math agree on the predeclared timing/benchmark-memory limits. Integrate their exact portable evidence, then finish actual UI/save-load/retained-memory comparisons and affected broad-profile stress. | Qualified responsive-menu, active runtime and remaining endpoint verdicts under their original identities. No sample pooling, renamed results or substitution of pilots/headless timing for required endpoints. |
-| 3 — Coordinator/profile owner; Black Glass native | Execute the broad CONT-12 campaign above: newly pinned AAI Base/Space Age upstream/published/current inputs first, then BZ, SE/K2SE, full Py and Bob/Angel closures with admitted combinations and ranked/incident profiles. Reconcile4.7.3 and exact earlier evidence without relabelling it. | Visible per-profile/per-axis native outcomes; missing AAI/BZ/SE coverage cannot hide behind another SIF/Galore or same-profile pass. |
-| 4 — Both, bounded ownership | Close the separately enumerated MIR-version, game-version and four Base/Space Age transition axes, including the new F018 predecessor and forward boundaries, plus cap/carrier, first-upgrade preference, mod addition/removal/readdition and mixed/scripted-state cases for the actual selected profiles. Preserve Imersite/Py and other original adverses and publish intelligible safe-upgrade instructions. | Protected originals and checked earned/current/queued/suspended/foreign state through each supported route; actual upstream refusals retain explicit dispositions and are not successful migrations. |
-| 5 — Aero fixture/review; Black Glass clients | Keep the accepted API1.0 draft3 numeric-count subset accurately documented. Combine independent alpha/beta consumer client observations with the existing strict Library session where possible; optional absence and physical-production witnesses stay separately scoped. | Stable only after applicable real consumers/client checks; no universal-extension claim or speculative platform expansion. |
-| 6 — Aero packaging/reconciliation; Black Glass native | B2/player254 is a retained nine-edition byte freeze; H25/ac46526d/F63C36D4 retains those identical B2 archives with separately bound helpers, while priority2 retains R25/r06 under their original performance inputs. Separately, the fa114/player41b catalogue and SIF records use F2104D5E/F20076D4: F210 Base/Space Age catalogue transitions pass four real gear completions/eight cold reloads, and the full F200/F210 Space Is Fake matrix passes16 load-only cases and four configured source/successor stages with two reloads each. Their complete primary custody is verified. The C563/source1c90/player9e native-input cohort is also retained, not later accepted player treea74d599d. The31 Base/16 Space Age Bob Plates bodies are centrally wired through checked PR1063; working full-Bob Base admission and114-command qualification are explicit above. Freeze the ten normal editions after these concrete corrections are accepted, then run affected native cases without relabelling C563 or earlier results. Current F200 catalogue and historical default/all-science successors remain open; F018 additionally requires its actual MIR1.8 predecessor and engine inputs; the latter are held at admitted preparation while the broad coverage gaps are addressed. Classify exact consumed-input applicability and complete those final-package checks, the retained request/continuity reconciliation and README/docs/changelog work. | Complete current-candidate parity/target/docs/changelog verdicts for every normal edition with exact evidence; old receipts keep their original identities. |
-| 7 — Aero history/build review; Black Glass release | Finish the unified root changelog and native projection, retire duplicate editable histories, verify retained package members and reconcile the best-effort historical inventory. Audit active docs/roadmap/test/build references against their actual authorities; preserve pinned historical facts. Classify material comparison differences in the existing continuity work, with direct/staged/refused migration routes and current client identities explicit. | One authored history, clean package closure, reproducible builds, accurate target/upgrade limits and zero unexplained material release differences. No new assurance framework or claim of universal qualification. |
-| 7 — Release coordinator | After every verdict passes, review the exact accepted source/assets, reconcile main/tag, run administration and separate immutability probes, stage one GitHub draft, verify all assets, publish and anonymously re-download, then deliver identical assets/notes into primary dist. | Verified public v5.0.0. GitHub-only for agents; the maintainer handles Mod Portal. No release before acceptance. |
+| Source/integration | Independent review, disjoint corrections, checked PR merges into the same dev; preserve originals. | Own coherent source batch, candidate selection and release coordination. |
+| Native | Prepare/review fixtures, settings, expectations and readback; no unassigned Factorio launch/library mutation. | Own live native lane, exact engines/libraries, server/clients, saves and restoration. |
+| Performance | Review method, math, applicability and portable results. | Run uninterrupted matched measurements on the declared host. |
+| Docs/builds | History, contributor guidance, package checks and independent candidate rebuild/readback. | Confirm descriptions against packaged behavior and real captures. |
+| Release | Independent readiness/download/inventory review and primary-checkout delivery. | Coordinate accepted promotion, canonical tag and one GitHub publication. Maintainer handles Mod Portal. |
 
-Keep player bytes stable after the demonstrated source correction. Independent fixture/docs work does not require a new player freeze. Any further production change needs a concrete defect, an affected-input review and a new exact artifact identity. Black Glass retains the sole native lane and existing resource/library locks; the attachment's second-host scheduling amendment was proposed, not an authorization to bypass current ownership. Source review, finite reconciliation and package work continue on Aero.
+Keep explicit file ownership, current agent-capacity limits, one active and one pending native assignment, and exclusive direct-library ownership. Planned packets are not dispatched jobs. Do not introduce another machine handoff scheme or competing workload during accepted timings. Handoff through exact GitHub commits/PRs; branch names alone do not identify test inputs. Routine reviewed dev integration needs no repeated permission; protections/checks remain binding.
+
+Each unit names observable outcome, existing requirement/incident IDs, exact inputs, permitted files, independent expectation, simplest bounded change, actual commands, stop condition and native limits. Finish commit/push/checks/review/merge/readback. Native workers stop at their assigned boundary; the coordinator selects the next ready packet.
+
+### Dependency route
+
+| Packet | Needs | Deliverable and exit condition |
+|---|---|---|
+| A — Live state/inputs | Start/resume | Dirt, locks and custody preserved; exact source/jobs/engines/archives and next assignments identified. |
+| B — Source parity/guards | A; C/G preparation can run alongside | Known material deltas have intended dispositions/checks; coherent source batch independently reviewed and required CI green. |
+| C — Executable scenarios | A; actual B contracts | Dependency-valid exact profiles, protected predecessors, independent expectations, usable controllers and resource admission. |
+| D — Candidate freeze | B and required C inputs ready | One exact ten-normal-edition candidate plus selected early cohort; controller/member/byte readback. |
+| E — Catalogue/profiles | D | Current load/research/effect/physical/save results or narrow trusted VER-06 reuse. |
+| F — Transitions | D; C predecessors | Named source/successor/save/two-reload chains, caps/carriers and actual engine/DLC/provider boundaries. |
+| G — Clients/API/runtime | Engine preparation A/C; D for MIR acceptance | Two real clients, personal state, initial/rejoin/restart, rendered views and applicable independent consumers. |
+| H — Performance/stress | D; healthy relevant E/G paths; predeclared workload | Responsive-menu, runtime, UI, load/memory and stress verdicts without scope loss. |
+| I — Final claims/contribution/docs | E/F/G/H and documentation work | Required release verdicts resolved; edition/upgrade/API claims match evidence; no hidden blocker. |
+| J — Promote/tag/publish | I only | Exact accepted main/tag/assets, verified public GitHub release and primary dist. |
+| K — Preserve/follow up | Verified J | Custody retained; actual incidents triaged; authorized5.0.1 selected by defects/measurements. |
+
+Preparation is parallel, heavy execution serial under its owner. Combine assertions when their actual inputs/endpoints fit an existing scenario. Do not wait for every historical input before source work, or score expensive timings on a known-bad catalogue.
+
+### A — Recover live state and inputs
+
+1. Read current AGENTS, specification index and affected contracts. Inspect primary/worktree dirt, exact dev/main/legacy refs, PR heads/checks, live jobs, custody and library ownership. Adopt matching in-progress work. Never reset, clean, rebase shared work or replace frozen inputs.
+2. Verify actual executable/version/hash and official mods. Black Glass reports its standalone2.1.23 update in current integration work; read back exact result/custody before accepting readiness. Preserve Steam/rollback evidence; do not repeat a completed updater or make FacMan a MIR gate.
+3. Bind next profile/settings, dependency archives, MIR ZIP, fixture/controller, protected input save, endpoint, resource budget and output directory. Missing inputs remain missing. Use archives once in their family library and restore selection controls.
+4. Discover publication access early without credential/control changes. Aero's26 October22:13 planning preflight reports Julesc013 access/permissions and mutable releases ready in local custody; it is neither Black Glass authentication nor prepublication acceptance. Rerun administration and the distinct immutability probe in the publisher's real context immediately before publication.
+5. Run development health before output batches. Resolve actual pressure by bounded batches/guarded cleanup, preserving originals, unique refs and adverse receipts. Incomplete scans are lower bounds, not deletion authority.
+
+### B — Complete source parity and current compatibility
+
+1. The coherent F210 combined Bob/Angel, native weapon/Ironclad and graphics-only K2 activation corrections are integrated through PR1082 at5667a6c1, following sulfur PR1076. Retain their original red controls and independently recovered continuation expectations. Source/host integration is complete for that batch; affected native acceptance remains open. Any further source defect still needs independent expectations and green checks before its next freeze.
+2. Close the F018 boundary. Research, ten-target packaging, fresh native preparation and configured-science source are integrated through PR1081/1085/1089/1090. The F100 legacy laser tail/F110+ migration selection is integrated through PR1087 after its current membership correction passed; preserve its original red job. Keep published migration bytes and old F100 characterization separate from new forward-continuity intent.
+3. Use CONT-01/02/12/15 and existing audit/request queues. EA41/C563 corrected totals are old-input difference occurrences, not unique defects/current results. Disposition each material delta as equivalent retained behavior, independently proven old bug correction, omission to implement, invalid comparison or explicit unsupported/unresolved input. Preserve original evidence/request decisions; an unimplemented proposal is not automatically delivered functionality.
+4. Finish settings → selection → construction → preflight → publication and applicable runtime/migration. Test defaults, configured, disabled and meaningful adverse/interaction controls. Cover named AAI/BZ/Py/K2/SE/Bob/Angel/ATAN and incident profiles in valid closures; individual passes do not prove arbitrary composition.
+5. Consume only necessary fields, accept equivalent native defaults and preserve foreign fields/state. Reject unsafe writes before publication. Optional nonactivation needs a proven safe path; never silently discard established research. Refusal is not a startup pass. SCI-UNLOCK-01/Space-Lab-Research-61 retain unknown-reporter limits; a representative case is not exact reproduction.
+6. Keep authored research, the small deterministic Generator and bounded collection outside it. No compiler imports, global unlock solver, recursive world traversal, snapshots or speculative framework/API. Structural changes need a demonstrated defect/duplication boundary; optimizations need measured cost and opposing behavioral checks.
+
+### C — Prepare executable routes
+
+1. Inspect the actual host plan, run narrow affected checks, then required current-head host/CI. Use pinned Lua and necessary historical Git inputs. Host green remains source evidence, not native acceptance; do not restore retired code to satisfy history reads.
+2. Rebind candidate profiles from the frozen inventory while retaining published controls/old identities. Check dependency closure, settings, active-mod observer, fixture/archive hashes. Never substitute moving dev or the stale EA41 successor in the F110→F200 route.
+3. F018 needs exact0.18.47 engine/data, published MIR1.8.0 archive/profile and protected source save. Its published source is5662c66c;1.8.1 targets1.0 and no4.7.01803 exists. Fresh default preparation is not a run. Extend all-science runner/profile only after proving its actual source/laser/vector contract; the old allowlist is not F018 support.
+4. Prepare the actual F018→F100 saved route and F110 rename execution. Preserve inherited stepping obligations; recover supported engine routes instead of promising every direct jump.
+5. Resolve F210 distinct-client identity through existing standalone discovery. Prove two real clients before the full session. Configured synthetic LAN names alone are not join evidence: require the actual distinct nonempty server/client identities. Isolated paths or one client do not pass. Classify controller/environment errors before retrying a long case and retain the first adverse.
+
+### D — Freeze and decide evidence applicability
+
+1. Settle source, relevant settings/default data, master projection, controllers and target records before a heavy candidate run. Run repository/diff/package controls and required CI on committed inputs; independently review ownership/migration/API/engine changes.
+2. Freeze one full commit into a new outside output directory using the existing adapter and early selector. Include ten normal editions plus labelled F006–F012. F001–F005 lack exact loader/schema inputs; no empty/false placeholders.
+3. Aero independently verifies inventory, member paths/bytes, root/info/version/changelog, migration membership, licenses, closure and excluded private/developer files. Retain source/controller/runtime/compression identity and ZIP hashes; accepted package custody must reach primary checkout.
+4. For old evidence compare consumed source/package members, engine/official mods, upstream bytes, settings, save, fixture/controller, scenario and endpoint. Reuse only demonstrably unchanged trusted inputs under their original execution. Shared/uncertain effects widen checks. Changelog-only changes need parser/package/identity review and final smoke, ordinarily not every physical test.
+5. A freeze is not acceptance. Keep failed artifacts/observations. Corrections create new exact inputs with affected checks; never overwrite assets, pool samples, rename results or silently rebuild during publication.
+
+### E — Qualify current catalogues and profiles
+
+| Normal edition | Exact engine floor | Current-package obligation |
+|---|---|---|
+| F210 | 2.1.23 | Primary Base/Space Age, admitted overhauls, catalogue/physical effects, settings/overrides, saved transitions, clients and final performance. |
+| F200 | 2.0.77 | Actual Base/Space Age subset, catalogue/effects, receiver/cargo differences, saves/clients and affected comparison. |
+| F110 | 1.1.110 | Direct/continuation/settings/science subset; earned/current/queued/suspended state, reloads and actual F200 successor. |
+| F100 | 1.0.0 | Retained subset plus legacy laser continuity, saved state and forward rename. |
+| F018 | 0.18.47 | Normal subset; MIR1.8 predecessor; fresh/configured/all-policy and admitted forward continuity. |
+| F017 | 0.17.79 | Retained subset, default/all-science, saved research/queue and supported stepping. |
+| F016 | 0.16.51 | Retained subset/settings, actual saved-state API and supported stepping. |
+| F015 | 0.15.40 | Retained subset/settings, finite/infinite behavior through available APIs and stepping. |
+| F014 | 0.14.23 | Older effect/finite/readback limits; no invented later numeric-level/queue API. |
+| F013 | 0.13.20 | Oldest normal subset, loader/map-init constraints, save/reload and preserved original adverse. |
+
+1. Bind each verdict to final ZIP/consumed inputs through execution or narrow VER-06 reuse. Another edition/host test does not pass the row. Actual capability subsets are intentional, but retained behavior cannot disappear.
+2. Check every applicable declaration's ID, costs/formula, science amounts, prerequisites, effects/recipes, finite boundary, native owner, cap and settings. Share mechanism tests; test distinct recipe/effect/ownership cases and required physical output.
+3. Execute CONT-12 gaps: AAI Base/Space Age, BZ, SE/K2SE, full Py, Bob/Angel individual/combined and ranked/incident cases. Separate upstream-invalid, startup, catalogue, useful research/physical, save and client outcomes. Boot never substitutes for later axes.
+4. Exercise configured science, competing preference, enabled/disabled families and module/productivity/recycling/pipeline/receiver overrides with affected lab/native-owner interactions. Use independent upstream/published expectations and opponents proving no unsafe writes/state loss.
+5. F006–F012 get finite-subset build/layout checks, extraction instructions and honest best-effort limits. Useful available native checks do not displace normal blockers. Missing F001–F005 inputs stay visible without invented support.
+
+### F — Qualify save and migration boundaries
+
+1. Use exact published predecessor archives/settings and immutable originals. MIR4.7 is the normal family predecessor with hash-distinct variants where relevant; F018 is MIR1.8. Never patch a published predecessor or resave a real factory with partial catalogue.
+2. Observe earliest accessible loaded state, after configuration/migration, real successor research, new save, cold reload and second cold reload. Compare earned/next levels, native bonuses, costs/science/recipes, current queue, declared42%/27% work, cap ownership, carriers, scripted offsets, foreign disablement and unrelated state.
+3. Finish the protected [F110→F200 route](../tests/fixtures/f110-f200-transition/README.md): r05 source lab/save/two reloads is scoped evidence only. Rebind stale successor inputs, execute actual successor and preserve earlier failures.
+4. Run F018 predecessor/forward and F100→F110 laser rename after the bridge passes. Observe earned/current/queued work and effects; IDs/builds/source-only runs do not prove continuity.
+5. Execute [F200 finite-cap hop](../tests/fixtures/f200-legacy-cap/README.md): protected source → disabled0.6 intermediate, zero labs/two reloads → reenabled0.7, one real lab/two reloads. Preserve owned state/27% work and foreign-disabled42% queue; do not skip stages or infer rights from a bucket.
+6. Close [K2 Imersite](../tests/fixtures/k2-imersite-transition/README.md) and [K2SE carrier](../tests/fixtures/k2se-imersite-carrier-retention/README.md) source/successor/carrier/reload routes. Material/host/load results do not qualify them; retain the published4.7.2 intermediate adverse instead of manufacturing a fixed MIR4.
+7. Resolve named MIR-version, inherited engine stepping, DLC and provider/settings routes independently. C563 F200→F210 Base remains old-input evidence; later changes need applicability review. Preference ambiguity follows the documented unchanged-settings intermediate, not invented recovery.
+8. Exercise affected force merge/reset, cap tighten/relax/earned-above-cap, scripted foreign offsets and optional disable cleanup. No invented levels or aggregate overwrites. Removing a mod and saving can discard state; never promise remove-save-readd or downgrade as inverse migration. Document direct/staged/refused/unresolved routes.
+
+### G — Qualify clients, Library, runtime and API
+
+1. Run the actual [multiplayer protocol](../tests/fixtures/library-multiplayer/README.md) on exact F210 candidate/engine: two distinct clients, independent EN/DE views, initial/rejoin/server restart, rendered detail/search/filter/scroll/translation, refresh/queue/absence behavior. Joining reconstruction must use its actual lifecycle.
+2. Preserve F200's older six joins/ten captures and limits; review applicability instead of calling them F210/current. Visually inspect screenshots for clipping/misleading content, not merely image existence.
+3. Exercise both independent API consumers: required/optional absence, stage timing, duplicate/invalid prewrite rejection, detached runtime results, useful native/physical effect, save/reload and actual client observation. No private imports/fake clients/universal API claim. Keep draft3's numeric subset explicit until its required acceptance passes.
+4. Run affected agriculture/spoilage/passive-repair lifecycle and multiplayer: external offsets, enable/disable cleanup, exclusions, planting/harvest timing, force/player separation and reload. Native effects require no recurring MIR maintenance; scripted/UI work keeps its own correctness/budget.
+5. Controller/client readiness failure stays a failed preparation, not a MIR session pass. Repair the narrow cause; never substitute headless, multiple forces or relaxed identity checks for two clients.
+
+### H — Qualify performance and stress
+
+1. Predeclare frozen workload/practical tolerances before scored runs. Match published4.7, same-output replay, candidate and valid no-MIR controls on the same host with exact engine/settings/mods/cache/observer. State alternate comparator limits where no-MIR dependencies are invalid.
+2. Keep R25's F200/B2 menu result and r06's actual runtime schedule under original inputs; integrate portable/custody readback accurately. Older passes, pilots, empty plan arrays and admission refusals do not qualify later bytes.
+3. Meet PERF-04: credible substantial menu improvement, targeting at least50% less MIR-added time where measurable, plus no material control/endpoint regression. Report absolute seconds, incremental/direct paired differences, spread and uncertainty; prior roughly90% MIR-added improvement is not90% faster Factorio.
+4. Complete save/load, first Library open/search/filter/refresh/repeated open-close, peak/retained memory and actual runtime/stress. Name metrics precisely; count useful repair/agriculture and timing alongside CPU. Less work is not optimization; cache retention is not automatically leakage.
+5. Vary unrelated recipe domains, active definitions/effects, players/forces and scheduled entities separately. Offline work counts/native timing are different proofs. Separate instrumented/scored packages; stop unrelated heavy work on the measured host.
+6. Regressions return to a bounded defect/measured optimization and affected requalification. No cosmetic rewrite, minification, global cache/scan or weakened threshold. Retain failed experiments; change mechanism before retrying.
+
+### I — Contributor path, documentation and final verdict
+
+1. Prove ordinary clone/fork/feature branch → shared-source edit → affected checks → same-identity local replacement build → root/info/version/changelog inspection → focused upstream PR. No release credentials/library replication/new platform merely for a local ZIP. Explain working-tree versus committed builds and real version options.
+2. Document private title/author/version customization using actual supported commands. Keep local branding changes out of unrelated PRs. SDK owns companion/API examples; tools own packages. TGT-08's clarified continuation guidance does not require uprooting production names or creating generic fork/coexistence machinery.
+3. Guide future continuation authors through info/dependencies, qualified imports/assets, shared prototype/settings/shortcut/command/interface identities, self-mod change detection, native ownership/overrides, migrations and external consumers. Renaming does not transfer earned research; storage is already per-mod. Their refactor/coexistence needs actual tests, not our claim of universal support.
+4. Update README surgically, preserving badges/catalogue/settings/examples/troubleshooting. Route old release diary to existing history/support homes. Verify current settings/research, edition, API and recovery copy; keep transient hashes/counts out of the product opening.
+5. Verify root master/projection/pinned recovery:27 selected MIR1–3 releases, every unique MIR4/MIR5 source release, no duplicated backports/invented dates/false edition history. Run formatter/parser/version checks after final authored edits.
+6. Reconcile CONT-01..17 and original requests against their required outcomes/evidence. New proposals keep actual decisions; one axis does not complete a subject. No unexplained material difference, unqualified promised save route or known startup/synchronization blocker hides in a summary.
+7. Independent final verdict covers parity, profiles, save/client safety, API subset, performance/non-regression, package/delivery identity, exact inputs and honest limits. Update support/notes accordingly. No final tag while a required verdict is open.
+
+### J — Promote, tag, publish and deliver
+
+1. Follow [existing publication steps](development.md#github-publication-after-acceptance). Complete required dev/main promotion without reset/force or altering legacy/history. Read back main; its tree must equal the final qualified tree or differences need explicit review/applicability before release.
+2. Verify frozen inventory without replacing accepted assets. Later package-excluded evidence/docs require separate tree review and proof consumed player/controller/fixture inputs are unchanged; do not rename old executions. Changed consumed inputs get new identity/affected tests.
+3. In real publisher context rerun health, administration and distinct release-immutability probe. Require authenticated permissions and both immutable flags false; never alter credentials/controls to pass. Authorized unsigned annotated tag is allowed if enrolled key is unavailable; checksums are not signatures.
+4. Reconcile existing v5.0.0/release by ID first; preserve unexpected objects. Tag only accepted/read-back main. Never move/suffix a final tag to retry.
+5. Create/resume one draft titled exactly MIR 5.0.0, summary first, concise benefits and tested upgrade/download scope; use a body file/structured argument. Public set derives from inventory: ten normal ZIPs, selected seven best-effort ZIPs and useful sums. Exclude developer inventory/bundles/evidence/upload instructions.
+6. Verify every staged name/label/root/version/length/SHA. Early extraction/native limits and exact engine floors agree across metadata/notes. Reconcile lost upload responses by existing asset/release ID; do not duplicate or automatically replace mismatched bytes.
+7. Recheck source/tag/verdict/inventory/mutable status, publish that same draft ID and read back publication if response is lost. GitHub only for agents; maintainer handles Mod Portal.
+8. Anonymously download every selected public asset without authorization headers; compare length/hash with accepted files/sums. Verify public URL/title/tag/versions/labels. An authenticated draft download is not public readback.
+9. Copy identical ZIPs/sums/notes/useful upload text to primary dist and rehash. Preserve promotion/tag/draft/download and native/save custody. Primary active branch ends clean/equal remote. Remove only completed clean temporary work after readback; keep unique material discoverable.
+
+**Done means the qualified release is public, all selected anonymous downloads are verified and primary-checkout delivery is complete.** Report exact commit/tag/link, qualified edition/profile/transition scope, measured performance, hashes and limitations. Candidate, green CI and draft upload are not completion.
+
+### K — After verified release
+
+Retain released bytes, engines/profiles/settings and protected saves. Triage actual reports against those inputs and safe recovery guidance. Continue authorized5.0.1 on concrete defects, measured costs and useful stress; never defer a known5.0.0 blocker or invent speculative architecture here. Keep contributor guidance current as real consumers expose requirements.
+
+### Existing commands, failure paths and resumption
+
+Use actual entrypoints and machine-local packet values; placeholders are not evidence or executable assignments.
+
+```powershell
+pwsh -NoProfile -File tools/commands/workspace/Test-MIRDevelopmentHealth.ps1
+pwsh -NoProfile -File tests/Test-MIR5HostControls.ps1 -Plan
+pwsh -NoProfile -File tests/Test-MIR5HostControls.ps1 -LuaRuntimeDir <pinned-runtime-dir>
+python -B tools/check_repository.py
+python -B tools/changelog.py
+python -B tests/test_package.py
+python -B tests/test_release.py
+git diff --check
+```
+
+```powershell
+python tools/release.py --source source --revision <full-commit> --output <new-outside-directory> --early-target-record targets/early-editions.json
+python tools/release.py --source source --output <same-directory> --verify
+```
+
+Gameplay/save uses tools/Invoke-NativeFixture.ps1 with ArchiveLibrary, FactorioBin, ProfilePath, FixtureSources, CaseName, OutputRoot and exact ExpectedMIRArchiveSha256; successor input binds InputSavePath/ExpectedInputSaveSha256. Historical/transition flags apply only to declared protocols. Existing fixture READMEs own case-specific parameters. Prototype capture is data-only; multiplayer uses tools/Invoke-MultiplayerFixture.ps1/session helper; timed work uses its actual declared helpers/plans. Read parameters rather than dispatch a guessed command.
+
+| Observation | Required response |
+|---|---|
+| Red source/host/oracle | Classify implementation, independently disproven expectation, seam or environment. Preserve red, fix smallest justified cause, rerun affected checks; no red required-CI merge. |
+| Native startup/effect/state failure | Protect original save/artifact/log; stop unsafe resaving, diagnose independently, fix/requalify changed input. Continue independent ready work. |
+| Resource/library refusal | Inspect actual admission/owner and restore only owned controls. No unchanged retry loop, silent guard lowering or library copies. |
+| Missing engine/archive/save/client | Name exact input/owner and continue independent work; ask only for indispensable unavailable input. |
+| Source advances during freeze | Retain original run/input; queue change separately, compare consumed paths and select requalification. Never swap mid-run. |
+| Unavailable reporter closure | Preserve incident/missing inputs; representative test stays distinct from exact reproduction. |
+| Publication mismatch/lost response | Resolve existing object by ID/hash, preserve unexpected objects; no forced tag, blind duplicate release or early publication. |
+
+Resume by reading this queue/current refs once, inspecting dirt/locks/jobs, adopting matching work and selecting the earliest ready critical-path packet. Continue one concrete outcome, commit/push and update its receipt/queue. Do not reread all transcripts, duplicate campaigns, create another plan/framework or ask routine dev permission. If limits intervene, preserve exact progress/missing input/next command in primary custody without claiming completion.
+
 
 <details>
 <summary>Retained earlier execution notes and exact evidence pointers; use the current queue above for scheduling.</summary>
