@@ -1,0 +1,146 @@
+{
+  "schema": 1,
+  "kind": "MIR5FullBobSpaceAgeMaterial201992NativeChainV1",
+  "status": "selected-seven-family-labs-physical-save-two-reloads-pass",
+  "player_source_commit": "20199257df89dc0fb76e7c86478d7a906def14e3",
+  "controller_commit": "5e63f26656c974ee0bcc852f1b35c368c02a62cd",
+  "player_source_tree": "2a8972193520001cb559962e5675309d5fda523c",
+  "engine": {
+    "sha256": "FE4A1DA30F322A0D0B8AEB3DF7276332222BAAA143E2352569B723E84B2B9060",
+    "file_version": "2.1.23.87750",
+    "product_version": "2.1.23",
+    "base_version": "2.1.23"
+  },
+  "profile": {
+    "path": "tests/profiles/bob-full-space-age-material-gameplay-f210-2123.json",
+    "sha256": "509E8F363DD69C36DE079AEBC86B59B529CC7A809AAF47DD69020F84FEC6BB8E",
+    "loaded_mods_each_stage": [
+      "base@2.1.23",
+      "bobassembly@3.0.2",
+      "bobelectronics@3.0.1",
+      "bobenemies@3.0.1",
+      "bobequipment@3.0.0",
+      "bobgreenhouse@3.0.1",
+      "bobinserters@3.0.0",
+      "boblibrary@3.0.1",
+      "boblogistics@3.0.2",
+      "bobmining@3.0.2",
+      "bobmodules@3.0.1",
+      "bobores@3.0.0",
+      "bobplates@3.0.2",
+      "bobpower@3.0.1",
+      "bobrevamp@3.0.1",
+      "bobtech@3.0.0",
+      "bobvehicleequipment@3.0.0",
+      "bobwarfare@3.0.2",
+      "elevated-rails@2.1.23",
+      "mir-fixture-mir5-active-mods-observer@0.1.0",
+      "mir-fixture-mir5-bob-core-gameplay@0.1.0",
+      "more-infinite-research@5.0.21000",
+      "quality@2.1.23",
+      "recycler@2.1.23",
+      "space-age@2.1.23"
+    ]
+  },
+  "player_sha256": "0D4C19C6A2C9FED241B77A9752132BA452D7357B8B86B1AA6CA7DB7372CD0FE6",
+  "fixtures": [
+    {
+      "name": "mir-fixture-mir5-bob-core-gameplay_0.1.0.zip",
+      "sha256": "4CCB640EE064ECF8DBBE504CD343AB073AB86DE18EC6BB66109374C102EDA7B7"
+    },
+    {
+      "name": "mir-fixture-mir5-active-mods-observer_0.1.0.zip",
+      "sha256": "A15A7D628D66953D2E0C4D4FA288F47CBF9C5678327C7EB3D23ADB5DC78331C0"
+    }
+  ],
+  "native_result_sha256": "3F01C93275F77DDA08CF64060078BF83937B320898AC6A205651B11FD9B9B233",
+  "witnesses": {
+    "profile": "f210-bob-core-no-angel",
+    "selected_families": 7,
+    "named_technologies": 14,
+    "actual_lab_completions": 28,
+    "finite_levels_completed_by_lab": 21,
+    "continuation_levels_completed_by_lab": 7,
+    "science_consumed": {
+      "automation-science-pack": 28,
+      "logistic-science-pack": 20,
+      "chemical-science-pack": 16,
+      "production-science-pack": 8,
+      "space-science-pack": 10,
+      "metallurgic-science-pack": 4
+    },
+    "native_recipe_productivity_per_route": 0.08,
+    "native_effect_per_completed_level": 0.02,
+    "fixture_accelerates_count_and_time": true,
+    "physical_alloy_witness": true,
+    "physical_routes": [
+      "bob-bronze-alloy",
+      "bob-gunmetal-alloy"
+    ],
+    "physical_crafts_per_route": 100,
+    "physical_before_mir_productivity": true,
+    "physical_after_mir_productivity": true,
+    "ordinary_tuning_qualified": false,
+    "candidate_full_catalogue_comparison_required": true,
+    "on_load_read_only": false,
+    "foreign_force_witness_not_claimed": true
+  },
+  "fixture_guarded_output_ranges": {
+    "bronze_before": [
+      500,
+      500
+    ],
+    "gunmetal_before": [
+      1000,
+      1000
+    ],
+    "bronze_after": [
+      535,
+      540
+    ],
+    "gunmetal_after": [
+      1070,
+      1080
+    ],
+    "meaning": "Independent fixture assertion bounds, not separately exported observed totals."
+  },
+  "cold_reloads": [
+    {
+      "ordinal": 1,
+      "save_byte_identical": true,
+      "save_sha256": "DA38C034AD8C913FFD305682BAF86729DEBCEB80707A0154C01035DBF8DA6390",
+      "on_load_read_only": true
+    },
+    {
+      "ordinal": 2,
+      "save_byte_identical": true,
+      "save_sha256": "DA38C034AD8C913FFD305682BAF86729DEBCEB80707A0154C01035DBF8DA6390",
+      "on_load_read_only": true
+    }
+  ],
+  "custody": {
+    "path": "build/mir5/recovery-historical/bob-full-sa-material-gameplay-r01",
+    "manifest_sha256": "11995F7123672071562174F74CBA85703C23BB39734F4FDB828DC8B033CA72B3",
+    "original_and_primary_members_verified": 22,
+    "bytes": 1506732,
+    "mismatches": []
+  },
+  "restoration": {
+    "native_control_status": "restored-direct-library-controls",
+    "original_receipt_sha256": "92FBB4BCE9486CABE93EADFB28A0FA8B16003079AE1CBBFF7728EE7B0C295959",
+    "supplemental_readback_sha256": "1D07232A80FEB68E1FFFAA41535B6518EB63B6518249C76DD9672C836447E232",
+    "note": "Original optional native_library_controls field remains null from a receipt-only field-name typo; actual native result and separate supplemental readback preserve restored-direct-library-controls. Original receipt is unchanged."
+  },
+  "raw_receipts": {
+    "path": "spec/evidence/bob-full-sa-material-201992-native-receipts.json.gz",
+    "gzip_bytes": 33461,
+    "gzip_sha256": "1FE2C8FCFDDB3B112CF2E42971EE6D2D4DCDBB28FC016E265B26760FC3CF4DDF",
+    "uncompressed_sha256": "87E59C93BF1D8FAD863294BAE2934A06B8848452B6C9EC49EC34A9CFF4E0BF9D",
+    "members": 7
+  },
+  "limits": [
+    "The unchanged sparse-Bob fixture marker retains profile=f210-bob-core-no-angel; the exact full-Bob closure is established independently by all four native loaded-selection records and the profile hash, not inferred from that marker.",
+    "The five additional bronze/copper-tungsten/gunmetal/invar/nitinol level1/4 pairs are absent from q006 B6. Their independent native applicability and physical witness do not create published-output equality.",
+    "No whole-modset qualification, full-catalogue-current capture, ordinary tuning, foreign-force, migration, client, scored performance or release acceptance."
+  ]
+}
