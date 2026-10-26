@@ -12,6 +12,7 @@ import zipfile
 TARGET_RECORD = "targets/editions.json"
 REQUIRE = re.compile(r'''\brequire\s*\(\s*["']([^"']+)["']\s*\)''')
 ENTRYPOINTS = ("data.lua", "settings.lua", "data-final-fixes.lua", "control.lua")
+F210_ONLY_MIGRATION = "migrations/more-infinite-research_4.7.0.json"
 
 
 def digest(data):
@@ -251,6 +252,11 @@ def members(source, version=None, committed_files=None, target=None, editions=No
         if editions is None:
             editions, _ = read_editions(source, target_record=selected_record)
         committed_files = select_edition(committed_files, info, target, editions)
+        # Published 4.7.3 shipped the K2 Imersite rename only in its F210
+        # edition.  Preserve that migration-name history for the other eight
+        # selected player packages without narrowing generic fixture archives.
+        if target != "f210":
+            committed_files.pop(F210_ONLY_MIGRATION, None)
     elif "presentation/changelog/current.txt" in committed_files:
         encoded = info["version"].rsplit(".", 1)[-1]
         if not re.fullmatch(r"[0-9]{5}", encoded):

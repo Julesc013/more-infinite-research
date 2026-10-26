@@ -15,6 +15,17 @@ pack = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(pack)
 
 
+# `targets-baseline.json` records the historical membership and the nine local
+# published 4.7.3 archives confirm these exact payload hashes.  The common
+# migrations shipped everywhere; the Imersite rename was F210-only.
+PUBLISHED_473_SHARED_MIGRATION_SHA256 = {
+    "migrations/more-infinite-research_2.0.5.json": "07A2759B963321A87B1047029AE426C7B2784033BC7C4F899D2640C037C5EEE2",
+    "migrations/more-infinite-research_2.1.0.json": "F427B215D77BC86608010ADC1D0D1A1C98BE61F0D7140EF716D77E46DAB8092D",
+}
+F210_ONLY_MIGRATION = "migrations/more-infinite-research_4.7.0.json"
+PUBLISHED_473_F210_MIGRATION_SHA256 = "0980B0B6F1675F6827A8E4151F778143EA74C9C6C3440CC2318129DBCE63C379"
+
+
 class PackageTests(unittest.TestCase):
     @staticmethod
     def _git(repository, *arguments):
@@ -82,10 +93,32 @@ class PackageTests(unittest.TestCase):
                 self.assertEqual(any(path.startswith("adapters/") for path in files), reduced)
                 self.assertIn("api/v1/data.lua", files)
                 self.assertIn("api/v1/runtime.lua", files)
-                for migration in ("2.0.5", "2.1.0", "4.7.0"):
-                    path = "migrations/more-infinite-research_" + migration + ".json"
-                    self.assertIn(path, files)
-                    self.assertEqual(files[path], (source / path).read_bytes())
+                expected_migrations = dict(PUBLISHED_473_SHARED_MIGRATION_SHA256)
+                if target == "f210":
+                    expected_migrations[F210_ONLY_MIGRATION] = PUBLISHED_473_F210_MIGRATION_SHA256
+                actual_migrations = {path for path in files if path.startswith("migrations/")}
+                self.assertEqual(actual_migrations, set(expected_migrations))
+                for path, expected_sha256 in expected_migrations.items():
+                    self.assertEqual(hashlib.sha256(files[path]).hexdigest().upper(), expected_sha256)
+
+                # Target selection may remove the one published F210-only
+                # migration, but must otherwise preserve the selected player
+                # artifact byte-for-byte.
+                source_files = {
+                    path.relative_to(source).as_posix(): path.read_bytes()
+                    for path in source.rglob("*")
+                    if path.is_file() and pack.admitted(path.relative_to(source).as_posix())
+                }
+                editions, _ = pack.read_editions(source)
+                unfiltered_info = json.loads(source_files["info.json"])
+                unfiltered = pack.select_edition(source_files, unfiltered_info, target, editions)
+                unfiltered["info.json"] = (json.dumps(unfiltered_info, ensure_ascii=False, indent=2) + "\n").encode("utf-8")
+                if target == "f210":
+                    self.assertEqual(files, unfiltered)
+                else:
+                    self.assertEqual(set(unfiltered) - set(files), {F210_ONLY_MIGRATION})
+                    self.assertEqual({path: value for path, value in files.items() if path != F210_ONLY_MIGRATION},
+                                     {path: value for path, value in unfiltered.items() if path != F210_ONLY_MIGRATION})
                 for name in files:
                     self.assertFalse(name.startswith(("source/", "targets/", "tests/", "spec/")))
 
