@@ -135,8 +135,10 @@ class ScienceTests(unittest.TestCase):
           local messages, options = {}, {["mir-lab-incompatibility-policy"]="skip"}
           local raw = raw_with({"automation-science-pack","logistic-science-pack"},
             {restricted={"automation-science-pack"}})
+          local row = technology({{"logistic-science-pack",1}}, {"authored gate"})
+          row.effects = {}
           local function run()
-            return science.apply_family({technology({{"logistic-science-pack",1}})}, nil, {
+            return science.apply_family({row}, nil, {
               options=options, raw=raw, target={id="f210"}, mods={},
               log=function(message) messages[#messages+1] = message end})
           end
@@ -145,7 +147,74 @@ class ScienceTests(unittest.TestCase):
           options["mir-debug-generation-report"] = true
           run()
           assert(#messages == 1 and messages[1] ==
-            "[more-infinite-research] mir-owned: disabled (lab-incompatible-skip)")
+            "[more-infinite-research] mir-owned: disabled (lab-incompatible-skip)"
+              .. " science=logistic-science-pack:1 prerequisites=authored\\sgate effects=0"
+              .. " science_outcome=lab-incompatible-skip lab_outcome=incompatible-skip icon=none")
+        ''')
+
+    def test_generation_report_formats_current_full_reduced_and_optional_native_fields(self):
+        self.lua.execute(r'''
+          local messages = {}
+          local raw = raw_with({"automation-science-pack","logistic-science-pack"},
+            {whole={"automation-science-pack","logistic-science-pack"}})
+          local full = technology({{"automation-science-pack",2},{"logistic-science-pack",1}},
+            {"authored gate","beta=anchor"})
+          full.effects = {{type="character-running-speed", modifier=.1}}
+          full.icon = "__base__/graphics/icons/alpha beta=gamma,delta\\epsilon.png"
+          science.apply_family({full}, nil, {options={["mir-debug-generation-report"]=true}, raw=raw,
+            target={id="f210"}, mods={}, log=function(message) messages[#messages+1] = message end})
+          assert(messages[1] == "[more-infinite-research] mir-owned: available (configured)"
+            .. " science=automation-science-pack:2,logistic-science-pack:1"
+            .. " prerequisites=authored\\sgate,beta\\=anchor effects=1"
+            .. " science_outcome=configured lab_outcome=full"
+            .. " icon=__base__/graphics/icons/alpha\\sbeta\\=gamma\\,delta\\\\epsilon.png")
+
+          messages = {}
+          raw = raw_with({"automation-science-pack","logistic-science-pack"},
+            {restricted={"automation-science-pack"}})
+          local reduced = technology({{"automation-science-pack",1},{"logistic-science-pack",1}})
+          reduced.effects = {}
+          reduced.icons = {{icon="__base__/graphics/icons/technology/lab-research.png"}}
+          science.apply_family({reduced}, nil, {options={["mir-debug-generation-report"]=true}, raw=raw,
+            target={id="f210"}, mods={}, log=function(message) messages[#messages+1] = message end})
+          assert(messages[1] == "[more-infinite-research] mir-owned: available (lab-reduced)"
+            .. " science=automation-science-pack:1 prerequisites=none effects=0"
+            .. " science_outcome=lab-reduced lab_outcome=reduced"
+            .. " icon=__base__/graphics/icons/technology/lab-research.png")
+        ''')
+
+    def test_generation_report_handles_malformed_and_unavailable_science_sources(self):
+        self.lua.execute(r'''
+          local messages = {}
+          local malformed = technology({{name="automation-science-pack", amount=0}}, {"authored gate"})
+          malformed.effects = {}
+          local reports = science.apply_family({malformed}, nil, {
+            options={["mir-debug-generation-report"]=true}, raw=raw_with({}, {}), target={id="f210"}, mods={},
+            log=function(message) messages[#messages+1] = message end})
+          assert(reports[1].enabled == false and reports[1].reason == "invalid-science-ingredient")
+          assert(messages[1] == "[more-infinite-research] mir-owned: disabled (invalid-science-ingredient)"
+            .. " science=invalid prerequisites=authored\\sgate effects=0"
+            .. " science_outcome=invalid-science-ingredient lab_outcome=not-evaluated icon=none")
+
+          messages = {}
+          local raw = raw_with({"automation-science-pack","logistic-science-pack","chemical-science-pack",
+            "production-science-pack","military-science-pack","utility-science-pack"},
+            {whole={"automation-science-pack","logistic-science-pack","chemical-science-pack",
+              "production-science-pack","military-science-pack","utility-science-pack"}})
+          install_sources(raw, false)
+          raw.recipe["logistic-science-pack"] = nil
+          local source_missing = technology({{"automation-science-pack",1}}, {"authored"})
+          source_missing.effects = {}
+          reports = science.apply_family({source_missing}, nil, {
+            options={["mir-debug-generation-report"]=true,["mir-science-pack-ingredient-policy"]="all-official"},
+            raw=raw, target={id="f210"}, mods={}, log=function(message) messages[#messages+1] = message end})
+          assert(reports[1].enabled == false and reports[1].reason ==
+            "invalid-science-source:logistic-science-pack:missing-recipe:logistic-science-pack")
+          assert(messages[1] == "[more-infinite-research] mir-owned: disabled"
+            .. " (invalid-science-source:logistic-science-pack:missing-recipe:logistic-science-pack)"
+            .. " science=automation-science-pack:1 prerequisites=authored effects=0"
+            .. " science_outcome=invalid-science-source\\:logistic-science-pack\\:missing-recipe\\:logistic-science-pack"
+            .. " lab_outcome=not-evaluated icon=none")
         ''')
 
     def test_target_bindings_keep_historical_aliases_and_named_end_gates(self):
