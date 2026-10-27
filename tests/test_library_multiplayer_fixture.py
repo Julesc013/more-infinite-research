@@ -1005,7 +1005,7 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
           $ast=[Management.Automation.Language.Parser]::ParseFile($env:MIR_TEST_WRAPPER,[ref]$tokens,[ref]$errors)
           if($errors.Count){throw $errors[0].Message}
           function Assert-Session([bool]$Condition,[string]$Message){if(-not$Condition){throw $Message}}
-          foreach($name in @('New-StandaloneF210ApiConsumerSourceProjection','Get-StandaloneIdentityFixtureSources')){
+          foreach($name in @('Get-StandaloneF210ApiConsumerRawGitMemberBytes','New-StandaloneF210ApiConsumerSourceProjection','Get-StandaloneIdentityFixtureSources')){
             $node=@($ast.FindAll({param($candidate) $candidate -is [Management.Automation.Language.FunctionDefinitionAst] -and $candidate.Name -ceq $name},$true))
             if($node.Count-ne1){throw "standalone API projection function is absent or ambiguous: $name"}
             Invoke-Expression $node[0].Extent.Text
@@ -1020,12 +1020,12 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
             }finally{$stream.Dispose()}
             return $archive
           }
-          $root=$env:MIR_TEST_WORK;$repo=$env:MIR_TEST_REPO;$library=Join-Path $root 'library';$null=New-Item -ItemType Directory -Path $library
+          $root=$env:MIR_TEST_WORK;$repo=$env:MIR_TEST_REPO;$revision=@(& git -C $repo rev-parse --verify 'HEAD^{commit}');if($LASTEXITCODE-ne0-or$revision.Count-ne1){throw 'test source revision is unavailable'};$library=Join-Path $root 'library';$null=New-Item -ItemType Directory -Path $library
           $alphaSource=Join-Path $repo 'tests/fixtures/api-alpha';$betaSource=Join-Path $repo 'tests/fixtures/api-beta'
           $alphaArchive=New-SourceArchive -Library $library -Source $alphaSource -Members @('control.lua','data.lua','graphics/icon.png','info.json')
           $betaArchive=New-SourceArchive -Library $library -Source $betaSource -Members @('control.lua','data-final-fixes.lua','graphics/icon.png','info.json')
-          $alpha=New-StandaloneF210ApiConsumerSourceProjection -RepoRoot $repo -ArchiveLibrary $library -OutputRoot (Join-Path $root 'alpha') -FixtureName 'mir-fixture-mir5-api-alpha' -ExpectedArchiveSha256 (Get-MIRImmutableInputSha256 $alphaArchive)
-          $beta=New-StandaloneF210ApiConsumerSourceProjection -RepoRoot $repo -ArchiveLibrary $library -OutputRoot (Join-Path $root 'beta') -FixtureName 'mir-fixture-mir5-api-beta' -ExpectedArchiveSha256 (Get-MIRImmutableInputSha256 $betaArchive)
+          $alpha=New-StandaloneF210ApiConsumerSourceProjection -RepoRoot $repo -ArchiveLibrary $library -OutputRoot (Join-Path $root 'alpha') -FixtureName 'mir-fixture-mir5-api-alpha' -ExpectedArchiveSha256 (Get-MIRImmutableInputSha256 $alphaArchive) -SourceRevision $revision[0]
+          $beta=New-StandaloneF210ApiConsumerSourceProjection -RepoRoot $repo -ArchiveLibrary $library -OutputRoot (Join-Path $root 'beta') -FixtureName 'mir-fixture-mir5-api-beta' -ExpectedArchiveSha256 (Get-MIRImmutableInputSha256 $betaArchive) -SourceRevision $revision[0]
           if(
             $alpha.members.Count -ne 4 -or
             $beta.members.Count -ne 4 -or
@@ -1040,13 +1040,87 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
           function Assert-Rejects([string]$Name,[scriptblock]$Block){$rejected=$false;try{&$Block}catch{$rejected=$true};if(-not$rejected){throw "standalone API projection accepted opponent: $Name"}}
           Assert-Rejects 'unprojected API object' {Get-StandaloneIdentityFixtureSources -Sources @($canonicalLibrary,$canonicalObserver,$alphaSource,$betaSource) -LibraryFixtureSource $canonicalLibrary -StagedLibraryFixtureSource $canonicalLibrary -StagedObserverSource $canonicalObserver -RepoRoot $repo -StagedApiConsumerSources @{'mir-fixture-mir5-api-alpha'=$alpha;'mir-fixture-mir5-api-beta'=$beta}|Out-Null}
           $extraRepo=Join-Path $root 'extra-repository';$extraSource=Join-Path $extraRepo 'tests/fixtures/api-alpha';$null=New-Item -ItemType Directory -Path (Split-Path -Parent $extraSource) -Force;Copy-Item -LiteralPath $alphaSource -Destination $extraSource -Recurse;[IO.File]::WriteAllText((Join-Path $extraSource 'extra.lua'),'return {}',[Text.UTF8Encoding]::new($false))
-          Assert-Rejects 'extra runtime member' {New-StandaloneF210ApiConsumerSourceProjection -RepoRoot $extraRepo -ArchiveLibrary $library -OutputRoot (Join-Path $root 'extra-output') -FixtureName 'mir-fixture-mir5-api-alpha' -ExpectedArchiveSha256 (Get-MIRImmutableInputSha256 $alphaArchive)|Out-Null}
+          Assert-Rejects 'extra runtime member' {New-StandaloneF210ApiConsumerSourceProjection -RepoRoot $extraRepo -ArchiveLibrary $library -OutputRoot (Join-Path $root 'extra-output') -FixtureName 'mir-fixture-mir5-api-alpha' -ExpectedArchiveSha256 (Get-MIRImmutableInputSha256 $alphaArchive) -SourceRevision $revision[0]|Out-Null}
           $driftRepo=Join-Path $root 'drift-repository';$driftSource=Join-Path $driftRepo 'tests/fixtures/api-beta';$null=New-Item -ItemType Directory -Path (Split-Path -Parent $driftSource) -Force;Copy-Item -LiteralPath $betaSource -Destination $driftSource -Recurse;$driftInfo=Get-Content -LiteralPath (Join-Path $driftSource 'info.json') -Raw|ConvertFrom-Json -AsHashtable;$driftInfo.factorio_version='2.0';[IO.File]::WriteAllText((Join-Path $driftSource 'info.json'),($driftInfo|ConvertTo-Json -Depth 8)+[Environment]::NewLine,[Text.UTF8Encoding]::new($false))
-          Assert-Rejects 'F210 metadata drift' {New-StandaloneF210ApiConsumerSourceProjection -RepoRoot $driftRepo -ArchiveLibrary $library -OutputRoot (Join-Path $root 'drift-output') -FixtureName 'mir-fixture-mir5-api-beta' -ExpectedArchiveSha256 (Get-MIRImmutableInputSha256 $betaArchive)|Out-Null}
-          Assert-Rejects 'stale beta archive' {New-StandaloneF210ApiConsumerSourceProjection -RepoRoot $repo -ArchiveLibrary $library -OutputRoot (Join-Path $root 'stale-output') -FixtureName 'mir-fixture-mir5-api-beta' -ExpectedArchiveSha256 ('A'*64)|Out-Null}
+          Assert-Rejects 'F210 metadata drift' {New-StandaloneF210ApiConsumerSourceProjection -RepoRoot $driftRepo -ArchiveLibrary $library -OutputRoot (Join-Path $root 'drift-output') -FixtureName 'mir-fixture-mir5-api-beta' -ExpectedArchiveSha256 (Get-MIRImmutableInputSha256 $betaArchive) -SourceRevision $revision[0]|Out-Null}
+          Assert-Rejects 'stale beta archive' {New-StandaloneF210ApiConsumerSourceProjection -RepoRoot $repo -ArchiveLibrary $library -OutputRoot (Join-Path $root 'stale-output') -FixtureName 'mir-fixture-mir5-api-beta' -ExpectedArchiveSha256 ('A'*64) -SourceRevision $revision[0]|Out-Null}
           'PASS standalone API runtime projections and archive guards'
         '''
         with tempfile.TemporaryDirectory(prefix="mir5-standalone-api-projection-") as work:
+            result = subprocess.run(
+                ["pwsh", "-NoLogo", "-NoProfile", "-Command", script], capture_output=True, text=True,
+                env=dict(os.environ, MIR_TEST_WRAPPER=str(WRAPPER), MIR_TEST_REPO=str(ROOT), MIR_TEST_WORK=work,
+                         MIR_TEST_LIBRARY_ACTIVATION=str(ROOT / "tools/lib/compatibility/LibraryActivation.ps1")), check=False,
+            )
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+
+    def test_standalone_f210_api_consumers_project_selected_raw_git_bytes_despite_crlf_worktree(self):
+        script = r'''
+          $ErrorActionPreference='Stop'; Set-StrictMode -Version Latest
+          function Get-MIRImmutableInputSha256([string]$Path){(Get-FileHash -LiteralPath $Path -Algorithm SHA256).Hash.ToUpperInvariant()}
+          function Assert-Session([bool]$Condition,[string]$Message){if(-not$Condition){throw $Message}}
+          function Assert-Rejects([string]$Name,[scriptblock]$Block){$rejected=$false;try{&$Block}catch{$rejected=$true};if(-not$rejected){throw "raw Git projection accepted opponent: $Name"}}
+          function Get-GitBytes([string]$Repo,[string]$Revision,[string]$Path){
+            $start=[Diagnostics.ProcessStartInfo]::new();$start.FileName='git';$start.UseShellExecute=$false;$start.RedirectStandardOutput=$true;$start.RedirectStandardError=$true
+            foreach($argument in @('-C',$Repo,'show',($Revision+':'+$Path))){$null=$start.ArgumentList.Add($argument)}
+            $process=[Diagnostics.Process]::new();$process.StartInfo=$start;if(-not$process.Start()){throw "raw Git test read did not start: $Path"}
+            $output=[IO.MemoryStream]::new();try{$process.StandardOutput.BaseStream.CopyTo($output);$null=$process.StandardError.ReadToEnd();$process.WaitForExit();if($process.ExitCode-ne0){throw "raw Git test member is absent: $Path"}}finally{$process.Dispose()}
+            return ,$output.ToArray()
+          }
+          $tokens=$null;$errors=$null;$ast=[Management.Automation.Language.Parser]::ParseFile($env:MIR_TEST_WRAPPER,[ref]$tokens,[ref]$errors);if($errors.Count){throw $errors[0].Message}
+          . $env:MIR_TEST_LIBRARY_ACTIVATION
+          foreach($name in @('Resolve-StandaloneF210ApiConsumerSourceRevision','Get-StandaloneF210ApiConsumerRawGitMemberBytes','New-StandaloneF210ApiConsumerSourceProjection')){
+            $node=@($ast.FindAll({param($candidate) $candidate -is [Management.Automation.Language.FunctionDefinitionAst] -and $candidate.Name -ceq $name},$true));if($node.Count-ne1){throw "raw Git projection function is absent or ambiguous: $name"};Invoke-Expression $node[0].Extent.Text
+          }
+          $root=$env:MIR_TEST_WORK;$repo=$env:MIR_TEST_REPO;$sourceRevision=@(& git -C $repo rev-parse --verify 'HEAD^{commit}');if($LASTEXITCODE-ne0-or$sourceRevision.Count-ne1){throw 'source test revision is unavailable'}
+          $fixtures=@{
+            'api-alpha'=@('control.lua','data.lua','graphics/icon.png','info.json','info-f200.json')
+            'api-beta'=@('control.lua','data-final-fixes.lua','graphics/icon.png','info.json','info-f200.json')
+          }
+          function New-FixtureGitRepository([string]$Destination,[scriptblock]$Mutation){
+            foreach($fixture in $fixtures.Keys){foreach($member in $fixtures[$fixture]){$destinationPath=Join-Path $Destination ('tests/fixtures/'+$fixture+'/'+$member);$null=New-Item -ItemType Directory -Path (Split-Path -Parent $destinationPath) -Force;[IO.File]::WriteAllBytes($destinationPath,(Get-GitBytes $repo $sourceRevision[0] ('tests/fixtures/'+$fixture+'/'+$member)))}}
+            if($null-ne$Mutation){&$Mutation $Destination}
+            & git -C $Destination init --quiet;if($LASTEXITCODE-ne0){throw 'temporary fixture repository initialization failed'}
+            & git -C $Destination add tests;if($LASTEXITCODE-ne0){throw 'temporary fixture repository add failed'}
+            & git -C $Destination -c user.name=MIRFixtureTest -c user.email=mir-fixture-test@example.invalid commit --quiet -m fixture;if($LASTEXITCODE-ne0){throw 'temporary fixture repository commit failed'}
+            $revision=@(& git -C $Destination rev-parse --verify 'HEAD^{commit}');if($LASTEXITCODE-ne0-or$revision.Count-ne1){throw 'temporary fixture revision is unavailable'}
+            return [string]$revision[0]
+          }
+          function New-GitSourceArchive([string]$RepoRoot,[string]$Revision,[string]$Library,[string]$FixtureName){
+            $shortName=if($FixtureName-ceq'mir-fixture-mir5-api-alpha'){'api-alpha'}else{'api-beta'}
+            $members=if($shortName-ceq'api-alpha'){@('control.lua','data.lua','graphics/icon.png','info.json')}else{@('control.lua','data-final-fixes.lua','graphics/icon.png','info.json')}
+            $info=[Text.Encoding]::UTF8.GetString((Get-GitBytes $RepoRoot $Revision ('tests/fixtures/'+$shortName+'/info.json')))|ConvertFrom-Json -AsHashtable
+            $archive=Join-Path $Library ($info.name+'_'+$info.version+'.zip');$stream=[IO.File]::Open($archive,[IO.FileMode]::CreateNew,[IO.FileAccess]::Write,[IO.FileShare]::None)
+            try{$zip=[IO.Compression.ZipArchive]::new($stream,[IO.Compression.ZipArchiveMode]::Create,$false);try{foreach($member in $members){$entry=$zip.CreateEntry($info.name+'_'+$info.version+'/'+$member,[IO.Compression.CompressionLevel]::Optimal);$entryStream=$entry.Open();try{$raw=Get-GitBytes $RepoRoot $Revision ('tests/fixtures/'+$shortName+'/'+$member);$entryStream.Write($raw,0,$raw.Length)}finally{$entryStream.Dispose()}}}finally{$zip.Dispose()}}finally{$stream.Dispose()}
+            return $archive
+          }
+          function Convert-TextMembersToCrlf([string]$RepoRoot){
+            foreach($fixture in $fixtures.Keys){foreach($member in $fixtures[$fixture]){if($member-notmatch'\.(lua|json)$'){continue};$path=Join-Path $RepoRoot ('tests/fixtures/'+$fixture+'/'+$member);$text=[Text.Encoding]::UTF8.GetString([IO.File]::ReadAllBytes($path));if($text.Contains("`r")){throw "fixture source was not raw LF: $fixture/$member"};[IO.File]::WriteAllText($path,$text.Replace("`n","`r`n"),[Text.UTF8Encoding]::new($false))}}
+          }
+          $baselineRepo=Join-Path $root 'baseline-repository';$baselineRevision=New-FixtureGitRepository $baselineRepo $null
+          $resolvedRevision=Resolve-StandaloneF210ApiConsumerSourceRevision -RepoRoot $baselineRepo;if($resolvedRevision-cne$baselineRevision){throw 'API consumers did not resolve one committed source revision'}
+          $library=Join-Path $root 'library';$null=New-Item -ItemType Directory -Path $library
+          $alphaArchive=New-GitSourceArchive $baselineRepo $baselineRevision $library 'mir-fixture-mir5-api-alpha';$betaArchive=New-GitSourceArchive $baselineRepo $baselineRevision $library 'mir-fixture-mir5-api-beta'
+          Convert-TextMembersToCrlf $baselineRepo
+          $legacy=Join-Path $root 'legacy-working-tree-alpha';$null=New-Item -ItemType Directory -Path $legacy
+          foreach($member in @('control.lua','data.lua','graphics/icon.png','info.json')){$destination=Join-Path $legacy $member;$null=New-Item -ItemType Directory -Path (Split-Path -Parent $destination) -Force;[IO.File]::Copy((Join-Path $baselineRepo ('tests/fixtures/api-alpha/'+$member)),$destination,$false)}
+          Assert-Rejects 'legacy CRLF working-tree projection' {Assert-MIRLibraryFixtureArchive -Archive $alphaArchive -SourceDirectory $legacy}
+          $alpha=New-StandaloneF210ApiConsumerSourceProjection -RepoRoot $baselineRepo -ArchiveLibrary $library -OutputRoot (Join-Path $root 'alpha') -FixtureName 'mir-fixture-mir5-api-alpha' -ExpectedArchiveSha256 (Get-FileHash -LiteralPath $alphaArchive -Algorithm SHA256).Hash -SourceRevision $resolvedRevision
+          $beta=New-StandaloneF210ApiConsumerSourceProjection -RepoRoot $baselineRepo -ArchiveLibrary $library -OutputRoot (Join-Path $root 'beta') -FixtureName 'mir-fixture-mir5-api-beta' -ExpectedArchiveSha256 (Get-FileHash -LiteralPath $betaArchive -Algorithm SHA256).Hash -SourceRevision $resolvedRevision
+          foreach($fixture in @($alpha,$beta)){if($fixture.source_revision-cne$resolvedRevision-or$fixture.members.Count-ne4){throw 'raw Git projection did not retain its selected source revision and four runtime members'};Assert-MIRLibraryFixtureArchive -Archive $fixture.archive -SourceDirectory $fixture.source}
+          foreach($fixtureSpec in @(@{name='mir-fixture-mir5-api-alpha';short='api-alpha';projection=$alpha},@{name='mir-fixture-mir5-api-beta';short='api-beta';projection=$beta})){foreach($member in $fixtureSpec.projection.members){$expected=[Convert]::ToHexString([Security.Cryptography.SHA256]::HashData((Get-GitBytes $baselineRepo $resolvedRevision ('tests/fixtures/'+$fixtureSpec.short+'/'+$member.path))));$actual=(Get-FileHash -LiteralPath (Join-Path $fixtureSpec.projection.source $member.path) -Algorithm SHA256).Hash.ToUpperInvariant();if($actual-cne$expected){throw "raw Git member bytes differ: $($fixtureSpec.short)/$($member.path)"}}}
+          $validAlphaHash=(Get-FileHash -LiteralPath $alphaArchive -Algorithm SHA256).Hash;$validBetaHash=(Get-FileHash -LiteralPath $betaArchive -Algorithm SHA256).Hash
+          $tamperedRepo=Join-Path $root 'tampered-repository';$tamperedRevision=New-FixtureGitRepository $tamperedRepo {param($path)[IO.File]::AppendAllText((Join-Path $path 'tests/fixtures/api-alpha/control.lua'),'-- changed',[Text.UTF8Encoding]::new($false))}
+          Assert-Rejects 'tampered committed selected member' {New-StandaloneF210ApiConsumerSourceProjection -RepoRoot $tamperedRepo -ArchiveLibrary $library -OutputRoot (Join-Path $root 'tampered-output') -FixtureName 'mir-fixture-mir5-api-alpha' -ExpectedArchiveSha256 $validAlphaHash -SourceRevision $tamperedRevision|Out-Null}
+          $missingRepo=Join-Path $root 'missing-repository';$missingRevision=New-FixtureGitRepository $missingRepo {param($path)Remove-Item -LiteralPath (Join-Path $path 'tests/fixtures/api-alpha/data.lua')}
+          Assert-Rejects 'missing committed runtime member' {New-StandaloneF210ApiConsumerSourceProjection -RepoRoot $missingRepo -ArchiveLibrary $library -OutputRoot (Join-Path $root 'missing-output') -FixtureName 'mir-fixture-mir5-api-alpha' -ExpectedArchiveSha256 $validAlphaHash -SourceRevision $missingRevision|Out-Null}
+          $extraRepo=Join-Path $root 'extra-repository';$extraRevision=New-FixtureGitRepository $extraRepo {param($path)[IO.File]::WriteAllText((Join-Path $path 'tests/fixtures/api-beta/extra.lua'),'return {}',[Text.UTF8Encoding]::new($false))}
+          Assert-Rejects 'extra committed runtime member' {New-StandaloneF210ApiConsumerSourceProjection -RepoRoot $extraRepo -ArchiveLibrary $library -OutputRoot (Join-Path $root 'extra-output') -FixtureName 'mir-fixture-mir5-api-beta' -ExpectedArchiveSha256 $validBetaHash -SourceRevision $extraRevision|Out-Null}
+          $metadataRepo=Join-Path $root 'metadata-repository';$metadataRevision=New-FixtureGitRepository $metadataRepo {param($path)$metadata=Join-Path $path 'tests/fixtures/api-beta/info.json';$text=[Text.Encoding]::UTF8.GetString([IO.File]::ReadAllBytes($metadata));[IO.File]::WriteAllText($metadata,$text.Replace('"factorio_version": "2.1"','"factorio_version": "2.0"'),[Text.UTF8Encoding]::new($false))}
+          Assert-Rejects 'committed F210 metadata drift' {New-StandaloneF210ApiConsumerSourceProjection -RepoRoot $metadataRepo -ArchiveLibrary $library -OutputRoot (Join-Path $root 'metadata-output') -FixtureName 'mir-fixture-mir5-api-beta' -ExpectedArchiveSha256 $validBetaHash -SourceRevision $metadataRevision|Out-Null}
+          'PASS raw Git API consumer projection and CRLF/tamper/membership/metadata opponents'
+        '''
+        with tempfile.TemporaryDirectory(prefix="mir5-standalone-api-raw-git-") as work:
             result = subprocess.run(
                 ["pwsh", "-NoLogo", "-NoProfile", "-Command", script], capture_output=True, text=True,
                 env=dict(os.environ, MIR_TEST_WRAPPER=str(WRAPPER), MIR_TEST_REPO=str(ROOT), MIR_TEST_WORK=work,
