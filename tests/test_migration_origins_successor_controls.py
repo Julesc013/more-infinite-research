@@ -371,7 +371,7 @@ class MigrationOriginSuccessorControls(unittest.TestCase):
                           "persistence_claim": False}, f200_profile["fixture_startup_setting"])
         self.assertEqual("BD1B88D7DE85489207F71C1B080FD61617FAEF9655370BF0332A51579308ECE3",
                          f200_profile["archive_sha256"]["more-infinite-research_5.0.20000.zip"])
-        self.assertEqual("19F53F53662252065E2640F1D9184AA85E4AE9F24DD75A0F639931C8A24519D8",
+        self.assertEqual("B9DBE3F1B60C40426C6D88AE1443C90150755F3CDCF784FCA2536CD614350DD7",
                          f200_profile["archive_sha256"][f"{NAME}_0.2.0.zip"])
         self.assertEqual("58F04FB9D417F2726835F4A6740490DE3C1841665DAC81C2BA3DFA94050D9457",
                          f210_profile["archive_sha256"]["more-infinite-research_5.0.21000.zip"])
@@ -379,7 +379,7 @@ class MigrationOriginSuccessorControls(unittest.TestCase):
                          f210_profile["source_save"]["sha256"])
         self.assertEqual("ProtectedOriginalF200SourceSave", f210_profile["settings_mode"])
         self.assertNotIn("required_completed_f200_stage", f210_profile["source_save"])
-        self.assertEqual("CCA5E310C88D7A0D1E83520B26397090E45BE4A692394AC54D095692CD6F03F1",
+        self.assertEqual("8C7E04AA783C081B6329B46CCBDF192B302D26402EF8A24DCEC61DC1FC43FF44",
                          f210_profile["archive_sha256"][f"{NAME}_0.3.0.zip"])
         self.assertEqual({"README.md", "catalogue.lua", "control.lua", "data-final-fixes.lua", "info-f200.json", "info-f210.json", "settings-updates.lua"},
                          {path.name for path in FIXTURE.iterdir() if path.is_file()})
