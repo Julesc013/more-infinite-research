@@ -1,0 +1,89 @@
+{
+  "schema": 1,
+  "kind": "MIR5F210Q010CorrectedCurrentDataSettingsReadbackV1",
+  "status": "native-data-capture-completed-partial-intent-still-different",
+  "source_commit": "6873c2116f4da7c4d70069aecaf79e338ec1fbea",
+  "player_source_tree": "d5d8694b2fbd7229de84c9966691d5446c82219b",
+  "player_sha256": "2ABAF369E020D8AD18A0C04940A8811BECFA5E63E5B479C668E2D3A3123D032B",
+  "engine_sha256": "8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38",
+  "profile": "tests/profiles/bob-angel-full-space-age-standalone-f210-2123.json",
+  "profile_sha256": "05F2786E896B1F28C2E4239134BA370B0C2BCF6CCB1384E03999FB0E89C8B980",
+  "native_result": {
+    "sha256": "B4BED64A6312CA12C296909D0CD36B4735183A90CD1BBA7C698CE2D2AB5823E0",
+    "status": "completed-data-stage-observation-only",
+    "exit_code": 0,
+    "timed_out": false,
+    "dumps": {
+      "data_raw": {
+        "path": "write-data/script-output/data-raw-dump.json",
+        "bytes": 67502572,
+        "sha256": "454915A4F65279DB9A6D8545D2A209AAAB568ACAE69EA44F29E46584C3CF43FB"
+      },
+      "mod_settings": {
+        "path": "write-data/script-output/mod-settings-dump.json",
+        "bytes": 783931,
+        "sha256": "83C3A4166488BFEF80225DE9818810DE4CE0DDD37760C6B17BEC810AC8162D17"
+      }
+    }
+  },
+  "adopted_references": {
+    "chain": "spec/evidence/f210-q010-8f-preparation-native-chain.json",
+    "scope": "Exact unchanged standalone upstream/B6/replay arms retained under their original identities; this capture executes only the changed current arm."
+  },
+  "partial_intent_comparison": {
+    "intent": "spec/inventory/bob-angel-f210-intent-r01.json",
+    "intent_sha256": "2F291B7860BCD8AC53BACE8D0732410E0ED4D8E8F4AB605DB54237DBFBAE73CD",
+    "comparison_sha256": "07ABD8765777FB1C82018A812BB19407A136FB80133E44F08F69B0B2672768D0",
+    "reviewed_rows_matched": 149,
+    "remaining_differences": [
+      {
+        "domain": "data",
+        "names": [
+          "recipe-prod-research_concrete-1",
+          "recipe-prod-research_copper-1",
+          "recipe-prod-research_copper_cable-1",
+          "recipe-prod-research_explosives-1",
+          "recipe-prod-research_heavy_ammo-1",
+          "recipe-prod-research_inserters-1",
+          "recipe-prod-research_iron-1",
+          "recipe-prod-research_landfill-1",
+          "recipe-prod-research_modules-1",
+          "recipe-prod-research_oil_cracking_productivity-1",
+          "recipe-prod-research_science_pack_productivity-1"
+        ],
+        "type": "technology"
+      }
+    ],
+    "observed_repairs": "No remaining settings, literal-title, native-art or signed-credit row differences against the partial reviewed expectation. Nine effect-order representations and the oil/science public rows remain distinct comparison blockers."
+  },
+  "caller_adverse": {
+    "terminal_sha256": "B1FF5B404D6BD4567DDD98DFDE0A0B5591CB78E7D5F102D91102E99F96F282BB",
+    "failure": "[broad-f210-r04] native data_raw dump path is absent",
+    "classification": "Post-result caller treated relative dump paths as absolute; the independent readback resolves each path below the native output root. No native rerun."
+  },
+  "custody": {
+    "primary_root": "build/mir5/recovery-historical/q010-current6873-data-settings-r01",
+    "original_and_primary_members_verified": 9,
+    "bytes": 68376785,
+    "path_readback_sha256": "E431B8C82B9FAE6BEE47199670C9F221FF41B6673CA8D89E691D1EBB64C35488"
+  },
+  "restoration": {
+    "library_controls_restored": true,
+    "original_mir_sha256": "C563CB5B96C9E64CB3373BDB60CF5C8B7D3C97E93EADB8F924443C703CDC024D",
+    "archive_restoration": "original-C563-restored",
+    "factorio_processes_after": 0
+  },
+  "limits": [
+    "Data-stage output only; no gameplay, save, multiplayer, menu-response or release qualification.",
+    "The 18.633-second process observation is unscored and supports no performance claim.",
+    "This source predates the later reviewed combined oil/science progression correction; that changed candidate requires its own freeze and affected observation.",
+    "The earlier 8F failures and the caller adverse remain preserved."
+  ],
+  "receipts": {
+    "path": "spec/evidence/f210-q010-6873-current-capture-native-receipts.json.gz",
+    "bytes": 33871,
+    "sha256": "A4F62A58AE6FB42E6E41807277A34CB28984828B4C15D981FA178EF321B323BA",
+    "uncompressed_sha256": "2159E3B1A05E721B0A658E7D4272C98CD2F5CD1BA5B61DF1F379B439E9E5E311",
+    "members": 5
+  }
+}
