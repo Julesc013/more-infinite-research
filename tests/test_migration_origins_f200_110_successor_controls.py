@@ -365,14 +365,15 @@ class MigrationOriginF200110SuccessorControls(unittest.TestCase):
         self.assertEqual({}, result["storage"])
 
     def test_profiles_bind_the_one_passed_r05_source_and_the_coherent_module_credit_candidate(self):
-        f200, f210, f200_source_defaults, f200_source_defaults_r02, source_defaults = (
+        f200, f210, f200_source_defaults, f200_source_defaults_r02, source_defaults, disabled = (
             json.loads(F200_PROFILE.read_text()),
             json.loads(F210_PROFILE.read_text()),
             json.loads(F200_SOURCE_DEFAULTS_PROFILE.read_text()),
             json.loads(F200_SOURCE_DEFAULTS_R02_PROFILE.read_text()),
             json.loads(F210_SOURCE_DEFAULTS_PROFILE.read_text()),
+            json.loads(F210_SOURCE_DEFAULTS_MODULES_DISABLED_PROFILE.read_text()),
         )
-        for profile in (f200, f210, f200_source_defaults, f200_source_defaults_r02, source_defaults):
+        for profile in (f200, f210, f200_source_defaults, f200_source_defaults_r02, source_defaults, disabled):
             self.assertEqual("88FC8E9891040275E001930C3E6AA0A4A7A28C31D81DF30E3F08AEDD98E5019A",
                              profile["source_save"]["sha256"])
             self.assertEqual("4FBD622144E3B69E39C0530385AA70C92971208584CA32D4A10B1FCC1A978997",
@@ -387,6 +388,7 @@ class MigrationOriginF200110SuccessorControls(unittest.TestCase):
         self.assertEqual("3fbdeb9a7422d70be53dccde2924711464b47ac5", f200_source_defaults["successor_fixture_commit"])
         self.assertEqual("b03a51351e44e943a50c7ead8f32a9ca89c75551", f200_source_defaults_r02["successor_fixture_commit"])
         self.assertEqual("713ff517c5fc846a24a0a768229a55f991e2852c", source_defaults["successor_fixture_commit"])
+        self.assertEqual("41ee18a087dc6adabd70a2457a44a8aed76f46db", disabled["successor_fixture_commit"])
         self.assertEqual("97C4700C141090ECC59549FB684351A504B057C9BEC34A6E5A852441CEB8738F",
                          f200["archive_sha256"]["mir-fixture-mir5-migration-origin-f200-110-source_0.2.0.zip"])
         self.assertEqual("83EDCE7B40C6ABF13C60769691ABA4534F032FE87E82F2CF9E7CCE451D38EE5D",
@@ -401,6 +403,8 @@ class MigrationOriginF200110SuccessorControls(unittest.TestCase):
                          f210["archive_sha256"]["more-infinite-research_5.0.21000.zip"])
         self.assertEqual("3597682FF6AC7A7BFBA9B62B38A9E3958A1BCA04692750B4DDE18B746346B871",
                          source_defaults["archive_sha256"]["mir-fixture-mir5-migration-origin-f200-110-source_0.4.0.zip"])
+        self.assertEqual("34A5EC5015CB63296A767EBD249AEEA499B934FA74286B5FDE6B837937629A35",
+                         disabled["archive_sha256"]["mir-fixture-mir5-migration-origin-f200-110-source_0.5.0.zip"])
         self.assertEqual("published-source-defaults-input", source_defaults["variant"])
         self.assertEqual("Defaults", source_defaults["settings_mode"])
         self.assertEqual("f210_source_defaults", source_defaults["target"])
@@ -410,6 +414,9 @@ class MigrationOriginF200110SuccessorControls(unittest.TestCase):
         self.assertEqual("published-source-defaults-input-f200-r02-direct-token", f200_source_defaults_r02["variant"])
         self.assertEqual("Defaults", f200_source_defaults_r02["settings_mode"])
         self.assertEqual("f200_source_defaults", f200_source_defaults_r02["target"])
+        self.assertEqual("published-source-defaults-modules-disabled-input", disabled["variant"])
+        self.assertEqual("Defaults", disabled["settings_mode"])
+        self.assertEqual("f210_source_defaults_modules_disabled", disabled["target"])
         self.assertEqual(
             ["base", "mir-fixture-mir5-active-mods-observer", "more-infinite-research",
              "mir-fixture-mir5-migration-origin-f200-110-source"],
@@ -418,10 +425,12 @@ class MigrationOriginF200110SuccessorControls(unittest.TestCase):
         self.assertEqual("0.4.0", source_defaults["mods"][-1]["version"])
         self.assertEqual("0.3.0", f200_source_defaults["mods"][-1]["version"])
         self.assertEqual("0.3.0", f200_source_defaults_r02["mods"][-1]["version"])
+        self.assertEqual("0.5.0", disabled["mods"][-1]["version"])
         self.assertNotIn("space-age", {entry["name"] for entry in f210["mods"]})
         self.assertNotIn("space-age", {entry["name"] for entry in source_defaults["mods"]})
         self.assertNotIn("space-age", {entry["name"] for entry in f200_source_defaults["mods"]})
         self.assertNotIn("space-age", {entry["name"] for entry in f200_source_defaults_r02["mods"]})
+        self.assertNotIn("space-age", {entry["name"] for entry in disabled["mods"]})
 
     def test_profiles_reject_the_r12_and_r13_superseded_fixture_archive_pins(self):
         cases = (
@@ -450,6 +459,11 @@ class MigrationOriginF200110SuccessorControls(unittest.TestCase):
              "3597682FF6AC7A7BFBA9B62B38A9E3958A1BCA04692750B4DDE18B746346B871",
              ("F4C54047A9734180D31C14F18BE38B744F053F399A0D8184961C2B563463C831",
               "E1878CAEE523CDC4DC86C9E6B0B5029A78E4D96ADC1A3C80BE8521355A6655A3")),
+            (json.loads(F210_SOURCE_DEFAULTS_MODULES_DISABLED_PROFILE.read_text()),
+             "mir-fixture-mir5-migration-origin-f200-110-source_0.5.0.zip",
+             "34A5EC5015CB63296A767EBD249AEEA499B934FA74286B5FDE6B837937629A35",
+             ("3597682FF6AC7A7BFBA9B62B38A9E3958A1BCA04692750B4DDE18B746346B871",
+              "F83F930E659FEC7A088FC01459D70CAE49D0E3656C3F0D7DB7181D228B9E9DF2")),
         )
 
         def assert_approved(profile, archive, approved):
@@ -846,6 +860,7 @@ class MigrationOriginF200110SuccessorControls(unittest.TestCase):
         self.assertEqual((False, False, False),
                          (result["module_startup_enabled"], result["player_module_enabled"],
                           result["player_module_prototype_enabled"]))
+        self.assertEqual(9, result["candidate_module_effects"])
         self.assertEqual(([2, 2, 2], [2, 2, 2], [2, 2, 2]),
                          (result["player_module_holders"], result["foreign_module_holders"],
                           result["detached_module_holders"]))
@@ -857,6 +872,13 @@ class MigrationOriginF200110SuccessorControls(unittest.TestCase):
         self.assertEqual(["reset:player", "save"], result["order"])
         self.assertEqual("completed", result["state"]["successors"]["f210_source_defaults_modules_disabled"]["phase"])
         markers = [value for value in result["logs"] if value.startswith("[MIR5_NATIVE_FIXTURE] RESULT ")]
+        observations = [json.loads(value.split(" OBSERVED ", 1)[1]) for value in result["logs"]
+                        if value.startswith("[MIR5_NATIVE_FIXTURE] OBSERVED ")]
+        self.assertTrue(any((.11, .11, .11) ==
+                            (value["current_candidate_speed_module_bonus"],
+                             value["current_candidate_productivity_module_bonus"],
+                             value["current_candidate_efficiency_module_bonus"])
+                            for value in observations))
         self.assertEqual(3, len(markers))
         self.assertIn('"stage":"initial"', markers[0])
         self.assertIn('"stage":"reload"', markers[1])
