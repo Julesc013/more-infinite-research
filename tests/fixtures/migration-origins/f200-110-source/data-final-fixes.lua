@@ -75,25 +75,11 @@ local function expected_effects(row)
 end
 
 for name, default_value in pairs(catalogue.settings) do
-  local setting = data.raw["bool-setting"] and data.raw["bool-setting"][name]
-  if setting == nil or setting.type ~= "bool-setting" or setting.setting_type ~= "startup"
-      or setting.default_value ~= default_value then
-    fail("published setting default differs: " .. name)
-  end
   local runtime = settings.startup[name]
   if runtime == nil or runtime.value ~= default_value then
     fail("effective default setting differs: " .. name)
   end
 end
-
-local setting_count = 0
-for name in pairs(data.raw["bool-setting"] or {}) do
-  if name:sub(1, 4) == "ips-" then
-    if catalogue.settings[name] == nil then fail("unexpected published setting: " .. name) end
-    setting_count = setting_count + 1
-  end
-end
-if setting_count ~= 42 then fail("published setting count differs") end
 
 local roster_count = 0
 for name, value in pairs(data.raw.technology or {}) do

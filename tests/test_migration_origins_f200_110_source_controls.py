@@ -92,7 +92,7 @@ class MigrationOriginF200110SourceControls(unittest.TestCase):
         rows[ROBOT] = {"science": ORDINARY, "effects": [{"type": "worker-robot-battery", "modifier": .10}]}
         return rows
 
-    def source_raw(self):
+    def source_technology_raw(self):
         rows = {}
         for name, expected in self.expected_rows().items():
             rows[name] = {
@@ -101,11 +101,33 @@ class MigrationOriginF200110SourceControls(unittest.TestCase):
                          "ingredients": [[pack, 1] for pack in expected["science"]]},
                 "prerequisites": list(expected["science"]), "effects": copy.deepcopy(expected["effects"]),
             }
+        return {"technology": rows, "sentinel": {"unchanged": 17}}
+
+    def source_settings_raw(self):
         setting_rows = {
             name: {"type": "bool-setting", "name": name, "setting_type": "startup", "default_value": value}
             for name, value in SETTINGS.items()
         }
-        return {"technology": rows, "bool-setting": setting_rows, "sentinel": {"unchanged": 17}}
+        return {"bool-setting": setting_rows, "sentinel": {"unchanged": 19}}
+
+    def run_settings(self, raw, mods):
+        catalogue_path = (FIXTURE / "catalogue.lua").as_posix()
+        settings_path = (FIXTURE / "settings-final-fixes.lua").as_posix()
+        self.lua.globals().catalogue_path = catalogue_path
+        self.lua.globals().settings_path = settings_path
+        self.lua.execute(r'''
+          function migration_origin_110_run_settings(raw, mods)
+            local env={data={raw=raw},mods=mods}
+            env.require=function(name)
+              assert(name=="__mir-fixture-mir5-migration-origin-f200-110-source__/catalogue")
+              return assert(loadfile(catalogue_path,"t",env))()
+            end
+            env._G=env;setmetatable(env,{__index=_G})
+            local ok,message=pcall(function() assert(loadfile(settings_path,"t",env))() end)
+            return {ok=ok,message=tostring(message),raw=raw}
+          end
+        ''')
+        return py(self.lua.eval("migration_origin_110_run_settings")(lua(self.lua, copy.deepcopy(raw)), lua(self.lua, mods)))
 
     def run_data(self, raw, mods, settings=SETTINGS):
         catalogue_path = (FIXTURE / "catalogue.lua").as_posix()
@@ -127,9 +149,16 @@ class MigrationOriginF200110SourceControls(unittest.TestCase):
         ''')
         return py(self.lua.eval("migration_origin_110_run_data")(lua(self.lua, copy.deepcopy(raw)), lua(self.lua, mods), lua(self.lua, settings)))
 
-    def test_data_guard_pins_the_31_source_rows_and_the_six_craftable_science_effects(self):
+    def test_separate_settings_and_data_guards_pin_the_42_defaults_and_31_source_rows(self):
         mods = {"base": "2.0.77", "more-infinite-research": "1.1.0", "mir-fixture-mir5-migration-origin-f200-110-source": "0.1.0"}
-        accepted = self.run_data(self.source_raw(), mods)
+        accepted_settings = self.run_settings(self.source_settings_raw(), mods)
+        self.assertTrue(accepted_settings["ok"], accepted_settings["message"])
+        self.assertEqual(19, accepted_settings["raw"]["sentinel"]["unchanged"])
+
+        # Factorio's data-final stage has technologies and effective startup
+        # values, but not settings prototypes. The historical default check is
+        # intentionally exercised in settings-final-fixes instead.
+        accepted = self.run_data(self.source_technology_raw(), mods)
         self.assertTrue(accepted["ok"], accepted["message"])
         rows = accepted["raw"]["technology"]
         self.assertEqual(31, len(rows))
@@ -143,20 +172,26 @@ class MigrationOriginF200110SourceControls(unittest.TestCase):
                          (rows["recipe-prod-research_plastic-1"].get("level"), rows["recipe-prod-research_plastic-1"]["unit"]["count_formula"], rows["recipe-prod-research_plastic-1"]["unit"]["time"]))
         self.assertEqual(17, accepted["raw"]["sentinel"]["unchanged"])
 
-        variants = []
-        missing = self.source_raw(); del missing["technology"][DIRECT]; variants.append(("missing-row", missing, SETTINGS))
-        wrong_effect = self.source_raw(); wrong_effect["technology"][DIRECT]["effects"][0]["change"] = .05; variants.append(("gear-effect", wrong_effect, SETTINGS))
-        foreign_effect = self.source_raw(); foreign_effect["technology"][DIRECT]["effects"].append({"type": "change-recipe-productivity", "recipe": "foreign", "change": .10}); variants.append(("foreign-effect", foreign_effect, SETTINGS))
-        raw_level = self.source_raw(); raw_level["technology"][DIRECT]["level"] = 1; variants.append(("raw-level", raw_level, SETTINGS))
-        missing_space = self.source_raw(); missing_space["technology"][DIRECT]["prerequisites"].remove("space-science-pack"); variants.append(("space-prerequisite", missing_space, SETTINGS))
-        wrong_default = self.source_raw(); wrong_default["bool-setting"]["ips-enable-research_breeding"]["default_value"] = False; variants.append(("breeding-default", wrong_default, SETTINGS))
-        wrong_effective = dict(SETTINGS); wrong_effective["ips-enable-research_breeding"] = False; variants.append(("breeding-effective", self.source_raw(), wrong_effective))
-        for label, candidate, candidate_settings in variants:
+        data_variants = []
+        missing = self.source_technology_raw(); del missing["technology"][DIRECT]; data_variants.append(("missing-row", missing, SETTINGS))
+        wrong_effect = self.source_technology_raw(); wrong_effect["technology"][DIRECT]["effects"][0]["change"] = .05; data_variants.append(("gear-effect", wrong_effect, SETTINGS))
+        foreign_effect = self.source_technology_raw(); foreign_effect["technology"][DIRECT]["effects"].append({"type": "change-recipe-productivity", "recipe": "foreign", "change": .10}); data_variants.append(("foreign-effect", foreign_effect, SETTINGS))
+        raw_level = self.source_technology_raw(); raw_level["technology"][DIRECT]["level"] = 1; data_variants.append(("raw-level", raw_level, SETTINGS))
+        missing_space = self.source_technology_raw(); missing_space["technology"][DIRECT]["prerequisites"].remove("space-science-pack"); data_variants.append(("space-prerequisite", missing_space, SETTINGS))
+        wrong_effective = dict(SETTINGS); wrong_effective["ips-enable-research_breeding"] = False; data_variants.append(("breeding-effective", self.source_technology_raw(), wrong_effective))
+        for label, candidate, candidate_settings in data_variants:
             with self.subTest(label=label):
                 before = copy.deepcopy(candidate)
                 rejected = self.run_data(candidate, mods, candidate_settings)
                 self.assertFalse(rejected["ok"])
                 self.assertEqual(before, rejected["raw"])
+
+        wrong_default = self.source_settings_raw()
+        wrong_default["bool-setting"]["ips-enable-research_breeding"]["default_value"] = False
+        before = copy.deepcopy(wrong_default)
+        rejected_settings = self.run_settings(wrong_default, mods)
+        self.assertFalse(rejected_settings["ok"])
+        self.assertEqual(before, rejected_settings["raw"])
 
     def test_catalogue_records_the_archived_base_output_set_without_current_catalogue_fallbacks(self):
         text = (FIXTURE / "catalogue.lua").read_text(encoding="utf-8")
@@ -168,6 +203,15 @@ class MigrationOriginF200110SourceControls(unittest.TestCase):
         self.assertIn('["ips-enable-research_inventory_capacity"] = false', text)
         self.assertEqual(31, len(self.expected_rows()))
         self.assertEqual(72, sum(len(row["effects"]) for row in self.expected_rows().values()))
+
+    def test_settings_defaults_are_checked_only_in_the_settings_stage(self):
+        settings_stage = (FIXTURE / "settings-final-fixes.lua").read_text(encoding="utf-8")
+        data_stage = (FIXTURE / "data-final-fixes.lua").read_text(encoding="utf-8")
+        self.assertIn('data.raw["bool-setting"]', settings_stage)
+        self.assertIn("published setting count differs", settings_stage)
+        self.assertNotIn("settings.startup", settings_stage)
+        self.assertIn("settings.startup", data_stage)
+        self.assertNotIn('data.raw["bool-setting"]', data_stage)
 
     def test_control_is_source_only_and_retains_real_lab_reload_and_force_state_boundaries(self):
         control = (FIXTURE / "control.lua").read_text(encoding="utf-8")
@@ -196,7 +240,7 @@ class MigrationOriginF200110SourceControls(unittest.TestCase):
                          profile["archive_sha256"]["more-infinite-research_1.1.0.zip"])
         self.assertEqual("82F954450AB7AB761686C288B23331E5C087C29F0846837810D1F3F96BD98A18",
                          profile["archive_sha256"]["mir-fixture-mir5-migration-origin-f200-110-source_0.1.0.zip"])
-        self.assertEqual({"README.md", "catalogue.lua", "control.lua", "data-final-fixes.lua", "info.json"},
+        self.assertEqual({"README.md", "catalogue.lua", "control.lua", "data-final-fixes.lua", "settings-final-fixes.lua", "info.json"},
                          {path.name for path in FIXTURE.iterdir() if path.is_file()})
         self.assertIn("not a migration pass", (FIXTURE / "README.md").read_text(encoding="utf-8"))
 
