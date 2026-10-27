@@ -32,7 +32,7 @@ def _encoded(document: object) -> bytes:
 
 def _analysis_plan(cohort: str = "r23") -> dict[str, object]:
     plan = json.loads(SPEC_PATH.read_text(encoding="utf-8"))
-    if cohort in ("r24", "r25"):
+    if cohort in ("r24", "r25", "r26"):
         plan["kind"] = f"MIR5ResponsiveMenu{cohort.upper()}AnalysisPlanV1"
         plan["raw_plan"]["path"] = f"spec/evidence/bob-angel-menu-plan-{cohort}.json"
         plan["schedule"]["total_rows"] = 262
@@ -46,6 +46,8 @@ def _analysis_plan(cohort: str = "r23") -> dict[str, object]:
         plan["analysis"]["assumption"] = "The 64 paired blocks are treated as independent and roughly symmetric."
     else:
         assert cohort == "r23"
+    if cohort == "r26":
+        plan["identity"]["replay"] = {"sha256": "A" * 64}
     return plan
 
 
@@ -68,6 +70,7 @@ def _raw_plan(plan: dict[str, object]) -> dict[str, object]:
         },
         "ordinary_config_sha256": identity["ordinary_config_sha256"],
         "player_data_sha256": identity["player_data_sha256"],
+        **({"replay": copy.deepcopy(identity["replay"])} if "replay" in identity else {}),
         "tolerances": {
             "aa_absolute_seconds": plan["tolerance_policy"]["aa_absolute_seconds"],
             "aa_relative_percent": plan["tolerance_policy"]["aa_relative_percent"],
@@ -189,6 +192,35 @@ def _prepared(cohort: str = "r23") -> tuple[dict[str, object], dict[str, object]
 
 
 class MenuComparisonAnalysisTests(unittest.TestCase):
+    def test_f210_r26_uses_its_own_bound_inputs_without_pooling_f200(self) -> None:
+        plan = _analysis_plan("r26")
+        identity = plan["identity"]
+        identity["engine"] = {"version": "2.1.23", "sha256": "1" * 64}
+        identity["profile"] = {"path": "tests/profiles/bob-angel-full-space-age-standalone-f210-2123.json", "sha256": "2" * 64}
+        for arm, version in (("published", "4.7.21003"), ("candidate", "5.0.21000")):
+            identity[arm].update(version=version, root=f"more-infinite-research_{version}", factorio_version="2.1")
+        raw = _raw_plan(plan)
+        raw_hash = _sha256(_encoded(raw))
+        plan["raw_plan"]["sha256"] = raw_hash
+        result = _result(plan, published_offsets=[1.0, 3.0] * 32, candidate_offsets=[0.25, 0.75] * 32)
+        output = ANALYZER.analyze(plan, "A" * 64, raw, raw_hash, result, "B" * 64)
+        self.assertEqual(output["kind"], "MIR5ResponsiveMenuR26AnalysisV1")
+        self.assertEqual(len(output["paired_blocks"]), 64)
+        self.assertEqual(output["objective"]["reduction_percent"], 75.0)
+        self.assertFalse(output["claims"]["release_qualification"])
+        wrong_plan = copy.deepcopy(plan)
+        wrong_plan["raw_plan"]["path"] = "spec/evidence/bob-angel-menu-plan-r25.json"
+        with self.assertRaises(ANALYZER.MenuAnalysisError):
+            ANALYZER.analyze(wrong_plan, "A" * 64, raw, raw_hash, result, "B" * 64)
+        wrong_engine = copy.deepcopy(result)
+        wrong_engine["inputs"]["factorio"]["base_version"] = "2.0.77"
+        with self.assertRaises(ANALYZER.MenuAnalysisError):
+            ANALYZER.analyze(plan, "A" * 64, raw, raw_hash, wrong_engine, "B" * 64)
+        wrong_replay = copy.deepcopy(result)
+        wrong_replay["inputs"]["replay"]["sha256"] = "C" * 64
+        with self.assertRaises(ANALYZER.MenuAnalysisError):
+            ANALYZER.analyze(plan, "A" * 64, raw, raw_hash, wrong_replay, "B" * 64)
+
     def test_r25_preserves_the_fixed_large_schedule_with_a_distinct_plan_identity(self) -> None:
         plan, raw, raw_hash = _prepared("r25")
         result = _result(plan)
