@@ -246,7 +246,13 @@ function run_control_model(mods, vector, prerequisites, effect_names, missing, t
       force.recipes[recipe]={productivity_bonus=0}
     end
     local inputs={}
-    for _,item in ipairs(vector) do inputs[#inputs+1]={name=item,amount=1} end
+    -- Deliberately differ from the declared data-stage order: runtime
+    -- ingredients must still match exact identities and quantities.
+    for index=#vector,1,-1 do inputs[#inputs+1]={name=vector[index],amount=1} end
+    if tamper=="runtime-input-weight" then inputs[3].amount=2 end
+    if tamper=="runtime-input-duplicate" then inputs[3].name=inputs[2].name end
+    if tamper=="runtime-input-foreign" then inputs[3].name="unexpected-science" end
+    if tamper=="runtime-input-missing" then table.remove(inputs) end
     force.technologies["recipe-prod-research_science_pack_productivity-1"]=
       technology("recipe-prod-research_science_pack_productivity-1",science_effects,inputs,prerequisites)
     force.technologies["recipe-prod-research_oil_cracking_productivity-1"]=
@@ -551,6 +557,27 @@ end
         self.assertFalse(tampered["ok"])
         self.assertIn("reload oil saved identity differs", tampered["message"])
         self.assertEqual(1, tampered["saves"])
+
+    def test_runtime_inputs_reject_missing_duplicate_foreign_and_changed_weights(self):
+        for opponent in ("runtime-input-weight", "runtime-input-duplicate", "runtime-input-foreign", "runtime-input-missing"):
+            with self.subTest(opponent=opponent):
+                result = plain(self.lua.eval("run_control_model")(
+                    lua_value(self.lua, self._mods(False)), lua_value(self.lua, BASE_VECTOR),
+                    lua_value(self.lua, BASE_PREREQUISITES), lua_value(self.lua, BASE_EFFECTS), None, opponent))
+                self.assertFalse(result["ok"])
+                self.assertIn("ingredient", result["message"])
+                self.assertEqual(0, result["saves"])
+
+    def test_frozen_98bab_runtime_guard_refuses_reordered_equal_ingredients(self):
+        self.lua.globals().control_override = subprocess.check_output([
+            "git", "show", "98bab2c2d346dc508c0f008d824ebc867d920595:tests/fixtures/bob-angel-f210-science-oil/control.lua"
+        ], cwd=ROOT).decode("utf-8")
+        result = plain(self.lua.eval("run_control_model")(
+            lua_value(self.lua, self._mods(False)), lua_value(self.lua, BASE_VECTOR),
+            lua_value(self.lua, BASE_PREREQUISITES), lua_value(self.lua, BASE_EFFECTS), None))
+        self.assertFalse(result["ok"])
+        self.assertIn("science ingredient differs", result["message"])
+        self.assertEqual(0, result["saves"])
 
     def test_frozen_seeds_reproduce_native_level_and_reset_refusals(self):
         for revision in ("c37fca88667d550660f5b9c0efd7f272b56d6025",

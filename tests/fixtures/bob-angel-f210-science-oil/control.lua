@@ -33,13 +33,19 @@ local function effect_vector(value, expected, label)
 end
 local function input_vector(value, expected, label)
   local inputs = value.research_unit_ingredients
-  if type(inputs) ~= "table" or #inputs ~= #expected then fail(label .. " ingredient count differs") end
-  for index, name in ipairs(expected) do
-    local input = inputs[index]
-    if type(input) ~= "table" or input.name ~= name or input.amount ~= 1 then
-      fail(label .. " ingredient differs at " .. tostring(index))
+  local diagnostic = {expected=expected, actual=inputs}
+  if type(inputs) ~= "table" or #inputs ~= #expected then fail(label .. " ingredient count differs", diagnostic) end
+  -- Runtime ResearchIngredient arrays describe names/amounts, without an
+  -- authored-order contract. Data-final preflight still checks exact order.
+  local required, seen = {}, {}
+  for _, name in ipairs(expected) do required[name] = true end
+  for index, input in ipairs(inputs) do
+    if type(input) ~= "table" or required[input.name] ~= true or seen[input.name] or input.amount ~= 1 then
+      fail(label .. " ingredient differs at " .. tostring(index), diagnostic)
     end
+    seen[input.name] = true
   end
+  return inputs
 end
 local function queue_snapshot(force)
   local queue = {}
@@ -82,11 +88,11 @@ end
 local function science_snapshot(force, expected, level, label)
   local value = technology(force, facts.science)
   effect_vector(value, expected.effects, label .. " science")
-  input_vector(value, expected.vector, label .. " science")
+  local inputs = input_vector(value, expected.vector, label .. " science")
   if value.level ~= level or value.researched ~= false or value.prototype.max_level ~= 4294967295 then
     fail(label .. " science level differs")
   end
-  return {level=value.level, bonuses=bonuses(force, expected.effects, .1 * (level - 1))}
+  return {level=value.level, ingredients=inputs, bonuses=bonuses(force, expected.effects, .1 * (level - 1))}
 end
 local function assert_oil_snapshot(actual, expected, label)
   if type(actual) ~= "table" or actual.level ~= expected.level or actual.enabled ~= expected.enabled
@@ -177,7 +183,8 @@ local function marker(stage, state, expected)
   log("[MIR5_NATIVE_FIXTURE] RESULT " .. helpers.table_to_json({
     case="bob-angel-f210-science-oil", stage=stage, status="passed",
     witnesses={closure=expected.id, actual_science_laboratory_completions=state.finished,
-      exact_science_inputs=expected.vector, admitted_producer_count=#expected.effects,
+      exact_science_inputs=expected.vector, actual_science_inputs=science.ingredients,
+      admitted_producer_count=#expected.effects,
       science_level=science.level, science_recipe_productivity_bonus=.2,
       oil_seeded_not_laboratory_earned=true, oil_level=oil.level, oil_saved_progress=oil.saved_progress,
       oil_effect_recipes={"heavy-oil-cracking", "light-oil-cracking"}, foreign_disabled=true,
