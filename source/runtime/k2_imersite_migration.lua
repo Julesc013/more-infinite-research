@@ -137,19 +137,25 @@ local function set_queue(force, names, current, progress)
   if force.research_progress ~= (current and progress or 0) then error("MIR Imersite progress readback differs", 2) end
 end
 
-local function queued(names, id)
-  for _, name in ipairs(names) do if name == id then return true end end
-  return false
+local function mapped_public_destinations(source_queue, plan_queue)
+  local out = {}
+  for index, source in ipairs(source_queue) do
+    local destination = plan_queue[index]
+    if (source == HOLDERS[1] or source == HOLDERS[2])
+        and (destination == EARLY or destination == TAIL) then out[destination] = true end
+  end
+  return out
 end
 
-local function restore_public_flags(technologies, before, plan)
+local function restore_public_flags(technologies, before, plan, source_queue)
+  local mapped = mapped_public_destinations(source_queue,plan.queue)
   for _, id in ipairs({EARLY,TAIL}) do
     -- LuaTechnology.level enables the technology.  Preserve foreign force
-    -- presentation/disablement when this handoff did not map a carrier into
-    -- the public row.  A mapped queue target deliberately retains the native
-    -- activation needed for the restored queue to remain researchable.
+    -- presentation/disablement unless the matching source queue row was a
+    -- carrier mapped into this public row. A pre-existing public queue entry
+    -- is never permission to replace a foreign disablement.
     technologies[id].visible_when_disabled = before[id].visible_when_disabled
-    if not queued(plan.queue,id) then technologies[id].enabled = before[id].enabled end
+    if not mapped[id] then technologies[id].enabled = before[id].enabled end
   end
 end
 
@@ -237,7 +243,7 @@ function M.reconcile_force(force, change, records, legacy)
     set_state(technologies[EARLY],plan.early)
     set_state(technologies[TAIL],plan.tail)
     set_queue(force,plan.queue,plan.current,plan.progress)
-    restore_public_flags(technologies,before,plan)
+    restore_public_flags(technologies,before,plan,source_queue)
     clear(technologies[HOLDERS[1]],1)
     clear(technologies[HOLDERS[2]],4)
     local after = force.recipes[contract.effect.recipe].productivity_bonus

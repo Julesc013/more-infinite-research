@@ -146,17 +146,32 @@ class ImersiteMigrationTests(unittest.TestCase):
           assert(records[1].earned == 5)
         ''')
 
-    def test_mapped_public_queue_keeps_activation_right_but_restores_other_public_flags(self):
+    def test_unmapped_public_queue_preserves_foreign_disablement(self):
         self.lua.execute('''
           local force,rows = world(5)
-          rows[E].enabled=false; rows[E].visible_when_disabled=true
+          rows[T].enabled=false; rows[T].visible_when_disabled=true
+          force.research_queue={force.technologies[T]}
+          assert(migration.reconcile_force(force,.02,{}))
+          -- T was already the public queue entry. Its level write must not use
+          -- that unrelated queue position to replace foreign disablement.
+          assert(not rows[T].enabled and rows[T].visible_when_disabled)
+          assert(force.current_research.name == T and force.research_progress == .42)
+        ''')
+
+    def test_mapped_public_queue_keeps_activation_for_direct_and_verified_legacy_carriers(self):
+        self.lua.execute('''
+          local force,rows = world(5)
           rows[T].enabled=false; rows[T].visible_when_disabled=true
           assert(migration.reconcile_force(force,.02,{}))
-          assert(not rows[E].enabled and rows[E].visible_when_disabled)
-          -- The source carrier maps to T, so its native level write deliberately
-          -- keeps it enabled for the restored queue; visibility is still foreign state.
           assert(rows[T].enabled and rows[T].visible_when_disabled)
-          assert(force.current_research.name == T and force.research_progress == .42)
+
+          force,rows = world(5)
+          rows[T].enabled=false; rows[T].visible_when_disabled=true
+          local legacy={schema=3,force_index=1,source="json-two-holders-v1",source_version="4.6.21000",
+            phase="holder-retained-retryable",early=state(6,false,.42),continuation=state(4),
+            queue_before={H},queue_after_removal={H},current_before=H,current_after_removal=H,progress_before=.42}
+          assert(migration.reconcile_force(force,.02,{},legacy))
+          assert(rows[T].enabled and rows[T].visible_when_disabled)
         ''')
 
     def test_detached_queue_refusal_preserves_original_error_and_carrier_work(self):
