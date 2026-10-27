@@ -1,0 +1,13 @@
+{
+  "name": "mir-fixture-mir5-space-location-api-witness",
+  "version": "0.1.0",
+  "title": "Space-location LuaForce API witness",
+  "author": "MIR maintainers",
+  "description": "Private disposable-world witness for the Factorio 2.1 space-location LuaForce API.",
+  "factorio_version": "2.1",
+  "dependencies": [
+    "base >= 2.1.23",
+    "space-age = 2.1.23",
+    "more-infinite-research = 5.0.21000"
+  ]
+}

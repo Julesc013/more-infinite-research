@@ -91,6 +91,7 @@ $controls = @(
   [ordered]@{path='tests/test_k2_imersite_transition_fixture.py';lua=$true},
   [ordered]@{path='tests/test_k2se_imersite_carrier_fixture.py';lua=$true},
   [ordered]@{path='tests/test_api.py';lua=$true},
+  [ordered]@{path='tests/test_space_location_api_witness.py';lua=$true},
   [ordered]@{path='tests/test_runtime_api.py';lua=$true},
   [ordered]@{path='tests/test_sdk.py';lua=$true},
   [ordered]@{path='tests/test_fixture_controls.py';lua=$true},
