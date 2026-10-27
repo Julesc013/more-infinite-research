@@ -73,13 +73,25 @@ local function prerequisites(value)
   for _, prerequisite in pairs(value.prerequisites or {}) do prerequisite.research_recursive() end
 end
 
-local function lab(state)
+local function read_lab(state)
   local value = state.lab
   if value == nil or value.valid == false then fail("player lab is absent") end
-  value.energy = LAB_ENERGY
   local inventory = value.get_inventory(defines.inventory.lab_input)
   if inventory == nil then fail("player lab inventory is absent") end
+  return value, inventory
+end
+
+local function recharge_lab(state)
+  local value, inventory = read_lab(state)
+  value.energy = LAB_ENERGY
+  if value.energy <= 0 then fail("player lab has no power") end
   return inventory
+end
+
+local function freeze_lab(state)
+  local value = read_lab(state)
+  value.energy = 0
+  if value.energy ~= 0 then fail("player lab did not freeze after the final source completion") end
 end
 
 local function assert_acceleration(value)
@@ -121,7 +133,7 @@ local function assert_completed(state)
   if game.forces.player.current_research ~= nil or #(game.forces.player.research_queue or {}) ~= 0 then
     fail("capped player gear queue survived")
   end
-  local inventory = lab(state)
+  local _, inventory = read_lab(state)
   for _, name in ipairs(SCIENCE) do
     if inventory.get_item_count(name) ~= INITIAL_PACKS - 2 then
       fail("real lab consumption differs for " .. name)
@@ -178,7 +190,7 @@ script.on_init(function()
     actual_lab_completions = 0, milestone = "unstarted", foreign_force_index = foreign.index,
     foreign_queue = assert_foreign(foreign), lab = entity, deadline_tick = game.tick + DEADLINE}
   storage[KEY] = state
-  local inventory = lab(state)
+  local inventory = recharge_lab(state)
   for _, name in ipairs(SCIENCE) do
     if inventory.insert{name = name, count = INITIAL_PACKS} ~= INITIAL_PACKS then
       fail("could not insert native science " .. name)
@@ -195,8 +207,14 @@ script.on_event(defines.events.on_research_finished, function(event)
     fail("unexpected native gear completion phase")
   end
   state.actual_lab_completions = state.actual_lab_completions + 1
-  state.phase = state.actual_lab_completions == 1 and "await-second-queue" or "await-published-cap"
-  if state.actual_lab_completions > 2 then fail("source completed more than two gear levels") end
+  if state.actual_lab_completions == 1 then
+    state.phase = "await-second-queue"
+  elseif state.actual_lab_completions == 2 then
+    state.phase = "await-published-cap"
+    freeze_lab(state)
+  else
+    fail("source completed more than two gear levels")
+  end
 end)
 
 script.on_load(function()
@@ -219,12 +237,16 @@ script.on_event(defines.events.on_tick, function()
     return
   end
   if game.tick > state.deadline_tick then fail("source labs did not complete") end
-  lab(state)
-  if state.phase == "await-second-queue" and game.forces.player.current_research == nil then
-    if game.forces.player.add_research(technology(game.forces.player, GEAR)) ~= true then
-      fail("could not queue second native gear research")
+  if state.phase == "await-first-lab" or state.phase == "await-second-lab" then
+    recharge_lab(state)
+  elseif state.phase == "await-second-queue" then
+    if game.forces.player.current_research == nil then
+      if game.forces.player.add_research(technology(game.forces.player, GEAR)) ~= true then
+        fail("could not queue second native gear research")
+      end
+      state.phase = "await-second-lab"
     end
-    state.phase = "await-second-lab"
+    recharge_lab(state)
   elseif state.phase == "await-published-cap" then
     local player = status(game.forces.player)
     if player.enabled == false and player.visible == true then
@@ -235,5 +257,7 @@ script.on_event(defines.events.on_tick, function()
       marker("initial", state)
       game.server_save(SAVE)
     end
+  else
+    fail("source fixture phase is invalid")
   end
 end)
