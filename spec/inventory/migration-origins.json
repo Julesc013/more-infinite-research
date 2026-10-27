@@ -1318,9 +1318,10 @@
         }
       ],
       "direct_current_engine_status": "direct-f200-origin",
-      "archive_sha256": null,
-      "archive_byte_status": "tag-source-characterized-archive-not-byte-verified",
-      "native_status": "not_run"
+      "archive_sha256": "251EFDAB4983CDFF0E2C150304DF7B7846EDEA6E1B5B0927C3FBBD8449E65DAB",
+      "archive_byte_status": "verified-official-archive-info-controller-only-not-native-qualified",
+      "native_status": "not_run",
+      "archive_readback": "spec/evidence/historical-boolean-cap-f200-archive-metadata.json"
     },
     {
       "tag": "2.5.11",
@@ -1347,9 +1348,10 @@
         }
       ],
       "direct_current_engine_status": "direct-f200-origin",
-      "archive_sha256": null,
-      "archive_byte_status": "tag-source-characterized-archive-not-byte-verified",
-      "native_status": "not_run"
+      "archive_sha256": "4AE3DA83C4F8CB7D084891065387B78032BB25B8E4ED3948058D9B773070847C",
+      "archive_byte_status": "verified-official-archive-info-controller-only-not-native-qualified",
+      "native_status": "not_run",
+      "archive_readback": "spec/evidence/historical-boolean-cap-f200-archive-metadata.json"
     },
     {
       "tag": "3.0.0",
@@ -1751,9 +1753,10 @@
         }
       ],
       "direct_current_engine_status": "direct-f210-origin",
-      "archive_sha256": null,
-      "archive_byte_status": "tag-source-characterized-archive-not-byte-verified",
-      "native_status": "not_run"
+      "archive_sha256": "5D88F2F971622E04846F6FC26859777F429C71FE34ECD9250AB2BA56B9A4C1B7",
+      "archive_byte_status": "verified-official-archive-info-controller-only-not-native-qualified",
+      "native_status": "not_run",
+      "archive_readback": "spec/evidence/historical-boolean-cap-archive-metadata.json"
     },
     {
       "tag": "3.2.11",
@@ -1782,9 +1785,10 @@
         }
       ],
       "direct_current_engine_status": "direct-f210-origin",
-      "archive_sha256": null,
-      "archive_byte_status": "tag-source-characterized-archive-not-byte-verified",
-      "native_status": "not_run"
+      "archive_sha256": "5B0252C3E1B8A20FF8E31F408F0217DDC77D2DF0D1C15F59653E948472870A5A",
+      "archive_byte_status": "verified-official-archive-info-controller-only-not-native-qualified",
+      "native_status": "not_run",
+      "archive_readback": "spec/evidence/historical-boolean-cap-archive-metadata.json"
     }
   ],
   "migration_member_audit": {
@@ -2141,7 +2145,7 @@
           "archive_sha256": "6395C4A5A0F74C67729746D0FBF6162329978B47C5C29D54CC0045F2977C7E44",
           "source_case": "not_run",
           "final_5_x_case": "not_run",
-          "disposition": "requires-exact-archive-and-native-source-save"
+          "disposition": "archive-verified-requires-native-source-save-and-successor-qualification"
         },
         {
           "origin_tag": "1.1.5",
@@ -2157,7 +2161,7 @@
           "archive_sha256": "880C137F7AB35FE7AF1DA5538BFA91F620C80785134DB488800352DD6154AB22",
           "source_case": "not_run",
           "final_5_x_case": "not_run",
-          "disposition": "requires-exact-archive-and-native-source-save"
+          "disposition": "archive-verified-requires-native-source-save-and-successor-qualification"
         },
         {
           "origin_tag": "1.2.5",
@@ -2266,18 +2270,18 @@
         {
           "origin_tag": "2.5.10",
           "factorio_version": "2.0",
-          "archive_sha256": null,
+          "archive_sha256": "251EFDAB4983CDFF0E2C150304DF7B7846EDEA6E1B5B0927C3FBBD8449E65DAB",
           "source_case": "not_run",
           "final_5_x_case": "not_run",
-          "disposition": "requires-exact-archive-and-native-source-save"
+          "disposition": "archive-verified-requires-native-source-save-and-successor-qualification"
         },
         {
           "origin_tag": "2.5.11",
           "factorio_version": "2.0",
-          "archive_sha256": null,
+          "archive_sha256": "4AE3DA83C4F8CB7D084891065387B78032BB25B8E4ED3948058D9B773070847C",
           "source_case": "not_run",
           "final_5_x_case": "not_run",
-          "disposition": "requires-exact-archive-and-native-source-save"
+          "disposition": "archive-verified-requires-native-source-save-and-successor-qualification"
         },
         {
           "origin_tag": "2.0.0",
@@ -2426,18 +2430,18 @@
         {
           "origin_tag": "3.2.10",
           "factorio_version": "2.1",
-          "archive_sha256": null,
+          "archive_sha256": "5D88F2F971622E04846F6FC26859777F429C71FE34ECD9250AB2BA56B9A4C1B7",
           "source_case": "not_run",
           "final_5_x_case": "not_run",
-          "disposition": "requires-exact-archive-and-native-source-save"
+          "disposition": "archive-verified-requires-native-source-save-and-successor-qualification"
         },
         {
           "origin_tag": "3.2.11",
           "factorio_version": "2.1",
-          "archive_sha256": null,
+          "archive_sha256": "5B0252C3E1B8A20FF8E31F408F0217DDC77D2DF0D1C15F59653E948472870A5A",
           "source_case": "not_run",
           "final_5_x_case": "not_run",
-          "disposition": "requires-exact-archive-and-native-source-save"
+          "disposition": "archive-verified-requires-native-source-save-and-successor-qualification"
         }
       ]
     },
