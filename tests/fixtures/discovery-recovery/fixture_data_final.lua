@@ -62,13 +62,27 @@ local function assert_iron(row)
   return unit
 end
 
-local function assert_discovery(row)
+local function assert_discovery(row, version)
   if type(row) ~= "table" or row.name ~= DISCOVERY or row.type ~= "technology" then
     fail("source Vulcanus discovery technology is absent")
   end
-  local effect = type(row.effects) == "table" and row.effects[1] or nil
-  if type(row.effects) ~= "table" or #row.effects ~= 1 or type(effect) ~= "table"
-      or effect.type ~= "unlock-space-location" or effect.space_location ~= "vulcanus" then
+  local effects = row.effects
+  if type(effects) ~= "table" then fail("source Vulcanus discovery effect differs") end
+  if version == "3.2.0" then
+    local effect = effects[1]
+    if #effects ~= 1 or type(effect) ~= "table" or effect.type ~= "unlock-travel-to-space-platforms"
+        or effect.modifier ~= true then
+      fail("source Vulcanus discovery effect differs")
+    end
+  elseif version == "3.2.1" then
+    local unlock, travel = effects[1], effects[2]
+    if #effects ~= 2 or type(unlock) ~= "table" or unlock.type ~= "unlock-space-location"
+        or unlock.space_location ~= "vulcanus"
+        or type(travel) ~= "table" or travel.type ~= "unlock-travel-to-space-platforms"
+        or travel.modifier ~= true then
+      fail("source Vulcanus discovery effect differs")
+    end
+  else
     fail("source Vulcanus discovery effect differs")
   end
   local unit = row.unit
@@ -85,7 +99,7 @@ function M.apply(stage)
   exact_official_closure(stage)
   local iron_unit = assert_iron(data.raw.technology and data.raw.technology[IRON])
   if stage == "source" then
-    local discovery_unit = assert_discovery(data.raw.technology and data.raw.technology[DISCOVERY])
+    local discovery_unit = assert_discovery(data.raw.technology and data.raw.technology[DISCOVERY], source_version())
     discovery_unit.count_formula, discovery_unit.count, discovery_unit.time = nil, 1, 1
   else
     -- A five-second current lab preserves a representable 42-percent queue
