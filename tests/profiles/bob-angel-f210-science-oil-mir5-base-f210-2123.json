@@ -219,7 +219,7 @@
     "bobwarfare_3.0.2.zip": "535CFECE8A712650959FA172290A43E9DBC290BA4F3CD21B9CC6DE621726A0EA",
     "mir-fixture-mir5-active-mods-observer_0.1.0.zip": "A15A7D628D66953D2E0C4D4FA288F47CBF9C5678327C7EB3D23ADB5DC78331C0",
     "more-infinite-research_5.0.21000.zip": "E3A65C08AC7798A66FB1BE30D24307B17C8B366DD901953BDE2A09BD6939C8CE",
-    "mir-fixture-mir5-bob-angel-f210-science-oil_0.1.0.zip": "FEFEE3B8625E71FF50F1C0A193301D58394F8BA23AA937AAAA736B1A2D2349A7"
+    "mir-fixture-mir5-bob-angel-f210-science-oil_0.1.0.zip": "CF59148489FE31A6974DC619A20CE41C28BD79DB3BE797F62324A4CD493C8F13"
   },
-  "scope": "Exact b251ae7a54104ace87cb0da4cf531cf53f03c93d/player79b73a6a8e68987737e69bf2d95ec6555b49f901 F210 base current-successor input for the Bob/Angel science and disabled oil fixture. Exact q009/q010 closure and A15 observer are unchanged. The four-member raw-Git a9754abcd7405e1ddffa9f4dc8051b71d00855fe owned fixture is FEFEE3B8625E71FF50F1C0A193301D58394F8BA23AA937AAAA736B1A2D2349A7 (7893 bytes). Prepared input only: native science labs, oil saved state, server save and cold reloads remain required. Original c37 prepared containers and native adverses remain preserved."
+  "scope": "Exact b251ae7a54104ace87cb0da4cf531cf53f03c93d/player79b73a6a8e68987737e69bf2d95ec6555b49f901 F210 base current-successor input for the Bob/Angel science and disabled oil fixture. Exact q009/q010 closure and A15 observer are unchanged. The four-member raw-Git 32ddafc4fece8d0c3a998a897ee9de1a3e32053e owned fixture is CF59148489FE31A6974DC619A20CE41C28BD79DB3BE797F62324A4CD493C8F13 (8199 bytes). Prepared input only: native science labs, oil saved state, server save and cold reloads remain required. Original c37/a975/98bab prepared containers and native adverses remain preserved."
 }

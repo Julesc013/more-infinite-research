@@ -29,11 +29,12 @@ SOURCE = "b251ae7a54104ace87cb0da4cf531cf53f03c93d"
 PLAYER_TREE = "79b73a6a8e68987737e69bf2d95ec6555b49f901"
 SCIENCE = "recipe-prod-research_science_pack_productivity-1"
 OIL = "recipe-prod-research_oil_cracking_productivity-1"
-INPUT_REVISION = "a9754abcd7405e1ddffa9f4dc8051b71d00855fe"
-INPUT_RECEIPT = ROOT / "spec/evidence/bob-angel-f210-science-oil-inputs-a9754abc.json"
+INPUT_REVISION = "32ddafc4fece8d0c3a998a897ee9de1a3e32053e"
+INPUT_RECEIPT = ROOT / "spec/evidence/bob-angel-f210-science-oil-inputs-32ddafc4.json"
 FIXTURE_ARCHIVE = "mir-fixture-mir5-bob-angel-f210-science-oil_0.1.0.zip"
-FIXTURE_SHA = "FEFEE3B8625E71FF50F1C0A193301D58394F8BA23AA937AAAA736B1A2D2349A7"
-FIXTURE_BYTES = 7893
+FIXTURE_SHA = "CF59148489FE31A6974DC619A20CE41C28BD79DB3BE797F62324A4CD493C8F13"
+FIXTURE_BYTES = 8199
+FROZEN_PACKAGE_TOOL_SHA256 = "00ED00D66BD558554068405C8882419F852FC2F66646088052888D70E25DA61E"
 
 BASE_VECTOR = [
     "automation-science-pack", "logistic-science-pack", "chemical-science-pack",
@@ -226,6 +227,14 @@ function run_control_model(mods, vector, prerequisites, effect_names, missing, t
       if key=="researched" and value==false then state.level=1 end
     end})
   end
+  local function apply_native_research_effects(force)
+    local science=force.technologies["recipe-prod-research_science_pack_productivity-1"]
+    local oil=force.technologies["recipe-prod-research_oil_cracking_productivity-1"]
+    for _,recipe in ipairs(effect_names) do force.recipes[recipe].productivity_bonus=.1*(science.level-1) end
+    for _,recipe in ipairs({"heavy-oil-cracking","light-oil-cracking"}) do
+      force.recipes[recipe].productivity_bonus=.1*(oil.level-1)
+    end
+  end
   local function new_force(name,index)
     local force={name=name,index=index,valid=true,technologies={},recipes={},research_queue={},research_progress=0}
     local science_effects,oil_effects={},{}
@@ -238,7 +247,13 @@ function run_control_model(mods, vector, prerequisites, effect_names, missing, t
       force.recipes[recipe]={productivity_bonus=0}
     end
     local inputs={}
-    for _,item in ipairs(vector) do inputs[#inputs+1]={name=item,amount=1} end
+    -- Deliberately differ from the declared data-stage order: runtime
+    -- ingredients must still match exact identities and quantities.
+    for index=#vector,1,-1 do inputs[#inputs+1]={name=vector[index],amount=1} end
+    if tamper=="runtime-input-weight" then inputs[3].amount=2 end
+    if tamper=="runtime-input-duplicate" then inputs[3].name=inputs[2].name end
+    if tamper=="runtime-input-foreign" then inputs[3].name="unexpected-science" end
+    if tamper=="runtime-input-missing" then table.remove(inputs) end
     force.technologies["recipe-prod-research_science_pack_productivity-1"]=
       technology("recipe-prod-research_science_pack_productivity-1",science_effects,inputs,prerequisites)
     force.technologies["recipe-prod-research_oil_cracking_productivity-1"]=
@@ -256,12 +271,9 @@ function run_control_model(mods, vector, prerequisites, effect_names, missing, t
     for _,value in pairs(force.technologies) do value.force=force end
     function force.enable_all_prototypes() end
     function force.reset_technology_effects()
-      local science=force.technologies["recipe-prod-research_science_pack_productivity-1"]
+      apply_native_research_effects(force)
       local oil=force.technologies["recipe-prod-research_oil_cracking_productivity-1"]
-      for _,recipe in ipairs(effect_names) do force.recipes[recipe].productivity_bonus=.1*(science.level-1) end
-      for _,recipe in ipairs({"heavy-oil-cracking","light-oil-cracking"}) do
-        force.recipes[recipe].productivity_bonus=.1*(oil.level-1)
-      end
+      if oil.level>1 then oil.enabled=true end
     end
     function force.add_research(value)
       if value==nil or value.enabled~=true or force.current_research~=nil then return false end
@@ -308,9 +320,9 @@ function run_control_model(mods, vector, prerequisites, effect_names, missing, t
   game.tick=1;ok,result=pcall(callbacks.events[2]);if not ok then return {ok=false,message=tostring(result),saves=saves,markers=markers} end
   local science=player.technologies["recipe-prod-research_science_pack_productivity-1"]
   for completion=1,2 do
-    science.researched=false;science.level=completion+1;player.current_research=nil;player.research_queue={};player.reset_technology_effects()
+    science.researched=false;science.level=completion+1;player.current_research=nil;player.research_queue={};apply_native_research_effects(player)
     for _,item in ipairs(vector) do counts[item]=counts[item]-1 end
-    ok,result=pcall(callbacks.events[1],{research=science});if not ok then return {ok=false,message=tostring(result),saves=saves,markers=markers} end
+    ok,result=pcall(callbacks.events[1],{research=science,by_script=tamper=="scripted-completion"});if not ok then return {ok=false,message=tostring(result),saves=saves,markers=markers} end
     game.tick=game.tick+1;ok,result=pcall(callbacks.events[2]);if not ok then return {ok=false,message=tostring(result),saves=saves,markers=markers} end
   end
   if tamper=="oil" then player.technologies["recipe-prod-research_oil_cracking_productivity-1"].saved_progress=.5 end
@@ -419,26 +431,30 @@ end
         expected = {name: f"tests/fixtures/bob-angel-f210-science-oil/{name}"
                     for name in ("info.json", "control.lua", "data-final-fixes.lua", "fixture_facts.lua")}
         self.assertEqual(expected, {row["path"]: row["source_path"] for row in fixture["members"]})
-        for revision in (INPUT_REVISION, "HEAD"):
-            for row in fixture["members"]:
+        for row in fixture["members"]:
+            for revision in (INPUT_REVISION, "HEAD"):
                 raw = subprocess.check_output(["git", "show", f"{revision}:{row['source_path']}"], cwd=ROOT)
                 self.assertEqual((row["sha256"], row["bytes"]),
                                  (hashlib.sha256(raw).hexdigest().upper(), len(raw)),
                                  f"{revision}:{row['source_path']}")
         helper = receipt["package_tool"]
         raw_helper = subprocess.check_output(["git", "show", f"{INPUT_REVISION}:{helper['path']}"], cwd=ROOT)
-        self.assertEqual(helper["committed_sha256"], hashlib.sha256(raw_helper).hexdigest().upper(),
-                         f"{INPUT_REVISION}:{helper['path']}")
+        self.assertEqual(FROZEN_PACKAGE_TOOL_SHA256, hashlib.sha256(raw_helper).hexdigest().upper())
+        self.assertEqual(FROZEN_PACKAGE_TOOL_SHA256, helper["committed_sha256"])
+        self.assertEqual(FROZEN_PACKAGE_TOOL_SHA256, helper["executed_worktree_sha256"])
+        # Preserve the actual build-tool identity and independently prove that
+        # today's helper still rebuilds those exact frozen fixture members.
         with tempfile.TemporaryDirectory() as temporary:
-            projection = Path(temporary) / "fixture-projection"
+            temporary = Path(temporary)
+            projection = temporary / "projection"
             projection.mkdir()
-            for row in fixture["members"]:
-                (projection / row["path"]).write_bytes(subprocess.check_output(
-                    ["git", "show", f"{INPUT_REVISION}:{row['source_path']}"], cwd=ROOT))
-            record = PACKAGE.build(projection, Path(temporary) / FIXTURE_ARCHIVE)
-            self.assertEqual((FIXTURE_SHA, FIXTURE_BYTES), (record["sha256"].upper(), record["bytes"]))
+            for member in fixture["members"]:
+                (projection / member["path"]).write_bytes(subprocess.check_output(
+                    ["git", "show", f"{INPUT_REVISION}:{member['source_path']}"], cwd=ROOT))
+            current = PACKAGE.build(projection, temporary / FIXTURE_ARCHIVE)
+            self.assertEqual((FIXTURE_SHA, FIXTURE_BYTES), (current["sha256"].upper(), current["bytes"]))
             self.assertEqual([{"path": row["path"], "sha256": row["sha256"].lower(), "bytes": row["bytes"]}
-                              for row in fixture["members"]], record["members"])
+                              for row in fixture["members"]], current["members"])
         expected_profiles = {
             "tests/profiles/bob-angel-f210-science-oil-mir5-base-f210-2123.json",
             "tests/profiles/bob-angel-f210-science-oil-mir5-space-age-f210-2123.json",
@@ -556,21 +572,54 @@ end
         self.assertIn("reload oil saved identity differs", tampered["message"])
         self.assertEqual(1, tampered["saves"])
 
-    def test_frozen_c37_seed_reproduces_native_researched_false_level_reset(self):
+    def test_runtime_inputs_reject_missing_duplicate_foreign_and_changed_weights(self):
+        for opponent in ("runtime-input-weight", "runtime-input-duplicate", "runtime-input-foreign", "runtime-input-missing"):
+            with self.subTest(opponent=opponent):
+                result = plain(self.lua.eval("run_control_model")(
+                    lua_value(self.lua, self._mods(False)), lua_value(self.lua, BASE_VECTOR),
+                    lua_value(self.lua, BASE_PREREQUISITES), lua_value(self.lua, BASE_EFFECTS), None, opponent))
+                self.assertFalse(result["ok"])
+                self.assertIn("ingredient", result["message"])
+                self.assertEqual(0, result["saves"])
+
+    def test_frozen_98bab_runtime_guard_refuses_reordered_equal_ingredients(self):
         self.lua.globals().control_override = subprocess.check_output([
-            "git", "show", "c37fca88667d550660f5b9c0efd7f272b56d6025:tests/fixtures/bob-angel-f210-science-oil/control.lua"
+            "git", "show", "98bab2c2d346dc508c0f008d824ebc867d920595:tests/fixtures/bob-angel-f210-science-oil/control.lua"
         ], cwd=ROOT).decode("utf-8")
         result = plain(self.lua.eval("run_control_model")(
             lua_value(self.lua, self._mods(False)), lua_value(self.lua, BASE_VECTOR),
             lua_value(self.lua, BASE_PREREQUISITES), lua_value(self.lua, BASE_EFFECTS), None))
         self.assertFalse(result["ok"])
-        self.assertIn("player oil saved identity differs", result["message"])
+        self.assertIn("science ingredient differs", result["message"])
         self.assertEqual(0, result["saves"])
+
+    def test_frozen_seeds_reproduce_native_level_and_reset_refusals(self):
+        for revision in ("c37fca88667d550660f5b9c0efd7f272b56d6025",
+                         "a9754abcd7405e1ddffa9f4dc8051b71d00855fe"):
+            with self.subTest(revision=revision):
+                self.lua.globals().control_override = subprocess.check_output([
+                    "git", "show", revision + ":tests/fixtures/bob-angel-f210-science-oil/control.lua"
+                ], cwd=ROOT).decode("utf-8")
+                result = plain(self.lua.eval("run_control_model")(
+                    lua_value(self.lua, self._mods(False)), lua_value(self.lua, BASE_VECTOR),
+                    lua_value(self.lua, BASE_PREREQUISITES), lua_value(self.lua, BASE_EFFECTS), None))
+                self.assertFalse(result["ok"])
+                self.assertIn("player oil saved identity differs", result["message"])
+                self.assertEqual(0, result["saves"])
+
+    def test_scripted_research_does_not_satisfy_actual_lab_completion_witness(self):
+        result = plain(self.lua.eval("run_control_model")(
+            lua_value(self.lua, self._mods(False)), lua_value(self.lua, BASE_VECTOR),
+            lua_value(self.lua, BASE_PREREQUISITES), lua_value(self.lua, BASE_EFFECTS), None,
+            "scripted-completion"))
+        self.assertEqual(0, result["saves"])
+        self.assertEqual({}, result["markers"])
 
     def test_source_guard_has_explicit_level_setter_and_readonly_opponents(self):
         source = (FIXTURE / "control.lua").read_text(encoding="utf-8")
         self.assertLess(source.index("value.researched = false"), source.index("value.level = level"))
         self.assertLess(source.index("value.level = level"), source.index("value.enabled = false"))
+        self.assertLess(source.index("force.reset_technology_effects()"), source.index("value.enabled = false"))
         self.assertLess(source.index("value.enabled = false"), source.index("value.saved_progress = saved"))
         self.assertIn('effect_vector(value, expected.effects, label .. " science")', source)
         self.assertIn('input_vector(value, expected.vector, label .. " science")', source)
