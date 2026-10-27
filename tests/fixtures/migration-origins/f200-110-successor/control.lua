@@ -158,12 +158,14 @@ local function source_row_text(row)
     .. " saved=" .. tostring(row.saved)
 end
 local function runtime_row_text(value)
-  if type(value) ~= "table" then return "technology=" .. tostring(value) end
+  local kind = type(value)
+  if kind ~= "table" and kind ~= "userdata" then return "technology=" .. tostring(value) end
+  local prototype = value.prototype
   return "level=" .. tostring(value.level)
     .. " researched=" .. tostring(value.researched)
     .. " enabled=" .. tostring(value.enabled)
     .. " visible=" .. tostring(value.visible_when_disabled)
-    .. " maximum=" .. tostring(value.prototype and value.prototype.max_level)
+    .. " maximum=" .. tostring(prototype and prototype.max_level)
     .. " saved=" .. tostring(value.saved_progress)
 end
 local function saved_fraction(value)
@@ -180,11 +182,21 @@ local function assert_snapshot(snapshot, names, label, direct_level, direct_save
   for _, name in ipairs(names) do
     local row = snapshot.technologies[name]
     local expected_level = name == catalogue.direct and direct_level or 2
-    local expected_progress = name == catalogue.direct and direct_saved or 0
+    local expected_progress
+    if name == catalogue.direct then
+      expected_progress = direct_saved
+    else
+      expected_progress = 0
+    end
+    local progress_matches
+    if name == catalogue.direct and expected_progress == nil then
+      progress_matches = saved_fraction(row.saved)
+    else
+      progress_matches = close(row.saved, expected_progress)
+    end
     if type(row) ~= "table" or row.level ~= expected_level or row.researched ~= false or row.enabled ~= true
         or row.visible ~= false or row.maximum ~= UINT32_MAX
-        or (name == catalogue.direct and expected_progress == nil and not saved_fraction(row.saved))
-        or (name ~= catalogue.direct or expected_progress ~= nil) and not close(row.saved, expected_progress) then
+        or not progress_matches then
       fail(label .. " saved source technology differs: " .. name .. " " .. source_row_text(row))
     end
     if snapshot.effects[name] ~= source_effect_signature(name) then

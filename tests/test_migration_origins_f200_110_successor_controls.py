@@ -290,7 +290,7 @@ class MigrationOriginF200110SuccessorControls(unittest.TestCase):
         self.lua.globals().legacy_module_definitions_path = LEGACY_MODULE_DEFINITIONS.as_posix()
         self.lua.globals().legacy_module_runtime_path = LEGACY_MODULE_RUNTIME.as_posix()
         self.lua.execute(r'''
-          function migration_origin_110_successor_lifecycle(target, source_fixture_name, active_wrapper_name, catalogue_fixture_name, legacy_module_bonus, reset_drops_module_bonus, saved_battery_token, current_recipe_scalar, duplicate_current_recipe, foreign_saved, foreign_queue_progress, foreign_current_saved)
+          function migration_origin_110_successor_lifecycle(target, source_fixture_name, active_wrapper_name, catalogue_fixture_name, legacy_module_bonus, reset_drops_module_bonus, saved_battery_token, current_recipe_scalar, duplicate_current_recipe, foreign_saved, foreign_queue_progress, foreign_current_saved, foreign_current_technology)
             local callbacks={events={}}
             local env={storage={},logs={},created_labs=0,saved=false,
               script={active_mods={},on_configuration_changed=function(fn) callbacks.configuration=fn end,
@@ -419,7 +419,11 @@ class MigrationOriginF200110SuccessorControls(unittest.TestCase):
             foreign.current_research=foreign.technologies[catalogue.direct]
             foreign.research_queue={foreign.technologies[catalogue.direct],foreign.technologies["recipe-prod-research_plastic-1"]}
             foreign.research_progress=foreign_queue_progress
-            if foreign_current_saved~=nil then foreign.technologies[catalogue.direct].saved_progress=foreign_current_saved end
+            if foreign_current_technology~=nil then
+              foreign.technologies[catalogue.direct]=foreign_current_technology
+            elseif foreign_current_saved~=nil then
+              foreign.technologies[catalogue.direct].saved_progress=foreign_current_saved
+            end
             local state={phase="completed",roster=roster,source_labs=1,player_snapshot=player_snapshot,
               foreign_index=2,foreign_snapshot=foreign_snapshot,
               foreign_queue={current=catalogue.direct,queue={catalogue.direct,"recipe-prod-research_plastic-1"},progress=.42},
@@ -596,10 +600,16 @@ class MigrationOriginF200110SuccessorControls(unittest.TestCase):
         self.assertEqual((0, .42), (accepted["foreign_saved"], accepted["foreign_progress"]))
         self.assertEqual((1, 1), (accepted["created_labs"], accepted["player_add_calls"]))
 
+        saved_fraction = py(self.lua.eval("migration_origin_110_successor_lifecycle")(
+            "f200", source["name"], wrapper["name"], None, None, False, None, None, False, .125, .42, None))
+        self.assertTrue(saved_fraction["ok"], saved_fraction["message"])
+        self.assertEqual((.125, .42), (saved_fraction["foreign_saved"], saved_fraction["foreign_progress"]))
+        self.assertEqual((1, 1), (saved_fraction["created_labs"], saved_fraction["player_add_calls"]))
+
         opponents = (
-            ("saved", 0, .42, .1,
+            ("saved", .125, .42, .1,
              "foreign retained source technology differs: recipe-prod-research_gears-1"),
-            ("queue", 0, .41, None, "foreign queue/progress differs"),
+            ("queue", .125, .41, None, "foreign queue/progress differs"),
         )
         for label, saved, progress, current_saved, expected in opponents:
             with self.subTest(label=label):
@@ -609,7 +619,7 @@ class MigrationOriginF200110SuccessorControls(unittest.TestCase):
                 self.assertFalse(result["ok"])
                 self.assertIn(expected, result["message"])
                 if label == "saved":
-                    self.assertIn("source{level=1 researched=false enabled=true visible=false maximum=4294967295 saved=0}",
+                    self.assertIn("source{level=1 researched=false enabled=true visible=false maximum=4294967295 saved=0.125}",
                                   result["message"])
                     self.assertIn("actual{level=1 researched=false enabled=true visible=false maximum=4294967295 saved=0.1}",
                                   result["message"])
@@ -617,6 +627,41 @@ class MigrationOriginF200110SuccessorControls(unittest.TestCase):
                 self.assertFalse(result["saved"])
                 self.assertFalse(result["source_state_changed"])
                 self.assertFalse(result["active_state_changed"])
+
+    def test_runtime_row_diagnostic_reads_native_userdata_shape(self):
+        self._install_lifecycle_model()
+        source = json.loads((SOURCE_FIXTURE / "info.json").read_text(encoding="utf-8"))
+        wrapper = json.loads((FIXTURE / "info-f200.json").read_text(encoding="utf-8"))
+
+        class NativePrototype:
+            max_level = 4294967295
+
+        class NativeTechnology:
+            name = DIRECT
+            valid = True
+            level = 1
+            researched = False
+            enabled = True
+            visible_when_disabled = False
+            saved_progress = .1
+            prototype = NativePrototype()
+
+        actual = NativeTechnology()
+        self.assertEqual("userdata", self.lua.eval("function(value) return type(value) end")(actual))
+        result = py(self.lua.eval("migration_origin_110_successor_lifecycle")(
+            "f200", source["name"], wrapper["name"], None, None, False,
+            None, None, False, .125, .42, None, actual))
+        self.assertFalse(result["ok"])
+        self.assertIn("foreign retained source technology differs: recipe-prod-research_gears-1", result["message"])
+        self.assertIn("source{level=1 researched=false enabled=true visible=false maximum=4294967295 saved=0.125}",
+                      result["message"])
+        self.assertIn("actual{level=1 researched=false enabled=true visible=false maximum=4294967295 saved=0.1}",
+                      result["message"])
+        self.assertNotIn("technology=", result["message"])
+        self.assertEqual((0, 0), (result["created_labs"], result["player_add_calls"]))
+        self.assertFalse(result["saved"])
+        self.assertFalse(result["source_state_changed"])
+        self.assertFalse(result["active_state_changed"])
 
     def test_control_accepts_only_the_exact_native_battery_token_and_current_recipe_float32_token(self):
         self._install_lifecycle_model()
