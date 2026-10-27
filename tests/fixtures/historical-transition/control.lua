@@ -101,6 +101,28 @@ local function freeze_source_lab(state)
   if lab.active or lab.energy ~= 0 then fail("published source lab did not freeze") end
 end
 
+local function assert_foreign_saved_state()
+  if target.foreign_force_name == nil then return end
+  local foreign = game.forces[target.foreign_force_name]
+  if not foreign then fail("historical transition foreign force is absent") end
+  local direct = technology(foreign, target.direct)
+  local progress = foreign.get_saved_technology_progress(target.direct)
+  if direct.enabled ~= false or direct.researched or not close(progress, target.foreign_saved_progress) then
+    fail("historical transition disabled foreign state differs")
+  end
+end
+
+local function seed_foreign_saved_state()
+  if target.foreign_force_name == nil then return end
+  local foreign = game.create_force(target.foreign_force_name)
+  if not foreign then fail("could not create historical transition foreign force") end
+  local direct = technology(foreign, target.direct)
+  if direct.researched then fail("historical transition foreign direct was already complete") end
+  direct.enabled = false
+  foreign.set_saved_technology_progress(target.direct, target.foreign_saved_progress)
+  assert_foreign_saved_state()
+end
+
 local function assert_source_direct(state)
   local force = game.forces.player
   local direct = technology(force, target.direct)
@@ -175,6 +197,7 @@ local function assert_candidate_input(state)
       or not close(force.manual_mining_speed_modifier, state.before_mining + target.direct_effect) then
     fail("MIR5 did not receive the published earned direct state")
   end
+  assert_foreign_saved_state()
   if target.successor_mode == "lab" then
     if direct.level ~= 2 or direct.researched then fail("MIR5 direct successor level differs") end
     assert_partial(force)
@@ -186,6 +209,7 @@ end
 local function assert_candidate_complete(state)
   local force = game.forces.player
   local direct = technology(force, target.direct)
+  assert_foreign_saved_state()
   if target.successor_mode == "preservation-only" then
     if (state.successor_direct_finished or 0) ~= 0 or not direct.researched
         or not close(force.manual_mining_speed_modifier, state.before_mining + target.direct_effect)
@@ -215,6 +239,10 @@ local function marker(stage, state)
   -- distinction as JSON null rather than emitting Lua's invalid JSON `nil`.
   local marker_queue_enabled = nil
   if target.queue_api == true then marker_queue_enabled = queue_enabled(force) end
+  local foreign_progress = nil
+  if target.foreign_force_name ~= nil then
+    foreign_progress = game.forces[target.foreign_force_name].get_saved_technology_progress(target.direct)
+  end
   log("[MIR5_NATIVE_FIXTURE] RESULT {"
     .. "\"case\":\"historical-transition\","
     .. "\"stage\":\"" .. stage .. "\","
@@ -229,6 +257,7 @@ local function marker(stage, state)
     .. "\"research_progress\":" .. tostring(force.research_progress) .. ","
     .. "\"queue_api\":" .. tostring(target.queue_api == true) .. ","
     .. "\"research_queue_enabled\":" .. json_boolean_or_null(marker_queue_enabled) .. ","
+    .. "\"foreign_saved_progress\":" .. (foreign_progress and tostring(foreign_progress) or "null") .. ","
     .. "\"two_cold_reload_witness\":" .. tostring(stage == "reload") .. ","
     .. "\"on_load_read_only\":" .. tostring(stage == "reload")
     .. "}")
@@ -238,6 +267,7 @@ local function initialize_published()
   if not game.active_mods["more-infinite-research"] then fail("published transition requires MIR") end
   local force, surface = game.forces.player, game.surfaces[1]
   local direct = technology(force, target.direct)
+  seed_foreign_saved_state()
   unlock_prerequisites(direct)
   direct.enabled = true
   if direct.researched then fail("published direct probe was already complete") end
@@ -334,6 +364,7 @@ script.on_event(defines.events.on_tick, function()
   if target.stage == "published" and state.phase == "published-ready" then
     assert_source_direct(state)
     assert_partial(game.forces.player)
+    assert_foreign_saved_state()
     if not state.saved then
       state.saved = true
       marker("initial", state)

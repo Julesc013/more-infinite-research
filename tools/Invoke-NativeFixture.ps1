@@ -321,7 +321,17 @@ function Assert-HistoricalFixtureArchive([string]$Archive,[string]$SourceDirecto
   } finally {$zip.Dispose()}
 }
 function Get-HistoricalTransitionFixtureTarget([string]$Target,[string]$MetadataPath,[string]$Stage) {
-  $allowed=@('f013','f014','f015','f016','f017','f100','f110')
+  $expectedTargets=[ordered]@{
+    f013=@{factorio_version='0.13';published_mir_version='4.7.01302';mir_version='5.0.01300'}
+    f014=@{factorio_version='0.14';published_mir_version='4.7.01402';mir_version='5.0.01400'}
+    f015=@{factorio_version='0.15';published_mir_version='4.7.01502';mir_version='5.0.01500'}
+    f016=@{factorio_version='0.16';published_mir_version='4.7.01602';mir_version='5.0.01600'}
+    f017=@{factorio_version='0.17';published_mir_version='4.7.01702';mir_version='5.0.01700'}
+    f018=@{factorio_version='0.18';published_mir_version='1.8.0';mir_version='5.0.01800'}
+    f100=@{factorio_version='1.0';published_mir_version='4.7.10002';mir_version='5.0.10000'}
+    f110=@{factorio_version='1.1';published_mir_version='4.7.11002';mir_version='5.0.11000'}
+  }
+  $allowed=@($expectedTargets.Keys)
   Assert-Fixture ($Target -in $allowed) 'historical transition target is unsupported'
   Assert-Fixture ($Stage -in @('published','mir5')) 'historical transition stage is unsupported'
   $metadata=(Resolve-Path -LiteralPath $MetadataPath).Path
@@ -333,10 +343,9 @@ function Get-HistoricalTransitionFixtureTarget([string]$Target,[string]$Metadata
   foreach($field in @('factorio_version','minimum_base','published_mir_version','mir_version','published_archive_sha256','direct','direct_effect','successor_mode')){
     Assert-Fixture ($selected.ContainsKey($field) -and -not [string]::IsNullOrWhiteSpace([string]$selected[$field])) "historical transition target lacks $field"
   }
-  Assert-Fixture ($Target -cmatch '^f(?:013|014|015|016|017|100|110)$') 'historical transition target literal identity differs'
-  Assert-Fixture ([string]$selected.factorio_version -cmatch '^(?:0[.]1[3-7]|1[.][01])$') 'historical transition factorio version differs'
-  $edition=$Target.Substring(1)
-  Assert-Fixture ([string]$selected.published_mir_version -ceq ('4.7.'+$edition+'02') -and [string]$selected.mir_version -ceq ('5.0.'+$edition+'00')) 'historical transition MIR versions differ'
+  $expected=$expectedTargets[$Target]
+  Assert-Fixture ([string]$selected.factorio_version -ceq [string]$expected.factorio_version) 'historical transition factorio version differs'
+  Assert-Fixture ([string]$selected.published_mir_version -ceq [string]$expected.published_mir_version -and [string]$selected.mir_version -ceq [string]$expected.mir_version) 'historical transition MIR versions differ'
   Assert-Fixture ([string]$selected.published_archive_sha256 -cmatch '^[A-Fa-f0-9]{64}$') 'historical transition published archive hash differs'
   Assert-Fixture ([string]$selected.direct -cmatch '^[a-z0-9][a-z0-9_-]*$') 'historical transition direct is not a literal-safe identifier'
   $directScience=@($selected.direct_science)
@@ -354,6 +363,15 @@ function Get-HistoricalTransitionFixtureTarget([string]$Target,[string]$Metadata
   if($queue){
     Assert-Fixture ($selected.ContainsKey('queue_probe') -and [string]$selected['queue_probe'] -cmatch '^[a-z0-9][a-z0-9_-]*$') 'historical transition queue probe is not a literal-safe identifier'
   }elseif($selected.ContainsKey('queue_probe')){throw '[mir5-native-fixture] historical transition non-queue target declares a queue probe'}
+  if($Target -ceq 'f018'){
+    Assert-Fixture ([string]$selected.published_archive_sha256 -ceq 'D785E6EBE7A72E6E9F01A3F89774A6AA30479430410447F603FEF1E0B9BD7B24') 'F018 historical transition published archive hash differs'
+    Assert-Fixture ([string]$selected.mir5_archive_sha256 -ceq '7803FC661DEFA441D1E9D508D1CA80029E619201BBECB0BF113D60D3D3ABEEB9') 'F018 historical transition MIR5 archive hash differs'
+    Assert-Fixture ($selected.ContainsKey('foreign_force_name') -and [string]$selected.foreign_force_name -ceq 'mir5-historical-transition-foreign') 'F018 historical transition foreign force differs'
+    Assert-Fixture ($selected.ContainsKey('foreign_saved_progress') -and [double]$selected.foreign_saved_progress -gt 0 -and [double]$selected.foreign_saved_progress -lt 1) 'F018 historical transition foreign progress differs'
+    Assert-Fixture ([string]$selected.published_unit_count_formula -ceq '8000 * 2^(L-1)' -and [string]$selected.mir5_unit_count_formula -ceq '1*(8000*2^(L-1))') 'F018 historical transition cost contract differs'
+  }elseif($selected.ContainsKey('foreign_force_name') -or $selected.ContainsKey('foreign_saved_progress') -or $selected.ContainsKey('published_unit_count_formula') -or $selected.ContainsKey('mir5_unit_count_formula')){
+    throw '[mir5-native-fixture] non-F018 historical transition declares F018-only state'
+  }
   $version=if($Stage -ceq 'published'){[string]$selected.published_mir_version}else{[string]$selected.mir_version}
   [pscustomobject][ordered]@{path=$metadata;sha256=Get-FixtureSha $metadata;name=[string]$value.name;version=[string]$value.version;target=$Target;stage=$Stage;factorio_version=[string]$selected.factorio_version;minimum_base=[string]$selected.minimum_base;mir_version=$version;definition=$selected}
 }
@@ -372,6 +390,10 @@ function ConvertTo-HistoricalTransitionFixtureTargetLiteral($Fixture) {
   if($value.ContainsKey('queue_api') -and [bool]$value.queue_api){
     $lines.Add('  queue_api=true,')
     $lines.Add(('  queue_probe="{0}",' -f [string]$value.queue_probe))
+  }
+  if([string]$Fixture.target -ceq 'f018'){
+    $lines.Add(('  foreign_force_name="{0}",' -f [string]$value.foreign_force_name))
+    $lines.Add(('  foreign_saved_progress={0},' -f ([double]$value.foreign_saved_progress).ToString('0.################',[Globalization.CultureInfo]::InvariantCulture)))
   }
   $lines.Add('}')
   ($lines -join "`n")+"`n"
@@ -555,6 +577,8 @@ if($MIRAbsent){
     Assert-Fixture ([string]$mirRows[0].version -ceq [string]$historicalFixture.mir_version) 'historical transition profile MIR version differs'
     if($HistoricalTransitionStage -ceq 'published'){
       Assert-Fixture ($ExpectedMIRArchiveSha256.ToUpperInvariant() -ceq [string]$historicalFixture.definition.published_archive_sha256) 'historical transition published archive hash differs'
+    }elseif($historicalFixture.target -ceq 'f018'){
+      Assert-Fixture ($ExpectedMIRArchiveSha256.ToUpperInvariant() -ceq [string]$historicalFixture.definition.mir5_archive_sha256) 'F018 historical transition MIR5 archive hash differs'
     }
   }
 }

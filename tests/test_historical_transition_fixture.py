@@ -1,4 +1,4 @@
-"""Host controls for the seven exact-engine historical predecessor transition fixture.
+"""Host controls for the eight exact-engine historical predecessor transition fixture.
 
 These controls exercise only the fixture and its runner contract.  They do not
 run Factorio or claim that a published save upgrades successfully.
@@ -28,14 +28,16 @@ class HistoricalTransitionFixtureControls(unittest.TestCase):
     def setUp(self):
         self.lua = LuaRuntime(unpack_returned_tuples=True)
 
-    def test_all_seven_profiles_pin_published_and_mir5_versions_without_extra_mods(self):
-        # Accepted public 4.7.2 archive checksums from dist/MIR-4.7.2-SHA256SUMS.txt.
+    def test_all_eight_profiles_pin_published_and_mir5_versions_without_extra_mods(self):
+        # F013--F110 use accepted public 4.7.2 checksums. F018 is the earlier
+        # published 1.8.0 archive, not an invented 4.7.018 predecessor.
         expected = {
             "f013": ("0.13.20", "4.7.01302", "5.0.01300", "69D02F628F1278B5D161B61E39DB4E3D1A5978E31D01638E2AE23E28594637C8", "preservation-only", False),
             "f014": ("0.14.23", "4.7.01402", "5.0.01400", "D34B6281A3815CD52AD91CABD1E1669650F2A2A761D9109DEDC07268D78D2CDE", "preservation-only", False),
             "f015": ("0.15.40", "4.7.01502", "5.0.01500", "758AA85BF41A10188DEA914AC456F672BAC7D3430E646CBDB6D761BE5ECC7B8A", "lab", False),
             "f016": ("0.16.51", "4.7.01602", "5.0.01600", "00053C78EE854EB8AE0CB5318F7A41E3C81E62F29FEB6E6DCE317635743520DB", "lab", False),
             "f017": ("0.17.79", "4.7.01702", "5.0.01700", "3FB8750565526816C1C33B3ADD6B82165B5AA6D026D47CD242251455FE5CFE32", "lab", True),
+            "f018": ("0.18.47", "1.8.0", "5.0.01800", "D785E6EBE7A72E6E9F01A3F89774A6AA30479430410447F603FEF1E0B9BD7B24", "lab", True),
             "f100": ("1.0.0", "4.7.10002", "5.0.10000", "87A80EB76B30A73BC8F16A8F4B92AA59BA3CC400FF5921819CB5E9CEFAB745E0", "lab", True),
             "f110": ("1.1.110", "4.7.11002", "5.0.11000", "723159A24668E28EE70214CCCC727D5B104CAA0A9A7A7FD73B4938D55E5F3E91", "lab", True),
         }
@@ -58,6 +60,13 @@ class HistoricalTransitionFixtureControls(unittest.TestCase):
                     self.assertEqual(fact["queue_probe"], "braking-force-1")
                 else:
                     self.assertNotIn("queue_probe", fact)
+                if target == "f018":
+                    self.assertEqual(fact["foreign_force_name"], "mir5-historical-transition-foreign")
+                    self.assertEqual(fact["foreign_saved_progress"], .27)
+                    self.assertEqual(
+                        (fact["mir5_archive_sha256"], fact["published_unit_count_formula"], fact["mir5_unit_count_formula"]),
+                        ("7803FC661DEFA441D1E9D508D1CA80029E619201BBECB0BF113D60D3D3ABEEB9", "8000 * 2^(L-1)", "1*(8000*2^(L-1))"),
+                    )
                 for role, version in (("published", published), ("mir5", mir5)):
                     profile = json.loads((ROOT / f"tests/profiles/historical-transition-{role}-{target}.json")
                                          .read_text(encoding="utf-8"))
@@ -76,7 +85,9 @@ class HistoricalTransitionFixtureControls(unittest.TestCase):
         self.assertIn("MIR5 historical transition requires an immutable predecessor save hash", source)
         self.assertIn("historical transition profile MIR version differs", source)
         self.assertIn("historical transition published archive hash differs", source)
-        self.assertIn("('4.7.'+$edition+'02')", source)
+        self.assertIn("f018=@{factorio_version='0.18';published_mir_version='1.8.0';mir_version='5.0.01800'}", source)
+        self.assertIn("F018 historical transition foreign force differs", source)
+        self.assertIn("F018 historical transition cost contract differs", source)
         self.assertIn("historical fixtures require a fresh full run", source)
         self.assertIn("historical-transition", source)
         self.assertIn("transition_stage", source)
@@ -104,6 +115,11 @@ class HistoricalTransitionFixtureControls(unittest.TestCase):
           $early=Get-HistoricalTransitionFixtureTarget -Target f013 -MetadataPath $env:MIR_TEST_METADATA -Stage mir5
           $earlyLiteral=ConvertTo-HistoricalTransitionFixtureTargetLiteral $early
           if($earlyLiteral -notmatch 'successor_mode="preservation-only"' -or $earlyLiteral -match 'partial_progress'){throw 'early literal invented a successor state'}
+          $f018=Get-HistoricalTransitionFixtureTarget -Target f018 -MetadataPath $env:MIR_TEST_METADATA -Stage published
+          $f018Mir5=Get-HistoricalTransitionFixtureTarget -Target f018 -MetadataPath $env:MIR_TEST_METADATA -Stage mir5
+          if($f018.mir_version -cne '1.8.0' -or $f018Mir5.mir_version -cne '5.0.01800'){throw 'F018 stage version differs'}
+          $f018Literal=ConvertTo-HistoricalTransitionFixtureTargetLiteral $f018Mir5
+          if($f018Literal -notmatch 'foreign_force_name="mir5-historical-transition-foreign"' -or $f018Literal -notmatch 'foreign_saved_progress=0.27'){throw 'F018 foreign literal differs'}
         '''
         env = dict(os.environ, MIR_TEST_RUNNER=str(RUNNER), MIR_TEST_METADATA=str(FIXTURE / "metadata.json"))
         result = subprocess.run(["pwsh", "-NoProfile", "-Command", functions], cwd=ROOT,
@@ -114,11 +130,26 @@ class HistoricalTransitionFixtureControls(unittest.TestCase):
         del broken["targets"]["f017"]["queue_probe"]
         stale = json.loads((FIXTURE / "metadata.json").read_text(encoding="utf-8"))
         stale["targets"]["f017"]["published_mir_version"] = "4.7.01700"
+        f018_wrong_version = json.loads((FIXTURE / "metadata.json").read_text(encoding="utf-8"))
+        f018_wrong_version["targets"]["f018"]["published_mir_version"] = "4.7.01802"
+        f018_wrong_hash = json.loads((FIXTURE / "metadata.json").read_text(encoding="utf-8"))
+        f018_wrong_hash["targets"]["f018"]["published_archive_sha256"] = "0" * 64
+        f018_wrong_mir_hash = json.loads((FIXTURE / "metadata.json").read_text(encoding="utf-8"))
+        f018_wrong_mir_hash["targets"]["f018"]["mir5_archive_sha256"] = "0" * 64
+        f018_wrong_target = json.loads((FIXTURE / "metadata.json").read_text(encoding="utf-8"))
+        f018_wrong_target["targets"]["f018"] = f018_wrong_target["targets"]["f017"]
         with tempfile.TemporaryDirectory(prefix="mir5-historical-transition-bad-") as work:
             root = Path(work)
             broken_path, stale_path = root / "broken.json", root / "stale.json"
+            wrong_version_path, wrong_hash_path, wrong_mir_hash_path, wrong_target_path = (
+                root / "f018-wrong-version.json", root / "f018-wrong-hash.json", root / "f018-wrong-mir-hash.json", root / "f018-wrong-target.json"
+            )
             broken_path.write_text(json.dumps(broken), encoding="utf-8")
             stale_path.write_text(json.dumps(stale), encoding="utf-8")
+            wrong_version_path.write_text(json.dumps(f018_wrong_version), encoding="utf-8")
+            wrong_hash_path.write_text(json.dumps(f018_wrong_hash), encoding="utf-8")
+            wrong_mir_hash_path.write_text(json.dumps(f018_wrong_mir_hash), encoding="utf-8")
+            wrong_target_path.write_text(json.dumps(f018_wrong_target), encoding="utf-8")
             rejection = functions + r'''
               $queueRefused=$false
               try { Get-HistoricalTransitionFixtureTarget -Target f017 -MetadataPath $env:MIR_TEST_BROKEN -Stage published | Out-Null }
@@ -128,9 +159,29 @@ class HistoricalTransitionFixtureControls(unittest.TestCase):
               try { Get-HistoricalTransitionFixtureTarget -Target f017 -MetadataPath $env:MIR_TEST_STALE -Stage published | Out-Null }
               catch { if($_.Exception.Message -match 'MIR versions differ'){$staleRefused=$true}else{throw} }
               if(-not $staleRefused){throw 'stale 4.7.0 predecessor accepted'}
+              $wrongVersionRefused=$false
+              try { Get-HistoricalTransitionFixtureTarget -Target f018 -MetadataPath $env:MIR_TEST_F018_WRONG_VERSION -Stage published | Out-Null }
+              catch { if($_.Exception.Message -match 'MIR versions differ'){$wrongVersionRefused=$true}else{throw} }
+              if(-not $wrongVersionRefused){throw 'synthetic 4.7.018 predecessor accepted'}
+              $wrongHashRefused=$false
+              try { Get-HistoricalTransitionFixtureTarget -Target f018 -MetadataPath $env:MIR_TEST_F018_WRONG_HASH -Stage published | Out-Null }
+              catch { if($_.Exception.Message -match 'published archive hash differs'){$wrongHashRefused=$true}else{throw} }
+              if(-not $wrongHashRefused){throw 'wrong F018 predecessor hash accepted'}
+              $wrongMirHashRefused=$false
+              try { Get-HistoricalTransitionFixtureTarget -Target f018 -MetadataPath $env:MIR_TEST_F018_WRONG_MIR_HASH -Stage mir5 | Out-Null }
+              catch { if($_.Exception.Message -match 'MIR5 archive hash differs'){$wrongMirHashRefused=$true}else{throw} }
+              if(-not $wrongMirHashRefused){throw 'wrong F018 successor hash accepted'}
+              $wrongTargetRefused=$false
+              try { Get-HistoricalTransitionFixtureTarget -Target f018 -MetadataPath $env:MIR_TEST_F018_WRONG_TARGET -Stage published | Out-Null }
+              catch { if($_.Exception.Message -match 'factorio version differs'){$wrongTargetRefused=$true}else{throw} }
+              if(-not $wrongTargetRefused){throw 'F017 row admitted as F018'}
             '''
             env["MIR_TEST_BROKEN"] = str(broken_path)
             env["MIR_TEST_STALE"] = str(stale_path)
+            env["MIR_TEST_F018_WRONG_VERSION"] = str(wrong_version_path)
+            env["MIR_TEST_F018_WRONG_HASH"] = str(wrong_hash_path)
+            env["MIR_TEST_F018_WRONG_MIR_HASH"] = str(wrong_mir_hash_path)
+            env["MIR_TEST_F018_WRONG_TARGET"] = str(wrong_target_path)
             result = subprocess.run(["pwsh", "-NoProfile", "-Command", rejection], cwd=ROOT,
                                     text=True, capture_output=True, env=env, check=False)
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
@@ -184,6 +235,63 @@ class HistoricalTransitionFixtureControls(unittest.TestCase):
                        MIR_TEST_GOOD=str(good), MIR_TEST_WRONG=str(wrong), MIR_TEST_SOURCE=str(FIXTURE))
             result = subprocess.run(["pwsh", "-NoProfile", "-Command", functions + check], cwd=ROOT,
                                     text=True, capture_output=True, env=env, check=False)
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+
+    def test_f018_transition_archive_guard_composes_only_the_real_predecessor_or_successor_dependency(self):
+        functions = r'''
+          $ErrorActionPreference='Stop';Set-StrictMode -Version Latest
+          $tokens=$null;$errors=$null
+          $ast=[Management.Automation.Language.Parser]::ParseFile($env:MIR_TEST_RUNNER,[ref]$tokens,[ref]$errors)
+          if($errors.Count){throw 'parse failed'}
+          foreach($name in @('Assert-Fixture','Get-FixtureSha','Get-HistoricalTransitionFixtureTarget',
+            'ConvertTo-HistoricalTransitionFixtureTargetLiteral','Assert-HistoricalTransitionFixtureArchive')){
+            $node=@($ast.FindAll({param($n) $n -is [Management.Automation.Language.FunctionDefinitionAst] -and $n.Name -ceq $name},$true))
+            if($node.Count -ne 1){throw ('missing '+$name)}
+            Invoke-Expression $node[0].Extent.Text
+          }
+        '''
+        members = {name: (FIXTURE / name).read_bytes() for name in
+                   ("control.lua", "settings-updates.lua", "data-final-fixes.lua", "target.lua")}
+        with tempfile.TemporaryDirectory(prefix="mir5-f018-transition-archive-") as work:
+            root = Path(work)
+            published, mir5, wrong = root / "published.zip", root / "mir5.zip", root / "wrong.zip"
+            for stage, path, expected_dependency in (
+                ("published", published, "more-infinite-research = 1.8.0"),
+                ("mir5", mir5, "more-infinite-research = 5.0.01800"),
+                ("mir5", wrong, "more-infinite-research = 4.7.01802"),
+            ):
+                literal = (subprocess.run(
+                    ["pwsh", "-NoProfile", "-Command", functions +
+                     f"$fixture=Get-HistoricalTransitionFixtureTarget -Target f018 -MetadataPath $env:MIR_TEST_METADATA -Stage {stage}; ConvertTo-HistoricalTransitionFixtureTargetLiteral $fixture"],
+                    cwd=ROOT, text=True, capture_output=True, check=True,
+                    env=dict(os.environ, MIR_TEST_RUNNER=str(RUNNER), MIR_TEST_METADATA=str(FIXTURE / "metadata.json")),
+                ).stdout.strip() + "\n").encode("utf-8")
+                payload = dict(members)
+                payload["target-literal.lua"] = literal
+                payload["info.json"] = json.dumps({
+                    "name": self.metadata["name"], "version": self.metadata["version"], "factorio_version": "0.18",
+                    "dependencies": ["base >= 0.18.47", expected_dependency],
+                }).encode("utf-8")
+                archive_root = self.metadata["name"] + "_" + self.metadata["version"] + "/"
+                with zipfile.ZipFile(path, "w") as archive:
+                    for name, value in payload.items():
+                        archive.writestr(archive_root + name, value)
+            check = r'''
+              $published=Get-HistoricalTransitionFixtureTarget -Target f018 -MetadataPath $env:MIR_TEST_METADATA -Stage published
+              $mir5=Get-HistoricalTransitionFixtureTarget -Target f018 -MetadataPath $env:MIR_TEST_METADATA -Stage mir5
+              Assert-HistoricalTransitionFixtureArchive -Archive $env:MIR_TEST_PUBLISHED -SourceDirectory $env:MIR_TEST_SOURCE -Fixture $published
+              Assert-HistoricalTransitionFixtureArchive -Archive $env:MIR_TEST_MIR5 -SourceDirectory $env:MIR_TEST_SOURCE -Fixture $mir5
+              $refused=$false
+              try { Assert-HistoricalTransitionFixtureArchive -Archive $env:MIR_TEST_WRONG -SourceDirectory $env:MIR_TEST_SOURCE -Fixture $mir5 }
+              catch { if($_.Exception.Message -match 'dependencies differ'){$refused=$true}else{throw} }
+              if(-not $refused){throw 'synthetic 4.7.018 transition dependency accepted'}
+            '''
+            result = subprocess.run(
+                ["pwsh", "-NoProfile", "-Command", functions + check], cwd=ROOT, text=True, capture_output=True,
+                env=dict(os.environ, MIR_TEST_RUNNER=str(RUNNER), MIR_TEST_METADATA=str(FIXTURE / "metadata.json"),
+                         MIR_TEST_PUBLISHED=str(published), MIR_TEST_MIR5=str(mir5), MIR_TEST_WRONG=str(wrong),
+                         MIR_TEST_SOURCE=str(FIXTURE)), check=False,
+            )
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
 
     def test_published_to_mir5_mock_preserves_partial_progress_and_queue_until_real_successor_event(self):
@@ -331,6 +439,147 @@ class HistoricalTransitionFixtureControls(unittest.TestCase):
           assert(not ok and tostring(message):find("lacks the published fixture state",1,true))
         ''')
 
+    def test_f018_same_engine_transition_uses_force_saved_progress_and_refuses_foreign_state_before_successor_write(self):
+        self.lua.globals().fixture = FIXTURE.as_posix()
+        self.lua.globals().control = (FIXTURE / "control.lua").as_posix()
+        self.lua.execute(r'''
+          package.path=fixture .. "/?.lua"
+          function f018_install_target(stage)
+            fixture_target={id="f018",stage=stage,mir_version=stage == "published" and "1.8.0" or "5.0.01800",
+              direct="recipe-prod-research_character_mining_speed-1",direct_effect=.05,
+              direct_science={"military-science-pack","utility-science-pack"},successor_mode="lab",partial_progress=.42,
+              queue_api=true,queue_probe="braking-force-1",foreign_force_name="mir5-historical-transition-foreign",
+              foreign_saved_progress=.27}
+            package.loaded.target=nil;package.loaded["target-literal"]=nil
+            package.preload["target-literal"]=function()return fixture_target end
+          end
+          function f018_force(name)
+            local function strict_technology(name)
+              local value={name=name,level=1,researched=false,enabled=true,prerequisites={}}
+              setmetatable(value,{__index=function(_,key)
+                if key == "saved_progress" then error("LuaTechnology::saved_progress is unavailable on 0.18") end
+              end,__newindex=function(table,key,value)
+                if key == "saved_progress" then error("LuaTechnology::saved_progress is unavailable on 0.18") end
+                rawset(table,key,value)
+              end})
+              return value
+            end
+            local direct=strict_technology("recipe-prod-research_character_mining_speed-1")
+            local braking=strict_technology("braking-force-1")
+            local saved={}
+            local force={name=name,technologies={[direct.name]=direct,[braking.name]=braking},manual_mining_speed_modifier=0,
+              research_progress=0,research_queue_enabled=false}
+            setmetatable(force,{__index=function(table,key)
+              if key == "current_research" then return rawget(table,"_current") end
+              if key == "research_queue" then return rawget(table,"_queue") or {} end
+              if key == "get_spawn_position" then return function()return {x=0,y=0}end end
+            end,__newindex=function(table,key,value)
+              if key == "current_research" then error("LuaForce::current_research is read only")
+              elseif key == "research_queue" then
+                if table.research_queue_enabled ~= true then error("LuaForce::research_queue is unavailable while disabled") end
+                local rows={};for index,item in ipairs(value) do rows[index]=type(item)=="string" and table.technologies[item] or item end
+                rawset(table,"_queue",rows);rawset(table,"_current",rows[1])
+              else rawset(table,key,value) end
+            end})
+            function force.add_research(value)
+              if type(value)=="string" then value=force.technologies[value] end
+              if force.research_queue_enabled ~= true or not value or force.current_research ~= nil then return false end
+              force.research_queue={value};return true
+            end
+            function force.get_saved_technology_progress(technology)
+              local name=type(technology)=="string" and technology or technology.name
+              return saved[name]
+            end
+            function force.set_saved_technology_progress(technology,progress)
+              local name=type(technology)=="string" and technology or technology.name
+              local row=force.technologies[name]
+              assert(row and not row.researched and force.current_research ~= row and progress > 0 and progress < 1)
+              saved[name]=progress
+            end
+            direct.force=force;braking.force=force
+            return force,direct,braking
+          end
+          function f018_world()
+            local creates=0
+            local function lab()
+              local counts={};local inventory={insert=function(stack)counts[stack.name]=(counts[stack.name] or 0)+stack.count;return stack.count end,
+                get_item_count=function(name)return counts[name] or 0 end}
+              return {valid=true,active=true,energy=0,get_inventory=function()return inventory end}
+            end
+            local surface={create_entity=function()creates=creates+1;return lab()end}
+            return surface,function()return creates end
+          end
+          function f018_run(corruption)
+            callbacks={events={}};messages,saves={},{}
+            script={on_init=function(f)callbacks.init=f end,on_configuration_changed=function(f)callbacks.configuration=f end,
+              on_load=function(f)callbacks.load=f end,on_event=function(event,f)callbacks.events[event]=f end}
+            defines={events={on_research_finished=1,on_tick=2},inventory={lab_input=1}}
+            log=function(value)table.insert(messages,value)end
+            local player,direct,braking=f018_force("player")
+            local surface,created=f018_world()
+            game={active_mods={["more-infinite-research"]=true},forces={player=player},surfaces={[1]=surface},tick=1,
+              server_save=function(name)table.insert(saves,name)end}
+            function game.create_force(name)
+              assert(game.forces[name] == nil,"foreign force already exists")
+              local force=f018_force(name);game.forces[name]=force;return force
+            end
+            global={};f018_install_target("published");assert(loadfile(control,"t",_ENV))();callbacks.init()
+            local foreign=game.forces[fixture_target.foreign_force_name]
+            assert(foreign and foreign.technologies[fixture_target.direct].enabled == false
+              and math.abs(foreign.get_saved_technology_progress(fixture_target.direct)-.27)<.000001)
+            local readable=pcall(function()return foreign.technologies[fixture_target.direct].saved_progress end)
+            local writable=pcall(function()foreign.technologies[fixture_target.direct].saved_progress=.27 end)
+            assert(not readable and not writable,"fixture read or wrote unavailable LuaTechnology.saved_progress")
+            player.manual_mining_speed_modifier=.05;direct.level=2
+            local source=global.mir5_historical_transition.source_lab
+            for _,name in ipairs(fixture_target.direct_science) do source.get_inventory().insert{name=name,count=-1} end
+            callbacks.events[defines.events.on_research_finished]({research=direct})
+            player.research_queue={};callbacks.events[defines.events.on_tick]();callbacks.events[defines.events.on_tick]()
+            assert(global.mir5_historical_transition.phase == "published-ready" and saves[#saves] == "mir5-native-complete")
+            callbacks.load();callbacks.events[defines.events.on_tick]()
+            fixture_target.stage="mir5";fixture_target.mir_version="5.0.01800"
+            if corruption == "configuration" then
+              foreign.set_saved_technology_progress(fixture_target.direct,.26)
+              local before=created();local ok,message=pcall(function()callbacks.configuration({})end)
+              return ok,tostring(message),before,created(),table.concat(messages,"\n")
+            end
+            callbacks.configuration({})
+            assert(global.mir5_historical_transition.phase == "mir5-successor" and created() == 2
+              and math.abs(foreign.get_saved_technology_progress(fixture_target.direct)-.27)<.000001)
+            direct.level=3;player.manual_mining_speed_modifier=.10;player.research_queue={braking}
+            callbacks.events[defines.events.on_research_finished]({research=direct});callbacks.events[defines.events.on_tick]()
+            assert(global.mir5_historical_transition.phase == "mir5-complete" and saves[#saves] == "mir5-native-complete")
+            if corruption == "reload" then
+              foreign.set_saved_technology_progress(fixture_target.direct,.26)
+              callbacks.load();local ok,message=pcall(function()callbacks.events[defines.events.on_tick]()end)
+              return ok,tostring(message),created(),created(),table.concat(messages,"\n")
+            end
+            callbacks.load();callbacks.events[defines.events.on_tick]()
+            return true,"",created(),created(),table.concat(messages,"\n")
+          end
+        ''')
+        good = self.lua.eval("f018_run")(None)
+        self.assertTrue(good[0], good[1])
+        markers = [
+            json.loads(line.split(" RESULT ", 1)[1])
+            for line in good[4].splitlines()
+            if "[MIR5_NATIVE_FIXTURE] RESULT " in line and '"target":"f018"' in line
+        ]
+        self.assertTrue(markers)
+        for marker in markers:
+            self.assertTrue(marker["queue_api"])
+            self.assertTrue(marker["research_queue_enabled"])
+            self.assertEqual(marker["foreign_saved_progress"], .27)
+
+        prewrite = self.lua.eval("f018_run")("configuration")
+        self.assertFalse(prewrite[0])
+        self.assertIn("disabled foreign state differs", prewrite[1])
+        self.assertEqual(prewrite[2:], (1, 1, prewrite[4]))
+
+        reload = self.lua.eval("f018_run")("reload")
+        self.assertFalse(reload[0])
+        self.assertIn("disabled foreign state differs", reload[1])
+
     def test_data_final_preflight_accepts_each_pinned_cost_shape_before_acceleration(self):
         # This retained oracle characterizes earlier 4.2.2-era native inputs;
         # it is deliberately not the default 4.7.2 source contract below.
@@ -342,6 +591,7 @@ class HistoricalTransitionFixtureControls(unittest.TestCase):
             "f015": (None, "8000*2^(L-1)", "1*(8000*2^(L-1))"),
             "f016": (None, "8000*2^(L-1)", "1*(8000*2^(L-1))"),
             "f017": (None, "8000*2^(L-1)", "1*(8000*2^(L-1))"),
+            "f018": (None, "8000 * 2^(L-1)", "1*(8000*2^(L-1))"),
             "f100": (None, "8000*2^(L-1)", "1*(8000*2^(L-1))"),
             "f110": (None, "8000*2^(L-1)", "1*(8000*2^(L-1))"),
         }
@@ -354,6 +604,15 @@ class HistoricalTransitionFixtureControls(unittest.TestCase):
             "direct_effect": .05,
             "direct_science": ["utility-science-pack", "military-science-pack"],
         })
+        self.assertEqual(self.metadata["published_1_8_0_f018_preflight"], {
+            "kind": "published-1.8.0-source-data-stage-contract",
+            "source_commit": "5662c66c372e6aca025eab9f446de55a5cc6c1c9",
+            "published_archive_sha256": "D785E6EBE7A72E6E9F01A3F89774A6AA30479430410447F603FEF1E0B9BD7B24",
+            "unit_count_formula": "8000 * 2^(L-1)",
+            "unit_time": 60,
+            "direct_effect": .05,
+            "direct_science": ["military-science-pack", "utility-science-pack"],
+        })
 
         self.lua.globals().fixture = FIXTURE.as_posix()
         self.lua.globals().data_final = (FIXTURE / "data-final-fixes.lua").as_posix()
@@ -361,7 +620,7 @@ class HistoricalTransitionFixtureControls(unittest.TestCase):
           package.path=fixture .. "/?.lua"
           function data_final_row(id, stage, expected_effect, actual_effect, expected_science, actual_science, count, count_formula)
             package.loaded.target=nil;package.loaded["target-literal"]=nil
-            package.preload["target-literal"]=function()return {id=id,stage=stage,mir_version="4.7." .. id:sub(2) .. "02",
+            package.preload["target-literal"]=function()return {id=id,stage=stage,mir_version=id == "f018" and (stage == "published" and "1.8.0" or "5.0.01800") or ("4.7." .. id:sub(2) .. "02"),
               direct="recipe-prod-research_character_mining_speed-1",direct_effect=expected_effect,successor_mode=(id == "f013" and "preservation-only" or "lab"),partial_progress=.42,
               direct_science=expected_science,queue_api=id == "f017",queue_probe=id == "f017" and "braking-force-1" or nil}end
             local ingredients={};for index,name in ipairs(actual_science) do ingredients[index]={name,1} end
@@ -448,6 +707,17 @@ class HistoricalTransitionFixtureControls(unittest.TestCase):
         self.assertIn("effect differs", bad[1])
         self.assertEqual((bad[2]["unit"]["count"], bad[2]["unit"]["count_formula"], bad[2]["unit"]["time"]),
                          (8000, "8000*2^(L-1)", 60))
+
+        f018_bad = self.lua.eval("data_final_effect_row")(
+            "f018", .05, .1,
+            self.lua.table_from(("military-science-pack", "utility-science-pack")),
+            "8000 * 2^(L-1)",
+        )
+        self.assertFalse(f018_bad[0])
+        self.assertIn("effect differs", f018_bad[1])
+        # Rejection precedes the fixture's count/time acceleration.
+        self.assertEqual((f018_bad[2]["unit"]["count"], f018_bad[2]["unit"]["count_formula"], f018_bad[2]["unit"]["time"]),
+                         (8000, "8000 * 2^(L-1)", 60))
 
 
 def main():
