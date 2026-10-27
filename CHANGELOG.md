@@ -52,6 +52,7 @@ This is the authoritative product changelog. Each MIR 1–3 master release appea
 - Avoid global science-unlock and foreign-research discovery during ordinary research construction.
 - Retain selected cryogenic science and its native unlock prerequisite when a mod replaces the native research trigger with an ordinary research unit.
 - Preserve earned-above-cap research, suspended work and queues through admitted save transitions; restore only disablement owned by MIR.
+- Recover MIR-owned cap disablement from historical boolean ledgers without granting foreign disablement or visibility records an enablement right.
 - Preserve the original foreign disablement baseline across native resets and equivalent productivity-effect orderings; restore only MIR-owned enablement transitions.
 - Preserve unqueued foreign Imersite public disablement and visibility through its named hidden-carrier handoff.
 - Reconcile scripted contributions against external baselines rather than overwrite aggregate foreign bonuses.
@@ -66,7 +67,7 @@ This is the authoritative product changelog. Each MIR 1–3 master release appea
 
 ### Info
 
-- Supply ten normal target editions from one player-source tree, including Factorio 0.18.47; additional earlier editions are best-effort GitHub distributions as their adapters become buildable.
+- Supply nine stable target editions from one player-source tree; Factorio 0.18.47 and additional earlier editions are experimental best-effort GitHub distributions as their adapters become buildable.
 - Exact engine minimums and available features depend on the selected target; Factorio 2.1 requires base 2.1.23.
 - Use one shared master changelog for all editions; historical entries retain their original release and engine scope.
 - Keep local replacement build versions consistent across package metadata, changelog and public API queries; selecting another engine edition requires target adaptation.

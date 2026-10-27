@@ -133,6 +133,18 @@
     "intermediate_1_to_3_runtime_schema_evolution": {
       "status": "pending",
       "scope": "This unit records each tag's info.json and migration-member bodies, not a completed control.lua/runtime-state evolution audit for every intermediate 1.x-3.x tag."
+    },
+    "published_boolean_cap_controllers": {
+      "status": "eight-public-original-archive-bodies-verified-not-native-qualified",
+      "receipt": "spec/evidence/historical-boolean-cap-archive-metadata.json",
+      "receipt_sha256": "F56981D287F8BA9E21B06C7238078FA17D14BB307E2700346904815FCE74617B",
+      "scope": "MIR2.5.10/2.5.11 F200, MIR3.2.10/3.2.11 F210 and MIR4.0/4.1 F200/F210 only; other historical packages remain unverified by these probes.",
+      "writer_authority": "The matched e01/e6df/09eb controller writes literal true only after observing technology.enabled and writing false. Only that positive marker proves disablement ownership. The optional visibility boolean proves its own field independently.",
+      "tag_archive_difference": "The four MIR4.0/4.1 modern ZIPs ship policy-v1 body09eb rather than tag-source body67c3. Do not infer these saved-state schemas from tag code.",
+      "reader_boundary": "One-time configuration import for currently admitted authored IDs/settings/source classes; bounded known producer operations, positive marker and current state checks. Structured V3 import remains independent. No later native-worker right is inferred from schema1.",
+      "native_status": "not_run; require actual old source-save, candidate, earned effects/new research and two cold reloads before migration acceptance",
+      "f200_supplement": "spec/evidence/historical-boolean-cap-f200-archive-metadata.json",
+      "f200_supplement_sha256": "370DD37BCE5003F819C2D2F0671582529CE4A6047A89FF23EB9E9146405CAFA1"
     }
   },
   "published_tag_sources": [
