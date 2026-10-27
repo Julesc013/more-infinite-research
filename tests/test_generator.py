@@ -833,6 +833,62 @@ class GeneratorTests(unittest.TestCase):
           end
         ''')
 
+    def test_disabled_modern_module_main_emits_exact_holders_and_runtime_credit_preserves_public_state(self):
+        self.lua.execute('''
+          mods = {}
+          local startup, environment = defaults(), full_world(mods)
+          startup["ips-enable-research_modules"].value = false
+          settings, data, helpers, log = {startup=startup}, environment, nil, function() end
+          assert(dofile(data_final_path) == nil and environment.writes == 1)
+          local rows = {}
+          for _, row in ipairs(environment.emitted) do rows[row.name] = row end
+          local main = rows["recipe-prod-research_modules-1"]
+          assert(main and main.enabled == false and main.max_level == "infinite" and #main.effects == 9,
+            "disabled module main differs")
+          local holder_ids = {"mir-legacy-module-credit-speed-module", "mir-legacy-module-credit-productivity-module",
+            "mir-legacy-module-credit-efficiency-module"}
+          for _, id in ipairs(holder_ids) do
+            local holder = rows[id]
+            assert(holder and holder.hidden == true and holder.enabled == false and holder.visible_when_disabled == false
+              and holder.max_level == "infinite" and #holder.effects == 1 and holder.effects[1].change == .01,
+              "disabled module holder differs: " .. id)
+          end
+
+          local function runtime_technology(row, level, researched)
+            local ingredients = {}
+            for index, ingredient in ipairs(row.unit.ingredients) do
+              ingredients[index] = {name=ingredient[1], amount=ingredient[2]}
+            end
+            return {valid=true, name=row.name, level=level, researched=researched, enabled=row.enabled ~= false,
+              visible_when_disabled=row.visible_when_disabled == true, saved_progress=.27,
+              research_unit_count=row.unit.count, research_unit_energy=row.unit.time * 60,
+              research_unit_ingredients=ingredients, prototype={name=row.name, level=row.level,
+                max_level=row.max_level == "infinite" and 4294967295 or row.max_level, hidden=row.hidden == true,
+                enabled=row.enabled ~= false, visible_when_disabled=row.visible_when_disabled == true,
+                upgrade=row.upgrade == true, effects=row.effects}}
+          end
+          local technologies = {[main.name]=runtime_technology(main, 3, false)}
+          for _, id in ipairs(holder_ids) do technologies[id] = runtime_technology(rows[id], 1, false) end
+          local force = {valid=true, index=1, technologies=technologies, research_queue={"preserved"}, research_progress=.42}
+          game = {forces={player=force}}
+          script = {active_mods={base="2.1.23", ["more-infinite-research"]="5.0.21000"}}
+          package.loaded["runtime.legacy_module_credits"] = nil
+          local credits = require("runtime.legacy_module_credits")
+          local event = {mod_changes={ ["more-infinite-research"]={old_version="1.1.0", new_version="5.0.21000"}}}
+          local plan = credits.preflight(event)
+          assert(plan and plan.target == "f210" and #plan.forces == 1)
+          assert(credits.apply(plan) == true)
+          local live_main = technologies[main.name]
+          assert(live_main.level == 3 and live_main.researched == false and live_main.enabled == false
+            and live_main.saved_progress == .27 and force.research_queue[1] == "preserved" and force.research_progress == .42,
+            "legacy credit changed disabled public module state")
+          for _, id in ipairs(holder_ids) do
+            local holder = technologies[id]
+            assert(holder.level == 3 and holder.enabled == false and holder.visible_when_disabled == false,
+              "legacy holder was not credited without public enablement")
+          end
+        ''')
+
     def test_data_final_keeps_malformed_missing_effects_for_generator_preflight(self):
         self.lua.execute('''
           local function refuse(effect, expected)
