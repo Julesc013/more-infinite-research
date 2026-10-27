@@ -52,7 +52,7 @@ local function canonical_saved_effects(raw, label)
   if type(raw) ~= "string" or raw:sub(1, 1) ~= "{" or raw:sub(-1) ~= "}" then
     fail(label .. " source effect signature is malformed")
   end
-  local body, offset, ordinal, rows = raw:sub(2, -2), 1, 1, {}
+  local body, offset, ordinal, rows, indexed_rows = raw:sub(2, -2), 1, 1, {}, {}
   while offset <= #body do
     local start_at, end_at, index, record = body:find("n:(%d+)=(%b{})", offset)
     if start_at ~= offset or tonumber(index) ~= ordinal then
@@ -62,7 +62,7 @@ local function canonical_saved_effects(raw, label)
     if change == nil or recipe == nil or source_effect_changes[change] ~= true then
       fail(label .. " source effect record is not a published MIR1 productivity change")
     end
-    rows[#rows + 1], ordinal = record, ordinal + 1
+    rows[#rows + 1], indexed_rows[#indexed_rows + 1], ordinal = record, "n:" .. index .. "=" .. record, ordinal + 1
     offset = end_at + 1
     if offset <= #body then
       if body:sub(offset, offset) ~= "," then fail(label .. " source effect signature separator differs") end
@@ -70,6 +70,9 @@ local function canonical_saved_effects(raw, label)
     end
   end
   if #rows == 0 then fail(label .. " source effect signature is empty") end
+  if "{" .. table.concat(indexed_rows, ",") .. "}" ~= raw then
+    fail(label .. " source effect signature did not round-trip losslessly")
+  end
   return canonical_effect_rows(rows)
 end
 local function canonical_current_effects(effects_value, label)

@@ -342,6 +342,12 @@ class MigrationOriginSuccessorControls(unittest.TestCase):
                 self.assertIn("effect", rejected["message"])
                 # Failure must neither rewrite the saved source signature nor
                 # create a candidate lab/continuation record.
+                source_rows = 2 if effect_case == "missing-duplicate" else 1
+                expected_signature = "{" + ",".join(
+                    f"n:{index}={{s:change=n:0.10000000149011612,s:recipe=s:iron-gear-wheel,"
+                    "s:type=s:change-recipe-productivity}}"
+                    for index in range(1, source_rows + 1)) + "}"
+                self.assertEqual(expected_signature, rejected["source_effect_signature"])
                 self.assertEqual("completed", rejected["state"]["phase"])
                 self.assertNotIn("f210", rejected["state"].get("successors", {}))
 
