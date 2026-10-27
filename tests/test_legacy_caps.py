@@ -560,6 +560,36 @@ class LegacyCapsTests(unittest.TestCase):
             native_force(23, {[fallback.name] = native_technology(false, true)}), {fallback}, nil,
             F200_ALLOWLIST)
           assert(rows[fallback.name].disabled and facts.decisions[1].outcome == "owned_disable_imported")
+
+          -- A V1 source could use its no-mod-data fallback before a current
+          -- F210 planned binding, and vice versa for F200.  The operation is
+          -- a bounded historical producer detail, not a different identity.
+          old = boolean_bucket(23, gear, 4, true, false)
+          old.managed_technologies[gear.name].operation = "runtime-settings-transport"
+          rows, facts = legacy.import_boolean_for_force(old, force, {gear}, nil)
+          assert(rows[gear.name].disabled and facts.decisions[1].outcome == "owned_disable_imported")
+          old = boolean_bucket(23, fallback, 4, true, false)
+          old.managed_technologies[fallback.name].operation = "emit"
+          rows, facts = legacy.import_boolean_for_force(old,
+            native_force(23, {[fallback.name] = native_technology(false, true)}), {fallback}, nil,
+            F200_ALLOWLIST)
+          assert(rows[fallback.name].disabled and facts.decisions[1].outcome == "owned_disable_imported")
+
+          -- Equivalence is source-class-specific: an operation from the other
+          -- class, or an unknown operation, cannot create a historical right.
+          old = boolean_bucket(23, gear, 4, true, false)
+          old.managed_technologies[gear.name].operation = "emit_base_extension"
+          rows, facts = legacy.import_boolean_for_force(old, force, {gear}, nil)
+          assert(rows[gear.name] == nil and facts.decisions[1].outcome == "policy_mismatch")
+          old = boolean_bucket(23, braking, 2, true, nil)
+          old.managed_technologies[braking.name].operation = "emit"
+          rows, facts = legacy.import_boolean_for_force(old,
+            native_force(23, {[braking.name] = native_technology(false, false)}), {braking}, nil)
+          assert(rows[braking.name] == nil and facts.decisions[1].outcome == "policy_mismatch")
+          old = boolean_bucket(23, gear, 4, true, false)
+          old.managed_technologies[gear.name].operation = "unknown-operation"
+          rows, facts = legacy.import_boolean_for_force(old, force, {gear}, nil)
+          assert(rows[gear.name] == nil and facts.decisions[1].outcome == "policy_mismatch")
         ''')
 
     def test_schema1_is_bounded_pure_and_does_not_change_structured_v3_imports(self):
