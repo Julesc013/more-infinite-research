@@ -1,0 +1,15 @@
+{
+  "name": "mir-fixture-planet-discovery-api",
+  "version": "0.1.0",
+  "title": "Planet discovery API observer",
+  "author": "MIR maintainers",
+  "description": "Read-only Factorio 2.1 Space Age planet discovery API witness.",
+  "factorio_version": "2.1",
+  "dependencies": [
+    "base >= 2.1.23",
+    "quality >= 2.1.23",
+    "elevated-rails >= 2.1.23",
+    "recycler >= 2.1.23",
+    "space-age >= 2.1.23"
+  ]
+}
