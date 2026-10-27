@@ -29,11 +29,11 @@ SOURCE = "b251ae7a54104ace87cb0da4cf531cf53f03c93d"
 PLAYER_TREE = "79b73a6a8e68987737e69bf2d95ec6555b49f901"
 SCIENCE = "recipe-prod-research_science_pack_productivity-1"
 OIL = "recipe-prod-research_oil_cracking_productivity-1"
-INPUT_REVISION = "98bab2c2d346dc508c0f008d824ebc867d920595"
-INPUT_RECEIPT = ROOT / "spec/evidence/bob-angel-f210-science-oil-inputs-98bab2c2.json"
+INPUT_REVISION = "32ddafc4fece8d0c3a998a897ee9de1a3e32053e"
+INPUT_RECEIPT = ROOT / "spec/evidence/bob-angel-f210-science-oil-inputs-32ddafc4.json"
 FIXTURE_ARCHIVE = "mir-fixture-mir5-bob-angel-f210-science-oil_0.1.0.zip"
-FIXTURE_SHA = "E30178847A7F36FBF30AA1984DE03AAF4CA95F31CCAC44EEA875F203E72F079F"
-FIXTURE_BYTES = 8014
+FIXTURE_SHA = "CF59148489FE31A6974DC619A20CE41C28BD79DB3BE797F62324A4CD493C8F13"
+FIXTURE_BYTES = 8199
 
 BASE_VECTOR = [
     "automation-science-pack", "logistic-science-pack", "chemical-science-pack",
