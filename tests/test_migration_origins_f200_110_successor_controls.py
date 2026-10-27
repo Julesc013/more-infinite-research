@@ -252,7 +252,7 @@ class MigrationOriginF200110SuccessorControls(unittest.TestCase):
                              (profile["candidate"]["source_commit"], profile["candidate"]["player_tree"]))
             self.assertEqual("bec37fb87a05d17cf4cf0225e0458218830fef63", profile["source_fixture_commit"])
             self.assertEqual("3ae2711867cd60f6c871f641c331349d941dd8c3", profile["source_fixture_controller_commit"])
-            self.assertEqual("d2723b835124a62893d65c601316c1779d94abf5", profile["successor_fixture_commit"])
+            self.assertEqual("c03257d1a672ca62ff523afae65df3239bef518c", profile["successor_fixture_commit"])
             self.assertEqual("2fb64822b82569e3b50f0653e361fb7148f18b63", profile["origin_source_commit"])
         self.assertEqual("29F2597180F0BCB8CB25A651A19068678635D42C35A96EE56F6186DE737037E0",
                          f200["archive_sha256"]["mir-fixture-mir5-migration-origin-f200-110-source_0.2.0.zip"])

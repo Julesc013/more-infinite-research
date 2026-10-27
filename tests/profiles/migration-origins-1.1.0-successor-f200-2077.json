@@ -5,7 +5,7 @@
   "origin_source_commit": "2fb64822b82569e3b50f0653e361fb7148f18b63",
   "source_fixture_commit": "bec37fb87a05d17cf4cf0225e0458218830fef63",
   "source_fixture_controller_commit": "3ae2711867cd60f6c871f641c331349d941dd8c3",
-  "successor_fixture_commit": "d2723b835124a62893d65c601316c1779d94abf5",
+  "successor_fixture_commit": "c03257d1a672ca62ff523afae65df3239bef518c",
   "target": "f200",
   "factorio_line": "2.0",
   "engine": {
