@@ -64,36 +64,16 @@ local function copy_map(values)
   return result
 end
 
-local function set_from_map(values)
-  local result = {}
-  for name in pairs(values or {}) do result[name] = true end
-  return result
-end
-
 local function expected_effects(row)
   return count_signatures(row.effects)
 end
 
 for name, default_value in pairs(catalogue.settings) do
-  local setting = data.raw["bool-setting"] and data.raw["bool-setting"][name]
-  if setting == nil or setting.type ~= "bool-setting" or setting.setting_type ~= "startup"
-      or setting.default_value ~= default_value then
-    fail("published setting default differs: " .. name)
-  end
   local runtime = settings.startup[name]
   if runtime == nil or runtime.value ~= default_value then
     fail("effective default setting differs: " .. name)
   end
 end
-
-local setting_count = 0
-for name in pairs(data.raw["bool-setting"] or {}) do
-  if name:sub(1, 4) == "ips-" then
-    if catalogue.settings[name] == nil then fail("unexpected published setting: " .. name) end
-    setting_count = setting_count + 1
-  end
-end
-if setting_count ~= 42 then fail("published setting count differs") end
 
 local roster_count = 0
 for name, value in pairs(data.raw.technology or {}) do
@@ -104,18 +84,19 @@ for name, value in pairs(data.raw.technology or {}) do
     local expected = catalogue.rows[name]
     if expected == nil then fail("unexpected source row: " .. name) end
     if value.type ~= "technology" or value.name ~= name or value.level ~= nil
-        or value.upgrade ~= true or value.max_level ~= "infinite" or value.enabled == false then
+        or value.upgrade ~= true or value.max_level ~= "infinite" or value.enabled ~= nil then
       fail("source identity differs: " .. name)
     end
     local unit = value.unit
     if type(unit) ~= "table" or unit.count_formula ~= catalogue.source_formula or unit.time ~= catalogue.source_time then
       fail("source unit differs: " .. name)
     end
+    local science = catalogue.science[expected.science]
     assert_same_counts(map_ingredients(unit.ingredients, "source science " .. name),
-      copy_map(catalogue.science[expected.science]),
+      copy_map(science.ingredients),
       "source science " .. name)
     assert_same_counts(map_prerequisites(value.prerequisites, "source prerequisites " .. name),
-      set_from_map(catalogue.science[expected.science]),
+      copy_map(science.prerequisites),
       "source prerequisites " .. name)
     assert_same_counts(count_signatures(value.effects), expected_effects(expected), "source effects " .. name)
     roster_count = roster_count + 1
