@@ -2,6 +2,7 @@
 import argparse
 from pathlib import Path
 import sys
+import subprocess
 import unittest
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -74,10 +75,50 @@ class CapsTests(unittest.TestCase):
           local f = force(3, {[speed.name] = speed}, {}, nil, nil)
           local ownership = caps.reconcile(f, {[speed.name] = 10}, {})
           assert(not speed.enabled and speed.visible_when_disabled)
-          assert(ownership[3][speed.name].disabled == nil
+          assert(ownership[3][speed.name].disabled == false
             and ownership[3][speed.name].visible_when_disabled == false)
           caps.reconcile(f, {[speed.name] = 0}, ownership)
           assert(not speed.enabled and not speed.visible_when_disabled and ownership[3] == nil)
+        ''')
+
+    def test_native_reenable_during_finite_cap_never_acquires_foreign_restoration_right(self):
+        self.lua.globals().old_caps_source = subprocess.check_output([
+            "git", "show", "c37fca88667d550660f5b9c0efd7f272b56d6025:source/runtime/caps.lua"
+        ], cwd=ROOT).decode("utf-8")
+        self.lua.execute('''
+          local old = assert(load(old_caps_source, "published-e3-caps", "t", _G))()
+          for _, visible in ipairs({false, true}) do
+            for _, module in ipairs({caps, old}) do
+              local owner = technology("steel-plate-productivity", 2, false)
+              owner.visible_when_disabled = visible
+              local unrelated = technology("automation", 1, true)
+              local f = force(22, {[owner.name]=owner,[unrelated.name]=unrelated}, {unrelated}, unrelated, .42)
+              local rows = {}
+              module.reconcile(f, {[owner.name]=1}, rows)
+              -- The engine exposes enabled=true again across a prototype
+              -- configuration/reset, while the same finite cap still applies.
+              owner.enabled = true
+              module.reconcile(f, {[owner.name]=1}, rows)
+              assert(not owner.enabled and owner.level == 2 and not owner.researched)
+              module.reconcile(f, {[owner.name]=0}, rows)
+              assert(owner.enabled == (module == old), "foreign baseline was promoted into a restoration right")
+              assert(owner.visible_when_disabled == visible)
+              assert(f.current_research == unrelated and f.research_progress == .42 and #f.research_queue == 1)
+              assert(rows[22] == nil)
+            end
+          end
+        ''')
+
+    def test_legacy_visibility_only_row_preserves_its_foreign_baseline(self):
+        self.lua.execute('''
+          local owner = technology("steel-plate-productivity", 2, true)
+          owner.visible_when_disabled = true
+          local f = force(23, {[owner.name]=owner}, {}, nil, nil)
+          local rows = {[23]={[owner.name]={visible_when_disabled=false}}}
+          caps.reconcile(f, {[owner.name]=1}, rows)
+          assert(rows[23][owner.name].disabled == false and not owner.enabled)
+          caps.reconcile(f, {[owner.name]=0}, rows)
+          assert(not owner.enabled and not owner.visible_when_disabled and rows[23] == nil)
         ''')
 
     def test_queue_filter_preserves_order_and_unrelated_current_progress(self):

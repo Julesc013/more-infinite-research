@@ -255,10 +255,13 @@ local function reconcile_authored_prototype_disablement(force, owned_disabled)
         end
         local record = owned[row.id]
         if type(record) ~= "table" then
-          record = {}
+          record = {disabled = true}
           owned[row.id] = record
+        elseif record.disabled == nil then
+          -- A prior visibility-only cap row preserves foreign disablement;
+          -- a native reset cannot grant this policy a new restoration right.
+          record.disabled = false
         end
-        record.disabled = true
         technology.enabled = false
       end
     end

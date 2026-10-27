@@ -221,6 +221,11 @@ function cap_order_flow(common_path,source_path,canonical_path,permuted_path,rel
     local ok,message=invoke(control.load);if not ok then return false,message end
     if configuration then
       reconcile(player);reconcile(game.forces[2])
+      -- A refusal opponent must corrupt the state after the real MIR helper;
+      -- native re-enablement before it is now the regression being repaired.
+      if opponent=="foreign-enabled" and cap==0 then
+        game.forces[2].technologies["steel-plate-productivity"].enabled=true
+      end
       ok,message=invoke(control.changed);if not ok then return false,message end
     end
     return tick(control)
@@ -255,7 +260,6 @@ function cap_order_flow(common_path,source_path,canonical_path,permuted_path,rel
   if not ok then return result(false,message) end
   ok,message=reload_twice(permuted);if not ok then return result(false,message) end
   cap=0;effects[1],effects[2]=effects[2],effects[1]
-  if opponent=="foreign-enabled" then game.forces[2].technologies["steel-plate-productivity"].enabled=true end
   local relaxed=load_control(relaxed_path,"relaxed");ok,message=first_tick(relaxed,true)
   if not ok then return result(false,message) end
   ok,message=reload_twice(relaxed);return result(ok,message)
@@ -505,7 +509,7 @@ end
 
     def test_actual_caps_helper_records_only_foreign_visibility_then_restores_it_without_enabling(self):
         result = plain(self.lua.eval("cap_order_actual_foreign_visibility")())
-        self.assertEqual((False, True, None, False),
+        self.assertEqual((False, True, False, False),
                          (result["at_cap"]["enabled"], result["at_cap"]["visible"],
                           result["at_cap"].get("disabled"), result["at_cap"]["visibility"]))
         self.assertEqual((False, False, None),
