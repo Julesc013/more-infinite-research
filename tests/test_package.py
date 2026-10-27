@@ -241,13 +241,27 @@ class PackageTests(unittest.TestCase):
             "duplicate": target + b'\n  distribution_version="5.0.21000",\n',
             "missing-id": target.replace(b"id=", b"edition="),
             "duplicate-id": target + b'\n  id="f210",\n',
+            "malformed-duplicate-id": target + b'\n  id="poison",\n',
             "wrong-source-codec": target.replace(b'id="f210"', b'id="f200"'),
+            "malformed-duplicate-version": target + b'\n  distribution_version="poison",\n',
         }
         for name, broken_target in malformed.items():
             with self.subTest(contract=name):
                 broken = dict(files, **{"platform/target.lua": broken_target})
                 with self.assertRaisesRegex(ValueError, "source target"):
                     pack.members(source, version="5.0.21001", committed_files=broken)
+                if name.startswith("malformed-duplicate"):
+                    with tempfile.TemporaryDirectory() as temporary:
+                        fixture = Path(temporary) / "source"
+                        (fixture / "platform").mkdir(parents=True)
+                        (fixture / "info.json").write_bytes(files["info.json"])
+                        (fixture / "data.lua").write_text("data:extend({})\n")
+                        (fixture / "platform/target.lua").write_bytes(broken_target)
+                        output = Path(temporary) / "never/more-infinite-research_5.0.21001.zip"
+                        with self.assertRaisesRegex(ValueError, "source target"):
+                            pack.build(fixture, output, version="5.0.21001")
+                        self.assertFalse(output.exists())
+                        self.assertFalse(output.parent.exists())
 
         with tempfile.TemporaryDirectory() as temporary:
             fixture = Path(temporary) / "fixture"

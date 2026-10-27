@@ -23,7 +23,9 @@ EARLY_DESCRIPTION = ("Adds fixed finite default continuations of selected resear
                      "Factorio releases; it has no configurable startup settings.")
 MIR_PLAYER_NAME = "more-infinite-research"
 SOURCE_TARGET_PATH = "platform/target.lua"
+SOURCE_TARGET_ID_ASSIGNMENT = re.compile(rb'(?m)^[ \t]*id[ \t]*=')
 SOURCE_TARGET_ID = re.compile(rb'(?m)^[ \t]*id[ \t]*=[ \t]*"(?P<id>f\d{3})"[ \t]*,[ \t]*\r?$')
+SOURCE_DISTRIBUTION_VERSION_ASSIGNMENT = re.compile(rb'(?m)^[ \t]*distribution_version[ \t]*=')
 SOURCE_DISTRIBUTION_VERSION = re.compile(
     rb'(?m)^[ \t]*distribution_version[ \t]*=[ \t]*"(?P<version>\d+\.\d+\.\d{5})"[ \t]*,[ \t]*\r?$')
 CODEC_VERSION = re.compile(r"^(?P<major>\d+)\.(?P<minor>\d+)\.(?P<encoded>\d{5})$")
@@ -193,7 +195,9 @@ def render_local_mir_target_version(files, source_version, requested_version, na
     target = files[SOURCE_TARGET_PATH]
     ids = list(SOURCE_TARGET_ID.finditer(target))
     versions = list(SOURCE_DISTRIBUTION_VERSION.finditer(target))
-    if len(ids) != 1 or len(versions) != 1:
+    if (len(SOURCE_TARGET_ID_ASSIGNMENT.findall(target)) != 1
+            or len(SOURCE_DISTRIBUTION_VERSION_ASSIGNMENT.findall(target)) != 1
+            or len(ids) != 1 or len(versions) != 1):
         raise ValueError("MIR local version package has invalid source target metadata")
     target_id = ids[0].group("id").decode("ascii")
     target_version = versions[0].group("version").decode("ascii")
