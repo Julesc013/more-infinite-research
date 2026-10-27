@@ -127,7 +127,9 @@ Assert-MIRDirectLibraryStartupDeclaredInputs -ProfileDefinition $profileDefiniti
 $buildTmp = Join-Path $repo 'build/tmp'
 $output = [IO.Path]::GetFullPath($OutputRoot)
 Assert-MIR5PrototypeCapture (Test-MIR5PrototypeCaptureContainedPath -Root $buildTmp -Path $output) 'OutputRoot must be a new directory beneath build/tmp'
-& (Join-Path $repo 'tools/commands/workspace/Test-MIRDevelopmentHealth.ps1') -MaxScanSeconds 2 -MaxEntriesPerRoot 500 | Out-Host
+# Startup needs the current checkpoint and a small advisory sample. A full
+# branch custody audit is separate from this already-pinned native execution.
+& (Join-Path $repo 'tools/commands/workspace/Test-MIRDevelopmentHealth.ps1') -Mode Hook -MaxWorktrees 2 -MaxBranches 4 -MaxScanSeconds 2 -MaxEntriesPerRoot 500 | Out-Host
 
 $resources = $null
 $activation = $null

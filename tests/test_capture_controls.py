@@ -744,6 +744,53 @@ class CaptureControlTests(unittest.TestCase):
         self.assertFalse(cases["unverified"]["valid"])
         self.assertIn("must be a verified FixtureSources input", cases["unverified"]["message"])
 
+    def test_native_health_calls_retain_dirty_checkpoint_without_branch_history_audit(self):
+        scratch = ROOT / "build/tmp/native-health-control"
+        scratch.mkdir(parents=True, exist_ok=True)
+        with tempfile.TemporaryDirectory(dir=scratch) as temporary:
+            repo = Path(temporary).resolve()
+            self.assertTrue(repo.is_relative_to(scratch.resolve()))
+            git = ["git", "-C", str(repo), "-c", "core.hooksPath=" + str(repo / "no-hooks"),
+                   "-c", "commit.gpgsign=false", "-c", "user.name=MIR Fixture",
+                   "-c", "user.email=fixture@example.invalid"]
+            subprocess.run([*git, "init", "-q"], check=True, capture_output=True)
+            (repo / "anchor.txt").write_text("checkpoint\n", encoding="utf-8")
+            subprocess.run([*git, "add", "anchor.txt"], check=True, capture_output=True)
+            subprocess.run([*git, "commit", "-qm", "initial"], check=True, capture_output=True)
+            for name in ("extra-a", "extra-b", "extra-c", "extra-d", "extra-e"):
+                subprocess.run([*git, "branch", name], check=True, capture_output=True)
+            health = Path("tools/commands/workspace/Test-MIRDevelopmentHealth.ps1")
+            (repo / health).parent.mkdir(parents=True)
+            (repo / health).write_bytes((ROOT / health).read_bytes())
+            sentinel = repo / "uncommitted.txt"
+            sentinel.write_bytes(b"must remain untouched\n")
+            for wrapper in (PROTOTYPE_CAPTURE, NATIVE_FIXTURE):
+                command = r'''
+                  $repo='__REPO__';$tokens=$null;$errors=$null
+                  $ast=[System.Management.Automation.Language.Parser]::ParseFile('__WRAPPER__',[ref]$tokens,[ref]$errors)
+                  if($errors.Count){throw 'Wrapper parse failed'}
+                  $calls=@($ast.FindAll({param($node)
+                    $node -is [System.Management.Automation.Language.CommandAst] -and
+                    $node.InvocationOperator -eq 'Ampersand' -and
+                    $node.Extent.Text.Contains('Test-MIRDevelopmentHealth.ps1')
+                  },$true))
+                  if($calls.Count -ne 1){throw 'Expected one native health call'}
+                  & ([scriptblock]::Create($calls[0].Extent.Text+' -AsJson'))
+                '''.replace("__REPO__", str(repo).replace("'", "''")).replace(
+                    "__WRAPPER__", str(wrapper).replace("'", "''"))
+                result = subprocess.run(["pwsh", "-NoProfile", "-Command", command],
+                                        cwd=repo, check=True, text=True, capture_output=True)
+                report = json.loads(result.stdout.lstrip("\ufeff"))
+                self.assertEqual(report["mode"], "hook", wrapper.name)
+                self.assertTrue(report["checkpoint_required"], wrapper.name)
+                self.assertGreater(report["git"]["dirty"]["count"], 0)
+                self.assertLessEqual(report["scan_limits"]["max_worktrees"], 2)
+                self.assertLessEqual(report["scan_limits"]["max_branches"], 4)
+                self.assertTrue(report["git"]["branches"]["truncated"])
+                self.assertTrue(all(row["unique_commit_count"] is None
+                                    for row in report["git"]["branches"]["rows"]))
+                self.assertEqual(sentinel.read_bytes(), b"must remain untouched\n")
+
     def test_capture_wrappers_remain_powershell_parseable(self):
         for script in (PROTOTYPE_CAPTURE, REPLAY_CAPTURE, MENU_COMPARISON, NATIVE_FIXTURE):
             assert_powershell_parses(script)
