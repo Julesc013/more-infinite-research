@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
-"""Analyze one frozen R23, R24 or R25 responsive-menu observation receipt.
+"""Analyze one frozen R23, R24, R25 or R26 responsive-menu observation receipt.
 
-This reader is deliberately narrow. It accepts the three fixed experiment
+This reader is deliberately narrow. It accepts the four fixed experiment
 cohorts, preserves their raw observations, and produces an
 endpoint-only menu analysis.  It does not prepare archives, launch Factorio,
 or make a release, runtime, UI-fidelity, or memory verdict.
@@ -38,6 +38,8 @@ COHORTS = {
                          "raw_path": "spec/evidence/bob-angel-menu-plan-r24.json", "result_kind": "MIR5ResponsiveMenuR24AnalysisV1"},
     "MIR5ResponsiveMenuR25AnalysisPlanV1": {"id": "r25", "blocks": 64, "critical": T95_N64_DF63,
                          "raw_path": "spec/evidence/bob-angel-menu-plan-r25.json", "result_kind": "MIR5ResponsiveMenuR25AnalysisV1"},
+    "MIR5ResponsiveMenuR26AnalysisPlanV1": {"id": "r26", "blocks": 64, "critical": T95_N64_DF63,
+                         "raw_path": "spec/evidence/bob-angel-menu-plan-r26.json", "result_kind": "MIR5ResponsiveMenuR26AnalysisV1"},
 }
 
 
@@ -105,7 +107,7 @@ def _string(value: Any, label: str) -> str:
 def _cohort(plan: dict[str, Any]) -> dict[str, Any]:
     kind = _string(plan.get("kind"), "analysis plan kind")
     if kind not in COHORTS:
-        raise MenuAnalysisError("analysis plan must identify the fixed R23 or R24 cohort")
+        raise MenuAnalysisError("analysis plan must identify a fixed R23, R24, R25 or R26 cohort")
     return COHORTS[kind]
 
 
