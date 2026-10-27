@@ -5,10 +5,12 @@
 # read-only control registration without launching the engine.
 import argparse
 import hashlib
+import importlib.util
 import json
 from pathlib import Path
 import subprocess
 import sys
+import tempfile
 import unittest
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -35,6 +37,7 @@ HELD_FLAGS_SOURCE_PROFILE = PROFILES / "k2-imersite-held-public-flags-source-f21
 HELD_FLAGS_FIXED_PROFILE = PROFILES / "k2-imersite-held-public-flags-fixed-f210.json"
 HELD_FLAGS_INPUT_REVISION = "3d1c6d166ce1a412cab2dc9bdd506d1de7afe00d"
 HELD_FLAGS_INPUT_RECEIPT = ROOT / "spec/evidence/k2-imersite-held-public-flags-inputs-3d1c6d16.json"
+FROZEN_PACKAGE_TOOL_SHA256 = "00ED00D66BD558554068405C8882419F852FC2F66646088052888D70E25DA61E"
 HELD_FLAGS_FIXTURE_ARCHIVES = {
     "source": ("mir-fixture-mir5-k2-imersite-held-public-flags_0.1.0.zip",
                "9CC52FD88DFFA2081FEB77B539A5C2AF0CE820C4ECD62FE1146F7FBA31837BAA", 6820),
@@ -61,6 +64,10 @@ STAGES = {
     "published-4.7": ("4.7.21002", "0.2.0"),
     "mir5": ("5.0.21000", "0.3.0"),
 }
+_package_spec = importlib.util.spec_from_file_location("k2_imersite_transition_package", ROOT / "tools" / "package.py")
+PACKAGE = importlib.util.module_from_spec(_package_spec)
+assert _package_spec.loader is not None
+_package_spec.loader.exec_module(PACKAGE)
 
 
 class K2ImersiteTransitionFixtureTests(unittest.TestCase):
@@ -721,8 +728,23 @@ class K2ImersiteTransitionFixtureTests(unittest.TestCase):
                     self.assertEqual((member["sha256"], member["bytes"]),
                                      (hashlib.sha256(raw).hexdigest().upper(), len(raw)))
         helper = receipt["package_tool"]
-        raw_helper = subprocess.check_output(["git", "show", f"HEAD:{helper['path']}"], cwd=ROOT)
-        self.assertEqual(helper["committed_sha256"], hashlib.sha256(raw_helper).hexdigest().upper())
+        self.assertEqual(FROZEN_PACKAGE_TOOL_SHA256, helper["committed_sha256"])
+        self.assertEqual(FROZEN_PACKAGE_TOOL_SHA256, helper["executed_worktree_sha256"])
+        with tempfile.TemporaryDirectory() as temporary:
+            temporary = Path(temporary)
+            for row in receipt["stages"]:
+                with self.subTest(current_helper_stage=row["stage"]):
+                    projection = temporary / (row["stage"] + "-projection")
+                    projection.mkdir()
+                    for member in row["members"]:
+                        (projection / member["path"]).write_bytes(subprocess.check_output(
+                            ["git", "show", f"HEAD:{member['source_path']}"], cwd=ROOT))
+                    record = PACKAGE.build(projection, temporary / Path(row["archive"]).name)
+                    self.assertEqual((row["sha256"], row["bytes"]),
+                                     (record["sha256"].upper(), record["bytes"]))
+                    self.assertEqual([{"path": member["path"], "sha256": member["sha256"].lower(),
+                                       "bytes": member["bytes"]}
+                                      for member in row["members"]], record["members"])
 
     def test_held_public_flags_data_preflights_the_real_k2so_rows_before_fixture_state(self):
         for stage in ("source", "fixed"):
