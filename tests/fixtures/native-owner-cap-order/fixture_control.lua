@@ -246,8 +246,8 @@ function M.apply(stage)
     local foreign_state = assert_foreign(foreign, expected, stage, stage .. " foreign")
     assert_player_snapshot(player, state.player, stage, stage .. " player")
     assert_foreign_snapshot(foreign_state, state.foreign, stage, stage .. " foreign")
-    -- A configuration create step likewise cannot produce the stage's
-    -- server-backed initial result.
+    -- The configuration callback also precedes this leg's first server tick;
+    -- it cannot produce the server-backed initial result.
     state.player, state.foreign, state.phase, state.stage = player, foreign_state, stage .. "-prepared", stage
   end)
 

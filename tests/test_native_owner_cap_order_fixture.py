@@ -203,9 +203,10 @@ function cap_order_flow(common_path, canonical_path, permuted_path, relaxed_path
     game.tick=game.tick+1
     return invoke(control.events[1])
   end
-  local function initial_server(control)
+  local function first_server_tick(control, configuration)
     mode="server"
     local ok,message=invoke(control.load);if not ok then return false,message end
+    if configuration then ok,message=invoke(control.changed);if not ok then return false,message end end
     return tick(control)
   end
   local function reload_twice(control)
@@ -220,32 +221,31 @@ function cap_order_flow(common_path, canonical_path, permuted_path, relaxed_path
   mode="create"
   local ok,message=invoke(canonical.init);if not ok then return {ok=false,message=message,markers=markers,marker_modes=marker_modes,saves=saves,create_saves=create_saves,resets=resets,storage=storage} end
   if opponent=="seed-skip" then
-    cap=1;effects[1],effects[2]=effects[2],effects[1]
-    player.reset_technology_effects();game.forces[2].reset_technology_effects()
     local permuted=load_control(permuted_path,"permuted")
-    mode="create";ok,message=invoke(permuted.changed)
+    ok,message=first_server_tick(permuted,true)
     return {ok=ok,message=message,markers=markers,marker_modes=marker_modes,saves=saves,create_saves=create_saves,resets=resets,storage=storage}
   end
-  ok,message=initial_server(canonical);if not ok then return {ok=false,message=message,markers=markers,marker_modes=marker_modes,saves=saves,create_saves=create_saves,resets=resets,storage=storage} end
+  ok,message=first_server_tick(canonical,false);if not ok then return {ok=false,message=message,markers=markers,marker_modes=marker_modes,saves=saves,create_saves=create_saves,resets=resets,storage=storage} end
   ok,message=reload_twice(canonical);if not ok then return {ok=false,message=message,markers=markers,saves=saves,resets=resets,storage=storage} end
+  if saves~=1 or create_saves~=0 then
+    return {ok=false,message="canonical server initial save is absent",markers=markers,marker_modes=marker_modes,saves=saves,create_saves=create_saves,resets=resets,storage=storage}
+  end
   if opponent=="skipped-transition" then
-    cap=0;player.reset_technology_effects()
-    local relaxed=load_control(relaxed_path,"relaxed");mode="create";ok,message=invoke(relaxed.changed)
+    cap=0
+    local relaxed=load_control(relaxed_path,"relaxed");ok,message=first_server_tick(relaxed,true)
     return {ok=ok,message=message,markers=markers,marker_modes=marker_modes,saves=saves,create_saves=create_saves,resets=resets,storage=storage}
   end
   cap=1;effects[1],effects[2]=effects[2],effects[1]
   if opponent=="wrong-effect" then effects[1].change=.11 end
   player.reset_technology_effects();game.forces[2].reset_technology_effects()
   if opponent=="corrupt-saved" then storage.mir5_native_owner_cap_order.player.saved_progress=.26 end
-  local permuted=load_control(permuted_path,"permuted");mode="create";ok,message=invoke(permuted.changed)
+  local permuted=load_control(permuted_path,"permuted");ok,message=first_server_tick(permuted,true)
   if not ok then return {ok=false,message=message,markers=markers,marker_modes=marker_modes,saves=saves,create_saves=create_saves,resets=resets,storage=storage} end
-  ok,message=initial_server(permuted);if not ok then return {ok=false,message=message,markers=markers,marker_modes=marker_modes,saves=saves,create_saves=create_saves,resets=resets,storage=storage} end
   ok,message=reload_twice(permuted);if not ok then return {ok=false,message=message,markers=markers,saves=saves,resets=resets,storage=storage} end
   cap=0;effects[1],effects[2]=effects[2],effects[1];player.reset_technology_effects();game.forces[2].reset_technology_effects()
   if opponent=="foreign-enabled" then game.forces[2].technologies["steel-plate-productivity"].enabled=true end
-  local relaxed=load_control(relaxed_path,"relaxed");mode="create";ok,message=invoke(relaxed.changed)
+  local relaxed=load_control(relaxed_path,"relaxed");ok,message=first_server_tick(relaxed,true)
   if not ok then return {ok=false,message=message,markers=markers,marker_modes=marker_modes,saves=saves,create_saves=create_saves,resets=resets,storage=storage} end
-  ok,message=initial_server(relaxed);if not ok then return {ok=false,message=message,markers=markers,marker_modes=marker_modes,saves=saves,create_saves=create_saves,resets=resets,storage=storage} end
   ok,message=reload_twice(relaxed)
   return {ok=ok,message=message,markers=markers,marker_modes=marker_modes,saves=saves,create_saves=create_saves,resets=resets,storage=storage,player=player,foreign=game.forces[2]}
 end
@@ -403,11 +403,12 @@ end
             old_control = Path(temporary) / "fixture_control.lua"
             old_control.write_text(old, encoding="utf-8")
             result = self._flow(control_path=old_control)
-        self.assertTrue(result["ok"], result["message"])
+        self.assertFalse(result["ok"])
         observations = [(plain(result["markers"][index])["stage"], result["marker_modes"][index])
                         for index in range(1, len(result["markers"]) + 1)]
         self.assertNotIn(("initial", "server"), observations)
-        self.assertEqual((0, 3), (result["saves"], result["create_saves"]))
+        self.assertEqual((0, 1), (result["saves"], result["create_saves"]))
+        self.assertIn("canonical server initial save is absent", result["message"])
 
     def test_technology_level_setter_requires_a_separate_following_foreign_disable_write(self):
         original = (FIXTURE / "fixture_control.lua").read_text(encoding="utf-8")
@@ -437,7 +438,8 @@ end
     def test_readme_states_raw_projection_and_unfrozen_native_limits(self):
         readme = (FIXTURE / "README.md").read_text(encoding="utf-8")
         for text in ("seven-member source projection", "tracked source bytes", "does not create this projection automatically",
-                     "*-prepared", "first server tick", "no state write or save", OBSERVER_SHA, MIR_SHA, "no native"):
+                     "canonical leg uses create-only mode", "configuration callback runs during server load", "first server tick",
+                     "no state write or save", OBSERVER_SHA, MIR_SHA, "no native"):
             self.assertIn(text, readme)
         shared = (FIXTURE / "fixture_control.lua").read_text(encoding="utf-8")
         self.assertIn("reset_technology_effects", shared)
