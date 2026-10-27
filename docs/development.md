@@ -178,6 +178,8 @@ Release and branch/control permissions remain explicit. Documentation adoption i
 
 Keep the existing extended-version build and qualification workflow. After acceptance, follow [final Portal copies](../spec/targets.md#final-portal-copies) to export selected finished packages for the maintainer, preserving the GitHub originals. This final output operation does not introduce a source/runtime codec or another build configuration.
 
+For one accepted stable extended package, create an unqualified final Portal copy without rebuilding source: `python tools/export_portal.py --input <accepted-extended-zip> --target f210 --output <portal-copy-directory>/more-infinite-research_5.0.09.zip`. For source patch `p` from 0 through 99, the final third component is `10*p+d`, with `d` F013=1, F014=2, F015=3, F016=4, F017=5, F100=6, F110=7, F200=8 and F210=9. The exporter accepts only those nine editions; it retains the ZIP root, changelog and every other member payload, changes only `info.json.version` and the packaged `distribution_version` literal, prints independent input/output checksums and does not establish native or release acceptance.
+
 The [release adapter](../tools/release.py) builds ten target packages from one committed player tree and its tracked edition record: nine stable editions plus the GitHub-only experimental F018 package. For release delivery, explicitly include the buildable best-effort early cohort from that same commit. Select a full commit and a new output directory outside the checkout:
 
 ```powershell
