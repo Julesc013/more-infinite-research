@@ -289,14 +289,15 @@ class MigrationOriginF200110SourceControls(unittest.TestCase):
                          (profile["origin_tag"], profile["origin_source_commit"], profile["engine"]["version"], profile["engine"]["sha256"]))
         self.assertEqual("6395C4A5A0F74C67729746D0FBF6162329978B47C5C29D54CC0045F2977C7E44",
                          profile["archive_sha256"]["more-infinite-research_1.1.0.zip"])
-        self.assertEqual("D1E92F0117AA89B3B20BB31EDEAFDE2654A63AEB08934D2C13CCEA589BF69C82",
+        self.assertEqual("087952B335FEC82F1F32773323257789478B5A132AF7024E0D1434EE742E38ED",
                          profile["archive_sha256"]["mir-fixture-mir5-migration-origin-f200-110-source_0.1.0.zip"])
         self.assertEqual({"README.md", "catalogue.lua", "control.lua", "data-final-fixes.lua", "settings-final-fixes.lua", "info.json"},
                          {path.name for path in FIXTURE.iterdir() if path.is_file()})
         self.assertEqual({"catalogue.lua", "control.lua", "data-final-fixes.lua", "settings-final-fixes.lua", "info.json"},
                          {path.name for path in FIXTURE.iterdir() if path.is_file() and path.name != "README.md"})
         self.assertIn("not a migration pass", (FIXTURE / "README.md").read_text(encoding="utf-8"))
-        self.assertIn("Superseded, never-executed r04", profile["scope"])
+        self.assertIn("Prepared r05", profile["scope"])
+        self.assertIn("never-executed r04", profile["scope"])
 
     def test_control_registers_callbacks_without_runtime_access_at_load(self):
         path = (FIXTURE / "control.lua").as_posix()
