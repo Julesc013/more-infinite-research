@@ -174,7 +174,9 @@ local function assert_force(force, expected, rows, label, ignored_technology, ig
 end
 local function saved_offset(expected, label)
   local value = expected and expected.fields and expected.fields.manual_mining_speed_modifier
-  if type(value) ~= "number" then fail(label .. " source-owned scripted offset is malformed") end
+  if type(value) ~= "number" or value ~= value or value == math.huge or value == -math.huge then
+    fail(label .. " source-owned scripted offset is malformed")
+  end
   return value
 end
 local function offset_json(value)
@@ -191,9 +193,28 @@ local function reapply_source_owned_offsets(state_value)
   local player_expected = saved_offset(state_value.player_snapshot, "player")
   local foreign_expected = saved_offset(state_value.foreign_snapshot, "foreign")
   local detached_expected = saved_offset(state_value.detached_snapshot, "detached")
-  player.manual_mining_speed_modifier = player_expected
-  foreign.manual_mining_speed_modifier = foreign_expected
-  detached.manual_mining_speed_modifier = detached_expected
+  local function validate(before, expected, label)
+    if type(before) ~= "number" or before ~= before or before == math.huge or before == -math.huge then
+      fail(label .. " source-owned pre-configuration offset is not finite actual=" .. offset_json(before))
+    end
+    if before ~= 0 and before ~= expected then
+      fail(label .. " source-owned pre-configuration offset differs expected-reset=0 expected-saved="
+        .. offset_json(expected) .. " actual=" .. offset_json(before))
+    end
+  end
+  -- Validate every force before modifying any one of them.  Only the native
+  -- reset-to-zero observation and the exact saved fixture sentinel are valid.
+  validate(player_before, player_expected, "player")
+  validate(foreign_before, foreign_expected, "foreign")
+  validate(detached_before, detached_expected, "detached")
+  local function apply(force, before, expected)
+    if before == expected then return "retained" end
+    force.manual_mining_speed_modifier = expected
+    return "reapplied"
+  end
+  local player_action = apply(player, player_before, player_expected)
+  local foreign_action = apply(foreign, foreign_before, foreign_expected)
+  local detached_action = apply(detached, detached_before, detached_expected)
   if not close(player.manual_mining_speed_modifier, player_expected)
       or not close(foreign.manual_mining_speed_modifier, foreign_expected)
       or not close(detached.manual_mining_speed_modifier, detached_expected) then
@@ -202,6 +223,8 @@ local function reapply_source_owned_offsets(state_value)
   log("[MIR5_MIGRATION_ORIGIN_OFFSET_REAPPLY] {\"action\":\"configuration-source-owned-reapply\",\"player_before\":"
     .. offset_json(player_before) .. ",\"foreign_before\":" .. offset_json(foreign_before)
     .. ",\"detached_before\":" .. offset_json(detached_before)
+    .. ",\"player_action\":\"" .. player_action .. "\",\"foreign_action\":\"" .. foreign_action
+    .. "\",\"detached_action\":\"" .. detached_action .. "\""
     .. ",\"player_expected\":" .. offset_json(player_expected)
     .. ",\"foreign_expected\":" .. offset_json(foreign_expected)
     .. ",\"detached_expected\":" .. offset_json(detached_expected) .. "}")

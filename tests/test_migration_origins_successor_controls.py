@@ -212,7 +212,7 @@ class MigrationOriginSuccessorControls(unittest.TestCase):
         path = (FIXTURE / "control.lua").as_posix()
         self.lua.globals().successor_runtime_path = path
         self.lua.execute(r'''
-          function migration_successor_run_control(target_name,mutate,already_current,effect_case,reset_offsets_before_configuration,mutate_offset_after_configuration)
+          function migration_successor_run_control(target_name,mutate,already_current,effect_case,reset_offsets_before_configuration,mutate_offset_after_configuration,preconfiguration_drift)
             local callbacks={events={}}
             local direct_name="recipe-prod-research_gears-1"
             local alternate_name="recipe-prod-research_plastic-1"
@@ -343,6 +343,9 @@ class MigrationOriginSuccessorControls(unittest.TestCase):
                 foreign.manual_mining_speed_modifier=0
                 detached.manual_mining_speed_modifier=0
               end
+              if preconfiguration_drift=="player" then player.manual_mining_speed_modifier=.25 end
+              if preconfiguration_drift=="foreign" then foreign.manual_mining_speed_modifier=.25 end
+              if preconfiguration_drift=="detached" then detached.manual_mining_speed_modifier=.25 end
               callbacks.configuration()
             end
             local function reload_target(target)
@@ -370,6 +373,8 @@ class MigrationOriginSuccessorControls(unittest.TestCase):
             return {ok=ok,message=tostring(message),state=state,gear=player.technologies[direct_name].level,
               bonus=player.recipes["iron-gear-wheel"].productivity_bonus,saved=env.saved,logs=env.logs,
               reload_read_only=env.reload_read_only,add_calls=player.add_calls,
+              offsets={player=player.manual_mining_speed_modifier,foreign=foreign.manual_mining_speed_modifier,
+                detached=detached.manual_mining_speed_modifier},
               source_effect_signature=state.player_snapshot.effects[direct_name],
               initial_source_effect_signature=initial_source_effect_signature}
           end
@@ -382,6 +387,7 @@ class MigrationOriginSuccessorControls(unittest.TestCase):
                 self.assertEqual("completed", accepted["state"]["successors"][target]["phase"])
                 self.assertEqual(1, accepted["state"]["successors"][target]["candidate_actual_labs"])
                 self.assertEqual(3, len(accepted["logs"]))
+                self.assertIn('"player_action":"retained","foreign_action":"retained","detached_action":"retained"', accepted["logs"][0])
                 self.assertTrue(accepted["reload_read_only"])
                 self.assertEqual(1, accepted["add_calls"])
 
@@ -390,8 +396,19 @@ class MigrationOriginSuccessorControls(unittest.TestCase):
         reapply_markers = [line for line in reapply["logs"] if "MIR5_MIGRATION_ORIGIN_OFFSET_REAPPLY" in line]
         self.assertEqual(1, len(reapply_markers))
         self.assertIn('"player_before":0,"foreign_before":0,"detached_before":0', reapply_markers[0])
+        self.assertIn('"player_action":"reapplied","foreign_action":"reapplied","detached_action":"reapplied"', reapply_markers[0])
         self.assertIn('"player_expected":0.125,"foreign_expected":0.125,"detached_expected":0.125', reapply_markers[0])
         self.assertTrue(reapply["reload_read_only"])
+
+        for force_name in ("player", "foreign", "detached"):
+            with self.subTest(preconfiguration_drift=force_name):
+                rejected = py(self.lua.eval("migration_successor_run_control")(
+                    "f200", False, False, None, False, False, force_name))
+                self.assertFalse(rejected["ok"])
+                self.assertIn(force_name + " source-owned pre-configuration offset differs", rejected["message"])
+                self.assertEqual({}, rejected["state"].get("successors", {}))
+                self.assertEqual(0, rejected["add_calls"])
+                self.assertEqual(.25, rejected["offsets"][force_name])
 
         # The source snapshot remains raw/indexed.  Current F210 may expose
         # the same additive effects in a different order, with explicit
