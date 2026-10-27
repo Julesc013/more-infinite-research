@@ -329,10 +329,10 @@ local function begin()
   -- mutate a force, fixture storage, or a candidate lab.
   local observed = assert_supporting_state(state_value, false)
   assert_direct_before(state_value)
-  -- The protected source fixture seeded and snapshotted these three force
-  -- offsets.  Current-engine configuration resets them before any mod
-  -- callback, so only this fixture restores its own sentinel here.  Reloads
-  -- stay read-only and no arbitrary script or console modifier is claimed.
+  -- The protected fixture owns these three saved sentinels. Reapply only the
+  -- admitted zero condition after source preflight; these writes do not prove
+  -- which lifecycle phase reset the field. That needs the separate native
+  -- diagnostic. Reloads never reapply arbitrary script or console modifiers.
   reapply_source_owned_offsets(state_value)
   state_value.successors = state_value.successors or {}
   if state_value.successors[target_name] ~= nil then fail("target successor already began") end
