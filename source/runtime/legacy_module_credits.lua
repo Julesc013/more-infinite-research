@@ -113,7 +113,9 @@ local function exact_holder_shape(technology, descriptor)
       or prototype.max_level ~= UINT32_MAX or prototype.hidden ~= true
       or prototype.upgrade ~= true or prototype.enabled ~= false or prototype.visible_when_disabled ~= false
       or type(effects) ~= "table" or #effects ~= 1
-      or technology.research_unit_count ~= 1 or not close(technology.research_unit_energy, 1)
+      -- The authored definition uses unit.time = 1 second.  LuaTechnology
+      -- exposes that duration as 60 ticks, not as the authored seconds.
+      or technology.research_unit_count ~= 1 or not close(technology.research_unit_energy, 60)
       or not one_automation_pack(technology.research_unit_ingredients)
       or type(technology.enabled) ~= "boolean" or type(technology.visible_when_disabled) ~= "boolean" then
     return false
@@ -134,14 +136,6 @@ local function holder_mode(technology, descriptor, completed_levels)
   end
   if technology.level == 1 then return "initial" end
   if completed_levels > 0 and technology.level == 1 + completed_levels then return "credited" end
-  return nil
-end
-
-local function force_by_index(index)
-  if not game or not game.forces then return nil end
-  for _, force in pairs(game.forces) do
-    if valid_force(force) and force.index == index then return force end
-  end
   return nil
 end
 
@@ -207,10 +201,20 @@ function M.apply(plan)
   if plan == nil then return false end
   if not valid_plan(plan) then error("MIR invalid legacy module credit plan", 2) end
   if active_target() ~= plan.target then error("MIR legacy module credit plan target is no longer active", 2) end
+  if not game or not game.forces then error("MIR legacy module credit requires the force collection", 2) end
+  local forces_by_index = {}
+  for _, force in pairs(game.forces) do
+    if valid_force(force) then
+      if forces_by_index[force.index] ~= nil then
+        error("MIR legacy module credit rejects duplicate force indexes", 2)
+      end
+      forces_by_index[force.index] = force
+    end
+  end
   local live = {}
   for index = 1, #plan.forces do
     local row = plan.forces[index]
-    local force = force_by_index(row.index)
+    local force = forces_by_index[row.index]
     local current = force and detached_force_plan(force) or nil
     if current == nil or current == false or current.completed ~= row.completed
         or current.holder_level ~= row.holder_level then

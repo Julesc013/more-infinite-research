@@ -43,7 +43,7 @@ class LegacyModuleCreditTests(unittest.TestCase):
           end
           local function holder(descriptor)
             return {valid=true,name=descriptor.id,level=1,researched=false,enabled=false,visible_when_disabled=false,
-              research_unit_count=1,research_unit_energy=1,
+              research_unit_count=1,research_unit_energy=60,
               research_unit_ingredients={{name="automation-science-pack",amount=1}},
               prototype={name=descriptor.id,level=1,max_level=UINT32_MAX,hidden=true,enabled=false,
                 visible_when_disabled=false,upgrade=true,effects={{type="change-recipe-productivity",recipe=descriptor.recipe,change=descriptor.change}}}}
@@ -63,6 +63,8 @@ class LegacyModuleCreditTests(unittest.TestCase):
             env.script={active_mods={},on_configuration_changed=function(fn)callbacks.configuration=fn end}
             if target=="f200" then
               env.script.active_mods={base="2.0.77",["more-infinite-research"]="5.0.20000"}
+            elseif target=="f200-forward" then
+              env.script.active_mods={base="2.0.99",["more-infinite-research"]="5.0.20001"}
             elseif target=="f200-final-copy" then
               env.script.active_mods={base="2.0.99",["more-infinite-research"]="5.0.08"}
             elseif target=="f210" then
@@ -76,6 +78,7 @@ class LegacyModuleCreditTests(unittest.TestCase):
               end
               if name=="platform.target" then
                 if target=="f200" then return {id="f200",recipe_productivity=true,distribution_version="5.0.20000"} end
+                if target=="f200-forward" then return {id="f200",recipe_productivity=true,distribution_version="5.0.20001"} end
                 if target=="f200-final-copy" then return {id="f200",recipe_productivity=true,distribution_version="5.0.08"} end
                 return {id="f210",recipe_productivity=true,distribution_version="5.0.21000"}
               end
@@ -130,6 +133,14 @@ class LegacyModuleCreditTests(unittest.TestCase):
             return {ok=ok,message=tostring(message),storage=value.env.storage.mir_legacy_module_credits,
               holder=value.player.technologies[value.descriptors[1].id].level}
           end
+          function legacy_module_credit_reject_one_tick_holder()
+            local value=legacy_module_credit_environment("f200")
+            value.player.technologies[value.descriptors[1].id].research_unit_energy=1
+            local ok,message=pcall(function() value.runtime.preflight(value.event) end)
+            return {ok=ok,message=tostring(message),
+              holder=value.player.technologies[value.descriptors[1].id].level,
+              foreign_holder=value.foreign.technologies[value.descriptors[1].id].level}
+          end
           function legacy_module_credit_inactive(target,old_version)
             local value=legacy_module_credit_environment(target)
             value.event.mod_changes["more-infinite-research"].old_version=old_version
@@ -152,6 +163,19 @@ class LegacyModuleCreditTests(unittest.TestCase):
               result.holders[descriptor.id]={level=holder.level,enabled=holder.enabled,visible=holder.visible_when_disabled}
             end
             return result
+          end
+          function legacy_module_credit_apply_indexes_forces_once()
+            local value=legacy_module_credit_environment("f200")
+            local forces={player=value.player,foreign=value.foreign}
+            for index=3,66 do forces["force"..index]=force(index,2,false,value.descriptors) end
+            local pair_calls=0
+            value.env.game.forces=setmetatable(forces,{__pairs=function(table)
+              pair_calls=pair_calls+1;return next,table,nil
+            end})
+            local plan=value.runtime.preflight(value.event)
+            assert(plan and #plan.forces==66)
+            assert(value.runtime.apply(plan)==true)
+            return {pair_calls=pair_calls,last=forces.force66.technologies[value.descriptors[1].id].level}
           end
         ''')
 
@@ -181,7 +205,7 @@ class LegacyModuleCreditTests(unittest.TestCase):
         self.assertEqual(1, result["two"][0]["unit"]["ingredients"][0][1])
 
     def test_exact_f200_and_f210_base_preflight_freeze_only_old_completed_levels(self):
-        for target in ("f200", "f210", "f200-final-copy"):
+        for target in ("f200", "f200-forward", "f210", "f200-final-copy"):
             with self.subTest(target=target):
                 result = py(self.lua.eval("legacy_module_credit_success")(target))
                 self.assertEqual((3, 1, .27, "preserved", .42),
@@ -198,6 +222,11 @@ class LegacyModuleCreditTests(unittest.TestCase):
         self.assertIn("non-current force shape", nondefault["message"])
         self.assertNotIn("storage", nondefault)
         self.assertEqual(1, nondefault["holder"])
+
+        one_tick = py(self.lua.eval("legacy_module_credit_reject_one_tick_holder")())
+        self.assertFalse(one_tick["ok"])
+        self.assertIn("non-current force shape", one_tick["message"])
+        self.assertEqual((1, 1), (one_tick["holder"], one_tick["foreign_holder"]))
 
         drift = py(self.lua.eval("legacy_module_credit_reject_after_preflight")())
         self.assertFalse(drift["ok"])
@@ -221,6 +250,11 @@ class LegacyModuleCreditTests(unittest.TestCase):
             self.assertEqual(before, holder["level"])
             self.assertFalse(holder["enabled"])
             self.assertFalse(holder["visible"])
+
+    def test_apply_indexes_the_force_collection_once_before_any_holder_write(self):
+        result = py(self.lua.eval("legacy_module_credit_apply_indexes_forces_once")())
+        self.assertEqual(2, result["pair_calls"])
+        self.assertEqual(2, result["last"])
 
     def test_runtime_has_no_tick_research_or_recipe_bonus_reconciliation(self):
         source = RUNTIME.read_text(encoding="utf-8")
