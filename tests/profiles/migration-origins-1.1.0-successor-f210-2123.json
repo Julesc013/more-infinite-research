@@ -4,7 +4,7 @@
   "origin_tag": "1.1.0",
   "origin_source_commit": "2fb64822b82569e3b50f0653e361fb7148f18b63",
   "source_fixture_commit": "d8e24b4a79b6064a373c03210c5ef6be0b013f79",
-  "successor_fixture_commit": "e37225cf63417c37e4ea2be162667f4d84324340",
+  "successor_fixture_commit": "63747976abb25a12f53284de6f7d29e6a823833f",
   "target": "f210",
   "factorio_line": "2.1",
   "engine": {
@@ -25,11 +25,11 @@
     {"name": "base", "version": "2.1.23", "enabled": true},
     {"name": "mir-fixture-mir5-active-mods-observer", "version": "0.1.0", "enabled": true},
     {"name": "more-infinite-research", "version": "5.0.21000", "enabled": true},
-    {"name": "mir-fixture-mir5-migration-origin-f200-110-successor", "version": "0.2.0", "enabled": true}
+    {"name": "mir-fixture-mir5-migration-origin-f200-110-source", "version": "0.3.0", "enabled": true}
   ],
   "archive_sha256": {
     "mir-fixture-mir5-active-mods-observer_0.1.0.zip": "A15A7D628D66953D2E0C4D4FA288F47CBF9C5678327C7EB3D23ADB5DC78331C0",
-    "mir-fixture-mir5-migration-origin-f200-110-successor_0.2.0.zip": "CCA857B7F6F27F440715B24FE9568FDB4EDE900A673CC4265FB659EE3BCE4A00",
+    "mir-fixture-mir5-migration-origin-f200-110-source_0.3.0.zip": "BB6AD7204CB8669EA1EC8CC3F4C613A84BACBF51F21EEC51598633D14CF11462",
     "more-infinite-research_5.0.21000.zip": "7CE6A4DF78019F6B98237E638A1C927C5FDB538D4A1442EE22D846DD962DDCDC"
   },
   "scope": "Prepared direct F200-to-F210 Base successor of the corrected protected MIR 1.1.0 F200 source stage under a575 MIR5 F210. It is not runnable until the exact corrected source save/result are bound. Space Age planet repair is a separate route and is not selected here."
