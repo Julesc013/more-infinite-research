@@ -136,7 +136,7 @@ local function state()
   end
   return value
 end
-local function assert_force(force, expected, rows, label, ignored_technology, ignored_recipe)
+local function assert_force(force, expected, rows, label, ignored_technology, ignored_recipe, check_offset)
   if force == nil or force.valid == false then fail(label .. " force is absent") end
   if type(expected.technologies) ~= "table" or type(expected.effects) ~= "table" or type(expected.recipes) ~= "table" then
     fail(label .. " source snapshot is malformed")
@@ -164,8 +164,8 @@ local function assert_force(force, expected, rows, label, ignored_technology, ig
       fail(label .. " earned recipe contribution changed: " .. recipe)
     end
   end
-  if type(force.manual_mining_speed_modifier) ~= "number"
-      or not close(force.manual_mining_speed_modifier, expected.fields.manual_mining_speed_modifier) then
+  if check_offset ~= false and (type(force.manual_mining_speed_modifier) ~= "number"
+      or not close(force.manual_mining_speed_modifier, expected.fields.manual_mining_speed_modifier)) then
     fail(label .. " unrelated scripted offset changed expected="
       .. tostring(expected.fields.manual_mining_speed_modifier)
       .. " actual=" .. tostring(force.manual_mining_speed_modifier))
@@ -239,18 +239,20 @@ local function exact_target()
   end
   fail("runtime target closure differs")
 end
-local function assert_supporting_state(state_value)
+local function assert_supporting_state(state_value, check_offsets)
   if settings.startup[catalogue.breeding_setting] == nil
       or settings.startup[catalogue.breeding_setting].value ~= false then
     fail("effective false historical breeding setting was not retained")
   end
   local player_effects = assert_force(game.forces.player, state_value.player_snapshot, state_value.roster,
-    "player", catalogue.direct, catalogue.gear_recipe)
+    "player", catalogue.direct, catalogue.gear_recipe, check_offsets)
   local foreign = game.forces[state_value.foreign_index]
-  local foreign_effects = assert_force(foreign, state_value.foreign_snapshot, state_value.roster, "foreign")
+  local foreign_effects = assert_force(foreign, state_value.foreign_snapshot, state_value.roster, "foreign",
+    nil, nil, check_offsets)
   assert_queue(foreign, state_value.foreign_queue, "foreign")
   local detached = game.forces[state_value.detached_index]
-  local detached_effects = assert_force(detached, state_value.detached_snapshot, state_value.roster, "detached")
+  local detached_effects = assert_force(detached, state_value.detached_snapshot, state_value.roster, "detached",
+    nil, nil, check_offsets)
   if not close(technology(detached, catalogue.direct).saved_progress, .27) then
     fail("detached historical progress changed")
   end
@@ -322,13 +324,16 @@ end
 local function begin()
   local target_name = exact_target()
   local state_value = state()
-  -- The protected source fixture seeded and snapshotted these three force
-  -- offsets.  Current-engine configuration resets them before any mod
-  -- callback, so only this fixture restores its own sentinel here.  Reloads
-  -- stay read-only and no arbitrary script or console modifier is claimed.
-  reapply_source_owned_offsets(state_value)
-  local observed = assert_supporting_state(state_value)
+  -- Validate every retained source field before restoring the one documented
+  -- engine-reset sentinel.  Bad source rows/effects/recipes/queues must not
+  -- mutate a force, fixture storage, or a candidate lab.
+  local observed = assert_supporting_state(state_value, false)
   assert_direct_before(state_value)
+  -- The protected fixture owns these three saved sentinels. Reapply only the
+  -- admitted zero condition after source preflight; these writes do not prove
+  -- which lifecycle phase reset the field. That needs the separate native
+  -- diagnostic. Reloads never reapply arbitrary script or console modifiers.
+  reapply_source_owned_offsets(state_value)
   state_value.successors = state_value.successors or {}
   if state_value.successors[target_name] ~= nil then fail("target successor already began") end
   local successor = {}

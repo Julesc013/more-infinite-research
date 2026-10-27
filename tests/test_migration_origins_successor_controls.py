@@ -212,7 +212,7 @@ class MigrationOriginSuccessorControls(unittest.TestCase):
         path = (FIXTURE / "control.lua").as_posix()
         self.lua.globals().successor_runtime_path = path
         self.lua.execute(r'''
-          function migration_successor_run_control(target_name,mutate,already_current,effect_case,reset_offsets_before_configuration,mutate_offset_after_configuration,preconfiguration_drift)
+          function migration_successor_run_control(target_name,mutate,already_current,effect_case,reset_offsets_before_configuration,mutate_offset_after_configuration,preconfiguration_drift,source_drift)
             local callbacks={events={}}
             local direct_name="recipe-prod-research_gears-1"
             local alternate_name="recipe-prod-research_plastic-1"
@@ -300,6 +300,8 @@ class MigrationOriginSuccessorControls(unittest.TestCase):
               player_snapshot=expected,foreign_index=2,foreign_snapshot=foreign_expected,
               foreign_queue={current=direct_name,queue={direct_name,alternate_name},progress=.42},
               detached_index=3,detached_snapshot=detached_expected}
+            if source_drift=="gear-recipe" then player.recipes["iron-gear-wheel"].productivity_bonus=.2 end
+            if source_drift=="queue" then foreign.research_progress=.41 end
             local initial_source_effect_signature=state.player_snapshot.effects[direct_name]
             local inventory={items={}}
             function inventory.clear() inventory.items={} end
@@ -309,7 +311,7 @@ class MigrationOriginSuccessorControls(unittest.TestCase):
             env={
               storage={mir5_migration_origin_f200_100_source=state},
               settings={startup={["ips-enable-research_breeding"]={value=false}}},
-              game={forces={player=player,[2]=foreign,[3]=detached},surfaces={[1]={create_entity=function() return entity end}},tick=0,speed=1,
+              game={forces={player=player,[2]=foreign,[3]=detached},surfaces={[1]={create_entity=function() env.created_labs=(env.created_labs or 0)+1;return entity end}},tick=0,speed=1,
                 server_save=function(_) env.saved=true end},
               helpers={table_to_json=function(_) return "{}" end}, log=function(message) env.logs[#env.logs+1]=message end, logs={},
               script={active_mods={},on_configuration_changed=function(fn) callbacks.configuration=fn end,
@@ -373,6 +375,7 @@ class MigrationOriginSuccessorControls(unittest.TestCase):
             return {ok=ok,message=tostring(message),state=state,gear=player.technologies[direct_name].level,
               bonus=player.recipes["iron-gear-wheel"].productivity_bonus,saved=env.saved,logs=env.logs,
               reload_read_only=env.reload_read_only,add_calls=player.add_calls,
+              created_labs=env.created_labs or 0,
               offsets={player=player.manual_mining_speed_modifier,foreign=foreign.manual_mining_speed_modifier,
                 detached=detached.manual_mining_speed_modifier},
               source_effect_signature=state.player_snapshot.effects[direct_name],
@@ -443,6 +446,27 @@ class MigrationOriginSuccessorControls(unittest.TestCase):
                 self.assertEqual("completed", rejected["state"]["phase"])
                 self.assertNotIn("f210", rejected["state"].get("successors", {}))
 
+        # A real engine reset is permitted only after all immutable source
+        # rows/effects/recipes/queues have been preflighted.  Every failure
+        # below must leave all three reset fields at zero and avoid fixture
+        # storage or lab creation.
+        combined_invalid = (
+            ("effect", ("f210", False, False, "wrong-recipe", True), "effect"),
+            ("row", ("f200", True, False, None, True), "source row changed before candidate work"),
+            ("recipe", ("f200", False, False, None, True, False, None, "gear-recipe"),
+             "original MIR1 source earned gear contribution differs"),
+            ("queue", ("f200", False, False, None, True, False, None, "queue"), "queue/progress differs"),
+        )
+        for label, arguments, expected_message in combined_invalid:
+            with self.subTest(combined_reset_invalid=label):
+                rejected = py(self.lua.eval("migration_successor_run_control")(*arguments))
+                self.assertFalse(rejected["ok"])
+                self.assertIn(expected_message, rejected["message"])
+                self.assertEqual({"player": 0, "foreign": 0, "detached": 0}, rejected["offsets"])
+                self.assertEqual("completed", rejected["state"]["phase"])
+                self.assertEqual({}, rejected["state"].get("successors", {}))
+                self.assertEqual((0, 0), (rejected["add_calls"], rejected["created_labs"]))
+
         already_current = py(self.lua.eval("migration_successor_run_control")("f200", False, True))
         self.assertTrue(already_current["ok"], already_current["message"])
         self.assertEqual(0, already_current["add_calls"])
@@ -475,7 +499,7 @@ class MigrationOriginSuccessorControls(unittest.TestCase):
                           "persistence_claim": False}, f200_profile["fixture_startup_setting"])
         self.assertEqual("BD1B88D7DE85489207F71C1B080FD61617FAEF9655370BF0332A51579308ECE3",
                          f200_profile["archive_sha256"]["more-infinite-research_5.0.20000.zip"])
-        self.assertEqual("838803FD017705EFE204EAA00413E5512AC90C3C4CF8F10E8B4F201FA693CE91",
+        self.assertEqual("382DBFB1583C95E05B8CCF885528E5670A871FA8327619839BDDF3834F64C9FC",
                          f200_profile["archive_sha256"][f"{NAME}_0.2.0.zip"])
         self.assertEqual("58F04FB9D417F2726835F4A6740490DE3C1841665DAC81C2BA3DFA94050D9457",
                          f210_profile["archive_sha256"]["more-infinite-research_5.0.21000.zip"])
@@ -483,7 +507,7 @@ class MigrationOriginSuccessorControls(unittest.TestCase):
                          f210_profile["source_save"]["sha256"])
         self.assertEqual("ProtectedOriginalF200SourceSave", f210_profile["settings_mode"])
         self.assertNotIn("required_completed_f200_stage", f210_profile["source_save"])
-        self.assertEqual("514C9B2C2F3F564814C2EA621C3BCFD6837FEB4BC89B6B98FC84127CBF167ABF",
+        self.assertEqual("5288C64C04F9BA7A396984CF7C242BBE12724F75A775D4AAF2B2C75FFB470D58",
                          f210_profile["archive_sha256"][f"{NAME}_0.3.0.zip"])
         self.assertEqual({"README.md", "catalogue.lua", "control.lua", "data-final-fixes.lua", "info-f200.json", "info-f210.json", "settings-updates.lua"},
                          {path.name for path in FIXTURE.iterdir() if path.is_file()})
