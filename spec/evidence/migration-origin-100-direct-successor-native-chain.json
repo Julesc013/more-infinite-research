@@ -1,0 +1,148 @@
+{
+  "schema": 1,
+  "kind": "MIR5MigrationOrigin100DirectSuccessorNativeChainV1",
+  "status": "passed-bounded-direct-successors-from-protected-published-mir1-f200-source",
+  "scope": "Two private direct successors from the same immutable published MIR 1.0.0 F200 source save: one F200 candidate and one F210 engine-hop candidate. Each retains the source baseline, completes one new candidate gear laboratory, saves, and passes two read-only cold reloads. This evidence does not recreate or duplicate the source world and does not qualify a later candidate, arbitrary dependency closure, multiplayer, physical production, performance, or release acceptance.",
+  "source_stage_reused": {
+    "chain": "spec/evidence/migration-origin-100-f200-source-native-chain.json",
+    "status": "passed-exact-published-mir1-f200-source-stage",
+    "result_sha256": "156DB224E0042D8D988E2CF127641E9AAE0FCF7430402A645F93A2BE41BC8A30",
+    "protected_save_sha256": "F8B38209DA632C8B2EFA049C8F69CDB3E3EC01F6BEE0C5D03BAFF03C27989C54",
+    "protected_save_bytes": 424681,
+    "source_actual_gear_laboratory_completions": 1,
+    "reuse_limit": "The source-stage laboratory count is historical work retained by the source chain. It is not additional successor work and the source world was not rerun."
+  },
+  "frozen_execution": {
+    "fixture_source_head": "7ac3a90596f6f3645fbdd13877418bafe87f1aa4",
+    "caller_sha256": "42D31FAD20D7B24A915B0938F9A1F2A732B6CFF7A5DCEBA32C0076D6607C15AE",
+    "f200_private_profile_sha256": "5807798DE9E13141A56A0125225387F779E2C882AC2763B17BC54EF15E49FDDE",
+    "f210_private_profile_sha256": "F76177251852C7FEB3594276EC487F5EB740F111937C3C2DB52C4CC0E3B4C364",
+    "binding_note": "The later tracked profile/README integration binds the accepted r08 containers but does not rename the frozen native source head or its two candidate packages."
+  },
+  "direct_successors": [
+    {
+      "target": "f200",
+      "engine": {
+        "version": "2.0.77",
+        "sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B"
+      },
+      "candidate": {
+        "version": "5.0.20000",
+        "archive_sha256": "BD1B88D7DE85489207F71C1B080FD61617FAEF9655370BF0332A51579308ECE3",
+        "fixture_archive_sha256": "838803FD017705EFE204EAA00413E5512AC90C3C4CF8F10E8B4F201FA693CE91",
+        "observer_archive_sha256": "723D1E7721449FC26040E5E6629416767BDC20AD79CF8723115846DB662A1F87"
+      },
+      "result": {
+        "status": "passed-private-native-fixture",
+        "sha256": "10D06912D531FBB163F2F3D0C2CD9FF5997FD42F4020E4EB779716468EA7A5A5",
+        "terminal_sha256": "5EDE44EECCB9A6BA605E8B3D3A6D7CB1DB42D895366D19A4F37A6F497B7BBF78",
+        "completed_save_sha256": "FC0D37EB88C69B5A82C69321EBCD454459435D0F0F6DD13D01C2A1F6481FDDD6",
+        "completed_save_bytes": 443832,
+        "source_rows": 21,
+        "source_actual_labs": 1,
+        "new_candidate_actual_labs": 1,
+        "direct_level": {"source": 2, "candidate": 3},
+        "gear_bonus": {"source": 0.10000000149011612, "candidate": 0.20000000298023224},
+        "foreign_queue_progress": 0.42000000000000004,
+        "detached_progress": 0.27,
+        "effective_breeding_setting": false,
+        "read_only_cold_reloads": 2,
+        "reload_save_byte_identical": true,
+        "direct_library_controls": "restored-direct-library-controls",
+        "factorio_processes_after_terminal": 0
+      }
+    },
+    {
+      "target": "f210",
+      "engine": {
+        "version": "2.1.23",
+        "sha256": "FE4A1DA30F322A0D0B8AEB3DF7276332222BAAA143E2352569B723E84B2B9060"
+      },
+      "candidate": {
+        "version": "5.0.21000",
+        "archive_sha256": "58F04FB9D417F2726835F4A6740490DE3C1841665DAC81C2BA3DFA94050D9457",
+        "fixture_archive_sha256": "514C9B2C2F3F564814C2EA621C3BCFD6837FEB4BC89B6B98FC84127CBF167ABF",
+        "observer_archive_sha256": "2E1BE5952D2A4CC5C74A0D149E075D247BA110A3FAE5B6768D3EAEBABCEF989C"
+      },
+      "result": {
+        "status": "passed-private-native-fixture",
+        "sha256": "7194A99741C57397F106CC8E2CF45A1A15F245F437AD462DC01A70BAF5AAA391",
+        "terminal_sha256": "5928E2835993A72B61E7EE6254E5D640158D6F51A62062760C2BCBC7B15F0BE0",
+        "completed_save_sha256": "D48B5C94618A7496360BB67A37FACE237B5A38A3F2A596B7CDFCBA8C7DA54F64",
+        "completed_save_bytes": 446517,
+        "source_rows": 21,
+        "source_actual_labs": 1,
+        "new_candidate_actual_labs": 1,
+        "direct_level": {"source": 2, "candidate": 3},
+        "gear_bonus": {"source": 0.10000000149011612, "candidate": 0.2},
+        "foreign_queue_progress": 0.42000000000000004,
+        "detached_progress": 0.27,
+        "effective_breeding_setting": false,
+        "read_only_cold_reloads": 2,
+        "reload_save_byte_identical": true,
+        "direct_library_controls": "restored-direct-library-controls",
+        "factorio_processes_after_terminal": 0
+      }
+    }
+  ],
+  "fixture_owned_sentinel_boundary": {
+    "persisted_snapshot_value": 0.125,
+    "fields": ["player.manual_mining_speed_modifier", "foreign.manual_mining_speed_modifier", "detached.manual_mining_speed_modifier"],
+    "configuration_rule": "Before a write, each value must be either the observed engine reset value 0 or the saved snapshot value. Only zero is re-applied; an already-correct value is retained; every other value refuses before candidate work.",
+    "reload_rule": "Cold reload assertions are pure and write no sentinel value.",
+    "representation_rule": "The raw source effect signature is retained. The observer accepts only verified additive change-recipe-productivity ordering, omitted hidden=false, and the four exact source float32 projections; it preserves multiplicity and rejects all other effect drift.",
+    "claim_limit": "This fixture lifecycle correction does not assert that MIR reconstructs unowned script or console modifiers."
+  },
+  "custody": {
+    "f200": {
+      "primary_root": "build/qualification/migration-origins/migration-origin-100-successor-f200-r08/native-output",
+      "members": 18,
+      "bytes": 545171,
+      "original_and_primary_file_hashes_checked": 36,
+      "original_manifest_sha256": "B58FFD483F159D52D3003AE16F82D9B98EBA9BDD988697E60AB69A5720E24ECF",
+      "primary_manifest_sha256": "B58FFD483F159D52D3003AE16F82D9B98EBA9BDD988697E60AB69A5720E24ECF",
+      "all_member_hashes_matched": true
+    },
+    "f210": {
+      "primary_root": "build/qualification/migration-origins/migration-origin-100-successor-f210-r08/native-output",
+      "members": 17,
+      "bytes": 559873,
+      "original_and_primary_file_hashes_checked": 34,
+      "original_manifest_sha256": "434496DD3C2F2278CAFC0D4C359AFAC07E813C88897D8D9F659D923EDBAE878D",
+      "primary_manifest_sha256": "434496DD3C2F2278CAFC0D4C359AFAC07E813C88897D8D9F659D923EDBAE878D",
+      "all_member_hashes_matched": true
+    },
+    "full_originals": "All native results, saves, logs, preflights, configuration and library-control snapshots remain only in discoverable primary custody; this tracked chain carries hashes and safe summaries rather than those payloads."
+  },
+  "preserved_adverses": {
+    "pre_engine_same_slot_observer_copy_refusal": {
+      "target": "f200-r04",
+      "terminal_sha256": "3C5DC7C7E4E46B3A050FE51AF7D9864830D39E2B93DB89827539A960C585916F",
+      "preflight_sha256": "A5964636B623D892FC0F42677904772E63CCD23EF7A11D1CDCBA88F74F801147",
+      "disposition": "The caller refused before a native result when its observer archive copy targeted the already-selected library path. It is retained separately from the five native fixture adverses."
+    },
+    "native_result_count": 5,
+    "safe_receipt_records": "spec/evidence/migration-origin-100-direct-successor-native-receipts-r01.json.gz"
+  },
+  "receipts": {
+    "path": "spec/evidence/migration-origin-100-direct-successor-native-receipts-r01.json.gz",
+    "sha256": "BE465DC46BDA90D21D518D2D42E43AF7C377DB8940EE5BBA97CEBCE3614A9B59",
+    "bytes": 3292,
+    "safe_records": 8,
+    "roundtrip_verified": true,
+    "exclusions": "The compact capsule has five native adverses, two native passes, and one labelled derived marker record. It excludes save binaries, player/configuration data, raw preflight snapshots, full logs, and library-control payloads."
+  },
+  "claims": {
+    "same_immutable_original_source_save_consumed_by_both_successors": true,
+    "f200_direct_successor": true,
+    "f210_direct_engine_hop_successor": true,
+    "source_world_recreated": false,
+    "later_candidate_applicability": false,
+    "ver_06_review": "root-owned-pending",
+    "multiplayer": false,
+    "physical_factory": false,
+    "performance": false,
+    "release_qualification": false
+  },
+  "limitations": "This is one protected published MIR 1.0.0 F200 origin, two exact frozen candidate packages, and two exact engine families. It neither covers every historical origin nor relabels BD1/58F observations as a later source/package; current-new-source applicability and VER-06 remain pending with the maintainer."
+}
