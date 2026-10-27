@@ -30,6 +30,21 @@ CONTINUATION_IDS = {
     "worker-robots-storage-4",
 }
 DISABLED_BATTERY = "recipe-prod-research_batteries-1"
+BASE_LITERAL_NAME_PRESENTATION_REPAIRS = {
+    # The published rows retain the original shape as captured evidence.  The
+    # two substitutions were invalid F210 Base locale children; the enclosing
+    # MIR keys are literal titles in every shipped locale.
+    "recipe-prod-research_mining_drill-1": {
+        "captured": ["technology-name.more-infinite-research.research_mining_drill",
+                     ["item-name.electric-mining-drill"]],
+        "emitted": ["technology-name.more-infinite-research.research_mining_drill"],
+    },
+    "recipe-prod-research_walls-1": {
+        "captured": ["technology-name.more-infinite-research.research_walls",
+                     ["item-name.stone-wall"]],
+        "emitted": ["technology-name.more-infinite-research.research_walls"],
+    },
+}
 
 
 def _lua_value(lua, value):
@@ -57,6 +72,16 @@ def _plain(value):
 
 def _sha256(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest().upper()
+
+
+def _repair_base_literal_name_presentation(rows):
+    """Use exactly the two reviewed successor presentation values."""
+    repaired = deepcopy(rows)
+    for technology, expected in BASE_LITERAL_NAME_PRESENTATION_REPAIRS.items():
+        if repaired.get(technology, {}).get("localised_name") != expected["captured"]:
+            raise AssertionError(f"captured Py presentation changed: {technology}")
+        repaired[technology]["localised_name"] = deepcopy(expected["emitted"])
+    return repaired
 
 
 class PyF210PipelineTests(unittest.TestCase):
@@ -187,7 +212,7 @@ class PyF210PipelineTests(unittest.TestCase):
     def assert_full_pipeline(self, case):
         rows = self._technology_rows(self.stage(case))
         expected = self._expected_capture(case)
-        published = expected["published_rows"]
+        published = _repair_base_literal_name_presentation(expected["published_rows"])
         continuations = expected["published_continuations"]
         actual_productivity = {
             name: row for name, row in rows.items()
