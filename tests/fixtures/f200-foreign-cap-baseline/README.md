@@ -1,0 +1,9 @@
+# F200 foreign cap-baseline preparation
+
+This disposable F200 Base route exercises the current-MIR cap ownership distinction that the older published-cap fixture cannot observe: an uncapped current-MIR source seeds earned level-three gear state with 2% productivity and 27% detached work, then creates a separately foreign level-three gear row only after its native reset and marks that row disabled/hidden with an unrelated `braking-force-1` queue at 42%.
+
+The finite 0.2.0 stage changes only the F200 gear cap to one. MIR's ordinary configuration lifecycle must retain the player enablement-restoration right while recording the foreign `disabled=false` baseline. The relaxed 0.3.0 stage changes only that cap back to zero: player gear must restore enabled/visible state, while foreign gear remains disabled/hidden and its queue/progress, earned level, effect and detached work remain exact. There are no laboratories, research completions, physical-output or tuning claims.
+
+The source is protected only after its first actual server tick emits `initial` and calls `game.server_save`; create-only preparation is not a save result. Each stage then requires two read-only cold reload markers. Source, finite and relaxed fixture packages are seven-member projections: the four stage files plus the three shared `fixture_*.lua` aliases. The caller uses the existing generic `Invoke-NativeFixture.ps1` with exact profiles and package-record projections; it does not compose or stage these inputs.
+
+The prepared profiles and receipt bind F200 2.0.77, the F200 observer, current 98fb/58F F200 MIR archive and raw-Git fixture package bytes. They are preparation only: source/save hashes, engine execution, native lifecycle behavior, release qualification and ordinary balance remain pending.
