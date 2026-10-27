@@ -151,8 +151,10 @@ function cap_order_flow(common_path, canonical_path, permuted_path, relaxed_path
     end})
     local probe={name="automation",valid=true,level=1,researched=false,enabled=true,visible_when_disabled=false,saved_progress=0,
       prototype={max_level=1,effects={}}}
+    local prerequisite={name="automation-science-pack",valid=true,researched=false,enabled=true}
     local value={name=name,index=index,valid=true,technologies={["steel-plate-productivity"]=owner,automation=probe},
       recipes={ ["steel-plate"]={productivity_bonus=0},["casting-steel"]={productivity_bonus=0}},research_queue={},research_progress=0,owned=owned}
+    value.technologies["automation-science-pack"]=prerequisite
     function value.enable_all_prototypes() end
     function value.reset_technology_effects()
       resets=resets+1
@@ -169,6 +171,7 @@ function cap_order_flow(common_path, canonical_path, permuted_path, relaxed_path
     end
     function value.add_research(technology)
       if technology==nil or technology.enabled~=true or value.current_research~=nil then return false end
+      if technology==probe and (probe.researched or not prerequisite.researched) then return false end
       value.current_research=technology;value.research_queue={technology};value.research_progress=technology.saved_progress or 0
       technology.saved_progress=0;return true
     end
@@ -402,6 +405,23 @@ end
                                                result["foreign"]["technologies"]["steel-plate-productivity"]["visible_when_disabled"],
                                                result["foreign"]["research_progress"]))
         self.assertEqual("relaxed-complete", result["storage"]["mir5_native_owner_cap_order"]["phase"])
+
+    def test_foreign_queue_requires_the_named_native_prerequisite_without_changing_saved_investment(self):
+        original = (FIXTURE / "fixture_control.lua").read_text(encoding="utf-8")
+        old = original.replace("  prerequisite.researched = true\n", "")
+        self.assertNotEqual(original, old)
+        with tempfile.TemporaryDirectory() as temporary:
+            path = Path(temporary) / "missing-prerequisite.lua"
+            path.write_text(old, encoding="utf-8", newline="\n")
+            refused = self._flow(control_path=path)
+        self.assertFalse(refused["ok"])
+        self.assertIn("could not queue foreign probe", refused["message"])
+        self.assertEqual(0, refused["saves"])
+        passed = self._flow()
+        self.assertTrue(passed["ok"], passed["message"])
+        self.assertTrue(passed["foreign"]["technologies"]["automation-science-pack"]["researched"])
+        self.assertFalse(passed["foreign"]["technologies"]["automation"]["researched"])
+        self.assertEqual(.42, passed["foreign"]["research_progress"])
 
     def test_transition_refuses_effect_drift_skipped_stage_corrupted_saved_state_and_foreign_enablement(self):
         for opponent, phrase in (("wrong-effect", "effect differs"), ("seed-skip", "required prior"), ("skipped-transition", "required prior"),

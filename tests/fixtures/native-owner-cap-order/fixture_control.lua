@@ -199,7 +199,13 @@ local function setup_foreign(expected)
   owner.enabled = false
   owner.visible_when_disabled = false
   local probe = foreign.technologies[PROBE]
-  if probe == nil then fail("foreign queue probe is absent") end
+  local prerequisite = foreign.technologies["automation-science-pack"]
+  if probe == nil or prerequisite == nil then fail("foreign queue probe is absent") end
+  -- Enabling prototypes does not research Automation's named prerequisite.
+  -- Seed only that fixture prerequisite before constructing the saved queue.
+  prerequisite.researched = true
+  probe.researched = false
+  probe.enabled = true
   if foreign.add_research(probe) ~= true then fail("could not queue foreign probe") end
   foreign.research_progress = 0.42
   -- This is a documented engine event, not a call into MIR. It lets the
