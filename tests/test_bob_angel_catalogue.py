@@ -11,7 +11,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "tools"))
 import recover_modern_catalogue as catalogue
 from test_k2_base_catalogue import _lua_value, _plain
-from native_credit_oracle import NATIVE_CREDIT_DEFAULT_SCALAR, NATIVE_CREDIT_DESCRIPTORS, native_credit_carrier_rows, verified_public_rows
+from native_credit_oracle import NATIVE_CREDIT_DEFAULT_SCALAR, NATIVE_CREDIT_DESCRIPTORS, native_credit_carrier_rows, legacy_module_credit_rows, verified_public_rows
 
 SETTINGS_INTENT = ROOT / "spec/inventory/bob-angel-f200-intent-r03.json"
 SETTINGS_INTENT_SHA256 = "1D200906E8996F4049009EE6761E73C88FFC70824BC838496786A32EF927207C"
@@ -122,6 +122,7 @@ class BobAngelCatalogueTests(unittest.TestCase):
                     raise AssertionError("Credit scalar lacks its independent captured setting default: " + family)
         cls.expected_complete_data = deepcopy(cls.expected_data)
         catalogue._apply_reviewed(cls.expected_complete_data, reviewed, "data")
+        cls.expected_complete_data["technology"].update(legacy_module_credit_rows(cls.inputs["raw"]["recipe"]))
         cls.mods = {row["name"]: row["version"] for row in json.loads(
             (ROOT / "tests/profiles/bob-angel-f200-2077.json").read_text())["mods"] if row["enabled"]}
 

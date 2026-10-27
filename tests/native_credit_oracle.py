@@ -2,7 +2,8 @@
 
 These assertions live with the host controls rather than player source.  They
 keep the frozen published catalogue as the public-output oracle and validate
-the twelve deliberately added signed carrier pairs field-for-field.
+the twelve deliberately added signed carrier pairs and three historical module
+credit holders field-for-field.
 """
 
 NATIVE_CREDIT_DESCRIPTORS = (
@@ -75,6 +76,30 @@ def native_credit_carrier_rows(public_rows, captured_recipes):
     return expected
 
 
+def legacy_module_credit_rows(captured_recipes):
+    """Three fixed historical credits, independently checked after publication."""
+    expected = {}
+    for recipe in ("speed-module", "productivity-module", "efficiency-module"):
+        if recipe not in captured_recipes:
+            continue
+        name = "mir-legacy-module-credit-" + recipe
+        expected[name] = {
+            "type": "technology", "name": name,
+            "icon": "__base__/graphics/technology/module.png", "icon_size": 256,
+            "level": 1, "upgrade": True, "hidden": True, "enabled": False,
+            "visible_when_disabled": False, "max_level": "infinite",
+            "order": "zz[mir-legacy-module-credit]-" + name,
+            "effects": [{"type": "change-recipe-productivity", "recipe": recipe, "change": .01}],
+            "unit": {"count": 1, "time": 1, "ingredients": [["automation-science-pack", 1]]},
+        }
+    return expected
+
+
+def current_native_credit_rows(public_rows, captured_recipes):
+    return {**native_credit_carrier_rows(public_rows, captured_recipes),
+            **legacy_module_credit_rows(captured_recipes)}
+
+
 def captured_public_productivity_recipes(public_rows):
     """Return the exact named productivity routes preserved by a capture."""
     return {
@@ -89,7 +114,7 @@ def split_public_and_native_credit_rows(rows):
     """Partition outputs without accepting unknown carrier identities."""
     public, credit = {}, {}
     for name, row in rows.items():
-        destination = credit if name.startswith("mir-native-credit-") else public
+        destination = credit if name.startswith(("mir-native-credit-", "mir-legacy-module-credit-")) else public
         destination[name] = row
     return public, credit
 
@@ -101,7 +126,7 @@ def verified_public_rows(rows, captured_recipes):
     unexpected carrier an error rather than silently filtering it out.
     """
     public, credit = split_public_and_native_credit_rows(rows)
-    expected = native_credit_carrier_rows(public, captured_recipes)
+    expected = current_native_credit_rows(public, captured_recipes)
     if credit != expected:
         raise AssertionError("native-credit rows differ from the exact authored oracle")
     if set(rows) != set(public) | set(expected):
