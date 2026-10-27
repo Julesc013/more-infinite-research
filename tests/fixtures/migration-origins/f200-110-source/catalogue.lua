@@ -55,24 +55,70 @@ return {
     ["ips-enable-research_furnace"] = true,
     ["ips-enable-research_mining_drill"] = true,
   },
-  -- The old util.lua selects these F200 tools.  The enabled gate then adds
-  -- space science as a prerequisite to every emitted row.
+  -- Exact original `U.pick_science_for_stream` and
+  -- `U.build_prereqs_for` outputs on Base 2.0.77.  The enabled space gate
+  -- appends only a prerequisite; it never changes the unit ingredients.
   science = {
     ordinary = {
-      ["automation-science-pack"] = 1, ["logistic-science-pack"] = 1,
-      ["chemical-science-pack"] = 1, ["production-science-pack"] = 1,
-      ["space-science-pack"] = 1,
+      ingredients = {
+        ["automation-science-pack"] = 1, ["logistic-science-pack"] = 1,
+        ["chemical-science-pack"] = 1, ["production-science-pack"] = 1,
+      },
+      prerequisites = {
+        ["automation-science-pack"] = true, ["logistic-science-pack"] = true,
+        ["chemical-science-pack"] = true, ["production-science-pack"] = true,
+        ["space-science-pack"] = true,
+      },
     },
-    military = {
-      ["automation-science-pack"] = 1, ["logistic-science-pack"] = 1,
-      ["chemical-science-pack"] = 1, ["production-science-pack"] = 1,
-      ["military-science-pack"] = 1, ["space-science-pack"] = 1,
+    space = {
+      ingredients = {
+        ["automation-science-pack"] = 1, ["logistic-science-pack"] = 1,
+        ["chemical-science-pack"] = 1, ["production-science-pack"] = 1,
+        ["space-science-pack"] = 1,
+      },
+      prerequisites = {
+        ["automation-science-pack"] = true, ["logistic-science-pack"] = true,
+        ["chemical-science-pack"] = true, ["production-science-pack"] = true,
+        ["space-science-pack"] = true,
+      },
+    },
+    military_space = {
+      ingredients = {
+        ["automation-science-pack"] = 1, ["logistic-science-pack"] = 1,
+        ["chemical-science-pack"] = 1, ["production-science-pack"] = 1,
+        ["military-science-pack"] = 1, ["space-science-pack"] = 1,
+      },
+      prerequisites = {
+        ["automation-science-pack"] = true, ["logistic-science-pack"] = true,
+        ["chemical-science-pack"] = true, ["production-science-pack"] = true,
+        ["military-science-pack"] = true, ["space-science-pack"] = true,
+      },
+    },
+    military_gate = {
+      ingredients = {
+        ["automation-science-pack"] = 1, ["logistic-science-pack"] = 1,
+        ["chemical-science-pack"] = 1, ["production-science-pack"] = 1,
+        ["military-science-pack"] = 1,
+      },
+      prerequisites = {
+        ["automation-science-pack"] = true, ["logistic-science-pack"] = true,
+        ["chemical-science-pack"] = true, ["production-science-pack"] = true,
+        ["military-science-pack"] = true, ["space-science-pack"] = true,
+      },
     },
     all_f200_tools = {
-      ["automation-science-pack"] = 1, ["logistic-science-pack"] = 1,
-      ["chemical-science-pack"] = 1, ["production-science-pack"] = 1,
-      ["military-science-pack"] = 1, ["utility-science-pack"] = 1,
-      ["space-science-pack"] = 1,
+      ingredients = {
+        ["automation-science-pack"] = 1, ["logistic-science-pack"] = 1,
+        ["chemical-science-pack"] = 1, ["production-science-pack"] = 1,
+        ["military-science-pack"] = 1, ["utility-science-pack"] = 1,
+        ["space-science-pack"] = 1,
+      },
+      prerequisites = {
+        ["automation-science-pack"] = true, ["logistic-science-pack"] = true,
+        ["chemical-science-pack"] = true, ["production-science-pack"] = true,
+        ["military-science-pack"] = true, ["utility-science-pack"] = true,
+        ["space-science-pack"] = true,
+      },
     },
   },
   -- `rows` is literal archived 1.1.0 config plus F200 Base recipe-output
@@ -100,36 +146,37 @@ return {
       recipe("productivity-module", .10), recipe("speed-module", .10), recipe("efficiency-module", .10),
       recipe("productivity-module-2", .05), recipe("speed-module-2", .05), recipe("efficiency-module-2", .05),
       recipe("productivity-module-3", .02), recipe("speed-module-3", .02), recipe("efficiency-module-3", .02),
+      recipe("productivity-module", .01), recipe("speed-module", .01), recipe("efficiency-module", .01),
     }},
-    ["recipe-prod-research_belts-1"] = {science = "ordinary", effects = {
+    ["recipe-prod-research_belts-1"] = {science = "space", effects = {
       recipe("transport-belt", .10), recipe("underground-belt", .10), recipe("splitter", .10),
       recipe("fast-transport-belt", .05), recipe("fast-underground-belt", .05), recipe("fast-splitter", .05),
       recipe("express-transport-belt", .02), recipe("express-underground-belt", .02), recipe("express-splitter", .02),
     }},
-    ["recipe-prod-research_inserters-1"] = {science = "ordinary", effects = {
+    ["recipe-prod-research_inserters-1"] = {science = "space", effects = {
       recipe("inserter", .10), recipe("burner-inserter", .10), recipe("fast-inserter", .05),
       recipe("long-handed-inserter", .05), recipe("bulk-inserter", .02),
     }},
-    ["recipe-prod-research_bullets-1"] = {science = "military", effects = {
+    ["recipe-prod-research_bullets-1"] = {science = "military_space", effects = {
       recipe("firearm-magazine", .10), recipe("shotgun-shell", .10),
       recipe("piercing-rounds-magazine", .05), recipe("piercing-shotgun-shell", .05),
       recipe("uranium-rounds-magazine", .02),
     }},
-    ["recipe-prod-research_rockets-1"] = {science = "military", effects = {
+    ["recipe-prod-research_rockets-1"] = {science = "military_gate", effects = {
       recipe("rocket", .10), recipe("explosive-rocket", .05), recipe("atomic-bomb", .02),
     }},
-    ["recipe-prod-research_robot_battery-1"] = {science = "ordinary", effects = {
+    ["recipe-prod-research_robot_battery-1"] = {science = "space", effects = {
       {type = "worker-robot-battery", modifier = .10},
     }},
     ["recipe-prod-research_science_pack_productivity-1"] = {science = "all_f200_tools", effects = {
       recipe("automation-science-pack", .10), recipe("logistic-science-pack", .10), recipe("chemical-science-pack", .10),
       recipe("military-science-pack", .10), recipe("production-science-pack", .10), recipe("utility-science-pack", .10),
     }},
-    ["recipe-prod-research_walls-1"] = {science = "ordinary", effects = {recipe("stone-wall", .10), recipe("gate", .05)}},
-    ["recipe-prod-research_grenades-1"] = {science = "ordinary", effects = {recipe("grenade", .10), recipe("cluster-grenade", .05)}},
-    ["recipe-prod-research_rails-1"] = {science = "ordinary", effects = {recipe("rail", .10)}},
+    ["recipe-prod-research_walls-1"] = {science = "military_space", effects = {recipe("stone-wall", .10), recipe("gate", .05)}},
+    ["recipe-prod-research_grenades-1"] = {science = "military_space", effects = {recipe("grenade", .10), recipe("cluster-grenade", .05)}},
+    ["recipe-prod-research_rails-1"] = {science = "space", effects = {recipe("rail", .10)}},
     ["recipe-prod-research_electric_energy-1"] = {science = "ordinary", effects = {recipe("solar-panel", .10), recipe("accumulator", .10)}},
-    ["recipe-prod-research_concrete-1"] = {science = "ordinary", effects = {
+    ["recipe-prod-research_concrete-1"] = {science = "space", effects = {
       recipe("stone-brick", .10), recipe("concrete", .05), recipe("hazard-concrete", .05),
       recipe("refined-concrete", .02), recipe("refined-hazard-concrete", .02),
     }},
