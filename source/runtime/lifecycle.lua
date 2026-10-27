@@ -552,7 +552,7 @@ local function import_legacy_caps_on_configuration(event)
       -- marker is the only selector here; both readers still receive the
       -- current preflighted candidate list and current ownership, so an old
       -- version label cannot manufacture a restoration right.
-      local import_for_force = legacy_bucket.policy_version == 1
+      local import_for_force = type(legacy_bucket) == "table" and legacy_bucket.policy_version == 1
         and legacy_caps.import_boolean_for_force or legacy_caps.import_for_force
       local rows = import_for_force(legacy_bucket, force,
         legacy_candidates(force, owner, direct_f200_hop), owned, allowlist)

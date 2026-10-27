@@ -799,6 +799,23 @@ class LegacyCapsLifecycleTests(unittest.TestCase):
             and not malformed_item.enabled and malformed_item.visible_when_disabled)
         ''')
 
+    def test_non_table_legacy_bucket_cannot_crash_or_grant_ownership(self):
+        self.lua.execute('''
+          for _, old in ipairs({true, 7, "legacy"}) do
+            local item = technology(gear_name)
+            boot({[1] = force(1, {[gear_name] = item})}, old)
+            lifecycle.on_configuration_changed()
+            assert(not item.enabled and item.visible_when_disabled
+              and storage.mir.maximum_level_control == old
+              and storage.mir_caps.legacy_caps_checked
+              and next(storage.mir_caps.owned_disabled) == nil,
+              "malformed predecessor gained authority or lost its original value")
+            lifecycle.on_configuration_changed()
+            assert(not item.enabled and item.visible_when_disabled,
+              "repeated configuration imported malformed predecessor rights")
+          end
+        ''')
+
     def test_unrecognized_old_state_is_examined_only_once(self):
         self.lua.execute('''
           local item, old = technology(gear_name), legacy({gear_name}, {1})
