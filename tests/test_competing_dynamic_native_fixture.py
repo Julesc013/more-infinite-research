@@ -25,8 +25,8 @@ ARCHIVES = {
 }
 STAGES = (
     ("published-4.7", "published", "4.7.20002", "0.1.0", False),
-    ("mir5-prefer-mir", "mir5-prefer-mir", "5.0.20000", "0.2.0", True),
-    ("mir5-prefer-foreign", "mir5-prefer-foreign", "5.0.20000", "0.3.0", False),
+    ("mir5-prefer-mir", "successor-prefer-mir", "5.0.20000", "0.2.0", True),
+    ("mir5-prefer-foreign", "successor-prefer-foreign", "5.0.20000", "0.3.0", False),
 )
 PROFILES = tuple(
     ROOT / "tests/profiles" / f"competing-dynamic-gameplay-{provider}-{label}-f200-sa-2077.json"
@@ -331,7 +331,7 @@ end
         self.assertFalse(result["ok"])
         self.assertIn("empty prerequisites", result["message"])
         bad = deepcopy(SOURCE_ROWS["ce"])
-        result = run(str(FIXTURE / "ce/mir5-prefer-mir/data-final-fixes.lua"), str(FIXTURE / "ce/data-final-common.lua"), "ce", "5.0.20001",
+        result = run(str(FIXTURE / "ce/successor-prefer-mir/data-final-fixes.lua"), str(FIXTURE / "ce/data-final-common.lua"), "ce", "5.0.20001",
                      lua_value(self.lua, bad))
         self.assertFalse(result["ok"])
         self.assertIn("unexpected CE fixture closure", result["message"])

@@ -8,6 +8,7 @@ import unittest
 
 ROOT = Path(__file__).resolve().parents[1]
 FIXTURE = ROOT / "tests/fixtures/integration-catalogue-upgrade"
+SUCCESSOR_ROLE = "successor"
 FOREIGN_OWNER = ROOT / "tests/fixtures/integration-foreign-owner"
 RECOVERED = ROOT / "tests/fixtures/armor-py-f200-472-recovered-facts.json"
 BASE_ORACLE = ROOT / "spec/inventory/modern-f200-470.json"
@@ -27,6 +28,10 @@ def f200_runtime_api_path():
             if path.is_file():
                 return path
     return None
+
+
+def fixture_role(stage):
+    return SUCCESSOR_ROLE if stage == "mir5" else stage
 
 
 def py(value):
@@ -104,7 +109,7 @@ class IntegrationCatalogueUpgradeFixtureTests(unittest.TestCase):
         return rows
 
     def _run_data(self, stage, raw, mods):
-        self.lua.globals().stage_path = (FIXTURE / stage / "data-final-fixes.lua").as_posix()
+        self.lua.globals().stage_path = (FIXTURE / fixture_role(stage) / "data-final-fixes.lua").as_posix()
         self.lua.globals().common_path = (FIXTURE / "data-final-common.lua").as_posix()
         self.lua.globals().catalogue_path = (FIXTURE / "catalogue.lua").as_posix()
         self.lua.execute(r'''

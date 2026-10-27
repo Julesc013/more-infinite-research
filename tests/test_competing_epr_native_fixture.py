@@ -291,7 +291,7 @@ class CompetingEprNativeFixtureTests(unittest.TestCase):
             self.assertEqual(mir, profile["mods"][3]["version"])
             self.assertEqual(fixture_version, profile["mods"][4]["version"])
             self.assertNotIn("space-age", [item["name"] for item in profile["mods"]])
-            info = json.loads((FIXTURE / {"0.1.0": "published", "0.2.0": "mir5-prefer-mir", "0.3.0": "mir5-prefer-foreign"}[fixture_version] / "info.json").read_text())
+            info = json.loads((FIXTURE / {"0.1.0": "published", "0.2.0": "successor-prefer-mir", "0.3.0": "successor-prefer-foreign"}[fixture_version] / "info.json").read_text())
             self.assertEqual((NAME, fixture_version, "2.0"), (info["name"], info["version"], info["factorio_version"]))
         chain = json.loads(CHAIN_PATH.read_text(encoding="utf-8"))
         receipt_path = reference_path(chain["raw_reference_receipt"]["path"])
@@ -309,8 +309,8 @@ class CompetingEprNativeFixtureTests(unittest.TestCase):
         self.assertFalse(chain["claims"]["native_save_chain_passed"])
 
     def test_captured_tail_preflight_precedes_the_only_disposable_count_time_mutation(self):
-        variants = (("published", "4.7.20002", False), ("mir5-prefer-mir", "5.0.20000", True),
-                    ("mir5-prefer-foreign", "5.0.20000", False))
+        variants = (("published", "4.7.20002", False), ("successor-prefer-mir", "5.0.20000", True),
+                    ("successor-prefer-foreign", "5.0.20000", False))
         for directory, mir, preference in variants:
             with self.subTest(directory=directory):
                 result = self.lua.eval("epr_fixture_data")(str(FIXTURE / directory / "data-final-fixes.lua"), mir, self.row())
@@ -333,8 +333,8 @@ class CompetingEprNativeFixtureTests(unittest.TestCase):
         self.assertEqual(60, result["row"]["unit"]["time"])
 
     def test_controls_parse_without_runtime_access_and_on_load_is_read_only(self):
-        variants = (("published", "4.7.20002", "0.1.0"), ("mir5-prefer-mir", "5.0.20000", "0.2.0"),
-                    ("mir5-prefer-foreign", "5.0.20000", "0.3.0"))
+        variants = (("published", "4.7.20002", "0.1.0"), ("successor-prefer-mir", "5.0.20000", "0.2.0"),
+                    ("successor-prefer-foreign", "5.0.20000", "0.3.0"))
         for directory, mir, version in variants:
             with self.subTest(directory=directory):
                 result = self.lua.eval("epr_fixture_parse")(str(FIXTURE / directory / "control.lua"), mir, version)
@@ -384,7 +384,7 @@ class CompetingEprNativeFixtureTests(unittest.TestCase):
                 self.assertIn(phrase, result["message"])
     def test_preference_successors_preserve_native_witnesses_and_reject_opponents(self):
         run = self.lua.eval("epr_fixture_successor_flow")
-        result = run(str(FIXTURE / "mir5-prefer-mir" / "control.lua"), str(FIXTURE / "mir5-prefer-foreign" / "control.lua"), "", lua_value(self.lua, self.tail_names))
+        result = run(str(FIXTURE / "successor-prefer-mir" / "control.lua"), str(FIXTURE / "successor-prefer-foreign" / "control.lua"), "", lua_value(self.lua, self.tail_names))
         self.assertTrue(result["ok"], result["message"])
         self.assertEqual("prefer-foreign-completed", result["phase"])
         self.assertEqual((7, .6, .27, 0, .42),
@@ -404,7 +404,7 @@ class CompetingEprNativeFixtureTests(unittest.TestCase):
         }
         for opponent, phrase in opponents.items():
             with self.subTest(opponent=opponent):
-                result = run(str(FIXTURE / "mir5-prefer-mir" / "control.lua"), str(FIXTURE / "mir5-prefer-foreign" / "control.lua"), opponent, lua_value(self.lua, self.tail_names))
+                result = run(str(FIXTURE / "successor-prefer-mir" / "control.lua"), str(FIXTURE / "successor-prefer-foreign" / "control.lua"), opponent, lua_value(self.lua, self.tail_names))
                 self.assertFalse(result["ok"])
                 self.assertIn(phrase, result["message"])
 

@@ -11,8 +11,8 @@ from native_credit_oracle import verified_public_rows
 ROOT = Path(__file__).resolve().parents[1]
 FIXTURE = ROOT / "tests/fixtures/foreign-research-preservation"
 SOURCE = FIXTURE / "published-4.7"
-DESTINATION = FIXTURE / "mir5"
-UNRESOLVED = FIXTURE / "mir5-unresolved"
+DESTINATION = FIXTURE / "successor"
+UNRESOLVED = FIXTURE / "successor-unresolved"
 PROFILE = ROOT / "tests/profiles/foreign-research-preservation-f210.json"
 
 

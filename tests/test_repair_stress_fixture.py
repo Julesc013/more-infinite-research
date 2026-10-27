@@ -31,6 +31,10 @@ F200_OBSERVER = "723D1E7721449FC26040E5E6629416767BDC20AD79CF8723115846DB662A1F8
 F210_OBSERVER = "2E1BE5952D2A4CC5C74A0D149E075D247BA110A3FAE5B6768D3EAEBABCEF989C"
 F210_PUBLISHED = "A4BB8F47232C689B267EF434F557187A8795C47280FA464169DE917FB579517F"
 F210_ACTIVE_CANDIDATE = "4F5BEE023930666FC0F921136A69B59861741BE44C311E03D46347D42018ECBC"
+
+
+def fixture_role(arm):
+    return "successor" if arm == "mir5" else arm
 VARIANTS = {
     "f200": {
         "published": {
@@ -289,7 +293,7 @@ end
         for target, variants in VARIANTS.items():
             for arm, expected in variants.items():
                 with self.subTest(target=target, arm=arm):
-                    info = json.loads((FIXTURE / arm / expected["info"]).read_text(encoding="utf-8"))
+                    info = json.loads((FIXTURE / fixture_role(arm) / expected["info"]).read_text(encoding="utf-8"))
                     self.assertEqual(
                         (NAME, expected["fixture"], expected["factorio"]),
                         (info["name"], info["version"], info["factorio_version"]),

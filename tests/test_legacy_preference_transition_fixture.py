@@ -22,6 +22,10 @@ VARIANTS = {
 }
 
 
+def fixture_role(stage):
+    return stage.replace('mir5-', 'successor-', 1)
+
+
 def lua_value(lua, value):
     if isinstance(value, dict):
         return lua.table_from({key: lua_value(lua, item) for key, item in value.items()})
@@ -248,10 +252,10 @@ end
     def test_all_stage_metadata_and_exact_preflight_precede_acceleration(self):
         for directory, (mir, fixture, preference) in VARIANTS.items():
             with self.subTest(directory=directory):
-                info = json.loads((FIXTURE / directory / 'info.json').read_text(encoding='utf-8'))
+                info = json.loads((FIXTURE / fixture_role(directory) / 'info.json').read_text(encoding='utf-8'))
                 self.assertEqual((NAME, fixture, '2.0'), (info['name'], info['version'], info['factorio_version']))
                 self.assertIn(f'more-infinite-research = {mir}', info['dependencies'])
-                result = self.lua.eval('legacy_fixture_data')(str(FIXTURE / directory / 'data-final-fixes.lua'), str(FIXTURE / 'data-final-common.lua'),
+                result = self.lua.eval('legacy_fixture_data')(str(FIXTURE / fixture_role(directory) / 'data-final-fixes.lua'), str(FIXTURE / 'data-final-common.lua'),
                     lua_value(self.lua, self.row(preference)), mir, fixture, preference)
                 self.assertTrue(result['ok'], result['message'])
                 row = plain(result['raw']['technology']['recipe-prod-research_breeding-1'])

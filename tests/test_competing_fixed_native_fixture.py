@@ -21,6 +21,17 @@ PROFILES = tuple(ROOT / "tests/profiles" / name for name in (
     "competing-fixed-mir5-prefer-foreign-providers-readded-f200-sa-2077.json",
 ))
 FIXTURE_NAME = "mir-fixture-mir5-competing-fixed-gameplay"
+SUCCESSOR_ROLES = {
+    "mir5-prefer-mir": "successor-prefer-mir",
+    "mir5-prefer-foreign": "successor-prefer-foreign",
+    "mir5-prefer-mir-again": "successor-prefer-mir-again",
+    "mir5-prefer-foreign-providers-removed": "successor-prefer-foreign-providers-removed",
+    "mir5-prefer-foreign-providers-readded": "successor-prefer-foreign-providers-readded",
+}
+
+
+def fixture_role(stage):
+    return SUCCESSOR_ROLES.get(stage, stage)
 FOREIGN_DATA = FIXTURE / "foreign-data.lua"
 FULL_BIOFLUX_DATA = FIXTURE / "full-bioflux-data.lua"
 ALL = ("basic-plate-productivity", "electric-circuit-productivity", "advanced-circuit-productivity",
@@ -320,7 +331,7 @@ end
         stages = ("published", "mir5-prefer-mir", "mir5-prefer-foreign", "mir5-prefer-mir-again",
                   "mir5-prefer-foreign-providers-removed", "mir5-prefer-foreign-providers-readded")
         for stage, (_, fixture, _) in zip(stages, versions):
-            info = json.loads((FIXTURE / stage / "info.json").read_text(encoding="utf-8"))
+            info = json.loads((FIXTURE / fixture_role(stage) / "info.json").read_text(encoding="utf-8"))
             self.assertEqual((FIXTURE_NAME, fixture, "2.0"), (info["name"], info["version"], info["factorio_version"]))
         for stage, mir, expected, providers_present in (("published", "4.7.20002", False, True),
                                                          ("mir5-prefer-mir", "5.0.20000", True, True),
@@ -328,7 +339,7 @@ end
                                                          ("mir5-prefer-mir-again", "5.0.20000", True, True),
                                                          ("mir5-prefer-foreign-providers-removed", "5.0.20000", False, False),
                                                          ("mir5-prefer-foreign-providers-readded", "5.0.20000", False, True)):
-            setting = self.lua.eval("fixed_setting")(str(FIXTURE / stage / "settings-updates.lua"), mir, providers_present)
+            setting = self.lua.eval("fixed_setting")(str(FIXTURE / fixture_role(stage) / "settings-updates.lua"), mir, providers_present)
             self.assertTrue(setting["ok"], setting["message"])
             self.assertEqual(expected, setting["value"])
 
@@ -390,7 +401,7 @@ end
                 bioflux_row["enabled"] = False
             mir_rows["recipe-prod-research_breeding-1"] = row
             foreign_rows = self.selected_rows() if providers_present else {}
-            result = self.lua.eval("fixed_mir_data")(str(FIXTURE / stage / "data-final-fixes.lua"), str(FOREIGN_DATA), str(FULL_BIOFLUX_DATA), fixture, preference, lua_value(self.lua, mir_rows), lua_value(self.lua, foreign_rows), providers_present)
+            result = self.lua.eval("fixed_mir_data")(str(FIXTURE / fixture_role(stage) / "data-final-fixes.lua"), str(FOREIGN_DATA), str(FULL_BIOFLUX_DATA), fixture, preference, lua_value(self.lua, mir_rows), lua_value(self.lua, foreign_rows), providers_present)
             self.assertTrue(result["ok"], result["message"])
             technologies = plain(result["raw"])["technology"]
             actual = technologies["recipe-prod-research_breeding-1"]
@@ -406,15 +417,15 @@ end
                                  for name, foreign in technologies.items() if name in self.selected_rows()}
                 self.assertEqual({(None, "1", 1)}, foreign_costs)
         bad = deepcopy(false); bad["effects"].append({"type": "change-recipe-productivity", "recipe": "fish-breeding", "change": .1})
-        result = self.lua.eval("fixed_mir_data")(str(FIXTURE / "mir5-prefer-foreign" / "data-final-fixes.lua"), str(FOREIGN_DATA), str(FULL_BIOFLUX_DATA), "0.3.0", False, lua_value(self.lua, {"recipe-prod-research_breeding-1": bad, "recipe-prod-research_bioflux-1": bioflux}), lua_value(self.lua, self.selected_rows()))
+        result = self.lua.eval("fixed_mir_data")(str(FIXTURE / fixture_role("mir5-prefer-foreign") / "data-final-fixes.lua"), str(FOREIGN_DATA), str(FULL_BIOFLUX_DATA), "0.3.0", False, lua_value(self.lua, {"recipe-prod-research_breeding-1": bad, "recipe-prod-research_bioflux-1": bioflux}), lua_value(self.lua, self.selected_rows()))
         self.assertFalse(result["ok"])
         self.assertIn("captured released MIR breeding effects count changed", result["message"])
         bad_bioflux = deepcopy(bioflux); bad_bioflux["enabled"] = True
-        result = self.lua.eval("fixed_mir_data")(str(FIXTURE / "mir5-prefer-foreign" / "data-final-fixes.lua"), str(FOREIGN_DATA), str(FULL_BIOFLUX_DATA), "0.3.0", False, lua_value(self.lua, {"recipe-prod-research_breeding-1": false, "recipe-prod-research_bioflux-1": bad_bioflux}), lua_value(self.lua, self.selected_rows()))
+        result = self.lua.eval("fixed_mir_data")(str(FIXTURE / fixture_role("mir5-prefer-foreign") / "data-final-fixes.lua"), str(FOREIGN_DATA), str(FULL_BIOFLUX_DATA), "0.3.0", False, lua_value(self.lua, {"recipe-prod-research_breeding-1": false, "recipe-prod-research_bioflux-1": bad_bioflux}), lua_value(self.lua, self.selected_rows()))
         self.assertFalse(result["ok"])
         self.assertIn("captured released MIR bioflux identity changed", result["message"])
         foreign = self.selected_rows(); foreign["bioflux-productivity"]["effects"][0]["change"] = .2
-        result = self.lua.eval("fixed_mir_data")(str(FIXTURE / "mir5-prefer-foreign" / "data-final-fixes.lua"), str(FOREIGN_DATA), str(FULL_BIOFLUX_DATA), "0.3.0", False, lua_value(self.lua, {"recipe-prod-research_breeding-1": false, "recipe-prod-research_bioflux-1": bioflux}), lua_value(self.lua, foreign))
+        result = self.lua.eval("fixed_mir_data")(str(FIXTURE / fixture_role("mir5-prefer-foreign") / "data-final-fixes.lua"), str(FOREIGN_DATA), str(FULL_BIOFLUX_DATA), "0.3.0", False, lua_value(self.lua, {"recipe-prod-research_breeding-1": false, "recipe-prod-research_bioflux-1": bioflux}), lua_value(self.lua, foreign))
         self.assertFalse(result["ok"])
         self.assertIn("bioflux-productivity effects changed", result["message"])
 
