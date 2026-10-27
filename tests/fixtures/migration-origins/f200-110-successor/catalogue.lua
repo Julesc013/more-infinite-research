@@ -6,14 +6,18 @@ end
 
 return {
   storage_key = "mir5_migration_origin_f200_110_source",
-  fixture = "mir-fixture-mir5-migration-origin-f200-110-successor",
+  -- Factorio storage is owned by the fixture mod identity.  The successor
+  -- projection must therefore replace the source fixture by name, rather
+  -- than add a differently named observer that cannot see its protected
+  -- source state.
+  fixture = "mir-fixture-mir5-migration-origin-f200-110-source",
   direct = "recipe-prod-research_gears-1",
   gear_recipe = "iron-gear-wheel",
   robot_battery = "recipe-prod-research_robot_battery-1",
   source_fixture_version = "0.1.0",
   targets = {
-    f200 = {base = "2.0.77", mir = "5.0.20000", fixture = "0.1.0"},
-    f210 = {base = "2.1.23", mir = "5.0.21000", fixture = "0.2.0"},
+    f200 = {base = "2.0.77", mir = "5.0.20000", fixture = "0.2.0"},
+    f210 = {base = "2.1.23", mir = "5.0.21000", fixture = "0.3.0"},
   },
   save = "mir5-native-complete",
   deadline_ticks = 18000,

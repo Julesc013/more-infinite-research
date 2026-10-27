@@ -1,6 +1,6 @@
 {
-  "name": "mir-fixture-mir5-migration-origin-f200-110-successor",
-  "version": "0.1.0",
+  "name": "mir-fixture-mir5-migration-origin-f200-110-source",
+  "version": "0.2.0",
   "title": "MIR 1.1.0 F200 direct F200 successor",
   "author": "MIR maintainers",
   "description": "Private observer of the protected published MIR 1.1.0 F200 source save under MIR5 F200.",

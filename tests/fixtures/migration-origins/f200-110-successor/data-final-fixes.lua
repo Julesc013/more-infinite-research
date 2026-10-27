@@ -1,4 +1,4 @@
-local catalogue = require("__mir-fixture-mir5-migration-origin-f200-110-successor__/catalogue")
+local catalogue = require("__mir-fixture-mir5-migration-origin-f200-110-source__/catalogue")
 
 local selected = nil
 for name, expected in pairs(catalogue.targets) do

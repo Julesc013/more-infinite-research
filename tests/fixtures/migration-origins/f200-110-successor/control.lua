@@ -1,4 +1,4 @@
-local catalogue = require("__mir-fixture-mir5-migration-origin-f200-110-successor__/catalogue")
+local catalogue = require("__mir-fixture-mir5-migration-origin-f200-110-source__/catalogue")
 local KEY, FIXTURE = catalogue.storage_key, catalogue.fixture
 local UINT32_MAX, loaded, reload_reported = 4294967295, false, false
 
