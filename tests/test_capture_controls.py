@@ -1,7 +1,7 @@
 """Host-only controls for the MIR5 active-mods observer capture route.
 
 These controls execute the asset-only fixture in isolated Lua 5.2 and parse
-the PowerShell wrappers. They never build a ZIP or launch Factorio.
+the PowerShell wrappers and small synthetic archive metadata. They never launch Factorio.
 """
 import argparse
 import base64
@@ -76,6 +76,62 @@ def prototype_capture_output_budget_binder_cases() -> dict:
         }
 
     return {"eight_gib": invoke(8192), "over_limit": invoke(8193)}
+
+
+def prototype_capture_archive_guard_cases() -> dict:
+    """Exercise the real archive gate without running the capture body or engine."""
+    with tempfile.TemporaryDirectory(prefix="mir-capture-archive-") as directory:
+        root = Path(directory)
+        cases = []
+
+        def case(label, version, *, name="more-infinite-research", family="2.0", engine_line="2.0",
+                 wrong_hash=False, wrong_root=False, wrong_filename=False, duplicate_info=False):
+            library = root / label
+            library.mkdir()
+            archive_root = f"{name}_{version}"
+            path = library / ("renamed.zip" if wrong_filename else archive_root + ".zip")
+            info = {"name": name, "version": version, "factorio_version": family}
+            with zipfile.ZipFile(path, "w") as value:
+                value.writestr(("wrong-root" if wrong_root else archive_root) + "/info.json", json.dumps(info))
+                if duplicate_info:
+                    value.writestr("second-root/info.json", json.dumps(info))
+            cases.append({"label": label, "path": str(path), "library": str(library), "engine_line": engine_line,
+                          "sha256": "0" * 64 if wrong_hash else hashlib.sha256(path.read_bytes()).hexdigest().upper()})
+
+        for version in ("1.1.0", "2.5.11", "3.2.11", "4.7.20003", "5.0.21000"):
+            line = "2.1" if version in ("3.2.11", "5.0.21000") else "2.0"
+            case("valid-" + version, version, family=line, engine_line=line)
+        for version in ("0.1.0", "6.0.21000", "1.1.0-rc.1", "1.111111.0", "4.7.3", "5.0.09"):
+            case("invalid-" + version, version)
+        case("wrong-hash", "1.1.0", wrong_hash=True)
+        case("wrong-family", "1.1.0", family="2.1")
+        case("wrong-name", "1.1.0", name="another-mod")
+        case("wrong-root", "1.1.0", wrong_root=True)
+        case("wrong-filename", "1.1.0", wrong_filename=True)
+        case("duplicate-info", "1.1.0", duplicate_info=True)
+        manifest = root / "cases.json"
+        manifest.write_text(json.dumps(cases), encoding="utf-8", newline="\n")
+        capture_path = str(PROTOTYPE_CAPTURE).replace("'", "''")
+        manifest_path = str(manifest).replace("'", "''")
+        command = f"""
+$tokens=$null;$errors=$null
+$ast=[System.Management.Automation.Language.Parser]::ParseFile('{capture_path}',[ref]$tokens,[ref]$errors)
+if($errors.Count){{throw 'capture parse failed'}}
+$names=@('Assert-MIR5PrototypeCapture','Get-MIR5PrototypeCaptureSha256','Get-MIR5PrototypeCaptureMIRArchive')
+$functions=@($ast.FindAll({{param($node) $node -is [System.Management.Automation.Language.FunctionDefinitionAst] -and $node.Name -in $names}},$true))
+if($functions.Count-ne3){{throw 'capture archive functions differ'}}
+foreach($function in $functions){{Invoke-Expression $function.Extent.Text}}
+$rows=@(foreach($case in (Get-Content -LiteralPath '{manifest_path}' -Raw|ConvertFrom-Json)){{
+  try{{
+    $identity=Get-MIR5PrototypeCaptureMIRArchive -Archive $case.path -Library $case.library -ExpectedSha256 $case.sha256 -EngineLine $case.engine_line
+    [ordered]@{{label=$case.label;accepted=$true;version=$identity.version;error=$null}}
+  }}catch{{[ordered]@{{label=$case.label;accepted=$false;error=$_.Exception.Message}}}}
+}})
+ConvertTo-Json -InputObject $rows -Depth 5 -Compress
+"""
+        result = subprocess.run(["pwsh", "-NoProfile", "-Command", command], cwd=ROOT,
+                                check=True, text=True, capture_output=True)
+        return {row["label"]: row for row in json.loads(result.stdout)}
 
 
 def prototype_capture_declared_input_guard_cases() -> dict:
@@ -545,6 +601,23 @@ class CaptureControlTests(unittest.TestCase):
             "-LatestInvocation -ActiveModsObserver $activeModsObserverName",
             native_fixture,
         )
+
+    def test_capture_archive_gate_admits_pinned_modern_historical_and_extended_metadata(self):
+        cases = prototype_capture_archive_guard_cases()
+        for version in ("1.1.0", "2.5.11", "3.2.11", "4.7.20003", "5.0.21000"):
+            with self.subTest(version=version):
+                case = cases["valid-" + version]
+                self.assertTrue(case["accepted"], case["error"])
+                self.assertEqual(version, case["version"])
+
+    def test_capture_archive_gate_retains_version_and_immutable_identity_rejections(self):
+        cases = prototype_capture_archive_guard_cases()
+        rejected = [label for label in cases if not label.startswith("valid-")]
+        self.assertEqual(12, len(rejected))
+        for label in rejected:
+            with self.subTest(case=label):
+                self.assertFalse(cases[label]["accepted"])
+                self.assertIn("[mir5-prototype-capture]", cases[label]["error"])
 
     def test_prototype_capture_accepts_the_declared_eight_gib_output_budget_only(self):
         cases = prototype_capture_output_budget_binder_cases()
