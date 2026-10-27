@@ -40,9 +40,18 @@ for name, value in pairs(data.raw.technology or {}) do
   if name:sub(1, #catalogue.technology_prefix) == catalogue.technology_prefix then
     assert(name:sub(-#catalogue.technology_suffix) == catalogue.technology_suffix,
       "[mir5-migration-origin-f200-100-source] source roster suffix differs")
-    assert(value.type == "technology" and value.name == name and value.level == 1
-      and value.upgrade == true and value.max_level == "infinite" and value.enabled ~= false,
-      "[mir5-migration-origin-f200-100-source] source roster identity differs: " .. name)
+    -- MIR 1.0.0 authoring intentionally omits the optional raw `level` field.
+    -- Factorio materializes its runtime prototype level as 1; control.lua checks
+    -- that parsed-runtime fact independently. An explicit raw level here would
+    -- describe different source bytes, including an explicit level of 1.
+    local identity_matches = value.type == "technology" and value.name == name and value.level == nil
+      and value.upgrade == true and value.max_level == "infinite" and value.enabled ~= false
+    if not identity_matches then
+      error("[mir5-migration-origin-f200-100-source] source roster identity differs: " .. name
+        .. " type=" .. tostring(value.type) .. " raw_name=" .. tostring(value.name)
+        .. " raw_level=" .. tostring(value.level) .. " upgrade=" .. tostring(value.upgrade)
+        .. " max_level=" .. tostring(value.max_level) .. " enabled=" .. tostring(value.enabled))
+    end
     local unit = assert(value.unit,
       "[mir5-migration-origin-f200-100-source] source roster unit is absent: " .. name)
     assert(unit.count_formula == catalogue.source_formula and unit.time == catalogue.source_time,
