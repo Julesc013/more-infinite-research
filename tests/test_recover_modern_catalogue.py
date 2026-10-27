@@ -19,6 +19,46 @@ def _json_bytes(value):
     return (json.dumps(value, ensure_ascii=False, sort_keys=True, indent=2) + "\n").encode("utf-8")
 
 
+F210_BOB_ANGEL_EFFECT_ORDER_IDS = (
+    "recipe-prod-research_concrete-1",
+    "recipe-prod-research_copper-1",
+    "recipe-prod-research_copper_cable-1",
+    "recipe-prod-research_explosives-1",
+    "recipe-prod-research_heavy_ammo-1",
+    "recipe-prod-research_inserters-1",
+    "recipe-prod-research_iron-1",
+    "recipe-prod-research_landfill-1",
+    "recipe-prod-research_modules-1",
+)
+
+
+def _canonical_hash(value) -> str:
+    return hashlib.sha256(
+        json.dumps(value, ensure_ascii=False, sort_keys=True, separators=(",", ":")).encode("utf-8")
+    ).hexdigest().upper()
+
+
+def _reconstruct_static_prefix_effects(effects, base_seed_recipes, published_recipes):
+    """Keep the declared Base seed sequence, then canonically append B6-only effects."""
+    by_recipe = {}
+    for effect in effects:
+        if not isinstance(effect, dict) or not isinstance(effect.get("recipe"), str) or not effect["recipe"]:
+            raise ValueError("effect lacks a concrete recipe identity")
+        if effect["recipe"] in by_recipe:
+            raise ValueError("effect recipes must be unique")
+        by_recipe[effect["recipe"]] = effect
+    if len(published_recipes) != len(set(published_recipes)):
+        raise ValueError("published B6 recipe sequence is duplicate")
+    missing = [recipe for recipe in base_seed_recipes if recipe not in by_recipe]
+    if missing:
+        raise ValueError("published B6 payload is missing a required Base seed recipe")
+    if set(published_recipes) != set(by_recipe):
+        raise ValueError("effect recipes differ from the complete published B6 payload")
+    return [by_recipe[recipe] for recipe in base_seed_recipes] + [
+        by_recipe[recipe] for recipe in sorted(set(published_recipes) - set(base_seed_recipes))
+    ]
+
+
 def _write_json(path: Path, value) -> None:
     path.write_bytes(_json_bytes(value))
 
@@ -187,6 +227,132 @@ def _capture(root: Path, raw: dict, settings: dict, *, published: bool,
 
 
 class ModernCatalogueTests(unittest.TestCase):
+    def test_bob_angel_f210_effect_order_dispositions_reconstruct_only_nine_complete_b6_rows(self):
+        """B6 supplies payloads; unmodded Base supplies only the static prefix order."""
+        intent_path = ROOT / "spec/inventory/bob-angel-f210-intent-r01.json"
+        intent = json.loads(intent_path.read_text(encoding="utf-8"))
+        provenance = intent["provenance"]["effect_order_representation"]
+        base_inventory_path = ROOT / provenance["unmodded_space_age_base_inventory"]["path"]
+        self.assertEqual(
+            hashlib.sha256(base_inventory_path.read_bytes()).hexdigest().upper(),
+            provenance["unmodded_space_age_base_inventory"]["sha256"],
+        )
+        self.assertEqual(
+            base_inventory_path.stat().st_size,
+            provenance["unmodded_space_age_base_inventory"]["bytes"],
+        )
+        self.assertEqual(provenance["unmodded_space_age_base_inventory"]["profile"], "space-age-f210")
+        self.assertEqual(
+            [row["sha256"] for row in provenance["combined_b6_payload_captures"]],
+            ["A8935196FBF9A58DA01BB26EFD739CE74941DB2885C6A1514E9379F64A33C3C1"] * 2,
+        )
+        self.assertEqual(
+            [row["path"] for row in provenance["combined_b6_payload_captures"]],
+            [
+                "build/mir5/recovery-historical/broad-ecosystem-f210-1c90-r04/"
+                "q010-published/write-data/script-output/data-raw-dump.json",
+                "build/mir5/recovery-historical/bob-angel-q010-standalone-preparation-r04/"
+                "published/write-data/script-output/data-raw-dump.json",
+            ],
+        )
+
+        base_inventory = json.loads(base_inventory_path.read_text(encoding="utf-8"))
+        profile = catalogue._inventory_profile(base_inventory, "space-age-f210")
+        base_rows = {
+            row["name"]: row["row"]
+            for row in catalogue._intended_domain(profile, "data")["additions"]
+            if row["type"] == "technology"
+        }
+        reviewed = {
+            row["name"]: row
+            for row in intent["differences"]
+            if row["id"].startswith("BA-F210-EFFECT-ORDER-RECONSTRUCT-")
+        }
+        self.assertEqual(set(reviewed), set(F210_BOB_ANGEL_EFFECT_ORDER_IDS))
+        self.assertEqual(len(intent["differences"]), 158)
+        self.assertNotIn(
+            "BA-F210-EFFECT-ORDER-UNRESOLVED",
+            {row["id"] for row in intent["unresolved_categories"]},
+        )
+
+        for name in F210_BOB_ANGEL_EFFECT_ORDER_IDS:
+            with self.subTest(technology=name):
+                record = reviewed[name]
+                representation = record["representation"]
+                expected = deepcopy(record["expected_candidate"])
+                expected_effects = expected.pop("effects")
+                base_seed = [effect["recipe"] for effect in base_rows[name]["effects"]]
+                self.assertEqual(representation["base_seed_recipe_order"], base_seed)
+                self.assertEqual(
+                    {
+                        key: representation[key]
+                        for key in (
+                            "base_seed_recipe_order",
+                            "published_effect_recipe_order",
+                            "canonical_remaining_recipe_order",
+                        )
+                    },
+                    provenance["technologies"][name],
+                )
+                self.assertEqual(_canonical_hash(expected), representation["published_non_effect_fields_sha256"])
+
+                by_recipe = {effect["recipe"]: effect for effect in expected_effects}
+                published_effects = [
+                    by_recipe[recipe] for recipe in representation["published_effect_recipe_order"]
+                ]
+                self.assertEqual(len(by_recipe), len(expected_effects))
+                self.assertEqual(
+                    _canonical_hash(sorted(published_effects, key=lambda effect: json.dumps(
+                        effect, ensure_ascii=False, sort_keys=True, separators=(",", ":")
+                    ))),
+                    representation["published_effect_multiset_sha256"],
+                )
+                published = {**expected, "effects": published_effects}
+                self.assertEqual(_canonical_hash(published), record["independent_before_sha256"])
+                self.assertEqual(
+                    _reconstruct_static_prefix_effects(
+                        published_effects,
+                        representation["base_seed_recipe_order"],
+                        representation["published_effect_recipe_order"],
+                    ),
+                    expected_effects,
+                )
+                self.assertEqual(
+                    representation["canonical_remaining_recipe_order"],
+                    sorted(set(representation["published_effect_recipe_order"]) - set(base_seed)),
+                )
+
+        sample = deepcopy(reviewed["recipe-prod-research_inserters-1"])
+        published = _reconstruct_static_prefix_effects(
+            sample["expected_candidate"]["effects"],
+            sample["representation"]["base_seed_recipe_order"],
+            sample["representation"]["published_effect_recipe_order"],
+        )
+        with self.assertRaisesRegex(ValueError, "missing a required Base seed"):
+            _reconstruct_static_prefix_effects(
+                published[1:], sample["representation"]["base_seed_recipe_order"],
+                sample["representation"]["published_effect_recipe_order"],
+            )
+        with self.assertRaisesRegex(ValueError, "differ from the complete published B6 payload"):
+            _reconstruct_static_prefix_effects(
+                published + [{"type": "change-recipe-productivity", "recipe": "unexpected", "change": 0.1}],
+                sample["representation"]["base_seed_recipe_order"],
+                sample["representation"]["published_effect_recipe_order"],
+            )
+        with self.assertRaisesRegex(ValueError, "must be unique"):
+            _reconstruct_static_prefix_effects(
+                published + [deepcopy(published[0])], sample["representation"]["base_seed_recipe_order"],
+                sample["representation"]["published_effect_recipe_order"],
+            )
+        self.assertNotEqual(
+            _reconstruct_static_prefix_effects(
+                published,
+                list(reversed(sample["representation"]["base_seed_recipe_order"])),
+                sample["representation"]["published_effect_recipe_order"],
+            ),
+            sample["expected_candidate"]["effects"],
+        )
+
     def test_bob_angel_growth_review_retains_data_and_changes_only_exact_published_ceiling_fields(self):
         inventory = json.loads((ROOT / "spec/inventory/bob-angel-f200-472.json").read_text(encoding="utf-8"))
         profile = catalogue._inventory_profile(inventory, "bob-angel-f200")

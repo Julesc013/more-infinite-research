@@ -2,8 +2,8 @@
   "schema": 2,
   "kind": "MIR5ModernCatalogueReviewedDifferencesV1",
   "claims": [
-    "This partial F210 Bob/Angel intent contains only 149 exact named expected rows reconstructed from the fresh standalone U/B6 oracle and separately declared contracts.",
-    "It admits 123 SET-02 growth ceilings, two literal-title child removals, and 24 finite signed native-credit carriers; it does not derive an expected row from current player output.",
+    "This partial F210 Bob/Angel intent contains only 158 exact named expected rows reconstructed from the fresh standalone U/B6 oracle and separately declared contracts.",
+    "It admits 123 SET-02 growth ceilings, two literal-title child removals, 24 finite signed native-credit carriers, and nine B6-payload-preserving static-prefix effect representations; it does not derive an expected row from current player output.",
     "It does not establish gameplay, save, Library, performance, native, or release acceptance. Unresolved classes remain comparison blockers."
   ],
   "provenance": {
@@ -80,7 +80,271 @@
       "tests/test_bob_angel_catalogue.py": "30BE9078664DE29FA935FAB428D4B1DA30F0FD17ABB760D72CAD52E00036B510",
       "tests/test_modern_targets.py": "C5C4C85F8CB2E54E3CF48A7EDCAA7A112F14B437E01EA1E5CCA8D020E94FCD75"
     },
-    "scope": "Data/settings expected-output preparation only; no candidate capture supplies expected values."
+    "scope": "Data/settings expected-output preparation only; no candidate capture supplies expected values.",
+    "effect_order_representation": {
+      "status": "reviewed-finite-representation-not-a-semantic-allowance",
+      "rule": "For each named q010 B6 technology, select the independent unmodded F210 Space Age B6 seed recipe names that are present in the complete B6 payload, retain that seed order, then append the remaining B6 payload recipes in canonical name order. Preserve every B6 effect object, multiplicity and non-effect technology field exactly. Current player output is compared only after this expected sequence is complete.",
+      "unmodded_space_age_base_inventory": {
+        "path": "spec/inventory/modern-f210-470.json",
+        "sha256": "C37027F17D4F02C50C664739B242D62E29AAE0C68079450FCBA95499DC7EFB79",
+        "bytes": 7874747,
+        "profile": "space-age-f210",
+        "published_mir_version": "4.7.21003",
+        "engine_base_version": "2.1.23"
+      },
+      "combined_b6_payload_captures": [
+        {
+          "path": "build/mir5/recovery-historical/broad-ecosystem-f210-1c90-r04/q010-published/write-data/script-output/data-raw-dump.json",
+          "sha256": "A8935196FBF9A58DA01BB26EFD739CE74941DB2885C6A1514E9379F64A33C3C1",
+          "bytes": 67953508
+        },
+        {
+          "path": "build/mir5/recovery-historical/bob-angel-q010-standalone-preparation-r04/published/write-data/script-output/data-raw-dump.json",
+          "sha256": "A8935196FBF9A58DA01BB26EFD739CE74941DB2885C6A1514E9379F64A33C3C1",
+          "bytes": 67953508
+        }
+      ],
+      "technologies": {
+        "recipe-prod-research_concrete-1": {
+          "base_seed_recipe_order": [
+            "stone-brick",
+            "concrete",
+            "concrete-from-molten-iron",
+            "hazard-concrete",
+            "refined-concrete",
+            "refined-hazard-concrete"
+          ],
+          "published_effect_recipe_order": [
+            "stone-brick",
+            "angels-concrete",
+            "concrete",
+            "concrete-from-molten-iron",
+            "hazard-concrete",
+            "refined-concrete",
+            "refined-hazard-concrete"
+          ],
+          "canonical_remaining_recipe_order": [
+            "angels-concrete"
+          ]
+        },
+        "recipe-prod-research_copper-1": {
+          "base_seed_recipe_order": [
+            "casting-copper",
+            "copper-plate"
+          ],
+          "published_effect_recipe_order": [
+            "angels-plate-copper",
+            "angels-plate-copper-2",
+            "casting-copper",
+            "copper-plate"
+          ],
+          "canonical_remaining_recipe_order": [
+            "angels-plate-copper",
+            "angels-plate-copper-2"
+          ]
+        },
+        "recipe-prod-research_copper_cable-1": {
+          "base_seed_recipe_order": [
+            "casting-copper-cable",
+            "copper-cable"
+          ],
+          "published_effect_recipe_order": [
+            "angels-wire-copper-2",
+            "casting-copper-cable",
+            "copper-cable"
+          ],
+          "canonical_remaining_recipe_order": [
+            "angels-wire-copper-2"
+          ]
+        },
+        "recipe-prod-research_explosives-1": {
+          "base_seed_recipe_order": [
+            "explosives"
+          ],
+          "published_effect_recipe_order": [
+            "angels-solid-nitroglycerin",
+            "angels-solid-trinitrotoluene",
+            "explosives"
+          ],
+          "canonical_remaining_recipe_order": [
+            "angels-solid-nitroglycerin",
+            "angels-solid-trinitrotoluene"
+          ]
+        },
+        "recipe-prod-research_heavy_ammo-1": {
+          "base_seed_recipe_order": [
+            "cannon-shell",
+            "explosive-cannon-shell",
+            "explosive-uranium-cannon-shell",
+            "uranium-cannon-shell",
+            "artillery-shell",
+            "railgun-ammo"
+          ],
+          "published_effect_recipe_order": [
+            "cannon-shell",
+            "explosive-cannon-shell",
+            "explosive-uranium-cannon-shell",
+            "uranium-cannon-shell",
+            "artillery-shell",
+            "bob-atomic-artillery-shell",
+            "bob-distractor-artillery-shell",
+            "bob-explosive-artillery-shell",
+            "bob-fire-artillery-shell",
+            "bob-poison-artillery-shell",
+            "bob-scatter-cannon-shell",
+            "railgun-ammo"
+          ],
+          "canonical_remaining_recipe_order": [
+            "bob-atomic-artillery-shell",
+            "bob-distractor-artillery-shell",
+            "bob-explosive-artillery-shell",
+            "bob-fire-artillery-shell",
+            "bob-poison-artillery-shell",
+            "bob-scatter-cannon-shell"
+          ]
+        },
+        "recipe-prod-research_inserters-1": {
+          "base_seed_recipe_order": [
+            "burner-inserter",
+            "inserter",
+            "fast-inserter",
+            "long-handed-inserter",
+            "bulk-inserter",
+            "stack-inserter"
+          ],
+          "published_effect_recipe_order": [
+            "burner-inserter",
+            "inserter",
+            "fast-inserter",
+            "long-handed-inserter",
+            "bob-express-bulk-inserter",
+            "bob-red-bulk-inserter",
+            "bob-turbo-bulk-inserter",
+            "bulk-inserter",
+            "stack-inserter",
+            "bob-express-inserter",
+            "bob-steam-inserter",
+            "bob-turbo-inserter"
+          ],
+          "canonical_remaining_recipe_order": [
+            "bob-express-bulk-inserter",
+            "bob-express-inserter",
+            "bob-red-bulk-inserter",
+            "bob-steam-inserter",
+            "bob-turbo-bulk-inserter",
+            "bob-turbo-inserter"
+          ]
+        },
+        "recipe-prod-research_iron-1": {
+          "base_seed_recipe_order": [
+            "casting-iron",
+            "iron-plate"
+          ],
+          "published_effect_recipe_order": [
+            "angels-plate-iron",
+            "angels-plate-iron-2",
+            "casting-iron",
+            "iron-plate"
+          ],
+          "canonical_remaining_recipe_order": [
+            "angels-plate-iron",
+            "angels-plate-iron-2"
+          ]
+        },
+        "recipe-prod-research_landfill-1": {
+          "base_seed_recipe_order": [
+            "landfill",
+            "foundation"
+          ],
+          "published_effect_recipe_order": [
+            "angels-solid-mud-landfill",
+            "landfill",
+            "foundation"
+          ],
+          "canonical_remaining_recipe_order": [
+            "angels-solid-mud-landfill"
+          ]
+        },
+        "recipe-prod-research_modules-1": {
+          "base_seed_recipe_order": [
+            "efficiency-module",
+            "productivity-module",
+            "quality-module",
+            "speed-module",
+            "efficiency-module-2",
+            "productivity-module-2",
+            "quality-module-2",
+            "speed-module-2",
+            "efficiency-module-3",
+            "productivity-module-3",
+            "quality-module-3",
+            "speed-module-3"
+          ],
+          "published_effect_recipe_order": [
+            "angels-bio-yield-module",
+            "bob-pollution-clean-module-1",
+            "bob-pollution-create-module-1",
+            "efficiency-module",
+            "productivity-module",
+            "quality-module",
+            "speed-module",
+            "angels-bio-yield-module-2",
+            "bob-pollution-clean-module-2",
+            "bob-pollution-create-module-2",
+            "efficiency-module-2",
+            "productivity-module-2",
+            "quality-module-2",
+            "speed-module-2",
+            "angels-bio-yield-module-3",
+            "bob-pollution-clean-module-3",
+            "bob-pollution-create-module-3",
+            "efficiency-module-3",
+            "productivity-module-3",
+            "quality-module-3",
+            "speed-module-3",
+            "angels-bio-yield-module-4",
+            "angels-bio-yield-module-5",
+            "bob-efficiency-module-4",
+            "bob-efficiency-module-5",
+            "bob-pollution-clean-module-4",
+            "bob-pollution-clean-module-5",
+            "bob-pollution-create-module-4",
+            "bob-pollution-create-module-5",
+            "bob-productivity-module-4",
+            "bob-productivity-module-5",
+            "bob-quality-module-4",
+            "bob-quality-module-5",
+            "bob-speed-module-4",
+            "bob-speed-module-5"
+          ],
+          "canonical_remaining_recipe_order": [
+            "angels-bio-yield-module",
+            "angels-bio-yield-module-2",
+            "angels-bio-yield-module-3",
+            "angels-bio-yield-module-4",
+            "angels-bio-yield-module-5",
+            "bob-efficiency-module-4",
+            "bob-efficiency-module-5",
+            "bob-pollution-clean-module-1",
+            "bob-pollution-clean-module-2",
+            "bob-pollution-clean-module-3",
+            "bob-pollution-clean-module-4",
+            "bob-pollution-clean-module-5",
+            "bob-pollution-create-module-1",
+            "bob-pollution-create-module-2",
+            "bob-pollution-create-module-3",
+            "bob-pollution-create-module-4",
+            "bob-pollution-create-module-5",
+            "bob-productivity-module-4",
+            "bob-productivity-module-5",
+            "bob-quality-module-4",
+            "bob-quality-module-5",
+            "bob-speed-module-4",
+            "bob-speed-module-5"
+          ]
+        }
+      }
+    }
   },
   "differences": [
     {
@@ -5539,6 +5803,1370 @@
         }
       },
       "reason": "Finite signed dormant carrier derived from the independent B6 public main, captured named recipe presence, and the fixed native-credit descriptor; the current player is not an expected-row input."
+    },
+    {
+      "id": "BA-F210-EFFECT-ORDER-RECONSTRUCT-CONCRETE-1",
+      "profile": "bob-angel-f210",
+      "domain": "data",
+      "type": "technology",
+      "name": "recipe-prod-research_concrete-1",
+      "expected_candidate": {
+        "name": "recipe-prod-research_concrete-1",
+        "localised_name": [
+          "technology-name.more-infinite-research.research_concrete",
+          [
+            "technology-name.concrete"
+          ]
+        ],
+        "localised_description": [
+          "technology-description.more-infinite-research.recipe_productivity"
+        ],
+        "icons": [
+          {
+            "icon": "__base__/graphics/technology/concrete.png",
+            "icon_size": 256
+          },
+          {
+            "icon": "__core__/graphics/icons/technology/constants/constant-recipe-productivity.png",
+            "icon_size": 128,
+            "scale": 0.5,
+            "shift": [
+              50,
+              50
+            ],
+            "floating": true
+          }
+        ],
+        "effects": [
+          {
+            "type": "change-recipe-productivity",
+            "recipe": "stone-brick",
+            "change": 0.1
+          },
+          {
+            "type": "change-recipe-productivity",
+            "recipe": "concrete",
+            "change": 0.05
+          },
+          {
+            "type": "change-recipe-productivity",
+            "recipe": "concrete-from-molten-iron",
+            "change": 0.05
+          },
+          {
+            "type": "change-recipe-productivity",
+            "recipe": "hazard-concrete",
+            "change": 0.05
+          },
+          {
+            "type": "change-recipe-productivity",
+            "recipe": "refined-concrete",
+            "change": 0.02
+          },
+          {
+            "type": "change-recipe-productivity",
+            "recipe": "refined-hazard-concrete",
+            "change": 0.02
+          },
+          {
+            "type": "change-recipe-productivity",
+            "recipe": "angels-concrete",
+            "change": 0.05
+          }
+        ],
+        "prerequisites": [
+          "automation-science-pack",
+          "logistic-science-pack",
+          "chemical-science-pack",
+          "production-science-pack",
+          "space-science-pack"
+        ],
+        "unit": {
+          "ingredients": [
+            [
+              "automation-science-pack",
+              1
+            ],
+            [
+              "logistic-science-pack",
+              1
+            ],
+            [
+              "chemical-science-pack",
+              1
+            ],
+            [
+              "production-science-pack",
+              1
+            ],
+            [
+              "space-science-pack",
+              1
+            ]
+          ],
+          "count_formula": "8000*2^(L-1)",
+          "time": 60
+        },
+        "max_level": "infinite",
+        "order": "p[research_concrete]",
+        "level": 1,
+        "upgrade": true,
+        "type": "technology"
+      },
+      "independent_before_sha256": "6F8DF30BAEFD14AB9DCE9D932B4B46C039CBF072D20A8EB526798C48FCBAE960",
+      "representation": {
+        "base_seed_recipe_order": [
+          "stone-brick",
+          "concrete",
+          "concrete-from-molten-iron",
+          "hazard-concrete",
+          "refined-concrete",
+          "refined-hazard-concrete"
+        ],
+        "published_effect_recipe_order": [
+          "stone-brick",
+          "angels-concrete",
+          "concrete",
+          "concrete-from-molten-iron",
+          "hazard-concrete",
+          "refined-concrete",
+          "refined-hazard-concrete"
+        ],
+        "canonical_remaining_recipe_order": [
+          "angels-concrete"
+        ],
+        "published_non_effect_fields_sha256": "2D8EB506325F7F6DB6CC73DEC4379F6C262F0191BEDA66C62A79D3ACE0CDFD8B",
+        "published_effect_multiset_sha256": "FF61CEE9900892CB66DD3DD9AF835ADF5A79A043CDCC9C4BB185B820CA9CE78A"
+      },
+      "reason": "The independently captured q010 B6 technology payload is retained exactly. Its effect presentation is reconstructed as the independent unmodded F210 Space Age B6 static seed prefix followed by the remaining B6 recipes in canonical name order; this is a finite declared sequence representation, not a candidate-derived allowance or payload change."
+    },
+    {
+      "id": "BA-F210-EFFECT-ORDER-RECONSTRUCT-COPPER-1",
+      "profile": "bob-angel-f210",
+      "domain": "data",
+      "type": "technology",
+      "name": "recipe-prod-research_copper-1",
+      "expected_candidate": {
+        "name": "recipe-prod-research_copper-1",
+        "localised_name": [
+          "technology-name.more-infinite-research.research_copper",
+          [
+            "item-name.copper-plate"
+          ]
+        ],
+        "localised_description": [
+          "technology-description.more-infinite-research.recipe_productivity"
+        ],
+        "icons": [
+          {
+            "icon": "__angelssmeltinggraphics__/graphics/icons/plate-copper.png",
+            "icon_size": 32
+          },
+          {
+            "icon": "__core__/graphics/icons/technology/constants/constant-recipe-productivity.png",
+            "icon_size": 128,
+            "scale": 0.5,
+            "shift": [
+              50,
+              50
+            ],
+            "floating": true
+          }
+        ],
+        "effects": [
+          {
+            "type": "change-recipe-productivity",
+            "recipe": "casting-copper",
+            "change": 0.1
+          },
+          {
+            "type": "change-recipe-productivity",
+            "recipe": "copper-plate",
+            "change": 0.1
+          },
+          {
+            "type": "change-recipe-productivity",
+            "recipe": "angels-plate-copper",
+            "change": 0.1
+          },
+          {
+            "type": "change-recipe-productivity",
+            "recipe": "angels-plate-copper-2",
+            "change": 0.1
+          }
+        ],
+        "prerequisites": [
+          "automation-science-pack",
+          "logistic-science-pack",
+          "chemical-science-pack",
+          "production-science-pack"
+        ],
+        "unit": {
+          "ingredients": [
+            [
+              "automation-science-pack",
+              1
+            ],
+            [
+              "logistic-science-pack",
+              1
+            ],
+            [
+              "chemical-science-pack",
+              1
+            ],
+            [
+              "production-science-pack",
+              1
+            ]
+          ],
+          "count_formula": "8000*2^(L-1)",
+          "time": 60
+        },
+        "max_level": "infinite",
+        "order": "p[research_copper]",
+        "level": 1,
+        "upgrade": true,
+        "type": "technology"
+      },
+      "independent_before_sha256": "4F961A505D2ECB9D3C81F6C07279943FA1B0E639F4FA5217DBF6EFEF26093502",
+      "representation": {
+        "base_seed_recipe_order": [
+          "casting-copper",
+          "copper-plate"
+        ],
+        "published_effect_recipe_order": [
+          "angels-plate-copper",
+          "angels-plate-copper-2",
+          "casting-copper",
+          "copper-plate"
+        ],
+        "canonical_remaining_recipe_order": [
+          "angels-plate-copper",
+          "angels-plate-copper-2"
+        ],
+        "published_non_effect_fields_sha256": "475958E316C3DFAAC6DC41E3348009A28CC16901CD65BBDC3CEACFF26A910BDE",
+        "published_effect_multiset_sha256": "2AFD36E7A86E37B9CDDDC3775A0BB8F5D3CAF0FD3776C55C2316F5118D1CBD60"
+      },
+      "reason": "The independently captured q010 B6 technology payload is retained exactly. Its effect presentation is reconstructed as the independent unmodded F210 Space Age B6 static seed prefix followed by the remaining B6 recipes in canonical name order; this is a finite declared sequence representation, not a candidate-derived allowance or payload change."
+    },
+    {
+      "id": "BA-F210-EFFECT-ORDER-RECONSTRUCT-COPPER-CABLE-1",
+      "profile": "bob-angel-f210",
+      "domain": "data",
+      "type": "technology",
+      "name": "recipe-prod-research_copper_cable-1",
+      "expected_candidate": {
+        "name": "recipe-prod-research_copper_cable-1",
+        "localised_name": [
+          "technology-name.more-infinite-research.research_copper_cable",
+          [
+            "item-name.copper-cable"
+          ]
+        ],
+        "localised_description": [
+          "technology-description.more-infinite-research.recipe_productivity"
+        ],
+        "icons": [
+          {
+            "icon": "__angelssmeltinggraphics__/graphics/icons/wire-copper.png",
+            "icon_size": 32
+          },
+          {
+            "icon": "__core__/graphics/icons/technology/constants/constant-recipe-productivity.png",
+            "icon_size": 128,
+            "scale": 0.5,
+            "shift": [
+              50,
+              50
+            ],
+            "floating": true
+          }
+        ],
+        "effects": [
+          {
+            "type": "change-recipe-productivity",
+            "recipe": "casting-copper-cable",
+            "change": 0.1
+          },
+          {
+            "type": "change-recipe-productivity",
+            "recipe": "copper-cable",
+            "change": 0.1
+          },
+          {
+            "type": "change-recipe-productivity",
+            "recipe": "angels-wire-copper-2",
+            "change": 0.1
+          }
+        ],
+        "prerequisites": [
+          "automation-science-pack",
+          "logistic-science-pack",
+          "chemical-science-pack",
+          "production-science-pack"
+        ],
+        "unit": {
+          "ingredients": [
+            [
+              "automation-science-pack",
+              1
+            ],
+            [
+              "logistic-science-pack",
+              1
+            ],
+            [
+              "chemical-science-pack",
+              1
+            ],
+            [
+              "production-science-pack",
+              1
+            ]
+          ],
+          "count_formula": "8000*2^(L-1)",
+          "time": 60
+        },
+        "max_level": "infinite",
+        "order": "p[research_copper_cable]",
+        "level": 1,
+        "upgrade": true,
+        "type": "technology"
+      },
+      "independent_before_sha256": "161EB260953E7E4672D8F57AB0B2DEB76D8D8C190B8CF2488EB5955EB1201CC3",
+      "representation": {
+        "base_seed_recipe_order": [
+          "casting-copper-cable",
+          "copper-cable"
+        ],
+        "published_effect_recipe_order": [
+          "angels-wire-copper-2",
+          "casting-copper-cable",
+          "copper-cable"
+        ],
+        "canonical_remaining_recipe_order": [
+          "angels-wire-copper-2"
+        ],
+        "published_non_effect_fields_sha256": "5A192466D5B97E6D895EA822EE8EA0BB1387D98D1EAA6A5EAE0D23D7BC42F389",
+        "published_effect_multiset_sha256": "04B80271AF7552485592E5C56687D706F1778B63B300891D130CC10FCE82B5A5"
+      },
+      "reason": "The independently captured q010 B6 technology payload is retained exactly. Its effect presentation is reconstructed as the independent unmodded F210 Space Age B6 static seed prefix followed by the remaining B6 recipes in canonical name order; this is a finite declared sequence representation, not a candidate-derived allowance or payload change."
+    },
+    {
+      "id": "BA-F210-EFFECT-ORDER-RECONSTRUCT-EXPLOSIVES-1",
+      "profile": "bob-angel-f210",
+      "domain": "data",
+      "type": "technology",
+      "name": "recipe-prod-research_explosives-1",
+      "expected_candidate": {
+        "name": "recipe-prod-research_explosives-1",
+        "localised_name": [
+          "technology-name.more-infinite-research.research_explosives",
+          [
+            "item-name.explosives"
+          ]
+        ],
+        "localised_description": [
+          "technology-description.more-infinite-research.recipe_productivity"
+        ],
+        "icons": [
+          {
+            "icon": "__base__/graphics/technology/explosives.png",
+            "icon_size": 256
+          },
+          {
+            "icon": "__core__/graphics/icons/technology/constants/constant-recipe-productivity.png",
+            "icon_size": 128,
+            "scale": 0.5,
+            "shift": [
+              50,
+              50
+            ],
+            "floating": true
+          }
+        ],
+        "effects": [
+          {
+            "type": "change-recipe-productivity",
+            "recipe": "explosives",
+            "change": 0.1
+          },
+          {
+            "type": "change-recipe-productivity",
+            "recipe": "angels-solid-nitroglycerin",
+            "change": 0.1
+          },
+          {
+            "type": "change-recipe-productivity",
+            "recipe": "angels-solid-trinitrotoluene",
+            "change": 0.1
+          }
+        ],
+        "prerequisites": [
+          "automation-science-pack",
+          "logistic-science-pack",
+          "chemical-science-pack",
+          "production-science-pack",
+          "metallurgic-science-pack"
+        ],
+        "unit": {
+          "ingredients": [
+            [
+              "automation-science-pack",
+              1
+            ],
+            [
+              "logistic-science-pack",
+              1
+            ],
+            [
+              "chemical-science-pack",
+              1
+            ],
+            [
+              "production-science-pack",
+              1
+            ],
+            [
+              "metallurgic-science-pack",
+              1
+            ]
+          ],
+          "count_formula": "8000*2^(L-1)",
+          "time": 60
+        },
+        "max_level": "infinite",
+        "order": "p[research_explosives]",
+        "level": 1,
+        "upgrade": true,
+        "type": "technology"
+      },
+      "independent_before_sha256": "3BB470D80F53EC24A5F69D61C123A6862D89C6B117652B1CCCD6FFD6602E034E",
+      "representation": {
+        "base_seed_recipe_order": [
+          "explosives"
+        ],
+        "published_effect_recipe_order": [
+          "angels-solid-nitroglycerin",
+          "angels-solid-trinitrotoluene",
+          "explosives"
+        ],
+        "canonical_remaining_recipe_order": [
+          "angels-solid-nitroglycerin",
+          "angels-solid-trinitrotoluene"
+        ],
+        "published_non_effect_fields_sha256": "A61A4D585D79AD659106F5E53665B439300A7E68F2D7D093948D74974D3CA595",
+        "published_effect_multiset_sha256": "E12870D0045E2FAAA77C33E113B3124BEE38F3766EC4EB2BBDE5810B062B9A16"
+      },
+      "reason": "The independently captured q010 B6 technology payload is retained exactly. Its effect presentation is reconstructed as the independent unmodded F210 Space Age B6 static seed prefix followed by the remaining B6 recipes in canonical name order; this is a finite declared sequence representation, not a candidate-derived allowance or payload change."
+    },
+    {
+      "id": "BA-F210-EFFECT-ORDER-RECONSTRUCT-HEAVY-AMMO-1",
+      "profile": "bob-angel-f210",
+      "domain": "data",
+      "type": "technology",
+      "name": "recipe-prod-research_heavy_ammo-1",
+      "expected_candidate": {
+        "name": "recipe-prod-research_heavy_ammo-1",
+        "localised_name": [
+          "technology-name.more-infinite-research.research_heavy_ammo",
+          [
+            "item-name.cannon-shell"
+          ]
+        ],
+        "localised_description": [
+          "technology-description.more-infinite-research.recipe_productivity"
+        ],
+        "icons": [
+          {
+            "icon": "__base__/graphics/icons/cannon-shell.png",
+            "icon_size": 64
+          },
+          {
+            "icon": "__core__/graphics/icons/technology/constants/constant-recipe-productivity.png",
+            "icon_size": 128,
+            "scale": 0.5,
+            "shift": [
+              50,
+              50
+            ],
+            "floating": true
+          }
+        ],
+        "effects": [
+          {
+            "type": "change-recipe-productivity",
+            "recipe": "cannon-shell",
+            "change": 0.1
+          },
+          {
+            "type": "change-recipe-productivity",
+            "recipe": "explosive-cannon-shell",
+            "change": 0.05
+          },
+          {
+            "type": "change-recipe-productivity",
+            "recipe": "explosive-uranium-cannon-shell",
+            "change": 0.02
+          },
+          {
+            "type": "change-recipe-productivity",
+            "recipe": "uranium-cannon-shell",
+            "change": 0.02
+          },
+          {
+            "type": "change-recipe-productivity",
+            "recipe": "artillery-shell",
+            "change": 0.01
+          },
+          {
+            "type": "change-recipe-productivity",
+            "recipe": "railgun-ammo",
+            "change": 0.01
+          },
+          {
+            "type": "change-recipe-productivity",
+            "recipe": "bob-atomic-artillery-shell",
+            "change": 0.01
+          },
+          {
+            "type": "change-recipe-productivity",
+            "recipe": "bob-distractor-artillery-shell",
+            "change": 0.01
+          },
+          {
+            "type": "change-recipe-productivity",
+            "recipe": "bob-explosive-artillery-shell",
+            "change": 0.01
+          },
+          {
+            "type": "change-recipe-productivity",
+            "recipe": "bob-fire-artillery-shell",
+            "change": 0.01
+          },
+          {
+            "type": "change-recipe-productivity",
+            "recipe": "bob-poison-artillery-shell",
+            "change": 0.01
+          },
+          {
+            "type": "change-recipe-productivity",
+            "recipe": "bob-scatter-cannon-shell",
+            "change": 0.01
+          }
+        ],
+        "prerequisites": [
+          "automation-science-pack",
+          "logistic-science-pack",
+          "chemical-science-pack",
+          "production-science-pack",
+          "military-science-pack",
+          "metallurgic-science-pack",
+          "space-science-pack"
+        ],
+        "unit": {
+          "ingredients": [
+            [
+              "automation-science-pack",
+              1
+            ],
+            [
+              "logistic-science-pack",
+              1
+            ],
+            [
+              "chemical-science-pack",
+              1
+            ],
+            [
+              "production-science-pack",
+              1
+            ],
+            [
+              "military-science-pack",
+              1
+            ],
+            [
+              "metallurgic-science-pack",
+              1
+            ],
+            [
+              "space-science-pack",
+              1
+            ]
+          ],
+          "count_formula": "8000*2^(L-1)",
+          "time": 60
+        },
+        "max_level": "infinite",
+        "order": "p[research_heavy_ammo]",
+        "level": 1,
+        "upgrade": true,
+        "type": "technology"
+      },
+      "independent_before_sha256": "04B8074E3897BF0287729E3E825A5D8C79DF1132BF8C837D808870C1B0AC9518",
+      "representation": {
+        "base_seed_recipe_order": [
+          "cannon-shell",
+          "explosive-cannon-shell",
+          "explosive-uranium-cannon-shell",
+          "uranium-cannon-shell",
+          "artillery-shell",
+          "railgun-ammo"
+        ],
+        "published_effect_recipe_order": [
+          "cannon-shell",
+          "explosive-cannon-shell",
+          "explosive-uranium-cannon-shell",
+          "uranium-cannon-shell",
+          "artillery-shell",
+          "bob-atomic-artillery-shell",
+          "bob-distractor-artillery-shell",
+          "bob-explosive-artillery-shell",
+          "bob-fire-artillery-shell",
+          "bob-poison-artillery-shell",
+          "bob-scatter-cannon-shell",
+          "railgun-ammo"
+        ],
+        "canonical_remaining_recipe_order": [
+          "bob-atomic-artillery-shell",
+          "bob-distractor-artillery-shell",
+          "bob-explosive-artillery-shell",
+          "bob-fire-artillery-shell",
+          "bob-poison-artillery-shell",
+          "bob-scatter-cannon-shell"
+        ],
+        "published_non_effect_fields_sha256": "2D09B06B66E11D6644973B2D48C3D757524FD83566D94EA23EBFAA39B67A91B2",
+        "published_effect_multiset_sha256": "EB0FB065EC74345B550883802BC701F7B36D6EDF3F8F9081AD86E2CADB024AC2"
+      },
+      "reason": "The independently captured q010 B6 technology payload is retained exactly. Its effect presentation is reconstructed as the independent unmodded F210 Space Age B6 static seed prefix followed by the remaining B6 recipes in canonical name order; this is a finite declared sequence representation, not a candidate-derived allowance or payload change."
+    },
+    {
+      "id": "BA-F210-EFFECT-ORDER-RECONSTRUCT-INSERTERS-1",
+      "profile": "bob-angel-f210",
+      "domain": "data",
+      "type": "technology",
+      "name": "recipe-prod-research_inserters-1",
+      "expected_candidate": {
+        "name": "recipe-prod-research_inserters-1",
+        "localised_name": [
+          "technology-name.more-infinite-research.research_inserters",
+          [
+            "technology-name.fast-inserter"
+          ]
+        ],
+        "localised_description": [
+          "technology-description.more-infinite-research.recipe_productivity"
+        ],
+        "icons": [
+          {
+            "icon": "__boblogistics__/graphics/icons/technology/long-inserters.png",
+            "icon_size": 128
+          },
+          {
+            "icon": "__core__/graphics/icons/technology/constants/constant-recipe-productivity.png",
+            "icon_size": 128,
+            "scale": 0.5,
+            "shift": [
+              50,
+              50
+            ],
+            "floating": true
+          }
+        ],
+        "effects": [
+          {
+            "type": "change-recipe-productivity",
+            "recipe": "burner-inserter",
+            "change": 0.1
+          },
+          {
+            "type": "change-recipe-productivity",
+            "recipe": "inserter",
+            "change": 0.1
+          },
+          {
+            "type": "change-recipe-productivity",
+            "recipe": "fast-inserter",
+            "change": 0.05
+          },
+          {
+            "type": "change-recipe-productivity",
+            "recipe": "long-handed-inserter",
+            "change": 0.05
+          },
+          {
+            "type": "change-recipe-productivity",
+            "recipe": "bulk-inserter",
+            "change": 0.02
+          },
+          {
+            "type": "change-recipe-productivity",
+            "recipe": "stack-inserter",
+            "change": 0.01
+          },
+          {
+            "type": "change-recipe-productivity",
+            "recipe": "bob-express-bulk-inserter",
+            "change": 0.02
+          },
+          {
+            "type": "change-recipe-productivity",
+            "recipe": "bob-express-inserter",
+            "change": 0.01
+          },
+          {
+            "type": "change-recipe-productivity",
+            "recipe": "bob-red-bulk-inserter",
+            "change": 0.02
+          },
+          {
+            "type": "change-recipe-productivity",
+            "recipe": "bob-steam-inserter",
+            "change": 0.01
+          },
+          {
+            "type": "change-recipe-productivity",
+            "recipe": "bob-turbo-bulk-inserter",
+            "change": 0.02
+          },
+          {
+            "type": "change-recipe-productivity",
+            "recipe": "bob-turbo-inserter",
+            "change": 0.01
+          }
+        ],
+        "prerequisites": [
+          "automation-science-pack",
+          "logistic-science-pack",
+          "chemical-science-pack",
+          "production-science-pack",
+          "space-science-pack"
+        ],
+        "unit": {
+          "ingredients": [
+            [
+              "automation-science-pack",
+              1
+            ],
+            [
+              "logistic-science-pack",
+              1
+            ],
+            [
+              "chemical-science-pack",
+              1
+            ],
+            [
+              "production-science-pack",
+              1
+            ],
+            [
+              "space-science-pack",
+              1
+            ]
+          ],
+          "count_formula": "8000*2^(L-1)",
+          "time": 60
+        },
+        "max_level": "infinite",
+        "order": "p[research_inserters]",
+        "level": 1,
+        "upgrade": true,
+        "type": "technology"
+      },
+      "independent_before_sha256": "E49D3EDD55FD2EB39FB82ECE5DF203164F177E6BAC4A749DB9B46C4DC9A4EB4E",
+      "representation": {
+        "base_seed_recipe_order": [
+          "burner-inserter",
+          "inserter",
+          "fast-inserter",
+          "long-handed-inserter",
+          "bulk-inserter",
+          "stack-inserter"
+        ],
+        "published_effect_recipe_order": [
+          "burner-inserter",
+          "inserter",
+          "fast-inserter",
+          "long-handed-inserter",
+          "bob-express-bulk-inserter",
+          "bob-red-bulk-inserter",
+          "bob-turbo-bulk-inserter",
+          "bulk-inserter",
+          "stack-inserter",
+          "bob-express-inserter",
+          "bob-steam-inserter",
+          "bob-turbo-inserter"
+        ],
+        "canonical_remaining_recipe_order": [
+          "bob-express-bulk-inserter",
+          "bob-express-inserter",
+          "bob-red-bulk-inserter",
+          "bob-steam-inserter",
+          "bob-turbo-bulk-inserter",
+          "bob-turbo-inserter"
+        ],
+        "published_non_effect_fields_sha256": "A0BEB5E73F774B353C9C80E7AACAE83C440DD1528C1F1182D3CB8321BB28BA34",
+        "published_effect_multiset_sha256": "F077D8596BBEF7F23353932246C8A2126BC93B620E81BCD0A50EB540D698571B"
+      },
+      "reason": "The independently captured q010 B6 technology payload is retained exactly. Its effect presentation is reconstructed as the independent unmodded F210 Space Age B6 static seed prefix followed by the remaining B6 recipes in canonical name order; this is a finite declared sequence representation, not a candidate-derived allowance or payload change."
+    },
+    {
+      "id": "BA-F210-EFFECT-ORDER-RECONSTRUCT-IRON-1",
+      "profile": "bob-angel-f210",
+      "domain": "data",
+      "type": "technology",
+      "name": "recipe-prod-research_iron-1",
+      "expected_candidate": {
+        "name": "recipe-prod-research_iron-1",
+        "localised_name": [
+          "technology-name.more-infinite-research.research_iron",
+          [
+            "item-name.iron-plate"
+          ]
+        ],
+        "localised_description": [
+          "technology-description.more-infinite-research.recipe_productivity"
+        ],
+        "icons": [
+          {
+            "icon": "__angelssmeltinggraphics__/graphics/icons/plate-iron.png",
+            "icon_size": 32
+          },
+          {
+            "icon": "__core__/graphics/icons/technology/constants/constant-recipe-productivity.png",
+            "icon_size": 128,
+            "scale": 0.5,
+            "shift": [
+              50,
+              50
+            ],
+            "floating": true
+          }
+        ],
+        "effects": [
+          {
+            "type": "change-recipe-productivity",
+            "recipe": "casting-iron",
+            "change": 0.1
+          },
+          {
+            "type": "change-recipe-productivity",
+            "recipe": "iron-plate",
+            "change": 0.1
+          },
+          {
+            "type": "change-recipe-productivity",
+            "recipe": "angels-plate-iron",
+            "change": 0.1
+          },
+          {
+            "type": "change-recipe-productivity",
+            "recipe": "angels-plate-iron-2",
+            "change": 0.1
+          }
+        ],
+        "prerequisites": [
+          "automation-science-pack",
+          "logistic-science-pack",
+          "chemical-science-pack",
+          "production-science-pack"
+        ],
+        "unit": {
+          "ingredients": [
+            [
+              "automation-science-pack",
+              1
+            ],
+            [
+              "logistic-science-pack",
+              1
+            ],
+            [
+              "chemical-science-pack",
+              1
+            ],
+            [
+              "production-science-pack",
+              1
+            ]
+          ],
+          "count_formula": "8000*2^(L-1)",
+          "time": 60
+        },
+        "max_level": "infinite",
+        "order": "p[research_iron]",
+        "level": 1,
+        "upgrade": true,
+        "type": "technology"
+      },
+      "independent_before_sha256": "A992205AB4A4967AF2B727FD3D725CA13A112C1E8C649D64D2A805B8B3C18868",
+      "representation": {
+        "base_seed_recipe_order": [
+          "casting-iron",
+          "iron-plate"
+        ],
+        "published_effect_recipe_order": [
+          "angels-plate-iron",
+          "angels-plate-iron-2",
+          "casting-iron",
+          "iron-plate"
+        ],
+        "canonical_remaining_recipe_order": [
+          "angels-plate-iron",
+          "angels-plate-iron-2"
+        ],
+        "published_non_effect_fields_sha256": "88757D298F0D5F6C1A5FA34DBD892D74B7C975095F5B83D2D4FE228DBE182891",
+        "published_effect_multiset_sha256": "CA10EDB3E41D786906BAB2074153245F993BB55DF9D4C5079BAB09FB108045D6"
+      },
+      "reason": "The independently captured q010 B6 technology payload is retained exactly. Its effect presentation is reconstructed as the independent unmodded F210 Space Age B6 static seed prefix followed by the remaining B6 recipes in canonical name order; this is a finite declared sequence representation, not a candidate-derived allowance or payload change."
+    },
+    {
+      "id": "BA-F210-EFFECT-ORDER-RECONSTRUCT-LANDFILL-1",
+      "profile": "bob-angel-f210",
+      "domain": "data",
+      "type": "technology",
+      "name": "recipe-prod-research_landfill-1",
+      "expected_candidate": {
+        "name": "recipe-prod-research_landfill-1",
+        "localised_name": [
+          "technology-name.more-infinite-research.research_landfill",
+          [
+            "technology-name.landfill"
+          ]
+        ],
+        "localised_description": [
+          "technology-description.more-infinite-research.recipe_productivity"
+        ],
+        "icons": [
+          {
+            "icon": "__base__/graphics/technology/landfill.png",
+            "icon_size": 256
+          },
+          {
+            "icon": "__core__/graphics/icons/technology/constants/constant-recipe-productivity.png",
+            "icon_size": 128,
+            "scale": 0.5,
+            "shift": [
+              50,
+              50
+            ],
+            "floating": true
+          }
+        ],
+        "effects": [
+          {
+            "type": "change-recipe-productivity",
+            "recipe": "landfill",
+            "change": 0.1
+          },
+          {
+            "type": "change-recipe-productivity",
+            "recipe": "foundation",
+            "change": 0.05
+          },
+          {
+            "type": "change-recipe-productivity",
+            "recipe": "angels-solid-mud-landfill",
+            "change": 0.1
+          }
+        ],
+        "prerequisites": [
+          "automation-science-pack",
+          "logistic-science-pack",
+          "chemical-science-pack",
+          "production-science-pack",
+          "metallurgic-science-pack",
+          "space-science-pack"
+        ],
+        "unit": {
+          "ingredients": [
+            [
+              "automation-science-pack",
+              1
+            ],
+            [
+              "logistic-science-pack",
+              1
+            ],
+            [
+              "chemical-science-pack",
+              1
+            ],
+            [
+              "production-science-pack",
+              1
+            ],
+            [
+              "metallurgic-science-pack",
+              1
+            ],
+            [
+              "space-science-pack",
+              1
+            ]
+          ],
+          "count_formula": "8000*2^(L-1)",
+          "time": 60
+        },
+        "max_level": "infinite",
+        "order": "p[research_landfill]",
+        "level": 1,
+        "upgrade": true,
+        "type": "technology"
+      },
+      "independent_before_sha256": "A1645587169EE2583EE760E319D6E986B5EE5979DBEC063911B9FC923350B36D",
+      "representation": {
+        "base_seed_recipe_order": [
+          "landfill",
+          "foundation"
+        ],
+        "published_effect_recipe_order": [
+          "angels-solid-mud-landfill",
+          "landfill",
+          "foundation"
+        ],
+        "canonical_remaining_recipe_order": [
+          "angels-solid-mud-landfill"
+        ],
+        "published_non_effect_fields_sha256": "15CF6DFF6007AE4AF96299CA53C69043DBDC3221C46A49F1DA83EE4912B7A5AB",
+        "published_effect_multiset_sha256": "341201078CB6ACCD09D528F358DE1BD08C626C71B8FC4D518BB434E4127F97B7"
+      },
+      "reason": "The independently captured q010 B6 technology payload is retained exactly. Its effect presentation is reconstructed as the independent unmodded F210 Space Age B6 static seed prefix followed by the remaining B6 recipes in canonical name order; this is a finite declared sequence representation, not a candidate-derived allowance or payload change."
+    },
+    {
+      "id": "BA-F210-EFFECT-ORDER-RECONSTRUCT-MODULES-1",
+      "profile": "bob-angel-f210",
+      "domain": "data",
+      "type": "technology",
+      "name": "recipe-prod-research_modules-1",
+      "expected_candidate": {
+        "name": "recipe-prod-research_modules-1",
+        "localised_name": [
+          "technology-name.more-infinite-research.research_modules",
+          [
+            "technology-name.modules"
+          ]
+        ],
+        "localised_description": [
+          "technology-description.more-infinite-research.recipe_productivity"
+        ],
+        "icons": [
+          {
+            "icon": "__quality__/graphics/technology/module.png",
+            "icon_size": 256
+          },
+          {
+            "icon": "__core__/graphics/icons/technology/constants/constant-recipe-productivity.png",
+            "icon_size": 128,
+            "scale": 0.5,
+            "shift": [
+              50,
+              50
+            ],
+            "floating": true
+          }
+        ],
+        "effects": [
+          {
+            "type": "change-recipe-productivity",
+            "recipe": "efficiency-module",
+            "change": 0.1
+          },
+          {
+            "type": "change-recipe-productivity",
+            "recipe": "productivity-module",
+            "change": 0.1
+          },
+          {
+            "type": "change-recipe-productivity",
+            "recipe": "quality-module",
+            "change": 0.1
+          },
+          {
+            "type": "change-recipe-productivity",
+            "recipe": "speed-module",
+            "change": 0.1
+          },
+          {
+            "type": "change-recipe-productivity",
+            "recipe": "efficiency-module-2",
+            "change": 0.05
+          },
+          {
+            "type": "change-recipe-productivity",
+            "recipe": "productivity-module-2",
+            "change": 0.05
+          },
+          {
+            "type": "change-recipe-productivity",
+            "recipe": "quality-module-2",
+            "change": 0.05
+          },
+          {
+            "type": "change-recipe-productivity",
+            "recipe": "speed-module-2",
+            "change": 0.05
+          },
+          {
+            "type": "change-recipe-productivity",
+            "recipe": "efficiency-module-3",
+            "change": 0.02
+          },
+          {
+            "type": "change-recipe-productivity",
+            "recipe": "productivity-module-3",
+            "change": 0.02
+          },
+          {
+            "type": "change-recipe-productivity",
+            "recipe": "quality-module-3",
+            "change": 0.02
+          },
+          {
+            "type": "change-recipe-productivity",
+            "recipe": "speed-module-3",
+            "change": 0.02
+          },
+          {
+            "type": "change-recipe-productivity",
+            "recipe": "angels-bio-yield-module",
+            "change": 0.1
+          },
+          {
+            "type": "change-recipe-productivity",
+            "recipe": "angels-bio-yield-module-2",
+            "change": 0.05
+          },
+          {
+            "type": "change-recipe-productivity",
+            "recipe": "angels-bio-yield-module-3",
+            "change": 0.02
+          },
+          {
+            "type": "change-recipe-productivity",
+            "recipe": "angels-bio-yield-module-4",
+            "change": 0.01
+          },
+          {
+            "type": "change-recipe-productivity",
+            "recipe": "angels-bio-yield-module-5",
+            "change": 0.01
+          },
+          {
+            "type": "change-recipe-productivity",
+            "recipe": "bob-efficiency-module-4",
+            "change": 0.01
+          },
+          {
+            "type": "change-recipe-productivity",
+            "recipe": "bob-efficiency-module-5",
+            "change": 0.01
+          },
+          {
+            "type": "change-recipe-productivity",
+            "recipe": "bob-pollution-clean-module-1",
+            "change": 0.1
+          },
+          {
+            "type": "change-recipe-productivity",
+            "recipe": "bob-pollution-clean-module-2",
+            "change": 0.05
+          },
+          {
+            "type": "change-recipe-productivity",
+            "recipe": "bob-pollution-clean-module-3",
+            "change": 0.02
+          },
+          {
+            "type": "change-recipe-productivity",
+            "recipe": "bob-pollution-clean-module-4",
+            "change": 0.01
+          },
+          {
+            "type": "change-recipe-productivity",
+            "recipe": "bob-pollution-clean-module-5",
+            "change": 0.01
+          },
+          {
+            "type": "change-recipe-productivity",
+            "recipe": "bob-pollution-create-module-1",
+            "change": 0.1
+          },
+          {
+            "type": "change-recipe-productivity",
+            "recipe": "bob-pollution-create-module-2",
+            "change": 0.05
+          },
+          {
+            "type": "change-recipe-productivity",
+            "recipe": "bob-pollution-create-module-3",
+            "change": 0.02
+          },
+          {
+            "type": "change-recipe-productivity",
+            "recipe": "bob-pollution-create-module-4",
+            "change": 0.01
+          },
+          {
+            "type": "change-recipe-productivity",
+            "recipe": "bob-pollution-create-module-5",
+            "change": 0.01
+          },
+          {
+            "type": "change-recipe-productivity",
+            "recipe": "bob-productivity-module-4",
+            "change": 0.01
+          },
+          {
+            "type": "change-recipe-productivity",
+            "recipe": "bob-productivity-module-5",
+            "change": 0.01
+          },
+          {
+            "type": "change-recipe-productivity",
+            "recipe": "bob-quality-module-4",
+            "change": 0.01
+          },
+          {
+            "type": "change-recipe-productivity",
+            "recipe": "bob-quality-module-5",
+            "change": 0.01
+          },
+          {
+            "type": "change-recipe-productivity",
+            "recipe": "bob-speed-module-4",
+            "change": 0.01
+          },
+          {
+            "type": "change-recipe-productivity",
+            "recipe": "bob-speed-module-5",
+            "change": 0.01
+          }
+        ],
+        "prerequisites": [
+          "automation-science-pack",
+          "logistic-science-pack",
+          "chemical-science-pack",
+          "production-science-pack",
+          "cryogenic-science-pack"
+        ],
+        "unit": {
+          "ingredients": [
+            [
+              "automation-science-pack",
+              1
+            ],
+            [
+              "logistic-science-pack",
+              1
+            ],
+            [
+              "chemical-science-pack",
+              1
+            ],
+            [
+              "production-science-pack",
+              1
+            ],
+            [
+              "cryogenic-science-pack",
+              1
+            ]
+          ],
+          "count_formula": "8000*2^(L-1)",
+          "time": 60
+        },
+        "max_level": "infinite",
+        "order": "p[research_modules]",
+        "level": 1,
+        "upgrade": true,
+        "type": "technology"
+      },
+      "independent_before_sha256": "9FABE4DC1D86F145A9C3676AC4684BF1E683544236B2297C993BDCA180CBB64F",
+      "representation": {
+        "base_seed_recipe_order": [
+          "efficiency-module",
+          "productivity-module",
+          "quality-module",
+          "speed-module",
+          "efficiency-module-2",
+          "productivity-module-2",
+          "quality-module-2",
+          "speed-module-2",
+          "efficiency-module-3",
+          "productivity-module-3",
+          "quality-module-3",
+          "speed-module-3"
+        ],
+        "published_effect_recipe_order": [
+          "angels-bio-yield-module",
+          "bob-pollution-clean-module-1",
+          "bob-pollution-create-module-1",
+          "efficiency-module",
+          "productivity-module",
+          "quality-module",
+          "speed-module",
+          "angels-bio-yield-module-2",
+          "bob-pollution-clean-module-2",
+          "bob-pollution-create-module-2",
+          "efficiency-module-2",
+          "productivity-module-2",
+          "quality-module-2",
+          "speed-module-2",
+          "angels-bio-yield-module-3",
+          "bob-pollution-clean-module-3",
+          "bob-pollution-create-module-3",
+          "efficiency-module-3",
+          "productivity-module-3",
+          "quality-module-3",
+          "speed-module-3",
+          "angels-bio-yield-module-4",
+          "angels-bio-yield-module-5",
+          "bob-efficiency-module-4",
+          "bob-efficiency-module-5",
+          "bob-pollution-clean-module-4",
+          "bob-pollution-clean-module-5",
+          "bob-pollution-create-module-4",
+          "bob-pollution-create-module-5",
+          "bob-productivity-module-4",
+          "bob-productivity-module-5",
+          "bob-quality-module-4",
+          "bob-quality-module-5",
+          "bob-speed-module-4",
+          "bob-speed-module-5"
+        ],
+        "canonical_remaining_recipe_order": [
+          "angels-bio-yield-module",
+          "angels-bio-yield-module-2",
+          "angels-bio-yield-module-3",
+          "angels-bio-yield-module-4",
+          "angels-bio-yield-module-5",
+          "bob-efficiency-module-4",
+          "bob-efficiency-module-5",
+          "bob-pollution-clean-module-1",
+          "bob-pollution-clean-module-2",
+          "bob-pollution-clean-module-3",
+          "bob-pollution-clean-module-4",
+          "bob-pollution-clean-module-5",
+          "bob-pollution-create-module-1",
+          "bob-pollution-create-module-2",
+          "bob-pollution-create-module-3",
+          "bob-pollution-create-module-4",
+          "bob-pollution-create-module-5",
+          "bob-productivity-module-4",
+          "bob-productivity-module-5",
+          "bob-quality-module-4",
+          "bob-quality-module-5",
+          "bob-speed-module-4",
+          "bob-speed-module-5"
+        ],
+        "published_non_effect_fields_sha256": "23B96DBE1B555F3A33F18CDDB86F7F7D0A75ED0DB0F8E9D52EF453C0CFA95382",
+        "published_effect_multiset_sha256": "E1FCD73C1AD8951702DC582518C6C6ABB04B351CB0D64A7F8504DED146DBC8B4"
+      },
+      "reason": "The independently captured q010 B6 technology payload is retained exactly. Its effect presentation is reconstructed as the independent unmodded F210 Space Age B6 static seed prefix followed by the remaining B6 recipes in canonical name order; this is a finite declared sequence representation, not a candidate-derived allowance or payload change."
     }
   ],
   "must_match_without_exception": {
@@ -5551,12 +7179,6 @@
     }
   },
   "unresolved_categories": [
-    {
-      "id": "BA-F210-EFFECT-ORDER-UNRESOLVED",
-      "status": "blocker-no-allowance",
-      "observed_class": "nine existing technology effect-array ordering differences",
-      "required_evidence": "A pre-existing independent stable-order requirement plus the complete B6 payload/multiplicity for each named technology; current output may identify rows but cannot choose an order."
-    },
     {
       "id": "BA-F210-ADDITION-OIL-CRACKING-UNRESOLVED",
       "status": "blocker-no-allowance",
