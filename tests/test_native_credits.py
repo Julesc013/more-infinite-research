@@ -288,6 +288,73 @@ class NativeCreditRuntimeTests(unittest.TestCase):
           end
         ''')
 
+    def test_private_major_first_upgrade_keeps_the_published_47_preference_safeguard(self):
+        self.lua.execute(r'''
+          local cases = {
+            {name="F200 fish", recipe="fish-breeding", main="recipe-prod-research_breeding-1", new_version="6.1.20002"},
+            {name="F210 Base copper", recipe="copper-plate", main="recipe-prod-research_copper-1", new_version="6.1.21002"},
+          }
+          local function assert_no_preflight_writes(force, label)
+            for _, state in pairs(force._states) do
+              assert(state.writes.level == 0 and state.writes.enabled == 0,
+                label .. " wrote native research during preflight")
+            end
+          end
+          local function write_snapshot(force)
+            local out = {}
+            for name, state in pairs(force._states) do
+              out[name] = {level=state.writes.level, enabled=state.writes.enabled}
+            end
+            return out
+          end
+          local function assert_same_writes(force, before, label)
+            for name, state in pairs(force._states) do
+              assert(before[name].level == state.writes.level and before[name].enabled == state.writes.enabled,
+                label .. " wrote native research during preflight")
+            end
+          end
+          for _, case in ipairs(cases) do
+            local event = {mod_startup_settings_changed=true,
+              mod_changes={['more-infinite-research']={old_version='4.7.20003', new_version=case.new_version}}}
+
+            storage, game = {}, {forces={}}
+            local earned = make_force(1, {[case.recipe]=true}, {[case.main]=2})
+            game.forces[1] = earned
+            local ok, message = pcall(native_credits.preflight_legacy_preference_transition, event, true)
+            assert(not ok and tostring(message):find("startup settings unchanged", 1, true),
+              case.name .. " private-major first upgrade bypassed the ambiguity refusal")
+            assert(storage.mir_native_credits == nil)
+            assert_no_preflight_writes(earned, case.name .. " rejection")
+
+            assert(pcall(native_credits.preflight_legacy_preference_transition, event, false))
+            assert_no_preflight_writes(earned, case.name .. " unrelated-provider transition")
+            event.mod_startup_settings_changed = false
+            assert(pcall(native_credits.preflight_legacy_preference_transition, event, true))
+            assert_no_preflight_writes(earned, case.name .. " unchanged-settings transition")
+
+            event.mod_startup_settings_changed = true
+            native_credits.on_init()
+            local record = ledger(earned, case.recipe)
+            assert(record and record.included == true and record.offset == 0,
+              case.name .. " did not establish its per-force, per-recipe ledger")
+            local writes = write_snapshot(earned)
+            assert(pcall(native_credits.preflight_legacy_preference_transition, event, true))
+            assert_same_writes(earned, writes, case.name .. " valid ledger")
+            record.offset = 1
+            ok, message = pcall(native_credits.preflight_legacy_preference_transition, event, true)
+            assert(not ok and tostring(message):find("startup settings unchanged", 1, true),
+              case.name .. " stale ledger bypassed the ambiguity refusal")
+            assert_same_writes(earned, writes, case.name .. " stale ledger rejection")
+
+            storage, game = {}, {forces={}}
+            local unearned = make_force(2, {[case.recipe]=true}, {[case.main]=1})
+            game.forces[2] = unearned
+            assert(pcall(native_credits.preflight_legacy_preference_transition, event, true))
+            assert(storage.mir_native_credits == nil)
+            assert_no_preflight_writes(unearned, case.name .. " unearned transition")
+          end
+        ''')
+
     def test_legacy_preflight_allows_unearned_or_nonmatching_configuration_events(self):
         self.lua.execute(r'''
           local force = make_force(1)
@@ -307,6 +374,16 @@ class NativeCreditRuntimeTests(unittest.TestCase):
           local different = {mod_startup_settings_changed=true,
             mod_changes={['more-infinite-research']={old_version='5.0.20000', new_version='5.0.20001'}}}
           ok, message = pcall(native_credits.preflight_legacy_preference_transition, different, true)
+          assert(ok, tostring(message))
+          assert(storage.mir_native_credits == nil)
+
+          local missing_destination = {mod_startup_settings_changed=true,
+            mod_changes={['more-infinite-research']={old_version='4.7.20002', new_version=''}}}
+          ok, message = pcall(native_credits.preflight_legacy_preference_transition, missing_destination, true)
+          assert(ok, tostring(message))
+          local malformed_destination = {mod_startup_settings_changed=true,
+            mod_changes={['more-infinite-research']={old_version='4.7.20002', new_version=false}}}
+          ok, message = pcall(native_credits.preflight_legacy_preference_transition, malformed_destination, true)
           assert(ok, tostring(message))
           assert(storage.mir_native_credits == nil)
         ''')
