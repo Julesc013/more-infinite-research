@@ -32,6 +32,7 @@ This is the authoritative product changelog. Each MIR 1–3 master release appea
 ### Bugfixes
 
 - Restore the published visibility of all twenty retained Bob/Angel material setting families for admitted Factorio 2.1 Base and Space Age profiles.
+- Restore the seven published Bob/Angel Factorio 2.1 productivity technology icons from their direct native prototype references.
 - Restore omitted research names and descriptions across the shipped locales while preserving existing translations.
 - Add missing titles for hidden Imersite state and unavailable material explanations.
 - Preserve the combined Factorio 2.1 Bob/Angel Space Age carbon effect vector when its recipe named carbon produces Angel carbon instead of the ordinary carbon item.
