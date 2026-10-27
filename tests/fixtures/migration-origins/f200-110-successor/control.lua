@@ -169,6 +169,26 @@ local function assert_snapshot(snapshot, names, label, direct_level, direct_prog
     fail(label .. " saved worker-robot-battery contribution differs")
   end
 end
+local function observe_module_bonuses(force, snapshot, label)
+  if label ~= "player" then return end
+  local observed = {}
+  for _, recipe in ipairs({"speed-module", "productivity-module", "efficiency-module"}) do
+    local source, candidate = snapshot.recipes[recipe], force.recipes[recipe]
+    if type(source) ~= "number" or candidate == nil or candidate.valid == false
+        or type(candidate.productivity_bonus) ~= "number" then
+      fail("player module-bonus observation is absent: " .. recipe)
+    end
+    observed[recipe] = {source = source, candidate = candidate.productivity_bonus}
+  end
+  log("[MIR5_NATIVE_FIXTURE] OBSERVED {"
+    .. "\"case\":\"migration-origin-1.1.0-module-bonus-pre-scalar\","
+    .. "\"original_source_speed_module_bonus\":" .. tostring(observed["speed-module"].source) .. ","
+    .. "\"original_source_productivity_module_bonus\":" .. tostring(observed["productivity-module"].source) .. ","
+    .. "\"original_source_efficiency_module_bonus\":" .. tostring(observed["efficiency-module"].source) .. ","
+    .. "\"current_candidate_speed_module_bonus\":" .. tostring(observed["speed-module"].candidate) .. ","
+    .. "\"current_candidate_productivity_module_bonus\":" .. tostring(observed["productivity-module"].candidate) .. ","
+    .. "\"current_candidate_efficiency_module_bonus\":" .. tostring(observed["efficiency-module"].candidate) .. "}")
+end
 local function assert_force(force, snapshot, names, label, ignore_direct, candidate_delta)
   if force == nil or force.valid == false then fail(label .. " force is absent") end
   for _, name in ipairs(names) do
@@ -181,6 +201,7 @@ local function assert_force(force, snapshot, names, label, ignore_direct, candid
       end
     end
   end
+  observe_module_bonuses(force, snapshot, label)
   for recipe, expected in pairs(snapshot.recipes) do
     local value = force.recipes[recipe]
     local wanted = expected
@@ -337,6 +358,17 @@ local function complete(target, state_value, successor)
     fail("candidate player queue survived completion")
   end
 end
+local function reset_after_candidate_lab(target, state_value, successor)
+  local player = game.forces.player
+  if type(player.reset_technology_effects) ~= "function" then
+    fail("candidate force cannot reset technology effects")
+  end
+  player.reset_technology_effects()
+  -- This reset belongs to the initial completion transaction.  Re-running the
+  -- read-only completion checks prevents it from discarding source rights,
+  -- candidate progress, or the foreign queue before the completed save.
+  complete(target, state_value, successor)
+end
 
 script.on_configuration_changed(begin)
 script.on_load(function()
@@ -378,6 +410,7 @@ script.on_event(defines.events.on_tick, function()
     successor.lab.energy = 1000000000
   else
     complete(target, state_value, successor)
+    reset_after_candidate_lab(target, state_value, successor)
     successor.phase = "completed"
     marker("initial", target, state_value, successor)
     game.server_save(catalogue.save)
