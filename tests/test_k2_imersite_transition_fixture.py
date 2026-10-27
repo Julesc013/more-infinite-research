@@ -11,6 +11,7 @@ import unittest
 
 ROOT = Path(__file__).resolve().parents[1]
 FIXTURE = ROOT / "tests/fixtures/k2-imersite-transition"
+HELD_FLAGS_FIXTURE = ROOT / "tests/fixtures/k2-imersite-held-public-flags"
 PROFILES = ROOT / "tests/profiles"
 EARLY = "recipe-prod-research_material_imersite-1"
 TAIL = "recipe-prod-research_material_imersite-4"
@@ -24,6 +25,8 @@ CURRENT_SOURCE_TREE = "79b73a6a8e68987737e69bf2d95ec6555b49f901"
 CURRENT_MIR_ARCHIVE = "E3A65C08AC7798A66FB1BE30D24307B17C8B366DD901953BDE2A09BD6939C8CE"
 CURRENT_MIR_BYTES = 679250
 CURRENT_MIR_NAME = "more-infinite-research_5.0.21000.zip"
+HELD_FLAGS_SOURCE_PROFILE = PROFILES / "k2-imersite-held-public-flags-source-f210.json"
+HELD_FLAGS_FIXED_PROFILE = PROFILES / "k2-imersite-held-public-flags-fixed-f210.json"
 OBSERVER_ARCHIVE = "mir-fixture-mir5-active-mods-observer_0.1.0.zip"
 EXTERNAL_ARCHIVES = {
     "flib_0.17.2.zip": "0A48C15DC0FC6C13BB3FE8293BA6CB35A07F3B0F37D37ACB50AB30E32E8E019D",
@@ -491,6 +494,213 @@ class K2ImersiteTransitionFixtureTests(unittest.TestCase):
         self.assertEqual(6, diagnostic["actual"]["tail"]["level"])
         self.assertEqual(0.42, diagnostic["actual"]["tail"]["saved_progress"])
         self.assertIsNone(result["diagnostics"][2])
+
+    def _held_flags_data(self, stage: str, opponent: str = ""):
+        self.lua.globals().held_data_path = (HELD_FLAGS_FIXTURE / "fixture_data_final.lua").as_posix()
+        self.lua.globals().held_settings_path = (HELD_FLAGS_FIXTURE / "fixture_settings.lua").as_posix()
+        self.lua.globals().held_stage = stage
+        self.lua.globals().held_opponent = opponent
+        return self.lua.execute(r'''
+          local early, tail = "recipe-prod-research_material_imersite-1", "recipe-prod-research_material_imersite-4"
+          local holder, carrier = "mir-k2-imersite-staged-state-1", "mir-k2-imersite-continuation-state-4"
+          local powder = "kr-imersite-powder"
+          local function row(name, level, maximum, hidden)
+            return {name=name, level=level, max_level=maximum, hidden=hidden,
+              effects={{type="change-recipe-productivity", recipe=powder, change=.02}}}
+          end
+          mods = {base="2.1.23",["elevated-rails"]="2.1.23",quality="2.1.23",recycler="2.1.23",
+            ["space-age"]="2.1.23",flib="0.17.2",["k2so-assets"]="1.0.7",Krastorio2="2.1.4",
+            ["Krastorio2-spaced-out"]="2.0.19",Krastorio2Assets="2.1.0",
+            Krastorio2MenuSimulations="2.1.0",["xy-k2so-enhancements-nulls-fork"]="0.8.3",
+            ["more-infinite-research"]="5.0.21000",
+            ["mir-fixture-mir5-k2-imersite-held-public-flags"]=held_stage == "source" and "0.1.0" or "0.2.0"}
+          data = {raw={technology={
+            [early]=row(early,1,3,false), [tail]=row(tail,4,"infinite",false),
+            [holder]=row(holder,1,"infinite",true), [carrier]=row(carrier,4,"infinite",true),
+          }, ["int-setting"]={["ips-max-level-research_material_imersite"]={default_value=0}}}}
+          if held_opponent == "effect" then data.raw.technology[tail].effects[1].change=.03 end
+          if held_opponent == "carrier" then data.raw.technology[carrier].hidden=false end
+          if held_opponent == "missing" then data.raw.technology[tail]=nil end
+          if held_opponent == "duplicate" then table.insert(data.raw.technology[tail].effects,
+            {type="change-recipe-productivity",recipe=powder,change=.02}) end
+          if held_opponent == "setting" then data.raw["int-setting"]["ips-max-level-research_material_imersite"].default_value=1 end
+          if held_opponent == "closure" then mods["space-age"]="2.1.22" end
+          local settings = assert(loadfile(held_settings_path, "t", _G))()
+          local final = assert(loadfile(held_data_path, "t", _G))()
+          local ok, message = pcall(function() settings.apply(held_stage); final.apply(held_stage) end)
+          return {ok=ok, message=tostring(message), rows=data.raw.technology,
+            setting=data.raw["int-setting"]["ips-max-level-research_material_imersite"]}
+        ''')
+
+    def _held_flags_flow(self, opponent: str = ""):
+        self.lua.globals().held_control_path = (HELD_FLAGS_FIXTURE / "fixture_control.lua").as_posix()
+        self.lua.globals().held_opponent = opponent
+        return self.lua.execute(r'''
+          local callbacks, calls, logs = {}, {saves=0}, {}
+          local early, tail = "recipe-prod-research_material_imersite-1", "recipe-prod-research_material_imersite-4"
+          local holder, carrier = "mir-k2-imersite-staged-state-1", "mir-k2-imersite-continuation-state-4"
+          local powder = "kr-imersite-powder"
+          local function technology(name, level, maximum, hidden)
+            local values = {name=name, valid=true, level=level, researched=false, saved_progress=0,
+              enabled=true, visible_when_disabled=false,
+              prototype={max_level=maximum, hidden=hidden,
+                effects={{type="change-recipe-productivity", recipe=powder, change=.02}}}}
+            return setmetatable({}, {__index=values, __newindex=function(_, key, value)
+              values[key]=value
+              -- Factorio's level setter re-enables a technology. This catches
+              -- accidental multi-assignment ordering in the fixture setup.
+              if key == "level" then values.enabled=true end
+            end})
+          end
+          local function make_force(index)
+            local values = {index=index, technologies={
+              [early]=technology(early,1,3,false), [tail]=technology(tail,4,4294967295,false),
+              [holder]=technology(holder,1,4294967295,true), [carrier]=technology(carrier,4,4294967295,true),
+            }, recipes={[powder]={productivity_bonus=0}}, research_queue={}, research_progress=0}
+            local value = {}
+            value.enable_all_prototypes=function() end
+            value.reset_technology_effects=function()
+              local state=values.technologies[holder]
+              values.recipes[powder].productivity_bonus=(state.level-1)*.02
+            end
+            return setmetatable(value, {__index=values, __newindex=function(_, key, entry) values[key]=entry end})
+          end
+          local player, foreign = make_force(1), nil
+          game = {forces={player=player}, create_force=function(name)
+            assert(name == "mir5-k2-imersite-held-public-flags-foreign")
+            foreign=make_force(2); game.forces[foreign.index]=foreign; return foreign
+          end, server_save=function(name) assert(name == "mir5-native-complete"); calls.saves=calls.saves+1 end}
+          storage = {}
+          settings = {startup={["ips-max-level-research_material_imersite"]={value=0}}}
+          defines = {events={on_tick=1}}
+          helpers = {table_to_json=function(value) return "host-json" end}
+          log = function(value) logs[#logs+1]=value end
+          script = {active_mods={base="2.1.23",["elevated-rails"]="2.1.23",quality="2.1.23",recycler="2.1.23",
+              ["space-age"]="2.1.23",flib="0.17.2",["k2so-assets"]="1.0.7",Krastorio2="2.1.4",
+              ["Krastorio2-spaced-out"]="2.0.19",Krastorio2Assets="2.1.0",
+              Krastorio2MenuSimulations="2.1.0",["xy-k2so-enhancements-nulls-fork"]="0.8.3",
+              ["more-infinite-research"]="5.0.21000",
+              ["mir-fixture-mir5-k2-imersite-held-public-flags"]="0.1.0"},
+            on_init=function(callback) callbacks.init=callback end,
+            on_load=function(callback) callbacks.load=callback end,
+            on_configuration_changed=function(callback) callbacks.configuration=callback end,
+            on_event=function(event, callback) callbacks.tick=callback end}
+          local module = assert(loadfile(held_control_path, "t", _G))()
+          module.apply("source")
+          local ok, message = pcall(function()
+            callbacks.init()
+            if held_opponent ~= "skipped-transition" then
+              callbacks.tick()
+              assert(storage.mir5_k2_imersite_held_public_flags.phase == "source-complete")
+              callbacks.load(); callbacks.tick()
+            end
+            -- This is the expected result of the normal fixed MIR lifecycle,
+            -- supplied by the host double only to exercise fixture ordering.
+            local e, t, h, c = player.technologies[early], player.technologies[tail],
+              player.technologies[holder], player.technologies[carrier]
+            e.level=3; e.researched=true; e.saved_progress=0; e.enabled=false; e.visible_when_disabled=true
+            t.level=4; t.researched=false; t.saved_progress=held_opponent == "saved-progress" and .26 or .27
+              ; t.enabled=false; t.visible_when_disabled=false
+            h.level=1; h.researched=false; h.saved_progress=0; h.enabled=false; h.visible_when_disabled=false
+            c.level=4; c.researched=false; c.saved_progress=0; c.enabled=false; c.visible_when_disabled=false
+            player.recipes[powder].productivity_bonus=.06
+            if held_opponent == "public-flags" then e.enabled=true end
+            script.active_mods["mir-fixture-mir5-k2-imersite-held-public-flags"]="0.2.0"
+            module.apply("fixed")
+            callbacks.configuration()
+            assert(storage.mir5_k2_imersite_held_public_flags.phase == "fixed-prepared")
+            callbacks.tick()
+            assert(storage.mir5_k2_imersite_held_public_flags.phase == "fixed-complete")
+            callbacks.load(); callbacks.tick()
+          end)
+          return {ok=ok, message=tostring(message), saves=calls.saves, markers=#logs,
+            phase=storage.mir5_k2_imersite_held_public_flags and storage.mir5_k2_imersite_held_public_flags.phase,
+            foreign=foreign and {early_enabled=foreign.technologies[early].enabled,
+              early_visible=foreign.technologies[early].visible_when_disabled,
+              tail_enabled=foreign.technologies[tail].enabled,
+              tail_visible=foreign.technologies[tail].visible_when_disabled}}
+        ''')
+
+    def test_held_public_flags_profiles_pin_e3a_source_and_leave_fixed_mir_pending(self):
+        source = json.loads(HELD_FLAGS_SOURCE_PROFILE.read_text(encoding="utf-8"))
+        fixed = json.loads(HELD_FLAGS_FIXED_PROFILE.read_text(encoding="utf-8"))
+        for profile, fixture_version in ((source, "0.1.0"), (fixed, "0.2.0")):
+            with self.subTest(kind=profile["kind"]):
+                self.assertEqual(("f210", "2.1", "Defaults"),
+                                 (profile["target"], profile["factorio_line"], profile["settings_mode"]))
+                self.assertEqual(("2.1.23", ENGINE_SHA),
+                                 (profile["engine"]["version"], profile["engine"]["sha256"]))
+                mods = {row["name"]: row["version"] for row in profile["mods"]}
+                self.assertEqual(("5.0.21000", fixture_version),
+                                 (mods["more-infinite-research"], mods["mir-fixture-mir5-k2-imersite-held-public-flags"]))
+                self.assertEqual("2.0.19", mods["Krastorio2-spaced-out"])
+                self.assertEqual(EXTERNAL_ARCHIVES,
+                                 {name: digest for name, digest in profile["archive_sha256"].items()
+                                  if name != CURRENT_MIR_NAME})
+        self.assertEqual(CURRENT_MIR_ARCHIVE, source["archive_sha256"][CURRENT_MIR_NAME])
+        self.assertNotIn(CURRENT_MIR_NAME, fixed["archive_sha256"])
+        self.assertIn("not dispatchable", fixed["scope"])
+        for stage, version in (("source", "0.1.0"), ("fixed", "0.2.0")):
+            with self.subTest(stage=stage):
+                info = json.loads((HELD_FLAGS_FIXTURE / stage / "info.json").read_text(encoding="utf-8"))
+                self.assertEqual(("mir-fixture-mir5-k2-imersite-held-public-flags", version),
+                                 (info["name"], info["version"]))
+                self.assertEqual(
+                    f'require("__mir-fixture-mir5-k2-imersite-held-public-flags__/fixture_control").apply("{stage}")\n',
+                    (HELD_FLAGS_FIXTURE / stage / "control.lua").read_text(encoding="utf-8"),
+                )
+        readme = (HELD_FLAGS_FIXTURE / "README.md").read_text(encoding="utf-8")
+        for expected in (CURRENT_SOURCE, CURRENT_SOURCE_TREE, CURRENT_MIR_ARCHIVE, "679250 bytes",
+                         "zero laboratory completions", "pending"):
+            self.assertIn(expected, readme)
+
+    def test_held_public_flags_data_preflights_the_real_k2so_rows_before_fixture_state(self):
+        for stage in ("source", "fixed"):
+            with self.subTest(stage=stage):
+                result = self._held_flags_data(stage)
+                self.assertTrue(result["ok"], result["message"])
+                self.assertEqual(0, result["setting"]["default_value"])
+                self.assertEqual(.02, result["rows"][TAIL]["effects"][1]["change"])
+        for opponent, phrase, unchanged in (("effect", "Imersite effect differs", TAIL),
+                                            ("carrier", "carrier identity differs", CARRIER),
+                                            ("missing", "public Imersite continuation row is absent", EARLY),
+                                            ("duplicate", "Imersite effect differs", TAIL),
+                                            ("setting", "K2SO Imersite maximum default differs", EARLY),
+                                            ("closure", "unexpected F210 K2SO Imersite closure", EARLY)):
+            with self.subTest(opponent=opponent):
+                result = self._held_flags_data("fixed", opponent)
+                self.assertFalse(result["ok"])
+                self.assertIn(phrase, result["message"])
+                self.assertEqual(1 if opponent == "setting" else 0, result["setting"]["default_value"])
+                self.assertEqual(.03 if opponent == "effect" else .02,
+                                 result["rows"][unchanged]["effects"][1]["change"])
+
+    def test_held_public_flags_control_defers_server_save_and_requires_preserved_unqueued_flags(self):
+        source = (HELD_FLAGS_FIXTURE / "fixture_control.lua").read_text(encoding="utf-8")
+        self.assertIn('state.phase ~= "source-complete"', source)
+        self.assertIn("game.server_save(SAVE)", source)
+        self.assertNotIn("remote.call", source)
+        self.assertNotIn("storage.mir", source)
+        on_load = source.split("script.on_load", 1)[1].split("script.on_event", 1)[0]
+        self.assertNotIn("game.", on_load)
+        self.assertNotIn("storage", on_load)
+        positive = self._held_flags_flow()
+        self.assertTrue(positive["ok"], positive["message"])
+        self.assertEqual((2, 4, "fixed-complete"), (positive["saves"], positive["markers"], positive["phase"]))
+        self.assertEqual((False, False, False, True),
+                         (positive["foreign"]["early_enabled"], positive["foreign"]["early_visible"],
+                          positive["foreign"]["tail_enabled"], positive["foreign"]["tail_visible"]))
+        corrupted = self._held_flags_flow("public-flags")
+        self.assertFalse(corrupted["ok"])
+        self.assertIn("public enabled/visibility flags differ", corrupted["message"])
+        self.assertEqual((1, 2, "source-complete"), (corrupted["saves"], corrupted["markers"], corrupted["phase"]))
+        for opponent, phrase, source_saves in (("saved-progress", "public continuation detached work differs", 1),
+                                               ("skipped-transition", "completed E3A source state is absent", 0)):
+            with self.subTest(opponent=opponent):
+                result = self._held_flags_flow(opponent)
+                self.assertFalse(result["ok"])
+                self.assertIn(phrase, result["message"])
+                self.assertEqual(source_saves, result["saves"])
 
 
 if __name__ == "__main__":
