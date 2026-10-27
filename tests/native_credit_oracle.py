@@ -97,7 +97,8 @@ def legacy_module_credit_rows(captured_recipes):
 
 def current_native_credit_rows(public_rows, captured_recipes):
     return {**native_credit_carrier_rows(public_rows, captured_recipes),
-            **legacy_module_credit_rows(captured_recipes)}
+            **(legacy_module_credit_rows(captured_recipes)
+               if "recipe-prod-research_modules-1" in public_rows else {})}
 
 
 def captured_public_productivity_recipes(public_rows):
