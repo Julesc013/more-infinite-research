@@ -1,0 +1,92 @@
+{
+  "schema": 1,
+  "kind": "MIR5LegacyBooleanCapPreparedInputsV1",
+  "status": "exact-fixtures-built-not-native-qualified",
+  "fixture_source_commit": "9ef64ff41e0c7140467df044dfe20837f1fa5a40",
+  "fixture_source_tree": "efbe89b4f48542c04af298ecc9fd6b92119bd5ae",
+  "case_name": "legacy-boolean-cap",
+  "custody_root": "build/qualification/legacy-boolean-cap-a575-prepared-inputs-r01",
+  "package_tool": {
+    "path": "tools/package.py",
+    "executed_worktree_sha256": "32BDBE5E0D8B776A57BC8DF63DD536DD81AEDF54141AC6EC6B1BEF4044C90674"
+  },
+  "fixture_archives": [
+    {
+      "stage": "published-source",
+      "version": "0.1.0",
+      "archive": "build/qualification/legacy-boolean-cap-a575-prepared-inputs-r01/mir-fixture-mir5-legacy-boolean-cap_0.1.0.zip",
+      "sha256": "A33E86829C63B995228E79CEA7421E669A4D2C5F7F76BDAF8F2D7F2B742F4C3D",
+      "bytes": 5008,
+      "projection": "build/qualification/legacy-boolean-cap-a575-prepared-inputs-r01/fixture-0.1.0-projection",
+      "members": [
+        {"path": "control.lua", "source_path": "tests/fixtures/legacy-boolean-cap/published/control.lua", "sha256": "D2D70F06F692BEE80DD7DF8E09EDDA7EF2BC1E1CDA926DCE331B160C5B08CC2F", "bytes": 11084},
+        {"path": "data-final-fixes.lua", "source_path": "tests/fixtures/legacy-boolean-cap/published/data-final-fixes.lua", "sha256": "8FD3DBE6D847680639442ABABAFC60F0CC60BAE2BA11EFD19C26A4606CB78C52", "bytes": 1820},
+        {"path": "info.json", "source_path": "tests/fixtures/legacy-boolean-cap/published/info.json", "sha256": "B066898F875EC64B2A960643725E4785180FB801810D7BDD3EC769EDD4018695", "bytes": 271},
+        {"path": "settings-updates.lua", "source_path": "tests/fixtures/legacy-boolean-cap/published/settings-updates.lua", "sha256": "9E8D15D1CF977EE90BFA1F6792BBA1B0D9F1E7A98E55A89164FD2FBEEC1067E8", "bytes": 883}
+      ]
+    },
+    {
+      "stage": "f200-successor",
+      "version": "0.2.0",
+      "archive": "build/qualification/legacy-boolean-cap-a575-prepared-inputs-r01/mir-fixture-mir5-legacy-boolean-cap_0.2.0.zip",
+      "sha256": "0504A2AC4BA0BC6985EF5AFB24AC72CA9B62DF9B02090663AA1AA5A9DC5B0EED",
+      "bytes": 5199,
+      "projection": "build/qualification/legacy-boolean-cap-a575-prepared-inputs-r01/fixture-0.2.0-projection",
+      "members": [
+        {"path": "control.lua", "source_path": "tests/fixtures/legacy-boolean-cap/f200/successor/control.lua", "sha256": "65A6B7D99EFBA852EA91A530CE9C4D0BEDBD27135AC67B93BED23B15D43C143A", "bytes": 81},
+        {"path": "data-final-fixes.lua", "source_path": "tests/fixtures/legacy-boolean-cap/f200/successor/data-final-fixes.lua", "sha256": "D84F98D522A25832534A90D5ED71BBB5BE944F862F68401792C9154A7687D2A5", "bytes": 1807},
+        {"path": "fixture_control.lua", "source_path": "tests/fixtures/legacy-boolean-cap/fixture_control.lua", "sha256": "71C5959F4861197F699C71E248DCE4EDE184AE5C55D18499501A16EB61777D97", "bytes": 10959},
+        {"path": "info.json", "source_path": "tests/fixtures/legacy-boolean-cap/f200/successor/info.json", "sha256": "3E54EE382BAF2D1E1BB03BDC34B5F88491A02EE8D9A986B1336ACD7624C77A7B", "bytes": 274},
+        {"path": "settings-updates.lua", "source_path": "tests/fixtures/legacy-boolean-cap/f200/successor/settings-updates.lua", "sha256": "F97D0D3E337C2FD3E7B8FB14D80B7DF4043F7071A299CEB7D8895E341B196015", "bytes": 817}
+      ]
+    },
+    {
+      "stage": "f210-direct-successor",
+      "version": "0.3.0",
+      "archive": "build/qualification/legacy-boolean-cap-a575-prepared-inputs-r01/mir-fixture-mir5-legacy-boolean-cap_0.3.0.zip",
+      "sha256": "D1BDF52D254F6C1DE051117293D9F731295BFC8E3C1909DFFA8F2DA15413F876",
+      "bytes": 5316,
+      "projection": "build/qualification/legacy-boolean-cap-a575-prepared-inputs-r01/fixture-0.3.0-projection",
+      "members": [
+        {"path": "control.lua", "source_path": "tests/fixtures/legacy-boolean-cap/f210/successor/control.lua", "sha256": "0341FCF30615C303A7D3CDF517F0C030A6653F22156B5B40411C6280DFB388FA", "bytes": 81},
+        {"path": "data-final-fixes.lua", "source_path": "tests/fixtures/legacy-boolean-cap/f210/successor/data-final-fixes.lua", "sha256": "C001B5B4317ED213DC6C01ED622CEE908F64F0E2C059379C8C5FB01F42ADD5E8", "bytes": 1899},
+        {"path": "fixture_control.lua", "source_path": "tests/fixtures/legacy-boolean-cap/fixture_control.lua", "sha256": "71C5959F4861197F699C71E248DCE4EDE184AE5C55D18499501A16EB61777D97", "bytes": 10959},
+        {"path": "info.json", "source_path": "tests/fixtures/legacy-boolean-cap/f210/successor/info.json", "sha256": "32181A0BF1F33B576AA3001B010AE77FBEBCEB948B799033A2066DDD18F7BE83", "bytes": 281},
+        {"path": "settings-updates.lua", "source_path": "tests/fixtures/legacy-boolean-cap/f210/successor/settings-updates.lua", "sha256": "A8957200244C3161362F2B370EC73343055B7C1D9CFD8F555D51C1049A137130", "bytes": 1009}
+      ]
+    }
+  ],
+  "profiles": [
+    {"path": "tests/profiles/legacy-boolean-cap-published-400-f200-2077.json", "sha256": "F7619DBCE379714DE885B52C986C9E226F41CE2D7E01657F474D5622FFA32094", "bytes": 1202},
+    {"path": "tests/profiles/legacy-boolean-cap-current-f200-2077.json", "sha256": "3E752149AA993E1F181FD3FD1C728E035DFE0C67AB59DB7DD326743D99CC40C3", "bytes": 1399},
+    {"path": "tests/profiles/legacy-boolean-cap-current-f210-2123.json", "sha256": "F6F3C0135A8AE9830EFE780D3E74E248A726A195822367F607C8015C9EA6C85B", "bytes": 1462}
+  ],
+  "inputs": {
+    "published_source": {
+      "origin_tag": "4.0.0",
+      "archive": "more-infinite-research_4.0.20000.zip",
+      "sha256": "5C0E299D78C4EE545958448DAE48D87BE5FE1B959875D4CB93A264D95D3DB0AE",
+      "bytes": 1067014,
+      "archive_body": "09eb6ece484c8e3c1bcdafaea31451ce84a27108"
+    },
+    "current_candidate": {
+      "source_commit": "a575a4198807b6aea9e26963e3d9970fc5c068ae",
+      "player_tree": "398c79c687d2bc662c976355ced1436201c43f11",
+      "f200": {"engine": "2.0.77", "engine_sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B", "archive": "more-infinite-research_5.0.20000.zip", "sha256": "8DB28D2DE45F26033B5F54E176902A3138A903AF0F4B48EAB6B9971466021B4F", "bytes": 680963},
+      "f210": {"engine": "2.1.23", "engine_sha256": "FE4A1DA30F322A0D0B8AEB3DF7276332222BAAA143E2352569B723E84B2B9060", "archive": "more-infinite-research_5.0.21000.zip", "sha256": "7CE6A4DF78019F6B98237E638A1C927C5FDB538D4A1442EE22D846DD962DDCDC", "bytes": 681347}
+    }
+  },
+  "archive_guard": {
+    "status": "all-three-owned-projections-pass-real-guard",
+    "command": "Assert-MIRLibraryFixtureArchive -Archive <selected archive> -SourceDirectory <selected projection>",
+    "helpers": [
+      {"path": "tools/lib/validation/ImmutableInputStaging.ps1", "sha256": "B5FBFAC8537B08F9790BD3EE8ACEAAB38EE5CBB8EF005E67E8375DE568BBC12C"},
+      {"path": "tools/lib/compatibility/LibraryActivation.ps1", "sha256": "123A2241B895B57217AA969A677FF21BBFB268FE55E9734287883B4D6AE25099"}
+    ]
+  },
+  "native_execution": false,
+  "library_mutation": false,
+  "laboratory_completion": false,
+  "protected_source_save": "pending native source stage",
+  "release_qualification": false
+}
