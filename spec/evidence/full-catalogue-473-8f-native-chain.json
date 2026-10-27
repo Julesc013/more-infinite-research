@@ -1,0 +1,418 @@
+{
+  "schema": 1,
+  "kind": "MIR5FullCatalogue473Current8FCompositeNativeChainV1",
+  "status": "four-native-stages-passed-original-caller-adverse-preserved",
+  "player_source_tree": "44eadfad017440d384f0e932b0eecbcb991a5e40",
+  "stages": [
+    {
+      "profile": "base",
+      "role": "successor",
+      "result_sha256": "F0C0A2B417601C68DC245388C2E5A4219D7AACDB94C6817A4A4D8F99A35D68C7",
+      "controller_source": "023396d77f7935d0c217ad6ae4a6a31049273dad",
+      "profile_sha256": "A35007741F2A141CF4AC02A0949ED2D01E34FF86DA370325E96B4362CE786228",
+      "engine": {
+        "path": "D:\\Games\\Steam\\steamapps\\common\\Factorio\\bin\\x64\\factorio.exe",
+        "sha256": "FE4A1DA30F322A0D0B8AEB3DF7276332222BAAA143E2352569B723E84B2B9060",
+        "file_version": "2.1.23.87750",
+        "product_version": "2.1.23",
+        "base_version": "2.1.23"
+      },
+      "player_sha256": "8F858F6B7E604757DE84D960E7D7701021B956782C65A13978E3AFD711F7B071",
+      "native_initial": {
+        "case": "full-catalogue-upgrade",
+        "stage": "initial",
+        "status": "passed",
+        "profile": "base",
+        "qualification": "native-runner-readback-required",
+        "witnesses": {
+          "public_rows": 53,
+          "level_backed_rows": 53,
+          "native_owner_rows": 0,
+          "scripted_rows_not_seeded": 0,
+          "zero_credit_rows": 20,
+          "source_gear_lab": 1,
+          "successor_gear_lab": 1,
+          "queued_progress": 0.42000000000000004,
+          "paused_progress": 0.27,
+          "save_name": "mir5-native-complete",
+          "on_load_read_only": false
+        }
+      },
+      "completed_save_sha256": "EF6D48AF7025555D188A67A93696831C06B8F1CF36CF0C34ED246B578FC3F0C4",
+      "input_save": {
+        "sha256": "6B57C3F1A8EE7517923757CF363256D7604669638377CFCB4F78103D9B577AE2",
+        "path": "D:\\Projects\\Factorio\\mir5-fullcatalogue-473-exec-023-r01\\build\\tmp\\full-catalogue-473-current8f-r01\\native\\base\\published-4.7.3\\write-data\\saves\\mir5-native-complete.zip"
+      },
+      "input_save_byte_identical": true,
+      "new_lab_completions": 1,
+      "cold_reloads": [
+        {
+          "ordinal": 1,
+          "save_sha256": "EF6D48AF7025555D188A67A93696831C06B8F1CF36CF0C34ED246B578FC3F0C4",
+          "save_byte_identical": true,
+          "native_marker": {
+            "case": "full-catalogue-upgrade",
+            "stage": "reload",
+            "status": "passed",
+            "profile": "base",
+            "qualification": "native-runner-readback-required",
+            "witnesses": {
+              "public_rows": 53,
+              "level_backed_rows": 53,
+              "native_owner_rows": 0,
+              "scripted_rows_not_seeded": 0,
+              "zero_credit_rows": 20,
+              "source_gear_lab": 1,
+              "successor_gear_lab": 1,
+              "queued_progress": 0.42000000000000004,
+              "paused_progress": 0.27,
+              "save_name": "mir5-native-complete",
+              "on_load_read_only": true
+            }
+          }
+        },
+        {
+          "ordinal": 2,
+          "save_sha256": "EF6D48AF7025555D188A67A93696831C06B8F1CF36CF0C34ED246B578FC3F0C4",
+          "save_byte_identical": true,
+          "native_marker": {
+            "case": "full-catalogue-upgrade",
+            "stage": "reload",
+            "status": "passed",
+            "profile": "base",
+            "qualification": "native-runner-readback-required",
+            "witnesses": {
+              "public_rows": 53,
+              "level_backed_rows": 53,
+              "native_owner_rows": 0,
+              "scripted_rows_not_seeded": 0,
+              "zero_credit_rows": 20,
+              "source_gear_lab": 1,
+              "successor_gear_lab": 1,
+              "queued_progress": 0.42000000000000004,
+              "paused_progress": 0.27,
+              "save_name": "mir5-native-complete",
+              "on_load_read_only": true
+            }
+          }
+        }
+      ],
+      "restoration": "restored-direct-library-controls"
+    },
+    {
+      "profile": "base",
+      "role": "published",
+      "result_sha256": "7357D6D7222B19DD1D9062B6F8D85B1E54AA651DF8CE3A0948D41FFDDBEDC4F0",
+      "controller_source": "023396d77f7935d0c217ad6ae4a6a31049273dad",
+      "profile_sha256": "0A2F198FC98E543291FF6A42702C10FA9A77F5A7CC6404CA56F1CBCF5244F4CE",
+      "engine": {
+        "path": "D:\\Games\\Steam\\steamapps\\common\\Factorio\\bin\\x64\\factorio.exe",
+        "sha256": "FE4A1DA30F322A0D0B8AEB3DF7276332222BAAA143E2352569B723E84B2B9060",
+        "file_version": "2.1.23.87750",
+        "product_version": "2.1.23",
+        "base_version": "2.1.23"
+      },
+      "player_sha256": "B6EB9430056ABD384DB00F94929FE7DAC0A37441ACF4BC277946689682628852",
+      "native_initial": {
+        "case": "full-catalogue-upgrade",
+        "stage": "initial",
+        "status": "passed",
+        "profile": "base",
+        "qualification": "native-runner-readback-required",
+        "witnesses": {
+          "public_rows": 53,
+          "level_backed_rows": 53,
+          "native_owner_rows": 0,
+          "scripted_rows_not_seeded": 0,
+          "zero_credit_rows": 20,
+          "source_gear_lab": 1,
+          "successor_gear_lab": 0,
+          "queued_progress": 0.42000000000000004,
+          "paused_progress": 0.27,
+          "save_name": "mir5-native-complete",
+          "on_load_read_only": false
+        }
+      },
+      "completed_save_sha256": "6B57C3F1A8EE7517923757CF363256D7604669638377CFCB4F78103D9B577AE2",
+      "input_save": null,
+      "input_save_byte_identical": null,
+      "new_lab_completions": 1,
+      "cold_reloads": [
+        {
+          "ordinal": 1,
+          "save_sha256": "6B57C3F1A8EE7517923757CF363256D7604669638377CFCB4F78103D9B577AE2",
+          "save_byte_identical": true,
+          "native_marker": {
+            "case": "full-catalogue-upgrade",
+            "stage": "reload",
+            "status": "passed",
+            "profile": "base",
+            "qualification": "native-runner-readback-required",
+            "witnesses": {
+              "public_rows": 53,
+              "level_backed_rows": 53,
+              "native_owner_rows": 0,
+              "scripted_rows_not_seeded": 0,
+              "zero_credit_rows": 20,
+              "source_gear_lab": 1,
+              "successor_gear_lab": 0,
+              "queued_progress": 0.42000000000000004,
+              "paused_progress": 0.27,
+              "save_name": "mir5-native-complete",
+              "on_load_read_only": true
+            }
+          }
+        },
+        {
+          "ordinal": 2,
+          "save_sha256": "6B57C3F1A8EE7517923757CF363256D7604669638377CFCB4F78103D9B577AE2",
+          "save_byte_identical": true,
+          "native_marker": {
+            "case": "full-catalogue-upgrade",
+            "stage": "reload",
+            "status": "passed",
+            "profile": "base",
+            "qualification": "native-runner-readback-required",
+            "witnesses": {
+              "public_rows": 53,
+              "level_backed_rows": 53,
+              "native_owner_rows": 0,
+              "scripted_rows_not_seeded": 0,
+              "zero_credit_rows": 20,
+              "source_gear_lab": 1,
+              "successor_gear_lab": 0,
+              "queued_progress": 0.42000000000000004,
+              "paused_progress": 0.27,
+              "save_name": "mir5-native-complete",
+              "on_load_read_only": true
+            }
+          }
+        }
+      ],
+      "restoration": "restored-direct-library-controls"
+    },
+    {
+      "profile": "space-age",
+      "role": "published",
+      "result_sha256": "1D7F5304D5BA4AAE9A3568E2DB6AB56D5EAC0075AE3CC0DB10848AD24224259D",
+      "controller_source": "023396d77f7935d0c217ad6ae4a6a31049273dad",
+      "profile_sha256": "C0EB75E9A1043CC1F46832986BF21953B7E6C670028B792C2EFAD79F12BA0C1F",
+      "engine": {
+        "path": "D:\\Games\\Steam\\steamapps\\common\\Factorio\\bin\\x64\\factorio.exe",
+        "sha256": "FE4A1DA30F322A0D0B8AEB3DF7276332222BAAA143E2352569B723E84B2B9060",
+        "file_version": "2.1.23.87750",
+        "product_version": "2.1.23",
+        "base_version": "2.1.23"
+      },
+      "player_sha256": "B6EB9430056ABD384DB00F94929FE7DAC0A37441ACF4BC277946689682628852",
+      "native_initial": {
+        "case": "full-catalogue-upgrade",
+        "stage": "initial",
+        "status": "passed",
+        "profile": "space-age",
+        "qualification": "native-runner-readback-required",
+        "witnesses": {
+          "public_rows": 71,
+          "level_backed_rows": 69,
+          "native_owner_rows": 5,
+          "scripted_rows_not_seeded": 2,
+          "zero_credit_rows": 24,
+          "source_gear_lab": 1,
+          "successor_gear_lab": 0,
+          "queued_progress": 0.42000000000000004,
+          "paused_progress": 0.27,
+          "save_name": "mir5-native-complete",
+          "on_load_read_only": false
+        }
+      },
+      "completed_save_sha256": "3467CBF7D90F79C3B5A0A0A773AE78CC62DF7F3B1DB1CFAEA8A90B3554633D59",
+      "input_save": null,
+      "input_save_byte_identical": null,
+      "new_lab_completions": 1,
+      "cold_reloads": [
+        {
+          "ordinal": 1,
+          "save_sha256": "3467CBF7D90F79C3B5A0A0A773AE78CC62DF7F3B1DB1CFAEA8A90B3554633D59",
+          "save_byte_identical": true,
+          "native_marker": {
+            "case": "full-catalogue-upgrade",
+            "stage": "reload",
+            "status": "passed",
+            "profile": "space-age",
+            "qualification": "native-runner-readback-required",
+            "witnesses": {
+              "public_rows": 71,
+              "level_backed_rows": 69,
+              "native_owner_rows": 5,
+              "scripted_rows_not_seeded": 2,
+              "zero_credit_rows": 24,
+              "source_gear_lab": 1,
+              "successor_gear_lab": 0,
+              "queued_progress": 0.42000000000000004,
+              "paused_progress": 0.27,
+              "save_name": "mir5-native-complete",
+              "on_load_read_only": true
+            }
+          }
+        },
+        {
+          "ordinal": 2,
+          "save_sha256": "3467CBF7D90F79C3B5A0A0A773AE78CC62DF7F3B1DB1CFAEA8A90B3554633D59",
+          "save_byte_identical": true,
+          "native_marker": {
+            "case": "full-catalogue-upgrade",
+            "stage": "reload",
+            "status": "passed",
+            "profile": "space-age",
+            "qualification": "native-runner-readback-required",
+            "witnesses": {
+              "public_rows": 71,
+              "level_backed_rows": 69,
+              "native_owner_rows": 5,
+              "scripted_rows_not_seeded": 2,
+              "zero_credit_rows": 24,
+              "source_gear_lab": 1,
+              "successor_gear_lab": 0,
+              "queued_progress": 0.42000000000000004,
+              "paused_progress": 0.27,
+              "save_name": "mir5-native-complete",
+              "on_load_read_only": true
+            }
+          }
+        }
+      ],
+      "restoration": "restored-direct-library-controls"
+    },
+    {
+      "profile": "space-age",
+      "role": "successor",
+      "result_sha256": "15D1332E9EA20AD9013A889CA2E62F433F624CAFAD0F57E41EB9A3A69E25AEC3",
+      "controller_source": "023396d77f7935d0c217ad6ae4a6a31049273dad",
+      "profile_sha256": "AF87E9036BE75D171F26F64D4826015FA7DE30481DE4C08631D94B857012F33B",
+      "engine": {
+        "path": "D:\\Games\\Steam\\steamapps\\common\\Factorio\\bin\\x64\\factorio.exe",
+        "sha256": "FE4A1DA30F322A0D0B8AEB3DF7276332222BAAA143E2352569B723E84B2B9060",
+        "file_version": "2.1.23.87750",
+        "product_version": "2.1.23",
+        "base_version": "2.1.23"
+      },
+      "player_sha256": "8F858F6B7E604757DE84D960E7D7701021B956782C65A13978E3AFD711F7B071",
+      "native_initial": {
+        "case": "full-catalogue-upgrade",
+        "stage": "initial",
+        "status": "passed",
+        "profile": "space-age",
+        "qualification": "native-runner-readback-required",
+        "witnesses": {
+          "public_rows": 71,
+          "level_backed_rows": 69,
+          "native_owner_rows": 5,
+          "scripted_rows_not_seeded": 2,
+          "zero_credit_rows": 24,
+          "source_gear_lab": 1,
+          "successor_gear_lab": 1,
+          "queued_progress": 0.42000000000000004,
+          "paused_progress": 0.27,
+          "save_name": "mir5-native-complete",
+          "on_load_read_only": false
+        }
+      },
+      "completed_save_sha256": "E2CBA6B5CE5A9E34C3BC9F25A4FAB105F47D8535320626DE6C0E930B40403A26",
+      "input_save": {
+        "sha256": "3467CBF7D90F79C3B5A0A0A773AE78CC62DF7F3B1DB1CFAEA8A90B3554633D59",
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\mir5\\recovery-historical\\full-catalogue-473-current8f-r01\\native-output\\native\\space-age\\published-4.7.3\\write-data\\saves\\mir5-native-complete.zip"
+      },
+      "input_save_byte_identical": true,
+      "new_lab_completions": 1,
+      "cold_reloads": [
+        {
+          "ordinal": 1,
+          "save_sha256": "E2CBA6B5CE5A9E34C3BC9F25A4FAB105F47D8535320626DE6C0E930B40403A26",
+          "save_byte_identical": true,
+          "native_marker": {
+            "case": "full-catalogue-upgrade",
+            "stage": "reload",
+            "status": "passed",
+            "profile": "space-age",
+            "qualification": "native-runner-readback-required",
+            "witnesses": {
+              "public_rows": 71,
+              "level_backed_rows": 69,
+              "native_owner_rows": 5,
+              "scripted_rows_not_seeded": 2,
+              "zero_credit_rows": 24,
+              "source_gear_lab": 1,
+              "successor_gear_lab": 1,
+              "queued_progress": 0.42000000000000004,
+              "paused_progress": 0.27,
+              "save_name": "mir5-native-complete",
+              "on_load_read_only": true
+            }
+          }
+        },
+        {
+          "ordinal": 2,
+          "save_sha256": "E2CBA6B5CE5A9E34C3BC9F25A4FAB105F47D8535320626DE6C0E930B40403A26",
+          "save_byte_identical": true,
+          "native_marker": {
+            "case": "full-catalogue-upgrade",
+            "stage": "reload",
+            "status": "passed",
+            "profile": "space-age",
+            "qualification": "native-runner-readback-required",
+            "witnesses": {
+              "public_rows": 71,
+              "level_backed_rows": 69,
+              "native_owner_rows": 5,
+              "scripted_rows_not_seeded": 2,
+              "zero_credit_rows": 24,
+              "source_gear_lab": 1,
+              "successor_gear_lab": 1,
+              "queued_progress": 0.42000000000000004,
+              "paused_progress": 0.27,
+              "save_name": "mir5-native-complete",
+              "on_load_read_only": true
+            }
+          }
+        }
+      ],
+      "restoration": "restored-direct-library-controls"
+    }
+  ],
+  "runs": [
+    {
+      "path": "build/mir5/recovery-historical/full-catalogue-473-current8f-r01",
+      "original_terminal_status": "adverse",
+      "terminal_sha256": "14BC101FEBC98C8699484B1D22F7B97097DF7392079365BD36EC651A64FF991B",
+      "original_and_primary_members_verified": 61,
+      "bytes": 4209240
+    },
+    {
+      "path": "build/mir5/recovery-historical/full-catalogue-473-current8f-r02-successor",
+      "original_terminal_status": "passed",
+      "terminal_sha256": "9894E48CB17902B86FDEC01DA64186AB06AA379161AD97C1C4995700770BD8B8",
+      "original_and_primary_members_verified": 17,
+      "bytes": 883998
+    }
+  ],
+  "actual_new_lab_completions": 4,
+  "actual_cold_reloads": 8,
+  "reader_adverse": {
+    "terminal_sha256": "14BC101FEBC98C8699484B1D22F7B97097DF7392079365BD36EC651A64FF991B",
+    "meaning": "The original caller incorrectly required level-backed count to equal public count after a successful Space Age source. The canonical fixture explicitly leaves two scripted rows unseeded, so69+2=71 is correct. All native results remain intact; the repair consumed the retained source save and ran only its missing successor."
+  },
+  "limits": [
+    "Exact unmodded Base and all-official Space Age4.7.21003 to8F scenarios, not all overhaul/provider/DLC directions.",
+    "Catalogue state is level-seeded; four actual gear labs are counted once across the four stages. Carried counters are not additional research.",
+    "Space Age scripted carriers are presence-only; their runtime effects require separate scenarios.",
+    "Production servers stop after the live completion/save predicate; both cold reloads per stage exit naturally.",
+    "No ordinary tuning, manufacturing, client, memory, timing or release verdict. Later corrected-source inputs retain separate identities."
+  ],
+  "receipts": {
+    "path": "spec/evidence/full-catalogue-473-8f-native-receipts.json.gz",
+    "bytes": 38521,
+    "sha256": "B0AE1F18EF7CC4E1AEA1025FE57491339224B1450A109474BE4C120F3209A80F",
+    "uncompressed_sha256": "AA580E43F944312787EA0884B874FCFA5DE9695EEEAAE31CEB503A41FCB3B16E",
+    "members": 6
+  }
+}
