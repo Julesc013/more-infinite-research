@@ -35,14 +35,14 @@ HELD_FLAGS_FIXED_MIR_ARCHIVE = "59C14208B200CC534353CD46391210FE0B53E4C5739FFE8A
 HELD_FLAGS_FIXED_MIR_BYTES = 679575
 HELD_FLAGS_SOURCE_PROFILE = PROFILES / "k2-imersite-held-public-flags-source-f210.json"
 HELD_FLAGS_FIXED_PROFILE = PROFILES / "k2-imersite-held-public-flags-fixed-f210.json"
-HELD_FLAGS_INPUT_REVISION = "3d1c6d166ce1a412cab2dc9bdd506d1de7afe00d"
-HELD_FLAGS_INPUT_RECEIPT = ROOT / "spec/evidence/k2-imersite-held-public-flags-inputs-3d1c6d16.json"
+HELD_FLAGS_INPUT_REVISION = "a9754abcd7405e1ddffa9f4dc8051b71d00855fe"
+HELD_FLAGS_INPUT_RECEIPT = ROOT / "spec/evidence/k2-imersite-held-public-flags-inputs-a9754abc.json"
 FROZEN_PACKAGE_TOOL_SHA256 = "00ED00D66BD558554068405C8882419F852FC2F66646088052888D70E25DA61E"
 HELD_FLAGS_FIXTURE_ARCHIVES = {
     "source": ("mir-fixture-mir5-k2-imersite-held-public-flags_0.1.0.zip",
-               "9CC52FD88DFFA2081FEB77B539A5C2AF0CE820C4ECD62FE1146F7FBA31837BAA", 6820),
+               "F57D35293380C5B06D49FE5841341E6D8F2E217A81312D6C43049974633BFC59", 6816),
     "fixed": ("mir-fixture-mir5-k2-imersite-held-public-flags_0.2.0.zip",
-              "0DA6D8B9FFEADE9DF6B5EE9B160490BAC7663EB3AE0E59CCEADA9A03E01F80C9", 6819),
+              "FB33961AB84A0A5CFACF682AF0E0A29AD58CF9EBB665F92AACA06EAADBF091B9", 6815),
 }
 OBSERVER_ARCHIVE = "mir-fixture-mir5-active-mods-observer_0.1.0.zip"
 EXTERNAL_ARCHIVES = {
@@ -571,6 +571,7 @@ class K2ImersiteTransitionFixtureTests(unittest.TestCase):
               -- Factorio's level setter re-enables a technology. This catches
               -- accidental multi-assignment ordering in the fixture setup.
               if key == "level" then values.enabled=true end
+              if key == "researched" and value == false then values.level=level end
             end})
           end
           local function make_force(index)
@@ -581,6 +582,7 @@ class K2ImersiteTransitionFixtureTests(unittest.TestCase):
             local value = {}
             value.enable_all_prototypes=function() end
             value.reset_technology_effects=function()
+              for _,technology in pairs(values.technologies) do technology.enabled=true end
               local state=values.technologies[holder]
               values.recipes[powder].productivity_bonus=(state.level-1)*.02
             end
@@ -724,7 +726,8 @@ class K2ImersiteTransitionFixtureTests(unittest.TestCase):
                                  for name in ("fixture_control.lua", "fixture_data_final.lua", "fixture_settings.lua")})
                 self.assertEqual(expected, {member["path"]: member["source_path"] for member in row["members"]})
                 for member in row["members"]:
-                    raw = subprocess.check_output(["git", "show", f"HEAD:{member['source_path']}"], cwd=ROOT)
+                    raw = subprocess.check_output(
+                        ["git", "show", f"{HELD_FLAGS_INPUT_REVISION}:{member['source_path']}"], cwd=ROOT)
                     self.assertEqual((member["sha256"], member["bytes"]),
                                      (hashlib.sha256(raw).hexdigest().upper(), len(raw)))
         helper = receipt["package_tool"]
@@ -738,7 +741,7 @@ class K2ImersiteTransitionFixtureTests(unittest.TestCase):
                     projection.mkdir()
                     for member in row["members"]:
                         (projection / member["path"]).write_bytes(subprocess.check_output(
-                            ["git", "show", f"HEAD:{member['source_path']}"], cwd=ROOT))
+                            ["git", "show", f"{HELD_FLAGS_INPUT_REVISION}:{member['source_path']}"], cwd=ROOT))
                     record = PACKAGE.build(projection, temporary / Path(row["archive"]).name)
                     self.assertEqual((row["sha256"], row["bytes"]),
                                      (record["sha256"].upper(), record["bytes"]))

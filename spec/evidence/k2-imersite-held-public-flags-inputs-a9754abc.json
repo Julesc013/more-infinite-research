@@ -1,0 +1,169 @@
+{
+  "schema": 1,
+  "kind": "MIR5K2ImersiteHeldPublicFlagsPreparedInputsV1",
+  "status": "exact-source-fixtures-built-not-native-qualified",
+  "fixture_source_commit": "a9754abcd7405e1ddffa9f4dc8051b71d00855fe",
+  "case_name": "k2-imersite-held-public-flags",
+  "package_tool": {
+    "path": "tools/package.py",
+    "committed_sha256": "00ED00D66BD558554068405C8882419F852FC2F66646088052888D70E25DA61E",
+    "executed_worktree_sha256": "00ED00D66BD558554068405C8882419F852FC2F66646088052888D70E25DA61E"
+  },
+  "runtime": {
+    "implementation": "cpython",
+    "version": [
+      3,
+      14,
+      7
+    ],
+    "zlib_build_version": "1.3.1.zlib-ng",
+    "zlib_runtime_version": "1.3.1.zlib-ng"
+  },
+  "custody_root": "build/mir5/k2-imersite-held-public-flags-a9754abc-root-r01",
+  "native_execution": false,
+  "library_mutation": false,
+  "lab_completion": false,
+  "saved_input_hashes": "pending actual source server save and successor input save",
+  "release_qualification": false,
+  "stages": [
+    {
+      "stage": "source",
+      "version": "0.1.0",
+      "archive": "build/mir5/k2-imersite-held-public-flags-a9754abc-root-r01/mir-fixture-mir5-k2-imersite-held-public-flags_0.1.0.zip",
+      "sha256": "F57D35293380C5B06D49FE5841341E6D8F2E217A81312D6C43049974633BFC59",
+      "bytes": 6816,
+      "projection": "build/mir5/k2-imersite-held-public-flags-a9754abc-root-r01/source-projection",
+      "members": [
+        {
+          "path": "control.lua",
+          "source_path": "tests/fixtures/k2-imersite-held-public-flags/source/control.lua",
+          "sha256": "3260AE53E2DB8A29286DED8055DD460F40438A19BFC7BB448692D391E2C048AD",
+          "bytes": 94
+        },
+        {
+          "path": "data-final-fixes.lua",
+          "source_path": "tests/fixtures/k2-imersite-held-public-flags/source/data-final-fixes.lua",
+          "sha256": "8257A49B5AB4B2A3E9EB76A78E2482C921E4DEAB71C0CAFA26BF918EC493714F",
+          "bytes": 97
+        },
+        {
+          "path": "fixture_control.lua",
+          "source_path": "tests/fixtures/k2-imersite-held-public-flags/fixture_control.lua",
+          "sha256": "25C458483B3187F4DBC7D56B17479D16E3D235B22E147B722105E1A00B427301",
+          "bytes": 12933
+        },
+        {
+          "path": "fixture_data_final.lua",
+          "source_path": "tests/fixtures/k2-imersite-held-public-flags/fixture_data_final.lua",
+          "sha256": "FDE49E15BC0145CA4082C12EAAA75395A4BC8E4F72A3CAC5035E0F91AAF9C250",
+          "bytes": 2395
+        },
+        {
+          "path": "fixture_settings.lua",
+          "source_path": "tests/fixtures/k2-imersite-held-public-flags/fixture_settings.lua",
+          "sha256": "CBAFAE81A740464F20AA9E2583185486B3B718DD23CB8521FFD460C19371AD41",
+          "bytes": 522
+        },
+        {
+          "path": "info.json",
+          "source_path": "tests/fixtures/k2-imersite-held-public-flags/source/info.json",
+          "sha256": "D8B8DE4D62BFF1FD1C42093CD8C012837B8C03627B9512BAB7098B58AD3A01F4",
+          "bytes": 459
+        },
+        {
+          "path": "settings-updates.lua",
+          "source_path": "tests/fixtures/k2-imersite-held-public-flags/source/settings-updates.lua",
+          "sha256": "341486169A8D3C5154310CD69F0C0A2C2AA4F93E121362F2E4CA6B9A4309EA33",
+          "bytes": 95
+        }
+      ]
+    },
+    {
+      "stage": "fixed",
+      "version": "0.2.0",
+      "archive": "build/mir5/k2-imersite-held-public-flags-a9754abc-root-r01/mir-fixture-mir5-k2-imersite-held-public-flags_0.2.0.zip",
+      "sha256": "FB33961AB84A0A5CFACF682AF0E0A29AD58CF9EBB665F92AACA06EAADBF091B9",
+      "bytes": 6815,
+      "projection": "build/mir5/k2-imersite-held-public-flags-a9754abc-root-r01/fixed-projection",
+      "members": [
+        {
+          "path": "control.lua",
+          "source_path": "tests/fixtures/k2-imersite-held-public-flags/fixed/control.lua",
+          "sha256": "3DD3BB8B24CFA78D07CBDB91BC56361F6FE4401CB312DB4CFE741030FC3570CD",
+          "bytes": 93
+        },
+        {
+          "path": "data-final-fixes.lua",
+          "source_path": "tests/fixtures/k2-imersite-held-public-flags/fixed/data-final-fixes.lua",
+          "sha256": "3CD2498C95E6C1054CE4170C0761347330AE7D0B360913EC27335DA537844BB4",
+          "bytes": 96
+        },
+        {
+          "path": "fixture_control.lua",
+          "source_path": "tests/fixtures/k2-imersite-held-public-flags/fixture_control.lua",
+          "sha256": "25C458483B3187F4DBC7D56B17479D16E3D235B22E147B722105E1A00B427301",
+          "bytes": 12933
+        },
+        {
+          "path": "fixture_data_final.lua",
+          "source_path": "tests/fixtures/k2-imersite-held-public-flags/fixture_data_final.lua",
+          "sha256": "FDE49E15BC0145CA4082C12EAAA75395A4BC8E4F72A3CAC5035E0F91AAF9C250",
+          "bytes": 2395
+        },
+        {
+          "path": "fixture_settings.lua",
+          "source_path": "tests/fixtures/k2-imersite-held-public-flags/fixture_settings.lua",
+          "sha256": "CBAFAE81A740464F20AA9E2583185486B3B718DD23CB8521FFD460C19371AD41",
+          "bytes": 522
+        },
+        {
+          "path": "info.json",
+          "source_path": "tests/fixtures/k2-imersite-held-public-flags/fixed/info.json",
+          "sha256": "CE053407DAA290F562C6CECA62F35840A8E6A89BF221DDF3C774086320E77512",
+          "bytes": 458
+        },
+        {
+          "path": "settings-updates.lua",
+          "source_path": "tests/fixtures/k2-imersite-held-public-flags/fixed/settings-updates.lua",
+          "sha256": "EE359B2C5A6A804EBB45A7255D79EE25657E7C53EBA11B37DFE1F8E612533346",
+          "bytes": 94
+        }
+      ]
+    }
+  ],
+  "projection_contract": {
+    "member_count": 7,
+    "members": [
+      "info.json",
+      "control.lua",
+      "data-final-fixes.lua",
+      "settings-updates.lua",
+      "fixture_control.lua",
+      "fixture_data_final.lua",
+      "fixture_settings.lua"
+    ],
+    "description": "Each stage projection contains stage info.json and three stage wrappers plus the three shared fixture aliases; no README or alternate metadata is selected."
+  },
+  "archive_guard": {
+    "status": "both-seven-member-source-projections-pass-real-guard",
+    "command": "Assert-MIRLibraryFixtureArchive -Archive <selected archive> -SourceDirectory <seven-member raw-Git projection>",
+    "helpers": [
+      {
+        "path": "tools/lib/validation/ImmutableInputStaging.ps1",
+        "committed_sha256": "B5FBFAC8537B08F9790BD3EE8ACEAAB38EE5CBB8EF005E67E8375DE568BBC12C",
+        "executed_worktree_sha256": "B5FBFAC8537B08F9790BD3EE8ACEAAB38EE5CBB8EF005E67E8375DE568BBC12C"
+      },
+      {
+        "path": "tools/lib/compatibility/LibraryActivation.ps1",
+        "committed_sha256": "123A2241B895B57217AA969A677FF21BBFB268FE55E9734287883B4D6AE25099",
+        "executed_worktree_sha256": "123A2241B895B57217AA969A677FF21BBFB268FE55E9734287883B4D6AE25099"
+      }
+    ]
+  },
+  "host_control_limit": "The focused host double supplies expected post-MIR configuration state only to exercise fixture ordering. It neither invokes nor evidences an actual MIR configuration callback.",
+  "supersedes_prepared_input": "spec/evidence/k2-imersite-held-public-flags-inputs-3d1c6d16.json",
+  "limits": [
+    "Prepared correction only: native researched=false clears the technology to its initial level, so it precedes level seeding.",
+    "Original prepared receipts and native adverses remain unchanged. No new native or release qualification."
+  ]
+}

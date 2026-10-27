@@ -32,7 +32,7 @@
     "xy-k2so-enhancements-nulls-fork_0.8.3.zip": "930F43B96B04012FEF090C40D8B16A6B3F259D1713C86CF59DFF3E9A5A97E2BE",
     "mir-fixture-mir5-active-mods-observer_0.1.0.zip": "2E1BE5952D2A4CC5C74A0D149E075D247BA110A3FAE5B6768D3EAEBABCEF989C",
     "more-infinite-research_5.0.21000.zip": "59C14208B200CC534353CD46391210FE0B53E4C5739FFE8A3633B5D82DEE8C47",
-    "mir-fixture-mir5-k2-imersite-held-public-flags_0.2.0.zip": "0DA6D8B9FFEADE9DF6B5EE9B160490BAC7663EB3AE0E59CCEADA9A03E01F80C9"
+    "mir-fixture-mir5-k2-imersite-held-public-flags_0.2.0.zip": "FB33961AB84A0A5CFACF682AF0E0A29AD58CF9EBB665F92AACA06EAADBF091B9"
   },
-  "scope": "Exact 6786c95704fdd6b7a8fcee645c375f54ac8d03da/playerb6857d3774ffd792f82f5bb3ee38b312abedc7b4 F210 fixed successor input for the held-public-flags fixture. Current MIR archive 59C14208B200CC534353CD46391210FE0B53E4C5739FFE8A3633B5D82DEE8C47 is 679575 bytes. The seven-member raw-Git fixture projection is 0DA6D8B9FFEADE9DF6B5EE9B160490BAC7663EB3AE0E59CCEADA9A03E01F80C9 (6819 bytes). Source save and native execution remain pending; this profile is prepared but not a native result."
+  "scope": "Exact 6786c95704fdd6b7a8fcee645c375f54ac8d03da/playerb6857d3774ffd792f82f5bb3ee38b312abedc7b4 F210 fixed successor input for the held-public-flags fixture. Current MIR archive 59C14208B200CC534353CD46391210FE0B53E4C5739FFE8A3633B5D82DEE8C47 is 679575 bytes. Active seven-member owned fixture from immutable raw Git a9754abcd7405e1ddffa9f4dc8051b71d00855fe: FB33961AB84A0A5CFACF682AF0E0A29AD58CF9EBB665F92AACA06EAADBF091B9 (6815 bytes). Prepared input only: source save, successor and two read-only reloads remain required. Original3d1c prepared containers remain preserved. This profile is prepared but not a native result."
 }
