@@ -1,0 +1,89 @@
+{
+  "schema": 1,
+  "kind": "MIRPlanetDiscoveryApiPreparedInputsV1",
+  "status": "prepared-owned-fixture-and-profile-not-native-qualified",
+  "source": {
+    "commit": "c21cc5edea8480ef3a7e482cec13d30cf2e70c47",
+    "fixture_path": "tests/fixtures/planet-discovery-api",
+    "fixture_tree": "73cdd29368611d068f151eb6c9d92c2a6b104a1c"
+  },
+  "packager": {
+    "path": "tools/package.py",
+    "git_blob": "02ed2ddf44fb18fb39ba2e3ae1cb18ce5d4e068f",
+    "sha256": "32BDBE5E0D8B776A57BC8DF63DD536DD81AEDF54141AC6EC6B1BEF4044C90674",
+    "runtime": {
+      "implementation": "cpython",
+      "version": [
+        3,
+        14,
+        7
+      ],
+      "zlib_build_version": "1.3.1.zlib-ng",
+      "zlib_runtime_version": "1.3.1.zlib-ng"
+    }
+  },
+  "fixture": {
+    "name": "mir-fixture-planet-discovery-api",
+    "version": "0.1.0",
+    "factorio_version": "2.1",
+    "archive": {
+      "name": "mir-fixture-planet-discovery-api_0.1.0.zip",
+      "bytes": 1909,
+      "sha256": "509D8101BA47EE6047B588093AB2B0A18D03BB13EE79EA2D42E23112AFF188C4"
+    },
+    "members": [
+      {
+        "path": "control.lua",
+        "sha256": "4bee479ea607a10426ed619f0271618776f3b696ce5787854e74d8c40cc0febb",
+        "bytes": 4005,
+        "source_path": "tests/fixtures/planet-discovery-api/control.lua",
+        "git_blob": "221f03387ef680d6fcbeb425bb4dc40a354b843d"
+      },
+      {
+        "path": "info.json",
+        "sha256": "70f763178e6fd8fcaea06fe77a36b0e4eda3e47ba5134e99d4f9d6de00fb71ce",
+        "bytes": 414,
+        "source_path": "tests/fixtures/planet-discovery-api/info.json",
+        "git_blob": "deb1c03301d2508d313d743cf8c0e1441c2504c4"
+      }
+    ]
+  },
+  "profile": {
+    "path": "tests/profiles/planet-discovery-api-standalone-f210-2123.json",
+    "sha256": "E8290046888ACE4413636CB4B8B6E890186996B6A036DEAAA026A954461AA320",
+    "git_blob": "e1eb3d58a96f1b49b6304727bb785debe391f955"
+  },
+  "custody": {
+    "root": "build/qualification/planet-discovery-api-prepared-r01",
+    "source_projection": "build/qualification/planet-discovery-api-prepared-r01/source",
+    "archives": "build/qualification/planet-discovery-api-prepared-r01/archives"
+  },
+  "runner": {
+    "path": "tools/Invoke-NativeFixture.ps1",
+    "case": "planet-discovery-api-f210-2123",
+    "consumer_markers": [
+      "MIR_PLANET_DISCOVERY_API"
+    ],
+    "switches": [
+      "CreateOnly",
+      "MIRAbsent"
+    ],
+    "expected_peak_memory_mib": 4096,
+    "timeout_seconds": 180,
+    "budget_scope": "Conservative admission ceiling, not measured usage or a scored performance sample.",
+    "native_owner_inputs": [
+      "ArchiveLibrary direct archive library",
+      "FactorioBin matching the selected engine hash",
+      "fresh OutputRoot under build/tmp"
+    ],
+    "admission": "Black Glass sole native lane; this is the existing pending API witness, not a second parallel assignment."
+  },
+  "native_result": null,
+  "limits": [
+    "No Factorio process was launched on Aero and no direct library was changed.",
+    "The two-file SourceDirectory is a raw-Git projection, not the canonical directory containing README.md.",
+    "The owner must provision the selected owned ZIP in the existing direct library before Invoke-NativeFixture, verify its hash and retain/restore prior controls through the existing guarded workflow.",
+    "If the earlier read-only console probe already supplies trusted exact-engine evidence, adopt it instead of running a duplicate observation.",
+    "The fixture observes query return types and values without assuming initial unlock flags; actual historical source/candidate/save/two-reload recovery remains separate."
+  ]
+}
