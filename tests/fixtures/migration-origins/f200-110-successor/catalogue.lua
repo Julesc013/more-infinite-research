@@ -6,7 +6,7 @@ end
 
 return {
   storage_key = "mir5_migration_origin_f200_110_source",
-  fixture = "mir-fixture-mir5-migration-origin-f200-110-successor",
+  fixture = "mir-fixture-mir5-migration-origin-f200-110-source",
   direct = "recipe-prod-research_gears-1",
   gear_recipe = "iron-gear-wheel",
   robot_battery = "recipe-prod-research_robot_battery-1",
