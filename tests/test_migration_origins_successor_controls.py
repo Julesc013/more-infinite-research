@@ -9,6 +9,7 @@ import unittest
 
 ROOT = Path(__file__).resolve().parents[1]
 FIXTURE = ROOT / "tests/fixtures/migration-origins/f200-100-successor"
+EARLY_OBSERVER = ROOT / "tests/fixtures/migration-origins/f200-100-early-entry-observer"
 F200_PROFILE = ROOT / "tests/profiles/migration-origins-1.0.0-successor-f200-2077.json"
 F210_PROFILE = ROOT / "tests/profiles/migration-origins-1.0.0-successor-f210-2123.json"
 NAME = "mir-fixture-mir5-migration-origin-f200-100-source"
@@ -127,6 +128,51 @@ class MigrationOriginSuccessorControls(unittest.TestCase):
         self.assertIsNotNone(result["callbacks"]["load"])
         self.assertEqual(2, len(result["callbacks"]["events"]))
         self.assertEqual({}, result["forbidden"])
+
+    def test_early_entry_observer_is_base_only_read_only_and_records_all_three_forces(self):
+        info = json.loads((EARLY_OBSERVER / "info.json").read_text(encoding="utf-8"))
+        self.assertEqual(
+            ("mir-fixture-mir5-migration-origin-f200-100-early-entry-observer", "0.1.0", "2.0"),
+            (info["name"], info["version"], info["factorio_version"]))
+        self.assertEqual(["base = 2.0.77"], info["dependencies"])
+        self.assertLess(info["name"], "more-infinite-research")
+
+        path = (EARLY_OBSERVER / "control.lua").as_posix()
+        self.lua.globals().early_entry_observer_path = path
+        self.lua.execute(r'''
+          function migration_early_entry_observer_run()
+            local callbacks,logs={},{ }
+            local player={valid=true,manual_mining_speed_modifier=.125}
+            local foreign={valid=true,manual_mining_speed_modifier=.125}
+            local detached={valid=true,manual_mining_speed_modifier=.125}
+            local env={
+              game={forces={player=player,
+                ["mir5-migration-origin-f200-100-foreign"]=foreign,
+                ["mir5-migration-origin-f200-100-detached"]=detached}},
+              script={on_init=function(fn) callbacks.init=fn end,
+                on_configuration_changed=function(fn) callbacks.configuration=fn end},
+              log=function(message) logs[#logs+1]=message end}
+            env._G=env;setmetatable(env,{__index=function(_,key)
+              if key=="storage" then error("early observer must not access storage") end
+              return _G[key]
+            end})
+            local ok,message=pcall(function()
+              assert(loadfile(early_entry_observer_path,"t",env))()
+              callbacks.init();callbacks.configuration({})
+            end)
+            return {ok=ok,message=tostring(message),logs=logs,
+              values={player=player.manual_mining_speed_modifier,
+                foreign=foreign.manual_mining_speed_modifier,
+                detached=detached.manual_mining_speed_modifier}}
+          end
+        ''')
+        result = py(self.lua.eval("migration_early_entry_observer_run")())
+        self.assertTrue(result["ok"], result["message"])
+        self.assertEqual({"player": .125, "foreign": .125, "detached": .125}, result["values"])
+        self.assertEqual(
+            ['[MIR5_MIGRATION_ORIGIN_EARLY_OFFSET] {"event":"init","player":0.125,"foreign":0.125,"detached":0.125}',
+             '[MIR5_MIGRATION_ORIGIN_EARLY_OFFSET] {"event":"configuration-changed","player":0.125,"foreign":0.125,"detached":0.125}'],
+            result["logs"])
 
     def test_successor_settings_stage_supplies_only_the_explicit_false_startup_input(self):
         path = (FIXTURE / "settings-updates.lua").as_posix()

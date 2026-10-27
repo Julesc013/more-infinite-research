@@ -1,0 +1,11 @@
+{
+  "name": "mir-fixture-mir5-migration-origin-f200-100-early-entry-observer",
+  "version": "0.1.0",
+  "title": "MIR 1.0.0 migration early-entry offset observer",
+  "author": "MIR maintainers",
+  "description": "Private read-only lifecycle observer for the MIR 1.0.0 F200 migration-origin diagnostic.",
+  "factorio_version": "2.0",
+  "dependencies": [
+    "base = 2.0.77"
+  ]
+}
