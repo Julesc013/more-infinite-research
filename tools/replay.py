@@ -202,6 +202,10 @@ def _read_capture(location: Path, expected_mir: bool, mir_custody: Path | None =
             selected_record = {**selected_record, "path": str(mir_custody.resolve())}
         verified_external.append(_external_record(selected_record, f"selected archive {index}"))
     selected = _normalise_selection(selected_records, "selected archives", without_mir=True)
+    # This receipt identifies selected archive bytes, not native load order.
+    # Adding MIR can reorder its entries; generated/loaded sequences below
+    # remain independently exact and every external archive is still hashed.
+    selected.sort(key=lambda row: (row["name"], row["version"], _json_bytes(row)))
     loaded = result.get("loaded_selection")
     # Early governed one-mod captures recorded the one loaded identity as a
     # scalar.  Preserve that exact receipt input while comparing it as the

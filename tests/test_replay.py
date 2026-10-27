@@ -163,6 +163,54 @@ def _capture(root: Path, raw: dict, settings: dict, *, published: bool, base_ver
 
 
 class ReplayTests(unittest.TestCase):
+    def test_archive_receipt_order_is_independent_but_identities_and_native_order_are_exact(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            no_mir, published = self._pair(root)
+            provider = root / "external/provider.zip"
+            provider.write_bytes(b"independent upstream provider")
+            extra = {"name": "provider", "version": "1.0.0", "builtin": False,
+                     "path": str(provider), "sha256": _sha(provider)}
+            for capture in (no_mir, published):
+                result_path = capture / "result.json"
+                result = json.loads(result_path.read_text(encoding="utf-8"))
+                result["selected_archives"].insert(0 if capture == published else 1, dict(extra))
+                mods = result["generated_selection"]["mods"]
+                mods.append({"name": "provider", "version": "1.0.0", "enabled": True})
+                selection = capture / "selection.json"
+                _write_json(selection, {"mods": mods})
+                result["generated_selection"] = {**_file_record(capture, selection), "mods": mods}
+                result["loaded_selection"].append("provider@1.0.0")
+                _write_json(result_path, result)
+            receipt = replay.build_replay(no_mir, published, root / "reordered-equal")
+            self.assertEqual(receipt["comparison"]["data_patches"], 2)
+
+            result_path = published / "result.json"
+            original = json.loads(result_path.read_text(encoding="utf-8"))
+            other = root / "external/other-provider.zip"
+            other.write_bytes(b"different upstream provider")
+            changed = deepcopy(original)
+            changed["selected_archives"][0].update(path=str(other), sha256=_sha(other))
+            _write_json(result_path, changed)
+            with self.assertRaisesRegex(replay.ReplayError, "selected upstream archive identities differ"):
+                replay.build_replay(no_mir, published, root / "changed-identity")
+
+            changed = deepcopy(original)
+            changed["loaded_selection"].reverse()
+            _write_json(result_path, changed)
+            with self.assertRaisesRegex(replay.ReplayError, "loaded upstream selections differ"):
+                replay.build_replay(no_mir, published, root / "changed-load-order")
+
+            changed = deepcopy(original)
+            changed["generated_selection"]["mods"].reverse()
+            selection = published / "selection.json"
+            _write_json(selection, {"mods": changed["generated_selection"]["mods"]})
+            changed["generated_selection"] = {**_file_record(published, selection),
+                                               "mods": changed["generated_selection"]["mods"]}
+            _write_json(result_path, changed)
+            with self.assertRaisesRegex(replay.ReplayError, "generated upstream selections differ"):
+                replay.build_replay(no_mir, published, root / "changed-generated-order")
+
     def _pair(self, directory: Path, *, base_version: str = "2.1.23") -> tuple[Path, Path]:
         no_mir = _capture(directory / "no-mir", _base_raw(), _base_settings(), published=False, base_version=base_version)
         published = _capture(directory / "published", _published_raw(), _published_settings(), published=True, base_version=base_version)
