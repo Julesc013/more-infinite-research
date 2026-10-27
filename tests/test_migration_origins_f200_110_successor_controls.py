@@ -88,6 +88,7 @@ class MigrationOriginF200110SuccessorControls(unittest.TestCase):
         rows = catalogue["rows"]
         self.assertEqual(SOURCE_ROWS, set(rows))
         self.assertEqual(31, len(rows))
+        self.assertEqual("mir-fixture-mir5-migration-origin-f200-110-source", catalogue["fixture"])
         self.assertEqual(("change-recipe-productivity", "iron-gear-wheel", .10),
                          (rows[DIRECT][0]["type"], rows[DIRECT][0]["recipe"], rows[DIRECT][0]["change"]))
         self.assertEqual(("worker-robot-battery", .10), (rows[ROBOT][0]["type"], rows[ROBOT][0]["modifier"]))
@@ -95,6 +96,20 @@ class MigrationOriginF200110SuccessorControls(unittest.TestCase):
         self.assertEqual(42, len(catalogue["settings"]))
         self.assertTrue(catalogue["settings"]["ips-enable-research_breeding"])
         self.assertFalse(catalogue["settings"]["ips-enable-research_inventory_capacity"])
+
+    def test_successor_wrappers_retain_the_source_fixture_identity_and_only_change_the_targeted_wrapper_version(self):
+        f200 = json.loads((FIXTURE / "info-f200.json").read_text(encoding="utf-8"))
+        f210 = json.loads((FIXTURE / "info-f210.json").read_text(encoding="utf-8"))
+        for wrapper, base, mir, version in (
+            (f200, "2.0", "5.0.20000", "0.2.0"),
+            (f210, "2.1", "5.0.21000", "0.3.0"),
+        ):
+            with self.subTest(version=version):
+                self.assertEqual("mir-fixture-mir5-migration-origin-f200-110-source", wrapper["name"])
+                self.assertEqual(version, wrapper["version"])
+                self.assertEqual(base, wrapper["factorio_version"])
+                self.assertIn(f"more-infinite-research = {mir}", wrapper["dependencies"])
+                self.assertNotIn("mir-fixture-mir5-migration-origin-f200-110-successor", wrapper["name"])
 
     def test_data_guard_admits_only_the_two_exact_candidate_targets_and_accelerates_only_direct_cost(self):
         f200 = {"base": "2.0.77", "more-infinite-research": "5.0.20000",
