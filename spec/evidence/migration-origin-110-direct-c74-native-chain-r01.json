@@ -178,7 +178,7 @@
       {
         "id": "f210-r14-r02",
         "result_sha256": "0EADF337345DF9A75731483FE8359FF2A53D7743D8F64649AB538A98FD130763",
-        "disposition": "Failed before a successor laboratory or save because fresh Defaults did not supply published ips-require-space-gate=true. The original source default remains true; this is the input boundary corrected by the explicit two-value source-default arm."
+        "disposition": "Failed before a successor laboratory or save with the ips-require-space-gate key. The failed native marker did not log the actual operand. Independent source/default comparison establishes published true versus current false; that comparison supports the input diagnosis corrected by the explicit two-value source-default arm."
       }
     ],
     "zero_native_profile_fixture_pin_refusal": {
@@ -216,5 +216,5 @@
     "performance": false,
     "release_qualification": false
   },
-  "limitations": "This chain covers only the exact published MIR1.1.0 F200 source, the protected88FC source save, the c74 Base F200/F210 candidate archives, their two exact engine families, and the two explicitly staged source defaults. It does not qualify arbitrary persisted settings files, Space Age, module-disabled or cap closures, modules-disabled, another current candidate, a release, or every historical origin."
+  "limitations": "This chain covers only the exact published MIR1.1.0 F200 source, the protected88FC source save, the c74 Base F200/F210 candidate archives, their two exact engine families, and the two explicitly staged source defaults. It does not qualify arbitrary persisted settings files, Space Age, modules-disabled or cap closures, another current candidate, a release, or every historical origin."
 }
