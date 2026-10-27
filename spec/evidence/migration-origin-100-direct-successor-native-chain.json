@@ -126,11 +126,12 @@
   },
   "receipts": {
     "path": "spec/evidence/migration-origin-100-direct-successor-native-receipts-r01.json.gz",
-    "sha256": "BE465DC46BDA90D21D518D2D42E43AF7C377DB8940EE5BBA97CEBCE3614A9B59",
-    "bytes": 3292,
-    "safe_records": 8,
-    "roundtrip_verified": true,
-    "exclusions": "The compact capsule has five native adverses, two native passes, and one labelled derived marker record. It excludes save binaries, player/configuration data, raw preflight snapshots, full logs, and library-control payloads."
+    "sha256": "E97869D16F6D3D4A6DA7710FCC425CBB33484D188694576C174647D816AD5785",
+    "bytes": 22830,
+    "original_native_result_receipts": 7,
+    "derived_marker_records": 1,
+    "strict_utf8_decode_roundtrip_verified": true,
+    "exclusions": "The compact capsule embeds the exact UTF-8 bytes, original length, and SHA256 for five native adverse result.json receipts and two passed result.json receipts, plus one labelled derived marker record. It excludes save binaries, player/configuration data, raw preflight snapshots, full logs, and library-control payloads."
   },
   "claims": {
     "same_immutable_original_source_save_consumed_by_both_successors": true,
