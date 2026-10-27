@@ -446,7 +446,7 @@ class MigrationOriginSuccessorControls(unittest.TestCase):
                 self.assertEqual("completed", rejected["state"]["phase"])
                 self.assertNotIn("f210", rejected["state"].get("successors", {}))
 
-        # A real engine reset is permitted only after all immutable source
+        # The modelled reset-to-zero condition is handled only after source
         # rows/effects/recipes/queues have been preflighted.  Every failure
         # below must leave all three reset fields at zero and avoid fixture
         # storage or lab creation.
