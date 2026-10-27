@@ -146,8 +146,14 @@ local function assert_completed(state)
   assert_foreign(game.forces[state.foreign_force_index], state.foreign_queue)
   local _, inventory = read_lab(state)
   for _, name in ipairs(SCIENCE) do
-    if inventory.get_item_count(name) ~= state.destination_science_before[name] - 1 then
-      fail("successor real lab consumption differs for " .. name)
+    local actual, before = inventory.get_item_count(name), state.destination_science_before[name]
+    if actual ~= before - 1 then
+      local force = game.forces.player
+      fail("successor real lab consumption differs for " .. name .. " expected=" .. tostring(before - 1)
+        .. " actual=" .. tostring(actual) .. " before=" .. tostring(before)
+        .. " labs=" .. tostring(state.destination_lab_completions) .. " level=" .. tostring(status(force).level)
+        .. " current=" .. tostring(force.current_research and force.current_research.name)
+        .. " progress=" .. tostring(force.research_progress))
     end
   end
 end
