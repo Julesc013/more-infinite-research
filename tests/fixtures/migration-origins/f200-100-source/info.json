@@ -1,0 +1,12 @@
+{
+  "name": "mir-fixture-mir5-migration-origin-f200-100-source",
+  "version": "0.1.0",
+  "title": "MIR 1.0.0 F200 migration-origin source",
+  "author": "MIR maintainers",
+  "description": "Disposable exact MIR 1.0.0 F200 source-save fixture; not player content.",
+  "factorio_version": "2.0",
+  "dependencies": [
+    "base = 2.0.77",
+    "more-infinite-research = 1.0.0"
+  ]
+}

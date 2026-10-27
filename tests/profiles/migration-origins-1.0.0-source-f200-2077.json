@@ -1,0 +1,34 @@
+{
+  "schema": 1,
+  "kind": "mir5-migration-origin-published-source",
+  "origin_tag": "1.0.0",
+  "origin_source_commit": "f0057a96847512b50acdd6e23fc21b5b41e75adb",
+  "target": "f200",
+  "factorio_line": "2.0",
+  "engine": {
+    "version": "2.0.77",
+    "sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B"
+  },
+  "settings_mode": "Defaults",
+  "mods": [
+    {
+      "name": "base",
+      "version": "2.0.77",
+      "enabled": true
+    },
+    {
+      "name": "more-infinite-research",
+      "version": "1.0.0",
+      "enabled": true
+    },
+    {
+      "name": "mir-fixture-mir5-migration-origin-f200-100-source",
+      "version": "0.1.0",
+      "enabled": true
+    }
+  ],
+  "archive_sha256": {
+    "more-infinite-research_1.0.0.zip": "C328D8F958BEC2A44297E94E83B1A956D76BEA5E333601A42FDDE60F4155472F"
+  },
+  "scope": "Exact official MIR 1.0.0 F200 source preparation. It earns one selected original MIR technology and preserves the source save for a separately reviewed successor. This profile is not a migration or current-package pass."
+}
