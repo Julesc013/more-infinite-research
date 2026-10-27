@@ -1,0 +1,23 @@
+{
+  "schema": 1,
+  "kind": "mir5-full-catalogue-upgrade",
+  "target": "f210",
+  "factorio_line": "2.1",
+  "engine": {"version": "2.1.23", "sha256": "FE4A1DA30F322A0D0B8AEB3DF7276332222BAAA143E2352569B723E84B2B9060"},
+  "settings_mode": "Defaults",
+  "mods": [
+    {"name": "base", "version": "2.1.23", "enabled": true},
+    {"name": "elevated-rails", "version": "2.1.23", "enabled": true},
+    {"name": "quality", "version": "2.1.23", "enabled": true},
+    {"name": "recycler", "version": "2.1.23", "enabled": true},
+    {"name": "space-age", "version": "2.1.23", "enabled": true},
+    {"name": "mir-fixture-mir5-active-mods-observer", "version": "0.1.0", "enabled": true},
+    {"name": "more-infinite-research", "version": "5.0.21000", "enabled": true},
+    {"name": "mir-fixture-mir5-full-catalogue-upgrade", "version": "0.2.0", "enabled": true}
+  ],
+  "archive_sha256": {
+    "mir-fixture-mir5-active-mods-observer_0.1.0.zip": "A15A7D628D66953D2E0C4D4FA288F47CBF9C5678327C7EB3D23ADB5DC78331C0",
+    "more-infinite-research_5.0.21000.zip": "8F858F6B7E604757DE84D960E7D7701021B956782C65A13978E3AFD711F7B071"
+  },
+  "scope": "Prepared-only F210 all-official Space Age MIR5 successor for the exact published 4.7.3 source save. It preserves every seeded state row and the five source-read native owners, completes one successor gear lab, and requires two cold reloads. Native execution remains required."
+}

@@ -1,0 +1,23 @@
+{
+  "schema": 1,
+  "kind": "mir5-full-catalogue-upgrade",
+  "target": "f210",
+  "factorio_line": "2.1",
+  "engine": {"version": "2.1.23", "sha256": "FE4A1DA30F322A0D0B8AEB3DF7276332222BAAA143E2352569B723E84B2B9060"},
+  "settings_mode": "Defaults",
+  "mods": [
+    {"name": "base", "version": "2.1.23", "enabled": true},
+    {"name": "elevated-rails", "version": "2.1.23", "enabled": true},
+    {"name": "quality", "version": "2.1.23", "enabled": true},
+    {"name": "recycler", "version": "2.1.23", "enabled": true},
+    {"name": "space-age", "version": "2.1.23", "enabled": true},
+    {"name": "mir-fixture-mir5-active-mods-observer", "version": "0.1.0", "enabled": true},
+    {"name": "more-infinite-research", "version": "4.7.21003", "enabled": true},
+    {"name": "mir-fixture-mir5-full-catalogue-upgrade", "version": "0.1.0", "enabled": true}
+  ],
+  "archive_sha256": {
+    "mir-fixture-mir5-active-mods-observer_0.1.0.zip": "A15A7D628D66953D2E0C4D4FA288F47CBF9C5678327C7EB3D23ADB5DC78331C0",
+    "more-infinite-research_4.7.21003.zip": "B6EB9430056ABD384DB00F94929FE7DAC0A37441ACF4BC277946689682628852"
+  },
+  "scope": "Prepared-only F210 all-official Space Age published 4.7.3 source stage: independent complete-catalogue state seed including five named published native owners, one real gear lab, 42% queue, detached 27% paused progress, source save, and two cold reloads. Native execution remains required."
+}
