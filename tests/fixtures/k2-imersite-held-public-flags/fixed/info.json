@@ -1,0 +1,9 @@
+{
+  "name": "mir-fixture-mir5-k2-imersite-held-public-flags",
+  "version": "0.2.0",
+  "title": "MIR K2SO held Imersite public-flag successor fixture",
+  "author": "MIR maintainers",
+  "description": "Disposable F210 K2SO public-flag handoff observer; no laboratory claim.",
+  "factorio_version": "2.1",
+  "dependencies": ["base >= 2.1.23", "space-age = 2.1.23", "Krastorio2 = 2.1.4", "Krastorio2-spaced-out = 2.0.19", "more-infinite-research = 5.0.21000"]
+}
