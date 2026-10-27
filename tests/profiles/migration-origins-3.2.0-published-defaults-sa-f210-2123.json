@@ -1,0 +1,50 @@
+{
+  "schema": 1,
+  "kind": "mir5-migration-origin-published-default-prototype-capture-selection",
+  "origin_tag": "3.2.0",
+  "origin_source_commit": "c8f3d8248cc89b8636cf1ee485fd8889422c6124",
+  "target": "f210",
+  "factorio_line": "2.1",
+  "engine": {
+    "version": "2.1.23",
+    "sha256": "8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38"
+  },
+  "settings_mode": "Defaults",
+  "mods": [
+    {
+      "name": "base",
+      "version": "2.1.23",
+      "enabled": true
+    },
+    {
+      "name": "elevated-rails",
+      "version": "2.1.23",
+      "enabled": true
+    },
+    {
+      "name": "quality",
+      "version": "2.1.23",
+      "enabled": true
+    },
+    {
+      "name": "recycler",
+      "version": "2.1.23",
+      "enabled": true
+    },
+    {
+      "name": "space-age",
+      "version": "2.1.23",
+      "enabled": true
+    },
+    {
+      "name": "mir-fixture-mir5-active-mods-observer",
+      "version": "0.1.0",
+      "enabled": true
+    }
+  ],
+  "archive_sha256": {
+    "more-infinite-research_3.2.0.zip": "35372EE6D16DA6765E8C30AEAAF5DA4A5D300F02C0A0A03648C80893A5394F32",
+    "mir-fixture-mir5-active-mods-observer_0.1.0.zip": "A15A7D628D66953D2E0C4D4FA288F47CBF9C5678327C7EB3D23ADB5DC78331C0"
+  },
+  "scope": "Exact published MIR 3.2.0 F210 Space Age Defaults data/settings observation. Invoke-PrototypeCapture adds the separately hash-bound published MIR archive, so the actual native selection is the exact five Factorio 2.1.23 official Space Age modules, MIR 3.2.0, and the active-mods observer. This profile creates no map, save, gameplay, migration, performance or release qualification."
+}
