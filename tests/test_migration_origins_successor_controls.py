@@ -186,6 +186,10 @@ class MigrationOriginSuccessorControls(unittest.TestCase):
               if effect_case=="ordered" then return {source_record("iron-gear-wheel",.1),source_record("advanced-circuit",.1)} end
               if effect_case=="four-values" then return {source_record("iron-gear-wheel",.1),source_record("advanced-circuit",.05),
                 source_record("processing-unit",.02),source_record("low-density-structure",.01)} end
+              if effect_case=="ten-records" then return {source_record("iron-gear-wheel",.1),source_record("advanced-circuit",.05),
+                source_record("processing-unit",.02),source_record("low-density-structure",.01),source_record("electric-engine-unit",.1),
+                source_record("rocket-control-unit",.05),source_record("speed-module",.02),source_record("productivity-module",.01),
+                source_record("utility-science-pack",.1),source_record("space-science-pack",.05)} end
               if effect_case=="missing-duplicate" then return {source_record("iron-gear-wheel",.1),source_record("iron-gear-wheel",.1)} end
               return {source_record("iron-gear-wheel",.1)}
             end
@@ -193,6 +197,9 @@ class MigrationOriginSuccessorControls(unittest.TestCase):
               if effect_case=="ordered" then return {effect("advanced-circuit",.1),effect("iron-gear-wheel",.1,false,false)} end
               if effect_case=="four-values" then return {effect("low-density-structure",.01,false,false),effect("processing-unit",.02),
                 effect("advanced-circuit",.05,false,false),effect("iron-gear-wheel",.1)} end
+              if effect_case=="ten-records" then return {effect("space-science-pack",.05),effect("utility-science-pack",.1,false,false),
+                effect("productivity-module",.01),effect("speed-module",.02),effect("rocket-control-unit",.05),effect("electric-engine-unit",.1),
+                effect("low-density-structure",.01),effect("processing-unit",.02),effect("advanced-circuit",.05,false,false),effect("iron-gear-wheel",.1)} end
               if effect_case=="wrong-recipe" then return {effect("steel-plate",.1)} end
               if effect_case=="wrong-type" then return {effect("iron-gear-wheel",.1,"unlock-recipe")} end
               if effect_case=="wrong-change" then return {effect("iron-gear-wheel",.05)} end
@@ -226,8 +233,13 @@ class MigrationOriginSuccessorControls(unittest.TestCase):
             detached.technologies[direct_name].saved_progress=.27
             if mutate then player.technologies[alternate_name].level=3 end
             local function effects(records)
-              local rows={}
-              for index,row in ipairs(records) do rows[#rows+1]="n:"..index.."={s:change=n:"..row.change..",s:recipe=s:"..row.recipe..",s:type=s:"..row.kind.."}" end
+              local indexed,rows={},{}
+              for index,row in ipairs(records) do indexed[#indexed+1]={index=index,row=row} end
+              table.sort(indexed,function(left,right) return tostring(left.index)<tostring(right.index) end)
+              for _,value in ipairs(indexed) do
+                local row=value.row
+                rows[#rows+1]="n:"..value.index.."={s:change=n:"..row.change..",s:recipe=s:"..row.recipe..",s:type=s:"..row.kind.."}"
+              end
               return "{"..table.concat(rows,",").."}"
             end
             local function snapshot(direct_saved)
@@ -242,6 +254,7 @@ class MigrationOriginSuccessorControls(unittest.TestCase):
               player_snapshot=expected,foreign_index=2,foreign_snapshot=foreign_expected,
               foreign_queue={current=direct_name,queue={direct_name,alternate_name},progress=.42},
               detached_index=3,detached_snapshot=detached_expected}
+            local initial_source_effect_signature=state.player_snapshot.effects[direct_name]
             local inventory={items={}}
             function inventory.clear() inventory.items={} end
             function inventory.insert(row) inventory.items[row.name]=(inventory.items[row.name] or 0)+row.count;return row.count end
@@ -305,7 +318,8 @@ class MigrationOriginSuccessorControls(unittest.TestCase):
             return {ok=ok,message=tostring(message),state=state,gear=player.technologies[direct_name].level,
               bonus=player.recipes["iron-gear-wheel"].productivity_bonus,saved=env.saved,logs=env.logs,
               reload_read_only=env.reload_read_only,add_calls=player.add_calls,
-              source_effect_signature=state.player_snapshot.effects[direct_name]}
+              source_effect_signature=state.player_snapshot.effects[direct_name],
+              initial_source_effect_signature=initial_source_effect_signature}
           end
         ''')
         for target in ("f200", "f210"):
@@ -334,6 +348,11 @@ class MigrationOriginSuccessorControls(unittest.TestCase):
         self.assertIn("0.05000000074505806", all_changes["source_effect_signature"])
         self.assertIn("0.019999999552965164", all_changes["source_effect_signature"])
         self.assertIn("0.0099999997764825821", all_changes["source_effect_signature"])
+        ten_records = py(self.lua.eval("migration_successor_run_control")("f210", False, False, "ten-records"))
+        self.assertTrue(ten_records["ok"], ten_records["message"])
+        self.assertIn("n:1=", ten_records["source_effect_signature"])
+        self.assertLess(ten_records["source_effect_signature"].index("n:10="),
+                        ten_records["source_effect_signature"].index("n:2="))
 
         for effect_case in ("wrong-recipe", "wrong-type", "wrong-change", "hidden-true", "duplicate", "missing-duplicate"):
             with self.subTest(effect_case=effect_case):
@@ -342,12 +361,8 @@ class MigrationOriginSuccessorControls(unittest.TestCase):
                 self.assertIn("effect", rejected["message"])
                 # Failure must neither rewrite the saved source signature nor
                 # create a candidate lab/continuation record.
-                source_rows = 2 if effect_case == "missing-duplicate" else 1
-                expected_signature = "{" + ",".join(
-                    f"n:{index}={{s:change=n:0.10000000149011612,s:recipe=s:iron-gear-wheel,"
-                    "s:type=s:change-recipe-productivity}}"
-                    for index in range(1, source_rows + 1)) + "}"
-                self.assertEqual(expected_signature, rejected["source_effect_signature"])
+                self.assertEqual(rejected["initial_source_effect_signature"],
+                                 rejected["source_effect_signature"])
                 self.assertEqual("completed", rejected["state"]["phase"])
                 self.assertNotIn("f210", rejected["state"].get("successors", {}))
 

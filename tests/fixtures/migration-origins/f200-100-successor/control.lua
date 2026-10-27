@@ -52,17 +52,18 @@ local function canonical_saved_effects(raw, label)
   if type(raw) ~= "string" or raw:sub(1, 1) ~= "{" or raw:sub(-1) ~= "}" then
     fail(label .. " source effect signature is malformed")
   end
-  local body, offset, ordinal, rows, indexed_rows = raw:sub(2, -2), 1, 1, {}, {}
+  local body, offset, rows, indexed_rows, indexes = raw:sub(2, -2), 1, {}, {}, {}
   while offset <= #body do
     local start_at, end_at, index, record = body:find("n:(%d+)=(%b{})", offset)
-    if start_at ~= offset or tonumber(index) ~= ordinal then
+    local numeric_index = tonumber(index)
+    if start_at ~= offset or numeric_index == nil or numeric_index < 1 or indexes[numeric_index] == true then
       fail(label .. " source effect signature is not a lossless indexed vector")
     end
     local change, recipe = record:match("^%{s:change=n:([^,{}]+),s:recipe=s:([^,{}]+),s:type=s:change%-recipe%-productivity%}$")
     if change == nil or recipe == nil or source_effect_changes[change] ~= true then
       fail(label .. " source effect record is not a published MIR1 productivity change")
     end
-    rows[#rows + 1], indexed_rows[#indexed_rows + 1], ordinal = record, "n:" .. index .. "=" .. record, ordinal + 1
+    rows[#rows + 1], indexed_rows[#indexed_rows + 1], indexes[numeric_index] = record, "n:" .. index .. "=" .. record, true
     offset = end_at + 1
     if offset <= #body then
       if body:sub(offset, offset) ~= "," then fail(label .. " source effect signature separator differs") end
@@ -70,6 +71,9 @@ local function canonical_saved_effects(raw, label)
     end
   end
   if #rows == 0 then fail(label .. " source effect signature is empty") end
+  for index = 1, #rows do
+    if indexes[index] ~= true then fail(label .. " source effect signature indexes are not contiguous") end
+  end
   if "{" .. table.concat(indexed_rows, ",") .. "}" ~= raw then
     fail(label .. " source effect signature did not round-trip losslessly")
   end
