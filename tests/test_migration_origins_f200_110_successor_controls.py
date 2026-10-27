@@ -454,6 +454,14 @@ class MigrationOriginF200110SuccessorControls(unittest.TestCase):
             local module_runtime=env.require("runtime.legacy_module_credits")
             assert(module_runtime.on_configuration_changed({mod_changes={
               ["more-infinite-research"]={old_version="1.1.0",new_version=env.script.active_mods["more-infinite-research"]}}})==true)
+            local marker_counts={}
+            local function marker_count()
+              local count=0
+              for _,value in ipairs(env.logs) do
+                if value:sub(1,29)=="[MIR5_NATIVE_FIXTURE] RESULT " then count=count+1 end
+              end
+              return count
+            end
             local ok,message=pcall(function()
               assert(loadfile(successor_control_path,"t",env))()
               callbacks.configuration({})
@@ -465,6 +473,11 @@ class MigrationOriginF200110SuccessorControls(unittest.TestCase):
               env.game.tick=1;callbacks.events[2]()
               local saved_phase=state.successors[target].phase
               callbacks.load();env.game.tick=2;callbacks.events[2]()
+               marker_counts.after_first_reload=marker_count()
+               env.game.tick=3;callbacks.events[2]()
+               marker_counts.after_ordinary_tick=marker_count()
+               callbacks.load();env.game.tick=4;callbacks.events[2]()
+               marker_counts.after_second_reload=marker_count()
               assert(saved_phase=="completed")
             end)
             return {ok=ok,message=tostring(message),state=state,
@@ -474,9 +487,10 @@ class MigrationOriginF200110SuccessorControls(unittest.TestCase):
               player_gear=player.recipes[catalogue.gear_recipe].productivity_bonus,
               player_level=player.technologies[catalogue.direct].level,
               player_manual=player.manual_mining_speed_modifier,player_battery=player.worker_robots_battery_modifier,
-              foreign_progress=foreign.research_progress,detached_progress=detached.technologies[catalogue.direct].saved_progress,
+               foreign_progress=foreign.research_progress,detached_progress=detached.technologies[catalogue.direct].saved_progress,
                player_add_calls=player.add_calls,player_reset_calls=player.reset_calls,
                foreign_reset_calls=foreign.reset_calls,detached_reset_calls=detached.reset_calls,order=order,
+               marker_counts=marker_counts,
                source_state_changed=state.successors~=nil,
               candidate_module_effects=#player.technologies["recipe-prod-research_modules-1"].prototype.effects,
               player_module_holders={player.technologies[catalogue.module_credit.holders[1].id].level,
@@ -540,9 +554,12 @@ class MigrationOriginF200110SuccessorControls(unittest.TestCase):
                                      value["current_candidate_productivity_module_bonus"],
                                      value["current_candidate_efficiency_module_bonus"])
                                     for value in observations))
-                self.assertEqual(2, len(markers))
+                self.assertEqual(3, len(markers))
                 self.assertIn('"stage":"initial"', markers[0])
                 self.assertIn('"stage":"reload"', markers[1])
+                self.assertIn('"stage":"reload"', markers[2])
+                self.assertEqual({"after_first_reload": 2, "after_ordinary_tick": 2, "after_second_reload": 3},
+                                 result["marker_counts"])
                 self.assertTrue(result["source_state_changed"])
                 self.assertTrue(result["active_state_changed"])
 
