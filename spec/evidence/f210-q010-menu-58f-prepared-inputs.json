@@ -12,7 +12,8 @@
   },
   "preparation_controller": {
     "source_commit": "5df7aaddf763e0a574f0cb1e13040648242d9619",
-    "source_tree": "7a41432ebfb31498ccba9af1f69d04477b30ab6c",
+    "repository_tree": "18e61316bbb7d050fa815f9e99f1356bca4da472",
+    "player_source_tree": "ffc5f2e3359de4f326a184cf6a3c29a55941150a",
     "replay_projection": {
       "status": "current-replay-with-receipt-matching-capture-harness",
       "reason": "The original r04 capture records a relative tools/Invoke-PrototypeCapture.ps1 path with SHA-256 75B74DB6A...4864F. Current replay code canonicalises the otherwise-equal selected-archive identities, but the current capture harness has later changed to SHA-256 14A3A429...12F81. The two-file ignored projection used current replay.py and the exact 61bc harness; it did not alter either tracked tool or a native input.",
