@@ -1010,20 +1010,20 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
             if($node.Count-ne1){throw "standalone API projection function is absent or ambiguous: $name"}
             Invoke-Expression $node[0].Extent.Text
           }
-          function New-SourceArchive([string]$Library,[string]$Source,[string[]]$Members){
-            $info=Get-Content -LiteralPath (Join-Path $Source 'info.json') -Raw|ConvertFrom-Json -AsHashtable
+          function New-SourceArchive([string]$Library,[string]$RepoRoot,[string]$Revision,[string]$FixtureName,[string[]]$Members){
+            $info=[Text.Encoding]::UTF8.GetString((Get-StandaloneF210ApiConsumerRawGitMemberBytes -RepoRoot $RepoRoot -SourceRevision $Revision -FixtureName $FixtureName -Member 'info.json'))|ConvertFrom-Json -AsHashtable
             $archive=Join-Path $Library ($info.name+'_'+$info.version+'.zip')
             $stream=[IO.File]::Open($archive,[IO.FileMode]::CreateNew,[IO.FileAccess]::Write,[IO.FileShare]::None)
             try{
               $zip=[IO.Compression.ZipArchive]::new($stream,[IO.Compression.ZipArchiveMode]::Create,$false)
-              try{foreach($name in $Members){$entry=$zip.CreateEntry($info.name+'_'+$info.version+'/'+$name,[IO.Compression.CompressionLevel]::Optimal);$entryStream=$entry.Open();$input=[IO.File]::OpenRead((Join-Path $Source $name));try{$input.CopyTo($entryStream)}finally{$input.Dispose();$entryStream.Dispose()}}}finally{$zip.Dispose()}
+              try{foreach($name in $Members){$entry=$zip.CreateEntry($info.name+'_'+$info.version+'/'+$name,[IO.Compression.CompressionLevel]::Optimal);$entryStream=$entry.Open();try{$raw=Get-StandaloneF210ApiConsumerRawGitMemberBytes -RepoRoot $RepoRoot -SourceRevision $Revision -FixtureName $FixtureName -Member $name;$entryStream.Write($raw,0,$raw.Length)}finally{$entryStream.Dispose()}}}finally{$zip.Dispose()}
             }finally{$stream.Dispose()}
             return $archive
           }
           $root=$env:MIR_TEST_WORK;$repo=$env:MIR_TEST_REPO;$revision=@(& git -C $repo rev-parse --verify 'HEAD^{commit}');if($LASTEXITCODE-ne0-or$revision.Count-ne1){throw 'test source revision is unavailable'};$library=Join-Path $root 'library';$null=New-Item -ItemType Directory -Path $library
           $alphaSource=Join-Path $repo 'tests/fixtures/api-alpha';$betaSource=Join-Path $repo 'tests/fixtures/api-beta'
-          $alphaArchive=New-SourceArchive -Library $library -Source $alphaSource -Members @('control.lua','data.lua','graphics/icon.png','info.json')
-          $betaArchive=New-SourceArchive -Library $library -Source $betaSource -Members @('control.lua','data-final-fixes.lua','graphics/icon.png','info.json')
+          $alphaArchive=New-SourceArchive -Library $library -RepoRoot $repo -Revision $revision[0] -FixtureName 'mir-fixture-mir5-api-alpha' -Members @('control.lua','data.lua','graphics/icon.png','info.json')
+          $betaArchive=New-SourceArchive -Library $library -RepoRoot $repo -Revision $revision[0] -FixtureName 'mir-fixture-mir5-api-beta' -Members @('control.lua','data-final-fixes.lua','graphics/icon.png','info.json')
           $alpha=New-StandaloneF210ApiConsumerSourceProjection -RepoRoot $repo -ArchiveLibrary $library -OutputRoot (Join-Path $root 'alpha') -FixtureName 'mir-fixture-mir5-api-alpha' -ExpectedArchiveSha256 (Get-MIRImmutableInputSha256 $alphaArchive) -SourceRevision $revision[0]
           $beta=New-StandaloneF210ApiConsumerSourceProjection -RepoRoot $repo -ArchiveLibrary $library -OutputRoot (Join-Path $root 'beta') -FixtureName 'mir-fixture-mir5-api-beta' -ExpectedArchiveSha256 (Get-MIRImmutableInputSha256 $betaArchive) -SourceRevision $revision[0]
           if(
