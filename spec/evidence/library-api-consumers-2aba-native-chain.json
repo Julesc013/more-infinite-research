@@ -1,0 +1,275 @@
+{
+  "schema": 1,
+  "kind": "MIR5StandaloneTwoClientApiConsumerReadbackV1",
+  "status": "targeted-native-client-session-and-independent-readback-pass",
+  "controller_source": "a0de591d8a85705fa9540bc3948e870edbf00449",
+  "player_source_tree": "d5d8694b2fbd7229de84c9966691d5446c82219b",
+  "engine_sha256": "8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38",
+  "mir_archive_sha256": "2ABAF369E020D8AD18A0C04940A8811BECFA5E63E5B479C668E2D3A3123D032B",
+  "profile": "tests/profiles/library-api-consumers-standalone-f210-2123.json",
+  "profile_sha256": "AA3BEC37C45855486FDA8B1199B25EB5EF0EB438EDBC333104C004A7F55C2D02",
+  "beta_fixture_sha256": "690004F145E8B0DD52B4030BD8B27F7B581495EEFAAC5CB3A2F30A23FCA08951",
+  "native_receipts": {
+    "terminal_sha256": "2FD608013331DD0AD53540A9F1B7DF5BD100EC55401E19D79C90A8888FF9CFDE",
+    "native_result_sha256": "7BBFAF0E62BEC6BC2ACB5BB08EFFB4DFF3135AE7BA1E9EF8B30BBEDFE24E0C78",
+    "session_sha256": "007583993A93F4C95192FECD5BB93326CE65D33380B060EEA369E5D5E5EF043B",
+    "preparation_sha256": "B096172EAC6151454C5022783C60C5900DC530093EC14887F3D85E3BE02D4A6E"
+  },
+  "actual_completed_witness": {
+    "case": "library-multiplayer",
+    "stage": "completed",
+    "status": "passed",
+    "witnesses": {
+      "base_version": "2.1.23",
+      "mir_version": "5.0.21000",
+      "actual_join_events": 6,
+      "screenshot_calls": 10,
+      "initial_settled_without_reopen": true,
+      "initial_settle_ticks": 60,
+      "first_open": true,
+      "search": true,
+      "refresh": true,
+      "reopen": true,
+      "measurement_output": "native-localised-profiler-log",
+      "timing_values_stored": false,
+      "two_connected_clients_required": true,
+      "locales_required": [
+        "en",
+        "de"
+      ],
+      "distinct_personal_query_and_selection": true,
+      "initial_native_snapshot_immutable": true,
+      "live_refresh": {
+        "real_lab_completions": 2,
+        "native_laboratory_completion_by_script": false,
+        "native_research_started_events": 3,
+        "queue_lengths_observed": [
+          2,
+          1,
+          0
+        ],
+        "native_research_cancelled_events": 1,
+        "native_foreign_force_created_events": 1,
+        "gear_level": 3,
+        "gear_productivity": 0.2,
+        "science_consumed_per_named_pack": 2,
+        "fixture_accelerates_gear_count_and_time_only": true,
+        "ordinary_tuning_qualified": false,
+        "root_and_query_identity_preserved": true,
+        "cross_force_view_state_preserved": true
+      },
+      "availability_terminal_labels_checked": true,
+      "host_restart_observed": true,
+      "on_load_read_only": true,
+      "rendering_pending_external_png_readback": true,
+      "screenshot_requests_are_not_headless_rendering_proof": true
+    }
+  },
+  "api_client_load_markers": [
+    {
+      "phase": "initial",
+      "client": "MIR5English",
+      "MIR5_API_ALPHA": {
+        "stage": "load",
+        "tick": 3032,
+        "reload_researched": true,
+        "reload_level": 1,
+        "reload_manual_crafting_speed_modifier": 0.05
+      },
+      "MIR5_API_BETA": {
+        "stage": "load",
+        "tick": 3032,
+        "reload_level": 1,
+        "reload_researched": false,
+        "reload_manual_crafting_speed_modifier": 0.05
+      }
+    },
+    {
+      "phase": "initial",
+      "client": "MIR5Deutsch",
+      "MIR5_API_ALPHA": {
+        "stage": "load",
+        "tick": 3848,
+        "reload_researched": true,
+        "reload_level": 1,
+        "reload_manual_crafting_speed_modifier": 0.05
+      },
+      "MIR5_API_BETA": {
+        "stage": "load",
+        "tick": 3848,
+        "reload_level": 1,
+        "reload_researched": false,
+        "reload_manual_crafting_speed_modifier": 0.05
+      }
+    },
+    {
+      "phase": "rejoin",
+      "client": "MIR5English",
+      "MIR5_API_ALPHA": {
+        "stage": "load",
+        "tick": 4851,
+        "reload_researched": true,
+        "reload_level": 1,
+        "reload_manual_crafting_speed_modifier": 0.05
+      },
+      "MIR5_API_BETA": {
+        "stage": "load",
+        "tick": 4851,
+        "reload_level": 1,
+        "reload_researched": false,
+        "reload_manual_crafting_speed_modifier": 0.05
+      }
+    },
+    {
+      "phase": "rejoin",
+      "client": "MIR5Deutsch",
+      "MIR5_API_ALPHA": {
+        "stage": "load",
+        "tick": 5378,
+        "reload_researched": true,
+        "reload_level": 1,
+        "reload_manual_crafting_speed_modifier": 0.05
+      },
+      "MIR5_API_BETA": {
+        "stage": "load",
+        "tick": 5378,
+        "reload_level": 1,
+        "reload_researched": false,
+        "reload_manual_crafting_speed_modifier": 0.05
+      }
+    },
+    {
+      "phase": "restart",
+      "client": "MIR5English",
+      "MIR5_API_ALPHA": {
+        "stage": "load",
+        "tick": 6072,
+        "reload_researched": true,
+        "reload_level": 1,
+        "reload_manual_crafting_speed_modifier": 0.05
+      },
+      "MIR5_API_BETA": {
+        "stage": "load",
+        "tick": 6072,
+        "reload_level": 1,
+        "reload_researched": false,
+        "reload_manual_crafting_speed_modifier": 0.05
+      }
+    },
+    {
+      "phase": "restart",
+      "client": "MIR5Deutsch",
+      "MIR5_API_ALPHA": {
+        "stage": "load",
+        "tick": 6610,
+        "reload_researched": true,
+        "reload_level": 1,
+        "reload_manual_crafting_speed_modifier": 0.05
+      },
+      "MIR5_API_BETA": {
+        "stage": "load",
+        "tick": 6610,
+        "reload_level": 1,
+        "reload_researched": false,
+        "reload_manual_crafting_speed_modifier": 0.05
+      }
+    }
+  ],
+  "protected_session_saves": {
+    "seed_sha256": "C43760057FA94F2037576A9742B540E4D650EC1D3E1074ED6ED023B13CA70A53",
+    "restart_save_sha256": "E4DA681063E93B6454C8CFEB41F8311497B513FE40E15651EFA99A9B80FE782D",
+    "final_save_sha256": "97A71FBA2E9BAA19631D14DE3EC0E6DF988DA40ACBDB8EE75FD2FCFB95B25CDC"
+  },
+  "input_save_byte_identical": true,
+  "visual_readback": {
+    "status": "all-ten-actual-session-pngs-inspected-by-root",
+    "dimensions": "1280x720",
+    "scope": "EN gear and DE mining list/detail at initial, settled, rejoin and restart; both availability views. Titles render without missing-key markup or toast obstruction.",
+    "limits": "Existing untranslated German controls use English fallback; this is not complete German translation, all languages/scales, API-specific row rendering or full-modpack UI acceptance.",
+    "screenshots": [
+      {
+        "path": "session/client-en/script-output/mir5-library-multiplayer/availability-1.png",
+        "sha256": "430042C5F8AF70514994A774BD8F23DBCDFB10DF472A72628883D572CCC2A615",
+        "bytes": 1013244
+      },
+      {
+        "path": "session/client-en/script-output/mir5-library-multiplayer/initial-1.png",
+        "sha256": "1B191E06E9DE24E447B7DF1A2A6CDF76A7E74D1F10D605D408B660D8F544F22F",
+        "bytes": 1043324
+      },
+      {
+        "path": "session/client-en/script-output/mir5-library-multiplayer/settled-1.png",
+        "sha256": "BF41A4D6E1CFF6644C2C151B838AEAEC181A8C553DF50FD41D21F6E65AECBA78",
+        "bytes": 1047636
+      },
+      {
+        "path": "session/client-en/script-output/mir5-library-multiplayer/rejoin-1.png",
+        "sha256": "3C5515BB4F7B4DFB1755C027F4E5E6133134D1C16675173E012314D485F78971",
+        "bytes": 1051314
+      },
+      {
+        "path": "session/client-en/script-output/mir5-library-multiplayer/restart-1.png",
+        "sha256": "F5B03002E97AB29E904F7C7D30992C6C928217D881EF6EA4997842844F372D6E",
+        "bytes": 1066685
+      },
+      {
+        "path": "session/client-de/script-output/mir5-library-multiplayer/availability-2.png",
+        "sha256": "C45849E39F1C729DDAF8191B34BA97FE741CB2E974A806FC2F1DE404C12F2D70",
+        "bytes": 1016699
+      },
+      {
+        "path": "session/client-de/script-output/mir5-library-multiplayer/initial-2.png",
+        "sha256": "FE0961D5011951252F0496326228F304B74C9B5D73E3BD79B3C8C1B447F624DC",
+        "bytes": 1047959
+      },
+      {
+        "path": "session/client-de/script-output/mir5-library-multiplayer/settled-2.png",
+        "sha256": "243D97091CBAF9B8739E4F8A111A964CA2CEAE2BD05BA6B093CF2A8B2D8AD209",
+        "bytes": 1052718
+      },
+      {
+        "path": "session/client-de/script-output/mir5-library-multiplayer/rejoin-2.png",
+        "sha256": "BB6B09C8AB4AECD5D473DB94612C0F571A4829D69279ACCA685F301B91093AB1",
+        "bytes": 1049355
+      },
+      {
+        "path": "session/client-de/script-output/mir5-library-multiplayer/restart-2.png",
+        "sha256": "1837C8B215AE327FC855CFB3898116224F56D298BAE2A55DC03EF4D475778E9C",
+        "bytes": 1066631
+      }
+    ]
+  },
+  "custody": {
+    "primary_root": "build/mir5/recovery-historical/library-api-consumers-standalone-current-r03",
+    "original_and_primary_members_independently_rehashed": 224,
+    "bytes": 22271052,
+    "readback_sha256": "98A5B38C445FC4D24FF68B876806CE1DFD3754A1B66DEC8EB864FA26B4DFAA36"
+  },
+  "restoration": {
+    "harness_library_controls": "restored-direct-library-controls",
+    "outer_borrowed_player": "restored to C563 prestate",
+    "outer_borrowed_library_fixture": "restored to absent prestate",
+    "outer_borrowed_beta_fixture": "restored to 726C prestate",
+    "factorio_processes_after": 0,
+    "dependency_payload_bytes_copied": 0,
+    "archive_links_created": 0,
+    "archive_extractions": 0
+  },
+  "prior_adverse_disposition": [
+    "r01 stopped before engine launch on stale beta control.lua archive bytes; canonical four-member beta was rebuilt twice identically and pinned without weakening membership checks.",
+    "r02 stopped before engine launch when a projection descriptor was cast to a path; the caller now binds its actual source string and a real descriptor/path opponent protects the boundary."
+  ],
+  "limits": [
+    "Exact Base-only D5/2ABA standalone case; not the later oil/science or native-cap source freeze.",
+    "Two actual gear labs use fixture-shortened count/time; ordinary tuning is not qualified.",
+    "API markers establish the stated client load/state values; they do not qualify every API function, optional-absence behavior or arbitrary extension.",
+    "No timing/performance, all ecosystem, migration matrix or release verdict."
+  ],
+  "receipts": {
+    "path": "spec/evidence/library-api-consumers-2aba-native-receipts.json.gz",
+    "bytes": 65104,
+    "sha256": "7EA7E4AECABDDB227942FCCADAD8831DC2CA807F7F0916EC25F193150E6DF0B7",
+    "uncompressed_sha256": "5660A624CC2F0A2F4ACBD0C7069CACCC32FAF109E86B4200D0BF036891A4D814",
+    "members": 16
+  }
+}
