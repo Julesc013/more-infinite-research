@@ -14,6 +14,7 @@ from copy import deepcopy
 import hashlib
 import json
 from pathlib import Path
+import re
 import sys
 from typing import Any, Mapping
 
@@ -458,7 +459,7 @@ def recover_profile(identifier: str, no_mir_root: Path, published_root: Path,
     if not published["published_mir"]["version"].startswith("4.7."):
         raise CatalogueError("oracle recovery requires published MIR 4.7, never a MIR5 candidate")
     if expected_version is not None and published["published_mir"]["version"] != expected_version:
-        raise CatalogueError("recovery requires the exact published 4.7.0 target distribution")
+        raise CatalogueError(f"recovery requires the exact published {expected_version} target distribution")
     _assert_matching_inputs(no_mir, published)
     data = _diff_domain(no_mir["raw"], published["raw"], f"{identifier} data")
     settings = _diff_domain(no_mir["settings"], published["settings"], f"{identifier} settings")
@@ -492,12 +493,16 @@ def recover_profile(identifier: str, no_mir_root: Path, published_root: Path,
 def recover_inventory(base_no_mir: Path, base_published: Path,
                       space_age_no_mir: Path, space_age_published: Path,
                       k2so_no_mir: Path | None = None, k2so_published: Path | None = None,
-                      *, target: str = "f210") -> dict[str, Any]:
+                      *, target: str = "f210", published_version: str | None = None) -> dict[str, Any]:
     if target not in {"f200", "f210"}:
         raise CatalogueError("modern recovery requires F200 or F210")
     if (k2so_no_mir is None) != (k2so_published is None):
         raise CatalogueError("K2SO recovery requires both no-MIR and published captures")
-    published_version = "4.7." + target[1:] + "00"
+    if published_version is None:
+        published_version = "4.7." + target[1:] + "00"
+    if not isinstance(published_version, str) or re.fullmatch(
+            r"4[.]7[.]" + target[1:] + r"[0-9]{2}", published_version) is None:
+        raise CatalogueError("published version must be an exact MIR4.7 distribution for the selected target")
     profiles = [
         recover_profile("base-" + target, base_no_mir, base_published, expected_version=published_version),
         recover_profile("space-age-" + target, space_age_no_mir, space_age_published, expected_version=published_version),
@@ -860,6 +865,8 @@ def main(argv: list[str] | None = None) -> int:
     recover.add_argument("--k2so-published", type=Path)
     recover.add_argument("--output", type=Path, required=True)
     recover.add_argument("--target", choices=("f200", "f210"), default="f210")
+    recover.add_argument("--published-version",
+                         help="Exact same-target MIR4.7 numeric version; defaults to the original CCC00 cohort")
     bob_angel = commands.add_parser("recover-bob-angel-f210",
                                     help="recover the fixed q010 F210 Bob+Angel+Space Age oracle")
     bob_angel.add_argument("--no-mir", type=Path, required=True)
@@ -881,7 +888,8 @@ def main(argv: list[str] | None = None) -> int:
         if args.command == "recover":
             result = recover_inventory(args.base_no_mir, args.base_published,
                                        args.space_age_no_mir, args.space_age_published,
-                                       args.k2so_no_mir, args.k2so_published, target=args.target)
+                                       args.k2so_no_mir, args.k2so_published, target=args.target,
+                                       published_version=args.published_version)
             _write_new_json(args.output, result)
             print(json.dumps({"status": result["status"], "output": str(args.output.resolve())}, sort_keys=True))
             return 0

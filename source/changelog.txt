@@ -66,6 +66,7 @@ Version: @DISTRIBUTION_VERSION@
       owned by MIR.
     - Preserve native-owner cap restoration across equivalent productivity-effect orderings without re-enabling foreign-disabled
       research.
+    - Preserve unqueued foreign Imersite public disablement and visibility through its named hidden-carrier handoff.
     - Reconcile scripted contributions against external baselines rather than overwrite aggregate foreign bonuses.
     - Walk nested pipeline and receiver prototype fields without recursive Lua stack growth.
 
