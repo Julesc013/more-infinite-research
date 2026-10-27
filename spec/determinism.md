@@ -1,11 +1,11 @@
 ---
 title: "Determinism and reproducibility"
 status: current
-applies_to: "MIR replacement development"
+applies_to: "MIR development"
 audience: developer
 doc_type: specification
 owner: mir-maintainers
-last_reviewed: 2026-10-22
+last_reviewed: 2026-10-27
 supersedes: []
 superseded_by: []
 source_of_truth_for:

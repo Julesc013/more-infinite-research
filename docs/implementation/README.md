@@ -1,53 +1,35 @@
 ---
-title: "Implementation draft: reading order and boundaries"
-status: draft
-applies_to: "MIR replacement development; explanatory pseudocode, not executable product"
+title: "Implementation reading guide"
+status: current
+applies_to: "MIR development"
 audience: developer
 doc_type: reference
 owner: mir-maintainers
-last_reviewed: 2026-10-22
+last_reviewed: 2026-10-27
 supersedes: []
 superseded_by: []
 source_of_truth_for:
-  - mir-implementation-draft-README
+  - mir-implementation-reading-guide
 ---
 
-# Implementation draft 01
+# Implementation reading guide
 
-**Purpose:** turn the supplied proposed specification into reviewable control flow, ownership rules and opposing tests. This is not an implementation, an API stability declaration, or a new normative specification.
+Read the implementation and its governing contract together. The [specification index](../../spec/README.md) owns requirements, `source/` owns implementation, tests own independent expectations and [progress](../progress.md) owns exact qualification status.
 
-## Read only the relevant part
+| Responsibility | Implementation | Contract or check |
+|---|---|---|
+| Authored native research and local publication | [Generator](../../source/research/generator.lua), [settings](../../source/research/settings.lua), [data finalizer](../../source/data-final-fixes.lua) | [Generator](../../spec/generator.md), [settings](../../spec/settings.md), [compatibility](../../spec/compatibility.md) |
+| Events, caps and saved state | [Bootstrap](../../source/runtime/bootstrap.lua), [lifecycle](../../source/runtime/lifecycle.lua) | [Runtime](../../spec/runtime.md), [migrations](../../spec/migrations.md) |
+| Library and public integration | [Library](../../source/runtime/library.lua), [data API](../../source/api/v1/data.lua), [runtime API](../../source/api/v1/runtime.lua) | [API guide](../api.md), [SDK](../../sdk/README.md), [API contract](../../spec/api.md) |
+| Engine selection and package composition | [Target adapter](../../source/platform/target.lua), [packager](../../tools/package.py), [release adapter](../../tools/release.py) | [Targets](../../spec/targets.md) |
+| Independent verification and current commands | [Host driver](../../tests/Test-MIR5HostControls.ps1), [development guide](../development.md) | [Verification](../../spec/verification.md), [performance](../../spec/performance.md) |
 
-| File | Use |
-|---|---|
-| [Blueprint](blueprint.md) | Pseudocode from settings declaration to prototype publication, API use, runtime and migration. |
-| [Review](review.md) | What is already specified, what remains unresolved, and narrowly proposed refinements. |
-| [Opposing tests](opposing-tests.md) | Independent expected properties and examples of defects the tests must detect. |
+Use the host driver's `-Plan` output before selecting checks and keep native, save, client and performance observations under their exact inputs. A current document, a host test or a built package does not close a missing native acceptance gate.
 
-The authority remains [the specification index](../../spec/README.md). The reviewed baseline is `MIR5_REPO_SPEC_DOCS_DIAGRAMS_2026-10-22.zip`, with the exact digest in the accompanying delivery manifest. API signatures follow its **1.0.0-draft.2**, not earlier messages in the discussion.
+## Superseded implementation drafts
 
-## What the notation means
+The former API `1.0.0-draft.2` pseudocode, draft review and proposed opposing-test catalogue were temporary explanatory material. Their normative requirements remain governed by the adopted specification; their original proposal text and IDs remain in the exact Git references below. Current source, SDK examples, executable controls and the progress record replace their active reading instructions. This retirement neither marks unimplemented proposals delivered nor changes an acceptance threshold.
 
-- Uppercase procedures are explanatory operations, **not new public API functions or mandatory modules**.
-- `REQUIRED_RECOVERY(...)` denotes a concrete missing historical value or rule. It is a stop condition, never a shipped fallback, placeholder technology, guessed default or runtime data loader.
-- `PROPOSAL` denotes a refinement to review before amending the indicated specification. This draft cannot silently change that contract.
-- `OWNED` means one component may mutate the table; `BORROWED` means it must not. These are documentation conventions, not a runtime ownership framework.
-- Assertions are intended behavior. No pseudocode assertion is an executed test.
-
-The blueprint uses ordinary native-shaped Lua records. It does not introduce a serialized instruction language, plugin scheduler, generic mutation plan, second technology catalogue or compiler intermediate representation.
-
-## Boundaries that remain fixed
-
-Keep authored research identities and progression; permit exact bindings, finite alternatives and specifically justified bounded recipe collection. Keep full applicable delivered settings, continuations, overrides, runtime, Library and integration behavior. Do not defer them by calling the replacement a smaller core. Runtime and migrations never import the Generator. External data calls execute immediately. Historical identity preservation is decided before an omission branch.
-
-## What is deliberately not supplied
-
-There are no Factorio source files, native test results, recovered production technology IDs, invented cost curves, speculative migration values or new numerical performance results in this addendum. The baseline's continuity groups remain unreconciled and its native acceptance remains not run.
-
-## Import and cutover
-
-The addendum introduces four files in `docs/implementation/`. It updates only the baseline pack's `tools/adoption/pack_members.json` so that the existing exact-membership checker can recognize them. No existing specification, source, API example, root document, test oracle or acceptance status is replaced.
-
-Review that one manifest change against the baseline before overlaying it; do not overwrite a locally modified membership manifest. On a modified checkout, reconcile the additional four paths rather than blindly applying the supplied manifest.
-
-These implementation drafts are temporary explanatory material. During final cutover, keep only sections that remain useful to contributors; retire duplicated draft rationale. Do not preserve this folder as a competing permanent architecture authority.
+- [blueprint.md](https://github.com/Julesc013/more-infinite-research/blob/902c4ff8187679ac80e637b169f9fd96a98ff90f/docs/implementation/blueprint.md) — original SHA-256 `F021F1DD82E9CF5B935B2CB74EC4602452B76D0E5F4568710B69B9FC3259D08A`.
+- [review.md](https://github.com/Julesc013/more-infinite-research/blob/902c4ff8187679ac80e637b169f9fd96a98ff90f/docs/implementation/review.md) — original SHA-256 `199CE1AA70ED82ADC824F922B1EF994BB39F3AFA6D61DECF545C7F1688E656EB`.
+- [opposing-tests.md](https://github.com/Julesc013/more-infinite-research/blob/902c4ff8187679ac80e637b169f9fd96a98ff90f/docs/implementation/opposing-tests.md) — original SHA-256 `045C7AE96ACCBE229B5E045CA8380FE056E278A932BABADC953857C75CEA173A`.

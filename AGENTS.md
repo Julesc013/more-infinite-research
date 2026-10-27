@@ -12,7 +12,7 @@ Read [spec/README.md](spec/README.md) and the task-specific contract. [docs/deve
 
 ## Workflow and custody
 
-- `dev` is dedicated to MIR5 in the canonical layout. Future MIR4.7 maintenance uses separate task branches from published tags; follow [the development and maintenance policy](docs/development.md#development-and-maintenance-lines).
+- `dev` is dedicated to MIR5 in the canonical layout. Future MIR4.7 maintenance uses separate task branches from published tags; follow [the development and maintenance policy](docs/development.md#development-line-and-maintenance-branches).
 - Maintainer standing authorization covers branches, pushes, PRs, normal checked merges into `dev`, local synchronization and removal of completed clean disposable work branches. No repeated permission is needed. Enforced branch rules and required checks remain mandatory.
 - Commit and push completed reviewable units with detailed validation and limitations; merge frequently through PRs and read back exact remote trees. Preserve Aero's original commits and separate review branches. Never reset, clean, force-push or rebase shared work as a synchronization shortcut.
 - Before output batches, run `tools/commands/workspace/Test-MIRDevelopmentHealth.ps1`. Resolve actual disk pressure through bounded batches or existing guarded cleanup. A dirty/unique checkpoint needs a commit/push or explicit preservation disposition; it never disables Git/GitHub.

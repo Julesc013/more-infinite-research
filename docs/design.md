@@ -1,11 +1,11 @@
 ---
 title: "Synthesized design and decisions"
-status: draft
-applies_to: "MIR replacement development"
+status: current
+applies_to: "MIR development"
 audience: developer
 doc_type: explanation
 owner: mir-maintainers
-last_reviewed: 2026-10-22
+last_reviewed: 2026-10-27
 supersedes: []
 superseded_by: []
 source_of_truth_for:
@@ -14,9 +14,9 @@ source_of_truth_for:
 
 # Synthesized design and decisions
 
-## Recommended decision
+## Adopted design
 
-Replace the general research compiler with a small **Generator** that constructs native technology prototypes from authored definitions and effective settings. Keep exact, explicit compatibility rules outside it. Preserve the complete applicable product, not the old machinery.
+MIR uses a small **Generator** to construct native technology prototypes from authored definitions and effective settings. Keep exact, explicit compatibility rules outside it. Preserve the complete applicable product, not the old machinery.
 
 Unify public extension terminology as **MIR API**. Its data and runtime surfaces follow Factorio lifecycle boundaries. The **SDK** is developer material that demonstrates and checks those interfaces. It is not another in-game execution platform.
 
@@ -26,7 +26,7 @@ The existing MEP was a separately distributed data-only preview with no authoriz
 
 The strongest common idea is reducing responsibilities, not replacing one large representation with another. Explicit declarations, independently observed effects, native engine behavior, stable IDs and bounded tasks are retained.
 
-The plans still disagree on `mod/` versus `source/`, silent omissions, deferred Library/runtime parity, unconditional bans on scans, universal formula models and whether a one-technology demo proves the whole architecture. This synthesis resolves those conflicts rather than appending one more competing plan.
+The adopted contracts resolve source placement, omission policy, complete applicable Library/runtime parity, bounded collection and native formula ownership. The canonical `source/` tree implements those responsibilities; exact unfinished qualification stays in the progress record.
 
 | Decision | Reason |
 |---|---|
@@ -38,13 +38,13 @@ The plans still disagree on `mod/` versus `source/`, silent omissions, deferred 
 | Explicit small copies at ownership boundaries | Pure-looking constructors can still alias caller arrays. Test isolation without a certificate/proxy framework. |
 | Necessary collection outside Generator | Preserve existing broad recipe/settings behavior without per-family whole-world scans or invented research. |
 | Complete stable-release parity | Smaller code is not equivalent if it removes Library, caps, migrations, settings or useful integrations. |
-| Two separate cutovers | First preserve/replace behavior, then mechanically flatten paths with identical player members. |
+| Canonical unversioned roots | Player source, requirements, docs and tooling use their final responsibilities; historical inputs retain exact immutable references. |
 
 ## Things not to promise
 
-There is no evidence yet of MIR replacement speed, and no finite test suite proves universal crash-freedom. Expected constant-time named lookup does not make arbitrary output constant time. Supporting more active effects creates real work. Offline inventories, small native tables and a short Generator reduce risk; only observed native results establish improvement.
+Performance evidence retains its exact workload and source identity; a final-current-package performance verdict remains open. No finite test suite proves universal crash-freedom. Expected constant-time named lookup does not make arbitrary output constant time. Supporting more active effects creates real work. Offline inventories, small native tables and a short Generator reduce risk; only observed native results establish improvement.
 
-The most useful next result is a real historical research with working settings/effects, followed early by a difficult continuation/cap case and independently installable API consumers. In parallel, same-output replay tests whether the removed machinery actually accounts for substantial menu time. Reject an ineffective mechanism before mass-porting.
+Continue from the exact completed native observations rather than replaying them under a new name. Remaining migration, mod/settings, client, runtime and stress cases follow the ordered progress worklist. Matched same-output replay and menu measurements supply the separate performance verdict.
 
 ## What stays out
 

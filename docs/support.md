@@ -1,7 +1,7 @@
 ---
 title: "Support and upgrade boundaries"
-status: draft
-applies_to: "MIR replacement development"
+status: current
+applies_to: "MIR development"
 audience: maintainer
 doc_type: reference
 owner: mir-maintainers

@@ -1,7 +1,7 @@
 ---
 title: "Development guide"
 status: current
-applies_to: "MIR replacement development"
+applies_to: "MIR development"
 audience: developer
 doc_type: how-to
 owner: mir-maintainers
@@ -13,6 +13,16 @@ source_of_truth_for:
 ---
 
 # Development guide
+
+## Development line and maintenance branches
+
+`dev` is dedicated to MIR5 in the canonical layout: `source/`, `spec/`, `docs/`, `tests/`, `tools/`, `targets/` and `sdk/`. Implement the final product directly in those roots. Tests use version-neutral roles such as `published` and `successor`; fixture IDs, product versions and immutable historical references keep their actual identities.
+
+MIR4 maintenance starts from the exact published tag that needs a fix, currently `v4.7.3`, on a bounded task branch. Check and tag that release from its maintenance branch. Keep its implementation in the preserved Git refs rather than restoring a parallel MIR4 source or documentation tree on `dev`. Any shared correction needed by MIR5 receives its own reviewed integration.
+
+Main promotion and the canonical `v5.0.0` tag follow the remaining acceptance and publication gates. Current documentation and canonical paths do not imply release qualification. The maintainer handles Mod Portal publication; agent-managed releases remain GitHub-only.
+
+Use neutral names for new output batches: `build/host-gate` for hosted control output, `build/qualification` for new test evidence and packets, and `build/packages` for new candidate package custody. Accepted delivery remains in `dist`. Existing `build/mir5` paths are retained where exact receipts or active frozen jobs consume them; preserve those bytes and locators instead of moving recorded evidence or retargeting a live job.
 
 ## Start with a bounded task
 
@@ -32,14 +42,6 @@ Stop condition:
 ```
 
 For the first port, recover actual identity/tuning/settings from the pinned baseline. Do not invent a cleaner-looking replacement ID. Host expected output must not be generated from the candidate and then declared independent.
-
-## Development and maintenance lines
-
-`dev` owns MIR5 development in the canonical `source/`, `spec/`, `docs/`, `tests/`, `tools/`, `targets/` and `sdk/` roots. Structural cutover is complete; product qualification and publication remain open. `main` retains the published release until qualified MIR5 promotion.
-
-Future MIR4.7 hotfixes start on a separate task branch from the exact published4.7 tag being patched, using that line's source and build controls. Keep its review, qualification and release tag on that maintenance line. Port an applicable correction into MIR5 as a separate reviewed change; do not restore the MIR4 implementation or staging roots into `dev`. Existing signing, publication, custody and branch protections still apply.
-
-Historical migration fixtures have distinct predecessor and successor roles; they are excluded from player packages and are not parallel editable product roots. A reviewed role-directory relocation preserves payload bytes, fixture identities and pinned historical references while updating current consumers. Historical receipts and ignored `build/mir5/` custody retain their original paths.
 
 ## Community bugs and request continuity
 

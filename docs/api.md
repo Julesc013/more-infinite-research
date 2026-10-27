@@ -1,11 +1,11 @@
 ---
 title: "MIR API guide"
-status: draft
-applies_to: "MIR replacement development"
+status: current
+applies_to: "MIR development"
 audience: developer
 doc_type: reference
 owner: mir-maintainers
-last_reviewed: 2026-10-24
+last_reviewed: 2026-10-27
 supersedes: []
 superseded_by: []
 source_of_truth_for:

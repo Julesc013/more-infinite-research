@@ -1,11 +1,11 @@
 ---
 title: "MIR specification index"
 status: current
-applies_to: "MIR replacement development"
+applies_to: "MIR development"
 audience: developer
 doc_type: specification
 owner: mir-maintainers
-last_reviewed: 2026-10-23
+last_reviewed: 2026-10-27
 supersedes: []
 superseded_by: []
 source_of_truth_for:
@@ -58,4 +58,4 @@ Root-path changes do not change these requirements. Relative links within this d
 
 ## Visual route and change record
 
-Read the [architecture explainer](../docs/architecture.md) for the lifecycle picture and the [visual atlas](../docs/diagrams/index.html) for rendered diagrams. They explain these contracts; they do not override them. New product acceptance remains not run.
+Read the [architecture explainer](../docs/architecture.md) for the lifecycle picture and the [visual atlas](../docs/diagrams/index.html) for rendered diagrams. They explain these contracts; they do not override them. Final release acceptance remains incomplete; the progress record names exact observations and remaining gates.

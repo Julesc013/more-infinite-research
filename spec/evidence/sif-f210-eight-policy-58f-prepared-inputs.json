@@ -1,0 +1,131 @@
+{
+  "schema": 1,
+  "kind": "MIR5SIFF210EightCurrentPolicyPreparedInputsV1",
+  "status": "eight-current-policy-inputs-prepared-not-native-qualified",
+  "claims": {
+    "native_execution": false,
+    "library_mutation": false,
+    "saved_game_upgrade": false,
+    "laboratory_completion": false,
+    "performance_measurement": false,
+    "release_qualification": false
+  },
+  "fixture_input_controller": {
+    "source_commit": "d65f68d41af70723e64035be5893969c2a1ac1bf",
+    "repository_tree": "7342537985190a2843bf79c9821f139985451e99",
+    "raw_git_projection": "The seven new selector sources were read as exact d65 Git blobs, with current checked-out blob identity independently equal for every recorded member before package.py used the two-member projection.",
+    "package_helper": {
+      "path": "tools/package.py",
+      "sha256": "D5DCCBFABB69E6D7F529DBB9BCE8B907231EB682E9059BF3586777F3C74FBB50"
+    }
+  },
+  "candidate": {
+    "source_controller_commit": "98fbdd33fe47eb678a5e1aaf17fee903eba2a22a",
+    "repository_tree": "2bf3267b8c85c4da7de0b8fba0f63131f897f810",
+    "player_tree": "ffc5f2e3359de4f326a184cf6a3c29a55941150a",
+    "freeze_record": {
+      "path": "spec/evidence/current-assets-98fbdd33-root-readback.json",
+      "sha256": "334F745CDEC9657986524FC40B7A2BCF5CA7A27301346F50882A116A1EC540E1"
+    },
+    "archive": {
+      "path": "build/mir5/assets/98fbdd33-root-r01/more-infinite-research_5.0.21000.zip",
+      "sha256": "58F04FB9D417F2726835F4A6740490DE3C1841665DAC81C2BA3DFA94050D9457",
+      "bytes": 679860
+    }
+  },
+  "engine": {
+    "path": "D:/Games/Steam/steamapps/common/Factorio/bin/x64/factorio.exe",
+    "version": "2.1.23",
+    "sha256": "FE4A1DA30F322A0D0B8AEB3DF7276332222BAAA143E2352569B723E84B2B9060"
+  },
+  "shared_dependency_closure": {
+    "space-is-fake_1.0.78.zip": "3B5F2A381ADF1D9AECF048293E20035963A528720FBDC148CCC2B0418049FF13",
+    "cr-commons_1.0.33.zip": "378D3114B09C872358088B33500BC4AB0B9B9EFD9E5650DBEA0E87B5914C29BB",
+    "cr-extras_1.0.10.zip": "3AB74877E49FB245E62593B669EB4D5C762207C047CA6F70E4D0CC9B67DF0225",
+    "mir-fixture-mir5-active-mods-observer_0.1.0.zip": "2E1BE5952D2A4CC5C74A0D149E075D247BA110A3FAE5B6768D3EAEBABCEF989C"
+  },
+  "reused_owned_fixtures": {
+    "successor_core": {
+      "source_directory": "build/mir5/sif-58f-prepared-inputs-r01/sources/successor",
+      "archive": "build/mir5/sif-58f-prepared-inputs-r01/mir-fixture-mir5-sif-science-retirement-f210_0.2.0.zip",
+      "sha256": "DE16335F30C13C0B931D42B31BDEEFFD04B718C27353C9863669C164B53C053A",
+      "bytes": 9169,
+      "member_count": 4,
+      "original_prepared_receipt": "spec/evidence/sif-f210-configured-58f-prepared-inputs.json"
+    },
+    "configured_selector": {
+      "source_directory": "build/mir5/sif-58f-prepared-inputs-r01/sources/configured",
+      "archive": "build/mir5/sif-58f-prepared-inputs-r01/mir-fixture-mir5-sif-policy-configured-f210_0.1.0.zip",
+      "sha256": "5A2856D0B74D50E2F34EAF1CD0D40CCAB9DDDA8A722F77A4638BAE279EEAA58E",
+      "bytes": 932,
+      "member_count": 2,
+      "original_prepared_receipt": "spec/evidence/sif-f210-configured-58f-prepared-inputs.json"
+    },
+    "observer": {
+      "source_directory": "build/mir5/sif-58f-prepared-inputs-r01/sources/observer",
+      "archive": "build/mir5/recovery-historical/aai-starting-trigger-4a-r01/run-r01/preserved-own-archives/2E1BE5952D2A4CC5C74A0D149E075D247BA110A3FAE5B6768D3EAEBABCEF989C/mir-fixture-mir5-active-mods-observer_0.1.0.zip",
+      "sha256": "2E1BE5952D2A4CC5C74A0D149E075D247BA110A3FAE5B6768D3EAEBABCEF989C",
+      "bytes": 834
+    }
+  },
+  "profiles": [
+    {"policy": "configured", "path": "tests/profiles/sif-science-retirement-mir5-configured-current-f210-2123.json", "sha256": "AB28D0A530863554F83CC437CCDD41A490296A5272878A1DBE582282DD679157", "bytes": 2774, "role": "existing configured successor profile reused as a CreateOnly policy witness only; its separately passed source-to-successor route remains distinct"},
+    {"policy": "space", "path": "tests/profiles/sif-science-retirement-mir5-space-current-f210-2123.json", "sha256": "57B31507F562F5E86DE24F7DCD4C4BC42773C2BBCCF8A17B36A372F1F8BD202D", "bytes": 2544, "role": "fresh zero-write current policy witness"},
+    {"policy": "space-and-promethium", "path": "tests/profiles/sif-science-retirement-mir5-space-and-promethium-current-f210-2123.json", "sha256": "DB8926198DF81A814BAB4B7BF8865528427056FE5F416D274268C83CD17C5DDD", "bytes": 2517, "role": "fresh zero-write current policy witness"},
+    {"policy": "space-age-progression", "path": "tests/profiles/sif-science-retirement-mir5-space-age-progression-current-f210-2123.json", "sha256": "BC4FDC69A4C56ED95100C4BC3B2DA01BA21C6EAF828665FFA4A1AE987BBD8A2E", "bytes": 2520, "role": "fresh zero-write current policy witness"},
+    {"policy": "official-progression", "path": "tests/profiles/sif-science-retirement-mir5-official-progression-current-f210-2123.json", "sha256": "9B41144258281D4C3EEC88A4B19E05D91B9B9BECE0FDB6AAC91A3BC1351CD364", "bytes": 2517, "role": "fresh zero-write current policy witness"},
+    {"policy": "mod-progression", "path": "tests/profiles/sif-science-retirement-mir5-mod-progression-current-f210-2123.json", "sha256": "42282F5E47C115BF4E19F9ADE316329C9E28A0F8C01BB1982F5FE1A1F0D530DD", "bytes": 2502, "role": "fresh zero-write current policy witness"},
+    {"policy": "all-official", "path": "tests/profiles/sif-science-retirement-mir5-all-official-current-f210-2123.json", "sha256": "81E8FDD937FCDA9F0C8624E581FEDDEBA6322DAE71953C9ABD42F7604DEB04ED", "bytes": 2493, "role": "fresh zero-write current policy witness"},
+    {"policy": "all", "path": "tests/profiles/sif-science-retirement-mir5-all-current-f210-2123.json", "sha256": "B7C150948869280BE3AB3786D66A4C422E629929EFE8E59936A80CA2DD253ECD", "bytes": 2466, "role": "fresh zero-write current policy witness"}
+  ],
+  "raw_git_rebuilt_selectors": [
+    {"policy": "space", "source_directory": "build/mir5/sif-58f-prepared-inputs-r01/sources/space", "archive": "mir-fixture-mir5-sif-policy-space-f210_0.1.0.zip", "archive_sha256": "0D5619F87A40251B6FEC6AD7C32D40079B22E032E09F73F77BD1D613CC41E0B6", "archive_bytes": 905, "members": [{"path": "info.json", "source_path": "tests/fixtures/sif-science-retirement/f210/policy-space/info.json", "git_blob": "660b71fdad3f313d67fd1a69ce77295fece3506e", "sha256": "C779DF4B8222E0B859694B6FA74C0274A5141AB68ADBFA92C91FBE24D6A758C7"}, {"path": "settings-updates.lua", "source_path": "tests/fixtures/sif-science-retirement/shared/selectors/space/settings-updates.lua", "git_blob": "a2fe5203a4d40c787bf8214c4bf69ba4ab77de60", "sha256": "E3B197872A7D91B000BA34FC04ABD41D3B98042A7F7F541AAF73A6A610B2E902"}]},
+    {"policy": "space-and-promethium", "source_directory": "build/mir5/sif-58f-prepared-inputs-r01/sources/space-and-promethium", "archive": "mir-fixture-mir5-sif-policy-space-and-promethium-f210_0.1.0.zip", "archive_sha256": "11FD8A185848C0FC243C59BC7EB793A265A6EDA2B8DCA6254902317275A13DD9", "archive_bytes": 988, "members": [{"path": "info.json", "source_path": "tests/fixtures/sif-science-retirement/f210/policy-space-and-promethium/info.json", "git_blob": "9e3f659538b3c03be981a915799c9bb21da1b533", "sha256": "C72647EAFFF9681D1EFC99276BCA66A4EE4DD8016B437F841457C909E24D8CB9"}, {"path": "settings-updates.lua", "source_path": "tests/fixtures/sif-science-retirement/shared/selectors/space-and-promethium/settings-updates.lua", "git_blob": "db700bd2cb68d7d9bc1544a8110e022a8fedb004", "sha256": "D9757DE6181447E71C86BEBE07DC0847636299696AD50D1805C56587D1AE18E2"}]},
+    {"policy": "space-age-progression", "source_directory": "build/mir5/sif-58f-prepared-inputs-r01/sources/space-age-progression", "archive": "mir-fixture-mir5-sif-policy-space-age-progression-f210_0.1.0.zip", "archive_sha256": "B815EC89F8A6F68E003559054005C2BAF4B18C07A25CDB3C8749D9FF532A8765", "archive_bytes": 991, "members": [{"path": "info.json", "source_path": "tests/fixtures/sif-science-retirement/f210/policy-space-age-progression/info.json", "git_blob": "6371c6c3f3a4e4c13a3a6a5575cff903368e84cc", "sha256": "6DD7134BBFE87C9CB772BD265986D16013359A8F126C15E81105AB003AF007F6"}, {"path": "settings-updates.lua", "source_path": "tests/fixtures/sif-science-retirement/shared/selectors/space-age-progression/settings-updates.lua", "git_blob": "2772ad5a751f7c401bf3dc183a8fd6b2f581d1f3", "sha256": "E8169BF41BE248FF3FDED8DC50C97FF58FE7B8C61536E54A77276948341A50C0"}]},
+    {"policy": "official-progression", "source_directory": "build/mir5/sif-58f-prepared-inputs-r01/sources/official-progression", "archive": "mir-fixture-mir5-sif-policy-official-progression-f210_0.1.0.zip", "archive_sha256": "80DF1F9188F3755654091E71484D7C11BCE89C8CA90CB602EBEEB3A19F8E97E1", "archive_bytes": 986, "members": [{"path": "info.json", "source_path": "tests/fixtures/sif-science-retirement/f210/policy-official-progression/info.json", "git_blob": "3ab7b99ac548e552b69c123af8e16cacaf490826", "sha256": "20F6C1CA75B5B49F7085DDB2AD58BB4E6AA750624EE539A48D9F435CA7AE1968"}, {"path": "settings-updates.lua", "source_path": "tests/fixtures/sif-science-retirement/shared/selectors/official-progression/settings-updates.lua", "git_blob": "b8822f1b6926b86fc07fbcec878dada2aab10fc6", "sha256": "52C52521377A2EB426CC10B8F1FC3572CCFCD4CE5E6651B5CB7C6DBE7208CA05"}]},
+    {"policy": "mod-progression", "source_directory": "build/mir5/sif-58f-prepared-inputs-r01/sources/mod-progression", "archive": "mir-fixture-mir5-sif-policy-mod-progression-f210_0.1.0.zip", "archive_sha256": "8CA8586F68C2DC80AD1D3A9D5EE12075DD0AFCF5A41F5067D0CE300E159F7281", "archive_bytes": 960, "members": [{"path": "info.json", "source_path": "tests/fixtures/sif-science-retirement/f210/policy-mod-progression/info.json", "git_blob": "422e5d7a09acfdf39b6177ab84d48ed02c4c3867", "sha256": "AE1EE695F1C847FCE164C1A332B8DE08071CBBDBCA869DF25BFD2B1673788FA3"}, {"path": "settings-updates.lua", "source_path": "tests/fixtures/sif-science-retirement/shared/selectors/mod-progression/settings-updates.lua", "git_blob": "27ee3a80950880fd24c37b441de273a54c1dc93e", "sha256": "35F4F695C3B6E3B0116D33209CD899DCFFCC518A0A12A2AFB78F811D81F571D7"}]},
+    {"policy": "all-official", "source_directory": "build/mir5/sif-58f-prepared-inputs-r01/sources/all-official", "archive": "mir-fixture-mir5-sif-policy-all-official-f210_0.1.0.zip", "archive_sha256": "9FC6E97D28BDBB794A7B441588AE24C93C5A11E4D8F3797C0E19EB063185A03D", "archive_bytes": 945, "members": [{"path": "info.json", "source_path": "tests/fixtures/sif-science-retirement/f210/policy-all-official/info.json", "git_blob": "1469679f41a28dea64bd25eb311b8483e8405a2e", "sha256": "F7DB5D04967B37E5600F007507EE2BCC0DBB96FF328F5AC43403A6C10AE0EBB3"}, {"path": "settings-updates.lua", "source_path": "tests/fixtures/sif-science-retirement/shared/selectors/all-official/settings-updates.lua", "git_blob": "4a39c5b2f0220c78db1ebbe82d02a118fde83de0", "sha256": "E719D04DE0D2590B3B49C03FCFCF4271C22AD2A9E17C44A709A950DEC4F41DBF"}]},
+    {"policy": "all", "source_directory": "build/mir5/sif-58f-prepared-inputs-r01/sources/all", "archive": "mir-fixture-mir5-sif-policy-all-f210_0.1.0.zip", "archive_sha256": "F0789EE3EAEB30A48CDD334D39FF1B4123356525B5423CBFCBF7077976102E4A", "archive_bytes": 894, "members": [{"path": "info.json", "source_path": "tests/fixtures/sif-science-retirement/f210/policy-all/info.json", "git_blob": "1c8b53449dfa936ba5f5f7244cb74f2bafcc8fa3", "sha256": "4BD62474B44148457464F7C2A422301768C7E45766F53076777C1DE2B78A332E"}, {"path": "settings-updates.lua", "source_path": "tests/fixtures/sif-science-retirement/shared/selectors/all/settings-updates.lua", "git_blob": "9fe59a6d7575622dc3f2670f9dc88d0595bc144b", "sha256": "4465E98D3D6C5DBFB5AE7FEC1767F87436173664F8A12BDFC0FD422176FDAC79"}]}
+  ],
+  "archive_guard": {
+    "status": "all-eight-selector-archives-pass-real-guard",
+    "command": "Assert-MIRLibraryFixtureArchive -Archive <recorded archive> -SourceDirectory <recorded raw-Git projection>",
+    "helpers": {
+      "tools/lib/validation/ImmutableInputStaging.ps1": "5B4BAF3BDAE524BF5EE1862723C421F824F24C9C3F07483CADC24EB03F7431B5",
+      "tools/lib/compatibility/LibraryActivation.ps1": "56DF583DB746CB571195EF5AC4BD334D59AAA8A2D16AE6B48EC38AB31720377A"
+    }
+  },
+  "native_admission_proposal": {
+    "exclusive_lane_required": true,
+    "archive_library": "D:/Projects/Factorio/testmods/2.1",
+    "fixture_sources_prefix": "D:/Projects/Factorio/more-infinite-research/build/mir5/sif-58f-prepared-inputs-r01/sources",
+    "per_case_timeout_seconds": 300,
+    "expected_peak_memory_mib": 4096,
+    "admission_wait_seconds": 30,
+    "aggregate_wall_clock_minutes": 30,
+    "case_commands": [
+      "pwsh -NoProfile -File tools/Invoke-NativeFixture.ps1 -ArchiveLibrary D:/Projects/Factorio/testmods/2.1 -FactorioBin D:/Games/Steam/steamapps/common/Factorio/bin/x64/factorio.exe -ProfilePath tests/profiles/sif-science-retirement-mir5-configured-current-f210-2123.json -FixtureSources @('D:/Projects/Factorio/more-infinite-research/build/mir5/sif-58f-prepared-inputs-r01/sources/successor','D:/Projects/Factorio/more-infinite-research/build/mir5/sif-58f-prepared-inputs-r01/sources/configured','D:/Projects/Factorio/more-infinite-research/build/mir5/sif-58f-prepared-inputs-r01/sources/observer') -ExpectedMIRArchiveSha256 58F04FB9D417F2726835F4A6740490DE3C1841665DAC81C2BA3DFA94050D9457 -ActiveModsObserver mir-fixture-mir5-active-mods-observer -CaseName sif-science-retirement-f210-configured -OutputRoot build/tmp/sif-f210-eight-policy-58f-r01/configured -CreateOnly -ConsumerMarkers MIR5_SIF_CANDIDATE -TimeoutSeconds 300 -ExpectedPeakMemoryMiB 4096 -AdmissionWaitSeconds 30",
+      "pwsh -NoProfile -File tools/Invoke-NativeFixture.ps1 -ArchiveLibrary D:/Projects/Factorio/testmods/2.1 -FactorioBin D:/Games/Steam/steamapps/common/Factorio/bin/x64/factorio.exe -ProfilePath tests/profiles/sif-science-retirement-mir5-space-current-f210-2123.json -FixtureSources @('D:/Projects/Factorio/more-infinite-research/build/mir5/sif-58f-prepared-inputs-r01/sources/successor','D:/Projects/Factorio/more-infinite-research/build/mir5/sif-58f-prepared-inputs-r01/sources/space','D:/Projects/Factorio/more-infinite-research/build/mir5/sif-58f-prepared-inputs-r01/sources/observer') -ExpectedMIRArchiveSha256 58F04FB9D417F2726835F4A6740490DE3C1841665DAC81C2BA3DFA94050D9457 -ActiveModsObserver mir-fixture-mir5-active-mods-observer -CaseName sif-science-retirement-f210-space -OutputRoot build/tmp/sif-f210-eight-policy-58f-r01/space -CreateOnly -ConsumerMarkers MIR5_SIF_CANDIDATE -TimeoutSeconds 300 -ExpectedPeakMemoryMiB 4096 -AdmissionWaitSeconds 30",
+      "pwsh -NoProfile -File tools/Invoke-NativeFixture.ps1 -ArchiveLibrary D:/Projects/Factorio/testmods/2.1 -FactorioBin D:/Games/Steam/steamapps/common/Factorio/bin/x64/factorio.exe -ProfilePath tests/profiles/sif-science-retirement-mir5-space-and-promethium-current-f210-2123.json -FixtureSources @('D:/Projects/Factorio/more-infinite-research/build/mir5/sif-58f-prepared-inputs-r01/sources/successor','D:/Projects/Factorio/more-infinite-research/build/mir5/sif-58f-prepared-inputs-r01/sources/space-and-promethium','D:/Projects/Factorio/more-infinite-research/build/mir5/sif-58f-prepared-inputs-r01/sources/observer') -ExpectedMIRArchiveSha256 58F04FB9D417F2726835F4A6740490DE3C1841665DAC81C2BA3DFA94050D9457 -ActiveModsObserver mir-fixture-mir5-active-mods-observer -CaseName sif-science-retirement-f210-space-and-promethium -OutputRoot build/tmp/sif-f210-eight-policy-58f-r01/space-and-promethium -CreateOnly -ConsumerMarkers MIR5_SIF_CANDIDATE -TimeoutSeconds 300 -ExpectedPeakMemoryMiB 4096 -AdmissionWaitSeconds 30",
+      "pwsh -NoProfile -File tools/Invoke-NativeFixture.ps1 -ArchiveLibrary D:/Projects/Factorio/testmods/2.1 -FactorioBin D:/Games/Steam/steamapps/common/Factorio/bin/x64/factorio.exe -ProfilePath tests/profiles/sif-science-retirement-mir5-space-age-progression-current-f210-2123.json -FixtureSources @('D:/Projects/Factorio/more-infinite-research/build/mir5/sif-58f-prepared-inputs-r01/sources/successor','D:/Projects/Factorio/more-infinite-research/build/mir5/sif-58f-prepared-inputs-r01/sources/space-age-progression','D:/Projects/Factorio/more-infinite-research/build/mir5/sif-58f-prepared-inputs-r01/sources/observer') -ExpectedMIRArchiveSha256 58F04FB9D417F2726835F4A6740490DE3C1841665DAC81C2BA3DFA94050D9457 -ActiveModsObserver mir-fixture-mir5-active-mods-observer -CaseName sif-science-retirement-f210-space-age-progression -OutputRoot build/tmp/sif-f210-eight-policy-58f-r01/space-age-progression -CreateOnly -ConsumerMarkers MIR5_SIF_CANDIDATE -TimeoutSeconds 300 -ExpectedPeakMemoryMiB 4096 -AdmissionWaitSeconds 30",
+      "pwsh -NoProfile -File tools/Invoke-NativeFixture.ps1 -ArchiveLibrary D:/Projects/Factorio/testmods/2.1 -FactorioBin D:/Games/Steam/steamapps/common/Factorio/bin/x64/factorio.exe -ProfilePath tests/profiles/sif-science-retirement-mir5-official-progression-current-f210-2123.json -FixtureSources @('D:/Projects/Factorio/more-infinite-research/build/mir5/sif-58f-prepared-inputs-r01/sources/successor','D:/Projects/Factorio/more-infinite-research/build/mir5/sif-58f-prepared-inputs-r01/sources/official-progression','D:/Projects/Factorio/more-infinite-research/build/mir5/sif-58f-prepared-inputs-r01/sources/observer') -ExpectedMIRArchiveSha256 58F04FB9D417F2726835F4A6740490DE3C1841665DAC81C2BA3DFA94050D9457 -ActiveModsObserver mir-fixture-mir5-active-mods-observer -CaseName sif-science-retirement-f210-official-progression -OutputRoot build/tmp/sif-f210-eight-policy-58f-r01/official-progression -CreateOnly -ConsumerMarkers MIR5_SIF_CANDIDATE -TimeoutSeconds 300 -ExpectedPeakMemoryMiB 4096 -AdmissionWaitSeconds 30",
+      "pwsh -NoProfile -File tools/Invoke-NativeFixture.ps1 -ArchiveLibrary D:/Projects/Factorio/testmods/2.1 -FactorioBin D:/Games/Steam/steamapps/common/Factorio/bin/x64/factorio.exe -ProfilePath tests/profiles/sif-science-retirement-mir5-mod-progression-current-f210-2123.json -FixtureSources @('D:/Projects/Factorio/more-infinite-research/build/mir5/sif-58f-prepared-inputs-r01/sources/successor','D:/Projects/Factorio/more-infinite-research/build/mir5/sif-58f-prepared-inputs-r01/sources/mod-progression','D:/Projects/Factorio/more-infinite-research/build/mir5/sif-58f-prepared-inputs-r01/sources/observer') -ExpectedMIRArchiveSha256 58F04FB9D417F2726835F4A6740490DE3C1841665DAC81C2BA3DFA94050D9457 -ActiveModsObserver mir-fixture-mir5-active-mods-observer -CaseName sif-science-retirement-f210-mod-progression -OutputRoot build/tmp/sif-f210-eight-policy-58f-r01/mod-progression -CreateOnly -ConsumerMarkers MIR5_SIF_CANDIDATE -TimeoutSeconds 300 -ExpectedPeakMemoryMiB 4096 -AdmissionWaitSeconds 30",
+      "pwsh -NoProfile -File tools/Invoke-NativeFixture.ps1 -ArchiveLibrary D:/Projects/Factorio/testmods/2.1 -FactorioBin D:/Games/Steam/steamapps/common/Factorio/bin/x64/factorio.exe -ProfilePath tests/profiles/sif-science-retirement-mir5-all-official-current-f210-2123.json -FixtureSources @('D:/Projects/Factorio/more-infinite-research/build/mir5/sif-58f-prepared-inputs-r01/sources/successor','D:/Projects/Factorio/more-infinite-research/build/mir5/sif-58f-prepared-inputs-r01/sources/all-official','D:/Projects/Factorio/more-infinite-research/build/mir5/sif-58f-prepared-inputs-r01/sources/observer') -ExpectedMIRArchiveSha256 58F04FB9D417F2726835F4A6740490DE3C1841665DAC81C2BA3DFA94050D9457 -ActiveModsObserver mir-fixture-mir5-active-mods-observer -CaseName sif-science-retirement-f210-all-official -OutputRoot build/tmp/sif-f210-eight-policy-58f-r01/all-official -CreateOnly -ConsumerMarkers MIR5_SIF_CANDIDATE -TimeoutSeconds 300 -ExpectedPeakMemoryMiB 4096 -AdmissionWaitSeconds 30",
+      "pwsh -NoProfile -File tools/Invoke-NativeFixture.ps1 -ArchiveLibrary D:/Projects/Factorio/testmods/2.1 -FactorioBin D:/Games/Steam/steamapps/common/Factorio/bin/x64/factorio.exe -ProfilePath tests/profiles/sif-science-retirement-mir5-all-current-f210-2123.json -FixtureSources @('D:/Projects/Factorio/more-infinite-research/build/mir5/sif-58f-prepared-inputs-r01/sources/successor','D:/Projects/Factorio/more-infinite-research/build/mir5/sif-58f-prepared-inputs-r01/sources/all','D:/Projects/Factorio/more-infinite-research/build/mir5/sif-58f-prepared-inputs-r01/sources/observer') -ExpectedMIRArchiveSha256 58F04FB9D417F2726835F4A6740490DE3C1841665DAC81C2BA3DFA94050D9457 -ActiveModsObserver mir-fixture-mir5-active-mods-observer -CaseName sif-science-retirement-f210-all -OutputRoot build/tmp/sif-f210-eight-policy-58f-r01/all -CreateOnly -ConsumerMarkers MIR5_SIF_CANDIDATE -TimeoutSeconds 300 -ExpectedPeakMemoryMiB 4096 -AdmissionWaitSeconds 30"
+    ]
+  },
+  "configured_successor_disposition": {
+    "status": "already-passed-separate-published-to-current-save-route",
+    "native_chain": "spec/evidence/sif-f210-configured-58f-native-chain.json",
+    "source_profile": "tests/profiles/sif-science-retirement-published-configured-f210-2123.json",
+    "current_profile": "tests/profiles/sif-science-retirement-mir5-configured-current-f210-2123.json",
+    "limit": "This packet does not replay its source labs, predecessor save, successor labs, or reloads. Its configured row is only a new CreateOnly runtime-policy observation."
+  },
+  "limits": [
+    "Preparation is not execution: no entry in the eight-call matrix has been run, and no policy is marked passed.",
+    "Every CreateOnly case must emit exactly its MIR5_SIF_CANDIDATE init marker and return with zero storage/native-state writes; it cannot qualify a save upgrade, a laboratory completion, ordinary science costs, physical production, timing, performance, or release.",
+    "The historical cr-extras1.0.01 upstream and MIR failures remain under their original inputs. This packet selects only the independently present 1.0.10 closure.",
+    "The old generic F210 policy profiles retain historical candidate identities and are not retargeted. The seven new current profiles and existing configured-current profile bind the 58F candidate explicitly.",
+    "The 4 GiB/300-second per-case and 30-minute aggregate values are a proposed governed admission, not a reserve waiver or actual resource result. The sole native worker must accept the packet before dispatch."
+  ]
+}

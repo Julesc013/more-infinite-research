@@ -1,7 +1,7 @@
 ---
 title: "Save continuity and migration"
 status: current
-applies_to: "MIR replacement development"
+applies_to: "MIR development"
 audience: developer
 doc_type: specification
 owner: mir-maintainers
