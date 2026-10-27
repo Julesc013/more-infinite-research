@@ -5,7 +5,7 @@ applies_to: "MIR replacement development"
 audience: developer
 doc_type: how-to
 owner: mir-maintainers
-last_reviewed: 2026-10-26
+last_reviewed: 2026-10-27
 supersedes: []
 superseded_by: []
 source_of_truth_for:
@@ -104,6 +104,8 @@ Follow [verification](../spec/verification.md). Run cheap affected checks first,
 The ATAN, K2, automatic-family and BobTech controls read their historical selectors, profile/qualification source and automatic-family logs from published commit `bd9774f323b6eb1561c1d9ff0c91ecc3f7acd1d1`, checking each original captured SHA256. The named prerequisite-repair control additionally reads its published 4.7.3 source baseline at `8643cc91bc915e008556a5315dbb0a743247e7ab`, checking both recorded blob IDs. They do not require editable MIR4 source or historical files in the current tree. A shallow checkout needs `git fetch --no-tags --depth=1 origin bd9774f323b6eb1561c1d9ff0c91ecc3f7acd1d1` and `git fetch --no-tags --depth=1 origin 8643cc91bc915e008556a5315dbb0a743247e7ab` before those controls; the hosted workflow performs both exact fetches. The readers have no network or current-file fallback. Current MIR5 settings/catalogue assertions continue to read current source.
 
 The F210 K2 capture controls read their two original profile blobs from exact native-input commit `5c51ed46d1762b4fca7480f05a057482bbbedb0a` and verify the captured SHA256 values. Current profiles may rebind observer or candidate archives without changing that historical observation. A shallow checkout also needs `git fetch --no-tags --depth=1 origin 5c51ed46d1762b4fca7480f05a057482bbbedb0a`; the hosted plan/host jobs fetch this exact object before controls. The reader has no moving-HEAD, network or current-file fallback.
+
+The Bob/Angel F210 science/oil fixture control also checks its four selected runtime members and package helper against construction commit `c37fca88667d550660f5b9c0efd7f272b56d6025` and current `HEAD`. Before running that control or the full host driver locally, fetch the exact object with `git fetch --no-tags --depth=1 origin c37fca88667d550660f5b9c0efd7f272b56d6025`; the hosted plan/host jobs already do so. A merged squash commit does not guarantee that this original construction commit is present in a clone. The [prepared-input receipt](../spec/evidence/bob-angel-f210-science-oil-inputs-c37fca88.json) pins the fixture bytes; neither this fetch nor the host control launches Factorio or qualifies gameplay.
 
 A test correction needs independent evidence. A resource refusal is not a pass, fail or timing sample. A path-only rename still needs package member equality and final-layout smoke, because import and package mistakes are real defects.
 
