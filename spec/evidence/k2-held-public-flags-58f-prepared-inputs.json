@@ -1,0 +1,88 @@
+{
+  "schema": 1,
+  "kind": "MIR5K2HeldFlagsCurrentPreparedInputsV1",
+  "status": "existing-owned-fixtures-rebuilt-exactly-current-successor-prepared-not-native-qualified",
+  "case_name": "k2-imersite-held-public-flags",
+  "fixture_provenance": {
+    "prepared_input_receipt": "spec/evidence/k2-imersite-held-public-flags-inputs-a9754abc.json",
+    "receipt_sha256": "F47676CDBEC2C4B714B086DCD828D7AF11FDE4B2C226ECA2FCC092EEF0977361",
+    "raw_git_commit": "a9754abcd7405e1ddffa9f4dc8051b71d00855fe",
+    "all_fourteen_raw_git_members_match": true
+  },
+  "builder": {
+    "path": "tools/package.py",
+    "sha256": "D5DCCBFABB69E6D7F529DBB9BCE8B907231EB682E9059BF3586777F3C74FBB50",
+    "outputs_identical_to_prior_builder": true
+  },
+  "source": {
+    "source_commit": "b251ae7a54104ace87cb0da4cf531cf53f03c93d",
+    "player_tree": "79b73a6a8e68987737e69bf2d95ec6555b49f901",
+    "archive_sha256": "E3A65C08AC7798A66FB1BE30D24307B17C8B366DD901953BDE2A09BD6939C8CE",
+    "archive_path": "build/mir5/assets/b251ae7a-r01/more-infinite-research_5.0.21000.zip",
+    "bytes": 679250
+  },
+  "fixed": {
+    "source_commit": "98fbdd33fe47eb678a5e1aaf17fee903eba2a22a",
+    "player_tree": "ffc5f2e3359de4f326a184cf6a3c29a55941150a",
+    "archive_sha256": "58F04FB9D417F2726835F4A6740490DE3C1841665DAC81C2BA3DFA94050D9457",
+    "archive_path": "build/mir5/assets/98fbdd33-root-r01/more-infinite-research_5.0.21000.zip",
+    "bytes": 679860
+  },
+  "engine": {
+    "version": "2.1.23",
+    "sha256": "FE4A1DA30F322A0D0B8AEB3DF7276332222BAAA143E2352569B723E84B2B9060"
+  },
+  "observer": {
+    "sha256": "2E1BE5952D2A4CC5C74A0D149E075D247BA110A3FAE5B6768D3EAEBABCEF989C",
+    "source_projection": "build/mir5/sif-58f-prepared-inputs-r01/sources/observer"
+  },
+  "stages": [
+    {
+      "stage": "source",
+      "archive": "build/mir5/k2-held-flags-58f-prepared-r01/mir-fixture-mir5-k2-imersite-held-public-flags_0.1.0.zip",
+      "projection": "build/mir5/k2-held-flags-58f-prepared-r01/source-projection",
+      "name": "mir-fixture-mir5-k2-imersite-held-public-flags_0.1.0.zip",
+      "sha256": "F57D35293380C5B06D49FE5841341E6D8F2E217A81312D6C43049974633BFC59",
+      "bytes": 6816,
+      "members": 7
+    },
+    {
+      "stage": "fixed",
+      "archive": "build/mir5/k2-held-flags-58f-prepared-r01/mir-fixture-mir5-k2-imersite-held-public-flags_0.2.0.zip",
+      "projection": "build/mir5/k2-held-flags-58f-prepared-r01/fixed-projection",
+      "name": "mir-fixture-mir5-k2-imersite-held-public-flags_0.2.0.zip",
+      "sha256": "FB33961AB84A0A5CFACF682AF0E0A29AD58CF9EBB665F92AACA06EAADBF091B9",
+      "bytes": 6815,
+      "members": 7
+    }
+  ],
+  "profiles": [
+    {
+      "stage": "source",
+      "path": "tests/profiles/k2-imersite-held-public-flags-source-f210.json",
+      "sha256": "582634A08D30D0CFA21C1F1914BC121DCF9E0A2196671C7DDDB4F560C5D9F79A",
+      "bytes": 3044
+    },
+    {
+      "stage": "fixed",
+      "path": "tests/profiles/k2-imersite-held-public-flags-fixed-f210.json",
+      "sha256": "0BFFED656EAAB364094348251491B4491DE423EF10ADAA65F81E1B5EF4DE3732",
+      "bytes": 3132
+    }
+  ],
+  "native_execution": false,
+  "library_mutation": false,
+  "actual_lab_completions": 0,
+  "release_qualification": false,
+  "limits": [
+    "Prepared exact source and successor inputs, not a native result.",
+    "The older6786/59C successor remains at its original prepared Git identity; it was never qualified by changing this profile.",
+    "The fixture seeds a level4 holder, three2% earned levels,27% detached work and foreign public disablement/visibility. No lab or production claim.",
+    "An actual source save, fixed normal configuration handoff, save and two cold reloads per stage remain required.",
+    "This held-state route does not qualify the separate queued K2SO or K2SE saved-carrier routes."
+  ],
+  "archive_guard": {
+    "status": "both-seven-member-owned-fixtures-pass-real-guard",
+    "command": "Assert-MIRLibraryFixtureArchive -Archive <exact archive> -SourceDirectory <raw Git projection>"
+  }
+}
