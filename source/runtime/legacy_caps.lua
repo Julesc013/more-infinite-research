@@ -45,6 +45,11 @@ local function field(object, name)
   return nil
 end
 
+local function map_entry(map, key)
+  if type(map) ~= "table" then return nil end
+  return map[key]
+end
+
 local function exact_key(candidate)
   return table.concat({candidate.name, candidate.setting, candidate.source,
     candidate.operation}, "\0")
@@ -166,6 +171,25 @@ local function admitted_candidate(candidate, allowed)
   return authority
 end
 
+-- The public 3.2.11/4.0/4.1 player archives retained a smaller, boolean
+-- policy-v1 controller.  Its only positive enablement proof is the exact
+-- `true` marker written after that controller observed an enabled technology
+-- and disabled it for a finite cap.  Restrict the historical reader to the
+-- two producer classes that controller actually wrote; later native-owner
+-- tails have a different contract and cannot acquire schema-1 authority.
+local function boolean_candidate_admitted(candidate, allowed)
+  if admitted_candidate(candidate, allowed) == nil then return false end
+  if candidate.source == "generated-stream" then
+    return candidate.operation == "emit"
+      or candidate.operation == "runtime-settings-transport"
+  end
+  if candidate.source == "base-continuation" then
+    return candidate.operation == "emit_base_extension"
+      or candidate.operation == "runtime-settings-transport"
+  end
+  return false
+end
+
 local function candidate_list(candidates)
   if type(candidates) ~= "table" then
     error("MIR legacy caps candidates must be a table", 3)
@@ -206,6 +230,15 @@ local function policy_matches(policy, candidate, authority)
     and policy.policy_transport == authority.policy_transport
     and policy.ownership_kind == authority.ownership_kind
     and policy.legacy == false
+    and policy.blocked_reason == nil
+    and positive_integer(policy.selected)
+end
+
+local function boolean_policy_matches(policy, candidate)
+  return type(policy) == "table"
+    and policy.setting == candidate.setting
+    and policy.source == candidate.source
+    and policy.operation == candidate.operation
     and policy.blocked_reason == nil
     and positive_integer(policy.selected)
 end
@@ -350,6 +383,93 @@ function M.import_for_force(legacy_bucket, force, candidates, current_owned, all
         else
           set_decision(facts, index, candidate, "visibility_imported_disable_unproven")
         end
+      end
+    end
+  end
+  return rows, facts
+end
+
+-- Decode the earlier public policy-v1 boolean ledger without relaxing the
+-- structured policy-v3 reader above.  The caller selects this component only
+-- for an exact known predecessor bucket; this pure function still requires a
+-- current preflighted candidate, its exact saved tuple, a valid Force and the
+-- live native state before returning a new ownership row.
+function M.import_boolean_for_force(legacy_bucket, force, candidates, current_owned, allowed)
+  local entries, count = candidate_list(candidates)
+  if current_owned ~= nil and type(current_owned) ~= "table" then
+    error("MIR legacy caps current ownership must be a table or nil", 2)
+  end
+
+  local rows = {}
+  local facts = {legacy_policy1 = false, candidates_checked = count, imported = 0, decisions = {}}
+  if type(legacy_bucket) ~= "table" or legacy_bucket.policy_version ~= 1 then
+    for index = 1, count do set_decision(facts, index, entries[index], "legacy_policy_unrecognized") end
+    return rows, facts
+  end
+  facts.legacy_policy1 = true
+
+  if force == nil or field(force, "valid") == false then
+    for index = 1, count do set_decision(facts, index, entries[index], "force_unavailable") end
+    return rows, facts
+  end
+  local force_index = field(force, "index")
+  if not positive_integer(force_index) then
+    for index = 1, count do set_decision(facts, index, entries[index], "force_index_invalid") end
+    return rows, facts
+  end
+
+  local saved_managed = field(legacy_bucket, "managed_technologies")
+  local saved_disabled = field(legacy_bucket, "disabled_by_cap")
+  local saved_visibility = field(legacy_bucket, "visibility_by_cap")
+  local saved_unowned = field(legacy_bucket, "unowned_disabled_by_cap")
+  local managed = type(saved_managed) == "table" and saved_managed or nil
+  local disabled = type(saved_disabled) == "table" and saved_disabled[force_index] or nil
+  local visibility = type(saved_visibility) == "table" and saved_visibility[force_index] or nil
+  local unowned = type(saved_unowned) == "table" and saved_unowned[force_index] or nil
+
+  for index = 1, count do
+    local candidate = entries[index]
+    if not boolean_candidate_admitted(candidate, allowed) then
+      set_decision(facts, index, candidate, "candidate_not_admitted")
+    elseif current_owned and current_owned[candidate.name] ~= nil then
+      set_decision(facts, index, candidate, "current_mir5_ownership_retained")
+    else
+      local policy = managed and managed[candidate.name] or nil
+      local disabled_marker = map_entry(disabled, candidate.name)
+      local visibility_marker = map_entry(visibility, candidate.name)
+      local unowned_marker = map_entry(unowned, candidate.name)
+      local technology = native_technology(force, candidate.name)
+      if not boolean_policy_matches(policy, candidate) then
+        set_decision(facts, index, candidate, "policy_mismatch")
+      elseif visibility_marker ~= nil and type(visibility_marker) ~= "boolean" then
+        set_decision(facts, index, candidate, "visibility_record_mismatch")
+      elseif visibility_marker ~= nil and not current_visibility_owned_state(technology) then
+        set_decision(facts, index, candidate, "visibility_state_changed")
+      elseif disabled_marker == true and unowned_marker == nil
+          and current_disable_owned_state(technology) then
+        local row = visibility_marker ~= nil
+          and {disabled = true, visible_when_disabled = visibility_marker}
+          or {disabled = true}
+        rows[candidate.name] = row
+        facts.imported = facts.imported + 1
+        set_decision(facts, index, candidate, "owned_disable_imported")
+      elseif visibility_marker ~= nil then
+        -- The historical visibility boolean proves only its own MIR write.
+        -- A missing, malformed or foreign disable marker must never enable a
+        -- current disabled technology.
+        rows[candidate.name] = {visible_when_disabled = visibility_marker}
+        facts.imported = facts.imported + 1
+        if unowned_marker ~= nil then
+          set_decision(facts, index, candidate, "visibility_imported_unowned_disable_excluded")
+        elseif disabled_marker == true then
+          set_decision(facts, index, candidate, "visibility_imported_enablement_reenabled")
+        elseif disabled_marker == nil then
+          set_decision(facts, index, candidate, "visibility_only_imported")
+        else
+          set_decision(facts, index, candidate, "visibility_imported_disable_unproven")
+        end
+      else
+        set_decision(facts, index, candidate, "boolean_marker_missing")
       end
     end
   end
