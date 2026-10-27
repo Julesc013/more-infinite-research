@@ -63,6 +63,7 @@ $controls = @(
   [ordered]@{path='tests/test_competing_productivity.py';lua=$true},
   [ordered]@{path='tests/test_native_credit_definitions.py';lua=$true},
   [ordered]@{path='tests/test_native_credits.py';lua=$true},
+  [ordered]@{path='tests/test_legacy_module_credits.py';lua=$true},
   [ordered]@{path='tests/test_legacy_preference_transition_fixture.py';lua=$true},
   [ordered]@{path='tests/test_competing_epr_native_fixture.py';lua=$true},
   [ordered]@{path='tests/test_competing_fixed_reference.py';lua=$true},
