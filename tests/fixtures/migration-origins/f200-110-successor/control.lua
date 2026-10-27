@@ -90,7 +90,7 @@ local function same_effect_counts(actual, expected)
   for key, count in pairs(expected) do if actual[key] ~= count then return false end end
   return true
 end
-local function assert_module_credit(force, snapshot, label)
+local function assert_module_credit(force, snapshot, label, target)
   local contract = catalogue.module_credit
   if type(contract) ~= "table" or type(contract.public) ~= "table" or type(contract.holders) ~= "table"
       or #contract.public ~= 9 or #contract.holders ~= 3 then
@@ -104,7 +104,8 @@ local function assert_module_credit(force, snapshot, label)
   local completed = saved.level - 1 + (saved.researched and 1 or 0)
   if completed < 1 then fail(label .. " saved module credit is absent") end
   local public = technology(force, "recipe-prod-research_modules-1")
-  if public.prototype == nil
+  if public.prototype == nil or public.enabled ~= target.modules_enabled
+      or public.prototype.enabled ~= target.modules_enabled
       or not same_effect_counts(recipe_effect_counts(public.prototype.effects, label .. " current public module"),
         recipe_effect_counts(contract.public, "candidate public module")) then
     fail(label .. " current public module effects differ")
@@ -141,11 +142,15 @@ local function assert_queue(force, expected, label)
   end
   for index, name in ipairs(expected.queue) do if actual.queue[index] ~= name then fail(label .. " queue identity differs") end end
 end
-local function assert_settings()
+local function assert_settings(target)
   if map_count(catalogue.settings) ~= 42 then fail("published source settings roster differs") end
   for name, expected in pairs(catalogue.settings) do
     local value = settings.startup[name]
-    if value == nil or value.value ~= expected then fail("published source setting differs: " .. name) end
+    local candidate_expected = expected
+    if name == "ips-enable-research_modules" then candidate_expected = target.modules_enabled end
+    if value == nil or value.value ~= candidate_expected then
+      fail("candidate startup setting differs: " .. name)
+    end
   end
 end
 local function source_row_text(row)
@@ -235,12 +240,16 @@ local function observe_module_bonuses(force, snapshot, label)
     .. "\"current_candidate_productivity_module_bonus\":" .. tostring(observed["productivity-module"].candidate) .. ","
     .. "\"current_candidate_efficiency_module_bonus\":" .. tostring(observed["efficiency-module"].candidate) .. "}")
 end
-local function assert_force(force, snapshot, names, label, ignore_direct, candidate_delta)
+local function assert_force(force, snapshot, names, label, ignore_direct, candidate_delta, target)
   if force == nil or force.valid == false then fail(label .. " force is absent") end
   for _, name in ipairs(names) do
     local expected, actual = snapshot.technologies[name], technology(force, name)
     if name ~= catalogue.direct or not ignore_direct then
-      if actual.level ~= expected.level or actual.researched ~= expected.researched or actual.enabled ~= expected.enabled
+      local expected_enabled = expected.enabled
+      if name == "recipe-prod-research_modules-1" then
+        expected_enabled = target.modules_enabled
+      end
+      if actual.level ~= expected.level or actual.researched ~= expected.researched or actual.enabled ~= expected_enabled
           or actual.visible_when_disabled ~= expected.visible or actual.prototype.max_level ~= expected.maximum
           or not close(actual.saved_progress, expected.saved) then
         fail(label .. " retained source technology differs: " .. name
@@ -292,22 +301,22 @@ local function exact_target()
     if script.active_mods.base == expected.base and script.active_mods["more-infinite-research"] == expected.mir
         and script.active_mods[FIXTURE] == expected.fixture
         and script.active_mods["mir-fixture-mir5-active-mods-observer"] == "0.1.0" then
-      return name
+      return name, expected
     end
   end
   fail("successor runtime target closure differs")
 end
-local function assert_source_before(state_value, names, ignore_direct, delta)
-  assert_settings()
-  assert_force(game.forces.player, state_value.player_snapshot, names, "player", ignore_direct, delta or 0)
-  assert_module_credit(game.forces.player, state_value.player_snapshot, "player")
+local function assert_source_before(state_value, names, ignore_direct, delta, target)
+  assert_settings(target)
+  assert_force(game.forces.player, state_value.player_snapshot, names, "player", ignore_direct, delta or 0, target)
+  assert_module_credit(game.forces.player, state_value.player_snapshot, "player", target)
   local foreign = game.forces[state_value.foreign_index]
-  assert_force(foreign, state_value.foreign_snapshot, names, "foreign", false, 0)
-  assert_module_credit(foreign, state_value.foreign_snapshot, "foreign")
+  assert_force(foreign, state_value.foreign_snapshot, names, "foreign", false, 0, target)
+  assert_module_credit(foreign, state_value.foreign_snapshot, "foreign", target)
   assert_queue(foreign, state_value.foreign_queue, "foreign")
   local detached = game.forces[state_value.detached_index]
-  assert_force(detached, state_value.detached_snapshot, names, "detached", false, 0)
-  assert_module_credit(detached, state_value.detached_snapshot, "detached")
+  assert_force(detached, state_value.detached_snapshot, names, "detached", false, 0, target)
+  assert_module_credit(detached, state_value.detached_snapshot, "detached", target)
   local idle = queue_snapshot(detached)
   if idle.current ~= false or #idle.queue ~= 0 then fail("detached source queue changed") end
 end
@@ -371,11 +380,11 @@ local function marker(stage, target, state_value, successor)
     .. "\"manual_mining_baseline\":0,\"on_load_read_only\":" .. tostring(stage == "reload") .. "}")
 end
 local function begin()
-  local target = exact_target()
+  local target, target_config = exact_target()
   local state_value, names = state()
   -- Every retained source field is validated before this fixture creates a
   -- candidate lab or writes its successor record.
-  assert_source_before(state_value, names, false, 0)
+  assert_source_before(state_value, names, false, 0, target_config)
   if type(state_value.successors) == "table" and state_value.successors[target] ~= nil then
     fail("target successor already began")
   end
@@ -394,9 +403,9 @@ local function begin()
     fail("could not queue one actual candidate gear lab")
   end
 end
-local function complete(target, state_value, successor)
+local function complete(target, target_config, state_value, successor)
   local names = source_names()
-  assert_source_before(state_value, names, true, successor.candidate_delta)
+  assert_source_before(state_value, names, true, successor.candidate_delta, target_config)
   local direct = technology(game.forces.player, catalogue.direct)
   local before = state_value.player_snapshot.technologies[catalogue.direct]
   if successor.candidate_actual_labs ~= 1 or direct.level ~= before.level + 1 or direct.researched ~= false
@@ -408,7 +417,7 @@ local function complete(target, state_value, successor)
     fail("candidate player queue survived completion")
   end
 end
-local function reset_after_candidate_lab(target, state_value, successor)
+local function reset_after_candidate_lab(target, target_config, state_value, successor)
   local player = game.forces.player
   if type(player.reset_technology_effects) ~= "function" then
     fail("candidate force cannot reset technology effects")
@@ -417,7 +426,7 @@ local function reset_after_candidate_lab(target, state_value, successor)
   -- This reset belongs to the initial completion transaction.  Re-running the
   -- read-only completion checks prevents it from discarding source rights,
   -- candidate progress, or the foreign queue before the completed save.
-  complete(target, state_value, successor)
+  complete(target, target_config, state_value, successor)
 end
 
 script.on_configuration_changed(begin)
@@ -441,13 +450,13 @@ script.on_event(defines.events.on_research_finished, function(event)
   end
 end)
 script.on_event(defines.events.on_tick, function()
-  local target = exact_target()
+  local target, target_config = exact_target()
   local state_value = state()
   local successor = state_value.successors and state_value.successors[target]
   if type(successor) ~= "table" then fail("target successor state is absent") end
   if successor.phase == "completed" then
     if loaded and not reload_reported then
-      complete(target, state_value, successor)
+      complete(target, target_config, state_value, successor)
       marker("reload", target, state_value, successor)
       reload_reported = true
     end
@@ -459,8 +468,8 @@ script.on_event(defines.events.on_tick, function()
     if successor.lab == nil or successor.lab.valid == false then fail("candidate gear lab became invalid") end
     successor.lab.energy = 1000000000
   else
-    complete(target, state_value, successor)
-    reset_after_candidate_lab(target, state_value, successor)
+    complete(target, target_config, state_value, successor)
+    reset_after_candidate_lab(target, target_config, state_value, successor)
     successor.phase = "completed"
     marker("initial", target, state_value, successor)
     game.server_save(catalogue.save)

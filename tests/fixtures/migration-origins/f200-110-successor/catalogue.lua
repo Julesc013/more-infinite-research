@@ -32,8 +32,12 @@ return {
   },
   source_fixture_version = "0.1.0",
   targets = {
-    f200 = {base = "2.0.77", mir = "5.0.20000", fixture = "0.2.0"},
-    f210 = {base = "2.1.23", mir = "5.0.21000", fixture = "0.3.0"},
+    f200 = {base = "2.0.77", mir = "5.0.20000", fixture = "0.2.0", modules_enabled = true},
+    f210 = {base = "2.1.23", mir = "5.0.21000", fixture = "0.3.0", modules_enabled = true},
+    -- This wrapper retains the source fixture's mod/storage identity while
+    -- changing only the effective startup default in its settings stage.  It
+    -- is a separate saved-state qualification input, not a new source state.
+    f210_modules_disabled = {base = "2.1.23", mir = "5.0.21000", fixture = "0.4.0", modules_enabled = false},
   },
   save = "mir5-native-complete",
   deadline_ticks = 18000,
