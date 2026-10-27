@@ -166,14 +166,45 @@ class MigrationOriginSuccessorControls(unittest.TestCase):
         path = (FIXTURE / "control.lua").as_posix()
         self.lua.globals().successor_runtime_path = path
         self.lua.execute(r'''
-          function migration_successor_run_control(target_name,mutate,already_current)
+          function migration_successor_run_control(target_name,mutate,already_current,effect_case)
             local callbacks={events={}}
             local direct_name="recipe-prod-research_gears-1"
             local alternate_name="recipe-prod-research_plastic-1"
+            local native_string, current_numeric_form=string, "source"
+            local source_changes={[.1]="0.10000000149011612",[.05]="0.05000000074505806",
+              [.02]="0.019999999552965164",[.01]="0.0099999997764825821"}
+            local short_changes={[.1]="0.1",[.05]="0.05",[.02]="0.02",[.01]="0.01"}
+            local function effect(recipe,change,kind,hidden)
+              local row={type=kind or "change-recipe-productivity",recipe=recipe,change=change}
+              if hidden~=nil then row.hidden=hidden end
+              return row
+            end
+            local function source_record(recipe,change,kind)
+              return {recipe=recipe,change=source_changes[change],kind=kind or "change-recipe-productivity"}
+            end
+            local function direct_source_records()
+              if effect_case=="ordered" then return {source_record("iron-gear-wheel",.1),source_record("advanced-circuit",.1)} end
+              if effect_case=="four-values" then return {source_record("iron-gear-wheel",.1),source_record("advanced-circuit",.05),
+                source_record("processing-unit",.02),source_record("low-density-structure",.01)} end
+              if effect_case=="missing-duplicate" then return {source_record("iron-gear-wheel",.1),source_record("iron-gear-wheel",.1)} end
+              return {source_record("iron-gear-wheel",.1)}
+            end
+            local function direct_current_effects()
+              if effect_case=="ordered" then return {effect("advanced-circuit",.1),effect("iron-gear-wheel",.1,false,false)} end
+              if effect_case=="four-values" then return {effect("low-density-structure",.01,false,false),effect("processing-unit",.02),
+                effect("advanced-circuit",.05,false,false),effect("iron-gear-wheel",.1)} end
+              if effect_case=="wrong-recipe" then return {effect("steel-plate",.1)} end
+              if effect_case=="wrong-type" then return {effect("iron-gear-wheel",.1,"unlock-recipe")} end
+              if effect_case=="wrong-change" then return {effect("iron-gear-wheel",.05)} end
+              if effect_case=="hidden-true" then return {effect("iron-gear-wheel",.1,false,true)} end
+              if effect_case=="duplicate" then return {effect("iron-gear-wheel",.1),effect("iron-gear-wheel",.1)} end
+              if effect_case=="missing-duplicate" then return {effect("iron-gear-wheel",.1)} end
+              return {effect("iron-gear-wheel",.1)}
+            end
             local function tech(name,level,saved)
+              local effect_rows=name==direct_name and direct_current_effects() or {effect("plastic-bar",.1)}
               return {name=name,valid=true,level=level,researched=false,enabled=true,visible_when_disabled=false,
-                saved_progress=saved or 0,prototype={max_level=4294967295,effects={{type="change-recipe-productivity",
-                recipe=name==direct_name and "iron-gear-wheel" or "plastic-bar",change=.1}},
+                saved_progress=saved or 0,prototype={max_level=4294967295,effects=effect_rows,
                 research_unit_ingredients={{name="automation-science-pack",amount=1}}},
                 research_unit_ingredients={{name="automation-science-pack",amount=1}}}
             end
@@ -194,14 +225,16 @@ class MigrationOriginSuccessorControls(unittest.TestCase):
             foreign.technologies[direct_name].saved_progress=.42
             detached.technologies[direct_name].saved_progress=.27
             if mutate then player.technologies[alternate_name].level=3 end
-            local function effects(change,recipe)
-              return "{n:1={s:change=n:"..string.format("%.17g",change)..",s:recipe=s:"..recipe..",s:type=s:change-recipe-productivity}}"
+            local function effects(records)
+              local rows={}
+              for index,row in ipairs(records) do rows[#rows+1]="n:"..index.."={s:change=n:"..row.change..",s:recipe=s:"..row.recipe..",s:type=s:"..row.kind.."}" end
+              return "{"..table.concat(rows,",").."}"
             end
             local function snapshot(direct_saved)
               return {technologies={
                 [direct_name]={level=2,researched=false,enabled=true,visible=false,saved=direct_saved,maximum=4294967295},
                 [alternate_name]={level=2,researched=false,enabled=true,visible=false,saved=0,maximum=4294967295}},
-                effects={[direct_name]=effects(.1,"iron-gear-wheel"),[alternate_name]=effects(.1,"plastic-bar")},
+                effects={[direct_name]=effects(direct_source_records()),[alternate_name]=effects({source_record("plastic-bar",.1)})},
                 recipes={["iron-gear-wheel"]=.1,["plastic-bar"]=.1},fields={manual_mining_speed_modifier=.125}}
             end
             local expected, foreign_expected, detached_expected=snapshot(0), snapshot(.42), snapshot(.27)
@@ -222,7 +255,14 @@ class MigrationOriginSuccessorControls(unittest.TestCase):
               helpers={table_to_json=function(_) return "{}" end}, log=function(message) env.logs[#env.logs+1]=message end, logs={},
               script={active_mods={},on_configuration_changed=function(fn) callbacks.configuration=fn end,
                 on_load=function(fn) callbacks.load=fn end,on_event=function(event,fn) callbacks.events[event]=fn end},
-              defines={events={on_research_finished=1,on_tick=2},inventory={lab_input=1}}
+              defines={events={on_research_finished=1,on_tick=2},inventory={lab_input=1}},
+              string=setmetatable({format=function(pattern,value)
+                if pattern=="%.17g" and type(value)=="number" and source_changes[value]~=nil then
+                  if current_numeric_form=="short" then return short_changes[value] end
+                  return source_changes[value]
+                end
+                return native_string.format(pattern,value)
+              end},{__index=native_string})
             }
             env.require=function(name) assert(name=="__mir-fixture-mir5-migration-origin-f200-100-source__/catalogue");return {
               storage_key="mir5_migration_origin_f200_100_source",fixture="mir-fixture-mir5-migration-origin-f200-100-source",
@@ -237,7 +277,7 @@ class MigrationOriginSuccessorControls(unittest.TestCase):
                 ["mir-fixture-mir5-migration-origin-f200-100-source"]="0.3.0"}
             end
             local function load_target(target)
-              callbacks={events={}};env.script.active_mods=mods_for(target)
+              callbacks={events={}};current_numeric_form=target=="f210" and "short" or "source";env.script.active_mods=mods_for(target)
               assert(loadfile(successor_runtime_path,"t",env))()
               callbacks.configuration()
             end
@@ -264,7 +304,8 @@ class MigrationOriginSuccessorControls(unittest.TestCase):
             end)
             return {ok=ok,message=tostring(message),state=state,gear=player.technologies[direct_name].level,
               bonus=player.recipes["iron-gear-wheel"].productivity_bonus,saved=env.saved,logs=env.logs,
-              reload_read_only=env.reload_read_only,add_calls=player.add_calls}
+              reload_read_only=env.reload_read_only,add_calls=player.add_calls,
+              source_effect_signature=state.player_snapshot.effects[direct_name]}
           end
         ''')
         for target in ("f200", "f210"):
@@ -277,6 +318,32 @@ class MigrationOriginSuccessorControls(unittest.TestCase):
                 self.assertEqual(2, len(accepted["logs"]))
                 self.assertTrue(accepted["reload_read_only"])
                 self.assertEqual(1, accepted["add_calls"])
+
+        # The source snapshot remains raw/indexed.  Current F210 may expose
+        # the same additive effects in a different order, with explicit
+        # hidden=false and short decimals; the fixture may project only those
+        # verified representation differences for its comparison.
+        ordered = py(self.lua.eval("migration_successor_run_control")("f210", False, False, "ordered"))
+        self.assertTrue(ordered["ok"], ordered["message"])
+        self.assertEqual(
+            "{n:1={s:change=n:0.10000000149011612,s:recipe=s:iron-gear-wheel,s:type=s:change-recipe-productivity},"
+            "n:2={s:change=n:0.10000000149011612,s:recipe=s:advanced-circuit,s:type=s:change-recipe-productivity}}",
+            ordered["source_effect_signature"])
+        all_changes = py(self.lua.eval("migration_successor_run_control")("f210", False, False, "four-values"))
+        self.assertTrue(all_changes["ok"], all_changes["message"])
+        self.assertIn("0.05000000074505806", all_changes["source_effect_signature"])
+        self.assertIn("0.019999999552965164", all_changes["source_effect_signature"])
+        self.assertIn("0.0099999997764825821", all_changes["source_effect_signature"])
+
+        for effect_case in ("wrong-recipe", "wrong-type", "wrong-change", "hidden-true", "duplicate", "missing-duplicate"):
+            with self.subTest(effect_case=effect_case):
+                rejected = py(self.lua.eval("migration_successor_run_control")("f210", False, False, effect_case))
+                self.assertFalse(rejected["ok"])
+                self.assertIn("effect", rejected["message"])
+                # Failure must neither rewrite the saved source signature nor
+                # create a candidate lab/continuation record.
+                self.assertEqual("completed", rejected["state"]["phase"])
+                self.assertNotIn("f210", rejected["state"].get("successors", {}))
 
         already_current = py(self.lua.eval("migration_successor_run_control")("f200", False, True))
         self.assertTrue(already_current["ok"], already_current["message"])

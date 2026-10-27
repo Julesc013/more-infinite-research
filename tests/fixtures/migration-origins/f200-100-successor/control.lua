@@ -23,6 +23,79 @@ local function signature(value)
   for _, key in ipairs(keys) do rows[#rows + 1] = signature(key) .. "=" .. signature(value[key]) end
   return "{" .. table.concat(rows, ",") .. "}"
 end
+-- The protected MIR 1.0 snapshot is an immutable source signature.  The
+-- current engines expose the same additive recipe-productivity effects with
+-- only two observed representation differences: 2.1 may add hidden=false,
+-- and its float presentation may use the short authored decimal.  Preserve
+-- source bytes and project only the four published values for comparison.
+local source_effect_changes = {
+  ["0.10000000149011612"] = true,
+  ["0.05000000074505806"] = true,
+  ["0.019999999552965164"] = true,
+  ["0.0099999997764825821"] = true,
+}
+local current_to_source_change = {
+  ["0.1"] = "0.10000000149011612",
+  ["0.05"] = "0.05000000074505806",
+  ["0.02"] = "0.019999999552965164",
+  ["0.01"] = "0.0099999997764825821",
+  ["0.10000000149011612"] = "0.10000000149011612",
+  ["0.05000000074505806"] = "0.05000000074505806",
+  ["0.019999999552965164"] = "0.019999999552965164",
+  ["0.0099999997764825821"] = "0.0099999997764825821",
+}
+local function canonical_effect_rows(rows)
+  table.sort(rows)
+  return "{" .. table.concat(rows, ",") .. "}"
+end
+local function canonical_saved_effects(raw, label)
+  if type(raw) ~= "string" or raw:sub(1, 1) ~= "{" or raw:sub(-1) ~= "}" then
+    fail(label .. " source effect signature is malformed")
+  end
+  local body, offset, ordinal, rows = raw:sub(2, -2), 1, 1, {}
+  while offset <= #body do
+    local start_at, end_at, index, record = body:find("n:(%d+)=(%b{})", offset)
+    if start_at ~= offset or tonumber(index) ~= ordinal then
+      fail(label .. " source effect signature is not a lossless indexed vector")
+    end
+    local change, recipe = record:match("^%{s:change=n:([^,{}]+),s:recipe=s:([^,{}]+),s:type=s:change%-recipe%-productivity%}$")
+    if change == nil or recipe == nil or source_effect_changes[change] ~= true then
+      fail(label .. " source effect record is not a published MIR1 productivity change")
+    end
+    rows[#rows + 1], ordinal = record, ordinal + 1
+    offset = end_at + 1
+    if offset <= #body then
+      if body:sub(offset, offset) ~= "," then fail(label .. " source effect signature separator differs") end
+      offset = offset + 1
+    end
+  end
+  if #rows == 0 then fail(label .. " source effect signature is empty") end
+  return canonical_effect_rows(rows)
+end
+local function canonical_current_effects(effects_value, label)
+  if type(effects_value) ~= "table" then fail(label .. " current effect vector is malformed") end
+  local rows = {}
+  for index, effect in ipairs(effects_value) do
+    if type(effect) ~= "table" then fail(label .. " current effect record is malformed") end
+    if effect.hidden ~= nil and effect.hidden ~= false then
+      fail(label .. " current effect hidden flag differs")
+    end
+    local projected = {}
+    for key, value in pairs(effect) do
+      if key ~= "hidden" or value ~= false then projected[key] = value end
+    end
+    local record = signature(projected)
+    local change, recipe = record:match("^%{s:change=n:([^,{}]+),s:recipe=s:([^,{}]+),s:type=s:change%-recipe%-productivity%}$")
+    local source_change = change and current_to_source_change[change] or nil
+    if source_change == nil or recipe == nil then
+      fail(label .. " current effect record differs at index " .. tostring(index))
+    end
+    rows[#rows + 1] = "{s:change=n:" .. source_change .. ",s:recipe=s:" .. recipe
+      .. ",s:type=s:change-recipe-productivity}"
+  end
+  if #rows == 0 then fail(label .. " current effect vector is empty") end
+  return canonical_effect_rows(rows)
+end
 local function queue_snapshot(force)
   local queue = {}
   for index, value in ipairs(force.research_queue or {}) do queue[index] = value.name end
@@ -72,7 +145,8 @@ local function assert_force(force, expected, rows, label, ignored_technology, ig
       fail(label .. " source row changed before candidate work: " .. name)
     end
     observed_effects[name] = signature(now.prototype.effects or {})
-    if observed_effects[name] ~= expected.effects[name] then
+    if canonical_current_effects(now.prototype.effects or {}, label .. " current " .. name)
+        ~= canonical_saved_effects(expected.effects[name], label .. " source " .. name) then
       fail(label .. " source effect vector changed: " .. name .. " expected=" .. tostring(expected.effects[name])
         .. " actual=" .. observed_effects[name])
     end
