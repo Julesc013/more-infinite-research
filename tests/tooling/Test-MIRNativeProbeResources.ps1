@@ -182,7 +182,7 @@ try {
   $boundarySnapshot.memory.free_bytes=$tenGiBMemoryRequired
   $priorSnapshot=${function:Get-MIR441ResourceSnapshot}
   try {
-    Set-Item -Path Function:Get-MIR441ResourceSnapshot -Value {param([string]$WorkRoot) return $boundarySnapshot}.GetNewClosure()
+    Set-Item -Path Function:Get-MIR441ResourceSnapshot -Value {param([string]$WorkRoot) return ($boundarySnapshot|Select-Object *)}.GetNewClosure()
     $tenGiBBudget=New-MIRNativeProbeResourceContext -RepoRoot $repo -OutputRoot (Join-Path $root 'ten-gib-peak-budget') -ExpectedPeakMemoryMiB 10240 -MaxNewOutputMiB 1 -UseExactOutputRoot
     Assert-Probe ([int64]$tenGiBBudget.peak_memory_bytes -eq $tenGiB) 'ten-gib-declared-peak-admitted'
     [IO.Directory]::CreateDirectory($tenGiBBudget.root)|Out-Null
