@@ -66,7 +66,8 @@ for _, historical_stream in ipairs(historical.streams) do
       for key, value in pairs(override) do field[key] = value end
       -- Published K2SO omits the hidden field instead of declaring false.
       if k2so_active and historical_stream.k2so_visible then field.hidden = nil end
-      if bob_angel_active and require("compatibility.bob_angel_profile").setting_visible(historical_stream.key) then
+      if (bob_angel_active or bob_angel_f210_profile ~= nil)
+          and require("compatibility.bob_angel_profile").setting_visible(historical_stream.key) then
         field.hidden = nil
       end
       if bob_tech_active and require("compatibility.bob_tech_profile").setting_visible(historical_stream.key) then

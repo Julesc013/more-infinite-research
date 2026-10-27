@@ -32,14 +32,21 @@ log("[MIR5_HISTORICAL_TRANSITION_PREFLIGHT] target=" .. display(target.id)
   .. " time=" .. display(unit.time) .. " science=" .. table.concat(science, ",")
   .. " effects=" .. table.concat(effects, ","))
 local formula_targets = {
-  f015 = true, f016 = true, f017 = true, f100 = true, f110 = true,
+  f015 = true, f016 = true, f017 = true, f018 = true, f100 = true, f110 = true,
 }
 if target.id == "f013" or target.id == "f014" then
   assert(unit.count == 8000 and unit.count_formula == nil and unit.time == 60,
     "historical transition direct numeric cost or time differs")
 else
   assert(formula_targets[target.id], "historical transition target cost family differs")
-  local formulas = {published = "8000*2^(L-1)", mir5 = "1*(8000*2^(L-1))"}
+  local formulas
+  if target.id == "f018" then
+    -- Published MIR 1.8.0 emitted this source-authored expression with its
+    -- spaces; MIR5's reduced constructor has its separately retained ABI.
+    formulas = {published = "8000 * 2^(L-1)", mir5 = "1*(8000*2^(L-1))"}
+  else
+    formulas = {published = "8000*2^(L-1)", mir5 = "1*(8000*2^(L-1))"}
+  end
   local expected_formula = formulas[target.stage]
   assert(expected_formula ~= nil and unit.count_formula == expected_formula and unit.time == 60,
     "historical transition direct formula cost or time differs")

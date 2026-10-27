@@ -16,6 +16,7 @@ import zipfile
 
 ROOT = Path(__file__).resolve().parents[1]
 FIXTURE = ROOT / "tests/fixtures/historical-native"
+TRANSITION_FIXTURE = ROOT / "tests/fixtures/historical-transition"
 RUNNER = ROOT / "tools/Invoke-NativeFixture.ps1"
 ALL_SCIENCE_METADATA = FIXTURE / "metadata-all-science.json"
 DEFAULT_METADATA_SHA256 = "1fb15c0f79d19cc40912eb7010842d4e5c81f0986cd9d383307c03b4419bcd0a"
@@ -146,7 +147,7 @@ class HistoricalNativeFixtureControls(unittest.TestCase):
                 )
                 self.assertEqual(actual, wanted)
 
-    def test_f018_runner_binds_the_named_laser_tail_and_refuses_the_4_7_transition_protocol(self):
+    def test_f018_runner_binds_the_named_laser_tail_and_only_admits_the_real_1_8_transition_protocol(self):
         script = r'''
           $ErrorActionPreference='Stop'; Set-StrictMode -Version Latest
           $tokens=$null;$errors=$null
@@ -165,19 +166,27 @@ class HistoricalNativeFixtureControls(unittest.TestCase):
           $badRejected=$false
           try{Get-HistoricalFixtureTarget -Target f018 -MetadataPath $env:MIR_TEST_BAD|Out-Null}
           catch{$badRejected=$_.Exception.Message -match 'F018 historical continuation differs'}
+          $transition=Get-HistoricalTransitionFixtureTarget -Target f018 -MetadataPath $env:MIR_TEST_TRANSITION -Stage published
+          if($transition.mir_version -cne '1.8.0'){throw 'real F018 predecessor differs'}
+          $fake=Get-Content -LiteralPath $env:MIR_TEST_TRANSITION -Raw|ConvertFrom-Json -AsHashtable
+          $fake.targets.f018.published_mir_version='4.7.01802'
+          $fake|ConvertTo-Json -Depth 20|Set-Content -LiteralPath $env:MIR_TEST_BAD_TRANSITION -NoNewline
           $transitionRejected=$false
-          try{Get-HistoricalTransitionFixtureTarget -Target f018 -MetadataPath $env:MIR_TEST_BAD -Stage published|Out-Null}
-          catch{$transitionRejected=$_.Exception.Message -match 'historical transition target is unsupported'}
+          try{Get-HistoricalTransitionFixtureTarget -Target f018 -MetadataPath $env:MIR_TEST_BAD_TRANSITION -Stage published|Out-Null}
+          catch{$transitionRejected=$_.Exception.Message -match 'MIR versions differ'}
           if(-not $badRejected -or -not $transitionRejected){throw 'F018 admission boundary differs'}
           [ordered]@{literal=(ConvertTo-HistoricalFixtureTargetLiteral $selected);target=$selected.target;
             factorio_version=$selected.factorio_version;minimum_base=$selected.minimum_base;mir_version=$selected.mir_version}|ConvertTo-Json -Compress
         '''
         with tempfile.TemporaryDirectory(prefix="mir5-f018-native-admission-") as work:
             bad_path = Path(work) / "bad-f018.json"
+            bad_transition_path = Path(work) / "bad-f018-transition.json"
             result = subprocess.run(
                 ["pwsh", "-NoLogo", "-NoProfile", "-Command", script], cwd=ROOT,
                 env=dict(os.environ, MIR_TEST_RUNNER=str(RUNNER),
-                         MIR_TEST_DEFAULT=str(FIXTURE / "metadata.json"), MIR_TEST_BAD=str(bad_path)),
+                         MIR_TEST_DEFAULT=str(FIXTURE / "metadata.json"), MIR_TEST_BAD=str(bad_path),
+                         MIR_TEST_TRANSITION=str(TRANSITION_FIXTURE / "metadata.json"),
+                         MIR_TEST_BAD_TRANSITION=str(bad_transition_path)),
                 text=True, capture_output=True, check=False,
             )
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
