@@ -241,5 +241,14 @@
     "The foreign force remains disabled with queued42% state. Both completed saves survive two read-only cold reloads with identical bytes.",
     "No ordinary science/oil tuning, physical science production, all-physics behavior, client behavior, performance, release, or broad migration qualification follows."
   ],
+  "receipts": {
+    "path": "spec/evidence/bob-angel-f210-science-oil-e3-native-receipts.json.gz",
+    "bytes": 154099,
+    "sha256": "A3C61E311A7A3630E87B26E4CF7731E912F20B9CD996F8C6015C7394B36687AC",
+    "uncompressed_sha256": "7441CF836D6C62915490E534AE01C7139D09138B76C69BC904C52630575F968E",
+    "members": 22,
+    "contents": "prepared input receipt; terminal, preflight and native result for both passing cases; terminal, native result and Factorio current log for each retained adverse",
+    "excludes": ["saves", "config.ini", "player-data", "mod settings"]
+  },
   "release_qualification": false
 }
