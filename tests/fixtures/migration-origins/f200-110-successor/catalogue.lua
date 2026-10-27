@@ -34,6 +34,10 @@ return {
   targets = {
     f200 = {base = "2.0.77", mir = "5.0.20000", fixture = "0.2.0"},
     f210 = {base = "2.1.23", mir = "5.0.21000", fixture = "0.3.0"},
+    -- This wrapper supplies only the two published 1.1 startup values whose
+    -- current Defaults values differ.  It is a concrete input arm, not an
+    -- inference from or repair of an existing player settings file.
+    f210_source_defaults = {base = "2.1.23", mir = "5.0.21000", fixture = "0.4.0"},
   },
   save = "mir5-native-complete",
   deadline_ticks = 18000,

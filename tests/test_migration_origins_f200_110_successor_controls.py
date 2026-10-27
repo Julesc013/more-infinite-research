@@ -14,6 +14,7 @@ FIXTURE = ROOT / "tests/fixtures/migration-origins/f200-110-successor"
 SOURCE_FIXTURE = ROOT / "tests/fixtures/migration-origins/f200-110-source"
 F200_PROFILE = ROOT / "tests/profiles/migration-origins-1.1.0-successor-f200-2077.json"
 F210_PROFILE = ROOT / "tests/profiles/migration-origins-1.1.0-successor-f210-2123.json"
+F210_SOURCE_DEFAULTS_INFO = FIXTURE / "info-f210-source-defaults.json"
 LEGACY_MODULE_DEFINITIONS = ROOT / "source/research/legacy_module_credit_definitions.lua"
 LEGACY_MODULE_RUNTIME = ROOT / "source/runtime/legacy_module_credits.lua"
 DIRECT = "recipe-prod-research_gears-1"
@@ -68,14 +69,24 @@ class MigrationOriginF200110SuccessorControls(unittest.TestCase):
                      "effects": [{"type": "change-recipe-productivity", "recipe": "iron-gear-wheel", "change": .10}]},
         }, "sentinel": {"unchanged": 43}}
 
-    def run_data(self, raw, mods):
+    def source_settings(self):
+        catalogue_path = (FIXTURE / "catalogue.lua").as_posix()
+        self.lua.globals().catalogue_path = catalogue_path
+        self.lua.execute("function migration_origin_110_successor_settings() return assert(loadfile(catalogue_path))().settings end")
+        return py(self.lua.eval("migration_origin_110_successor_settings")())
+
+    def run_data(self, raw, mods, setting_values=None):
         catalogue_path = (FIXTURE / "catalogue.lua").as_posix()
         data_path = (FIXTURE / "data-final-fixes.lua").as_posix()
         self.lua.globals().catalogue_path = catalogue_path
         self.lua.globals().data_path = data_path
         self.lua.execute(r'''
-          function migration_origin_110_successor_data(raw, mods)
-            local env={data={raw=raw},mods=mods}
+          function migration_origin_110_successor_data(raw, mods, setting_values)
+            local env={data={raw=raw},mods=mods,settings={startup={}}}
+            for name,value in pairs(setting_values) do env.settings.startup[name]={value=value} end
+            setmetatable(raw,{__index=function(_,key)
+              if key=="bool-setting" then error("data stage must not read setting prototypes") end
+            end})
             env.require=function(name)
               assert(name=="__mir-fixture-mir5-migration-origin-f200-110-source__/catalogue")
               return assert(loadfile(catalogue_path,"t",env))()
@@ -85,7 +96,21 @@ class MigrationOriginF200110SuccessorControls(unittest.TestCase):
             return {ok=ok,message=tostring(message),raw=raw}
           end
         ''')
-        return py(self.lua.eval("migration_origin_110_successor_data")(lua(self.lua, copy.deepcopy(raw)), lua(self.lua, mods)))
+        values = self.source_settings() if setting_values is None else setting_values
+        return py(self.lua.eval("migration_origin_110_successor_data")(lua(self.lua, copy.deepcopy(raw)), lua(self.lua, mods), lua(self.lua, values)))
+
+    def run_settings_update(self, raw, mods):
+        settings_path = (FIXTURE / "settings-updates.lua").as_posix()
+        self.lua.globals().settings_path = settings_path
+        self.lua.execute(r'''
+          function migration_origin_110_successor_settings_update(raw, mods)
+            local env={data={raw=raw},mods=mods}
+            env._G=env;setmetatable(env,{__index=_G})
+            local ok,message=pcall(function() assert(loadfile(settings_path,"t",env))() end)
+            return {ok=ok,message=tostring(message),raw=raw}
+          end
+        ''')
+        return py(self.lua.eval("migration_origin_110_successor_settings_update")(lua(self.lua, copy.deepcopy(raw)), lua(self.lua, mods)))
 
     def test_catalogue_pins_all_31_old_rows_and_the_separate_worker_battery_fact(self):
         catalogue_path = (FIXTURE / "catalogue.lua").as_posix()
@@ -154,10 +179,12 @@ class MigrationOriginF200110SuccessorControls(unittest.TestCase):
         source = json.loads((SOURCE_FIXTURE / "info.json").read_text(encoding="utf-8"))
         f200 = json.loads((FIXTURE / "info-f200.json").read_text(encoding="utf-8"))
         f210 = json.loads((FIXTURE / "info-f210.json").read_text(encoding="utf-8"))
+        source_defaults = json.loads(F210_SOURCE_DEFAULTS_INFO.read_text(encoding="utf-8"))
         source_version = tuple(map(int, source["version"].split(".")))
         for wrapper, base, mir, version in (
             (f200, "2.0", "5.0.20000", "0.2.0"),
             (f210, "2.1", "5.0.21000", "0.3.0"),
+            (source_defaults, "2.1", "5.0.21000", "0.4.0"),
         ):
             with self.subTest(version=version):
                 self.assertEqual(source["name"], wrapper["name"])
@@ -167,14 +194,17 @@ class MigrationOriginF200110SuccessorControls(unittest.TestCase):
                 self.assertNotEqual(RETIRED_SUCCESSOR_NAME, wrapper["name"])
                 self.assertGreater(tuple(map(int, wrapper["version"].split("."))), source_version)
 
-    def test_data_guard_admits_only_the_two_exact_candidate_targets_and_accelerates_only_direct_cost(self):
+    def test_data_guard_admits_only_exact_candidate_targets_with_the_published_effective_settings(self):
         f200 = {"base": "2.0.77", "more-infinite-research": "5.0.20000",
                 "mir-fixture-mir5-active-mods-observer": "0.1.0",
                 "mir-fixture-mir5-migration-origin-f200-110-source": "0.2.0"}
         f210 = {"base": "2.1.23", "more-infinite-research": "5.0.21000",
                 "mir-fixture-mir5-active-mods-observer": "0.1.0",
                 "mir-fixture-mir5-migration-origin-f200-110-source": "0.3.0"}
-        for label, mods in (("f200", f200), ("f210", f210)):
+        f210_source_defaults = dict(f210)
+        f210_source_defaults["mir-fixture-mir5-migration-origin-f200-110-source"] = "0.4.0"
+        source_settings = self.source_settings()
+        for label, mods in (("f200", f200), ("f210", f210), ("f210-source-defaults", f210_source_defaults)):
             with self.subTest(label=label):
                 accepted = self.run_data(self.candidate_raw(), mods)
                 self.assertTrue(accepted["ok"], accepted["message"])
@@ -186,11 +216,22 @@ class MigrationOriginF200110SuccessorControls(unittest.TestCase):
         missing_observer = dict(f200); missing_observer.pop("mir-fixture-mir5-active-mods-observer"); variants.append(("observer", self.candidate_raw(), missing_observer))
         wrong_effect = self.candidate_raw(); wrong_effect["technology"][DIRECT]["effects"][0]["change"] = .05; variants.append(("effect", wrong_effect, f200))
         empty_science = self.candidate_raw(); empty_science["technology"][DIRECT]["unit"]["ingredients"] = []; variants.append(("science", empty_science, f200))
-        for label, raw, mods in variants:
+        wrong_gate = dict(source_settings); wrong_gate["ips-require-space-gate"] = False
+        variants.append(("gate", self.candidate_raw(), f210_source_defaults, wrong_gate,
+                         "ips-require-space-gate expected=true actual=false"))
+        wrong_inventory = dict(source_settings); wrong_inventory["ips-enable-research_inventory_capacity"] = True
+        variants.append(("inventory", self.candidate_raw(), f210_source_defaults, wrong_inventory,
+                         "ips-enable-research_inventory_capacity expected=false actual=true"))
+        for variant in variants:
+            label, raw, mods = variant[:3]
+            settings = variant[3] if len(variant) == 5 else source_settings
+            expected_message = variant[4] if len(variant) == 5 else None
             with self.subTest(label=label):
                 before = copy.deepcopy(raw)
-                rejected = self.run_data(raw, mods)
+                rejected = self.run_data(raw, mods, settings)
                 self.assertFalse(rejected["ok"])
+                if expected_message is not None:
+                    self.assertIn(expected_message, rejected["message"])
                 # lupa represents an empty Lua vector as an empty mapping on
                 # the way back to Python.  Check the actual mutation boundary
                 # instead: rejection cannot alter the selected cost/time or
@@ -202,6 +243,33 @@ class MigrationOriginF200110SuccessorControls(unittest.TestCase):
                 self.assertEqual(before_direct["unit"].get("count_formula"), after_direct["unit"].get("count_formula"))
                 self.assertEqual(before_direct["unit"].get("time"), after_direct["unit"].get("time"))
                 self.assertEqual(before["sentinel"], rejected["raw"]["sentinel"])
+
+    def test_settings_updates_stages_only_the_two_published_default_differences(self):
+        mods = {"base": "2.1.23", "more-infinite-research": "5.0.21000",
+                "mir-fixture-mir5-migration-origin-f200-110-source": "0.4.0"}
+        raw = {"bool-setting": {
+            "ips-require-space-gate": {"type": "bool-setting", "name": "ips-require-space-gate", "default_value": False},
+            "ips-enable-research_inventory_capacity": {"type": "bool-setting", "name": "ips-enable-research_inventory_capacity", "default_value": True},
+            "untouched": {"type": "bool-setting", "name": "untouched", "default_value": True},
+        }}
+        accepted = self.run_settings_update(raw, mods)
+        self.assertTrue(accepted["ok"], accepted["message"])
+        settings = accepted["raw"]["bool-setting"]
+        self.assertEqual((True, False, True),
+                         (settings["ips-require-space-gate"]["default_value"],
+                          settings["ips-enable-research_inventory_capacity"]["default_value"],
+                          settings["untouched"]["default_value"]))
+        for label, path, value in (
+            ("gate-current", "ips-require-space-gate", True),
+            ("inventory-current", "ips-enable-research_inventory_capacity", False),
+        ):
+            with self.subTest(label=label):
+                opponent = copy.deepcopy(raw)
+                opponent["bool-setting"][path]["default_value"] = value
+                rejected = self.run_settings_update(opponent, mods)
+                self.assertFalse(rejected["ok"])
+                self.assertIn("startup setting prototype differs", rejected["message"])
+                self.assertEqual(opponent, rejected["raw"])
 
     def test_control_registers_without_runtime_access_and_refuses_missing_source_before_candidate_writes(self):
         path = (FIXTURE / "control.lua").as_posix()
@@ -496,6 +564,9 @@ class MigrationOriginF200110SuccessorControls(unittest.TestCase):
             if target=="f200" then
               env.script.active_mods={base="2.0.77",["more-infinite-research"]="5.0.20000",
                 [active_wrapper_name]="0.2.0",["mir-fixture-mir5-active-mods-observer"]="0.1.0"}
+            elseif target=="f210_source_defaults" then
+              env.script.active_mods={base="2.1.23",["more-infinite-research"]="5.0.21000",
+                [active_wrapper_name]="0.4.0",["mir-fixture-mir5-active-mods-observer"]="0.1.0"}
             else
               env.script.active_mods={base="2.1.23",["more-infinite-research"]="5.0.21000",
                 [active_wrapper_name]="0.3.0",["mir-fixture-mir5-active-mods-observer"]="0.1.0"}
@@ -587,6 +658,7 @@ class MigrationOriginF200110SuccessorControls(unittest.TestCase):
         wrappers = {
             "f200": json.loads((FIXTURE / "info-f200.json").read_text(encoding="utf-8")),
             "f210": json.loads((FIXTURE / "info-f210.json").read_text(encoding="utf-8")),
+            "f210_source_defaults": json.loads(F210_SOURCE_DEFAULTS_INFO.read_text(encoding="utf-8")),
         }
         for target, wrapper in wrappers.items():
             with self.subTest(target=target):

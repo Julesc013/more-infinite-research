@@ -146,7 +146,11 @@ local function assert_settings()
   if map_count(catalogue.settings) ~= 42 then fail("published source settings roster differs") end
   for name, expected in pairs(catalogue.settings) do
     local value = settings.startup[name]
-    if value == nil or value.value ~= expected then fail("published source setting differs: " .. name) end
+    local actual = value and value.value
+    if actual ~= expected then
+      fail("published source setting differs: " .. name
+        .. " expected=" .. tostring(expected) .. " actual=" .. tostring(actual))
+    end
   end
 end
 local function source_row_text(row)
