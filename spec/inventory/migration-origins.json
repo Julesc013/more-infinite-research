@@ -1889,7 +1889,7 @@
         "sha256": "9BCF1813BBDCBBD90088D74672CEF639FBC96689604673E529CF3AA8FC8D89AF",
         "bytes": 695297,
         "local_direct_library_status": "retained-local-copy-reported",
-        "native_status": "source-chain-exists-but-not-current-5-x-qualified"
+        "native_status": "4.7.2-source-chain-only-not-4.7.3-origin-qualification"
       },
       {
         "edition": "f100",
@@ -1897,7 +1897,7 @@
         "sha256": "C04F3543EBF99D2B76B2C9193EA0886381B7CDDF2F2C1610310E7961B24BE0E1",
         "bytes": 709722,
         "local_direct_library_status": "retained-local-copy-reported",
-        "native_status": "source-chain-exists-but-not-current-5-x-qualified"
+        "native_status": "4.7.2-source-chain-only-not-4.7.3-origin-qualification"
       },
       {
         "edition": "f110",
@@ -1966,7 +1966,24 @@
       "path": "spec/evidence/historical-transition-017-100-110-chain.json",
       "sha256": "759C19C45C9B3100769B39DCA8CD843C295C8C610FF59FEA8D399CFAD6191E82",
       "status": "passed-017-100-110-exact-engine-chain-only",
-      "reuse": "does-not-satisfy-direct-f200-or-f210-origin-matrix"
+      "published_source_archives": [
+        {
+          "edition": "f017",
+          "filename": "more-infinite-research_4.7.01702.zip",
+          "sha256": "3FB8750565526816C1C33B3ADD6B82165B5AA6D026D47CD242251455FE5CFE32"
+        },
+        {
+          "edition": "f100",
+          "filename": "more-infinite-research_4.7.10002.zip",
+          "sha256": "87A80EB76B30A73BC8F16A8F4B92AA59BA3CC400FF5921819CB5E9CEFAB745E0"
+        },
+        {
+          "edition": "f110",
+          "filename": "more-infinite-research_4.7.11002.zip",
+          "sha256": "723159A24668E28EE70214CCCC727D5B104CAA0A9A7A7FD73B4938D55E5F3E91"
+        }
+      ],
+      "reuse": "4.7.2-only-published-source-chain; does-not-qualify-any-4.7.3-origin-and-does-not-satisfy-direct-f200-or-f210-origin-matrix"
     },
     {
       "path": "spec/evidence/historical-native-chain.json",
