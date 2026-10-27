@@ -1,0 +1,215 @@
+{
+  "schema": 1,
+  "kind": "MIR5SIFSevenPolicy58FPreparedInputsV1",
+  "status": "raw-git-selectors-built-and-guarded-not-native-qualified",
+  "fixture_input_commit": "98fbdd33fe47eb678a5e1aaf17fee903eba2a22a",
+  "candidate": {
+    "source_commit": "98fbdd33fe47eb678a5e1aaf17fee903eba2a22a",
+    "player_tree": "ffc5f2e3359de4f326a184cf6a3c29a55941150a",
+    "archive": "build/mir5/aero-98fb-modern-readback-r01/more-infinite-research_5.0.21000.zip",
+    "sha256": "58F04FB9D417F2726835F4A6740490DE3C1841665DAC81C2BA3DFA94050D9457",
+    "bytes": 679860
+  },
+  "engine": {
+    "version": "2.1.23",
+    "sha256": "FE4A1DA30F322A0D0B8AEB3DF7276332222BAAA143E2352569B723E84B2B9060"
+  },
+  "builder": {
+    "path": "tools/package.py",
+    "sha256": "D5DCCBFABB69E6D7F529DBB9BCE8B907231EB682E9059BF3586777F3C74FBB50",
+    "source_revision": "98fbdd33fe47eb678a5e1aaf17fee903eba2a22a"
+  },
+  "closure": {
+    "mods": [
+      {"name": "base", "version": "2.1.23"},
+      {"name": "elevated-rails", "version": "2.1.23"},
+      {"name": "quality", "version": "2.1.23"},
+      {"name": "recycler", "version": "2.1.23"},
+      {"name": "space-age", "version": "2.1.23"},
+      {"name": "cr-commons", "version": "1.0.33", "sha256": "378D3114B09C872358088B33500BC4AB0B9B9EFD9E5650DBEA0E87B5914C29BB"},
+      {"name": "cr-extras", "version": "1.0.10", "sha256": "3AB74877E49FB245E62593B669EB4D5C762207C047CA6F70E4D0CC9B67DF0225"},
+      {"name": "space-is-fake", "version": "1.0.78", "sha256": "3B5F2A381ADF1D9AECF048293E20035963A528720FBDC148CCC2B0418049FF13"},
+      {"name": "more-infinite-research", "version": "5.0.21000", "sha256": "58F04FB9D417F2726835F4A6740490DE3C1841665DAC81C2BA3DFA94050D9457"},
+      {"name": "mir-fixture-mir5-sif-science-retirement-f210", "version": "0.2.0", "sha256": "DE16335F30C13C0B931D42B31BDEEFFD04B718C27353C9863669C164B53C053A"},
+      {"name": "mir-fixture-mir5-active-mods-observer", "version": "0.1.0", "sha256": "2E1BE5952D2A4CC5C74A0D149E075D247BA110A3FAE5B6768D3EAEBABCEF989C"}
+    ],
+    "core": {
+      "source_directory": "build/mir5/aero-sif-58f-owned-fixtures-r01/sources/successor",
+      "archive": "build/mir5/aero-sif-58f-owned-fixtures-r01/mir-fixture-mir5-sif-science-retirement-f210_0.2.0.zip",
+      "sha256": "DE16335F30C13C0B931D42B31BDEEFFD04B718C27353C9863669C164B53C053A",
+      "bytes": 9169,
+      "members": [
+        {"path": "info.json", "source_path": "tests/fixtures/sif-science-retirement/f210/mir5/info.json", "blob_sha1": "cfd12bf5d2e5a4441727f3533fe2bf6eb487abae", "sha256": "07FB41E7557E0918A4E0203503B6A9ACB6BE83E4B649C59989C1D96B0304726E", "bytes": 493},
+        {"path": "contract.lua", "source_path": "tests/fixtures/sif-science-retirement/shared/core/contract.lua", "blob_sha1": "eda8012e1bfeb097ffc67fc661c7629532f5d06f", "sha256": "56C5CDC75CA1CAD9FA8148629E6174B4371D4D141480E9019F35EC4F27D54E38", "bytes": 5376},
+        {"path": "data-final-fixes.lua", "source_path": "tests/fixtures/sif-science-retirement/shared/core/data-final-fixes.lua", "blob_sha1": "29165e56d004cae60b2113de10f9d892fad69e8f", "sha256": "B4563603FFB89431C9137126909A0583133386CB8A7474CA65C16C47C7ECCBC8", "bytes": 5930},
+        {"path": "control.lua", "source_path": "tests/fixtures/sif-science-retirement/shared/core/control.lua", "blob_sha1": "36e2f1af891ad742f98bcf08d93ee83e70476c94", "sha256": "91921EECC871FA59F9500832A91FA262F6964E2613243DCF2A73594326379E4A", "bytes": 19750}
+      ]
+    },
+    "observer": {
+      "source_directory": "build/mir5/aero-sif-58f-owned-fixtures-r01/sources/observer",
+      "archive": "build/mir5/aero-sif-58f-owned-fixtures-r01/mir-fixture-mir5-active-mods-observer_0.1.0.zip",
+      "sha256": "2E1BE5952D2A4CC5C74A0D149E075D247BA110A3FAE5B6768D3EAEBABCEF989C",
+      "bytes": 834,
+      "members": [
+        {"path": "info.json", "source_path": "tests/fixtures/active-mods-observer/info.json", "blob_sha1": "7d9113c418e49ef4a7a6c5db454c0e0cf40dedf7", "sha256": "C37A55C4776F1B4DABA7E4D5C98CF22FD0E978A461D3E6FD8A95E238B97908BD", "bytes": 231},
+        {"path": "data-final-fixes.lua", "source_path": "tests/fixtures/active-mods-observer/data-final-fixes.lua", "blob_sha1": "0561997352770afb91631e80c83ae92ce0921945", "sha256": "89D364F0033A7EE036998E6C29A3558099C25AD2707CB24914790C49FB21555C", "bytes": 477}
+      ]
+    }
+  },
+  "policies": [
+    {
+      "policy": "space",
+      "case_name": "sif-science-retirement-f210-space",
+      "profile": {"path": "tests/profiles/sif-science-retirement-mir5-space-f210-2123.json", "blob_sha1": "9cda726870d8ada0616c13f43a0010df3f7d947b", "sha256": "1C763D6211811172C2373144EF8817CB9D24975BC36A5D80A131102FC2DDA8AF", "bytes": 2179},
+      "selector": {
+        "source_directory": "build/mir5/aero-sif-seven-policy-58f-prep-r01/sources/space",
+        "archive": "build/mir5/aero-sif-seven-policy-58f-prep-r01/mir-fixture-mir5-sif-policy-space-f210_0.1.0.zip",
+        "name": "mir-fixture-mir5-sif-policy-space-f210",
+        "version": "0.1.0",
+        "sha256": "0D5619F87A40251B6FEC6AD7C32D40079B22E032E09F73F77BD1D613CC41E0B6",
+        "bytes": 905,
+        "members": [
+          {"path": "info.json", "source_path": "tests/fixtures/sif-science-retirement/f210/policy-space/info.json", "blob_sha1": "660b71fdad3f313d67fd1a69ce77295fece3506e", "sha256": "C779DF4B8222E0B859694B6FA74C0274A5141AB68ADBFA92C91FBE24D6A758C7", "bytes": 394},
+          {"path": "settings-updates.lua", "source_path": "tests/fixtures/sif-science-retirement/shared/selectors/space/settings-updates.lua", "blob_sha1": "a2fe5203a4d40c787bf8214c4bf69ba4ab77de60", "sha256": "E3B197872A7D91B000BA34FC04ABD41D3B98042A7F7F541AAF73A6A610B2E902", "bytes": 528}
+        ]
+      }
+    },
+    {
+      "policy": "space-and-promethium",
+      "case_name": "sif-science-retirement-f210-space-and-promethium",
+      "profile": {"path": "tests/profiles/sif-science-retirement-mir5-space-and-promethium-f210-2123.json", "blob_sha1": "fdcca4e170a4f5ec967581bedd9f2561fc57cff7", "sha256": "5AD4B3B563AB8CF6CA288303124FBD03966CF3279FBEA8BCE680FD8D59AB59DA", "bytes": 2209},
+      "selector": {
+        "source_directory": "build/mir5/aero-sif-seven-policy-58f-prep-r01/sources/space-and-promethium",
+        "archive": "build/mir5/aero-sif-seven-policy-58f-prep-r01/mir-fixture-mir5-sif-policy-space-and-promethium-f210_0.1.0.zip",
+        "name": "mir-fixture-mir5-sif-policy-space-and-promethium-f210",
+        "version": "0.1.0",
+        "sha256": "11FD8A185848C0FC243C59BC7EB793A265A6EDA2B8DCA6254902317275A13DD9",
+        "bytes": 988,
+        "members": [
+          {"path": "info.json", "source_path": "tests/fixtures/sif-science-retirement/f210/policy-space-and-promethium/info.json", "blob_sha1": "9e3f659538b3c03be981a915799c9bb21da1b533", "sha256": "C72647EAFFF9681D1EFC99276BCA66A4EE4DD8016B437F841457C909E24D8CB9", "bytes": 424},
+          {"path": "settings-updates.lua", "source_path": "tests/fixtures/sif-science-retirement/shared/selectors/space-and-promethium/settings-updates.lua", "blob_sha1": "db700bd2cb68d7d9bc1544a8110e022a8fedb004", "sha256": "D9757DE6181447E71C86BEBE07DC0847636299696AD50D1805C56587D1AE18E2", "bytes": 603}
+        ]
+      }
+    },
+    {
+      "policy": "space-age-progression",
+      "case_name": "sif-science-retirement-f210-space-age-progression",
+      "profile": {"path": "tests/profiles/sif-science-retirement-mir5-space-age-progression-f210-2123.json", "blob_sha1": "2c72d2813eb64ea251bafd27c30eeab3cdb53a83", "sha256": "EC21AF7809AE443C54FC6C24D44626D6691B5D75B848DB46890E86ACD73D281C", "bytes": 2211},
+      "selector": {
+        "source_directory": "build/mir5/aero-sif-seven-policy-58f-prep-r01/sources/space-age-progression",
+        "archive": "build/mir5/aero-sif-seven-policy-58f-prep-r01/mir-fixture-mir5-sif-policy-space-age-progression-f210_0.1.0.zip",
+        "name": "mir-fixture-mir5-sif-policy-space-age-progression-f210",
+        "version": "0.1.0",
+        "sha256": "B815EC89F8A6F68E003559054005C2BAF4B18C07A25CDB3C8749D9FF532A8765",
+        "bytes": 991,
+        "members": [
+          {"path": "info.json", "source_path": "tests/fixtures/sif-science-retirement/f210/policy-space-age-progression/info.json", "blob_sha1": "6371c6c3f3a4e4c13a3a6a5575cff903368e84cc", "sha256": "6DD7134BBFE87C9CB772BD265986D16013359A8F126C15E81105AB003AF007F6", "bytes": 426},
+          {"path": "settings-updates.lua", "source_path": "tests/fixtures/sif-science-retirement/shared/selectors/space-age-progression/settings-updates.lua", "blob_sha1": "2772ad5a751f7c401bf3dc183a8fd6b2f581d1f3", "sha256": "E8169BF41BE248FF3FDED8DC50C97FF58FE7B8C61536E54A77276948341A50C0", "bytes": 608}
+        ]
+      }
+    },
+    {
+      "policy": "official-progression",
+      "case_name": "sif-science-retirement-f210-official-progression",
+      "profile": {"path": "tests/profiles/sif-science-retirement-mir5-official-progression-f210-2123.json", "blob_sha1": "0a7ca283b3bf9b1590ecc3eb64d572487ecd95e7", "sha256": "DC08C3F7BD1DE7F6AA87D412C78B84944198ACAD9A33946B0CFC2C8706703ECD", "bytes": 2209},
+      "selector": {
+        "source_directory": "build/mir5/aero-sif-seven-policy-58f-prep-r01/sources/official-progression",
+        "archive": "build/mir5/aero-sif-seven-policy-58f-prep-r01/mir-fixture-mir5-sif-policy-official-progression-f210_0.1.0.zip",
+        "name": "mir-fixture-mir5-sif-policy-official-progression-f210",
+        "version": "0.1.0",
+        "sha256": "80DF1F9188F3755654091E71484D7C11BCE89C8CA90CB602EBEEB3A19F8E97E1",
+        "bytes": 986,
+        "members": [
+          {"path": "info.json", "source_path": "tests/fixtures/sif-science-retirement/f210/policy-official-progression/info.json", "blob_sha1": "3ab7b99ac548e552b69c123af8e16cacaf490826", "sha256": "20F6C1CA75B5B49F7085DDB2AD58BB4E6AA750624EE539A48D9F435CA7AE1968", "bytes": 424},
+          {"path": "settings-updates.lua", "source_path": "tests/fixtures/sif-science-retirement/shared/selectors/official-progression/settings-updates.lua", "blob_sha1": "b8822f1b6926b86fc07fbcec878dada2aab10fc6", "sha256": "52C52521377A2EB426CC10B8F1FC3572CCFCD4CE5E6651B5CB7C6DBE7208CA05", "bytes": 603}
+        ]
+      }
+    },
+    {
+      "policy": "mod-progression",
+      "case_name": "sif-science-retirement-f210-mod-progression",
+      "profile": {"path": "tests/profiles/sif-science-retirement-mir5-mod-progression-f210-2123.json", "blob_sha1": "10849710fa73940152c4b8cd9d484c3268624eee", "sha256": "56AFD9173BDC88DDDFE6D0C73D30661B4CDA43A2030A30FCA8D35DB6B62EF27E", "bytes": 2199},
+      "selector": {
+        "source_directory": "build/mir5/aero-sif-seven-policy-58f-prep-r01/sources/mod-progression",
+        "archive": "build/mir5/aero-sif-seven-policy-58f-prep-r01/mir-fixture-mir5-sif-policy-mod-progression-f210_0.1.0.zip",
+        "name": "mir-fixture-mir5-sif-policy-mod-progression-f210",
+        "version": "0.1.0",
+        "sha256": "8CA8586F68C2DC80AD1D3A9D5EE12075DD0AFCF5A41F5067D0CE300E159F7281",
+        "bytes": 960,
+        "members": [
+          {"path": "info.json", "source_path": "tests/fixtures/sif-science-retirement/f210/policy-mod-progression/info.json", "blob_sha1": "422e5d7a09acfdf39b6177ab84d48ed02c4c3867", "sha256": "AE1EE695F1C847FCE164C1A332B8DE08071CBBDBCA869DF25BFD2B1673788FA3", "bytes": 414},
+          {"path": "settings-updates.lua", "source_path": "tests/fixtures/sif-science-retirement/shared/selectors/mod-progression/settings-updates.lua", "blob_sha1": "27ee3a80950880fd24c37b441de273a54c1dc93e", "sha256": "35F4F695C3B6E3B0116D33209CD899DCFFCC518A0A12A2AFB78F811D81F571D7", "bytes": 578}
+        ]
+      }
+    },
+    {
+      "policy": "all-official",
+      "case_name": "sif-science-retirement-f210-all-official",
+      "profile": {"path": "tests/profiles/sif-science-retirement-mir5-all-official-f210-2123.json", "blob_sha1": "af69e30e11551096a1203b7dcb62082fd6874009", "sha256": "176C82EE426B2A1402C7D6F6D50821A7170AC13ABF53A4DFAE68BB1031770BBE", "bytes": 2193},
+      "selector": {
+        "source_directory": "build/mir5/aero-sif-seven-policy-58f-prep-r01/sources/all-official",
+        "archive": "build/mir5/aero-sif-seven-policy-58f-prep-r01/mir-fixture-mir5-sif-policy-all-official-f210_0.1.0.zip",
+        "name": "mir-fixture-mir5-sif-policy-all-official-f210",
+        "version": "0.1.0",
+        "sha256": "9FC6E97D28BDBB794A7B441588AE24C93C5A11E4D8F3797C0E19EB063185A03D",
+        "bytes": 945,
+        "members": [
+          {"path": "info.json", "source_path": "tests/fixtures/sif-science-retirement/f210/policy-all-official/info.json", "blob_sha1": "1469679f41a28dea64bd25eb311b8483e8405a2e", "sha256": "F7DB5D04967B37E5600F007507EE2BCC0DBB96FF328F5AC43403A6C10AE0EBB3", "bytes": 408},
+          {"path": "settings-updates.lua", "source_path": "tests/fixtures/sif-science-retirement/shared/selectors/all-official/settings-updates.lua", "blob_sha1": "4a39c5b2f0220c78db1ebbe82d02a118fde83de0", "sha256": "E719D04DE0D2590B3B49C03FCFCF4271C22AD2A9E17C44A709A950DEC4F41DBF", "bytes": 563}
+        ]
+      }
+    },
+    {
+      "policy": "all",
+      "case_name": "sif-science-retirement-f210-all",
+      "profile": {"path": "tests/profiles/sif-science-retirement-mir5-all-f210-2123.json", "blob_sha1": "1db0a68e8c56f1746604f6bdce780f61cba79bda", "sha256": "639DF59B70ED06C8D46C9F4AAD8009AF61069AD9A10EF4379837D75A37898498", "bytes": 2175},
+      "selector": {
+        "source_directory": "build/mir5/aero-sif-seven-policy-58f-prep-r01/sources/all",
+        "archive": "build/mir5/aero-sif-seven-policy-58f-prep-r01/mir-fixture-mir5-sif-policy-all-f210_0.1.0.zip",
+        "name": "mir-fixture-mir5-sif-policy-all-f210",
+        "version": "0.1.0",
+        "sha256": "F0789EE3EAEB30A48CDD334D39FF1B4123356525B5423CBFCBF7077976102E4A",
+        "bytes": 894,
+        "members": [
+          {"path": "info.json", "source_path": "tests/fixtures/sif-science-retirement/f210/policy-all/info.json", "blob_sha1": "1c8b53449dfa936ba5f5f7244cb74f2bafcc8fa3", "sha256": "4BD62474B44148457464F7C2A422301768C7E45766F53076777C1DE2B78A332E", "bytes": 390},
+          {"path": "settings-updates.lua", "source_path": "tests/fixtures/sif-science-retirement/shared/selectors/all/settings-updates.lua", "blob_sha1": "9fe59a6d7575622dc3f2670f9dc88d0595bc144b", "sha256": "4465E98D3D6C5DBFB5AE7FEC1767F87436173664F8A12BDFC0FD422176FDAC79", "bytes": 518}
+        ]
+      }
+    }
+  ],
+  "archive_guard": {
+    "status": "all-nine-fixture-archives-guarded",
+    "command": "Assert-MIRLibraryFixtureArchive -Archive <selected archive> -SourceDirectory <recorded raw-Git projection>",
+    "observation": "build/mir5/aero-sif-seven-policy-58f-prep-r01/archive-guard-observation.json"
+  },
+  "runner": {
+    "script": "tools/Invoke-NativeFixture.ps1",
+    "mode": "CreateOnly",
+    "consumer_marker": "MIR5_SIF_CANDIDATE",
+    "case_name_format": "sif-science-retirement-f210-<policy>",
+    "archive_library": "D:\\Projects\\Factorio\\testmods\\2.1",
+    "factorio_bin": "D:\\Games\\Steam\\steamapps\\common\\Factorio\\bin\\x64\\factorio.exe",
+    "expected_mir_archive_sha256": "58F04FB9D417F2726835F4A6740490DE3C1841665DAC81C2BA3DFA94050D9457",
+    "active_mods_observer": "mir-fixture-mir5-active-mods-observer",
+    "timeout_seconds": 180,
+    "expected_peak_memory_mib": 2048,
+    "admission_wait_seconds": 30,
+    "fixture_sources_order": [
+      "build/mir5/aero-sif-58f-owned-fixtures-r01/sources/successor",
+      "build/mir5/aero-sif-seven-policy-58f-prep-r01/sources/<policy>",
+      "build/mir5/aero-sif-58f-owned-fixtures-r01/sources/observer"
+    ],
+    "output_root_format": "build/tmp/sif-science-retirement-f210-<policy>-58f-create-only-r01"
+  },
+  "native_execution": false,
+  "library_mutation": false,
+  "performance_qualification": false,
+  "release_qualification": false,
+  "limits": [
+    "Configured policy is excluded: its source-to-successor native route remains separately recorded in spec/evidence/sif-f210-configured-58f-native-chain.json.",
+    "Each prepared case is a fresh CreateOnly data/runtime-load witness; it does not establish a saved upgrade, a laboratory completion, performance, or release qualification.",
+    "The caller must supply the exact installed archive library and each recorded fixture container; this packet does not copy or extract dependency or player archives.",
+    "The generic policy profiles retain their existing pinned upstream archives; ExpectedMIRArchiveSha256 supplies the current MIR pin.",
+    "No native invocation, output save, or result receipt was produced."
+  ]
+}
