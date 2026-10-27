@@ -12,6 +12,42 @@
 -- dependency.  The caller supplies a small limits map where 0 means unlimited.
 local M = {}
 
+-- Temporary native-owner fixture telemetry. This branch is diagnostic-only:
+-- keep the gate local to the fixture, bounded, and entirely outside storage.
+local DIAGNOSTIC_FIXTURE = "mir-fixture-mir5-native-owner-cap-order"
+local DIAGNOSTIC_OWNER = "steel-plate-productivity"
+local DIAGNOSTIC_FOREIGN_FORCE = "mir5-native-owner-cap-order-foreign"
+local DIAGNOSTIC_LIMIT = 128
+local diagnostic_lines = 0
+local active_mods = script and script.active_mods or mods or {}
+
+local function diagnostic_value(value)
+  if value == nil then return "nil" end
+  return tostring(value)
+end
+
+local function diagnostic_snapshot(phase, force, name, limit, owned_disabled)
+  if active_mods[DIAGNOSTIC_FIXTURE] == nil or type(log) ~= "function"
+      or diagnostic_lines >= DIAGNOSTIC_LIMIT or name ~= DIAGNOSTIC_OWNER or limit == nil
+      or not force or (force.name ~= "player" and force.name ~= DIAGNOSTIC_FOREIGN_FORCE) then
+    return
+  end
+  local technology = force.technologies and force.technologies[name] or nil
+  local owned = type(owned_disabled) == "table" and owned_disabled[force.index] or nil
+  local record = type(owned) == "table" and owned[name] or nil
+  diagnostic_lines = diagnostic_lines + 1
+  log("[MIR5_CAP_OWNERSHIP_DIAGNOSTIC] module=caps phase=" .. phase
+    .. " force=" .. diagnostic_value(force.name)
+    .. " index=" .. diagnostic_value(force.index)
+    .. " limit=" .. diagnostic_value(limit)
+    .. " level=" .. diagnostic_value(technology and technology.level)
+    .. " researched=" .. diagnostic_value(technology and technology.researched)
+    .. " enabled=" .. diagnostic_value(technology and technology.enabled)
+    .. " visible=" .. diagnostic_value(technology and technology.visible_when_disabled)
+    .. " record_disabled=" .. diagnostic_value(type(record) == "table" and record.disabled or nil)
+    .. " record_visible=" .. diagnostic_value(type(record) == "table" and record.visible_when_disabled or nil))
+end
+
 local function positive_integer(value)
   return type(value) == "number" and value == value and value ~= math.huge
     and value ~= -math.huge and value > 0 and value == math.floor(value)
@@ -131,6 +167,8 @@ function M.reconcile(force, limits, owned_disabled, targets)
     end
   end
 
+  diagnostic_snapshot("before", force, DIAGNOSTIC_OWNER, selected[DIAGNOSTIC_OWNER], owned_disabled)
+
   -- Research callbacks pass one admitted family.  Filter only that sparse
   -- selection too: rewriting another family's queue entry here would turn a
   -- named research event into a broad reconciliation.
@@ -168,6 +206,7 @@ function M.reconcile(force, limits, owned_disabled, targets)
   end
 
   if owned and next(owned) == nil then owned_disabled[force.index] = nil end
+  diagnostic_snapshot("after", force, DIAGNOSTIC_OWNER, selected[DIAGNOSTIC_OWNER], owned_disabled)
   return owned_disabled, {queue_changed = queue_changed, removed_current = removed_current,
     unresolved_current = unresolved_current}
 end

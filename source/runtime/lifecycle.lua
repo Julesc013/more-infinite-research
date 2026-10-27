@@ -12,6 +12,11 @@ local M = {}
 
 local STORAGE_KEY = "mir_caps"
 local SCHEMA = 1
+local DIAGNOSTIC_FIXTURE = "mir-fixture-mir5-native-owner-cap-order"
+local DIAGNOSTIC_OWNER = "steel-plate-productivity"
+local DIAGNOSTIC_FOREIGN_FORCE = "mir5-native-owner-cap-order-foreign"
+local DIAGNOSTIC_LIMIT = 128
+local diagnostic_lines = 0
 local WORKER_TAIL_NAMES = {"worker-robots-speed-6", "worker-robots-speed-7"}
 local active_mods = script and script.active_mods or mods or {}
 local worker_modifiers
@@ -158,6 +163,43 @@ local function existing_state()
   end
   if type(value.owned_disabled) ~= "table" then error("MIR invalid caps ownership state", 2) end
   return value
+end
+
+-- Temporary native-owner fixture telemetry. It observes lifecycle boundaries
+-- without allocating state; caps.lua provides the paired write-path snapshots.
+local function diagnostic_value(value)
+  if value == nil then return "nil" end
+  return tostring(value)
+end
+
+local function diagnostic_force(phase, force, research)
+  if active_mods[DIAGNOSTIC_FIXTURE] == nil or type(log) ~= "function"
+      or diagnostic_lines >= DIAGNOSTIC_LIMIT or not force or force.valid == false
+      or type(force.index) ~= "number"
+      or (force.name ~= "player" and force.name ~= DIAGNOSTIC_FOREIGN_FORCE) then
+    return
+  end
+  local technology = force.technologies and force.technologies[DIAGNOSTIC_OWNER] or nil
+  local current = existing_state()
+  local owned = current and current.owned_disabled and current.owned_disabled[force.index] or nil
+  local record = type(owned) == "table" and owned[DIAGNOSTIC_OWNER] or nil
+  diagnostic_lines = diagnostic_lines + 1
+  log("[MIR5_CAP_OWNERSHIP_DIAGNOSTIC] module=lifecycle phase=" .. phase
+    .. " force=" .. diagnostic_value(force.name)
+    .. " index=" .. diagnostic_value(force.index)
+    .. " research=" .. diagnostic_value(research and research.name)
+    .. " level=" .. diagnostic_value(technology and technology.level)
+    .. " researched=" .. diagnostic_value(technology and technology.researched)
+    .. " enabled=" .. diagnostic_value(technology and technology.enabled)
+    .. " visible=" .. diagnostic_value(technology and technology.visible_when_disabled)
+    .. " record_disabled=" .. diagnostic_value(type(record) == "table" and record.disabled or nil)
+    .. " record_visible=" .. diagnostic_value(type(record) == "table" and record.visible_when_disabled or nil))
+end
+
+local function diagnostic_named_forces(phase)
+  if not game or not game.forces then return end
+  diagnostic_force(phase, game.forces.player, nil)
+  diagnostic_force(phase, game.forces[DIAGNOSTIC_FOREIGN_FORCE], nil)
 end
 
 local function ensure_state()
@@ -585,23 +627,31 @@ local function clear_force(index)
 end
 
 function M.on_init()
+  diagnostic_named_forces("init-before")
   reconcile_all(false)
+  diagnostic_named_forces("init-after")
 end
 
 function M.on_configuration_changed(event)
+  diagnostic_named_forces("configuration-before")
   reconcile_all(true, import_legacy_caps_on_configuration(event))
+  diagnostic_named_forces("configuration-after")
 end
 
 function M.on_force_created(event)
   local force = event and event.force
+  diagnostic_force("force-created-before", force, nil)
   if valid_force(force) then clear_force(force.index) end
   reconcile_event(event)
+  diagnostic_force("force-created-after", force, nil)
 end
 
 function M.on_force_reset(event)
   local force = event and event.force
+  diagnostic_force("force-reset-before", force, nil)
   if valid_force(force) then clear_force(force.index) end
   reconcile_event(event)
+  diagnostic_force("force-reset-after", force, nil)
 end
 
 function M.on_forces_merged(event)
@@ -610,23 +660,33 @@ function M.on_forces_merged(event)
 end
 
 function M.on_research_finished(event)
+  diagnostic_force("research-finished-before", event_force(event), event and event.research)
   reconcile_event(event, true)
+  diagnostic_force("research-finished-after", event_force(event), event and event.research)
 end
 
 function M.on_research_reversed(event)
+  diagnostic_force("research-reversed-before", event_force(event), event and event.research)
   reconcile_event(event, true)
+  diagnostic_force("research-reversed-after", event_force(event), event and event.research)
 end
 
 function M.on_technology_effects_reset(event)
+  diagnostic_force("technology-effects-reset-before", event_force(event), nil)
   reconcile_event(event)
+  diagnostic_force("technology-effects-reset-after", event_force(event), nil)
 end
 
 function M.on_research_started(event)
+  diagnostic_force("research-started-before", event_force(event), event and event.research)
   reconcile_event(event, true)
+  diagnostic_force("research-started-after", event_force(event), event and event.research)
 end
 
 function M.on_research_cancelled(event)
+  diagnostic_force("research-cancelled-before", event_force(event), event and event.research)
   reconcile_event(event, true)
+  diagnostic_force("research-cancelled-after", event_force(event), event and event.research)
 end
 
 -- There are no local bindings to reconstruct. The parse-time bootstrap owns
