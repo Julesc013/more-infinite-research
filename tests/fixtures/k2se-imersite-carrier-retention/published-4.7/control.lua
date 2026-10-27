@@ -73,7 +73,9 @@ local function status(force, label, disabled)
   local active = queue(force)
   if active.current ~= TAIL or #active.names ~= 2 or active.names[1] ~= TAIL or active.names[2] ~= TAIL
       or not close(active.progress, 0.42) then
-    fail(label .. " source current/queued investment differs")
+    fail(label .. " source current/queued investment differs: expected current=" .. TAIL
+      .. " queue=[" .. TAIL .. "," .. TAIL .. "] progress=0.42; actual current=" .. tostring(active.current)
+      .. " queue=[" .. table.concat(active.names, ",") .. "] progress=" .. tostring(active.progress))
   end
   return {early=early.level, tail=tail.level, queue=active, bonus=powder_bonus(force)}
 end
