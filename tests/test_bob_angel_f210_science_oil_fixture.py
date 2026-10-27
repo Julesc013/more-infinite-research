@@ -34,6 +34,7 @@ INPUT_RECEIPT = ROOT / "spec/evidence/bob-angel-f210-science-oil-inputs-32ddafc4
 FIXTURE_ARCHIVE = "mir-fixture-mir5-bob-angel-f210-science-oil_0.1.0.zip"
 FIXTURE_SHA = "CF59148489FE31A6974DC619A20CE41C28BD79DB3BE797F62324A4CD493C8F13"
 FIXTURE_BYTES = 8199
+FROZEN_PACKAGE_TOOL_SHA256 = "00ED00D66BD558554068405C8882419F852FC2F66646088052888D70E25DA61E"
 
 BASE_VECTOR = [
     "automation-science-pack", "logistic-science-pack", "chemical-science-pack",
@@ -437,10 +438,23 @@ end
                                  (hashlib.sha256(raw).hexdigest().upper(), len(raw)),
                                  f"{revision}:{row['source_path']}")
         helper = receipt["package_tool"]
-        for revision in (INPUT_REVISION, "HEAD"):
-            raw_helper = subprocess.check_output(["git", "show", f"{revision}:{helper['path']}"], cwd=ROOT)
-            self.assertEqual(helper["committed_sha256"], hashlib.sha256(raw_helper).hexdigest().upper(),
-                             f"{revision}:{helper['path']}")
+        raw_helper = subprocess.check_output(["git", "show", f"{INPUT_REVISION}:{helper['path']}"], cwd=ROOT)
+        self.assertEqual(FROZEN_PACKAGE_TOOL_SHA256, hashlib.sha256(raw_helper).hexdigest().upper())
+        self.assertEqual(FROZEN_PACKAGE_TOOL_SHA256, helper["committed_sha256"])
+        self.assertEqual(FROZEN_PACKAGE_TOOL_SHA256, helper["executed_worktree_sha256"])
+        # Preserve the actual build-tool identity and independently prove that
+        # today's helper still rebuilds those exact frozen fixture members.
+        with tempfile.TemporaryDirectory() as temporary:
+            temporary = Path(temporary)
+            projection = temporary / "projection"
+            projection.mkdir()
+            for member in fixture["members"]:
+                (projection / member["path"]).write_bytes(subprocess.check_output(
+                    ["git", "show", f"{INPUT_REVISION}:{member['source_path']}"], cwd=ROOT))
+            current = PACKAGE.build(projection, temporary / FIXTURE_ARCHIVE)
+            self.assertEqual((FIXTURE_SHA, FIXTURE_BYTES), (current["sha256"].upper(), current["bytes"]))
+            self.assertEqual([{"path": row["path"], "sha256": row["sha256"].lower(), "bytes": row["bytes"]}
+                              for row in fixture["members"]], current["members"])
         expected_profiles = {
             "tests/profiles/bob-angel-f210-science-oil-mir5-base-f210-2123.json",
             "tests/profiles/bob-angel-f210-science-oil-mir5-space-age-f210-2123.json",

@@ -27,6 +27,7 @@ OBSERVER_SHA = "2E1BE5952D2A4CC5C74A0D149E075D247BA110A3FAE5B6768D3EAEBABCEF989C
 MIR_SHA = "E3A65C08AC7798A66FB1BE30D24307B17C8B366DD901953BDE2A09BD6939C8CE"
 INPUT_REVISION = "0ddeb251984d166b075afb6f69367837ffd34dc7"
 INPUT_RECEIPT = ROOT / "spec/evidence/native-owner-cap-order-inputs-0ddeb251.json"
+FROZEN_PACKAGE_TOOL_SHA256 = "00ED00D66BD558554068405C8882419F852FC2F66646088052888D70E25DA61E"
 FIXTURE_SHAS = {
     "canonical": "74A078594452D47EC1CFDB52D1538BB42DE477E9A4A4804315C5BE22C9033E41",
     "permuted": "D041AF1722821BE48FD3DED89ACCD9E0FD2E00C5F718E2183A0145403061A3FE",
@@ -341,8 +342,22 @@ end
                 self.assertEqual((member["sha256"], member["bytes"]),
                                  (hashlib.sha256(raw).hexdigest().upper(), len(raw)))
         helper = receipt["package_tool"]
-        raw_helper = subprocess.check_output(["git", "show", "HEAD:" + helper["path"]], cwd=ROOT)
-        self.assertEqual(helper["sha256"], hashlib.sha256(raw_helper).hexdigest().upper())
+        self.assertEqual(FROZEN_PACKAGE_TOOL_SHA256, helper["sha256"])
+        with tempfile.TemporaryDirectory() as temporary:
+            temporary = Path(temporary)
+            for row in receipt["stages"]:
+                with self.subTest(current_helper_stage=row["stage"]):
+                    projection = temporary / (row["stage"] + "-projection")
+                    projection.mkdir()
+                    for member in row["members"]:
+                        (projection / member["path"]).write_bytes(subprocess.check_output(
+                            ["git", "show", "HEAD:" + member["source_path"]], cwd=ROOT))
+                    record = PACKAGE.build(projection, temporary / Path(row["archive"]).name)
+                    self.assertEqual((row["sha256"], row["bytes"]),
+                                     (record["sha256"].upper(), record["bytes"]))
+                    self.assertEqual([{"path": member["path"], "sha256": member["sha256"].lower(),
+                                       "bytes": member["bytes"]}
+                                      for member in row["members"]], record["members"])
 
     def test_data_stages_preflight_before_only_the_permuted_fixture_write(self):
         for stage, (_, cap, recipes) in STAGES.items():
