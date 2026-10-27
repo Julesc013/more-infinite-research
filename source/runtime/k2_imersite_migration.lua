@@ -124,17 +124,48 @@ local function set_state(technology, state)
   technology.saved_progress = state.saved_progress
 end
 
+local function assert_queue_identity(force, names, current)
+  if not same_names(queue_names(force), names) or current_name(force) ~= (current or names[1]) then
+    error("MIR Imersite queue readback differs", 2)
+  end
+end
+
+local function assert_queue_readback(force, names, current, progress)
+  assert_queue_identity(force,names,current)
+  if force.research_progress ~= (current and progress or 0) then error("MIR Imersite progress readback differs", 2) end
+end
+
 local function set_queue(force, names, current, progress)
   local rows = {}
   for _, id in ipairs(names) do rows[#rows+1] = assert(force.technologies[id], "MIR missing queued technology " .. id) end
   force.research_queue = rows
-  if not same_names(queue_names(force), names) or current_name(force) ~= (current or names[1]) then
-    error("MIR Imersite queue readback differs", 2)
-  end
+  assert_queue_identity(force,names,current)
   -- Native progress has no setter when no technology is being researched.
   -- Detached work belongs to Technology.saved_progress, restored above.
   if current_name(force) ~= nil then force.research_progress = current and progress or 0 end
-  if force.research_progress ~= (current and progress or 0) then error("MIR Imersite progress readback differs", 2) end
+  assert_queue_readback(force,names,current,progress)
+end
+
+local function mapped_public_destinations(source_queue, plan_queue)
+  local out = {}
+  for index, source in ipairs(source_queue) do
+    local destination = plan_queue[index]
+    if (source == HOLDERS[1] or source == HOLDERS[2])
+        and (destination == EARLY or destination == TAIL) then out[destination] = true end
+  end
+  return out
+end
+
+local function restore_public_flags(technologies, before, plan, source_queue)
+  local mapped = mapped_public_destinations(source_queue,plan.queue)
+  for _, id in ipairs({EARLY,TAIL}) do
+    -- LuaTechnology.level enables the technology.  Preserve foreign force
+    -- presentation/disablement unless the matching source queue row was a
+    -- carrier mapped into this public row. A pre-existing public queue entry
+    -- is never permission to replace a foreign disablement.
+    technologies[id].visible_when_disabled = before[id].visible_when_disabled
+    if not mapped[id] then technologies[id].enabled = before[id].enabled end
+  end
 end
 
 local function clear(holder, first)
@@ -221,8 +252,10 @@ function M.reconcile_force(force, change, records, legacy)
     set_state(technologies[EARLY],plan.early)
     set_state(technologies[TAIL],plan.tail)
     set_queue(force,plan.queue,plan.current,plan.progress)
+    restore_public_flags(technologies,before,plan,source_queue)
     clear(technologies[HOLDERS[1]],1)
     clear(technologies[HOLDERS[2]],4)
+    assert_queue_readback(force,plan.queue,plan.current,plan.progress)
     local after = force.recipes[contract.effect.recipe].productivity_bonus
     if not finite(bonus) or not finite(after) or math.abs(after-bonus) > 0.0000001 then
       error("MIR Imersite handoff changed the earned powder bonus")
