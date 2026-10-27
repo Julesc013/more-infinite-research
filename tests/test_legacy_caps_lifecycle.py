@@ -375,6 +375,112 @@ class LegacyCapsLifecycleTests(unittest.TestCase):
             "direct F200 import displaced an existing MIR5 ownership decision")
         ''')
 
+    def test_earlier_published_f200_v3_hops_keep_regular_f210_reader_and_boundaries(self):
+        self.lua.execute('''
+          -- Archive inspection establishes these as the published F200 V3
+          -- controller versions: 5d covers 4.2rc/stable through 4.4.1 and
+          -- 48 covers 4.4.2 through 4.6.  They use the same settings-derived
+          -- source tuple, but cannot be admitted by an unbounded old-version
+          -- prefix or by the ordinary F210 transported reader alone.
+          local published = {
+            "4.2.20000", "4.2.20001", "4.2.20002", "4.3.20000",
+            "4.4.20000", "4.4.20001", "4.4.20002",
+            "4.5.20000", "4.5.20001", "4.5.20002", "4.6.20000"
+          }
+          for index, version in ipairs(published) do
+            local item = technology(gear_name)
+            item.level, item.researched = 3, false
+            item.enabled, item.visible_when_disabled = false, true
+            local source = f200_gear_legacy(index, 2)
+            boot({[index] = force(index, {[gear_name] = item})}, source, nil,
+              {target_id = "f210", limit = 40})
+            lifecycle.on_configuration_changed(f200_to_f210_event(version))
+            assert(item.enabled and not item.visible_when_disabled
+              and item.level == 3 and item.researched == false
+              and storage.mir_caps.legacy_caps_checked
+              and storage.mir_caps.owned_disabled[index] == nil,
+              "published F200 V3 hop was not restored: " .. version)
+            assert(source.disabled_by_cap[index][gear_name].enabled_before_cap
+              and source.visibility_by_cap[index][gear_name].value == false,
+              "published F200 V3 source evidence was altered: " .. version)
+          end
+
+          -- 4.2.20000 is also the public F210 package codec.  Its normal
+          -- transported record must continue through the ordinary reader when
+          -- the event has that colliding version, rather than being consumed
+          -- only as an F200 predecessor.
+          local f210 = technology(gear_name)
+          f210.level, f210.researched = 3, false
+          f210.enabled, f210.visible_when_disabled = false, true
+          local transported = legacy({gear_name}, {80})
+          boot({[80] = force(80, {[gear_name] = f210})}, transported, nil,
+            {target_id = "f210", limit = 40})
+          lifecycle.on_configuration_changed(f200_to_f210_event("4.2.20000"))
+          assert(f210.enabled and not f210.visible_when_disabled
+            and storage.mir_caps.legacy_caps_checked and next(storage.mir_caps.owned_disabled) == nil,
+            "colliding F210 V3 record lost its ordinary transported reader")
+
+          -- Neither the already-published V1 4.1 F200 version nor absent
+          -- patch codecs can select the extra settings-derived V3 bridge.
+          for index, version in ipairs({"4.1.20000", "4.2.20003", "4.4.20003", "4.8.20000"}) do
+            local item = technology(gear_name)
+            item.enabled, item.visible_when_disabled = false, true
+            local source = f200_gear_legacy(index, 2)
+            boot({[index] = force(index, {[gear_name] = item})}, source, nil,
+              {target_id = "f210", limit = 40})
+            lifecycle.on_configuration_changed(f200_to_f210_event(version))
+            assert(not item.enabled and item.visible_when_disabled
+              and storage.mir_caps.legacy_caps_checked
+              and storage.mir_caps.owned_disabled[index] == nil,
+              "unpublished or non-V3 F200 codec gained a bridge: " .. version)
+          end
+        ''')
+
+    def test_442_f200_worker_hop_keeps_current_and_foreign_boundaries(self):
+        self.lua.execute('''
+          local name = "worker-robots-speed-6"
+          local player, foreign = worker(name), worker(name)
+          player.level, player.researched = 3, false
+          player.enabled, player.visible_when_disabled = false, true
+          foreign.level, foreign.researched = 3, false
+          foreign.enabled, foreign.visible_when_disabled = false, false
+          local player_force = force(1, {[name] = player})
+          player_force.research_queue, player_force.current_research, player_force.research_progress =
+            {player}, player, .42
+          local source = f200_worker_legacy(1, 2, name)
+          boot({[1] = player_force, [2] = force(2, {[name] = foreign})}, source, nil,
+            {target_id = "f210", worker_limit = 40})
+          lifecycle.on_configuration_changed(f200_to_f210_event("4.4.20002"))
+          assert(player.enabled and not player.visible_when_disabled and player.level == 3
+            and player_force.research_queue[1] == player and player_force.current_research == player
+            and player_force.research_progress == .42
+            and not foreign.enabled and not foreign.visible_when_disabled
+            and storage.mir_caps.legacy_caps_checked and next(storage.mir_caps.owned_disabled) == nil,
+            "published 4.4.20002 worker hop changed earned, queue, or foreign state")
+
+          -- A current MIR5 decision wins even for this earlier direct-hop
+          -- predecessor; the exceptional reader cannot overwrite a tombstone.
+          local retained = worker(name)
+          retained.enabled, retained.visible_when_disabled = false, true
+          local current = {schema = 1, owned_disabled = {[1] = {[name] = false}}}
+          boot({[1] = force(1, {[name] = retained})}, source, current,
+            {target_id = "f210", worker_limit = 40})
+          lifecycle.on_configuration_changed(f200_to_f210_event("4.4.20002"))
+          assert(not retained.enabled and retained.visible_when_disabled
+            and current.owned_disabled[1][name] == false and current.legacy_caps_checked,
+            "earlier worker predecessor displaced current MIR5 ownership")
+
+          local invalid = worker(name)
+          invalid.enabled, invalid.visible_when_disabled = false, true
+          invalid.prototype.effects[1].modifier = .66
+          boot({[3] = force(3, {[name] = invalid})}, f200_worker_legacy(3, 2, name), nil,
+            {target_id = "f210", worker_limit = 40})
+          lifecycle.on_configuration_changed(f200_to_f210_event("4.4.20002"))
+          assert(not invalid.enabled and invalid.visible_when_disabled
+            and storage.mir_caps.legacy_caps_checked and storage.mir_caps.owned_disabled[3] == nil,
+            "earlier worker predecessor bypassed current native-owner admission")
+        ''')
+
     def test_f200_to_f210_bridge_refuses_missing_wrong_or_malformed_event(self):
         self.lua.execute('''
           local old = f200_gear_legacy(1, 2)
