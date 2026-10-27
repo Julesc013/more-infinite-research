@@ -182,13 +182,14 @@ try {
   $boundarySnapshot.memory.free_bytes=$tenGiBMemoryRequired
   $priorSnapshot=${function:Get-MIR441ResourceSnapshot}
   try {
-    Set-Item -Path Function:Get-MIR441ResourceSnapshot -Value {param([string]$WorkRoot) return $boundarySnapshot}.GetNewClosure()
+    Set-Item -Path Function:Get-MIR441ResourceSnapshot -Value {param([string]$WorkRoot) return $boundarySnapshot.PSObject.Copy()}.GetNewClosure()
     $tenGiBBudget=New-MIRNativeProbeResourceContext -RepoRoot $repo -OutputRoot (Join-Path $root 'ten-gib-peak-budget') -ExpectedPeakMemoryMiB 10240 -MaxNewOutputMiB 1 -UseExactOutputRoot
     Assert-Probe ([int64]$tenGiBBudget.peak_memory_bytes -eq $tenGiB) 'ten-gib-declared-peak-admitted'
     [IO.Directory]::CreateDirectory($tenGiBBudget.root)|Out-Null
-    $tenGiBRun=Invoke-MIRNativeProbeProcess -Context $tenGiBBudget -FilePath $child -Arguments @('-NoProfile','-Command','exit 0') -TimeoutSeconds 20
+    $tenGiBRun=Invoke-MIRNativeProbeProcess -Context $tenGiBBudget -FilePath $child -Arguments @('-NoProfile','-Command','Start-Sleep -Milliseconds 1200; exit 0') -TimeoutSeconds 20
     $tenGiBRunning=@(Get-Content -LiteralPath $tenGiBRun.ledger|ForEach-Object {$_|ConvertFrom-Json -Depth 12}|Where-Object {$null-ne$_.PSObject.Properties['process']})
-    Assert-Probe ($tenGiBRun.status-ceq'passed'-and$tenGiBRunning.Count-ge1-and[int64]$tenGiBRunning[0].process.expected_peak_memory_bytes-eq$tenGiB) 'ten-gib-process-budget-forwarded'
+    Assert-Probe ($tenGiBRun.status-ceq'passed'-and$tenGiBRunning.Count-ge2-and[int64]$tenGiBRunning[0].process.expected_peak_memory_bytes-eq$tenGiB) 'ten-gib-process-budget-forwarded-across-samples'
+    Assert-Probe ($null-eq$boundarySnapshot.PSObject.Properties['process']) 'snapshot-source-not-mutated-across-samples'
     $boundarySnapshot.memory.free_bytes=$tenGiBMemoryRequired-1
     Refuses-Probe {New-MIRNativeProbeResourceContext -RepoRoot $repo -OutputRoot (Join-Path $root 'ten-gib-insufficient-memory') -ExpectedPeakMemoryMiB 10240 -MaxNewOutputMiB 1 -UseExactOutputRoot} '[mir441-resource-admission-memory]'
   } finally {
@@ -245,9 +246,14 @@ try {
     # The direct actor includes registration and memory reads before its first
     # 250 ms cadence wait. Keep the two-observation assertion but give this
     # controlled host child enough lifetime on a loaded hosted runner.
-    $factorioObservation=Invoke-MIRNativeProbeFactorioProcess -Context $context -FilePath $child -Arguments @('-NoProfile','-Command','Start-Sleep -Seconds 2') -TimeoutSeconds 20 -SampleMilliseconds 250 -OwnedProcessSampleCallback $factorioCallbacks.sample -OwnedProcessExitCallback $factorioCallbacks.exit
+    $factorioObservation=Invoke-MIRNativeProbeFactorioProcess -Context $context -FilePath $child -Arguments @('-NoProfile','-Command','Start-Sleep -Seconds 4') -TimeoutSeconds 20 -SampleMilliseconds 250 -OwnedProcessSampleCallback $factorioCallbacks.sample -OwnedProcessExitCallback $factorioCallbacks.exit
     $factorioReceipt=Get-MIROwnedProcessMemoryObservationReceipt -Sampler $factorioSampler
-    Assert-Probe ($factorioObservation.status-ceq'passed'-and$factorioObservation.result.duration_measurement.scope-ceq'direct-native-executable-start-to-exit'-and$factorioCallbacks.state.sample_events-ge2-and$factorioCallbacks.state.exit_events-eq1-and$factorioReceipt.status-ceq'complete-observation'-and$factorioReceipt.observations.Count-ge2) 'factorio-wrapper-benchmark-observation'
+    $factorioObservationPassed=$factorioObservation.status-ceq'passed'-and$factorioObservation.result.duration_measurement.scope-ceq'direct-native-executable-start-to-exit'-and$factorioCallbacks.state.sample_events-ge2-and$factorioCallbacks.state.exit_events-eq1-and$factorioReceipt.status-ceq'complete-observation'-and$factorioReceipt.observations.Count-ge2
+    if(-not$factorioObservationPassed){
+      $details=[ordered]@{run_status=$factorioObservation.status;sample_events=$factorioCallbacks.state.sample_events;exit_events=$factorioCallbacks.state.exit_events;receipt_status=$factorioReceipt.status;observation_count=$factorioReceipt.observations.Count;incomplete_reasons=@($factorioReceipt.incomplete_reasons|Select-Object -First 8)}
+      Write-Host ('[mir5-native-factorio-observation-details] '+($details|ConvertTo-Json -Compress))
+    }
+    Assert-Probe $factorioObservationPassed 'factorio-wrapper-benchmark-observation'
     Refuses-Probe {Invoke-MIR441MonitoredProcess -FilePath $child -Arguments @('-NoProfile','-Command','exit 0') -WorkRoot (Join-Path $benchmarkRoot 'invalid-cadence') -LedgerPath (Join-Path $benchmarkRoot 'invalid-cadence/resources.jsonl') -Policy $context.policy -EstimatedPeakBytes 1MB -ExpectedPeakMemoryBytes 64MB -SampleMilliseconds 250} '[mir441-resource-observation-callback-required]'
     Refuses-Probe {Invoke-MIR441MonitoredProcess -FilePath $child -Arguments @('-NoProfile','-Command','exit 0') -WorkRoot (Join-Path $benchmarkRoot 'invalid-callback') -LedgerPath (Join-Path $benchmarkRoot 'invalid-callback/resources.jsonl') -Policy $context.policy -EstimatedPeakBytes 1MB -ExpectedPeakMemoryBytes 64MB -OwnedProcessSampleCallback {param($event)}} '[mir441-resource-observation-cadence-required]'
     Refuses-Probe {Invoke-MIR441MonitoredProcess -FilePath $child -Arguments @('-NoProfile','-Command','exit 0') -WorkRoot (Join-Path $benchmarkRoot 'invalid-interval') -LedgerPath (Join-Path $benchmarkRoot 'invalid-interval/resources.jsonl') -Policy $context.policy -EstimatedPeakBytes 1MB -ExpectedPeakMemoryBytes 64MB -SampleMilliseconds 500 -OwnedProcessSampleCallback {param($event)}} 'SampleMilliseconds'
