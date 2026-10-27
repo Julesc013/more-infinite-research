@@ -31,9 +31,13 @@ for _, name in ipairs(science) do
   assert(tool.type == "tool" and tool.name == name and tool.durability == 1,
     "[mir5-legacy-boolean-cap-f200] successor science tool differs: " .. name)
 end
+local lab = assert(data.raw.lab and data.raw.lab.lab,
+  "[mir5-legacy-boolean-cap-f200] Base lab is absent")
+assert(lab.type == "lab" and lab.name == "lab" and lab.researching_speed == 1,
+  "[mir5-legacy-boolean-cap-f200] Base lab research speed differs")
 assert(type(gear.effects) == "table" and #gear.effects == 1
   and gear.effects[1].type == "change-recipe-productivity"
   and gear.effects[1].recipe == "iron-gear-wheel" and gear.effects[1].change == 0.10,
   "[mir5-legacy-boolean-cap-f200] successor gear productivity effect differs")
 
-unit.count, unit.count_formula, unit.time = 1, nil, 1
+unit.count, unit.count_formula, unit.time = 1, nil, 5
