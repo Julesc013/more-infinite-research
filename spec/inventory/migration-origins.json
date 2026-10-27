@@ -1686,24 +1686,28 @@
   "migration_member_audit": {
     "current_source_members": [
       {
-        "path": "migrations/more-infinite-research_2.0.5.json",
+        "path": "source/migrations/more-infinite-research_2.0.5.json",
         "sha256": "07A2759B963321A87B1047029AE426C7B2784033BC7C4F899D2640C037C5EEE2",
-        "git_blob": "014ca09a8864fab28275dafcf02f0295c8cac229"
+        "git_blob": "014ca09a8864fab28275dafcf02f0295c8cac229",
+        "package_member": "migrations/more-infinite-research_2.0.5.json"
       },
       {
-        "path": "migrations/more-infinite-research_2.1.0.json",
+        "path": "source/migrations/more-infinite-research_2.1.0.json",
         "sha256": "F427B215D77BC86608010ADC1D0D1A1C98BE61F0D7140EF716D77E46DAB8092D",
-        "git_blob": "0faf1db024013eab38164432037b51c37d052f00"
+        "git_blob": "0faf1db024013eab38164432037b51c37d052f00",
+        "package_member": "migrations/more-infinite-research_2.1.0.json"
       },
       {
-        "path": "migrations/more-infinite-research_4.7.0.json",
+        "path": "source/migrations/more-infinite-research_4.7.0.json",
         "sha256": "0980B0B6F1675F6827A8E4151F778143EA74C9C6C3440CC2318129DBCE63C379",
-        "git_blob": "fc59c77d1a43c547ec261e57676a1d1df187c21a"
+        "git_blob": "fc59c77d1a43c547ec261e57676a1d1df187c21a",
+        "package_member": "migrations/more-infinite-research_4.7.0.json"
       },
       {
-        "path": "migrations/more-infinite-research_5.0.11000.json",
+        "path": "source/migrations/more-infinite-research_5.0.11000.json",
         "sha256": "C26C6B21D777F3C20410C9C9ECDAFFE8ADF8DDDEAE556FE8B044146CEC40117D",
-        "git_blob": "e798b97979f9432bc3970938e5e412311aac6e6e"
+        "git_blob": "e798b97979f9432bc3970938e5e412311aac6e6e",
+        "package_member": "migrations/more-infinite-research_5.0.11000.json"
       }
     ],
     "current_lua_migration_members": [],
