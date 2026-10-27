@@ -1,11 +1,11 @@
 ---
 title: "Repository and contribution contract"
-status: proposed
-applies_to: "MIR replacement development"
+status: current
+applies_to: "MIR development"
 audience: developer
 doc_type: specification
 owner: mir-maintainers
-last_reviewed: 2026-10-22
+last_reviewed: 2026-10-27
 supersedes: []
 superseded_by: []
 source_of_truth_for:
@@ -14,7 +14,7 @@ source_of_truth_for:
 
 # Repository and contribution contract
 
-`REPO-01` — One active player source root (`source/`), one normative specification root (`spec/`, singular), one documentation root, and one public MIR API. Historical releases live in existing preserved Git refs/artifact custody, not active duplicate architecture trees. Development integrates through `dev`; `main` is the maintained release until accepted promotion. Do not add a permanent product-major branch solely for the rewrite.
+`REPO-01` — One active player source root (`source/`), one normative specification root (`spec/`, singular), one documentation root, and one public MIR API. Historical releases live in existing preserved Git refs/artifact custody, not active duplicate architecture trees. Development integrates through `dev`, which is dedicated to the canonical MIR5 implementation and documentation. Main promotion follows accepted release qualification. Maintain older releases on bounded task branches from their exact published tags, including `v4.7.3`; tag checked fixes there and preserve their original Git history. Do not restore a parallel MIR4 tree on dev or add a permanent product-major branch.
 
 ## Names and documentation
 
@@ -24,7 +24,7 @@ The specification owns requirements; source owns the implementation/declarations
 
 Keep `AGENTS.md` short. It routes a contributor to this index and a task-specific contract; it does not restate all specs or order every agent to read history. Current-task packets include only the input refs, relevant pages, affected source, expected result and commands. Token estimates are approximate; file/word counts and required-reading scope are directly auditable.
 
-Use front matter for docs during coexistence with the existing documentation conventions. One logical line per prose paragraph. Avoid maintaining a second generated docs-governance estate solely for the replacement. Retire obsolete required readers through an explicit reviewed cutover, not by disabling branch protection after a failure.
+Use the current front-matter convention for specifications and documentation. One logical line per prose paragraph. Avoid maintaining a second generated docs-governance estate solely for the replacement. Retire obsolete required readers through an explicit reviewed cutover, not by disabling branch protection after a failure.
 
 ## Change contract
 
@@ -56,10 +56,10 @@ Standing authorization for ordinary reviewed dev branches/PRs does not imply aut
 
 Root replacements are adopted by review, not auto-installed by a documentation ZIP. Preserve existing release, filesystem, engine and signing safeguards until their replacements are explicitly accepted. Retiring obsolete internal tests is legitimate; erasing required behavior is not.
 
-## Temporary roots and API-major roots
+## Canonical roots and API-major roots
 
 `REPO-05` — Final responsibilities use the unversioned roots `source`, `spec`, `docs`, `tests`, `tools`, `targets` and `sdk`. A temporary staging component is removed only by the reviewed file-disposition map. `api/v1` is a real public compatibility boundary, not product-major staging, and survives.
 
-Permanent diagrams describe package-relative paths or unversioned repository responsibilities. The transition diagram and import/cutover instructions live under the retirement list and are removed at final cutover. A rendered HTML atlas contains its graphics inline and has no dependency on a network renderer; diagrams never become a second normative specification.
+Permanent diagrams describe package-relative paths or unversioned repository responsibilities. Superseded import packs, pseudocode and cutover instructions remain in their exact historical Git refs. A rendered HTML atlas contains its graphics inline and has no dependency on a network renderer; diagrams never become a second normative specification.
 
-The revised drop-in keeps root document changes staged. Extracting it can replace an older pack's same-named staged files; compare their hashes first with the read-only merge checker. Unknown local edits are conflicts, not permission to overwrite.
+New test output and package batches use neutral output roots. Preserve exact historical receipt paths and live frozen inputs; a directory cleanup never rewrites a recorded observation or grants release authority.
