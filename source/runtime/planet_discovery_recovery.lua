@@ -11,6 +11,11 @@ local AFFECTED_ORIGINS = {
   ["3.2.1"] = true,
 }
 
+local function iterable_mapping(value)
+  local value_type = type(value)
+  return value_type == "table" or value_type == "userdata"
+end
+
 local function exact_upgrade(event)
   if target.id ~= "f210" or type(target.distribution_version) ~= "string"
       or target.distribution_version == "" then
@@ -25,7 +30,7 @@ end
 
 local function ordered_forces()
   local forces = game and game.forces
-  if type(forces) ~= "table" then return {} end
+  if not iterable_mapping(forces) then return {} end
   local ordered = {}
   for _, force in pairs(forces) do
     if force and force.valid ~= false and type(force.name) == "string" then
@@ -38,7 +43,7 @@ end
 
 local function researched_location_names(force, locations)
   local technologies = force and force.technologies
-  if type(technologies) ~= "table" or type(locations) ~= "table" then return {} end
+  if not iterable_mapping(technologies) or not iterable_mapping(locations) then return {} end
   local names, seen = {}, {}
   for _, technology in pairs(technologies) do
     local prototype = technology and technology.researched == true and technology.prototype or nil
@@ -67,7 +72,7 @@ local function repair_force(force, locations)
   end
   local repaired = 0
   for _, location in ipairs(researched_location_names(force, locations)) do
-    if force.is_space_location_unlocked(location) ~= true then
+    if force.is_space_location_unlocked(location) == false then
       force.unlock_space_location(location)
       repaired = repaired + 1
     end
@@ -80,7 +85,7 @@ end
 function M.apply(event)
   if not exact_upgrade(event) then return 0 end
   local locations = prototypes and prototypes.space_location
-  if type(locations) ~= "table" then return 0 end
+  if not iterable_mapping(locations) then return 0 end
   local repaired = 0
   for _, force in ipairs(ordered_forces()) do
     repaired = repaired + repair_force(force, locations)

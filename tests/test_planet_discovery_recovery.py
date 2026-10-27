@@ -52,6 +52,13 @@ class PlanetDiscoveryRecoveryTests(unittest.TestCase):
             package.loaded["runtime.planet_discovery_recovery"] = nil
             return require("runtime.planet_discovery_recovery")
           end
+
+          function native_mapping(rows, handles, values)
+            local handle = assert(io.tmpfile())
+            values[handle] = rows
+            handles[#handles + 1] = handle
+            return handle
+          end
         ''')
 
     def test_exact_upgrade_repairs_each_missing_researched_location_once_in_deterministic_order(self):
@@ -78,6 +85,33 @@ class PlanetDiscoveryRecoveryTests(unittest.TestCase):
           assert(alpha_state.unlocks == 2 and zeta_state.unlocks == 1)
           assert(recovery.on_configuration_changed(event("3.2.0", "5.0.21000")) == 0)
           assert(alpha_state.unlocks == 2 and zeta_state.unlocks == 1)
+        ''')
+
+    def test_lua_custom_table_shaped_force_technology_and_location_maps_are_admitted(self):
+        self.lua.execute(r'''
+          local values = {}
+          local handles = {}
+          local candidate, state = force("custom", native_mapping({
+            location=tech(true, {{type="unlock-space-location",space_location="nauvis"}}),
+          }, handles, values))
+          game = {forces=native_mapping({custom=candidate}, handles, values)}
+          prototypes = {space_location=native_mapping({nauvis={}}, handles, values)}
+          local original_metatables = {}
+          local custom_table_metatable = {
+            __pairs=function(value) return next, values[value], nil end,
+            __index=function(value, key) return values[value] and values[value][key] end,
+          }
+          for _, handle in ipairs(handles) do
+            original_metatables[handle] = debug.getmetatable(handle)
+            debug.setmetatable(handle, custom_table_metatable)
+          end
+          local recovery = load_recovery("f210", "5.0.21000")
+          assert(recovery.apply(event("3.2.0", "5.0.21000")) == 1)
+          assert(state.unlocked.nauvis and state.unlocks == 1)
+          for _, handle in ipairs(handles) do
+            debug.setmetatable(handle, original_metatables[handle])
+            handle:close()
+          end
         ''')
 
     def test_wrong_event_target_or_destination_refuses_before_observing_forces(self):
@@ -139,6 +173,23 @@ class PlanetDiscoveryRecoveryTests(unittest.TestCase):
           assert(recovery.on_configuration_changed(event("3.2.1", "5.0.21000")) == 0)
           assert(state.unlocks == 0 and state.unlocked.nauvis)
           assert(candidate.research_progress == .42 and candidate.unrelated == "keep")
+        ''')
+
+    def test_missing_or_non_boolean_location_queries_never_unlock_a_location(self):
+        self.lua.execute(r'''
+          local nil_query, nil_state = force("nil-query", {
+            one=tech(true, {{type="unlock-space-location",space_location="nauvis"}}),
+          })
+          local non_boolean_query, non_boolean_state = force("non-boolean-query", {
+            one=tech(true, {{type="unlock-space-location",space_location="fulgora"}}),
+          })
+          function nil_query.is_space_location_unlocked(_) return nil end
+          function non_boolean_query.is_space_location_unlocked(_) return "unknown" end
+          game = {forces={nil_query=nil_query,non_boolean_query=non_boolean_query}}
+          local recovery = load_recovery("f210", "5.0.21000")
+          assert(recovery.apply(event("3.2.0", "5.0.21000")) == 0)
+          assert(nil_state.unlocks == 0 and non_boolean_state.unlocks == 0)
+          assert(nil_query.research_progress == .42 and non_boolean_query.unrelated == "keep")
         ''')
 
 
