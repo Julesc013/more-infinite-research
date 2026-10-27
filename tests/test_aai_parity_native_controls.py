@@ -12,6 +12,24 @@ import unittest
 
 ROOT = Path(__file__).resolve().parents[1]
 FIXTURE = ROOT / "tests" / "fixtures" / "aai-parity-native"
+PUBLISHED_PROFILES = {
+    "base": ROOT / "tests" / "profiles" / "aai-parity-native-published-base-f210-2123.json",
+    "space-age": ROOT / "tests" / "profiles" / "aai-parity-native-published-space-age-f210-2123.json",
+}
+SUCCESSOR_PROFILES = {
+    "base": ROOT / "tests" / "profiles" / "aai-parity-native-mir5-base-f210-2123.json",
+    "space-age": ROOT / "tests" / "profiles" / "aai-parity-native-mir5-space-age-f210-2123.json",
+}
+ENGINE = {
+    "version": "2.1.23",
+    "sha256": "FE4A1DA30F322A0D0B8AEB3DF7276332222BAAA143E2352569B723E84B2B9060",
+}
+PUBLISHED_MIR_SHA256 = "B6EB9430056ABD384DB00F94929FE7DAC0A37441ACF4BC277946689682628852"
+CURRENT_MIR_SHA256 = "E3A65C08AC7798A66FB1BE30D24307B17C8B366DD901953BDE2A09BD6939C8CE"
+CURRENT_SOURCE = "b251ae7a54104ace87cb0da4cf531cf53f03c93d"
+CURRENT_SOURCE_TREE = "79b73a6a8e68987737e69bf2d95ec6555b49f901"
+OBSERVER_SHA256 = "2E1BE5952D2A4CC5C74A0D149E075D247BA110A3FAE5B6768D3EAEBABCEF989C"
+AAI_SHA256 = "DFB734B8B9B8BF847C90759E8A63D2DB4C24B5DF871D49E2A230E1AE58E7E829"
 BASE_SCIENCE = [
     ["automation-science-pack", 1],
     ["logistic-science-pack", 1],
@@ -481,6 +499,52 @@ class AaiParityNativeControls(unittest.TestCase):
         readme = (FIXTURE / "README.md").read_text(encoding="utf-8")
         self.assertIn("does not claim a Base-to-Space-Age migration", readme)
         self.assertIn("two cold reloads", readme)
+
+    def test_published_source_and_current_successor_profiles_bind_only_the_declared_same_closure_handoff(self):
+        expected_names = {
+            "base": ["base", "aai-industry", "mir-fixture-mir5-active-mods-observer", "more-infinite-research",
+                     "mir-fixture-mir5-aai-parity-native"],
+            "space-age": ["base", "elevated-rails", "quality", "recycler", "space-age", "aai-industry",
+                          "mir-fixture-mir5-active-mods-observer", "more-infinite-research",
+                          "mir-fixture-mir5-aai-parity-native"],
+        }
+        for closure in ("base", "space-age"):
+            with self.subTest(closure=closure):
+                published = json.loads(PUBLISHED_PROFILES[closure].read_text(encoding="utf-8"))
+                successor = json.loads(SUCCESSOR_PROFILES[closure].read_text(encoding="utf-8"))
+                self.assertEqual((1, "mir5-aai-parity-native-published-source", "f210", "2.1", "Defaults", ENGINE),
+                                 (published["schema"], published["kind"], published["target"], published["factorio_line"],
+                                  published["settings_mode"], published["engine"]))
+                self.assertEqual((1, "mir5-aai-parity-native-current-successor", "f210", "2.1", "Defaults", ENGINE),
+                                 (successor["schema"], successor["kind"], successor["target"], successor["factorio_line"],
+                                  successor["settings_mode"], successor["engine"]))
+                self.assertEqual(expected_names[closure], [row["name"] for row in published["mods"]])
+                self.assertEqual(expected_names[closure], [row["name"] for row in successor["mods"]])
+                self.assertTrue(all(row["enabled"] is True for row in published["mods"] + successor["mods"]))
+                published_mods = {row["name"]: row["version"] for row in published["mods"]}
+                successor_mods = {row["name"]: row["version"] for row in successor["mods"]}
+                self.assertEqual("4.7.21003", published_mods.pop("more-infinite-research"))
+                self.assertEqual("0.1.0", published_mods.pop("mir-fixture-mir5-aai-parity-native"))
+                self.assertEqual("5.0.21000", successor_mods.pop("more-infinite-research"))
+                self.assertEqual("0.2.0", successor_mods.pop("mir-fixture-mir5-aai-parity-native"))
+                self.assertEqual(published_mods, successor_mods)
+                self.assertEqual({
+                    "aai-industry_0.7.5.zip": AAI_SHA256,
+                    "mir-fixture-mir5-active-mods-observer_0.1.0.zip": OBSERVER_SHA256,
+                    "more-infinite-research_4.7.21003.zip": PUBLISHED_MIR_SHA256,
+                }, published["archive_sha256"])
+                self.assertEqual({
+                    "aai-industry_0.7.5.zip": AAI_SHA256,
+                    "mir-fixture-mir5-active-mods-observer_0.1.0.zip": OBSERVER_SHA256,
+                    "more-infinite-research_5.0.21000.zip": CURRENT_MIR_SHA256,
+                }, successor["archive_sha256"])
+                self.assertIn(CURRENT_SOURCE, successor["scope"])
+                self.assertIn(CURRENT_SOURCE_TREE, successor["scope"])
+                self.assertIn("679250 bytes", successor["scope"])
+                self.assertIn("InputSavePath/ExpectedInputSaveSha256", successor["scope"])
+                self.assertIn("Prepared input only; native execution remains required.", successor["scope"])
+        self.assertNotIn("Base-to-Space-Age source claim", SUCCESSOR_PROFILES["base"].read_text(encoding="utf-8"))
+        self.assertIn("not a Base-to-Space-Age source claim", SUCCESSOR_PROFILES["space-age"].read_text(encoding="utf-8"))
 
     def test_data_guard_accelerates_only_validated_aai_and_mir_workloads(self):
         for stage in ("published-4.7", "mir5"):
