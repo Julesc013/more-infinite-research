@@ -1,6 +1,8 @@
 local facts = require("__mir-fixture-mir5-bob-angel-f210-science-oil__/fixture_facts")
 local KEY, SAVE = "mir5_bob_angel_f210_science_oil", "mir5-native-complete"
 local loaded, reload_reported = false, false
+local diagnostic_lines = 0
+local DIAGNOSTIC_LIMIT = 32
 
 local function fail(message, fields)
   if helpers and helpers.table_to_json and log then
@@ -62,12 +64,30 @@ local function bonuses(force, effects, expected)
   end
   return values
 end
+local function oil_fields(value)
+  return {level=value.level, researched=value.researched, enabled=value.enabled,
+    visible_when_disabled=value.visible_when_disabled, saved_progress=value.saved_progress,
+    prototype_max_level=value.prototype and value.prototype.max_level or nil}
+end
+local function oil_seed_diagnostic(phase, force, value, level, saved, label)
+  if diagnostic_lines >= DIAGNOSTIC_LIMIT or helpers == nil or helpers.table_to_json == nil or log == nil then return end
+  diagnostic_lines = diagnostic_lines + 1
+  log("[MIR5_NATIVE_FIXTURE] OIL_SEED_DIAGNOSTIC " .. helpers.table_to_json({
+    case="bob-angel-f210-science-oil", status="observed", phase=phase, label=label,
+    force=force and force.name or nil,
+    expected={level=level, researched=false, enabled=false, visible_when_disabled=true, saved_progress=saved,
+      prototype_max_level=4294967295},
+    actual=oil_fields(value),
+  }))
+end
 local function oil_snapshot(force, level, saved, label)
   local value = technology(force, facts.oil)
   effect_vector(value, facts.oil_effects, label .. " oil")
+  local actual, expected = oil_fields(value), {level=level, researched=false, enabled=false,
+    visible_when_disabled=true, saved_progress=saved, prototype_max_level=4294967295}
   if value.level ~= level or value.researched ~= false or value.enabled ~= false
       or value.visible_when_disabled ~= true or not close(value.saved_progress, saved)
-      or value.prototype.max_level ~= 4294967295 then fail(label .. " oil saved identity differs") end
+      or value.prototype.max_level ~= 4294967295 then fail(label .. " oil saved identity differs", {expected=expected, actual=actual}) end
   return {level=value.level, enabled=value.enabled, visible=value.visible_when_disabled, saved_progress=value.saved_progress,
     bonuses=bonuses(force, facts.oil_effects, .1 * (level - 1)), queue=queue_snapshot(force)}
 end
@@ -97,12 +117,17 @@ local function seed_oil(force, level, saved, label)
   local value = technology(force, facts.oil)
   -- LuaTechnology.level re-enables its technology. Set disablement and saved
   -- investment afterwards so this fixture observes the real setter boundary.
+  oil_seed_diagnostic("before-level", force, value, level, saved, label)
   value.level = level
+  oil_seed_diagnostic("after-level", force, value, level, saved, label)
   value.researched = false
+  oil_seed_diagnostic("after-researched-false", force, value, level, saved, label)
   value.enabled = false
   value.visible_when_disabled = true
   value.saved_progress = saved
+  oil_seed_diagnostic("after-flags-and-saved-progress", force, value, level, saved, label)
   force.reset_technology_effects()
+  oil_seed_diagnostic("after-reset-technology-effects", force, value, level, saved, label)
   return oil_snapshot(force, level, saved, label)
 end
 local function seed_foreign(expected)

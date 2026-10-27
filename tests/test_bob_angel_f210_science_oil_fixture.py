@@ -209,7 +209,7 @@ function parse_control()
 end
 
 function run_control_model(mods, vector, prerequisites, effect_names, missing, tamper)
-  local markers,saves={},0
+  local markers,diagnostics,saves={}, {}, 0
   local function technology(name,effects,ingredients,prerequisites)
     local state={name=name,valid=true,level=1,researched=false,enabled=true,visible_when_disabled=false,
       saved_progress=0,prototype={max_level=4294967295,effects=effects or {}},
@@ -281,7 +281,10 @@ function run_control_model(mods, vector, prerequisites, effect_names, missing, t
   local lab={valid=true,energy=0,get_inventory=function(which) assert(which==1);return inventory end}
   game.surfaces[1]={create_entity=function(spec) assert(spec.name=="lab" and spec.force==player);return lab end}
   local callbacks,storage={events={}},{}
-  local env={game=game,storage=storage,helpers={table_to_json=function(row) markers[#markers+1]=row;return "{}" end},
+  local env={game=game,storage=storage,helpers={table_to_json=function(row)
+      if row.stage ~= nil then markers[#markers+1]=row else diagnostics[#diagnostics+1]=row end
+      return "{}"
+    end},
     log=function() end,script={active_mods=mods,on_init=function(fn)callbacks.init=fn end,on_load=function(fn)callbacks.load=fn end,
       on_event=function(event,fn)callbacks.events[event]=fn end},defines={events={on_research_finished=1,on_tick=2},inventory={lab_input=1}}}
   local cache={}
@@ -294,22 +297,22 @@ function run_control_model(mods, vector, prerequisites, effect_names, missing, t
   env._G=env;setmetatable(env,{__index=_G})
   local chunk,message=loadfile(fixture.."/control.lua","t",env);assert(chunk,message);chunk()
   local ok,result=pcall(callbacks.init)
-  if not ok then return {ok=false,message=tostring(result),saves=saves,markers=markers} end
-  game.tick=1;ok,result=pcall(callbacks.events[2]);if not ok then return {ok=false,message=tostring(result),saves=saves,markers=markers} end
+  if not ok then return {ok=false,message=tostring(result),saves=saves,markers=markers,diagnostics=diagnostics} end
+  game.tick=1;ok,result=pcall(callbacks.events[2]);if not ok then return {ok=false,message=tostring(result),saves=saves,markers=markers,diagnostics=diagnostics} end
   local science=player.technologies["recipe-prod-research_science_pack_productivity-1"]
   for completion=1,2 do
     science.level=science.level+1;science.researched=false;player.current_research=nil;player.research_queue={};player.reset_technology_effects()
     for _,item in ipairs(vector) do counts[item]=counts[item]-1 end
-    ok,result=pcall(callbacks.events[1],{research=science});if not ok then return {ok=false,message=tostring(result),saves=saves,markers=markers} end
-    game.tick=game.tick+1;ok,result=pcall(callbacks.events[2]);if not ok then return {ok=false,message=tostring(result),saves=saves,markers=markers} end
+    ok,result=pcall(callbacks.events[1],{research=science});if not ok then return {ok=false,message=tostring(result),saves=saves,markers=markers,diagnostics=diagnostics} end
+    game.tick=game.tick+1;ok,result=pcall(callbacks.events[2]);if not ok then return {ok=false,message=tostring(result),saves=saves,markers=markers,diagnostics=diagnostics} end
   end
   if tamper=="oil" then player.technologies["recipe-prod-research_oil_cracking_productivity-1"].saved_progress=.5 end
   for _=1,2 do
-    ok,result=pcall(callbacks.load);if not ok then return {ok=false,message=tostring(result),saves=saves,markers=markers} end
-    game.tick=game.tick+1;ok,result=pcall(callbacks.events[2]);if not ok then return {ok=false,message=tostring(result),saves=saves,markers=markers} end
+    ok,result=pcall(callbacks.load);if not ok then return {ok=false,message=tostring(result),saves=saves,markers=markers,diagnostics=diagnostics} end
+    game.tick=game.tick+1;ok,result=pcall(callbacks.events[2]);if not ok then return {ok=false,message=tostring(result),saves=saves,markers=markers,diagnostics=diagnostics} end
   end
   local oil=player.technologies["recipe-prod-research_oil_cracking_productivity-1"]
-  return {ok=true,saves=saves,markers=markers,science_level=science.level,
+  return {ok=true,saves=saves,markers=markers,diagnostics=diagnostics,science_level=science.level,
     oil={level=oil.level,enabled=oil.enabled,visible_when_disabled=oil.visible_when_disabled,
       saved_progress=oil.saved_progress},counts=counts}
 end
@@ -475,6 +478,13 @@ end
                     self.assertEqual(len(effect_rows), witness["admitted_producer_count"])
                 self.assertEqual(.27, result["oil"]["saved_progress"])
                 self.assertTrue(all(result["counts"][name] == 30 for name in vector))
+                self.assertEqual(10, len(result["diagnostics"]))
+                self.assertEqual(["before-level", "after-level", "after-researched-false",
+                                  "after-flags-and-saved-progress", "after-reset-technology-effects"] * 2,
+                                 [row["phase"] for row in result["diagnostics"]])
+                for row in result["diagnostics"]:
+                    self.assertEqual("observed", row["status"])
+                    self.assertEqual(4294967295, row["expected"]["prototype_max_level"])
         refused = plain(self.lua.eval("run_control_model")(
             lua_value(self.lua, self._mods(True)), lua_value(self.lua, SA_VECTOR),
             lua_value(self.lua, SA_PREREQUISITES), lua_value(self.lua, SA_EFFECTS), "research-speed-5"))
@@ -492,6 +502,11 @@ end
         source = (FIXTURE / "control.lua").read_text(encoding="utf-8")
         self.assertLess(source.index("value.level = level"), source.index("value.enabled = false"))
         self.assertLess(source.index("value.enabled = false"), source.index("value.saved_progress = saved"))
+        self.assertIn("OIL_SEED_DIAGNOSTIC", source)
+        for phase in ("before-level", "after-level", "after-researched-false",
+                      "after-flags-and-saved-progress", "after-reset-technology-effects"):
+            self.assertIn(phase, source)
+        self.assertIn('fail(label .. " oil saved identity differs", {expected=expected, actual=actual})', source)
         self.assertIn('effect_vector(value, expected.effects, label .. " science")', source)
         self.assertIn('input_vector(value, expected.vector, label .. " science")', source)
         self.assertIn("foreign queue snapshot differs", source)
