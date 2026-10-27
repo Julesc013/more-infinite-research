@@ -46,6 +46,12 @@ return {
     [0.01] = "0.0099999997764825821",
     [0.20] = "0.20000000298023224",
   },
+  -- The original F200 source save records this force modifier as its native
+  -- `0.1` spelling.  It is intentionally separate from recipe-effect tokens,
+  -- whose Factorio float32 serialisation is part of the protected snapshot.
+  source_modifier_tokens = {
+    [0.10] = "0.1",
+  },
   settings = {
     ["ips-require-space-gate"] = true,
     ["ips-enable-research_breeding"] = true,

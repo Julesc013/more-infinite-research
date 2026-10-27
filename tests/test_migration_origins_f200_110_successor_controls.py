@@ -119,6 +119,7 @@ class MigrationOriginF200110SuccessorControls(unittest.TestCase):
         )
         single_precision_one_percent = struct.unpack("<f", struct.pack("<f", .01))[0]
         self.assertEqual(format(single_precision_one_percent, ".17g"), catalogue["source_change_tokens"][.01])
+        self.assertEqual("0.1", catalogue["source_modifier_tokens"][.10])
         for recipe in ("speed-module", "productivity-module", "efficiency-module"):
             with self.subTest(recipe=recipe):
                 self.assertAlmostEqual(.11, sum(effect["change"] for effect in rows[MODULES]
@@ -218,6 +219,7 @@ class MigrationOriginF200110SuccessorControls(unittest.TestCase):
               return {storage_key="mir5_migration_origin_f200_110_source",fixture="mir-fixture-mir5-migration-origin-f200-110-source",
                 direct="recipe-prod-research_gears-1",gear_recipe="iron-gear-wheel",save="mir5-native-complete",deadline_ticks=18000,lab_packs=32,expected_gear_delta=.1,
                 source_change_tokens={[.1]="0.10000000149011612",[.05]="0.05000000074505806",[.02]="0.019999999552965164",[.2]="0.20000000298023224"},
+                source_modifier_tokens={[.1]="0.1"},
                 rows={["recipe-prod-research_gears-1"]={{type="change-recipe-productivity",recipe="iron-gear-wheel",change=.1}}},settings={test=true},
                 targets={f200={base="2.0.77",mir="5.0.20000",fixture="0.2.0"},f210={base="2.1.23",mir="5.0.21000",fixture="0.3.0"}}}
             end
@@ -288,7 +290,7 @@ class MigrationOriginF200110SuccessorControls(unittest.TestCase):
         self.lua.globals().legacy_module_definitions_path = LEGACY_MODULE_DEFINITIONS.as_posix()
         self.lua.globals().legacy_module_runtime_path = LEGACY_MODULE_RUNTIME.as_posix()
         self.lua.execute(r'''
-          function migration_origin_110_successor_lifecycle(target, source_fixture_name, active_wrapper_name, catalogue_fixture_name, legacy_module_bonus, reset_drops_module_bonus)
+          function migration_origin_110_successor_lifecycle(target, source_fixture_name, active_wrapper_name, catalogue_fixture_name, legacy_module_bonus, reset_drops_module_bonus, saved_battery_token, current_recipe_scalar, duplicate_current_recipe)
             local callbacks={events={}}
             local env={storage={},logs={},created_labs=0,saved=false,
               script={active_mods={},on_configuration_changed=function(fn) callbacks.configuration=fn end,
@@ -330,7 +332,7 @@ class MigrationOriginF200110SuccessorControls(unittest.TestCase):
                 if effect.type=="change-recipe-productivity" then
                   rows[#rows+1]=effect.type.."|"..effect.recipe.."|"..catalogue.source_change_tokens[effect.change]
                 elseif effect.type=="worker-robot-battery" then
-                  rows[#rows+1]=effect.type.."|"..catalogue.source_change_tokens[effect.modifier]
+                  rows[#rows+1]=effect.type.."|"..catalogue.source_modifier_tokens[effect.modifier]
                 end
               end
               table.sort(rows);return table.concat(rows,",")
@@ -419,6 +421,9 @@ class MigrationOriginF200110SuccessorControls(unittest.TestCase):
               foreign_index=2,foreign_snapshot=foreign_snapshot,
               foreign_queue={current=catalogue.direct,queue={catalogue.direct,"recipe-prod-research_plastic-1"},progress=.42},
               detached_index=3,detached_snapshot=detached_snapshot}
+            if saved_battery_token~=nil then
+              state.player_snapshot.effects[catalogue.robot_battery]="worker-robot-battery|"..saved_battery_token
+            end
             -- Model Factorio's per-mod storage ownership: the protected
             -- state belongs to the source fixture identity, not every
             -- fixture whose source directory happens to contain this control.
@@ -454,6 +459,18 @@ class MigrationOriginF200110SuccessorControls(unittest.TestCase):
             local module_runtime=env.require("runtime.legacy_module_credits")
             assert(module_runtime.on_configuration_changed({mod_changes={
               ["more-infinite-research"]={old_version="1.1.0",new_version=env.script.active_mods["more-infinite-research"]}}})==true)
+            local function alter_current_module_shape(force)
+              local effects=force.technologies["recipe-prod-research_modules-1"].prototype.effects
+              if current_recipe_scalar~=nil then
+                for _,effect in ipairs(effects) do
+                  if effect.change==.1 then effect.change=current_recipe_scalar end
+                end
+              end
+              if duplicate_current_recipe then
+                effects[#effects+1]={type="change-recipe-productivity",recipe="speed-module",change=current_recipe_scalar or .1}
+              end
+            end
+            alter_current_module_shape(player);alter_current_module_shape(foreign);alter_current_module_shape(detached)
             local marker_counts={}
             local function marker_count()
               local count=0
@@ -492,6 +509,7 @@ class MigrationOriginF200110SuccessorControls(unittest.TestCase):
                foreign_reset_calls=foreign.reset_calls,detached_reset_calls=detached.reset_calls,order=order,
                marker_counts=marker_counts,
                source_state_changed=state.successors~=nil,
+              source_battery_effect=state.player_snapshot.effects[catalogue.robot_battery],
               candidate_module_effects=#player.technologies["recipe-prod-research_modules-1"].prototype.effects,
               player_module_holders={player.technologies[catalogue.module_credit.holders[1].id].level,
                 player.technologies[catalogue.module_credit.holders[2].id].level,
@@ -562,6 +580,48 @@ class MigrationOriginF200110SuccessorControls(unittest.TestCase):
                                  result["marker_counts"])
                 self.assertTrue(result["source_state_changed"])
                 self.assertTrue(result["active_state_changed"])
+
+    def test_control_accepts_only_the_exact_native_battery_token_and_current_recipe_float32_token(self):
+        self._install_lifecycle_model()
+        source = json.loads((SOURCE_FIXTURE / "info.json").read_text(encoding="utf-8"))
+        native_recipe_scalar = struct.unpack("<f", struct.pack("<f", .10))[0]
+        wrappers = {
+            "f200": json.loads((FIXTURE / "info-f200.json").read_text(encoding="utf-8")),
+            "f210": json.loads((FIXTURE / "info-f210.json").read_text(encoding="utf-8")),
+        }
+        for target, wrapper in wrappers.items():
+            with self.subTest(target=target):
+                result = py(self.lua.eval("migration_origin_110_successor_lifecycle")(
+                    target, source["name"], wrapper["name"], None, None, False,
+                    None, native_recipe_scalar, False))
+                self.assertTrue(result["ok"], result["message"])
+                self.assertEqual("worker-robot-battery|0.1", result["source_battery_effect"])
+                self.assertEqual((1, 1), (result["created_labs"], result["player_add_calls"]))
+
+    def test_control_refuses_battery_or_recipe_token_drift_before_candidate_writes(self):
+        self._install_lifecycle_model()
+        source = json.loads((SOURCE_FIXTURE / "info.json").read_text(encoding="utf-8"))
+        wrapper = json.loads((FIXTURE / "info-f200.json").read_text(encoding="utf-8"))
+        native_recipe_scalar = struct.unpack("<f", struct.pack("<f", .10))[0]
+        variants = (
+            ("battery", "0.10000000149011612", native_recipe_scalar, False,
+             "player saved source effect multiset differs: recipe-prod-research_robot_battery-1"),
+            ("scalar", None, native_recipe_scalar + .00000001, False,
+             "published source recipe-effect scalar is unsupported"),
+            ("multiplicity", None, native_recipe_scalar, True,
+             "player current public module effects differ"),
+        )
+        for label, battery_token, recipe_scalar, duplicate, expected in variants:
+            with self.subTest(label=label):
+                result = py(self.lua.eval("migration_origin_110_successor_lifecycle")(
+                    "f200", source["name"], wrapper["name"], None, None, False,
+                    battery_token, recipe_scalar, duplicate))
+                self.assertFalse(result["ok"])
+                self.assertIn(expected, result["message"])
+                self.assertEqual((0, 0), (result["created_labs"], result["player_add_calls"]))
+                self.assertFalse(result["saved"])
+                self.assertFalse(result["source_state_changed"])
+                self.assertFalse(result["active_state_changed"])
 
     def test_renamed_successor_cannot_consume_the_protected_source_storage(self):
         self._install_lifecycle_model()

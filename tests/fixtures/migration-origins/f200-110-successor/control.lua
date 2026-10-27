@@ -27,7 +27,18 @@ local function source_names()
 end
 local function token(value)
   local result = catalogue.source_change_tokens[value]
-  if result == nil then fail("published source effect scalar is unsupported") end
+  if result ~= nil then return result end
+  -- Current runtime recipe effects may expose the exact numeric value of a
+  -- recorded native float32 token rather than the authored Lua decimal.  This
+  -- is an exact finite alternate spelling, not a rounded comparison.
+  for _, native in pairs(catalogue.source_change_tokens) do
+    if value == tonumber(native) then return native end
+  end
+  fail("published source recipe-effect scalar is unsupported")
+end
+local function modifier_token(value)
+  local result = catalogue.source_modifier_tokens[value]
+  if result == nil then fail("published source modifier scalar is unsupported") end
   return result
 end
 local function source_effect_signature(name)
@@ -36,7 +47,7 @@ local function source_effect_signature(name)
     if effect.type == "change-recipe-productivity" then
       rows[#rows + 1] = effect.type .. "|" .. effect.recipe .. "|" .. token(effect.change)
     elseif effect.type == "worker-robot-battery" then
-      rows[#rows + 1] = effect.type .. "|" .. token(effect.modifier)
+      rows[#rows + 1] = effect.type .. "|" .. modifier_token(effect.modifier)
     else
       fail("published source effect type is unsupported")
     end
