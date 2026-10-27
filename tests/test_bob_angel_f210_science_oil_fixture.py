@@ -12,6 +12,7 @@ import hashlib
 import importlib.util
 import json
 from pathlib import Path
+import subprocess
 import sys
 import tempfile
 import unittest
@@ -28,6 +29,11 @@ SOURCE = "b251ae7a54104ace87cb0da4cf531cf53f03c93d"
 PLAYER_TREE = "79b73a6a8e68987737e69bf2d95ec6555b49f901"
 SCIENCE = "recipe-prod-research_science_pack_productivity-1"
 OIL = "recipe-prod-research_oil_cracking_productivity-1"
+INPUT_REVISION = "c37fca88667d550660f5b9c0efd7f272b56d6025"
+INPUT_RECEIPT = ROOT / "spec/evidence/bob-angel-f210-science-oil-inputs-c37fca88.json"
+FIXTURE_ARCHIVE = "mir-fixture-mir5-bob-angel-f210-science-oil_0.1.0.zip"
+FIXTURE_SHA = "3F02D963DD2B067DA54C4916DBF5F11B7E0D5C51A3856E5DF9B0D8108A8B7630"
+FIXTURE_BYTES = 7825
 
 BASE_VECTOR = [
     "automation-science-pack", "logistic-science-pack", "chemical-science-pack",
@@ -344,10 +350,14 @@ end
                 ], new["mods"])
                 self.assertEqual(old["archive_sha256"] | {
                     "more-infinite-research_5.0.21000.zip": MIR_SHA,
+                    FIXTURE_ARCHIVE: FIXTURE_SHA,
                 }, new["archive_sha256"])
                 self.assertEqual(OBSERVER_SHA, new["archive_sha256"]["mir-fixture-mir5-active-mods-observer_0.1.0.zip"])
+                self.assertEqual(FIXTURE_SHA, new["archive_sha256"][FIXTURE_ARCHIVE])
                 self.assertIn(SOURCE, new["scope"])
                 self.assertIn(PLAYER_TREE, new["scope"])
+                self.assertIn(FIXTURE_SHA, new["scope"])
+                self.assertIn(f"{FIXTURE_BYTES} bytes", new["scope"])
                 self.assertIn("Prepared input only", new["scope"])
                 fixture_info = json.loads((FIXTURE / "info.json").read_text(encoding="utf-8"))
                 self.assertEqual(["base = 2.1.23", "more-infinite-research = 5.0.21000"],
@@ -383,6 +393,47 @@ end
                 self.assertEqual((FIXTURE / "info.json").read_bytes(),
                                  package.read(f"{NAME}_0.1.0/info.json"))
             self.assertEqual(hashlib.sha256(archive.read_bytes()).hexdigest().upper(), record["sha256"].upper())
+
+    def test_prepared_inputs_pin_the_four_raw_git_runtime_members_without_native_claims(self):
+        receipt = json.loads(INPUT_RECEIPT.read_bytes())
+        self.assertEqual("MIR5BobAngelF210ScienceOilPreparedInputsV1", receipt["kind"])
+        self.assertEqual(INPUT_REVISION, receipt["fixture_source_commit"])
+        self.assertEqual("bob-angel-f210-science-oil", receipt["case_name"])
+        for field in ("native_execution", "library_mutation", "laboratory_completion", "release_qualification"):
+            self.assertIs(receipt[field], False)
+        self.assertIn("pending", receipt["saved_input_hashes"])
+        fixture = receipt["fixture"]
+        self.assertEqual((NAME, "0.1.0", FIXTURE_SHA, FIXTURE_BYTES),
+                         (fixture["name"], fixture["version"], fixture["sha256"], fixture["bytes"]))
+        self.assertEqual(4, len(fixture["members"]))
+        self.assertEqual(4, receipt["projection_contract"]["member_count"])
+        self.assertEqual(["info.json", "control.lua", "data-final-fixes.lua", "fixture_facts.lua"],
+                         receipt["projection_contract"]["members"])
+        self.assertIn("README", receipt["projection_contract"]["description"])
+        self.assertEqual("four-member-raw-git-projection-passes-real-guard", receipt["archive_guard"]["status"])
+        self.assertIn("Assert-MIRLibraryFixtureArchive", receipt["archive_guard"]["command"])
+        expected = {name: f"tests/fixtures/bob-angel-f210-science-oil/{name}"
+                    for name in ("info.json", "control.lua", "data-final-fixes.lua", "fixture_facts.lua")}
+        self.assertEqual(expected, {row["path"]: row["source_path"] for row in fixture["members"]})
+        for row in fixture["members"]:
+            raw = subprocess.check_output(["git", "show", f"{INPUT_REVISION}:{row['source_path']}"], cwd=ROOT)
+            self.assertEqual((row["sha256"], row["bytes"]),
+                             (hashlib.sha256(raw).hexdigest().upper(), len(raw)))
+        helper = receipt["package_tool"]
+        raw_helper = subprocess.check_output(["git", "show", f"{INPUT_REVISION}:{helper['path']}"], cwd=ROOT)
+        self.assertEqual(helper["committed_sha256"], hashlib.sha256(raw_helper).hexdigest().upper())
+        expected_profiles = {
+            "tests/profiles/bob-angel-f210-science-oil-mir5-base-f210-2123.json",
+            "tests/profiles/bob-angel-f210-science-oil-mir5-space-age-f210-2123.json",
+        }
+        self.assertEqual(expected_profiles, set(receipt["profile_bindings"]))
+        self.assertEqual({FIXTURE_SHA}, set(receipt["profile_bindings"].values()))
+        self.assertEqual((SOURCE, PLAYER_TREE, MIR_SHA),
+                         (receipt["mir_input"]["source_commit"], receipt["mir_input"]["player_tree"],
+                          receipt["mir_input"]["sha256"]))
+        self.assertEqual(("2.1.23", ENGINE_SHA, 679250),
+                         (receipt["mir_input"]["engine"]["version"], receipt["mir_input"]["engine"]["sha256"],
+                          receipt["mir_input"]["bytes"]))
 
     def test_data_preflight_binds_independent_vectors_before_accelerating_only_science(self):
         for space_age, vector, effect_rows in ((False, BASE_VECTOR, BASE_EFFECTS), (True, SA_VECTOR, SA_EFFECTS)):
