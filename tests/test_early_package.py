@@ -108,8 +108,7 @@ class EarlyPackageTests(unittest.TestCase):
                         b'require("adapters.early.data").apply(require("platform.target"))\n',
                     )
                     self.assertNotIn(b"@DISTRIBUTION_VERSION@", changelog)
-                    self.assertEqual(changelog.count(
-                        b"Version: 5.0." + target[1:].encode("ascii") + b"00"), 1)
+                    self.assertEqual(changelog.count(b"Version: 5.0.0\n"), 1)
                     self.assertEqual(locale, (source / pack.EARLY_LOCALE_SOURCE).read_bytes())
                     self.assertIn(
                         ("mir-" + {
