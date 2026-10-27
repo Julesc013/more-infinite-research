@@ -176,6 +176,8 @@ Release and branch/control permissions remain explicit. Documentation adoption i
 
 ## Offline player asset freeze
 
+Keep the existing extended-version build and qualification workflow. After acceptance, follow [final Portal copies](../spec/targets.md#final-portal-copies) to export selected finished packages for the maintainer, preserving the GitHub originals. This final output operation does not introduce a source/runtime codec or another build configuration.
+
 The [release adapter](../tools/release.py) builds ten target packages from one committed player tree and its tracked edition record: nine stable editions plus the GitHub-only experimental F018 package. For release delivery, explicitly include the buildable best-effort early cohort from that same commit. Select a full commit and a new output directory outside the checkout:
 
 ```powershell
