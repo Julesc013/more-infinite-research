@@ -211,9 +211,14 @@
       "writer_authority": "The matched e01/e6df/09eb controller writes literal true only after observing technology.enabled and writing false. Only that positive marker proves disablement ownership. The optional visibility boolean proves its own field independently.",
       "tag_archive_difference": "The four MIR4.0/4.1 modern ZIPs ship policy-v1 body09eb rather than tag-source body67c3. Do not infer these saved-state schemas from tag code.",
       "reader_boundary": "One-time configuration import for currently admitted authored IDs/settings/source classes; bounded known producer operations, positive marker and current state checks. Structured V3 import remains independent. No later native-worker right is inferred from schema1.",
-      "native_status": "not_run; require actual old source-save, candidate, earned effects/new research and two cold reloads before migration acceptance",
+      "native_status": "passed-exact-4.0.20000-Base-policy-v1-to-a575-F200-and-direct-F210-only; other-origins-and-full-catalogues-unqualified",
       "f200_supplement": "spec/evidence/historical-boolean-cap-f200-archive-metadata.json",
-      "f200_supplement_sha256": "370DD37BCE5003F819C2D2F0671582529CE4A6047A89FF23EB9E9146405CAFA1"
+      "f200_supplement_sha256": "370DD37BCE5003F819C2D2F0671582529CE4A6047A89FF23EB9E9146405CAFA1",
+      "native_evidence": {
+        "path": "spec/evidence/legacy-boolean-cap-a575-native-chain.json",
+        "sha256": "C9BCCAC54903586119169F5628DA2819185B401022E319E34805A79DAD9CB0C3",
+        "scope": "One published F2004.0.20000 source; two direct a575 successors. Original4.0.21000 source and whole-origin qualification remain open."
+      }
     }
   },
   "published_tag_sources": [
@@ -2126,6 +2131,12 @@
       "status": "passed-same-original-mir1-save-to-bd1-f200-and-58f-f210-only",
       "protected_source_save_sha256": "F8B38209DA632C8B2EFA049C8F69CDB3E3EC01F6BEE0C5D03BAFF03C27989C54",
       "reuse": "retains-original-frozen-inputs-current-candidate-applicability-pending"
+    },
+    {
+      "path": "spec/evidence/legacy-boolean-cap-a575-native-chain.json",
+      "sha256": "C9BCCAC54903586119169F5628DA2819185B401022E319E34805A79DAD9CB0C3",
+      "status": "passed-exact-a575-Base-policy-v1-source-F200-and-direct-F210-only",
+      "reuse": "Exact4.0.20000 source/8DB+7CE successor fixture inputs only; not full origin, other origins or later changed inputs."
     }
   ],
   "migration_execution_matrix": {
