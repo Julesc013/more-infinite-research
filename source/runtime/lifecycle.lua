@@ -548,7 +548,13 @@ local function import_legacy_caps_on_configuration(event)
       selected_owners[force.index] = owner
       local _, admitted = full_limits_for(force, true, owner, true)
       local owned = discard_unbound_ownership(force, current.owned_disabled, admitted, owner)
-      local rows = legacy_caps.import_for_force(legacy_bucket, force,
+      -- Public policy-v1 used a distinct, boolean component ledger.  Its
+      -- marker is the only selector here; both readers still receive the
+      -- current preflighted candidate list and current ownership, so an old
+      -- version label cannot manufacture a restoration right.
+      local import_for_force = legacy_bucket.policy_version == 1
+        and legacy_caps.import_boolean_for_force or legacy_caps.import_for_force
+      local rows = import_for_force(legacy_bucket, force,
         legacy_candidates(force, owner, direct_f200_hop), owned, allowlist)
       merge_legacy_rows(current.owned_disabled, force.index, rows)
     end
