@@ -238,7 +238,7 @@
     "Data-stage preflight retains its declared input order. The Factorio 2.1 runtime ResearchIngredient arrays are witnessed as exact name/amount multisets, without an unproved runtime ordering assertion.",
     "Both cases use two real laboratory completions whose fixture event counter admits only event.by_script=false; the fixture accelerates only science count and time.",
     "Oil is a seeded, disabled earned identity with saved27% progress and two named effects; it is deliberately not represented as a laboratory-earned oil result.",
-    "The foreign force remains disabled with queued42% state. Both completed saves survive two read-only cold reloads with identical bytes.",
+    "The foreign oil technology remains disabled while the foreign force retains its queued 42% automation state. Both completed saves survive two read-only cold reloads with identical bytes.",
     "No ordinary science/oil tuning, physical science production, all-physics behavior, client behavior, performance, release, or broad migration qualification follows."
   ],
   "receipts": {
