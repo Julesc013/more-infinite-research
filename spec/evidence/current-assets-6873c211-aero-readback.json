@@ -1,0 +1,485 @@
+{
+  "schema": 1,
+  "kind": "MIR5CurrentAssetFreezeReadbackV1",
+  "status": "independent-aero-rebuild-verified-not-native-qualified",
+  "source": {
+    "commit": "6873c2116f4da7c4d70069aecaf79e338ec1fbea",
+    "mod_name": "more-infinite-research",
+    "mod_title": "More Infinite Research",
+    "path": "source",
+    "source_distribution_version": "5.0.21000",
+    "source_tree": "d5d8694b2fbd7229de84c9966691d5446c82219b",
+    "tree": "9a43749ec8b93888c815c245ece378ef82b28ee8"
+  },
+  "controller": {
+    "package_tool": {
+      "path": "tools/package.py",
+      "sha256": "00ed00d66bd558554068405c8882419f852fc2f66646088052888d70e25da61e"
+    },
+    "release_tool": {
+      "path": "tools/release.py",
+      "sha256": "59beddf90a97e0a0141a87a50539fad5dc18e331ace675e79d43d9e0fab7cddf"
+    },
+    "runtime": {
+      "implementation": "cpython",
+      "version": [
+        3,
+        14,
+        7
+      ],
+      "zlib_build_version": "1.3.1.zlib-ng",
+      "zlib_runtime_version": "1.3.1.zlib-ng"
+    },
+    "zip_policy": {
+      "compression": "ZIP_DEFLATED",
+      "compresslevel": 9,
+      "member_create_system": 3,
+      "member_external_attr": 2175008768,
+      "member_timestamp": [
+        1980,
+        1,
+        1,
+        0,
+        0,
+        0
+      ]
+    }
+  },
+  "target_record": {
+    "blob": "b7c2a789e17b6726c341f8a3ff97d6a27d43c0d6",
+    "path": "targets/editions.json",
+    "sha256": "2a2e2a7e9c54224aece72366a1bb3ef7d9007a7bec92bb53c4d9b0276b6e33f6"
+  },
+  "normal_targets": [
+    "f013",
+    "f014",
+    "f015",
+    "f016",
+    "f017",
+    "f018",
+    "f100",
+    "f110",
+    "f200",
+    "f210"
+  ],
+  "best_effort_targets": [
+    "f006",
+    "f007",
+    "f008",
+    "f009",
+    "f010",
+    "f011",
+    "f012"
+  ],
+  "inventory_sha256": "033EED330F447ABA7AB43378EC7B75F4185243B168FB76481A20E1F71F3C673A",
+  "inventory_body_sha256": "3382F9A760799A9CA5345206A9C7DC42B99460260749A0FA9418A9277352ED32",
+  "primary_custody": "build/mir5/assets/6873c211-aero-r01",
+  "files": [
+    {
+      "name": "MIR5ReleaseAssetInventoryV1.json",
+      "bytes": 208528,
+      "sha256": "033EED330F447ABA7AB43378EC7B75F4185243B168FB76481A20E1F71F3C673A"
+    },
+    {
+      "name": "more-infinite-research_5.0.00600.zip",
+      "bytes": 135584,
+      "sha256": "6CCC4113CA8DED952940F0FCCE90C0F76451F1E6A8D7CD17297E75E31F219FE7"
+    },
+    {
+      "name": "more-infinite-research_5.0.00700.zip",
+      "bytes": 135585,
+      "sha256": "B18CAA8DBC4EF63F2B42257DF0045E7FCDA8206D32A97E98AD7929805B8FA75B"
+    },
+    {
+      "name": "more-infinite-research_5.0.00800.zip",
+      "bytes": 135583,
+      "sha256": "FE9F4BE66B38EB640DFB82965C7C355DFAA2AE125266549C435AABE6FA3CE160"
+    },
+    {
+      "name": "more-infinite-research_5.0.00900.zip",
+      "bytes": 135585,
+      "sha256": "9698F49778690895D2F1ED946CCBACD5A128E277A50232C04DB9B6064325D817"
+    },
+    {
+      "name": "more-infinite-research_5.0.01000.zip",
+      "bytes": 135581,
+      "sha256": "8E965912D2E08B882C4939663DD6B55F974DF8E7D157B22F27B2B841C99ACA90"
+    },
+    {
+      "name": "more-infinite-research_5.0.01100.zip",
+      "bytes": 135584,
+      "sha256": "EEE661F0D56F2B46AD76894F979DA54BECAB0089433DCEED67F988DD621BEA12"
+    },
+    {
+      "name": "more-infinite-research_5.0.01200.zip",
+      "bytes": 135586,
+      "sha256": "9A1D356962DEC61949A637B3E83E4B4E65011AA5B0C8CEC00C556CEE9E1D2FA8"
+    },
+    {
+      "name": "more-infinite-research_5.0.01300.zip",
+      "bytes": 453060,
+      "sha256": "DC88171FCE2F071C350CCADF588C3A6FDED0E52997B350368C51E6C906025ED9"
+    },
+    {
+      "name": "more-infinite-research_5.0.01400.zip",
+      "bytes": 453065,
+      "sha256": "2EB969E2920B03ABC2C729313841D0690CAD573E2201A6E0597AF1B5E21E0BBC"
+    },
+    {
+      "name": "more-infinite-research_5.0.01500.zip",
+      "bytes": 453064,
+      "sha256": "BBB2A0874F4A0C908415F0FEBD5574C37D5813BA673B4C0A95AB677B896CC474"
+    },
+    {
+      "name": "more-infinite-research_5.0.01600.zip",
+      "bytes": 453066,
+      "sha256": "125F62404EE1BDE8B202B68117000F819A0549D3D6E705C211D89A570605E295"
+    },
+    {
+      "name": "more-infinite-research_5.0.01700.zip",
+      "bytes": 453064,
+      "sha256": "C101D4D8F58283FCE07E558063E41BAA7A53DF1847FC6E2FF9074CC6FE84A923"
+    },
+    {
+      "name": "more-infinite-research_5.0.01800.zip",
+      "bytes": 453066,
+      "sha256": "09627C3A3120966BD4D4151BCF7F0585F266085A4C1194D7167323EF216EC9AA"
+    },
+    {
+      "name": "more-infinite-research_5.0.10000.zip",
+      "bytes": 453051,
+      "sha256": "B280D2980689F84CD9F58D947AA873347C433CF8AC639DEE3F0EBD132E202472"
+    },
+    {
+      "name": "more-infinite-research_5.0.11000.zip",
+      "bytes": 453363,
+      "sha256": "46F235819C5A5BA405569A22F1BC80732FF32510FBA9D639F01C31220F918F70"
+    },
+    {
+      "name": "more-infinite-research_5.0.20000.zip",
+      "bytes": 678128,
+      "sha256": "22C8F5EF4C4D366B26D4A050D86FA093F12F3BF65E61AF7969F43138D69765EB"
+    },
+    {
+      "name": "more-infinite-research_5.0.21000.zip",
+      "bytes": 678510,
+      "sha256": "2ABAF369E020D8AD18A0C04940A8811BECFA5E63E5B479C668E2D3A3123D032B"
+    },
+    {
+      "name": "SHA256SUMS-early.txt",
+      "bytes": 721,
+      "sha256": "6FE8530209BEC1EDF2C69557F51CD5876844D52C5E17E3C8DA07F1E1431A8211"
+    },
+    {
+      "name": "SHA256SUMS.txt",
+      "bytes": 1030,
+      "sha256": "4B75E24F79620D034CFE4574A3F6FFBDB017A020ABE857C121C86B679BDD721B"
+    }
+  ],
+  "verification": {
+    "release_freeze_with_internal_independent_repeat_build": "passed",
+    "all_twenty_primary_files_hash_verified": true,
+    "all_seventeen_member_inventories_independently_read_back": true,
+    "root_info_filename_and_current_changelog_version_match": true,
+    "no_duplicate_or_private_developer_members": true,
+    "controller_and_runtime_match_prior_freeze": true,
+    "normal_player_archives": 10,
+    "separately_labelled_best_effort_archives": 7
+  },
+  "previous_freeze": {
+    "source_commit": "61bc49e55cee121db75f300d5ae954d3f8488105",
+    "readback": "spec/evidence/current-assets-61bc49e5-aero-readback.json"
+  },
+  "byte_identical_previous_archives": [],
+  "previous_member_differences": [
+    {
+      "name": "more-infinite-research_5.0.01300.zip",
+      "target": "f013",
+      "changed_members": [
+        "changelog.txt"
+      ],
+      "member_hashes": [
+        {
+          "path": "changelog.txt",
+          "old_sha256": "D18BC45C6B07DD19187EE3833F50B6685177C775B0B62CE7E9DD61EC014CE85F",
+          "new_sha256": "4D4FF060E0459AD059F777ABB9574D388751734F374382858B610F50BA116426"
+        }
+      ],
+      "all_other_member_bytes_identical": true
+    },
+    {
+      "name": "more-infinite-research_5.0.01400.zip",
+      "target": "f014",
+      "changed_members": [
+        "changelog.txt"
+      ],
+      "member_hashes": [
+        {
+          "path": "changelog.txt",
+          "old_sha256": "5B6C6ACEE6D6F7C57F4D2868407E2C5859B0FDA6A2AFB3458C098BE4A48BD878",
+          "new_sha256": "691E6B98E2918DDEF3BDC6946CFD1EB5352D5A8A2C4CE3DE95BBF2E4C7A2B4AC"
+        }
+      ],
+      "all_other_member_bytes_identical": true
+    },
+    {
+      "name": "more-infinite-research_5.0.01500.zip",
+      "target": "f015",
+      "changed_members": [
+        "changelog.txt"
+      ],
+      "member_hashes": [
+        {
+          "path": "changelog.txt",
+          "old_sha256": "4A3444267B1AE335CE434F44ABFCA8D11922BEBB52165041787AD3B8231984F2",
+          "new_sha256": "49A35ACA12E9804C207164BFE739FE8CD92EC4CDE6E54BD4647305057B8D2EEE"
+        }
+      ],
+      "all_other_member_bytes_identical": true
+    },
+    {
+      "name": "more-infinite-research_5.0.01600.zip",
+      "target": "f016",
+      "changed_members": [
+        "changelog.txt"
+      ],
+      "member_hashes": [
+        {
+          "path": "changelog.txt",
+          "old_sha256": "A38F81EC5388EBDAA499D9598C8EAAEB67155B02625984AE1ED95D530690D238",
+          "new_sha256": "5B3F2567496715488194B7F40BAAB888DAC68EB0F72FC9EA73880EC8F81E9DB0"
+        }
+      ],
+      "all_other_member_bytes_identical": true
+    },
+    {
+      "name": "more-infinite-research_5.0.01700.zip",
+      "target": "f017",
+      "changed_members": [
+        "changelog.txt"
+      ],
+      "member_hashes": [
+        {
+          "path": "changelog.txt",
+          "old_sha256": "4A57CFC60720D800CCE354AA52BAFFC7B8669EABBED0AF3105B2FF090EF8DC1E",
+          "new_sha256": "67863A16105F04D3765F5AC95A9A9357E210BAB2C5EBF398C117C0F87AF9FA5E"
+        }
+      ],
+      "all_other_member_bytes_identical": true
+    },
+    {
+      "name": "more-infinite-research_5.0.01800.zip",
+      "target": "f018",
+      "changed_members": [
+        "changelog.txt"
+      ],
+      "member_hashes": [
+        {
+          "path": "changelog.txt",
+          "old_sha256": "9D70632AB073538905ECA1170C5FCBF47594AE67D243EA373AB76E09986D7AE8",
+          "new_sha256": "D54E115EB7D0FB37FF4B60DBAF4B6011896C0865B0114CE459FC16FC4249ED21"
+        }
+      ],
+      "all_other_member_bytes_identical": true
+    },
+    {
+      "name": "more-infinite-research_5.0.10000.zip",
+      "target": "f100",
+      "changed_members": [
+        "changelog.txt"
+      ],
+      "member_hashes": [
+        {
+          "path": "changelog.txt",
+          "old_sha256": "AFD3EB814F8B971FCFBE97573515741BDEA22C0EB03756C08193F8C86F08E5A5",
+          "new_sha256": "C5D10352DF589A8A4458B151A072891AF16CFDF410B7B4D2BAD9E94405E58D84"
+        }
+      ],
+      "all_other_member_bytes_identical": true
+    },
+    {
+      "name": "more-infinite-research_5.0.11000.zip",
+      "target": "f110",
+      "changed_members": [
+        "changelog.txt"
+      ],
+      "member_hashes": [
+        {
+          "path": "changelog.txt",
+          "old_sha256": "087721DA302A0D2E859125FD9172C52546CFD5358D17D03F3B51CA8854724D6B",
+          "new_sha256": "1A79989E808102B167AA721FD16DAE05C59BF427213BB0A7BF36238CED60FAEC"
+        }
+      ],
+      "all_other_member_bytes_identical": true
+    },
+    {
+      "name": "more-infinite-research_5.0.20000.zip",
+      "target": "f200",
+      "changed_members": [
+        "changelog.txt",
+        "compatibility/modern_catalogue.lua",
+        "research/settings.lua"
+      ],
+      "member_hashes": [
+        {
+          "path": "changelog.txt",
+          "old_sha256": "7364A427AFDD90BFA741DC1A5993137E7B8F0B8841ADDFCEAE3FB9D4E52500CD",
+          "new_sha256": "754F35250834620C78B0DDB9612E5F748E183722BB6548BDF964C412E5F4490D"
+        },
+        {
+          "path": "compatibility/modern_catalogue.lua",
+          "old_sha256": "7FD311075AFE49564D20BA4D18413D8BBC4513AE059220ACCA0973525B8EED31",
+          "new_sha256": "1EF134572E5EEE844F6150C0DB6080853678C3645C5FE7810F58A1B2120C5E00"
+        },
+        {
+          "path": "research/settings.lua",
+          "old_sha256": "F2C27E541EE2E29DAA54F11B4DDFDABFDD29E50B79CC9C4633AC16C0426BB0F2",
+          "new_sha256": "EC6C86948246D0BE078D84E0B5DCE3419C83075355184E7E21AF4F6819F484D2"
+        }
+      ],
+      "all_other_member_bytes_identical": true
+    },
+    {
+      "name": "more-infinite-research_5.0.21000.zip",
+      "target": "f210",
+      "changed_members": [
+        "changelog.txt",
+        "compatibility/modern_catalogue.lua",
+        "research/settings.lua"
+      ],
+      "member_hashes": [
+        {
+          "path": "changelog.txt",
+          "old_sha256": "A961B1D090E58192F0E50CDE4BBB59006096CAC39AD9559B630325D6789B2FE1",
+          "new_sha256": "F6D67238829ADB98C591919BB341D98EA4E595AE64A964F8FBB05B8FBB87728E"
+        },
+        {
+          "path": "compatibility/modern_catalogue.lua",
+          "old_sha256": "7FD311075AFE49564D20BA4D18413D8BBC4513AE059220ACCA0973525B8EED31",
+          "new_sha256": "1EF134572E5EEE844F6150C0DB6080853678C3645C5FE7810F58A1B2120C5E00"
+        },
+        {
+          "path": "research/settings.lua",
+          "old_sha256": "F2C27E541EE2E29DAA54F11B4DDFDABFDD29E50B79CC9C4633AC16C0426BB0F2",
+          "new_sha256": "EC6C86948246D0BE078D84E0B5DCE3419C83075355184E7E21AF4F6819F484D2"
+        }
+      ],
+      "all_other_member_bytes_identical": true
+    },
+    {
+      "name": "more-infinite-research_5.0.00600.zip",
+      "target": "f006",
+      "changed_members": [
+        "changelog.txt"
+      ],
+      "member_hashes": [
+        {
+          "path": "changelog.txt",
+          "old_sha256": "6CA5934CE155B86E92B3842B97AA27FCC971B5E0714119DA92674BB68C19CFBC",
+          "new_sha256": "503EE651B880F9E33CC62047A926901F56ABA6D4C4ED9D2ECC3B4AE0452DD27E"
+        }
+      ],
+      "all_other_member_bytes_identical": true
+    },
+    {
+      "name": "more-infinite-research_5.0.00700.zip",
+      "target": "f007",
+      "changed_members": [
+        "changelog.txt"
+      ],
+      "member_hashes": [
+        {
+          "path": "changelog.txt",
+          "old_sha256": "C080AF59AACC3942ED996017EB6B1399202B45BFCD080AF435BF9520A4381BAA",
+          "new_sha256": "F0E1E078A7CBA8201AC01C63265B51A3E43515E6DDCEC5AFC47235A56EF26372"
+        }
+      ],
+      "all_other_member_bytes_identical": true
+    },
+    {
+      "name": "more-infinite-research_5.0.00800.zip",
+      "target": "f008",
+      "changed_members": [
+        "changelog.txt"
+      ],
+      "member_hashes": [
+        {
+          "path": "changelog.txt",
+          "old_sha256": "9C18DC7A675BE13A6D0BE1FE4487AA4AC584CB46B891152040B057FB5418CD82",
+          "new_sha256": "0A075CFE36A08761B335E4F705C10B42BDD79DDCB4587E85D28101693239DFE5"
+        }
+      ],
+      "all_other_member_bytes_identical": true
+    },
+    {
+      "name": "more-infinite-research_5.0.00900.zip",
+      "target": "f009",
+      "changed_members": [
+        "changelog.txt"
+      ],
+      "member_hashes": [
+        {
+          "path": "changelog.txt",
+          "old_sha256": "BD2457091084873E564B48AE03BECA7B1E1212257D6ECD3E00F4229FC6782B41",
+          "new_sha256": "37DD39EAC00B6A97CEE4A1F346C540E1B78B0BAD053FD9BCCC2C27769791D05F"
+        }
+      ],
+      "all_other_member_bytes_identical": true
+    },
+    {
+      "name": "more-infinite-research_5.0.01000.zip",
+      "target": "f010",
+      "changed_members": [
+        "changelog.txt"
+      ],
+      "member_hashes": [
+        {
+          "path": "changelog.txt",
+          "old_sha256": "12F247CCFF6585563364B6BD9D6F8132343C93C74284AA55FC3A724EDBA7B275",
+          "new_sha256": "C5152919BF81945951BE4DB3DBF4D7F6BDEA79F6476598E1105B39CE8FDE4F85"
+        }
+      ],
+      "all_other_member_bytes_identical": true
+    },
+    {
+      "name": "more-infinite-research_5.0.01100.zip",
+      "target": "f011",
+      "changed_members": [
+        "changelog.txt"
+      ],
+      "member_hashes": [
+        {
+          "path": "changelog.txt",
+          "old_sha256": "312762631FAEF65F735FFFD80AC4662566F1946D2DF99BDF55418323103B75F3",
+          "new_sha256": "8B456E7D0962C93BAC0E7109731F8A0260EAC77B0A3E744BAF14BB21E15627D6"
+        }
+      ],
+      "all_other_member_bytes_identical": true
+    },
+    {
+      "name": "more-infinite-research_5.0.01200.zip",
+      "target": "f012",
+      "changed_members": [
+        "changelog.txt"
+      ],
+      "member_hashes": [
+        {
+          "path": "changelog.txt",
+          "old_sha256": "E303D7F9FE5DE06E5EB796F5D7B2340952C153CDB2277A8842CDB6979319ECDB",
+          "new_sha256": "A29385E72A1273750EA6B19B99CD2D9BBC53858165C72B58E19324D9388A7A46"
+        }
+      ],
+      "all_other_member_bytes_identical": true
+    }
+  ],
+  "comparison_custody": "build/mir5/assets/61bc49e5-aero-r01",
+  "limits": [
+    "Offline build and independent member/hash readback only; no Factorio execution or archive-library mutation on Aero.",
+    "All seventeen archives change their changelog. Only F200/F210 additionally change the shared settings and catalogue members; every other member is byte-identical to the retained61bc freeze.",
+    "The finite icon correction and material-setting visibility activate only in the selected F210 Bob/Angel branch; current native capture/rendering qualification remains required.",
+    "Earlier native receipts retain their actual controller, fixture, profile, settings, engine, package and save identities; reuse requires the consumed-input review in VER-06.",
+    "This tooling source also includes the before-output declared input guard; it does not convert old native executions into new harness executions.",
+    "No new gameplay, migration, multiplayer, performance, normal-target qualification or release verdict is granted.",
+    "F006-F012 remain separately labelled best-effort builds; F001-F005 are not invented distributions."
+  ]
+}
