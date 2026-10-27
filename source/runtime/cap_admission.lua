@@ -6,14 +6,16 @@ local M = {}
 
 local INFINITE_MAX_LEVEL = 4294967295
 
-local function exact_recipes(expected, effects, change)
-  if type(effects) ~= "table" or #effects ~= #expected then return false end
-  for index = 1, #expected do
+local function exact_recipes(expected, expected_count, effects, change)
+  if type(effects) ~= "table" or #effects ~= expected_count then return false end
+  local seen = {}
+  for index = 1, #effects do
     local effect = effects[index]
     if type(effect) ~= "table" or effect.type ~= "change-recipe-productivity"
-        or effect.recipe ~= expected[index] or effect.change ~= change then
+        or expected[effect.recipe] ~= true or seen[effect.recipe] or effect.change ~= change then
       return false
     end
+    seen[effect.recipe] = true
   end
   return true
 end
@@ -35,18 +37,17 @@ local function declared_contract(declaration)
     if type(recipe) ~= "string" or recipe == "" or recipes[recipe] then return nil end
     recipes[recipe] = true
   end
-  -- Preserve the authored order: the native prototype contract was captured
-  -- as an exact ordered effect list, rather than a permissive recipe set.
-  local ordered = {}
-  for index = 1, #admission.recipes do ordered[index] = admission.recipes[index] end
-  return ordered
+  -- Native productivity effects are semantically recipe-keyed. Retain every
+  -- authored recipe exactly once, but do not turn a presentation-only array
+  -- permutation into loss of a proven cap-restoration right.
+  return recipes, #admission.recipes
 end
 
 function M.admits_native_owner(lookup, declaration, configured_change)
   if type(lookup) ~= "function" then return false end
   local change = configured_change == nil and 0.1 or configured_change
   if type(change) ~= "number" or change ~= change or change <= 0 or change == math.huge then return false end
-  local recipes = declared_contract(declaration)
+  local recipes, recipe_count = declared_contract(declaration)
   if recipes == nil then return false end
   local ok, technology = pcall(lookup, declaration.id)
   if not ok or technology == nil then return false end
@@ -54,7 +55,7 @@ function M.admits_native_owner(lookup, declaration, configured_change)
     local prototype = technology.prototype
     return technology.name == declaration.id and prototype ~= nil
       and prototype.max_level == INFINITE_MAX_LEVEL
-      and exact_recipes(recipes, prototype.effects, change)
+      and exact_recipes(recipes, recipe_count, prototype.effects, change)
   end)
   return checked and accepted or false
 end

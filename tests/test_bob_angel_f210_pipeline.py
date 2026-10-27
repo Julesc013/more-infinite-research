@@ -10,6 +10,7 @@ from copy import deepcopy
 import gzip
 import hashlib
 import json
+import math
 from pathlib import Path
 import sys
 import unittest
@@ -120,6 +121,95 @@ PRODUCTIVITY_BADGE = {
     "floating": True,
 }
 
+# These lists are independently derived from the q009/q010 upstream raw lab
+# inputs and eligible recipe outputs below.  They deliberately do not come
+# from a candidate output or the former B6 omission: COMP-01/COMP-02 retain
+# every concrete accepted producer once this authored family is selected.
+UPSTREAM_LAB_PRODUCTIVITY_RECIPES = {
+    "base": [
+        "angels-desert-garden-a", "angels-desert-garden-cultivating-a",
+        "angels-swamp-garden-a", "angels-swamp-garden-cultivating-a",
+        "angels-temperate-garden-a", "angels-temperate-garden-cultivating-a",
+        "automation-science-pack", "bob-advanced-logistic-science-pack",
+        "bob-alien-science-pack", "bob-alien-science-pack-blue", "bob-alien-science-pack-green",
+        "bob-alien-science-pack-orange", "bob-alien-science-pack-purple", "bob-alien-science-pack-red",
+        "bob-alien-science-pack-yellow", "bob-science-pack-gold", "chemical-science-pack",
+        "logistic-science-pack", "military-science-pack", "production-science-pack", "utility-science-pack",
+    ],
+    "space_age": [
+        "agricultural-science-pack", "angels-desert-garden-a", "angels-desert-garden-cultivating-a",
+        "angels-swamp-garden-a", "angels-swamp-garden-cultivating-a",
+        "angels-temperate-garden-a", "angels-temperate-garden-cultivating-a",
+        "automation-science-pack", "bob-advanced-logistic-science-pack", "bob-alien-science-pack",
+        "bob-alien-science-pack-blue", "bob-alien-science-pack-green", "bob-alien-science-pack-orange",
+        "bob-alien-science-pack-purple", "bob-alien-science-pack-red", "bob-alien-science-pack-yellow",
+        "bob-science-pack-gold", "chemical-science-pack", "cryogenic-science-pack",
+        "electromagnetic-science-pack", "logistic-science-pack", "metallurgic-science-pack",
+        "military-science-pack", "production-science-pack", "promethium-science-pack",
+        "space-science-pack", "utility-science-pack",
+    ],
+}
+
+# The authored ordinary F210 seed is kept in its own stable order. The
+# remaining effects are the independently derived upstream lab producers
+# above, appended in the existing single collector's recipe-name order.
+AUTHORED_SCIENCE_EFFECT_SEEDS = {
+    "base": [
+        "automation-science-pack", "chemical-science-pack", "logistic-science-pack",
+        "military-science-pack", "production-science-pack", "utility-science-pack",
+    ],
+    "space_age": [
+        "agricultural-science-pack", "automation-science-pack", "chemical-science-pack",
+        "cryogenic-science-pack", "electromagnetic-science-pack", "logistic-science-pack",
+        "metallurgic-science-pack", "military-science-pack", "production-science-pack",
+        "promethium-science-pack", "space-science-pack", "utility-science-pack",
+    ],
+}
+
+COMBINED_SCIENCE_VECTORS = {
+    "base": [
+        "automation-science-pack", "logistic-science-pack", "chemical-science-pack",
+        "production-science-pack", "utility-science-pack", "military-science-pack",
+        "angels-token-bio", "bob-advanced-logistic-science-pack",
+    ],
+    "space_age": [
+        "automation-science-pack", "logistic-science-pack", "chemical-science-pack",
+        "production-science-pack", "utility-science-pack", "military-science-pack",
+        "space-science-pack", "agricultural-science-pack", "metallurgic-science-pack",
+        "electromagnetic-science-pack", "cryogenic-science-pack", "promethium-science-pack",
+        "angels-token-bio", "bob-advanced-logistic-science-pack",
+    ],
+}
+
+COMBINED_SCIENCE_PREREQUISITES = {
+    "base": [
+        "research-speed-5", "utility-science-pack", "research-speed-6", "automation-science-pack",
+        "logistic-science-pack", "chemical-science-pack", "production-science-pack", "military-science-pack",
+        "angels-gardens", "bob-advanced-logistic-science-pack",
+    ],
+    "space_age": [
+        "research-speed-5", "utility-science-pack", "research-speed-6", "automation-science-pack",
+        "logistic-science-pack", "chemical-science-pack", "production-science-pack", "military-science-pack",
+        "space-science-pack", "agricultural-science-pack", "metallurgic-science-pack",
+        "electromagnetic-science-pack", "cryogenic-science-pack", "promethium-science-pack",
+        "angels-gardens", "bob-advanced-logistic-science-pack",
+    ],
+}
+
+F200_DISABLED_OIL = {
+    "effects": ["heavy-oil-cracking", "light-oil-cracking"],
+    "science": ["automation-science-pack", "logistic-science-pack"],
+    "count_formula": "8000*2^(L-1)",
+    "time": 60,
+}
+
+ITEM_TYPES = {
+    "item", "tool", "mining-tool", "module", "ammo", "capsule", "gun", "armor", "repair-tool",
+    "item-with-entity-data", "item-with-inventory", "item-with-label", "item-with-tags",
+    "selection-tool", "copy-paste-tool", "blueprint", "blueprint-book", "deconstruction-item",
+    "upgrade-item", "spidertron-remote", "rail-planner", "space-platform-starter-pack",
+}
+
 
 def _lua_value(lua, value):
     if isinstance(value, dict):
@@ -225,6 +315,113 @@ class BobAngelF210PipelineTests(unittest.TestCase):
     def _setting_rows(lua):
         return _plain(lua.globals().settings_rows)
 
+    @staticmethod
+    def _recipe_rows(recipe):
+        if not isinstance(recipe, dict):
+            return []
+        normal, expensive = recipe.get("normal"), recipe.get("expensive")
+        if normal is None and expensive is None:
+            return [recipe]
+        return [row for row in (normal, expensive) if isinstance(row, dict)]
+
+    @staticmethod
+    def _field(recipe, row, name):
+        return row[name] if name in row else recipe.get(name)
+
+    @staticmethod
+    def _result_rows(row):
+        results = row.get("results")
+        if isinstance(results, list):
+            return results
+        result = row.get("result")
+        if isinstance(result, str) and result:
+            return [{"type": "item", "name": result, "amount": row.get("result_count", 1)}]
+        return []
+
+    @staticmethod
+    def _ingredient_rows(row):
+        ingredients = row.get("ingredients")
+        if isinstance(ingredients, list):
+            return ingredients
+        ingredient = row.get("ingredient")
+        if isinstance(ingredient, str) and ingredient:
+            return [{"type": "item", "name": ingredient, "amount": row.get("ingredient_amount", 1)}]
+        return []
+
+    @staticmethod
+    def _positive_item_result(result):
+        if not isinstance(result, dict) or result.get("type", "item") != "item":
+            return None
+        name = result.get("name")
+        if not isinstance(name, str) or not name:
+            return None
+        amount = result.get("amount", 1)
+        if not isinstance(amount, (int, float)) or not math.isfinite(amount) or amount < 0:
+            return None
+        probability = result.get("independent_probability", 1)
+        if "probability" in result or not isinstance(probability, (int, float)) or not math.isfinite(probability):
+            return None
+        if probability <= 0 or probability > 1:
+            return None
+        ignored = result.get("ignored_by_productivity", result.get("ignored_by_stats", 0))
+        if not isinstance(ignored, (int, float)) or not math.isfinite(ignored) or ignored < 0:
+            return None
+        extra = result.get("extra_count_fraction", 0)
+        if not isinstance(extra, (int, float)) or not math.isfinite(extra) or extra < 0 or extra > 1:
+            return None
+        if amount - ignored <= 0 and not (ignored == 0 and extra > 0):
+            return None
+        return name
+
+    @classmethod
+    def _upstream_lab_productivity_recipes(cls, raw):
+        # This finite independent projection is deliberately restricted to the
+        # captured upstream recipe/lab shapes. It applies COMP-02's concrete
+        # item, local-yield, denial, hidden/recycling, and shared-input guards
+        # before comparing the complete expected effect vector.
+        item_names = set()
+        for lab in raw["lab"].values():
+            if not isinstance(lab, dict):
+                continue
+            for name in lab.get("inputs", []):
+                if isinstance(name, str) and any(name in raw.get(kind, {}) for kind in ITEM_TYPES):
+                    item_names.add(name)
+        selected = []
+        for name, recipe in raw["recipe"].items():
+            if not isinstance(name, str) or not name or not isinstance(recipe, dict) or recipe.get("parameter") is True:
+                continue
+            rows = cls._recipe_rows(recipe)
+            if not rows:
+                continue
+            matched, blocked = False, False
+            for row in rows:
+                categories = cls._field(recipe, row, "categories")
+                category = cls._field(recipe, row, "category")
+                if (cls._field(recipe, row, "hidden") is True
+                        or cls._field(recipe, row, "allow_productivity") is False
+                        or cls._field(recipe, row, "maximum_productivity") == 0
+                        or category == "recycling"
+                        or isinstance(categories, list) and "recycling" in categories):
+                    blocked = True
+                    break
+                inputs = {
+                    result["name"] for result in cls._ingredient_rows(row)
+                    if isinstance(result, dict) and result.get("type", "item") == "item"
+                    and isinstance(result.get("name"), str)
+                }
+                for result in cls._result_rows(row):
+                    product = cls._positive_item_result(result)
+                    if product in item_names:
+                        if product in inputs:
+                            blocked = True
+                            break
+                        matched = True
+                if blocked:
+                    break
+            if matched and not blocked:
+                selected.append(name)
+        return sorted(selected)
+
     def test_context_is_bounded_upstream_only_and_binds_exact_r04_inputs(self):
         self.assertLessEqual(CONTEXT.stat().st_size, MAX_CONTEXT_BYTES)
         self.assertEqual(R04_PLAN_SHA256, self.context["r04"]["plan_sha256"])
@@ -289,6 +486,85 @@ class BobAngelF210PipelineTests(unittest.TestCase):
         self.assertNotIn("recipe-prod-research_material_copper_tungsten-1", space_rows)
         for rows in (base_rows, space_rows):
             self.assertNotIn("recipe-prod-research_material_aluminium-1", rows)
+
+    def test_combined_science_productivity_keeps_the_full_upstream_lab_family_and_native_progression(self):
+        for case in ("base", "space_age"):
+            with self.subTest(case=case):
+                source = self.context["cases"][case]
+                # Verify the finite names from upstream lab inputs and recipe
+                # products before staging candidate source.
+                self.assertEqual(
+                    UPSTREAM_LAB_PRODUCTIVITY_RECIPES[case],
+                    self._upstream_lab_productivity_recipes(source["raw"]),
+                )
+                row = self._rows(self.stage(case))["recipe-prod-research_science_pack_productivity-1"]
+                vector = COMBINED_SCIENCE_VECTORS[case]
+                self.assertEqual([[name, 1] for name in vector], row["unit"]["ingredients"])
+                self.assertEqual(COMBINED_SCIENCE_PREREQUISITES[case], row["prerequisites"])
+                expected_effects = AUTHORED_SCIENCE_EFFECT_SEEDS[case] + [
+                    recipe for recipe in UPSTREAM_LAB_PRODUCTIVITY_RECIPES[case]
+                    if recipe not in AUTHORED_SCIENCE_EFFECT_SEEDS[case]
+                ]
+                self.assertEqual(expected_effects,
+                                 [effect["recipe"] for effect in row["effects"]])
+                self.assertEqual(
+                    [{"type": "change-recipe-productivity", "recipe": recipe, "change": 0.1}
+                     for recipe in expected_effects],
+                    row["effects"],
+                )
+        self.assertEqual(27, len(UPSTREAM_LAB_PRODUCTIVITY_RECIPES["space_age"]))
+
+    def test_combined_oil_cracking_is_a_disabled_f200_saved_identity_on_both_f210_profiles(self):
+        for case in ("base", "space_age"):
+            with self.subTest(case=case):
+                row = self._rows(self.stage(case))["recipe-prod-research_oil_cracking_productivity-1"]
+                self.assertFalse(row["enabled"])
+                self.assertEqual(F200_DISABLED_OIL["effects"], [effect["recipe"] for effect in row["effects"]])
+                self.assertEqual([[name, 1] for name in F200_DISABLED_OIL["science"]], row["unit"]["ingredients"])
+                self.assertEqual(F200_DISABLED_OIL["science"], row["prerequisites"])
+                self.assertEqual(F200_DISABLED_OIL["count_formula"], row["unit"]["count_formula"])
+                self.assertEqual(F200_DISABLED_OIL["time"], row["unit"]["time"])
+
+    def test_combined_science_preflight_and_collector_keep_typed_denial_and_nonactivation_boundaries(self):
+        source = self.context["cases"]["space_age"]
+
+        missing = deepcopy(source["raw"])
+        missing["item"].pop("bob-advanced-logistic-science-pack")
+        failed = self.stage("space_age", raw=missing, expect_failure=True)
+        self.assertIn("named science/input item changed", str(failed.globals().message))
+        self.assertEqual(0, failed.globals().technology_publications)
+
+        denied = deepcopy(source["raw"])
+        denied["recipe"]["bob-advanced-logistic-science-pack"]["allow_productivity"] = False
+        rows = self._rows(self.stage("space_age", raw=denied))
+        effects = [effect["recipe"] for effect in rows["recipe-prod-research_science_pack_productivity-1"]["effects"]]
+        self.assertNotIn("bob-advanced-logistic-science-pack", effects)
+        self.assertEqual(26, len(effects))
+
+        fluid = deepcopy(source["raw"])
+        fluid["fluid"]["fixture-science-fluid"] = {"type": "fluid", "name": "fixture-science-fluid"}
+        fluid["lab"]["lab"]["inputs"].append("fixture-science-fluid")
+        fluid["recipe"]["fixture-science-fluid"] = {
+            "type": "recipe", "name": "fixture-science-fluid", "results": [
+                {"type": "fluid", "name": "fixture-science-fluid", "amount": 1},
+            ],
+        }
+        rows = self._rows(self.stage("space_age", raw=fluid))
+        self.assertNotIn("fixture-science-fluid", [effect["recipe"] for effect in
+                         rows["recipe-prod-research_science_pack_productivity-1"]["effects"]])
+
+        lua = LuaRuntime(unpack_returned_tuples=True)
+        lua.globals().player_root = SOURCE_ROOT.as_posix()
+        lua.globals().inactive_mods = _lua_value(lua, {
+            key: value for key, value in source["selection"].items() if key != "bobtech"
+        })
+        selected = lua.execute(r'''
+          package.path=player_root.."/?.lua;"..player_root.."/?/init.lua"; package.cpath=""
+          local target=require("platform.target")
+          target.id,target.factorio_version,target.minimum_base="f210","2.1","2.1.23"
+          return require("compatibility.bob_angel_f210_profile").select(inactive_mods)
+        ''')
+        self.assertIsNone(selected)
 
     def test_f210_bob_angel_uses_the_seven_captured_native_presentation_refs(self):
         # Both exact q009/q010 upstream rows carry the same direct prototype

@@ -1104,8 +1104,12 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
           $repo=$env:MIR_TEST_REPO
           $library=Join-Path $repo 'tests/fixtures/library-multiplayer'
           $observer=Join-Path $repo 'tests/fixtures/active-mods-observer'
+          $alpha=Join-Path $repo 'tests/fixtures/api-alpha'
+          $beta=Join-Path $repo 'tests/fixtures/api-beta'
           $accepted=@(Get-StandaloneIdentityFixtureSources -Sources @($library) -LibraryFixtureSource $library -StagedLibraryFixtureSource $library -StagedObserverSource $observer -RepoRoot $repo -StagedApiConsumerSources @{})
           if($accepted.Count-ne2 -or $accepted[0]-ine$library -or $accepted[1]-ine$observer){throw 'canonical observer was not appended exactly once'}
+          $apiAccepted=@(Get-StandaloneIdentityFixtureSources -Sources @($library,$observer,$alpha,$beta) -LibraryFixtureSource $library -StagedLibraryFixtureSource $library -StagedObserverSource $observer -RepoRoot $repo -StagedApiConsumerSources @{'mir-fixture-mir5-api-alpha'=$alpha;'mir-fixture-mir5-api-beta'=$beta})
+          if($apiAccepted.Count-ne4-or$apiAccepted[0]-ine$library-or$apiAccepted[1]-ine$observer-or$apiAccepted[2]-ine$alpha-or$apiAccepted[3]-ine$beta){throw 'standalone API consumer sources were not retained through the normal projection'}
           function Assert-Rejects([string]$Name,[scriptblock]$Block){$rejected=$false;try{&$Block}catch{$rejected=$true};if(-not$rejected){throw "discovery observer source accepted opponent: $Name"}}
           $missingRepo=Join-Path $env:MIR_TEST_WORK 'missing-repository';$null=New-Item -ItemType Directory -Path (Join-Path $missingRepo 'tests/fixtures') -Force
           Assert-Rejects 'missing canonical observer' {Get-StandaloneIdentityFixtureSources -Sources @($library) -LibraryFixtureSource $library -StagedLibraryFixtureSource $library -StagedObserverSource $observer -RepoRoot $missingRepo|Out-Null}
