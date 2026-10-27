@@ -1,11 +1,11 @@
 ---
 title: "How MIR fits together"
-status: draft
-applies_to: "MIR replacement development"
+status: current
+applies_to: "MIR development"
 audience: developer
 doc_type: explanation
 owner: mir-maintainers
-last_reviewed: 2026-10-24
+last_reviewed: 2026-10-27
 supersedes: []
 superseded_by: []
 source_of_truth_for:
@@ -16,7 +16,7 @@ source_of_truth_for:
 
 ## Start with the picture, not the folders
 
-Open the [offline visual atlas](diagrams/index.html). It contains twelve permanent architecture diagrams, each with editable Mermaid source, SVG and PNG. The temporary repository cutover has its own transition diagram in the cutover guide. The pictures describe the proposal, not an executed Factorio trace.
+Open the [offline visual atlas](diagrams/index.html). It contains twelve permanent architecture diagrams, each with editable Mermaid source, SVG and PNG. The diagrams explain the current responsibilities; exact Factorio observations and remaining qualification are recorded in [progress](progress.md).
 
 ![The whole mod](diagrams/01_overview.png)
 

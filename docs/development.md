@@ -1,7 +1,7 @@
 ---
 title: "Development guide"
-status: draft
-applies_to: "MIR replacement development"
+status: current
+applies_to: "MIR development"
 audience: developer
 doc_type: how-to
 owner: mir-maintainers
@@ -13,6 +13,16 @@ source_of_truth_for:
 ---
 
 # Development guide
+
+## Development line and maintenance branches
+
+`dev` is dedicated to MIR5 in the canonical layout: `source/`, `spec/`, `docs/`, `tests/`, `tools/`, `targets/` and `sdk/`. Implement the final product directly in those roots. Tests use version-neutral roles such as `published` and `successor`; fixture IDs, product versions and immutable historical references keep their actual identities.
+
+MIR4 maintenance starts from the exact published tag that needs a fix, currently `v4.7.3`, on a bounded task branch. Check and tag that release from its maintenance branch. Keep its implementation in the preserved Git refs rather than restoring a parallel MIR4 source or documentation tree on `dev`. Any shared correction needed by MIR5 receives its own reviewed integration.
+
+Main promotion and the canonical `v5.0.0` tag follow the remaining acceptance and publication gates. Current documentation and canonical paths do not imply release qualification. The maintainer handles Mod Portal publication; agent-managed releases remain GitHub-only.
+
+Use neutral names for new output batches: `build/host-gate` for hosted control output, `build/qualification` for new test evidence and packets, and `build/packages` for new candidate package custody. Accepted delivery remains in `dist`. Existing `build/mir5` paths are retained where exact receipts or active frozen jobs consume them; preserve those bytes and locators instead of moving recorded evidence or retargeting a live job.
 
 ## Start with a bounded task
 
