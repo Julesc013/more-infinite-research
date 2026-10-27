@@ -42,6 +42,8 @@ jobs:
           if ($LASTEXITCODE -ne 0) { throw 'Exact captured Bob/Angel science-oil fixture-source fetch failed.' }
           git fetch --no-tags --depth=1 origin 09a66acc9c613617f95074f23f3fd9a4aab4765b
           if ($LASTEXITCODE -ne 0) { throw 'Exact pre-disabled native owner cap fixture-source fetch failed.' }
+          git fetch --no-tags --depth=1 origin ce48d0d78c68bc78779a8449f50e4dc0e6b0bc9c
+          if ($LASTEXITCODE -ne 0) { throw 'Exact F200 foreign cap baseline fixture-source fetch failed.' }
       - id: bind
         name: Bind the exact ordered host-control plan
         shell: pwsh
@@ -125,6 +127,8 @@ jobs:
           if ($LASTEXITCODE -ne 0) { throw 'Exact captured Bob/Angel science-oil fixture-source fetch failed.' }
           git fetch --no-tags --depth=1 origin 09a66acc9c613617f95074f23f3fd9a4aab4765b
           if ($LASTEXITCODE -ne 0) { throw 'Exact pre-disabled native owner cap fixture-source fetch failed.' }
+          git fetch --no-tags --depth=1 origin ce48d0d78c68bc78779a8449f50e4dc0e6b0bc9c
+          if ($LASTEXITCODE -ne 0) { throw 'Exact F200 foreign cap baseline fixture-source fetch failed.' }
       - name: Restore the bound host-control plan
         uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
         with:
