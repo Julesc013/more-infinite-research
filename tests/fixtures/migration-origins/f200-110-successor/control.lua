@@ -58,13 +58,14 @@ end
 local function source_recipe_bonuses(direct_earned)
   local expected = {}
   for name, effects in pairs(catalogue.rows) do
-    -- The source fixture seeds the direct gear row at level 2 only for the
-    -- player.  The foreign and detached witnesses remain at level 1, so their
-    -- snapshots deliberately retain every other earned source effect but not
-    -- this direct row's first contribution.
-    if name ~= catalogue.direct or direct_earned then
-      for _, effect in ipairs(effects) do
-        if effect.type == "change-recipe-productivity" then
+    for _, effect in ipairs(effects) do
+      if effect.type == "change-recipe-productivity" then
+        -- The published source fixture snapshots every native recipe touched
+        -- by its selected rows.  Its foreign/detached direct gear row is
+        -- unearned, so that key is a retained zero rather than absent state.
+        if name == catalogue.direct and not direct_earned then
+          expected[effect.recipe] = expected[effect.recipe] or 0
+        else
           expected[effect.recipe] = (expected[effect.recipe] or 0) + effect.change
         end
       end

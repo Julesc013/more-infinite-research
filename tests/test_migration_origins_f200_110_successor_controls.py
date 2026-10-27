@@ -316,11 +316,11 @@ class MigrationOriginF200110SuccessorControls(unittest.TestCase):
                              (profile["candidate"]["source_commit"], profile["candidate"]["player_tree"]))
             self.assertEqual("bec37fb87a05d17cf4cf0225e0458218830fef63", profile["source_fixture_commit"])
             self.assertEqual("3ae2711867cd60f6c871f641c331349d941dd8c3", profile["source_fixture_controller_commit"])
-            self.assertEqual("c03257d1a672ca62ff523afae65df3239bef518c", profile["successor_fixture_commit"])
+            self.assertEqual("3b578cb6b1c28d05fb26b3afda3f9253f978f58a", profile["successor_fixture_commit"])
             self.assertEqual("2fb64822b82569e3b50f0653e361fb7148f18b63", profile["origin_source_commit"])
-        self.assertEqual("1767DE15AB78628C4C404D280F4DC789521BF4DEE86B349ED379C47234BD69F0",
+        self.assertEqual("97C4700C141090ECC59549FB684351A504B057C9BEC34A6E5A852441CEB8738F",
                          f200["archive_sha256"]["mir-fixture-mir5-migration-origin-f200-110-source_0.2.0.zip"])
-        self.assertEqual("E1878CAEE523CDC4DC86C9E6B0B5029A78E4D96ADC1A3C80BE8521355A6655A3",
+        self.assertEqual("83EDCE7B40C6ABF13C60769691ABA4534F032FE87E82F2CF9E7CCE451D38EE5D",
                          f210["archive_sha256"]["mir-fixture-mir5-migration-origin-f200-110-source_0.3.0.zip"])
         self.assertEqual("050AC35BAB6BA1F01E160DB612B73A03E58E0ABE6A291D18109FAB1B235B63B5",
                          f200["archive_sha256"]["more-infinite-research_5.0.20000.zip"])
@@ -328,28 +328,31 @@ class MigrationOriginF200110SuccessorControls(unittest.TestCase):
                          f210["archive_sha256"]["more-infinite-research_5.0.21000.zip"])
         self.assertNotIn("space-age", {entry["name"] for entry in f210["mods"]})
 
-    def test_profiles_reject_the_r12_stale_fixture_archive_pins(self):
+    def test_profiles_reject_the_r12_and_r13_superseded_fixture_archive_pins(self):
         cases = (
             (json.loads(F200_PROFILE.read_text()),
              "mir-fixture-mir5-migration-origin-f200-110-source_0.2.0.zip",
-             "1767DE15AB78628C4C404D280F4DC789521BF4DEE86B349ED379C47234BD69F0",
-             "29F2597180F0BCB8CB25A651A19068678635D42C35A96EE56F6186DE737037E0"),
+             "97C4700C141090ECC59549FB684351A504B057C9BEC34A6E5A852441CEB8738F",
+             ("29F2597180F0BCB8CB25A651A19068678635D42C35A96EE56F6186DE737037E0",
+              "1767DE15AB78628C4C404D280F4DC789521BF4DEE86B349ED379C47234BD69F0")),
             (json.loads(F210_PROFILE.read_text()),
              "mir-fixture-mir5-migration-origin-f200-110-source_0.3.0.zip",
-             "E1878CAEE523CDC4DC86C9E6B0B5029A78E4D96ADC1A3C80BE8521355A6655A3",
-             "F4C54047A9734180D31C14F18BE38B744F053F399A0D8184961C2B563463C831"),
+             "83EDCE7B40C6ABF13C60769691ABA4534F032FE87E82F2CF9E7CCE451D38EE5D",
+             ("F4C54047A9734180D31C14F18BE38B744F053F399A0D8184961C2B563463C831",
+              "E1878CAEE523CDC4DC86C9E6B0B5029A78E4D96ADC1A3C80BE8521355A6655A3")),
         )
 
         def assert_approved(profile, archive, approved):
             self.assertEqual(approved, profile["archive_sha256"][archive])
 
-        for profile, archive, approved, stale in cases:
-            with self.subTest(archive=archive):
-                assert_approved(profile, archive, approved)
-                rejected = copy.deepcopy(profile)
-                rejected["archive_sha256"][archive] = stale
-                with self.assertRaises(AssertionError):
-                    assert_approved(rejected, archive, approved)
+        for profile, archive, approved, stale_values in cases:
+            for stale in stale_values:
+                with self.subTest(archive=archive, stale=stale):
+                    assert_approved(profile, archive, approved)
+                    rejected = copy.deepcopy(profile)
+                    rejected["archive_sha256"][archive] = stale
+                    with self.assertRaises(AssertionError):
+                        assert_approved(rejected, archive, approved)
 
     def test_control_keeps_only_the_saved_source_roster_as_earned_state(self):
         control = (FIXTURE / "control.lua").read_text(encoding="utf-8")
@@ -378,7 +381,7 @@ class MigrationOriginF200110SuccessorControls(unittest.TestCase):
         self.lua.globals().legacy_module_definitions_path = LEGACY_MODULE_DEFINITIONS.as_posix()
         self.lua.globals().legacy_module_runtime_path = LEGACY_MODULE_RUNTIME.as_posix()
         self.lua.execute(r'''
-          function migration_origin_110_successor_lifecycle(target, source_fixture_name, active_wrapper_name, catalogue_fixture_name, legacy_module_bonus, reset_drops_module_bonus, saved_battery_token, current_recipe_scalar, duplicate_current_recipe, foreign_saved, foreign_queue_progress, foreign_current_saved, foreign_current_technology)
+          function migration_origin_110_successor_lifecycle(target, source_fixture_name, active_wrapper_name, catalogue_fixture_name, legacy_module_bonus, reset_drops_module_bonus, saved_battery_token, current_recipe_scalar, duplicate_current_recipe, foreign_saved, foreign_queue_progress, foreign_current_saved, foreign_current_technology, recipe_snapshot_variant)
             local callbacks={events={}}
             local env={storage={},logs={},created_labs=0,saved=false,
               script={active_mods={},on_configuration_changed=function(fn) callbacks.configuration=fn end,
@@ -428,9 +431,11 @@ class MigrationOriginF200110SuccessorControls(unittest.TestCase):
             local function recipe_values(direct_earned)
               local result={}
               for name,effects in pairs(catalogue.rows) do
-                if name~=catalogue.direct or direct_earned then
-                  for _,effect in ipairs(effects) do
-                    if effect.type=="change-recipe-productivity" then
+                for _,effect in ipairs(effects) do
+                  if effect.type=="change-recipe-productivity" then
+                    if name==catalogue.direct and not direct_earned then
+                      result[effect.recipe]=result[effect.recipe] or 0
+                    else
                       result[effect.recipe]=(result[effect.recipe] or 0)+effect.change
                     end
                   end
@@ -517,6 +522,19 @@ class MigrationOriginF200110SuccessorControls(unittest.TestCase):
               foreign_index=2,foreign_snapshot=foreign_snapshot,
               foreign_queue={current=catalogue.direct,queue={catalogue.direct,"recipe-prod-research_plastic-1"},progress=.42},
               detached_index=3,detached_snapshot=detached_snapshot}
+            local recipe_snapshot, recipe_variant = foreign_snapshot, recipe_snapshot_variant
+            if type(recipe_variant)=="string" and recipe_variant:sub(1,9)=="detached-" then
+              recipe_snapshot,recipe_variant=detached_snapshot,recipe_variant:sub(10)
+            end
+            if recipe_variant=="missing-direct" then
+              recipe_snapshot.recipes[catalogue.gear_recipe]=nil
+            elseif recipe_variant=="extra" then
+              recipe_snapshot.recipes["fixture-extra-recipe"]=0
+            elseif recipe_variant=="wrong-direct" then
+              recipe_snapshot.recipes[catalogue.gear_recipe]=.1
+            elseif recipe_variant~=nil then
+              error("unexpected source recipe variant: "..tostring(recipe_snapshot_variant))
+            end
             if saved_battery_token~=nil then
               state.player_snapshot.effects[catalogue.robot_battery]="worker-robot-battery|"..saved_battery_token
             end
@@ -747,6 +765,37 @@ class MigrationOriginF200110SuccessorControls(unittest.TestCase):
                                   result["message"])
                     self.assertIn("actual{level=1 researched=false enabled=true visible=false maximum=4294967295 saved=0.1}",
                                   result["message"])
+                self.assertEqual((0, 0), (result["created_labs"], result["player_add_calls"]))
+                self.assertFalse(result["saved"])
+                self.assertFalse(result["source_state_changed"])
+                self.assertFalse(result["active_state_changed"])
+
+    def test_control_retains_the_unearned_foreign_direct_recipe_as_an_exact_zero_key(self):
+        self._install_lifecycle_model()
+        source = json.loads((SOURCE_FIXTURE / "info.json").read_text(encoding="utf-8"))
+        wrapper = json.loads((FIXTURE / "info-f200.json").read_text(encoding="utf-8"))
+
+        accepted = py(self.lua.eval("migration_origin_110_successor_lifecycle")(
+            "f200", source["name"], wrapper["name"]))
+        self.assertTrue(accepted["ok"], accepted["message"])
+        self.assertEqual((0, 0), (accepted["foreign_gear"], accepted["detached_gear"]))
+        self.assertEqual((1, 1), (accepted["created_labs"], accepted["player_add_calls"]))
+
+        opponents = (
+            ("missing-direct", "foreign saved recipe-bonus count differs"),
+            ("extra", "foreign saved recipe-bonus count differs"),
+            ("wrong-direct", "foreign saved recipe bonus differs: iron-gear-wheel"),
+            ("detached-missing-direct", "detached saved recipe-bonus count differs"),
+            ("detached-extra", "detached saved recipe-bonus count differs"),
+            ("detached-wrong-direct", "detached saved recipe bonus differs: iron-gear-wheel"),
+        )
+        for variant, expected in opponents:
+            with self.subTest(variant=variant):
+                result = py(self.lua.eval("migration_origin_110_successor_lifecycle")(
+                    "f200", source["name"], wrapper["name"], None, None, False,
+                    None, None, False, None, None, None, None, variant))
+                self.assertFalse(result["ok"])
+                self.assertIn(expected, result["message"])
                 self.assertEqual((0, 0), (result["created_labs"], result["player_add_calls"]))
                 self.assertFalse(result["saved"])
                 self.assertFalse(result["source_state_changed"])
