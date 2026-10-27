@@ -55,7 +55,7 @@
     "space-exploration-graphics-5_0.7.5.zip":"255DEB48E1C1F19083203603F6758BEEA952CE91F2430970188F59AE766C4ADA",
     "space-exploration-postprocess_0.7.7.zip":"E23462598A34CAC81DB6420C443AC92EB7F5C295616A1192C90F2DE19D54312D",
     "mir-fixture-mir5-active-mods-observer_0.1.0.zip":"A15A7D628D66953D2E0C4D4FA288F47CBF9C5678327C7EB3D23ADB5DC78331C0",
-    "more-infinite-research_5.0.21000.zip":"C563CB5B96C9E64CB3373BDB60CF5C8B7D3C97E93EADB8F924443C703CDC024D"
+    "more-infinite-research_5.0.21000.zip":"E3A65C08AC7798A66FB1BE30D24307B17C8B366DD901953BDE2A09BD6939C8CE"
   },
-  "scope":"Frozen current F210 K2SE successor arm for the hidden Imersite native saved-state retention witness. It must consume only the verified source save and retain state before fixture writes; native results remain required."
+  "scope":"Exact b251ae7a54104ace87cb0da4cf531cf53f03c93d/player79b73a6a8e68987737e69bf2d95ec6555b49f901 F210 K2SE successor arm for the hidden Imersite native saved-state retention witness. It binds current MIR archive E3A65C08AC7798A66FB1BE30D24307B17C8B366DD901953BDE2A09BD6939C8CE (679250 bytes), consumes only the verified source save, and retains state before fixture writes; native results remain required."
 }
