@@ -25,8 +25,8 @@ NAME = "mir-fixture-mir5-native-owner-cap-order"
 ENGINE_SHA = "FE4A1DA30F322A0D0B8AEB3DF7276332222BAAA143E2352569B723E84B2B9060"
 OBSERVER_SHA = "2E1BE5952D2A4CC5C74A0D149E075D247BA110A3FAE5B6768D3EAEBABCEF989C"
 MIR_SHA = "E3A65C08AC7798A66FB1BE30D24307B17C8B366DD901953BDE2A09BD6939C8CE"
-INPUT_REVISION = "0ddeb251984d166b075afb6f69367837ffd34dc7"
-INPUT_RECEIPT = ROOT / "spec/evidence/native-owner-cap-order-inputs-0ddeb251.json"
+INPUT_REVISION = "09a66acc9c613617f95074f23f3fd9a4aab4765b"
+INPUT_RECEIPT = ROOT / "spec/evidence/native-owner-cap-order-pre-disabled-source-inputs-09a66acc9.json"
 FIXTURE_SHAS = {
     "source": "510626DA637A34BA760DF1D3752CA137E8CC65116A9BD83423FEDC2328A01907",
     "canonical": "C903D4B2AC0A98AF4CC28B8BB737C07B19CAC72BBB27C8E3B5DC9E780069482D",
@@ -319,8 +319,9 @@ end
 
     def test_prepared_inputs_bind_every_raw_git_alias_without_native_or_saved_state_claims(self):
         receipt = json.loads(INPUT_RECEIPT.read_bytes())
-        self.assertEqual("MIR5NativeOwnerCapOrderPreparedInputsV1", receipt["kind"])
+        self.assertEqual("MIR5NativeOwnerCapOrderPreDisabledSourcePreparedInputsV1", receipt["kind"])
         self.assertEqual(INPUT_REVISION, receipt["fixture_source_commit"])
+        self.assertEqual("cc99ed1e5a9bb9b392ee5431edf03d92e2d135c2", receipt["fixture_source_tree"])
         for field in ("native_execution", "library_mutation", "lab_completion", "release_qualification"):
             self.assertIs(receipt[field], False)
         self.assertIn("pending", receipt["saved_input_hashes"])
@@ -335,12 +336,16 @@ end
                              for name in ("fixture_control.lua", "fixture_data_final.lua", "fixture_settings.lua")})
             self.assertEqual(expected, {member["path"]: member["source_path"] for member in row["members"]})
             for member in row["members"]:
-                raw = subprocess.check_output(["git", "show", "HEAD:" + member["source_path"]], cwd=ROOT)
+                raw = subprocess.check_output(["git", "show", INPUT_REVISION + ":" + member["source_path"]], cwd=ROOT)
                 self.assertEqual((member["sha256"], member["bytes"]),
                                  (hashlib.sha256(raw).hexdigest().upper(), len(raw)))
         helper = receipt["package_tool"]
-        raw_helper = subprocess.check_output(["git", "show", "HEAD:" + helper["path"]], cwd=ROOT)
+        raw_helper = subprocess.check_output(["git", "show", INPUT_REVISION + ":" + helper["path"]], cwd=ROOT)
         self.assertEqual(helper["sha256"], hashlib.sha256(raw_helper).hexdigest().upper())
+        self.assertEqual([
+            "spec/evidence/native-owner-cap-order-inputs-5a469182.json",
+            "spec/evidence/native-owner-cap-order-inputs-0ddeb251.json",
+        ], receipt["historical_prepared_inputs"])
 
     def test_data_stages_preflight_before_only_the_permuted_fixture_write(self):
         for stage, (_, cap, recipes) in STAGES.items():
