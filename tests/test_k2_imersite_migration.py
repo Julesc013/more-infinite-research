@@ -21,7 +21,7 @@ class ImersiteMigrationTests(unittest.TestCase):
             return {level=level,researched=researched == true,saved_progress=progress or 0}
           end
           function world(completed)
-            local rows, technologies = {}, {}
+            local rows, technologies, values = {}, {}, {}
             local recipe = {productivity_bonus=0.123}
             local function total()
               local sum = 0
@@ -45,12 +45,15 @@ class ImersiteMigrationTests(unittest.TestCase):
                   -- LuaTechnology.level enables the technology.  The migration
                   -- must therefore restore any unqueued foreign disablement.
                   if key == "level" then rows[id].enabled=true end
+                  if key == "enabled" and value == false and values.drop_public_queue == id then
+                    values.research_queue,values.current_research,values.research_progress={},nil,0
+                  end
                   total()
                 end})
             end
             rows[H].level = completed+1; rows[H].saved_progress=0.42
-            local values = {index=1,technologies=technologies,recipes={["kr-imersite-powder"]=recipe},
-              research_queue={technologies[H]},current_research=technologies[H],research_progress=0.42}
+            values.index,values.technologies,values.recipes=1,technologies,{["kr-imersite-powder"]=recipe}
+            values.research_queue,values.current_research,values.research_progress={technologies[H]},technologies[H],0.42
             local force = setmetatable({}, {
               __index=function(_,key) return values[key] end,
               __newindex=function(_,key,value)
@@ -172,6 +175,21 @@ class ImersiteMigrationTests(unittest.TestCase):
             queue_before={H},queue_after_removal={H},current_before=H,current_after_removal=H,progress_before=.42}
           assert(migration.reconcile_force(force,.02,{},legacy))
           assert(rows[T].enabled and rows[T].visible_when_disabled)
+        ''')
+
+    def test_public_flag_queue_mutation_rolls_back_before_recording_handoff(self):
+        self.lua.execute('''
+          local force,rows,values = world(5)
+          rows[T].enabled=false; rows[T].visible_when_disabled=true
+          force.research_queue={force.technologies[T]}
+          values.drop_public_queue=T
+          local bonus,records=force.recipes["kr-imersite-powder"].productivity_bonus,{}
+          local ok,message=pcall(migration.reconcile_force,force,.02,records)
+          assert(not ok and tostring(message):find("queue readback differs",1,true))
+          assert(next(records) == nil and rows[H].level == 6 and rows[H].saved_progress == .42 and rows[H].enabled)
+          assert(rows[T].level == 4 and not rows[T].enabled and rows[T].visible_when_disabled)
+          assert(force.current_research.name == T and #force.research_queue == 1 and force.research_progress == .42)
+          assert(math.abs(force.recipes["kr-imersite-powder"].productivity_bonus-bonus) < 1e-9)
         ''')
 
     def test_detached_queue_refusal_preserves_original_error_and_carrier_work(self):
