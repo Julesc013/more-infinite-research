@@ -1,0 +1,29 @@
+{
+  "schema": 1,
+  "kind": "mir5-migration-origin-successor-engine-hop",
+  "origin_tag": "1.0.0",
+  "origin_source_commit": "f0057a96847512b50acdd6e23fc21b5b41e75adb",
+  "target": "f210",
+  "factorio_line": "2.1",
+  "engine": {
+    "version": "2.1.23",
+    "sha256": "FE4A1DA30F322A0D0B8AEB3DF7276332222BAAA143E2352569B723E84B2B9060"
+  },
+  "settings_mode": "ProtectedF200SuccessorSave",
+  "source_save": {
+    "origin_source_sha256": "F8B38209DA632C8B2EFA049C8F69CDB3E3EC01F6BEE0C5D03BAFF03C27989C54",
+    "required_completed_f200_stage": "migration-origin-1.0.0-f200-successor"
+  },
+  "mods": [
+    {"name": "base", "version": "2.1.23", "enabled": true},
+    {"name": "mir-fixture-mir5-active-mods-observer", "version": "0.1.0", "enabled": true},
+    {"name": "more-infinite-research", "version": "5.0.21000", "enabled": true},
+    {"name": "mir-fixture-mir5-migration-origin-f200-100-source", "version": "0.3.0", "enabled": true}
+  ],
+  "archive_sha256": {
+    "mir-fixture-mir5-active-mods-observer_0.1.0.zip": "2E1BE5952D2A4CC5C74A0D149E075D247BA110A3FAE5B6768D3EAEBABCEF989C",
+    "mir-fixture-mir5-migration-origin-f200-100-source_0.3.0.zip": "16609472F17EF4F4A4644A353D0696F0A9DAC66235107F7C8D58C1FA8E2CF1CC",
+    "more-infinite-research_5.0.21000.zip": "58F04FB9D417F2726835F4A6740490DE3C1841665DAC81C2BA3DFA94050D9457"
+  },
+  "scope": "Separate F200-to-F210 handoff after a protected completed MIR5 F200 successor. It preserves original-state witnesses and the F200 candidate lab before one actual F210 gear lab, save and two read-only cold reloads. It is prepared input only."
+}
