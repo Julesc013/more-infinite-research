@@ -37,6 +37,31 @@ CAPTURE_HASHES = {
     },
 }
 
+# Independent B6 settings receipts: q009 Base and q010 Space Age each expose
+# all seven startup controls for these twenty material families.  The source
+# catalogue is not an oracle for this finite visibility set.
+PUBLISHED_SETTINGS_RECEIPTS = {
+    "base": {
+        "result_sha256": "C34FEA8FE3FD291167FC78622FF3B9892F6843C91F6AF59D055E3EDA9717898E",
+        "settings_sha256": "E6B637555269C37B07108DE4F9342B6AEB9A55403F52DFCBE8403349647105B3",
+    },
+    "space_age": {
+        "result_sha256": "E0B9A8A6473FFB1ED23365AA9F2C14F57A0DF411C6D10F46E112D9534DCC0CCA",
+        "settings_sha256": "5385BE2E5B4ADD9EC17FAFEB7AB2A01FA60987AAEA849C77347618BD5E8CBBA4",
+    },
+}
+BOB_ANGEL_MATERIAL_FAMILIES = (
+    "aluminium", "brass", "bronze", "cobalt_steel", "copper_tungsten",
+    "glycerol", "gold", "gunmetal", "hydrochloric_acid", "hydrofluoric_acid",
+    "invar", "lead", "nickel", "nitinol", "nitric_acid", "platinum",
+    "silver", "tin", "titanium", "zinc",
+)
+MATERIAL_SETTING_PREFIXES = (
+    "ips-enable-", "ips-cost-base-", "ips-cost-linear-increment-",
+    "ips-cost-growth-", "ips-max-level-", "ips-research-time-",
+    "ips-effect-per-level-",
+)
+
 
 def _lua_value(lua, value):
     if isinstance(value, dict):
@@ -138,6 +163,10 @@ class BobAngelF210PipelineTests(unittest.TestCase):
     def _expected(self, case):
         return self.context["cases"][case]["expected_published_technologies"]
 
+    @staticmethod
+    def _setting_rows(lua):
+        return _plain(lua.globals().settings_rows)
+
     def test_context_is_bounded_upstream_only_and_binds_exact_r04_inputs(self):
         self.assertLessEqual(CONTEXT.stat().st_size, MAX_CONTEXT_BYTES)
         self.assertEqual(R04_PLAN_SHA256, self.context["r04"]["plan_sha256"])
@@ -202,6 +231,35 @@ class BobAngelF210PipelineTests(unittest.TestCase):
         self.assertNotIn("recipe-prod-research_material_copper_tungsten-1", space_rows)
         for rows in (base_rows, space_rows):
             self.assertNotIn("recipe-prod-research_material_aluminium-1", rows)
+
+    def test_full_bob_angel_material_settings_keep_the_b6_visible_absence_and_partial_closure_hidden(self):
+        for case in ("base", "space_age"):
+            with self.subTest(case=case):
+                source = self.context["cases"][case]
+                receipt = PUBLISHED_SETTINGS_RECEIPTS[case]
+                self.assertTrue(all(len(receipt[field]) == 64 for field in receipt))
+                active = self._setting_rows(self.stage(case))
+                partial_mods = deepcopy(source["selection"])
+                partial_mods.pop("bobtech")
+                partial = self._setting_rows(self.stage(case, mods=partial_mods))
+                expected_names = {
+                    f"{prefix}research_material_{family}"
+                    for family in BOB_ANGEL_MATERIAL_FAMILIES
+                    for prefix in MATERIAL_SETTING_PREFIXES
+                }
+                self.assertEqual(140, len(expected_names))
+                for family in BOB_ANGEL_MATERIAL_FAMILIES:
+                    for prefix in MATERIAL_SETTING_PREFIXES:
+                        name = f"{prefix}research_material_{family}"
+                        self.assertIn(name, active)
+                        self.assertNotIn("hidden", active[name], name)
+                        self.assertIn(name, partial)
+                        self.assertIs(partial[name].get("hidden"), True, name)
+                        self.assertEqual(
+                            {key: value for key, value in active[name].items() if key != "hidden"},
+                            {key: value for key, value in partial[name].items() if key != "hidden"},
+                            name,
+                        )
 
     def test_carbon_keeps_published_products_when_angel_repurposes_the_recipe(self):
         raw = self.context["cases"]["space_age"]["raw"]
