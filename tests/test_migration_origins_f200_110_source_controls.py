@@ -272,7 +272,6 @@ class MigrationOriginF200110SourceControls(unittest.TestCase):
         self.assertEqual({}, result["storage"])
         self.assertEqual({"labels": 0, "resets": 0, "research": 0, "labs": 0, "forces": 0}, result["counters"])
 
-
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--lua-runtime-dir", type=Path, required=True)
