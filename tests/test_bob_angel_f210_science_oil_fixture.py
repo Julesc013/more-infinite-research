@@ -419,11 +419,12 @@ end
         expected = {name: f"tests/fixtures/bob-angel-f210-science-oil/{name}"
                     for name in ("info.json", "control.lua", "data-final-fixes.lua", "fixture_facts.lua")}
         self.assertEqual(expected, {row["path"]: row["source_path"] for row in fixture["members"]})
-        for row in fixture["members"]:
-            raw = subprocess.check_output(["git", "show", f"{INPUT_REVISION}:{row['source_path']}"], cwd=ROOT)
-            self.assertEqual((row["sha256"], row["bytes"]),
-                             (hashlib.sha256(raw).hexdigest().upper(), len(raw)),
-                             f"{INPUT_REVISION}:{row['source_path']}")
+        for revision in (INPUT_REVISION, "HEAD"):
+            for row in fixture["members"]:
+                raw = subprocess.check_output(["git", "show", f"{revision}:{row['source_path']}"], cwd=ROOT)
+                self.assertEqual((row["sha256"], row["bytes"]),
+                                 (hashlib.sha256(raw).hexdigest().upper(), len(raw)),
+                                 f"{revision}:{row['source_path']}")
         helper = receipt["package_tool"]
         raw_helper = subprocess.check_output(["git", "show", f"{INPUT_REVISION}:{helper['path']}"], cwd=ROOT)
         self.assertEqual(helper["committed_sha256"], hashlib.sha256(raw_helper).hexdigest().upper(),

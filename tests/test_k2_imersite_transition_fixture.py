@@ -725,11 +725,13 @@ class K2ImersiteTransitionFixtureTests(unittest.TestCase):
                 expected.update({name: f"tests/fixtures/k2-imersite-held-public-flags/{name}"
                                  for name in ("fixture_control.lua", "fixture_data_final.lua", "fixture_settings.lua")})
                 self.assertEqual(expected, {member["path"]: member["source_path"] for member in row["members"]})
-                for member in row["members"]:
-                    raw = subprocess.check_output(
-                        ["git", "show", f"{HELD_FLAGS_INPUT_REVISION}:{member['source_path']}"], cwd=ROOT)
-                    self.assertEqual((member["sha256"], member["bytes"]),
-                                     (hashlib.sha256(raw).hexdigest().upper(), len(raw)))
+                for revision in (HELD_FLAGS_INPUT_REVISION, "HEAD"):
+                    for member in row["members"]:
+                        raw = subprocess.check_output(
+                            ["git", "show", f"{revision}:{member['source_path']}"], cwd=ROOT)
+                        self.assertEqual((member["sha256"], member["bytes"]),
+                                         (hashlib.sha256(raw).hexdigest().upper(), len(raw)),
+                                         f"{revision}:{member['source_path']}")
         helper = receipt["package_tool"]
         self.assertEqual(FROZEN_PACKAGE_TOOL_SHA256, helper["committed_sha256"])
         self.assertEqual(FROZEN_PACKAGE_TOOL_SHA256, helper["executed_worktree_sha256"])
