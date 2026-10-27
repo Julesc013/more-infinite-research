@@ -1,0 +1,378 @@
+{
+  "schema": 1,
+  "kind": "MIR5LegacyBooleanCapA575NativeChainV1",
+  "status": "completed-with-retained-f200-adverses-and-final-duration-pass",
+  "scope": "Base-only Factorio 2.0 policy-v1 boolean-cap ownership and saved-progress regression. This is not a complete MIR4 catalogue, all origin, all modpack, performance, or release qualification.",
+  "frozen_inputs": {
+    "published_source": {
+      "mir_version": "4.0.20000",
+      "archive_sha256": "5C0E299D78C4EE545958448DAE48D87BE5FE1B959875D4CB93A264D95D3DB0AE",
+      "source_result_sha256": "A9B9E522DD9B208016E263330132169CBE9DC11E98570F80AA82BBEE2966784F",
+      "protected_save_sha256": "CEEB858FA19CC763EC09B83B23FD1640BECAD64A9A880405AD5D3B0C92E05602"
+    },
+    "current_f200": {
+      "mir_version": "5.0.20000",
+      "archive_sha256": "8DB28D2DE45F26033B5F54E176902A3138A903AF0F4B48EAB6B9971466021B4F"
+    },
+    "current_f210": {
+      "mir_version": "5.0.21000",
+      "archive_sha256": "7CE6A4DF78019F6B98237E638A1C927C5FDB538D4A1442EE22D846DD962DDCDC"
+    },
+    "candidate_source_commit": "a575a4198807b6aea9e26963e3d9970fc5c068ae",
+    "candidate_player_tree": "398c79c687d2bc662c976355ced1436201c43f11",
+    "fixture_lineage": {
+      "baseline_raw_commit": "9ef64ff41e0c7140467df044dfe20837f1fa5a40",
+      "r02_diagnostic_raw_commit": "262eb1791ea74ab1b8aefaa598e08a755bcf982c",
+      "r03_tool_raw_commit": "272f7a3c26f8ca9275fba957e2793db35e49ed03",
+      "r04_duration_raw_commit": "31fa55badd9547a845315d2bf20864efc4b541a6"
+    }
+  },
+  "direct_save_topology": {
+    "source_save_sha256": "CEEB858FA19CC763EC09B83B23FD1640BECAD64A9A880405AD5D3B0C92E05602",
+    "f200_input_sha256": "CEEB858FA19CC763EC09B83B23FD1640BECAD64A9A880405AD5D3B0C92E05602",
+    "f210_input_sha256": "CEEB858FA19CC763EC09B83B23FD1640BECAD64A9A880405AD5D3B0C92E05602",
+    "direct_from_same_original_source": true,
+    "no_intermediate_mir5_handoff": true
+  },
+  "stages": [
+    {
+      "id": "published-source",
+      "role": "published-4.0.20000-source",
+      "status": "passed-private-native-fixture",
+      "result_sha256": "A9B9E522DD9B208016E263330132169CBE9DC11E98570F80AA82BBEE2966784F",
+      "result_bytes": 41567,
+      "primary_result_path": "build/qualification/legacy-boolean-cap-a575-r01/published-source/native-output/result.json",
+      "terminal_sha256": "AAD41233240C6C5FD84B4594B86A5AFDFC231ADD8A62473B7D45AF1D4843FEE6",
+      "caller_sha256": "3CDDA59444252D9EE89262360ADFCFDB9213806D73576E837527F590EA276AB5",
+      "fixture_raw_commit": "9ef64ff41e0c7140467df044dfe20837f1fa5a40",
+      "harness_source_head": "a391b74bbe0c79baf05cb9acdb0ea5478f58342b",
+      "profile_sha256": "F7619DBCE379714DE885B52C986C9E226F41CE2D7E01657F474D5622FFA32094",
+      "fixture_sha256": "A33E86829C63B995228E79CEA7421E669A4D2C5F7F76BDAF8F2D7F2B742F4C3D",
+      "engine_sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B",
+      "candidate_sha256": "5C0E299D78C4EE545958448DAE48D87BE5FE1B959875D4CB93A264D95D3DB0AE",
+      "input_save_sha256": null,
+      "initial_witnesses": {
+        "source_mir": "4.0.20000",
+        "actual_lab_completions": 2,
+        "player_level": 3,
+        "player_enabled": false,
+        "player_visible_when_disabled": true,
+        "saved_progress": 0.27,
+        "productivity_bonus": 0.20000000298023224,
+        "foreign_disabled": true,
+        "foreign_queue_progress": 0.42000000000000004,
+        "on_load_read_only": false
+      },
+      "cold_reload_count": 2,
+      "cold_reload_save_sha256": [
+        "CEEB858FA19CC763EC09B83B23FD1640BECAD64A9A880405AD5D3B0C92E05602",
+        "CEEB858FA19CC763EC09B83B23FD1640BECAD64A9A880405AD5D3B0C92E05602"
+      ],
+      "archive_restoration": [
+        {
+          "destination": "D:\\Projects\\Factorio\\testmods\\2.0\\mir-fixture-mir5-legacy-boolean-cap_0.1.0.zip",
+          "restored": true,
+          "prior_exists": false,
+          "prior_sha256": "",
+          "prior_bytes": 0
+        },
+        {
+          "destination": "D:\\Projects\\Factorio\\testmods\\2.0\\more-infinite-research_4.0.20000.zip",
+          "restored": true,
+          "prior_exists": false,
+          "prior_sha256": "",
+          "prior_bytes": 0
+        }
+      ],
+      "factorio_processes_after": 0
+    },
+    {
+      "id": "current-f210-direct",
+      "role": "direct-original-ceeb-to-current-f210",
+      "status": "passed-private-native-fixture",
+      "result_sha256": "37EC12494648A2E48229DC851FF6B29FF5124F22A9805A2504C129287BB5D902",
+      "result_bytes": 33563,
+      "primary_result_path": "build/qualification/legacy-boolean-cap-a575-r01/current-f210-direct/native-output/result.json",
+      "terminal_sha256": "6E8D0BF8E81B2A4BA59C068F74F06DA057D824C9268C8985EF853A10FBC75E0A",
+      "caller_sha256": "3CDDA59444252D9EE89262360ADFCFDB9213806D73576E837527F590EA276AB5",
+      "fixture_raw_commit": "9ef64ff41e0c7140467df044dfe20837f1fa5a40",
+      "harness_source_head": "a391b74bbe0c79baf05cb9acdb0ea5478f58342b",
+      "profile_sha256": "F6F3C0135A8AE9830EFE780D3E74E248A726A195822367F607C8015C9EA6C85B",
+      "fixture_sha256": "D1BDF52D254F6C1DE051117293D9F731295BFC8E3C1909DFFA8F2DA15413F876",
+      "engine_sha256": "FE4A1DA30F322A0D0B8AEB3DF7276332222BAAA143E2352569B723E84B2B9060",
+      "candidate_sha256": "7CE6A4DF78019F6B98237E638A1C927C5FDB538D4A1442EE22D846DD962DDCDC",
+      "input_save_sha256": "CEEB858FA19CC763EC09B83B23FD1640BECAD64A9A880405AD5D3B0C92E05602",
+      "initial_witnesses": {
+        "source_mir": "4.0.20000",
+        "destination_mir": "5.0.21000",
+        "source_actual_lab_completions": 2,
+        "destination_actual_lab_completions": 1,
+        "player_level": 4,
+        "player_enabled": true,
+        "player_visible_when_disabled": true,
+        "productivity_bonus": 0.3,
+        "foreign_disabled": true,
+        "foreign_queue_progress": 0.42000000000000004,
+        "on_load_read_only": false
+      },
+      "cold_reload_count": 2,
+      "cold_reload_save_sha256": [
+        "6CD9F72B5A45DDDCA77D189277C08FDA009505CE7AF1E687BD26D7779B42AFC6",
+        "6CD9F72B5A45DDDCA77D189277C08FDA009505CE7AF1E687BD26D7779B42AFC6"
+      ],
+      "archive_restoration": [
+        {
+          "destination": "D:\\Projects\\Factorio\\testmods\\2.1\\mir-fixture-mir5-legacy-boolean-cap_0.3.0.zip",
+          "restored": true,
+          "prior_exists": false,
+          "prior_sha256": "",
+          "prior_bytes": 0
+        },
+        {
+          "destination": "D:\\Projects\\Factorio\\testmods\\2.1\\more-infinite-research_5.0.21000.zip",
+          "restored": true,
+          "prior_exists": true,
+          "prior_sha256": "C563CB5B96C9E64CB3373BDB60CF5C8B7D3C97E93EADB8F924443C703CDC024D",
+          "prior_bytes": 568598
+        }
+      ],
+      "factorio_processes_after": 0
+    },
+    {
+      "id": "current-f200-r01",
+      "role": "direct-original-ceeb-to-current-f200-first-adverse",
+      "status": "failed",
+      "result_sha256": "AEEE9F6BE1645188EC28A3C498DC89B7F6B4AAB6C0BA84BB2E92C5E78092AAB6",
+      "result_bytes": 5665,
+      "primary_result_path": "build/qualification/legacy-boolean-cap-a575-r01/current-f200/native-output/result.json",
+      "terminal_sha256": "DE515849104102AA0C921A70BCA2F4B473BC8F7D12F7BA1CD478A30AFDA9F1E2",
+      "caller_sha256": "3CDDA59444252D9EE89262360ADFCFDB9213806D73576E837527F590EA276AB5",
+      "fixture_raw_commit": "9ef64ff41e0c7140467df044dfe20837f1fa5a40",
+      "harness_source_head": "a391b74bbe0c79baf05cb9acdb0ea5478f58342b",
+      "profile_sha256": "3E752149AA993E1F181FD3FD1C728E035DFE0C67AB59DB7DD326743D99CC40C3",
+      "fixture_sha256": "0504A2AC4BA0BC6985EF5AFB24AC72CA9B62DF9B02090663AA1AA5A9DC5B0EED",
+      "engine_sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B",
+      "candidate_sha256": "8DB28D2DE45F26033B5F54E176902A3138A903AF0F4B48EAB6B9971466021B4F",
+      "input_save_sha256": "CEEB858FA19CC763EC09B83B23FD1640BECAD64A9A880405AD5D3B0C92E05602",
+      "initial_witnesses": null,
+      "cold_reload_count": 0,
+      "cold_reload_save_sha256": [],
+      "archive_restoration": [
+        {
+          "destination": "D:\\Projects\\Factorio\\testmods\\2.0\\mir-fixture-mir5-legacy-boolean-cap_0.2.0.zip",
+          "restored": true,
+          "prior_exists": false,
+          "prior_sha256": "",
+          "prior_bytes": 0
+        },
+        {
+          "destination": "D:\\Projects\\Factorio\\testmods\\2.0\\more-infinite-research_5.0.20000.zip",
+          "restored": true,
+          "prior_exists": true,
+          "prior_sha256": "B67FF048860F2707579CF582C933ED46D7BF52769F5ABE1B0279DDCC2A0323BD",
+          "prior_bytes": 553231
+        }
+      ],
+      "factorio_processes_after": 0
+    },
+    {
+      "id": "current-f200-r02",
+      "role": "direct-original-ceeb-to-current-f200-count-diagnostic-adverse",
+      "status": "failed",
+      "result_sha256": "041C4085099D488398F848667ACA4B5D1A48ACA754EB90F7DF26F4B7D700A3A2",
+      "result_bytes": 5837,
+      "primary_result_path": "build/qualification/legacy-boolean-cap-a575-r02-diagnostic/current-f200/native-output/result.json",
+      "terminal_sha256": "0B98BB1DF3D0518105F70C451B048FEBD91CAE5D95ABE95036729043A02A32AF",
+      "caller_sha256": "FAE9A3269836AE5C7C4C3F5ECFB08E124B54DA5BCE04D85BBE3FACCC9488D5F2",
+      "fixture_raw_commit": "262eb1791ea74ab1b8aefaa598e08a755bcf982c",
+      "harness_source_head": "a391b74bbe0c79baf05cb9acdb0ea5478f58342b",
+      "profile_sha256": "D89B26B147C2BE981DC74FA3EC6F1663592FB6828789571D6AF55160FE856402",
+      "fixture_sha256": "0B99228A1746B339E0BDD3F36269AE3884EE75DE4C2C3121209603005DF6DC53",
+      "engine_sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B",
+      "candidate_sha256": "8DB28D2DE45F26033B5F54E176902A3138A903AF0F4B48EAB6B9971466021B4F",
+      "input_save_sha256": "CEEB858FA19CC763EC09B83B23FD1640BECAD64A9A880405AD5D3B0C92E05602",
+      "initial_witnesses": null,
+      "cold_reload_count": 0,
+      "cold_reload_save_sha256": [],
+      "archive_restoration": [
+        {
+          "destination": "D:\\Projects\\Factorio\\testmods\\2.0\\mir-fixture-mir5-legacy-boolean-cap_0.2.0.zip",
+          "restored": true,
+          "prior_exists": false,
+          "prior_sha256": "",
+          "prior_bytes": 0
+        },
+        {
+          "destination": "D:\\Projects\\Factorio\\testmods\\2.0\\more-infinite-research_5.0.20000.zip",
+          "restored": true,
+          "prior_exists": true,
+          "prior_sha256": "B67FF048860F2707579CF582C933ED46D7BF52769F5ABE1B0279DDCC2A0323BD",
+          "prior_bytes": 553231
+        }
+      ],
+      "factorio_processes_after": 0
+    },
+    {
+      "id": "current-f200-r03",
+      "role": "direct-original-ceeb-to-current-f200-tool-observation-adverse",
+      "status": "failed",
+      "result_sha256": "F709B94DE2DEA7C0B9841CA0DBC08BA895A503C37CA1BDC91F6ACAA9CBA42E5B",
+      "result_bytes": 5785,
+      "primary_result_path": "build/qualification/legacy-boolean-cap-a575-r03-tool-observation/current-f200/native-output/result.json",
+      "terminal_sha256": "2D8589B8F314962AB5BF1656D7AF84328FAB6646656346CA74A213400CAB589C",
+      "caller_sha256": "BE8B54E2EAB9C05445E35B088BB2AE41776E9F0D8AE7D3ABFF1D0BE8B73A6FC7",
+      "fixture_raw_commit": "272f7a3c26f8ca9275fba957e2793db35e49ed03",
+      "harness_source_head": "272f7a3c26f8ca9275fba957e2793db35e49ed03",
+      "profile_sha256": "2C2E87CDB6B01A6F55E7CCE4883D338EEA2DF2343F84B52C9357ACD38F2AB45E",
+      "fixture_sha256": "1BDD36E57B1CADFE4B69296E977F2B7FFC36B0BF13AE0939AEE0F311B83C11EB",
+      "engine_sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B",
+      "candidate_sha256": "8DB28D2DE45F26033B5F54E176902A3138A903AF0F4B48EAB6B9971466021B4F",
+      "input_save_sha256": "CEEB858FA19CC763EC09B83B23FD1640BECAD64A9A880405AD5D3B0C92E05602",
+      "initial_witnesses": null,
+      "cold_reload_count": 0,
+      "cold_reload_save_sha256": [],
+      "archive_restoration": [
+        {
+          "destination": "D:\\Projects\\Factorio\\testmods\\2.0\\mir-fixture-mir5-legacy-boolean-cap_0.2.0.zip",
+          "restored": true,
+          "prior_exists": false,
+          "prior_sha256": "",
+          "prior_bytes": 0
+        },
+        {
+          "destination": "D:\\Projects\\Factorio\\testmods\\2.0\\more-infinite-research_5.0.20000.zip",
+          "restored": true,
+          "prior_exists": true,
+          "prior_sha256": "B67FF048860F2707579CF582C933ED46D7BF52769F5ABE1B0279DDCC2A0323BD",
+          "prior_bytes": 553231
+        }
+      ],
+      "factorio_processes_after": 0
+    },
+    {
+      "id": "current-f200-r04",
+      "role": "direct-original-ceeb-to-current-f200-five-second-duration-pass",
+      "status": "passed-private-native-fixture",
+      "result_sha256": "2C001CA77A1E1DD7B3356D2168FD3ABF5C5159B46CEAC37AE2A724F87AE4BADD",
+      "result_bytes": 34083,
+      "primary_result_path": "build/qualification/legacy-boolean-cap-a575-r04-duration/current-f200/native-output/result.json",
+      "terminal_sha256": "3CC84FE95244776D5064510274FF51D2292CE1CE4CDF5E31CDEEB6078B08F65B",
+      "caller_sha256": "9E687F5C01284A722C4249E32BE9BBCA25168BC16963EDC33EB4755408CFD478",
+      "fixture_raw_commit": "31fa55badd9547a845315d2bf20864efc4b541a6",
+      "harness_source_head": "31fa55badd9547a845315d2bf20864efc4b541a6",
+      "profile_sha256": "489A47E717EC6CD082CF0D4A5A21778783FAFF57AF5CB6F790051EFDE140D2CE",
+      "fixture_sha256": "A19D6A6C33FF4C1234BE229508AF7A6178321B4844E83323A05DB59ABBAD937D",
+      "engine_sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B",
+      "candidate_sha256": "8DB28D2DE45F26033B5F54E176902A3138A903AF0F4B48EAB6B9971466021B4F",
+      "input_save_sha256": "CEEB858FA19CC763EC09B83B23FD1640BECAD64A9A880405AD5D3B0C92E05602",
+      "initial_witnesses": {
+        "source_mir": "4.0.20000",
+        "destination_mir": "5.0.20000",
+        "source_actual_lab_completions": 2,
+        "destination_actual_lab_completions": 1,
+        "player_level": 4,
+        "player_enabled": true,
+        "player_visible_when_disabled": true,
+        "productivity_bonus": 0.30000001192092896,
+        "foreign_disabled": true,
+        "foreign_queue_progress": 0.42000000000000004,
+        "on_load_read_only": false
+      },
+      "cold_reload_count": 2,
+      "cold_reload_save_sha256": [
+        "DA6321B2FE863C69EA23A926BE942CD5ECDBEBC44C97E3CD0006D739BA683CBE",
+        "DA6321B2FE863C69EA23A926BE942CD5ECDBEBC44C97E3CD0006D739BA683CBE"
+      ],
+      "archive_restoration": [
+        {
+          "destination": "D:\\Projects\\Factorio\\testmods\\2.0\\mir-fixture-mir5-legacy-boolean-cap_0.2.0.zip",
+          "restored": true,
+          "prior_exists": false,
+          "prior_sha256": "",
+          "prior_bytes": 0
+        },
+        {
+          "destination": "D:\\Projects\\Factorio\\testmods\\2.0\\more-infinite-research_5.0.20000.zip",
+          "restored": true,
+          "prior_exists": true,
+          "prior_sha256": "B67FF048860F2707579CF582C933ED46D7BF52769F5ABE1B0279DDCC2A0323BD",
+          "prior_bytes": 553231
+        }
+      ],
+      "factorio_processes_after": 0
+    }
+  ],
+  "accepted_native_scope": {
+    "source_actual_lab_completions": 2,
+    "f200_new_lab_completions": 1,
+    "f210_new_lab_completions": 1,
+    "unique_accepted_lab_completions": 4,
+    "read_only_cold_reloads": 6,
+    "protected_saves": {
+      "source_ceeb": "CEEB858FA19CC763EC09B83B23FD1640BECAD64A9A880405AD5D3B0C92E05602",
+      "f210_6cd9": "6CD9F72B5A45DDDCA77D189277C08FDA009505CE7AF1E687BD26D7779B42AFC6",
+      "f200_da63": "DA6321B2FE863C69EA23A926BE942CD5ECDBEBC44C97E3CD0006D739BA683CBE"
+    },
+    "final_f200_duration_predicate": "0.73 remaining tool-science units; passing marker does not serialize a per-stack successful value"
+  },
+  "retained_f200_adverses": [
+    {
+      "id": "current-f200-r01",
+      "result_sha256": "AEEE9F6BE1645188EC28A3C498DC89B7F6B4AAB6C0BA84BB2E92C5E78092AAB6",
+      "terminal_sha256": "DE515849104102AA0C921A70BCA2F4B473BC8F7D12F7BA1CD478A30AFDA9F1E2",
+      "status": "failed",
+      "preserved": true
+    },
+    {
+      "id": "current-f200-r02",
+      "result_sha256": "041C4085099D488398F848667ACA4B5D1A48ACA754EB90F7DF26F4B7D700A3A2",
+      "terminal_sha256": "0B98BB1DF3D0518105F70C451B048FEBD91CAE5D95ABE95036729043A02A32AF",
+      "status": "failed",
+      "preserved": true
+    },
+    {
+      "id": "current-f200-r03",
+      "result_sha256": "F709B94DE2DEA7C0B9841CA0DBC08BA895A503C37CA1BDC91F6ACAA9CBA42E5B",
+      "terminal_sha256": "2D8589B8F314962AB5BF1656D7AF84328FAB6646656346CA74A213400CAB589C",
+      "status": "failed",
+      "preserved": true
+    }
+  ],
+  "receipts": {
+    "path": "spec/evidence/legacy-boolean-cap-a575-native-receipts-r01.json.gz",
+    "sha256": "8CD3D77CE5DE40C2AB8B17439FD7E9CFB0946F151FBC96DC4DA75C5C37810983",
+    "bytes": 26731,
+    "uncompressed_sha256": "DBF7B5BC845FF31ED2C17E92ED73426FAA76CD3045CD68730B880734CACAB4A1",
+    "exact_safe_original_native_results": 6,
+    "derived_safe_log_observations": 2,
+    "strict_utf8_base64_gzip_roundtrip_verified": true,
+    "exclusions": [
+      "save binaries",
+      "full logs",
+      "configuration payloads",
+      "player-data payloads",
+      "preflight payloads",
+      "library-control payloads",
+      "screenshots"
+    ]
+  },
+  "custody": {
+    "full_originals": "All original result, save, log, configuration, preflight, library-control, and native-output custody remains at the recorded primary locations; this compact capsule embeds only safe result receipts and bounded derived observations.",
+    "final_f200_raw_and_primary_members": 18,
+    "final_f200_raw_and_primary_bytes": 824079,
+    "final_f200_raw_and_primary_hash_manifest_equal": true
+  },
+  "claims": {
+    "native_execution": true,
+    "base_4_0_policy_v1_ownership_and_progress_regression": true,
+    "full_4_0_catalogue": false,
+    "all_origins_or_modpacks": false,
+    "performance": false,
+    "release_qualification": false
+  },
+  "limitations": [
+    "The successful F200 marker proves the unchanged 0.73 predicate but does not serialize an exact successful per-stack tool value.",
+    "F200 r01-r03 remain independent native adverses and are not relabelled as passes.",
+    "Fixture scope covers source-owned Base policy-v1 state only and does not assert survival of arbitrary unowned script or console modifiers."
+  ]
+}
