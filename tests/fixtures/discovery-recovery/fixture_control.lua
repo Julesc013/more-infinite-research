@@ -337,7 +337,9 @@ end
 local function complete_source(state)
   local player = game.forces.player
   local discovery = technology(player, DISCOVERY, "source player")
-  if state.source_actual_labs ~= 1 or discovery.researched ~= true or location_unlocked(player, "source player") then
+  local expected_unlocked = state.source_version == "3.2.1"
+  if state.source_actual_labs ~= 1 or discovery.researched ~= true
+      or location_unlocked(player, "source player") ~= expected_unlocked then
     fail("actual source Vulcanus discovery result differs")
   end
   assert_consumed(state.lab, state.source_packs, "source discovery")
@@ -373,8 +375,12 @@ local function successor_begin()
   local player = game.forces.player
   local foreign = game.forces[state.foreign_index]
   -- This preflight intentionally runs before successor storage/lab writes.
-  local player_before = assert_source_snapshot(player, state.player, "successor player", false, true)
-  if player_before.discovery.unlocked ~= true then fail("MIR discovery repair did not restore researched Vulcanus") end
+  local requires_repair = state.source_version == "3.2.0"
+  local player_before = assert_source_snapshot(player, state.player, "successor player", false, requires_repair)
+  if player_before.discovery.unlocked ~= true then
+    if requires_repair then fail("MIR discovery repair did not restore researched Vulcanus") end
+    fail("3.2.1 source Vulcanus discovery was not retained by successor")
+  end
   local foreign_before = assert_source_snapshot(foreign, state.foreign, "successor foreign", true)
   local iron = technology(player, IRON, "successor player")
   iron_effects(iron, "successor player")

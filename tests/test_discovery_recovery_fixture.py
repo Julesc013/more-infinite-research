@@ -81,12 +81,20 @@ function discovery_data(data_path, helper_path, stage, mir, fixture_version, dis
   if opponent=="foreign-iron-effect" then iron.effects[1].recipe="foreign-recipe" end
   if opponent=="wrong-iron-effect" then iron.effects[1].change=.2 end
   local technologies={[iron.name]=iron}
-  if discovery_present then technologies["planet-discovery-vulcanus"]={name="planet-discovery-vulcanus",type="technology",
-    unit={count=1000,time=60,ingredients={{"automation-science-pack",1}}},
-    effects={{type="unlock-travel-to-space-platforms",modifier=true}}} end
+  if discovery_present then
+    local discovery_effects={{type="unlock-travel-to-space-platforms",modifier=true}}
+    if mir=="3.2.1" then
+      discovery_effects={{type="unlock-space-location",space_location="vulcanus",use_icon_overlay_constant=true},
+        {type="unlock-travel-to-space-platforms",modifier=true}}
+    end
+    technologies["planet-discovery-vulcanus"]={name="planet-discovery-vulcanus",type="technology",
+      unit={count=1000,time=60,ingredients={{"automation-science-pack",1}}},effects=discovery_effects}
+  end
   if opponent=="wrong-discovery-effect" then
     technologies["planet-discovery-vulcanus"].effects={{type="unlock-space-location",space_location="vulcanus"}}
   end
+  if opponent=="missing-discovery-unlock" then table.remove(technologies["planet-discovery-vulcanus"].effects,1) end
+  if opponent=="wrong-discovery-unlock" then technologies["planet-discovery-vulcanus"].effects[1].space_location="nauvis" end
   local mods={base="2.1.23",["space-age"]="2.1.23",quality="2.1.23",["elevated-rails"]="2.1.23",recycler="2.1.23",
     ["mir-fixture-mir5-active-mods-observer"]="0.1.0",["more-infinite-research"]=mir,
     ["mir-fixture-discovery-recovery"]=fixture_version}
@@ -136,8 +144,12 @@ function discovery_flow(helper_path, source_path, successor_path, source_mir, so
       research_queue={},research_progress=0,locations={vulcanus=false}}
     local prerequisite=tech("fixture-direct-prerequisite",value,{}, {})
     value.technologies[prerequisite.name]=prerequisite
-    value.technologies['planet-discovery-vulcanus']=tech('planet-discovery-vulcanus',value,
-      {{type='unlock-travel-to-space-platforms',modifier=true}},{prerequisite})
+    local discovery_effects={{type='unlock-travel-to-space-platforms',modifier=true}}
+    if source_mir=='3.2.1' then
+      discovery_effects={{type='unlock-space-location',space_location='vulcanus',use_icon_overlay_constant=true},
+        {type='unlock-travel-to-space-platforms',modifier=true}}
+    end
+    value.technologies['planet-discovery-vulcanus']=tech('planet-discovery-vulcanus',value,discovery_effects,{prerequisite})
     value.technologies['recipe-prod-research_iron-1']=tech('recipe-prod-research_iron-1',value,
       {{type='change-recipe-productivity',recipe='casting-iron',change=.1},
        {type='change-recipe-productivity',recipe='iron-plate',change=.1}},{prerequisite})
@@ -215,7 +227,10 @@ function discovery_flow(helper_path, source_path, successor_path, source_mir, so
   -- completion.  A later normal tick must not mislabel that initial load as
   -- a reload of the completed save.
   ok,result=invoke('load');if not ok then return {ok=false,message=result} end
-  local discovery=player.technologies['planet-discovery-vulcanus'];discovery.researched=true;player.locations.vulcanus=opponent=='source-unlocked-after-lab'
+  local discovery=player.technologies['planet-discovery-vulcanus'];discovery.researched=true
+  player.locations.vulcanus=source_mir=='3.2.1'
+  if opponent=='source-unlocked-after-lab' then player.locations.vulcanus=true end
+  if opponent=='source-locked-after-lab' then player.locations.vulcanus=false end
   player.current_research=nil;player.research_queue={};player.research_progress=0
   local source_scripted=opponent=='source-scripted-event'
   ok,result=invoke('research',{research=discovery,by_script=source_scripted});if not ok then return {ok=false,message=result} end
@@ -244,7 +259,13 @@ function discovery_flow(helper_path, source_path, successor_path, source_mir, so
     if #markers~=source_reload_markers then return {ok=false,message='source cold reload emitted more than one marker'} end
   end
   if opponent=='absent-state' then storage.mir5_discovery_recovery_fixture=nil end
-  if opponent=='missing-repair' then player.locations.vulcanus=false else player.locations.vulcanus=true end
+  if opponent=='missing-repair' then
+    player.locations.vulcanus=false
+  elseif source_mir=='3.2.0' then
+    -- The old 3.2.0 effect vector leaves the location locked; only this
+    -- branch models ordinary candidate recovery before successor init.
+    player.locations.vulcanus=true
+  end
   if opponent=='bad-source' then storage.mir5_discovery_recovery_fixture.player.iron.bonus=.1 end
   if opponent=='foreign-unlocked' then game.forces[2].locations.vulcanus=true end
   if opponent=='saved-progress-loss' then player.technologies['recipe-prod-research_iron-1'].saved_progress=.18 end
@@ -314,10 +335,17 @@ end
                     self.assertEqual((None, "8000*2^(L-1)", 60),
                                      (result["iron"]["unit"].get("count"), result["iron"]["unit"].get("count_formula"),
                                       result["iron"]["unit"]["time"]))
-                if stage != "successor":
+                if stage == "source-320":
                     self.assertEqual((1, 1), (result["discovery"]["unit"].get("count"), result["discovery"]["unit"]["time"]))
                     self.assertEqual(
                         [{"type": "unlock-travel-to-space-platforms", "modifier": True}],
+                        result["discovery"]["effects"],
+                    )
+                elif stage == "source-321":
+                    self.assertEqual((1, 1), (result["discovery"]["unit"].get("count"), result["discovery"]["unit"]["time"]))
+                    self.assertEqual(
+                        [{"type": "unlock-space-location", "space_location": "vulcanus", "use_icon_overlay_constant": True},
+                         {"type": "unlock-travel-to-space-platforms", "modifier": True}],
                         result["discovery"]["effects"],
                     )
         missing = self.data_result("source-320", discovery_present=False)
@@ -328,6 +356,8 @@ end
                                   ("duplicate-iron-effect", "historical Space Age iron productivity effect differs"),
                                   ("foreign-iron-effect", "historical Space Age iron productivity effect differs"),
                                   ("wrong-discovery-effect", "source Vulcanus discovery effect differs"),
+                                  ("missing-discovery-unlock", "source Vulcanus discovery effect differs"),
+                                  ("wrong-discovery-unlock", "source Vulcanus discovery effect differs"),
                                   ("wrong-closure", "official Space Age closure differs"),
                                   ("extra-mod", "unexpected active mod in fixture closure")):
             with self.subTest(opponent=opponent):
@@ -354,8 +384,9 @@ end
                 self.assertEqual((1, 1), (result["markers"][0]["source_actual_labs"], result["markers"][3]["successor_actual_labs"]))
                 self.assertEqual(3, result["markers"][0]["source_scripted_iron_level"])
                 self.assertAlmostEqual(.2, result["markers"][0]["source_scripted_iron_plate_bonus"])
-                self.assertTrue(result["markers"][0]["source_vulcanus_native_locked_after_discovery"])
-                self.assertFalse(result["markers"][0]["player_vulcanus_unlocked"])
+                source_unlocked = source_version == "3.2.1"
+                self.assertEqual(not source_unlocked, result["markers"][0]["source_vulcanus_native_locked_after_discovery"])
+                self.assertEqual(source_unlocked, result["markers"][0]["player_vulcanus_unlocked"])
                 self.assertTrue(all(row["player_vulcanus_unlocked"] for row in result["markers"][3:]))
                 self.assertTrue(all(row["foreign_vulcanus_unresearched_locked"] for row in result["markers"]))
 
@@ -393,12 +424,12 @@ end
         self.assertIn("protected iron state differs", lost["message"])
 
     def test_successor_refuses_missing_repair_or_protected_state_before_candidate_lab_or_storage_write(self):
-        for opponent, phrase in (("missing-repair", "MIR discovery repair did not restore researched Vulcanus"),
-                                  ("absent-state", "protected 3.2.x source state is absent"),
-                                  ("bad-source", "protected iron state differs"),
-                                  ("foreign-unlocked", "unresearched foreign Vulcanus state differs")):
-            with self.subTest(opponent=opponent):
-                result = self.flow_result(opponent)
+        for opponent, phrase, source_stage in (("missing-repair", "MIR discovery repair did not restore researched Vulcanus", "source-320"),
+                                                ("absent-state", "protected 3.2.x source state is absent", "source-321"),
+                                                ("bad-source", "protected iron state differs", "source-321"),
+                                                ("foreign-unlocked", "unresearched foreign Vulcanus state differs", "source-321")):
+            with self.subTest(opponent=opponent, source_stage=source_stage):
+                result = self.flow_result(opponent, source_stage)
                 self.assertFalse(result["ok"])
                 self.assertIn(phrase, result["message"])
                 self.assertEqual(result["before_labs"], result["labs"])
@@ -418,10 +449,13 @@ end
                 self.assertEqual(0, result["labs"])
                 self.assertEqual({}, result["state"])
 
-    def test_source_refuses_an_unlocked_location_after_the_real_discovery_lab(self):
-        result = self.flow_result("source-unlocked-after-lab")
-        self.assertFalse(result["ok"])
-        self.assertIn("actual source Vulcanus discovery result differs", result["message"])
+    def test_source_refuses_a_location_state_other_than_its_version_oracle_after_the_real_discovery_lab(self):
+        for source_stage, opponent in (("source-320", "source-unlocked-after-lab"),
+                                       ("source-321", "source-locked-after-lab")):
+            with self.subTest(source_stage=source_stage, opponent=opponent):
+                result = self.flow_result(opponent, source_stage)
+                self.assertFalse(result["ok"])
+                self.assertIn("actual source Vulcanus discovery result differs", result["message"])
 
     def test_wrappers_share_one_fixture_identity_register_handlers_without_runtime_access_and_load_is_read_only(self):
         wrappers = [("source", FIXTURE / source_stage / "control.lua", source_mir, source_fixture)
