@@ -119,8 +119,12 @@ class MigrationOriginF200SourceControls(unittest.TestCase):
         self.assertTrue(result["ok"], result["message"])
         self.assertIsNotNone(result["callbacks"]["init"])
         self.assertIsNotNone(result["callbacks"]["load"])
+        # ``py`` deliberately converts contiguous positive Lua integer keys to
+        # the equivalent zero-indexed Python list.  Require both actual event
+        # callbacks rather than indexing it as an unconverted Lua table.
+        self.assertEqual(2, len(result["callbacks"]["events"]))
+        self.assertIsNotNone(result["callbacks"]["events"][0])
         self.assertIsNotNone(result["callbacks"]["events"][1])
-        self.assertIsNotNone(result["callbacks"]["events"][2])
         self.assertEqual({}, result["forbidden"])
 
     def test_profile_and_fixture_identity_are_source_only(self):
