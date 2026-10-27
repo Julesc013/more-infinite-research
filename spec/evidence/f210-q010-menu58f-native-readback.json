@@ -151,7 +151,7 @@
     "data_raw_difference_paths": 0,
     "mod_settings_difference_paths": 0,
     "decoded_lists_types_and_values_preserved": true,
-    "cause": "Raw JSON bytes differ while the decoded mapping/list values and canonical serialisations are equal; this is object-key serialization order only.",
+    "cause": "Raw JSON bytes differ while the decoded mapping/list values and canonical serialisations are equal; this establishes a representation-only difference, while the specific lexical cause remains unproved.",
     "disposition": "The strict retained B6 byte-equality guard, its terminal adverse, and every raw receipt remain unchanged. This diagnosis is not a guard waiver or a passed replay-byte-equality result."
   },
   "custody": {
