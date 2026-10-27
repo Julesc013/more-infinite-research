@@ -313,7 +313,7 @@ class MigrationOriginF200110SuccessorControls(unittest.TestCase):
         self.lua.globals().legacy_module_definitions_path = LEGACY_MODULE_DEFINITIONS.as_posix()
         self.lua.globals().legacy_module_runtime_path = LEGACY_MODULE_RUNTIME.as_posix()
         self.lua.execute(r'''
-          function migration_origin_110_successor_lifecycle(target, source_fixture_name, active_wrapper_name, catalogue_fixture_name, legacy_module_bonus, reset_drops_module_bonus, saved_battery_token, current_recipe_scalar, duplicate_current_recipe, foreign_saved, foreign_queue_progress, foreign_current_saved, foreign_current_technology)
+          function migration_origin_110_successor_lifecycle(target, source_fixture_name, active_wrapper_name, catalogue_fixture_name, legacy_module_bonus, reset_drops_module_bonus, saved_battery_token, current_recipe_scalar, duplicate_current_recipe, foreign_saved, foreign_queue_progress, foreign_current_saved, foreign_current_technology, recipe_snapshot_variant)
             local callbacks={events={}}
             local env={storage={},logs={},created_labs=0,saved=false,
               script={active_mods={},on_configuration_changed=function(fn) callbacks.configuration=fn end,
@@ -363,9 +363,11 @@ class MigrationOriginF200110SuccessorControls(unittest.TestCase):
             local function recipe_values(direct_earned)
               local result={}
               for name,effects in pairs(catalogue.rows) do
-                if name~=catalogue.direct or direct_earned then
-                  for _,effect in ipairs(effects) do
-                    if effect.type=="change-recipe-productivity" then
+                for _,effect in ipairs(effects) do
+                  if effect.type=="change-recipe-productivity" then
+                    if name==catalogue.direct and not direct_earned then
+                      result[effect.recipe]=result[effect.recipe] or 0
+                    else
                       result[effect.recipe]=(result[effect.recipe] or 0)+effect.change
                     end
                   end
@@ -451,6 +453,19 @@ class MigrationOriginF200110SuccessorControls(unittest.TestCase):
               foreign_index=2,foreign_snapshot=foreign_snapshot,
               foreign_queue={current=catalogue.direct,queue={catalogue.direct,"recipe-prod-research_plastic-1"},progress=.42},
               detached_index=3,detached_snapshot=detached_snapshot}
+            local recipe_snapshot, recipe_variant = foreign_snapshot, recipe_snapshot_variant
+            if type(recipe_variant)=="string" and recipe_variant:sub(1,9)=="detached-" then
+              recipe_snapshot,recipe_variant=detached_snapshot,recipe_variant:sub(10)
+            end
+            if recipe_variant=="missing-direct" then
+              recipe_snapshot.recipes[catalogue.gear_recipe]=nil
+            elseif recipe_variant=="extra" then
+              recipe_snapshot.recipes["fixture-extra-recipe"]=0
+            elseif recipe_variant=="wrong-direct" then
+              recipe_snapshot.recipes[catalogue.gear_recipe]=.1
+            elseif recipe_variant~=nil then
+              error("unexpected source recipe variant: "..tostring(recipe_snapshot_variant))
+            end
             if saved_battery_token~=nil then
               state.player_snapshot.effects[catalogue.robot_battery]="worker-robot-battery|"..saved_battery_token
             end
@@ -646,6 +661,37 @@ class MigrationOriginF200110SuccessorControls(unittest.TestCase):
                                   result["message"])
                     self.assertIn("actual{level=1 researched=false enabled=true visible=false maximum=4294967295 saved=0.1}",
                                   result["message"])
+                self.assertEqual((0, 0), (result["created_labs"], result["player_add_calls"]))
+                self.assertFalse(result["saved"])
+                self.assertFalse(result["source_state_changed"])
+                self.assertFalse(result["active_state_changed"])
+
+    def test_control_retains_the_unearned_foreign_direct_recipe_as_an_exact_zero_key(self):
+        self._install_lifecycle_model()
+        source = json.loads((SOURCE_FIXTURE / "info.json").read_text(encoding="utf-8"))
+        wrapper = json.loads((FIXTURE / "info-f200.json").read_text(encoding="utf-8"))
+
+        accepted = py(self.lua.eval("migration_origin_110_successor_lifecycle")(
+            "f200", source["name"], wrapper["name"]))
+        self.assertTrue(accepted["ok"], accepted["message"])
+        self.assertEqual((0, 0), (accepted["foreign_gear"], accepted["detached_gear"]))
+        self.assertEqual((1, 1), (accepted["created_labs"], accepted["player_add_calls"]))
+
+        opponents = (
+            ("missing-direct", "foreign saved recipe-bonus count differs"),
+            ("extra", "foreign saved recipe-bonus count differs"),
+            ("wrong-direct", "foreign saved recipe bonus differs: iron-gear-wheel"),
+            ("detached-missing-direct", "detached saved recipe-bonus count differs"),
+            ("detached-extra", "detached saved recipe-bonus count differs"),
+            ("detached-wrong-direct", "detached saved recipe bonus differs: iron-gear-wheel"),
+        )
+        for variant, expected in opponents:
+            with self.subTest(variant=variant):
+                result = py(self.lua.eval("migration_origin_110_successor_lifecycle")(
+                    "f200", source["name"], wrapper["name"], None, None, False,
+                    None, None, False, None, None, None, None, variant))
+                self.assertFalse(result["ok"])
+                self.assertIn(expected, result["message"])
                 self.assertEqual((0, 0), (result["created_labs"], result["player_add_calls"]))
                 self.assertFalse(result["saved"])
                 self.assertFalse(result["source_state_changed"])
