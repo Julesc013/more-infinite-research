@@ -1,0 +1,2 @@
+-- Intentionally empty: the native data-stage load line identifies this selected
+-- control-only observer to the existing exact loaded-selection verifier.
