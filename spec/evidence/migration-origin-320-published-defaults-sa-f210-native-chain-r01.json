@@ -1,0 +1,106 @@
+{
+  "schema": 1,
+  "kind": "MIR5MigrationOrigin320PublishedDefaultsSANativeReferenceV1",
+  "status": "completed-data-stage-observation-only",
+  "scope": "One exact published MIR 3.2.0 Space Age data/settings Defaults reference on the standalone Factorio 2.1.23 engine.",
+  "origin": {
+    "published_version": "3.2.0",
+    "tag_commit": "c8f3d8248cc89b8636cf1ee485fd8889422c6124",
+    "archive_sha256": "35372EE6D16DA6765E8C30AEAAF5DA4A5D300F02C0A0A03648C80893A5394F32",
+    "archive_bytes": 1029464,
+    "factorio_version": "2.1"
+  },
+  "controller": {
+    "source_head": "36de9342b119391424dd52d2bc48882e3177d9a5",
+    "prototype_capture_sha256": "A7363640A13A87935829C9FF9276049F91DA9825475DCE472133E643133EB01E",
+    "caller_sha256": "F021613916AEE7AFADE19D3634F16AAAB5797BA3A5DB5FB196EC6E57F50124E1",
+    "preflight_sha256": "309A665833F424B3A0274E6E3FDA584BCDFFCB8D862438632F3298EF14F3281B",
+    "terminal_sha256": "CDE4BDB3341EAB1CD3A4BE8BE3E5F9900A012B0B08C48E3327F28F10CE475903"
+  },
+  "inputs": {
+    "engine": {
+      "path": "D:\\Games\\Factorio\\2.1\\bin\\x64\\factorio.exe",
+      "base_version": "2.1.23",
+      "sha256": "8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38"
+    },
+    "profile_sha256": "B07EA32E7A8D3F1D7FDD8EFC2B02AA68D9527C2364CA59FD197AE89B3FEE0EFE",
+    "active_mods_observer": {
+      "sha256": "A15A7D628D66953D2E0C4D4FA288F47CBF9C5678327C7EB3D23ADB5DC78331C0",
+      "bytes": 835
+    },
+    "selected_mods": [
+      "base@2.1.23",
+      "elevated-rails@2.1.23",
+      "quality@2.1.23",
+      "recycler@2.1.23",
+      "space-age@2.1.23",
+      "mir-fixture-mir5-active-mods-observer@0.1.0",
+      "more-infinite-research@3.2.0"
+    ]
+  },
+  "native_observation": {
+    "result_sha256": "A5C74F45F31F805D62A66403931F91969C9FFC9AB0B8A80752264502BB97718A",
+    "result_bytes": 15597,
+    "process_exit_code": 0,
+    "process_status": "passed",
+    "native_status": "completed-data-stage-observation-only",
+    "data_raw_dump": {
+      "sha256": "5BF261F92779F7AE565E524E99B059821792DE6D833AAF99A587E5EFDF5FF110",
+      "bytes": 29794879
+    },
+    "mod_settings_dump": {
+      "sha256": "21D74CB9C8C3FB3323B47885673CADB9A550A86305E1838C8460C4195B266ADD",
+      "bytes": 546285
+    }
+  },
+  "custody": {
+    "raw_native_output": {
+      "path": "build/tmp/migration-origin-3.2.0-published-defaults-sa-f210-r01",
+      "members": 9,
+      "bytes": 30402839
+    },
+    "primary_native_output": {
+      "path": "build/qualification/migration-origins/migration-origin-320-published-defaults-sa-f210-r01/native-output",
+      "members": 9,
+      "bytes": 30402839,
+      "raw_member_hashes_reverified": true
+    },
+    "primary_outer": {
+      "path": "build/qualification/migration-origins/migration-origin-320-published-defaults-sa-f210-r01",
+      "members": 13,
+      "bytes": 30833230
+    }
+  },
+  "restoration": {
+    "direct_library_controls": "restored-direct-library-controls",
+    "mir_3_2_slot_restored_absent": true,
+    "active_mods_observer_restored": true,
+    "factorio_processes_remaining": 0
+  },
+  "receipt_capsule": {
+    "path": "spec/evidence/migration-origin-320-published-defaults-sa-f210-native-receipts-r01.json.gz",
+    "contains": "Exact UTF-8 bytes of the safe native result receipt only.",
+    "excludes": [
+      "data dumps",
+      "configuration",
+      "full logs",
+      "player data",
+      "preflight payloads",
+      "library-control payloads"
+    ]
+  },
+  "claims": {
+    "published_data_settings_reference": true,
+    "map": false,
+    "save": false,
+    "gameplay": false,
+    "migration": false,
+    "performance": false,
+    "release_qualification": false
+  },
+  "limitations": [
+    "This records one published MIR 3.2.0 Defaults data/settings observation only.",
+    "It neither creates nor validates a source save or a successor migration route.",
+    "Raw dumps remain in private primary custody and are referenced only by hash and size."
+  ]
+}
