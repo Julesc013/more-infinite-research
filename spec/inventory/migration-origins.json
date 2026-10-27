@@ -2,6 +2,22 @@
   "schema": "MIR5MigrationOriginsInventoryV1",
   "status": "read-only-source-and-custody-inventory-not-native-qualification",
   "inventory_commit": "0b91883f5175cd6cc19b7bb92d83cdb590a3ee71",
+  "maintainer_scope_clarification_2026_10_28": {
+    "recorded_local_date": "2026-10-28",
+    "source": "Maintainer message and question reply in the Aero goal thread; original spelling preserved.",
+    "source_thread": "01a16580-d9e9-7150-93aa-6d3ca19eec25",
+    "public_custody": "https://github.com/Julesc013/more-infinite-research/pull/1272#issuecomment-6454806929",
+    "verbatim_request": "yeah i mean it would be nive if all old saves wera appropriately migrated to new technology and settings and ids and mods and etc, but if we just dont know for certain what to do then we can leave it for later but ideally we have migration support from each breaking change or known change or major version or minor release or patches known to change things and etc... i dont really know what i want, i just want mir 5.0.0 to work, and this may or may not be a good idea",
+    "ambiguous_lock_decision": {
+      "question": "One migration policy needs your decision: a save that skipped MIR 3.2.2 can retain a researched-but-locked planet, but there is no saved marker distinguishing the old MIR defect from an intentional lock by another mod. For these ambiguous later saves, should MIR preserve the lock and offer an explicit one-time repair, or automatically restore every researched discovery? The first choice best preserves other mods’ intent.",
+      "verbatim_answer": "Preserve ambiguous locks; explicit repair",
+      "question_reference": "call_9764f59cb97144bb888d664c095eef63:0"
+    },
+    "interpretation_not_verbatim": "Prioritize exact MIR 4.7.3 stable predecessor upgrades and representative protected saves for each materially distinct known breaking contract. Retain the complete modern-origin inventory and cumulative migrations. Uncertain older histories may remain explicitly deferred/unverified rather than guessed; a separate every-old-patch campaign is not a 5.0.0 prerequisite. This is the implementation interpretation, not additional wording attributed to the maintainer.",
+    "accepted_policy_commit": "94b26192cf0dfdfd74313b580b445051e6983651",
+    "accepted_policy_pr": "https://github.com/Julesc013/more-infinite-research/pull/1272",
+    "evidence_limit": "Decision custody only. No native result, support claim or historical status changes. Required current/selected-boundary failures, all applicable native/save/client/performance gates and future MIR 5 stable continuity remain."
+  },
   "audit_scope": {
     "tag_source_records": 64,
     "tag_source_range": "1.0.0 through 3.2.11",
@@ -2207,7 +2223,7 @@
   ],
   "migration_execution_matrix": {
     "direct_f200_and_f210_tag_origins": {
-      "policy": "One protected source save per exact archive when available; direct F200/F210 execution is required before a later 5.x acceptance claim.",
+      "policy": "Retain each exact origin and protected save when available. Under the 28 October 2026 clarification, 5.0.0 release selection covers 4.7.3 stable predecessors and materially distinct known older saved-state contracts. Other uncertain routes may remain explicitly deferred/unverified. A native claim for any named route still needs its exact source/candidate/save/two-reload evidence; grouping never supplies an unrun origin pass.",
       "cases": [
         {
           "origin_tag": "1.0.0",
@@ -2803,7 +2819,7 @@
       "policy": "Test a protected accepted 5.0.0 save against each later accepted 5.x package with exact package/archive and engine pins; this inventory is not evidence that a future build passed."
     },
     "mir4_modern_origins": {
-      "policy": "Each published modern archive is a separate origin unless exact archive-byte equality and all consumed inputs justify reuse. Same-version prerelease/stable bytes remain distinct; all 36 server digests here differ. F200 sources require both current F200 and F210 successors; F210 sources do not imply downgrade support. Existing narrow native results retain their separately recorded identities.",
+      "policy": "Keep all published archives as distinct identities, including same-version byte variants. Select representative known migration contracts for 5.0.0 under the 28 October 2026 clarification; shared writer code alone does not establish equivalence of IDs, effects, settings or saved state. Required engine-hop cases remain separate. Existing native results retain their exact identities; unrun origins stay unverified rather than inherited passes.",
       "cases": [
         {
           "origin_tag": "v4.0.0",

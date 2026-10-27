@@ -29,9 +29,10 @@ function New-TestArchive([string]$Library,[string]$Name,[string]$Version,[string
 }
 function New-NativeFixturePreflightPrefix([string]$Runner,[string]$Path){
   $sourceBytes=[IO.File]::ReadAllBytes($Runner);$source=[Text.UTF8Encoding]::new($false,$true).GetString($sourceBytes)
-  $boundary="& (Join-Path `$repo 'tools/commands/workspace/Test-MIRDevelopmentHealth.ps1') -MaxScanSeconds 2 -MaxEntriesPerRoot 500 | Out-Host"
+  # Stop before the health call regardless of its advisory sampling options.
+  $boundary="& (Join-Path `$repo 'tools/commands/workspace/Test-MIRDevelopmentHealth.ps1')"
   $offset=$source.IndexOf($boundary,[StringComparison]::Ordinal)
-  Assert-Library ($offset -gt 0) 'native-fixture-preflight-boundary'
+  Assert-Library ($offset -gt 0 -and $offset -eq $source.LastIndexOf($boundary,[StringComparison]::Ordinal)) 'native-fixture-preflight-boundary'
   $prefix=[Text.UTF8Encoding]::new($false).GetBytes($source.Substring(0,$offset))
   Assert-Library ($prefix.Length -le $sourceBytes.Length -and [Convert]::ToHexString($prefix) -ceq [Convert]::ToHexString([byte[]]$sourceBytes[0..($prefix.Length-1)])) 'native-fixture-preflight-source-bytes'
   [IO.File]::WriteAllBytes($Path,$prefix+[Text.UTF8Encoding]::new($false).GetBytes("`nreturn`n"))

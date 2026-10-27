@@ -5,7 +5,7 @@ applies_to: "MIR development"
 audience: maintainer
 doc_type: reference
 owner: mir-maintainers
-last_reviewed: 2026-10-25
+last_reviewed: 2026-10-28
 supersedes: []
 superseded_by: []
 source_of_truth_for:
@@ -55,13 +55,25 @@ F001/0.1.2 and F002/0.2.10 lack an evidenced standalone-mod format. F003/0.3.2, 
 
 Keep the original save, its pre-update backup, the selected mod archives and startup settings. Test a copy with the matching edition first. Preserve inherited settings for the first load; configuration changes and productivity-provider changes have separate transition requirements. Load, inspect earned research and bonuses, inspect current/queued or suspended work, save under a new name and cold-reload that copy before adopting it.
 
-MIR 5 is still unreleased. Its required qualification includes 4.7.3 predecessor saves across supported editions and direct upgrades from every applicable published MIR 1.0.0-and-later origin on Factorio 2.0/2.1; this requirement is not a claim that those routes have all passed. The [migration scope](../spec/migrations.md#required-origin-coverage) separates exact same-engine upgrades, engine bridges and unavailable historical inputs. Later MIR 5 releases must retain tested direct upgrades from earlier MIR 5 saves for engine-valid origin/candidate pairs on supported editions. Earlier pre-5 origins on Factorio 1.1 and below remain best effort beyond the required 4.7.3 routes. Check the release's exact qualification and engine requirements before using a candidate on a real factory.
+MIR 5 is still unreleased. Release qualification prioritizes 4.7.3 predecessor saves on all stable editions and older representatives covering known changes to identities, effects, settings, schemas and ownership. The complete modern-origin inventory remains, but an uncertain older route can be deferred explicitly instead of guessed; not every historical patch has passed a native upgrade. The [migration scope](../spec/migrations.md#required-origin-coverage) distinguishes qualified routes, engine bridges and deferred inputs. Future MIR 5 stable forward-upgrade obligations remain. Earlier pre-5 origins on 1.1 and below are best effort beyond the required 4.7.3 routes. Check the actual release evidence and limitations before adopting a candidate on a real factory.
 
 The candidate refuses a first published F2004.7 upgrade when earned overlapping productivity has no recorded MIR5 preference baseline, startup settings changed, and a known productivity provider is present or being removed. This also applies when moving directly from Factorio2.0 to2.1. Keep the original save: first evaluate the matching MIR5 F200 candidate on the original2.0 engine with the original mods and startup settings, then save and cold-reload that copy before changing the engine, provider or preference. The refusal protects research whose old preference cannot be inferred safely. The [migration policy](../spec/migrations.md#finite-transition-policy) distinguishes the observed4.7.2 two-step guard path, the separately passed C563 provider-free Base engine hop, and the still-unqualified4.7.3 settings/provider combinations. Each result retains its exact package and profile inputs.
 
 A cap below earned research limits future work without erasing earned levels. MIR restores only disablement it owns; another mod's configuration callback can independently reset technology state. Hidden migration carriers preserve named historical investments and must not be removed as cosmetic clutter. The retained [recovery guidance](../README.md#save-compatibility) and original incident records remain relevant to previously resaved factories: restoring a missing definition cannot reconstruct history already erased from a save.
 
 Use the Research Library shortcut on modern targets to inspect research, queues, settings and availability. Its search/filter and language preferences belong to each player. Queue actions use native research behavior; the Library is not a second research planner. Startup settings take effect on the appropriate restart, and exporting a settings profile does not silently change the active game configuration.
+
+## Researched planet still locked
+
+MIR preserves ambiguous locks rather than deciding that another mod was wrong. For a deliberately chosen one-time repair on Factorio 2.1 Space Age, first confirm that no active mod intends that lock. The following player-console example targets only your current force and Vulcanus, and only when the current researched technology contains the matching native unlock effect. It leaves unresearched discoveries and other forces alone. The [LuaForce API](https://lua-api.factorio.com/latest/classes/LuaForce.html#unlock_space_location) provides the operation; the methods are also present in the locally inspected 2.1.23 API documentation. This is operator recovery guidance, not a MIR migration qualification result.
+
+Lua console commands permanently disable achievements for that save, so use a copy; see the [official console documentation](https://wiki.factorio.com/Console#Scripting_and_cheat_commands).
+
+```lua
+/c local f=game.player.force; local n="vulcanus"; local t=f.technologies["planet-discovery-"..n]; for _,e in pairs(t and t.researched and t.prototype.effects or {}) do if e.type=="unlock-space-location" and e.space_location==n and not f.is_space_location_unlocked(n) then f.unlock_space_location(n) end end
+```
+
+For another official discovery, replace `vulcanus` with `gleba`, `fulgora` or `aquilo`. In a server console, explicitly select the intended force with `game.forces["force-name"]` instead of `game.player.force`. If the current technology has no matching native grant, the example does nothing; retain the save and report that configuration rather than inventing an association or granting research. An existing native upgrade may already restore the location without any operator repair.
 
 ## Recovery from the 4.2.1 incident
 
