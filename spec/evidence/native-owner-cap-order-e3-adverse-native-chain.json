@@ -1,0 +1,105 @@
+{
+  "schema": 1,
+  "kind": "MIR5NativeOwnerCapOrderAdverseReadbackV1",
+  "status": "canonical-and-permuted-pass-relaxed-foreign-disablement-fails",
+  "player_source_commit": "b251ae7a54104ace87cb0da4cf531cf53f03c93d",
+  "player_source_tree": "79b73a6a8e68987737e69bf2d95ec6555b49f901",
+  "mir_sha256": "E3A65C08AC7798A66FB1BE30D24307B17C8B366DD901953BDE2A09BD6939C8CE",
+  "engine_sha256": "FE4A1DA30F322A0D0B8AEB3DF7276332222BAAA143E2352569B723E84B2B9060",
+  "fixture_source": "5a40aa5e0c3e04b1609280fa176a423bc3fffd8e",
+  "controller_source": "84e1e1e5f6a411086b73d25bbea410ff4bb5e8c5",
+  "stages": [
+    {
+      "stage": "canonical",
+      "status": "passed-private-native-fixture",
+      "result_sha256": "D43FD994C4B416C73FE72B273CDE6CC4AFA9CDCC5E947696056F116BF7009018",
+      "completed_save_sha256": "7950327F84CE6CD27D7170F81F8E332610A64F20F39597732EC19E6071CCA99B",
+      "cold_reloads": 2,
+      "witness": {
+        "fixture_stage": "0.1.0",
+        "cap": 1,
+        "effect_order": [
+          "steel-plate",
+          "casting-steel"
+        ],
+        "actual_lab_completions": 0,
+        "native_state_seeded": true,
+        "player_level": 2,
+        "player_saved_progress": 0.27,
+        "player_enabled": false,
+        "foreign_enabled": false,
+        "foreign_queue_progress": 0.42000000000000004,
+        "on_load_read_only": false
+      }
+    },
+    {
+      "stage": "permuted",
+      "status": "passed-private-native-fixture",
+      "result_sha256": "B6CB98E8378B5AF914720D4972DB0D37024E3548A51992201E23048F8E1988FF",
+      "completed_save_sha256": "F4FD5C279C01AD80A5826C3F6ADF7B269D4E050B9DDACCDF9A5B7D0ECF378F00",
+      "cold_reloads": 2,
+      "witness": {
+        "fixture_stage": "0.2.0",
+        "cap": 1,
+        "effect_order": [
+          "casting-steel",
+          "steel-plate"
+        ],
+        "actual_lab_completions": 0,
+        "native_state_seeded": true,
+        "player_level": 2,
+        "player_saved_progress": 0.27,
+        "player_enabled": false,
+        "foreign_enabled": false,
+        "foreign_queue_progress": 0.42000000000000004,
+        "on_load_read_only": false
+      }
+    },
+    {
+      "stage": "relaxed",
+      "status": "failed",
+      "result_sha256": "0A33DF4141BE12D36950606781B34CDAD4D9EF474DC9A3FBB1E010F8AD971D49"
+    }
+  ],
+  "first_run_custody": {
+    "original_and_primary_members_verified": 46,
+    "bytes": 2184577
+  },
+  "relaxed_diagnostic": {
+    "fixture_source": "0ddeb251984d166b075afb6f69367837ffd34dc7",
+    "controller_source": "3e76fe2d41b8e99305f6a132c00024b2f927bee9",
+    "status": "failed",
+    "result_sha256": "048A53F144FF1952A4B958CA7193F3066A174D5FF544A67B40B6822353BA597D",
+    "observed_foreign": {
+      "level": 2,
+      "researched": false,
+      "enabled": true,
+      "maximum": 4294967295
+    },
+    "custody": {
+      "original_and_primary_members_verified": 7,
+      "bytes": 43506
+    }
+  },
+  "restoration": {
+    "status": "restored-and-custodied-after-preserved-native-adverse",
+    "readback_sha256": "3D2C3144874E5CB08CE3DA093D50E3FF6D38AD8FA4DA96F87CDCC7D511DE401F",
+    "original_terminal_sha256": "9F7E8D624A0C30DF21063D1D148BFBB3E4D72BEF835D0C143247B3E3D7827026",
+    "note": "The original outer restore call failed after the native adverse. A separate contained no-engine repair restored prior originals; the original failed terminal remains immutable."
+  },
+  "limits": [
+    "This is a real open stability gate. The relaxed foreign-disablement expectation remains false and has not been waived.",
+    "Canonical and effect-permuted stages each pass two cold reloads; no relaxed successor save or reload passes.",
+    "All native technology levels and bonuses are explicitly seeded; this fixture has zero laboratory completions.",
+    "The diagnostic proves enabled=true at the guard, not which engine or MIR callback caused the earlier transition. Cause attribution needs separate evidence.",
+    "Earlier create/save and unmet-Automation-prerequisite fixture adverses remain preserved in primary custody; no failed execution is relabelled as passing.",
+    "No current-later-player, F200, performance, arbitrary mod-combination or release qualification."
+  ],
+  "receipts": {
+    "path": "spec/evidence/native-owner-cap-order-e3-adverse-receipts.json.gz",
+    "bytes": 50886,
+    "sha256": "0FC64036EA9FD5CBA954DB41AB9981D1B8F1320EA26595FAD8225FC0E8830320",
+    "uncompressed_sha256": "1565A36B5E3B21BEDA9060C991348522A45DEF129ECE6F9EB3CB6A2A13F5AD10",
+    "members": 9
+  }
+}
