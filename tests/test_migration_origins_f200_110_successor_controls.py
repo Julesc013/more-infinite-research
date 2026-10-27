@@ -13,6 +13,8 @@ F200_PROFILE = ROOT / "tests/profiles/migration-origins-1.1.0-successor-f200-207
 F210_PROFILE = ROOT / "tests/profiles/migration-origins-1.1.0-successor-f210-2123.json"
 DIRECT = "recipe-prod-research_gears-1"
 ROBOT = "recipe-prod-research_robot_battery-1"
+SOURCE_FIXTURE = "mir-fixture-mir5-migration-origin-f200-110-source"
+RETIRED_SUCCESSOR_FIXTURE = "mir-fixture-mir5-migration-origin-f200-110-successor"
 
 # Pinned from the archived 1.1.0 config and F200 Base recipe output set; this
 # test does not take its expected identities from the successor catalogue.
@@ -52,6 +54,20 @@ def lua(runtime, value):
 
 
 class MigrationOriginF200110SuccessorControls(unittest.TestCase):
+    def test_successor_keeps_the_protected_source_fixture_identity_across_the_version_upgrade(self):
+        f200 = json.loads((FIXTURE / "info-f200.json").read_text(encoding="utf-8"))
+        f210 = json.loads((FIXTURE / "info-f210.json").read_text(encoding="utf-8"))
+        catalogue = (FIXTURE / "catalogue.lua").read_text(encoding="utf-8")
+        data = (FIXTURE / "data-final-fixes.lua").read_text(encoding="utf-8")
+        control = (FIXTURE / "control.lua").read_text(encoding="utf-8")
+
+        self.assertEqual((SOURCE_FIXTURE, "0.1.1"), (f200["name"], f200["version"]))
+        self.assertEqual((SOURCE_FIXTURE, "0.2.0"), (f210["name"], f210["version"]))
+        self.assertIn(f'fixture = "{SOURCE_FIXTURE}"', catalogue)
+        self.assertIn(f'__{SOURCE_FIXTURE}__/catalogue', data)
+        self.assertIn(f'__{SOURCE_FIXTURE}__/catalogue', control)
+        self.assertNotIn(RETIRED_SUCCESSOR_FIXTURE, catalogue)
+
     def candidate_raw(self):
         return {"technology": {
             DIRECT: {"type": "technology", "name": DIRECT, "level": 1, "upgrade": True,
@@ -70,7 +86,7 @@ class MigrationOriginF200110SuccessorControls(unittest.TestCase):
           function migration_origin_110_successor_data(raw, mods)
             local env={data={raw=raw},mods=mods}
             env.require=function(name)
-              assert(name=="__mir-fixture-mir5-migration-origin-f200-110-successor__/catalogue")
+              assert(name=="__mir-fixture-mir5-migration-origin-f200-110-source__/catalogue")
               return assert(loadfile(catalogue_path,"t",env))()
             end
             env._G=env;setmetatable(env,{__index=_G})
@@ -99,10 +115,10 @@ class MigrationOriginF200110SuccessorControls(unittest.TestCase):
     def test_data_guard_admits_only_the_two_exact_candidate_targets_and_accelerates_only_direct_cost(self):
         f200 = {"base": "2.0.77", "more-infinite-research": "5.0.20000",
                 "mir-fixture-mir5-active-mods-observer": "0.1.0",
-                "mir-fixture-mir5-migration-origin-f200-110-successor": "0.1.0"}
+                SOURCE_FIXTURE: "0.1.1"}
         f210 = {"base": "2.1.23", "more-infinite-research": "5.0.21000",
                 "mir-fixture-mir5-active-mods-observer": "0.1.0",
-                "mir-fixture-mir5-migration-origin-f200-110-successor": "0.2.0"}
+                SOURCE_FIXTURE: "0.2.0"}
         for label, mods in (("f200", f200), ("f210", f210)):
             with self.subTest(label=label):
                 accepted = self.run_data(self.candidate_raw(), mods)
@@ -140,16 +156,16 @@ class MigrationOriginF200110SuccessorControls(unittest.TestCase):
             local callbacks,forbidden={events={}},{ }
             local env={script={active_mods={base="2.0.77",["more-infinite-research"]="5.0.20000",
                 ["mir-fixture-mir5-active-mods-observer"]="0.1.0",
-                ["mir-fixture-mir5-migration-origin-f200-110-successor"]="0.1.0"},
+                ["mir-fixture-mir5-migration-origin-f200-110-source"]="0.1.1"},
               on_configuration_changed=function(fn) callbacks.configuration=fn end,
               on_load=function(fn) callbacks.load=fn end,on_event=function(event,fn) callbacks.events[event]=fn end},
               defines={events={on_research_finished=1,on_tick=2},inventory={lab_input=1}},storage={}}
-            env.require=function(name) assert(name=="__mir-fixture-mir5-migration-origin-f200-110-successor__/catalogue")
-              return {storage_key="mir5_migration_origin_f200_110_source",fixture="mir-fixture-mir5-migration-origin-f200-110-successor",
+            env.require=function(name) assert(name=="__mir-fixture-mir5-migration-origin-f200-110-source__/catalogue")
+              return {storage_key="mir5_migration_origin_f200_110_source",fixture="mir-fixture-mir5-migration-origin-f200-110-source",
                 direct="recipe-prod-research_gears-1",gear_recipe="iron-gear-wheel",save="mir5-native-complete",deadline_ticks=18000,lab_packs=32,expected_gear_delta=.1,
                 source_change_tokens={[.1]="0.10000000149011612",[.05]="0.05000000074505806",[.02]="0.019999999552965164",[.2]="0.20000000298023224"},
                 rows={["recipe-prod-research_gears-1"]={{type="change-recipe-productivity",recipe="iron-gear-wheel",change=.1}}},settings={test=true},
-                targets={f200={base="2.0.77",mir="5.0.20000",fixture="0.1.0"},f210={base="2.1.23",mir="5.0.21000",fixture="0.2.0"}}}
+                targets={f200={base="2.0.77",mir="5.0.20000",fixture="0.1.1"},f210={base="2.1.23",mir="5.0.21000",fixture="0.2.0"}}}
             end
             env._G=env;setmetatable(env,{__index=function(_,key)
               if key=="game" or key=="settings" then forbidden[key]=true;return nil end
@@ -178,12 +194,12 @@ class MigrationOriginF200110SuccessorControls(unittest.TestCase):
             self.assertEqual(("a575a4198807b6aea9e26963e3d9970fc5c068ae", "398c79c687d2bc662c976355ced1436201c43f11"),
                              (profile["candidate"]["source_commit"], profile["candidate"]["player_tree"]))
             self.assertEqual("d8e24b4a79b6064a373c03210c5ef6be0b013f79", profile["source_fixture_commit"])
-            self.assertEqual("e37225cf63417c37e4ea2be162667f4d84324340", profile["successor_fixture_commit"])
+            self.assertEqual("6a9ec92ddd719417e70e1b8162f5c722c890449d", profile["successor_fixture_commit"])
             self.assertEqual("2fb64822b82569e3b50f0653e361fb7148f18b63", profile["origin_source_commit"])
-        self.assertEqual("4F689098546C3A9D94C9C8D642D9BA775F93727799C2AB47BA9F0A15F40AEFA8",
-                         f200["archive_sha256"]["mir-fixture-mir5-migration-origin-f200-110-successor_0.1.0.zip"])
-        self.assertEqual("CCA857B7F6F27F440715B24FE9568FDB4EDE900A673CC4265FB659EE3BCE4A00",
-                         f210["archive_sha256"]["mir-fixture-mir5-migration-origin-f200-110-successor_0.2.0.zip"])
+        self.assertEqual("E503154E77C1BCE05E72F437B18003E5C3A7A14DCD71740E2FBD2BDE3CBFE72F",
+                         f200["archive_sha256"]["mir-fixture-mir5-migration-origin-f200-110-source_0.1.1.zip"])
+        self.assertEqual("FB09D143C9F69B1506C4CBA046A26D58C2CDFEE417C2AC4B83B2109E97691845",
+                         f210["archive_sha256"]["mir-fixture-mir5-migration-origin-f200-110-source_0.2.0.zip"])
         self.assertEqual("8DB28D2DE45F26033B5F54E176902A3138A903AF0F4B48EAB6B9971466021B4F",
                          f200["archive_sha256"]["more-infinite-research_5.0.20000.zip"])
         self.assertEqual("7CE6A4DF78019F6B98237E638A1C927C5FDB538D4A1442EE22D846DD962DDCDC",
