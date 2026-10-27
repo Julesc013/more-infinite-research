@@ -84,7 +84,7 @@ for name, value in pairs(data.raw.technology or {}) do
     local expected = catalogue.rows[name]
     if expected == nil then fail("unexpected source row: " .. name) end
     if value.type ~= "technology" or value.name ~= name or value.level ~= nil
-        or value.upgrade ~= true or value.max_level ~= "infinite" or value.enabled == false then
+        or value.upgrade ~= true or value.max_level ~= "infinite" or value.enabled ~= nil then
       fail("source identity differs: " .. name)
     end
     local unit = value.unit

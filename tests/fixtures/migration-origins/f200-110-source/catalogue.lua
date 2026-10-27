@@ -146,6 +146,7 @@ return {
       recipe("productivity-module", .10), recipe("speed-module", .10), recipe("efficiency-module", .10),
       recipe("productivity-module-2", .05), recipe("speed-module-2", .05), recipe("efficiency-module-2", .05),
       recipe("productivity-module-3", .02), recipe("speed-module-3", .02), recipe("efficiency-module-3", .02),
+      recipe("productivity-module", .01), recipe("speed-module", .01), recipe("efficiency-module", .01),
     }},
     ["recipe-prod-research_belts-1"] = {science = "space", effects = {
       recipe("transport-belt", .10), recipe("underground-belt", .10), recipe("splitter", .10),

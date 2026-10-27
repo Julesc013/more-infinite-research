@@ -29,9 +29,13 @@ EFFECTS = {
     "low_density_structure": {"low-density-structure": .10}, "rocket_fuel": {"rocket-fuel": .10},
     "copper": {"copper-plate": .10}, "iron": {"iron-plate": .10}, "engine": {"engine-unit": .10},
     "electric_engine": {"electric-engine-unit": .10}, "flying_robot_frame": {"flying-robot-frame": .10},
-    "modules": {"productivity-module": .10, "speed-module": .10, "efficiency-module": .10,
-                "productivity-module-2": .05, "speed-module-2": .05, "efficiency-module-2": .05,
-                "productivity-module-3": .02, "speed-module-3": .02, "efficiency-module-3": .02},
+    # The archived group-four `%-module$` pattern selects the three Base
+    # tier-one modules a second time at .01; recipe/effect pairs are a
+    # multiset, not a recipe-keyed map.
+    "modules": [("productivity-module", .10), ("speed-module", .10), ("efficiency-module", .10),
+                ("productivity-module-2", .05), ("speed-module-2", .05), ("efficiency-module-2", .05),
+                ("productivity-module-3", .02), ("speed-module-3", .02), ("efficiency-module-3", .02),
+                ("productivity-module", .01), ("speed-module", .01), ("efficiency-module", .01)],
     "belts": {"transport-belt": .10, "underground-belt": .10, "splitter": .10,
               "fast-transport-belt": .05, "fast-underground-belt": .05, "fast-splitter": .05,
               "express-transport-belt": .02, "express-underground-belt": .02, "express-splitter": .02},
@@ -77,6 +81,10 @@ STREAM_KEYS = (
 SETTINGS = {"ips-require-space-gate": True, **{f"ips-enable-research_{key}": key != "inventory_capacity" for key in STREAM_KEYS}}
 
 
+def effect_items(effects):
+    return effects.items() if isinstance(effects, dict) else effects
+
+
 def py(value):
     if hasattr(value, "items"):
         items = list(value.items())
@@ -104,7 +112,7 @@ class MigrationOriginF200110SourceControls(unittest.TestCase):
                 "ingredients": ROW_INGREDIENTS[key],
                 "prerequisites": ROW_PREREQUISITES[key],
                 "effects": [{"type": "change-recipe-productivity", "recipe": recipe, "change": change}
-                            for recipe, change in recipes.items()],
+                            for recipe, change in effect_items(recipes)],
             }
         rows[ROBOT] = {"ingredients": SPACE, "prerequisites": SPACE,
                        "effects": [{"type": "worker-robot-battery", "modifier": .10}]}
@@ -114,7 +122,7 @@ class MigrationOriginF200110SourceControls(unittest.TestCase):
         rows = {}
         for name, expected in self.expected_rows().items():
             rows[name] = {
-                "type": "technology", "name": name, "upgrade": True, "max_level": "infinite", "enabled": True,
+                "type": "technology", "name": name, "upgrade": True, "max_level": "infinite",
                 "unit": {"count_formula": "8000 * 2^(L-1)", "time": 60,
                          "ingredients": [[pack, 1] for pack in expected["ingredients"]]},
                 "prerequisites": list(expected["prerequisites"]), "effects": copy.deepcopy(expected["effects"]),
@@ -201,6 +209,7 @@ class MigrationOriginF200110SourceControls(unittest.TestCase):
         wrong_effect = self.source_technology_raw(); wrong_effect["technology"][DIRECT]["effects"][0]["change"] = .05; data_variants.append(("gear-effect", wrong_effect, SETTINGS))
         foreign_effect = self.source_technology_raw(); foreign_effect["technology"][DIRECT]["effects"].append({"type": "change-recipe-productivity", "recipe": "foreign", "change": .10}); data_variants.append(("foreign-effect", foreign_effect, SETTINGS))
         raw_level = self.source_technology_raw(); raw_level["technology"][DIRECT]["level"] = 1; data_variants.append(("raw-level", raw_level, SETTINGS))
+        explicit_enabled = self.source_technology_raw(); explicit_enabled["technology"][DIRECT]["enabled"] = True; data_variants.append(("explicit-enabled", explicit_enabled, SETTINGS))
         missing_space = self.source_technology_raw(); missing_space["technology"][DIRECT]["prerequisites"].remove("space-science-pack"); data_variants.append(("space-prerequisite", missing_space, SETTINGS))
         ordinary_unit_gate = self.source_technology_raw(); ordinary_unit_gate["technology"][DIRECT]["unit"]["ingredients"].append(["space-science-pack", 1]); data_variants.append(("ordinary-unit-space", ordinary_unit_gate, SETTINGS))
         space_unit_missing = self.source_technology_raw(); space_unit_missing["technology"]["recipe-prod-research_belts-1"]["unit"]["ingredients"].pop(); data_variants.append(("space-unit-missing", space_unit_missing, SETTINGS))
@@ -244,7 +253,7 @@ class MigrationOriginF200110SourceControls(unittest.TestCase):
         self.assertIn('["ips-enable-research_breeding"] = true', text)
         self.assertIn('["ips-enable-research_inventory_capacity"] = false', text)
         self.assertEqual(31, len(self.expected_rows()))
-        self.assertEqual(72, sum(len(row["effects"]) for row in self.expected_rows().values()))
+        self.assertEqual(75, sum(len(row["effects"]) for row in self.expected_rows().values()))
 
     def test_settings_defaults_are_checked_only_in_the_settings_stage(self):
         settings_stage = (FIXTURE / "settings-final-fixes.lua").read_text(encoding="utf-8")
