@@ -349,6 +349,25 @@ class LifecycleTests(unittest.TestCase):
           assert(storage.mir_caps == nil and not foreign_disabled.enabled,
             "prototype admission re-enabled foreign disablement")
 
+          -- A foreign finite-cap baseline cannot gain restoration rights from
+          -- the separate authored-prototype policy after a native re-enable.
+          local cap_foreign = technology(name, 3, false)
+          local cap_foreign_force = force(37, {[name] = cap_foreign}, {}, nil, nil)
+          boot({[37] = cap_foreign_force}, 2)
+          handlers.init()
+          local foreign_saved = storage
+          assert(foreign_saved.mir_caps.owned_disabled[37][name].disabled == false)
+          cap_foreign.prototype.enabled, cap_foreign.enabled = false, true
+          boot({[37] = cap_foreign_force}, 2, "", foreign_saved)
+          handlers.configuration()
+          assert(not cap_foreign.enabled and storage.mir_caps.owned_disabled[37][name].disabled == false)
+          foreign_saved = storage
+          cap_foreign.prototype.enabled = true
+          boot({[37] = cap_foreign_force}, 0, "", foreign_saved)
+          handlers.configuration()
+          assert(not cap_foreign.enabled and storage.mir_caps == nil,
+            "authored policy promoted a foreign cap baseline into restoration rights")
+
           -- A finite cap right remains owned while the prototype is disabled;
           -- once it is admitted at a non-over-cap level, normal cap recovery
           -- restores that same recorded right.
@@ -552,16 +571,17 @@ class LifecycleTests(unittest.TestCase):
             {["ips-max-level-research_low_density_structure"] = 2})
           handlers.init()
           assert(not foreign.enabled and foreign.visible_when_disabled
-            and storage.mir_caps.owned_disabled[48][name].disabled == nil)
+            and storage.mir_caps.owned_disabled[48][name].disabled == false)
           assert_queue(foreign_force, foreign_queue, .27, "initial foreign cap changed queue/progress")
 
           saved = storage
           foreign.prototype.effects = {second, first}
+          foreign.enabled = true -- Native reconfiguration exposes the row again.
           boot({[48] = foreign_force}, 0, "", saved, nil, 0, {['space-age'] = '2.1.23'}, nil,
             {["ips-max-level-research_low_density_structure"] = 2})
           handlers.configuration()
           assert(not foreign.enabled and foreign.visible_when_disabled and storage.mir_caps
-            and storage.mir_caps.owned_disabled[48][name].disabled == nil,
+            and storage.mir_caps.owned_disabled[48][name].disabled == false,
             "effect permutation changed foreign native disablement ownership")
           assert_queue(foreign_force, foreign_queue, .27, "permuted foreign owner changed queue/progress")
 
@@ -817,7 +837,7 @@ class LifecycleTests(unittest.TestCase):
           assert(not gear.enabled and gear.visible_when_disabled)
           assert(not worker.enabled and worker.visible_when_disabled)
           assert(not foreign.enabled and foreign.visible_when_disabled)
-          assert(storage.mir_caps.owned_disabled[32][gear_name].disabled == nil,
+          assert(storage.mir_caps.owned_disabled[32][gear_name].disabled == false,
             "foreign disablement was claimed by MIR")
 
           gear.level = 2
@@ -845,7 +865,7 @@ class LifecycleTests(unittest.TestCase):
           boot({[7] = source, [8] = destination}, 10)
           handlers.init()
           assert(not foreign.enabled and foreign.visible_when_disabled, "cap did not preserve foreign disablement")
-          assert(storage.mir_caps.owned_disabled[7][name].disabled == nil,
+          assert(storage.mir_caps.owned_disabled[7][name].disabled == false,
             "unexpected foreign disable ownership: " .. tostring(storage.mir_caps.owned_disabled[7][name].disabled))
           local saved_storage = storage
           boot({[7] = source, [8] = destination}, 0, "", saved_storage)
@@ -912,7 +932,7 @@ class LifecycleTests(unittest.TestCase):
           boot({[13] = foreign_force}, 0, "", nil, nil, 10)
           handlers.init()
           assert(not foreign.enabled and foreign.visible_when_disabled)
-          assert(storage.mir_caps.owned_disabled[13][owner].disabled == nil)
+          assert(storage.mir_caps.owned_disabled[13][owner].disabled == false)
           saved_storage = storage
           boot({[13] = foreign_force}, 0, "", saved_storage, nil, 0)
           handlers.configuration()

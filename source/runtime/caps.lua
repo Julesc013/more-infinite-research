@@ -142,27 +142,31 @@ function M.reconcile(force, limits, owned_disabled, targets)
     local level = valid_level(technology)
     if technology and limit > 0 and level and level > limit then
       local record = owned and owned[name]
+      local previously_observed = type(record) == "table"
+      owned, record = ensure_record(owned_disabled, force.index, owned, name)
+      if record.disabled == nil then
+        -- A legacy visibility-only row already proves foreign disablement.
+        -- Record the first baseline once: native resets/reconfiguration can
+        -- re-enable this row while the same finite cap is still in force.
+        record.disabled = not previously_observed and technology.enabled == true
+      end
       if technology.visible_when_disabled ~= true then
-        owned, record = ensure_record(owned_disabled, force.index, owned, name)
         if record.visible_when_disabled == nil then
           record.visible_when_disabled = technology.visible_when_disabled == true
         end
         technology.visible_when_disabled = true
       end
-      if technology.enabled then
-        owned, record = ensure_record(owned_disabled, force.index, owned, name)
-        record.disabled = true
-        technology.enabled = false
-      end
+      if technology.enabled then technology.enabled = false end
     elseif technology and owned and type(owned[name]) == "table" then
       local record = owned[name]
-      -- An explicit MIR record proves this module performed the prior
-      -- enabled-to-disabled transition. Pre-disabled foreign technologies
-      -- never gain this record and therefore remain disabled on relaxation.
+      -- Only disabled=true grants an enablement-restoration right. False
+      -- retains the observed foreign baseline across native re-enablement;
+      -- later reconciliations must never turn it into a MIR-owned transition.
       if record.visible_when_disabled ~= nil then
         technology.visible_when_disabled = record.visible_when_disabled
       end
-      if record.disabled == true then technology.enabled = true end
+      if record.disabled == true and technology.enabled ~= true then technology.enabled = true
+      elseif record.disabled == false and technology.enabled ~= false then technology.enabled = false end
       owned[name] = nil
     end
   end
