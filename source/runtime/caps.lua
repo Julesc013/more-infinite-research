@@ -5,9 +5,9 @@
 --     disabled = true,
 --     visible_when_disabled = false
 --   }
--- Each field records a state this module actually changed. `disabled` is the
--- sole authority for re-enabling a technology later; visibility can be owned
--- independently for a technology that was already disabled by another mod.
+-- `disabled=true` records MIR's enablement-restoration right; false preserves
+-- the first foreign-disabled baseline. Visibility records the prior value
+-- only when MIR changes it and can be owned independently of enablement.
 -- This module deliberately has no settings, event, prototype, or Generator
 -- dependency.  The caller supplies a small limits map where 0 means unlimited.
 local M = {}
