@@ -29,10 +29,10 @@ CURRENT_SOURCE_TREE = "79b73a6a8e68987737e69bf2d95ec6555b49f901"
 CURRENT_MIR_ARCHIVE = "E3A65C08AC7798A66FB1BE30D24307B17C8B366DD901953BDE2A09BD6939C8CE"
 CURRENT_MIR_BYTES = 679250
 CURRENT_MIR_NAME = "more-infinite-research_5.0.21000.zip"
-HELD_FLAGS_FIXED_SOURCE = "6786c95704fdd6b7a8fcee645c375f54ac8d03da"
-HELD_FLAGS_FIXED_SOURCE_TREE = "b6857d3774ffd792f82f5bb3ee38b312abedc7b4"
-HELD_FLAGS_FIXED_MIR_ARCHIVE = "59C14208B200CC534353CD46391210FE0B53E4C5739FFE8A3633B5D82DEE8C47"
-HELD_FLAGS_FIXED_MIR_BYTES = 679575
+HELD_FLAGS_FIXED_SOURCE = "98fbdd33fe47eb678a5e1aaf17fee903eba2a22a"
+HELD_FLAGS_FIXED_SOURCE_TREE = "ffc5f2e3359de4f326a184cf6a3c29a55941150a"
+HELD_FLAGS_FIXED_MIR_ARCHIVE = "58F04FB9D417F2726835F4A6740490DE3C1841665DAC81C2BA3DFA94050D9457"
+HELD_FLAGS_FIXED_MIR_BYTES = 679860
 HELD_FLAGS_SOURCE_PROFILE = PROFILES / "k2-imersite-held-public-flags-source-f210.json"
 HELD_FLAGS_FIXED_PROFILE = PROFILES / "k2-imersite-held-public-flags-fixed-f210.json"
 HELD_FLAGS_INPUT_REVISION = "a9754abcd7405e1ddffa9f4dc8051b71d00855fe"
@@ -644,7 +644,7 @@ class K2ImersiteTransitionFixtureTests(unittest.TestCase):
               tail_visible=foreign.technologies[tail].visible_when_disabled}}
         ''')
 
-    def test_held_public_flags_profiles_pin_e3a_source_and_6786_fixed_successor(self):
+    def test_held_public_flags_profiles_pin_e3a_source_and_reviewed_fixed_successor(self):
         source = json.loads(HELD_FLAGS_SOURCE_PROFILE.read_text(encoding="utf-8"))
         fixed = json.loads(HELD_FLAGS_FIXED_PROFILE.read_text(encoding="utf-8"))
         for stage, profile, fixture_version in (("source", source, "0.1.0"), ("fixed", fixed, "0.2.0")):
