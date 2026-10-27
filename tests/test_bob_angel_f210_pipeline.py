@@ -242,6 +242,12 @@ class BobAngelF210PipelineTests(unittest.TestCase):
                 partial_mods = deepcopy(source["selection"])
                 partial_mods.pop("bobtech")
                 partial = self._setting_rows(self.stage(case, mods=partial_mods))
+                expected_names = {
+                    f"{prefix}research_material_{family}"
+                    for family in BOB_ANGEL_MATERIAL_FAMILIES
+                    for prefix in MATERIAL_SETTING_PREFIXES
+                }
+                self.assertEqual(140, len(expected_names))
                 for family in BOB_ANGEL_MATERIAL_FAMILIES:
                     for prefix in MATERIAL_SETTING_PREFIXES:
                         name = f"{prefix}research_material_{family}"
