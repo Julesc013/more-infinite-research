@@ -91,6 +91,7 @@
           "path": "spec/inventory/modern-f210-470.json",
           "sha256": "C37027F17D4F02C50C664739B242D62E29AAE0C68079450FCBA95499DC7EFB79",
           "profile": "space-age-f210",
+          "published_mir_version": "4.7.21000",
           "row_sha256": "7E0E2EEDF6D80F5BD1C0159D4E8CAC60BC85F8442F1951D0B3157A3D0B74D8D9"
         },
         "q010_b6_progression": {
@@ -191,13 +192,13 @@
     "scope": "Data/settings expected-output preparation only; no candidate capture supplies expected values.",
     "effect_order_representation": {
       "status": "reviewed-finite-representation-not-a-semantic-allowance",
-      "rule": "For each named q010 B6 technology, select the independent unmodded F210 Space Age B6 seed recipe names that are present in the complete B6 payload, retain that seed order, then append the remaining B6 payload recipes in canonical name order. Preserve every B6 effect object, multiplicity and non-effect technology field exactly. Current player output is compared only after this expected sequence is complete.",
+      "rule": "For each named q010 B6 technology, select the independent original fixed unmodded F210 Space Age 4.7.21000 seed recipe names that are present in the complete q010 B6 payload, retain that seed order, then append the remaining q010 B6 payload recipes in canonical name order. Preserve every q010 B6 effect object, multiplicity and non-effect technology field exactly. Current player output is compared only after this expected sequence is complete.",
       "unmodded_space_age_base_inventory": {
         "path": "spec/inventory/modern-f210-470.json",
         "sha256": "C37027F17D4F02C50C664739B242D62E29AAE0C68079450FCBA95499DC7EFB79",
         "bytes": 7874747,
         "profile": "space-age-f210",
-        "published_mir_version": "4.7.21003",
+        "published_mir_version": "4.7.21000",
         "engine_base_version": "2.1.23"
       },
       "combined_b6_payload_captures": [
@@ -6046,7 +6047,7 @@
         "published_non_effect_fields_sha256": "2D8EB506325F7F6DB6CC73DEC4379F6C262F0191BEDA66C62A79D3ACE0CDFD8B",
         "published_effect_multiset_sha256": "FF61CEE9900892CB66DD3DD9AF835ADF5A79A043CDCC9C4BB185B820CA9CE78A"
       },
-      "reason": "The independently captured q010 B6 technology payload is retained exactly. Its effect presentation is reconstructed as the independent unmodded F210 Space Age B6 static seed prefix followed by the remaining B6 recipes in canonical name order; this is a finite declared sequence representation, not a candidate-derived allowance or payload change."
+      "reason": "The independently captured q010 B6 technology payload is retained exactly. Its effect presentation is reconstructed as the independent original fixed unmodded F210 Space Age 4.7.21000 static seed prefix followed by the remaining q010 B6 recipes in canonical name order; this is a finite declared sequence representation, not a candidate-derived allowance or payload change."
     },
     {
       "id": "BA-F210-EFFECT-ORDER-RECONSTRUCT-COPPER-1",
@@ -6156,7 +6157,7 @@
         "published_non_effect_fields_sha256": "475958E316C3DFAAC6DC41E3348009A28CC16901CD65BBDC3CEACFF26A910BDE",
         "published_effect_multiset_sha256": "2AFD36E7A86E37B9CDDDC3775A0BB8F5D3CAF0FD3776C55C2316F5118D1CBD60"
       },
-      "reason": "The independently captured q010 B6 technology payload is retained exactly. Its effect presentation is reconstructed as the independent unmodded F210 Space Age B6 static seed prefix followed by the remaining B6 recipes in canonical name order; this is a finite declared sequence representation, not a candidate-derived allowance or payload change."
+      "reason": "The independently captured q010 B6 technology payload is retained exactly. Its effect presentation is reconstructed as the independent original fixed unmodded F210 Space Age 4.7.21000 static seed prefix followed by the remaining q010 B6 recipes in canonical name order; this is a finite declared sequence representation, not a candidate-derived allowance or payload change."
     },
     {
       "id": "BA-F210-EFFECT-ORDER-RECONSTRUCT-COPPER-CABLE-1",
@@ -6259,7 +6260,7 @@
         "published_non_effect_fields_sha256": "5A192466D5B97E6D895EA822EE8EA0BB1387D98D1EAA6A5EAE0D23D7BC42F389",
         "published_effect_multiset_sha256": "04B80271AF7552485592E5C56687D706F1778B63B300891D130CC10FCE82B5A5"
       },
-      "reason": "The independently captured q010 B6 technology payload is retained exactly. Its effect presentation is reconstructed as the independent unmodded F210 Space Age B6 static seed prefix followed by the remaining B6 recipes in canonical name order; this is a finite declared sequence representation, not a candidate-derived allowance or payload change."
+      "reason": "The independently captured q010 B6 technology payload is retained exactly. Its effect presentation is reconstructed as the independent original fixed unmodded F210 Space Age 4.7.21000 static seed prefix followed by the remaining q010 B6 recipes in canonical name order; this is a finite declared sequence representation, not a candidate-derived allowance or payload change."
     },
     {
       "id": "BA-F210-EFFECT-ORDER-RECONSTRUCT-EXPLOSIVES-1",
@@ -6367,7 +6368,7 @@
         "published_non_effect_fields_sha256": "A61A4D585D79AD659106F5E53665B439300A7E68F2D7D093948D74974D3CA595",
         "published_effect_multiset_sha256": "E12870D0045E2FAAA77C33E113B3124BEE38F3766EC4EB2BBDE5810B062B9A16"
       },
-      "reason": "The independently captured q010 B6 technology payload is retained exactly. Its effect presentation is reconstructed as the independent unmodded F210 Space Age B6 static seed prefix followed by the remaining B6 recipes in canonical name order; this is a finite declared sequence representation, not a candidate-derived allowance or payload change."
+      "reason": "The independently captured q010 B6 technology payload is retained exactly. Its effect presentation is reconstructed as the independent original fixed unmodded F210 Space Age 4.7.21000 static seed prefix followed by the remaining q010 B6 recipes in canonical name order; this is a finite declared sequence representation, not a candidate-derived allowance or payload change."
     },
     {
       "id": "BA-F210-EFFECT-ORDER-RECONSTRUCT-HEAVY-AMMO-1",
@@ -6548,7 +6549,7 @@
         "published_non_effect_fields_sha256": "2D09B06B66E11D6644973B2D48C3D757524FD83566D94EA23EBFAA39B67A91B2",
         "published_effect_multiset_sha256": "EB0FB065EC74345B550883802BC701F7B36D6EDF3F8F9081AD86E2CADB024AC2"
       },
-      "reason": "The independently captured q010 B6 technology payload is retained exactly. Its effect presentation is reconstructed as the independent unmodded F210 Space Age B6 static seed prefix followed by the remaining B6 recipes in canonical name order; this is a finite declared sequence representation, not a candidate-derived allowance or payload change."
+      "reason": "The independently captured q010 B6 technology payload is retained exactly. Its effect presentation is reconstructed as the independent original fixed unmodded F210 Space Age 4.7.21000 static seed prefix followed by the remaining q010 B6 recipes in canonical name order; this is a finite declared sequence representation, not a candidate-derived allowance or payload change."
     },
     {
       "id": "BA-F210-EFFECT-ORDER-RECONSTRUCT-INSERTERS-1",
@@ -6719,7 +6720,7 @@
         "published_non_effect_fields_sha256": "A0BEB5E73F774B353C9C80E7AACAE83C440DD1528C1F1182D3CB8321BB28BA34",
         "published_effect_multiset_sha256": "F077D8596BBEF7F23353932246C8A2126BC93B620E81BCD0A50EB540D698571B"
       },
-      "reason": "The independently captured q010 B6 technology payload is retained exactly. Its effect presentation is reconstructed as the independent unmodded F210 Space Age B6 static seed prefix followed by the remaining B6 recipes in canonical name order; this is a finite declared sequence representation, not a candidate-derived allowance or payload change."
+      "reason": "The independently captured q010 B6 technology payload is retained exactly. Its effect presentation is reconstructed as the independent original fixed unmodded F210 Space Age 4.7.21000 static seed prefix followed by the remaining q010 B6 recipes in canonical name order; this is a finite declared sequence representation, not a candidate-derived allowance or payload change."
     },
     {
       "id": "BA-F210-EFFECT-ORDER-RECONSTRUCT-IRON-1",
@@ -6829,7 +6830,7 @@
         "published_non_effect_fields_sha256": "88757D298F0D5F6C1A5FA34DBD892D74B7C975095F5B83D2D4FE228DBE182891",
         "published_effect_multiset_sha256": "CA10EDB3E41D786906BAB2074153245F993BB55DF9D4C5079BAB09FB108045D6"
       },
-      "reason": "The independently captured q010 B6 technology payload is retained exactly. Its effect presentation is reconstructed as the independent unmodded F210 Space Age B6 static seed prefix followed by the remaining B6 recipes in canonical name order; this is a finite declared sequence representation, not a candidate-derived allowance or payload change."
+      "reason": "The independently captured q010 B6 technology payload is retained exactly. Its effect presentation is reconstructed as the independent original fixed unmodded F210 Space Age 4.7.21000 static seed prefix followed by the remaining q010 B6 recipes in canonical name order; this is a finite declared sequence representation, not a candidate-derived allowance or payload change."
     },
     {
       "id": "BA-F210-EFFECT-ORDER-RECONSTRUCT-LANDFILL-1",
@@ -6942,7 +6943,7 @@
         "published_non_effect_fields_sha256": "15CF6DFF6007AE4AF96299CA53C69043DBDC3221C46A49F1DA83EE4912B7A5AB",
         "published_effect_multiset_sha256": "341201078CB6ACCD09D528F358DE1BD08C626C71B8FC4D518BB434E4127F97B7"
       },
-      "reason": "The independently captured q010 B6 technology payload is retained exactly. Its effect presentation is reconstructed as the independent unmodded F210 Space Age B6 static seed prefix followed by the remaining B6 recipes in canonical name order; this is a finite declared sequence representation, not a candidate-derived allowance or payload change."
+      "reason": "The independently captured q010 B6 technology payload is retained exactly. Its effect presentation is reconstructed as the independent original fixed unmodded F210 Space Age 4.7.21000 static seed prefix followed by the remaining q010 B6 recipes in canonical name order; this is a finite declared sequence representation, not a candidate-derived allowance or payload change."
     },
     {
       "id": "BA-F210-EFFECT-ORDER-RECONSTRUCT-MODULES-1",
@@ -7274,7 +7275,7 @@
         "published_non_effect_fields_sha256": "23B96DBE1B555F3A33F18CDDB86F7F7D0A75ED0DB0F8E9D52EF453C0CFA95382",
         "published_effect_multiset_sha256": "E1FCD73C1AD8951702DC582518C6C6ABB04B351CB0D64A7F8504DED146DBC8B4"
       },
-      "reason": "The independently captured q010 B6 technology payload is retained exactly. Its effect presentation is reconstructed as the independent unmodded F210 Space Age B6 static seed prefix followed by the remaining B6 recipes in canonical name order; this is a finite declared sequence representation, not a candidate-derived allowance or payload change."
+      "reason": "The independently captured q010 B6 technology payload is retained exactly. Its effect presentation is reconstructed as the independent original fixed unmodded F210 Space Age 4.7.21000 static seed prefix followed by the remaining q010 B6 recipes in canonical name order; this is a finite declared sequence representation, not a candidate-derived allowance or payload change."
     },
     {
       "id": "BA-F210-ADDITION-OIL-CRACKING-SAVED-IDENTITY",
@@ -7600,7 +7601,7 @@
         "upgrade": true
       },
       "independent_before_sha256": "7E0E2EEDF6D80F5BD1C0159D4E8CAC60BC85F8442F1951D0B3157A3D0B74D8D9",
-      "reason": "The unmodded F210 Space Age B6 family supplies the complete technology body, tuning, captions, icons, level, order and static 12-recipe seed. The independently captured q010 B6 research-speed-7 supplies only its 14-pack unit progression and 16 prerequisites. COMP-02 selects all concrete non-hidden, non-denied item producers of q010 upstream lab inputs, preserving the static seed order before the canonical 15-recipe suffix."
+      "reason": "The original fixed unmodded F210 Space Age 4.7.21000 family supplies the complete technology body, tuning, captions, icons, level, order and static 12-recipe seed. The independently captured q010 B6 research-speed-7 supplies only its 14-pack unit progression and 16 prerequisites. COMP-02 selects all concrete non-hidden, non-denied item producers of q010 upstream lab inputs, preserving the static seed order before the canonical 15-recipe suffix."
     }
   ],
   "must_match_without_exception": {

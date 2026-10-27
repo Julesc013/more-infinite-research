@@ -7,10 +7,12 @@ doubles. They prepare a native scenario only; they do not execute Factorio.
 from __future__ import annotations
 
 import argparse
+import hashlib
 import importlib.util
 import json
 from pathlib import Path
 import shutil
+import subprocess
 import sys
 import tempfile
 import unittest
@@ -23,6 +25,13 @@ NAME = "mir-fixture-mir5-native-owner-cap-order"
 ENGINE_SHA = "FE4A1DA30F322A0D0B8AEB3DF7276332222BAAA143E2352569B723E84B2B9060"
 OBSERVER_SHA = "2E1BE5952D2A4CC5C74A0D149E075D247BA110A3FAE5B6768D3EAEBABCEF989C"
 MIR_SHA = "E3A65C08AC7798A66FB1BE30D24307B17C8B366DD901953BDE2A09BD6939C8CE"
+INPUT_REVISION = "5a40aa5e0c3e04b1609280fa176a423bc3fffd8e"
+INPUT_RECEIPT = ROOT / "spec/evidence/native-owner-cap-order-inputs-5a40aa5e.json"
+FIXTURE_SHAS = {
+    "canonical": "C9E3D957315A5944850226265C59018368A6FB7F89EF2125308472089B9EB3C7",
+    "permuted": "82DE9C6A610E3D633B979C81987986AE129D304E67A7BB158684B551E44B5BD1",
+    "relaxed": "E0B7107C14300D0D93282BA20CDABE38120DAEDB967586731F25A9BFCDB93333",
+}
 STAGES = {
     "canonical": ("0.1.0", 1, ("steel-plate", "casting-steel")),
     "permuted": ("0.2.0", 1, ("casting-steel", "steel-plate")),
@@ -142,8 +151,10 @@ function cap_order_flow(common_path, canonical_path, permuted_path, relaxed_path
     end})
     local probe={name="automation",valid=true,level=1,researched=false,enabled=true,visible_when_disabled=false,saved_progress=0,
       prototype={max_level=1,effects={}}}
+    local prerequisite={name="automation-science-pack",valid=true,researched=false,enabled=true}
     local value={name=name,index=index,valid=true,technologies={["steel-plate-productivity"]=owner,automation=probe},
       recipes={ ["steel-plate"]={productivity_bonus=0},["casting-steel"]={productivity_bonus=0}},research_queue={},research_progress=0,owned=owned}
+    value.technologies["automation-science-pack"]=prerequisite
     function value.enable_all_prototypes() end
     function value.reset_technology_effects()
       resets=resets+1
@@ -160,6 +171,7 @@ function cap_order_flow(common_path, canonical_path, permuted_path, relaxed_path
     end
     function value.add_research(technology)
       if technology==nil or technology.enabled~=true or value.current_research~=nil then return false end
+      if technology==probe and (probe.researched or not prerequisite.researched) then return false end
       value.current_research=technology;value.research_queue={technology};value.research_progress=technology.saved_progress or 0
       technology.saved_progress=0;return true
     end
@@ -296,14 +308,41 @@ end
                 self.assertEqual([(name, version if name != NAME else STAGES[stage][0]) for name, version in expected],
                                  [(row["name"], row["version"]) for row in profile["mods"]])
                 self.assertEqual({"mir-fixture-mir5-active-mods-observer_0.1.0.zip",
-                                  "more-infinite-research_5.0.21000.zip"}, set(profile["archive_sha256"]))
+                                  "more-infinite-research_5.0.21000.zip", f"{NAME}_{version}.zip"},
+                                 set(profile["archive_sha256"]))
                 self.assertEqual(OBSERVER_SHA, profile["archive_sha256"]["mir-fixture-mir5-active-mods-observer_0.1.0.zip"])
                 self.assertEqual(MIR_SHA, profile["archive_sha256"]["more-infinite-research_5.0.21000.zip"])
+                self.assertEqual(FIXTURE_SHAS[stage], profile["archive_sha256"][f"{NAME}_{version}.zip"])
                 self.assertEqual((NAME, version, "2.1"), (info["name"], info["version"], info["factorio_version"]))
                 self.assertIn("pending", profile["scope"])
                 self.assertIn("b251ae7a", profile["scope"])
                 self.assertIn(str(cap), (FIXTURE / "fixture_settings.lua").read_text(encoding="utf-8"))
                 self.assertEqual(2, len(recipes))
+
+    def test_prepared_inputs_bind_every_raw_git_alias_without_native_or_saved_state_claims(self):
+        receipt = json.loads(INPUT_RECEIPT.read_bytes())
+        self.assertEqual("MIR5NativeOwnerCapOrderPreparedInputsV1", receipt["kind"])
+        self.assertEqual(INPUT_REVISION, receipt["fixture_source_commit"])
+        for field in ("native_execution", "library_mutation", "lab_completion", "release_qualification"):
+            self.assertIs(receipt[field], False)
+        self.assertIn("pending", receipt["saved_input_hashes"])
+        self.assertEqual(list(STAGES), [row["stage"] for row in receipt["stages"]])
+        for row in receipt["stages"]:
+            stage, version = row["stage"], STAGES[row["stage"]][0]
+            self.assertEqual((version, FIXTURE_SHAS[stage]), (row["version"], row["sha256"]))
+            self.assertEqual(7, len(row["members"]))
+            expected = {name: f"tests/fixtures/native-owner-cap-order/{stage}/{name}"
+                        for name in ("info.json", "control.lua", "data-final-fixes.lua", "settings-updates.lua")}
+            expected.update({name: f"tests/fixtures/native-owner-cap-order/{name}"
+                             for name in ("fixture_control.lua", "fixture_data_final.lua", "fixture_settings.lua")})
+            self.assertEqual(expected, {member["path"]: member["source_path"] for member in row["members"]})
+            for member in row["members"]:
+                raw = subprocess.check_output(["git", "show", "HEAD:" + member["source_path"]], cwd=ROOT)
+                self.assertEqual((member["sha256"], member["bytes"]),
+                                 (hashlib.sha256(raw).hexdigest().upper(), len(raw)))
+        helper = receipt["package_tool"]
+        raw_helper = subprocess.check_output(["git", "show", "HEAD:" + helper["path"]], cwd=ROOT)
+        self.assertEqual(helper["sha256"], hashlib.sha256(raw_helper).hexdigest().upper())
 
     def test_data_stages_preflight_before_only_the_permuted_fixture_write(self):
         for stage, (_, cap, recipes) in STAGES.items():
@@ -366,6 +405,23 @@ end
                                                result["foreign"]["technologies"]["steel-plate-productivity"]["visible_when_disabled"],
                                                result["foreign"]["research_progress"]))
         self.assertEqual("relaxed-complete", result["storage"]["mir5_native_owner_cap_order"]["phase"])
+
+    def test_foreign_queue_requires_the_named_native_prerequisite_without_changing_saved_investment(self):
+        original = (FIXTURE / "fixture_control.lua").read_text(encoding="utf-8")
+        old = original.replace("  prerequisite.researched = true\n", "")
+        self.assertNotEqual(original, old)
+        with tempfile.TemporaryDirectory() as temporary:
+            path = Path(temporary) / "missing-prerequisite.lua"
+            path.write_text(old, encoding="utf-8", newline="\n")
+            refused = self._flow(control_path=path)
+        self.assertFalse(refused["ok"])
+        self.assertIn("could not queue foreign probe", refused["message"])
+        self.assertEqual(0, refused["saves"])
+        passed = self._flow()
+        self.assertTrue(passed["ok"], passed["message"])
+        self.assertTrue(passed["foreign"]["technologies"]["automation-science-pack"]["researched"])
+        self.assertFalse(passed["foreign"]["technologies"]["automation"]["researched"])
+        self.assertEqual(.42, passed["foreign"]["research_progress"])
 
     def test_transition_refuses_effect_drift_skipped_stage_corrupted_saved_state_and_foreign_enablement(self):
         for opponent, phrase in (("wrong-effect", "effect differs"), ("seed-skip", "required prior"), ("skipped-transition", "required prior"),

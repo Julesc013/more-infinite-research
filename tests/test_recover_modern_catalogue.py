@@ -266,7 +266,7 @@ def _capture(root: Path, raw: dict, settings: dict, *, published: bool,
 
 class ModernCatalogueTests(unittest.TestCase):
     def test_bob_angel_f210_effect_order_dispositions_reconstruct_only_nine_complete_b6_rows(self):
-        """B6 supplies payloads; unmodded Base supplies only the static prefix order."""
+        """q010 B6 supplies payloads; fixed unmodded4.7.21000 supplies only static prefix order."""
         intent_path = ROOT / "spec/inventory/bob-angel-f210-intent-r01.json"
         intent = json.loads(intent_path.read_text(encoding="utf-8"))
         provenance = intent["provenance"]["effect_order_representation"]
@@ -295,6 +295,11 @@ class ModernCatalogueTests(unittest.TestCase):
         )
 
         base_inventory = json.loads(base_inventory_path.read_text(encoding="utf-8"))
+        self.assertEqual(
+            base_inventory["source"]["published_version"],
+            provenance["unmodded_space_age_base_inventory"]["published_mir_version"],
+        )
+        self.assertEqual(base_inventory["source"]["published_version"], "4.7.21000")
         profile = catalogue._inventory_profile(base_inventory, "space-age-f210")
         base_rows = {
             row["name"]: row["row"]
@@ -308,6 +313,18 @@ class ModernCatalogueTests(unittest.TestCase):
         }
         self.assertEqual(set(reviewed), set(F210_BOB_ANGEL_EFFECT_ORDER_IDS))
         self.assertEqual(len(intent["differences"]), 160)
+        expected_candidate_fingerprints = [
+            {
+                "id": row["id"],
+                "expected_candidate": row.get("expected_candidate"),
+                "independent_before_sha256": row.get("independent_before_sha256"),
+            }
+            for row in intent["differences"]
+        ]
+        self.assertEqual(
+            _canonical_hash(expected_candidate_fingerprints),
+            "3164C44D11D4F249948A8A1A00BCFF394546E20E91B9FDEBEDDC4AB50D29819B",
+        )
         self.assertNotIn(
             "BA-F210-EFFECT-ORDER-UNRESOLVED",
             {row["id"] for row in intent["unresolved_categories"]},
@@ -396,6 +413,16 @@ class ModernCatalogueTests(unittest.TestCase):
         intent_path = ROOT / "spec/inventory/bob-angel-f210-intent-r01.json"
         intent = json.loads(intent_path.read_text(encoding="utf-8"))
         provenance = intent["provenance"]["addition_contracts"]
+        self.assertEqual(
+            {
+                "oil_cracking_saved_identity": provenance["oil_cracking_saved_identity"]["expected_row_sha256"],
+                "science_pack_productivity": provenance["science_pack_productivity"]["expected_row_sha256"],
+            },
+            {
+                "oil_cracking_saved_identity": "06ACB52331F062C4D40A73252D890592E831AEFCDA140AF605681FFCCEAB23C3",
+                "science_pack_productivity": "70707E8F7368145F3286F77F6E6435419EAB0CDF3B6FD843962DD767DFCCB95B",
+            },
+        )
         records = {
             row["name"]: row
             for row in intent["differences"]
@@ -441,6 +468,11 @@ class ModernCatalogueTests(unittest.TestCase):
             science_provenance["unmodded_f210_body"]["sha256"],
         )
         base_inventory = json.loads(body_path.read_text(encoding="utf-8"))
+        self.assertEqual(
+            base_inventory["source"]["published_version"],
+            science_provenance["unmodded_f210_body"]["published_mir_version"],
+        )
+        self.assertEqual(base_inventory["source"]["published_version"], "4.7.21000")
         profile = catalogue._inventory_profile(
             base_inventory, science_provenance["unmodded_f210_body"]["profile"]
         )

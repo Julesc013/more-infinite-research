@@ -18,6 +18,23 @@ HOLDER = "mir-k2-imersite-staged-state-1"
 CARRIER = "mir-k2-imersite-continuation-state-4"
 POWDER = "kr-imersite-powder"
 ENGINE_SHA = "FE4A1DA30F322A0D0B8AEB3DF7276332222BAAA143E2352569B723E84B2B9060"
+CURRENT_FREEZE = ROOT / "spec/evidence/current-assets-b251ae7a-aero-readback.json"
+CURRENT_SOURCE = "b251ae7a54104ace87cb0da4cf531cf53f03c93d"
+CURRENT_SOURCE_TREE = "79b73a6a8e68987737e69bf2d95ec6555b49f901"
+CURRENT_MIR_ARCHIVE = "E3A65C08AC7798A66FB1BE30D24307B17C8B366DD901953BDE2A09BD6939C8CE"
+CURRENT_MIR_BYTES = 679250
+CURRENT_MIR_NAME = "more-infinite-research_5.0.21000.zip"
+OBSERVER_ARCHIVE = "mir-fixture-mir5-active-mods-observer_0.1.0.zip"
+EXTERNAL_ARCHIVES = {
+    "flib_0.17.2.zip": "0A48C15DC0FC6C13BB3FE8293BA6CB35A07F3B0F37D37ACB50AB30E32E8E019D",
+    "k2so-assets_1.0.7.zip": "C3E11214407B08120B2EE717405D3B0398F533647695AB2E6EF6DF9267D62017",
+    "Krastorio2_2.1.4.zip": "9E5A56AC52BA0DD96A2D9FFBEFB8B242270EC946159D3DBED77B24B3C1C7147E",
+    "Krastorio2-spaced-out_2.0.19.zip": "8FCA3A3C202DD4939D5D85ACE93BE775CEDFE3D02FBDAF9DB78B77883B2C662B",
+    "Krastorio2Assets_2.1.0.zip": "39EF950EC8B21A40357DD0240EF8389501EE75CCA82717F2773B98554DA46E29",
+    "Krastorio2MenuSimulations_2.1.0.zip": "3A485B449B356DC4B3EB4233DE4E803B3A001259FBC251BDC9F9D9120B3C53A7",
+    "xy-k2so-enhancements-nulls-fork_0.8.3.zip": "930F43B96B04012FEF090C40D8B16A6B3F259D1713C86CF59DFF3E9A5A97E2BE",
+    OBSERVER_ARCHIVE: "2E1BE5952D2A4CC5C74A0D149E075D247BA110A3FAE5B6768D3EAEBABCEF989C",
+}
 MIR_ARCHIVES = {
     "4.6.21000": "B376C9A67651894F10A71A29110131B7D7490326A818360B10FE9595DBDFB1BB",
     "4.7.21002": "A4BB8F47232C689B267EF434F557187A8795C47280FA464169DE917FB579517F",
@@ -158,12 +175,6 @@ class K2ImersiteTransitionFixtureTests(unittest.TestCase):
         )
 
     def test_exact_profiles_pin_the_three_stage_k2so_closure(self):
-        expected_external = {
-            "flib_0.17.2.zip", "k2so-assets_1.0.7.zip", "Krastorio2_2.1.4.zip",
-            "Krastorio2-spaced-out_2.0.19.zip", "Krastorio2Assets_2.1.0.zip",
-            "Krastorio2MenuSimulations_2.1.0.zip", "xy-k2so-enhancements-nulls-fork_0.8.3.zip",
-            "mir-fixture-mir5-active-mods-observer_0.1.0.zip",
-        }
         for stage, (mir, fixture) in STAGES.items():
             with self.subTest(stage=stage):
                 profile = json.loads((PROFILES / f"k2-imersite-transition-{stage}-f210.json").read_text(encoding="utf-8"))
@@ -176,18 +187,18 @@ class K2ImersiteTransitionFixtureTests(unittest.TestCase):
                 self.assertEqual(fixture, mods["mir-fixture-mir5-k2-imersite-transition"])
                 self.assertEqual("2.0.19", mods["Krastorio2-spaced-out"])
                 self.assertEqual("1.0.7", mods["k2so-assets"])
-                self.assertEqual(expected_external, set(profile["archive_sha256"]))
+                archives = profile["archive_sha256"]
+                external = {name: digest for name, digest in archives.items() if name != CURRENT_MIR_NAME}
+                self.assertEqual(EXTERNAL_ARCHIVES, external)
+                if stage == "mir5":
+                    self.assertEqual(CURRENT_MIR_ARCHIVE, archives[CURRENT_MIR_NAME])
+                else:
+                    self.assertNotIn(CURRENT_MIR_NAME, archives)
         readme = (FIXTURE / "README.md").read_text(encoding="utf-8")
         for digest in MIR_ARCHIVES.values():
             self.assertIn(digest, readme)
 
     def test_direct_profile_adds_only_the_ordered_direct_cost_companion(self):
-        expected_external = {
-            "flib_0.17.2.zip", "k2so-assets_1.0.7.zip", "Krastorio2_2.1.4.zip",
-            "Krastorio2-spaced-out_2.0.19.zip", "Krastorio2Assets_2.1.0.zip",
-            "Krastorio2MenuSimulations_2.1.0.zip", "xy-k2so-enhancements-nulls-fork_0.8.3.zip",
-            "mir-fixture-mir5-active-mods-observer_0.1.0.zip",
-        }
         direct = json.loads((PROFILES / "k2-imersite-transition-direct-f210.json").read_text(encoding="utf-8"))
         self.assertEqual("mir5-k2-imersite-transition-direct-4.6-to-mir5", direct["kind"])
         self.assertEqual(("2.1.23", ENGINE_SHA), (direct["engine"]["version"], direct["engine"]["sha256"]))
@@ -200,7 +211,10 @@ class K2ImersiteTransitionFixtureTests(unittest.TestCase):
             names.index("mir-fixture-mir5-k2-imersite-direct-cost"),
             names.index("mir-fixture-mir5-k2-imersite-transition"),
         )
-        self.assertEqual(expected_external, set(direct["archive_sha256"]))
+        archives = direct["archive_sha256"]
+        external = {name: digest for name, digest in archives.items() if name != CURRENT_MIR_NAME}
+        self.assertEqual(EXTERNAL_ARCHIVES, external)
+        self.assertEqual(CURRENT_MIR_ARCHIVE, archives[CURRENT_MIR_NAME])
 
         published = json.loads((PROFILES / "k2-imersite-transition-published-4.7-f210.json").read_text(encoding="utf-8"))
         self.assertNotIn(
@@ -212,6 +226,29 @@ class K2ImersiteTransitionFixtureTests(unittest.TestCase):
         self.assertEqual("mir-fixture-mir5-k2-imersite-direct-cost", info["name"])
         self.assertIn("mir-fixture-mir5-k2-imersite-transition >= 0.3.0", info["dependencies"])
         self.assertFalse((FIXTURE / "direct-cost/control.lua").exists())
+
+    def test_current_successor_profiles_bind_the_freeze_and_keep_direct_and_failed_paths_separate(self):
+        freeze = json.loads(CURRENT_FREEZE.read_text(encoding="utf-8"))
+        self.assertEqual((CURRENT_SOURCE, CURRENT_SOURCE_TREE),
+                         (freeze["source"]["commit"], freeze["source"]["source_tree"]))
+        asset = next(row for row in freeze["files"] if row["name"] == CURRENT_MIR_NAME)
+        self.assertEqual((CURRENT_MIR_BYTES, CURRENT_MIR_ARCHIVE), (asset["bytes"], asset["sha256"]))
+
+        current = json.loads((PROFILES / "k2-imersite-transition-mir5-f210.json").read_text(encoding="utf-8"))
+        direct = json.loads((PROFILES / "k2-imersite-transition-direct-f210.json").read_text(encoding="utf-8"))
+        for profile in (current, direct):
+            with self.subTest(kind=profile["kind"]):
+                self.assertEqual(CURRENT_MIR_ARCHIVE, profile["archive_sha256"][CURRENT_MIR_NAME])
+                for expected in (CURRENT_SOURCE, CURRENT_SOURCE_TREE, CURRENT_MIR_ARCHIVE, f"{CURRENT_MIR_BYTES} bytes"):
+                    self.assertIn(expected, profile["scope"])
+
+        self.assertIn("failed published4.7 intermediate", current["scope"])
+        self.assertIn("protected already-passed published4.6 source save", direct["scope"])
+        self.assertIn("not the failed published4.7 intermediate", direct["scope"])
+        readme = (FIXTURE / "README.md").read_text(encoding="utf-8")
+        for expected in (CURRENT_SOURCE, CURRENT_SOURCE_TREE, CURRENT_MIR_ARCHIVE, f"{CURRENT_MIR_BYTES} bytes",
+                         "run40075366627", "does not convert that adverse into a pass"):
+            self.assertIn(expected, readme)
 
     def test_direct_cost_companion_preflights_both_rows_then_matches_the_source_fixture_cost(self):
         result = self._direct_cost()
