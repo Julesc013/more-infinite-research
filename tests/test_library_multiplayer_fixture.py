@@ -574,6 +574,10 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
                 "A15A7D628D66953D2E0C4D4FA288F47CBF9C5678327C7EB3D23ADB5DC78331C0",
             "more-infinite-research_5.0.21000.zip":
                 "2ABAF369E020D8AD18A0C04940A8811BECFA5E63E5B479C668E2D3A3123D032B",
+            "mir-fixture-mir5-api-alpha_0.1.0.zip":
+                "DB5ED843FA9D85A1ABDC22595E62D315CA1A2191C846208079F85D4D016CE904",
+            "mir-fixture-mir5-api-beta_0.1.0.zip":
+                "690004F145E8B0DD52B4030BD8B27F7B581495EEFAAC5CB3A2F30A23FCA08951",
         })
         self.assertNotIn("mir-fixture-mir5-api-beta-production", {row["name"] for row in profile["mods"]})
 
@@ -605,6 +609,8 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
           Assert-Rejected 'unexpected beta production' {param($s)$s['mods']=@($s['mods'])+@([ordered]@{name='mir-fixture-mir5-api-beta-production';version='0.1.0';enabled=$true})}
           Assert-Rejected 'wrong current MIR archive' {param($s)$s['archive_sha256']['more-infinite-research_5.0.21000.zip']='A'*64}
           Assert-Rejected 'wrong standalone observer projection' {param($s)$s['archive_sha256']['mir-fixture-mir5-active-mods-observer_0.1.0.zip']='A'*64}
+          Assert-Rejected 'wrong alpha consumer archive' {param($s)$s['archive_sha256']['mir-fixture-mir5-api-alpha_0.1.0.zip']='A'*64}
+          Assert-Rejected 'wrong beta consumer archive' {param($s)$s['archive_sha256']['mir-fixture-mir5-api-beta_0.1.0.zip']='A'*64}
         '''
         result = subprocess.run(
             ["pwsh", "-NoLogo", "-NoProfile", "-Command", script],
@@ -990,6 +996,64 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
             )
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
 
+    def test_standalone_f210_api_consumers_project_exact_runtime_members_through_the_real_archive_guard(self):
+        script = r'''
+          $ErrorActionPreference='Stop'; Set-StrictMode -Version Latest
+          function Get-MIRImmutableInputSha256([string]$Path){(Get-FileHash -LiteralPath $Path -Algorithm SHA256).Hash.ToUpperInvariant()}
+          . $env:MIR_TEST_LIBRARY_ACTIVATION
+          $tokens=$null;$errors=$null
+          $ast=[Management.Automation.Language.Parser]::ParseFile($env:MIR_TEST_WRAPPER,[ref]$tokens,[ref]$errors)
+          if($errors.Count){throw $errors[0].Message}
+          function Assert-Session([bool]$Condition,[string]$Message){if(-not$Condition){throw $Message}}
+          foreach($name in @('New-StandaloneF210ApiConsumerSourceProjection','Get-StandaloneIdentityFixtureSources')){
+            $node=@($ast.FindAll({param($candidate) $candidate -is [Management.Automation.Language.FunctionDefinitionAst] -and $candidate.Name -ceq $name},$true))
+            if($node.Count-ne1){throw "standalone API projection function is absent or ambiguous: $name"}
+            Invoke-Expression $node[0].Extent.Text
+          }
+          function New-SourceArchive([string]$Library,[string]$Source,[string[]]$Members){
+            $info=Get-Content -LiteralPath (Join-Path $Source 'info.json') -Raw|ConvertFrom-Json -AsHashtable
+            $archive=Join-Path $Library ($info.name+'_'+$info.version+'.zip')
+            $stream=[IO.File]::Open($archive,[IO.FileMode]::CreateNew,[IO.FileAccess]::Write,[IO.FileShare]::None)
+            try{
+              $zip=[IO.Compression.ZipArchive]::new($stream,[IO.Compression.ZipArchiveMode]::Create,$false)
+              try{foreach($name in $Members){$entry=$zip.CreateEntry($info.name+'_'+$info.version+'/'+$name,[IO.Compression.CompressionLevel]::Optimal);$entryStream=$entry.Open();$input=[IO.File]::OpenRead((Join-Path $Source $name));try{$input.CopyTo($entryStream)}finally{$input.Dispose();$entryStream.Dispose()}}}finally{$zip.Dispose()}
+            }finally{$stream.Dispose()}
+            return $archive
+          }
+          $root=$env:MIR_TEST_WORK;$repo=$env:MIR_TEST_REPO;$library=Join-Path $root 'library';$null=New-Item -ItemType Directory -Path $library
+          $alphaSource=Join-Path $repo 'tests/fixtures/api-alpha';$betaSource=Join-Path $repo 'tests/fixtures/api-beta'
+          $alphaArchive=New-SourceArchive -Library $library -Source $alphaSource -Members @('control.lua','data.lua','graphics/icon.png','info.json')
+          $betaArchive=New-SourceArchive -Library $library -Source $betaSource -Members @('control.lua','data-final-fixes.lua','graphics/icon.png','info.json')
+          $alpha=New-StandaloneF210ApiConsumerSourceProjection -RepoRoot $repo -ArchiveLibrary $library -OutputRoot (Join-Path $root 'alpha') -FixtureName 'mir-fixture-mir5-api-alpha' -ExpectedArchiveSha256 (Get-MIRImmutableInputSha256 $alphaArchive)
+          $beta=New-StandaloneF210ApiConsumerSourceProjection -RepoRoot $repo -ArchiveLibrary $library -OutputRoot (Join-Path $root 'beta') -FixtureName 'mir-fixture-mir5-api-beta' -ExpectedArchiveSha256 (Get-MIRImmutableInputSha256 $betaArchive)
+          if(
+            $alpha.members.Count -ne 4 -or
+            $beta.members.Count -ne 4 -or
+            (@($alpha.members.path) -contains 'info-f200.json') -or
+            (@($beta.members.path) -contains 'info-f200.json')
+          ){throw 'standalone API runtime projection member set differs'}
+          Assert-MIRLibraryFixtureArchive -Archive $alpha.archive -SourceDirectory $alpha.source
+          Assert-MIRLibraryFixtureArchive -Archive $beta.archive -SourceDirectory $beta.source
+          $canonicalLibrary=Join-Path $repo 'tests/fixtures/library-multiplayer';$canonicalObserver=Join-Path $repo 'tests/fixtures/active-mods-observer'
+          $sources=@(Get-StandaloneIdentityFixtureSources -Sources @($canonicalLibrary,$canonicalObserver,$alphaSource,$betaSource) -LibraryFixtureSource $canonicalLibrary -StagedLibraryFixtureSource $canonicalLibrary -StagedObserverSource $canonicalObserver -RepoRoot $repo -StagedApiConsumerSources @{'mir-fixture-mir5-api-alpha'=$alpha.source;'mir-fixture-mir5-api-beta'=$beta.source})
+          if($sources.Count-ne4-or$sources[2]-ine$alpha.source-or$sources[3]-ine$beta.source){throw 'standalone API consumer sources were not projected through the actual source binder'}
+          function Assert-Rejects([string]$Name,[scriptblock]$Block){$rejected=$false;try{&$Block}catch{$rejected=$true};if(-not$rejected){throw "standalone API projection accepted opponent: $Name"}}
+          Assert-Rejects 'unprojected API object' {Get-StandaloneIdentityFixtureSources -Sources @($canonicalLibrary,$canonicalObserver,$alphaSource,$betaSource) -LibraryFixtureSource $canonicalLibrary -StagedLibraryFixtureSource $canonicalLibrary -StagedObserverSource $canonicalObserver -RepoRoot $repo -StagedApiConsumerSources @{'mir-fixture-mir5-api-alpha'=$alpha;'mir-fixture-mir5-api-beta'=$beta}|Out-Null}
+          $extraRepo=Join-Path $root 'extra-repository';$extraSource=Join-Path $extraRepo 'tests/fixtures/api-alpha';$null=New-Item -ItemType Directory -Path (Split-Path -Parent $extraSource) -Force;Copy-Item -LiteralPath $alphaSource -Destination $extraSource -Recurse;[IO.File]::WriteAllText((Join-Path $extraSource 'extra.lua'),'return {}',[Text.UTF8Encoding]::new($false))
+          Assert-Rejects 'extra runtime member' {New-StandaloneF210ApiConsumerSourceProjection -RepoRoot $extraRepo -ArchiveLibrary $library -OutputRoot (Join-Path $root 'extra-output') -FixtureName 'mir-fixture-mir5-api-alpha' -ExpectedArchiveSha256 (Get-MIRImmutableInputSha256 $alphaArchive)|Out-Null}
+          $driftRepo=Join-Path $root 'drift-repository';$driftSource=Join-Path $driftRepo 'tests/fixtures/api-beta';$null=New-Item -ItemType Directory -Path (Split-Path -Parent $driftSource) -Force;Copy-Item -LiteralPath $betaSource -Destination $driftSource -Recurse;$driftInfo=Get-Content -LiteralPath (Join-Path $driftSource 'info.json') -Raw|ConvertFrom-Json -AsHashtable;$driftInfo.factorio_version='2.0';[IO.File]::WriteAllText((Join-Path $driftSource 'info.json'),($driftInfo|ConvertTo-Json -Depth 8)+[Environment]::NewLine,[Text.UTF8Encoding]::new($false))
+          Assert-Rejects 'F210 metadata drift' {New-StandaloneF210ApiConsumerSourceProjection -RepoRoot $driftRepo -ArchiveLibrary $library -OutputRoot (Join-Path $root 'drift-output') -FixtureName 'mir-fixture-mir5-api-beta' -ExpectedArchiveSha256 (Get-MIRImmutableInputSha256 $betaArchive)|Out-Null}
+          Assert-Rejects 'stale beta archive' {New-StandaloneF210ApiConsumerSourceProjection -RepoRoot $repo -ArchiveLibrary $library -OutputRoot (Join-Path $root 'stale-output') -FixtureName 'mir-fixture-mir5-api-beta' -ExpectedArchiveSha256 ('A'*64)|Out-Null}
+          'PASS standalone API runtime projections and archive guards'
+        '''
+        with tempfile.TemporaryDirectory(prefix="mir5-standalone-api-projection-") as work:
+            result = subprocess.run(
+                ["pwsh", "-NoLogo", "-NoProfile", "-Command", script], capture_output=True, text=True,
+                env=dict(os.environ, MIR_TEST_WRAPPER=str(WRAPPER), MIR_TEST_REPO=str(ROOT), MIR_TEST_WORK=work,
+                         MIR_TEST_LIBRARY_ACTIVATION=str(ROOT / "tools/lib/compatibility/LibraryActivation.ps1")), check=False,
+            )
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+
     def test_standalone_identity_fixture_stage_enables_only_its_hash_bound_hidden_setting(self):
         script = r'''
           $ErrorActionPreference='Stop'; Set-StrictMode -Version Latest
@@ -1042,9 +1106,9 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
           $observer=Join-Path $repo 'tests/fixtures/active-mods-observer'
           $alpha=Join-Path $repo 'tests/fixtures/api-alpha'
           $beta=Join-Path $repo 'tests/fixtures/api-beta'
-          $accepted=@(Get-StandaloneIdentityFixtureSources -Sources @($library) -LibraryFixtureSource $library -StagedLibraryFixtureSource $library -StagedObserverSource $observer -RepoRoot $repo)
+          $accepted=@(Get-StandaloneIdentityFixtureSources -Sources @($library) -LibraryFixtureSource $library -StagedLibraryFixtureSource $library -StagedObserverSource $observer -RepoRoot $repo -StagedApiConsumerSources @{})
           if($accepted.Count-ne2 -or $accepted[0]-ine$library -or $accepted[1]-ine$observer){throw 'canonical observer was not appended exactly once'}
-          $apiAccepted=@(Get-StandaloneIdentityFixtureSources -Sources @($library,$observer,$alpha,$beta) -LibraryFixtureSource $library -StagedLibraryFixtureSource $library -StagedObserverSource $observer -RepoRoot $repo)
+          $apiAccepted=@(Get-StandaloneIdentityFixtureSources -Sources @($library,$observer,$alpha,$beta) -LibraryFixtureSource $library -StagedLibraryFixtureSource $library -StagedObserverSource $observer -RepoRoot $repo -StagedApiConsumerSources @{'mir-fixture-mir5-api-alpha'=$alpha;'mir-fixture-mir5-api-beta'=$beta})
           if($apiAccepted.Count-ne4-or$apiAccepted[0]-ine$library-or$apiAccepted[1]-ine$observer-or$apiAccepted[2]-ine$alpha-or$apiAccepted[3]-ine$beta){throw 'standalone API consumer sources were not retained through the normal projection'}
           function Assert-Rejects([string]$Name,[scriptblock]$Block){$rejected=$false;try{&$Block}catch{$rejected=$true};if(-not$rejected){throw "discovery observer source accepted opponent: $Name"}}
           $missingRepo=Join-Path $env:MIR_TEST_WORK 'missing-repository';$null=New-Item -ItemType Directory -Path (Join-Path $missingRepo 'tests/fixtures') -Force

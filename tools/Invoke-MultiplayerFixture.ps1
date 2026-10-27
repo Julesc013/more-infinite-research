@@ -79,6 +79,10 @@ function Assert-MultiplayerFixtureSelection {
       mir_archive_sha256='2ABAF369E020D8AD18A0C04940A8811BECFA5E63E5B479C668E2D3A3123D032B'
       fixture_mods=@('mir-fixture-mir5-library-multiplayer@0.1.0','mir-fixture-mir5-api-alpha@0.1.0','mir-fixture-mir5-api-beta@0.1.0')
       optional_archives=@('more-infinite-research_5.0.21000.zip','mir-fixture-mir5-library-multiplayer_0.1.0.zip','mir-fixture-mir5-api-alpha_0.1.0.zip','mir-fixture-mir5-api-beta_0.1.0.zip')
+      api_consumer_archive_sha256=[ordered]@{
+        'mir-fixture-mir5-api-alpha_0.1.0.zip'='DB5ED843FA9D85A1ABDC22595E62D315CA1A2191C846208079F85D4D016CE904'
+        'mir-fixture-mir5-api-beta_0.1.0.zip'='690004F145E8B0DD52B4030BD8B27F7B581495EEFAAC5CB3A2F30A23FCA08951'
+      }
       standalone_f210=$true;api_client_consumers=$true
     }
     [ordered]@{
@@ -158,6 +162,13 @@ function Assert-MultiplayerFixtureSelection {
   if($target.Contains('fixture_archive_required')){
     $fixtureArchive='mir-fixture-mir5-library-multiplayer_0.1.1.zip'
     Assert-Session ($target.fixture_archive_required -is [bool] -and $target.fixture_archive_required -and $archives.Contains($fixtureArchive) -and $archives[$fixtureArchive] -is [string] -and $archives[$fixtureArchive] -cmatch '^[A-F0-9]{64}$') 'standalone identity discovery fixture archive differs'
+  }
+  if($target.Contains('api_consumer_archive_sha256')){
+    $apiArchives=$target.api_consumer_archive_sha256
+    Assert-Session ($apiArchives -is [System.Collections.IDictionary] -and $apiArchives.Count-eq2) 'standalone API consumer archive binding differs'
+    foreach($entry in $apiArchives.GetEnumerator()){
+      Assert-Session ($entry.Key -is [string] -and $entry.Value -is [string] -and $entry.Value -cmatch '^[A-F0-9]{64}$' -and $archives.Contains([string]$entry.Key) -and $archives[[string]$entry.Key] -ceq [string]$entry.Value) "standalone API consumer archive differs: $($entry.Key)"
+    }
   }
   foreach($entry in $archives.GetEnumerator()){
     Assert-Session ($allowedArchives -ccontains [string]$entry.Key -and $entry.Value -is [string] -and $entry.Value -cmatch '^[A-F0-9]{64}$') 'multiplayer fixture archive binding differs'
@@ -309,20 +320,58 @@ function New-StandaloneIdentityObserverSourceProjection {
   Assert-MIRLibraryFixtureArchive -Archive $archive -SourceDirectory $stage
   return [pscustomobject]@{source=$stage;canonical_source=$canonical;archive=$archive;sha256=$ExpectedArchiveSha256.ToUpperInvariant();members=@($runtimeNames|ForEach-Object {[ordered]@{path=$_;sha256=(Get-FileHash -LiteralPath (Join-Path $stage $_) -Algorithm SHA256).Hash.ToUpperInvariant()}});alternate_metadata='info-f200.json'}
 }
+function New-StandaloneF210ApiConsumerSourceProjection {
+  param(
+    [Parameter(Mandatory)][string]$RepoRoot,
+    [Parameter(Mandatory)][string]$ArchiveLibrary,
+    [Parameter(Mandatory)][string]$OutputRoot,
+    [Parameter(Mandatory)][ValidateSet('mir-fixture-mir5-api-alpha','mir-fixture-mir5-api-beta')][string]$FixtureName,
+    [Parameter(Mandatory)][ValidatePattern('^[A-Fa-f0-9]{64}$')][string]$ExpectedArchiveSha256
+  )
+  $shortName=if($FixtureName-ceq'mir-fixture-mir5-api-alpha'){'api-alpha'}else{'api-beta'}
+  $canonical=(Resolve-Path -LiteralPath (Join-Path $RepoRoot ('tests/fixtures/'+$shortName))).Path
+  $canonicalFiles=@(Get-ChildItem -LiteralPath $canonical -Recurse -File|Sort-Object FullName)
+  $canonicalNames=@($canonicalFiles|ForEach-Object {[IO.Path]::GetRelativePath($canonical,$_.FullName).Replace('\','/')})
+  $runtimeNames=if($shortName-ceq'api-alpha'){@('control.lua','data.lua','graphics/icon.png','info.json')}else{@('control.lua','data-final-fixes.lua','graphics/icon.png','info.json')}
+  $expectedCanonical=@($runtimeNames)+@('info-f200.json')
+  Assert-Session ($canonicalNames.Count-eq$expectedCanonical.Count-and ((@($canonicalNames|Sort-Object)-join'|')-ceq(@($expectedCanonical|Sort-Object)-join'|'))) "standalone API canonical source members differ: $FixtureName"
+  $info=Get-Content -LiteralPath (Join-Path $canonical 'info.json') -Raw|ConvertFrom-Json -AsHashtable
+  $f200Info=Get-Content -LiteralPath (Join-Path $canonical 'info-f200.json') -Raw|ConvertFrom-Json -AsHashtable
+  Assert-Session ([string]$info.name-ceq$FixtureName-and[string]$info.version-ceq'0.1.0'-and[string]$info.factorio_version-ceq'2.1') "standalone API canonical F210 metadata differs: $FixtureName"
+  Assert-Session ([string]$f200Info.name-ceq$FixtureName-and[string]$f200Info.version-ceq'0.1.0'-and[string]$f200Info.factorio_version-ceq'2.0') "standalone API alternate F200 metadata differs: $FixtureName"
+  $archive=Join-Path (Resolve-Path -LiteralPath $ArchiveLibrary).Path ($FixtureName+'_0.1.0.zip')
+  Assert-Session ((Get-FileHash -LiteralPath $archive -Algorithm SHA256).Hash.ToUpperInvariant()-ceq$ExpectedArchiveSha256.ToUpperInvariant()) "standalone API archive differs: $FixtureName"
+  $stage=Join-Path $OutputRoot ('standalone-f210-'+$shortName+'-fixture-source')
+  Assert-Session (-not(Test-Path -LiteralPath $stage)) "standalone API fixture stage already exists: $FixtureName"
+  $null=New-Item -ItemType Directory -Path $stage
+  foreach($name in $runtimeNames){
+    $destination=Join-Path $stage $name
+    [IO.Directory]::CreateDirectory((Split-Path -Parent $destination))|Out-Null
+    [IO.File]::Copy((Join-Path $canonical $name),$destination,$false)
+  }
+  $stageNames=@(Get-ChildItem -LiteralPath $stage -Recurse -File|ForEach-Object {[IO.Path]::GetRelativePath($stage,$_.FullName).Replace('\','/')})
+  Assert-Session ($stageNames.Count-eq$runtimeNames.Count-and ((@($stageNames|Sort-Object)-join'|')-ceq(@($runtimeNames|Sort-Object)-join'|'))) "standalone API fixture projection members differ: $FixtureName"
+  foreach($name in $runtimeNames){Assert-Session ((Get-FileHash -LiteralPath (Join-Path $stage $name) -Algorithm SHA256).Hash.ToUpperInvariant()-ceq(Get-FileHash -LiteralPath (Join-Path $canonical $name) -Algorithm SHA256).Hash.ToUpperInvariant()) "standalone API fixture projection bytes differ: $FixtureName/$name"}
+  Assert-MIRLibraryFixtureArchive -Archive $archive -SourceDirectory $stage
+  return [pscustomobject]@{name=$FixtureName;source=$stage;canonical_source=$canonical;archive=$archive;sha256=$ExpectedArchiveSha256.ToUpperInvariant();members=@($runtimeNames|Sort-Object|ForEach-Object {[ordered]@{path=$_;sha256=(Get-FileHash -LiteralPath (Join-Path $stage $_) -Algorithm SHA256).Hash.ToUpperInvariant()}});alternate_metadata='info-f200.json'}
+}
 function Get-StandaloneIdentityFixtureSources {
   param(
     [Parameter(Mandatory)][string[]]$Sources,
     [Parameter(Mandatory)][string]$LibraryFixtureSource,
     [Parameter(Mandatory)][string]$StagedLibraryFixtureSource,
     [Parameter(Mandatory)][string]$StagedObserverSource,
-    [Parameter(Mandatory)][string]$RepoRoot
+    [Parameter(Mandatory)][string]$RepoRoot,
+    [AllowNull()][hashtable]$StagedApiConsumerSources=$null
   )
+  $stagedApiConsumers=if($null-eq$StagedApiConsumerSources){@{}}else{$StagedApiConsumerSources}
   $canonicalObserver=(Resolve-Path -LiteralPath (Join-Path $RepoRoot 'tests/fixtures/active-mods-observer')).Path
   $canonicalInfo=Get-Content -LiteralPath (Join-Path $canonicalObserver 'info.json') -Raw|ConvertFrom-Json -AsHashtable
   Assert-Session ([string]$canonicalInfo.name-ceq'mir-fixture-mir5-active-mods-observer' -and [string]$canonicalInfo.version-ceq'0.1.0' -and [string]$canonicalInfo.factorio_version-ceq'2.1') 'standalone identity discovery canonical observer source differs'
   $library=(Resolve-Path -LiteralPath $LibraryFixtureSource).Path
   $staged=(Resolve-Path -LiteralPath $StagedLibraryFixtureSource).Path
-  $result=[Collections.Generic.List[string]]::new();$libraryCount=0;$observerCount=0
+  $result=[Collections.Generic.List[string]]::new();$libraryCount=0;$observerCount=0;$apiCounts=@{}
+  foreach($name in @('mir-fixture-mir5-api-alpha','mir-fixture-mir5-api-beta')){$apiCounts[$name]=0}
   foreach($candidate in $Sources){
     $source=(Resolve-Path -LiteralPath $candidate).Path
     $info=Get-Content -LiteralPath (Join-Path $source 'info.json') -Raw|ConvertFrom-Json -AsHashtable
@@ -332,6 +381,15 @@ function Get-StandaloneIdentityFixtureSources {
     }elseif([string]$info.name-ceq'mir-fixture-mir5-active-mods-observer'){
       Assert-Session ($source-ieq$canonicalObserver) 'standalone identity discovery observer source differs from its canonical source'
       $observerCount++;$result.Add((Resolve-Path -LiteralPath $StagedObserverSource).Path)
+    }elseif($apiCounts.ContainsKey([string]$info.name)){
+      $name=[string]$info.name
+      Assert-Session ($stagedApiConsumers.ContainsKey($name)) "standalone API consumer source is not admitted: $name"
+      $stagedApiSource=$stagedApiConsumers[$name]
+      Assert-Session ($stagedApiSource -is [string] -and -not[string]::IsNullOrWhiteSpace($stagedApiSource)) "standalone API consumer projection path differs: $name"
+      $canonicalApi=(Resolve-Path -LiteralPath (Join-Path $RepoRoot ('tests/fixtures/'+$(if($name-ceq'mir-fixture-mir5-api-alpha'){'api-alpha'}else{'api-beta'})))).Path
+      Assert-Session ($source-ieq$canonicalApi) "standalone API consumer source differs from its canonical template: $name"
+      $apiCounts[$name]++
+      $result.Add((Resolve-Path -LiteralPath $stagedApiSource).Path)
     }else{$result.Add($source)}
   }
   Assert-Session ($libraryCount-eq1) 'standalone identity discovery requires one canonical Library fixture source'
@@ -340,6 +398,9 @@ function Get-StandaloneIdentityFixtureSources {
   if($observerCount-eq0){$result.Add($stagedObserver)}
   $actualObserver=@($result|Where-Object {$_-ieq$stagedObserver})
   Assert-Session ($actualObserver.Count-eq1) 'standalone identity discovery requires one verified canonical observer source'
+  foreach($name in @($stagedApiConsumers.Keys)){
+    Assert-Session ($apiCounts.ContainsKey([string]$name)-and$apiCounts[[string]$name]-eq1) "standalone API consumer source count differs: $name"
+  }
   return @($result.ToArray())
 }
 function Install-StandaloneIdentityFixtureArchive {
@@ -420,6 +481,8 @@ $profile=$templateProfile
 $selection=Get-Content -LiteralPath $profile -Raw|ConvertFrom-Json -AsHashtable
 $discoveryFixture=$null;$discoveryInstall=$null;$fixtureSourcesForRun=@($FixtureSources)
 $standaloneObserver=$null;$standaloneLibraryFixture=$null
+$standaloneApiConsumerFixtures=@{}
+$standaloneApiConsumerSources=@{}
 if($StandaloneIdentityDiscovery){
   # The checked-in functional profile is a template only.  The actual
   # environmental packet is assembled below from the standalone engine, C563,
@@ -454,8 +517,15 @@ if($standaloneF210){
   # observer are strict projections, not duplicate archives or a 0.1.1 mode.
   $standaloneLibraryFixture=New-StandaloneF210LibraryFixtureSourceProjection -RepoRoot $repo -OutputRoot $output
   $standaloneObserver=New-StandaloneIdentityObserverSourceProjection -RepoRoot $repo -ArchiveLibrary $library -OutputRoot $output -ExpectedArchiveSha256 ([string]$target.observer_sha256)
+  if($target.PSObject.Properties['api_client_consumers']-and$target.api_client_consumers-eq$true){
+    foreach($name in @('mir-fixture-mir5-api-alpha','mir-fixture-mir5-api-beta')){
+      $archiveName=$name+'_0.1.0.zip'
+      $standaloneApiConsumerFixtures[$name]=New-StandaloneF210ApiConsumerSourceProjection -RepoRoot $repo -ArchiveLibrary $library -OutputRoot $output -FixtureName $name -ExpectedArchiveSha256 ([string]$target.api_consumer_archive_sha256[$archiveName])
+      $standaloneApiConsumerSources[$name]=[string]$standaloneApiConsumerFixtures[$name].source
+    }
+  }
   $canonicalLibrary=Join-Path $repo 'tests/fixtures/library-multiplayer'
-  $fixtureSourcesForRun=Get-StandaloneIdentityFixtureSources -Sources $FixtureSources -LibraryFixtureSource $canonicalLibrary -StagedLibraryFixtureSource $standaloneLibraryFixture.source -StagedObserverSource $standaloneObserver.source -RepoRoot $repo
+  $fixtureSourcesForRun=Get-StandaloneIdentityFixtureSources -Sources $FixtureSources -LibraryFixtureSource $canonicalLibrary -StagedLibraryFixtureSource $standaloneLibraryFixture.source -StagedObserverSource $standaloneObserver.source -RepoRoot $repo -StagedApiConsumerSources $standaloneApiConsumerSources
 }
 # The normal standalone target remains the ordinary two-client Library
 # contract.  Only the explicitly environmental discovery route needs its
