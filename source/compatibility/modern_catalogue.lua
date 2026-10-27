@@ -410,19 +410,19 @@ local function valid_icon_size(value)
     and value == math.floor(value)
 end
 
-local function apply_bob_angel_f210_native_icons(definitions, raw)
+local function apply_bob_angel_f210_native_icons(by_key, raw)
   if type(raw) ~= "table" then return end
-  local by_key = {}
-  for _, definition in ipairs(definitions) do by_key[definition.key] = definition end
   for _, source in ipairs(BOB_ANGEL_F210_NATIVE_ICON_SOURCES) do
     local prototype_group = raw[source.prototype_type]
     local prototype = type(prototype_group) == "table" and prototype_group[source.prototype_name] or nil
-    local icon_size = prototype and prototype.icon_size
-    if type(prototype) == "table" and type(prototype.icon) == "string" and prototype.icon ~= ""
+    if type(prototype) == "table" then
+      local icon_size = prototype.icon_size
+      if type(prototype.icon) == "string" and prototype.icon ~= ""
         and (icon_size == nil or valid_icon_size(icon_size)) then
-      local definition = assert(by_key[source.key], "MIR Bob/Angel icon binding lacks " .. source.key)
-      definition.icon = prototype.icon
-      definition.icon_size = icon_size or 64
+        local definition = assert(by_key[source.key], "MIR Bob/Angel icon binding lacks " .. source.key)
+        definition.icon = prototype.icon
+        definition.icon_size = icon_size or 64
+      end
     end
   end
 end
@@ -858,9 +858,9 @@ function M.select(active_mods, raw)
     bob_angel_f210_delta = require("compatibility.modern_catalogue.bob_angel_f210")
       [bob_angel_f210 == "space-age" and "space_age" or "base"]
     apply_authored_definitions(definitions, bob_angel_f210_delta)
-    apply_bob_angel_f210_native_icons(definitions, raw)
     local by_key = {}
     for _, definition in ipairs(definitions) do by_key[definition.key] = definition end
+    apply_bob_angel_f210_native_icons(by_key, raw)
     for key, science in pairs(bob_angel_f210_delta.definition_science or {}) do
       local definition = by_key[key]
       if definition == nil then error("MIR combined Bob/Angel catalogue lacks declared key " .. key, 2) end

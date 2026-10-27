@@ -338,6 +338,25 @@ class BobAngelF210PipelineTests(unittest.TestCase):
                         PRODUCTIVITY_BADGE,
                     ], rows[f"recipe-prod-{binding['key']}-1"]["icons"])
 
+        # A malformed native entry is not a prototype.  The finite art binding
+        # must leave it untouched and retain the independently captured Base
+        # presentation instead of indexing a primitive as though it were a
+        # Factorio prototype table.
+        for primitive in (True, 7, "not-a-prototype"):
+            raw = deepcopy(source["raw"])
+            for binding in BOB_ANGEL_F210_NATIVE_ICON_BINDINGS:
+                raw[binding["source_type"]][binding["source_name"]] = primitive
+            lua = self.stage("space_age", raw=raw)
+            rows = self._rows(lua)
+            final_raw = _plain(lua.globals().data.raw)
+            for binding in BOB_ANGEL_F210_NATIVE_ICON_BINDINGS:
+                with self.subTest(failure=f"primitive-{type(primitive).__name__}", key=binding["key"]):
+                    self.assertEqual([
+                        {"icon": binding["fallback_icon"], "icon_size": binding["fallback_icon_size"]},
+                        PRODUCTIVITY_BADGE,
+                    ], rows[f"recipe-prod-{binding['key']}-1"]["icons"])
+                    self.assertEqual(primitive, final_raw[binding["source_type"]][binding["source_name"]])
+
         raw = deepcopy(source["raw"])
         lua = self.stage("space_age", raw=raw)
         first = BOB_ANGEL_F210_NATIVE_ICON_BINDINGS[0]
