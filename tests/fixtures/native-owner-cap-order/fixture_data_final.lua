@@ -6,6 +6,7 @@ local NAME = "steel-plate-productivity"
 local FIXTURE = "mir-fixture-mir5-native-owner-cap-order"
 local CLOSURE = {"base", "elevated-rails", "quality", "recycler", "space-age"}
 local STAGES = {
+  source = {version = "0.0.1", cap = 0, permuted = false},
   canonical = {version = "0.1.0", cap = 1, permuted = false},
   permuted = {version = "0.2.0", cap = 1, permuted = true},
   relaxed = {version = "0.3.0", cap = 0, permuted = false},

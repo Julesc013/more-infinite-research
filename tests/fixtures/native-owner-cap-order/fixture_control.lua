@@ -12,7 +12,8 @@ local RECIPES = {"steel-plate", "casting-steel"}
 local UINT32_MAX = 4294967295
 local CLOSURE = {"base", "elevated-rails", "quality", "recycler", "space-age"}
 local STAGES = {
-  canonical = {version = "0.1.0", cap = 1, effects = {"steel-plate", "casting-steel"}, prior = nil},
+  source = {version = "0.0.1", cap = 0, effects = {"steel-plate", "casting-steel"}, prior = nil},
+  canonical = {version = "0.1.0", cap = 1, effects = {"steel-plate", "casting-steel"}, prior = "source-complete"},
   permuted = {version = "0.2.0", cap = 1, effects = {"casting-steel", "steel-plate"}, prior = "canonical-complete"},
   relaxed = {version = "0.3.0", cap = 0, effects = {"steel-plate", "casting-steel"}, prior = "permuted-complete"},
 }
@@ -109,7 +110,7 @@ local function assert_owner(force, expected, stage, label)
   if value.level ~= 2 or value.researched ~= false or value.prototype.max_level ~= UINT32_MAX then
     fail(label .. " level or native maximum differs")
   end
-  if stage == "relaxed" then
+  if stage == "source" or stage == "relaxed" then
     if value.enabled ~= true or value.visible_when_disabled ~= false then fail(label .. " owned cap was not restored") end
   elseif value.enabled ~= false or value.visible_when_disabled ~= true then
     fail(label .. " owned cap is absent")
@@ -130,7 +131,7 @@ local function assert_foreign(force, expected, stage, label)
       .. ", researched=" .. tostring(value.researched) .. ", enabled=" .. tostring(value.enabled)
       .. ", maximum=" .. tostring(value.prototype.max_level))
   end
-  if stage == "relaxed" then
+  if stage == "source" or stage == "relaxed" then
     if value.visible_when_disabled ~= false then fail(label .. " foreign visibility was not restored") end
   elseif value.visible_when_disabled ~= true then
     fail(label .. " foreign visibility cap witness is absent")
@@ -152,7 +153,7 @@ local function assert_player_snapshot(actual, expected, stage, label)
       or not same_bonuses(actual.bonuses, expected.bonuses) or not same_queue(actual.queue, expected.queue) then
     fail(label .. " player saved state differs")
   end
-  if stage == "relaxed" then
+  if stage == "source" or stage == "relaxed" then
     if actual.enabled ~= true or actual.visible ~= false then fail(label .. " player cap restoration differs") end
   elseif actual.enabled ~= false or actual.visible ~= true then
     fail(label .. " player cap state differs")
@@ -164,7 +165,7 @@ local function assert_foreign_snapshot(actual, expected, stage, label)
       or actual.maximum ~= expected.maximum or not same_bonuses(actual.bonuses, expected.bonuses)
       or not same_queue(actual.queue, expected.queue) then fail(label .. " foreign saved state differs") end
   if actual.enabled ~= false then fail(label .. " foreign disablement changed") end
-  if stage == "relaxed" then
+  if stage == "source" or stage == "relaxed" then
     if actual.visible ~= false then fail(label .. " foreign visibility restoration differs") end
   elseif actual.visible ~= true then
     fail(label .. " foreign cap visibility differs")
@@ -197,11 +198,8 @@ local function setup_foreign(expected)
   local foreign = game.create_force("mir5-native-owner-cap-order-foreign")
   foreign.enable_all_prototypes()
   local owner = technology(foreign)
-  -- LuaTechnology.level re-enables a technology. Keep the intentional
-  -- foreign disablement after the level seed in separate writes.
+  -- Earn the native level while this source stage has no steel cap.
   owner.level = 2
-  owner.enabled = false
-  owner.visible_when_disabled = false
   local probe = foreign.technologies[PROBE]
   local prerequisite = foreign.technologies["automation-science-pack"]
   if probe == nil or prerequisite == nil then fail("foreign queue probe is absent") end
@@ -212,41 +210,42 @@ local function setup_foreign(expected)
   probe.enabled = true
   if foreign.add_research(probe) ~= true then fail("could not queue foreign probe") end
   foreign.research_progress = 0.42
-  -- This is a documented engine event, not a call into MIR. It lets the
-  -- runtime observe a pre-disabled foreign owner and its unrelated queue.
+  -- Both level assignment and native reset expose enabled=true to their
+  -- synchronous callbacks. Establish foreign disablement only after those
+  -- operations, in the uncapped source saved before finite caps are enabled.
   foreign.reset_technology_effects()
+  owner.enabled = false
+  owner.visible_when_disabled = false
   return foreign
 end
 
 function M.apply(stage)
   local expected = stage_info(stage)
   script.on_init(function()
-    if stage ~= "canonical" then fail("only canonical stage may initialize a fresh save") end
+    if stage ~= "source" then fail("only uncapped source stage may initialize a fresh save") end
     check_closure(expected)
     if storage[KEY] ~= nil then fail("fixture state already exists") end
     local player = game.forces.player
     player.enable_all_prototypes()
     local owner = technology(player)
-    -- Set the level first: assigning it re-enables a LuaTechnology.
     owner.level = 2
+    -- Reapply native effects before the final source presentation flags.
+    player.reset_technology_effects()
     owner.enabled = true
     owner.visible_when_disabled = false
-    -- `on_technology_effects_reset` is the actual engine boundary. The
-    -- fixture neither imports nor invokes any MIR lifecycle handler.
-    player.reset_technology_effects()
     owner.saved_progress = 0.27
-    local player_state = assert_owner(player, expected, stage, "canonical player")
+    local player_state = assert_owner(player, expected, stage, "source player")
     local foreign = setup_foreign(expected)
-    local foreign_state = assert_foreign(foreign, expected, stage, "canonical foreign")
+    local foreign_state = assert_foreign(foreign, expected, stage, "source foreign")
     -- The create-only seed is not a server save. Keep this state pending
     -- until the first actual server tick can emit INITIAL and save it.
-    local state = {phase = "canonical-prepared", player = player_state, foreign = foreign_state,
+    local state = {phase = "source-prepared", player = player_state, foreign = foreign_state,
       foreign_index = foreign.index, stage = stage}
     storage[KEY] = state
   end)
 
   script.on_configuration_changed(function()
-    if stage == "canonical" then fail("canonical stage does not accept a successor configuration") end
+    if stage == "source" then fail("source stage does not accept a successor configuration") end
     check_closure(expected)
     local state = storage[KEY]
     if type(state) ~= "table" or state.phase ~= expected.prior or type(state.player) ~= "table"
