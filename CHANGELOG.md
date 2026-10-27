@@ -13,6 +13,8 @@ This is the authoritative product changelog. Each MIR 1–3 master release appea
 - Keep native bonuses separate from event-driven agriculture, spoilage and bounded passive repair.
 - Provide the MIR API for immediate data-stage publication and detached read-only runtime queries, with bounded copying of external definitions.
 - Retain the Research Library, personal views, settings export and translations; explain named unavailable features without reconstructing research at runtime.
+- Keep extended GitHub package numbers and unified source changelog history; prepare compact Portal numbers only on final copies of accepted builds.
+- Establish reusable historical migration inputs for the MIR5 baseline and retain cumulative migration steps for later direct upgrades.
 
 ### Compatibility
 
@@ -26,7 +28,7 @@ This is the authoritative product changelog. Each MIR 1–3 master release appea
 - Preserve the disabled Bob/Angel oil-cracking identity and bind the selected science-pack productivity family to its admitted current lab inputs and captured combined progression.
 - Preserve Ironclad mortar shooting speed and native weapon categories when their dedicated streams are disabled or overlap removal is off.
 - Restore F210 Bob sulfur and sulfuric-acid research through the complete settings-to-publication path.
-- Add the Factorio 0.18.47 direct-effect research and legacy laser continuation using the shared historical adapter.
+- Provide the experimental Factorio 0.18.47 build from shared F100 research and fixtures, with separate startup and metadata checks.
 - Preserve separate finite and infinite material stages, native recipe ownership and hidden Imersite migration carriers where supported.
 - Keep two historical runtime interfaces available; unconsumed developer previews do not become player APIs.
 
