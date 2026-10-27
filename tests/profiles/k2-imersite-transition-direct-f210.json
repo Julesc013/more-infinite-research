@@ -98,7 +98,8 @@
     "Krastorio2Assets_2.1.0.zip": "39EF950EC8B21A40357DD0240EF8389501EE75CCA82717F2773B98554DA46E29",
     "Krastorio2MenuSimulations_2.1.0.zip": "3A485B449B356DC4B3EB4233DE4E803B3A001259FBC251BDC9F9D9120B3C53A7",
     "xy-k2so-enhancements-nulls-fork_0.8.3.zip": "930F43B96B04012FEF090C40D8B16A6B3F259D1713C86CF59DFF3E9A5A97E2BE",
-    "mir-fixture-mir5-active-mods-observer_0.1.0.zip": "2E1BE5952D2A4CC5C74A0D149E075D247BA110A3FAE5B6768D3EAEBABCEF989C"
+    "mir-fixture-mir5-active-mods-observer_0.1.0.zip": "2E1BE5952D2A4CC5C74A0D149E075D247BA110A3FAE5B6768D3EAEBABCEF989C",
+    "more-infinite-research_5.0.21000.zip": "E3A65C08AC7798A66FB1BE30D24307B17C8B366DD901953BDE2A09BD6939C8CE"
   },
-  "scope": "Direct published 4.6 K2SO save to MIR5: preserve the frozen predecessor's one-count Imersite source costs through migration, then require the existing successor's ordinary lab and two cold reloads."
+  "scope": "Exact b251ae7a54104ace87cb0da4cf531cf53f03c93d/player79b73a6a8e68987737e69bf2d95ec6555b49f901 F210 direct published4.6 K2SO recovery input. It consumes only the protected already-passed published4.6 source save, not the failed published4.7 intermediate. Current MIR archive E3A65C08AC7798A66FB1BE30D24307B17C8B366DD901953BDE2A09BD6939C8CE is 679250 bytes. Prepared input only; native execution remains required."
 }
