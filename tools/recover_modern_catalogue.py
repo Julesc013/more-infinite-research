@@ -98,7 +98,8 @@ def _recorded_file(root: Path, value: Any, label: str, *, require_bytes: bool = 
     }
 
 
-def _normalise_mods(rows: Any, label: str, without_mir: bool) -> list[dict[str, Any]]:
+def _normalise_mods(rows: Any, label: str, without_mir: bool, *,
+                    order_independent: bool = False) -> list[dict[str, Any]]:
     output: list[dict[str, Any]] = []
     for index, raw in enumerate(_list(rows, label), 1):
         row = _mapping(raw, f"{label}[{index}]")
@@ -120,6 +121,13 @@ def _normalise_mods(rows: Any, label: str, without_mir: bool) -> list[dict[str, 
                 raise CatalogueError(f"{label}[{index}].sha256 is invalid")
             normal["sha256"] = digest.upper()
         output.append(normal)
+    # Factorio's selected-archive receipt is an identity set.  The historic
+    # q010 no-MIR and published captures contain the exact same members but
+    # record them in different orders after MIR is added.  Keep order for
+    # generated and loaded selections, whose sequence remains part of their
+    # respective contracts, but canonicalise this identity-only receipt.
+    if order_independent:
+        output.sort(key=lambda row: (row["name"], row["version"], _json_bytes(row)))
     return output
 
 
@@ -171,8 +179,10 @@ def read_capture(root: Path, *, require_mir: bool | None) -> dict[str, Any]:
     if not all(isinstance(value, str) and value for value in engine_identity.values()):
         raise CatalogueError("capture engine lacks exact identity")
     engine_identity["sha256"] = engine_identity["sha256"].upper()
-    selected = _normalise_mods(result.get("selected_archives"), "selected archives", without_mir=True)
-    selected_all = _normalise_mods(result.get("selected_archives"), "selected archives", without_mir=False)
+    selected = _normalise_mods(result.get("selected_archives"), "selected archives", without_mir=True,
+                               order_independent=True)
+    selected_all = _normalise_mods(result.get("selected_archives"), "selected archives", without_mir=False,
+                                   order_independent=True)
     mir_records = [row for row in selected_all if row["name"] == "more-infinite-research"]
     mir_archive = result.get("mir_archive")
     if require_mir:
@@ -523,6 +533,41 @@ def recover_inventory(base_no_mir: Path, base_published: Path,
     return result
 
 
+def recover_bob_angel_f210_inventory(no_mir_root: Path, published_root: Path) -> dict[str, Any]:
+    """Recover the one exact F210 Bob+Angel+Space Age independent oracle.
+
+    This is deliberately a one-profile admission, not a new profile planner:
+    the 4.7.21003 q010 captures are a separate published distribution from the
+    original fixed Base/Space Age 4.7.21000 recovery cohort.
+    """
+    profile = recover_profile("bob-angel-f210", no_mir_root, published_root,
+                              expected_version="4.7.21003")
+    if profile["capture_receipts"]["published_470"]["engine"]["factorio_version"] != "2.1":
+        raise CatalogueError("Bob/Angel F210 recovery requires an actual 2.1 capture")
+    return {
+        "schema": SCHEMA,
+        "kind": KIND,
+        "status": "hash-verified-published-bob-angel-f210-oracle",
+        "claims": {
+            "native_qualification": False,
+            "player_package": False,
+            "runtime_catalogue": False,
+            "candidate_expectations_derived_from_candidate": False,
+        },
+        "source": {
+            "published_version": "4.7.21003",
+            "engine_family": "2.1",
+            "profiles": ["bob-angel-f210"],
+        },
+        "profiles": [profile],
+        "reviewed_differences_contract": {
+            "kind": REVIEW_KIND,
+            "required_fields": ["id", "profile", "domain", "type", "name", "expected_candidate", "reason"],
+            "rule": "Only an exact named entry can change the independent intended output; omissions are null.",
+        },
+    }
+
+
 def _write_new_json(path: Path, value: Any) -> None:
     if path.exists():
         raise CatalogueError(f"preserve existing output: {path}")
@@ -807,9 +852,15 @@ def main(argv: list[str] | None = None) -> int:
     recover.add_argument("--k2so-published", type=Path)
     recover.add_argument("--output", type=Path, required=True)
     recover.add_argument("--target", choices=("f200", "f210"), default="f210")
+    bob_angel = commands.add_parser("recover-bob-angel-f210",
+                                    help="recover the fixed q010 F210 Bob+Angel+Space Age oracle")
+    bob_angel.add_argument("--no-mir", type=Path, required=True)
+    bob_angel.add_argument("--published", type=Path, required=True)
+    bob_angel.add_argument("--output", type=Path, required=True)
     compare = commands.add_parser("compare", help="compare a candidate capture with the independent oracle")
     compare.add_argument("--inventory", type=Path, required=True)
     compare.add_argument("--profile", choices=("base-f210", "space-age-f210", "k2so-f210", "bob-core-f210",
+        "bob-angel-f210",
         "base-f200", "space-age-f200", "k2so-f200"), required=True)
     compare.add_argument("--baseline", type=Path, required=True)
     compare.add_argument("--candidate", type=Path, required=True)
@@ -823,6 +874,11 @@ def main(argv: list[str] | None = None) -> int:
             result = recover_inventory(args.base_no_mir, args.base_published,
                                        args.space_age_no_mir, args.space_age_published,
                                        args.k2so_no_mir, args.k2so_published, target=args.target)
+            _write_new_json(args.output, result)
+            print(json.dumps({"status": result["status"], "output": str(args.output.resolve())}, sort_keys=True))
+            return 0
+        if args.command == "recover-bob-angel-f210":
+            result = recover_bob_angel_f210_inventory(args.no_mir, args.published)
             _write_new_json(args.output, result)
             print(json.dumps({"status": result["status"], "output": str(args.output.resolve())}, sort_keys=True))
             return 0
