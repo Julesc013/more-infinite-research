@@ -25,6 +25,7 @@ SUCCESSOR_BODY = FIXTURE / "fixture_control.lua"
 SOURCE_PROFILE = ROOT / "tests/profiles/legacy-boolean-cap-published-400-f200-2077.json"
 F200_PROFILE = ROOT / "tests/profiles/legacy-boolean-cap-current-f200-2077.json"
 F210_PROFILE = ROOT / "tests/profiles/legacy-boolean-cap-current-f210-2123.json"
+PREPARED_INPUT_RECEIPT = ROOT / "spec/evidence/legacy-boolean-cap-a575-prepared-inputs-9ef64ff41.json"
 ARCHIVE_SHA256 = "5C0E299D78C4EE545958448DAE48D87BE5FE1B959875D4CB93A264D95D3DB0AE"
 POLICY_SHA256 = "687E2EB214C7097C1691562ECE206AA69FDE24194164A8EF33F48AF14405C0EA"
 GEAR = "recipe-prod-research_gears-1"
@@ -515,6 +516,49 @@ class LegacyBooleanCapFixtureTests(unittest.TestCase):
                     with zipfile.ZipFile(archive) as package:
                         self.assertEqual({f"{NAME}_{version}/{name}" for name in expected},
                                          {entry.filename for entry in package.infolist() if not entry.is_dir()})
+
+    def test_prepared_input_receipt_binds_only_the_owned_projections_and_current_candidate(self):
+        receipt = json.loads(PREPARED_INPUT_RECEIPT.read_text(encoding="utf-8"))
+        self.assertEqual(("MIR5LegacyBooleanCapPreparedInputsV1",
+                          "exact-fixtures-built-not-native-qualified", False, False, False, False),
+                         (receipt["kind"], receipt["status"], receipt["native_execution"],
+                          receipt["library_mutation"], receipt["laboratory_completion"],
+                          receipt["release_qualification"]))
+        self.assertEqual(("9ef64ff41e0c7140467df044dfe20837f1fa5a40",
+                          "efbe89b4f48542c04af298ecc9fd6b92119bd5ae"),
+                         (receipt["fixture_source_commit"], receipt["fixture_source_tree"]))
+        profile_by_path = {row["path"]: row for row in receipt["profiles"]}
+        for path in (SOURCE_PROFILE, F200_PROFILE, F210_PROFILE):
+            with self.subTest(profile=path.name):
+                expected = profile_by_path[str(path.relative_to(ROOT)).replace("\\", "/")]
+                self.assertEqual((expected["bytes"], expected["sha256"]),
+                                 (path.stat().st_size, hashlib.sha256(path.read_bytes()).hexdigest().upper()))
+        expected_versions = {"published-source": "0.1.0", "f200-successor": "0.2.0",
+                             "f210-direct-successor": "0.3.0"}
+        for fixture in receipt["fixture_archives"]:
+            with self.subTest(stage=fixture["stage"]):
+                self.assertEqual(expected_versions[fixture["stage"]], fixture["version"])
+                self.assertEqual("build/qualification/legacy-boolean-cap-a575-prepared-inputs-r01",
+                                 fixture["archive"].rsplit("/", 1)[0])
+                expected_members = {row["path"]: (row["sha256"], row["bytes"])
+                                    for row in fixture["members"]}
+                stage = SOURCE if fixture["version"] == "0.1.0" else (F200 if fixture["version"] == "0.2.0" else F210)
+                actual_members = {}
+                for row in fixture["members"]:
+                    source = ROOT / row["source_path"]
+                    actual_members[row["path"]] = (hashlib.sha256(source.read_bytes()).hexdigest().upper(),
+                                                    source.stat().st_size)
+                self.assertEqual(expected_members, actual_members)
+                if stage != SOURCE:
+                    self.assertIn("fixture_control.lua", expected_members)
+        candidate = receipt["inputs"]["current_candidate"]
+        self.assertEqual(("a575a4198807b6aea9e26963e3d9970fc5c068ae",
+                          "398c79c687d2bc662c976355ced1436201c43f11"),
+                         (candidate["source_commit"], candidate["player_tree"]))
+        self.assertEqual(("8DB28D2DE45F26033B5F54E176902A3138A903AF0F4B48EAB6B9971466021B4F", 680963),
+                         (candidate["f200"]["sha256"], candidate["f200"]["bytes"]))
+        self.assertEqual(("7CE6A4DF78019F6B98237E638A1C927C5FDB538D4A1442EE22D846DD962DDCDC", 681347),
+                         (candidate["f210"]["sha256"], candidate["f210"]["bytes"]))
 
     def test_native_shaped_source_model_requires_the_observed_cap_disablement_before_the_protected_save(self):
         passed = self.source_flow()
