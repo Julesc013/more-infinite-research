@@ -241,6 +241,22 @@
       "runner_kind": "review",
       "status": "not_run",
       "implementation_command": null
+    },
+    {
+      "id": "MIG-ORIGINS",
+      "requirement": "MIG-05",
+      "assertion": "Every actual published 4.7.3 predecessor edition and every engine-valid published MIR 1.0.0-and-later origin on 2.0/2.1 has its own protected save direct upgrade, new research, saved successor and two cold reloads; later MIR 5 direct upgrades retain their supported-edition coverage.",
+      "runner_kind": "native",
+      "status": "not_run",
+      "implementation_command": null
+    },
+    {
+      "id": "MIG-HISTORY",
+      "requirement": "MIG-06",
+      "assertion": "Cumulative package mappings and bounded schema transformations preserve published filenames and work for both previously-applied and skipped-release histories without replaying old mutations or importing retired implementations.",
+      "runner_kind": "host/native",
+      "status": "not_run",
+      "implementation_command": null
     }
   ]
 }

@@ -44,6 +44,8 @@ Settings coverage combines defaults, per-setting boundaries and targeted interac
 
 `VER-03` — Production-save tests require a complete relevant catalogue. Partial development slices use disposable worlds. Test first loaded state, upgrade, save, two cold reloads and distinct clients after host restart as applicable.
 
+The [required migration origins](migrations.md#required-origin-coverage) are a separate release gate: every actual 4.7.3 predecessor edition, every published engine-valid MIR origin from 1.0.0 onward for 2.0/2.1, and retained MIR 5-or-later direct upgrades on supported editions. Audit exact publication and engine eligibility before scheduling the finite cases. Keep source generation, direct mod upgrade, engine/DLC/provider changes and cold reloads separately observable; a shared fixture or prior origin pass cannot replace another origin's save route. Missing archives, incompatible historical sources and unexecuted routes retain explicit statuses. Historical byte variants and existing adverse receipts remain distinguishable.
+
 ## Release verdicts
 
 Keep these independent: feature parity; supported-profile correctness; migration/client safety; performance improvement; non-regression controls; package/delivery identity. A public release deadline or green host CI does not override a missing verdict. No native test is counted as passed when unavailable, refused or not run.
