@@ -147,9 +147,9 @@
       ],
       "migration_members": [],
       "direct_current_engine_status": "direct-f200-origin",
-      "archive_sha256": null,
-      "archive_byte_status": "tag-source-characterized-archive-not-byte-verified",
-      "native_status": "not_run"
+      "archive_sha256": "C328D8F958BEC2A44297E94E83B1A956D76BEA5E333601A42FDDE60F4155472F",
+      "archive_byte_status": "verified-by-exact-f200-source-stage-r02",
+      "native_status": "source-stage-passed-successor-not-run"
     },
     {
       "tag": "1.1.0",
@@ -2041,10 +2041,10 @@
         {
           "origin_tag": "1.0.0",
           "factorio_version": "2.0",
-          "archive_sha256": null,
-          "source_case": "not_run",
+          "archive_sha256": "C328D8F958BEC2A44297E94E83B1A956D76BEA5E333601A42FDDE60F4155472F",
+          "source_case": "passed-exact-f200-source-stage-r02",
           "final_5_x_case": "not_run",
-          "disposition": "requires-exact-archive-and-native-source-save"
+          "disposition": "exact-f200-source-stage-passed-successor-pending"
         },
         {
           "origin_tag": "1.1.0",
