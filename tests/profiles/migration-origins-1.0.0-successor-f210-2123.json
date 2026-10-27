@@ -28,7 +28,7 @@
   ],
   "archive_sha256": {
     "mir-fixture-mir5-active-mods-observer_0.1.0.zip": "2E1BE5952D2A4CC5C74A0D149E075D247BA110A3FAE5B6768D3EAEBABCEF989C",
-    "mir-fixture-mir5-migration-origin-f200-100-source_0.3.0.zip": "16609472F17EF4F4A4644A353D0696F0A9DAC66235107F7C8D58C1FA8E2CF1CC",
+    "mir-fixture-mir5-migration-origin-f200-100-source_0.3.0.zip": "CCA5E310C88D7A0D1E83520B26397090E45BE4A692394AC54D095692CD6F03F1",
     "more-infinite-research_5.0.21000.zip": "58F04FB9D417F2726835F4A6740490DE3C1841665DAC81C2BA3DFA94050D9457"
   },
   "scope": "Direct protected MIR 1.0.0 F200 source-save successor under the verified 98fb MIR5 F210 asset. It does not consume an intervening MIR5 F200 successor save: it preserves the original state before one actual current gear lab, then saves and performs two read-only cold reloads. Its bounded fixture supplies the source's effective false breeding startup input but makes no claim that a user-authored override persists across a later default change. It is prepared input only."
