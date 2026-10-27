@@ -1,0 +1,140 @@
+{
+  "schema": 1,
+  "kind": "MIR5MigrationOrigin110PublishedDefaultsCaptureNativeChainV1",
+  "status": "completed-data-stage-observation-only",
+  "scope": "One exact published MIR 1.1.0 Defaults data/settings capture on Factorio 2.0.77. This records original-engine inputs for subsequent fixture review. It does not create a map or save, perform gameplay or migration, or qualify performance, release, or a successor package.",
+  "frozen_execution": {
+    "controller": {
+      "commit": "49c2a74bb8f56faaadb32b695fe0bd8f354b9a25",
+      "caller_sha256": "DB67CD3262AA949C9E388BB5C4F3D488FBF6ACEDAC202B454A10BEB3278993B3",
+      "preflight_sha256": "C2D92FF57353D7A0555D63AD2149FC906225E734DBDEB6E943C091166A7BF99A"
+    },
+    "profile_history": {
+      "two_row_selector_commit": "437cad4770e5dad70274f9e449e591eb5e6049c2",
+      "explicit_published_archive_pin_commit": "77a2f1a08aeca43951634d921385a01a4f785fbd",
+      "profile_sha256": "9E03A4F9749367F7B9945652C0391A502FC724A0A106894C2AD861A950EB0C89",
+      "profile_bytes": 1207,
+      "upstream_profile_selection": [
+        "base@2.0.77",
+        "mir-fixture-mir5-active-mods-observer@0.1.0"
+      ],
+      "actual_native_selection": [
+        "base@2.0.77",
+        "mir-fixture-mir5-active-mods-observer@0.1.0",
+        "more-infinite-research@1.1.0"
+      ]
+    },
+    "capture_helper": {
+      "admission_commit": "736fa87449b99837ac0efe4f9aa5ab999c4aa8b7",
+      "path": "tools/Invoke-PrototypeCapture.ps1",
+      "sha256": "A7363640A13A87935829C9FF9276049F91DA9825475DCE472133E643133EB01E",
+      "scope": "The bounded helper admission recognizes numeric published MIR 1.x archives while retaining archive SHA, name, root, filename, engine-family, profile, observer, and governed-resource checks."
+    },
+    "engine": {
+      "path": "D:/Games/Factorio/2.0/bin/x64/factorio.exe",
+      "sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B",
+      "base_version": "2.0.77"
+    },
+    "archives": {
+      "published_mir": {
+        "name": "more-infinite-research_1.1.0.zip",
+        "sha256": "6395C4A5A0F74C67729746D0FBF6162329978B47C5C29D54CC0045F2977C7E44",
+        "bytes": 60927
+      },
+      "active_mods_observer": {
+        "name": "mir-fixture-mir5-active-mods-observer_0.1.0.zip",
+        "sha256": "723D1E7721449FC26040E5E6629416767BDC20AD79CF8723115846DB662A1F87",
+        "bytes": 834
+      }
+    },
+    "limits": {
+      "timeout_seconds": 240,
+      "expected_peak_memory_mib": 4096,
+      "max_new_output_mib": 512,
+      "admission_wait_seconds": 30
+    }
+  },
+  "native_observation": {
+    "result": {
+      "path": "build/qualification/migration-origins/migration-origin-110-published-defaults-f200-r01/native-output/result.json",
+      "sha256": "436395F42EEA9EC24E125ADEB4BA5B0FEE735CF3635FFF902DD466958782030F",
+      "bytes": 12704,
+      "status": "completed-data-stage-observation-only",
+      "process_exit_code": 0,
+      "timed_out": false
+    },
+    "dumps": {
+      "data_raw": {
+        "path": "write-data/script-output/data-raw-dump.json",
+        "sha256": "6BCE64CEEFD4205A57C9F6DC121E9C23BF57F405C36AF20E128F61B3C791A9F3",
+        "bytes": 13303691
+      },
+      "mod_settings": {
+        "path": "write-data/script-output/mod-settings-dump.json",
+        "sha256": "05F488F086632186F435CD2D48238D65023287D672F731C18FC9FDC6E95C5357",
+        "bytes": 14567
+      }
+    }
+  },
+  "restoration_and_custody": {
+    "published_mir_slot": {
+      "before": "absent",
+      "after": "absent"
+    },
+    "observer_slot": {
+      "before_after_exact": true,
+      "sha256": "723D1E7721449FC26040E5E6629416767BDC20AD79CF8723115846DB662A1F87",
+      "bytes": 834
+    },
+    "library_controls": {
+      "before_after_exact": true,
+      "mod_list_sha256": "9A4983B5929B116BCD5909E9B75E6EEB9B79A881637A583E4EC2504E9FA57073",
+      "mod_settings_absent_before_after": true,
+      "native_library_controls_restored": true
+    },
+    "factorio_processes_after_terminal": 0,
+    "raw_native_output": {
+      "members": 9,
+      "member_manifest_sha256": "457463260C69CF97DC407C54A17A1F7E28BD23CAA26BA1954912821AB64FE4E4",
+      "manifest_encoding": "UTF-8 sorted path|bytes|sha256 lines with a final LF"
+    },
+    "primary_custody": {
+      "root": "build/qualification/migration-origins/migration-origin-110-published-defaults-f200-r01",
+      "members": 13,
+      "member_manifest_sha256": "EC866B55338D9B20028199B4059ED4E95558C4F4CEBA818FC795E0038D1BBE3E",
+      "all_nine_raw_members_match_native_output": true,
+      "terminal_sha256": "1C71BD84F27255A5CC3D0B3ECA0E333DF7D3521D014E89616FB9CCFD0855650D"
+    }
+  },
+  "profile_contract_correction": "The executable PrototypeCapture contract requires the profile to omit MIR because the separately hash-bound MIRArchive supplies it. The final profile therefore has two upstream rows and pins the published archive explicitly.",
+  "receipts": {
+    "path": "spec/evidence/migration-origin-110-published-defaults-native-receipts-r01.json.gz",
+    "sha256": "B541C87677DD82B97A8839042536C0E713D271971B15651CD24D817D2A35AF0B",
+    "bytes": 5364,
+    "uncompressed_sha256": "86B3F0B3FC121262E269D976AC73698DA33BC8EB4EA09728963C8DC36EAA9BF0",
+    "uncompressed_bytes": 17590,
+    "exact_safe_original_receipts": 1,
+    "strict_utf8_base64_gzip_roundtrip_verified": true,
+    "exclusions": [
+      "full logs",
+      "configuration payloads",
+      "player data",
+      "preflight payloads",
+      "library-control payloads",
+      "data dumps",
+      "settings dumps",
+      "save binaries",
+      "archive payloads"
+    ]
+  },
+  "claims": {
+    "native_execution": true,
+    "data_settings_capture": true,
+    "source_save": false,
+    "migration": false,
+    "gameplay": false,
+    "lab_completion": false,
+    "performance": false,
+    "release_qualification": false
+  }
+}
