@@ -14,6 +14,18 @@
       "military-science-pack"
     ]
   },
+  "published_1_8_0_f018_preflight": {
+    "kind": "published-1.8.0-source-data-stage-contract",
+    "source_commit": "5662c66c372e6aca025eab9f446de55a5cc6c1c9",
+    "published_archive_sha256": "D785E6EBE7A72E6E9F01A3F89774A6AA30479430410447F603FEF1E0B9BD7B24",
+    "unit_count_formula": "8000 * 2^(L-1)",
+    "unit_time": 60,
+    "direct_effect": 0.05,
+    "direct_science": [
+      "military-science-pack",
+      "utility-science-pack"
+    ]
+  },
   "targets": {
     "f013": {
       "factorio_version": "0.13",
@@ -86,6 +98,28 @@
       "partial_progress": 0.42,
       "queue_api": true,
       "queue_probe": "braking-force-1",
+      "successor_mode": "lab"
+    },
+    "f018": {
+      "factorio_version": "0.18",
+      "minimum_base": "0.18.47",
+      "published_mir_version": "1.8.0",
+      "mir_version": "5.0.01800",
+      "published_archive_sha256": "D785E6EBE7A72E6E9F01A3F89774A6AA30479430410447F603FEF1E0B9BD7B24",
+      "mir5_archive_sha256": "7803FC661DEFA441D1E9D508D1CA80029E619201BBECB0BF113D60D3D3ABEEB9",
+      "published_unit_count_formula": "8000 * 2^(L-1)",
+      "mir5_unit_count_formula": "1*(8000*2^(L-1))",
+      "direct": "recipe-prod-research_character_mining_speed-1",
+      "direct_effect": 0.05,
+      "direct_science": [
+        "military-science-pack",
+        "utility-science-pack"
+      ],
+      "partial_progress": 0.42,
+      "queue_api": true,
+      "queue_probe": "braking-force-1",
+      "foreign_force_name": "mir5-historical-transition-foreign",
+      "foreign_saved_progress": 0.27,
       "successor_mode": "lab"
     },
     "f100": {

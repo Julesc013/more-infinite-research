@@ -374,6 +374,72 @@ class ModernCatalogueTests(unittest.TestCase):
             with self.assertRaisesRegex(catalogue.CatalogueError, "selected upstream archive identities differ"):
                 catalogue.compare_candidate(inventory_path, "bob-angel-f210", baseline, candidate)
 
+    def test_old_inventory_archive_order_preserves_other_receipt_fields_and_bytes(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            captures = self._captures(root)
+            provider = {"name": "zzz-upstream", "version": "1.0.0", "enabled": True}
+            identity = {"name": provider["name"], "version": provider["version"], "builtin": False,
+                        "sha256": hashlib.sha256(b"independent upstream archive").hexdigest().upper()}
+
+            def add_provider(capture):
+                receipt_path = capture / "result.json"
+                receipt = json.loads(receipt_path.read_bytes())
+                mods = [provider, *receipt["generated_selection"]["mods"]]
+                selection_path = capture / "selection.json"
+                _write_json(selection_path, {"mods": mods})
+                receipt["generated_selection"] = {**_record(capture, selection_path), "mods": mods}
+                receipt["selected_archives"].insert(0, identity)
+                receipt["loaded_selection"].insert(0, "zzz-upstream@1.0.0")
+                _write_json(receipt_path, receipt)
+
+            for capture in captures:
+                add_provider(capture)
+            inventory = catalogue.recover_inventory(*captures)
+            # Older sealed inventories preserve archive enumeration order.
+            # Neither their bytes nor order-sensitive selection fields change.
+            profile = catalogue._inventory_profile(inventory, "base-f210")
+            original_receipt = profile["capture_receipts"]["no_mir"]
+            original_receipt["selected_archives_without_mir"].reverse()
+            inventory_path = root / "old-order.json"
+            _write_json(inventory_path, inventory)
+            original_bytes = inventory_path.read_bytes()
+            baseline_bytes = (captures[0] / "result.json").read_bytes()
+
+            expected = _published_raw()
+            del expected["mod-data"]
+            candidate = _capture(root / "candidate", expected, _published_settings(),
+                                 published=True, mir_version="5.0.21000")
+            add_provider(candidate)
+            self.assertEqual(catalogue.compare_candidate(
+                inventory_path, "base-f210", captures[0], candidate)["status"],
+                "equal-intended-native-output")
+            self.assertEqual(inventory_path.read_bytes(), original_bytes)
+            self.assertEqual((captures[0] / "result.json").read_bytes(), baseline_bytes)
+
+            for opponent in ("sha", "generated-order", "loaded-order", "extra-mir", "duplicate", "extra-field"):
+                with self.subTest(opponent=opponent):
+                    changed = deepcopy(inventory)
+                    receipt = catalogue._inventory_profile(changed, "base-f210")["capture_receipts"]["no_mir"]
+                    archives = receipt["selected_archives_without_mir"]
+                    if opponent == "sha":
+                        archives[0]["sha256"] = "0" * 64
+                    elif opponent == "generated-order":
+                        receipt["selection_without_mir"].reverse()
+                    elif opponent == "loaded-order":
+                        receipt["loaded_without_mir"].reverse()
+                    elif opponent == "extra-mir":
+                        archives.append({"name": "more-infinite-research", "version": "4.7.21000",
+                                         "builtin": False, "sha256": "0" * 64})
+                    elif opponent == "duplicate":
+                        archives.append(deepcopy(archives[0]))
+                    else:
+                        archives[0]["unexpected_identity_field"] = "must remain visible"
+                    bad_path = root / (opponent + ".json")
+                    _write_json(bad_path, changed)
+                    with self.assertRaisesRegex(catalogue.CatalogueError, "baseline does not match"):
+                        catalogue.compare_candidate(bad_path, "base-f210", captures[0], candidate)
+
     def test_paired_profile_files_allow_only_hash_verified_full_document_equivalence(self):
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
