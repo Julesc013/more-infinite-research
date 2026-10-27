@@ -536,6 +536,13 @@ class HistoricalTransitionFixtureControls(unittest.TestCase):
             callbacks.events[defines.events.on_research_finished]({research=direct})
             player.research_queue={};callbacks.events[defines.events.on_tick]();callbacks.events[defines.events.on_tick]()
             assert(global.mir5_historical_transition.phase == "published-ready" and saves[#saves] == "mir5-native-complete")
+            if corruption == "published-reload" then
+              -- This is the protected predecessor save's own cold reload,
+              -- before successor configuration can observe it.
+              foreign.set_saved_technology_progress(fixture_target.direct,.26)
+              callbacks.load();local ok,message=pcall(function()callbacks.events[defines.events.on_tick]()end)
+              return ok,tostring(message),created(),created(),table.concat(messages,"\n")
+            end
             callbacks.load();callbacks.events[defines.events.on_tick]()
             fixture_target.stage="mir5";fixture_target.mir_version="5.0.01800"
             if corruption == "configuration" then
@@ -579,6 +586,10 @@ class HistoricalTransitionFixtureControls(unittest.TestCase):
         reload = self.lua.eval("f018_run")("reload")
         self.assertFalse(reload[0])
         self.assertIn("disabled foreign state differs", reload[1])
+
+        corrupted_published_reload = self.lua.eval("f018_run")("published-reload")
+        self.assertFalse(corrupted_published_reload[0])
+        self.assertIn("disabled foreign state differs", corrupted_published_reload[1])
 
     def test_data_final_preflight_accepts_each_pinned_cost_shape_before_acceleration(self):
         # This retained oracle characterizes earlier 4.2.2-era native inputs;
