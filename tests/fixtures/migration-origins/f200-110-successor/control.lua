@@ -44,12 +44,18 @@ local function source_effect_signature(name)
   table.sort(rows)
   return table.concat(rows, ",")
 end
-local function source_recipe_bonuses()
+local function source_recipe_bonuses(direct_earned)
   local expected = {}
-  for _, effects in pairs(catalogue.rows) do
-    for _, effect in ipairs(effects) do
-      if effect.type == "change-recipe-productivity" then
-        expected[effect.recipe] = (expected[effect.recipe] or 0) + effect.change
+  for name, effects in pairs(catalogue.rows) do
+    -- The source fixture seeds the direct gear row at level 2 only for the
+    -- player.  The foreign and detached witnesses remain at level 1, so their
+    -- snapshots deliberately retain every other earned source effect but not
+    -- this direct row's first contribution.
+    if name ~= catalogue.direct or direct_earned then
+      for _, effect in ipairs(effects) do
+        if effect.type == "change-recipe-productivity" then
+          expected[effect.recipe] = (expected[effect.recipe] or 0) + effect.change
+        end
       end
     end
   end
@@ -94,7 +100,7 @@ local function assert_snapshot(snapshot, names, label, direct_level, direct_prog
       fail(label .. " saved source effect multiset differs: " .. name)
     end
   end
-  local recipes = source_recipe_bonuses()
+  local recipes = source_recipe_bonuses(direct_level >= 2)
   if map_count(snapshot.recipes) ~= map_count(recipes) then fail(label .. " saved recipe-bonus count differs") end
   for recipe, expected in pairs(recipes) do
     if not close(snapshot.recipes[recipe], expected) then fail(label .. " saved recipe bonus differs: " .. recipe) end

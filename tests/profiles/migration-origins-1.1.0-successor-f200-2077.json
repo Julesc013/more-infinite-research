@@ -1,0 +1,35 @@
+{
+  "schema": 1,
+  "kind": "mir5-migration-origin-direct-successor-prepared",
+  "origin_tag": "1.1.0",
+  "origin_source_commit": "2fb64822b82569e3b50f0653e361fb7148f18b63",
+  "source_fixture_commit": "d8e24b4a79b6064a373c03210c5ef6be0b013f79",
+  "target": "f200",
+  "factorio_line": "2.0",
+  "engine": {
+    "version": "2.0.77",
+    "sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B"
+  },
+  "settings_mode": "ProtectedOriginalF200SourceSavePendingNative",
+  "source_save": {
+    "status": "awaiting-corrected-r03-native-source-result",
+    "sha256": null,
+    "source_result_sha256": null
+  },
+  "candidate": {
+    "source_commit": "a575a4198807b6aea9e26963e3d9970fc5c068ae",
+    "player_tree": "398c79c687d2bc662c976355ced1436201c43f11"
+  },
+  "mods": [
+    {"name": "base", "version": "2.0.77", "enabled": true},
+    {"name": "mir-fixture-mir5-active-mods-observer", "version": "0.1.0", "enabled": true},
+    {"name": "more-infinite-research", "version": "5.0.20000", "enabled": true},
+    {"name": "mir-fixture-mir5-migration-origin-f200-110-successor", "version": "0.1.0", "enabled": true}
+  ],
+  "archive_sha256": {
+    "mir-fixture-mir5-active-mods-observer_0.1.0.zip": "723D1E7721449FC26040E5E6629416767BDC20AD79CF8723115846DB662A1F87",
+    "mir-fixture-mir5-migration-origin-f200-110-successor_0.1.0.zip": "989B261022930B6B4F517A5474435490CE1AAE0C7F7804DDE027CE63017C19E7",
+    "more-infinite-research_5.0.20000.zip": "8DB28D2DE45F26033B5F54E176902A3138A903AF0F4B48EAB6B9971466021B4F"
+  },
+  "scope": "Prepared direct F200 successor of the corrected protected MIR 1.1.0 F200 source stage under a575 MIR5 F200. It is not runnable until the exact corrected source save/result are bound, and it does not qualify an F210 route or a current package."
+}
