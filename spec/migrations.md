@@ -5,7 +5,7 @@ applies_to: "MIR development"
 audience: developer
 doc_type: specification
 owner: mir-maintainers
-last_reviewed: 2026-10-27
+last_reviewed: 2026-10-28
 supersedes: []
 superseded_by: []
 source_of_truth_for:
@@ -20,7 +20,7 @@ A data-stage generator cannot inspect the player's save. Runtime code cannot rel
 
 ## Baseline and upgrade paths
 
-The principal predecessor is the exact published 4.7.3 package for the same engine family, supplemented by the complete modern-origin requirement below. Preserve prior release variants by their hashes where relevant; version text alone does not identify previously reissued bytes. Distinct older upgrade boundaries retain their previously promised scope or receive an explicit documented bridge decision. Never recommend downgrade as the automatic inverse of upgrade.
+The principal predecessor is the exact published 4.7.3 package for the same engine family, supplemented by the known historical migration boundaries below. Preserve prior release variants by their hashes where relevant; version text alone does not identify previously reissued bytes. Distinct older upgrade boundaries retain their previously promised scope or receive an explicit documented bridge decision. Never recommend downgrade as the automatic inverse of upgrade.
 
 Private incomplete slices use disposable worlds only. Do not load and resave a real full MIR factory with a one-technology replacement package. Full-save migration qualification starts only after all relevant definitions and runtime bridges exist.
 
@@ -32,7 +32,7 @@ Published F2004.7 did not persist the old competing-productivity preference, and
 
 ## Finite transition policy
 
-Record direct, staged, refused, unavailable and unresolved routes against their exact inputs instead of treating every engine/DLC/provider permutation as supported. The maintainer's explicit origin coverage below expands the migration gate; it does not imply arbitrary engine/mod combinations. A later source change needs a consumed-path applicability review and any affected native scenario; unchanged evidence keeps its original name and verdict.
+Record direct, staged, refused, unavailable and unresolved routes against their exact inputs instead of treating every engine/DLC/provider permutation as supported. The maintainer's explicit origin coverage below defines the migration gate; it does not imply arbitrary engine/mod combinations. A later source change needs a consumed-path applicability review and any affected native scenario; unchanged evidence keeps its original name and verdict.
 
 | Route | Policy and current evidence boundary |
 |---|---|
@@ -49,23 +49,36 @@ For a refused or unqualified upgrade, retain the original save and its matching 
 
 ## Required origin coverage
 
-`MIG-05` — The maintainer expanded stable-edition save qualification on 27 October 2026. Test exact published MIR 4.7.3 saves into MIR5 for every stable supported Factorio edition with an actual 4.7.3 predecessor. On Factorio 2.0 and 2.1, additionally qualify direct latest-MIR upgrades from every published MIR version from 1.0.0 onward that is valid for the source engine, including distinct relevant published byte variants. The 1.0.0 tag declares Factorio 2.0; a small MIR version number is not evidence that a modern-origin case is inapplicable. MIR 1–3 origins are not limited to the selected master-changelog entries. For 1.1 and earlier, all pre-5 origins beyond 4.7.3 remain best effort; MIR 5-and-later origins require tested forward upgrades for every engine-valid origin/candidate pair among delivered stable editions. Separately labelled best-effort editions, including F018, retain their target contract and recorded qualification limits.
+The [origin inventory](inventory/migration-origins.json) retains the exact maintainer request, separate lock-repair answer and implementation interpretation under `maintainer_scope_clarification_2026_10_28`. Original wording and interpreted requirements remain distinguishable.
+
+`MIG-05` — The maintainer's 28 October 2026 clarification supersedes the earlier requirement to complete a separate historical campaign for every published patch before 5.0.0. The release must qualify exact published MIR 4.7.3 saves for every stable supported edition with an actual predecessor, plus older saves representing each materially distinct known breaking contract: technology identities, native effects/progression, settings, migration-name history, saved-state schemas and disablement/contribution ownership. Preserve the complete modern-origin inventory and the goal of useful direct upgrades from MIR 1.0.0 onward on 2.0/2.1. Unknown or ambiguous older histories may remain explicitly unverified/deferred; never guess a repair or count that disposition as a pass. A known reproducible regression in a required current or selected boundary route remains a release blocker.
+
+Group older releases by their actual consumed saved-state contract, not only major/minor/patch labels or one identical writer file. A patch with a changed contract needs its own affected case. Select useful representative protected saves for unchanged contracts, preserving exact source/archive/engine/settings identities. A representative pass qualifies its tested route and demonstrated contract only; it does not become a native pass for every unrun tag. The 1.0.0 tag really targets Factorio 2.0, and the inventory includes non-master/backport releases; neither a small version number nor omission from the master changelog justifies discarding it.
 
 | Origin and destination | Required qualification |
 |---|---|
-| Exact 4.7.3 to 5.0.0, same supported engine edition | Each published predecessor edition; Base and Space Age where actually supported, plus affected settings/provider/mod regression closures. |
-| Every published MIR release from 1.0.0 through 4.x to MIR5 on 2.0/2.1 | Each actual engine-valid published origin, with its package, settings, migration history and save pinned; direct MIR upgrade without requiring an intermediate MIR release. |
-| Each 2.0 origin brought forward to 2.1 | Qualify a separate 2.1 successor from every applicable protected 2.0 origin save, in addition to its same-engine upgrade; identify the original source engine/package and every required engine bridge. Do not manufacture a 2.1 predecessor by editing an old package's metadata. A 2.1-only origin does not imply a supported downgrade into 2.0. |
-| A stable target with no published 4.7.3 artifact | Record that absence explicitly, use the latest actual relevant predecessor where one exists, and qualify the target's forward route; never invent a 4.7.3 package or count a missing input as a pass. F018 has its separate experimental target contract. |
-| Each MIR 5-or-later stable origin to a later MIR 5 release | Retain immutable origin saves and prove the direct upgrade into the new candidate for every engine-valid stable origin/candidate pair, including earlier supported Factorio editions. Previously accepted results require exact-input applicability review rather than silent relabelling. F018 remains governed by its limited experimental contract. |
+| Exact 4.7.3 to 5.0.0, same stable edition | Each actual published predecessor; Base/Space Age where supported and affected settings/provider/mod closures. |
+| Known distinct older MIR 1–4 contracts on 2.0/2.1 | Protected representatives covering each actual identity/effect/settings/schema/ownership change, including material published-byte variants. Direct MIR upgrade requires no invented intermediate release. |
+| Selected 2.0 sources brought forward to 2.1 | Separate 2.1 successors for the required predecessor and known distinct boundaries, with original engine/package and necessary engine bridges recorded. No fabricated 2.1 predecessor or downgrade promise. |
+| Other older modern origins | Retain inventory, saves, mappings and exact statuses. Continue inexpensive relevant coverage; defer uncertain/unavailable cases with an explicit reason and support limit, never a guessed recovery or implied pass. |
+| Stable target without a published 4.7.3 artifact | Record absence and use the latest actual relevant predecessor; qualify the route instead of inventing an artifact. F018 retains its experimental contract. |
+| MIR 5-or-later stable origins | Retain the tested forward-upgrade obligation for engine-valid stable origin/candidate pairs. This older-history clarification does not waive future MIR 5 save continuity. |
+
+The nine stable-edition obligations, applicable current native/save/client/performance gates and cumulative migration-file preservation remain unchanged. F018 and earlier best-effort editions retain their separately stated limits. Historical checkpoints keep their original requirements as history; they do not restore the superseded every-tag 5.0.0 gate.
 
 Recover the finite origin list from published tags/releases and their actual package metadata and hashes. For every origin record the source commit, engine eligibility, archive identity, relevant JSON/Lua migration names and contents, required mods/settings, save identity and any unavailable input or known historical defect. Distinguish a published artifact from a reconstruction of its tagged source. Keep this coverage with the existing inventories, profiles and exact evidence; do not add a production history database, generic migration planner or another assurance framework.
 
 Reuse protected existing saves and trusted exact-input receipts before generating new source worlds, including saves from older engine patches and earlier engine families. For unqualified routes, start with the currently installed 2.0/2.1 engines and available dependency archives; record their exact versions/hashes and any differences from the save's original mod/settings closure. Preserve the historical MIR origin's identity. A passing run qualifies its actual tested inputs, without pretending to reproduce a different historical dependency closure. Before fetching older dependency versions, classify suspicious differences against source-fixture expectations, engine/API changes and changed upstream behavior; isolate the affected input only when needed. Unsupported save formats use the necessary installed engine bridges on disposable copies. Missing original dependency archives alone do not block this first evaluation, and unexplained earned-state loss never becomes an accepted expectation.
 
-Each origin needs an actual original-save to candidate-save to two-cold-reload route under `MIG-03`, with new native research and the expected earned effect where research is supported. Check completed/next levels, partial and queued/suspended work, native and scripted contributions, settings, caps and disablement ownership, relevant entities and unrelated force state. Select boundary states and affected mod closures explicitly; a fresh-world load or one 4.7.3 save does not qualify all older origins. Shared fixtures may exercise common checks, but different origin saves remain different native cases. Reuse a successful frozen source stage without recreating or overwriting it.
+Each selected qualification route needs an actual original-save to candidate-save to two-cold-reload route under `MIG-03`, with new native research and the expected earned effect where research is supported. Check completed/next levels, partial and queued/suspended work, native and scripted contributions, settings, caps and disablement ownership, relevant entities and unrelated force state. Select boundary states and affected mod closures explicitly; a fresh-world load or one 4.7.3 save does not qualify all older origins. Shared fixtures may exercise common checks, but different origin saves remain different native cases. Reuse a successful frozen source stage without recreating or overwriting it.
 
-An engine that cannot read the origin save format needs an explicit engine bridge; this is distinct from requiring an intermediate MIR installation. An old mod that cannot create or load a valid source save remains an evidenced adverse/unavailable route requiring recovery work or a maintainer decision. Preserve its original bytes and failure instead of patching the published archive and calling it historical qualification. The existing 4.2.1 loss guidance and 4.7 preference-history ambiguity remain real limits: no migration can infer erased earned state without surviving evidence.
+An engine that cannot read the origin save format needs an explicit engine bridge; this is distinct from requiring an intermediate MIR installation. An old mod that cannot create or load a valid source save remains an evidenced adverse/unavailable route. Under the 28 October decision, an uncertain older route may be deferred after recording the actual obstacle, preserved inputs and support limit; a required current or known boundary failure still needs correction. Preserve its original bytes and failure instead of patching the published archive and calling it historical qualification. The existing 4.2.1 loss guidance and 4.7 preference-history ambiguity remain real limits: no migration can infer erased earned state without surviving evidence.
+
+## Ambiguous researched-planet locks
+
+The maintainer selected preservation with explicit repair on 28 October 2026. A researched-but-locked location without a surviving ownership marker does not authorize MIR to override another mod's lock. Keep ambiguous state unchanged by MIR and offer only an explicit operator-selected repair of a known researched grant. Do not unlock all researched locations automatically, infer lost intent from a version label, or add a recurring repair handler.
+
+The exact no-helper a575/EC0E native comparison already reports Vulcanus unlocked before its separate queue refusal; it does not justify the draft automatic helper or prove a complete successor. Continue the affected preservation case under its exact inputs. Unknown inherited histories remain unverified. MIR cannot reconstruct a lock already discarded by engine loading before callbacks. The [one-time recovery procedure](../docs/support.md#researched-planet-still-locked) selects one force/location and verifies its current researched native grant; it is an operator choice, not a migration pass.
 
 ## Migrations themselves
 

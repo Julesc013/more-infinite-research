@@ -325,9 +325,10 @@ local function assert_source_before(state_value, names, ignore_direct, delta, ta
 end
 local function direct_delta(value)
   local matches = 0
+  local expected = token(catalogue.expected_gear_delta)
   for _, effect in ipairs(value.prototype.effects or {}) do
     if effect.type == "change-recipe-productivity" and effect.recipe == catalogue.gear_recipe
-        and effect.change == catalogue.expected_gear_delta then matches = matches + 1 end
+        and token(effect.change) == expected then matches = matches + 1 end
   end
   if matches ~= 1 then fail("candidate direct gear effect differs") end
   return catalogue.expected_gear_delta

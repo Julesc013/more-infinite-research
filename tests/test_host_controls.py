@@ -7,6 +7,7 @@ longer relevant to the delivered host controls.
 """
 import json
 from pathlib import Path
+import re
 import subprocess
 import unittest
 
@@ -209,6 +210,13 @@ class HostControlsTests(unittest.TestCase):
         self.assertIn("git fetch --no-tags --depth=1 origin bd9774f323b6eb1561c1d9ff0c91ecc3f7acd1d1", workflow)
         self.assertIn("git fetch --no-tags --depth=1 origin 8643cc91bc915e008556a5315dbb0a743247e7ab", workflow)
         self.assertIn("git fetch --no-tags --depth=1 origin c37fca88667d550660f5b9c0efd7f272b56d6025", workflow)
+        fixture_control = (ROOT / "tests/test_f200_foreign_cap_baseline_fixture.py").read_text(encoding="utf-8")
+        fixture_revision = re.search(r'^FIXTURE_REVISION = "([0-9a-f]{40})"$', fixture_control, re.MULTILINE)
+        self.assertIsNotNone(fixture_revision)
+        required_fetch = "git fetch --no-tags --depth=1 origin " + fixture_revision.group(1)
+        jobs = dict(re.findall(r"(?ms)^  ([a-z-]+):\n(.*?)(?=^  [a-z-]+:\n|\Z)", workflow))
+        for job in ("verification-plan", "host-controls"):
+            self.assertIn(required_fetch, jobs[job], job)
         self.assertIn("actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1", workflow)
         self.assertIn("actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065", workflow)
         self.assertIn("python-version: '3.14'", workflow)
