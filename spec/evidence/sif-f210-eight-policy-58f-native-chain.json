@@ -1,0 +1,247 @@
+{
+  "schema": 1,
+  "kind": "MIR5SIFF210EightCurrentPolicyNativeChainV1",
+  "status": "passed-private-eight-current-policy-runtime-loads",
+  "scope": "Eight fresh current-package science-policy runtime loads on Factorio2.1.23 with SIF1.0.78/cr-commons1.0.33/cr-extras1.0.10. This does not repeat the protected predecessor-save campaign.",
+  "controller_commit": "2362911caf577750875d973862d21d02efe06f9a",
+  "candidate": {
+    "exists": true,
+    "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\mir5\\assets\\98fbdd33-root-r01\\more-infinite-research_5.0.21000.zip",
+    "bytes": 679860,
+    "sha256": "58F04FB9D417F2726835F4A6740490DE3C1841665DAC81C2BA3DFA94050D9457"
+  },
+  "engine": {
+    "exists": true,
+    "path": "D:\\Games\\Steam\\steamapps\\common\\Factorio\\bin\\x64\\factorio.exe",
+    "bytes": 49373136,
+    "sha256": "FE4A1DA30F322A0D0B8AEB3DF7276332222BAAA143E2352569B723E84B2B9060"
+  },
+  "prepared_input_receipt": {
+    "path": "spec/evidence/sif-f210-eight-policy-58f-prepared-inputs.json",
+    "sha256": "DFC5798E0BCAD55F59437D832552CE2BE3B500A3BFB3E5A442DD93CCB33768BD"
+  },
+  "actual_observer_sha256": "2E1BE5952D2A4CC5C74A0D149E075D247BA110A3FAE5B6768D3EAEBABCEF989C",
+  "restored_observer_sha256": "A15A7D628D66953D2E0C4D4FA288F47CBF9C5678327C7EB3D23ADB5DC78331C0",
+  "policies": [
+    {
+      "policy": "configured",
+      "status": "passed-private-native-runtime-load-only",
+      "profile_sha256": "AB28D0A530863554F83CC437CCDD41A490296A5272878A1DBE582282DD679157",
+      "result_sha256": "746EE0A381B785C1F09F26F341ECB18076F3242DBE503F67F0ADCFE5DDA54CCE",
+      "native_log_sha256": "9D41814A9291F5FE35FF026357CE7DEA342BF1E2DF5AEDCEB7591C4CEB474457",
+      "native_marker": {
+        "case": "sif-science-retirement-f210-configured",
+        "stage": "init",
+        "status": "passed",
+        "witnesses": {
+          "target": "f210",
+          "policy": "configured",
+          "mir_version": "5.0.21000",
+          "fresh_candidate": true,
+          "runtime_rows": true,
+          "retired_space_science": false,
+          "retired_space_prerequisite": false,
+          "storage_writes": false,
+          "native_state_writes": false
+        }
+      }
+    },
+    {
+      "policy": "space",
+      "status": "passed-private-native-runtime-load-only",
+      "profile_sha256": "57B31507F562F5E86DE24F7DCD4C4BC42773C2BBCCF8A17B36A372F1F8BD202D",
+      "result_sha256": "EF7461B5B9E59CAD99AA82862470399E9022E303EE56C06CCAEE582B3EA60237",
+      "native_log_sha256": "31E0B31338730D63EF9463AAC5C4AA72C196E425DF85D6B53F69B42DFAEA33F4",
+      "native_marker": {
+        "case": "sif-science-retirement-f210-space",
+        "stage": "init",
+        "status": "passed",
+        "witnesses": {
+          "target": "f210",
+          "policy": "space",
+          "mir_version": "5.0.21000",
+          "fresh_candidate": true,
+          "runtime_rows": true,
+          "retired_space_science": false,
+          "retired_space_prerequisite": false,
+          "storage_writes": false,
+          "native_state_writes": false
+        }
+      }
+    },
+    {
+      "policy": "space-and-promethium",
+      "status": "passed-private-native-runtime-load-only",
+      "profile_sha256": "DB8926198DF81A814BAB4B7BF8865528427056FE5F416D274268C83CD17C5DDD",
+      "result_sha256": "12C37F33365DE3276B2B9C39AF02C545B8D6C3BCBAA4214C25E96D2EA2596BEF",
+      "native_log_sha256": "00C1F6AFBDFC4D5843E45505784DA0F2D1BFD4FC8C464346FF5606609A4E6A3B",
+      "native_marker": {
+        "case": "sif-science-retirement-f210-space-and-promethium",
+        "stage": "init",
+        "status": "passed",
+        "witnesses": {
+          "target": "f210",
+          "policy": "space-and-promethium",
+          "mir_version": "5.0.21000",
+          "fresh_candidate": true,
+          "runtime_rows": true,
+          "retired_space_science": false,
+          "retired_space_prerequisite": false,
+          "storage_writes": false,
+          "native_state_writes": false
+        }
+      }
+    },
+    {
+      "policy": "space-age-progression",
+      "status": "passed-private-native-runtime-load-only",
+      "profile_sha256": "BC4FDC69A4C56ED95100C4BC3B2DA01BA21C6EAF828665FFA4A1AE987BBD8A2E",
+      "result_sha256": "6F3524832AFED5ABF46DFC092988FF9D667AE1764B05563D1DC5F33E5EBF3951",
+      "native_log_sha256": "CBBCAE93F504E1E844961CC2AF5A8803831B119A2B7F678C683F5262599ACB96",
+      "native_marker": {
+        "case": "sif-science-retirement-f210-space-age-progression",
+        "stage": "init",
+        "status": "passed",
+        "witnesses": {
+          "target": "f210",
+          "policy": "space-age-progression",
+          "mir_version": "5.0.21000",
+          "fresh_candidate": true,
+          "runtime_rows": true,
+          "retired_space_science": false,
+          "retired_space_prerequisite": false,
+          "storage_writes": false,
+          "native_state_writes": false
+        }
+      }
+    },
+    {
+      "policy": "official-progression",
+      "status": "passed-private-native-runtime-load-only",
+      "profile_sha256": "9B41144258281D4C3EEC88A4B19E05D91B9B9BECE0FDB6AAC91A3BC1351CD364",
+      "result_sha256": "3152137F703CEF3E1374D7819D339ED7DCB442492DEB204E5CAF4039C104539B",
+      "native_log_sha256": "577C6F7FAA50264AF4443D1C98076D9974A15747321CF97532D351881EA9AEFD",
+      "native_marker": {
+        "case": "sif-science-retirement-f210-official-progression",
+        "stage": "init",
+        "status": "passed",
+        "witnesses": {
+          "target": "f210",
+          "policy": "official-progression",
+          "mir_version": "5.0.21000",
+          "fresh_candidate": true,
+          "runtime_rows": true,
+          "retired_space_science": false,
+          "retired_space_prerequisite": false,
+          "storage_writes": false,
+          "native_state_writes": false
+        }
+      }
+    },
+    {
+      "policy": "mod-progression",
+      "status": "passed-private-native-runtime-load-only",
+      "profile_sha256": "42282F5E47C115BF4E19F9ADE316329C9E28A0F8C01BB1982F5FE1A1F0D530DD",
+      "result_sha256": "8B8115D7AFB4651677CD05819EA071A689F441902C72F291F7BD63EC2996E49D",
+      "native_log_sha256": "B2A773C2442DE5D5884B61D000F73D4529141A51FF2E43575F0C2F63A25A3456",
+      "native_marker": {
+        "case": "sif-science-retirement-f210-mod-progression",
+        "stage": "init",
+        "status": "passed",
+        "witnesses": {
+          "target": "f210",
+          "policy": "mod-progression",
+          "mir_version": "5.0.21000",
+          "fresh_candidate": true,
+          "runtime_rows": true,
+          "retired_space_science": false,
+          "retired_space_prerequisite": false,
+          "storage_writes": false,
+          "native_state_writes": false
+        }
+      }
+    },
+    {
+      "policy": "all-official",
+      "status": "passed-private-native-runtime-load-only",
+      "profile_sha256": "81E8FDD937FCDA9F0C8624E581FEDDEBA6322DAE71953C9ABD42F7604DEB04ED",
+      "result_sha256": "F07E5F1BC476C30011D845E90C79563E1471EB5273C62BDB1640560BE1D2DE4E",
+      "native_log_sha256": "234E3C82D8AC4D28B53DFD39E3B1F8556650035EC2A929E4BCE51C36330FEDB7",
+      "native_marker": {
+        "case": "sif-science-retirement-f210-all-official",
+        "stage": "init",
+        "status": "passed",
+        "witnesses": {
+          "target": "f210",
+          "policy": "all-official",
+          "mir_version": "5.0.21000",
+          "fresh_candidate": true,
+          "runtime_rows": true,
+          "retired_space_science": false,
+          "retired_space_prerequisite": false,
+          "storage_writes": false,
+          "native_state_writes": false
+        }
+      }
+    },
+    {
+      "policy": "all",
+      "status": "passed-private-native-runtime-load-only",
+      "profile_sha256": "B7C150948869280BE3AB3786D66A4C422E629929EFE8E59936A80CA2DD253ECD",
+      "result_sha256": "CB1A9DC4D980E61B14AD9823A774BBE01403352CD57A3867B57F86D9F30388C6",
+      "native_log_sha256": "5FF2E639C48CAB48B7E8C6C8D432A3A0DF123C6190C0547B6340DE3BD86DFAB7",
+      "native_marker": {
+        "case": "sif-science-retirement-f210-all",
+        "stage": "init",
+        "status": "passed",
+        "witnesses": {
+          "target": "f210",
+          "policy": "all",
+          "mir_version": "5.0.21000",
+          "fresh_candidate": true,
+          "runtime_rows": true,
+          "retired_space_science": false,
+          "retired_space_prerequisite": false,
+          "storage_writes": false,
+          "native_state_writes": false
+        }
+      }
+    }
+  ],
+  "marker_interpretation": "Zero-write witnesses describe fixture observers only. Retired-space false literals report absence; strict runtime row/science/prerequisite assertions execute before the marker. They are not universal MIR mutation or full gameplay claims.",
+  "custody": {
+    "primary_root": "build/qualification/sif-eight-policy-58f-r02",
+    "members_per_copy": 64,
+    "bytes_per_copy": 6898720,
+    "original_and_primary_sha256_checks": 128,
+    "all_matched": true,
+    "terminal_sha256": "0FFC55CBEDB0B60A2F2CDD30A2AB4D28526F9BA24B8BFC020316AECFB6A1571E",
+    "manifest_sha256": "7E2A0F9ECA2450322415A7018AB2CB46A51D3D56B16A562603597FC8AE1CD2E8",
+    "readback_sha256": "14B3CC97F4DBA809B257B8056CD2C016C4A45A61A9BDB04947B16BD93A3B2EEE"
+  },
+  "restoration": {
+    "all_controls_and_owned_slots_restored": true,
+    "factorio_processes_after": 0,
+    "live_mir_keeper_sha256": "C563CB5B96C9E64CB3373BDB60CF5C8B7D3C97E93EADB8F924443C703CDC024D"
+  },
+  "receipts": {
+    "path": "spec/evidence/sif-f210-eight-policy-58f-native-receipts.json.gz",
+    "sha256": "57475E57110A0A30D58B724E28919F44A48F57A1AA9888D694B29BC1F68819F2",
+    "bytes": 28763,
+    "lossless_safe_result_records": 8,
+    "derived_native_marker_records": 1,
+    "roundtrip_verified": true
+  },
+  "retained_adverses": "Two prior zero-native caller refusals (receipt-field binding and unsupported NativeFixture MaxNewOutputMiB argument) remain preserved in primary custody; neither is a native sample or MIR defect.",
+  "claims": {
+    "eight_exact_runtime_policy_loads": true,
+    "actual_laboratory_completions": false,
+    "save_upgrade": false,
+    "cold_reloads": false,
+    "ordinary_science_costs": false,
+    "physical_production": false,
+    "performance": false,
+    "release_qualification": false
+  },
+  "limits": "Fresh map seed archives are retained as creation outputs, not qualified played-save/reload chains. The separate configured published-to-current save/lab/reload result keeps its own inputs. This CreateOnly batch does not replace remaining client, modpack, migration or performance qualification."
+}
