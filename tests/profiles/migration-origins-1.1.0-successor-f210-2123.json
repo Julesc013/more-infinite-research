@@ -18,8 +18,8 @@
     "source_result_sha256": "4FBD622144E3B69E39C0530385AA70C92971208584CA32D4A10B1FCC1A978997"
   },
   "candidate": {
-    "source_commit": "3e835be9ce06287362b3a7b0faacd107c13ae07c",
-    "player_tree": "a00b2372a06d5398787b2d54169d5494e7c27a7e"
+    "source_commit": "1ea2092d34a3c98942229f11775cd1d3930f54e4",
+    "player_tree": "e8fc567ae0c1742a2cad9fea7911469c0fe9688a"
   },
   "mods": [
     {"name": "base", "version": "2.1.23", "enabled": true},
@@ -30,7 +30,7 @@
   "archive_sha256": {
     "mir-fixture-mir5-active-mods-observer_0.1.0.zip": "A15A7D628D66953D2E0C4D4FA288F47CBF9C5678327C7EB3D23ADB5DC78331C0",
     "mir-fixture-mir5-migration-origin-f200-110-source_0.3.0.zip": "F4C54047A9734180D31C14F18BE38B744F053F399A0D8184961C2B563463C831",
-    "more-infinite-research_5.0.21000.zip": "039BC18B70E179DB600E29C8442637DD9972D7AB81E3F0770FDCF1056D6316B4"
+    "more-infinite-research_5.0.21000.zip": "F46330269500EC407D0780F6E63A4627FE9E8B7DF39B55BE2D34FED3284D6D96"
   },
-  "scope": "Prepared direct F200-to-F210 Base successor of the protected passed MIR 1.1.0 F200 r05 source stage under coherent 3e835be9 MIR5 F210. It asserts the normal nine-effect public module row and three separate retained earned .01 holders; native successor execution remains pending. Space Age planet repair is a separate route and is not selected here."
+  "scope": "Prepared direct F200-to-F210 Base successor of the protected passed MIR 1.1.0 F200 r05 source stage under coherent 1ea2092d MIR5 F210. It asserts the normal nine-effect public module row and three separate retained earned .01 holders; native successor execution remains pending. Space Age planet repair is a separate route and is not selected here."
 }
