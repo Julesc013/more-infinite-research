@@ -67,7 +67,15 @@ local function oil_snapshot(force, level, saved, label)
   effect_vector(value, facts.oil_effects, label .. " oil")
   if value.level ~= level or value.researched ~= false or value.enabled ~= false
       or value.visible_when_disabled ~= true or not close(value.saved_progress, saved)
-      or value.prototype.max_level ~= 4294967295 then fail(label .. " oil saved identity differs") end
+      or value.prototype.max_level ~= 4294967295 then
+    fail(label .. " oil saved identity differs", {
+      expected={level=level, researched=false, enabled=false, visible_when_disabled=true,
+        saved_progress=saved, prototype_max_level=4294967295},
+      actual={level=value.level, researched=value.researched, enabled=value.enabled,
+        visible_when_disabled=value.visible_when_disabled, saved_progress=value.saved_progress,
+        prototype_max_level=value.prototype.max_level},
+    })
+  end
   return {level=value.level, enabled=value.enabled, visible=value.visible_when_disabled, saved_progress=value.saved_progress,
     bonuses=bonuses(force, facts.oil_effects, .1 * (level - 1)), queue=queue_snapshot(force)}
 end
@@ -101,10 +109,12 @@ local function seed_oil(force, level, saved, label)
   -- Clear it before the level setter, which establishes the earned levels.
   value.researched = false
   value.level = level
+  -- Native reset re-enables an earned technology. Establish the intended
+  -- foreign flags and detached investment after that last native operation.
+  force.reset_technology_effects()
   value.enabled = false
   value.visible_when_disabled = true
   value.saved_progress = saved
-  force.reset_technology_effects()
   return oil_snapshot(force, level, saved, label)
 end
 local function seed_foreign(expected)
@@ -195,7 +205,8 @@ end)
 
 script.on_event(defines.events.on_research_finished, function(event)
   local state = storage[KEY]
-  if state == nil or state.phase ~= "researching" or event.research == nil or event.research.force ~= game.forces.player then return end
+  if state == nil or state.phase ~= "researching" or event.by_script ~= false
+      or event.research == nil or event.research.force ~= game.forces.player then return end
   if event.research.name ~= facts.science or not state.started or state.finished >= 2 then fail("unexpected research completion") end
   state.finished, state.started = state.finished + 1, false
 end)

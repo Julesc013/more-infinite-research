@@ -226,6 +226,14 @@ function run_control_model(mods, vector, prerequisites, effect_names, missing, t
       if key=="researched" and value==false then state.level=1 end
     end})
   end
+  local function apply_native_research_effects(force)
+    local science=force.technologies["recipe-prod-research_science_pack_productivity-1"]
+    local oil=force.technologies["recipe-prod-research_oil_cracking_productivity-1"]
+    for _,recipe in ipairs(effect_names) do force.recipes[recipe].productivity_bonus=.1*(science.level-1) end
+    for _,recipe in ipairs({"heavy-oil-cracking","light-oil-cracking"}) do
+      force.recipes[recipe].productivity_bonus=.1*(oil.level-1)
+    end
+  end
   local function new_force(name,index)
     local force={name=name,index=index,valid=true,technologies={},recipes={},research_queue={},research_progress=0}
     local science_effects,oil_effects={},{}
@@ -256,12 +264,9 @@ function run_control_model(mods, vector, prerequisites, effect_names, missing, t
     for _,value in pairs(force.technologies) do value.force=force end
     function force.enable_all_prototypes() end
     function force.reset_technology_effects()
-      local science=force.technologies["recipe-prod-research_science_pack_productivity-1"]
+      apply_native_research_effects(force)
       local oil=force.technologies["recipe-prod-research_oil_cracking_productivity-1"]
-      for _,recipe in ipairs(effect_names) do force.recipes[recipe].productivity_bonus=.1*(science.level-1) end
-      for _,recipe in ipairs({"heavy-oil-cracking","light-oil-cracking"}) do
-        force.recipes[recipe].productivity_bonus=.1*(oil.level-1)
-      end
+      if oil.level>1 then oil.enabled=true end
     end
     function force.add_research(value)
       if value==nil or value.enabled~=true or force.current_research~=nil then return false end
@@ -308,9 +313,9 @@ function run_control_model(mods, vector, prerequisites, effect_names, missing, t
   game.tick=1;ok,result=pcall(callbacks.events[2]);if not ok then return {ok=false,message=tostring(result),saves=saves,markers=markers} end
   local science=player.technologies["recipe-prod-research_science_pack_productivity-1"]
   for completion=1,2 do
-    science.researched=false;science.level=completion+1;player.current_research=nil;player.research_queue={};player.reset_technology_effects()
+    science.researched=false;science.level=completion+1;player.current_research=nil;player.research_queue={};apply_native_research_effects(player)
     for _,item in ipairs(vector) do counts[item]=counts[item]-1 end
-    ok,result=pcall(callbacks.events[1],{research=science});if not ok then return {ok=false,message=tostring(result),saves=saves,markers=markers} end
+    ok,result=pcall(callbacks.events[1],{research=science,by_script=tamper=="scripted-completion"});if not ok then return {ok=false,message=tostring(result),saves=saves,markers=markers} end
     game.tick=game.tick+1;ok,result=pcall(callbacks.events[2]);if not ok then return {ok=false,message=tostring(result),saves=saves,markers=markers} end
   end
   if tamper=="oil" then player.technologies["recipe-prod-research_oil_cracking_productivity-1"].saved_progress=.5 end
@@ -547,21 +552,33 @@ end
         self.assertIn("reload oil saved identity differs", tampered["message"])
         self.assertEqual(1, tampered["saves"])
 
-    def test_frozen_c37_seed_reproduces_native_researched_false_level_reset(self):
-        self.lua.globals().control_override = subprocess.check_output([
-            "git", "show", "c37fca88667d550660f5b9c0efd7f272b56d6025:tests/fixtures/bob-angel-f210-science-oil/control.lua"
-        ], cwd=ROOT).decode("utf-8")
+    def test_frozen_seeds_reproduce_native_level_and_reset_refusals(self):
+        for revision in ("c37fca88667d550660f5b9c0efd7f272b56d6025",
+                         "a9754abcd7405e1ddffa9f4dc8051b71d00855fe"):
+            with self.subTest(revision=revision):
+                self.lua.globals().control_override = subprocess.check_output([
+                    "git", "show", revision + ":tests/fixtures/bob-angel-f210-science-oil/control.lua"
+                ], cwd=ROOT).decode("utf-8")
+                result = plain(self.lua.eval("run_control_model")(
+                    lua_value(self.lua, self._mods(False)), lua_value(self.lua, BASE_VECTOR),
+                    lua_value(self.lua, BASE_PREREQUISITES), lua_value(self.lua, BASE_EFFECTS), None))
+                self.assertFalse(result["ok"])
+                self.assertIn("player oil saved identity differs", result["message"])
+                self.assertEqual(0, result["saves"])
+
+    def test_scripted_research_does_not_satisfy_actual_lab_completion_witness(self):
         result = plain(self.lua.eval("run_control_model")(
             lua_value(self.lua, self._mods(False)), lua_value(self.lua, BASE_VECTOR),
-            lua_value(self.lua, BASE_PREREQUISITES), lua_value(self.lua, BASE_EFFECTS), None))
-        self.assertFalse(result["ok"])
-        self.assertIn("player oil saved identity differs", result["message"])
+            lua_value(self.lua, BASE_PREREQUISITES), lua_value(self.lua, BASE_EFFECTS), None,
+            "scripted-completion"))
         self.assertEqual(0, result["saves"])
+        self.assertEqual({}, result["markers"])
 
     def test_source_guard_has_explicit_level_setter_and_readonly_opponents(self):
         source = (FIXTURE / "control.lua").read_text(encoding="utf-8")
         self.assertLess(source.index("value.researched = false"), source.index("value.level = level"))
         self.assertLess(source.index("value.level = level"), source.index("value.enabled = false"))
+        self.assertLess(source.index("force.reset_technology_effects()"), source.index("value.enabled = false"))
         self.assertLess(source.index("value.enabled = false"), source.index("value.saved_progress = saved"))
         self.assertIn('effect_vector(value, expected.effects, label .. " science")', source)
         self.assertIn('input_vector(value, expected.vector, label .. " science")', source)
