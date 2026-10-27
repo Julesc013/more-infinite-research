@@ -64,12 +64,6 @@ local function copy_map(values)
   return result
 end
 
-local function set_from_map(values)
-  local result = {}
-  for name in pairs(values or {}) do result[name] = true end
-  return result
-end
-
 local function expected_effects(row)
   return count_signatures(row.effects)
 end
