@@ -493,5 +493,19 @@
     "Original6873,535e and earlier native observations retain their actual identities; none is relabelled as a b251 execution.",
     "No new gameplay, migration, multiplayer, performance, normal-target qualification or release verdict is granted.",
     "F006-F012 remain separately labelled best-effort builds; F001-F005 are not invented distributions."
-  ]
+  ],
+  "independent_black_glass_verification": {
+    "status": "all-twenty-files-byte-identical-to-aero",
+    "source_commit": "b251ae7a54104ace87cb0da4cf531cf53f03c93d",
+    "player_source_tree": "79b73a6a8e68987737e69bf2d95ec6555b49f901",
+    "normal_zip_count": 10,
+    "best_effort_zip_count": 7,
+    "file_count": 20,
+    "total_bytes": 6143633,
+    "inventory_sha256": "8304D1C800E3F1E78960DEBFC6409E6298FFC570A7687FE2772EDDE8F459CB45",
+    "primary_custody": "build/mir5/assets/b251ae7a-r01",
+    "readback_path": "build/mir5/recovery/assets-b251ae7a-primary-readback-r01.json",
+    "readback_sha256": "2362966851AF1DC9B27755391B8AD9D5C54777A2EF8F48E93D8EA79F3812006C",
+    "native_qualification": false
+  }
 }
