@@ -673,7 +673,11 @@ class K2ImersiteTransitionFixtureTests(unittest.TestCase):
         readme = (HELD_FLAGS_FIXTURE / "README.md").read_text(encoding="utf-8")
         for expected in (CURRENT_SOURCE, CURRENT_SOURCE_TREE, CURRENT_MIR_ARCHIVE, "679250 bytes",
                          HELD_FLAGS_FIXED_SOURCE, HELD_FLAGS_FIXED_SOURCE_TREE, HELD_FLAGS_FIXED_MIR_ARCHIVE,
-                         f"{HELD_FLAGS_FIXED_MIR_BYTES}-byte", "zero laboratory completions", "pending"):
+                         f"{HELD_FLAGS_FIXED_MIR_BYTES}-byte", HELD_FLAGS_INPUT_REVISION,
+                         "CaseName=k2-imersite-held-public-flags", "exactly seven members",
+                         "fixture_control.lua", "fixture_data_final.lua", "fixture_settings.lua",
+                         "post-MIR state only", "neither invokes nor evidences the real MIR configuration callback",
+                         "Assert-MIRLibraryFixtureArchive", "zero laboratory completions", "pending"):
             self.assertIn(expected, readme)
 
     def test_held_public_flags_prepared_inputs_bind_raw_git_projections_without_native_callback_claims(self):
