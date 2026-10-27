@@ -1,0 +1,56 @@
+{
+  "schema": 1,
+  "kind": "MIR5F210Q010CompleteIntendedOutputReadbackV1",
+  "status": "equal-complete-intended-data-and-settings-output",
+  "source_commit": "535e8d97f12c6b482d2d2e1c677fb64589dd64ed",
+  "player_source_tree": "be97756eca9690f16868ab5d8f8800cc28803258",
+  "player_sha256": "90F252545F4BDE0E6D5F980B552366F0101EA77F2D5CBCA162A48906A8D0C2DD",
+  "engine_sha256": "8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38",
+  "profile_sha256": "05F2786E896B1F28C2E4239134BA370B0C2BCF6CCB1384E03999FB0E89C8B980",
+  "native_result_sha256": "33F25B1A23E10B8563E83374ED804FC628873651BB8D436AE0903C98501950D0",
+  "dumps": {
+    "data_raw": {
+      "path": "write-data/script-output/data-raw-dump.json",
+      "bytes": 67502534,
+      "sha256": "F63D209A868B21BBBE67C1C675EFCF6697774E40383D87C2E000AA48CEEFB849"
+    },
+    "mod_settings": {
+      "path": "write-data/script-output/mod-settings-dump.json",
+      "bytes": 783931,
+      "sha256": "83C3A4166488BFEF80225DE9818810DE4CE0DDD37760C6B17BEC810AC8162D17"
+    }
+  },
+  "intent": {
+    "path": "spec/inventory/bob-angel-f210-intent-r01.json",
+    "source_commit": "289bb68439b3f6097ab00cfc6f03fa54375a6cfb",
+    "sha256": "962DD9429C52A176989DFEF9401AB6772A130EF72F91F1DB7DF1683342DC249E",
+    "reviewed_rows": 160,
+    "comparison_sha256": "169D4203923DB2F627E9D725193E1DBA194B92D1C62980A23F8E6355A4DA69F8",
+    "remaining_differences": []
+  },
+  "adopted_references": "spec/evidence/f210-q010-8f-preparation-native-chain.json",
+  "custody": {
+    "primary_root": "build/mir5/recovery-historical/q010-current535e-data-settings-r01",
+    "original_and_primary_members_independently_verified": 9,
+    "bytes": 68376727,
+    "readback_sha256": "D50730A7B17A857B0B61E4737E5189F90B97F4A17234EBC49CFEFD4740FEC995"
+  },
+  "restoration": {
+    "original_mir": "C563 restored",
+    "controls_restored": true,
+    "factorio_processes_after": 0
+  },
+  "limits": [
+    "Exact q010 combined profile data/settings comparison only; no all-mod or arbitrary-combination claim.",
+    "Oil saved-identity and science research gameplay/save qualification remains separate.",
+    "Later native-cap source has distinct package identity; this result retains its actual90F inputs.",
+    "No menu, elapsed performance, gameplay, migration matrix or release verdict."
+  ],
+  "receipts": {
+    "path": "spec/evidence/f210-q010-90f-intended-output-native-receipts.json.gz",
+    "bytes": 28003,
+    "sha256": "E0925758C329D9FC5281453C1C907B61DC9655572774B9EA7D80E5ACE00943C5",
+    "uncompressed_sha256": "79AB9B599041FDAAB2756A12F1C462807615AA8A79BAE3A57715CAD8469EFC47",
+    "members": 4
+  }
+}
