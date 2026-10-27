@@ -251,6 +251,13 @@ if($null-ne$clear-or[MIROwnedMenuNative]::FixtureIdentityReads-ne0){throw 'clear
             self.assertNotEqual(refused.returncode, 0)
             self.assertIn("CounterbalancedBlocks", refused.stderr + refused.stdout)
 
+    def test_declared_ten_gib_peak_is_admitted_by_the_menu_parameter_contract_only(self):
+        plan = invoke_as_json(f"-PlanOnly -ExpectedPeakMemoryMiB 10240 {DECLARED_POLICY}")
+        self.assertEqual(plan["status"], "planned-not-executed")
+        refused = invoke_failure(f"-PlanOnly -ExpectedPeakMemoryMiB 10241 {DECLARED_POLICY}")
+        self.assertNotEqual(refused.returncode, 0)
+        self.assertIn("ExpectedPeakMemoryMiB", refused.stderr + refused.stdout)
+
     def test_plan_marks_undeclared_tolerances_and_preflight_requires_them(self):
         plan = invoke_as_json("-PlanOnly")
         self.assertEqual(plan["tolerance_policy"]["status"], "required-before-execution")
