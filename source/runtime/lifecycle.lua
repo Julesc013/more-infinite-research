@@ -183,6 +183,10 @@ local function diagnostic_force(phase, force, research)
   local current = existing_state()
   local owned = current and current.owned_disabled and current.owned_disabled[force.index] or nil
   local record = type(owned) == "table" and owned[DIAGNOSTIC_OWNER] or nil
+  local record_disabled, record_visible
+  if type(record) == "table" then
+    record_disabled, record_visible = record.disabled, record.visible_when_disabled
+  end
   diagnostic_lines = diagnostic_lines + 1
   log("[MIR5_CAP_OWNERSHIP_DIAGNOSTIC] module=lifecycle phase=" .. phase
     .. " force=" .. diagnostic_value(force.name)
@@ -192,8 +196,9 @@ local function diagnostic_force(phase, force, research)
     .. " researched=" .. diagnostic_value(technology and technology.researched)
     .. " enabled=" .. diagnostic_value(technology and technology.enabled)
     .. " visible=" .. diagnostic_value(technology and technology.visible_when_disabled)
-    .. " record_disabled=" .. diagnostic_value(type(record) == "table" and record.disabled or nil)
-    .. " record_visible=" .. diagnostic_value(type(record) == "table" and record.visible_when_disabled or nil))
+    .. " record_present=" .. tostring(type(record) == "table")
+    .. " record_disabled=" .. diagnostic_value(record_disabled)
+    .. " record_visible=" .. diagnostic_value(record_visible))
 end
 
 local function diagnostic_named_forces(phase)

@@ -35,6 +35,10 @@ local function diagnostic_snapshot(phase, force, name, limit, owned_disabled)
   local technology = force.technologies and force.technologies[name] or nil
   local owned = type(owned_disabled) == "table" and owned_disabled[force.index] or nil
   local record = type(owned) == "table" and owned[name] or nil
+  local record_disabled, record_visible
+  if type(record) == "table" then
+    record_disabled, record_visible = record.disabled, record.visible_when_disabled
+  end
   diagnostic_lines = diagnostic_lines + 1
   log("[MIR5_CAP_OWNERSHIP_DIAGNOSTIC] module=caps phase=" .. phase
     .. " force=" .. diagnostic_value(force.name)
@@ -44,8 +48,9 @@ local function diagnostic_snapshot(phase, force, name, limit, owned_disabled)
     .. " researched=" .. diagnostic_value(technology and technology.researched)
     .. " enabled=" .. diagnostic_value(technology and technology.enabled)
     .. " visible=" .. diagnostic_value(technology and technology.visible_when_disabled)
-    .. " record_disabled=" .. diagnostic_value(type(record) == "table" and record.disabled or nil)
-    .. " record_visible=" .. diagnostic_value(type(record) == "table" and record.visible_when_disabled or nil))
+    .. " record_present=" .. tostring(type(record) == "table")
+    .. " record_disabled=" .. diagnostic_value(record_disabled)
+    .. " record_visible=" .. diagnostic_value(record_visible))
 end
 
 local function positive_integer(value)
