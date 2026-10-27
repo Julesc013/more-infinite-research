@@ -7,7 +7,7 @@
     "version": "2.1.23",
     "sha256": "8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38"
   },
-  "fixture_source_commit": "759fa8ee71294747e58bb361409b8c541a0d0256",
+  "fixture_source_commit": "41c13d7c7b58da9706717b630793af61c3cc2051",
   "case": "discovery-recovery",
   "settings_mode": "ProtectedOriginalSourceSavePendingNative",
   "mods": [
@@ -54,7 +54,7 @@
   ],
   "archive_sha256": {
     "mir-fixture-mir5-active-mods-observer_0.1.0.zip": "2E1BE5952D2A4CC5C74A0D149E075D247BA110A3FAE5B6768D3EAEBABCEF989C",
-    "mir-fixture-discovery-recovery_0.2.0.zip": "D776E7919485B4D4AD34C492A27872168A1A6930924AB9FC022EC9CC74603BBF",
+    "mir-fixture-discovery-recovery_0.2.0.zip": "631EAE6227631B487BE20887058719795EAB156A7324B8AA9D1ED23609BAA06D",
     "more-infinite-research_5.0.21000.zip": "99EDF6EF6723434EBBDA1AED4AA58A74A26827D94FD18F67E88C118C3DF96BD6"
   },
   "role": "private-proposed-recovery-successor",
