@@ -125,7 +125,11 @@ local function assert_foreign(force, expected, stage, label)
   local value = technology(force)
   check_effects(value, expected.effects, label)
   if value.level ~= 2 or value.researched ~= false or value.enabled ~= false
-      or value.prototype.max_level ~= UINT32_MAX then fail(label .. " foreign native state differs") end
+      or value.prototype.max_level ~= UINT32_MAX then
+    fail(label .. " foreign native state differs: level=" .. tostring(value.level)
+      .. ", researched=" .. tostring(value.researched) .. ", enabled=" .. tostring(value.enabled)
+      .. ", maximum=" .. tostring(value.prototype.max_level))
+  end
   if stage == "relaxed" then
     if value.visible_when_disabled ~= false then fail(label .. " foreign visibility was not restored") end
   elseif value.visible_when_disabled ~= true then
