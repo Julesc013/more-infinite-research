@@ -41,8 +41,14 @@
         "source_rows": 21,
         "source_actual_labs": 1,
         "new_candidate_actual_labs": 1,
-        "direct_level": {"source": 2, "candidate": 3},
-        "gear_bonus": {"source": 0.10000000149011612, "candidate": 0.20000000298023224},
+        "direct_level": {
+          "source": 2,
+          "candidate": 3
+        },
+        "gear_bonus": {
+          "source": 0.10000000149011612,
+          "candidate": 0.20000000298023224
+        },
         "foreign_queue_progress": 0.42000000000000004,
         "detached_progress": 0.27,
         "effective_breeding_setting": false,
@@ -73,8 +79,14 @@
         "source_rows": 21,
         "source_actual_labs": 1,
         "new_candidate_actual_labs": 1,
-        "direct_level": {"source": 2, "candidate": 3},
-        "gear_bonus": {"source": 0.10000000149011612, "candidate": 0.2},
+        "direct_level": {
+          "source": 2,
+          "candidate": 3
+        },
+        "gear_bonus": {
+          "source": 0.10000000149011612,
+          "candidate": 0.2
+        },
         "foreign_queue_progress": 0.42000000000000004,
         "detached_progress": 0.27,
         "effective_breeding_setting": false,
@@ -87,11 +99,16 @@
   ],
   "fixture_owned_sentinel_boundary": {
     "persisted_snapshot_value": 0.125,
-    "fields": ["player.manual_mining_speed_modifier", "foreign.manual_mining_speed_modifier", "detached.manual_mining_speed_modifier"],
-    "configuration_rule": "Before a write, each value must be either the observed engine reset value 0 or the saved snapshot value. Only zero is re-applied; an already-correct value is retained; every other value refuses before candidate work.",
+    "fields": [
+      "player.manual_mining_speed_modifier",
+      "foreign.manual_mining_speed_modifier",
+      "detached.manual_mining_speed_modifier"
+    ],
+    "configuration_rule": "Before a write, each value must be either the separately observed zero value or the saved snapshot value. Only zero is re-applied; an already-correct value is retained; every other value refuses before candidate work.",
     "reload_rule": "Cold reload assertions are pure and write no sentinel value.",
     "representation_rule": "The raw source effect signature is retained. The observer accepts only verified additive change-recipe-productivity ordering, omitted hidden=false, and the four exact source float32 projections; it preserves multiplicity and rejects all other effect drift.",
-    "claim_limit": "This fixture lifecycle correction does not assert that MIR reconstructs unowned script or console modifiers."
+    "claim_limit": "This fixture lifecycle correction does not assert that MIR reconstructs unowned script or console modifiers.",
+    "reset_attribution": "The recorded zero marker alone does not establish engine causality or execution before MIR initialization/configuration. Bind the actual early-observer source/container, caller/selection and native ordering before making that separate claim."
   },
   "custody": {
     "f200": {
@@ -145,5 +162,5 @@
     "performance": false,
     "release_qualification": false
   },
-  "limitations": "This is one protected published MIR 1.0.0 F200 origin, two exact frozen candidate packages, and two exact engine families. It neither covers every historical origin nor relabels BD1/58F observations as a later source/package; current-new-source applicability and VER-06 remain pending with the maintainer."
+  "limitations": "This is one protected published MIR 1.0.0 F200 origin, two exact frozen candidate packages, and two exact engine families. It neither covers every historical origin nor relabels BD1/58F observations as a later source/package; current-new-source applicability and VER-06 remain pending with the maintainer. The offset condition and fixture-owned reapplication do not prove a pre-MIR engine reset; other native observations retain their frozen scope while that attribution remains unverified."
 }
