@@ -324,8 +324,8 @@ end
 local function begin()
   local target_name = exact_target()
   local state_value = state()
-  -- Validate every retained source field before restoring the one documented
-  -- engine-reset sentinel.  Bad source rows/effects/recipes/queues must not
+  -- Validate every retained source field before restoring the documented zero
+  -- sentinel. Bad source rows/effects/recipes/queues must not
   -- mutate a force, fixture storage, or a candidate lab.
   local observed = assert_supporting_state(state_value, false)
   assert_direct_before(state_value)
