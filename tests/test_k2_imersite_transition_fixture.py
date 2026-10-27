@@ -4,8 +4,10 @@
 # validate explicit closure, data preflights, fixture-only acceleration, and
 # read-only control registration without launching the engine.
 import argparse
+import hashlib
 import json
 from pathlib import Path
+import subprocess
 import sys
 import unittest
 
@@ -31,6 +33,14 @@ HELD_FLAGS_FIXED_MIR_ARCHIVE = "59C14208B200CC534353CD46391210FE0B53E4C5739FFE8A
 HELD_FLAGS_FIXED_MIR_BYTES = 679575
 HELD_FLAGS_SOURCE_PROFILE = PROFILES / "k2-imersite-held-public-flags-source-f210.json"
 HELD_FLAGS_FIXED_PROFILE = PROFILES / "k2-imersite-held-public-flags-fixed-f210.json"
+HELD_FLAGS_INPUT_REVISION = "3d1c6d166ce1a412cab2dc9bdd506d1de7afe00d"
+HELD_FLAGS_INPUT_RECEIPT = ROOT / "spec/evidence/k2-imersite-held-public-flags-inputs-3d1c6d16.json"
+HELD_FLAGS_FIXTURE_ARCHIVES = {
+    "source": ("mir-fixture-mir5-k2-imersite-held-public-flags_0.1.0.zip",
+               "9CC52FD88DFFA2081FEB77B539A5C2AF0CE820C4ECD62FE1146F7FBA31837BAA", 6820),
+    "fixed": ("mir-fixture-mir5-k2-imersite-held-public-flags_0.2.0.zip",
+              "0DA6D8B9FFEADE9DF6B5EE9B160490BAC7663EB3AE0E59CCEADA9A03E01F80C9", 6819),
+}
 OBSERVER_ARCHIVE = "mir-fixture-mir5-active-mods-observer_0.1.0.zip"
 EXTERNAL_ARCHIVES = {
     "flib_0.17.2.zip": "0A48C15DC0FC6C13BB3FE8293BA6CB35A07F3B0F37D37ACB50AB30E32E8E019D",
@@ -628,7 +638,7 @@ class K2ImersiteTransitionFixtureTests(unittest.TestCase):
     def test_held_public_flags_profiles_pin_e3a_source_and_6786_fixed_successor(self):
         source = json.loads(HELD_FLAGS_SOURCE_PROFILE.read_text(encoding="utf-8"))
         fixed = json.loads(HELD_FLAGS_FIXED_PROFILE.read_text(encoding="utf-8"))
-        for profile, fixture_version in ((source, "0.1.0"), (fixed, "0.2.0")):
+        for stage, profile, fixture_version in (("source", source, "0.1.0"), ("fixed", fixed, "0.2.0")):
             with self.subTest(kind=profile["kind"]):
                 self.assertEqual(("f210", "2.1", "Defaults"),
                                  (profile["target"], profile["factorio_line"], profile["settings_mode"]))
@@ -638,9 +648,13 @@ class K2ImersiteTransitionFixtureTests(unittest.TestCase):
                 self.assertEqual(("5.0.21000", fixture_version),
                                  (mods["more-infinite-research"], mods["mir-fixture-mir5-k2-imersite-held-public-flags"]))
                 self.assertEqual("2.0.19", mods["Krastorio2-spaced-out"])
+                fixture_archive, fixture_sha, fixture_bytes = HELD_FLAGS_FIXTURE_ARCHIVES[stage]
                 self.assertEqual(EXTERNAL_ARCHIVES,
                                  {name: digest for name, digest in profile["archive_sha256"].items()
-                                  if name != CURRENT_MIR_NAME})
+                                  if name not in {CURRENT_MIR_NAME, fixture_archive}})
+                self.assertEqual(fixture_sha, profile["archive_sha256"][fixture_archive])
+                self.assertIn(fixture_sha, profile["scope"])
+                self.assertIn(f"{fixture_bytes} bytes", profile["scope"])
         self.assertEqual(CURRENT_MIR_ARCHIVE, source["archive_sha256"][CURRENT_MIR_NAME])
         self.assertEqual(HELD_FLAGS_FIXED_MIR_ARCHIVE, fixed["archive_sha256"][CURRENT_MIR_NAME])
         for expected in (HELD_FLAGS_FIXED_SOURCE, HELD_FLAGS_FIXED_SOURCE_TREE,
@@ -661,6 +675,50 @@ class K2ImersiteTransitionFixtureTests(unittest.TestCase):
                          HELD_FLAGS_FIXED_SOURCE, HELD_FLAGS_FIXED_SOURCE_TREE, HELD_FLAGS_FIXED_MIR_ARCHIVE,
                          f"{HELD_FLAGS_FIXED_MIR_BYTES}-byte", "zero laboratory completions", "pending"):
             self.assertIn(expected, readme)
+
+    def test_held_public_flags_prepared_inputs_bind_raw_git_projections_without_native_callback_claims(self):
+        receipt = json.loads(HELD_FLAGS_INPUT_RECEIPT.read_bytes())
+        self.assertEqual("MIR5K2ImersiteHeldPublicFlagsPreparedInputsV1", receipt["kind"])
+        self.assertEqual(HELD_FLAGS_INPUT_REVISION, receipt["fixture_source_commit"])
+        self.assertEqual("k2-imersite-held-public-flags", receipt["case_name"])
+        for field in ("native_execution", "library_mutation", "lab_completion", "release_qualification"):
+            self.assertIs(receipt[field], False)
+        self.assertIn("pending", receipt["saved_input_hashes"])
+        self.assertEqual(
+            ["info.json", "control.lua", "data-final-fixes.lua", "settings-updates.lua",
+             "fixture_control.lua", "fixture_data_final.lua", "fixture_settings.lua"],
+            receipt["projection_contract"]["members"],
+        )
+        self.assertEqual(7, receipt["projection_contract"]["member_count"])
+        self.assertIn("no README or alternate metadata", receipt["projection_contract"]["description"])
+        self.assertEqual("both-seven-member-source-projections-pass-real-guard", receipt["archive_guard"]["status"])
+        self.assertIn("Assert-MIRLibraryFixtureArchive", receipt["archive_guard"]["command"])
+        self.assertIn("post-MIR configuration state", receipt["host_control_limit"])
+        self.assertIn("neither invokes nor evidences an actual MIR configuration callback", receipt["host_control_limit"])
+
+        profiles = {"source": json.loads(HELD_FLAGS_SOURCE_PROFILE.read_bytes()),
+                    "fixed": json.loads(HELD_FLAGS_FIXED_PROFILE.read_bytes())}
+        self.assertEqual(["source", "fixed"], [row["stage"] for row in receipt["stages"]])
+        for row in receipt["stages"]:
+            stage = row["stage"]
+            archive, digest, bytes_count = HELD_FLAGS_FIXTURE_ARCHIVES[stage]
+            with self.subTest(stage=stage):
+                self.assertEqual((archive.rsplit("_", 1)[1][:-4], digest, bytes_count),
+                                 (row["version"], row["sha256"], row["bytes"]))
+                self.assertEqual(digest, profiles[stage]["archive_sha256"][archive])
+                self.assertEqual(7, len(row["members"]))
+                expected = {name: f"tests/fixtures/k2-imersite-held-public-flags/{stage}/{name}"
+                            for name in ("info.json", "control.lua", "data-final-fixes.lua", "settings-updates.lua")}
+                expected.update({name: f"tests/fixtures/k2-imersite-held-public-flags/{name}"
+                                 for name in ("fixture_control.lua", "fixture_data_final.lua", "fixture_settings.lua")})
+                self.assertEqual(expected, {member["path"]: member["source_path"] for member in row["members"]})
+                for member in row["members"]:
+                    raw = subprocess.check_output(["git", "show", f"HEAD:{member['source_path']}"], cwd=ROOT)
+                    self.assertEqual((member["sha256"], member["bytes"]),
+                                     (hashlib.sha256(raw).hexdigest().upper(), len(raw)))
+        helper = receipt["package_tool"]
+        raw_helper = subprocess.check_output(["git", "show", f"HEAD:{helper['path']}"], cwd=ROOT)
+        self.assertEqual(helper["committed_sha256"], hashlib.sha256(raw_helper).hexdigest().upper())
 
     def test_held_public_flags_data_preflights_the_real_k2so_rows_before_fixture_state(self):
         for stage in ("source", "fixed"):

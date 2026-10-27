@@ -31,7 +31,8 @@
     "Krastorio2MenuSimulations_2.1.0.zip": "3A485B449B356DC4B3EB4233DE4E803B3A001259FBC251BDC9F9D9120B3C53A7",
     "xy-k2so-enhancements-nulls-fork_0.8.3.zip": "930F43B96B04012FEF090C40D8B16A6B3F259D1713C86CF59DFF3E9A5A97E2BE",
     "mir-fixture-mir5-active-mods-observer_0.1.0.zip": "2E1BE5952D2A4CC5C74A0D149E075D247BA110A3FAE5B6768D3EAEBABCEF989C",
-    "more-infinite-research_5.0.21000.zip": "E3A65C08AC7798A66FB1BE30D24307B17C8B366DD901953BDE2A09BD6939C8CE"
+    "more-infinite-research_5.0.21000.zip": "E3A65C08AC7798A66FB1BE30D24307B17C8B366DD901953BDE2A09BD6939C8CE",
+    "mir-fixture-mir5-k2-imersite-held-public-flags_0.1.0.zip": "9CC52FD88DFFA2081FEB77B539A5C2AF0CE820C4ECD62FE1146F7FBA31837BAA"
   },
-  "scope": "Exact b251ae7a54104ace87cb0da4cf531cf53f03c93d/player79b73a6a8e68987737e69bf2d95ec6555b49f901 old E3A F210 K2SO source input for a state-only held-public-flags fixture. Source save, fixture ZIP, and native execution remain pending."
+  "scope": "Exact b251ae7a54104ace87cb0da4cf531cf53f03c93d/player79b73a6a8e68987737e69bf2d95ec6555b49f901 old E3A F210 K2SO source input for a state-only held-public-flags fixture. The seven-member raw-Git fixture projection is 9CC52FD88DFFA2081FEB77B539A5C2AF0CE820C4ECD62FE1146F7FBA31837BAA (6820 bytes); source save and native execution remain pending."
 }
