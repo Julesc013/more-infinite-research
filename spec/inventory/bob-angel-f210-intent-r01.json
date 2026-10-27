@@ -2,9 +2,9 @@
   "schema": 2,
   "kind": "MIR5ModernCatalogueReviewedDifferencesV1",
   "claims": [
-    "This partial F210 Bob/Angel intent contains only 158 exact named expected rows reconstructed from the fresh standalone U/B6 oracle and separately declared contracts.",
-    "It admits 123 SET-02 growth ceilings, two literal-title child removals, 24 finite signed native-credit carriers, and nine B6-payload-preserving static-prefix effect representations; it does not derive an expected row from current player output.",
-    "It does not establish gameplay, save, Library, performance, native, or release acceptance. Unresolved classes remain comparison blockers."
+    "This partial F210 Bob/Angel intent contains only 160 exact named expected rows reconstructed from the fresh standalone U/B6 oracle and separately declared contracts.",
+    "It admits 123 SET-02 growth ceilings, two literal-title child removals, 24 finite signed native-credit carriers, nine B6-payload-preserving static-prefix effect representations, and two independently reconstructed non-B6 retained/progression rows; it does not derive an expected row from current player output.",
+    "It does not establish gameplay, save, Library, performance, native, or release acceptance. The two added rows retain explicit native gameplay and qualification requirements."
   ],
   "provenance": {
     "fresh_standalone_oracle": {
@@ -73,6 +73,114 @@
       "independent_oracle": "tests/native_credit_oracle.py::NATIVE_CREDIT_DESCRIPTORS/native_credit_carrier_rows",
       "control": "tests/test_bob_angel_catalogue.py::test_dormant_credit_oracle_retains_excluded_routes_and_rejects_conflicting_effects",
       "count": 24
+    },
+    "addition_contracts": {
+      "oil_cracking_saved_identity": {
+        "status": "reviewed-exact-disabled-earned-identity",
+        "f200_intent": {
+          "path": "spec/inventory/bob-angel-f200-intent-r03.json",
+          "sha256": "1D200906E8996F4049009EE6761E73C88FFC70824BC838496786A32EF927207C",
+          "difference_id": "BA-BASE-IDENTITY-RESEARCH_OIL_CRACKING_PRODUCTIVITY"
+        },
+        "field_adaptation": "None. The F210 Bob+Angel selection retains the exact accepted F200 disabled saved-identity row; only the separately selected F210 profile binds it.",
+        "expected_row_sha256": "06ACB52331F062C4D40A73252D890592E831AEFCDA140AF605681FFCCEAB23C3"
+      },
+      "science_pack_productivity": {
+        "status": "reviewed-static-body-q010-progression-and-comp02-producers",
+        "unmodded_f210_body": {
+          "path": "spec/inventory/modern-f210-470.json",
+          "sha256": "C37027F17D4F02C50C664739B242D62E29AAE0C68079450FCBA95499DC7EFB79",
+          "profile": "space-age-f210",
+          "row_sha256": "7E0E2EEDF6D80F5BD1C0159D4E8CAC60BC85F8442F1951D0B3157A3D0B74D8D9"
+        },
+        "q010_b6_progression": {
+          "data_raw_dump": {
+            "bytes": 67953508,
+            "sha256": "A8935196FBF9A58DA01BB26EFD739CE74941DB2885C6A1514E9379F64A33C3C1"
+          },
+          "technology": "research-speed-7",
+          "row_sha256": "33BC54319E68C46FC06E91215669B88FD30997355D0B3A0F183BBF869242F80E",
+          "used_fields": [
+            "prerequisites",
+            "unit.ingredients"
+          ]
+        },
+        "q010_upstream_context": {
+          "path": "tests/fixtures/bob-angel-f210-upstream-context.json.gz",
+          "sha256": "CE1A0C0551C2C461B305E2C990811DCC316DCFFC12923166D0A27A4172A32598",
+          "case": "space_age",
+          "source_data_raw_dump": {
+            "bytes": 67302883,
+            "sha256": "3CEA9040B2ABCB5BD9E8615AC2866A798DACE7B6B31A999CB498B8CFCCA8AB92"
+          }
+        },
+        "normative_contract": [
+          "spec/compatibility.md#COMP-01",
+          "spec/compatibility.md#COMP-02",
+          "spec/determinism.md#DET-02"
+        ],
+        "static_seed_recipe_order": [
+          "agricultural-science-pack",
+          "automation-science-pack",
+          "chemical-science-pack",
+          "cryogenic-science-pack",
+          "electromagnetic-science-pack",
+          "logistic-science-pack",
+          "metallurgic-science-pack",
+          "military-science-pack",
+          "production-science-pack",
+          "promethium-science-pack",
+          "space-science-pack",
+          "utility-science-pack"
+        ],
+        "producer_recipe_names": [
+          "agricultural-science-pack",
+          "angels-desert-garden-a",
+          "angels-desert-garden-cultivating-a",
+          "angels-swamp-garden-a",
+          "angels-swamp-garden-cultivating-a",
+          "angels-temperate-garden-a",
+          "angels-temperate-garden-cultivating-a",
+          "automation-science-pack",
+          "bob-advanced-logistic-science-pack",
+          "bob-alien-science-pack",
+          "bob-alien-science-pack-blue",
+          "bob-alien-science-pack-green",
+          "bob-alien-science-pack-orange",
+          "bob-alien-science-pack-purple",
+          "bob-alien-science-pack-red",
+          "bob-alien-science-pack-yellow",
+          "bob-science-pack-gold",
+          "chemical-science-pack",
+          "cryogenic-science-pack",
+          "electromagnetic-science-pack",
+          "logistic-science-pack",
+          "metallurgic-science-pack",
+          "military-science-pack",
+          "production-science-pack",
+          "promethium-science-pack",
+          "space-science-pack",
+          "utility-science-pack"
+        ],
+        "canonical_remaining_recipe_order": [
+          "angels-desert-garden-a",
+          "angels-desert-garden-cultivating-a",
+          "angels-swamp-garden-a",
+          "angels-swamp-garden-cultivating-a",
+          "angels-temperate-garden-a",
+          "angels-temperate-garden-cultivating-a",
+          "bob-advanced-logistic-science-pack",
+          "bob-alien-science-pack",
+          "bob-alien-science-pack-blue",
+          "bob-alien-science-pack-green",
+          "bob-alien-science-pack-orange",
+          "bob-alien-science-pack-purple",
+          "bob-alien-science-pack-red",
+          "bob-alien-science-pack-yellow",
+          "bob-science-pack-gold"
+        ],
+        "expected_row_sha256": "70707E8F7368145F3286F77F6E6435419EAB0CDF3B6FD843962DD767DFCCB95B"
+      }
     },
     "source_hashes": {
       "spec/settings.md": "3844FF8780C29087C9E5E65BAEF049B6D80CBABC5A9DD7E762A40D740955E3AD",
@@ -7167,6 +7275,332 @@
         "published_effect_multiset_sha256": "E1FCD73C1AD8951702DC582518C6C6ABB04B351CB0D64A7F8504DED146DBC8B4"
       },
       "reason": "The independently captured q010 B6 technology payload is retained exactly. Its effect presentation is reconstructed as the independent unmodded F210 Space Age B6 static seed prefix followed by the remaining B6 recipes in canonical name order; this is a finite declared sequence representation, not a candidate-derived allowance or payload change."
+    },
+    {
+      "id": "BA-F210-ADDITION-OIL-CRACKING-SAVED-IDENTITY",
+      "profile": "bob-angel-f210",
+      "domain": "data",
+      "type": "technology",
+      "name": "recipe-prod-research_oil_cracking_productivity-1",
+      "expected_candidate": {
+        "effects": [
+          {
+            "change": 0.1,
+            "recipe": "heavy-oil-cracking",
+            "type": "change-recipe-productivity"
+          },
+          {
+            "change": 0.1,
+            "recipe": "light-oil-cracking",
+            "type": "change-recipe-productivity"
+          }
+        ],
+        "enabled": false,
+        "icons": [
+          {
+            "icon": "__base__/graphics/technology/oil-processing.png",
+            "icon_size": 256
+          },
+          {
+            "floating": true,
+            "icon": "__core__/graphics/icons/technology/constants/constant-recipe-productivity.png",
+            "icon_size": 128,
+            "scale": 0.5,
+            "shift": [
+              50,
+              50
+            ]
+          }
+        ],
+        "level": 1,
+        "localised_description": [
+          "technology-description.more-infinite-research.recipe_productivity"
+        ],
+        "localised_name": [
+          "technology-name.more-infinite-research.research_oil_cracking_productivity"
+        ],
+        "max_level": "infinite",
+        "name": "recipe-prod-research_oil_cracking_productivity-1",
+        "order": "p[research_oil_cracking_productivity]",
+        "prerequisites": [
+          "automation-science-pack",
+          "logistic-science-pack"
+        ],
+        "type": "technology",
+        "unit": {
+          "count_formula": "8000*2^(L-1)",
+          "ingredients": [
+            [
+              "automation-science-pack",
+              1
+            ],
+            [
+              "logistic-science-pack",
+              1
+            ]
+          ],
+          "time": 60
+        },
+        "upgrade": true
+      },
+      "independent_before_sha256": "06ACB52331F062C4D40A73252D890592E831AEFCDA140AF605681FFCCEAB23C3",
+      "reason": "The accepted F200 r03 contract retains this exact published Base earned identity disabled after Angel replaces active routes. The F210 Bob+Angel selection is an explicit target binding, not a field adaptation; all saved identity, effects, science, tuning, icons and order remain the independently declared F200 row."
+    },
+    {
+      "id": "BA-F210-ADDITION-SCIENCE-PACK-COMP02-COMBINED-PRODUCERS",
+      "profile": "bob-angel-f210",
+      "domain": "data",
+      "type": "technology",
+      "name": "recipe-prod-research_science_pack_productivity-1",
+      "expected_candidate": {
+        "effects": [
+          {
+            "type": "change-recipe-productivity",
+            "recipe": "agricultural-science-pack",
+            "change": 0.1
+          },
+          {
+            "type": "change-recipe-productivity",
+            "recipe": "automation-science-pack",
+            "change": 0.1
+          },
+          {
+            "type": "change-recipe-productivity",
+            "recipe": "chemical-science-pack",
+            "change": 0.1
+          },
+          {
+            "type": "change-recipe-productivity",
+            "recipe": "cryogenic-science-pack",
+            "change": 0.1
+          },
+          {
+            "type": "change-recipe-productivity",
+            "recipe": "electromagnetic-science-pack",
+            "change": 0.1
+          },
+          {
+            "type": "change-recipe-productivity",
+            "recipe": "logistic-science-pack",
+            "change": 0.1
+          },
+          {
+            "type": "change-recipe-productivity",
+            "recipe": "metallurgic-science-pack",
+            "change": 0.1
+          },
+          {
+            "type": "change-recipe-productivity",
+            "recipe": "military-science-pack",
+            "change": 0.1
+          },
+          {
+            "type": "change-recipe-productivity",
+            "recipe": "production-science-pack",
+            "change": 0.1
+          },
+          {
+            "type": "change-recipe-productivity",
+            "recipe": "promethium-science-pack",
+            "change": 0.1
+          },
+          {
+            "type": "change-recipe-productivity",
+            "recipe": "space-science-pack",
+            "change": 0.1
+          },
+          {
+            "type": "change-recipe-productivity",
+            "recipe": "utility-science-pack",
+            "change": 0.1
+          },
+          {
+            "type": "change-recipe-productivity",
+            "recipe": "angels-desert-garden-a",
+            "change": 0.1
+          },
+          {
+            "type": "change-recipe-productivity",
+            "recipe": "angels-desert-garden-cultivating-a",
+            "change": 0.1
+          },
+          {
+            "type": "change-recipe-productivity",
+            "recipe": "angels-swamp-garden-a",
+            "change": 0.1
+          },
+          {
+            "type": "change-recipe-productivity",
+            "recipe": "angels-swamp-garden-cultivating-a",
+            "change": 0.1
+          },
+          {
+            "type": "change-recipe-productivity",
+            "recipe": "angels-temperate-garden-a",
+            "change": 0.1
+          },
+          {
+            "type": "change-recipe-productivity",
+            "recipe": "angels-temperate-garden-cultivating-a",
+            "change": 0.1
+          },
+          {
+            "type": "change-recipe-productivity",
+            "recipe": "bob-advanced-logistic-science-pack",
+            "change": 0.1
+          },
+          {
+            "type": "change-recipe-productivity",
+            "recipe": "bob-alien-science-pack",
+            "change": 0.1
+          },
+          {
+            "type": "change-recipe-productivity",
+            "recipe": "bob-alien-science-pack-blue",
+            "change": 0.1
+          },
+          {
+            "type": "change-recipe-productivity",
+            "recipe": "bob-alien-science-pack-green",
+            "change": 0.1
+          },
+          {
+            "type": "change-recipe-productivity",
+            "recipe": "bob-alien-science-pack-orange",
+            "change": 0.1
+          },
+          {
+            "type": "change-recipe-productivity",
+            "recipe": "bob-alien-science-pack-purple",
+            "change": 0.1
+          },
+          {
+            "type": "change-recipe-productivity",
+            "recipe": "bob-alien-science-pack-red",
+            "change": 0.1
+          },
+          {
+            "type": "change-recipe-productivity",
+            "recipe": "bob-alien-science-pack-yellow",
+            "change": 0.1
+          },
+          {
+            "type": "change-recipe-productivity",
+            "recipe": "bob-science-pack-gold",
+            "change": 0.1
+          }
+        ],
+        "icons": [
+          {
+            "icon": "__space-age__/graphics/technology/research-productivity.png",
+            "icon_size": 256
+          },
+          {
+            "floating": true,
+            "icon": "__core__/graphics/icons/technology/constants/constant-recipe-productivity.png",
+            "icon_size": 128,
+            "scale": 0.5,
+            "shift": [
+              50,
+              50
+            ]
+          }
+        ],
+        "level": 1,
+        "localised_description": [
+          "technology-description.more-infinite-research.recipe_productivity"
+        ],
+        "localised_name": [
+          "technology-name.more-infinite-research.research_science_pack_productivity"
+        ],
+        "max_level": "infinite",
+        "name": "recipe-prod-research_science_pack_productivity-1",
+        "order": "p[research_science_pack_productivity]",
+        "prerequisites": [
+          "research-speed-5",
+          "utility-science-pack",
+          "research-speed-6",
+          "automation-science-pack",
+          "logistic-science-pack",
+          "chemical-science-pack",
+          "production-science-pack",
+          "military-science-pack",
+          "space-science-pack",
+          "agricultural-science-pack",
+          "metallurgic-science-pack",
+          "electromagnetic-science-pack",
+          "cryogenic-science-pack",
+          "promethium-science-pack",
+          "angels-gardens",
+          "bob-advanced-logistic-science-pack"
+        ],
+        "type": "technology",
+        "unit": {
+          "count_formula": "8000*2^(L-1)",
+          "ingredients": [
+            [
+              "automation-science-pack",
+              1
+            ],
+            [
+              "logistic-science-pack",
+              1
+            ],
+            [
+              "chemical-science-pack",
+              1
+            ],
+            [
+              "production-science-pack",
+              1
+            ],
+            [
+              "utility-science-pack",
+              1
+            ],
+            [
+              "military-science-pack",
+              1
+            ],
+            [
+              "space-science-pack",
+              1
+            ],
+            [
+              "agricultural-science-pack",
+              1
+            ],
+            [
+              "metallurgic-science-pack",
+              1
+            ],
+            [
+              "electromagnetic-science-pack",
+              1
+            ],
+            [
+              "cryogenic-science-pack",
+              1
+            ],
+            [
+              "promethium-science-pack",
+              1
+            ],
+            [
+              "angels-token-bio",
+              1
+            ],
+            [
+              "bob-advanced-logistic-science-pack",
+              1
+            ]
+          ],
+          "time": 120
+        },
+        "upgrade": true
+      },
+      "independent_before_sha256": "7E0E2EEDF6D80F5BD1C0159D4E8CAC60BC85F8442F1951D0B3157A3D0B74D8D9",
+      "reason": "The unmodded F210 Space Age B6 family supplies the complete technology body, tuning, captions, icons, level, order and static 12-recipe seed. The independently captured q010 B6 research-speed-7 supplies only its 14-pack unit progression and 16 prerequisites. COMP-02 selects all concrete non-hidden, non-denied item producers of q010 upstream lab inputs, preserving the static seed order before the canonical 15-recipe suffix."
     }
   ],
   "must_match_without_exception": {
@@ -7180,18 +7614,13 @@
   },
   "unresolved_categories": [
     {
-      "id": "BA-F210-ADDITION-OIL-CRACKING-UNRESOLVED",
-      "status": "blocker-no-allowance",
-      "technology": "recipe-prod-research_oil_cracking_productivity-1",
-      "B6_expected_presence": "absent",
-      "required_evidence": "Finite independently declared science, prerequisite, effect, tuning, and progression applicability contract before adding a non-B6 expected technology."
-    },
-    {
-      "id": "BA-F210-ADDITION-SCIENCE-PACK-UNRESOLVED",
-      "status": "blocker-no-allowance",
-      "technology": "recipe-prod-research_science_pack_productivity-1",
-      "B6_expected_presence": "absent",
-      "required_evidence": "Finite independently declared science, prerequisite, effect, tuning, and progression applicability contract before adding a non-B6 expected technology."
+      "id": "BA-F210-ADDITION-NATIVE-QUALIFICATION-REQUIRED",
+      "status": "expected-output-defined-native-qualification-required",
+      "technologies": [
+        "recipe-prod-research_oil_cracking_productivity-1",
+        "recipe-prod-research_science_pack_productivity-1"
+      ],
+      "scope": "The two expected rows are independently reconstructed comparison inputs only. Exact F210 Bob+Angel gameplay, save/migration and performance qualification remain outstanding and may not be inferred from this intent."
     }
   ]
 }
