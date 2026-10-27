@@ -240,6 +240,8 @@ def _validate_analysis_plan(plan: dict[str, Any]) -> list[dict[str, Any]]:
     _sha256(candidate.get("asset_inventory_sha256"), "analysis inventory SHA-256")
     _sha256(identity.get("ordinary_config_sha256"), "analysis ordinary configuration SHA-256")
     _sha256(identity.get("player_data_sha256"), "analysis player data SHA-256")
+    if _cohort(plan)["id"] == "r26":
+        _sha256(_mapping(identity.get("replay"), "analysis replay").get("sha256"), "analysis replay SHA-256")
     tolerance = _mapping(plan.get("tolerance_policy"), "analysis tolerance policy")
     _same(_number(tolerance.get("aa_absolute_seconds"), "analysis AA absolute seconds", positive=True), 0.5, "analysis AA absolute seconds")
     _same(_number(tolerance.get("aa_relative_percent"), "analysis AA relative percent", positive=True), 5.0, "analysis AA relative percent")
@@ -289,6 +291,8 @@ def _validate_raw_plan(raw_plan: dict[str, Any], analysis_plan: dict[str, Any], 
     _expect_hash(candidate.get("asset_inventory_sha256"), expected_candidate.get("asset_inventory_sha256"), "raw plan inventory SHA-256")
     _expect_hash(raw_plan.get("ordinary_config_sha256"), identity.get("ordinary_config_sha256"), "raw plan ordinary configuration SHA-256")
     _expect_hash(raw_plan.get("player_data_sha256"), identity.get("player_data_sha256"), "raw plan player data SHA-256")
+    if _cohort(analysis_plan)["id"] == "r26":
+        _expect_hash(_mapping(raw_plan.get("replay"), "raw plan replay").get("sha256"), identity["replay"]["sha256"], "raw plan replay SHA-256")
     tolerance = _mapping(raw_plan.get("tolerances"), "raw plan tolerances")
     expected_tolerance = _mapping(analysis_plan.get("tolerance_policy"), "analysis tolerance policy")
     _same(_number(tolerance.get("aa_absolute_seconds"), "raw plan AA absolute seconds"), _number(expected_tolerance.get("aa_absolute_seconds"), "analysis AA absolute seconds"), "raw plan AA absolute seconds")
@@ -334,7 +338,10 @@ def _validate_identity(result: dict[str, Any], analysis_plan: dict[str, Any]) ->
         _same(_string(candidate.get(key), f"result candidate {key}"), _string(expected_candidate.get(key), f"analysis candidate {key}"), f"result candidate {key}")
     replay = _mapping(inputs.get("replay"), "result replay archive")
     _same(_string(replay.get("version"), "result replay version"), _string(expected_published.get("version"), "analysis published version"), "result replay version")
-    _expect_hash(replay.get("sha256"), replay.get("sha256"), "result replay SHA-256")
+    # Earlier plans predate an independently frozen replay input; retain their
+    # original scope. R26 binds the prepared replay before any scored launch.
+    expected_replay = identity["replay"]["sha256"] if _cohort(analysis_plan)["id"] == "r26" else replay.get("sha256")
+    _expect_hash(replay.get("sha256"), expected_replay, "result replay SHA-256")
     for key in ("name", "root", "factorio_version"):
         _same(_string(replay.get(key), f"result replay {key}"), _string(expected_published.get(key), f"analysis published {key}"), f"result replay {key}")
     if _sha256(replay.get("sha256"), "result replay SHA-256") == _sha256(published.get("sha256"), "result published SHA-256"):

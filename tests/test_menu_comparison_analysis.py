@@ -46,6 +46,8 @@ def _analysis_plan(cohort: str = "r23") -> dict[str, object]:
         plan["analysis"]["assumption"] = "The 64 paired blocks are treated as independent and roughly symmetric."
     else:
         assert cohort == "r23"
+    if cohort == "r26":
+        plan["identity"]["replay"] = {"sha256": "A" * 64}
     return plan
 
 
@@ -68,6 +70,7 @@ def _raw_plan(plan: dict[str, object]) -> dict[str, object]:
         },
         "ordinary_config_sha256": identity["ordinary_config_sha256"],
         "player_data_sha256": identity["player_data_sha256"],
+        **({"replay": copy.deepcopy(identity["replay"])} if "replay" in identity else {}),
         "tolerances": {
             "aa_absolute_seconds": plan["tolerance_policy"]["aa_absolute_seconds"],
             "aa_relative_percent": plan["tolerance_policy"]["aa_relative_percent"],
@@ -213,6 +216,10 @@ class MenuComparisonAnalysisTests(unittest.TestCase):
         wrong_engine["inputs"]["factorio"]["base_version"] = "2.0.77"
         with self.assertRaises(ANALYZER.MenuAnalysisError):
             ANALYZER.analyze(plan, "A" * 64, raw, raw_hash, wrong_engine, "B" * 64)
+        wrong_replay = copy.deepcopy(result)
+        wrong_replay["inputs"]["replay"]["sha256"] = "C" * 64
+        with self.assertRaises(ANALYZER.MenuAnalysisError):
+            ANALYZER.analyze(plan, "A" * 64, raw, raw_hash, wrong_replay, "B" * 64)
 
     def test_r25_preserves_the_fixed_large_schedule_with_a_distinct_plan_identity(self) -> None:
         plan, raw, raw_hash = _prepared("r25")
