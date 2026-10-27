@@ -1,8 +1,8 @@
 -- Shared startup-setting stage for the disposable F210 native-owner cap-order
--- fixture. The three package versions select only their intended cap.
+-- fixture. The four package versions select only their intended cap.
 local M = {}
 
-local CAPS = {canonical = 1, permuted = 1, relaxed = 0}
+local CAPS = {source = 0, canonical = 1, permuted = 1, relaxed = 0}
 
 function M.apply(stage)
   local cap = CAPS[stage]

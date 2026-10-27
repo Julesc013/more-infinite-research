@@ -1,4 +1,4 @@
-"""Host controls for the three-stage F210 native-owner cap-order fixture.
+"""Host controls for the four-stage F210 native-owner cap-order fixture.
 
 The controls execute the fixture's stage code with bounded native-shaped
 doubles. They prepare a native scenario only; they do not execute Factorio.
@@ -28,11 +28,13 @@ MIR_SHA = "E3A65C08AC7798A66FB1BE30D24307B17C8B366DD901953BDE2A09BD6939C8CE"
 INPUT_REVISION = "0ddeb251984d166b075afb6f69367837ffd34dc7"
 INPUT_RECEIPT = ROOT / "spec/evidence/native-owner-cap-order-inputs-0ddeb251.json"
 FIXTURE_SHAS = {
-    "canonical": "74A078594452D47EC1CFDB52D1538BB42DE477E9A4A4804315C5BE22C9033E41",
-    "permuted": "D041AF1722821BE48FD3DED89ACCD9E0FD2E00C5F718E2183A0145403061A3FE",
-    "relaxed": "06C6D57F77C39A943291532CC6C7773995C0A39A08DABB62177E2AF6EF4BE4B9",
+    "source": "510626DA637A34BA760DF1D3752CA137E8CC65116A9BD83423FEDC2328A01907",
+    "canonical": "C903D4B2AC0A98AF4CC28B8BB737C07B19CAC72BBB27C8E3B5DC9E780069482D",
+    "permuted": "DF603E559893BD6DCDE11CCB7AD637A18470457F95EB9476CCB3347B2A0840B7",
+    "relaxed": "4B6D90A3A53F946AE349A35F9F76F75FB7226FECF0ED0D9FCED798C9043FD354",
 }
 STAGES = {
+    "source": ("0.0.1", 0, ("steel-plate", "casting-steel")),
     "canonical": ("0.1.0", 1, ("steel-plate", "casting-steel")),
     "permuted": ("0.2.0", 1, ("casting-steel", "steel-plate")),
     "relaxed": ("0.3.0", 0, ("steel-plate", "casting-steel")),
@@ -60,6 +62,7 @@ def plain(value, seen=None):
 
 class NativeOwnerCapOrderFixtureTests(unittest.TestCase):
     def setUp(self):
+        (ROOT / "build").mkdir(exist_ok=True)
         self.lua = LuaRuntime(unpack_returned_tuples=True)
         source_path = str((ROOT / "source").resolve()).replace("\\", "/")
         self.lua.execute(f'package.path = "{source_path}/?.lua;" .. package.path')
@@ -80,7 +83,7 @@ function cap_order_data(settings_path, data_path, settings_alias, data_alias, st
     if key=="value" then return effective_cap end
   end, __newindex=function() error("startup setting is read-only") end})
   local env={mods={base="2.1.23",["elevated-rails"]="2.1.23",quality="2.1.23",recycler="2.1.23",["space-age"]="2.1.23",
-    ["more-infinite-research"]="5.0.21000",["mir-fixture-mir5-native-owner-cap-order"]=(stage=="canonical" and "0.1.0" or stage=="permuted" and "0.2.0" or "0.3.0")},data={raw=settings_raw}}
+    ["more-infinite-research"]="5.0.21000",["mir-fixture-mir5-native-owner-cap-order"]=(({source="0.0.1",canonical="0.1.0",permuted="0.2.0",relaxed="0.3.0"})[stage])},data={raw=settings_raw}}
   local cache={}
   env.require=function(name)
     local aliases={
@@ -103,7 +106,7 @@ end
 
 function cap_order_parse(path, control_alias, stage)
   local callbacks,reads={events={}},{game=0,storage=0,settings=0}
-  local version=stage=="canonical" and "0.1.0" or stage=="permuted" and "0.2.0" or "0.3.0"
+  local version=({source="0.0.1",canonical="0.1.0",permuted="0.2.0",relaxed="0.3.0"})[stage]
   local env={script={active_mods={base="2.1.23",["elevated-rails"]="2.1.23",quality="2.1.23",recycler="2.1.23",["space-age"]="2.1.23",
       ["more-infinite-research"]="5.0.21000",["mir-fixture-mir5-native-owner-cap-order"]=version},
       on_init=function(f)callbacks.init=f end,on_configuration_changed=function(f)callbacks.changed=f end,
@@ -121,17 +124,18 @@ function cap_order_parse(path, control_alias, stage)
   return {ok=ok,message=tostring(result),callbacks=callbacks,reads=reads}
 end
 
-function cap_order_flow(common_path, canonical_path, permuted_path, relaxed_path, opponent)
-  local markers,marker_modes,saves,create_saves,resets={}, {},0,0,0
+function cap_order_flow(common_path,source_path,canonical_path,permuted_path,relaxed_path,opponent)
+  local saves,create_saves,resets=0,0,0
+  local markers,marker_modes={},{}
   local effects={{type="change-recipe-productivity",recipe="steel-plate",change=.1},
     {type="change-recipe-productivity",recipe="casting-steel",change=.1}}
-  local cap=1
-  local function matches(ordered)
+  local cap=0
+  local owned={}
+  package.loaded["runtime.caps"]=nil
+  local caps=require("runtime.caps")
+  local function matches()
     if #effects~=2 then return false end
-    if ordered then
-      return effects[1].recipe=="steel-plate" and effects[2].recipe=="casting-steel"
-        and effects[1].change==.1 and effects[2].change==.1
-    end
+    if opponent=="old-order" then return effects[1].recipe=="steel-plate" and effects[2].recipe=="casting-steel" end
     local seen={}
     for _,effect in ipairs(effects) do
       if effect.type~="change-recipe-productivity" or effect.change~=.1 or seen[effect.recipe]
@@ -140,56 +144,55 @@ function cap_order_flow(common_path, canonical_path, permuted_path, relaxed_path
     end
     return seen["steel-plate"] and seen["casting-steel"]
   end
-  local function make_force(name,index,owned)
-    local owner_state={name="steel-plate-productivity",valid=true,level=1,researched=false,enabled=true,visible_when_disabled=false,
-      saved_progress=0,prototype={max_level=4294967295,effects=effects}}
-    -- LuaTechnology.level re-enables the technology.  A proxy keeps that
-    -- setter behavior visible to this fixture's ordinary Lua callbacks.
-    local owner=setmetatable({}, {__index=owner_state,__newindex=function(_,key,value)
-      owner_state[key]=value
-      if key=="level" then owner_state.enabled=true end
+  local function reconcile(force)
+    if not matches() then owned[force.index]=nil;return end
+    caps.reconcile(force,{["steel-plate-productivity"]=cap},owned)
+  end
+  local function make_force(name,index)
+    local value
+    local state={name="steel-plate-productivity",valid=true,level=1,researched=false,enabled=true,
+      visible_when_disabled=false,saved_progress=0,prototype={max_level=4294967295,effects=effects}}
+    local owner=setmetatable({}, {__index=state,__newindex=function(_,key,entry)
+      state[key]=entry
+      if key=="level" then state.enabled=true;reconcile(value) end
     end})
-    local probe={name="automation",valid=true,level=1,researched=false,enabled=true,visible_when_disabled=false,saved_progress=0,
-      prototype={max_level=1,effects={}}}
+    local probe={name="automation",valid=true,level=1,researched=false,enabled=true,
+      saved_progress=0,prototype={max_level=1,effects={}}}
     local prerequisite={name="automation-science-pack",valid=true,researched=false,enabled=true}
-    local value={name=name,index=index,valid=true,technologies={["steel-plate-productivity"]=owner,automation=probe},
-      recipes={ ["steel-plate"]={productivity_bonus=0},["casting-steel"]={productivity_bonus=0}},research_queue={},research_progress=0,owned=owned}
-    value.technologies["automation-science-pack"]=prerequisite
-    function value.enable_all_prototypes() end
+    value={name=name,index=index,valid=true,technologies={[state.name]=owner,automation=probe,
+      [prerequisite.name]=prerequisite}, recipes={["steel-plate"]={productivity_bonus=0},
+      ["casting-steel"]={productivity_bonus=0}},research_queue={},research_progress=0}
+    function value.enable_all_prototypes() for _,row in pairs(value.technologies) do row.enabled=true end end
     function value.reset_technology_effects()
       resets=resets+1
-      if value.owned and not matches(opponent=="old-order") then value.owned=false end
-      if cap>0 then
-        if owner.visible_when_disabled~=true then owner.visible_when_disabled=true;value.visibility_owned=true end
-        if value.owned then owner.enabled=false end
-      else
-        if value.visibility_owned then owner.visible_when_disabled=false;value.visibility_owned=false end
-        if value.owned then owner.enabled=true end
-      end
-      value.recipes["steel-plate"].productivity_bonus=.1
-      value.recipes["casting-steel"].productivity_bonus=.1
+      -- Observed native reset exposes the owner's enabled prototype default
+      -- before the synchronous MIR callback; it does not change earned level.
+      owner.enabled=true
+      reconcile(value)
+      for _,recipe in pairs(value.recipes) do recipe.productivity_bonus=.1*(owner.level-1) end
     end
     function value.add_research(technology)
-      if technology==nil or technology.enabled~=true or value.current_research~=nil then return false end
+      if not technology or not technology.enabled or value.current_research then return false end
       if technology==probe and (probe.researched or not prerequisite.researched) then return false end
       value.current_research=technology;value.research_queue={technology};value.research_progress=technology.saved_progress or 0
       technology.saved_progress=0;return true
     end
     return value
   end
-  local player=make_force("player",1,true)
+  local player=make_force("player",1)
   local mode="create"
   local game={tick=0,forces={player=player,[1]=player}}
   function game.create_force(name)
-    local foreign=make_force(name,2,false);game.forces[name]=foreign;game.forces[2]=foreign;return foreign
+    local force=make_force(name,2);game.forces[name]=force;game.forces[2]=force;return force
   end
   function game.server_save(name)
     assert(name=="mir5-native-complete")
     if mode=="server" then saves=saves+1 else create_saves=create_saves+1 end
   end
   local storage={}
-  local function stage_version(stage)
-    return stage=="canonical" and "0.1.0" or stage=="permuted" and "0.2.0" or "0.3.0"
+  local function result(ok,message)
+    return {ok=ok,message=message,markers=markers,marker_modes=marker_modes,saves=saves,
+      create_saves=create_saves,resets=resets,storage=storage,player=player,foreign=game.forces[2]}
   end
   local function load_control(path,stage)
     local callbacks={events={}}
@@ -198,68 +201,63 @@ function cap_order_flow(common_path, canonical_path, permuted_path, relaxed_path
       helpers={table_to_json=function(row)markers[#markers+1]=row;marker_modes[#marker_modes+1]=mode;return "{}" end},
       log=function(row)assert(row:match("^%[MIR5_NATIVE_FIXTURE%] RESULT "))end,
       script={active_mods={base="2.1.23",["elevated-rails"]="2.1.23",quality="2.1.23",recycler="2.1.23",["space-age"]="2.1.23",
-        ["more-infinite-research"]="5.0.21000",["mir-fixture-mir5-native-owner-cap-order"]=stage_version(stage)},
-        on_init=function(f)callbacks.init=f end,on_configuration_changed=function(f)callbacks.changed=f end,
-        on_load=function(f)callbacks.load=f end,on_event=function(event,f)callbacks.events[event]=f end},defines={events={on_tick=1}}}
+        ["more-infinite-research"]="5.0.21000",["mir-fixture-mir5-native-owner-cap-order"]=
+          ({source="0.0.1",canonical="0.1.0",permuted="0.2.0",relaxed="0.3.0"})[stage]},
+        on_init=function(fn)callbacks.init=fn end,on_configuration_changed=function(fn)callbacks.changed=fn end,
+        on_load=function(fn)callbacks.load=fn end,on_event=function(event,fn)callbacks.events[event]=fn end},
+      defines={events={on_tick=1}}}
     env.require=function(name)
       assert(name=="__mir-fixture-mir5-native-owner-cap-order__/fixture_control")
       local chunk,message=loadfile(common_path,"t",env);assert(chunk,message);return chunk()
     end
-    env._G=env;setmetatable(env,{__index=function(_,key)return _G[key]end})
+    env._G=env;setmetatable(env,{__index=_G})
     local chunk,message=loadfile(path,"t",env);assert(chunk,message);chunk();return callbacks
   end
-  local function invoke(callback)
-    local ok,message=pcall(callback);return ok,tostring(message)
-  end
-  local function tick(control)
-    game.tick=game.tick+1
-    return invoke(control.events[1])
-  end
-  local function first_server_tick(control, configuration)
+  local function invoke(callback) local ok,message=pcall(callback);return ok,tostring(message) end
+  local function tick(control) game.tick=game.tick+1;return invoke(control.events[1]) end
+  local function first_tick(control,configuration)
     mode="server"
     local ok,message=invoke(control.load);if not ok then return false,message end
-    if configuration then ok,message=invoke(control.changed);if not ok then return false,message end end
+    if configuration then
+      reconcile(player);reconcile(game.forces[2])
+      ok,message=invoke(control.changed);if not ok then return false,message end
+    end
     return tick(control)
   end
   local function reload_twice(control)
     for _=1,2 do
-      mode="server"
       local ok,message=invoke(control.load);if not ok then return false,message end
       ok,message=tick(control);if not ok then return false,message end
     end
     return true,""
   end
-  local canonical=load_control(canonical_path,"canonical")
-  mode="create"
-  local ok,message=invoke(canonical.init);if not ok then return {ok=false,message=message,markers=markers,marker_modes=marker_modes,saves=saves,create_saves=create_saves,resets=resets,storage=storage} end
+  local source=load_control(source_path,"source")
+  local ok,message=invoke(source.init);if not ok then return result(false,message) end
   if opponent=="seed-skip" then
-    local permuted=load_control(permuted_path,"permuted")
-    ok,message=first_server_tick(permuted,true)
-    return {ok=ok,message=message,markers=markers,marker_modes=marker_modes,saves=saves,create_saves=create_saves,resets=resets,storage=storage}
+    cap=1
+    local permuted=load_control(permuted_path,"permuted");ok,message=first_tick(permuted,true);return result(ok,message)
   end
-  ok,message=first_server_tick(canonical,false);if not ok then return {ok=false,message=message,markers=markers,marker_modes=marker_modes,saves=saves,create_saves=create_saves,resets=resets,storage=storage} end
-  ok,message=reload_twice(canonical);if not ok then return {ok=false,message=message,markers=markers,saves=saves,resets=resets,storage=storage} end
-  if saves~=1 or create_saves~=0 then
-    return {ok=false,message="canonical server initial save is absent",markers=markers,marker_modes=marker_modes,saves=saves,create_saves=create_saves,resets=resets,storage=storage}
-  end
+  ok,message=first_tick(source,false);if not ok then return result(false,message) end
+  ok,message=reload_twice(source);if not ok then return result(false,message) end
+  if saves~=1 or create_saves~=0 then return result(false,"source server initial save is absent") end
+  cap=1
+  local canonical=load_control(canonical_path,"canonical");ok,message=first_tick(canonical,true)
+  if not ok then return result(false,message) end
+  ok,message=reload_twice(canonical);if not ok then return result(false,message) end
   if opponent=="skipped-transition" then
-    cap=0
-    local relaxed=load_control(relaxed_path,"relaxed");ok,message=first_server_tick(relaxed,true)
-    return {ok=ok,message=message,markers=markers,marker_modes=marker_modes,saves=saves,create_saves=create_saves,resets=resets,storage=storage}
+    cap=0;local relaxed=load_control(relaxed_path,"relaxed");ok,message=first_tick(relaxed,true);return result(ok,message)
   end
-  cap=1;effects[1],effects[2]=effects[2],effects[1]
+  effects[1],effects[2]=effects[2],effects[1]
   if opponent=="wrong-effect" then effects[1].change=.11 end
-  player.reset_technology_effects();game.forces[2].reset_technology_effects()
   if opponent=="corrupt-saved" then storage.mir5_native_owner_cap_order.player.saved_progress=.26 end
-  local permuted=load_control(permuted_path,"permuted");ok,message=first_server_tick(permuted,true)
-  if not ok then return {ok=false,message=message,markers=markers,marker_modes=marker_modes,saves=saves,create_saves=create_saves,resets=resets,storage=storage} end
-  ok,message=reload_twice(permuted);if not ok then return {ok=false,message=message,markers=markers,saves=saves,resets=resets,storage=storage} end
-  cap=0;effects[1],effects[2]=effects[2],effects[1];player.reset_technology_effects();game.forces[2].reset_technology_effects()
+  local permuted=load_control(permuted_path,"permuted");ok,message=first_tick(permuted,true)
+  if not ok then return result(false,message) end
+  ok,message=reload_twice(permuted);if not ok then return result(false,message) end
+  cap=0;effects[1],effects[2]=effects[2],effects[1]
   if opponent=="foreign-enabled" then game.forces[2].technologies["steel-plate-productivity"].enabled=true end
-  local relaxed=load_control(relaxed_path,"relaxed");ok,message=first_server_tick(relaxed,true)
-  if not ok then return {ok=false,message=message,markers=markers,marker_modes=marker_modes,saves=saves,create_saves=create_saves,resets=resets,storage=storage} end
-  ok,message=reload_twice(relaxed)
-  return {ok=ok,message=message,markers=markers,marker_modes=marker_modes,saves=saves,create_saves=create_saves,resets=resets,storage=storage,player=player,foreign=game.forces[2]}
+  local relaxed=load_control(relaxed_path,"relaxed");ok,message=first_tick(relaxed,true)
+  if not ok then return result(false,message) end
+  ok,message=reload_twice(relaxed);return result(ok,message)
 end
 ''')
         self.lua.execute(r'''
@@ -287,7 +285,7 @@ end
 
     def _flow(self, opponent: str = "", control_path: Path = FIXTURE / "fixture_control.lua"):
         return self.lua.eval("cap_order_flow")(
-            str(control_path), str(FIXTURE / "canonical" / "control.lua"),
+            str(control_path), str(FIXTURE / "source" / "control.lua"), str(FIXTURE / "canonical" / "control.lua"),
             str(FIXTURE / "permuted" / "control.lua"), str(FIXTURE / "relaxed" / "control.lua"), opponent)
 
     def test_profiles_prepare_only_the_exact_f210_space_age_stage_closure(self):
@@ -390,13 +388,13 @@ end
     def test_canonical_permutation_and_cap_relaxation_keep_only_owned_disablement_through_two_reload_ticks_each(self):
         result = self._flow()
         self.assertTrue(result["ok"], result["message"])
-        self.assertEqual((3, 6), (result["saves"], result["resets"]))
+        self.assertEqual((4, 2), (result["saves"], result["resets"]))
         self.assertEqual(0, result["create_saves"])
-        markers = [plain(result["markers"][index]) for index in range(1, 10)]
-        self.assertEqual(["initial", "reload", "reload"] * 3, [marker["stage"] for marker in markers])
-        self.assertEqual(["server"] * 9, [result["marker_modes"][index] for index in range(1, 10)])
-        self.assertEqual([1, 1, 1, 1, 1, 1, 0, 0, 0], [marker["witnesses"]["cap"] for marker in markers])
-        self.assertEqual([0] * 9, [marker["witnesses"]["actual_lab_completions"] for marker in markers])
+        markers = [plain(result["markers"][index]) for index in range(1, 13)]
+        self.assertEqual(["initial", "reload", "reload"] * 4, [marker["stage"] for marker in markers])
+        self.assertEqual(["server"] * 12, [result["marker_modes"][index] for index in range(1, 13)])
+        self.assertEqual([0, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0, 0], [marker["witnesses"]["cap"] for marker in markers])
+        self.assertEqual([0] * 12, [marker["witnesses"]["actual_lab_completions"] for marker in markers])
         self.assertTrue(all(marker["witnesses"]["native_state_seeded"] for marker in markers))
         self.assertEqual((2, .27, True), (result["player"]["technologies"]["steel-plate-productivity"]["level"],
                                           result["player"]["technologies"]["steel-plate-productivity"]["saved_progress"],
@@ -435,15 +433,15 @@ end
                     self.assertIn("enabled=true", result["message"])
                     self.assertIn("maximum=4294967295", result["message"])
                 if opponent not in ("seed-skip", "skipped-transition"):
-                    self.assertLessEqual(result["saves"], 2)
+                    self.assertLessEqual(result["saves"], 3)
 
     def test_create_only_completion_cannot_substitute_for_the_required_initial_server_save(self):
         original = (FIXTURE / "fixture_control.lua").read_text(encoding="utf-8")
         old = original.replace(
-            'local state = {phase = "canonical-prepared", player = player_state, foreign = foreign_state,\n'
+            'local state = {phase = "source-prepared", player = player_state, foreign = foreign_state,\n'
             '      foreign_index = foreign.index, stage = stage}\n'
             '    storage[KEY] = state',
-            'local state = {phase = "canonical-complete", player = player_state, foreign = foreign_state,\n'
+            'local state = {phase = "source-complete", player = player_state, foreign = foreign_state,\n'
             '      foreign_index = foreign.index, stage = stage}\n'
             '    storage[KEY] = state\n'
             '    marker("initial", state, expected)\n'
@@ -467,24 +465,21 @@ end
                         for index in range(1, len(result["markers"]) + 1)]
         self.assertNotIn(("initial", "server"), observations)
         self.assertEqual((0, 1), (result["saves"], result["create_saves"]))
-        self.assertIn("canonical server initial save is absent", result["message"])
+        self.assertIn("source server initial save is absent", result["message"])
 
-    def test_technology_level_setter_requires_a_separate_following_foreign_disable_write(self):
+    def test_foreign_disablement_must_follow_native_reset_in_uncapped_source(self):
         original = (FIXTURE / "fixture_control.lua").read_text(encoding="utf-8")
-        old_assignment = "owner.level, owner.enabled, owner.visible_when_disabled = 2, false, false"
-        self.assertNotIn(old_assignment, original)
         mutated = original.replace(
-            "owner.level = 2\n  owner.enabled = false\n  owner.visible_when_disabled = false",
-            old_assignment,
-            1,
-        )
+            "foreign.reset_technology_effects()\n  owner.enabled = false",
+            "owner.enabled = false\n  foreign.reset_technology_effects()", 1)
         self.assertNotEqual(original, mutated)
         with tempfile.TemporaryDirectory(dir=ROOT / "build") as temporary:
-            old_control = Path(temporary) / "fixture_control.lua"
-            old_control.write_text(mutated, encoding="utf-8")
-            result = self._flow(control_path=old_control)
+            control = Path(temporary) / "fixture_control.lua"
+            control.write_text(mutated, encoding="utf-8", newline="\n")
+            result = self._flow(control_path=control)
         self.assertFalse(result["ok"])
         self.assertIn("foreign native state differs", result["message"])
+        self.assertEqual(0, result["saves"])
 
     def test_actual_caps_helper_records_only_foreign_visibility_then_restores_it_without_enabling(self):
         result = plain(self.lua.eval("cap_order_actual_foreign_visibility")())
@@ -497,7 +492,7 @@ end
     def test_readme_states_raw_projection_and_unfrozen_native_limits(self):
         readme = (FIXTURE / "README.md").read_text(encoding="utf-8")
         for text in ("seven-member source projection", "tracked source bytes", "does not create this projection automatically",
-                     "canonical leg uses create-only mode", "configuration callback runs during server load", "first server tick",
+                     "source leg uses create-only mode", "configuration callback runs during server load", "first server tick",
                      "no state write or save", OBSERVER_SHA, MIR_SHA, "no native"):
             self.assertIn(text, readme)
         shared = (FIXTURE / "fixture_control.lua").read_text(encoding="utf-8")

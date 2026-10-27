@@ -53,7 +53,7 @@
   "archive_sha256": {
     "mir-fixture-mir5-active-mods-observer_0.1.0.zip": "2E1BE5952D2A4CC5C74A0D149E075D247BA110A3FAE5B6768D3EAEBABCEF989C",
     "more-infinite-research_5.0.21000.zip": "E3A65C08AC7798A66FB1BE30D24307B17C8B366DD901953BDE2A09BD6939C8CE",
-    "mir-fixture-mir5-native-owner-cap-order_0.1.0.zip": "74A078594452D47EC1CFDB52D1538BB42DE477E9A4A4804315C5BE22C9033E41"
+    "mir-fixture-mir5-native-owner-cap-order_0.1.0.zip": "C903D4B2AC0A98AF4CC28B8BB737C07B19CAC72BBB27C8E3B5DC9E780069482D"
   },
-  "scope": "Prepared F210 canonical native-owner cap-state input only. The b251ae7a post-cap MIR archive and exact seven-member fixture ZIP from 0ddeb251 are pinned; actual native execution and saved-input hashes remain pending. State is seeded, with no lab completion or release-qualification claim."
+  "scope": "Prepared F210 canonical native-owner cap-state successor only. It consumes the separately saved uncapped 0.0.1 source through normal cap=1 configuration before the permuted and relaxed successors. The b251ae7a post-cap MIR archive and exact seven-member fixture ZIP are pinned; actual native execution and saved-input hashes remain pending. State is seeded, with no lab completion or release-qualification claim."
 }
