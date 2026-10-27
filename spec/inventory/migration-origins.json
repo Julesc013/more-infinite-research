@@ -227,7 +227,7 @@
       "direct_current_engine_status": "direct-f200-origin",
       "archive_sha256": "C328D8F958BEC2A44297E94E83B1A956D76BEA5E333601A42FDDE60F4155472F",
       "archive_byte_status": "verified-by-exact-f200-source-stage-r02",
-      "native_status": "source-stage-passed-successor-not-run"
+      "native_status": "source-and-direct-f200-f210-frozen-successors-passed-current-applicability-pending"
     },
     {
       "tag": "1.1.0",
@@ -2110,6 +2110,13 @@
       "sha256": "A52E3FCCA2714A4EF4710BED5133C69059062A19ED9C51F9A0628DF70EA13029",
       "status": "pre-engine-refusal-unsupported-MaxNewOutputMiB",
       "reuse": "adverse-preserved"
+    },
+    {
+      "path": "spec/evidence/migration-origin-100-direct-successor-native-chain.json",
+      "sha256": "168B71659B9C8ECB1DD3AFA69B0428389949B6A5436C99D789F963A7FA670813",
+      "status": "passed-same-original-mir1-save-to-bd1-f200-and-58f-f210-only",
+      "protected_source_save_sha256": "F8B38209DA632C8B2EFA049C8F69CDB3E3EC01F6BEE0C5D03BAFF03C27989C54",
+      "reuse": "retains-original-frozen-inputs-current-candidate-applicability-pending"
     }
   ],
   "migration_execution_matrix": {
@@ -2121,8 +2128,10 @@
           "factorio_version": "2.0",
           "archive_sha256": "C328D8F958BEC2A44297E94E83B1A956D76BEA5E333601A42FDDE60F4155472F",
           "source_case": "passed-exact-f200-source-stage-r02",
-          "final_5_x_case": "not_run",
-          "disposition": "exact-f200-source-stage-passed-successor-pending"
+          "final_5_x_case": "passed-frozen-bd1-f200-and-58f-f210-direct-successors-r08",
+          "disposition": "original-source-reused-two-direct-successors-passed-later-candidate-pending",
+          "successor_evidence": "spec/evidence/migration-origin-100-direct-successor-native-chain.json",
+          "current_candidate_applicability": "not-adopted-without-VER-06-review-or-affected-native-execution"
         },
         {
           "origin_tag": "1.1.0",
@@ -3242,7 +3251,7 @@
     "Existing MIR4 source and cross-engine chains are retained as scoped reuse candidates, not relabelled as current 5.x acceptance.",
     "Intermediate 1.x-3.x control.lua/runtime schema evolution is not inferred from the absence of migration Lua and remains pending source-boundary audit.",
     "No fixture, save, profile, package, direct library, engine, or artifact is changed by this inventory.",
-    "All 18 MIR4 release records and their 36 modern archive identities are now enumerated. Archive-byte verification, protected source-save availability, per-origin state oracles and native upgrades remain pending except for separately recorded exact scoped evidence.",
+    "All 18 MIR4 release records and their 36 modern archives now have byte-verified identities and actual info/controller observations. Protected source-save availability, per-origin state oracles and native upgrades remain pending except for separately recorded exact scoped evidence.",
     "Early MIR4 raw source info.json can retain an earlier product version; do not construct a historical distribution by repackaging that raw metadata or infer package eligibility from it. Verify the published archive and its actual info.json.",
     "MIR4 4.2.0-rc.1 and 4.2.0-stable reuse source-version labels but their modern archive digests differ; preserve both origins and their tag exceptions without renaming or merging their identities."
   ],
