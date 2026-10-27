@@ -97,8 +97,10 @@ local function seed_oil(force, level, saved, label)
   local value = technology(force, facts.oil)
   -- LuaTechnology.level re-enables its technology. Set disablement and saved
   -- investment afterwards so this fixture observes the real setter boundary.
-  value.level = level
+  -- Native researched=false resets an infinite technology to its first level.
+  -- Clear it before the level setter, which establishes the earned levels.
   value.researched = false
+  value.level = level
   value.enabled = false
   value.visible_when_disabled = true
   value.saved_progress = saved
