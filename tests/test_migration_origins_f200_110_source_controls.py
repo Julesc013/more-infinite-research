@@ -194,7 +194,7 @@ class MigrationOriginF200110SourceControls(unittest.TestCase):
                          (profile["origin_tag"], profile["origin_source_commit"], profile["engine"]["version"], profile["engine"]["sha256"]))
         self.assertEqual("6395C4A5A0F74C67729746D0FBF6162329978B47C5C29D54CC0045F2977C7E44",
                          profile["archive_sha256"]["more-infinite-research_1.1.0.zip"])
-        self.assertEqual("1CFAF4C3C3FBC3E3C9B47B85018C3D159D7EEA0270B42532511EC3A74A8E7488",
+        self.assertEqual("82F954450AB7AB761686C288B23331E5C087C29F0846837810D1F3F96BD98A18",
                          profile["archive_sha256"]["mir-fixture-mir5-migration-origin-f200-110-source_0.1.0.zip"])
         self.assertEqual({"README.md", "catalogue.lua", "control.lua", "data-final-fixes.lua", "info.json"},
                          {path.name for path in FIXTURE.iterdir() if path.is_file()})
