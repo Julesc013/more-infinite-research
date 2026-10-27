@@ -1,7 +1,7 @@
 ---
 title: "Performance and resource contract"
-status: proposed
-applies_to: "MIR replacement development"
+status: current
+applies_to: "MIR development"
 audience: developer
 doc_type: specification
 owner: mir-maintainers
