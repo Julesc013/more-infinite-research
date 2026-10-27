@@ -1,5 +1,5 @@
--- Narrow decoder for restoration rights left by the pinned MIR 4.7 cap
--- controller.  This module is deliberately pure: the configuration-change
+-- Narrow decoders for restoration rights left by actual historical MIR cap
+-- controllers.  This module is deliberately pure: the configuration-change
 -- owner supplies the old bucket, current Force, already-admitted candidates,
 -- and any current MIR5 ownership rows.  It never reads storage/global or
 -- writes a LuaForce or LuaTechnology.
@@ -177,17 +177,16 @@ end
 -- and disabled it for a finite cap.  Restrict the historical reader to the
 -- two producer classes that controller actually wrote; later native-owner
 -- tails have a different contract and cannot acquire schema-1 authority.
+local function boolean_operation_admitted(source, operation)
+  return (source == "generated-stream"
+      and (operation == "emit" or operation == "runtime-settings-transport"))
+    or (source == "base-continuation"
+      and (operation == "emit_base_extension" or operation == "runtime-settings-transport"))
+end
+
 local function boolean_candidate_admitted(candidate, allowed)
-  if admitted_candidate(candidate, allowed) == nil then return false end
-  if candidate.source == "generated-stream" then
-    return candidate.operation == "emit"
-      or candidate.operation == "runtime-settings-transport"
-  end
-  if candidate.source == "base-continuation" then
-    return candidate.operation == "emit_base_extension"
-      or candidate.operation == "runtime-settings-transport"
-  end
-  return false
+  return admitted_candidate(candidate, allowed) ~= nil
+    and boolean_operation_admitted(candidate.source, candidate.operation)
 end
 
 local function candidate_list(candidates)
@@ -238,7 +237,7 @@ local function boolean_policy_matches(policy, candidate)
   return type(policy) == "table"
     and policy.setting == candidate.setting
     and policy.source == candidate.source
-    and policy.operation == candidate.operation
+    and boolean_operation_admitted(candidate.source, policy.operation)
     and policy.blocked_reason == nil
     and positive_integer(policy.selected)
 end
@@ -392,8 +391,9 @@ end
 -- Decode the earlier public policy-v1 boolean ledger without relaxing the
 -- structured policy-v3 reader above.  The caller selects this component only
 -- for an exact known predecessor bucket; this pure function still requires a
--- current preflighted candidate, its exact saved tuple, a valid Force and the
--- live native state before returning a new ownership row.
+-- current preflighted candidate, its exact saved name/setting/source and one
+-- of the two historical producer operations, a valid Force and the live
+-- native state before returning a new ownership row.
 function M.import_boolean_for_force(legacy_bucket, force, candidates, current_owned, allowed)
   local entries, count = candidate_list(candidates)
   if current_owned ~= nil and type(current_owned) ~= "table" then
