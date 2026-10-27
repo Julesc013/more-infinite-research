@@ -15,7 +15,7 @@ ROOT = Path(__file__).resolve().parents[1]
 FIXTURE = ROOT / "tests/fixtures/f110-f200-transition"
 SHARED = FIXTURE / "shared"
 SOURCE = FIXTURE / "f110/published-4.7.3"
-SUCCESSOR = FIXTURE / "f200/mir5"
+SUCCESSOR = FIXTURE / "f200/successor"
 DIRECT = "recipe-prod-research_character_mining_speed-1"
 CONTINUATION = "inserter-capacity-bonus-8"
 

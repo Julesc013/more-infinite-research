@@ -12,6 +12,7 @@ import unittest
 
 ROOT = Path(__file__).resolve().parents[1]
 FIXTURE = ROOT / "tests" / "fixtures" / "aai-parity-native"
+SUCCESSOR_ROLE = "successor"
 PUBLISHED_PROFILES = {
     "base": ROOT / "tests" / "profiles" / "aai-parity-native-published-base-f210-2123.json",
     "space-age": ROOT / "tests" / "profiles" / "aai-parity-native-published-space-age-f210-2123.json",
@@ -155,6 +156,7 @@ class AaiParityNativeControls(unittest.TestCase):
         self.lua.execute(
             r'''
             function run_data(stage, raw, mods)
+              local role = stage == "mir5" and "successor" or stage
               local env = {data={raw=raw}, mods=mods}
               env.require = function(name)
                 if name == "__mir-fixture-mir5-aai-parity-native__/fixture_data_final" then
@@ -167,18 +169,19 @@ class AaiParityNativeControls(unittest.TestCase):
                   return assert(loadfile(fixture .. "/published-4.7/catalogue.lua", "t", env))()
                 end
                 if name == "__mir-fixture-mir5-aai-parity-native__/mir5/catalogue" then
-                  return assert(loadfile(fixture .. "/mir5/catalogue.lua", "t", env))()
+                  return assert(loadfile(fixture .. "/successor/catalogue.lua", "t", env))()
                 end
                 error("unexpected fixture module: " .. tostring(name))
               end
               env._G = env
               setmetatable(env, {__index=_G})
               local ok, message = pcall(function()
-                return assert(loadfile(fixture .. "/" .. stage .. "/data-final-fixes.lua", "t", env))()
+                return assert(loadfile(fixture .. "/" .. role .. "/data-final-fixes.lua", "t", env))()
               end)
               return {ok=ok, message=tostring(message), raw=raw}
             end
             function parse_control(stage, mods)
+              local role = stage == "mir5" and "successor" or stage
               local callbacks, forbidden = {events={}}, {}
               local env = {
                 script={active_mods=mods,on_init=function(fn) callbacks.init=fn end,on_load=function(fn) callbacks.load=fn end,
@@ -197,7 +200,7 @@ class AaiParityNativeControls(unittest.TestCase):
                   return assert(loadfile(fixture .. "/published-4.7/catalogue.lua", "t", env))()
                 end
                 if name == "__mir-fixture-mir5-aai-parity-native__/mir5/catalogue" then
-                  return assert(loadfile(fixture .. "/mir5/catalogue.lua", "t", env))()
+                  return assert(loadfile(fixture .. "/successor/catalogue.lua", "t", env))()
                 end
                 error("unexpected fixture module: " .. tostring(name))
               end
@@ -206,7 +209,7 @@ class AaiParityNativeControls(unittest.TestCase):
                 if key == "game" or key == "storage" then forbidden[key]=true; return nil end
                 return _G[key]
               end})
-              local ok, message = pcall(function() assert(loadfile(fixture .. "/" .. stage .. "/control.lua", "t", env))() end)
+              local ok, message = pcall(function() assert(loadfile(fixture .. "/" .. role .. "/control.lua", "t", env))() end)
               return {ok=ok, message=tostring(message), callbacks=callbacks, forbidden=forbidden}
             end
             function run_same_closure_protocol()
@@ -396,6 +399,7 @@ class AaiParityNativeControls(unittest.TestCase):
               end
               function game.server_save(name) assert(name=="mir5-native-complete");saves=saves+1 end
               local function environment(stage, active, target_callbacks)
+                local role = stage == "mir5" and "successor" or stage
                 local env={
                   script={active_mods=active,on_init=function(fn)target_callbacks.init=fn end,on_load=function(fn)target_callbacks.load=fn end,
                     on_configuration_changed=function(fn)target_callbacks.configuration=fn end,on_event=function(event,fn)target_callbacks.events[event]=fn end},
@@ -409,11 +413,11 @@ class AaiParityNativeControls(unittest.TestCase):
                   if name=="__mir-fixture-mir5-aai-parity-native__/fixture_control" then return assert(loadfile(fixture.."/shared/control.lua","t",env))() end
                   if name=="__mir-fixture-mir5-aai-parity-native__/catalogue" then return assert(loadfile(fixture.."/shared/catalogue.lua","t",env))() end
                   if name=="__mir-fixture-mir5-aai-parity-native__/published-4.7/catalogue" then return assert(loadfile(fixture.."/published-4.7/catalogue.lua","t",env))() end
-                  if name=="__mir-fixture-mir5-aai-parity-native__/mir5/catalogue" then return assert(loadfile(fixture.."/mir5/catalogue.lua","t",env))() end
+                  if name=="__mir-fixture-mir5-aai-parity-native__/mir5/catalogue" then return assert(loadfile(fixture.."/successor/catalogue.lua","t",env))() end
                   error("unexpected module: "..tostring(name))
                 end
                 env._G=env;setmetatable(env,{__index=_G})
-                local ok,message=pcall(function()assert(loadfile(fixture.."/"..stage.."/control.lua","t",env))()end)
+                local ok,message=pcall(function()assert(loadfile(fixture.."/"..role.."/control.lua","t",env))()end)
                 assert(ok,message)
               end
               local published={base="2.1.23",["aai-industry"]="0.7.5",["more-infinite-research"]="4.7.21003",["mir-fixture-mir5-aai-parity-native"]="0.1.0"}
@@ -488,7 +492,8 @@ class AaiParityNativeControls(unittest.TestCase):
 
     def test_stage_infos_are_exact_and_only_define_same_closure_stages(self):
         for stage, fixture_version, mir_version in (("published-4.7", "0.1.0", "4.7.21003"), ("mir5", "0.2.0", "5.0.21000")):
-            info = json.loads((FIXTURE / stage / "info.json").read_text(encoding="utf-8"))
+            role = SUCCESSOR_ROLE if stage == "mir5" else stage
+            info = json.loads((FIXTURE / role / "info.json").read_text(encoding="utf-8"))
             with self.subTest(stage=stage):
                 self.assertEqual(("mir-fixture-mir5-aai-parity-native", fixture_version, "2.1"),
                                  (info["name"], info["version"], info["factorio_version"]))

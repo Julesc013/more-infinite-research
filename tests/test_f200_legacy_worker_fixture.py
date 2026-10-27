@@ -13,6 +13,7 @@ import unittest
 
 ROOT = Path(__file__).resolve().parents[1]
 FIXTURE = ROOT / "tests/fixtures/f200-legacy-worker"
+SUCCESSOR_ROLE = "successor"
 PUBLISHED_PROFILE = ROOT / "tests/profiles/f200-legacy-worker-published-4.7-2077.json"
 MIR5_PROFILE = ROOT / "tests/profiles/f200-legacy-worker-mir5-2077.json"
 NAME = "mir-fixture-mir5-f200-legacy-worker"
@@ -26,6 +27,10 @@ ROW = {
              "ingredients": [[name, 1] for name in SCIENCE]},
     "effects": [{"type": "worker-robot-speed", "modifier": .65}],
 }
+
+
+def fixture_role(stage):
+    return SUCCESSOR_ROLE if stage == "mir5" else stage
 
 
 def lua_value(lua, value):
@@ -263,7 +268,7 @@ class F200LegacyWorkerFixtureTests(unittest.TestCase):
                                  [row["name"] for row in profile["mods"]])
                 self.assertEqual((mir, version), (profile["mods"][2]["version"], profile["mods"][3]["version"]))
                 self.assertNotIn("space-age", [row["name"] for row in profile["mods"]])
-                info = json.loads((FIXTURE / ("published" if version == "0.1.0" else "mir5") / "info.json").read_text())
+                info = json.loads((FIXTURE / ("published" if version == "0.1.0" else SUCCESSOR_ROLE) / "info.json").read_text())
                 self.assertEqual((NAME, version, "2.0"), (info["name"], info["version"], info["factorio_version"]))
 
     def test_exact_base_native_row_preflight_precedes_only_disposable_count_time_mutation(self):
@@ -272,7 +277,7 @@ class F200LegacyWorkerFixtureTests(unittest.TestCase):
                 row = self.row()
                 if directory == "published":
                     row["visible_when_disabled"] = True
-                result = self.lua.eval("worker_data")(str(FIXTURE / directory / "data-final-fixes.lua"), mir, row)
+                result = self.lua.eval("worker_data")(str(FIXTURE / fixture_role(directory) / "data-final-fixes.lua"), mir, row)
                 self.assertTrue(result["ok"], result["message"])
                 self.assertEqual((None, "1", 1), (result["row"]["unit"]["count"], result["row"]["unit"]["count_formula"], result["row"]["unit"]["time"]))
         bad = self.row(); bad["visible_when_disabled"] = True; bad["effects"][1]["modifier"] = .6
@@ -286,7 +291,7 @@ class F200LegacyWorkerFixtureTests(unittest.TestCase):
     def test_controls_parse_without_game_access_and_source_never_writes_player_presentation(self):
         for directory, mir, version in (("published", "4.7.20002", "0.1.0"), ("mir5", "5.0.20000", "0.2.0")):
             with self.subTest(directory=directory):
-                result = self.lua.eval("worker_parse")(str(FIXTURE / directory / "control.lua"), mir, version)
+                result = self.lua.eval("worker_parse")(str(FIXTURE / fixture_role(directory) / "control.lua"), mir, version)
                 self.assertTrue(result["ok"], result["message"])
                 self.assertEqual({}, plain(result["reads"]))
                 self.assertIsNotNone(result["callbacks"]["load"])
@@ -302,13 +307,13 @@ class F200LegacyWorkerFixtureTests(unittest.TestCase):
         self.assertIn("await-second-queue", source)
         self.assertNotIn("research_queue_enabled", source)
         for directory in ("published", "mir5"):
-            control = (FIXTURE / directory / "control.lua").read_text(encoding="utf-8")
+            control = (FIXTURE / fixture_role(directory) / "control.lua").read_text(encoding="utf-8")
             body = control.split("script.on_load(function()", 1)[1].split("script.on_event(defines.events.on_tick", 1)[0]
             self.assertNotIn("game.", body, f"{directory} on_load touched LuaGameScript")
             self.assertNotRegex(body, r"storage\s*\[.*?\]\s*=", f"{directory} on_load wrote fixture storage")
 
     def test_two_real_native_worker_labs_restore_source_right_then_one_successor_lab_and_reloads(self):
-        result = self.lua.eval("worker_flow")(str(FIXTURE / "published/control.lua"), str(FIXTURE / "mir5/control.lua"), "")
+        result = self.lua.eval("worker_flow")(str(FIXTURE / "published/control.lua"), str(FIXTURE / "successor/control.lua"), "")
         self.assertTrue(result["ok"], result["message"])
         self.assertEqual(("completed", 2, 1, 9), (result["phase"], result["source_labs"], result["destination_labs"], result["player_level"]))
         self.assertAlmostEqual(3.323, result["bonus"], places=6)
@@ -325,7 +330,7 @@ class F200LegacyWorkerFixtureTests(unittest.TestCase):
 
     def test_exact_processing_ticks_accept_a_distinct_raw_event_elapsed(self):
         result = self.lua.eval("worker_flow")(str(FIXTURE / "published/control.lua"),
-                                               str(FIXTURE / "mir5/control.lua"), "raw-elapsed-offset")
+                                               str(FIXTURE / "successor/control.lua"), "raw-elapsed-offset")
         self.assertTrue(result["ok"], result["message"])
         self.assertEqual((44, 44, 45),
                          (result["remaining_ticks"], result["processing_ticks"], result["elapsed_ticks"]))
@@ -346,7 +351,7 @@ class F200LegacyWorkerFixtureTests(unittest.TestCase):
         }
         for opponent, phrase in opponents.items():
             with self.subTest(opponent=opponent):
-                result = self.lua.eval("worker_flow")(str(FIXTURE / "published/control.lua"), str(FIXTURE / "mir5/control.lua"), opponent)
+                result = self.lua.eval("worker_flow")(str(FIXTURE / "published/control.lua"), str(FIXTURE / "successor/control.lua"), opponent)
                 self.assertFalse(result["ok"]); self.assertIn(phrase, result["message"])
                 if opponent == "consumption-overshoot":
                     self.assertIn("expected_units=21.266", result["message"])

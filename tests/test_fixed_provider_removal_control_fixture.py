@@ -11,6 +11,16 @@ ROOT = Path(__file__).resolve().parents[1]
 FIXTURE = ROOT / 'tests/fixtures/fixed-provider-removal-control'
 FACTS = ROOT / 'tests/fixtures/competing-fixed-f200-sa-captured-facts.json'
 FIXTURE_NAME = 'mir-fixture-mir5-fixed-provider-removal-control'
+SUCCESSOR_ROLES = {
+    'mir5-prefer-mir': 'successor-prefer-mir',
+    'mir5-prefer-foreign': 'successor-prefer-foreign',
+    'mir5-providers-readded-foreign': 'successor-providers-readded-foreign',
+    'mir5-providers-removed': 'successor-providers-removed',
+}
+
+
+def fixture_role(stage):
+    return SUCCESSOR_ROLES.get(stage, stage)
 PROFILES = {
     'published': ROOT / 'tests/profiles/fixed-provider-removal-control-published-f200-sa-2077.json',
     'mir5-prefer-mir': ROOT / 'tests/profiles/fixed-provider-removal-control-mir5-prefer-mir-f200-sa-2077.json',
@@ -131,7 +141,7 @@ end
         for stage,(mir,fixture,preference,providers_present) in STAGES.items():
             rows=self.source_rows() if stage=='published' else self.mir_rows(preference,providers_present)
             raw={'technology':rows,'bool-setting':{'mir-prefer-this-mod-for-competing-techs':{'default_value':not preference}}}
-            result=self.lua.eval('removal_data')(str(FIXTURE/stage/'data-final-fixes.lua'),str(FIXTURE/'data-facts.lua'),lua_value(self.lua,raw),lua_value(self.lua,self.mods(mir,fixture,providers_present)))
+            result=self.lua.eval('removal_data')(str(FIXTURE/fixture_role(stage)/'data-final-fixes.lua'),str(FIXTURE/'data-facts.lua'),lua_value(self.lua,raw),lua_value(self.lua,self.mods(mir,fixture,providers_present)))
             self.assertTrue(result['ok'],result['message']);actual=plain(result['raw'])['technology']
             if stage=='published':
                 self.assertEqual(('1',1),(actual['bioflux-productivity']['unit']['count_formula'],actual['bioflux-productivity']['unit']['time']))
