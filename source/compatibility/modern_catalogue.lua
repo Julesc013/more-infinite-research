@@ -392,6 +392,41 @@ local function copy(value, seen)
   return result
 end
 
+-- The exact F210 Bob/Angel captures bind these seven authored presentations
+-- to direct native prototypes.  This is a finite profile-local correction:
+-- it neither discovers prototype art nor writes to the foreign prototypes.
+local BOB_ANGEL_F210_NATIVE_ICON_SOURCES = {
+  {key="research_advanced_circuit", prototype_type="technology", prototype_name="advanced-circuit"},
+  {key="research_copper", prototype_type="item", prototype_name="copper-plate"},
+  {key="research_copper_cable", prototype_type="item", prototype_name="copper-cable"},
+  {key="research_inserters", prototype_type="technology", prototype_name="fast-inserter"},
+  {key="research_iron", prototype_type="item", prototype_name="iron-plate"},
+  {key="research_iron_sticks", prototype_type="item", prototype_name="iron-stick"},
+  {key="research_mining_drill", prototype_type="item", prototype_name="electric-mining-drill"},
+}
+
+local function valid_icon_size(value)
+  return type(value) == "number" and value == value and value > 0 and value < math.huge
+    and value == math.floor(value)
+end
+
+local function apply_bob_angel_f210_native_icons(definitions, raw)
+  if type(raw) ~= "table" then return end
+  local by_key = {}
+  for _, definition in ipairs(definitions) do by_key[definition.key] = definition end
+  for _, source in ipairs(BOB_ANGEL_F210_NATIVE_ICON_SOURCES) do
+    local prototype_group = raw[source.prototype_type]
+    local prototype = type(prototype_group) == "table" and prototype_group[source.prototype_name] or nil
+    local icon_size = prototype and prototype.icon_size
+    if type(prototype) == "table" and type(prototype.icon) == "string" and prototype.icon ~= ""
+        and (icon_size == nil or valid_icon_size(icon_size)) then
+      local definition = assert(by_key[source.key], "MIR Bob/Angel icon binding lacks " .. source.key)
+      definition.icon = prototype.icon
+      definition.icon_size = icon_size or 64
+    end
+  end
+end
+
 local function active_space_age(active_mods)
   return type(active_mods) == "table" and active_mods["space-age"] ~= nil
 end
@@ -823,6 +858,7 @@ function M.select(active_mods, raw)
     bob_angel_f210_delta = require("compatibility.modern_catalogue.bob_angel_f210")
       [bob_angel_f210 == "space-age" and "space_age" or "base"]
     apply_authored_definitions(definitions, bob_angel_f210_delta)
+    apply_bob_angel_f210_native_icons(definitions, raw)
     local by_key = {}
     for _, definition in ipairs(definitions) do by_key[definition.key] = definition end
     for key, science in pairs(bob_angel_f210_delta.definition_science or {}) do
