@@ -18,8 +18,8 @@
     "source_result_sha256": "4FBD622144E3B69E39C0530385AA70C92971208584CA32D4A10B1FCC1A978997"
   },
   "candidate": {
-    "source_commit": "1ea2092d34a3c98942229f11775cd1d3930f54e4",
-    "player_tree": "e8fc567ae0c1742a2cad9fea7911469c0fe9688a"
+    "source_commit": "c74b7c4680545f3ccf27f38016d1144fefe8eee3",
+    "player_tree": "f81c63afca2e6eb5b7e46dffe892548553899db3"
   },
   "mods": [
     {"name": "base", "version": "2.0.77", "enabled": true},
@@ -30,7 +30,7 @@
   "archive_sha256": {
     "mir-fixture-mir5-active-mods-observer_0.1.0.zip": "723D1E7721449FC26040E5E6629416767BDC20AD79CF8723115846DB662A1F87",
     "mir-fixture-mir5-migration-origin-f200-110-source_0.2.0.zip": "29F2597180F0BCB8CB25A651A19068678635D42C35A96EE56F6186DE737037E0",
-    "more-infinite-research_5.0.20000.zip": "DE17D246D07A565F0FCB9A8DA49EB0D83355C6432343FE4341913BC67A0459A4"
+    "more-infinite-research_5.0.20000.zip": "050AC35BAB6BA1F01E160DB612B73A03E58E0ABE6A291D18109FAB1B235B63B5"
   },
-  "scope": "Prepared direct F200 successor of the protected passed MIR 1.1.0 F200 r05 source stage under coherent 1ea2092d MIR5 F200. It asserts the normal nine-effect public module row and three separate retained earned .01 holders; native successor execution remains pending and does not qualify an F210 route or current package."
+  "scope": "Prepared direct F200 successor of the protected passed MIR 1.1.0 F200 r05 source stage under coherent c74b7c46 MIR5 F200. It asserts the normal nine-effect public module row and three separate retained earned .01 holders; native successor execution remains pending and does not qualify an F210 route or current package."
 }
