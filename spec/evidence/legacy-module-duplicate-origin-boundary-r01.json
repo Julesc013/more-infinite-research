@@ -1,0 +1,185 @@
+{
+  "schema": 1,
+  "kind": "MIRLegacyModuleDuplicateOriginBoundaryV1",
+  "scope": "Archive-byte inspection of the published MIR 1.0.0, 1.1.0, and 1.2.0 module-stream producers, plus one independent published 1.1.0 F200 native data capture. This identifies the finite duplicate-.01 boundary; it is not native qualification of 1.0.0 or 1.2.0 migration routes.",
+  "base_input": {
+    "engine_version": "2.0.77",
+    "engine_sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B",
+    "member": "data/base/prototypes/item.lua",
+    "member_sha256": "E992959C0B306DADE7B40156212890CE82F3A2A8B941667FCF3A0384A82F9B15",
+    "module_names": [
+      "speed-module",
+      "speed-module-2",
+      "speed-module-3",
+      "efficiency-module",
+      "efficiency-module-2",
+      "efficiency-module-3",
+      "productivity-module",
+      "productivity-module-2",
+      "productivity-module-3"
+    ],
+    "module_4_declarations": 0,
+    "scope_note": "This is the installed exact F200 Base source used to evaluate the finite published-module patterns; its module declarations are not inferred from a tag."
+  },
+  "published_archives": [
+    {
+      "version": "1.0.0",
+      "source_commit": "f0057a96847512b50acdd6e23fc21b5b41e75adb",
+      "archive_path": "build/qualification/migration-origins/migration-origin-100-f200-source-r01-caller/inputs/more-infinite-research_1.0.0.zip",
+      "archive_sha256": "C328D8F958BEC2A44297E94E83B1A956D76BEA5E333601A42FDDE60F4155472F",
+      "archive_bytes": 61208,
+      "archive_root": "more-infinite-research_1.0.0",
+      "loaded_members": [
+        {"path": "more-infinite-research_1.0.0/data.lua", "sha256": "EEC542BC073ABE81D22378808F128F81590EF9295EA0C11CB9C09BF5403E6680", "bytes": 87},
+        {"path": "more-infinite-research_1.0.0/data-updates.lua", "sha256": "40938FC260D1000F46954F8FC91C4FD07A88AAF602157C2FD06D77C564695DA2", "bytes": 29},
+        {"path": "more-infinite-research_1.0.0/prototypes/config.lua", "sha256": "38F0C83A92E1DFD19C443C27D630D2B07EBD2B9C40F1D1353C913FA6BEA8CF7B", "bytes": 5252},
+        {"path": "more-infinite-research_1.0.0/prototypes/util.lua", "sha256": "914FDD57944FCB3DC5B5F44E34245ABC00DF61589E23AFE3E665C89E65968000", "bytes": 9858},
+        {"path": "more-infinite-research_1.0.0/prototypes/tech-gen.lua", "sha256": "899DD012431E43EA4E2EEC3D554D68DCEF3FC8FBE35404D014B571E20B517F4D", "bytes": 2466},
+        {"path": "more-infinite-research_1.0.0/settings.lua", "sha256": "B70607D32F907E2F916C6AECF6ABF1CAC59B9DD403C1DCE04B0BC3FD5CD6AE49", "bytes": 1090}
+      ],
+      "entrypoint_chain": [
+        {"member": "data.lua", "lines": "1-2", "expression": "require(\"prototypes.config\"); require(\"prototypes.util\")"},
+        {"member": "data-updates.lua", "line": 1, "expression": "require(\"prototypes.tech-gen\")"}
+      ],
+      "module_stream": {
+        "config_member": "prototypes/config.lua",
+        "config_lines": "55-63",
+        "groups": [
+          {"change": 0.1, "items": ["productivity-module", "speed-module", "efficiency-module"]},
+          {"change": 0.05, "items": ["productivity-module-2", "speed-module-2", "efficiency-module-2"]},
+          {"change": 0.02, "items": ["productivity-module-3", "speed-module-3", "efficiency-module-3"]},
+          {"change": 0.01, "item_patterns": ["%-module%-4$"]}
+        ],
+        "helper_member": "prototypes/util.lua",
+        "helper_lines": "158-184",
+        "pattern_namespaces": ["data.raw.item", "data.raw.ammo"],
+        "effect_emitter_member": "prototypes/tech-gen.lua",
+        "effect_emitter_lines": "51-55",
+        "effect_emitter_expression": "one change-recipe-productivity effect is appended for every recipe in every nonempty group; it has no cross-group deduplication."
+      },
+      "duplicate_boundary": {
+        "result": "absent",
+        "reason": "The only .01 pattern is %-module%-4$, Base 2.0.77 has no module-4 declaration, and this helper does not scan data.raw.module."
+      }
+    },
+    {
+      "version": "1.1.0",
+      "source_commit": "2fb64822b82569e3b50f0653e361fb7148f18b63",
+      "archive_path": "build/qualification/migration-origins/next-f200-origin-archives-r01/inputs/more-infinite-research_1.1.0.zip",
+      "archive_sha256": "6395C4A5A0F74C67729746D0FBF6162329978B47C5C29D54CC0045F2977C7E44",
+      "archive_bytes": 60927,
+      "archive_root": "more-infinite-research_1.1.0",
+      "loaded_members": [
+        {"path": "more-infinite-research_1.1.0/data.lua", "sha256": "EEC542BC073ABE81D22378808F128F81590EF9295EA0C11CB9C09BF5403E6680", "bytes": 87},
+        {"path": "more-infinite-research_1.1.0/data-updates.lua", "sha256": "33C94BBDA0C3FBFDFC50A7CE40C312E4B0406B56E85D4460C967C922162FA396", "bytes": 12},
+        {"path": "more-infinite-research_1.1.0/prototypes/config.lua", "sha256": "B23238E2F9C438AD817C430D0BCA74CC7F29C578D9CE6D5A8CF433FD2417C0A9", "bytes": 6747},
+        {"path": "more-infinite-research_1.1.0/prototypes/util.lua", "sha256": "3A50FCA7C7B013E307DED8B8578056B56C4C36D73FBCAB1DA225F0B7EA401866", "bytes": 7810},
+        {"path": "more-infinite-research_1.1.0/prototypes/tech-gen.lua", "sha256": "0BB972ADECD1F0BD9880A5156EA48DDE426751A245D8C5923896B51ADE32BCC1", "bytes": 2764},
+        {"path": "more-infinite-research_1.1.0/settings.lua", "sha256": "6562D6BBA8DBDC4414A767DDB50143594CC0D1180726A832D17B7EB752E1C9EC", "bytes": 10227}
+      ],
+      "entrypoint_chain": [
+        {"member": "data.lua", "lines": "1-2", "expression": "require(\"prototypes.config\"); require(\"prototypes.util\")"},
+        {"member": "data-updates.lua", "line": 1, "expression": "require(\"prototypes.tech-gen\")"}
+      ],
+      "module_stream": {
+        "setting_member": "settings.lua",
+        "setting_line": 37,
+        "setting": "ips-enable-research_modules",
+        "setting_default": true,
+        "config_member": "prototypes/config.lua",
+        "config_lines": "41-46",
+        "groups": [
+          {"change": 0.1, "items": ["productivity-module", "speed-module", "efficiency-module"]},
+          {"change": 0.05, "items": ["productivity-module-2", "speed-module-2", "efficiency-module-2"]},
+          {"change": 0.02, "items": ["productivity-module-3", "speed-module-3", "efficiency-module-3"]},
+          {"change": 0.01, "item_patterns": ["%-module%-4$", "mega%-module", "merge%-module", "omni%-module", "ultimate%-module", "%-module$"]}
+        ],
+        "helper_member": "prototypes/util.lua",
+        "helper_lines": "127-159",
+        "pattern_namespaces": ["data.raw.item", "data.raw.ammo", "data.raw.capsule", "data.raw.module"],
+        "effect_emitter_member": "prototypes/tech-gen.lua",
+        "effect_emitter_lines": "45-50",
+        "effect_emitter_expression": "one change-recipe-productivity effect is appended for every recipe in every nonempty group; it has no cross-group deduplication."
+      },
+      "duplicate_boundary": {
+        "result": "present",
+        "reason": "The broad %-module$ pattern scans Base tier-one data.raw.module entries after those same recipes were selected by the explicit .10 group."
+      }
+    },
+    {
+      "version": "1.2.0",
+      "source_commit": "b80413b2aa225529a236b7b00a7cee9420af65bc",
+      "archive_path": "build/qualification/migration-origins/next-f200-origin-archives-r01/inputs/more-infinite-research_1.2.0.zip",
+      "archive_sha256": "880C137F7AB35FE7AF1DA5538BFA91F620C80785134DB488800352DD6154AB22",
+      "archive_bytes": 92638,
+      "archive_root": "more-infinite-research_1.2.0",
+      "loaded_members": [
+        {"path": "more-infinite-research_1.2.0/data.lua", "sha256": "EEC542BC073ABE81D22378808F128F81590EF9295EA0C11CB9C09BF5403E6680", "bytes": 87},
+        {"path": "more-infinite-research_1.2.0/data-updates.lua", "sha256": "39997983219FF42A3BADA02BE0F29A3E76D4BE8F50B318B33965E0DB3547373F", "bytes": 130},
+        {"path": "more-infinite-research_1.2.0/prototypes/config.lua", "sha256": "A2544C644632163AC51D6468F35D7D796D7666B19BEF41AB54FE2B72D9169A07", "bytes": 8366},
+        {"path": "more-infinite-research_1.2.0/prototypes/util.lua", "sha256": "9CEB32150B6B5A29CFEDF57621F986BB8619160C1073B9CB7905B98091894C42", "bytes": 15026},
+        {"path": "more-infinite-research_1.2.0/prototypes/tech-gen.lua", "sha256": "DA42E66F381CB9EF53F168FC6892D19403CDBCF8A94817F386173C3D2DD671AA", "bytes": 3610},
+        {"path": "more-infinite-research_1.2.0/settings.lua", "sha256": "0CC4E2C1BA0F0A14E652C7F4D238236E80C2B8FE23A59F5B97C0DD4171C344B3", "bytes": 7511}
+      ],
+      "entrypoint_chain": [
+        {"member": "data.lua", "lines": "1-2", "expression": "require(\"prototypes.config\"); require(\"prototypes.util\")"},
+        {"member": "data-updates.lua", "lines": "1-4", "expression": "require(\"prototypes.tech-gen\"); require(\"prototypes.base-tech-extensions\"); require(\"prototypes.weapon-speed-adjustments\"); require(\"prototypes.max-level-control\")"}
+      ],
+      "module_stream": {
+        "config_member": "prototypes/config.lua",
+        "config_lines": "87-91",
+        "groups": [
+          {"change": 0.1, "items": ["productivity-module", "speed-module", "efficiency-module", "quality-module"]},
+          {"change": 0.05, "items": ["productivity-module-2", "speed-module-2", "efficiency-module-2", "quality-module-2"]},
+          {"change": 0.02, "items": ["productivity-module-3", "speed-module-3", "efficiency-module-3", "quality-module-3"]}
+        ],
+        "helper_member": "prototypes/util.lua",
+        "helper_lines": "333-343",
+        "pattern_namespaces": ["data.raw.item", "data.raw.ammo", "data.raw.capsule", "data.raw.module"],
+        "effect_emitter_member": "prototypes/tech-gen.lua",
+        "effect_emitter_lines": "81-86",
+        "effect_emitter_expression": "one change-recipe-productivity effect is appended for every recipe in every nonempty group; the module stream has no item_patterns group."
+      },
+      "duplicate_boundary": {
+        "result": "absent",
+        "reason": "The module stream contains only three explicit nonoverlapping tier groups; there is no .01 group or module-name pattern from which a duplicate tier-one effect can arise."
+      }
+    }
+  ],
+  "independent_native_1_1_observation": {
+    "scope": "Published MIR 1.1.0 default F200 Base prototype capture, not an MIR5 successor or migration pass.",
+    "result_path": "build/qualification/migration-origins/migration-origin-110-published-defaults-f200-r01/native-output/result.json",
+    "result_sha256": "436395F42EEA9EC24E125ADEB4BA5B0FEE735CF3635FFF902DD466958782030F",
+    "result_bytes": 12704,
+    "data_dump_path": "build/qualification/migration-origins/migration-origin-110-published-defaults-f200-r01/native-output/write-data/script-output/data-raw-dump.json",
+    "data_dump_sha256": "6BCE64CEEFD4205A57C9F6DC121E9C23BF57F405C36AF20E128F61B3C791A9F3",
+    "data_dump_bytes": 13303691,
+    "settings_dump_sha256": "05F488F086632186F435CD2D48238D65023287D672F731C18FC9FDC6E95C5357",
+    "settings_dump_bytes": 14567,
+    "technology": "recipe-prod-research_modules-1",
+    "effects": [
+      {"recipe": "speed-module", "change": 0.1},
+      {"recipe": "productivity-module", "change": 0.1},
+      {"recipe": "efficiency-module", "change": 0.1},
+      {"recipe": "speed-module-2", "change": 0.05},
+      {"recipe": "productivity-module-2", "change": 0.05},
+      {"recipe": "efficiency-module-2", "change": 0.05},
+      {"recipe": "speed-module-3", "change": 0.02},
+      {"recipe": "productivity-module-3", "change": 0.02},
+      {"recipe": "efficiency-module-3", "change": 0.02},
+      {"recipe": "speed-module", "change": 0.01},
+      {"recipe": "productivity-module", "change": 0.01},
+      {"recipe": "efficiency-module", "change": 0.01}
+    ]
+  },
+  "conclusion": {
+    "duplicate_basic_module_boundary": "The tier-one .01 duplicate is proven for exact published 1.1.0 only within the inspected 1.0.0, 1.1.0, and 1.2.0 archives.",
+    "recovery_boundary": "The independent 1.1.0 native observation supports retaining three earned .01 contributions separately from the current public module row. It does not authorize a broader source-version admission.",
+    "future_1_2_source_reference": "A normal published 1.2.0 source capture remains required for its direct migration route. It is not required merely to decide this duplicate-effect boundary, because its archive has no .01 module producer."
+  },
+  "limits": [
+    "No 1.0.0 or 1.2.0 native prototype row is claimed here; their duplicate conclusions are finite archive-plus-exact-Base-source analysis.",
+    "No migration successor, source save, gameplay, performance, package or release qualification is claimed.",
+    "The inspected exact ZIP bytes, not a presumed equality with their tags, are the source of the loaded-member facts."
+  ]
+}

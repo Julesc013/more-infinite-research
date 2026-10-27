@@ -138,13 +138,32 @@ local function queue_snapshot(force)
     queue = queue, progress = force.research_progress}
 end
 
-local function assert_queue(force, expected, label)
+local function queue_ids(values)
+  local out = {}
+  for index, value in ipairs(values or {}) do out[index] = tostring(value) end
+  return table.concat(out, ",")
+end
+
+local function queue_diagnostic(expected, actual, vulcanus_unlocked)
+  return " expected-current=" .. tostring(expected.current)
+    .. " actual-current=" .. tostring(actual.current)
+    .. " expected-queue-ids=" .. queue_ids(expected.queue)
+    .. " actual-queue-ids=" .. queue_ids(actual.queue)
+    .. " expected-queue-length=" .. tostring(#(expected.queue or {}))
+    .. " actual-queue-length=" .. tostring(#(actual.queue or {}))
+    .. " expected-progress=" .. tostring(expected.progress)
+    .. " actual-progress=" .. tostring(actual.progress)
+    .. " vulcanus-unlocked=" .. tostring(vulcanus_unlocked)
+end
+
+local function assert_queue(force, expected, label, vulcanus_unlocked)
   local actual = queue_snapshot(force)
+  local diagnostic = queue_diagnostic(expected, actual, vulcanus_unlocked)
   if actual.current ~= expected.current or #actual.queue ~= #expected.queue or not close(actual.progress, expected.progress) then
-    fail(label .. " queue/progress differs")
+    fail(label .. " queue/progress differs;" .. diagnostic)
   end
   for index, name in ipairs(expected.queue) do
-    if actual.queue[index] ~= name then fail(label .. " queue identity differs") end
+    if actual.queue[index] ~= name then fail(label .. " queue identity differs;" .. diagnostic) end
   end
   return actual
 end
@@ -226,7 +245,7 @@ local function assert_source_snapshot(force, expected, label, foreign, repaired)
       or not close(iron.effect, expected.iron.effect) or not close(iron.bonus, expected.iron.bonus) then
     fail(label .. " protected iron state differs")
   end
-  assert_queue(force, expected.queue, label .. " protected")
+  assert_queue(force, expected.queue, label .. " protected", actual.discovery.unlocked)
   if iron.level ~= 3 or iron.researched ~= false or not close(iron.effect, .1) or not close(iron.bonus, .2) then
     fail(label .. " earned iron state differs")
   end
@@ -234,7 +253,7 @@ local function assert_source_snapshot(force, expected, label, foreign, repaired)
     if actual.discovery.researched ~= false or actual.discovery.unlocked ~= false then
       fail(label .. " unresearched foreign Vulcanus state differs")
     end
-    assert_queue(force, {current = IRON, queue = {IRON}, progress = .27}, label)
+    assert_queue(force, {current = IRON, queue = {IRON}, progress = .27}, label, actual.discovery.unlocked)
   else
     local expected_unlocked = repaired and true or expected.discovery.unlocked
     if actual.discovery.researched ~= true then
@@ -244,7 +263,7 @@ local function assert_source_snapshot(force, expected, label, foreign, repaired)
       if repaired then fail("MIR discovery repair did not restore researched Vulcanus") end
       fail(label .. " player Vulcanus discovery state differs")
     end
-    assert_queue(force, {current = IRON, queue = {IRON}, progress = .42}, label)
+    assert_queue(force, {current = IRON, queue = {IRON}, progress = .42}, label, actual.discovery.unlocked)
   end
   return actual
 end
@@ -275,7 +294,7 @@ local function marker(stage, state, successor)
     source_scripted_iron_plate_bonus = state.player.iron.bonus,
     foreign_iron_progress = state.foreign.queue.progress,
     source_discovery_lab_researched = state.player.discovery.researched,
-    source_vulcanus_locked_seed = not state.player.discovery.unlocked,
+    source_vulcanus_native_locked_after_discovery = not state.player.discovery.unlocked,
     player_vulcanus_unlocked = player.discovery.unlocked,
     foreign_vulcanus_unresearched_locked = not state.foreign.discovery.researched and not state.foreign.discovery.unlocked,
     on_load_read_only = stage == "reload",
@@ -289,6 +308,7 @@ local function source_preflight()
   local discovery = technology(player, DISCOVERY, "source player")
   local iron = technology(player, IRON, "source player")
   if discovery.researched then fail("source Vulcanus discovery is already researched") end
+  if location_unlocked(player, "source player") then fail("source Vulcanus is unexpectedly unlocked") end
   if iron.researched or iron.level ~= 1 then fail("source iron technology is not fresh") end
   iron_effects(iron, "source player")
   research_unit(discovery, "source Vulcanus discovery")
@@ -310,7 +330,6 @@ local function seed_foreign()
   iron.level = 3
   foreign.reset_technology_effects()
   if not close((foreign.recipes["iron-plate"] or {}).productivity_bonus, .2) then fail("foreign iron bonus differs") end
-  foreign.lock_space_location(LOCATION)
   if location_unlocked(foreign, "foreign") then fail("foreign Vulcanus did not remain locked") end
   if foreign.add_research(iron) ~= true then fail("could not queue foreign iron") end
   foreign.research_progress = .27
@@ -337,13 +356,13 @@ end
 local function complete_source(state)
   local player = game.forces.player
   local discovery = technology(player, DISCOVERY, "source player")
-  if state.source_actual_labs ~= 1 or discovery.researched ~= true or not location_unlocked(player, "source player") then
+  local expected_unlocked = state.source_version == "3.2.1"
+  if state.source_actual_labs ~= 1 or discovery.researched ~= true
+      or location_unlocked(player, "source player") ~= expected_unlocked then
     fail("actual source Vulcanus discovery result differs")
   end
   assert_consumed(state.lab, state.source_packs, "source discovery")
   freeze_lab(state.lab)
-  player.lock_space_location(LOCATION)
-  if location_unlocked(player, "source player") then fail("could not simulate the locked discovered Vulcanus state") end
   local iron = technology(player, IRON, "source player")
   iron.researched = false
   iron.level = 3
@@ -375,8 +394,12 @@ local function successor_begin()
   local player = game.forces.player
   local foreign = game.forces[state.foreign_index]
   -- This preflight intentionally runs before successor storage/lab writes.
-  local player_before = assert_source_snapshot(player, state.player, "successor player", false, true)
-  if player_before.discovery.unlocked ~= true then fail("MIR discovery repair did not restore researched Vulcanus") end
+  local requires_repair = state.source_version == "3.2.0"
+  local player_before = assert_source_snapshot(player, state.player, "successor player", false, requires_repair)
+  if player_before.discovery.unlocked ~= true then
+    if requires_repair then fail("MIR discovery repair did not restore researched Vulcanus") end
+    fail("3.2.1 source Vulcanus discovery was not retained by successor")
+  end
   local foreign_before = assert_source_snapshot(foreign, state.foreign, "successor foreign", true)
   local iron = technology(player, IRON, "successor player")
   iron_effects(iron, "successor player")
