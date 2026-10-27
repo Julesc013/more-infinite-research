@@ -24,14 +24,15 @@ assert(technology.type == "technology" and technology.name == catalogue.direct a
     and technology.upgrade == true and technology.max_level == "infinite" and technology.enabled ~= false,
   "[mir5-migration-origin-f200-100-successor] candidate gear identity differs")
 
-local gear_effect = false
+local gear_effects = 0
 for _, effect in ipairs(technology.effects or {}) do
   if effect.type == "change-recipe-productivity" and effect.recipe == catalogue.gear_recipe
-      and type(effect.change) == "number" and effect.change > 0 then
-    gear_effect = true
+      and effect.change == catalogue.expected_gear_delta then
+    gear_effects = gear_effects + 1
   end
 end
-assert(gear_effect, "[mir5-migration-origin-f200-100-successor] candidate gear productivity effect is absent")
+assert(gear_effects == 1,
+  "[mir5-migration-origin-f200-100-successor] candidate gear productivity effect differs")
 assert(type(technology.unit) == "table" and type(technology.unit.ingredients) == "table"
     and #technology.unit.ingredients > 0,
   "[mir5-migration-origin-f200-100-successor] candidate gear science is absent")

@@ -72,6 +72,10 @@ local function assert_force(force, expected, rows, label, ignored_technology, ig
       fail(label .. " source row changed before candidate work: " .. name)
     end
     observed_effects[name] = signature(now.prototype.effects or {})
+    if observed_effects[name] ~= expected.effects[name] then
+      fail(label .. " source effect vector changed: " .. name .. " expected=" .. tostring(expected.effects[name])
+        .. " actual=" .. observed_effects[name])
+    end
   end
   for recipe, before in pairs(expected.recipes) do
     local now = force.recipes[recipe]
@@ -95,7 +99,7 @@ local function exact_target()
   end
   fail("runtime target closure differs")
 end
-local function assert_supporting_state(state_value, target_name)
+local function assert_supporting_state(state_value)
   if settings.startup[catalogue.breeding_setting] == nil
       or settings.startup[catalogue.breeding_setting].value ~= false then
     fail("effective false historical breeding setting was not retained")
@@ -112,14 +116,7 @@ local function assert_supporting_state(state_value, target_name)
   end
   local idle = queue_snapshot(detached)
   if idle.current ~= false or #idle.queue ~= 0 then fail("detached historical queue changed") end
-  state_value.successors = state_value.successors or {}
-  state_value.successors[target_name] = state_value.successors[target_name] or {}
-  local successor = state_value.successors[target_name]
-  successor.before_effects = {player = player_effects, foreign = foreign_effects, detached = detached_effects}
-  successor.source_effects = state_value.player_snapshot.effects
-  successor.source_rows = #state_value.roster
-  successor.source_actual_labs = state_value.source_labs
-  return successor
+  return {player = player_effects, foreign = foreign_effects, detached = detached_effects}
 end
 local function same_technology(actual, expected, label)
   if type(expected) ~= "table" or actual.level ~= expected.level or actual.researched ~= expected.researched
@@ -128,29 +125,13 @@ local function same_technology(actual, expected, label)
     fail(label .. " direct historical state differs")
   end
 end
-local function assert_direct_before(state_value, target_name)
+local function assert_direct_before(state_value)
   local direct = technology(game.forces.player, catalogue.direct)
-  if target_name == "f200" then
-    same_technology(direct, state_value.player_snapshot.technologies[catalogue.direct], "F200 source")
-    if not close(game.forces.player.recipes[catalogue.gear_recipe].productivity_bonus,
-        state_value.player_snapshot.recipes[catalogue.gear_recipe]) then
-      fail("F200 source earned gear contribution differs")
-    end
-    return
+  same_technology(direct, state_value.player_snapshot.technologies[catalogue.direct], "original MIR1 source")
+  if not close(game.forces.player.recipes[catalogue.gear_recipe].productivity_bonus,
+      state_value.player_snapshot.recipes[catalogue.gear_recipe]) then
+    fail("original MIR1 source earned gear contribution differs")
   end
-  local prior = state_value.successors and state_value.successors.f200
-  if type(prior) ~= "table" or prior.phase ~= "completed" or type(prior.after_direct) ~= "table" then
-    fail("F210 successor lacks the completed protected F200 handoff")
-  end
-  same_technology(direct, prior.after_direct, "F210 F200-handoff")
-  if not close(game.forces.player.recipes[catalogue.gear_recipe].productivity_bonus, prior.after_bonus) then
-    fail("F210 F200-handoff earned gear contribution differs")
-  end
-end
-local function assert_source_before(state_value, target_name)
-  local successor = assert_supporting_state(state_value, target_name)
-  assert_direct_before(state_value, target_name)
-  return successor
 end
 local function new_lab()
   local entity = game.surfaces[1].create_entity{name = "lab", position = {8, 0}, force = game.forces.player}
@@ -174,6 +155,16 @@ local function fill_lab(entity, inventory, value)
   entity.energy = 1000000000
   return packs
 end
+local function freeze_lab(successor)
+  local entity = successor.lab
+  if entity == nil or entity.valid == false then fail("candidate gear lab became invalid before completion freeze") end
+  local inventory = entity.get_inventory(defines.inventory.lab_input)
+  if inventory == nil then fail("candidate gear lab input is absent before completion freeze") end
+  inventory.clear()
+  entity.energy = 0
+  successor.lab = nil
+  successor.packs = nil
+end
 local function marker(stage, target_name, state_value, successor)
   log("[MIR5_NATIVE_FIXTURE] RESULT " .. helpers.table_to_json({
     case = "migration-origin-1.0.0-" .. target_name .. "-successor", stage = stage, status = "passed",
@@ -191,12 +182,16 @@ end
 local function begin()
   local target_name = exact_target()
   local state_value = state()
-  local successor = assert_source_before(state_value, target_name)
-  if successor.phase ~= nil then fail("target successor already began") end
+  local observed = assert_supporting_state(state_value)
+  assert_direct_before(state_value)
+  state_value.successors = state_value.successors or {}
+  if state_value.successors[target_name] ~= nil then fail("target successor already began") end
+  local successor = {}
+  state_value.successors[target_name] = successor
   local direct = technology(game.forces.player, catalogue.direct)
   local before_bonus = game.forces.player.recipes[catalogue.gear_recipe].productivity_bonus
   local delta = effects(direct)[catalogue.gear_recipe]
-  if type(delta) ~= "number" or delta <= 0 then fail("candidate runtime gear contribution is absent") end
+  if not close(delta, catalogue.expected_gear_delta) then fail("candidate runtime gear contribution differs") end
   local entity, inventory = new_lab()
   successor.target = target_name
   successor.phase = "await-candidate-lab"
@@ -204,16 +199,24 @@ local function begin()
   successor.candidate_actual_labs = 0
   successor.before_bonus = before_bonus
   successor.candidate_delta = delta
+  successor.before_effects = observed
+  successor.source_effects = state_value.player_snapshot.effects
+  successor.source_rows = #state_value.roster
+  successor.source_actual_labs = state_value.source_labs
   successor.lab, successor.packs = entity, fill_lab(entity, inventory, direct)
-  if game.forces.player.add_research(direct) ~= true or game.forces.player.current_research ~= direct then
-    fail("could not queue one actual candidate gear lab")
+  local current = game.forces.player.current_research
+  if current == nil then
+    if game.forces.player.add_research(direct) ~= true or game.forces.player.current_research ~= direct then
+      fail("could not queue one actual candidate gear lab")
+    end
+  elseif current ~= direct then
+    fail("source player has unrelated current research")
   end
 end
 local function complete(target_name, state_value, successor)
-  assert_supporting_state(state_value, target_name)
+  assert_supporting_state(state_value)
   local direct = technology(game.forces.player, catalogue.direct)
-  local before_level = target_name == "f200" and state_value.player_snapshot.technologies[catalogue.direct].level
-    or state_value.successors.f200.after_direct.level
+  local before_level = state_value.player_snapshot.technologies[catalogue.direct].level
   if successor.candidate_actual_labs ~= 1 or direct.level ~= before_level + 1
       or direct.researched ~= false or not close(game.forces.player.recipes[catalogue.gear_recipe].productivity_bonus,
         successor.before_bonus + successor.candidate_delta) then
@@ -222,9 +225,6 @@ local function complete(target_name, state_value, successor)
   if game.forces.player.current_research ~= nil or #game.forces.player.research_queue ~= 0 then
     fail("candidate player queue survived completion")
   end
-  successor.after_direct = {level = direct.level, researched = direct.researched, enabled = direct.enabled,
-    visible = direct.visible_when_disabled, maximum = direct.prototype.max_level, saved = direct.saved_progress}
-  successor.after_bonus = game.forces.player.recipes[catalogue.gear_recipe].productivity_bonus
 end
 script.on_configuration_changed(begin)
 script.on_load(function()
@@ -240,6 +240,7 @@ script.on_event(defines.events.on_research_finished, function(event)
         and event.research.name == catalogue.direct then
       successor.candidate_actual_labs = successor.candidate_actual_labs + 1
       if successor.candidate_actual_labs ~= 1 then fail("candidate gear lab completed more than once") end
+      freeze_lab(successor)
       successor.phase = "await-observation"
     end
   end
@@ -261,8 +262,10 @@ script.on_event(defines.events.on_tick, function()
     fail("target successor phase is invalid")
   end
   if game.tick > successor.deadline then fail("candidate gear lab did not complete") end
-  if successor.lab == nil or successor.lab.valid == false then fail("candidate gear lab became invalid") end
-  successor.lab.energy = 1000000000
+  if successor.phase == "await-candidate-lab" then
+    if successor.lab == nil or successor.lab.valid == false then fail("candidate gear lab became invalid") end
+    successor.lab.energy = 1000000000
+  end
   if successor.phase == "await-observation" then
     complete(target_name, state_value, successor)
     successor.phase = "completed"

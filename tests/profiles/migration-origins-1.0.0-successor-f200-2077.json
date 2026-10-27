@@ -10,6 +10,12 @@
     "sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B"
   },
   "settings_mode": "ProtectedSourceSave",
+  "fixture_startup_setting": {
+    "name": "ips-enable-research_breeding",
+    "value": false,
+    "delivery": "fixture-settings-updates-default-for-successor-load-only",
+    "persistence_claim": false
+  },
   "source_save": {
     "sha256": "F8B38209DA632C8B2EFA049C8F69CDB3E3EC01F6BEE0C5D03BAFF03C27989C54",
     "source_result_sha256": "156DB224E0042D8D988E2CF127641E9AAE0FCF7430402A645F93A2BE41BC8A30"
@@ -25,5 +31,5 @@
     "mir-fixture-mir5-migration-origin-f200-100-source_0.2.0.zip": "8B55E1CE22873EB20B0D270071A082CCC71C45530B1AAAD94800CD720AAE8FBE",
     "more-infinite-research_5.0.20000.zip": "BD1B88D7DE85489207F71C1B080FD61617FAEF9655370BF0332A51579308ECE3"
   },
-  "scope": "Protected MIR 1.0.0 F200 source-save successor under the verified 98fb MIR5 F200 asset. It must preserve all retained source state before one actual current gear lab, then save and perform two read-only cold reloads. It is prepared input only."
+  "scope": "Protected MIR 1.0.0 F200 source-save successor under the verified 98fb MIR5 F200 asset. It must preserve all retained source state before one actual current gear lab, then save and perform two read-only cold reloads. Its bounded fixture supplies the source's effective false breeding startup input but makes no claim that a user-authored override persists across a later default change. It is prepared input only."
 }

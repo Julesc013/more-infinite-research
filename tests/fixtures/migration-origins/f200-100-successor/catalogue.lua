@@ -12,4 +12,5 @@ return {
   save = "mir5-native-complete",
   deadline_ticks = 18000,
   lab_packs = 16,
+  expected_gear_delta = .10,
 }
