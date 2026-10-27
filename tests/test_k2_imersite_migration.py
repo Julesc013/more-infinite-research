@@ -40,7 +40,13 @@ class ImersiteMigrationTests(unittest.TestCase):
                   prerequisites=id == T and {{name=E}} or {}}}
               technologies[id] = setmetatable({}, {
                 __index=function(_,key) return rows[id][key] end,
-                __newindex=function(_,key,value) rows[id][key]=value; total() end})
+                __newindex=function(_,key,value)
+                  rows[id][key]=value
+                  -- LuaTechnology.level enables the technology.  The migration
+                  -- must therefore restore any unqueued foreign disablement.
+                  if key == "level" then rows[id].enabled=true end
+                  total()
+                end})
             end
             rows[H].level = completed+1; rows[H].saved_progress=0.42
             local values = {index=1,technologies=technologies,recipes={["kr-imersite-powder"]=recipe},
@@ -123,6 +129,34 @@ class ImersiteMigrationTests(unittest.TestCase):
             assert(not migration.reconcile_force(force,.02,records))
             assert(values.progress_writes == nil)
           end
+        ''')
+
+    def test_handoff_preserves_unqueued_public_disablement_and_visibility(self):
+        self.lua.execute('''
+          local force,rows = world(5)
+          force.research_queue = {}
+          rows[E].enabled=false; rows[E].visible_when_disabled=true
+          rows[T].enabled=false; rows[T].visible_when_disabled=false
+          local records={}
+          assert(migration.reconcile_force(force,.02,records))
+          assert(not rows[E].enabled and rows[E].visible_when_disabled)
+          assert(not rows[T].enabled and not rows[T].visible_when_disabled)
+          assert(force.current_research == nil and #force.research_queue == 0 and force.research_progress == 0)
+          assert(rows[H].level == 1 and not rows[H].enabled and rows[C].level == 4 and not rows[C].enabled)
+          assert(records[1].earned == 5)
+        ''')
+
+    def test_mapped_public_queue_keeps_activation_right_but_restores_other_public_flags(self):
+        self.lua.execute('''
+          local force,rows = world(5)
+          rows[E].enabled=false; rows[E].visible_when_disabled=true
+          rows[T].enabled=false; rows[T].visible_when_disabled=true
+          assert(migration.reconcile_force(force,.02,{}))
+          assert(not rows[E].enabled and rows[E].visible_when_disabled)
+          -- The source carrier maps to T, so its native level write deliberately
+          -- keeps it enabled for the restored queue; visibility is still foreign state.
+          assert(rows[T].enabled and rows[T].visible_when_disabled)
+          assert(force.current_research.name == T and force.research_progress == .42)
         ''')
 
     def test_detached_queue_refusal_preserves_original_error_and_carrier_work(self):

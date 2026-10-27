@@ -137,6 +137,22 @@ local function set_queue(force, names, current, progress)
   if force.research_progress ~= (current and progress or 0) then error("MIR Imersite progress readback differs", 2) end
 end
 
+local function queued(names, id)
+  for _, name in ipairs(names) do if name == id then return true end end
+  return false
+end
+
+local function restore_public_flags(technologies, before, plan)
+  for _, id in ipairs({EARLY,TAIL}) do
+    -- LuaTechnology.level enables the technology.  Preserve foreign force
+    -- presentation/disablement when this handoff did not map a carrier into
+    -- the public row.  A mapped queue target deliberately retains the native
+    -- activation needed for the restored queue to remain researchable.
+    technologies[id].visible_when_disabled = before[id].visible_when_disabled
+    if not queued(plan.queue,id) then technologies[id].enabled = before[id].enabled end
+  end
+end
+
 local function clear(holder, first)
   set_state(holder, {researched=false,level=first,saved_progress=0})
   holder.enabled, holder.visible_when_disabled = false, false
@@ -221,6 +237,7 @@ function M.reconcile_force(force, change, records, legacy)
     set_state(technologies[EARLY],plan.early)
     set_state(technologies[TAIL],plan.tail)
     set_queue(force,plan.queue,plan.current,plan.progress)
+    restore_public_flags(technologies,before,plan)
     clear(technologies[HOLDERS[1]],1)
     clear(technologies[HOLDERS[2]],4)
     local after = force.recipes[contract.effect.recipe].productivity_bonus
