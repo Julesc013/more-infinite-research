@@ -61,6 +61,63 @@ local function source_recipe_bonuses(direct_earned)
   end
   return expected
 end
+local function recipe_effect_counts(effects, label)
+  if type(effects) ~= "table" then fail(label .. " effects are absent") end
+  local counts = {}
+  for _, effect in ipairs(effects) do
+    if type(effect) ~= "table" or effect.type ~= "change-recipe-productivity"
+        or type(effect.recipe) ~= "string" then
+      fail(label .. " effect shape differs")
+    end
+    local key = effect.type .. "|" .. effect.recipe .. "|" .. token(effect.change)
+    counts[key] = (counts[key] or 0) + 1
+  end
+  return counts
+end
+local function same_effect_counts(actual, expected)
+  if map_count(actual) ~= map_count(expected) then return false end
+  for key, count in pairs(expected) do if actual[key] ~= count then return false end end
+  return true
+end
+local function assert_module_credit(force, snapshot, label)
+  local contract = catalogue.module_credit
+  if type(contract) ~= "table" or type(contract.public) ~= "table" or type(contract.holders) ~= "table"
+      or #contract.public ~= 9 or #contract.holders ~= 3 then
+    fail("candidate module-credit contract is malformed")
+  end
+  local saved = snapshot.technologies["recipe-prod-research_modules-1"]
+  if type(saved) ~= "table" or type(saved.level) ~= "number" or saved.level < 1
+      or type(saved.researched) ~= "boolean" then
+    fail(label .. " saved module level is malformed")
+  end
+  local completed = saved.level - 1 + (saved.researched and 1 or 0)
+  if completed < 1 then fail(label .. " saved module credit is absent") end
+  local public = technology(force, "recipe-prod-research_modules-1")
+  if public.prototype == nil
+      or not same_effect_counts(recipe_effect_counts(public.prototype.effects, label .. " current public module"),
+        recipe_effect_counts(contract.public, "candidate public module")) then
+    fail(label .. " current public module effects differ")
+  end
+  for _, descriptor in ipairs(contract.holders) do
+    local holder = force.technologies[descriptor.id]
+    local prototype = holder and holder.prototype
+    if holder == nil or holder.valid == false or holder.name ~= descriptor.id
+        or holder.level ~= 1 + completed or holder.researched ~= false
+        or holder.enabled ~= false or holder.visible_when_disabled ~= false
+        or prototype == nil or prototype.name ~= descriptor.id or prototype.level ~= 1
+        or prototype.max_level ~= UINT32_MAX or prototype.hidden ~= true
+        or prototype.enabled ~= false or prototype.visible_when_disabled ~= false
+        or holder.research_unit_count ~= 1 or holder.research_unit_energy ~= 60
+        or type(holder.research_unit_ingredients) ~= "table" or #holder.research_unit_ingredients ~= 1
+        or holder.research_unit_ingredients[1].name ~= "automation-science-pack"
+        or holder.research_unit_ingredients[1].amount ~= 1
+        or not same_effect_counts(recipe_effect_counts(prototype.effects, label .. " module credit holder"), {
+          ["change-recipe-productivity|" .. descriptor.recipe .. "|" .. token(descriptor.change)] = 1,
+        }) then
+      fail(label .. " retained module credit differs: " .. tostring(descriptor.id))
+    end
+  end
+end
 local function queue_snapshot(force)
   local queue = {}
   for index, value in ipairs(force.research_queue or {}) do queue[index] = value.name end
@@ -172,11 +229,14 @@ end
 local function assert_source_before(state_value, names, ignore_direct, delta)
   assert_settings()
   assert_force(game.forces.player, state_value.player_snapshot, names, "player", ignore_direct, delta or 0)
+  assert_module_credit(game.forces.player, state_value.player_snapshot, "player")
   local foreign = game.forces[state_value.foreign_index]
   assert_force(foreign, state_value.foreign_snapshot, names, "foreign", false, 0)
+  assert_module_credit(foreign, state_value.foreign_snapshot, "foreign")
   assert_queue(foreign, state_value.foreign_queue, "foreign")
   local detached = game.forces[state_value.detached_index]
   assert_force(detached, state_value.detached_snapshot, names, "detached", false, 0)
+  assert_module_credit(detached, state_value.detached_snapshot, "detached")
   local idle = queue_snapshot(detached)
   if idle.current ~= false or #idle.queue ~= 0 then fail("detached source queue changed") end
 end

@@ -13,6 +13,8 @@ FIXTURE = ROOT / "tests/fixtures/migration-origins/f200-110-successor"
 SOURCE_FIXTURE = ROOT / "tests/fixtures/migration-origins/f200-110-source"
 F200_PROFILE = ROOT / "tests/profiles/migration-origins-1.1.0-successor-f200-2077.json"
 F210_PROFILE = ROOT / "tests/profiles/migration-origins-1.1.0-successor-f210-2123.json"
+LEGACY_MODULE_DEFINITIONS = ROOT / "source/research/legacy_module_credit_definitions.lua"
+LEGACY_MODULE_RUNTIME = ROOT / "source/runtime/legacy_module_credits.lua"
 DIRECT = "recipe-prod-research_gears-1"
 ROBOT = "recipe-prod-research_robot_battery-1"
 MODULES = "recipe-prod-research_modules-1"
@@ -119,6 +121,27 @@ class MigrationOriginF200110SuccessorControls(unittest.TestCase):
         self.assertEqual(42, len(catalogue["settings"]))
         self.assertTrue(catalogue["settings"]["ips-enable-research_breeding"])
         self.assertFalse(catalogue["settings"]["ips-enable-research_inventory_capacity"])
+        module_credit = catalogue["module_credit"]
+        self.assertEqual(
+            Counter({
+                ("change-recipe-productivity", "speed-module", .10): 1,
+                ("change-recipe-productivity", "productivity-module", .10): 1,
+                ("change-recipe-productivity", "efficiency-module", .10): 1,
+                ("change-recipe-productivity", "speed-module-2", .05): 1,
+                ("change-recipe-productivity", "productivity-module-2", .05): 1,
+                ("change-recipe-productivity", "efficiency-module-2", .05): 1,
+                ("change-recipe-productivity", "speed-module-3", .02): 1,
+                ("change-recipe-productivity", "productivity-module-3", .02): 1,
+                ("change-recipe-productivity", "efficiency-module-3", .02): 1,
+            }),
+            Counter((effect["type"], effect["recipe"], effect["change"]) for effect in module_credit["public"]),
+        )
+        self.assertEqual(
+            [("mir-legacy-module-credit-speed-module", "speed-module", .01),
+             ("mir-legacy-module-credit-productivity-module", "productivity-module", .01),
+             ("mir-legacy-module-credit-efficiency-module", "efficiency-module", .01)],
+            [(holder["id"], holder["recipe"], holder["change"]) for holder in module_credit["holders"]],
+        )
 
     def test_successor_wrappers_retain_the_source_fixture_identity_and_only_change_the_targeted_wrapper_version(self):
         source = json.loads((SOURCE_FIXTURE / "info.json").read_text(encoding="utf-8"))
@@ -210,14 +233,14 @@ class MigrationOriginF200110SuccessorControls(unittest.TestCase):
         self.assertIn("protected MIR 1.1 source state is absent", result["message_config"])
         self.assertEqual({}, result["storage"])
 
-    def test_profiles_bind_the_one_passed_r05_source_and_pin_only_a575_inputs(self):
+    def test_profiles_bind_the_one_passed_r05_source_and_the_coherent_module_credit_candidate(self):
         f200, f210 = json.loads(F200_PROFILE.read_text()), json.loads(F210_PROFILE.read_text())
         for profile in (f200, f210):
             self.assertEqual("88FC8E9891040275E001930C3E6AA0A4A7A28C31D81DF30E3F08AEDD98E5019A",
                              profile["source_save"]["sha256"])
             self.assertEqual("4FBD622144E3B69E39C0530385AA70C92971208584CA32D4A10B1FCC1A978997",
                              profile["source_save"]["source_result_sha256"])
-            self.assertEqual(("a575a4198807b6aea9e26963e3d9970fc5c068ae", "398c79c687d2bc662c976355ced1436201c43f11"),
+            self.assertEqual(("3e835be9ce06287362b3a7b0faacd107c13ae07c", "a00b2372a06d5398787b2d54169d5494e7c27a7e"),
                              (profile["candidate"]["source_commit"], profile["candidate"]["player_tree"]))
             self.assertEqual("d8e24b4a79b6064a373c03210c5ef6be0b013f79", profile["source_fixture_commit"])
             self.assertEqual("aae9bc947674cd059df60d9617a412a059970cc2", profile["successor_fixture_commit"])
@@ -226,9 +249,9 @@ class MigrationOriginF200110SuccessorControls(unittest.TestCase):
                          f200["archive_sha256"]["mir-fixture-mir5-migration-origin-f200-110-source_0.2.0.zip"])
         self.assertEqual("E4BCB251C6D4D0FBAA5DD4E9F36E3B5969A6A7863A2C51E649CADBE6B99A315E",
                          f210["archive_sha256"]["mir-fixture-mir5-migration-origin-f200-110-source_0.3.0.zip"])
-        self.assertEqual("8DB28D2DE45F26033B5F54E176902A3138A903AF0F4B48EAB6B9971466021B4F",
+        self.assertEqual("E1C84EA381FAA57BA7089AAD10B1AFD1408666A41AFE13962ABCBA6321EE889D",
                          f200["archive_sha256"]["more-infinite-research_5.0.20000.zip"])
-        self.assertEqual("7CE6A4DF78019F6B98237E638A1C927C5FDB538D4A1442EE22D846DD962DDCDC",
+        self.assertEqual("039BC18B70E179DB600E29C8442637DD9972D7AB81E3F0770FDCF1056D6316B4",
                          f210["archive_sha256"]["more-infinite-research_5.0.21000.zip"])
         self.assertNotIn("space-age", {entry["name"] for entry in f210["mods"]})
 
@@ -249,6 +272,8 @@ class MigrationOriginF200110SuccessorControls(unittest.TestCase):
         control_path = (FIXTURE / "control.lua").as_posix()
         self.lua.globals().catalogue_path = catalogue_path
         self.lua.globals().successor_control_path = control_path
+        self.lua.globals().legacy_module_definitions_path = LEGACY_MODULE_DEFINITIONS.as_posix()
+        self.lua.globals().legacy_module_runtime_path = LEGACY_MODULE_RUNTIME.as_posix()
         self.lua.execute(r'''
           function migration_origin_110_successor_lifecycle(target, source_fixture_name, active_wrapper_name, catalogue_fixture_name)
             local callbacks={events={}}
@@ -258,12 +283,24 @@ class MigrationOriginF200110SuccessorControls(unittest.TestCase):
               defines={events={on_research_finished=1,on_tick=2},inventory={lab_input=1}}}
             local catalogue
             env.require=function(name)
-              assert(name=="__mir-fixture-mir5-migration-origin-f200-110-source__/catalogue")
-              if catalogue==nil then
-                catalogue=assert(loadfile(catalogue_path,"t",env))()
-                if catalogue_fixture_name~=nil then catalogue.fixture=catalogue_fixture_name end
+              if name=="__mir-fixture-mir5-migration-origin-f200-110-source__/catalogue" then
+                if catalogue==nil then
+                  catalogue=assert(loadfile(catalogue_path,"t",env))()
+                  if catalogue_fixture_name~=nil then catalogue.fixture=catalogue_fixture_name end
+                end
+                return catalogue
               end
-              return catalogue
+              if name=="research.legacy_module_credit_definitions" then
+                return assert(loadfile(legacy_module_definitions_path,"t",env))()
+              end
+              if name=="runtime.legacy_module_credits" then
+                return assert(loadfile(legacy_module_runtime_path,"t",env))()
+              end
+              if name=="platform.target" then
+                if target=="f200" then return {id="f200",recipe_productivity=true,distribution_version="5.0.20000"} end
+                return {id="f210",recipe_productivity=true,distribution_version="5.0.21000"}
+              end
+              error("unexpected module: "..tostring(name))
             end
             env.log=function(message) env.logs[#env.logs+1]=message end
             env._G=env;setmetatable(env,{__index=_G})
@@ -308,9 +345,28 @@ class MigrationOriginF200110SuccessorControls(unittest.TestCase):
               return {technologies=technologies,effects=effects,recipes=recipe_values(direct_level>=2),
                 fields={manual_mining_speed_modifier=0,worker_robots_battery_modifier=.1}}
             end
-            local function make_force(label,direct_level,direct_progress)
+            local function copy_effects(effects)
+              local out={}
+              for index,effect in ipairs(effects) do
+                out[index]={type=effect.type,recipe=effect.recipe,change=effect.change}
+              end
+              return out
+            end
+            local function install_current_module_credit(force,snapshot,definitions)
+              local main=force.technologies["recipe-prod-research_modules-1"]
+              main.prototype={name="recipe-prod-research_modules-1",level=1,max_level=UINT32_MAX,
+                hidden=false,enabled=true,upgrade=true,effects=copy_effects(catalogue.module_credit.public)}
+              for _,row in ipairs(definitions.technologies()) do
+                force.technologies[row.name]={valid=true,name=row.name,level=1,researched=false,enabled=false,visible_when_disabled=false,
+                  research_unit_count=row.unit.count,research_unit_energy=row.unit.time*60,
+                  research_unit_ingredients={{name=row.unit.ingredients[1][1],amount=row.unit.ingredients[1][2]}},
+                  prototype={name=row.name,level=row.level,max_level=UINT32_MAX,hidden=row.hidden,enabled=row.enabled,
+                    visible_when_disabled=row.visible_when_disabled,upgrade=row.upgrade,effects=copy_effects(row.effects)}}
+              end
+            end
+            local function make_force(label,index,direct_level,direct_progress)
               local snapshot=source_snapshot(direct_level,direct_progress)
-              local force={name=label,valid=true,technologies={},recipes={},manual_mining_speed_modifier=0,
+              local force={name=label,index=index,valid=true,technologies={},recipes={},manual_mining_speed_modifier=0,
                 worker_robots_battery_modifier=.1,research_queue={},research_progress=0,current_research=nil,add_calls=0}
               for _,name in ipairs(roster) do
                 local saved=snapshot.technologies[name]
@@ -330,9 +386,9 @@ class MigrationOriginF200110SuccessorControls(unittest.TestCase):
               end
               return force,snapshot
             end
-            local player,player_snapshot=make_force("player",2,0)
-            local foreign,foreign_snapshot=make_force("foreign",1,.42)
-            local detached,detached_snapshot=make_force("detached",1,.27)
+            local player,player_snapshot=make_force("player",1,2,0)
+            local foreign,foreign_snapshot=make_force("foreign",2,1,.42)
+            local detached,detached_snapshot=make_force("detached",3,1,.27)
             foreign.current_research=foreign.technologies[catalogue.direct]
             foreign.research_queue={foreign.technologies[catalogue.direct],foreign.technologies["recipe-prod-research_plastic-1"]}
             foreign.research_progress=.42
@@ -363,6 +419,13 @@ class MigrationOriginF200110SuccessorControls(unittest.TestCase):
               env.script.active_mods={base="2.1.23",["more-infinite-research"]="5.0.21000",
                 [active_wrapper_name]="0.3.0",["mir-fixture-mir5-active-mods-observer"]="0.1.0"}
             end
+            local definitions=env.require("research.legacy_module_credit_definitions")
+            install_current_module_credit(player,player_snapshot,definitions)
+            install_current_module_credit(foreign,foreign_snapshot,definitions)
+            install_current_module_credit(detached,detached_snapshot,definitions)
+            local module_runtime=env.require("runtime.legacy_module_credits")
+            assert(module_runtime.on_configuration_changed({mod_changes={
+              ["more-infinite-research"]={old_version="1.1.0",new_version=env.script.active_mods["more-infinite-research"]}}})==true)
             local ok,message=pcall(function()
               assert(loadfile(successor_control_path,"t",env))()
               callbacks.configuration({})
@@ -385,6 +448,16 @@ class MigrationOriginF200110SuccessorControls(unittest.TestCase):
               player_manual=player.manual_mining_speed_modifier,player_battery=player.worker_robots_battery_modifier,
               foreign_progress=foreign.research_progress,detached_progress=detached.technologies[catalogue.direct].saved_progress,
               player_add_calls=player.add_calls,source_state_changed=state.successors~=nil,
+              candidate_module_effects=#player.technologies["recipe-prod-research_modules-1"].prototype.effects,
+              player_module_holders={player.technologies[catalogue.module_credit.holders[1].id].level,
+                player.technologies[catalogue.module_credit.holders[2].id].level,
+                player.technologies[catalogue.module_credit.holders[3].id].level},
+              foreign_module_holders={foreign.technologies[catalogue.module_credit.holders[1].id].level,
+                foreign.technologies[catalogue.module_credit.holders[2].id].level,
+                foreign.technologies[catalogue.module_credit.holders[3].id].level},
+              detached_module_holders={detached.technologies[catalogue.module_credit.holders[1].id].level,
+                detached.technologies[catalogue.module_credit.holders[2].id].level,
+                detached.technologies[catalogue.module_credit.holders[3].id].level},
               active_state_changed=type(storage_by_mod[active_wrapper_name][catalogue.storage_key])=="table"
                 and storage_by_mod[active_wrapper_name][catalogue.storage_key].successors~=nil}
           end
@@ -416,6 +489,9 @@ class MigrationOriginF200110SuccessorControls(unittest.TestCase):
                 self.assertEqual((0, 0), (result["foreign_gear"], result["detached_gear"]))
                 self.assertEqual((0, .1), (result["player_manual"], result["player_battery"]))
                 self.assertEqual((.42, .27), (result["foreign_progress"], result["detached_progress"]))
+                self.assertEqual(9, result["candidate_module_effects"])
+                self.assertEqual(([2, 2, 2], [2, 2, 2], [2, 2, 2]),
+                                 (result["player_module_holders"], result["foreign_module_holders"], result["detached_module_holders"]))
                 self.assertEqual("completed", result["state"]["successors"][target]["phase"])
                 self.assertEqual(1, result["state"]["successors"][target]["candidate_actual_labs"])
                 self.assertEqual(2, len(result["logs"]))

@@ -14,6 +14,22 @@ return {
   direct = "recipe-prod-research_gears-1",
   gear_recipe = "iron-gear-wheel",
   robot_battery = "recipe-prod-research_robot_battery-1",
+  -- The current public row deliberately has its normal nine effects only.
+  -- The three published 1.1.0 .01 tier-one effects are retained by hidden
+  -- earned-state holders after configuration, rather than duplicated on the
+  -- current public technology.
+  module_credit = {
+    public = {
+      recipe("efficiency-module", .10), recipe("productivity-module", .10), recipe("speed-module", .10),
+      recipe("efficiency-module-2", .05), recipe("productivity-module-2", .05), recipe("speed-module-2", .05),
+      recipe("efficiency-module-3", .02), recipe("productivity-module-3", .02), recipe("speed-module-3", .02),
+    },
+    holders = {
+      {id = "mir-legacy-module-credit-speed-module", recipe = "speed-module", change = .01},
+      {id = "mir-legacy-module-credit-productivity-module", recipe = "productivity-module", change = .01},
+      {id = "mir-legacy-module-credit-efficiency-module", recipe = "efficiency-module", change = .01},
+    },
+  },
   source_fixture_version = "0.1.0",
   targets = {
     f200 = {base = "2.0.77", mir = "5.0.20000", fixture = "0.2.0"},
