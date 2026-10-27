@@ -1,0 +1,13 @@
+{
+  "name": "mir-fixture-discovery-recovery",
+  "version": "0.2.0",
+  "title": "MIR5 discovery-recovery successor fixture",
+  "author": "MIR maintainers",
+  "description": "Disposable MIR5 observation of a protected 3.2.x Vulcanus discovery recovery save.",
+  "factorio_version": "2.1",
+  "dependencies": [
+    "base = 2.1.23",
+    "space-age = 2.1.23",
+    "more-infinite-research = 5.0.21000"
+  ]
+}
