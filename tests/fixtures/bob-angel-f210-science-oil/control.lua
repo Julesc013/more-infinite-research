@@ -118,10 +118,10 @@ local function seed_oil(force, level, saved, label)
   -- LuaTechnology.level re-enables its technology. Set disablement and saved
   -- investment afterwards so this fixture observes the real setter boundary.
   oil_seed_diagnostic("before-level", force, value, level, saved, label)
-  value.level = level
-  oil_seed_diagnostic("after-level", force, value, level, saved, label)
   value.researched = false
   oil_seed_diagnostic("after-researched-false", force, value, level, saved, label)
+  value.level = level
+  oil_seed_diagnostic("after-level", force, value, level, saved, label)
   value.enabled = false
   value.visible_when_disabled = true
   value.saved_progress = saved
