@@ -9,10 +9,12 @@ import unittest
 
 ROOT = Path(__file__).resolve().parents[1]
 FIXTURE = ROOT / "tests/fixtures/migration-origins/f200-110-successor"
+SOURCE_FIXTURE = ROOT / "tests/fixtures/migration-origins/f200-110-source"
 F200_PROFILE = ROOT / "tests/profiles/migration-origins-1.1.0-successor-f200-2077.json"
 F210_PROFILE = ROOT / "tests/profiles/migration-origins-1.1.0-successor-f210-2123.json"
 DIRECT = "recipe-prod-research_gears-1"
 ROBOT = "recipe-prod-research_robot_battery-1"
+RETIRED_SUCCESSOR_NAME = "mir-fixture-mir5-migration-origin-f200-110-successor"
 
 # Pinned from the archived 1.1.0 config and F200 Base recipe output set; this
 # test does not take its expected identities from the successor catalogue.
@@ -98,19 +100,20 @@ class MigrationOriginF200110SuccessorControls(unittest.TestCase):
         self.assertFalse(catalogue["settings"]["ips-enable-research_inventory_capacity"])
 
     def test_successor_wrappers_retain_the_source_fixture_identity_and_only_change_the_targeted_wrapper_version(self):
+        source = json.loads((SOURCE_FIXTURE / "info.json").read_text(encoding="utf-8"))
         f200 = json.loads((FIXTURE / "info-f200.json").read_text(encoding="utf-8"))
         f210 = json.loads((FIXTURE / "info-f210.json").read_text(encoding="utf-8"))
-        source_version = (0, 1, 0)
+        source_version = tuple(map(int, source["version"].split(".")))
         for wrapper, base, mir, version in (
             (f200, "2.0", "5.0.20000", "0.2.0"),
             (f210, "2.1", "5.0.21000", "0.3.0"),
         ):
             with self.subTest(version=version):
-                self.assertEqual("mir-fixture-mir5-migration-origin-f200-110-source", wrapper["name"])
+                self.assertEqual(source["name"], wrapper["name"])
                 self.assertEqual(version, wrapper["version"])
                 self.assertEqual(base, wrapper["factorio_version"])
                 self.assertIn(f"more-infinite-research = {mir}", wrapper["dependencies"])
-                self.assertNotIn("mir-fixture-mir5-migration-origin-f200-110-successor", wrapper["name"])
+                self.assertNotEqual(RETIRED_SUCCESSOR_NAME, wrapper["name"])
                 self.assertGreater(tuple(map(int, wrapper["version"].split("."))), source_version)
 
     def test_data_guard_admits_only_the_two_exact_candidate_targets_and_accelerates_only_direct_cost(self):
@@ -218,33 +221,31 @@ class MigrationOriginF200110SuccessorControls(unittest.TestCase):
         self.assertNotIn("manual_mining_speed_modifier =", control)
         self.assertNotIn("pairs(game.forces.player.technologies)", control)
 
-    def test_control_preserves_the_independent_source_snapshot_through_one_real_candidate_lab_and_reload(self):
-        """Exercise the real fixture lifecycle, including the non-earned direct row.
-
-        The saved player owns the first direct gear contribution (level two),
-        whereas the foreign and detached source witnesses keep that technology
-        at level one.  Their gear bonus must therefore remain zero.  This is a
-        source-state fact, not a convenience projection of the current MIR5
-        catalogue.
-        """
+    def _install_lifecycle_model(self):
+        """Install the source-storage-aware fixture lifecycle double."""
         catalogue_path = (FIXTURE / "catalogue.lua").as_posix()
         control_path = (FIXTURE / "control.lua").as_posix()
         self.lua.globals().catalogue_path = catalogue_path
         self.lua.globals().successor_control_path = control_path
         self.lua.execute(r'''
-          function migration_origin_110_successor_lifecycle(target, active_fixture)
+          function migration_origin_110_successor_lifecycle(target, source_fixture_name, active_wrapper_name, catalogue_fixture_name)
             local callbacks={events={}}
             local env={storage={},logs={},created_labs=0,saved=false,
               script={active_mods={},on_configuration_changed=function(fn) callbacks.configuration=fn end,
                 on_load=function(fn) callbacks.load=fn end,on_event=function(event,fn) callbacks.events[event]=fn end},
               defines={events={on_research_finished=1,on_tick=2},inventory={lab_input=1}}}
+            local catalogue
             env.require=function(name)
               assert(name=="__mir-fixture-mir5-migration-origin-f200-110-source__/catalogue")
-              return assert(loadfile(catalogue_path,"t",env))()
+              if catalogue==nil then
+                catalogue=assert(loadfile(catalogue_path,"t",env))()
+                if catalogue_fixture_name~=nil then catalogue.fixture=catalogue_fixture_name end
+              end
+              return catalogue
             end
             env.log=function(message) env.logs[#env.logs+1]=message end
             env._G=env;setmetatable(env,{__index=_G})
-            local catalogue=env.require("__mir-fixture-mir5-migration-origin-f200-110-source__/catalogue")
+            catalogue=env.require("__mir-fixture-mir5-migration-origin-f200-110-source__/catalogue")
             local UINT32_MAX=4294967295
             local function close(left,right) return type(left)=="number" and type(right)=="number" and math.abs(left-right)<=.000001 end
             local function names()
@@ -320,10 +321,9 @@ class MigrationOriginF200110SuccessorControls(unittest.TestCase):
             -- Model Factorio's per-mod storage ownership: the protected
             -- state belongs to the source fixture identity, not every
             -- fixture whose source directory happens to contain this control.
-            local source_storage, renamed_storage = {}, {}
-            source_storage[catalogue.storage_key]=state
-            local fixture_name=active_fixture or catalogue.fixture
-            env.storage=fixture_name==catalogue.fixture and source_storage or renamed_storage
+            local storage_by_mod={[source_fixture_name]={[catalogue.storage_key]=state}}
+            if storage_by_mod[active_wrapper_name]==nil then storage_by_mod[active_wrapper_name]={} end
+            env.storage=storage_by_mod[active_wrapper_name]
             env.settings={startup={}}
             for name,value in pairs(catalogue.settings) do env.settings.startup[name]={value=value} end
             local inventory={items={}}
@@ -336,10 +336,10 @@ class MigrationOriginF200110SuccessorControls(unittest.TestCase):
               server_save=function(_) env.saved=true end}
             if target=="f200" then
               env.script.active_mods={base="2.0.77",["more-infinite-research"]="5.0.20000",
-                [fixture_name]="0.2.0",["mir-fixture-mir5-active-mods-observer"]="0.1.0"}
+                [active_wrapper_name]="0.2.0",["mir-fixture-mir5-active-mods-observer"]="0.1.0"}
             else
               env.script.active_mods={base="2.1.23",["more-infinite-research"]="5.0.21000",
-                [fixture_name]="0.3.0",["mir-fixture-mir5-active-mods-observer"]="0.1.0"}
+                [active_wrapper_name]="0.3.0",["mir-fixture-mir5-active-mods-observer"]="0.1.0"}
             end
             local ok,message=pcall(function()
               assert(loadfile(successor_control_path,"t",env))()
@@ -363,12 +363,29 @@ class MigrationOriginF200110SuccessorControls(unittest.TestCase):
               player_manual=player.manual_mining_speed_modifier,player_battery=player.worker_robots_battery_modifier,
               foreign_progress=foreign.research_progress,detached_progress=detached.technologies[catalogue.direct].saved_progress,
               player_add_calls=player.add_calls,source_state_changed=state.successors~=nil,
-              renamed_storage_changed=next(renamed_storage)~=nil}
+              active_state_changed=type(storage_by_mod[active_wrapper_name][catalogue.storage_key])=="table"
+                and storage_by_mod[active_wrapper_name][catalogue.storage_key].successors~=nil}
           end
         ''')
-        for target in ("f200", "f210"):
+    def test_control_preserves_the_independent_source_snapshot_through_one_real_candidate_lab_and_reload(self):
+        """Exercise the real fixture lifecycle, including the non-earned direct row.
+
+        The saved player owns the first direct gear contribution (level two),
+        whereas the foreign and detached source witnesses keep that technology
+        at level one.  Their gear bonus must therefore remain zero.  This is a
+        source-state fact, not a convenience projection of the current MIR5
+        catalogue.
+        """
+        self._install_lifecycle_model()
+        source = json.loads((SOURCE_FIXTURE / "info.json").read_text(encoding="utf-8"))
+        wrappers = {
+            "f200": json.loads((FIXTURE / "info-f200.json").read_text(encoding="utf-8")),
+            "f210": json.loads((FIXTURE / "info-f210.json").read_text(encoding="utf-8")),
+        }
+        for target, wrapper in wrappers.items():
             with self.subTest(target=target):
-                result = py(self.lua.eval("migration_origin_110_successor_lifecycle")(target))
+                result = py(self.lua.eval("migration_origin_110_successor_lifecycle")(
+                    target, source["name"], wrapper["name"]))
                 self.assertTrue(result["ok"], result["message"])
                 self.assertTrue(result["saved"])
                 self.assertEqual(1, result["created_labs"])
@@ -383,19 +400,22 @@ class MigrationOriginF200110SuccessorControls(unittest.TestCase):
                 self.assertIn('"stage":"initial"', result["logs"][0])
                 self.assertIn('"stage":"reload"', result["logs"][1])
                 self.assertTrue(result["source_state_changed"])
-                self.assertFalse(result["renamed_storage_changed"])
+                self.assertTrue(result["active_state_changed"])
 
     def test_renamed_successor_cannot_consume_the_protected_source_storage(self):
+        self._install_lifecycle_model()
+        source = json.loads((SOURCE_FIXTURE / "info.json").read_text(encoding="utf-8"))
         for target in ("f200", "f210"):
             with self.subTest(target=target):
                 result = py(self.lua.eval("migration_origin_110_successor_lifecycle")(
-                    target, "mir-fixture-mir5-migration-origin-f200-110-successor"))
+                    target, source["name"], RETIRED_SUCCESSOR_NAME, RETIRED_SUCCESSOR_NAME))
                 self.assertFalse(result["ok"])
-                self.assertIn("successor runtime target closure differs", result["message"])
+                self.assertIn("protected MIR 1.1 source state is absent", result["message"])
+                self.assertNotIn("successor runtime target closure differs", result["message"])
                 self.assertEqual(0, result["created_labs"])
                 self.assertEqual(0, result["player_add_calls"])
                 self.assertFalse(result["source_state_changed"])
-                self.assertFalse(result["renamed_storage_changed"])
+                self.assertFalse(result["active_state_changed"])
 
 
 if __name__ == "__main__":
