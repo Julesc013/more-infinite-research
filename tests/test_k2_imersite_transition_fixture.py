@@ -25,6 +25,10 @@ CURRENT_SOURCE_TREE = "79b73a6a8e68987737e69bf2d95ec6555b49f901"
 CURRENT_MIR_ARCHIVE = "E3A65C08AC7798A66FB1BE30D24307B17C8B366DD901953BDE2A09BD6939C8CE"
 CURRENT_MIR_BYTES = 679250
 CURRENT_MIR_NAME = "more-infinite-research_5.0.21000.zip"
+HELD_FLAGS_FIXED_SOURCE = "6786c95704fdd6b7a8fcee645c375f54ac8d03da"
+HELD_FLAGS_FIXED_SOURCE_TREE = "b6857d3774ffd792f82f5bb3ee38b312abedc7b4"
+HELD_FLAGS_FIXED_MIR_ARCHIVE = "59C14208B200CC534353CD46391210FE0B53E4C5739FFE8A3633B5D82DEE8C47"
+HELD_FLAGS_FIXED_MIR_BYTES = 679575
 HELD_FLAGS_SOURCE_PROFILE = PROFILES / "k2-imersite-held-public-flags-source-f210.json"
 HELD_FLAGS_FIXED_PROFILE = PROFILES / "k2-imersite-held-public-flags-fixed-f210.json"
 OBSERVER_ARCHIVE = "mir-fixture-mir5-active-mods-observer_0.1.0.zip"
@@ -621,7 +625,7 @@ class K2ImersiteTransitionFixtureTests(unittest.TestCase):
               tail_visible=foreign.technologies[tail].visible_when_disabled}}
         ''')
 
-    def test_held_public_flags_profiles_pin_e3a_source_and_leave_fixed_mir_pending(self):
+    def test_held_public_flags_profiles_pin_e3a_source_and_6786_fixed_successor(self):
         source = json.loads(HELD_FLAGS_SOURCE_PROFILE.read_text(encoding="utf-8"))
         fixed = json.loads(HELD_FLAGS_FIXED_PROFILE.read_text(encoding="utf-8"))
         for profile, fixture_version in ((source, "0.1.0"), (fixed, "0.2.0")):
@@ -638,8 +642,11 @@ class K2ImersiteTransitionFixtureTests(unittest.TestCase):
                                  {name: digest for name, digest in profile["archive_sha256"].items()
                                   if name != CURRENT_MIR_NAME})
         self.assertEqual(CURRENT_MIR_ARCHIVE, source["archive_sha256"][CURRENT_MIR_NAME])
-        self.assertNotIn(CURRENT_MIR_NAME, fixed["archive_sha256"])
-        self.assertIn("not dispatchable", fixed["scope"])
+        self.assertEqual(HELD_FLAGS_FIXED_MIR_ARCHIVE, fixed["archive_sha256"][CURRENT_MIR_NAME])
+        for expected in (HELD_FLAGS_FIXED_SOURCE, HELD_FLAGS_FIXED_SOURCE_TREE,
+                         HELD_FLAGS_FIXED_MIR_ARCHIVE, f"{HELD_FLAGS_FIXED_MIR_BYTES} bytes",
+                         "prepared but not a native result"):
+            self.assertIn(expected, fixed["scope"])
         for stage, version in (("source", "0.1.0"), ("fixed", "0.2.0")):
             with self.subTest(stage=stage):
                 info = json.loads((HELD_FLAGS_FIXTURE / stage / "info.json").read_text(encoding="utf-8"))
@@ -651,7 +658,8 @@ class K2ImersiteTransitionFixtureTests(unittest.TestCase):
                 )
         readme = (HELD_FLAGS_FIXTURE / "README.md").read_text(encoding="utf-8")
         for expected in (CURRENT_SOURCE, CURRENT_SOURCE_TREE, CURRENT_MIR_ARCHIVE, "679250 bytes",
-                         "zero laboratory completions", "pending"):
+                         HELD_FLAGS_FIXED_SOURCE, HELD_FLAGS_FIXED_SOURCE_TREE, HELD_FLAGS_FIXED_MIR_ARCHIVE,
+                         f"{HELD_FLAGS_FIXED_MIR_BYTES}-byte", "zero laboratory completions", "pending"):
             self.assertIn(expected, readme)
 
     def test_held_public_flags_data_preflights_the_real_k2so_rows_before_fixture_state(self):

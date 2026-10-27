@@ -30,7 +30,8 @@
     "Krastorio2Assets_2.1.0.zip": "39EF950EC8B21A40357DD0240EF8389501EE75CCA82717F2773B98554DA46E29",
     "Krastorio2MenuSimulations_2.1.0.zip": "3A485B449B356DC4B3EB4233DE4E803B3A001259FBC251BDC9F9D9120B3C53A7",
     "xy-k2so-enhancements-nulls-fork_0.8.3.zip": "930F43B96B04012FEF090C40D8B16A6B3F259D1713C86CF59DFF3E9A5A97E2BE",
-    "mir-fixture-mir5-active-mods-observer_0.1.0.zip": "2E1BE5952D2A4CC5C74A0D149E075D247BA110A3FAE5B6768D3EAEBABCEF989C"
+    "mir-fixture-mir5-active-mods-observer_0.1.0.zip": "2E1BE5952D2A4CC5C74A0D149E075D247BA110A3FAE5B6768D3EAEBABCEF989C",
+    "more-infinite-research_5.0.21000.zip": "59C14208B200CC534353CD46391210FE0B53E4C5739FFE8A3633B5D82DEE8C47"
   },
-  "scope": "F210 K2SO fixed successor preparation for the held-public-flags fixture. The post-1165 MIR 5.0.21000 archive hash, fixture ZIP checksum, source save, and native execution are intentionally pending an accepted source freeze; this profile is not dispatchable."
+  "scope": "Exact 6786c95704fdd6b7a8fcee645c375f54ac8d03da/playerb6857d3774ffd792f82f5bb3ee38b312abedc7b4 F210 fixed successor input for the held-public-flags fixture. Current MIR archive 59C14208B200CC534353CD46391210FE0B53E4C5739FFE8A3633B5D82DEE8C47 is 679575 bytes. Fixture ZIP checksum, source save, and native execution remain pending; this profile is prepared but not a native result."
 }
