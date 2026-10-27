@@ -8,6 +8,7 @@ import subprocess
 import sys
 import tempfile
 import unittest
+import zipfile
 
 ROOT = Path(__file__).resolve().parents[1]
 F200_RUNTIME_API_CANDIDATES = (
@@ -545,17 +546,33 @@ class FixtureControlHostStageTests(unittest.TestCase):
                 "25084C8B20FF4EBFB819C8351E351F38325B06E65F741D2660067C775C061A19",
         })
 
-    def test_primary_f210_profile_pins_current_packager_fixture_archives(self):
+    def test_primary_f210_profile_pins_selected_archive_containers_and_fixture_members(self):
         profile = json.loads((ROOT / "tests/profiles/api-consumers-f210-2123.json").read_bytes())
-        expected = {
-            "api-alpha": "DB5ED843FA9D85A1ABDC22595E62D315CA1A2191C846208079F85D4D016CE904",
-            "api-beta": "943AF6BF26C0B4C0CE4861C1E25CAC0CB90DACF08A7A8229669A1DA481F01894",
-            "api-beta-production": "25084C8B20FF4EBFB819C8351E351F38325B06E65F741D2660067C775C061A19",
-            "active-mods-observer": "2E1BE5952D2A4CC5C74A0D149E075D247BA110A3FAE5B6768D3EAEBABCEF989C",
+        expected_members = {
+            "api-alpha": {
+                "control.lua": ("8C5531606C96A1B93DD7B2E72C46F239866FC1EB161728BCFD66635B9592C8DB", 4989),
+                "data.lua": ("EF8BF389DF2694649EBF70B2F94C00E964D0AAA43AD72CC6A930B85203E41881", 736),
+                "graphics/icon.png": ("AAEB6587D7BB7F5332AF05DAB446DF3DB3B100C0776E45FA078DE2A574DABB3D", 137),
+                "info.json": ("CC8C9254B536C16B44A6F9E7B4B63250F1477C5ADAF2337C1A401A8E459DCF7F", 375),
+            },
+            "api-beta": {
+                "control.lua": ("81994E94DE86BFBB303160196A3E6EA99A00FD527A552763E7F6EDC18FF8F729", 4428),
+                "data-final-fixes.lua": ("66502AB391A50F57D30150CDE9BDAEBE42ACDC2101A75AC15E54D9D8AC27B2B4", 952),
+                "graphics/icon.png": ("530F9250623036693D3E5A79F830B9C8A6D61E727C92219FD6A28EE62A424CCE", 137),
+                "info.json": ("5C2611225712DFD0B89B77DDCB13267F48AD5E6592BE535282C82015E8DB486C", 380),
+            },
+            "api-beta-production": {
+                "control.lua": ("CFAF0D288CD51BF03BCF88D09468858A5DD11AC52EF6E4216673EE2AF306B5CF", 14105),
+                "info.json": ("2DDBF822E5C06774BCBEB88F0341026E4EB152D0A468EAF6DC061C17060FCB46", 432),
+            },
+            "active-mods-observer": {
+                "data-final-fixes.lua": ("89D364F0033A7EE036998E6C29A3558099C25AD2707CB24914790C49FB21555C", 477),
+                "info.json": ("C37A55C4776F1B4DABA7E4D5C98CF22FD0E978A461D3E6FD8A95E238B97908BD", 231),
+            },
         }
         with tempfile.TemporaryDirectory() as temporary:
             output = Path(temporary)
-            for fixture, expected_sha256 in expected.items():
+            for fixture, expected in expected_members.items():
                 source = ROOT / "tests/fixtures" / fixture
                 info = json.loads((source / "info.json").read_bytes())
                 archive = output / f"{info['name']}_{info['version']}.zip"
@@ -564,12 +581,24 @@ class FixtureControlHostStageTests(unittest.TestCase):
                     check=True, capture_output=True, text=True,
                 )
                 record = json.loads(completed.stdout)
-                self.assertEqual(record["sha256"].upper(), expected_sha256)
-                self.assertEqual(hashlib.sha256(archive.read_bytes()).hexdigest().upper(), expected_sha256)
-                self.assertEqual(
-                    profile["archive_sha256"][archive.name], expected_sha256,
-                    f"profile pin differs for {fixture}",
-                )
+                self.assertEqual(record["sha256"].upper(), hashlib.sha256(archive.read_bytes()).hexdigest().upper())
+                self.assertIn(archive.name, profile["archive_sha256"], f"profile omits selected {fixture} archive")
+                record_members = {
+                    row["path"]: (row["sha256"].upper(), row["bytes"])
+                    for row in record["members"]
+                }
+                with zipfile.ZipFile(archive) as generated:
+                    prefix = f"{info['name']}_{info['version']}/"
+                    archive_members = {
+                        entry.filename.removeprefix(prefix): (
+                            hashlib.sha256(generated.read(entry)).hexdigest().upper(), entry.file_size,
+                        )
+                        for entry in generated.infolist()
+                    }
+                    self.assertTrue(all(entry.filename.startswith(prefix) for entry in generated.infolist()))
+                    self.assertEqual(len(archive_members), len(generated.infolist()))
+                self.assertEqual(record_members, expected, f"package source members differ for {fixture}")
+                self.assertEqual(archive_members, expected, f"archive members differ for {fixture}")
 
     def test_alpha_accepts_float32_native_effect_without_mutating_beta(self):
         self.lua.globals().fixture_control = self.control("api-alpha")
