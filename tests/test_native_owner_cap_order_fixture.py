@@ -113,7 +113,7 @@ function cap_order_parse(path, control_alias, stage)
 end
 
 function cap_order_flow(common_path, canonical_path, permuted_path, relaxed_path, opponent)
-  local markers,saves,resets={},0,0
+  local markers,marker_modes,saves,create_saves,resets={}, {},0,0,0
   local effects={{type="change-recipe-productivity",recipe="steel-plate",change=.1},
     {type="change-recipe-productivity",recipe="casting-steel",change=.1}}
   local cap=1
@@ -166,11 +166,15 @@ function cap_order_flow(common_path, canonical_path, permuted_path, relaxed_path
     return value
   end
   local player=make_force("player",1,true)
+  local mode="create"
   local game={tick=0,forces={player=player,[1]=player}}
   function game.create_force(name)
     local foreign=make_force(name,2,false);game.forces[name]=foreign;game.forces[2]=foreign;return foreign
   end
-  function game.server_save(name) assert(name=="mir5-native-complete");saves=saves+1 end
+  function game.server_save(name)
+    assert(name=="mir5-native-complete")
+    if mode=="server" then saves=saves+1 else create_saves=create_saves+1 end
+  end
   local storage={}
   local function stage_version(stage)
     return stage=="canonical" and "0.1.0" or stage=="permuted" and "0.2.0" or "0.3.0"
@@ -179,7 +183,7 @@ function cap_order_flow(common_path, canonical_path, permuted_path, relaxed_path
     local callbacks={events={}}
     local env={game=game,storage=storage,settings={startup={
       ["ips-max-level-research_steel"]={value=cap},["mir-settings-profile-import"]={value=""}}},
-      helpers={table_to_json=function(row)markers[#markers+1]=row;return "{}" end},
+      helpers={table_to_json=function(row)markers[#markers+1]=row;marker_modes[#marker_modes+1]=mode;return "{}" end},
       log=function(row)assert(row:match("^%[MIR5_NATIVE_FIXTURE%] RESULT "))end,
       script={active_mods={base="2.1.23",["elevated-rails"]="2.1.23",quality="2.1.23",recycler="2.1.23",["space-age"]="2.1.23",
         ["more-infinite-research"]="5.0.21000",["mir-fixture-mir5-native-owner-cap-order"]=stage_version(stage)},
@@ -195,34 +199,55 @@ function cap_order_flow(common_path, canonical_path, permuted_path, relaxed_path
   local function invoke(callback)
     local ok,message=pcall(callback);return ok,tostring(message)
   end
+  local function tick(control)
+    game.tick=game.tick+1
+    return invoke(control.events[1])
+  end
+  local function first_server_tick(control, configuration)
+    mode="server"
+    local ok,message=invoke(control.load);if not ok then return false,message end
+    if configuration then ok,message=invoke(control.changed);if not ok then return false,message end end
+    return tick(control)
+  end
   local function reload_twice(control)
     for _=1,2 do
+      mode="server"
       local ok,message=invoke(control.load);if not ok then return false,message end
-      game.tick=game.tick+1;ok,message=invoke(control.events[1]);if not ok then return false,message end
+      ok,message=tick(control);if not ok then return false,message end
     end
     return true,""
   end
   local canonical=load_control(canonical_path,"canonical")
-  local ok,message=invoke(canonical.init);if not ok then return {ok=false,message=message,markers=markers,saves=saves,resets=resets,storage=storage} end
+  mode="create"
+  local ok,message=invoke(canonical.init);if not ok then return {ok=false,message=message,markers=markers,marker_modes=marker_modes,saves=saves,create_saves=create_saves,resets=resets,storage=storage} end
+  if opponent=="seed-skip" then
+    local permuted=load_control(permuted_path,"permuted")
+    ok,message=first_server_tick(permuted,true)
+    return {ok=ok,message=message,markers=markers,marker_modes=marker_modes,saves=saves,create_saves=create_saves,resets=resets,storage=storage}
+  end
+  ok,message=first_server_tick(canonical,false);if not ok then return {ok=false,message=message,markers=markers,marker_modes=marker_modes,saves=saves,create_saves=create_saves,resets=resets,storage=storage} end
   ok,message=reload_twice(canonical);if not ok then return {ok=false,message=message,markers=markers,saves=saves,resets=resets,storage=storage} end
+  if saves~=1 or create_saves~=0 then
+    return {ok=false,message="canonical server initial save is absent",markers=markers,marker_modes=marker_modes,saves=saves,create_saves=create_saves,resets=resets,storage=storage}
+  end
   if opponent=="skipped-transition" then
-    cap=0;player.reset_technology_effects()
-    local relaxed=load_control(relaxed_path,"relaxed");ok,message=invoke(relaxed.changed)
-    return {ok=ok,message=message,markers=markers,saves=saves,resets=resets,storage=storage}
+    cap=0
+    local relaxed=load_control(relaxed_path,"relaxed");ok,message=first_server_tick(relaxed,true)
+    return {ok=ok,message=message,markers=markers,marker_modes=marker_modes,saves=saves,create_saves=create_saves,resets=resets,storage=storage}
   end
   cap=1;effects[1],effects[2]=effects[2],effects[1]
   if opponent=="wrong-effect" then effects[1].change=.11 end
   player.reset_technology_effects();game.forces[2].reset_technology_effects()
   if opponent=="corrupt-saved" then storage.mir5_native_owner_cap_order.player.saved_progress=.26 end
-  local permuted=load_control(permuted_path,"permuted");ok,message=invoke(permuted.changed)
-  if not ok then return {ok=false,message=message,markers=markers,saves=saves,resets=resets,storage=storage} end
+  local permuted=load_control(permuted_path,"permuted");ok,message=first_server_tick(permuted,true)
+  if not ok then return {ok=false,message=message,markers=markers,marker_modes=marker_modes,saves=saves,create_saves=create_saves,resets=resets,storage=storage} end
   ok,message=reload_twice(permuted);if not ok then return {ok=false,message=message,markers=markers,saves=saves,resets=resets,storage=storage} end
   cap=0;effects[1],effects[2]=effects[2],effects[1];player.reset_technology_effects();game.forces[2].reset_technology_effects()
   if opponent=="foreign-enabled" then game.forces[2].technologies["steel-plate-productivity"].enabled=true end
-  local relaxed=load_control(relaxed_path,"relaxed");ok,message=invoke(relaxed.changed)
-  if not ok then return {ok=false,message=message,markers=markers,saves=saves,resets=resets,storage=storage} end
+  local relaxed=load_control(relaxed_path,"relaxed");ok,message=first_server_tick(relaxed,true)
+  if not ok then return {ok=false,message=message,markers=markers,marker_modes=marker_modes,saves=saves,create_saves=create_saves,resets=resets,storage=storage} end
   ok,message=reload_twice(relaxed)
-  return {ok=ok,message=message,markers=markers,saves=saves,resets=resets,storage=storage,player=player,foreign=game.forces[2]}
+  return {ok=ok,message=message,markers=markers,marker_modes=marker_modes,saves=saves,create_saves=create_saves,resets=resets,storage=storage,player=player,foreign=game.forces[2]}
 end
 ''')
         self.lua.execute(r'''
@@ -327,8 +352,10 @@ end
         result = self._flow()
         self.assertTrue(result["ok"], result["message"])
         self.assertEqual((3, 6), (result["saves"], result["resets"]))
+        self.assertEqual(0, result["create_saves"])
         markers = [plain(result["markers"][index]) for index in range(1, 10)]
         self.assertEqual(["initial", "reload", "reload"] * 3, [marker["stage"] for marker in markers])
+        self.assertEqual(["server"] * 9, [result["marker_modes"][index] for index in range(1, 10)])
         self.assertEqual([1, 1, 1, 1, 1, 1, 0, 0, 0], [marker["witnesses"]["cap"] for marker in markers])
         self.assertEqual([0] * 9, [marker["witnesses"]["actual_lab_completions"] for marker in markers])
         self.assertTrue(all(marker["witnesses"]["native_state_seeded"] for marker in markers))
@@ -341,15 +368,47 @@ end
         self.assertEqual("relaxed-complete", result["storage"]["mir5_native_owner_cap_order"]["phase"])
 
     def test_transition_refuses_effect_drift_skipped_stage_corrupted_saved_state_and_foreign_enablement(self):
-        for opponent, phrase in (("wrong-effect", "effect differs"), ("skipped-transition", "required prior"),
+        for opponent, phrase in (("wrong-effect", "effect differs"), ("seed-skip", "required prior"), ("skipped-transition", "required prior"),
                                   ("corrupt-saved", "player saved state differs"), ("foreign-enabled", "foreign native state differs"),
                                   ("old-order", "owned cap was not restored")):
             with self.subTest(opponent=opponent):
                 result = self._flow(opponent)
                 self.assertFalse(result["ok"])
                 self.assertIn(phrase, result["message"])
-                if opponent != "skipped-transition":
+                if opponent not in ("seed-skip", "skipped-transition"):
                     self.assertLessEqual(result["saves"], 2)
+
+    def test_create_only_completion_cannot_substitute_for_the_required_initial_server_save(self):
+        original = (FIXTURE / "fixture_control.lua").read_text(encoding="utf-8")
+        old = original.replace(
+            'local state = {phase = "canonical-prepared", player = player_state, foreign = foreign_state,\n'
+            '      foreign_index = foreign.index, stage = stage}\n'
+            '    storage[KEY] = state',
+            'local state = {phase = "canonical-complete", player = player_state, foreign = foreign_state,\n'
+            '      foreign_index = foreign.index, stage = stage}\n'
+            '    storage[KEY] = state\n'
+            '    marker("initial", state, expected)\n'
+            '    game.server_save(SAVE)',
+            1,
+        )
+        old = old.replace(
+            'state.player, state.foreign, state.phase, state.stage = player, foreign_state, stage .. "-prepared", stage',
+            'state.player, state.foreign, state.phase, state.stage = player, foreign_state, stage .. "-complete", stage\n'
+            '    marker("initial", state, expected)\n'
+            '    game.server_save(SAVE)',
+            1,
+        )
+        self.assertNotEqual(original, old)
+        with tempfile.TemporaryDirectory(dir=ROOT / "build") as temporary:
+            old_control = Path(temporary) / "fixture_control.lua"
+            old_control.write_text(old, encoding="utf-8")
+            result = self._flow(control_path=old_control)
+        self.assertFalse(result["ok"])
+        observations = [(plain(result["markers"][index])["stage"], result["marker_modes"][index])
+                        for index in range(1, len(result["markers"]) + 1)]
+        self.assertNotIn(("initial", "server"), observations)
+        self.assertEqual((0, 1), (result["saves"], result["create_saves"]))
+        self.assertIn("canonical server initial save is absent", result["message"])
 
     def test_technology_level_setter_requires_a_separate_following_foreign_disable_write(self):
         original = (FIXTURE / "fixture_control.lua").read_text(encoding="utf-8")
@@ -379,7 +438,8 @@ end
     def test_readme_states_raw_projection_and_unfrozen_native_limits(self):
         readme = (FIXTURE / "README.md").read_text(encoding="utf-8")
         for text in ("seven-member source projection", "tracked source bytes", "does not create this projection automatically",
-                     OBSERVER_SHA, MIR_SHA, "no native"):
+                     "canonical leg uses create-only mode", "configuration callback runs during server load", "first server tick",
+                     "no state write or save", OBSERVER_SHA, MIR_SHA, "no native"):
             self.assertIn(text, readme)
         shared = (FIXTURE / "fixture_control.lua").read_text(encoding="utf-8")
         self.assertIn("reset_technology_effects", shared)
