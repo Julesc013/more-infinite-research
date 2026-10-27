@@ -21,6 +21,7 @@ F210_SOURCE_DEFAULTS_PROFILE = ROOT / "tests/profiles/migration-origins-1.1.0-su
 F210_SOURCE_DEFAULTS_INFO = FIXTURE / "info-f210-source-defaults.json"
 F210_SOURCE_DEFAULTS_MODULES_DISABLED_INFO = FIXTURE / "info-f210-source-defaults-modules-disabled.json"
 F210_SOURCE_DEFAULTS_MODULES_DISABLED_PROFILE = ROOT / "tests/profiles/migration-origins-1.1.0-successor-f210-source-defaults-modules-disabled-2123.json"
+F210_SOURCE_DEFAULTS_MODULES_DISABLED_F0DD_PROFILE = ROOT / "tests/profiles/migration-origins-1.1.0-successor-f210-source-defaults-modules-disabled-f0dd-2123.json"
 LEGACY_MODULE_DEFINITIONS = ROOT / "source/research/legacy_module_credit_definitions.lua"
 LEGACY_MODULE_RUNTIME = ROOT / "source/runtime/legacy_module_credits.lua"
 DIRECT = "recipe-prod-research_gears-1"
@@ -432,6 +433,27 @@ class MigrationOriginF200110SuccessorControls(unittest.TestCase):
         self.assertNotIn("space-age", {entry["name"] for entry in f200_source_defaults_r02["mods"]})
         self.assertNotIn("space-age", {entry["name"] for entry in disabled["mods"]})
 
+    def test_f0dd_effects_reset_retry_rebinds_only_the_current_candidate(self):
+        previous = json.loads(F210_SOURCE_DEFAULTS_MODULES_DISABLED_PROFILE.read_text())
+        retry = json.loads(F210_SOURCE_DEFAULTS_MODULES_DISABLED_F0DD_PROFILE.read_text())
+        self.assertEqual(
+            ("f0dd9f62adc8bf0a8eaaf9babc1fcfef9f3241ea", "0229b2bb3ad0c514fc4dca18c32fd544b9ba7d72"),
+            (retry["candidate"]["source_commit"], retry["candidate"]["player_tree"]),
+        )
+        self.assertEqual("654C57DDCE2E994C1E8DDC4F808198D4FAC7EAB6284B18C4A628E6DA5465DE23",
+                         retry["archive_sha256"]["more-infinite-research_5.0.21000.zip"])
+        self.assertEqual("published-source-defaults-modules-disabled-input-effects-reset-retry", retry["variant"])
+        for key in ("origin_tag", "origin_source_commit", "source_fixture_commit",
+                    "source_fixture_controller_commit", "successor_fixture_commit", "target",
+                    "factorio_line", "engine", "settings_mode", "source_save", "mods"):
+            self.assertEqual(previous[key], retry[key], key)
+        self.assertEqual(previous["archive_sha256"]["mir-fixture-mir5-active-mods-observer_0.1.0.zip"],
+                         retry["archive_sha256"]["mir-fixture-mir5-active-mods-observer_0.1.0.zip"])
+        self.assertEqual(previous["archive_sha256"]["mir-fixture-mir5-migration-origin-f200-110-source_0.5.0.zip"],
+                         retry["archive_sha256"]["mir-fixture-mir5-migration-origin-f200-110-source_0.5.0.zip"])
+        self.assertEqual(("c74b7c4680545f3ccf27f38016d1144fefe8eee3", "f81c63afca2e6eb5b7e46dffe892548553899db3"),
+                         (previous["candidate"]["source_commit"], previous["candidate"]["player_tree"]))
+
     def test_profiles_reject_the_r12_and_r13_superseded_fixture_archive_pins(self):
         cases = (
             (json.loads(F200_PROFILE.read_text()),
@@ -460,6 +482,11 @@ class MigrationOriginF200110SuccessorControls(unittest.TestCase):
              ("F4C54047A9734180D31C14F18BE38B744F053F399A0D8184961C2B563463C831",
               "E1878CAEE523CDC4DC86C9E6B0B5029A78E4D96ADC1A3C80BE8521355A6655A3")),
             (json.loads(F210_SOURCE_DEFAULTS_MODULES_DISABLED_PROFILE.read_text()),
+             "mir-fixture-mir5-migration-origin-f200-110-source_0.5.0.zip",
+             "34A5EC5015CB63296A767EBD249AEEA499B934FA74286B5FDE6B837937629A35",
+             ("3597682FF6AC7A7BFBA9B62B38A9E3958A1BCA04692750B4DDE18B746346B871",
+              "F83F930E659FEC7A088FC01459D70CAE49D0E3656C3F0D7DB7181D228B9E9DF2")),
+            (json.loads(F210_SOURCE_DEFAULTS_MODULES_DISABLED_F0DD_PROFILE.read_text()),
              "mir-fixture-mir5-migration-origin-f200-110-source_0.5.0.zip",
              "34A5EC5015CB63296A767EBD249AEEA499B934FA74286B5FDE6B837937629A35",
              ("3597682FF6AC7A7BFBA9B62B38A9E3958A1BCA04692750B4DDE18B746346B871",
