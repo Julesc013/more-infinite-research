@@ -220,6 +220,7 @@ class ReleaseTests(unittest.TestCase):
                 "source-tree": alter(("source", "tree"), "0" * 40),
                 "target-digest": alter(("target_record", "sha256"), "0" * 64),
                 "controller-tool": alter(("controller", "package_tool", "sha256"), "0" * 64),
+                "controller-codec": alter(("controller", "versioning_tool", "sha256"), "0" * 64),
                 "controller-runtime": alter(("controller", "runtime", "zlib_runtime_version"), "0.0.0"),
             }
             for name, mutate in cases.items():
@@ -278,7 +279,7 @@ class ReleaseTests(unittest.TestCase):
             frozen = temporary / "frozen"
             release.freeze(source, frozen, revision=commit)
             for name, transform in {
-                "root": lambda member, data: (member.replace("more-infinite-research_5.0.01300", "wrong-root"), data),
+                "root": lambda member, data: (member.replace("more-infinite-research_5.0.01", "wrong-root"), data),
                 "info": self._wrong_info,
             }.items():
                 with self.subTest(name=name):

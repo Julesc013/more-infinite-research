@@ -5,7 +5,7 @@ return {
   id="f210",
   factorio_version="2.1",
   minimum_base="2.1.23",
-  distribution_version="5.0.21000",
+  distribution_version="5.0.0",
   reduced=false,
   research_levels=true,
   recipe_productivity=true,

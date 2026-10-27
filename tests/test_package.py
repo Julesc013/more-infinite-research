@@ -100,7 +100,7 @@ class PackageTests(unittest.TestCase):
                 self.assertEqual(info["factorio_version"], family)
                 self.assertEqual(info["dependencies"], expected_dependencies)
                 self.assertEqual(info["dependencies"][0], "base >= " + minimum)
-                self.assertEqual(info["version"], "5.0." + target[1:] + "00")
+                self.assertEqual(info["version"], pack.distribution_version("5.0.0", target))
                 self.assertEqual(json.loads(files["info.json"])["version"], info["version"])
                 self.assertIn(('id = "' + target + '"').encode(), files["platform/target.lua"])
                 probability = "independent_probability" if target == "f210" else "probability"
@@ -204,13 +204,14 @@ class PackageTests(unittest.TestCase):
         source_files = dict(source_rows)
         selected_info, selected_rows = pack.members(source, target="f210")
 
-        local_version = "6.1.21002"
+        local_version = "6.1.29"
         local_info, local_rows = pack.members(source, version=local_version)
         local_files = dict(local_rows)
 
         self.assertEqual(local_info["version"], local_version)
         self.assertEqual(json.loads(local_files["info.json"])["version"], local_version)
-        self.assertIn(local_version.encode("ascii"), local_files["changelog.txt"])
+        self.assertIn(b"Version: 6.1.2\n", local_files["changelog.txt"])
+        self.assertNotIn(local_version.encode("ascii"), local_files["changelog.txt"])
         expected_target = source_files["platform/target.lua"].replace(
             source_info["version"].encode("ascii"), local_version.encode("ascii"))
         self.assertEqual(local_files["platform/target.lua"], expected_target)
@@ -223,8 +224,8 @@ class PackageTests(unittest.TestCase):
         self.assertEqual((selected_after_info, selected_after_rows), (selected_info, selected_rows))
 
         with tempfile.TemporaryDirectory() as temporary:
-            output = Path(temporary) / "wrong/more-infinite-research_5.0.20000.zip"
-            for wrong_edition in ("5.0.20000", "5.0.01501"):
+            output = Path(temporary) / "wrong/more-infinite-research_5.0.09.zip"
+            for wrong_edition in ("5.0.08", "5.0.03"):
                 with self.subTest(version=wrong_edition):
                     with self.assertRaisesRegex(ValueError, "different MIR edition"):
                         pack.build(source, output, version=wrong_edition)
@@ -238,7 +239,7 @@ class PackageTests(unittest.TestCase):
         target = files["platform/target.lua"]
         malformed = {
             "missing": target.replace(b"distribution_version", b"distribution_verson"),
-            "duplicate": target + b'\n  distribution_version="5.0.21000",\n',
+            "duplicate": target + b'\n  distribution_version="5.0.0",\n',
             "missing-id": target.replace(b"id=", b"edition="),
             "duplicate-id": target + b'\n  id="f210",\n',
             "malformed-duplicate-id": target + b'\n  id="poison",\n',
@@ -249,7 +250,7 @@ class PackageTests(unittest.TestCase):
             with self.subTest(contract=name):
                 broken = dict(files, **{"platform/target.lua": broken_target})
                 with self.assertRaisesRegex(ValueError, "source target"):
-                    pack.members(source, version="5.0.21001", committed_files=broken)
+                    pack.members(source, version="5.0.19", committed_files=broken)
                 if name.startswith("malformed-duplicate"):
                     with tempfile.TemporaryDirectory() as temporary:
                         fixture = Path(temporary) / "source"
@@ -257,9 +258,9 @@ class PackageTests(unittest.TestCase):
                         (fixture / "info.json").write_bytes(files["info.json"])
                         (fixture / "data.lua").write_text("data:extend({})\n")
                         (fixture / "platform/target.lua").write_bytes(broken_target)
-                        output = Path(temporary) / "never/more-infinite-research_5.0.21001.zip"
+                        output = Path(temporary) / "never/more-infinite-research_5.0.19.zip"
                         with self.assertRaisesRegex(ValueError, "source target"):
-                            pack.build(fixture, output, version="5.0.21001")
+                            pack.build(fixture, output, version="5.0.19")
                         self.assertFalse(output.exists())
                         self.assertFalse(output.parent.exists())
 
@@ -297,7 +298,7 @@ class PackageTests(unittest.TestCase):
                 file.parent.mkdir(parents=True, exist_ok=True)
                 file.write_text("return {}\n")
             (source / "info.json").write_text(json.dumps({"name":"more-infinite-research",
-                "version":"5.0.21000","factorio_version":"2.1","dependencies":["base >= 2.1.23"]}))
+                "version":"5.0.0","factorio_version":"2.1","dependencies":["base >= 2.1.23"]}))
             for name in ("LICENSE", "thumbnail.png", "changelog.txt"):
                 destination = source / name
                 destination.parent.mkdir(parents=True, exist_ok=True)
@@ -309,18 +310,18 @@ class PackageTests(unittest.TestCase):
             git("add", ".")
             git("commit", "-qm", "frozen player and edition")
             commit = git("rev-parse", "HEAD").decode().strip()
-            record = pack.build(source, root / "out/more-infinite-research_5.0.21000.zip",
+            record = pack.build(source, root / "out/more-infinite-research_5.0.09.zip",
                                 revision=commit, target="f210")
             self.assertEqual(record["edition_record_sha256"], hashlib.sha256(original).hexdigest())
             self.assertEqual(record["source_commit"], commit)
             self.assertEqual(record["target"], "f210")
             self.assertEqual(record["target_record"], pack.TARGET_RECORD)
             with zipfile.ZipFile(record["archive"]) as archive:
-                info = json.loads(archive.read("more-infinite-research_5.0.21000/info.json"))
+                info = json.loads(archive.read("more-infinite-research_5.0.09/info.json"))
                 self.assertEqual(info["dependencies"], ["base >= 2.1.23"])
             edition.write_text('{"schema":1,"targets":{}}\n')
             git("add", edition.relative_to(root).as_posix())
-            rejected = root / "dirty/more-infinite-research_5.0.21000.zip"
+            rejected = root / "dirty/more-infinite-research_5.0.09.zip"
             with self.assertRaisesRegex(ValueError, "target record differs from the frozen revision"):
                 pack.build(source, rejected, revision=commit, target="f210")
             self.assertFalse(rejected.exists())
@@ -341,7 +342,7 @@ class PackageTests(unittest.TestCase):
             self.assertEqual(set(editions), {"f013", "f014", "f015", "f016", "f017", "f018", "f100", "f110", "f200", "f210"})
             for target_id, edition in editions.items():
                 with self.subTest(target=target_id):
-                    version = "5.0." + target_id[1:] + "00"
+                    version = pack.distribution_version("5.0.0", target_id)
                     member_root = "more-infinite-research_" + version
                     filename = member_root + ".zip"
                     staged = pack.build(
@@ -410,9 +411,9 @@ class PackageTests(unittest.TestCase):
                 self.assertEqual(current["previous_history_bytes"], record["bytes"])
                 self.assertEqual(current["previous_history_sha256"], record["history_sha256"])
                 self.assertEqual(current["license_sha256"], record["license_sha256"])
-                self.assertEqual(files["changelog.txt"], entry.replace(b"@DISTRIBUTION_VERSION@", info["version"].encode()))
+                self.assertEqual(files["changelog.txt"], entry)
                 self.assertTrue(files["changelog.txt"].startswith(
-                    ("-" * 99 + "\nVersion: " + info["version"] + "\n").encode()))
+                    b"-" * 99 + b"\nVersion: 5.0.0\n"))
                 self.assertEqual(files["changelog.txt"].count(b"Version: 1.0.0\n"), 1)
                 self.assertNotIn(b"Version: 1.9.5\n", files["changelog.txt"])
                 self.assertEqual(hashlib.sha256(files["LICENSE"]).hexdigest().upper(), record["license_sha256"])
@@ -430,9 +431,9 @@ class PackageTests(unittest.TestCase):
                 with self.assertRaisesRegex(ValueError, "missing player presentation"):
                     pack.members(source, committed_files=broken, target="f200")
 
-        for corrupt in (b"Version: 5.0.0\n", files["changelog.txt"] * 2):
+        for corrupt in (b"Version: 5.0.1\n", files["changelog.txt"] * 2):
             broken = dict(files, **{"changelog.txt": corrupt})
-            with self.assertRaisesRegex(ValueError, "exactly one"):
+            with self.assertRaisesRegex(ValueError, "source-version header"):
                 pack.members(source, committed_files=broken, target="f200")
 
     def test_committed_build_ignores_dirty_untracked_and_line_ending_worktree_bytes(self):

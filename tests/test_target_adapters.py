@@ -1,6 +1,7 @@
 """Pure controls for selected-target API capabilities and reduced stage adapters."""
 import argparse
 import importlib.util
+import json
 from pathlib import Path
 import sys
 import tempfile
@@ -139,12 +140,38 @@ class TargetAdapterTests(unittest.TestCase):
           package.loaded["__more-infinite-research__.api.v1.data"] = nil
           local selected = require("platform.target")
           assert(selected.id == "f210" and selected.factorio_version == "2.1")
-          assert(selected.minimum_base == "2.1.23" and selected.distribution_version == "5.0.21000")
+          assert(selected.minimum_base == "2.1.23" and selected.distribution_version == "5.0.0")
           assert(not selected.reduced and selected.research_levels and selected.recipe_productivity)
           local api = require("__more-infinite-research__.api.v1.data")
-          assert(api.get_version().product == "5.0.21000")
+          assert(api.get_version().product == "5.0.0")
           assert(api.get_capabilities().technology_creation and api.get_capabilities().recipe_productivity)
         ''')
+
+    def test_raw_source_is_plain_but_selected_f210_package_reports_its_portal_product(self):
+        self.assertEqual(json.loads((ROOT / "source/info.json").read_text(encoding="utf-8"))["version"], "5.0.0")
+        with tempfile.TemporaryDirectory() as temporary:
+            temporary = Path(temporary)
+            archive = temporary / "more-infinite-research_5.0.09.zip"
+            pack.build(ROOT / "source", archive, target="f210")
+            with zipfile.ZipFile(archive) as package:
+                package.extractall(temporary)
+            self.lua.globals().player_root = (temporary / "more-infinite-research_5.0.09").as_posix()
+            self.lua.execute(r'''
+              package.path = player_root .. "/?.lua;" .. player_root .. "/?/init.lua"
+              package.loaded["platform.target"] = nil
+              package.preload["platform.target"] = nil
+              package.loaded["__more-infinite-research__.api.v1.data"] = nil
+              package.preload["__more-infinite-research__/platform/target"] = function()
+                return assert(loadfile(player_root .. "/platform/target.lua"))()
+              end
+              package.preload["__more-infinite-research__.api.v1.data"] = function()
+                return assert(loadfile(player_root .. "/api/v1/data.lua"))()
+              end
+              local target = require("platform.target")
+              local api = require("__more-infinite-research__.api.v1.data")
+              assert(target.id == "f210" and target.distribution_version == "5.0.09")
+              assert(api.get_version().product == "5.0.09")
+            ''')
 
     def test_reduced_data_and_settings_adapters_are_target_bound_and_skip_library(self):
         self.lua.execute(r'''

@@ -7,7 +7,14 @@ import os
 from pathlib import Path
 import re
 import subprocess
+import sys
 import zipfile
+
+_TOOLS = str(Path(__file__).resolve().parent)
+if _TOOLS not in sys.path:
+    sys.path.insert(0, _TOOLS)
+from versioning import (distribution_version, distribution_versions, parse_source_version,
+                        source_version_from_distribution)
 
 TARGET_RECORD = "targets/editions.json"
 EARLY_TARGET_RECORD = "targets/early-editions.json"
@@ -27,8 +34,7 @@ SOURCE_TARGET_ID_ASSIGNMENT = re.compile(rb'(?m)^[ \t]*id[ \t]*=')
 SOURCE_TARGET_ID = re.compile(rb'(?m)^[ \t]*id[ \t]*=[ \t]*"(?P<id>f\d{3})"[ \t]*,[ \t]*\r?$')
 SOURCE_DISTRIBUTION_VERSION_ASSIGNMENT = re.compile(rb'(?m)^[ \t]*distribution_version[ \t]*=')
 SOURCE_DISTRIBUTION_VERSION = re.compile(
-    rb'(?m)^[ \t]*distribution_version[ \t]*=[ \t]*"(?P<version>\d+\.\d+\.\d{5})"[ \t]*,[ \t]*\r?$')
-CODEC_VERSION = re.compile(r"^(?P<major>\d+)\.(?P<minor>\d+)\.(?P<encoded>\d{5})$")
+    rb'(?m)^[ \t]*distribution_version[ \t]*=[ \t]*"(?P<version>\d+\.\d+\.\d+)"[ \t]*,[ \t]*\r?$')
 
 
 def digest(data):
@@ -161,17 +167,41 @@ def read_editions(source, revision=None, target_record=TARGET_RECORD):
     return record["targets"], digest(data)
 
 
-def player_presentation(files, info):
+def player_presentation(files, source_version):
     for required in ("LICENSE", "thumbnail.png", "changelog.txt"):
         if not files.get(required):
             raise ValueError("Selected edition has missing player presentation: " + required)
     entry = files["changelog.txt"]
     token = b"@DISTRIBUTION_VERSION@"
-    if entry.count(token) != 1:
-        raise ValueError("Current changelog needs exactly one distribution-version token")
+    header = b"Version: " + source_version.encode("ascii") + b"\n"
+    if token in entry or entry.count(header) != 1:
+        raise ValueError("Current changelog must retain exactly one source-version header")
     out = {name: raw for name, raw in files.items() if not name.startswith("presentation/changelog/")}
-    out["changelog.txt"] = entry.replace(token, info["version"].encode("ascii"))
     return out
+
+
+def source_target_metadata(files, source_version):
+    """Read the one plain source target literal before package materialization."""
+    if SOURCE_TARGET_PATH not in files:
+        raise ValueError("MIR package has no source target metadata")
+    if not isinstance(source_version, str):
+        raise ValueError("MIR package has an invalid source version")
+    try:
+        parse_source_version(source_version)
+    except ValueError as error:
+        raise ValueError("MIR package has an invalid source version") from error
+    target = files[SOURCE_TARGET_PATH]
+    ids = list(SOURCE_TARGET_ID.finditer(target))
+    versions = list(SOURCE_DISTRIBUTION_VERSION.finditer(target))
+    if (len(SOURCE_TARGET_ID_ASSIGNMENT.findall(target)) != 1
+            or len(SOURCE_DISTRIBUTION_VERSION_ASSIGNMENT.findall(target)) != 1
+            or len(ids) != 1 or len(versions) != 1):
+        raise ValueError("MIR package has invalid source target metadata")
+    target_id = ids[0].group("id").decode("ascii")
+    target_version = versions[0].group("version").decode("ascii")
+    if target_version != source_version:
+        raise ValueError("MIR package has mismatched source target metadata")
+    return target, target_id, versions[0]
 
 
 def render_local_mir_target_version(files, source_version, requested_version, name):
@@ -182,38 +212,39 @@ def render_local_mir_target_version(files, source_version, requested_version, na
     other Lua byte for a same-edition local package.
     """
     if name != MIR_PLAYER_NAME:
-        return files
-    if SOURCE_TARGET_PATH not in files:
-        raise ValueError("MIR local version package has no source target metadata")
-    if not isinstance(source_version, str) or not isinstance(requested_version, str):
+        return files, source_version
+    if not isinstance(requested_version, str):
         raise ValueError("MIR local version package has an invalid distribution codec")
-    source_match = CODEC_VERSION.fullmatch(source_version)
-    requested_match = CODEC_VERSION.fullmatch(requested_version)
-    if source_match is None or requested_match is None:
-        raise ValueError("MIR local version package has an invalid distribution codec")
-
-    target = files[SOURCE_TARGET_PATH]
-    ids = list(SOURCE_TARGET_ID.finditer(target))
-    versions = list(SOURCE_DISTRIBUTION_VERSION.finditer(target))
-    if (len(SOURCE_TARGET_ID_ASSIGNMENT.findall(target)) != 1
-            or len(SOURCE_DISTRIBUTION_VERSION_ASSIGNMENT.findall(target)) != 1
-            or len(ids) != 1 or len(versions) != 1):
-        raise ValueError("MIR local version package has invalid source target metadata")
-    target_id = ids[0].group("id").decode("ascii")
-    target_version = versions[0].group("version").decode("ascii")
-    if target_version != source_version:
+    try:
+        target, target_id, version_match = source_target_metadata(files, source_version)
+    except ValueError as error:
+        raise ValueError(str(error).replace("MIR package", "MIR local version package")) from error
+    if target_id != "f210":
         raise ValueError("MIR local version package has mismatched source target metadata")
-    target_codec = int(target_id[1:])
-    if int(source_match.group("encoded")) // 100 != target_codec:
-        raise ValueError("MIR local version package has mismatched source target codec")
-    if int(requested_match.group("encoded")) // 100 != target_codec:
-        raise ValueError("Local distribution version selects a different MIR edition")
+    try:
+        local_source_version = source_version_from_distribution(requested_version, target_id)
+    except ValueError as error:
+        raise ValueError("Local distribution version selects a different MIR edition") from error
 
     rendered = dict(files)
-    match = versions[0]
+    match = version_match
     rendered[SOURCE_TARGET_PATH] = (target[:match.start("version")]
                                     + requested_version.encode("ascii")
                                     + target[match.end("version"):])
+    return rendered, local_source_version
+
+
+def render_local_changelog_version(files, source_version, local_source_version):
+    """Keep a local packaged history in source-version form, never edition form."""
+    entry = files.get("changelog.txt")
+    if entry is None:
+        return files
+    old = b"Version: " + source_version.encode("ascii") + b"\n"
+    if entry.count(old) != 1 or b"@DISTRIBUTION_VERSION@" in entry:
+        raise ValueError("MIR local version package has invalid source changelog")
+    rendered = dict(files)
+    rendered["changelog.txt"] = entry.replace(
+        old, b"Version: " + local_source_version.encode("ascii") + b"\n", 1)
     return rendered
 
 
@@ -249,10 +280,12 @@ def select_edition(files, info, target, editions):
                       if value["factorio_version"] == info.get("factorio_version")]
     if len(source_targets) != 1:
         raise ValueError("Source metadata has no unique declared edition")
-    major, minor, encoded = info["version"].split(".")
-    if len(encoded) != 5 or int(encoded) // 100 != int(source_targets[0][1:]):
-        raise ValueError("Source version does not use the declared distribution codec")
-    info["version"] = major + "." + minor + "." + str(int(target[1:]) * 100 + int(encoded) % 100).zfill(5)
+    source_version = info.get("version")
+    try:
+        distribution_versions(source_version, tuple(editions))
+    except ValueError as error:
+        raise ValueError("Source version or declared edition codec is invalid") from error
+    info["version"] = distribution_version(source_version, target)
     info["factorio_version"] = selected["factorio_version"]
     dependencies = info.get("dependencies", [])
     extras = [item for item in dependencies if not re.match(r"^\s*base(?:\s|[<>=!]|$)", item)]
@@ -282,7 +315,7 @@ def select_edition(files, info, target, editions):
     # never ships another edition's unused compiler, GUI or runtime body.
     closure = require_closure(files, [*ENTRYPOINTS, "api/v1/data.lua", "api/v1/runtime.lua", "platform/target.lua"])
     selected_files = {name: data for name, data in files.items() if not name.endswith(".lua") or name in closure}
-    return player_presentation(selected_files, info)
+    return player_presentation(selected_files, source_version)
 
 
 def select_early_edition(files, info, target, editions):
@@ -304,15 +337,15 @@ def select_early_edition(files, info, target, editions):
     if selected["factorio_version"] != "0." + str(int(target[1:])):
         raise ValueError("Early target and Factorio line differ: " + target)
 
-    version = info.get("version")
-    match = re.fullmatch(r"(\d+)[.](\d+)[.](\d{5})", version if isinstance(version, str) else "")
-    if match is None:
-        raise ValueError("Source version does not use the declared distribution codec")
-    patch = int(match.group(3)) % 100
+    source_version = info.get("version")
+    try:
+        distribution_versions(source_version, tuple(editions))
+    except ValueError as error:
+        raise ValueError("Source version or declared early edition codec is invalid") from error
     info.clear()
     info.update({
         "name": "more-infinite-research",
-        "version": match.group(1) + "." + match.group(2) + "." + str(int(target[1:]) * 100 + patch).zfill(5),
+        "version": distribution_version(source_version, target),
         "title": "More Infinite Research",
         "author": "Julesc013",
         "description": EARLY_DESCRIPTION,
@@ -341,7 +374,7 @@ def select_early_edition(files, info, target, editions):
     selected_files["thumbnail.png"] = files["thumbnail.png"]
     selected_files["changelog.txt"] = files["changelog.txt"]
     selected_files[EARLY_LOCALE_OUTPUT] = files[EARLY_LOCALE_SOURCE]
-    return player_presentation(selected_files, info)
+    return player_presentation(selected_files, source_version)
 
 
 def members(source, version=None, committed_files=None, target=None, editions=None,
@@ -362,6 +395,7 @@ def members(source, version=None, committed_files=None, target=None, editions=No
         raise ValueError("Selected source has no info.json")
     info = json.loads(committed_files["info.json"].decode("utf-8"))
     source_version = info.get("version")
+    local_source_version = source_version
     if version is not None:
         info["version"] = version
     if not re.fullmatch(r"[a-zA-Z0-9_-]+", info["name"]):
@@ -389,13 +423,12 @@ def members(source, version=None, committed_files=None, target=None, editions=No
             committed_files.pop(F110_PLUS_MIGRATION, None)
     else:
         if version is not None:
-            committed_files = render_local_mir_target_version(
+            committed_files, local_source_version = render_local_mir_target_version(
                 committed_files, source_version, info["version"], info["name"])
+            committed_files = render_local_changelog_version(
+                committed_files, source_version, local_source_version)
         if "changelog.txt" in committed_files:
-            encoded = info["version"].rsplit(".", 1)[-1]
-            if not re.fullmatch(r"[0-9]{5}", encoded):
-                raise ValueError("Player presentation requires a distribution codec")
-            committed_files = player_presentation(committed_files, info)
+            committed_files = player_presentation(committed_files, local_source_version)
     rows = []
     for relative, contents in sorted(committed_files.items()):
         if admitted(relative):

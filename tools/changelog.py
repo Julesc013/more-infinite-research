@@ -4,7 +4,13 @@ import argparse
 import json
 from pathlib import Path
 import re
+import sys
 import textwrap
+
+_TOOLS = str(Path(__file__).resolve().parent)
+if _TOOLS not in sys.path:
+    sys.path.insert(0, _TOOLS)
+from versioning import parse_source_version
 
 ROOT = Path(__file__).resolve().parents[1]
 SEPARATOR = "-" * 99
@@ -58,8 +64,8 @@ def factorio(text, source_version):
     if records[0]["version"] != source_version:
         raise ValueError("Current changelog version differs from source/info.json")
     lines = []
-    for index, record in enumerate(records):
-        lines.extend([SEPARATOR, "Version: " + ("@DISTRIBUTION_VERSION@" if index == 0 else record["version"])])
+    for record in records:
+        lines.extend([SEPARATOR, "Version: " + record["version"]])
         if record["date"] and record["date"] != "Unreleased":
             lines.append("Date: " + record["date"])
         for section in record["sections"]:
@@ -95,8 +101,8 @@ def factorio(text, source_version):
 
 def rendered(root=ROOT):
     info = json.loads((root / "source/info.json").read_text(encoding="utf-8"))
-    major, minor, distribution = map(int, info["version"].split("."))
-    source_version = f"{major}.{minor}.{distribution % 100}"
+    major, minor, patch = parse_source_version(info["version"])
+    source_version = f"{major}.{minor}.{patch}"
     return factorio((root / "CHANGELOG.md").read_text(encoding="utf-8"), source_version)
 
 

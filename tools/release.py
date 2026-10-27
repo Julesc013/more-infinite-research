@@ -11,8 +11,14 @@ import tempfile
 import zipfile
 import zlib
 
+_TOOLS = str(Path(__file__).resolve().parent)
+if _TOOLS not in sys.path:
+    sys.path.insert(0, _TOOLS)
+from versioning import distribution_version, distribution_versions
+
 
 PACKAGE_PATH = Path(__file__).with_name("package.py")
+VERSIONING_PATH = Path(__file__).with_name("versioning.py")
 PACKAGE_SPEC = importlib.util.spec_from_file_location("mir5_release_package", PACKAGE_PATH)
 package = importlib.util.module_from_spec(PACKAGE_SPEC)
 PACKAGE_SPEC.loader.exec_module(package)
@@ -27,7 +33,6 @@ EARLY_TARGETS = ("f006", "f007", "f008", "f009", "f010", "f011", "f012")
 EARLY_QUALIFICATION = "best-effort-early-data-only-distributions-not-native-qualified"
 MOD_NAME = "more-infinite-research"
 SOURCE_VERSION = "5.0.0"
-SOURCE_DISTRIBUTION_VERSION = "5.0.21000"
 SOURCE_LABEL = "source5.0.0"
 RELEASE_TAG = "v5.0.0"
 RELEASE_TITLE = "MIR 5.0.0"
@@ -46,6 +51,7 @@ def _controller_identity():
     return {
         "release_tool": {"path": "tools/release.py", "sha256": digest(Path(__file__).read_bytes())},
         "package_tool": {"path": "tools/package.py", "sha256": digest(PACKAGE_PATH.read_bytes())},
+        "versioning_tool": {"path": "tools/versioning.py", "sha256": digest(VERSIONING_PATH.read_bytes())},
         "runtime": {
             "implementation": sys.implementation.name,
             "version": list(sys.version_info[:3]),
@@ -81,7 +87,7 @@ def _source_identity(source, revision):
         info = json.loads(files["info.json"].decode("utf-8"))
     except (KeyError, UnicodeDecodeError, json.JSONDecodeError) as error:
         raise ValueError("Frozen player source has invalid info.json") from error
-    if (info.get("name") != MOD_NAME or info.get("version") != SOURCE_DISTRIBUTION_VERSION
+    if (info.get("name") != MOD_NAME or info.get("version") != SOURCE_VERSION
             or not isinstance(info.get("title"), str) or not info["title"]):
         raise ValueError("Frozen player source is not the exact MIR 5.0.0 source identity")
     return source, repository, files, {
@@ -91,7 +97,7 @@ def _source_identity(source, revision):
         "path": relative,
         "mod_name": MOD_NAME,
         "mod_title": info["title"],
-        "source_distribution_version": SOURCE_DISTRIBUTION_VERSION,
+        "source_version": SOURCE_VERSION,
     }
 
 
@@ -117,6 +123,7 @@ def _target_identity(source, repository, commit, target_record):
             raise ValueError("Frozen target record has an unavailable edition: " + target)
         if not isinstance(edition.get("factorio_version"), str) or not isinstance(edition.get("minimum_base"), str):
             raise ValueError("Frozen target record has invalid edition metadata: " + target)
+    distribution_versions(SOURCE_VERSION, TARGETS)
     return editions, {
         "path": relative,
         "blob": blob,
@@ -151,6 +158,7 @@ def _early_target_identity(source, repository, commit, target_record):
                 or not isinstance(edition.get("factorio_version"), str)
                 or not isinstance(edition.get("minimum_base"), str)):
             raise ValueError("Frozen early target record has an invalid edition: " + target)
+    distribution_versions(SOURCE_VERSION, EARLY_TARGETS)
     return editions, {
         "path": relative,
         "blob": blob,
@@ -159,7 +167,7 @@ def _early_target_identity(source, repository, commit, target_record):
 
 
 def _version(target):
-    return "5.0." + target[1:] + "00"
+    return distribution_version(SOURCE_VERSION, target)
 
 
 def _archive_name(target):

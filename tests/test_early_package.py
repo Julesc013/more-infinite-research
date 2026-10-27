@@ -61,11 +61,12 @@ class EarlyPackageTests(unittest.TestCase):
                         target=target,
                         target_record=EARLY_RECORD,
                     )
-                    root = "more-infinite-research_5.0." + target[1:] + "00"
+                    version = pack.distribution_version("5.0.0", target)
+                    root = "more-infinite-research_" + version
                     self.assertEqual(record["kind"], "early-data-only-package-members-not-gameplay-qualification")
                     self.assertEqual(record["delivery"], selected["delivery"])
                     self.assertEqual(record["target_record"], EARLY_RECORD)
-                    self.assertEqual(record["version"], "5.0." + target[1:] + "00")
+                    self.assertEqual(record["version"], version)
                     with zipfile.ZipFile(output) as archive:
                         names = archive.namelist()
                         info = json.loads(archive.read(root + "/info.json"))
@@ -87,7 +88,7 @@ class EarlyPackageTests(unittest.TestCase):
                     ])
                     self.assertEqual(info, {
                         "name": "more-infinite-research",
-                        "version": "5.0." + target[1:] + "00",
+                        "version": version,
                         "title": "More Infinite Research",
                         "author": "Julesc013",
                         "description": pack.EARLY_DESCRIPTION,
@@ -108,8 +109,7 @@ class EarlyPackageTests(unittest.TestCase):
                         b'require("adapters.early.data").apply(require("platform.target"))\n',
                     )
                     self.assertNotIn(b"@DISTRIBUTION_VERSION@", changelog)
-                    self.assertEqual(changelog.count(
-                        b"Version: 5.0." + target[1:].encode("ascii") + b"00"), 1)
+                    self.assertEqual(changelog.count(b"Version: 5.0.0"), 1)
                     self.assertEqual(locale, (source / pack.EARLY_LOCALE_SOURCE).read_bytes())
                     self.assertIn(
                         ("mir-" + {
