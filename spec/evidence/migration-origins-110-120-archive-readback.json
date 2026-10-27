@@ -1,0 +1,72 @@
+{
+  "schema": 1,
+  "kind": "MIRPublishedOriginArchiveReadbackV1",
+  "scope": "Exact official 1.1.0 and1.2.0 ZIP bytes inspected without extracting, repackaging or executing. Archive recovery is not native migration qualification.",
+  "archives": [
+    {
+      "tag": "1.1.0",
+      "source_commit": "2fb64822b82569e3b50f0653e361fb7148f18b63",
+      "archive_path": "build/qualification/migration-origins/next-f200-origin-archives-r01/inputs/more-infinite-research_1.1.0.zip",
+      "archive_sha256": "6395C4A5A0F74C67729746D0FBF6162329978B47C5C29D54CC0045F2977C7E44",
+      "archive_bytes": 60927,
+      "official_asset_url": "https://github.com/Julesc013/more-infinite-research/releases/download/1.1.0/more-infinite-research_1.1.0.zip",
+      "archive_root": "more-infinite-research_1.1.0",
+      "info": {
+        "name": "more-infinite-research",
+        "version": "1.1.0",
+        "title": "More Infinite Research",
+        "author": "Julesc013",
+        "description": "Adds infinite productivity research for intermediates and other useful ingredients not covered by existing vanilla, Space Age, or modded productivity researches.\nAdds Space Age productivity techs to the vanilla base game where missing.",
+        "factorio_version": "2.0",
+        "dependencies": [
+          "base >= 2.0",
+          "? space-age"
+        ]
+      },
+      "player_members": 8,
+      "control_lua_present": false,
+      "migrations": [],
+      "tag_member_byte_differences": [],
+      "native_status": "not_run"
+    },
+    {
+      "tag": "1.2.0",
+      "source_commit": "b80413b2aa225529a236b7b00a7cee9420af65bc",
+      "archive_path": "build/qualification/migration-origins/next-f200-origin-archives-r01/inputs/more-infinite-research_1.2.0.zip",
+      "archive_sha256": "880C137F7AB35FE7AF1DA5538BFA91F620C80785134DB488800352DD6154AB22",
+      "archive_bytes": 92638,
+      "official_asset_url": "https://github.com/Julesc013/more-infinite-research/releases/download/1.2.0/more-infinite-research_1.2.0.zip",
+      "archive_root": "more-infinite-research_1.2.0",
+      "info": {
+        "name": "more-infinite-research",
+        "version": "1.2.0",
+        "title": "More Infinite Research",
+        "author": "Julesc013",
+        "description": "Adds infinite productivity research for intermediates and other useful ingredients not covered by existing vanilla, Space Age, or modded productivity researches.\nAdds Space Age productivity techs to the vanilla base game where missing.",
+        "factorio_version": "2.0",
+        "dependencies": [
+          "base >= 2.0",
+          "? space-age"
+        ]
+      },
+      "player_members": 33,
+      "control_lua_present": false,
+      "migrations": [],
+      "tag_member_byte_differences": [
+        "LICENSE",
+        "locale/de/more-infinite-research.cfg",
+        "locale/en/more-infinite-research.cfg",
+        "locale/es/more-infinite-research.cfg",
+        "locale/fr/more-infinite-research.cfg",
+        "locale/it/more-infinite-research.cfg",
+        "locale/pl/more-infinite-research.cfg",
+        "locale/pt-BR/more-infinite-research.cfg",
+        "locale/ru/more-infinite-research.cfg",
+        "locale/zh-CN/more-infinite-research.cfg",
+        "README.md",
+        "TODO.txt"
+      ],
+      "native_status": "not_run"
+    }
+  ]
+}
