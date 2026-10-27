@@ -866,6 +866,18 @@ function M.select(active_mods, raw)
       if definition == nil then error("MIR combined Bob/Angel catalogue lacks declared key " .. key, 2) end
       definition.science = science
     end
+    -- A combined profile can bind a captured progression vector while leaving
+    -- the product family collector-owned. Do not use definition_overrides:
+    -- that would exact-bind effects and suppress COMP-02 lab producers.
+    for key, fields in pairs(bob_angel_f210_delta.definition_progression or {}) do
+      local definition = by_key[key]
+      if definition == nil or type(fields) ~= "table" or type(fields.science) ~= "string"
+        or fields.exact_prerequisites ~= true or type(fields.prerequisites) ~= "table" then
+        error("MIR combined Bob/Angel catalogue has invalid progression " .. tostring(key), 2)
+      end
+      definition.science = fields.science
+      definition.prerequisites, definition.exact_prerequisites = copy(fields.prerequisites), true
+    end
     for family in pairs(bob_angel_f210_delta.definition_overrides or {}) do exact_product_target_families[family] = true end
     for _, addition in ipairs(bob_angel_f210_delta.additions or {}) do exact_product_target_families[addition.family] = true end
     profile = "bob-angel-" .. bob_angel_f210 .. "-f210"
