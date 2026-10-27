@@ -4,7 +4,7 @@
   "origin_tag": "1.1.0",
   "origin_source_commit": "2fb64822b82569e3b50f0653e361fb7148f18b63",
   "source_fixture_commit": "d8e24b4a79b6064a373c03210c5ef6be0b013f79",
-  "successor_fixture_commit": "63747976abb25a12f53284de6f7d29e6a823833f",
+  "successor_fixture_commit": "aae9bc947674cd059df60d9617a412a059970cc2",
   "target": "f200",
   "factorio_line": "2.0",
   "engine": {
@@ -13,9 +13,8 @@
   },
   "settings_mode": "ProtectedOriginalF200SourceSavePendingNative",
   "source_save": {
-    "status": "awaiting-corrected-r03-native-source-result",
-    "sha256": null,
-    "source_result_sha256": null
+    "sha256": "88FC8E9891040275E001930C3E6AA0A4A7A28C31D81DF30E3F08AEDD98E5019A",
+    "source_result_sha256": "4FBD622144E3B69E39C0530385AA70C92971208584CA32D4A10B1FCC1A978997"
   },
   "candidate": {
     "source_commit": "a575a4198807b6aea9e26963e3d9970fc5c068ae",
@@ -29,8 +28,8 @@
   ],
   "archive_sha256": {
     "mir-fixture-mir5-active-mods-observer_0.1.0.zip": "723D1E7721449FC26040E5E6629416767BDC20AD79CF8723115846DB662A1F87",
-    "mir-fixture-mir5-migration-origin-f200-110-source_0.2.0.zip": "F5283A1CF1A06F8BB1B76CAAA10A694CBBD16441327E71EC690A9C2EE33DBDD8",
+    "mir-fixture-mir5-migration-origin-f200-110-source_0.2.0.zip": "3DCB5676C3819CB2DF6F4177DC120A38B45FAC62D8BE795C8765E2D6A540D966",
     "more-infinite-research_5.0.20000.zip": "8DB28D2DE45F26033B5F54E176902A3138A903AF0F4B48EAB6B9971466021B4F"
   },
-  "scope": "Prepared direct F200 successor of the corrected protected MIR 1.1.0 F200 source stage under a575 MIR5 F200. It is not runnable until the exact corrected source save/result are bound, and it does not qualify an F210 route or a current package."
+  "scope": "Direct F200 successor input of the protected passed MIR 1.1.0 F200 r05 source stage under a575 MIR5 F200. It remains unadmitted: the successor has no native result and does not qualify an F210 route or a current package."
 }

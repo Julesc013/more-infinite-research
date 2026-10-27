@@ -210,20 +210,21 @@ class MigrationOriginF200110SuccessorControls(unittest.TestCase):
         self.assertIn("protected MIR 1.1 source state is absent", result["message_config"])
         self.assertEqual({}, result["storage"])
 
-    def test_profiles_keep_the_save_explicitly_unbound_and_pin_only_a575_inputs(self):
+    def test_profiles_bind_the_one_passed_r05_source_and_pin_only_a575_inputs(self):
         f200, f210 = json.loads(F200_PROFILE.read_text()), json.loads(F210_PROFILE.read_text())
         for profile in (f200, f210):
-            self.assertEqual("awaiting-corrected-r03-native-source-result", profile["source_save"]["status"])
-            self.assertIsNone(profile["source_save"]["sha256"])
-            self.assertIsNone(profile["source_save"]["source_result_sha256"])
+            self.assertEqual("88FC8E9891040275E001930C3E6AA0A4A7A28C31D81DF30E3F08AEDD98E5019A",
+                             profile["source_save"]["sha256"])
+            self.assertEqual("4FBD622144E3B69E39C0530385AA70C92971208584CA32D4A10B1FCC1A978997",
+                             profile["source_save"]["source_result_sha256"])
             self.assertEqual(("a575a4198807b6aea9e26963e3d9970fc5c068ae", "398c79c687d2bc662c976355ced1436201c43f11"),
                              (profile["candidate"]["source_commit"], profile["candidate"]["player_tree"]))
             self.assertEqual("d8e24b4a79b6064a373c03210c5ef6be0b013f79", profile["source_fixture_commit"])
-            self.assertEqual("63747976abb25a12f53284de6f7d29e6a823833f", profile["successor_fixture_commit"])
+            self.assertEqual("aae9bc947674cd059df60d9617a412a059970cc2", profile["successor_fixture_commit"])
             self.assertEqual("2fb64822b82569e3b50f0653e361fb7148f18b63", profile["origin_source_commit"])
-        self.assertEqual("F5283A1CF1A06F8BB1B76CAAA10A694CBBD16441327E71EC690A9C2EE33DBDD8",
+        self.assertEqual("3DCB5676C3819CB2DF6F4177DC120A38B45FAC62D8BE795C8765E2D6A540D966",
                          f200["archive_sha256"]["mir-fixture-mir5-migration-origin-f200-110-source_0.2.0.zip"])
-        self.assertEqual("BB6AD7204CB8669EA1EC8CC3F4C613A84BACBF51F21EEC51598633D14CF11462",
+        self.assertEqual("E4BCB251C6D4D0FBAA5DD4E9F36E3B5969A6A7863A2C51E649CADBE6B99A315E",
                          f210["archive_sha256"]["mir-fixture-mir5-migration-origin-f200-110-source_0.3.0.zip"])
         self.assertEqual("8DB28D2DE45F26033B5F54E176902A3138A903AF0F4B48EAB6B9971466021B4F",
                          f200["archive_sha256"]["more-infinite-research_5.0.20000.zip"])
