@@ -6,7 +6,13 @@ param(
   [Parameter(Mandatory)][string]$CandidateArchive,
   [Parameter(Mandatory)][string]$CanonicalObserverArchive,
   [Parameter(Mandatory)][string]$OutputRoot,
-  [Parameter(Mandatory)][string]$RecoveryRoot
+  [Parameter(Mandatory)][string]$RecoveryRoot,
+  [switch]$SuccessorOnly,
+  [string]$AdoptedSpaceAgeSourceSavePath,
+  [string]$ExpectedAdoptedSpaceAgeSourceSha256,
+  [string]$AdoptedSpaceAgeResultPath,
+  [string]$ExpectedAdoptedSpaceAgeResultSha256,
+  [string]$OriginalAssignmentDeadlineUtc
 )
 
 $ErrorActionPreference = 'Stop'
@@ -198,7 +204,7 @@ function Assert-Full473Result($Result, [string]$Stage, [string]$ProfileName) {
   Assert-Full473 (([string]$Result.initial.stage -ceq 'initial') -and ([string]$Result.initial.status -ceq 'passed') -and ([string]$Result.initial.profile -ceq $ProfileName)) "initial fixture marker differs: $ProfileName/$Stage"
   $witness = $Result.initial.witnesses
   $expectedOwners = if ($ProfileName -ceq 'base') { 0 } else { 5 }
-  Assert-Full473 (($null -ne $witness) -and ($witness.public_rows -gt 0) -and ($witness.level_backed_rows -eq $witness.public_rows) -and ($witness.native_owner_rows -eq $expectedOwners) -and (Test-Full473Close $witness.queued_progress .42) -and (Test-Full473Close $witness.paused_progress .27) -and ([string]$witness.save_name -ceq 'mir5-native-complete')) "complete catalogue, native-owner, queue, or detached-force witness differs: $ProfileName/$Stage"
+  Assert-Full473 (($null -ne $witness) -and ($witness.public_rows -gt 0) -and (($witness.level_backed_rows + $witness.scripted_rows_not_seeded) -eq $witness.public_rows) -and ($witness.native_owner_rows -eq $expectedOwners) -and (Test-Full473Close $witness.queued_progress .42) -and (Test-Full473Close $witness.paused_progress .27) -and ([string]$witness.save_name -ceq 'mir5-native-complete')) "complete catalogue, native-owner, queue, or detached-force witness differs: $ProfileName/$Stage"
   $expectedSuccessorLabs = if ($Stage -ceq 'published') { 0 } else { 1 }
   Assert-Full473 (($witness.source_gear_lab -eq 1) -and ($witness.successor_gear_lab -eq $expectedSuccessorLabs)) "gear-lab witness differs: $ProfileName/$Stage"
   if ($Stage -ceq 'mir5') { Assert-Full473 ($Result.input_save_byte_identical -eq $true) "successor changed protected published save: $ProfileName" }
@@ -215,11 +221,17 @@ $out = [IO.Path]::GetFullPath($OutputRoot)
 $recovery = [IO.Path]::GetFullPath($RecoveryRoot)
 $controllerSha = Get-Full473Sha $PSCommandPath
 $started = [DateTime]::UtcNow
-$deadline = $started.AddMinutes(30)
+$deadline = if ($SuccessorOnly) {
+  Assert-Full473 (-not [string]::IsNullOrWhiteSpace($OriginalAssignmentDeadlineUtc)) 'successor-only continuation requires the original assignment deadline'
+  ([datetime]$OriginalAssignmentDeadlineUtc).ToUniversalTime()
+} else {
+  $started.AddMinutes(30)
+}
 $archiveStates = [Collections.Generic.List[object]]::new()
 $archiveRestoration = @()
 $snapshotRoot = Join-Path $recovery 'preexisting-library-archives'
 $results = @()
+$adoptedSpaceAge = $null
 $failure = $null
 $failedStage = $null
 $custody = $null
@@ -264,6 +276,19 @@ foreach ($profileName in @('base', 'space-age')) {
     Assert-Full473Profile $entry['data'] $stageName $profileName
   }
 }
+if ($SuccessorOnly) {
+  Assert-Full473 (-not [string]::IsNullOrWhiteSpace($AdoptedSpaceAgeSourceSavePath)) 'successor-only continuation requires the retained Space Age source save'
+  Assert-Full473 (-not [string]::IsNullOrWhiteSpace($ExpectedAdoptedSpaceAgeSourceSha256)) 'successor-only continuation requires the retained Space Age source-save hash'
+  Assert-Full473 (-not [string]::IsNullOrWhiteSpace($AdoptedSpaceAgeResultPath)) 'successor-only continuation requires the retained Space Age source result'
+  Assert-Full473 (-not [string]::IsNullOrWhiteSpace($ExpectedAdoptedSpaceAgeResultSha256)) 'successor-only continuation requires the retained Space Age source-result hash'
+  $adoptedSave = (Resolve-Path -LiteralPath $AdoptedSpaceAgeSourceSavePath).Path
+  $adoptedResultPath = (Resolve-Path -LiteralPath $AdoptedSpaceAgeResultPath).Path
+  Assert-Full473 ((Get-Full473Sha $adoptedSave) -ceq $ExpectedAdoptedSpaceAgeSourceSha256.ToUpperInvariant()) 'retained Space Age source save differs'
+  Assert-Full473 ((Get-Full473Sha $adoptedResultPath) -ceq $ExpectedAdoptedSpaceAgeResultSha256.ToUpperInvariant()) 'retained Space Age source result differs'
+  $adoptedResult = Get-Content -LiteralPath $adoptedResultPath -Raw | ConvertFrom-Json -AsHashtable
+  Assert-Full473Result $adoptedResult 'published' 'space-age'
+  $adoptedSpaceAge = [ordered]@{ result_path = $adoptedResultPath; result_sha256 = Get-Full473Sha $adoptedResultPath; save_path = $adoptedSave; save_sha256 = Get-Full473Sha $adoptedSave; native_replayed = $false }
+}
 $publishedArchive = Join-Path $library 'more-infinite-research_4.7.21003.zip'
 $candidateLibrary = Join-Path $library 'more-infinite-research_5.0.21000.zip'
 Assert-Full473 ((Get-Full473Sha $publishedArchive) -ceq $publishedSha) 'direct library published4.7.3 archive differs'
@@ -298,6 +323,7 @@ $preflight = [ordered]@{
   observer = [ordered]@{ canonical_path = $observerCanonical; sha256 = $observerSha; bytes = (Get-Item -LiteralPath $observerCanonical).Length; staged = $observer }
   fixtures = $fixtures; profiles = $profiles; output_root = $out; recovery_root = $recovery
 }
+$preflight.adopted_space_age_source = $adoptedSpaceAge
 $preflight.fixture_input_custody = Copy-Full473Custody $fixtureInputRoot (Join-Path $recovery 'fixture-input-custody')
 Write-Full473Json (Join-Path $recovery 'preflight.json') $preflight
 
@@ -310,7 +336,24 @@ try {
     Set-Full473TemporaryArchive $fixtures.mir5.archive $archiveStates | Out-Null
   } | Out-Null
   $runner = Join-Path $repo 'tools/Invoke-NativeFixture.ps1'
-  foreach ($profileName in @('base', 'space-age')) {
+  if ($SuccessorOnly) {
+    $profileName = 'space-age'
+    $successor = $profiles[$profileName].mir5
+    $failedStage = $profileName + '/mir5-from-4.7.3'
+    Assert-Full473Budget 300
+    $successorOutput = Join-Path $out ('native/' + $profileName + '/mir5-from-4.7.3')
+    & $runner -RepoRoot $repo -ArchiveLibrary $library -FactorioBin $engine -ProfilePath $successor.path -FixtureSources @($fixtures.mir5.source_directory, $observer.source_directory) -ExpectedMIRArchiveSha256 $candidateSha -ActiveModsObserver $observerName -CaseName 'full-catalogue-upgrade' -OutputRoot $successorOutput -ExpectedPeakMemoryMiB 6144 -TimeoutSeconds 300 -AdmissionWaitSeconds 30 -InputSavePath $adoptedSave -ExpectedInputSaveSha256 $adoptedSpaceAge.save_sha256 | Out-Null
+    $successorResultPath = Join-Path $successorOutput 'result.json'
+    Assert-Full473 (Test-Path -LiteralPath $successorResultPath -PathType Leaf) 'successor result is absent: space-age'
+    $successorResult = Get-Content -LiteralPath $successorResultPath -Raw | ConvertFrom-Json -AsHashtable
+    Assert-Full473Result $successorResult 'mir5' $profileName
+    $successorSave = Join-Path $successorOutput 'write-data/saves/mir5-native-complete.zip'
+    Assert-Full473 (Test-Path -LiteralPath $successorSave -PathType Leaf) 'successor completed save is absent: space-age'
+    $successorSaveSha = Get-Full473Sha $successorSave
+    Assert-Full473 (@($successorResult.reloads | Where-Object { [string]$_.save_sha256 -ceq $successorSaveSha }).Count -eq 2) 'successor reload saves differ: space-age'
+    $results += [ordered]@{ profile = $profileName; stage = 'mir5-from-4.7.3'; result_path = $successorResultPath; result_sha256 = Get-Full473Sha $successorResultPath; input_save_path = $adoptedSave; input_save_sha256 = $adoptedSpaceAge.save_sha256; save_path = $successorSave; save_sha256 = $successorSaveSha }
+  } else {
+    foreach ($profileName in @('base', 'space-age')) {
     $source = $profiles[$profileName].published
     $failedStage = $profileName + '/published'
     Assert-Full473Budget 300
@@ -339,6 +382,7 @@ try {
     $successorSaveSha = Get-Full473Sha $successorSave
     Assert-Full473 (@($successorResult.reloads | Where-Object { [string]$_.save_sha256 -ceq $successorSaveSha }).Count -eq 2) "successor reload saves differ: $profileName"
     $results += [ordered]@{ profile = $profileName; stage = 'mir5-from-4.7.3'; result_path = $successorResultPath; result_sha256 = Get-Full473Sha $successorResultPath; input_save_path = $sourceSave; input_save_sha256 = $sourceSaveSha; save_path = $successorSave; save_sha256 = $successorSaveSha }
+    }
   }
 } catch {
   $failure = $_.Exception.Message
@@ -366,12 +410,13 @@ if (Test-Path -LiteralPath $out) {
   $custody = Copy-Full473Custody $out (Join-Path $recovery 'native-output')
 }
 $withinBudget = ([DateTime]::UtcNow -le $deadline)
-$passed = ([string]::IsNullOrWhiteSpace($failure) -and $results.Count -eq 4 -and $withinBudget -and @(Get-Process -Name factorio -ErrorAction SilentlyContinue).Count -eq 0)
+$expectedResultCount = if ($SuccessorOnly) { 1 } else { 4 }
+$passed = ([string]::IsNullOrWhiteSpace($failure) -and $results.Count -eq $expectedResultCount -and $withinBudget -and @(Get-Process -Name factorio -ErrorAction SilentlyContinue).Count -eq 0)
 $terminal = [ordered]@{
   schema = 1; kind = 'MIR5FullCatalogue473Current8FQualificationV1'; status = if ($passed) { 'passed' } else { 'adverse' }
   controller_sha256 = $controllerSha; source_head = $sourceCommit; source_tree = $sourceTree; source_clean = $true; limits = $preflight.limits
   assignment_started_utc = $started.ToString('o'); assignment_deadline_utc = $deadline.ToString('o'); elapsed_seconds = [Math]::Round(([DateTime]::UtcNow - $started).TotalSeconds, 3); within_assignment_budget = $withinBudget
-  failed_stage = $failedStage; failure = $failure; results = $results; native_output_bytes = $outputBytes; native_process_count = $processCount; factorio_processes_after_terminal = @(Get-Process -Name factorio -ErrorAction SilentlyContinue).Count; library_archive_restoration = $archiveRestoration; custody = $custody
+  successor_only = [bool]$SuccessorOnly; adopted_space_age_source = $adoptedSpaceAge; failed_stage = $failedStage; failure = $failure; results = $results; native_output_bytes = $outputBytes; native_process_count = $processCount; factorio_processes_after_terminal = @(Get-Process -Name factorio -ErrorAction SilentlyContinue).Count; library_archive_restoration = $archiveRestoration; custody = $custody
 }
 Write-Full473Json (Join-Path $recovery 'terminal.json') $terminal
 [pscustomobject]$terminal
