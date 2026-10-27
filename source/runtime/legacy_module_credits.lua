@@ -78,10 +78,12 @@ end
 local function exact_main(technology)
   local prototype = technology and technology.prototype
   local effects = prototype and prototype.effects
+  -- A cap or foreign owner may disable further research without removing
+  -- already-earned effects. This bridge never writes public enablement.
   if technology == nil or technology.valid == false or technology.name ~= MAIN_ID
       or prototype == nil or prototype.name ~= MAIN_ID or prototype.level ~= 1
       or prototype.max_level ~= UINT32_MAX or prototype.hidden == true or prototype.upgrade ~= true
-      or prototype.enabled == false or technology.enabled ~= true
+      or prototype.enabled == false or type(technology.enabled) ~= "boolean"
       or type(effects) ~= "table" or #effects ~= 9 or completed(technology) == nil then
     return nil
   end
