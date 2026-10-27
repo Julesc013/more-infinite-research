@@ -248,7 +248,8 @@ class MigrationOriginF200110SuccessorControls(unittest.TestCase):
                              profile["source_save"]["source_result_sha256"])
             self.assertEqual(("3e835be9ce06287362b3a7b0faacd107c13ae07c", "a00b2372a06d5398787b2d54169d5494e7c27a7e"),
                              (profile["candidate"]["source_commit"], profile["candidate"]["player_tree"]))
-            self.assertEqual("d8e24b4a79b6064a373c03210c5ef6be0b013f79", profile["source_fixture_commit"])
+            self.assertEqual("bec37fb87a05d17cf4cf0225e0458218830fef63", profile["source_fixture_commit"])
+            self.assertEqual("3ae2711867cd60f6c871f641c331349d941dd8c3", profile["source_fixture_controller_commit"])
             self.assertEqual("bc9481f6ec77bbc85d1f0e5ff12d3211e0a6b150", profile["successor_fixture_commit"])
             self.assertEqual("2fb64822b82569e3b50f0653e361fb7148f18b63", profile["origin_source_commit"])
         self.assertEqual("3B81E942F56C6AF8EB5F05E1ACF9719D3A6646885047F6787F0C0C5F514C56CF",
