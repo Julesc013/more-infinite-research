@@ -93,6 +93,7 @@ function discovery_data(data_path, helper_path, stage, mir, fixture_version, dis
   if opponent=="wrong-discovery-effect" then
     technologies["planet-discovery-vulcanus"].effects={{type="unlock-space-location",space_location="vulcanus"}}
   end
+  if opponent=="absent-discovery-overlay" then technologies["planet-discovery-vulcanus"].effects[1].use_icon_overlay_constant=nil end
   if opponent=="missing-discovery-unlock" then table.remove(technologies["planet-discovery-vulcanus"].effects,1) end
   if opponent=="wrong-discovery-unlock" then technologies["planet-discovery-vulcanus"].effects[1].space_location="nauvis" end
   local mods={base="2.1.23",["space-age"]="2.1.23",quality="2.1.23",["elevated-rails"]="2.1.23",recycler="2.1.23",
@@ -266,13 +267,18 @@ function discovery_flow(helper_path, source_path, successor_path, source_mir, so
     -- branch models ordinary candidate recovery before successor init.
     player.locations.vulcanus=true
   end
+  if opponent=='queue-diagnostic' then
+    player.current_research=player.technologies['planet-discovery-vulcanus']
+    player.research_queue={player.technologies['planet-discovery-vulcanus']}
+    player.research_progress=.41
+  end
   if opponent=='bad-source' then storage.mir5_discovery_recovery_fixture.player.iron.bonus=.1 end
   if opponent=='foreign-unlocked' then game.forces[2].locations.vulcanus=true end
   if opponent=='saved-progress-loss' then player.technologies['recipe-prod-research_iron-1'].saved_progress=.18 end
   local before_labs=game.lab_count
   local successor;successor,message=load_control(successor_path,'successor');if successor==nil then return {ok=false,message=message} end
   ok,result=invoke('load');if not ok then return {ok=false,message=result} end
-  ok,result=invoke('changed');if not ok then return {ok=false,message=result,labs=game.lab_count,before_labs=before_labs,state=storage.mir5_discovery_recovery_fixture or {}} end
+  ok,result=invoke('changed');if not ok then return {ok=false,message=result,labs=game.lab_count,before_labs=before_labs,markers=markers,state=storage.mir5_discovery_recovery_fixture or {}} end
   local iron=player.technologies['recipe-prod-research_iron-1'];iron.level=4;player.current_research=nil;player.research_queue={};player.research_progress=0;player.reset_technology_effects()
   if opponent~='candidate-no-consumption' then
     for name in pairs(storage.mir5_discovery_recovery_fixture.successor.packs) do
@@ -351,6 +357,9 @@ end
         missing = self.data_result("source-320", discovery_present=False)
         self.assertFalse(missing["ok"])
         self.assertIn("source Vulcanus discovery technology is absent", missing["message"])
+        absent_overlay = self.data_result("source-321", opponent="absent-discovery-overlay")
+        self.assertTrue(absent_overlay["ok"], absent_overlay["message"])
+        self.assertNotIn("use_icon_overlay_constant", absent_overlay["discovery"]["effects"][0])
         for opponent, phrase in (("wrong-iron-effect", "historical Space Age iron productivity effect differs"),
                                   ("missing-iron-effect", "historical Space Age iron productivity effect differs"),
                                   ("duplicate-iron-effect", "historical Space Age iron productivity effect differs"),
@@ -434,6 +443,23 @@ end
                 self.assertIn(phrase, result["message"])
                 self.assertEqual(result["before_labs"], result["labs"])
                 self.assertNotIn("successor", result["state"])
+
+    def test_successor_queue_refusal_reports_read_only_state_before_lab_storage_or_success_marker(self):
+        result = self.flow_result("queue-diagnostic", "source-320")
+        self.assertFalse(result["ok"])
+        self.assertIn("successor player protected queue/progress differs;", result["message"])
+        for detail in ("expected-current=recipe-prod-research_iron-1",
+                       "actual-current=planet-discovery-vulcanus",
+                       "expected-queue-ids=recipe-prod-research_iron-1",
+                       "actual-queue-ids=planet-discovery-vulcanus",
+                       "expected-queue-length=1", "actual-queue-length=1",
+                       "expected-progress=0.42", "actual-progress=0.41",
+                       "vulcanus-unlocked=true"):
+            with self.subTest(detail=detail):
+                self.assertIn(detail, result["message"])
+        self.assertEqual(result["before_labs"], result["labs"])
+        self.assertNotIn("successor", result["state"])
+        self.assertTrue(all(row["fixture_role"] == "source" for row in result["markers"]))
 
     def test_source_definition_refuses_before_seed_storage_or_lab_mutation(self):
         for opponent, phrase in (("missing-source-definition", "source player technology is absent: planet-discovery-vulcanus"),

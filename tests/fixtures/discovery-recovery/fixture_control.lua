@@ -138,13 +138,32 @@ local function queue_snapshot(force)
     queue = queue, progress = force.research_progress}
 end
 
-local function assert_queue(force, expected, label)
+local function queue_ids(values)
+  local out = {}
+  for index, value in ipairs(values or {}) do out[index] = tostring(value) end
+  return table.concat(out, ",")
+end
+
+local function queue_diagnostic(expected, actual, vulcanus_unlocked)
+  return " expected-current=" .. tostring(expected.current)
+    .. " actual-current=" .. tostring(actual.current)
+    .. " expected-queue-ids=" .. queue_ids(expected.queue)
+    .. " actual-queue-ids=" .. queue_ids(actual.queue)
+    .. " expected-queue-length=" .. tostring(#(expected.queue or {}))
+    .. " actual-queue-length=" .. tostring(#(actual.queue or {}))
+    .. " expected-progress=" .. tostring(expected.progress)
+    .. " actual-progress=" .. tostring(actual.progress)
+    .. " vulcanus-unlocked=" .. tostring(vulcanus_unlocked)
+end
+
+local function assert_queue(force, expected, label, vulcanus_unlocked)
   local actual = queue_snapshot(force)
+  local diagnostic = queue_diagnostic(expected, actual, vulcanus_unlocked)
   if actual.current ~= expected.current or #actual.queue ~= #expected.queue or not close(actual.progress, expected.progress) then
-    fail(label .. " queue/progress differs")
+    fail(label .. " queue/progress differs;" .. diagnostic)
   end
   for index, name in ipairs(expected.queue) do
-    if actual.queue[index] ~= name then fail(label .. " queue identity differs") end
+    if actual.queue[index] ~= name then fail(label .. " queue identity differs;" .. diagnostic) end
   end
   return actual
 end
@@ -226,7 +245,7 @@ local function assert_source_snapshot(force, expected, label, foreign, repaired)
       or not close(iron.effect, expected.iron.effect) or not close(iron.bonus, expected.iron.bonus) then
     fail(label .. " protected iron state differs")
   end
-  assert_queue(force, expected.queue, label .. " protected")
+  assert_queue(force, expected.queue, label .. " protected", actual.discovery.unlocked)
   if iron.level ~= 3 or iron.researched ~= false or not close(iron.effect, .1) or not close(iron.bonus, .2) then
     fail(label .. " earned iron state differs")
   end
@@ -234,7 +253,7 @@ local function assert_source_snapshot(force, expected, label, foreign, repaired)
     if actual.discovery.researched ~= false or actual.discovery.unlocked ~= false then
       fail(label .. " unresearched foreign Vulcanus state differs")
     end
-    assert_queue(force, {current = IRON, queue = {IRON}, progress = .27}, label)
+    assert_queue(force, {current = IRON, queue = {IRON}, progress = .27}, label, actual.discovery.unlocked)
   else
     local expected_unlocked = repaired and true or expected.discovery.unlocked
     if actual.discovery.researched ~= true then
@@ -244,7 +263,7 @@ local function assert_source_snapshot(force, expected, label, foreign, repaired)
       if repaired then fail("MIR discovery repair did not restore researched Vulcanus") end
       fail(label .. " player Vulcanus discovery state differs")
     end
-    assert_queue(force, {current = IRON, queue = {IRON}, progress = .42}, label)
+    assert_queue(force, {current = IRON, queue = {IRON}, progress = .42}, label, actual.discovery.unlocked)
   end
   return actual
 end

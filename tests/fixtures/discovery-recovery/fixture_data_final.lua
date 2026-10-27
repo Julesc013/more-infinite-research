@@ -77,7 +77,7 @@ local function assert_discovery(row, version)
   elseif version == "3.2.1" then
     local unlock, travel = effects[1], effects[2]
     if #effects ~= 2 or type(unlock) ~= "table" or unlock.type ~= "unlock-space-location"
-        or unlock.space_location ~= "vulcanus" or unlock.use_icon_overlay_constant ~= true
+        or unlock.space_location ~= "vulcanus"
         or type(travel) ~= "table" or travel.type ~= "unlock-travel-to-space-platforms"
         or travel.modifier ~= true then
       fail("source Vulcanus discovery effect differs")
