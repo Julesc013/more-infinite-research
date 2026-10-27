@@ -12,8 +12,10 @@
     "expected_digest_meaning": "Expected GitHub asset digests are server hash authorities. They are not assertions that this audit downloaded or independently verified archive bytes."
   },
   "counts": {
-    "direct_f200_origins": 19,
-    "direct_f210_origins": 20,
+    "direct_f200_origins": 37,
+    "direct_f210_origins": 38,
+    "mir1_to_3_direct_f200_tag_origins": 19,
+    "mir1_to_3_direct_f210_tag_origins": 20,
     "requires_engine_bridge_or_best_effort_older_origins": 25,
     "published_4_7_3_supported_edition_origins": 9,
     "current_source_migration_json_members": 4,
@@ -22,12 +24,29 @@
     "mir4_prerelease_modern_archive_origins": 2
   },
   "published_mir4_release_origin_inventory": {
-    "status": "partial-only-v4.7.3-release-metadata-characterized",
-    "enumerated_release_origins": 1,
+    "status": "all-18-mir4-release-metadata-characterized-not-archive-byte-verified",
+    "enumerated_release_origins": 18,
     "enumerated_tags": [
+      "v4.0.0",
+      "v4.1.0",
+      "v4.2.0-rc.1",
+      "v4.2.0-stable",
+      "v4.2.1",
+      "v4.2.2",
+      "v4.3.0",
+      "v4.4.0",
+      "v4.4.1",
+      "v4.4.2",
+      "v4.5.0",
+      "v4.5.1",
+      "v4.5.2",
+      "v4.6.0",
+      "v4.7.0",
+      "v4.7.1",
+      "v4.7.2",
       "v4.7.3"
     ],
-    "prior_mir4_release_origin_enumeration": "pending; this bounded unit must not be read as a complete MIR4 release or archive-variant inventory"
+    "prior_mir4_release_origin_enumeration": "superseded by published_mir4_release_origins: all18 release records and36 modern asset identities are metadata-characterized; archive bytes and member manifests remain unverified in this inventory"
   },
   "source_state_producer_boundaries": {
     "current": [
