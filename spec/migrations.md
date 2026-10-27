@@ -1,6 +1,6 @@
 ---
 title: "Save continuity and migration"
-status: proposed
+status: current
 applies_to: "MIR replacement development"
 audience: developer
 doc_type: specification

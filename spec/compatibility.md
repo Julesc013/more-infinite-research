@@ -1,6 +1,6 @@
 ---
 title: "Compatibility and binding"
-status: proposed
+status: current
 applies_to: "MIR replacement development"
 audience: developer
 doc_type: specification

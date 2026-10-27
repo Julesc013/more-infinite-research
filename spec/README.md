@@ -16,7 +16,7 @@ source_of_truth_for:
 
 ## Status and authority
 
-The maintainer adopted this specification set for replacement development on 2026-10-23 through the MIR 5.0.0 implementation-and-release goal. Its normative requirements govern the new implementation even where a focused page retains the original proposal metadata. Implementation and native acceptance remain incomplete; the explanatory pseudocode is subordinate to these contracts.
+The maintainer adopted this specification set for replacement development on 2026-10-23 through the MIR 5.0.0 implementation-and-release goal. The focused contracts are current normative requirements. Their document status does not assert implementation, native acceptance or API stability; those gates remain separately recorded and incomplete. The explanatory pseudocode is subordinate to these contracts.
 
 Use this order to resolve conflicts: explicit current maintainer decisions and preserved player obligations; actual target-engine constraints; this specification; implementation and independent tests; explanatory documentation and agent task packets. Engine facts constrain feasibility, not product priority. When obligations conflict with an engine restriction, expose the conflict and obtain a documented decision. Never erase a user obligation by editing a test or an architectural slogan.
 
