@@ -2,12 +2,12 @@ local TARGETS = {
   f200 = {
     case = "legacy-boolean-cap-current-f200", base = "2.0.77", mir = "5.0.20000", fixture = "0.2.0",
     prefix = "mir5-legacy-boolean-cap-f200", restored_label = "F200 restored player",
-    completed_label = "F200 post-lab player", science_tool_durability = 1,
+    completed_label = "F200 post-lab player", science_tool_durability = 1, research_unit_energy = 300,
   },
   f210 = {
     case = "legacy-boolean-cap-current-f210", base = "2.1.23", mir = "5.0.21000", fixture = "0.3.0",
     prefix = "mir5-legacy-boolean-cap-f210", restored_label = "F210 direct restored player",
-    completed_label = "F210 direct post-lab player", reject_space_age = true,
+    completed_label = "F210 direct post-lab player", reject_space_age = true, research_unit_energy = 60,
   },
 }
 
@@ -133,9 +133,19 @@ local function freeze_lab(state)
   if value.energy ~= 0 then fail("source player lab did not freeze after completion") end
 end
 
-local function assert_acceleration(value)
-  if value.research_unit_count ~= 1 or not close(value.research_unit_energy, 60) then
-    fail("fixture did not retain one-unit one-second native research")
+local function assert_acceleration(state, value)
+  if value.research_unit_count ~= 1 or not close(value.research_unit_energy, target.research_unit_energy) then
+    fail("fixture did not retain the target-specific one-unit native research duration")
+  end
+  if target.science_tool_durability ~= nil then
+    local modifier = game.forces.player.laboratory_speed_modifier
+    if not close(modifier, 0) then fail("F200 laboratory speed modifier differs") end
+    local lab = read_lab(state)
+    local modules = lab.get_module_inventory()
+    if modules == nil or type(modules.is_empty) ~= "function" then
+      fail("F200 lab module inventory is absent")
+    end
+    if modules.is_empty() ~= true then fail("F200 lab module inventory is not empty") end
   end
 end
 
@@ -163,7 +173,7 @@ local function assert_source(state)
   assert_status(player, {level = 3, researched = false, enabled = true, visible = true,
     maximum = UINT32_MAX, bonus = .20, saved_progress = .27}, target.restored_label)
   assert_foreign(game.forces[state.foreign_force_index], state.foreign_queue)
-  assert_acceleration(technology(game.forces.player, GEAR))
+  assert_acceleration(state, technology(game.forces.player, GEAR))
   return player
 end
 
@@ -172,6 +182,7 @@ local function assert_completed(state)
   assert_status(status(game.forces.player), {level = 4, researched = false, enabled = true, visible = true,
     maximum = UINT32_MAX, bonus = .30}, target.completed_label)
   assert_foreign(game.forces[state.foreign_force_index], state.foreign_queue)
+  assert_acceleration(state, technology(game.forces.player, GEAR))
   local _, inventory = read_lab(state)
   for _, name in ipairs(SCIENCE) do
     if target.science_tool_durability ~= nil then
