@@ -197,8 +197,11 @@
       "state_obligation_disposition": "No control.lua exists in the 1.0.0 tag tree. Absent migration Lua is not proof that a source save has no obligation; preserve data-stage identities and require native source-save evidence."
     },
     "intermediate_1_to_3_runtime_schema_evolution": {
-      "status": "pending",
-      "scope": "This unit records each tag's info.json and migration-member bodies, not a completed control.lua/runtime-state evolution audit for every intermediate 1.x-3.x tag."
+      "status": "39-modern-tag-control-topologies-and-representative-writers-characterized-not-archive-save-native-qualified",
+      "scope": "19 F200 and20 F210 direct-current-engine MIR1-MIR3 tag sources; seven data-only, seven legacy wrappers,25 stage wrappers. The25 older-engine origins remain outside this runtime audit.",
+      "receipt": "spec/evidence/historical-modern-tag-runtime-boundaries.json",
+      "receipt_sha256": "39BA333B289F504AC32D299AB7CEF915BE84BB54D6410A60B654A32E974D1781",
+      "remaining": "Published-body and protected-source-save equivalence, every actual source/candidate/save/two-reload route, and field-specific recovery applicability remain separate obligations."
     },
     "published_boolean_cap_controllers": {
       "status": "eight-public-original-archive-bodies-verified-not-native-qualified",
@@ -1318,9 +1321,10 @@
         }
       ],
       "direct_current_engine_status": "direct-f200-origin",
-      "archive_sha256": null,
-      "archive_byte_status": "tag-source-characterized-archive-not-byte-verified",
-      "native_status": "not_run"
+      "archive_sha256": "251EFDAB4983CDFF0E2C150304DF7B7846EDEA6E1B5B0927C3FBBD8449E65DAB",
+      "archive_byte_status": "verified-official-archive-info-controller-only-not-native-qualified",
+      "native_status": "not_run",
+      "archive_readback": "spec/evidence/historical-boolean-cap-f200-archive-metadata.json"
     },
     {
       "tag": "2.5.11",
@@ -1347,9 +1351,10 @@
         }
       ],
       "direct_current_engine_status": "direct-f200-origin",
-      "archive_sha256": null,
-      "archive_byte_status": "tag-source-characterized-archive-not-byte-verified",
-      "native_status": "not_run"
+      "archive_sha256": "4AE3DA83C4F8CB7D084891065387B78032BB25B8E4ED3948058D9B773070847C",
+      "archive_byte_status": "verified-official-archive-info-controller-only-not-native-qualified",
+      "native_status": "not_run",
+      "archive_readback": "spec/evidence/historical-boolean-cap-f200-archive-metadata.json"
     },
     {
       "tag": "3.0.0",
@@ -1751,9 +1756,10 @@
         }
       ],
       "direct_current_engine_status": "direct-f210-origin",
-      "archive_sha256": null,
-      "archive_byte_status": "tag-source-characterized-archive-not-byte-verified",
-      "native_status": "not_run"
+      "archive_sha256": "5D88F2F971622E04846F6FC26859777F429C71FE34ECD9250AB2BA56B9A4C1B7",
+      "archive_byte_status": "verified-official-archive-info-controller-only-not-native-qualified",
+      "native_status": "not_run",
+      "archive_readback": "spec/evidence/historical-boolean-cap-archive-metadata.json"
     },
     {
       "tag": "3.2.11",
@@ -1782,9 +1788,10 @@
         }
       ],
       "direct_current_engine_status": "direct-f210-origin",
-      "archive_sha256": null,
-      "archive_byte_status": "tag-source-characterized-archive-not-byte-verified",
-      "native_status": "not_run"
+      "archive_sha256": "5B0252C3E1B8A20FF8E31F408F0217DDC77D2DF0D1C15F59653E948472870A5A",
+      "archive_byte_status": "verified-official-archive-info-controller-only-not-native-qualified",
+      "native_status": "not_run",
+      "archive_readback": "spec/evidence/historical-boolean-cap-archive-metadata.json"
     }
   ],
   "migration_member_audit": {
@@ -2141,7 +2148,7 @@
           "archive_sha256": "6395C4A5A0F74C67729746D0FBF6162329978B47C5C29D54CC0045F2977C7E44",
           "source_case": "not_run",
           "final_5_x_case": "not_run",
-          "disposition": "requires-exact-archive-and-native-source-save"
+          "disposition": "archive-verified-requires-native-source-save-and-successor-qualification"
         },
         {
           "origin_tag": "1.1.5",
@@ -2157,7 +2164,7 @@
           "archive_sha256": "880C137F7AB35FE7AF1DA5538BFA91F620C80785134DB488800352DD6154AB22",
           "source_case": "not_run",
           "final_5_x_case": "not_run",
-          "disposition": "requires-exact-archive-and-native-source-save"
+          "disposition": "archive-verified-requires-native-source-save-and-successor-qualification"
         },
         {
           "origin_tag": "1.2.5",
@@ -2266,18 +2273,18 @@
         {
           "origin_tag": "2.5.10",
           "factorio_version": "2.0",
-          "archive_sha256": null,
+          "archive_sha256": "251EFDAB4983CDFF0E2C150304DF7B7846EDEA6E1B5B0927C3FBBD8449E65DAB",
           "source_case": "not_run",
           "final_5_x_case": "not_run",
-          "disposition": "requires-exact-archive-and-native-source-save"
+          "disposition": "archive-verified-requires-native-source-save-and-successor-qualification"
         },
         {
           "origin_tag": "2.5.11",
           "factorio_version": "2.0",
-          "archive_sha256": null,
+          "archive_sha256": "4AE3DA83C4F8CB7D084891065387B78032BB25B8E4ED3948058D9B773070847C",
           "source_case": "not_run",
           "final_5_x_case": "not_run",
-          "disposition": "requires-exact-archive-and-native-source-save"
+          "disposition": "archive-verified-requires-native-source-save-and-successor-qualification"
         },
         {
           "origin_tag": "2.0.0",
@@ -2426,18 +2433,18 @@
         {
           "origin_tag": "3.2.10",
           "factorio_version": "2.1",
-          "archive_sha256": null,
+          "archive_sha256": "5D88F2F971622E04846F6FC26859777F429C71FE34ECD9250AB2BA56B9A4C1B7",
           "source_case": "not_run",
           "final_5_x_case": "not_run",
-          "disposition": "requires-exact-archive-and-native-source-save"
+          "disposition": "archive-verified-requires-native-source-save-and-successor-qualification"
         },
         {
           "origin_tag": "3.2.11",
           "factorio_version": "2.1",
-          "archive_sha256": null,
+          "archive_sha256": "5B0252C3E1B8A20FF8E31F408F0217DDC77D2DF0D1C15F59653E948472870A5A",
           "source_case": "not_run",
           "final_5_x_case": "not_run",
-          "disposition": "requires-exact-archive-and-native-source-save"
+          "disposition": "archive-verified-requires-native-source-save-and-successor-qualification"
         }
       ]
     },
@@ -3251,7 +3258,7 @@
     "Exact 1.0.0 is F200-direct by its info.json factorio_version 2.0 and must not be moved into the older-engine bridge population.",
     "The 25 non-F200/F210 tag origins remain explicit best-effort bridge cases. Existing F017/F100/F110 evidence is useful only at its recorded exact inputs.",
     "Existing MIR4 source and cross-engine chains are retained as scoped reuse candidates, not relabelled as current 5.x acceptance.",
-    "Intermediate 1.x-3.x control.lua/runtime schema evolution is not inferred from the absence of migration Lua and remains pending source-boundary audit.",
+    "The39 modern MIR1-MIR3 tag control topologies and13 representative writer modules are recorded in historical-modern-tag-runtime-boundaries.json. Published archive bodies, actual saved-state ownership and native upgrades are not inferred; the25 older-engine runtime origins remain outside that audit.",
     "No fixture, save, profile, package, direct library, engine, or artifact is changed by this inventory.",
     "All 18 MIR4 release records and their 36 modern archives now have byte-verified identities and actual info/controller observations. Protected source-save availability, per-origin state oracles and native upgrades remain pending except for separately recorded exact scoped evidence.",
     "Early MIR4 raw source info.json can retain an earlier product version; do not construct a historical distribution by repackaging that raw metadata or infer package eligibility from it. Verify the published archive and its actual info.json.",
