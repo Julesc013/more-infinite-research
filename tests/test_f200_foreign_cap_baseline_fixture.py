@@ -24,6 +24,11 @@ ENGINE_SHA = "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B"
 OBSERVER_SHA = "723D1E7721449FC26040E5E6629416767BDC20AD79CF8723115846DB662A1F87"
 MIR_SHA = "BD1B88D7DE85489207F71C1B080FD61617FAEF9655370BF0332A51579308ECE3"
 STAGES = {"source": ("0.1.0", 0), "finite": ("0.2.0", 1), "relaxed": ("0.3.0", 0)}
+PROFILES = {
+    "source": ROOT / "tests" / "profiles" / "f200-foreign-cap-baseline-source-2077.json",
+    "finite": ROOT / "tests" / "profiles" / "f200-foreign-cap-baseline-finite-2077.json",
+    "relaxed": ROOT / "tests" / "profiles" / "f200-foreign-cap-baseline-relaxed-2077.json",
+}
 
 
 def lua_value(lua, value):
@@ -256,6 +261,37 @@ end
                 result = self.data_result("finite", opponent)
                 self.assertFalse(result["ok"])
                 self.assertIn(phrase, result["message"])
+
+    def test_prepared_profiles_bind_only_f200_current_mir_observer_and_each_tiny_stage(self):
+        expected_common = [
+            ("base", "2.0.77", True),
+            ("mir-fixture-mir5-active-mods-observer", "0.1.0", True),
+            ("more-infinite-research", "5.0.20000", True),
+        ]
+        fixture_hashes = {
+            "source": "F37D3628B918E9649967C0F1C7E3B9ACE07C696CB54D00DD30C2B110F8D95CFC",
+            "finite": "18EEB497CAF09C1AD4BA0DCB044C633AADB34BADCD1DE3B820E889AE8B25860F",
+            "relaxed": "81D15678E0D8BF00EFD987672502289020DDC55F2EB2A2F262F2E6C07D23BA96",
+        }
+        for stage, (version, _) in STAGES.items():
+            with self.subTest(stage=stage):
+                profile = json.loads(PROFILES[stage].read_text(encoding="utf-8"))
+                self.assertEqual((1, f"mir5-f200-foreign-cap-baseline-{stage}", "f200", "2.0", "Defaults"),
+                                 (profile["schema"], profile["kind"], profile["target"],
+                                  profile["factorio_line"], profile["settings_mode"]))
+                self.assertEqual({"version": "2.0.77", "sha256": ENGINE_SHA}, profile["engine"])
+                self.assertEqual(expected_common + [(NAME, version, True)],
+                                 [(row["name"], row["version"], row["enabled"]) for row in profile["mods"]])
+                self.assertEqual({
+                    "mir-fixture-mir5-active-mods-observer_0.1.0.zip": OBSERVER_SHA,
+                    "more-infinite-research_5.0.20000.zip": MIR_SHA,
+                    f"{NAME}_{version}.zip": fixture_hashes[stage],
+                }, profile["archive_sha256"])
+                self.assertIn("no native pass", profile["scope"])
+                if stage == "source":
+                    self.assertNotIn("InputSavePath", profile["scope"])
+                else:
+                    self.assertIn("InputSavePath/ExpectedInputSaveSha256", profile["scope"])
 
     def test_wrappers_register_without_parse_time_native_access_and_load_is_read_only(self):
         for stage, (version, _) in STAGES.items():
