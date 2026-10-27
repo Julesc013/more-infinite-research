@@ -154,10 +154,10 @@
     "bobvehicleequipment_3.0.0.zip": "BFAE596FFFCC88C3CDCB0A7FB07B72B2314D05AAEDED520F83292D35AB3B2146",
     "bobwarfare_3.0.2.zip": "535CFECE8A712650959FA172290A43E9DBC290BA4F3CD21B9CC6DE621726A0EA",
     "mir-fixture-mir5-active-mods-observer_0.1.0.zip": "A15A7D628D66953D2E0C4D4FA288F47CBF9C5678327C7EB3D23ADB5DC78331C0",
-    "more-infinite-research_5.0.21000.zip": "0D4C19C6A2C9FED241B77A9752132BA452D7357B8B86B1AA6CA7DB7372CD0FE6",
-    "mir-fixture-mir5-bob-core-gameplay_0.1.0.zip": "4CCB640EE064ECF8DBBE504CD343AB073AB86DE18EC6BB66109374C102EDA7B7"
+    "more-infinite-research_5.0.21000.zip": "8F858F6B7E604757DE84D960E7D7701021B956782C65A13978E3AFD711F7B071",
+    "mir-fixture-mir5-bob-core-gameplay_0.1.0.zip": "C51A77C317F41839ECBC3FECA3A548838642CE07D186E30635D6B8C78B03849D"
   },
-  "scope": "Private F210 2.1.23 full-Bob plus Space Age material gameplay input. The existing independent sparse-Bob fixture expectations are unchanged: seven named families, 28 real lab completions, two untouched alloy routes before and after earned productivity, saved witness and two cold reloads. Admission and actual gameplay remain required; this profile is not a result. The five added material pairs were absent from q006 published B6, so B6 is not used as an equality oracle for those additions. This does not qualify all full-Bob technologies, default research timing, migration, clients or performance.",
+  "scope": "Private F210 2.1.23 full-Bob plus Space Age material gameplay input. Preserve the exact q006 upstream closure and independent seven-family/28-lab expectations. The expanded five-route physical witness covers bronze, gunmetal, invar, nitinol and the actual molten-copper/metallurgy copper-tungsten route, including the foundry inherent 50% baseline, native 8% MIR recipe bonus, saved state and two cold reloads. Admission and actual native execution remain required. The five material pairs were absent from q006 published B6, so B6 is not an equality oracle for those additions. No whole-modset, ordinary tuning, migration, client or performance qualification follows.",
   "source_selection": {
     "path": "tests/profiles/bob-full-space-age-f210-2123.json",
     "sha256": "47A538A60B8B9446FA525B5FEFE2E7C2AA4D32C357BE45276748FC2F28C9A1D4",
