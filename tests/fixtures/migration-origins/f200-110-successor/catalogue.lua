@@ -33,6 +33,7 @@ return {
   source_fixture_version = "0.1.0",
   targets = {
     f200 = {base = "2.0.77", mir = "5.0.20000", fixture = "0.2.0"},
+    f200_source_defaults = {base = "2.0.77", mir = "5.0.20000", fixture = "0.3.0"},
     f210 = {base = "2.1.23", mir = "5.0.21000", fixture = "0.3.0"},
     -- This wrapper supplies only the two published 1.1 startup values whose
     -- current Defaults values differ.  It is a concrete input arm, not an

@@ -1,5 +1,7 @@
 local FIXTURE = "mir-fixture-mir5-migration-origin-f200-110-source"
-assert(mods.base == "2.1.23" and mods["more-infinite-research"] == "5.0.21000" and mods[FIXTURE] == "0.4.0",
+local selected = (mods.base == "2.0.77" and mods["more-infinite-research"] == "5.0.20000" and mods[FIXTURE] == "0.3.0")
+  or (mods.base == "2.1.23" and mods["more-infinite-research"] == "5.0.21000" and mods[FIXTURE] == "0.4.0")
+assert(selected,
   "[mir5-migration-origin-f200-110-successor] unexpected source-default settings closure")
 
 local values = {

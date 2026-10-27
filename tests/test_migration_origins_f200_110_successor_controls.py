@@ -14,6 +14,7 @@ FIXTURE = ROOT / "tests/fixtures/migration-origins/f200-110-successor"
 SOURCE_FIXTURE = ROOT / "tests/fixtures/migration-origins/f200-110-source"
 F200_PROFILE = ROOT / "tests/profiles/migration-origins-1.1.0-successor-f200-2077.json"
 F210_PROFILE = ROOT / "tests/profiles/migration-origins-1.1.0-successor-f210-2123.json"
+F200_SOURCE_DEFAULTS_INFO = FIXTURE / "info-f200-source-defaults.json"
 F210_SOURCE_DEFAULTS_PROFILE = ROOT / "tests/profiles/migration-origins-1.1.0-successor-f210-source-defaults-2123.json"
 F210_SOURCE_DEFAULTS_INFO = FIXTURE / "info-f210-source-defaults.json"
 LEGACY_MODULE_DEFINITIONS = ROOT / "source/research/legacy_module_credit_definitions.lua"
@@ -179,11 +180,13 @@ class MigrationOriginF200110SuccessorControls(unittest.TestCase):
     def test_successor_wrappers_retain_the_source_fixture_identity_and_only_change_the_targeted_wrapper_version(self):
         source = json.loads((SOURCE_FIXTURE / "info.json").read_text(encoding="utf-8"))
         f200 = json.loads((FIXTURE / "info-f200.json").read_text(encoding="utf-8"))
+        f200_source_defaults = json.loads(F200_SOURCE_DEFAULTS_INFO.read_text(encoding="utf-8"))
         f210 = json.loads((FIXTURE / "info-f210.json").read_text(encoding="utf-8"))
         source_defaults = json.loads(F210_SOURCE_DEFAULTS_INFO.read_text(encoding="utf-8"))
         source_version = tuple(map(int, source["version"].split(".")))
         for wrapper, base, mir, version in (
             (f200, "2.0", "5.0.20000", "0.2.0"),
+            (f200_source_defaults, "2.0", "5.0.20000", "0.3.0"),
             (f210, "2.1", "5.0.21000", "0.3.0"),
             (source_defaults, "2.1", "5.0.21000", "0.4.0"),
         ):
@@ -204,9 +207,12 @@ class MigrationOriginF200110SuccessorControls(unittest.TestCase):
                 "mir-fixture-mir5-migration-origin-f200-110-source": "0.3.0"}
         f210_source_defaults = dict(f210)
         f210_source_defaults["mir-fixture-mir5-migration-origin-f200-110-source"] = "0.4.0"
+        f200_source_defaults = dict(f200)
+        f200_source_defaults["mir-fixture-mir5-migration-origin-f200-110-source"] = "0.3.0"
         source_settings = self.source_settings()
         for label, mods, effective_settings in (
             ("f200", f200, {}),
+            ("f200-source-defaults", f200_source_defaults, source_settings),
             ("f210", f210, {}),
             ("f210-source-defaults", f210_source_defaults, source_settings),
         ):
@@ -250,31 +256,37 @@ class MigrationOriginF200110SuccessorControls(unittest.TestCase):
                 self.assertEqual(before["sentinel"], rejected["raw"]["sentinel"])
 
     def test_settings_updates_stages_only_the_two_published_default_differences(self):
-        mods = {"base": "2.1.23", "more-infinite-research": "5.0.21000",
-                "mir-fixture-mir5-migration-origin-f200-110-source": "0.4.0"}
         raw = {"bool-setting": {
             "ips-require-space-gate": {"type": "bool-setting", "name": "ips-require-space-gate", "default_value": False},
             "ips-enable-research_inventory_capacity": {"type": "bool-setting", "name": "ips-enable-research_inventory_capacity", "default_value": True},
             "untouched": {"type": "bool-setting", "name": "untouched", "default_value": True},
         }}
-        accepted = self.run_settings_update(raw, mods)
-        self.assertTrue(accepted["ok"], accepted["message"])
-        settings = accepted["raw"]["bool-setting"]
-        self.assertEqual((True, False, True),
-                         (settings["ips-require-space-gate"]["default_value"],
-                          settings["ips-enable-research_inventory_capacity"]["default_value"],
-                          settings["untouched"]["default_value"]))
-        for label, path, value in (
-            ("gate-current", "ips-require-space-gate", True),
-            ("inventory-current", "ips-enable-research_inventory_capacity", False),
-        ):
-            with self.subTest(label=label):
-                opponent = copy.deepcopy(raw)
-                opponent["bool-setting"][path]["default_value"] = value
-                rejected = self.run_settings_update(opponent, mods)
-                self.assertFalse(rejected["ok"])
-                self.assertIn("startup setting prototype differs", rejected["message"])
-                self.assertEqual(opponent, rejected["raw"])
+        closures = (
+            ("f200", {"base": "2.0.77", "more-infinite-research": "5.0.20000",
+                        "mir-fixture-mir5-migration-origin-f200-110-source": "0.3.0"}),
+            ("f210", {"base": "2.1.23", "more-infinite-research": "5.0.21000",
+                        "mir-fixture-mir5-migration-origin-f200-110-source": "0.4.0"}),
+        )
+        for target, mods in closures:
+            with self.subTest(target=target):
+                accepted = self.run_settings_update(raw, mods)
+                self.assertTrue(accepted["ok"], accepted["message"])
+                settings = accepted["raw"]["bool-setting"]
+                self.assertEqual((True, False, True),
+                                 (settings["ips-require-space-gate"]["default_value"],
+                                  settings["ips-enable-research_inventory_capacity"]["default_value"],
+                                  settings["untouched"]["default_value"]))
+                for label, path, value in (
+                    ("gate-current", "ips-require-space-gate", True),
+                    ("inventory-current", "ips-enable-research_inventory_capacity", False),
+                ):
+                    with self.subTest(label=label):
+                        opponent = copy.deepcopy(raw)
+                        opponent["bool-setting"][path]["default_value"] = value
+                        rejected = self.run_settings_update(opponent, mods)
+                        self.assertFalse(rejected["ok"])
+                        self.assertIn("startup setting prototype differs", rejected["message"])
+                        self.assertEqual(opponent, rejected["raw"])
 
     def test_control_registers_without_runtime_access_and_refuses_missing_source_before_candidate_writes(self):
         path = (FIXTURE / "control.lua").as_posix()
@@ -434,7 +446,7 @@ class MigrationOriginF200110SuccessorControls(unittest.TestCase):
                 return assert(loadfile(legacy_module_runtime_path,"t",env))()
               end
               if name=="platform.target" then
-                if target=="f200" then return {id="f200",recipe_productivity=true,distribution_version="5.0.20000"} end
+              if target=="f200" or target=="f200_source_defaults" then return {id="f200",recipe_productivity=true,distribution_version="5.0.20000"} end
                 return {id="f210",recipe_productivity=true,distribution_version="5.0.21000"}
               end
               error("unexpected module: "..tostring(name))
@@ -592,6 +604,9 @@ class MigrationOriginF200110SuccessorControls(unittest.TestCase):
             if target=="f200" then
               env.script.active_mods={base="2.0.77",["more-infinite-research"]="5.0.20000",
                 [active_wrapper_name]="0.2.0",["mir-fixture-mir5-active-mods-observer"]="0.1.0"}
+            elseif target=="f200_source_defaults" then
+              env.script.active_mods={base="2.0.77",["more-infinite-research"]="5.0.20000",
+                [active_wrapper_name]="0.3.0",["mir-fixture-mir5-active-mods-observer"]="0.1.0"}
             elseif target=="f210_source_defaults" then
               env.script.active_mods={base="2.1.23",["more-infinite-research"]="5.0.21000",
                 [active_wrapper_name]="0.4.0",["mir-fixture-mir5-active-mods-observer"]="0.1.0"}
@@ -685,6 +700,7 @@ class MigrationOriginF200110SuccessorControls(unittest.TestCase):
         source = json.loads((SOURCE_FIXTURE / "info.json").read_text(encoding="utf-8"))
         wrappers = {
             "f200": json.loads((FIXTURE / "info-f200.json").read_text(encoding="utf-8")),
+            "f200_source_defaults": json.loads(F200_SOURCE_DEFAULTS_INFO.read_text(encoding="utf-8")),
             "f210": json.loads((FIXTURE / "info-f210.json").read_text(encoding="utf-8")),
             "f210_source_defaults": json.loads(F210_SOURCE_DEFAULTS_INFO.read_text(encoding="utf-8")),
         }

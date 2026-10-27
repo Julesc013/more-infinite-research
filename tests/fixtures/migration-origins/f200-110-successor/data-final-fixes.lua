@@ -14,7 +14,7 @@ if selected == "f210" or selected == "f210_source_defaults" then
     "[mir5-migration-origin-f200-110-successor] F210 direct source successor excludes the separate planet-repair route")
 end
 
-if selected == "f210_source_defaults" then
+if selected == "f200_source_defaults" or selected == "f210_source_defaults" then
   for name, expected in pairs(catalogue.settings) do
     local value = settings and settings.startup and settings.startup[name]
     local actual = value and value.value
