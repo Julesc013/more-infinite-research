@@ -56,7 +56,8 @@ Version: @DISTRIBUTION_VERSION@
     - Accept an explicit native 300% recipe ceiling as equivalent to omission in Factorio 2.0 Bob/Angel bindings.
     - Keep graphics-only Krastorio asset mods from selecting an absent overhaul or suppressing unrelated compatibility bindings.
     - Apply the existing growth-factor ceiling of 1000 to native setting bounds, preserving defaults and zero inheritance.
-    - Keep the first-upgrade preference safeguard when upgrading an earned Factorio 2.0 save from MIR 4.7.3.
+    - Keep the first-upgrade preference safeguard when upgrading an earned Factorio 2.0 save from MIR 4.7.3, including same-name
+      local builds with a private distribution version.
     - Refresh relevant open Research Library views after native research, queue and force events without changing research state.
     - Preserve in-flight Library translations across client load and retry expired requests in deterministic order.
     - Avoid global science-unlock and foreign-research discovery during ordinary research construction.
@@ -84,6 +85,8 @@ Version: @DISTRIBUTION_VERSION@
       best-effort GitHub distributions as their adapters become buildable.
     - Exact engine minimums and available features depend on the selected target; Factorio 2.1 requires base 2.1.23.
     - Use one shared master changelog for all editions; historical entries retain their original release and engine scope.
+    - Keep local replacement build versions consistent across package metadata, changelog and public API queries; selecting another
+      engine edition requires target adaptation.
     - Offer optional fixed finite F006–F012 builds from the shared source, with readable museum research names and explicit
       best-effort limits; current native and save qualification is absent.
 
