@@ -9,9 +9,20 @@ for name, expected in pairs(catalogue.targets) do
   end
 end
 assert(selected ~= nil, "[mir5-migration-origin-f200-110-successor] exact target closure differs")
-if selected == "f210" or selected == "f210_modules_disabled" then
+if selected == "f210" or selected == "f210_source_defaults" or selected == "f210_source_defaults_modules_disabled" then
   assert(mods["space-age"] == nil and mods["elevated-rails"] == nil and mods.quality == nil and mods.recycler == nil,
     "[mir5-migration-origin-f200-110-successor] F210 direct source successor excludes the separate planet-repair route")
+end
+
+if selected == "f200_source_defaults" or selected == "f210_source_defaults" or selected == "f210_source_defaults_modules_disabled" then
+  for name, expected in pairs(catalogue.settings) do
+    if name == "ips-enable-research_modules" then expected = selected_target.modules_enabled end
+    local value = settings and settings.startup and settings.startup[name]
+    local actual = value and value.value
+    assert(actual == expected,
+      "[mir5-migration-origin-f200-110-successor] effective startup setting differs: " .. name
+        .. " expected=" .. tostring(expected) .. " actual=" .. tostring(actual))
+  end
 end
 
 local module_setting = settings and settings.startup and settings.startup["ips-enable-research_modules"]

@@ -14,8 +14,12 @@ FIXTURE = ROOT / "tests/fixtures/migration-origins/f200-110-successor"
 SOURCE_FIXTURE = ROOT / "tests/fixtures/migration-origins/f200-110-source"
 F200_PROFILE = ROOT / "tests/profiles/migration-origins-1.1.0-successor-f200-2077.json"
 F210_PROFILE = ROOT / "tests/profiles/migration-origins-1.1.0-successor-f210-2123.json"
-F210_MODULES_DISABLED_PROFILE = ROOT / "tests/profiles/migration-origins-1.1.0-successor-f210-modules-disabled-2123.json"
-F210_MODULES_DISABLED_INFO = FIXTURE / "info-f210-modules-disabled.json"
+F200_SOURCE_DEFAULTS_INFO = FIXTURE / "info-f200-source-defaults.json"
+F200_SOURCE_DEFAULTS_PROFILE = ROOT / "tests/profiles/migration-origins-1.1.0-successor-f200-source-defaults-2077.json"
+F210_SOURCE_DEFAULTS_PROFILE = ROOT / "tests/profiles/migration-origins-1.1.0-successor-f210-source-defaults-2123.json"
+F210_SOURCE_DEFAULTS_INFO = FIXTURE / "info-f210-source-defaults.json"
+F210_SOURCE_DEFAULTS_MODULES_DISABLED_INFO = FIXTURE / "info-f210-source-defaults-modules-disabled.json"
+F210_SOURCE_DEFAULTS_MODULES_DISABLED_PROFILE = ROOT / "tests/profiles/migration-origins-1.1.0-successor-f210-source-defaults-modules-disabled-2123.json"
 LEGACY_MODULE_DEFINITIONS = ROOT / "source/research/legacy_module_credit_definitions.lua"
 LEGACY_MODULE_RUNTIME = ROOT / "source/runtime/legacy_module_credits.lua"
 DIRECT = "recipe-prod-research_gears-1"
@@ -75,19 +79,24 @@ class MigrationOriginF200110SuccessorControls(unittest.TestCase):
                       "effects": [{"type": "change-recipe-productivity", "recipe": "speed-module", "change": .10}]},
         }, "sentinel": {"unchanged": 43}}
 
-    def run_data(self, raw, mods, modules_enabled=True):
+    def source_settings(self):
+        catalogue_path = (FIXTURE / "catalogue.lua").as_posix()
+        self.lua.globals().catalogue_path = catalogue_path
+        self.lua.execute("function migration_origin_110_successor_settings() return assert(loadfile(catalogue_path))().settings end")
+        return py(self.lua.eval("migration_origin_110_successor_settings")())
+
+    def run_data(self, raw, mods, setting_values=None):
         catalogue_path = (FIXTURE / "catalogue.lua").as_posix()
         data_path = (FIXTURE / "data-final-fixes.lua").as_posix()
         self.lua.globals().catalogue_path = catalogue_path
         self.lua.globals().data_path = data_path
         self.lua.execute(r'''
-          function migration_origin_110_successor_data(raw, mods, modules_enabled)
-            local guarded_raw=setmetatable(raw,{__index=function(_,key)
-              if key=="bool-setting" then error("data stage must not read raw setting prototypes") end
-              return nil
+          function migration_origin_110_successor_data(raw, mods, setting_values)
+            local env={data={raw=raw},mods=mods,settings={startup={}}}
+            for name,value in pairs(setting_values) do env.settings.startup[name]={value=value} end
+            setmetatable(raw,{__index=function(_,key)
+              if key=="bool-setting" then error("data stage must not read setting prototypes") end
             end})
-            local env={data={raw=guarded_raw},mods=mods,
-              settings={startup={ ["ips-enable-research_modules"]={value=modules_enabled} }}}
             env.require=function(name)
               assert(name=="__mir-fixture-mir5-migration-origin-f200-110-source__/catalogue")
               return assert(loadfile(catalogue_path,"t",env))()
@@ -97,20 +106,21 @@ class MigrationOriginF200110SuccessorControls(unittest.TestCase):
             return {ok=ok,message=tostring(message),raw=raw}
           end
         ''')
-        return py(self.lua.eval("migration_origin_110_successor_data")(lua(self.lua, copy.deepcopy(raw)), lua(self.lua, mods), modules_enabled))
+        values = self.source_settings() if setting_values is None else setting_values
+        return py(self.lua.eval("migration_origin_110_successor_data")(lua(self.lua, copy.deepcopy(raw)), lua(self.lua, mods), lua(self.lua, values)))
 
     def run_settings_update(self, raw, mods):
-        path = (FIXTURE / "settings-updates.lua").as_posix()
-        self.lua.globals().settings_update_path = path
+        settings_path = (FIXTURE / "settings-updates.lua").as_posix()
+        self.lua.globals().settings_path = settings_path
         self.lua.execute(r'''
-          function migration_origin_110_successor_settings(raw, mods)
+          function migration_origin_110_successor_settings_update(raw, mods)
             local env={data={raw=raw},mods=mods}
             env._G=env;setmetatable(env,{__index=_G})
-            local ok,message=pcall(function() assert(loadfile(settings_update_path,"t",env))() end)
+            local ok,message=pcall(function() assert(loadfile(settings_path,"t",env))() end)
             return {ok=ok,message=tostring(message),raw=raw}
           end
         ''')
-        return py(self.lua.eval("migration_origin_110_successor_settings")(lua(self.lua, copy.deepcopy(raw)), lua(self.lua, mods)))
+        return py(self.lua.eval("migration_origin_110_successor_settings_update")(lua(self.lua, copy.deepcopy(raw)), lua(self.lua, mods)))
 
     def test_catalogue_pins_all_31_old_rows_and_the_separate_worker_battery_fact(self):
         catalogue_path = (FIXTURE / "catalogue.lua").as_posix()
@@ -179,13 +189,17 @@ class MigrationOriginF200110SuccessorControls(unittest.TestCase):
     def test_successor_wrappers_retain_the_source_fixture_identity_and_only_change_the_targeted_wrapper_version(self):
         source = json.loads((SOURCE_FIXTURE / "info.json").read_text(encoding="utf-8"))
         f200 = json.loads((FIXTURE / "info-f200.json").read_text(encoding="utf-8"))
+        f200_source_defaults = json.loads(F200_SOURCE_DEFAULTS_INFO.read_text(encoding="utf-8"))
         f210 = json.loads((FIXTURE / "info-f210.json").read_text(encoding="utf-8"))
-        disabled = json.loads(F210_MODULES_DISABLED_INFO.read_text(encoding="utf-8"))
+        source_defaults = json.loads(F210_SOURCE_DEFAULTS_INFO.read_text(encoding="utf-8"))
+        disabled = json.loads(F210_SOURCE_DEFAULTS_MODULES_DISABLED_INFO.read_text(encoding="utf-8"))
         source_version = tuple(map(int, source["version"].split(".")))
         for wrapper, base, mir, version in (
             (f200, "2.0", "5.0.20000", "0.2.0"),
+            (f200_source_defaults, "2.0", "5.0.20000", "0.3.0"),
             (f210, "2.1", "5.0.21000", "0.3.0"),
-            (disabled, "2.1", "5.0.21000", "0.4.0"),
+            (source_defaults, "2.1", "5.0.21000", "0.4.0"),
+            (disabled, "2.1", "5.0.21000", "0.5.0"),
         ):
             with self.subTest(version=version):
                 self.assertEqual(source["name"], wrapper["name"])
@@ -195,23 +209,38 @@ class MigrationOriginF200110SuccessorControls(unittest.TestCase):
                 self.assertNotEqual(RETIRED_SUCCESSOR_NAME, wrapper["name"])
                 self.assertGreater(tuple(map(int, wrapper["version"].split("."))), source_version)
 
-    def test_data_guard_admits_exact_enabled_and_disabled_module_targets_without_raw_setting_reads(self):
+    def test_data_guard_admits_only_exact_candidate_targets_with_the_published_effective_settings(self):
         f200 = {"base": "2.0.77", "more-infinite-research": "5.0.20000",
                 "mir-fixture-mir5-active-mods-observer": "0.1.0",
                 "mir-fixture-mir5-migration-origin-f200-110-source": "0.2.0"}
         f210 = {"base": "2.1.23", "more-infinite-research": "5.0.21000",
                 "mir-fixture-mir5-active-mods-observer": "0.1.0",
                 "mir-fixture-mir5-migration-origin-f200-110-source": "0.3.0"}
-        disabled = dict(f210); disabled["mir-fixture-mir5-migration-origin-f200-110-source"] = "0.4.0"
-        for label, mods in (("f200", f200), ("f210", f210)):
+        f210_source_defaults = dict(f210)
+        f210_source_defaults["mir-fixture-mir5-migration-origin-f200-110-source"] = "0.4.0"
+        f200_source_defaults = dict(f200)
+        f200_source_defaults["mir-fixture-mir5-migration-origin-f200-110-source"] = "0.3.0"
+        disabled = dict(f210)
+        disabled["mir-fixture-mir5-migration-origin-f200-110-source"] = "0.5.0"
+        source_settings = self.source_settings()
+        normal_settings = {"ips-enable-research_modules": True}
+        disabled_settings = dict(source_settings)
+        disabled_settings["ips-enable-research_modules"] = False
+        for label, raw, mods, effective_settings in (
+            ("f200", self.candidate_raw(), f200, normal_settings),
+            ("f200-source-defaults", self.candidate_raw(), f200_source_defaults, source_settings),
+            ("f210", self.candidate_raw(), f210, normal_settings),
+            ("f210-source-defaults", self.candidate_raw(), f210_source_defaults, source_settings),
+            ("f210-source-defaults-modules-disabled", self.candidate_raw(False), disabled, disabled_settings),
+        ):
             with self.subTest(label=label):
-                accepted = self.run_data(self.candidate_raw(), mods)
+                accepted = self.run_data(raw, mods, effective_settings)
                 self.assertTrue(accepted["ok"], accepted["message"])
                 unit = accepted["raw"]["technology"][DIRECT]["unit"]
                 self.assertEqual((1, None, 1), (unit.get("count"), unit.get("count_formula"), unit["time"]))
                 self.assertEqual(43, accepted["raw"]["sentinel"]["unchanged"])
         disabled_raw = self.candidate_raw(False)
-        accepted = self.run_data(disabled_raw, disabled, False)
+        accepted = self.run_data(disabled_raw, disabled, disabled_settings)
         self.assertTrue(accepted["ok"], accepted["message"])
         self.assertFalse(accepted["raw"]["technology"][MODULES]["enabled"])
         self.assertEqual((1, None, 1), (accepted["raw"]["technology"][DIRECT]["unit"].get("count"),
@@ -222,15 +251,27 @@ class MigrationOriginF200110SuccessorControls(unittest.TestCase):
         missing_observer = dict(f200); missing_observer.pop("mir-fixture-mir5-active-mods-observer"); variants.append(("observer", self.candidate_raw(), missing_observer))
         wrong_effect = self.candidate_raw(); wrong_effect["technology"][DIRECT]["effects"][0]["change"] = .05; variants.append(("effect", wrong_effect, f200))
         empty_science = self.candidate_raw(); empty_science["technology"][DIRECT]["unit"]["ingredients"] = []; variants.append(("science", empty_science, f200))
-        wrong_effective_setting = self.candidate_raw(False); variants.append(("disabled-setting", wrong_effective_setting, disabled, True))
-        reenabled_public = self.candidate_raw(True); variants.append(("disabled-public", reenabled_public, disabled, False))
+        wrong_gate = dict(disabled_settings); wrong_gate["ips-require-space-gate"] = False
+        variants.append(("gate", self.candidate_raw(False), disabled, wrong_gate,
+                         "ips-require-space-gate expected=true actual=false"))
+        wrong_inventory = dict(disabled_settings); wrong_inventory["ips-enable-research_inventory_capacity"] = True
+        variants.append(("inventory", self.candidate_raw(False), disabled, wrong_inventory,
+                         "ips-enable-research_inventory_capacity expected=false actual=true"))
+        wrong_module = dict(disabled_settings); wrong_module["ips-enable-research_modules"] = True
+        variants.append(("disabled-setting", self.candidate_raw(False), disabled, wrong_module,
+                         "ips-enable-research_modules expected=false actual=true"))
+        variants.append(("disabled-public", self.candidate_raw(True), disabled, disabled_settings,
+                         "candidate module enabled state differs"))
         for variant in variants:
             label, raw, mods = variant[:3]
-            effective = variant[3] if len(variant) == 4 else True
+            settings = variant[3] if len(variant) == 5 else source_settings
+            expected_message = variant[4] if len(variant) == 5 else None
             with self.subTest(label=label):
                 before = copy.deepcopy(raw)
-                rejected = self.run_data(raw, mods, effective)
+                rejected = self.run_data(raw, mods, settings)
                 self.assertFalse(rejected["ok"])
+                if expected_message is not None:
+                    self.assertIn(expected_message, rejected["message"])
                 # lupa represents an empty Lua vector as an empty mapping on
                 # the way back to Python.  Check the actual mutation boundary
                 # instead: rejection cannot alter the selected cost/time or
@@ -243,30 +284,46 @@ class MigrationOriginF200110SuccessorControls(unittest.TestCase):
                 self.assertEqual(before_direct["unit"].get("time"), after_direct["unit"].get("time"))
                 self.assertEqual(before["sentinel"], rejected["raw"]["sentinel"])
 
-    def test_settings_update_changes_only_the_owned_module_default_after_exact_prototype_guard(self):
-        mods = {"base": "2.1.23", "more-infinite-research": "5.0.21000",
-                "mir-fixture-mir5-migration-origin-f200-110-source": "0.4.0"}
+    def test_settings_updates_stages_only_the_two_published_default_differences(self):
         raw = {"bool-setting": {
+            "ips-require-space-gate": {"type": "bool-setting", "name": "ips-require-space-gate", "default_value": False},
+            "ips-enable-research_inventory_capacity": {"type": "bool-setting", "name": "ips-enable-research_inventory_capacity", "default_value": True},
             "ips-enable-research_modules": {"type": "bool-setting", "name": "ips-enable-research_modules", "default_value": True},
-            "fixture-untouched": {"type": "bool-setting", "name": "fixture-untouched", "default_value": True},
+            "untouched": {"type": "bool-setting", "name": "untouched", "default_value": True},
         }}
-        accepted = self.run_settings_update(raw, mods)
-        self.assertTrue(accepted["ok"], accepted["message"])
-        settings = accepted["raw"]["bool-setting"]
-        self.assertFalse(settings["ips-enable-research_modules"]["default_value"])
-        self.assertTrue(settings["fixture-untouched"]["default_value"])
-
-        for label, value in (("already-false", False), ("wrong-type", "not-a-setting")):
-            with self.subTest(label=label):
-                opponent = copy.deepcopy(raw)
-                if label == "already-false":
-                    opponent["bool-setting"]["ips-enable-research_modules"]["default_value"] = value
-                else:
-                    opponent["bool-setting"]["ips-enable-research_modules"]["type"] = value
-                before = copy.deepcopy(opponent)
-                rejected = self.run_settings_update(opponent, mods)
-                self.assertFalse(rejected["ok"])
-                self.assertEqual(before, rejected["raw"])
+        closures = (
+            ("f200", {"base": "2.0.77", "more-infinite-research": "5.0.20000",
+                        "mir-fixture-mir5-migration-origin-f200-110-source": "0.3.0"}),
+            ("f210", {"base": "2.1.23", "more-infinite-research": "5.0.21000",
+                        "mir-fixture-mir5-migration-origin-f200-110-source": "0.4.0"}),
+            ("f210-disabled", {"base": "2.1.23", "more-infinite-research": "5.0.21000",
+                                "mir-fixture-mir5-migration-origin-f200-110-source": "0.5.0"}),
+        )
+        for target, mods in closures:
+            with self.subTest(target=target):
+                accepted = self.run_settings_update(raw, mods)
+                self.assertTrue(accepted["ok"], accepted["message"])
+                settings = accepted["raw"]["bool-setting"]
+                expected_module = target != "f210-disabled"
+                self.assertEqual((True, False, expected_module, True),
+                                 (settings["ips-require-space-gate"]["default_value"],
+                                  settings["ips-enable-research_inventory_capacity"]["default_value"],
+                                  settings["ips-enable-research_modules"]["default_value"],
+                                  settings["untouched"]["default_value"]))
+                for label, path, value in (
+                    ("gate-current", "ips-require-space-gate", True),
+                    ("inventory-current", "ips-enable-research_inventory_capacity", False),
+                    ("modules-current", "ips-enable-research_modules", False),
+                ):
+                    if path == "ips-enable-research_modules" and target != "f210-disabled":
+                        continue
+                    with self.subTest(label=label):
+                        opponent = copy.deepcopy(raw)
+                        opponent["bool-setting"][path]["default_value"] = value
+                        rejected = self.run_settings_update(opponent, mods)
+                        self.assertFalse(rejected["ok"])
+                        self.assertIn("startup setting prototype differs", rejected["message"])
+                        self.assertEqual(opponent, rejected["raw"])
 
     def test_control_registers_without_runtime_access_and_refuses_missing_source_before_candidate_writes(self):
         path = (FIXTURE / "control.lua").as_posix()
@@ -307,12 +364,13 @@ class MigrationOriginF200110SuccessorControls(unittest.TestCase):
         self.assertEqual({}, result["storage"])
 
     def test_profiles_bind_the_one_passed_r05_source_and_the_coherent_module_credit_candidate(self):
-        f200, f210, disabled = (
+        f200, f210, f200_source_defaults, source_defaults = (
             json.loads(F200_PROFILE.read_text()),
             json.loads(F210_PROFILE.read_text()),
-            json.loads(F210_MODULES_DISABLED_PROFILE.read_text()),
+            json.loads(F200_SOURCE_DEFAULTS_PROFILE.read_text()),
+            json.loads(F210_SOURCE_DEFAULTS_PROFILE.read_text()),
         )
-        for profile in (f200, f210, disabled):
+        for profile in (f200, f210, f200_source_defaults, source_defaults):
             self.assertEqual("88FC8E9891040275E001930C3E6AA0A4A7A28C31D81DF30E3F08AEDD98E5019A",
                              profile["source_save"]["sha256"])
             self.assertEqual("4FBD622144E3B69E39C0530385AA70C92971208584CA32D4A10B1FCC1A978997",
@@ -324,28 +382,36 @@ class MigrationOriginF200110SuccessorControls(unittest.TestCase):
             self.assertEqual("2fb64822b82569e3b50f0653e361fb7148f18b63", profile["origin_source_commit"])
         self.assertEqual("3b578cb6b1c28d05fb26b3afda3f9253f978f58a", f200["successor_fixture_commit"])
         self.assertEqual("3b578cb6b1c28d05fb26b3afda3f9253f978f58a", f210["successor_fixture_commit"])
-        self.assertEqual("da79509b008d565befacbf252e975109caba0c63", disabled["successor_fixture_commit"])
+        self.assertEqual("3fbdeb9a7422d70be53dccde2924711464b47ac5", f200_source_defaults["successor_fixture_commit"])
+        self.assertEqual("713ff517c5fc846a24a0a768229a55f991e2852c", source_defaults["successor_fixture_commit"])
         self.assertEqual("97C4700C141090ECC59549FB684351A504B057C9BEC34A6E5A852441CEB8738F",
                          f200["archive_sha256"]["mir-fixture-mir5-migration-origin-f200-110-source_0.2.0.zip"])
         self.assertEqual("83EDCE7B40C6ABF13C60769691ABA4534F032FE87E82F2CF9E7CCE451D38EE5D",
                          f210["archive_sha256"]["mir-fixture-mir5-migration-origin-f200-110-source_0.3.0.zip"])
         self.assertEqual("050AC35BAB6BA1F01E160DB612B73A03E58E0ABE6A291D18109FAB1B235B63B5",
                          f200["archive_sha256"]["more-infinite-research_5.0.20000.zip"])
+        self.assertEqual("7A864117D88FC6E52FF8FC7C290017FFF827F9F4C8A789A80EED6E13618A2196",
+                         f200_source_defaults["archive_sha256"]["mir-fixture-mir5-migration-origin-f200-110-source_0.3.0.zip"])
         self.assertEqual("625756F9E2536383954A121EB24FFB3AE0C0A540B7557E3F03A79C2D8A6A0D59",
                          f210["archive_sha256"]["more-infinite-research_5.0.21000.zip"])
-        self.assertEqual("F83F930E659FEC7A088FC01459D70CAE49D0E3656C3F0D7DB7181D228B9E9DF2",
-                         disabled["archive_sha256"]["mir-fixture-mir5-migration-origin-f200-110-source_0.4.0.zip"])
-        self.assertEqual("modules-disabled-default", disabled["variant"])
-        self.assertEqual("Defaults", disabled["settings_mode"])
-        self.assertEqual("f210_modules_disabled", disabled["target"])
+        self.assertEqual("3597682FF6AC7A7BFBA9B62B38A9E3958A1BCA04692750B4DDE18B746346B871",
+                         source_defaults["archive_sha256"]["mir-fixture-mir5-migration-origin-f200-110-source_0.4.0.zip"])
+        self.assertEqual("published-source-defaults-input", source_defaults["variant"])
+        self.assertEqual("Defaults", source_defaults["settings_mode"])
+        self.assertEqual("f210_source_defaults", source_defaults["target"])
+        self.assertEqual("published-source-defaults-input", f200_source_defaults["variant"])
+        self.assertEqual("Defaults", f200_source_defaults["settings_mode"])
+        self.assertEqual("f200_source_defaults", f200_source_defaults["target"])
         self.assertEqual(
             ["base", "mir-fixture-mir5-active-mods-observer", "more-infinite-research",
              "mir-fixture-mir5-migration-origin-f200-110-source"],
-            [entry["name"] for entry in disabled["mods"]],
+            [entry["name"] for entry in source_defaults["mods"]],
         )
-        self.assertEqual("0.4.0", disabled["mods"][-1]["version"])
+        self.assertEqual("0.4.0", source_defaults["mods"][-1]["version"])
+        self.assertEqual("0.3.0", f200_source_defaults["mods"][-1]["version"])
         self.assertNotIn("space-age", {entry["name"] for entry in f210["mods"]})
-        self.assertNotIn("space-age", {entry["name"] for entry in disabled["mods"]})
+        self.assertNotIn("space-age", {entry["name"] for entry in source_defaults["mods"]})
+        self.assertNotIn("space-age", {entry["name"] for entry in f200_source_defaults["mods"]})
 
     def test_profiles_reject_the_r12_and_r13_superseded_fixture_archive_pins(self):
         cases = (
@@ -359,9 +425,14 @@ class MigrationOriginF200110SuccessorControls(unittest.TestCase):
              "83EDCE7B40C6ABF13C60769691ABA4534F032FE87E82F2CF9E7CCE451D38EE5D",
              ("F4C54047A9734180D31C14F18BE38B744F053F399A0D8184961C2B563463C831",
               "E1878CAEE523CDC4DC86C9E6B0B5029A78E4D96ADC1A3C80BE8521355A6655A3")),
-            (json.loads(F210_MODULES_DISABLED_PROFILE.read_text()),
+            (json.loads(F200_SOURCE_DEFAULTS_PROFILE.read_text()),
+             "mir-fixture-mir5-migration-origin-f200-110-source_0.3.0.zip",
+             "7A864117D88FC6E52FF8FC7C290017FFF827F9F4C8A789A80EED6E13618A2196",
+             ("29F2597180F0BCB8CB25A651A19068678635D42C35A96EE56F6186DE737037E0",
+              "1767DE15AB78628C4C404D280F4DC789521BF4DEE86B349ED379C47234BD69F0")),
+            (json.loads(F210_SOURCE_DEFAULTS_PROFILE.read_text()),
              "mir-fixture-mir5-migration-origin-f200-110-source_0.4.0.zip",
-             "F83F930E659FEC7A088FC01459D70CAE49D0E3656C3F0D7DB7181D228B9E9DF2",
+             "3597682FF6AC7A7BFBA9B62B38A9E3958A1BCA04692750B4DDE18B746346B871",
              ("F4C54047A9734180D31C14F18BE38B744F053F399A0D8184961C2B563463C831",
               "E1878CAEE523CDC4DC86C9E6B0B5029A78E4D96ADC1A3C80BE8521355A6655A3")),
         )
@@ -427,7 +498,7 @@ class MigrationOriginF200110SuccessorControls(unittest.TestCase):
                 return assert(loadfile(legacy_module_runtime_path,"t",env))()
               end
               if name=="platform.target" then
-                if target=="f200" then return {id="f200",recipe_productivity=true,distribution_version="5.0.20000"} end
+              if target=="f200" or target=="f200_source_defaults" then return {id="f200",recipe_productivity=true,distribution_version="5.0.20000"} end
                 return {id="f210",recipe_productivity=true,distribution_version="5.0.21000"}
               end
               error("unexpected module: "..tostring(name))
@@ -575,7 +646,7 @@ class MigrationOriginF200110SuccessorControls(unittest.TestCase):
             end
             env.settings={startup={}}
             for name,value in pairs(catalogue.settings) do env.settings.startup[name]={value=value} end
-            local modules_enabled=target~="f210_modules_disabled"
+            local modules_enabled=target~="f210_source_defaults_modules_disabled"
             env.settings.startup["ips-enable-research_modules"].value=modules_enabled
             local inventory={items={}}
             inventory.clear=function() inventory.items={} end
@@ -588,9 +659,15 @@ class MigrationOriginF200110SuccessorControls(unittest.TestCase):
             if target=="f200" then
               env.script.active_mods={base="2.0.77",["more-infinite-research"]="5.0.20000",
                 [active_wrapper_name]="0.2.0",["mir-fixture-mir5-active-mods-observer"]="0.1.0"}
-            elseif target=="f210_modules_disabled" then
+            elseif target=="f200_source_defaults" then
+              env.script.active_mods={base="2.0.77",["more-infinite-research"]="5.0.20000",
+                [active_wrapper_name]="0.3.0",["mir-fixture-mir5-active-mods-observer"]="0.1.0"}
+            elseif target=="f210_source_defaults" then
               env.script.active_mods={base="2.1.23",["more-infinite-research"]="5.0.21000",
                 [active_wrapper_name]="0.4.0",["mir-fixture-mir5-active-mods-observer"]="0.1.0"}
+            elseif target=="f210_source_defaults_modules_disabled" then
+              env.script.active_mods={base="2.1.23",["more-infinite-research"]="5.0.21000",
+                [active_wrapper_name]="0.5.0",["mir-fixture-mir5-active-mods-observer"]="0.1.0"}
             else
               env.script.active_mods={base="2.1.23",["more-infinite-research"]="5.0.21000",
                 [active_wrapper_name]="0.3.0",["mir-fixture-mir5-active-mods-observer"]="0.1.0"}
@@ -684,7 +761,9 @@ class MigrationOriginF200110SuccessorControls(unittest.TestCase):
         source = json.loads((SOURCE_FIXTURE / "info.json").read_text(encoding="utf-8"))
         wrappers = {
             "f200": json.loads((FIXTURE / "info-f200.json").read_text(encoding="utf-8")),
+            "f200_source_defaults": json.loads(F200_SOURCE_DEFAULTS_INFO.read_text(encoding="utf-8")),
             "f210": json.loads((FIXTURE / "info-f210.json").read_text(encoding="utf-8")),
+            "f210_source_defaults": json.loads(F210_SOURCE_DEFAULTS_INFO.read_text(encoding="utf-8")),
         }
         for target, wrapper in wrappers.items():
             with self.subTest(target=target):
@@ -732,9 +811,9 @@ class MigrationOriginF200110SuccessorControls(unittest.TestCase):
     def test_modules_disabled_successor_keeps_source_rights_but_never_reenables_the_public_row(self):
         self._install_lifecycle_model()
         source = json.loads((SOURCE_FIXTURE / "info.json").read_text(encoding="utf-8"))
-        wrapper = json.loads(F210_MODULES_DISABLED_INFO.read_text(encoding="utf-8"))
+        wrapper = json.loads(F210_SOURCE_DEFAULTS_MODULES_DISABLED_INFO.read_text(encoding="utf-8"))
         result = py(self.lua.eval("migration_origin_110_successor_lifecycle")(
-            "f210_modules_disabled", source["name"], wrapper["name"]))
+            "f210_source_defaults_modules_disabled", source["name"], wrapper["name"]))
         self.assertTrue(result["ok"], result["message"])
         self.assertTrue(result["saved"])
         self.assertEqual((False, False, False),
@@ -749,7 +828,7 @@ class MigrationOriginF200110SuccessorControls(unittest.TestCase):
         self.assertEqual((1, 0, 0), (result["player_reset_calls"], result["foreign_reset_calls"],
                                      result["detached_reset_calls"]))
         self.assertEqual(["reset:player", "save"], result["order"])
-        self.assertEqual("completed", result["state"]["successors"]["f210_modules_disabled"]["phase"])
+        self.assertEqual("completed", result["state"]["successors"]["f210_source_defaults_modules_disabled"]["phase"])
         markers = [value for value in result["logs"] if value.startswith("[MIR5_NATIVE_FIXTURE] RESULT ")]
         self.assertEqual(3, len(markers))
         self.assertIn('"stage":"initial"', markers[0])

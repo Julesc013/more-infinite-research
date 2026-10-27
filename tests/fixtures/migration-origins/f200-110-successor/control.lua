@@ -149,8 +149,10 @@ local function assert_settings(target)
     local value = settings.startup[name]
     local candidate_expected = expected
     if name == "ips-enable-research_modules" then candidate_expected = target.modules_enabled end
-    if value == nil or value.value ~= candidate_expected then
-      fail("candidate startup setting differs: " .. name)
+    local actual = value and value.value
+    if actual ~= candidate_expected then
+      fail("candidate startup setting differs: " .. name
+        .. " expected=" .. tostring(candidate_expected) .. " actual=" .. tostring(actual))
     end
   end
 end
