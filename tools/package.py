@@ -179,7 +179,8 @@ def player_presentation(files, info):
     entry = files["changelog.txt"]
     token = b"@DISTRIBUTION_VERSION@"
     header = (b"Version: " + source_changelog_version(info["version"]).encode("ascii") + b"\n")
-    if token in entry or entry.count(header) != 1:
+    prefix = b"-" * 99 + b"\n" + header
+    if token in entry or not entry.startswith(prefix) or entry.splitlines().count(header[:-1]) != 1:
         raise ValueError("Current changelog needs exactly one source-version header")
     out = {name: raw for name, raw in files.items() if not name.startswith("presentation/changelog/")}
     return out

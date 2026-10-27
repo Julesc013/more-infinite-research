@@ -31,6 +31,18 @@ F110_PLUS_MIGRATION_TARGETS = {"f110", "f200", "f210"}
 
 
 class PackageTests(unittest.TestCase):
+    def test_source_header_is_a_heading_not_an_entry_mention(self):
+        entry = (b"-" * 99 + b"\nVersion: 5.0.0\n\n  Changes:\n"
+                 b"    - Example source label: Version: 5.0.0\n")
+        files = {"LICENSE": b"retained license", "thumbnail.png": b"retained image",
+                 "changelog.txt": entry}
+        self.assertEqual(files, pack.player_presentation(files, {"version": "5.0.21000"}))
+        for invalid in (b"Version: 4.7.3\n" + entry, entry + entry):
+            with self.subTest(changelog=invalid):
+                with self.assertRaisesRegex(ValueError, "source-version header"):
+                    pack.player_presentation(dict(files, **{"changelog.txt": invalid}),
+                                             {"version": "5.0.21000"})
+
     @staticmethod
     def _git(repository, *arguments):
         return subprocess.check_output(["git", "-C", str(repository), *arguments])
