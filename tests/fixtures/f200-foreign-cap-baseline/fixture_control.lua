@@ -8,6 +8,8 @@ local CASE = "f200-foreign-cap-baseline"
 local FIXTURE = "mir-fixture-mir5-f200-foreign-cap-baseline"
 local GEAR = "recipe-prod-research_gears-1"
 local PROBE = "braking-force-1"
+local RAILWAY = "railway"
+local CHEMICAL = "chemical-science-pack"
 local UINT32_MAX = 4294967295
 local STAGES = {
   source = {version = "0.1.0", cap = 0, prior = nil},
@@ -129,7 +131,13 @@ local function seed_foreign()
   local foreign = game.create_force("mir5-f200-foreign-cap-baseline-foreign")
   foreign.enable_all_prototypes()
   local gear, probe = technology(foreign), foreign.technologies[PROBE]
+  local railway, chemical = foreign.technologies[RAILWAY], foreign.technologies[CHEMICAL]
   if probe == nil or probe.valid == false then fail("foreign queue probe is absent") end
+  if railway == nil or railway.valid == false or chemical == nil or chemical.valid == false then
+    fail("foreign queue probe prerequisites are absent")
+  end
+  railway.researched = true
+  chemical.researched = true
   gear.researched = false
   gear.level = 3
   probe.researched = false

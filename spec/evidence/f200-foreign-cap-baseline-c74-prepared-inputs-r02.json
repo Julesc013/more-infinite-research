@@ -1,0 +1,245 @@
+{
+  "schema": 1,
+  "kind": "MIR5F200ForeignCapBaselinePreparedInputsV2",
+  "status": "corrected-prerequisite-fixtures-built-for-c74-current-player-not-native-qualified",
+  "fixture_source_commit": "24dd0497e8f550b8b2bc2dc74b885d7a606dcf08",
+  "fixture_source_tree": "89e80ebb450346f633efc9b4d3379dec7df9bfbb",
+  "custody_root": "build/qualification/f200-foreign-cap-baseline-c74-r02",
+  "native_execution": false,
+  "library_mutation": false,
+  "lab_completion": false,
+  "saved_input_hashes": "pending source, finite and relaxed server saves",
+  "release_qualification": false,
+  "original_prepared_receipt": "spec/evidence/f200-foreign-cap-baseline-58f-prepared-inputs.json",
+  "input_player": {
+    "asset_readback": {
+      "git_commit": "654f5d2721ecd36393ea529e28c45905130d82ab",
+      "path": "spec/evidence/current-assets-c74b7c46-root-readback.json",
+      "git_blob": "47cd9c69ade94135005e0edcfde9ba9d283a398d",
+      "github_url": "https://github.com/Julesc013/more-infinite-research/blob/654f5d2721ecd36393ea529e28c45905130d82ab/spec/evidence/current-assets-c74b7c46-root-readback.json"
+    },
+    "source_commit": "c74b7c4680545f3ccf27f38016d1144fefe8eee3",
+    "source_tree": "f81c63afca2e6eb5b7e46dffe892548553899db3",
+    "archive": "more-infinite-research_5.0.20000.zip",
+    "sha256": "050AC35BAB6BA1F01E160DB612B73A03E58E0ABE6A291D18109FAB1B235B63B5",
+    "bytes": 685621
+  },
+  "engine": {
+    "version": "2.0.77",
+    "sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B"
+  },
+  "observer": {
+    "archive": "mir-fixture-mir5-active-mods-observer_0.1.0.zip",
+    "sha256": "723D1E7721449FC26040E5E6629416767BDC20AD79CF8723115846DB662A1F87"
+  },
+  "original_precursor": {
+    "prepared_receipt": "spec/evidence/f200-foreign-cap-baseline-58f-prepared-inputs.json",
+    "fixture_source_commit": "ce48d0d78c68bc78779a8449f50e4dc0e6b0bc9c",
+    "fixture_source_tree": "88b6a18139621196bf53907d979887798f8ac5ed",
+    "path": "tools/package.py",
+    "sha256": "D5DCCBFABB69E6D7F529DBB9BCE8B907231EB682E9059BF3586777F3C74FBB50",
+    "meaning": "immutable ce48/58f fixture producer; its fixture packages are not relabelled as this corrected preparation"
+  },
+  "fixture_package": {
+    "path": "tools/package.py",
+    "sha256": "32BDBE5E0D8B776A57BC8DF63DD536DD81AEDF54141AC6EC6B1BEF4044C90674",
+    "meaning": "current controller that packaged the corrected raw-Git 24dd fixture projections"
+  },
+  "verification_controller": {
+    "path": "tools/package.py",
+    "sha256": "32BDBE5E0D8B776A57BC8DF63DD536DD81AEDF54141AC6EC6B1BEF4044C90674",
+    "meaning": "current package controller used for byte verification; actual archive-guard helpers are recorded separately"
+  },
+  "profiles": [
+    {
+      "stage": "source",
+      "path": "tests/profiles/f200-foreign-cap-baseline-source-2077.json",
+      "sha256": "C894809B83F0DE45F0BA130D7CDD71CB3BDFACAB8F31FBE472C4412C8394C117",
+      "bytes": 1328
+    },
+    {
+      "stage": "finite",
+      "path": "tests/profiles/f200-foreign-cap-baseline-finite-2077.json",
+      "sha256": "11E8E808D0982FFB45429DC3926B89CB6385B04EE900027A3BFC7948255540F9",
+      "bytes": 1349
+    },
+    {
+      "stage": "relaxed",
+      "path": "tests/profiles/f200-foreign-cap-baseline-relaxed-2077.json",
+      "sha256": "7D6F2E6B0D1A7E3FF891FC3BCE964CF22D4A265459F7877EAB495D2427FF0C2E",
+      "bytes": 1365
+    }
+  ],
+  "stages": [
+    {
+      "stage": "source",
+      "version": "0.1.0",
+      "archive": "build/qualification/f200-foreign-cap-baseline-c74-r02/fixtures/mir-fixture-mir5-f200-foreign-cap-baseline_0.1.0.zip",
+      "sha256": "3D514CCF22CD1B42DB28DEE2DE928D5A8DBC73E9E1A8B45BBBC32F87F1601651",
+      "bytes": 6446,
+      "projection": "build/qualification/f200-foreign-cap-baseline-c74-r02/sources/source",
+      "members": [
+        {
+          "path": "control.lua",
+          "source_path": "tests/fixtures/f200-foreign-cap-baseline/source/control.lua",
+          "sha256": "1AC575C10525915AA062E9A4CCA6DA58A6E200B4D5041D5527A589E235B32BB2",
+          "bytes": 90
+        },
+        {
+          "path": "data-final-fixes.lua",
+          "source_path": "tests/fixtures/f200-foreign-cap-baseline/source/data-final-fixes.lua",
+          "sha256": "72E096EF0F0A5CDF65DD5272F9ABA5810D2203E05080E6179D7F42112C20AC9E",
+          "bytes": 93
+        },
+        {
+          "path": "fixture_control.lua",
+          "source_path": "tests/fixtures/f200-foreign-cap-baseline/fixture_control.lua",
+          "sha256": "9ADCCCBF4B1FE88D29F5E1D6625FFF2F6C075681FA2F49C0D1C2485C106BBAD9",
+          "bytes": 10493
+        },
+        {
+          "path": "fixture_data_final.lua",
+          "source_path": "tests/fixtures/f200-foreign-cap-baseline/fixture_data_final.lua",
+          "sha256": "76D67017B2DE14735EA4CF1A9CA3E45D5848E7E48592A30F50D057575FE2F716",
+          "bytes": 2930
+        },
+        {
+          "path": "fixture_settings.lua",
+          "source_path": "tests/fixtures/f200-foreign-cap-baseline/fixture_settings.lua",
+          "sha256": "EF1DF4DF90B9325ADDD6B922E560524AF891C1AAA11EC24C63DB66DAF17A39BC",
+          "bytes": 974
+        },
+        {
+          "path": "info.json",
+          "source_path": "tests/fixtures/f200-foreign-cap-baseline/source/info.json",
+          "sha256": "B4F0CB3BFE21CB7C82230960C2B11898F2D1939A0FA4DC67761BC2296EDD2F41",
+          "bytes": 390
+        },
+        {
+          "path": "settings-updates.lua",
+          "source_path": "tests/fixtures/f200-foreign-cap-baseline/source/settings-updates.lua",
+          "sha256": "8BF7EC3EFF65A641AC178240ABC96E242B4BA7B85805064DCFAF3E2FE2131971",
+          "bytes": 91
+        }
+      ]
+    },
+    {
+      "stage": "finite",
+      "version": "0.2.0",
+      "archive": "build/qualification/f200-foreign-cap-baseline-c74-r02/fixtures/mir-fixture-mir5-f200-foreign-cap-baseline_0.2.0.zip",
+      "sha256": "71440309308B3E82F23E21597CC1AE49C79E9BFF4A69388F104B86FB5DCA304E",
+      "bytes": 6450,
+      "projection": "build/qualification/f200-foreign-cap-baseline-c74-r02/sources/finite",
+      "members": [
+        {
+          "path": "control.lua",
+          "source_path": "tests/fixtures/f200-foreign-cap-baseline/finite/control.lua",
+          "sha256": "6EEF9D6E740FDEE1D0FF851BBA4A3B3F318F7744B7B75B8A20E3DB3081DDA3EF",
+          "bytes": 90
+        },
+        {
+          "path": "data-final-fixes.lua",
+          "source_path": "tests/fixtures/f200-foreign-cap-baseline/finite/data-final-fixes.lua",
+          "sha256": "4E727C62C4B912D3E6EC76A52FDCB97699020750EF60BACA90688FFFA4014468",
+          "bytes": 93
+        },
+        {
+          "path": "fixture_control.lua",
+          "source_path": "tests/fixtures/f200-foreign-cap-baseline/fixture_control.lua",
+          "sha256": "9ADCCCBF4B1FE88D29F5E1D6625FFF2F6C075681FA2F49C0D1C2485C106BBAD9",
+          "bytes": 10493
+        },
+        {
+          "path": "fixture_data_final.lua",
+          "source_path": "tests/fixtures/f200-foreign-cap-baseline/fixture_data_final.lua",
+          "sha256": "76D67017B2DE14735EA4CF1A9CA3E45D5848E7E48592A30F50D057575FE2F716",
+          "bytes": 2930
+        },
+        {
+          "path": "fixture_settings.lua",
+          "source_path": "tests/fixtures/f200-foreign-cap-baseline/fixture_settings.lua",
+          "sha256": "EF1DF4DF90B9325ADDD6B922E560524AF891C1AAA11EC24C63DB66DAF17A39BC",
+          "bytes": 974
+        },
+        {
+          "path": "info.json",
+          "source_path": "tests/fixtures/f200-foreign-cap-baseline/finite/info.json",
+          "sha256": "1512E2D99553F75A1D5548FD01D0DC972A0774FB296C4150FFA0C52EF3ABC8A0",
+          "bytes": 395
+        },
+        {
+          "path": "settings-updates.lua",
+          "source_path": "tests/fixtures/f200-foreign-cap-baseline/finite/settings-updates.lua",
+          "sha256": "BEDAD6CEA51C663FCF55EB09FE3D43A4D94EFFE684E9EE941C647F03F08028FD",
+          "bytes": 91
+        }
+      ]
+    },
+    {
+      "stage": "relaxed",
+      "version": "0.3.0",
+      "archive": "build/qualification/f200-foreign-cap-baseline-c74-r02/fixtures/mir-fixture-mir5-f200-foreign-cap-baseline_0.3.0.zip",
+      "sha256": "E76721DC9C0EE5858366ED2C4C589862572303B0616EE8B5E5DE249B7F9CE875",
+      "bytes": 6450,
+      "projection": "build/qualification/f200-foreign-cap-baseline-c74-r02/sources/relaxed",
+      "members": [
+        {
+          "path": "control.lua",
+          "source_path": "tests/fixtures/f200-foreign-cap-baseline/relaxed/control.lua",
+          "sha256": "4D5F4DFE1929AE84925B1B9402FBF24E3633BDA48E121F00B10BCA33D84DDF30",
+          "bytes": 91
+        },
+        {
+          "path": "data-final-fixes.lua",
+          "source_path": "tests/fixtures/f200-foreign-cap-baseline/relaxed/data-final-fixes.lua",
+          "sha256": "E1683A511BE0A4B4301CEAE9F3796793D7BF0CA10A04DB144B7E8A2317C83606",
+          "bytes": 94
+        },
+        {
+          "path": "fixture_control.lua",
+          "source_path": "tests/fixtures/f200-foreign-cap-baseline/fixture_control.lua",
+          "sha256": "9ADCCCBF4B1FE88D29F5E1D6625FFF2F6C075681FA2F49C0D1C2485C106BBAD9",
+          "bytes": 10493
+        },
+        {
+          "path": "fixture_data_final.lua",
+          "source_path": "tests/fixtures/f200-foreign-cap-baseline/fixture_data_final.lua",
+          "sha256": "76D67017B2DE14735EA4CF1A9CA3E45D5848E7E48592A30F50D057575FE2F716",
+          "bytes": 2930
+        },
+        {
+          "path": "fixture_settings.lua",
+          "source_path": "tests/fixtures/f200-foreign-cap-baseline/fixture_settings.lua",
+          "sha256": "EF1DF4DF90B9325ADDD6B922E560524AF891C1AAA11EC24C63DB66DAF17A39BC",
+          "bytes": 974
+        },
+        {
+          "path": "info.json",
+          "source_path": "tests/fixtures/f200-foreign-cap-baseline/relaxed/info.json",
+          "sha256": "23556C902FE5EC30427CB037ABA6529D33E24F97D23AB1450558648AB94886EA",
+          "bytes": 390
+        },
+        {
+          "path": "settings-updates.lua",
+          "source_path": "tests/fixtures/f200-foreign-cap-baseline/relaxed/settings-updates.lua",
+          "sha256": "8C9FEC469ED6B654DD712500BCEE75233A6391B49DED5CFFCCF1754D8CCF944D",
+          "bytes": 92
+        }
+      ]
+    }
+  ],
+  "archive_guard": {
+    "status": "all-three-corrected-source-projections-pass-real-guard",
+    "command": "Assert-MIRLibraryFixtureArchive -Archive <selected archive> -SourceDirectory <seven-member projection>",
+    "helpers": [
+      {
+        "path": "tools/lib/validation/ImmutableInputStaging.ps1",
+        "sha256": "B5FBFAC8537B08F9790BD3EE8ACEAAB38EE5CBB8EF005E67E8375DE568BBC12C"
+      },
+      {
+        "path": "tools/lib/compatibility/LibraryActivation.ps1",
+        "sha256": "123A2241B895B57217AA969A677FF21BBFB268FE55E9734287883B4D6AE25099"
+      }
+    ]
+  }
+}

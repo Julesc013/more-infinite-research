@@ -27,10 +27,10 @@ NAME = "mir-fixture-mir5-f200-foreign-cap-baseline"
 GEAR = "recipe-prod-research_gears-1"
 ENGINE_SHA = "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B"
 OBSERVER_SHA = "723D1E7721449FC26040E5E6629416767BDC20AD79CF8723115846DB662A1F87"
-MIR_SHA = "BD1B88D7DE85489207F71C1B080FD61617FAEF9655370BF0332A51579308ECE3"
+MIR_SHA = "050AC35BAB6BA1F01E160DB612B73A03E58E0ABE6A291D18109FAB1B235B63B5"
 STAGES = {"source": ("0.1.0", 0), "finite": ("0.2.0", 1), "relaxed": ("0.3.0", 0)}
-FIXTURE_REVISION = "ce48d0d78c68bc78779a8449f50e4dc0e6b0bc9c"
-INPUT_RECEIPT = ROOT / "spec" / "evidence" / "f200-foreign-cap-baseline-58f-prepared-inputs.json"
+FIXTURE_REVISION = "24dd0497e8f550b8b2bc2dc74b885d7a606dcf08"
+INPUT_RECEIPT = ROOT / "spec" / "evidence" / "f200-foreign-cap-baseline-c74-prepared-inputs-r02.json"
 PROFILES = {
     "source": ROOT / "tests" / "profiles" / "f200-foreign-cap-baseline-source-2077.json",
     "finite": ROOT / "tests" / "profiles" / "f200-foreign-cap-baseline-finite-2077.json",
@@ -132,6 +132,7 @@ end
 
 function f200_foreign_cap_flow(common_path, source_path, finite_path, relaxed_path, caps_path, opponent)
   local GEAR="recipe-prod-research_gears-1";local PROBE="braking-force-1"
+  local RAILWAY="railway";local CHEMICAL="chemical-science-pack"
   local versions={source="0.1.0",finite="0.2.0",relaxed="0.3.0"}
   local caps_for_stage={source=0,finite=1,relaxed=0}
   local markers,saves={},0
@@ -143,12 +144,17 @@ function f200_foreign_cap_flow(common_path, source_path, finite_path, relaxed_pa
     local value={name=name,index=index,valid=true,technologies={},recipes={['iron-gear-wheel']={productivity_bonus=0}},
       research_queue={},research_progress=0}
     value.technologies[GEAR]=technology(GEAR,value);value.technologies[PROBE]=technology(PROBE,value)
+    if opponent~="foreign-railway-absent" then value.technologies[RAILWAY]=technology(RAILWAY,value) end
+    if opponent~="foreign-chemical-absent" then value.technologies[CHEMICAL]=technology(CHEMICAL,value) end
     function value.enable_all_prototypes() end
     function value.reset_technology_effects()
       value.recipes['iron-gear-wheel'].productivity_bonus=(value.technologies[GEAR].level-1)*.01
     end
     function value.add_research(research)
       if research==nil or value.current_research~=nil then return false end
+      local railway,chemical=value.technologies[RAILWAY],value.technologies[CHEMICAL]
+      if research.name==PROBE and (railway==nil or railway.researched~=true or
+          chemical==nil or chemical.researched~=true) then return false end
       value.current_research=research;value.research_queue={research};value.research_progress=0;return true
     end
     return value
@@ -203,7 +209,7 @@ function f200_foreign_cap_flow(common_path, source_path, finite_path, relaxed_pa
     caps.reconcile(game.forces[2],limits,owned,targets)
   end
   local source,message=load_control(source_path,"source");if not source then return {ok=false,message=message} end
-  local ok,result=invoke(source,"init");if not ok then return {ok=false,message=result} end
+  local ok,result=invoke(source,"init");if not ok then return {ok=false,message=result,saves=saves} end
   if saves~=0 then return {ok=false,message="create-only seed was counted as a save"} end
   local source_create_saves=saves
   ok,result=tick(source);if not ok then return {ok=false,message=result} end
@@ -250,9 +256,9 @@ end
             stage, lua_value(self.lua, deepcopy(self.row)), opponent,
         ))
 
-    def flow_result(self, opponent=""):
+    def flow_result(self, opponent="", common_path=FIXTURE / "fixture_control.lua"):
         return plain(self.lua.eval("f200_foreign_cap_flow")(
-            str(FIXTURE / "fixture_control.lua"), str(FIXTURE / "source/control.lua"),
+            str(common_path), str(FIXTURE / "source/control.lua"),
             str(FIXTURE / "finite/control.lua"), str(FIXTURE / "relaxed/control.lua"),
             str(ROOT / "source/runtime/caps.lua"), opponent,
         ))
@@ -285,9 +291,9 @@ end
             ("more-infinite-research", "5.0.20000", True),
         ]
         fixture_hashes = {
-            "source": "F37D3628B918E9649967C0F1C7E3B9ACE07C696CB54D00DD30C2B110F8D95CFC",
-            "finite": "18EEB497CAF09C1AD4BA0DCB044C633AADB34BADCD1DE3B820E889AE8B25860F",
-            "relaxed": "81D15678E0D8BF00EFD987672502289020DDC55F2EB2A2F262F2E6C07D23BA96",
+            "source": "3D514CCF22CD1B42DB28DEE2DE928D5A8DBC73E9E1A8B45BBBC32F87F1601651",
+            "finite": "71440309308B3E82F23E21597CC1AE49C79E9BFF4A69388F104B86FB5DCA304E",
+            "relaxed": "E76721DC9C0EE5858366ED2C4C589862572303B0616EE8B5E5DE249B7F9CE875",
         }
         for stage, (version, _) in STAGES.items():
             with self.subTest(stage=stage):
@@ -303,6 +309,7 @@ end
                     "more-infinite-research_5.0.20000.zip": MIR_SHA,
                     f"{NAME}_{version}.zip": fixture_hashes[stage],
                 }, profile["archive_sha256"])
+                self.assertIn("c74b7c46", profile["scope"])
                 self.assertIn("no native pass", profile["scope"])
                 if stage == "source":
                     self.assertNotIn("InputSavePath", profile["scope"])
@@ -311,19 +318,33 @@ end
 
     def test_prepared_input_receipt_binds_raw_git_members_and_generic_fixture_archives(self):
         receipt = json.loads(INPUT_RECEIPT.read_text(encoding="utf-8"))
-        self.assertEqual(("MIR5F200ForeignCapBaselinePreparedInputsV1", FIXTURE_REVISION,
-                          "88b6a18139621196bf53907d979887798f8ac5ed"),
+        self.assertEqual(("MIR5F200ForeignCapBaselinePreparedInputsV2", FIXTURE_REVISION,
+                          "89e80ebb450346f633efc9b4d3379dec7df9bfbb"),
                          (receipt["kind"], receipt["fixture_source_commit"], receipt["fixture_source_tree"]))
         for field in ("native_execution", "library_mutation", "lab_completion", "release_qualification"):
             self.assertIs(receipt[field], False)
-        self.assertEqual(("98fbdd33fe47eb678a5e1aaf17fee903eba2a22a",
-                          "ffc5f2e3359de4f326a184cf6a3c29a55941150a", MIR_SHA, 679477),
+        self.assertEqual("spec/evidence/f200-foreign-cap-baseline-58f-prepared-inputs.json",
+                         receipt["original_prepared_receipt"])
+        self.assertEqual(("c74b7c4680545f3ccf27f38016d1144fefe8eee3",
+                          "f81c63afca2e6eb5b7e46dffe892548553899db3", MIR_SHA, 685621),
                          (receipt["input_player"]["source_commit"], receipt["input_player"]["source_tree"],
                           receipt["input_player"]["sha256"], receipt["input_player"]["bytes"]))
+        self.assertEqual({
+            "git_commit": "654f5d2721ecd36393ea529e28c45905130d82ab",
+            "path": "spec/evidence/current-assets-c74b7c46-root-readback.json",
+            "git_blob": "47cd9c69ade94135005e0edcfde9ba9d283a398d",
+            "github_url": "https://github.com/Julesc013/more-infinite-research/blob/654f5d2721ecd36393ea529e28c45905130d82ab/spec/evidence/current-assets-c74b7c46-root-readback.json",
+        }, receipt["input_player"]["asset_readback"])
         self.assertEqual({"version": "2.0.77", "sha256": ENGINE_SHA}, receipt["engine"])
         self.assertEqual(OBSERVER_SHA, receipt["observer"]["sha256"])
         self.assertEqual(("tools/package.py", "D5DCCBFABB69E6D7F529DBB9BCE8B907231EB682E9059BF3586777F3C74FBB50"),
-                         (receipt["package_tool"]["path"], receipt["package_tool"]["sha256"]))
+                         (receipt["original_precursor"]["path"], receipt["original_precursor"]["sha256"]))
+        self.assertEqual(("tools/package.py", "32BDBE5E0D8B776A57BC8DF63DD536DD81AEDF54141AC6EC6B1BEF4044C90674"),
+                         (receipt["fixture_package"]["path"], receipt["fixture_package"]["sha256"]))
+        self.assertEqual(("tools/package.py", "32BDBE5E0D8B776A57BC8DF63DD536DD81AEDF54141AC6EC6B1BEF4044C90674"),
+                         (receipt["verification_controller"]["path"], receipt["verification_controller"]["sha256"]))
+        self.assertEqual(receipt["verification_controller"]["sha256"],
+                         hashlib.sha256((ROOT / "tools" / "package.py").read_bytes()).hexdigest().upper())
         self.assertEqual(["source", "finite", "relaxed"], [row["stage"] for row in receipt["stages"]])
         for profile in receipt["profiles"]:
             actual = ROOT / profile["path"]
@@ -334,6 +355,10 @@ end
             for stage in receipt["stages"]:
                 with self.subTest(stage=stage["stage"]):
                     self.assertEqual(7, len(stage["members"]))
+                    self.assertEqual((
+                        f"build/qualification/f200-foreign-cap-baseline-c74-r02/fixtures/{NAME}_{stage['version']}.zip",
+                        f"build/qualification/f200-foreign-cap-baseline-c74-r02/sources/{stage['stage']}",
+                    ), (stage["archive"], stage["projection"]))
                     projection = temporary / stage["stage"]
                     projection.mkdir()
                     for member in stage["members"]:
@@ -353,6 +378,28 @@ end
                     with zipfile.ZipFile(archive) as zipped:
                         self.assertEqual({f"{NAME}_{stage['version']}/{member}" for member in expected_members},
                                          {entry.filename for entry in zipped.infolist() if not entry.is_dir()})
+
+    def test_foreign_probe_prerequisites_are_researched_before_the_source_queue_and_save(self):
+        source = (FIXTURE / "fixture_control.lua").read_text(encoding="utf-8")
+        old_source = source.replace("  railway.researched = true\n  chemical.researched = true\n", "")
+        self.assertNotEqual(source, old_source)
+        with tempfile.TemporaryDirectory(dir=ROOT / "build") as temporary:
+            old_control = Path(temporary) / "fixture_control.lua"
+            old_control.write_text(old_source, encoding="utf-8", newline="\n")
+            failed = self.flow_result(common_path=old_control)
+        self.assertFalse(failed["ok"])
+        self.assertIn("could not queue foreign probe", failed["message"])
+        self.assertEqual(0, failed["saves"])
+        passed = self.flow_result()
+        self.assertTrue(passed["ok"], passed.get("message"))
+
+    def test_foreign_probe_requires_both_named_base_prerequisites_before_any_source_save(self):
+        for opponent in ("foreign-railway-absent", "foreign-chemical-absent"):
+            with self.subTest(opponent=opponent):
+                result = self.flow_result(opponent)
+                self.assertFalse(result["ok"])
+                self.assertIn("foreign queue probe prerequisites are absent", result["message"])
+                self.assertEqual(0, result["saves"])
 
     def test_current_caps_survives_a_native_reset_only_when_the_foreign_false_baseline_is_retained(self):
         retained = self.flow_result("foreign-native-reset")
