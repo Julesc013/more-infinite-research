@@ -1,0 +1,7 @@
+# Planet discovery API witness
+
+This prepared, unexecuted Factorio 2.1.23 Space Age fixture runs only `on_init` with the six-mod Base/DLC closure and no MIR. It logs LuaCustomTable shapes before querying, then preflights the exact closure, native mappings, player force, query method and five named locations before logging read-only `is_space_location_unlocked` observations and accepting only boolean results.
+
+The intended runner route is `Invoke-NativeFixture.ps1 -CreateOnly -MIRAbsent -CaseName planet-discovery-api-f210-2123 -ConsumerMarkers MIR_PLANET_DISCOVERY_API`. The fixture changes no forces, technologies, planets or gameplay state and registers no scheduled work. The runner still creates its ordinary disposable seed save; it uses no historical input save. Prepared inputs and host controls establish no native result, helper recovery, historical-save transition, gameplay or performance acceptance.
+
+Use the [prepared-input record](../../../spec/evidence/planet-discovery-api-prepared-inputs-r01.json) and its selected profile. Rebuild the owned ZIP from that record's full source commit, and pass only its two raw-Git members as `FixtureSources`; the canonical directory also contains this excluded README. The native owner supplies the existing direct archive library, the exact engine and a fresh `build/tmp` output path under exclusive ownership. This is the existing pending API witness; reuse an equivalent trusted console observation if it has already completed.

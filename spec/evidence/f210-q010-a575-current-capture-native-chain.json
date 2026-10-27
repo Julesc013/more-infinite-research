@@ -1,0 +1,267 @@
+{
+  "schema": 1,
+  "kind": "MIR5F210Q010A575CurrentCaptureNativeChainV1",
+  "status": "completed-data-capture-with-zero-difference-independent-comparison",
+  "scope": "One current a575/7CE F210 Bob+Angel+Space-Age data/settings capture. Data-stage only; no gameplay, save, menu, timing, performance, replay-byte-equality, or release qualification.",
+  "frozen_execution": {
+    "controller": {
+      "source_head": "728404053cf27b0e647e7b64e841622b5c8a3fde",
+      "caller_sha256": "5A946C543A1CE3E76FEB3993423F2D5AB2EF29A57735272A662D6D45A965036D",
+      "preflight_sha256": "680E5B2BEE4032BD5C474E666C0141D806055F470B12B27DBF00F6EF92FCC534"
+    },
+    "candidate": {
+      "source_commit": "a575a4198807b6aea9e26963e3d9970fc5c068ae",
+      "player_tree": "398c79c687d2bc662c976355ced1436201c43f11",
+      "archive_sha256": "7CE6A4DF78019F6B98237E638A1C927C5FDB538D4A1442EE22D846DD962DDCDC",
+      "archive_bytes": 681347,
+      "version": "5.0.21000"
+    },
+    "engine": {
+      "sha256": "8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38",
+      "base_version": "2.1.23",
+      "factorio_version": "2.1"
+    },
+    "profile": {
+      "path": "tests/profiles/bob-angel-full-space-age-standalone-f210-2123.json",
+      "sha256": "05F2786E896B1F28C2E4239134BA370B0C2BCF6CCB1384E03999FB0E89C8B980",
+      "canonical_upstream_entries": 37,
+      "selected_archive_hashes": 32
+    },
+    "observer": {
+      "name": "mir-fixture-mir5-active-mods-observer",
+      "version": "0.1.0",
+      "sha256": "A15A7D628D66953D2E0C4D4FA288F47CBF9C5678327C7EB3D23ADB5DC78331C0",
+      "bytes": 835
+    }
+  },
+  "native_observation": {
+    "result": {
+      "sha256": "58D99F6D306CDCA49D18CDF60D6DEBF74B723BEB97FA509B7FB07B028A536071",
+      "bytes": 39568,
+      "status": "completed-data-stage-observation-only",
+      "exit_code": 0,
+      "timed_out": false
+    },
+    "dumps": {
+      "data_raw": {
+        "sha256": "F63D209A868B21BBBE67C1C675EFCF6697774E40383D87C2E000AA48CEEFB849",
+        "bytes": 67502534
+      },
+      "mod_settings": {
+        "sha256": "83C3A4166488BFEF80225DE9818810DE4CE0DDD37760C6B17BEC810AC8162D17",
+        "bytes": 783931
+      }
+    },
+    "loaded_entries": {
+      "count": 38,
+      "canonical_profile_entries": 37,
+      "includes_candidate_mir": true,
+      "ordered_sha256": "8DCC4CF8C8F5FB004B3BF2CB9E66B0672772F05FCA6EEBA8337099FF709F3975",
+      "ordered": [
+        "angelsaddons-mobility-graphics-crawler@2.1.0",
+        "angelsaddons-mobility-graphics-petro@2.1.0",
+        "angelsaddons-mobility-graphics-smelting@2.1.0",
+        "angelsaddons-mobility@2.1.1",
+        "angelsaddons-storage@2.1.1",
+        "angelsbioprocessing@2.1.2",
+        "angelsbioprocessinggraphics@2.1.0",
+        "angelsinfiniteores@2.1.0",
+        "angelspetrochem@2.1.3",
+        "angelspetrochemgraphics@2.1.0",
+        "angelsrefining@2.1.3",
+        "angelsrefininggraphics@2.1.0",
+        "angelssmelting@2.1.1",
+        "angelssmeltinggraphics@2.1.1",
+        "base@2.1.23",
+        "bobassembly@3.0.2",
+        "bobelectronics@3.0.1",
+        "bobenemies@3.0.1",
+        "bobequipment@3.0.0",
+        "bobgreenhouse@3.0.1",
+        "bobinserters@3.0.0",
+        "boblibrary@3.0.1",
+        "boblogistics@3.0.2",
+        "bobmining@3.0.2",
+        "bobmodules@3.0.1",
+        "bobores@3.0.0",
+        "bobplates@3.0.2",
+        "bobpower@3.0.1",
+        "bobrevamp@3.0.1",
+        "bobtech@3.0.0",
+        "bobvehicleequipment@3.0.0",
+        "bobwarfare@3.0.2",
+        "elevated-rails@2.1.23",
+        "mir-fixture-mir5-active-mods-observer@0.1.0",
+        "more-infinite-research@5.0.21000",
+        "quality@2.1.23",
+        "recycler@2.1.23",
+        "space-age@2.1.23"
+      ]
+    }
+  },
+  "independent_comparison": {
+    "sha256": "2C9005261C383AC50E27F1AA692BDCE82E07A8237EBBCE3C938A8C11F736C94E",
+    "bytes": 14982,
+    "status": "equal-intended-native-output",
+    "difference_count": 0,
+    "oracle_sha256": "6AEFF07252E2449ED049B0EDB8DFC17A0B4B4AEB19BF5E36D25A76DEA1F9E8AB",
+    "reviewed_disposition_count": 160
+  },
+  "retained_current58f_equivalence": {
+    "source_commit": "98fbdd33fe47eb678a5e1aaf17fee903eba2a22a",
+    "archive_sha256": "58F04FB9D417F2726835F4A6740490DE3C1841665DAC81C2BA3DFA94050D9457",
+    "data_raw": {
+      "sha256": "F63D209A868B21BBBE67C1C675EFCF6697774E40383D87C2E000AA48CEEFB849",
+      "bytes": 67502534,
+      "byte_identical_to_7ce": true
+    },
+    "mod_settings": {
+      "sha256": "83C3A4166488BFEF80225DE9818810DE4CE0DDD37760C6B17BEC810AC8162D17",
+      "bytes": 783931,
+      "byte_identical_to_7ce": true
+    },
+    "old_raw_and_primary_members": 9,
+    "old_raw_and_primary_hashes_equal": true
+  },
+  "restoration": {
+    "original_mir_sha256": "C563CB5B96C9E64CB3373BDB60CF5C8B7D3C97E93EADB8F924443C703CDC024D",
+    "original_mir_bytes": 568598,
+    "candidate_after_sha256": "7CE6A4DF78019F6B98237E638A1C927C5FDB538D4A1442EE22D846DD962DDCDC",
+    "observer_after_sha256": "A15A7D628D66953D2E0C4D4FA288F47CBF9C5678327C7EB3D23ADB5DC78331C0",
+    "active_profile_absent_before": true,
+    "active_profile_absent_after": true,
+    "controls": [
+      {
+        "name": "mod-list.json",
+        "before_sha256": "48C46678CC8369DB15CC12CDFB23309EB076DC4433B76E9426083D0074BCCC91",
+        "before_bytes": 39201,
+        "after_sha256": "48C46678CC8369DB15CC12CDFB23309EB076DC4433B76E9426083D0074BCCC91",
+        "after_bytes": 39201,
+        "exact": true
+      },
+      {
+        "name": "mod-settings.dat",
+        "before_sha256": "667897C514B66298A1E400058B65EA14EB36322D88864B98AE38E4C9B81387BC",
+        "before_bytes": 60744,
+        "after_sha256": "667897C514B66298A1E400058B65EA14EB36322D88864B98AE38E4C9B81387BC",
+        "after_bytes": 60744,
+        "exact": true
+      }
+    ],
+    "factorio_processes_after": 0
+  },
+  "custody": {
+    "primary_root": "build/qualification/f210-q010-a575-current-capture-r02",
+    "members": 12,
+    "bytes": 69120406,
+    "manifest_sha256": "C84EA5A56D93FD42AE8658037F874A34E9C42CE357CD6B9167B23A5F7656F3E3",
+    "manifest_matches_full_primary": true,
+    "new_raw_and_primary_members": 9,
+    "new_raw_and_primary_hashes_equal": true,
+    "members_detail": [
+      {
+        "path": "archive-stage/library-candidate-after-stage.zip",
+        "sha256": "7CE6A4DF78019F6B98237E638A1C927C5FDB538D4A1442EE22D846DD962DDCDC",
+        "bytes": 681347
+      },
+      {
+        "path": "caller-terminal.json",
+        "sha256": "181BBFEAE08EBE59FE131705D648950ABA91CF302746005E24D081FAB46A724C",
+        "bytes": 46397
+      },
+      {
+        "path": "comparison.json",
+        "sha256": "2C9005261C383AC50E27F1AA692BDCE82E07A8237EBBCE3C938A8C11F736C94E",
+        "bytes": 14982
+      },
+      {
+        "path": "native-output/config.ini",
+        "sha256": "E0CA07B648DF71ACBCD3D7E5B5B6F501A2712D33FB31BEE37DE00507939DB4D6",
+        "bytes": 279
+      },
+      {
+        "path": "native-output/process-1.resources.jsonl",
+        "sha256": "BA6F6E90B17F2D549B1AA91B74A473AB36F489E7D69CF4D3F660D917D2D9A05F",
+        "bytes": 11776
+      },
+      {
+        "path": "native-output/process-1.stderr.txt",
+        "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+        "bytes": 0
+      },
+      {
+        "path": "native-output/process-1.stdout.txt",
+        "sha256": "9362BEF3BE43B8E9D6F806F20B086D967310B91DB4F3BA0C1629FBA32F6A627B",
+        "bytes": 17993
+      },
+      {
+        "path": "native-output/result.json",
+        "sha256": "58D99F6D306CDCA49D18CDF60D6DEBF74B723BEB97FA509B7FB07B028A536071",
+        "bytes": 39568
+      },
+      {
+        "path": "native-output/selection.json",
+        "sha256": "6B8538CAEC4BC027ACACBF4353F885FE4BA1C069C7BB8C4BB0926F0D52D87086",
+        "bytes": 3833
+      },
+      {
+        "path": "native-output/write-data/factorio-current.log",
+        "sha256": "FE4B3160AE7FC679CB0FEB1C1DE5CF707363025B46CF116E56A1054D75C03473",
+        "bytes": 17766
+      },
+      {
+        "path": "native-output/write-data/script-output/data-raw-dump.json",
+        "sha256": "F63D209A868B21BBBE67C1C675EFCF6697774E40383D87C2E000AA48CEEFB849",
+        "bytes": 67502534
+      },
+      {
+        "path": "native-output/write-data/script-output/mod-settings-dump.json",
+        "sha256": "83C3A4166488BFEF80225DE9818810DE4CE0DDD37760C6B17BEC810AC8162D17",
+        "bytes": 783931
+      }
+    ],
+    "full_originals": "Full dumps, logs, configuration, preflight, direct-library snapshots, and archive bytes remain in private original and primary custody; no payload is copied into this public evidence."
+  },
+  "preserved_zero_native_refusal": {
+    "caller_sha256": "6774259BE436358E582AD3E565596F8922DDDDB42C936A9685195337B19A28F7",
+    "preflight_sha256": "78DB813C680D82ED1D18FC37F9525B1266E07DFC0DD97BA1D14BAA722C13B0C2",
+    "terminal_sha256": "A979777B6AE2C4A3B5763B2CD92AEFC78E49CE519DF12AAF60B6FFEEA1345CFE",
+    "classification": "pre-engine argument-binding refusal; no PrototypeCapture result, Factorio process, dump, or comparison exists",
+    "error": "Cannot process command because of one or more missing mandatory parameters: FactorioBin ProfilePath OutputRoot."
+  },
+  "receipts": {
+    "path": "spec/evidence/f210-q010-a575-current-capture-native-receipts-r01.json.gz",
+    "sha256": "5A9A8D9D6FC857C3E5B331C37C4D76424E6A51D232803A3C71BD582501CEE20E",
+    "bytes": 16632,
+    "uncompressed_sha256": "E37E686947D3768B5A6DA8F0DE694F680B74E6878EB6EE0E65123764DF72A6BF",
+    "exact_safe_original_receipts": 2,
+    "strict_utf8_base64_gzip_roundtrip_verified": true,
+    "exclusions": [
+      "full data/raw dumps",
+      "full mod-settings dump",
+      "full logs",
+      "configuration payloads",
+      "player data",
+      "preflight payloads",
+      "library-control payloads",
+      "archive payloads"
+    ]
+  },
+  "claims": {
+    "native_execution": true,
+    "data_stage": true,
+    "gameplay": false,
+    "save": false,
+    "menu": false,
+    "timing": false,
+    "performance": false,
+    "replay_byte_equality": false,
+    "release_qualification": false
+  },
+  "limitations": [
+    "The capture and zero-difference comparison are data/settings evidence only.",
+    "The preserved r01 caller refusal is zero-native and is not relabelled as a native result.",
+    "Existing upstream, B6, and replay inputs remain under their original identities and were not rerun.",
+    "The 58F/7CE assertion is limited to the two byte-identical current data/settings dumps recorded here."
+  ]
+}
