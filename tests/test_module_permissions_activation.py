@@ -164,6 +164,8 @@ class ModulePermissionsActivationTests(unittest.TestCase):
           run_final_fixes()
           assert(installs == 1)
           assert(package.loaded["overrides.module_permissions"] == nil)
+          assert(package.loaded["research.legacy_module_credit_definitions"] == nil,
+            "absent authored module research imported its credit definitions")
         """)
 
     def test_raw_true_applies_published_permissions_without_changing_gear_emission(self):

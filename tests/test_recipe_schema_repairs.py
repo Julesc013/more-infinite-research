@@ -107,7 +107,7 @@ class RecipeSchemaRepairTests(unittest.TestCase):
                   environment.raw.recipe["atan-ash-seperation"] = recipe
                   settings,mods,data,helpers,log={startup=defaults()},{base="2.1.23"},environment,nil,function() end
                   if selected then mods["atan-ash"]="2.2.1" else mods["atan-ash"]="2.2.2" end
-                  assert(dofile(data_final_path) == nil and environment.writes == 1 and #environment.emitted == 74)
+                  assert(dofile(data_final_path) == nil and environment.writes == 1 and #environment.emitted == 77)
                   local science_pack_productivity
                   for _, row in ipairs(environment.emitted) do
                     if row.name == "recipe-prod-research_science_pack_productivity-1" then

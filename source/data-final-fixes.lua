@@ -158,9 +158,15 @@ require("research.native_credit_definitions").append(technologies, data.raw, val
 -- Fixed native holders retain MIR1.1's already-earned extra module effects.
 -- A removed optional recipe cannot make its hidden holder a startup failure.
 if require("platform.target").recipe_productivity == true then
-  for _, holder in ipairs(require("research.legacy_module_credit_definitions").technologies()) do
-    if data.raw.recipe[holder.effects[1].recipe] ~= nil then
-      technologies[#technologies + 1] = holder
+  local module_main_present = false
+  for _, technology in ipairs(technologies) do
+    if technology.name == "recipe-prod-research_modules-1" then module_main_present = true; break end
+  end
+  if module_main_present then
+    for _, holder in ipairs(require("research.legacy_module_credit_definitions").technologies()) do
+      if data.raw.recipe[holder.effects[1].recipe] ~= nil then
+        technologies[#technologies + 1] = holder
+      end
     end
   end
 end

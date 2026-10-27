@@ -270,6 +270,12 @@ class MigrationOriginF200110SuccessorControls(unittest.TestCase):
         self.assertIn("worker-robot-battery contribution", control)
         self.assertIn("event.by_script ~= false", control)
         self.assertLess(control.index("assert_source_before(state_value, names, false, 0)"), control.index("state_value.successors ="))
+        self.assertLess(control.index("observe_module_bonuses(force, snapshot, label)"),
+                        control.index("for recipe, expected in pairs(snapshot.recipes) do"))
+        initial_reset = "complete(target, state_value, successor)\n    reset_after_candidate_lab(target, state_value, successor)"
+        self.assertIn(initial_reset, control)
+        self.assertLess(control.index(initial_reset),
+                        control.index("game.server_save(catalogue.save)"))
         self.assertNotIn("manual_mining_speed_modifier =", control)
         self.assertNotIn("pairs(game.forces.player.technologies)", control)
 
@@ -282,7 +288,7 @@ class MigrationOriginF200110SuccessorControls(unittest.TestCase):
         self.lua.globals().legacy_module_definitions_path = LEGACY_MODULE_DEFINITIONS.as_posix()
         self.lua.globals().legacy_module_runtime_path = LEGACY_MODULE_RUNTIME.as_posix()
         self.lua.execute(r'''
-          function migration_origin_110_successor_lifecycle(target, source_fixture_name, active_wrapper_name, catalogue_fixture_name, legacy_module_bonus)
+          function migration_origin_110_successor_lifecycle(target, source_fixture_name, active_wrapper_name, catalogue_fixture_name, legacy_module_bonus, reset_drops_module_bonus)
             local callbacks={events={}}
             local env={storage={},logs={},created_labs=0,saved=false,
               script={active_mods={},on_configuration_changed=function(fn) callbacks.configuration=fn end,
@@ -371,10 +377,11 @@ class MigrationOriginF200110SuccessorControls(unittest.TestCase):
                     visible_when_disabled=row.visible_when_disabled,upgrade=row.upgrade,effects=copy_effects(row.effects)}}
               end
             end
+            local order={}
             local function make_force(label,index,direct_level,direct_progress)
               local snapshot=source_snapshot(direct_level,direct_progress)
               local force={name=label,index=index,valid=true,technologies={},recipes={},manual_mining_speed_modifier=0,
-                worker_robots_battery_modifier=.1,research_queue={},research_progress=0,current_research=nil,add_calls=0}
+                worker_robots_battery_modifier=.1,research_queue={},research_progress=0,current_research=nil,add_calls=0,reset_calls=0}
               for _,name in ipairs(roster) do
                 local saved=snapshot.technologies[name]
                 local value={name=name,valid=true,level=saved.level,researched=false,enabled=true,visible_when_disabled=false,
@@ -391,11 +398,20 @@ class MigrationOriginF200110SuccessorControls(unittest.TestCase):
               force.add_research=function(research)
                 force.add_calls=force.add_calls+1;force.current_research=research;force.research_queue={research};force.research_progress=0;return true
               end
+              force.reset_technology_effects=function()
+                force.reset_calls=force.reset_calls+1;order[#order+1]="reset:"..label
+                if force.reset_drops_module_bonus then
+                  for _,recipe in ipairs({"speed-module","productivity-module","efficiency-module"}) do
+                    force.recipes[recipe].productivity_bonus=force.recipes[recipe].productivity_bonus-.01
+                  end
+                end
+              end
               return force,snapshot
             end
             local player,player_snapshot=make_force("player",1,2,0)
             local foreign,foreign_snapshot=make_force("foreign",2,1,.42)
             local detached,detached_snapshot=make_force("detached",3,1,.27)
+            player.reset_drops_module_bonus=reset_drops_module_bonus==true
             foreign.current_research=foreign.technologies[catalogue.direct]
             foreign.research_queue={foreign.technologies[catalogue.direct],foreign.technologies["recipe-prod-research_plastic-1"]}
             foreign.research_progress=.42
@@ -423,7 +439,7 @@ class MigrationOriginF200110SuccessorControls(unittest.TestCase):
             local entity={valid=true,energy=0,get_inventory=function(_) return inventory end}
             env.game={forces={player=player,[2]=foreign,[3]=detached},tick=0,
               surfaces={[1]={create_entity=function(_) env.created_labs=env.created_labs+1;return entity end}},
-              server_save=function(_) env.saved=true end}
+              server_save=function(_) env.saved=true;order[#order+1]="save" end}
             if target=="f200" then
               env.script.active_mods={base="2.0.77",["more-infinite-research"]="5.0.20000",
                 [active_wrapper_name]="0.2.0",["mir-fixture-mir5-active-mods-observer"]="0.1.0"}
@@ -438,6 +454,14 @@ class MigrationOriginF200110SuccessorControls(unittest.TestCase):
             local module_runtime=env.require("runtime.legacy_module_credits")
             assert(module_runtime.on_configuration_changed({mod_changes={
               ["more-infinite-research"]={old_version="1.1.0",new_version=env.script.active_mods["more-infinite-research"]}}})==true)
+            local marker_counts={}
+            local function marker_count()
+              local count=0
+              for _,value in ipairs(env.logs) do
+                if value:sub(1,29)=="[MIR5_NATIVE_FIXTURE] RESULT " then count=count+1 end
+              end
+              return count
+            end
             local ok,message=pcall(function()
               assert(loadfile(successor_control_path,"t",env))()
               callbacks.configuration({})
@@ -449,6 +473,11 @@ class MigrationOriginF200110SuccessorControls(unittest.TestCase):
               env.game.tick=1;callbacks.events[2]()
               local saved_phase=state.successors[target].phase
               callbacks.load();env.game.tick=2;callbacks.events[2]()
+               marker_counts.after_first_reload=marker_count()
+               env.game.tick=3;callbacks.events[2]()
+               marker_counts.after_ordinary_tick=marker_count()
+               callbacks.load();env.game.tick=4;callbacks.events[2]()
+               marker_counts.after_second_reload=marker_count()
               assert(saved_phase=="completed")
             end)
             return {ok=ok,message=tostring(message),state=state,
@@ -458,8 +487,11 @@ class MigrationOriginF200110SuccessorControls(unittest.TestCase):
               player_gear=player.recipes[catalogue.gear_recipe].productivity_bonus,
               player_level=player.technologies[catalogue.direct].level,
               player_manual=player.manual_mining_speed_modifier,player_battery=player.worker_robots_battery_modifier,
-              foreign_progress=foreign.research_progress,detached_progress=detached.technologies[catalogue.direct].saved_progress,
-              player_add_calls=player.add_calls,source_state_changed=state.successors~=nil,
+               foreign_progress=foreign.research_progress,detached_progress=detached.technologies[catalogue.direct].saved_progress,
+               player_add_calls=player.add_calls,player_reset_calls=player.reset_calls,
+               foreign_reset_calls=foreign.reset_calls,detached_reset_calls=detached.reset_calls,order=order,
+               marker_counts=marker_counts,
+               source_state_changed=state.successors~=nil,
               candidate_module_effects=#player.technologies["recipe-prod-research_modules-1"].prototype.effects,
               player_module_holders={player.technologies[catalogue.module_credit.holders[1].id].level,
                 player.technologies[catalogue.module_credit.holders[2].id].level,
@@ -501,14 +533,33 @@ class MigrationOriginF200110SuccessorControls(unittest.TestCase):
                 self.assertEqual((0, 0), (result["foreign_gear"], result["detached_gear"]))
                 self.assertEqual((0, .1), (result["player_manual"], result["player_battery"]))
                 self.assertEqual((.42, .27), (result["foreign_progress"], result["detached_progress"]))
+                self.assertEqual((1, 0, 0), (result["player_reset_calls"], result["foreign_reset_calls"], result["detached_reset_calls"]))
+                self.assertEqual(["reset:player", "save"], result["order"])
                 self.assertEqual(9, result["candidate_module_effects"])
                 self.assertEqual(([2, 2, 2], [2, 2, 2], [2, 2, 2]),
                                  (result["player_module_holders"], result["foreign_module_holders"], result["detached_module_holders"]))
                 self.assertEqual("completed", result["state"]["successors"][target]["phase"])
                 self.assertEqual(1, result["state"]["successors"][target]["candidate_actual_labs"])
-                self.assertEqual(2, len(result["logs"]))
-                self.assertIn('"stage":"initial"', result["logs"][0])
-                self.assertIn('"stage":"reload"', result["logs"][1])
+                observations = [json.loads(value.split(" OBSERVED ", 1)[1]) for value in result["logs"]
+                                if value.startswith("[MIR5_NATIVE_FIXTURE] OBSERVED ")]
+                markers = [value for value in result["logs"] if value.startswith("[MIR5_NATIVE_FIXTURE] RESULT ")]
+                self.assertGreaterEqual(len(observations), 3)
+                self.assertTrue(any((.11, .11, .11) ==
+                                    (value["original_source_speed_module_bonus"],
+                                     value["original_source_productivity_module_bonus"],
+                                     value["original_source_efficiency_module_bonus"])
+                                    for value in observations))
+                self.assertTrue(any((.11, .11, .11) ==
+                                    (value["current_candidate_speed_module_bonus"],
+                                     value["current_candidate_productivity_module_bonus"],
+                                     value["current_candidate_efficiency_module_bonus"])
+                                    for value in observations))
+                self.assertEqual(3, len(markers))
+                self.assertIn('"stage":"initial"', markers[0])
+                self.assertIn('"stage":"reload"', markers[1])
+                self.assertIn('"stage":"reload"', markers[2])
+                self.assertEqual({"after_first_reload": 2, "after_ordinary_tick": 2, "after_second_reload": 3},
+                                 result["marker_counts"])
                 self.assertTrue(result["source_state_changed"])
                 self.assertTrue(result["active_state_changed"])
 
@@ -542,8 +593,41 @@ class MigrationOriginF200110SuccessorControls(unittest.TestCase):
                 self.assertRegex(result["message"],
                                  r"player retained source recipe contribution differs: (speed|productivity|efficiency)-module")
                 self.assertEqual((0, 0), (result["created_labs"], result["player_add_calls"]))
+                self.assertFalse(result["saved"])
+                self.assertEqual(0, result["player_reset_calls"])
+                observations = [json.loads(value.split(" OBSERVED ", 1)[1]) for value in result["logs"]
+                                if value.startswith("[MIR5_NATIVE_FIXTURE] OBSERVED ")]
+                self.assertTrue(any((.11, .11, .11, .1, .1, .1) ==
+                                    (value["original_source_speed_module_bonus"],
+                                     value["original_source_productivity_module_bonus"],
+                                     value["original_source_efficiency_module_bonus"],
+                                     value["current_candidate_speed_module_bonus"],
+                                     value["current_candidate_productivity_module_bonus"],
+                                     value["current_candidate_efficiency_module_bonus"])
+                                    for value in observations))
                 self.assertFalse(result["source_state_changed"])
                 self.assertFalse(result["active_state_changed"])
+
+    def test_candidate_effect_reset_refuses_to_save_when_it_loses_the_saved_module_one_percent(self):
+        self._install_lifecycle_model()
+        source = json.loads((SOURCE_FIXTURE / "info.json").read_text(encoding="utf-8"))
+        wrappers = {
+            "f200": json.loads((FIXTURE / "info-f200.json").read_text(encoding="utf-8")),
+            "f210": json.loads((FIXTURE / "info-f210.json").read_text(encoding="utf-8")),
+        }
+        for target, wrapper in wrappers.items():
+            with self.subTest(target=target):
+                result = py(self.lua.eval("migration_origin_110_successor_lifecycle")(
+                    target, source["name"], wrapper["name"], None, None, True))
+                self.assertFalse(result["ok"])
+                self.assertRegex(result["message"],
+                                 r"player retained source recipe contribution differs: (speed|productivity|efficiency)-module")
+                self.assertEqual((1, 1), (result["created_labs"], result["player_add_calls"]))
+                self.assertEqual((1, 0, 0), (result["player_reset_calls"], result["foreign_reset_calls"], result["detached_reset_calls"]))
+                self.assertEqual(["reset:player"], result["order"])
+                self.assertFalse(result["saved"])
+                self.assertEqual("await-observation", result["state"]["successors"][target]["phase"])
+                self.assertFalse(any(value.startswith("[MIR5_NATIVE_FIXTURE] RESULT ") for value in result["logs"]))
 
 
 if __name__ == "__main__":
