@@ -1,5 +1,6 @@
 """Independent controls for the prepared direct MIR 1.1.0 successors."""
 import argparse
+from collections import Counter
 import copy
 import json
 from pathlib import Path
@@ -13,6 +14,7 @@ F200_PROFILE = ROOT / "tests/profiles/migration-origins-1.1.0-successor-f200-207
 F210_PROFILE = ROOT / "tests/profiles/migration-origins-1.1.0-successor-f210-2123.json"
 DIRECT = "recipe-prod-research_gears-1"
 ROBOT = "recipe-prod-research_robot_battery-1"
+MODULES = "recipe-prod-research_modules-1"
 
 # Pinned from the archived 1.1.0 config and F200 Base recipe output set; this
 # test does not take its expected identities from the successor catalogue.
@@ -24,7 +26,7 @@ SOURCE_ROWS = {
     "recipe-prod-research_low_density_structure-1", "recipe-prod-research_rocket_fuel-1",
     "recipe-prod-research_copper-1", "recipe-prod-research_iron-1", "recipe-prod-research_engine-1",
     "recipe-prod-research_electric_engine-1", "recipe-prod-research_flying_robot_frame-1",
-    "recipe-prod-research_modules-1", "recipe-prod-research_belts-1", "recipe-prod-research_inserters-1",
+    MODULES, "recipe-prod-research_belts-1", "recipe-prod-research_inserters-1",
     "recipe-prod-research_bullets-1", "recipe-prod-research_rockets-1", ROBOT,
     "recipe-prod-research_science_pack_productivity-1", "recipe-prod-research_walls-1",
     "recipe-prod-research_grenades-1", "recipe-prod-research_rails-1",
@@ -92,6 +94,25 @@ class MigrationOriginF200110SuccessorControls(unittest.TestCase):
         self.assertEqual(("change-recipe-productivity", "iron-gear-wheel", .10),
                          (rows[DIRECT][0]["type"], rows[DIRECT][0]["recipe"], rows[DIRECT][0]["change"]))
         self.assertEqual(("worker-robot-battery", .10), (rows[ROBOT][0]["type"], rows[ROBOT][0]["modifier"]))
+        self.assertEqual(75, sum(len(effects) for effects in rows.values()))
+        self.assertEqual(
+            Counter({
+                ("change-recipe-productivity", "speed-module", .10): 1,
+                ("change-recipe-productivity", "productivity-module", .10): 1,
+                ("change-recipe-productivity", "efficiency-module", .10): 1,
+                ("change-recipe-productivity", "speed-module", .01): 1,
+                ("change-recipe-productivity", "productivity-module", .01): 1,
+                ("change-recipe-productivity", "efficiency-module", .01): 1,
+                ("change-recipe-productivity", "speed-module-2", .05): 1,
+                ("change-recipe-productivity", "productivity-module-2", .05): 1,
+                ("change-recipe-productivity", "efficiency-module-2", .05): 1,
+                ("change-recipe-productivity", "speed-module-3", .02): 1,
+                ("change-recipe-productivity", "productivity-module-3", .02): 1,
+                ("change-recipe-productivity", "efficiency-module-3", .02): 1,
+            }),
+            Counter((effect["type"], effect.get("recipe"), effect.get("change")) for effect in rows[MODULES]),
+        )
+        self.assertEqual("0.009999999776482582", catalogue["source_change_tokens"][.01])
         self.assertNotIn("recipe-prod-research_inventory_capacity-1", rows)
         self.assertEqual(42, len(catalogue["settings"]))
         self.assertTrue(catalogue["settings"]["ips-enable-research_breeding"])

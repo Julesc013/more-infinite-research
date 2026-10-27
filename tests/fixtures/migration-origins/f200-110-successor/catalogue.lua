@@ -27,6 +27,7 @@ return {
     [0.10] = "0.10000000149011612",
     [0.05] = "0.05000000074505806",
     [0.02] = "0.019999999552965164",
+    [0.01] = "0.009999999776482582",
     [0.20] = "0.20000000298023224",
   },
   settings = {
@@ -91,7 +92,14 @@ return {
     ["recipe-prod-research_engine-1"] = {recipe("engine-unit", .10)},
     ["recipe-prod-research_electric_engine-1"] = {recipe("electric-engine-unit", .10)},
     ["recipe-prod-research_flying_robot_frame-1"] = {recipe("flying-robot-frame", .10)},
-    ["recipe-prod-research_modules-1"] = {recipe("productivity-module", .10), recipe("speed-module", .10), recipe("efficiency-module", .10), recipe("productivity-module-2", .05), recipe("speed-module-2", .05), recipe("efficiency-module-2", .05), recipe("productivity-module-3", .02), recipe("speed-module-3", .02), recipe("efficiency-module-3", .02)},
+    ["recipe-prod-research_modules-1"] = {
+      recipe("productivity-module", .10), recipe("speed-module", .10), recipe("efficiency-module", .10),
+      recipe("productivity-module-2", .05), recipe("speed-module-2", .05), recipe("efficiency-module-2", .05),
+      recipe("productivity-module-3", .02), recipe("speed-module-3", .02), recipe("efficiency-module-3", .02),
+      -- Published 1.1.0 also retained this second tier-one pattern group.
+      -- These are separate same-recipe effects, not replacements for the .10 rows.
+      recipe("speed-module", .01), recipe("productivity-module", .01), recipe("efficiency-module", .01),
+    },
     ["recipe-prod-research_belts-1"] = {recipe("transport-belt", .10), recipe("underground-belt", .10), recipe("splitter", .10), recipe("fast-transport-belt", .05), recipe("fast-underground-belt", .05), recipe("fast-splitter", .05), recipe("express-transport-belt", .02), recipe("express-underground-belt", .02), recipe("express-splitter", .02)},
     ["recipe-prod-research_inserters-1"] = {recipe("inserter", .10), recipe("burner-inserter", .10), recipe("fast-inserter", .05), recipe("long-handed-inserter", .05), recipe("bulk-inserter", .02)},
     ["recipe-prod-research_bullets-1"] = {recipe("firearm-magazine", .10), recipe("shotgun-shell", .10), recipe("piercing-rounds-magazine", .05), recipe("piercing-shotgun-shell", .05), recipe("uranium-rounds-magazine", .02)},
