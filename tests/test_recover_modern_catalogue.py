@@ -580,13 +580,66 @@ class ModernCatalogueTests(unittest.TestCase):
                 catalogue.recover_inventory(baseline, candidate, baseline, candidate, target="f200")
             wrong_version = _capture(root / "wrong-version", _published_raw(), _published_settings(),
                                      published=True, target="f200", mir_version="4.7.20001")
-            with self.assertRaisesRegex(catalogue.CatalogueError, "exact published 4.7.0"):
+            with self.assertRaisesRegex(catalogue.CatalogueError, "exact published 4.7.20000"):
                 catalogue.recover_inventory(baseline, wrong_version, baseline, wrong_version, target="f200")
             baseline210 = _capture(root / "engine210-baseline", _baseline_raw(), _baseline_settings(), published=False)
             published210 = _capture(root / "engine210-published", _published_raw(), _published_settings(),
                                      published=True, mir_version="4.7.20000")
             with self.assertRaisesRegex(catalogue.CatalogueError, "actual captured engine family"):
                 catalogue.recover_inventory(baseline210, published210, baseline210, published210, target="f200")
+
+    def test_explicit_published_hotfix_is_exact_and_keeps_the_original_default(self):
+        for target, version in (("f210", "4.7.21003"), ("f200", "4.7.20003")):
+            with self.subTest(target=target), tempfile.TemporaryDirectory() as temporary:
+                root = Path(temporary)
+                baseline = _capture(root / "baseline", _baseline_raw(), _baseline_settings(),
+                                    published=False, target=target)
+                raw = _published_raw()
+                if target == "f200":
+                    del raw["mod-data"]
+                published = _capture(root / "published", raw, _published_settings(), published=True,
+                                     target=target, mir_version=version)
+                with self.assertRaisesRegex(catalogue.CatalogueError, "exact published 4.7."):
+                    catalogue.recover_inventory(baseline, published, baseline, published, target=target)
+                inventory = catalogue.recover_inventory(
+                    baseline, published, baseline, published, target=target, published_version=version)
+                self.assertEqual(version, inventory["source"]["published_version"])
+                self.assertEqual(["base-" + target, "space-age-" + target],
+                                 inventory["source"]["profiles"])
+                output = root / "hotfix-inventory.json"
+                command = ["recover", "--target", target, "--published-version", version,
+                           "--base-no-mir", str(baseline), "--base-published", str(published),
+                           "--space-age-no-mir", str(baseline), "--space-age-published", str(published),
+                           "--output", str(output)]
+                with contextlib.redirect_stdout(io.StringIO()):
+                    self.assertEqual(0, catalogue.main(command))
+                self.assertEqual(inventory, json.loads(output.read_bytes()))
+                wrong = _capture(root / "other-patch", raw, _published_settings(), published=True,
+                                 target=target, mir_version=version[:-1] + "2")
+                with self.assertRaisesRegex(catalogue.CatalogueError, "exact published " + version):
+                    catalogue.recover_inventory(baseline, published, baseline, wrong,
+                                               target=target, published_version=version)
+
+    def test_published_version_selector_refuses_cross_target_or_candidate_before_capture_reads(self):
+        absent = ROOT / "build" / "absent-catalogue-control-input"
+        for version in ("", False, 470, "4.7.20003", "4.7.2103", "4.7.210003", "4.7.210-1",
+                        "4.8.21003", "5.0.21000", "4.7.21003\n", " 4.7.21003"):
+            with self.subTest(version=version), self.assertRaisesRegex(
+                    catalogue.CatalogueError, "exact MIR4.7 distribution"):
+                catalogue.recover_inventory(absent, absent, absent, absent,
+                                           target="f210", published_version=version)
+
+    def test_default_f210_reference_profiles_have_no_mir_or_lab_fixture(self):
+        official = ["base", "elevated-rails", "quality", "recycler", "space-age"]
+        for name, names in (("base", ["base"]), ("space-age", official)):
+            profile = json.loads((ROOT / f"tests/profiles/{name}-f210-2123.json").read_bytes())
+            self.assertEqual(("f210", "2.1", "Defaults"),
+                             (profile["target"], profile["factorio_line"], profile["settings_mode"]))
+            self.assertEqual({"version": "2.1.23", "sha256":
+                              "FE4A1DA30F322A0D0B8AEB3DF7276332222BAAA143E2352569B723E84B2B9060"},
+                             profile["engine"])
+            self.assertEqual([{"name": mod, "version": "2.1.23", "enabled": True} for mod in names],
+                             profile["mods"])
 
     def _captures(self, root: Path) -> tuple[Path, Path, Path, Path]:
         no_mir = _capture(root / "base-no-mir", _baseline_raw(), _baseline_settings(), published=False)

@@ -130,6 +130,26 @@ for member in members:
 
 The library archive must already match the profile's selected archive SHA256; a same-name container with different bytes is refused. The projection is caller-owned temporary input, not a ZIP extraction, dependency copy or a substitute for the profile's engine/archive admission. Do not pipe `git show` through text cmdlets when creating that projection: its selected blobs are binary input, even where an individual member happens to be text.
 
+## Recover an exact published catalogue
+
+`tools/recover_modern_catalogue.py recover` accepts `--published-version` for an exact same-target MIR4.7 numeric distribution, such as `4.7.21003` or `4.7.20003`. Omitting it retains the original `4.7.21000`/`4.7.20000` recovery contract. Every supplied published arm, including optional K2SO, must match that version; engine, archive, capture-hash and paired-input checks still apply. MIR5 is never admitted as the published oracle.
+
+For the outstanding default F2104.7.3 row-set check, the native owner can use `tests/profiles/base-f210-2123.json` and `tests/profiles/space-age-f210-2123.json`. Both select only their exact official2.1.23 closure and Defaults, omitting MIR and every gameplay fixture. Capture a no-MIR and exact B6 arm for each through `tools/Invoke-PrototypeCapture.ps1`; the published arms pass `-MIRArchive` and `-ExpectedMIRArchiveSha256` together. Bind the real engine/library/output/resource inputs under the existing exclusive native assignment. A seeded or accelerated upgrade fixture is not an unmodified default reference.
+
+After those four actual captures, the following recovery command uses their caller-supplied roots and a new output path. It does not run Factorio or turn host/synthetic captures into native evidence:
+
+```powershell
+$recoveryArguments = @(
+  '--target', 'f210', '--published-version', '4.7.21003',
+  '--base-no-mir', $baseNoMirCapture, '--base-published', $baseB6Capture,
+  '--space-age-no-mir', $spaceAgeNoMirCapture, '--space-age-published', $spaceAgeB6Capture,
+  '--output', $newCataloguePath
+)
+python -B tools/recover_modern_catalogue.py recover @recoveryArguments
+```
+
+Preserve `spec/inventory/modern-f210-470.json` and existing receipts as the original fixed4.7.21000 inputs. Compare the newly recovered complete B6 public/native-owner rows with the finite upgrade fixture plan before claiming complete B6 coverage. Resolve omissions or deliberate differences independently; raw catalogue recovery alone does not qualify MIR5 effects, saves, clients or performance.
+
 ## Isolated client launches
 
 Reuse the selected engine by its exact executable path. Keep each client's ordinary `config.ini`, `write-data`, logs and saves beneath that assignment's existing `build/tmp` output root; keep verified dependency archives in the engine-family direct `testmods` library. Each client needs a separate writable directory, not a second game installation or a `TestProfiles` directory inside Steam. The existing native harness generates these configurations and owns their restoration/custody.
