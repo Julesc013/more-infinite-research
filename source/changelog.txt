@@ -64,6 +64,8 @@ Version: @DISTRIBUTION_VERSION@
       ordinary research unit.
     - Preserve earned-above-cap research, suspended work and queues through admitted save transitions; restore only disablement
       owned by MIR.
+    - Preserve native-owner cap restoration across equivalent productivity-effect orderings without re-enabling foreign-disabled
+      research.
     - Reconcile scripted contributions against external baselines rather than overwrite aggregate foreign bonuses.
     - Walk nested pipeline and receiver prototype fields without recursive Lua stack growth.
 

@@ -494,6 +494,96 @@ class LifecycleTests(unittest.TestCase):
             "a malformed native owner gained cap ownership")
         ''')
 
+    def test_space_age_native_owner_effect_permutation_retains_only_proven_cap_rights(self):
+        self.lua.execute('''
+          local name = "low-density-structure-productivity"
+          local first = {type = "change-recipe-productivity", recipe = "low-density-structure", change = .1}
+          local second = {type = "change-recipe-productivity", recipe = "casting-low-density-structure", change = .1}
+          local function native_owner(enabled, effects)
+            local value = technology(name, 3, enabled)
+            value.prototype = {max_level = 4294967295, effects = effects or {first, second}}
+            return value
+          end
+          local function assert_queue(f, queued, progress, label)
+            assert(f.research_queue[1] == queued and f.research_queue[2] == nil
+              and f.current_research == queued and f.research_progress == progress, label)
+          end
+
+          -- A finite cap first records MIR's actual enabled-to-disabled write.
+          -- Reordering two otherwise equal native productivity effects must not
+          -- discard that right or disturb an unrelated valid queue/progress.
+          local queued = technology("unrelated-owned-queue", 1, true)
+          local owned = native_owner(true)
+          local owned_force = force(47, {[name] = owned, [queued.name] = queued}, {queued}, queued, .42)
+          owned.force, queued.force = owned_force, owned_force
+          boot({[47] = owned_force}, 0, "", nil, nil, 0, {['space-age'] = '2.1.23'}, nil,
+            {["ips-max-level-research_low_density_structure"] = 2})
+          handlers.init()
+          assert(not owned.enabled and owned.visible_when_disabled
+            and storage.mir_caps.owned_disabled[47][name].disabled == true)
+          assert_queue(owned_force, queued, .42, "initial native cap changed unrelated queue/progress")
+
+          local saved = storage
+          owned.prototype.effects = {second, first}
+          boot({[47] = owned_force}, 0, "", saved, nil, 0, {['space-age'] = '2.1.23'}, nil,
+            {["ips-max-level-research_low_density_structure"] = 2})
+          handlers.configuration()
+          assert(not owned.enabled and owned.visible_when_disabled and storage.mir_caps
+            and storage.mir_caps.owned_disabled[47][name].disabled == true,
+            "effect permutation discarded an owned native cap right")
+          assert_queue(owned_force, queued, .42, "permuted native owner changed unrelated queue/progress")
+
+          saved = storage
+          boot({[47] = owned_force}, 0, "", saved, nil, 0, {['space-age'] = '2.1.23'})
+          handlers.configuration()
+          assert(owned.enabled and not owned.visible_when_disabled and storage.mir_caps == nil,
+            "relaxed native cap did not restore the proven right after effect permutation")
+          assert_queue(owned_force, queued, .42, "native cap relaxation changed unrelated queue/progress")
+
+          -- The same permutation must not turn a foreign pre-disablement into
+          -- a MIR enablement right. Its separately recorded visibility write is
+          -- restored on relaxation, while enabled remains false.
+          local foreign_queue = technology("unrelated-foreign-queue", 1, true)
+          local foreign = native_owner(false)
+          local foreign_force = force(48, {[name] = foreign, [foreign_queue.name] = foreign_queue},
+            {foreign_queue}, foreign_queue, .27)
+          foreign.force, foreign_queue.force = foreign_force, foreign_force
+          boot({[48] = foreign_force}, 0, "", nil, nil, 0, {['space-age'] = '2.1.23'}, nil,
+            {["ips-max-level-research_low_density_structure"] = 2})
+          handlers.init()
+          assert(not foreign.enabled and foreign.visible_when_disabled
+            and storage.mir_caps.owned_disabled[48][name].disabled == nil)
+          assert_queue(foreign_force, foreign_queue, .27, "initial foreign cap changed queue/progress")
+
+          saved = storage
+          foreign.prototype.effects = {second, first}
+          boot({[48] = foreign_force}, 0, "", saved, nil, 0, {['space-age'] = '2.1.23'}, nil,
+            {["ips-max-level-research_low_density_structure"] = 2})
+          handlers.configuration()
+          assert(not foreign.enabled and foreign.visible_when_disabled and storage.mir_caps
+            and storage.mir_caps.owned_disabled[48][name].disabled == nil,
+            "effect permutation changed foreign native disablement ownership")
+          assert_queue(foreign_force, foreign_queue, .27, "permuted foreign owner changed queue/progress")
+
+          saved = storage
+          boot({[48] = foreign_force}, 0, "", saved, nil, 0, {['space-age'] = '2.1.23'})
+          handlers.configuration()
+          assert(not foreign.enabled and not foreign.visible_when_disabled and storage.mir_caps == nil,
+            "relaxed native cap re-enabled foreign disablement after effect permutation")
+          assert_queue(foreign_force, foreign_queue, .27, "foreign cap relaxation changed queue/progress")
+
+          -- Equality is recipe/type/change/count based, not permissive: a
+          -- duplicate replacement still cannot acquire native cap ownership.
+          local duplicate = native_owner(true, {first, first})
+          local duplicate_force = force(49, {[name] = duplicate}, {}, nil, nil)
+          duplicate.force = duplicate_force
+          boot({[49] = duplicate_force}, 0, "", nil, nil, 0, {['space-age'] = '2.1.23'}, nil,
+            {["ips-max-level-research_low_density_structure"] = 2})
+          handlers.init()
+          assert(duplicate.enabled and not duplicate.visible_when_disabled and storage.mir_caps == nil,
+            "duplicate native productivity recipe gained cap ownership")
+        ''')
+
     def test_foreign_interface_collision_fails_without_removing_it(self):
         self.lua.execute('''
           storage = {}; settings = {startup = startup_values(0, "")}
