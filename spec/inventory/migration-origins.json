@@ -6,23 +6,47 @@
     "tag_source_records": 64,
     "tag_source_range": "1.0.0 through 3.2.11",
     "archive_byte_status_meaning": "Only a non-null archive SHA256 plus an explicit source says archive bytes were verified. Tag-source characterization never implies an archive was found.",
-    "native_status_meaning": "Exact native evidence only. not_run is retained rather than inferred."
+    "native_status_meaning": "Exact native evidence only. not_run is retained rather than inferred.",
+    "mir4_release_records": 18,
+    "mir4_scope": "All 18 published MIR4 GitHub release records, including the preserved 4.2.0-rc.1 prerelease. Modern asset identities are server metadata, not newly verified archive bytes or native results.",
+    "expected_digest_meaning": "Expected GitHub asset digests are server hash authorities. They are not assertions that this audit downloaded or independently verified archive bytes."
   },
   "counts": {
-    "direct_f200_origins": 19,
-    "direct_f210_origins": 20,
+    "direct_f200_origins": 37,
+    "direct_f210_origins": 38,
+    "mir1_to_3_direct_f200_tag_origins": 19,
+    "mir1_to_3_direct_f210_tag_origins": 20,
     "requires_engine_bridge_or_best_effort_older_origins": 25,
     "published_4_7_3_supported_edition_origins": 9,
     "current_source_migration_json_members": 4,
-    "audited_lua_migration_members_across_64_tag_sources": 0
+    "audited_lua_migration_members_across_64_tag_sources": 0,
+    "mir4_stable_modern_archive_origins": 34,
+    "mir4_prerelease_modern_archive_origins": 2
   },
   "published_mir4_release_origin_inventory": {
-    "status": "partial-only-v4.7.3-release-metadata-characterized",
-    "enumerated_release_origins": 1,
+    "status": "all-18-mir4-release-metadata-characterized-not-archive-byte-verified",
+    "enumerated_release_origins": 18,
     "enumerated_tags": [
+      "v4.0.0",
+      "v4.1.0",
+      "v4.2.0-rc.1",
+      "v4.2.0-stable",
+      "v4.2.1",
+      "v4.2.2",
+      "v4.3.0",
+      "v4.4.0",
+      "v4.4.1",
+      "v4.4.2",
+      "v4.5.0",
+      "v4.5.1",
+      "v4.5.2",
+      "v4.6.0",
+      "v4.7.0",
+      "v4.7.1",
+      "v4.7.2",
       "v4.7.3"
     ],
-    "prior_mir4_release_origin_enumeration": "pending; this bounded unit must not be read as a complete MIR4 release or archive-variant inventory"
+    "prior_mir4_release_origin_enumeration": "superseded by published_mir4_release_origins: all18 release records and36 modern asset identities are metadata-characterized; archive bytes and member manifests remain unverified in this inventory"
   },
   "source_state_producer_boundaries": {
     "current": [
@@ -1686,24 +1710,28 @@
   "migration_member_audit": {
     "current_source_members": [
       {
-        "path": "migrations/more-infinite-research_2.0.5.json",
+        "path": "source/migrations/more-infinite-research_2.0.5.json",
         "sha256": "07A2759B963321A87B1047029AE426C7B2784033BC7C4F899D2640C037C5EEE2",
-        "git_blob": "014ca09a8864fab28275dafcf02f0295c8cac229"
+        "git_blob": "014ca09a8864fab28275dafcf02f0295c8cac229",
+        "package_member": "migrations/more-infinite-research_2.0.5.json"
       },
       {
-        "path": "migrations/more-infinite-research_2.1.0.json",
+        "path": "source/migrations/more-infinite-research_2.1.0.json",
         "sha256": "F427B215D77BC86608010ADC1D0D1A1C98BE61F0D7140EF716D77E46DAB8092D",
-        "git_blob": "0faf1db024013eab38164432037b51c37d052f00"
+        "git_blob": "0faf1db024013eab38164432037b51c37d052f00",
+        "package_member": "migrations/more-infinite-research_2.1.0.json"
       },
       {
-        "path": "migrations/more-infinite-research_4.7.0.json",
+        "path": "source/migrations/more-infinite-research_4.7.0.json",
         "sha256": "0980B0B6F1675F6827A8E4151F778143EA74C9C6C3440CC2318129DBCE63C379",
-        "git_blob": "fc59c77d1a43c547ec261e57676a1d1df187c21a"
+        "git_blob": "fc59c77d1a43c547ec261e57676a1d1df187c21a",
+        "package_member": "migrations/more-infinite-research_4.7.0.json"
       },
       {
-        "path": "migrations/more-infinite-research_5.0.11000.json",
+        "path": "source/migrations/more-infinite-research_5.0.11000.json",
         "sha256": "C26C6B21D777F3C20410C9C9ECDAFFE8ADF8DDDEAE556FE8B044146CEC40117D",
-        "git_blob": "e798b97979f9432bc3970938e5e412311aac6e6e"
+        "git_blob": "e798b97979f9432bc3970938e5e412311aac6e6e",
+        "package_member": "migrations/more-infinite-research_5.0.11000.json"
       }
     ],
     "current_lua_migration_members": [],
@@ -2600,6 +2628,533 @@
     "future_5_x_upgrade_cadence": {
       "status": "not_run",
       "policy": "Test a protected accepted 5.0.0 save against each later accepted 5.x package with exact package/archive and engine pins; this inventory is not evidence that a future build passed."
+    },
+    "mir4_modern_origins": {
+      "policy": "Each published modern archive is a separate origin unless exact archive-byte equality and all consumed inputs justify reuse. Same-version prerelease/stable bytes remain distinct; all 36 server digests here differ. F200 sources require both current F200 and F210 successors; F210 sources do not imply downgrade support. Existing narrow native results retain their separately recorded identities.",
+      "cases": [
+        {
+          "origin_tag": "v4.0.0",
+          "origin_commit": "5ca449820bdfa5595ca03686f32c74904c46daf3",
+          "prerelease": false,
+          "source_edition": "f200",
+          "origin_archive": "more-infinite-research_4.0.20000.zip",
+          "expected_archive_sha256": "5C0E299D78C4EE545958448DAE48D87BE5FE1B959875D4CB93A264D95D3DB0AE",
+          "candidate_editions": [
+            "f200",
+            "f210"
+          ],
+          "source_save_case": "not_run",
+          "candidate_upgrade_cases": "not_run",
+          "disposition": "Reuse a protected matching source save when available; otherwise verify this exact MIR archive before source preparation. Installed engine patches and available dependencies are valid first-pass inputs when recorded."
+        },
+        {
+          "origin_tag": "v4.0.0",
+          "origin_commit": "5ca449820bdfa5595ca03686f32c74904c46daf3",
+          "prerelease": false,
+          "source_edition": "f210",
+          "origin_archive": "more-infinite-research_4.0.21000.zip",
+          "expected_archive_sha256": "38541A7ED0A4181811A1E94231FF58A1268F91E7B89C7CA3D9D5F682242094B1",
+          "candidate_editions": [
+            "f210"
+          ],
+          "source_save_case": "not_run",
+          "candidate_upgrade_cases": "not_run",
+          "disposition": "Reuse a protected matching source save when available; otherwise verify this exact MIR archive before source preparation. Installed engine patches and available dependencies are valid first-pass inputs when recorded."
+        },
+        {
+          "origin_tag": "v4.1.0",
+          "origin_commit": "3562377b520cccb071b97b3968946eae7024c950",
+          "prerelease": false,
+          "source_edition": "f200",
+          "origin_archive": "more-infinite-research_4.1.20000.zip",
+          "expected_archive_sha256": "7E4EEB5D0E42152F7416CAA0BCA6274A4FDDA242AFBEDAFBAD8788CEDA2ECF34",
+          "candidate_editions": [
+            "f200",
+            "f210"
+          ],
+          "source_save_case": "not_run",
+          "candidate_upgrade_cases": "not_run",
+          "disposition": "Reuse a protected matching source save when available; otherwise verify this exact MIR archive before source preparation. Installed engine patches and available dependencies are valid first-pass inputs when recorded."
+        },
+        {
+          "origin_tag": "v4.1.0",
+          "origin_commit": "3562377b520cccb071b97b3968946eae7024c950",
+          "prerelease": false,
+          "source_edition": "f210",
+          "origin_archive": "more-infinite-research_4.1.21000.zip",
+          "expected_archive_sha256": "6E77FC9A2DEF9C3B58A2D85A4A113F9F3DE19A5712EB1EB6BBF93C14A238E0D1",
+          "candidate_editions": [
+            "f210"
+          ],
+          "source_save_case": "not_run",
+          "candidate_upgrade_cases": "not_run",
+          "disposition": "Reuse a protected matching source save when available; otherwise verify this exact MIR archive before source preparation. Installed engine patches and available dependencies are valid first-pass inputs when recorded."
+        },
+        {
+          "origin_tag": "v4.2.0-rc.1",
+          "origin_commit": "16dbc698cbb55fa2d494c2412332bb4935f7fa4c",
+          "prerelease": true,
+          "source_edition": "f200",
+          "origin_archive": "more-infinite-research_4.2.20000.zip",
+          "expected_archive_sha256": "96B7534C6081D689A860EACF37F710AD172404B5D182B2B8A4D8E41004929931",
+          "candidate_editions": [
+            "f200",
+            "f210"
+          ],
+          "source_save_case": "not_run",
+          "candidate_upgrade_cases": "not_run",
+          "disposition": "Reuse a protected matching source save when available; otherwise verify this exact MIR archive before source preparation. Installed engine patches and available dependencies are valid first-pass inputs when recorded."
+        },
+        {
+          "origin_tag": "v4.2.0-rc.1",
+          "origin_commit": "16dbc698cbb55fa2d494c2412332bb4935f7fa4c",
+          "prerelease": true,
+          "source_edition": "f210",
+          "origin_archive": "more-infinite-research_4.2.21000.zip",
+          "expected_archive_sha256": "8E9DDF6D4245B69F5E81C5FE5D76A55B2E26D22C4E927E2A513260E0130D5D4A",
+          "candidate_editions": [
+            "f210"
+          ],
+          "source_save_case": "not_run",
+          "candidate_upgrade_cases": "not_run",
+          "disposition": "Reuse a protected matching source save when available; otherwise verify this exact MIR archive before source preparation. Installed engine patches and available dependencies are valid first-pass inputs when recorded."
+        },
+        {
+          "origin_tag": "v4.2.0-stable",
+          "origin_commit": "6d19c874ea7d026d297865b96aa1b2b0916e9e61",
+          "prerelease": false,
+          "source_edition": "f200",
+          "origin_archive": "more-infinite-research_4.2.20000.zip",
+          "expected_archive_sha256": "9C4EFA1D4C3D09F5D945F227A480EA1644C494F6F9162A9CC1FB50A7523D7557",
+          "candidate_editions": [
+            "f200",
+            "f210"
+          ],
+          "source_save_case": "not_run",
+          "candidate_upgrade_cases": "not_run",
+          "disposition": "Reuse a protected matching source save when available; otherwise verify this exact MIR archive before source preparation. Installed engine patches and available dependencies are valid first-pass inputs when recorded."
+        },
+        {
+          "origin_tag": "v4.2.0-stable",
+          "origin_commit": "6d19c874ea7d026d297865b96aa1b2b0916e9e61",
+          "prerelease": false,
+          "source_edition": "f210",
+          "origin_archive": "more-infinite-research_4.2.21000.zip",
+          "expected_archive_sha256": "DE45F114931BEACF78F2CC6ABFBF3B2BDD7A79CC27E780A6E1A483FCA5ED9422",
+          "candidate_editions": [
+            "f210"
+          ],
+          "source_save_case": "not_run",
+          "candidate_upgrade_cases": "not_run",
+          "disposition": "Reuse a protected matching source save when available; otherwise verify this exact MIR archive before source preparation. Installed engine patches and available dependencies are valid first-pass inputs when recorded."
+        },
+        {
+          "origin_tag": "v4.2.1",
+          "origin_commit": "27c4777c27b3287f18df02e200235a1870bac465",
+          "prerelease": false,
+          "source_edition": "f200",
+          "origin_archive": "more-infinite-research_4.2.20001.zip",
+          "expected_archive_sha256": "EDD4A15F1C405C4B2F8487D86FC16F8C0A06470F71D3B4D05B4CAB8329D41732",
+          "candidate_editions": [
+            "f200",
+            "f210"
+          ],
+          "source_save_case": "not_run",
+          "candidate_upgrade_cases": "not_run",
+          "disposition": "Reuse a protected matching source save when available; otherwise verify this exact MIR archive before source preparation. Installed engine patches and available dependencies are valid first-pass inputs when recorded."
+        },
+        {
+          "origin_tag": "v4.2.1",
+          "origin_commit": "27c4777c27b3287f18df02e200235a1870bac465",
+          "prerelease": false,
+          "source_edition": "f210",
+          "origin_archive": "more-infinite-research_4.2.21001.zip",
+          "expected_archive_sha256": "5B1F56479D490DCA116EC373809C63138513B5A7AEBDDE1871DAB7373709A396",
+          "candidate_editions": [
+            "f210"
+          ],
+          "source_save_case": "not_run",
+          "candidate_upgrade_cases": "not_run",
+          "disposition": "Reuse a protected matching source save when available; otherwise verify this exact MIR archive before source preparation. Installed engine patches and available dependencies are valid first-pass inputs when recorded."
+        },
+        {
+          "origin_tag": "v4.2.2",
+          "origin_commit": "44fb1439ecb960e36fd79dccbec7eac902d6eb5e",
+          "prerelease": false,
+          "source_edition": "f200",
+          "origin_archive": "more-infinite-research_4.2.20002.zip",
+          "expected_archive_sha256": "14C2B23E0F4657F9F79585A982639463678D640C04916FEECC365D93B6894A65",
+          "candidate_editions": [
+            "f200",
+            "f210"
+          ],
+          "source_save_case": "not_run",
+          "candidate_upgrade_cases": "not_run",
+          "disposition": "Reuse a protected matching source save when available; otherwise verify this exact MIR archive before source preparation. Installed engine patches and available dependencies are valid first-pass inputs when recorded."
+        },
+        {
+          "origin_tag": "v4.2.2",
+          "origin_commit": "44fb1439ecb960e36fd79dccbec7eac902d6eb5e",
+          "prerelease": false,
+          "source_edition": "f210",
+          "origin_archive": "more-infinite-research_4.2.21002.zip",
+          "expected_archive_sha256": "E1303B101002618F5B2112A6EF32EE9D6A95EBEF01825A0AE17D1DA54FDCDC8B",
+          "candidate_editions": [
+            "f210"
+          ],
+          "source_save_case": "not_run",
+          "candidate_upgrade_cases": "not_run",
+          "disposition": "Reuse a protected matching source save when available; otherwise verify this exact MIR archive before source preparation. Installed engine patches and available dependencies are valid first-pass inputs when recorded."
+        },
+        {
+          "origin_tag": "v4.3.0",
+          "origin_commit": "0e2703d7b545b97a2bdb308a02d84857288b6dc1",
+          "prerelease": false,
+          "source_edition": "f200",
+          "origin_archive": "more-infinite-research_4.3.20000.zip",
+          "expected_archive_sha256": "856D81ACD0B25F24EB1DCC8B0FA4BCD68FE1A66DAFC8011A8807EF1F77F05C65",
+          "candidate_editions": [
+            "f200",
+            "f210"
+          ],
+          "source_save_case": "not_run",
+          "candidate_upgrade_cases": "not_run",
+          "disposition": "Reuse a protected matching source save when available; otherwise verify this exact MIR archive before source preparation. Installed engine patches and available dependencies are valid first-pass inputs when recorded."
+        },
+        {
+          "origin_tag": "v4.3.0",
+          "origin_commit": "0e2703d7b545b97a2bdb308a02d84857288b6dc1",
+          "prerelease": false,
+          "source_edition": "f210",
+          "origin_archive": "more-infinite-research_4.3.21000.zip",
+          "expected_archive_sha256": "9CB1B6466FC767072E0D11BFC02A139DABD8286CCF5F669C2E2500047B012F7F",
+          "candidate_editions": [
+            "f210"
+          ],
+          "source_save_case": "not_run",
+          "candidate_upgrade_cases": "not_run",
+          "disposition": "Reuse a protected matching source save when available; otherwise verify this exact MIR archive before source preparation. Installed engine patches and available dependencies are valid first-pass inputs when recorded."
+        },
+        {
+          "origin_tag": "v4.4.0",
+          "origin_commit": "72b5c72eab810baf74c9a785ac4ebbc0d438c94a",
+          "prerelease": false,
+          "source_edition": "f200",
+          "origin_archive": "more-infinite-research_4.4.20000.zip",
+          "expected_archive_sha256": "29D85A53ABC69A6B3FDC0E4EA58C77FC9B53E5671B84441192AEE5E65A4CFBD4",
+          "candidate_editions": [
+            "f200",
+            "f210"
+          ],
+          "source_save_case": "not_run",
+          "candidate_upgrade_cases": "not_run",
+          "disposition": "Reuse a protected matching source save when available; otherwise verify this exact MIR archive before source preparation. Installed engine patches and available dependencies are valid first-pass inputs when recorded."
+        },
+        {
+          "origin_tag": "v4.4.0",
+          "origin_commit": "72b5c72eab810baf74c9a785ac4ebbc0d438c94a",
+          "prerelease": false,
+          "source_edition": "f210",
+          "origin_archive": "more-infinite-research_4.4.21000.zip",
+          "expected_archive_sha256": "BD72F63F0E41214416E0D49515BFB94BAA5A98080F42CD378298C5654F39FDF4",
+          "candidate_editions": [
+            "f210"
+          ],
+          "source_save_case": "not_run",
+          "candidate_upgrade_cases": "not_run",
+          "disposition": "Reuse a protected matching source save when available; otherwise verify this exact MIR archive before source preparation. Installed engine patches and available dependencies are valid first-pass inputs when recorded."
+        },
+        {
+          "origin_tag": "v4.4.1",
+          "origin_commit": "2a41ffaf2756b6ef6b250a3cfed5903e6a5085c6",
+          "prerelease": false,
+          "source_edition": "f200",
+          "origin_archive": "more-infinite-research_4.4.20001.zip",
+          "expected_archive_sha256": "FD3D83C36275EA6C5A5F7AB9BE1D5C8CE17893865E2151A8781E643054DECB3F",
+          "candidate_editions": [
+            "f200",
+            "f210"
+          ],
+          "source_save_case": "not_run",
+          "candidate_upgrade_cases": "not_run",
+          "disposition": "Reuse a protected matching source save when available; otherwise verify this exact MIR archive before source preparation. Installed engine patches and available dependencies are valid first-pass inputs when recorded."
+        },
+        {
+          "origin_tag": "v4.4.1",
+          "origin_commit": "2a41ffaf2756b6ef6b250a3cfed5903e6a5085c6",
+          "prerelease": false,
+          "source_edition": "f210",
+          "origin_archive": "more-infinite-research_4.4.21001.zip",
+          "expected_archive_sha256": "981B0C2322D51DAF72B84DE02CFE7607CEF6A6612269EC9DCBC6ABBB58137092",
+          "candidate_editions": [
+            "f210"
+          ],
+          "source_save_case": "not_run",
+          "candidate_upgrade_cases": "not_run",
+          "disposition": "Reuse a protected matching source save when available; otherwise verify this exact MIR archive before source preparation. Installed engine patches and available dependencies are valid first-pass inputs when recorded."
+        },
+        {
+          "origin_tag": "v4.4.2",
+          "origin_commit": "fe385332f778e1c79a0ad930140fe6e4defdb17a",
+          "prerelease": false,
+          "source_edition": "f200",
+          "origin_archive": "more-infinite-research_4.4.20002.zip",
+          "expected_archive_sha256": "9467A82FC0DE73CB520C987A54A778B7278F0ADFD0315100D539FDAB843B5B58",
+          "candidate_editions": [
+            "f200",
+            "f210"
+          ],
+          "source_save_case": "not_run",
+          "candidate_upgrade_cases": "not_run",
+          "disposition": "Reuse a protected matching source save when available; otherwise verify this exact MIR archive before source preparation. Installed engine patches and available dependencies are valid first-pass inputs when recorded."
+        },
+        {
+          "origin_tag": "v4.4.2",
+          "origin_commit": "fe385332f778e1c79a0ad930140fe6e4defdb17a",
+          "prerelease": false,
+          "source_edition": "f210",
+          "origin_archive": "more-infinite-research_4.4.21002.zip",
+          "expected_archive_sha256": "12FBB1D1B71CD27B87C734A0B7F34F3B996EC4899C7A2F27C5A0C9C7A5BE972F",
+          "candidate_editions": [
+            "f210"
+          ],
+          "source_save_case": "not_run",
+          "candidate_upgrade_cases": "not_run",
+          "disposition": "Reuse a protected matching source save when available; otherwise verify this exact MIR archive before source preparation. Installed engine patches and available dependencies are valid first-pass inputs when recorded."
+        },
+        {
+          "origin_tag": "v4.5.0",
+          "origin_commit": "3096e89a044d705828cbcda93ac05bd877535d12",
+          "prerelease": false,
+          "source_edition": "f200",
+          "origin_archive": "more-infinite-research_4.5.20000.zip",
+          "expected_archive_sha256": "9BD93DD13F28BD3589A14873BE17F81CC51B14A852647B046B04EA1269922CC5",
+          "candidate_editions": [
+            "f200",
+            "f210"
+          ],
+          "source_save_case": "not_run",
+          "candidate_upgrade_cases": "not_run",
+          "disposition": "Reuse a protected matching source save when available; otherwise verify this exact MIR archive before source preparation. Installed engine patches and available dependencies are valid first-pass inputs when recorded."
+        },
+        {
+          "origin_tag": "v4.5.0",
+          "origin_commit": "3096e89a044d705828cbcda93ac05bd877535d12",
+          "prerelease": false,
+          "source_edition": "f210",
+          "origin_archive": "more-infinite-research_4.5.21000.zip",
+          "expected_archive_sha256": "A9954810B25A28DD8791C206D8BE88B5A219BB8BB191971C80A201CA49DBF083",
+          "candidate_editions": [
+            "f210"
+          ],
+          "source_save_case": "not_run",
+          "candidate_upgrade_cases": "not_run",
+          "disposition": "Reuse a protected matching source save when available; otherwise verify this exact MIR archive before source preparation. Installed engine patches and available dependencies are valid first-pass inputs when recorded."
+        },
+        {
+          "origin_tag": "v4.5.1",
+          "origin_commit": "69c297f9bca974f4280158781aa97a9678d0fcd4",
+          "prerelease": false,
+          "source_edition": "f200",
+          "origin_archive": "more-infinite-research_4.5.20001.zip",
+          "expected_archive_sha256": "6AF50F62B56580BBED277C0A943F356970598A38D3007C0F7F98EC3F07A14EDE",
+          "candidate_editions": [
+            "f200",
+            "f210"
+          ],
+          "source_save_case": "not_run",
+          "candidate_upgrade_cases": "not_run",
+          "disposition": "Reuse a protected matching source save when available; otherwise verify this exact MIR archive before source preparation. Installed engine patches and available dependencies are valid first-pass inputs when recorded."
+        },
+        {
+          "origin_tag": "v4.5.1",
+          "origin_commit": "69c297f9bca974f4280158781aa97a9678d0fcd4",
+          "prerelease": false,
+          "source_edition": "f210",
+          "origin_archive": "more-infinite-research_4.5.21001.zip",
+          "expected_archive_sha256": "10A63F6B664265B2403EA55885507F4039B1D143F08E140E81AD74775D6ADF4F",
+          "candidate_editions": [
+            "f210"
+          ],
+          "source_save_case": "not_run",
+          "candidate_upgrade_cases": "not_run",
+          "disposition": "Reuse a protected matching source save when available; otherwise verify this exact MIR archive before source preparation. Installed engine patches and available dependencies are valid first-pass inputs when recorded."
+        },
+        {
+          "origin_tag": "v4.5.2",
+          "origin_commit": "8e4de4be0f24a3da514ad39179d5ce254459788d",
+          "prerelease": false,
+          "source_edition": "f200",
+          "origin_archive": "more-infinite-research_4.5.20002.zip",
+          "expected_archive_sha256": "BACA8E34001F5569F367FCFEC28C118653269EC29FACB811E5B75B49C3C082DD",
+          "candidate_editions": [
+            "f200",
+            "f210"
+          ],
+          "source_save_case": "not_run",
+          "candidate_upgrade_cases": "not_run",
+          "disposition": "Reuse a protected matching source save when available; otherwise verify this exact MIR archive before source preparation. Installed engine patches and available dependencies are valid first-pass inputs when recorded."
+        },
+        {
+          "origin_tag": "v4.5.2",
+          "origin_commit": "8e4de4be0f24a3da514ad39179d5ce254459788d",
+          "prerelease": false,
+          "source_edition": "f210",
+          "origin_archive": "more-infinite-research_4.5.21002.zip",
+          "expected_archive_sha256": "E26B9B4603E520167694043300EF1AEEB07429189F3F9CE99DB1956D9645A704",
+          "candidate_editions": [
+            "f210"
+          ],
+          "source_save_case": "not_run",
+          "candidate_upgrade_cases": "not_run",
+          "disposition": "Reuse a protected matching source save when available; otherwise verify this exact MIR archive before source preparation. Installed engine patches and available dependencies are valid first-pass inputs when recorded."
+        },
+        {
+          "origin_tag": "v4.6.0",
+          "origin_commit": "9d6a9de1d77ca526da78428f8de52d5c61f9f55b",
+          "prerelease": false,
+          "source_edition": "f200",
+          "origin_archive": "more-infinite-research_4.6.20000.zip",
+          "expected_archive_sha256": "31DC1B9DF2D434C3B617BA663F461C5950DEE34505FC5024D7F168A0FB19BD52",
+          "candidate_editions": [
+            "f200",
+            "f210"
+          ],
+          "source_save_case": "not_run",
+          "candidate_upgrade_cases": "not_run",
+          "disposition": "Reuse a protected matching source save when available; otherwise verify this exact MIR archive before source preparation. Installed engine patches and available dependencies are valid first-pass inputs when recorded."
+        },
+        {
+          "origin_tag": "v4.6.0",
+          "origin_commit": "9d6a9de1d77ca526da78428f8de52d5c61f9f55b",
+          "prerelease": false,
+          "source_edition": "f210",
+          "origin_archive": "more-infinite-research_4.6.21000.zip",
+          "expected_archive_sha256": "5A1CA84B0AA8E9690B9095DB12DC991C26EF9081481E2A530B953F47384A945A",
+          "candidate_editions": [
+            "f210"
+          ],
+          "source_save_case": "not_run",
+          "candidate_upgrade_cases": "not_run",
+          "disposition": "Reuse a protected matching source save when available; otherwise verify this exact MIR archive before source preparation. Installed engine patches and available dependencies are valid first-pass inputs when recorded."
+        },
+        {
+          "origin_tag": "v4.7.0",
+          "origin_commit": "84bd157ad7b63b7d171fac2311bf30de70429c11",
+          "prerelease": false,
+          "source_edition": "f200",
+          "origin_archive": "more-infinite-research_4.7.20000.zip",
+          "expected_archive_sha256": "7958731AAD672C7F16B9307E7B20F97B8E97B58CC57E5D1F9AE670018A8A1B5B",
+          "candidate_editions": [
+            "f200",
+            "f210"
+          ],
+          "source_save_case": "not_run",
+          "candidate_upgrade_cases": "not_run",
+          "disposition": "Reuse a protected matching source save when available; otherwise verify this exact MIR archive before source preparation. Installed engine patches and available dependencies are valid first-pass inputs when recorded."
+        },
+        {
+          "origin_tag": "v4.7.0",
+          "origin_commit": "84bd157ad7b63b7d171fac2311bf30de70429c11",
+          "prerelease": false,
+          "source_edition": "f210",
+          "origin_archive": "more-infinite-research_4.7.21000.zip",
+          "expected_archive_sha256": "708A529F1F6D649E0A732216CD8D8FEFE68F2C6C2DF2B40DA030C2C4C51558D1",
+          "candidate_editions": [
+            "f210"
+          ],
+          "source_save_case": "not_run",
+          "candidate_upgrade_cases": "not_run",
+          "disposition": "Reuse a protected matching source save when available; otherwise verify this exact MIR archive before source preparation. Installed engine patches and available dependencies are valid first-pass inputs when recorded."
+        },
+        {
+          "origin_tag": "v4.7.1",
+          "origin_commit": "8911ab8f9ad4a7c8764444148183a4dfa137ed7d",
+          "prerelease": false,
+          "source_edition": "f200",
+          "origin_archive": "more-infinite-research_4.7.20001.zip",
+          "expected_archive_sha256": "EEE6D5AEFA26CD58B973EEF34BF31E368C078B436190F47587D4F5B46CDB954D",
+          "candidate_editions": [
+            "f200",
+            "f210"
+          ],
+          "source_save_case": "not_run",
+          "candidate_upgrade_cases": "not_run",
+          "disposition": "Reuse a protected matching source save when available; otherwise verify this exact MIR archive before source preparation. Installed engine patches and available dependencies are valid first-pass inputs when recorded."
+        },
+        {
+          "origin_tag": "v4.7.1",
+          "origin_commit": "8911ab8f9ad4a7c8764444148183a4dfa137ed7d",
+          "prerelease": false,
+          "source_edition": "f210",
+          "origin_archive": "more-infinite-research_4.7.21001.zip",
+          "expected_archive_sha256": "5F1C85F1290E2E07411813FDDD01D763DA47C6768CE85B3E7913A1D9A2CF2153",
+          "candidate_editions": [
+            "f210"
+          ],
+          "source_save_case": "not_run",
+          "candidate_upgrade_cases": "not_run",
+          "disposition": "Reuse a protected matching source save when available; otherwise verify this exact MIR archive before source preparation. Installed engine patches and available dependencies are valid first-pass inputs when recorded."
+        },
+        {
+          "origin_tag": "v4.7.2",
+          "origin_commit": "bd9774f323b6eb1561c1d9ff0c91ecc3f7acd1d1",
+          "prerelease": false,
+          "source_edition": "f200",
+          "origin_archive": "more-infinite-research_4.7.20002.zip",
+          "expected_archive_sha256": "F3943EB4D69CCDAC41BD9F922AD03A5C78F34F22D8E7FA5A88A7A658AB1010B7",
+          "candidate_editions": [
+            "f200",
+            "f210"
+          ],
+          "source_save_case": "not_run",
+          "candidate_upgrade_cases": "not_run",
+          "disposition": "Reuse a protected matching source save when available; otherwise verify this exact MIR archive before source preparation. Installed engine patches and available dependencies are valid first-pass inputs when recorded."
+        },
+        {
+          "origin_tag": "v4.7.2",
+          "origin_commit": "bd9774f323b6eb1561c1d9ff0c91ecc3f7acd1d1",
+          "prerelease": false,
+          "source_edition": "f210",
+          "origin_archive": "more-infinite-research_4.7.21002.zip",
+          "expected_archive_sha256": "A4BB8F47232C689B267EF434F557187A8795C47280FA464169DE917FB579517F",
+          "candidate_editions": [
+            "f210"
+          ],
+          "source_save_case": "not_run",
+          "candidate_upgrade_cases": "not_run",
+          "disposition": "Reuse a protected matching source save when available; otherwise verify this exact MIR archive before source preparation. Installed engine patches and available dependencies are valid first-pass inputs when recorded."
+        },
+        {
+          "origin_tag": "v4.7.3",
+          "origin_commit": "8643cc91bc915e008556a5315dbb0a743247e7ab",
+          "prerelease": false,
+          "source_edition": "f200",
+          "origin_archive": "more-infinite-research_4.7.20003.zip",
+          "expected_archive_sha256": "FBBA844DD04011A12BB6DA885745B0733AD37FAB181EAAD9EE4346B9B0D32647",
+          "candidate_editions": [
+            "f200",
+            "f210"
+          ],
+          "source_save_case": "not_run",
+          "candidate_upgrade_cases": "not_run",
+          "disposition": "Reuse a protected matching source save when available; otherwise verify this exact MIR archive before source preparation. Installed engine patches and available dependencies are valid first-pass inputs when recorded."
+        },
+        {
+          "origin_tag": "v4.7.3",
+          "origin_commit": "8643cc91bc915e008556a5315dbb0a743247e7ab",
+          "prerelease": false,
+          "source_edition": "f210",
+          "origin_archive": "more-infinite-research_4.7.21003.zip",
+          "expected_archive_sha256": "B6EB9430056ABD384DB00F94929FE7DAC0A37441ACF4BC277946689682628852",
+          "candidate_editions": [
+            "f210"
+          ],
+          "source_save_case": "not_run",
+          "candidate_upgrade_cases": "not_run",
+          "disposition": "Reuse a protected matching source save when available; otherwise verify this exact MIR archive before source preparation. Installed engine patches and available dependencies are valid first-pass inputs when recorded."
+        }
+      ]
     }
   },
   "known_gaps_and_retention": [
@@ -2607,8 +3162,976 @@
     "Exact 1.0.0 is F200-direct by its info.json factorio_version 2.0 and must not be moved into the older-engine bridge population.",
     "The 25 non-F200/F210 tag origins remain explicit best-effort bridge cases. Existing F017/F100/F110 evidence is useful only at its recorded exact inputs.",
     "Existing MIR4 source and cross-engine chains are retained as scoped reuse candidates, not relabelled as current 5.x acceptance.",
-    "Only v4.7.3 is enumerated in published_mir4_release_origin_inventory. Earlier MIR4 releases and their archive variants remain a visible pending inventory task.",
     "Intermediate 1.x-3.x control.lua/runtime schema evolution is not inferred from the absence of migration Lua and remains pending source-boundary audit.",
-    "No fixture, save, profile, package, direct library, engine, or artifact is changed by this inventory."
-  ]
+    "No fixture, save, profile, package, direct library, engine, or artifact is changed by this inventory.",
+    "All 18 MIR4 release records and their 36 modern archive identities are now enumerated. Archive-byte verification, protected source-save availability, per-origin state oracles and native upgrades remain pending except for separately recorded exact scoped evidence.",
+    "Early MIR4 raw source info.json can retain an earlier product version; do not construct a historical distribution by repackaging that raw metadata or infer package eligibility from it. Verify the published archive and its actual info.json.",
+    "MIR4 4.2.0-rc.1 and 4.2.0-stable reuse source-version labels but their modern archive digests differ; preserve both origins and their tag exceptions without renaming or merging their identities."
+  ],
+  "published_mir4_release_origins": {
+    "status": "git-and-github-release-metadata-only-not-native-qualified",
+    "metadata_endpoint": "https://api.github.com/repos/Julesc013/more-infinite-research/releases?per_page=100",
+    "metadata_snapshot_sha256": "6E80BF580563E44A0CCEA872EF88E4A08547C0DFE564109030D3312F3314AEBF",
+    "metadata_primary_locator": "build/qualification/migration-origins/mir4-release-metadata.json",
+    "release_count": 18,
+    "records": [
+      {
+        "tag": "v4.0.0",
+        "full_commit": "5ca449820bdfa5595ca03686f32c74904c46daf3",
+        "github_release_id": 379184899,
+        "prerelease": false,
+        "published_at": "2026-08-30T05:02:35Z",
+        "release_url": "https://github.com/Julesc013/more-infinite-research/releases/tag/v4.0.0",
+        "raw_info_observation": {
+          "path": "info.json",
+          "git_blob": "4abe232385f22774f62a6ec5ff4d0147a8c5cf3b",
+          "sha256": "2F51821A98F9CD616068145BB38D74598242A2AECBE6C060465C07D2BBC9A5E1",
+          "observed_version": "3.2.11",
+          "observed_factorio_version": "2.1",
+          "scope": "Observed raw source metadata only; composed distribution metadata must be read from the actual archive before execution."
+        },
+        "migration_source_members": [
+          {
+            "path": "migrations/more-infinite-research_2.0.5.json",
+            "git_blob": "014ca09a8864fab28275dafcf02f0295c8cac229",
+            "bytes": 142,
+            "sha256": "07A2759B963321A87B1047029AE426C7B2784033BC7C4F899D2640C037C5EEE2"
+          },
+          {
+            "path": "migrations/more-infinite-research_2.1.0.json",
+            "git_blob": "0faf1db024013eab38164432037b51c37d052f00",
+            "bytes": 125,
+            "sha256": "F427B215D77BC86608010ADC1D0D1A1C98BE61F0D7140EF716D77E46DAB8092D"
+          }
+        ],
+        "modern_archives": [
+          {
+            "edition": "f200",
+            "filename": "more-infinite-research_4.0.20000.zip",
+            "version": "4.0.20000",
+            "source_version": "4.0.0",
+            "github_asset_id": 536164432,
+            "bytes": 1067014,
+            "expected_archive_sha256": "5C0E299D78C4EE545958448DAE48D87BE5FE1B959875D4CB93A264D95D3DB0AE",
+            "hash_authority": "GitHub release asset digest; archive bytes not fetched or verified by this audit",
+            "download_url": "https://github.com/Julesc013/more-infinite-research/releases/download/v4.0.0/more-infinite-research_4.0.20000.zip",
+            "archive_byte_status": "metadata-characterized-not-byte-verified-in-this-audit",
+            "native_status": "not_run"
+          },
+          {
+            "edition": "f210",
+            "filename": "more-infinite-research_4.0.21000.zip",
+            "version": "4.0.21000",
+            "source_version": "4.0.0",
+            "github_asset_id": 536164425,
+            "bytes": 1069552,
+            "expected_archive_sha256": "38541A7ED0A4181811A1E94231FF58A1268F91E7B89C7CA3D9D5F682242094B1",
+            "hash_authority": "GitHub release asset digest; archive bytes not fetched or verified by this audit",
+            "download_url": "https://github.com/Julesc013/more-infinite-research/releases/download/v4.0.0/more-infinite-research_4.0.21000.zip",
+            "archive_byte_status": "metadata-characterized-not-byte-verified-in-this-audit",
+            "native_status": "not_run"
+          }
+        ]
+      },
+      {
+        "tag": "v4.1.0",
+        "full_commit": "3562377b520cccb071b97b3968946eae7024c950",
+        "github_release_id": 383203807,
+        "prerelease": false,
+        "published_at": "2026-09-05T09:55:54Z",
+        "release_url": "https://github.com/Julesc013/more-infinite-research/releases/tag/v4.1.0",
+        "raw_info_observation": {
+          "path": "info.json",
+          "git_blob": "4abe232385f22774f62a6ec5ff4d0147a8c5cf3b",
+          "sha256": "2F51821A98F9CD616068145BB38D74598242A2AECBE6C060465C07D2BBC9A5E1",
+          "observed_version": "3.2.11",
+          "observed_factorio_version": "2.1",
+          "scope": "Observed raw source metadata only; composed distribution metadata must be read from the actual archive before execution."
+        },
+        "migration_source_members": [
+          {
+            "path": "migrations/more-infinite-research_2.0.5.json",
+            "git_blob": "014ca09a8864fab28275dafcf02f0295c8cac229",
+            "bytes": 142,
+            "sha256": "07A2759B963321A87B1047029AE426C7B2784033BC7C4F899D2640C037C5EEE2"
+          },
+          {
+            "path": "migrations/more-infinite-research_2.1.0.json",
+            "git_blob": "0faf1db024013eab38164432037b51c37d052f00",
+            "bytes": 125,
+            "sha256": "F427B215D77BC86608010ADC1D0D1A1C98BE61F0D7140EF716D77E46DAB8092D"
+          }
+        ],
+        "modern_archives": [
+          {
+            "edition": "f200",
+            "filename": "more-infinite-research_4.1.20000.zip",
+            "version": "4.1.20000",
+            "source_version": "4.1.0",
+            "github_asset_id": 545663038,
+            "bytes": 1059713,
+            "expected_archive_sha256": "7E4EEB5D0E42152F7416CAA0BCA6274A4FDDA242AFBEDAFBAD8788CEDA2ECF34",
+            "hash_authority": "GitHub release asset digest; archive bytes not fetched or verified by this audit",
+            "download_url": "https://github.com/Julesc013/more-infinite-research/releases/download/v4.1.0/more-infinite-research_4.1.20000.zip",
+            "archive_byte_status": "metadata-characterized-not-byte-verified-in-this-audit",
+            "native_status": "not_run"
+          },
+          {
+            "edition": "f210",
+            "filename": "more-infinite-research_4.1.21000.zip",
+            "version": "4.1.21000",
+            "source_version": "4.1.0",
+            "github_asset_id": 545662993,
+            "bytes": 1062500,
+            "expected_archive_sha256": "6E77FC9A2DEF9C3B58A2D85A4A113F9F3DE19A5712EB1EB6BBF93C14A238E0D1",
+            "hash_authority": "GitHub release asset digest; archive bytes not fetched or verified by this audit",
+            "download_url": "https://github.com/Julesc013/more-infinite-research/releases/download/v4.1.0/more-infinite-research_4.1.21000.zip",
+            "archive_byte_status": "metadata-characterized-not-byte-verified-in-this-audit",
+            "native_status": "not_run"
+          }
+        ]
+      },
+      {
+        "tag": "v4.2.0-rc.1",
+        "full_commit": "16dbc698cbb55fa2d494c2412332bb4935f7fa4c",
+        "github_release_id": 402429146,
+        "prerelease": true,
+        "published_at": "2026-10-03T09:13:43Z",
+        "release_url": "https://github.com/Julesc013/more-infinite-research/releases/tag/v4.2.0-rc.1",
+        "raw_info_observation": null,
+        "migration_source_members": [
+          {
+            "path": "source/migrations/more-infinite-research_2.0.5.json",
+            "git_blob": "014ca09a8864fab28275dafcf02f0295c8cac229",
+            "bytes": 142,
+            "sha256": "07A2759B963321A87B1047029AE426C7B2784033BC7C4F899D2640C037C5EEE2"
+          },
+          {
+            "path": "source/migrations/more-infinite-research_2.1.0.json",
+            "git_blob": "0faf1db024013eab38164432037b51c37d052f00",
+            "bytes": 125,
+            "sha256": "F427B215D77BC86608010ADC1D0D1A1C98BE61F0D7140EF716D77E46DAB8092D"
+          }
+        ],
+        "modern_archives": [
+          {
+            "edition": "f200",
+            "filename": "more-infinite-research_4.2.20000.zip",
+            "version": "4.2.20000",
+            "source_version": "4.2.0",
+            "github_asset_id": 607509723,
+            "bytes": 1238138,
+            "expected_archive_sha256": "96B7534C6081D689A860EACF37F710AD172404B5D182B2B8A4D8E41004929931",
+            "hash_authority": "GitHub release asset digest; archive bytes not fetched or verified by this audit",
+            "download_url": "https://github.com/Julesc013/more-infinite-research/releases/download/v4.2.0-rc.1/more-infinite-research_4.2.20000.zip",
+            "archive_byte_status": "metadata-characterized-not-byte-verified-in-this-audit",
+            "native_status": "not_run"
+          },
+          {
+            "edition": "f210",
+            "filename": "more-infinite-research_4.2.21000.zip",
+            "version": "4.2.21000",
+            "source_version": "4.2.0",
+            "github_asset_id": 607509743,
+            "bytes": 1242094,
+            "expected_archive_sha256": "8E9DDF6D4245B69F5E81C5FE5D76A55B2E26D22C4E927E2A513260E0130D5D4A",
+            "hash_authority": "GitHub release asset digest; archive bytes not fetched or verified by this audit",
+            "download_url": "https://github.com/Julesc013/more-infinite-research/releases/download/v4.2.0-rc.1/more-infinite-research_4.2.21000.zip",
+            "archive_byte_status": "metadata-characterized-not-byte-verified-in-this-audit",
+            "native_status": "not_run"
+          }
+        ]
+      },
+      {
+        "tag": "v4.2.0-stable",
+        "full_commit": "6d19c874ea7d026d297865b96aa1b2b0916e9e61",
+        "github_release_id": 402577876,
+        "prerelease": false,
+        "published_at": "2026-10-03T15:48:35Z",
+        "release_url": "https://github.com/Julesc013/more-infinite-research/releases/tag/v4.2.0-stable",
+        "raw_info_observation": null,
+        "migration_source_members": [
+          {
+            "path": "source/migrations/more-infinite-research_2.0.5.json",
+            "git_blob": "014ca09a8864fab28275dafcf02f0295c8cac229",
+            "bytes": 142,
+            "sha256": "07A2759B963321A87B1047029AE426C7B2784033BC7C4F899D2640C037C5EEE2"
+          },
+          {
+            "path": "source/migrations/more-infinite-research_2.1.0.json",
+            "git_blob": "0faf1db024013eab38164432037b51c37d052f00",
+            "bytes": 125,
+            "sha256": "F427B215D77BC86608010ADC1D0D1A1C98BE61F0D7140EF716D77E46DAB8092D"
+          }
+        ],
+        "modern_archives": [
+          {
+            "edition": "f200",
+            "filename": "more-infinite-research_4.2.20000.zip",
+            "version": "4.2.20000",
+            "source_version": "4.2.0",
+            "github_asset_id": 608069690,
+            "bytes": 1241057,
+            "expected_archive_sha256": "9C4EFA1D4C3D09F5D945F227A480EA1644C494F6F9162A9CC1FB50A7523D7557",
+            "hash_authority": "GitHub release asset digest; archive bytes not fetched or verified by this audit",
+            "download_url": "https://github.com/Julesc013/more-infinite-research/releases/download/v4.2.0-stable/more-infinite-research_4.2.20000.zip",
+            "archive_byte_status": "metadata-characterized-not-byte-verified-in-this-audit",
+            "native_status": "not_run"
+          },
+          {
+            "edition": "f210",
+            "filename": "more-infinite-research_4.2.21000.zip",
+            "version": "4.2.21000",
+            "source_version": "4.2.0",
+            "github_asset_id": 608069880,
+            "bytes": 1244976,
+            "expected_archive_sha256": "DE45F114931BEACF78F2CC6ABFBF3B2BDD7A79CC27E780A6E1A483FCA5ED9422",
+            "hash_authority": "GitHub release asset digest; archive bytes not fetched or verified by this audit",
+            "download_url": "https://github.com/Julesc013/more-infinite-research/releases/download/v4.2.0-stable/more-infinite-research_4.2.21000.zip",
+            "archive_byte_status": "metadata-characterized-not-byte-verified-in-this-audit",
+            "native_status": "not_run"
+          }
+        ]
+      },
+      {
+        "tag": "v4.2.1",
+        "full_commit": "27c4777c27b3287f18df02e200235a1870bac465",
+        "github_release_id": 407909462,
+        "prerelease": false,
+        "published_at": "2026-10-09T13:03:56Z",
+        "release_url": "https://github.com/Julesc013/more-infinite-research/releases/tag/v4.2.1",
+        "raw_info_observation": null,
+        "migration_source_members": [
+          {
+            "path": "source/migrations/more-infinite-research_2.0.5.json",
+            "git_blob": "014ca09a8864fab28275dafcf02f0295c8cac229",
+            "bytes": 142,
+            "sha256": "07A2759B963321A87B1047029AE426C7B2784033BC7C4F899D2640C037C5EEE2"
+          },
+          {
+            "path": "source/migrations/more-infinite-research_2.1.0.json",
+            "git_blob": "0faf1db024013eab38164432037b51c37d052f00",
+            "bytes": 125,
+            "sha256": "F427B215D77BC86608010ADC1D0D1A1C98BE61F0D7140EF716D77E46DAB8092D"
+          }
+        ],
+        "modern_archives": [
+          {
+            "edition": "f200",
+            "filename": "more-infinite-research_4.2.20001.zip",
+            "version": "4.2.20001",
+            "source_version": "4.2.1",
+            "github_asset_id": 624981884,
+            "bytes": 1415574,
+            "expected_archive_sha256": "EDD4A15F1C405C4B2F8487D86FC16F8C0A06470F71D3B4D05B4CAB8329D41732",
+            "hash_authority": "GitHub release asset digest; archive bytes not fetched or verified by this audit",
+            "download_url": "https://github.com/Julesc013/more-infinite-research/releases/download/v4.2.1/more-infinite-research_4.2.20001.zip",
+            "archive_byte_status": "metadata-characterized-not-byte-verified-in-this-audit",
+            "native_status": "not_run"
+          },
+          {
+            "edition": "f210",
+            "filename": "more-infinite-research_4.2.21001.zip",
+            "version": "4.2.21001",
+            "source_version": "4.2.1",
+            "github_asset_id": 624989028,
+            "bytes": 1419453,
+            "expected_archive_sha256": "5B1F56479D490DCA116EC373809C63138513B5A7AEBDDE1871DAB7373709A396",
+            "hash_authority": "GitHub release asset digest; archive bytes not fetched or verified by this audit",
+            "download_url": "https://github.com/Julesc013/more-infinite-research/releases/download/v4.2.1/more-infinite-research_4.2.21001.zip",
+            "archive_byte_status": "metadata-characterized-not-byte-verified-in-this-audit",
+            "native_status": "not_run"
+          }
+        ]
+      },
+      {
+        "tag": "v4.2.2",
+        "full_commit": "44fb1439ecb960e36fd79dccbec7eac902d6eb5e",
+        "github_release_id": 408949558,
+        "prerelease": false,
+        "published_at": "2026-10-10T12:50:26Z",
+        "release_url": "https://github.com/Julesc013/more-infinite-research/releases/tag/v4.2.2",
+        "raw_info_observation": null,
+        "migration_source_members": [
+          {
+            "path": "source/migrations/more-infinite-research_2.0.5.json",
+            "git_blob": "014ca09a8864fab28275dafcf02f0295c8cac229",
+            "bytes": 142,
+            "sha256": "07A2759B963321A87B1047029AE426C7B2784033BC7C4F899D2640C037C5EEE2"
+          },
+          {
+            "path": "source/migrations/more-infinite-research_2.1.0.json",
+            "git_blob": "0faf1db024013eab38164432037b51c37d052f00",
+            "bytes": 125,
+            "sha256": "F427B215D77BC86608010ADC1D0D1A1C98BE61F0D7140EF716D77E46DAB8092D"
+          }
+        ],
+        "modern_archives": [
+          {
+            "edition": "f200",
+            "filename": "more-infinite-research_4.2.20002.zip",
+            "version": "4.2.20002",
+            "source_version": "4.2.2",
+            "github_asset_id": 627967995,
+            "bytes": 1421262,
+            "expected_archive_sha256": "14C2B23E0F4657F9F79585A982639463678D640C04916FEECC365D93B6894A65",
+            "hash_authority": "GitHub release asset digest; archive bytes not fetched or verified by this audit",
+            "download_url": "https://github.com/Julesc013/more-infinite-research/releases/download/v4.2.2/more-infinite-research_4.2.20002.zip",
+            "archive_byte_status": "metadata-characterized-not-byte-verified-in-this-audit",
+            "native_status": "not_run"
+          },
+          {
+            "edition": "f210",
+            "filename": "more-infinite-research_4.2.21002.zip",
+            "version": "4.2.21002",
+            "source_version": "4.2.2",
+            "github_asset_id": 627968233,
+            "bytes": 1425122,
+            "expected_archive_sha256": "E1303B101002618F5B2112A6EF32EE9D6A95EBEF01825A0AE17D1DA54FDCDC8B",
+            "hash_authority": "GitHub release asset digest; archive bytes not fetched or verified by this audit",
+            "download_url": "https://github.com/Julesc013/more-infinite-research/releases/download/v4.2.2/more-infinite-research_4.2.21002.zip",
+            "archive_byte_status": "metadata-characterized-not-byte-verified-in-this-audit",
+            "native_status": "not_run"
+          }
+        ]
+      },
+      {
+        "tag": "v4.3.0",
+        "full_commit": "0e2703d7b545b97a2bdb308a02d84857288b6dc1",
+        "github_release_id": 411700807,
+        "prerelease": false,
+        "published_at": "2026-10-13T13:25:24Z",
+        "release_url": "https://github.com/Julesc013/more-infinite-research/releases/tag/v4.3.0",
+        "raw_info_observation": null,
+        "migration_source_members": [
+          {
+            "path": "source/migrations/more-infinite-research_2.0.5.json",
+            "git_blob": "014ca09a8864fab28275dafcf02f0295c8cac229",
+            "bytes": 142,
+            "sha256": "07A2759B963321A87B1047029AE426C7B2784033BC7C4F899D2640C037C5EEE2"
+          },
+          {
+            "path": "source/migrations/more-infinite-research_2.1.0.json",
+            "git_blob": "0faf1db024013eab38164432037b51c37d052f00",
+            "bytes": 125,
+            "sha256": "F427B215D77BC86608010ADC1D0D1A1C98BE61F0D7140EF716D77E46DAB8092D"
+          }
+        ],
+        "modern_archives": [
+          {
+            "edition": "f200",
+            "filename": "more-infinite-research_4.3.20000.zip",
+            "version": "4.3.20000",
+            "source_version": "4.3.0",
+            "github_asset_id": 637109639,
+            "bytes": 1456776,
+            "expected_archive_sha256": "856D81ACD0B25F24EB1DCC8B0FA4BCD68FE1A66DAFC8011A8807EF1F77F05C65",
+            "hash_authority": "GitHub release asset digest; archive bytes not fetched or verified by this audit",
+            "download_url": "https://github.com/Julesc013/more-infinite-research/releases/download/v4.3.0/more-infinite-research_4.3.20000.zip",
+            "archive_byte_status": "metadata-characterized-not-byte-verified-in-this-audit",
+            "native_status": "not_run"
+          },
+          {
+            "edition": "f210",
+            "filename": "more-infinite-research_4.3.21000.zip",
+            "version": "4.3.21000",
+            "source_version": "4.3.0",
+            "github_asset_id": 637109643,
+            "bytes": 1460639,
+            "expected_archive_sha256": "9CB1B6466FC767072E0D11BFC02A139DABD8286CCF5F669C2E2500047B012F7F",
+            "hash_authority": "GitHub release asset digest; archive bytes not fetched or verified by this audit",
+            "download_url": "https://github.com/Julesc013/more-infinite-research/releases/download/v4.3.0/more-infinite-research_4.3.21000.zip",
+            "archive_byte_status": "metadata-characterized-not-byte-verified-in-this-audit",
+            "native_status": "not_run"
+          }
+        ]
+      },
+      {
+        "tag": "v4.4.0",
+        "full_commit": "72b5c72eab810baf74c9a785ac4ebbc0d438c94a",
+        "github_release_id": 413564113,
+        "prerelease": false,
+        "published_at": "2026-10-15T08:16:05Z",
+        "release_url": "https://github.com/Julesc013/more-infinite-research/releases/tag/v4.4.0",
+        "raw_info_observation": null,
+        "migration_source_members": [
+          {
+            "path": "source/migrations/more-infinite-research_2.0.5.json",
+            "git_blob": "014ca09a8864fab28275dafcf02f0295c8cac229",
+            "bytes": 142,
+            "sha256": "07A2759B963321A87B1047029AE426C7B2784033BC7C4F899D2640C037C5EEE2"
+          },
+          {
+            "path": "source/migrations/more-infinite-research_2.1.0.json",
+            "git_blob": "0faf1db024013eab38164432037b51c37d052f00",
+            "bytes": 125,
+            "sha256": "F427B215D77BC86608010ADC1D0D1A1C98BE61F0D7140EF716D77E46DAB8092D"
+          }
+        ],
+        "modern_archives": [
+          {
+            "edition": "f200",
+            "filename": "more-infinite-research_4.4.20000.zip",
+            "version": "4.4.20000",
+            "source_version": "4.4.0",
+            "github_asset_id": 643184818,
+            "bytes": 1403874,
+            "expected_archive_sha256": "29D85A53ABC69A6B3FDC0E4EA58C77FC9B53E5671B84441192AEE5E65A4CFBD4",
+            "hash_authority": "GitHub release asset digest; archive bytes not fetched or verified by this audit",
+            "download_url": "https://github.com/Julesc013/more-infinite-research/releases/download/v4.4.0/more-infinite-research_4.4.20000.zip",
+            "archive_byte_status": "metadata-characterized-not-byte-verified-in-this-audit",
+            "native_status": "not_run"
+          },
+          {
+            "edition": "f210",
+            "filename": "more-infinite-research_4.4.21000.zip",
+            "version": "4.4.21000",
+            "source_version": "4.4.0",
+            "github_asset_id": 643184887,
+            "bytes": 1407744,
+            "expected_archive_sha256": "BD72F63F0E41214416E0D49515BFB94BAA5A98080F42CD378298C5654F39FDF4",
+            "hash_authority": "GitHub release asset digest; archive bytes not fetched or verified by this audit",
+            "download_url": "https://github.com/Julesc013/more-infinite-research/releases/download/v4.4.0/more-infinite-research_4.4.21000.zip",
+            "archive_byte_status": "metadata-characterized-not-byte-verified-in-this-audit",
+            "native_status": "not_run"
+          }
+        ]
+      },
+      {
+        "tag": "v4.4.1",
+        "full_commit": "2a41ffaf2756b6ef6b250a3cfed5903e6a5085c6",
+        "github_release_id": 413691909,
+        "prerelease": false,
+        "published_at": "2026-10-15T10:50:21Z",
+        "release_url": "https://github.com/Julesc013/more-infinite-research/releases/tag/v4.4.1",
+        "raw_info_observation": null,
+        "migration_source_members": [
+          {
+            "path": "source/migrations/more-infinite-research_2.0.5.json",
+            "git_blob": "014ca09a8864fab28275dafcf02f0295c8cac229",
+            "bytes": 142,
+            "sha256": "07A2759B963321A87B1047029AE426C7B2784033BC7C4F899D2640C037C5EEE2"
+          },
+          {
+            "path": "source/migrations/more-infinite-research_2.1.0.json",
+            "git_blob": "0faf1db024013eab38164432037b51c37d052f00",
+            "bytes": 125,
+            "sha256": "F427B215D77BC86608010ADC1D0D1A1C98BE61F0D7140EF716D77E46DAB8092D"
+          }
+        ],
+        "modern_archives": [
+          {
+            "edition": "f200",
+            "filename": "more-infinite-research_4.4.20001.zip",
+            "version": "4.4.20001",
+            "source_version": "4.4.1",
+            "github_asset_id": 643548906,
+            "bytes": 1403717,
+            "expected_archive_sha256": "FD3D83C36275EA6C5A5F7AB9BE1D5C8CE17893865E2151A8781E643054DECB3F",
+            "hash_authority": "GitHub release asset digest; archive bytes not fetched or verified by this audit",
+            "download_url": "https://github.com/Julesc013/more-infinite-research/releases/download/v4.4.1/more-infinite-research_4.4.20001.zip",
+            "archive_byte_status": "metadata-characterized-not-byte-verified-in-this-audit",
+            "native_status": "not_run"
+          },
+          {
+            "edition": "f210",
+            "filename": "more-infinite-research_4.4.21001.zip",
+            "version": "4.4.21001",
+            "source_version": "4.4.1",
+            "github_asset_id": 643548913,
+            "bytes": 1407589,
+            "expected_archive_sha256": "981B0C2322D51DAF72B84DE02CFE7607CEF6A6612269EC9DCBC6ABBB58137092",
+            "hash_authority": "GitHub release asset digest; archive bytes not fetched or verified by this audit",
+            "download_url": "https://github.com/Julesc013/more-infinite-research/releases/download/v4.4.1/more-infinite-research_4.4.21001.zip",
+            "archive_byte_status": "metadata-characterized-not-byte-verified-in-this-audit",
+            "native_status": "not_run"
+          }
+        ]
+      },
+      {
+        "tag": "v4.4.2",
+        "full_commit": "fe385332f778e1c79a0ad930140fe6e4defdb17a",
+        "github_release_id": 415194452,
+        "prerelease": false,
+        "published_at": "2026-10-16T17:10:35Z",
+        "release_url": "https://github.com/Julesc013/more-infinite-research/releases/tag/v4.4.2",
+        "raw_info_observation": null,
+        "migration_source_members": [
+          {
+            "path": "source/migrations/more-infinite-research_2.0.5.json",
+            "git_blob": "014ca09a8864fab28275dafcf02f0295c8cac229",
+            "bytes": 142,
+            "sha256": "07A2759B963321A87B1047029AE426C7B2784033BC7C4F899D2640C037C5EEE2"
+          },
+          {
+            "path": "source/migrations/more-infinite-research_2.1.0.json",
+            "git_blob": "0faf1db024013eab38164432037b51c37d052f00",
+            "bytes": 125,
+            "sha256": "F427B215D77BC86608010ADC1D0D1A1C98BE61F0D7140EF716D77E46DAB8092D"
+          }
+        ],
+        "modern_archives": [
+          {
+            "edition": "f200",
+            "filename": "more-infinite-research_4.4.20002.zip",
+            "version": "4.4.20002",
+            "source_version": "4.4.2",
+            "github_asset_id": 648013220,
+            "bytes": 1409555,
+            "expected_archive_sha256": "9467A82FC0DE73CB520C987A54A778B7278F0ADFD0315100D539FDAB843B5B58",
+            "hash_authority": "GitHub release asset digest; archive bytes not fetched or verified by this audit",
+            "download_url": "https://github.com/Julesc013/more-infinite-research/releases/download/v4.4.2/more-infinite-research_4.4.20002.zip",
+            "archive_byte_status": "metadata-characterized-not-byte-verified-in-this-audit",
+            "native_status": "not_run"
+          },
+          {
+            "edition": "f210",
+            "filename": "more-infinite-research_4.4.21002.zip",
+            "version": "4.4.21002",
+            "source_version": "4.4.2",
+            "github_asset_id": 648013233,
+            "bytes": 1413555,
+            "expected_archive_sha256": "12FBB1D1B71CD27B87C734A0B7F34F3B996EC4899C7A2F27C5A0C9C7A5BE972F",
+            "hash_authority": "GitHub release asset digest; archive bytes not fetched or verified by this audit",
+            "download_url": "https://github.com/Julesc013/more-infinite-research/releases/download/v4.4.2/more-infinite-research_4.4.21002.zip",
+            "archive_byte_status": "metadata-characterized-not-byte-verified-in-this-audit",
+            "native_status": "not_run"
+          }
+        ]
+      },
+      {
+        "tag": "v4.5.0",
+        "full_commit": "3096e89a044d705828cbcda93ac05bd877535d12",
+        "github_release_id": 415832995,
+        "prerelease": false,
+        "published_at": "2026-10-17T14:00:18Z",
+        "release_url": "https://github.com/Julesc013/more-infinite-research/releases/tag/v4.5.0",
+        "raw_info_observation": null,
+        "migration_source_members": [
+          {
+            "path": "source/migrations/more-infinite-research_2.0.5.json",
+            "git_blob": "014ca09a8864fab28275dafcf02f0295c8cac229",
+            "bytes": 142,
+            "sha256": "07A2759B963321A87B1047029AE426C7B2784033BC7C4F899D2640C037C5EEE2"
+          },
+          {
+            "path": "source/migrations/more-infinite-research_2.1.0.json",
+            "git_blob": "0faf1db024013eab38164432037b51c37d052f00",
+            "bytes": 125,
+            "sha256": "F427B215D77BC86608010ADC1D0D1A1C98BE61F0D7140EF716D77E46DAB8092D"
+          }
+        ],
+        "modern_archives": [
+          {
+            "edition": "f200",
+            "filename": "more-infinite-research_4.5.20000.zip",
+            "version": "4.5.20000",
+            "source_version": "4.5.0",
+            "github_asset_id": 650612486,
+            "bytes": 1412620,
+            "expected_archive_sha256": "9BD93DD13F28BD3589A14873BE17F81CC51B14A852647B046B04EA1269922CC5",
+            "hash_authority": "GitHub release asset digest; archive bytes not fetched or verified by this audit",
+            "download_url": "https://github.com/Julesc013/more-infinite-research/releases/download/v4.5.0/more-infinite-research_4.5.20000.zip",
+            "archive_byte_status": "metadata-characterized-not-byte-verified-in-this-audit",
+            "native_status": "not_run"
+          },
+          {
+            "edition": "f210",
+            "filename": "more-infinite-research_4.5.21000.zip",
+            "version": "4.5.21000",
+            "source_version": "4.5.0",
+            "github_asset_id": 650612517,
+            "bytes": 1416632,
+            "expected_archive_sha256": "A9954810B25A28DD8791C206D8BE88B5A219BB8BB191971C80A201CA49DBF083",
+            "hash_authority": "GitHub release asset digest; archive bytes not fetched or verified by this audit",
+            "download_url": "https://github.com/Julesc013/more-infinite-research/releases/download/v4.5.0/more-infinite-research_4.5.21000.zip",
+            "archive_byte_status": "metadata-characterized-not-byte-verified-in-this-audit",
+            "native_status": "not_run"
+          }
+        ]
+      },
+      {
+        "tag": "v4.5.1",
+        "full_commit": "69c297f9bca974f4280158781aa97a9678d0fcd4",
+        "github_release_id": 415853821,
+        "prerelease": false,
+        "published_at": "2026-10-17T14:39:52Z",
+        "release_url": "https://github.com/Julesc013/more-infinite-research/releases/tag/v4.5.1",
+        "raw_info_observation": null,
+        "migration_source_members": [
+          {
+            "path": "source/migrations/more-infinite-research_2.0.5.json",
+            "git_blob": "014ca09a8864fab28275dafcf02f0295c8cac229",
+            "bytes": 142,
+            "sha256": "07A2759B963321A87B1047029AE426C7B2784033BC7C4F899D2640C037C5EEE2"
+          },
+          {
+            "path": "source/migrations/more-infinite-research_2.1.0.json",
+            "git_blob": "0faf1db024013eab38164432037b51c37d052f00",
+            "bytes": 125,
+            "sha256": "F427B215D77BC86608010ADC1D0D1A1C98BE61F0D7140EF716D77E46DAB8092D"
+          }
+        ],
+        "modern_archives": [
+          {
+            "edition": "f200",
+            "filename": "more-infinite-research_4.5.20001.zip",
+            "version": "4.5.20001",
+            "source_version": "4.5.1",
+            "github_asset_id": 650707582,
+            "bytes": 1412966,
+            "expected_archive_sha256": "6AF50F62B56580BBED277C0A943F356970598A38D3007C0F7F98EC3F07A14EDE",
+            "hash_authority": "GitHub release asset digest; archive bytes not fetched or verified by this audit",
+            "download_url": "https://github.com/Julesc013/more-infinite-research/releases/download/v4.5.1/more-infinite-research_4.5.20001.zip",
+            "archive_byte_status": "metadata-characterized-not-byte-verified-in-this-audit",
+            "native_status": "not_run"
+          },
+          {
+            "edition": "f210",
+            "filename": "more-infinite-research_4.5.21001.zip",
+            "version": "4.5.21001",
+            "source_version": "4.5.1",
+            "github_asset_id": 650707601,
+            "bytes": 1416978,
+            "expected_archive_sha256": "10A63F6B664265B2403EA55885507F4039B1D143F08E140E81AD74775D6ADF4F",
+            "hash_authority": "GitHub release asset digest; archive bytes not fetched or verified by this audit",
+            "download_url": "https://github.com/Julesc013/more-infinite-research/releases/download/v4.5.1/more-infinite-research_4.5.21001.zip",
+            "archive_byte_status": "metadata-characterized-not-byte-verified-in-this-audit",
+            "native_status": "not_run"
+          }
+        ]
+      },
+      {
+        "tag": "v4.5.2",
+        "full_commit": "8e4de4be0f24a3da514ad39179d5ce254459788d",
+        "github_release_id": 416333929,
+        "prerelease": false,
+        "published_at": "2026-10-18T08:45:54Z",
+        "release_url": "https://github.com/Julesc013/more-infinite-research/releases/tag/v4.5.2",
+        "raw_info_observation": null,
+        "migration_source_members": [
+          {
+            "path": "source/migrations/more-infinite-research_2.0.5.json",
+            "git_blob": "014ca09a8864fab28275dafcf02f0295c8cac229",
+            "bytes": 142,
+            "sha256": "07A2759B963321A87B1047029AE426C7B2784033BC7C4F899D2640C037C5EEE2"
+          },
+          {
+            "path": "source/migrations/more-infinite-research_2.1.0.json",
+            "git_blob": "0faf1db024013eab38164432037b51c37d052f00",
+            "bytes": 125,
+            "sha256": "F427B215D77BC86608010ADC1D0D1A1C98BE61F0D7140EF716D77E46DAB8092D"
+          }
+        ],
+        "modern_archives": [
+          {
+            "edition": "f200",
+            "filename": "more-infinite-research_4.5.20002.zip",
+            "version": "4.5.20002",
+            "source_version": "4.5.2",
+            "github_asset_id": 652970198,
+            "bytes": 1419470,
+            "expected_archive_sha256": "BACA8E34001F5569F367FCFEC28C118653269EC29FACB811E5B75B49C3C082DD",
+            "hash_authority": "GitHub release asset digest; archive bytes not fetched or verified by this audit",
+            "download_url": "https://github.com/Julesc013/more-infinite-research/releases/download/v4.5.2/more-infinite-research_4.5.20002.zip",
+            "archive_byte_status": "metadata-characterized-not-byte-verified-in-this-audit",
+            "native_status": "not_run"
+          },
+          {
+            "edition": "f210",
+            "filename": "more-infinite-research_4.5.21002.zip",
+            "version": "4.5.21002",
+            "source_version": "4.5.2",
+            "github_asset_id": 652970231,
+            "bytes": 1423276,
+            "expected_archive_sha256": "E26B9B4603E520167694043300EF1AEEB07429189F3F9CE99DB1956D9645A704",
+            "hash_authority": "GitHub release asset digest; archive bytes not fetched or verified by this audit",
+            "download_url": "https://github.com/Julesc013/more-infinite-research/releases/download/v4.5.2/more-infinite-research_4.5.21002.zip",
+            "archive_byte_status": "metadata-characterized-not-byte-verified-in-this-audit",
+            "native_status": "not_run"
+          }
+        ]
+      },
+      {
+        "tag": "v4.6.0",
+        "full_commit": "9d6a9de1d77ca526da78428f8de52d5c61f9f55b",
+        "github_release_id": 418350860,
+        "prerelease": false,
+        "published_at": "2026-10-20T12:03:13Z",
+        "release_url": "https://github.com/Julesc013/more-infinite-research/releases/tag/v4.6.0",
+        "raw_info_observation": null,
+        "migration_source_members": [
+          {
+            "path": "source/migrations/more-infinite-research_2.0.5.json",
+            "git_blob": "014ca09a8864fab28275dafcf02f0295c8cac229",
+            "bytes": 142,
+            "sha256": "07A2759B963321A87B1047029AE426C7B2784033BC7C4F899D2640C037C5EEE2"
+          },
+          {
+            "path": "source/migrations/more-infinite-research_2.1.0.json",
+            "git_blob": "0faf1db024013eab38164432037b51c37d052f00",
+            "bytes": 125,
+            "sha256": "F427B215D77BC86608010ADC1D0D1A1C98BE61F0D7140EF716D77E46DAB8092D"
+          }
+        ],
+        "modern_archives": [
+          {
+            "edition": "f200",
+            "filename": "more-infinite-research_4.6.20000.zip",
+            "version": "4.6.20000",
+            "source_version": "4.6.0",
+            "github_asset_id": 659215650,
+            "bytes": 1422240,
+            "expected_archive_sha256": "31DC1B9DF2D434C3B617BA663F461C5950DEE34505FC5024D7F168A0FB19BD52",
+            "hash_authority": "GitHub release asset digest; archive bytes not fetched or verified by this audit",
+            "download_url": "https://github.com/Julesc013/more-infinite-research/releases/download/v4.6.0/more-infinite-research_4.6.20000.zip",
+            "archive_byte_status": "metadata-characterized-not-byte-verified-in-this-audit",
+            "native_status": "not_run"
+          },
+          {
+            "edition": "f210",
+            "filename": "more-infinite-research_4.6.21000.zip",
+            "version": "4.6.21000",
+            "source_version": "4.6.0",
+            "github_asset_id": 659215667,
+            "bytes": 1425938,
+            "expected_archive_sha256": "5A1CA84B0AA8E9690B9095DB12DC991C26EF9081481E2A530B953F47384A945A",
+            "hash_authority": "GitHub release asset digest; archive bytes not fetched or verified by this audit",
+            "download_url": "https://github.com/Julesc013/more-infinite-research/releases/download/v4.6.0/more-infinite-research_4.6.21000.zip",
+            "archive_byte_status": "metadata-characterized-not-byte-verified-in-this-audit",
+            "native_status": "not_run"
+          }
+        ]
+      },
+      {
+        "tag": "v4.7.0",
+        "full_commit": "84bd157ad7b63b7d171fac2311bf30de70429c11",
+        "github_release_id": 420193454,
+        "prerelease": false,
+        "published_at": "2026-10-22T00:52:15Z",
+        "release_url": "https://github.com/Julesc013/more-infinite-research/releases/tag/v4.7.0",
+        "raw_info_observation": null,
+        "migration_source_members": [
+          {
+            "path": "source/migrations/more-infinite-research_2.0.5.json",
+            "git_blob": "014ca09a8864fab28275dafcf02f0295c8cac229",
+            "bytes": 142,
+            "sha256": "07A2759B963321A87B1047029AE426C7B2784033BC7C4F899D2640C037C5EEE2"
+          },
+          {
+            "path": "source/migrations/more-infinite-research_2.1.0.json",
+            "git_blob": "0faf1db024013eab38164432037b51c37d052f00",
+            "bytes": 125,
+            "sha256": "F427B215D77BC86608010ADC1D0D1A1C98BE61F0D7140EF716D77E46DAB8092D"
+          },
+          {
+            "path": "source/migrations/more-infinite-research_4.7.0.json",
+            "git_blob": "fc59c77d1a43c547ec261e57676a1d1df187c21a",
+            "bytes": 235,
+            "sha256": "0980B0B6F1675F6827A8E4151F778143EA74C9C6C3440CC2318129DBCE63C379"
+          }
+        ],
+        "modern_archives": [
+          {
+            "edition": "f200",
+            "filename": "more-infinite-research_4.7.20000.zip",
+            "version": "4.7.20000",
+            "source_version": "4.7.0",
+            "github_asset_id": 664236308,
+            "bytes": 1448004,
+            "expected_archive_sha256": "7958731AAD672C7F16B9307E7B20F97B8E97B58CC57E5D1F9AE670018A8A1B5B",
+            "hash_authority": "GitHub release asset digest; archive bytes not fetched or verified by this audit",
+            "download_url": "https://github.com/Julesc013/more-infinite-research/releases/download/v4.7.0/more-infinite-research_4.7.20000.zip",
+            "archive_byte_status": "metadata-characterized-not-byte-verified-in-this-audit",
+            "native_status": "not_run"
+          },
+          {
+            "edition": "f210",
+            "filename": "more-infinite-research_4.7.21000.zip",
+            "version": "4.7.21000",
+            "source_version": "4.7.0",
+            "github_asset_id": 664236314,
+            "bytes": 1461799,
+            "expected_archive_sha256": "708A529F1F6D649E0A732216CD8D8FEFE68F2C6C2DF2B40DA030C2C4C51558D1",
+            "hash_authority": "GitHub release asset digest; archive bytes not fetched or verified by this audit",
+            "download_url": "https://github.com/Julesc013/more-infinite-research/releases/download/v4.7.0/more-infinite-research_4.7.21000.zip",
+            "archive_byte_status": "metadata-characterized-not-byte-verified-in-this-audit",
+            "native_status": "not_run"
+          }
+        ]
+      },
+      {
+        "tag": "v4.7.1",
+        "full_commit": "8911ab8f9ad4a7c8764444148183a4dfa137ed7d",
+        "github_release_id": 421546138,
+        "prerelease": false,
+        "published_at": "2026-10-23T08:55:38Z",
+        "release_url": "https://github.com/Julesc013/more-infinite-research/releases/tag/v4.7.1",
+        "raw_info_observation": null,
+        "migration_source_members": [
+          {
+            "path": "source/migrations/more-infinite-research_2.0.5.json",
+            "git_blob": "014ca09a8864fab28275dafcf02f0295c8cac229",
+            "bytes": 142,
+            "sha256": "07A2759B963321A87B1047029AE426C7B2784033BC7C4F899D2640C037C5EEE2"
+          },
+          {
+            "path": "source/migrations/more-infinite-research_2.1.0.json",
+            "git_blob": "0faf1db024013eab38164432037b51c37d052f00",
+            "bytes": 125,
+            "sha256": "F427B215D77BC86608010ADC1D0D1A1C98BE61F0D7140EF716D77E46DAB8092D"
+          },
+          {
+            "path": "source/migrations/more-infinite-research_4.7.0.json",
+            "git_blob": "fc59c77d1a43c547ec261e57676a1d1df187c21a",
+            "bytes": 235,
+            "sha256": "0980B0B6F1675F6827A8E4151F778143EA74C9C6C3440CC2318129DBCE63C379"
+          }
+        ],
+        "modern_archives": [
+          {
+            "edition": "f200",
+            "filename": "more-infinite-research_4.7.20001.zip",
+            "version": "4.7.20001",
+            "source_version": "4.7.1",
+            "github_asset_id": 668533595,
+            "bytes": 1448410,
+            "expected_archive_sha256": "EEE6D5AEFA26CD58B973EEF34BF31E368C078B436190F47587D4F5B46CDB954D",
+            "hash_authority": "GitHub release asset digest; archive bytes not fetched or verified by this audit",
+            "download_url": "https://github.com/Julesc013/more-infinite-research/releases/download/v4.7.1/more-infinite-research_4.7.20001.zip",
+            "archive_byte_status": "metadata-characterized-not-byte-verified-in-this-audit",
+            "native_status": "not_run"
+          },
+          {
+            "edition": "f210",
+            "filename": "more-infinite-research_4.7.21001.zip",
+            "version": "4.7.21001",
+            "source_version": "4.7.1",
+            "github_asset_id": 668300303,
+            "bytes": 1462211,
+            "expected_archive_sha256": "5F1C85F1290E2E07411813FDDD01D763DA47C6768CE85B3E7913A1D9A2CF2153",
+            "hash_authority": "GitHub release asset digest; archive bytes not fetched or verified by this audit",
+            "download_url": "https://github.com/Julesc013/more-infinite-research/releases/download/v4.7.1/more-infinite-research_4.7.21001.zip",
+            "archive_byte_status": "metadata-characterized-not-byte-verified-in-this-audit",
+            "native_status": "not_run"
+          }
+        ]
+      },
+      {
+        "tag": "v4.7.2",
+        "full_commit": "bd9774f323b6eb1561c1d9ff0c91ecc3f7acd1d1",
+        "github_release_id": 421767969,
+        "prerelease": false,
+        "published_at": "2026-10-23T11:49:43Z",
+        "release_url": "https://github.com/Julesc013/more-infinite-research/releases/tag/v4.7.2",
+        "raw_info_observation": null,
+        "migration_source_members": [
+          {
+            "path": "source/migrations/more-infinite-research_2.0.5.json",
+            "git_blob": "014ca09a8864fab28275dafcf02f0295c8cac229",
+            "bytes": 142,
+            "sha256": "07A2759B963321A87B1047029AE426C7B2784033BC7C4F899D2640C037C5EEE2"
+          },
+          {
+            "path": "source/migrations/more-infinite-research_2.1.0.json",
+            "git_blob": "0faf1db024013eab38164432037b51c37d052f00",
+            "bytes": 125,
+            "sha256": "F427B215D77BC86608010ADC1D0D1A1C98BE61F0D7140EF716D77E46DAB8092D"
+          },
+          {
+            "path": "source/migrations/more-infinite-research_4.7.0.json",
+            "git_blob": "fc59c77d1a43c547ec261e57676a1d1df187c21a",
+            "bytes": 235,
+            "sha256": "0980B0B6F1675F6827A8E4151F778143EA74C9C6C3440CC2318129DBCE63C379"
+          }
+        ],
+        "modern_archives": [
+          {
+            "edition": "f200",
+            "filename": "more-infinite-research_4.7.20002.zip",
+            "version": "4.7.20002",
+            "source_version": "4.7.2",
+            "github_asset_id": 668950980,
+            "bytes": 1449338,
+            "expected_archive_sha256": "F3943EB4D69CCDAC41BD9F922AD03A5C78F34F22D8E7FA5A88A7A658AB1010B7",
+            "hash_authority": "GitHub release asset digest; archive bytes not fetched or verified by this audit",
+            "download_url": "https://github.com/Julesc013/more-infinite-research/releases/download/v4.7.2/more-infinite-research_4.7.20002.zip",
+            "archive_byte_status": "metadata-characterized-not-byte-verified-in-this-audit",
+            "native_status": "not_run"
+          },
+          {
+            "edition": "f210",
+            "filename": "more-infinite-research_4.7.21002.zip",
+            "version": "4.7.21002",
+            "source_version": "4.7.2",
+            "github_asset_id": 668950994,
+            "bytes": 1463150,
+            "expected_archive_sha256": "A4BB8F47232C689B267EF434F557187A8795C47280FA464169DE917FB579517F",
+            "hash_authority": "GitHub release asset digest; archive bytes not fetched or verified by this audit",
+            "download_url": "https://github.com/Julesc013/more-infinite-research/releases/download/v4.7.2/more-infinite-research_4.7.21002.zip",
+            "archive_byte_status": "metadata-characterized-not-byte-verified-in-this-audit",
+            "native_status": "not_run"
+          }
+        ]
+      },
+      {
+        "tag": "v4.7.3",
+        "full_commit": "8643cc91bc915e008556a5315dbb0a743247e7ab",
+        "github_release_id": 422732162,
+        "prerelease": false,
+        "published_at": "2026-10-24T12:57:54Z",
+        "release_url": "https://github.com/Julesc013/more-infinite-research/releases/tag/v4.7.3",
+        "raw_info_observation": null,
+        "migration_source_members": [
+          {
+            "path": "source/migrations/more-infinite-research_2.0.5.json",
+            "git_blob": "014ca09a8864fab28275dafcf02f0295c8cac229",
+            "bytes": 142,
+            "sha256": "07A2759B963321A87B1047029AE426C7B2784033BC7C4F899D2640C037C5EEE2"
+          },
+          {
+            "path": "source/migrations/more-infinite-research_2.1.0.json",
+            "git_blob": "0faf1db024013eab38164432037b51c37d052f00",
+            "bytes": 125,
+            "sha256": "F427B215D77BC86608010ADC1D0D1A1C98BE61F0D7140EF716D77E46DAB8092D"
+          },
+          {
+            "path": "source/migrations/more-infinite-research_4.7.0.json",
+            "git_blob": "fc59c77d1a43c547ec261e57676a1d1df187c21a",
+            "bytes": 235,
+            "sha256": "0980B0B6F1675F6827A8E4151F778143EA74C9C6C3440CC2318129DBCE63C379"
+          }
+        ],
+        "modern_archives": [
+          {
+            "edition": "f200",
+            "filename": "more-infinite-research_4.7.20003.zip",
+            "version": "4.7.20003",
+            "source_version": "4.7.3",
+            "github_asset_id": 672267718,
+            "bytes": 1449475,
+            "expected_archive_sha256": "FBBA844DD04011A12BB6DA885745B0733AD37FAB181EAAD9EE4346B9B0D32647",
+            "hash_authority": "GitHub release asset digest; archive bytes not fetched or verified by this audit",
+            "download_url": "https://github.com/Julesc013/more-infinite-research/releases/download/v4.7.3/more-infinite-research_4.7.20003.zip",
+            "archive_byte_status": "metadata-characterized-not-byte-verified-in-this-audit",
+            "native_status": "not_run"
+          },
+          {
+            "edition": "f210",
+            "filename": "more-infinite-research_4.7.21003.zip",
+            "version": "4.7.21003",
+            "source_version": "4.7.3",
+            "github_asset_id": 672267722,
+            "bytes": 1463293,
+            "expected_archive_sha256": "B6EB9430056ABD384DB00F94929FE7DAC0A37441ACF4BC277946689682628852",
+            "hash_authority": "GitHub release asset digest; archive bytes not fetched or verified by this audit",
+            "download_url": "https://github.com/Julesc013/more-infinite-research/releases/download/v4.7.3/more-infinite-research_4.7.21003.zip",
+            "archive_byte_status": "metadata-characterized-not-byte-verified-in-this-audit",
+            "native_status": "not_run"
+          }
+        ]
+      }
+    ],
+    "migration_source_scan_scope": "Only root migrations/, source/migrations/ and source/shared/migrations/ JSON/Lua members are characterized here. Generated distribution members and actual archive info.json still require archive inspection; this is not a whole-composer recovery or runtime-schema qualification."
+  }
 }

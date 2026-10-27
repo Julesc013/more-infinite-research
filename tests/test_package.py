@@ -31,6 +31,27 @@ F110_PLUS_MIGRATION_TARGETS = {"f110", "f200", "f210"}
 
 
 class PackageTests(unittest.TestCase):
+    def test_source_header_is_a_heading_not_an_entry_mention(self):
+        entry = (b"-" * 99 + b"\nVersion: 5.0.0\n\n  Changes:\n"
+                 b"    - Example source label: Version: 5.0.0\n")
+        files = {"LICENSE": b"retained license", "thumbnail.png": b"retained image",
+                 "changelog.txt": entry,
+                 pack.SOURCE_TARGET_PATH: (ROOT / "source" / pack.SOURCE_TARGET_PATH).read_bytes()}
+        self.assertEqual(files, pack.player_presentation(files, {"version": "5.0.21000"}))
+        local_files = pack.render_local_mir_target_version(
+            files, "5.0.21000", "6.1.21002", "more-infinite-research")
+        self.assertEqual(b"Version: 6.1.2", local_files["changelog.txt"].splitlines()[1])
+        self.assertIn(b"    - Example source label: Version: 5.0.0\n", local_files["changelog.txt"])
+        for invalid in (b"Version: 4.7.3\n" + entry, entry + entry):
+            with self.subTest(changelog=invalid):
+                with self.assertRaisesRegex(ValueError, "source-version header"):
+                    pack.player_presentation(dict(files, **{"changelog.txt": invalid}),
+                                             {"version": "5.0.21000"})
+                with self.assertRaisesRegex(ValueError, "source-version header"):
+                    pack.render_local_mir_target_version(
+                        dict(files, **{"changelog.txt": invalid}),
+                        "5.0.21000", "6.1.21002", "more-infinite-research")
+
     @staticmethod
     def _git(repository, *arguments):
         return subprocess.check_output(["git", "-C", str(repository), *arguments])
@@ -210,7 +231,8 @@ class PackageTests(unittest.TestCase):
 
         self.assertEqual(local_info["version"], local_version)
         self.assertEqual(json.loads(local_files["info.json"])["version"], local_version)
-        self.assertIn(local_version.encode("ascii"), local_files["changelog.txt"])
+        self.assertIn(b"Version: 6.1.2\n", local_files["changelog.txt"])
+        self.assertNotIn(local_version.encode("ascii"), local_files["changelog.txt"])
         expected_target = source_files["platform/target.lua"].replace(
             source_info["version"].encode("ascii"), local_version.encode("ascii"))
         self.assertEqual(local_files["platform/target.lua"], expected_target)
@@ -410,9 +432,9 @@ class PackageTests(unittest.TestCase):
                 self.assertEqual(current["previous_history_bytes"], record["bytes"])
                 self.assertEqual(current["previous_history_sha256"], record["history_sha256"])
                 self.assertEqual(current["license_sha256"], record["license_sha256"])
-                self.assertEqual(files["changelog.txt"], entry.replace(b"@DISTRIBUTION_VERSION@", info["version"].encode()))
+                self.assertEqual(files["changelog.txt"], entry)
                 self.assertTrue(files["changelog.txt"].startswith(
-                    ("-" * 99 + "\nVersion: " + info["version"] + "\n").encode()))
+                    b"-" * 99 + b"\nVersion: 5.0.0\n"))
                 self.assertEqual(files["changelog.txt"].count(b"Version: 1.0.0\n"), 1)
                 self.assertNotIn(b"Version: 1.9.5\n", files["changelog.txt"])
                 self.assertEqual(hashlib.sha256(files["LICENSE"]).hexdigest().upper(), record["license_sha256"])
@@ -430,9 +452,9 @@ class PackageTests(unittest.TestCase):
                 with self.assertRaisesRegex(ValueError, "missing player presentation"):
                     pack.members(source, committed_files=broken, target="f200")
 
-        for corrupt in (b"Version: 5.0.0\n", files["changelog.txt"] * 2):
+        for corrupt in (b"Version: 5.0.1\n", files["changelog.txt"] * 2):
             broken = dict(files, **{"changelog.txt": corrupt})
-            with self.assertRaisesRegex(ValueError, "exactly one"):
+            with self.assertRaisesRegex(ValueError, "source-version header"):
                 pack.members(source, committed_files=broken, target="f200")
 
     def test_committed_build_ignores_dirty_untracked_and_line_ending_worktree_bytes(self):
