@@ -2113,7 +2113,7 @@
     },
     {
       "path": "spec/evidence/migration-origin-100-direct-successor-native-chain.json",
-      "sha256": "168B71659B9C8ECB1DD3AFA69B0428389949B6A5436C99D789F963A7FA670813",
+      "sha256": "F7088432C89DEE88323F2478368A0453770AF4799B75D98485823ADC53A16211",
       "status": "passed-same-original-mir1-save-to-bd1-f200-and-58f-f210-only",
       "protected_source_save_sha256": "F8B38209DA632C8B2EFA049C8F69CDB3E3EC01F6BEE0C5D03BAFF03C27989C54",
       "reuse": "retains-original-frozen-inputs-current-candidate-applicability-pending"

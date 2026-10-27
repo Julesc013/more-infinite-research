@@ -22,7 +22,7 @@ MIR4 maintenance starts from the exact published tag that needs a fix, currently
 
 Main promotion and the canonical `v5.0.0` tag follow the remaining acceptance and publication gates. Current documentation and canonical paths do not imply release qualification. The maintainer handles Mod Portal publication; agent-managed releases remain GitHub-only.
 
-Use neutral names for new output batches: `build/host-gate` for hosted control output, `build/qualification` for new test evidence and packets, and `build/packages` for new candidate package custody. Accepted delivery remains in `dist`. Existing `build/mir5` paths are retained where exact receipts or active frozen jobs consume them; preserve those bytes and locators instead of moving recorded evidence or retargeting a live job.
+Use neutral names for new output batches: `build/host-gate` for hosted control output, `build/qualification` for new test evidence and packets, and `build/packages` for new candidate package custody. Raw native execution uses the existing governor-admitted checkout-local `build/tmp` or `build/p` scratch roots; preserve hash-verified retained evidence under `build/qualification` after the run. Accepted delivery remains in `dist`. Existing `build/mir5` paths are retained where exact receipts or active frozen jobs consume them; preserve those bytes and locators instead of moving recorded evidence or retargeting a live job.
 
 ## Start with a bounded task
 
