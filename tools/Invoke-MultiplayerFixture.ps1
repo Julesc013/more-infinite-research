@@ -72,6 +72,16 @@ function Assert-MultiplayerFixtureSelection {
       standalone_f210=$true
     }
     [ordered]@{
+      fixture_case='library-multiplayer';target='f210-standalone'
+      kind='mir5-library-api-consumers-standalone-f210-native-selection';factorio_line='2.1';base='2.1.23'
+      engine_sha256='8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38';mir='5.0.21000';build_version=87750
+      observer_sha256='A15A7D628D66953D2E0C4D4FA288F47CBF9C5678327C7EB3D23ADB5DC78331C0'
+      mir_archive_sha256='2ABAF369E020D8AD18A0C04940A8811BECFA5E63E5B479C668E2D3A3123D032B'
+      fixture_mods=@('mir-fixture-mir5-library-multiplayer@0.1.0','mir-fixture-mir5-api-alpha@0.1.0','mir-fixture-mir5-api-beta@0.1.0')
+      optional_archives=@('more-infinite-research_5.0.21000.zip','mir-fixture-mir5-library-multiplayer_0.1.0.zip','mir-fixture-mir5-api-alpha_0.1.0.zip','mir-fixture-mir5-api-beta_0.1.0.zip')
+      standalone_f210=$true;api_client_consumers=$true
+    }
+    [ordered]@{
       fixture_case='library-multiplayer';target='standalone-identity-discovery'
       kind='mir5-library-standalone-identity-discovery-f210-selection';factorio_line='2.1';base='2.1.23'
       engine_sha256='8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38';mir='5.0.21000';build_version=87750
