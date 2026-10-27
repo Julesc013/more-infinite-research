@@ -202,10 +202,24 @@ M.base = {
   -- routes, but B6 records no MIR aluminium material identities in this tuple.
   material_stages={copy(COPPER_TUNGSTEN_STAGE)},
   definition_overrides={
+    -- The F200 r03 contract retains this earned identity after Angel replaces
+    -- its active routes.  Keep its two-pack progression and effects, but do
+    -- not offer a new combined-profile research path.
+    research_oil_cracking_productivity={available=false, science="science_automation_logistic"},
     research_lubricant_productivity=angel_override("base", "research_lubricant_productivity"),
     research_steel=angel_override("base", "research_steel"),
     research_sulfur=angel_override("base", "research_sulfur"),
     research_sulfuric_acid_productivity=angel_override("base", "research_sulfuric_acid_productivity"),
+  },
+  -- Keep the shared science-product collector active. This binds q009's
+  -- captured ingredients and prerequisite progression without exact-binding
+  -- its effects; they still come from concrete current lab inputs in the one
+  -- final collection pass.
+  definition_progression={
+    research_science_pack_productivity={science="science_bob_angel_base_research", exact_prerequisites=true,
+      prerequisites={"research-speed-5", "utility-science-pack", "research-speed-6", "automation-science-pack",
+        "logistic-science-pack", "chemical-science-pack", "production-science-pack", "military-science-pack",
+        "angels-gardens", "bob-advanced-logistic-science-pack"}},
   },
   continuation_overrides={
     braking_force={science="science_bob_angel_base_braking"},
@@ -228,6 +242,9 @@ M.space_age = {
     -- two-route vector rather than granting the ordinary item-carbon bonus.
     research_carbon={effects={effect("burnt-spoilage", 0.5), effect("coal-synthesis", 0.2)}},
     research_lubricant_productivity=angel_override("space_age", "research_lubricant_productivity"),
+    -- Preserve the F200 r03 earned identity in the combined profile rather
+    -- than creating the unsupported five-pack active oil route.
+    research_oil_cracking_productivity={available=false, science="science_automation_logistic"},
     research_oil_processing_productivity=angel_override("space_age", "research_oil_processing_productivity"),
     research_sulfur=angel_override("space_age", "research_sulfur"),
     research_sulfuric_acid_productivity=angel_override("space_age", "research_sulfuric_acid_productivity"),
@@ -239,6 +256,17 @@ M.space_age = {
     research_breeding="science_bob_angel_space_breeding",
     research_lithium="science_bob_angel_space_lithium",
     research_tungsten="science_bob_angel_space_tungsten",
+  },
+  -- q010's combined native research-speed progression is the independent
+  -- source for this vector. Effects remain collector-owned, not exact
+  -- profile data, so every concrete accepted lab-input producer is kept.
+  definition_progression={
+    research_science_pack_productivity={science="science_bob_angel_space_research", exact_prerequisites=true,
+      prerequisites={"research-speed-5", "utility-science-pack", "research-speed-6", "automation-science-pack",
+        "logistic-science-pack", "chemical-science-pack", "production-science-pack", "military-science-pack",
+        "space-science-pack", "agricultural-science-pack", "metallurgic-science-pack",
+        "electromagnetic-science-pack", "cryogenic-science-pack", "promethium-science-pack", "angels-gardens",
+        "bob-advanced-logistic-science-pack"}},
   },
   continuation_overrides={
     braking_force={science="science_bob_angel_space_braking"},
