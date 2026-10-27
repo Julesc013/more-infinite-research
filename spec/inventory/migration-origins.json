@@ -250,7 +250,8 @@
       "direct_current_engine_status": "direct-f200-origin",
       "archive_sha256": "6395C4A5A0F74C67729746D0FBF6162329978B47C5C29D54CC0045F2977C7E44",
       "archive_byte_status": "verified-official-archive-and-actual-info-not-native-qualified",
-      "native_status": "not_run",
+      "native_status": "source-fixture-data-stage-refused-no-qualified-save",
+      "native_adverse": "spec/evidence/modern-origin-fixture-native-adverses-r01.json",
       "archive_readback": "spec/evidence/migration-origins-110-120-archive-readback.json"
     },
     {
@@ -2221,7 +2222,7 @@
           "origin_tag": "1.1.0",
           "factorio_version": "2.0",
           "archive_sha256": "6395C4A5A0F74C67729746D0FBF6162329978B47C5C29D54CC0045F2977C7E44",
-          "source_case": "not_run",
+          "source_case": "source-fixture-data-stage-refused-no-qualified-save",
           "final_5_x_case": "not_run",
           "disposition": "archive-verified-requires-native-source-save-and-successor-qualification"
         },

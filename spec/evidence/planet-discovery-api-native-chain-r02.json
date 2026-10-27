@@ -1,0 +1,152 @@
+{
+  "schema": 1,
+  "kind": "MIR5PlanetDiscoveryApiNativeChainV2",
+  "status": "passed-private-native-runtime-load-only",
+  "scope": "One changed-input, CreateOnly/MIRAbsent Factorio 2.1.23 API observation of official Space Age runtime object shapes and boolean query values. It is not migration, gameplay, save, performance, timing, helper, release, or product qualification.",
+  "frozen_execution": {
+    "controller": {
+      "commit": "e8e14a2be32dff71b8dd5ec6bfcc0f9f0bce7a87",
+      "caller_sha256": "681A5FEF35D5BED8FA897D7F7635151CEAABFCB97C53E4B13D4C2A6995D19DB3",
+      "preflight_sha256": "8AA6276E4B770C931134F927D195BA3BEB5F964043D11508C0F99852B06D1DC1"
+    },
+    "fixture": {
+      "source_commit": "16ab5dfcbee44c5405d326f3abbe4e15d66ee983",
+      "archive_sha256": "AFE06C60410AEBAB92E1063DEA03E60DCCA878B1FD744E375AD32134AB1BEC9A",
+      "archive_bytes": 2193,
+      "raw_git_members": {
+        "control.lua": "4BEE479EA607A10426ED619F0271618776F3B696CE5787854E74D8C40CC0FEBB",
+        "data.lua": "A4EC1207764304BF3AFA079270537AA706AD48A85D466A93458A6A267506847D",
+        "info.json": "70F763178E6FD8FCAEA06FE77A36B0E4EDA3E47BA5134E99D4F9D6DE00FB71CE"
+      }
+    },
+    "engine": {
+      "path": "D:/Games/Factorio/2.1/bin/x64/factorio.exe",
+      "sha256": "8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38",
+      "base_version": "2.1.23"
+    },
+    "profile": {
+      "sha256": "640A6AA65D0ED4CB9A4DC9CCC3F318C931F1208103EE4B8B160119D4C1479820",
+      "selection_count": 6,
+      "selection": [
+        "base@2.1.23",
+        "elevated-rails@2.1.23",
+        "mir-fixture-planet-discovery-api@0.1.0",
+        "quality@2.1.23",
+        "recycler@2.1.23",
+        "space-age@2.1.23"
+      ],
+      "mir_absent": true
+    },
+    "limits": {
+      "timeout_seconds": 180,
+      "expected_peak_memory_mib": 4096,
+      "native_output_limit_mib": 128,
+      "admission_wait_seconds": 30
+    }
+  },
+  "native_observation": {
+    "result": {
+      "path": "build/qualification/planet-discovery-api-native-r02/native-output/result.json",
+      "sha256": "F80FC022081A175CA0D299AB731365B429D3D0ACD8BBB3E122CA4A60A38B6849",
+      "bytes": 16084,
+      "status": "passed-private-native-runtime-load-only",
+      "exit_code": 0,
+      "timed_out": false
+    },
+    "derived_marker_excerpt": {
+      "classification": "derived-safe-log-excerpt-not-an-original-native-receipt",
+      "source_log_sha256": "F85C9C5CC949C3A1BFE478CE0ABDC8DB27DCA6ED6BE6D5C55E6C740E6A4318D5",
+      "source_lines": [120, 121, 122],
+      "excerpt_sha256": "45FDFA1B393521BE44C7091ED4640F3BD6949A3328F70DFC4E339854ED6165FC",
+      "observed_shapes": {
+        "game.forces": "LuaCustomTable",
+        "player.force": "LuaForce",
+        "player.force.technologies": "LuaCustomTable",
+        "game.space_locations": "LuaCustomTable"
+      },
+      "observed_booleans": {
+        "nauvis": true,
+        "vulcanus": false,
+        "gleba": false,
+        "fulgora": false,
+        "aquilo": false
+      }
+    }
+  },
+  "restoration_and_custody": {
+    "fixture_slot_before": "absent",
+    "fixture_slot_after": "absent",
+    "controls": {
+      "mod_list": {
+        "before_after_exact": true,
+        "sha256": "48C46678CC8369DB15CC12CDFB23309EB076DC4433B76E9426083D0074BCCC91",
+        "bytes": 39201
+      },
+      "mod_settings": {
+        "before_after_exact": true,
+        "sha256": "667897C514B66298A1E400058B65EA14EB36322D88864B98AE38E4C9B81387BC",
+        "bytes": 60744
+      }
+    },
+    "factorio_processes_after": 0,
+    "raw_output": {
+      "members": 9,
+      "manifest_sha256": "DACF1D2C169250393DB8B4FE77AB30D705ED341D03DD59DDF54EF019DB4B9AE8"
+    },
+    "primary_custody": {
+      "root": "build/qualification/planet-discovery-api-native-r02",
+      "members": 12,
+      "manifest_sha256": "149142C53163A96D65C0AF0FF2D8439D813BB29F966D73A05C0959D6599EB58D",
+      "all_nine_raw_members_match_native_output": true,
+      "terminal_sha256": "2ECB6C28450B40840D870E8465B74D5371AD8D8E9F3BDB5120F2A97081D4EAC9"
+    }
+  },
+  "preserved_adverses": {
+    "original_native_result": {
+      "path": "build/qualification/planet-discovery-api-native-r01/native-output/result.json",
+      "sha256": "D1401514ED3E0D83F16FA21A98B326DB43169D92C57DD1D74D9FA4E5AAE9BDF8",
+      "classification": "actual API observation followed by the original generic loaded-selection failure because the prior control-only fixture did not emit its data-stage Loading mod line"
+    },
+    "prior_pre_engine_refusals": [
+      {
+        "sha256": "6D00A648466FDAF260908752C3A8F7CCE0897B0BE784495040E12A88A643D8A3",
+        "classification": "raw SHA256 incorrectly compared with a Git SHA1 object identifier"
+      },
+      {
+        "sha256": "563064ABC1CBBC9E5C73254CF76B869D3266239E306B57B03B953E701C041FE9",
+        "classification": "package source was an untracked projection rather than the canonical revision path"
+      }
+    ],
+    "lossless_adverse_capsule": "spec/evidence/modern-origin-fixture-native-adverses-r01.json.gz"
+  },
+  "receipts": {
+    "path": "spec/evidence/planet-discovery-api-native-receipts-r02.json.gz",
+    "sha256": "2D1A2DDC3CB956DFF830FA2A002142CCB91E01D4DDBECEA287256BA8B6E78D69",
+    "bytes": 6733,
+    "uncompressed_sha256": "D486384D4B1EC56EDD0CE3E779CEC48261121F3C4A364E85BF8AF782EFC5EB40",
+    "uncompressed_bytes": 26165,
+    "exact_safe_original_receipts": 1,
+    "strict_utf8_base64_gzip_roundtrip_verified": true,
+    "exclusions": [
+      "full logs",
+      "configuration payloads",
+      "player-data payloads",
+      "preflight payloads",
+      "library-control payloads",
+      "save binaries",
+      "screenshots",
+      "archive payloads"
+    ]
+  },
+  "claims": {
+    "native_execution": true,
+    "create_only": true,
+    "mir_absent": true,
+    "migration": false,
+    "gameplay": false,
+    "save": false,
+    "performance": false,
+    "timing": false,
+    "release_qualification": false
+  }
+}

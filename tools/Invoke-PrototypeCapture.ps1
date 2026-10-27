@@ -1,4 +1,4 @@
-# Native data-stage observer for MIR 4/5 archive custody. It creates no map,
+# Native data-stage observer for modern MIR archive custody. It creates no map,
 # save, gameplay, menu, or release claim; its payload is Factorio --dump-data.
 [CmdletBinding()]
 param(
@@ -57,7 +57,7 @@ function Get-MIR5PrototypeCaptureMIRArchive {
     $reader = [IO.StreamReader]::new($entries[0].Open())
     try { $info = $reader.ReadToEnd() | ConvertFrom-Json -AsHashtable } finally { $reader.Dispose() }
     Assert-MIR5PrototypeCapture ([string]$info.name -ceq 'more-infinite-research') 'MIR archive name differs'
-    Assert-MIR5PrototypeCapture ([string]$info.version -match '^(?:4[.]\d{1,5}[.]\d{5}|5[.]\d{1,5}[.]\d{5})$') 'MIR archive must be a 4.x or 5.x numeric distribution'
+    Assert-MIR5PrototypeCapture ([string]$info.version -match '^(?:[1-3][.]\d{1,5}[.]\d{1,5}|[45][.]\d{1,5}[.]\d{5})$') 'MIR archive must use numeric MIR1-3 source or MIR4-5 extended distribution versions'
     Assert-MIR5PrototypeCapture ([string]$info.factorio_version -ceq $EngineLine) 'MIR archive Factorio family differs from selected engine'
     Assert-MIR5PrototypeCapture ($root -ceq ([string]$info.name + '_' + [string]$info.version)) 'MIR archive root differs from metadata'
     Assert-MIR5PrototypeCapture ([IO.Path]::GetFileName($path) -ceq ($root + '.zip')) 'MIR archive filename differs from metadata'
