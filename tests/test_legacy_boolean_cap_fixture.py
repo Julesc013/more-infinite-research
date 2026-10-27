@@ -70,6 +70,15 @@ class LegacyBooleanCapFixtureTests(unittest.TestCase):
             "effects": [{"type": "change-recipe-productivity", "recipe": "iron-gear-wheel", "change": .10}],
         }
 
+    def raw(self, tool_science=False):
+        raw = {"technology": {GEAR: self.row()}, "sentinel": {"unchanged": 17}}
+        if tool_science:
+            raw["tool"] = {
+                name: {"type": "tool", "name": name, "durability": 1}
+                for name, _ in SCIENCE
+            }
+        return raw
+
     def run_data(self, path, raw, mods):
         self.lua.globals().fixture_data_path = path.as_posix()
         self.lua.execute(r'''
@@ -233,18 +242,36 @@ class LegacyBooleanCapFixtureTests(unittest.TestCase):
         ''')
         return py(self.lua.eval("legacy_boolean_cap_source_flow")(keep_enabled))
 
-    def successor_flow(self, target_name):
+    def successor_flow(self, target_name, science_consumption="expected"):
         self.lua.globals().fixture_successor_body_path = SUCCESSOR_BODY.as_posix()
         self.lua.globals().fixture_successor_wrapper_path = ((F200 if target_name == "f200" else F210) / "control.lua").as_posix()
         self.lua.execute(r'''
-          function legacy_boolean_cap_successor_flow(target_name)
+          function legacy_boolean_cap_successor_flow(target_name,science_consumption)
             local callbacks,markers,saves={events={}},{},0
             local science={"automation-science-pack","logistic-science-pack","chemical-science-pack","production-science-pack"}
             local function inventory()
-              local value={counts={}}
-              function value.insert(request) value.counts[request.name]=(value.counts[request.name] or 0)+request.count;return request.count end
+              local value={counts={},by_name={},slots={},slot_count=0}
+              local function stack_for(name)
+                local stack=value.by_name[name]
+                if stack==nil then
+                  value.slot_count=value.slot_count+1
+                  stack={valid_for_read=true,name=name,type=target_name=="f200" and "tool" or "item",count=0,durability=1}
+                  value.by_name[name]=stack;value.slots[value.slot_count]=stack
+                end
+                return stack
+              end
+              function value.insert(request)
+                local stack=stack_for(request.name)
+                value.counts[request.name]=(value.counts[request.name] or 0)+request.count
+                stack.count=stack.count+request.count
+                return request.count
+              end
               function value.get_item_count(name) return value.counts[name] or 0 end
-              return value
+              return setmetatable(value,{__len=function(self) return self.slot_count end,
+                __index=function(self,key)
+                  if type(key)=="number" then return self.slots[key] end
+                  return rawget(self,key)
+                end})
             end
             local function lab(force)
               local value={valid=true,force=force,contents=inventory(),energy_writes=0}
@@ -283,7 +310,7 @@ class LegacyBooleanCapFixtureTests(unittest.TestCase):
             local gear=player.technologies["recipe-prod-research_gears-1"]
             gear.level=3;gear.saved_progress=.27;player.recipes["iron-gear-wheel"].productivity_bonus=.20
             local source_lab=lab(player)
-            for _,name in ipairs(science) do source_lab.contents.counts[name]=14 end
+            for _,name in ipairs(science) do source_lab.contents.insert{name=name,count=14} end
             local state={phase="completed",source_mir="4.0.20000",actual_lab_completions=2,milestone="actual2labs",
               player_cap={level=3,researched=false,enabled=true,visible=true,maximum=4294967295,bonus=.20,saved_progress=.27},
               foreign_force_index=foreign.index,foreign_queue={current="braking-force-1",queue={"braking-force-1"},progress=.42},lab=source_lab}
@@ -316,10 +343,27 @@ class LegacyBooleanCapFixtureTests(unittest.TestCase):
             ok,message=invoke(callbacks.events[1],{research=foreign.technologies["recipe-prod-research_gears-1"]});if not ok then return {ok=false,message=message} end
             local after_foreign_energy,after_foreign_labs=state.lab.energy,state.destination_lab_completions
             player.current_research=nil;player.research_queue={};gear.level=4;player.recipes["iron-gear-wheel"].productivity_bonus=.30
-            for _,name in ipairs(science) do state.lab.contents.counts[name]=state.lab.contents.counts[name]-1 end
+            for _,name in ipairs(science) do
+              local stack=state.lab.contents.by_name[name]
+              if target_name=="f200" then
+                if science_consumption=="expected" then stack.durability=.27
+                elseif science_consumption=="none" then stack.durability=1
+                elseif science_consumption=="excess" then stack.durability=.1
+                elseif science_consumption=="malformed-type" then stack.type="item"
+                elseif science_consumption=="malformed-durability" then stack.durability=0
+                else error("unknown science consumption model: "..tostring(science_consumption)) end
+              else
+                state.lab.contents.counts[name]=state.lab.contents.counts[name]-1
+                stack.count=stack.count-1
+              end
+            end
             ok,message=invoke(callbacks.events[1],{research=gear});if not ok then return {ok=false,message=message} end
             local after_finish_energy,after_finish_writes=state.lab.energy,state.lab.energy_writes
             local after_finish_counts={};for _,name in ipairs(science) do after_finish_counts[name]=state.lab.contents.counts[name] end
+            local after_finish_tools={};for _,name in ipairs(science) do
+              local stack=state.lab.contents.by_name[name]
+              after_finish_tools[name]={count=stack.count,durability=stack.durability,type=stack.type}
+            end
             ok,message=tick();if not ok then return {ok=false,message=message} end
             local before_reload={phase=state.phase,labs=state.destination_lab_completions,player=state.successor_player and state.successor_player.level,
               energy=state.lab.energy,writes=state.lab.energy_writes,counts={}}
@@ -335,24 +379,26 @@ class LegacyBooleanCapFixtureTests(unittest.TestCase):
             return {ok=true,saves=saves,markers=markers,lab={configuration_energy=after_configuration_energy,
               configuration_writes=after_configuration_writes,foreign_energy=after_foreign_energy,foreign_labs=after_foreign_labs,
               after_finish_energy=after_finish_energy,after_finish_writes=after_finish_writes,after_finish_counts=after_finish_counts,
+              after_finish_tools=after_finish_tools,
               reload_energy=state.lab.energy,reload_energy_writes=state.lab.energy_writes,reload_storage_unchanged=storage_unchanged},
-              state={phase=state.phase,labs=state.destination_lab_completions,player=state.successor_player}}
+              state={phase=state.phase,labs=state.destination_lab_completions,player=state.successor_player,
+                tool_remaining=state.destination_science_remaining}}
           end
         ''')
-        return py(self.lua.eval("legacy_boolean_cap_successor_flow")(target_name))
+        return py(self.lua.eval("legacy_boolean_cap_successor_flow")(target_name, science_consumption))
 
     def test_data_preflights_pin_the_independent_published_and_successor_row_before_acceleration(self):
         stages = (
             (SOURCE / "data-final-fixes.lua", {"base": "2.0.77", "more-infinite-research": "4.0.20000",
-                                                 "mir-fixture-mir5-legacy-boolean-cap": "0.1.0"}),
+                                                 "mir-fixture-mir5-legacy-boolean-cap": "0.1.0"}, False),
             (F200 / "data-final-fixes.lua", {"base": "2.0.77", "more-infinite-research": "5.0.20000",
-                                               "mir-fixture-mir5-legacy-boolean-cap": "0.2.0"}),
+                                               "mir-fixture-mir5-legacy-boolean-cap": "0.2.0"}, True),
             (F210 / "data-final-fixes.lua", {"base": "2.1.23", "more-infinite-research": "5.0.21000",
-                                               "mir-fixture-mir5-legacy-boolean-cap": "0.3.0"}),
+                                               "mir-fixture-mir5-legacy-boolean-cap": "0.3.0"}, False),
         )
-        for path, mods in stages:
+        for path, mods, tool_science in stages:
             with self.subTest(path=path):
-                raw = {"technology": {GEAR: self.row()}, "sentinel": {"unchanged": 17}}
+                raw = self.raw(tool_science)
                 accepted = self.run_data(path, raw, mods)
                 self.assertTrue(accepted["ok"], accepted["message"])
                 unit = accepted["raw"]["technology"][GEAR]["unit"]
@@ -365,12 +411,27 @@ class LegacyBooleanCapFixtureTests(unittest.TestCase):
                     ("science", lambda row: row["unit"]["ingredients"].__setitem__(0, ["foreign-science-pack", 1])),
                     ("effect", lambda row: row["effects"][0].update({"change": .01})),
                 ):
-                    candidate = {"technology": {GEAR: self.row()}, "sentinel": {"unchanged": 17}}
+                    candidate = self.raw(tool_science)
                     mutate(candidate["technology"][GEAR])
                     before = copy.deepcopy(candidate)
                     rejected = self.run_data(path, candidate, mods)
                     self.assertFalse(rejected["ok"], (label, rejected["message"]))
                     self.assertEqual(before, rejected["raw"])
+
+        f200_mods = {"base": "2.0.77", "more-infinite-research": "5.0.20000",
+                     "mir-fixture-mir5-legacy-boolean-cap": "0.2.0"}
+        for label, mutate in (
+            ("missing-tool", lambda raw: raw.pop("tool")),
+            ("plain-item", lambda raw: raw["tool"][SCIENCE[0][0]].update({"type": "item"})),
+            ("wrong-durability", lambda raw: raw["tool"][SCIENCE[0][0]].update({"durability": .5})),
+        ):
+            with self.subTest(tool_guard=label):
+                candidate = self.raw(True)
+                mutate(candidate)
+                before = copy.deepcopy(candidate)
+                rejected = self.run_data(F200 / "data-final-fixes.lua", candidate, f200_mods)
+                self.assertFalse(rejected["ok"], rejected["message"])
+                self.assertEqual(before, rejected["raw"])
 
     def test_settings_stages_select_only_the_historical_source_cap(self):
         source_mods = {"base": "2.0.77", "more-infinite-research": "4.0.20000",
@@ -609,11 +670,41 @@ class LegacyBooleanCapFixtureTests(unittest.TestCase):
                                  (passed["lab"]["foreign_energy"], passed["lab"]["foreign_labs"]))
                 self.assertEqual(0, passed["lab"]["after_finish_energy"])
                 self.assertGreater(passed["lab"]["after_finish_writes"], passed["lab"]["configuration_writes"])
-                self.assertEqual({name: 21 for name, _ in SCIENCE}, passed["lab"]["after_finish_counts"])
+                expected_count = 22 if target == "f200" else 21
+                self.assertEqual({name: expected_count for name, _ in SCIENCE}, passed["lab"]["after_finish_counts"])
+                if target == "f200":
+                    self.assertAlmostEqual(.73, passed["state"]["tool_remaining"])
+                    self.assertEqual({name: {"count": 22, "durability": .27, "type": "tool"}
+                                      for name, _ in SCIENCE}, passed["lab"]["after_finish_tools"])
                 self.assertEqual(0, passed["lab"]["reload_energy"])
                 self.assertTrue(passed["lab"]["reload_storage_unchanged"])
                 self.assertEqual(("completed", 1, 4),
                                  (passed["state"]["phase"], passed["state"]["labs"], passed["state"]["player"]["level"]))
+
+    def test_f200_tool_science_observation_requires_exact_remaining_unit_consumption(self):
+        passed = self.successor_flow("f200")
+        self.assertTrue(passed["ok"], passed.get("message"))
+        self.assertAlmostEqual(.73, passed["state"]["tool_remaining"])
+        for name, _ in SCIENCE:
+            with self.subTest(name=name):
+                stack = passed["lab"]["after_finish_tools"][name]
+                self.assertEqual((22, "tool"), (stack["count"], stack["type"]))
+                self.assertAlmostEqual(.27, stack["durability"])
+
+        for model, expected in (
+            ("none", "F200 successor tool science consumption differs"),
+            ("excess", "F200 successor tool science consumption differs"),
+            ("malformed-type", "F200 science stack is not a tool"),
+            ("malformed-durability", "F200 science tool durability is invalid"),
+        ):
+            with self.subTest(model=model):
+                refused = self.successor_flow("f200", model)
+                self.assertFalse(refused["ok"])
+                self.assertIn(expected, refused["message"])
+                if model == "none":
+                    for field in ("before-units=", "after-units=", "expected-delta=", "actual-delta=",
+                                  "observed-lab-progress="):
+                        self.assertIn(field, refused["message"])
 
 
 if __name__ == "__main__":
