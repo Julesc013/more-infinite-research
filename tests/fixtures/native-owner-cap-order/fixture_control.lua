@@ -116,7 +116,7 @@ local function assert_owner(force, expected, stage, label)
   end
   local state = snapshot(force)
   for _, name in ipairs(RECIPES) do
-    if not close(state.bonuses[name], 0.2) then fail(label .. " native recipe bonus differs") end
+    if not close(state.bonuses[name], 0.1) then fail(label .. " native recipe bonus differs") end
   end
   return state
 end
@@ -126,14 +126,18 @@ local function assert_foreign(force, expected, stage, label)
   check_effects(value, expected.effects, label)
   if value.level ~= 2 or value.researched ~= false or value.enabled ~= false
       or value.prototype.max_level ~= UINT32_MAX then fail(label .. " foreign native state differs") end
-  if value.visible_when_disabled ~= false then fail(label .. " foreign visibility changed") end
+  if stage == "relaxed" then
+    if value.visible_when_disabled ~= false then fail(label .. " foreign visibility was not restored") end
+  elseif value.visible_when_disabled ~= true then
+    fail(label .. " foreign visibility cap witness is absent")
+  end
   local queue = queue_snapshot(force)
   if queue.current ~= PROBE or #queue.queue ~= 1 or queue.queue[1] ~= PROBE or not close(queue.progress, 0.42) then
     fail(label .. " foreign current research or progress differs")
   end
   local state = snapshot(force)
   for _, name in ipairs(RECIPES) do
-    if not close(state.bonuses[name], 0.2) then fail(label .. " foreign native recipe bonus differs") end
+    if not close(state.bonuses[name], 0.1) then fail(label .. " foreign native recipe bonus differs") end
   end
   return state
 end
@@ -156,7 +160,11 @@ local function assert_foreign_snapshot(actual, expected, stage, label)
       or actual.maximum ~= expected.maximum or not same_bonuses(actual.bonuses, expected.bonuses)
       or not same_queue(actual.queue, expected.queue) then fail(label .. " foreign saved state differs") end
   if actual.enabled ~= false then fail(label .. " foreign disablement changed") end
-  if actual.visible ~= false then fail(label .. " foreign visibility differs") end
+  if stage == "relaxed" then
+    if actual.visible ~= false then fail(label .. " foreign visibility restoration differs") end
+  elseif actual.visible ~= true then
+    fail(label .. " foreign cap visibility differs")
+  end
 end
 
 local function marker(stage, state, expected)

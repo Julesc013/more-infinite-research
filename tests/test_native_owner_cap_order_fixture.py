@@ -52,6 +52,8 @@ def plain(value, seen=None):
 class NativeOwnerCapOrderFixtureTests(unittest.TestCase):
     def setUp(self):
         self.lua = LuaRuntime(unpack_returned_tuples=True)
+        source_path = str((ROOT / "source").resolve()).replace("\\", "/")
+        self.lua.execute(f'package.path = "{source_path}/?.lua;" .. package.path')
         self.lua.execute(r'''
 function cap_order_data(settings_path, data_path, settings_alias, data_alias, stage, opponent)
   local effects={
@@ -133,11 +135,15 @@ function cap_order_flow(common_path, canonical_path, permuted_path, relaxed_path
     function value.reset_technology_effects()
       resets=resets+1
       if value.owned and not matches(opponent=="old-order") then value.owned=false end
-      if value.owned then
-        if cap==0 then owner.enabled=true;owner.visible_when_disabled=false else owner.enabled=false;owner.visible_when_disabled=true end
+      if cap>0 then
+        if owner.visible_when_disabled~=true then owner.visible_when_disabled=true;value.visibility_owned=true end
+        if value.owned then owner.enabled=false end
+      else
+        if value.visibility_owned then owner.visible_when_disabled=false;value.visibility_owned=false end
+        if value.owned then owner.enabled=true end
       end
-      value.recipes["steel-plate"].productivity_bonus=.2
-      value.recipes["casting-steel"].productivity_bonus=.2
+      value.recipes["steel-plate"].productivity_bonus=.1
+      value.recipes["casting-steel"].productivity_bonus=.1
     end
     function value.add_research(technology)
       if technology==nil or technology.enabled~=true or value.current_research~=nil then return false end
@@ -204,6 +210,23 @@ function cap_order_flow(common_path, canonical_path, permuted_path, relaxed_path
   if not ok then return {ok=false,message=message,markers=markers,saves=saves,resets=resets,storage=storage} end
   ok,message=reload_twice(relaxed)
   return {ok=ok,message=message,markers=markers,saves=saves,resets=resets,storage=storage,player=player,foreign=game.forces[2]}
+end
+''')
+        self.lua.execute(r'''
+function cap_order_actual_foreign_visibility()
+  package.loaded["runtime.caps"]=nil
+  local caps=require("runtime.caps")
+  local name="steel-plate-productivity"
+  local technology={name=name,valid=true,level=2,researched=false,enabled=false,visible_when_disabled=false}
+  local force={index=48,valid=true,technologies={[name]=technology}}
+  local owned={}
+  caps.reconcile(force,{[name]=1},owned)
+  local at_cap={enabled=technology.enabled,visible=technology.visible_when_disabled,
+    disabled=owned[48] and owned[48][name] and owned[48][name].disabled,
+    visibility=owned[48] and owned[48][name] and owned[48][name].visible_when_disabled}
+  caps.reconcile(force,{[name]=0},owned)
+  return {at_cap=at_cap,relaxed={enabled=technology.enabled,visible=technology.visible_when_disabled,
+    owner=owned[48]}}
 end
 ''')
 
@@ -291,8 +314,9 @@ end
         self.assertEqual((2, .27, True), (result["player"]["technologies"]["steel-plate-productivity"]["level"],
                                           result["player"]["technologies"]["steel-plate-productivity"]["saved_progress"],
                                           result["player"]["technologies"]["steel-plate-productivity"]["enabled"]))
-        self.assertEqual((False, .42), (result["foreign"]["technologies"]["steel-plate-productivity"]["enabled"],
-                                        result["foreign"]["research_progress"]))
+        self.assertEqual((False, False, .42), (result["foreign"]["technologies"]["steel-plate-productivity"]["enabled"],
+                                               result["foreign"]["technologies"]["steel-plate-productivity"]["visible_when_disabled"],
+                                               result["foreign"]["research_progress"]))
         self.assertEqual("relaxed-complete", result["storage"]["mir5_native_owner_cap_order"]["phase"])
 
     def test_transition_refuses_effect_drift_skipped_stage_corrupted_saved_state_and_foreign_enablement(self):
@@ -305,6 +329,14 @@ end
                 self.assertIn(phrase, result["message"])
                 if opponent != "skipped-transition":
                     self.assertLessEqual(result["saves"], 2)
+
+    def test_actual_caps_helper_records_only_foreign_visibility_then_restores_it_without_enabling(self):
+        result = plain(self.lua.eval("cap_order_actual_foreign_visibility")())
+        self.assertEqual((False, True, None, False),
+                         (result["at_cap"]["enabled"], result["at_cap"]["visible"],
+                          result["at_cap"].get("disabled"), result["at_cap"]["visibility"]))
+        self.assertEqual((False, False, None),
+                         (result["relaxed"]["enabled"], result["relaxed"]["visible"], result["relaxed"].get("owner")))
 
     def test_readme_states_raw_projection_and_unfrozen_native_limits(self):
         readme = (FIXTURE / "README.md").read_text(encoding="utf-8")
