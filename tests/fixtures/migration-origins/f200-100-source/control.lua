@@ -231,6 +231,12 @@ local function establish_foreign_state(rows, alternate)
   local foreign = game.create_force("mir5-migration-origin-f200-100-foreign")
   seed_rows(foreign, rows, "foreign")
   local direct, probe = technology(foreign, CATALOGUE.direct), technology(foreign, alternate)
+  -- F200's queue is always available, but its entries still need their own
+  -- completed prerequisite chains.  Do this after the source-row seeds and
+  -- before the final queue/snapshot so the retained baseline records any
+  -- engine side effects from legitimate queue admission.
+  prerequisites(direct)
+  prerequisites(probe)
   direct.saved_progress, probe.saved_progress = .42, 0
   foreign.research_queue = {direct, probe}
   foreign.research_progress = .42
