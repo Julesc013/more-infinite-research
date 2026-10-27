@@ -14,6 +14,7 @@ FIXTURE = ROOT / "tests/fixtures/migration-origins/f200-110-successor"
 SOURCE_FIXTURE = ROOT / "tests/fixtures/migration-origins/f200-110-source"
 F200_PROFILE = ROOT / "tests/profiles/migration-origins-1.1.0-successor-f200-2077.json"
 F210_PROFILE = ROOT / "tests/profiles/migration-origins-1.1.0-successor-f210-2123.json"
+F210_SOURCE_DEFAULTS_PROFILE = ROOT / "tests/profiles/migration-origins-1.1.0-successor-f210-source-defaults-2123.json"
 F210_SOURCE_DEFAULTS_INFO = FIXTURE / "info-f210-source-defaults.json"
 LEGACY_MODULE_DEFINITIONS = ROOT / "source/research/legacy_module_credit_definitions.lua"
 LEGACY_MODULE_RUNTIME = ROOT / "source/runtime/legacy_module_credits.lua"
@@ -204,9 +205,13 @@ class MigrationOriginF200110SuccessorControls(unittest.TestCase):
         f210_source_defaults = dict(f210)
         f210_source_defaults["mir-fixture-mir5-migration-origin-f200-110-source"] = "0.4.0"
         source_settings = self.source_settings()
-        for label, mods in (("f200", f200), ("f210", f210), ("f210-source-defaults", f210_source_defaults)):
+        for label, mods, effective_settings in (
+            ("f200", f200, {}),
+            ("f210", f210, {}),
+            ("f210-source-defaults", f210_source_defaults, source_settings),
+        ):
             with self.subTest(label=label):
-                accepted = self.run_data(self.candidate_raw(), mods)
+                accepted = self.run_data(self.candidate_raw(), mods, effective_settings)
                 self.assertTrue(accepted["ok"], accepted["message"])
                 unit = accepted["raw"]["technology"][DIRECT]["unit"]
                 self.assertEqual((1, None, 1), (unit.get("count"), unit.get("count_formula"), unit["time"]))
@@ -310,8 +315,12 @@ class MigrationOriginF200110SuccessorControls(unittest.TestCase):
         self.assertEqual({}, result["storage"])
 
     def test_profiles_bind_the_one_passed_r05_source_and_the_coherent_module_credit_candidate(self):
-        f200, f210 = json.loads(F200_PROFILE.read_text()), json.loads(F210_PROFILE.read_text())
-        for profile in (f200, f210):
+        f200, f210, source_defaults = (
+            json.loads(F200_PROFILE.read_text()),
+            json.loads(F210_PROFILE.read_text()),
+            json.loads(F210_SOURCE_DEFAULTS_PROFILE.read_text()),
+        )
+        for profile in (f200, f210, source_defaults):
             self.assertEqual("88FC8E9891040275E001930C3E6AA0A4A7A28C31D81DF30E3F08AEDD98E5019A",
                              profile["source_save"]["sha256"])
             self.assertEqual("4FBD622144E3B69E39C0530385AA70C92971208584CA32D4A10B1FCC1A978997",
@@ -320,8 +329,10 @@ class MigrationOriginF200110SuccessorControls(unittest.TestCase):
                              (profile["candidate"]["source_commit"], profile["candidate"]["player_tree"]))
             self.assertEqual("bec37fb87a05d17cf4cf0225e0458218830fef63", profile["source_fixture_commit"])
             self.assertEqual("3ae2711867cd60f6c871f641c331349d941dd8c3", profile["source_fixture_controller_commit"])
-            self.assertEqual("3b578cb6b1c28d05fb26b3afda3f9253f978f58a", profile["successor_fixture_commit"])
             self.assertEqual("2fb64822b82569e3b50f0653e361fb7148f18b63", profile["origin_source_commit"])
+        self.assertEqual("3b578cb6b1c28d05fb26b3afda3f9253f978f58a", f200["successor_fixture_commit"])
+        self.assertEqual("3b578cb6b1c28d05fb26b3afda3f9253f978f58a", f210["successor_fixture_commit"])
+        self.assertEqual("457ce88627f2462fc4e60210668f822d98cabdc8", source_defaults["successor_fixture_commit"])
         self.assertEqual("97C4700C141090ECC59549FB684351A504B057C9BEC34A6E5A852441CEB8738F",
                          f200["archive_sha256"]["mir-fixture-mir5-migration-origin-f200-110-source_0.2.0.zip"])
         self.assertEqual("83EDCE7B40C6ABF13C60769691ABA4534F032FE87E82F2CF9E7CCE451D38EE5D",
@@ -330,7 +341,19 @@ class MigrationOriginF200110SuccessorControls(unittest.TestCase):
                          f200["archive_sha256"]["more-infinite-research_5.0.20000.zip"])
         self.assertEqual("625756F9E2536383954A121EB24FFB3AE0C0A540B7557E3F03A79C2D8A6A0D59",
                          f210["archive_sha256"]["more-infinite-research_5.0.21000.zip"])
+        self.assertEqual("EA2D9AABB4AE00D6E15DFA8B6B7E0BC401B8356599FBCF7BED8889BFB033B587",
+                         source_defaults["archive_sha256"]["mir-fixture-mir5-migration-origin-f200-110-source_0.4.0.zip"])
+        self.assertEqual("published-source-defaults-input", source_defaults["variant"])
+        self.assertEqual("Defaults", source_defaults["settings_mode"])
+        self.assertEqual("f210_source_defaults", source_defaults["target"])
+        self.assertEqual(
+            ["base", "mir-fixture-mir5-active-mods-observer", "more-infinite-research",
+             "mir-fixture-mir5-migration-origin-f200-110-source"],
+            [entry["name"] for entry in source_defaults["mods"]],
+        )
+        self.assertEqual("0.4.0", source_defaults["mods"][-1]["version"])
         self.assertNotIn("space-age", {entry["name"] for entry in f210["mods"]})
+        self.assertNotIn("space-age", {entry["name"] for entry in source_defaults["mods"]})
 
     def test_profiles_reject_the_r12_and_r13_superseded_fixture_archive_pins(self):
         cases = (
@@ -342,6 +365,11 @@ class MigrationOriginF200110SuccessorControls(unittest.TestCase):
             (json.loads(F210_PROFILE.read_text()),
              "mir-fixture-mir5-migration-origin-f200-110-source_0.3.0.zip",
              "83EDCE7B40C6ABF13C60769691ABA4534F032FE87E82F2CF9E7CCE451D38EE5D",
+             ("F4C54047A9734180D31C14F18BE38B744F053F399A0D8184961C2B563463C831",
+              "E1878CAEE523CDC4DC86C9E6B0B5029A78E4D96ADC1A3C80BE8521355A6655A3")),
+            (json.loads(F210_SOURCE_DEFAULTS_PROFILE.read_text()),
+             "mir-fixture-mir5-migration-origin-f200-110-source_0.4.0.zip",
+             "EA2D9AABB4AE00D6E15DFA8B6B7E0BC401B8356599FBCF7BED8889BFB033B587",
              ("F4C54047A9734180D31C14F18BE38B744F053F399A0D8184961C2B563463C831",
               "E1878CAEE523CDC4DC86C9E6B0B5029A78E4D96ADC1A3C80BE8521355A6655A3")),
         )
