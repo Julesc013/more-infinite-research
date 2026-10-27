@@ -5,10 +5,15 @@ controller, a save migration, or a laboratory result.
 """
 import argparse
 import copy
+import hashlib
+import importlib.util
 import json
 from pathlib import Path
+import shutil
 import sys
+import tempfile
 import unittest
+import zipfile
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -16,6 +21,7 @@ FIXTURE = ROOT / "tests/fixtures/legacy-boolean-cap"
 SOURCE = FIXTURE / "published"
 F200 = FIXTURE / "f200/successor"
 F210 = FIXTURE / "f210/successor"
+SUCCESSOR_BODY = FIXTURE / "fixture_control.lua"
 SOURCE_PROFILE = ROOT / "tests/profiles/legacy-boolean-cap-published-400-f200-2077.json"
 F200_PROFILE = ROOT / "tests/profiles/legacy-boolean-cap-current-f200-2077.json"
 F210_PROFILE = ROOT / "tests/profiles/legacy-boolean-cap-current-f210-2123.json"
@@ -26,6 +32,10 @@ SCIENCE = [
     ["automation-science-pack", 1], ["logistic-science-pack", 1],
     ["chemical-science-pack", 1], ["production-science-pack", 1],
 ]
+NAME = "mir-fixture-mir5-legacy-boolean-cap"
+_package_spec = importlib.util.spec_from_file_location("legacy_boolean_cap_package", ROOT / "tools/package.py")
+PACKAGE = importlib.util.module_from_spec(_package_spec)
+_package_spec.loader.exec_module(PACKAGE)
 
 
 def py(value):
@@ -84,6 +94,7 @@ class LegacyBooleanCapFixtureTests(unittest.TestCase):
 
     def parse_control(self, path, mods):
         self.lua.globals().fixture_control_path = path.as_posix()
+        self.lua.globals().fixture_successor_body_path = SUCCESSOR_BODY.as_posix()
         self.lua.execute(r'''
           function legacy_boolean_cap_parse(mods)
             local callbacks,forbidden={events={}},{}
@@ -95,6 +106,17 @@ class LegacyBooleanCapFixtureTests(unittest.TestCase):
               if key=="game" or key=="storage" or key=="settings" then forbidden[key]=true;return nil end
               return _G[key]
             end})
+            local modules={}
+            env.require=function(name)
+              if name~="__mir-fixture-mir5-legacy-boolean-cap__/fixture_control" then
+                error("unexpected fixture module: "..tostring(name))
+              end
+              if modules[name]==nil then
+                local chunk,message=loadfile(fixture_successor_body_path,"t",env);assert(chunk,message)
+                modules[name]=chunk()
+              end
+              return modules[name]
+            end
             local ok,message=pcall(function() assert(loadfile(fixture_control_path,"t",env))() end)
             return {ok=ok,message=tostring(message),callbacks=callbacks,forbidden=forbidden}
           end
@@ -136,7 +158,15 @@ class LegacyBooleanCapFixtureTests(unittest.TestCase):
             local player=force("player",1)
             local game={tick=0,forces={player=player,[1]=player},surfaces={[1]={}}}
             game.surfaces[1].create_entity=function(request)
-              local result={valid=true,energy=0,force=request.force,contents=inventory()}
+              local result={valid=true,force=request.force,contents=inventory(),energy_writes=0}
+              local native_energy=0
+              setmetatable(result,{__index=function(_,key)
+                if key=="energy" then return native_energy end
+                return rawget(result,key)
+              end,__newindex=function(_,key,value)
+                if key=="energy" then native_energy=value;result.energy_writes=result.energy_writes+1
+                else rawset(result,key,value) end
+              end})
               function result.get_inventory(kind) return result.contents end
               return result
             end
@@ -166,13 +196,17 @@ class LegacyBooleanCapFixtureTests(unittest.TestCase):
             player.current_research=nil;player.research_queue={};gear.level=2;player.recipes["iron-gear-wheel"].productivity_bonus=.10
             for _,name in ipairs(science) do state.lab.contents.counts[name]=state.lab.contents.counts[name]-1 end
             ok,message=invoke(callbacks.events[1],{research=gear});if not ok then return {ok=false,message=message} end
+            local after_first_energy,after_first_writes=state.lab.energy,state.lab.energy_writes
             ok,message=tick();if not ok then return {ok=false,message=message} end
             player.current_research=nil;player.research_queue={};gear.level=3;player.recipes["iron-gear-wheel"].productivity_bonus=.20
             if not keep_enabled then gear.enabled=false end
             for _,name in ipairs(science) do state.lab.contents.counts[name]=state.lab.contents.counts[name]-1 end
             ok,message=invoke(callbacks.events[1],{research=gear});if not ok then return {ok=false,message=message} end
+            local after_second_energy,after_second_writes=state.lab.energy,state.lab.energy_writes
             if keep_enabled then game.tick=state.deadline_tick+1 else game.tick=game.tick+1 end
             ok,message=invoke(callbacks.events[2]);if not ok then return {ok=false,message=message} end
+            local before_reload={phase=state.phase,labs=state.actual_lab_completions,milestone=state.milestone,
+              cap=state.player_cap and state.player_cap.level,energy=state.lab.energy,energy_writes=state.lab.energy_writes}
             for _=1,2 do
               ok,message=invoke(callbacks.load);if not ok then return {ok=false,message=message} end
               ok,message=tick();if not ok then return {ok=false,message=message} end
@@ -181,12 +215,126 @@ class LegacyBooleanCapFixtureTests(unittest.TestCase):
                 milestone=storage.mir5_legacy_boolean_cap.milestone,player_cap=storage.mir5_legacy_boolean_cap.player_cap},
               player={level=gear.level,enabled=gear.enabled,visible=gear.visible_when_disabled,
                 progress=gear.saved_progress,bonus=player.recipes["iron-gear-wheel"].productivity_bonus},
+              lab={after_first_energy=after_first_energy,after_first_writes=after_first_writes,
+                after_second_energy=after_second_energy,after_second_writes=after_second_writes,
+                reload_energy=state.lab.energy,reload_energy_writes=state.lab.energy_writes,
+                reload_storage_unchanged=before_reload.phase==state.phase and before_reload.labs==state.actual_lab_completions
+                  and before_reload.milestone==state.milestone and before_reload.cap==state.player_cap.level
+                  and before_reload.energy==state.lab.energy and before_reload.energy_writes==state.lab.energy_writes},
               foreign={level=game.forces[2].technologies["recipe-prod-research_gears-1"].level,
                 enabled=game.forces[2].technologies["recipe-prod-research_gears-1"].enabled,
                 visible_when_disabled=game.forces[2].technologies["recipe-prod-research_gears-1"].visible_when_disabled}}
           end
         ''')
         return py(self.lua.eval("legacy_boolean_cap_source_flow")(keep_enabled))
+
+    def successor_flow(self, target_name):
+        self.lua.globals().fixture_successor_body_path = SUCCESSOR_BODY.as_posix()
+        self.lua.globals().fixture_successor_wrapper_path = ((F200 if target_name == "f200" else F210) / "control.lua").as_posix()
+        self.lua.execute(r'''
+          function legacy_boolean_cap_successor_flow(target_name)
+            local callbacks,markers,saves={events={}},{},0
+            local science={"automation-science-pack","logistic-science-pack","chemical-science-pack","production-science-pack"}
+            local function inventory()
+              local value={counts={}}
+              function value.insert(request) value.counts[request.name]=(value.counts[request.name] or 0)+request.count;return request.count end
+              function value.get_item_count(name) return value.counts[name] or 0 end
+              return value
+            end
+            local function lab(force)
+              local value={valid=true,force=force,contents=inventory(),energy_writes=0}
+              local native_energy=0
+              setmetatable(value,{__index=function(_,key)
+                if key=="energy" then return native_energy end
+                return rawget(value,key)
+              end,__newindex=function(_,key,next)
+                if key=="energy" then native_energy=next;value.energy_writes=value.energy_writes+1
+                else rawset(value,key,next) end
+              end})
+              function value.get_inventory(kind) return value.contents end
+              return value
+            end
+            local function technology(name,force)
+              return {name=name,force=force,valid=true,level=1,researched=false,enabled=true,visible_when_disabled=true,
+                saved_progress=0,prerequisites={},prototype={max_level=4294967295},research_unit_count=1,research_unit_energy=60}
+            end
+            local function force(name,index)
+              local value={name=name,index=index,valid=true,technologies={},recipes={ ["iron-gear-wheel"]={productivity_bonus=0}},
+                research_queue={},research_progress=0}
+              local gear=technology("recipe-prod-research_gears-1",value)
+              value.technologies[gear.name]=gear
+              value.technologies["braking-force-1"]=technology("braking-force-1",value)
+              function value.add_research(research)
+                if research==nil or value.current_research~=nil then return false end
+                value.current_research=research;value.research_queue={research};value.research_progress=research.saved_progress or 0;return true
+              end
+              return value
+            end
+            local player,foreign=force("player",1),force("mir5-legacy-boolean-cap-foreign",2)
+            foreign.technologies["recipe-prod-research_gears-1"].enabled=false
+            foreign.technologies["recipe-prod-research_gears-1"].visible_when_disabled=false
+            foreign.current_research=foreign.technologies["braking-force-1"]
+            foreign.research_queue={foreign.current_research};foreign.research_progress=.42
+            local gear=player.technologies["recipe-prod-research_gears-1"]
+            gear.level=3;gear.saved_progress=.27;player.recipes["iron-gear-wheel"].productivity_bonus=.20
+            local source_lab=lab(player)
+            for _,name in ipairs(science) do source_lab.contents.counts[name]=14 end
+            local state={phase="completed",source_mir="4.0.20000",actual_lab_completions=2,milestone="actual2labs",
+              player_cap={level=3,researched=false,enabled=true,visible=true,maximum=4294967295,bonus=.20,saved_progress=.27},
+              foreign_force_index=foreign.index,foreign_queue={current="braking-force-1",queue={"braking-force-1"},progress=.42},lab=source_lab}
+            local game={tick=0,forces={player=player,[1]=player,[2]=foreign,[foreign.name]=foreign}}
+            function game.server_save(name) assert(name=="mir5-native-complete");saves=saves+1 end
+            local expected=target_name=="f200" and {base="2.0.77",mir="5.0.20000",fixture="0.2.0"}
+              or {base="2.1.23",mir="5.0.21000",fixture="0.3.0"}
+            local storage={mir5_legacy_boolean_cap=state}
+            local env={game=game,storage=storage,settings={startup={
+              ["ips-max-level-research_gears"]={value=0},["ips-effect-per-level-research_gears"]={value=10}}},
+              helpers={table_to_json=function(row)markers[#markers+1]=row;return "{}" end},
+              log=function(value)assert(value:match("^%[MIR5_NATIVE_FIXTURE%] RESULT "))end,
+              script={active_mods={base=expected.base,["more-infinite-research"]=expected.mir,
+                ["mir-fixture-mir5-legacy-boolean-cap"]=expected.fixture},
+                on_load=function(fn)callbacks.load=fn end,on_configuration_changed=function(fn)callbacks.configuration=fn end,
+                on_event=function(event,fn)callbacks.events[event]=fn end},
+              defines={events={on_research_finished=1,on_tick=2},inventory={lab_input=1}}}
+            env._G=env;setmetatable(env,{__index=_G})
+            local module
+            env.require=function(name)
+              assert(name=="__mir-fixture-mir5-legacy-boolean-cap__/fixture_control")
+              if module==nil then local chunk,message=loadfile(fixture_successor_body_path,"t",env);assert(chunk,message);module=chunk() end
+              return module
+            end
+            local chunk,message=loadfile(fixture_successor_wrapper_path,"t",env);assert(chunk,message);chunk()
+            local function invoke(callback,argument) local ok,message=pcall(callback,argument);return ok,tostring(message) end
+            local function tick() game.tick=game.tick+1;return invoke(callbacks.events[2]) end
+            local ok,message=invoke(callbacks.configuration);if not ok then return {ok=false,message=message} end
+            local after_configuration_energy,after_configuration_writes=state.lab.energy,state.lab.energy_writes
+            ok,message=invoke(callbacks.events[1],{research=foreign.technologies["recipe-prod-research_gears-1"]});if not ok then return {ok=false,message=message} end
+            local after_foreign_energy,after_foreign_labs=state.lab.energy,state.destination_lab_completions
+            player.current_research=nil;player.research_queue={};gear.level=4;player.recipes["iron-gear-wheel"].productivity_bonus=.30
+            for _,name in ipairs(science) do state.lab.contents.counts[name]=state.lab.contents.counts[name]-1 end
+            ok,message=invoke(callbacks.events[1],{research=gear});if not ok then return {ok=false,message=message} end
+            local after_finish_energy,after_finish_writes=state.lab.energy,state.lab.energy_writes
+            local after_finish_counts={};for _,name in ipairs(science) do after_finish_counts[name]=state.lab.contents.counts[name] end
+            ok,message=tick();if not ok then return {ok=false,message=message} end
+            local before_reload={phase=state.phase,labs=state.destination_lab_completions,player=state.successor_player and state.successor_player.level,
+              energy=state.lab.energy,writes=state.lab.energy_writes,counts={}}
+            for _,name in ipairs(science) do before_reload.counts[name]=state.lab.contents.counts[name] end
+            for _=1,2 do
+              ok,message=invoke(callbacks.load);if not ok then return {ok=false,message=message} end
+              ok,message=tick();if not ok then return {ok=false,message=message} end
+            end
+            local storage_unchanged=before_reload.phase==state.phase and before_reload.labs==state.destination_lab_completions
+              and before_reload.player==state.successor_player.level and before_reload.energy==state.lab.energy
+              and before_reload.writes==state.lab.energy_writes
+            for _,name in ipairs(science) do storage_unchanged=storage_unchanged and before_reload.counts[name]==state.lab.contents.counts[name] end
+            return {ok=true,saves=saves,markers=markers,lab={configuration_energy=after_configuration_energy,
+              configuration_writes=after_configuration_writes,foreign_energy=after_foreign_energy,foreign_labs=after_foreign_labs,
+              after_finish_energy=after_finish_energy,after_finish_writes=after_finish_writes,after_finish_counts=after_finish_counts,
+              reload_energy=state.lab.energy,reload_energy_writes=state.lab.energy_writes,reload_storage_unchanged=storage_unchanged},
+              state={phase=state.phase,labs=state.destination_lab_completions,player=state.successor_player}}
+          end
+        ''')
+        return py(self.lua.eval("legacy_boolean_cap_successor_flow")(target_name))
 
     def test_data_preflights_pin_the_independent_published_and_successor_row_before_acceleration(self):
         stages = (
@@ -268,20 +416,26 @@ class LegacyBooleanCapFixtureTests(unittest.TestCase):
                           observed["maximum_level_control"]["matched_git_body"],
                           observed["maximum_level_control"]["tag_source_git_blob"]))
         source = json.loads(SOURCE_PROFILE.read_text(encoding="utf-8"))
-        self.assertEqual(ARCHIVE_SHA256, source["archive_sha256"]["more-infinite-research_4.0.20000.zip"])
+        self.assertEqual({"more-infinite-research_4.0.20000.zip": ARCHIVE_SHA256,
+                          "mir-fixture-mir5-legacy-boolean-cap_0.1.0.zip":
+                              "A33E86829C63B995228E79CEA7421E669A4D2C5F7F76BDAF8F2D7F2B742F4C3D"},
+                         source["archive_sha256"])
         self.assertEqual(("4.0.0", "09eb6ece484c8e3c1bcdafaea31451ce84a27108"),
                          (source["origin_tag"], source["origin_archive_body"]))
-        for profile_path, target, mir, fixture, archive, digest, size in (
+        for profile_path, target, mir, fixture, archive, digest, size, fixture_digest in (
             (F200_PROFILE, "f200", "5.0.20000", "0.2.0", "more-infinite-research_5.0.20000.zip",
-             "7450900FB863D86A9A798E130965959FE9731FAD1DFAE592B69707358343604C", 680580),
+             "8DB28D2DE45F26033B5F54E176902A3138A903AF0F4B48EAB6B9971466021B4F", 680963,
+             "0504A2AC4BA0BC6985EF5AFB24AC72CA9B62DF9B02090663AA1AA5A9DC5B0EED"),
             (F210_PROFILE, "f210", "5.0.21000", "0.3.0", "more-infinite-research_5.0.21000.zip",
-             "F2D19181643C757649DC28A317917CC0806D651D0A7EFA8BDAB4C69DFF6EAFF5", 680964),
+             "7CE6A4DF78019F6B98237E638A1C927C5FDB538D4A1442EE22D846DD962DDCDC", 681347,
+             "D1BDF52D254F6C1DE051117293D9F731295BFC8E3C1909DFFA8F2DA15413F876"),
         ):
             profile = json.loads(profile_path.read_text(encoding="utf-8"))
             with self.subTest(profile=profile_path.name):
-                self.assertEqual({archive: digest}, profile["archive_sha256"])
-                self.assertEqual(("8465e2a2c0dbab16a3260e6bab86bcadddb4f997",
-                                  "2c4d9253ff2f427d528726a402cc7f8547130d0d", size),
+                self.assertEqual({archive: digest, f"mir-fixture-mir5-legacy-boolean-cap_{fixture}.zip": fixture_digest},
+                                 profile["archive_sha256"])
+                self.assertEqual(("a575a4198807b6aea9e26963e3d9970fc5c068ae",
+                                  "398c79c687d2bc662c976355ced1436201c43f11", size),
                                  (profile["candidate_binding"]["source_commit"],
                                   profile["candidate_binding"]["player_tree"],
                                   profile["candidate_binding"]["bytes"]))
@@ -301,17 +455,66 @@ class LegacyBooleanCapFixtureTests(unittest.TestCase):
         self.assertIn("actual_lab_completions ~= 2", source)
         self.assertIn("game.server_save(SAVE)", source)
         self.assertIn('marker("reload", state)', source)
-        f200 = (F200 / "control.lua").read_text(encoding="utf-8")
-        f210 = (F210 / "control.lua").read_text(encoding="utf-8")
-        self.assertIn("F200 restored player", f200)
-        self.assertIn("F210 direct restored player", f210)
-        self.assertIn("script.active_mods.base ~= \"2.1.23\"", f210)
-        self.assertIn("direct successor carries Space Age companions", f210)
-        for control in (f200, f210):
-            self.assertIn("foreign gear", control)
-            self.assertIn("destination_lab_completions ~= 1", control)
-            self.assertIn("game.server_save(SAVE)", control)
-            self.assertIn('marker("reload", state)', control)
+        body = SUCCESSOR_BODY.read_text(encoding="utf-8")
+        self.assertIn("F200 restored player", body)
+        self.assertIn("F210 direct restored player", body)
+        self.assertIn("direct successor carries Space Age companions", body)
+        self.assertIn("foreign gear", body)
+        self.assertIn("destination_lab_completions ~= 1", body)
+        self.assertIn("game.server_save(SAVE)", body)
+        self.assertIn('marker("reload", state)', body)
+        self.assertIn("return {apply = apply}", body)
+        self.assertEqual('require("__mir-fixture-mir5-legacy-boolean-cap__/fixture_control").apply("f200")\n',
+                         (F200 / "control.lua").read_text(encoding="utf-8"))
+        self.assertEqual('require("__mir-fixture-mir5-legacy-boolean-cap__/fixture_control").apply("f210")\n',
+                         (F210 / "control.lua").read_text(encoding="utf-8"))
+
+    def test_owned_fixture_projections_bind_the_shared_successor_body_and_exact_archive_members(self):
+        stages = (
+            (SOURCE, "0.1.0", SOURCE_PROFILE, {
+                "control.lua": ("D2D70F06F692BEE80DD7DF8E09EDDA7EF2BC1E1CDA926DCE331B160C5B08CC2F", 11084),
+                "data-final-fixes.lua": ("8FD3DBE6D847680639442ABABAFC60F0CC60BAE2BA11EFD19C26A4606CB78C52", 1820),
+                "info.json": ("B066898F875EC64B2A960643725E4785180FB801810D7BDD3EC769EDD4018695", 271),
+                "settings-updates.lua": ("9E8D15D1CF977EE90BFA1F6792BBA1B0D9F1E7A98E55A89164FD2FBEEC1067E8", 883),
+            }),
+            (F200, "0.2.0", F200_PROFILE, {
+                "control.lua": ("65A6B7D99EFBA852EA91A530CE9C4D0BEDBD27135AC67B93BED23B15D43C143A", 81),
+                "data-final-fixes.lua": ("D84F98D522A25832534A90D5ED71BBB5BE944F862F68401792C9154A7687D2A5", 1807),
+                "fixture_control.lua": ("71C5959F4861197F699C71E248DCE4EDE184AE5C55D18499501A16EB61777D97", 10959),
+                "info.json": ("3E54EE382BAF2D1E1BB03BDC34B5F88491A02EE8D9A986B1336ACD7624C77A7B", 274),
+                "settings-updates.lua": ("F97D0D3E337C2FD3E7B8FB14D80B7DF4043F7071A299CEB7D8895E341B196015", 817),
+            }),
+            (F210, "0.3.0", F210_PROFILE, {
+                "control.lua": ("0341FCF30615C303A7D3CDF517F0C030A6653F22156B5B40411C6280DFB388FA", 81),
+                "data-final-fixes.lua": ("C001B5B4317ED213DC6C01ED622CEE908F64F0E2C059379C8C5FB01F42ADD5E8", 1899),
+                "fixture_control.lua": ("71C5959F4861197F699C71E248DCE4EDE184AE5C55D18499501A16EB61777D97", 10959),
+                "info.json": ("32181A0BF1F33B576AA3001B010AE77FBEBCEB948B799033A2066DDD18F7BE83", 281),
+                "settings-updates.lua": ("A8957200244C3161362F2B370EC73343055B7C1D9CFD8F555D51C1049A137130", 1009),
+            }),
+        )
+        with tempfile.TemporaryDirectory(dir=ROOT / "build") as temporary:
+            root = Path(temporary)
+            for stage, version, profile_path, expected in stages:
+                with self.subTest(version=version):
+                    projection = root / version
+                    projection.mkdir()
+                    for source in stage.iterdir():
+                        if source.is_file():
+                            shutil.copyfile(source, projection / source.name)
+                    if stage != SOURCE:
+                        shutil.copyfile(SUCCESSOR_BODY, projection / "fixture_control.lua")
+                    archive = root / f"{NAME}_{version}.zip"
+                    record = PACKAGE.build(projection, archive)
+                    observed = {row["path"]: (row["sha256"].upper(), row["bytes"]) for row in record["members"]}
+                    self.assertIsNone(record["source_commit"])
+                    self.assertEqual(expected, observed)
+                    self.assertEqual(record["sha256"].upper(), hashlib.sha256(archive.read_bytes()).hexdigest().upper())
+                    self.assertEqual(record["sha256"].upper(),
+                                     json.loads(profile_path.read_text(encoding="utf-8"))["archive_sha256"]
+                                     [f"{NAME}_{version}.zip"])
+                    with zipfile.ZipFile(archive) as package:
+                        self.assertEqual({f"{NAME}_{version}/{name}" for name in expected},
+                                         {entry.filename for entry in package.infolist() if not entry.is_dir()})
 
     def test_native_shaped_source_model_requires_the_observed_cap_disablement_before_the_protected_save(self):
         passed = self.source_flow()
@@ -327,10 +530,33 @@ class LegacyBooleanCapFixtureTests(unittest.TestCase):
         self.assertEqual((2, "actual2labs", .27),
                          (passed["state"]["actual_lab_completions"], passed["state"]["milestone"],
                           passed["state"]["player_cap"]["saved_progress"]))
+        self.assertGreater(passed["lab"]["after_first_energy"], 0)
+        self.assertEqual(0, passed["lab"]["after_second_energy"])
+        self.assertGreater(passed["lab"]["after_second_writes"], passed["lab"]["after_first_writes"])
+        self.assertEqual(0, passed["lab"]["reload_energy"])
+        self.assertTrue(passed["lab"]["reload_storage_unchanged"])
 
         refused = self.source_flow(keep_enabled=True)
         self.assertFalse(refused["ok"])
         self.assertIn("source labs did not complete", refused["message"])
+
+    def test_successor_freezes_the_live_lab_once_and_cold_reloads_are_native_and_storage_read_only(self):
+        for target in ("f200", "f210"):
+            with self.subTest(target=target):
+                passed = self.successor_flow(target)
+                self.assertTrue(passed["ok"], passed.get("message"))
+                self.assertEqual(1, passed["saves"])
+                self.assertEqual(["initial", "reload", "reload"], [row["stage"] for row in passed["markers"]])
+                self.assertGreater(passed["lab"]["configuration_energy"], 0)
+                self.assertEqual((passed["lab"]["configuration_energy"], 0),
+                                 (passed["lab"]["foreign_energy"], passed["lab"]["foreign_labs"]))
+                self.assertEqual(0, passed["lab"]["after_finish_energy"])
+                self.assertGreater(passed["lab"]["after_finish_writes"], passed["lab"]["configuration_writes"])
+                self.assertEqual({name: 21 for name, _ in SCIENCE}, passed["lab"]["after_finish_counts"])
+                self.assertEqual(0, passed["lab"]["reload_energy"])
+                self.assertTrue(passed["lab"]["reload_storage_unchanged"])
+                self.assertEqual(("completed", 1, 4),
+                                 (passed["state"]["phase"], passed["state"]["labs"], passed["state"]["player"]["level"]))
 
 
 if __name__ == "__main__":
