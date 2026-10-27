@@ -312,6 +312,68 @@ class ModernCatalogueTests(unittest.TestCase):
             self.assertEqual(catalogue.compare_candidate(path, "k2so-f210", base_no_mir, candidate)["status"],
                              "equal-intended-native-output")
 
+    def test_bob_angel_f210_recovery_canonicalises_selected_archive_order_only(self):
+        """q010's historic no-MIR/B6 archive receipts contain equal identities in a different order."""
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            baseline = _capture(root / "upstream", _baseline_raw(), _baseline_settings(), published=False)
+            published = _capture(root / "published", _published_raw(), _published_settings(), published=True,
+                                 mir_version="4.7.21003")
+            external = root / "external"
+            extra = {
+                "name": "bob-angel-provider", "version": "2.1.0", "builtin": False,
+                "sha256": hashlib.sha256((external / "base-info.json").read_bytes()).hexdigest().upper(),
+            }
+
+            def set_selected(capture: Path, rows: list[dict]) -> None:
+                receipt_path = capture / "result.json"
+                receipt = json.loads(receipt_path.read_text(encoding="utf-8"))
+                receipt["selected_archives"] = rows
+                _write_json(receipt_path, receipt)
+
+            baseline_receipt = json.loads((baseline / "result.json").read_text(encoding="utf-8"))
+            published_receipt = json.loads((published / "result.json").read_text(encoding="utf-8"))
+            # The selected-archive receipt is an identity set; generated and
+            # loaded selection ordering remains separately exact.
+            set_selected(baseline, [baseline_receipt["selected_archives"][0], extra])
+            set_selected(published, [extra, published_receipt["selected_archives"][0],
+                                     published_receipt["selected_archives"][1]])
+
+            inventory_path = root / "bob-angel-f210.json"
+            with contextlib.redirect_stdout(io.StringIO()), contextlib.redirect_stderr(io.StringIO()):
+                self.assertEqual(catalogue.main([
+                    "recover-bob-angel-f210", "--no-mir", str(baseline), "--published", str(published),
+                    "--output", str(inventory_path),
+                ]), 0)
+            inventory = json.loads(inventory_path.read_text(encoding="utf-8"))
+            self.assertEqual(inventory["source"], {
+                "published_version": "4.7.21003", "engine_family": "2.1", "profiles": ["bob-angel-f210"],
+            })
+            expected_raw = _published_raw()
+            del expected_raw["mod-data"]
+            candidate = _capture(root / "candidate", expected_raw, _published_settings(), published=True,
+                                 mir_version="5.0.21000")
+            candidate_receipt = json.loads((candidate / "result.json").read_text(encoding="utf-8"))
+            set_selected(candidate, [extra, candidate_receipt["selected_archives"][0],
+                                     candidate_receipt["selected_archives"][1]])
+
+            self.assertEqual(
+                catalogue.compare_candidate(inventory_path, "bob-angel-f210", baseline, candidate)["status"],
+                "equal-intended-native-output",
+            )
+            with contextlib.redirect_stdout(io.StringIO()), contextlib.redirect_stderr(io.StringIO()):
+                self.assertEqual(catalogue.main([
+                    "compare", "--inventory", str(inventory_path), "--profile", "bob-angel-f210",
+                    "--baseline", str(baseline), "--candidate", str(candidate),
+                ]), 0)
+
+            changed = deepcopy(extra)
+            changed["sha256"] = "0" * 64
+            set_selected(candidate, [changed, candidate_receipt["selected_archives"][0],
+                                     candidate_receipt["selected_archives"][1]])
+            with self.assertRaisesRegex(catalogue.CatalogueError, "selected upstream archive identities differ"):
+                catalogue.compare_candidate(inventory_path, "bob-angel-f210", baseline, candidate)
+
     def test_paired_profile_files_allow_only_hash_verified_full_document_equivalence(self):
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
