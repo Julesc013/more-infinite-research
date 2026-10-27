@@ -481,6 +481,24 @@ class LegacyCapsLifecycleTests(unittest.TestCase):
             "earlier worker predecessor bypassed current native-owner admission")
         ''')
 
+    def test_47_f200_worker_hop_keeps_current_false_tombstone(self):
+        self.lua.execute('''
+          -- The existing 4.7 bridge has the same current-MIR5 precedence
+          -- boundary as the newly admitted 4.4.2 worker predecessor. A
+          -- literal false is a durable current decision, not a malformed row
+          -- to discard before either exceptional reader observes it.
+          local name = "worker-robots-speed-6"
+          local retained = worker(name)
+          retained.enabled, retained.visible_when_disabled = false, true
+          local current = {schema = 1, owned_disabled = {[1] = {[name] = false}}}
+          boot({[1] = force(1, {[name] = retained})}, f200_worker_legacy(1, 2, name), current,
+            {target_id = "f210", worker_limit = 40})
+          lifecycle.on_configuration_changed(f200_to_f210_event("4.7.20003"))
+          assert(not retained.enabled and retained.visible_when_disabled
+            and current.owned_disabled[1][name] == false and current.legacy_caps_checked,
+            "4.7 worker predecessor displaced a current MIR5 false tombstone")
+        ''')
+
     def test_f200_to_f210_bridge_refuses_missing_wrong_or_malformed_event(self):
         self.lua.execute('''
           local old = f200_gear_legacy(1, 2)
