@@ -27,6 +27,14 @@ class BootstrapTests(unittest.TestCase):
             NATIVE_CREDIT_ACTIVE = native_credit_active == true
             credit_calls = {}
             configuration_order = {}
+            planet_recovery_calls = {}
+            package.preload["runtime.planet_discovery_recovery"] = function()
+              return {on_configuration_changed = function(event)
+                planet_recovery_calls.count = (planet_recovery_calls.count or 0) + 1
+                planet_recovery_calls.event = event
+                table.insert(configuration_order, "planet-discovery-recovery")
+              end}
+            end
             package.preload["platform.target"] = function()
               local target = dofile(player_root .. "/platform/target.lua")
               target.recipe_productivity = NATIVE_CREDIT_ACTIVE
@@ -101,7 +109,10 @@ class BootstrapTests(unittest.TestCase):
                 events_active = function() return SCRIPTED_ACTIVE end,
                 agriculture_events_active = function() return SCRIPTED_ACTIVE end,
                 on_init = function() scripted_calls.init = (scripted_calls.init or 0) + 1 end,
-                on_configuration_changed = function(event) scripted_calls.configuration = event end,
+                on_configuration_changed = function(event)
+                  scripted_calls.configuration = event
+                  table.insert(configuration_order, "scripted-effects")
+                end,
                 on_load = function() scripted_calls.load = (scripted_calls.load or 0) + 1 end,
                 on_research_finished = function(event) scripted_calls.research_finished = event end,
                 on_research_reversed = function(event) scripted_calls.research_reversed = event end,
@@ -124,7 +135,10 @@ class BootstrapTests(unittest.TestCase):
                 return player.frame
               end
               module.on_init = function() library_calls.init = (library_calls.init or 0) + 1 end
-              module.on_configuration_changed = function(event) library_calls.configuration = event end
+              module.on_configuration_changed = function(event)
+                library_calls.configuration = event
+                table.insert(configuration_order, "library")
+              end
               module.on_load = function() library_calls.load = (library_calls.load or 0) + 1 end
               module.on_lua_shortcut = function(event) library_calls.shortcut = event end
               module.on_gui_text_changed = function(event) library_calls.text = event end
@@ -196,6 +210,7 @@ class BootstrapTests(unittest.TestCase):
             package.loaded["control"] = nil
             package.loaded["runtime.bootstrap"] = nil
             package.loaded["platform.target"] = nil
+            package.loaded["runtime.planet_discovery_recovery"] = nil
             package.loaded["runtime.native_credits"] = nil
             package.loaded["runtime.configuration"] = nil
             package.loaded["runtime.lifecycle"] = nil
@@ -330,6 +345,25 @@ class BootstrapTests(unittest.TestCase):
           assert(handlers.events[19] == nil and handlers.events[20] == nil)
           for id = 7, 13 do assert(type(handlers.events[id]) == "function") end
           for id = 15, 18 do assert(type(handlers.events[id]) == "function") end
+        ''')
+
+    def test_historical_discoveries_reconcile_after_effects_and_only_on_configuration_change(self):
+        self.lua.execute('''
+          install_modules(true, false, true, true)
+          install_runtime({}, {["space-age"] = "2.1.23"})
+          load_control()
+          handlers.init(); handlers.load()
+          assert(planet_recovery_calls.count == nil, "discovery recovery ran on init or load")
+          local event = {mod_changes = {["more-infinite-research"] = {
+            old_version = "3.2.0", new_version = "5.0.21000"}}}
+          handlers.configuration(event)
+          assert(planet_recovery_calls.count == 1 and planet_recovery_calls.event == event)
+          local expected = {"native-credit-preflight", "lifecycle", "native-credit-reconcile",
+            "scripted-effects", "planet-discovery-recovery", "library"}
+          assert(#configuration_order == #expected)
+          for index, name in ipairs(expected) do assert(configuration_order[index] == name) end
+          handlers.load()
+          assert(planet_recovery_calls.count == 1, "cold load repeated discovery recovery")
         ''')
 
     def test_native_credit_lifecycle_survives_provider_absence_without_research_callbacks(self):

@@ -13,6 +13,7 @@ local settings_commands = require("runtime.settings_commands")
 local passive_repair = require("runtime.passive_repair")
 local effective = require("runtime.configuration")
 local target = require("platform.target")
+local planet_discovery_recovery = require("runtime.planet_discovery_recovery")
 local native_credits
 if target.recipe_productivity == true then
   native_credits = require("runtime.native_credits")
@@ -352,6 +353,8 @@ local function on_configuration_changed(event)
       end
     end
   end
+  -- Repair the exact old discovery defect after any native-effect reset.
+  planet_discovery_recovery.on_configuration_changed(event)
   library.on_configuration_changed(event)
   reconcile_repair()
   reconcile_translations()
