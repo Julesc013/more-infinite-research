@@ -94,6 +94,7 @@ class PortalExportTests(unittest.TestCase):
             self.assertEqual(record["extended_version"], extended)
             self.assertEqual(record["portal_version"], "5.0.09")
             self.assertEqual(record["input"]["sha256"], self._sha256(input_archive))
+            self.assertEqual(record["input"]["sha256_after_export"], self._sha256(input_archive))
             self.assertEqual(record["output"]["sha256"], self._sha256(output))
             self.assertEqual([row["path"] for row in record["permitted_member_differences"]], [info_path, target_path])
 
@@ -160,6 +161,30 @@ class PortalExportTests(unittest.TestCase):
             record = json.loads(completed.stdout)
             self.assertEqual(record["output"]["sha256"], self._sha256(output))
             self.assertEqual(record["output"]["path"], str(output.resolve()))
+
+    def test_refuses_a_changed_input_after_writing_and_preserves_the_partial_copy_for_diagnosis(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            temporary = Path(temporary)
+            input_archive = temporary / "more-infinite-research_5.0.21000.zip"
+            self._write_completed_zip(input_archive)
+            original_input = input_archive.read_bytes()
+            output = temporary / "more-infinite-research_5.0.09.zip"
+            original_reader = portal._read_completed_archive
+
+            def read_then_change_input(path, *arguments):
+                result = original_reader(path, *arguments)
+                if Path(path).resolve() == output.resolve():
+                    input_archive.write_bytes(original_input + b"changed-after-copy")
+                return result
+
+            portal._read_completed_archive = read_then_change_input
+            try:
+                with self.assertRaisesRegex(portal.PortalExportError, "changed while the Portal copy was written"):
+                    portal.export_portal_copy(input_archive, "f210", output)
+            finally:
+                portal._read_completed_archive = original_reader
+            self.assertTrue(output.is_file())
+            self.assertEqual(output.read_bytes()[:2], b"PK")
 
 
 if __name__ == "__main__":

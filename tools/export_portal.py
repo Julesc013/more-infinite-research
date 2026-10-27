@@ -180,8 +180,11 @@ def export_portal_copy(input_archive: Path, target: str, output_archive: Path) -
     if output_archive.name != expected_output_name:
         raise PortalExportError("Portal export output filename must be " + expected_output_name)
 
+    input_sha256 = _sha256_path(input_archive)
     members, payloads, archive_comment, info_path, target_path = _read_completed_archive(
         input_archive, target, expected_extended, expected_root)
+    if _sha256_path(input_archive) != input_sha256:
+        raise PortalExportError("Portal export input changed while its completed members were read")
     updated = dict(payloads)
     updated[info_path] = _replace_one(INFO_VERSION, payloads[info_path], expected_extended, portal_version, "info.json")
     updated[target_path] = _replace_one(
@@ -202,6 +205,9 @@ def export_portal_copy(input_archive: Path, target: str, output_archive: Path) -
     for path, contents in payloads.items():
         if path not in changed and output_payloads[path] != contents:
             raise PortalExportError("Portal export changed an unapproved member: " + path)
+    input_sha256_after_export = _sha256_path(input_archive)
+    if input_sha256_after_export != input_sha256:
+        raise PortalExportError("Portal export input changed while the Portal copy was written")
     return {
         "schema": 1,
         "kind": "MIR5PortalCopyExportV1",
@@ -210,7 +216,12 @@ def export_portal_copy(input_archive: Path, target: str, output_archive: Path) -
         "extended_version": expected_extended,
         "portal_version": portal_version,
         "root": expected_root,
-        "input": {"path": str(input_archive), "sha256": _sha256_path(input_archive), "bytes": input_archive.stat().st_size},
+        "input": {
+            "path": str(input_archive),
+            "sha256": input_sha256,
+            "sha256_after_export": input_sha256_after_export,
+            "bytes": input_archive.stat().st_size,
+        },
         "output": {"path": str(output_archive.resolve()), "sha256": _sha256_path(output_archive), "bytes": output_archive.stat().st_size},
         "permitted_member_differences": [
             {"path": path, "before_sha256": _sha256(payloads[path]), "after_sha256": _sha256(output_payloads[path])}
