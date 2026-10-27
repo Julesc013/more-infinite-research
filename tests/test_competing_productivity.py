@@ -422,7 +422,15 @@ class CompetingProductivityTests(unittest.TestCase):
             assert(value.enabled == false and value.visible_when_disabled == true)
           end
           assert(#force.research_queue == 1 and force.research_queue[1] == unrelated and force.research_progress == .42)
-          assert(storage.mir_competing_productivity.owned_disabled[force.index][first.id].disabled == nil)
+          assert(storage.mir_competing_productivity.owned_disabled[force.index][first.id].disabled == false)
+
+          -- Native reconfiguration cannot promote the original foreign baseline
+          -- into a restoration right through this second caller of caps.
+          force.technologies[first.id].enabled = true
+          runtime.on_configuration_changed()
+          assert(force.technologies[first.id].enabled == false
+            and storage.mir_competing_productivity.owned_disabled[force.index][first.id].disabled == false)
+          assert(#force.research_queue == 1 and force.research_queue[1] == unrelated and force.research_progress == .42)
 
           -- A false preference releases only records owned by this module. The
           -- pre-disabled foreign tail keeps its disabled state and baseline visibility.
