@@ -72,6 +72,8 @@ Version: 5.0.0
       owned by MIR.
     - Recover MIR-owned cap disablement from historical boolean ledgers without granting foreign disablement or visibility records
       an enablement right.
+    - Retain cap-restoration rights across published Factorio 2.0 MIR 4.2–4.7 upgrades into Factorio 2.1, preserving current MIR
+      decisions and foreign disablement.
     - Preserve the original foreign disablement baseline across native resets and equivalent productivity-effect orderings; restore
       only MIR-owned enablement transitions.
     - Preserve unqueued foreign Imersite public disablement and visibility through its named hidden-carrier handoff.

@@ -1,0 +1,76 @@
+{
+  "schema": "mir-historical-cap-archive-metadata-probe-r01-mir4-remaining-structured",
+  "scope": "The remaining 24 public MIR4 modern F200/F210 ZIPs after prior v4.0/v4.1, v4.2.0-rc.1, v4.2.0-stable, v4.3.0, and v4.6.0 probes. Each ZIP was fetched into memory, hash-checked, inspected through an in-memory ZIP stream, and discarded; no archive was persisted or executed.",
+  "status": "archive-bytes-verified; metadata-and-controller-body-read-only; no-native-claim",
+  "preserves_prior_receipts": [
+    "build/qualification/aero-historical-cap-archive-metadata-r01/public-original-cap-archive-metadata.json",
+    "build/qualification/aero-historical-cap-archive-metadata-r01/public-original-cap-archive-metadata-2.5-supplement.json",
+    "build/qualification/aero-historical-cap-archive-metadata-r01/public-mir4-structured-cap-archive-metadata-r01.json"
+  ],
+  "limits": [
+    "This is not a save, engine, compatibility, migration, or native qualification result.",
+    "Only sole info.json metadata and the sole player maximum_level_control.lua entry were examined for each ZIP.",
+    "The observed controller cohorts do not by themselves authorize a current MIR5 importer or establish per-save policy rows."
+  ],
+  "input_metadata": {
+    "migration_origins_path": "spec/inventory/migration-origins.json",
+    "migration_origins_git_blob": "0BDDD9A6AE8EED82A5CCC013652247FAB3DAA19F",
+    "migration_origins_sha256": "FCE00686DFED365FDEB6B7F96716602E01F5FC038D3CD66FBCE0211F10AEE17E",
+    "public_download_url_template": "https://github.com/Julesc013/more-infinite-research/releases/download/{release_tag}/{filename}"
+  },
+  "member_layout": {
+    "info_json": "{zip_root}/info.json",
+    "maximum_level_control": "{zip_root}/prototypes/mir/runtime/maximum_level_control.lua",
+    "tag_source_member": "source/prototypes/mir/runtime/maximum_level_control.lua"
+  },
+  "controller_cohorts": {
+    "5d8": {
+      "tag_source_git_blob": "5D8B9939C0B159FE947BB94E28FA8819A4AD71C3",
+      "raw_bytes": 42409,
+      "raw_sha256": "05315ADA92D1FAC91669CC6564E7BB293082F9919E5CE4D97F88EE8FCC0C4B46",
+      "normalized_lf_sha256": "05315ADA92D1FAC91669CC6564E7BB293082F9919E5CE4D97F88EE8FCC0C4B46",
+      "policy_version": 3,
+      "storage_shape": "structured per-force disabled_by_cap, visibility_by_cap, and unowned_disabled_by_cap records",
+      "cap_guard": {"line": 840, "source": "if cap and technology.level > cap then"},
+      "disable_writer": "inside an enabled-state guard, writes structured policy_version/force_index/cap/binding_fingerprint/ownership_key/ownership_kind/enabled_before_cap=true before enabled=false",
+      "visibility_writer": "captures structured visibility before visible_when_disabled=true"
+    },
+    "48": {
+      "tag_source_git_blob": "48DE6BDF4332939C73EC9FC4AE793A9623C015DA",
+      "raw_bytes": 43260,
+      "raw_sha256": "D786E6D522B87B9102F2D774D7B0CAA825B54DDF18753C4CC776CD6DB1789FCE",
+      "normalized_lf_sha256": "D786E6D522B87B9102F2D774D7B0CAA825B54DDF18753C4CC776CD6DB1789FCE",
+      "policy_version": 3,
+      "storage_shape": "structured per-force disabled_by_cap, visibility_by_cap, and unowned_disabled_by_cap records",
+      "cap_guard": {"line": 862, "source": "if cap and technology.level > cap then"},
+      "disable_writer": "inside an enabled-state guard, writes structured policy_version/force_index/cap/binding_fingerprint/ownership_key/ownership_kind/enabled_before_cap=true before enabled=false",
+      "visibility_writer": "captures structured visibility before visible_when_disabled=true"
+    }
+  },
+  "observations": [
+    {"release_tag":"v4.2.1","tag_commit":"27C4777C27B3287F18DF02E200235A1870BAC465","edition":"f200","asset_id":624981884,"filename":"more-infinite-research_4.2.20001.zip","observed_info":{"name":"more-infinite-research","version":"4.2.20001","factorio_version":"2.0"},"archive":{"bytes":1415574,"sha256":"EDD4A15F1C405C4B2F8487D86FC16F8C0A06470F71D3B4D05B4CAB8329D41732","matches_expected":true},"controller_cohort":"5d8","normalized_lf_matches_tag_source":true},
+    {"release_tag":"v4.2.1","tag_commit":"27C4777C27B3287F18DF02E200235A1870BAC465","edition":"f210","asset_id":624989028,"filename":"more-infinite-research_4.2.21001.zip","observed_info":{"name":"more-infinite-research","version":"4.2.21001","factorio_version":"2.1"},"archive":{"bytes":1419453,"sha256":"5B1F56479D490DCA116EC373809C63138513B5A7AEBDDE1871DAB7373709A396","matches_expected":true},"controller_cohort":"5d8","normalized_lf_matches_tag_source":true},
+    {"release_tag":"v4.2.2","tag_commit":"44FB1439ECB960E36FD79DCCBEC7EAC902D6EB5E","edition":"f200","asset_id":627967995,"filename":"more-infinite-research_4.2.20002.zip","observed_info":{"name":"more-infinite-research","version":"4.2.20002","factorio_version":"2.0"},"archive":{"bytes":1421262,"sha256":"14C2B23E0F4657F9F79585A982639463678D640C04916FEECC365D93B6894A65","matches_expected":true},"controller_cohort":"5d8","normalized_lf_matches_tag_source":true},
+    {"release_tag":"v4.2.2","tag_commit":"44FB1439ECB960E36FD79DCCBEC7EAC902D6EB5E","edition":"f210","asset_id":627968233,"filename":"more-infinite-research_4.2.21002.zip","observed_info":{"name":"more-infinite-research","version":"4.2.21002","factorio_version":"2.1"},"archive":{"bytes":1425122,"sha256":"E1303B101002618F5B2112A6EF32EE9D6A95EBEF01825A0AE17D1DA54FDCDC8B","matches_expected":true},"controller_cohort":"5d8","normalized_lf_matches_tag_source":true},
+    {"release_tag":"v4.4.0","tag_commit":"72B5C72EAB810BAF74C9A785AC4EBBC0D438C94A","edition":"f200","asset_id":643184818,"filename":"more-infinite-research_4.4.20000.zip","observed_info":{"name":"more-infinite-research","version":"4.4.20000","factorio_version":"2.0"},"archive":{"bytes":1403874,"sha256":"29D85A53ABC69A6B3FDC0E4EA58C77FC9B53E5671B84441192AEE5E65A4CFBD4","matches_expected":true},"controller_cohort":"5d8","normalized_lf_matches_tag_source":true},
+    {"release_tag":"v4.4.0","tag_commit":"72B5C72EAB810BAF74C9A785AC4EBBC0D438C94A","edition":"f210","asset_id":643184887,"filename":"more-infinite-research_4.4.21000.zip","observed_info":{"name":"more-infinite-research","version":"4.4.21000","factorio_version":"2.1"},"archive":{"bytes":1407744,"sha256":"BD72F63F0E41214416E0D49515BFB94BAA5A98080F42CD378298C5654F39FDF4","matches_expected":true},"controller_cohort":"5d8","normalized_lf_matches_tag_source":true},
+    {"release_tag":"v4.4.1","tag_commit":"2A41FFAF2756B6EF6B250A3CFED5903E6A5085C6","edition":"f200","asset_id":643548906,"filename":"more-infinite-research_4.4.20001.zip","observed_info":{"name":"more-infinite-research","version":"4.4.20001","factorio_version":"2.0"},"archive":{"bytes":1403717,"sha256":"FD3D83C36275EA6C5A5F7AB9BE1D5C8CE17893865E2151A8781E643054DECB3F","matches_expected":true},"controller_cohort":"5d8","normalized_lf_matches_tag_source":true},
+    {"release_tag":"v4.4.1","tag_commit":"2A41FFAF2756B6EF6B250A3CFED5903E6A5085C6","edition":"f210","asset_id":643548913,"filename":"more-infinite-research_4.4.21001.zip","observed_info":{"name":"more-infinite-research","version":"4.4.21001","factorio_version":"2.1"},"archive":{"bytes":1407589,"sha256":"981B0C2322D51DAF72B84DE02CFE7607CEF6A6612269EC9DCBC6ABBB58137092","matches_expected":true},"controller_cohort":"5d8","normalized_lf_matches_tag_source":true},
+    {"release_tag":"v4.4.2","tag_commit":"FE385332F778E1C79A0AD930140FE6E4DEFDB17A","edition":"f200","asset_id":648013220,"filename":"more-infinite-research_4.4.20002.zip","observed_info":{"name":"more-infinite-research","version":"4.4.20002","factorio_version":"2.0"},"archive":{"bytes":1409555,"sha256":"9467A82FC0DE73CB520C987A54A778B7278F0ADFD0315100D539FDAB843B5B58","matches_expected":true},"controller_cohort":"48","normalized_lf_matches_tag_source":true},
+    {"release_tag":"v4.4.2","tag_commit":"FE385332F778E1C79A0AD930140FE6E4DEFDB17A","edition":"f210","asset_id":648013233,"filename":"more-infinite-research_4.4.21002.zip","observed_info":{"name":"more-infinite-research","version":"4.4.21002","factorio_version":"2.1"},"archive":{"bytes":1413555,"sha256":"12FBB1D1B71CD27B87C734A0B7F34F3B996EC4899C7A2F27C5A0C9C7A5BE972F","matches_expected":true},"controller_cohort":"48","normalized_lf_matches_tag_source":true},
+    {"release_tag":"v4.5.0","tag_commit":"3096E89A044D705828CBCDA93AC05BD877535D12","edition":"f200","asset_id":650612486,"filename":"more-infinite-research_4.5.20000.zip","observed_info":{"name":"more-infinite-research","version":"4.5.20000","factorio_version":"2.0"},"archive":{"bytes":1412620,"sha256":"9BD93DD13F28BD3589A14873BE17F81CC51B14A852647B046B04EA1269922CC5","matches_expected":true},"controller_cohort":"48","normalized_lf_matches_tag_source":true},
+    {"release_tag":"v4.5.0","tag_commit":"3096E89A044D705828CBCDA93AC05BD877535D12","edition":"f210","asset_id":650612517,"filename":"more-infinite-research_4.5.21000.zip","observed_info":{"name":"more-infinite-research","version":"4.5.21000","factorio_version":"2.1"},"archive":{"bytes":1416632,"sha256":"A9954810B25A28DD8791C206D8BE88B5A219BB8BB191971C80A201CA49DBF083","matches_expected":true},"controller_cohort":"48","normalized_lf_matches_tag_source":true},
+    {"release_tag":"v4.5.1","tag_commit":"69C297F9BCA974F4280158781AA97A9678D0FCD4","edition":"f200","asset_id":650707582,"filename":"more-infinite-research_4.5.20001.zip","observed_info":{"name":"more-infinite-research","version":"4.5.20001","factorio_version":"2.0"},"archive":{"bytes":1412966,"sha256":"6AF50F62B56580BBED277C0A943F356970598A38D3007C0F7F98EC3F07A14EDE","matches_expected":true},"controller_cohort":"48","normalized_lf_matches_tag_source":true},
+    {"release_tag":"v4.5.1","tag_commit":"69C297F9BCA974F4280158781AA97A9678D0FCD4","edition":"f210","asset_id":650707601,"filename":"more-infinite-research_4.5.21001.zip","observed_info":{"name":"more-infinite-research","version":"4.5.21001","factorio_version":"2.1"},"archive":{"bytes":1416978,"sha256":"10A63F6B664265B2403EA55885507F4039B1D143F08E140E81AD74775D6ADF4F","matches_expected":true},"controller_cohort":"48","normalized_lf_matches_tag_source":true},
+    {"release_tag":"v4.5.2","tag_commit":"8E4DE4BE0F24A3DA514AD39179D5CE254459788D","edition":"f200","asset_id":652970198,"filename":"more-infinite-research_4.5.20002.zip","observed_info":{"name":"more-infinite-research","version":"4.5.20002","factorio_version":"2.0"},"archive":{"bytes":1419470,"sha256":"BACA8E34001F5569F367FCFEC28C118653269EC29FACB811E5B75B49C3C082DD","matches_expected":true},"controller_cohort":"48","normalized_lf_matches_tag_source":true},
+    {"release_tag":"v4.5.2","tag_commit":"8E4DE4BE0F24A3DA514AD39179D5CE254459788D","edition":"f210","asset_id":652970231,"filename":"more-infinite-research_4.5.21002.zip","observed_info":{"name":"more-infinite-research","version":"4.5.21002","factorio_version":"2.1"},"archive":{"bytes":1423276,"sha256":"E26B9B4603E520167694043300EF1AEEB07429189F3F9CE99DB1956D9645A704","matches_expected":true},"controller_cohort":"48","normalized_lf_matches_tag_source":true},
+    {"release_tag":"v4.7.0","tag_commit":"84BD157AD7B63B7D171FAC2311BF30DE70429C11","edition":"f200","asset_id":664236308,"filename":"more-infinite-research_4.7.20000.zip","observed_info":{"name":"more-infinite-research","version":"4.7.20000","factorio_version":"2.0"},"archive":{"bytes":1448004,"sha256":"7958731AAD672C7F16B9307E7B20F97B8E97B58CC57E5D1F9AE670018A8A1B5B","matches_expected":true},"controller_cohort":"48","normalized_lf_matches_tag_source":true},
+    {"release_tag":"v4.7.0","tag_commit":"84BD157AD7B63B7D171FAC2311BF30DE70429C11","edition":"f210","asset_id":664236314,"filename":"more-infinite-research_4.7.21000.zip","observed_info":{"name":"more-infinite-research","version":"4.7.21000","factorio_version":"2.1"},"archive":{"bytes":1461799,"sha256":"708A529F1F6D649E0A732216CD8D8FEFE68F2C6C2DF2B40DA030C2C4C51558D1","matches_expected":true},"controller_cohort":"48","normalized_lf_matches_tag_source":true},
+    {"release_tag":"v4.7.1","tag_commit":"8911AB8F9AD4A7C8764444148183A4DFA137ED7D","edition":"f200","asset_id":668533595,"filename":"more-infinite-research_4.7.20001.zip","observed_info":{"name":"more-infinite-research","version":"4.7.20001","factorio_version":"2.0"},"archive":{"bytes":1448410,"sha256":"EEE6D5AEFA26CD58B973EEF34BF31E368C078B436190F47587D4F5B46CDB954D","matches_expected":true},"controller_cohort":"48","normalized_lf_matches_tag_source":true},
+    {"release_tag":"v4.7.1","tag_commit":"8911AB8F9AD4A7C8764444148183A4DFA137ED7D","edition":"f210","asset_id":668300303,"filename":"more-infinite-research_4.7.21001.zip","observed_info":{"name":"more-infinite-research","version":"4.7.21001","factorio_version":"2.1"},"archive":{"bytes":1462211,"sha256":"5F1C85F1290E2E07411813FDDD01D763DA47C6768CE85B3E7913A1D9A2CF2153","matches_expected":true},"controller_cohort":"48","normalized_lf_matches_tag_source":true},
+    {"release_tag":"v4.7.2","tag_commit":"BD9774F323B6EB1561C1D9FF0C91ECC3F7ACD1D1","edition":"f200","asset_id":668950980,"filename":"more-infinite-research_4.7.20002.zip","observed_info":{"name":"more-infinite-research","version":"4.7.20002","factorio_version":"2.0"},"archive":{"bytes":1449338,"sha256":"F3943EB4D69CCDAC41BD9F922AD03A5C78F34F22D8E7FA5A88A7A658AB1010B7","matches_expected":true},"controller_cohort":"48","normalized_lf_matches_tag_source":true},
+    {"release_tag":"v4.7.2","tag_commit":"BD9774F323B6EB1561C1D9FF0C91ECC3F7ACD1D1","edition":"f210","asset_id":668950994,"filename":"more-infinite-research_4.7.21002.zip","observed_info":{"name":"more-infinite-research","version":"4.7.21002","factorio_version":"2.1"},"archive":{"bytes":1463150,"sha256":"A4BB8F47232C689B267EF434F557187A8795C47280FA464169DE917FB579517F","matches_expected":true},"controller_cohort":"48","normalized_lf_matches_tag_source":true},
+    {"release_tag":"v4.7.3","tag_commit":"8643CC91BC915E008556A5315DBB0A743247E7AB","edition":"f200","asset_id":672267718,"filename":"more-infinite-research_4.7.20003.zip","observed_info":{"name":"more-infinite-research","version":"4.7.20003","factorio_version":"2.0"},"archive":{"bytes":1449475,"sha256":"FBBA844DD04011A12BB6DA885745B0733AD37FAB181EAAD9EE4346B9B0D32647","matches_expected":true},"controller_cohort":"48","normalized_lf_matches_tag_source":true},
+    {"release_tag":"v4.7.3","tag_commit":"8643CC91BC915E008556A5315DBB0A743247E7AB","edition":"f210","asset_id":672267722,"filename":"more-infinite-research_4.7.21003.zip","observed_info":{"name":"more-infinite-research","version":"4.7.21003","factorio_version":"2.1"},"archive":{"bytes":1463293,"sha256":"B6EB9430056ABD384DB00F94929FE7DAC0A37441ACF4BC277946689682628852","matches_expected":true},"controller_cohort":"48","normalized_lf_matches_tag_source":true}
+  ]
+}
