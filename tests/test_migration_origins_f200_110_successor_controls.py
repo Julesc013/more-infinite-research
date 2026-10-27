@@ -252,11 +252,11 @@ class MigrationOriginF200110SuccessorControls(unittest.TestCase):
                              (profile["candidate"]["source_commit"], profile["candidate"]["player_tree"]))
             self.assertEqual("bec37fb87a05d17cf4cf0225e0458218830fef63", profile["source_fixture_commit"])
             self.assertEqual("3ae2711867cd60f6c871f641c331349d941dd8c3", profile["source_fixture_controller_commit"])
-            self.assertEqual("c03257d1a672ca62ff523afae65df3239bef518c", profile["successor_fixture_commit"])
+            self.assertEqual("3b578cb6b1c28d05fb26b3afda3f9253f978f58a", profile["successor_fixture_commit"])
             self.assertEqual("2fb64822b82569e3b50f0653e361fb7148f18b63", profile["origin_source_commit"])
-        self.assertEqual("1767DE15AB78628C4C404D280F4DC789521BF4DEE86B349ED379C47234BD69F0",
+        self.assertEqual("97C4700C141090ECC59549FB684351A504B057C9BEC34A6E5A852441CEB8738F",
                          f200["archive_sha256"]["mir-fixture-mir5-migration-origin-f200-110-source_0.2.0.zip"])
-        self.assertEqual("E1878CAEE523CDC4DC86C9E6B0B5029A78E4D96ADC1A3C80BE8521355A6655A3",
+        self.assertEqual("83EDCE7B40C6ABF13C60769691ABA4534F032FE87E82F2CF9E7CCE451D38EE5D",
                          f210["archive_sha256"]["mir-fixture-mir5-migration-origin-f200-110-source_0.3.0.zip"])
         self.assertEqual("050AC35BAB6BA1F01E160DB612B73A03E58E0ABE6A291D18109FAB1B235B63B5",
                          f200["archive_sha256"]["more-infinite-research_5.0.20000.zip"])
@@ -264,28 +264,31 @@ class MigrationOriginF200110SuccessorControls(unittest.TestCase):
                          f210["archive_sha256"]["more-infinite-research_5.0.21000.zip"])
         self.assertNotIn("space-age", {entry["name"] for entry in f210["mods"]})
 
-    def test_profiles_reject_the_r12_stale_fixture_archive_pins(self):
+    def test_profiles_reject_the_r12_and_r13_superseded_fixture_archive_pins(self):
         cases = (
             (json.loads(F200_PROFILE.read_text()),
              "mir-fixture-mir5-migration-origin-f200-110-source_0.2.0.zip",
-             "1767DE15AB78628C4C404D280F4DC789521BF4DEE86B349ED379C47234BD69F0",
-             "29F2597180F0BCB8CB25A651A19068678635D42C35A96EE56F6186DE737037E0"),
+             "97C4700C141090ECC59549FB684351A504B057C9BEC34A6E5A852441CEB8738F",
+             ("29F2597180F0BCB8CB25A651A19068678635D42C35A96EE56F6186DE737037E0",
+              "1767DE15AB78628C4C404D280F4DC789521BF4DEE86B349ED379C47234BD69F0")),
             (json.loads(F210_PROFILE.read_text()),
              "mir-fixture-mir5-migration-origin-f200-110-source_0.3.0.zip",
-             "E1878CAEE523CDC4DC86C9E6B0B5029A78E4D96ADC1A3C80BE8521355A6655A3",
-             "F4C54047A9734180D31C14F18BE38B744F053F399A0D8184961C2B563463C831"),
+             "83EDCE7B40C6ABF13C60769691ABA4534F032FE87E82F2CF9E7CCE451D38EE5D",
+             ("F4C54047A9734180D31C14F18BE38B744F053F399A0D8184961C2B563463C831",
+              "E1878CAEE523CDC4DC86C9E6B0B5029A78E4D96ADC1A3C80BE8521355A6655A3")),
         )
 
         def assert_approved(profile, archive, approved):
             self.assertEqual(approved, profile["archive_sha256"][archive])
 
-        for profile, archive, approved, stale in cases:
-            with self.subTest(archive=archive):
-                assert_approved(profile, archive, approved)
-                rejected = copy.deepcopy(profile)
-                rejected["archive_sha256"][archive] = stale
-                with self.assertRaises(AssertionError):
-                    assert_approved(rejected, archive, approved)
+        for profile, archive, approved, stale_values in cases:
+            for stale in stale_values:
+                with self.subTest(archive=archive, stale=stale):
+                    assert_approved(profile, archive, approved)
+                    rejected = copy.deepcopy(profile)
+                    rejected["archive_sha256"][archive] = stale
+                    with self.assertRaises(AssertionError):
+                        assert_approved(rejected, archive, approved)
 
     def test_control_keeps_only_the_saved_source_roster_as_earned_state(self):
         control = (FIXTURE / "control.lua").read_text(encoding="utf-8")
