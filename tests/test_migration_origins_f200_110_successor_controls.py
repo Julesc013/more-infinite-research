@@ -4,6 +4,7 @@ from collections import Counter
 import copy
 import json
 from pathlib import Path
+import struct
 import sys
 import unittest
 
@@ -114,7 +115,12 @@ class MigrationOriginF200110SuccessorControls(unittest.TestCase):
             }),
             Counter((effect["type"], effect.get("recipe"), effect.get("change")) for effect in rows[MODULES]),
         )
-        self.assertEqual("0.009999999776482582", catalogue["source_change_tokens"][.01])
+        single_precision_one_percent = struct.unpack("<f", struct.pack("<f", .01))[0]
+        self.assertEqual(format(single_precision_one_percent, ".17g"), catalogue["source_change_tokens"][.01])
+        for recipe in ("speed-module", "productivity-module", "efficiency-module"):
+            with self.subTest(recipe=recipe):
+                self.assertAlmostEqual(.11, sum(effect["change"] for effect in rows[MODULES]
+                                                 if effect.get("recipe") == recipe))
         self.assertNotIn("recipe-prod-research_inventory_capacity-1", rows)
         self.assertEqual(42, len(catalogue["settings"]))
         self.assertTrue(catalogue["settings"]["ips-enable-research_breeding"])
@@ -249,7 +255,7 @@ class MigrationOriginF200110SuccessorControls(unittest.TestCase):
         self.lua.globals().catalogue_path = catalogue_path
         self.lua.globals().successor_control_path = control_path
         self.lua.execute(r'''
-          function migration_origin_110_successor_lifecycle(target, source_fixture_name, active_wrapper_name, catalogue_fixture_name)
+          function migration_origin_110_successor_lifecycle(target, source_fixture_name, active_wrapper_name, catalogue_fixture_name, legacy_module_bonus)
             local callbacks={events={}}
             local env={storage={},logs={},created_labs=0,saved=false,
               script={active_mods={},on_configuration_changed=function(fn) callbacks.configuration=fn end,
@@ -345,6 +351,11 @@ class MigrationOriginF200110SuccessorControls(unittest.TestCase):
             local storage_by_mod={[source_fixture_name]={[catalogue.storage_key]=state}}
             if storage_by_mod[active_wrapper_name]==nil then storage_by_mod[active_wrapper_name]={} end
             env.storage=storage_by_mod[active_wrapper_name]
+            if legacy_module_bonus~=nil then
+              for _,recipe in ipairs({"speed-module","productivity-module","efficiency-module"}) do
+                player.recipes[recipe].productivity_bonus=legacy_module_bonus
+              end
+            end
             env.settings={startup={}}
             for name,value in pairs(catalogue.settings) do env.settings.startup[name]={value=value} end
             local inventory={items={}}
@@ -435,6 +446,24 @@ class MigrationOriginF200110SuccessorControls(unittest.TestCase):
                 self.assertNotIn("successor runtime target closure differs", result["message"])
                 self.assertEqual(0, result["created_labs"])
                 self.assertEqual(0, result["player_add_calls"])
+                self.assertFalse(result["source_state_changed"])
+                self.assertFalse(result["active_state_changed"])
+
+    def test_legacy_tier_one_module_ten_percent_is_refused_before_candidate_lab_or_successor_write(self):
+        self._install_lifecycle_model()
+        source = json.loads((SOURCE_FIXTURE / "info.json").read_text(encoding="utf-8"))
+        wrappers = {
+            "f200": json.loads((FIXTURE / "info-f200.json").read_text(encoding="utf-8")),
+            "f210": json.loads((FIXTURE / "info-f210.json").read_text(encoding="utf-8")),
+        }
+        for target, wrapper in wrappers.items():
+            with self.subTest(target=target):
+                result = py(self.lua.eval("migration_origin_110_successor_lifecycle")(
+                    target, source["name"], wrapper["name"], None, .10))
+                self.assertFalse(result["ok"])
+                self.assertRegex(result["message"],
+                                 r"player retained source recipe contribution differs: (speed|productivity|efficiency)-module")
+                self.assertEqual((0, 0), (result["created_labs"], result["player_add_calls"]))
                 self.assertFalse(result["source_state_changed"])
                 self.assertFalse(result["active_state_changed"])
 
