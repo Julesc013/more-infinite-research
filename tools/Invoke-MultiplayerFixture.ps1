@@ -320,23 +320,55 @@ function New-StandaloneIdentityObserverSourceProjection {
   Assert-MIRLibraryFixtureArchive -Archive $archive -SourceDirectory $stage
   return [pscustomobject]@{source=$stage;canonical_source=$canonical;archive=$archive;sha256=$ExpectedArchiveSha256.ToUpperInvariant();members=@($runtimeNames|ForEach-Object {[ordered]@{path=$_;sha256=(Get-FileHash -LiteralPath (Join-Path $stage $_) -Algorithm SHA256).Hash.ToUpperInvariant()}});alternate_metadata='info-f200.json'}
 }
+function Resolve-StandaloneF210ApiConsumerSourceRevision {
+  param([Parameter(Mandatory)][string]$RepoRoot)
+  $revision=@(& git -C $RepoRoot rev-parse --verify 'HEAD^{commit}')
+  Assert-Session ($LASTEXITCODE-eq0-and$revision.Count-eq1-and$revision[0]-cmatch'^[0-9a-f]{40}$') 'standalone API consumer source revision differs'
+  return [string]$revision[0]
+}
+function Get-StandaloneF210ApiConsumerRawGitMemberBytes {
+  param(
+    [Parameter(Mandatory)][string]$RepoRoot,
+    [Parameter(Mandatory)][ValidatePattern('^[0-9a-f]{40}$')][string]$SourceRevision,
+    [Parameter(Mandatory)][ValidateSet('mir-fixture-mir5-api-alpha','mir-fixture-mir5-api-beta')][string]$FixtureName,
+    [Parameter(Mandatory)][string]$Member
+  )
+  $shortName=if($FixtureName-ceq'mir-fixture-mir5-api-alpha'){'api-alpha'}else{'api-beta'}
+  $runtimeNames=if($shortName-ceq'api-alpha'){@('control.lua','data.lua','graphics/icon.png','info.json')}else{@('control.lua','data-final-fixes.lua','graphics/icon.png','info.json')}
+  Assert-Session (@($runtimeNames)+@('info-f200.json')-ccontains$Member) "standalone API consumer member is not admitted: $FixtureName/$Member"
+  $start=[Diagnostics.ProcessStartInfo]::new()
+  $start.FileName='git';$start.UseShellExecute=$false;$start.RedirectStandardOutput=$true;$start.RedirectStandardError=$true
+  foreach($argument in @('-C',$RepoRoot,'show',($SourceRevision+':tests/fixtures/'+$shortName+'/'+$Member))){$null=$start.ArgumentList.Add($argument)}
+  $process=[Diagnostics.Process]::new();$process.StartInfo=$start
+  Assert-Session ($process.Start()) "standalone API consumer raw Git read did not start: $FixtureName/$Member"
+  $bytes=[IO.MemoryStream]::new()
+  try{
+    $process.StandardOutput.BaseStream.CopyTo($bytes)
+    $null=$process.StandardError.ReadToEnd()
+    $process.WaitForExit()
+    Assert-Session ($process.ExitCode-eq0) "standalone API consumer raw Git member differs: $FixtureName/$Member"
+  } finally {$process.Dispose()}
+  return ,$bytes.ToArray()
+}
 function New-StandaloneF210ApiConsumerSourceProjection {
   param(
     [Parameter(Mandatory)][string]$RepoRoot,
     [Parameter(Mandatory)][string]$ArchiveLibrary,
     [Parameter(Mandatory)][string]$OutputRoot,
     [Parameter(Mandatory)][ValidateSet('mir-fixture-mir5-api-alpha','mir-fixture-mir5-api-beta')][string]$FixtureName,
-    [Parameter(Mandatory)][ValidatePattern('^[A-Fa-f0-9]{64}$')][string]$ExpectedArchiveSha256
+    [Parameter(Mandatory)][ValidatePattern('^[A-Fa-f0-9]{64}$')][string]$ExpectedArchiveSha256,
+    [Parameter(Mandatory)][ValidatePattern('^[0-9a-f]{40}$')][string]$SourceRevision
   )
   $shortName=if($FixtureName-ceq'mir-fixture-mir5-api-alpha'){'api-alpha'}else{'api-beta'}
-  $canonical=(Resolve-Path -LiteralPath (Join-Path $RepoRoot ('tests/fixtures/'+$shortName))).Path
-  $canonicalFiles=@(Get-ChildItem -LiteralPath $canonical -Recurse -File|Sort-Object FullName)
-  $canonicalNames=@($canonicalFiles|ForEach-Object {[IO.Path]::GetRelativePath($canonical,$_.FullName).Replace('\','/')})
   $runtimeNames=if($shortName-ceq'api-alpha'){@('control.lua','data.lua','graphics/icon.png','info.json')}else{@('control.lua','data-final-fixes.lua','graphics/icon.png','info.json')}
   $expectedCanonical=@($runtimeNames)+@('info-f200.json')
+  $sourcePrefix='tests/fixtures/'+$shortName+'/'
+  $canonicalPaths=@(& git -C $RepoRoot ls-tree -r --name-only $SourceRevision -- ('tests/fixtures/'+$shortName))
+  Assert-Session ($LASTEXITCODE-eq0-and$canonicalPaths.Count-eq$expectedCanonical.Count) "standalone API canonical source members differ: $FixtureName"
+  $canonicalNames=@($canonicalPaths|ForEach-Object {Assert-Session ($_.StartsWith($sourcePrefix,[StringComparison]::Ordinal)) "standalone API canonical source path differs: $FixtureName"; $_.Substring($sourcePrefix.Length)})
   Assert-Session ($canonicalNames.Count-eq$expectedCanonical.Count-and ((@($canonicalNames|Sort-Object)-join'|')-ceq(@($expectedCanonical|Sort-Object)-join'|'))) "standalone API canonical source members differ: $FixtureName"
-  $info=Get-Content -LiteralPath (Join-Path $canonical 'info.json') -Raw|ConvertFrom-Json -AsHashtable
-  $f200Info=Get-Content -LiteralPath (Join-Path $canonical 'info-f200.json') -Raw|ConvertFrom-Json -AsHashtable
+  $info=[Text.Encoding]::UTF8.GetString((Get-StandaloneF210ApiConsumerRawGitMemberBytes -RepoRoot $RepoRoot -SourceRevision $SourceRevision -FixtureName $FixtureName -Member 'info.json'))|ConvertFrom-Json -AsHashtable
+  $f200Info=[Text.Encoding]::UTF8.GetString((Get-StandaloneF210ApiConsumerRawGitMemberBytes -RepoRoot $RepoRoot -SourceRevision $SourceRevision -FixtureName $FixtureName -Member 'info-f200.json'))|ConvertFrom-Json -AsHashtable
   Assert-Session ([string]$info.name-ceq$FixtureName-and[string]$info.version-ceq'0.1.0'-and[string]$info.factorio_version-ceq'2.1') "standalone API canonical F210 metadata differs: $FixtureName"
   Assert-Session ([string]$f200Info.name-ceq$FixtureName-and[string]$f200Info.version-ceq'0.1.0'-and[string]$f200Info.factorio_version-ceq'2.0') "standalone API alternate F200 metadata differs: $FixtureName"
   $archive=Join-Path (Resolve-Path -LiteralPath $ArchiveLibrary).Path ($FixtureName+'_0.1.0.zip')
@@ -347,13 +379,13 @@ function New-StandaloneF210ApiConsumerSourceProjection {
   foreach($name in $runtimeNames){
     $destination=Join-Path $stage $name
     [IO.Directory]::CreateDirectory((Split-Path -Parent $destination))|Out-Null
-    [IO.File]::Copy((Join-Path $canonical $name),$destination,$false)
+    [IO.File]::WriteAllBytes($destination,(Get-StandaloneF210ApiConsumerRawGitMemberBytes -RepoRoot $RepoRoot -SourceRevision $SourceRevision -FixtureName $FixtureName -Member $name))
   }
   $stageNames=@(Get-ChildItem -LiteralPath $stage -Recurse -File|ForEach-Object {[IO.Path]::GetRelativePath($stage,$_.FullName).Replace('\','/')})
   Assert-Session ($stageNames.Count-eq$runtimeNames.Count-and ((@($stageNames|Sort-Object)-join'|')-ceq(@($runtimeNames|Sort-Object)-join'|'))) "standalone API fixture projection members differ: $FixtureName"
-  foreach($name in $runtimeNames){Assert-Session ((Get-FileHash -LiteralPath (Join-Path $stage $name) -Algorithm SHA256).Hash.ToUpperInvariant()-ceq(Get-FileHash -LiteralPath (Join-Path $canonical $name) -Algorithm SHA256).Hash.ToUpperInvariant()) "standalone API fixture projection bytes differ: $FixtureName/$name"}
+  foreach($name in $runtimeNames){$expected=[Convert]::ToHexString([Security.Cryptography.SHA256]::HashData((Get-StandaloneF210ApiConsumerRawGitMemberBytes -RepoRoot $RepoRoot -SourceRevision $SourceRevision -FixtureName $FixtureName -Member $name)));Assert-Session ((Get-FileHash -LiteralPath (Join-Path $stage $name) -Algorithm SHA256).Hash.ToUpperInvariant()-ceq$expected) "standalone API fixture projection bytes differ: $FixtureName/$name"}
   Assert-MIRLibraryFixtureArchive -Archive $archive -SourceDirectory $stage
-  return [pscustomobject]@{name=$FixtureName;source=$stage;canonical_source=$canonical;archive=$archive;sha256=$ExpectedArchiveSha256.ToUpperInvariant();members=@($runtimeNames|Sort-Object|ForEach-Object {[ordered]@{path=$_;sha256=(Get-FileHash -LiteralPath (Join-Path $stage $_) -Algorithm SHA256).Hash.ToUpperInvariant()}});alternate_metadata='info-f200.json'}
+  return [pscustomobject]@{name=$FixtureName;source=$stage;source_revision=$SourceRevision;canonical_source=('tests/fixtures/'+$shortName);archive=$archive;sha256=$ExpectedArchiveSha256.ToUpperInvariant();members=@($runtimeNames|Sort-Object|ForEach-Object {[ordered]@{path=$_;sha256=(Get-FileHash -LiteralPath (Join-Path $stage $_) -Algorithm SHA256).Hash.ToUpperInvariant()}});alternate_metadata='info-f200.json'}
 }
 function Get-StandaloneIdentityFixtureSources {
   param(
@@ -483,6 +515,7 @@ $discoveryFixture=$null;$discoveryInstall=$null;$fixtureSourcesForRun=@($Fixture
 $standaloneObserver=$null;$standaloneLibraryFixture=$null
 $standaloneApiConsumerFixtures=@{}
 $standaloneApiConsumerSources=@{}
+$apiConsumerSourceRevision=$null
 if($StandaloneIdentityDiscovery){
   # The checked-in functional profile is a template only.  The actual
   # environmental packet is assembled below from the standalone engine, C563,
@@ -518,9 +551,10 @@ if($standaloneF210){
   $standaloneLibraryFixture=New-StandaloneF210LibraryFixtureSourceProjection -RepoRoot $repo -OutputRoot $output
   $standaloneObserver=New-StandaloneIdentityObserverSourceProjection -RepoRoot $repo -ArchiveLibrary $library -OutputRoot $output -ExpectedArchiveSha256 ([string]$target.observer_sha256)
   if($target.PSObject.Properties['api_client_consumers']-and$target.api_client_consumers-eq$true){
+    $apiConsumerSourceRevision=Resolve-StandaloneF210ApiConsumerSourceRevision -RepoRoot $repo
     foreach($name in @('mir-fixture-mir5-api-alpha','mir-fixture-mir5-api-beta')){
       $archiveName=$name+'_0.1.0.zip'
-      $standaloneApiConsumerFixtures[$name]=New-StandaloneF210ApiConsumerSourceProjection -RepoRoot $repo -ArchiveLibrary $library -OutputRoot $output -FixtureName $name -ExpectedArchiveSha256 ([string]$target.api_consumer_archive_sha256[$archiveName])
+      $standaloneApiConsumerFixtures[$name]=New-StandaloneF210ApiConsumerSourceProjection -RepoRoot $repo -ArchiveLibrary $library -OutputRoot $output -FixtureName $name -ExpectedArchiveSha256 ([string]$target.api_consumer_archive_sha256[$archiveName]) -SourceRevision $apiConsumerSourceRevision
       $standaloneApiConsumerSources[$name]=[string]$standaloneApiConsumerFixtures[$name].source
     }
   }
@@ -544,7 +578,7 @@ $record=[ordered]@{
   engine=$prepared.engine;profile=$prepared.profile;fixtures=$prepared.fixtures;mir_archive=$prepared.mir_archive
   preparation=$prepared;session_expected_peak_memory_mib=$SessionExpectedPeakMemoryMiB;release_qualification=$false;visual_review=$false
   standalone_identity_discovery=if($StandaloneIdentityDiscovery){[ordered]@{fixture_source=$discoveryFixture.source;fixture_archive_sha256=[string]$selection.archive_sha256['mir-fixture-mir5-library-multiplayer_0.1.1.zip'];observer_source=$discoveryObserver.source;observer_canonical_source=$discoveryObserver.canonical_source;observer_archive_sha256=$discoveryObserver.sha256;observer_members=$discoveryObserver.members;observer_alternate_metadata=$discoveryObserver.alternate_metadata;environmental_only=$true}}else{$null}
-  standalone_f210=if($standaloneF210){[ordered]@{fixture_source=$standaloneLibraryFixture.source;fixture_canonical_source=$standaloneLibraryFixture.canonical_source;fixture_members=$standaloneLibraryFixture.members;fixture_source_metadata=$standaloneLibraryFixture.source_metadata;fixture_excluded_canonical_members=$standaloneLibraryFixture.excluded_canonical_members;observer_source=$standaloneObserver.source;observer_canonical_source=$standaloneObserver.canonical_source;observer_archive_sha256=$standaloneObserver.sha256;observer_members=$standaloneObserver.members;observer_alternate_metadata=$standaloneObserver.alternate_metadata;steam_identity=$false}}else{$null}
+  standalone_f210=if($standaloneF210){[ordered]@{fixture_source=$standaloneLibraryFixture.source;fixture_canonical_source=$standaloneLibraryFixture.canonical_source;fixture_members=$standaloneLibraryFixture.members;fixture_source_metadata=$standaloneLibraryFixture.source_metadata;fixture_excluded_canonical_members=$standaloneLibraryFixture.excluded_canonical_members;observer_source=$standaloneObserver.source;observer_canonical_source=$standaloneObserver.canonical_source;observer_archive_sha256=$standaloneObserver.sha256;observer_members=$standaloneObserver.members;observer_alternate_metadata=$standaloneObserver.alternate_metadata;api_consumer_source_revision=$apiConsumerSourceRevision;steam_identity=$false}}else{$null}
   harness_sha256=(Get-FileHash -LiteralPath $PSCommandPath -Algorithm SHA256).Hash
 }
 try {
