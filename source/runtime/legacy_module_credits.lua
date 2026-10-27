@@ -83,7 +83,7 @@ local function exact_main(technology)
   if technology == nil or technology.valid == false or technology.name ~= MAIN_ID
       or prototype == nil or prototype.name ~= MAIN_ID or prototype.level ~= 1
       or prototype.max_level ~= UINT32_MAX or prototype.hidden == true or prototype.upgrade ~= true
-      or prototype.enabled == false or type(technology.enabled) ~= "boolean"
+      or type(prototype.enabled) ~= "boolean" or type(technology.enabled) ~= "boolean"
       or type(effects) ~= "table" or #effects ~= 9 or completed(technology) == nil then
     return nil
   end
