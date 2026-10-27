@@ -1,0 +1,126 @@
+{
+  "schema": 1,
+  "kind": "MIR5F210VanillaPublishedB6DefaultPrototypeCapturePreparedInputsV1",
+  "status": "two-default-capture-inputs-prepared-native-capture-not-run",
+  "scope": "Two exact unmodded Factorio 2.1.23 published MIR4.7.21003/B6 Defaults PrototypeCapture inputs. They are intended to establish independent full data-stage technology and settings surfaces for Base and Space Age; they do not create a map, save, lab, gameplay, migration, menu, performance, or release result.",
+  "claims": {
+    "native_execution": false,
+    "data_stage_equivalence": false,
+    "library_mutation": false,
+    "save_or_laboratory_execution": false,
+    "migration": false,
+    "performance_measurement": false,
+    "release_qualification": false
+  },
+  "preparation_controller": {
+    "source_commit": "cf1507e245f422ba3f61c09b63ac173f91e76cd8",
+    "repository_tree": "e3dc3119ff2b21a4abbcf8fb7edcc9341557e606",
+    "player_source_tree": "c9f1ede6b610b4d10bb9c80578f0c52679a1faed",
+    "prototype_capture": {
+      "path": "tools/Invoke-PrototypeCapture.ps1",
+      "sha256": "14A3A4293D0FFFB02C8C389743F868CD3F5783E46301861DB96AD4646D512F81"
+    },
+    "direct_library_measurement": {
+      "path": "tools/lib/validation/DirectLibraryStartupMeasurement.ps1",
+      "sha256": "D069C014D74E883C249928E812A258E2A2CB34AFE499219CB46A513345C2EC34"
+    },
+    "library_activation": {
+      "path": "tools/lib/compatibility/LibraryActivation.ps1",
+      "sha256": "123A2241B895B57217AA969A677FF21BBFB268FE55E9734287883B4D6AE25099"
+    },
+    "native_resource_guard": {
+      "path": "tools/lib/validation/NativeProbeResources.ps1",
+      "sha256": "77725C06B12BFC1CF26D92E70CE566B3342811EBE5ED8B12BA1F0A675D9B704E"
+    }
+  },
+  "engine": {
+    "path": "D:/Games/Steam/steamapps/common/Factorio/bin/x64/factorio.exe",
+    "version": "2.1.23",
+    "file_version": "2.1.23.87750",
+    "sha256": "FE4A1DA30F322A0D0B8AEB3DF7276332222BAAA143E2352569B723E84B2B9060"
+  },
+  "direct_library": {
+    "path": "D:/Projects/Factorio/testmods/2.1",
+    "published_mir": {
+      "archive": "more-infinite-research_4.7.21003.zip",
+      "sha256": "B6EB9430056ABD384DB00F94929FE7DAC0A37441ACF4BC277946689682628852",
+      "bytes": 1463293
+    },
+    "active_mods_observer": {
+      "archive": "mir-fixture-mir5-active-mods-observer_0.1.0.zip",
+      "sha256": "A15A7D628D66953D2E0C4D4FA288F47CBF9C5678327C7EB3D23ADB5DC78331C0",
+      "bytes": 835
+    },
+    "mutation_policy": "Both archives must already be present at the stated filenames. Invoke-PrototypeCapture may activate only the exact declared selection and must restore direct-library controls; this packet stages, copies, extracts, or hardlinks no dependency archive."
+  },
+  "profiles": [
+    {
+      "role": "base-defaults",
+      "path": "tests/profiles/vanilla-published-4.7.3-base-f210-2123.json",
+      "sha256": "3EE47C7F9477A58A45772821307E2054BCFF94FA137F6F823D41943F2A113E1C",
+      "bytes": 961,
+      "selected_mods": [
+        "base@2.1.23",
+        "mir-fixture-mir5-active-mods-observer@0.1.0",
+        "more-infinite-research@4.7.21003 (explicit MIRArchive)"
+      ],
+      "output_root": "build/tmp/f210-vanilla-published-b6-default-capture-r01/base"
+    },
+    {
+      "role": "space-age-defaults",
+      "path": "tests/profiles/vanilla-published-4.7.3-space-age-f210-2123.json",
+      "sha256": "FE9217131DA67976CF6E906D877BB1B2893F4BF90C5625E54C6801E5A7D58C3F",
+      "bytes": 1228,
+      "selected_mods": [
+        "base@2.1.23",
+        "elevated-rails@2.1.23",
+        "quality@2.1.23",
+        "recycler@2.1.23",
+        "space-age@2.1.23",
+        "mir-fixture-mir5-active-mods-observer@0.1.0",
+        "more-infinite-research@4.7.21003 (explicit MIRArchive)"
+      ],
+      "output_root": "build/tmp/f210-vanilla-published-b6-default-capture-r01/space-age"
+    }
+  ],
+  "existing_native_seeded_stages_not_rowset_equivalence": [
+    {
+      "role": "base",
+      "result_path": "build/mir5/recovery-historical/full-catalogue-473-current8f-r01/native-output/native/base/published-4.7.3/result.json",
+      "result_sha256": "7357D6D7222B19DD1D9062B6F8D85B1E54AA651DF8CE3A0948D41FFDDBEDC4F0",
+      "witnessed_public_rows": 53,
+      "limitation": "The full-catalogue fixture observed a seeded runtime count and source save/reloads. It did not retain an exact vanilla B6 data-raw/settings capture or prove its seeded row set equals every B6 Defaults row."
+    },
+    {
+      "role": "space-age",
+      "result_path": "build/mir5/recovery-historical/full-catalogue-473-current8f-r01/native-output/native/space-age/published-4.7.3/result.json",
+      "result_sha256": "1D7F5304D5BA4AAE9A3568E2DB6AB56D5EAC0075AE3CC0DB10848AD24224259D",
+      "witnessed_public_rows": 71,
+      "limitation": "The full-catalogue fixture observed a seeded runtime count and source save/reloads. It did not retain an exact vanilla B6 data-raw/settings capture or prove its seeded row set equals every B6 Defaults row."
+    }
+  ],
+  "native_admission_proposal": {
+    "exclusive_native_owner_required": true,
+    "per_capture": {
+      "timeout_seconds": 240,
+      "expected_peak_memory_mib": 4096,
+      "max_new_output_mib": 512,
+      "admission_wait_seconds": 30
+    },
+    "commands": [
+      "pwsh -NoProfile -File tools/Invoke-PrototypeCapture.ps1 -ArchiveLibrary D:/Projects/Factorio/testmods/2.1 -FactorioBin D:/Games/Steam/steamapps/common/Factorio/bin/x64/factorio.exe -ProfilePath tests/profiles/vanilla-published-4.7.3-base-f210-2123.json -OutputRoot build/tmp/f210-vanilla-published-b6-default-capture-r01/base -MIRArchive D:/Projects/Factorio/testmods/2.1/more-infinite-research_4.7.21003.zip -ExpectedMIRArchiveSha256 B6EB9430056ABD384DB00F94929FE7DAC0A37441ACF4BC277946689682628852 -ActiveModsObserver mir-fixture-mir5-active-mods-observer -TimeoutSeconds 240 -ExpectedPeakMemoryMiB 4096 -MaxNewOutputMiB 512 -AdmissionWaitSeconds 30",
+      "pwsh -NoProfile -File tools/Invoke-PrototypeCapture.ps1 -ArchiveLibrary D:/Projects/Factorio/testmods/2.1 -FactorioBin D:/Games/Steam/steamapps/common/Factorio/bin/x64/factorio.exe -ProfilePath tests/profiles/vanilla-published-4.7.3-space-age-f210-2123.json -OutputRoot build/tmp/f210-vanilla-published-b6-default-capture-r01/space-age -MIRArchive D:/Projects/Factorio/testmods/2.1/more-infinite-research_4.7.21003.zip -ExpectedMIRArchiveSha256 B6EB9430056ABD384DB00F94929FE7DAC0A37441ACF4BC277946689682628852 -ActiveModsObserver mir-fixture-mir5-active-mods-observer -TimeoutSeconds 240 -ExpectedPeakMemoryMiB 4096 -MaxNewOutputMiB 512 -AdmissionWaitSeconds 30"
+    ],
+    "required_result_contract": [
+      "Each capture must report MIR5PrototypeCaptureV1, exit naturally with code zero, bind the exact FE4 engine, B6 archive, A15 observer, selected default closure, and restored direct-library controls.",
+      "Each capture must retain hash-verified data-raw-dump.json and mod-settings-dump.json before any comparison.",
+      "An independent consumer must derive each complete public MIR technology/settings surface from the B6 dumps and compare all identities and meaningful fields to the exact Defaults row set; the 53/71 seeded counts alone are insufficient.",
+      "A refusal, missing dump, mismatched archive/profile/engine, or failed restoration is not a successful capture and cannot be substituted by the earlier seeded fixture runs."
+    ]
+  },
+  "limits": [
+    "This is a two-input native-capture preparation packet only. Neither command has run, and neither target is marked captured, equivalent, gameplay-passed, migration-passed, timing-qualified, or release-qualified.",
+    "The packet intentionally does not reuse protected source saves, full-catalogue lab fixtures, or old seeded-count assertions as the requested exact B6 Defaults equivalence proof.",
+    "No current MIR5 archive, current candidate, source/player freeze, candidate result, or historical receipt is retargeted or relabelled."
+  ]
+}
