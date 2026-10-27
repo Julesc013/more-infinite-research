@@ -100,6 +100,7 @@ class MigrationOriginF200110SuccessorControls(unittest.TestCase):
     def test_successor_wrappers_retain_the_source_fixture_identity_and_only_change_the_targeted_wrapper_version(self):
         f200 = json.loads((FIXTURE / "info-f200.json").read_text(encoding="utf-8"))
         f210 = json.loads((FIXTURE / "info-f210.json").read_text(encoding="utf-8"))
+        source_version = (0, 1, 0)
         for wrapper, base, mir, version in (
             (f200, "2.0", "5.0.20000", "0.2.0"),
             (f210, "2.1", "5.0.21000", "0.3.0"),
@@ -110,6 +111,7 @@ class MigrationOriginF200110SuccessorControls(unittest.TestCase):
                 self.assertEqual(base, wrapper["factorio_version"])
                 self.assertIn(f"more-infinite-research = {mir}", wrapper["dependencies"])
                 self.assertNotIn("mir-fixture-mir5-migration-origin-f200-110-successor", wrapper["name"])
+                self.assertGreater(tuple(map(int, wrapper["version"].split("."))), source_version)
 
     def test_data_guard_admits_only_the_two_exact_candidate_targets_and_accelerates_only_direct_cost(self):
         f200 = {"base": "2.0.77", "more-infinite-research": "5.0.20000",
@@ -230,7 +232,7 @@ class MigrationOriginF200110SuccessorControls(unittest.TestCase):
         self.lua.globals().catalogue_path = catalogue_path
         self.lua.globals().successor_control_path = control_path
         self.lua.execute(r'''
-          function migration_origin_110_successor_lifecycle(target)
+          function migration_origin_110_successor_lifecycle(target, active_fixture)
             local callbacks={events={}}
             local env={storage={},logs={},created_labs=0,saved=false,
               script={active_mods={},on_configuration_changed=function(fn) callbacks.configuration=fn end,
@@ -315,7 +317,13 @@ class MigrationOriginF200110SuccessorControls(unittest.TestCase):
               foreign_index=2,foreign_snapshot=foreign_snapshot,
               foreign_queue={current=catalogue.direct,queue={catalogue.direct,"recipe-prod-research_plastic-1"},progress=.42},
               detached_index=3,detached_snapshot=detached_snapshot}
-            env.storage[catalogue.storage_key]=state
+            -- Model Factorio's per-mod storage ownership: the protected
+            -- state belongs to the source fixture identity, not every
+            -- fixture whose source directory happens to contain this control.
+            local source_storage, renamed_storage = {}, {}
+            source_storage[catalogue.storage_key]=state
+            local fixture_name=active_fixture or catalogue.fixture
+            env.storage=fixture_name==catalogue.fixture and source_storage or renamed_storage
             env.settings={startup={}}
             for name,value in pairs(catalogue.settings) do env.settings.startup[name]={value=value} end
             local inventory={items={}}
@@ -328,10 +336,10 @@ class MigrationOriginF200110SuccessorControls(unittest.TestCase):
               server_save=function(_) env.saved=true end}
             if target=="f200" then
               env.script.active_mods={base="2.0.77",["more-infinite-research"]="5.0.20000",
-                [catalogue.fixture]="0.2.0",["mir-fixture-mir5-active-mods-observer"]="0.1.0"}
+                [fixture_name]="0.2.0",["mir-fixture-mir5-active-mods-observer"]="0.1.0"}
             else
               env.script.active_mods={base="2.1.23",["more-infinite-research"]="5.0.21000",
-                [catalogue.fixture]="0.3.0",["mir-fixture-mir5-active-mods-observer"]="0.1.0"}
+                [fixture_name]="0.3.0",["mir-fixture-mir5-active-mods-observer"]="0.1.0"}
             end
             local ok,message=pcall(function()
               assert(loadfile(successor_control_path,"t",env))()
@@ -354,7 +362,8 @@ class MigrationOriginF200110SuccessorControls(unittest.TestCase):
               player_level=player.technologies[catalogue.direct].level,
               player_manual=player.manual_mining_speed_modifier,player_battery=player.worker_robots_battery_modifier,
               foreign_progress=foreign.research_progress,detached_progress=detached.technologies[catalogue.direct].saved_progress,
-              player_add_calls=player.add_calls}
+              player_add_calls=player.add_calls,source_state_changed=state.successors~=nil,
+              renamed_storage_changed=next(renamed_storage)~=nil}
           end
         ''')
         for target in ("f200", "f210"):
@@ -373,6 +382,20 @@ class MigrationOriginF200110SuccessorControls(unittest.TestCase):
                 self.assertEqual(2, len(result["logs"]))
                 self.assertIn('"stage":"initial"', result["logs"][0])
                 self.assertIn('"stage":"reload"', result["logs"][1])
+                self.assertTrue(result["source_state_changed"])
+                self.assertFalse(result["renamed_storage_changed"])
+
+    def test_renamed_successor_cannot_consume_the_protected_source_storage(self):
+        for target in ("f200", "f210"):
+            with self.subTest(target=target):
+                result = py(self.lua.eval("migration_origin_110_successor_lifecycle")(
+                    target, "mir-fixture-mir5-migration-origin-f200-110-successor"))
+                self.assertFalse(result["ok"])
+                self.assertIn("successor runtime target closure differs", result["message"])
+                self.assertEqual(0, result["created_labs"])
+                self.assertEqual(0, result["player_add_calls"])
+                self.assertFalse(result["source_state_changed"])
+                self.assertFalse(result["renamed_storage_changed"])
 
 
 if __name__ == "__main__":
