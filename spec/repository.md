@@ -58,6 +58,6 @@ Root replacements are adopted by review, not auto-installed by a documentation Z
 
 ## Canonical roots and API-major roots
 
-`REPO-05` — Current responsibilities use the final unversioned roots `source`, `spec`, `docs`, `tests`, `tools`, `targets` and `sdk`. Nested `tests/fixtures/**/mir5` directories identify historical successor-phase contracts, not temporary product staging. Preserve their tested identities and pinned historical references. `api/v1` is a real public compatibility boundary, independent of product-major layout.
+`REPO-05` — Current responsibilities use the final unversioned roots `source`, `spec`, `docs`, `tests`, `tools`, `targets` and `sdk`. Historical migration fixtures keep distinct predecessor and successor contracts; a reviewed directory relocation preserves their payload bytes, tested identities and pinned historical references. `api/v1` is a real public compatibility boundary, independent of product-major layout.
 
 Permanent diagrams describe package-relative paths or unversioned repository responsibilities. Historical transition material retains its recorded source identity. A rendered HTML atlas contains its graphics inline and has no dependency on a network renderer; diagrams never become a second normative specification.

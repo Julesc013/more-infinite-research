@@ -39,7 +39,7 @@ For the first port, recover actual identity/tuning/settings from the pinned base
 
 Future MIR4.7 hotfixes start on a separate task branch from the exact published4.7 tag being patched, using that line's source and build controls. Keep its review, qualification and release tag on that maintenance line. Port an applicable correction into MIR5 as a separate reviewed change; do not restore the MIR4 implementation or staging roots into `dev`. Existing signing, publication, custody and branch protections still apply.
 
-Nested fixture paths such as `tests/fixtures/f200-legacy-cap/mir5/` identify the MIR5 successor of a historical migration test. They preserve tested source identities and are excluded from player packages; they are not parallel editable product roots. Historical receipts and ignored `build/mir5/` custody retain their original paths.
+Historical migration fixtures have distinct predecessor and successor roles; they are excluded from player packages and are not parallel editable product roots. A reviewed role-directory relocation preserves payload bytes, fixture identities and pinned historical references while updating current consumers. Historical receipts and ignored `build/mir5/` custody retain their original paths.
 
 ## Community bugs and request continuity
 
