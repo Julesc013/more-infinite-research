@@ -62,6 +62,64 @@ MATERIAL_SETTING_PREFIXES = (
     "ips-effect-per-level-",
 )
 
+# The q009/q010 upstream prototype references and B6 output rows independently
+# agree on this finite presentation correction.  The current player source is
+# deliberately not an input to these values.  `source_icon_size=None` is the
+# ordinary Factorio default-size case; the published technology records 64.
+BOB_ANGEL_F210_NATIVE_ICON_BINDINGS = (
+    {
+        "key": "research_advanced_circuit", "source_type": "technology", "source_name": "advanced-circuit",
+        "source_icon": "__bobelectronics__/graphics/icons/technology/advanced-electronics.png",
+        "source_icon_size": 128,
+        "published_icon": "__bobelectronics__/graphics/icons/technology/advanced-electronics.png",
+        "published_icon_size": 128,
+        "fallback_icon": "__base__/graphics/technology/advanced-circuit.png", "fallback_icon_size": 256,
+    },
+    {
+        "key": "research_copper", "source_type": "item", "source_name": "copper-plate",
+        "source_icon": "__angelssmeltinggraphics__/graphics/icons/plate-copper.png", "source_icon_size": 32,
+        "published_icon": "__angelssmeltinggraphics__/graphics/icons/plate-copper.png", "published_icon_size": 32,
+        "fallback_icon": "__base__/graphics/icons/copper-plate.png", "fallback_icon_size": 64,
+    },
+    {
+        "key": "research_copper_cable", "source_type": "item", "source_name": "copper-cable",
+        "source_icon": "__angelssmeltinggraphics__/graphics/icons/wire-copper.png", "source_icon_size": 32,
+        "published_icon": "__angelssmeltinggraphics__/graphics/icons/wire-copper.png", "published_icon_size": 32,
+        "fallback_icon": "__base__/graphics/icons/copper-cable.png", "fallback_icon_size": 64,
+    },
+    {
+        "key": "research_inserters", "source_type": "technology", "source_name": "fast-inserter",
+        "source_icon": "__boblogistics__/graphics/icons/technology/long-inserters.png", "source_icon_size": 128,
+        "published_icon": "__boblogistics__/graphics/icons/technology/long-inserters.png", "published_icon_size": 128,
+        "fallback_icon": "__base__/graphics/technology/fast-inserter.png", "fallback_icon_size": 256,
+    },
+    {
+        "key": "research_iron", "source_type": "item", "source_name": "iron-plate",
+        "source_icon": "__angelssmeltinggraphics__/graphics/icons/plate-iron.png", "source_icon_size": 32,
+        "published_icon": "__angelssmeltinggraphics__/graphics/icons/plate-iron.png", "published_icon_size": 32,
+        "fallback_icon": "__base__/graphics/icons/iron-plate.png", "fallback_icon_size": 64,
+    },
+    {
+        "key": "research_iron_sticks", "source_type": "item", "source_name": "iron-stick",
+        "source_icon": "__angelssmeltinggraphics__/graphics/icons/rod-iron.png", "source_icon_size": 32,
+        "published_icon": "__angelssmeltinggraphics__/graphics/icons/rod-iron.png", "published_icon_size": 32,
+        "fallback_icon": "__base__/graphics/icons/iron-stick.png", "fallback_icon_size": 64,
+    },
+    {
+        "key": "research_mining_drill", "source_type": "item", "source_name": "electric-mining-drill",
+        "source_icon": "__bobmining__/graphics/icons/electric-mining-drill-1.png", "source_icon_size": None,
+        "published_icon": "__bobmining__/graphics/icons/electric-mining-drill-1.png", "published_icon_size": 64,
+        "fallback_icon": "__base__/graphics/icons/electric-mining-drill.png", "fallback_icon_size": 64,
+    },
+)
+PRODUCTIVITY_BADGE = {
+    "icon": "__core__/graphics/icons/technology/constants/constant-recipe-productivity.png",
+    "icon_size": 128,
+    "scale": 0.5,
+    "shift": [50, 50],
+    "floating": True,
+}
+
 
 def _lua_value(lua, value):
     if isinstance(value, dict):
@@ -231,6 +289,82 @@ class BobAngelF210PipelineTests(unittest.TestCase):
         self.assertNotIn("recipe-prod-research_material_copper_tungsten-1", space_rows)
         for rows in (base_rows, space_rows):
             self.assertNotIn("recipe-prod-research_material_aluminium-1", rows)
+
+    def test_f210_bob_angel_uses_the_seven_captured_native_presentation_refs(self):
+        # Both exact q009/q010 upstream rows carry the same direct prototype
+        # art, and their independently captured B6 rows carry the same output
+        # icon plus the normal MIR productivity badge.  Do not derive either
+        # side from the candidate under test.
+        for case in ("base", "space_age"):
+            with self.subTest(case=case):
+                source = self.context["cases"][case]
+                rows = self._rows(self.stage(case))
+                for binding in BOB_ANGEL_F210_NATIVE_ICON_BINDINGS:
+                    with self.subTest(case=case, key=binding["key"]):
+                        native = source["raw"][binding["source_type"]][binding["source_name"]]
+                        self.assertEqual(binding["source_icon"], native["icon"])
+                        self.assertEqual(binding["source_icon_size"], native.get("icon_size"))
+                        rendered = rows[f"recipe-prod-{binding['key']}-1"]["icons"]
+                        self.assertEqual([
+                            {"icon": binding["published_icon"], "icon_size": binding["published_icon_size"]},
+                            PRODUCTIVITY_BADGE,
+                        ], rendered)
+
+    def test_f210_bob_angel_native_presentation_is_scoped_and_falls_back_without_mutation(self):
+        source = self.context["cases"]["space_age"]
+
+        inactive_mods = deepcopy(source["selection"])
+        inactive_mods.pop("bobtech")
+        inactive_rows = self._rows(self.stage("space_age", mods=inactive_mods))
+        for binding in BOB_ANGEL_F210_NATIVE_ICON_BINDINGS:
+            with self.subTest(profile="inactive", key=binding["key"]):
+                self.assertEqual([
+                    {"icon": binding["fallback_icon"], "icon_size": binding["fallback_icon_size"]},
+                    PRODUCTIVITY_BADGE,
+                ], inactive_rows[f"recipe-prod-{binding['key']}-1"]["icons"])
+
+        for failure, mutate in (
+            ("absent-icon", lambda prototype: prototype.pop("icon")),
+            ("malformed-size", lambda prototype: prototype.__setitem__("icon_size", "not-a-positive-integer")),
+        ):
+            raw = deepcopy(source["raw"])
+            for binding in BOB_ANGEL_F210_NATIVE_ICON_BINDINGS:
+                mutate(raw[binding["source_type"]][binding["source_name"]])
+            rows = self._rows(self.stage("space_age", raw=raw))
+            for binding in BOB_ANGEL_F210_NATIVE_ICON_BINDINGS:
+                with self.subTest(failure=failure, key=binding["key"]):
+                    self.assertEqual([
+                        {"icon": binding["fallback_icon"], "icon_size": binding["fallback_icon_size"]},
+                        PRODUCTIVITY_BADGE,
+                    ], rows[f"recipe-prod-{binding['key']}-1"]["icons"])
+
+        # A malformed native entry is not a prototype.  The finite art binding
+        # must leave it untouched and retain the independently captured Base
+        # presentation instead of indexing a primitive as though it were a
+        # Factorio prototype table.
+        for primitive in (True, 7, "not-a-prototype"):
+            raw = deepcopy(source["raw"])
+            for binding in BOB_ANGEL_F210_NATIVE_ICON_BINDINGS:
+                raw[binding["source_type"]][binding["source_name"]] = primitive
+            lua = self.stage("space_age", raw=raw)
+            rows = self._rows(lua)
+            final_raw = _plain(lua.globals().data.raw)
+            for binding in BOB_ANGEL_F210_NATIVE_ICON_BINDINGS:
+                with self.subTest(failure=f"primitive-{type(primitive).__name__}", key=binding["key"]):
+                    self.assertEqual([
+                        {"icon": binding["fallback_icon"], "icon_size": binding["fallback_icon_size"]},
+                        PRODUCTIVITY_BADGE,
+                    ], rows[f"recipe-prod-{binding['key']}-1"]["icons"])
+                    self.assertEqual(primitive, final_raw[binding["source_type"]][binding["source_name"]])
+
+        raw = deepcopy(source["raw"])
+        lua = self.stage("space_age", raw=raw)
+        first = BOB_ANGEL_F210_NATIVE_ICON_BINDINGS[0]
+        technology_name = f"recipe-prod-{first['key']}-1"
+        lua.execute(f'data.raw.technology["{technology_name}"].icons[1].icon="__test__/mutated-output.png"')
+        direct = _plain(lua.globals().data.raw[first["source_type"]][first["source_name"]])
+        self.assertEqual(first["source_icon"], direct["icon"])
+        self.assertEqual(first["source_icon_size"], direct.get("icon_size"))
 
     def test_full_bob_angel_material_settings_keep_the_b6_visible_absence_and_partial_closure_hidden(self):
         for case in ("base", "space_age"):
