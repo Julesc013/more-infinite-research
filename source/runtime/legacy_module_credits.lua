@@ -2,14 +2,14 @@
 --
 -- This is intentionally narrower than native_credits: it recognizes exactly
 -- the published 1.1.0 -> MIR5 F200/F210 Base configuration event, reads only
--- the named public module row and three authored hidden holders, and stores a
--- single applied marker. Native holder levels retain the actual credit; no
+-- the named public module row and three authored hidden holders. Native holder
+-- levels retain the actual credit; no
 -- recipe scan, research subscription, tick work, or historical ledger exists.
 local definitions = require("research.legacy_module_credit_definitions")
+local platform_target = require("platform.target")
 
 local M = {}
 
-local STORAGE_KEY = "mir_legacy_module_credits"
 local SCHEMA = 1
 local UINT32_MAX = 4294967295
 local EFFECT_TOLERANCE = .00000001
@@ -17,10 +17,6 @@ local MIR_MOD = "more-infinite-research"
 local PUBLISHED_VERSION = "1.1.0"
 local MAIN_ID = "recipe-prod-research_modules-1"
 local DESCRIPTORS = definitions.descriptors()
-local TARGETS = {
-  f200 = {base = "2.0.77", mir = "5.0.20000"},
-  f210 = {base = "2.1.23", mir = "5.0.21000"},
-}
 local MAIN_EFFECTS = {
   ["efficiency-module"] = .1,
   ["productivity-module"] = .1,
@@ -47,24 +43,14 @@ local function valid_force(force)
   return force and force.valid ~= false and integer(force.index) and force.index > 0
 end
 
-local function state()
-  local value = storage[STORAGE_KEY]
-  if value == nil then return nil end
-  if type(value) ~= "table" or value.schema ~= SCHEMA or type(value.applied) ~= "boolean" then
-    error("MIR unsupported legacy module credit state", 3)
-  end
-  return value
-end
-
 local function active_target()
   local active = script and script.active_mods
   if not active or active["space-age"] ~= nil then return nil end
-  for id, target in pairs(TARGETS) do
-    if active.base == target.base and active[MIR_MOD] == target.mir then
-      return id
-    end
-  end
-  return nil
+  if platform_target.recipe_productivity ~= true
+      or (platform_target.id ~= "f200" and platform_target.id ~= "f210")
+      or type(platform_target.distribution_version) ~= "string"
+      or active[MIR_MOD] ~= platform_target.distribution_version then return nil end
+  return platform_target.id
 end
 
 local function target_for_event(event)
@@ -73,9 +59,9 @@ local function target_for_event(event)
   local change = type(changes) == "table" and changes[MIR_MOD] or nil
   if type(change) ~= "table" or change.old_version ~= PUBLISHED_VERSION then return nil end
   local target = active_target()
-  if target ~= nil and change.new_version == TARGETS[target].mir then return target end
+  if target ~= nil and change.new_version == platform_target.distribution_version then return target end
   if target == nil then return nil end
-  if change.new_version ~= TARGETS[target].mir then
+  if change.new_version ~= platform_target.distribution_version then
     error("MIR legacy module credit does not admit this destination version", 3)
   end
 end
@@ -119,7 +105,7 @@ local function one_automation_pack(ingredients)
   return type(item) == "table" and item.name == "automation-science-pack" and item.amount == 1
 end
 
-local function exact_holder(technology, descriptor, initial)
+local function exact_holder_shape(technology, descriptor)
   local prototype = technology and technology.prototype
   local effects = prototype and prototype.effects
   if technology == nil or technology.valid == false or technology.name ~= descriptor.id
@@ -137,11 +123,18 @@ local function exact_holder(technology, descriptor, initial)
       or effect.recipe ~= descriptor.recipe or not close(effect.change, descriptor.change) then
     return false
   end
-  if initial and (technology.enabled ~= false or technology.visible_when_disabled ~= false
-      or technology.level ~= 1 or technology.researched ~= false) then
-    return false
-  end
   return completed(technology) ~= nil
+end
+
+local function holder_mode(technology, descriptor, completed_levels)
+  if not exact_holder_shape(technology, descriptor)
+      or technology.enabled ~= false or technology.visible_when_disabled ~= false
+      or technology.researched ~= false then
+    return nil
+  end
+  if technology.level == 1 then return "initial" end
+  if completed_levels > 0 and technology.level == 1 + completed_levels then return "credited" end
+  return nil
 end
 
 local function force_by_index(index)
@@ -152,25 +145,23 @@ local function force_by_index(index)
   return nil
 end
 
-local function inspect_force(force, initial)
+local function detached_force_plan(force)
   if not valid_force(force) or force.technologies == nil then return nil end
   local completed_levels = exact_main(force.technologies[MAIN_ID])
   if completed_levels == nil then return nil end
+  local mode = nil
   for index = 1, #DESCRIPTORS do
-    if not exact_holder(force.technologies[DESCRIPTORS[index].id], DESCRIPTORS[index], initial) then return nil end
+    local holder = holder_mode(force.technologies[DESCRIPTORS[index].id], DESCRIPTORS[index], completed_levels)
+    if holder == nil or (mode ~= nil and mode ~= holder) then return nil end
+    mode = holder
   end
-  return completed_levels
-end
-
-local function detached_force_plan(force)
-  local count = inspect_force(force, true)
-  if count == nil then return nil end
-  return {index = force.index, completed = count, holder_level = 1 + count}
+  if completed_levels == 0 or mode == "credited" then return false end
+  return {index = force.index, completed = completed_levels, holder_level = 1 + completed_levels}
 end
 
 local function valid_plan(plan)
   if type(plan) ~= "table" or plan.schema ~= SCHEMA or type(plan.target) ~= "string"
-      or type(plan.forces) ~= "table" or TARGETS[plan.target] == nil then
+      or type(plan.forces) ~= "table" or (plan.target ~= "f200" and plan.target ~= "f210") then
     return false
   end
   local seen = {}
@@ -187,14 +178,12 @@ local function valid_plan(plan)
   return true
 end
 
--- Preflight contains no storage or technology write. Its result carries only
+-- Preflight contains no technology write. Its result carries only
 -- force indexes and level counts, so callers cannot smuggle live objects from
 -- an unvalidated force into the later apply phase.
 function M.preflight(event)
   local target = target_for_event(event)
   if target == nil then return nil end
-  local current = state()
-  if current and current.applied then return nil end
   if not game or not game.forces then
     error("MIR legacy module credit requires the force collection", 2)
   end
@@ -203,10 +192,11 @@ function M.preflight(event)
     if valid_force(force) then
       local row = detached_force_plan(force)
       if row == nil then error("MIR legacy module credit rejects a non-current force shape", 2) end
-      plan.forces[#plan.forces + 1] = row
+      if row ~= false then plan.forces[#plan.forces + 1] = row end
     end
   end
   table.sort(plan.forces, function(left, right) return left.index < right.index end)
+  if #plan.forces == 0 then return nil end
   return plan
 end
 
@@ -217,14 +207,13 @@ function M.apply(plan)
   if plan == nil then return false end
   if not valid_plan(plan) then error("MIR invalid legacy module credit plan", 2) end
   if active_target() ~= plan.target then error("MIR legacy module credit plan target is no longer active", 2) end
-  local current = state()
-  if current and current.applied then return false end
-
   local live = {}
   for index = 1, #plan.forces do
     local row = plan.forces[index]
     local force = force_by_index(row.index)
-    if force == nil or inspect_force(force, true) ~= row.completed then
+    local current = force and detached_force_plan(force) or nil
+    if current == nil or current == false or current.completed ~= row.completed
+        or current.holder_level ~= row.holder_level then
       error("MIR legacy module credit plan no longer matches a current force", 2)
     end
     live[index] = force
@@ -238,7 +227,6 @@ function M.apply(plan)
       holder.visible_when_disabled = false
     end
   end
-  storage[STORAGE_KEY] = {schema = SCHEMA, applied = true}
   return true
 end
 
@@ -247,16 +235,14 @@ function M.on_configuration_changed(event)
 end
 
 -- Effect reset can re-enable a holder after its level was written. Cleanup
--- touches only already-applied, exact named holders; it never changes levels,
--- public effects, recipe bonuses, queues, or storage.
+-- touches only exact named holders; it never changes levels, public effects,
+-- recipe bonuses, queues, or storage.
 function M.on_technology_effects_reset(event)
-  local current = state()
-  if current == nil or current.applied ~= true then return false end
   local force = event and event.force
   if not valid_force(force) or force.technologies == nil then return false end
   for index = 1, #DESCRIPTORS do
     local holder = force.technologies[DESCRIPTORS[index].id]
-    if not exact_holder(holder, DESCRIPTORS[index], false) then return false end
+    if not exact_holder_shape(holder, DESCRIPTORS[index]) then return false end
   end
   for index = 1, #DESCRIPTORS do
     local holder = force.technologies[DESCRIPTORS[index].id]

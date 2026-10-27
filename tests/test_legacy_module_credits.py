@@ -63,14 +63,23 @@ class LegacyModuleCreditTests(unittest.TestCase):
             env.script={active_mods={},on_configuration_changed=function(fn)callbacks.configuration=fn end}
             if target=="f200" then
               env.script.active_mods={base="2.0.77",["more-infinite-research"]="5.0.20000"}
+            elseif target=="f200-final-copy" then
+              env.script.active_mods={base="2.0.99",["more-infinite-research"]="5.0.08"}
             elseif target=="f210" then
               env.script.active_mods={base="2.1.23",["more-infinite-research"]="5.0.21000"}
             elseif target=="f210-space-age" then
               env.script.active_mods={base="2.1.23",["more-infinite-research"]="5.0.21000",["space-age"]="2.0.77"}
             else error("unknown test target") end
             env.require=function(name)
-              assert(name=="research.legacy_module_credit_definitions")
-              return assert(loadfile(definitions_path,"t",env))()
+              if name=="research.legacy_module_credit_definitions" then
+                return assert(loadfile(definitions_path,"t",env))()
+              end
+              if name=="platform.target" then
+                if target=="f200" then return {id="f200",recipe_productivity=true,distribution_version="5.0.20000"} end
+                if target=="f200-final-copy" then return {id="f200",recipe_productivity=true,distribution_version="5.0.08"} end
+                return {id="f210",recipe_productivity=true,distribution_version="5.0.21000"}
+              end
+              error("unexpected module: "..tostring(name))
             end
             env._G=env;setmetatable(env,{__index=_G})
             local runtime=assert(loadfile(runtime_path,"t",env))()
@@ -85,7 +94,8 @@ class LegacyModuleCreditTests(unittest.TestCase):
           function legacy_module_credit_success(target)
             local value=legacy_module_credit_environment(target)
             local plan=value.runtime.preflight(value.event)
-            assert(plan and plan.target==target and #plan.forces==2)
+            local expected_target=target=="f210" and "f210" or "f200"
+            assert(plan and plan.target==expected_target and #plan.forces==2)
             assert(plan.forces[1].force==nil and plan.forces[2].force==nil)
             assert(value.env.storage.mir_legacy_module_credits==nil)
             for _,descriptor in ipairs(value.descriptors) do
@@ -93,8 +103,7 @@ class LegacyModuleCreditTests(unittest.TestCase):
               assert(value.foreign.technologies[descriptor.id].level==1)
             end
             assert(value.runtime.apply(plan)==true)
-            local result={storage=value.env.storage.mir_legacy_module_credits,
-              player_main=value.player.technologies["recipe-prod-research_modules-1"].level,
+            local result={player_main=value.player.technologies["recipe-prod-research_modules-1"].level,
               foreign_main=value.foreign.technologies["recipe-prod-research_modules-1"].level,
               player_saved=value.player.technologies["recipe-prod-research_modules-1"].saved_progress,
               player_queue=value.player.research_queue[1],foreign_progress=value.foreign.research_progress,
@@ -172,10 +181,9 @@ class LegacyModuleCreditTests(unittest.TestCase):
         self.assertEqual(1, result["two"][0]["unit"]["ingredients"][0][1])
 
     def test_exact_f200_and_f210_base_preflight_freeze_only_old_completed_levels(self):
-        for target in ("f200", "f210"):
+        for target in ("f200", "f210", "f200-final-copy"):
             with self.subTest(target=target):
                 result = py(self.lua.eval("legacy_module_credit_success")(target))
-                self.assertEqual(True, result["storage"]["applied"])
                 self.assertEqual((3, 1, .27, "preserved", .42),
                                  (result["player_main"], result["foreign_main"], result["player_saved"],
                                   result["player_queue"], result["foreign_progress"]))
@@ -219,6 +227,9 @@ class LegacyModuleCreditTests(unittest.TestCase):
         self.assertNotIn("on_tick", source)
         self.assertNotIn("on_research_finished", source)
         self.assertNotIn("recipe_bonus", source)
+        self.assertNotIn("storage[", source)
+        self.assertNotIn('"2.0.77"', source)
+        self.assertNotIn('"5.0.20000"', source)
         self.assertIn("function M.preflight(event)", source)
         self.assertIn("function M.apply(plan)", source)
         self.assertIn("function M.on_technology_effects_reset(event)", source)
