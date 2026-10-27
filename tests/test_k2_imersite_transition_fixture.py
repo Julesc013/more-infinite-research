@@ -564,6 +564,7 @@ class K2ImersiteTransitionFixtureTests(unittest.TestCase):
               -- Factorio's level setter re-enables a technology. This catches
               -- accidental multi-assignment ordering in the fixture setup.
               if key == "level" then values.enabled=true end
+              if key == "researched" and value == false then values.level=level end
             end})
           end
           local function make_force(index)
@@ -574,6 +575,7 @@ class K2ImersiteTransitionFixtureTests(unittest.TestCase):
             local value = {}
             value.enable_all_prototypes=function() end
             value.reset_technology_effects=function()
+              for _,technology in pairs(values.technologies) do technology.enabled=true end
               local state=values.technologies[holder]
               values.recipes[powder].productivity_bonus=(state.level-1)*.02
             end
