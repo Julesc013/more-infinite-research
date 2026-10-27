@@ -1576,8 +1576,10 @@
         }
       ],
       "direct_current_engine_status": "direct-f210-origin",
-      "archive_sha256": null,
-      "archive_byte_status": "tag-source-characterized-archive-not-byte-verified",
+      "archive_sha256": "35372EE6D16DA6765E8C30AEAAF5DA4A5D300F02C0A0A03648C80893A5394F32",
+      "archive_bytes": 1029464,
+      "archive_byte_status": "official-release-bytes-verified-all-290-members-equal-exact-tag-not-native-qualified",
+      "archive_readback": "spec/evidence/migration-origins-320-321-archive-readback.json",
       "native_status": "not_run"
     },
     {
@@ -1606,8 +1608,10 @@
         }
       ],
       "direct_current_engine_status": "direct-f210-origin",
-      "archive_sha256": null,
-      "archive_byte_status": "tag-source-characterized-archive-not-byte-verified",
+      "archive_sha256": "4CE24BE8550CB76EADC2B076747277025E9FD3E7BAAE3E4A996EDD36F78005A6",
+      "archive_bytes": 1029716,
+      "archive_byte_status": "official-release-bytes-verified-all-290-members-equal-exact-tag-not-native-qualified",
+      "archive_readback": "spec/evidence/migration-origins-320-321-archive-readback.json",
       "native_status": "not_run"
     },
     {
@@ -2396,18 +2400,18 @@
         {
           "origin_tag": "3.2.0",
           "factorio_version": "2.1",
-          "archive_sha256": null,
+          "archive_sha256": "35372EE6D16DA6765E8C30AEAAF5DA4A5D300F02C0A0A03648C80893A5394F32",
           "source_case": "not_run",
           "final_5_x_case": "not_run",
-          "disposition": "requires-exact-archive-and-native-source-save"
+          "disposition": "archive-byte-verified-requires-native-source-save-and-direct-successor"
         },
         {
           "origin_tag": "3.2.1",
           "factorio_version": "2.1",
-          "archive_sha256": null,
+          "archive_sha256": "4CE24BE8550CB76EADC2B076747277025E9FD3E7BAAE3E4A996EDD36F78005A6",
           "source_case": "not_run",
           "final_5_x_case": "not_run",
-          "disposition": "requires-exact-archive-and-native-source-save"
+          "disposition": "archive-byte-verified-requires-native-source-save-and-direct-successor"
         },
         {
           "origin_tag": "3.2.2",
