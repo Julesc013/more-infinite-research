@@ -661,6 +661,41 @@ class LegacyCapsLifecycleTests(unittest.TestCase):
             "schema1 granted a later native worker tail restoration right")
         ''')
 
+    def test_schema1_f200_transport_tuple_maps_to_current_f210_emissions(self):
+        self.lua.execute('''
+          -- The public schema-1 F200 component persisted the same finite
+          -- settings transport for both producer classes.  Current F210
+          -- admission identifies their emitted forms as `emit` and
+          -- `emit_base_extension`; the historical tuple must not be rejected
+          -- merely because the successor has those current operation names.
+          local gear, braking = technology(gear_name), technology("braking-force-8")
+          gear.level, gear.researched = 3, false
+          gear.enabled, gear.visible_when_disabled = false, true
+          braking.level, braking.researched = 3, false
+          braking.enabled, braking.visible_when_disabled = false, true
+          local old = schema1(23, {
+            {name = gear_name, setting = "ips-max-level-research_gears",
+              source = "generated-stream", operation = "runtime-settings-transport",
+              selected = 2, visibility = false},
+            {name = braking.name, setting = "mir-max-level-braking-force",
+              source = "base-continuation", operation = "runtime-settings-transport",
+              selected = 2, visibility = false}
+          })
+          boot({[23] = force(23, {[gear.name] = gear, [braking.name] = braking})}, old, nil,
+            {target_id = "f210", limit = 0})
+          lifecycle.on_configuration_changed()
+          assert(gear.enabled and not gear.visible_when_disabled
+            and braking.enabled and not braking.visible_when_disabled
+            and gear.level == 3 and braking.level == 3
+            and storage.mir_caps.legacy_caps_checked
+            and next(storage.mir_caps.owned_disabled) == nil,
+            "schema1 F200 transport tuple did not restore current F210 emitted rows")
+          assert(old.unique.keep
+            and old.managed_technologies[gear.name].operation == "runtime-settings-transport"
+            and old.managed_technologies[braking.name].operation == "runtime-settings-transport",
+            "schema1 cross-hop altered predecessor tuple evidence")
+        ''')
+
     def test_schema1_rejects_unadmitted_or_current_state_and_is_never_read_on_load(self):
         self.lua.execute('''
           local item = technology(gear_name)
