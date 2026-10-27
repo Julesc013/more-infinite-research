@@ -25,12 +25,12 @@ NAME = "mir-fixture-mir5-native-owner-cap-order"
 ENGINE_SHA = "FE4A1DA30F322A0D0B8AEB3DF7276332222BAAA143E2352569B723E84B2B9060"
 OBSERVER_SHA = "2E1BE5952D2A4CC5C74A0D149E075D247BA110A3FAE5B6768D3EAEBABCEF989C"
 MIR_SHA = "E3A65C08AC7798A66FB1BE30D24307B17C8B366DD901953BDE2A09BD6939C8CE"
-INPUT_REVISION = "5a4691821069d79daf7060ac9b79a191f12d0b24"
-INPUT_RECEIPT = ROOT / "spec/evidence/native-owner-cap-order-inputs-5a469182.json"
+INPUT_REVISION = "5a40aa5e0c3e04b1609280fa176a423bc3fffd8e"
+INPUT_RECEIPT = ROOT / "spec/evidence/native-owner-cap-order-inputs-5a40aa5e.json"
 FIXTURE_SHAS = {
-    "canonical": "C0054209A0F653C5B5FDBF529560722E2ABE3EFDE9088456B56B2BF46D4369B7",
-    "permuted": "25107173A949B952BE83DE1131CCFE44A0919D4A0CA451A7287FE2896FA1609A",
-    "relaxed": "10B3821CF87B833FCCE7D1EB5F268FB97C68C7CDAEBC3520D5A16E95017FEB7B",
+    "canonical": "C9E3D957315A5944850226265C59018368A6FB7F89EF2125308472089B9EB3C7",
+    "permuted": "82DE9C6A610E3D633B979C81987986AE129D304E67A7BB158684B551E44B5BD1",
+    "relaxed": "E0B7107C14300D0D93282BA20CDABE38120DAEDB967586731F25A9BFCDB93333",
 }
 STAGES = {
     "canonical": ("0.1.0", 1, ("steel-plate", "casting-steel")),
@@ -151,8 +151,10 @@ function cap_order_flow(common_path, canonical_path, permuted_path, relaxed_path
     end})
     local probe={name="automation",valid=true,level=1,researched=false,enabled=true,visible_when_disabled=false,saved_progress=0,
       prototype={max_level=1,effects={}}}
+    local prerequisite={name="automation-science-pack",valid=true,researched=false,enabled=true}
     local value={name=name,index=index,valid=true,technologies={["steel-plate-productivity"]=owner,automation=probe},
       recipes={ ["steel-plate"]={productivity_bonus=0},["casting-steel"]={productivity_bonus=0}},research_queue={},research_progress=0,owned=owned}
+    value.technologies["automation-science-pack"]=prerequisite
     function value.enable_all_prototypes() end
     function value.reset_technology_effects()
       resets=resets+1
@@ -169,6 +171,7 @@ function cap_order_flow(common_path, canonical_path, permuted_path, relaxed_path
     end
     function value.add_research(technology)
       if technology==nil or technology.enabled~=true or value.current_research~=nil then return false end
+      if technology==probe and (probe.researched or not prerequisite.researched) then return false end
       value.current_research=technology;value.research_queue={technology};value.research_progress=technology.saved_progress or 0
       technology.saved_progress=0;return true
     end
@@ -402,6 +405,23 @@ end
                                                result["foreign"]["technologies"]["steel-plate-productivity"]["visible_when_disabled"],
                                                result["foreign"]["research_progress"]))
         self.assertEqual("relaxed-complete", result["storage"]["mir5_native_owner_cap_order"]["phase"])
+
+    def test_foreign_queue_requires_the_named_native_prerequisite_without_changing_saved_investment(self):
+        original = (FIXTURE / "fixture_control.lua").read_text(encoding="utf-8")
+        old = original.replace("  prerequisite.researched = true\n", "")
+        self.assertNotEqual(original, old)
+        with tempfile.TemporaryDirectory() as temporary:
+            path = Path(temporary) / "missing-prerequisite.lua"
+            path.write_text(old, encoding="utf-8", newline="\n")
+            refused = self._flow(control_path=path)
+        self.assertFalse(refused["ok"])
+        self.assertIn("could not queue foreign probe", refused["message"])
+        self.assertEqual(0, refused["saves"])
+        passed = self._flow()
+        self.assertTrue(passed["ok"], passed["message"])
+        self.assertTrue(passed["foreign"]["technologies"]["automation-science-pack"]["researched"])
+        self.assertFalse(passed["foreign"]["technologies"]["automation"]["researched"])
+        self.assertEqual(.42, passed["foreign"]["research_progress"])
 
     def test_transition_refuses_effect_drift_skipped_stage_corrupted_saved_state_and_foreign_enablement(self):
         for opponent, phrase in (("wrong-effect", "effect differs"), ("seed-skip", "required prior"), ("skipped-transition", "required prior"),
