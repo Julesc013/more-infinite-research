@@ -25,8 +25,8 @@ The maintainer's 2026-10-27 clarification sets this implementation and qualifica
 | 1 — Primary | F210, Factorio 2.1.23 |
 | 2 — Secondary | F200, Factorio 2.0.77 |
 | 3 — Tertiary | F110 and F100 |
-| 4 | F018 through F013 |
-| 5 | F012 through F006 |
+| 4 | F017 through F013 |
+| 5 | F018 and F012 through F006, best effort |
 | 6 | F005 through F003 |
 | 7 | F002 and F001 |
 
@@ -34,7 +34,7 @@ MIR5 completion takes precedence over speculative additions. Parity, useful supp
 
 Choose the next ready task using this order. Independent lower-priority preparation may proceed while a higher-priority assignment runs or awaits indispensable inputs, provided it does not delay that assignment or compete for its resources. Scheduling priority does not change edition scope, supported capability subsets or release acceptance.
 
-Build F200 for 2.0.77 and eight historical normal editions, including selected F018/0.18.47, from the same shared implementation, retaining their delivered capability subsets and stable mod/technology/migration identities under the source/portal/extended version policy below. Keep common feature behavior, setting identities and meanings, and presentation consistent where native capabilities permit; isolate engine differences in the selected adapters. Run final current-package and affected native checks for every delivered target subset before release, reusing exact unchanged evidence under its original inputs and verdicts. Earlier normal editions retain their actual capability subsets; F006–F012 remain separately labelled best-effort builds. F210 priority does not authorize an unqualified normal edition or silently narrow the release scope. State unresolved gaps by edition; all applicable native, upgrade/save/client, performance and delivery requirements remain binding.
+Build F200 for 2.0.77 and the seven historical stable editions F110/F100/F017–F013, from the same shared implementation, retaining their delivered capability subsets and stable mod/technology/migration identities using the existing extended GitHub codec and final-copy Portal policy below. Keep common feature behavior, setting identities and meanings, and presentation consistent where native capabilities permit; isolate engine differences in the selected adapters. Run final current-package and affected native checks for every delivered target subset before release, reusing exact unchanged evidence under its original inputs and verdicts. Earlier normal editions retain their actual capability subsets; F018 and F006–F012 remain separately labelled best-effort builds. F210 priority does not authorize an unqualified normal edition or silently narrow the release scope. State unresolved gaps by edition; all applicable native, upgrade/save/client, performance and delivery requirements remain binding.
 
 ## Baseline targets, not new qualification
 
@@ -54,29 +54,31 @@ The previous release records identify these nine target editions. Their identifi
 
 Verify each current executable, official mods and consumed API against the actual local environment. The inherited source recorded 2.1.14 documentation; this revision observed official latest pages labelled 2.1.23. Neither observation is native qualification. Exact-version URL retrieval was unavailable; native work must pin and record the consumed target documentation. Do not silently chase a newer experimental binary during a frozen comparison.
 
-`TGT-02` — `factorio_version` is the two-part engine family and the `base >= x.y.z` dependency is the declared patch minimum. The maintainer's 27 October 2026 decision requires three explicit version forms: source `MAJOR.MINOR.PATCH`; portal distribution `MAJOR.MINOR.(10 * PATCH + edition_digit)`, with at least two digits in the third component; and extended distribution `MAJOR.MINOR.(100 * CCC + PATCH)`, padded to five digits. Use the fixed table below to choose a distribution form; never guess the source release or target from a bare third component. Patch digits identify the source patch, never a retry or RC counter. Source patch is limited to 0–99 for a release including extended editions; advance the minor release before overflow. Reject invalid or colliding target mappings and any numeric component outside Factorio's 0–65535 range before writing output. [Mod structure](https://lua-api.factorio.com/latest/auxiliary/mod-structure.html)
+`TGT-02` — Keep the existing ordinary build and GitHub release numbering: `100 * CCC + SOURCE_PATCH`, padded to five digits. `factorio_version` remains the two-part engine family and `base >= x.y.z` the actual declared minimum. Tags and the complete authored/generated changelog history use the unified source version, such as 5.0.0. Portal numbering is only a final-copy conversion after the accepted extended build is complete; it is not a new default codec, edition registry, source/runtime architecture or normal build mode. Preserve existing internal version metadata unless a final copy's identity must change. [Mod structure](https://lua-api.factorio.com/latest/auxiliary/mod-structure.html)
 
 ## Source, portal and extended versions
 
-| Edition | Distribution form | Fixed portal digit | Source 5.0.0 package version |
-|---|---|---|---|
-| F001–F012 | Extended | None | 5.0.00100 through 5.0.01200, when buildable |
-| F013 | Portal | 1 | 5.0.01 |
-| F014 | Portal | 2 | 5.0.02 |
-| F015 | Portal | 3 | 5.0.03 |
-| F016 | Portal | 4 | 5.0.04 |
-| F017 | Portal | 5 | 5.0.05 |
-| F018 | Extended | None | 5.0.01800 |
-| F100 | Portal | 6 | 5.0.06 |
-| F110 | Portal | 7 | 5.0.07 |
-| F200 | Portal | 8 | 5.0.08 |
-| F210 | Portal | 9 | 5.0.09 |
+| Edition | GitHub package for source 5.0.0 | Final Portal copy, if selected by maintainer |
+|---|---|---|
+| F001–F012 | 5.0.00100 through 5.0.01200, when buildable | None normally |
+| F013 | 5.0.01300 | 5.0.01 |
+| F014 | 5.0.01400 | 5.0.02 |
+| F015 | 5.0.01500 | 5.0.03 |
+| F016 | 5.0.01600 | 5.0.04 |
+| F017 | 5.0.01700 | 5.0.05 |
+| F018 | 5.0.01800, experimental/best effort | None normally |
+| F100 | 5.0.10000 | 5.0.06 |
+| F110 | 5.0.11000 | 5.0.07 |
+| F200 | 5.0.20000 | 5.0.08 |
+| F210 | 5.0.21000 | 5.0.09 |
 
-For source 5.0.1, F210 is 5.0.19 and F018 is 5.0.01801; for source 5.0.10, they are 5.0.109 and 5.0.01810. Portal digits are stable edition identities, not priority positions. Do not reassign them when editions are added or omitted. F018 remains a normal build/qualification obligation despite using extended distribution numbering. Early-edition buildability and best-effort limits remain unchanged.
+The final Portal copy uses `10 * SOURCE_PATCH + fixed_digit`, formatted with at least two digits: F013–F017 use 1–5, F100 uses 6, F110 uses 7, F200 uses 8, F210 uses 9. Source 5.0.1 therefore keeps GitHub F210 5.0.21001 and optionally yields Portal 5.0.19. Retain the existing 0–99 patch range for extended editions and do not reinterpret patch digits as retries. Validate the relationship between package metadata and source history; do not replace source-version changelog headers with either distribution number.
 
-Canonical editable metadata, Git tags, release titles and authored/generated changelog history use the unified source version, including the changelog shipped inside each player ZIP. A selected package's `info.json`, ZIP filename/root, inventory and target distribution metadata use its exact portal or extended version; the runtime API continues reporting the actual installed package version through its existing product-version field. Validate the relationship between these fields rather than forcing a source changelog header to equal the encoded package number. All editions carry the same complete source history. Do not rewrite historical changelog sections, published package bytes, migration filenames, tags or receipts to fit this new scheme.
+Create any selected Portal copy from the accepted final extended ZIP, with its own exact hash and only the necessary package identity fields changed together: filename, `info.json` version and any existing packaged literal that reports the installed distribution version. Preserve the enclosing ZIP folder and member paths; Factorio does not require that folder to match the external ZIP filename. Other player members and source changelog history remain byte-identical. Verify permitted metadata differences, each copy's checksum, native load/version reporting and the affected configuration-change transition at final delivery. The extended package receives full product qualification; the Portal copy needs only conversion-integrity and affected version-sensitive checks. Check source-version changelog parsing/presentation once without promising automatic update-history filtering. Do not rebuild the product or repeat the full matrix for the copy. Never rewrite published artifacts, migration filenames or historical receipts. All GitHub player release assets remain extended. The maintainer alone publishes to the Mod Portal; agent releases remain GitHub-only.
 
-Portal-numbered editions are the normal Mod Portal selection for the maintainer. F001–F012 and F018 remain extended and GitHub-oriented, with any exceptional Mod Portal publication a separate maintainer action. The name of a version form grants no agent Mod Portal publication authority; agent releases remain GitHub-only.
+The stable qualification set is F013–F017/F100/F110/F200/F210 on both channels: their GitHub and Portal packages have the same qualified gameplay. F018 and F001–F012 have a separate best-effort support claim. A shared defect affecting a stable edition still needs correction.
+
+F018 is a best-effort GitHub derivative of F100, like the additional early editions in support policy. Reuse F100 source, fixtures and applicable mod selections instead of maintaining an independent test campaign. Its only separate native obligations are 0.18 startup/no-crash and correct package information; F100 tests provide the shared behavior/migration coverage under their real execution identities. Label F018 experimental, record missing or failed startup checks honestly, and do not hold the stable Portal editions for unavailable 0.18 inputs. Keep required engine metadata differences narrow; do not invent compatibility by editing external mod archives.
 
 ## Package contract
 
@@ -106,7 +108,7 @@ Cryptographic identity and successful CI do not prove gameplay correctness. Rele
 
 The requested engine patches are0.1.2,0.2.10,0.3.2,0.4.1,0.5.3,0.6.4,0.7.5,0.8.8,0.9.8,0.10.12,0.11.22 and0.12.35. F001/F002 have no evidenced standalone mod-loader contract; [0.3.0 introduced standalone mods](https://www.factorio.com/blog/post/factorio-030-released). F003–F005 have credible mod loading but lack supplied exact engine/prototype inputs and remain unresolved. No current native result establishes them. The installed-engine and preserved museum-tag facts for F006–F012 support a fixed-default finite, data-only adapter; they do not establish settings, runtime API, Library, migration or native-infinite parity. The opt-in target record keeps these builds outside normal-edition qualification verdicts.
 
-Factorio0.18.47 is also visible in the [official history](https://wiki.factorio.com/Version_history/0.18.0). It was excluded from the inherited baseline; the maintainer now explicitly selects F018 as a normal edition in every MIR5 build/release train. Its intended minimum is0.18.47 and distribution codec is01800 for source5.0.0. Recover the actual historical F018 definitions and engine constraints, implement them through shared adapters, and complete its applicable native/save qualification before stable release. No0.18 engine is installed on Aero; Black Glass owns engine/input inventory and the native lane. F100 packaging does not prove backward compatibility. This is a selected implementation and qualification obligation, not a new pass.
+Factorio 0.18.47 is visible in the [official history](https://wiki.factorio.com/Version_history/0.18.0). The maintainer's latest 27 October clarification supersedes its earlier normal-edition qualification plan: F018 is an experimental/best-effort GitHub derivative of F100. Keep its existing shared adapter and correct 0.18 metadata, reuse F100 tests/mod selections and available old saves, and limit separate 0.18 native work to startup/no-crash and package information. Do not require a separate predecessor, forward-migration, all-policy or modpack campaign, or delay stable Portal editions to install/recover 0.18 inputs. Existing old source/fixture/receipt references remain history under their actual identities.
 
 ## Shared release history
 

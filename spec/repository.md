@@ -42,13 +42,13 @@ Packaging, performance and test receipts belong outside player source. Raw nativ
 
 ## Current tree and history
 
-`REPO-03` — Every tracked path removed at cutover has a reviewed disposition: superseded implementation; transferred current requirement; retained regression/migration; preserved history; or unresolved. Unresolved prevents deletion. Also preserve untracked local saves, dirty files and unique local commits; Git history alone does not capture them.
+`REPO-03` — The structural cutover to canonical roots is adopted, with reviewed dispositions for removed paths: superseded implementation; transferred current requirement; retained regression/migration; preserved history; or unresolved. Future removals still need a disposition; unresolved prevents deletion. Structural completion does not establish final package, native or release acceptance. Preserve untracked local saves, dirty files and unique local commits; Git history alone does not capture them.
 
-The active tree must not contain obsolete product-major source/spec/doc/SDK subtrees after qualified cutover. Do not replace them with a large `archive/` or `.mir/history/` directory. Keep only small current source pointers and regression material that has a current consumer. `.mir/` is not preserved as a sacred folder: transfer useful facts, retire old generated authority and remove it if no active consumer remains. AIDE is optional external developer assistance, not a second policy or runtime dependency.
+The active tree uses the canonical source/spec/doc/SDK roots without obsolete product-major implementation subtrees. Historical fixture successor phases remain distinct from product roots. Keep small source pointers and regression material with actual consumers instead of recreating an active history estate. The retired `.mir/` authority remains historical; AIDE is optional external developer assistance, not a second policy or runtime dependency.
 
 This does not require removing old version numbers from changelogs, historical source URLs, test fixture identities or migration filenames. Such strings may protect compatibility. Cleanup must be based on responsibility and active dependencies, not blind find/replace.
 
-`REPO-04` — Filesystem relocation is a separate semantic-neutral commit. The package root remains relative; production import/asset paths contain no checkout prefix. Check dependency closure, case-sensitive path resolution, staged/canonical docs links, exact member parity, final-layout native smoke and generated metadata. Do not combine formula/ID/migration changes with the move.
+`REPO-04` — Filesystem relocation is a separate semantic-neutral commit. The package root remains relative; production import/asset paths contain no checkout prefix. Check dependency closure, case-sensitive path resolution, documentation links, exact member parity, final-layout native smoke and generated metadata. Do not combine formula/ID/migration changes with the move.
 
 ## Authority and permissions
 
@@ -58,7 +58,7 @@ Root replacements are adopted by review, not auto-installed by a documentation Z
 
 ## Canonical roots and API-major roots
 
-`REPO-05` — Final responsibilities use the unversioned roots `source`, `spec`, `docs`, `tests`, `tools`, `targets` and `sdk`. A temporary staging component is removed only by the reviewed file-disposition map. `api/v1` is a real public compatibility boundary, not product-major staging, and survives.
+`REPO-05` — Current responsibilities use the final unversioned roots `source`, `spec`, `docs`, `tests`, `tools`, `targets` and `sdk`. Historical migration fixtures keep distinct predecessor and successor contracts; a reviewed directory relocation preserves their payload bytes, tested identities and pinned historical references. `api/v1` is a real public compatibility boundary, independent of product-major layout.
 
 Permanent diagrams describe package-relative paths or unversioned repository responsibilities. Superseded import packs, pseudocode and cutover instructions remain in their exact historical Git refs. A rendered HTML atlas contains its graphics inline and has no dependency on a network renderer; diagrams never become a second normative specification.
 
