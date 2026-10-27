@@ -68,7 +68,7 @@ local function assert_discovery(row)
   end
   local effect = type(row.effects) == "table" and row.effects[1] or nil
   if type(row.effects) ~= "table" or #row.effects ~= 1 or type(effect) ~= "table"
-      or effect.type ~= "unlock-space-location" or effect.space_location ~= "vulcanus" then
+      or effect.type ~= "unlock-travel-to-space-platforms" or effect.modifier ~= true then
     fail("source Vulcanus discovery effect differs")
   end
   local unit = row.unit

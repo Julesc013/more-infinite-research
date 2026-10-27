@@ -275,7 +275,7 @@ local function marker(stage, state, successor)
     source_scripted_iron_plate_bonus = state.player.iron.bonus,
     foreign_iron_progress = state.foreign.queue.progress,
     source_discovery_lab_researched = state.player.discovery.researched,
-    source_vulcanus_locked_seed = not state.player.discovery.unlocked,
+    source_vulcanus_native_locked_after_discovery = not state.player.discovery.unlocked,
     player_vulcanus_unlocked = player.discovery.unlocked,
     foreign_vulcanus_unresearched_locked = not state.foreign.discovery.researched and not state.foreign.discovery.unlocked,
     on_load_read_only = stage == "reload",
@@ -289,6 +289,7 @@ local function source_preflight()
   local discovery = technology(player, DISCOVERY, "source player")
   local iron = technology(player, IRON, "source player")
   if discovery.researched then fail("source Vulcanus discovery is already researched") end
+  if location_unlocked(player, "source player") then fail("source Vulcanus is unexpectedly unlocked") end
   if iron.researched or iron.level ~= 1 then fail("source iron technology is not fresh") end
   iron_effects(iron, "source player")
   research_unit(discovery, "source Vulcanus discovery")
@@ -310,7 +311,6 @@ local function seed_foreign()
   iron.level = 3
   foreign.reset_technology_effects()
   if not close((foreign.recipes["iron-plate"] or {}).productivity_bonus, .2) then fail("foreign iron bonus differs") end
-  foreign.lock_space_location(LOCATION)
   if location_unlocked(foreign, "foreign") then fail("foreign Vulcanus did not remain locked") end
   if foreign.add_research(iron) ~= true then fail("could not queue foreign iron") end
   foreign.research_progress = .27
@@ -337,13 +337,11 @@ end
 local function complete_source(state)
   local player = game.forces.player
   local discovery = technology(player, DISCOVERY, "source player")
-  if state.source_actual_labs ~= 1 or discovery.researched ~= true or not location_unlocked(player, "source player") then
+  if state.source_actual_labs ~= 1 or discovery.researched ~= true or location_unlocked(player, "source player") then
     fail("actual source Vulcanus discovery result differs")
   end
   assert_consumed(state.lab, state.source_packs, "source discovery")
   freeze_lab(state.lab)
-  player.lock_space_location(LOCATION)
-  if location_unlocked(player, "source player") then fail("could not simulate the locked discovered Vulcanus state") end
   local iron = technology(player, IRON, "source player")
   iron.researched = false
   iron.level = 3
