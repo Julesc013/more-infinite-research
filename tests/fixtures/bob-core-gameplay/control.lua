@@ -284,11 +284,23 @@ end
 
 local function assert_route_fluid_machine(machine, route, label, before)
   if not route_has_fluid(route) then return end
-  if type(machine.fluids_count) ~= "number" or machine.fluids_count ~= 4
-      or type(machine.get_fluid_capacity) ~= "function"
-      or machine.get_fluid_capacity(1) ~= 1000 or machine.get_fluid_capacity(2) ~= 1000
-      or machine.get_fluid_capacity(3) ~= 100 or machine.get_fluid_capacity(4) ~= 100
-      or type(machine.get_fluid_count) ~= "function" or type(machine.insert_fluid) ~= "function" then
+  -- Recipe-created runtime storages may merge several prototype fluid boxes.
+  -- Static foundry geometry is independently fixed in data-final-fixes; here
+  -- check usable exposed storage, then earn the exact fluid mass/output proof.
+  local count = machine.fluids_count
+  local usable = type(count) == "number" and count >= 1 and count <= 16
+    and count == math.floor(count) and type(machine.get_fluid_capacity) == "function"
+    and type(machine.get_fluid_count) == "function" and type(machine.insert_fluid) == "function"
+  if usable then
+    for index = 1, count do
+      local capacity = machine.get_fluid_capacity(index)
+      if type(capacity) ~= "number" or not (capacity > 0 and capacity < math.huge) then
+        usable = false
+        break
+      end
+    end
+  end
+  if not usable then
     local observed_before = type(before) == "string" and before or "<not-observed>"
     fail(label .. " native metallurgy fluid machine differs; before={" .. observed_before
       .. "}; after={" .. fluid_storage_observation(machine) .. "}")

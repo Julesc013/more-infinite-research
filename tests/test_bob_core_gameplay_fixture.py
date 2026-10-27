@@ -447,6 +447,10 @@ class BobCoreGameplayFixtureTests(unittest.TestCase):
         self.lua.globals().alloys = lua_value(self.lua, list(ALLOY_ROUTES))
         for opponent, expected in (
                 ("", ""),
+                ("different-storage-capacity:bob-copper-tungsten-alloy", ""),
+                ("different-storage-layout:bob-copper-tungsten-alloy", ""),
+                ("zero-storage-capacity:bob-copper-tungsten-alloy", "native metallurgy fluid machine differs"),
+                ("unusable-second-storage:bob-copper-tungsten-alloy", "native metallurgy fluid machine differs"),
                 ("wrong-output:bob-bronze-alloy", "native alloy output differs"),
                 ("wrong-output:bob-invar-alloy", "native alloy output differs"),
                 ("wrong-output:bob-nitinol-alloy", "native alloy output differs"),
@@ -496,7 +500,11 @@ class BobCoreGameplayFixtureTests(unittest.TestCase):
                     machine.get_recipe = function() return machine.selected end
                     setmetatable(machine, {__index=function(_, key)
                       if key == "fluids_count" then
-                        if route.category == "metallurgy" and machine.selected then return 4 end
+                        if route.category == "metallurgy" and machine.selected then
+                          if target == route.recipe and (kind == "different-storage-layout"
+                              or kind == "unusable-second-storage") then return 2 end
+                          return 1
+                        end
                         return 0
                       end
                     end})
@@ -506,7 +514,7 @@ class BobCoreGameplayFixtureTests(unittest.TestCase):
                       if index == 3 then return modules end
                     end
                     machine.insert_fluid = function(fluid)
-                      local capacity = 1000
+                      local capacity = machine.get_fluid_capacity(1)
                       local inserted = math.min(capacity - (fluids[fluid.name] or 0), fluid.amount)
                       fluids[fluid.name] = (fluids[fluid.name] or 0) + inserted
                       return inserted
@@ -516,7 +524,10 @@ class BobCoreGameplayFixtureTests(unittest.TestCase):
                       if index < 1 or index > machine.fluids_count then
                         error("fluid capacity requested outside exposed storage")
                       end
-                      return index <= 2 and 1000 or 100
+                      if target == route.recipe and kind == "zero-storage-capacity" then return 0 end
+                      if target == route.recipe and kind == "different-storage-capacity" then return 160 end
+                      if index == 2 then return kind == "unusable-second-storage" and 0 or 40 end
+                      return 80
                     end
                     machine.fluids = fluids
                     return machine
@@ -626,7 +637,9 @@ class BobCoreGameplayFixtureTests(unittest.TestCase):
                     end
                     local recipe = production and production.recipe
                     if not recipe then return false, "alloy route did not start" end
-                    for _ = 1, 4 do
+                    -- Drive at most one ordinary insertion tick per craft,
+                    -- independent of the obsolete large-buffer assumption.
+                    for _ = 1, 100 + 1 do
                       local machine = state.alloy_machines[recipe]
                       local input = machine.get_inventory(1)
                       local output = machine.get_inventory(2)
@@ -661,7 +674,7 @@ class BobCoreGameplayFixtureTests(unittest.TestCase):
                     original_guard_ok=original_guard_ok,original_guard_message=tostring(original_guard_message),
                   }
                 ''')
-                if opponent:
+                if expected:
                     self.assertFalse(result["first_ok"])
                     self.assertIn(expected, result["first_message"])
                 else:
@@ -741,7 +754,7 @@ class BobCoreGameplayFixtureTests(unittest.TestCase):
                     machines[route.recipe] = {
                       valid=true,energy=index == 1 and 17 or 29,crafting_progress=0,bonus_progress=1,
                       productivity_bonus=route.inherent_productivity + .08,
-                      fluids_count=route.category == "metallurgy" and 4 or 0,
+                      fluids_count=route.category == "metallurgy" and 1 or 0,
                       prototype={name=route.machine,crafting_categories={[route.category]=true}},
                       get_recipe=function() return {name=route.recipe} end,
                       get_inventory=function(index)
@@ -750,9 +763,12 @@ class BobCoreGameplayFixtureTests(unittest.TestCase):
                         if index == 3 then return modules end
                       end,
                       get_fluid_count=function(name) return fluids[name] or 0 end,
-                      get_fluid_capacity=function(index) return index <= 2 and 1000 or 100 end,
+                      get_fluid_capacity=function(index)
+                        assert(index == 1, "queried an unexposed merged storage")
+                        return 80
+                      end,
                       insert_fluid=function(fluid)
-                        local inserted = math.min(1000 - (fluids[fluid.name] or 0), fluid.amount)
+                        local inserted = math.min(80 - (fluids[fluid.name] or 0), fluid.amount)
                         fluids[fluid.name] = (fluids[fluid.name] or 0) + inserted
                         return inserted
                       end,
