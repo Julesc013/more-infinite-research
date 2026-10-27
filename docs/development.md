@@ -107,19 +107,28 @@ The F210 K2 capture controls read their two original profile blobs from exact na
 
 A test correction needs independent evidence. A resource refusal is not a pass, fail or timing sample. A path-only rename still needs package member equality and final-layout smoke, because import and package mistakes are real defects.
 
-For a native fixture, the caller must provision the selected, hash-pinned ZIP in the direct library before invoking `Invoke-NativeFixture.ps1`; that runner verifies fixtures but never packages or stages them. Build each `FixtureSources` directory as a checkout-local temporary projection containing exactly the package record's members, then verify it against the selected container before admission. Do not pass a canonical fixture directory wholesale when it includes alternate metadata such as `info-f200.json` that is intentionally absent from the selected F210 ZIP.
+For a native fixture, the caller must provision the selected, hash-pinned ZIP in the direct library before invoking `Invoke-NativeFixture.ps1`; that runner verifies fixtures but never packages or stages them. Build each `FixtureSources` directory as a checkout-local temporary projection containing exactly the package record's members, then verify it against the selected container before admission. For a committed input, package with `--revision <full-commit>` and project the selected raw Git blobs from that same commit; do not copy a Windows working tree whose `autocrlf` policy may have changed the selected Lua or JSON bytes. A deliberately local, unpinned experiment may use its working-tree bytes, but it is not interchangeable with a strict profile archive pin. Do not pass a canonical fixture directory wholesale when it includes alternate metadata such as `info-f200.json` that is intentionally absent from the selected F210 ZIP.
 
 ```powershell
+$revision = git rev-parse HEAD
+$packageRecord = python .\tools\package.py --source $canonicalFixtureSource --revision $revision --output $selectedArchive | ConvertFrom-Json
 $projection = Join-Path $OutputRoot 'fixture-source'
-foreach ($relative in $packageRecord.members.path) {
-  $destination = Join-Path $projection $relative
-  New-Item -ItemType Directory -Force -Path (Split-Path -Parent $destination) | Out-Null
-  Copy-Item -LiteralPath (Join-Path $canonicalFixtureSource $relative) -Destination $destination
-}
+if (Test-Path -LiteralPath $projection) { throw "Preserve existing fixture projection: $projection" }
+$sourceRoot = 'tests/fixtures/<selected-fixture>' # repository-relative; not an absolute working-tree path
+@'
+from pathlib import Path
+import subprocess, sys
+revision, source_root, projection, *members = sys.argv[1:]
+for member in members:
+    raw = subprocess.check_output(["git", "show", f"{revision}:{source_root}/{member}"])
+    destination = Path(projection, member)
+    destination.parent.mkdir(parents=True, exist_ok=True)
+    destination.write_bytes(raw)
+'@ | python - $revision $sourceRoot $projection $packageRecord.members.path
 .\tools\Invoke-NativeFixture.ps1 -ArchiveLibrary $library -FixtureSources $projection <other exact arguments>
 ```
 
-The library archive must already match the profile's selected archive SHA256; a same-name container with different bytes is refused. The projection is caller-owned temporary input, not a ZIP extraction, dependency copy or a substitute for the profile's engine/archive admission.
+The library archive must already match the profile's selected archive SHA256; a same-name container with different bytes is refused. The projection is caller-owned temporary input, not a ZIP extraction, dependency copy or a substitute for the profile's engine/archive admission. Do not pipe `git show` through text cmdlets when creating that projection: its selected blobs are binary input, even where an individual member happens to be text.
 
 ## Isolated client launches
 

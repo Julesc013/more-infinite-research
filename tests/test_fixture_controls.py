@@ -55,6 +55,13 @@ class FixtureControlHostStageTests(unittest.TestCase):
             cwd=ROOT, env=environment, text=True, capture_output=True, check=False,
         )
 
+    @staticmethod
+    def git_blob_bytes(revision: str, path: Path) -> bytes:
+        relative = path.relative_to(ROOT).as_posix()
+        return subprocess.check_output(
+            ["git", "-C", str(ROOT), "show", f"{revision}:{relative}"]
+        )
+
     def setUp(self):
         self.lua = LuaRuntime(unpack_returned_tuples=True)
         self.lua.execute(r"""
@@ -561,6 +568,9 @@ class FixtureControlHostStageTests(unittest.TestCase):
 
     def test_primary_f210_profile_pins_selected_archive_containers_and_fixture_members(self):
         profile = json.loads((ROOT / "tests/profiles/api-consumers-f210-2123.json").read_bytes())
+        revision = subprocess.check_output(
+            ["git", "-C", str(ROOT), "rev-parse", "HEAD^{commit}"], text=True
+        ).strip()
         expected_members = {
             "api-alpha": {
                 "control.lua": ("8C5531606C96A1B93DD7B2E72C46F239866FC1EB161728BCFD66635B9592C8DB", 4989),
@@ -587,15 +597,18 @@ class FixtureControlHostStageTests(unittest.TestCase):
             output = Path(temporary)
             for fixture, expected in expected_members.items():
                 source = ROOT / "tests/fixtures" / fixture
-                info = json.loads((source / "info.json").read_bytes())
+                info = json.loads(self.git_blob_bytes(revision, source / "info.json"))
                 archive = output / f"{info['name']}_{info['version']}.zip"
                 completed = subprocess.run(
-                    [sys.executable, str(ROOT / "tools/package.py"), "--source", str(source), "--output", str(archive)],
+                    [sys.executable, str(ROOT / "tools/package.py"), "--source", str(source),
+                     "--revision", revision, "--output", str(archive)],
                     check=True, capture_output=True, text=True,
                 )
                 record = json.loads(completed.stdout)
                 self.assertEqual(record["sha256"].upper(), hashlib.sha256(archive.read_bytes()).hexdigest().upper())
+                self.assertEqual(record["source_commit"], revision)
                 self.assertIn(archive.name, profile["archive_sha256"], f"profile omits selected {fixture} archive")
+                self.assertEqual(record["sha256"].upper(), profile["archive_sha256"][archive.name])
                 record_members = {
                     row["path"]: (row["sha256"].upper(), row["bytes"])
                     for row in record["members"]
@@ -616,13 +629,43 @@ class FixtureControlHostStageTests(unittest.TestCase):
                 for relative in record_members:
                     projected = projection / relative
                     projected.parent.mkdir(parents=True, exist_ok=True)
-                    projected.write_bytes((source / relative).read_bytes())
+                    projected.write_bytes(self.git_blob_bytes(revision, source / relative))
                 accepted = self.fixture_archive_preflight(archive, projection)
                 self.assertEqual(accepted.returncode, 0, accepted.stdout + accepted.stderr)
                 self.assertTrue((source / "info-f200.json").is_file())
                 rejected = self.fixture_archive_preflight(archive, source)
                 self.assertNotEqual(rejected.returncode, 0)
                 self.assertIn("[mir-library-fixture-membership]", rejected.stdout + rejected.stderr)
+
+                if fixture == "api-alpha":
+                    crlf_source = output / "api-alpha-crlf"
+                    for relative in record_members:
+                        raw = self.git_blob_bytes(revision, source / relative)
+                        if relative.endswith((".lua", ".json")):
+                            self.assertNotIn(b"\r\n", raw)
+                            raw = raw.replace(b"\n", b"\r\n")
+                        staged = crlf_source / relative
+                        staged.parent.mkdir(parents=True, exist_ok=True)
+                        staged.write_bytes(raw)
+                    crlf_archive = output / "crlf" / archive.name
+                    crlf_completed = subprocess.run(
+                        [sys.executable, str(ROOT / "tools/package.py"), "--source", str(crlf_source),
+                         "--output", str(crlf_archive)],
+                        check=True, capture_output=True, text=True,
+                    )
+                    crlf_record = json.loads(crlf_completed.stdout)
+                    crlf_members = {
+                        row["path"]: (row["sha256"].upper(), row["bytes"])
+                        for row in crlf_record["members"]
+                    }
+                    self.assertEqual(crlf_record["sha256"].upper(),
+                                     "871C2545184B7DE34B2DAE1AC319AB46D397BCA7994464F39532CB4A812B1ED5")
+                    self.assertEqual(crlf_members, {
+                        "control.lua": ("B53A87280F7C46F6FC3A84A6C86E51DB6C1F69DE41F953C39E2E2665410C9E4A", 5105),
+                        "data.lua": ("40FA5F1C333775662D469E5EFD52B71DD8F989A544374DB6A9EEEDF9C46D5266", 756),
+                        "graphics/icon.png": ("AAEB6587D7BB7F5332AF05DAB446DF3DB3B100C0776E45FA078DE2A574DABB3D", 137),
+                        "info.json": ("5C77C93C01C17CD422DB6C64F80C2A24B3384A9FB640C032A5D2E3773C4DE491", 386),
+                    })
 
     def test_alpha_accepts_float32_native_effect_without_mutating_beta(self):
         self.lua.globals().fixture_control = self.control("api-alpha")
