@@ -1,9 +1,11 @@
 """Opposing controls for the package-excluded modern-catalogue oracle."""
 import contextlib
 from copy import deepcopy
+import gzip
 import hashlib
 import io
 import json
+import math
 from pathlib import Path
 import sys
 import tempfile
@@ -36,6 +38,42 @@ def _canonical_hash(value) -> str:
     return hashlib.sha256(
         json.dumps(value, ensure_ascii=False, sort_keys=True, separators=(",", ":")).encode("utf-8")
     ).hexdigest().upper()
+
+
+def _f210_bob_angel_science_recipe_names(raw: dict) -> list[str]:
+    """Return the finite COMP-02 q010 producer set from upstream-only fields."""
+    labs = raw.get("lab")
+    recipes = raw.get("recipe")
+    if not isinstance(labs, dict) or not isinstance(recipes, dict):
+        raise ValueError("q010 context lacks the bounded lab/recipe projection")
+    lab_inputs = {
+        item
+        for lab in labs.values()
+        if isinstance(lab, dict)
+        for item in lab.get("inputs", [])
+        if isinstance(item, str) and item
+    }
+    selected = []
+    for name, recipe in recipes.items():
+        if not isinstance(name, str) or not name or not isinstance(recipe, dict):
+            continue
+        if (recipe.get("type") != "recipe" or recipe.get("hidden") is True
+                or recipe.get("allow_productivity") is False or recipe.get("maximum_productivity") == 0
+                or recipe.get("category") == "recycling"):
+            continue
+        for result in recipe.get("results", []):
+            if not isinstance(result, dict) or result.get("type", "item") != "item":
+                continue
+            if result.get("name") not in lab_inputs:
+                continue
+            amount = result.get("amount", 1)
+            probability = result.get("probability", 1)
+            if (isinstance(amount, (int, float)) and not isinstance(amount, bool) and math.isfinite(amount)
+                    and amount > 0 and isinstance(probability, (int, float)) and not isinstance(probability, bool)
+                    and math.isfinite(probability) and probability > 0):
+                selected.append(name)
+                break
+    return sorted(selected)
 
 
 def _reconstruct_static_prefix_effects(effects, base_seed_recipes, published_recipes):
@@ -269,7 +307,7 @@ class ModernCatalogueTests(unittest.TestCase):
             if row["id"].startswith("BA-F210-EFFECT-ORDER-RECONSTRUCT-")
         }
         self.assertEqual(set(reviewed), set(F210_BOB_ANGEL_EFFECT_ORDER_IDS))
-        self.assertEqual(len(intent["differences"]), 158)
+        self.assertEqual(len(intent["differences"]), 160)
         self.assertNotIn(
             "BA-F210-EFFECT-ORDER-UNRESOLVED",
             {row["id"] for row in intent["unresolved_categories"]},
@@ -352,6 +390,113 @@ class ModernCatalogueTests(unittest.TestCase):
             ),
             sample["expected_candidate"]["effects"],
         )
+
+    def test_bob_angel_f210_addition_dispositions_have_independent_oil_and_science_authority(self):
+        """The two non-B6 additions use F200/B6/upstream inputs, never current output."""
+        intent_path = ROOT / "spec/inventory/bob-angel-f210-intent-r01.json"
+        intent = json.loads(intent_path.read_text(encoding="utf-8"))
+        provenance = intent["provenance"]["addition_contracts"]
+        records = {
+            row["name"]: row
+            for row in intent["differences"]
+            if row["id"].startswith("BA-F210-ADDITION-")
+        }
+        self.assertEqual(set(records), {
+            "recipe-prod-research_oil_cracking_productivity-1",
+            "recipe-prod-research_science_pack_productivity-1",
+        })
+        self.assertEqual(len(intent["differences"]), 160)
+        self.assertEqual(
+            {row["id"] for row in intent["unresolved_categories"]},
+            {"BA-F210-ADDITION-NATIVE-QUALIFICATION-REQUIRED"},
+        )
+
+        oil_provenance = provenance["oil_cracking_saved_identity"]
+        oil_source_path = ROOT / oil_provenance["f200_intent"]["path"]
+        self.assertEqual(
+            hashlib.sha256(oil_source_path.read_bytes()).hexdigest().upper(),
+            oil_provenance["f200_intent"]["sha256"],
+        )
+        oil_source = json.loads(oil_source_path.read_text(encoding="utf-8"))
+        oil_row = next(
+            row for row in oil_source["differences"]
+            if row["id"] == oil_provenance["f200_intent"]["difference_id"]
+        )
+        oil = records[oil_row["name"]]
+        self.assertEqual(oil["independent_before_sha256"], _canonical_hash(oil_row["expected_candidate"]))
+        self.assertEqual(oil["expected_candidate"], oil_row["expected_candidate"])
+        self.assertFalse(oil["expected_candidate"]["enabled"])
+        self.assertEqual(
+            [effect["recipe"] for effect in oil["expected_candidate"]["effects"]],
+            ["heavy-oil-cracking", "light-oil-cracking"],
+        )
+        oil_drift = deepcopy(oil_row["expected_candidate"])
+        oil_drift["effects"].pop()
+        self.assertNotEqual(_canonical_hash(oil_drift), oil["independent_before_sha256"])
+
+        science_provenance = provenance["science_pack_productivity"]
+        body_path = ROOT / science_provenance["unmodded_f210_body"]["path"]
+        self.assertEqual(
+            hashlib.sha256(body_path.read_bytes()).hexdigest().upper(),
+            science_provenance["unmodded_f210_body"]["sha256"],
+        )
+        base_inventory = json.loads(body_path.read_text(encoding="utf-8"))
+        profile = catalogue._inventory_profile(
+            base_inventory, science_provenance["unmodded_f210_body"]["profile"]
+        )
+        body = next(
+            row["row"] for row in profile["published_output"]["data"]["additions"]
+            if row["type"] == "technology" and row["name"]
+            == "recipe-prod-research_science_pack_productivity-1"
+        )
+        self.assertEqual(
+            _canonical_hash(body), science_provenance["unmodded_f210_body"]["row_sha256"]
+        )
+
+        context_path = ROOT / science_provenance["q010_upstream_context"]["path"]
+        self.assertEqual(
+            hashlib.sha256(context_path.read_bytes()).hexdigest().upper(),
+            science_provenance["q010_upstream_context"]["sha256"],
+        )
+        with gzip.open(context_path, "rt", encoding="utf-8") as stream:
+            context = json.load(stream)
+        case = context["cases"][science_provenance["q010_upstream_context"]["case"]]
+        self.assertEqual(
+            case["source_data_raw_dump"], science_provenance["q010_upstream_context"]["source_data_raw_dump"],
+        )
+        self.assertEqual(
+            case["published_data_raw_dump"], science_provenance["q010_b6_progression"]["data_raw_dump"],
+        )
+        speed = case["expected_published_technologies"]["research-speed-7"]
+        self.assertEqual(_canonical_hash(speed), science_provenance["q010_b6_progression"]["row_sha256"])
+
+        producer_names = _f210_bob_angel_science_recipe_names(case["raw"])
+        self.assertEqual(producer_names, science_provenance["producer_recipe_names"])
+        seed_names = [effect["recipe"] for effect in body["effects"]]
+        self.assertEqual(seed_names, science_provenance["static_seed_recipe_order"])
+        self.assertTrue(set(seed_names).issubset(producer_names))
+        remaining_names = sorted(set(producer_names) - set(seed_names))
+        self.assertEqual(remaining_names, science_provenance["canonical_remaining_recipe_order"])
+        expected = deepcopy(body)
+        expected["effects"] = [
+            {"type": "change-recipe-productivity", "recipe": recipe, "change": 0.1}
+            for recipe in seed_names + remaining_names
+        ]
+        expected["prerequisites"] = deepcopy(speed["prerequisites"])
+        expected["unit"]["ingredients"] = deepcopy(speed["unit"]["ingredients"])
+        science = records[expected["name"]]
+        self.assertEqual(science["independent_before_sha256"], _canonical_hash(body))
+        self.assertEqual(science["expected_candidate"], expected)
+        self.assertEqual(_canonical_hash(expected), science_provenance["expected_row_sha256"])
+
+        producer_drift = deepcopy(case["raw"])
+        producer_drift["recipe"]["bob-advanced-logistic-science-pack"]["allow_productivity"] = False
+        self.assertNotEqual(
+            _f210_bob_angel_science_recipe_names(producer_drift), producer_names,
+        )
+        progression_drift = deepcopy(speed)
+        progression_drift["prerequisites"].pop()
+        self.assertNotEqual(progression_drift["prerequisites"], expected["prerequisites"])
 
     def test_bob_angel_growth_review_retains_data_and_changes_only_exact_published_ceiling_fields(self):
         inventory = json.loads((ROOT / "spec/inventory/bob-angel-f200-472.json").read_text(encoding="utf-8"))
