@@ -8,8 +8,8 @@
     "archive_byte_status_meaning": "Only a non-null archive SHA256 plus an explicit source says archive bytes were verified. Tag-source characterization never implies an archive was found.",
     "native_status_meaning": "Exact native evidence only. not_run is retained rather than inferred.",
     "mir4_release_records": 18,
-    "mir4_scope": "All 18 published MIR4 GitHub release records, including the preserved 4.2.0-rc.1 prerelease. Modern asset identities are server metadata, not newly verified archive bytes or native results.",
-    "expected_digest_meaning": "Expected GitHub asset digests are server hash authorities. They are not assertions that this audit downloaded or independently verified archive bytes."
+    "mir4_scope": "All 18 published MIR4 GitHub release records, including the preserved 4.2.0-rc.1 prerelease. The three named historical-cap archive-inspector receipts verify the 36 modern ZIP bytes, sole info.json and maximum-level controller members; those observations do not establish saves or native results.",
+    "expected_digest_meaning": "Expected GitHub asset digests are server hash authorities. The later named MIR4 archive-inspector receipts independently match all 36 modern asset bytes; no other archive byte is implied verified."
   },
   "counts": {
     "direct_f200_origins": 37,
@@ -24,7 +24,7 @@
     "mir4_prerelease_modern_archive_origins": 2
   },
   "published_mir4_release_origin_inventory": {
-    "status": "all-18-mir4-release-metadata-characterized-not-archive-byte-verified",
+    "status": "all-18-mir4-release-metadata-characterized; all-36-modern-archive-bytes-and-cap-controller-members-verified-by-named-receipts-not-native-qualified",
     "enumerated_release_origins": 18,
     "enumerated_tags": [
       "v4.0.0",
@@ -46,7 +46,73 @@
       "v4.7.2",
       "v4.7.3"
     ],
-    "prior_mir4_release_origin_enumeration": "superseded by published_mir4_release_origins: all18 release records and36 modern asset identities are metadata-characterized; archive bytes and member manifests remain unverified in this inventory"
+    "prior_mir4_release_origin_enumeration": "superseded by published_mir4_release_origins: all18 release records and36 modern asset identities are metadata-characterized. The named archive-inspector receipts now verify each modern ZIP plus its sole info.json and maximum-level controller only; complete manifests, source saves and native upgrades remain unverified.",
+    "archive_inspector_disposition": {
+      "status": "all-36-mir4-modern-archives-byte-info-controller-verified-only",
+      "receipts": [
+        {
+          "path": "spec/evidence/historical-boolean-cap-archive-metadata.json",
+          "sha256": "F56981D287F8BA9E21B06C7238078FA17D14BB307E2700346904815FCE74617B",
+          "mir4_assets": 4,
+          "controller_cohort": "policy-v1 boolean"
+        },
+        {
+          "path": "spec/evidence/historical-structured-cap-archive-metadata.json",
+          "sha256": "EBD7141075DBF3BC6FEF2BDE250DC1E7CF907B05EBBD634942829E094B7AD054",
+          "mir4_assets": 8,
+          "controller_cohort": "policy-v3 structured"
+        },
+        {
+          "path": "spec/evidence/historical-remaining-cap-archive-metadata.json",
+          "sha256": "92B6A83A887B615394CD4AB9C1A26AE737261657F98F530D8325C4D998DCFDA5",
+          "mir4_assets": 24,
+          "controller_cohort": "policy-v3 structured"
+        }
+      ],
+      "cohort_counts": {
+        "policy_v1_boolean": 4,
+        "policy_v3_structured": 32
+      },
+      "actual_archive_info_by_release": {
+        "v4.0.0": { "f200": "4.0.20000", "f210": "4.0.21000" },
+        "v4.1.0": { "f200": "4.1.20000", "f210": "4.1.21000" },
+        "v4.2.0-rc.1": { "f200": "4.2.20000", "f210": "4.2.21000" },
+        "v4.2.0-stable": { "f200": "4.2.20000", "f210": "4.2.20000" },
+        "v4.2.1": { "f200": "4.2.20001", "f210": "4.2.21001" },
+        "v4.2.2": { "f200": "4.2.20002", "f210": "4.2.21002" },
+        "v4.3.0": { "f200": "4.3.20000", "f210": "4.3.21000" },
+        "v4.4.0": { "f200": "4.4.20000", "f210": "4.4.21000" },
+        "v4.4.1": { "f200": "4.4.20001", "f210": "4.4.21001" },
+        "v4.4.2": { "f200": "4.4.20002", "f210": "4.4.21002" },
+        "v4.5.0": { "f200": "4.5.20000", "f210": "4.5.21000" },
+        "v4.5.1": { "f200": "4.5.20001", "f210": "4.5.21001" },
+        "v4.5.2": { "f200": "4.5.20002", "f210": "4.5.21002" },
+        "v4.6.0": { "f200": "4.6.20000", "f210": "4.6.21000" },
+        "v4.7.0": { "f200": "4.7.20000", "f210": "4.7.21000" },
+        "v4.7.1": { "f200": "4.7.20001", "f210": "4.7.21001" },
+        "v4.7.2": { "f200": "4.7.20002", "f210": "4.7.21002" },
+        "v4.7.3": { "f200": "4.7.20003", "f210": "4.7.21003" }
+      },
+      "structured_f200_actual_info_versions": [
+        "4.2.20000",
+        "4.2.20001",
+        "4.2.20002",
+        "4.3.20000",
+        "4.4.20000",
+        "4.4.20001",
+        "4.4.20002",
+        "4.5.20000",
+        "4.5.20001",
+        "4.5.20002",
+        "4.6.20000",
+        "4.7.20000",
+        "4.7.20001",
+        "4.7.20002",
+        "4.7.20003"
+      ],
+      "v4_2_stable_f210_version_exception": "The archive named more-infinite-research_4.2.21000.zip retains its original expected digest and filename, but its actual info.json version is 4.2.20000. This is an observed archive identity, not a filename correction.",
+      "limits": "Only archive bytes, sole info.json and sole maximum_level_control.lua were inspected. This does not qualify source saves, settings, migration state, current reader behavior or native upgrades."
+    }
   },
   "source_state_producer_boundaries": {
     "current": [
@@ -3181,10 +3247,11 @@
     "MIR4 4.2.0-rc.1 and 4.2.0-stable reuse source-version labels but their modern archive digests differ; preserve both origins and their tag exceptions without renaming or merging their identities."
   ],
   "published_mir4_release_origins": {
-    "status": "git-and-github-release-metadata-only-not-native-qualified",
+    "status": "git-and-github-release-metadata-plus-36-modern-archive-info-controller-inspections-not-native-qualified",
     "metadata_endpoint": "https://api.github.com/repos/Julesc013/more-infinite-research/releases?per_page=100",
     "metadata_snapshot_sha256": "6E80BF580563E44A0CCEA872EF88E4A08547C0DFE564109030D3312F3314AEBF",
     "metadata_primary_locator": "build/qualification/migration-origins/mir4-release-metadata.json",
+    "archive_inspector_disposition": "See published_mir4_release_origin_inventory.archive_inspector_disposition for later byte-verified public-archive observations. The per-asset metadata-characterized values below preserve the original release-metadata audit rather than claiming its earlier process downloaded those bytes.",
     "release_count": 18,
     "records": [
       {
