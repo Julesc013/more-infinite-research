@@ -257,7 +257,7 @@ local function published_m4_startup_change(event)
   local changes = event.mod_changes
   local change = type(changes) == "table" and changes[MIR_MOD] or nil
   return type(change) == "table" and PUBLISHED_F200_M4_VERSIONS[change.old_version] == true
-    and type(change.new_version) == "string" and change.new_version:match("^5%.") ~= nil
+    and type(change.new_version) == "string" and change.new_version ~= ""
 end
 
 local function valid_record_for_observation(records, observation)
