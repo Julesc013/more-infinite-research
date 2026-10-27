@@ -1,0 +1,73 @@
+{
+  "schema": 1,
+  "kind": "discovery-recovery-prepared-native-selection",
+  "target": "f210",
+  "factorio_line": "2.1",
+  "engine": {
+    "version": "2.1.23",
+    "sha256": "8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38"
+  },
+  "fixture_source_commit": "41c13d7c7b58da9706717b630793af61c3cc2051",
+  "case": "discovery-recovery",
+  "settings_mode": "ProtectedOriginalSourceSavePendingNative",
+  "mods": [
+    {
+      "name": "base",
+      "version": "2.1.23",
+      "enabled": true
+    },
+    {
+      "name": "elevated-rails",
+      "version": "2.1.23",
+      "enabled": true
+    },
+    {
+      "name": "quality",
+      "version": "2.1.23",
+      "enabled": true
+    },
+    {
+      "name": "recycler",
+      "version": "2.1.23",
+      "enabled": true
+    },
+    {
+      "name": "space-age",
+      "version": "2.1.23",
+      "enabled": true
+    },
+    {
+      "name": "mir-fixture-mir5-active-mods-observer",
+      "version": "0.1.0",
+      "enabled": true
+    },
+    {
+      "name": "more-infinite-research",
+      "version": "5.0.21000",
+      "enabled": true
+    },
+    {
+      "name": "mir-fixture-discovery-recovery",
+      "version": "0.2.0",
+      "enabled": true
+    }
+  ],
+  "archive_sha256": {
+    "mir-fixture-mir5-active-mods-observer_0.1.0.zip": "2E1BE5952D2A4CC5C74A0D149E075D247BA110A3FAE5B6768D3EAEBABCEF989C",
+    "mir-fixture-discovery-recovery_0.2.0.zip": "631EAE6227631B487BE20887058719795EAB156A7324B8AA9D1ED23609BAA06D",
+    "more-infinite-research_5.0.21000.zip": "99EDF6EF6723434EBBDA1AED4AA58A74A26827D94FD18F67E88C118C3DF96BD6"
+  },
+  "role": "private-proposed-recovery-successor",
+  "source_save": {
+    "status": "unbound-awaiting-qualified-original-source",
+    "sha256": null,
+    "source_result_sha256": null,
+    "source_version": null
+  },
+  "candidate": {
+    "source_commit": "e47a0fdf746ce0e7ba237ab97be87172eacd4fb7",
+    "player_source": "1d71d0936bfe836764300174d9ae8457c31e72f4",
+    "release_candidate": false
+  },
+  "scope": "Prepared direct successor using the private e47 helper package, not accepted Dev/release source. Requires the exact protected source save/result and native-owner approval before execution. No migration or helper result is claimed."
+}
