@@ -274,6 +274,9 @@ end
         self.assertTrue(result["foreign_locked"])
         self.assertEqual(.27, result["foreign_progress"])
         self.assertEqual(["initial", "reload", "initial", "reload", "reload"], [row["stage"] for row in result["markers"]])
+        self.assertEqual(["discovery-recovery"] * 5, [row["case"] for row in result["markers"]])
+        self.assertEqual(["source", "source", "successor", "successor", "successor"],
+                         [row["fixture_role"] for row in result["markers"]])
         self.assertEqual((1, 1), (result["markers"][0]["source_actual_labs"], result["markers"][2]["successor_actual_labs"]))
         self.assertTrue(all(row["foreign_vulcanus_unresearched_locked"] for row in result["markers"]))
 

@@ -6,7 +6,7 @@ local M = {}
 local KEY = "mir5_discovery_recovery_fixture"
 local FIXTURE = "mir-fixture-discovery-recovery"
 local OBSERVER = "mir-fixture-mir5-active-mods-observer"
-local CASE = "discovery-recovery-f210"
+local CASE = "discovery-recovery"
 local SAVE = "mir5-native-complete"
 local IRON = "recipe-prod-research_iron-1"
 local DISCOVERY = "planet-discovery-vulcanus"
@@ -248,7 +248,8 @@ end
 local function marker(stage, state, successor)
   log("[MIR5_NATIVE_FIXTURE] RESULT " .. helpers.table_to_json({
     case = CASE, stage = stage, status = "passed", qualification = "native-runner-readback-required",
-    source_version = state.source_version, source_actual_labs = state.source_actual_labs,
+    fixture_role = successor and "successor" or "source", source_version = state.source_version,
+    source_actual_labs = state.source_actual_labs,
     successor_actual_labs = successor and successor.actual_labs or 0,
     source_iron_level = state.player.iron.level, source_iron_plate_bonus = state.player.iron.bonus,
     foreign_iron_progress = state.foreign.queue.progress,
