@@ -58,8 +58,8 @@ def factorio(text, source_version):
     if records[0]["version"] != source_version:
         raise ValueError("Current changelog version differs from source/info.json")
     lines = []
-    for index, record in enumerate(records):
-        lines.extend([SEPARATOR, "Version: " + ("@DISTRIBUTION_VERSION@" if index == 0 else record["version"])])
+    for record in records:
+        lines.extend([SEPARATOR, "Version: " + record["version"]])
         if record["date"] and record["date"] != "Unreleased":
             lines.append("Date: " + record["date"])
         for section in record["sections"]:

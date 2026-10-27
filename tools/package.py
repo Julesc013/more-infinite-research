@@ -161,16 +161,27 @@ def read_editions(source, revision=None, target_record=TARGET_RECORD):
     return record["targets"], digest(data)
 
 
+def source_changelog_version(version):
+    """Decode the retained extended codec only for a unified source header."""
+    if not isinstance(version, str):
+        raise ValueError("Player presentation requires a distribution codec")
+    match = CODEC_VERSION.fullmatch(version)
+    if match is None:
+        raise ValueError("Player presentation requires a distribution codec")
+    return (match.group("major") + "." + match.group("minor")
+            + "." + str(int(match.group("encoded")) % 100))
+
+
 def player_presentation(files, info):
     for required in ("LICENSE", "thumbnail.png", "changelog.txt"):
         if not files.get(required):
             raise ValueError("Selected edition has missing player presentation: " + required)
     entry = files["changelog.txt"]
     token = b"@DISTRIBUTION_VERSION@"
-    if entry.count(token) != 1:
-        raise ValueError("Current changelog needs exactly one distribution-version token")
+    header = (b"Version: " + source_changelog_version(info["version"]).encode("ascii") + b"\n")
+    if token in entry or entry.count(header) != 1:
+        raise ValueError("Current changelog needs exactly one source-version header")
     out = {name: raw for name, raw in files.items() if not name.startswith("presentation/changelog/")}
-    out["changelog.txt"] = entry.replace(token, info["version"].encode("ascii"))
     return out
 
 
@@ -214,6 +225,13 @@ def render_local_mir_target_version(files, source_version, requested_version, na
     rendered[SOURCE_TARGET_PATH] = (target[:match.start("version")]
                                     + requested_version.encode("ascii")
                                     + target[match.end("version"):])
+    entry = files.get("changelog.txt")
+    if entry is not None:
+        old = b"Version: " + source_changelog_version(source_version).encode("ascii") + b"\n"
+        if b"@DISTRIBUTION_VERSION@" in entry or entry.count(old) != 1:
+            raise ValueError("MIR local version package has invalid source changelog")
+        rendered["changelog.txt"] = entry.replace(
+            old, b"Version: " + source_changelog_version(requested_version).encode("ascii") + b"\n", 1)
     return rendered
 
 
@@ -392,9 +410,6 @@ def members(source, version=None, committed_files=None, target=None, editions=No
             committed_files = render_local_mir_target_version(
                 committed_files, source_version, info["version"], info["name"])
         if "changelog.txt" in committed_files:
-            encoded = info["version"].rsplit(".", 1)[-1]
-            if not re.fullmatch(r"[0-9]{5}", encoded):
-                raise ValueError("Player presentation requires a distribution codec")
             committed_files = player_presentation(committed_files, info)
     rows = []
     for relative, contents in sorted(committed_files.items()):

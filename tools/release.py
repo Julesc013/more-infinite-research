@@ -31,6 +31,7 @@ SOURCE_DISTRIBUTION_VERSION = "5.0.21000"
 SOURCE_LABEL = "source5.0.0"
 RELEASE_TAG = "v5.0.0"
 RELEASE_TITLE = "MIR 5.0.0"
+SOURCE_CHANGELOG_HEADER = (b"-" * 99) + b"\nVersion: " + SOURCE_VERSION.encode("ascii") + b"\n"
 
 
 def digest(data):
@@ -183,6 +184,7 @@ def _asset(record, target, edition):
             if names != expected or len(names) != len(set(names)):
                 raise ValueError("Archive member identity differs from the frozen package")
             info = json.loads(archive.read(root + "/info.json").decode("utf-8"))
+            changelog = archive.read(root + "/changelog.txt")
     except (OSError, zipfile.BadZipFile, KeyError, UnicodeDecodeError, json.JSONDecodeError) as error:
         raise ValueError("Archive has invalid frozen player metadata") from error
     dependencies = info.get("dependencies")
@@ -191,6 +193,8 @@ def _asset(record, target, edition):
             or not isinstance(dependencies, list) or not dependencies
             or dependencies[0] != "base >= " + edition["minimum_base"]):
         raise ValueError("Archive info.json differs from the declared edition")
+    if not changelog.startswith(SOURCE_CHANGELOG_HEADER):
+        raise ValueError("Archive changelog does not retain the unified source header")
     return {
         "target": target,
         "name": path.name,
