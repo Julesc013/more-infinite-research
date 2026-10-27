@@ -166,7 +166,9 @@ local function assert_force(force, expected, rows, label, ignored_technology, ig
   end
   if type(force.manual_mining_speed_modifier) ~= "number"
       or not close(force.manual_mining_speed_modifier, expected.fields.manual_mining_speed_modifier) then
-    fail(label .. " unrelated scripted offset changed")
+    fail(label .. " unrelated scripted offset changed expected="
+      .. tostring(expected.fields.manual_mining_speed_modifier)
+      .. " actual=" .. tostring(force.manual_mining_speed_modifier))
   end
   return observed_effects
 end

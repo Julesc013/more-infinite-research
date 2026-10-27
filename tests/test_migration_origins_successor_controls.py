@@ -212,7 +212,7 @@ class MigrationOriginSuccessorControls(unittest.TestCase):
         path = (FIXTURE / "control.lua").as_posix()
         self.lua.globals().successor_runtime_path = path
         self.lua.execute(r'''
-          function migration_successor_run_control(target_name,mutate,already_current,effect_case)
+          function migration_successor_run_control(target_name,mutate,already_current,effect_case,actual_offset)
             local callbacks={events={}}
             local direct_name="recipe-prod-research_gears-1"
             local alternate_name="recipe-prod-research_plastic-1"
@@ -272,6 +272,7 @@ class MigrationOriginSuccessorControls(unittest.TestCase):
               return value
             end
             local player, foreign, detached=force("player",2,.1), force("foreign",2,.1), force("detached",2,.1)
+            player.manual_mining_speed_modifier=actual_offset or .125
             if already_current then player.current_research=player.technologies[direct_name];player.research_queue={player.technologies[direct_name]} end
             foreign.research_queue={foreign.technologies[direct_name],foreign.technologies[alternate_name]}
             foreign.current_research=foreign.technologies[direct_name];foreign.research_progress=.42
@@ -420,6 +421,12 @@ class MigrationOriginSuccessorControls(unittest.TestCase):
         self.assertFalse(rejected["ok"])
         self.assertIn("source row changed before candidate work", rejected["message"])
         self.assertEqual(2, rejected["gear"])
+
+        offset_rejected = py(self.lua.eval("migration_successor_run_control")("f200", False, False, None, .25))
+        self.assertFalse(offset_rejected["ok"])
+        self.assertIn("player unrelated scripted offset changed expected=0.125 actual=0.25", offset_rejected["message"])
+        self.assertEqual("completed", offset_rejected["state"]["phase"])
+        self.assertNotIn("f200", offset_rejected["state"].get("successors", {}))
 
     def test_fixture_identity_profiles_and_storage_preservation_contract_are_exact(self):
         f200_info = json.loads((FIXTURE / "info-f200.json").read_text(encoding="utf-8"))
