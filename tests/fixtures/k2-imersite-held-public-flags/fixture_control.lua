@@ -151,14 +151,17 @@ local function prepare_source()
   local holder, carrier = technology(player, HOLDER), technology(player, CARRIER)
   -- A level assignment re-enables a LuaTechnology. Keep the detached private
   -- credit active only after the level/progress seed, without using MIR state.
-  holder.level = 4
   holder.researched = false
+  holder.level = 4
   holder.saved_progress = 0.27
+  carrier.researched = false
+  carrier.level = 4
+  carrier.saved_progress = 0
+  -- Reapply native credit before the final fixture flags: native reset restores
+  -- prototype enabled defaults, including the enabled private carriers.
+  player.reset_technology_effects()
   holder.enabled = true
   holder.visible_when_disabled = false
-  carrier.level = 4
-  carrier.researched = false
-  carrier.saved_progress = 0
   carrier.enabled = false
   carrier.visible_when_disabled = false
   local early, tail = technology(player, EARLY), technology(player, TAIL)
@@ -166,9 +169,6 @@ local function prepare_source()
   early.visible_when_disabled = true
   tail.enabled = false
   tail.visible_when_disabled = false
-  -- A documented engine reset observes the native seed without calling a MIR
-  -- handler. It makes the source native productivity state explicit.
-  player.reset_technology_effects()
   local foreign = game.create_force(FOREIGN)
   foreign.enable_all_prototypes()
   local foreign_early, foreign_tail = technology(foreign, EARLY), technology(foreign, TAIL)
