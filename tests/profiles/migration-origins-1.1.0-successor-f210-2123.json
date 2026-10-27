@@ -5,7 +5,7 @@
   "origin_source_commit": "2fb64822b82569e3b50f0653e361fb7148f18b63",
   "source_fixture_commit": "bec37fb87a05d17cf4cf0225e0458218830fef63",
   "source_fixture_controller_commit": "3ae2711867cd60f6c871f641c331349d941dd8c3",
-  "successor_fixture_commit": "4d604149abf0b0bc4e50895137bfbf23374d4185",
+  "successor_fixture_commit": "d2723b835124a62893d65c601316c1779d94abf5",
   "target": "f210",
   "factorio_line": "2.1",
   "engine": {
@@ -29,7 +29,7 @@
   ],
   "archive_sha256": {
     "mir-fixture-mir5-active-mods-observer_0.1.0.zip": "A15A7D628D66953D2E0C4D4FA288F47CBF9C5678327C7EB3D23ADB5DC78331C0",
-    "mir-fixture-mir5-migration-origin-f200-110-source_0.3.0.zip": "6957A4AE583D59F157C4A516B9596547E3EADA86C2F6207D03717E7E79912885",
+    "mir-fixture-mir5-migration-origin-f200-110-source_0.3.0.zip": "F4C54047A9734180D31C14F18BE38B744F053F399A0D8184961C2B563463C831",
     "more-infinite-research_5.0.21000.zip": "039BC18B70E179DB600E29C8442637DD9972D7AB81E3F0770FDCF1056D6316B4"
   },
   "scope": "Prepared direct F200-to-F210 Base successor of the protected passed MIR 1.1.0 F200 r05 source stage under coherent 3e835be9 MIR5 F210. It asserts the normal nine-effect public module row and three separate retained earned .01 holders; native successor execution remains pending. Space Age planet repair is a separate route and is not selected here."

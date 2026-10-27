@@ -5,7 +5,7 @@
   "origin_source_commit": "2fb64822b82569e3b50f0653e361fb7148f18b63",
   "source_fixture_commit": "bec37fb87a05d17cf4cf0225e0458218830fef63",
   "source_fixture_controller_commit": "3ae2711867cd60f6c871f641c331349d941dd8c3",
-  "successor_fixture_commit": "4d604149abf0b0bc4e50895137bfbf23374d4185",
+  "successor_fixture_commit": "d2723b835124a62893d65c601316c1779d94abf5",
   "target": "f200",
   "factorio_line": "2.0",
   "engine": {
@@ -29,7 +29,7 @@
   ],
   "archive_sha256": {
     "mir-fixture-mir5-active-mods-observer_0.1.0.zip": "723D1E7721449FC26040E5E6629416767BDC20AD79CF8723115846DB662A1F87",
-    "mir-fixture-mir5-migration-origin-f200-110-source_0.2.0.zip": "CB17064C0AEE29C34106F5070C9C006BA5F30D2C9A60457B57C4D0418C5CDABF",
+    "mir-fixture-mir5-migration-origin-f200-110-source_0.2.0.zip": "29F2597180F0BCB8CB25A651A19068678635D42C35A96EE56F6186DE737037E0",
     "more-infinite-research_5.0.20000.zip": "E1C84EA381FAA57BA7089AAD10B1AFD1408666A41AFE13962ABCBA6321EE889D"
   },
   "scope": "Prepared direct F200 successor of the protected passed MIR 1.1.0 F200 r05 source stage under coherent 3e835be9 MIR5 F200. It asserts the normal nine-effect public module row and three separate retained earned .01 holders; native successor execution remains pending and does not qualify an F210 route or current package."
