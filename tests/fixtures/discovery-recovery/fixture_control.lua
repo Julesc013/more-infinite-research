@@ -9,6 +9,7 @@ local OBSERVER = "mir-fixture-mir5-active-mods-observer"
 local CASE = "discovery-recovery"
 local SAVE = "mir5-native-complete"
 local IRON = "recipe-prod-research_iron-1"
+local GEAR = "recipe-prod-research_gears-1"
 local DISCOVERY = "planet-discovery-vulcanus"
 local LOCATION = "vulcanus"
 local PACKS = 32
@@ -91,6 +92,22 @@ local function iron_effects(value, label)
   return .1
 end
 
+local function gear_effects(value, label)
+  local expected = {"casting-iron-gear-wheel", "iron-gear-wheel"}
+  local effects = value.prototype and value.prototype.effects
+  local count = 0
+  for index, effect in ipairs(effects or {}) do
+    count = count + 1
+    local recipe = expected[index]
+    if type(effect) ~= "table" or effect.type ~= "change-recipe-productivity"
+        or effect.recipe ~= recipe or effect.change ~= .1 then
+      fail(label .. " gear effect differs")
+    end
+  end
+  if count ~= #expected then fail(label .. " gear effect differs") end
+  return .1
+end
+
 local function saved_progress(value, label)
   local progress = value.saved_progress
   if type(progress) ~= "number" or progress ~= progress or progress < 0 or progress >= 1 then
@@ -168,6 +185,28 @@ local function assert_queue(force, expected, label, vulcanus_unlocked)
   return actual
 end
 
+local function pause_fixture_iron_queue(force, expected)
+  if type(expected) ~= "table" or expected.current ~= IRON or #(expected.queue or {}) ~= 1
+      or expected.queue[1] ~= IRON or not close(expected.progress, .42) then
+    fail("protected player iron queue is not fixture-owned")
+  end
+  -- LuaForce.research_queue accepts a complete TechnologyID array.  Its exact
+  -- 2.1.23 contract says an empty array cancels only the current queue; never
+  -- use cancel_current_research(), which can also remove dependent entries.
+  force.research_queue = {}
+  local paused = queue_snapshot(force)
+  if paused.current ~= false or #paused.queue ~= 0 then fail("could not pause fixture-owned player iron queue") end
+end
+
+local function restore_fixture_iron_queue(force, expected)
+  -- Restore the captured TechnologyID names first, then the documented
+  -- read/write progress field, and read them back because invalid entries are
+  -- silently dropped by LuaForce.research_queue.
+  force.research_queue = expected.queue
+  force.research_progress = expected.progress
+  assert_queue(force, expected, "restored player iron", location_unlocked(force, "restored player"))
+end
+
 local function research_unit(value, label)
   local packs, seen = {}, {}
   for _, ingredient in ipairs(value.research_unit_ingredients or {}) do
@@ -235,6 +274,32 @@ local function snapshot(force, label)
   }
 end
 
+local function gear_snapshot(force, label)
+  local gear = technology(force, GEAR, label)
+  local recipe = force.recipes and force.recipes["iron-gear-wheel"]
+  if recipe == nil or recipe.valid == false or type(recipe.productivity_bonus) ~= "number" then
+    fail(label .. " iron-gear-wheel productivity is absent")
+  end
+  if type(gear.level) ~= "number" or gear.level < 1 or gear.level % 1 ~= 0 then
+    fail(label .. " gear level is invalid")
+  end
+  return {level = gear.level, bonus = recipe.productivity_bonus, effect = gear_effects(gear, label)}
+end
+
+local function assert_gear_advance(before, after, label)
+  if type(before) ~= "table" or type(after) ~= "table" or after.level ~= before.level + 1
+      or not close(after.effect, before.effect) or not close(after.bonus, before.bonus + before.effect) then
+    fail(label .. " gear lab result differs")
+  end
+end
+
+local function assert_same_gear(actual, expected, label)
+  if type(actual) ~= "table" or type(expected) ~= "table" or actual.level ~= expected.level
+      or not close(actual.bonus, expected.bonus) or not close(actual.effect, expected.effect) then
+    fail(label .. " saved gear state differs")
+  end
+end
+
 local function assert_source_snapshot(force, expected, label, foreign, repaired)
   if type(expected) ~= "table" or type(expected.iron) ~= "table" or type(expected.discovery) ~= "table"
       or type(expected.queue) ~= "table" then fail(label .. " protected source state is malformed") end
@@ -285,6 +350,7 @@ end
 
 local function marker(stage, state, successor)
   local player = snapshot(game.forces.player, "fixture marker player")
+  local gear = successor and gear_snapshot(game.forces.player, "fixture marker gear") or false
   log("[MIR5_NATIVE_FIXTURE] RESULT " .. helpers.table_to_json({
     case = CASE, stage = stage, status = "passed", qualification = "native-runner-readback-required",
     fixture_role = successor and "successor" or "source", source_version = state.source_version,
@@ -292,6 +358,13 @@ local function marker(stage, state, successor)
     successor_actual_labs = successor and successor.actual_labs or 0,
     source_scripted_iron_level = state.player.iron.level,
     source_scripted_iron_plate_bonus = state.player.iron.bonus,
+    player_iron_queue_current = player.queue.current,
+    player_iron_queue_progress = player.queue.progress,
+    successor_gear_level_before = successor and successor.gear_before.level or false,
+    successor_gear_bonus_before = successor and successor.gear_before.bonus or false,
+    successor_gear_level_after = successor and gear.level or false,
+    successor_gear_bonus_after = successor and gear.bonus or false,
+    successor_gear_native_effect = successor and gear.effect or false,
     foreign_iron_progress = state.foreign.queue.progress,
     source_discovery_lab_researched = state.player.discovery.researched,
     source_vulcanus_native_locked_after_discovery = not state.player.discovery.unlocked,
@@ -403,29 +476,44 @@ local function successor_begin()
   local foreign_before = assert_source_snapshot(foreign, state.foreign, "successor foreign", true)
   local iron = technology(player, IRON, "successor player")
   iron_effects(iron, "successor player")
-  local lab, inventory = new_lab(player, "successor iron")
-  local successor = {phase = "await-successor-iron", actual_labs = 0, lab = lab,
-    packs = fill_lab(lab, inventory, iron, "successor iron"), deadline = game.tick + DEADLINE,
-    player_before = player_before, foreign_before = foreign_before}
+  local gear = technology(player, GEAR, "successor player")
+  local gear_before = gear_snapshot(player, "successor player")
+  research_unit(gear, "successor gear")
+  local gear_prerequisites = collect_direct_prerequisites(gear, "successor gear")
+  -- The protected source state has now been fully read and compared.  The
+  -- temporary queue pause is a fixture-owned operation only: it lets the
+  -- unqueued gear family perform the one successor lab without changing the
+  -- saved iron research unit or claiming that the product paused it.
+  pause_fixture_iron_queue(player, player_before.queue)
+  local gear_labels = seed_direct_prerequisites(gear_prerequisites)
+  if player.add_research(gear) ~= true or player.current_research == nil or player.current_research.name ~= GEAR then
+    restore_fixture_iron_queue(player, player_before.queue)
+    fail("could not queue one actual successor gear lab")
+  end
+  local lab, inventory = new_lab(player, "successor gear")
+  local successor = {phase = "await-successor-gear", actual_labs = 0, lab = lab,
+    packs = fill_lab(lab, inventory, gear, "successor gear"), deadline = game.tick + DEADLINE,
+    player_before = player_before, foreign_before = foreign_before, gear_before = gear_before,
+    gear_prerequisites = gear_labels, iron_queue = player_before.queue}
   state.successor = successor
 end
 
 local function complete_successor(state)
   local successor = state.successor
   local player = game.forces.player
-  local iron = technology(player, IRON, "successor player")
   local discovery = technology(player, DISCOVERY, "successor player")
   if discovery.researched ~= true or not location_unlocked(player, "successor player") then
     fail("successor Vulcanus discovery was not retained after candidate lab")
   end
-  if successor.actual_labs ~= 1 or iron.level ~= 4 or iron.researched ~= false
-      or not close((player.recipes["iron-plate"] or {}).productivity_bonus, .3) then
-    fail("actual successor iron lab result differs")
-  end
-  if player.current_research ~= nil or #(player.research_queue or {}) ~= 0 then fail("successor iron queue survived completion") end
+  if successor.actual_labs ~= 1 then fail("actual successor gear lab count differs") end
+  assert_gear_advance(successor.gear_before, gear_snapshot(player, "actual successor gear"), "actual successor gear")
+  restore_fixture_iron_queue(player, successor.iron_queue)
+  assert_source_snapshot(player, state.player, "successor restored player", false,
+    state.source_version == "3.2.0")
   local foreign = game.forces[state.foreign_index]
   assert_source_snapshot(foreign, state.foreign, "successor foreign", true)
   successor.player_after = snapshot(player, "successor player")
+  successor.gear_after = gear_snapshot(player, "successor player")
   successor.foreign_after = snapshot(foreign, "successor foreign")
   successor.phase = "successor-complete"
   -- See the matching source completion boundary above: a completed save is
@@ -450,10 +538,10 @@ function M.apply(stage)
     if state.phase == "await-source-discovery" and event.research.name == DISCOVERY then
       state.source_actual_labs = state.source_actual_labs + 1
       if state.source_actual_labs ~= 1 then fail("source discovery lab completed more than once") end
-    elseif type(state.successor) == "table" and state.successor.phase == "await-successor-iron" and event.research.name == IRON then
-      assert_consumed(state.successor.lab, state.successor.packs, "successor iron")
+    elseif type(state.successor) == "table" and state.successor.phase == "await-successor-gear" and event.research.name == GEAR then
+      assert_consumed(state.successor.lab, state.successor.packs, "successor gear")
       state.successor.actual_labs = state.successor.actual_labs + 1
-      if state.successor.actual_labs ~= 1 then fail("successor iron lab completed more than once") end
+      if state.successor.actual_labs ~= 1 then fail("successor gear lab completed more than once") end
       freeze_lab(state.successor.lab)
       state.successor.phase = "await-successor-observation"
     end
@@ -477,9 +565,9 @@ function M.apply(stage)
     end
     local successor = state.successor
     if type(successor) ~= "table" then fail("successor state is absent") end
-    if successor.phase == "await-successor-iron" then
-      if game.tick > successor.deadline then fail("successor iron lab did not finish") end
-      if successor.lab == nil or successor.lab.valid == false then fail("successor iron lab became invalid") end
+    if successor.phase == "await-successor-gear" then
+      if game.tick > successor.deadline then fail("successor gear lab did not finish") end
+      if successor.lab == nil or successor.lab.valid == false then fail("successor gear lab became invalid") end
       successor.lab.energy = 1000000000
     elseif successor.phase == "await-successor-observation" then
       complete_successor(state)
@@ -492,6 +580,8 @@ function M.apply(stage)
         fail("successor cold reload lost Vulcanus discovery")
       end
       assert_same(player_after, successor.player_after, "successor cold reload player")
+      assert_same_gear(gear_snapshot(game.forces.player, "successor cold reload gear"), successor.gear_after,
+        "successor cold reload gear")
       assert_same(snapshot(foreign, "successor cold reload foreign"), successor.foreign_after, "successor cold reload foreign")
       marker("reload", state, successor)
       reload_reported = true
