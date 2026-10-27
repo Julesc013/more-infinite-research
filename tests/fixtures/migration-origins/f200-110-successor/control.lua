@@ -148,7 +148,28 @@ local function assert_settings()
     if value == nil or value.value ~= expected then fail("published source setting differs: " .. name) end
   end
 end
-local function assert_snapshot(snapshot, names, label, direct_level, direct_progress)
+local function source_row_text(row)
+  if type(row) ~= "table" then return "row=" .. tostring(row) end
+  return "level=" .. tostring(row.level)
+    .. " researched=" .. tostring(row.researched)
+    .. " enabled=" .. tostring(row.enabled)
+    .. " visible=" .. tostring(row.visible)
+    .. " maximum=" .. tostring(row.maximum)
+    .. " saved=" .. tostring(row.saved)
+end
+local function runtime_row_text(value)
+  if type(value) ~= "table" then return "technology=" .. tostring(value) end
+  return "level=" .. tostring(value.level)
+    .. " researched=" .. tostring(value.researched)
+    .. " enabled=" .. tostring(value.enabled)
+    .. " visible=" .. tostring(value.visible_when_disabled)
+    .. " maximum=" .. tostring(value.prototype and value.prototype.max_level)
+    .. " saved=" .. tostring(value.saved_progress)
+end
+local function saved_fraction(value)
+  return type(value) == "number" and value == value and value >= 0 and value < 1
+end
+local function assert_snapshot(snapshot, names, label, direct_level, direct_saved)
   if type(snapshot) ~= "table" or type(snapshot.technologies) ~= "table" or type(snapshot.effects) ~= "table"
       or type(snapshot.recipes) ~= "table" or type(snapshot.fields) ~= "table" then
     fail(label .. " saved source snapshot is malformed")
@@ -159,10 +180,12 @@ local function assert_snapshot(snapshot, names, label, direct_level, direct_prog
   for _, name in ipairs(names) do
     local row = snapshot.technologies[name]
     local expected_level = name == catalogue.direct and direct_level or 2
-    local expected_progress = name == catalogue.direct and direct_progress or 0
+    local expected_progress = name == catalogue.direct and direct_saved or 0
     if type(row) ~= "table" or row.level ~= expected_level or row.researched ~= false or row.enabled ~= true
-        or row.visible ~= false or row.maximum ~= UINT32_MAX or not close(row.saved, expected_progress) then
-      fail(label .. " saved source technology differs: " .. name)
+        or row.visible ~= false or row.maximum ~= UINT32_MAX
+        or (name == catalogue.direct and expected_progress == nil and not saved_fraction(row.saved))
+        or (name ~= catalogue.direct or expected_progress ~= nil) and not close(row.saved, expected_progress) then
+      fail(label .. " saved source technology differs: " .. name .. " " .. source_row_text(row))
     end
     if snapshot.effects[name] ~= source_effect_signature(name) then
       fail(label .. " saved source effect multiset differs: " .. name)
@@ -208,7 +231,8 @@ local function assert_force(force, snapshot, names, label, ignore_direct, candid
       if actual.level ~= expected.level or actual.researched ~= expected.researched or actual.enabled ~= expected.enabled
           or actual.visible_when_disabled ~= expected.visible or actual.prototype.max_level ~= expected.maximum
           or not close(actual.saved_progress, expected.saved) then
-        fail(label .. " retained source technology differs: " .. name)
+        fail(label .. " retained source technology differs: " .. name
+          .. " source{" .. source_row_text(expected) .. "} actual{" .. runtime_row_text(actual) .. "}")
       end
     end
   end
@@ -239,7 +263,10 @@ local function state()
   if #value.roster ~= #names then fail("protected source roster count differs") end
   for index, name in ipairs(names) do if value.roster[index] ~= name then fail("protected source roster differs: " .. name) end end
   assert_snapshot(value.player_snapshot, names, "player", 2, 0)
-  assert_snapshot(value.foreign_snapshot, names, "foreign", 1, .42)
+  -- An active native research queue has its own `research_progress`.  The
+  -- saved technology field is a separate persisted fraction, so preserve its
+  -- actual source value (validated as [0,1)) rather than proxying queue .42.
+  assert_snapshot(value.foreign_snapshot, names, "foreign", 1, nil)
   assert_snapshot(value.detached_snapshot, names, "detached", 1, .27)
   if value.foreign_queue.current ~= catalogue.direct or #value.foreign_queue.queue ~= 2
       or value.foreign_queue.queue[1] ~= catalogue.direct or value.foreign_queue.queue[2] ~= "recipe-prod-research_plastic-1"

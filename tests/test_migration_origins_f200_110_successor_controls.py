@@ -267,7 +267,7 @@ class MigrationOriginF200110SuccessorControls(unittest.TestCase):
     def test_control_keeps_only_the_saved_source_roster_as_earned_state(self):
         control = (FIXTURE / "control.lua").read_text(encoding="utf-8")
         self.assertIn("assert_snapshot(value.player_snapshot, names, \"player\", 2, 0)", control)
-        self.assertIn("assert_snapshot(value.foreign_snapshot, names, \"foreign\", 1, .42)", control)
+        self.assertIn("assert_snapshot(value.foreign_snapshot, names, \"foreign\", 1, nil)", control)
         self.assertIn("assert_snapshot(value.detached_snapshot, names, \"detached\", 1, .27)", control)
         self.assertIn("worker-robot-battery contribution", control)
         self.assertIn("event.by_script ~= false", control)
@@ -290,7 +290,7 @@ class MigrationOriginF200110SuccessorControls(unittest.TestCase):
         self.lua.globals().legacy_module_definitions_path = LEGACY_MODULE_DEFINITIONS.as_posix()
         self.lua.globals().legacy_module_runtime_path = LEGACY_MODULE_RUNTIME.as_posix()
         self.lua.execute(r'''
-          function migration_origin_110_successor_lifecycle(target, source_fixture_name, active_wrapper_name, catalogue_fixture_name, legacy_module_bonus, reset_drops_module_bonus, saved_battery_token, current_recipe_scalar, duplicate_current_recipe)
+          function migration_origin_110_successor_lifecycle(target, source_fixture_name, active_wrapper_name, catalogue_fixture_name, legacy_module_bonus, reset_drops_module_bonus, saved_battery_token, current_recipe_scalar, duplicate_current_recipe, foreign_saved, foreign_queue_progress, foreign_current_saved)
             local callbacks={events={}}
             local env={storage={},logs={},created_labs=0,saved=false,
               script={active_mods={},on_configuration_changed=function(fn) callbacks.configuration=fn end,
@@ -350,11 +350,11 @@ class MigrationOriginF200110SuccessorControls(unittest.TestCase):
               end
               return result
             end
-            local function source_snapshot(direct_level,direct_progress)
+            local function source_snapshot(direct_level,direct_saved)
               local technologies,effects={},{}
               for _,name in ipairs(roster) do
                 technologies[name]={level=name==catalogue.direct and direct_level or 2,researched=false,
-                  enabled=true,visible=false,saved=name==catalogue.direct and direct_progress or 0,maximum=UINT32_MAX}
+                  enabled=true,visible=false,saved=name==catalogue.direct and direct_saved or 0,maximum=UINT32_MAX}
                 effects[name]=source_effect_signature(name)
               end
               return {technologies=technologies,effects=effects,recipes=recipe_values(direct_level>=2),
@@ -380,8 +380,8 @@ class MigrationOriginF200110SuccessorControls(unittest.TestCase):
               end
             end
             local order={}
-            local function make_force(label,index,direct_level,direct_progress)
-              local snapshot=source_snapshot(direct_level,direct_progress)
+            local function make_force(label,index,direct_level,direct_saved)
+              local snapshot=source_snapshot(direct_level,direct_saved)
               local force={name=label,index=index,valid=true,technologies={},recipes={},manual_mining_speed_modifier=0,
                 worker_robots_battery_modifier=.1,research_queue={},research_progress=0,current_research=nil,add_calls=0,reset_calls=0}
               for _,name in ipairs(roster) do
@@ -411,12 +411,15 @@ class MigrationOriginF200110SuccessorControls(unittest.TestCase):
               return force,snapshot
             end
             local player,player_snapshot=make_force("player",1,2,0)
-            local foreign,foreign_snapshot=make_force("foreign",2,1,.42)
+            if foreign_saved==nil then foreign_saved=0 end
+            if foreign_queue_progress==nil then foreign_queue_progress=.42 end
+            local foreign,foreign_snapshot=make_force("foreign",2,1,foreign_saved)
             local detached,detached_snapshot=make_force("detached",3,1,.27)
             player.reset_drops_module_bonus=reset_drops_module_bonus==true
             foreign.current_research=foreign.technologies[catalogue.direct]
             foreign.research_queue={foreign.technologies[catalogue.direct],foreign.technologies["recipe-prod-research_plastic-1"]}
-            foreign.research_progress=.42
+            foreign.research_progress=foreign_queue_progress
+            if foreign_current_saved~=nil then foreign.technologies[catalogue.direct].saved_progress=foreign_current_saved end
             local state={phase="completed",roster=roster,source_labs=1,player_snapshot=player_snapshot,
               foreign_index=2,foreign_snapshot=foreign_snapshot,
               foreign_queue={current=catalogue.direct,queue={catalogue.direct,"recipe-prod-research_plastic-1"},progress=.42},
@@ -504,7 +507,8 @@ class MigrationOriginF200110SuccessorControls(unittest.TestCase):
               player_gear=player.recipes[catalogue.gear_recipe].productivity_bonus,
               player_level=player.technologies[catalogue.direct].level,
               player_manual=player.manual_mining_speed_modifier,player_battery=player.worker_robots_battery_modifier,
-               foreign_progress=foreign.research_progress,detached_progress=detached.technologies[catalogue.direct].saved_progress,
+               foreign_progress=foreign.research_progress,foreign_saved=foreign.technologies[catalogue.direct].saved_progress,
+               detached_progress=detached.technologies[catalogue.direct].saved_progress,
                player_add_calls=player.add_calls,player_reset_calls=player.reset_calls,
                foreign_reset_calls=foreign.reset_calls,detached_reset_calls=detached.reset_calls,order=order,
                marker_counts=marker_counts,
@@ -551,6 +555,7 @@ class MigrationOriginF200110SuccessorControls(unittest.TestCase):
                 self.assertEqual((0, 0), (result["foreign_gear"], result["detached_gear"]))
                 self.assertEqual((0, .1), (result["player_manual"], result["player_battery"]))
                 self.assertEqual((.42, .27), (result["foreign_progress"], result["detached_progress"]))
+                self.assertEqual(0, result["foreign_saved"])
                 self.assertEqual((1, 0, 0), (result["player_reset_calls"], result["foreign_reset_calls"], result["detached_reset_calls"]))
                 self.assertEqual(["reset:player", "save"], result["order"])
                 self.assertEqual(9, result["candidate_module_effects"])
@@ -580,6 +585,38 @@ class MigrationOriginF200110SuccessorControls(unittest.TestCase):
                                  result["marker_counts"])
                 self.assertTrue(result["source_state_changed"])
                 self.assertTrue(result["active_state_changed"])
+
+    def test_control_keeps_foreign_saved_progress_independent_of_active_queue_progress(self):
+        self._install_lifecycle_model()
+        source = json.loads((SOURCE_FIXTURE / "info.json").read_text(encoding="utf-8"))
+        wrapper = json.loads((FIXTURE / "info-f200.json").read_text(encoding="utf-8"))
+        accepted = py(self.lua.eval("migration_origin_110_successor_lifecycle")(
+            "f200", source["name"], wrapper["name"], None, None, False, None, None, False, 0, .42, None))
+        self.assertTrue(accepted["ok"], accepted["message"])
+        self.assertEqual((0, .42), (accepted["foreign_saved"], accepted["foreign_progress"]))
+        self.assertEqual((1, 1), (accepted["created_labs"], accepted["player_add_calls"]))
+
+        opponents = (
+            ("saved", 0, .42, .1,
+             "foreign retained source technology differs: recipe-prod-research_gears-1"),
+            ("queue", 0, .41, None, "foreign queue/progress differs"),
+        )
+        for label, saved, progress, current_saved, expected in opponents:
+            with self.subTest(label=label):
+                result = py(self.lua.eval("migration_origin_110_successor_lifecycle")(
+                    "f200", source["name"], wrapper["name"], None, None, False,
+                    None, None, False, saved, progress, current_saved))
+                self.assertFalse(result["ok"])
+                self.assertIn(expected, result["message"])
+                if label == "saved":
+                    self.assertIn("source{level=1 researched=false enabled=true visible=false maximum=4294967295 saved=0}",
+                                  result["message"])
+                    self.assertIn("actual{level=1 researched=false enabled=true visible=false maximum=4294967295 saved=0.1}",
+                                  result["message"])
+                self.assertEqual((0, 0), (result["created_labs"], result["player_add_calls"]))
+                self.assertFalse(result["saved"])
+                self.assertFalse(result["source_state_changed"])
+                self.assertFalse(result["active_state_changed"])
 
     def test_control_accepts_only_the_exact_native_battery_token_and_current_recipe_float32_token(self):
         self._install_lifecycle_model()
