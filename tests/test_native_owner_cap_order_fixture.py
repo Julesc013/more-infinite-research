@@ -27,6 +27,7 @@ OBSERVER_SHA = "2E1BE5952D2A4CC5C74A0D149E075D247BA110A3FAE5B6768D3EAEBABCEF989C
 MIR_SHA = "E3A65C08AC7798A66FB1BE30D24307B17C8B366DD901953BDE2A09BD6939C8CE"
 INPUT_REVISION = "09a66acc9c613617f95074f23f3fd9a4aab4765b"
 INPUT_RECEIPT = ROOT / "spec/evidence/native-owner-cap-order-pre-disabled-source-inputs-09a66acc9.json"
+FROZEN_PACKAGE_TOOL_SHA256 = "00ED00D66BD558554068405C8882419F852FC2F66646088052888D70E25DA61E"
 FIXTURE_SHAS = {
     "source": "510626DA637A34BA760DF1D3752CA137E8CC65116A9BD83423FEDC2328A01907",
     "canonical": "C903D4B2AC0A98AF4CC28B8BB737C07B19CAC72BBB27C8E3B5DC9E780069482D",
@@ -346,6 +347,22 @@ end
             "spec/evidence/native-owner-cap-order-inputs-5a469182.json",
             "spec/evidence/native-owner-cap-order-inputs-0ddeb251.json",
         ], receipt["historical_prepared_inputs"])
+        self.assertEqual(FROZEN_PACKAGE_TOOL_SHA256, helper["sha256"])
+        with tempfile.TemporaryDirectory() as temporary:
+            temporary = Path(temporary)
+            for row in receipt["stages"]:
+                with self.subTest(current_helper_stage=row["stage"]):
+                    projection = temporary / (row["stage"] + "-projection")
+                    projection.mkdir()
+                    for member in row["members"]:
+                        (projection / member["path"]).write_bytes(subprocess.check_output(
+                            ["git", "show", "HEAD:" + member["source_path"]], cwd=ROOT))
+                    record = PACKAGE.build(projection, temporary / Path(row["archive"]).name)
+                    self.assertEqual((row["sha256"], row["bytes"]),
+                                     (record["sha256"].upper(), record["bytes"]))
+                    self.assertEqual([{"path": member["path"], "sha256": member["sha256"].lower(),
+                                       "bytes": member["bytes"]}
+                                      for member in row["members"]], record["members"])
 
     def test_data_stages_preflight_before_only_the_permuted_fixture_write(self):
         for stage, (_, cap, recipes) in STAGES.items():

@@ -419,17 +419,26 @@ end
         expected = {name: f"tests/fixtures/bob-angel-f210-science-oil/{name}"
                     for name in ("info.json", "control.lua", "data-final-fixes.lua", "fixture_facts.lua")}
         self.assertEqual(expected, {row["path"]: row["source_path"] for row in fixture["members"]})
-        for row in fixture["members"]:
-            for revision in (INPUT_REVISION, "HEAD"):
+        for revision in (INPUT_REVISION, "HEAD"):
+            for row in fixture["members"]:
                 raw = subprocess.check_output(["git", "show", f"{revision}:{row['source_path']}"], cwd=ROOT)
                 self.assertEqual((row["sha256"], row["bytes"]),
                                  (hashlib.sha256(raw).hexdigest().upper(), len(raw)),
                                  f"{revision}:{row['source_path']}")
         helper = receipt["package_tool"]
-        for revision in (INPUT_REVISION, "HEAD"):
-            raw_helper = subprocess.check_output(["git", "show", f"{revision}:{helper['path']}"], cwd=ROOT)
-            self.assertEqual(helper["committed_sha256"], hashlib.sha256(raw_helper).hexdigest().upper(),
-                             f"{revision}:{helper['path']}")
+        raw_helper = subprocess.check_output(["git", "show", f"{INPUT_REVISION}:{helper['path']}"], cwd=ROOT)
+        self.assertEqual(helper["committed_sha256"], hashlib.sha256(raw_helper).hexdigest().upper(),
+                         f"{INPUT_REVISION}:{helper['path']}")
+        with tempfile.TemporaryDirectory() as temporary:
+            projection = Path(temporary) / "fixture-projection"
+            projection.mkdir()
+            for row in fixture["members"]:
+                (projection / row["path"]).write_bytes(subprocess.check_output(
+                    ["git", "show", f"{INPUT_REVISION}:{row['source_path']}"], cwd=ROOT))
+            record = PACKAGE.build(projection, Path(temporary) / FIXTURE_ARCHIVE)
+            self.assertEqual((FIXTURE_SHA, FIXTURE_BYTES), (record["sha256"].upper(), record["bytes"]))
+            self.assertEqual([{"path": row["path"], "sha256": row["sha256"].lower(), "bytes": row["bytes"]}
+                              for row in fixture["members"]], record["members"])
         expected_profiles = {
             "tests/profiles/bob-angel-f210-science-oil-mir5-base-f210-2123.json",
             "tests/profiles/bob-angel-f210-science-oil-mir5-space-age-f210-2123.json",

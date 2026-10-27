@@ -198,6 +198,83 @@ class PackageTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, "adaptation remains incomplete"):
                 pack.members(ROOT / "source", target="f200", editions=editions)
 
+    def test_generic_local_mir_version_updates_only_its_declared_runtime_target(self):
+        source = ROOT / "source"
+        source_info, source_rows = pack.members(source)
+        source_files = dict(source_rows)
+        selected_info, selected_rows = pack.members(source, target="f210")
+
+        local_version = "6.1.21002"
+        local_info, local_rows = pack.members(source, version=local_version)
+        local_files = dict(local_rows)
+
+        self.assertEqual(local_info["version"], local_version)
+        self.assertEqual(json.loads(local_files["info.json"])["version"], local_version)
+        self.assertIn(local_version.encode("ascii"), local_files["changelog.txt"])
+        expected_target = source_files["platform/target.lua"].replace(
+            source_info["version"].encode("ascii"), local_version.encode("ascii"))
+        self.assertEqual(local_files["platform/target.lua"], expected_target)
+        changed = {"info.json", "changelog.txt", "platform/target.lua"}
+        self.assertEqual({name: data for name, data in local_files.items() if name not in changed},
+                         {name: data for name, data in source_files.items() if name not in changed})
+
+        # A generic local-version call cannot alter selected-target materialization.
+        selected_after_info, selected_after_rows = pack.members(source, target="f210")
+        self.assertEqual((selected_after_info, selected_after_rows), (selected_info, selected_rows))
+
+        with tempfile.TemporaryDirectory() as temporary:
+            output = Path(temporary) / "wrong/more-infinite-research_5.0.20000.zip"
+            for wrong_edition in ("5.0.20000", "5.0.01501"):
+                with self.subTest(version=wrong_edition):
+                    with self.assertRaisesRegex(ValueError, "different MIR edition"):
+                        pack.build(source, output, version=wrong_edition)
+                    self.assertFalse(output.exists())
+                    self.assertFalse(output.parent.exists())
+
+    def test_generic_local_mir_version_refuses_malformed_target_contract_and_leaves_fixture_lua_raw(self):
+        source = ROOT / "source"
+        _, rows = pack.members(source)
+        files = dict(rows)
+        target = files["platform/target.lua"]
+        malformed = {
+            "missing": target.replace(b"distribution_version", b"distribution_verson"),
+            "duplicate": target + b'\n  distribution_version="5.0.21000",\n',
+            "missing-id": target.replace(b"id=", b"edition="),
+            "duplicate-id": target + b'\n  id="f210",\n',
+            "malformed-duplicate-id": target + b'\n  id="poison",\n',
+            "wrong-source-codec": target.replace(b'id="f210"', b'id="f200"'),
+            "malformed-duplicate-version": target + b'\n  distribution_version="poison",\n',
+        }
+        for name, broken_target in malformed.items():
+            with self.subTest(contract=name):
+                broken = dict(files, **{"platform/target.lua": broken_target})
+                with self.assertRaisesRegex(ValueError, "source target"):
+                    pack.members(source, version="5.0.21001", committed_files=broken)
+                if name.startswith("malformed-duplicate"):
+                    with tempfile.TemporaryDirectory() as temporary:
+                        fixture = Path(temporary) / "source"
+                        (fixture / "platform").mkdir(parents=True)
+                        (fixture / "info.json").write_bytes(files["info.json"])
+                        (fixture / "data.lua").write_text("data:extend({})\n")
+                        (fixture / "platform/target.lua").write_bytes(broken_target)
+                        output = Path(temporary) / "never/more-infinite-research_5.0.21001.zip"
+                        with self.assertRaisesRegex(ValueError, "source target"):
+                            pack.build(fixture, output, version="5.0.21001")
+                        self.assertFalse(output.exists())
+                        self.assertFalse(output.parent.exists())
+
+        with tempfile.TemporaryDirectory() as temporary:
+            fixture = Path(temporary) / "fixture"
+            (fixture / "platform").mkdir(parents=True)
+            (fixture / "info.json").write_text(json.dumps({"name": "test-fixture", "version": "0.1.0"}))
+            (fixture / "data.lua").write_text("data:extend({})\n")
+            decoy = b'return { id="f210", distribution_version="0.1.0" }\n'
+            (fixture / "platform/target.lua").write_bytes(decoy)
+            _, fixture_rows = pack.members(fixture, version="0.2.0")
+            fixture_files = dict(fixture_rows)
+            self.assertEqual(fixture_files["platform/target.lua"], decoy)
+            self.assertEqual(json.loads(fixture_files["info.json"])["version"], "0.2.0")
+
     def test_selected_edition_missing_module_refuses_instead_of_shipping_broken_imports(self):
         source = ROOT / "source"
         _, rows = pack.members(source)
