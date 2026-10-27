@@ -1,0 +1,144 @@
+{
+  "schema": 1,
+  "kind": "MIR5CommittedAssetFreezeReadbackV1",
+  "status": "offline-build-verify-and-primary-hash-readback-pass",
+  "machine": "BLACKGLASS-WIN1",
+  "source_commit": "535e8d97f12c6b482d2d2e1c677fb64589dd64ed",
+  "player_source_tree": "be97756eca9690f16868ab5d8f8800cc28803258",
+  "inventory_sha256": "814C68671C25DB22850699F6E64BE219D03034A2BCE5EC867D9EF68D6A2207F7",
+  "inventory_internal_sha256": "D8FC9FE21B3E87F39A23BDD5D4031AF89B7A9F53E44F472DEED7241C5B04FC0C",
+  "normal_edition_count": 10,
+  "best_effort_edition_count": 7,
+  "file_count": 20,
+  "total_bytes": 6142839,
+  "primary_custody": "build/mir5/assets/535e8d97-r01",
+  "primary_readback": {
+    "path": "build/mir5/recovery/assets-535e8d97-primary-readback-r01.json",
+    "sha256": "7C196F4A192FDDB41D3A8AF173EB999B0B625E7548A12A10E9E835CD12887853"
+  },
+  "files": [
+    {
+      "name": "MIR5ReleaseAssetInventoryV1.json",
+      "bytes": 208528,
+      "sha256": "814C68671C25DB22850699F6E64BE219D03034A2BCE5EC867D9EF68D6A2207F7"
+    },
+    {
+      "name": "more-infinite-research_5.0.00600.zip",
+      "bytes": 135634,
+      "sha256": "C6DF42DFFBC53138FFF9DC007F1524F91CB03EB7A8608CE889F582ED65EA4518"
+    },
+    {
+      "name": "more-infinite-research_5.0.00700.zip",
+      "bytes": 135634,
+      "sha256": "BC4EBA958A75F7FBE3ADC95980A08166B5639D967CB70706FE73F08310ADBF38"
+    },
+    {
+      "name": "more-infinite-research_5.0.00800.zip",
+      "bytes": 135632,
+      "sha256": "A89DB896FFD665F8AA0FC0A72274EA59CD1E4DA19047EE2E4AF700B6159B3E4E"
+    },
+    {
+      "name": "more-infinite-research_5.0.00900.zip",
+      "bytes": 135634,
+      "sha256": "85EEAF944DF4E6AA6AAB54F5C9A72116ACD73B5DF1DBF6E9913DF0D0BFE919CF"
+    },
+    {
+      "name": "more-infinite-research_5.0.01000.zip",
+      "bytes": 135633,
+      "sha256": "7FE749B17A13BE8CEEE5F7F592AB51FB493405A4DA2CD587B09936AF4555F1B7"
+    },
+    {
+      "name": "more-infinite-research_5.0.01100.zip",
+      "bytes": 135634,
+      "sha256": "08A491715946DEABED870A2E7C901F00DB09F81DD9D45DDBD0E7BFB2DBA00FED"
+    },
+    {
+      "name": "more-infinite-research_5.0.01200.zip",
+      "bytes": 135636,
+      "sha256": "15378FD49561AA24B70E76834B68E6FD88C01D36AA615FD0C9C0F2443D3CEC09"
+    },
+    {
+      "name": "more-infinite-research_5.0.01300.zip",
+      "bytes": 453111,
+      "sha256": "4BC654E9E1D3588EBF493789918EAAB843BF3FF28FA116116EA3EC977CF74347"
+    },
+    {
+      "name": "more-infinite-research_5.0.01400.zip",
+      "bytes": 453114,
+      "sha256": "6506AD38ABC319DA7FA59DD7949E750885BED5360BF4353D463267218C227296"
+    },
+    {
+      "name": "more-infinite-research_5.0.01500.zip",
+      "bytes": 453113,
+      "sha256": "DC9186ED222973187D1EA2A9394467BCDEAE2318385853BE189E40A266371426"
+    },
+    {
+      "name": "more-infinite-research_5.0.01600.zip",
+      "bytes": 453115,
+      "sha256": "19F7ECA87F7016AC80B9D54B4E56FE6BD6279A720A1C855145E02E763F685F65"
+    },
+    {
+      "name": "more-infinite-research_5.0.01700.zip",
+      "bytes": 453114,
+      "sha256": "6412F8FC90DDE3F954747DBA6E4715D141C3A27141D89555DA0CC8B823D2CF30"
+    },
+    {
+      "name": "more-infinite-research_5.0.01800.zip",
+      "bytes": 453115,
+      "sha256": "06CB88A526D7B3FCD428C00D606B0660BADF870498E3CACFC1ABE869A888B4BA"
+    },
+    {
+      "name": "more-infinite-research_5.0.10000.zip",
+      "bytes": 453101,
+      "sha256": "1B37CC738EE55C0D3509C1D4BB0334BD5A4E6BC5CFDF2E4BFB1D34681F2F98AE"
+    },
+    {
+      "name": "more-infinite-research_5.0.11000.zip",
+      "bytes": 453414,
+      "sha256": "4DC7269404A4627A182D1120696EF8EE8A3220D9C3A9DDE280F9034E6D633A35"
+    },
+    {
+      "name": "more-infinite-research_5.0.20000.zip",
+      "bytes": 678772,
+      "sha256": "C5695DBA86046627250185F0A9F2F0706E0179627F45685381ACC046F78FA9FB"
+    },
+    {
+      "name": "more-infinite-research_5.0.21000.zip",
+      "bytes": 679154,
+      "sha256": "90F252545F4BDE0E6D5F980B552366F0101EA77F2D5CBCA162A48906A8D0C2DD"
+    },
+    {
+      "name": "SHA256SUMS-early.txt",
+      "bytes": 721,
+      "sha256": "DF36C32CEB3C504BF8B1BA8CD3269CAB7546532927B9DD67DB6C56D4E2246116"
+    },
+    {
+      "name": "SHA256SUMS.txt",
+      "bytes": 1030,
+      "sha256": "4F5A571920406B406D6EE2385BAF4BD20049BC9A7882BB5FB01D124902323A31"
+    }
+  ],
+  "previous_freeze": "spec/evidence/current-assets-6873c211-aero-readback.json",
+  "member_delta": {
+    "all_seventeen_archives": [
+      "changelog.txt"
+    ],
+    "additional_f200_and_f210_members": [
+      "compatibility/modern_catalogue.lua",
+      "compatibility/modern_catalogue/bob_angel_f210.lua"
+    ],
+    "other_members_byte_identical": true
+  },
+  "validation": [
+    "Existing tools/release.py builds all ten normal and seven best-effort editions from the exact accepted committed source.",
+    "Existing tools/release.py --verify passes the complete inventory.",
+    "Every external and primary file is independently rehashed and identical; package member deltas are compared to the retained6873 cohort."
+  ],
+  "limits": [
+    "Offline package provenance only; no native, gameplay, save, client, timing or release verdict.",
+    "The compatibility correction activates only in selected F210 Bob/Angel profiles. Affected native observations remain required.",
+    "The later source does not relabel earlier results: reuse requires the consumed-input proof in VER-06.",
+    "Independent Aero rebuild remains separate; this record claims only the actual Black Glass build/readback.",
+    "F006-F012 remain separately labelled best-effort data-only builds. No F001-F005 distribution is invented."
+  ]
+}
