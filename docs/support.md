@@ -24,9 +24,9 @@ An ecosystem name is not a test result. Support records should identify exact Fa
 
 ## Candidate editions
 
-Factorio **2.1 with minimum base 2.1.23 (F210)** is the primary design target. The normal editions retain their actual capability subsets and the existing version encoding, composed from shared source and narrow adapters. Every delivered edition requires final current-package and affected native qualification; records distinguish each edition's observed results and remaining gaps. Primary-target priority does not qualify an earlier edition or remove its release obligations.
+Factorio **2.1 with minimum base 2.1.23 (F210)** is the primary design target. The nine stable editions retain their actual capability subsets and the existing version encoding, composed from shared source and narrow adapters. Every stable delivered edition requires final current-package and affected native qualification; records distinguish each edition's observed results and remaining gaps. Primary-target priority does not qualify an earlier stable edition or remove its release obligations.
 
-The [tracked edition record](../targets/editions.json) selects one self-contained player ZIP for each engine family. The following are selected baseline engine minimums; they do not announce completed final-package acceptance. F018/0.18.47 is newly selected, with its source/build port integrated; actual all-science, forward-continuity and exact-engine/save qualification remain pending. Select the same engine family when upgrading, rather than install another target's ZIP because its distribution number is larger.
+The [tracked edition record](../targets/editions.json) selects one self-contained player ZIP for each stable engine family plus the F018 experimental build. The following are selected baseline engine minimums; they do not announce completed final-package acceptance. F018/0.18.47 is GitHub-only best effort: its source/build port is integrated, but only correct metadata/package information and an actual0.18 native load/crash smoke are in scope, not an upgrade recommendation. For stable upgrades, select the same engine family rather than another target's ZIP because its distribution number is larger.
 
 | Target | Factorio family | Minimum base | MIR5 distribution |
 |---|---|---|---|
@@ -34,7 +34,7 @@ The [tracked edition record](../targets/editions.json) selects one self-containe
 | F200 | 2.0 | 2.0.77 | 5.0.20000 |
 | F110 | 1.1 | 1.1.110 | 5.0.11000 |
 | F100 | 1.0 | 1.0.0 | 5.0.10000 |
-| F018 | 0.18 | 0.18.47 | 5.0.01800 — native qualification pending |
+| F018 | 0.18 | 0.18.47 | 5.0.01800 — GitHub-only experimental; native load/crash smoke pending |
 | F017 | 0.17 | 0.17.79 | 5.0.01700 |
 | F016 | 0.16 | 0.16.51 | 5.0.01600 |
 | F015 | 0.15 | 0.15.40 | 5.0.01500 |
@@ -47,7 +47,7 @@ Modern targets expose recipe productivity and the Research Library. Expansion re
 
 The separately selected [early-edition record](../targets/early-editions.json) builds F006/0.6.4, F007/0.7.5, F008/0.8.8, F009/0.9.8, F010/0.10.12, F011/0.11.22 and F012/0.12.35. These are data-only fixed finite research subsets recovered from the museum releases, with14/22/22/22/22/22/26 technologies respectively. They have no startup settings, runtime API, Library or migrations, and have not passed current native or save qualification. They are best-effort GitHub artifacts outside the normal-edition native acceptance claim. F006–F008 transport ZIPs require extraction into the engine mods folder; do not infer direct ZIP loading. Preserve original saves and installation files.
 
-F001/0.1.2 and F002/0.2.10 lack an evidenced standalone-mod format. F003/0.3.2, F004/0.4.1 and F005/0.5.3 lack supplied exact engine/prototype inputs, so no build or native pass is claimed. F018/0.18.47 was excluded from the inherited baseline but is now selected as a normal edition, with source/build integration complete and actual native/forward-save qualification pending. Missing editions are recorded explicitly instead of filled with empty packages. The [target contract](../spec/targets.md#additional-historical-editions) owns these limits and their release disposition.
+F001/0.1.2 and F002/0.2.10 lack an evidenced standalone-mod format. F003/0.3.2, F004/0.4.1 and F005/0.5.3 lack supplied exact engine/prototype inputs, so no build or native pass is claimed. F018/0.18.47 is selected for a permanent GitHub-only experimental package, not a stable or Portal edition. It reuses F100 mechanics and compatible inputs only where justified, has metadata/package and actual native load/crash-smoke scope, and does not inherit an F100 native result or stable save/modpack/science/client/performance obligations. Its missing0.18 engine/input does not block the nine stable editions. Missing editions are recorded explicitly instead of filled with empty packages. The [target contract](../spec/targets.md#additional-historical-editions) owns these limits and their release disposition.
 
 ## First upgrade
 
