@@ -1,0 +1,558 @@
+{
+  "schema": 1,
+  "kind": "MIR5FixtureRoleRelocationReadbackV1",
+  "status": "byte-identical-active-role-relocation",
+  "role_mapping": {
+    "mir5": "successor",
+    "mir5-*": "successor-*"
+  },
+  "parent_commit": "902c4ff8187679ac80e637b169f9fd96a98ff90f",
+  "relocation_commit": "223bec4b008a48de03d854ff86582e447e4b425c",
+  "player_source_tree": "ffc5f2e3359de4f326a184cf6a3c29a55941150a",
+  "payload_count": 108,
+  "payloads": [
+    {
+      "old_path": "tests/fixtures/aai-parity-native/mir5/catalogue.lua",
+      "successor_path": "tests/fixtures/aai-parity-native/successor/catalogue.lua",
+      "sha256": "98CD3A05376D844AFB881ACA6F88C827E928DC9F7B4A94387CDA1B806735C2EC"
+    },
+    {
+      "old_path": "tests/fixtures/aai-parity-native/mir5/control.lua",
+      "successor_path": "tests/fixtures/aai-parity-native/successor/control.lua",
+      "sha256": "E867E2CB36B6C3C77A407F785DDD7CEFB73C05436DB26398FAA97A99EBB30820"
+    },
+    {
+      "old_path": "tests/fixtures/aai-parity-native/mir5/data-final-fixes.lua",
+      "successor_path": "tests/fixtures/aai-parity-native/successor/data-final-fixes.lua",
+      "sha256": "14093B7430ABD57510717B09362624EE50B66BA6A9496CC7C4FB411546F64D0B"
+    },
+    {
+      "old_path": "tests/fixtures/aai-parity-native/mir5/info.json",
+      "successor_path": "tests/fixtures/aai-parity-native/successor/info.json",
+      "sha256": "2BC40173678A054A52730C4E511AB95F49303F2C13CBEF05B58B8FBA1B550118"
+    },
+    {
+      "old_path": "tests/fixtures/bob-angel-continuity/mir5/control.lua",
+      "successor_path": "tests/fixtures/bob-angel-continuity/successor/control.lua",
+      "sha256": "9F7BE827F64847ED38D6F739491DB1059632018DB88FCAC8E3784A7558863E1A"
+    },
+    {
+      "old_path": "tests/fixtures/bob-angel-continuity/mir5/data-final-fixes.lua",
+      "successor_path": "tests/fixtures/bob-angel-continuity/successor/data-final-fixes.lua",
+      "sha256": "59325432E5C35E5F38F502A31173CAEF99D15714BD05120F7D47F999FFE67398"
+    },
+    {
+      "old_path": "tests/fixtures/bob-angel-continuity/mir5/data.lua",
+      "successor_path": "tests/fixtures/bob-angel-continuity/successor/data.lua",
+      "sha256": "6B1E6B4B6211ABA0106998C9A2AFE583DA1393BD7BF295222E3BAB97F204B2BB"
+    },
+    {
+      "old_path": "tests/fixtures/bob-angel-continuity/mir5/info.json",
+      "successor_path": "tests/fixtures/bob-angel-continuity/successor/info.json",
+      "sha256": "4BC0DE4461B4021A70066762466D4CB6A9D730194E993DB12A4DD7C6F3B507E4"
+    },
+    {
+      "old_path": "tests/fixtures/competing-dynamic-gameplay/ce/mir5-prefer-foreign/data-final-fixes.lua",
+      "successor_path": "tests/fixtures/competing-dynamic-gameplay/ce/successor-prefer-foreign/data-final-fixes.lua",
+      "sha256": "EBA276B386ED0BA31677AA7C4B4D7FFFB5F2FBBE8EA357518F6A0C6DAF79B59B"
+    },
+    {
+      "old_path": "tests/fixtures/competing-dynamic-gameplay/ce/mir5-prefer-foreign/info.json",
+      "successor_path": "tests/fixtures/competing-dynamic-gameplay/ce/successor-prefer-foreign/info.json",
+      "sha256": "90662FE2B27E691E8FFAEA55F2DF8633558DA5B9AE12946A413D520149B47C7A"
+    },
+    {
+      "old_path": "tests/fixtures/competing-dynamic-gameplay/ce/mir5-prefer-foreign/settings-updates.lua",
+      "successor_path": "tests/fixtures/competing-dynamic-gameplay/ce/successor-prefer-foreign/settings-updates.lua",
+      "sha256": "8AD5F6232C1A5F1BBB91F89C9BADF10963839416A77A918028C47D8ADF55A4D1"
+    },
+    {
+      "old_path": "tests/fixtures/competing-dynamic-gameplay/ce/mir5-prefer-mir/data-final-fixes.lua",
+      "successor_path": "tests/fixtures/competing-dynamic-gameplay/ce/successor-prefer-mir/data-final-fixes.lua",
+      "sha256": "EBA276B386ED0BA31677AA7C4B4D7FFFB5F2FBBE8EA357518F6A0C6DAF79B59B"
+    },
+    {
+      "old_path": "tests/fixtures/competing-dynamic-gameplay/ce/mir5-prefer-mir/info.json",
+      "successor_path": "tests/fixtures/competing-dynamic-gameplay/ce/successor-prefer-mir/info.json",
+      "sha256": "A1A44757DE56B1DE6E51BB0563C23DCDE956ABC96C7A7304A633E9CFC2AE0FB6"
+    },
+    {
+      "old_path": "tests/fixtures/competing-dynamic-gameplay/ce/mir5-prefer-mir/settings-updates.lua",
+      "successor_path": "tests/fixtures/competing-dynamic-gameplay/ce/successor-prefer-mir/settings-updates.lua",
+      "sha256": "BAE66B096A4453D00FF74B82FE6E18616330791AFF141D0A4091E43A4F67F6A0"
+    },
+    {
+      "old_path": "tests/fixtures/competing-dynamic-gameplay/pr/mir5-prefer-foreign/data-final-fixes.lua",
+      "successor_path": "tests/fixtures/competing-dynamic-gameplay/pr/successor-prefer-foreign/data-final-fixes.lua",
+      "sha256": "EBA276B386ED0BA31677AA7C4B4D7FFFB5F2FBBE8EA357518F6A0C6DAF79B59B"
+    },
+    {
+      "old_path": "tests/fixtures/competing-dynamic-gameplay/pr/mir5-prefer-foreign/info.json",
+      "successor_path": "tests/fixtures/competing-dynamic-gameplay/pr/successor-prefer-foreign/info.json",
+      "sha256": "0D90AD0D95D531D9044E248241C30B3FCCA996D159B736C8D7EA68E6CE15E6AF"
+    },
+    {
+      "old_path": "tests/fixtures/competing-dynamic-gameplay/pr/mir5-prefer-foreign/settings-updates.lua",
+      "successor_path": "tests/fixtures/competing-dynamic-gameplay/pr/successor-prefer-foreign/settings-updates.lua",
+      "sha256": "B31DFB69EA2AA09A652C84539BFF3F3D47FD2973632CDFBF9636ADE3E0F63109"
+    },
+    {
+      "old_path": "tests/fixtures/competing-dynamic-gameplay/pr/mir5-prefer-mir/data-final-fixes.lua",
+      "successor_path": "tests/fixtures/competing-dynamic-gameplay/pr/successor-prefer-mir/data-final-fixes.lua",
+      "sha256": "EBA276B386ED0BA31677AA7C4B4D7FFFB5F2FBBE8EA357518F6A0C6DAF79B59B"
+    },
+    {
+      "old_path": "tests/fixtures/competing-dynamic-gameplay/pr/mir5-prefer-mir/info.json",
+      "successor_path": "tests/fixtures/competing-dynamic-gameplay/pr/successor-prefer-mir/info.json",
+      "sha256": "85C3C07987784F51825BDEF54B3BB24814A92F97EED01A5F72C4E600E1DC46B3"
+    },
+    {
+      "old_path": "tests/fixtures/competing-dynamic-gameplay/pr/mir5-prefer-mir/settings-updates.lua",
+      "successor_path": "tests/fixtures/competing-dynamic-gameplay/pr/successor-prefer-mir/settings-updates.lua",
+      "sha256": "7C84986097B3D4406ADE584FBE9BC41A63F62119BF10D15ADB270A9F4E1C5383"
+    },
+    {
+      "old_path": "tests/fixtures/competing-epr/mir5-prefer-foreign/control.lua",
+      "successor_path": "tests/fixtures/competing-epr/successor-prefer-foreign/control.lua",
+      "sha256": "6A3634A4BE83DA37F6489CBF8DFEC40D2BF77A134E529FE53642F07DC7D82BF1"
+    },
+    {
+      "old_path": "tests/fixtures/competing-epr/mir5-prefer-foreign/data-final-fixes.lua",
+      "successor_path": "tests/fixtures/competing-epr/successor-prefer-foreign/data-final-fixes.lua",
+      "sha256": "62B4385AA1C515CA975609236DD40D67FAC7A26FBDFFE8BE61BE513A38B8827D"
+    },
+    {
+      "old_path": "tests/fixtures/competing-epr/mir5-prefer-foreign/info.json",
+      "successor_path": "tests/fixtures/competing-epr/successor-prefer-foreign/info.json",
+      "sha256": "A062CF345B958C7D12BF46F9CCB3B28D104F05DD929F2EEFBFE1C0755B079003"
+    },
+    {
+      "old_path": "tests/fixtures/competing-epr/mir5-prefer-foreign/settings-updates.lua",
+      "successor_path": "tests/fixtures/competing-epr/successor-prefer-foreign/settings-updates.lua",
+      "sha256": "9DA95F42197F9666EEAAF4A42397A9F2FD677BDE2AC95C8AC7DAD54764EB7E71"
+    },
+    {
+      "old_path": "tests/fixtures/competing-epr/mir5-prefer-mir/control.lua",
+      "successor_path": "tests/fixtures/competing-epr/successor-prefer-mir/control.lua",
+      "sha256": "3B7D0155F5896D928C8DCB48D3825FFCCA9D63B55C04050E7D699664A308634B"
+    },
+    {
+      "old_path": "tests/fixtures/competing-epr/mir5-prefer-mir/data-final-fixes.lua",
+      "successor_path": "tests/fixtures/competing-epr/successor-prefer-mir/data-final-fixes.lua",
+      "sha256": "62B4385AA1C515CA975609236DD40D67FAC7A26FBDFFE8BE61BE513A38B8827D"
+    },
+    {
+      "old_path": "tests/fixtures/competing-epr/mir5-prefer-mir/info.json",
+      "successor_path": "tests/fixtures/competing-epr/successor-prefer-mir/info.json",
+      "sha256": "C854C9DB024CF67AFE5B6CD9BB492637B91670A9389AC97B1F5A3130BAB097F5"
+    },
+    {
+      "old_path": "tests/fixtures/competing-epr/mir5-prefer-mir/settings-updates.lua",
+      "successor_path": "tests/fixtures/competing-epr/successor-prefer-mir/settings-updates.lua",
+      "sha256": "F0EF09DA34E09752AA9B5BF3EC3057B8BD81F4F2B612697A4404047B9ECBD9D8"
+    },
+    {
+      "old_path": "tests/fixtures/competing-fixed-gameplay/mir5-prefer-foreign-providers-readded/data-final-fixes.lua",
+      "successor_path": "tests/fixtures/competing-fixed-gameplay/successor-prefer-foreign-providers-readded/data-final-fixes.lua",
+      "sha256": "717FF62125001A22ABBBD81C0B3D2FC9B9461901538D77F6C40246969825A0D1"
+    },
+    {
+      "old_path": "tests/fixtures/competing-fixed-gameplay/mir5-prefer-foreign-providers-readded/info.json",
+      "successor_path": "tests/fixtures/competing-fixed-gameplay/successor-prefer-foreign-providers-readded/info.json",
+      "sha256": "8500E6F7726D0CA4B17274590CFA567FB2705FAFB0F8F506F002A9384935DB28"
+    },
+    {
+      "old_path": "tests/fixtures/competing-fixed-gameplay/mir5-prefer-foreign-providers-readded/settings-updates.lua",
+      "successor_path": "tests/fixtures/competing-fixed-gameplay/successor-prefer-foreign-providers-readded/settings-updates.lua",
+      "sha256": "4841E4873986B47878E1310C4BFDE691920E32237C921B49084212F916C03DDF"
+    },
+    {
+      "old_path": "tests/fixtures/competing-fixed-gameplay/mir5-prefer-foreign-providers-removed/data-final-fixes.lua",
+      "successor_path": "tests/fixtures/competing-fixed-gameplay/successor-prefer-foreign-providers-removed/data-final-fixes.lua",
+      "sha256": "3946EA391E93351C4440995C95EF0FFB64F072CAAFC35CD8E98E5541AC55ABA4"
+    },
+    {
+      "old_path": "tests/fixtures/competing-fixed-gameplay/mir5-prefer-foreign-providers-removed/info.json",
+      "successor_path": "tests/fixtures/competing-fixed-gameplay/successor-prefer-foreign-providers-removed/info.json",
+      "sha256": "D0D4039711BD03905FB4C43C33830BA5F530CDEF2B5D27A79B50874913FEB11F"
+    },
+    {
+      "old_path": "tests/fixtures/competing-fixed-gameplay/mir5-prefer-foreign-providers-removed/settings-updates.lua",
+      "successor_path": "tests/fixtures/competing-fixed-gameplay/successor-prefer-foreign-providers-removed/settings-updates.lua",
+      "sha256": "54A58EBB0CA50BA4E1AAA780C282AA61A00CCC8468EE95DAB996FA86D702F41F"
+    },
+    {
+      "old_path": "tests/fixtures/competing-fixed-gameplay/mir5-prefer-foreign/data-final-fixes.lua",
+      "successor_path": "tests/fixtures/competing-fixed-gameplay/successor-prefer-foreign/data-final-fixes.lua",
+      "sha256": "B3A3450D5E9260EFE6E97DFBFC426A7B5BE7FF2971C4A5E065BAAC6F53372355"
+    },
+    {
+      "old_path": "tests/fixtures/competing-fixed-gameplay/mir5-prefer-foreign/info.json",
+      "successor_path": "tests/fixtures/competing-fixed-gameplay/successor-prefer-foreign/info.json",
+      "sha256": "361626654673B4CE1D8C3586E865E00419EAB1BE60CB3BE28F9DAD7A45D3C7D7"
+    },
+    {
+      "old_path": "tests/fixtures/competing-fixed-gameplay/mir5-prefer-foreign/settings-updates.lua",
+      "successor_path": "tests/fixtures/competing-fixed-gameplay/successor-prefer-foreign/settings-updates.lua",
+      "sha256": "5AC58A75BB1274F74AD02CFED5AF90975DD39D5D628F610A61C3DF1483B1EC09"
+    },
+    {
+      "old_path": "tests/fixtures/competing-fixed-gameplay/mir5-prefer-mir-again/data-final-fixes.lua",
+      "successor_path": "tests/fixtures/competing-fixed-gameplay/successor-prefer-mir-again/data-final-fixes.lua",
+      "sha256": "5E9066C8773C3788341C13282018EC582DC848CC5EA6DA4F959904E5FF547F5D"
+    },
+    {
+      "old_path": "tests/fixtures/competing-fixed-gameplay/mir5-prefer-mir-again/info.json",
+      "successor_path": "tests/fixtures/competing-fixed-gameplay/successor-prefer-mir-again/info.json",
+      "sha256": "08680F7156FEAA0DB229CC8EE1099C7D73CF72B1C4DF96868256778129F77C98"
+    },
+    {
+      "old_path": "tests/fixtures/competing-fixed-gameplay/mir5-prefer-mir-again/settings-updates.lua",
+      "successor_path": "tests/fixtures/competing-fixed-gameplay/successor-prefer-mir-again/settings-updates.lua",
+      "sha256": "BD08BF0909449DD4B896EACCE732AD0DC96B016622453E157EA8CB6E6D19B8CE"
+    },
+    {
+      "old_path": "tests/fixtures/competing-fixed-gameplay/mir5-prefer-mir/data-final-fixes.lua",
+      "successor_path": "tests/fixtures/competing-fixed-gameplay/successor-prefer-mir/data-final-fixes.lua",
+      "sha256": "1BF19A4D6EC56C7FCA019A763A3CCCA57ED2AD07A732923FB3DC6E74830AC62D"
+    },
+    {
+      "old_path": "tests/fixtures/competing-fixed-gameplay/mir5-prefer-mir/info.json",
+      "successor_path": "tests/fixtures/competing-fixed-gameplay/successor-prefer-mir/info.json",
+      "sha256": "C9A5C1A01E526F2BA97A1F1F42829DBEFA15A4E92E042FC3C82156D959393AF9"
+    },
+    {
+      "old_path": "tests/fixtures/competing-fixed-gameplay/mir5-prefer-mir/settings-updates.lua",
+      "successor_path": "tests/fixtures/competing-fixed-gameplay/successor-prefer-mir/settings-updates.lua",
+      "sha256": "BD08BF0909449DD4B896EACCE732AD0DC96B016622453E157EA8CB6E6D19B8CE"
+    },
+    {
+      "old_path": "tests/fixtures/f110-f200-transition/f200/mir5/catalogue.lua",
+      "successor_path": "tests/fixtures/f110-f200-transition/f200/successor/catalogue.lua",
+      "sha256": "2798D422DA96233AA1B034CE17D0CA91F5B1F9E657BC6D0AD52886E5AB2D620D"
+    },
+    {
+      "old_path": "tests/fixtures/f110-f200-transition/f200/mir5/control.lua",
+      "successor_path": "tests/fixtures/f110-f200-transition/f200/successor/control.lua",
+      "sha256": "241F2A3287C9FCF7C32C0A1C85553E1D3FEC674234CFD1FB1809FFE0D2D12A35"
+    },
+    {
+      "old_path": "tests/fixtures/f110-f200-transition/f200/mir5/data-final-fixes.lua",
+      "successor_path": "tests/fixtures/f110-f200-transition/f200/successor/data-final-fixes.lua",
+      "sha256": "F7610000ED8055FCDA3C842A4C45DFBE7AF94D6F67BBD1EF52E166FFD967D4C4"
+    },
+    {
+      "old_path": "tests/fixtures/f110-f200-transition/f200/mir5/info.json",
+      "successor_path": "tests/fixtures/f110-f200-transition/f200/successor/info.json",
+      "sha256": "92D434B7F6EDAEA47B2DEEC63CAD8DC59D69765312F5A7DF20E90AB87E9FD89C"
+    },
+    {
+      "old_path": "tests/fixtures/f110-f200-transition/f200/mir5/settings-updates.lua",
+      "successor_path": "tests/fixtures/f110-f200-transition/f200/successor/settings-updates.lua",
+      "sha256": "190999CD0DDA458EAC183EA918AC9CDCE43AF66F2DCC6CAD68183DE5C3AF8444"
+    },
+    {
+      "old_path": "tests/fixtures/f200-legacy-cap/mir5/control.lua",
+      "successor_path": "tests/fixtures/f200-legacy-cap/successor/control.lua",
+      "sha256": "0558B5C8ACE1C9DA3AEA220FAD0D3C1F7A6E05A3E74EED3A09D1EE990D67877C"
+    },
+    {
+      "old_path": "tests/fixtures/f200-legacy-cap/mir5/data-final-fixes.lua",
+      "successor_path": "tests/fixtures/f200-legacy-cap/successor/data-final-fixes.lua",
+      "sha256": "998DA5D12C9EEAC6BE0FA9903E4E3522BC08C8F78563EB3D0491194A4D4E1F3D"
+    },
+    {
+      "old_path": "tests/fixtures/f200-legacy-cap/mir5/info.json",
+      "successor_path": "tests/fixtures/f200-legacy-cap/successor/info.json",
+      "sha256": "AE629F89589286972541A1B5702D2A5A81BF00853FCD4C41947BABD95BCB76EA"
+    },
+    {
+      "old_path": "tests/fixtures/f200-legacy-cap/mir5/settings-updates.lua",
+      "successor_path": "tests/fixtures/f200-legacy-cap/successor/settings-updates.lua",
+      "sha256": "2F5FBCC8001D770B495341FFED7530F1CADCD1F589459AC552079DAD62D28744"
+    },
+    {
+      "old_path": "tests/fixtures/f200-legacy-worker/mir5/control.lua",
+      "successor_path": "tests/fixtures/f200-legacy-worker/successor/control.lua",
+      "sha256": "5503DDC38A4A883130009C704C1C364EAFA059806384FF313C62C5F6F833864B"
+    },
+    {
+      "old_path": "tests/fixtures/f200-legacy-worker/mir5/data-final-fixes.lua",
+      "successor_path": "tests/fixtures/f200-legacy-worker/successor/data-final-fixes.lua",
+      "sha256": "051410251D91484A7B0B42A90339B65F7F217284C30CBB71C9CFE54E3EC6B753"
+    },
+    {
+      "old_path": "tests/fixtures/f200-legacy-worker/mir5/info.json",
+      "successor_path": "tests/fixtures/f200-legacy-worker/successor/info.json",
+      "sha256": "EB50560285E904CF79211F6F3AE9E40FC8762354C56414A9B43A2EEC25966F9E"
+    },
+    {
+      "old_path": "tests/fixtures/f200-legacy-worker/mir5/settings-updates.lua",
+      "successor_path": "tests/fixtures/f200-legacy-worker/successor/settings-updates.lua",
+      "sha256": "44B0BF1E91A9343758390F3570D13FC4D5DAD0869455F1D057B59AFA1AD3548B"
+    },
+    {
+      "old_path": "tests/fixtures/fixed-provider-removal-control/mir5-prefer-foreign/data-final-fixes.lua",
+      "successor_path": "tests/fixtures/fixed-provider-removal-control/successor-prefer-foreign/data-final-fixes.lua",
+      "sha256": "EA4E9A5DFBE7FFA17C421CC5B241CB03025396588D7E384107F86EA2FBC09723"
+    },
+    {
+      "old_path": "tests/fixtures/fixed-provider-removal-control/mir5-prefer-foreign/info.json",
+      "successor_path": "tests/fixtures/fixed-provider-removal-control/successor-prefer-foreign/info.json",
+      "sha256": "C081DF065F35FA970EB5038779FB7A9AAF9C66248AC2BB1F04B2B8704EB641E3"
+    },
+    {
+      "old_path": "tests/fixtures/fixed-provider-removal-control/mir5-prefer-foreign/settings-updates.lua",
+      "successor_path": "tests/fixtures/fixed-provider-removal-control/successor-prefer-foreign/settings-updates.lua",
+      "sha256": "4649C95235596F28201BB12569C76D600975BFDFC31445BA86C6CEFDDEC2DA5A"
+    },
+    {
+      "old_path": "tests/fixtures/fixed-provider-removal-control/mir5-prefer-mir/data-final-fixes.lua",
+      "successor_path": "tests/fixtures/fixed-provider-removal-control/successor-prefer-mir/data-final-fixes.lua",
+      "sha256": "8CA7C3CCA6CC2AD6150517691319383B53C42E66F290D55B30ACCF7E0A6A784B"
+    },
+    {
+      "old_path": "tests/fixtures/fixed-provider-removal-control/mir5-prefer-mir/info.json",
+      "successor_path": "tests/fixtures/fixed-provider-removal-control/successor-prefer-mir/info.json",
+      "sha256": "A5FB9956735FEEA0ED93B553DE6C35D80AEF6ABC5B84734BCA62DC8EFA9BA885"
+    },
+    {
+      "old_path": "tests/fixtures/fixed-provider-removal-control/mir5-prefer-mir/settings-updates.lua",
+      "successor_path": "tests/fixtures/fixed-provider-removal-control/successor-prefer-mir/settings-updates.lua",
+      "sha256": "C53ABF348F547D5AFE9C6A00CE655ECEE8082AC040DE54A5ED12E4F2F832ED53"
+    },
+    {
+      "old_path": "tests/fixtures/fixed-provider-removal-control/mir5-providers-readded-foreign/data-final-fixes.lua",
+      "successor_path": "tests/fixtures/fixed-provider-removal-control/successor-providers-readded-foreign/data-final-fixes.lua",
+      "sha256": "4E480D7D10D0B991C79D464846327B8522CE56E196EB70E600A1144308F9E047"
+    },
+    {
+      "old_path": "tests/fixtures/fixed-provider-removal-control/mir5-providers-readded-foreign/info.json",
+      "successor_path": "tests/fixtures/fixed-provider-removal-control/successor-providers-readded-foreign/info.json",
+      "sha256": "3E4629A1FA74FD4001DC98AC0F4881A73CBFEC7D9236A70EF8ECFE2D452AF6B4"
+    },
+    {
+      "old_path": "tests/fixtures/fixed-provider-removal-control/mir5-providers-readded-foreign/settings-updates.lua",
+      "successor_path": "tests/fixtures/fixed-provider-removal-control/successor-providers-readded-foreign/settings-updates.lua",
+      "sha256": "4649C95235596F28201BB12569C76D600975BFDFC31445BA86C6CEFDDEC2DA5A"
+    },
+    {
+      "old_path": "tests/fixtures/fixed-provider-removal-control/mir5-providers-removed/data-final-fixes.lua",
+      "successor_path": "tests/fixtures/fixed-provider-removal-control/successor-providers-removed/data-final-fixes.lua",
+      "sha256": "467D18140425A4C127E40606F1CE6955272BCAF076C7AF8EBAC18CB426B2C130"
+    },
+    {
+      "old_path": "tests/fixtures/fixed-provider-removal-control/mir5-providers-removed/info.json",
+      "successor_path": "tests/fixtures/fixed-provider-removal-control/successor-providers-removed/info.json",
+      "sha256": "96AE6EAFCF22F02C8B8115FA8CEE8D56A1EE34D07ABCB2FFD19D62F101529263"
+    },
+    {
+      "old_path": "tests/fixtures/fixed-provider-removal-control/mir5-providers-removed/settings-updates.lua",
+      "successor_path": "tests/fixtures/fixed-provider-removal-control/successor-providers-removed/settings-updates.lua",
+      "sha256": "DC1629B8458B2FD668396768772A079F0CFACFA8BCA2B4057189E299CBEB29D2"
+    },
+    {
+      "old_path": "tests/fixtures/foreign-research-preservation/mir5-unresolved/control.lua",
+      "successor_path": "tests/fixtures/foreign-research-preservation/successor-unresolved/control.lua",
+      "sha256": "4FC7808646E77C4B5EA65D6CD602435F090C25C02F9E559DD722ADAC38FD6DCA"
+    },
+    {
+      "old_path": "tests/fixtures/foreign-research-preservation/mir5-unresolved/data-final-fixes.lua",
+      "successor_path": "tests/fixtures/foreign-research-preservation/successor-unresolved/data-final-fixes.lua",
+      "sha256": "608BBBFEB533F2AFE7954D986C926A6FBC995CB586A447109E942748CB5A5E21"
+    },
+    {
+      "old_path": "tests/fixtures/foreign-research-preservation/mir5-unresolved/data-updates.lua",
+      "successor_path": "tests/fixtures/foreign-research-preservation/successor-unresolved/data-updates.lua",
+      "sha256": "899CD312C0226E716603219AEC5F5DBB750D430151C46612D3C86A611E29EC58"
+    },
+    {
+      "old_path": "tests/fixtures/foreign-research-preservation/mir5-unresolved/data.lua",
+      "successor_path": "tests/fixtures/foreign-research-preservation/successor-unresolved/data.lua",
+      "sha256": "EECDD8BB3E6D208BF486588A8FCB18379CCD5A57B6E579C0C5AB8A2A4CD1E5B6"
+    },
+    {
+      "old_path": "tests/fixtures/foreign-research-preservation/mir5-unresolved/info.json",
+      "successor_path": "tests/fixtures/foreign-research-preservation/successor-unresolved/info.json",
+      "sha256": "D47002D61E3CB6B7E64E11B5C4385787F99AFFA3405DBE35862E3B0EF336C2BF"
+    },
+    {
+      "old_path": "tests/fixtures/foreign-research-preservation/mir5/control.lua",
+      "successor_path": "tests/fixtures/foreign-research-preservation/successor/control.lua",
+      "sha256": "E07CB8B63D796861E7C0AF73E503E4EDD838567F265BEBEE53308A87F065E398"
+    },
+    {
+      "old_path": "tests/fixtures/foreign-research-preservation/mir5/data-updates.lua",
+      "successor_path": "tests/fixtures/foreign-research-preservation/successor/data-updates.lua",
+      "sha256": "3747D53BD55E15CBBD02164CD7FF86556E1EF579847344908A1C7E204E322840"
+    },
+    {
+      "old_path": "tests/fixtures/foreign-research-preservation/mir5/data.lua",
+      "successor_path": "tests/fixtures/foreign-research-preservation/successor/data.lua",
+      "sha256": "EECDD8BB3E6D208BF486588A8FCB18379CCD5A57B6E579C0C5AB8A2A4CD1E5B6"
+    },
+    {
+      "old_path": "tests/fixtures/foreign-research-preservation/mir5/info.json",
+      "successor_path": "tests/fixtures/foreign-research-preservation/successor/info.json",
+      "sha256": "FB8B82A10A6DD155BBAAA80285D4CF18877D8861A1FBBDBCB3ACB5D35A2B21B6"
+    },
+    {
+      "old_path": "tests/fixtures/full-catalogue-upgrade/f210/mir5-from-4.7.3/catalogue.lua",
+      "successor_path": "tests/fixtures/full-catalogue-upgrade/f210/successor-from-4.7.3/catalogue.lua",
+      "sha256": "3BBE2F22DC4CB6C25D5A6ADC3F1C806E9A3C6A5F6DAACBF25AB3E45AED7AD253"
+    },
+    {
+      "old_path": "tests/fixtures/full-catalogue-upgrade/f210/mir5-from-4.7.3/control.lua",
+      "successor_path": "tests/fixtures/full-catalogue-upgrade/f210/successor-from-4.7.3/control.lua",
+      "sha256": "17529CF29AA8192E72771512AC19AB1D76C02C4E6DE8384A20B6C5AC7465A5E3"
+    },
+    {
+      "old_path": "tests/fixtures/full-catalogue-upgrade/f210/mir5-from-4.7.3/data-final-fixes.lua",
+      "successor_path": "tests/fixtures/full-catalogue-upgrade/f210/successor-from-4.7.3/data-final-fixes.lua",
+      "sha256": "0A05CD2FB14D2256D39EFBA308DA3BF8FC7F461B439660ECB66E0D48734EF043"
+    },
+    {
+      "old_path": "tests/fixtures/full-catalogue-upgrade/f210/mir5-from-4.7.3/info.json",
+      "successor_path": "tests/fixtures/full-catalogue-upgrade/f210/successor-from-4.7.3/info.json",
+      "sha256": "DCBB3891669344E8B8F73EA41EEC25ED5FC711AFA1EC4428439BCF08343DC319"
+    },
+    {
+      "old_path": "tests/fixtures/full-catalogue-upgrade/f210/mir5/catalogue.lua",
+      "successor_path": "tests/fixtures/full-catalogue-upgrade/f210/successor/catalogue.lua",
+      "sha256": "2349FD768562CB402C1ACAA69169031A11C344B8E8FDEC9EFAB6931A7A7F6F4C"
+    },
+    {
+      "old_path": "tests/fixtures/full-catalogue-upgrade/f210/mir5/control.lua",
+      "successor_path": "tests/fixtures/full-catalogue-upgrade/f210/successor/control.lua",
+      "sha256": "17529CF29AA8192E72771512AC19AB1D76C02C4E6DE8384A20B6C5AC7465A5E3"
+    },
+    {
+      "old_path": "tests/fixtures/full-catalogue-upgrade/f210/mir5/data-final-fixes.lua",
+      "successor_path": "tests/fixtures/full-catalogue-upgrade/f210/successor/data-final-fixes.lua",
+      "sha256": "0A05CD2FB14D2256D39EFBA308DA3BF8FC7F461B439660ECB66E0D48734EF043"
+    },
+    {
+      "old_path": "tests/fixtures/full-catalogue-upgrade/f210/mir5/info.json",
+      "successor_path": "tests/fixtures/full-catalogue-upgrade/f210/successor/info.json",
+      "sha256": "42F2D92FC4FFE12A2655EE0D1F60102FE2AA014CB34D0C04C89ACA50E387172D"
+    },
+    {
+      "old_path": "tests/fixtures/full-catalogue-upgrade/mir5/catalogue.lua",
+      "successor_path": "tests/fixtures/full-catalogue-upgrade/successor/catalogue.lua",
+      "sha256": "EDD83D4B81D0711CCCDCC4599FAFC11184934BC8BB4304CA82A0A03DE812E71D"
+    },
+    {
+      "old_path": "tests/fixtures/full-catalogue-upgrade/mir5/control.lua",
+      "successor_path": "tests/fixtures/full-catalogue-upgrade/successor/control.lua",
+      "sha256": "17529CF29AA8192E72771512AC19AB1D76C02C4E6DE8384A20B6C5AC7465A5E3"
+    },
+    {
+      "old_path": "tests/fixtures/full-catalogue-upgrade/mir5/data-final-fixes.lua",
+      "successor_path": "tests/fixtures/full-catalogue-upgrade/successor/data-final-fixes.lua",
+      "sha256": "0A05CD2FB14D2256D39EFBA308DA3BF8FC7F461B439660ECB66E0D48734EF043"
+    },
+    {
+      "old_path": "tests/fixtures/full-catalogue-upgrade/mir5/info.json",
+      "successor_path": "tests/fixtures/full-catalogue-upgrade/successor/info.json",
+      "sha256": "593E1B5AECB221F8099C6DDB70D2429FD805F88071444C59BA030188AB740432"
+    },
+    {
+      "old_path": "tests/fixtures/integration-catalogue-upgrade/mir5/data-final-fixes.lua",
+      "successor_path": "tests/fixtures/integration-catalogue-upgrade/successor/data-final-fixes.lua",
+      "sha256": "87FD1497B72B70BFF663909522FE41FF468B3C00D08F8DDD7A6C05F963BCDF6C"
+    },
+    {
+      "old_path": "tests/fixtures/integration-catalogue-upgrade/mir5/info.json",
+      "successor_path": "tests/fixtures/integration-catalogue-upgrade/successor/info.json",
+      "sha256": "7DB45381576471CA5065EE1FC95D40F2359AF30D71BE925B70E1A7833561FD85"
+    },
+    {
+      "old_path": "tests/fixtures/k2-imersite-transition/mir5/control.lua",
+      "successor_path": "tests/fixtures/k2-imersite-transition/successor/control.lua",
+      "sha256": "44EF021966099D58F024E80112237FB772E7AD2D2AA5BCCD9305A4F31BCB1954"
+    },
+    {
+      "old_path": "tests/fixtures/k2-imersite-transition/mir5/data-final-fixes.lua",
+      "successor_path": "tests/fixtures/k2-imersite-transition/successor/data-final-fixes.lua",
+      "sha256": "36AA69ACA6901338A54CCB13452C3B6E3052639A26728209117DA6D6F77D97AA"
+    },
+    {
+      "old_path": "tests/fixtures/k2-imersite-transition/mir5/info.json",
+      "successor_path": "tests/fixtures/k2-imersite-transition/successor/info.json",
+      "sha256": "8E2971734D0B854263767D6E4F987A119372E8FA48F94A03BE6B0C2BA393B531"
+    },
+    {
+      "old_path": "tests/fixtures/k2-imersite-transition/mir5/settings-updates.lua",
+      "successor_path": "tests/fixtures/k2-imersite-transition/successor/settings-updates.lua",
+      "sha256": "110A811A5F9F24527DBACD40793089763AE75EA504A7831F36EFB7246F3D530F"
+    },
+    {
+      "old_path": "tests/fixtures/k2se-imersite-carrier-retention/mir5/control.lua",
+      "successor_path": "tests/fixtures/k2se-imersite-carrier-retention/successor/control.lua",
+      "sha256": "A6F331B0275378E5D2DA0E05C277A78B79D5223E16E3407368EC390E9BCC4743"
+    },
+    {
+      "old_path": "tests/fixtures/k2se-imersite-carrier-retention/mir5/data-final-fixes.lua",
+      "successor_path": "tests/fixtures/k2se-imersite-carrier-retention/successor/data-final-fixes.lua",
+      "sha256": "E80DC711C618F202811DAE884117886035A27253958A6354ED0E2E8A2777BA7F"
+    },
+    {
+      "old_path": "tests/fixtures/k2se-imersite-carrier-retention/mir5/info.json",
+      "successor_path": "tests/fixtures/k2se-imersite-carrier-retention/successor/info.json",
+      "sha256": "B4AC6CBF4FEB10B9B0080E2D0F19DE65058B15ABB256542551D345FE5E80480F"
+    },
+    {
+      "old_path": "tests/fixtures/legacy-preference-transition/mir5-false/data-final-fixes.lua",
+      "successor_path": "tests/fixtures/legacy-preference-transition/successor-false/data-final-fixes.lua",
+      "sha256": "B8880EA1130D3BA64732361449F85A2CA4C68924FC71111C86F3860D390159F5"
+    },
+    {
+      "old_path": "tests/fixtures/legacy-preference-transition/mir5-false/info.json",
+      "successor_path": "tests/fixtures/legacy-preference-transition/successor-false/info.json",
+      "sha256": "0FC67F7FA8D8A6547D5186AFFEE2131A39376F8F580B622978DC2BB7F351E6FD"
+    },
+    {
+      "old_path": "tests/fixtures/legacy-preference-transition/mir5-false/settings-updates.lua",
+      "successor_path": "tests/fixtures/legacy-preference-transition/successor-false/settings-updates.lua",
+      "sha256": "DF3DC5F6D63184C9FF5996C5FAB68FC951838F4C08C88F14FAE72D5795A89F11"
+    },
+    {
+      "old_path": "tests/fixtures/legacy-preference-transition/mir5-true/data-final-fixes.lua",
+      "successor_path": "tests/fixtures/legacy-preference-transition/successor-true/data-final-fixes.lua",
+      "sha256": "73E55257957E3C469E9CEE16408313BD2A21012BF818A35096B756AC1F822428"
+    },
+    {
+      "old_path": "tests/fixtures/legacy-preference-transition/mir5-true/info.json",
+      "successor_path": "tests/fixtures/legacy-preference-transition/successor-true/info.json",
+      "sha256": "2CDABD20514BDB9E6E4FD78C7DC31936B27A80A8C430262C43CB7D5C9A26377A"
+    },
+    {
+      "old_path": "tests/fixtures/legacy-preference-transition/mir5-true/settings-updates.lua",
+      "successor_path": "tests/fixtures/legacy-preference-transition/successor-true/settings-updates.lua",
+      "sha256": "C1732EEBEA4648193FFCA2ADF307434E554D9250CD65EC29734E1D80199C86E9"
+    },
+    {
+      "old_path": "tests/fixtures/repair-stress/mir5/info-f210.json",
+      "successor_path": "tests/fixtures/repair-stress/successor/info-f210.json",
+      "sha256": "A8795707F4E806065D017A738B49C61743BA0C7CEDD2C62C4843595AAD16D143"
+    },
+    {
+      "old_path": "tests/fixtures/repair-stress/mir5/info.json",
+      "successor_path": "tests/fixtures/repair-stress/successor/info.json",
+      "sha256": "5A468239AB361691B0BC290480C3B10CFDE5BAC9C5768E8E2EC898AC13E5C07E"
+    },
+    {
+      "old_path": "tests/fixtures/sif-science-retirement/f200/mir5/info.json",
+      "successor_path": "tests/fixtures/sif-science-retirement/f200/successor/info.json",
+      "sha256": "C926926AF819FE5AD99D932C6D0028DFAB34614D444890F1DEDEC7A758352CA6"
+    },
+    {
+      "old_path": "tests/fixtures/sif-science-retirement/f210/mir5/info.json",
+      "successor_path": "tests/fixtures/sif-science-retirement/f210/successor/info.json",
+      "sha256": "07FB41E7557E0918A4E0203503B6A9ACB6BE83E4B649C59989C1D96B0304726E"
+    }
+  ],
+  "scope": "Active fixture directory roles only. Historical Git/evidence paths, public fixture module identities, public versions, and ignored build/mir5 custody are unchanged.",
+  "native_execution": false,
+  "release_qualification": false
+}

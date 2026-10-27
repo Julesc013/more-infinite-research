@@ -42,6 +42,10 @@ OBSOLETE_CANDIDATE_ANCHORS = {
  'research-speed-7': ['research-speed-5','utility-science-pack','research-speed-6'],
  'weapon-shooting-speed-7': ['weapon-shooting-speed-5','utility-science-pack','weapon-shooting-speed-6'],
 }
+
+
+def fixture_role(stage):
+    return 'successor' if stage == 'mir5' else stage
 EFFECTS = {
  'research-speed-7': [{'type':'laboratory-speed','modifier':.6}],
  'weapon-shooting-speed-7': [{'type':'gun-speed','ammo_category':'bullet','modifier':.4},{'type':'gun-speed','ammo_category':'shotgun-shell','modifier':.4}],
@@ -478,7 +482,7 @@ class SIFScienceRetirementFixtureTests(unittest.TestCase):
             if not ok then return {ok=false,message=tostring(result),writes=writes,markers=markers} end
             return {ok=true,message='',writes=writes,markers=markers,payload=payload,storage_empty=next(storage)==nil}
           end        ''')
-    def core(self,target,stage): return FIXTURE/target/stage
+    def core(self,target,stage): return FIXTURE/target/fixture_role(stage)
     def core_lua(self,name): return CORE/name
     def selector_lua(self,policy): return SELECTORS/policy/'settings-updates.lua'
     def data(self,target,stage,policy,raw=None,mods=None):

@@ -8,6 +8,7 @@ import unittest
 
 ROOT = Path(__file__).resolve().parents[1]
 FIXTURE = ROOT / "tests/fixtures/full-catalogue-upgrade"
+SUCCESSOR_ROLE = "successor"
 PROFILES = ROOT / "tests/profiles"
 ORACLE = ROOT / "spec/inventory/modern-f200-470.json"
 SHARED = FIXTURE / "shared"
@@ -19,6 +20,10 @@ F200_RUNTIME_API_CANDIDATES = (
 )
 OWNERS = {"low-density-structure-productivity", "plastic-bar-productivity", "processing-unit-productivity", "rocket-fuel-productivity", "steel-plate-productivity"}
 DESCRIPTORS = (("research_copper", "recipe-prod-research_copper-1", "copper-plate"), ("research_iron", "recipe-prod-research_iron-1", "iron-plate"), ("research_breeding", "recipe-prod-research_breeding-1", "fish-breeding"), ("research_oil_processing_productivity", "recipe-prod-research_oil_processing_productivity-1", "advanced-oil-processing"), ("research_oil_processing_productivity", "recipe-prod-research_oil_processing_productivity-1", "basic-oil-processing"), ("research_oil_processing_productivity", "recipe-prod-research_oil_processing_productivity-1", "coal-liquefaction"), ("research_bullets", "recipe-prod-research_bullets-1", "firearm-magazine"), ("research_grenades", "recipe-prod-research_grenades-1", "grenade"), ("research_lubricant_productivity", "recipe-prod-research_lubricant_productivity-1", "lubricant"), ("research_breeding", "recipe-prod-research_breeding-1", "pentapod-egg"), ("research_concrete", "recipe-prod-research_concrete-1", "stone-brick"), ("research_sulfuric_acid_productivity", "recipe-prod-research_sulfuric_acid_productivity-1", "sulfuric-acid"))
+
+
+def fixture_role(stage):
+    return SUCCESSOR_ROLE if stage == "mir5" else stage
 
 
 def f200_runtime_api_path():
@@ -111,7 +116,7 @@ class FullCatalogueUpgradeFixtureTests(unittest.TestCase):
                         "mir-fixture-mir5-full-catalogue-upgrade":"0.1.0" if stage == "published-4.7" else "0.2.0"}
                 if space: mods.update({"space-age":"2.0.77", "elevated-rails":"2.0.77", "quality":"2.0.77"})
                 with self.subTest(stage=stage, space=space):
-                    result = self.lua.eval("run_data")((FIXTURE / stage / "data-final-fixes.lua").as_posix(), (SHARED / "data-final-fixes.lua").as_posix(), (FIXTURE / stage / "catalogue.lua").as_posix(), lua(self.lua, raw), lua(self.lua, mods))
+                    result = self.lua.eval("run_data")((FIXTURE / fixture_role(stage) / "data-final-fixes.lua").as_posix(), (SHARED / "data-final-fixes.lua").as_posix(), (FIXTURE / fixture_role(stage) / "catalogue.lua").as_posix(), lua(self.lua, raw), lua(self.lua, mods))
                     self.assertTrue(result["ok"], result["message"])
                     actual = py(result["raw"])["technology"]["recipe-prod-research_gears-1"]["unit"]
                     self.assertEqual((None, "1", 1), (actual.get("count"), actual["count_formula"], actual["time"]))
@@ -129,19 +134,19 @@ class FullCatalogueUpgradeFixtureTests(unittest.TestCase):
                     with self.subTest(stage=stage, space=space, ingredients=ingredients):
                         raw_input = lua(self.lua, {"technology": {"recipe-prod-research_gears-1": altered}})
                         before = py(raw_input)
-                        result = self.lua.eval("run_data")((FIXTURE / stage / "data-final-fixes.lua").as_posix(), (SHARED / "data-final-fixes.lua").as_posix(), (FIXTURE / stage / "catalogue.lua").as_posix(), raw_input, lua(self.lua, mods))
+                        result = self.lua.eval("run_data")((FIXTURE / fixture_role(stage) / "data-final-fixes.lua").as_posix(), (SHARED / "data-final-fixes.lua").as_posix(), (FIXTURE / fixture_role(stage) / "catalogue.lua").as_posix(), raw_input, lua(self.lua, mods))
                         self.assertFalse(result["ok"])
                         self.assertIn("gear science", str(result["message"]))
                         self.assertEqual(before, py(result["raw"]))
         gear = {"max_level":"infinite", "unit":{"count_formula":"8000*2^(L-1)", "time":61}, "effects":[{"type":"change-recipe-productivity", "recipe":"iron-gear-wheel", "change":.1}]}
-        result = self.lua.eval("run_data")((FIXTURE / "mir5/data-final-fixes.lua").as_posix(), (SHARED / "data-final-fixes.lua").as_posix(), (FIXTURE / "mir5/catalogue.lua").as_posix(), lua(self.lua, {"technology":{"recipe-prod-research_gears-1":gear}}), lua(self.lua, {"base":"2.0.77", "more-infinite-research":"5.0.20000", "mir-fixture-mir5-full-catalogue-upgrade":"0.2.0"}))
+        result = self.lua.eval("run_data")((FIXTURE / "successor/data-final-fixes.lua").as_posix(), (SHARED / "data-final-fixes.lua").as_posix(), (FIXTURE / "successor/catalogue.lua").as_posix(), lua(self.lua, {"technology":{"recipe-prod-research_gears-1":gear}}), lua(self.lua, {"base":"2.0.77", "more-infinite-research":"5.0.20000", "mir-fixture-mir5-full-catalogue-upgrade":"0.2.0"}))
         self.assertFalse(result["ok"]); self.assertIn("workload differs", str(result["message"])); self.assertEqual(61, gear["unit"]["time"])
 
     def test_controls_register_without_game_or_storage_reads(self):
         for stage in ("published-4.7", "mir5"):
             with self.subTest(stage=stage):
-                self.lua.globals().control_path = (FIXTURE / stage / "control.lua").as_posix()
-                self.lua.globals().catalogue_path = (FIXTURE / stage / "catalogue.lua").as_posix()
+                self.lua.globals().control_path = (FIXTURE / fixture_role(stage) / "control.lua").as_posix()
+                self.lua.globals().catalogue_path = (FIXTURE / fixture_role(stage) / "catalogue.lua").as_posix()
                 self.lua.globals().common_control_path = (SHARED / "control.lua").as_posix()
                 self.lua.globals().source_stage = stage == "published-4.7"
                 self.lua.execute("""
@@ -206,7 +211,7 @@ class FullCatalogueUpgradeFixtureTests(unittest.TestCase):
                     self.assertEqual((mir, fixture), (mods["more-infinite-research"], mods["mir-fixture-mir5-full-catalogue-upgrade"]))
                     self.assertEqual(profile == "space-age", "space-age" in mods)
                     self.assertEqual(expected_hash, data["archive_sha256"])
-        self.assertEqual((FIXTURE / "published-4.7/catalogue.lua").read_bytes(), (FIXTURE / "mir5/catalogue.lua").read_bytes())
+        self.assertEqual((FIXTURE / "published-4.7/catalogue.lua").read_bytes(), (FIXTURE / "successor/catalogue.lua").read_bytes())
         for path in FIXTURE.rglob("*.lua"):
             text = path.read_text(encoding="utf-8")
             self.assertNotIn("__more-infinite-research__", text)

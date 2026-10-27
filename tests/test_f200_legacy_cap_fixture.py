@@ -14,6 +14,7 @@ import unittest
 
 ROOT = Path(__file__).resolve().parents[1]
 FIXTURE = ROOT / "tests/fixtures/f200-legacy-cap"
+SUCCESSOR_ROLE = "successor"
 ORACLE = ROOT / "spec/inventory/modern-f200-470.json"
 F210_ORACLE = ROOT / "spec/inventory/modern-f210-470.json"
 PUBLISHED_PROFILE = ROOT / "tests/profiles/f200-legacy-cap-published-4.7-2077.json"
@@ -33,6 +34,10 @@ NAME = "mir-fixture-mir5-f200-legacy-cap"
 GEAR = "recipe-prod-research_gears-1"
 SCIENCE = ("automation-science-pack", "logistic-science-pack",
            "chemical-science-pack", "production-science-pack")
+
+
+def fixture_role(stage):
+    return SUCCESSOR_ROLE if stage == "mir5" else stage
 
 
 def lua_value(lua, value):
@@ -370,7 +375,7 @@ class F200LegacyCapFixtureTests(unittest.TestCase):
                 self.assertEqual(mir, profile["mods"][2]["version"])
                 self.assertEqual(version, profile["mods"][3]["version"])
                 self.assertNotIn("space-age", [item["name"] for item in profile["mods"]])
-                info_path = FIXTURE / "published/info.json" if version == "0.1.0" else (PUBLISHED_CONTROL_INFO if version == "0.3.0" else FIXTURE / "mir5/info.json")
+                info_path = FIXTURE / "published/info.json" if version == "0.1.0" else (PUBLISHED_CONTROL_INFO if version == "0.3.0" else FIXTURE / "successor/info.json")
                 info = json.loads(info_path.read_text())
                 self.assertEqual((NAME, version, "2.0"), (info["name"], info["version"], info["factorio_version"]))
                 if version == "0.3.0":
@@ -446,7 +451,7 @@ class F200LegacyCapFixtureTests(unittest.TestCase):
 
         successor_row = self.f210_row()
         successor = self.data_result(F210_CROSS / "data-final-fixes.lua", "2.1.23", "5.0.21000", "0.5.0", successor_row,
-                                     data_alias=FIXTURE / "mir5/data-final-fixes.lua")
+                                     data_alias=FIXTURE / "successor/data-final-fixes.lua")
         self.assertTrue(successor["ok"], successor["message"])
         self.assertEqual((None, "1", 1), (successor["row"]["unit"]["count"], successor["row"]["unit"]["count_formula"], successor["row"]["unit"]["time"]))
         self.assertEqual(.01, successor["row"]["effects"][1]["change"])
@@ -454,13 +459,13 @@ class F200LegacyCapFixtureTests(unittest.TestCase):
         bad_effect = self.f210_row()
         bad_effect["effects"][1]["change"] = .02
         rejected = self.data_result(F210_CROSS / "data-final-fixes.lua", "2.1.23", "5.0.21000", "0.5.0", bad_effect,
-                                    data_alias=FIXTURE / "mir5/data-final-fixes.lua")
+                                    data_alias=FIXTURE / "successor/data-final-fixes.lua")
         self.assertFalse(rejected["ok"])
         self.assertIn("1% fixture-selected effect changed", rejected["message"])
         self.assertEqual(("8000*2^(L-1)", 60), (rejected["row"]["unit"]["count_formula"], rejected["row"]["unit"]["time"]))
 
         companion = self.data_result(F210_CROSS / "data-final-fixes.lua", "2.1.23", "5.0.21000", "0.5.0", self.f210_row(),
-                                     data_alias=FIXTURE / "mir5/data-final-fixes.lua", companions={"quality": "2.1.23"})
+                                     data_alias=FIXTURE / "successor/data-final-fixes.lua", companions={"quality": "2.1.23"})
         self.assertFalse(companion["ok"])
         self.assertIn("F210 Base successor carries Space Age companion", companion["message"])
         self.assertEqual(("8000*2^(L-1)", 60), (companion["row"]["unit"]["count_formula"], companion["row"]["unit"]["time"]))
@@ -468,7 +473,7 @@ class F200LegacyCapFixtureTests(unittest.TestCase):
         for stage, version in ((F210_DISABLED, "0.6.0"), (F210_REENABLED, "0.7.0")):
             with self.subTest(stage=stage.name):
                 result = self.data_result(stage / "data-final-fixes.lua", "2.1.23", "5.0.21000", version,
-                                          self.f210_row(), data_alias=FIXTURE / "mir5/data-final-fixes.lua")
+                                          self.f210_row(), data_alias=FIXTURE / "successor/data-final-fixes.lua")
                 self.assertTrue(result["ok"], result["message"])
                 self.assertEqual((None, "1", 1),
                                  (result["row"]["unit"]["count"], result["row"]["unit"]["count_formula"],
@@ -546,7 +551,7 @@ class F200LegacyCapFixtureTests(unittest.TestCase):
                 row = self.row()
                 if directory == "published":
                     row["visible_when_disabled"] = True
-                result = self.data_result(FIXTURE / directory / "data-final-fixes.lua", "2.0.77", mir, fixture, row)
+                result = self.data_result(FIXTURE / fixture_role(directory) / "data-final-fixes.lua", "2.0.77", mir, fixture, row)
                 self.assertTrue(result["ok"], result["message"])
                 unit = result["row"]["unit"]
                 self.assertIsNone(unit["count"])
@@ -567,14 +572,14 @@ class F200LegacyCapFixtureTests(unittest.TestCase):
         self.assertIn("cap presentation changed", result["message"])
         wrong_mir5 = self.row()
         wrong_mir5["visible_when_disabled"] = True
-        result = self.data_result(FIXTURE / "mir5" / "data-final-fixes.lua", "2.0.77", "5.0.20000", "0.2.0", wrong_mir5)
+        result = self.data_result(FIXTURE / SUCCESSOR_ROLE / "data-final-fixes.lua", "2.0.77", "5.0.20000", "0.2.0", wrong_mir5)
         self.assertFalse(result["ok"])
         self.assertIn("fresh presentation changed", result["message"])
 
     def test_published_relaxation_uses_the_published_visibility_preflight_and_canonical_successor_control(self):
         published = (FIXTURE / "published/data-final-fixes.lua").read_text(encoding="utf-8")
-        mir5 = (FIXTURE / "mir5/data-final-fixes.lua").read_text(encoding="utf-8")
-        control = (FIXTURE / "mir5/control.lua").read_text(encoding="utf-8")
+        mir5 = (FIXTURE / "successor/data-final-fixes.lua").read_text(encoding="utf-8")
+        control = (FIXTURE / "successor/control.lua").read_text(encoding="utf-8")
         self.assertIn("technology.visible_when_disabled == true", published)
         self.assertIn("cap presentation changed", published)
         self.assertIn("technology.visible_when_disabled == nil", mir5)
@@ -584,7 +589,7 @@ class F200LegacyCapFixtureTests(unittest.TestCase):
     def test_controls_parse_without_game_or_storage_access_and_never_write_source_player_presentation(self):
         for directory, mir, version in (("published", "4.7.20002", "0.1.0"), ("mir5", "5.0.20000", "0.2.0")):
             with self.subTest(directory=directory):
-                result = self.parse_result(FIXTURE / directory / "control.lua", "2.0.77", mir, version)
+                result = self.parse_result(FIXTURE / fixture_role(directory) / "control.lua", "2.0.77", mir, version)
                 self.assertTrue(result["ok"], result["message"])
                 self.assertEqual({}, plain(result["reads"]))
                 self.assertIsNotNone(result["callbacks"]["load"])
@@ -598,7 +603,7 @@ class F200LegacyCapFixtureTests(unittest.TestCase):
         self.assertIn("await-second-queue", source)
         self.assertNotIn("research_queue_enabled", source)
         for directory in ("published", "mir5"):
-            control = (FIXTURE / directory / "control.lua").read_text(encoding="utf-8")
+            control = (FIXTURE / fixture_role(directory) / "control.lua").read_text(encoding="utf-8")
             body = control.split("script.on_load(function()", 1)[1].split("script.on_event(defines.events.on_tick", 1)[0]
             self.assertNotIn("game.", body, f"{directory} on_load touched LuaGameScript")
             self.assertNotRegex(body, r"storage\s*\[.*?\]\s*=", f"{directory} on_load wrote fixture storage")
@@ -607,7 +612,7 @@ class F200LegacyCapFixtureTests(unittest.TestCase):
         source = self.parse_result(F200_CROSS / "control.lua", "2.0.77", "4.7.20003", "0.4.0",
                                    FIXTURE / "published/control.lua")
         successor = self.parse_result(F210_CROSS / "control.lua", "2.1.23", "5.0.21000", "0.5.0",
-                                      FIXTURE / "mir5/control.lua")
+                                      FIXTURE / "successor/control.lua")
         for stage, result in (("source", source), ("successor", successor)):
             with self.subTest(stage=stage):
                 self.assertTrue(result["ok"], result["message"])
@@ -620,7 +625,7 @@ class F200LegacyCapFixtureTests(unittest.TestCase):
             "source_base": "2.0.77", "source_mir": "4.7.20003", "source_fixture": "0.4.0",
             "destination_base": "2.1.23", "destination_mir": "5.0.21000", "destination_fixture": "0.5.0",
             "source_control_alias": str(FIXTURE / "published/control.lua"),
-            "destination_control_alias": str(FIXTURE / "mir5/control.lua"),
+            "destination_control_alias": str(FIXTURE / "successor/control.lua"),
         }
         result = self.flow_result(F200_CROSS / "control.lua", F210_CROSS / "control.lua", "", options)
         self.assertTrue(result["ok"], result["message"])
@@ -655,14 +660,14 @@ class F200LegacyCapFixtureTests(unittest.TestCase):
             "source_base": "2.0.77", "source_mir": "4.7.20003", "source_fixture": "0.4.0",
             "source_control_alias": str(FIXTURE / "published/control.lua"),
             "disabled_path": str(F210_DISABLED / "control.lua"), "disabled_base": "2.1.23", "disabled_mir": "5.0.21000",
-            "disabled_fixture": "0.6.0", "disabled_control_alias": str(FIXTURE / "mir5/control.lua"),
+            "disabled_fixture": "0.6.0", "disabled_control_alias": str(FIXTURE / "successor/control.lua"),
             "reenabled_path": str(F210_REENABLED / "control.lua"), "reenabled_base": "2.1.23", "reenabled_mir": "5.0.21000",
-            "reenabled_fixture": "0.7.0", "reenabled_control_alias": str(FIXTURE / "mir5/control.lua"),
+            "reenabled_fixture": "0.7.0", "reenabled_control_alias": str(FIXTURE / "successor/control.lua"),
         }
         for stage, version in ((F210_DISABLED, "0.6.0"), (F210_REENABLED, "0.7.0")):
             with self.subTest(parse=stage.name):
                 parsed = self.parse_result(stage / "control.lua", "2.1.23", "5.0.21000", version,
-                                           FIXTURE / "mir5/control.lua")
+                                           FIXTURE / "successor/control.lua")
                 self.assertTrue(parsed["ok"], parsed["message"])
                 self.assertEqual({}, plain(parsed["reads"]))
 
@@ -703,7 +708,7 @@ class F200LegacyCapFixtureTests(unittest.TestCase):
                 self.assertEqual((0, 0), (rejected["queue_entries"], rejected["destination_labs"]))
 
     def test_published_completed_v010_source_save_uses_only_the_exact_old_case_fallback_on_cold_reload(self):
-        result = self.flow_result(FIXTURE / "published" / "control.lua", FIXTURE / "mir5" / "control.lua", "",
+        result = self.flow_result(FIXTURE / "published" / "control.lua", FIXTURE / SUCCESSOR_ROLE / "control.lua", "",
                                   {"omit_source_case": True})
         self.assertTrue(result["ok"], result["message"])
         self.assertIsNone(result["source_case"])
@@ -711,7 +716,7 @@ class F200LegacyCapFixtureTests(unittest.TestCase):
         self.assertEqual((2, 1, 2), (result["source_labs"], result["destination_labs"], result["saves"]))
 
     def test_two_real_source_labs_restore_positive_cap_then_one_real_successor_lab_and_reload(self):
-        result = self.flow_result(FIXTURE / "published" / "control.lua", FIXTURE / "mir5" / "control.lua")
+        result = self.flow_result(FIXTURE / "published" / "control.lua", FIXTURE / SUCCESSOR_ROLE / "control.lua")
         self.assertTrue(result["ok"], result["message"])
         self.assertEqual("completed", result["phase"])
         self.assertEqual((2, 1), (result["source_labs"], result["destination_labs"]))
@@ -730,7 +735,7 @@ class F200LegacyCapFixtureTests(unittest.TestCase):
         self.assertEqual((6, 1, 2), (result["markers"], result["diagnostics"], result["saves"]))
 
     def test_exact_processing_ticks_accept_a_distinct_raw_event_elapsed(self):
-        result = self.flow_result(FIXTURE / "published" / "control.lua", FIXTURE / "mir5" / "control.lua",
+        result = self.flow_result(FIXTURE / "published" / "control.lua", FIXTURE / SUCCESSOR_ROLE / "control.lua",
                                   "raw-elapsed-offset")
         self.assertTrue(result["ok"], result["message"])
         self.assertEqual((44, 44, 45),
@@ -738,7 +743,7 @@ class F200LegacyCapFixtureTests(unittest.TestCase):
         self.assertEqual(1, result["diagnostics"])
 
     def test_published_relaxation_uses_the_same_tick_accounting_without_claiming_mir5_runtime(self):
-        result = self.flow_result(FIXTURE / "published" / "control.lua", FIXTURE / "mir5" / "control.lua", "",
+        result = self.flow_result(FIXTURE / "published" / "control.lua", FIXTURE / SUCCESSOR_ROLE / "control.lua", "",
                                   {"destination_mir": "4.7.20002", "destination_fixture": "0.3.0"})
         self.assertTrue(result["ok"], result["message"])
         self.assertEqual((2, 1, 44), (result["source_labs"], result["destination_labs"], result["remaining_ticks"]))
@@ -758,7 +763,7 @@ class F200LegacyCapFixtureTests(unittest.TestCase):
         }
         for opponent, phrase in opponents.items():
             with self.subTest(opponent=opponent):
-                result = self.flow_result(FIXTURE / "published" / "control.lua", FIXTURE / "mir5" / "control.lua", opponent)
+                result = self.flow_result(FIXTURE / "published" / "control.lua", FIXTURE / SUCCESSOR_ROLE / "control.lua", opponent)
                 self.assertFalse(result["ok"])
                 self.assertIn(phrase, result["message"])
                 if opponent == "consumption-overshoot":

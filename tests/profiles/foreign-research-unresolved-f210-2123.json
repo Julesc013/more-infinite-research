@@ -26,7 +26,7 @@
     }
   ],
   "fixture": {
-    "root": "tests/fixtures/foreign-research-preservation/mir5-unresolved",
+    "root": "tests/fixtures/foreign-research-preservation/successor-unresolved",
     "included_members": [
       "info.json",
       "data.lua",

@@ -10,6 +10,10 @@ import unittest
 ROOT = Path(__file__).resolve().parents[1]
 FIXTURE = ROOT / "tests/fixtures/full-catalogue-upgrade"
 F210 = FIXTURE / "f210"
+SUCCESSOR_ROLES = {
+    "mir5": "successor",
+    "mir5-from-4.7.3": "successor-from-4.7.3",
+}
 SHARED = FIXTURE / "shared"
 PROFILES = ROOT / "tests/profiles"
 ORACLE = ROOT / "spec/inventory/modern-f210-470.json"
@@ -33,6 +37,10 @@ STAGES = (
     ("mir5-from-4.7.3", "5.0.21000", "0.2.0", CANDIDATE_CURRENT, OBSERVER_A15),
 )
 SOURCE_STAGES = {"published-4.7", "published-4.7.3"}
+
+
+def fixture_role(stage):
+    return SUCCESSOR_ROLES.get(stage, stage)
 GEAR_SCIENCE = [[name, 1] for name in ("automation-science-pack", "logistic-science-pack", "chemical-science-pack", "production-science-pack")]
 OWNERS = {
     "low-density-structure-productivity",
@@ -171,7 +179,7 @@ class FullCatalogueUpgradeF210FixtureTests(unittest.TestCase):
                 if space:
                     mods.update({"elevated-rails": "2.1.23", "quality": "2.1.23", "recycler": "2.1.23", "space-age": "2.1.23"})
                 with self.subTest(stage=stage, space=space):
-                    result = self.lua.eval("run_data")((F210 / stage / "data-final-fixes.lua").as_posix(), (SHARED / "data-final-fixes.lua").as_posix(), (F210 / stage / "catalogue.lua").as_posix(), (SHARED / "f210-catalogue.lua").as_posix(), lua(self.lua, raw), lua(self.lua, mods))
+                    result = self.lua.eval("run_data")((F210 / fixture_role(stage) / "data-final-fixes.lua").as_posix(), (SHARED / "data-final-fixes.lua").as_posix(), (F210 / fixture_role(stage) / "catalogue.lua").as_posix(), (SHARED / "f210-catalogue.lua").as_posix(), lua(self.lua, raw), lua(self.lua, mods))
                     self.assertTrue(result["ok"], result["message"])
                     actual = py(result["raw"])["technology"]["recipe-prod-research_gears-1"]["unit"]
                     self.assertEqual((None, "1", 1), (actual.get("count"), actual["count_formula"], actual["time"]))
@@ -189,7 +197,7 @@ class FullCatalogueUpgradeF210FixtureTests(unittest.TestCase):
                     with self.subTest(stage=stage, space=space, ingredients=ingredients):
                         raw_input = lua(self.lua, {"technology": {"recipe-prod-research_gears-1": altered}})
                         before = py(raw_input)
-                        result = self.lua.eval("run_data")((F210 / stage / "data-final-fixes.lua").as_posix(), (SHARED / "data-final-fixes.lua").as_posix(), (F210 / stage / "catalogue.lua").as_posix(), (SHARED / "f210-catalogue.lua").as_posix(), raw_input, lua(self.lua, mods))
+                        result = self.lua.eval("run_data")((F210 / fixture_role(stage) / "data-final-fixes.lua").as_posix(), (SHARED / "data-final-fixes.lua").as_posix(), (F210 / fixture_role(stage) / "catalogue.lua").as_posix(), (SHARED / "f210-catalogue.lua").as_posix(), raw_input, lua(self.lua, mods))
                         self.assertFalse(result["ok"])
                         self.assertIn("gear science", str(result["message"]))
                         self.assertEqual(before, py(result["raw"]))
@@ -198,12 +206,12 @@ class FullCatalogueUpgradeF210FixtureTests(unittest.TestCase):
                         with self.subTest(stage=stage, wrong_mir=wrong_mir):
                             raw_input = lua(self.lua, {"technology": {"recipe-prod-research_gears-1": copy.deepcopy(gear)}})
                             before = py(raw_input)
-                            result = self.lua.eval("run_data")((F210 / stage / "data-final-fixes.lua").as_posix(), (SHARED / "data-final-fixes.lua").as_posix(), (F210 / stage / "catalogue.lua").as_posix(), (SHARED / "f210-catalogue.lua").as_posix(), raw_input, lua(self.lua, {**mods, "more-infinite-research": wrong_mir}))
+                            result = self.lua.eval("run_data")((F210 / fixture_role(stage) / "data-final-fixes.lua").as_posix(), (SHARED / "data-final-fixes.lua").as_posix(), (F210 / fixture_role(stage) / "catalogue.lua").as_posix(), (SHARED / "f210-catalogue.lua").as_posix(), raw_input, lua(self.lua, {**mods, "more-infinite-research": wrong_mir}))
                             self.assertFalse(result["ok"])
                             self.assertIn("unexpected MIR target closure", str(result["message"]))
                             self.assertEqual(before, py(result["raw"]))
         gear = {"max_level": "infinite", "unit": {"count_formula": "8000*2^(L-1)", "time": 61}, "effects": [{"type": "change-recipe-productivity", "recipe": "iron-gear-wheel", "change": .1}]}
-        result = self.lua.eval("run_data")((F210 / "mir5/data-final-fixes.lua").as_posix(), (SHARED / "data-final-fixes.lua").as_posix(), (F210 / "mir5/catalogue.lua").as_posix(), (SHARED / "f210-catalogue.lua").as_posix(), lua(self.lua, {"technology": {"recipe-prod-research_gears-1": gear}}), lua(self.lua, {"base": "2.1.23", "more-infinite-research": "5.0.21000", "mir-fixture-mir5-full-catalogue-upgrade": "0.2.0"}))
+        result = self.lua.eval("run_data")((F210 / "successor/data-final-fixes.lua").as_posix(), (SHARED / "data-final-fixes.lua").as_posix(), (F210 / "successor/catalogue.lua").as_posix(), (SHARED / "f210-catalogue.lua").as_posix(), lua(self.lua, {"technology": {"recipe-prod-research_gears-1": gear}}), lua(self.lua, {"base": "2.1.23", "more-infinite-research": "5.0.21000", "mir-fixture-mir5-full-catalogue-upgrade": "0.2.0"}))
         self.assertFalse(result["ok"])
         self.assertIn("workload differs", str(result["message"]))
         self.assertEqual(61, py(result["raw"])["technology"]["recipe-prod-research_gears-1"]["unit"]["time"])
@@ -216,8 +224,8 @@ class FullCatalogueUpgradeF210FixtureTests(unittest.TestCase):
     def test_shared_control_registers_f210_stages_without_runtime_reads(self):
         for stage, mir, fixture, _, _ in STAGES:
             with self.subTest(stage=stage):
-                self.lua.globals().control_path = (F210 / stage / "control.lua").as_posix()
-                self.lua.globals().catalogue_path = (F210 / stage / "catalogue.lua").as_posix()
+                self.lua.globals().control_path = (F210 / fixture_role(stage) / "control.lua").as_posix()
+                self.lua.globals().catalogue_path = (F210 / fixture_role(stage) / "catalogue.lua").as_posix()
                 self.lua.globals().f210_catalogue_path = (SHARED / "f210-catalogue.lua").as_posix()
                 self.lua.globals().common_control_path = (SHARED / "control.lua").as_posix()
                 self.lua.globals().source_stage = stage in SOURCE_STAGES
@@ -384,8 +392,8 @@ class FullCatalogueUpgradeF210FixtureTests(unittest.TestCase):
     def test_f210_473_source_snapshot_reaches_the_current_successor_unchanged(self):
         self.lua.globals().source_control_path = (F210 / "published-4.7.3" / "control.lua").as_posix()
         self.lua.globals().source_catalogue_path = (F210 / "published-4.7.3" / "catalogue.lua").as_posix()
-        self.lua.globals().successor_control_path = (F210 / "mir5-from-4.7.3" / "control.lua").as_posix()
-        self.lua.globals().successor_catalogue_path = (F210 / "mir5-from-4.7.3" / "catalogue.lua").as_posix()
+        self.lua.globals().successor_control_path = (F210 / "successor-from-4.7.3" / "control.lua").as_posix()
+        self.lua.globals().successor_catalogue_path = (F210 / "successor-from-4.7.3" / "catalogue.lua").as_posix()
         self.lua.globals().f210_catalogue_path = (SHARED / "f210-catalogue.lua").as_posix()
         self.lua.globals().common_control_path = (SHARED / "control.lua").as_posix()
         self.lua.execute("""
@@ -525,7 +533,7 @@ class FullCatalogueUpgradeF210FixtureTests(unittest.TestCase):
 
     def test_profiles_and_shared_staging_contract_are_explicit(self):
         for stage, mir, fixture, _, _ in STAGES:
-            info = json.loads((F210 / stage / "info.json").read_text(encoding="utf-8"))
+            info = json.loads((F210 / fixture_role(stage) / "info.json").read_text(encoding="utf-8"))
             with self.subTest(info_stage=stage):
                 self.assertEqual(("mir-fixture-mir5-full-catalogue-upgrade", fixture, "2.1"), (info["name"], info["version"], info["factorio_version"]))
                 self.assertEqual([
@@ -560,13 +568,13 @@ class FullCatalogueUpgradeF210FixtureTests(unittest.TestCase):
                     self.assertEqual({"version": "2.1.23", "sha256": "FE4A1DA30F322A0D0B8AEB3DF7276332222BAAA143E2352569B723E84B2B9060"}, data["engine"])
                     self.assertEqual(expected_mods, data["mods"])
                     self.assertEqual({"mir-fixture-mir5-active-mods-observer_0.1.0.zip": observer, f"more-infinite-research_{mir}.zip": archive}, data["archive_sha256"])
-        self.assertEqual((F210 / "published-4.7/control.lua").read_bytes(), (F210 / "mir5/control.lua").read_bytes())
-        self.assertEqual((F210 / "published-4.7/data-final-fixes.lua").read_bytes(), (F210 / "mir5/data-final-fixes.lua").read_bytes())
-        self.assertEqual((F210 / "published-4.7.3/control.lua").read_bytes(), (F210 / "mir5-from-4.7.3/control.lua").read_bytes())
-        self.assertEqual((F210 / "published-4.7.3/data-final-fixes.lua").read_bytes(), (F210 / "mir5-from-4.7.3/data-final-fixes.lua").read_bytes())
+        self.assertEqual((F210 / "published-4.7/control.lua").read_bytes(), (F210 / "successor/control.lua").read_bytes())
+        self.assertEqual((F210 / "published-4.7/data-final-fixes.lua").read_bytes(), (F210 / "successor/data-final-fixes.lua").read_bytes())
+        self.assertEqual((F210 / "published-4.7.3/control.lua").read_bytes(), (F210 / "successor-from-4.7.3/control.lua").read_bytes())
+        self.assertEqual((F210 / "published-4.7.3/data-final-fixes.lua").read_bytes(), (F210 / "successor-from-4.7.3/data-final-fixes.lua").read_bytes())
         self.assertEqual("4.7.21002", self.plan["target"]["published_mir"])
         for stage in ("published-4.7.3", "mir5-from-4.7.3"):
-            self.lua.globals().catalogue_path = (F210 / stage / "catalogue.lua").as_posix()
+            self.lua.globals().catalogue_path = (F210 / fixture_role(stage) / "catalogue.lua").as_posix()
             self.lua.globals().f210_catalogue_path = (SHARED / "f210-catalogue.lua").as_posix()
             self.lua.execute("""
               function load_f210_473_catalogue()

@@ -15,6 +15,7 @@ import unittest
 
 ROOT = Path(__file__).resolve().parents[1]
 FIXTURE = ROOT / "tests/fixtures/k2-imersite-transition"
+SUCCESSOR_ROLE = "successor"
 HELD_FLAGS_FIXTURE = ROOT / "tests/fixtures/k2-imersite-held-public-flags"
 PROFILES = ROOT / "tests/profiles"
 EARLY = "recipe-prod-research_material_imersite-1"
@@ -64,6 +65,10 @@ STAGES = {
     "published-4.7": ("4.7.21002", "0.2.0"),
     "mir5": ("5.0.21000", "0.3.0"),
 }
+
+
+def fixture_role(stage):
+    return SUCCESSOR_ROLE if stage == "mir5" else stage
 _package_spec = importlib.util.spec_from_file_location("k2_imersite_transition_package", ROOT / "tools" / "package.py")
 PACKAGE = importlib.util.module_from_spec(_package_spec)
 assert _package_spec.loader is not None
@@ -187,8 +192,8 @@ class K2ImersiteTransitionFixtureTests(unittest.TestCase):
     def _data(self, stage: str, opponent: str = "", setting_default=None):
         if setting_default is None:
             setting_default = 3 if stage == "predecessor-4.6" else 0
-        path = (FIXTURE / stage / "data-final-fixes.lua").as_posix()
-        setting = FIXTURE / stage / "settings-updates.lua"
+        path = (FIXTURE / fixture_role(stage) / "data-final-fixes.lua").as_posix()
+        setting = FIXTURE / fixture_role(stage) / "settings-updates.lua"
         return self.lua.eval("run_k2_data_fixture")(
             path, setting.as_posix() if setting.exists() else "", stage, opponent, setting_default
         )
@@ -376,13 +381,13 @@ class K2ImersiteTransitionFixtureTests(unittest.TestCase):
     def test_controls_register_without_game_or_storage_reads_and_keep_native_boundaries(self):
         for stage in STAGES:
             with self.subTest(stage=stage):
-                result = self.lua.eval("parse_k2_control")((FIXTURE / stage / "control.lua").as_posix())
+                result = self.lua.eval("parse_k2_control")((FIXTURE / fixture_role(stage) / "control.lua").as_posix())
                 self.assertTrue(result["ok"], result["message"])
                 self.assertIsNone(result["forbidden"]["game"])
                 self.assertIsNone(result["forbidden"]["storage"])
                 self.assertIsNotNone(result["callbacks"]["load"])
                 self.assertIsNotNone(result["callbacks"]["events"][1])
-                source = (FIXTURE / stage / "control.lua").read_text(encoding="utf-8")
+                source = (FIXTURE / fixture_role(stage) / "control.lua").read_text(encoding="utf-8")
                 self.assertIn("game.server_save", source)
                 self.assertIn('local SAVE = "mir5-native-complete"', source)
                 self.assertNotIn("force.research_queue =", source)
@@ -402,14 +407,14 @@ class K2ImersiteTransitionFixtureTests(unittest.TestCase):
         self.assertIn("force.technologies[TAIL] ~= nil", published)
         self.assertIn("state.published_mir", published)
         self.assertNotIn("CARRIER].enabled = true", published)
-        successor = (FIXTURE / "mir5/control.lua").read_text(encoding="utf-8")
+        successor = (FIXTURE / "successor/control.lua").read_text(encoding="utf-8")
         self.assertIn('direct_predecessor_handoff=state.handoff_source == "direct-4.6"', successor)
         self.assertIn("recovered_tail_saved_progress_before_lab=0.42", successor)
         self.assertIn("state.published_mir ~= \"4.7.21002\"", successor)
         self.assertIn("destination_lab_completions ~= 1", successor)
 
     def _successor_configuration(self, kind, opponent=""):
-        self.lua.globals().successor_path = (FIXTURE / "mir5/control.lua").as_posix()
+        self.lua.globals().successor_path = (FIXTURE / "successor/control.lua").as_posix()
         self.lua.globals().source_kind_fixture = kind
         self.lua.globals().source_opponent = opponent
         return self.lua.execute(r'''

@@ -20,7 +20,7 @@ A data-stage generator cannot inspect the player's save. Runtime code cannot rel
 
 ## Baseline and upgrade paths
 
-The principal predecessor is the exact published 4.7 package for the same engine family. Preserve prior release variants by their hashes where relevant; version text alone does not identify previously reissued bytes. Distinct older upgrade boundaries retain their previously promised scope or receive an explicit documented bridge decision. Never recommend downgrade as the automatic inverse of upgrade.
+The principal predecessor is the exact published 4.7.3 package for the same engine family, supplemented by the complete modern-origin requirement below. Preserve prior release variants by their hashes where relevant; version text alone does not identify previously reissued bytes. Distinct older upgrade boundaries retain their previously promised scope or receive an explicit documented bridge decision. Never recommend downgrade as the automatic inverse of upgrade.
 
 Private incomplete slices use disposable worlds only. Do not load and resave a real full MIR factory with a one-technology replacement package. Full-save migration qualification starts only after all relevant definitions and runtime bridges exist.
 
@@ -32,7 +32,7 @@ Published F2004.7 did not persist the old competing-productivity preference, and
 
 ## Finite transition policy
 
-Record direct, staged, refused and unresolved routes against their exact inputs instead of treating every engine/DLC/provider permutation as supported. Additional best-effort editions do not silently multiply the retained native matrix. A later source change needs a consumed-path applicability review and any affected native scenario; unchanged evidence keeps its original name and verdict.
+Record direct, staged, refused, unavailable and unresolved routes against their exact inputs instead of treating every engine/DLC/provider permutation as supported. The maintainer's explicit origin coverage below expands the migration gate; it does not imply arbitrary engine/mod combinations. A later source change needs a consumed-path applicability review and any affected native scenario; unchanged evidence keeps its original name and verdict.
 
 | Route | Policy and current evidence boundary |
 |---|---|
@@ -47,11 +47,35 @@ Record direct, staged, refused and unresolved routes against their exact inputs 
 
 For a refused or unqualified upgrade, retain the original save and its matching archives/settings, test only a copy, and use a named qualified intermediate route when one exists. Do not recommend a downgrade or a remove-save-readd cycle as an inferred inverse migration.
 
+## Required origin coverage
+
+`MIG-05` — The maintainer expanded save qualification on 27 October 2026. Test exact published MIR 4.7.3 saves into MIR5 for every supported Factorio edition with an actual 4.7.3 predecessor. On Factorio 2.0 and 2.1, additionally qualify direct latest-MIR upgrades from every published MIR version from 1.0.0 onward that is valid for the source engine, including distinct relevant published byte variants. The 1.0.0 tag declares Factorio 2.0; a small MIR version number is not evidence that a modern-origin case is inapplicable. MIR 1–3 origins are not limited to the selected master-changelog entries. For 1.1 and earlier, all pre-5 origins beyond 4.7.3 remain best effort; MIR 5-and-later origins require tested forward upgrades for every engine-valid origin/candidate pair among delivered supported editions. Separately labelled best-effort editions retain their target contract and recorded qualification limits.
+
+| Origin and destination | Required qualification |
+|---|---|
+| Exact 4.7.3 to 5.0.0, same supported engine edition | Each published predecessor edition; Base and Space Age where actually supported, plus affected settings/provider/mod regression closures. |
+| Every published MIR release from 1.0.0 through 4.x to MIR5 on 2.0/2.1 | Each actual engine-valid published origin, with its package, settings, migration history and save pinned; direct MIR upgrade without requiring an intermediate MIR release. |
+| Each 2.0 origin brought forward to 2.1 | Qualify a separate 2.1 successor from every applicable protected 2.0 origin save, in addition to its same-engine upgrade; identify the original source engine/package and every required engine bridge. Do not manufacture a 2.1 predecessor by editing an old package's metadata. A 2.1-only origin does not imply a supported downgrade into 2.0. |
+| A target with no published 4.7.3 artifact | Record that absence explicitly, use the latest actual relevant predecessor where one exists, and qualify the target's forward route; never invent a 4.7.3 package or count a missing input as a pass. |
+| Each MIR 5-or-later origin to a later MIR 5 release | Retain immutable origin saves and prove the direct upgrade into the new candidate for every engine-valid origin/candidate pair, including earlier supported Factorio editions. Previously accepted results require exact-input applicability review rather than silent relabelling. |
+
+Recover the finite origin list from published tags/releases and their actual package metadata and hashes. For every origin record the source commit, engine eligibility, archive identity, relevant JSON/Lua migration names and contents, required mods/settings, save identity and any unavailable input or known historical defect. Distinguish a published artifact from a reconstruction of its tagged source. Keep this coverage with the existing inventories, profiles and exact evidence; do not add a production history database, generic migration planner or another assurance framework.
+
+Each origin needs an actual original-save to candidate-save to two-cold-reload route under `MIG-03`, with new native research and the expected earned effect where research is supported. Check completed/next levels, partial and queued/suspended work, native and scripted contributions, settings, caps and disablement ownership, relevant entities and unrelated force state. Select boundary states and affected mod closures explicitly; a fresh-world load or one 4.7.3 save does not qualify all older origins. Shared fixtures may exercise common checks, but different origin saves remain different native cases. Reuse a successful frozen source stage without recreating or overwriting it.
+
+An engine that cannot read the origin save format needs an explicit engine bridge; this is distinct from requiring an intermediate MIR installation. An old mod that cannot create or load a valid source save remains an evidenced adverse/unavailable route requiring recovery work or a maintainer decision. Preserve its original bytes and failure instead of patching the published archive and calling it historical qualification. The existing 4.2.1 loss guidance and 4.7 preference-history ambiguity remain real limits: no migration can infer erased earned state without surviving evidence.
+
 ## Migrations themselves
 
 `MIG-02` — Inventory existing JSON/Lua migrations by filename, purpose, required predecessor and imports. Factorio remembers applied names and runs JSON before Lua migrations. Do not rename filenames mechanically during repository cleanup. Decouple required historical logic from retired imports without retaining a whole old subsystem. [Migrations](https://lua-api.factorio.com/latest/auxiliary/migrations.html)
 
 Small state transformations are idempotent. Keep the existing storage/global namespace and contribution baselines where necessary. Do not reset every force/technology, clear `mir` storage or grant invented levels to repair an unexplained failure. Writing native `level`/`researched` can itself change benefits/enablement; test effective state. [LuaTechnology](https://lua-api.factorio.com/latest/classes/LuaTechnology.html)
+
+`MIG-06` — Maintain one shared cumulative migration set and narrow engine adapters. Audit every historically published migration filename, ordered transformation, predecessor schema, import and affected identity before deciding to retain, replace its internals or retire its implementation. Preserve applied filenames and live rename/carrier obligations. Required recovery must be self-contained or use current bounded runtime helpers; it must not import a retired compiler, Generator or old whole-version source tree. A blanket restoration of every historical Lua script is not acceptable: a previously applied migration is skipped, while a newly added filename can run against much newer saves and on mod addition. Test both histories before shipping a recovered step.
+
+Prefer preserving an unchanged native identity to renaming it. Where a rename is necessary, retain the exact JSON mapping and test the ordered composition of all relevant mappings, including a save that already applied an earlier mapping. Use Lua only for necessary saved-state transformations with explicit schema/input guards and a bounded set of MIR-owned entries; preserve foreign contributions and invalid-object handling. Reconciliation may be idempotent, but that does not make replaying an old exactly-once engine migration safe. No repeated world/entity scan or per-tick migration loop follows from cumulative support.
+
+Every future release reviews its identity, schema and setting changes against the retained origin matrix. Add a new stable migration filename only when a new transformation is necessary; do not add empty files per release or repurpose an already applied name for work that existing saves must execute again. Keep independent package-membership/rename-chain/schema controls and native direct-upgrade fixtures. Record source-save, candidate-save and reload hashes in the existing evidence chain. Historical source and large save custody stay outside player packages; only required live migration code and mappings ship.
 
 ## Independent observation
 

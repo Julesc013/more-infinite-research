@@ -242,11 +242,11 @@ class BobAngelNativeFixtureTests(unittest.TestCase):
 
     def setUp(self):
         self.lua = LuaRuntime(unpack_returned_tuples=True)
-        self.lua.globals().data_fixes = (FIXTURE / "mir5/data-final-fixes.lua").as_posix()
-        self.lua.globals().mir5_control = (FIXTURE / "mir5/control.lua").as_posix()
+        self.lua.globals().data_fixes = (FIXTURE / "successor/data-final-fixes.lua").as_posix()
+        self.lua.globals().mir5_control = (FIXTURE / "successor/control.lua").as_posix()
         self.lua.globals().published_control_path = (FIXTURE / "published-4.7/control.lua").as_posix()
         self.lua.globals().published_reset_control_path = (FIXTURE / "published-config-control/control.lua").as_posix()
-        self.lua.globals().mir5_control_path = (FIXTURE / "mir5/control.lua").as_posix()
+        self.lua.globals().mir5_control_path = (FIXTURE / "successor/control.lua").as_posix()
         self.lua.globals().effect3_control_path = (FIXTURE / "effect3-cap2/control.lua").as_posix()
         self.lua.globals().effect1_control_path = (FIXTURE / "effect1-cap40/control.lua").as_posix()
         self.lua.execute(r'''
@@ -564,7 +564,7 @@ class BobAngelNativeFixtureTests(unittest.TestCase):
     def test_profiles_pin_source_destination_and_relaxation_archives(self):
         base = json.loads(BASE_PROFILE.read_text(encoding="utf-8"))
         expected = {"published": ("4.7.20002", "0.1.0"), "published_reset": ("4.7.20002", "0.1.1"), "mir5": ("5.0.20000", "0.2.0"), "effect3": ("5.0.20000", "0.3.0"), "effect1": ("5.0.20000", "0.4.0")}
-        directories = {"published": "published-4.7", "published_reset": "published-config-control", "mir5": "mir5", "effect3": "effect3-cap2", "effect1": "effect1-cap40"}
+        directories = {"published": "published-4.7", "published_reset": "published-config-control", "mir5": "successor", "effect3": "effect3-cap2", "effect1": "effect1-cap40"}
         for key,path in PROFILE_PATHS.items():
             profile=json.loads(path.read_text(encoding="utf-8"))
             self.assertEqual(profile["target"],"f200")
@@ -703,7 +703,7 @@ class BobAngelNativeFixtureTests(unittest.TestCase):
                 self.assertEqual((300+effect-1)//effect,useful)
                 self.assertEqual(min(cap,useful),cap)
         source=(FIXTURE/"published-4.7/control.lua").read_text(encoding="utf-8")
-        mir5=(FIXTURE/"mir5/control.lua").read_text(encoding="utf-8")
+        mir5=(FIXTURE/"successor/control.lua").read_text(encoding="utf-8")
         self.assertIn("historical_lab_completed_levels=0",source)
         self.assertIn("no_fabricated_150_completion_claim=true",source)
         self.assertIn("assert_external_prewrite",source)

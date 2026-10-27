@@ -12,6 +12,7 @@ import unittest
 
 ROOT = Path(__file__).resolve().parents[1]
 FIXTURE = ROOT / "tests/fixtures/k2se-imersite-carrier-retention"
+SUCCESSOR_ROLE = "successor"
 BASE_PROFILE = ROOT / "tests/profiles/k2se-base-f210-2123.json"
 PUBLISHED_PROFILE = ROOT / "tests/profiles/k2se-imersite-carriers-published-4.7-f210-2123.json"
 SUCCESSOR_PROFILE = ROOT / "tests/profiles/k2se-imersite-carriers-mir5-f210-2123.json"
@@ -24,6 +25,10 @@ SUCCESSOR_SOURCE = "b251ae7a54104ace87cb0da4cf531cf53f03c93d"
 SUCCESSOR_SOURCE_TREE = "79b73a6a8e68987737e69bf2d95ec6555b49f901"
 EARLY = "mir-k2-imersite-staged-state-1"
 TAIL = "mir-k2-imersite-continuation-state-4"
+
+
+def fixture_role(stage):
+    return SUCCESSOR_ROLE if stage == "mir5" else stage
 OBSERVER = "mir-fixture-mir5-active-mods-observer_0.1.0.zip"
 
 
@@ -162,7 +167,7 @@ class K2SEImersiteCarrierFixtureTests(unittest.TestCase):
 
     def _data(self, stage, opponent=""):
         return self.lua.eval("carrier_data")(
-            str(FIXTURE / stage / "data-final-fixes.lua"), "published" if stage == "published-4.7" else "mir5", opponent)
+            str(FIXTURE / fixture_role(stage) / "data-final-fixes.lua"), "published" if stage == "published-4.7" else "mir5", opponent)
 
     def test_profiles_preserve_exact_q013_closure_and_select_only_two_mir_fixture_arms(self):
         base = json.loads(BASE_PROFILE.read_text(encoding="utf-8"))
@@ -213,18 +218,18 @@ class K2SEImersiteCarrierFixtureTests(unittest.TestCase):
     def test_controls_register_without_game_or_storage_reads_and_on_load_is_read_only(self):
         for stage in ("published-4.7", "mir5"):
             with self.subTest(stage=stage):
-                parsed = self.lua.eval("carrier_parse")(str(FIXTURE / stage / "control.lua"), "published" if stage == "published-4.7" else "successor")
+                parsed = self.lua.eval("carrier_parse")(str(FIXTURE / fixture_role(stage) / "control.lua"), "published" if stage == "published-4.7" else "successor")
                 self.assertTrue(parsed["ok"], parsed["message"])
                 self.assertEqual((0, 0), (parsed["reads"]["game"], parsed["reads"]["storage"]))
                 self.assertIsNotNone(parsed["callbacks"]["load"])
                 self.assertIsNotNone(parsed["callbacks"]["events"][1])
-                source = (FIXTURE / stage / "control.lua").read_text(encoding="utf-8")
+                source = (FIXTURE / fixture_role(stage) / "control.lua").read_text(encoding="utf-8")
                 on_load = source.split("script.on_load", 1)[1].split("script.on_event", 1)[0]
                 self.assertNotIn("game.", on_load)
                 self.assertNotIn("storage", on_load)
 
     def test_source_then_successor_retains_native_seeded_carriers_through_two_reload_callbacks(self):
-        result = self.lua.eval("carrier_flow")(str(FIXTURE / "published-4.7/control.lua"), str(FIXTURE / "mir5/control.lua"), "")
+        result = self.lua.eval("carrier_flow")(str(FIXTURE / "published-4.7/control.lua"), str(FIXTURE / "successor/control.lua"), "")
         self.assertTrue(result["ok"], result["message"])
         self.assertEqual(2, result["saves"])
         markers = [as_plain(result["markers"][index]) for index in range(1, 5)]
@@ -245,7 +250,7 @@ class K2SEImersiteCarrierFixtureTests(unittest.TestCase):
         self.assertEqual("successor-complete", result["storage"]["mir5_k2se_imersite_carrier_retention"]["phase"])
 
     def test_source_failure_reports_actual_player_queue_after_force_creation_boundary(self):
-        result = self.lua.eval("carrier_flow")(str(FIXTURE / "published-4.7/control.lua"), str(FIXTURE / "mir5/control.lua"),
+        result = self.lua.eval("carrier_flow")(str(FIXTURE / "published-4.7/control.lua"), str(FIXTURE / "successor/control.lua"),
                                                 "force-created-clears-player-investment")
         self.assertFalse(result["ok"])
         self.assertIn("source current/queued investment differs", result["message"])
@@ -255,7 +260,7 @@ class K2SEImersiteCarrierFixtureTests(unittest.TestCase):
         self.assertEqual(0, result["saves"])
 
     def test_successor_refuses_changed_foreign_carrier_before_its_own_state_write(self):
-        result = self.lua.eval("carrier_flow")(str(FIXTURE / "published-4.7/control.lua"), str(FIXTURE / "mir5/control.lua"), "foreign-enabled")
+        result = self.lua.eval("carrier_flow")(str(FIXTURE / "published-4.7/control.lua"), str(FIXTURE / "successor/control.lua"), "foreign-enabled")
         self.assertFalse(result["ok"])
         self.assertIn("independently disabled foreign carrier differs", result["message"])
         self.assertEqual(2, len(list(result["markers"].keys())))
