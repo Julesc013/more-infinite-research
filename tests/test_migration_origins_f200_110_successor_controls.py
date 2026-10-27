@@ -439,7 +439,7 @@ class MigrationOriginF200110SuccessorControls(unittest.TestCase):
         self.lua.globals().legacy_module_definitions_path = LEGACY_MODULE_DEFINITIONS.as_posix()
         self.lua.globals().legacy_module_runtime_path = LEGACY_MODULE_RUNTIME.as_posix()
         self.lua.execute(r'''
-          function migration_origin_110_successor_lifecycle(target, source_fixture_name, active_wrapper_name, catalogue_fixture_name, legacy_module_bonus, reset_drops_module_bonus, saved_battery_token, current_recipe_scalar, duplicate_current_recipe, foreign_saved, foreign_queue_progress, foreign_current_saved, foreign_current_technology, recipe_snapshot_variant)
+          function migration_origin_110_successor_lifecycle(target, source_fixture_name, active_wrapper_name, catalogue_fixture_name, legacy_module_bonus, reset_drops_module_bonus, saved_battery_token, current_recipe_scalar, duplicate_current_recipe, foreign_saved, foreign_queue_progress, foreign_current_saved, foreign_current_technology, recipe_snapshot_variant, direct_recipe_scalar, duplicate_direct_recipe)
             local callbacks={events={}}
             local env={storage={},logs={},created_labs=0,saved=false,
               script={active_mods={},on_configuration_changed=function(fn) callbacks.configuration=fn end,
@@ -537,8 +537,20 @@ class MigrationOriginF200110SuccessorControls(unittest.TestCase):
                 worker_robots_battery_modifier=.1,research_queue={},research_progress=0,current_research=nil,add_calls=0,reset_calls=0}
               for _,name in ipairs(roster) do
                 local saved=snapshot.technologies[name]
+                local effects=catalogue.rows[name]
+                if name==catalogue.direct and (direct_recipe_scalar~=nil or duplicate_direct_recipe) then
+                  effects=copy_effects(effects)
+                  for _,effect in ipairs(effects) do
+                    if effect.type=="change-recipe-productivity" and effect.recipe==catalogue.gear_recipe
+                        and direct_recipe_scalar~=nil then effect.change=direct_recipe_scalar end
+                  end
+                  if duplicate_direct_recipe then
+                    effects[#effects+1]={type="change-recipe-productivity",recipe=catalogue.gear_recipe,
+                      change=direct_recipe_scalar or catalogue.expected_gear_delta}
+                  end
+                end
                 local value={name=name,valid=true,level=saved.level,researched=false,enabled=true,visible_when_disabled=false,
-                  saved_progress=saved.saved,prototype={max_level=UINT32_MAX,effects=catalogue.rows[name]},
+                  saved_progress=saved.saved,prototype={max_level=UINT32_MAX,effects=effects},
                   research_unit_ingredients={{name="automation-science-pack",amount=1}}}
                 value.force=force;force.technologies[name]=value
               end
@@ -901,6 +913,36 @@ class MigrationOriginF200110SuccessorControls(unittest.TestCase):
                 result = py(self.lua.eval("migration_origin_110_successor_lifecycle")(
                     "f200", source["name"], wrapper["name"], None, None, False,
                     battery_token, recipe_scalar, duplicate))
+                self.assertFalse(result["ok"])
+                self.assertIn(expected, result["message"])
+                self.assertEqual((0, 0), (result["created_labs"], result["player_add_calls"]))
+                self.assertFalse(result["saved"])
+                self.assertFalse(result["source_state_changed"])
+                self.assertFalse(result["active_state_changed"])
+
+    def test_control_accepts_exact_current_direct_gear_tokens_and_refuses_drift_or_duplicates(self):
+        self._install_lifecycle_model()
+        source = json.loads((SOURCE_FIXTURE / "info.json").read_text(encoding="utf-8"))
+        wrapper = json.loads((FIXTURE / "info-f200.json").read_text(encoding="utf-8"))
+        native_recipe_scalar = struct.unpack("<f", struct.pack("<f", .10))[0]
+
+        for label, scalar in (("authored", .10), ("native-float32", native_recipe_scalar)):
+            with self.subTest(label=label):
+                result = py(self.lua.eval("migration_origin_110_successor_lifecycle")(
+                    "f200", source["name"], wrapper["name"], None, None, False,
+                    None, None, False, None, None, None, None, None, scalar, False))
+                self.assertTrue(result["ok"], result["message"])
+                self.assertEqual((1, 1), (result["created_labs"], result["player_add_calls"]))
+
+        opponents = (
+            ("wrong-scalar", .11, False, "published source recipe-effect scalar is unsupported"),
+            ("duplicate", native_recipe_scalar, True, "candidate direct gear effect differs"),
+        )
+        for label, scalar, duplicate, expected in opponents:
+            with self.subTest(label=label):
+                result = py(self.lua.eval("migration_origin_110_successor_lifecycle")(
+                    "f200", source["name"], wrapper["name"], None, None, False,
+                    None, None, False, None, None, None, None, None, scalar, duplicate))
                 self.assertFalse(result["ok"])
                 self.assertIn(expected, result["message"])
                 self.assertEqual((0, 0), (result["created_labs"], result["player_add_calls"]))
