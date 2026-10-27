@@ -25,6 +25,12 @@ for index, name in ipairs(science) do
     and ingredient[3] == nil,
     "[mir5-legacy-boolean-cap-f200] successor gear science differs at " .. tostring(index))
 end
+for _, name in ipairs(science) do
+  local tool = assert(data.raw.tool and data.raw.tool[name],
+    "[mir5-legacy-boolean-cap-f200] successor science tool is absent: " .. name)
+  assert(tool.type == "tool" and tool.name == name and tool.durability == 1,
+    "[mir5-legacy-boolean-cap-f200] successor science tool differs: " .. name)
+end
 assert(type(gear.effects) == "table" and #gear.effects == 1
   and gear.effects[1].type == "change-recipe-productivity"
   and gear.effects[1].recipe == "iron-gear-wheel" and gear.effects[1].change == 0.10,

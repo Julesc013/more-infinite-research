@@ -2,7 +2,7 @@ local TARGETS = {
   f200 = {
     case = "legacy-boolean-cap-current-f200", base = "2.0.77", mir = "5.0.20000", fixture = "0.2.0",
     prefix = "mir5-legacy-boolean-cap-f200", restored_label = "F200 restored player",
-    completed_label = "F200 post-lab player",
+    completed_label = "F200 post-lab player", science_tool_durability = 1,
   },
   f210 = {
     case = "legacy-boolean-cap-current-f210", base = "2.1.23", mir = "5.0.21000", fixture = "0.3.0",
@@ -92,6 +92,34 @@ local function read_lab(state)
   return value, inventory
 end
 
+-- Factorio 2.0 represents Base science packs as ToolPrototype instances.  The
+-- inventory's uint32 item count therefore does not expose partial durability:
+-- a stack with one 0.27-durability pack and thirteen full packs still counts
+-- as fourteen items.  The F200 data-stage guard pins the one-unit maximum;
+-- this runtime reader accounts for every matching occupied stack without
+-- making the F210 plain-item route depend on old tool semantics.
+local function tool_equivalents(inventory, name)
+  local maximum = target.science_tool_durability
+  if type(maximum) ~= "number" or maximum <= 0 then fail("F200 tool science maximum is invalid") end
+  local total, observed = 0, false
+  for index = 1, #inventory do
+    local stack = inventory[index]
+    if stack ~= nil and stack.valid_for_read and stack.name == name then
+      if stack.type ~= "tool" then fail("F200 science stack is not a tool: " .. name) end
+      local count, durability = stack.count, stack.durability
+      if type(count) ~= "number" or count < 1 or count ~= math.floor(count) then
+        fail("F200 science tool count is invalid: " .. name)
+      end
+      if type(durability) ~= "number" or durability <= 0 or durability > maximum then
+        fail("F200 science tool durability is invalid: " .. name)
+      end
+      total, observed = total + count - 1 + durability / maximum, true
+    end
+  end
+  if not observed then fail("F200 science tool stack is absent: " .. name) end
+  return total
+end
+
 local function recharge_lab(state)
   local value, inventory = read_lab(state)
   value.energy = LAB_ENERGY
@@ -146,14 +174,28 @@ local function assert_completed(state)
   assert_foreign(game.forces[state.foreign_force_index], state.foreign_queue)
   local _, inventory = read_lab(state)
   for _, name in ipairs(SCIENCE) do
-    local actual, before = inventory.get_item_count(name), state.destination_science_before[name]
-    if actual ~= before - 1 then
-      local force = game.forces.player
-      fail("successor real lab consumption differs for " .. name .. " expected=" .. tostring(before - 1)
-        .. " actual=" .. tostring(actual) .. " before=" .. tostring(before)
-        .. " labs=" .. tostring(state.destination_lab_completions) .. " level=" .. tostring(status(force).level)
-        .. " current=" .. tostring(force.current_research and force.current_research.name)
-        .. " progress=" .. tostring(force.research_progress))
+    if target.science_tool_durability ~= nil then
+      local before = state.destination_science_before[name]
+      local expected = before - state.destination_science_remaining
+      local actual = tool_equivalents(inventory, name)
+      if not close(actual, expected) then
+        local force = game.forces.player
+        fail("F200 successor tool science consumption differs for " .. name
+          .. " before-units=" .. tostring(before) .. " after-units=" .. tostring(actual)
+          .. " expected-delta=" .. tostring(state.destination_science_remaining)
+          .. " actual-delta=" .. tostring(before - actual)
+          .. " observed-lab-progress=" .. tostring(force.research_progress))
+      end
+    else
+      local actual, before = inventory.get_item_count(name), state.destination_science_before[name]
+      if actual ~= before - 1 then
+        local force = game.forces.player
+        fail("successor real lab consumption differs for " .. name .. " expected=" .. tostring(before - 1)
+          .. " actual=" .. tostring(actual) .. " before=" .. tostring(before)
+          .. " labs=" .. tostring(state.destination_lab_completions) .. " level=" .. tostring(status(force).level)
+          .. " current=" .. tostring(force.current_research and force.current_research.name)
+          .. " progress=" .. tostring(force.research_progress))
+      end
     end
   end
 end
@@ -192,12 +234,19 @@ script.on_configuration_changed(function()
     if inventory.insert{name = name, count = DESTINATION_PACKS} ~= DESTINATION_PACKS then
       fail("could not insert successor science " .. name)
     end
-    state.destination_science_before[name] = inventory.get_item_count(name)
+    state.destination_science_before[name] = target.science_tool_durability ~= nil
+      and tool_equivalents(inventory, name) or inventory.get_item_count(name)
   end
   local player, gear = game.forces.player, technology(game.forces.player, GEAR)
   if player.add_research(gear) ~= true or player.current_research ~= gear
       or not close(player.research_progress, .27) then
     fail("restored source investment did not become successor research")
+  end
+  if target.science_tool_durability ~= nil then
+    state.destination_science_remaining = 1 - player.research_progress
+    if not close(state.destination_science_remaining, .73) then
+      fail("F200 successor remaining science unit differs")
+    end
   end
   state.destination_started, state.destination_lab_completions = true, 0
   state.phase, state.deadline_tick = "await-successor-lab", game.tick + DEADLINE
