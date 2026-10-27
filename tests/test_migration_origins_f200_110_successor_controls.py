@@ -178,7 +178,12 @@ class MigrationOriginF200110SuccessorControls(unittest.TestCase):
             self.assertEqual(("a575a4198807b6aea9e26963e3d9970fc5c068ae", "398c79c687d2bc662c976355ced1436201c43f11"),
                              (profile["candidate"]["source_commit"], profile["candidate"]["player_tree"]))
             self.assertEqual("d8e24b4a79b6064a373c03210c5ef6be0b013f79", profile["source_fixture_commit"])
+            self.assertEqual("e37225cf63417c37e4ea2be162667f4d84324340", profile["successor_fixture_commit"])
             self.assertEqual("2fb64822b82569e3b50f0653e361fb7148f18b63", profile["origin_source_commit"])
+        self.assertEqual("4F689098546C3A9D94C9C8D642D9BA775F93727799C2AB47BA9F0A15F40AEFA8",
+                         f200["archive_sha256"]["mir-fixture-mir5-migration-origin-f200-110-successor_0.1.0.zip"])
+        self.assertEqual("CCA857B7F6F27F440715B24FE9568FDB4EDE900A673CC4265FB659EE3BCE4A00",
+                         f210["archive_sha256"]["mir-fixture-mir5-migration-origin-f200-110-successor_0.2.0.zip"])
         self.assertEqual("8DB28D2DE45F26033B5F54E176902A3138A903AF0F4B48EAB6B9971466021B4F",
                          f200["archive_sha256"]["more-infinite-research_5.0.20000.zip"])
         self.assertEqual("7CE6A4DF78019F6B98237E638A1C927C5FDB538D4A1442EE22D846DD962DDCDC",

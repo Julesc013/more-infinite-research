@@ -4,6 +4,7 @@
   "origin_tag": "1.1.0",
   "origin_source_commit": "2fb64822b82569e3b50f0653e361fb7148f18b63",
   "source_fixture_commit": "d8e24b4a79b6064a373c03210c5ef6be0b013f79",
+  "successor_fixture_commit": "e37225cf63417c37e4ea2be162667f4d84324340",
   "target": "f200",
   "factorio_line": "2.0",
   "engine": {
@@ -28,7 +29,7 @@
   ],
   "archive_sha256": {
     "mir-fixture-mir5-active-mods-observer_0.1.0.zip": "723D1E7721449FC26040E5E6629416767BDC20AD79CF8723115846DB662A1F87",
-    "mir-fixture-mir5-migration-origin-f200-110-successor_0.1.0.zip": "989B261022930B6B4F517A5474435490CE1AAE0C7F7804DDE027CE63017C19E7",
+    "mir-fixture-mir5-migration-origin-f200-110-successor_0.1.0.zip": "4F689098546C3A9D94C9C8D642D9BA775F93727799C2AB47BA9F0A15F40AEFA8",
     "more-infinite-research_5.0.20000.zip": "8DB28D2DE45F26033B5F54E176902A3138A903AF0F4B48EAB6B9971466021B4F"
   },
   "scope": "Prepared direct F200 successor of the corrected protected MIR 1.1.0 F200 source stage under a575 MIR5 F200. It is not runnable until the exact corrected source save/result are bound, and it does not qualify an F210 route or a current package."
