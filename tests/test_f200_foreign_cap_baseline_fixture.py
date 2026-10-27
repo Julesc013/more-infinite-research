@@ -8,11 +8,16 @@ from __future__ import annotations
 
 import argparse
 from copy import deepcopy
+import hashlib
+import importlib.util
 import json
 from pathlib import Path
 import re
+import subprocess
 import sys
+import tempfile
 import unittest
+import zipfile
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -24,11 +29,17 @@ ENGINE_SHA = "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B"
 OBSERVER_SHA = "723D1E7721449FC26040E5E6629416767BDC20AD79CF8723115846DB662A1F87"
 MIR_SHA = "BD1B88D7DE85489207F71C1B080FD61617FAEF9655370BF0332A51579308ECE3"
 STAGES = {"source": ("0.1.0", 0), "finite": ("0.2.0", 1), "relaxed": ("0.3.0", 0)}
+FIXTURE_REVISION = "ce48d0d78c68bc78779a8449f50e4dc0e6b0bc9c"
+INPUT_RECEIPT = ROOT / "spec" / "evidence" / "f200-foreign-cap-baseline-58f-prepared-inputs.json"
 PROFILES = {
     "source": ROOT / "tests" / "profiles" / "f200-foreign-cap-baseline-source-2077.json",
     "finite": ROOT / "tests" / "profiles" / "f200-foreign-cap-baseline-finite-2077.json",
     "relaxed": ROOT / "tests" / "profiles" / "f200-foreign-cap-baseline-relaxed-2077.json",
 }
+PACKAGE_SPEC = importlib.util.spec_from_file_location("mir_package", ROOT / "tools" / "package.py")
+PACKAGE = importlib.util.module_from_spec(PACKAGE_SPEC)
+assert PACKAGE_SPEC.loader is not None
+PACKAGE_SPEC.loader.exec_module(PACKAGE)
 
 
 def lua_value(lua, value):
@@ -194,6 +205,7 @@ function f200_foreign_cap_flow(common_path, source_path, finite_path, relaxed_pa
   local source,message=load_control(source_path,"source");if not source then return {ok=false,message=message} end
   local ok,result=invoke(source,"init");if not ok then return {ok=false,message=result} end
   if saves~=0 then return {ok=false,message="create-only seed was counted as a save"} end
+  local source_create_saves=saves
   ok,result=tick(source);if not ok then return {ok=false,message=result} end
   for _=1,2 do ok,result=reload(source_path,"source");if not ok then return {ok=false,message=result} end end
   if opponent=="lost-progress" then player.technologies[GEAR].saved_progress=.26 end
@@ -211,13 +223,17 @@ function f200_foreign_cap_flow(common_path, source_path, finite_path, relaxed_pa
     ok,result=reload(finite_path,"finite");if not ok then return {ok=false,message=result,saves=saves} end
   end
   if storage.mir5_f200_foreign_cap_baseline.phase~=saved_phase then return {ok=false,message="cold reload wrote fixture phase"} end
+  if opponent=="foreign-native-reset" or opponent=="missing-foreign-baseline" then
+    game.forces[2].technologies[GEAR].enabled=true
+  end
+  if opponent=="missing-foreign-baseline" then storage.mir_caps.owned_disabled[2]=nil end
   transition(0)
   local relaxed;relaxed,message=load_control(relaxed_path,"relaxed");if not relaxed then return {ok=false,message=message} end
   ok,result=invoke(relaxed,"changed");if not ok then return {ok=false,message=result,saves=saves} end
   ok,result=tick(relaxed);if not ok then return {ok=false,message=result,saves=saves} end
   for _=1,2 do ok,result=reload(relaxed_path,"relaxed");if not ok then return {ok=false,message=result,saves=saves} end end
   local foreign=game.forces[2]
-  return {ok=true,saves=saves,markers=markers,storage=storage,
+  return {ok=true,saves=saves,source_create_saves=source_create_saves,markers=markers,storage=storage,
     player={level=player.technologies[GEAR].level,researched=player.technologies[GEAR].researched,
       saved_progress=player.technologies[GEAR].saved_progress,
       bonus=player.recipes['iron-gear-wheel'].productivity_bonus},
@@ -293,6 +309,58 @@ end
                 else:
                     self.assertIn("InputSavePath/ExpectedInputSaveSha256", profile["scope"])
 
+    def test_prepared_input_receipt_binds_raw_git_members_and_generic_fixture_archives(self):
+        receipt = json.loads(INPUT_RECEIPT.read_text(encoding="utf-8"))
+        self.assertEqual(("MIR5F200ForeignCapBaselinePreparedInputsV1", FIXTURE_REVISION,
+                          "88b6a18139621196bf53907d979887798f8ac5ed"),
+                         (receipt["kind"], receipt["fixture_source_commit"], receipt["fixture_source_tree"]))
+        for field in ("native_execution", "library_mutation", "lab_completion", "release_qualification"):
+            self.assertIs(receipt[field], False)
+        self.assertEqual(("98fbdd33fe47eb678a5e1aaf17fee903eba2a22a",
+                          "ffc5f2e3359de4f326a184cf6a3c29a55941150a", MIR_SHA, 679477),
+                         (receipt["input_player"]["source_commit"], receipt["input_player"]["source_tree"],
+                          receipt["input_player"]["sha256"], receipt["input_player"]["bytes"]))
+        self.assertEqual({"version": "2.0.77", "sha256": ENGINE_SHA}, receipt["engine"])
+        self.assertEqual(OBSERVER_SHA, receipt["observer"]["sha256"])
+        self.assertEqual(("tools/package.py", "D5DCCBFABB69E6D7F529DBB9BCE8B907231EB682E9059BF3586777F3C74FBB50"),
+                         (receipt["package_tool"]["path"], receipt["package_tool"]["sha256"]))
+        self.assertEqual(["source", "finite", "relaxed"], [row["stage"] for row in receipt["stages"]])
+        for profile in receipt["profiles"]:
+            actual = ROOT / profile["path"]
+            self.assertEqual((profile["sha256"], profile["bytes"]),
+                             (hashlib.sha256(actual.read_bytes()).hexdigest().upper(), actual.stat().st_size))
+        with tempfile.TemporaryDirectory(dir=ROOT / "build") as temporary:
+            temporary = Path(temporary)
+            for stage in receipt["stages"]:
+                with self.subTest(stage=stage["stage"]):
+                    self.assertEqual(7, len(stage["members"]))
+                    projection = temporary / stage["stage"]
+                    projection.mkdir()
+                    for member in stage["members"]:
+                        raw = subprocess.check_output(
+                            ["git", "show", FIXTURE_REVISION + ":" + member["source_path"]], cwd=ROOT)
+                        self.assertEqual((member["sha256"], member["bytes"]),
+                                         (hashlib.sha256(raw).hexdigest().upper(), len(raw)))
+                        target = projection / member["path"]
+                        self.assertEqual(target.parent, projection)
+                        target.write_bytes(raw)
+                    archive = temporary / Path(stage["archive"]).name
+                    record = PACKAGE.build(projection, archive)
+                    self.assertEqual((stage["sha256"].lower(), stage["bytes"]),
+                                     (record["sha256"], record["bytes"]))
+                    expected_members = {member["path"] for member in stage["members"]}
+                    self.assertEqual(expected_members, {member["path"] for member in record["members"]})
+                    with zipfile.ZipFile(archive) as zipped:
+                        self.assertEqual({f"{NAME}_{stage['version']}/{member}" for member in expected_members},
+                                         {entry.filename for entry in zipped.infolist() if not entry.is_dir()})
+
+    def test_current_caps_survives_a_native_reset_only_when_the_foreign_false_baseline_is_retained(self):
+        retained = self.flow_result("foreign-native-reset")
+        self.assertTrue(retained["ok"], retained.get("message"))
+        absent = self.flow_result("missing-foreign-baseline")
+        self.assertFalse(absent["ok"])
+        self.assertIn("relaxed foreign disablement changed", absent["message"])
+
     def test_wrappers_register_without_parse_time_native_access_and_load_is_read_only(self):
         for stage, (version, _) in STAGES.items():
             with self.subTest(stage=stage):
@@ -317,6 +385,7 @@ end
     def test_current_caps_capture_foreign_false_baseline_then_relax_without_labs(self):
         result = self.flow_result()
         self.assertTrue(result["ok"], result.get("message"))
+        self.assertEqual(0, result["source_create_saves"])
         self.assertEqual(3, result["saves"])
         self.assertEqual(["initial", "reload", "reload"] * 3,
                          [row["stage"] for row in result["markers"]])
@@ -351,12 +420,12 @@ end
                 self.assertLessEqual(result.get("saves", 0), 2)
 
     def test_source_state_is_not_a_create_only_save_and_successors_require_prior_state(self):
-        original = (FIXTURE / "fixture_control.lua").read_text(encoding="utf-8")
-        old = original.replace('state.phase, state.player, state.foreign = stage .. "-complete", player, foreign\n      marker("initial", state, expected)\n      game.server_save(SAVE)',
-                               'state.phase, state.player, state.foreign = stage .. "-complete", player, foreign\n      marker("initial", state, expected)', 1)
-        self.assertNotEqual(original, old)
-        self.assertIn("game.server_save(SAVE)", original)
-        self.assertIn('state.phase ~= expected.prior', original)
+        result = self.flow_result()
+        self.assertTrue(result["ok"], result.get("message"))
+        self.assertEqual((0, 3), (result["source_create_saves"], result["saves"]))
+        source = (FIXTURE / "fixture_control.lua").read_text(encoding="utf-8")
+        self.assertIn("game.server_save(SAVE)", source)
+        self.assertIn('state.phase ~= expected.prior', source)
 
 
 if __name__ == "__main__":
