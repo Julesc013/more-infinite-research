@@ -172,16 +172,20 @@ def source_changelog_version(version):
             + "." + str(int(match.group("encoded")) % 100))
 
 
+def source_changelog_header(entry, version):
+    token = b"@DISTRIBUTION_VERSION@"
+    header = b"Version: " + source_changelog_version(version).encode("ascii") + b"\n"
+    prefix = b"-" * 99 + b"\n" + header
+    if token in entry or not entry.startswith(prefix) or entry.splitlines().count(header[:-1]) != 1:
+        raise ValueError("Current changelog needs exactly one source-version header")
+    return header
+
+
 def player_presentation(files, info):
     for required in ("LICENSE", "thumbnail.png", "changelog.txt"):
         if not files.get(required):
             raise ValueError("Selected edition has missing player presentation: " + required)
-    entry = files["changelog.txt"]
-    token = b"@DISTRIBUTION_VERSION@"
-    header = (b"Version: " + source_changelog_version(info["version"]).encode("ascii") + b"\n")
-    prefix = b"-" * 99 + b"\n" + header
-    if token in entry or not entry.startswith(prefix) or entry.splitlines().count(header[:-1]) != 1:
-        raise ValueError("Current changelog needs exactly one source-version header")
+    source_changelog_header(files["changelog.txt"], info["version"])
     out = {name: raw for name, raw in files.items() if not name.startswith("presentation/changelog/")}
     return out
 
@@ -228,9 +232,7 @@ def render_local_mir_target_version(files, source_version, requested_version, na
                                     + target[match.end("version"):])
     entry = files.get("changelog.txt")
     if entry is not None:
-        old = b"Version: " + source_changelog_version(source_version).encode("ascii") + b"\n"
-        if b"@DISTRIBUTION_VERSION@" in entry or entry.count(old) != 1:
-            raise ValueError("MIR local version package has invalid source changelog")
+        old = source_changelog_header(entry, source_version)
         rendered["changelog.txt"] = entry.replace(
             old, b"Version: " + source_changelog_version(requested_version).encode("ascii") + b"\n", 1)
     return rendered

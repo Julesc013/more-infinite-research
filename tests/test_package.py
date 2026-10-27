@@ -35,13 +35,22 @@ class PackageTests(unittest.TestCase):
         entry = (b"-" * 99 + b"\nVersion: 5.0.0\n\n  Changes:\n"
                  b"    - Example source label: Version: 5.0.0\n")
         files = {"LICENSE": b"retained license", "thumbnail.png": b"retained image",
-                 "changelog.txt": entry}
+                 "changelog.txt": entry,
+                 pack.SOURCE_TARGET_PATH: (ROOT / "source" / pack.SOURCE_TARGET_PATH).read_bytes()}
         self.assertEqual(files, pack.player_presentation(files, {"version": "5.0.21000"}))
+        local_files = pack.render_local_mir_target_version(
+            files, "5.0.21000", "6.1.21002", "more-infinite-research")
+        self.assertEqual(b"Version: 6.1.2", local_files["changelog.txt"].splitlines()[1])
+        self.assertIn(b"    - Example source label: Version: 5.0.0\n", local_files["changelog.txt"])
         for invalid in (b"Version: 4.7.3\n" + entry, entry + entry):
             with self.subTest(changelog=invalid):
                 with self.assertRaisesRegex(ValueError, "source-version header"):
                     pack.player_presentation(dict(files, **{"changelog.txt": invalid}),
                                              {"version": "5.0.21000"})
+                with self.assertRaisesRegex(ValueError, "source-version header"):
+                    pack.render_local_mir_target_version(
+                        dict(files, **{"changelog.txt": invalid}),
+                        "5.0.21000", "6.1.21002", "more-infinite-research")
 
     @staticmethod
     def _git(repository, *arguments):
