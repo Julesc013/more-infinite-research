@@ -5,7 +5,7 @@ applies_to: "MIR development"
 audience: developer
 doc_type: specification
 owner: mir-maintainers
-last_reviewed: 2026-10-27
+last_reviewed: 2026-10-28
 supersedes: []
 superseded_by: []
 source_of_truth_for:
@@ -44,7 +44,7 @@ Settings coverage combines defaults, per-setting boundaries and targeted interac
 
 `VER-03` — Production-save tests require a complete relevant catalogue. Partial development slices use disposable worlds. Test first loaded state, upgrade, save, two cold reloads and distinct clients after host restart as applicable.
 
-The [required migration origins](migrations.md#required-origin-coverage) are a separate release gate: every actual 4.7.3 predecessor edition, every published engine-valid MIR origin from 1.0.0 onward for 2.0/2.1, and retained MIR 5-or-later direct upgrades on supported editions. Audit exact publication and engine eligibility before scheduling the finite cases. Keep source generation, direct mod upgrade, engine/DLC/provider changes and cold reloads separately observable; a shared fixture or prior origin pass cannot replace another origin's save route. Missing archives, incompatible historical sources and unexecuted routes retain explicit statuses. Historical byte variants and existing adverse receipts remain distinguishable.
+The [required migration boundaries](migrations.md#required-origin-coverage) retain every actual 4.7.3 stable predecessor route, representative older saves for each materially distinct known identity/effect/settings/schema/ownership change, and future MIR 5 stable save continuity. The 28 October maintainer clarification removes a separate every-old-patch campaign as a 5.0.0 prerequisite. Grouping guides scenario selection, never relabels evidence: each claimed native route still needs its actual source/candidate/save/two-reload proof. Keep direct mod upgrades, engine/DLC/provider changes and cold reloads separately observable. Uncertain or unavailable older cases may be recorded as deferred/unverified with preserved inputs and explicit support limits; known failures in required current or selected boundary routes remain blockers. Historical byte variants and adverse receipts remain distinguishable.
 
 ## Release verdicts
 

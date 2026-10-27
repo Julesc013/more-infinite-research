@@ -865,6 +865,8 @@ For missing or unresearchable research, first check its enable setting, edition/
 
 For unexpected recipe productivity, enable `mir-debug-recipe-matches`, inspect the selected recipe list and check output identities, hidden/recycling exclusions and data-stage load order. Another mod may change the recipe after MIR runs. Use `mir-debug-scripted-effects` for the supported scripted-effect diagnostics. Include the selected edition, exact archives, settings, reproduction steps and protected save through [SUPPORT.md](SUPPORT.md); do not repeatedly risk the only copy of a factory.
 
+For a researched planet that remains locked, MIR preserves ambiguous mod intent. The [one-time recovery guidance](docs/support.md#researched-planet-still-locked) provides an explicit selected-force/location repair; unknown old histories remain unverified rather than automatically rewritten.
+
 <details>
 <summary>Historical literal diagnostics for older published releases</summary>
 
