@@ -23,6 +23,7 @@
     }
   ],
   "archive_sha256": {
+    "more-infinite-research_1.1.0.zip": "6395C4A5A0F74C67729746D0FBF6162329978B47C5C29D54CC0045F2977C7E44",
     "mir-fixture-mir5-active-mods-observer_0.1.0.zip": "723D1E7721449FC26040E5E6629416767BDC20AD79CF8723115846DB662A1F87"
   },
   "scope": "Exact published MIR 1.1.0 F200 Defaults data/settings observation. Invoke-PrototypeCapture adds the separately hash-bound published MIR archive, so the actual native selection is Base, MIR 1.1.0 and the active-mods observer only. This profile creates no map, save, gameplay, migration, performance or release qualification."
