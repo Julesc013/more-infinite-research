@@ -172,6 +172,40 @@ local function assert_force(force, expected, rows, label, ignored_technology, ig
   end
   return observed_effects
 end
+local function saved_offset(expected, label)
+  local value = expected and expected.fields and expected.fields.manual_mining_speed_modifier
+  if type(value) ~= "number" then fail(label .. " source-owned scripted offset is malformed") end
+  return value
+end
+local function offset_json(value)
+  if type(value) ~= "number" then return "null" end
+  return string.format("%.17g", value)
+end
+local function reapply_source_owned_offsets(state_value)
+  local player = game.forces.player
+  local foreign = game.forces[state_value.foreign_index]
+  local detached = game.forces[state_value.detached_index]
+  if player == nil or foreign == nil or detached == nil then fail("source-owned force is absent before offset reapply") end
+  local player_before, foreign_before, detached_before = player.manual_mining_speed_modifier,
+    foreign.manual_mining_speed_modifier, detached.manual_mining_speed_modifier
+  local player_expected = saved_offset(state_value.player_snapshot, "player")
+  local foreign_expected = saved_offset(state_value.foreign_snapshot, "foreign")
+  local detached_expected = saved_offset(state_value.detached_snapshot, "detached")
+  player.manual_mining_speed_modifier = player_expected
+  foreign.manual_mining_speed_modifier = foreign_expected
+  detached.manual_mining_speed_modifier = detached_expected
+  if not close(player.manual_mining_speed_modifier, player_expected)
+      or not close(foreign.manual_mining_speed_modifier, foreign_expected)
+      or not close(detached.manual_mining_speed_modifier, detached_expected) then
+    fail("source-owned scripted offset reapply differs")
+  end
+  log("[MIR5_MIGRATION_ORIGIN_OFFSET_REAPPLY] {\"action\":\"configuration-source-owned-reapply\",\"player_before\":"
+    .. offset_json(player_before) .. ",\"foreign_before\":" .. offset_json(foreign_before)
+    .. ",\"detached_before\":" .. offset_json(detached_before)
+    .. ",\"player_expected\":" .. offset_json(player_expected)
+    .. ",\"foreign_expected\":" .. offset_json(foreign_expected)
+    .. ",\"detached_expected\":" .. offset_json(detached_expected) .. "}")
+end
 local function exact_target()
   for name, expected in pairs(catalogue.targets) do
     if script.active_mods.base == expected.base and script.active_mods["more-infinite-research"] == expected.mir
@@ -265,6 +299,11 @@ end
 local function begin()
   local target_name = exact_target()
   local state_value = state()
+  -- The protected source fixture seeded and snapshotted these three force
+  -- offsets.  Current-engine configuration resets them before any mod
+  -- callback, so only this fixture restores its own sentinel here.  Reloads
+  -- stay read-only and no arbitrary script or console modifier is claimed.
+  reapply_source_owned_offsets(state_value)
   local observed = assert_supporting_state(state_value)
   assert_direct_before(state_value)
   state_value.successors = state_value.successors or {}

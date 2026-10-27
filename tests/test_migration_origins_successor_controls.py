@@ -212,7 +212,7 @@ class MigrationOriginSuccessorControls(unittest.TestCase):
         path = (FIXTURE / "control.lua").as_posix()
         self.lua.globals().successor_runtime_path = path
         self.lua.execute(r'''
-          function migration_successor_run_control(target_name,mutate,already_current,effect_case,actual_offset)
+          function migration_successor_run_control(target_name,mutate,already_current,effect_case,reset_offsets_before_configuration,mutate_offset_after_configuration)
             local callbacks={events={}}
             local direct_name="recipe-prod-research_gears-1"
             local alternate_name="recipe-prod-research_plastic-1"
@@ -272,7 +272,6 @@ class MigrationOriginSuccessorControls(unittest.TestCase):
               return value
             end
             local player, foreign, detached=force("player",2,.1), force("foreign",2,.1), force("detached",2,.1)
-            player.manual_mining_speed_modifier=actual_offset or .125
             if already_current then player.current_research=player.technologies[direct_name];player.research_queue={player.technologies[direct_name]} end
             foreign.research_queue={foreign.technologies[direct_name],foreign.technologies[alternate_name]}
             foreign.current_research=foreign.technologies[direct_name];foreign.research_progress=.42
@@ -339,6 +338,11 @@ class MigrationOriginSuccessorControls(unittest.TestCase):
             local function load_target(target)
               callbacks={events={}};current_numeric_form=target=="f210" and "short" or "source";env.script.active_mods=mods_for(target)
               assert(loadfile(successor_runtime_path,"t",env))()
+              if reset_offsets_before_configuration then
+                player.manual_mining_speed_modifier=0
+                foreign.manual_mining_speed_modifier=0
+                detached.manual_mining_speed_modifier=0
+              end
               callbacks.configuration()
             end
             local function reload_target(target)
@@ -360,6 +364,7 @@ class MigrationOriginSuccessorControls(unittest.TestCase):
             end
             local ok,message=pcall(function()
               load_target(target_name)
+              if mutate_offset_after_configuration then player.manual_mining_speed_modifier=.25 end
               finish();local before_reload=stable(state);reload_target(target_name);env.reload_read_only=(before_reload==stable(state))
             end)
             return {ok=ok,message=tostring(message),state=state,gear=player.technologies[direct_name].level,
@@ -376,9 +381,17 @@ class MigrationOriginSuccessorControls(unittest.TestCase):
                 self.assertEqual((3, .2, True), (accepted["gear"], accepted["bonus"], accepted["saved"]))
                 self.assertEqual("completed", accepted["state"]["successors"][target]["phase"])
                 self.assertEqual(1, accepted["state"]["successors"][target]["candidate_actual_labs"])
-                self.assertEqual(2, len(accepted["logs"]))
+                self.assertEqual(3, len(accepted["logs"]))
                 self.assertTrue(accepted["reload_read_only"])
                 self.assertEqual(1, accepted["add_calls"])
+
+        reapply = py(self.lua.eval("migration_successor_run_control")("f200", False, False, None, True))
+        self.assertTrue(reapply["ok"], reapply["message"])
+        reapply_markers = [line for line in reapply["logs"] if "MIR5_MIGRATION_ORIGIN_OFFSET_REAPPLY" in line]
+        self.assertEqual(1, len(reapply_markers))
+        self.assertIn('"player_before":0,"foreign_before":0,"detached_before":0', reapply_markers[0])
+        self.assertIn('"player_expected":0.125,"foreign_expected":0.125,"detached_expected":0.125', reapply_markers[0])
+        self.assertTrue(reapply["reload_read_only"])
 
         # The source snapshot remains raw/indexed.  Current F210 may expose
         # the same additive effects in a different order, with explicit
@@ -422,11 +435,11 @@ class MigrationOriginSuccessorControls(unittest.TestCase):
         self.assertIn("source row changed before candidate work", rejected["message"])
         self.assertEqual(2, rejected["gear"])
 
-        offset_rejected = py(self.lua.eval("migration_successor_run_control")("f200", False, False, None, .25))
+        offset_rejected = py(self.lua.eval("migration_successor_run_control")("f200", False, False, None, False, True))
         self.assertFalse(offset_rejected["ok"])
         self.assertIn("player unrelated scripted offset changed expected=0.125 actual=0.25", offset_rejected["message"])
         self.assertEqual("completed", offset_rejected["state"]["phase"])
-        self.assertNotIn("f200", offset_rejected["state"].get("successors", {}))
+        self.assertEqual("await-observation", offset_rejected["state"]["successors"]["f200"]["phase"])
 
     def test_fixture_identity_profiles_and_storage_preservation_contract_are_exact(self):
         f200_info = json.loads((FIXTURE / "info-f200.json").read_text(encoding="utf-8"))
