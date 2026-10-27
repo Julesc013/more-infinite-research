@@ -1,0 +1,185 @@
+{
+  "schema": 1,
+  "kind": "MIR5F210Q010Menu58fNativeReadbackV1",
+  "status": "current58f-intent-equality-observed-replay-byte-adverse-retained",
+  "claims": {
+    "current_data_settings_intent_equality": true,
+    "fresh_replay_raw_byte_equality": false,
+    "fresh_replay_decoded_data_settings_equality": true,
+    "gameplay": false,
+    "menu_response": false,
+    "save": false,
+    "performance": false,
+    "pilot": false,
+    "release_qualification": false
+  },
+  "controller": {
+    "source_commit": "9c38d0ffa9e949c778bc85123497b47c2a67d2cb",
+    "path": "controller.ps1",
+    "sha256": "6ED09E05664F62964FBB8D6F770B576577F52654DC03C3DAA6E3E91C1CC42041",
+    "original_root": "D:/Projects/Factorio/mir5-q010-58f-9c38-r01",
+    "primary_custody_root": "build/mir5/recovery-historical/f210-q010-menu58f-native-r01"
+  },
+  "candidate": {
+    "source_commit": "98fbdd33fe47eb678a5e1aaf17fee903eba2a22a",
+    "player_source_tree": "ffc5f2e3359de4f326a184cf6a3c29a55941150a",
+    "archive": {
+      "path": "build/mir5/assets/98fbdd33-root-r01/more-infinite-research_5.0.21000.zip",
+      "sha256": "58F04FB9D417F2726835F4A6740490DE3C1841665DAC81C2BA3DFA94050D9457",
+      "bytes": 679860,
+      "factorio_version": "2.1"
+    },
+    "freeze_readback": {
+      "path": "spec/evidence/current-assets-98fbdd33-root-readback.json",
+      "sha256": "334F745CDEC9657986524FC40B7A2BCF5CA7A27301346F50882A116A1EC540E1"
+    }
+  },
+  "engine": {
+    "version": "2.1.23",
+    "factorio_version": "2.1",
+    "sha256": "8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38"
+  },
+  "profile": {
+    "path": "tests/profiles/bob-angel-full-space-age-standalone-f210-2123-current58f.json",
+    "sha256": "05F2786E896B1F28C2E4239134BA370B0C2BCF6CCB1384E03999FB0E89C8B980",
+    "matching_original_capture_profile": "tests/profiles/bob-angel-full-space-age-standalone-f210-2123.json",
+    "exact_profile_bytes_equal": true,
+    "active_mods_observer": {
+      "archive": "mir-fixture-mir5-active-mods-observer_0.1.0.zip",
+      "sha256": "A15A7D628D66953D2E0C4D4FA288F47CBF9C5678327C7EB3D23ADB5DC78331C0"
+    }
+  },
+  "current58f_intent_observation": {
+    "capture_result": {
+      "path": "current-capture-native-output/result.json",
+      "sha256": "04E927345533769A5236EF674ECC73CB28A486DAE86CC652604DECE523D4D6A2",
+      "status": "completed-data-stage-observation-only",
+      "endpoint_class": "factorio-data-stage-dump-only",
+      "library_controls_restored": true
+    },
+    "receipt_command": {
+      "prepared_input_receipt": "spec/evidence/f210-q010-menu-58f-prepared-inputs.json",
+      "prepared_input_receipt_sha256": "39C4CC104841ACC0FF8C2118740ED50E1663804E6C20F937DDFF4A26DCA0E70E",
+      "command_key": "next_native_admission.fresh_current58f_capture.command",
+      "tool": "tools/Invoke-PrototypeCapture.ps1",
+      "tool_sha256": "14A3A4293D0FFFB02C8C389743F868CD3F5783E46301861DB96AD4646D512F81"
+    },
+    "comparison": {
+      "path": "current-intent-comparison-r01.json",
+      "sha256": "72B36B3203B6EF8E9587C9846B1AC9177A03FAD5D858F9231DA35DB8902618E6",
+      "status": "equal-intended-native-output",
+      "scope": "complete data/settings output only; no gameplay, menu, save, runtime, or release qualification",
+      "independent_oracle_sha256": "6AEFF07252E2449ED049B0EDB8DFC17A0B4B4AEB19BF5E36D25A76DEA1F9E8AB",
+      "reviewed_disposition_count": 160,
+      "unresolved_difference_count": 0
+    },
+    "current_dump_receipts": {
+      "data_raw": {
+        "sha256": "F63D209A868B21BBBE67C1C675EFCF6697774E40383D87C2E000AA48CEEFB849",
+        "bytes": 67502534
+      },
+      "mod_settings": {
+        "sha256": "83C3A4166488BFEF80225DE9818810DE4CE0DDD37760C6B17BEC810AC8162D17",
+        "bytes": 783931
+      },
+      "selection_sha256": "6B8538CAEC4BC027ACACBF4353F885FE4BA1C069C7BB8C4BB0926F0D52D87086"
+    }
+  },
+  "retained_published_and_replay_identity": {
+    "original_published_capture": {
+      "root": "build/mir5/recovery-historical/bob-angel-q010-standalone-preparation-r04/published",
+      "result_sha256": "E0B9A8A6473FFB1ED23365AA9F2C14F57A0DF411C6D10F46E112D9534DCC0CCA",
+      "source_commit": "61bc49e55cee121db75f300d5ae954d3f8488105",
+      "capture_harness": {
+        "path": "tools/Invoke-PrototypeCapture.ps1",
+        "sha256": "75B74DB6ACD81E016F10DF34C178563F3BF922901BCF8A7F49A32372B984864F"
+      },
+      "archive": {
+        "path": "build/mir5/recovery-historical/bob-angel-q010-standalone-preparation-r04/published-custody/more-infinite-research_4.7.21003.zip",
+        "sha256": "B6EB9430056ABD384DB00F94929FE7DAC0A37441ACF4BC277946689682628852",
+        "bytes": 1463293
+      },
+      "data_raw_sha256": "A8935196FBF9A58DA01BB26EFD739CE74941DB2885C6A1514E9379F64A33C3C1",
+      "mod_settings_sha256": "5385BE2E5B4ADD9EC17FAFEB7AB2A01FA60987AAEA849C77347618BD5E8CBBA4"
+    },
+    "fresh_replay_capture": {
+      "result": {
+        "path": "replay-capture-native-output/result.json",
+        "sha256": "93077E7C22B1FBCE7D156FA9E28B820327E47EC81E0A05067778E1E675363CDF",
+        "status": "completed-data-stage-observation-only",
+        "library_controls_restored": true
+      },
+      "receipt_command": {
+        "prepared_input_receipt": "spec/evidence/f210-q010-menu-58f-prepared-inputs.json",
+        "prepared_input_receipt_sha256": "39C4CC104841ACC0FF8C2118740ED50E1663804E6C20F937DDFF4A26DCA0E70E",
+        "command_key": "next_native_admission.fresh_replay_capture.command",
+        "tool": "tools/Invoke-ReplayCapture.ps1",
+        "tool_sha256": "134B823B18741BE2766B6DAFD823F87369D456B99870BEF25F1C296507FE7C9C",
+        "historical_capture_harness_sha256": "75B74DB6ACD81E016F10DF34C178563F3BF922901BCF8A7F49A32372B984864F"
+      },
+      "composed_replay_archive": {
+        "path": "build/mir5/recovery/f210-q010-menu58f-preparation-r01/composition/more-infinite-research_4.7.21003.zip",
+        "sha256": "1A921CA95C165A9D012F9CAA84BB873C6AB63F6B77D62AAE681CE1EF7C343E3E",
+        "bytes": 1532319,
+        "not_a_player_package": true
+      },
+      "data_raw": {
+        "sha256": "D5514C623EB1925282D7F2950A00A77372C58815A73D9E32A00334E232E57F90",
+        "bytes": 67953508,
+        "retained_published_byte_equal": false,
+        "decoded_native_value_equal": true,
+        "canonical_sha256": "6DE157D5ADC9ECB108E7BBD40B494BFCA02F20370E365B82F53EFF3000DADA42"
+      },
+      "mod_settings": {
+        "sha256": "BCC7E49EDA26DCACE46EC21A7E747FA999CC4042763B76D9403EDB595130F044",
+        "bytes": 1078518,
+        "retained_published_byte_equal": false,
+        "decoded_native_value_equal": true,
+        "canonical_sha256": "86D4CC86E6730A806C25146B73D7B7DA811AF0B7DB81FFCE8220219B4B37246E"
+      },
+      "selection_sha256": "7A04137A1DFD6D1ECBC61FE1294C7052A2E6F991FA286F5F3A568827C1478EF1"
+    }
+  },
+  "replay_serialization_diagnosis": {
+    "outer_terminal": {
+      "path": "terminal.json",
+      "sha256": "DA1F4036F8F13867B25846B00111C8A0AE10C6770F0DAAD9A94FC00BC0D9B3C0",
+      "status": "adverse-or-refused",
+      "failure": "fresh replay dump equality differs from retained B6 bytes"
+    },
+    "method": "Decode the exact retained B6 and fresh replay JSON dumps, compare every object field and ordered list with tools/replay.py _same_json_value, and separately serialise each decoded value with UTF-8 JSON object keys sorted and compact separators.",
+    "data_raw_difference_paths": 0,
+    "mod_settings_difference_paths": 0,
+    "decoded_lists_types_and_values_preserved": true,
+    "cause": "Raw JSON bytes differ while the decoded mapping/list values and canonical serialisations are equal; this establishes a representation-only difference, while the specific lexical cause remains unproved.",
+    "disposition": "The strict retained B6 byte-equality guard, its terminal adverse, and every raw receipt remain unchanged. This diagnosis is not a guard waiver or a passed replay-byte-equality result."
+  },
+  "custody": {
+    "original_root": "D:/Projects/Factorio/mir5-q010-58f-9c38-r01/build/tmp/f210-q010-menu58f-native-r01",
+    "primary_root": "build/mir5/recovery-historical/f210-q010-menu58f-native-r01",
+    "manifest": {
+      "path": "build/mir5/recovery-historical/f210-q010-menu58f-native-r01/custody-manifest.json",
+      "sha256": "226AEB518BEE86FF15ABFE80BCC211D782A6BF1FD738B4D1800EE61FFBCB4E23"
+    },
+    "verified_member_count": 18,
+    "verified_total_bytes": 137497740,
+    "missing_count": 0,
+    "mismatch_count": 0,
+    "unsafe_path_count": 0,
+    "factorio_processes_after": 0,
+    "live_mir_after_sha256": "C563CB5B96C9E64CB3373BDB60CF5C8B7D3C97E93EADB8F924443C703CDC024D",
+    "live_observer_after_sha256": "A15A7D628D66953D2E0C4D4FA288F47CBF9C5678327C7EB3D23ADB5DC78331C0"
+  },
+  "metadata_receipt_capsule": {
+    "path": "spec/evidence/f210-q010-menu58f-native-receipts.json",
+    "sha256": "59AEADA556393721C35E96507FFF7EFC154BD5153C40D541E06F8F3EB27277F3",
+    "bytes": 5273,
+    "contents": "The two capture-member manifests, outer terminal, preflight, current comparison and custody readback hashes. Full dump bytes remain only in original and primary custody."
+  },
+  "limitations": [
+    "The current58F result is a data/settings endpoint observation only. It establishes neither gameplay, menu response, save behavior, client behavior, pilot, elapsed measurement, performance comparison nor release qualification.",
+    "The fresh replay result remains a retained adverse at the strict raw-byte boundary. Semantic decoded equality does not relabel it as a byte-equality pass or modify the historical B6 source/archive records.",
+    "No new engine, timing cohort, performance sample, native rerun, profile mutation, archive installation or library mutation was performed by this readback."
+  ],
+  "release_qualification": false
+}

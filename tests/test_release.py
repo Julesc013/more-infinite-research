@@ -280,6 +280,7 @@ class ReleaseTests(unittest.TestCase):
             for name, transform in {
                 "root": lambda member, data: (member.replace("more-infinite-research_5.0.01300", "wrong-root"), data),
                 "info": self._wrong_info,
+                "changelog": self._wrong_changelog,
             }.items():
                 with self.subTest(name=name):
                     output = temporary / ("archive-" + name)
@@ -325,6 +326,12 @@ class ReleaseTests(unittest.TestCase):
             info = json.loads(data)
             info["title"] = "Wrong title"
             data = (json.dumps(info, indent=2) + "\n").encode("utf-8")
+        return member, data
+
+    @staticmethod
+    def _wrong_changelog(member, data):
+        if member.endswith("/changelog.txt"):
+            data = data.replace(b"Version: 5.0.0\n", b"Version: 5.0.01300\n", 1)
         return member, data
 
 
