@@ -8,7 +8,7 @@ import unittest
 
 from native_credit_oracle import (
     captured_public_productivity_recipes,
-    native_credit_carrier_rows,
+    current_native_credit_rows as native_credit_carrier_rows,
     split_public_and_native_credit_rows,
 )
 
@@ -498,7 +498,7 @@ class GeneratorTests(unittest.TestCase):
     def test_data_stage_defers_inactive_binding_and_preflights_active_profile(self):
         self.lua.execute('''
           local ok, message, environment = disabled_data_final()
-          assert(ok, message); assert(environment.writes == 1 and #environment.emitted == 95 and environment.emitted[1].enabled == false)
+          assert(ok, message); assert(environment.writes == 1 and #environment.emitted == 98 and environment.emitted[1].enabled == false)
           ok, message, environment = missing_active_space_age_binding()
           assert(not ok and tostring(message):find("missing required recipe casting-iron-gear-wheel", 1, true), tostring(message))
           assert(environment.writes == 0, "active binding wrote before named preflight")
@@ -810,6 +810,85 @@ class GeneratorTests(unittest.TestCase):
             and foreign.effects[1].change == .7, 'foreign technology was changed')
         ''')
 
+    def test_missing_module_recipe_omits_only_its_hidden_historical_holder(self):
+        self.lua.execute('''
+          settings, mods, helpers, log = {startup=defaults()}, {}, nil, function() end
+          data = full_world(mods)
+          data.raw.recipe['efficiency-module'] = nil
+          local before = data.raw.recipe['speed-module']
+          assert(dofile(data_final_path) == nil and data.writes == 1)
+          local ids = {}
+          for _, row in ipairs(data.emitted) do ids[row.name] = row end
+          assert(ids['mir-legacy-module-credit-efficiency-module'] == nil)
+          for _, recipe in ipairs({'speed-module', 'productivity-module'}) do
+            local holder = ids['mir-legacy-module-credit-' .. recipe]
+            assert(holder.hidden and holder.enabled == false and holder.effects[1].change == .01)
+          end
+          assert(data.raw.recipe['speed-module'] == before)
+          for _, row in ipairs(data.emitted) do
+            for _, effect in ipairs(row.effects or {}) do
+              assert(effect.type ~= 'change-recipe-productivity'
+                or effect.recipe ~= 'efficiency-module', row.name)
+            end
+          end
+        ''')
+
+    def test_disabled_modern_module_main_emits_exact_holders_and_runtime_credit_preserves_public_state(self):
+        self.lua.execute('''
+          mods = {}
+          local startup, environment = defaults(), full_world(mods)
+          startup["ips-enable-research_modules"].value = false
+          settings, data, helpers, log = {startup=startup}, environment, nil, function() end
+          assert(dofile(data_final_path) == nil and environment.writes == 1)
+          local rows = {}
+          for _, row in ipairs(environment.emitted) do rows[row.name] = row end
+          local main = rows["recipe-prod-research_modules-1"]
+          assert(main and main.enabled == false and main.max_level == "infinite" and #main.effects == 9,
+            "disabled module main differs")
+          local holder_ids = {"mir-legacy-module-credit-speed-module", "mir-legacy-module-credit-productivity-module",
+            "mir-legacy-module-credit-efficiency-module"}
+          for _, id in ipairs(holder_ids) do
+            local holder = rows[id]
+            assert(holder and holder.hidden == true and holder.enabled == false and holder.visible_when_disabled == false
+              and holder.max_level == "infinite" and #holder.effects == 1 and holder.effects[1].change == .01,
+              "disabled module holder differs: " .. id)
+          end
+
+          local function runtime_technology(row, level, researched)
+            local ingredients = {}
+            for index, ingredient in ipairs(row.unit.ingredients) do
+              ingredients[index] = {name=ingredient[1], amount=ingredient[2]}
+            end
+            return {valid=true, name=row.name, level=level, researched=researched, enabled=row.enabled ~= false,
+              visible_when_disabled=row.visible_when_disabled == true, saved_progress=.27,
+              research_unit_count=row.unit.count, research_unit_energy=row.unit.time * 60,
+              research_unit_ingredients=ingredients, prototype={name=row.name, level=row.level,
+                max_level=row.max_level == "infinite" and 4294967295 or row.max_level, hidden=row.hidden == true,
+                enabled=row.enabled ~= false, visible_when_disabled=row.visible_when_disabled == true,
+                upgrade=row.upgrade == true, effects=row.effects}}
+          end
+          local technologies = {[main.name]=runtime_technology(main, 3, false)}
+          for _, id in ipairs(holder_ids) do technologies[id] = runtime_technology(rows[id], 1, false) end
+          local force = {valid=true, index=1, technologies=technologies, research_queue={"preserved"}, research_progress=.42}
+          game = {forces={player=force}}
+          script = {active_mods={base="2.1.23", ["more-infinite-research"]="5.0.21000"}}
+          package.loaded["runtime.legacy_module_credits"] = nil
+          local credits = require("runtime.legacy_module_credits")
+          local event = {mod_changes={ ["more-infinite-research"]={old_version="1.1.0", new_version="5.0.21000"}}}
+          local plan = credits.preflight(event)
+          assert(plan and plan.target == "f210" and #plan.forces == 1)
+          assert(credits.apply(plan) == true)
+          local live_main = technologies[main.name]
+          assert(live_main.level == 3 and live_main.researched == false and live_main.enabled == false
+            and live_main.saved_progress == .27 and force.research_queue[1] == "preserved" and force.research_progress == .42,
+            "legacy credit changed disabled public module state")
+          for _, id in ipairs(holder_ids) do
+            local holder = technologies[id]
+            assert(holder.level == 3 and holder.enabled == false and holder.visible_when_disabled == false,
+              "legacy holder was not credited without public enablement")
+          end
+        ''')
+
     def test_data_final_keeps_malformed_missing_effects_for_generator_preflight(self):
         self.lua.execute('''
           local function refuse(effect, expected)
@@ -855,14 +934,15 @@ class GeneratorTests(unittest.TestCase):
           data.raw.lab = setmetatable({}, {__pairs=function()
             reads = reads + 1; return next,labs,nil
           end})
-          assert(dofile(data_final_path) == nil and data.writes == 1 and #data.emitted == 74)
+          assert(dofile(data_final_path) == nil and data.writes == 1 and #data.emitted == 77)
           -- The retained science-pack family uses its existing bounded
           -- lab-input product binding plus the policy pass: no foreign
           -- technology read is introduced.
           assert(reads == 2 and data.raw.technology["Space-Lab-Research-61"] == foreign)
           for _, row in ipairs(data.emitted) do
-            if row.name:sub(1, 18) == "mir-native-credit-" then
-              -- Private signed carriers are not player research. They retain
+            if row.name:sub(1, 18) == "mir-native-credit-"
+                or row.name:sub(1, 25) == "mir-legacy-module-credit-" then
+              -- Private native holders are not player research. They retain
               -- their isolated one-pack mechanism unit rather than inheriting
               -- the public science policy checked below.
               assert(row.hidden and row.enabled == false and row.visible_when_disabled == false
@@ -884,7 +964,7 @@ class GeneratorTests(unittest.TestCase):
           data.raw.lab = {restricted={inputs={"automation-science-pack"}}}
           local foreign = {enabled=true,foreign=77}
           data.raw.technology["foreign"] = foreign
-          assert(dofile(data_final_path) == nil and data.writes == 1 and #data.emitted == 74)
+          assert(dofile(data_final_path) == nil and data.writes == 1 and #data.emitted == 77)
           for _, row in ipairs(data.emitted) do assert(row.enabled == false and #row.unit.ingredients > 0) end
           assert(data.raw.technology.foreign == foreign and foreign.enabled and foreign.foreign == 77)
         ''')
@@ -1151,13 +1231,13 @@ class GeneratorTests(unittest.TestCase):
           environment = full_world(k2mods)
           settings, data, helpers, log = {startup = startup}, environment, nil, function() end
           assert(dofile(data_final_path) == nil)
-          assert(environment.writes == 1 and #environment.emitted == 102)
+          assert(environment.writes == 1 and #environment.emitted == 105)
           local final_ids, final_count = {}, 0
           for _, row in ipairs(environment.emitted) do
             assert(final_ids[row.name] == nil, "duplicate generated K2SO technology " .. row.name)
             final_ids[row.name], final_count = row, final_count + 1
           end
-          assert(final_count == 102)
+          assert(final_count == 105)
           assert(final_ids["recipe-prod-research_gears-1"] and final_ids["recipe-prod-research_agricultural_growth_speed-1"]
             and final_ids["recipe-prod-research_spoilage_preservation-1"] and final_ids["recipe-prod-research_material_imersite-4"])
           assert(final_ids["recipe-prod-research_material_rare_metals-1"]
@@ -1372,7 +1452,7 @@ class GeneratorTests(unittest.TestCase):
           package.preload["research.scripted_effects"] = nil
           package.preload["overrides.prototype_limits"] = nil
           assert(ok, message)
-          assert(environment.writes == 1 and #environment.emitted == 74)
+          assert(environment.writes == 1 and #environment.emitted == 77)
           assert(package.loaded["compatibility.space_age_scripted_effects"] == nil)
           assert(package.loaded["research.scripted_effects"] == nil)
           assert(package.loaded["overrides.prototype_limits"] == nil)
@@ -1629,7 +1709,7 @@ class GeneratorTests(unittest.TestCase):
           settings, mods, data, helpers, log = {startup = startup}, {}, environment, nil, function() end
           package.loaded["overrides.prototype_limits"] = nil
           assert(dofile(data_final_path) == nil)
-          assert(environment.writes == 1 and #environment.emitted == 74)
+          assert(environment.writes == 1 and #environment.emitted == 77)
           assert(package.loaded["overrides.prototype_limits"] ~= nil)
           assert(environment.raw["fixture-receiver"].zero.energy_usage == "1W")
         ''')
@@ -1645,7 +1725,7 @@ class GeneratorTests(unittest.TestCase):
           local environment = full_world(mods)
           settings, data, helpers, log = {startup = startup}, environment, nil, function() end
           assert(dofile(data_final_path) == nil)
-          assert(environment.writes == 1 and #environment.emitted == 95)
+          assert(environment.writes == 1 and #environment.emitted == 98)
           local ids = {}
           for _, row in ipairs(environment.emitted) do ids[row.name] = row end
           assert(ids["recipe-prod-research_gears-1"] ~= nil)

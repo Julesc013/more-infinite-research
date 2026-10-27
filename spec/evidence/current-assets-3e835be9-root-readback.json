@@ -1,0 +1,485 @@
+{
+  "schema": 1,
+  "kind": "MIR5CurrentAssetFreezeReadbackV1",
+  "status": "root-freeze-rebuilt-and-primary-hash-verified-not-native-qualified",
+  "source": {
+    "commit": "3e835be9ce06287362b3a7b0faacd107c13ae07c",
+    "mod_name": "more-infinite-research",
+    "mod_title": "More Infinite Research",
+    "path": "source",
+    "source_distribution_version": "5.0.21000",
+    "source_tree": "a00b2372a06d5398787b2d54169d5494e7c27a7e",
+    "tree": "616ceed2c2830e0a0504a5e6e38f72470db976f5"
+  },
+  "controller": {
+    "package_tool": {
+      "path": "tools/package.py",
+      "sha256": "32bdbe5e0d8b776a57bc8df63dd536dd81aedf54141ac6ec6b1bef4044c90674"
+    },
+    "release_tool": {
+      "path": "tools/release.py",
+      "sha256": "5479e735fa3b1420d7bdc662f3650feb24dbfbcf08223480398a024f7055ec0b"
+    },
+    "runtime": {
+      "implementation": "cpython",
+      "version": [
+        3,
+        14,
+        7
+      ],
+      "zlib_build_version": "1.3.1.zlib-ng",
+      "zlib_runtime_version": "1.3.1.zlib-ng"
+    },
+    "zip_policy": {
+      "compression": "ZIP_DEFLATED",
+      "compresslevel": 9,
+      "member_create_system": 3,
+      "member_external_attr": 2175008768,
+      "member_timestamp": [
+        1980,
+        1,
+        1,
+        0,
+        0,
+        0
+      ]
+    }
+  },
+  "target_record": {
+    "blob": "b7c2a789e17b6726c341f8a3ff97d6a27d43c0d6",
+    "path": "targets/editions.json",
+    "sha256": "2a2e2a7e9c54224aece72366a1bb3ef7d9007a7bec92bb53c4d9b0276b6e33f6"
+  },
+  "stable_targets": [
+    "f013",
+    "f014",
+    "f015",
+    "f016",
+    "f017",
+    "f100",
+    "f110",
+    "f200",
+    "f210"
+  ],
+  "best_effort_targets": [
+    "f006",
+    "f007",
+    "f008",
+    "f009",
+    "f010",
+    "f011",
+    "f012",
+    "f018"
+  ],
+  "inventory_sha256": "338A0DA1DA51B7242C0626C643E9B3D8B640CA49926889F37CABD331FEA2FAC9",
+  "inventory_body_sha256": "4f31b1cde3a7dfae7d47e47a42b4ad84746aa35a11dba403f9ebc96bf8b36935",
+  "primary_custody": "build/packages/3e835be9-root-r01",
+  "original_custody": "D:/Projects/Factorio/mir5-packages-3e835be9-root-r01",
+  "files": [
+    {
+      "name": "MIR5ReleaseAssetInventoryV1.json",
+      "bytes": 209090,
+      "sha256": "338A0DA1DA51B7242C0626C643E9B3D8B640CA49926889F37CABD331FEA2FAC9"
+    },
+    {
+      "name": "more-infinite-research_5.0.00600.zip",
+      "bytes": 136074,
+      "sha256": "A083E3706369695A368F9826F5A9659AAB8D501EB88E640A8B2350A3FDE06F6C"
+    },
+    {
+      "name": "more-infinite-research_5.0.00700.zip",
+      "bytes": 136074,
+      "sha256": "902DDCD862A655A5F5AEF18CF9FDD68A71815C29658A90392A99647FF8F76ACC"
+    },
+    {
+      "name": "more-infinite-research_5.0.00800.zip",
+      "bytes": 136072,
+      "sha256": "BC47885AD179B4DBE2A18B920F35D7BC38CCA8C4E105806A761F5956E3BF81A2"
+    },
+    {
+      "name": "more-infinite-research_5.0.00900.zip",
+      "bytes": 136074,
+      "sha256": "FE0B27BBFC32C1B34FBA51B090D8B2854920070459C2A60DBF4615312661E0D4"
+    },
+    {
+      "name": "more-infinite-research_5.0.01000.zip",
+      "bytes": 136074,
+      "sha256": "BE3457B714C595D1315DA9496D252AC56FF373640A1D0C2D25AB1E87EBC088B9"
+    },
+    {
+      "name": "more-infinite-research_5.0.01100.zip",
+      "bytes": 136074,
+      "sha256": "689B195BA8AC5F7CDED24D9254EDC7354E02B8B25888257CA2675F1317B5F208"
+    },
+    {
+      "name": "more-infinite-research_5.0.01200.zip",
+      "bytes": 136076,
+      "sha256": "8CB1B67087DB49DEF4F592F8897505BBE4F7142A593B2560DD8FE1D3335CD60B"
+    },
+    {
+      "name": "more-infinite-research_5.0.01300.zip",
+      "bytes": 453552,
+      "sha256": "0A26C82CE8AE41DEE30C28BBD66ACCF3713C87E31264B3B4B1A092DE253A17C1"
+    },
+    {
+      "name": "more-infinite-research_5.0.01400.zip",
+      "bytes": 453554,
+      "sha256": "C29A71B90F06BA92B3ABA4F1BF749E04729379AB22AADBAFB2E4100A255A529F"
+    },
+    {
+      "name": "more-infinite-research_5.0.01500.zip",
+      "bytes": 453553,
+      "sha256": "6F51F436C09C1FE35F83F7475F1809B3C5DAC2A3AC3195C7A53343122F3E9800"
+    },
+    {
+      "name": "more-infinite-research_5.0.01600.zip",
+      "bytes": 453555,
+      "sha256": "0CBBDF06AB30594B7293E9D81A42E956057A916CDEB0B6FA20BEEB6BCF2188C0"
+    },
+    {
+      "name": "more-infinite-research_5.0.01700.zip",
+      "bytes": 453554,
+      "sha256": "981358DF7B06C226D8F276AAE46C0E9BC0B81A7BAC7BE36B677FD28AC4E04A89"
+    },
+    {
+      "name": "more-infinite-research_5.0.01800.zip",
+      "bytes": 453555,
+      "sha256": "86A67B0080EDF29442FA94EDF36EE42C74B48D8314501C8FF29EC7D16E3B1F46"
+    },
+    {
+      "name": "more-infinite-research_5.0.10000.zip",
+      "bytes": 453546,
+      "sha256": "225A4325CB18741694C4B5448376E7008E81980B06A150A15F3552DB22B801C2"
+    },
+    {
+      "name": "more-infinite-research_5.0.11000.zip",
+      "bytes": 453857,
+      "sha256": "45F21EDD92F360600C77C39589A20BFF7C1D93DA7B1D458A22975AEC166FC931"
+    },
+    {
+      "name": "more-infinite-research_5.0.20000.zip",
+      "bytes": 685544,
+      "sha256": "E1C84EA381FAA57BA7089AAD10B1AFD1408666A41AFE13962ABCBA6321EE889D"
+    },
+    {
+      "name": "more-infinite-research_5.0.21000.zip",
+      "bytes": 685928,
+      "sha256": "039BC18B70E179DB600E29C8442637DD9972D7AB81E3F0770FDCF1056D6316B4"
+    },
+    {
+      "name": "SHA256SUMS-early.txt",
+      "bytes": 721,
+      "sha256": "683608943D7DA77F2DCB4488EAE7B3694FDE3ECD1AE3AAC43E9EF71A16BD1C06"
+    },
+    {
+      "name": "SHA256SUMS.txt",
+      "bytes": 1030,
+      "sha256": "A2133695E6EC7CD13B3659CCB46231F62B3B223C51D038C7EB59B818BCBD1A80"
+    }
+  ],
+  "total_files": 20,
+  "total_bytes": 6163557,
+  "comparison_source": "a575a4198807b6aea9e26963e3d9970fc5c068ae",
+  "archive_member_differences": [
+    {
+      "name": "more-infinite-research_5.0.00600.zip",
+      "before_archive_sha256": "6180CB7C89455314A29DAA5D9A7FDC615E4AAF4905CA9040394227BC1B50DB18",
+      "after_archive_sha256": "A083E3706369695A368F9826F5A9659AAB8D501EB88E640A8B2350A3FDE06F6C",
+      "members": [
+        {
+          "path": "changelog.txt",
+          "before_sha256": "C6D4793BA778A27DC4E30C8D710781306889BFF7EB9C718018E8D587B7FCE67D",
+          "after_sha256": "8C21D2CA3CB80224AB2936F6FA0089A2C5F40E61302A3CDDEF7DB5094F5F09D2",
+          "before_bytes": 124207,
+          "after_bytes": 124391
+        }
+      ]
+    },
+    {
+      "name": "more-infinite-research_5.0.00700.zip",
+      "before_archive_sha256": "7A183A600002FB70F635DA2B9F81D3924D39BFE605A542BD346671987C7FA470",
+      "after_archive_sha256": "902DDCD862A655A5F5AEF18CF9FDD68A71815C29658A90392A99647FF8F76ACC",
+      "members": [
+        {
+          "path": "changelog.txt",
+          "before_sha256": "C6D4793BA778A27DC4E30C8D710781306889BFF7EB9C718018E8D587B7FCE67D",
+          "after_sha256": "8C21D2CA3CB80224AB2936F6FA0089A2C5F40E61302A3CDDEF7DB5094F5F09D2",
+          "before_bytes": 124207,
+          "after_bytes": 124391
+        }
+      ]
+    },
+    {
+      "name": "more-infinite-research_5.0.00800.zip",
+      "before_archive_sha256": "4680552E5FD7C4FC2B517270754F76592FF7AD953A735D63FF80FB7CFB6513F6",
+      "after_archive_sha256": "BC47885AD179B4DBE2A18B920F35D7BC38CCA8C4E105806A761F5956E3BF81A2",
+      "members": [
+        {
+          "path": "changelog.txt",
+          "before_sha256": "C6D4793BA778A27DC4E30C8D710781306889BFF7EB9C718018E8D587B7FCE67D",
+          "after_sha256": "8C21D2CA3CB80224AB2936F6FA0089A2C5F40E61302A3CDDEF7DB5094F5F09D2",
+          "before_bytes": 124207,
+          "after_bytes": 124391
+        }
+      ]
+    },
+    {
+      "name": "more-infinite-research_5.0.00900.zip",
+      "before_archive_sha256": "5BD1C6EF4F948B9E500371DC7CDB079FFC37B6FAA4A4104F41A25D2090591668",
+      "after_archive_sha256": "FE0B27BBFC32C1B34FBA51B090D8B2854920070459C2A60DBF4615312661E0D4",
+      "members": [
+        {
+          "path": "changelog.txt",
+          "before_sha256": "C6D4793BA778A27DC4E30C8D710781306889BFF7EB9C718018E8D587B7FCE67D",
+          "after_sha256": "8C21D2CA3CB80224AB2936F6FA0089A2C5F40E61302A3CDDEF7DB5094F5F09D2",
+          "before_bytes": 124207,
+          "after_bytes": 124391
+        }
+      ]
+    },
+    {
+      "name": "more-infinite-research_5.0.01000.zip",
+      "before_archive_sha256": "BBD23A563575D8FE3CF2B3DD2A8274702F7420AA680D33D38ECD7AC96CA84B30",
+      "after_archive_sha256": "BE3457B714C595D1315DA9496D252AC56FF373640A1D0C2D25AB1E87EBC088B9",
+      "members": [
+        {
+          "path": "changelog.txt",
+          "before_sha256": "C6D4793BA778A27DC4E30C8D710781306889BFF7EB9C718018E8D587B7FCE67D",
+          "after_sha256": "8C21D2CA3CB80224AB2936F6FA0089A2C5F40E61302A3CDDEF7DB5094F5F09D2",
+          "before_bytes": 124207,
+          "after_bytes": 124391
+        }
+      ]
+    },
+    {
+      "name": "more-infinite-research_5.0.01100.zip",
+      "before_archive_sha256": "2DDF778B7F66EEAA2EE913DCE236D8BC52E75B2DAB4C9375CB039DDCA77E4957",
+      "after_archive_sha256": "689B195BA8AC5F7CDED24D9254EDC7354E02B8B25888257CA2675F1317B5F208",
+      "members": [
+        {
+          "path": "changelog.txt",
+          "before_sha256": "C6D4793BA778A27DC4E30C8D710781306889BFF7EB9C718018E8D587B7FCE67D",
+          "after_sha256": "8C21D2CA3CB80224AB2936F6FA0089A2C5F40E61302A3CDDEF7DB5094F5F09D2",
+          "before_bytes": 124207,
+          "after_bytes": 124391
+        }
+      ]
+    },
+    {
+      "name": "more-infinite-research_5.0.01200.zip",
+      "before_archive_sha256": "B00230964EB9035985E59EEB638AA23DAC209E429F67AB306C7021961E6E97F4",
+      "after_archive_sha256": "8CB1B67087DB49DEF4F592F8897505BBE4F7142A593B2560DD8FE1D3335CD60B",
+      "members": [
+        {
+          "path": "changelog.txt",
+          "before_sha256": "C6D4793BA778A27DC4E30C8D710781306889BFF7EB9C718018E8D587B7FCE67D",
+          "after_sha256": "8C21D2CA3CB80224AB2936F6FA0089A2C5F40E61302A3CDDEF7DB5094F5F09D2",
+          "before_bytes": 124207,
+          "after_bytes": 124391
+        }
+      ]
+    },
+    {
+      "name": "more-infinite-research_5.0.01300.zip",
+      "before_archive_sha256": "B614FBE67E2CBD2866B9FC9E0B138E7264875680A62B98ED76BE553BF53D22E0",
+      "after_archive_sha256": "0A26C82CE8AE41DEE30C28BBD66ACCF3713C87E31264B3B4B1A092DE253A17C1",
+      "members": [
+        {
+          "path": "changelog.txt",
+          "before_sha256": "C6D4793BA778A27DC4E30C8D710781306889BFF7EB9C718018E8D587B7FCE67D",
+          "after_sha256": "8C21D2CA3CB80224AB2936F6FA0089A2C5F40E61302A3CDDEF7DB5094F5F09D2",
+          "before_bytes": 124207,
+          "after_bytes": 124391
+        }
+      ]
+    },
+    {
+      "name": "more-infinite-research_5.0.01400.zip",
+      "before_archive_sha256": "CBE0424A9DF250ACBB51A5A001CACF9472DD5E3DC894116010E41765FCE25E47",
+      "after_archive_sha256": "C29A71B90F06BA92B3ABA4F1BF749E04729379AB22AADBAFB2E4100A255A529F",
+      "members": [
+        {
+          "path": "changelog.txt",
+          "before_sha256": "C6D4793BA778A27DC4E30C8D710781306889BFF7EB9C718018E8D587B7FCE67D",
+          "after_sha256": "8C21D2CA3CB80224AB2936F6FA0089A2C5F40E61302A3CDDEF7DB5094F5F09D2",
+          "before_bytes": 124207,
+          "after_bytes": 124391
+        }
+      ]
+    },
+    {
+      "name": "more-infinite-research_5.0.01500.zip",
+      "before_archive_sha256": "BF650EA031F3C21C56890650B2902588395DFD77A0927458FDB28FAF7F3D89EA",
+      "after_archive_sha256": "6F51F436C09C1FE35F83F7475F1809B3C5DAC2A3AC3195C7A53343122F3E9800",
+      "members": [
+        {
+          "path": "changelog.txt",
+          "before_sha256": "C6D4793BA778A27DC4E30C8D710781306889BFF7EB9C718018E8D587B7FCE67D",
+          "after_sha256": "8C21D2CA3CB80224AB2936F6FA0089A2C5F40E61302A3CDDEF7DB5094F5F09D2",
+          "before_bytes": 124207,
+          "after_bytes": 124391
+        }
+      ]
+    },
+    {
+      "name": "more-infinite-research_5.0.01600.zip",
+      "before_archive_sha256": "3F2AB91762B710D081B7939F3CF854526C33C4DC3B3777426B7E82C1D7C3E296",
+      "after_archive_sha256": "0CBBDF06AB30594B7293E9D81A42E956057A916CDEB0B6FA20BEEB6BCF2188C0",
+      "members": [
+        {
+          "path": "changelog.txt",
+          "before_sha256": "C6D4793BA778A27DC4E30C8D710781306889BFF7EB9C718018E8D587B7FCE67D",
+          "after_sha256": "8C21D2CA3CB80224AB2936F6FA0089A2C5F40E61302A3CDDEF7DB5094F5F09D2",
+          "before_bytes": 124207,
+          "after_bytes": 124391
+        }
+      ]
+    },
+    {
+      "name": "more-infinite-research_5.0.01700.zip",
+      "before_archive_sha256": "B627ECD28C8AC755E6A84E2BF575199EA7C79DA40DDACB6594752D1888E29991",
+      "after_archive_sha256": "981358DF7B06C226D8F276AAE46C0E9BC0B81A7BAC7BE36B677FD28AC4E04A89",
+      "members": [
+        {
+          "path": "changelog.txt",
+          "before_sha256": "C6D4793BA778A27DC4E30C8D710781306889BFF7EB9C718018E8D587B7FCE67D",
+          "after_sha256": "8C21D2CA3CB80224AB2936F6FA0089A2C5F40E61302A3CDDEF7DB5094F5F09D2",
+          "before_bytes": 124207,
+          "after_bytes": 124391
+        }
+      ]
+    },
+    {
+      "name": "more-infinite-research_5.0.01800.zip",
+      "before_archive_sha256": "FB26AF11930C74C7609A94152CC5024D1383AB383FBA5F2821D7CCB6142C9A48",
+      "after_archive_sha256": "86A67B0080EDF29442FA94EDF36EE42C74B48D8314501C8FF29EC7D16E3B1F46",
+      "members": [
+        {
+          "path": "changelog.txt",
+          "before_sha256": "C6D4793BA778A27DC4E30C8D710781306889BFF7EB9C718018E8D587B7FCE67D",
+          "after_sha256": "8C21D2CA3CB80224AB2936F6FA0089A2C5F40E61302A3CDDEF7DB5094F5F09D2",
+          "before_bytes": 124207,
+          "after_bytes": 124391
+        }
+      ]
+    },
+    {
+      "name": "more-infinite-research_5.0.10000.zip",
+      "before_archive_sha256": "D10B676E0800A689B9D2EE5D0CB47DC47A42EF7760E06C01D5F0D7F41493D2A7",
+      "after_archive_sha256": "225A4325CB18741694C4B5448376E7008E81980B06A150A15F3552DB22B801C2",
+      "members": [
+        {
+          "path": "changelog.txt",
+          "before_sha256": "C6D4793BA778A27DC4E30C8D710781306889BFF7EB9C718018E8D587B7FCE67D",
+          "after_sha256": "8C21D2CA3CB80224AB2936F6FA0089A2C5F40E61302A3CDDEF7DB5094F5F09D2",
+          "before_bytes": 124207,
+          "after_bytes": 124391
+        }
+      ]
+    },
+    {
+      "name": "more-infinite-research_5.0.11000.zip",
+      "before_archive_sha256": "E54A6481F976CE357F099BC7C1CB8C8455877505AFD976DF958B067F965AF9E5",
+      "after_archive_sha256": "45F21EDD92F360600C77C39589A20BFF7C1D93DA7B1D458A22975AEC166FC931",
+      "members": [
+        {
+          "path": "changelog.txt",
+          "before_sha256": "C6D4793BA778A27DC4E30C8D710781306889BFF7EB9C718018E8D587B7FCE67D",
+          "after_sha256": "8C21D2CA3CB80224AB2936F6FA0089A2C5F40E61302A3CDDEF7DB5094F5F09D2",
+          "before_bytes": 124207,
+          "after_bytes": 124391
+        }
+      ]
+    },
+    {
+      "name": "more-infinite-research_5.0.20000.zip",
+      "before_archive_sha256": "8DB28D2DE45F26033B5F54E176902A3138A903AF0F4B48EAB6B9971466021B4F",
+      "after_archive_sha256": "E1C84EA381FAA57BA7089AAD10B1AFD1408666A41AFE13962ABCBA6321EE889D",
+      "members": [
+        {
+          "path": "changelog.txt",
+          "before_sha256": "C6D4793BA778A27DC4E30C8D710781306889BFF7EB9C718018E8D587B7FCE67D",
+          "after_sha256": "8C21D2CA3CB80224AB2936F6FA0089A2C5F40E61302A3CDDEF7DB5094F5F09D2",
+          "before_bytes": 124207,
+          "after_bytes": 124391
+        },
+        {
+          "path": "data-final-fixes.lua",
+          "before_sha256": "9625DB7AE72B3155AA0CA30995FF05337A4E5A1C10A2133FB7B79268515C92CE",
+          "after_sha256": "FD73C6B88AEB83206FA4C612E5E92727266C16597ECBE30D7CE26F3E428C69ED",
+          "before_bytes": 12371,
+          "after_bytes": 13051
+        },
+        {
+          "path": "research/legacy_module_credit_definitions.lua",
+          "before_sha256": null,
+          "after_sha256": "98182E7F7C8294678DDFC01CE45C2CC23616B622039D8FDB952E5CCACB567AC7",
+          "before_bytes": 0,
+          "after_bytes": 2011
+        },
+        {
+          "path": "runtime/bootstrap.lua",
+          "before_sha256": "24CCCF6215EB2FF0DD9392ACA235C0D09A7BD8C4FAEE74D6052157DA5EBE7856",
+          "after_sha256": "0848C672B47C84A5F40BC47274BE359887A17183D3E4779AA38DFEACAF4D3027",
+          "before_bytes": 27247,
+          "after_bytes": 27759
+        },
+        {
+          "path": "runtime/legacy_module_credits.lua",
+          "before_sha256": null,
+          "after_sha256": "EA56F8B7075CC4F87BFECC60695BBE47FC2BFFA45C5024E08F5E94956D7C325E",
+          "before_bytes": 0,
+          "after_bytes": 10796
+        }
+      ]
+    },
+    {
+      "name": "more-infinite-research_5.0.21000.zip",
+      "before_archive_sha256": "7CE6A4DF78019F6B98237E638A1C927C5FDB538D4A1442EE22D846DD962DDCDC",
+      "after_archive_sha256": "039BC18B70E179DB600E29C8442637DD9972D7AB81E3F0770FDCF1056D6316B4",
+      "members": [
+        {
+          "path": "changelog.txt",
+          "before_sha256": "C6D4793BA778A27DC4E30C8D710781306889BFF7EB9C718018E8D587B7FCE67D",
+          "after_sha256": "8C21D2CA3CB80224AB2936F6FA0089A2C5F40E61302A3CDDEF7DB5094F5F09D2",
+          "before_bytes": 124207,
+          "after_bytes": 124391
+        },
+        {
+          "path": "data-final-fixes.lua",
+          "before_sha256": "9625DB7AE72B3155AA0CA30995FF05337A4E5A1C10A2133FB7B79268515C92CE",
+          "after_sha256": "FD73C6B88AEB83206FA4C612E5E92727266C16597ECBE30D7CE26F3E428C69ED",
+          "before_bytes": 12371,
+          "after_bytes": 13051
+        },
+        {
+          "path": "research/legacy_module_credit_definitions.lua",
+          "before_sha256": null,
+          "after_sha256": "98182E7F7C8294678DDFC01CE45C2CC23616B622039D8FDB952E5CCACB567AC7",
+          "before_bytes": 0,
+          "after_bytes": 2011
+        },
+        {
+          "path": "runtime/bootstrap.lua",
+          "before_sha256": "24CCCF6215EB2FF0DD9392ACA235C0D09A7BD8C4FAEE74D6052157DA5EBE7856",
+          "after_sha256": "0848C672B47C84A5F40BC47274BE359887A17183D3E4779AA38DFEACAF4D3027",
+          "before_bytes": 27247,
+          "after_bytes": 27759
+        },
+        {
+          "path": "runtime/legacy_module_credits.lua",
+          "before_sha256": null,
+          "after_sha256": "EA56F8B7075CC4F87BFECC60695BBE47FC2BFFA45C5024E08F5E94956D7C325E",
+          "before_bytes": 0,
+          "after_bytes": 10796
+        }
+      ]
+    }
+  ],
+  "limits": [
+    "Private package provenance only; these are not accepted release assets or current native qualification.",
+    "All17 ZIPs change their source changelog. F200/F210 additionally change data-final-fixes.lua and runtime/bootstrap.lua and add only the two fixed legacy-module-credit modules. Every other member path and payload is identical to retaineda575.",
+    "The original MIR1.1 source save88FC8E98 must independently pass both exact changed modern packages; no old native result is relabelled. Space Age and non-default module-setting closures remain unqualified.",
+    "F018/F006-F012 remain GitHub-only best effort. Portal copies, final native/client/performance qualification and release remain open."
+  ]
+}

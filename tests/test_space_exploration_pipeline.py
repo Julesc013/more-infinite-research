@@ -8,6 +8,7 @@ import json
 from pathlib import Path
 import sys
 import unittest
+from native_credit_oracle import legacy_module_credit_rows
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -128,8 +129,10 @@ class SpaceExplorationPipelineTests(unittest.TestCase):
         legacy_names = {"mir-k2-imersite-staged-state-1", "mir-k2-imersite-continuation-state-4"}
         legacy = {name: row for name, row in emitted.items() if name in legacy_names}
         public = {name: row for name, row in emitted.items()
-                  if not name.startswith("mir-native-credit-") and name not in legacy_names}
+                  if not name.startswith(("mir-native-credit-", "mir-legacy-module-credit-")) and name not in legacy_names}
         carriers = {name: row for name, row in emitted.items() if name.startswith("mir-native-credit-")}
+        module_holders = {name: row for name, row in emitted.items() if name.startswith("mir-legacy-module-credit-")}
+        self.assertEqual(legacy_module_credit_rows(self.context["cases"][case]["raw"]["recipe"]), module_holders)
         self.assertEqual(legacy_names if case == "k2se" else set(), set(legacy), case)
         self.assertTrue(all(row["hidden"] is True and row["enabled"] is True for row in legacy.values()))
         self.assertEqual(set(public), set(expected), case)

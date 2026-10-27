@@ -133,6 +133,34 @@ class LegacyModuleCreditTests(unittest.TestCase):
             return {ok=ok,message=tostring(message),storage=value.env.storage.mir_legacy_module_credits,
               holder=value.player.technologies[value.descriptors[1].id].level}
           end
+          function legacy_module_credit_disabled_prototype_main(target)
+            local value=legacy_module_credit_environment(target)
+            for _,force in pairs(value.env.game.forces) do
+              local main=force.technologies["recipe-prod-research_modules-1"]
+              main.prototype.enabled=false;main.enabled=false
+            end
+            local plan=value.runtime.preflight(value.event)
+            assert(plan and #plan.forces==2)
+            assert(value.runtime.apply(plan)==true)
+            local result={}
+            for name,force in pairs(value.env.game.forces) do
+              local main=force.technologies["recipe-prod-research_modules-1"]
+              result[name]={level=main.level,enabled=main.enabled,saved_progress=main.saved_progress,
+                queue=force.research_queue[1],progress=force.research_progress,holders={}}
+              for _,descriptor in ipairs(value.descriptors) do
+                local holder=force.technologies[descriptor.id]
+                result[name].holders[#result[name].holders+1]={level=holder.level,
+                  enabled=holder.enabled,visible=holder.visible_when_disabled}
+              end
+            end
+            return result
+          end
+          function legacy_module_credit_reject_nonboolean_prototype_enablement()
+            local value=legacy_module_credit_environment("f210")
+            value.player.technologies["recipe-prod-research_modules-1"].prototype.enabled="false"
+            local ok,message=pcall(function() value.runtime.preflight(value.event) end)
+            return {ok=ok,message=tostring(message),holder=value.player.technologies[value.descriptors[1].id].level}
+          end
           function legacy_module_credit_reject_one_tick_holder()
             local value=legacy_module_credit_environment("f200")
             value.player.technologies[value.descriptors[1].id].research_unit_energy=1
@@ -250,6 +278,58 @@ class LegacyModuleCreditTests(unittest.TestCase):
             self.assertEqual(before, holder["level"])
             self.assertFalse(holder["enabled"])
             self.assertFalse(holder["visible"])
+
+    def test_disabled_public_research_keeps_earned_credit_without_gaining_enablement(self):
+        self.lua.execute(r'''
+          for _, disable_before_preflight in ipairs({true, false}) do
+            local value = legacy_module_credit_environment("f210")
+            local main = value.player.technologies["recipe-prod-research_modules-1"]
+            if disable_before_preflight then main.enabled = false end
+            local plan = value.runtime.preflight(value.event)
+            main.enabled = false -- A cap may disable research during reconciliation.
+            assert(value.runtime.apply(plan) == true)
+            assert(main.enabled == false and main.level == 3 and main.saved_progress == .27)
+            assert(value.player.research_queue[1] == "preserved")
+            for _, descriptor in ipairs(value.descriptors) do
+              local holder = value.player.technologies[descriptor.id]
+              assert(holder.level == 3 and holder.enabled == false and holder.visible_when_disabled == false)
+            end
+          end
+        ''')
+
+    def test_disabled_public_prototype_is_a_current_base_row_and_keeps_all_public_state(self):
+        for target in ("f200", "f210"):
+            with self.subTest(target=target):
+                result = py(self.lua.eval("legacy_module_credit_disabled_prototype_main")(target))
+                self.assertEqual((3, False, .27, "preserved", .42),
+                                 (result["player"]["level"], result["player"]["enabled"], result["player"]["saved_progress"],
+                                  result["player"]["queue"], result["player"]["progress"]))
+                self.assertEqual((1, False, .27, "preserved", .42),
+                                 (result["foreign"]["level"], result["foreign"]["enabled"], result["foreign"]["saved_progress"],
+                                  result["foreign"]["queue"], result["foreign"]["progress"]))
+                self.assertEqual([(3, False, False)] * 3,
+                                 [(holder["level"], holder["enabled"], holder["visible"])
+                                  for holder in result["player"]["holders"]])
+                self.assertEqual([(2, False, False)] * 3,
+                                 [(holder["level"], holder["enabled"], holder["visible"])
+                                  for holder in result["foreign"]["holders"]])
+
+    def test_invalid_public_enablement_type_refuses_before_holder_writes(self):
+        self.lua.execute(r'''
+          local value = legacy_module_credit_environment("f210")
+          value.player.technologies["recipe-prod-research_modules-1"].enabled = "false"
+          local ok = pcall(value.runtime.preflight, value.event)
+          assert(not ok)
+          for _, descriptor in ipairs(value.descriptors) do
+            assert(value.player.technologies[descriptor.id].level == 1)
+          end
+        ''')
+
+    def test_invalid_public_prototype_enablement_type_refuses_before_holder_writes(self):
+        result = py(self.lua.eval("legacy_module_credit_reject_nonboolean_prototype_enablement")())
+        self.assertFalse(result["ok"])
+        self.assertIn("non-current force shape", result["message"])
+        self.assertEqual(1, result["holder"])
 
     def test_apply_indexes_the_force_collection_once_before_any_holder_write(self):
         result = py(self.lua.eval("legacy_module_credit_apply_indexes_forces_once")())

@@ -26,6 +26,7 @@ class BootstrapTests(unittest.TestCase):
             SCRIPTED_ACTIVE = scripted_active == true
             NATIVE_CREDIT_ACTIVE = native_credit_active == true
             credit_calls = {}
+            module_credit_calls = {}
             configuration_order = {}
             package.preload["platform.target"] = function()
               local target = dofile(player_root .. "/platform/target.lua")
@@ -53,6 +54,23 @@ class BootstrapTests(unittest.TestCase):
                 end
               end
               return module
+            end
+            package.preload["runtime.legacy_module_credits"] = function()
+              return {
+                preflight = function(event)
+                  module_credit_calls.preflight = event
+                  table.insert(configuration_order, "module-credit-preflight")
+                  if MODULE_CREDIT_PREFLIGHT_ERROR then error(MODULE_CREDIT_PREFLIGHT_ERROR) end
+                  return {snapshot = true}
+                end,
+                apply = function(plan)
+                  module_credit_calls.plan = plan
+                  table.insert(configuration_order, "module-credit-apply")
+                end,
+                on_technology_effects_reset = function(event)
+                  module_credit_calls.reset = event
+                end
+              }
             end
             lifecycle_calls = {}
             library_calls = {}
@@ -197,6 +215,7 @@ class BootstrapTests(unittest.TestCase):
             package.loaded["runtime.bootstrap"] = nil
             package.loaded["platform.target"] = nil
             package.loaded["runtime.native_credits"] = nil
+            package.loaded["runtime.legacy_module_credits"] = nil
             package.loaded["runtime.configuration"] = nil
             package.loaded["runtime.lifecycle"] = nil
             package.loaded["runtime.scripted_effects"] = nil
@@ -344,8 +363,10 @@ class BootstrapTests(unittest.TestCase):
           assert(credit_calls.on_init == 1 and credit_calls.preflight == 1 and credit_calls.on_configuration_changed == 1
             and credit_calls.on_load == 1)
           assert(configuration_order[1] == "native-credit-preflight"
-            and configuration_order[2] == "lifecycle"
-            and configuration_order[3] == "native-credit-reconcile")
+            and configuration_order[2] == "module-credit-preflight"
+            and configuration_order[3] == "lifecycle"
+            and configuration_order[4] == "native-credit-reconcile"
+            and configuration_order[5] == "module-credit-apply")
           assert(credit_calls.last_preflight_provider_relevant == false,
             "ordinary Base upgrade was marked as a competing-provider transition")
           for _, id in ipairs({1, 2, 3, 20}) do assert(type(handlers.events[id]) == "function") end
@@ -361,6 +382,36 @@ class BootstrapTests(unittest.TestCase):
           assert(storage.mir_native_credits == nil and handlers.nth[60] == nil and handlers.nth[61] == nil)
           install_modules(false, false, false, false); remote.interfaces = {}; load_control()
           for _, id in ipairs({1, 2, 3, 4, 5, 6, 19, 20}) do assert(handlers.events[id] == nil) end
+        ''')
+
+    def test_module_credit_preflight_precedes_all_configuration_writes(self):
+        self.lua.execute('''
+          install_modules(false, false, false, true); install_runtime(); load_control()
+          MODULE_CREDIT_PREFLIGHT_ERROR = "invalid legacy module shape"
+          local event = {mod_changes={}}
+          local ok, message = pcall(handlers.configuration, event)
+          assert(not ok and tostring(message):find(MODULE_CREDIT_PREFLIGHT_ERROR, 1, true))
+          assert(module_credit_calls.preflight == event and module_credit_calls.plan == nil)
+          assert(lifecycle_calls.configuration == nil and credit_calls.on_configuration_changed == nil
+            and library_calls.configuration == nil)
+        ''')
+
+    def test_module_credit_has_no_init_load_research_or_old_target_work(self):
+        self.lua.execute('''
+          install_modules(false, false, false, true); install_runtime(); load_control()
+          handlers.init(); handlers.load()
+          assert(next(module_credit_calls) == nil)
+          local event = {mod_changes={}}
+          handlers.configuration(event)
+          assert(module_credit_calls.preflight == event and module_credit_calls.plan.snapshot == true)
+          handlers.events[20]({force=player.force})
+          assert(module_credit_calls.reset.force == player.force)
+          handlers.events[3]({destination=player.force, source_index=2})
+          assert(module_credit_calls.reset.force == player.force)
+          for _, id in ipairs({4, 5, 6, 19}) do assert(handlers.events[id] == nil) end
+          install_modules(false, false, false, false); remote.interfaces = {}; load_control()
+          handlers.init(); handlers.configuration(event); handlers.load()
+          assert(next(module_credit_calls) == nil)
         ''')
 
     def test_native_credit_preflight_marks_a_named_removed_provider_relevant(self):

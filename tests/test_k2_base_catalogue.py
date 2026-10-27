@@ -12,7 +12,7 @@ import sys
 import unittest
 
 from native_credit_oracle import (
-    native_credit_carrier_rows,
+    current_native_credit_rows as native_credit_carrier_rows,
     split_public_and_native_credit_rows,
 )
 

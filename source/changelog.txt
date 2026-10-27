@@ -45,6 +45,8 @@ Version: 5.0.0
 
   Bugfixes:
 
+    - Retain the extra tier-one module productivity already earned in admitted MIR 1.1 saves through hidden native credits, while
+      new module research uses the corrected effects.
     - Restore the published visibility of all twenty retained Bob/Angel material setting families for admitted Factorio 2.1 Base and
       Space Age profiles.
     - Restore the seven published Bob/Angel Factorio 2.1 productivity technology icons from their direct native prototype
