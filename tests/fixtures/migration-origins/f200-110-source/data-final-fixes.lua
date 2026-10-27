@@ -97,11 +97,12 @@ for name, value in pairs(data.raw.technology or {}) do
     if type(unit) ~= "table" or unit.count_formula ~= catalogue.source_formula or unit.time ~= catalogue.source_time then
       fail("source unit differs: " .. name)
     end
+    local science = catalogue.science[expected.science]
     assert_same_counts(map_ingredients(unit.ingredients, "source science " .. name),
-      copy_map(catalogue.science[expected.science]),
+      copy_map(science.ingredients),
       "source science " .. name)
     assert_same_counts(map_prerequisites(value.prerequisites, "source prerequisites " .. name),
-      set_from_map(catalogue.science[expected.science]),
+      copy_map(science.prerequisites),
       "source prerequisites " .. name)
     assert_same_counts(count_signatures(value.effects), expected_effects(expected), "source effects " .. name)
     roster_count = roster_count + 1

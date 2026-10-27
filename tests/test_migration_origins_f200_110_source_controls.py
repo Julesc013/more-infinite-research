@@ -13,9 +13,11 @@ FIXTURE = ROOT / "tests/fixtures/migration-origins/f200-110-source"
 PROFILE = ROOT / "tests/profiles/migration-origins-1.1.0-source-f200-2077.json"
 DIRECT = "recipe-prod-research_gears-1"
 ROBOT = "recipe-prod-research_robot_battery-1"
-ORDINARY = ("automation-science-pack", "logistic-science-pack", "chemical-science-pack", "production-science-pack", "space-science-pack")
-MILITARY = ORDINARY[:-1] + ("military-science-pack", "space-science-pack")
-ALL_TOOLS = ORDINARY[:-1] + ("military-science-pack", "utility-science-pack", "space-science-pack")
+CORE = ("automation-science-pack", "logistic-science-pack", "chemical-science-pack", "production-science-pack")
+SPACE = CORE + ("space-science-pack",)
+MILITARY_SPACE = CORE + ("military-science-pack", "space-science-pack")
+MILITARY_GATE = CORE + ("military-science-pack",)
+ALL_TOOLS = CORE + ("military-science-pack", "utility-science-pack", "space-science-pack")
 
 # Exact archived 1.1.0 config combined with the installed Base 2.0.77 recipe
 # outputs.  This is intentionally not imported from the fixture catalogue.
@@ -48,8 +50,22 @@ EFFECTS = {
     "furnace": {"stone-furnace": .20, "steel-furnace": .10, "electric-furnace": .05},
     "mining_drill": {"burner-mining-drill": .20, "electric-mining-drill": .10},
 }
-ROW_SCIENCE = {key: ORDINARY for key in EFFECTS}
-ROW_SCIENCE.update({"bullets": MILITARY, "rockets": MILITARY, "science_pack_productivity": ALL_TOOLS})
+# Independent literal execution facts from official 1.1.0 `prototypes/util.lua`
+# `U.pick_science_for_stream` / `U.build_prereqs_for` on Base 2.0.77's
+# seven actual tool/technology identities.  The enabled Space gate appends a
+# prerequisite only; it does not append a unit ingredient.
+ROW_INGREDIENTS = {key: CORE for key in EFFECTS}
+ROW_PREREQUISITES = {key: SPACE for key in EFFECTS}
+for _key in ("belts", "inserters", "rails", "concrete"):
+    ROW_INGREDIENTS[_key] = SPACE
+    ROW_PREREQUISITES[_key] = SPACE
+for _key in ("bullets", "walls", "grenades"):
+    ROW_INGREDIENTS[_key] = MILITARY_SPACE
+    ROW_PREREQUISITES[_key] = MILITARY_SPACE
+ROW_INGREDIENTS["rockets"] = MILITARY_GATE
+ROW_PREREQUISITES["rockets"] = MILITARY_SPACE
+ROW_INGREDIENTS["science_pack_productivity"] = ALL_TOOLS
+ROW_PREREQUISITES["science_pack_productivity"] = ALL_TOOLS
 STREAM_KEYS = (
     "breeding", "plastic", "sulfur", "batteries", "explosives", "gears", "iron_sticks", "copper_cable",
     "electronic_circuit", "advanced_circuit", "processing_unit", "low_density_structure", "rocket_fuel", "copper",
@@ -85,11 +101,13 @@ class MigrationOriginF200110SourceControls(unittest.TestCase):
         for key, recipes in EFFECTS.items():
             name = f"recipe-prod-research_{key}-1"
             rows[name] = {
-                "science": ROW_SCIENCE[key],
+                "ingredients": ROW_INGREDIENTS[key],
+                "prerequisites": ROW_PREREQUISITES[key],
                 "effects": [{"type": "change-recipe-productivity", "recipe": recipe, "change": change}
                             for recipe, change in recipes.items()],
             }
-        rows[ROBOT] = {"science": ORDINARY, "effects": [{"type": "worker-robot-battery", "modifier": .10}]}
+        rows[ROBOT] = {"ingredients": SPACE, "prerequisites": SPACE,
+                       "effects": [{"type": "worker-robot-battery", "modifier": .10}]}
         return rows
 
     def source_technology_raw(self):
@@ -98,8 +116,8 @@ class MigrationOriginF200110SourceControls(unittest.TestCase):
             rows[name] = {
                 "type": "technology", "name": name, "upgrade": True, "max_level": "infinite", "enabled": True,
                 "unit": {"count_formula": "8000 * 2^(L-1)", "time": 60,
-                         "ingredients": [[pack, 1] for pack in expected["science"]]},
-                "prerequisites": list(expected["science"]), "effects": copy.deepcopy(expected["effects"]),
+                         "ingredients": [[pack, 1] for pack in expected["ingredients"]]},
+                "prerequisites": list(expected["prerequisites"]), "effects": copy.deepcopy(expected["effects"]),
             }
         return {"technology": rows, "sentinel": {"unchanged": 17}}
 
@@ -165,8 +183,14 @@ class MigrationOriginF200110SourceControls(unittest.TestCase):
         self.assertNotIn("recipe-prod-research_inventory_capacity-1", rows)
         self.assertEqual(6, len(rows["recipe-prod-research_science_pack_productivity-1"]["effects"]))
         self.assertNotIn("space-science-pack", {effect["recipe"] for effect in rows["recipe-prod-research_science_pack_productivity-1"]["effects"]})
-        self.assertEqual([[pack, 1] for pack in ORDINARY], rows[DIRECT]["unit"]["ingredients"])
-        self.assertEqual(list(ORDINARY), rows[DIRECT]["prerequisites"])
+        self.assertEqual([[pack, 1] for pack in CORE], rows[DIRECT]["unit"]["ingredients"])
+        self.assertEqual(list(SPACE), rows[DIRECT]["prerequisites"])
+        self.assertEqual([[pack, 1] for pack in MILITARY_SPACE],
+                         rows["recipe-prod-research_walls-1"]["unit"]["ingredients"])
+        self.assertEqual(list(MILITARY_SPACE), rows["recipe-prod-research_grenades-1"]["prerequisites"])
+        self.assertEqual([[pack, 1] for pack in MILITARY_GATE],
+                         rows["recipe-prod-research_rockets-1"]["unit"]["ingredients"])
+        self.assertEqual(list(MILITARY_SPACE), rows["recipe-prod-research_rockets-1"]["prerequisites"])
         self.assertEqual((1, None, 1), (rows[DIRECT]["unit"].get("count"), rows[DIRECT]["unit"].get("count_formula"), rows[DIRECT]["unit"]["time"]))
         self.assertEqual((None, "8000 * 2^(L-1)", 60),
                          (rows["recipe-prod-research_plastic-1"].get("level"), rows["recipe-prod-research_plastic-1"]["unit"]["count_formula"], rows["recipe-prod-research_plastic-1"]["unit"]["time"]))
@@ -178,6 +202,9 @@ class MigrationOriginF200110SourceControls(unittest.TestCase):
         foreign_effect = self.source_technology_raw(); foreign_effect["technology"][DIRECT]["effects"].append({"type": "change-recipe-productivity", "recipe": "foreign", "change": .10}); data_variants.append(("foreign-effect", foreign_effect, SETTINGS))
         raw_level = self.source_technology_raw(); raw_level["technology"][DIRECT]["level"] = 1; data_variants.append(("raw-level", raw_level, SETTINGS))
         missing_space = self.source_technology_raw(); missing_space["technology"][DIRECT]["prerequisites"].remove("space-science-pack"); data_variants.append(("space-prerequisite", missing_space, SETTINGS))
+        ordinary_unit_gate = self.source_technology_raw(); ordinary_unit_gate["technology"][DIRECT]["unit"]["ingredients"].append(["space-science-pack", 1]); data_variants.append(("ordinary-unit-space", ordinary_unit_gate, SETTINGS))
+        space_unit_missing = self.source_technology_raw(); space_unit_missing["technology"]["recipe-prod-research_belts-1"]["unit"]["ingredients"].pop(); data_variants.append(("space-unit-missing", space_unit_missing, SETTINGS))
+        rocket_unit_gate = self.source_technology_raw(); rocket_unit_gate["technology"]["recipe-prod-research_rockets-1"]["unit"]["ingredients"].append(["space-science-pack", 1]); data_variants.append(("rocket-unit-space", rocket_unit_gate, SETTINGS))
         wrong_effective = dict(SETTINGS); wrong_effective["ips-enable-research_breeding"] = False; data_variants.append(("breeding-effective", self.source_technology_raw(), wrong_effective))
         for label, candidate, candidate_settings in data_variants:
             with self.subTest(label=label):
@@ -260,6 +287,7 @@ class MigrationOriginF200110SourceControls(unittest.TestCase):
         self.assertEqual({"catalogue.lua", "control.lua", "data-final-fixes.lua", "settings-final-fixes.lua", "info.json"},
                          {path.name for path in FIXTURE.iterdir() if path.is_file() and path.name != "README.md"})
         self.assertIn("not a migration pass", (FIXTURE / "README.md").read_text(encoding="utf-8"))
+        self.assertIn("Superseded, never-executed r04", profile["scope"])
 
     def test_control_registers_callbacks_without_runtime_access_at_load(self):
         path = (FIXTURE / "control.lua").as_posix()
