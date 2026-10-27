@@ -231,10 +231,15 @@ function discovery_flow(helper_path, source_path, successor_path, source_mir, so
   ok,result=tick();if not ok then return {ok=false,message=result} end
   if #markers~=source_initial_markers then return {ok=false,message='source ordinary tick emitted reload marker'} end
   local source_phase=storage.mir5_discovery_recovery_fixture.phase
-  local source_reload,error=load_control(source_path,'source');if source_reload==nil then return {ok=false,message=error} end
-  ok,result=invoke('load');if not ok then return {ok=false,message=result} end
-  ok,result=tick();if not ok then return {ok=false,message=result} end
-  if storage.mir5_discovery_recovery_fixture.phase~=source_phase then return {ok=false,message='source cold reload wrote phase'} end
+  for ordinal=1,2 do
+    local source_reload,error=load_control(source_path,'source');if source_reload==nil then return {ok=false,message=error} end
+    ok,result=invoke('load');if not ok then return {ok=false,message=result} end
+    ok,result=tick();if not ok then return {ok=false,message=result} end
+    if storage.mir5_discovery_recovery_fixture.phase~=source_phase then return {ok=false,message='source cold reload wrote phase'} end
+    local source_reload_markers=#markers
+    ok,result=tick();if not ok then return {ok=false,message=result} end
+    if #markers~=source_reload_markers then return {ok=false,message='source cold reload emitted more than one marker'} end
+  end
   if opponent=='absent-state' then storage.mir5_discovery_recovery_fixture=nil end
   if opponent=='missing-repair' then player.locations.vulcanus=false else player.locations.vulcanus=true end
   if opponent=='bad-source' then storage.mir5_discovery_recovery_fixture.player.iron.bonus=.1 end
@@ -264,12 +269,14 @@ function discovery_flow(helper_path, source_path, successor_path, source_mir, so
   local successor_initial_markers=#markers
   ok,result=tick();if not ok then return {ok=false,message=result} end
   if #markers~=successor_initial_markers then return {ok=false,message='successor ordinary tick emitted reload marker'} end
-  local reload,error=load_control(successor_path,'successor');if reload==nil then return {ok=false,message=error} end
-  ok,result=invoke('load');if not ok then return {ok=false,message=result} end
-  ok,result=tick();if not ok then return {ok=false,message=result} end
-  local successor_reload_markers=#markers
-  ok,result=tick();if not ok then return {ok=false,message=result} end
-  if #markers~=successor_reload_markers then return {ok=false,message='successor cold reload emitted more than one marker'} end
+  for ordinal=1,2 do
+    local reload,error=load_control(successor_path,'successor');if reload==nil then return {ok=false,message=error} end
+    ok,result=invoke('load');if not ok then return {ok=false,message=result} end
+    ok,result=tick();if not ok then return {ok=false,message=result} end
+    local successor_reload_markers=#markers
+    ok,result=tick();if not ok then return {ok=false,message=result} end
+    if #markers~=successor_reload_markers then return {ok=false,message='successor cold reload emitted more than one marker'} end
+  end
   return {ok=true,saves=saves,source_create_saves=source_create_saves,markers=markers,labs=game.lab_count,state=final,player_bonus=player.recipes['iron-plate'].productivity_bonus,
     foreign_locked=not game.forces[2].locations.vulcanus,foreign_progress=game.forces[2].research_progress}
 end
@@ -331,17 +338,17 @@ end
                 self.assertAlmostEqual(.3, result["player_bonus"])
                 self.assertTrue(result["foreign_locked"])
                 self.assertEqual(.27, result["foreign_progress"])
-                self.assertEqual(["initial", "reload", "initial", "reload"], [row["stage"] for row in result["markers"]])
-                self.assertEqual(["discovery-recovery"] * 4, [row["case"] for row in result["markers"]])
-                self.assertEqual(["source", "source", "successor", "successor"],
+                self.assertEqual(["initial", "reload", "reload", "initial", "reload", "reload"], [row["stage"] for row in result["markers"]])
+                self.assertEqual(["discovery-recovery"] * 6, [row["case"] for row in result["markers"]])
+                self.assertEqual(["source"] * 3 + ["successor"] * 3,
                                  [row["fixture_role"] for row in result["markers"]])
-                self.assertEqual([source_version] * 4, [row["source_version"] for row in result["markers"]])
-                self.assertEqual((1, 1), (result["markers"][0]["source_actual_labs"], result["markers"][2]["successor_actual_labs"]))
+                self.assertEqual([source_version] * 6, [row["source_version"] for row in result["markers"]])
+                self.assertEqual((1, 1), (result["markers"][0]["source_actual_labs"], result["markers"][3]["successor_actual_labs"]))
                 self.assertEqual(3, result["markers"][0]["source_scripted_iron_level"])
                 self.assertAlmostEqual(.2, result["markers"][0]["source_scripted_iron_plate_bonus"])
                 self.assertTrue(result["markers"][0]["source_vulcanus_locked_seed"])
                 self.assertFalse(result["markers"][0]["player_vulcanus_unlocked"])
-                self.assertTrue(all(row["player_vulcanus_unlocked"] for row in result["markers"][2:]))
+                self.assertTrue(all(row["player_vulcanus_unlocked"] for row in result["markers"][3:]))
                 self.assertTrue(all(row["foreign_vulcanus_unresearched_locked"] for row in result["markers"]))
 
     def test_only_non_scripted_research_events_can_complete_fixture_labs(self):
