@@ -21,6 +21,14 @@ EARLY_LOCALE_SOURCE = "adapters/early/locale/en/more-infinite-research.cfg"
 EARLY_LOCALE_OUTPUT = "locale/en/more-infinite-research.cfg"
 EARLY_DESCRIPTION = ("Adds fixed finite default continuations of selected research bonus lines for museum "
                      "Factorio releases; it has no configurable startup settings.")
+MIR_PLAYER_NAME = "more-infinite-research"
+SOURCE_TARGET_PATH = "platform/target.lua"
+SOURCE_TARGET_ID_ASSIGNMENT = re.compile(rb'(?m)^[ \t]*id[ \t]*=')
+SOURCE_TARGET_ID = re.compile(rb'(?m)^[ \t]*id[ \t]*=[ \t]*"(?P<id>f\d{3})"[ \t]*,[ \t]*\r?$')
+SOURCE_DISTRIBUTION_VERSION_ASSIGNMENT = re.compile(rb'(?m)^[ \t]*distribution_version[ \t]*=')
+SOURCE_DISTRIBUTION_VERSION = re.compile(
+    rb'(?m)^[ \t]*distribution_version[ \t]*=[ \t]*"(?P<version>\d+\.\d+\.\d{5})"[ \t]*,[ \t]*\r?$')
+CODEC_VERSION = re.compile(r"^(?P<major>\d+)\.(?P<minor>\d+)\.(?P<encoded>\d{5})$")
 
 
 def digest(data):
@@ -164,6 +172,49 @@ def player_presentation(files, info):
     out = {name: raw for name, raw in files.items() if not name.startswith("presentation/changelog/")}
     out["changelog.txt"] = entry.replace(token, info["version"].encode("ascii"))
     return out
+
+
+def render_local_mir_target_version(files, source_version, requested_version, name):
+    """Keep the runtime version aligned for a generic local MIR package.
+
+    This is deliberately narrower than selected-edition materialization: it
+    validates and replaces the one authored source literal, preserving every
+    other Lua byte for a same-edition local package.
+    """
+    if name != MIR_PLAYER_NAME:
+        return files
+    if SOURCE_TARGET_PATH not in files:
+        raise ValueError("MIR local version package has no source target metadata")
+    if not isinstance(source_version, str) or not isinstance(requested_version, str):
+        raise ValueError("MIR local version package has an invalid distribution codec")
+    source_match = CODEC_VERSION.fullmatch(source_version)
+    requested_match = CODEC_VERSION.fullmatch(requested_version)
+    if source_match is None or requested_match is None:
+        raise ValueError("MIR local version package has an invalid distribution codec")
+
+    target = files[SOURCE_TARGET_PATH]
+    ids = list(SOURCE_TARGET_ID.finditer(target))
+    versions = list(SOURCE_DISTRIBUTION_VERSION.finditer(target))
+    if (len(SOURCE_TARGET_ID_ASSIGNMENT.findall(target)) != 1
+            or len(SOURCE_DISTRIBUTION_VERSION_ASSIGNMENT.findall(target)) != 1
+            or len(ids) != 1 or len(versions) != 1):
+        raise ValueError("MIR local version package has invalid source target metadata")
+    target_id = ids[0].group("id").decode("ascii")
+    target_version = versions[0].group("version").decode("ascii")
+    if target_version != source_version:
+        raise ValueError("MIR local version package has mismatched source target metadata")
+    target_codec = int(target_id[1:])
+    if int(source_match.group("encoded")) // 100 != target_codec:
+        raise ValueError("MIR local version package has mismatched source target codec")
+    if int(requested_match.group("encoded")) // 100 != target_codec:
+        raise ValueError("Local distribution version selects a different MIR edition")
+
+    rendered = dict(files)
+    match = versions[0]
+    rendered[SOURCE_TARGET_PATH] = (target[:match.start("version")]
+                                    + requested_version.encode("ascii")
+                                    + target[match.end("version"):])
+    return rendered
 
 
 def require_closure(files, pending):
@@ -310,6 +361,7 @@ def members(source, version=None, committed_files=None, target=None, editions=No
     if "info.json" not in committed_files:
         raise ValueError("Selected source has no info.json")
     info = json.loads(committed_files["info.json"].decode("utf-8"))
+    source_version = info.get("version")
     if version is not None:
         info["version"] = version
     if not re.fullmatch(r"[a-zA-Z0-9_-]+", info["name"]):
@@ -335,11 +387,15 @@ def members(source, version=None, committed_files=None, target=None, editions=No
         # early packages are data-only and have no migration members.
         if selected_record != EARLY_TARGET_RECORD and target not in F110_PLUS_MIGRATION_TARGETS:
             committed_files.pop(F110_PLUS_MIGRATION, None)
-    elif "changelog.txt" in committed_files:
-        encoded = info["version"].rsplit(".", 1)[-1]
-        if not re.fullmatch(r"[0-9]{5}", encoded):
-            raise ValueError("Player presentation requires a distribution codec")
-        committed_files = player_presentation(committed_files, info)
+    else:
+        if version is not None:
+            committed_files = render_local_mir_target_version(
+                committed_files, source_version, info["version"], info["name"])
+        if "changelog.txt" in committed_files:
+            encoded = info["version"].rsplit(".", 1)[-1]
+            if not re.fullmatch(r"[0-9]{5}", encoded):
+                raise ValueError("Player presentation requires a distribution codec")
+            committed_files = player_presentation(committed_files, info)
     rows = []
     for relative, contents in sorted(committed_files.items()):
         if admitted(relative):
