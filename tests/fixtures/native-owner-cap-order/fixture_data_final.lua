@@ -48,11 +48,14 @@ function M.apply(stage)
   if expected == nil then fail("unknown data-final stage") end
   assert_closure(expected)
   local technology = data.raw.technology and data.raw.technology[NAME]
-  local setting = data.raw["int-setting"] and data.raw["int-setting"]["ips-max-level-research_steel"]
+  -- Setting prototypes exist only during the settings stage.  At data-final
+  -- use the effective startup value that the engine exposes to this stage.
+  local startup = settings.startup
+  local setting = startup and startup["ips-max-level-research_steel"]
   if type(technology) ~= "table" or technology.name ~= NAME or technology.max_level ~= "infinite" then
     fail("steel native owner is absent or finite")
   end
-  if type(setting) ~= "table" or setting.default_value ~= expected.cap then
+  if type(setting) ~= "table" or setting.value ~= expected.cap then
     fail("steel cap setting differs")
   end
   assert_effects(technology) -- All fixture writes are below this preflight.

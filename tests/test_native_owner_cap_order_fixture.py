@@ -63,10 +63,15 @@ function cap_order_data(settings_path, data_path, settings_alias, data_alias, st
   if opponent=="missing" then effects[2]=nil end
   if opponent=="duplicate" then effects[2]={type="change-recipe-productivity",recipe="steel-plate",change=.1} end
   if opponent=="wrong-value" then effects[2].change=.11 end
-  local raw={technology={ ["steel-plate-productivity"]={name="steel-plate-productivity",max_level="infinite",effects=effects}},
-    ["int-setting"]={ ["ips-max-level-research_steel"]={default_value=0,minimum_value=0}}}
+  local settings_raw={ ["int-setting"]={ ["ips-max-level-research_steel"]={default_value=0,minimum_value=0}}}
+  local prototype_raw={technology={ ["steel-plate-productivity"]={name="steel-plate-productivity",max_level="infinite",effects=effects}}}
+  local expected_cap=stage=="canonical" and 1 or stage=="permuted" and 1 or 0
+  local effective_cap=opponent=="wrong-cap" and (expected_cap==0 and 1 or 0) or expected_cap
+  local startup_value=setmetatable({}, {__index=function(_,key)
+    if key=="value" then return effective_cap end
+  end, __newindex=function() error("startup setting is read-only") end})
   local env={mods={base="2.1.23",["elevated-rails"]="2.1.23",quality="2.1.23",recycler="2.1.23",["space-age"]="2.1.23",
-    ["more-infinite-research"]="5.0.21000",["mir-fixture-mir5-native-owner-cap-order"]=(stage=="canonical" and "0.1.0" or stage=="permuted" and "0.2.0" or "0.3.0")},data={raw=raw}}
+    ["more-infinite-research"]="5.0.21000",["mir-fixture-mir5-native-owner-cap-order"]=(stage=="canonical" and "0.1.0" or stage=="permuted" and "0.2.0" or "0.3.0")},data={raw=settings_raw}}
   local cache={}
   env.require=function(name)
     local aliases={
@@ -79,10 +84,12 @@ function cap_order_data(settings_path, data_path, settings_alias, data_alias, st
   end
   env._G=env;setmetatable(env,{__index=function(_,key)return _G[key]end})
   local chunk,message=loadfile(settings_path,"t",env);assert(chunk,message);local ok,result=pcall(chunk)
-  if not ok then return {ok=false,message=tostring(result),raw=raw} end
-  local setting=raw["int-setting"]["ips-max-level-research_steel"].default_value
+  if not ok then return {ok=false,message=tostring(result),raw=settings_raw} end
+  local setting=settings_raw["int-setting"]["ips-max-level-research_steel"].default_value
+  env.data={raw=prototype_raw}
+  env.settings={startup={ ["ips-max-level-research_steel"]=startup_value}}
   chunk,message=loadfile(data_path,"t",env);assert(chunk,message);ok,result=pcall(chunk)
-  return {ok=ok,message=tostring(result),raw=raw,setting=setting}
+  return {ok=ok,message=tostring(result),raw=prototype_raw,settings_raw=settings_raw,setting=setting}
 end
 
 function cap_order_parse(path, control_alias, stage)
@@ -125,8 +132,14 @@ function cap_order_flow(common_path, canonical_path, permuted_path, relaxed_path
     return seen["steel-plate"] and seen["casting-steel"]
   end
   local function make_force(name,index,owned)
-    local owner={name="steel-plate-productivity",valid=true,level=1,researched=false,enabled=true,visible_when_disabled=false,
+    local owner_state={name="steel-plate-productivity",valid=true,level=1,researched=false,enabled=true,visible_when_disabled=false,
       saved_progress=0,prototype={max_level=4294967295,effects=effects}}
+    -- LuaTechnology.level re-enables the technology.  A proxy keeps that
+    -- setter behavior visible to this fixture's ordinary Lua callbacks.
+    local owner=setmetatable({}, {__index=owner_state,__newindex=function(_,key,value)
+      owner_state[key]=value
+      if key=="level" then owner_state.enabled=true end
+    end})
     local probe={name="automation",valid=true,level=1,researched=false,enabled=true,visible_when_disabled=false,saved_progress=0,
       prototype={max_level=1,effects={}}}
     local value={name=name,index=index,valid=true,technologies={["steel-plate-productivity"]=owner,automation=probe},
@@ -235,9 +248,9 @@ end
             str(FIXTURE / stage / "settings-updates.lua"), str(FIXTURE / stage / "data-final-fixes.lua"),
             str(FIXTURE / "fixture_settings.lua"), str(FIXTURE / "fixture_data_final.lua"), stage, opponent)
 
-    def _flow(self, opponent: str = ""):
+    def _flow(self, opponent: str = "", control_path: Path = FIXTURE / "fixture_control.lua"):
         return self.lua.eval("cap_order_flow")(
-            str(FIXTURE / "fixture_control.lua"), str(FIXTURE / "canonical" / "control.lua"),
+            str(control_path), str(FIXTURE / "canonical" / "control.lua"),
             str(FIXTURE / "permuted" / "control.lua"), str(FIXTURE / "relaxed" / "control.lua"), opponent)
 
     def test_profiles_prepare_only_the_exact_f210_space_age_stage_closure(self):
@@ -273,6 +286,8 @@ end
                 result = self._data(stage)
                 self.assertTrue(result["ok"], result["message"])
                 self.assertEqual(cap, result["setting"])
+                self.assertNotIn("int-setting", result["raw"])
+                self.assertIn("int-setting", result["settings_raw"])
                 effects = result["raw"]["technology"]["steel-plate-productivity"]["effects"]
                 self.assertEqual(list(recipes), [effects[index]["recipe"] for index in range(1, 3)])
                 self.assertEqual([.1, .1], [effects[index]["change"] for index in range(1, 3)])
@@ -281,6 +296,12 @@ end
                 result = self._data("permuted", opponent)
                 self.assertFalse(result["ok"])
                 self.assertIn(phrase, result["message"])
+        with self.subTest(opponent="wrong-cap"):
+            result = self._data("permuted", "wrong-cap")
+            self.assertFalse(result["ok"])
+            self.assertIn("steel cap setting differs", result["message"])
+            effects = result["raw"]["technology"]["steel-plate-productivity"]["effects"]
+            self.assertEqual(["steel-plate", "casting-steel"], [effects[index]["recipe"] for index in range(1, 3)])
         wrong_phase = self.lua.eval("cap_order_data")(
             str(FIXTURE / "permuted" / "settings-updates.lua"), str(FIXTURE / "permuted" / "data-final-fixes.lua"),
             str(FIXTURE / "fixture_settings.lua"), str(FIXTURE / "fixture_data_final.lua"), "canonical", "")
@@ -329,6 +350,23 @@ end
                 self.assertIn(phrase, result["message"])
                 if opponent != "skipped-transition":
                     self.assertLessEqual(result["saves"], 2)
+
+    def test_technology_level_setter_requires_a_separate_following_foreign_disable_write(self):
+        original = (FIXTURE / "fixture_control.lua").read_text(encoding="utf-8")
+        old_assignment = "owner.level, owner.enabled, owner.visible_when_disabled = 2, false, false"
+        self.assertNotIn(old_assignment, original)
+        mutated = original.replace(
+            "owner.level = 2\n  owner.enabled = false\n  owner.visible_when_disabled = false",
+            old_assignment,
+            1,
+        )
+        self.assertNotEqual(original, mutated)
+        with tempfile.TemporaryDirectory(dir=ROOT / "build") as temporary:
+            old_control = Path(temporary) / "fixture_control.lua"
+            old_control.write_text(mutated, encoding="utf-8")
+            result = self._flow(control_path=old_control)
+        self.assertFalse(result["ok"])
+        self.assertIn("foreign native state differs", result["message"])
 
     def test_actual_caps_helper_records_only_foreign_visibility_then_restores_it_without_enabling(self):
         result = plain(self.lua.eval("cap_order_actual_foreign_visibility")())

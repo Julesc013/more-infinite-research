@@ -189,7 +189,11 @@ local function setup_foreign(expected)
   local foreign = game.create_force("mir5-native-owner-cap-order-foreign")
   foreign.enable_all_prototypes()
   local owner = technology(foreign)
-  owner.level, owner.enabled, owner.visible_when_disabled = 2, false, false
+  -- LuaTechnology.level re-enables a technology. Keep the intentional
+  -- foreign disablement after the level seed in separate writes.
+  owner.level = 2
+  owner.enabled = false
+  owner.visible_when_disabled = false
   local probe = foreign.technologies[PROBE]
   if probe == nil then fail("foreign queue probe is absent") end
   if foreign.add_research(probe) ~= true then fail("could not queue foreign probe") end
@@ -209,7 +213,10 @@ function M.apply(stage)
     local player = game.forces.player
     player.enable_all_prototypes()
     local owner = technology(player)
-    owner.level, owner.enabled, owner.visible_when_disabled = 2, true, false
+    -- Set the level first: assigning it re-enables a LuaTechnology.
+    owner.level = 2
+    owner.enabled = true
+    owner.visible_when_disabled = false
     -- `on_technology_effects_reset` is the actual engine boundary. The
     -- fixture neither imports nor invokes any MIR lifecycle handler.
     player.reset_technology_effects()
