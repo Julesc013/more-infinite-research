@@ -105,11 +105,27 @@ for index = 1, #DECLARATIONS do
     STATIC_GENERATED_BY_ID[row.id] = row
   end
 end
--- This literal target authority comes from package materialization, never
--- predecessor storage. F200 alone had the published settings-derived V3
--- native-worker transport; all other targets retain transported V3 admission.
+-- Default target authority comes from package materialization, never saved
+-- state. Current F200 declarations admit settings-derived V3; other targets
+-- retain ordinary transported V3 admission. The one-time reader below may
+-- additionally consider exact published F200 predecessor tuples.
 local LEGACY_ALLOWLIST = legacy_caps.allowlist(DECLARATIONS, platform_target.id)
+-- Actual info.json versions from the hash-checked structured MIR4 F200 ZIPs.
+-- RC/stable4.2 share a value; the stable F210 ZIP also reports4.2.20000.
+-- This event gate therefore permits an additional reader, never replaces the
+-- ordinary F210 reader or identifies an engine from the version text alone.
 local PUBLISHED_F200_M4_VERSIONS = {
+  ["4.2.20000"] = true,
+  ["4.2.20001"] = true,
+  ["4.2.20002"] = true,
+  ["4.3.20000"] = true,
+  ["4.4.20000"] = true,
+  ["4.4.20001"] = true,
+  ["4.4.20002"] = true,
+  ["4.5.20000"] = true,
+  ["4.5.20001"] = true,
+  ["4.5.20002"] = true,
+  ["4.6.20000"] = true,
   ["4.7.20000"] = true,
   ["4.7.20001"] = true,
   ["4.7.20002"] = true,
@@ -342,7 +358,10 @@ local function discard_unbound_ownership(force, owned_disabled, admitted, owner,
           local modifier = row.worker_effect_modifier
           if modifier == nil then modifier = 0.65 end
           if name ~= owner or modifier ~= worker_modifier(name) then owned[name] = nil end
-        else
+        elseif row ~= false or name ~= owner then
+          -- A false tombstone for the admitted current owner grants no
+          -- effect/restoration right. Keep it ahead of historical imports;
+          -- deleting it here would let an older ledger reclaim ownership.
           owned[name] = nil
         end
       end
@@ -527,15 +546,15 @@ local function import_legacy_caps_on_configuration(event)
   -- old bucket is malformed. A reused force index must never re-open import.
   current.legacy_caps_checked = true
 
-  -- An old cap bucket cannot report which engine wrote it.  Only this exact
-  -- package-change event permits current F210 rows to use the separately
-  -- constructed F200 predecessor tuple; ordinary/malformed/no-event F210
-  -- imports remain on the transported-only allowlist.
-  local direct_f200_hop = direct_f200_to_f210_transition(event)
+  -- A version label cannot identify the source engine: published stable4.2
+  -- F210 reports the F200 value. Always retain ordinary tuple admission, and
+  -- consider settings-derived V3 only for a known package-change event and
+  -- schema. The decoder still requires the exact per-row provenance/state.
+  local direct_f200_hop = type(legacy_bucket) == "table"
+    and legacy_bucket.policy_version == 3 and direct_f200_to_f210_transition(event)
   -- The one-time marker above keeps this exceptional construction out of
   -- ordinary control parsing, cold loads and subsequent configurations.
-  local allowlist = direct_f200_hop and legacy_caps.f200_direct_hop_allowlist(DECLARATIONS)
-    or LEGACY_ALLOWLIST
+  local f200_allowlist = direct_f200_hop and legacy_caps.f200_direct_hop_allowlist(DECLARATIONS)
 
   local selected_owners = {}
   if not game or not game.forces then return selected_owners end
@@ -548,9 +567,20 @@ local function import_legacy_caps_on_configuration(event)
       selected_owners[force.index] = owner
       local _, admitted = full_limits_for(force, true, owner, true)
       local owned = discard_unbound_ownership(force, current.owned_disabled, admitted, owner)
-      local rows = legacy_caps.import_for_force(legacy_bucket, force,
-        legacy_candidates(force, owner, direct_f200_hop), owned, allowlist)
+      -- Public policy-v1 used a distinct, boolean component ledger.  Its
+      -- marker is the only selector here; both readers still receive the
+      -- current preflighted candidate list and current ownership, so an old
+      -- version label cannot manufacture a restoration right.
+      local import_for_force = type(legacy_bucket) == "table" and legacy_bucket.policy_version == 1
+        and legacy_caps.import_boolean_for_force or legacy_caps.import_for_force
+      local rows = import_for_force(legacy_bucket, force,
+        legacy_candidates(force, owner, false), owned, LEGACY_ALLOWLIST)
       merge_legacy_rows(current.owned_disabled, force.index, rows)
+      if direct_f200_hop then
+        local predecessor_rows = legacy_caps.import_for_force(legacy_bucket, force,
+          legacy_candidates(force, owner, true), current.owned_disabled[force.index], f200_allowlist)
+        merge_legacy_rows(current.owned_disabled, force.index, predecessor_rows)
+      end
     end
   end
   return selected_owners

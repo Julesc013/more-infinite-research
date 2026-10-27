@@ -39,7 +39,8 @@ local function source_roster(force)
   for name, value in pairs(force.technologies) do
     if name:sub(1, #CATALOGUE.technology_prefix) == CATALOGUE.technology_prefix then
       if name:sub(-#CATALOGUE.technology_suffix) ~= CATALOGUE.technology_suffix
-          or value == nil or value.valid == false or value.prototype.max_level ~= UINT32_MAX then
+          or value == nil or value.valid == false or value.prototype.level ~= 1
+          or value.prototype.max_level ~= UINT32_MAX then
         fail("source runtime roster identity differs: " .. tostring(name))
       end
       rows[#rows + 1] = name

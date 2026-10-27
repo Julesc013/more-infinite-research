@@ -1,0 +1,8 @@
+{
+  "name": "mir-fixture-mir5-legacy-boolean-cap",
+  "version": "0.3.0",
+  "title": "MIR5 F210 policy-v1 boolean-cap direct successor fixture",
+  "author": "MIR maintainers",
+  "factorio_version": "2.1",
+  "dependencies": ["base >= 2.1.0", "more-infinite-research >= 5.0.21000"]
+}

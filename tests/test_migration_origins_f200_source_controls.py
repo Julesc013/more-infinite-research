@@ -50,7 +50,7 @@ def lua(runtime, value):
 class MigrationOriginF200SourceControls(unittest.TestCase):
     def source_technology(self, name, recipe, science=None):
         return {
-            "type": "technology", "name": name, "level": 1, "upgrade": True,
+            "type": "technology", "name": name, "upgrade": True,
             "max_level": "infinite", "enabled": True,
             "unit": {"count_formula": "8000 * 2^(L-1)", "time": 60,
                      "ingredients": copy.deepcopy(SCIENCE if science is None else science)},
@@ -118,6 +118,8 @@ class MigrationOriginF200SourceControls(unittest.TestCase):
             duplicate_science["technology"][SECONDARY]["unit"]["ingredients"][0][:]
         wrong_effect = self.source_raw()
         wrong_effect["technology"][DIRECT]["effects"][0]["change"] = .05
+        explicit_raw_level = self.source_raw()
+        explicit_raw_level["technology"][SECONDARY]["level"] = 1
         variants = (
             ("closure", self.source_raw(), {**mods, "more-infinite-research": "1.0.1"}, False),
             ("setting", self.source_raw(), mods, True),
@@ -130,6 +132,7 @@ class MigrationOriginF200SourceControls(unittest.TestCase):
             ("unexpected-extra", unexpected_extra, mods, False),
             ("duplicate-science", duplicate_science, mods, False),
             ("gear-effect", wrong_effect, mods, False),
+            ("explicit-raw-level", explicit_raw_level, mods, False),
         )
         for label, candidate, candidate_mods, breeding in variants:
             with self.subTest(label=label):
@@ -228,6 +231,7 @@ class MigrationOriginF200SourceControls(unittest.TestCase):
         queue = control.index("foreign.research_queue", foreign)
         self.assertLess(control.index("prerequisites(direct)", foreign), queue)
         self.assertLess(control.index("prerequisites(probe)", foreign), queue)
+        self.assertIn("value.prototype.level ~= 1", control)
         self.assertNotRegex(control, re.compile(r"\.level\s*=.*?\n.*?\.researched\s*=\s*false", re.DOTALL))
         readme = (FIXTURE / "README.md").read_text(encoding="utf-8")
         self.assertIn("not a migration pass", readme)

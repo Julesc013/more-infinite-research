@@ -28,6 +28,12 @@ class LegacyCapsTests(unittest.TestCase):
               cap_setting = "ips-max-level-research_spoilage_preservation",
               legacy_binding = {source = "generated-stream", operation = "emit"}}
           })
+          V1_ALLOWLIST = legacy.allowlist({
+            {id = "recipe-prod-research_gears-1", cap_setting = "ips-max-level-research_gears",
+              legacy_binding = {source = "generated-stream", operation = "emit"}},
+            {id = "braking-force-8", cap_setting = "mir-max-level-braking-force",
+              legacy_binding = {source = "base-continuation", operation = "emit_base_extension"}}
+          })
           F200_ALLOWLIST = legacy.allowlist({
             {id = "recipe-prod-research_gears-1", cap_setting = "ips-max-level-research_gears",
               legacy_binding = {source = "generated-stream", operation = "runtime-settings-transport",
@@ -50,6 +56,10 @@ class LegacyCapsTests(unittest.TestCase):
           local raw_import_for_force = legacy.import_for_force
           function legacy.import_for_force(bucket, force, candidates, current, allowlist)
             return raw_import_for_force(bucket, force, candidates, current, allowlist or direct_allowlist)
+          end
+          local raw_import_boolean_for_force = legacy.import_boolean_for_force
+          function legacy.import_boolean_for_force(bucket, force, candidates, current, allowlist)
+            return raw_import_boolean_for_force(bucket, force, candidates, current, allowlist or V1_ALLOWLIST)
           end
 
           function candidate(name, setting, source, operation, admitted)
@@ -106,6 +116,21 @@ class LegacyCapsTests(unittest.TestCase):
             return row
           end
 
+          function boolean_bucket(index, candidate, cap, disable, visibility)
+            local row = {policy_version = 1,
+              managed_technologies = {[candidate.name] = {
+                source = candidate.source, operation = candidate.operation,
+                setting = candidate.setting, selected = cap
+              }},
+              disabled_by_cap = {[index] = {}}, unowned_disabled_by_cap = {[index] = {}}
+            }
+            if disable ~= false then row.disabled_by_cap[index][candidate.name] = true end
+            if visibility ~= nil then
+              row.visibility_by_cap = {[index] = {[candidate.name] = visibility}}
+            end
+            return row
+          end
+
           function native_force(index, technologies)
             local value = {valid = true, index = index, technologies = technologies}
             return setmetatable(value, {__newindex = function()
@@ -113,8 +138,8 @@ class LegacyCapsTests(unittest.TestCase):
             end})
           end
 
-          function native_technology(enabled)
-            local value = {enabled = enabled == true, visible_when_disabled = true,
+          function native_technology(enabled, visible)
+            local value = {enabled = enabled == true, visible_when_disabled = visible ~= false,
               level = 11, researched = true, saved_progress = .42}
             return setmetatable(value, {__newindex = function()
               error("legacy decoder must not mutate a technology")
@@ -415,6 +440,185 @@ class LegacyCapsTests(unittest.TestCase):
           for index = 1, 129 do oversized[index] = gear end
           local ok = pcall(function() legacy.import_for_force(old, f, oversized, nil) end)
           assert(not ok, "candidate bound was not enforced")
+        ''')
+
+    def test_imports_schema1_boolean_rights_with_and_without_a_visibility_snapshot(self):
+        self.lua.execute('''
+          -- Published 3.2.11 and the released F200/F210 4.0/4.1 ZIPs use
+          -- policy_version=1 and this exact boolean marker shape.
+          local gear = candidate("recipe-prod-research_gears-1", "ips-max-level-research_gears",
+            "generated-stream", "emit")
+          local technology = native_technology(false, true)
+          local old = boolean_bucket(14, gear, 3, true, false)
+          local rows, facts = legacy.import_boolean_for_force(old,
+            native_force(14, {[gear.name] = technology}), {gear}, nil)
+          assert(facts.legacy_policy1 and facts.candidates_checked == 1 and facts.imported == 1)
+          assert(facts.decisions[1].outcome == "owned_disable_imported")
+          assert(rows[gear.name].disabled and rows[gear.name].visible_when_disabled == false)
+          rows[gear.name].visible_when_disabled = true
+          assert(old.visibility_by_cap[14][gear.name] == false,
+            "boolean output retained a mutable saved visibility value")
+          assert(technology.enabled == false and technology.visible_when_disabled == true
+            and technology.level == 11 and technology.researched and technology.saved_progress == .42)
+
+          -- Earlier V1 bodies had no visibility map.  They can prove the
+          -- disable right but cannot manufacture a visibility restoration.
+          old = boolean_bucket(14, gear, 3, true, nil)
+          rows, facts = legacy.import_boolean_for_force(old,
+            native_force(14, {[gear.name] = native_technology(false, false)}), {gear}, nil)
+          assert(rows[gear.name].disabled and rows[gear.name].visible_when_disabled == nil)
+          assert(facts.decisions[1].outcome == "owned_disable_imported")
+        ''')
+
+    def test_schema1_keeps_foreign_and_changed_enablement_separate_from_visibility(self):
+        self.lua.execute('''
+          local gear = candidate("recipe-prod-research_gears-1", "ips-max-level-research_gears",
+            "generated-stream", "emit")
+          local old = boolean_bucket(18, gear, 3, true, false)
+          old.unowned_disabled_by_cap[18][gear.name] = true
+          local rows, facts = legacy.import_boolean_for_force(old,
+            native_force(18, {[gear.name] = native_technology(false, true)}), {gear}, nil)
+          assert(rows[gear.name].disabled == nil and rows[gear.name].visible_when_disabled == false)
+          assert(facts.decisions[1].outcome == "visibility_imported_unowned_disable_excluded")
+
+          old = boolean_bucket(18, gear, 3, true, false)
+          rows, facts = legacy.import_boolean_for_force(old,
+            native_force(18, {[gear.name] = native_technology(true, true)}), {gear}, nil)
+          assert(rows[gear.name].disabled == nil and rows[gear.name].visible_when_disabled == false)
+          assert(facts.decisions[1].outcome == "visibility_imported_enablement_reenabled")
+
+          old = boolean_bucket(18, gear, 3, false, false)
+          rows, facts = legacy.import_boolean_for_force(old,
+            native_force(18, {[gear.name] = native_technology(false, false)}), {gear}, nil)
+          assert(rows[gear.name] == nil and facts.decisions[1].outcome == "visibility_state_changed")
+
+          old = boolean_bucket(18, gear, 3, true, false)
+          rows, facts = legacy.import_boolean_for_force(old,
+            native_force(18, {[gear.name] = native_technology(false, true)}), {gear}, {
+              [gear.name] = {disabled = true}
+            })
+          assert(rows[gear.name] == nil and facts.decisions[1].outcome == "current_mir5_ownership_retained")
+        ''')
+
+    def test_schema1_accepts_only_actual_producer_tuple_shapes_and_boolean_markers(self):
+        self.lua.execute('''
+          local gear = candidate("recipe-prod-research_gears-1", "ips-max-level-research_gears",
+            "generated-stream", "emit")
+          local force = native_force(23, {[gear.name] = native_technology(false, true)})
+          local old = boolean_bucket(23, gear, 4, true, false)
+          old.managed_technologies[gear.name].setting = "ips-max-level-research_iron"
+          local rows, facts = legacy.import_boolean_for_force(old, force, {gear}, nil)
+          assert(rows[gear.name] == nil and facts.decisions[1].outcome == "policy_mismatch")
+
+          old = boolean_bucket(23, gear, 0, true, false)
+          rows, facts = legacy.import_boolean_for_force(old, force, {gear}, nil)
+          assert(rows[gear.name] == nil and facts.decisions[1].outcome == "policy_mismatch")
+          old = boolean_bucket(23, gear, 4, true, false)
+          old.managed_technologies[gear.name].blocked_reason = "late_prototype_mutation"
+          rows, facts = legacy.import_boolean_for_force(old, force, {gear}, nil)
+          assert(rows[gear.name] == nil and facts.decisions[1].outcome == "policy_mismatch")
+
+          old = boolean_bucket(23, gear, 4, true, false)
+          old.disabled_by_cap[23][gear.name] = {enabled_before_cap = true}
+          rows, facts = legacy.import_boolean_for_force(old, force, {gear}, nil)
+          assert(rows[gear.name].disabled == nil and rows[gear.name].visible_when_disabled == false)
+          assert(facts.decisions[1].outcome == "visibility_imported_disable_unproven")
+
+          old = boolean_bucket(23, gear, 4, true, false)
+          old.visibility_by_cap[23][gear.name] = {value = false}
+          rows, facts = legacy.import_boolean_for_force(old, force, {gear}, nil)
+          assert(rows[gear.name] == nil and facts.decisions[1].outcome == "visibility_record_mismatch")
+
+          local worker = candidate("worker-robots-speed-6", "mir-max-level-worker-robots-speed",
+            "native-owner", "native-owner-cap")
+          old = boolean_bucket(23, worker, 4, true, false)
+          rows, facts = legacy.import_boolean_for_force(old,
+            native_force(23, {[worker.name] = native_technology(false, true)}), {worker}, nil,
+            F200_WORKER_ALLOWLIST)
+          assert(rows[worker.name] == nil and facts.decisions[1].outcome == "candidate_not_admitted")
+
+          local invalid_operation = candidate(gear.name, gear.setting,
+            "generated-stream", "foreign-operation")
+          old = boolean_bucket(23, invalid_operation, 4, true, false)
+          rows, facts = legacy.import_boolean_for_force(old, force, {invalid_operation}, nil,
+            V1_ALLOWLIST)
+          assert(rows[gear.name] == nil and facts.decisions[1].outcome == "candidate_not_admitted")
+
+          -- Both real V1 producer forms remain bounded: the compiled base
+          -- continuation and the no-mod-data runtime transport fallback.
+          local braking = candidate("braking-force-8", "mir-max-level-braking-force",
+            "base-continuation", "emit_base_extension")
+          old = boolean_bucket(23, braking, 2, true, nil)
+          rows, facts = legacy.import_boolean_for_force(old,
+            native_force(23, {[braking.name] = native_technology(false, false)}), {braking}, nil)
+          assert(rows[braking.name].disabled and facts.decisions[1].outcome == "owned_disable_imported")
+
+          local fallback = candidate(gear.name, gear.setting,
+            "generated-stream", "runtime-settings-transport")
+          old = boolean_bucket(23, fallback, 4, true, false)
+          rows, facts = legacy.import_boolean_for_force(old,
+            native_force(23, {[fallback.name] = native_technology(false, true)}), {fallback}, nil,
+            F200_ALLOWLIST)
+          assert(rows[fallback.name].disabled and facts.decisions[1].outcome == "owned_disable_imported")
+
+          -- A V1 source could use its no-mod-data fallback before a current
+          -- F210 planned binding, and vice versa for F200.  The operation is
+          -- a bounded historical producer detail, not a different identity.
+          old = boolean_bucket(23, gear, 4, true, false)
+          old.managed_technologies[gear.name].operation = "runtime-settings-transport"
+          rows, facts = legacy.import_boolean_for_force(old, force, {gear}, nil)
+          assert(rows[gear.name].disabled and facts.decisions[1].outcome == "owned_disable_imported")
+          old = boolean_bucket(23, fallback, 4, true, false)
+          old.managed_technologies[fallback.name].operation = "emit"
+          rows, facts = legacy.import_boolean_for_force(old,
+            native_force(23, {[fallback.name] = native_technology(false, true)}), {fallback}, nil,
+            F200_ALLOWLIST)
+          assert(rows[fallback.name].disabled and facts.decisions[1].outcome == "owned_disable_imported")
+
+          -- Equivalence is source-class-specific: an operation from the other
+          -- class, or an unknown operation, cannot create a historical right.
+          old = boolean_bucket(23, gear, 4, true, false)
+          old.managed_technologies[gear.name].operation = "emit_base_extension"
+          rows, facts = legacy.import_boolean_for_force(old, force, {gear}, nil)
+          assert(rows[gear.name] == nil and facts.decisions[1].outcome == "policy_mismatch")
+          old = boolean_bucket(23, braking, 2, true, nil)
+          old.managed_technologies[braking.name].operation = "emit"
+          rows, facts = legacy.import_boolean_for_force(old,
+            native_force(23, {[braking.name] = native_technology(false, false)}), {braking}, nil)
+          assert(rows[braking.name] == nil and facts.decisions[1].outcome == "policy_mismatch")
+          old = boolean_bucket(23, gear, 4, true, false)
+          old.managed_technologies[gear.name].operation = "unknown-operation"
+          rows, facts = legacy.import_boolean_for_force(old, force, {gear}, nil)
+          assert(rows[gear.name] == nil and facts.decisions[1].outcome == "policy_mismatch")
+        ''')
+
+    def test_schema1_is_bounded_pure_and_does_not_change_structured_v3_imports(self):
+        self.lua.execute('''
+          local gear = candidate("recipe-prod-research_gears-1", "ips-max-level-research_gears",
+            "generated-stream", "emit")
+          local reads = 0
+          local old = setmetatable({policy_version = 1}, {__index = function(_, key)
+            reads = reads + 1
+            if key == "managed_technologies" or key == "disabled_by_cap"
+                or key == "visibility_by_cap" or key == "unowned_disabled_by_cap" then return {} end
+            error("unexpected schema1 legacy field " .. tostring(key))
+          end, __pairs = function() error("schema1 legacy maps must not be enumerated") end})
+          local rows, facts = legacy.import_boolean_for_force(old, native_force(29, {}), {gear}, nil)
+          assert(next(rows) == nil and facts.legacy_policy1 and facts.candidates_checked == 1)
+          assert(reads <= 4)
+          local oversized = {}
+          for index = 1, 129 do oversized[index] = gear end
+          local ok = pcall(function() legacy.import_boolean_for_force(old, native_force(29, {}), oversized, nil) end)
+          assert(not ok, "schema1 candidate bound was not enforced")
+
+          local structured = old_bucket(29, gear, 3, "mir32-1234abcd")
+          rows, facts = legacy.import_boolean_for_force(structured,
+            native_force(29, {[gear.name] = native_technology(false, true)}), {gear}, nil)
+          assert(rows[gear.name] == nil and not facts.legacy_policy1)
+          rows, facts = legacy.import_for_force(structured,
+            native_force(29, {[gear.name] = native_technology(false, true)}), {gear}, nil)
+          assert(rows[gear.name].disabled and facts.legacy_policy3,
+            "schema1 decoder changed structured-v3 admission")
         ''')
 
     def test_source_has_no_old_runtime_import_or_mutating_assignment(self):

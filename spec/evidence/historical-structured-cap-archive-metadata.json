@@ -1,0 +1,131 @@
+{
+  "schema": "mir-historical-cap-archive-metadata-probe-r01-mir4-structured",
+  "scope": "Eight named public MIR4 F200/F210 ZIPs only: v4.2.0-rc.1, v4.2.0-stable, v4.3.0, and v4.6.0. Each ZIP was fetched into memory, hash-checked, inspected through an in-memory ZIP stream, and discarded; no archive was persisted or executed.",
+  "status": "archive-bytes-verified; metadata-and-controller-body-read-only; no-native-claim",
+  "preserves_prior_receipts": [
+    "build/qualification/aero-historical-cap-archive-metadata-r01/public-original-cap-archive-metadata.json",
+    "build/qualification/aero-historical-cap-archive-metadata-r01/public-original-cap-archive-metadata-2.5-supplement.json"
+  ],
+  "limits": [
+    "This is not a save, engine, compatibility, migration, or native qualification result.",
+    "Only sole info.json metadata and the sole player maximum_level_control.lua entry were examined for each stated ZIP.",
+    "The extracted controller comparison establishes archive-to-tag source identity for these eight inputs only; it does not establish which save rows exist or are admissible in MIR5."
+  ],
+  "input_metadata": {
+    "migration_origins_path": "spec/inventory/migration-origins.json",
+    "migration_origins_git_blob": "0BDDD9A6AE8EED82A5CCC013652247FAB3DAA19F",
+    "migration_origins_sha256": "FCE00686DFED365FDEB6B7F96716602E01F5FC038D3CD66FBCE0211F10AEE17E"
+  },
+  "controller_cohorts": {
+    "5d8": {
+      "tag_source_git_blob": "5D8B9939C0B159FE947BB94E28FA8819A4AD71C3",
+      "raw_bytes": 42409,
+      "raw_sha256": "05315ADA92D1FAC91669CC6564E7BB293082F9919E5CE4D97F88EE8FCC0C4B46",
+      "policy_version": 3,
+      "storage_shape": "structured per-force disabled_by_cap, visibility_by_cap, and unowned_disabled_by_cap records",
+      "cap_guard": {"line": 840, "source": "if cap and technology.level > cap then"},
+      "visibility_writer": "captures structured visibility before setting technology.visible_when_disabled=true",
+      "disable_writer": "only inside an enabled-state guard; writes policy_version, force_index, cap, binding_fingerprint, ownership_key, ownership_kind, and enabled_before_cap=true before setting technology.enabled=false"
+    },
+    "48": {
+      "tag_source_git_blob": "48DE6BDF4332939C73EC9FC4AE793A9623C015DA",
+      "raw_bytes": 43260,
+      "raw_sha256": "D786E6D522B87B9102F2D774D7B0CAA825B54DDF18753C4CC776CD6DB1789FCE",
+      "policy_version": 3,
+      "storage_shape": "structured per-force disabled_by_cap, visibility_by_cap, and unowned_disabled_by_cap records",
+      "cap_guard": {"line": 862, "source": "if cap and technology.level > cap then"},
+      "visibility_writer": "captures structured visibility before setting technology.visible_when_disabled=true",
+      "disable_writer": "only inside an enabled-state guard; writes policy_version, force_index, cap, binding_fingerprint, ownership_key, ownership_kind, and enabled_before_cap=true before setting technology.enabled=false"
+    }
+  },
+  "observations": [
+    {
+      "release_tag": "v4.2.0-rc.1",
+      "tag_commit": "16DBC698CBB55FA2D494C2412332BB4935F7FA4C",
+      "edition": "f200",
+      "asset_id": 607509723,
+      "filename": "more-infinite-research_4.2.20000.zip",
+      "public_download_url": "https://github.com/Julesc013/more-infinite-research/releases/download/v4.2.0-rc.1/more-infinite-research_4.2.20000.zip",
+      "archive": {"expected_bytes": 1238138, "observed_bytes": 1238138, "expected_sha256": "96B7534C6081D689A860EACF37F710AD172404B5D182B2B8A4D8E41004929931", "observed_sha256": "96B7534C6081D689A860EACF37F710AD172404B5D182B2B8A4D8E41004929931", "verified": true},
+      "info_json": {"entry": "more-infinite-research_4.2.20000/info.json", "name": "more-infinite-research", "version": "4.2.20000", "factorio_version": "2.0"},
+      "maximum_level_control": {"entry": "more-infinite-research_4.2.20000/prototypes/mir/runtime/maximum_level_control.lua", "cohort": "5d8", "tag_source_member": "source/prototypes/mir/runtime/maximum_level_control.lua", "normalized_lf_matches_tag_source": true}
+    },
+    {
+      "release_tag": "v4.2.0-rc.1",
+      "tag_commit": "16DBC698CBB55FA2D494C2412332BB4935F7FA4C",
+      "edition": "f210",
+      "asset_id": 607509743,
+      "filename": "more-infinite-research_4.2.21000.zip",
+      "public_download_url": "https://github.com/Julesc013/more-infinite-research/releases/download/v4.2.0-rc.1/more-infinite-research_4.2.21000.zip",
+      "archive": {"expected_bytes": 1242094, "observed_bytes": 1242094, "expected_sha256": "8E9DDF6D4245B69F5E81C5FE5D76A55B2E26D22C4E927E2A513260E0130D5D4A", "observed_sha256": "8E9DDF6D4245B69F5E81C5FE5D76A55B2E26D22C4E927E2A513260E0130D5D4A", "verified": true},
+      "info_json": {"entry": "more-infinite-research_4.2.21000/info.json", "name": "more-infinite-research", "version": "4.2.21000", "factorio_version": "2.1"},
+      "maximum_level_control": {"entry": "more-infinite-research_4.2.21000/prototypes/mir/runtime/maximum_level_control.lua", "cohort": "5d8", "tag_source_member": "source/prototypes/mir/runtime/maximum_level_control.lua", "normalized_lf_matches_tag_source": true}
+    },
+    {
+      "release_tag": "v4.2.0-stable",
+      "tag_commit": "6D19C874EA7D026D297865B96AA1B2B0916E9E61",
+      "edition": "f200",
+      "asset_id": 608069690,
+      "filename": "more-infinite-research_4.2.20000.zip",
+      "public_download_url": "https://github.com/Julesc013/more-infinite-research/releases/download/v4.2.0-stable/more-infinite-research_4.2.20000.zip",
+      "archive": {"expected_bytes": 1241057, "observed_bytes": 1241057, "expected_sha256": "9C4EFA1D4C3D09F5D945F227A480EA1644C494F6F9162A9CC1FB50A7523D7557", "observed_sha256": "9C4EFA1D4C3D09F5D945F227A480EA1644C494F6F9162A9CC1FB50A7523D7557", "verified": true},
+      "info_json": {"entry": "more-infinite-research_4.2.20000/info.json", "name": "more-infinite-research", "version": "4.2.20000", "factorio_version": "2.0"},
+      "maximum_level_control": {"entry": "more-infinite-research_4.2.20000/prototypes/mir/runtime/maximum_level_control.lua", "cohort": "5d8", "tag_source_member": "source/prototypes/mir/runtime/maximum_level_control.lua", "normalized_lf_matches_tag_source": true}
+    },
+    {
+      "release_tag": "v4.2.0-stable",
+      "tag_commit": "6D19C874EA7D026D297865B96AA1B2B0916E9E61",
+      "edition": "f210",
+      "asset_id": 608069880,
+      "filename": "more-infinite-research_4.2.21000.zip",
+      "public_download_url": "https://github.com/Julesc013/more-infinite-research/releases/download/v4.2.0-stable/more-infinite-research_4.2.21000.zip",
+      "archive": {"expected_bytes": 1244976, "observed_bytes": 1244976, "expected_sha256": "DE45F114931BEACF78F2CC6ABFBF3B2BDD7A79CC27E780A6E1A483FCA5ED9422", "observed_sha256": "DE45F114931BEACF78F2CC6ABFBF3B2BDD7A79CC27E780A6E1A483FCA5ED9422", "verified": true},
+      "info_json": {"entry": "more-infinite-research_4.2.21000/info.json", "name": "more-infinite-research", "version": "4.2.20000", "factorio_version": "2.1"},
+      "maximum_level_control": {"entry": "more-infinite-research_4.2.21000/prototypes/mir/runtime/maximum_level_control.lua", "cohort": "5d8", "tag_source_member": "source/prototypes/mir/runtime/maximum_level_control.lua", "normalized_lf_matches_tag_source": true}
+    },
+    {
+      "release_tag": "v4.3.0",
+      "tag_commit": "0E2703D7B545B97A2BDB308A02D84857288B6DC1",
+      "edition": "f200",
+      "asset_id": 637109639,
+      "filename": "more-infinite-research_4.3.20000.zip",
+      "public_download_url": "https://github.com/Julesc013/more-infinite-research/releases/download/v4.3.0/more-infinite-research_4.3.20000.zip",
+      "archive": {"expected_bytes": 1456776, "observed_bytes": 1456776, "expected_sha256": "856D81ACD0B25F24EB1DCC8B0FA4BCD68FE1A66DAFC8011A8807EF1F77F05C65", "observed_sha256": "856D81ACD0B25F24EB1DCC8B0FA4BCD68FE1A66DAFC8011A8807EF1F77F05C65", "verified": true},
+      "info_json": {"entry": "more-infinite-research_4.3.20000/info.json", "name": "more-infinite-research", "version": "4.3.20000", "factorio_version": "2.0"},
+      "maximum_level_control": {"entry": "more-infinite-research_4.3.20000/prototypes/mir/runtime/maximum_level_control.lua", "cohort": "5d8", "tag_source_member": "source/prototypes/mir/runtime/maximum_level_control.lua", "normalized_lf_matches_tag_source": true}
+    },
+    {
+      "release_tag": "v4.3.0",
+      "tag_commit": "0E2703D7B545B97A2BDB308A02D84857288B6DC1",
+      "edition": "f210",
+      "asset_id": 637109643,
+      "filename": "more-infinite-research_4.3.21000.zip",
+      "public_download_url": "https://github.com/Julesc013/more-infinite-research/releases/download/v4.3.0/more-infinite-research_4.3.21000.zip",
+      "archive": {"expected_bytes": 1460639, "observed_bytes": 1460639, "expected_sha256": "9CB1B6466FC767072E0D11BFC02A139DABD8286CCF5F669C2E2500047B012F7F", "observed_sha256": "9CB1B6466FC767072E0D11BFC02A139DABD8286CCF5F669C2E2500047B012F7F", "verified": true},
+      "info_json": {"entry": "more-infinite-research_4.3.21000/info.json", "name": "more-infinite-research", "version": "4.3.21000", "factorio_version": "2.1"},
+      "maximum_level_control": {"entry": "more-infinite-research_4.3.21000/prototypes/mir/runtime/maximum_level_control.lua", "cohort": "5d8", "tag_source_member": "source/prototypes/mir/runtime/maximum_level_control.lua", "normalized_lf_matches_tag_source": true}
+    },
+    {
+      "release_tag": "v4.6.0",
+      "tag_commit": "9D6A9DE1D77CA526DA78428F8DE52D5C61F9F55B",
+      "edition": "f200",
+      "asset_id": 659215650,
+      "filename": "more-infinite-research_4.6.20000.zip",
+      "public_download_url": "https://github.com/Julesc013/more-infinite-research/releases/download/v4.6.0/more-infinite-research_4.6.20000.zip",
+      "archive": {"expected_bytes": 1422240, "observed_bytes": 1422240, "expected_sha256": "31DC1B9DF2D434C3B617BA663F461C5950DEE34505FC5024D7F168A0FB19BD52", "observed_sha256": "31DC1B9DF2D434C3B617BA663F461C5950DEE34505FC5024D7F168A0FB19BD52", "verified": true},
+      "info_json": {"entry": "more-infinite-research_4.6.20000/info.json", "name": "more-infinite-research", "version": "4.6.20000", "factorio_version": "2.0"},
+      "maximum_level_control": {"entry": "more-infinite-research_4.6.20000/prototypes/mir/runtime/maximum_level_control.lua", "cohort": "48", "tag_source_member": "source/prototypes/mir/runtime/maximum_level_control.lua", "normalized_lf_matches_tag_source": true}
+    },
+    {
+      "release_tag": "v4.6.0",
+      "tag_commit": "9D6A9DE1D77CA526DA78428F8DE52D5C61F9F55B",
+      "edition": "f210",
+      "asset_id": 659215667,
+      "filename": "more-infinite-research_4.6.21000.zip",
+      "public_download_url": "https://github.com/Julesc013/more-infinite-research/releases/download/v4.6.0/more-infinite-research_4.6.21000.zip",
+      "archive": {"expected_bytes": 1425938, "observed_bytes": 1425938, "expected_sha256": "5A1CA84B0AA8E9690B9095DB12DC991C26EF9081481E2A530B953F47384A945A", "observed_sha256": "5A1CA84B0AA8E9690B9095DB12DC991C26EF9081481E2A530B953F47384A945A", "verified": true},
+      "info_json": {"entry": "more-infinite-research_4.6.21000/info.json", "name": "more-infinite-research", "version": "4.6.21000", "factorio_version": "2.1"},
+      "maximum_level_control": {"entry": "more-infinite-research_4.6.21000/prototypes/mir/runtime/maximum_level_control.lua", "cohort": "48", "tag_source_member": "source/prototypes/mir/runtime/maximum_level_control.lua", "normalized_lf_matches_tag_source": true}
+    }
+  ]
+}

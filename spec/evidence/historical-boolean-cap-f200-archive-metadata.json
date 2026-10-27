@@ -1,0 +1,84 @@
+{
+  "schema": "mir-historical-cap-archive-metadata-probe-r01-supplement-2.5",
+  "scope": "Two named public original F200 MIR ZIPs only. Each ZIP was fetched into memory, hash-checked, inspected through an in-memory ZIP stream, and discarded; no archive was persisted or executed.",
+  "status": "archive-bytes-verified; metadata-and-controller-body-read-only; no-native-claim",
+  "preserves_original_receipt": "build/qualification/aero-historical-cap-archive-metadata-r01/public-original-cap-archive-metadata.json",
+  "limits": [
+    "This is not a save, engine, compatibility, migration, or native qualification result.",
+    "Only sole info.json metadata and the sole player maximum_level_control.lua entry were examined for each stated ZIP.",
+    "The observed archive member, rather than merely the tag source body, establishes the recorded composed-controller cohort."
+  ],
+  "input_metadata": {
+    "migration_origins_path": "spec/inventory/migration-origins.json",
+    "release_asset_audit_path": "build/mir5/aero-modern-migration-history-audit-r01/public-release-asset-inventory.json",
+    "release_asset_audit_sha256": "0D36B7F5D11EF17FEA4C8FDB2062993A8EA5627633F98298F034EC8F4CB0892C"
+  },
+  "observations": [
+    {
+      "release_tag": "2.5.10",
+      "edition": "f200",
+      "asset_id": 517437614,
+      "filename": "more-infinite-research_2.5.10.zip",
+      "public_download_url": "https://github.com/Julesc013/more-infinite-research/releases/download/2.5.10/more-infinite-research_2.5.10.zip",
+      "archive": {
+        "expected_bytes": 1062874,
+        "observed_bytes": 1062874,
+        "expected_sha256": "251EFDAB4983CDFF0E2C150304DF7B7846EDEA6E1B5B0927C3FBBD8449E65DAB",
+        "observed_sha256": "251EFDAB4983CDFF0E2C150304DF7B7846EDEA6E1B5B0927C3FBBD8449E65DAB",
+        "verified": true
+      },
+      "info_json": {
+        "entry": "more-infinite-research_2.5.10/info.json",
+        "name": "more-infinite-research",
+        "version": "2.5.10",
+        "factorio_version": "2.0"
+      },
+      "maximum_level_control": {
+        "entry": "more-infinite-research_2.5.10/prototypes/mir/runtime/maximum_level_control.lua",
+        "raw_bytes": 7637,
+        "raw_sha256": "0B498CF69738E2388101876A882A408399E7935A8CD13D8225C9428CA22179D9",
+        "normalized_lf_bytes": 7637,
+        "normalized_lf_sha256": "0B498CF69738E2388101876A882A408399E7935A8CD13D8225C9428CA22179D9",
+        "tag_source_commit": "6BB483DE9042A7EC4C93674933E7F6C1670D79AA",
+        "tag_source_member": "prototypes/mir/runtime/maximum_level_control.lua",
+        "tag_source_git_blob": "E01BD8828E0A09D7918CC4966CAB55B071B3F928",
+        "tag_source_bytes": 7637,
+        "tag_source_sha256": "0B498CF69738E2388101876A882A408399E7935A8CD13D8225C9428CA22179D9",
+        "normalized_lf_matches_tag_source": true
+      }
+    },
+    {
+      "release_tag": "2.5.11",
+      "edition": "f200",
+      "asset_id": 518275372,
+      "filename": "more-infinite-research_2.5.11.zip",
+      "public_download_url": "https://github.com/Julesc013/more-infinite-research/releases/download/2.5.11/more-infinite-research_2.5.11.zip",
+      "archive": {
+        "expected_bytes": 1065193,
+        "observed_bytes": 1065193,
+        "expected_sha256": "4AE3DA83C4F8CB7D084891065387B78032BB25B8E4ED3948058D9B773070847C",
+        "observed_sha256": "4AE3DA83C4F8CB7D084891065387B78032BB25B8E4ED3948058D9B773070847C",
+        "verified": true
+      },
+      "info_json": {
+        "entry": "more-infinite-research_2.5.11/info.json",
+        "name": "more-infinite-research",
+        "version": "2.5.11",
+        "factorio_version": "2.0"
+      },
+      "maximum_level_control": {
+        "entry": "more-infinite-research_2.5.11/prototypes/mir/runtime/maximum_level_control.lua",
+        "raw_bytes": 9606,
+        "raw_sha256": "687E2EB214C7097C1691562ECE206AA69FDE24194164A8EF33F48AF14405C0EA",
+        "normalized_lf_bytes": 9606,
+        "normalized_lf_sha256": "687E2EB214C7097C1691562ECE206AA69FDE24194164A8EF33F48AF14405C0EA",
+        "tag_source_commit": "E08E6B0A8C054C8E9D09A7081CEC3BD65DE0E3AF",
+        "tag_source_member": "prototypes/mir/runtime/maximum_level_control.lua",
+        "tag_source_git_blob": "09EB6ECE484C8E3C1BCDAFAEA31451CE84A27108",
+        "tag_source_bytes": 9606,
+        "tag_source_sha256": "687E2EB214C7097C1691562ECE206AA69FDE24194164A8EF33F48AF14405C0EA",
+        "normalized_lf_matches_tag_source": true
+      }
+    }
+  ]
+}

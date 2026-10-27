@@ -78,6 +78,27 @@ class LegacyCapsLifecycleTests(unittest.TestCase):
             end
             return old
           end
+          -- Public policy-v1 retained only its exact managed tuple, a true
+          -- disable marker, and (in the later 09eb cohort) an optional
+          -- visibility boolean.  This helper is intentionally not a full
+          -- old-engine model.
+          function schema1(index, entries)
+            local old = {policy_version = 1, managed_technologies = {},
+              disabled_by_cap = {[index] = {}}, unowned_disabled_by_cap = {[index] = {}},
+              unique = {keep = true}}
+            for _, entry in ipairs(entries) do
+              old.managed_technologies[entry.name] = {source = entry.source,
+                operation = entry.operation, setting = entry.setting,
+                selected = entry.selected or 2}
+              if entry.disabled ~= false then old.disabled_by_cap[index][entry.name] = true end
+              if entry.visibility ~= nil then
+                old.visibility_by_cap = old.visibility_by_cap or {}
+                old.visibility_by_cap[index] = old.visibility_by_cap[index] or {}
+                old.visibility_by_cap[index][entry.name] = entry.visibility
+              end
+            end
+            return old
+          end
           -- Exact published F200 4.7.20002 maximum-level controller shape
           -- for its generated gear stream.  Its V3 policy was settings-derived
           -- because the 2.0 target did not carry the later finalizer binding.
@@ -354,6 +375,130 @@ class LegacyCapsLifecycleTests(unittest.TestCase):
             "direct F200 import displaced an existing MIR5 ownership decision")
         ''')
 
+    def test_earlier_published_f200_v3_hops_keep_regular_f210_reader_and_boundaries(self):
+        self.lua.execute('''
+          -- Archive inspection establishes these as the published F200 V3
+          -- controller versions: 5d covers 4.2rc/stable through 4.4.1 and
+          -- 48 covers 4.4.2 through 4.6.  They use the same settings-derived
+          -- source tuple, but cannot be admitted by an unbounded old-version
+          -- prefix or by the ordinary F210 transported reader alone.
+          local published = {
+            "4.2.20000", "4.2.20001", "4.2.20002", "4.3.20000",
+            "4.4.20000", "4.4.20001", "4.4.20002",
+            "4.5.20000", "4.5.20001", "4.5.20002", "4.6.20000"
+          }
+          for index, version in ipairs(published) do
+            local item = technology(gear_name)
+            item.level, item.researched = 3, false
+            item.enabled, item.visible_when_disabled = false, true
+            local source = f200_gear_legacy(index, 2)
+            boot({[index] = force(index, {[gear_name] = item})}, source, nil,
+              {target_id = "f210", limit = 40})
+            lifecycle.on_configuration_changed(f200_to_f210_event(version))
+            assert(item.enabled and not item.visible_when_disabled
+              and item.level == 3 and item.researched == false
+              and storage.mir_caps.legacy_caps_checked
+              and storage.mir_caps.owned_disabled[index] == nil,
+              "published F200 V3 hop was not restored: " .. version)
+            assert(source.disabled_by_cap[index][gear_name].enabled_before_cap
+              and source.visibility_by_cap[index][gear_name].value == false,
+              "published F200 V3 source evidence was altered: " .. version)
+          end
+
+          -- 4.2.20000 is also the public F210 package codec.  Its normal
+          -- transported record must continue through the ordinary reader when
+          -- the event has that colliding version, rather than being consumed
+          -- only as an F200 predecessor.
+          local f210 = technology(gear_name)
+          f210.level, f210.researched = 3, false
+          f210.enabled, f210.visible_when_disabled = false, true
+          local transported = legacy({gear_name}, {80})
+          boot({[80] = force(80, {[gear_name] = f210})}, transported, nil,
+            {target_id = "f210", limit = 40})
+          lifecycle.on_configuration_changed(f200_to_f210_event("4.2.20000"))
+          assert(f210.enabled and not f210.visible_when_disabled
+            and storage.mir_caps.legacy_caps_checked and next(storage.mir_caps.owned_disabled) == nil,
+            "colliding F210 V3 record lost its ordinary transported reader")
+
+          -- Neither the already-published V1 4.1 F200 version nor absent
+          -- patch codecs can select the extra settings-derived V3 bridge.
+          for index, version in ipairs({"4.1.20000", "4.2.20003", "4.4.20003", "4.8.20000"}) do
+            local item = technology(gear_name)
+            item.enabled, item.visible_when_disabled = false, true
+            local source = f200_gear_legacy(index, 2)
+            boot({[index] = force(index, {[gear_name] = item})}, source, nil,
+              {target_id = "f210", limit = 40})
+            lifecycle.on_configuration_changed(f200_to_f210_event(version))
+            assert(not item.enabled and item.visible_when_disabled
+              and storage.mir_caps.legacy_caps_checked
+              and storage.mir_caps.owned_disabled[index] == nil,
+              "unpublished or non-V3 F200 codec gained a bridge: " .. version)
+          end
+        ''')
+
+    def test_442_f200_worker_hop_keeps_current_and_foreign_boundaries(self):
+        self.lua.execute('''
+          local name = "worker-robots-speed-6"
+          local player, foreign = worker(name), worker(name)
+          player.level, player.researched = 3, false
+          player.enabled, player.visible_when_disabled = false, true
+          foreign.level, foreign.researched = 3, false
+          foreign.enabled, foreign.visible_when_disabled = false, false
+          local player_force = force(1, {[name] = player})
+          player_force.research_queue, player_force.current_research, player_force.research_progress =
+            {player}, player, .42
+          local source = f200_worker_legacy(1, 2, name)
+          boot({[1] = player_force, [2] = force(2, {[name] = foreign})}, source, nil,
+            {target_id = "f210", worker_limit = 40})
+          lifecycle.on_configuration_changed(f200_to_f210_event("4.4.20002"))
+          assert(player.enabled and not player.visible_when_disabled and player.level == 3
+            and player_force.research_queue[1] == player and player_force.current_research == player
+            and player_force.research_progress == .42
+            and not foreign.enabled and not foreign.visible_when_disabled
+            and storage.mir_caps.legacy_caps_checked and next(storage.mir_caps.owned_disabled) == nil,
+            "published 4.4.20002 worker hop changed earned, queue, or foreign state")
+
+          -- A current MIR5 decision wins even for this earlier direct-hop
+          -- predecessor; the exceptional reader cannot overwrite a tombstone.
+          local retained = worker(name)
+          retained.enabled, retained.visible_when_disabled = false, true
+          local current = {schema = 1, owned_disabled = {[1] = {[name] = false}}}
+          boot({[1] = force(1, {[name] = retained})}, source, current,
+            {target_id = "f210", worker_limit = 40})
+          lifecycle.on_configuration_changed(f200_to_f210_event("4.4.20002"))
+          assert(not retained.enabled and retained.visible_when_disabled
+            and current.owned_disabled[1][name] == false and current.legacy_caps_checked,
+            "earlier worker predecessor displaced current MIR5 ownership")
+
+          local invalid = worker(name)
+          invalid.enabled, invalid.visible_when_disabled = false, true
+          invalid.prototype.effects[1].modifier = .66
+          boot({[3] = force(3, {[name] = invalid})}, f200_worker_legacy(3, 2, name), nil,
+            {target_id = "f210", worker_limit = 40})
+          lifecycle.on_configuration_changed(f200_to_f210_event("4.4.20002"))
+          assert(not invalid.enabled and invalid.visible_when_disabled
+            and storage.mir_caps.legacy_caps_checked and storage.mir_caps.owned_disabled[3] == nil,
+            "earlier worker predecessor bypassed current native-owner admission")
+        ''')
+
+    def test_47_f200_worker_hop_keeps_current_false_tombstone(self):
+        self.lua.execute('''
+          -- The existing 4.7 bridge has the same current-MIR5 precedence
+          -- boundary as the newly admitted 4.4.2 worker predecessor. A
+          -- literal false is a durable current decision, not a malformed row
+          -- to discard before either exceptional reader observes it.
+          local name = "worker-robots-speed-6"
+          local retained = worker(name)
+          retained.enabled, retained.visible_when_disabled = false, true
+          local current = {schema = 1, owned_disabled = {[1] = {[name] = false}}}
+          boot({[1] = force(1, {[name] = retained})}, f200_worker_legacy(1, 2, name), current,
+            {target_id = "f210", worker_limit = 40})
+          lifecycle.on_configuration_changed(f200_to_f210_event("4.7.20003"))
+          assert(not retained.enabled and retained.visible_when_disabled
+            and current.owned_disabled[1][name] == false and current.legacy_caps_checked,
+            "4.7 worker predecessor displaced a current MIR5 false tombstone")
+        ''')
+
     def test_f200_to_f210_bridge_refuses_missing_wrong_or_malformed_event(self):
         self.lua.execute('''
           local old = f200_gear_legacy(1, 2)
@@ -547,6 +692,182 @@ class LegacyCapsLifecycleTests(unittest.TestCase):
             "F200 worker import accepted a non-published native effect")
         ''')
 
+    def test_schema1_f200_fallback_and_f210_planned_rows_preserve_owned_state_only(self):
+        self.lua.execute('''
+          -- The V1 09eb public controller's no-mod-data path used this exact
+          -- F200 runtime-settings tuple.  The source cap is two; current F200
+          -- first retains the earned level and later restores only its own
+          -- disablement when the current cap is unlimited.
+          local player, foreign = technology(gear_name), technology(gear_name)
+          player.level, player.researched = 3, false
+          player.enabled, player.visible_when_disabled = false, true
+          foreign.level, foreign.researched = 3, false
+          foreign.enabled, foreign.visible_when_disabled = false, false
+          local player_force, foreign_force = force(1, {[gear_name] = player}), force(2, {[gear_name] = foreign})
+          local old = schema1(1, {{name = gear_name, setting = "ips-max-level-research_gears",
+            source = "generated-stream", operation = "runtime-settings-transport", selected = 2, visibility = false}})
+          old.disabled_by_cap[2] = {[gear_name] = false}
+          boot({[1] = player_force, [2] = foreign_force}, old, nil,
+            {target_id = "f200", limit = 2})
+          lifecycle.on_configuration_changed()
+          local saved = storage.mir_caps
+          assert(not player.enabled and player.visible_when_disabled
+            and saved.owned_disabled[1][gear_name].disabled
+            and saved.owned_disabled[1][gear_name].visible_when_disabled == false,
+            "schema1 source cap did not retain its owned finite state")
+          assert(not foreign.enabled and foreign.visible_when_disabled
+            and saved.owned_disabled[2][gear_name].disabled == false,
+            "schema1 false foreign marker gained an enablement right")
+
+          player_force.research_queue, player_force.current_research, player_force.research_progress =
+            {player}, player, .42
+          boot({[1] = player_force, [2] = foreign_force}, old, saved,
+            {target_id = "f200", limit = 0})
+          lifecycle.on_configuration_changed()
+          assert(player.enabled and not player.visible_when_disabled
+            and player.level == 3 and player.researched == false
+            and player_force.research_queue[1] == player and player_force.current_research == player
+            and player_force.research_progress == .42,
+            "schema1 cap relaxation changed owned earned state or progress")
+          assert(not foreign.enabled and not foreign.visible_when_disabled and foreign.level == 3
+            and saved.legacy_caps_checked and next(saved.owned_disabled) == nil,
+            "schema1 cap relaxation restored a foreign false marker")
+          assert(old.unique.keep and old.disabled_by_cap[1][gear_name] == true,
+            "schema1 import changed predecessor evidence")
+
+          -- F210's planned V1 tuple is independently admitted from the
+          -- current authored generated row; no predecessor version label or
+          -- F200 special event selects this reader.
+          local planned = technology(gear_name)
+          planned.level, planned.researched = 3, false
+          planned.enabled, planned.visible_when_disabled = false, true
+          local planned_old = schema1(3, {{name = gear_name, setting = "ips-max-level-research_gears",
+            source = "generated-stream", operation = "emit", selected = 2, visibility = false}})
+          boot({[3] = force(3, {[gear_name] = planned})}, planned_old, nil,
+            {target_id = "f210", limit = 0})
+          lifecycle.on_configuration_changed()
+          assert(planned.enabled and not planned.visible_when_disabled and planned.level == 3
+            and storage.mir_caps.legacy_caps_checked and next(storage.mir_caps.owned_disabled) == nil,
+            "schema1 planned F210 tuple was not restored through current admission")
+        ''')
+
+    def test_schema1_base_continuation_optional_visibility_and_native_tail_boundary(self):
+        self.lua.execute('''
+          -- The compiled V1 continuation was an independently named emitted
+          -- row.  A missing visibility map proves only the true disable
+          -- marker, never a visibility restoration.
+          local braking = technology("braking-force-8")
+          braking.level, braking.researched = 3, false
+          braking.enabled, braking.visible_when_disabled = false, false
+          local continuation_old = schema1(51, {{name = braking.name,
+            setting = "mir-max-level-braking-force", source = "base-continuation",
+            operation = "emit_base_extension", selected = 2}})
+          boot({[51] = force(51, {[braking.name] = braking})}, continuation_old, nil,
+            {target_id = "f210", active_mods = {['space-age'] = '2.1.23'}, limit = 0})
+          lifecycle.on_configuration_changed()
+          assert(braking.enabled and not braking.visible_when_disabled and braking.level == 3
+            and storage.mir_caps.legacy_caps_checked and next(storage.mir_caps.owned_disabled) == nil,
+            "schema1 continuation changed an uncaptured visibility baseline")
+
+          -- Schema1 never grants the later native-owner/worker-speed tail a
+          -- right, even where current native preflight recognises the .65
+          -- owner.  It remains disabled and no MIR5 row is persisted.
+          local name, tail = "worker-robots-speed-6", worker("worker-robots-speed-6")
+          tail.enabled, tail.visible_when_disabled = false, true
+          local worker_old = schema1(7, {{name = name,
+            setting = "mir-max-level-worker-robots-speed", source = "native-owner",
+            operation = "native-owner-cap", selected = 2, visibility = false}})
+          boot({[7] = force(7, {[name] = tail})}, worker_old, nil,
+            {target_id = "f210", worker_limit = 0})
+          lifecycle.on_configuration_changed()
+          assert(not tail.enabled and tail.visible_when_disabled
+            and storage.mir_caps.legacy_caps_checked and storage.mir_caps.owned_disabled[7] == nil,
+            "schema1 granted a later native worker tail restoration right")
+        ''')
+
+    def test_schema1_f200_transport_tuple_maps_to_current_f210_emissions(self):
+        self.lua.execute('''
+          -- The public schema-1 F200 component persisted the same finite
+          -- settings transport for both producer classes.  Current F210
+          -- admission identifies their emitted forms as `emit` and
+          -- `emit_base_extension`; the historical tuple must not be rejected
+          -- merely because the successor has those current operation names.
+          local gear, braking = technology(gear_name), technology("braking-force-8")
+          gear.level, gear.researched = 3, false
+          gear.enabled, gear.visible_when_disabled = false, true
+          braking.level, braking.researched = 3, false
+          braking.enabled, braking.visible_when_disabled = false, true
+          local old = schema1(23, {
+            {name = gear_name, setting = "ips-max-level-research_gears",
+              source = "generated-stream", operation = "runtime-settings-transport",
+              selected = 2, visibility = false},
+            {name = braking.name, setting = "mir-max-level-braking-force",
+              source = "base-continuation", operation = "runtime-settings-transport",
+              selected = 2, visibility = false}
+          })
+          boot({[23] = force(23, {[gear.name] = gear, [braking.name] = braking})}, old, nil,
+            {target_id = "f210", limit = 0})
+          lifecycle.on_configuration_changed()
+          assert(gear.enabled and not gear.visible_when_disabled
+            and braking.enabled and not braking.visible_when_disabled
+            and gear.level == 3 and braking.level == 3
+            and storage.mir_caps.legacy_caps_checked
+            and next(storage.mir_caps.owned_disabled) == nil,
+            "schema1 F200 transport tuple did not restore current F210 emitted rows")
+          assert(old.unique.keep
+            and old.managed_technologies[gear.name].operation == "runtime-settings-transport"
+            and old.managed_technologies[braking.name].operation == "runtime-settings-transport",
+            "schema1 cross-hop altered predecessor tuple evidence")
+        ''')
+
+    def test_schema1_rejects_unadmitted_or_current_state_and_is_never_read_on_load(self):
+        self.lua.execute('''
+          local item = technology(gear_name)
+          item.enabled, item.visible_when_disabled = false, true
+          local old = schema1(1, {{name = gear_name, setting = "ips-max-level-research_gears",
+            source = "generated-stream", operation = "emit", selected = 2, visibility = false}})
+          boot({[1] = force(1, {[gear_name] = item})}, old)
+          lifecycle.on_load()
+          assert(storage.mir_caps == nil and not item.enabled and item.visible_when_disabled,
+            "on_load imported a schema1 predecessor right")
+          lifecycle.on_configuration_changed()
+          assert(item.enabled and not item.visible_when_disabled and storage.mir_caps.legacy_caps_checked)
+
+          local current_item = technology(gear_name)
+          current_item.enabled, current_item.visible_when_disabled = false, true
+          local current = {schema = 1, owned_disabled = {
+            [1] = {[gear_name] = {disabled = false, visible_when_disabled = false}}}}
+          boot({[1] = force(1, {[gear_name] = current_item})}, old, current)
+          lifecycle.on_configuration_changed()
+          assert(not current_item.enabled and not current_item.visible_when_disabled
+            and current.legacy_caps_checked,
+            "schema1 overwrote current MIR5 ownership")
+
+          local disabled_prototype = technology(gear_name)
+          disabled_prototype.enabled, disabled_prototype.visible_when_disabled = false, true
+          disabled_prototype.prototype.enabled = false
+          boot({[1] = force(1, {[gear_name] = disabled_prototype})}, old)
+          lifecycle.on_configuration_changed()
+          assert(not disabled_prototype.enabled and disabled_prototype.visible_when_disabled
+            and storage.mir_caps.legacy_caps_checked and storage.mir_caps.owned_disabled[1] == nil,
+            "schema1 imported a row without current prototype admission")
+
+          local malformed = schema1(1, {{name = gear_name, setting = "ips-max-level-research_gears",
+            source = "generated-stream", operation = "emit", selected = 2, visibility = false}})
+          malformed.policy_version = 2
+          local malformed_item = technology(gear_name)
+          malformed_item.enabled, malformed_item.visible_when_disabled = false, true
+          boot({[1] = force(1, {[gear_name] = malformed_item})}, malformed)
+          lifecycle.on_configuration_changed()
+          assert(not malformed_item.enabled and malformed_item.visible_when_disabled
+            and storage.mir_caps.legacy_caps_checked,
+            "an unknown schema gained schema1 restoration authority")
+          malformed.policy_version = 1
+          lifecycle.on_configuration_changed()
+          assert(not malformed_item.enabled and malformed_item.visible_when_disabled,
+            "one-time marker reread a repaired schema1 bucket")
+        ''')
+
     def test_marker_survives_empty_map_and_prevents_later_reimport(self):
         self.lua.execute('''
           local item = technology(gear_name)
@@ -600,6 +921,23 @@ class LegacyCapsLifecycleTests(unittest.TestCase):
           assert(not ok and tostring(message):find("current ownership", 1, true))
           assert(malformed.owned_disabled[1] == "preserved-malformed-row"
             and not malformed_item.enabled and malformed_item.visible_when_disabled)
+        ''')
+
+    def test_non_table_legacy_bucket_cannot_crash_or_grant_ownership(self):
+        self.lua.execute('''
+          for _, old in ipairs({true, 7, "legacy"}) do
+            local item = technology(gear_name)
+            boot({[1] = force(1, {[gear_name] = item})}, old)
+            lifecycle.on_configuration_changed()
+            assert(not item.enabled and item.visible_when_disabled
+              and storage.mir.maximum_level_control == old
+              and storage.mir_caps.legacy_caps_checked
+              and next(storage.mir_caps.owned_disabled) == nil,
+              "malformed predecessor gained authority or lost its original value")
+            lifecycle.on_configuration_changed()
+            assert(not item.enabled and item.visible_when_disabled,
+              "repeated configuration imported malformed predecessor rights")
+          end
         ''')
 
     def test_unrecognized_old_state_is_examined_only_once(self):
