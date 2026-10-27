@@ -1,0 +1,207 @@
+{
+  "schema": 1,
+  "kind": "MIR5NativeOwnerCapOrderPreparedInputsV1",
+  "status": "exact-source-fixtures-built-not-native-qualified",
+  "fixture_source_commit": "5a40aa5e0c3e04b1609280fa176a423bc3fffd8e",
+  "package_tool": {
+    "path": "tools/package.py",
+    "sha256": "00ED00D66BD558554068405C8882419F852FC2F66646088052888D70E25DA61E"
+  },
+  "runtime": {
+    "implementation": "cpython",
+    "version": [
+      3,
+      14,
+      7
+    ],
+    "zlib_build_version": "1.3.1.zlib-ng",
+    "zlib_runtime_version": "1.3.1.zlib-ng"
+  },
+  "custody_root": "build/mir5/native-owner-cap-order-5a40aa5e-black-glass-r01",
+  "native_execution": false,
+  "library_mutation": false,
+  "lab_completion": false,
+  "saved_input_hashes": "pending actual canonical and permuted server saves",
+  "release_qualification": false,
+  "stages": [
+    {
+      "stage": "canonical",
+      "version": "0.1.0",
+      "archive": "build/mir5/native-owner-cap-order-5a40aa5e-black-glass-r01/fixtures/mir-fixture-mir5-native-owner-cap-order_0.1.0.zip",
+      "sha256": "C9E3D957315A5944850226265C59018368A6FB7F89EF2125308472089B9EB3C7",
+      "bytes": 7039,
+      "projection": "build/mir5/native-owner-cap-order-5a40aa5e-black-glass-r01/sources/canonical",
+      "members": [
+        {
+          "path": "control.lua",
+          "source_path": "tests/fixtures/native-owner-cap-order/canonical/control.lua",
+          "sha256": "9CF81FC24F1FBF81A840B3B83452F047ED93CB0C15460D0ABFA6CC41C88DA168",
+          "bytes": 90
+        },
+        {
+          "path": "data-final-fixes.lua",
+          "source_path": "tests/fixtures/native-owner-cap-order/canonical/data-final-fixes.lua",
+          "sha256": "C4A51DFE3A1094CB27EEFB3A8AE19DED77DB67151D8BB21649799008251203CF",
+          "bytes": 93
+        },
+        {
+          "path": "fixture_control.lua",
+          "source_path": "tests/fixtures/native-owner-cap-order/fixture_control.lua",
+          "sha256": "D38333E9C476C7ABB4C542E718BD769F01410FBB1583A4AED8CA5402D19A32DD",
+          "bytes": 13843
+        },
+        {
+          "path": "fixture_data_final.lua",
+          "source_path": "tests/fixtures/native-owner-cap-order/fixture_data_final.lua",
+          "sha256": "DEE056518474FA3BFEC625DF58E58923350AEDB0B100DE3C285DBEDF07EDEDAD",
+          "bytes": 2683
+        },
+        {
+          "path": "fixture_settings.lua",
+          "source_path": "tests/fixtures/native-owner-cap-order/fixture_settings.lua",
+          "sha256": "753B7768FEBE2AE7DB2792A746156A8D271D1420B6B70BAD44F0DED5AF1F2F22",
+          "bytes": 782
+        },
+        {
+          "path": "info.json",
+          "source_path": "tests/fixtures/native-owner-cap-order/canonical/info.json",
+          "sha256": "18C5D70916C16EA8D5E07FC4144B809361565CD06E547846F5040726195382DE",
+          "bytes": 408
+        },
+        {
+          "path": "settings-updates.lua",
+          "source_path": "tests/fixtures/native-owner-cap-order/canonical/settings-updates.lua",
+          "sha256": "15E941BF99A32F2594AA196F3E9FFC7A61EE919380021F2056E78EBC88030EA8",
+          "bytes": 91
+        }
+      ]
+    },
+    {
+      "stage": "permuted",
+      "version": "0.2.0",
+      "archive": "build/mir5/native-owner-cap-order-5a40aa5e-black-glass-r01/fixtures/mir-fixture-mir5-native-owner-cap-order_0.2.0.zip",
+      "sha256": "82DE9C6A610E3D633B979C81987986AE129D304E67A7BB158684B551E44B5BD1",
+      "bytes": 7045,
+      "projection": "build/mir5/native-owner-cap-order-5a40aa5e-black-glass-r01/sources/permuted",
+      "members": [
+        {
+          "path": "control.lua",
+          "source_path": "tests/fixtures/native-owner-cap-order/permuted/control.lua",
+          "sha256": "2E0D0132924CAA1038445F816425EDA916C3C4FE0201405F5C676B7C500A5049",
+          "bytes": 89
+        },
+        {
+          "path": "data-final-fixes.lua",
+          "source_path": "tests/fixtures/native-owner-cap-order/permuted/data-final-fixes.lua",
+          "sha256": "69836C8813F73CBB55390777883DBEA502A66CA224713761244A782D45651F6A",
+          "bytes": 92
+        },
+        {
+          "path": "fixture_control.lua",
+          "source_path": "tests/fixtures/native-owner-cap-order/fixture_control.lua",
+          "sha256": "D38333E9C476C7ABB4C542E718BD769F01410FBB1583A4AED8CA5402D19A32DD",
+          "bytes": 13843
+        },
+        {
+          "path": "fixture_data_final.lua",
+          "source_path": "tests/fixtures/native-owner-cap-order/fixture_data_final.lua",
+          "sha256": "DEE056518474FA3BFEC625DF58E58923350AEDB0B100DE3C285DBEDF07EDEDAD",
+          "bytes": 2683
+        },
+        {
+          "path": "fixture_settings.lua",
+          "source_path": "tests/fixtures/native-owner-cap-order/fixture_settings.lua",
+          "sha256": "753B7768FEBE2AE7DB2792A746156A8D271D1420B6B70BAD44F0DED5AF1F2F22",
+          "bytes": 782
+        },
+        {
+          "path": "info.json",
+          "source_path": "tests/fixtures/native-owner-cap-order/permuted/info.json",
+          "sha256": "1F1BC79DCA06FE20EFD3232142F2572B96351652C1829288A4C2D62E852652B4",
+          "bytes": 413
+        },
+        {
+          "path": "settings-updates.lua",
+          "source_path": "tests/fixtures/native-owner-cap-order/permuted/settings-updates.lua",
+          "sha256": "66A876A5E6106CD01F994D0C47CD8A15B63546966FEF8757131D32D2F529E2CD",
+          "bytes": 90
+        }
+      ]
+    },
+    {
+      "stage": "relaxed",
+      "version": "0.3.0",
+      "archive": "build/mir5/native-owner-cap-order-5a40aa5e-black-glass-r01/fixtures/mir-fixture-mir5-native-owner-cap-order_0.3.0.zip",
+      "sha256": "E0B7107C14300D0D93282BA20CDABE38120DAEDB967586731F25A9BFCDB93333",
+      "bytes": 7036,
+      "projection": "build/mir5/native-owner-cap-order-5a40aa5e-black-glass-r01/sources/relaxed",
+      "members": [
+        {
+          "path": "control.lua",
+          "source_path": "tests/fixtures/native-owner-cap-order/relaxed/control.lua",
+          "sha256": "425072E8A3CA1780ACDE8FA78DA6B46BB9822AA2455ECECA942E87D049F70DAB",
+          "bytes": 88
+        },
+        {
+          "path": "data-final-fixes.lua",
+          "source_path": "tests/fixtures/native-owner-cap-order/relaxed/data-final-fixes.lua",
+          "sha256": "EFE48D4CFE1AB0426AF547E014A4D50FFAD64EC48A51F1DCD8E53E0DE601D4D0",
+          "bytes": 91
+        },
+        {
+          "path": "fixture_control.lua",
+          "source_path": "tests/fixtures/native-owner-cap-order/fixture_control.lua",
+          "sha256": "D38333E9C476C7ABB4C542E718BD769F01410FBB1583A4AED8CA5402D19A32DD",
+          "bytes": 13843
+        },
+        {
+          "path": "fixture_data_final.lua",
+          "source_path": "tests/fixtures/native-owner-cap-order/fixture_data_final.lua",
+          "sha256": "DEE056518474FA3BFEC625DF58E58923350AEDB0B100DE3C285DBEDF07EDEDAD",
+          "bytes": 2683
+        },
+        {
+          "path": "fixture_settings.lua",
+          "source_path": "tests/fixtures/native-owner-cap-order/fixture_settings.lua",
+          "sha256": "753B7768FEBE2AE7DB2792A746156A8D271D1420B6B70BAD44F0DED5AF1F2F22",
+          "bytes": 782
+        },
+        {
+          "path": "info.json",
+          "source_path": "tests/fixtures/native-owner-cap-order/relaxed/info.json",
+          "sha256": "C9EEBD9681F7B96D4551008A6AE1B45755E6A5DEB8543D9F5CCA3D11CBF540FD",
+          "bytes": 399
+        },
+        {
+          "path": "settings-updates.lua",
+          "source_path": "tests/fixtures/native-owner-cap-order/relaxed/settings-updates.lua",
+          "sha256": "99C1C65A98B73117AE2BE3EDA694C9362DE2DD66987C1520C0BB3AA26666369C",
+          "bytes": 89
+        }
+      ]
+    }
+  ],
+  "archive_guard": {
+    "status": "all-three-source-projections-pass-real-guard",
+    "command": "Assert-MIRLibraryFixtureArchive -Archive <selected archive> -SourceDirectory <seven-member projection>",
+    "helpers": [
+      {
+        "path": "tools/lib/validation/ImmutableInputStaging.ps1",
+        "committed_sha256": "B5FBFAC8537B08F9790BD3EE8ACEAAB38EE5CBB8EF005E67E8375DE568BBC12C",
+        "executed_worktree_sha256": "B5FBFAC8537B08F9790BD3EE8ACEAAB38EE5CBB8EF005E67E8375DE568BBC12C"
+      },
+      {
+        "path": "tools/lib/compatibility/LibraryActivation.ps1",
+        "committed_sha256": "123A2241B895B57217AA969A677FF21BBFB268FE55E9734287883B4D6AE25099",
+        "executed_worktree_sha256": "123A2241B895B57217AA969A677FF21BBFB268FE55E9734287883B4D6AE25099"
+      }
+    ]
+  },
+  "prior_native_adverse": {
+    "controller_fixture_source": "5a4691821069d79daf7060ac9b79a191f12d0b24",
+    "native_result_sha256": "3A371F4DB8EBD987BA48641C9207F9F6E2BAD39E8B25653F2EB42D30817E922A",
+    "failure": "could not queue foreign probe",
+    "primary_terminal": "build/mir5/recovery-historical/native-owner-cap-order-e3-r02/terminal.json",
+    "disposition": "Seed only the independently named Automation prerequisite; all queue, progress and foreign-disablement predicates retained."
+  }
+}

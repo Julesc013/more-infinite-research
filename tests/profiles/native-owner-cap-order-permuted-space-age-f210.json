@@ -9,19 +9,51 @@
   },
   "settings_mode": "Defaults",
   "mods": [
-    {"name": "base", "version": "2.1.23", "enabled": true},
-    {"name": "elevated-rails", "version": "2.1.23", "enabled": true},
-    {"name": "quality", "version": "2.1.23", "enabled": true},
-    {"name": "recycler", "version": "2.1.23", "enabled": true},
-    {"name": "space-age", "version": "2.1.23", "enabled": true},
-    {"name": "mir-fixture-mir5-active-mods-observer", "version": "0.1.0", "enabled": true},
-    {"name": "more-infinite-research", "version": "5.0.21000", "enabled": true},
-    {"name": "mir-fixture-mir5-native-owner-cap-order", "version": "0.2.0", "enabled": true}
+    {
+      "name": "base",
+      "version": "2.1.23",
+      "enabled": true
+    },
+    {
+      "name": "elevated-rails",
+      "version": "2.1.23",
+      "enabled": true
+    },
+    {
+      "name": "quality",
+      "version": "2.1.23",
+      "enabled": true
+    },
+    {
+      "name": "recycler",
+      "version": "2.1.23",
+      "enabled": true
+    },
+    {
+      "name": "space-age",
+      "version": "2.1.23",
+      "enabled": true
+    },
+    {
+      "name": "mir-fixture-mir5-active-mods-observer",
+      "version": "0.1.0",
+      "enabled": true
+    },
+    {
+      "name": "more-infinite-research",
+      "version": "5.0.21000",
+      "enabled": true
+    },
+    {
+      "name": "mir-fixture-mir5-native-owner-cap-order",
+      "version": "0.2.0",
+      "enabled": true
+    }
   ],
   "archive_sha256": {
     "mir-fixture-mir5-active-mods-observer_0.1.0.zip": "2E1BE5952D2A4CC5C74A0D149E075D247BA110A3FAE5B6768D3EAEBABCEF989C",
     "more-infinite-research_5.0.21000.zip": "E3A65C08AC7798A66FB1BE30D24307B17C8B366DD901953BDE2A09BD6939C8CE",
-    "mir-fixture-mir5-native-owner-cap-order_0.2.0.zip": "25107173A949B952BE83DE1131CCFE44A0919D4A0CA451A7287FE2896FA1609A"
+    "mir-fixture-mir5-native-owner-cap-order_0.2.0.zip": "82DE9C6A610E3D633B979C81987986AE129D304E67A7BB158684B551E44B5BD1"
   },
-  "scope": "Prepared F210 permuted native-owner cap-state input only. The b251ae7a post-cap MIR archive and exact seven-member fixture ZIP from 5a469182 are pinned; actual native execution and saved-input hashes remain pending. State is seeded, with no lab completion or release-qualification claim."
+  "scope": "Prepared F210 permuted native-owner cap-state input only. The b251ae7a post-cap MIR archive and exact seven-member fixture ZIP from 5a40aa5e are pinned; actual native execution and saved-input hashes remain pending. State is seeded, with no lab completion or release-qualification claim."
 }
