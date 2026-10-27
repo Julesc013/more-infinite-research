@@ -1,0 +1,16 @@
+{
+  "name": "mir-fixture-mir5-full-catalogue-upgrade",
+  "version": "0.2.0",
+  "title": "MIR 5 private F210 full catalogue 4.7.3 successor",
+  "author": "MIR maintainers",
+  "description": "Disposable F210 MIR5 successor for one published 4.7.3 full catalogue upgrade witness; not player content.",
+  "factorio_version": "2.1",
+  "dependencies": [
+    "base = 2.1.23",
+    "? elevated-rails = 2.1.23",
+    "? quality = 2.1.23",
+    "? recycler = 2.1.23",
+    "? space-age = 2.1.23",
+    "more-infinite-research = 5.0.21000"
+  ]
+}
