@@ -1,9 +1,12 @@
 """Pure Lua 5.2 host-stage parse checks for MIR 5 API consumer controls."""
 import argparse
+import hashlib
 import json
 import os
 from pathlib import Path
+import subprocess
 import sys
+import tempfile
 import unittest
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -530,9 +533,43 @@ class FixtureControlHostStageTests(unittest.TestCase):
             ("mir-fixture-mir5-api-beta-production", "0.1.0", True),
         ])
         self.assertEqual(profile["archive_sha256"], {
+            "more-infinite-research_5.0.21000.zip":
+                "2ABAF369E020D8AD18A0C04940A8811BECFA5E63E5B479C668E2D3A3123D032B",
             "mir-fixture-mir5-active-mods-observer_0.1.0.zip":
                 "2E1BE5952D2A4CC5C74A0D149E075D247BA110A3FAE5B6768D3EAEBABCEF989C",
+            "mir-fixture-mir5-api-alpha_0.1.0.zip":
+                "DB5ED843FA9D85A1ABDC22595E62D315CA1A2191C846208079F85D4D016CE904",
+            "mir-fixture-mir5-api-beta_0.1.0.zip":
+                "943AF6BF26C0B4C0CE4861C1E25CAC0CB90DACF08A7A8229669A1DA481F01894",
+            "mir-fixture-mir5-api-beta-production_0.1.0.zip":
+                "25084C8B20FF4EBFB819C8351E351F38325B06E65F741D2660067C775C061A19",
         })
+
+    def test_primary_f210_profile_pins_current_packager_fixture_archives(self):
+        profile = json.loads((ROOT / "tests/profiles/api-consumers-f210-2123.json").read_bytes())
+        expected = {
+            "api-alpha": "DB5ED843FA9D85A1ABDC22595E62D315CA1A2191C846208079F85D4D016CE904",
+            "api-beta": "943AF6BF26C0B4C0CE4861C1E25CAC0CB90DACF08A7A8229669A1DA481F01894",
+            "api-beta-production": "25084C8B20FF4EBFB819C8351E351F38325B06E65F741D2660067C775C061A19",
+            "active-mods-observer": "2E1BE5952D2A4CC5C74A0D149E075D247BA110A3FAE5B6768D3EAEBABCEF989C",
+        }
+        with tempfile.TemporaryDirectory() as temporary:
+            output = Path(temporary)
+            for fixture, expected_sha256 in expected.items():
+                source = ROOT / "tests/fixtures" / fixture
+                info = json.loads((source / "info.json").read_bytes())
+                archive = output / f"{info['name']}_{info['version']}.zip"
+                completed = subprocess.run(
+                    [sys.executable, str(ROOT / "tools/package.py"), "--source", str(source), "--output", str(archive)],
+                    check=True, capture_output=True, text=True,
+                )
+                record = json.loads(completed.stdout)
+                self.assertEqual(record["sha256"].upper(), expected_sha256)
+                self.assertEqual(hashlib.sha256(archive.read_bytes()).hexdigest().upper(), expected_sha256)
+                self.assertEqual(
+                    profile["archive_sha256"][archive.name], expected_sha256,
+                    f"profile pin differs for {fixture}",
+                )
 
     def test_alpha_accepts_float32_native_effect_without_mutating_beta(self):
         self.lua.globals().fixture_control = self.control("api-alpha")
