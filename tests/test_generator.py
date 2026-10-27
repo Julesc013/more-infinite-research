@@ -37,6 +37,37 @@ FROZEN_GEAR_ROWS = json.loads(r'''{
 }''')
 
 
+# The immutable 4.7 inventories retain two invalid Base presentation children.
+# Every shipped MIR title for these IDs is a literal, while the F200/F210 Base
+# locale exposes only entity-name (not item-name) for each subject. Preserve
+# the captured rows as evidence, but compare current generated output against
+# the bounded display repair rather than reintroducing unresolved locale keys.
+BASE_LITERAL_NAME_PRESENTATION_REPAIRS = {
+    "recipe-prod-research_mining_drill-1": {
+        "captured": ["technology-name.more-infinite-research.research_mining_drill",
+                     ["item-name.electric-mining-drill"]],
+        "emitted": ["technology-name.more-infinite-research.research_mining_drill"],
+    },
+    "recipe-prod-research_walls-1": {
+        "captured": ["technology-name.more-infinite-research.research_walls",
+                     ["item-name.stone-wall"]],
+        "emitted": ["technology-name.more-infinite-research.research_walls"],
+    },
+}
+
+
+def repaired_base_literal_name_rows(expected):
+    """Apply only the two reviewed Base LocalisedString presentation repairs."""
+    for name, repair in BASE_LITERAL_NAME_PRESENTATION_REPAIRS.items():
+        row = expected.get(name)
+        if row is None:
+            raise AssertionError(f"published oracle lacks repaired Base row: {name}")
+        if row.get("localised_name") != repair["captured"]:
+            raise AssertionError(f"published oracle changed outside captured Base name shape: {name}")
+        expected[name] = {**row, "localised_name": repair["emitted"]}
+    return expected
+
+
 # These are the only permitted additions to the published 4.7.2 K2SO
 # 75-technology capture. They restore the three finite A05 -1 identities
 # whose exact reviewed-forward tuple was omitted by 4.7.2, while preserving
@@ -1456,7 +1487,7 @@ class GeneratorTests(unittest.TestCase):
                 row["name"]: plain_lua(row)
                 for row in self.lua.globals().published_emitted.values()
             }
-            expected = dict(expected_profiles[profile])
+            expected = repaired_base_literal_name_rows(dict(expected_profiles[profile]))
             if profile == "base-f210":
                 # F210 Base deliberately carries the exact F200 Base public row
                 # so engine loading retains an earned cross-target technology.
@@ -1520,8 +1551,10 @@ class GeneratorTests(unittest.TestCase):
               settings, data, helpers, log = {startup = defaults()}, full_world(mods), nil, function() end
               assert(dofile(data_final_path) == nil)
             ''')
-            expected = {row["name"]: host_row(row["row"])
-                        for row in profile["published_output"]["data"]["additions"] if row["type"] == "technology"}
+            expected = repaired_base_literal_name_rows({
+                row["name"]: host_row(row["row"])
+                for row in profile["published_output"]["data"]["additions"] if row["type"] == "technology"
+            })
             actual = {row["name"]: plain_lua(row) for row in self.lua.globals().data.emitted.values()}
             actual_public, actual_credit = split_public_and_native_credit_rows(actual)
             self.assertEqual(actual_public, expected, profile["id"])

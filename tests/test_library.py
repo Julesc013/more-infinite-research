@@ -18,8 +18,9 @@ class LibraryTests(unittest.TestCase):
 
           package.preload["research.catalogue"] = function()
             return {
+              gear_id = function() return "recipe-prod-research_gears-1" end,
               declared = function()
-                return {
+                return library_declarations or {
                   {id = "recipe-prod-research_gears-1", name = "Iron gear wheel productivity",
                     family = "mir", cap = 2, cap_setting = "ips-max-level-research_gears",
                     finite = false, max_level = "infinite"}
@@ -205,6 +206,7 @@ class LibraryTests(unittest.TestCase):
           function boot()
             storage = {}
             settings = {startup = {}}
+            library_declarations = nil
             screen = gui_container(nil)
             gear = {valid = true, name = "recipe-prod-research_gears-1", level = 3,
               researched = true, enabled = false, visible_when_disabled = true,
@@ -839,6 +841,91 @@ class LibraryTests(unittest.TestCase):
           library.on_string_translated({player_index = 1, id = gear_request,
             translated = true, result = "Closed stale gear"})
           assert(library.subscription_needs() == false)
+        ''')
+
+    def test_base_literal_translation_names_reach_the_real_library_list_and_detail(self):
+        self.lua.execute(r'''
+          -- Factorio 2.1.23 Base has no item-name.electric-mining-drill.  The
+          -- old emitted child therefore makes this native-like request double
+          -- refuse eagerly before it can publish a Library label.
+          local locale = {
+            ["technology-name.more-infinite-research.research_mining_drill"] = "Erzförderer-Produktivität",
+            ["technology-name.more-infinite-research.research_gears"] = "Eisenrad-Produktivität",
+            ["item-name.iron-gear-wheel"] = "Eisenrad"
+          }
+          local function translate(value)
+            local key = type(value) == "table" and value[1] or value
+            local text = assert(locale[key], "unresolved F210 Base locale key: " .. tostring(key))
+            if type(value) == "table" then
+              for index = 2, #value do
+                local replacement = translate(value[index])
+                text = string.gsub(text, "__" .. tostring(index - 1) .. "__", replacement)
+              end
+            end
+            return text
+          end
+          local old_shape = {
+            "technology-name.more-infinite-research.research_mining_drill",
+            {"item-name.electric-mining-drill"}
+          }
+          local old_ok, old_error = pcall(translate, old_shape)
+          assert(not old_ok and string.find(old_error, "item-name.electric-mining-drill", 1, true),
+            "the old unresolved child did not fail the native-like translator")
+
+          -- Use the actual Base catalogue and data-stage constructor, then
+          -- feed that emitted LocalisedString to the unmocked Library model.
+          local modern_catalogue = require("compatibility.modern_catalogue")
+          local definition
+          for _, candidate in ipairs(modern_catalogue.select({}).definitions) do
+            if candidate.key == "research_mining_drill" then definition = candidate; break end
+          end
+          assert(definition)
+          local stream = {base_cost=8000, linear_increment=0, growth_factor=2,
+            effect_percent=20, research_time=60, enabled=true}
+          local emitted = require("research.modern").technology(definition,
+            {options={}, streams={[definition.family]=stream}})
+          assert(emitted.name == "recipe-prod-research_mining_drill-1"
+            and #emitted.localised_name == 1
+            and emitted.localised_name[1] == "technology-name.more-infinite-research.research_mining_drill")
+
+          local gear_emitted = require("research.productivity").gears(stream)
+          assert(gear_emitted.localised_name[2][1] == "item-name.iron-gear-wheel")
+          package.preload["presentation.library_model"] = nil
+          package.loaded["presentation.library_model"] = nil
+          boot()
+          local mining = {valid=true, name=emitted.name, level=1, researched=false, enabled=true,
+            visible_when_disabled=true, localised_name=emitted.localised_name,
+            prototype={max_level=4294967295, effects=emitted.effects}}
+          gear = {valid=true, name=gear_emitted.name, level=1, researched=false, enabled=true,
+            visible_when_disabled=true, localised_name=gear_emitted.localised_name,
+            prototype={max_level=4294967295, effects=gear_emitted.effects}}
+          player.force.technologies = {[mining.name]=mining, [gear.name]=gear}
+          player.force.research_queue, player.force.current_research, player.force.research_progress = {},nil,0
+          library_declarations = {
+            {id=mining.name, family=definition.family, progression=1, native_order=definition.order,
+              setting="ips-enable-" .. definition.family, cap_setting="ips-max-level-" .. definition.family,
+              recipe="burner-mining-drill", locale_key=emitted.localised_name[1]},
+            {id=gear.name, family="research_gears", progression=1, native_order="p[research_gears]",
+              setting="ips-enable-research_gears", cap_setting="ips-max-level-research_gears",
+              recipe="iron-gear-wheel", locale_key=gear_emitted.localised_name[1]}
+          }
+          player.request_translation = function(localised)
+            local request = {id=player.next_translation_id + 1, localised=localised, result=translate(localised)}
+            player.next_translation_id = request.id
+            player.translation_requests[#player.translation_requests + 1] = request
+            return request.id
+          end
+          local root = library.open(player, {selected=mining.name})
+          assert(#player.translation_requests == 2)
+          for _, request in ipairs(player.translation_requests) do
+            library.on_string_translated({player_index=1, id=request.id, translated=true, result=request.result})
+          end
+          local content = research_content(root)
+          local listed = content["mir_library_results"].items
+          assert(#listed == 2 and (listed[1] == "Erzförderer-Produktivität" or listed[2] == "Erzförderer-Produktivität"))
+          assert(listed[1] == "Eisenrad-Produktivität" or listed[2] == "Eisenrad-Produktivität",
+            "the working gear LocalisedString regressed")
+          assert(content["mir_library_detail"]["mir_library_detail_title"].caption == "Erzförderer-Produktivität")
         ''')
 
     def test_all_view_scans_native_identities_once_and_family_change_invalidates_unissued_work(self):

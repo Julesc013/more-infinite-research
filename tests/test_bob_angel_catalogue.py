@@ -16,6 +16,21 @@ from native_credit_oracle import NATIVE_CREDIT_DEFAULT_SCALAR, NATIVE_CREDIT_DES
 SETTINGS_INTENT = ROOT / "spec/inventory/bob-angel-f200-intent-r03.json"
 SETTINGS_INTENT_SHA256 = "1D200906E8996F4049009EE6761E73C88FFC70824BC838496786A32EF927207C"
 GROWTH_MAXIMUM = 1000
+BASE_LITERAL_NAME_PRESENTATION_REPAIRS = {
+    # Retain the independent B6 rows unchanged, then apply the two separately
+    # reviewed F210 Base locale repairs. Both enclosing MIR keys are literal
+    # titles in the shipped locale catalogue; the nested item keys are absent.
+    "recipe-prod-research_mining_drill-1": {
+        "captured": ["technology-name.more-infinite-research.research_mining_drill",
+                     ["item-name.electric-mining-drill"]],
+        "emitted": ["technology-name.more-infinite-research.research_mining_drill"],
+    },
+    "recipe-prod-research_walls-1": {
+        "captured": ["technology-name.more-infinite-research.research_walls",
+                     ["item-name.stone-wall"]],
+        "emitted": ["technology-name.more-infinite-research.research_walls"],
+    },
+}
 
 
 def sha256(path):
@@ -25,6 +40,17 @@ def sha256(path):
 def canonical_row_sha256(row):
     text = json.dumps(row, ensure_ascii=False, sort_keys=True, separators=(",", ":")) + "\n"
     return hashlib.sha256(text.encode("utf-8")).hexdigest().upper()
+
+
+def repair_base_literal_name_presentation(data):
+    """Apply only the two independently pinned successor presentation fields."""
+    repaired = deepcopy(data)
+    for technology, expected in BASE_LITERAL_NAME_PRESENTATION_REPAIRS.items():
+        actual = repaired["technology"].get(technology, {}).get("localised_name")
+        if actual != expected["captured"]:
+            raise AssertionError(f"captured Bob/Angel presentation changed: {technology}")
+        repaired["technology"][technology]["localised_name"] = deepcopy(expected["emitted"])
+    return repaired
 
 
 class BobAngelCatalogueTests(unittest.TestCase):
@@ -81,6 +107,7 @@ class BobAngelCatalogueTests(unittest.TestCase):
         # captured recipes, independently of candidate or player code.
         public_review = [row for row in reviewed if not row["name"].startswith("mir-native-credit-")]
         catalogue._apply_reviewed(cls.expected_data, public_review, "data")
+        cls.expected_data = repair_base_literal_name_presentation(cls.expected_data)
         credits = native_credit_carrier_rows(cls.expected_data["technology"], cls.inputs["raw"]["recipe"])
         credit_review = {row["name"]: row["expected_candidate"] for row in reviewed
                          if row["name"].startswith("mir-native-credit-")}

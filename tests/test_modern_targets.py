@@ -62,6 +62,35 @@ class ModernTargetTests(unittest.TestCase):
           end
         ''')
 
+    def test_base_literal_names_do_not_keep_absent_f210_item_children(self):
+        locale_files = sorted((ROOT / "source" / "locale").glob("*/more-infinite-research.cfg"))
+        self.assertEqual(len(locale_files), 50)
+        for path in locale_files:
+            values = {}
+            for line in path.read_text(encoding="utf-8").splitlines():
+                key, separator, value = line.partition("=")
+                if separator:
+                    values[key] = value
+            for key in ("more-infinite-research.research_mining_drill",
+                        "more-infinite-research.research_walls"):
+                self.assertNotIn("__", values[key], f"literal title unexpectedly gained a placeholder: {path}")
+        self.lua.execute('''
+          local selected = names(catalogue.select({}).definitions)
+          -- F210 Base locale supplies entity-name.electric-mining-drill and
+          -- entity-name.stone-wall, but not their item-name variants.  Each
+          -- restored MIR title is a literal in all shipped locales, so neither
+          -- child is a valid substitution argument.
+          assert(selected.research_mining_drill.localised_name[1]
+            == "technology-name.more-infinite-research.research_mining_drill"
+            and #selected.research_mining_drill.localised_name == 1)
+          assert(selected.research_walls.localised_name[1]
+            == "technology-name.more-infinite-research.research_walls"
+            and #selected.research_walls.localised_name == 1)
+          -- A real parameter remains independent evidence that this control
+          -- has not flattened unrelated LocalisedStrings.
+          assert(selected.research_advanced_circuit.localised_name[2][1] == "item-name.advanced-circuit")
+        ''')
+
     def test_f200_keeps_875_settings_and_supported_nondefault_values(self):
         self.lua.execute('''
           f200()
