@@ -55,7 +55,7 @@ For a refused or unqualified upgrade, retain the original save and its matching 
 |---|---|
 | Exact 4.7.3 to 5.0.0, same supported engine edition | Each published predecessor edition; Base and Space Age where actually supported, plus affected settings/provider/mod regression closures. |
 | Every published 1.0.0-through 4.x origin to 5.0.0 on 2.0/2.1 | Each actual engine-valid published origin, with its package, settings, migration history and save pinned; direct MIR upgrade without requiring an intermediate MIR release. |
-| A 2.0 origin brought forward to 2.1 | Keep a separate engine-hop case where needed; identify the original source engine/package and every engine bridge. Do not manufacture a 2.1 predecessor by editing an old package's metadata. |
+| Each 2.0 origin brought forward to 2.1 | Qualify a separate 2.1 successor from every applicable protected 2.0 origin save, in addition to its same-engine upgrade; identify the original source engine/package and every required engine bridge. Do not manufacture a 2.1 predecessor by editing an old package's metadata. A 2.1-only origin does not imply a supported downgrade into 2.0. |
 | A target with no published 4.7.3 artifact | Record that absence explicitly, use the latest actual relevant predecessor where one exists, and qualify the target's forward route; never invent a 4.7.3 package or count a missing input as a pass. |
 | Each MIR 5-or-later origin to a later MIR 5 release | Retain immutable origin saves and prove the direct upgrade into the new candidate, including earlier supported Factorio editions. Previously accepted results require exact-input applicability review rather than silent relabelling. |
 
