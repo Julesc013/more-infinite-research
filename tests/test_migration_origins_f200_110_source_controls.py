@@ -226,6 +226,52 @@ class MigrationOriginF200110SourceControls(unittest.TestCase):
         self.assertIsNotNone(result["callbacks"]["load"])
         self.assertEqual({}, result["forbidden"])
 
+    def test_runtime_bad_roster_refuses_before_speed_or_fixture_mutation(self):
+        self.lua.globals().fixture_control_path = (FIXTURE / "control.lua").as_posix()
+        self.lua.globals().catalogue_path = (FIXTURE / "catalogue.lua").as_posix()
+        self.lua.execute(r'''
+          function migration_origin_110_bad_roster_preflight()
+            local catalogue=assert(loadfile(catalogue_path))()
+            local callbacks,counters={events={}}, {labels=0,resets=0,research=0,labs=0,forces=0}
+            local startup={}
+            for name,value in pairs(catalogue.settings) do startup[name]={value=value} end
+            local technologies={}
+            for name in pairs(catalogue.rows) do
+              technologies[name]={name=name,valid=true,level=1,researched=false,enabled=true,saved_progress=0,
+                prototype={level=1,max_level=4294967295}}
+            end
+            technologies[catalogue.direct].prototype.max_level=7
+            local force={valid=true,technologies=technologies,recipes={},research_queue={},research_progress=0}
+            function force.enable_all_prototypes() counters.labels=counters.labels+1 end
+            function force.reset_technology_effects() counters.resets=counters.resets+1 end
+            function force.add_research() counters.research=counters.research+1;return true end
+            local game={speed=1,tick=0,forces={player=force},surfaces={[1]={create_entity=function()
+              counters.labs=counters.labs+1;return nil end}}}
+            function game.create_force() counters.forces=counters.forces+1;return nil end
+            local storage={}
+            local env={game=game,storage=storage,settings={startup=startup},
+              script={active_mods={base="2.0.77",["more-infinite-research"]="1.1.0",
+                ["mir-fixture-mir5-migration-origin-f200-110-source"]="0.1.0"},
+                on_init=function(fn)callbacks.init=fn end,on_load=function(fn)callbacks.load=fn end,
+                on_event=function(event,fn)callbacks.events[event]=fn end},
+              defines={events={on_research_finished=1,on_tick=2},inventory={lab_input=1}}}
+            env.require=function(name)
+              assert(name=="__mir-fixture-mir5-migration-origin-f200-110-source__/catalogue")
+              return assert(loadfile(catalogue_path,"t",env))()
+            end
+            env._G=env;setmetatable(env,{__index=_G})
+            assert(loadfile(fixture_control_path,"t",env))()
+            local ok,message=pcall(callbacks.init)
+            return {ok=ok,message=tostring(message),speed=game.speed,storage=storage,counters=counters}
+          end
+        ''')
+        result = py(self.lua.eval("migration_origin_110_bad_roster_preflight")())
+        self.assertFalse(result["ok"])
+        self.assertIn("source runtime roster identity differs", result["message"])
+        self.assertEqual(1, result["speed"])
+        self.assertEqual({}, result["storage"])
+        self.assertEqual({"labels": 0, "resets": 0, "research": 0, "labs": 0, "forces": 0}, result["counters"])
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
