@@ -2,7 +2,7 @@
   "schema": 1,
   "kind": "MIR5MigrationOrigin110DirectC74NativeChainV1",
   "status": "passed-bounded-direct-successors-from-one-protected-published-mir1-f200-source",
-  "scope": "Two exact Base direct successors of one protected published MIR 1.1.0 F200 source save: F210 on2.1.23 and F200 on2.0.77, each with the exact c74b7c46 candidate and only the two independently verified source-default inputs. This record is not arbitrary mod-settings-file recovery, Space Age, an offsetting arm, a current-release qualification, multiplayer, physical-production, performance, or release evidence.",
+  "scope": "Two exact Base direct successors of one protected published MIR 1.1.0 F200 source save: F210 on2.1.23 and F200 on2.0.77, each with the exact c74b7c46 candidate and only the two independently verified source-default inputs. This record is not arbitrary mod-settings-file recovery, Space Age, an modules-disabled arm, a current-release qualification, multiplayer, physical-production, performance, or release evidence.",
   "source_stage_reused": {
     "chain": "spec/evidence/migration-origin-110-f200-source-native-chain-r05.json",
     "receipts": "spec/evidence/migration-origin-110-f200-source-native-receipts-r05.json.gz",
@@ -209,12 +209,12 @@
     "source_world_recreated": false,
     "arbitrary_mod_settings_file_recovery": false,
     "space_age": false,
-    "offsetting": false,
+    "modules-disabled": false,
     "later_candidate_applicability": false,
     "multiplayer": false,
     "physical_factory": false,
     "performance": false,
     "release_qualification": false
   },
-  "limitations": "This chain covers only the exact published MIR1.1.0 F200 source, the protected88FC source save, the c74 Base F200/F210 candidate archives, their two exact engine families, and the two explicitly staged source defaults. It does not qualify arbitrary persisted settings files, Space Age, module-disabled or cap closures, offsetting, another current candidate, a release, or every historical origin."
+  "limitations": "This chain covers only the exact published MIR1.1.0 F200 source, the protected88FC source save, the c74 Base F200/F210 candidate archives, their two exact engine families, and the two explicitly staged source defaults. It does not qualify arbitrary persisted settings files, Space Age, module-disabled or cap closures, modules-disabled, another current candidate, a release, or every historical origin."
 }
