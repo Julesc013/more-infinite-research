@@ -16,8 +16,8 @@
   ],
   "archive_sha256": {
     "mir-fixture-mir5-active-mods-observer_0.1.0.zip": "723D1E7721449FC26040E5E6629416767BDC20AD79CF8723115846DB662A1F87",
-    "more-infinite-research_5.0.20000.zip": "BD1B88D7DE85489207F71C1B080FD61617FAEF9655370BF0332A51579308ECE3",
-    "mir-fixture-mir5-f200-foreign-cap-baseline_0.2.0.zip": "18EEB497CAF09C1AD4BA0DCB044C633AADB34BADCD1DE3B820E889AE8B25860F"
+    "more-infinite-research_5.0.20000.zip": "050AC35BAB6BA1F01E160DB612B73A03E58E0ABE6A291D18109FAB1B235B63B5",
+    "mir-fixture-mir5-f200-foreign-cap-baseline_0.2.0.zip": "71440309308B3E82F23E21597CC1AE49C79E9BFF4A69388F104B86FB5DCA304E"
   },
-  "scope": "Current-MIR F200 finite-cap prepared successor: consume the immutable source save through InputSavePath/ExpectedInputSaveSha256, capture the foreign disabled=false baseline at cap one, save, and cold-reload twice. Zero labs; no native pass."
+  "scope": "c74b7c46 current-MIR F200 finite-cap prepared successor with the corrected seven-member raw-Git 24dd0497 fixture 71440309 (6450 bytes): consume the immutable source save through InputSavePath/ExpectedInputSaveSha256, capture the foreign disabled=false baseline at cap one, save, and cold-reload twice. Zero labs; no native pass."
 }
