@@ -113,7 +113,11 @@ class K2SEImersiteCarrierFixtureTests(unittest.TestCase):
             local player=make_force("player")
             local game={forces={player=player},tick=0}
             function game.create_force(name)
-              local value=make_force(name);game.forces[name]=value;return value
+              local value=make_force(name);game.forces[name]=value
+              if opponent=="force-created-clears-player-investment" then
+                player.current_research=nil;player.research_queue={};player.research_progress=0
+              end
+              return value
             end
             function game.server_save(name) assert(name=="mir5-native-complete");saves=saves+1 end
             local storage={}
@@ -239,6 +243,16 @@ class K2SEImersiteCarrierFixtureTests(unittest.TestCase):
                          (markers[3]["witnesses"]["foreign_tail_saved_progress"], markers[3]["witnesses"]["foreign_disabled"],
                           markers[3]["witnesses"]["foreign_powder_productivity"]))
         self.assertEqual("successor-complete", result["storage"]["mir5_k2se_imersite_carrier_retention"]["phase"])
+
+    def test_source_failure_reports_actual_player_queue_after_force_creation_boundary(self):
+        result = self.lua.eval("carrier_flow")(str(FIXTURE / "published-4.7/control.lua"), str(FIXTURE / "mir5/control.lua"),
+                                                "force-created-clears-player-investment")
+        self.assertFalse(result["ok"])
+        self.assertIn("source current/queued investment differs", result["message"])
+        self.assertIn("expected current=mir-k2-imersite-continuation-state-4 queue=[mir-k2-imersite-continuation-state-4,mir-k2-imersite-continuation-state-4] progress=0.42",
+                      result["message"])
+        self.assertIn("actual current=false queue=[] progress=0", result["message"])
+        self.assertEqual(0, result["saves"])
 
     def test_successor_refuses_changed_foreign_carrier_before_its_own_state_write(self):
         result = self.lua.eval("carrier_flow")(str(FIXTURE / "published-4.7/control.lua"), str(FIXTURE / "mir5/control.lua"), "foreign-enabled")
