@@ -250,9 +250,9 @@ end
 local function init()
   check_closure()
   if storage[KEY] ~= nil then fail("source fixture state already exists") end
-  game.speed = 16
   local player = game.forces.player
   local rows = source_roster(player)
+  game.speed = 16
   seed_rows(player, rows, "source player", CATALOGUE.direct)
   local direct = technology(player, CATALOGUE.direct)
   prerequisites(direct)
