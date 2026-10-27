@@ -469,5 +469,19 @@
     "Original b251/E3A cap assignments, 90F/2ABA and earlier observations retain their actual identities; none is relabelled as a 6786 execution.",
     "No new gameplay, migration, multiplayer, performance, normal-target qualification or release verdict is granted.",
     "F006-F012 remain separately labelled best-effort builds; F001-F005 are not invented distributions."
-  ]
+  ],
+  "independent_black_glass_verification": {
+    "status": "all-twenty-files-byte-identical-to-aero",
+    "source_commit": "6786c95704fdd6b7a8fcee645c375f54ac8d03da",
+    "player_source_tree": "b6857d3774ffd792f82f5bb3ee38b312abedc7b4",
+    "normal_zip_count": 10,
+    "best_effort_zip_count": 7,
+    "file_count": 20,
+    "total_bytes": 6144756,
+    "inventory_sha256": "3023E2A94759E2678FA3F999273E983A3AAD8D965BDBBFCD7F8ED9DCF67B575A",
+    "primary_custody": "build/mir5/assets/6786c957-root-r01",
+    "readback_path": "build/mir5/recovery/assets-6786c957-root-primary-readback-r01.json",
+    "readback_sha256": "94F3A9A28EB5793E2FECE41CB7E377C3B956A299FD94772FB32C29573ECCE0C9",
+    "native_qualification": false
+  }
 }
