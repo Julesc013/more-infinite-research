@@ -18,6 +18,10 @@ TARGETS = {
  # is the same semantic version declared by that archive's info.json.
  'f210': {'engine':'2.1.23','line':'2.1','engine_sha':'FE4A1DA30F322A0D0B8AEB3DF7276332222BAAA143E2352569B723E84B2B9060','sif':'1.0.78','sif_sha':'3B5F2A381ADF1D9AECF048293E20035963A528720FBDC148CCC2B0418049FF13','commons':'1.0.33','commons_sha':'378D3114B09C872358088B33500BC4AB0B9B9EFD9E5650DBEA0E87B5914C29BB','extras':'1.0.10','runtime_extras':'1.0.10','extras_sha':'3AB74877E49FB245E62593B669EB4D5C762207C047CA6F70E4D0CC9B67DF0225','observer_sha':'2E1BE5952D2A4CC5C74A0D149E075D247BA110A3FAE5B6768D3EAEBABCEF989C','published':'4.7.21002','candidate':'5.0.21000'},
 }
+CURRENT_F210_SOURCE = '6786c95704fdd6b7a8fcee645c375f54ac8d03da'
+CURRENT_F210_PLAYER_TREE = 'b6857d3774ffd792f82f5bb3ee38b312abedc7b4'
+CURRENT_F210_ARCHIVE = '59C14208B200CC534353CD46391210FE0B53E4C5739FFE8A3633B5D82DEE8C47'
+CURRENT_F210_ARCHIVE_BYTES = 679575
 
 # Independent published continuation rows and the separately derived corrected
 # MIR5 SIF expectation. This intentionally does not import contract.lua.
@@ -638,6 +642,29 @@ class SIFScienceRetirementFixtureTests(unittest.TestCase):
                 candidate=json.loads((PROFILES/f'sif-science-retirement-mir5-{policy}-{target}-{suffix}.json').read_text());mods={row['name']:row['version']for row in candidate['mods']};self.assertEqual((target,meta['line'],meta['engine'],meta['engine_sha'],'Defaults'),(candidate['target'],candidate['factorio_line'],candidate['engine']['version'],candidate['engine']['sha256'],candidate['settings_mode']));expected_mods={'base':meta['engine'],'elevated-rails':meta['engine'],'quality':meta['engine'],'space-age':meta['engine'],'cr-commons':meta['commons'],'space-is-fake':meta['sif'],'more-infinite-research':meta['candidate'],f'mir-fixture-mir5-sif-science-retirement-{target}':'0.2.0',f'mir-fixture-mir5-sif-policy-{policy}-{target}':'0.1.0','mir-fixture-mir5-active-mods-observer':'0.1.0'};
                 if target=='f210':expected_mods.update({'recycler':meta['engine'],'cr-extras':meta['extras']})
                 self.assertEqual(expected_mods,mods);self.assertEqual(expected,candidate['archive_sha256']);self.assertIn('does not qualify saved-game upgrade persistence',candidate['scope'])
+
+    def test_current_f210_configured_successor_is_distinct_from_generic_candidate_policy(self):
+        generic=json.loads((PROFILES/'sif-science-retirement-mir5-configured-f210-2123.json').read_text())
+        current=json.loads((PROFILES/'sif-science-retirement-mir5-configured-current-f210-2123.json').read_text())
+        meta=TARGETS['f210']
+        self.assertEqual((1,'mir5-sif-science-retirement-current-successor','f210','2.1','Defaults'),
+                         (current['schema'],current['kind'],current['target'],current['factorio_line'],current['settings_mode']))
+        self.assertEqual((meta['engine'],meta['engine_sha']),
+                         (current['engine']['version'],current['engine']['sha256']))
+        self.assertEqual(generic['mods'],current['mods'])
+        self.assertEqual(generic['archive_sha256'] | {
+            'more-infinite-research_5.0.21000.zip': CURRENT_F210_ARCHIVE,
+        },current['archive_sha256'])
+        self.assertEqual(meta['observer_sha'],current['archive_sha256']['mir-fixture-mir5-active-mods-observer_0.1.0.zip'])
+        self.assertIn(CURRENT_F210_SOURCE,current['scope'])
+        self.assertIn(CURRENT_F210_PLAYER_TREE,current['scope'])
+        self.assertIn(CURRENT_F210_ARCHIVE,current['scope'])
+        self.assertIn(f'{CURRENT_F210_ARCHIVE_BYTES} bytes',current['scope'])
+        self.assertIn('published4.7.21002 configured source save',current['scope'])
+        self.assertIn('two source cold reloads',current['scope'])
+        self.assertIn('two real successor BioLab completions',current['scope'])
+        self.assertIn('queued 42% and paused 27%',current['scope'])
+        self.assertIn('Prepared input only',current['scope'])
     def test_upstream_f210_control_omits_mir_without_changing_dependency_inputs(self):
         upstream=json.loads((PROFILES/'sif-upstream-f210-2123.json').read_text())
         candidate=json.loads((PROFILES/'sif-science-retirement-mir5-configured-f210-2123.json').read_text())
