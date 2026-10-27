@@ -431,6 +431,9 @@ end
                 result = self._flow(opponent)
                 self.assertFalse(result["ok"])
                 self.assertIn(phrase, result["message"])
+                if opponent == "foreign-enabled":
+                    self.assertIn("enabled=true", result["message"])
+                    self.assertIn("maximum=4294967295", result["message"])
                 if opponent not in ("seed-skip", "skipped-transition"):
                     self.assertLessEqual(result["saves"], 2)
 
