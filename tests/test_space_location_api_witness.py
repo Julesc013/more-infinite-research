@@ -138,7 +138,8 @@ class SpaceLocationApiWitnessTests(unittest.TestCase):
             ("mir-fixture-mir5-space-location-api-witness", "0.1.0", True),
         ])
         self.assertEqual(profile["archive_sha256"], {
-            "more-infinite-research_5.0.21000.zip": "7CE6A4DF78019F6B98237E638A1C927C5FDB538D4A1442EE22D846DD962DDCDC"
+            "more-infinite-research_5.0.21000.zip": "7CE6A4DF78019F6B98237E638A1C927C5FDB538D4A1442EE22D846DD962DDCDC",
+            "mir-fixture-mir5-space-location-api-witness_0.1.0.zip": "512760CDB3FA9CA75370CF1A1C223F386291BEDDFFAFF6E7CC333E40A8C6BAD1",
         })
         info = json.loads((FIXTURE / "info.json").read_text(encoding="utf-8"))
         self.assertEqual(info["name"], "mir-fixture-mir5-space-location-api-witness")

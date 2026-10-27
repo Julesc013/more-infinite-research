@@ -18,7 +18,8 @@
     {"name": "mir-fixture-mir5-space-location-api-witness", "version": "0.1.0", "enabled": true}
   ],
   "archive_sha256": {
-    "more-infinite-research_5.0.21000.zip": "7CE6A4DF78019F6B98237E638A1C927C5FDB538D4A1442EE22D846DD962DDCDC"
+    "more-infinite-research_5.0.21000.zip": "7CE6A4DF78019F6B98237E638A1C927C5FDB538D4A1442EE22D846DD962DDCDC",
+    "mir-fixture-mir5-space-location-api-witness_0.1.0.zip": "512760CDB3FA9CA75370CF1A1C223F386291BEDDFFAFF6E7CC333E40A8C6BAD1"
   },
   "scope": "Private standalone Factorio2.1.23 Space Age LuaForce space-location API witness using the current a575/7CE MIR package. It observes fixture-owned lock/unlock calls, exact official technology-effect fields, an unresearched location, a separate force queue sentinel, save, and two read-only reloads. It does not earn research or claim a MIR migration, general persistence behavior, gameplay, performance, or release qualification."
 }
