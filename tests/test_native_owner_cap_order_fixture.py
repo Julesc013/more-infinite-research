@@ -7,10 +7,12 @@ doubles. They prepare a native scenario only; they do not execute Factorio.
 from __future__ import annotations
 
 import argparse
+import hashlib
 import importlib.util
 import json
 from pathlib import Path
 import shutil
+import subprocess
 import sys
 import tempfile
 import unittest
@@ -23,6 +25,13 @@ NAME = "mir-fixture-mir5-native-owner-cap-order"
 ENGINE_SHA = "FE4A1DA30F322A0D0B8AEB3DF7276332222BAAA143E2352569B723E84B2B9060"
 OBSERVER_SHA = "2E1BE5952D2A4CC5C74A0D149E075D247BA110A3FAE5B6768D3EAEBABCEF989C"
 MIR_SHA = "E3A65C08AC7798A66FB1BE30D24307B17C8B366DD901953BDE2A09BD6939C8CE"
+INPUT_REVISION = "5a4691821069d79daf7060ac9b79a191f12d0b24"
+INPUT_RECEIPT = ROOT / "spec/evidence/native-owner-cap-order-inputs-5a469182.json"
+FIXTURE_SHAS = {
+    "canonical": "C0054209A0F653C5B5FDBF529560722E2ABE3EFDE9088456B56B2BF46D4369B7",
+    "permuted": "25107173A949B952BE83DE1131CCFE44A0919D4A0CA451A7287FE2896FA1609A",
+    "relaxed": "10B3821CF87B833FCCE7D1EB5F268FB97C68C7CDAEBC3520D5A16E95017FEB7B",
+}
 STAGES = {
     "canonical": ("0.1.0", 1, ("steel-plate", "casting-steel")),
     "permuted": ("0.2.0", 1, ("casting-steel", "steel-plate")),
@@ -296,14 +305,41 @@ end
                 self.assertEqual([(name, version if name != NAME else STAGES[stage][0]) for name, version in expected],
                                  [(row["name"], row["version"]) for row in profile["mods"]])
                 self.assertEqual({"mir-fixture-mir5-active-mods-observer_0.1.0.zip",
-                                  "more-infinite-research_5.0.21000.zip"}, set(profile["archive_sha256"]))
+                                  "more-infinite-research_5.0.21000.zip", f"{NAME}_{version}.zip"},
+                                 set(profile["archive_sha256"]))
                 self.assertEqual(OBSERVER_SHA, profile["archive_sha256"]["mir-fixture-mir5-active-mods-observer_0.1.0.zip"])
                 self.assertEqual(MIR_SHA, profile["archive_sha256"]["more-infinite-research_5.0.21000.zip"])
+                self.assertEqual(FIXTURE_SHAS[stage], profile["archive_sha256"][f"{NAME}_{version}.zip"])
                 self.assertEqual((NAME, version, "2.1"), (info["name"], info["version"], info["factorio_version"]))
                 self.assertIn("pending", profile["scope"])
                 self.assertIn("b251ae7a", profile["scope"])
                 self.assertIn(str(cap), (FIXTURE / "fixture_settings.lua").read_text(encoding="utf-8"))
                 self.assertEqual(2, len(recipes))
+
+    def test_prepared_inputs_bind_every_raw_git_alias_without_native_or_saved_state_claims(self):
+        receipt = json.loads(INPUT_RECEIPT.read_bytes())
+        self.assertEqual("MIR5NativeOwnerCapOrderPreparedInputsV1", receipt["kind"])
+        self.assertEqual(INPUT_REVISION, receipt["fixture_source_commit"])
+        for field in ("native_execution", "library_mutation", "lab_completion", "release_qualification"):
+            self.assertIs(receipt[field], False)
+        self.assertIn("pending", receipt["saved_input_hashes"])
+        self.assertEqual(list(STAGES), [row["stage"] for row in receipt["stages"]])
+        for row in receipt["stages"]:
+            stage, version = row["stage"], STAGES[row["stage"]][0]
+            self.assertEqual((version, FIXTURE_SHAS[stage]), (row["version"], row["sha256"]))
+            self.assertEqual(7, len(row["members"]))
+            expected = {name: f"tests/fixtures/native-owner-cap-order/{stage}/{name}"
+                        for name in ("info.json", "control.lua", "data-final-fixes.lua", "settings-updates.lua")}
+            expected.update({name: f"tests/fixtures/native-owner-cap-order/{name}"
+                             for name in ("fixture_control.lua", "fixture_data_final.lua", "fixture_settings.lua")})
+            self.assertEqual(expected, {member["path"]: member["source_path"] for member in row["members"]})
+            for member in row["members"]:
+                raw = subprocess.check_output(["git", "show", "HEAD:" + member["source_path"]], cwd=ROOT)
+                self.assertEqual((member["sha256"], member["bytes"]),
+                                 (hashlib.sha256(raw).hexdigest().upper(), len(raw)))
+        helper = receipt["package_tool"]
+        raw_helper = subprocess.check_output(["git", "show", "HEAD:" + helper["path"]], cwd=ROOT)
+        self.assertEqual(helper["sha256"], hashlib.sha256(raw_helper).hexdigest().upper())
 
     def test_data_stages_preflight_before_only_the_permuted_fixture_write(self):
         for stage, (_, cap, recipes) in STAGES.items():
