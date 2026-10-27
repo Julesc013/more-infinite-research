@@ -481,5 +481,19 @@
     "This tooling source also includes the before-output declared input guard; it does not convert old native executions into new harness executions.",
     "No new gameplay, migration, multiplayer, performance, normal-target qualification or release verdict is granted.",
     "F006-F012 remain separately labelled best-effort builds; F001-F005 are not invented distributions."
-  ]
+  ],
+  "independent_black_glass_verification": {
+    "status": "all-twenty-files-byte-identical-to-independent-aero-freeze",
+    "source_commit": "6873c2116f4da7c4d70069aecaf79e338ec1fbea",
+    "source_tree": "d5d8694b2fbd7229de84c9966691d5446c82219b",
+    "rebuilt_and_verified_normal_zip_count": 10,
+    "rebuilt_and_verified_best_effort_zip_count": 7,
+    "file_count": 20,
+    "total_bytes": 6140804,
+    "inventory_sha256": "033EED330F447ABA7AB43378EC7B75F4185243B168FB76481A20E1F71F3C673A",
+    "primary_custody": "build/mir5/assets/6873c211-r01",
+    "local_readback_path": "build/mir5/recovery/assets-6873c211-primary-readback-r01.json",
+    "local_readback_sha256": "3747D175A3E85802506D490C47DC7CDEBE3B92F15A0B50804B9EDC182475B5BF",
+    "native_qualification": false
+  }
 }
