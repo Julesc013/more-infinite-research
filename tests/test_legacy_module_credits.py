@@ -251,6 +251,35 @@ class LegacyModuleCreditTests(unittest.TestCase):
             self.assertFalse(holder["enabled"])
             self.assertFalse(holder["visible"])
 
+    def test_disabled_public_research_keeps_earned_credit_without_gaining_enablement(self):
+        self.lua.execute(r'''
+          for _, disable_before_preflight in ipairs({true, false}) do
+            local value = legacy_module_credit_environment("f210")
+            local main = value.player.technologies["recipe-prod-research_modules-1"]
+            if disable_before_preflight then main.enabled = false end
+            local plan = value.runtime.preflight(value.event)
+            main.enabled = false -- A cap may disable research during reconciliation.
+            assert(value.runtime.apply(plan) == true)
+            assert(main.enabled == false and main.level == 3 and main.saved_progress == .27)
+            assert(value.player.research_queue[1] == "preserved")
+            for _, descriptor in ipairs(value.descriptors) do
+              local holder = value.player.technologies[descriptor.id]
+              assert(holder.level == 3 and holder.enabled == false and holder.visible_when_disabled == false)
+            end
+          end
+        ''')
+
+    def test_invalid_public_enablement_type_refuses_before_holder_writes(self):
+        self.lua.execute(r'''
+          local value = legacy_module_credit_environment("f210")
+          value.player.technologies["recipe-prod-research_modules-1"].enabled = "false"
+          local ok = pcall(value.runtime.preflight, value.event)
+          assert(not ok)
+          for _, descriptor in ipairs(value.descriptors) do
+            assert(value.player.technologies[descriptor.id].level == 1)
+          end
+        ''')
+
     def test_apply_indexes_the_force_collection_once_before_any_holder_write(self):
         result = py(self.lua.eval("legacy_module_credit_apply_indexes_forces_once")())
         self.assertEqual(2, result["pair_calls"])
