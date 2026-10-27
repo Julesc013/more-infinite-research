@@ -219,6 +219,47 @@
       "receipt_sha256": "39BA333B289F504AC32D299AB7CEF915BE84BB54D6410A60B654A32E974D1781",
       "remaining": "Published-body and protected-source-save equivalence, every actual source/candidate/save/two-reload route, and field-specific recovery applicability remain separate obligations."
     },
+    "historical_combined_shooting_effects": {
+      "status": "published-source-boundary-characterized; protected-source-save-and-successors-not-run",
+      "audit_custody": "https://github.com/Julesc013/more-infinite-research/pull/1264#issuecomment-6455077644",
+      "published_origins": [
+        {
+          "tag": "1.2.0",
+          "source_commit": "b80413b2aa225529a236b7b00a7cee9420af65bc",
+          "archive_sha256": "880C137F7AB35FE7AF1DA5538BFA91F620C80785134DB488800352DD6154AB22"
+        },
+        {
+          "tag": "1.2.5",
+          "source_commit": "172156bfc815a004162754732b0e604983e19c58",
+          "archive_sha256": "4B3A2F84324488BE859A0BC465C03F2B7D891D6521CC69A65CE1A611944E5E72"
+        },
+        {
+          "tag": "1.2.9",
+          "source_commit": "e0f081e4cad7121c1bddedbfadbd3b83d42c438c",
+          "archive_sha256": "6006C08E4D1F60B88306F8750F26FC3EFC3B7BAC1C3FD0CC214F52BB80D94AC4"
+        }
+      ],
+      "published_archive_custody": "5662c66c372e6aca025eab9f446de55a5cc6c1c9:dist/",
+      "published_contract": "All three archives emit recipe-prod-research_rocket_shooting_speed-1 with both gun-speed rocket+.1 and cannon-shell+.1; no separate cannon row/setting or shooting migration. Their unconditional weapon-speed-adjustments removes both categories from every matching weapon-shooting-speed-N, including finite owners.",
+      "first_proven_direct_f200_split": {
+        "tag": "1.9.0",
+        "source_commit": "4e386ca6a3b54a1109bbd2a991c73e11ac920704",
+        "archive_sha256": "4A07F409AC78B7AEA900CBD8CECFD1104EB16F89E1F9EF8A72656D5A0BA6A6AF",
+        "contract": "Separate rocket and cannon public rows, each+.1. No shooting mapping in its JSON migration. This does not classify intermediate older-engine origins."
+      },
+      "candidate_audit": {
+        "source_commit": "c74b7c4680545f3ccf27f38016d1144fefe8eee3",
+        "player_tree": "f81c63afca2e6eb5b7e46dffe892548553899db3",
+        "direct_definitions_blob": "07e1b9162be6502d69fdd6c202e15613c6f4ac5e",
+        "contract": "Separate rocket-only and cannon-only rows; no shooting transfer in the audited runtime/migration members. The module bridge is module-only, native_credits covers recipe productivity, and modern weapon overlap changes authored weapon-shooting-speed-7 rather than finite1-6. This is a source observation, not demonstrated native save loss."
+      },
+      "finite_owner_caveat": "Read-only installed Base2.0.77 technology.lua SHA25619E827C2B7D02A72EACA5BE284DD67BF76E0D4ECDD86722232D8F98805D4FE6F declares rocket effects on finite3/.5,4/.7,5/.9,6/1.3 and cannon on5/.8,6/1.5. These are raw source facts only. Restoring finite native effects can mask a missing old MIR component or create a separate intended correction; total-only equality or a guessed+.1 carrier is insufficient.",
+      "existing_data_observation": "spec/evidence/migration-origin-120-published-defaults-f200-native-chain-r01.json",
+      "next_input": "Project the already captured exact1.2 Defaults34 MIR rows, finite weapon-shooting-speed1-6 and effective startup settings from raw7714C28BE891B81D3F8A598697F52DD0A678E3F3493600A96ECB7D7F1563745D/settingsC512FBFDC2240D481B6A21E30764E1C82BAF2EC5238C01E6B2C4C80F0142C3C8; the existing portable receipt does not contain those dumps. No new native capture is implied.",
+      "required_selected_boundary_checks": "Use a protected actual source save; record the combined MIR row and finite native owners' effects/earned states, separate rocket/cannon totals, effective settings and foreign offsets before selecting a destination correction. Then exercise each selected direct successor, one new native lab, preserved queued/detached work, successor save and two read-only cold reloads. Export the finite source snapshots once so successor expectations use observed source data. Do not accelerate the queued progress witness or infer its missing fields.",
+      "native_status": "not_run",
+      "evidence_limit": "Archive/source audit and existing data/settings capture only. No new fixture, world, repair, gameplay, migration or release pass; no historical native status or count is changed. Other1.2 settings/player-stat boundaries retain separate obligations."
+    },
     "published_boolean_cap_controllers": {
       "status": "eight-public-original-archive-bodies-verified-not-native-qualified",
       "receipt": "spec/evidence/historical-boolean-cap-archive-metadata.json",
