@@ -10,4 +10,6 @@ The fixture pins all 42 published startup defaults in its finite `settings-final
 
 Only `recipe-prod-research_gears-1` is accelerated for one real source laboratory completion. The other 30 rows are labelled level seeds, never laboratory evidence. The save records the source gear's +.10 recipe productivity, the independently seeded robot-battery force contribution, foreign queued `.42`, detached `.27`, and the native zero manual-mining baseline. No inventory-capacity source technology is emitted or earned.
 
+The current prepared r04 input is a five-runtime-member raw-Git projection (`catalogue.lua`, `control.lua`, `data-final-fixes.lua`, `settings-final-fixes.lua`, and `info.json`) packaged as `mir-fixture-mir5-migration-origin-f200-110-source_0.1.0.zip`, SHA-256 `D1E92F0117AA89B3B20BB31EDEAFDE2654A63AEB08934D2C13CCEA589BF69C82`, 8,724 bytes. It replaces neither the failed r03 packet nor its result: r03 remains the adverse record that exposed the invalid data-stage setting-prototype read.
+
 The generic native runner must observe two read-only cold reload markers with byte-identical save bytes. A later F200 or F210 successor must consume this protected source save through a separately reviewed fixture and exact package/settings bindings.

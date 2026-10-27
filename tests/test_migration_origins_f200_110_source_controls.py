@@ -186,12 +186,27 @@ class MigrationOriginF200110SourceControls(unittest.TestCase):
                 self.assertFalse(rejected["ok"])
                 self.assertEqual(before, rejected["raw"])
 
+        setting_variants = []
         wrong_default = self.source_settings_raw()
         wrong_default["bool-setting"]["ips-enable-research_breeding"]["default_value"] = False
-        before = copy.deepcopy(wrong_default)
-        rejected_settings = self.run_settings(wrong_default, mods)
-        self.assertFalse(rejected_settings["ok"])
-        self.assertEqual(before, rejected_settings["raw"])
+        setting_variants.append(("default", wrong_default))
+        wrong_type = self.source_settings_raw()
+        wrong_type["bool-setting"]["ips-enable-research_breeding"]["setting_type"] = "runtime-global"
+        setting_variants.append(("type", wrong_type))
+        missing_setting = self.source_settings_raw()
+        del missing_setting["bool-setting"]["ips-enable-research_breeding"]
+        setting_variants.append(("missing", missing_setting))
+        foreign_setting = self.source_settings_raw()
+        foreign_setting["bool-setting"]["ips-unpublished"] = {
+            "type": "bool-setting", "name": "ips-unpublished", "setting_type": "startup", "default_value": True,
+        }
+        setting_variants.append(("foreign", foreign_setting))
+        for label, candidate in setting_variants:
+            with self.subTest(settings=label):
+                before = copy.deepcopy(candidate)
+                rejected_settings = self.run_settings(candidate, mods)
+                self.assertFalse(rejected_settings["ok"])
+                self.assertEqual(before, rejected_settings["raw"])
 
     def test_catalogue_records_the_archived_base_output_set_without_current_catalogue_fallbacks(self):
         text = (FIXTURE / "catalogue.lua").read_text(encoding="utf-8")
@@ -238,10 +253,12 @@ class MigrationOriginF200110SourceControls(unittest.TestCase):
                          (profile["origin_tag"], profile["origin_source_commit"], profile["engine"]["version"], profile["engine"]["sha256"]))
         self.assertEqual("6395C4A5A0F74C67729746D0FBF6162329978B47C5C29D54CC0045F2977C7E44",
                          profile["archive_sha256"]["more-infinite-research_1.1.0.zip"])
-        self.assertEqual("82F954450AB7AB761686C288B23331E5C087C29F0846837810D1F3F96BD98A18",
+        self.assertEqual("D1E92F0117AA89B3B20BB31EDEAFDE2654A63AEB08934D2C13CCEA589BF69C82",
                          profile["archive_sha256"]["mir-fixture-mir5-migration-origin-f200-110-source_0.1.0.zip"])
         self.assertEqual({"README.md", "catalogue.lua", "control.lua", "data-final-fixes.lua", "settings-final-fixes.lua", "info.json"},
                          {path.name for path in FIXTURE.iterdir() if path.is_file()})
+        self.assertEqual({"catalogue.lua", "control.lua", "data-final-fixes.lua", "settings-final-fixes.lua", "info.json"},
+                         {path.name for path in FIXTURE.iterdir() if path.is_file() and path.name != "README.md"})
         self.assertIn("not a migration pass", (FIXTURE / "README.md").read_text(encoding="utf-8"))
 
     def test_control_registers_callbacks_without_runtime_access_at_load(self):

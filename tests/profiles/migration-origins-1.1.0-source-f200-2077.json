@@ -29,7 +29,7 @@
   ],
   "archive_sha256": {
     "more-infinite-research_1.1.0.zip": "6395C4A5A0F74C67729746D0FBF6162329978B47C5C29D54CC0045F2977C7E44",
-    "mir-fixture-mir5-migration-origin-f200-110-source_0.1.0.zip": "82F954450AB7AB761686C288B23331E5C087C29F0846837810D1F3F96BD98A18"
+    "mir-fixture-mir5-migration-origin-f200-110-source_0.1.0.zip": "D1E92F0117AA89B3B20BB31EDEAFDE2654A63AEB08934D2C13CCEA589BF69C82"
   },
-  "scope": "Prepared exact official MIR 1.1.0 F200 source stage: all observed published F200 rows/defaults, thirty labelled seeds, one real gear laboratory completion, source recipe/robot-battery facts, queued and detached source state, save and two read-only reloads. A same-engine or F210 MIR5 successor remains separately pending; this profile is not a migration or current-package pass."
+  "scope": "Prepared r04 exact official MIR 1.1.0 F200 source stage: a raw-Git five-runtime-member fixture validates all 42 published setting prototypes/defaults in settings-final-fixes and effective settings plus all observed F200 rows in data-final-fixes, then records thirty labelled seeds, one real gear laboratory completion, source recipe/robot-battery facts, queued and detached source state, save and two read-only reloads. The failed r03 four-member packet remains adverse custody. A same-engine or F210 MIR5 successor remains separately pending; this profile is not a migration or current-package pass."
 }
