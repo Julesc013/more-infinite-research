@@ -7,7 +7,7 @@
     "version": "2.1.23",
     "sha256": "8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38"
   },
-  "fixture_source_commit": "c17bf7423d0884c05e39c0bad69de288aaf859db",
+  "fixture_source_commit": "71c09dcd3f8f2271f670c2585814047d79df1c50",
   "case": "discovery-recovery",
   "settings_mode": "Defaults",
   "mods": [
@@ -54,7 +54,7 @@
   ],
   "archive_sha256": {
     "mir-fixture-mir5-active-mods-observer_0.1.0.zip": "2E1BE5952D2A4CC5C74A0D149E075D247BA110A3FAE5B6768D3EAEBABCEF989C",
-    "mir-fixture-discovery-recovery_0.1.0.zip": "F316A9D1E7B5403C475B6811CEA24A9436F0C5C76FA09EDE1705D1A9E2B9706B",
+    "mir-fixture-discovery-recovery_0.1.0.zip": "D2278B5CE5360D5A42DB18D3A056AD2663160395C738DA60FFE89AD14408E85F",
     "more-infinite-research_3.2.0.zip": "35372EE6D16DA6765E8C30AEAAF5DA4A5D300F02C0A0A03648C80893A5394F32"
   },
   "role": "published-source",
