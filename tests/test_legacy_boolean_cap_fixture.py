@@ -9,7 +9,7 @@ import hashlib
 import importlib.util
 import json
 from pathlib import Path
-import shutil
+import subprocess
 import sys
 import tempfile
 import unittest
@@ -54,6 +54,10 @@ def lua(runtime, value):
     if isinstance(value, list):
         return runtime.table_from([lua(runtime, item) for item in value])
     return value
+
+
+def raw_git_bytes(revision, path):
+    return subprocess.check_output(["git", "show", f"{revision}:{path}"], cwd=ROOT)
 
 
 class LegacyBooleanCapFixtureTests(unittest.TestCase):
@@ -471,39 +475,30 @@ class LegacyBooleanCapFixtureTests(unittest.TestCase):
                          (F210 / "control.lua").read_text(encoding="utf-8"))
 
     def test_owned_fixture_projections_bind_the_shared_successor_body_and_exact_archive_members(self):
+        receipt = json.loads(PREPARED_INPUT_RECEIPT.read_text(encoding="utf-8"))
+        fixtures_by_stage = {fixture["stage"]: fixture for fixture in receipt["fixture_archives"]}
         stages = (
-            (SOURCE, "0.1.0", SOURCE_PROFILE, {
-                "control.lua": ("D2D70F06F692BEE80DD7DF8E09EDDA7EF2BC1E1CDA926DCE331B160C5B08CC2F", 11084),
-                "data-final-fixes.lua": ("8FD3DBE6D847680639442ABABAFC60F0CC60BAE2BA11EFD19C26A4606CB78C52", 1820),
-                "info.json": ("B066898F875EC64B2A960643725E4785180FB801810D7BDD3EC769EDD4018695", 271),
-                "settings-updates.lua": ("9E8D15D1CF977EE90BFA1F6792BBA1B0D9F1E7A98E55A89164FD2FBEEC1067E8", 883),
-            }),
-            (F200, "0.2.0", F200_PROFILE, {
-                "control.lua": ("65A6B7D99EFBA852EA91A530CE9C4D0BEDBD27135AC67B93BED23B15D43C143A", 81),
-                "data-final-fixes.lua": ("D84F98D522A25832534A90D5ED71BBB5BE944F862F68401792C9154A7687D2A5", 1807),
-                "fixture_control.lua": ("71C5959F4861197F699C71E248DCE4EDE184AE5C55D18499501A16EB61777D97", 10959),
-                "info.json": ("3E54EE382BAF2D1E1BB03BDC34B5F88491A02EE8D9A986B1336ACD7624C77A7B", 274),
-                "settings-updates.lua": ("F97D0D3E337C2FD3E7B8FB14D80B7DF4043F7071A299CEB7D8895E341B196015", 817),
-            }),
-            (F210, "0.3.0", F210_PROFILE, {
-                "control.lua": ("0341FCF30615C303A7D3CDF517F0C030A6653F22156B5B40411C6280DFB388FA", 81),
-                "data-final-fixes.lua": ("C001B5B4317ED213DC6C01ED622CEE908F64F0E2C059379C8C5FB01F42ADD5E8", 1899),
-                "fixture_control.lua": ("71C5959F4861197F699C71E248DCE4EDE184AE5C55D18499501A16EB61777D97", 10959),
-                "info.json": ("32181A0BF1F33B576AA3001B010AE77FBEBCEB948B799033A2066DDD18F7BE83", 281),
-                "settings-updates.lua": ("A8957200244C3161362F2B370EC73343055B7C1D9CFD8F555D51C1049A137130", 1009),
-            }),
+            ("published-source", "0.1.0", SOURCE_PROFILE),
+            ("f200-successor", "0.2.0", F200_PROFILE),
+            ("f210-direct-successor", "0.3.0", F210_PROFILE),
         )
-        with tempfile.TemporaryDirectory(dir=ROOT / "build") as temporary:
+        with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
-            for stage, version, profile_path, expected in stages:
+            for stage, version, profile_path in stages:
                 with self.subTest(version=version):
+                    fixture = fixtures_by_stage[stage]
+                    self.assertEqual(version, fixture["version"])
+                    expected = {member["path"]: (member["sha256"], member["bytes"])
+                                for member in fixture["members"]}
                     projection = root / version
                     projection.mkdir()
-                    for source in stage.iterdir():
-                        if source.is_file():
-                            shutil.copyfile(source, projection / source.name)
-                    if stage != SOURCE:
-                        shutil.copyfile(SUCCESSOR_BODY, projection / "fixture_control.lua")
+                    for member in fixture["members"]:
+                        raw = raw_git_bytes(receipt["fixture_source_commit"], member["source_path"])
+                        self.assertEqual((member["sha256"], member["bytes"]),
+                                         (hashlib.sha256(raw).hexdigest().upper(), len(raw)))
+                        destination = projection / member["path"]
+                        destination.parent.mkdir(parents=True, exist_ok=True)
+                        destination.write_bytes(raw)
                     archive = root / f"{NAME}_{version}.zip"
                     record = PACKAGE.build(projection, archive)
                     observed = {row["path"]: (row["sha256"].upper(), row["bytes"]) for row in record["members"]}
@@ -516,6 +511,26 @@ class LegacyBooleanCapFixtureTests(unittest.TestCase):
                     with zipfile.ZipFile(archive) as package:
                         self.assertEqual({f"{NAME}_{version}/{name}" for name in expected},
                                          {entry.filename for entry in package.infolist() if not entry.is_dir()})
+
+            # A checkout that rewrites even one raw member to CRLF cannot
+            # satisfy the frozen archive receipt.  This is the old projection
+            # failure, expressed without depending on the runner's Git EOL
+            # setting.
+            source_fixture = fixtures_by_stage["published-source"]
+            altered = root / "crlf"
+            altered.mkdir()
+            for member in source_fixture["members"]:
+                raw = raw_git_bytes(receipt["fixture_source_commit"], member["source_path"])
+                if member["path"] == "control.lua":
+                    raw = raw.replace(b"\n", b"\r\n")
+                (altered / member["path"]).write_bytes(raw)
+            crlf_archive = altered / f"{NAME}_0.1.0.zip"
+            crlf_record = PACKAGE.build(altered, crlf_archive)
+            crlf_members = {row["path"]: (row["sha256"].upper(), row["bytes"])
+                            for row in crlf_record["members"]}
+            expected_source_members = {member["path"]: (member["sha256"], member["bytes"])
+                                       for member in source_fixture["members"]}
+            self.assertNotEqual(expected_source_members, crlf_members)
 
     def test_prepared_input_receipt_binds_only_the_owned_projections_and_current_candidate(self):
         receipt = json.loads(PREPARED_INPUT_RECEIPT.read_text(encoding="utf-8"))
@@ -542,14 +557,12 @@ class LegacyBooleanCapFixtureTests(unittest.TestCase):
                                  fixture["archive"].rsplit("/", 1)[0])
                 expected_members = {row["path"]: (row["sha256"], row["bytes"])
                                     for row in fixture["members"]}
-                stage = SOURCE if fixture["version"] == "0.1.0" else (F200 if fixture["version"] == "0.2.0" else F210)
                 actual_members = {}
                 for row in fixture["members"]:
-                    source = ROOT / row["source_path"]
-                    actual_members[row["path"]] = (hashlib.sha256(source.read_bytes()).hexdigest().upper(),
-                                                    source.stat().st_size)
+                    raw = raw_git_bytes(receipt["fixture_source_commit"], row["source_path"])
+                    actual_members[row["path"]] = (hashlib.sha256(raw).hexdigest().upper(), len(raw))
                 self.assertEqual(expected_members, actual_members)
-                if stage != SOURCE:
+                if fixture["stage"] != "published-source":
                     self.assertIn("fixture_control.lua", expected_members)
         candidate = receipt["inputs"]["current_candidate"]
         self.assertEqual(("a575a4198807b6aea9e26963e3d9970fc5c068ae",
