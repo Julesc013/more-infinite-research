@@ -669,6 +669,35 @@ class SIFScienceRetirementFixtureTests(unittest.TestCase):
         self.assertIn('two real successor BioLab completions',current['scope'])
         self.assertIn('queued 42% and paused 27%',current['scope'])
         self.assertIn('Prepared input only',current['scope'])
+
+    def test_current_f210_policy_profiles_bind_each_fresh_zero_write_case(self):
+        meta=TARGETS['f210']
+        for policy in POLICIES:
+            with self.subTest(policy=policy):
+                generic=json.loads((PROFILES/f'sif-science-retirement-mir5-{policy}-f210-2123.json').read_text())
+                filename=(f'sif-science-retirement-mir5-configured-current-f210-2123.json'
+                          if policy == 'configured' else
+                          f'sif-science-retirement-mir5-{policy}-current-f210-2123.json')
+                current=json.loads((PROFILES/filename).read_text())
+                self.assertEqual(generic['mods'],current['mods'])
+                self.assertEqual(generic['archive_sha256'] | {
+                    'more-infinite-research_5.0.21000.zip': CURRENT_F210_ARCHIVE,
+                },current['archive_sha256'])
+                self.assertEqual((meta['engine'],meta['engine_sha']),
+                                 (current['engine']['version'],current['engine']['sha256']))
+                self.assertIn(CURRENT_F210_SOURCE,current['scope'])
+                self.assertIn(CURRENT_F210_PLAYER_TREE,current['scope'])
+                self.assertIn(CURRENT_F210_ARCHIVE,current['scope'])
+                self.assertIn(f'{CURRENT_F210_ARCHIVE_BYTES} bytes',current['scope'])
+                self.assertIn('2E1BE5952D2A4CC5C74A0D149E075D247BA110A3FAE5B6768D3EAEBABCEF989C',current['scope'])
+                if policy == 'configured':
+                    self.assertEqual('mir5-sif-science-retirement-current-successor',current['kind'])
+                    self.assertIn('published4.7.21002 configured source save',current['scope'])
+                else:
+                    self.assertEqual('mir5-sif-science-retirement-current-policy',current['kind'])
+                    self.assertIn(f'MIR5_SIF_CANDIDATE marker for sif-science-retirement-f210-{policy}',current['scope'])
+                    self.assertIn('returns before a storage or native-state write',current['scope'])
+                    self.assertIn('does not qualify saved-game upgrade persistence',current['scope'])
     def test_upstream_f210_control_omits_mir_without_changing_dependency_inputs(self):
         upstream=json.loads((PROFILES/'sif-upstream-f210-2123.json').read_text())
         candidate=json.loads((PROFILES/'sif-science-retirement-mir5-configured-f210-2123.json').read_text())
