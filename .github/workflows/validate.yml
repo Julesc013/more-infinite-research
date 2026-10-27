@@ -81,7 +81,7 @@ jobs:
             driver = [ordered]@{ path = $driver; sha256 = $driverHash }
             controls = $controls
           }
-          $outputDirectory = Join-Path $PWD 'build/mir5-host-gate'
+          $outputDirectory = Join-Path $PWD 'build/host-gate'
           [IO.Directory]::CreateDirectory($outputDirectory) | Out-Null
           $outputPath = Join-Path $outputDirectory 'plan.json'
           [IO.File]::WriteAllText($outputPath, (($record | ConvertTo-Json -Depth 32) + "`n"), [Text.UTF8Encoding]::new($false))
@@ -97,7 +97,7 @@ jobs:
         with:
           include-hidden-files: true
           name: ${{ steps.artifact.outputs.plan_artifact }}
-          path: build/mir5-host-gate/plan.json
+          path: build/host-gate/plan.json
           if-no-files-found: error
 
   host-controls:
@@ -129,14 +129,14 @@ jobs:
         uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
         with:
           name: ${{ needs.verification-plan.outputs.plan_artifact }}
-          path: build/mir5-host-gate
+          path: build/host-gate
       - name: Verify plan artifact readback against this checkout
         shell: pwsh
         env:
           MIR5_HOST_PLAN_SHA256: ${{ needs.verification-plan.outputs.plan_sha256 }}
         run: |
           $ErrorActionPreference = 'Stop'
-          $planPath = 'build/mir5-host-gate/plan.json'
+          $planPath = 'build/host-gate/plan.json'
           if (-not (Test-Path -LiteralPath $planPath -PathType Leaf)) { throw 'Bound MIR5 host plan artifact is absent.' }
           $actualPlanHash = (Get-FileHash -LiteralPath $planPath -Algorithm SHA256).Hash.ToUpperInvariant()
           if ($actualPlanHash -cne $env:MIR5_HOST_PLAN_SHA256) { throw 'Bound MIR5 host plan artifact hash differs.' }
