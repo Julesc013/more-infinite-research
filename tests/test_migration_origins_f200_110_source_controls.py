@@ -315,6 +315,61 @@ class MigrationOriginF200110SourceControls(unittest.TestCase):
         self.assertIsNotNone(result["callbacks"]["load"])
         self.assertEqual({}, result["forbidden"])
 
+    def test_runtime_lab_uses_ingredients_without_turning_the_space_gate_into_science(self):
+        self.lua.globals().fixture_control_path = (FIXTURE / "control.lua").as_posix()
+        self.lua.globals().catalogue_path = (FIXTURE / "catalogue.lua").as_posix()
+        self.lua.execute(r'''
+          function migration_origin_110_fill_lab(ingredients)
+            local callbacks, inventory = {}, {items={}}
+            inventory.clear=function() inventory.items={} end
+            inventory.insert=function(row)
+              inventory.items[row.name]=(inventory.items[row.name] or 0)+row.count
+              return row.count
+            end
+            local entity={valid=true,energy=0,get_inventory=function(index)
+              assert(index==1);return inventory end}
+            local env={script={on_init=function(fn)callbacks.init=fn end,
+                on_load=function()end,on_event=function()end},
+              defines={events={on_research_finished=1,on_tick=2},inventory={lab_input=1}}}
+            env.require=function(name)
+              assert(name=="__mir-fixture-mir5-migration-origin-f200-110-source__/catalogue")
+              return assert(loadfile(catalogue_path,"t",env))()
+            end
+            env._G=env;setmetatable(env,{__index=_G})
+            assert(loadfile(fixture_control_path,"t",env))()
+            -- Exercise the actual lab feeder without performing unrelated
+            -- source-world seeds. Its inputs below are archived native facts.
+            local fill
+            for index=1,32 do
+              local name,value=debug.getupvalue(callbacks.init,index)
+              if name==nil then break end
+              if name=="fill_lab" then fill=value;break end
+            end
+            assert(type(fill)=="function","source init must own its lab feeder")
+            local state={lab=entity}
+            local ok,message=pcall(fill,state,{research_unit_ingredients=ingredients})
+            return {ok=ok,message=tostring(message),items=inventory.items,
+              initial_packs=state.initial_packs,energy=entity.energy}
+          end
+        ''')
+        ingredients = [{"name": pack, "amount": 1} for pack in CORE]
+        result = py(self.lua.eval("migration_origin_110_fill_lab")(lua(self.lua, ingredients)))
+        self.assertTrue(result["ok"], result["message"])
+        self.assertEqual({pack: 32 for pack in CORE}, result["items"])
+        self.assertEqual(result["items"], result["initial_packs"])
+        self.assertNotIn("space-science-pack", result["items"])
+        self.assertEqual(1000000000, result["energy"])
+        for label, invalid in (
+            ("prerequisite-is-not-an-ingredient", ingredients + [{"name": "space-science-pack", "amount": 1}]),
+            ("missing-ingredient", ingredients[:-1]),
+            ("duplicate-ingredient", ingredients + [ingredients[0]]),
+            ("wrong-amount", [{"name": CORE[0], "amount": 2}] + ingredients[1:]),
+        ):
+            with self.subTest(label=label):
+                refused = py(self.lua.eval("migration_origin_110_fill_lab")(lua(self.lua, invalid)))
+                self.assertFalse(refused["ok"])
+                self.assertIn("source runtime science", refused["message"])
+
     def test_runtime_bad_roster_refuses_before_speed_or_fixture_mutation(self):
         self.lua.globals().fixture_control_path = (FIXTURE / "control.lua").as_posix()
         self.lua.globals().catalogue_path = (FIXTURE / "catalogue.lua").as_posix()

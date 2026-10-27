@@ -38,7 +38,7 @@ end
 local function expected_science(name)
   local row = CATALOGUE.rows[name]
   if row == nil then fail("source catalogue row is absent: " .. tostring(name)) end
-  return CATALOGUE.science[row.science]
+  return CATALOGUE.science[row.science].ingredients
 end
 
 local function source_roster(force)
