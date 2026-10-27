@@ -230,7 +230,7 @@ function Assert-Full473Budget([int]$MinimumSeconds) {
 
 $actualHead = ([string](& git -C $repo rev-parse HEAD)).Trim()
 $actualSourceTree = ([string](& git -C $repo rev-parse 'HEAD:source')).Trim()
-$actualStatus = ([string](& git -C $repo status --porcelain=v1)).Trim()
+$actualStatus = (@(& git -C $repo status --porcelain=v1) -join "`n").Trim()
 Assert-Full473 ($actualHead -ceq $sourceCommit) 'frozen source commit differs'
 Assert-Full473 ($actualSourceTree -ceq $sourceTree) 'frozen player source tree differs'
 Assert-Full473 ([string]::IsNullOrWhiteSpace($actualStatus)) 'frozen source worktree is dirty'
