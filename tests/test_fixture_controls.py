@@ -42,6 +42,19 @@ def f210_runtime_api_path():
 
 
 class FixtureControlHostStageTests(unittest.TestCase):
+    @staticmethod
+    def fixture_archive_preflight(archive: Path, source: Path) -> subprocess.CompletedProcess:
+        environment = dict(os.environ,
+                           MIR_TEST_IDENTITY=str(ROOT / "tools/lib/validation/ImmutableInputStaging.ps1"),
+                           MIR_TEST_LIBRARY=str(ROOT / "tools/lib/compatibility/LibraryActivation.ps1"),
+                           MIR_TEST_ARCHIVE=str(archive), MIR_TEST_SOURCE=str(source))
+        return subprocess.run(
+            ["pwsh", "-NoLogo", "-NoProfile", "-Command",
+             ('$ErrorActionPreference="Stop";. $env:MIR_TEST_IDENTITY;. $env:MIR_TEST_LIBRARY;'
+              'Assert-MIRLibraryFixtureArchive -Archive $env:MIR_TEST_ARCHIVE -SourceDirectory $env:MIR_TEST_SOURCE')],
+            cwd=ROOT, env=environment, text=True, capture_output=True, check=False,
+        )
+
     def setUp(self):
         self.lua = LuaRuntime(unpack_returned_tuples=True)
         self.lua.execute(r"""
@@ -599,6 +612,17 @@ class FixtureControlHostStageTests(unittest.TestCase):
                     self.assertEqual(len(archive_members), len(generated.infolist()))
                 self.assertEqual(record_members, expected, f"package source members differ for {fixture}")
                 self.assertEqual(archive_members, expected, f"archive members differ for {fixture}")
+                projection = output / f"{fixture}-package-members"
+                for relative in record_members:
+                    projected = projection / relative
+                    projected.parent.mkdir(parents=True, exist_ok=True)
+                    projected.write_bytes((source / relative).read_bytes())
+                accepted = self.fixture_archive_preflight(archive, projection)
+                self.assertEqual(accepted.returncode, 0, accepted.stdout + accepted.stderr)
+                self.assertTrue((source / "info-f200.json").is_file())
+                rejected = self.fixture_archive_preflight(archive, source)
+                self.assertNotEqual(rejected.returncode, 0)
+                self.assertIn("[mir-library-fixture-membership]", rejected.stdout + rejected.stderr)
 
     def test_alpha_accepts_float32_native_effect_without_mutating_beta(self):
         self.lua.globals().fixture_control = self.control("api-alpha")

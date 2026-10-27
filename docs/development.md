@@ -107,6 +107,20 @@ The F210 K2 capture controls read their two original profile blobs from exact na
 
 A test correction needs independent evidence. A resource refusal is not a pass, fail or timing sample. A path-only rename still needs package member equality and final-layout smoke, because import and package mistakes are real defects.
 
+For a native fixture, the caller must provision the selected, hash-pinned ZIP in the direct library before invoking `Invoke-NativeFixture.ps1`; that runner verifies fixtures but never packages or stages them. Build each `FixtureSources` directory as a checkout-local temporary projection containing exactly the package record's members, then verify it against the selected container before admission. Do not pass a canonical fixture directory wholesale when it includes alternate metadata such as `info-f200.json` that is intentionally absent from the selected F210 ZIP.
+
+```powershell
+$projection = Join-Path $OutputRoot 'fixture-source'
+foreach ($relative in $packageRecord.members.path) {
+  $destination = Join-Path $projection $relative
+  New-Item -ItemType Directory -Force -Path (Split-Path -Parent $destination) | Out-Null
+  Copy-Item -LiteralPath (Join-Path $canonicalFixtureSource $relative) -Destination $destination
+}
+.\tools\Invoke-NativeFixture.ps1 -ArchiveLibrary $library -FixtureSources $projection <other exact arguments>
+```
+
+The library archive must already match the profile's selected archive SHA256; a same-name container with different bytes is refused. The projection is caller-owned temporary input, not a ZIP extraction, dependency copy or a substitute for the profile's engine/archive admission.
+
 ## Isolated client launches
 
 Reuse the selected engine by its exact executable path. Keep each client's ordinary `config.ini`, `write-data`, logs and saves beneath that assignment's existing `build/tmp` output root; keep verified dependency archives in the engine-family direct `testmods` library. Each client needs a separate writable directory, not a second game installation or a `TestProfiles` directory inside Steam. The existing native harness generates these configurations and owns their restoration/custody.
