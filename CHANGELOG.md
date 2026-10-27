@@ -51,6 +51,7 @@ This is the authoritative product changelog. Each MIR 1–3 master release appea
 - Retain selected cryogenic science and its native unlock prerequisite when a mod replaces the native research trigger with an ordinary research unit.
 - Preserve earned-above-cap research, suspended work and queues through admitted save transitions; restore only disablement owned by MIR.
 - Preserve native-owner cap restoration across equivalent productivity-effect orderings without re-enabling foreign-disabled research.
+- Preserve unqueued foreign Imersite public disablement and visibility through its named hidden-carrier handoff.
 - Reconcile scripted contributions against external baselines rather than overwrite aggregate foreign bonuses.
 - Walk nested pipeline and receiver prototype fields without recursive Lua stack growth.
 
