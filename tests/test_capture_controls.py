@@ -11,7 +11,9 @@ import json
 from pathlib import Path
 import subprocess
 import sys
+import tempfile
 import unittest
+import zipfile
 
 ROOT = Path(__file__).resolve().parents[1]
 FIXTURE = ROOT / "tests/fixtures/active-mods-observer"
@@ -74,6 +76,121 @@ def prototype_capture_output_budget_binder_cases() -> dict:
         }
 
     return {"eight_gib": invoke(8192), "over_limit": invoke(8193)}
+
+
+def prototype_capture_declared_input_guard_cases() -> dict:
+    """Run the real capture prefix through declared-input admission only."""
+    source = PROTOTYPE_CAPTURE.read_text(encoding="utf-8")
+    boundary = "$buildTmp = Join-Path $repo 'build/tmp'"
+    offset = source.index(boundary)
+    guard = (
+        "Assert-MIRDirectLibraryStartupDeclaredInputs -ProfileDefinition "
+        "$profileDefinition -EngineIdentity $engineIdentity -ArchiveHashes "
+        "$archiveHashes -ErrorPrefix 'mir5-prototype-capture'"
+    )
+    if source.count(guard) != 1:
+        raise AssertionError("prototype capture declared-input assertion is missing or ambiguous")
+
+    with tempfile.TemporaryDirectory(prefix="mir5-prototype-capture-preflight-") as temp:
+        root = Path(temp)
+        runner = root / "Invoke-PrototypeCapture-preflight.ps1"
+        runner.write_text(source[:offset] + "\nreturn\n", encoding="utf-8", newline="\n")
+        engine = root / "engine"
+        factorio = engine / "bin/x64/factorio.exe"
+        factorio.parent.mkdir(parents=True)
+        factorio.write_bytes(b"fake Factorio identity for host-only preflight")
+        base = engine / "data/base"
+        base.mkdir(parents=True)
+        (base / "info.json").write_text(
+            json.dumps({"name": "base", "version": "2.1.23", "dependencies": []}),
+            encoding="utf-8",
+        )
+        library = root / "library"
+        library.mkdir()
+        archive = library / "controlled_1.0.0.zip"
+        with zipfile.ZipFile(archive, "w", compression=zipfile.ZIP_DEFLATED) as value:
+            value.writestr(
+                "controlled_1.0.0/info.json",
+                json.dumps(
+                    {
+                        "name": "controlled",
+                        "version": "1.0.0",
+                        "factorio_version": "2.1",
+                        "dependencies": ["base"],
+                    }
+                ),
+            )
+        archive_name = archive.name
+        archive_hash = hashlib.sha256(archive.read_bytes()).hexdigest().upper()
+        engine_hash = hashlib.sha256(factorio.read_bytes()).hexdigest().upper()
+        profile = root / "profile.json"
+        output = root / "output"
+
+        def invoke(name: str, declared_engine, declared_archives, *, remove_call: bool = False) -> dict:
+            active_runner = runner
+            if remove_call:
+                active_runner = root / "Invoke-PrototypeCapture-preflight-call-removed.ps1"
+                active_runner.write_text(
+                    (source[:offset].replace(guard, "", 1)) + "\nreturn\n",
+                    encoding="utf-8",
+                    newline="\n",
+                )
+            value = {
+                "mods": [
+                    {"name": "base", "version": "2.1.23", "enabled": True},
+                    {"name": "controlled", "version": "1.0.0", "enabled": True},
+                ]
+            }
+            if declared_engine is not None:
+                value["engine"] = declared_engine
+            if declared_archives is not None:
+                value["archive_sha256"] = declared_archives
+            profile.write_text(json.dumps(value), encoding="utf-8")
+            result = subprocess.run(
+                [
+                    "pwsh", "-NoProfile", "-File", str(active_runner),
+                    "-ArchiveLibrary", str(library),
+                    "-FactorioBin", str(factorio),
+                    "-ProfilePath", str(profile),
+                    "-OutputRoot", str(output),
+                    "-RepoRoot", str(ROOT),
+                ],
+                cwd=ROOT,
+                text=True,
+                capture_output=True,
+            )
+            return {
+                "returncode": result.returncode,
+                "output": result.stdout + result.stderr,
+                "output_exists": output.exists(),
+                "controls_exist": any(
+                    (library / name).exists()
+                    for name in ("mod-list.json", "mod-settings.dat", ".mir-active-profile.json")
+                ),
+            }
+
+        valid_engine = {"version": "2.1.23", "sha256": engine_hash}
+        valid_archives = {archive_name: archive_hash}
+        legacy = invoke("legacy", None, None)
+        partial = invoke("partial", valid_engine, {"removed-provider_9.9.9.zip": "A" * 64})
+        valid = invoke("valid", valid_engine, valid_archives)
+        wrong_version = invoke("wrong-version", {"version": "2.1.22", "sha256": engine_hash}, valid_archives)
+        wrong_engine_hash = invoke("wrong-engine-hash", {"version": "2.1.23", "sha256": "0" * 64}, valid_archives)
+        wrong_selected = invoke("wrong-selected", valid_engine, {archive_name: "0" * 64})
+        malformed_selected = invoke("malformed-selected", valid_engine, {archive_name: "not-a-sha"})
+        malformed_map = invoke("malformed-map", valid_engine, "not-an-archive-map")
+        call_removed = invoke("call-removed", valid_engine, {archive_name: "0" * 64}, remove_call=True)
+        return {
+            "legacy": legacy,
+            "partial": partial,
+            "valid": valid,
+            "wrong_version": wrong_version,
+            "wrong_engine_hash": wrong_engine_hash,
+            "wrong_selected": wrong_selected,
+            "malformed_selected": malformed_selected,
+            "malformed_map": malformed_map,
+            "call_removed": call_removed,
+        }
 
 
 def native_fixture_observer_guard_cases() -> dict:
@@ -440,6 +557,33 @@ class CaptureControlTests(unittest.TestCase):
         self.assertIn("MaxNewOutputMiB", cases["over_limit"]["output"])
         self.assertIn("maximum allowed range", cases["over_limit"]["output"])
         self.assertNotIn("missing-factorio.exe", cases["over_limit"]["output"])
+
+    def test_prototype_capture_refuses_declared_selected_inputs_before_output_or_admission(self):
+        cases = prototype_capture_declared_input_guard_cases()
+
+        for name in ("legacy", "partial", "valid"):
+            with self.subTest(name=name):
+                self.assertEqual(cases[name]["returncode"], 0, cases[name]["output"])
+                self.assertFalse(cases[name]["output_exists"])
+                self.assertFalse(cases[name]["controls_exist"])
+
+        expected = {
+            "wrong_version": "profile engine base differs",
+            "wrong_engine_hash": "profile engine hash differs",
+            "wrong_selected": "profile selected archive hash differs",
+            "malformed_selected": "profile selected archive hash is malformed",
+            "malformed_map": "profile archive metadata differs",
+        }
+        for name, message in expected.items():
+            with self.subTest(name=name):
+                self.assertNotEqual(cases[name]["returncode"], 0)
+                self.assertIn(f"[mir5-prototype-capture] {message}", cases[name]["output"])
+                self.assertFalse(cases[name]["output_exists"])
+                self.assertFalse(cases[name]["controls_exist"])
+
+        self.assertEqual(cases["call_removed"]["returncode"], 0, cases["call_removed"]["output"])
+        self.assertFalse(cases["call_removed"]["output_exists"])
+        self.assertFalse(cases["call_removed"]["controls_exist"])
 
     def test_native_fixture_active_seed_mode_is_finite_and_deferred(self):
         source = NATIVE_FIXTURE.read_text(encoding="utf-8")

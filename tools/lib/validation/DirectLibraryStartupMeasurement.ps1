@@ -35,6 +35,34 @@ function Get-MIRDirectLibraryStartupEngineIdentity {
   [pscustomobject][ordered]@{path=$file.FullName;sha256=Get-MIRImmutableInputSha256 -Path $file.FullName;file_version=[string]$file.VersionInfo.FileVersion;product_version=[string]$file.VersionInfo.ProductVersion;base_version=[string]$base.version}
 }
 
+function Assert-MIRDirectLibraryStartupDeclaredInputs {
+  param(
+    [Parameter(Mandatory)][Collections.IDictionary]$ProfileDefinition,
+    [Parameter(Mandatory)]$EngineIdentity,
+    [Parameter(Mandatory)][Collections.IDictionary]$ArchiveHashes,
+    [Parameter(Mandatory)][string]$ErrorPrefix
+  )
+  $fail={param([string]$Message)throw "[$ErrorPrefix] $Message"}.GetNewClosure()
+  if($ProfileDefinition.Contains('engine')){
+    $declared=$ProfileDefinition['engine']
+    if(-not($declared -is [Collections.IDictionary] -and $declared.Contains('version') -and $declared.Contains('sha256') -and
+      $declared['version'] -is [string] -and $declared['sha256'] -is [string] -and [string]$declared['sha256'] -cmatch '^[a-fA-F0-9]{64}$')){&$fail 'profile engine metadata differs'}
+    if([string]$declared['version'] -cne [string]$EngineIdentity.base_version){&$fail 'profile engine base differs'}
+    if([string]$declared['sha256'] -cne [string]$EngineIdentity.sha256){&$fail 'profile engine hash differs'}
+  }
+  if($ProfileDefinition.Contains('archive_sha256')){
+    $declared=$ProfileDefinition['archive_sha256']
+    if(-not($declared -is [Collections.IDictionary])){&$fail 'profile archive metadata differs'}
+    foreach($name in $ArchiveHashes.Keys){
+      if($declared.Contains($name)){
+        $expected=$declared[$name]
+        if(-not($expected -is [string] -and [string]$expected -cmatch '^[a-fA-F0-9]{64}$')){&$fail "profile selected archive hash is malformed: $name"}
+        if([string]$expected -cne [string]$ArchiveHashes[$name]){&$fail "profile selected archive hash differs: $name"}
+      }
+    }
+  }
+}
+
 function Read-MIRDirectLibraryStartupProfile {
   param([Parameter(Mandatory)][string]$Path)
   $value=(Get-Content -Raw -LiteralPath $Path).TrimStart([char]0xFEFF)|ConvertFrom-Json -AsHashtable

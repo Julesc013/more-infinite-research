@@ -120,6 +120,9 @@ Import-Module $identityModule -Force
 
 $baseRows = @(Read-MIRDirectLibraryStartupProfile -Path $profileInput)
 $mir = if ($hasMIRArchive) { Get-MIR5PrototypeCaptureMIRArchive -Archive $MIRArchive -Library $library -ExpectedSha256 $ExpectedMIRArchiveSha256 -EngineLine $engineLine } else { $null }
+$engineIdentity = Get-MIRDirectLibraryStartupEngineIdentity -FactorioBin $engine -EngineDataDirectory $engineData
+$archiveHashes = Get-MIRDirectLibraryStartupArchiveHashes -LibraryDirectory $library -EngineDataDirectory $engineData -BaseRows $baseRows -MirArchive $mir
+Assert-MIRDirectLibraryStartupDeclaredInputs -ProfileDefinition $profileDefinition -EngineIdentity $engineIdentity -ArchiveHashes $archiveHashes -ErrorPrefix 'mir5-prototype-capture'
 
 $buildTmp = Join-Path $repo 'build/tmp'
 $output = [IO.Path]::GetFullPath($OutputRoot)
@@ -140,7 +143,7 @@ $record = [ordered]@{
     native_probe_resources_sha256=Get-MIR5PrototypeCaptureSha256 (Join-Path $repo 'tools/lib/validation/NativeProbeResources.ps1')
     library_activation_sha256=Get-MIR5PrototypeCaptureSha256 (Join-Path $repo 'tools/lib/compatibility/LibraryActivation.ps1')
   }
-  engine=[ordered]@{path=$engine;sha256=Get-MIR5PrototypeCaptureSha256 $engine;base_version=[string]$base.version;factorio_version=$engineLine}
+  engine=[ordered]@{path=$engineIdentity.path;sha256=$engineIdentity.sha256;base_version=$engineIdentity.base_version;factorio_version=$engineLine}
   profile_input=[ordered]@{path=$profileInput;sha256=Get-MIR5PrototypeCaptureSha256 $profileInput}
   mir_archive=$mir
   active_mods_observer=$null
@@ -161,8 +164,6 @@ try {
   Write-MIRDirectLibraryStartupProfile -Path $selection -BaseRows $baseRows -MirArchive $mir
   $config = Join-Path $run 'config.ini'
   New-MIRDirectLibraryStartupConfig -Path $config -EngineDataDirectory $engineData -WriteDataDirectory $writeData
-  $archiveHashes = Get-MIRDirectLibraryStartupArchiveHashes -LibraryDirectory $library -EngineDataDirectory $engineData -BaseRows $baseRows -MirArchive $mir
-
   $activation = Start-MIRLibraryActivation -LibraryDirectory $library -EngineDataDirectory $engineData -ProfilePath $selection -ArchiveHashes $archiveHashes -SettingsMode Defaults
   Add-MIRNativeProbeLibraryActivation -Context $resources -Activation $activation
   $record.generated_selection = [ordered]@{
