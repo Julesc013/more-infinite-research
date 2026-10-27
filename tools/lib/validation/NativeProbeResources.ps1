@@ -9,7 +9,7 @@ function New-MIRNativeProbeResourceContext {
   param(
     [Parameter(Mandatory)][string]$RepoRoot,
     [Parameter(Mandatory)][string]$OutputRoot,
-    [ValidateRange(0,8192)][int]$ExpectedPeakMemoryMiB=0,
+    [ValidateRange(0,10240)][int]$ExpectedPeakMemoryMiB=0,
     [ValidateRange(1,8192)][int]$MaxNewOutputMiB=120,
     [switch]$UseExactOutputRoot
   )

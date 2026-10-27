@@ -18,6 +18,7 @@ CURRENT_F200_PROFILE = ROOT / "tests/profiles/library-multiplayer-current-f200-2
 F210_PROFILE = ROOT / "tests/profiles/library-multiplayer-f210-2123.json"
 STANDALONE_F210_PROFILE = ROOT / "tests/profiles/library-multiplayer-standalone-f210-2123.json"
 F210_API_CONSUMERS_PROFILE = ROOT / "tests/profiles/library-api-consumers-f210-2123.json"
+STANDALONE_F210_API_CONSUMERS_PROFILE = ROOT / "tests/profiles/library-api-consumers-standalone-f210-2123.json"
 PAIRED_PUBLISHED_PROFILE = ROOT / "tests/profiles/library-paired-browser-published-f200-2077.json"
 PAIRED_MIR5_PROFILE = ROOT / "tests/profiles/library-paired-browser-mir5-f200-2077.json"
 SCRIPTED_EFFECTS_PROFILE = ROOT / "tests/profiles/scripted-effects-multiplayer-f200-sa-2077.json"
@@ -551,6 +552,69 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
         })
         self.assertNotIn("mir-fixture-mir5-api-beta-production", {row["name"] for row in profile["mods"]})
 
+    def test_standalone_f210_api_client_profile_binds_the_exact_current_six_mod_closure(self):
+        profile = json.loads(STANDALONE_F210_API_CONSUMERS_PROFILE.read_text(encoding="utf-8"))
+        self.assertEqual(profile["kind"], "mir5-library-api-consumers-standalone-f210-native-selection")
+        self.assertEqual((profile["target"], profile["factorio_line"], profile["settings_mode"]),
+                         ("f210-standalone", "2.1", "Defaults"))
+        self.assertEqual(profile["engine"], {
+            "version": "2.1.23",
+            "sha256": "8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38",
+        })
+        self.assertEqual([(row["name"], row["version"], row["enabled"]) for row in profile["mods"]], [
+            ("base", "2.1.23", True),
+            ("mir-fixture-mir5-active-mods-observer", "0.1.0", True),
+            ("more-infinite-research", "5.0.21000", True),
+            ("mir-fixture-mir5-library-multiplayer", "0.1.0", True),
+            ("mir-fixture-mir5-api-alpha", "0.1.0", True),
+            ("mir-fixture-mir5-api-beta", "0.1.0", True),
+        ])
+        self.assertEqual(profile["archive_sha256"], {
+            "mir-fixture-mir5-active-mods-observer_0.1.0.zip":
+                "A15A7D628D66953D2E0C4D4FA288F47CBF9C5678327C7EB3D23ADB5DC78331C0",
+            "more-infinite-research_5.0.21000.zip":
+                "2ABAF369E020D8AD18A0C04940A8811BECFA5E63E5B479C668E2D3A3123D032B",
+        })
+        self.assertNotIn("mir-fixture-mir5-api-beta-production", {row["name"] for row in profile["mods"]})
+
+    def test_multiplayer_wrapper_admits_only_the_exact_standalone_api_client_profile(self):
+        script = r'''
+          $ErrorActionPreference='Stop'; Set-StrictMode -Version Latest
+          $tokens=$null;$errors=$null
+          $ast=[Management.Automation.Language.Parser]::ParseFile($env:MIR_TEST_WRAPPER,[ref]$tokens,[ref]$errors)
+          if($errors.Count){throw $errors[0].Message}
+          function Assert-Session([bool]$Condition,[string]$Message){if(-not $Condition){throw $Message}}
+          $node=@($ast.FindAll({param($candidate)
+            $candidate -is [Management.Automation.Language.FunctionDefinitionAst] -and $candidate.Name -ceq 'Assert-MultiplayerFixtureSelection'
+          },$true))
+          if($node.Count-ne1){throw 'selection function is absent or ambiguous'}
+          Invoke-Expression $node[0].Extent.Text
+          function Read-Profile {Get-Content -LiteralPath $env:MIR_TEST_STANDALONE_API_CLIENT_PROFILE -Raw|ConvertFrom-Json -AsHashtable}
+          $engine='8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38'
+          $selected=Assert-MultiplayerFixtureSelection -Selection (Read-Profile) -EngineSha256 $engine -FixtureCase 'library-multiplayer'
+          if($selected.kind-cne'mir5-library-api-consumers-standalone-f210-native-selection'-or$selected.standalone_f210-ne$true-or$selected.api_client_consumers-ne$true){throw 'standalone API client target differs'}
+          function Assert-Rejected([string]$Name,[scriptblock]$Mutate,[string]$Engine=$engine){
+            $selection=Read-Profile;&$Mutate $selection
+            try{$null=Assert-MultiplayerFixtureSelection -Selection $selection -EngineSha256 $Engine -FixtureCase 'library-multiplayer'}catch{return}
+            throw "standalone API client profile accepted opponent: $Name"
+          }
+          Assert-Rejected 'wrong engine' {param($s)$s['engine']['sha256']='A'*64}
+          Assert-Rejected 'engine argument differs' {} ('A'*64)
+          Assert-Rejected 'alpha missing' {param($s)$s['mods']=@($s['mods']|Where-Object {$_.name-cne'mir-fixture-mir5-api-alpha'})}
+          Assert-Rejected 'beta missing' {param($s)$s['mods']=@($s['mods']|Where-Object {$_.name-cne'mir-fixture-mir5-api-beta'})}
+          Assert-Rejected 'unexpected beta production' {param($s)$s['mods']=@($s['mods'])+@([ordered]@{name='mir-fixture-mir5-api-beta-production';version='0.1.0';enabled=$true})}
+          Assert-Rejected 'wrong current MIR archive' {param($s)$s['archive_sha256']['more-infinite-research_5.0.21000.zip']='A'*64}
+          Assert-Rejected 'wrong standalone observer projection' {param($s)$s['archive_sha256']['mir-fixture-mir5-active-mods-observer_0.1.0.zip']='A'*64}
+        '''
+        result = subprocess.run(
+            ["pwsh", "-NoLogo", "-NoProfile", "-Command", script],
+            capture_output=True, text=True,
+            env=dict(os.environ, MIR_TEST_WRAPPER=str(WRAPPER),
+                     MIR_TEST_STANDALONE_API_CLIENT_PROFILE=str(STANDALONE_F210_API_CONSUMERS_PROFILE)),
+            check=False,
+        )
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+
     def test_multiplayer_wrapper_admits_only_the_frozen_complete_api_client_profile(self):
         script = r'''
           $ErrorActionPreference='Stop'; Set-StrictMode -Version Latest
@@ -976,8 +1040,12 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
           $repo=$env:MIR_TEST_REPO
           $library=Join-Path $repo 'tests/fixtures/library-multiplayer'
           $observer=Join-Path $repo 'tests/fixtures/active-mods-observer'
+          $alpha=Join-Path $repo 'tests/fixtures/api-alpha'
+          $beta=Join-Path $repo 'tests/fixtures/api-beta'
           $accepted=@(Get-StandaloneIdentityFixtureSources -Sources @($library) -LibraryFixtureSource $library -StagedLibraryFixtureSource $library -StagedObserverSource $observer -RepoRoot $repo)
           if($accepted.Count-ne2 -or $accepted[0]-ine$library -or $accepted[1]-ine$observer){throw 'canonical observer was not appended exactly once'}
+          $apiAccepted=@(Get-StandaloneIdentityFixtureSources -Sources @($library,$observer,$alpha,$beta) -LibraryFixtureSource $library -StagedLibraryFixtureSource $library -StagedObserverSource $observer -RepoRoot $repo)
+          if($apiAccepted.Count-ne4-or$apiAccepted[0]-ine$library-or$apiAccepted[1]-ine$observer-or$apiAccepted[2]-ine$alpha-or$apiAccepted[3]-ine$beta){throw 'standalone API consumer sources were not retained through the normal projection'}
           function Assert-Rejects([string]$Name,[scriptblock]$Block){$rejected=$false;try{&$Block}catch{$rejected=$true};if(-not$rejected){throw "discovery observer source accepted opponent: $Name"}}
           $missingRepo=Join-Path $env:MIR_TEST_WORK 'missing-repository';$null=New-Item -ItemType Directory -Path (Join-Path $missingRepo 'tests/fixtures') -Force
           Assert-Rejects 'missing canonical observer' {Get-StandaloneIdentityFixtureSources -Sources @($library) -LibraryFixtureSource $library -StagedLibraryFixtureSource $library -StagedObserverSource $observer -RepoRoot $missingRepo|Out-Null}

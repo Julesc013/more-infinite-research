@@ -47,24 +47,7 @@ function Get-FixtureSha([string]$Path) {
   (Get-FileHash -LiteralPath $Path -Algorithm SHA256).Hash.ToUpperInvariant()
 }
 function Assert-DeclaredFixtureInputs([Collections.IDictionary]$ProfileDefinition,$EngineIdentity,[Collections.IDictionary]$ArchiveHashes) {
-  if($ProfileDefinition.Contains('engine')){
-    $declared=$ProfileDefinition['engine']
-    Assert-Fixture ($declared -is [Collections.IDictionary] -and $declared.Contains('version') -and $declared.Contains('sha256') -and
-      $declared['version'] -is [string] -and $declared['sha256'] -is [string] -and [string]$declared['sha256'] -cmatch '^[a-fA-F0-9]{64}$') 'profile engine metadata differs'
-    Assert-Fixture ([string]$declared['version'] -ceq [string]$EngineIdentity.base_version) 'profile engine base differs'
-    Assert-Fixture ([string]$declared['sha256'] -ceq [string]$EngineIdentity.sha256) 'profile engine hash differs'
-  }
-  if($ProfileDefinition.Contains('archive_sha256')){
-    $declared=$ProfileDefinition['archive_sha256']
-    Assert-Fixture ($declared -is [Collections.IDictionary]) 'profile archive metadata differs'
-    foreach($name in $ArchiveHashes.Keys){
-      if($declared.Contains($name)){
-        $expected=$declared[$name]
-        Assert-Fixture ($expected -is [string] -and [string]$expected -cmatch '^[a-fA-F0-9]{64}$') "profile selected archive hash is malformed: $name"
-        Assert-Fixture ([string]$expected -ceq [string]$ArchiveHashes[$name]) "profile selected archive hash differs: $name"
-      }
-    }
-  }
+  Assert-MIRDirectLibraryStartupDeclaredInputs -ProfileDefinition $ProfileDefinition -EngineIdentity $EngineIdentity -ArchiveHashes $ArchiveHashes -ErrorPrefix 'mir5-native-fixture'
 }
 function Assert-FixtureLog([string]$Text) {
   Assert-Fixture (-not [regex]::IsMatch($Text,'(?im)^\s*\d+[.]\d+\s+Error\b|^Error while running event\b|\bException at tick\b|\bnon-recoverable error\b|^stack traceback:$')) 'fatal native diagnostic'

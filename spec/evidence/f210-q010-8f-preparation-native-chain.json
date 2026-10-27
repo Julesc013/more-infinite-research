@@ -1,0 +1,175 @@
+{
+  "schema": 1,
+  "kind": "MIR5F210Q010FourArmPreparationAndResourceAdverseV1",
+  "status": "four-data-arms-completed-reference-equal-current-intent-and-menu-open",
+  "profile": "tests/profiles/bob-angel-full-space-age-standalone-f210-2123.json",
+  "loaded_selection_rows_without_mir": 37,
+  "arms": {
+    "upstream": {
+      "result_sha256": "D41AD1D22012EC9FB4525D00C871222F8C276BC4FFE99C952716B1053329BCA7",
+      "engine_sha256": "8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38",
+      "profile_sha256": "05F2786E896B1F28C2E4239134BA370B0C2BCF6CCB1384E03999FB0E89C8B980",
+      "dumps": {
+        "data_raw": {
+          "path": "write-data/script-output/data-raw-dump.json",
+          "bytes": 67302883,
+          "sha256": "3CEA9040B2ABCB5BD9E8615AC2866A798DACE7B6B31A999CB498B8CFCCA8AB92"
+        },
+        "mod_settings": {
+          "path": "write-data/script-output/mod-settings-dump.json",
+          "bytes": 36519,
+          "sha256": "3CED1BE6BBDDB651DE8D40CE5FAA76BCF41260B386238B0B1F3FA47C14C8B0AB"
+        }
+      },
+      "player_sha256": null
+    },
+    "published": {
+      "result_sha256": "E0B9A8A6473FFB1ED23365AA9F2C14F57A0DF411C6D10F46E112D9534DCC0CCA",
+      "engine_sha256": "8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38",
+      "profile_sha256": "05F2786E896B1F28C2E4239134BA370B0C2BCF6CCB1384E03999FB0E89C8B980",
+      "dumps": {
+        "data_raw": {
+          "path": "write-data/script-output/data-raw-dump.json",
+          "bytes": 67953508,
+          "sha256": "A8935196FBF9A58DA01BB26EFD739CE74941DB2885C6A1514E9379F64A33C3C1"
+        },
+        "mod_settings": {
+          "path": "write-data/script-output/mod-settings-dump.json",
+          "bytes": 1078518,
+          "sha256": "5385BE2E5B4ADD9EC17FAFEB7AB2A01FA60987AAEA849C77347618BD5E8CBBA4"
+        }
+      },
+      "player_sha256": "B6EB9430056ABD384DB00F94929FE7DAC0A37441ACF4BC277946689682628852"
+    },
+    "replay": {
+      "result_sha256": "428CDE05ADF89FE39B9660FD6D83C3D643FEA84C9DCDE97263F3A498330DBDDA",
+      "engine_sha256": "8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38",
+      "profile_sha256": "05F2786E896B1F28C2E4239134BA370B0C2BCF6CCB1384E03999FB0E89C8B980",
+      "dumps": {
+        "data_raw": {
+          "path": "write-data/script-output/data-raw-dump.json",
+          "bytes": 67953508,
+          "sha256": "D5514C623EB1925282D7F2950A00A77372C58815A73D9E32A00334E232E57F90"
+        },
+        "mod_settings": {
+          "path": "write-data/script-output/mod-settings-dump.json",
+          "bytes": 1078518,
+          "sha256": "BCC7E49EDA26DCACE46EC21A7E747FA999CC4042763B76D9403EDB595130F044"
+        }
+      },
+      "player_sha256": "1A921CA95C165A9D012F9CAA84BB873C6AB63F6B77D62AAE681CE1EF7C343E3E"
+    },
+    "current8f": {
+      "result_sha256": "8A6483B155EE6891AC0C21AFEB7CD6C28F005DF95B4CE6D0FB57CEAFF4CEF1BB",
+      "engine_sha256": "8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38",
+      "profile_sha256": "05F2786E896B1F28C2E4239134BA370B0C2BCF6CCB1384E03999FB0E89C8B980",
+      "dumps": {
+        "data_raw": {
+          "path": "write-data/script-output/data-raw-dump.json",
+          "bytes": 67502461,
+          "sha256": "E98ADF3D72E22F3845DC9B2F883D0E9072C53D5D57704933C4D8B7C07C71B753"
+        },
+        "mod_settings": {
+          "path": "write-data/script-output/mod-settings-dump.json",
+          "bytes": 787011,
+          "sha256": "B951E976DEE9027361778707786C6AD4397210D3E91903314A3A2F60DEF7A162"
+        }
+      },
+      "player_sha256": "8F858F6B7E604757DE84D960E7D7701021B956782C65A13978E3AFD711F7B071"
+    }
+  },
+  "player_source_tree": "44eadfad017440d384f0e932b0eecbcb991a5e40",
+  "replay_archive": {
+    "bytes": 1532319,
+    "path": "more-infinite-research_4.7.21003.zip",
+    "sha256": "1A921CA95C165A9D012F9CAA84BB873C6AB63F6B77D62AAE681CE1EF7C343E3E"
+  },
+  "published_replay_comparison_sha256": "7824C7B46249094C63B245B6485E17BD7CFB18743B07EBAE361E7D7838D8F6B3",
+  "adoption": "r05 adopted the exact successful r04 upstream/B6 captures and executed only the missing replay/current arms. The r04 caller replay-order refusal remains adverse.",
+  "caller_correction": {
+    "pr": "https://github.com/Julesc013/more-infinite-research/pull/1134",
+    "source": "9912dc0cf250a1a601bd77f7c750c1a58f984d0c",
+    "scope": "Canonicalize selected-archive identity order only; actual hashes and generated/native load order stay exact."
+  },
+  "custody": [
+    {
+      "path": "build/mir5/recovery-historical/bob-angel-q010-standalone-preparation-r04",
+      "manifest_sha256": "618CC68D6D1E887DF1A68D2D6524DED95749BAA285C692BD3A9692AAFFBC6808",
+      "original_and_primary_members_verified": 18
+    },
+    {
+      "path": "build/mir5/recovery-historical/bob-angel-q010-missing-arms-r05",
+      "manifest_sha256": "3B61AEB3A66AE472E5E39754CBE30991BAF877FD6F9794B2CD13897FDC1814F4",
+      "original_and_primary_members_verified": 29
+    },
+    {
+      "path": "build/mir5/recovery/q010-ordinary-menu-control-r01",
+      "manifest_sha256": "88331DFB8F5A16B4E40329E977197920228CC6ED141038307CB839398B2AA83F",
+      "original_and_primary_members_verified": 11
+    }
+  ],
+  "independent_oracle": {
+    "path": "build/mir5/recovery/menu-f210-intent-r01/bob-angel-f210-8dc-b6-oracle-r01.json",
+    "sha256": "6AEFF07252E2449ED049B0EDB8DFC17A0B4B4AEB19BF5E36D25A76DEA1F9E8AB",
+    "finding": "Every recovered profile field except capture_receipts equals the earlier independently recovered FE4 q010 B6 oracle. No8F data produced its expectations."
+  },
+  "current8f_comparison": {
+    "status": "different-intended-native-output",
+    "unreviewed_technology_rows": 39,
+    "unreviewed_settings_rows": 243,
+    "finding": "The strict comparison retains24 new signed-credit rows, two public additions and existing effect-order/name/art differences. Settings contain the separately adopted123 growth maxima and a real140-row visibility omission; some rows have both fields.",
+    "source_corrections": [
+      "PR1138 restores independently verified B6 visibility; affected fresh native qualification remains required.",
+      "PR1139 prepares seven native-art corrections. No blanket candidate-intent acceptance follows."
+    ]
+  },
+  "ordinary_menu_control": {
+    "status": "resource-budget-adverse-before-observed-response",
+    "mir_loaded": false,
+    "manifest_sha256": "88331DFB8F5A16B4E40329E977197920228CC6ED141038307CB839398B2AA83F",
+    "result_sha256": "B2299BD13C9E78E9DE2DC1AC971AC31BFA760FF81C15B4B3A8C9832536E286B1",
+    "resource_ledger_sha256": "19E8210D35214224F2A37DB25DDFE3F853CE8673092CA4B0FB0631AC4FF781C3",
+    "declared_peak_bytes": 6442450944,
+    "observed_peak_private_bytes": 8285151232,
+    "observed_peak_working_set_bytes": 2460893184,
+    "failure": "[mir441-resource-process-budget]",
+    "meaning": "The unmodded-MIR control reached sprite loading and exceeded its6GiB declaration. No ordinary-menu action response or scored sample is accepted; no MIR5 memory or speed conclusion follows."
+  },
+  "restoration": {
+    "original_candidate_sha256": "C563CB5B96C9E64CB3373BDB60CF5C8B7D3C97E93EADB8F924443C703CDC024D",
+    "published_sha256": "B6EB9430056ABD384DB00F94929FE7DAC0A37441ACF4BC277946689682628852",
+    "controls": {
+      "mod_list_json": {
+        "path": "D:\\Projects\\Factorio\\testmods\\2.1\\mod-list.json",
+        "exists": true,
+        "bytes": 39201,
+        "sha256": "48C46678CC8369DB15CC12CDFB23309EB076DC4433B76E9426083D0074BCCC91"
+      },
+      "mod_settings_dat": {
+        "path": "D:\\Projects\\Factorio\\testmods\\2.1\\mod-settings.dat",
+        "exists": true,
+        "bytes": 60744,
+        "sha256": "667897C514B66298A1E400058B65EA14EB36322D88864B98AE38E4C9B81387BC"
+      },
+      "active_profile_marker": {
+        "path": "D:\\Projects\\Factorio\\testmods\\2.1\\.mir-active-profile.json",
+        "exists": false,
+        "bytes": null,
+        "sha256": null
+      }
+    },
+    "factorio_process_count": 0
+  },
+  "limits": [
+    "Data-stage dump endpoints only, no gameplay/save/client/timing acceptance from these four captures.",
+    "A same-output diagnostic replay is a reference, never a player package or production compiler.",
+    "Independent current intent, fresh corrected inputs, owned-menu response and predeclared matched timing remain open."
+  ],
+  "receipts": {
+    "path": "spec/evidence/f210-q010-8f-preparation-native-receipts.json.gz",
+    "bytes": 197382,
+    "sha256": "C0F94AE0572E25D281DD4493E66A28D8005D5D10F151CB01E699E724E6D54944",
+    "uncompressed_sha256": "8E941A997A57E6E87918E12796F192A9D96450ED161F9CFE174AFD255C4C53E5",
+    "members": 13
+  }
+}

@@ -24,7 +24,7 @@ param(
   [string]$OutputRoot = '',
   [string]$ActiveModsObserver = '',
   [ValidateRange(1,300)][int]$TimeoutSeconds = 300,
-  [ValidateRange(1,8192)][int]$ExpectedPeakMemoryMiB = 2048,
+  [ValidateRange(1,10240)][int]$ExpectedPeakMemoryMiB = 2048,
   [ValidateRange(1,8192)][int]$MaxNewOutputMiB = 512,
   [ValidateSet(8,64)][int]$CounterbalancedBlocks = 8,
   [ValidateRange(0,300)][int]$AdmissionWaitSeconds = 0,
