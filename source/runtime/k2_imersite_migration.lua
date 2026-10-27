@@ -124,10 +124,14 @@ local function set_state(technology, state)
   technology.saved_progress = state.saved_progress
 end
 
-local function assert_queue_readback(force, names, current, progress)
+local function assert_queue_identity(force, names, current)
   if not same_names(queue_names(force), names) or current_name(force) ~= (current or names[1]) then
     error("MIR Imersite queue readback differs", 2)
   end
+end
+
+local function assert_queue_readback(force, names, current, progress)
+  assert_queue_identity(force,names,current)
   if force.research_progress ~= (current and progress or 0) then error("MIR Imersite progress readback differs", 2) end
 end
 
@@ -135,6 +139,7 @@ local function set_queue(force, names, current, progress)
   local rows = {}
   for _, id in ipairs(names) do rows[#rows+1] = assert(force.technologies[id], "MIR missing queued technology " .. id) end
   force.research_queue = rows
+  assert_queue_identity(force,names,current)
   -- Native progress has no setter when no technology is being researched.
   -- Detached work belongs to Technology.saved_progress, restored above.
   if current_name(force) ~= nil then force.research_progress = current and progress or 0 end

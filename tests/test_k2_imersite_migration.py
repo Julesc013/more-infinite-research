@@ -60,10 +60,16 @@ class ImersiteMigrationTests(unittest.TestCase):
                 if key == "research_queue" then
                   if values.reject_once then values.reject_once=false; error("opposing native queue refusal") end
                   values.research_queue=value; values.current_research=value[1]
+                  if values.corrupt_queue_current_once then
+                    values.current_research=technologies[values.corrupt_queue_current_once]
+                    values.corrupt_queue_current_once=nil
+                  end
                   if value[1] == nil then values.research_progress=0 end
                 elseif key == "research_progress" then
                   if values.current_research == nil then error("No research in progress") end
                   values.progress_writes=(values.progress_writes or 0)+1
+                  values.progress_write_currents=values.progress_write_currents or {}
+                  values.progress_write_currents[#values.progress_write_currents+1]=values.current_research.name
                   values.research_progress=value
                 else values[key]=value end
               end})
@@ -189,6 +195,19 @@ class ImersiteMigrationTests(unittest.TestCase):
           assert(next(records) == nil and rows[H].level == 6 and rows[H].saved_progress == .42 and rows[H].enabled)
           assert(rows[T].level == 4 and not rows[T].enabled and rows[T].visible_when_disabled)
           assert(force.current_research.name == T and #force.research_queue == 1 and force.research_progress == .42)
+          assert(math.abs(force.recipes["kr-imersite-powder"].productivity_bonus-bonus) < 1e-9)
+        ''')
+
+    def test_unexpected_queue_current_refuses_before_progress_write(self):
+        self.lua.execute('''
+          local force,rows,values = world(5)
+          values.corrupt_queue_current_once=E
+          local bonus,records=force.recipes["kr-imersite-powder"].productivity_bonus,{}
+          local ok,message=pcall(migration.reconcile_force,force,.02,records)
+          assert(not ok and tostring(message):find("queue readback differs",1,true))
+          assert(#values.progress_write_currents == 1 and values.progress_write_currents[1] == H)
+          assert(next(records) == nil and rows[H].level == 6 and rows[H].saved_progress == .42 and rows[H].enabled)
+          assert(force.current_research.name == H and #force.research_queue == 1 and force.research_progress == .42)
           assert(math.abs(force.recipes["kr-imersite-powder"].productivity_bonus-bonus) < 1e-9)
         ''')
 
