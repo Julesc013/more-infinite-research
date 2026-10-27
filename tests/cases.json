@@ -245,7 +245,7 @@
     {
       "id": "MIG-ORIGINS",
       "requirement": "MIG-05",
-      "assertion": "Every actual published 4.7.3 predecessor edition and every engine-valid published MIR 1.0.0-and-later origin on 2.0/2.1 has its own protected save direct upgrade, new research, saved successor and two cold reloads; later MIR 5 direct upgrades retain their supported-edition coverage.",
+      "assertion": "Every actual published 4.7.3 predecessor edition and every engine-valid published MIR 1.0.0-and-later origin on 2.0/2.1 has its own protected save direct upgrade, new research, saved successor and two cold reloads; later MIR 5 direct upgrades retain coverage for engine-valid origin/candidate pairs on supported editions.",
       "runner_kind": "native",
       "status": "not_run",
       "implementation_command": null
