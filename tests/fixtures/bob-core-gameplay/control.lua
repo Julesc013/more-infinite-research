@@ -270,11 +270,12 @@ local function fluid_storage_observation(machine)
   local recipe = selected and selected.name or "<none>"
   local count = machine.fluids_count
   local capacities = {}
-  if type(count) == "number" and count >= 0 and count == math.floor(count)
-      and count <= 16 and type(machine.get_fluid_capacity) == "function" then
-    for index = 1, count do
+  if type(count) == "number" and count >= 0 and count < math.huge
+      and count == math.floor(count) and type(machine.get_fluid_capacity) == "function" then
+    for index = 1, math.min(count, 16) do
       capacities[#capacities + 1] = tostring(machine.get_fluid_capacity(index))
     end
+    if count > 16 then capacities[#capacities + 1] = "<" .. tostring(count - 16) .. " not shown>" end
   else
     capacities[1] = "<not-queried>"
   end
@@ -288,7 +289,7 @@ local function assert_route_fluid_machine(machine, route, label, before)
   -- Static foundry geometry is independently fixed in data-final-fixes; here
   -- check usable exposed storage, then earn the exact fluid mass/output proof.
   local count = machine.fluids_count
-  local usable = type(count) == "number" and count >= 1 and count <= 16
+  local usable = type(count) == "number" and count >= 1 and count < math.huge
     and count == math.floor(count) and type(machine.get_fluid_capacity) == "function"
     and type(machine.get_fluid_count) == "function" and type(machine.insert_fluid) == "function"
   if usable then

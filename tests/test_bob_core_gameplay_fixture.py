@@ -449,8 +449,10 @@ class BobCoreGameplayFixtureTests(unittest.TestCase):
                 ("", ""),
                 ("different-storage-capacity:bob-copper-tungsten-alloy", ""),
                 ("different-storage-layout:bob-copper-tungsten-alloy", ""),
+                ("large-storage-layout:bob-copper-tungsten-alloy", ""),
                 ("zero-storage-capacity:bob-copper-tungsten-alloy", "native metallurgy fluid machine differs"),
                 ("unusable-second-storage:bob-copper-tungsten-alloy", "native metallurgy fluid machine differs"),
+                ("unusable-late-storage:bob-copper-tungsten-alloy", "native metallurgy fluid machine differs"),
                 ("wrong-output:bob-bronze-alloy", "native alloy output differs"),
                 ("wrong-output:bob-invar-alloy", "native alloy output differs"),
                 ("wrong-output:bob-nitinol-alloy", "native alloy output differs"),
@@ -501,6 +503,8 @@ class BobCoreGameplayFixtureTests(unittest.TestCase):
                     setmetatable(machine, {__index=function(_, key)
                       if key == "fluids_count" then
                         if route.category == "metallurgy" and machine.selected then
+                          if target == route.recipe and (kind == "large-storage-layout"
+                              or kind == "unusable-late-storage") then return 17 end
                           if target == route.recipe and (kind == "different-storage-layout"
                               or kind == "unusable-second-storage") then return 2 end
                           return 1
@@ -526,6 +530,7 @@ class BobCoreGameplayFixtureTests(unittest.TestCase):
                       end
                       if target == route.recipe and kind == "zero-storage-capacity" then return 0 end
                       if target == route.recipe and kind == "different-storage-capacity" then return 160 end
+                      if index == 17 and kind == "unusable-late-storage" then return 0 end
                       if index == 2 then return kind == "unusable-second-storage" and 0 or 40 end
                       return 80
                     end
@@ -891,7 +896,7 @@ class BobCoreGameplayFixtureTests(unittest.TestCase):
         runtime = source.index("assert_route_fluid_machine(machine, route, phase .. \" \" .. route.recipe, fluid_before)", begin_alloy)
         self.assertLess(before, selected)
         self.assertLess(selected, runtime)
-        self.assertIn("count <= 16", source)
+        self.assertIn("math.min(count, 16)", source)
 
 
 if __name__ == "__main__":
