@@ -72,7 +72,7 @@ local function repair_force(force, locations)
   end
   local repaired = 0
   for _, location in ipairs(researched_location_names(force, locations)) do
-    if force.is_space_location_unlocked(location) ~= true then
+    if force.is_space_location_unlocked(location) == false then
       force.unlock_space_location(location)
       repaired = repaired + 1
     end

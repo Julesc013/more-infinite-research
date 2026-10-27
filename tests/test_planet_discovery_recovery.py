@@ -175,6 +175,23 @@ class PlanetDiscoveryRecoveryTests(unittest.TestCase):
           assert(candidate.research_progress == .42 and candidate.unrelated == "keep")
         ''')
 
+    def test_missing_or_non_boolean_location_queries_never_unlock_a_location(self):
+        self.lua.execute(r'''
+          local nil_query, nil_state = force("nil-query", {
+            one=tech(true, {{type="unlock-space-location",space_location="nauvis"}}),
+          })
+          local non_boolean_query, non_boolean_state = force("non-boolean-query", {
+            one=tech(true, {{type="unlock-space-location",space_location="fulgora"}}),
+          })
+          function nil_query.is_space_location_unlocked(_) return nil end
+          function non_boolean_query.is_space_location_unlocked(_) return "unknown" end
+          game = {forces={nil_query=nil_query,non_boolean_query=non_boolean_query}}
+          local recovery = load_recovery("f210", "5.0.21000")
+          assert(recovery.apply(event("3.2.0", "5.0.21000")) == 0)
+          assert(nil_state.unlocks == 0 and non_boolean_state.unlocks == 0)
+          assert(nil_query.research_progress == .42 and non_boolean_query.unrelated == "keep")
+        ''')
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
