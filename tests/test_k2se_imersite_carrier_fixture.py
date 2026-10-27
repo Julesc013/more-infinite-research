@@ -15,10 +15,13 @@ FIXTURE = ROOT / "tests/fixtures/k2se-imersite-carrier-retention"
 BASE_PROFILE = ROOT / "tests/profiles/k2se-base-f210-2123.json"
 PUBLISHED_PROFILE = ROOT / "tests/profiles/k2se-imersite-carriers-published-4.7-f210-2123.json"
 SUCCESSOR_PROFILE = ROOT / "tests/profiles/k2se-imersite-carriers-mir5-f210-2123.json"
-FREEZE = ROOT / "spec/evidence/current-assets-1c90ceb7-readback.json"
+FREEZE = ROOT / "spec/evidence/current-assets-b251ae7a-aero-readback.json"
 ENGINE_SHA = "FE4A1DA30F322A0D0B8AEB3DF7276332222BAAA143E2352569B723E84B2B9060"
 PUBLISHED_SHA = "B6EB9430056ABD384DB00F94929FE7DAC0A37441ACF4BC277946689682628852"
-SUCCESSOR_SHA = "C563CB5B96C9E64CB3373BDB60CF5C8B7D3C97E93EADB8F924443C703CDC024D"
+SUCCESSOR_SHA = "E3A65C08AC7798A66FB1BE30D24307B17C8B366DD901953BDE2A09BD6939C8CE"
+SUCCESSOR_BYTES = 679250
+SUCCESSOR_SOURCE = "b251ae7a54104ace87cb0da4cf531cf53f03c93d"
+SUCCESSOR_SOURCE_TREE = "79b73a6a8e68987737e69bf2d95ec6555b49f901"
 EARLY = "mir-k2-imersite-staged-state-1"
 TAIL = "mir-k2-imersite-continuation-state-4"
 OBSERVER = "mir-fixture-mir5-active-mods-observer_0.1.0.zip"
@@ -179,8 +182,14 @@ class K2SEImersiteCarrierFixtureTests(unittest.TestCase):
                 self.assertEqual(base["archive_sha256"], archives)
                 self.assertEqual("A15A7D628D66953D2E0C4D4FA288F47CBF9C5678327C7EB3D23ADB5DC78331C0", archives[OBSERVER])
         freeze = json.loads(FREEZE.read_text(encoding="utf-8"))
+        self.assertEqual((SUCCESSOR_SOURCE, SUCCESSOR_SOURCE_TREE),
+                         (freeze["source"]["commit"], freeze["source"]["source_tree"]))
         asset = next(row for row in freeze["files"] if row["name"] == "more-infinite-research_5.0.21000.zip")
-        self.assertEqual((568598, SUCCESSOR_SHA), (asset["bytes"], asset["sha256"]))
+        self.assertEqual((SUCCESSOR_BYTES, SUCCESSOR_SHA), (asset["bytes"], asset["sha256"]))
+        scope = json.loads(SUCCESSOR_PROFILE.read_text(encoding="utf-8"))["scope"]
+        for expected in (SUCCESSOR_SOURCE, SUCCESSOR_SOURCE_TREE, SUCCESSOR_SHA, f"{SUCCESSOR_BYTES} bytes"):
+            self.assertIn(expected, scope)
+        self.assertNotIn("C563CB5B96C9E64CB3373BDB60CF5C8B7D3C97E93EADB8F924443C703CDC024D", scope)
 
     def test_data_preflight_checks_both_hidden_rows_without_fixture_mutation(self):
         for stage in ("published-4.7", "mir5"):
@@ -242,7 +251,8 @@ class K2SEImersiteCarrierFixtureTests(unittest.TestCase):
 
     def test_readme_limits_the_fixture_to_native_saved_state_retention(self):
         readme = (FIXTURE / "README.md").read_text(encoding="utf-8")
-        for text in (PUBLISHED_SHA, SUCCESSOR_SHA, "not laboratory-earned historical evidence", "K2SO runtime bridge",
+        for text in (PUBLISHED_SHA, SUCCESSOR_SHA, SUCCESSOR_SOURCE, SUCCESSOR_SOURCE_TREE, f"{SUCCESSOR_BYTES} bytes",
+                     "not laboratory-earned historical evidence", "K2SO runtime bridge",
                      "A15 and canonical 2E1", "Native execution remains required"):
             self.assertIn(text, readme)
 
