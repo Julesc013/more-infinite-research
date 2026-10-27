@@ -180,9 +180,13 @@ local function marker(stage, state, expected)
   }))
 end
 
-local function save(stage, state, expected)
-  marker(stage, state, expected)
+local function save_initial(state, expected)
+  marker("initial", state, expected)
   game.server_save(SAVE)
+end
+
+local function mark_reload(state, expected)
+  marker("reload", state, expected)
 end
 
 local function setup_foreign(expected)
@@ -224,10 +228,11 @@ function M.apply(stage)
     local player_state = assert_owner(player, expected, stage, "canonical player")
     local foreign = setup_foreign(expected)
     local foreign_state = assert_foreign(foreign, expected, stage, "canonical foreign")
-    local state = {phase = "canonical-complete", player = player_state, foreign = foreign_state,
+    -- The create-only seed is not a server save. Keep this state pending
+    -- until the first actual server tick can emit INITIAL and save it.
+    local state = {phase = "canonical-prepared", player = player_state, foreign = foreign_state,
       foreign_index = foreign.index, stage = stage}
     storage[KEY] = state
-    save("initial", state, expected)
   end)
 
   script.on_configuration_changed(function()
@@ -241,8 +246,9 @@ function M.apply(stage)
     local foreign_state = assert_foreign(foreign, expected, stage, stage .. " foreign")
     assert_player_snapshot(player, state.player, stage, stage .. " player")
     assert_foreign_snapshot(foreign_state, state.foreign, stage, stage .. " foreign")
-    state.player, state.foreign, state.phase, state.stage = player, foreign_state, stage .. "-complete", stage
-    save("initial", state, expected)
+    -- The configuration callback also precedes this leg's first server tick;
+    -- it cannot produce the server-backed initial result.
+    state.player, state.foreign, state.phase, state.stage = player, foreign_state, stage .. "-prepared", stage
   end)
 
   script.on_load(function()
@@ -253,17 +259,32 @@ function M.apply(stage)
   end)
 
   script.on_event(defines.events.on_tick, function()
-    if not reload_requested or reload_logged then return end
     local state = storage[KEY]
-    if type(state) ~= "table" or state.phase ~= stage .. "-complete" or state.stage ~= stage then
+    if type(state) ~= "table" or state.stage ~= stage then
       fail("cold reload changed fixture phase")
     end
+    if state.phase == stage .. "-prepared" then
+      -- This is the first tick of the real server leg. Complete the seed only
+      -- after every live state assertion has passed, then create the input
+      -- consumed by the two read-only cold reloads.
+      check_closure(expected)
+      local player = assert_owner(game.forces.player, expected, stage, "initial server player")
+      local foreign = assert_foreign(game.forces[state.foreign_index], expected, stage, "initial server foreign")
+      assert_player_snapshot(player, state.player, stage, "initial server player")
+      assert_foreign_snapshot(foreign, state.foreign, stage, "initial server foreign")
+      state.player, state.foreign, state.phase = player, foreign, stage .. "-complete"
+      save_initial(state, expected)
+      reload_requested, reload_logged = false, true
+      return
+    end
+    if state.phase ~= stage .. "-complete" then fail("cold reload changed fixture phase") end
+    if not reload_requested or reload_logged then return end
     check_closure(expected)
     local player = assert_owner(game.forces.player, expected, stage, "cold reload player")
     local foreign = assert_foreign(game.forces[state.foreign_index], expected, stage, "cold reload foreign")
     assert_player_snapshot(player, state.player, stage, "cold reload player")
     assert_foreign_snapshot(foreign, state.foreign, stage, "cold reload foreign")
-    marker("reload", state, expected)
+    mark_reload(state, expected)
     reload_logged = true
   end)
 end
