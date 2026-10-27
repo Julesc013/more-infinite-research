@@ -19,6 +19,12 @@ SCIENCE = [
     ["logistic-science-pack", 1],
     ["production-science-pack", 1],
 ]
+EXTRA_SCIENCE = {
+    "recipe-prod-research_belts-1": [["space-science-pack", 1]],
+    "recipe-prod-research_inserters-1": [["space-science-pack", 1]],
+    "recipe-prod-research_bullets-1": [["military-science-pack", 1], ["space-science-pack", 1]],
+    "recipe-prod-research_rockets-1": [["military-science-pack", 1]],
+}
 SETTING = "ips-enable-research_breeding"
 CATALOGUE_MODULE = "__mir-fixture-mir5-migration-origin-f200-100-source__/catalogue"
 
@@ -42,20 +48,24 @@ def lua(runtime, value):
 
 
 class MigrationOriginF200SourceControls(unittest.TestCase):
-    def source_technology(self, name, recipe):
+    def source_technology(self, name, recipe, science=None):
         return {
             "type": "technology", "name": name, "level": 1, "upgrade": True,
             "max_level": "infinite", "enabled": True,
             "unit": {"count_formula": "8000 * 2^(L-1)", "time": 60,
-                     "ingredients": copy.deepcopy(SCIENCE)},
+                     "ingredients": copy.deepcopy(SCIENCE if science is None else science)},
             "effects": [{"type": "change-recipe-productivity", "recipe": recipe, "change": .10}],
         }
 
     def source_raw(self):
-        return {"technology": {
+        rows = {
             DIRECT: self.source_technology(DIRECT, "iron-gear-wheel"),
             SECONDARY: self.source_technology(SECONDARY, "plastic-bar"),
-        }, "sentinel": {"unchanged": 17}}
+        }
+        for name, extras in EXTRA_SCIENCE.items():
+            rows[name] = self.source_technology(
+                name, f"fixture-{name}", SCIENCE + extras)
+        return {"technology": rows, "sentinel": {"unchanged": 17}}
 
     def run_data(self, raw, mods, breeding=False):
         path = (FIXTURE / "data-final-fixes.lua").as_posix()
@@ -66,7 +76,9 @@ class MigrationOriginF200SourceControls(unittest.TestCase):
               minimum_rows=2,direct="recipe-prod-research_gears-1",unavailable_space_age_setting="ips-enable-research_breeding",
               source_formula="8000 * 2^(L-1)",source_time=60,
               source_science={["automation-science-pack"]=1,["chemical-science-pack"]=1,
-                ["logistic-science-pack"]=1,["production-science-pack"]=1}}
+                ["logistic-science-pack"]=1,["production-science-pack"]=1},
+              source_science_extras={belts={"space-science-pack"},inserters={"space-science-pack"},
+                bullets={"military-science-pack","space-science-pack"},rockets={"military-science-pack"}}}
             local env={data={raw=raw},mods=mods,settings={startup={
               ["ips-enable-research_breeding"]={value=breeding}}}}
             env.require=function(name) assert(name=="__mir-fixture-mir5-migration-origin-f200-100-source__/catalogue");return catalogue end
@@ -89,10 +101,18 @@ class MigrationOriginF200SourceControls(unittest.TestCase):
         self.assertEqual((None, "8000 * 2^(L-1)", 60),
                          (secondary.get("count"), secondary.get("count_formula"), secondary["time"]))
         self.assertEqual(SCIENCE, accepted["raw"]["technology"][DIRECT]["unit"]["ingredients"])
+        for name, extras in EXTRA_SCIENCE.items():
+            with self.subTest(name=name):
+                self.assertEqual(SCIENCE + extras,
+                                 accepted["raw"]["technology"][name]["unit"]["ingredients"])
         self.assertEqual(17, accepted["raw"]["sentinel"]["unchanged"])
 
         wrong_science = self.source_raw()
         wrong_science["technology"][SECONDARY]["unit"]["ingredients"][1][0] = "foreign-science-pack"
+        missing_extra = self.source_raw()
+        missing_extra["technology"]["recipe-prod-research_bullets-1"]["unit"]["ingredients"].pop()
+        unexpected_extra = self.source_raw()
+        unexpected_extra["technology"][DIRECT]["unit"]["ingredients"].append(["military-science-pack", 1])
         duplicate_science = self.source_raw()
         duplicate_science["technology"][SECONDARY]["unit"]["ingredients"][1] = \
             duplicate_science["technology"][SECONDARY]["unit"]["ingredients"][0][:]
@@ -106,6 +126,8 @@ class MigrationOriginF200SourceControls(unittest.TestCase):
                                                               "ingredients": copy.deepcopy(SCIENCE)}},
                                       SECONDARY: self.source_technology(SECONDARY, "plastic-bar")}}, mods, False),
             ("science", wrong_science, mods, False),
+            ("missing-extra", missing_extra, mods, False),
+            ("unexpected-extra", unexpected_extra, mods, False),
             ("duplicate-science", duplicate_science, mods, False),
             ("gear-effect", wrong_effect, mods, False),
         )

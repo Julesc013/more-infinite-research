@@ -16,4 +16,13 @@ return {
     ["logistic-science-pack"] = 1,
     ["production-science-pack"] = 1,
   },
+  -- Exact F200-effective extras from the published 1.0.0
+  -- prototypes/util.lua `EXTRA` map.  Agricultural science is absent on
+  -- F200, so the rocket stream retains only its available military extra.
+  source_science_extras = {
+    belts = {"space-science-pack"},
+    inserters = {"space-science-pack"},
+    bullets = {"military-science-pack", "space-science-pack"},
+    rockets = {"military-science-pack"},
+  },
 }

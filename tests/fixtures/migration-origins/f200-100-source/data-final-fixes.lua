@@ -23,6 +23,18 @@ local function science_map(value)
   return actual
 end
 
+local function expected_science(name)
+  local result = {}
+  for pack, amount in pairs(catalogue.source_science) do result[pack] = amount end
+  local key = name:sub(#catalogue.technology_prefix + 1, #name - #catalogue.technology_suffix)
+  for _, pack in ipairs(catalogue.source_science_extras[key] or {}) do
+    assert(result[pack] == nil,
+      "[mir5-migration-origin-f200-100-source] source science extra duplicates a base pack: " .. name)
+    result[pack] = 1
+  end
+  return result
+end
+
 local roster = {}
 for name, value in pairs(data.raw.technology or {}) do
   if name:sub(1, #catalogue.technology_prefix) == catalogue.technology_prefix then
@@ -36,7 +48,7 @@ for name, value in pairs(data.raw.technology or {}) do
     assert(unit.count_formula == catalogue.source_formula and unit.time == catalogue.source_time,
       "[mir5-migration-origin-f200-100-source] source roster formula differs: " .. name)
     local actual_science = science_map(unit.ingredients)
-    for pack, amount in pairs(catalogue.source_science) do
+    for pack, amount in pairs(expected_science(name)) do
       assert(actual_science[pack] == amount,
         "[mir5-migration-origin-f200-100-source] source roster science differs: " .. name)
       actual_science[pack] = nil
