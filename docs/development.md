@@ -5,7 +5,7 @@ applies_to: "MIR development"
 audience: developer
 doc_type: how-to
 owner: mir-maintainers
-last_reviewed: 2026-10-27
+last_reviewed: 2026-10-28
 supersedes: []
 superseded_by: []
 source_of_truth_for:
@@ -89,7 +89,7 @@ python tools/package.py --source source --version 5.0.21001 --output ../mir-loca
 
 A higher private version can complicate selecting a later official build. Keeping MIR's name preserves identity, not proof that your changed prototypes/effects are save-compatible. Preserve the original save and matching archives/settings before testing; switching back to an official ZIP is not an automatic undo. Factorio records applied migration filenames per save, so rebuilding a ZIP does not rerun an already applied migration. Do not rename migrations to force replay; see the [native migration rules](https://lua-api.factorio.com/latest/auxiliary/migrations.html).
 
-Maintain the shared cumulative migration set under the [migration contract](../spec/migrations.md#required-origin-coverage). The modern qualification matrix starts at MIR 1.0.0, whose published tag targets Factorio 2.0, and covers every applicable published origin rather than only MIR 4.7.3 or selected changelog entries. Recover actual historical filenames, mappings and necessary schema readers without restoring retired subsystems. A new filename is required for new exactly-once work on saves that already applied an older migration; idempotent current reconciliation is a separate responsibility. For every release, preserve origin saves, qualify direct upgrades into the candidate and record engine/edition limits explicitly.
+Maintain the shared cumulative migration set under the [migration contract](../spec/migrations.md#required-origin-coverage). The retained modern-origin inventory starts at MIR 1.0.0, whose tag targets Factorio 2.0, and includes all applicable published origins. For 5.0.0 prioritize exact 4.7.3 stable-edition upgrades and each materially distinct known older identity/effect/settings/schema/ownership boundary; unchanged patch labels do not require separate bespoke migration files or campaigns. Unknown histories remain explicitly deferred/unverified, not guessed or counted as passed. Recover actual filenames, mappings and necessary readers without restoring retired subsystems. A new filename is required for new exactly-once work on saves that already applied an older migration; idempotent current reconciliation is separate. Preserve origin saves and keep future MIR 5 forward-upgrade obligations, exact evidence and engine/edition limits.
 
 Before sharing a proposed change upstream, inspect the plan, run the narrow affected controls and repository checks, and commit the bounded change. Create your own GitHub fork when ready to contribute, add its URL as a separate remote, push the feature branch there and open a PR targeting official dev. Keep personal version/branding edits out of an unrelated upstream fix. Official repository push permission is unnecessary for a local build or contribution. A local package, passing host control or successful load is not release, compatibility or native acceptance. Keep original saves and use a disposable profile for experiments.
 
