@@ -29,7 +29,7 @@
   ],
   "archive_sha256": {
     "more-infinite-research_1.1.0.zip": "6395C4A5A0F74C67729746D0FBF6162329978B47C5C29D54CC0045F2977C7E44",
-    "mir-fixture-mir5-migration-origin-f200-110-source_0.1.0.zip": "PENDING_RAW_GIT_FIXTURE_ARCHIVE"
+    "mir-fixture-mir5-migration-origin-f200-110-source_0.1.0.zip": "1CFAF4C3C3FBC3E3C9B47B85018C3D159D7EEA0270B42532511EC3A74A8E7488"
   },
   "scope": "Prepared exact official MIR 1.1.0 F200 source stage: all observed published F200 rows/defaults, thirty labelled seeds, one real gear laboratory completion, source recipe/robot-battery facts, queued and detached source state, save and two read-only reloads. A same-engine or F210 MIR5 successor remains separately pending; this profile is not a migration or current-package pass."
 }

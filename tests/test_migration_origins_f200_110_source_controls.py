@@ -192,6 +192,8 @@ class MigrationOriginF200110SourceControls(unittest.TestCase):
                          (profile["origin_tag"], profile["origin_source_commit"], profile["engine"]["version"], profile["engine"]["sha256"]))
         self.assertEqual("6395C4A5A0F74C67729746D0FBF6162329978B47C5C29D54CC0045F2977C7E44",
                          profile["archive_sha256"]["more-infinite-research_1.1.0.zip"])
+        self.assertEqual("1CFAF4C3C3FBC3E3C9B47B85018C3D159D7EEA0270B42532511EC3A74A8E7488",
+                         profile["archive_sha256"]["mir-fixture-mir5-migration-origin-f200-110-source_0.1.0.zip"])
         self.assertEqual({"README.md", "catalogue.lua", "control.lua", "data-final-fixes.lua", "info.json"},
                          {path.name for path in FIXTURE.iterdir() if path.is_file()})
         self.assertIn("not a migration pass", (FIXTURE / "README.md").read_text(encoding="utf-8"))
