@@ -197,8 +197,11 @@
       "state_obligation_disposition": "No control.lua exists in the 1.0.0 tag tree. Absent migration Lua is not proof that a source save has no obligation; preserve data-stage identities and require native source-save evidence."
     },
     "intermediate_1_to_3_runtime_schema_evolution": {
-      "status": "pending",
-      "scope": "This unit records each tag's info.json and migration-member bodies, not a completed control.lua/runtime-state evolution audit for every intermediate 1.x-3.x tag."
+      "status": "39-modern-tag-control-topologies-and-representative-writers-characterized-not-archive-save-native-qualified",
+      "scope": "19 F200 and20 F210 direct-current-engine MIR1-MIR3 tag sources; seven data-only, seven legacy wrappers,25 stage wrappers. The25 older-engine origins remain outside this runtime audit.",
+      "receipt": "spec/evidence/historical-modern-tag-runtime-boundaries.json",
+      "receipt_sha256": "39BA333B289F504AC32D299AB7CEF915BE84BB54D6410A60B654A32E974D1781",
+      "remaining": "Published-body and protected-source-save equivalence, every actual source/candidate/save/two-reload route, and field-specific recovery applicability remain separate obligations."
     },
     "published_boolean_cap_controllers": {
       "status": "eight-public-original-archive-bodies-verified-not-native-qualified",
@@ -3255,7 +3258,7 @@
     "Exact 1.0.0 is F200-direct by its info.json factorio_version 2.0 and must not be moved into the older-engine bridge population.",
     "The 25 non-F200/F210 tag origins remain explicit best-effort bridge cases. Existing F017/F100/F110 evidence is useful only at its recorded exact inputs.",
     "Existing MIR4 source and cross-engine chains are retained as scoped reuse candidates, not relabelled as current 5.x acceptance.",
-    "Intermediate 1.x-3.x control.lua/runtime schema evolution is not inferred from the absence of migration Lua and remains pending source-boundary audit.",
+    "The39 modern MIR1-MIR3 tag control topologies and13 representative writer modules are recorded in historical-modern-tag-runtime-boundaries.json. Published archive bodies, actual saved-state ownership and native upgrades are not inferred; the25 older-engine runtime origins remain outside that audit.",
     "No fixture, save, profile, package, direct library, engine, or artifact is changed by this inventory.",
     "All 18 MIR4 release records and their 36 modern archives now have byte-verified identities and actual info/controller observations. Protected source-save availability, per-origin state oracles and native upgrades remain pending except for separately recorded exact scoped evidence.",
     "Early MIR4 raw source info.json can retain an earlier product version; do not construct a historical distribution by repackaging that raw metadata or infer package eligibility from it. Verify the published archive and its actual info.json.",
