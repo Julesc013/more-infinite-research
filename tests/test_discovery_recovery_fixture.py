@@ -208,6 +208,10 @@ function discovery_flow(helper_path, source_path, successor_path, source_mir, so
   local ok,result=invoke('init');if not ok then return {ok=false,message=result,labs=game.lab_count,state=storage.mir5_discovery_recovery_fixture or {}} end
   local source_create_saves=saves
   if opponent=='source-create-save' and saves~=0 then return {ok=false,message='create-only was saved'} end
+  -- Factorio calls on_load when this server begins, before the first native
+  -- completion.  A later normal tick must not mislabel that initial load as
+  -- a reload of the completed save.
+  ok,result=invoke('load');if not ok then return {ok=false,message=result} end
   local discovery=player.technologies['planet-discovery-vulcanus'];discovery.researched=true;player.locations.vulcanus=true
   player.current_research=nil;player.research_queue={};player.research_progress=0
   local source_scripted=opponent=='source-scripted-event'
@@ -223,6 +227,9 @@ function discovery_flow(helper_path, source_path, successor_path, source_mir, so
     player.technologies['recipe-prod-research_iron-1'].saved_progress=.17
   end
   ok,result=tick();if not ok then return {ok=false,message=result} end
+  local source_initial_markers=#markers
+  ok,result=tick();if not ok then return {ok=false,message=result} end
+  if #markers~=source_initial_markers then return {ok=false,message='source ordinary tick emitted reload marker'} end
   local source_phase=storage.mir5_discovery_recovery_fixture.phase
   local source_reload,error=load_control(source_path,'source');if source_reload==nil then return {ok=false,message=error} end
   ok,result=invoke('load');if not ok then return {ok=false,message=result} end
@@ -235,6 +242,7 @@ function discovery_flow(helper_path, source_path, successor_path, source_mir, so
   if opponent=='saved-progress-loss' then player.technologies['recipe-prod-research_iron-1'].saved_progress=.18 end
   local before_labs=game.lab_count
   local successor;successor,message=load_control(successor_path,'successor');if successor==nil then return {ok=false,message=message} end
+  ok,result=invoke('load');if not ok then return {ok=false,message=result} end
   ok,result=invoke('changed');if not ok then return {ok=false,message=result,labs=game.lab_count,before_labs=before_labs,state=storage.mir5_discovery_recovery_fixture or {}} end
   local iron=player.technologies['recipe-prod-research_iron-1'];iron.level=4;player.current_research=nil;player.research_queue={};player.research_progress=0;player.reset_technology_effects()
   if opponent~='candidate-no-consumption' then
@@ -253,11 +261,15 @@ function discovery_flow(helper_path, source_path, successor_path, source_mir, so
   end
   ok,result=tick();if not ok then return {ok=false,message=result} end
   local final=storage.mir5_discovery_recovery_fixture
-  for _=1,2 do
-    local reload,error=load_control(successor_path,'successor');if reload==nil then return {ok=false,message=error} end
-    ok,result=invoke('load');if not ok then return {ok=false,message=result} end
-    ok,result=tick();if not ok then return {ok=false,message=result} end
-  end
+  local successor_initial_markers=#markers
+  ok,result=tick();if not ok then return {ok=false,message=result} end
+  if #markers~=successor_initial_markers then return {ok=false,message='successor ordinary tick emitted reload marker'} end
+  local reload,error=load_control(successor_path,'successor');if reload==nil then return {ok=false,message=error} end
+  ok,result=invoke('load');if not ok then return {ok=false,message=result} end
+  ok,result=tick();if not ok then return {ok=false,message=result} end
+  local successor_reload_markers=#markers
+  ok,result=tick();if not ok then return {ok=false,message=result} end
+  if #markers~=successor_reload_markers then return {ok=false,message='successor cold reload emitted more than one marker'} end
   return {ok=true,saves=saves,source_create_saves=source_create_saves,markers=markers,labs=game.lab_count,state=final,player_bonus=player.recipes['iron-plate'].productivity_bonus,
     foreign_locked=not game.forces[2].locations.vulcanus,foreign_progress=game.forces[2].research_progress}
 end
@@ -319,11 +331,11 @@ end
                 self.assertAlmostEqual(.3, result["player_bonus"])
                 self.assertTrue(result["foreign_locked"])
                 self.assertEqual(.27, result["foreign_progress"])
-                self.assertEqual(["initial", "reload", "initial", "reload", "reload"], [row["stage"] for row in result["markers"]])
-                self.assertEqual(["discovery-recovery"] * 5, [row["case"] for row in result["markers"]])
-                self.assertEqual(["source", "source", "successor", "successor", "successor"],
+                self.assertEqual(["initial", "reload", "initial", "reload"], [row["stage"] for row in result["markers"]])
+                self.assertEqual(["discovery-recovery"] * 4, [row["case"] for row in result["markers"]])
+                self.assertEqual(["source", "source", "successor", "successor"],
                                  [row["fixture_role"] for row in result["markers"]])
-                self.assertEqual([source_version] * 5, [row["source_version"] for row in result["markers"]])
+                self.assertEqual([source_version] * 4, [row["source_version"] for row in result["markers"]])
                 self.assertEqual((1, 1), (result["markers"][0]["source_actual_labs"], result["markers"][2]["successor_actual_labs"]))
                 self.assertEqual(3, result["markers"][0]["source_scripted_iron_level"])
                 self.assertAlmostEqual(.2, result["markers"][0]["source_scripted_iron_plate_bonus"])

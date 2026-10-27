@@ -357,6 +357,10 @@ local function complete_source(state)
   assert_source_snapshot(player, state.player, "source player", false)
   assert_source_snapshot(foreign, state.foreign, "foreign", true)
   state.phase = "source-complete"
+  -- An initial server load may already have armed this local callback before
+  -- the first source lab completes.  Only a later cold load may report a
+  -- reload observation for the completed save.
+  loaded, reload_reported = false, false
   marker("initial", state)
   game.server_save(SAVE)
 end
@@ -401,6 +405,9 @@ local function complete_successor(state)
   successor.player_after = snapshot(player, "successor player")
   successor.foreign_after = snapshot(foreign, "successor foreign")
   successor.phase = "successor-complete"
+  -- See the matching source completion boundary above: a completed save is
+  -- not a cold reload merely because the server continues ticking.
+  loaded, reload_reported = false, false
   marker("initial", state, successor)
   game.server_save(SAVE)
 end
