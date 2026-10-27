@@ -13,6 +13,8 @@ This is the authoritative product changelog. Each MIR 1–3 master release appea
 - Keep native bonuses separate from event-driven agriculture, spoilage and bounded passive repair.
 - Provide the MIR API for immediate data-stage publication and detached read-only runtime queries, with bounded copying of external definitions.
 - Retain the Research Library, personal views, settings export and translations; explain named unavailable features without reconstructing research at runtime.
+- Separate unified source versions and changelog history from portal distribution numbers for the nine selected editions; retain extended numbers for F001–F012 and F018.
+- Establish reusable historical migration inputs for the MIR5 baseline and retain cumulative migration steps for later direct upgrades.
 
 ### Compatibility
 

@@ -15,6 +15,10 @@ Version: @DISTRIBUTION_VERSION@
       external definitions.
     - Retain the Research Library, personal views, settings export and translations; explain named unavailable features without
       reconstructing research at runtime.
+    - Separate unified source versions and changelog history from portal distribution numbers for the nine selected editions; retain
+      extended numbers for F001–F012 and F018.
+    - Establish reusable historical migration inputs for the MIR5 baseline and retain cumulative migration steps for later direct
+      upgrades.
 
   Compatibility:
 

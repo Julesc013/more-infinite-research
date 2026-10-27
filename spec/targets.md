@@ -34,7 +34,7 @@ MIR5 completion takes precedence over speculative additions. Parity, useful supp
 
 Choose the next ready task using this order. Independent lower-priority preparation may proceed while a higher-priority assignment runs or awaits indispensable inputs, provided it does not delay that assignment or compete for its resources. Scheduling priority does not change edition scope, supported capability subsets or release acceptance.
 
-Build F200 for 2.0.77 and eight historical normal editions, including selected F018/0.18.47, from the same shared implementation, retaining their delivered capability subsets, the existing edition version encoding and stable mod/technology/migration identities. Keep common feature behavior, setting identities and meanings, and presentation consistent where native capabilities permit; isolate engine differences in the selected adapters. Run final current-package and affected native checks for every delivered target subset before release, reusing exact unchanged evidence under its original inputs and verdicts. Earlier normal editions retain their actual capability subsets; F006–F012 remain separately labelled best-effort builds. F210 priority does not authorize an unqualified normal edition or silently narrow the release scope. State unresolved gaps by edition; all applicable native, upgrade/save/client, performance and delivery requirements remain binding.
+Build F200 for 2.0.77 and eight historical normal editions, including selected F018/0.18.47, from the same shared implementation, retaining their delivered capability subsets and stable mod/technology/migration identities under the source/portal/extended version policy below. Keep common feature behavior, setting identities and meanings, and presentation consistent where native capabilities permit; isolate engine differences in the selected adapters. Run final current-package and affected native checks for every delivered target subset before release, reusing exact unchanged evidence under its original inputs and verdicts. Earlier normal editions retain their actual capability subsets; F006–F012 remain separately labelled best-effort builds. F210 priority does not authorize an unqualified normal edition or silently narrow the release scope. State unresolved gaps by edition; all applicable native, upgrade/save/client, performance and delivery requirements remain binding.
 
 ## Baseline targets, not new qualification
 
@@ -54,7 +54,29 @@ The previous release records identify these nine target editions. Their identifi
 
 Verify each current executable, official mods and consumed API against the actual local environment. The inherited source recorded 2.1.14 documentation; this revision observed official latest pages labelled 2.1.23. Neither observation is native qualification. Exact-version URL retrieval was unavailable; native work must pin and record the consumed target documentation. Do not silently chase a newer experimental binary during a frozen comparison.
 
-`TGT-02` — `factorio_version` is the family and the `base >= x.y.z` dependency is the declared patch minimum. Preserve the distribution codec `100 * target_code + source_patch`, padded to five digits, unless deliberately replaced with full migration/release review. Patch digits are not RC/build counters. Check internal root, archive filename, info metadata, changelog and release label together. [Mod structure](https://lua-api.factorio.com/latest/auxiliary/mod-structure.html)
+`TGT-02` — `factorio_version` is the two-part engine family and the `base >= x.y.z` dependency is the declared patch minimum. The maintainer's 27 October 2026 decision requires three explicit version forms: source `MAJOR.MINOR.PATCH`; portal distribution `MAJOR.MINOR.(10 * PATCH + edition_digit)`, with at least two digits in the third component; and extended distribution `MAJOR.MINOR.(100 * CCC + PATCH)`, padded to five digits. Use the fixed table below to choose a distribution form; never guess the source release or target from a bare third component. Patch digits identify the source patch, never a retry or RC counter. Source patch is limited to 0–99 for a release including extended editions; advance the minor release before overflow. Reject invalid or colliding target mappings and any numeric component outside Factorio's 0–65535 range before writing output. [Mod structure](https://lua-api.factorio.com/latest/auxiliary/mod-structure.html)
+
+## Source, portal and extended versions
+
+| Edition | Distribution form | Fixed portal digit | Source 5.0.0 package version |
+|---|---|---|---|
+| F001–F012 | Extended | None | 5.0.00100 through 5.0.01200, when buildable |
+| F013 | Portal | 1 | 5.0.01 |
+| F014 | Portal | 2 | 5.0.02 |
+| F015 | Portal | 3 | 5.0.03 |
+| F016 | Portal | 4 | 5.0.04 |
+| F017 | Portal | 5 | 5.0.05 |
+| F018 | Extended | None | 5.0.01800 |
+| F100 | Portal | 6 | 5.0.06 |
+| F110 | Portal | 7 | 5.0.07 |
+| F200 | Portal | 8 | 5.0.08 |
+| F210 | Portal | 9 | 5.0.09 |
+
+For source 5.0.1, F210 is 5.0.19 and F018 is 5.0.01801; for source 5.0.10, they are 5.0.109 and 5.0.01810. Portal digits are stable edition identities, not priority positions. Do not reassign them when editions are added or omitted. F018 remains a normal build/qualification obligation despite using extended distribution numbering. Early-edition buildability and best-effort limits remain unchanged.
+
+Canonical editable metadata, Git tags, release titles and authored/generated changelog history use the unified source version, including the changelog shipped inside each player ZIP. A selected package's `info.json`, ZIP filename/root, inventory and target distribution metadata use its exact portal or extended version; the runtime API continues reporting the actual installed package version through its existing product-version field. Validate the relationship between these fields rather than forcing a source changelog header to equal the encoded package number. All editions carry the same complete source history. Do not rewrite historical changelog sections, published package bytes, migration filenames, tags or receipts to fit this new scheme.
+
+Portal-numbered editions are the normal Mod Portal selection for the maintainer. F001–F012 and F018 remain extended and GitHub-oriented, with any exceptional Mod Portal publication a separate maintainer action. The name of a version form grants no agent Mod Portal publication authority; agent releases remain GitHub-only.
 
 ## Package contract
 
@@ -88,7 +110,7 @@ Factorio0.18.47 is also visible in the [official history](https://wiki.factorio.
 
 ## Shared release history
 
-`TGT-07` — [CHANGELOG.md](../CHANGELOG.md) is the sole authored product history: the selected27 MIR1–3 master releases, then every MIR4 and MIR5 source release. Retain historical scope and unique corrections without repeating reduced backport release logs. Do not invent release dates. The small formatter projects this Markdown into [source/changelog.txt](../source/changelog.txt), with native separators, indentation, unique version sections and valid continuation lines. Only the leading current-release version is substituted by the packager. Every distribution receives the same complete master history; its presence does not claim that a historical edition existed in an earlier MIR release. The [reconciliation inventory](inventory/changelog-history.json) preserves original input identities.
+`TGT-07` — [CHANGELOG.md](../CHANGELOG.md) is the sole authored product history: the selected27 MIR1–3 master releases, then every MIR4 and MIR5 source release. Retain historical scope and unique corrections without repeating reduced backport release logs. Do not invent release dates. The small formatter projects this Markdown into [source/changelog.txt](../source/changelog.txt), with native separators, indentation, unique version sections and valid continuation lines. The packager preserves every source-version header instead of substituting a portal or extended distribution number for the current release. Every distribution receives the same complete master history; its presence does not claim that a historical edition existed in an earlier MIR release. The [reconciliation inventory](inventory/changelog-history.json) preserves original input identities.
 
 ## Contributor builds and independently named forks
 

@@ -76,16 +76,16 @@ git clone https://github.com/Julesc013/more-infinite-research.git
 cd more-infinite-research
 git switch dev
 git switch -c fix/my-bounded-change
-python tools/package.py --source source --target f210 --output ../mir-local/more-infinite-research_5.0.21000.zip
+python tools/package.py --source source --target f210 --output ../mir-local/more-infinite-research_5.0.09.zip
 ```
 
-`--target` selects an implemented edition and derives its numeric version from `source/info.json`; it is not native qualification. For a one-off same-name package without target adaptation, use a valid five-digit distribution version and a matching output filename:
+`--target` selects an implemented edition and encodes the plain source version from `source/info.json` using the fixed [portal/extended edition map](../spec/targets.md#source-portal-and-extended-versions); it is not native qualification. Source 5.0.0 yields F210 5.0.09, while F018 remains 5.0.01800. For a one-off same-edition package with an explicit distribution override, use that edition's valid encoded version and a matching output filename:
 
 ```powershell
-python tools/package.py --source source --version 5.0.21001 --output ../mir-local/more-infinite-research_5.0.21001.zip
+python tools/package.py --source source --version 5.0.19 --output ../mir-local/more-infinite-research_5.0.19.zip
 ```
 
-`--version` and `--target` are intentionally mutually exclusive. `--version` retains the source target's CCC edition codec while changing `info.json`, the generated changelog and the runtime API product version together for a same-edition local package; selecting a different CCC requires `--target` adaptation. To change a selected edition's local version or ordinary presentation metadata, edit the working-tree `source/info.json` while retaining the official name, then use `--target`; the target packager derives the selected edition's version, Factorio line and minimum Base dependency from that source codec and the tracked target record. Do not use `tools/release.py` for this: it freezes the canonical ten-edition release identity and rejects a private product version/name. The F006–F012 best-effort data-only path separately regenerates its finite metadata, so it is not a private-branding path.
+`--version` and `--target` are intentionally mutually exclusive. The explicit distribution override must decode to the same selected edition; F210 5.0.19 corresponds to source 5.0.1. Its package metadata/runtime product version and source changelog header must describe that same release. The preferred source workflow is to edit the plain `source/info.json` version, for example 5.0.1, retain the official mod name, and build with `--target`; the packager derives portal or extended distribution metadata, the Factorio family and minimum Base dependency from the tracked target record. Keep changelog history in source versions. Do not use `tools/release.py` for a private build: it freezes the canonical release identity and rejects a private product version/name. The F006–F012 best-effort data-only path separately regenerates its finite metadata, so it is not a private-branding path.
 
 A higher private version can complicate selecting a later official build. Keeping MIR's name preserves identity, not proof that your changed prototypes/effects are save-compatible. Preserve the original save and matching archives/settings before testing; switching back to an official ZIP is not an automatic undo. Factorio records applied migration filenames per save, so rebuilding a ZIP does not rerun an already applied migration. Do not rename migrations to force replay; see the [native migration rules](https://lua-api.factorio.com/latest/auxiliary/migrations.html).
 
@@ -101,7 +101,7 @@ An advanced renamed fork is a separate product-design task, not a metadata-only 
 
 Edit the root [CHANGELOG.md](../CHANGELOG.md) as the single authored release history. Keep each Markdown paragraph or bullet on one logical line and use editor soft wrapping; aim for short readable sentences rather than manually wrapping repository prose. Retain the selected MIR1–3 master releases once, all MIR4 and later source releases, and edition-specific historical scope. Reduced backport logs are not separate master release entries.
 
-Run `python -B tools/changelog.py --write` after an edit. The small formatter writes the tracked [source/changelog.txt](../source/changelog.txt) projection with Factorio separators, indentation and132-character lines. Its only distribution-version placeholder belongs to the current release; the packager replaces it with the selected edition version. Check freshness with `python -B tools/changelog.py`; never hand-edit the projection. Commit both files together. The [reconciliation inventory](../spec/inventory/changelog-history.json) preserves the exact prior history fingerprints and recovery sources; it is outside player packages.
+Run `python -B tools/changelog.py --write` after an edit. The small formatter writes the tracked [source/changelog.txt](../source/changelog.txt) projection with Factorio separators, indentation and132-character lines. All version headers use the unified source release, including inside distributed ZIPs; portal and extended numbers belong to package metadata and filenames. Check freshness with `python -B tools/changelog.py`; never hand-edit the projection. Commit both files together. The [reconciliation inventory](../spec/inventory/changelog-history.json) preserves the exact prior history fingerprints and recovery sources; it is outside player packages.
 
 ## Before creating an abstraction
 

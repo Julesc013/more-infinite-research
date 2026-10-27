@@ -24,7 +24,7 @@ An ecosystem name is not a test result. Support records should identify exact Fa
 
 ## Candidate editions
 
-Factorio **2.1 with minimum base 2.1.23 (F210)** is the primary design target. The normal editions retain their actual capability subsets and the existing version encoding, composed from shared source and narrow adapters. Every delivered edition requires final current-package and affected native qualification; records distinguish each edition's observed results and remaining gaps. Primary-target priority does not qualify an earlier edition or remove its release obligations.
+Factorio **2.1 with minimum base 2.1.23 (F210)** is the primary design target. The normal editions retain their actual capability subsets and the [source/portal/extended version policy](../spec/targets.md#source-portal-and-extended-versions), composed from shared source and narrow adapters. Every delivered edition requires final current-package and affected native qualification; records distinguish each edition's observed results and remaining gaps. Primary-target priority does not qualify an earlier edition or remove its release obligations.
 
 The [tracked edition record](../targets/editions.json) selects one self-contained player ZIP for each engine family. The following are selected baseline engine minimums; they do not announce completed final-package acceptance. F018/0.18.47 is newly selected, with its source/build port integrated; actual all-science, forward-continuity and exact-engine/save qualification remain pending. Select the same engine family when upgrading, rather than install another target's ZIP because its distribution number is larger.
 
