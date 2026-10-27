@@ -384,10 +384,12 @@ function Get-StandaloneIdentityFixtureSources {
     }elseif($apiCounts.ContainsKey([string]$info.name)){
       $name=[string]$info.name
       Assert-Session ($stagedApiConsumers.ContainsKey($name)) "standalone API consumer source is not admitted: $name"
+      $stagedApiSource=$stagedApiConsumers[$name]
+      Assert-Session ($stagedApiSource -is [string] -and -not[string]::IsNullOrWhiteSpace($stagedApiSource)) "standalone API consumer projection path differs: $name"
       $canonicalApi=(Resolve-Path -LiteralPath (Join-Path $RepoRoot ('tests/fixtures/'+$(if($name-ceq'mir-fixture-mir5-api-alpha'){'api-alpha'}else{'api-beta'})))).Path
       Assert-Session ($source-ieq$canonicalApi) "standalone API consumer source differs from its canonical template: $name"
       $apiCounts[$name]++
-      $result.Add((Resolve-Path -LiteralPath ([string]$stagedApiConsumers[$name])).Path)
+      $result.Add((Resolve-Path -LiteralPath $stagedApiSource).Path)
     }else{$result.Add($source)}
   }
   Assert-Session ($libraryCount-eq1) 'standalone identity discovery requires one canonical Library fixture source'
@@ -480,6 +482,7 @@ $selection=Get-Content -LiteralPath $profile -Raw|ConvertFrom-Json -AsHashtable
 $discoveryFixture=$null;$discoveryInstall=$null;$fixtureSourcesForRun=@($FixtureSources)
 $standaloneObserver=$null;$standaloneLibraryFixture=$null
 $standaloneApiConsumerFixtures=@{}
+$standaloneApiConsumerSources=@{}
 if($StandaloneIdentityDiscovery){
   # The checked-in functional profile is a template only.  The actual
   # environmental packet is assembled below from the standalone engine, C563,
@@ -518,10 +521,11 @@ if($standaloneF210){
     foreach($name in @('mir-fixture-mir5-api-alpha','mir-fixture-mir5-api-beta')){
       $archiveName=$name+'_0.1.0.zip'
       $standaloneApiConsumerFixtures[$name]=New-StandaloneF210ApiConsumerSourceProjection -RepoRoot $repo -ArchiveLibrary $library -OutputRoot $output -FixtureName $name -ExpectedArchiveSha256 ([string]$target.api_consumer_archive_sha256[$archiveName])
+      $standaloneApiConsumerSources[$name]=[string]$standaloneApiConsumerFixtures[$name].source
     }
   }
   $canonicalLibrary=Join-Path $repo 'tests/fixtures/library-multiplayer'
-  $fixtureSourcesForRun=Get-StandaloneIdentityFixtureSources -Sources $FixtureSources -LibraryFixtureSource $canonicalLibrary -StagedLibraryFixtureSource $standaloneLibraryFixture.source -StagedObserverSource $standaloneObserver.source -RepoRoot $repo -StagedApiConsumerSources $standaloneApiConsumerFixtures
+  $fixtureSourcesForRun=Get-StandaloneIdentityFixtureSources -Sources $FixtureSources -LibraryFixtureSource $canonicalLibrary -StagedLibraryFixtureSource $standaloneLibraryFixture.source -StagedObserverSource $standaloneObserver.source -RepoRoot $repo -StagedApiConsumerSources $standaloneApiConsumerSources
 }
 # The normal standalone target remains the ordinary two-client Library
 # contract.  Only the explicitly environmental discovery route needs its
