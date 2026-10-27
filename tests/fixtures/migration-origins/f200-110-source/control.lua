@@ -167,8 +167,7 @@ local function seed_rows(force, rows, label, preserve)
     end
   end
   force.reset_technology_effects()
-  force.manual_mining_speed_modifier = .125
-  if not close(force.manual_mining_speed_modifier, .125) then fail(label .. " scripted offset seed differs") end
+  if not close(force.manual_mining_speed_modifier, 0) then fail(label .. " native manual-mining baseline differs") end
   if not close(force.worker_robots_battery_modifier, .1) then fail(label .. " robot battery contribution differs") end
 end
 

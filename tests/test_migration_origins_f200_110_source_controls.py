@@ -178,6 +178,8 @@ class MigrationOriginF200110SourceControls(unittest.TestCase):
         self.assertIn("saved_progress = .27", control)
         self.assertIn("worker_robots_battery_modifier", control)
         self.assertIn("recipe-prod-research_inventory_capacity-1", control)
+        self.assertIn("native manual-mining baseline differs", control)
+        self.assertNotIn("manual_mining_speed_modifier = .125", control)
         self.assertLess(control.index("force.reset_technology_effects()"), control.index("foreign.research_queue"))
         self.assertNotIn('more-infinite-research"] ~= "5.', control)
         self.assertNotRegex(control, re.compile(r"\.level\s*=.*?\n.*?\.researched\s*=\s*false", re.DOTALL))
