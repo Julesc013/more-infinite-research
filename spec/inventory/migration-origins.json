@@ -1,0 +1,2597 @@
+{
+  "schema": "MIR5MigrationOriginsInventoryV1",
+  "status": "read-only-source-and-custody-inventory-not-native-qualification",
+  "inventory_commit": "0b91883f5175cd6cc19b7bb92d83cdb590a3ee71",
+  "audit_scope": {
+    "tag_source_records": 64,
+    "tag_source_range": "1.0.0 through 3.2.11",
+    "archive_byte_status_meaning": "Only a non-null archive SHA256 plus an explicit source says archive bytes were verified. Tag-source characterization never implies an archive was found.",
+    "native_status_meaning": "Exact native evidence only. not_run is retained rather than inferred."
+  },
+  "counts": {
+    "direct_f200_origins": 19,
+    "direct_f210_origins": 20,
+    "requires_engine_bridge_or_best_effort_older_origins": 25,
+    "published_4_7_3_supported_edition_origins": 9,
+    "current_source_migration_json_members": 4,
+    "audited_lua_migration_members_across_64_tag_sources": 0
+  },
+  "published_mir4_release_origin_inventory": {
+    "status": "partial-only-v4.7.3-release-metadata-characterized",
+    "enumerated_release_origins": 1,
+    "enumerated_tags": [
+      "v4.7.3"
+    ],
+    "prior_mir4_release_origin_enumeration": "pending; this bounded unit must not be read as a complete MIR4 release or archive-variant inventory"
+  },
+  "source_state_producer_boundaries": {
+    "current": [
+      {
+        "path": "source/runtime/bootstrap.lua",
+        "role": "configuration/event entrypoint; historical carrier recovery",
+        "git_blob": "dabfbcdddab7561787c5d0ca489fef459c7c9662"
+      },
+      {
+        "path": "source/runtime/lifecycle.lua",
+        "role": "finite-cap state and direct F200 legacy-cap import",
+        "git_blob": "b0a55c468f40c7ca2fc2f0c18e30cc9cfe189103"
+      },
+      {
+        "path": "source/runtime/legacy_caps.lua",
+        "role": "bounded legacy-cap candidate import",
+        "git_blob": "2385560ffdc6fcf182293fd8897e1844d5bd23b1"
+      },
+      {
+        "path": "source/runtime/k2_imersite_migration.lua",
+        "role": "K2 staged-state carrier validation/recovery",
+        "git_blob": "8281613b096c45f3faa0b10c765d08430a3d4628"
+      },
+      {
+        "path": "source/runtime/native_credits.lua",
+        "role": "native migration-credit carrier state",
+        "git_blob": "d35bd49206b44bfaaa678e459b1555b0068a91f2"
+      },
+      {
+        "path": "source/runtime/spoilage_contribution.lua",
+        "role": "MIR-owned spoilage contribution retirement",
+        "git_blob": "1af1038cc304797558639c6e003474d90328504b"
+      },
+      {
+        "path": "source/runtime/library.lua",
+        "role": "durable library translation/request ledger",
+        "git_blob": "4c282cf5bc918fa92a711bc3833f5cfde2101fde"
+      },
+      {
+        "path": "source/runtime/library_translations.lua",
+        "role": "bounded ledger export/hydration",
+        "git_blob": "bec3edca63c8b71131597bf89d158af7a2f8c6a9"
+      }
+    ],
+    "mir4_7_3": [
+      {
+        "path": "source/prototypes/mir/platform/factorio/runtime_state.lua",
+        "git_blob": "7808b54f0f331e644bfac646859d398d9b2afbc0"
+      },
+      {
+        "path": "source/prototypes/mir/runtime/state.lua",
+        "git_blob": "d1a0f0c003333a38dd5b6bff1b4ac09283c6b154"
+      },
+      {
+        "path": "source/prototypes/mir/runtime/maximum_level_control.lua",
+        "git_blob": "48de6bdf4332939c73ec9fc4ae793a9623c015da"
+      },
+      {
+        "path": "source/prototypes/mir/runtime/productivity_family_adoption.lua",
+        "git_blob": "45d50e5fdba29fd0e11d08e2c269feb392b9cd4d"
+      },
+      {
+        "path": "source/prototypes/mir/runtime/k2_imersite_staged_state_migration.lua",
+        "git_blob": "0b31c3309a836bd77f73ff9fc93ea9491bb33eac"
+      },
+      {
+        "path": "source/prototypes/mir/stage/control.lua",
+        "git_blob": "4797e2ff35ad64943b03c77a9d9e688c56801827"
+      }
+    ],
+    "earliest_direct_f200_tag_1_0_0": {
+      "full_commit": "f0057a96847512b50acdd6e23fc21b5b41e75adb",
+      "lua_runtime_control_members": [],
+      "tag_tree_lua_members": [
+        "data.lua",
+        "data-updates.lua",
+        "settings.lua",
+        "prototypes/config.lua",
+        "prototypes/tech-gen.lua",
+        "prototypes/util.lua"
+      ],
+      "state_obligation_disposition": "No control.lua exists in the 1.0.0 tag tree. Absent migration Lua is not proof that a source save has no obligation; preserve data-stage identities and require native source-save evidence."
+    },
+    "intermediate_1_to_3_runtime_schema_evolution": {
+      "status": "pending",
+      "scope": "This unit records each tag's info.json and migration-member bodies, not a completed control.lua/runtime-state evolution audit for every intermediate 1.x-3.x tag."
+    }
+  },
+  "published_tag_sources": [
+    {
+      "tag": "1.0.0",
+      "full_commit": "f0057a96847512b50acdd6e23fc21b5b41e75adb",
+      "info_json_git_blob": "ee4c976598f6cfb315f73e296177dedad2a4bbea",
+      "factorio_version": "2.0",
+      "dependencies": [
+        "base >= 2.0",
+        "? space-age"
+      ],
+      "migration_members": [],
+      "direct_current_engine_status": "direct-f200-origin",
+      "archive_sha256": null,
+      "archive_byte_status": "tag-source-characterized-archive-not-byte-verified",
+      "native_status": "not_run"
+    },
+    {
+      "tag": "1.1.0",
+      "full_commit": "2fb64822b82569e3b50f0653e361fb7148f18b63",
+      "info_json_git_blob": "a731e21e714124e3ff64a87d92790909dc81143f",
+      "factorio_version": "2.0",
+      "dependencies": [
+        "base >= 2.0",
+        "? space-age"
+      ],
+      "migration_members": [],
+      "direct_current_engine_status": "direct-f200-origin",
+      "archive_sha256": null,
+      "archive_byte_status": "tag-source-characterized-archive-not-byte-verified",
+      "native_status": "not_run"
+    },
+    {
+      "tag": "1.1.5",
+      "full_commit": "ccd86acce668d6c3b4878bd08ec0b55a60ef2271",
+      "info_json_git_blob": "453d76711e68da11aa1ec27e486dfab87699a384",
+      "factorio_version": "2.0",
+      "dependencies": [
+        "base >= 2.0",
+        "? space-age"
+      ],
+      "migration_members": [],
+      "direct_current_engine_status": "direct-f200-origin",
+      "archive_sha256": null,
+      "archive_byte_status": "tag-source-characterized-archive-not-byte-verified",
+      "native_status": "not_run"
+    },
+    {
+      "tag": "1.2.0",
+      "full_commit": "b80413b2aa225529a236b7b00a7cee9420af65bc",
+      "info_json_git_blob": "85280e1ccd89e8f2e4db15ef5fe075c2d57d4634",
+      "factorio_version": "2.0",
+      "dependencies": [
+        "base >= 2.0",
+        "? space-age"
+      ],
+      "migration_members": [],
+      "direct_current_engine_status": "direct-f200-origin",
+      "archive_sha256": null,
+      "archive_byte_status": "tag-source-characterized-archive-not-byte-verified",
+      "native_status": "not_run"
+    },
+    {
+      "tag": "1.2.5",
+      "full_commit": "172156bfc815a004162754732b0e604983e19c58",
+      "info_json_git_blob": "7b7cc8ab01f7fb5c6edc432ea815dc6d246da14c",
+      "factorio_version": "2.0",
+      "dependencies": [
+        "base >= 2.0",
+        "? space-age"
+      ],
+      "migration_members": [],
+      "direct_current_engine_status": "direct-f200-origin",
+      "archive_sha256": null,
+      "archive_byte_status": "tag-source-characterized-archive-not-byte-verified",
+      "native_status": "not_run"
+    },
+    {
+      "tag": "1.2.9",
+      "full_commit": "e0f081e4cad7121c1bddedbfadbd3b83d42c438c",
+      "info_json_git_blob": "ba9973b9025b51d1a5690cae61c87d6cb104371c",
+      "factorio_version": "2.0",
+      "dependencies": [
+        "base >= 2.0",
+        "? space-age"
+      ],
+      "migration_members": [],
+      "direct_current_engine_status": "direct-f200-origin",
+      "archive_sha256": null,
+      "archive_byte_status": "tag-source-characterized-archive-not-byte-verified",
+      "native_status": "not_run"
+    },
+    {
+      "tag": "1.3.0",
+      "full_commit": "a33b99c1f39e1e779986a12a558a79ea97e69239",
+      "info_json_git_blob": "3af7bac03651b131482f1b77aa94b3a5a7faff23",
+      "factorio_version": "0.13",
+      "dependencies": [
+        "base >= 0.13"
+      ],
+      "migration_members": [
+        {
+          "path": "migrations/more-infinite-research_2.0.5.json",
+          "git_blob": "014ca09a8864fab28275dafcf02f0295c8cac229"
+        },
+        {
+          "path": "migrations/more-infinite-research_2.1.0.json",
+          "git_blob": "0faf1db024013eab38164432037b51c37d052f00"
+        }
+      ],
+      "direct_current_engine_status": "requires-engine-bridge-or-best-effort-older-engine",
+      "archive_sha256": null,
+      "archive_byte_status": "tag-source-characterized-archive-not-byte-verified",
+      "native_status": "not_run"
+    },
+    {
+      "tag": "1.3.5",
+      "full_commit": "7293cad3801d1c02f4a5d577fc20a425cced0b0e",
+      "info_json_git_blob": "2e0b6573c3fd562553dbfb077dac419db44e566e",
+      "factorio_version": "0.13",
+      "dependencies": [
+        "base >= 0.13"
+      ],
+      "migration_members": [
+        {
+          "path": "migrations/more-infinite-research_2.0.5.json",
+          "git_blob": "014ca09a8864fab28275dafcf02f0295c8cac229"
+        },
+        {
+          "path": "migrations/more-infinite-research_2.1.0.json",
+          "git_blob": "0faf1db024013eab38164432037b51c37d052f00"
+        }
+      ],
+      "direct_current_engine_status": "requires-engine-bridge-or-best-effort-older-engine",
+      "archive_sha256": null,
+      "archive_byte_status": "tag-source-characterized-archive-not-byte-verified",
+      "native_status": "not_run"
+    },
+    {
+      "tag": "1.3.9",
+      "full_commit": "b9459906a0971e237aed66855b51231e9b6bf028",
+      "info_json_git_blob": "b4e41c25b28c6225729c465872855e3386483a8f",
+      "factorio_version": "0.13",
+      "dependencies": [
+        "base >= 0.13"
+      ],
+      "migration_members": [
+        {
+          "path": "migrations/more-infinite-research_2.0.5.json",
+          "git_blob": "014ca09a8864fab28275dafcf02f0295c8cac229"
+        },
+        {
+          "path": "migrations/more-infinite-research_2.1.0.json",
+          "git_blob": "0faf1db024013eab38164432037b51c37d052f00"
+        }
+      ],
+      "direct_current_engine_status": "requires-engine-bridge-or-best-effort-older-engine",
+      "archive_sha256": null,
+      "archive_byte_status": "tag-source-characterized-archive-not-byte-verified",
+      "native_status": "not_run"
+    },
+    {
+      "tag": "1.4.0",
+      "full_commit": "fa192796ab274dd590c65b96d0f3f6a0f35cb155",
+      "info_json_git_blob": "26b918bdb62d3f5ed9d6b82216b79673682be001",
+      "factorio_version": "0.14",
+      "dependencies": [
+        "base >= 0.14"
+      ],
+      "migration_members": [
+        {
+          "path": "migrations/more-infinite-research_2.0.5.json",
+          "git_blob": "014ca09a8864fab28275dafcf02f0295c8cac229"
+        },
+        {
+          "path": "migrations/more-infinite-research_2.1.0.json",
+          "git_blob": "0faf1db024013eab38164432037b51c37d052f00"
+        }
+      ],
+      "direct_current_engine_status": "requires-engine-bridge-or-best-effort-older-engine",
+      "archive_sha256": null,
+      "archive_byte_status": "tag-source-characterized-archive-not-byte-verified",
+      "native_status": "not_run"
+    },
+    {
+      "tag": "1.4.5",
+      "full_commit": "efa372c95517c0d224828e7362433fcd9eb0a91b",
+      "info_json_git_blob": "93ef7e33eaab6e732f8a3118a0e92a127107331d",
+      "factorio_version": "0.14",
+      "dependencies": [
+        "base >= 0.14"
+      ],
+      "migration_members": [
+        {
+          "path": "migrations/more-infinite-research_2.0.5.json",
+          "git_blob": "014ca09a8864fab28275dafcf02f0295c8cac229"
+        },
+        {
+          "path": "migrations/more-infinite-research_2.1.0.json",
+          "git_blob": "0faf1db024013eab38164432037b51c37d052f00"
+        }
+      ],
+      "direct_current_engine_status": "requires-engine-bridge-or-best-effort-older-engine",
+      "archive_sha256": null,
+      "archive_byte_status": "tag-source-characterized-archive-not-byte-verified",
+      "native_status": "not_run"
+    },
+    {
+      "tag": "1.4.9",
+      "full_commit": "8f75fa45d52a55650e74423a99f04a0252db429b",
+      "info_json_git_blob": "18dffe535a4d86ab16edfe019c95720a662109e3",
+      "factorio_version": "0.14",
+      "dependencies": [
+        "base >= 0.14"
+      ],
+      "migration_members": [
+        {
+          "path": "migrations/more-infinite-research_2.0.5.json",
+          "git_blob": "014ca09a8864fab28275dafcf02f0295c8cac229"
+        },
+        {
+          "path": "migrations/more-infinite-research_2.1.0.json",
+          "git_blob": "0faf1db024013eab38164432037b51c37d052f00"
+        }
+      ],
+      "direct_current_engine_status": "requires-engine-bridge-or-best-effort-older-engine",
+      "archive_sha256": null,
+      "archive_byte_status": "tag-source-characterized-archive-not-byte-verified",
+      "native_status": "not_run"
+    },
+    {
+      "tag": "1.5.0",
+      "full_commit": "c2b526fd6dde81be7703daef53b075a1fd773e09",
+      "info_json_git_blob": "9893d9c3763e8a01ba7b5e55ffbb5ed273869b4b",
+      "factorio_version": "0.15",
+      "dependencies": [
+        "base >= 0.15"
+      ],
+      "migration_members": [
+        {
+          "path": "migrations/more-infinite-research_2.0.5.json",
+          "git_blob": "014ca09a8864fab28275dafcf02f0295c8cac229"
+        },
+        {
+          "path": "migrations/more-infinite-research_2.1.0.json",
+          "git_blob": "0faf1db024013eab38164432037b51c37d052f00"
+        }
+      ],
+      "direct_current_engine_status": "requires-engine-bridge-or-best-effort-older-engine",
+      "archive_sha256": null,
+      "archive_byte_status": "tag-source-characterized-archive-not-byte-verified",
+      "native_status": "not_run"
+    },
+    {
+      "tag": "1.5.5",
+      "full_commit": "2486bebf1909b6af1b0e99fce9e2d327e670a1c6",
+      "info_json_git_blob": "14cd2e81b5edf588f00364cf3a66b7e21d4d8801",
+      "factorio_version": "0.15",
+      "dependencies": [
+        "base >= 0.15"
+      ],
+      "migration_members": [
+        {
+          "path": "migrations/more-infinite-research_2.0.5.json",
+          "git_blob": "014ca09a8864fab28275dafcf02f0295c8cac229"
+        },
+        {
+          "path": "migrations/more-infinite-research_2.1.0.json",
+          "git_blob": "0faf1db024013eab38164432037b51c37d052f00"
+        }
+      ],
+      "direct_current_engine_status": "requires-engine-bridge-or-best-effort-older-engine",
+      "archive_sha256": null,
+      "archive_byte_status": "tag-source-characterized-archive-not-byte-verified",
+      "native_status": "not_run"
+    },
+    {
+      "tag": "1.5.9",
+      "full_commit": "8098510acc3530321a2dc32b8d2292aa814bb9c3",
+      "info_json_git_blob": "9c485073a8d1c1ea1c2816d115f8f8cf273437b8",
+      "factorio_version": "0.15",
+      "dependencies": [
+        "base >= 0.15"
+      ],
+      "migration_members": [
+        {
+          "path": "migrations/more-infinite-research_2.0.5.json",
+          "git_blob": "014ca09a8864fab28275dafcf02f0295c8cac229"
+        },
+        {
+          "path": "migrations/more-infinite-research_2.1.0.json",
+          "git_blob": "0faf1db024013eab38164432037b51c37d052f00"
+        }
+      ],
+      "direct_current_engine_status": "requires-engine-bridge-or-best-effort-older-engine",
+      "archive_sha256": null,
+      "archive_byte_status": "tag-source-characterized-archive-not-byte-verified",
+      "native_status": "not_run"
+    },
+    {
+      "tag": "1.6.0",
+      "full_commit": "a48509ed1dfbae8eba4b3dc7a701065063c12d5f",
+      "info_json_git_blob": "5354f5adc1852c0a5a7cad825d78c4efe5e58ae9",
+      "factorio_version": "0.16",
+      "dependencies": [
+        "base >= 0.16"
+      ],
+      "migration_members": [
+        {
+          "path": "migrations/more-infinite-research_2.0.5.json",
+          "git_blob": "014ca09a8864fab28275dafcf02f0295c8cac229"
+        },
+        {
+          "path": "migrations/more-infinite-research_2.1.0.json",
+          "git_blob": "0faf1db024013eab38164432037b51c37d052f00"
+        }
+      ],
+      "direct_current_engine_status": "requires-engine-bridge-or-best-effort-older-engine",
+      "archive_sha256": null,
+      "archive_byte_status": "tag-source-characterized-archive-not-byte-verified",
+      "native_status": "not_run"
+    },
+    {
+      "tag": "1.6.5",
+      "full_commit": "da298d36cd41b6874e51eae31252cebd079872ad",
+      "info_json_git_blob": "b0969f3979cb164c5529f9ef5b07fb9ff448b90c",
+      "factorio_version": "0.16",
+      "dependencies": [
+        "base >= 0.16"
+      ],
+      "migration_members": [
+        {
+          "path": "migrations/more-infinite-research_2.0.5.json",
+          "git_blob": "014ca09a8864fab28275dafcf02f0295c8cac229"
+        },
+        {
+          "path": "migrations/more-infinite-research_2.1.0.json",
+          "git_blob": "0faf1db024013eab38164432037b51c37d052f00"
+        }
+      ],
+      "direct_current_engine_status": "requires-engine-bridge-or-best-effort-older-engine",
+      "archive_sha256": null,
+      "archive_byte_status": "tag-source-characterized-archive-not-byte-verified",
+      "native_status": "not_run"
+    },
+    {
+      "tag": "1.6.9",
+      "full_commit": "595ebcfc8b1f35b53906ea85fdb2d1de70f9bb2d",
+      "info_json_git_blob": "e1cc2becb62ce1518b03ce8f6118cf2e771b4ae7",
+      "factorio_version": "0.16",
+      "dependencies": [
+        "base >= 0.16"
+      ],
+      "migration_members": [
+        {
+          "path": "migrations/more-infinite-research_2.0.5.json",
+          "git_blob": "014ca09a8864fab28275dafcf02f0295c8cac229"
+        },
+        {
+          "path": "migrations/more-infinite-research_2.1.0.json",
+          "git_blob": "0faf1db024013eab38164432037b51c37d052f00"
+        }
+      ],
+      "direct_current_engine_status": "requires-engine-bridge-or-best-effort-older-engine",
+      "archive_sha256": null,
+      "archive_byte_status": "tag-source-characterized-archive-not-byte-verified",
+      "native_status": "not_run"
+    },
+    {
+      "tag": "1.7.0",
+      "full_commit": "1a9b5a7b1162f8dca8125ef7bb792f57a9ae282b",
+      "info_json_git_blob": "039768111c5bc0a41e37ccd0f0b16c1ec3a9e4d8",
+      "factorio_version": "0.17",
+      "dependencies": [
+        "base >= 0.17"
+      ],
+      "migration_members": [
+        {
+          "path": "migrations/more-infinite-research_2.0.5.json",
+          "git_blob": "014ca09a8864fab28275dafcf02f0295c8cac229"
+        },
+        {
+          "path": "migrations/more-infinite-research_2.1.0.json",
+          "git_blob": "0faf1db024013eab38164432037b51c37d052f00"
+        }
+      ],
+      "direct_current_engine_status": "requires-engine-bridge-or-best-effort-older-engine",
+      "archive_sha256": null,
+      "archive_byte_status": "tag-source-characterized-archive-not-byte-verified",
+      "native_status": "not_run"
+    },
+    {
+      "tag": "1.7.1",
+      "full_commit": "9d9095c92055aebe557a55a7ab99bb9588fe73fb",
+      "info_json_git_blob": "8a7b0300d4ec4687707c72b26575eb8e713f95fd",
+      "factorio_version": "0.17",
+      "dependencies": [
+        "base >= 0.17"
+      ],
+      "migration_members": [
+        {
+          "path": "migrations/more-infinite-research_2.0.5.json",
+          "git_blob": "014ca09a8864fab28275dafcf02f0295c8cac229"
+        },
+        {
+          "path": "migrations/more-infinite-research_2.1.0.json",
+          "git_blob": "0faf1db024013eab38164432037b51c37d052f00"
+        }
+      ],
+      "direct_current_engine_status": "requires-engine-bridge-or-best-effort-older-engine",
+      "archive_sha256": null,
+      "archive_byte_status": "tag-source-characterized-archive-not-byte-verified",
+      "native_status": "not_run"
+    },
+    {
+      "tag": "1.7.5",
+      "full_commit": "c6692980dc9f5a1332a7888da33385a0107ae004",
+      "info_json_git_blob": "55414bc8b4e3933ee0507337ee0bb7ff0b11c11e",
+      "factorio_version": "0.17",
+      "dependencies": [
+        "base >= 0.17"
+      ],
+      "migration_members": [
+        {
+          "path": "migrations/more-infinite-research_2.0.5.json",
+          "git_blob": "014ca09a8864fab28275dafcf02f0295c8cac229"
+        },
+        {
+          "path": "migrations/more-infinite-research_2.1.0.json",
+          "git_blob": "0faf1db024013eab38164432037b51c37d052f00"
+        }
+      ],
+      "direct_current_engine_status": "requires-engine-bridge-or-best-effort-older-engine",
+      "archive_sha256": null,
+      "archive_byte_status": "tag-source-characterized-archive-not-byte-verified",
+      "native_status": "not_run"
+    },
+    {
+      "tag": "1.7.9",
+      "full_commit": "215ccced7018aac70919221c73e15d795f9d1653",
+      "info_json_git_blob": "45140086b6b34f5984bab69f5c05497df9c0b249",
+      "factorio_version": "0.17",
+      "dependencies": [
+        "base >= 0.17"
+      ],
+      "migration_members": [
+        {
+          "path": "migrations/more-infinite-research_2.0.5.json",
+          "git_blob": "014ca09a8864fab28275dafcf02f0295c8cac229"
+        },
+        {
+          "path": "migrations/more-infinite-research_2.1.0.json",
+          "git_blob": "0faf1db024013eab38164432037b51c37d052f00"
+        }
+      ],
+      "direct_current_engine_status": "requires-engine-bridge-or-best-effort-older-engine",
+      "archive_sha256": null,
+      "archive_byte_status": "tag-source-characterized-archive-not-byte-verified",
+      "native_status": "not_run"
+    },
+    {
+      "tag": "1.8.0",
+      "full_commit": "5662c66c372e6aca025eab9f446de55a5cc6c1c9",
+      "info_json_git_blob": "4905a60aee9819bba3e2162313ff724d6d03b706",
+      "factorio_version": "0.18",
+      "dependencies": [
+        "base >= 0.18"
+      ],
+      "migration_members": [
+        {
+          "path": "migrations/more-infinite-research_2.0.5.json",
+          "git_blob": "014ca09a8864fab28275dafcf02f0295c8cac229"
+        },
+        {
+          "path": "migrations/more-infinite-research_2.1.0.json",
+          "git_blob": "0faf1db024013eab38164432037b51c37d052f00"
+        }
+      ],
+      "direct_current_engine_status": "requires-engine-bridge-or-best-effort-older-engine",
+      "archive_sha256": null,
+      "archive_byte_status": "tag-source-characterized-archive-not-byte-verified",
+      "native_status": "not_run"
+    },
+    {
+      "tag": "1.8.1",
+      "full_commit": "33b6bb2cc6fe069aa1cb2226e82b14975756f6a2",
+      "info_json_git_blob": "0b1a53eabf519fc26582e44c4f0a0ec456dcd62a",
+      "factorio_version": "1.0",
+      "dependencies": [
+        "base >= 1.0"
+      ],
+      "migration_members": [
+        {
+          "path": "migrations/more-infinite-research_2.0.5.json",
+          "git_blob": "014ca09a8864fab28275dafcf02f0295c8cac229"
+        },
+        {
+          "path": "migrations/more-infinite-research_2.1.0.json",
+          "git_blob": "0faf1db024013eab38164432037b51c37d052f00"
+        }
+      ],
+      "direct_current_engine_status": "requires-engine-bridge-or-best-effort-older-engine",
+      "archive_sha256": null,
+      "archive_byte_status": "tag-source-characterized-archive-not-byte-verified",
+      "native_status": "not_run"
+    },
+    {
+      "tag": "1.8.2",
+      "full_commit": "0a192c27674a6b13847e2f5e1b2b530e62419ee8",
+      "info_json_git_blob": "f8c510508857b881f5ffd78498a299e91683edc3",
+      "factorio_version": "1.0",
+      "dependencies": [
+        "base >= 1.0"
+      ],
+      "migration_members": [
+        {
+          "path": "migrations/more-infinite-research_2.0.5.json",
+          "git_blob": "014ca09a8864fab28275dafcf02f0295c8cac229"
+        },
+        {
+          "path": "migrations/more-infinite-research_2.1.0.json",
+          "git_blob": "0faf1db024013eab38164432037b51c37d052f00"
+        }
+      ],
+      "direct_current_engine_status": "requires-engine-bridge-or-best-effort-older-engine",
+      "archive_sha256": null,
+      "archive_byte_status": "tag-source-characterized-archive-not-byte-verified",
+      "native_status": "not_run"
+    },
+    {
+      "tag": "1.8.5",
+      "full_commit": "2fa5b6fc1f86fe2a17779628efcbf83ffb033aed",
+      "info_json_git_blob": "b5b3648ebc5ca29497f184f9f4a1ac3c9df89689",
+      "factorio_version": "1.0",
+      "dependencies": [
+        "base >= 1.0"
+      ],
+      "migration_members": [
+        {
+          "path": "migrations/more-infinite-research_2.0.5.json",
+          "git_blob": "014ca09a8864fab28275dafcf02f0295c8cac229"
+        },
+        {
+          "path": "migrations/more-infinite-research_2.1.0.json",
+          "git_blob": "0faf1db024013eab38164432037b51c37d052f00"
+        }
+      ],
+      "direct_current_engine_status": "requires-engine-bridge-or-best-effort-older-engine",
+      "archive_sha256": null,
+      "archive_byte_status": "tag-source-characterized-archive-not-byte-verified",
+      "native_status": "not_run"
+    },
+    {
+      "tag": "1.8.9",
+      "full_commit": "8cdc87db5a686b12b1aa3c6f432ae8e4b74a4309",
+      "info_json_git_blob": "275d3618ef258187561e37e938dd67f5f409cee1",
+      "factorio_version": "1.0",
+      "dependencies": [
+        "base >= 1.0"
+      ],
+      "migration_members": [
+        {
+          "path": "migrations/more-infinite-research_2.0.5.json",
+          "git_blob": "014ca09a8864fab28275dafcf02f0295c8cac229"
+        },
+        {
+          "path": "migrations/more-infinite-research_2.1.0.json",
+          "git_blob": "0faf1db024013eab38164432037b51c37d052f00"
+        }
+      ],
+      "direct_current_engine_status": "requires-engine-bridge-or-best-effort-older-engine",
+      "archive_sha256": null,
+      "archive_byte_status": "tag-source-characterized-archive-not-byte-verified",
+      "native_status": "not_run"
+    },
+    {
+      "tag": "1.9.0",
+      "full_commit": "4e386ca6a3b54a1109bbd2a991c73e11ac920704",
+      "info_json_git_blob": "1cb7127f09c2e718195770f43fec0d26d8f6c6ec",
+      "factorio_version": "2.0",
+      "dependencies": [
+        "base >= 2.0",
+        "(?) quality",
+        "? space-age"
+      ],
+      "migration_members": [
+        {
+          "path": "migrations/more-infinite-research_2.0.5.json",
+          "git_blob": "014ca09a8864fab28275dafcf02f0295c8cac229"
+        }
+      ],
+      "direct_current_engine_status": "direct-f200-origin",
+      "archive_sha256": null,
+      "archive_byte_status": "tag-source-characterized-archive-not-byte-verified",
+      "native_status": "not_run"
+    },
+    {
+      "tag": "1.9.1",
+      "full_commit": "734e99dc5cebcd1b10285804359068167d3694f5",
+      "info_json_git_blob": "a87218948c5e695df43e91c7db3421fb7473188c",
+      "factorio_version": "2.0",
+      "dependencies": [
+        "base >= 2.0",
+        "(?) quality",
+        "? space-age"
+      ],
+      "migration_members": [
+        {
+          "path": "migrations/more-infinite-research_2.0.5.json",
+          "git_blob": "014ca09a8864fab28275dafcf02f0295c8cac229"
+        },
+        {
+          "path": "migrations/more-infinite-research_2.1.0.json",
+          "git_blob": "0faf1db024013eab38164432037b51c37d052f00"
+        }
+      ],
+      "direct_current_engine_status": "direct-f200-origin",
+      "archive_sha256": null,
+      "archive_byte_status": "tag-source-characterized-archive-not-byte-verified",
+      "native_status": "not_run"
+    },
+    {
+      "tag": "1.9.2",
+      "full_commit": "4a56169922c1472bbf8ef1947b8eaa18d8ad992f",
+      "info_json_git_blob": "7753c13aa45037086303d422e378fa9cc3d39492",
+      "factorio_version": "2.0",
+      "dependencies": [
+        "base >= 2.0",
+        "(?) quality",
+        "? space-age"
+      ],
+      "migration_members": [
+        {
+          "path": "migrations/more-infinite-research_2.0.5.json",
+          "git_blob": "014ca09a8864fab28275dafcf02f0295c8cac229"
+        },
+        {
+          "path": "migrations/more-infinite-research_2.1.0.json",
+          "git_blob": "0faf1db024013eab38164432037b51c37d052f00"
+        }
+      ],
+      "direct_current_engine_status": "direct-f200-origin",
+      "archive_sha256": null,
+      "archive_byte_status": "tag-source-characterized-archive-not-byte-verified",
+      "native_status": "not_run"
+    },
+    {
+      "tag": "1.9.3",
+      "full_commit": "c1bb2a6b05bb5d9ed782e010d0ab08f21c16af9c",
+      "info_json_git_blob": "97ccd67cd56bf49000a0c2ec892e1217c843fab6",
+      "factorio_version": "1.1",
+      "dependencies": [
+        "base >= 1.1"
+      ],
+      "migration_members": [
+        {
+          "path": "migrations/more-infinite-research_2.0.5.json",
+          "git_blob": "014ca09a8864fab28275dafcf02f0295c8cac229"
+        },
+        {
+          "path": "migrations/more-infinite-research_2.1.0.json",
+          "git_blob": "0faf1db024013eab38164432037b51c37d052f00"
+        }
+      ],
+      "direct_current_engine_status": "requires-engine-bridge-or-best-effort-older-engine",
+      "archive_sha256": null,
+      "archive_byte_status": "tag-source-characterized-archive-not-byte-verified",
+      "native_status": "not_run"
+    },
+    {
+      "tag": "1.9.4",
+      "full_commit": "426d6d48c6578a786ea7de0f224282baff9d342b",
+      "info_json_git_blob": "0aeac96472044ca62180318507830e28b704631f",
+      "factorio_version": "1.1",
+      "dependencies": [
+        "base >= 1.1"
+      ],
+      "migration_members": [
+        {
+          "path": "migrations/more-infinite-research_2.0.5.json",
+          "git_blob": "014ca09a8864fab28275dafcf02f0295c8cac229"
+        },
+        {
+          "path": "migrations/more-infinite-research_2.1.0.json",
+          "git_blob": "0faf1db024013eab38164432037b51c37d052f00"
+        }
+      ],
+      "direct_current_engine_status": "requires-engine-bridge-or-best-effort-older-engine",
+      "archive_sha256": null,
+      "archive_byte_status": "tag-source-characterized-archive-not-byte-verified",
+      "native_status": "not_run"
+    },
+    {
+      "tag": "1.9.5",
+      "full_commit": "67036cb43e3e4814626e5abf5ce5df17a6f765f7",
+      "info_json_git_blob": "3bcadaa684c9fdb8c3ffcce873e01ed904f66475",
+      "factorio_version": "1.1",
+      "dependencies": [
+        "base >= 1.1"
+      ],
+      "migration_members": [
+        {
+          "path": "migrations/more-infinite-research_2.0.5.json",
+          "git_blob": "014ca09a8864fab28275dafcf02f0295c8cac229"
+        },
+        {
+          "path": "migrations/more-infinite-research_2.1.0.json",
+          "git_blob": "0faf1db024013eab38164432037b51c37d052f00"
+        }
+      ],
+      "direct_current_engine_status": "requires-engine-bridge-or-best-effort-older-engine",
+      "archive_sha256": null,
+      "archive_byte_status": "tag-source-characterized-archive-not-byte-verified",
+      "native_status": "not_run"
+    },
+    {
+      "tag": "1.9.9",
+      "full_commit": "2243cfd31c0d6c575782c5b004514c3845d1907c",
+      "info_json_git_blob": "f20946236a6e704c89a344849f5efef47e25ba59",
+      "factorio_version": "1.1",
+      "dependencies": [
+        "base >= 1.1"
+      ],
+      "migration_members": [
+        {
+          "path": "migrations/more-infinite-research_2.0.5.json",
+          "git_blob": "014ca09a8864fab28275dafcf02f0295c8cac229"
+        },
+        {
+          "path": "migrations/more-infinite-research_2.1.0.json",
+          "git_blob": "0faf1db024013eab38164432037b51c37d052f00"
+        }
+      ],
+      "direct_current_engine_status": "requires-engine-bridge-or-best-effort-older-engine",
+      "archive_sha256": null,
+      "archive_byte_status": "tag-source-characterized-archive-not-byte-verified",
+      "native_status": "not_run"
+    },
+    {
+      "tag": "2.0.0",
+      "full_commit": "f7cfb1ecbed44122c4d9f6eb9544c90c7c772ff7",
+      "info_json_git_blob": "1c35a6198c8b786a4849405ca7f0cde86aa7c142",
+      "factorio_version": "2.1",
+      "dependencies": [
+        "base >= 2.1.8",
+        "? elevated-rails >= 2.1.8",
+        "? recycler >= 2.1.8",
+        "? quality >= 2.1.8",
+        "? space-age >= 2.1.8"
+      ],
+      "migration_members": [],
+      "direct_current_engine_status": "direct-f210-origin",
+      "archive_sha256": null,
+      "archive_byte_status": "tag-source-characterized-archive-not-byte-verified",
+      "native_status": "not_run"
+    },
+    {
+      "tag": "2.0.5",
+      "full_commit": "f02f783b662de9f0f5d01a8f29e823c0312d35ba",
+      "info_json_git_blob": "c0e4ce5b3f06d2cffc13fd87f313345e64222ca4",
+      "factorio_version": "2.1",
+      "dependencies": [
+        "base >= 2.1.8",
+        "? elevated-rails >= 2.1.8",
+        "? recycler >= 2.1.8",
+        "(?) quality >= 2.1.8",
+        "? space-age >= 2.1.8"
+      ],
+      "migration_members": [
+        {
+          "path": "migrations/more-infinite-research_2.0.5.json",
+          "git_blob": "014ca09a8864fab28275dafcf02f0295c8cac229"
+        }
+      ],
+      "direct_current_engine_status": "direct-f210-origin",
+      "archive_sha256": null,
+      "archive_byte_status": "tag-source-characterized-archive-not-byte-verified",
+      "native_status": "not_run"
+    },
+    {
+      "tag": "2.1.0",
+      "full_commit": "9d2da8ea08191a13605cd689f04972e820647cbb",
+      "info_json_git_blob": "f243482a5a810dd521e09e4336584ddadfd440af",
+      "factorio_version": "2.1",
+      "dependencies": [
+        "base >= 2.1.8",
+        "(?) elevated-rails",
+        "? recycler >= 2.1.8",
+        "(?) quality",
+        "? space-age >= 2.1.8"
+      ],
+      "migration_members": [
+        {
+          "path": "migrations/more-infinite-research_2.0.5.json",
+          "git_blob": "014ca09a8864fab28275dafcf02f0295c8cac229"
+        },
+        {
+          "path": "migrations/more-infinite-research_2.1.0.json",
+          "git_blob": "0faf1db024013eab38164432037b51c37d052f00"
+        }
+      ],
+      "direct_current_engine_status": "direct-f210-origin",
+      "archive_sha256": null,
+      "archive_byte_status": "tag-source-characterized-archive-not-byte-verified",
+      "native_status": "not_run"
+    },
+    {
+      "tag": "2.1.5",
+      "full_commit": "6008c51f99fc26d42458b85029869a30f27fb769",
+      "info_json_git_blob": "658d3f51877dd36f99536ea1c45db550d3414c39",
+      "factorio_version": "2.1",
+      "dependencies": [
+        "base >= 2.1.8",
+        "(?) elevated-rails",
+        "? recycler >= 2.1.8",
+        "(?) quality",
+        "? space-age >= 2.1.8"
+      ],
+      "migration_members": [
+        {
+          "path": "migrations/more-infinite-research_2.0.5.json",
+          "git_blob": "014ca09a8864fab28275dafcf02f0295c8cac229"
+        },
+        {
+          "path": "migrations/more-infinite-research_2.1.0.json",
+          "git_blob": "0faf1db024013eab38164432037b51c37d052f00"
+        }
+      ],
+      "direct_current_engine_status": "direct-f210-origin",
+      "archive_sha256": null,
+      "archive_byte_status": "tag-source-characterized-archive-not-byte-verified",
+      "native_status": "not_run"
+    },
+    {
+      "tag": "2.2.0",
+      "full_commit": "62a0015abe1a5dd4560c3e7a9a8c24b5a8609d1b",
+      "info_json_git_blob": "80496a14015a9c4fed4e88ce1ebd79ec21e2ad8e",
+      "factorio_version": "2.1",
+      "dependencies": [
+        "base >= 2.1.8",
+        "(?) elevated-rails",
+        "? recycler >= 2.1.8",
+        "(?) quality",
+        "? space-age >= 2.1.8"
+      ],
+      "migration_members": [
+        {
+          "path": "migrations/more-infinite-research_2.0.5.json",
+          "git_blob": "014ca09a8864fab28275dafcf02f0295c8cac229"
+        },
+        {
+          "path": "migrations/more-infinite-research_2.1.0.json",
+          "git_blob": "0faf1db024013eab38164432037b51c37d052f00"
+        }
+      ],
+      "direct_current_engine_status": "direct-f210-origin",
+      "archive_sha256": null,
+      "archive_byte_status": "tag-source-characterized-archive-not-byte-verified",
+      "native_status": "not_run"
+    },
+    {
+      "tag": "2.3.0",
+      "full_commit": "64389779dedaf87ad6b2f0e2e0b12844b1b9585e",
+      "info_json_git_blob": "387b953e367787eaeb6773f2f0e5482704779176",
+      "factorio_version": "2.0",
+      "dependencies": [
+        "base >= 2.0",
+        "(?) quality",
+        "? space-age"
+      ],
+      "migration_members": [
+        {
+          "path": "migrations/more-infinite-research_2.0.5.json",
+          "git_blob": "014ca09a8864fab28275dafcf02f0295c8cac229"
+        },
+        {
+          "path": "migrations/more-infinite-research_2.1.0.json",
+          "git_blob": "0faf1db024013eab38164432037b51c37d052f00"
+        }
+      ],
+      "direct_current_engine_status": "direct-f200-origin",
+      "archive_sha256": null,
+      "archive_byte_status": "tag-source-characterized-archive-not-byte-verified",
+      "native_status": "not_run"
+    },
+    {
+      "tag": "2.3.5",
+      "full_commit": "9eabc5439d3743be10c6f76d5ee36d9804a60f25",
+      "info_json_git_blob": "1321d672c921dfcd4c88f6e257f2e26a7b5a8f60",
+      "factorio_version": "2.0",
+      "dependencies": [
+        "base >= 2.0",
+        "(?) quality",
+        "? space-age"
+      ],
+      "migration_members": [
+        {
+          "path": "migrations/more-infinite-research_2.0.5.json",
+          "git_blob": "014ca09a8864fab28275dafcf02f0295c8cac229"
+        },
+        {
+          "path": "migrations/more-infinite-research_2.1.0.json",
+          "git_blob": "0faf1db024013eab38164432037b51c37d052f00"
+        }
+      ],
+      "direct_current_engine_status": "direct-f200-origin",
+      "archive_sha256": null,
+      "archive_byte_status": "tag-source-characterized-archive-not-byte-verified",
+      "native_status": "not_run"
+    },
+    {
+      "tag": "2.4.0",
+      "full_commit": "584b398f98d3e317fac31cba63edcb11360a5bb1",
+      "info_json_git_blob": "a8ac4f54f9480dd0df86e29ab8ec43155981d7f5",
+      "factorio_version": "2.0",
+      "dependencies": [
+        "base >= 2.0",
+        "(?) elevated-rails",
+        "? recycler",
+        "(?) quality",
+        "? space-age"
+      ],
+      "migration_members": [
+        {
+          "path": "migrations/more-infinite-research_2.0.5.json",
+          "git_blob": "014ca09a8864fab28275dafcf02f0295c8cac229"
+        },
+        {
+          "path": "migrations/more-infinite-research_2.1.0.json",
+          "git_blob": "0faf1db024013eab38164432037b51c37d052f00"
+        }
+      ],
+      "direct_current_engine_status": "direct-f200-origin",
+      "archive_sha256": null,
+      "archive_byte_status": "tag-source-characterized-archive-not-byte-verified",
+      "native_status": "not_run"
+    },
+    {
+      "tag": "2.4.5",
+      "full_commit": "7e4b6c530cfcc5b2e1429c4e9f4ccb0d6d3b42a4",
+      "info_json_git_blob": "3530a2d794e3ed43cd227f46183b4b2a884220e1",
+      "factorio_version": "2.0",
+      "dependencies": [
+        "base >= 2.0",
+        "(?) elevated-rails",
+        "? recycler",
+        "(?) quality",
+        "? space-age"
+      ],
+      "migration_members": [
+        {
+          "path": "migrations/more-infinite-research_2.0.5.json",
+          "git_blob": "014ca09a8864fab28275dafcf02f0295c8cac229"
+        },
+        {
+          "path": "migrations/more-infinite-research_2.1.0.json",
+          "git_blob": "0faf1db024013eab38164432037b51c37d052f00"
+        }
+      ],
+      "direct_current_engine_status": "direct-f200-origin",
+      "archive_sha256": null,
+      "archive_byte_status": "tag-source-characterized-archive-not-byte-verified",
+      "native_status": "not_run"
+    },
+    {
+      "tag": "2.4.9",
+      "full_commit": "7ebe93029695bbf809a15a14c6540530738a9e62",
+      "info_json_git_blob": "26ef1c63ff9f43a94eb614c1732b735ad6c1289f",
+      "factorio_version": "2.0",
+      "dependencies": [
+        "base >= 2.0",
+        "(?) elevated-rails",
+        "? recycler",
+        "(?) quality",
+        "(?) space-exploration",
+        "? space-age"
+      ],
+      "migration_members": [
+        {
+          "path": "migrations/more-infinite-research_2.0.5.json",
+          "git_blob": "014ca09a8864fab28275dafcf02f0295c8cac229"
+        },
+        {
+          "path": "migrations/more-infinite-research_2.1.0.json",
+          "git_blob": "0faf1db024013eab38164432037b51c37d052f00"
+        }
+      ],
+      "direct_current_engine_status": "direct-f200-origin",
+      "archive_sha256": null,
+      "archive_byte_status": "tag-source-characterized-archive-not-byte-verified",
+      "native_status": "not_run"
+    },
+    {
+      "tag": "2.5.0",
+      "full_commit": "bea21b068fb38dc26479b619454e50d5b4cf4793",
+      "info_json_git_blob": "ee4ff7a90fd813ad9454b5b3180165ef41227d80",
+      "factorio_version": "2.0",
+      "dependencies": [
+        "base >= 2.0.77",
+        "(?) elevated-rails",
+        "? recycler >= 2.0.77",
+        "(?) quality",
+        "(?) pypostprocessing",
+        "(?) space-exploration",
+        "? space-age >= 2.0.77"
+      ],
+      "migration_members": [
+        {
+          "path": "migrations/more-infinite-research_2.0.5.json",
+          "git_blob": "014ca09a8864fab28275dafcf02f0295c8cac229"
+        },
+        {
+          "path": "migrations/more-infinite-research_2.1.0.json",
+          "git_blob": "0faf1db024013eab38164432037b51c37d052f00"
+        }
+      ],
+      "direct_current_engine_status": "direct-f200-origin",
+      "archive_sha256": null,
+      "archive_byte_status": "tag-source-characterized-archive-not-byte-verified",
+      "native_status": "not_run"
+    },
+    {
+      "tag": "2.5.5",
+      "full_commit": "27877275854eb131efeb42672d3676c9c513c85e",
+      "info_json_git_blob": "562b4365b7bbe04f96107de21be6b06a1d213a5a",
+      "factorio_version": "2.0",
+      "dependencies": [
+        "base >= 2.0.77",
+        "(?) elevated-rails",
+        "? recycler >= 2.0.77",
+        "(?) quality",
+        "(?) pypostprocessing",
+        "(?) space-exploration",
+        "? space-age >= 2.0.77"
+      ],
+      "migration_members": [
+        {
+          "path": "migrations/more-infinite-research_2.0.5.json",
+          "git_blob": "014ca09a8864fab28275dafcf02f0295c8cac229"
+        },
+        {
+          "path": "migrations/more-infinite-research_2.1.0.json",
+          "git_blob": "0faf1db024013eab38164432037b51c37d052f00"
+        }
+      ],
+      "direct_current_engine_status": "direct-f200-origin",
+      "archive_sha256": null,
+      "archive_byte_status": "tag-source-characterized-archive-not-byte-verified",
+      "native_status": "not_run"
+    },
+    {
+      "tag": "2.5.9",
+      "full_commit": "89719eb8ea5c938b6a0e9d816e6324d4d59b87bb",
+      "info_json_git_blob": "88d5653a65e7f5cf4e6012723dac1ea9010623dd",
+      "factorio_version": "2.0",
+      "dependencies": [
+        "base >= 2.0.77",
+        "(?) elevated-rails",
+        "? recycler >= 2.0.77",
+        "(?) quality",
+        "(?) pypostprocessing",
+        "(?) space-exploration",
+        "? space-age >= 2.0.77"
+      ],
+      "migration_members": [
+        {
+          "path": "migrations/more-infinite-research_2.0.5.json",
+          "git_blob": "014ca09a8864fab28275dafcf02f0295c8cac229"
+        },
+        {
+          "path": "migrations/more-infinite-research_2.1.0.json",
+          "git_blob": "0faf1db024013eab38164432037b51c37d052f00"
+        }
+      ],
+      "direct_current_engine_status": "direct-f200-origin",
+      "archive_sha256": null,
+      "archive_byte_status": "tag-source-characterized-archive-not-byte-verified",
+      "native_status": "not_run"
+    },
+    {
+      "tag": "2.5.10",
+      "full_commit": "6bb483de9042a7ec4c93674933e7f6c1670d79aa",
+      "info_json_git_blob": "d12d6ccdc895c852df0b2fc51451e85c3bc53c29",
+      "factorio_version": "2.0",
+      "dependencies": [
+        "base >= 2.0.77",
+        "(?) elevated-rails",
+        "? recycler >= 2.0.77",
+        "(?) quality",
+        "(?) pypostprocessing",
+        "(?) space-exploration",
+        "? space-age >= 2.0.77"
+      ],
+      "migration_members": [
+        {
+          "path": "migrations/more-infinite-research_2.0.5.json",
+          "git_blob": "014ca09a8864fab28275dafcf02f0295c8cac229"
+        },
+        {
+          "path": "migrations/more-infinite-research_2.1.0.json",
+          "git_blob": "0faf1db024013eab38164432037b51c37d052f00"
+        }
+      ],
+      "direct_current_engine_status": "direct-f200-origin",
+      "archive_sha256": null,
+      "archive_byte_status": "tag-source-characterized-archive-not-byte-verified",
+      "native_status": "not_run"
+    },
+    {
+      "tag": "2.5.11",
+      "full_commit": "e08e6b0a8c054c8e9d09a7081cec3bd65de0e3af",
+      "info_json_git_blob": "91a242fcb8369374d74b1e8bac847e4c905e9192",
+      "factorio_version": "2.0",
+      "dependencies": [
+        "base >= 2.0.77",
+        "(?) elevated-rails",
+        "? recycler >= 2.0.77",
+        "(?) quality",
+        "(?) pypostprocessing",
+        "(?) space-exploration",
+        "? space-age >= 2.0.77"
+      ],
+      "migration_members": [
+        {
+          "path": "migrations/more-infinite-research_2.0.5.json",
+          "git_blob": "014ca09a8864fab28275dafcf02f0295c8cac229"
+        },
+        {
+          "path": "migrations/more-infinite-research_2.1.0.json",
+          "git_blob": "0faf1db024013eab38164432037b51c37d052f00"
+        }
+      ],
+      "direct_current_engine_status": "direct-f200-origin",
+      "archive_sha256": null,
+      "archive_byte_status": "tag-source-characterized-archive-not-byte-verified",
+      "native_status": "not_run"
+    },
+    {
+      "tag": "3.0.0",
+      "full_commit": "8da631a6e5774af6d8804a49107a61a7964a5b2c",
+      "info_json_git_blob": "67c6ed63ed16cd7dd8f63393717b4f649a46732e",
+      "factorio_version": "2.1",
+      "dependencies": [
+        "base >= 2.1.8",
+        "(?) elevated-rails",
+        "? recycler >= 2.1.8",
+        "(?) quality",
+        "? space-age >= 2.1.8"
+      ],
+      "migration_members": [
+        {
+          "path": "migrations/more-infinite-research_2.0.5.json",
+          "git_blob": "014ca09a8864fab28275dafcf02f0295c8cac229"
+        },
+        {
+          "path": "migrations/more-infinite-research_2.1.0.json",
+          "git_blob": "0faf1db024013eab38164432037b51c37d052f00"
+        }
+      ],
+      "direct_current_engine_status": "direct-f210-origin",
+      "archive_sha256": null,
+      "archive_byte_status": "tag-source-characterized-archive-not-byte-verified",
+      "native_status": "not_run"
+    },
+    {
+      "tag": "3.0.5",
+      "full_commit": "89d7764c4f0f5b67f7b2a2ca0a3827006e3a63d7",
+      "info_json_git_blob": "0ab4a47bdbb6dee27865b7f1e260757705390138",
+      "factorio_version": "2.1",
+      "dependencies": [
+        "base >= 2.1.8",
+        "(?) elevated-rails",
+        "? recycler >= 2.1.8",
+        "(?) quality",
+        "? space-age >= 2.1.8"
+      ],
+      "migration_members": [
+        {
+          "path": "migrations/more-infinite-research_2.0.5.json",
+          "git_blob": "014ca09a8864fab28275dafcf02f0295c8cac229"
+        },
+        {
+          "path": "migrations/more-infinite-research_2.1.0.json",
+          "git_blob": "0faf1db024013eab38164432037b51c37d052f00"
+        }
+      ],
+      "direct_current_engine_status": "direct-f210-origin",
+      "archive_sha256": null,
+      "archive_byte_status": "tag-source-characterized-archive-not-byte-verified",
+      "native_status": "not_run"
+    },
+    {
+      "tag": "3.1.0",
+      "full_commit": "8b5bdfa95e6538e75699a3138073d070aef64fb6",
+      "info_json_git_blob": "e587386d8a527c4e5e9fff3c264976ccf22d57a2",
+      "factorio_version": "2.1",
+      "dependencies": [
+        "base >= 2.1.8",
+        "(?) elevated-rails",
+        "? recycler >= 2.1.8",
+        "(?) quality",
+        "? space-age >= 2.1.8"
+      ],
+      "migration_members": [
+        {
+          "path": "migrations/more-infinite-research_2.0.5.json",
+          "git_blob": "014ca09a8864fab28275dafcf02f0295c8cac229"
+        },
+        {
+          "path": "migrations/more-infinite-research_2.1.0.json",
+          "git_blob": "0faf1db024013eab38164432037b51c37d052f00"
+        }
+      ],
+      "direct_current_engine_status": "direct-f210-origin",
+      "archive_sha256": null,
+      "archive_byte_status": "tag-source-characterized-archive-not-byte-verified",
+      "native_status": "not_run"
+    },
+    {
+      "tag": "3.1.1",
+      "full_commit": "e91963cf5f20b7f8c785196840a6ebcae8e8dd66",
+      "info_json_git_blob": "371c0946206cdbde75674618b0236ca8e6863cab",
+      "factorio_version": "2.1",
+      "dependencies": [
+        "base >= 2.1.8",
+        "(?) elevated-rails",
+        "? recycler >= 2.1.8",
+        "(?) quality",
+        "? space-age >= 2.1.8"
+      ],
+      "migration_members": [
+        {
+          "path": "migrations/more-infinite-research_2.0.5.json",
+          "git_blob": "014ca09a8864fab28275dafcf02f0295c8cac229"
+        },
+        {
+          "path": "migrations/more-infinite-research_2.1.0.json",
+          "git_blob": "0faf1db024013eab38164432037b51c37d052f00"
+        }
+      ],
+      "direct_current_engine_status": "direct-f210-origin",
+      "archive_sha256": null,
+      "archive_byte_status": "tag-source-characterized-archive-not-byte-verified",
+      "native_status": "not_run"
+    },
+    {
+      "tag": "3.1.2",
+      "full_commit": "4d7451400fecfb464dd9f34092f41c6c9a729b53",
+      "info_json_git_blob": "9a70c4f03fc623de4219d3d6dea777bd7578bc10",
+      "factorio_version": "2.1",
+      "dependencies": [
+        "base >= 2.1.8",
+        "(?) elevated-rails",
+        "? recycler >= 2.1.8",
+        "(?) quality",
+        "? space-age >= 2.1.8"
+      ],
+      "migration_members": [
+        {
+          "path": "migrations/more-infinite-research_2.0.5.json",
+          "git_blob": "014ca09a8864fab28275dafcf02f0295c8cac229"
+        },
+        {
+          "path": "migrations/more-infinite-research_2.1.0.json",
+          "git_blob": "0faf1db024013eab38164432037b51c37d052f00"
+        }
+      ],
+      "direct_current_engine_status": "direct-f210-origin",
+      "archive_sha256": null,
+      "archive_byte_status": "tag-source-characterized-archive-not-byte-verified",
+      "native_status": "not_run"
+    },
+    {
+      "tag": "3.1.5",
+      "full_commit": "c8bf4a742910cec9d6d3dee305c83deba1aa49eb",
+      "info_json_git_blob": "4a8dd3cb12181d5419655d92a0acf710f99d88b2",
+      "factorio_version": "2.1",
+      "dependencies": [
+        "base >= 2.1.8",
+        "(?) elevated-rails",
+        "? recycler >= 2.1.8",
+        "(?) quality",
+        "? space-age >= 2.1.8"
+      ],
+      "migration_members": [
+        {
+          "path": "migrations/more-infinite-research_2.0.5.json",
+          "git_blob": "014ca09a8864fab28275dafcf02f0295c8cac229"
+        },
+        {
+          "path": "migrations/more-infinite-research_2.1.0.json",
+          "git_blob": "0faf1db024013eab38164432037b51c37d052f00"
+        }
+      ],
+      "direct_current_engine_status": "direct-f210-origin",
+      "archive_sha256": null,
+      "archive_byte_status": "tag-source-characterized-archive-not-byte-verified",
+      "native_status": "not_run"
+    },
+    {
+      "tag": "3.1.9",
+      "full_commit": "1b9c6f32fc2bb53c413a593534e103a6043b4be3",
+      "info_json_git_blob": "ae53cbc33bfa349701b5789726360a286c05baed",
+      "factorio_version": "2.1",
+      "dependencies": [
+        "base >= 2.1.8",
+        "(?) elevated-rails",
+        "? recycler >= 2.1.8",
+        "(?) quality",
+        "? space-age >= 2.1.8"
+      ],
+      "migration_members": [
+        {
+          "path": "migrations/more-infinite-research_2.0.5.json",
+          "git_blob": "014ca09a8864fab28275dafcf02f0295c8cac229"
+        },
+        {
+          "path": "migrations/more-infinite-research_2.1.0.json",
+          "git_blob": "0faf1db024013eab38164432037b51c37d052f00"
+        }
+      ],
+      "direct_current_engine_status": "direct-f210-origin",
+      "archive_sha256": null,
+      "archive_byte_status": "tag-source-characterized-archive-not-byte-verified",
+      "native_status": "not_run"
+    },
+    {
+      "tag": "3.2.0",
+      "full_commit": "c8f3d8248cc89b8636cf1ee485fd8889422c6124",
+      "info_json_git_blob": "458a559346390a11fb0836cb91da8329bc9c858c",
+      "factorio_version": "2.1",
+      "dependencies": [
+        "base >= 2.1.11",
+        "(?) elevated-rails",
+        "? recycler >= 2.1.11",
+        "(?) quality",
+        "(?) Krastorio2",
+        "(?) Krastorio2-spaced-out",
+        "(?) space-exploration",
+        "? space-age >= 2.1.11"
+      ],
+      "migration_members": [
+        {
+          "path": "migrations/more-infinite-research_2.0.5.json",
+          "git_blob": "014ca09a8864fab28275dafcf02f0295c8cac229"
+        },
+        {
+          "path": "migrations/more-infinite-research_2.1.0.json",
+          "git_blob": "0faf1db024013eab38164432037b51c37d052f00"
+        }
+      ],
+      "direct_current_engine_status": "direct-f210-origin",
+      "archive_sha256": null,
+      "archive_byte_status": "tag-source-characterized-archive-not-byte-verified",
+      "native_status": "not_run"
+    },
+    {
+      "tag": "3.2.1",
+      "full_commit": "666bf1c24795036e934db2d31ae93b84b2e4cacf",
+      "info_json_git_blob": "e7c8517310d3110be8d6f0432d04d48e1bc50fb4",
+      "factorio_version": "2.1",
+      "dependencies": [
+        "base >= 2.1.8",
+        "(?) elevated-rails",
+        "? recycler >= 2.1.8",
+        "(?) quality",
+        "(?) Krastorio2",
+        "(?) Krastorio2-spaced-out",
+        "(?) space-exploration",
+        "? space-age >= 2.1.8"
+      ],
+      "migration_members": [
+        {
+          "path": "migrations/more-infinite-research_2.0.5.json",
+          "git_blob": "014ca09a8864fab28275dafcf02f0295c8cac229"
+        },
+        {
+          "path": "migrations/more-infinite-research_2.1.0.json",
+          "git_blob": "0faf1db024013eab38164432037b51c37d052f00"
+        }
+      ],
+      "direct_current_engine_status": "direct-f210-origin",
+      "archive_sha256": null,
+      "archive_byte_status": "tag-source-characterized-archive-not-byte-verified",
+      "native_status": "not_run"
+    },
+    {
+      "tag": "3.2.2",
+      "full_commit": "1138ed55ad7ad42e38cf9e821d1d4e7de5df6378",
+      "info_json_git_blob": "0788bf4e362a1457c1ccdba0b3ec9778df2fbd56",
+      "factorio_version": "2.1",
+      "dependencies": [
+        "base >= 2.1.8",
+        "(?) elevated-rails",
+        "? recycler >= 2.1.8",
+        "(?) quality",
+        "(?) Krastorio2",
+        "(?) Krastorio2-spaced-out",
+        "(?) pypostprocessing",
+        "(?) space-exploration",
+        "? space-age >= 2.1.8"
+      ],
+      "migration_members": [
+        {
+          "path": "migrations/more-infinite-research_2.0.5.json",
+          "git_blob": "014ca09a8864fab28275dafcf02f0295c8cac229"
+        },
+        {
+          "path": "migrations/more-infinite-research_2.1.0.json",
+          "git_blob": "0faf1db024013eab38164432037b51c37d052f00"
+        }
+      ],
+      "direct_current_engine_status": "direct-f210-origin",
+      "archive_sha256": null,
+      "archive_byte_status": "tag-source-characterized-archive-not-byte-verified",
+      "native_status": "not_run"
+    },
+    {
+      "tag": "3.2.3",
+      "full_commit": "1abe07573cde814c3cacf6153b5ae64dee4038ba",
+      "info_json_git_blob": "011c26b9767ef034bb296172e50cd50c5677a35b",
+      "factorio_version": "2.1",
+      "dependencies": [
+        "base >= 2.1.8",
+        "(?) elevated-rails",
+        "? recycler >= 2.1.8",
+        "(?) quality",
+        "(?) Krastorio2",
+        "(?) Krastorio2-spaced-out",
+        "(?) pypostprocessing",
+        "(?) space-exploration",
+        "? space-age >= 2.1.8"
+      ],
+      "migration_members": [
+        {
+          "path": "migrations/more-infinite-research_2.0.5.json",
+          "git_blob": "014ca09a8864fab28275dafcf02f0295c8cac229"
+        },
+        {
+          "path": "migrations/more-infinite-research_2.1.0.json",
+          "git_blob": "0faf1db024013eab38164432037b51c37d052f00"
+        }
+      ],
+      "direct_current_engine_status": "direct-f210-origin",
+      "archive_sha256": null,
+      "archive_byte_status": "tag-source-characterized-archive-not-byte-verified",
+      "native_status": "not_run"
+    },
+    {
+      "tag": "3.2.5",
+      "full_commit": "62fddd86b51db7c0238731815d15ca26a4b45857",
+      "info_json_git_blob": "9cf0f75e53d774e57be9bcfad2bf5ecdbc0482c8",
+      "factorio_version": "2.1",
+      "dependencies": [
+        "base >= 2.1.8",
+        "(?) elevated-rails",
+        "? recycler >= 2.1.8",
+        "(?) quality",
+        "(?) Krastorio2",
+        "(?) Krastorio2-spaced-out",
+        "(?) pypostprocessing",
+        "(?) space-exploration",
+        "? space-age >= 2.1.8"
+      ],
+      "migration_members": [
+        {
+          "path": "migrations/more-infinite-research_2.0.5.json",
+          "git_blob": "014ca09a8864fab28275dafcf02f0295c8cac229"
+        },
+        {
+          "path": "migrations/more-infinite-research_2.1.0.json",
+          "git_blob": "0faf1db024013eab38164432037b51c37d052f00"
+        }
+      ],
+      "direct_current_engine_status": "direct-f210-origin",
+      "archive_sha256": null,
+      "archive_byte_status": "tag-source-characterized-archive-not-byte-verified",
+      "native_status": "not_run"
+    },
+    {
+      "tag": "3.2.9",
+      "full_commit": "a60230a0695d2dd8fd1e727744614e746cda0bd8",
+      "info_json_git_blob": "f9d26153c9222fc0c667de2961f46dbda3627498",
+      "factorio_version": "2.1",
+      "dependencies": [
+        "base >= 2.1.8",
+        "(?) elevated-rails",
+        "? recycler >= 2.1.8",
+        "(?) quality",
+        "(?) Krastorio2",
+        "(?) Krastorio2-spaced-out",
+        "(?) pypostprocessing",
+        "(?) space-exploration",
+        "? space-age >= 2.1.8"
+      ],
+      "migration_members": [
+        {
+          "path": "migrations/more-infinite-research_2.0.5.json",
+          "git_blob": "014ca09a8864fab28275dafcf02f0295c8cac229"
+        },
+        {
+          "path": "migrations/more-infinite-research_2.1.0.json",
+          "git_blob": "0faf1db024013eab38164432037b51c37d052f00"
+        }
+      ],
+      "direct_current_engine_status": "direct-f210-origin",
+      "archive_sha256": null,
+      "archive_byte_status": "tag-source-characterized-archive-not-byte-verified",
+      "native_status": "not_run"
+    },
+    {
+      "tag": "3.2.10",
+      "full_commit": "4cbea531a1043e0cacb9ac5c496731c8d77bbdb6",
+      "info_json_git_blob": "6a229584614c68bbf609b065b2bf446dfafbf1c7",
+      "factorio_version": "2.1",
+      "dependencies": [
+        "base >= 2.1.8",
+        "(?) elevated-rails",
+        "? recycler >= 2.1.8",
+        "(?) quality",
+        "(?) Krastorio2",
+        "(?) Krastorio2-spaced-out",
+        "(?) pypostprocessing",
+        "(?) space-exploration",
+        "? space-age >= 2.1.8"
+      ],
+      "migration_members": [
+        {
+          "path": "migrations/more-infinite-research_2.0.5.json",
+          "git_blob": "014ca09a8864fab28275dafcf02f0295c8cac229"
+        },
+        {
+          "path": "migrations/more-infinite-research_2.1.0.json",
+          "git_blob": "0faf1db024013eab38164432037b51c37d052f00"
+        }
+      ],
+      "direct_current_engine_status": "direct-f210-origin",
+      "archive_sha256": null,
+      "archive_byte_status": "tag-source-characterized-archive-not-byte-verified",
+      "native_status": "not_run"
+    },
+    {
+      "tag": "3.2.11",
+      "full_commit": "e3d787deb35ff30157bb2013fa1cc745a445e629",
+      "info_json_git_blob": "8be05cc678353aade11407a8994dfc3518aa2f6c",
+      "factorio_version": "2.1",
+      "dependencies": [
+        "base >= 2.1.8",
+        "(?) elevated-rails",
+        "? recycler >= 2.1.8",
+        "(?) quality",
+        "(?) Krastorio2",
+        "(?) Krastorio2-spaced-out",
+        "(?) pypostprocessing",
+        "(?) space-exploration",
+        "? space-age >= 2.1.8"
+      ],
+      "migration_members": [
+        {
+          "path": "migrations/more-infinite-research_2.0.5.json",
+          "git_blob": "014ca09a8864fab28275dafcf02f0295c8cac229"
+        },
+        {
+          "path": "migrations/more-infinite-research_2.1.0.json",
+          "git_blob": "0faf1db024013eab38164432037b51c37d052f00"
+        }
+      ],
+      "direct_current_engine_status": "direct-f210-origin",
+      "archive_sha256": null,
+      "archive_byte_status": "tag-source-characterized-archive-not-byte-verified",
+      "native_status": "not_run"
+    }
+  ],
+  "migration_member_audit": {
+    "current_source_members": [
+      {
+        "path": "migrations/more-infinite-research_2.0.5.json",
+        "sha256": "07A2759B963321A87B1047029AE426C7B2784033BC7C4F899D2640C037C5EEE2",
+        "git_blob": "014ca09a8864fab28275dafcf02f0295c8cac229"
+      },
+      {
+        "path": "migrations/more-infinite-research_2.1.0.json",
+        "sha256": "F427B215D77BC86608010ADC1D0D1A1C98BE61F0D7140EF716D77E46DAB8092D",
+        "git_blob": "0faf1db024013eab38164432037b51c37d052f00"
+      },
+      {
+        "path": "migrations/more-infinite-research_4.7.0.json",
+        "sha256": "0980B0B6F1675F6827A8E4151F778143EA74C9C6C3440CC2318129DBCE63C379",
+        "git_blob": "fc59c77d1a43c547ec261e57676a1d1df187c21a"
+      },
+      {
+        "path": "migrations/more-infinite-research_5.0.11000.json",
+        "sha256": "C26C6B21D777F3C20410C9C9ECDAFFE8ADF8DDDEAE556FE8B044146CEC40117D",
+        "git_blob": "e798b97979f9432bc3970938e5e412311aac6e6e"
+      }
+    ],
+    "current_lua_migration_members": [],
+    "historical_unique_json_member_bodies": [
+      {
+        "path": "migrations/more-infinite-research_2.0.5.json",
+        "git_blob": "014ca09a8864fab28275dafcf02f0295c8cac229",
+        "observed_tags": [
+          "1.3.0",
+          "1.3.5",
+          "1.3.9",
+          "1.4.0",
+          "1.4.5",
+          "1.4.9",
+          "1.5.0",
+          "1.5.5",
+          "1.5.9",
+          "1.6.0",
+          "1.6.5",
+          "1.6.9",
+          "1.7.0",
+          "1.7.1",
+          "1.7.5",
+          "1.7.9",
+          "1.8.0",
+          "1.8.1",
+          "1.8.2",
+          "1.8.5",
+          "1.8.9",
+          "1.9.0",
+          "1.9.1",
+          "1.9.2",
+          "1.9.3",
+          "1.9.4",
+          "1.9.5",
+          "1.9.9",
+          "2.0.5",
+          "2.1.0",
+          "2.1.5",
+          "2.2.0",
+          "2.3.0",
+          "2.3.5",
+          "2.4.0",
+          "2.4.5",
+          "2.4.9",
+          "2.5.0",
+          "2.5.5",
+          "2.5.9",
+          "2.5.10",
+          "2.5.11",
+          "3.0.0",
+          "3.0.5",
+          "3.1.0",
+          "3.1.1",
+          "3.1.2",
+          "3.1.5",
+          "3.1.9",
+          "3.2.0",
+          "3.2.1",
+          "3.2.2",
+          "3.2.3",
+          "3.2.5",
+          "3.2.9",
+          "3.2.10",
+          "3.2.11"
+        ]
+      },
+      {
+        "path": "migrations/more-infinite-research_2.1.0.json",
+        "git_blob": "0faf1db024013eab38164432037b51c37d052f00",
+        "observed_tags": [
+          "1.3.0",
+          "1.3.5",
+          "1.3.9",
+          "1.4.0",
+          "1.4.5",
+          "1.4.9",
+          "1.5.0",
+          "1.5.5",
+          "1.5.9",
+          "1.6.0",
+          "1.6.5",
+          "1.6.9",
+          "1.7.0",
+          "1.7.1",
+          "1.7.5",
+          "1.7.9",
+          "1.8.0",
+          "1.8.1",
+          "1.8.2",
+          "1.8.5",
+          "1.8.9",
+          "1.9.1",
+          "1.9.2",
+          "1.9.3",
+          "1.9.4",
+          "1.9.5",
+          "1.9.9",
+          "2.1.0",
+          "2.1.5",
+          "2.2.0",
+          "2.3.0",
+          "2.3.5",
+          "2.4.0",
+          "2.4.5",
+          "2.4.9",
+          "2.5.0",
+          "2.5.5",
+          "2.5.9",
+          "2.5.10",
+          "2.5.11",
+          "3.0.0",
+          "3.0.5",
+          "3.1.0",
+          "3.1.1",
+          "3.1.2",
+          "3.1.5",
+          "3.1.9",
+          "3.2.0",
+          "3.2.1",
+          "3.2.2",
+          "3.2.3",
+          "3.2.5",
+          "3.2.9",
+          "3.2.10",
+          "3.2.11"
+        ]
+      }
+    ],
+    "historical_unique_lua_member_bodies": [],
+    "package_support": {
+      "path": "tools/package.py",
+      "line": 44,
+      "rule": "Lua members are selectable package members; JSON migration members are additionally selected only from the migrations directory."
+    },
+    "retention_decision": "Retain every published migration filename/body history. Missing Lua migration members do not prove the corresponding historical runtime state has no obligation; source_state_producer_boundaries names the current and MIR4 runtime-ledger/carrier owners to inspect before source-save creation."
+  },
+  "published_mir4_7_3": {
+    "tag": "v4.7.3",
+    "full_commit": "8643cc91bc915e008556a5315dbb0a743247e7ab",
+    "github_release_id": 422732162,
+    "metadata_source": {
+      "path": "spec/inventory/package-presentation-473.json",
+      "sha256": "5A86B2A720AB5A5F431748276567239EADBEE4698F90F237FB21C64601C0653E",
+      "statement": "Archive records come from retained release metadata and SHA256SUMS evidence. A local direct-library absence is not an invented archive absence."
+    },
+    "supported_edition_archives": [
+      {
+        "edition": "f013",
+        "filename": "more-infinite-research_4.7.01303.zip",
+        "sha256": "3918B10A0902FABD09BEA6D1F0E7EFF06B20B84F3D8CC5EC73E36FEDAAE64D4D",
+        "bytes": 695785,
+        "local_direct_library_status": "not-present-at-bounded-f013-direct-library-locator",
+        "native_status": "not_run"
+      },
+      {
+        "edition": "f014",
+        "filename": "more-infinite-research_4.7.01403.zip",
+        "sha256": "85C7798BD6DC80FAA021AB0F33519B57A740B8D3969E695A82BA55634BA1C87A",
+        "bytes": 695784,
+        "local_direct_library_status": "not-present-at-bounded-f014-direct-library-locator",
+        "native_status": "not_run"
+      },
+      {
+        "edition": "f015",
+        "filename": "more-infinite-research_4.7.01503.zip",
+        "sha256": "0F8DD4DD21B8D1542FF5EDF96FDC38F75C9AB3CE577DF29C5E9DE99E0643B510",
+        "bytes": 695575,
+        "local_direct_library_status": "not-present-at-bounded-f015-direct-library-locator",
+        "native_status": "not_run"
+      },
+      {
+        "edition": "f016",
+        "filename": "more-infinite-research_4.7.01603.zip",
+        "sha256": "DAC63B9B14278C952B1020F9AE600C1437A9812C79CBBA17DE3CB15AF0CED6BD",
+        "bytes": 695583,
+        "local_direct_library_status": "not-present-at-bounded-f016-direct-library-locator",
+        "native_status": "not_run"
+      },
+      {
+        "edition": "f017",
+        "filename": "more-infinite-research_4.7.01703.zip",
+        "sha256": "9BCF1813BBDCBBD90088D74672CEF639FBC96689604673E529CF3AA8FC8D89AF",
+        "bytes": 695297,
+        "local_direct_library_status": "retained-local-copy-reported",
+        "native_status": "source-chain-exists-but-not-current-5-x-qualified"
+      },
+      {
+        "edition": "f100",
+        "filename": "more-infinite-research_4.7.10003.zip",
+        "sha256": "C04F3543EBF99D2B76B2C9193EA0886381B7CDDF2F2C1610310E7961B24BE0E1",
+        "bytes": 709722,
+        "local_direct_library_status": "retained-local-copy-reported",
+        "native_status": "source-chain-exists-but-not-current-5-x-qualified"
+      },
+      {
+        "edition": "f110",
+        "filename": "more-infinite-research_4.7.11003.zip",
+        "sha256": "66C127D8BFC1919FA88F19D2D9B3047316A1B90401CAA05A6D05979B7A099D1E",
+        "bytes": 709749,
+        "local_direct_library_status": "retained-local-copy-reported",
+        "native_status": "published-source-qualified-current-5-x-successor-not-yet-bound"
+      },
+      {
+        "edition": "f200",
+        "filename": "more-infinite-research_4.7.20003.zip",
+        "sha256": "FBBA844DD04011A12BB6DA885745B0733AD37FAB181EAAD9EE4346B9B0D32647",
+        "bytes": 1449475,
+        "local_direct_library_status": "retained-local-copy-reported",
+        "native_status": "cross-engine-chain-exists-for-prior-candidates-not-final-current-5-x"
+      },
+      {
+        "edition": "f210",
+        "filename": "more-infinite-research_4.7.21003.zip",
+        "sha256": "B6EB9430056ABD384DB00F94929FE7DAC0A37441ACF4BC277946689682628852",
+        "bytes": 1463293,
+        "local_direct_library_status": "retained-local-copy-reported",
+        "native_status": "source-transition-chain-exists-for-prior-candidates-not-final-current-5-x"
+      }
+    ],
+    "inapplicable_current_target": {
+      "edition": "f018",
+      "status": "no-published-4.7.3-target-archive-in-baseline-inventory",
+      "archive_sha256": null,
+      "native_status": "not_run"
+    }
+  },
+  "exact_native_evidence": [
+    {
+      "path": "spec/evidence/full-catalogue-473-8f-native-chain.json",
+      "sha256": "E52C9BF84969E33D1C7132E97832CFAA29305FFEDBDE08DEC5C61E058997F60F",
+      "status": "passed-exact-b6-to-8f-base-and-space-age-only",
+      "reuse": "requires-exact-input-equivalence-before-adoption"
+    },
+    {
+      "path": "spec/evidence/full-catalogue-f200-f210-c563-native-chain-r01.json",
+      "sha256": "A13845A1EF36739185CFBD13B4066EE842ECC1AF7DD8734F3337B8FF4BAEF27F",
+      "status": "passed-exact-f200-to-f210-c563-only",
+      "reuse": "requires-exact-input-equivalence-before-adoption"
+    },
+    {
+      "path": "spec/evidence/full-catalogue-f200-f210-8f-native-chain.json",
+      "sha256": "23B4B74554438C73EFEA294E7328855F379079EA593DA31159B26DD6C0424399",
+      "status": "passed-protected-f200-save-to-8f-only",
+      "reuse": "not-final-current-5-x-acceptance"
+    },
+    {
+      "path": "spec/evidence/f110-f200-published-source-r05-native-chain.json",
+      "sha256": "BFF56165FCB7B3F5F5FACA29EE9A4E244DCA92833C0A6CE247BE40CF67E83CE2",
+      "status": "passed-f110-published-source-only",
+      "reuse": "protected-source-save-requires-exact-successor-binding"
+    },
+    {
+      "path": "spec/evidence/f110-f200-a1fd-successor-recovery-chain.json",
+      "sha256": "BA37B082C7AE2261423A1AA0C86D57FE8738601F27BF73A6D7B69FBC1B981948",
+      "status": "passed-f110-to-a1fd-f200-only",
+      "reuse": "not-final-current-5-x-acceptance"
+    },
+    {
+      "path": "spec/evidence/historical-transition-017-100-110-chain.json",
+      "sha256": "759C19C45C9B3100769B39DCA8CD843C295C8C610FF59FEA8D399CFAD6191E82",
+      "status": "passed-017-100-110-exact-engine-chain-only",
+      "reuse": "does-not-satisfy-direct-f200-or-f210-origin-matrix"
+    },
+    {
+      "path": "spec/evidence/historical-native-chain.json",
+      "sha256": "B97DD2F3BCADD40A79FD80BAC3625878841568A3221CC1E95745F4050CE41C02",
+      "status": "seven-exact-engine-private-scenarios",
+      "reuse": "not-a-direct-modern-origin-matrix"
+    },
+    {
+      "path": "build/qualification/sif-eight-policy-58f-r02/terminal.json",
+      "sha256": "0FFC55CBEDB0B60A2F2CDD30A2AB4D28526F9BA24B8BFC020316AECFB6A1571E",
+      "status": "passed-eight-createonly-current-policy-loads",
+      "custody_manifest_sha256": "7E2A0F9ECA2450322415A7018AB2CB46A51D3D56B16A562603597FC8AE1CD2E8",
+      "primary_custody_readback_sha256": "14B3CC97F4DBA809B257B8056CD2C016C4A45A61A9BDB04947B16BD93A3B2EEE",
+      "reuse": "not-a-save-lab-migration-or-performance-result"
+    },
+    {
+      "path": "build/mir5/recovery-historical/sif-f210-eight-policy-58f-r01/terminal.json",
+      "sha256": "A52E3FCCA2714A4EF4710BED5133C69059062A19ED9C51F9A0628DF70EA13029",
+      "status": "pre-engine-refusal-unsupported-MaxNewOutputMiB",
+      "reuse": "adverse-preserved"
+    }
+  ],
+  "migration_execution_matrix": {
+    "direct_f200_and_f210_tag_origins": {
+      "policy": "One protected source save per exact archive when available; direct F200/F210 execution is required before a later 5.x acceptance claim.",
+      "cases": [
+        {
+          "origin_tag": "1.0.0",
+          "factorio_version": "2.0",
+          "archive_sha256": null,
+          "source_case": "not_run",
+          "final_5_x_case": "not_run",
+          "disposition": "requires-exact-archive-and-native-source-save"
+        },
+        {
+          "origin_tag": "1.1.0",
+          "factorio_version": "2.0",
+          "archive_sha256": null,
+          "source_case": "not_run",
+          "final_5_x_case": "not_run",
+          "disposition": "requires-exact-archive-and-native-source-save"
+        },
+        {
+          "origin_tag": "1.1.5",
+          "factorio_version": "2.0",
+          "archive_sha256": null,
+          "source_case": "not_run",
+          "final_5_x_case": "not_run",
+          "disposition": "requires-exact-archive-and-native-source-save"
+        },
+        {
+          "origin_tag": "1.2.0",
+          "factorio_version": "2.0",
+          "archive_sha256": null,
+          "source_case": "not_run",
+          "final_5_x_case": "not_run",
+          "disposition": "requires-exact-archive-and-native-source-save"
+        },
+        {
+          "origin_tag": "1.2.5",
+          "factorio_version": "2.0",
+          "archive_sha256": null,
+          "source_case": "not_run",
+          "final_5_x_case": "not_run",
+          "disposition": "requires-exact-archive-and-native-source-save"
+        },
+        {
+          "origin_tag": "1.2.9",
+          "factorio_version": "2.0",
+          "archive_sha256": null,
+          "source_case": "not_run",
+          "final_5_x_case": "not_run",
+          "disposition": "requires-exact-archive-and-native-source-save"
+        },
+        {
+          "origin_tag": "1.9.0",
+          "factorio_version": "2.0",
+          "archive_sha256": null,
+          "source_case": "not_run",
+          "final_5_x_case": "not_run",
+          "disposition": "requires-exact-archive-and-native-source-save"
+        },
+        {
+          "origin_tag": "1.9.1",
+          "factorio_version": "2.0",
+          "archive_sha256": null,
+          "source_case": "not_run",
+          "final_5_x_case": "not_run",
+          "disposition": "requires-exact-archive-and-native-source-save"
+        },
+        {
+          "origin_tag": "1.9.2",
+          "factorio_version": "2.0",
+          "archive_sha256": null,
+          "source_case": "not_run",
+          "final_5_x_case": "not_run",
+          "disposition": "requires-exact-archive-and-native-source-save"
+        },
+        {
+          "origin_tag": "2.3.0",
+          "factorio_version": "2.0",
+          "archive_sha256": null,
+          "source_case": "not_run",
+          "final_5_x_case": "not_run",
+          "disposition": "requires-exact-archive-and-native-source-save"
+        },
+        {
+          "origin_tag": "2.3.5",
+          "factorio_version": "2.0",
+          "archive_sha256": null,
+          "source_case": "not_run",
+          "final_5_x_case": "not_run",
+          "disposition": "requires-exact-archive-and-native-source-save"
+        },
+        {
+          "origin_tag": "2.4.0",
+          "factorio_version": "2.0",
+          "archive_sha256": null,
+          "source_case": "not_run",
+          "final_5_x_case": "not_run",
+          "disposition": "requires-exact-archive-and-native-source-save"
+        },
+        {
+          "origin_tag": "2.4.5",
+          "factorio_version": "2.0",
+          "archive_sha256": null,
+          "source_case": "not_run",
+          "final_5_x_case": "not_run",
+          "disposition": "requires-exact-archive-and-native-source-save"
+        },
+        {
+          "origin_tag": "2.4.9",
+          "factorio_version": "2.0",
+          "archive_sha256": null,
+          "source_case": "not_run",
+          "final_5_x_case": "not_run",
+          "disposition": "requires-exact-archive-and-native-source-save"
+        },
+        {
+          "origin_tag": "2.5.0",
+          "factorio_version": "2.0",
+          "archive_sha256": null,
+          "source_case": "not_run",
+          "final_5_x_case": "not_run",
+          "disposition": "requires-exact-archive-and-native-source-save"
+        },
+        {
+          "origin_tag": "2.5.5",
+          "factorio_version": "2.0",
+          "archive_sha256": null,
+          "source_case": "not_run",
+          "final_5_x_case": "not_run",
+          "disposition": "requires-exact-archive-and-native-source-save"
+        },
+        {
+          "origin_tag": "2.5.9",
+          "factorio_version": "2.0",
+          "archive_sha256": null,
+          "source_case": "not_run",
+          "final_5_x_case": "not_run",
+          "disposition": "requires-exact-archive-and-native-source-save"
+        },
+        {
+          "origin_tag": "2.5.10",
+          "factorio_version": "2.0",
+          "archive_sha256": null,
+          "source_case": "not_run",
+          "final_5_x_case": "not_run",
+          "disposition": "requires-exact-archive-and-native-source-save"
+        },
+        {
+          "origin_tag": "2.5.11",
+          "factorio_version": "2.0",
+          "archive_sha256": null,
+          "source_case": "not_run",
+          "final_5_x_case": "not_run",
+          "disposition": "requires-exact-archive-and-native-source-save"
+        },
+        {
+          "origin_tag": "2.0.0",
+          "factorio_version": "2.1",
+          "archive_sha256": null,
+          "source_case": "not_run",
+          "final_5_x_case": "not_run",
+          "disposition": "requires-exact-archive-and-native-source-save"
+        },
+        {
+          "origin_tag": "2.0.5",
+          "factorio_version": "2.1",
+          "archive_sha256": null,
+          "source_case": "not_run",
+          "final_5_x_case": "not_run",
+          "disposition": "requires-exact-archive-and-native-source-save"
+        },
+        {
+          "origin_tag": "2.1.0",
+          "factorio_version": "2.1",
+          "archive_sha256": null,
+          "source_case": "not_run",
+          "final_5_x_case": "not_run",
+          "disposition": "requires-exact-archive-and-native-source-save"
+        },
+        {
+          "origin_tag": "2.1.5",
+          "factorio_version": "2.1",
+          "archive_sha256": null,
+          "source_case": "not_run",
+          "final_5_x_case": "not_run",
+          "disposition": "requires-exact-archive-and-native-source-save"
+        },
+        {
+          "origin_tag": "2.2.0",
+          "factorio_version": "2.1",
+          "archive_sha256": null,
+          "source_case": "not_run",
+          "final_5_x_case": "not_run",
+          "disposition": "requires-exact-archive-and-native-source-save"
+        },
+        {
+          "origin_tag": "3.0.0",
+          "factorio_version": "2.1",
+          "archive_sha256": null,
+          "source_case": "not_run",
+          "final_5_x_case": "not_run",
+          "disposition": "requires-exact-archive-and-native-source-save"
+        },
+        {
+          "origin_tag": "3.0.5",
+          "factorio_version": "2.1",
+          "archive_sha256": null,
+          "source_case": "not_run",
+          "final_5_x_case": "not_run",
+          "disposition": "requires-exact-archive-and-native-source-save"
+        },
+        {
+          "origin_tag": "3.1.0",
+          "factorio_version": "2.1",
+          "archive_sha256": null,
+          "source_case": "not_run",
+          "final_5_x_case": "not_run",
+          "disposition": "requires-exact-archive-and-native-source-save"
+        },
+        {
+          "origin_tag": "3.1.1",
+          "factorio_version": "2.1",
+          "archive_sha256": null,
+          "source_case": "not_run",
+          "final_5_x_case": "not_run",
+          "disposition": "requires-exact-archive-and-native-source-save"
+        },
+        {
+          "origin_tag": "3.1.2",
+          "factorio_version": "2.1",
+          "archive_sha256": null,
+          "source_case": "not_run",
+          "final_5_x_case": "not_run",
+          "disposition": "requires-exact-archive-and-native-source-save"
+        },
+        {
+          "origin_tag": "3.1.5",
+          "factorio_version": "2.1",
+          "archive_sha256": null,
+          "source_case": "not_run",
+          "final_5_x_case": "not_run",
+          "disposition": "requires-exact-archive-and-native-source-save"
+        },
+        {
+          "origin_tag": "3.1.9",
+          "factorio_version": "2.1",
+          "archive_sha256": null,
+          "source_case": "not_run",
+          "final_5_x_case": "not_run",
+          "disposition": "requires-exact-archive-and-native-source-save"
+        },
+        {
+          "origin_tag": "3.2.0",
+          "factorio_version": "2.1",
+          "archive_sha256": null,
+          "source_case": "not_run",
+          "final_5_x_case": "not_run",
+          "disposition": "requires-exact-archive-and-native-source-save"
+        },
+        {
+          "origin_tag": "3.2.1",
+          "factorio_version": "2.1",
+          "archive_sha256": null,
+          "source_case": "not_run",
+          "final_5_x_case": "not_run",
+          "disposition": "requires-exact-archive-and-native-source-save"
+        },
+        {
+          "origin_tag": "3.2.2",
+          "factorio_version": "2.1",
+          "archive_sha256": null,
+          "source_case": "not_run",
+          "final_5_x_case": "not_run",
+          "disposition": "requires-exact-archive-and-native-source-save"
+        },
+        {
+          "origin_tag": "3.2.3",
+          "factorio_version": "2.1",
+          "archive_sha256": null,
+          "source_case": "not_run",
+          "final_5_x_case": "not_run",
+          "disposition": "requires-exact-archive-and-native-source-save"
+        },
+        {
+          "origin_tag": "3.2.5",
+          "factorio_version": "2.1",
+          "archive_sha256": null,
+          "source_case": "not_run",
+          "final_5_x_case": "not_run",
+          "disposition": "requires-exact-archive-and-native-source-save"
+        },
+        {
+          "origin_tag": "3.2.9",
+          "factorio_version": "2.1",
+          "archive_sha256": null,
+          "source_case": "not_run",
+          "final_5_x_case": "not_run",
+          "disposition": "requires-exact-archive-and-native-source-save"
+        },
+        {
+          "origin_tag": "3.2.10",
+          "factorio_version": "2.1",
+          "archive_sha256": null,
+          "source_case": "not_run",
+          "final_5_x_case": "not_run",
+          "disposition": "requires-exact-archive-and-native-source-save"
+        },
+        {
+          "origin_tag": "3.2.11",
+          "factorio_version": "2.1",
+          "archive_sha256": null,
+          "source_case": "not_run",
+          "final_5_x_case": "not_run",
+          "disposition": "requires-exact-archive-and-native-source-save"
+        }
+      ]
+    },
+    "published_4_7_3_origins": {
+      "policy": "Each supported F013/F014/F015/F016/F017/F100/F110/F200/F210 source needs a 4.7.3-to-5.0.0 route appropriate to its engine bridge; do not claim an F018 source that was never published in this baseline.",
+      "cases": [
+        {
+          "edition": "f013",
+          "origin_archive_sha256": "3918B10A0902FABD09BEA6D1F0E7EFF06B20B84F3D8CC5EC73E36FEDAAE64D4D",
+          "source_case": "not_run",
+          "final_5_x_case": "not_run",
+          "disposition": "not-a-cartesian-modset-matrix"
+        },
+        {
+          "edition": "f014",
+          "origin_archive_sha256": "85C7798BD6DC80FAA021AB0F33519B57A740B8D3969E695A82BA55634BA1C87A",
+          "source_case": "not_run",
+          "final_5_x_case": "not_run",
+          "disposition": "not-a-cartesian-modset-matrix"
+        },
+        {
+          "edition": "f015",
+          "origin_archive_sha256": "0F8DD4DD21B8D1542FF5EDF96FDC38F75C9AB3CE577DF29C5E9DE99E0643B510",
+          "source_case": "not_run",
+          "final_5_x_case": "not_run",
+          "disposition": "not-a-cartesian-modset-matrix"
+        },
+        {
+          "edition": "f016",
+          "origin_archive_sha256": "DAC63B9B14278C952B1020F9AE600C1437A9812C79CBBA17DE3CB15AF0CED6BD",
+          "source_case": "not_run",
+          "final_5_x_case": "not_run",
+          "disposition": "not-a-cartesian-modset-matrix"
+        },
+        {
+          "edition": "f017",
+          "origin_archive_sha256": "9BCF1813BBDCBBD90088D74672CEF639FBC96689604673E529CF3AA8FC8D89AF",
+          "source_case": "source-chain-exists-but-not-current-5-x-qualified",
+          "final_5_x_case": "not_run",
+          "disposition": "not-a-cartesian-modset-matrix"
+        },
+        {
+          "edition": "f100",
+          "origin_archive_sha256": "C04F3543EBF99D2B76B2C9193EA0886381B7CDDF2F2C1610310E7961B24BE0E1",
+          "source_case": "source-chain-exists-but-not-current-5-x-qualified",
+          "final_5_x_case": "not_run",
+          "disposition": "not-a-cartesian-modset-matrix"
+        },
+        {
+          "edition": "f110",
+          "origin_archive_sha256": "66C127D8BFC1919FA88F19D2D9B3047316A1B90401CAA05A6D05979B7A099D1E",
+          "source_case": "published-source-qualified-current-5-x-successor-not-yet-bound",
+          "final_5_x_case": "not_run",
+          "disposition": "not-a-cartesian-modset-matrix"
+        },
+        {
+          "edition": "f200",
+          "origin_archive_sha256": "FBBA844DD04011A12BB6DA885745B0733AD37FAB181EAAD9EE4346B9B0D32647",
+          "source_case": "cross-engine-chain-exists-for-prior-candidates-not-final-current-5-x",
+          "final_5_x_case": "not_run",
+          "disposition": "not-a-cartesian-modset-matrix"
+        },
+        {
+          "edition": "f210",
+          "origin_archive_sha256": "B6EB9430056ABD384DB00F94929FE7DAC0A37441ACF4BC277946689682628852",
+          "source_case": "source-transition-chain-exists-for-prior-candidates-not-final-current-5-x",
+          "final_5_x_case": "not_run",
+          "disposition": "not-a-cartesian-modset-matrix"
+        }
+      ]
+    },
+    "older_engine_origins": {
+      "policy": "Visible best-effort engine-bridge population; never silently exclude it and never mislabel it as direct F200/F210.",
+      "cases": [
+        {
+          "origin_tag": "1.3.0",
+          "factorio_version": "0.13",
+          "full_commit": "a33b99c1f39e1e779986a12a558a79ea97e69239",
+          "disposition": "requires-engine-bridge-or-best-effort-older-engine",
+          "source_case": "not_run",
+          "final_5_x_case": "not_run"
+        },
+        {
+          "origin_tag": "1.3.5",
+          "factorio_version": "0.13",
+          "full_commit": "7293cad3801d1c02f4a5d577fc20a425cced0b0e",
+          "disposition": "requires-engine-bridge-or-best-effort-older-engine",
+          "source_case": "not_run",
+          "final_5_x_case": "not_run"
+        },
+        {
+          "origin_tag": "1.3.9",
+          "factorio_version": "0.13",
+          "full_commit": "b9459906a0971e237aed66855b51231e9b6bf028",
+          "disposition": "requires-engine-bridge-or-best-effort-older-engine",
+          "source_case": "not_run",
+          "final_5_x_case": "not_run"
+        },
+        {
+          "origin_tag": "1.4.0",
+          "factorio_version": "0.14",
+          "full_commit": "fa192796ab274dd590c65b96d0f3f6a0f35cb155",
+          "disposition": "requires-engine-bridge-or-best-effort-older-engine",
+          "source_case": "not_run",
+          "final_5_x_case": "not_run"
+        },
+        {
+          "origin_tag": "1.4.5",
+          "factorio_version": "0.14",
+          "full_commit": "efa372c95517c0d224828e7362433fcd9eb0a91b",
+          "disposition": "requires-engine-bridge-or-best-effort-older-engine",
+          "source_case": "not_run",
+          "final_5_x_case": "not_run"
+        },
+        {
+          "origin_tag": "1.4.9",
+          "factorio_version": "0.14",
+          "full_commit": "8f75fa45d52a55650e74423a99f04a0252db429b",
+          "disposition": "requires-engine-bridge-or-best-effort-older-engine",
+          "source_case": "not_run",
+          "final_5_x_case": "not_run"
+        },
+        {
+          "origin_tag": "1.5.0",
+          "factorio_version": "0.15",
+          "full_commit": "c2b526fd6dde81be7703daef53b075a1fd773e09",
+          "disposition": "requires-engine-bridge-or-best-effort-older-engine",
+          "source_case": "not_run",
+          "final_5_x_case": "not_run"
+        },
+        {
+          "origin_tag": "1.5.5",
+          "factorio_version": "0.15",
+          "full_commit": "2486bebf1909b6af1b0e99fce9e2d327e670a1c6",
+          "disposition": "requires-engine-bridge-or-best-effort-older-engine",
+          "source_case": "not_run",
+          "final_5_x_case": "not_run"
+        },
+        {
+          "origin_tag": "1.5.9",
+          "factorio_version": "0.15",
+          "full_commit": "8098510acc3530321a2dc32b8d2292aa814bb9c3",
+          "disposition": "requires-engine-bridge-or-best-effort-older-engine",
+          "source_case": "not_run",
+          "final_5_x_case": "not_run"
+        },
+        {
+          "origin_tag": "1.6.0",
+          "factorio_version": "0.16",
+          "full_commit": "a48509ed1dfbae8eba4b3dc7a701065063c12d5f",
+          "disposition": "requires-engine-bridge-or-best-effort-older-engine",
+          "source_case": "not_run",
+          "final_5_x_case": "not_run"
+        },
+        {
+          "origin_tag": "1.6.5",
+          "factorio_version": "0.16",
+          "full_commit": "da298d36cd41b6874e51eae31252cebd079872ad",
+          "disposition": "requires-engine-bridge-or-best-effort-older-engine",
+          "source_case": "not_run",
+          "final_5_x_case": "not_run"
+        },
+        {
+          "origin_tag": "1.6.9",
+          "factorio_version": "0.16",
+          "full_commit": "595ebcfc8b1f35b53906ea85fdb2d1de70f9bb2d",
+          "disposition": "requires-engine-bridge-or-best-effort-older-engine",
+          "source_case": "not_run",
+          "final_5_x_case": "not_run"
+        },
+        {
+          "origin_tag": "1.7.0",
+          "factorio_version": "0.17",
+          "full_commit": "1a9b5a7b1162f8dca8125ef7bb792f57a9ae282b",
+          "disposition": "requires-engine-bridge-or-best-effort-older-engine",
+          "source_case": "not_run",
+          "final_5_x_case": "not_run"
+        },
+        {
+          "origin_tag": "1.7.1",
+          "factorio_version": "0.17",
+          "full_commit": "9d9095c92055aebe557a55a7ab99bb9588fe73fb",
+          "disposition": "requires-engine-bridge-or-best-effort-older-engine",
+          "source_case": "not_run",
+          "final_5_x_case": "not_run"
+        },
+        {
+          "origin_tag": "1.7.5",
+          "factorio_version": "0.17",
+          "full_commit": "c6692980dc9f5a1332a7888da33385a0107ae004",
+          "disposition": "requires-engine-bridge-or-best-effort-older-engine",
+          "source_case": "not_run",
+          "final_5_x_case": "not_run"
+        },
+        {
+          "origin_tag": "1.7.9",
+          "factorio_version": "0.17",
+          "full_commit": "215ccced7018aac70919221c73e15d795f9d1653",
+          "disposition": "requires-engine-bridge-or-best-effort-older-engine",
+          "source_case": "not_run",
+          "final_5_x_case": "not_run"
+        },
+        {
+          "origin_tag": "1.8.0",
+          "factorio_version": "0.18",
+          "full_commit": "5662c66c372e6aca025eab9f446de55a5cc6c1c9",
+          "disposition": "requires-engine-bridge-or-best-effort-older-engine",
+          "source_case": "not_run",
+          "final_5_x_case": "not_run"
+        },
+        {
+          "origin_tag": "1.8.1",
+          "factorio_version": "1.0",
+          "full_commit": "33b6bb2cc6fe069aa1cb2226e82b14975756f6a2",
+          "disposition": "requires-engine-bridge-or-best-effort-older-engine",
+          "source_case": "not_run",
+          "final_5_x_case": "not_run"
+        },
+        {
+          "origin_tag": "1.8.2",
+          "factorio_version": "1.0",
+          "full_commit": "0a192c27674a6b13847e2f5e1b2b530e62419ee8",
+          "disposition": "requires-engine-bridge-or-best-effort-older-engine",
+          "source_case": "not_run",
+          "final_5_x_case": "not_run"
+        },
+        {
+          "origin_tag": "1.8.5",
+          "factorio_version": "1.0",
+          "full_commit": "2fa5b6fc1f86fe2a17779628efcbf83ffb033aed",
+          "disposition": "requires-engine-bridge-or-best-effort-older-engine",
+          "source_case": "not_run",
+          "final_5_x_case": "not_run"
+        },
+        {
+          "origin_tag": "1.8.9",
+          "factorio_version": "1.0",
+          "full_commit": "8cdc87db5a686b12b1aa3c6f432ae8e4b74a4309",
+          "disposition": "requires-engine-bridge-or-best-effort-older-engine",
+          "source_case": "not_run",
+          "final_5_x_case": "not_run"
+        },
+        {
+          "origin_tag": "1.9.3",
+          "factorio_version": "1.1",
+          "full_commit": "c1bb2a6b05bb5d9ed782e010d0ab08f21c16af9c",
+          "disposition": "requires-engine-bridge-or-best-effort-older-engine",
+          "source_case": "not_run",
+          "final_5_x_case": "not_run"
+        },
+        {
+          "origin_tag": "1.9.4",
+          "factorio_version": "1.1",
+          "full_commit": "426d6d48c6578a786ea7de0f224282baff9d342b",
+          "disposition": "requires-engine-bridge-or-best-effort-older-engine",
+          "source_case": "not_run",
+          "final_5_x_case": "not_run"
+        },
+        {
+          "origin_tag": "1.9.5",
+          "factorio_version": "1.1",
+          "full_commit": "67036cb43e3e4814626e5abf5ce5df17a6f765f7",
+          "disposition": "requires-engine-bridge-or-best-effort-older-engine",
+          "source_case": "not_run",
+          "final_5_x_case": "not_run"
+        },
+        {
+          "origin_tag": "1.9.9",
+          "factorio_version": "1.1",
+          "full_commit": "2243cfd31c0d6c575782c5b004514c3845d1907c",
+          "disposition": "requires-engine-bridge-or-best-effort-older-engine",
+          "source_case": "not_run",
+          "final_5_x_case": "not_run"
+        }
+      ]
+    },
+    "future_5_x_upgrade_cadence": {
+      "status": "not_run",
+      "policy": "Test a protected accepted 5.0.0 save against each later accepted 5.x package with exact package/archive and engine pins; this inventory is not evidence that a future build passed."
+    }
+  },
+  "known_gaps_and_retention": [
+    "All 64 versioned 1.x-3.x tag source trees are characterized, but no historical archive SHA256 is invented where a byte-verified published ZIP has not been located.",
+    "Exact 1.0.0 is F200-direct by its info.json factorio_version 2.0 and must not be moved into the older-engine bridge population.",
+    "The 25 non-F200/F210 tag origins remain explicit best-effort bridge cases. Existing F017/F100/F110 evidence is useful only at its recorded exact inputs.",
+    "Existing MIR4 source and cross-engine chains are retained as scoped reuse candidates, not relabelled as current 5.x acceptance.",
+    "Only v4.7.3 is enumerated in published_mir4_release_origin_inventory. Earlier MIR4 releases and their archive variants remain a visible pending inventory task.",
+    "Intermediate 1.x-3.x control.lua/runtime schema evolution is not inferred from the absence of migration Lua and remains pending source-boundary audit.",
+    "No fixture, save, profile, package, direct library, engine, or artifact is changed by this inventory."
+  ]
+}
