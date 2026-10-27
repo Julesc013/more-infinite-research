@@ -76,15 +76,27 @@ local function technology(force, name, label)
   return value
 end
 
-local function effect_change(value, recipe, label)
-  local effects, count, result = value.prototype and value.prototype.effects, 0, nil
-  for _, effect in pairs(effects or {}) do
-    if effect.type == "change-recipe-productivity" and effect.recipe == recipe then
-      count, result = count + 1, effect.change
+local function iron_effects(value, label)
+  local expected, seen = {['iron-plate'] = true, ['casting-iron'] = true}, {}
+  for _, effect in pairs((value.prototype and value.prototype.effects) or {}) do
+    if type(effect) ~= "table" or effect.type ~= "change-recipe-productivity"
+        or expected[effect.recipe] ~= true or effect.change ~= .1 or seen[effect.recipe] then
+      fail(label .. " Space Age iron effect differs")
     end
+    seen[effect.recipe] = true
   end
-  if count ~= 1 or not close(result, .1) then fail(label .. " iron effect differs") end
-  return result
+  for recipe in pairs(expected) do
+    if seen[recipe] ~= true then fail(label .. " Space Age iron effect differs") end
+  end
+  return .1
+end
+
+local function saved_progress(value, label)
+  local progress = value.saved_progress
+  if type(progress) ~= "number" or progress ~= progress or progress < 0 or progress >= 1 then
+    fail(label .. " saved technology progress is outside [0,1)")
+  end
+  return progress
 end
 
 local function location_unlocked(force, label)
@@ -180,6 +192,14 @@ local function freeze_lab(entity)
   entity.energy = 0
 end
 
+local function assert_consumed(entity, supplied, label)
+  local inventory = entity and entity.get_inventory(defines.inventory.lab_input)
+  if inventory == nil then fail(label .. " lab input is absent") end
+  for name, before in pairs(supplied or {}) do
+    if inventory.get_item_count(name) >= before then fail(label .. " lab did not consume " .. name) end
+  end
+end
+
 local function snapshot(force, label)
   local iron = technology(force, IRON, label)
   local discovery = technology(force, DISCOVERY, label)
@@ -189,7 +209,7 @@ local function snapshot(force, label)
   end
   return {
     iron = {level = iron.level, researched = iron.researched, enabled = iron.enabled,
-      saved_progress = iron.saved_progress, effect = effect_change(iron, "iron-plate", label),
+      saved_progress = saved_progress(iron, label), effect = iron_effects(iron, label),
       bonus = recipe.productivity_bonus},
     discovery = {researched = discovery.researched, unlocked = location_unlocked(force, label)},
     queue = queue_snapshot(force),
@@ -207,8 +227,7 @@ local function assert_source_snapshot(force, expected, label, foreign, repaired)
     fail(label .. " protected iron state differs")
   end
   assert_queue(force, expected.queue, label .. " protected")
-  if iron.level ~= 3 or iron.researched ~= false or not close(iron.effect, .1) or not close(iron.bonus, .2)
-      or not close(iron.saved_progress, 0) then
+  if iron.level ~= 3 or iron.researched ~= false or not close(iron.effect, .1) or not close(iron.bonus, .2) then
     fail(label .. " earned iron state differs")
   end
   if foreign then
@@ -246,14 +265,18 @@ local function assert_same(actual, expected, label)
 end
 
 local function marker(stage, state, successor)
+  local player = snapshot(game.forces.player, "fixture marker player")
   log("[MIR5_NATIVE_FIXTURE] RESULT " .. helpers.table_to_json({
     case = CASE, stage = stage, status = "passed", qualification = "native-runner-readback-required",
     fixture_role = successor and "successor" or "source", source_version = state.source_version,
     source_actual_labs = state.source_actual_labs,
     successor_actual_labs = successor and successor.actual_labs or 0,
-    source_iron_level = state.player.iron.level, source_iron_plate_bonus = state.player.iron.bonus,
+    source_scripted_iron_level = state.player.iron.level,
+    source_scripted_iron_plate_bonus = state.player.iron.bonus,
     foreign_iron_progress = state.foreign.queue.progress,
-    player_vulcanus_repaired = state.player.discovery.unlocked,
+    source_discovery_lab_researched = state.player.discovery.researched,
+    source_vulcanus_locked_seed = not state.player.discovery.unlocked,
+    player_vulcanus_unlocked = player.discovery.unlocked,
     foreign_vulcanus_unresearched_locked = not state.foreign.discovery.researched and not state.foreign.discovery.unlocked,
     on_load_read_only = stage == "reload",
   }))
@@ -267,7 +290,7 @@ local function source_preflight()
   local iron = technology(player, IRON, "source player")
   if discovery.researched then fail("source Vulcanus discovery is already researched") end
   if iron.researched or iron.level ~= 1 then fail("source iron technology is not fresh") end
-  effect_change(iron, "iron-plate", "source player")
+  iron_effects(iron, "source player")
   research_unit(discovery, "source Vulcanus discovery")
   research_unit(iron, "source iron")
   location_unlocked(player, "source player")
@@ -317,10 +340,7 @@ local function complete_source(state)
   if state.source_actual_labs ~= 1 or discovery.researched ~= true or not location_unlocked(player, "source player") then
     fail("actual source Vulcanus discovery result differs")
   end
-  for name, before in pairs(state.source_packs) do
-    local inventory = state.lab and state.lab.get_inventory(defines.inventory.lab_input)
-    if inventory == nil or inventory.get_item_count(name) >= before then fail("source discovery lab did not consume " .. name) end
-  end
+  assert_consumed(state.lab, state.source_packs, "source discovery")
   freeze_lab(state.lab)
   player.lock_space_location(LOCATION)
   if location_unlocked(player, "source player") then fail("could not simulate the locked discovered Vulcanus state") end
@@ -355,7 +375,7 @@ local function successor_begin()
   if player_before.discovery.unlocked ~= true then fail("MIR discovery repair did not restore researched Vulcanus") end
   local foreign_before = assert_source_snapshot(foreign, state.foreign, "successor foreign", true)
   local iron = technology(player, IRON, "successor player")
-  effect_change(iron, "iron-plate", "successor player")
+  iron_effects(iron, "successor player")
   local lab, inventory = new_lab(player, "successor iron")
   local successor = {phase = "await-successor-iron", actual_labs = 0, lab = lab,
     packs = fill_lab(lab, inventory, iron, "successor iron"), deadline = game.tick + DEADLINE,
@@ -367,6 +387,10 @@ local function complete_successor(state)
   local successor = state.successor
   local player = game.forces.player
   local iron = technology(player, IRON, "successor player")
+  local discovery = technology(player, DISCOVERY, "successor player")
+  if discovery.researched ~= true or not location_unlocked(player, "successor player") then
+    fail("successor Vulcanus discovery was not retained after candidate lab")
+  end
   if successor.actual_labs ~= 1 or iron.level ~= 4 or iron.researched ~= false
       or not close((player.recipes["iron-plate"] or {}).productivity_bonus, .3) then
     fail("actual successor iron lab result differs")
@@ -391,11 +415,13 @@ function M.apply(stage)
   end)
   script.on_event(defines.events.on_research_finished, function(event)
     local state = storage and storage[KEY]
-    if type(state) ~= "table" or event.research == nil or event.research.force ~= game.forces.player then return end
+    if type(state) ~= "table" or event.by_script ~= false or event.research == nil
+        or event.research.force ~= game.forces.player then return end
     if state.phase == "await-source-discovery" and event.research.name == DISCOVERY then
       state.source_actual_labs = state.source_actual_labs + 1
       if state.source_actual_labs ~= 1 then fail("source discovery lab completed more than once") end
     elseif type(state.successor) == "table" and state.successor.phase == "await-successor-iron" and event.research.name == IRON then
+      assert_consumed(state.successor.lab, state.successor.packs, "successor iron")
       state.successor.actual_labs = state.successor.actual_labs + 1
       if state.successor.actual_labs ~= 1 then fail("successor iron lab completed more than once") end
       freeze_lab(state.successor.lab)
@@ -432,6 +458,9 @@ function M.apply(stage)
       assert_source_snapshot(foreign, state.foreign, "successor cold reload foreign", true)
       if successor.player_after == nil or successor.foreign_after == nil then fail("successor saved observation is absent") end
       local player_after = snapshot(game.forces.player, "successor cold reload player")
+      if player_after.discovery.researched ~= true or player_after.discovery.unlocked ~= true then
+        fail("successor cold reload lost Vulcanus discovery")
+      end
       assert_same(player_after, successor.player_after, "successor cold reload player")
       assert_same(snapshot(foreign, "successor cold reload foreign"), successor.foreign_after, "successor cold reload foreign")
       marker("reload", state, successor)

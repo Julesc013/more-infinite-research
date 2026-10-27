@@ -74,7 +74,11 @@ class DiscoveryRecoveryFixtureTests(unittest.TestCase):
 function discovery_data(data_path, helper_path, stage, mir, fixture_version, discovery_present, opponent)
   local iron={name="recipe-prod-research_iron-1",type="technology",level=1,upgrade=true,max_level="infinite",
     enabled=true,unit={count_formula="8000*2^(L-1)",time=60,ingredients={{"automation-science-pack",1}}},
-    effects={{type="change-recipe-productivity",recipe="iron-plate",change=.1}}}
+    effects={{type="change-recipe-productivity",recipe="casting-iron",change=.1},
+      {type="change-recipe-productivity",recipe="iron-plate",change=.1}}}
+  if opponent=="missing-iron-effect" then table.remove(iron.effects,1) end
+  if opponent=="duplicate-iron-effect" then iron.effects[3]={type="change-recipe-productivity",recipe="iron-plate",change=.1} end
+  if opponent=="foreign-iron-effect" then iron.effects[1].recipe="foreign-recipe" end
   if opponent=="wrong-iron-effect" then iron.effects[1].change=.2 end
   local technologies={[iron.name]=iron}
   if discovery_present then technologies["planet-discovery-vulcanus"]={name="planet-discovery-vulcanus",type="technology",
@@ -95,9 +99,9 @@ function discovery_data(data_path, helper_path, stage, mir, fixture_version, dis
   return {ok=ok,message=tostring(message),iron=iron,discovery=technologies["planet-discovery-vulcanus"]}
 end
 
-function discovery_parse(wrapper_path, helper_path, stage)
+function discovery_parse(wrapper_path, helper_path, stage, source_mir, source_fixture)
   local callbacks,reads={events={}},{game=0,storage=0,settings=0}
-  local versions={source="3.2.1",successor="5.0.21000"};local fixture_versions={source="0.1.1",successor="0.2.0"}
+  local versions={source=source_mir,successor="5.0.21000"};local fixture_versions={source=source_fixture,successor="0.2.0"}
   local active={base="2.1.23",["space-age"]="2.1.23",quality="2.1.23",["elevated-rails"]="2.1.23",recycler="2.1.23",
     ["mir-fixture-mir5-active-mods-observer"]="0.1.0",["more-infinite-research"]=versions[stage],
     ["mir-fixture-discovery-recovery"]=fixture_versions[stage]}
@@ -117,7 +121,7 @@ function discovery_parse(wrapper_path, helper_path, stage)
   return {ok=load_ok,message=tostring(load_message),callbacks=callbacks,reads=reads}
 end
 
-function discovery_flow(helper_path, source_path, successor_path, opponent)
+function discovery_flow(helper_path, source_path, successor_path, source_mir, source_fixture, opponent)
   local callbacks,markers,saves={events={}}, {}, 0
   local function tech(name, force, effects, prerequisites)
     return {name=name,valid=true,force=force,level=1,researched=false,enabled=true,saved_progress=0,
@@ -132,7 +136,8 @@ function discovery_flow(helper_path, source_path, successor_path, opponent)
     value.technologies['planet-discovery-vulcanus']=tech('planet-discovery-vulcanus',value,
       {{type='unlock-space-location',space_location='vulcanus'}},{prerequisite})
     value.technologies['recipe-prod-research_iron-1']=tech('recipe-prod-research_iron-1',value,
-      {{type='change-recipe-productivity',recipe='iron-plate',change=.1}},{prerequisite})
+      {{type='change-recipe-productivity',recipe='casting-iron',change=.1},
+       {type='change-recipe-productivity',recipe='iron-plate',change=.1}},{prerequisite})
     function value.is_space_location_unlocked(location) return value.locations[location] end
     function value.lock_space_location(location) value.locations[location]=false end
     function value.reset_technology_effects()
@@ -168,7 +173,8 @@ function discovery_flow(helper_path, source_path, successor_path, opponent)
     ['ips-require-space-gate']={value=false},['mir-science-pack-ingredient-policy']={value='configured'},
     ['mir-lab-incompatibility-policy']={value='reduce'}}
   local active={base='2.1.23',['space-age']='2.1.23',quality='2.1.23',['elevated-rails']='2.1.23',recycler='2.1.23',
-    ['mir-fixture-mir5-active-mods-observer']='0.1.0',['more-infinite-research']='3.2.1',['mir-fixture-discovery-recovery']='0.1.1'}
+    ['mir-fixture-mir5-active-mods-observer']='0.1.0',['more-infinite-research']=source_mir,
+    ['mir-fixture-discovery-recovery']=source_fixture}
   local function load_control(path, stage)
     callbacks={events={}}
     if stage=='successor' then active['more-infinite-research']='5.0.21000';active['mir-fixture-discovery-recovery']='0.2.0' end
@@ -194,13 +200,28 @@ function discovery_flow(helper_path, source_path, successor_path, opponent)
   local source,message=load_control(source_path,'source');if source==nil then return {ok=false,message=message} end
   if opponent=='missing-source-definition' then player.technologies['planet-discovery-vulcanus']=nil end
   if opponent=='bad-source-setting' then startup['ips-effect-per-level-research_iron'].value=9 end
+  local source_effects=player.technologies['recipe-prod-research_iron-1'].prototype.effects
+  if opponent=='runtime-missing-iron-effect' then table.remove(source_effects,1) end
+  if opponent=='runtime-duplicate-iron-effect' then source_effects[3]={type='change-recipe-productivity',recipe='iron-plate',change=.1} end
+  if opponent=='runtime-foreign-iron-effect' then source_effects[1].recipe='foreign-recipe' end
+  if opponent=='runtime-wrong-iron-effect' then source_effects[1].change=.2 end
   local ok,result=invoke('init');if not ok then return {ok=false,message=result,labs=game.lab_count,state=storage.mir5_discovery_recovery_fixture or {}} end
   local source_create_saves=saves
   if opponent=='source-create-save' and saves~=0 then return {ok=false,message='create-only was saved'} end
   local discovery=player.technologies['planet-discovery-vulcanus'];discovery.researched=true;player.locations.vulcanus=true
   player.current_research=nil;player.research_queue={};player.research_progress=0
-  ok,result=invoke('research',{research=discovery});if not ok then return {ok=false,message=result} end
+  local source_scripted=opponent=='source-scripted-event'
+  ok,result=invoke('research',{research=discovery,by_script=source_scripted});if not ok then return {ok=false,message=result} end
+  if source_scripted then
+    ok,result=tick();if not ok then return {ok=false,message=result} end
+    local state=storage.mir5_discovery_recovery_fixture
+    return {ok=true,scripted_ignored=state.source_actual_labs==0 and state.phase=='await-source-discovery',
+      source_actual_labs=state.source_actual_labs,phase=state.phase,saves=saves,labs=game.lab_count}
+  end
   for name in pairs(storage.mir5_discovery_recovery_fixture.source_packs) do storage.mir5_discovery_recovery_fixture.lab.inventory.items[name]=0 end
+  if opponent=='nonzero-saved-progress' or opponent=='saved-progress-loss' then
+    player.technologies['recipe-prod-research_iron-1'].saved_progress=.17
+  end
   ok,result=tick();if not ok then return {ok=false,message=result} end
   local source_phase=storage.mir5_discovery_recovery_fixture.phase
   local source_reload,error=load_control(source_path,'source');if source_reload==nil then return {ok=false,message=error} end
@@ -211,11 +232,25 @@ function discovery_flow(helper_path, source_path, successor_path, opponent)
   if opponent=='missing-repair' then player.locations.vulcanus=false else player.locations.vulcanus=true end
   if opponent=='bad-source' then storage.mir5_discovery_recovery_fixture.player.iron.bonus=.1 end
   if opponent=='foreign-unlocked' then game.forces[2].locations.vulcanus=true end
+  if opponent=='saved-progress-loss' then player.technologies['recipe-prod-research_iron-1'].saved_progress=.18 end
   local before_labs=game.lab_count
   local successor;successor,message=load_control(successor_path,'successor');if successor==nil then return {ok=false,message=message} end
   ok,result=invoke('changed');if not ok then return {ok=false,message=result,labs=game.lab_count,before_labs=before_labs,state=storage.mir5_discovery_recovery_fixture or {}} end
   local iron=player.technologies['recipe-prod-research_iron-1'];iron.level=4;player.current_research=nil;player.research_queue={};player.research_progress=0;player.reset_technology_effects()
-  ok,result=invoke('research',{research=iron});if not ok then return {ok=false,message=result} end
+  if opponent~='candidate-no-consumption' then
+    for name in pairs(storage.mir5_discovery_recovery_fixture.successor.packs) do
+      storage.mir5_discovery_recovery_fixture.successor.lab.inventory.items[name]=0
+    end
+  end
+  if opponent=='relock-during-lab' then player.locations.vulcanus=false end
+  local successor_scripted=opponent=='successor-scripted-event'
+  ok,result=invoke('research',{research=iron,by_script=successor_scripted});if not ok then return {ok=false,message=result,labs=game.lab_count,before_labs=before_labs,state=storage.mir5_discovery_recovery_fixture or {}} end
+  if successor_scripted then
+    ok,result=tick();if not ok then return {ok=false,message=result} end
+    local state=storage.mir5_discovery_recovery_fixture
+    return {ok=true,scripted_ignored=state.successor.actual_labs==0 and state.successor.phase=='await-successor-iron',
+      successor_actual_labs=state.successor.actual_labs,phase=state.successor.phase,saves=saves,labs=game.lab_count}
+  end
   ok,result=tick();if not ok then return {ok=false,message=result} end
   local final=storage.mir5_discovery_recovery_fixture
   for _=1,2 do
@@ -238,10 +273,11 @@ end
             "successor" if stage == "successor" else "source", mir, version, discovery_present, opponent,
         ))
 
-    def flow_result(self, opponent=""):
+    def flow_result(self, opponent="", source_stage="source-321"):
+        source_mir, source_fixture = SOURCE_STAGES[source_stage]
         return plain(self.lua.eval("discovery_flow")(
-            str(FIXTURE / "fixture_control.lua"), str(FIXTURE / "source-321" / "control.lua"),
-            str(FIXTURE / "successor" / "control.lua"), opponent,
+            str(FIXTURE / "fixture_control.lua"), str(FIXTURE / source_stage / "control.lua"),
+            str(FIXTURE / "successor" / "control.lua"), source_mir, source_fixture, opponent,
         ))
 
     def test_data_preflight_requires_the_emitted_historical_rows_before_only_count_time_change(self):
@@ -249,14 +285,22 @@ end
             with self.subTest(stage=stage):
                 result = self.data_result(stage)
                 self.assertTrue(result["ok"], result["message"])
-                self.assertEqual((1, 1), (result["iron"]["unit"].get("count"), result["iron"]["unit"]["time"]))
-                self.assertIsNone(result["iron"]["unit"].get("count_formula"))
+                if stage == "successor":
+                    self.assertEqual((1, 5), (result["iron"]["unit"].get("count"), result["iron"]["unit"]["time"]))
+                    self.assertIsNone(result["iron"]["unit"].get("count_formula"))
+                else:
+                    self.assertEqual((None, "8000*2^(L-1)", 60),
+                                     (result["iron"]["unit"].get("count"), result["iron"]["unit"].get("count_formula"),
+                                      result["iron"]["unit"]["time"]))
                 if stage != "successor":
                     self.assertEqual((1, 1), (result["discovery"]["unit"].get("count"), result["discovery"]["unit"]["time"]))
         missing = self.data_result("source-320", discovery_present=False)
         self.assertFalse(missing["ok"])
         self.assertIn("source Vulcanus discovery technology is absent", missing["message"])
-        for opponent, phrase in (("wrong-iron-effect", "historical iron productivity effect differs"),
+        for opponent, phrase in (("wrong-iron-effect", "historical Space Age iron productivity effect differs"),
+                                  ("missing-iron-effect", "historical Space Age iron productivity effect differs"),
+                                  ("duplicate-iron-effect", "historical Space Age iron productivity effect differs"),
+                                  ("foreign-iron-effect", "historical Space Age iron productivity effect differs"),
                                   ("wrong-closure", "official Space Age closure differs"),
                                   ("extra-mod", "unexpected active mod in fixture closure")):
             with self.subTest(opponent=opponent):
@@ -265,20 +309,61 @@ end
                 self.assertIn(phrase, result["message"])
 
     def test_fixture_runs_one_source_discovery_and_one_successor_iron_lab_with_foreign_lock_preserved(self):
-        result = self.flow_result()
+        for source_stage, (source_version, _) in SOURCE_STAGES.items():
+            with self.subTest(source_stage=source_stage):
+                result = self.flow_result(source_stage=source_stage)
+                self.assertTrue(result["ok"], result.get("message"))
+                self.assertEqual(0, result["source_create_saves"])
+                self.assertEqual(2, result["saves"])
+                self.assertEqual(2, result["labs"])
+                self.assertAlmostEqual(.3, result["player_bonus"])
+                self.assertTrue(result["foreign_locked"])
+                self.assertEqual(.27, result["foreign_progress"])
+                self.assertEqual(["initial", "reload", "initial", "reload", "reload"], [row["stage"] for row in result["markers"]])
+                self.assertEqual(["discovery-recovery"] * 5, [row["case"] for row in result["markers"]])
+                self.assertEqual(["source", "source", "successor", "successor", "successor"],
+                                 [row["fixture_role"] for row in result["markers"]])
+                self.assertEqual([source_version] * 5, [row["source_version"] for row in result["markers"]])
+                self.assertEqual((1, 1), (result["markers"][0]["source_actual_labs"], result["markers"][2]["successor_actual_labs"]))
+                self.assertEqual(3, result["markers"][0]["source_scripted_iron_level"])
+                self.assertAlmostEqual(.2, result["markers"][0]["source_scripted_iron_plate_bonus"])
+                self.assertTrue(result["markers"][0]["source_vulcanus_locked_seed"])
+                self.assertFalse(result["markers"][0]["player_vulcanus_unlocked"])
+                self.assertTrue(all(row["player_vulcanus_unlocked"] for row in result["markers"][2:]))
+                self.assertTrue(all(row["foreign_vulcanus_unresearched_locked"] for row in result["markers"]))
+
+    def test_only_non_scripted_research_events_can_complete_fixture_labs(self):
+        for source_stage in SOURCE_STAGES:
+            with self.subTest(source_stage=source_stage, phase="source"):
+                result = self.flow_result("source-scripted-event", source_stage)
+                self.assertTrue(result["ok"], result.get("message"))
+                self.assertTrue(result["scripted_ignored"])
+                self.assertEqual((0, "await-source-discovery", 0),
+                                 (result["source_actual_labs"], result["phase"], result["saves"]))
+            with self.subTest(source_stage=source_stage, phase="successor"):
+                result = self.flow_result("successor-scripted-event", source_stage)
+                self.assertTrue(result["ok"], result.get("message"))
+                self.assertTrue(result["scripted_ignored"])
+                self.assertEqual((0, "await-successor-iron", 1),
+                                 (result["successor_actual_labs"], result["phase"], result["saves"]))
+
+    def test_successor_requires_consumed_science_and_retained_discovery_after_lab(self):
+        for opponent, phrase in (("candidate-no-consumption", "successor iron lab did not consume"),
+                                  ("relock-during-lab", "successor Vulcanus discovery was not retained after candidate lab")):
+            with self.subTest(opponent=opponent):
+                result = self.flow_result(opponent)
+                self.assertFalse(result["ok"])
+                self.assertIn(phrase, result["message"])
+                if opponent == "candidate-no-consumption":
+                    self.assertEqual(0, result["state"]["successor"]["actual_labs"])
+
+    def test_nonzero_source_saved_progress_is_captured_and_must_survive_successor_preflight(self):
+        result = self.flow_result("nonzero-saved-progress")
         self.assertTrue(result["ok"], result.get("message"))
-        self.assertEqual(0, result["source_create_saves"])
-        self.assertEqual(2, result["saves"])
-        self.assertEqual(2, result["labs"])
-        self.assertAlmostEqual(.3, result["player_bonus"])
-        self.assertTrue(result["foreign_locked"])
-        self.assertEqual(.27, result["foreign_progress"])
-        self.assertEqual(["initial", "reload", "initial", "reload", "reload"], [row["stage"] for row in result["markers"]])
-        self.assertEqual(["discovery-recovery"] * 5, [row["case"] for row in result["markers"]])
-        self.assertEqual(["source", "source", "successor", "successor", "successor"],
-                         [row["fixture_role"] for row in result["markers"]])
-        self.assertEqual((1, 1), (result["markers"][0]["source_actual_labs"], result["markers"][2]["successor_actual_labs"]))
-        self.assertTrue(all(row["foreign_vulcanus_unresearched_locked"] for row in result["markers"]))
+        self.assertAlmostEqual(.17, result["state"]["player"]["iron"]["saved_progress"])
+        lost = self.flow_result("saved-progress-loss")
+        self.assertFalse(lost["ok"])
+        self.assertIn("protected iron state differs", lost["message"])
 
     def test_successor_refuses_missing_repair_or_protected_state_before_candidate_lab_or_storage_write(self):
         for opponent, phrase in (("missing-repair", "MIR discovery repair did not restore researched Vulcanus"),
@@ -294,7 +379,11 @@ end
 
     def test_source_definition_refuses_before_seed_storage_or_lab_mutation(self):
         for opponent, phrase in (("missing-source-definition", "source player technology is absent: planet-discovery-vulcanus"),
-                                  ("bad-source-setting", "historical source default differs: ips-effect-per-level-research_iron")):
+                                  ("bad-source-setting", "historical source default differs: ips-effect-per-level-research_iron"),
+                                  ("runtime-missing-iron-effect", "source player Space Age iron effect differs"),
+                                  ("runtime-duplicate-iron-effect", "source player Space Age iron effect differs"),
+                                  ("runtime-foreign-iron-effect", "source player Space Age iron effect differs"),
+                                  ("runtime-wrong-iron-effect", "source player Space Age iron effect differs")):
             with self.subTest(opponent=opponent):
                 result = self.flow_result(opponent)
                 self.assertFalse(result["ok"])
@@ -303,10 +392,13 @@ end
                 self.assertEqual({}, result["state"])
 
     def test_wrappers_share_one_fixture_identity_register_handlers_without_runtime_access_and_load_is_read_only(self):
-        wrappers = {"source": FIXTURE / "source-321" / "control.lua", "successor": FIXTURE / "successor" / "control.lua"}
-        for stage, path in wrappers.items():
-            with self.subTest(stage=stage):
-                result = plain(self.lua.eval("discovery_parse")(str(path), str(FIXTURE / "fixture_control.lua"), stage))
+        wrappers = [("source", FIXTURE / source_stage / "control.lua", source_mir, source_fixture)
+                    for source_stage, (source_mir, source_fixture) in SOURCE_STAGES.items()]
+        wrappers.append(("successor", FIXTURE / "successor" / "control.lua", None, None))
+        for stage, path, source_mir, source_fixture in wrappers:
+            with self.subTest(stage=path.parent.name):
+                result = plain(self.lua.eval("discovery_parse")(str(path), str(FIXTURE / "fixture_control.lua"), stage,
+                                                                source_mir, source_fixture))
                 self.assertTrue(result["ok"], result["message"])
                 self.assertEqual({"game": 0, "storage": 0, "settings": 0}, result["reads"])
                 self.assertIsNotNone(result["callbacks"]["load"])

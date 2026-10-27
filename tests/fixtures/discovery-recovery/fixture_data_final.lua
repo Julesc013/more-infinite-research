@@ -43,11 +43,16 @@ local function assert_iron(row)
       or row.upgrade ~= true or row.max_level ~= "infinite" or row.enabled == false then
     fail("historical iron technology identity differs")
   end
-  local effects = row.effects
-  local effect = type(effects) == "table" and effects[1] or nil
-  if type(effects) ~= "table" or #effects ~= 1 or type(effect) ~= "table"
-      or effect.type ~= "change-recipe-productivity" or effect.recipe ~= "iron-plate" or effect.change ~= .1 then
-    fail("historical iron productivity effect differs")
+  local expected, seen = {['iron-plate'] = true, ['casting-iron'] = true}, {}
+  for _, effect in pairs(row.effects or {}) do
+    if type(effect) ~= "table" or effect.type ~= "change-recipe-productivity"
+        or expected[effect.recipe] ~= true or effect.change ~= .1 or seen[effect.recipe] then
+      fail("historical Space Age iron productivity effect differs")
+    end
+    seen[effect.recipe] = true
+  end
+  for recipe in pairs(expected) do
+    if seen[recipe] ~= true then fail("historical Space Age iron productivity effect differs") end
   end
   local unit = row.unit
   if type(unit) ~= "table" or unit.count ~= nil or unit.count_formula ~= "8000*2^(L-1)" or unit.time ~= 60
@@ -82,8 +87,11 @@ function M.apply(stage)
   if stage == "source" then
     local discovery_unit = assert_discovery(data.raw.technology and data.raw.technology[DISCOVERY])
     discovery_unit.count_formula, discovery_unit.count, discovery_unit.time = nil, 1, 1
+  else
+    -- A five-second current lab preserves a representable 42-percent queue
+    -- witness without changing a source row or claiming any tool quantity.
+    iron_unit.count_formula, iron_unit.count, iron_unit.time = nil, 1, 5
   end
-  iron_unit.count_formula, iron_unit.count, iron_unit.time = nil, 1, 1
 end
 
 return M
