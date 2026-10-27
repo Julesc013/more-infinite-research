@@ -212,7 +212,7 @@ class MigrationOriginSuccessorControls(unittest.TestCase):
         path = (FIXTURE / "control.lua").as_posix()
         self.lua.globals().successor_runtime_path = path
         self.lua.execute(r'''
-          function migration_successor_run_control(target_name,mutate,already_current,effect_case,reset_offsets_before_configuration,mutate_offset_after_configuration,preconfiguration_drift)
+          function migration_successor_run_control(target_name,mutate,already_current,effect_case,reset_offsets_before_configuration,mutate_offset_after_configuration,preconfiguration_drift,source_drift)
             local callbacks={events={}}
             local direct_name="recipe-prod-research_gears-1"
             local alternate_name="recipe-prod-research_plastic-1"
@@ -300,6 +300,8 @@ class MigrationOriginSuccessorControls(unittest.TestCase):
               player_snapshot=expected,foreign_index=2,foreign_snapshot=foreign_expected,
               foreign_queue={current=direct_name,queue={direct_name,alternate_name},progress=.42},
               detached_index=3,detached_snapshot=detached_expected}
+            if source_drift=="gear-recipe" then player.recipes["iron-gear-wheel"].productivity_bonus=.2 end
+            if source_drift=="queue" then foreign.research_progress=.41 end
             local initial_source_effect_signature=state.player_snapshot.effects[direct_name]
             local inventory={items={}}
             function inventory.clear() inventory.items={} end
@@ -309,7 +311,7 @@ class MigrationOriginSuccessorControls(unittest.TestCase):
             env={
               storage={mir5_migration_origin_f200_100_source=state},
               settings={startup={["ips-enable-research_breeding"]={value=false}}},
-              game={forces={player=player,[2]=foreign,[3]=detached},surfaces={[1]={create_entity=function() return entity end}},tick=0,speed=1,
+              game={forces={player=player,[2]=foreign,[3]=detached},surfaces={[1]={create_entity=function() env.created_labs=(env.created_labs or 0)+1;return entity end}},tick=0,speed=1,
                 server_save=function(_) env.saved=true end},
               helpers={table_to_json=function(_) return "{}" end}, log=function(message) env.logs[#env.logs+1]=message end, logs={},
               script={active_mods={},on_configuration_changed=function(fn) callbacks.configuration=fn end,
@@ -373,6 +375,7 @@ class MigrationOriginSuccessorControls(unittest.TestCase):
             return {ok=ok,message=tostring(message),state=state,gear=player.technologies[direct_name].level,
               bonus=player.recipes["iron-gear-wheel"].productivity_bonus,saved=env.saved,logs=env.logs,
               reload_read_only=env.reload_read_only,add_calls=player.add_calls,
+              created_labs=env.created_labs or 0,
               offsets={player=player.manual_mining_speed_modifier,foreign=foreign.manual_mining_speed_modifier,
                 detached=detached.manual_mining_speed_modifier},
               source_effect_signature=state.player_snapshot.effects[direct_name],
@@ -442,6 +445,27 @@ class MigrationOriginSuccessorControls(unittest.TestCase):
                                  rejected["source_effect_signature"])
                 self.assertEqual("completed", rejected["state"]["phase"])
                 self.assertNotIn("f210", rejected["state"].get("successors", {}))
+
+        # A real engine reset is permitted only after all immutable source
+        # rows/effects/recipes/queues have been preflighted.  Every failure
+        # below must leave all three reset fields at zero and avoid fixture
+        # storage or lab creation.
+        combined_invalid = (
+            ("effect", ("f210", False, False, "wrong-recipe", True), "effect"),
+            ("row", ("f200", True, False, None, True), "source row changed before candidate work"),
+            ("recipe", ("f200", False, False, None, True, False, None, "gear-recipe"),
+             "original MIR1 source earned gear contribution differs"),
+            ("queue", ("f200", False, False, None, True, False, None, "queue"), "queue/progress differs"),
+        )
+        for label, arguments, expected_message in combined_invalid:
+            with self.subTest(combined_reset_invalid=label):
+                rejected = py(self.lua.eval("migration_successor_run_control")(*arguments))
+                self.assertFalse(rejected["ok"])
+                self.assertIn(expected_message, rejected["message"])
+                self.assertEqual({"player": 0, "foreign": 0, "detached": 0}, rejected["offsets"])
+                self.assertEqual("completed", rejected["state"]["phase"])
+                self.assertEqual({}, rejected["state"].get("successors", {}))
+                self.assertEqual((0, 0), (rejected["add_calls"], rejected["created_labs"]))
 
         already_current = py(self.lua.eval("migration_successor_run_control")("f200", False, True))
         self.assertTrue(already_current["ok"], already_current["message"])
