@@ -810,7 +810,15 @@ def compare_candidate(inventory_path: Path, profile_id: str, baseline_root: Path
     profile = _inventory_profile(inventory, profile_id)
     baseline = read_capture(baseline_root, require_mir=False)
     candidate = read_capture(candidate_root, require_mir=True)
-    required_receipt = _mapping(_mapping(profile.get("capture_receipts"), "profile receipts").get("no_mir"), "no-MIR receipt")
+    required_receipt = dict(_mapping(
+        _mapping(profile.get("capture_receipts"), "profile receipts").get("no_mir"), "no-MIR receipt"))
+    # Old inventories retain the original archive enumeration order. Sort a
+    # local list only; preserve every identity field and every other receipt
+    # field, including order-sensitive generated/loaded selections.
+    archive_rows = _list(required_receipt.get("selected_archives_without_mir"), "inventory selected archives")
+    _normalise_mods(archive_rows, "inventory selected archives", without_mir=False)
+    required_receipt["selected_archives_without_mir"] = sorted(
+        archive_rows, key=lambda row: (row["name"], row["version"], _json_bytes(row)))
     if _capture_receipt(baseline) != required_receipt:
         raise CatalogueError("candidate baseline does not match the inventory's independent no-MIR receipt")
     profile_equivalence = _paired_profile_equivalence(
