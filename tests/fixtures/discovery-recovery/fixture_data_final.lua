@@ -5,6 +5,7 @@ local M = {}
 
 local FIXTURE = "mir-fixture-discovery-recovery"
 local IRON = "recipe-prod-research_iron-1"
+local GEAR = "recipe-prod-research_gears-1"
 local DISCOVERY = "planet-discovery-vulcanus"
 
 local function fail(message) error("[mir-fixture-discovery-recovery] " .. message) end
@@ -62,6 +63,36 @@ local function assert_iron(row)
   return unit
 end
 
+local function assert_gear(row)
+  if type(row) ~= "table" or row.name ~= GEAR or row.type ~= "technology" or row.max_level ~= "infinite" then
+    fail("current gear technology identity differs")
+  end
+  local expected = {"casting-iron-gear-wheel", "iron-gear-wheel"}
+  if type(row.effects) ~= "table" or #row.effects ~= #expected then
+    fail("current gear productivity effect differs")
+  end
+  for index, recipe in ipairs(expected) do
+    local effect = row.effects[index]
+    if type(effect) ~= "table" or effect.type ~= "change-recipe-productivity"
+        or effect.recipe ~= recipe or effect.change ~= .1 then
+      fail("current gear productivity effect differs")
+    end
+  end
+  local unit = row.unit
+  local packs = {"automation-science-pack", "logistic-science-pack", "chemical-science-pack", "production-science-pack"}
+  if type(unit) ~= "table" or unit.count ~= nil or unit.count_formula ~= "8000*2^(L-1)" or unit.time ~= 60
+      or type(unit.ingredients) ~= "table" or #unit.ingredients ~= #packs then
+    fail("current gear unit differs")
+  end
+  for index, name in ipairs(packs) do
+    local ingredient = unit.ingredients[index]
+    local actual_name = type(ingredient) == "table" and (ingredient.name or ingredient[1]) or nil
+    local actual_amount = type(ingredient) == "table" and (ingredient.amount or ingredient[2]) or nil
+    if actual_name ~= name or actual_amount ~= 1 then fail("current gear unit differs") end
+  end
+  return unit
+end
+
 local function assert_discovery(row, version)
   if type(row) ~= "table" or row.name ~= DISCOVERY or row.type ~= "technology" then
     fail("source Vulcanus discovery technology is absent")
@@ -102,9 +133,10 @@ function M.apply(stage)
     local discovery_unit = assert_discovery(data.raw.technology and data.raw.technology[DISCOVERY], source_version())
     discovery_unit.count_formula, discovery_unit.count, discovery_unit.time = nil, 1, 1
   else
-    -- A five-second current lab preserves a representable 42-percent queue
-    -- witness without changing a source row or claiming any tool quantity.
-    iron_unit.count_formula, iron_unit.count, iron_unit.time = nil, 1, 5
+    -- Keep the protected queued iron unit byte-for-byte shaped as loaded.  A
+    -- distinct unqueued gear row supplies the one accelerated successor lab.
+    local gear_unit = assert_gear(data.raw.technology and data.raw.technology[GEAR])
+    gear_unit.count_formula, gear_unit.count, gear_unit.time = nil, 1, 5
   end
 end
 

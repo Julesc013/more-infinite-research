@@ -599,7 +599,7 @@ $activeModsObserverBinding=Get-FixtureActiveModsObserver -Name $activeModsObserv
 $engineIdentity=Get-MIRDirectLibraryStartupEngineIdentity -FactorioBin $engine -EngineDataDirectory $engineData
 $archiveHashes=Get-MIRDirectLibraryStartupArchiveHashes -LibraryDirectory $library -EngineDataDirectory $engineData -BaseRows $rows -MirArchive $null
 Assert-DeclaredFixtureInputs -ProfileDefinition $profileDefinition -EngineIdentity $engineIdentity -ArchiveHashes $archiveHashes
-& (Join-Path $repo 'tools/commands/workspace/Test-MIRDevelopmentHealth.ps1') -MaxScanSeconds 2 -MaxEntriesPerRoot 500 | Out-Host
+& (Join-Path $repo 'tools/commands/workspace/Test-MIRDevelopmentHealth.ps1') -Mode Hook -MaxWorktrees 2 -MaxBranches 4 -MaxScanSeconds 2 -MaxEntriesPerRoot 500 | Out-Host
 $resources=$null;$activation=$null;$failure=$null
 $record=[ordered]@{
   kind='MIR5NativeFixtureV1';status='prepared';case=$CaseName
