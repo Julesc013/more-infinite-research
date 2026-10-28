@@ -3788,8 +3788,8 @@
         {
           "boundary": "K2 Imersite public/carrier identities",
           "status": "needs-correction",
-          "problem": "Direct4.6 AFCAF/R05 passes under its original FE4 inputs; E3A/b251 was later preparation. Current005D/8DC direct inputs are separately pinned and guarded. Exact published4.7.3 K2SE source89023 passes seeded state/save/two reloads, but current005D enables both foreign carriers before fixture writes. Published4.7.2 intermediate remains adverse.",
-          "next_action": "Reuse protected89023 to trace earliest MIR-context carrier flags and distinguish engine/prototype transition from callback writes. Preserve every successor/foreign assertion and qualify affected corrected successor/save/two reloads. The separate protected538B/current direct route has prepared inputs below; native-owner custody/resource admission and current result remain separate. No source recreation, published-archive patch, K2SO/public handoff or source-lab claim follows.",
+          "problem": "Current005D/8DC direct538B recovery passes at its own published proofPR1356; preserve oldAFCAF/FE4 and staged4.7.2 adverse. K2SE source89023 passes,but005D foreign flags aretrue before MIR configuration body and unchangedafter; unchangedB6 fixture-only control passes. Exact version/prototype/earlier lifecycle cause remains unresolved,not a proven MIR callback write.",
+          "next_action": "Reuse protected89023. Distinguish MIR-version/prototype migration or earlier lifecycle events and exact recoverable ownership; no missing optional field or old ledger overrides current/foreign rights. Preserve all original successor assertions and qualify actual corrected-current save/two reloads. Do not repeat the completed first-entry trace or fixture-only control unchanged; source recreation,K2SO/public handoff and lab-earned K2SE remain separate.",
           "prepared_inputs": {
             "path": "spec/evidence/k2-imersite-current005d-prepared-inputs-r01.json",
             "sha256": "02C6BFFB4CD524A11BF90DEC1269639963B61765027AE0D60A6A56E9C068EC56"
@@ -3802,6 +3802,10 @@
             {
               "path": "spec/evidence/k2se-carrier-current005d-native-chain-r01.json",
               "scope": "Protected zero-lab source passes; actual005D successor foreign-enablement failure and logging-only fields remain open."
+            },
+            {
+              "path": "spec/evidence/k2se-entry-and-published-control-chain-r04.json",
+              "scope": "MIR-context pre/post body diagnostic plus unchanged-published passing control; current K2SE successor still open."
             }
           ]
         }
