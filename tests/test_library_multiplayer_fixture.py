@@ -20,6 +20,7 @@ STANDALONE_F210_PROFILE = ROOT / "tests/profiles/library-multiplayer-standalone-
 F210_API_CONSUMERS_PROFILE = ROOT / "tests/profiles/library-api-consumers-f210-2123.json"
 STANDALONE_F210_API_CONSUMERS_PROFILE = ROOT / "tests/profiles/library-api-consumers-standalone-f210-2123.json"
 CURRENT_STANDALONE_F210_API_CONSUMERS_PROFILE = ROOT / "tests/profiles/library-api-consumers-current-standalone-f210-2123.json"
+CURRENT_STANDALONE_F210_SPACE_AGE_API_CONSUMERS_PROFILE = ROOT / "tests/profiles/library-api-consumers-current-space-age-standalone-f210-2123.json"
 PAIRED_PUBLISHED_PROFILE = ROOT / "tests/profiles/library-paired-browser-published-f200-2077.json"
 PAIRED_MIR5_PROFILE = ROOT / "tests/profiles/library-paired-browser-mir5-f200-2077.json"
 SCRIPTED_EFFECTS_PROFILE = ROOT / "tests/profiles/scripted-effects-multiplayer-f200-sa-2077.json"
@@ -74,10 +75,16 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
             local targets={
               f200={base="2.0.77",mir="5.0.20000"},
               f210={base="2.1.23",mir="5.0.21000"},
+              ["f210-space-age"]={base="2.1.23",mir="5.0.21000",space_age=true},
             }
             local selected=targets[target or "f200"]
             assert(selected,"unknown fixture target")
             local base_version,mir_version=selected.base,selected.mir
+            local gear_recipes=selected.space_age and {"casting-iron-gear-wheel","iron-gear-wheel"} or {"iron-gear-wheel"}
+            local gear_effects={}
+            for _,name in ipairs(gear_recipes) do
+              gear_effects[#gear_effects+1]={type="change-recipe-productivity",recipe=name,change=.1}
+            end
             if opponent=="f210-wrong-mir-version" then mir_version="5.0.21001"
             elseif opponent=="unsupported-target-base" then base_version="2.1.24" end
             local players, markers, screenshots, saves, lab_diagnostics = {}, {}, {}, {}, {}
@@ -86,7 +93,22 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
               force.technologies[name]={valid=true,name=name,force=force,level=1,researched=false,enabled=true,visible_when_disabled=false,
                 research_unit_count=1,research_unit_energy=60,
                 research_unit_ingredients=name==gear and gear_ingredients or nil,
-                prototype={effects={{type="change-recipe-productivity",recipe="iron-gear-wheel",change=.1}}}}
+                prototype={effects=name==gear and gear_effects or {{type="change-recipe-productivity",recipe="iron-gear-wheel",change=.1}}}}
+            end
+            if selected.space_age and opponent~="sa-native-owner-missing" then
+              force.technologies["research-productivity"]={valid=true,name="research-productivity",force=force,level=1,researched=false,
+                enabled=true,visible_when_disabled=false,prototype={valid=true,name="research-productivity",
+                  effects={{type="laboratory-productivity",modifier=.1}}}}
+            end
+            if opponent=="sa-casting-effect-missing" then
+              force.technologies[gear].prototype.effects={{type="change-recipe-productivity",recipe="iron-gear-wheel",change=.1}}
+            elseif opponent=="sa-casting-effect-duplicate" then
+              force.technologies[gear].prototype.effects={{type="change-recipe-productivity",recipe="casting-iron-gear-wheel",change=.1},
+                {type="change-recipe-productivity",recipe="casting-iron-gear-wheel",change=.1},
+                {type="change-recipe-productivity",recipe="iron-gear-wheel",change=.1}}
+            elseif opponent=="sa-casting-effect-wrong" then
+              force.technologies[gear].prototype.effects={{type="change-recipe-productivity",recipe="casting-iron-gear-wheel",change=.2},
+                {type="change-recipe-productivity",recipe="iron-gear-wheel",change=.1}}
             end
             local ingredients=force.technologies[gear].research_unit_ingredients
             if opponent=="science-missing" then table.remove(ingredients,4)
@@ -96,7 +118,7 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
             elseif opponent=="science-reordered" then
               force.technologies[gear].research_unit_ingredients={ingredients[4],ingredients[2],ingredients[1],ingredients[3]}
             end
-            for _,name in ipairs({"iron-gear-wheel","burner-mining-drill","electric-mining-drill"}) do
+            for _,name in ipairs(selected.space_age and {"iron-gear-wheel","casting-iron-gear-wheel","burner-mining-drill","electric-mining-drill"} or {"iron-gear-wheel","burner-mining-drill","electric-mining-drill"}) do
               force.recipes[name]={valid=true,name=name,productivity_bonus=0}
             end
             for _,name in ipairs({"automation-science-pack","logistic-science-pack","chemical-science-pack","production-science-pack"}) do
@@ -168,7 +190,9 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
                 foreign.technologies[tech_name]={valid=true,name=tech_name,force=foreign,level=1,researched=false,enabled=true,
                   visible_when_disabled=false}
               end
-              foreign.recipes["iron-gear-wheel"]={valid=true,name="iron-gear-wheel",productivity_bonus=0}
+              for _,recipe_name in ipairs(gear_recipes) do
+                foreign.recipes[recipe_name]={valid=true,name=recipe_name,productivity_bonus=0}
+              end
               fire(8,{force=opponent=="wrong-force-event" and force or foreign})
               if opponent=="foreign-force-gui" then en.gui.screen[ROOT_NAME]={valid=true,type="frame",visible=true} end
               return foreign
@@ -229,7 +253,14 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
               content.style.width=760
               tabs[CONTENT]=content
               if options.tab=="availability" then
-                if opponent~="missing-availability-label" then
+                if selected.space_age then
+                  local label=element("label",AVAILABILITY[1])
+                  label.caption={"mir-browser.availability-entry",
+                    {"technology-name.more-infinite-research.research_lab_productivity"},
+                    {opponent=="sa-availability-wrong" and "mir-browser.availability-requires-space-age" or "mir-browser.availability-native-research-productivity"}}
+                  content[AVAILABILITY[1]]=label
+                  content.children[#content.children+1]=label
+                elseif opponent~="missing-availability-label" then
                   for index,name in ipairs(AVAILABILITY) do
                     local label=element("label",name)
                     label.caption={"mir-browser.availability-entry",
@@ -323,15 +354,24 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
               end
               table.remove(force.research_queue,1)
               current.level=current.level+1
-              force.recipes["iron-gear-wheel"].productivity_bonus=force.recipes["iron-gear-wheel"].productivity_bonus+.1
+              for _,recipe_name in ipairs(gear_recipes) do
+                force.recipes[recipe_name].productivity_bonus=force.recipes[recipe_name].productivity_bonus+.1
+              end
               force.current_research=force.research_queue[1]
               fire(6,{research=current,by_script=opponent=="script-completion"})
               if force.current_research then fire(4,{research=force.current_research,last_research=current}) end
               return true
             end
             local discovery=opponent=="standalone-identity-discovery"
-            local active_mods={base=base_version,["more-infinite-research"]=mir_version,["mir-fixture-mir5-library-multiplayer"]=(discovery and "0.1.1" or "0.1.0"),["mir-fixture-mir5-active-mods-observer"]="0.1.0"}
-            if opponent=="f210-api-consumers" then
+            local fixture_version=selected.space_age and "0.2.0" or (discovery and "0.1.1" or "0.1.0")
+            local active_mods={base=base_version,["more-infinite-research"]=mir_version,["mir-fixture-mir5-library-multiplayer"]=fixture_version,["mir-fixture-mir5-active-mods-observer"]="0.1.0"}
+            if selected.space_age then
+              active_mods["elevated-rails"]="2.1.23"
+              active_mods.quality="2.1.23"
+              active_mods.recycler="2.1.23"
+              active_mods["space-age"]="2.1.23"
+            end
+            if opponent=="f210-api-consumers" or selected.space_age then
               active_mods["mir-fixture-mir5-api-alpha"]="0.1.0"
               active_mods["mir-fixture-mir5-api-beta"]="0.1.0"
             elseif opponent=="f210-api-alpha-only" then
@@ -345,6 +385,11 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
               active_mods["mir-fixture-mir5-api-alpha"]="0.1.0"
               active_mods["mir-fixture-mir5-api-beta"]="0.1.0"
               active_mods["mir-fixture-mir5-api-beta-production"]="0.1.0"
+            end
+            if selected.space_age then
+              if opponent=="sa-dlc-partial" then active_mods.recycler=nil
+              elseif opponent=="sa-api-alpha-only" then active_mods["mir-fixture-mir5-api-beta"]=nil
+              elseif opponent=="sa-api-beta-only" then active_mods["mir-fixture-mir5-api-alpha"]=nil end
             end
             local environment={
               script={active_mods=active_mods,
@@ -612,6 +657,40 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
         })
         self.assertNotIn("mir-fixture-mir5-api-beta-production", {row["name"] for row in profile["mods"]})
 
+    def test_current_standalone_f210_space_age_api_client_profile_binds_the_exact_ten_mod_closure(self):
+        profile = json.loads(CURRENT_STANDALONE_F210_SPACE_AGE_API_CONSUMERS_PROFILE.read_text(encoding="utf-8"))
+        self.assertEqual(profile["kind"], "mir5-library-api-consumers-current-space-age-standalone-f210-native-selection")
+        self.assertEqual((profile["target"], profile["factorio_line"], profile["settings_mode"],
+                          profile["session_expected_peak_memory_mib"], profile["space_age_library"]),
+                         ("f210-standalone", "2.1", "Defaults", 8192, True))
+        self.assertEqual(profile["engine"], {
+            "version": "2.1.23",
+            "sha256": "8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38",
+        })
+        self.assertEqual([(row["name"], row["version"], row["enabled"]) for row in profile["mods"]], [
+            ("base", "2.1.23", True),
+            ("elevated-rails", "2.1.23", True),
+            ("quality", "2.1.23", True),
+            ("recycler", "2.1.23", True),
+            ("space-age", "2.1.23", True),
+            ("mir-fixture-mir5-active-mods-observer", "0.1.0", True),
+            ("more-infinite-research", "5.0.21000", True),
+            ("mir-fixture-mir5-library-multiplayer", "0.2.0", True),
+            ("mir-fixture-mir5-api-alpha", "0.1.0", True),
+            ("mir-fixture-mir5-api-beta", "0.1.0", True),
+        ])
+        self.assertEqual(profile["archive_sha256"], {
+            "mir-fixture-mir5-active-mods-observer_0.1.0.zip":
+                "A15A7D628D66953D2E0C4D4FA288F47CBF9C5678327C7EB3D23ADB5DC78331C0",
+            "more-infinite-research_5.0.21000.zip":
+                "A8D0A4590154F3106E59BDB269F1AEB3ED8CC523F18F00ED7D76DC89059F5B8D",
+            "mir-fixture-mir5-api-alpha_0.1.0.zip":
+                "DB5ED843FA9D85A1ABDC22595E62D315CA1A2191C846208079F85D4D016CE904",
+            "mir-fixture-mir5-api-beta_0.1.0.zip":
+                "690004F145E8B0DD52B4030BD8B27F7B581495EEFAAC5CB3A2F30A23FCA08951",
+        })
+        self.assertNotIn("mir-fixture-mir5-api-beta-production", {row["name"] for row in profile["mods"]})
+
     def test_multiplayer_wrapper_admits_only_the_exact_standalone_api_client_profile(self):
         script = r'''
           $ErrorActionPreference='Stop'; Set-StrictMode -Version Latest
@@ -687,6 +766,56 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
             capture_output=True, text=True,
             env=dict(os.environ, MIR_TEST_WRAPPER=str(WRAPPER),
                      MIR_TEST_CURRENT_STANDALONE_API_CLIENT_PROFILE=str(CURRENT_STANDALONE_F210_API_CONSUMERS_PROFILE)),
+            check=False,
+        )
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+
+    def test_multiplayer_wrapper_admits_only_the_exact_current_standalone_space_age_api_client_profile_before_admission(self):
+        script = r'''
+          $ErrorActionPreference='Stop'; Set-StrictMode -Version Latest
+          $tokens=$null;$errors=$null
+          $ast=[Management.Automation.Language.Parser]::ParseFile($env:MIR_TEST_WRAPPER,[ref]$tokens,[ref]$errors)
+          if($errors.Count){throw $errors[0].Message}
+          function Assert-Session([bool]$Condition,[string]$Message){if(-not$Condition){throw $Message}}
+          $node=@($ast.FindAll({param($candidate)
+            $candidate -is [Management.Automation.Language.FunctionDefinitionAst] -and $candidate.Name -ceq 'Assert-MultiplayerFixtureSelection'
+          },$true))
+          if($node.Count-ne1){throw 'selection function is absent or ambiguous'}
+          Invoke-Expression $node[0].Extent.Text
+          function Read-Profile {Get-Content -LiteralPath $env:MIR_TEST_CURRENT_STANDALONE_SPACE_AGE_API_CLIENT_PROFILE -Raw|ConvertFrom-Json -AsHashtable}
+          $engine='8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38'
+          $current='A8D0A4590154F3106E59BDB269F1AEB3ED8CC523F18F00ED7D76DC89059F5B8D'
+          $selected=Assert-MultiplayerFixtureSelection -Selection (Read-Profile) -EngineSha256 $engine -FixtureCase 'library-multiplayer' -ExpectedMIRArchiveSha256 $current -SessionExpectedPeakMemoryMiB 8192
+          if($selected.kind-cne'mir5-library-api-consumers-current-space-age-standalone-f210-native-selection'-or$selected.standalone_f210-ne$true-or$selected.api_client_consumers-ne$true-or$selected.space_age_library-ne$true){throw 'current standalone Space Age API client target differs'}
+          $graphics=@($ast.FindAll({param($node)
+            $node -is [Management.Automation.Language.AssignmentStatementAst] -and $node.Left.Extent.Text-ceq'$clientGraphics'
+          },$true))
+          if($graphics.Count-ne1){throw 'multiplayer client graphics selection is missing or ambiguous'}
+          function Assert-Graphics([string]$Case,[bool]$SpaceAge,[string]$Expected,[string]$Name){
+            $FixtureCase=$Case;$spaceAgeLibrary=$SpaceAge;$clientGraphics=$null
+            Invoke-Expression $graphics[0].Extent.Text
+            if((@($clientGraphics)-join'|')-cne$Expected){throw "client graphics selection differs: $Name"}
+          }
+          Assert-Graphics 'library-multiplayer' $true '--force-graphics-preset|low|--video-memory-usage|low' 'Space Age Library'
+          Assert-Graphics 'library-multiplayer' $false '' 'Base Library'
+          Assert-Graphics 'scripted-effects-multiplayer' $false '--force-graphics-preset|low|--video-memory-usage|low' 'existing scripted-effects'
+          function Assert-Rejected([string]$Name,[scriptblock]$Mutate,[string]$Expected=$current,[int]$Peak=8192){
+            $selection=Read-Profile;&$Mutate $selection
+            try{$null=Assert-MultiplayerFixtureSelection -Selection $selection -EngineSha256 $engine -FixtureCase 'library-multiplayer' -ExpectedMIRArchiveSha256 $Expected -SessionExpectedPeakMemoryMiB $Peak}catch{return}
+            throw "current standalone Space Age API client profile accepted opponent: $Name"
+          }
+          Assert-Rejected 'wrong session admission' {} $current 7168
+          Assert-Rejected 'space age flag false' {param($s)$s['space_age_library']=$false}
+          Assert-Rejected 'Space Age companion missing' {param($s)$s['mods']=@($s['mods']|Where-Object {$_.name-cne'recycler'})}
+          Assert-Rejected 'unexpected extra mod' {param($s)$s['mods']=@($s['mods'])+@([ordered]@{name='mir-fixture-mir5-api-beta-production';version='0.1.0';enabled=$true})}
+          Assert-Rejected 'alpha missing' {param($s)$s['mods']=@($s['mods']|Where-Object {$_.name-cne'mir-fixture-mir5-api-alpha'})}
+          Assert-Rejected 'wrong beta consumer archive' {param($s)$s['archive_sha256']['mir-fixture-mir5-api-beta_0.1.0.zip']='A'*64}
+        '''
+        result = subprocess.run(
+            ["pwsh", "-NoLogo", "-NoProfile", "-Command", script],
+            capture_output=True, text=True,
+            env=dict(os.environ, MIR_TEST_WRAPPER=str(WRAPPER),
+                     MIR_TEST_CURRENT_STANDALONE_SPACE_AGE_API_CLIENT_PROFILE=str(CURRENT_STANDALONE_F210_SPACE_AGE_API_CONSUMERS_PROFILE)),
             check=False,
         )
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
@@ -1039,8 +1168,12 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
           $root=$env:MIR_TEST_WORK;$repo=$env:MIR_TEST_REPO;$library=Join-Path $root 'library';$null=New-Item -ItemType Directory -Path $library
           $normal=New-StandaloneF210LibraryFixtureSourceProjection -RepoRoot $repo -OutputRoot (Join-Path $root 'normal-output')
           $normalInfo=Get-Content -LiteralPath (Join-Path $normal.source 'info.json') -Raw|ConvertFrom-Json -AsHashtable
-          if($normal.members.Count-ne3 -or $normal.source_metadata-cne'info-f210.json' -or ((@($normal.excluded_canonical_members)-join'|')-cne'README.md|info.json') -or [string]$normalInfo.factorio_version-cne'2.1' -or ((@($normalInfo.dependencies)-join'|')-cne'base >= 2.1.23|more-infinite-research = 5.0.21000')){throw 'normal F210 projection metadata differs'}
+          if($normal.members.Count-ne3 -or $normal.source_metadata-cne'info-f210.json' -or ((@($normal.excluded_canonical_members)-join'|')-cne'info-f210-space-age.json|info.json|README.md') -or [string]$normalInfo.factorio_version-cne'2.1' -or [string]$normalInfo.version-cne'0.1.0' -or ((@($normalInfo.dependencies)-join'|')-cne'base >= 2.1.23|more-infinite-research = 5.0.21000')){throw 'normal F210 projection metadata differs'}
           $fixtureArchive=New-SourceArchive -Library $library -Source $normal.source -Members @('control.lua','info.json','settings-updates.lua')
+          $spaceAge=New-StandaloneF210LibraryFixtureSourceProjection -RepoRoot $repo -OutputRoot (Join-Path $root 'space-age-output') -SpaceAgeLibrary
+          $spaceAgeInfo=Get-Content -LiteralPath (Join-Path $spaceAge.source 'info.json') -Raw|ConvertFrom-Json -AsHashtable
+          if($spaceAge.members.Count-ne3 -or $spaceAge.source_metadata-cne'info-f210-space-age.json' -or ((@($spaceAge.excluded_canonical_members)-join'|')-cne'info-f210.json|info.json|README.md') -or [string]$spaceAgeInfo.factorio_version-cne'2.1' -or [string]$spaceAgeInfo.version-cne'0.2.0' -or ((@($spaceAgeInfo.dependencies)-join'|')-cne'base >= 2.1.23|space-age >= 2.1.23|more-infinite-research = 5.0.21000')){throw 'Space Age F210 projection metadata differs'}
+          $spaceAgeArchive=New-SourceArchive -Library $library -Source $spaceAge.source -Members @('control.lua','info.json','settings-updates.lua')
           $canonicalObserver=Join-Path $repo 'tests/fixtures/active-mods-observer';$observerArchive=New-SourceArchive -Library $library -Source $canonicalObserver -Members @('data-final-fixes.lua','info.json')
           $observerHash=(Get-FileHash -LiteralPath $observerArchive -Algorithm SHA256).Hash
           $observer=New-StandaloneIdentityObserverSourceProjection -RepoRoot $repo -ArchiveLibrary $library -OutputRoot (Join-Path $root 'observer-output') -ExpectedArchiveSha256 $observerHash
@@ -1048,6 +1181,9 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
           $sources=@(Get-StandaloneIdentityFixtureSources -Sources @($canonicalLibrary,$canonicalObserver) -LibraryFixtureSource $canonicalLibrary -StagedLibraryFixtureSource $normal.source -StagedObserverSource $observer.source -RepoRoot $repo)
           $prepared=Invoke-ActualNormalPreparation -Library $library -Sources $sources -Root (Join-Path $root 'positive')
           if($prepared.prepared.status-cne'passed-private-native-runtime-load-only' -or $sources.Count-ne2 -or $sources[0]-ine$normal.source -or $sources[1]-ine$observer.source){throw 'actual normal preparation did not retain the two exact projections'}
+          $spaceAgeSources=@(Get-StandaloneIdentityFixtureSources -Sources @($canonicalLibrary,$canonicalObserver) -LibraryFixtureSource $canonicalLibrary -StagedLibraryFixtureSource $spaceAge.source -StagedObserverSource $observer.source -RepoRoot $repo)
+          $spaceAgePrepared=Invoke-ActualNormalPreparation -Library $library -Sources $spaceAgeSources -Root (Join-Path $root 'space-age-positive')
+          if($spaceAgePrepared.prepared.status-cne'passed-private-native-runtime-load-only' -or $spaceAgeSources.Count-ne2 -or $spaceAgeSources[0]-ine$spaceAge.source -or $spaceAgeSources[1]-ine$observer.source){throw 'actual Space Age standalone preparation did not retain the two exact projections'}
           $missingLibrary=Join-Path $root 'missing-library';$null=New-Item -ItemType Directory -Path $missingLibrary;New-SourceArchive -Library $missingLibrary -Source $normal.source -Members @('control.lua','info.json')|Out-Null
           Assert-PreparationRejects 'missing runtime member' $missingLibrary $normal.source (Join-Path $root 'missing')
           $changedSource=Join-Path $root 'changed-source';Copy-Item -LiteralPath $normal.source -Destination $changedSource -Recurse;[IO.File]::AppendAllText((Join-Path $changedSource 'control.lua'),'-- changed',[Text.UTF8Encoding]::new($false))
@@ -1056,6 +1192,9 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
           $wrongRepo=Join-Path $root 'wrong-target-repo';$wrongFixture=Join-Path $wrongRepo 'tests/fixtures/library-multiplayer';$null=New-Item -ItemType Directory -Path (Split-Path -Parent $wrongFixture) -Force;Copy-Item -LiteralPath $canonicalLibrary -Destination $wrongFixture -Recurse
           $wrongInfo=Get-Content -LiteralPath (Join-Path $wrongFixture 'info-f210.json') -Raw|ConvertFrom-Json -AsHashtable;$wrongInfo.factorio_version='2.0';[IO.File]::WriteAllText((Join-Path $wrongFixture 'info-f210.json'),($wrongInfo|ConvertTo-Json -Depth 8)+[Environment]::NewLine,[Text.UTF8Encoding]::new($false))
           $wrongRejected=$false;try{New-StandaloneF210LibraryFixtureSourceProjection -RepoRoot $wrongRepo -OutputRoot (Join-Path $root 'wrong-output')|Out-Null}catch{$wrongRejected=$true};if(-not$wrongRejected){throw 'F200 fixture metadata was accepted for standalone F210 projection'}
+          $wrongSpaceAgeRepo=Join-Path $root 'wrong-space-age-repository';$wrongSpaceAgeFixture=Join-Path $wrongSpaceAgeRepo 'tests/fixtures/library-multiplayer';$null=New-Item -ItemType Directory -Path (Split-Path -Parent $wrongSpaceAgeFixture) -Force;Copy-Item -LiteralPath $canonicalLibrary -Destination $wrongSpaceAgeFixture -Recurse
+          $wrongSpaceAgeInfo=Get-Content -LiteralPath (Join-Path $wrongSpaceAgeFixture 'info-f210-space-age.json') -Raw|ConvertFrom-Json -AsHashtable;$wrongSpaceAgeInfo.version='0.1.0';[IO.File]::WriteAllText((Join-Path $wrongSpaceAgeFixture 'info-f210-space-age.json'),($wrongSpaceAgeInfo|ConvertTo-Json -Depth 8)+[Environment]::NewLine,[Text.UTF8Encoding]::new($false))
+          $wrongSpaceAgeRejected=$false;try{New-StandaloneF210LibraryFixtureSourceProjection -RepoRoot $wrongSpaceAgeRepo -OutputRoot (Join-Path $root 'wrong-space-age-output') -SpaceAgeLibrary|Out-Null}catch{$wrongSpaceAgeRejected=$true};if(-not$wrongSpaceAgeRejected){throw 'Base metadata was accepted for standalone F210 Space Age projection'}
           'PASS actual normal standalone F210 preparation and projection opponents'
         '''
         with tempfile.TemporaryDirectory(prefix="mir5-standalone-normal-preparation-") as work:
@@ -1500,6 +1639,35 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
                 self.assertFalse(rejected["ok"])
                 self.assertIn("unexpected non-base F210 multiplayer closure", rejected["message"])
 
+    def test_f210_space_age_api_client_fixture_requires_the_exact_native_and_library_vectors(self):
+        accepted = self.run_case(target="f210-space-age")
+        self.assertTrue(accepted["ok"], accepted["message"])
+        self.assertEqual((accepted["phase"], accepted["join_events"]), ("completed", 6))
+        self.assertTrue(accepted["load_unchanged"])
+        for marker in accepted["markers"]:
+            witnesses = marker["witnesses"]
+            self.assertTrue(witnesses["space_age_library"])
+            live = witnesses["live_refresh"]
+            self.assertIn("casting_gear_productivity", live)
+            self.assertAlmostEqual(live["gear_productivity"], 0 if marker["stage"] == "ready" else .2)
+            self.assertAlmostEqual(live["casting_gear_productivity"], 0 if marker["stage"] == "ready" else .2)
+
+        expected = {
+            "sa-casting-effect-missing": "Space Age native gear effect cardinality differs",
+            "sa-casting-effect-duplicate": "Space Age native gear effect cardinality differs",
+            "sa-casting-effect-wrong": "Space Age native gear effect differs",
+            "sa-native-owner-missing": "Space Age native research-productivity owner differs",
+            "sa-availability-wrong": "Space Age native research-productivity Availability differs",
+            "sa-dlc-partial": "unexpected non-base F210 multiplayer closure",
+            "sa-api-alpha-only": "unexpected non-base F210 multiplayer closure",
+            "sa-api-beta-only": "unexpected non-base F210 multiplayer closure",
+        }
+        for opponent, message in expected.items():
+            with self.subTest(opponent=opponent):
+                rejected = self.run_case(opponent, target="f210-space-age")
+                self.assertFalse(rejected["ok"])
+                self.assertIn(message, rejected["message"])
+
     def test_two_real_client_join_rejoin_and_restart_state_machine(self):
         result = self.run_case()
         self.assertTrue(result["ok"], result["message"])
@@ -1507,6 +1675,7 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
         self.assertTrue(result["load_unchanged"])
         self.assertEqual([item["stage"] for item in result["markers"]], ["ready", "rejoin-ready", "restart-ready", "completed"])
         completed = result["markers"][-1]["witnesses"]
+        self.assertNotIn("space_age_library", completed)
         self.assertTrue(completed["on_load_read_only"])
         self.assertTrue(completed["availability_terminal_labels_checked"])
         self.assertEqual(completed["screenshot_calls"], 10)
@@ -1514,6 +1683,7 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
         self.assertEqual(completed["initial_settle_ticks"], 60)
         self.assertEqual(result["saves"], ["mir5-library-multiplayer-restart", "mir5-native-complete"])
         live_refresh = completed["live_refresh"]
+        self.assertNotIn("casting_gear_productivity", live_refresh)
         self.assertEqual(live_refresh["real_lab_completions"], 2)
         self.assertFalse(live_refresh["native_laboratory_completion_by_script"])
         self.assertGreaterEqual(live_refresh["native_research_started_events"], 2)
@@ -1595,7 +1765,7 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
                          (0, False, .25, False, 2, 1, 0))
 
     def test_native_session_reader_accepts_actual_library_markers_and_rejects_mutations(self):
-        results = {target: self.run_case(target=target) for target in ("f200", "f210")}
+        results = {target: self.run_case(target=target) for target in ("f200", "f210", "f210-space-age")}
         for target, result in results.items():
             with self.subTest(target=target):
                 self.assertTrue(result["ok"], result["message"])
@@ -1632,10 +1802,12 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
             f210=[ordered]@{engine_sha256='FE4A1DA30F322A0D0B8AEB3DF7276332222BAAA143E2352569B723E84B2B9060';base='2.1.23';mir='5.0.21000'}
             standalone_normal=[ordered]@{engine_sha256='8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38';base='2.1.23';mir='5.0.21000';standalone_identity_discovery=$false}
             standalone_discovery=[ordered]@{engine_sha256='8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38';base='2.1.23';mir='5.0.21000';standalone_identity_discovery=$true}
+            standalone_space_age=[ordered]@{engine_sha256='8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38';base='2.1.23';mir='5.0.21000';standalone_identity_discovery=$false;space_age_library=$true}
           }
           function New-LibraryWitnessSpec([hashtable]$Target){
             $spec=@{library_witness_target=([ordered]@{engine_sha256=$Target.engine_sha256;base=$Target.base;mir=$Target.mir})}
             if($Target.Contains('standalone_identity_discovery') -and $Target.standalone_identity_discovery){$spec.standalone_identity_discovery=$true}
+            if($Target.Contains('space_age_library') -and $Target.space_age_library){$spec.space_age_library=$true;$spec.api_client_consumers=$true}
             return $spec
           }
           function Assert-LibraryWitnessTargetRejects([hashtable]$Spec,[string]$Engine,[string]$Name){
@@ -1654,10 +1826,17 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
           Assert-LibraryWitnessIdentityMode $true $discoveryStandalone
           Assert-LibraryWitnessModeRejects $true $normalStandalone 'normal target with discovery mode'
           Assert-LibraryWitnessModeRejects $false $discoveryStandalone 'discovery target with normal mode'
+          $spaceAgeStandalone=Get-LibraryWitnessTarget (New-LibraryWitnessSpec $targets.standalone_space_age) $targets.standalone_space_age.engine_sha256
+          Assert-LibraryWitnessBoolean $spaceAgeStandalone 'space_age_library' $true 'Space Age standalone target'
+          Assert-LibraryWitnessIdentityMode $false $spaceAgeStandalone
           $malformedStandalone=New-LibraryWitnessSpec $targets.standalone_normal;$malformedStandalone.standalone_identity_discovery='true'
           Assert-LibraryWitnessTargetRejects $malformedStandalone $targets.standalone_normal.engine_sha256 'malformed standalone mode'
           $explicitFalseStandalone=New-LibraryWitnessSpec $targets.standalone_normal;$explicitFalseStandalone.standalone_identity_discovery=$false
           Assert-LibraryWitnessTargetRejects $explicitFalseStandalone $targets.standalone_normal.engine_sha256 'explicit false standalone mode'
+          $missingSpaceAgeConsumer=New-LibraryWitnessSpec $targets.standalone_space_age;$missingSpaceAgeConsumer.Remove('api_client_consumers')
+          Assert-LibraryWitnessTargetRejects $missingSpaceAgeConsumer $targets.standalone_space_age.engine_sha256 'Space Age target without API consumer mode'
+          $falseSpaceAge=New-LibraryWitnessSpec $targets.standalone_space_age;$falseSpaceAge.space_age_library=$false
+          Assert-LibraryWitnessTargetRejects $falseSpaceAge $targets.standalone_space_age.engine_sha256 'false Space Age target'
           foreach($targetName in @('f200','f210')){
             $target=$targets[$targetName]
             $expectedLibraryWitness=Get-LibraryWitnessTarget (New-LibraryWitnessSpec $target) $target.engine_sha256
@@ -1677,6 +1856,15 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
           Assert-LibraryWitnessTargetRejects $crossMir $targets.f210.engine_sha256 'cross-MIR'
           Assert-LibraryWitnessTargetRejects (New-LibraryWitnessSpec $targets.f200) ('A'*64) 'unknown-engine'
           Assert-LibraryWitnessTargetRejects @{} $targets.f200.engine_sha256 'missing-target'
+          $expectedSpaceAgeWitness=Get-LibraryWitnessTarget (New-LibraryWitnessSpec $targets.standalone_space_age) $targets.standalone_space_age.engine_sha256
+          $spaceAgeMarkers=@($markerSets['f210-space-age'])
+          if($spaceAgeMarkers.Count-ne4){throw 'actual fixture markers are incomplete: f210-space-age'}
+          foreach($marker in $spaceAgeMarkers){
+            $stage=[string]$marker['stage']
+            $line='[MIR5_LIBRARY_MULTIPLAYER] RESULT '+($marker|ConvertTo-Json -Depth 20 -Compress)
+            $accepted=Get-StageMarker $line $stage ([int]$expectedJoins[$stage]) $expectedSpaceAgeWitness
+            if($null-eq$accepted-or$accepted.stage-cne$stage){throw "actual Space Age fixture marker rejected: $stage"}
+          }
           $expectedLibraryWitness=Get-LibraryWitnessTarget (New-LibraryWitnessSpec $targets.f200) $targets.f200.engine_sha256
           $markers=@($markerSets['f200'])
           function ConvertTo-LibraryMarkerLine([hashtable]$Marker){
@@ -1705,6 +1893,37 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
             Assert-LibraryReaderAccepts $marker
             $byStage[[string]$marker['stage']]=$marker
           }
+
+          $spaceAgeByStage=@{}
+          foreach($marker in $spaceAgeMarkers){$spaceAgeByStage[[string]$marker['stage']]=$marker}
+          function Assert-SpaceAgeReaderRejects([hashtable]$Marker,[string]$ExpectedStage,[int]$ExpectedJoins,[string]$Name){
+            $line=ConvertTo-LibraryMarkerLine $Marker
+            try{$accepted=Get-StageMarker $line $ExpectedStage $ExpectedJoins $expectedSpaceAgeWitness}catch{return}
+            if($null-ne$accepted){throw "reader accepted invalid Space Age marker: $Name"}
+          }
+          $missingSpaceAgeWitness=Copy-LibraryMarker $spaceAgeByStage['ready']
+          $missingSpaceAgeWitness['witnesses'].Remove('space_age_library')
+          Assert-SpaceAgeReaderRejects $missingSpaceAgeWitness 'ready' 0 'missing Space Age witness'
+          $falseSpaceAgeWitness=Copy-LibraryMarker $spaceAgeByStage['ready']
+          $falseSpaceAgeWitness['witnesses']['space_age_library']=$false
+          Assert-SpaceAgeReaderRejects $falseSpaceAgeWitness 'ready' 0 'false Space Age witness'
+          $missingCastingReady=Copy-LibraryMarker $spaceAgeByStage['ready']
+          $missingCastingReady['witnesses']['live_refresh'].Remove('casting_gear_productivity')
+          Assert-SpaceAgeReaderRejects $missingCastingReady 'ready' 0 'missing ready casting productivity'
+          $wrongCastingReady=Copy-LibraryMarker $spaceAgeByStage['ready']
+          $wrongCastingReady['witnesses']['live_refresh']['casting_gear_productivity']=1
+          Assert-SpaceAgeReaderRejects $wrongCastingReady 'ready' 0 'wrong ready casting productivity'
+          $wrongCastingCompleted=Copy-LibraryMarker $spaceAgeByStage['completed']
+          $wrongCastingCompleted['witnesses']['live_refresh']['casting_gear_productivity']=.1
+          Assert-SpaceAgeReaderRejects $wrongCastingCompleted 'completed' 6 'wrong completed casting productivity'
+          $crossedBase=Copy-LibraryMarker $byStage['completed']
+          $crossedBase['witnesses']['space_age_library']=$true
+          $crossedBase['witnesses']['live_refresh']['casting_gear_productivity']=.2
+          Assert-LibraryReaderRejects $crossedBase 'completed' 6 'Base marker with Space Age fields'
+          $crossedSpaceAge=Copy-LibraryMarker $spaceAgeByStage['completed']
+          $line=ConvertTo-LibraryMarkerLine $crossedSpaceAge
+          try{$accepted=Get-StageMarker $line 'completed' 6 $expectedLibraryWitness}catch{$accepted=$null}
+          if($null-ne$accepted){throw 'Base reader accepted a Space Age marker'}
 
           $minimumStarted=Copy-LibraryMarker $byStage['completed']
           $minimumStarted['witnesses']['live_refresh']['native_research_started_events']=2
