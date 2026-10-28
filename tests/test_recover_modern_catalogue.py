@@ -265,6 +265,34 @@ def _capture(root: Path, raw: dict, settings: dict, *, published: bool,
 
 
 class ModernCatalogueTests(unittest.TestCase):
+    def test_bob_angel_f210_legacy_credit_intent_uses_frozen_published_inputs(self):
+        intent = json.loads((ROOT / "spec/inventory/bob-angel-f210-intent-r01.json").read_text(encoding="utf-8"))
+        provenance = intent["provenance"]["legacy_credit_contracts"]
+        self.assertEqual(provenance["previous_160_row_intent_sha256"],
+                         "8B6ED54C7A50EAEFE0B4B2DF4C3BEA635E07A6667F12024F71EA1246ACDA253F")
+        rocket = provenance["public_rocket_input"]
+        self.assertEqual(_canonical_hash(rocket),
+                         "3E9B536E5228136E861D8CA6ECA7BB5789FC2647CDB70190858D7038835A5E06")
+        recipes = {"speed-module", "productivity-module", "efficiency-module"}
+        self.assertEqual(set(provenance["captured_recipe_names"]), recipes)
+        rows = {r["name"]: r["expected_candidate"] for r in intent["differences"]
+                if r["id"].startswith("BA-F210-LEGACY-CREDIT-")}
+        cannon = "mir-legacy-cannon-credit-rocket-shooting-speed"
+        self.assertEqual(set(rows), {"mir-legacy-module-credit-" + name for name in recipes} | {cannon})
+        for name, row in rows.items():
+            self.assertEqual((row["name"], row["type"], row["level"], row["max_level"]),
+                             (name, "technology", 1, "infinite"))
+            self.assertEqual((row["hidden"], row["enabled"], row["visible_when_disabled"], row["upgrade"]),
+                             (True, False, False, True))
+            self.assertEqual((row["unit"]["count"], row["unit"]["time"]), (1, 1))
+        for recipe in recipes:
+            self.assertEqual(rows["mir-legacy-module-credit-" + recipe]["effects"],
+                             [{"type": "change-recipe-productivity", "recipe": recipe, "change": .01}])
+        self.assertEqual(rows[cannon]["effects"],
+                         [{"type": "gun-speed", "ammo_category": "cannon-shell", "modifier": .1}])
+        self.assertEqual(rows[cannon]["unit"]["ingredients"],
+                         [[min(r[0] for r in rocket["unit"]["ingredients"]), 1]])
+
     def test_bob_angel_f210_effect_order_dispositions_reconstruct_only_nine_complete_b6_rows(self):
         """q010 B6 supplies payloads; fixed unmodded4.7.21000 supplies only static prefix order."""
         intent_path = ROOT / "spec/inventory/bob-angel-f210-intent-r01.json"
@@ -312,7 +340,7 @@ class ModernCatalogueTests(unittest.TestCase):
             if row["id"].startswith("BA-F210-EFFECT-ORDER-RECONSTRUCT-")
         }
         self.assertEqual(set(reviewed), set(F210_BOB_ANGEL_EFFECT_ORDER_IDS))
-        self.assertEqual(len(intent["differences"]), 160)
+        self.assertEqual(len(intent["differences"]), 164)
         expected_candidate_fingerprints = [
             {
                 "id": row["id"],
@@ -320,6 +348,7 @@ class ModernCatalogueTests(unittest.TestCase):
                 "independent_before_sha256": row.get("independent_before_sha256"),
             }
             for row in intent["differences"]
+            if not row["id"].startswith("BA-F210-LEGACY-CREDIT-")
         ]
         self.assertEqual(
             _canonical_hash(expected_candidate_fingerprints),
@@ -432,7 +461,7 @@ class ModernCatalogueTests(unittest.TestCase):
             "recipe-prod-research_oil_cracking_productivity-1",
             "recipe-prod-research_science_pack_productivity-1",
         })
-        self.assertEqual(len(intent["differences"]), 160)
+        self.assertEqual(len(intent["differences"]), 164)
         self.assertEqual(
             {row["id"] for row in intent["unresolved_categories"]},
             {"BA-F210-ADDITION-NATIVE-QUALIFICATION-REQUIRED"},

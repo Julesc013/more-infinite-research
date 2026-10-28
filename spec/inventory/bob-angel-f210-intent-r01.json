@@ -2,8 +2,8 @@
   "schema": 2,
   "kind": "MIR5ModernCatalogueReviewedDifferencesV1",
   "claims": [
-    "This partial F210 Bob/Angel intent contains only 160 exact named expected rows reconstructed from the fresh standalone U/B6 oracle and separately declared contracts.",
-    "It admits 123 SET-02 growth ceilings, two literal-title child removals, 24 finite signed native-credit carriers, nine B6-payload-preserving static-prefix effect representations, and two independently reconstructed non-B6 retained/progression rows; it does not derive an expected row from current player output.",
+    "This partial F210 Bob/Angel intent contains only 164 exact named expected rows reconstructed from the fresh standalone U/B6 oracle and separately declared contracts.",
+    "It admits 123 SET-02 growth ceilings, two literal-title child removals, 24 finite signed native-credit carriers, nine B6-payload-preserving static-prefix effect representations, three MIR1.1 module and one MIR1.2 cannon preservation holders, and two independently reconstructed non-B6 retained/progression rows; it does not derive an expected row from current player output.",
     "It does not establish gameplay, save, Library, performance, native, or release acceptance. The two added rows retain explicit native gameplay and qualification requirements."
   ],
   "provenance": {
@@ -453,6 +453,110 @@
           ]
         }
       }
+    },
+    "legacy_credit_contracts": {
+      "previous_160_row_intent_sha256": "8B6ED54C7A50EAEFE0B4B2DF4C3BEA635E07A6667F12024F71EA1246ACDA253F",
+      "independent_helper": {
+        "path": "tests/native_credit_oracle.py",
+        "sha256": "00123BC8496365EBA50B542FAAE62275D7FD4DCCCDA550E262077EDD8D3D6E1D",
+        "git_commit": "6c274a9274edee68df7216d07353092770776c27"
+      },
+      "public_rocket_source": "Existing independent B6 oracle technology addition, not the current candidate.",
+      "public_rocket_input": {
+        "effects": [
+          {
+            "ammo_category": "rocket",
+            "modifier": 0.1,
+            "type": "gun-speed"
+          }
+        ],
+        "icons": [
+          {
+            "icon": "__base__/graphics/technology/rocketry.png",
+            "icon_size": 256
+          },
+          {
+            "floating": true,
+            "icon": "__core__/graphics/icons/technology/constants/constant-speed.png",
+            "icon_size": 128,
+            "scale": 0.5,
+            "shift": [
+              50,
+              50
+            ]
+          }
+        ],
+        "level": 1,
+        "localised_description": [
+          "technology-description.more-infinite-research.direct_effect"
+        ],
+        "localised_name": [
+          "technology-name.more-infinite-research.research_rocket_shooting_speed",
+          [
+            "technology-name.rocketry"
+          ]
+        ],
+        "max_level": "infinite",
+        "name": "recipe-prod-research_rocket_shooting_speed-1",
+        "order": "p[research_rocket_shooting_speed]",
+        "prerequisites": [
+          "automation-science-pack",
+          "logistic-science-pack",
+          "chemical-science-pack",
+          "production-science-pack",
+          "military-science-pack",
+          "electromagnetic-science-pack",
+          "rocketry"
+        ],
+        "type": "technology",
+        "unit": {
+          "count_formula": "60*1.5^(L-1)",
+          "ingredients": [
+            [
+              "automation-science-pack",
+              1
+            ],
+            [
+              "logistic-science-pack",
+              1
+            ],
+            [
+              "chemical-science-pack",
+              1
+            ],
+            [
+              "production-science-pack",
+              1
+            ],
+            [
+              "military-science-pack",
+              1
+            ],
+            [
+              "electromagnetic-science-pack",
+              1
+            ]
+          ],
+          "time": 60
+        },
+        "upgrade": true
+      },
+      "public_rocket_input_sha256": "3E9B536E5228136E861D8CA6ECA7BB5789FC2647CDB70190858D7038835A5E06",
+      "captured_recipe_names": [
+        "efficiency-module",
+        "productivity-module",
+        "speed-module"
+      ],
+      "captured_upstream_data_raw_sha256": "3CEA9040B2ABCB5BD9E8615AC2866A798DACE7B6B31A999CB498B8CFCCA8AB92",
+      "native_source_evidence": [
+        "spec/evidence/migration-origin-110-f200-source-native-chain-r05.json",
+        "spec/evidence/migration-origin-120-f200-source-native-chain-r06.json"
+      ],
+      "native_successor_evidence": [
+        "spec/evidence/disabled-module-reset-f0dd-native-chain-r01.json",
+        "spec/evidence/migration-origin-120-575e-direct-native-chain-r01.json"
+      ],
+      "limits": "Four exact expected dormant prototype rows only. Separate Base saved-state results do not become Bob/Angel/Space Age migration, gameplay, menu, performance or release passes."
     }
   },
   "differences": [
@@ -7602,6 +7706,158 @@
       },
       "independent_before_sha256": "7E0E2EEDF6D80F5BD1C0159D4E8CAC60BC85F8442F1951D0B3157A3D0B74D8D9",
       "reason": "The original fixed unmodded F210 Space Age 4.7.21000 family supplies the complete technology body, tuning, captions, icons, level, order and static 12-recipe seed. The independently captured q010 B6 research-speed-7 supplies only its 14-pack unit progression and 16 prerequisites. COMP-02 selects all concrete non-hidden, non-denied item producers of q010 upstream lab inputs, preserving the static seed order before the canonical 15-recipe suffix."
+    },
+    {
+      "id": "BA-F210-LEGACY-CREDIT-CANNON-CREDIT-ROCKET-SHOOTING-SPEED",
+      "profile": "bob-angel-f210",
+      "domain": "data",
+      "type": "technology",
+      "name": "mir-legacy-cannon-credit-rocket-shooting-speed",
+      "expected_candidate": {
+        "type": "technology",
+        "name": "mir-legacy-cannon-credit-rocket-shooting-speed",
+        "icon": "__base__/graphics/technology/automation-1.png",
+        "icon_size": 256,
+        "level": 1,
+        "upgrade": true,
+        "hidden": true,
+        "enabled": false,
+        "visible_when_disabled": false,
+        "max_level": "infinite",
+        "order": "zz[mir-legacy-cannon-credit]-rocket-shooting-speed",
+        "effects": [
+          {
+            "type": "gun-speed",
+            "ammo_category": "cannon-shell",
+            "modifier": 0.1
+          }
+        ],
+        "unit": {
+          "count": 1,
+          "time": 1,
+          "ingredients": [
+            [
+              "automation-science-pack",
+              1
+            ]
+          ]
+        }
+      },
+      "reason": "Dormant native preservation holder required by published MIR1.1 module double-effect or MIR1.2 combined rocket/cannon saved-state contracts. Reconstructed from the independent B6 public rocket row, captured upstream recipe presence and package-excluded independent credit oracle; no current candidate output supplies an expected row."
+    },
+    {
+      "id": "BA-F210-LEGACY-CREDIT-MODULE-CREDIT-EFFICIENCY-MODULE",
+      "profile": "bob-angel-f210",
+      "domain": "data",
+      "type": "technology",
+      "name": "mir-legacy-module-credit-efficiency-module",
+      "expected_candidate": {
+        "type": "technology",
+        "name": "mir-legacy-module-credit-efficiency-module",
+        "icon": "__base__/graphics/technology/module.png",
+        "icon_size": 256,
+        "level": 1,
+        "upgrade": true,
+        "hidden": true,
+        "enabled": false,
+        "visible_when_disabled": false,
+        "max_level": "infinite",
+        "order": "zz[mir-legacy-module-credit]-mir-legacy-module-credit-efficiency-module",
+        "effects": [
+          {
+            "type": "change-recipe-productivity",
+            "recipe": "efficiency-module",
+            "change": 0.01
+          }
+        ],
+        "unit": {
+          "count": 1,
+          "time": 1,
+          "ingredients": [
+            [
+              "automation-science-pack",
+              1
+            ]
+          ]
+        }
+      },
+      "reason": "Dormant native preservation holder required by published MIR1.1 module double-effect or MIR1.2 combined rocket/cannon saved-state contracts. Reconstructed from the independent B6 public rocket row, captured upstream recipe presence and package-excluded independent credit oracle; no current candidate output supplies an expected row."
+    },
+    {
+      "id": "BA-F210-LEGACY-CREDIT-MODULE-CREDIT-PRODUCTIVITY-MODULE",
+      "profile": "bob-angel-f210",
+      "domain": "data",
+      "type": "technology",
+      "name": "mir-legacy-module-credit-productivity-module",
+      "expected_candidate": {
+        "type": "technology",
+        "name": "mir-legacy-module-credit-productivity-module",
+        "icon": "__base__/graphics/technology/module.png",
+        "icon_size": 256,
+        "level": 1,
+        "upgrade": true,
+        "hidden": true,
+        "enabled": false,
+        "visible_when_disabled": false,
+        "max_level": "infinite",
+        "order": "zz[mir-legacy-module-credit]-mir-legacy-module-credit-productivity-module",
+        "effects": [
+          {
+            "type": "change-recipe-productivity",
+            "recipe": "productivity-module",
+            "change": 0.01
+          }
+        ],
+        "unit": {
+          "count": 1,
+          "time": 1,
+          "ingredients": [
+            [
+              "automation-science-pack",
+              1
+            ]
+          ]
+        }
+      },
+      "reason": "Dormant native preservation holder required by published MIR1.1 module double-effect or MIR1.2 combined rocket/cannon saved-state contracts. Reconstructed from the independent B6 public rocket row, captured upstream recipe presence and package-excluded independent credit oracle; no current candidate output supplies an expected row."
+    },
+    {
+      "id": "BA-F210-LEGACY-CREDIT-MODULE-CREDIT-SPEED-MODULE",
+      "profile": "bob-angel-f210",
+      "domain": "data",
+      "type": "technology",
+      "name": "mir-legacy-module-credit-speed-module",
+      "expected_candidate": {
+        "type": "technology",
+        "name": "mir-legacy-module-credit-speed-module",
+        "icon": "__base__/graphics/technology/module.png",
+        "icon_size": 256,
+        "level": 1,
+        "upgrade": true,
+        "hidden": true,
+        "enabled": false,
+        "visible_when_disabled": false,
+        "max_level": "infinite",
+        "order": "zz[mir-legacy-module-credit]-mir-legacy-module-credit-speed-module",
+        "effects": [
+          {
+            "type": "change-recipe-productivity",
+            "recipe": "speed-module",
+            "change": 0.01
+          }
+        ],
+        "unit": {
+          "count": 1,
+          "time": 1,
+          "ingredients": [
+            [
+              "automation-science-pack",
+              1
+            ]
+          ]
+        }
+      },
+      "reason": "Dormant native preservation holder required by published MIR1.1 module double-effect or MIR1.2 combined rocket/cannon saved-state contracts. Reconstructed from the independent B6 public rocket row, captured upstream recipe presence and package-excluded independent credit oracle; no current candidate output supplies an expected row."
     }
   ],
   "must_match_without_exception": {
