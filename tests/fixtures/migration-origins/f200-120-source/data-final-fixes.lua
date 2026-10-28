@@ -106,8 +106,13 @@ if roster_count ~= 34 then fail("published source roster count differs") end
 
 for name, expected in pairs(catalogue.weapons) do
   local value = data.raw.technology[name]
-  if value == nil or value.type ~= "technology" or value.name ~= name then fail("finite weapon owner is absent: " .. name) end
-  assert_counts(counts(value.effects), expected_effects(expected), "finite weapon effects " .. name)
+  if value == nil or value.type ~= "technology" or value.name ~= name then fail("weapon owner is absent: " .. name) end
+  assert_counts(counts(value.effects), expected_effects(expected), "weapon effects " .. name)
+end
+
+local continuation = data.raw.technology["weapon-shooting-speed-7"]
+if continuation == nil or continuation.level ~= 7 or continuation.max_level ~= "infinite" then
+  fail("published infinite weapon continuation differs")
 end
 
 local direct = data.raw.technology[catalogue.direct]

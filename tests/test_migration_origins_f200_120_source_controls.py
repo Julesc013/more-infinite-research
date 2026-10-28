@@ -64,6 +64,7 @@ class MigrationOriginF200120SourceControls(unittest.TestCase):
         for name, row in technology.items():
             row["type"] = "technology"
             row["name"] = name
+        technology["weapon-shooting-speed-7"].update({"level": 7, "max_level": "infinite"})
         return {"technology": technology, "sentinel": {"unchanged": 41}}
 
     def run_settings(self, raw):
@@ -111,6 +112,7 @@ class MigrationOriginF200120SourceControls(unittest.TestCase):
                          tuple(self.catalogue["finite_weapon_seed_sets"]["player"]))
         self.assertEqual(("weapon-shooting-speed-1",), tuple(self.catalogue["finite_weapon_seed_sets"]["foreign"]))
         self.assertEqual({}, self.catalogue["finite_weapon_seed_sets"]["detached"])
+        self.assertEqual({f"weapon-shooting-speed-{level}" for level in range(1, 8)}, set(self.catalogue["weapons"]))
         self.assertEqual(("rocket", "cannon-shell", "electric", "flamethrower"), tuple(self.catalogue["gun_categories"]))
         self.assertEqual({"bullet": 1.5, "shotgun-shell": 1.6}, self.catalogue["finite_owner_gun_speed"]["player"])
         self.assertEqual({"bullet": .1, "shotgun-shell": .1}, self.catalogue["finite_owner_gun_speed"]["foreign"])
@@ -141,12 +143,15 @@ class MigrationOriginF200120SourceControls(unittest.TestCase):
         rocket["effects"] = [effect for effect in rocket["effects"] if effect.get("ammo_category") != "cannon-shell"]
         wrong_weapon = self.data_raw()
         wrong_weapon["technology"]["weapon-shooting-speed-1"]["effects"][0]["modifier"] = .05
+        wrong_continuation = self.data_raw()
+        wrong_continuation["technology"]["weapon-shooting-speed-7"]["max_level"] = 7
         wrong_runtime = {name: row["default_value"] for name, row in self.catalogue["settings"].items()}
         wrong_runtime[double_name] += 1
         for label, runner, candidate in (
             ("wrong-numeric-default", self.run_settings, wrong_numeric),
             ("missing-combined-cannon", self.run_data, missing_cannon),
             ("wrong-finite-effect", self.run_data, wrong_weapon),
+            ("wrong-infinite-continuation", self.run_data, wrong_continuation),
             ("wrong-effective-numeric", lambda raw: self.run_data(raw, wrong_runtime), self.data_raw()),
         ):
             with self.subTest(label=label):
@@ -227,7 +232,7 @@ class MigrationOriginF200120SourceControls(unittest.TestCase):
     def test_runtime_seed_earns_only_the_six_declared_finite_weapon_owners(self):
         self.lua.globals().fixture_control_path = (FIXTURE / "control.lua").as_posix()
         self.lua.execute(r'''
-          function migration_origin_120_seed_finite_owners(pre_research_seven)
+          function migration_origin_120_seed_finite_owners(pre_research_seven, malformed_finite, malformed_extension)
             local callbacks={events={}}
             local env={script={on_init=function(fn)callbacks.init=fn end,on_load=function()end,
               on_event=function(event,fn)callbacks.events[event]=fn end},
@@ -255,10 +260,14 @@ class MigrationOriginF200120SourceControls(unittest.TestCase):
             end
             for name,row in pairs(catalogue.weapons) do
               weapons[#weapons+1]=name
-              technologies[name]={name=name,valid=true,level=1,
+              local level=tonumber(string.match(name,"(%d+)$"))
+              local maximum=(name=="weapon-shooting-speed-7") and 4294967295 or level
+              technologies[name]={name=name,valid=true,level=level,
                 researched=(pre_research_seven and name=="weapon-shooting-speed-7") or false,enabled=true,
-                prototype={level=1,max_level=4294967295,effects=row.effects}}
+                prototype={level=level,max_level=maximum,effects=row.effects}}
             end
+            if malformed_finite then technologies["weapon-shooting-speed-6"].prototype.max_level=4294967295 end
+            if malformed_extension then technologies["weapon-shooting-speed-7"].prototype.level=6 end
             local force={technologies=technologies,worker_robots_battery_modifier=.1,guns={}}
             function force.enable_all_prototypes() end
             function force.reset_technology_effects()
@@ -267,6 +276,9 @@ class MigrationOriginF200120SourceControls(unittest.TestCase):
               force.worker_robots_battery_modifier=.1
             end
             force.get_gun_speed_modifier=function(category) return force.guns[category] or 0 end
+            local weapon_rows=upvalue(callbacks.init,"weapon_rows")
+            local admitted,admission_message=pcall(weapon_rows,force)
+            if not admitted then return {ok=false,message=tostring(admission_message),state={},guns=force.guns} end
             local seed=upvalue(callbacks.init,"seed_rows")
             local ok,message=pcall(seed,force,rows,weapons,"player",catalogue.direct,
               catalogue.finite_weapon_seed_sets.player,catalogue.finite_owner_gun_speed.player)
@@ -275,17 +287,233 @@ class MigrationOriginF200120SourceControls(unittest.TestCase):
             return {ok=ok,message=tostring(message),state=state,guns=force.guns}
           end
         ''')
-        accepted = py(self.lua.eval("migration_origin_120_seed_finite_owners")(False))
+        accepted = py(self.lua.eval("migration_origin_120_seed_finite_owners")(False, False, False))
         self.assertTrue(accepted["ok"], accepted["message"])
         for level in range(1, 7):
-            self.assertEqual({"level": 1, "researched": True}, accepted["state"][f"weapon-shooting-speed-{level}"])
-        self.assertEqual({"level": 1, "researched": False}, accepted["state"]["weapon-shooting-speed-7"])
+            self.assertEqual({"level": level, "researched": True}, accepted["state"][f"weapon-shooting-speed-{level}"])
+        self.assertEqual({"level": 7, "researched": False}, accepted["state"]["weapon-shooting-speed-7"])
         self.assertEqual({"bullet": 1.5, "shotgun-shell": 1.6},
                          {name: accepted["guns"][name] for name in ("bullet", "shotgun-shell")})
 
-        rejected = py(self.lua.eval("migration_origin_120_seed_finite_owners")(True))
+        rejected = py(self.lua.eval("migration_origin_120_seed_finite_owners")(True, False, False))
         self.assertFalse(rejected["ok"])
-        self.assertIn("finite weapon owner unexpectedly researched", rejected["message"])
+        self.assertIn("infinite weapon continuation differs", rejected["message"])
+
+        for label, malformed_finite, malformed_extension, expected in (
+            ("finite", True, False, "finite weapon owner differs"),
+            ("extension", False, True, "infinite weapon continuation differs"),
+        ):
+            with self.subTest(label=label):
+                rejected = py(self.lua.eval("migration_origin_120_seed_finite_owners")(False, malformed_finite, malformed_extension))
+                self.assertFalse(rejected["ok"])
+                self.assertIn(expected, rejected["message"])
+
+    def test_runtime_source_roster_accepts_only_recorded_recipe_float32_aliases(self):
+        self.lua.globals().fixture_control_path = (FIXTURE / "control.lua").as_posix()
+        self.lua.execute(r'''
+          function migration_origin_120_recipe_aliases(mode)
+            local callbacks={events={}}
+            local env={script={on_init=function(fn)callbacks.init=fn end,on_load=function()end,
+              on_event=function(event,fn)callbacks.events[event]=fn end},
+              defines={events={on_research_finished=1,on_tick=2},inventory={lab_input=1}}}
+            env.require=function(name)
+              assert(name=="__mir-fixture-mir5-migration-origin-f200-120-source__/catalogue")
+              return assert(loadfile(catalogue_path,"t",env))()
+            end
+            env._G=env;setmetatable(env,{__index=_G})
+            assert(loadfile(fixture_control_path,"t",env))()
+            local function upvalue(fn,wanted)
+              for index=1,64 do
+                local name,value=debug.getupvalue(fn,index)
+                if name==nil then break end
+                if name==wanted then return value end
+              end
+              error("missing upvalue "..wanted)
+            end
+            local catalogue=env.require("__mir-fixture-mir5-migration-origin-f200-120-source__/catalogue")
+            local function effects_copy(values,name)
+              local out={}
+              for index,effect in ipairs(values) do
+                local copy={}
+                for key,value in pairs(effect) do copy[key]=value end
+                if copy.type=="change-recipe-productivity" and mode=="float32" then
+                  local aliases={[.1]=0.10000000149011612,[.05]=0.05000000074505806,
+                    [.02]=0.019999999552965164,[.2]=0.20000000298023224}
+                  copy.change=aliases[copy.change] or copy.change
+                end
+                if copy.type=="change-recipe-productivity" and mode=="wrong-scalar"
+                    and name==catalogue.direct then copy.change=.10000001 end
+                out[index]=copy
+              end
+              if mode=="duplicate" and name==catalogue.direct then
+                local copy={}
+                for key,value in pairs(out[1]) do copy[key]=value end
+                out[#out+1]=copy
+              end
+              return out
+            end
+            local technologies={}
+            for name,row in pairs(catalogue.rows) do
+              technologies[name]={name=name,valid=true,prototype={level=row.level,max_level=4294967295,
+                effects=effects_copy(row.effects,name)}}
+            end
+            local source_rows=upvalue(callbacks.init,"source_rows")
+            local ok,message=pcall(source_rows,{technologies=technologies})
+            return {ok=ok,message=tostring(message)}
+          end
+        ''')
+        for label in ("authored", "float32"):
+            with self.subTest(label=label):
+                result = py(self.lua.eval("migration_origin_120_recipe_aliases")(label))
+                self.assertTrue(result["ok"], result["message"])
+        for label, expected in (("wrong-scalar", "source recipe-effect scalar is unsupported"),
+                                ("duplicate", "source runtime effects differ")):
+            with self.subTest(label=label):
+                result = py(self.lua.eval("migration_origin_120_recipe_aliases")(label))
+                self.assertFalse(result["ok"])
+                self.assertIn(expected, result["message"])
+
+    def test_source_emits_one_plain_snapshot_before_save_and_never_on_reload(self):
+        self.lua.globals().fixture_control_path = (FIXTURE / "control.lua").as_posix()
+        self.lua.execute(r'''
+          function migration_origin_120_source_observation(native_recipe_alias)
+            local callbacks,observations,logs={events={}}, {}, {}
+            local function copy_effects(values)
+              local out={}
+              for index,effect in ipairs(values) do
+                local copy={};for key,value in pairs(effect) do copy[key]=value end;out[index]=copy
+                if native_recipe_alias and copy.type=="change-recipe-productivity" then
+                  local aliases={[.1]=0.10000000149011612,[.05]=0.05000000074505806,
+                    [.02]=0.019999999552965164,[.2]=0.20000000298023224}
+                  copy.change=aliases[copy.change] or copy.change
+                end
+              end
+              return out
+            end
+            local function copy_ingredients(values)
+              local out={}
+              for index,value in ipairs(values) do out[index]={name=value[1],amount=value[2]} end
+              return out
+            end
+            local catalogue=assert(loadfile(catalogue_path))()
+            local function new_force(role)
+              local technologies,recipes={},{}
+              for name,row in pairs(catalogue.rows) do
+                technologies[name]={name=name,valid=true,level=row.level,researched=false,enabled=true,
+                  visible_when_disabled=false,saved_progress=0,prerequisites={},
+                  research_unit_ingredients=copy_ingredients(row.unit.ingredients),
+                  prototype={level=row.level,max_level=4294967295,effects=copy_effects(row.effects)}}
+                for _,effect in ipairs(row.effects) do
+                  if effect.type=="change-recipe-productivity" then recipes[effect.recipe]={valid=true,productivity_bonus=0} end
+                end
+              end
+              for name,row in pairs(catalogue.weapons) do
+                local level=tonumber(string.match(name,"(%d+)$"))
+                technologies[name]={name=name,valid=true,level=level,researched=false,enabled=true,
+                  visible_when_disabled=false,saved_progress=0,prerequisites={},
+                  prototype={level=level,max_level=(name=="weapon-shooting-speed-7") and 4294967295 or level,
+                    effects=copy_effects(row.effects)}}
+              end
+              local force={valid=true,role=role,technologies=technologies,recipes=recipes,research_queue={},research_progress=0,guns={}}
+              for _,technology in pairs(technologies) do technology.force=force end
+              function force.enable_all_prototypes() end
+              function force.reset_technology_effects()
+                force.worker_robots_battery_modifier=.1
+                for category,value in pairs(catalogue.direct_gun_speed) do force.guns[category]=value end
+                for category,value in pairs(catalogue.finite_owner_gun_speed[role] or {}) do force.guns[category]=value end
+              end
+              function force.get_gun_speed_modifier(category) return force.guns[category] or 0 end
+              function force.add_research(value) force.current_research=value;return true end
+              return force
+            end
+            local inventory={items={}}
+            function inventory.clear() inventory.items={} end
+            function inventory.insert(value) inventory.items[value.name]=(inventory.items[value.name] or 0)+value.count;return value.count end
+            function inventory.get_item_count(name) return inventory.items[name] or 0 end
+            local lab={valid=true,energy=0,get_inventory=function(index) assert(index==1);return inventory end}
+            local player=new_force("player")
+            local game={speed=1,tick=0,forces={player=player},surfaces={[1]={create_entity=function(value)
+              assert(value.name=="lab" and value.force==player);return lab end}},saved=false}
+            function game.create_force(name)
+              local role=(name:match("foreign$") and "foreign") or "detached"
+              local force=new_force(role);force.index=(role=="foreign") and 2 or 3
+              force.current_research=force.technologies[catalogue.direct]
+              game.forces[force.index]=force;game.forces[name]=force
+              return force
+            end
+            function game.server_save(name) assert(name=="mir5-native-complete");assert(#observations==1);game.saved=true end
+            local startup={};for name,row in pairs(catalogue.settings) do startup[name]={value=row.default_value} end
+            local storage={}
+            local env={game=game,storage=storage,settings={startup=startup},helpers={table_to_json=function(value)
+                observations[#observations+1]=value;return "{}" end},log=function(value)logs[#logs+1]=value end,
+              script={active_mods={base="2.0.77",["more-infinite-research"]="1.2.0",
+                ["mir-fixture-mir5-migration-origin-f200-120-source"]="0.1.0"},
+                on_init=function(fn)callbacks.init=fn end,on_load=function(fn)callbacks.load=fn end,
+                on_event=function(event,fn)callbacks.events[event]=fn end},
+              defines={events={on_research_finished=1,on_tick=2},inventory={lab_input=1}}}
+            env.require=function(name)
+              assert(name=="__mir-fixture-mir5-migration-origin-f200-120-source__/catalogue")
+              return catalogue
+            end
+            env._G=env;setmetatable(env,{__index=_G})
+            assert(loadfile(fixture_control_path,"t",env))()
+            callbacks.init()
+            local direct=player.technologies[catalogue.direct]
+            direct.level=2;player.recipes["iron-gear-wheel"].productivity_bonus=.1;inventory.clear()
+            callbacks.events[1]({research=direct})
+            callbacks.events[2]()
+            local observation_count=#observations
+            callbacks.events[2]()
+            local ordinary_tick_count=#observations
+            callbacks.load()
+            callbacks.events[2]()
+            return {observation=observations[1],observation_count=observation_count,
+              ordinary_tick_count=ordinary_tick_count,saved=game.saved,logs=logs}
+          end
+        ''')
+        expected_rows = set(self.catalogue["rows"])
+        expected_weapons = set(self.catalogue["weapons"])
+        expected_recipes = {effect["recipe"] for row in self.catalogue["rows"].values() for effect in row["effects"]
+                            if effect["type"] == "change-recipe-productivity"}
+        expected_guns = set(self.catalogue["gun_categories"]) | {"bullet", "shotgun-shell"}
+        for label, native_alias, expected_token in (
+            ("authored", False, "0.10000000000000001"),
+            ("native-float32", True, "0.10000000149011612"),
+        ):
+            with self.subTest(label=label):
+                result = py(self.lua.eval("migration_origin_120_source_observation")(native_alias))
+                self.assertTrue(result["saved"])
+                self.assertEqual((1, 1), (result["observation_count"], result["ordinary_tick_count"]))
+                observation = result["observation"]
+                self.assertEqual({"case", "detached", "foreign", "origin_tag", "player", "seed_counts",
+                                  "source_direct_lab_completions", "stage", "startup_settings"}, set(observation))
+                self.assertEqual(("migration-origin-f200-120-source", "source-before-protected-save", "1.2.0", 1),
+                                 (observation["case"], observation["stage"], observation["origin_tag"],
+                                  observation["source_direct_lab_completions"]))
+                self.assertEqual({"scripted_rows": 33, "player_finite_owners": 6,
+                                  "foreign_finite_owners": 1, "detached_finite_owners": 0}, observation["seed_counts"])
+                self.assertEqual({name: row["default_value"] for name, row in self.catalogue["settings"].items()},
+                                 observation["startup_settings"])
+                snapshots = {"player": observation["player"], "foreign": observation["foreign"]["snapshot"],
+                             "detached": observation["detached"]}
+                for name, snapshot in snapshots.items():
+                    with self.subTest(force=name):
+                        self.assertEqual({"technologies", "weapons", "recipes", "fields", "gun_speed"}, set(snapshot))
+                        self.assertEqual(expected_rows, set(snapshot["technologies"]))
+                        self.assertEqual(expected_weapons, set(snapshot["weapons"]))
+                        self.assertEqual(expected_recipes, set(snapshot["recipes"]))
+                        self.assertEqual({"worker_robots_battery_modifier"}, set(snapshot["fields"]))
+                        self.assertEqual(expected_guns, set(snapshot["gun_speed"]))
+                self.assertIn("change-recipe-productivity|iron-gear-wheel|" + expected_token,
+                              observation["player"]["technologies"][self.catalogue["direct"]]["effects"])
+                self.assertEqual({"snapshot", "queue"}, set(observation["foreign"]))
+                self.assertEqual({"current", "queue", "progress"}, set(observation["foreign"]["queue"]))
+                self.assertEqual("recipe-prod-research_gears-1", observation["foreign"]["queue"]["current"])
+                self.assertEqual(["recipe-prod-research_gears-1", "recipe-prod-research_plastic-1"],
+                                 observation["foreign"]["queue"]["queue"])
+                self.assertEqual(0.42, observation["foreign"]["queue"]["progress"])
+                self.assertEqual(1, sum("[MIR5_MIGRATION_ORIGIN_F200_120_SOURCE] SNAPSHOT" in line
+                                        for line in result["logs"]))
 
     def test_profile_and_fixture_are_source_only_preparation(self):
         info = json.loads((FIXTURE / "info.json").read_text(encoding="utf-8"))
