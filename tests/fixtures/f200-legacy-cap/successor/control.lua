@@ -174,6 +174,16 @@ local function destination_mode()
       source_mir = "4.7.20003", source_fixture = "0.4.0", science_type = "item", reenabled = true,
       previous_case = "f210-first-finite-cap-held", previous_fixture = "0.12.0"}
   end
+  if base == "2.0.77" and mir == "5.0.20000" and fixture == "0.14.0" then
+    return {case = "f200-first-finite-cap-held", label = "MIR5 F200 enabled finite-cap hold",
+      source_mir = "4.7.20003", source_fixture = "0.4.0", science_type = "tool",
+      disabled_intermediate = true, finite_cap = true}
+  end
+  if base == "2.0.77" and mir == "5.0.20000" and fixture == "0.15.0" then
+    return {case = "f200-first-finite-cap-relaxed", label = "MIR5 F200 first finite-cap relaxation",
+      source_mir = "4.7.20003", source_fixture = "0.4.0", science_type = "tool", reenabled = true,
+      previous_case = "f200-first-finite-cap-held", previous_fixture = "0.14.0"}
+  end
   if base == "2.0.77" and mir == "4.7.20002" and fixture == "0.3.0" then
     return {case = PUBLISHED_RELAXED_CASE, label = "published relaxed", source_mir = "4.7.20002", source_fixture = "0.1.0", science_type = "tool"}
   end

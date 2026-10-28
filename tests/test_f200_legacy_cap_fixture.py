@@ -33,6 +33,8 @@ F210_DISABLED = FIXTURE / "f210/disabled-after-f200"
 F210_REENABLED = FIXTURE / "f210/reenabled-after-f200"
 F210_FINITE_HELD = FIXTURE / "f210/first-finite-held"
 F210_FINITE_RELAXED = FIXTURE / "f210/first-finite-relaxed"
+F200_FINITE_HELD = FIXTURE / "f200/first-finite-held"
+F200_FINITE_RELAXED = FIXTURE / "f200/first-finite-relaxed"
 V3_SOURCE = FIXTURE / "f200/v3-440-source"
 V3_F200 = FIXTURE / "f200/v3-440-successor"
 V3_F210 = FIXTURE / "f210/v3-440-successor"
@@ -314,7 +316,8 @@ class F200LegacyCapFixtureTests(unittest.TestCase):
             elseif opponent=="saved-progress" then player.technologies[GEAR].saved_progress=.26
             elseif opponent=="lab-count" then state.actual_lab_completions=1 end
             local three_stage=options.disabled_path~=nil or options.reenabled_path~=nil
-            if destination_base=="2.1.23" or three_stage then
+            local science_base=three_stage and (options.reenabled_base or "2.1.23") or destination_base
+            if science_base=="2.1.23" then
               science_type="item"
               for _,name in ipairs(science) do
                 local stack=input.slot_by_name[name]
@@ -655,6 +658,40 @@ class F200LegacyCapFixtureTests(unittest.TestCase):
                                      {**options, "disabled_limit": 40})
         self.assertFalse(wrong_cap["ok"])
         self.assertIn("settings are not the verified positive-cap", wrong_cap["message"])
+
+    def test_first_enabled_f200_finite_cap_retains_tool_science_and_exact_phase(self):
+        options = {
+            "source_base": "2.0.77", "source_mir": "4.7.20003", "source_fixture": "0.4.0",
+            "source_control_alias": str(FIXTURE / "published/control.lua"),
+            "disabled_path": str(F200_FINITE_HELD / "control.lua"), "disabled_fixture": "0.14.0",
+            "disabled_base": "2.0.77", "disabled_mir": "5.0.20000",
+            "disabled_control_alias": str(FIXTURE / "successor/control.lua"),
+            "disabled_limit": 2, "finite_intermediate": True,
+            "reenabled_path": str(F200_FINITE_RELAXED / "control.lua"), "reenabled_fixture": "0.15.0",
+            "reenabled_base": "2.0.77", "reenabled_mir": "5.0.20000",
+            "reenabled_control_alias": str(FIXTURE / "successor/control.lua"),
+            "ordinary_completed_ticks": 3, "load_pending_before_tick": True,
+        }
+        result = self.flow_result(F200_CROSS / "control.lua", F200_FINITE_RELAXED / "control.lua", "", options)
+        self.assertTrue(result["ok"], result["message"])
+        self.assertEqual((2, 1, 4, .03, False, .42, 0, "tool"), tuple(result[k] for k in
+                         ("source_labs", "destination_labs", "player_level", "bonus", "foreign_enabled",
+                          "foreign_progress", "disabled_destination_labs", "science_type")))
+        self.assertAlmostEqual(44 / 60, result["inventory_consumed_units"])
+        self.assertEqual(["f200-f210-positive-legacy-cap-source"] * 3
+                         + ["f200-first-finite-cap-held"] * 3
+                         + ["f200-first-finite-cap-relaxed"] * 3, plain(result["marker_cases"]))
+        for opponent, phrase in (("skip-intermediate", "required disabled intermediate witness"),
+                                  ("wrong-disabled-setting", "expected owned family setting"),
+                                  ("old-disabled-right", "restored player native gear state differs"),
+                                  ("completed-reload-drift", "cold reload player saved progress differs")):
+            refused = self.flow_result(F200_CROSS / "control.lua", F200_FINITE_RELAXED / "control.lua", opponent, options)
+            self.assertFalse(refused["ok"], opponent)
+            self.assertIn(phrase, refused["message"])
+        row = self.row()
+        preflight = self.data_result(F200_FINITE_HELD / "data-final-fixes.lua", "2.0.77", "5.0.20000", "0.14.0", row,
+                                     data_alias=FIXTURE / "successor/data-final-fixes.lua")
+        self.assertTrue(preflight["ok"], preflight["message"])
 
     def test_first_finite_hold_keeps_an_enabled_prototype_and_independent_row_preflight(self):
         settings = self.settings_result(F210_FINITE_HELD / "settings-updates.lua")
