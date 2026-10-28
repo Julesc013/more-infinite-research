@@ -1,0 +1,219 @@
+{
+  "schema": 1,
+  "kind": "MIRQ006FullTechnologySettingsTransportV1",
+  "status": "exact-original-captures-projected-and-losslessly-transported",
+  "request": "https://github.com/Julesc013/more-infinite-research/issues/1359",
+  "historical_script": {
+    "path": "build/mir5/recovery/broad-a1fd-public-audit-r01/audit_a1fd_public.py",
+    "sha256": "9E00D07FC4287C65A1FC2CAF7DCA27A92EF36D7857EE618407A296B6FDBE5028",
+    "bytes": 22140,
+    "transport_record": "historical-reference/audit_a1fd_public.py",
+    "executed": false,
+    "authority": "Historical reference evidence only,not a current repository/runtime dependency or new audit framework."
+  },
+  "observations": [
+    {
+      "label": "q006-575e-upstream",
+      "original_result": {
+        "path": "build/qualification/broad-ecosystem-f210-575e-r02-native/q006-upstream/result.json",
+        "sha256": "C7BF5C387935ACB409A3875641FE0DDF1A9F8DAA816DD74A943684FA8462FD57",
+        "bytes": 27198
+      },
+      "original_raw": {
+        "path": "build/qualification/broad-ecosystem-f210-575e-r02-native/q006-upstream/write-data/script-output/data-raw-dump.json",
+        "sha256": "9850830424454DE5760C3CE0DB2A6D0055875339DE40B80EC08433E288EAFE2A",
+        "bytes": 53959294
+      },
+      "original_settings": {
+        "path": "build/qualification/broad-ecosystem-f210-575e-r02-native/q006-upstream/write-data/script-output/mod-settings-dump.json",
+        "sha256": "A66A00EB052466AE5615F921386024DDDB90B994DCD44FF61DAC83073CCC9219",
+        "bytes": 28826
+      },
+      "technology_projection": {
+        "sha256": "8FD4A1CA9C9FA77ACE38F37F6AD4A93AC089363FC83127E379EC18D1EC96D6C3",
+        "bytes": 942114,
+        "all_technology_rows": 673,
+        "raw_value_span": {
+          "utf8_character_start": 48571348,
+          "utf8_character_end": 49513462
+        },
+        "operation": "Original UTF-8 substring of the complete root technology value,delimited by JSONDecoder end position. No parse/re-serialization,ID selection,numeric normalization or nested/array reordering."
+      },
+      "settings_projection": "Entire original mod-settings-dump.json bytes unchanged",
+      "profile": {
+        "path": "D:\\Projects\\Factorio\\mir5-legacy-cannon-credit-r01\\tests\\profiles\\bob-full-space-age-f210-2123.json",
+        "sha256": "47A538A60B8B9446FA525B5FEFE2E7C2AA4D32C357BE45276748FC2F28C9A1D4"
+      },
+      "engine": {
+        "path": "D:\\Games\\Steam\\steamapps\\common\\Factorio\\bin\\x64\\factorio.exe",
+        "sha256": "FE4A1DA30F322A0D0B8AEB3DF7276332222BAAA143E2352569B723E84B2B9060",
+        "base_version": "2.1.23",
+        "factorio_version": "2.1"
+      },
+      "mir_archive": null,
+      "native_execution_reused_only": true
+    },
+    {
+      "label": "q006-575e-published",
+      "original_result": {
+        "path": "build/qualification/broad-ecosystem-f210-575e-r02-native/q006-published/result.json",
+        "sha256": "8EE3FA416F506381DDA7CBE06F9241DC6C2683F7190FA0A5396ADA3804453A29",
+        "bytes": 28361
+      },
+      "original_raw": {
+        "path": "build/qualification/broad-ecosystem-f210-575e-r02-native/q006-published/write-data/script-output/data-raw-dump.json",
+        "sha256": "0419DF1FD2C5495B5BEC692268F30294F1E19C168D199CB9BF4C7569EF20E6A4",
+        "bytes": 54630157
+      },
+      "original_settings": {
+        "path": "build/qualification/broad-ecosystem-f210-575e-r02-native/q006-published/write-data/script-output/mod-settings-dump.json",
+        "sha256": "CBC3F12DD307DBF47BF3BB34ADDE664082842AF03D68681D4D16DAE47FE650BD",
+        "bytes": 1071441
+      },
+      "technology_projection": {
+        "sha256": "6030BFD4EA8C2C36D28639DB6107C5FEC9708E2B135FC73BB551265C0ACE4FD9",
+        "bytes": 1112894,
+        "all_technology_rows": 746,
+        "raw_value_span": {
+          "utf8_character_start": 48572052,
+          "utf8_character_end": 49684946
+        },
+        "operation": "Original UTF-8 substring of the complete root technology value,delimited by JSONDecoder end position. No parse/re-serialization,ID selection,numeric normalization or nested/array reordering."
+      },
+      "settings_projection": "Entire original mod-settings-dump.json bytes unchanged",
+      "profile": {
+        "path": "D:\\Projects\\Factorio\\mir5-legacy-cannon-credit-r01\\tests\\profiles\\bob-full-space-age-f210-2123.json",
+        "sha256": "47A538A60B8B9446FA525B5FEFE2E7C2AA4D32C357BE45276748FC2F28C9A1D4"
+      },
+      "engine": {
+        "path": "D:\\Games\\Steam\\steamapps\\common\\Factorio\\bin\\x64\\factorio.exe",
+        "sha256": "FE4A1DA30F322A0D0B8AEB3DF7276332222BAAA143E2352569B723E84B2B9060",
+        "base_version": "2.1.23",
+        "factorio_version": "2.1"
+      },
+      "mir_archive": {
+        "path": "D:\\Projects\\Factorio\\testmods\\2.1\\more-infinite-research_4.7.21003.zip",
+        "sha256": "B6EB9430056ABD384DB00F94929FE7DAC0A37441ACF4BC277946689682628852",
+        "name": "more-infinite-research",
+        "version": "4.7.21003",
+        "factorio_version": "2.1",
+        "root": "more-infinite-research_4.7.21003"
+      },
+      "native_execution_reused_only": true
+    },
+    {
+      "label": "q006-575e-candidate",
+      "original_result": {
+        "path": "build/qualification/broad-ecosystem-f210-575e-r02-native/q006-candidate/result.json",
+        "sha256": "B97A8E1BCAB8818FE561C1448F916853775E8925945E4B54CFB6B2ECE601AFD2",
+        "bytes": 28358
+      },
+      "original_raw": {
+        "path": "build/qualification/broad-ecosystem-f210-575e-r02-native/q006-candidate/write-data/script-output/data-raw-dump.json",
+        "sha256": "24574A96BCD799365F9A02AEBCC15F5C195E1778BB136D0A7FF3CE6DA2884939",
+        "bytes": 54183632
+      },
+      "original_settings": {
+        "path": "build/qualification/broad-ecosystem-f210-575e-r02-native/q006-candidate/write-data/script-output/mod-settings-dump.json",
+        "sha256": "DE3A4C64980D4355CC5848024581CCC8C8AD953F59E675CB4EBBCBB9315C6C4E",
+        "bytes": 776854
+      },
+      "technology_projection": {
+        "sha256": "C81158CF1EC8E59859A1FABB4EEA67FDC64BC2EC720F05E690044D506ACB2BA0",
+        "bytes": 1165748,
+        "all_technology_rows": 785,
+        "raw_value_span": {
+          "utf8_character_start": 48572052,
+          "utf8_character_end": 49737800
+        },
+        "operation": "Original UTF-8 substring of the complete root technology value,delimited by JSONDecoder end position. No parse/re-serialization,ID selection,numeric normalization or nested/array reordering."
+      },
+      "settings_projection": "Entire original mod-settings-dump.json bytes unchanged",
+      "profile": {
+        "path": "D:\\Projects\\Factorio\\mir5-legacy-cannon-credit-r01\\tests\\profiles\\bob-full-space-age-f210-2123.json",
+        "sha256": "47A538A60B8B9446FA525B5FEFE2E7C2AA4D32C357BE45276748FC2F28C9A1D4"
+      },
+      "engine": {
+        "path": "D:\\Games\\Steam\\steamapps\\common\\Factorio\\bin\\x64\\factorio.exe",
+        "sha256": "FE4A1DA30F322A0D0B8AEB3DF7276332222BAAA143E2352569B723E84B2B9060",
+        "base_version": "2.1.23",
+        "factorio_version": "2.1"
+      },
+      "mir_archive": {
+        "path": "D:\\Projects\\Factorio\\testmods\\2.1\\more-infinite-research_5.0.21000.zip",
+        "sha256": "A8D0A4590154F3106E59BDB269F1AEB3ED8CC523F18F00ED7D76DC89059F5B8D",
+        "name": "more-infinite-research",
+        "version": "5.0.21000",
+        "factorio_version": "2.1",
+        "root": "more-infinite-research_5.0.21000"
+      },
+      "native_execution_reused_only": true
+    },
+    {
+      "label": "q006-a1fd-candidate",
+      "original_result": {
+        "path": "build/mir5/recovery-historical/a1fd-q006-native-r01/native-output/result.json",
+        "sha256": "D62E0A4711D2502FACAC3FA82BD856C0C05657DEA07B0C24B1FF967D3F8D6DA6",
+        "bytes": 28280
+      },
+      "original_raw": {
+        "path": "build/mir5/recovery-historical/a1fd-q006-native-r01/native-output/write-data/script-output/data-raw-dump.json",
+        "sha256": "E0E1F9AA55B3E6C5C5B0330CAD8E9A84F169BD96FE8FCA0B7F95E88EA6CC41B7",
+        "bytes": 54180366
+      },
+      "original_settings": {
+        "path": "build/mir5/recovery-historical/a1fd-q006-native-r01/native-output/write-data/script-output/mod-settings-dump.json",
+        "sha256": "DE3A4C64980D4355CC5848024581CCC8C8AD953F59E675CB4EBBCBB9315C6C4E",
+        "bytes": 776854
+      },
+      "technology_projection": {
+        "sha256": "D42C3EC36C77EAD7618272080349C7C56165EF62E3F9CB5F9ED675CE28D8D9B5",
+        "bytes": 1162482,
+        "all_technology_rows": 781,
+        "raw_value_span": {
+          "utf8_character_start": 48572052,
+          "utf8_character_end": 49734534
+        },
+        "operation": "Original UTF-8 substring of the complete root technology value,delimited by JSONDecoder end position. No parse/re-serialization,ID selection,numeric normalization or nested/array reordering."
+      },
+      "settings_projection": "Entire original mod-settings-dump.json bytes unchanged",
+      "profile": {
+        "path": "D:\\Projects\\Factorio\\mir5-broad-a1fd-candidate-r01\\tests\\profiles\\bob-full-space-age-f210-2123.json",
+        "sha256": "47A538A60B8B9446FA525B5FEFE2E7C2AA4D32C357BE45276748FC2F28C9A1D4"
+      },
+      "engine": {
+        "path": "D:\\Games\\Steam\\steamapps\\common\\Factorio\\bin\\x64\\factorio.exe",
+        "sha256": "FE4A1DA30F322A0D0B8AEB3DF7276332222BAAA143E2352569B723E84B2B9060",
+        "base_version": "2.1.23",
+        "factorio_version": "2.1"
+      },
+      "mir_archive": {
+        "path": "D:\\Projects\\Factorio\\testmods\\2.1\\more-infinite-research_5.0.21000.zip",
+        "sha256": "6088CD88D4FD06DE01D71C8A1C3C7D32A55A55BE073C0888A84B2AC0C8C467D7",
+        "name": "more-infinite-research",
+        "version": "5.0.21000",
+        "factorio_version": "2.1",
+        "root": "more-infinite-research_5.0.21000"
+      },
+      "native_execution_reused_only": true
+    }
+  ],
+  "optional_a1fd": {
+    "status": "included-exact-original",
+    "source": "a1fd431bd25e646f801e68a8ad00a8abb49ee094",
+    "mir_sha256": "6088CD88D4FD06DE01D71C8A1C3C7D32A55A55BE073C0888A84B2AC0C8C467D7"
+  },
+  "transport": {
+    "path": "spec/evidence/q006-full-technology-settings-projections-r01.json.gz",
+    "sha256": "D279B2AE549D326A719C82C47E1D42E3B55E55BFA7F8A01F47725FF371228595",
+    "bytes": 547673,
+    "records": 13,
+    "all_records_roundtrip_byte_identical": true
+  },
+  "exporter": {
+    "path": "build/qualification/export-q006-parity-inputs-r01.py",
+    "sha256": "8B9EE91B34F77BDA5EC6F82FE807068CC8E61689C92435FB8BC8FD5AA0310C41"
+  },
+  "custody_root": "build/qualification/q006-parity-capture-transport-r01-root",
+  "scope": "Read-only transfer of existing native data/settings and result bodies under original identities. All original full inputs rehashed; complete technology objects include every private row and preserve raw JSON numeric/nested/array representation. No new Factorio launch,mod-library operation,semantic comparison verdict,physical/save/client/performance or final-current-player qualification. Menu profile05F278 is distinct and not substituted."
+}
