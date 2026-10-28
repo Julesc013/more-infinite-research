@@ -83,7 +83,7 @@ class F200LegacyWorkerFixtureTests(unittest.TestCase):
             local ok,result=pcall(chunk);return {ok=ok,message=tostring(result),callbacks=callbacks,reads=reads}
           end
 
-          function worker_flow(source_path, destination_path, opponent, owner_root)
+          function worker_flow(source_path, destination_path, opponent, owner_root, startup_facade)
             local callbacks,markers,diagnostics,saves={events={}},0,0,0
             local WORKER="worker-robots-speed-6"
             local science={"automation-science-pack","logistic-science-pack","chemical-science-pack",
@@ -175,6 +175,7 @@ class F200LegacyWorkerFixtureTests(unittest.TestCase):
             end
             local entry
             local function load_control(path,mir,version,settings_values)
+              if startup_facade and version=="0.3.0"then settings_values.startup=startup_facade end
               local c={events={}}
               local env={script={active_mods={base="2.0.77",["more-infinite-research"]=mir,
                 ["mir-fixture-mir5-f200-legacy-worker"]=version},on_init=function(f)c.init=f end,
@@ -182,6 +183,9 @@ class F200LegacyWorkerFixtureTests(unittest.TestCase):
                 on_event=function(e,f)c.events[e]=f end},defines={events={on_tick=1,on_research_finished=2},inventory={lab_input=1}},
                 game=game,storage=storage,settings=settings_values,prototypes={item=item_prototypes},helpers={table_to_json=function(row)
                   if row.status=="passed" then assert(row.stage=="initial" or row.stage=="reload")
+                  elseif row.stage=="fixture-owner-preflight"then
+                    assert(row.maximum==40 and row.profile_import_empty==true)
+                    assert(type(row.startup_type)=="string" and type(row.maximum_type)=="string")
                   else
                     assert(row.stage=="finish-before-assertion");assert(type(row.research_start_tick)=="number")
                     assert(type(row.research_finished_tick)=="number");assert(type(row.raw_elapsed_ticks)=="number")
@@ -432,6 +436,23 @@ class F200LegacyWorkerFixtureTests(unittest.TestCase):
         self.assertFalse(r["ok"])
         self.assertIn("native worker state differs", r["message"])
         self.assertAlmostEqual(r["after_reload_bonus"], 4.463)
+
+    def test_fixture_owner_accepts_the_native_settings_userdata_facade(self):
+        lua = self.lua
+
+        class StartupFacade:
+            def __getitem__(self, name):
+                if name == "mir-max-level-worker-robots-speed":
+                    return lua.table_from({"value": 40})
+                if name == "mir-settings-profile-import":
+                    return lua.table_from({"value": ""})
+                raise KeyError(name)
+
+        owner = FIXTURE / "persisted-offset-owner"
+        r = self.lua.eval("worker_flow")(str(FIXTURE / "published/control.lua"), str(owner / "control.lua"),
+                                         "", str(owner), StartupFacade())
+        self.assertTrue(r["ok"], r["message"])
+        self.assertAlmostEqual(r["bonus"], 4.473)
 
     def test_entry_observer_is_read_only_for_native_state_and_returns_detached_records(self):
         self.lua.execute(r'''

@@ -17,12 +17,16 @@ function M.reconcile(state, entry, world, mods, startup, assert_restored)
       or type(state.player_with_independent) ~= "number" or not state.lab or state.lab.valid == false then
     fail("requires the original two-lab source and no prior fixture-owner reconciliation")
   end
-  if type(startup) ~= "table" or type(startup["mir-max-level-worker-robots-speed"]) ~= "table"
-      or type(startup["mir-settings-profile-import"]) ~= "table"
-      or mods.base ~= "2.0.77" or mods["more-infinite-research"] ~= "5.0.20000"
+  -- Runtime settings expose native read-only facades, not necessarily plain
+  -- Lua tables. Check the named API values without misclassifying that facade.
+  local maximum = startup and startup["mir-max-level-worker-robots-speed"]
+  local profile = startup and startup["mir-settings-profile-import"]
+  log("[MIR5_NATIVE_FIXTURE] DIAGNOSTIC " .. helpers.table_to_json({stage="fixture-owner-preflight",
+    startup_type=type(startup), maximum_type=type(maximum), profile_type=type(profile),
+    maximum=maximum and maximum.value or false, profile_import_empty=profile and profile.value == "" or false}))
+  if not maximum or not profile or mods.base ~= "2.0.77" or mods["more-infinite-research"] ~= "5.0.20000"
       or mods[FIXTURE] ~= "0.3.0" or mods["a-mir-fixture-worker-entry"] ~= "0.1.0"
-      or startup["mir-max-level-worker-robots-speed"].value ~= 40
-      or startup["mir-settings-profile-import"].value ~= "" then fail("exact fixture-owner closure/settings differ") end
+      or maximum.value ~= 40 or profile.value ~= "" then fail("exact fixture-owner closure/settings differ") end
   local expected = state.player_with_independent + 2 * MODIFIER
   if not close(state.player_baseline, 2.4) or not close(state.foreign_baseline, 2.4)
       or not close(state.player_with_independent - state.player_baseline, AMOUNT)
