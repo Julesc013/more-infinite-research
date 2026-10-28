@@ -2810,24 +2810,28 @@
         {
           "edition": "f200",
           "origin_archive_sha256": "FBBA844DD04011A12BB6DA885745B0733AD37FAB181EAAD9EE4346B9B0D32647",
-          "source_case": "cross-engine-chain-exists-for-prior-candidates-not-final-current-5-x",
-          "final_5_x_case": "not_run",
+          "source_case": "protected-published-473-base-source-reused-unchanged",
+          "final_5_x_case": "passed-current-base-same-edition-space-age-provider-pending",
           "disposition": "not-a-cartesian-modset-matrix",
           "current_archive_sha256": "65FC7E907FE3198B7290167989FE2564C1474190D06DAD49860063BEC418EC60",
           "current_completion": {
             "status": "needs-correction",
-            "problem": "Current consumed-path applicability or successor packet is incomplete; older passes retain their original inputs. This is not a declared current-package failure.",
+            "problem": "Current65FC same-edition Base successor now passes54 retained rows/effects, one new lab/save/two read-only cold reloads. Exact4.7.3 Space Age/provider qualification remains open.",
             "scenarios": [
               {
                 "closure": "base",
-                "status": "needs-correction",
+                "status": "closed",
                 "current_archive_sha256": "65FC7E907FE3198B7290167989FE2564C1474190D06DAD49860063BEC418EC60",
                 "existing_evidence": {
                   "path": "spec/evidence/full-catalogue-f200-f210-8f-native-chain.json",
                   "sha256": "23B4B74554438C73EFEA294E7328855F379079EA593DA31159B26DD6C0424399"
                 },
-                "next_action": "Reuse the protected published F200 Base source from the cross-engine chain, but prepare a same-edition F200 successor binding. The existing F200-to-F210 result cannot close it.",
-                "command_status": "not-ready: direct F200 successor profile/fixture/current binding"
+                "next_action": "Reuse this exact current same-edition Base result and protected9D39 source. Retain old cross-engine evidence under its original identity; Space Age/provider and other affected configurations remain separate.",
+                "command_status": "completed: frozen cb1 controller/current65FC/D3; one new lab and two unchanged-byte cold reloads",
+                "evidence": {
+                  "path": "spec/evidence/full-catalogue-473-f200-current7a2-native-chain-r01.json",
+                  "sha256": "37DD13431E3E492F8ABB94C206B85365EA135710727DFB9B5C1AA6F0660F0C0A"
+                }
               },
               {
                 "closure": "space-age",
@@ -3801,9 +3805,9 @@
         },
         {
           "boundary": "Published F2004.7.3 Base to F210 Base",
-          "status": "needs-correction",
-          "problem": "C563 and8F protected-save successors pass54 level-backed rows and partial/queued state; final505 applicability remains unreviewed.",
-          "next_action": "Review intervening consumed members for original9D39 source; reuse only proven unchanged checks, otherwise prepare current005D successor from that same source.",
+          "status": "closed",
+          "problem": "Actual current005D/7a2/player505 successor from unchanged protected9D39 passes54 retained level-backed rows/effects, queued42-percent/paused27-percent work, one new native lab/save/two unchanged-byte cold reloads on standalone2.1.23/8DC.",
+          "next_action": "Reuse the named current Base forward-engine route only. Preserve originalC563/8F results/adverses and the original source lab counted once; no Space Age/provider, GUI, arbitrary settings or whole-product verdict.",
           "evidence": [
             {
               "path": "spec/evidence/full-catalogue-f200-f210-c563-native-chain-r01.json",
@@ -3812,6 +3816,10 @@
             {
               "path": "spec/evidence/full-catalogue-f200-f210-8f-native-chain.json",
               "sha256": "23B4B74554438C73EFEA294E7328855F379079EA593DA31159B26DD6C0424399"
+            },
+            {
+              "path": "spec/evidence/full-catalogue-473-f200-current7a2-native-chain-r01.json",
+              "sha256": "37DD13431E3E492F8ABB94C206B85365EA135710727DFB9B5C1AA6F0660F0C0A"
             }
           ]
         },
