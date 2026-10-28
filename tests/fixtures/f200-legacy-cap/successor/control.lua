@@ -164,6 +164,16 @@ local function destination_mode()
     return {case = "f200-f210-v3-440-positive-cap", label = "MIR5 F210 published4.4.0",
       source_mir = "4.4.20000", source_fixture = "0.9.0", science_type = "item"}
   end
+  if base == "2.1.23" and mir == "5.0.21000" and fixture == "0.12.0" then
+    return {case = "f210-first-finite-cap-held", label = "MIR5 F210 enabled finite-cap hold",
+      source_mir = "4.7.20003", source_fixture = "0.4.0", science_type = "item",
+      disabled_intermediate = true, finite_cap = true}
+  end
+  if base == "2.1.23" and mir == "5.0.21000" and fixture == "0.13.0" then
+    return {case = "f210-first-finite-cap-relaxed", label = "MIR5 F210 first finite-cap relaxation",
+      source_mir = "4.7.20003", source_fixture = "0.4.0", science_type = "item", reenabled = true,
+      previous_case = "f210-first-finite-cap-held", previous_fixture = "0.12.0"}
+  end
   if base == "2.0.77" and mir == "4.7.20002" and fixture == "0.3.0" then
     return {case = PUBLISHED_RELAXED_CASE, label = "published relaxed", source_mir = "4.7.20002", source_fixture = "0.1.0", science_type = "tool"}
   end
@@ -247,6 +257,9 @@ end
 
 local function assert_disabled_intermediate(state, mode)
   assert_source_witness(state, mode)
+  if mode.finite_cap and technology(game.forces.player, GEAR).prototype.enabled ~= true then
+    fail("finite hold did not retain the enabled native prototype")
+  end
   local player = status(game.forces.player)
   assert_status(player, {level = 3, researched = false, enabled = false, visible = true,
     maximum = UINT32_MAX, bonus = 0.02, saved_progress = 0.27}, mode.label .. " player")
@@ -264,9 +277,11 @@ end
 local function assert_disabled_stage_witness(state, mode, pending_save)
   assert_source_witness(state, mode)
   local phase = pending_save and "disabled-intermediate-pending-save" or "disabled-intermediate-completed"
+  local expected_case = mode.disabled_intermediate and mode.case or (mode.previous_case or CROSS_ENGINE_DISABLED_CASE)
+  local expected_fixture = mode.disabled_intermediate and script.active_mods[FIXTURE] or (mode.previous_fixture or "0.6.0")
   if state.phase ~= phase
-      or state.disabled_stage_case ~= CROSS_ENGINE_DISABLED_CASE
-      or state.disabled_stage_fixture ~= "0.6.0"
+      or state.disabled_stage_case ~= expected_case
+      or state.disabled_stage_fixture ~= expected_fixture
       or state.disabled_stage_observed ~= (not pending_save)
       or type(state.disabled_stage_player) ~= "table"
       or type(state.disabled_stage_foreign) ~= "table"
@@ -383,12 +398,13 @@ end
 script.on_configuration_changed(function()
   local mode = destination_mode()
   local startup = settings.startup
-  if startup["ips-max-level-research_gears"].value ~= 40
+  if startup["ips-max-level-research_gears"].value ~= (mode.finite_cap and 2 or 40)
       or startup["ips-effect-per-level-research_gears"].value ~= 1
       or startup["mir-settings-profile-import"].value ~= "" then
-    fail("successor fixture settings are not the verified positive-cap relaxation")
+    fail("successor fixture settings are not the verified positive-cap stage")
   end
-  if mode.disabled_intermediate and startup["ips-enable-research_gears"].value ~= false then
+  if mode.disabled_intermediate and startup["ips-enable-research_gears"].value ~= (mode.finite_cap == true) then
+    if mode.finite_cap then fail("finite hold did not retain the expected owned family setting") end
     fail("disabled intermediate did not retain the disabled owned family setting")
   end
   if mode.reenabled and startup["ips-enable-research_gears"].value ~= true then
