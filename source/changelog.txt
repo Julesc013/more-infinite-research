@@ -53,6 +53,8 @@ Version: 5.0.0
       earned bonuses and ordinary foreign research inspection.
     - Keep authored disabled research unavailable after technology-effects resets and force lifecycle changes, including
       unlimited-cap configurations.
+    - Preserve proven MIR cap ownership when a published save is first upgraded with a research family disabled, so later
+      re-enabling restores only MIR-owned disablement.
     - Restore the published visibility of all twenty retained Bob/Angel material setting families for admitted Factorio 2.1 Base and
       Space Age profiles.
     - Restore the seven published Bob/Angel Factorio 2.1 productivity technology icons from their direct native prototype
