@@ -3866,13 +3866,17 @@
         },
         {
           "boundary": "F100 to F110 legacy-laser rename",
-          "status": "needs-correction",
-          "problem": "The known rename/continuation bridge has no named protected native route in the inspected inventory.",
-          "next_action": "Prepare one actual protected F100 source with the affected earned finite laser identity and direct F110 successor expectations/profile; check preserved effect, continuation, save and two reloads. Do not expand to F018 or all old-engine hops.",
+          "status": "closed-at-recorded-inputs",
+          "problem": "Named MIR5 F100 BA0D/1.0.0/99F1 to F1102C2B/1.1.110/B7B4 route passes atfd643b/source992c/playerfbb7. ProtectedFA0CF605 retains one actual source level/current42%+queued/suspended27%/foreign disablement through the native rename,one actual successor lab,native gun-speed2.21→2.22,new save and two unchanged-byte cold reloads per stage. Two private-fixture startup failures remain separate.",
+          "next_action": "Reuse only this exact named route and protected source;apply final changed-input review without recreating the valid source. Preserve original adverses and migration filename. No F018,arbitrary engine hop,full catalogue/client/performance or release claim.",
           "evidence": [
             {
               "path": "spec/evidence/historical-transition-017-100-110-chain.json",
               "sha256": "759C19C45C9B3100769B39DCA8CD843C295C8C610FF59FEA8D399CFAD6191E82"
+            },
+            {
+              "path": "spec/evidence/f100-f110-laser-native-chain-r03.json",
+              "scope": "Actual MIR5 F100→F110 earned laser/native-effect/42%+queue/27% detached/foreign-disablement,newlab/save/two cold reloads at exact recorded inputs."
             }
           ]
         },
