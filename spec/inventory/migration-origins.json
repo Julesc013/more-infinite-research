@@ -3752,8 +3752,8 @@
         {
           "boundary": "Structured-V3 cap ownership and F200/F210 label collision",
           "status": "needs-correction",
-          "problem": "Published-byte inspection and host tuple/collision controls exist; an earlier-V3 native finite-cap source/successor route remains missing.",
-          "next_action": "Qualify the named earlier structured-V3 representative and actual native worker-tail boundaries. The already pushed PR1365 carries the exact4.4 source and both modern successor results for review. Preserve per-row/current-negative/foreign ownership defenses; the exact F2104.2 archive has no codec collision per the correction record. Do not execute every version label or fabricate a mislabeled source.",
+          "problem": "Exact published4.4 sourceCE8F and both current0822/D3 and1246/8DC gear successors pass actual newlabs/save/two cold reloads. Native worker-tail boundaries remain unqualified. The supposed published F2104.2 label collision is disproved by the exact archive metadata correction; it is not an unrun native requirement.",
+          "next_action": "Reuse named4.4 source and both successors under original identities. Qualify the distinct actual native worker-tail boundary and the adjacent first-enabled finitecap correction. Preserve current-negative/per-row/foreign defenses and defensive synthetic collision controls. The DE45F114 F2104.2 archive is actually4.2.21000; do not fabricate a mislabeled source or rerun every patch label.",
           "evidence": [
             {
               "path": "spec/evidence/historical-structured-cap-archive-metadata.json",
@@ -3762,6 +3762,14 @@
             {
               "path": "spec/evidence/historical-remaining-cap-archive-metadata.json",
               "sha256": "92B6A83A887B615394CD4AB9C1A26AE737261657F98F530D8325C4D998DCFDA5"
+            },
+            {
+              "path": "spec/evidence/v3-440-cap-published-source-native-chain-r01.json",
+              "scope": "Protected published4.4 source with two earned labs and two cold reloads; successors remain separate."
+            },
+            {
+              "path": "spec/evidence/v3-440-cap-current-successors-native-chain-r02.json",
+              "scope": "Named earlier-V3 gear same/forward-engine routes pass; no worker or F2104.2 label-collision claim."
             },
             {
               "path": "spec/evidence/f210-420-exact-info-correction-r01.json",
