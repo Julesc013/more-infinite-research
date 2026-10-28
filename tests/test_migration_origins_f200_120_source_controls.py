@@ -179,7 +179,9 @@ class MigrationOriginF200120SourceControls(unittest.TestCase):
         self.assertIn("foreign_finite_weapon_owner_seeds", control)
         self.assertIn("CATALOGUE.finite_weapon_seed_sets.player", control)
         self.assertIn("source_cannon_gun_speed", control)
-        self.assertIn("foreign.research_queue, foreign.research_progress = {direct, probe}, .42", control)
+        self.assertIn("foreign.research_queue = {direct, probe}", control)
+        self.assertIn("foreign.research_progress = .42", control)
+        self.assertNotIn("foreign.research_queue, foreign.research_progress", control)
         self.assertIn("saved_progress = .27", control)
         self.assertIn("game.server_save(SAVE)", control)
         self.assertIn('marker("reload", value)', control)
@@ -187,6 +189,51 @@ class MigrationOriginF200120SourceControls(unittest.TestCase):
         self.assertIn("force.get_gun_speed_modifier(category)", control)
         self.assertNotIn('more-infinite-research"] ~= "5.', control)
         self.assertNotIn("count_formula = nil\n  direct.unit.count = 1\n  direct.unit.time = 60", control)
+
+    def test_foreign_queue_installation_precedes_native_progress_write(self):
+        self.lua.execute(r'''
+          function migration_origin_120_foreign_queue_write_order()
+            local direct,probe={name="recipe-prod-research_gears-1"},{name="recipe-prod-research_plastic-1"}
+            local function proxy()
+              local state={research_queue={},research_progress=0,current_research=nil}
+              return setmetatable({}, {
+                __index=function(_,key) return state[key] end,
+                __newindex=function(_,key,value)
+                  if key=="research_progress" then
+                    if state.current_research==nil then error("No research in progress") end
+                    state.research_progress=value
+                  elseif key=="research_queue" then
+                    state.research_queue=value
+                    state.current_research=value[1]
+                  else
+                    state[key]=value
+                  end
+                end
+              })
+            end
+            local old=proxy()
+            local old_ok,old_message=pcall(function()
+              old.research_queue,old.research_progress={direct,probe},.42
+            end)
+            local current=proxy()
+            local current_ok,current_message=pcall(function()
+              current.research_queue={direct,probe}
+              if current.current_research~=direct or #current.research_queue~=2 then error("queue installation differs") end
+              current.research_progress=.42
+            end)
+            return {old_ok=old_ok,old_message=tostring(old_message),current_ok=current_ok,
+              current_message=tostring(current_message),current=current.current_research and current.current_research.name,
+              queue={current.research_queue[1] and current.research_queue[1].name,current.research_queue[2] and current.research_queue[2].name},
+              progress=current.research_progress}
+          end
+        ''')
+        result = py(self.lua.eval("migration_origin_120_foreign_queue_write_order")())
+        self.assertFalse(result["old_ok"])
+        self.assertIn("No research in progress", result["old_message"])
+        self.assertTrue(result["current_ok"], result["current_message"])
+        self.assertEqual(("recipe-prod-research_gears-1",
+                          ["recipe-prod-research_gears-1", "recipe-prod-research_plastic-1"], .42),
+                         (result["current"], result["queue"], result["progress"]))
 
     def test_runtime_effect_scalars_admit_only_the_known_float32_spellings(self):
         self.lua.globals().fixture_control_path = (FIXTURE / "control.lua").as_posix()

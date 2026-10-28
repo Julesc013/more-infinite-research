@@ -135,7 +135,8 @@ local function prerequisites(value, seen)
   seen[value.name] = true
   for _, prerequisite in pairs(value.prerequisites or {}) do
     prerequisites(prerequisite, seen)
-    prerequisite.enabled, prerequisite.researched = true, true
+    prerequisite.enabled = true
+    prerequisite.researched = true
   end
 end
 
@@ -208,7 +209,9 @@ local function seed_rows(force, rows, weapons, label, preserve, finite_seeds, fi
   for _, name in ipairs(finite_seeds) do
     local owner = technology(force, name)
     prerequisites(owner)
-    owner.enabled, owner.researched, seeded[name] = true, true, true
+    owner.enabled = true
+    owner.researched = true
+    seeded[name] = true
   end
   for _, name in ipairs(weapons) do
     local value = technology(force, name)
@@ -288,8 +291,18 @@ local function establish_foreign(rows, weapons)
     CATALOGUE.finite_weapon_seed_sets.foreign, CATALOGUE.finite_owner_gun_speed.foreign)
   local direct, probe = technology(foreign, CATALOGUE.direct), technology(foreign, "recipe-prod-research_plastic-1")
   prerequisites(direct); prerequisites(probe)
-  direct.saved_progress, probe.saved_progress = .42, 0
-  foreign.research_queue, foreign.research_progress = {direct, probe}, .42
+  direct.saved_progress = .42
+  probe.saved_progress = 0
+  -- Lua assigns a property tuple right-to-left. LuaForce rejects a progress
+  -- write until the queue has installed its current research, so keep these
+  -- native writes as two ordered statements.
+  foreign.research_queue = {direct, probe}
+  local installed = queue_snapshot(foreign)
+  if installed.current ~= CATALOGUE.direct or #installed.queue ~= 2
+      or installed.queue[1] ~= CATALOGUE.direct or installed.queue[2] ~= probe.name then
+    fail("foreign queue installation differs before progress")
+  end
+  foreign.research_progress = .42
   return foreign.index, snapshot(foreign, rows, weapons), {current=CATALOGUE.direct, queue={CATALOGUE.direct, probe.name}, progress=.42}
 end
 
