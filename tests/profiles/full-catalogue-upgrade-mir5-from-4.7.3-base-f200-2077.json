@@ -1,0 +1,39 @@
+{
+  "schema": 1,
+  "kind": "mir5-full-catalogue-upgrade",
+  "target": "f200",
+  "factorio_line": "2.0",
+  "engine": {
+    "version": "2.0.77",
+    "sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B"
+  },
+  "settings_mode": "Defaults",
+  "mods": [
+    {
+      "name": "base",
+      "version": "2.0.77",
+      "enabled": true
+    },
+    {
+      "name": "mir-fixture-mir5-active-mods-observer",
+      "version": "0.1.0",
+      "enabled": true
+    },
+    {
+      "name": "more-infinite-research",
+      "version": "5.0.20000",
+      "enabled": true
+    },
+    {
+      "name": "mir-fixture-mir5-full-catalogue-upgrade",
+      "version": "0.2.0",
+      "enabled": true
+    }
+  ],
+  "archive_sha256": {
+    "mir-fixture-mir5-active-mods-observer_0.1.0.zip": "723D1E7721449FC26040E5E6629416767BDC20AD79CF8723115846DB662A1F87",
+    "more-infinite-research_5.0.20000.zip": "65FC7E907FE3198B7290167989FE2564C1474190D06DAD49860063BEC418EC60",
+    "mir-fixture-mir5-full-catalogue-upgrade_0.2.0.zip": "010EBE8BC6012C9436237CE8A57685175AE691A1155C2D223592CACAF5A892C2"
+  },
+  "scope": "Prepared current7a2/player505 F20065FC Base direct successor on2.0.77/D3 from protected published4.7.20003 source9D39. Compose existing successor metadata/thin loaders, exact f200/cross-to-f210 catalogue and three shared modules as recorded in full-catalogue-473-f200-current7a2-preparation-r01.json. Source defaults and full54-row effects/queued42-percent/detached27-percent, one new native gear lab/save/two cold reloads required. No source recreation or native pass implied."
+}
