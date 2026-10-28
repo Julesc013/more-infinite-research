@@ -295,6 +295,31 @@ local function establish_detached(rows, weapons)
   return detached.index, snapshot(detached, rows, weapons)
 end
 
+local function startup_snapshot()
+  local values = {}
+  for name in pairs(CATALOGUE.settings) do
+    local setting = settings.startup[name]
+    if setting == nil then fail("source startup setting is absent from observation: " .. name) end
+    values[name] = setting.value
+  end
+  return values
+end
+
+local function emit_source_observation(value)
+  if helpers == nil or type(helpers.table_to_json) ~= "function" then fail("plain JSON helper is unavailable") end
+  log("[MIR5_MIGRATION_ORIGIN_F200_120_SOURCE] SNAPSHOT " .. helpers.table_to_json({
+    case = "migration-origin-f200-120-source",
+    stage = "source-before-protected-save",
+    origin_tag = "1.2.0",
+    seed_counts = {scripted_rows = 33, player_finite_owners = 6, foreign_finite_owners = 1, detached_finite_owners = 0},
+    source_direct_lab_completions = value.source_labs,
+    startup_settings = startup_snapshot(),
+    player = value.player_snapshot,
+    foreign = {snapshot = value.foreign_snapshot, queue = queue_snapshot(game.forces[value.foreign_index])},
+    detached = value.detached_snapshot,
+  }))
+end
+
 local function marker(stage, value)
   local player = game.forces.player
   log("[MIR5_NATIVE_FIXTURE] RESULT {"
@@ -361,6 +386,8 @@ local function tick()
   value.foreign_index, value.foreign_snapshot, value.foreign_queue = establish_foreign(value.roster, value.weapons)
   value.detached_index, value.detached_snapshot = establish_detached(value.roster, value.weapons)
   value.phase = "completed"
+  assert_completed(value, "source before protected save")
+  emit_source_observation(value)
   marker("initial", value)
   game.server_save(SAVE)
 end
