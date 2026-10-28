@@ -72,6 +72,11 @@ local function weapon_rows(force)
   local rows = {}
   for name, expected in pairs(CATALOGUE.weapons) do
     local value = technology(force, name)
+    local runtime = CATALOGUE.weapon_runtime[name]
+    if runtime == nil or value.level ~= runtime.level or value.prototype.level ~= runtime.level
+        or value.prototype.max_level ~= runtime.max_level then
+      fail("finite weapon runtime level differs: " .. name)
+    end
     if effects_signature(value) ~= expected_signature(expected.effects) then fail("finite weapon effects differ: " .. name) end
     rows[#rows + 1] = name
   end
@@ -163,8 +168,13 @@ local function seed_rows(force, rows, weapons, label, preserve, finite_seeds, fi
   end
   for _, name in ipairs(weapons) do
     local value = technology(force, name)
+    local runtime = CATALOGUE.weapon_runtime[name]
+    if runtime == nil or value.level ~= runtime.level or value.prototype.level ~= runtime.level
+        or value.prototype.max_level ~= runtime.max_level then
+      fail(label .. " finite weapon owner initial level differs: " .. name)
+    end
     if seeded[name] then
-      if value.level ~= 1 or value.researched ~= true then fail(label .. " finite weapon owner seed differs") end
+      if value.researched ~= true then fail(label .. " finite weapon owner seed differs") end
     elseif value.researched ~= false then fail(label .. " finite weapon owner unexpectedly researched: " .. name) end
   end
   force.reset_technology_effects()
