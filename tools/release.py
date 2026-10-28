@@ -195,7 +195,7 @@ def _asset(record, target, edition):
         raise ValueError("Archive info.json differs from the declared edition")
     if not changelog.startswith(SOURCE_CHANGELOG_HEADER):
         raise ValueError("Archive changelog does not retain the unified source header")
-    return {
+    asset = {
         "target": target,
         "name": path.name,
         "version": version,
@@ -213,6 +213,9 @@ def _asset(record, target, edition):
         },
         "members": members,
     }
+    if target == "f018":
+        asset["support"] = "experimental-best-effort-github-only"
+    return asset
 
 
 def _early_asset(record, target, edition):
