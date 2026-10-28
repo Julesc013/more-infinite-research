@@ -375,6 +375,127 @@ class LegacyCapsLifecycleTests(unittest.TestCase):
             "direct F200 import displaced an existing MIR5 ownership decision")
         ''')
 
+    def test_live_enabled_v3_first_off_write_retains_only_newly_imported_cap_right(self):
+        self.lua.execute('''
+          -- R10 observes this exact boundary: the protected V3 row has a
+          -- positive disable proof and visibility value=true, while the live
+          -- player technology is enabled even though its authored prototype
+          -- is disabled.  MIR makes the first force-level true -> false write.
+          local function exercise(label, target_id, event, old)
+            local player, foreign = technology(gear_name), technology(gear_name)
+            player.level, player.researched, player.saved_progress = 3, false, .27
+            player.enabled, player.visible_when_disabled, player.prototype.enabled = true, true, false
+            foreign.level, foreign.researched, foreign.saved_progress = 3, false, .27
+            foreign.enabled, foreign.visible_when_disabled, foreign.prototype.enabled = false, true, false
+            local player_force = force(1, {[gear_name] = player})
+            local foreign_force = force(2, {[gear_name] = foreign})
+            old = old or f200_gear_legacy(1, 2)
+            old.visibility_by_cap[1][gear_name].value = true
+            boot({[1] = player_force, [2] = foreign_force}, old, nil,
+              {target_id = target_id, enabled = false, limit = 2})
+            lifecycle.on_configuration_changed(event)
+            local saved, owned = storage.mir_caps, storage.mir_caps.owned_disabled[1][gear_name]
+            assert(saved.legacy_caps_checked and owned.disabled == true
+              and owned.visible_when_disabled == true,
+              label .. " did not retain the observed MIR first-off write")
+            assert(not player.enabled and player.visible_when_disabled and player.level == 3
+              and player.researched == false and player.saved_progress == .27,
+              label .. " changed player earned or saved state during first-off capture")
+            assert(not foreign.enabled and foreign.visible_when_disabled and foreign.level == 3
+              and foreign.researched == false and foreign.saved_progress == .27,
+              label .. " claimed the independently disabled foreign force")
+            assert(old.disabled_by_cap[1][gear_name].enabled_before_cap
+              and old.visibility_by_cap[1][gear_name].value == true and old.unique.keep,
+              label .. " altered its exact predecessor evidence")
+
+            -- A cold parse/load and repeated disabled configuration has no
+            -- import opportunity. The durable row, not a callback-local
+            -- signal, must remain the same exact two-field ownership row.
+            local retained = owned
+            boot({[1] = player_force, [2] = foreign_force}, old, saved,
+              {target_id = target_id, enabled = false, limit = 2})
+            lifecycle.on_load()
+            lifecycle.on_configuration_changed()
+            assert(storage.mir_caps == saved and saved.owned_disabled[1][gear_name] == retained
+              and retained.disabled == true and retained.visible_when_disabled == true,
+              label .. " lost its one-time first-off ownership across reload")
+            for key in pairs(retained) do
+              assert(key == "disabled" or key == "visible_when_disabled",
+                label .. " persisted callback-local import state")
+            end
+
+            -- Prototype admission resumes only after the first-off record is
+            -- persisted; finite current settings are deliberately relaxed.
+            player.prototype.enabled, foreign.prototype.enabled = true, true
+            boot({[1] = player_force, [2] = foreign_force}, old, saved,
+              {target_id = target_id, enabled = true, limit = 40})
+            lifecycle.on_configuration_changed()
+            assert(player.enabled and player.visible_when_disabled and player.level == 3
+              and player.researched == false and player.saved_progress == .27,
+              label .. " did not restore its proven cap right after re-admission")
+            assert(not foreign.enabled and foreign.visible_when_disabled and foreign.level == 3
+              and foreign.researched == false and foreign.saved_progress == .27,
+              label .. " restored a foreign force after re-admission")
+            assert(saved.legacy_caps_checked and next(saved.owned_disabled) == nil,
+              label .. " reread legacy state or retained stale cap ownership")
+          end
+
+          exercise("same-engine F200", "f200", nil)
+          exercise("exact F200-to-F210", "f210", f200_to_f210_event())
+          exercise("ordinary transported F210", "f210", nil, legacy({gear_name}, {1}))
+        ''')
+
+    def test_live_enabled_v3_first_off_never_upgrades_current_or_unproven_right(self):
+        self.lua.execute('''
+          local function assert_no_right(label, old, current)
+            local item = technology(gear_name)
+            item.level, item.researched, item.saved_progress = 3, false, .27
+            item.enabled, item.visible_when_disabled, item.prototype.enabled = true, true, false
+            local f = force(1, {[gear_name] = item})
+            boot({[1] = f}, old, current, {target_id = "f210", enabled = false, limit = 2})
+            lifecycle.on_configuration_changed(f200_to_f210_event())
+            local saved = storage.mir_caps
+            local record = saved.owned_disabled[1] and saved.owned_disabled[1][gear_name]
+            assert(not item.enabled and item.visible_when_disabled and item.level == 3
+              and item.researched == false and item.saved_progress == .27,
+              label .. " changed live state before re-admission")
+            assert(type(record) ~= "table" or record.disabled ~= true,
+              label .. " gained a fresh MIR enablement right")
+
+            item.prototype.enabled = true
+            boot({[1] = f}, old, saved, {target_id = "f210", enabled = true, limit = 40})
+            lifecycle.on_configuration_changed()
+            assert(not item.enabled and item.visible_when_disabled and item.level == 3
+              and item.researched == false and item.saved_progress == .27,
+              label .. " restored without a newly imported positive V3 proof")
+            assert(saved.legacy_caps_checked and saved.owned_disabled[1] == nil,
+              label .. " reread legacy state after its one-time decision")
+          end
+
+          local current_negative = {schema = 1, owned_disabled = {
+            [1] = {[gear_name] = {disabled = false, visible_when_disabled = true}}}}
+          assert_no_right("current disabled=false", f200_gear_legacy(1, 2), current_negative)
+
+          local current_visibility_only = {schema = 1, owned_disabled = {
+            [1] = {[gear_name] = {visible_when_disabled = true}}}}
+          assert_no_right("current visibility-only", f200_gear_legacy(1, 2), current_visibility_only)
+
+          local missing = f200_gear_legacy(1, 2)
+          missing.visibility_by_cap[1][gear_name].value = true
+          missing.disabled_by_cap[1][gear_name] = nil
+          assert_no_right("missing V3 disable proof", missing, nil)
+
+          local corrupt = f200_gear_legacy(1, 2)
+          corrupt.visibility_by_cap[1][gear_name].value = true
+          corrupt.disabled_by_cap[1][gear_name].enabled_before_cap = false
+          assert_no_right("corrupt V3 disable proof", corrupt, nil)
+
+          local unowned = f200_gear_legacy(1, 2)
+          unowned.visibility_by_cap[1][gear_name].value = true
+          unowned.unowned_disabled_by_cap[1][gear_name] = true
+          assert_no_right("unowned V3 disable proof", unowned, nil)
+        ''')
+
     def test_earlier_published_f200_v3_hops_keep_regular_f210_reader_and_boundaries(self):
         self.lua.execute('''
           -- Archive inspection establishes these as the published F200 V3
