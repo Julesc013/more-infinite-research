@@ -13,9 +13,10 @@ FIXTURE = ROOT / "tests/fixtures/migration-origins/f200-120-source"
 PROFILE = ROOT / "tests/profiles/migration-origins-1.2.0-source-f200-2077.json"
 ORIGINAL_ARCHIVE = "880C137F7AB35FE7AF1DA5538BFA91F620C80785134DB488800352DD6154AB22"
 FACTS_SHA256 = "A017240FA9AF6E438462F5417397DBC3768AE1CC0BDB0DF5EE9D5313E593F98F"
-# This is the complete static fixture catalogue rendered once from the
-# independently captured 7714/C512 selected-native-facts projection.  It is
-# deliberately pinned here rather than reconstructed from current MIR code.
+# The row/settings section is rendered once from the independently captured
+# 7714/C512 selected-native-facts projection; its finite-owner seed section is
+# the separately reviewed source-fixture protocol. The complete static table
+# is pinned here rather than reconstructed from current MIR code.
 CATALOGUE_SHA256 = "C1E20AAF89944FF483C032FD0092783110CA38C5EDA3D7E1F0503480F25EE8E1"
 FIXTURE_NAME = "mir-fixture-mir5-migration-origin-f200-120-source"
 
