@@ -248,12 +248,13 @@ local function assert_disabled_intermediate(state, mode)
   return player
 end
 
-local function assert_disabled_stage_witness(state, mode)
+local function assert_disabled_stage_witness(state, mode, pending_save)
   assert_source_witness(state, mode)
-  if state.phase ~= "disabled-intermediate-completed"
+  local phase = pending_save and "disabled-intermediate-pending-save" or "disabled-intermediate-completed"
+  if state.phase ~= phase
       or state.disabled_stage_case ~= CROSS_ENGINE_DISABLED_CASE
       or state.disabled_stage_fixture ~= "0.6.0"
-      or state.disabled_stage_observed ~= true
+      or state.disabled_stage_observed ~= (not pending_save)
       or type(state.disabled_stage_player) ~= "table"
       or type(state.disabled_stage_foreign) ~= "table"
       or state.disabled_stage_destination_lab_completions ~= 0
@@ -382,6 +383,9 @@ script.on_configuration_changed(function()
   end
   local state = storage[KEY]
   if mode.disabled_intermediate then
+    if type(state) ~= "table" or state.phase ~= "completed" or state.disabled_stage_observed ~= nil then
+      fail("disabled intermediate requires an untouched source completion")
+    end
     local player = assert_disabled_intermediate(state, mode)
     state.disabled_stage_case = mode.case
     state.disabled_stage_fixture = script.active_mods[FIXTURE]
@@ -389,10 +393,10 @@ script.on_configuration_changed(function()
     state.disabled_stage_foreign = copy_queue(state.foreign_queue)
     state.disabled_stage_destination_lab_completions = 0
     state.disabled_stage_queue_entries = #game.forces.player.research_queue
-    state.disabled_stage_observed = true
-    state.phase = "disabled-intermediate-completed"
-    disabled_marker("initial", state)
-    game.server_save(SAVE)
+    -- Start-server configuration runs before the first ordinary server tick.
+    -- Stage the witness here; emit initial success only with its save request.
+    state.disabled_stage_observed = false
+    state.phase = "disabled-intermediate-pending-save"
     return
   end
   if mode.reenabled then assert_disabled_stage_witness(state, mode) end
@@ -467,6 +471,19 @@ end)
 script.on_event(defines.events.on_tick, function()
   local state = storage[KEY]
   if type(state) ~= "table" then fail("successor fixture storage is absent") end
+  if state.phase == "disabled-intermediate-pending-save" then
+    local mode = destination_mode()
+    if not mode.disabled_intermediate then fail("pending disabled save loaded under the wrong successor stage") end
+    assert_disabled_stage_witness(state, mode, true)
+    local player = assert_disabled_intermediate(state, mode)
+    assert_status(player, state.disabled_stage_player, "disabled intermediate first-tick player")
+    assert_foreign(game.forces[state.foreign_force_index], state.disabled_stage_foreign)
+    state.disabled_stage_observed = true
+    state.phase = "disabled-intermediate-completed"
+    disabled_marker("initial", state)
+    game.server_save(SAVE)
+    return
+  end
   if state.phase == "completed" then
     if loaded_snapshot and not reload_logged then
       local player = assert_completed(state, state.destination_label)
