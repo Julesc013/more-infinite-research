@@ -3720,7 +3720,7 @@
     {
       "id": "CONT-13",
       "category": "targets",
-      "subject": "All normal target editions and their actual subsets, including selected F018",
+      "subject": "Nine stable editions and their actual subsets; F018 and early GitHub-only editions remain best effort",
       "status": "partial",
       "resolved_records": [
         {
@@ -3805,7 +3805,7 @@
             "Neither F100 nor F110 package contained the Library or passive repair implementation selected for the modern targets. Current reduced adapters preserve that supported boundary.",
             "The old packages have no unified more-infinite-research.api interface. Current v1 query API is additive; exact native API/client qualification remains pending."
           ],
-          "limits": "No new gameplay, native/save/client/performance or all-target parity pass. F018 inherits the reduced implementation but still needs its own exact-engine and predecessor continuity qualification. CONT-13 remains partial."
+          "limits": "No new gameplay, native/save/client/performance or all-target parity pass. F018 inherits the reduced F100 implementation; its active independent verification is package metadata and a basic0.18.47 native load smoke. Separate predecessor, modpack, client and performance campaigns remain best effort under the later maintainer decision. CONT-13 remains partial."
         }
       ],
       "test_subjects": [
@@ -3814,7 +3814,7 @@
       ],
       "remaining_implementation": [],
       "remaining_qualification": [
-        "Run final current-package and affected native checks for every delivered target subset.",
+        "Run final current-package and affected native checks for the nine stable editions; apply the explicit metadata/load-smoke-only F018 and other best-effort support limits.",
         "Prioritize exact current F2102.1.23 acceptance while preserving F2002.0.77 and all seven historical-edition obligations; report each tested subset and remaining gaps without relabelling earlier receipts.",
         "Qualify actual game-version save hops and Base/Space Age transitions above; fresh worlds and same-engine MIR upgrades are separate evidence."
       ],
@@ -4296,9 +4296,9 @@
     "scope": "Reconcile this named science-binding delta explicitly. Older broad comparisons retain their exact predecessor/package/source scope; reuse requires a reviewed unaffected-input argument, not relabelling as4.7.3 execution."
   },
   "current_candidate": {
-    "source": "1c90ceb7f0096fa6ccbcb9fc369fae699889c866",
-    "player_tree": "9e669e6ffea27dda3f9f17dfb2873daf23a8e187",
-    "offline_package_evidence": "spec/evidence/current-assets-1c90ceb7-readback.json",
+    "source": "575e418c72eff2970fa5f6274956f6e8944d4e19",
+    "player_tree": "5ba53a8514b4641c749e91c0a68f32521fb3fee7",
+    "offline_package_evidence": "spec/evidence/current-assets-575e418c-root-readback.json",
     "native_qualification_complete": false,
     "release_qualification": false
   },
