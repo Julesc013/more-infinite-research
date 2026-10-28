@@ -223,6 +223,69 @@ class MigrationOriginF200120SourceControls(unittest.TestCase):
         self.assertFalse(result["ok"])
         self.assertIn("gun speed changed: cannon-shell", result["message"])
 
+    def test_runtime_seed_earns_only_the_six_declared_finite_weapon_owners(self):
+        self.lua.globals().fixture_control_path = (FIXTURE / "control.lua").as_posix()
+        self.lua.execute(r'''
+          function migration_origin_120_seed_finite_owners(pre_research_seven)
+            local callbacks={events={}}
+            local env={script={on_init=function(fn)callbacks.init=fn end,on_load=function()end,
+              on_event=function(event,fn)callbacks.events[event]=fn end},
+              defines={events={on_research_finished=1,on_tick=2},inventory={lab_input=1}}}
+            env.require=function(name)
+              assert(name=="__mir-fixture-mir5-migration-origin-f200-120-source__/catalogue")
+              return assert(loadfile(catalogue_path,"t",env))()
+            end
+            env._G=env;setmetatable(env,{__index=_G})
+            assert(loadfile(fixture_control_path,"t",env))()
+            local function upvalue(fn, wanted)
+              for index=1,64 do
+                local name,value=debug.getupvalue(fn,index)
+                if name==nil then break end
+                if name==wanted then return value end
+              end
+              error("missing upvalue " .. wanted)
+            end
+            local catalogue=env.require("__mir-fixture-mir5-migration-origin-f200-120-source__/catalogue")
+            local rows,weapons,technologies={}, {}, {}
+            for name,row in pairs(catalogue.rows) do
+              rows[#rows+1]=name
+              technologies[name]={name=name,valid=true,level=row.level,researched=false,enabled=true,
+                prototype={level=row.level,max_level=4294967295,effects=row.effects}}
+            end
+            for name,row in pairs(catalogue.weapons) do
+              weapons[#weapons+1]=name
+              technologies[name]={name=name,valid=true,level=1,
+                researched=(pre_research_seven and name=="weapon-shooting-speed-7") or false,enabled=true,
+                prototype={level=1,max_level=4294967295,effects=row.effects}}
+            end
+            local force={technologies=technologies,worker_robots_battery_modifier=.1,guns={}}
+            function force.enable_all_prototypes() end
+            function force.reset_technology_effects()
+              for category,value in pairs(catalogue.direct_gun_speed) do force.guns[category]=value end
+              for category,value in pairs(catalogue.finite_owner_gun_speed.player) do force.guns[category]=value end
+              force.worker_robots_battery_modifier=.1
+            end
+            force.get_gun_speed_modifier=function(category) return force.guns[category] or 0 end
+            local seed=upvalue(callbacks.init,"seed_rows")
+            local ok,message=pcall(seed,force,rows,weapons,"player",catalogue.direct,
+              catalogue.finite_weapon_seed_sets.player,catalogue.finite_owner_gun_speed.player)
+            local state={}
+            for _,name in ipairs(weapons) do state[name]={level=technologies[name].level,researched=technologies[name].researched} end
+            return {ok=ok,message=tostring(message),state=state,guns=force.guns}
+          end
+        ''')
+        accepted = py(self.lua.eval("migration_origin_120_seed_finite_owners")(False))
+        self.assertTrue(accepted["ok"], accepted["message"])
+        for level in range(1, 7):
+            self.assertEqual({"level": 1, "researched": True}, accepted["state"][f"weapon-shooting-speed-{level}"])
+        self.assertEqual({"level": 1, "researched": False}, accepted["state"]["weapon-shooting-speed-7"])
+        self.assertEqual({"bullet": 1.5, "shotgun-shell": 1.6},
+                         {name: accepted["guns"][name] for name in ("bullet", "shotgun-shell")})
+
+        rejected = py(self.lua.eval("migration_origin_120_seed_finite_owners")(True))
+        self.assertFalse(rejected["ok"])
+        self.assertIn("finite weapon owner unexpectedly researched", rejected["message"])
+
     def test_profile_and_fixture_are_source_only_preparation(self):
         info = json.loads((FIXTURE / "info.json").read_text(encoding="utf-8"))
         self.assertEqual((FIXTURE_NAME, "0.1.0", "2.0"), (info["name"], info["version"], info["factorio_version"]))
