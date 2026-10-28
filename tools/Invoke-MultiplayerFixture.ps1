@@ -116,6 +116,34 @@ function Assert-MultiplayerFixtureSelection {
       session_expected_peak_memory_mib=8192;standalone_f210=$true;api_client_consumers=$true;space_age_library=$true
     }
     [ordered]@{
+      fixture_case='library-multiplayer';target='f210-standalone'
+      kind='mir5-library-api-consumers-private-credits-standalone-f210-native-selection';factorio_line='2.1';base='2.1.23'
+      engine_sha256='8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38';mir='5.0.21000';build_version=87750
+      observer_sha256='A15A7D628D66953D2E0C4D4FA288F47CBF9C5678327C7EB3D23ADB5DC78331C0'
+      mir_archive_sha256='005D420671270306155CB4AC25E9CF77541202DFA16B206DCC016237619C9AA2'
+      fixture_mods=@('mir-fixture-mir5-library-multiplayer@0.3.0','mir-fixture-mir5-api-alpha@0.1.0','mir-fixture-mir5-api-beta@0.1.0')
+      optional_archives=@('more-infinite-research_5.0.21000.zip','mir-fixture-mir5-library-multiplayer_0.3.0.zip','mir-fixture-mir5-api-alpha_0.1.0.zip','mir-fixture-mir5-api-beta_0.1.0.zip')
+      api_consumer_archive_sha256=[ordered]@{
+        'mir-fixture-mir5-api-alpha_0.1.0.zip'='DB5ED843FA9D85A1ABDC22595E62D315CA1A2191C846208079F85D4D016CE904'
+        'mir-fixture-mir5-api-beta_0.1.0.zip'='690004F145E8B0DD52B4030BD8B27F7B581495EEFAAC5CB3A2F30A23FCA08951'
+      }
+      session_expected_peak_memory_mib=7168;standalone_f210=$true;api_client_consumers=$true;private_credit_checks=$true
+    }
+    [ordered]@{
+      fixture_case='library-multiplayer';target='f210-standalone'
+      kind='mir5-library-api-consumers-private-credits-space-age-standalone-f210-native-selection';factorio_line='2.1';base='2.1.23'
+      engine_sha256='8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38';mir='5.0.21000';build_version=87750
+      observer_sha256='A15A7D628D66953D2E0C4D4FA288F47CBF9C5678327C7EB3D23ADB5DC78331C0'
+      mir_archive_sha256='005D420671270306155CB4AC25E9CF77541202DFA16B206DCC016237619C9AA2'
+      fixture_mods=@('elevated-rails@2.1.23','quality@2.1.23','recycler@2.1.23','space-age@2.1.23','mir-fixture-mir5-library-multiplayer@0.3.0','mir-fixture-mir5-api-alpha@0.1.0','mir-fixture-mir5-api-beta@0.1.0')
+      optional_archives=@('more-infinite-research_5.0.21000.zip','mir-fixture-mir5-library-multiplayer_0.3.0.zip','mir-fixture-mir5-api-alpha_0.1.0.zip','mir-fixture-mir5-api-beta_0.1.0.zip')
+      api_consumer_archive_sha256=[ordered]@{
+        'mir-fixture-mir5-api-alpha_0.1.0.zip'='DB5ED843FA9D85A1ABDC22595E62D315CA1A2191C846208079F85D4D016CE904'
+        'mir-fixture-mir5-api-beta_0.1.0.zip'='690004F145E8B0DD52B4030BD8B27F7B581495EEFAAC5CB3A2F30A23FCA08951'
+      }
+      session_expected_peak_memory_mib=8192;standalone_f210=$true;api_client_consumers=$true;space_age_library=$true;private_credit_checks=$true
+    }
+    [ordered]@{
       fixture_case='library-multiplayer';target='standalone-identity-discovery'
       kind='mir5-library-standalone-identity-discovery-f210-selection';factorio_line='2.1';base='2.1.23'
       engine_sha256='8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38';mir='5.0.21000';build_version=87750
@@ -198,6 +226,11 @@ function Assert-MultiplayerFixtureSelection {
   }
   if($target.Contains('space_age_library')){
     Assert-Session ($target.space_age_library -is [bool] -and $target.space_age_library -and $Selection.Contains('space_age_library') -and $Selection['space_age_library'] -is [bool] -and $Selection['space_age_library'] -eq $true) 'multiplayer fixture Space Age Library selection differs'
+  }
+  if($target.Contains('private_credit_checks')){
+    Assert-Session ($target.private_credit_checks -is [bool] -and $target.private_credit_checks -and $Selection.Contains('private_credit_checks') -and $Selection['private_credit_checks'] -is [bool] -and $Selection['private_credit_checks'] -eq $true) 'multiplayer fixture private-credit selection differs'
+  }else{
+    Assert-Session (-not $Selection.Contains('private_credit_checks')) 'multiplayer fixture unexpected private-credit selection differs'
   }
   if($target.Contains('fixture_archive_required')){
     $fixtureArchive='mir-fixture-mir5-library-multiplayer_0.1.1.zip'
@@ -289,7 +322,8 @@ function New-StandaloneF210LibraryFixtureSourceProjection {
   param(
     [Parameter(Mandatory)][string]$RepoRoot,
     [Parameter(Mandatory)][string]$OutputRoot,
-    [switch]$SpaceAgeLibrary
+    [switch]$SpaceAgeLibrary,
+    [switch]$PrivateCreditChecks
   )
   # The checked-in fixture retains F200 metadata and its developer README.
   # Every F210 route stages precisely three runtime members. The selected
@@ -299,17 +333,24 @@ function New-StandaloneF210LibraryFixtureSourceProjection {
   $canonicalNames=@($canonicalFiles|ForEach-Object {[IO.Path]::GetRelativePath($canonical,$_.FullName).Replace('\','/')})
   $baseCanonical=@('README.md','control.lua','info-f210.json','info.json','settings-updates.lua')
   $spaceAgeMetadata='info-f210-space-age.json'
-  $expectedCanonical=if($canonicalNames-ccontains$spaceAgeMetadata){$baseCanonical+@($spaceAgeMetadata)}else{$baseCanonical}
+  $privateCreditMetadata='info-f210-private-credits.json'
+  $knownOptionalMetadata=@($spaceAgeMetadata,$privateCreditMetadata)
+  $expectedCanonical=$baseCanonical+@($canonicalNames|Where-Object {$knownOptionalMetadata-ccontains$_})
   Assert-Session ($canonicalNames.Count-eq$expectedCanonical.Count-and ((@($canonicalNames|Sort-Object)-join '|')-ceq(@($expectedCanonical|Sort-Object)-join '|'))) 'standalone F210 canonical Library fixture members differ'
   $f200Info=Get-Content -LiteralPath (Join-Path $canonical 'info.json') -Raw|ConvertFrom-Json -AsHashtable
   $f210BaseInfo=Get-Content -LiteralPath (Join-Path $canonical 'info-f210.json') -Raw|ConvertFrom-Json -AsHashtable
   Assert-Session ([string]$f200Info.name-ceq'mir-fixture-mir5-library-multiplayer' -and [string]$f200Info.version-ceq'0.1.0' -and [string]$f200Info.factorio_version-ceq'2.0') 'standalone F210 canonical F200 fixture metadata differs'
   Assert-Session ([string]$f210BaseInfo.name-ceq[string]$f200Info.name -and [string]$f210BaseInfo.version-ceq[string]$f200Info.version -and [string]$f210BaseInfo.factorio_version-ceq'2.1' -and ((@($f210BaseInfo.dependencies)-join '|')-ceq'base >= 2.1.23|more-infinite-research = 5.0.21000')) 'standalone F210 canonical Base fixture metadata differs'
-  $metadata=if($SpaceAgeLibrary){$spaceAgeMetadata}else{'info-f210.json'}
+  $metadata=if($PrivateCreditChecks){$privateCreditMetadata}elseif($SpaceAgeLibrary){$spaceAgeMetadata}else{'info-f210.json'}
   if($SpaceAgeLibrary){
     Assert-Session ($canonicalNames-ccontains$spaceAgeMetadata) 'standalone F210 Space Age fixture metadata is absent'
     $f210SpaceAgeInfo=Get-Content -LiteralPath (Join-Path $canonical $spaceAgeMetadata) -Raw|ConvertFrom-Json -AsHashtable
     Assert-Session ([string]$f210SpaceAgeInfo.name-ceq[string]$f200Info.name -and [string]$f210SpaceAgeInfo.version-ceq'0.2.0' -and [string]$f210SpaceAgeInfo.factorio_version-ceq'2.1' -and ((@($f210SpaceAgeInfo.dependencies)-join '|')-ceq'base >= 2.1.23|space-age >= 2.1.23|more-infinite-research = 5.0.21000')) 'standalone F210 Space Age fixture metadata differs'
+  }
+  if($PrivateCreditChecks){
+    Assert-Session ($canonicalNames-ccontains$privateCreditMetadata) 'standalone F210 private-credit fixture metadata is absent'
+    $f210PrivateCreditInfo=Get-Content -LiteralPath (Join-Path $canonical $privateCreditMetadata) -Raw|ConvertFrom-Json -AsHashtable
+    Assert-Session ([string]$f210PrivateCreditInfo.name-ceq[string]$f200Info.name -and [string]$f210PrivateCreditInfo.version-ceq'0.3.0' -and [string]$f210PrivateCreditInfo.factorio_version-ceq'2.1' -and ((@($f210PrivateCreditInfo.dependencies)-join '|')-ceq'base >= 2.1.23|? space-age >= 2.1.23|more-infinite-research = 5.0.21000')) 'standalone F210 private-credit fixture metadata differs'
   }
   $stage=Join-Path $OutputRoot 'standalone-f210-library-fixture-source'
   Assert-Session (-not(Test-Path -LiteralPath $stage)) 'standalone F210 fixture source stage already exists'
@@ -598,10 +639,11 @@ if($StandaloneIdentityDiscovery){
 $target=Assert-MultiplayerFixtureSelection -Selection $selection -EngineSha256 (Get-FileHash -LiteralPath $engine).Hash -FixtureCase $FixtureCase -ExpectedMIRArchiveSha256 $ExpectedMIRArchiveSha256 -SessionExpectedPeakMemoryMiB $SessionExpectedPeakMemoryMiB -StandaloneIdentityDiscovery:$StandaloneIdentityDiscovery
 $standaloneF210=($target.PSObject.Properties['standalone_f210'] -and $target.standalone_f210 -eq $true)
 $spaceAgeLibrary=($target.PSObject.Properties['space_age_library'] -and $target.space_age_library -eq $true)
+$privateCreditChecks=($target.PSObject.Properties['private_credit_checks'] -and $target.private_credit_checks -eq $true)
 if($standaloneF210){
-  # Standalone Base keeps the original 0.1.0 metadata; the explicitly selected
-  # Space Age sibling stages its 0.2.0 metadata. Both use strict projections.
-  $standaloneLibraryFixture=New-StandaloneF210LibraryFixtureSourceProjection -RepoRoot $repo -OutputRoot $output -SpaceAgeLibrary:$spaceAgeLibrary
+  # Standalone Base and Space Age retain their 0.1.0/0.2.0 metadata; only the
+  # two explicit private-credit selections stage the common 0.3.0 metadata.
+  $standaloneLibraryFixture=New-StandaloneF210LibraryFixtureSourceProjection -RepoRoot $repo -OutputRoot $output -SpaceAgeLibrary:$spaceAgeLibrary -PrivateCreditChecks:$privateCreditChecks
   $standaloneObserver=New-StandaloneIdentityObserverSourceProjection -RepoRoot $repo -ArchiveLibrary $library -OutputRoot $output -ExpectedArchiveSha256 ([string]$target.observer_sha256)
   if($target.PSObject.Properties['api_client_consumers']-and$target.api_client_consumers-eq$true){
     $apiConsumerSourceRevision=Resolve-StandaloneF210ApiConsumerSourceRevision -RepoRoot $repo
@@ -631,7 +673,7 @@ $record=[ordered]@{
   engine=$prepared.engine;profile=$prepared.profile;fixtures=$prepared.fixtures;mir_archive=$prepared.mir_archive
   preparation=$prepared;session_expected_peak_memory_mib=$SessionExpectedPeakMemoryMiB;release_qualification=$false;visual_review=$false
   standalone_identity_discovery=if($StandaloneIdentityDiscovery){[ordered]@{fixture_source=$discoveryFixture.source;fixture_archive_sha256=[string]$selection.archive_sha256['mir-fixture-mir5-library-multiplayer_0.1.1.zip'];observer_source=$discoveryObserver.source;observer_canonical_source=$discoveryObserver.canonical_source;observer_archive_sha256=$discoveryObserver.sha256;observer_members=$discoveryObserver.members;observer_alternate_metadata=$discoveryObserver.alternate_metadata;environmental_only=$true}}else{$null}
-  standalone_f210=if($standaloneF210){[ordered]@{fixture_source=$standaloneLibraryFixture.source;fixture_canonical_source=$standaloneLibraryFixture.canonical_source;fixture_members=$standaloneLibraryFixture.members;fixture_source_metadata=$standaloneLibraryFixture.source_metadata;fixture_excluded_canonical_members=$standaloneLibraryFixture.excluded_canonical_members;observer_source=$standaloneObserver.source;observer_canonical_source=$standaloneObserver.canonical_source;observer_archive_sha256=$standaloneObserver.sha256;observer_members=$standaloneObserver.members;observer_alternate_metadata=$standaloneObserver.alternate_metadata;api_consumer_source_revision=$apiConsumerSourceRevision;steam_identity=$false}}else{$null}
+  standalone_f210=if($standaloneF210){[ordered]@{fixture_source=$standaloneLibraryFixture.source;fixture_canonical_source=$standaloneLibraryFixture.canonical_source;fixture_members=$standaloneLibraryFixture.members;fixture_source_metadata=$standaloneLibraryFixture.source_metadata;fixture_excluded_canonical_members=$standaloneLibraryFixture.excluded_canonical_members;observer_source=$standaloneObserver.source;observer_canonical_source=$standaloneObserver.canonical_source;observer_archive_sha256=$standaloneObserver.sha256;observer_members=$standaloneObserver.members;observer_alternate_metadata=$standaloneObserver.alternate_metadata;api_consumer_source_revision=$apiConsumerSourceRevision;private_credit_checks=$privateCreditChecks;steam_identity=$false}}else{$null}
   harness_sha256=(Get-FileHash -LiteralPath $PSCommandPath -Algorithm SHA256).Hash
 }
 try {
@@ -723,6 +765,7 @@ try {
       $spec.api_client_consumers=$true
     }
     if($spaceAgeLibrary){$spec.space_age_library=$true}
+    if($privateCreditChecks){$spec.private_credit_checks=$true}
   }
   if($null -ne $pairedArm){$spec.paired_arm=$pairedArm}
   if($CollectProcessMemoryObservations){

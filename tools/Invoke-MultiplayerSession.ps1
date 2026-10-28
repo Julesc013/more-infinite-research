@@ -379,6 +379,16 @@ function Get-LibraryWitnessTarget([hashtable]$Spec,[string]$EngineSha256) {
     ) 'Space Age Library witness mode differs'
     $expected.space_age_library=$true
   }
+  if($Spec.ContainsKey('private_credit_checks')){
+    Assert-Session (
+      $Spec.private_credit_checks -is [bool] -and $Spec.private_credit_checks -and
+      -not $requestedStandaloneIdentityDiscovery -and
+      $EngineSha256 -ceq '8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38' -and
+      $Spec.ContainsKey('api_client_consumers') -and
+      $Spec.api_client_consumers -is [bool] -and $Spec.api_client_consumers
+    ) 'Private-credit Library witness mode differs'
+    $expected.private_credit_checks=$true
+  }
   return [pscustomobject]$expected
 }
 function Assert-LibraryWitnessIdentityMode([bool]$StandaloneIdentityDiscovery,[object]$LibraryWitnessTarget) {
@@ -457,6 +467,55 @@ function Get-StageMarker([string]$Text, [string]$Stage, [int]$ExpectedJoins, [ob
       }
     }else{
       Assert-Session ($null -eq $spaceAgeWitness -and $null -eq $casting) "$Stage Base Library witness includes Space Age fields"
+    }
+    $privateTarget=$ExpectedLibraryWitness.PSObject.Properties['private_credit_checks']
+    $privateWitness=$witness.PSObject.Properties['private_credit_visibility']
+    if($null -ne $privateTarget){
+      Assert-Session ($privateTarget.Value -is [bool] -and $privateTarget.Value) "$Stage private-credit Library target differs"
+    }
+    if($null -ne $privateTarget -and $Stage -ceq 'completed'){
+      Assert-Session ($null -ne $privateWitness -and $privateWitness.Value -is [pscustomobject]) "$Stage private-credit witness is absent or malformed"
+      $private=$privateWitness.Value
+      $fields=@('ids_checked','clients_checked','families_checked','private_selection_not_exposed','native_state_unchanged','personal_views_restored','before','after')
+      Assert-Session (@($private.PSObject.Properties).Count -eq $fields.Count) "$Stage private-credit witness fields differ"
+      foreach($field in $fields){
+        Assert-Session (@($private.PSObject.Properties.Name) -ccontains $field) "$Stage private-credit witness lacks $field"
+      }
+      Assert-LibraryWitnessInteger $private 'ids_checked' 4 $Stage
+      Assert-LibraryWitnessInteger $private 'clients_checked' 2 $Stage
+      foreach($field in @('private_selection_not_exposed','native_state_unchanged','personal_views_restored')){
+        Assert-LibraryWitnessBoolean $private $field $true $Stage
+      }
+      $families=@($private.families_checked)
+      Assert-Session ($families.Count -eq 2 -and $families[0] -is [string] -and $families[0] -ceq 'all' -and $families[1] -is [string] -and $families[1] -ceq 'external') "$Stage private-credit family observations differ"
+      $privateIds=@('mir-legacy-module-credit-speed-module','mir-legacy-module-credit-productivity-module','mir-legacy-module-credit-efficiency-module','mir-legacy-cannon-credit-rocket-shooting-speed')
+      $snapshots=@{}
+      foreach($snapshotName in @('before','after')){
+        $snapshot=$private.PSObject.Properties[$snapshotName].Value
+        Assert-Session ($snapshot -is [pscustomobject] -and @($snapshot.PSObject.Properties).Count -eq 4) "$Stage private-credit $snapshotName snapshot differs"
+        foreach($id in $privateIds){
+          Assert-Session (@($snapshot.PSObject.Properties.Name) -ccontains $id) "$Stage private-credit $snapshotName identity differs"
+          $holder=$snapshot.PSObject.Properties[$id].Value
+          Assert-Session ($holder -is [pscustomobject] -and @($holder.PSObject.Properties).Count -eq 4) "$Stage private-credit $snapshotName holder differs"
+          foreach($field in @('level','researched','enabled','visible_when_disabled')){
+            Assert-Session (@($holder.PSObject.Properties.Name) -ccontains $field) "$Stage private-credit $snapshotName holder lacks $field"
+          }
+          Assert-Session ((Test-LibraryInteger $holder.level) -and [int64]$holder.level -ge 1 -and [int64]$holder.level -le 4294967295) "$Stage private-credit $snapshotName level differs"
+          foreach($field in @('researched','enabled','visible_when_disabled')){
+            Assert-Session ($holder.PSObject.Properties[$field].Value -is [bool]) "$Stage private-credit $snapshotName $field is malformed"
+          }
+        }
+        $snapshots[$snapshotName]=$snapshot
+      }
+      foreach($id in $privateIds){
+        $before=$snapshots.before.PSObject.Properties[$id].Value
+        $after=$snapshots.after.PSObject.Properties[$id].Value
+        foreach($field in @('level','researched','enabled','visible_when_disabled')){
+          Assert-Session ($before.PSObject.Properties[$field].Value -ceq $after.PSObject.Properties[$field].Value) "$Stage private-credit $id $field changed"
+        }
+      }
+    }else{
+      Assert-Session ($null -eq $privateWitness) "$Stage unexpected private-credit witness"
     }
     if($Stage-ceq'ready') {
       Assert-LibraryWitnessBoolean $live 'native_laboratory_completion_by_script' $false $Stage
@@ -707,6 +766,9 @@ $spaceAgeLibrary=$false
 if($spec.ContainsKey('space_age_library')){
   Assert-Session ($fixtureCase-ceq'library-multiplayer' -and $spec.space_age_library -is [bool] -and $spec.space_age_library -and $apiClientConsumers -and -not $standaloneIdentityDiscovery) 'Space Age Library mode differs'
   $spaceAgeLibrary=$true
+}
+if($spec.ContainsKey('private_credit_checks')){
+  Assert-Session ($fixtureCase-ceq'library-multiplayer' -and $spec.private_credit_checks -is [bool] -and $spec.private_credit_checks -and $apiClientConsumers -and -not $standaloneIdentityDiscovery) 'Private-credit Library mode differs'
 }
 $collectProcessMemoryObservations = Get-ProcessMemoryObservationOptIn -Spec $spec -FixtureCase $fixtureCase
 $markerPrefix=switch($fixtureCase){'library-multiplayer'{'MIR5_LIBRARY_MULTIPLAYER'};'library-paired-browser'{'MIR5_LIBRARY_PAIRED_BROWSER'};default{'MIR5_SCRIPTED_EFFECTS_MULTIPLAYER'}}

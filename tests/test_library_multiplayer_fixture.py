@@ -21,6 +21,9 @@ F210_API_CONSUMERS_PROFILE = ROOT / "tests/profiles/library-api-consumers-f210-2
 STANDALONE_F210_API_CONSUMERS_PROFILE = ROOT / "tests/profiles/library-api-consumers-standalone-f210-2123.json"
 CURRENT_STANDALONE_F210_API_CONSUMERS_PROFILE = ROOT / "tests/profiles/library-api-consumers-current-standalone-f210-2123.json"
 CURRENT_STANDALONE_F210_SPACE_AGE_API_CONSUMERS_PROFILE = ROOT / "tests/profiles/library-api-consumers-current-space-age-standalone-f210-2123.json"
+PRIVATE_CREDITS_BASE_PROFILE = ROOT / "tests/profiles/library-api-consumers-private-credits-standalone-f210-2123.json"
+PRIVATE_CREDITS_SPACE_AGE_PROFILE = ROOT / "tests/profiles/library-api-consumers-private-credits-space-age-standalone-f210-2123.json"
+PRIVATE_CREDITS_INFO = ROOT / "tests/fixtures/library-multiplayer/info-f210-private-credits.json"
 PAIRED_PUBLISHED_PROFILE = ROOT / "tests/profiles/library-paired-browser-published-f200-2077.json"
 PAIRED_MIR5_PROFILE = ROOT / "tests/profiles/library-paired-browser-mir5-f200-2077.json"
 SCRIPTED_EFFECTS_PROFILE = ROOT / "tests/profiles/scripted-effects-multiplayer-f200-sa-2077.json"
@@ -56,17 +59,29 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
             local ROOT_NAME="mir_research_browser"
             local FILTERS="mir_library_filters"
             local QUERY="mir_library_query"
+            local FAMILY="mir_library_family"
             local SORT="mir_library_sort"
             local TABS="mir_library_tabs"
             local CONTENT="mir_library_research_content"
             local RESULTS="mir_library_results"
             local DETAIL="mir_library_detail"
             local DETAIL_TITLE="mir_library_detail_title"
+            local DETAIL_EMPTY="mir_library_detail_empty"
+            local ACTIONS="mir_library_actions"
+            local OPEN_NATIVE="mir_library_open_native"
             local AVAILABILITY={"mir_library_availability_1","mir_library_availability_2"}
             local AVAILABILITY_FAMILIES={"research_agricultural_growth_speed","research_spoilage_preservation"}
             local key="mir5_library_multiplayer"
             local gear="recipe-prod-research_gears-1"
             local mining="recipe-prod-research_mining_drill-1"
+            local private_credit_ids={
+              "mir-legacy-module-credit-speed-module",
+              "mir-legacy-module-credit-productivity-module",
+              "mir-legacy-module-credit-efficiency-module",
+              "mir-legacy-cannon-credit-rocket-shooting-speed",
+            }
+            local private_credit_id_set={}
+            for _,id in ipairs(private_credit_ids) do private_credit_id_set[id]=true end
             local gear_packs={"automation-science-pack","logistic-science-pack","chemical-science-pack","production-science-pack"}
             local gear_ingredients={
               {name=gear_packs[1],amount=1},{name=gear_packs[2],amount=1},
@@ -76,6 +91,9 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
               f200={base="2.0.77",mir="5.0.20000"},
               f210={base="2.1.23",mir="5.0.21000"},
               ["f210-space-age"]={base="2.1.23",mir="5.0.21000",space_age=true},
+              ["f210-private-credits"]={base="2.1.23",mir="5.0.21000",private_credits=true},
+              ["f210-space-age-private-credits"]={base="2.1.23",mir="5.0.21000",space_age=true,private_credits=true},
+              ["f200-private-credits"]={base="2.0.77",mir="5.0.20000",private_credits=true},
             }
             local selected=targets[target or "f200"]
             assert(selected,"unknown fixture target")
@@ -124,6 +142,16 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
             for _,name in ipairs({"automation-science-pack","logistic-science-pack","chemical-science-pack","production-science-pack"}) do
               force.technologies[name]={valid=true,name=name,force=force,level=1,researched=false,enabled=true,visible_when_disabled=false}
             end
+            if selected.private_credits and opponent~="private-credit-missing" then
+              for index,id in ipairs(private_credit_ids) do
+                force.technologies[id]={valid=true,name=id,force=force,level=index,researchable=false,
+                  researched=true,enabled=false,visible_when_disabled=false}
+              end
+            end
+            if selected.private_credits then
+              force.technologies["automation"]={valid=true,name="automation",force=force,level=1,
+                researched=true,enabled=true,visible_when_disabled=false}
+            end
             local function player(index, locale)
               local value={valid=true,index=index,name=index==1 and "MIR5English" or "MIR5Deutsch",locale=locale,connected=false,force=force,gui={screen={valid=true,type="screen"}}}
               players[index]=value
@@ -134,6 +162,7 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
             local callbacks={events={}}
             local next_profiler=0
             local open_calls=0
+            local private_query_calls, private_query_order = 0, {}
             local profiler_logs={}
             local game={forces={player=force},surfaces={[1]={valid=true,index=1}},tick=0}
             local function fire(name,event)
@@ -244,6 +273,8 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
               root[FILTERS]=filters
               filters[QUERY]=element("textfield",QUERY)
               filters[QUERY].text=options.search
+              filters[FAMILY]=element("drop-down",FAMILY)
+              filters[FAMILY].selected_index=options.family=="all" and 2 or (options.family=="external" and 3 or 1)
               filters[SORT]=element("drop-down",SORT)
               filters[SORT].selected_index=options.sort=="native" and 2 or 1
               local tabs=element("tabbed-pane",TABS)
@@ -277,6 +308,55 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
                 return
               end
               assert(options.visibility==1,"ordinary Library opens must reset Availability visibility")
+              local private_query=selected.private_credits and private_credit_id_set[options.selected]==true
+                and (options.family=="all" or options.family=="external") and options.search==options.selected
+              if private_query then
+                private_query_calls=private_query_calls+1
+                private_query_order[#private_query_order+1]={player=client.index,family=options.family,id=options.selected}
+                local results=element("list-box",RESULTS)
+                results.items={};results.selected_index=0
+                if opponent=="private-credit-listed" then
+                  results.items={options.selected};results.selected_index=1
+                end
+                content[RESULTS]=results
+                local detail=element("flow",DETAIL)
+                detail.style.width=content.style.maximal_width
+                detail[DETAIL_EMPTY]=element("label",DETAIL_EMPTY)
+                content[DETAIL]=detail
+                local actions=element("flow",ACTIONS)
+                actions[OPEN_NATIVE]=element("button",OPEN_NATIVE)
+                actions[OPEN_NATIVE].enabled=opponent=="private-credit-action-enabled"
+                content[ACTIONS]=actions
+                target.gui.screen[ROOT_NAME]=root
+                if opponent=="private-credit-mutate" and private_query_calls==1 then
+                  force.technologies[private_credit_ids[1]].level=force.technologies[private_credit_ids[1]].level+1
+                end
+                return
+              end
+              local ordinary_private_query=selected.private_credits and (
+                (options.family=="all" and options.search==gear and options.selected==gear) or
+                (options.family=="external" and options.search=="automation" and options.selected=="automation")
+              )
+              if ordinary_private_query and (
+                (opponent=="private-credit-empty-all" and options.family=="all") or
+                (opponent=="private-credit-empty-external" and options.family=="external")
+              ) then
+                local results=element("list-box",RESULTS)
+                results.items={};results.selected_index=0
+                content[RESULTS]=results
+                local detail=element("flow",DETAIL)
+                detail.style.width=content.style.maximal_width
+                detail[DETAIL_EMPTY]=element("label",DETAIL_EMPTY)
+                content[DETAIL]=detail
+                local actions=element("flow",ACTIONS)
+                actions[OPEN_NATIVE]=element("button",OPEN_NATIVE)
+                actions[OPEN_NATIVE].enabled=false
+                content[ACTIONS]=actions
+                target.gui.screen[ROOT_NAME]=root
+                return
+              end
+              if opponent=="private-credit-restore" and private_query_calls>0 and options.family=="mir" then filters[QUERY].text="restoration-failed" end
+              if opponent=="private-credit-stale-external-family" and private_query_calls>0 and options.family=="mir" then filters[FAMILY].selected_index=3 end
               local results=element("list-box",RESULTS)
               results.items={options.selected};results.selected_index=1
               content[RESULTS]=results
@@ -290,7 +370,16 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
               context["mir_library_context_status"]=element("label","mir_library_context_status")
               detail["mir_library_detail_level"]=element("label","mir_library_detail_level")
               content[DETAIL]=detail
+              if ordinary_private_query then
+                local actions=element("flow",ACTIONS)
+                actions[OPEN_NATIVE]=element("button",OPEN_NATIVE)
+                actions[OPEN_NATIVE].enabled=true
+                content[ACTIONS]=actions
+              end
               target.gui.screen[ROOT_NAME]=root
+              if ordinary_private_query and opponent=="private-credit-automation-mutate" and options.family=="external" then
+                force.technologies["automation"].level=force.technologies["automation"].level+1
+              end
             end
             local function refresh_mock_gui(client)
               local root=client.gui.screen[ROOT_NAME]
@@ -301,6 +390,7 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
               local detail=content and content[DETAIL]
               if not (root and query and detail) or query.text~=gear then return end
               local context=detail["mir_library_detail_context"]
+              if not context then return end
               local queued=#force.research_queue
               local current=force.current_research~=nil
               context["mir_library_context_status"].caption={"mir-browser.context-status",{current or queued>0 and "mir-browser.status-queued" or "mir-browser.status-ready"}}
@@ -363,7 +453,7 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
               return true
             end
             local discovery=opponent=="standalone-identity-discovery"
-            local fixture_version=selected.space_age and "0.2.0" or (discovery and "0.1.1" or "0.1.0")
+            local fixture_version=selected.private_credits and "0.3.0" or (selected.space_age and "0.2.0" or (discovery and "0.1.1" or "0.1.0"))
             local active_mods={base=base_version,["more-infinite-research"]=mir_version,["mir-fixture-mir5-library-multiplayer"]=fixture_version,["mir-fixture-mir5-active-mods-observer"]="0.1.0"}
             if selected.space_age then
               active_mods["elevated-rails"]="2.1.23"
@@ -371,7 +461,8 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
               active_mods.recycler="2.1.23"
               active_mods["space-age"]="2.1.23"
             end
-            if opponent=="f210-api-consumers" or selected.space_age then
+            local private_without_api=selected.private_credits and opponent=="private-credit-missing-api"
+            if (opponent=="f210-api-consumers" or selected.space_age or selected.private_credits) and not private_without_api then
               active_mods["mir-fixture-mir5-api-alpha"]="0.1.0"
               active_mods["mir-fixture-mir5-api-beta"]="0.1.0"
             elseif opponent=="f210-api-alpha-only" then
@@ -527,7 +618,8 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
             return {ok=true,message="",phase=storage[key].phase,markers=markers,screenshots=screenshots,saves=saves,
               load_unchanged=load_unchanged,join_events=storage[key].join_events,measurements=storage[key].measurements,
               profiler_logs=profiler_logs,lab_diagnostics=lab_diagnostics,lab_insert_counts=insert_counts,
-              rejected_bulk_inserts=rejected_bulk_inserts}
+              rejected_bulk_inserts=rejected_bulk_inserts,private_query_calls=private_query_calls,
+              private_query_order=private_query_order}
           end
         ''')
 
@@ -691,6 +783,59 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
         })
         self.assertNotIn("mir-fixture-mir5-api-beta-production", {row["name"] for row in profile["mods"]})
 
+    def test_private_credit_profiles_bind_the_current_archive_and_distinct_base_and_space_age_closures(self):
+        cases = (
+            (PRIVATE_CREDITS_BASE_PROFILE,
+             "mir5-library-api-consumers-private-credits-standalone-f210-native-selection", 7168, False,
+             [
+                 ("base", "2.1.23"),
+                 ("mir-fixture-mir5-active-mods-observer", "0.1.0"),
+                 ("more-infinite-research", "5.0.21000"),
+                 ("mir-fixture-mir5-library-multiplayer", "0.3.0"),
+                 ("mir-fixture-mir5-api-alpha", "0.1.0"),
+                 ("mir-fixture-mir5-api-beta", "0.1.0"),
+             ]),
+            (PRIVATE_CREDITS_SPACE_AGE_PROFILE,
+             "mir5-library-api-consumers-private-credits-space-age-standalone-f210-native-selection", 8192, True,
+             [
+                 ("base", "2.1.23"),
+                 ("elevated-rails", "2.1.23"),
+                 ("quality", "2.1.23"),
+                 ("recycler", "2.1.23"),
+                 ("space-age", "2.1.23"),
+                 ("mir-fixture-mir5-active-mods-observer", "0.1.0"),
+                 ("more-infinite-research", "5.0.21000"),
+                 ("mir-fixture-mir5-library-multiplayer", "0.3.0"),
+                 ("mir-fixture-mir5-api-alpha", "0.1.0"),
+                 ("mir-fixture-mir5-api-beta", "0.1.0"),
+             ]),
+        )
+        for path, kind, memory_mib, space_age, expected_mods in cases:
+            with self.subTest(profile=path.name):
+                profile = json.loads(path.read_text(encoding="utf-8"))
+                self.assertEqual((profile["kind"], profile["target"], profile["factorio_line"],
+                                  profile["settings_mode"], profile["session_expected_peak_memory_mib"]),
+                                 (kind, "f210-standalone", "2.1", "Defaults", memory_mib))
+                self.assertEqual(profile["engine"], {
+                    "version": "2.1.23",
+                    "sha256": "8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38",
+                })
+                self.assertTrue(profile["private_credit_checks"])
+                self.assertEqual(profile.get("space_age_library", False), space_age)
+                self.assertEqual([(row["name"], row["version"]) for row in profile["mods"]], expected_mods)
+                self.assertTrue(all(row["enabled"] is True for row in profile["mods"]))
+                self.assertEqual(profile["archive_sha256"], {
+                    "mir-fixture-mir5-active-mods-observer_0.1.0.zip":
+                        "A15A7D628D66953D2E0C4D4FA288F47CBF9C5678327C7EB3D23ADB5DC78331C0",
+                    "more-infinite-research_5.0.21000.zip":
+                        "005D420671270306155CB4AC25E9CF77541202DFA16B206DCC016237619C9AA2",
+                    "mir-fixture-mir5-api-alpha_0.1.0.zip":
+                        "DB5ED843FA9D85A1ABDC22595E62D315CA1A2191C846208079F85D4D016CE904",
+                    "mir-fixture-mir5-api-beta_0.1.0.zip":
+                        "690004F145E8B0DD52B4030BD8B27F7B581495EEFAAC5CB3A2F30A23FCA08951",
+                })
+                self.assertNotIn("mir-fixture-mir5-api-beta-production", {row["name"] for row in profile["mods"]})
+
     def test_multiplayer_wrapper_admits_only_the_exact_standalone_api_client_profile(self):
         script = r'''
           $ErrorActionPreference='Stop'; Set-StrictMode -Version Latest
@@ -816,6 +961,57 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
             capture_output=True, text=True,
             env=dict(os.environ, MIR_TEST_WRAPPER=str(WRAPPER),
                      MIR_TEST_CURRENT_STANDALONE_SPACE_AGE_API_CLIENT_PROFILE=str(CURRENT_STANDALONE_F210_SPACE_AGE_API_CONSUMERS_PROFILE)),
+            check=False,
+        )
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+
+    def test_multiplayer_wrapper_admits_only_the_exact_current_private_credit_base_and_space_age_profiles_before_admission(self):
+        script = r'''
+          $ErrorActionPreference='Stop'; Set-StrictMode -Version Latest
+          $tokens=$null;$errors=$null
+          $ast=[Management.Automation.Language.Parser]::ParseFile($env:MIR_TEST_WRAPPER,[ref]$tokens,[ref]$errors)
+          if($errors.Count){throw $errors[0].Message}
+          function Assert-Session([bool]$Condition,[string]$Message){if(-not$Condition){throw $Message}}
+          $node=@($ast.FindAll({param($candidate)
+            $candidate -is [Management.Automation.Language.FunctionDefinitionAst] -and $candidate.Name -ceq 'Assert-MultiplayerFixtureSelection'
+          },$true))
+          if($node.Count-ne1){throw 'selection function is absent or ambiguous'}
+          Invoke-Expression $node[0].Extent.Text
+          $engine='8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38'
+          $mir='005D420671270306155CB4AC25E9CF77541202DFA16B206DCC016237619C9AA2'
+          function Read-Profile([string]$Path){Get-Content -LiteralPath $Path -Raw|ConvertFrom-Json -AsHashtable}
+          function Assert-Selected([string]$Path,[int]$Peak,[bool]$SpaceAge,[string]$Kind){
+            $selected=Assert-MultiplayerFixtureSelection -Selection (Read-Profile $Path) -EngineSha256 $engine -FixtureCase 'library-multiplayer' -ExpectedMIRArchiveSha256 $mir -SessionExpectedPeakMemoryMiB $Peak
+            $spaceAgeProperty=$selected.PSObject.Properties['space_age_library']
+            $actualSpaceAge=[bool]($null-ne$spaceAgeProperty -and $spaceAgeProperty.Value -eq $true)
+            if($selected.kind-cne$Kind-or$selected.private_credit_checks-ne$true-or$selected.api_client_consumers-ne$true-or$actualSpaceAge-ne$SpaceAge){throw "private-credit target differs: $Kind"}
+          }
+          function Assert-Rejected([string]$Name,[string]$Path,[int]$Peak,[scriptblock]$Mutate,[switch]$Discovery){
+            $selection=Read-Profile $Path;&$Mutate $selection
+            try{
+              if($Discovery){$null=Assert-MultiplayerFixtureSelection -Selection $selection -EngineSha256 $engine -FixtureCase 'library-multiplayer' -ExpectedMIRArchiveSha256 $mir -SessionExpectedPeakMemoryMiB $Peak -StandaloneIdentityDiscovery}
+              else{$null=Assert-MultiplayerFixtureSelection -Selection $selection -EngineSha256 $engine -FixtureCase 'library-multiplayer' -ExpectedMIRArchiveSha256 $mir -SessionExpectedPeakMemoryMiB $Peak}
+            }catch{return}
+            throw "private-credit profile accepted opponent: $Name"
+          }
+          Assert-Selected $env:MIR_TEST_PRIVATE_CREDIT_BASE_PROFILE 7168 $false 'mir5-library-api-consumers-private-credits-standalone-f210-native-selection'
+          Assert-Selected $env:MIR_TEST_PRIVATE_CREDIT_SPACE_AGE_PROFILE 8192 $true 'mir5-library-api-consumers-private-credits-space-age-standalone-f210-native-selection'
+          foreach($case in @(
+            @{path=$env:MIR_TEST_PRIVATE_CREDIT_BASE_PROFILE;peak=7168;name='base false mode';mutate={param($s)$s['private_credit_checks']=$false}},
+            @{path=$env:MIR_TEST_PRIVATE_CREDIT_BASE_PROFILE;peak=7168;name='base missing API';mutate={param($s)$s['mods']=@($s['mods']|Where-Object {$_.name-cne'mir-fixture-mir5-api-alpha'})}},
+            @{path=$env:MIR_TEST_PRIVATE_CREDIT_BASE_PROFILE;peak=7168;name='base wrong fixture version';mutate={param($s)foreach($row in $s['mods']){if($row.name-ceq'mir-fixture-mir5-library-multiplayer'){$row.version='0.2.0'}}}},
+            @{path=$env:MIR_TEST_PRIVATE_CREDIT_SPACE_AGE_PROFILE;peak=8192;name='SA false mode';mutate={param($s)$s['private_credit_checks']=$false}},
+            @{path=$env:MIR_TEST_PRIVATE_CREDIT_SPACE_AGE_PROFILE;peak=8192;name='SA missing API';mutate={param($s)$s['mods']=@($s['mods']|Where-Object {$_.name-cne'mir-fixture-mir5-api-beta'})}},
+            @{path=$env:MIR_TEST_PRIVATE_CREDIT_SPACE_AGE_PROFILE;peak=8192;name='SA companion missing';mutate={param($s)$s['mods']=@($s['mods']|Where-Object {$_.name-cne'recycler'})}}
+          )){Assert-Rejected $case.name $case.path $case.peak $case.mutate}
+          Assert-Rejected 'private-credit discovery mode' $env:MIR_TEST_PRIVATE_CREDIT_BASE_PROFILE 7168 {} -Discovery
+        '''
+        result = subprocess.run(
+            ["pwsh", "-NoLogo", "-NoProfile", "-Command", script],
+            capture_output=True, text=True,
+            env=dict(os.environ, MIR_TEST_WRAPPER=str(WRAPPER),
+                     MIR_TEST_PRIVATE_CREDIT_BASE_PROFILE=str(PRIVATE_CREDITS_BASE_PROFILE),
+                     MIR_TEST_PRIVATE_CREDIT_SPACE_AGE_PROFILE=str(PRIVATE_CREDITS_SPACE_AGE_PROFILE)),
             check=False,
         )
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
@@ -1168,12 +1364,16 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
           $root=$env:MIR_TEST_WORK;$repo=$env:MIR_TEST_REPO;$library=Join-Path $root 'library';$null=New-Item -ItemType Directory -Path $library
           $normal=New-StandaloneF210LibraryFixtureSourceProjection -RepoRoot $repo -OutputRoot (Join-Path $root 'normal-output')
           $normalInfo=Get-Content -LiteralPath (Join-Path $normal.source 'info.json') -Raw|ConvertFrom-Json -AsHashtable
-          if($normal.members.Count-ne3 -or $normal.source_metadata-cne'info-f210.json' -or ((@($normal.excluded_canonical_members)-join'|')-cne'info-f210-space-age.json|info.json|README.md') -or [string]$normalInfo.factorio_version-cne'2.1' -or [string]$normalInfo.version-cne'0.1.0' -or ((@($normalInfo.dependencies)-join'|')-cne'base >= 2.1.23|more-infinite-research = 5.0.21000')){throw 'normal F210 projection metadata differs'}
+          if($normal.members.Count-ne3 -or $normal.source_metadata-cne'info-f210.json' -or ((@($normal.excluded_canonical_members)-join'|')-cne'info-f210-private-credits.json|info-f210-space-age.json|info.json|README.md') -or [string]$normalInfo.factorio_version-cne'2.1' -or [string]$normalInfo.version-cne'0.1.0' -or ((@($normalInfo.dependencies)-join'|')-cne'base >= 2.1.23|more-infinite-research = 5.0.21000')){throw 'normal F210 projection metadata differs'}
           $fixtureArchive=New-SourceArchive -Library $library -Source $normal.source -Members @('control.lua','info.json','settings-updates.lua')
           $spaceAge=New-StandaloneF210LibraryFixtureSourceProjection -RepoRoot $repo -OutputRoot (Join-Path $root 'space-age-output') -SpaceAgeLibrary
           $spaceAgeInfo=Get-Content -LiteralPath (Join-Path $spaceAge.source 'info.json') -Raw|ConvertFrom-Json -AsHashtable
-          if($spaceAge.members.Count-ne3 -or $spaceAge.source_metadata-cne'info-f210-space-age.json' -or ((@($spaceAge.excluded_canonical_members)-join'|')-cne'info-f210.json|info.json|README.md') -or [string]$spaceAgeInfo.factorio_version-cne'2.1' -or [string]$spaceAgeInfo.version-cne'0.2.0' -or ((@($spaceAgeInfo.dependencies)-join'|')-cne'base >= 2.1.23|space-age >= 2.1.23|more-infinite-research = 5.0.21000')){throw 'Space Age F210 projection metadata differs'}
+          if($spaceAge.members.Count-ne3 -or $spaceAge.source_metadata-cne'info-f210-space-age.json' -or ((@($spaceAge.excluded_canonical_members)-join'|')-cne'info-f210-private-credits.json|info-f210.json|info.json|README.md') -or [string]$spaceAgeInfo.factorio_version-cne'2.1' -or [string]$spaceAgeInfo.version-cne'0.2.0' -or ((@($spaceAgeInfo.dependencies)-join'|')-cne'base >= 2.1.23|space-age >= 2.1.23|more-infinite-research = 5.0.21000')){throw 'Space Age F210 projection metadata differs'}
           $spaceAgeArchive=New-SourceArchive -Library $library -Source $spaceAge.source -Members @('control.lua','info.json','settings-updates.lua')
+          $private=New-StandaloneF210LibraryFixtureSourceProjection -RepoRoot $repo -OutputRoot (Join-Path $root 'private-credit-output') -PrivateCreditChecks
+          $privateInfo=Get-Content -LiteralPath (Join-Path $private.source 'info.json') -Raw|ConvertFrom-Json -AsHashtable
+          if($private.members.Count-ne3 -or $private.source_metadata-cne'info-f210-private-credits.json' -or ((@($private.excluded_canonical_members)-join'|')-cne'info-f210-space-age.json|info-f210.json|info.json|README.md') -or [string]$privateInfo.factorio_version-cne'2.1' -or [string]$privateInfo.version-cne'0.3.0' -or ((@($privateInfo.dependencies)-join'|')-cne'base >= 2.1.23|? space-age >= 2.1.23|more-infinite-research = 5.0.21000')){throw 'private-credit F210 projection metadata differs'}
+          $privateArchive=New-SourceArchive -Library $library -Source $private.source -Members @('control.lua','info.json','settings-updates.lua')
           $canonicalObserver=Join-Path $repo 'tests/fixtures/active-mods-observer';$observerArchive=New-SourceArchive -Library $library -Source $canonicalObserver -Members @('data-final-fixes.lua','info.json')
           $observerHash=(Get-FileHash -LiteralPath $observerArchive -Algorithm SHA256).Hash
           $observer=New-StandaloneIdentityObserverSourceProjection -RepoRoot $repo -ArchiveLibrary $library -OutputRoot (Join-Path $root 'observer-output') -ExpectedArchiveSha256 $observerHash
@@ -1184,6 +1384,9 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
           $spaceAgeSources=@(Get-StandaloneIdentityFixtureSources -Sources @($canonicalLibrary,$canonicalObserver) -LibraryFixtureSource $canonicalLibrary -StagedLibraryFixtureSource $spaceAge.source -StagedObserverSource $observer.source -RepoRoot $repo)
           $spaceAgePrepared=Invoke-ActualNormalPreparation -Library $library -Sources $spaceAgeSources -Root (Join-Path $root 'space-age-positive')
           if($spaceAgePrepared.prepared.status-cne'passed-private-native-runtime-load-only' -or $spaceAgeSources.Count-ne2 -or $spaceAgeSources[0]-ine$spaceAge.source -or $spaceAgeSources[1]-ine$observer.source){throw 'actual Space Age standalone preparation did not retain the two exact projections'}
+          $privateSources=@(Get-StandaloneIdentityFixtureSources -Sources @($canonicalLibrary,$canonicalObserver) -LibraryFixtureSource $canonicalLibrary -StagedLibraryFixtureSource $private.source -StagedObserverSource $observer.source -RepoRoot $repo)
+          $privatePrepared=Invoke-ActualNormalPreparation -Library $library -Sources $privateSources -Root (Join-Path $root 'private-credit-positive')
+          if($privatePrepared.prepared.status-cne'passed-private-native-runtime-load-only' -or $privateSources.Count-ne2 -or $privateSources[0]-ine$private.source -or $privateSources[1]-ine$observer.source){throw 'actual private-credit standalone preparation did not retain the two exact projections'}
           $missingLibrary=Join-Path $root 'missing-library';$null=New-Item -ItemType Directory -Path $missingLibrary;New-SourceArchive -Library $missingLibrary -Source $normal.source -Members @('control.lua','info.json')|Out-Null
           Assert-PreparationRejects 'missing runtime member' $missingLibrary $normal.source (Join-Path $root 'missing')
           $changedSource=Join-Path $root 'changed-source';Copy-Item -LiteralPath $normal.source -Destination $changedSource -Recurse;[IO.File]::AppendAllText((Join-Path $changedSource 'control.lua'),'-- changed',[Text.UTF8Encoding]::new($false))
@@ -1195,6 +1398,9 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
           $wrongSpaceAgeRepo=Join-Path $root 'wrong-space-age-repository';$wrongSpaceAgeFixture=Join-Path $wrongSpaceAgeRepo 'tests/fixtures/library-multiplayer';$null=New-Item -ItemType Directory -Path (Split-Path -Parent $wrongSpaceAgeFixture) -Force;Copy-Item -LiteralPath $canonicalLibrary -Destination $wrongSpaceAgeFixture -Recurse
           $wrongSpaceAgeInfo=Get-Content -LiteralPath (Join-Path $wrongSpaceAgeFixture 'info-f210-space-age.json') -Raw|ConvertFrom-Json -AsHashtable;$wrongSpaceAgeInfo.version='0.1.0';[IO.File]::WriteAllText((Join-Path $wrongSpaceAgeFixture 'info-f210-space-age.json'),($wrongSpaceAgeInfo|ConvertTo-Json -Depth 8)+[Environment]::NewLine,[Text.UTF8Encoding]::new($false))
           $wrongSpaceAgeRejected=$false;try{New-StandaloneF210LibraryFixtureSourceProjection -RepoRoot $wrongSpaceAgeRepo -OutputRoot (Join-Path $root 'wrong-space-age-output') -SpaceAgeLibrary|Out-Null}catch{$wrongSpaceAgeRejected=$true};if(-not$wrongSpaceAgeRejected){throw 'Base metadata was accepted for standalone F210 Space Age projection'}
+          $wrongPrivateRepo=Join-Path $root 'wrong-private-credit-repository';$wrongPrivateFixture=Join-Path $wrongPrivateRepo 'tests/fixtures/library-multiplayer';$null=New-Item -ItemType Directory -Path (Split-Path -Parent $wrongPrivateFixture) -Force;Copy-Item -LiteralPath $canonicalLibrary -Destination $wrongPrivateFixture -Recurse
+          $wrongPrivateInfo=Get-Content -LiteralPath (Join-Path $wrongPrivateFixture 'info-f210-private-credits.json') -Raw|ConvertFrom-Json -AsHashtable;$wrongPrivateInfo.dependencies=@('base >= 2.1.23','more-infinite-research = 5.0.21000');[IO.File]::WriteAllText((Join-Path $wrongPrivateFixture 'info-f210-private-credits.json'),($wrongPrivateInfo|ConvertTo-Json -Depth 8)+[Environment]::NewLine,[Text.UTF8Encoding]::new($false))
+          $wrongPrivateRejected=$false;try{New-StandaloneF210LibraryFixtureSourceProjection -RepoRoot $wrongPrivateRepo -OutputRoot (Join-Path $root 'wrong-private-credit-output') -PrivateCreditChecks|Out-Null}catch{$wrongPrivateRejected=$true};if(-not$wrongPrivateRejected){throw 'private-credit fixture metadata accepted missing optional Space Age dependency'}
           'PASS actual normal standalone F210 preparation and projection opponents'
         '''
         with tempfile.TemporaryDirectory(prefix="mir5-standalone-normal-preparation-") as work:
@@ -1668,6 +1874,93 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
                 self.assertFalse(rejected["ok"])
                 self.assertIn(message, rejected["message"])
 
+    def test_private_credit_browser_probe_is_opt_in_and_preserves_native_state_and_personal_views(self):
+        info = json.loads(PRIVATE_CREDITS_INFO.read_text(encoding="utf-8"))
+        self.assertEqual(info, {
+            "name": "mir-fixture-mir5-library-multiplayer",
+            "version": "0.3.0",
+            "title": "MIR 5 private-credit Library browser fixture",
+            "author": "MIR maintainers",
+            "description": "Disposable two-client F210 public Library private-credit browser observation fixture.",
+            "factorio_version": "2.1",
+            "dependencies": [
+                "base >= 2.1.23",
+                "? space-age >= 2.1.23",
+                "more-infinite-research = 5.0.21000",
+            ],
+        })
+        ids = (
+            "mir-legacy-module-credit-speed-module",
+            "mir-legacy-module-credit-productivity-module",
+            "mir-legacy-module-credit-efficiency-module",
+            "mir-legacy-cannon-credit-rocket-shooting-speed",
+        )
+        expected_state = {
+            name: {
+                "level": index,
+                "researched": True,
+                "enabled": False,
+                "visible_when_disabled": False,
+            }
+            for index, name in enumerate(ids, start=1)
+        }
+        expected_order = [
+            {"player": player, "family": family, "id": name}
+            for player in (1, 2)
+            for family in ("all", "external")
+            for name in ids
+        ]
+        for target in ("f210-private-credits", "f210-space-age-private-credits"):
+            with self.subTest(target=target):
+                accepted = self.run_case(target=target)
+                self.assertTrue(accepted["ok"], accepted["message"])
+                self.assertEqual((accepted["phase"], accepted["join_events"]), ("completed", 6))
+                self.assertEqual([marker["stage"] for marker in accepted["markers"]],
+                                 ["ready", "rejoin-ready", "restart-ready", "completed"])
+                self.assertEqual(accepted["private_query_calls"], 16)
+                self.assertEqual(accepted["private_query_order"], expected_order)
+                for marker in accepted["markers"][:-1]:
+                    self.assertNotIn("private_credit_visibility", marker["witnesses"])
+                witness = accepted["markers"][-1]["witnesses"]["private_credit_visibility"]
+                self.assertEqual(witness, {
+                    "ids_checked": 4,
+                    "clients_checked": 2,
+                    "families_checked": ["all", "external"],
+                    "private_selection_not_exposed": True,
+                    "native_state_unchanged": True,
+                    "personal_views_restored": True,
+                    "before": expected_state,
+                    "after": expected_state,
+                })
+
+        for target in ("f210", "f210-space-age"):
+            with self.subTest(old_target=target):
+                ordinary = self.run_case(target=target)
+                self.assertTrue(ordinary["ok"], ordinary["message"])
+                self.assertNotIn("private_credit_visibility", ordinary["markers"][-1]["witnesses"])
+
+        opponents = {
+            "private-credit-missing": "private credit holder is absent",
+            "private-credit-listed": "private credit query exposed a public result or native action",
+            "private-credit-action-enabled": "private credit query exposed a public result or native action",
+            "private-credit-mutate": "private credit browse mutated native research state",
+            "private-credit-empty-all": "public Library all query did not expose a selected ordinary result",
+            "private-credit-empty-external": "public Library external query did not expose a selected ordinary result",
+            "private-credit-automation-mutate": "public Library browse mutated the automation native state",
+            "private-credit-restore": "personal browser query or selected view differs",
+            "private-credit-stale-external-family": "private credit browse did not restore the personal mir family filter",
+            "private-credit-missing-api": "unexpected non-base F210 multiplayer closure",
+            "standalone-identity-discovery": "private-credit Library fixture requires the current F210 API closure",
+        }
+        for opponent, message in opponents.items():
+            with self.subTest(opponent=opponent):
+                rejected = self.run_case(opponent, target="f210-private-credits")
+                self.assertFalse(rejected["ok"])
+                self.assertIn(message, rejected["message"])
+        rejected = self.run_case(target="f200-private-credits")
+        self.assertFalse(rejected["ok"])
+        self.assertIn("private-credit Library fixture requires the current F210 API closure", rejected["message"])
+
     def test_two_real_client_join_rejoin_and_restart_state_machine(self):
         result = self.run_case()
         self.assertTrue(result["ok"], result["message"])
@@ -1765,7 +2058,9 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
                          (0, False, .25, False, 2, 1, 0))
 
     def test_native_session_reader_accepts_actual_library_markers_and_rejects_mutations(self):
-        results = {target: self.run_case(target=target) for target in ("f200", "f210", "f210-space-age")}
+        results = {target: self.run_case(target=target) for target in (
+            "f200", "f210", "f210-space-age", "f210-private-credits", "f210-space-age-private-credits",
+        )}
         for target, result in results.items():
             with self.subTest(target=target):
                 self.assertTrue(result["ok"], result["message"])
@@ -1803,11 +2098,14 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
             standalone_normal=[ordered]@{engine_sha256='8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38';base='2.1.23';mir='5.0.21000';standalone_identity_discovery=$false}
             standalone_discovery=[ordered]@{engine_sha256='8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38';base='2.1.23';mir='5.0.21000';standalone_identity_discovery=$true}
             standalone_space_age=[ordered]@{engine_sha256='8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38';base='2.1.23';mir='5.0.21000';standalone_identity_discovery=$false;space_age_library=$true}
+            standalone_private_base=[ordered]@{engine_sha256='8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38';base='2.1.23';mir='5.0.21000';standalone_identity_discovery=$false;private_credit_checks=$true}
+            standalone_private_space_age=[ordered]@{engine_sha256='8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38';base='2.1.23';mir='5.0.21000';standalone_identity_discovery=$false;space_age_library=$true;private_credit_checks=$true}
           }
           function New-LibraryWitnessSpec([hashtable]$Target){
             $spec=@{library_witness_target=([ordered]@{engine_sha256=$Target.engine_sha256;base=$Target.base;mir=$Target.mir})}
             if($Target.Contains('standalone_identity_discovery') -and $Target.standalone_identity_discovery){$spec.standalone_identity_discovery=$true}
             if($Target.Contains('space_age_library') -and $Target.space_age_library){$spec.space_age_library=$true;$spec.api_client_consumers=$true}
+            if($Target.Contains('private_credit_checks') -and $Target.private_credit_checks){$spec.private_credit_checks=$true;$spec.api_client_consumers=$true}
             return $spec
           }
           function Assert-LibraryWitnessTargetRejects([hashtable]$Spec,[string]$Engine,[string]$Name){
@@ -1924,6 +2222,70 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
           $line=ConvertTo-LibraryMarkerLine $crossedSpaceAge
           try{$accepted=Get-StageMarker $line 'completed' 6 $expectedLibraryWitness}catch{$accepted=$null}
           if($null-ne$accepted){throw 'Base reader accepted a Space Age marker'}
+
+          $privateTargets=[ordered]@{
+            'f210-private-credits'=$targets.standalone_private_base
+            'f210-space-age-private-credits'=$targets.standalone_private_space_age
+          }
+          $privateByTarget=@{}
+          foreach($targetName in $privateTargets.Keys){
+            $target=$privateTargets[$targetName]
+            $expectedPrivateWitness=Get-LibraryWitnessTarget (New-LibraryWitnessSpec $target) $target.engine_sha256
+            Assert-LibraryWitnessBoolean $expectedPrivateWitness 'private_credit_checks' $true "private target $targetName"
+            $targetMarkers=@($markerSets[$targetName])
+            if($targetMarkers.Count-ne4){throw "actual private-credit fixture markers are incomplete: $targetName"}
+            $byPrivateStage=@{}
+            foreach($marker in $targetMarkers){
+              $stage=[string]$marker['stage']
+              $line=ConvertTo-LibraryMarkerLine $marker
+              $accepted=Get-StageMarker $line $stage ([int]$expectedJoins[$stage]) $expectedPrivateWitness
+              if($null-eq$accepted-or$accepted.stage-cne$stage){throw "actual private-credit fixture marker rejected: $targetName/$stage"}
+              $byPrivateStage[$stage]=$marker
+            }
+            $privateByTarget[$targetName]=[ordered]@{target=$target;expected=$expectedPrivateWitness;stages=$byPrivateStage}
+          }
+          function Assert-PrivateReaderRejects([hashtable]$Marker,[object]$Expected,[string]$ExpectedStage,[int]$ExpectedJoins,[string]$Name){
+            $line=ConvertTo-LibraryMarkerLine $Marker
+            try{$accepted=Get-StageMarker $line $ExpectedStage $ExpectedJoins $Expected}catch{return}
+            if($null-ne$accepted){throw "reader accepted invalid private-credit marker: $Name"}
+          }
+          $privateBase=$privateByTarget['f210-private-credits']
+          $privateCompleted=$privateBase.stages['completed']
+          $missingPrivate=Copy-LibraryMarker $privateCompleted
+          $missingPrivate['witnesses'].Remove('private_credit_visibility')
+          Assert-PrivateReaderRejects $missingPrivate $privateBase.expected 'completed' 6 'missing private witness'
+          $falsePrivate=Copy-LibraryMarker $privateCompleted
+          $falsePrivate['witnesses']['private_credit_visibility']['private_selection_not_exposed']=$false
+          Assert-PrivateReaderRejects $falsePrivate $privateBase.expected 'completed' 6 'false private selection witness'
+          $malformedPrivate=Copy-LibraryMarker $privateCompleted
+          $malformedPrivate['witnesses']['private_credit_visibility']['ids_checked']='4'
+          Assert-PrivateReaderRejects $malformedPrivate $privateBase.expected 'completed' 6 'malformed private count'
+          $wrongPrivateCount=Copy-LibraryMarker $privateCompleted
+          $wrongPrivateCount['witnesses']['private_credit_visibility']['families_checked']=@('all')
+          Assert-PrivateReaderRejects $wrongPrivateCount $privateBase.expected 'completed' 6 'private family count'
+          $foreignPrivateId=Copy-LibraryMarker $privateCompleted
+          $before=$foreignPrivateId['witnesses']['private_credit_visibility']['before']
+          $before.Remove('mir-legacy-module-credit-speed-module')
+          $before['foreign-credit']=[ordered]@{level=1;researched=$true;enabled=$false;visible_when_disabled=$false}
+          Assert-PrivateReaderRejects $foreignPrivateId $privateBase.expected 'completed' 6 'foreign private holder identity'
+          $changedPrivateLevel=Copy-LibraryMarker $privateCompleted
+          $changedPrivateLevel['witnesses']['private_credit_visibility']['after']['mir-legacy-module-credit-speed-module']['level']=2
+          Assert-PrivateReaderRejects $changedPrivateLevel $privateBase.expected 'completed' 6 'changed private holder level'
+          $wrongSnapshotKey=Copy-LibraryMarker $privateCompleted
+          $holder=$wrongSnapshotKey['witnesses']['private_credit_visibility']['before']['mir-legacy-module-credit-speed-module']
+          $holder.Remove('visible_when_disabled');$holder['unexpected']=$false
+          Assert-PrivateReaderRejects $wrongSnapshotKey $privateBase.expected 'completed' 6 'private snapshot key'
+          $prematurePrivate=Copy-LibraryMarker $privateBase.stages['ready']
+          $prematurePrivate['witnesses']['private_credit_visibility']=$privateCompleted['witnesses']['private_credit_visibility']
+          Assert-PrivateReaderRejects $prematurePrivate $privateBase.expected 'ready' 0 'premature private witness'
+          $expectedNormalStandalone=Get-LibraryWitnessTarget (New-LibraryWitnessSpec $targets.standalone_normal) $targets.standalone_normal.engine_sha256
+          Assert-PrivateReaderRejects (Copy-LibraryMarker $privateCompleted) $expectedNormalStandalone 'completed' 6 'private witness crossed into ordinary mode'
+          $falsePrivateTarget=New-LibraryWitnessSpec $targets.standalone_private_base;$falsePrivateTarget.private_credit_checks=$false
+          Assert-LibraryWitnessTargetRejects $falsePrivateTarget $targets.standalone_private_base.engine_sha256 'false private target mode'
+          $missingPrivateConsumer=New-LibraryWitnessSpec $targets.standalone_private_base;$missingPrivateConsumer.Remove('api_client_consumers')
+          Assert-LibraryWitnessTargetRejects $missingPrivateConsumer $targets.standalone_private_base.engine_sha256 'private target without API consumer mode'
+          $privateDiscovery=New-LibraryWitnessSpec $targets.standalone_private_base;$privateDiscovery.standalone_identity_discovery=$true
+          Assert-LibraryWitnessTargetRejects $privateDiscovery $targets.standalone_private_base.engine_sha256 'private target with discovery mode'
 
           $minimumStarted=Copy-LibraryMarker $byStage['completed']
           $minimumStarted['witnesses']['live_refresh']['native_research_started_events']=2

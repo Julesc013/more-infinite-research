@@ -6,7 +6,7 @@ The original Base selections admit F200 base2.0.77/MIR5.0.20000 and F210 base2.1
 
 The separate F210 API-client selection admits one additional exact closure: the same Library members plus the independently packaged `mir-fixture-mir5-api-alpha` and `mir-fixture-mir5-api-beta` consumers at 0.1.0. It excludes partial consumer selections, changed versions, extra mods, and the beta physical-production fixture. The existing clients must each emit one alpha and one beta `on_load` marker after every initial join, rejoin, and host-restart join; the session reader uses only the new bytes of that client’s own log, whether Factorio appends or replaces the file. This is a read-only runtime-query route, not a cable-production qualification.
 
-The [current-candidate API-client selection](../../profiles/library-api-consumers-current-standalone-f210-2123.json) separately pins the `575e`/`ba8` player tree and F210 archive `A8D0A459`, retaining the same standalone 2.1.23 engine, observer, two consumers and Base-only protocol. Its exact archive hashes are independent of the [earlier D5/2ABA selection](../../profiles/library-api-consumers-standalone-f210-2123.json), which remains unchanged. This is prepared input, not a current native result: the selected package still requires its actual two-client initial/rejoin/restart, laboratory, saved-state and rendered-view observations. Neither selection enables Space Age or qualifies its client behavior; the 7168 MiB session budget remains an admission estimate rather than a measured peak.
+The [retained A8 API-client selection](../../profiles/library-api-consumers-current-standalone-f210-2123.json) separately pins the `575e`/`ba8` player tree and F210 archive `A8D0A459`, retaining the same standalone 2.1.23 engine, observer, two consumers and Base-only protocol. Its exact archive hashes are independent of the [earlier D5/2ABA selection](../../profiles/library-api-consumers-standalone-f210-2123.json), which remains unchanged. The [A8 Base and Space Age native chain](../../../spec/evidence/library-api-575e-native-chain-r01.json) records the actual two-client initial/rejoin/restart, laboratory, saved-state and rendered-view observations for its frozen controllers. Those results retain source `575e` / player tree `5ba` and do not qualify the later private-credit Library correction. Neither Base selection enables Space Age; the 7168 MiB session budget remains an admission estimate rather than a measured peak.
 
 From the reviewed frozen checkout, the native owner supplies its existing direct `$ArchiveLibrary` and verified standalone `$FactorioBin` paths, then runs this typed invocation with a fresh output directory. The library must supply the selection's exact current MIR, observer and consumer archives through the existing owned-slot custody workflow; preserve and restore any previous archive slot as well as the runner-owned mod-list/settings controls. The wrapper does not select a different MIR package on the owner's behalf. The explicit 7168 MiB argument is required; the wrapper's generic 8192 MiB default is not this selection's budget.
 
@@ -30,7 +30,7 @@ $apiSession = @{
 .\tools\Invoke-MultiplayerFixture.ps1 @apiSession
 ```
 
-The distinct [current-candidate Space Age API-client selection](../../profiles/library-api-consumers-current-space-age-standalone-f210-2123.json) uses the same A8 MIR archive, standalone engine, observer and consumers, with Library fixture metadata 0.2.0. Its exact ten-mod closure adds `elevated-rails`, `quality`, `recycler` and `space-age`, all 2.1.23. Missing or extra mods, changed versions, crossed Base/Space Age markers and the beta physical-production fixture are rejected. The Base fixture remains 0.1.0; its frozen selections and earlier receipts remain separate inputs.
+The distinct [retained A8 Space Age API-client selection](../../profiles/library-api-consumers-current-space-age-standalone-f210-2123.json) uses the same A8 MIR archive, standalone engine, observer and consumers, with Library fixture metadata 0.2.0. Its exact ten-mod closure adds `elevated-rails`, `quality`, `recycler` and `space-age`, all 2.1.23. Missing or extra mods, changed versions, crossed Base/Space Age markers and the beta physical-production fixture are rejected. The Base fixture remains 0.1.0; its frozen selections and earlier receipts remain separate inputs.
 
 Use the same direct-library custody prerequisites above and a fresh output directory for this separate invocation. Its explicit 8192 MiB admission budget must agree with the profile and session. Clients use 1280×720 low-graphics functional rendering (`--force-graphics-preset low --video-memory-usage low`). Neither that budget nor successful host controls establish a measured peak, graphical acceptance or performance result.
 
@@ -53,6 +53,34 @@ $spaceAgeApiSession = @{
 }
 .\tools\Invoke-MultiplayerFixture.ps1 @spaceAgeApiSession
 ```
+
+The new private-credit selections pin source `8260bc8f` / player tree `50583733` and F210 archive `005D4206`, with fixture 0.3.0 on the same standalone 2.1.23 engine and independent API consumers. The [Base selection](../../profiles/library-api-consumers-private-credits-standalone-f210-2123.json) admits exactly six mods and 7168 MiB; the [Space Age selection](../../profiles/library-api-consumers-private-credits-space-age-standalone-f210-2123.json) admits exactly ten mods and 8192 MiB. Space Age retains low-graphics 1280×720 functional rendering. These are prepared inputs without native acceptance; the new mode is separate from the completed A8 runs above.
+
+After all four profiler observations and the 60-tick host-restart screenshot grace, fixture 0.3 uses only the public browser interface to search each of the four exact private credit IDs in All and External for both connected clients. Before its private queries, each client must see selected, enabled Gear research in All and native Automation in External, preventing an empty scope from passing the exclusion check. The private queries require empty result/detail views and disabled native-open actions. The probe compares native research/queue/effects, each holder's level/researched/enabled/visibility fields and Automation's native state before and after, then restores both personal views and their MIR family filter. It reads no MIR storage, imports no MIR module and grants no research. The probe adds no profiler samples, screenshots or timing ticks; its native GUI-state assertions are separate from rendered PNG evidence. Only the completed marker contains its typed `private_credit_visibility` witness.
+
+Use the same direct-library archive-slot custody and restoration requirements above, with the exact new MIR package and a fresh output directory. This Base invocation requires 7168 MiB explicitly:
+
+```powershell
+$privateApiSession = @{
+  ArchiveLibrary = $ArchiveLibrary
+  FactorioBin = $FactorioBin
+  ProfilePath = 'tests/profiles/library-api-consumers-private-credits-standalone-f210-2123.json'
+  FixtureSources = [string[]]@(
+    'tests/fixtures/library-multiplayer'
+    'tests/fixtures/active-mods-observer'
+    'tests/fixtures/api-alpha'
+    'tests/fixtures/api-beta'
+  )
+  ExpectedMIRArchiveSha256 = '005D420671270306155CB4AC25E9CF77541202DFA16B206DCC016237619C9AA2'
+  OutputRoot = 'build/tmp/library-api-private-credits-005d-base-r01'
+  FixtureCase = 'library-multiplayer'
+  SessionExpectedPeakMemoryMiB = 7168
+  RepoRoot = (Resolve-Path '.').Path
+}
+.\tools\Invoke-MultiplayerFixture.ps1 @privateApiSession
+```
+
+For the separate Space Age run, select `tests/profiles/library-api-consumers-private-credits-space-age-standalone-f210-2123.json`, set `SessionExpectedPeakMemoryMiB = 8192`, and choose a fresh Space Age output directory. Keep the four fixture source directories and 005D MIR hash. Both budgets are admission ceilings, not measured peaks; the wrapper rejects mismatched profile, package or budget before launching the session.
 
 The four latency observations are emitted directly to each executing process's native log as `[MIR5_LIBRARY_PROFILE] first_open`, `search`, `refresh` and `reopen`, followed by the engine-rendered profiler. Saved state and JSON witnesses contain only deterministic completion flags for those labels. Read the actual native log records to qualify timings; flags, profiler object identities and host mocks are not measured latency. No profiler value selects a gameplay or fixture-state transition.
 
