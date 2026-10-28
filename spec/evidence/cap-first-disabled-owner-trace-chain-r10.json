@@ -1,0 +1,584 @@
+{
+  "schema": 1,
+  "kind": "MIRCapFirstDisabledOwnerTraceNativeChainV1",
+  "status": "initial-disabled-visibility-only-import-becomes-negative-ownership",
+  "scope": "Requested first disabled81AF→F210 trace only. A separately hashed private MIR copy adds read/log calls to lifecycle.lua; reverse reconstruction and218 other payloads verified. A separately hashed private0.6 fixture stops explicitly after every original first-tick assertion and initialmarker,before save. Actual raw fixture verdict isfailed/intentional diagnostic stop,not005D acceptance. No canonical player/fixture change,lab/save/reload or reenable repair.",
+  "controller_commit": "54bce939a557fe1fe8a9ec0299f3c94ad44e1181",
+  "baseline_mir_sha256": "005D420671270306155CB4AC25E9CF77541202DFA16B206DCC016237619C9AA2",
+  "instrumented_mir_sha256": "BAFBE3FD34A5AD7D694D531E066EEEAC4AE30A60AED5769DBEB0828F1367A9F8",
+  "instrumented_fixture_sha256": "44EDCA7656C0B73366EC699B95787929F9DCC94A5007CA9625472F99BD8993BD",
+  "engine_sha256": "8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38",
+  "source_save": {
+    "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\cap-473-current7a2-r02-controller\\native-published\\write-data\\saves\\mir5-native-complete.zip",
+    "sha256": "81AFD312CB2391C7B0CF92C82CD022F93751E9E3FC99D181795078FC9651E4F9"
+  },
+  "packet_sha256": "AFA0432F68FA72F44A8A13F45847629117BB45D06738F50E412BBCC6B3AE4688",
+  "caller_sha256": "AC4E9BAB790A57D14BDB9AC108FFABA408CE6744044D8AE3B6070178B8152C17",
+  "actual_raw_result_sha256": "D4CC52F5FE5BDB36A0CD7A189D9AEC0D0993267C4D999C1377050099C918AA0D",
+  "event": {
+    "mir_mod_change": {
+      "old_version": "4.7.20003",
+      "new_version": "5.0.21000"
+    },
+    "fixture_mod_change": {
+      "old_version": "0.4.0",
+      "new_version": "0.6.0"
+    },
+    "startup_settings_changed": {
+      "present": false,
+      "kind": "nil"
+    }
+  },
+  "selected_observations": [
+    {
+      "stage": "before-import",
+      "context": "more-infinite-research",
+      "current": {
+        "mir_caps_present": false,
+        "schema": {
+          "present": false,
+          "kind": "nil"
+        },
+        "legacy_caps_checked": {
+          "present": false,
+          "kind": "nil"
+        },
+        "legacy_bucket_present": true,
+        "policy_version": {
+          "present": true,
+          "kind": "number",
+          "value": 3
+        },
+        "managed_gear": {
+          "present": true,
+          "kind": "table",
+          "value": {
+            "source": "generated-stream",
+            "operation": "runtime-settings-transport",
+            "setting": "ips-max-level-research_gears",
+            "selected": 2,
+            "policy_transport": "settings-derived-v3",
+            "ownership_kind": "settings-derived-v3",
+            "native_finite_stage": false,
+            "legacy": false
+          }
+        },
+        "player": {
+          "force_index": 1,
+          "owned_disabled": {
+            "present": false,
+            "kind": "nil"
+          },
+          "disabled_by_cap": {
+            "present": true,
+            "kind": "table",
+            "value": {
+              "policy_version": 3,
+              "force_index": 1,
+              "cap": 2,
+              "ownership_key": "nil\u0000ips-max-level-research_gears\u0000generated-stream\u0000runtime-settings-transport",
+              "ownership_kind": "settings-derived-v3",
+              "enabled_before_cap": true
+            }
+          },
+          "visibility_by_cap": {
+            "present": true,
+            "kind": "table",
+            "value": {
+              "policy_version": 3,
+              "force_index": 1,
+              "ownership_key": "nil\u0000ips-max-level-research_gears\u0000generated-stream\u0000runtime-settings-transport",
+              "ownership_kind": "settings-derived-v3",
+              "value": true
+            }
+          },
+          "unowned_disabled_by_cap": {
+            "present": false,
+            "kind": "nil"
+          }
+        },
+        "foreign": {
+          "force_index": 4,
+          "owned_disabled": {
+            "present": false,
+            "kind": "nil"
+          },
+          "disabled_by_cap": {
+            "present": false,
+            "kind": "nil"
+          },
+          "visibility_by_cap": {
+            "present": false,
+            "kind": "nil"
+          },
+          "unowned_disabled_by_cap": {
+            "present": false,
+            "kind": "nil"
+          }
+        }
+      },
+      "player_native": {
+        "force_index": 1,
+        "enabled": true,
+        "prototype_enabled": false,
+        "visible_when_disabled": true,
+        "level": 3,
+        "researched": false,
+        "saved_progress": 0.27
+      },
+      "foreign_native": {
+        "force_index": 4,
+        "enabled": false,
+        "prototype_enabled": false,
+        "visible_when_disabled": false,
+        "level": 1,
+        "researched": false,
+        "saved_progress": 0
+      },
+      "selected_force": false,
+      "decoded_gear": {
+        "present": false,
+        "kind": "nil"
+      },
+      "family_setting": false,
+      "mir_mod_change": {
+        "old_version": "4.7.20003",
+        "new_version": "5.0.21000"
+      },
+      "fixture_mod_change": {
+        "old_version": "0.4.0",
+        "new_version": "0.6.0"
+      },
+      "startup_settings_changed": {
+        "present": false,
+        "kind": "nil"
+      }
+    },
+    {
+      "stage": "f200-decoder-before-merge",
+      "context": "more-infinite-research",
+      "current": {
+        "mir_caps_present": true,
+        "schema": {
+          "present": true,
+          "kind": "number",
+          "value": 1
+        },
+        "legacy_caps_checked": {
+          "present": true,
+          "kind": "boolean",
+          "value": true
+        },
+        "legacy_bucket_present": true,
+        "policy_version": {
+          "present": true,
+          "kind": "number",
+          "value": 3
+        },
+        "managed_gear": {
+          "present": true,
+          "kind": "table",
+          "value": {
+            "source": "generated-stream",
+            "operation": "runtime-settings-transport",
+            "setting": "ips-max-level-research_gears",
+            "selected": 2,
+            "policy_transport": "settings-derived-v3",
+            "ownership_kind": "settings-derived-v3",
+            "native_finite_stage": false,
+            "legacy": false
+          }
+        },
+        "player": {
+          "force_index": 1,
+          "owned_disabled": {
+            "present": false,
+            "kind": "nil"
+          },
+          "disabled_by_cap": {
+            "present": true,
+            "kind": "table",
+            "value": {
+              "policy_version": 3,
+              "force_index": 1,
+              "cap": 2,
+              "ownership_key": "nil\u0000ips-max-level-research_gears\u0000generated-stream\u0000runtime-settings-transport",
+              "ownership_kind": "settings-derived-v3",
+              "enabled_before_cap": true
+            }
+          },
+          "visibility_by_cap": {
+            "present": true,
+            "kind": "table",
+            "value": {
+              "policy_version": 3,
+              "force_index": 1,
+              "ownership_key": "nil\u0000ips-max-level-research_gears\u0000generated-stream\u0000runtime-settings-transport",
+              "ownership_kind": "settings-derived-v3",
+              "value": true
+            }
+          },
+          "unowned_disabled_by_cap": {
+            "present": false,
+            "kind": "nil"
+          }
+        },
+        "foreign": {
+          "force_index": 4,
+          "owned_disabled": {
+            "present": false,
+            "kind": "nil"
+          },
+          "disabled_by_cap": {
+            "present": false,
+            "kind": "nil"
+          },
+          "visibility_by_cap": {
+            "present": false,
+            "kind": "nil"
+          },
+          "unowned_disabled_by_cap": {
+            "present": false,
+            "kind": "nil"
+          }
+        }
+      },
+      "player_native": {
+        "force_index": 1,
+        "enabled": true,
+        "prototype_enabled": false,
+        "visible_when_disabled": true,
+        "level": 3,
+        "researched": false,
+        "saved_progress": 0.27
+      },
+      "foreign_native": {
+        "force_index": 4,
+        "enabled": false,
+        "prototype_enabled": false,
+        "visible_when_disabled": false,
+        "level": 1,
+        "researched": false,
+        "saved_progress": 0
+      },
+      "selected_force": 1,
+      "decoded_gear": {
+        "present": true,
+        "kind": "table",
+        "value": {
+          "visible_when_disabled": true
+        }
+      },
+      "family_setting": false,
+      "mir_mod_change": {
+        "old_version": "4.7.20003",
+        "new_version": "5.0.21000"
+      },
+      "fixture_mod_change": {
+        "old_version": "0.4.0",
+        "new_version": "0.6.0"
+      },
+      "startup_settings_changed": {
+        "present": false,
+        "kind": "nil"
+      }
+    },
+    {
+      "stage": "after-import-before-reconcile",
+      "context": "more-infinite-research",
+      "current": {
+        "mir_caps_present": true,
+        "schema": {
+          "present": true,
+          "kind": "number",
+          "value": 1
+        },
+        "legacy_caps_checked": {
+          "present": true,
+          "kind": "boolean",
+          "value": true
+        },
+        "legacy_bucket_present": true,
+        "policy_version": {
+          "present": true,
+          "kind": "number",
+          "value": 3
+        },
+        "managed_gear": {
+          "present": true,
+          "kind": "table",
+          "value": {
+            "source": "generated-stream",
+            "operation": "runtime-settings-transport",
+            "setting": "ips-max-level-research_gears",
+            "selected": 2,
+            "policy_transport": "settings-derived-v3",
+            "ownership_kind": "settings-derived-v3",
+            "native_finite_stage": false,
+            "legacy": false
+          }
+        },
+        "player": {
+          "force_index": 1,
+          "owned_disabled": {
+            "present": true,
+            "kind": "table",
+            "value": {
+              "visible_when_disabled": true
+            }
+          },
+          "disabled_by_cap": {
+            "present": true,
+            "kind": "table",
+            "value": {
+              "policy_version": 3,
+              "force_index": 1,
+              "cap": 2,
+              "ownership_key": "nil\u0000ips-max-level-research_gears\u0000generated-stream\u0000runtime-settings-transport",
+              "ownership_kind": "settings-derived-v3",
+              "enabled_before_cap": true
+            }
+          },
+          "visibility_by_cap": {
+            "present": true,
+            "kind": "table",
+            "value": {
+              "policy_version": 3,
+              "force_index": 1,
+              "ownership_key": "nil\u0000ips-max-level-research_gears\u0000generated-stream\u0000runtime-settings-transport",
+              "ownership_kind": "settings-derived-v3",
+              "value": true
+            }
+          },
+          "unowned_disabled_by_cap": {
+            "present": false,
+            "kind": "nil"
+          }
+        },
+        "foreign": {
+          "force_index": 4,
+          "owned_disabled": {
+            "present": false,
+            "kind": "nil"
+          },
+          "disabled_by_cap": {
+            "present": false,
+            "kind": "nil"
+          },
+          "visibility_by_cap": {
+            "present": false,
+            "kind": "nil"
+          },
+          "unowned_disabled_by_cap": {
+            "present": false,
+            "kind": "nil"
+          }
+        }
+      },
+      "player_native": {
+        "force_index": 1,
+        "enabled": true,
+        "prototype_enabled": false,
+        "visible_when_disabled": true,
+        "level": 3,
+        "researched": false,
+        "saved_progress": 0.27
+      },
+      "foreign_native": {
+        "force_index": 4,
+        "enabled": false,
+        "prototype_enabled": false,
+        "visible_when_disabled": false,
+        "level": 1,
+        "researched": false,
+        "saved_progress": 0
+      },
+      "selected_force": false,
+      "decoded_gear": {
+        "present": false,
+        "kind": "nil"
+      },
+      "family_setting": false,
+      "mir_mod_change": {
+        "old_version": "4.7.20003",
+        "new_version": "5.0.21000"
+      },
+      "fixture_mod_change": {
+        "old_version": "0.4.0",
+        "new_version": "0.6.0"
+      },
+      "startup_settings_changed": {
+        "present": false,
+        "kind": "nil"
+      }
+    },
+    {
+      "stage": "after-reconcile",
+      "context": "more-infinite-research",
+      "current": {
+        "mir_caps_present": true,
+        "schema": {
+          "present": true,
+          "kind": "number",
+          "value": 1
+        },
+        "legacy_caps_checked": {
+          "present": true,
+          "kind": "boolean",
+          "value": true
+        },
+        "legacy_bucket_present": true,
+        "policy_version": {
+          "present": true,
+          "kind": "number",
+          "value": 3
+        },
+        "managed_gear": {
+          "present": true,
+          "kind": "table",
+          "value": {
+            "source": "generated-stream",
+            "operation": "runtime-settings-transport",
+            "setting": "ips-max-level-research_gears",
+            "selected": 2,
+            "policy_transport": "settings-derived-v3",
+            "ownership_kind": "settings-derived-v3",
+            "native_finite_stage": false,
+            "legacy": false
+          }
+        },
+        "player": {
+          "force_index": 1,
+          "owned_disabled": {
+            "present": true,
+            "kind": "table",
+            "value": {
+              "visible_when_disabled": true,
+              "disabled": false
+            }
+          },
+          "disabled_by_cap": {
+            "present": true,
+            "kind": "table",
+            "value": {
+              "policy_version": 3,
+              "force_index": 1,
+              "cap": 2,
+              "ownership_key": "nil\u0000ips-max-level-research_gears\u0000generated-stream\u0000runtime-settings-transport",
+              "ownership_kind": "settings-derived-v3",
+              "enabled_before_cap": true
+            }
+          },
+          "visibility_by_cap": {
+            "present": true,
+            "kind": "table",
+            "value": {
+              "policy_version": 3,
+              "force_index": 1,
+              "ownership_key": "nil\u0000ips-max-level-research_gears\u0000generated-stream\u0000runtime-settings-transport",
+              "ownership_kind": "settings-derived-v3",
+              "value": true
+            }
+          },
+          "unowned_disabled_by_cap": {
+            "present": false,
+            "kind": "nil"
+          }
+        },
+        "foreign": {
+          "force_index": 4,
+          "owned_disabled": {
+            "present": false,
+            "kind": "nil"
+          },
+          "disabled_by_cap": {
+            "present": false,
+            "kind": "nil"
+          },
+          "visibility_by_cap": {
+            "present": false,
+            "kind": "nil"
+          },
+          "unowned_disabled_by_cap": {
+            "present": false,
+            "kind": "nil"
+          }
+        }
+      },
+      "player_native": {
+        "force_index": 1,
+        "enabled": false,
+        "prototype_enabled": false,
+        "visible_when_disabled": true,
+        "level": 3,
+        "researched": false,
+        "saved_progress": 0.27
+      },
+      "foreign_native": {
+        "force_index": 4,
+        "enabled": false,
+        "prototype_enabled": false,
+        "visible_when_disabled": false,
+        "level": 1,
+        "researched": false,
+        "saved_progress": 0
+      },
+      "selected_force": false,
+      "decoded_gear": {
+        "present": false,
+        "kind": "nil"
+      },
+      "family_setting": false,
+      "mir_mod_change": {
+        "old_version": "4.7.20003",
+        "new_version": "5.0.21000"
+      },
+      "fixture_mod_change": {
+        "old_version": "0.4.0",
+        "new_version": "0.6.0"
+      },
+      "startup_settings_changed": {
+        "present": false,
+        "kind": "nil"
+      }
+    }
+  ],
+  "diagnosis": "Actual first entry is native enabledtrue/prototypefalse with no current row and exact positive legacyV3 rights. The admitted exceptional decoder returns only visibility; authored prototype disablement subsequently treats that newly imported visibility-only row as negative ownership while writing enabledtrue→false. The later persisted DBF98 negative is therefore created at the first disabled hop. Do not override an existing currentfalse using old ledger rights on reenable.",
+  "read_only_patch": {
+    "path": "read-only-patch.json",
+    "sha256": "16E4FFD045F0FD388B0E8E034DE63BD932B924D5C9A3BDDEDA851DACB608E16A",
+    "changed_member": "more-infinite-research_5.0.21000/runtime/lifecycle.lua",
+    "other_payloads_equal": 218,
+    "reverse_reconstructs_baseline": true
+  },
+  "fixture_stop_patch": {
+    "path": "fixture-stop-patch.json",
+    "sha256": "3B4B10A8ADBB8E88B4470EEF695A49742D54F95EAB56C10034D1DC234E79B5FC",
+    "original_first_tick_assertions_and_marker_unchanged": true,
+    "no_save": true
+  },
+  "root_readback": {
+    "path": "build/qualification/cap-first-disabled-owner-trace-r10-controller/root-readback-r01.json",
+    "sha256": "D2CA51B7F850937521D8280FF52FDB65AF2D0151D292CADAE7763C734DBB60D0",
+    "files": 8,
+    "bytes_per_copy": 105085
+  },
+  "lossless_receipts": {
+    "path": "spec/evidence/cap-first-disabled-owner-trace-receipts-r10.json.gz",
+    "sha256": "0B459F96E0E5E93B34CCE289BF3D05A86348D0EE1ADCEFAC6A506D4F31375BF6",
+    "bytes": 19148,
+    "records": 7
+  },
+  "prior_refusal": {
+    "stage": "R09",
+    "actual_processes": 0,
+    "reason": "Profile retained original0.6 fixture hash after private stop instrumentation. R10 explicitly pins44ED. Original packet/caller/terminal/restoration retained; no native result invented."
+  },
+  "counts": {
+    "actual_processes": 1,
+    "labs": 0,
+    "saves": 0,
+    "cold_reloads": 0
+  },
+  "remaining": "Aero smallest source/host correction preserving currentfalse,foreign rights,science-policy opponents; then qualify affected fresh disabled+reenabled stages from unchanged81AF. Preserve existingDBF98/adverses and original005D results."
+}
