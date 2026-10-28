@@ -1,0 +1,38 @@
+{
+  "schema": 1,
+  "kind": "mir5-migration-origin-direct-successor-prepared",
+  "origin_tag": "1.2.0",
+  "origin_source_commit": "b80413b2aa225529a236b7b00a7cee9420af65bc",
+  "source_fixture_commit": "e26bb227bf46f626964d1f3bfe272a6b36832c4d",
+  "source_fixture_controller_commit": "2eb20527ce3063fde0c7151985a021afc29bf7ca",
+  "successor_fixture_commit": "a715adbe89468ba6d6a88526920d2d93af611244",
+  "target": "f200",
+  "factorio_line": "2.0",
+  "engine": {
+    "version": "2.0.77",
+    "sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B"
+  },
+  "settings_mode": "Defaults",
+  "source_save": {
+    "sha256": "FDC9BA445B17716CAE7C021959B9B3BF4E1C7EE9F6485AA76DBCC59D70101CAC",
+    "bytes": 817810,
+    "source_result_sha256": "C7FE9F69963FFCF27686A4F0C0E5F2C79079BCD4698CF25158997AC00A619E9A"
+  },
+  "candidate": {
+    "source_commit": "f0dd9f62adc8bf0a8eaaf9babc1fcfef9f3241ea",
+    "player_tree": "0229b2bb3ad0c514fc4dca18c32fd544b9ba7d72",
+    "package_root": "build/packages/f0dd9f62-root-r01"
+  },
+  "mods": [
+    {"name": "base", "version": "2.0.77", "enabled": true},
+    {"name": "mir-fixture-mir5-active-mods-observer", "version": "0.1.0", "enabled": true},
+    {"name": "more-infinite-research", "version": "5.0.20000", "enabled": true},
+    {"name": "mir-fixture-mir5-migration-origin-f200-120-source", "version": "0.3.0", "enabled": true}
+  ],
+  "archive_sha256": {
+    "mir-fixture-mir5-active-mods-observer_0.1.0.zip": "723D1E7721449FC26040E5E6629416767BDC20AD79CF8723115846DB662A1F87",
+    "mir-fixture-mir5-migration-origin-f200-120-source_0.3.0.zip": "FE670CD6DE44FE3164F65C9D7A1702483E4A7EC2D59351519169B63A4BA4F078",
+    "more-infinite-research_5.0.20000.zip": "20A200883EFB29F8D216EA408C688F1862C80612D536DCD4FCDDC1E47768541D"
+  },
+  "scope": "Prepared direct published MIR 1.2.0 F200-to-current F200 Base successor using the same passed protected R06 source save as the F210 arm. It is prepared only; no F200 native assignment is selected. Its preservation checks and one-real-lab/save/reload protocol are identical in purpose to the F210 arm, while its engine and observer bindings remain exact F200 inputs."
+}

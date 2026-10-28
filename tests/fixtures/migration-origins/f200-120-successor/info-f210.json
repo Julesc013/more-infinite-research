@@ -1,0 +1,12 @@
+{
+  "name": "mir-fixture-mir5-migration-origin-f200-120-source",
+  "version": "0.2.0",
+  "title": "MIR 1.2.0 F200 direct F210 successor",
+  "author": "MIR maintainers",
+  "description": "Private observer of the protected published MIR 1.2.0 F200 source save under MIR5 F210 Base.",
+  "factorio_version": "2.1",
+  "dependencies": [
+    "base = 2.1.23",
+    "more-infinite-research = 5.0.21000"
+  ]
+}

@@ -1,0 +1,38 @@
+{
+  "schema": 1,
+  "kind": "mir5-migration-origin-direct-successor-prepared",
+  "origin_tag": "1.2.0",
+  "origin_source_commit": "b80413b2aa225529a236b7b00a7cee9420af65bc",
+  "source_fixture_commit": "e26bb227bf46f626964d1f3bfe272a6b36832c4d",
+  "source_fixture_controller_commit": "2eb20527ce3063fde0c7151985a021afc29bf7ca",
+  "successor_fixture_commit": "a715adbe89468ba6d6a88526920d2d93af611244",
+  "target": "f210",
+  "factorio_line": "2.1",
+  "engine": {
+    "version": "2.1.23",
+    "sha256": "FE4A1DA30F322A0D0B8AEB3DF7276332222BAAA143E2352569B723E84B2B9060"
+  },
+  "settings_mode": "Defaults",
+  "source_save": {
+    "sha256": "FDC9BA445B17716CAE7C021959B9B3BF4E1C7EE9F6485AA76DBCC59D70101CAC",
+    "bytes": 817810,
+    "source_result_sha256": "C7FE9F69963FFCF27686A4F0C0E5F2C79079BCD4698CF25158997AC00A619E9A"
+  },
+  "candidate": {
+    "source_commit": "f0dd9f62adc8bf0a8eaaf9babc1fcfef9f3241ea",
+    "player_tree": "0229b2bb3ad0c514fc4dca18c32fd544b9ba7d72",
+    "package_root": "build/packages/f0dd9f62-root-r01"
+  },
+  "mods": [
+    {"name": "base", "version": "2.1.23", "enabled": true},
+    {"name": "mir-fixture-mir5-active-mods-observer", "version": "0.1.0", "enabled": true},
+    {"name": "more-infinite-research", "version": "5.0.21000", "enabled": true},
+    {"name": "mir-fixture-mir5-migration-origin-f200-120-source", "version": "0.2.0", "enabled": true}
+  ],
+  "archive_sha256": {
+    "mir-fixture-mir5-active-mods-observer_0.1.0.zip": "A15A7D628D66953D2E0C4D4FA288F47CBF9C5678327C7EB3D23ADB5DC78331C0",
+    "mir-fixture-mir5-migration-origin-f200-120-source_0.2.0.zip": "3E4E51C3E67DFF85A721BAE94D30106D90C9A74DC56387DE89AE48EB2D44AFF3",
+    "more-infinite-research_5.0.21000.zip": "654C57DDCE2E994C1E8DDC4F808198D4FAC7EAB6284B18C4A628E6DA5465DE23"
+  },
+  "scope": "Prepared direct published MIR 1.2.0 F200-to-current F210 Base successor using the passed protected R06 source save. The fixture checks the protected 34-row, recipe, worker-battery, queue and detached state, validates separately pinned current Base finite weapon vectors, and requires the old combined rocket/cannon .1 contribution before its one real current gear laboratory, reset, successor save and two read-only cold reloads. Native execution is pending. This profile does not select a repair, qualify Space Age or arbitrary persisted mod-settings inputs."
+}
