@@ -93,7 +93,7 @@
         "v4.0.0": { "f200": "4.0.20000", "f210": "4.0.21000" },
         "v4.1.0": { "f200": "4.1.20000", "f210": "4.1.21000" },
         "v4.2.0-rc.1": { "f200": "4.2.20000", "f210": "4.2.21000" },
-        "v4.2.0-stable": { "f200": "4.2.20000", "f210": "4.2.20000" },
+        "v4.2.0-stable": { "f200": "4.2.20000", "f210": "4.2.21000" },
         "v4.2.1": { "f200": "4.2.20001", "f210": "4.2.21001" },
         "v4.2.2": { "f200": "4.2.20002", "f210": "4.2.21002" },
         "v4.3.0": { "f200": "4.3.20000", "f210": "4.3.21000" },
@@ -126,7 +126,7 @@
         "4.7.20002",
         "4.7.20003"
       ],
-      "v4_2_stable_f210_version_exception": "The archive named more-infinite-research_4.2.21000.zip retains its original expected digest and filename, but its actual info.json version is 4.2.20000. This is an observed archive identity, not a filename correction.",
+      "v4_2_stable_f210_version_exception": "The earlier eight-archive receipt reported4.2.20000 for F210, but independent Python/.NET reads of the same DE45F114 archive prove its sole info.json is4.2.21000. Preserve that receipt as contradicted on this field; no actual published codec collision is established. See spec/evidence/f210-420-exact-info-correction-r01.json.",
       "limits": "Only archive bytes, sole info.json and sole maximum_level_control.lua were inspected. This does not qualify source saves, settings, migration state, current reader behavior or native upgrades."
     }
   },
@@ -3752,8 +3752,8 @@
         {
           "boundary": "Structured-V3 cap ownership and F200/F210 label collision",
           "status": "needs-correction",
-          "problem": "The exact published4.4.20000/29D85A53 sourceCE8F and both current0822/D3 F200 and1246/8DC F210 gear successors now pass actual newlabs/save/two cold reloads. Earlier representative is qualified at those exact inputs; native worker-tail and actual F2104.2 mislabeled-source boundaries remain unqualified.",
-          "next_action": "Reuse the named4.4 source and successors under original identities; no source recreation or every-label campaign. Prepare the still-distinct native worker-tail and F2104.2 actual mislabeled-source cases,retain current-literal-false ownership opponents and resolve the separate enabled finitecap defect. Review final changed consumed paths underVER-06.",
+          "problem": "Exact published4.4 sourceCE8F and both current0822/D3 and1246/8DC gear successors pass actual newlabs/save/two cold reloads. Native worker-tail boundaries remain unqualified. The supposed published F2104.2 label collision is disproved by the exact archive metadata correction; it is not an unrun native requirement.",
+          "next_action": "Reuse named4.4 source and both successors under original identities. Qualify the distinct actual native worker-tail boundary and the adjacent first-enabled finitecap correction. Preserve current-negative/per-row/foreign defenses and defensive synthetic collision controls. The DE45F114 F2104.2 archive is actually4.2.21000; do not fabricate a mislabeled source or rerun every patch label.",
           "evidence": [
             {
               "path": "spec/evidence/historical-structured-cap-archive-metadata.json",
@@ -3770,8 +3770,17 @@
             {
               "path": "spec/evidence/v3-440-cap-current-successors-native-chain-r02.json",
               "scope": "Named earlier-V3 gear same/forward-engine routes pass; no worker or F2104.2 label-collision claim."
+            },
+            {
+              "path": "spec/evidence/f210-420-exact-info-correction-r01.json",
+              "scope": "Exact archive/raw info/Python/.NET correction; supposed published F2104.2 label-collision case is not applicable."
             }
-          ]
+          ],
+          "label_collision_disposition": {
+            "status": "not-applicable-for-the-exact-published-archive",
+            "evidence": "spec/evidence/f210-420-exact-info-correction-r01.json",
+            "reason": "DE45F114 actual sole info version4.2.21000 contradicts the older receipt field. Keep synthetic host defenses; no falsified source or native collision campaign."
+          }
         },
         {
           "boundary": "MIR3.2 researched discovery and foreign locks",
