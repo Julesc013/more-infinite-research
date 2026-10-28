@@ -396,6 +396,17 @@ function ConvertTo-HistoricalTransitionFixtureTargetLiteral($Fixture) {
   $lines.Add('}')
   ($lines -join "`n")+"`n"
 }
+function ConvertTo-HistoricalTransitionFixtureInfo($Fixture) {
+  $info=[ordered]@{
+    name=[string]$Fixture.name
+    version=[string]$Fixture.version
+    title='MIR historical transition fixture'
+    author='MIR maintainers'
+    factorio_version=[string]$Fixture.factorio_version
+    dependencies=@(('base >= '+[string]$Fixture.minimum_base),('more-infinite-research = '+[string]$Fixture.mir_version))
+  }
+  (($info|ConvertTo-Json -Depth 3)-replace "`r`n","`n")+"`n"
+}
 function Assert-HistoricalTransitionFixtureArchive([string]$Archive,[string]$SourceDirectory,$Fixture) {
   Assert-Fixture (Test-Path -LiteralPath $Archive -PathType Leaf) "historical transition fixture archive is absent: $Archive"
   $source=(Resolve-Path -LiteralPath $SourceDirectory).Path
@@ -426,6 +437,9 @@ function Assert-HistoricalTransitionFixtureArchive([string]$Archive,[string]$Sou
     $reader=[IO.StreamReader]::new($infoEntry.Open());try{$info=$reader.ReadToEnd()|ConvertFrom-Json -AsHashtable}finally{$reader.Dispose()}
     Assert-Fixture ([string]$info.name -ceq $expectedInfo.name -and [string]$info.version -ceq $expectedInfo.version -and [string]$info.factorio_version -ceq $expectedInfo.factorio_version) 'historical transition fixture info identity differs'
     Assert-Fixture ((@($info.dependencies) -join "`n") -ceq ($expectedInfo.dependencies -join "`n")) 'historical transition fixture dependencies differ'
+    foreach($field in @('title','author')){
+      Assert-Fixture ($info.ContainsKey($field) -and $info[$field] -is [string] -and -not [string]::IsNullOrWhiteSpace($info[$field])) "historical transition fixture info $field differs"
+    }
   } finally {$zip.Dispose()}
 }
 function New-HistoricalFixtureServerSettings([string]$Path,[string]$EngineData,[string]$FactorioVersion) {

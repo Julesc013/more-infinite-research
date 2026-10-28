@@ -81,6 +81,7 @@ class HistoricalTransitionFixtureControls(unittest.TestCase):
         source = RUNNER.read_text(encoding="utf-8")
         self.assertIn("[ValidateSet('','published','mir5')][string]$HistoricalTransitionStage=''", source)
         self.assertIn("Get-HistoricalTransitionFixtureTarget", source)
+        self.assertIn("ConvertTo-HistoricalTransitionFixtureInfo", source)
         self.assertIn("Assert-HistoricalTransitionFixtureArchive", source)
         self.assertIn("published historical transition must create a fresh predecessor save", source)
         self.assertIn("MIR5 historical transition requires an immutable predecessor save hash", source)
@@ -316,6 +317,19 @@ class HistoricalTransitionFixtureControls(unittest.TestCase):
           $ast=[Management.Automation.Language.Parser]::ParseFile($env:MIR_TEST_RUNNER,[ref]$tokens,[ref]$errors)
           if($errors.Count){throw 'parse failed'}
           foreach($name in @('Assert-Fixture','Get-FixtureSha','Get-HistoricalTransitionFixtureTarget',
+            'ConvertTo-HistoricalTransitionFixtureTargetLiteral','ConvertTo-HistoricalTransitionFixtureInfo','Assert-HistoricalTransitionFixtureArchive')){
+            $node=@($ast.FindAll({param($n) $n -is [Management.Automation.Language.FunctionDefinitionAst] -and $n.Name -ceq $name},$true))
+            if($node.Count -ne 1){throw ('missing '+$name)}
+            Invoke-Expression $node[0].Extent.Text
+          }
+          $fixture=Get-HistoricalTransitionFixtureTarget -Target f013 -MetadataPath $env:MIR_TEST_METADATA -Stage published
+        '''
+        guard_functions = r'''
+          $ErrorActionPreference='Stop';Set-StrictMode -Version Latest
+          $tokens=$null;$errors=$null
+          $ast=[Management.Automation.Language.Parser]::ParseFile($env:MIR_TEST_RUNNER,[ref]$tokens,[ref]$errors)
+          if($errors.Count){throw 'parse failed'}
+          foreach($name in @('Assert-Fixture','Get-FixtureSha','Get-HistoricalTransitionFixtureTarget',
             'ConvertTo-HistoricalTransitionFixtureTargetLiteral','Assert-HistoricalTransitionFixtureArchive')){
             $node=@($ast.FindAll({param($n) $n -is [Management.Automation.Language.FunctionDefinitionAst] -and $n.Name -ceq $name},$true))
             if($node.Count -ne 1){throw ('missing '+$name)}
@@ -328,35 +342,74 @@ class HistoricalTransitionFixtureControls(unittest.TestCase):
                                  text=True, capture_output=True, check=True,
                                  env=dict(os.environ, MIR_TEST_RUNNER=str(RUNNER),
                                           MIR_TEST_METADATA=str(FIXTURE / "metadata.json"))).stdout.strip() + "\n"
-        info = {
-            "name": self.metadata["name"], "version": self.metadata["version"], "factorio_version": "0.13",
-            "dependencies": ["base >= 0.13.20", "more-infinite-research = 4.7.01302"],
-        }
+        info = json.loads(subprocess.run(
+            ["pwsh", "-NoProfile", "-Command", functions + "ConvertTo-HistoricalTransitionFixtureInfo $fixture"],
+            cwd=ROOT, text=True, capture_output=True, check=True,
+            env=dict(os.environ, MIR_TEST_RUNNER=str(RUNNER), MIR_TEST_METADATA=str(FIXTURE / "metadata.json")),
+        ).stdout)
+        self.assertEqual((info["name"], info["version"], info["factorio_version"], info["dependencies"]),
+                         (self.metadata["name"], self.metadata["version"], "0.13",
+                          ["base >= 0.13.20", "more-infinite-research = 4.7.01302"]))
+        self.assertTrue(all(isinstance(info[field], str) and info[field].strip() for field in ("title", "author")))
         members = {name: (FIXTURE / name).read_bytes() for name in
                    ("control.lua", "settings-updates.lua", "data-final-fixes.lua", "target.lua")}
         members["target-literal.lua"] = literal.encode("utf-8")
         members["info.json"] = json.dumps(info).encode("utf-8")
         with tempfile.TemporaryDirectory(prefix="mir5-historical-transition-archive-") as work:
             root = Path(work)
-            good, wrong = root / "good.zip", root / "wrong.zip"
+            good, alternate, wrong = root / "good.zip", root / "alternate.zip", root / "wrong.zip"
             archive_root = self.metadata["name"] + "_" + self.metadata["version"] + "/"
-            for path, dependency in ((good, info["dependencies"]),
-                                     (wrong, ["base >= 0.13.20", "more-infinite-research = 4.7.01300"])):
+            for path, archive_info in (
+                (good, info),
+                (alternate, dict(info, title="Historical transition fixture", author="MIR test fixture author")),
+                (wrong, dict(info, dependencies=["base >= 0.13.20", "more-infinite-research = 4.7.01300"])),
+            ):
                 payload = dict(members)
-                payload["info.json"] = json.dumps(dict(info, dependencies=dependency)).encode("utf-8")
+                payload["info.json"] = json.dumps(archive_info).encode("utf-8")
                 with zipfile.ZipFile(path, "w") as archive:
                     for name, value in payload.items():
                         archive.writestr(archive_root + name, value)
+            bad_paths = {}
+            for label, archive_info in (
+                ("missing-title", {key: value for key, value in info.items() if key != "title"}),
+                ("blank-title", dict(info, title=" \t")),
+                ("number-title", dict(info, title=1)),
+                ("missing-author", {key: value for key, value in info.items() if key != "author"}),
+                ("blank-author", dict(info, author="")),
+                ("number-author", dict(info, author=1)),
+            ):
+                path = root / f"{label}.zip"
+                payload = dict(members)
+                payload["info.json"] = json.dumps(archive_info).encode("utf-8")
+                with zipfile.ZipFile(path, "w") as archive:
+                    for name, value in payload.items():
+                        archive.writestr(archive_root + name, value)
+                bad_paths[label] = path
             check = r'''
               Assert-HistoricalTransitionFixtureArchive -Archive $env:MIR_TEST_GOOD -SourceDirectory $env:MIR_TEST_SOURCE -Fixture $fixture
+              Assert-HistoricalTransitionFixtureArchive -Archive $env:MIR_TEST_ALTERNATE -SourceDirectory $env:MIR_TEST_SOURCE -Fixture $fixture
               $refused=$false
               try { Assert-HistoricalTransitionFixtureArchive -Archive $env:MIR_TEST_WRONG -SourceDirectory $env:MIR_TEST_SOURCE -Fixture $fixture }
               catch { if($_.Exception.Message -match 'dependencies differ'){$refused=$true}else{throw} }
               if(-not $refused){throw 'wrong stage dependency accepted'}
+              $invalid=@(
+                @{archive=$env:MIR_TEST_MISSING_TITLE;field='title'},@{archive=$env:MIR_TEST_BLANK_TITLE;field='title'},@{archive=$env:MIR_TEST_NUMBER_TITLE;field='title'},
+                @{archive=$env:MIR_TEST_MISSING_AUTHOR;field='author'},@{archive=$env:MIR_TEST_BLANK_AUTHOR;field='author'},@{archive=$env:MIR_TEST_NUMBER_AUTHOR;field='author'}
+              )
+              foreach($case in $invalid){
+                $refused=$false
+                try { Assert-HistoricalTransitionFixtureArchive -Archive $case.archive -SourceDirectory $env:MIR_TEST_SOURCE -Fixture $fixture }
+                catch { if($_.Exception.Message -match ('info '+$case.field+' differs')){$refused=$true}else{throw} }
+                if(-not $refused){throw ('invalid fixture '+$case.field+' accepted')}
+              }
             '''
             env = dict(os.environ, MIR_TEST_RUNNER=str(RUNNER), MIR_TEST_METADATA=str(FIXTURE / "metadata.json"),
-                       MIR_TEST_GOOD=str(good), MIR_TEST_WRONG=str(wrong), MIR_TEST_SOURCE=str(FIXTURE))
-            result = subprocess.run(["pwsh", "-NoProfile", "-Command", functions + check], cwd=ROOT,
+                       MIR_TEST_GOOD=str(good), MIR_TEST_ALTERNATE=str(alternate), MIR_TEST_WRONG=str(wrong),
+                       MIR_TEST_MISSING_TITLE=str(bad_paths["missing-title"]), MIR_TEST_BLANK_TITLE=str(bad_paths["blank-title"]),
+                       MIR_TEST_NUMBER_TITLE=str(bad_paths["number-title"]), MIR_TEST_MISSING_AUTHOR=str(bad_paths["missing-author"]),
+                       MIR_TEST_BLANK_AUTHOR=str(bad_paths["blank-author"]), MIR_TEST_NUMBER_AUTHOR=str(bad_paths["number-author"]),
+                       MIR_TEST_SOURCE=str(FIXTURE))
+            result = subprocess.run(["pwsh", "-NoProfile", "-Command", guard_functions + check], cwd=ROOT,
                                     text=True, capture_output=True, env=env, check=False)
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
 
@@ -367,7 +420,7 @@ class HistoricalTransitionFixtureControls(unittest.TestCase):
           $ast=[Management.Automation.Language.Parser]::ParseFile($env:MIR_TEST_RUNNER,[ref]$tokens,[ref]$errors)
           if($errors.Count){throw 'parse failed'}
           foreach($name in @('Assert-Fixture','Get-FixtureSha','Get-HistoricalTransitionFixtureTarget',
-            'ConvertTo-HistoricalTransitionFixtureTargetLiteral','Assert-HistoricalTransitionFixtureArchive')){
+            'ConvertTo-HistoricalTransitionFixtureTargetLiteral','ConvertTo-HistoricalTransitionFixtureInfo','Assert-HistoricalTransitionFixtureArchive')){
             $node=@($ast.FindAll({param($n) $n -is [Management.Automation.Language.FunctionDefinitionAst] -and $n.Name -ceq $name},$true))
             if($node.Count -ne 1){throw ('missing '+$name)}
             Invoke-Expression $node[0].Extent.Text
@@ -389,12 +442,17 @@ class HistoricalTransitionFixtureControls(unittest.TestCase):
                     cwd=ROOT, text=True, capture_output=True, check=True,
                     env=dict(os.environ, MIR_TEST_RUNNER=str(RUNNER), MIR_TEST_METADATA=str(FIXTURE / "metadata.json")),
                 ).stdout.strip() + "\n").encode("utf-8")
+                info = json.loads(subprocess.run(
+                    ["pwsh", "-NoProfile", "-Command", functions +
+                     f"$fixture=Get-HistoricalTransitionFixtureTarget -Target f018 -MetadataPath $env:MIR_TEST_METADATA -Stage {stage}; ConvertTo-HistoricalTransitionFixtureInfo $fixture"],
+                    cwd=ROOT, text=True, capture_output=True, check=True,
+                    env=dict(os.environ, MIR_TEST_RUNNER=str(RUNNER), MIR_TEST_METADATA=str(FIXTURE / "metadata.json")),
+                ).stdout)
                 payload = dict(members)
                 payload["target-literal.lua"] = literal
-                payload["info.json"] = json.dumps({
-                    "name": self.metadata["name"], "version": self.metadata["version"], "factorio_version": "0.18",
-                    "dependencies": ["base >= 0.18.47", expected_dependency],
-                }).encode("utf-8")
+                expected_stage_dependency = "more-infinite-research = " + ("1.8.0" if stage == "published" else "5.0.01800")
+                self.assertEqual(info["dependencies"], ["base >= 0.18.47", expected_stage_dependency])
+                payload["info.json"] = json.dumps(dict(info, dependencies=["base >= 0.18.47", expected_dependency])).encode("utf-8")
                 archive_root = self.metadata["name"] + "_" + self.metadata["version"] + "/"
                 with zipfile.ZipFile(path, "w") as archive:
                     for name, value in payload.items():

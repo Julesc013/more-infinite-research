@@ -17,7 +17,17 @@ Use the matching published-source profile:
 - [F015 / 0.15.40](../../profiles/historical-transition-473-published-f015.json)
 - [F016 / 0.16.51](../../profiles/historical-transition-473-published-f016.json)
 
-Prepare the existing six-member fixture projection for the selected stage. `Get-HistoricalTransitionFixtureTarget` reads the explicit metadata, and `ConvertTo-HistoricalTransitionFixtureTargetLiteral` supplies `target-literal.lua`. The four shared Lua files remain exact source bytes; `info.json` uses the selected engine family, fixture version and exact stage MIR dependency. The existing `Assert-HistoricalTransitionFixtureArchive` checks all six members, the literal and metadata before admission. Keep each projection and its resulting archive hash separate from earlier runs.
+Prepare the existing six-member fixture projection for the selected stage. `Get-HistoricalTransitionFixtureTarget` reads the explicit metadata, `ConvertTo-HistoricalTransitionFixtureTargetLiteral` supplies `target-literal.lua`, and `ConvertTo-HistoricalTransitionFixtureInfo` supplies UTF-8 `info.json` with the selected engine family, fixture version, exact stage MIR dependency and nonempty title/author. The archive guard intentionally requires only typed nonblank title/author, not a particular presentation string. The four shared Lua files remain exact source bytes; `Assert-HistoricalTransitionFixtureArchive` checks all six members, the literal and metadata before admission. Keep each projection and its resulting archive hash separate from earlier runs.
+
+To build the two generated projection members without executing the runner, load only its existing helper definitions, then write their UTF-8 output. Replace the metadata, target, stage and projection directory with the selected packet values.
+
+```powershell
+$projection = 'C:\\path\\to\\selected-projection'; $runner = 'tools/Invoke-NativeFixture.ps1'; $tokens = $null; $errors = $null
+$ast = [Management.Automation.Language.Parser]::ParseFile($runner, [ref]$tokens, [ref]$errors); if ($errors.Count) { throw 'runner parse failed' }
+foreach ($name in @('Assert-Fixture', 'Get-FixtureSha', 'Get-HistoricalTransitionFixtureTarget', 'ConvertTo-HistoricalTransitionFixtureTargetLiteral', 'ConvertTo-HistoricalTransitionFixtureInfo')) { $node = @($ast.FindAll({ param($item) $item -is [Management.Automation.Language.FunctionDefinitionAst] -and $item.Name -ceq $name }, $true)); if ($node.Count -ne 1) { throw "missing helper $name" }; Invoke-Expression $node[0].Extent.Text }
+$fixture = Get-HistoricalTransitionFixtureTarget -Target f013 -MetadataPath tests/fixtures/historical-transition/metadata-473-f013-f016.json -Stage published; $utf8 = [Text.UTF8Encoding]::new($false)
+[IO.File]::WriteAllText((Join-Path $projection 'target-literal.lua'), (ConvertTo-HistoricalTransitionFixtureTargetLiteral $fixture), $utf8); [IO.File]::WriteAllText((Join-Path $projection 'info.json'), (ConvertTo-HistoricalTransitionFixtureInfo $fixture), $utf8)
+```
 
 The native owner then uses `tools/Invoke-NativeFixture.ps1` with the selected direct `ArchiveLibrary`, exact `FactorioBin`, matching `ProfilePath`, projected `FixtureSources`, `CaseName=historical-transition`, `HistoricalTarget`, `HistoricalTransitionStage=published`, the explicit `HistoricalTransitionFixtureMetadataPath` above and the exact published `ExpectedMIRArchiveSha256`. The generic runner remains responsible for resource admission, original controls and save-byte preservation. These selections contain no dependency copies and grant no library ownership or native assignment.
 
