@@ -1,0 +1,173 @@
+{
+  "schema": 1,
+  "kind": "MIRF100F110LaserNativeChainV1",
+  "status": "passed-named-earned-laser-forward-engine-migration",
+  "scope": "Exact source992c MIR5 F100 BA0D/1.0.0/99F1 to F1102C2B/1.1.110/B7B4 at fixture controllerfd643b:one actual source lab/save/two colds,then exact protected source to renamed successor/one actual lab/save/two colds. Strict old/new identity,native ammo category/effect,current42% plus queued work,suspended27%,foreign disablement/42% queue and unrelated mining state assertions remain.",
+  "controller_commit": "fd643b296a05ff5ecdbc42f27bc466848af1e54e",
+  "artifact_source_commit": "992c76ee24caf2d723b469c3db760cbebdf35eeb",
+  "player_tree": "fbb7e9135280ce7f69692e9b0c4a44d743793f45",
+  "packages": {
+    "f100": {
+      "sha256": "BA0D9F519CEEA7557892912BFF6EF3CAC5E480DA5D8AF2FC288A0E01605266B2",
+      "bytes": 453779,
+      "changed_from_recorded_7a2": [
+        "changelog.txt"
+      ]
+    },
+    "f110": {
+      "sha256": "2C2B1C011A0806809AAD1B8769E8548DB20159F1DCAEA3BD11431CCC6D48A7D2",
+      "bytes": 454090,
+      "changed_from_recorded_7a2": [
+        "changelog.txt"
+      ]
+    }
+  },
+  "source": {
+    "path": "build/qualification/f100-f110-laser-source-r03-controller/native-source/write-data/saves/mir5-native-complete.zip",
+    "sha256": "FA0CF60550AA01FBF6E5882F72852165929E5D0AE426F240198255AA11B2673F",
+    "bytes": 774822
+  },
+  "successor": {
+    "path": "build/qualification/f100-f110-laser-successor-r01-controller/native-successor/write-data/saves/mir5-native-complete.zip",
+    "sha256": "A785F51124DF7E894061F2906DD6A3A774D0B9771B3C5FA5A1210B04539CCCE1",
+    "bytes": 784396
+  },
+  "cases": [
+    {
+      "label": "source-r01",
+      "status": "failed",
+      "controller": "0bb6c4a695f6b17d1492abeca3878202d8debda3",
+      "fixture_sha256": "8CFECFCA91934ED199CBFA3D7BDEB52D3F1D2359514498F9B6FE3EF5A313A96E",
+      "profile_sha256": "42D401A6008F2D9BE1EB20F3518D2E82508DF32ED7470D8FCB80B8CF45525BFE",
+      "result_sha256": "B463E90AEF8BC45503338FFE4C18CBE72024544FF7D5C3B02DB0A09C703AB452",
+      "packet_sha256": "0E297DE2F80A298619617A676CD6B0EE9137A69A946370A0B7731EEC9185D0E6",
+      "caller_sha256": "2E013BF949AAC219DEE879FA5EB1D3757F74A459F840AE5872456949253451CC",
+      "native_processes": 1,
+      "files": 7,
+      "bytes_per_copy": 17863,
+      "failure_class": "private-fixture-startup-preflight",
+      "expected_adverse": "laser fixture setting absent: mir-effect-per-level-laser-shooting-speed",
+      "cold_reloads": 0,
+      "new_labs": 0,
+      "new_saves": 0
+    },
+    {
+      "label": "source-r02",
+      "status": "failed",
+      "controller": "552d0394c5ac6cb8c5f1f3d45e9a517d6c80b83b",
+      "fixture_sha256": "552B5A43768A233375C6B32A56DFF32157A99B6D5115A90CE6B3C1C5B8ADAFDE",
+      "profile_sha256": "42D401A6008F2D9BE1EB20F3518D2E82508DF32ED7470D8FCB80B8CF45525BFE",
+      "result_sha256": "31006F187BB8972F9DF3F4AF4C55D56962DD8599161983CAF2259BFE48F3EE3E",
+      "packet_sha256": "FA9BC3630B6B7788B18E25E9068085307B3EEFBABE29E058B9D79885F24387A3",
+      "caller_sha256": "E30B9E515F8C61CF500EC19B0A6F3A8F135EA63877D3EE13BB153832A16DBB77",
+      "native_processes": 1,
+      "files": 7,
+      "bytes_per_copy": 18527,
+      "failure_class": "private-fixture-startup-preflight",
+      "expected_adverse": "laser fixture configured formula/time differs",
+      "cold_reloads": 0,
+      "new_labs": 0,
+      "new_saves": 0
+    },
+    {
+      "label": "source-r03",
+      "status": "passed-private-native-fixture",
+      "controller": "fd643b296a05ff5ecdbc42f27bc466848af1e54e",
+      "fixture_sha256": "49931CD57835F0F131945AEDBE9BEDF63CEA6A04B43D16D98864F35680BB78E4",
+      "profile_sha256": "42D401A6008F2D9BE1EB20F3518D2E82508DF32ED7470D8FCB80B8CF45525BFE",
+      "result_sha256": "3AE2235CA7E7C235C28432E2D82B438A0D08D7231CA5D1EABB77466E61338322",
+      "packet_sha256": "981FBBE038619D5BA038549388F5D2B82F4FD7EA461D727ED1D31F80AFB22E18",
+      "caller_sha256": "F1495201F7618485204599D81335CEFAAEAF664CD26283F6170C25AC21550344",
+      "native_processes": 4,
+      "files": 71,
+      "bytes_per_copy": 2915421,
+      "initial": {
+        "case": "f100-f110-laser-transition",
+        "stage": "initial",
+        "role": "source",
+        "status": "passed",
+        "source_labs": 1,
+        "successor_labs": 0,
+        "laser": "laser-turret-speed-8",
+        "level": 9,
+        "gun_speed_modifier": 2.21,
+        "source_gun_speed_baseline": 2.2,
+        "suspended_progress": 0.27,
+        "foreign_progress": 0.42,
+        "foreign_disabled": true,
+        "science_consumed_units": 1,
+        "on_load_read_only": false
+      },
+      "completed_save": {
+        "path": "build/qualification/f100-f110-laser-source-r03-controller/native-source/write-data/saves/mir5-native-complete.zip",
+        "sha256": "FA0CF60550AA01FBF6E5882F72852165929E5D0AE426F240198255AA11B2673F",
+        "bytes": 774822
+      },
+      "cold_reloads": 2,
+      "input_save": null
+    },
+    {
+      "label": "successor-r01",
+      "status": "passed-private-native-fixture",
+      "controller": "fd643b296a05ff5ecdbc42f27bc466848af1e54e",
+      "fixture_sha256": "A2AC72DCB49E75A0F8C79A33B06770EC309EDF562DB3E0AA23B0CCD556D71E5C",
+      "profile_sha256": "4666FBB2E6FECBF0A9C6EADC2EB1B465E8994F961A992E6FD9482934B37CB418",
+      "result_sha256": "0FC0280C538F36FD719B96F89437AF532B89D4962077BCFC6F1437FB7340B877",
+      "packet_sha256": "18A405433E350C3A6A34516697F7849DE40E243F787EF414F7A35013F2AA30C1",
+      "caller_sha256": "D02EC77DDB8E289EAAA7C5A0E2CD67603692D53135749B71ACF8BF7782EA075C",
+      "native_processes": 3,
+      "files": 71,
+      "bytes_per_copy": 2169197,
+      "initial": {
+        "case": "f100-f110-laser-transition",
+        "stage": "initial",
+        "role": "successor",
+        "status": "passed",
+        "source_labs": 1,
+        "successor_labs": 1,
+        "laser": "laser-shooting-speed-8",
+        "level": 10,
+        "gun_speed_modifier": 2.22,
+        "source_gun_speed_baseline": 2.2,
+        "suspended_progress": 0.27,
+        "foreign_progress": 0.42,
+        "foreign_disabled": true,
+        "science_consumed_units": 0.58333333333333,
+        "on_load_read_only": false
+      },
+      "completed_save": {
+        "path": "build/qualification/f100-f110-laser-successor-r01-controller/native-successor/write-data/saves/mir5-native-complete.zip",
+        "sha256": "A785F51124DF7E894061F2906DD6A3A774D0B9771B3C5FA5A1210B04539CCCE1",
+        "bytes": 784396
+      },
+      "cold_reloads": 2,
+      "input_save": {
+        "sha256": "FA0CF60550AA01FBF6E5882F72852165929E5D0AE426F240198255AA11B2673F",
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\f100-f110-laser-source-r03-controller\\native-source\\write-data\\saves\\mir5-native-complete.zip"
+      }
+    }
+  ],
+  "root_readback": {
+    "path": "build/qualification/f100-f110-laser-root-readback-r03.json",
+    "sha256": "2E9309F8FFE61B5EF0E99E9AACDD3FD6BF6855BEA83498588F0A4B915FB301AE",
+    "files": 156,
+    "bytes_per_copy": 5121008
+  },
+  "lossless_receipts": {
+    "path": "spec/evidence/f100-f110-laser-native-receipts-r03.json.gz",
+    "sha256": "A1419B09987897FFE155A6AAE85F17B695082EE1CAB760E1D4CB416147882EE3",
+    "bytes": 25670,
+    "records": 10
+  },
+  "counts": {
+    "accepted_native_processes": 7,
+    "retained_failed_startup_processes": 2,
+    "total_new_native_processes": 9,
+    "actual_source_labs": 1,
+    "actual_successor_labs": 1,
+    "cold_reloads": 4
+  },
+  "science_evidence": "The native fixture asserts actual tool stack count/durability for every selected pack:source consumes1 and successor35/60. The emitted consumed-unit field reports the declared value after those assertions; individual post-lab inventory values are not separately logged.",
+  "preserved_adverse": "R01 wrong private setting type andR02 expanded-vs-canonical constant formula stop before world creation. Preserve their exact original fixtures/packets/native logs and failed verdicts. R03 changes only fixture input corrections and bounded preflight logging; player packages are unchanged.",
+  "limits": "Closes this named MIR5 F100/F110 native laser bridge at exact inputs,not a published MIR4 source,F018 pass,full catalogue/modpack,client/multiplayer,performance or release verdict. Do not relabel earlier package results as fresh execution. Final coherent freeze/applicability remains separate."
+}

@@ -291,6 +291,7 @@ class F110F200RunnerControls(unittest.TestCase):
             $node=@($ast.FindAll({param($n) $n -is [Management.Automation.Language.FunctionDefinitionAst] -and $n.Name -ceq $name},$true))
             if($node.Count -ne 1){throw "helper missing: $name"};Invoke-Expression $node[0].Extent.Text
           }
+          $laserTransition=$false
           $processSelection=@($ast.FindAll({param($n)
             $n -is [Management.Automation.Language.AssignmentStatementAst] -and $n.Left.Extent.Text -ceq '$historicalProcess'
           },$true))
