@@ -2810,13 +2810,13 @@
         {
           "edition": "f200",
           "origin_archive_sha256": "FBBA844DD04011A12BB6DA885745B0733AD37FAB181EAAD9EE4346B9B0D32647",
-          "source_case": "protected-published-473-base-source-reused-unchanged",
-          "final_5_x_case": "passed-current-base-same-edition-space-age-provider-pending",
+          "source_case": "qualified-exact-published-473-base-and-selected-space-age-four-provider-sources",
+          "final_5_x_case": "passed-current-base-direct-and-selected-space-age-provider-two-step-preference",
           "disposition": "not-a-cartesian-modset-matrix",
           "current_archive_sha256": "65FC7E907FE3198B7290167989FE2564C1474190D06DAD49860063BEC418EC60",
           "current_completion": {
-            "status": "needs-correction",
-            "problem": "Current65FC same-edition Base successor now passes54 retained rows/effects, one new lab/save/two read-only cold reloads. Exact4.7.3 Space Age/provider qualification remains open.",
+            "status": "closed",
+            "problem": "Named Base same-edition and selected Space Age/four-provider4.7.3 routes pass current65FC. Separate complete catalogue/scripted/ordinary-tuning/GUI/physical/performance acceptance remains independent.",
             "scenarios": [
               {
                 "closure": "base",
@@ -2835,14 +2835,18 @@
               },
               {
                 "closure": "space-age",
-                "status": "needs-correction",
+                "status": "closed",
                 "current_archive_sha256": "65FC7E907FE3198B7290167989FE2564C1474190D06DAD49860063BEC418EC60",
                 "existing_evidence": {
                   "path": "spec/evidence/legacy-preference-transition-native-chain.json",
                   "sha256": "C686E9AFA34DEE3E7C1E7AEB5C6C1DEF4D1E8643C65255A37AC3C35AF1FA2EB1"
                 },
-                "next_action": "Prepare an exact4.7.20003 Space Age source and the selected affected provider closure; retain the4.7.20002 preference passes separately. Protect its save, then bind current F200. Do not enumerate arbitrary providers.",
-                "command_status": "not-ready: exact4.7.3 source/save and affected-provider binding"
+                "next_action": "Reuse only exact4.7.20003 Space Age/four-provider false/true source, protected first-switch refusal, unchanged-settings first upgrade and later opposite-preference save/lab/two-reload chains. Preserve4.7.20002 histories and two zero-native caller adverses; no other provider/permutation or whole-product pass.",
+                "command_status": "completed: frozen cb1/current65FC/D3, both original preference directions,6 saved stages/12 cold reloads,4 original and2 new candidate labs,2 expected refusal startups",
+                "evidence": {
+                  "path": "spec/evidence/legacy-preference-473-current7a2-native-chain-r01.json",
+                  "sha256": "F8275F094EB9A652272DCB6080720022421F758D0F6CD7D5BAE8C8AA17AEDCDE"
+                }
               }
             ]
           }
@@ -3837,9 +3841,9 @@
         },
         {
           "boundary": "F200 Space Age first-upgrade provider/preference",
-          "status": "needs-correction",
-          "problem": "Exact4.7.20002 chain passes protected refusals and both two-step directions. The selected4.7.20003 native provider route is not qualified.",
-          "next_action": "Share the exact4.7.3 Space Age source preparation with the stable F200 row. Preserve simultaneous-startup-change refusal and unchanged-settings first upgrade; then save/reload before preference/provider change with new lab/effects/foreign queue. No extra all-provider matrix.",
+          "status": "closed",
+          "problem": "Actual exact4.7.20003/FBBA sources with both preferences pass current65FC on2.0.77/D3 and the four exact providers. Simultaneous first switches refuse without saving; unchanged upgrades establish saved MIR5 baselines before later opposite preference/new labs.",
+          "next_action": "Reuse the named current4.7.3 two-step routes and their protected originals. Do not infer untested provider removal/DLC permutations, complete catalogue/GUI/physical behavior, or4.7.2/canonical package identity. Retain the source lab counters once and both zero-native caller failures.",
           "evidence": [
             {
               "path": "spec/evidence/legacy-preference-transition-native-chain.json",
@@ -3848,6 +3852,10 @@
             {
               "path": "spec/evidence/legacy-preference-canonical-current-native-chain.json",
               "sha256": "15D1419B8F09821DF35D87A887990CEB3804708A2D26413AF1CBA3905B43CF5F"
+            },
+            {
+              "path": "spec/evidence/legacy-preference-473-current7a2-native-chain-r01.json",
+              "sha256": "F8275F094EB9A652272DCB6080720022421F758D0F6CD7D5BAE8C8AA17AEDCDE"
             }
           ]
         }
