@@ -274,5 +274,10 @@
     "performance": false,
     "final_candidate_or_release_qualification": false
   },
-  "limits": "This does not select Black Glass's candidate or change a live packet. The exact FDC9 MIR1.2 source and prior f0dd cannon-loss adverse remain preserved. Corrected old-save, real lab, effects reset, save and two cold reloads still require exact native execution. Existing target support limits and all other release gates remain open."
+  "limits": "This does not select Black Glass's candidate or change a live packet. The exact FDC9 MIR1.2 source and prior f0dd cannon-loss adverse remain preserved. Native save/laboratory/reset/reload qualification belongs to the separate named chain under its own exact execution identities; this receipt establishes only build/member identity. Existing target support limits and all other release gates remain open.",
+  "separate_native_evidence": {
+    "path": "spec/evidence/migration-origin-120-575e-direct-native-chain-r01.json",
+    "sha256": "8B42D0FEC713CB6DD6CEC57C9C3BCA70ACA05E09ECE1228B36AE4F041733E240",
+    "relationship": "Separate exact native execution consumes the independently matching modern ZIPs. This package readback does not become an additional native run or laboratory count."
+  }
 }
