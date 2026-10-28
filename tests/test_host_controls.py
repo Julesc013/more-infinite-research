@@ -119,6 +119,7 @@ class HostControlsTests(unittest.TestCase):
             "tests/test_legacy_caps.py",
             "tests/test_legacy_caps_lifecycle.py",
             "tests/test_f200_legacy_cap_fixture.py",
+            "tests/test_native_fixture_modes.py",
             "tests/test_legacy_boolean_cap_fixture.py",
             "tests/test_f200_foreign_cap_baseline_fixture.py",
             "tests/test_native_owner_cap_order_fixture.py",
