@@ -21,11 +21,23 @@ local AVAILABILITY_FAMILIES = {
   "research_agricultural_growth_speed",
   "research_spoilage_preservation",
 }
+local SPACE_AGE = "space-age"
+local NATIVE_RESEARCH_PRODUCTIVITY = "research-productivity"
+local NATIVE_LAB_PRODUCTIVITY = "laboratory-productivity"
 
 local GEAR = "recipe-prod-research_gears-1"
 local MINING = "recipe-prod-research_mining_drill-1"
 local TECHNOLOGIES = {GEAR, MINING}
-local RECIPES = {"iron-gear-wheel", "burner-mining-drill", "electric-mining-drill"}
+local function space_age_library()
+  return script ~= nil and script.active_mods ~= nil and script.active_mods[SPACE_AGE] == "2.1.23"
+end
+
+local GEAR_RECIPES = space_age_library()
+  and {"casting-iron-gear-wheel", "iron-gear-wheel"}
+  or {"iron-gear-wheel"}
+local RECIPES = space_age_library()
+  and {"iron-gear-wheel", "casting-iron-gear-wheel", "burner-mining-drill", "electric-mining-drill"}
+  or {"iron-gear-wheel", "burner-mining-drill", "electric-mining-drill"}
 local GEAR_PACKS = {
   "automation-science-pack", "logistic-science-pack", "chemical-science-pack", "production-science-pack",
 }
@@ -137,6 +149,17 @@ local function open(player, view)
 end
 
 local function open_availability(player)
+  if space_age_library() then
+    local technology = player and player.force and player.force.technologies
+      and player.force.technologies[NATIVE_RESEARCH_PRODUCTIVITY]
+    local prototype = valid(technology) and technology.prototype or nil
+    local effects = prototype and prototype.effects or nil
+    local effect, extra = effects and effects[1] or nil, effects and effects[2] or nil
+    if not valid(prototype) or prototype.name ~= NATIVE_RESEARCH_PRODUCTIVITY or effect == nil or extra ~= nil
+        or effect.type ~= NATIVE_LAB_PRODUCTIVITY or not close(effect.modifier, GEAR_EFFECT) then
+      fail("Space Age native research-productivity owner differs")
+    end
+  end
   if not (remote.interfaces and remote.interfaces[BROWSER]) then fail("shipped public browser interface is absent") end
   if remote.call(BROWSER, "open", player.index, {tab="availability", search=""}) ~= true then
     fail("public browser interface did not open Availability for connected client")
@@ -278,14 +301,26 @@ local function gear_definition(force)
       or gear.research_unit_count ~= 1 or gear.research_unit_energy ~= 60 then
     fail("fixture gear acceleration or native initial state differs")
   end
-  local effects, matches = gear.prototype and gear.prototype.effects or {}, 0
-  for _, effect in ipairs(effects) do
-    if effect.type == "change-recipe-productivity" and effect.recipe == "iron-gear-wheel"
-        and close(effect.change, GEAR_EFFECT) then
-      matches = matches + 1
+  local effects = gear.prototype and gear.prototype.effects or {}
+  if space_age_library() then
+    if #effects ~= #GEAR_RECIPES then fail("Space Age native gear effect cardinality differs") end
+    for index, recipe in ipairs(GEAR_RECIPES) do
+      local effect = effects[index]
+      if effect == nil or effect.type ~= "change-recipe-productivity" or effect.recipe ~= recipe
+          or not close(effect.change, GEAR_EFFECT) then
+        fail("Space Age native gear effect differs")
+      end
     end
+  else
+    local matches = 0
+    for _, effect in ipairs(effects) do
+      if effect.type == "change-recipe-productivity" and effect.recipe == "iron-gear-wheel"
+          and close(effect.change, GEAR_EFFECT) then
+        matches = matches + 1
+      end
+    end
+    if matches ~= 1 then fail("native gear effect differs") end
   end
-  if matches ~= 1 then fail("native gear effect differs") end
   assert_gear_science_vector(gear)
   return gear
 end
@@ -354,9 +389,13 @@ local function assert_completed_gear(state, force)
   if state.finished ~= 2 or state.started < 2
       or gear.level ~= GEAR_LEVEL_AFTER_TWO_LABS or gear.researched
       or force.current_research ~= nil or not exact_queue(force, {})
-      or not close(force.recipes["iron-gear-wheel"].productivity_bonus, 2 * GEAR_EFFECT)
       or state.second_science_feed ~= true then
     fail("actual Library refresh research/queue state differs")
+  end
+  for _, recipe in ipairs(GEAR_RECIPES) do
+    if not close(force.recipes[recipe].productivity_bonus, 2 * GEAR_EFFECT) then
+      fail("actual Library refresh gear productivity differs: " .. recipe)
+    end
   end
   assert_lab_consumption(state)
 end
@@ -379,6 +418,17 @@ local function assert_availability(player)
   end
   if valid(content[RESULTS]) or valid(content[DETAIL]) or valid(content["mir_library_actions"]) then
     fail("Availability exposed research results or actions")
+  end
+  if space_age_library() then
+    local label = content[AVAILABILITY[1]]
+    local caption = valid(label) and label.caption or nil
+    if not valid(label) or label.type ~= "label" or localized_key(caption) ~= "mir-browser.availability-entry"
+        or localized_key(caption[2]) ~= "technology-name.more-infinite-research.research_lab_productivity"
+        or localized_key(caption[3]) ~= "mir-browser.availability-native-research-productivity"
+        or valid(content[AVAILABILITY[2]]) or #children ~= 1 then
+      fail("Space Age native research-productivity Availability differs")
+    end
+    return
   end
   for index, name in ipairs(AVAILABILITY) do
     local label = content[name]
@@ -415,46 +465,52 @@ local function screenshot(state, stage, player)
 end
 
 local function marker(stage, state)
+  local live_refresh = {
+    real_lab_completions=state.finished,
+    native_laboratory_completion_by_script=false,
+    native_research_started_events=state.started,
+    queue_lengths_observed={state.queue_before_lab, state.queue_after_first, state.queue_after_labs},
+    native_research_cancelled_events=state.cancelled,
+    native_foreign_force_created_events=state.force_created,
+    gear_level=state.native and state.native.technologies[GEAR].level,
+    gear_productivity=state.native and state.native.recipes["iron-gear-wheel"],
+    science_consumed_per_named_pack=LAB_PACKS,
+    fixture_accelerates_gear_count_and_time_only=true,
+    ordinary_tuning_qualified=false,
+    root_and_query_identity_preserved=true,
+    cross_force_view_state_preserved=true,
+  }
+  if space_age_library() then
+    live_refresh.casting_gear_productivity=state.native and state.native.recipes["casting-iron-gear-wheel"]
+  end
+  local witnesses = {
+    base_version=script.active_mods.base,
+    mir_version=script.active_mods["more-infinite-research"],
+    actual_join_events=state.join_events,
+    screenshot_calls=state.screenshot_calls,
+    initial_settled_without_reopen=state.initial_settled_tick ~= nil,
+    initial_settle_ticks=state.initial_settled_tick and state.initial_settled_tick - state.initial_capture_tick,
+    first_open=state.measurements.first_open,
+    search=state.measurements.search,
+    refresh=state.measurements.refresh,
+    reopen=state.measurements.reopen,
+    measurement_output="native-localised-profiler-log",
+    timing_values_stored=false,
+    two_connected_clients_required=true,
+    locales_required={"en", "de"},
+    distinct_personal_query_and_selection=true,
+    initial_native_snapshot_immutable=true,
+    live_refresh=live_refresh,
+    availability_terminal_labels_checked=state.availability_checked == true,
+    host_restart_observed=stage == "completed",
+    on_load_read_only=stage == "completed",
+    rendering_pending_external_png_readback=true,
+    screenshot_requests_are_not_headless_rendering_proof=true,
+  }
+  if space_age_library() then witnesses.space_age_library=true end
   log("[MIR5_LIBRARY_MULTIPLAYER] RESULT " .. helpers.table_to_json({
     case=CASE, stage=stage, status="passed",
-    witnesses={
-      base_version=script.active_mods.base,
-      mir_version=script.active_mods["more-infinite-research"],
-      actual_join_events=state.join_events,
-      screenshot_calls=state.screenshot_calls,
-      initial_settled_without_reopen=state.initial_settled_tick ~= nil,
-      initial_settle_ticks=state.initial_settled_tick and state.initial_settled_tick - state.initial_capture_tick,
-      first_open=state.measurements.first_open,
-      search=state.measurements.search,
-      refresh=state.measurements.refresh,
-      reopen=state.measurements.reopen,
-      measurement_output="native-localised-profiler-log",
-      timing_values_stored=false,
-      two_connected_clients_required=true,
-      locales_required={"en", "de"},
-      distinct_personal_query_and_selection=true,
-      initial_native_snapshot_immutable=true,
-      live_refresh={
-        real_lab_completions=state.finished,
-        native_laboratory_completion_by_script=false,
-        native_research_started_events=state.started,
-        queue_lengths_observed={state.queue_before_lab, state.queue_after_first, state.queue_after_labs},
-        native_research_cancelled_events=state.cancelled,
-        native_foreign_force_created_events=state.force_created,
-        gear_level=state.native and state.native.technologies[GEAR].level,
-        gear_productivity=state.native and state.native.recipes["iron-gear-wheel"],
-        science_consumed_per_named_pack=LAB_PACKS,
-        fixture_accelerates_gear_count_and_time_only=true,
-        ordinary_tuning_qualified=false,
-        root_and_query_identity_preserved=true,
-        cross_force_view_state_preserved=true,
-      },
-      availability_terminal_labels_checked=state.availability_checked == true,
-      host_restart_observed=stage == "completed",
-      on_load_read_only=stage == "completed",
-      rendering_pending_external_png_readback=true,
-      screenshot_requests_are_not_headless_rendering_proof=true,
-    }
+    witnesses=witnesses
   }))
 end
 
@@ -651,9 +707,13 @@ local function complete_foreign_force_refresh(state)
     fail("native foreign force identity differs")
   end
   local foreign_gear = technology(state.foreign, GEAR)
-  if foreign_gear.level ~= 1 or foreign_gear.researched
-      or not close(state.foreign.recipes["iron-gear-wheel"].productivity_bonus, 0) then
+  if foreign_gear.level ~= 1 or foreign_gear.researched then
     fail("foreign force inherited player Library research state")
+  end
+  for _, recipe in ipairs(GEAR_RECIPES) do
+    if not close(state.foreign.recipes[recipe].productivity_bonus, 0) then
+      fail("foreign force inherited player Library recipe productivity: " .. recipe)
+    end
   end
   assert_completed_gear(state, force)
   assert_live_queue_view(state, GEAR_LEVEL_AFTER_TWO_LABS, 0, false)
@@ -731,7 +791,11 @@ local function closure()
   -- probe stages a separately hashed 0.1.1 copy whose only semantic delta is
   -- its hidden startup flag; accepting either here keeps the fixture closure
   -- explicit instead of treating a staged archive as an unbound extra mod.
-  local fixture_version = standalone_identity_discovery() and "0.1.1" or "0.1.0"
+  local space_age = space_age_library()
+  if space_age and standalone_identity_discovery() then
+    fail("Space Age Library fixture cannot use standalone identity discovery")
+  end
+  local fixture_version = space_age and "0.2.0" or (standalone_identity_discovery() and "0.1.1" or "0.1.0")
   local allowed = {base=script.active_mods.base, ["more-infinite-research"]=target.mir_version,
     ["mir-fixture-mir5-active-mods-observer"]="0.1.0",
     ["mir-fixture-mir5-library-multiplayer"]=fixture_version}
@@ -744,6 +808,17 @@ local function closure()
       ["mir-fixture-mir5-api-alpha"]="0.1.0",
       ["mir-fixture-mir5-api-beta"]="0.1.0",
     }
+    if space_age then
+      closures[#closures + 1] = {
+        base=script.active_mods.base,
+        ["elevated-rails"]="2.1.23", quality="2.1.23", recycler="2.1.23", [SPACE_AGE]="2.1.23",
+        ["more-infinite-research"]=target.mir_version,
+        ["mir-fixture-mir5-active-mods-observer"]="0.1.0",
+        ["mir-fixture-mir5-library-multiplayer"]=fixture_version,
+        ["mir-fixture-mir5-api-alpha"]="0.1.0",
+        ["mir-fixture-mir5-api-beta"]="0.1.0",
+      }
+    end
   end
   for _, candidate in ipairs(closures) do
     local matches = true

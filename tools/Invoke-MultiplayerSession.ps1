@@ -369,6 +369,16 @@ function Get-LibraryWitnessTarget([hashtable]$Spec,[string]$EngineSha256) {
   Assert-Session ($provided.Count -eq 3 -and $provided.Contains('engine_sha256') -and $provided.Contains('base') -and $provided.Contains('mir') -and $provided.engine_sha256 -is [string] -and $provided.base -is [string] -and $provided.mir -is [string]) 'Library session witness target is absent or malformed'
   $expected=$matches[0]
   Assert-Session ($provided.engine_sha256 -ceq [string]$expected.engine_sha256 -and $provided.base -ceq [string]$expected.base -and $provided.mir -ceq [string]$expected.mir) 'Library session witness target differs from validated launch input'
+  if($Spec.ContainsKey('space_age_library')){
+    Assert-Session (
+      $Spec.space_age_library -is [bool] -and $Spec.space_age_library -and
+      -not $requestedStandaloneIdentityDiscovery -and
+      $EngineSha256 -ceq '8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38' -and
+      $Spec.ContainsKey('api_client_consumers') -and
+      $Spec.api_client_consumers -is [bool] -and $Spec.api_client_consumers
+    ) 'Space Age Library witness mode differs'
+    $expected.space_age_library=$true
+  }
   return [pscustomobject]$expected
 }
 function Assert-LibraryWitnessIdentityMode([bool]$StandaloneIdentityDiscovery,[object]$LibraryWitnessTarget) {
@@ -434,6 +444,20 @@ function Get-StageMarker([string]$Text, [string]$Stage, [int]$ExpectedJoins, [ob
     $liveProperty = $witness.PSObject.Properties['live_refresh']
     Assert-Session ($null -ne $liveProperty -and $liveProperty.Value -is [pscustomobject]) "$Stage Library live refresh is absent or malformed"
     $live = $liveProperty.Value
+    $spaceAgeTarget=$ExpectedLibraryWitness.PSObject.Properties['space_age_library']
+    $spaceAgeWitness=$witness.PSObject.Properties['space_age_library']
+    $casting=$live.PSObject.Properties['casting_gear_productivity']
+    if($null -ne $spaceAgeTarget){
+      Assert-Session ($spaceAgeTarget.Value -is [bool] -and $spaceAgeTarget.Value) "$Stage Space Age Library witness target differs"
+      Assert-LibraryWitnessBoolean $witness 'space_age_library' $true $Stage
+      if($Stage-ceq'ready'){
+        Assert-Session ($null -ne $casting -and (Test-LibraryInteger $casting.Value) -and [int64]$casting.Value -eq 0) "$Stage Library casting_gear_productivity differs"
+      }else{
+        Assert-Session ($null -ne $casting -and $casting.Value -is [double] -and [Math]::Abs([double]$casting.Value - 0.2) -le 0.0000001) "$Stage Library casting_gear_productivity differs"
+      }
+    }else{
+      Assert-Session ($null -eq $spaceAgeWitness -and $null -eq $casting) "$Stage Base Library witness includes Space Age fields"
+    }
     if($Stage-ceq'ready') {
       Assert-LibraryWitnessBoolean $live 'native_laboratory_completion_by_script' $false $Stage
       Assert-LibraryWitnessInteger $live 'science_consumed_per_named_pack' 2 $Stage
@@ -679,9 +703,14 @@ if($spec.ContainsKey('api_client_consumers')){
   Assert-Session ($fixtureCase-ceq'library-multiplayer' -and $spec.api_client_consumers -is [bool] -and $spec.api_client_consumers) 'API client consumer mode differs'
   $apiClientConsumers=$true
 }
+$spaceAgeLibrary=$false
+if($spec.ContainsKey('space_age_library')){
+  Assert-Session ($fixtureCase-ceq'library-multiplayer' -and $spec.space_age_library -is [bool] -and $spec.space_age_library -and $apiClientConsumers -and -not $standaloneIdentityDiscovery) 'Space Age Library mode differs'
+  $spaceAgeLibrary=$true
+}
 $collectProcessMemoryObservations = Get-ProcessMemoryObservationOptIn -Spec $spec -FixtureCase $fixtureCase
 $markerPrefix=switch($fixtureCase){'library-multiplayer'{'MIR5_LIBRARY_MULTIPLAYER'};'library-paired-browser'{'MIR5_LIBRARY_PAIRED_BROWSER'};default{'MIR5_SCRIPTED_EFFECTS_MULTIPLAYER'}}
-$clientGraphics=@(if($fixtureCase-ceq'scripted-effects-multiplayer'){'--force-graphics-preset';'low';'--video-memory-usage';'low'})
+$clientGraphics=@(if($fixtureCase-ceq'scripted-effects-multiplayer' -or $spaceAgeLibrary){'--force-graphics-preset';'low';'--video-memory-usage';'low'})
 foreach ($field in @('engine','engine_sha256','archive_library','workroot','seed_save','seed_sha256','server_config','server_settings','server_write_data','port','rcon_port','rcon_password','clients','expected_screenshots')) {
   Assert-Session $spec.ContainsKey($field) "session spec lacks $field"
 }

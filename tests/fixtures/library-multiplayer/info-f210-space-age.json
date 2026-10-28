@@ -1,0 +1,13 @@
+{
+  "name": "mir-fixture-mir5-library-multiplayer",
+  "version": "0.2.0",
+  "title": "MIR 5 private Space Age Library multiplayer fixture",
+  "author": "MIR maintainers",
+  "description": "Disposable two-client F210 Space Age Research Library join, rejoin, and host-restart fixture.",
+  "factorio_version": "2.1",
+  "dependencies": [
+    "base >= 2.1.23",
+    "space-age >= 2.1.23",
+    "more-infinite-research = 5.0.21000"
+  ]
+}
