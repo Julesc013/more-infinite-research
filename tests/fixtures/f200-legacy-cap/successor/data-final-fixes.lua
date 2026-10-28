@@ -26,8 +26,14 @@ end
 local technology = assert(data.raw.technology[NAME], "successor gear technology is absent")
 assert(technology.type == "technology" and technology.name == NAME and technology.level == 1
   and technology.upgrade == true and technology.max_level == "infinite"
-  and technology.enabled ~= false and technology.visible_when_disabled == nil and technology.hidden == nil,
+  and technology.visible_when_disabled == nil and technology.hidden == nil,
   "successor gear identity, progression, or fresh presentation changed")
+-- The disabled intermediate deliberately selects false. The other stages
+-- accept only the native omitted-true default or an explicit true boolean.
+local enabled = technology.enabled
+if enabled == nil then enabled = true end
+assert(type(enabled) == "boolean" and enabled == (fixture ~= "0.6.0"),
+  "successor gear enabled state differs from selected fixture stage")
 names(technology.prerequisites, SCIENCE, "successor gear prerequisites")
 local unit = assert(technology.unit, "successor gear unit is absent")
 assert(unit.count == nil and unit.count_formula == "8000*2^(L-1)" and unit.time == 60,

@@ -472,12 +472,34 @@ class F200LegacyCapFixtureTests(unittest.TestCase):
 
         for stage, version in ((F210_DISABLED, "0.6.0"), (F210_REENABLED, "0.7.0")):
             with self.subTest(stage=stage.name):
+                row = self.f210_row()
+                row["enabled"] = version != "0.6.0"
                 result = self.data_result(stage / "data-final-fixes.lua", "2.1.23", "5.0.21000", version,
-                                          self.f210_row(), data_alias=FIXTURE / "successor/data-final-fixes.lua")
+                                          row, data_alias=FIXTURE / "successor/data-final-fixes.lua")
                 self.assertTrue(result["ok"], result["message"])
                 self.assertEqual((None, "1", 1),
                                  (result["row"]["unit"]["count"], result["row"]["unit"]["count_formula"],
                                   result["row"]["unit"]["time"]))
+
+    def test_successor_enablement_matches_the_stage_before_any_acceleration(self):
+        for stage, version, wanted in ((F210_CROSS, "0.5.0", True),
+                                       (F210_DISABLED, "0.6.0", False),
+                                       (F210_REENABLED, "0.7.0", True)):
+            for raw in (None, True, False, 0, "false"):
+                with self.subTest(stage=stage.name, raw=raw):
+                    row = self.f210_row()
+                    row["enabled"] = raw
+                    result = self.data_result(stage / "data-final-fixes.lua", "2.1.23", "5.0.21000", version,
+                                              row, data_alias=FIXTURE / "successor/data-final-fixes.lua")
+                    admitted = raw is wanted or (raw is None and wanted)
+                    self.assertEqual(admitted, result["ok"], result["message"])
+                    if admitted:
+                        self.assertEqual((None, "1", 1),
+                                         (row["unit"]["count"], row["unit"]["count_formula"], row["unit"]["time"]))
+                    else:
+                        self.assertIn("successor gear enabled state differs", result["message"])
+                        self.assertEqual((None, "8000*2^(L-1)", 60),
+                                         (row["unit"]["count"], row["unit"]["count_formula"], row["unit"]["time"]))
 
     def test_cross_engine_disabled_and_reenabled_profiles_bind_the_exact_three_stage_inputs(self):
         source = json.loads(CROSS_SOURCE_PROFILE.read_text(encoding="utf-8"))
