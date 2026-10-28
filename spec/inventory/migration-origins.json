@@ -3903,8 +3903,8 @@
         {
           "boundary": "Published F200 cap disabled/re-enabled and V3 F210 worker tails",
           "status": "needs-correction",
-          "problem": "Modern first-enabled finite-cap gear routes pass at their recorded current inputs. Exact protected worker90B2 to currentE9/D3 fails strict0.2 because an independent player-only .123 aggregate offset is already absent before MIR configuration. Same-version published-runtime inert-prototype controls reproduce the boundary independently of MIR5. Worker acceptance remains open; original failure and all native assertions are preserved.",
-          "next_action": "Independently review the explicit fixture-owner/native-reset boundary,then qualify a distinct native-worker protocol on F200 and F210 with earned native effects,foreign disablement,partial work,one actual successor lab,new save and two cold reloads. Do not lower the original oracle or invent lost-offset ownership. Preserve recovered90B2 and all six adverse/diagnostic receipts; final coherent freeze follows affected qualification.",
+          "problem": "Named F2000.3 native-worker route now passes unchangedE9/D3 from protected90B2 at278967b2,with independent entry/unchanged aggregate guard,explicit fixture-owned0.123,original absolute/native/foreign/work assertions,one new real lab/save/two colds. Original strict0.2 and six contrasts remain failed/diagnostic. F210 item-science and finite first-hold worker paths retain separate obligations.",
+          "next_action": "Adopt the exact F200 result without relabelling old failures or recreating90B2. Prepare/qualify the separately declared F210 item-science successor from that same protected source with exact inputs. Review affected finite first-hold applicability separately. Preserve native-entry order proof and all fixture preflight adverses; no arbitrary lost-offset reconstruction in player code.",
           "evidence": [
             {
               "path": "spec/evidence/f200-foreign-cap-baseline-f0dd-native-chain-r01.json",
@@ -3953,6 +3953,10 @@
             {
               "path": "spec/evidence/worker-independent-offset-native-chain-r06.json",
               "scope": "Exact F200 worker successor failure and six bounded native contrasts; untracked player offset disappears before MIR callback and with unchanged published runtime plus inert prototype. Not a worker acceptance pass."
+            },
+            {
+              "path": "spec/evidence/worker-persisted-offset-f200-native-chain-r02.json",
+              "scope": "Exact F200 native worker with independently observed entry and explicitly owned fixture contribution,newlab/save/two colds;not original0.2 or F210/finite-first-hold acceptance."
             }
           ],
           "protected_473_cap_source": {
