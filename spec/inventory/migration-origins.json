@@ -3767,13 +3767,17 @@
         },
         {
           "boundary": "MIR3.2 researched discovery and foreign locks",
-          "status": "needs-correction",
-          "problem": "Exact3.2.0 EC0E to a575/7CE no-helper R05 passed; current505 applicability is not yet pinned.",
-          "next_action": "Review unchanged native grant/queued-cost/state paths before reuse. Preserve ambiguous later foreign locks and offer explicit operator repair; no automatic helper or inferred3.2.1 pass.",
+          "status": "ready-to-execute",
+          "problem": "Protected3.2.0 EC0E and original7CE R05 result remain qualified at their original inputs. Current005D successor/profile/fixture/observer/runner inputs are separately prepared; the current native route is unrun.",
+          "next_action": "When the native owner has a free assignment slot, bind actual EC0E/8DC/library/output and both verified A7E successor plus2E1 observer FixtureSources, then run the current005D R05 no-helper gear/save/two-reload case. Preserve iron unit/42% queue, foreign27%/lock and ambiguous later locks; no inferred3.2.1 pass or automatic repair.",
           "evidence": [
             {
               "path": "spec/evidence/discovery-recovery-a575-native-chain-r05.json",
               "sha256": "BA4FF5A3CD12904B9EEC3A60193C11DC6E314C2DD7130BD75BD6E1E0CAD6EF08"
+            },
+            {
+              "path": "spec/evidence/discovery-recovery-current005d-prepared-inputs-r01.json",
+              "sha256": "99419065B9E62F38327C241644D65F76BF888E3C79DB60EB8808E5C3833FE403"
             }
           ]
         },
