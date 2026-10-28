@@ -177,16 +177,16 @@ function Test-MIR441RetiredDirectory {
 
 function Get-MIR441TreeUsage {
   param([Parameter(Mandatory)][string]$Path)
-  [int64]$bytes=0;[int64]$files=0;$complete=$true;$watch=[Diagnostics.Stopwatch]::StartNew()
+  [int64]$bytes=0;[int64]$files=0;$complete=$true;$reparsePoints=0;$watch=[Diagnostics.Stopwatch]::StartNew()
   if(Test-Path -LiteralPath $Path -PathType Container){
     $pending=[Collections.Generic.Stack[IO.DirectoryInfo]]::new();$pending.Push([IO.DirectoryInfo]::new([IO.Path]::GetFullPath($Path)))
     while($pending.Count){
       $directory=$pending.Pop()
       try {
         foreach($item in $directory.EnumerateFileSystemInfos()){
-          if($item.Attributes-band[IO.FileAttributes]::ReparsePoint){$complete=$false;continue}
+          if($item.Attributes-band[IO.FileAttributes]::ReparsePoint){$complete=$false;$reparsePoints++;continue}
           if($item-is[IO.DirectoryInfo]){$pending.Push($item)}else{$bytes+=$item.Length;$files++}
-          if($files-ge10000-or$watch.Elapsed.TotalSeconds-ge2){return [pscustomobject]@{files=$files;bytes=$bytes;complete=$false}}
+          if($files-ge10000-or$watch.Elapsed.TotalSeconds-ge2){return [pscustomobject][ordered]@{files=$files;bytes=$bytes;complete=$false;stopped_by=$(if($files-ge10000){'file-limit'}else{'time-limit'});elapsed_ms=$watch.Elapsed.TotalMilliseconds;reparse_points=$reparsePoints}}
         }
       } catch [IO.DirectoryNotFoundException] {
         # A constructor can retire a queued directory while this live scan is
@@ -196,7 +196,7 @@ function Get-MIR441TreeUsage {
       }
     }
   }
-  return [pscustomobject][ordered]@{files=$files;bytes=$bytes;complete=$complete}
+  return [pscustomobject][ordered]@{files=$files;bytes=$bytes;complete=$complete;stopped_by=$(if($complete){$null}else{'reparse-point'});elapsed_ms=$watch.Elapsed.TotalMilliseconds;reparse_points=$reparsePoints}
 }
 
 function Get-MIR441OwnedProcessTree {
@@ -318,7 +318,7 @@ function Invoke-MIR441MonitoredProcess {
   }else{
     $admission=Assert-MIR441ResourceAdmission -Policy $Policy -WorkRoot $work -EstimatedPeakBytes $EstimatedPeakBytes -ExpectedPeakMemoryBytes $ExpectedPeakMemoryBytes
   }
-  $before=Get-MIR441TreeUsage -Path $work;if(-not$before.complete){throw '[mir441-resource-output-scan-incomplete]'}
+  $before=Get-MIR441TreeUsage -Path $work;if(-not$before.complete){throw ('[mir441-resource-output-scan-incomplete] '+($before|ConvertTo-Json -Compress))}
   $lockPath=Join-Path ([IO.Path]::GetFullPath((Join-Path $PSScriptRoot '../../..'))) 'build/tmp/mir-heavy.lock'
   $null=Resolve-MIR441RecoveryScratchPath -Path $lockPath
   New-Item -ItemType Directory -Force -Path (Split-Path -Parent $lockPath)|Out-Null
@@ -355,7 +355,7 @@ function Invoke-MIR441MonitoredProcess {
       $sample|Add-Member -NotePropertyName process -NotePropertyValue ([ordered]@{id=$process.Id;working_set_bytes=$tree.working_set_bytes;private_bytes=$tree.private_bytes;peak_working_set_bytes=$peak;peak_sampled_private_bytes=$privatePeak;expected_peak_memory_bytes=$ExpectedPeakMemoryBytes;phase='running';memory_enforcement='sampled-watchdog-not-hard-cap'})
       Write-MIR441Json -Value $sample -Path $ledger -Append
       if($tree.working_set_bytes-gt$ExpectedPeakMemoryBytes-or$tree.private_bytes-gt$ExpectedPeakMemoryBytes){throw '[mir441-resource-process-budget]'}
-      $usage=Get-MIR441TreeUsage -Path $work;if(-not$usage.complete){throw '[mir441-resource-output-scan-incomplete]'}
+      $usage=Get-MIR441TreeUsage -Path $work;if(-not$usage.complete){throw ('[mir441-resource-output-scan-incomplete] '+($usage|ConvertTo-Json -Compress))}
       if($usage.bytes-$before.bytes-gt$EstimatedPeakBytes){throw '[mir441-resource-output-budget]'}
       if($process.HasExited){
         Invoke-MIR441OwnedProcessObservation -Callback $OwnedProcessExitCallback -Process $process -StartedUtc $started -Timer $timer -NaturalExit

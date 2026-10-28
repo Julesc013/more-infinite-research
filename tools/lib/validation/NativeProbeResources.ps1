@@ -73,7 +73,7 @@ function Get-MIRNativeProbeRemainingOutputBytes {
     }
   }
   $usage=Get-MIR441TreeUsage -Path $Context.root
-  if(-not $usage.complete) { throw '[mir441-resource-output-scan-incomplete]' }
+  if(-not $usage.complete) { throw ('[mir441-resource-output-scan-incomplete] '+($usage|ConvertTo-Json -Compress)) }
   $newBytes=[int64]$usage.bytes-[int64]$Context.shared_alias_bytes
   $activationProperty=$Context.PSObject.Properties['library_activation']
   if($null -ne $activationProperty -and $null -ne $activationProperty.Value -and -not $activationProperty.Value.closed){
