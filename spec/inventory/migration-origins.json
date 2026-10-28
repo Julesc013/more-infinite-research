@@ -9,7 +9,7 @@
     "public_custody": "https://github.com/Julesc013/more-infinite-research/pull/1272#issuecomment-6454806929",
     "verbatim_request": "yeah i mean it would be nive if all old saves wera appropriately migrated to new technology and settings and ids and mods and etc, but if we just dont know for certain what to do then we can leave it for later but ideally we have migration support from each breaking change or known change or major version or minor release or patches known to change things and etc... i dont really know what i want, i just want mir 5.0.0 to work, and this may or may not be a good idea",
     "ambiguous_lock_decision": {
-      "question": "One migration policy needs your decision: a save that skipped MIR 3.2.2 can retain a researched-but-locked planet, but there is no saved marker distinguishing the old MIR defect from an intentional lock by another mod. For these ambiguous later saves, should MIR preserve the lock and offer an explicit one-time repair, or automatically restore every researched discovery? The first choice best preserves other mods’ intent.",
+      "question": "One migration policy needs your decision: a save that skipped MIR 3.2.2 can retain a researched-but-locked planet, but there is no saved marker distinguishing the old MIR defect from an intentional lock by another mod. For these ambiguous later saves, should MIR preserve the lock and offer an explicit one-time repair, or automatically restore every researched discovery? The first choice best preserves other modsÃ¢â‚¬â„¢ intent.",
       "verbatim_answer": "Preserve ambiguous locks; explicit repair",
       "question_reference": "call_9764f59cb97144bb888d664c095eef63:0"
     },
@@ -2306,6 +2306,18 @@
       "sha256": "FB053A1208DD2D0410EC90D71B0953985CD9C1D4A9D9EB2E9056C89E31B03C7B",
       "status": "passed-bounded-f014-published-to-f0dd-preservation-chain",
       "reuse": "Only the exact named source, candidate, engine/profile/fixture and state contract; broader or later applicability requires VER-06 review or affected execution."
+    },
+    {
+      "path": "spec/evidence/historical-473-f015-7a2-native-chain-r01.json",
+      "sha256": "57F474A329989479BA94045AC763DCAC09682907664DCC8EB8D9B38919EE6B84",
+      "status": "passed-exact-published4.7.3-named-mining-route-to-current7a2",
+      "reuse": "Exact named package/engine/save/fixture only; no full-edition or release verdict."
+    },
+    {
+      "path": "spec/evidence/historical-473-f016-7a2-native-chain-r01.json",
+      "sha256": "8A3FFE0733EC9B446FD3071719D97CD3AC1B7D7EC18AB665EF2256322CD42ABD",
+      "status": "passed-exact-published4.7.3-named-mining-route-to-current7a2",
+      "reuse": "Exact named package/engine/save/fixture only; no full-edition or release verdict."
     }
   ],
   "migration_execution_matrix": {
@@ -2633,70 +2645,213 @@
       ]
     },
     "published_4_7_3_origins": {
-      "policy": "Each supported F013/F014/F015/F016/F017/F100/F110/F200/F210 source needs a 4.7.3-to-5.0.0 route appropriate to its engine bridge; do not claim an F018 source that was never published in this baseline.",
+      "policy": "Exact published4.7.3 same-edition routes, Base/Space Age where supported. Current scoped completion is recorded below against player505/current7a2 assets. A closed named fixture route does not close complete relevant catalogue/settings/provider/runtime coverage or release acceptance. Historical4.7.2 sources remain separate; never relabel them4.7.3.",
       "cases": [
         {
           "edition": "f013",
           "origin_archive_sha256": "3918B10A0902FABD09BEA6D1F0E7EFF06B20B84F3D8CC5EC73E36FEDAAE64D4D",
-          "source_case": "not_run",
-          "final_5_x_case": "not_run",
-          "disposition": "not-a-cartesian-modset-matrix"
+          "source_case": "passed-exact-published-4.7.3-source-with-protected-save",
+          "final_5_x_case": "closed-named-mining-route-only",
+          "disposition": "not-a-cartesian-modset-matrix",
+          "current_archive_sha256": "4DB2D8848EBD2B4EECBF6D91CBEF8F69F5C31F634432496BB26AC40A3FC8964A",
+          "current_completion": {
+            "status": "closed",
+            "scope": "Named character-mining preservation without invented continuation, saved successor and two unchanged-byte cold reloads. Not full catalogue/modpack/client/performance or release qualification.",
+            "native_evidence": {
+              "path": "spec/evidence/historical-473-f013-f0dd-native-chain-r01.json",
+              "sha256": "08D8CDAD2D1CB7AAECE3847F46A94A975C8B40FB0C05D884DF34CC2255E7FCFD"
+            },
+            "applicability": {
+              "path": "spec/evidence/historical-473-f013-f014-7a2-applicability-r01.json",
+              "sha256": "21A60F7375C33E284BBCC66898AD145D340A28F848A4319698AEF82C794E3BB1"
+            },
+            "next_action": "Reuse the named result under its original execution identity. Review any separately required catalogue/settings/runtime coverage; do not rerun for a newer documentation commit."
+          }
         },
         {
           "edition": "f014",
           "origin_archive_sha256": "85C7798BD6DC80FAA021AB0F33519B57A740B8D3969E695A82BA55634BA1C87A",
-          "source_case": "not_run",
-          "final_5_x_case": "not_run",
-          "disposition": "not-a-cartesian-modset-matrix"
+          "source_case": "passed-exact-published-4.7.3-source-with-protected-save",
+          "final_5_x_case": "closed-named-mining-route-only",
+          "disposition": "not-a-cartesian-modset-matrix",
+          "current_archive_sha256": "0A2BE7297D09DCCF084B8A10734651C1499FDE218FA3E2635873329F36250834",
+          "current_completion": {
+            "status": "closed",
+            "scope": "Named character-mining preservation without invented continuation, saved successor and two unchanged-byte cold reloads. Not full catalogue/modpack/client/performance or release qualification.",
+            "native_evidence": {
+              "path": "spec/evidence/historical-473-f014-f0dd-native-chain-r01.json",
+              "sha256": "FB053A1208DD2D0410EC90D71B0953985CD9C1D4A9D9EB2E9056C89E31B03C7B"
+            },
+            "applicability": {
+              "path": "spec/evidence/historical-473-f013-f014-7a2-applicability-r01.json",
+              "sha256": "21A60F7375C33E284BBCC66898AD145D340A28F848A4319698AEF82C794E3BB1"
+            },
+            "next_action": "Reuse the named result under its original execution identity. Review any separately required catalogue/settings/runtime coverage; do not rerun for a newer documentation commit."
+          }
         },
         {
           "edition": "f015",
           "origin_archive_sha256": "0F8DD4DD21B8D1542FF5EDF96FDC38F75C9AB3CE577DF29C5E9DE99E0643B510",
-          "source_case": "not_run",
-          "final_5_x_case": "not_run",
-          "disposition": "not-a-cartesian-modset-matrix"
+          "source_case": "passed-exact-published-4.7.3-source-with-protected-save",
+          "final_5_x_case": "closed-named-mining-route-only",
+          "disposition": "not-a-cartesian-modset-matrix",
+          "current_archive_sha256": "37F7AC276460BC37C82D2426983B89D87393C22DFF8D39ECA17ACC7753F1480D",
+          "current_completion": {
+            "status": "closed",
+            "scope": "Named character-mining preservation, one new successor lab and partial-work checks, saved successor and two unchanged-byte cold reloads. Not full catalogue/modpack/client/performance or release qualification.",
+            "native_evidence": {
+              "path": "spec/evidence/historical-473-f015-7a2-native-chain-r01.json",
+              "sha256": "57F474A329989479BA94045AC763DCAC09682907664DCC8EB8D9B38919EE6B84"
+            },
+            "applicability": "Native successor already uses current7a2/player505 and this exact archive.",
+            "next_action": "Reuse the named result under its original execution identity. Review any separately required catalogue/settings/runtime coverage; do not rerun for a newer documentation commit."
+          }
         },
         {
           "edition": "f016",
           "origin_archive_sha256": "DAC63B9B14278C952B1020F9AE600C1437A9812C79CBBA17DE3CB15AF0CED6BD",
-          "source_case": "not_run",
-          "final_5_x_case": "not_run",
-          "disposition": "not-a-cartesian-modset-matrix"
+          "source_case": "passed-exact-published-4.7.3-source-with-protected-save",
+          "final_5_x_case": "closed-named-mining-route-only",
+          "disposition": "not-a-cartesian-modset-matrix",
+          "current_archive_sha256": "35A8624065D3137E463EBC89DE21C06531F52F9E5E90632EC3C997CF52EEE839",
+          "current_completion": {
+            "status": "closed",
+            "scope": "Named character-mining preservation, one new successor lab and partial-work checks, saved successor and two unchanged-byte cold reloads. Not full catalogue/modpack/client/performance or release qualification.",
+            "native_evidence": {
+              "path": "spec/evidence/historical-473-f016-7a2-native-chain-r01.json",
+              "sha256": "8A3FFE0733EC9B446FD3071719D97CD3AC1B7D7EC18AB665EF2256322CD42ABD"
+            },
+            "applicability": "Native successor already uses current7a2/player505 and this exact archive.",
+            "next_action": "Reuse the named result under its original execution identity. Review any separately required catalogue/settings/runtime coverage; do not rerun for a newer documentation commit."
+          }
         },
         {
           "edition": "f017",
           "origin_archive_sha256": "9BCF1813BBDCBBD90088D74672CEF639FBC96689604673E529CF3AA8FC8D89AF",
-          "source_case": "source-chain-exists-but-not-current-5-x-qualified",
+          "source_case": "published-4.7.3-archive-verified-source-save-not-yet-qualified",
           "final_5_x_case": "not_run",
-          "disposition": "not-a-cartesian-modset-matrix"
+          "disposition": "not-a-cartesian-modset-matrix",
+          "current_archive_sha256": "95228385A0862A807DB20A73F56CA0113693A1CDB3437410187303C598D784C7",
+          "current_completion": {
+            "status": "needs-correction",
+            "problem": "Preparation gap, not an observed MIR5 product defect: the existing historical-transition chain used4.7.2, not this4.7.3 archive.",
+            "next_action": "Extend the explicit4.7.3 historical metadata/profile selection to this target, validate the existing six-member projection, create/protect the exact4.7.3 source, then bind this current archive and run the direct successor/save/two-reload route.",
+            "existing_command": "tools/Invoke-NativeFixture.ps1 -CaseName historical-transition -HistoricalTarget f017 -HistoricalTransitionStage published|mir5 -HistoricalTransitionFixtureMetadataPath <reviewed explicit4.7.3 metadata>",
+            "command_status": "not-ready: metadata/profile/protected4.7.3 source must be prepared first",
+            "prior_evidence": {
+              "path": "spec/evidence/historical-transition-017-100-110-chain.json",
+              "sha256": "759C19C45C9B3100769B39DCA8CD843C295C8C610FF59FEA8D399CFAD6191E82"
+            }
+          }
         },
         {
           "edition": "f100",
           "origin_archive_sha256": "C04F3543EBF99D2B76B2C9193EA0886381B7CDDF2F2C1610310E7961B24BE0E1",
-          "source_case": "source-chain-exists-but-not-current-5-x-qualified",
+          "source_case": "published-4.7.3-archive-verified-source-save-not-yet-qualified",
           "final_5_x_case": "not_run",
-          "disposition": "not-a-cartesian-modset-matrix"
+          "disposition": "not-a-cartesian-modset-matrix",
+          "current_archive_sha256": "6BAE382DBD0AEC7199474921887CFBAC61016B8BF5E8FB990656493A8A174B6C",
+          "current_completion": {
+            "status": "needs-correction",
+            "problem": "Preparation gap, not an observed MIR5 product defect: the existing historical-transition chain used4.7.2, not this4.7.3 archive.",
+            "next_action": "Extend the explicit4.7.3 historical metadata/profile selection to this target, validate the existing six-member projection, create/protect the exact4.7.3 source, then bind this current archive and run the direct successor/save/two-reload route.",
+            "existing_command": "tools/Invoke-NativeFixture.ps1 -CaseName historical-transition -HistoricalTarget f100 -HistoricalTransitionStage published|mir5 -HistoricalTransitionFixtureMetadataPath <reviewed explicit4.7.3 metadata>",
+            "command_status": "not-ready: metadata/profile/protected4.7.3 source must be prepared first",
+            "prior_evidence": {
+              "path": "spec/evidence/historical-transition-017-100-110-chain.json",
+              "sha256": "759C19C45C9B3100769B39DCA8CD843C295C8C610FF59FEA8D399CFAD6191E82"
+            }
+          }
         },
         {
           "edition": "f110",
           "origin_archive_sha256": "66C127D8BFC1919FA88F19D2D9B3047316A1B90401CAA05A6D05979B7A099D1E",
           "source_case": "published-source-qualified-current-5-x-successor-not-yet-bound",
           "final_5_x_case": "not_run",
-          "disposition": "not-a-cartesian-modset-matrix"
+          "disposition": "not-a-cartesian-modset-matrix",
+          "current_archive_sha256": "1C3D982CD048D3C83BF75108F1F9AC769CE0DC833A2DE056CDE16EF8AE2925A9",
+          "current_completion": {
+            "status": "needs-correction",
+            "problem": "The exact4.7.3 F110 source exists, but its qualified successor is F200, not a direct same-edition F110 successor.",
+            "next_action": "Use the exact source-save identity from the source chain, prepare a direct F110 successor profile/fixture/current-archive binding, then execute the named F110 save/lab/two-reload case. Verify the full save hash in the original chain before launch.",
+            "source_evidence": {
+              "path": "spec/evidence/f110-f200-published-source-r05-native-chain.json",
+              "sha256": "BFF56165FCB7B3F5F5FACA29EE9A4E244DCA92833C0A6CE247BE40CF67E83CE2"
+            },
+            "command_status": "not-ready: same-edition successor binding missing"
+          }
         },
         {
           "edition": "f200",
           "origin_archive_sha256": "FBBA844DD04011A12BB6DA885745B0733AD37FAB181EAAD9EE4346B9B0D32647",
           "source_case": "cross-engine-chain-exists-for-prior-candidates-not-final-current-5-x",
           "final_5_x_case": "not_run",
-          "disposition": "not-a-cartesian-modset-matrix"
+          "disposition": "not-a-cartesian-modset-matrix",
+          "current_archive_sha256": "65FC7E907FE3198B7290167989FE2564C1474190D06DAD49860063BEC418EC60",
+          "current_completion": {
+            "status": "needs-correction",
+            "problem": "Current consumed-path applicability or successor packet is incomplete; older passes retain their original inputs. This is not a declared current-package failure.",
+            "scenarios": [
+              {
+                "closure": "base",
+                "status": "needs-correction",
+                "current_archive_sha256": "65FC7E907FE3198B7290167989FE2564C1474190D06DAD49860063BEC418EC60",
+                "existing_evidence": {
+                  "path": "spec/evidence/full-catalogue-f200-f210-8f-native-chain.json",
+                  "sha256": "23B4B74554438C73EFEA294E7328855F379079EA593DA31159B26DD6C0424399"
+                },
+                "next_action": "Reuse the protected published F200 Base source from the cross-engine chain, but prepare a same-edition F200 successor binding. The existing F200-to-F210 result cannot close it.",
+                "command_status": "not-ready: direct F200 successor profile/fixture/current binding"
+              },
+              {
+                "closure": "space-age",
+                "status": "needs-correction",
+                "current_archive_sha256": "65FC7E907FE3198B7290167989FE2564C1474190D06DAD49860063BEC418EC60",
+                "existing_evidence": {
+                  "path": "spec/evidence/legacy-preference-transition-native-chain.json",
+                  "sha256": "C686E9AFA34DEE3E7C1E7AEB5C6C1DEF4D1E8643C65255A37AC3C35AF1FA2EB1"
+                },
+                "next_action": "Prepare an exact4.7.20003 Space Age source and the selected affected provider closure; retain the4.7.20002 preference passes separately. Protect its save, then bind current F200. Do not enumerate arbitrary providers.",
+                "command_status": "not-ready: exact4.7.3 source/save and affected-provider binding"
+              }
+            ]
+          }
         },
         {
           "edition": "f210",
           "origin_archive_sha256": "B6EB9430056ABD384DB00F94929FE7DAC0A37441ACF4BC277946689682628852",
           "source_case": "source-transition-chain-exists-for-prior-candidates-not-final-current-5-x",
           "final_5_x_case": "not_run",
-          "disposition": "not-a-cartesian-modset-matrix"
+          "disposition": "not-a-cartesian-modset-matrix",
+          "current_archive_sha256": "005D420671270306155CB4AC25E9CF77541202DFA16B206DCC016237619C9AA2",
+          "current_completion": {
+            "status": "needs-correction",
+            "problem": "Current consumed-path applicability or successor packet is incomplete; older passes retain their original inputs. This is not a declared current-package failure.",
+            "scenarios": [
+              {
+                "closure": "base",
+                "status": "needs-correction",
+                "current_archive_sha256": "005D420671270306155CB4AC25E9CF77541202DFA16B206DCC016237619C9AA2",
+                "existing_evidence": {
+                  "path": "spec/evidence/full-catalogue-473-8f-native-chain.json",
+                  "sha256": "E52C9BF84969E33D1C7132E97832CFAA29305FFEDBDE08DEC5C61E058997F60F"
+                },
+                "next_action": "Review all intervening consumed members from8F to current005D for this exact protected Base or Space Age save. Reuse only proven unchanged checks; otherwise bind the existing source save to current profile/fixture/independent expectations and execute the affected successor. Never recreate a valid source merely for a new candidate.",
+                "command_status": "not-ready: explicit consumed-path verdict or current successor packet"
+              },
+              {
+                "closure": "space-age",
+                "status": "needs-correction",
+                "current_archive_sha256": "005D420671270306155CB4AC25E9CF77541202DFA16B206DCC016237619C9AA2",
+                "existing_evidence": {
+                  "path": "spec/evidence/full-catalogue-473-8f-native-chain.json",
+                  "sha256": "E52C9BF84969E33D1C7132E97832CFAA29305FFEDBDE08DEC5C61E058997F60F"
+                },
+                "next_action": "Review all intervening consumed members from8F to current005D for this exact protected Base or Space Age save. Reuse only proven unchanged checks; otherwise bind the existing source save to current profile/fixture/independent expectations and execute the affected successor. Never recreate a valid source merely for a new candidate.",
+                "command_status": "not-ready: explicit consumed-path verdict or current successor packet"
+              }
+            ]
+          }
         }
       ]
     },
@@ -3433,6 +3588,227 @@
           "source_save_case": "not_run",
           "candidate_upgrade_cases": "not_run",
           "disposition": "Reuse a protected matching source save when available; otherwise verify this exact MIR archive before source preparation. Installed engine patches and available dependencies are valid first-pass inputs when recorded."
+        }
+      ]
+    },
+    "completion_queue_5_0_0": {
+      "reviewed_commit": "22c2f9a8e49047a03ea8d1d844d68a79c11bc749",
+      "player_tree": "5058373348e9049f8b67ec4dbb79b400a904acd6",
+      "package_freeze": {
+        "path": "spec/evidence/current-assets-7a2f9322-root-readback.json",
+        "sha256": "286D2523C8489184171AEB3306338820BBE1634720D64CE3052CCB8FF5548084"
+      },
+      "native_owner": "Black Glass; Aero prepares/reviews without launching or mutating a direct library",
+      "status_meanings": {
+        "closed": "Only the named scoped route is satisfied; wider support/release verdicts remain independent.",
+        "ready-to-execute": "Exact archives/engine/settings/save/fixture/harness, independent expectations and existing command are frozen. None is inferred from a profile filename.",
+        "needs-correction": "A concrete preparation/applicability/fixture/product gap remains; the problem field distinguishes which.",
+        "explicitly-unverified-deferred": "Permitted uncertain/unavailable older history; no pass or guessed repair.",
+        "not-applicable": "Capability, absent predecessor or unsupported route is explicitly identified."
+      },
+      "same_edition_cases": "published_4_7_3_origins.cases above: nine editions, with separate Base/Space Age scenarios for F200/F210. Four closed named historical mining routes do not imply four fully qualified editions.",
+      "selection_rule": "Resolve consumed-path reviews first, then freeze one useful next native packet. Keep at most one active and one pending native assignment. Preserve original sources/adverses; no every-tag or every-permutation campaign.",
+      "older_contract_cases": [
+        {
+          "boundary": "MIR1.0 data-only identities",
+          "status": "needs-correction",
+          "problem": "Separate F200/BD1 and F210/58F routes passed from one protected F8B3 original; current505 consumed-path review is not complete.",
+          "next_action": "Compare intervening loaded members against the actual source/save/fixture contract; reuse exact unchanged checks or prepare only affected successor execution. No runtime decoder exists to reconstruct.",
+          "evidence": [
+            {
+              "path": "spec/evidence/migration-origin-100-direct-successor-native-chain.json",
+              "sha256": "F7088432C89DEE88323F2478368A0453770AF4799B75D98485823ADC53A16211"
+            }
+          ]
+        },
+        {
+          "boundary": "MIR1.1 module credits and disabled public row",
+          "status": "needs-correction",
+          "problem": "F200/F210 c74 direct routes and the f0dd disabled-module reset regression passed at their exact inputs; current applicability remains to be pinned.",
+          "next_action": "Review current bootstrap/reset/credit and Library separation. Keep the three historical .01 holders, disabled-public-row decision, source defaults and current native-owner credit expectations. Reuse unchanged cases; execute only affected paths.",
+          "evidence": [
+            {
+              "path": "spec/evidence/migration-origin-110-direct-c74-native-chain-r01.json",
+              "sha256": "51545C6E77262CBC6CDA4336449C8F8B62F18E28BF6030B107013488DB271700"
+            },
+            {
+              "path": "spec/evidence/disabled-module-reset-f0dd-native-chain-r01.json",
+              "sha256": "C9D9E2846077378002F174210D748499992997D22ACDA092DCDEAD7A2852C930"
+            }
+          ]
+        },
+        {
+          "boundary": "MIR1.2 combined rocket/cannon credit",
+          "status": "closed",
+          "problem": "The original575e F200/F210 Base routes pass from protected FDC9. Exact package/member and no-player consumed-path review supports current505 applicability for this named route only.",
+          "next_action": "Reuse the scoped original headless checks under their unchanged575e execution identities. Keep1.2.5/.9, Space Age and GUI saved-state cases unverified; do not rerun the unchanged chain solely for current documentation commits.",
+          "evidence": [
+            {
+              "path": "spec/evidence/migration-origin-120-575e-direct-native-chain-r01.json",
+              "sha256": "8B42D0FEC713CB6DD6CEC57C9C3BCA70ACA05E09ECE1228B36AE4F041733E240"
+            }
+          ],
+          "applicability": {
+            "path": "spec/evidence/migration-origin-120-7a2-applicability-r01.json",
+            "sha256": "0CCDF0447AA7D47E60CA355113EF1B7FA421EE4CBFDA41A3FDE35911D4B2A45D"
+          }
+        },
+        {
+          "boundary": "Policy-v1 literal-boolean cap ownership",
+          "status": "needs-correction",
+          "problem": "Exact4.0.20000 to a575 F200/direct F210 passed. Tag bodies differ from published controller bytes; no later candidate verdict is automatic.",
+          "next_action": "Review actual V1 reader/owner/effect/visibility consumed paths against505 and retain positive versus absent/false markers. Execute the affected representative only if equivalence cannot be proved.",
+          "evidence": [
+            {
+              "path": "spec/evidence/legacy-boolean-cap-a575-native-chain.json",
+              "sha256": "C9BCCAC54903586119169F5628DA2819185B401022E319E34805A79DAD9CB0C3"
+            },
+            {
+              "path": "spec/evidence/historical-boolean-cap-archive-metadata.json",
+              "sha256": "F56981D287F8BA9E21B06C7238078FA17D14BB307E2700346904815FCE74617B"
+            }
+          ]
+        },
+        {
+          "boundary": "Structured-V3 cap ownership and F200/F210 label collision",
+          "status": "needs-correction",
+          "problem": "Published-byte inspection and host tuple/collision controls exist; an earlier-V3 native finite-cap source/successor route remains missing.",
+          "next_action": "Select one byte-verified4.2/4.4 F200 representative, prepare/protect the owned/foreign worker-tail source and same/direct-F210 successor cases. Ordinary current-target reader and current literal-false ownership must win. Do not execute all15 version labels.",
+          "evidence": [
+            {
+              "path": "spec/evidence/historical-structured-cap-archive-metadata.json",
+              "sha256": "EBD7141075DBF3BC6FEF2BDE250DC1E7CF907B05EBBD634942829E094B7AD054"
+            },
+            {
+              "path": "spec/evidence/historical-remaining-cap-archive-metadata.json",
+              "sha256": "92B6A83A887B615394CD4AB9C1A26AE737261657F98F530D8325C4D998DCFDA5"
+            }
+          ]
+        },
+        {
+          "boundary": "MIR3.2 researched discovery and foreign locks",
+          "status": "needs-correction",
+          "problem": "Exact3.2.0 EC0E to a575/7CE no-helper R05 passed; current505 applicability is not yet pinned.",
+          "next_action": "Review unchanged native grant/queued-cost/state paths before reuse. Preserve ambiguous later foreign locks and offer explicit operator repair; no automatic helper or inferred3.2.1 pass.",
+          "evidence": [
+            {
+              "path": "spec/evidence/discovery-recovery-a575-native-chain-r05.json",
+              "sha256": "BA4FF5A3CD12904B9EEC3A60193C11DC6E314C2DD7130BD75BD6E1E0CAD6EF08"
+            }
+          ]
+        },
+        {
+          "boundary": "K2 Imersite public/carrier identities",
+          "status": "needs-correction",
+          "problem": "Direct4.6 to frozen MIR5 matching-cost chain passes; the published4.7.2 intermediate fails before MIR5. K2SE is a separate prepared closure.",
+          "next_action": "Review direct-route505 applicability, then qualify the distinct K2SE published-origin carrier case. Keep failed staged4.7.2 route explicit; do not patch an old archive or manufacture state to make it pass.",
+          "evidence": [
+            {
+              "path": "spec/evidence/native-recovery-wave-r05-chain.json",
+              "sha256": "36B34E7CCB41BFF138B41B9602DDEAB9C56502020EDE4CC9699F300667609F6B"
+            }
+          ]
+        }
+      ],
+      "additional_transition_cases": [
+        {
+          "boundary": "F1104.7.3 to F200",
+          "status": "needs-correction",
+          "problem": "Source r05 and a1fd/8BA recovered successor pass at exact older inputs.",
+          "next_action": "Compare consumed package members/save bridge before reusing, or execute the existing protected D524 source against current65FC with the existing bridge fixture. Retain outer-caller adverse.",
+          "evidence": [
+            {
+              "path": "spec/evidence/f110-f200-published-source-r05-native-chain.json",
+              "sha256": "BFF56165FCB7B3F5F5FACA29EE9A4E244DCA92833C0A6CE247BE40CF67E83CE2"
+            },
+            {
+              "path": "spec/evidence/f110-f200-a1fd-successor-recovery-chain.json",
+              "sha256": "BA37B082C7AE2261423A1AA0C86D57FE8738601F27BF73A6D7B69FBC1B981948"
+            }
+          ]
+        },
+        {
+          "boundary": "F100 to F110 legacy-laser rename",
+          "status": "needs-correction",
+          "problem": "The known rename/continuation bridge has no named protected native route in the inspected inventory.",
+          "next_action": "Prepare one actual protected F100 source with the affected earned finite laser identity and direct F110 successor expectations/profile; check preserved effect, continuation, save and two reloads. Do not expand to F018 or all old-engine hops.",
+          "evidence": [
+            {
+              "path": "spec/evidence/historical-transition-017-100-110-chain.json",
+              "sha256": "759C19C45C9B3100769B39DCA8CD843C295C8C610FF59FEA8D399CFAD6191E82"
+            }
+          ]
+        },
+        {
+          "boundary": "Published F2004.7.3 Base to F210 Base",
+          "status": "needs-correction",
+          "problem": "C563 and8F protected-save successors pass54 level-backed rows and partial/queued state; final505 applicability remains unreviewed.",
+          "next_action": "Review intervening consumed members for original9D39 source; reuse only proven unchanged checks, otherwise prepare current005D successor from that same source.",
+          "evidence": [
+            {
+              "path": "spec/evidence/full-catalogue-f200-f210-c563-native-chain-r01.json",
+              "sha256": "A13845A1EF36739185CFBD13B4066EE842ECC1AF7DD8734F3337B8FF4BAEF27F"
+            },
+            {
+              "path": "spec/evidence/full-catalogue-f200-f210-8f-native-chain.json",
+              "sha256": "23B4B74554438C73EFEA294E7328855F379079EA593DA31159B26DD6C0424399"
+            }
+          ]
+        },
+        {
+          "boundary": "Published F200 cap disabled/re-enabled and V3 F210 worker tails",
+          "status": "needs-correction",
+          "problem": "The zero-lab f0dd foreign-cap regression is a different seeded case, not a published-origin upgrade. Same/cross-engine published fixture routes are prepared only.",
+          "next_action": "Bind tests/fixtures/f200-legacy-cap and its existing same/cross-engine profiles to actual4.7.3 protected source, current65FC/005D, disabled0.6 and re-enabled0.7. Assert owned restoration, foreign disablement, .27/.42, actual re-enabled lab and two reloads per saved stage.",
+          "evidence": [
+            {
+              "path": "spec/evidence/f200-foreign-cap-baseline-f0dd-native-chain-r01.json",
+              "sha256": "8AFA0A785034D9C3C0D9F5A0E92B11BF827898CE57DB5AD795516B88FDABD33B"
+            }
+          ]
+        },
+        {
+          "boundary": "F200 Space Age first-upgrade provider/preference",
+          "status": "needs-correction",
+          "problem": "Exact4.7.20002 chain passes protected refusals and both two-step directions. The selected4.7.20003 native provider route is not qualified.",
+          "next_action": "Share the exact4.7.3 Space Age source preparation with the stable F200 row. Preserve simultaneous-startup-change refusal and unchanged-settings first upgrade; then save/reload before preference/provider change with new lab/effects/foreign queue. No extra all-provider matrix.",
+          "evidence": [
+            {
+              "path": "spec/evidence/legacy-preference-transition-native-chain.json",
+              "sha256": "C686E9AFA34DEE3E7C1E7AEB5C6C1DEF4D1E8643C65255A37AC3C35AF1FA2EB1"
+            },
+            {
+              "path": "spec/evidence/legacy-preference-canonical-current-native-chain.json",
+              "sha256": "15D1419B8F09821DF35D87A887990CEB3804708A2D26413AF1CBA3905B43CF5F"
+            }
+          ]
+        }
+      ],
+      "permitted_limits": [
+        {
+          "boundary": "Uncertain older1.9-3.x runtime writer histories",
+          "status": "explicitly-unverified-deferred",
+          "reason": "Writer topology/archived source alone does not establish actual saved ownership, browser or scripted-contribution meaning. Preserve inventories/originals and add a narrow decoder only with protected-state evidence; no guessed reconstruction."
+        },
+        {
+          "boundary": "K2 published4.7.2 intermediate",
+          "status": "explicitly-unverified-deferred",
+          "reason": "Observed published progress setter failure occurs before MIR5. Retain adverse and qualify direct4.6 route separately; no assertion that this staged route works."
+        },
+        {
+          "boundary": "Unselected DLC/provider permutations and remove-save-readd",
+          "status": "not-applicable",
+          "reason": "No blanket support promise. A specifically admitted add/remove-Space-Age or provider route requires its own protected inputs and evidence before claiming support. Absence-save can discard state; retain original backups."
+        },
+        {
+          "boundary": "F018 exact4.7.3 predecessor",
+          "status": "not-applicable",
+          "reason": "No published4.7.3 F018 artifact. F018 is experimental F100-derived package/metadata/load smoke only, not a tenth stable migration campaign."
+        },
+        {
+          "boundary": "F001-F012 and unavailable older origins",
+          "status": "explicitly-unverified-deferred",
+          "reason": "Retain best-effort build/loader/engine-format limits. Missing native inputs are not passes and do not create stable-release campaigns."
         }
       ]
     }
