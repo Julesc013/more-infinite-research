@@ -37,7 +37,7 @@ TARGET_ID = re.compile(
 )
 TARGET_VERSION_ASSIGNMENT = re.compile(rb"(?m)^[ \t]*distribution_version[ \t]*=")
 TARGET_VERSION = re.compile(
-    rb'(?m)^[ \t]*distribution_version[ \t]*=[ \t]*"(?P<version>\d+\.\d+\.\d+)"[ \t]*,[ \t]*\r?$'
+    rb'(?m)^[ \t]*distribution_version[ \t]*=[ \t]*"(?P<version>\d+\.\d+\.\d+)"[ \t]*,?[ \t]*\r?$'
 )
 
 

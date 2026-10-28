@@ -114,6 +114,57 @@ class PortalExportTests(unittest.TestCase):
             with self.assertRaisesRegex(portal.PortalExportError, "nine stable editions"):
                 portal.export_portal_copy(input_archive, "f018", temporary / "more-infinite-research_5.0.06.zip")
 
+    def test_real_packager_output_exports_with_only_the_permitted_metadata_changes(self):
+        revision = subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=ROOT, text=True).strip()
+        source_info = json.loads(subprocess.check_output(
+            ["git", "show", f"{revision}:source/info.json"], cwd=ROOT))
+        major, minor, encoded = map(int, source_info["version"].split("."))
+        patch = encoded % 100
+        extended = f"{major}.{minor}.{21000 + patch:05d}"
+        portal_version = f"{major}.{minor}.{10 * patch + 9:02d}"
+        with tempfile.TemporaryDirectory() as temporary:
+            temporary = Path(temporary)
+            input_archive = temporary / f"more-infinite-research_{extended}.zip"
+            subprocess.run(
+                [sys.executable, "-B", str(ROOT / "tools/package.py"), "--source", str(ROOT / "source"),
+                 "--revision", revision, "--target", "f210", "--output", str(input_archive)],
+                cwd=ROOT, check=True, text=True, capture_output=True,
+            )
+            before = input_archive.read_bytes()
+            names, payloads, comment = self._members(input_archive)
+            output = temporary / f"more-infinite-research_{portal_version}.zip"
+
+            record = portal.export_portal_copy(input_archive, "f210", output)
+
+            output_names, output_payloads, output_comment = self._members(output)
+            root = f"more-infinite-research_{extended}"
+            permitted = {root + "/info.json", root + "/platform/target.lua"}
+            self.assertEqual(names, output_names)
+            self.assertEqual(comment, output_comment)
+            self.assertEqual(before, input_archive.read_bytes())
+            self.assertEqual(permitted, {name for name in names if payloads[name] != output_payloads[name]})
+            for name in permitted:
+                self.assertEqual(payloads[name].replace(extended.encode(), portal_version.encode(), 1),
+                                 output_payloads[name])
+            self.assertEqual(portal_version, record["portal_version"])
+            self.assertEqual(self._sha256(output), record["output"]["sha256"])
+
+    def test_final_target_version_accepts_both_valid_trailing_comma_forms(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            for index, comma in enumerate(("", ",")):
+                with self.subTest(trailing_comma=bool(comma)):
+                    directory = Path(temporary) / str(index)
+                    directory.mkdir()
+                    input_archive = directory / "more-infinite-research_5.0.21000.zip"
+                    target_path = "more-infinite-research_5.0.21000/platform/target.lua"
+                    target = ('return {\n  id = "f210",\n'
+                              '  distribution_version = "5.0.21000"' + comma + '\n}\n').encode()
+                    self._write_completed_zip(input_archive, member_overrides={target_path: target})
+                    output = directory / "more-infinite-research_5.0.09.zip"
+                    portal.export_portal_copy(input_archive, "f210", output)
+                    _, payloads, _ = self._members(output)
+                    self.assertEqual(target.replace(b"5.0.21000", b"5.0.09"), payloads[target_path])
+
     def test_refuses_wrong_edition_root_version_filename_duplicate_and_path_anomalies(self):
         with tempfile.TemporaryDirectory() as temporary:
             temporary = Path(temporary)
