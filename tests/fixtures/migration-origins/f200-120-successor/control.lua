@@ -103,7 +103,7 @@ local function source_state()
   if #value.roster ~= C.source_rows or #value.weapons ~= C.source_weapons then fail("protected source roster count differs") end
   return value
 end
-local function assert_snapshot(snapshot, label, direct_level, direct_saved)
+local function assert_snapshot(snapshot, label)
   if type(snapshot) ~= "table" or type(snapshot.technologies) ~= "table" or type(snapshot.weapons) ~= "table"
       or type(snapshot.recipes) ~= "table" or type(snapshot.fields) ~= "table" or type(snapshot.gun_speed) ~= "table" then
     fail(label .. " source snapshot is malformed")
@@ -111,17 +111,24 @@ local function assert_snapshot(snapshot, label, direct_level, direct_saved)
   if count(snapshot.technologies) ~= C.source_rows or count(snapshot.weapons) ~= C.source_weapons then
     fail(label .. " source snapshot roster count differs")
   end
-  local combined = snapshot.technologies[C.source_combined]
-  if type(combined) ~= "table" or combined.level ~= direct_level or combined.researched ~= false
+  local combined, combined_expected = snapshot.technologies[C.source_combined], C.source_combined_state
+  if type(combined) ~= "table" or combined.level ~= combined_expected.level or combined.researched ~= false
       or combined.enabled ~= true or combined.visible ~= false or combined.maximum ~= UINT32_MAX
-      or not close(combined.saved, direct_saved) or combined.effects ~= C.source_combined_signature then
+      or not close(combined.saved, combined_expected.saved) or combined.effects ~= combined_expected.effects then
     fail(label .. " saved combined rocket/cannon state differs: " .. row_text(combined))
+  end
+  local gear, gear_expected = snapshot.technologies[C.direct], C.source_gears[label]
+  if type(gear) ~= "table" or type(gear_expected) ~= "table" or gear.level ~= gear_expected.level
+      or gear.researched ~= false or gear.enabled ~= true or gear.visible ~= false or gear.maximum ~= UINT32_MAX
+      or not close(gear.saved, gear_expected.saved) or gear.effects ~= gear_expected.effects
+      or not close(snapshot.recipes[C.gear_recipe], gear_expected.bonus) then
+    fail(label .. " saved gear state differs: " .. row_text(gear))
   end
   for name, expected in pairs(C.source_runtime) do
     local row = snapshot.weapons[name]
     if type(row) ~= "table" or row.level ~= expected.level or row.maximum ~= expected.maximum
         or row.researched ~= source_seeded(label, name) or row.enabled ~= true or row.visible ~= false
-        or not close(row.saved, 0) or row.effects ~= expected_gun_signature(expected.effects) then
+        or not close(row.saved, 0) or row.effects ~= expected.saved_effects then
       fail(label .. " saved finite owner differs: " .. name .. " " .. row_text(row))
     end
   end
@@ -131,19 +138,12 @@ local function assert_snapshot(snapshot, label, direct_level, direct_saved)
       fail(label .. " saved source gun total differs: " .. category)
     end
   end
-  if not close(snapshot.recipes[C.gear_recipe], .1) then fail(label .. " saved gear contribution differs") end
   if not close(snapshot.fields.worker_robots_battery_modifier, .1) then fail(label .. " saved worker-battery contribution differs") end
 end
 local function assert_source(value)
-  assert_snapshot(value.player_snapshot, "player", 2, 0)
-  -- Active queue progress belongs to LuaForce.  The foreign saved-progress
-  -- field is preserved as a separate source value and must not proxy .42.
-  local foreign_saved = value.foreign_snapshot.technologies[C.source_combined]
-  if type(foreign_saved) ~= "table" or type(foreign_saved.saved) ~= "number" or foreign_saved.saved < 0 or foreign_saved.saved >= 1 then
-    fail("foreign saved source combined progress differs")
-  end
-  assert_snapshot(value.foreign_snapshot, "foreign", 1, foreign_saved.saved)
-  assert_snapshot(value.detached_snapshot, "detached", 1, .27)
+  assert_snapshot(value.player_snapshot, "player")
+  assert_snapshot(value.foreign_snapshot, "foreign")
+  assert_snapshot(value.detached_snapshot, "detached")
   if value.foreign_queue.current ~= C.direct or #value.foreign_queue.queue ~= 2
       or value.foreign_queue.queue[1] ~= C.direct or value.foreign_queue.queue[2] ~= "recipe-prod-research_plastic-1"
       or not close(value.foreign_queue.progress, .42) then
@@ -188,7 +188,12 @@ local function assert_split(force, snapshot, label)
   if gun_signature(rocket.prototype.effects) ~= expected_gun_signature(C.split_effects.rocket) then
     fail(label .. " current rocket split effect differs")
   end
-  if cannon.level ~= 1 or cannon.researched ~= false or cannon.enabled ~= true or cannon.visible_when_disabled ~= false
+  -- The published combined level has one completed paid level.  A successor
+  -- may keep that cannon contribution in the hidden credit carrier or may
+  -- materialize it in the new public cannon row.  The aggregate gun check
+  -- below prevents either path from creating or dropping a contribution.
+  if type(cannon.level) ~= "number" or cannon.level % 1 ~= 0 or cannon.level < 1 or cannon.level > saved.level
+      or cannon.researched ~= false or cannon.enabled ~= true or cannon.visible_when_disabled ~= false
       or cannon.prototype.max_level ~= UINT32_MAX or not close(cannon.saved_progress, 0)
       or gun_signature(cannon.prototype.effects) ~= expected_gun_signature(C.split_effects.cannon) then
     fail(label .. " current cannon split state differs: " .. runtime_row_text(cannon))
@@ -241,10 +246,48 @@ local function assert_source_before(value)
   assert_force(game.forces.player, value.player_snapshot, "player", 0)
   assert_other_source_forces(value)
 end
+
+-- Read-only output before any strict current-state assertion gives an adverse
+-- native receipt the public/split/finite state of all three preserved forces.
+local function observed_effect(effect)
+  if type(effect) ~= "table" then return {invalid = tostring(effect)} end
+  return {type = effect.type, recipe = effect.recipe, ammo_category = effect.ammo_category,
+    change = effect.change, modifier = effect.modifier}
+end
+local function observed_technology(force, name)
+  local value = force and force.technologies and force.technologies[name]
+  if value == nil or value.valid == false then return {name = name, present = false} end
+  local effects = {}
+  for index, effect in ipairs(value.prototype.effects or {}) do effects[index] = observed_effect(effect) end
+  return {name = name, present = true, level = value.level, researched = value.researched,
+    enabled = value.enabled, visible = value.visible_when_disabled, saved = value.saved_progress,
+    maximum = value.prototype.max_level, effects = effects}
+end
+local function observed_force(force)
+  if force == nil or force.valid == false then return {present = false} end
+  local rows, seen = {}, {}
+  for _, name in ipairs({C.direct, C.source_combined, C.cannon}) do rows[#rows + 1], seen[name] = observed_technology(force, name), true end
+  for name in pairs(C.current_runtime) do if not seen[name] then rows[#rows + 1] = observed_technology(force, name) end end
+  table.sort(rows, function(left, right) return left.name < right.name end)
+  local guns = {}
+  for _, category in ipairs({"bullet", "shotgun-shell", "rocket", "cannon-shell", "electric", "flamethrower"}) do
+    guns[category] = force.get_gun_speed_modifier(category)
+  end
+  return {present = true, index = force.index, rows = rows, gun_speed = guns}
+end
+local function emit_current_observation(value, target_name)
+  if helpers == nil or type(helpers.table_to_json) ~= "function" then fail("plain JSON helper is unavailable") end
+  log("[MIR5_MIGRATION_ORIGIN_F200_120_SUCCESSOR] CURRENT " .. helpers.table_to_json({
+    case = "migration-origin-1.2.0-" .. target_name .. "-successor", stage = "before-source-assertions",
+    player = observed_force(game.forces.player), foreign = observed_force(game.forces[value.foreign_index]),
+    detached = observed_force(game.forces[value.detached_index]),
+  }))
+end
 local function direct_delta(value)
   local matches = 0
   for _, effect in ipairs(value.prototype.effects or {}) do
-    if effect.type == "change-recipe-productivity" and effect.recipe == C.gear_recipe and effect.change == C.expected_gear_delta then matches = matches + 1 end
+    if effect.type == "change-recipe-productivity" and effect.recipe == C.gear_recipe
+        and scalar(effect.change) == C.expected_gear_delta then matches = matches + 1 end
   end
   if matches ~= 1 then fail("candidate gear effect differs") end
   return C.expected_gear_delta
@@ -292,6 +335,7 @@ end
 local function begin()
   local target_name = target()
   local value = source_state()
+  emit_current_observation(value, target_name)
   assert_source_before(value)
   value.successors = value.successors or {}
   if value.successors[target_name] ~= nil then fail("target successor already began") end

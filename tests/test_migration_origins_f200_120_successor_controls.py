@@ -94,6 +94,17 @@ class MigrationOriginF200120SuccessorControls(unittest.TestCase):
         self.assertEqual("recipe-prod-research_cannon_shooting_speed-1", catalogue["cannon"])
         self.assertEqual(34, catalogue["source_rows"])
         self.assertEqual(7, catalogue["source_weapons"])
+        self.assertEqual(
+            {"level": 2, "saved": 0,
+             "effects": "gun-speed|cannon-shell|0.1,gun-speed|rocket|0.1"},
+            catalogue["source_combined_state"])
+        self.assertEqual(
+            {"player": (2, 0, .10000000149011612), "foreign": (1, 0, 0), "detached": (1, .27, 0)},
+            {name: (row["level"], row["saved"], row["bonus"])
+             for name, row in catalogue["source_gears"].items()})
+        self.assertEqual(
+            "gun-speed|bullet|0.3,gun-speed|shotgun-shell|0.4",
+            catalogue["source_runtime"]["weapon-shooting-speed-5"]["saved_effects"])
         self.assertEqual(("weapon-shooting-speed-1", "weapon-shooting-speed-2", "weapon-shooting-speed-3",
                           "weapon-shooting-speed-4", "weapon-shooting-speed-5", "weapon-shooting-speed-6"),
                          tuple(catalogue["source_finite_seed_sets"]["player"]))
@@ -118,8 +129,9 @@ class MigrationOriginF200120SuccessorControls(unittest.TestCase):
         source_control = (SOURCE_FIXTURE / "control.lua").read_text(encoding="utf-8")
         successor = (FIXTURE / "control.lua").read_text(encoding="utf-8")
         self.assertIn('local KEY = "mir5_migration_origin_f200_120_source"', source_control)
-        self.assertIn("source_combined_signature", successor)
+        self.assertIn("source_combined_state", successor)
         self.assertIn("assert_source_before(value)", successor)
+        self.assertIn("emit_current_observation(value, target_name)", successor)
         self.assertIn("assert_current_weapons", successor)
         self.assertIn("saved - (old[category] or 0) + (current[category] or 0)", successor)
         self.assertIn("candidate lab", successor)
@@ -215,7 +227,7 @@ class MigrationOriginF200120SuccessorControls(unittest.TestCase):
     def test_pre_lab_cannon_conservation_refuses_the_uncredited_current_shape(self):
         self.lua.globals().fixture_control_path = (FIXTURE / "control.lua").as_posix()
         self.lua.execute(r'''
-          function migration_origin_120_successor_cannon_boundary(credited)
+          function migration_origin_120_successor_cannon_boundary(mode)
             local callbacks={}
             local env={script={on_configuration_changed=function(fn) callbacks.configuration=fn end,
               on_load=function(fn) callbacks.load=fn end,on_event=function() end},
@@ -237,6 +249,7 @@ class MigrationOriginF200120SuccessorControls(unittest.TestCase):
             local catalogue=env.require("__mir-fixture-mir5-migration-origin-f200-120-source__/catalogue")
             local assert_source_before=upvalue(callbacks.configuration,"assert_source_before")
             local assert_force=upvalue(assert_source_before,"assert_force")
+            local direct_delta=upvalue(callbacks.configuration,"direct_delta")
             local function copy_effects(source)
               local out={};for index,effect in ipairs(source) do
                 out[index]={type=effect.type,ammo_category=effect.ammo_category,modifier=effect.modifier}
@@ -250,7 +263,7 @@ class MigrationOriginF200120SuccessorControls(unittest.TestCase):
             end
             add(catalogue.direct,2,4294967295,{},false)
             add(catalogue.source_combined,2,4294967295,catalogue.split_effects.rocket,false)
-            add(catalogue.cannon,1,4294967295,catalogue.split_effects.cannon,false)
+            add(catalogue.cannon,mode=="public" and 2 or 1,4294967295,catalogue.split_effects.cannon,false)
             local weapons={}
             for name,row in pairs(catalogue.current_runtime) do
               local researched=name~="weapon-shooting-speed-7"
@@ -265,22 +278,35 @@ class MigrationOriginF200120SuccessorControls(unittest.TestCase):
             local snapshot={technologies={
               [catalogue.direct]={level=2,researched=false,enabled=true,visible=false,maximum=4294967295,saved=0},
               [catalogue.source_combined]={level=2,researched=false,enabled=true,visible=false,maximum=4294967295,saved=0,
-                effects=catalogue.source_combined_signature},
+                effects=catalogue.source_combined_state.effects},
               },weapons=weapons,recipes={[catalogue.gear_recipe]=.1},fields={worker_robots_battery_modifier=.1},
               gun_speed={bullet=1.5,["shotgun-shell"]=1.6,rocket=.1,["cannon-shell"]=.1,electric=.1,flamethrower=.1}}
-            local speeds={bullet=1.5,["shotgun-shell"]=1.6,rocket=3.5,["cannon-shell"]=credited and 2.4 or 2.3,electric=.1,flamethrower=.1}
+            local speeds={bullet=1.5,["shotgun-shell"]=1.6,rocket=3.5,["cannon-shell"]=mode=="uncredited" and 2.3 or 2.4,electric=.1,flamethrower=.1}
             local force={valid=true,technologies=technologies,recipes={[catalogue.gear_recipe]={valid=true,productivity_bonus=.1},},
               worker_robots_battery_modifier=.1,get_gun_speed_modifier=function(category) return speeds[category] end}
             local ok,message=pcall(function() assert_force(force,snapshot,"player",0) end)
-            return {ok=ok,message=tostring(message)}
+            local function delta(effects)
+              local passed,detail=pcall(function() return direct_delta({prototype={effects=effects}}) end)
+              return {ok=passed,detail=tostring(detail)}
+            end
+            local exact={{type="change-recipe-productivity",recipe=catalogue.gear_recipe,change=0.10000000149011612}}
+            return {ok=ok,message=tostring(message),exact=delta(exact),raw=delta({{type="change-recipe-productivity",recipe=catalogue.gear_recipe,change=.1}}),
+              nearby=delta({{type="change-recipe-productivity",recipe=catalogue.gear_recipe,change=.10000001}}),
+              duplicate=delta({exact[1],exact[1]})}
           end
         ''')
         invoke = self.lua.eval("migration_origin_120_successor_cannon_boundary")
-        accepted = py(invoke(True))
-        rejected = py(invoke(False))
-        self.assertTrue(accepted["ok"], accepted["message"])
+        hidden = py(invoke("hidden"))
+        public = py(invoke("public"))
+        rejected = py(invoke("uncredited"))
+        self.assertTrue(hidden["ok"], hidden["message"])
+        self.assertTrue(public["ok"], public["message"])
         self.assertFalse(rejected["ok"])
         self.assertIn("preserved gun contribution differs: cannon-shell", rejected["message"])
+        self.assertTrue(hidden["exact"]["ok"], hidden["exact"]["detail"])
+        self.assertTrue(hidden["raw"]["ok"], hidden["raw"]["detail"])
+        self.assertFalse(hidden["nearby"]["ok"])
+        self.assertFalse(hidden["duplicate"]["ok"])
 
 
 if __name__ == "__main__":
