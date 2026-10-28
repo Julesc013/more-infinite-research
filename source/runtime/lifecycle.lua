@@ -111,7 +111,8 @@ end
 -- additionally consider exact published F200 predecessor tuples.
 local LEGACY_ALLOWLIST = legacy_caps.allowlist(DECLARATIONS, platform_target.id)
 -- Actual info.json versions from the hash-checked structured MIR4 F200 ZIPs.
--- RC/stable4.2 share a value; the stable F210 ZIP also reports4.2.20000.
+-- RC/stable4.2 F200 share a value. Exact F2104.2 metadata is4.2.21000;
+-- the earlier contradictory archive observation is retained with a correction.
 -- This event gate therefore permits an additional reader, never replaces the
 -- ordinary F210 reader or identifies an engine from the version text alone.
 local PUBLISHED_F200_M4_VERSIONS = {
@@ -375,7 +376,7 @@ local function discard_unbound_ownership(force, owned_disabled, admitted, owner,
   return owned
 end
 
-local function reconcile_force(force, owned_disabled, selected_owner, owner_resolved, target_name)
+local function reconcile_force(force, owned_disabled, selected_owner, owner_resolved, target_name, imported_reenabled)
   if not valid_force(force) then return end
   local owned = type(owned_disabled) == "table" and owned_disabled[force.index] or nil
   local include_worker = has_worker_ownership(owned)
@@ -409,7 +410,7 @@ local function reconcile_force(force, owned_disabled, selected_owner, owner_reso
     end
   end
   local targets = target_name and {[target_name] = true} or nil
-  local _, result = caps.reconcile(force, limits, owned_disabled, targets)
+  local _, result = caps.reconcile(force, limits, owned_disabled, targets, imported_reenabled)
   if result.unresolved_current then
     error("MIR unsupported native research queue state for over-cap current research: "
       .. result.unresolved_current, 2)
@@ -450,7 +451,10 @@ local function reconcile_all(clean_stale_forces, selected_owners, imported_reena
         imported_reenabled and imported_reenabled[force.index])
     end
     local owner = valid_force(force) and selected_owners and selected_owners[force.index] or nil
-    if current then reconcile_force(force, owned_disabled, owner, selected_owners ~= nil) end
+    if current then
+      reconcile_force(force, owned_disabled, owner, selected_owners ~= nil, nil,
+        imported_reenabled and imported_reenabled[force.index])
+    end
   end
   if current then discard_empty_state(current) end
 end
@@ -536,7 +540,7 @@ local function merge_legacy_rows(owned_disabled, force_index, rows, facts, impor
   -- This signal lasts only through this configuration callback. Bind it to
   -- the table actually created here, never a pre-existing row or just a name.
   -- The decoder still imports no enablement right for a live-enabled row;
-  -- the authored policy below must make its own observed true -> false write.
+  -- the current policy below must make its own observed true -> false write.
   if facts.legacy_policy3 then
     for _, decision in ipairs(facts.decisions) do
       local record = created[decision.name]
@@ -568,8 +572,8 @@ local function import_legacy_caps_on_configuration(event)
   -- old bucket is malformed. A reused force index must never re-open import.
   current.legacy_caps_checked = true
 
-  -- A version label cannot identify the source engine: published stable4.2
-  -- F210 reports the F200 value. Always retain ordinary tuple admission, and
+  -- A version label alone grants no per-row ownership. Retain ordinary tuple
+  -- admission before the exceptional predecessor reader, and
   -- consider settings-derived V3 only for a known package-change event and
   -- schema. The decoder still requires the exact per-row provenance/state.
   local direct_f200_hop = type(legacy_bucket) == "table"

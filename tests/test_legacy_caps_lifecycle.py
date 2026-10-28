@@ -526,7 +526,8 @@ class LegacyCapsLifecycleTests(unittest.TestCase):
               "published F200 V3 source evidence was altered: " .. version)
           end
 
-          -- 4.2.20000 is also the public F210 package codec.  Its normal
+          -- This synthetic collision does not represent the published F210
+          -- archive, whose exact metadata is4.2.21000. Its normal
           -- transported record must continue through the ordinary reader when
           -- the event has that colliding version, rather than being consumed
           -- only as an F200 predecessor.
@@ -687,6 +688,91 @@ class LegacyCapsLifecycleTests(unittest.TestCase):
           lifecycle.on_configuration_changed()
           assert(item.enabled and not item.visible_when_disabled and item.level == 3
             and saved.legacy_caps_checked and next(saved.owned_disabled) == nil)
+        ''')
+
+    def test_first_live_enabled_v3_import_retains_its_new_finite_cap_write(self):
+        self.lua.execute('''
+          local function check(target, event, transported)
+            local item = technology(gear_name)
+            item.enabled, item.prototype.enabled, item.saved_progress = true, true, .27
+            local f = force(1, {[gear_name] = item})
+            local old = transported and legacy({gear_name}, {1}) or f200_gear_legacy(1, 2)
+            old.visibility_by_cap[1][gear_name].value = true
+            boot({[1] = f}, old, nil, {target_id = target, enabled = true, limit = 2})
+            lifecycle.on_configuration_changed(event)
+            local saved = storage.mir_caps
+            assert(not item.enabled and saved.owned_disabled[1][gear_name].disabled == true,
+              "the first exact positive V3 import lost its new finite-cap disablement right")
+            assert(item.level == 3 and not item.researched and item.saved_progress == .27)
+            -- A cold load must reconstruct subscriptions without replaying
+            -- the transient proof or altering its durable positive result.
+            lifecycle.on_load()
+            assert(saved.owned_disabled[1][gear_name].disabled == true and not item.enabled)
+            boot({[1] = f}, old, saved, {target_id = target, enabled = true, limit = 40})
+            lifecycle.on_configuration_changed()
+            assert(item.enabled and item.visible_when_disabled and item.level == 3
+              and not item.researched and item.saved_progress == .27
+              and saved.legacy_caps_checked and next(saved.owned_disabled) == nil,
+              "relaxation failed to restore the exact newly owned finite-cap write")
+          end
+          check("f200", nil, false)
+          check("f210", f200_to_f210_event(), false)
+          check("f210", nil, true)
+        ''')
+
+    def test_first_live_enabled_worker_v3_import_retains_only_its_own_cap_write(self):
+        self.lua.execute('''
+          local name = "worker-robots-speed-6"
+          local item, foreign = worker(name), worker(name)
+          item.level, item.enabled, item.saved_progress = 7, true, .27
+          foreign.level, foreign.enabled, foreign.saved_progress = 7, false, .19
+          local probe = technology("braking-force-1")
+          local f = force(1, {[name] = item, [probe.name] = probe})
+          f.research_queue, f.current_research, f.research_progress = {probe}, probe, .42
+          local other = force(2, {[name] = foreign})
+          local old = f200_worker_legacy(1, 6, name)
+          boot({[1] = f, [2] = other}, old, nil, {target_id = "f210", worker_limit = 6})
+          lifecycle.on_configuration_changed(f200_to_f210_event("4.4.20002"))
+          local saved = storage.mir_caps
+          assert(not item.enabled and saved.owned_disabled[1][name].disabled == true
+            and saved.owned_disabled[1][name].worker_effect_modifier == .65,
+            "the exact admitted native worker lost its newly written cap right")
+          assert(not foreign.enabled and saved.owned_disabled[2][name].disabled == false)
+          boot({[1] = f, [2] = other}, old, saved, {target_id = "f210", worker_limit = 40})
+          lifecycle.on_configuration_changed()
+          assert(item.enabled and item.level == 7 and not item.researched and item.saved_progress == .27
+            and f.research_queue[1] == probe and f.current_research == probe and f.research_progress == .42)
+          assert(not foreign.enabled and foreign.level == 7 and foreign.saved_progress == .19
+            and saved.legacy_caps_checked and next(saved.owned_disabled) == nil,
+            "worker relaxation changed foreign rights, earned state or unrelated work")
+        ''')
+
+    def test_live_enabled_first_cap_never_promotes_existing_or_unproven_rows(self):
+        self.lua.execute('''
+          local function check(current, old, label)
+            local item = technology(gear_name)
+            item.enabled, item.prototype.enabled = true, true
+            local f = force(1, {[gear_name] = item})
+            boot({[1] = f}, old, current, {target_id = "f200", enabled = true, limit = 2})
+            lifecycle.on_configuration_changed()
+            local saved = storage.mir_caps
+            assert(not item.enabled and saved.owned_disabled[1][gear_name].disabled == false,
+              label .. " gained a positive right from an older import")
+            boot({[1] = f}, old, saved, {target_id = "f200", enabled = true, limit = 40})
+            lifecycle.on_configuration_changed()
+            assert(not item.enabled and next(saved.owned_disabled) == nil,
+              label .. " was incorrectly enabled after relaxation")
+          end
+          check({schema = 1, owned_disabled = {[1] = {[gear_name] =
+            {disabled = false, visible_when_disabled = true}}}}, f200_gear_legacy(1, 2), "current negative")
+          check({schema = 1, owned_disabled = {[1] = {[gear_name] =
+            {visible_when_disabled = true}}}}, f200_gear_legacy(1, 2), "existing visibility-only")
+          local missing = f200_gear_legacy(1, 2)
+          missing.disabled_by_cap[1][gear_name] = nil
+          check(nil, missing, "missing V3 positive proof")
+          local unowned = f200_gear_legacy(1, 2)
+          unowned.unowned_disabled_by_cap[1][gear_name] = true
+          check(nil, unowned, "unowned V3 marker")
         ''')
 
     def test_disabled_f200_direct_hop_defers_the_exact_right_until_f210_reenable(self):

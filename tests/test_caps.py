@@ -170,6 +170,33 @@ class CapsTests(unittest.TestCase):
           assert(speed.enabled and ownership[6] == nil)
         ''')
 
+    def test_first_import_proof_is_bound_to_the_written_record_and_live_state(self):
+        self.lua.execute('''
+          local function check(kind, expected)
+            local item = technology("recipe-prod-research_gears-1", 3, kind ~= "already-disabled")
+            local row = {visible_when_disabled = false}
+            if kind == "current-negative" then row.disabled = false end
+            local ownership = {[1] = {[item.name] = row}}
+            local proof = kind == "stale-record" and {visible_when_disabled = false} or row
+            local f = force(1, {[item.name] = item}, {}, nil, nil)
+            caps.reconcile(f, {[item.name] = 2}, ownership, nil, {[item.name] = proof})
+            assert(not item.enabled and ownership[1][item.name].disabled == expected,
+              kind .. " did not preserve the exact new-write ownership boundary")
+            caps.reconcile(f, {[item.name] = 0}, ownership)
+            assert(item.enabled == expected and not item.visible_when_disabled and ownership[1] == nil)
+          end
+          check("newly-imported", true)
+          check("stale-record", false)
+          check("current-negative", false)
+          check("already-disabled", false)
+          local item = technology("recipe-prod-research_gears-1", 3, true)
+          local row = {visible_when_disabled = false}
+          local owned = {[1] = {[item.name] = row}}
+          caps.reconcile(force(1, {[item.name] = item}, {}, nil, nil), {[item.name] = 0}, owned,
+            nil, {[item.name] = row})
+          assert(item.enabled and owned[1] == nil, "an unlimited policy used the proof to invent a disablement")
+        ''')
+
     def test_named_target_filters_only_its_own_queue_entries(self):
         self.lua.execute('''
           local belts = technology("recipe-prod-research_belts-1", 5, true)
