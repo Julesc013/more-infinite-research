@@ -1,0 +1,110 @@
+{
+  "schema": 1,
+  "kind": "MIRFirstEnabledFiniteCapF210NativeChainV1",
+  "status": "passed-first-enabled-family-cap-hold-and-relaxation",
+  "scope": "Exact source81AF→F2100.12 enabled-family/prototype cap2 hold/save/two colds→that exact heldsave0.13 cap40 restore/newlab/save/two colds. Strict family/prototype-enabled and phase/source/foreign/work/science assertions remain. This is ordinary cap reconciliation,not the previous family-disabled0.6 route.",
+  "controller_commit": "80f1a00830cdc90cc2b8e64ba3457b1c5796c8be",
+  "artifact_source_commit": "992c76ee24caf2d723b469c3db760cbebdf35eeb",
+  "player_tree": "fbb7e9135280ce7f69692e9b0c4a44d743793f45",
+  "candidate_sha256": "38C84CCBC4BFDA62FCB078772C4690AB81228484744A36D9EA303F5A75B16447",
+  "engine_sha256": "8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38",
+  "protected_source": {
+    "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\cap-473-current7a2-r02-controller\\native-published\\write-data\\saves\\mir5-native-complete.zip",
+    "sha256": "81AFD312CB2391C7B0CF92C82CD022F93751E9E3FC99D181795078FC9651E4F9"
+  },
+  "cases": [
+    {
+      "id": "held",
+      "initial_witnesses": {
+        "source_mir": "4.7.20003",
+        "destination_mir": "5.0.21000",
+        "source_actual_lab_completions": 2,
+        "destination_actual_lab_completions": 0,
+        "disabled_intermediate_observed": true,
+        "next_level": 3,
+        "productivity_bonus": 0.02,
+        "player_enabled": false,
+        "player_visible_when_disabled": true,
+        "saved_progress": 0.27,
+        "foreign_queue_progress": 0.42000000000000004,
+        "foreign_disabled": true,
+        "on_load_read_only": false
+      },
+      "fixture_sha256": "E2F3CDD736D7390CDF73A09DE05B9897B6E133F13076A3DF6D910BFF223D431E",
+      "profile_sha256": "4AA215A316A14DB5C3D00B16B91EB76647D8F4B36508A475B4700F0CF8AEF3B9",
+      "result_sha256": "77758BF977E88F5E9C12A155CFAE29FB236D837D15885EC52233C4297BB9B295",
+      "input_save": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\cap-473-current7a2-r02-controller\\native-published\\write-data\\saves\\mir5-native-complete.zip",
+        "sha256": "81AFD312CB2391C7B0CF92C82CD022F93751E9E3FC99D181795078FC9651E4F9"
+      },
+      "completed_save": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\first-finite-cap-f210-native-r01-controller\\native-held\\write-data\\saves\\mir5-native-complete.zip",
+        "sha256": "4C0F7BAAFF6A50ADEE5118E8D5CE28CEA95215D3F317F18FB741E230452BC097",
+        "bytes": 935248
+      },
+      "cold_reloads": 2
+    },
+    {
+      "id": "relaxed",
+      "initial_witnesses": {
+        "source_mir": "4.7.20003",
+        "destination_mir": "5.0.21000",
+        "source_actual_lab_completions": 2,
+        "destination_actual_lab_completions": 1,
+        "milestone": "actual2labs",
+        "next_level": 4,
+        "productivity_bonus": 0.03,
+        "player_enabled": true,
+        "player_visible_when_disabled": true,
+        "foreign_queue_progress": 0.42000000000000004,
+        "science_consumed_units": 0.7333333333333333,
+        "science_inventory_consumed_units": 1,
+        "science_type": "item",
+        "science_remaining_ticks": 44,
+        "science_processing_ticks": 44,
+        "science_elapsed_ticks": 43,
+        "science_units_after": {
+          "automation-science-pack": 21,
+          "logistic-science-pack": 21,
+          "chemical-science-pack": 21,
+          "production-science-pack": 21
+        },
+        "on_load_read_only": false
+      },
+      "fixture_sha256": "DD8F561F93A053D98B90C1566EFCF14C7C7370203818F7D3386D26DD68629E0C",
+      "profile_sha256": "E42694E47EF979C634E8389A5D74422D18032F14F207692F9BF2E13303322687",
+      "result_sha256": "CF70026782EC85B6D8467CE494586B44440155A057342E6FFE7FA83D7C75C857",
+      "input_save": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\first-finite-cap-f210-native-r01-controller\\native-held\\write-data\\saves\\mir5-native-complete.zip",
+        "sha256": "4C0F7BAAFF6A50ADEE5118E8D5CE28CEA95215D3F317F18FB741E230452BC097"
+      },
+      "completed_save": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\first-finite-cap-f210-native-r01-controller\\native-relaxed\\write-data\\saves\\mir5-native-complete.zip",
+        "sha256": "9E0B8408F38D18D0A2BF85545A5146AFAB478A608A3633F9AADB67D256AE6643",
+        "bytes": 935635
+      },
+      "cold_reloads": 2
+    }
+  ],
+  "packet_sha256": "280041DA318D196CB60A8CDE03AD0602598C746D2D01203C220CF5A4218E20E6",
+  "caller_sha256": "CA06451939EFBDA594D39874D67FD9CCDF69262E3CFD1BF171D319AF765DB0E2",
+  "root_readback": {
+    "path": "build/qualification/first-finite-cap-f210-native-r01-controller/root-readback-r01.json",
+    "sha256": "30E6A6EC51913FCC0C9F585E683B6FAED5619F784E44C548DB6413B5559C259E",
+    "files": 36,
+    "bytes_per_copy": 2115521
+  },
+  "lossless_receipts": {
+    "path": "spec/evidence/first-enabled-finite-cap-f210-native-receipts-r01.json.gz",
+    "sha256": "BC44A1ED93673655B2532FB76FB93E8F2DCD77BFA435A52450E030792F8E5FEA",
+    "bytes": 18730,
+    "records": 3
+  },
+  "counts": {
+    "new_native_processes": 6,
+    "new_actual_labs": 1,
+    "new_cold_reloads": 4,
+    "source_actual_labs_reused_once": 2
+  },
+  "limits": "Closes only this exact F210 gear first-enabled finite-cap route at38C84CCB/992c/fbb7/8DC. Same-engine F200 first-held route and native worker tails remain separate. Preserve all old negative/adverse saves; no DBF98 override,source recreation,universal ownership,other mod/client/performance or final17 freeze/release claim."
+}
