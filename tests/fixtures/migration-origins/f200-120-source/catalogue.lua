@@ -2578,6 +2578,18 @@ return {
       }
     }
   },
+  -- The published data-stage rows omit level for the finite Base chain, but
+  -- Factorio exposes the suffix-derived level and its finite maximum at
+  -- runtime.  Keep that runtime fact separate from the native data capture.
+  weapon_runtime = {
+    ["weapon-shooting-speed-1"] = {level = 1, max_level = 1},
+    ["weapon-shooting-speed-2"] = {level = 2, max_level = 2},
+    ["weapon-shooting-speed-3"] = {level = 3, max_level = 3},
+    ["weapon-shooting-speed-4"] = {level = 4, max_level = 4},
+    ["weapon-shooting-speed-5"] = {level = 5, max_level = 5},
+    ["weapon-shooting-speed-6"] = {level = 6, max_level = 6},
+    ["weapon-shooting-speed-7"] = {level = 7, max_level = 4294967295}
+  },
   finite_weapon_seed_sets = {
     player = {
       "weapon-shooting-speed-1",

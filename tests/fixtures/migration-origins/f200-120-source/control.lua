@@ -4,13 +4,6 @@ local SAVE = "mir5-native-complete"
 local DEADLINE, PACKS, UINT32_MAX = 18000, 32, 4294967295
 local CATALOGUE = require("__mir-fixture-mir5-migration-origin-f200-120-source__/catalogue")
 local loaded, reload_reported = false, false
-local EXTENDED_WEAPON = "weapon-shooting-speed-7"
-local RECIPE_CHANGE_TOKENS = {
-  [0.10] = "0.10000000149011612",
-  [0.05] = "0.05000000074505806",
-  [0.02] = "0.019999999552965164",
-  [0.20] = "0.20000000298023224",
-}
 
 local function fail(message) error("[mir5-migration-origin-f200-120-source] " .. message) end
 local function close(left, right) return type(left) == "number" and type(right) == "number" and math.abs(left - right) <= .000001 end
@@ -36,41 +29,61 @@ local function technology(force, name)
   return value
 end
 
-local function recipe_change_token(value)
-  local token = RECIPE_CHANGE_TOKENS[value]
-  if token ~= nil then return token end
-  -- The F200 runtime exposes only these recorded recipe changes as float32
-  -- spellings. This is a finite alternate representation, not a tolerance.
-  for _, native in pairs(RECIPE_CHANGE_TOKENS) do
-    if value == tonumber(native) then return native end
-  end
-  fail("source recipe-effect scalar is unsupported")
-end
-
-local function raw_signature(value)
+local function signature(value)
   if value.type == "change-recipe-productivity" then return value.type .. "|" .. tostring(value.recipe) .. "|" .. string.format("%.17g", value.change) end
   if value.type == "worker-robot-battery" then return value.type .. "|" .. string.format("%.17g", value.modifier) end
   if value.type == "gun-speed" then return value.type .. "|" .. tostring(value.ammo_category) .. "|" .. string.format("%.17g", value.modifier) end
   return tostring(value.type) .. "|unexpected"
 end
 
-local function canonical_signature(value)
-  if value.type == "change-recipe-productivity" then return value.type .. "|" .. tostring(value.recipe) .. "|" .. recipe_change_token(value.change) end
-  return raw_signature(value)
+-- Data-stage facts retain their exact published decimal spelling. Runtime
+-- technology prototypes expose the six known authored scalar values through
+-- float32. This is a finite representation admission, not a tolerance: any
+-- other nearby spelling remains a different effect.
+local RUNTIME_EFFECT_SCALARS = {
+  ["0.02"] = "0.02",
+  ["0.019999999552965164"] = "0.02",
+  ["0.050000000000000003"] = "0.050000000000000003",
+  ["0.05000000074505806"] = "0.050000000000000003",
+  ["0.10000000000000001"] = "0.10000000000000001",
+  ["0.10000000149011612"] = "0.10000000000000001",
+  ["0.20000000000000001"] = "0.20000000000000001",
+  ["0.20000000298023224"] = "0.20000000000000001",
+  ["0.29999999999999999"] = "0.29999999999999999",
+  ["0.30000001192092896"] = "0.29999999999999999",
+  ["0.40000000000000002"] = "0.40000000000000002",
+  ["0.40000000596046448"] = "0.40000000000000002"
+}
+
+local function runtime_scalar(value)
+  local text = string.format("%.17g", value)
+  return RUNTIME_EFFECT_SCALARS[text] or text
 end
 
-local function effects_signature(value, raw)
+local function runtime_signature(value)
+  if value.type == "change-recipe-productivity" then return value.type .. "|" .. tostring(value.recipe) .. "|" .. runtime_scalar(value.change) end
+  if value.type == "worker-robot-battery" then return value.type .. "|" .. runtime_scalar(value.modifier) end
+  if value.type == "gun-speed" then return value.type .. "|" .. tostring(value.ammo_category) .. "|" .. runtime_scalar(value.modifier) end
+  return tostring(value.type) .. "|unexpected"
+end
+
+local function effects_signature(value)
   local rows = {}
-  for _, effect in pairs(value.prototype.effects or {}) do
-    rows[#rows + 1] = raw and raw_signature(effect) or canonical_signature(effect)
-  end
+  for _, effect in pairs(value.prototype.effects or {}) do rows[#rows + 1] = signature(effect) end
+  table.sort(rows)
+  return table.concat(rows, ",")
+end
+
+local function runtime_effects_signature(value)
+  local rows = {}
+  for _, effect in pairs(value.prototype.effects or {}) do rows[#rows + 1] = runtime_signature(effect) end
   table.sort(rows)
   return table.concat(rows, ",")
 end
 
 local function expected_signature(effects)
   local rows = {}
-  for _, effect in ipairs(effects or {}) do rows[#rows + 1] = canonical_signature(effect) end
+  for _, effect in ipairs(effects or {}) do rows[#rows + 1] = signature(effect) end
   table.sort(rows)
   return table.concat(rows, ",")
 end
@@ -83,7 +96,7 @@ local function source_rows(force)
       if expected == nil or name:sub(-#CATALOGUE.technology_suffix) ~= CATALOGUE.technology_suffix
           or value == nil or value.valid == false or value.prototype.level ~= expected.level
           or value.prototype.max_level ~= UINT32_MAX then fail("source runtime roster identity differs: " .. tostring(name)) end
-      if effects_signature(value) ~= expected_signature(expected.effects) then fail("source runtime effects differ: " .. name) end
+      if runtime_effects_signature(value) ~= expected_signature(expected.effects) then fail("source runtime effects differ: " .. name) end
       rows[#rows + 1], seen[name] = name, true
     end
   end
@@ -97,20 +110,16 @@ local function weapon_rows(force)
   local rows = {}
   for name, expected in pairs(CATALOGUE.weapons) do
     local value = technology(force, name)
-    local prototype = value.prototype
-    if prototype == nil or effects_signature(value) ~= expected_signature(expected.effects) then fail("weapon effects differ: " .. name) end
-    if name == EXTENDED_WEAPON then
-      if value.level ~= 7 or prototype.level ~= 7 or prototype.max_level ~= UINT32_MAX or value.researched ~= false then
-        fail("infinite weapon continuation differs")
-      end
-    elseif prototype.level == nil or prototype.max_level ~= prototype.level or value.level ~= prototype.level
-        or value.researched ~= false then
-      fail("finite weapon owner differs: " .. name)
+    local runtime = CATALOGUE.weapon_runtime[name]
+    if runtime == nil or value.level ~= runtime.level or value.prototype.level ~= runtime.level
+        or value.prototype.max_level ~= runtime.max_level then
+      fail("finite weapon runtime level differs: " .. name)
     end
+    if runtime_effects_signature(value) ~= expected_signature(expected.effects) then fail("finite weapon effects differ: " .. name) end
     rows[#rows + 1] = name
   end
   table.sort(rows)
-  if #rows ~= 7 then fail("weapon owner roster count differs") end
+  if #rows ~= 7 then fail("finite weapon roster count differs") end
   return rows
 end
 
@@ -134,7 +143,7 @@ end
 
 local function technology_snapshot(value)
   return {level=value.level, researched=value.researched, enabled=value.enabled, visible=value.visible_when_disabled,
-    saved=value.saved_progress, maximum=value.prototype.max_level, effects=effects_signature(value, true)}
+    saved=value.saved_progress, maximum=value.prototype.max_level, effects=effects_signature(value)}
 end
 
 local function snapshot(force, rows, weapons)
@@ -171,7 +180,7 @@ local function assert_same_snapshot(force, rows, weapons, expected, label)
     local now = actual.weapons[name]
     if now == nil or now.level ~= before.level or now.researched ~= before.researched or now.enabled ~= before.enabled
         or now.visible ~= before.visible or now.maximum ~= before.maximum or not close(now.saved, before.saved)
-        or now.effects ~= before.effects then fail(label .. " weapon owner state changed: " .. name) end
+        or now.effects ~= before.effects then fail(label .. " finite weapon state changed: " .. name) end
   end
   for recipe, before in pairs(expected.recipes) do if not close(actual.recipes[recipe], before) then fail(label .. " recipe contribution changed: " .. recipe) end end
   for field, before in pairs(expected.fields) do if not close(actual.fields[field], before) then fail(label .. " force contribution changed: " .. field) end end
@@ -197,11 +206,13 @@ local function seed_rows(force, rows, weapons, label, preserve, finite_seeds, fi
   end
   for _, name in ipairs(weapons) do
     local value = technology(force, name)
+    local runtime = CATALOGUE.weapon_runtime[name]
+    if runtime == nil or value.level ~= runtime.level or value.prototype.level ~= runtime.level
+        or value.prototype.max_level ~= runtime.max_level then
+      fail(label .. " finite weapon owner initial level differs: " .. name)
+    end
     if seeded[name] then
-      if value.level ~= value.prototype.level or value.researched ~= true then fail(label .. " finite weapon owner seed differs") end
-    elseif name == EXTENDED_WEAPON then
-      if value.level ~= 7 or value.prototype.level ~= 7 or value.prototype.max_level ~= UINT32_MAX
-          or value.researched ~= false then fail(label .. " infinite weapon continuation differs") end
+      if value.researched ~= true then fail(label .. " finite weapon owner seed differs") end
     elseif value.researched ~= false then fail(label .. " finite weapon owner unexpectedly researched: " .. name) end
   end
   force.reset_technology_effects()

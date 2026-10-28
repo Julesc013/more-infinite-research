@@ -4,6 +4,7 @@ import copy
 import hashlib
 import json
 from pathlib import Path
+import subprocess
 import sys
 import unittest
 
@@ -17,7 +18,7 @@ FACTS_SHA256 = "A017240FA9AF6E438462F5417397DBC3768AE1CC0BDB0DF5EE9D5313E593F98F
 # 7714/C512 selected-native-facts projection; its finite-owner seed section is
 # the separately reviewed source-fixture protocol. The complete static table
 # is pinned here rather than reconstructed from current MIR code.
-CATALOGUE_SHA256 = "C1E20AAF89944FF483C032FD0092783110CA38C5EDA3D7E1F0503480F25EE8E1"
+CATALOGUE_SHA256 = "AA2841DBA0CE55654976B7E3010004FCD364446DE2DBF741D8FDF958A6C221CE"
 FIXTURE_NAME = "mir-fixture-mir5-migration-origin-f200-120-source"
 
 
@@ -49,6 +50,13 @@ class MigrationOriginF200120SourceControls(unittest.TestCase):
     def mods(self):
         return {"base": "2.0.77", "more-infinite-research": "1.2.0", FIXTURE_NAME: "0.1.0"}
 
+    def raw_git_catalogue(self):
+        relative = FIXTURE.relative_to(ROOT) / "catalogue.lua"
+        completed = subprocess.run(
+            ["git", "show", f"HEAD:{relative.as_posix()}"], cwd=ROOT,
+            check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        return completed.stdout
+
     def settings_raw(self):
         raw = {"sentinel": {"unchanged": 37}}
         for name, expected in self.catalogue["settings"].items():
@@ -64,7 +72,6 @@ class MigrationOriginF200120SourceControls(unittest.TestCase):
         for name, row in technology.items():
             row["type"] = "technology"
             row["name"] = name
-        technology["weapon-shooting-speed-7"].update({"level": 7, "max_level": "infinite"})
         return {"technology": technology, "sentinel": {"unchanged": 41}}
 
     def run_settings(self, raw):
@@ -103,7 +110,13 @@ class MigrationOriginF200120SourceControls(unittest.TestCase):
         return py(self.lua.eval("migration_origin_120_run_data")(lua(self.lua, copy.deepcopy(raw)), lua(self.lua, self.mods()), lua(self.lua, settings)))
 
     def test_frozen_native_catalogue_identity_and_exact_source_scope(self):
-        self.assertEqual(CATALOGUE_SHA256, hashlib.sha256((FIXTURE / "catalogue.lua").read_bytes()).hexdigest().upper())
+        raw_catalogue = self.raw_git_catalogue()
+        self.assertEqual(CATALOGUE_SHA256, hashlib.sha256(raw_catalogue).hexdigest().upper())
+        crlf_catalogue = raw_catalogue.replace(b"\n", b"\r\n")
+        self.assertNotEqual(CATALOGUE_SHA256, hashlib.sha256(crlf_catalogue).hexdigest().upper())
+        self.lua.globals().crlf_catalogue_source = crlf_catalogue.decode("utf-8")
+        self.lua.execute("migration_origin_120_crlf_catalogue=assert(load(crlf_catalogue_source))()")
+        self.assertEqual(self.catalogue, py(self.lua.globals().migration_origin_120_crlf_catalogue))
         self.assertEqual(34, len(self.catalogue["rows"]))
         self.assertEqual({"bool-setting": 45, "int-setting": 88, "double-setting": 44}, self.catalogue["setting_counts"])
         self.assertEqual(177, len(self.catalogue["settings"]))
@@ -112,11 +125,14 @@ class MigrationOriginF200120SourceControls(unittest.TestCase):
                          tuple(self.catalogue["finite_weapon_seed_sets"]["player"]))
         self.assertEqual(("weapon-shooting-speed-1",), tuple(self.catalogue["finite_weapon_seed_sets"]["foreign"]))
         self.assertEqual({}, self.catalogue["finite_weapon_seed_sets"]["detached"])
-        self.assertEqual({f"weapon-shooting-speed-{level}" for level in range(1, 8)}, set(self.catalogue["weapons"]))
         self.assertEqual(("rocket", "cannon-shell", "electric", "flamethrower"), tuple(self.catalogue["gun_categories"]))
         self.assertEqual({"bullet": 1.5, "shotgun-shell": 1.6}, self.catalogue["finite_owner_gun_speed"]["player"])
         self.assertEqual({"bullet": .1, "shotgun-shell": .1}, self.catalogue["finite_owner_gun_speed"]["foreign"])
         self.assertEqual(7, len(self.catalogue["weapons"]))
+        self.assertEqual(
+            {f"weapon-shooting-speed-{level}": {"level": level, "max_level": level}
+             for level in range(1, 7)} | {"weapon-shooting-speed-7": {"level": 7, "max_level": 4294967295}},
+            self.catalogue["weapon_runtime"])
         self.assertEqual("8000 * 2^(L-1)", self.catalogue["source_formula"])
         self.assertEqual(60, self.catalogue["source_time"])
         self.assertEqual(ORIGINAL_ARCHIVE, "880C137F7AB35FE7AF1DA5538BFA91F620C80785134DB488800352DD6154AB22")
@@ -143,15 +159,12 @@ class MigrationOriginF200120SourceControls(unittest.TestCase):
         rocket["effects"] = [effect for effect in rocket["effects"] if effect.get("ammo_category") != "cannon-shell"]
         wrong_weapon = self.data_raw()
         wrong_weapon["technology"]["weapon-shooting-speed-1"]["effects"][0]["modifier"] = .05
-        wrong_continuation = self.data_raw()
-        wrong_continuation["technology"]["weapon-shooting-speed-7"]["max_level"] = 7
         wrong_runtime = {name: row["default_value"] for name, row in self.catalogue["settings"].items()}
         wrong_runtime[double_name] += 1
         for label, runner, candidate in (
             ("wrong-numeric-default", self.run_settings, wrong_numeric),
             ("missing-combined-cannon", self.run_data, missing_cannon),
             ("wrong-finite-effect", self.run_data, wrong_weapon),
-            ("wrong-infinite-continuation", self.run_data, wrong_continuation),
             ("wrong-effective-numeric", lambda raw: self.run_data(raw, wrong_runtime), self.data_raw()),
         ):
             with self.subTest(label=label):
@@ -174,6 +187,86 @@ class MigrationOriginF200120SourceControls(unittest.TestCase):
         self.assertIn("force.get_gun_speed_modifier(category)", control)
         self.assertNotIn('more-infinite-research"] ~= "5.', control)
         self.assertNotIn("count_formula = nil\n  direct.unit.count = 1\n  direct.unit.time = 60", control)
+
+    def test_runtime_effect_scalars_admit_only_the_known_float32_spellings(self):
+        self.lua.globals().fixture_control_path = (FIXTURE / "control.lua").as_posix()
+        self.lua.execute(r'''
+          function migration_origin_120_runtime_effect_scalars(case)
+            local callbacks={events={}}
+            local env={script={on_init=function(fn)callbacks.init=fn end,on_load=function()end,
+              on_event=function(event,fn)callbacks.events[event]=fn end},
+              defines={events={on_research_finished=1,on_tick=2},inventory={lab_input=1}}}
+            env.require=function(name)
+              assert(name=="__mir-fixture-mir5-migration-origin-f200-120-source__/catalogue")
+              return assert(loadfile(catalogue_path,"t",env))()
+            end
+            env._G=env;setmetatable(env,{__index=_G})
+            assert(loadfile(fixture_control_path,"t",env))()
+            local function upvalue(fn, wanted)
+              for index=1,64 do
+                local name,value=debug.getupvalue(fn,index)
+                if name==nil then break end
+                if name==wanted then return value end
+              end
+              error("missing upvalue " .. wanted)
+            end
+            local catalogue=env.require("__mir-fixture-mir5-migration-origin-f200-120-source__/catalogue")
+            local float32={
+              ["0.02"]=0.019999999552965164,["0.050000000000000003"]=0.05000000074505806,
+              ["0.10000000000000001"]=0.10000000149011612,["0.20000000000000001"]=0.20000000298023224,
+              ["0.29999999999999999"]=0.30000001192092896,["0.40000000000000002"]=0.40000000596046448}
+            local function native_effects(source)
+              local out={}
+              for index,effect in ipairs(source) do
+                local copy={};for key,value in pairs(effect) do copy[key]=value end
+                local field=copy.change~=nil and "change" or (copy.modifier~=nil and "modifier" or nil)
+                if field~=nil then copy[field]=float32[string.format("%.17g",copy[field])] or copy[field] end
+                out[index]=copy
+              end
+              return out
+            end
+            local technologies={}
+            for name,row in pairs(catalogue.rows) do
+              technologies[name]={name=name,valid=true,level=row.level,researched=false,enabled=true,
+                prototype={level=row.level,max_level=4294967295,effects=native_effects(row.effects)}}
+            end
+            for name,row in pairs(catalogue.weapons) do
+              local runtime=catalogue.weapon_runtime[name]
+              technologies[name]={name=name,valid=true,level=runtime.level,researched=false,enabled=true,
+                prototype={level=runtime.level,max_level=runtime.max_level,effects=native_effects(row.effects)}}
+            end
+            if case=="recipe-nearby" then
+              technologies[catalogue.direct].prototype.effects[1].change=0.10000000149011613
+            elseif case=="recipe-duplicate" then
+              local effect=technologies[catalogue.direct].prototype.effects[1]
+              table.insert(technologies[catalogue.direct].prototype.effects,{type=effect.type,recipe=effect.recipe,change=effect.change})
+            elseif case=="gun-nearby" then
+              technologies["weapon-shooting-speed-1"].prototype.effects[1].modifier=0.10000000149011613
+            elseif case=="gun-duplicate" then
+              local effect=technologies["weapon-shooting-speed-1"].prototype.effects[1]
+              table.insert(technologies["weapon-shooting-speed-1"].prototype.effects,{type=effect.type,ammo_category=effect.ammo_category,modifier=effect.modifier})
+            end
+            local force={technologies=technologies}
+            local source_rows=upvalue(callbacks.init,"source_rows")
+            local weapon_rows=upvalue(callbacks.init,"weapon_rows")
+            local ok,message=pcall(function()
+              if case:sub(1,6)=="recipe" then source_rows(force) else weapon_rows(force) end
+            end)
+            return {ok=ok,message=tostring(message)}
+          end
+        ''')
+        invoke = self.lua.eval("migration_origin_120_runtime_effect_scalars")
+        for case in ("recipe-native", "gun-native"):
+            accepted = py(invoke(case))
+            self.assertTrue(accepted["ok"], accepted["message"])
+        for case, expected in (("recipe-nearby", "source runtime effects differ"),
+                               ("recipe-duplicate", "source runtime effects differ"),
+                               ("gun-nearby", "finite weapon effects differ"),
+                               ("gun-duplicate", "finite weapon effects differ")):
+            with self.subTest(case=case):
+                rejected = py(invoke(case))
+                self.assertFalse(rejected["ok"])
+                self.assertIn(expected, rejected["message"])
 
     def test_runtime_snapshot_refuses_an_incomplete_cannon_contribution(self):
         self.lua.globals().fixture_control_path = (FIXTURE / "control.lua").as_posix()
@@ -209,8 +302,9 @@ class MigrationOriginF200120SourceControls(unittest.TestCase):
             end
             for name,row in pairs(catalogue.weapons) do
               weapons[#weapons+1]=name
-              technologies[name]={name=name,valid=true,level=1,researched=false,enabled=true,
-                visible_when_disabled=false,saved_progress=0,prototype={max_level=4294967295,effects=row.effects}}
+              local runtime=catalogue.weapon_runtime[name]
+              technologies[name]={name=name,valid=true,level=runtime.level,researched=false,enabled=true,
+                visible_when_disabled=false,saved_progress=0,prototype={level=runtime.level,max_level=runtime.max_level,effects=row.effects}}
             end
             local force={technologies=technologies,recipes=recipes,worker_robots_battery_modifier=.1,guns={}}
             for category,value in pairs(catalogue.direct_gun_speed) do force.guns[category]=value end
@@ -232,7 +326,7 @@ class MigrationOriginF200120SourceControls(unittest.TestCase):
     def test_runtime_seed_earns_only_the_six_declared_finite_weapon_owners(self):
         self.lua.globals().fixture_control_path = (FIXTURE / "control.lua").as_posix()
         self.lua.execute(r'''
-          function migration_origin_120_seed_finite_owners(pre_research_seven, malformed_finite, malformed_extension)
+          function migration_origin_120_seed_finite_owners(pre_research_seven, wrong_finite_level)
             local callbacks={events={}}
             local env={script={on_init=function(fn)callbacks.init=fn end,on_load=function()end,
               on_event=function(event,fn)callbacks.events[event]=fn end},
@@ -260,14 +354,12 @@ class MigrationOriginF200120SourceControls(unittest.TestCase):
             end
             for name,row in pairs(catalogue.weapons) do
               weapons[#weapons+1]=name
-              local level=tonumber(string.match(name,"(%d+)$"))
-              local maximum=(name=="weapon-shooting-speed-7") and 4294967295 or level
-              technologies[name]={name=name,valid=true,level=level,
+              local runtime=catalogue.weapon_runtime[name]
+              technologies[name]={name=name,valid=true,level=runtime.level,
                 researched=(pre_research_seven and name=="weapon-shooting-speed-7") or false,enabled=true,
-                prototype={level=level,max_level=maximum,effects=row.effects}}
+                prototype={level=runtime.level,max_level=runtime.max_level,effects=row.effects}}
             end
-            if malformed_finite then technologies["weapon-shooting-speed-6"].prototype.max_level=4294967295 end
-            if malformed_extension then technologies["weapon-shooting-speed-7"].prototype.level=6 end
+            if wrong_finite_level then technologies["weapon-shooting-speed-4"].level=1 end
             local force={technologies=technologies,worker_robots_battery_modifier=.1,guns={}}
             function force.enable_all_prototypes() end
             function force.reset_technology_effects()
@@ -276,9 +368,6 @@ class MigrationOriginF200120SourceControls(unittest.TestCase):
               force.worker_robots_battery_modifier=.1
             end
             force.get_gun_speed_modifier=function(category) return force.guns[category] or 0 end
-            local weapon_rows=upvalue(callbacks.init,"weapon_rows")
-            local admitted,admission_message=pcall(weapon_rows,force)
-            if not admitted then return {ok=false,message=tostring(admission_message),state={},guns=force.guns} end
             local seed=upvalue(callbacks.init,"seed_rows")
             local ok,message=pcall(seed,force,rows,weapons,"player",catalogue.direct,
               catalogue.finite_weapon_seed_sets.player,catalogue.finite_owner_gun_speed.player)
@@ -287,7 +376,7 @@ class MigrationOriginF200120SourceControls(unittest.TestCase):
             return {ok=ok,message=tostring(message),state=state,guns=force.guns}
           end
         ''')
-        accepted = py(self.lua.eval("migration_origin_120_seed_finite_owners")(False, False, False))
+        accepted = py(self.lua.eval("migration_origin_120_seed_finite_owners")(False, False))
         self.assertTrue(accepted["ok"], accepted["message"])
         for level in range(1, 7):
             self.assertEqual({"level": level, "researched": True}, accepted["state"][f"weapon-shooting-speed-{level}"])
@@ -295,83 +384,13 @@ class MigrationOriginF200120SourceControls(unittest.TestCase):
         self.assertEqual({"bullet": 1.5, "shotgun-shell": 1.6},
                          {name: accepted["guns"][name] for name in ("bullet", "shotgun-shell")})
 
-        rejected = py(self.lua.eval("migration_origin_120_seed_finite_owners")(True, False, False))
+        rejected = py(self.lua.eval("migration_origin_120_seed_finite_owners")(True, False))
         self.assertFalse(rejected["ok"])
-        self.assertIn("infinite weapon continuation differs", rejected["message"])
+        self.assertIn("finite weapon owner unexpectedly researched", rejected["message"])
 
-        for label, malformed_finite, malformed_extension, expected in (
-            ("finite", True, False, "finite weapon owner differs"),
-            ("extension", False, True, "infinite weapon continuation differs"),
-        ):
-            with self.subTest(label=label):
-                rejected = py(self.lua.eval("migration_origin_120_seed_finite_owners")(False, malformed_finite, malformed_extension))
-                self.assertFalse(rejected["ok"])
-                self.assertIn(expected, rejected["message"])
-
-    def test_runtime_source_roster_accepts_only_recorded_recipe_float32_aliases(self):
-        self.lua.globals().fixture_control_path = (FIXTURE / "control.lua").as_posix()
-        self.lua.execute(r'''
-          function migration_origin_120_recipe_aliases(mode)
-            local callbacks={events={}}
-            local env={script={on_init=function(fn)callbacks.init=fn end,on_load=function()end,
-              on_event=function(event,fn)callbacks.events[event]=fn end},
-              defines={events={on_research_finished=1,on_tick=2},inventory={lab_input=1}}}
-            env.require=function(name)
-              assert(name=="__mir-fixture-mir5-migration-origin-f200-120-source__/catalogue")
-              return assert(loadfile(catalogue_path,"t",env))()
-            end
-            env._G=env;setmetatable(env,{__index=_G})
-            assert(loadfile(fixture_control_path,"t",env))()
-            local function upvalue(fn,wanted)
-              for index=1,64 do
-                local name,value=debug.getupvalue(fn,index)
-                if name==nil then break end
-                if name==wanted then return value end
-              end
-              error("missing upvalue "..wanted)
-            end
-            local catalogue=env.require("__mir-fixture-mir5-migration-origin-f200-120-source__/catalogue")
-            local function effects_copy(values,name)
-              local out={}
-              for index,effect in ipairs(values) do
-                local copy={}
-                for key,value in pairs(effect) do copy[key]=value end
-                if copy.type=="change-recipe-productivity" and mode=="float32" then
-                  local aliases={[.1]=0.10000000149011612,[.05]=0.05000000074505806,
-                    [.02]=0.019999999552965164,[.2]=0.20000000298023224}
-                  copy.change=aliases[copy.change] or copy.change
-                end
-                if copy.type=="change-recipe-productivity" and mode=="wrong-scalar"
-                    and name==catalogue.direct then copy.change=.10000001 end
-                out[index]=copy
-              end
-              if mode=="duplicate" and name==catalogue.direct then
-                local copy={}
-                for key,value in pairs(out[1]) do copy[key]=value end
-                out[#out+1]=copy
-              end
-              return out
-            end
-            local technologies={}
-            for name,row in pairs(catalogue.rows) do
-              technologies[name]={name=name,valid=true,prototype={level=row.level,max_level=4294967295,
-                effects=effects_copy(row.effects,name)}}
-            end
-            local source_rows=upvalue(callbacks.init,"source_rows")
-            local ok,message=pcall(source_rows,{technologies=technologies})
-            return {ok=ok,message=tostring(message)}
-          end
-        ''')
-        for label in ("authored", "float32"):
-            with self.subTest(label=label):
-                result = py(self.lua.eval("migration_origin_120_recipe_aliases")(label))
-                self.assertTrue(result["ok"], result["message"])
-        for label, expected in (("wrong-scalar", "source recipe-effect scalar is unsupported"),
-                                ("duplicate", "source runtime effects differ")):
-            with self.subTest(label=label):
-                result = py(self.lua.eval("migration_origin_120_recipe_aliases")(label))
-                self.assertFalse(result["ok"])
-                self.assertIn(expected, result["message"])
+        wrong_level = py(self.lua.eval("migration_origin_120_seed_finite_owners")(False, True))
+        self.assertFalse(wrong_level["ok"])
+        self.assertIn("finite weapon owner initial level differs: weapon-shooting-speed-4", wrong_level["message"])
 
     def test_source_emits_one_plain_snapshot_before_save_and_never_on_reload(self):
         self.lua.globals().fixture_control_path = (FIXTURE / "control.lua").as_posix()
@@ -525,7 +544,7 @@ class MigrationOriginF200120SourceControls(unittest.TestCase):
                           "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B"),
                          (profile["origin_tag"], profile["origin_source_commit"], profile["engine"]["version"], profile["engine"]["sha256"]))
         self.assertEqual(ORIGINAL_ARCHIVE, profile["archive_sha256"]["more-infinite-research_1.2.0.zip"])
-        self.assertEqual("38CC9761DD67D3E13F2BCF12EE5DE3BFC9A1727FC0B424E77B510A473DB40BE7",
+        self.assertEqual("725FB5E6F3E3BD1D2D1BC23C4290B76A969779763109272A95E20E64CF6F55CC",
                          profile["archive_sha256"]["mir-fixture-mir5-migration-origin-f200-120-source_0.1.0.zip"])
         self.assertEqual("723D1E7721449FC26040E5E6629416767BDC20AD79CF8723115846DB662A1F87",
                          profile["archive_sha256"]["mir-fixture-mir5-active-mods-observer_0.1.0.zip"])
