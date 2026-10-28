@@ -3651,8 +3651,8 @@
         {
           "boundary": "MIR1.1 module credits and disabled public row",
           "status": "needs-correction",
-          "problem": "A new current005D/F210 data-stage fixture preflight stops at candidate module enabled state differs before the source world loads. Existing c74/f0dd native results remain scoped; current product-versus-fixture diagnosis is unresolved.",
-          "next_action": "Aero independently diagnoses the explicit enabled/default representation against actual passed fixture bytes; retain enabled/disabled/module-credit/reset expectations and original88FC. Correct and rerun only the affected fixture if justified, without reflexive player changes. The pending F200 arm did not start.",
+          "problem": "The data-stage fixture used raw enabled==true and rejects a valid omitted native default. That false-positive predicate is corrected/host-verified;0609 did not serialize its actual raw field, so current native resolution remains unverified.",
+          "next_action": "Adopt the bounded fixture correction and rebuild/pin its own archive. Run the affected005D/8DC successor from unchanged88FC, retaining strictdisabled/opposite/malformed and allcredit/science/state checks; record actualnewlab/save/two-reloads. Keep0609adverse. Then qualify the separately pendingF200currentarm.",
           "evidence": [
             {
               "path": "spec/evidence/migration-origin-110-direct-c74-native-chain-r01.json",
@@ -3669,6 +3669,10 @@
             "github_exact_result_and_log": "https://github.com/Julesc013/more-infinite-research/pull/1322#issuecomment-6468897954",
             "capsule_sha256": "1E6728D36D7D2AE1D06B5C5F2153865BDCDF6C884621C9D1B51263DB6F4125B4",
             "scope": "One actual startup; no source world load/new lab/save/reload. Original88FC and all archives/controls restore; Factorio0."
+          },
+          "fixture_correction": {
+            "path": "spec/evidence/migration-origin-110-enabled-preflight-correction-r01.json",
+            "sha256": "718BB44C428204245DC5547A356A702D417E0FC80045A4C4C38281A9A7448590"
           }
         },
         {

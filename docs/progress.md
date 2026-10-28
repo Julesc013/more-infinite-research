@@ -5,7 +5,7 @@ applies_to: "MIR 5.0.0 replacement development"
 audience: maintainer
 doc_type: reference
 owner: mir-maintainers
-last_reviewed: 2026-10-28
+last_reviewed: 2026-10-29
 supersedes: []
 superseded_by: []
 source_of_truth_for:
@@ -385,6 +385,8 @@ The old `19a65f53` player evidence remains separately bound: the [F200 preferenc
 For each exact profile, distinguish upstream control, startup/data, actual research/physical output, MIR-version upgrade, Factorio-version upgrade, official-mod transition, mod addition/removal/readdition, cold reload and client/stress evidence. Missing archives, unrun axes and real failures stay visible; a successful boot does not pass the other columns. Keep native/old evidence under its original input identity and document applicability rather than restart unchanged cases. New narrow regression variants no longer displace these broad outstanding obligations.
 
 ## Ordered remaining work
+
+The [MIR1.1 enabled-preflight correction](../spec/evidence/migration-origin-110-enabled-preflight-correction-r01.json) removes a demonstrated fixture false positive: expectedtrue now accepts the omitted native default or literaltrue, while expectedfalse still requires explicitfalse and malformed/opposite values refuse before acceleration. The0609 result did not serialize its raw field, so this is not a claimed native resolution. Exact005D packaged construction and the documented default support the correction; current successor lab/effects/save/two-reload qualification still needs the rebuilt fixture and unchanged88FC source. The original failure and every credit/science/state assertion remain.
 
 The [fixed published-only diagnostic packet](../spec/evidence/f210-menu-repeatability-prepared-command-r01.json) now uses an explicit five-launch mode in the existing comparison runner, with distinct non-acceptance output and the unchanged endpoint/tolerances. Its declared-archive guard checks the existing profile pins before output/launch. The separate caller/map prototypes remain preserved and unexecuted; no second controller or archive authority is adopted. The earlier preparation gap is narrowed to Black Glass’s retained pilot-body readback, exact owner preflight/quiet window and frozen execution. The original failed38-sample cohort stays adverse.
 
