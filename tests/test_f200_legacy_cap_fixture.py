@@ -31,6 +31,8 @@ F200_473 = FIXTURE / "f200/same-from-473"
 F210_CROSS = FIXTURE / "f210/cross-from-f200"
 F210_DISABLED = FIXTURE / "f210/disabled-after-f200"
 F210_REENABLED = FIXTURE / "f210/reenabled-after-f200"
+F210_FINITE_HELD = FIXTURE / "f210/first-finite-held"
+F210_FINITE_RELAXED = FIXTURE / "f210/first-finite-relaxed"
 V3_SOURCE = FIXTURE / "f200/v3-440-source"
 V3_F200 = FIXTURE / "f200/v3-440-successor"
 V3_F210 = FIXTURE / "f210/v3-440-successor"
@@ -198,7 +200,7 @@ class F200LegacyCapFixtureTests(unittest.TestCase):
             function lab.get_module_inventory()return modules end
             local function tech(name, force)
               return {name=name,valid=true,force=force,level=1,researched=false,enabled=true,visible_when_disabled=false,saved_progress=0,
-                prototype={max_level=4294967295,visible_when_disabled=false},prerequisites={},research_unit_count=1,research_unit_energy=60,
+                prototype={max_level=4294967295,visible_when_disabled=false,enabled=true},prerequisites={},research_unit_count=1,research_unit_energy=60,
                 research_unit_ingredients={{name="automation-science-pack",amount=1},{name="logistic-science-pack",amount=1},{name="chemical-science-pack",amount=1},{name="production-science-pack",amount=1}}}
             end
             local function force(name,index)
@@ -333,8 +335,11 @@ class F200LegacyCapFixtureTests(unittest.TestCase):
               return rejected("three-stage flow requires both F210 successors")
             end
             if three_stage and opponent~="skip-intermediate" then
+              local disabled_enabled=options.finite_intermediate==true
+              if opponent=="wrong-disabled-setting"then disabled_enabled=not disabled_enabled end
               local disabled,message=load_control(options.disabled_path,options.disabled_base or "2.1.23",
-                options.disabled_mir or "5.0.21000",options.disabled_fixture or "0.6.0",startup(40,opponent=="wrong-disabled-setting"),options.disabled_control_alias)
+                options.disabled_mir or "5.0.21000",options.disabled_fixture or "0.6.0",
+                startup(options.disabled_limit or 40,disabled_enabled),options.disabled_control_alias)
               if not disabled then return rejected(message) end
               ok,result=invoke(disabled,"load");if not ok then return rejected(result) end
               local before_saves,before_markers=saves,markers
@@ -618,6 +623,53 @@ class F200LegacyCapFixtureTests(unittest.TestCase):
                                       data_alias=FIXTURE / "successor/data-final-fixes.lua")
             self.assertFalse(result["ok"])
             self.assertIn("1% fixture-selected effect changed", result["message"])
+            self.assertEqual(("8000*2^(L-1)", 60), tuple(result["row"]["unit"][k] for k in ("count_formula", "time")))
+
+    def test_first_enabled_finite_cap_uses_its_own_saved_phase_before_relaxing(self):
+        options = {
+            "source_base": "2.0.77", "source_mir": "4.7.20003", "source_fixture": "0.4.0",
+            "source_control_alias": str(FIXTURE / "published/control.lua"),
+            "disabled_path": str(F210_FINITE_HELD / "control.lua"), "disabled_fixture": "0.12.0",
+            "disabled_control_alias": str(FIXTURE / "successor/control.lua"),
+            "disabled_limit": 2, "finite_intermediate": True,
+            "reenabled_path": str(F210_FINITE_RELAXED / "control.lua"), "reenabled_fixture": "0.13.0",
+            "reenabled_control_alias": str(FIXTURE / "successor/control.lua"),
+            "ordinary_completed_ticks": 3, "load_pending_before_tick": True,
+        }
+        result = self.flow_result(F200_CROSS / "control.lua", F210_FINITE_RELAXED / "control.lua", "", options)
+        self.assertTrue(result["ok"], result["message"])
+        self.assertEqual((2, 1, 4, .03, False, .42, 0), tuple(result[k] for k in
+                         ("source_labs", "destination_labs", "player_level", "bonus", "foreign_enabled",
+                          "foreign_progress", "disabled_destination_labs")))
+        self.assertEqual(["f200-f210-positive-legacy-cap-source"] * 3
+                         + ["f210-first-finite-cap-held"] * 3
+                         + ["f210-first-finite-cap-relaxed"] * 3, plain(result["marker_cases"]))
+        for opponent, phrase in (("skip-intermediate", "required disabled intermediate witness"),
+                                  ("wrong-disabled-setting", "expected owned family setting"),
+                                  ("old-disabled-right", "restored player native gear state differs"),
+                                  ("completed-reload-drift", "cold reload player saved progress differs")):
+            refused = self.flow_result(F200_CROSS / "control.lua", F210_FINITE_RELAXED / "control.lua", opponent, options)
+            self.assertFalse(refused["ok"], opponent)
+            self.assertIn(phrase, refused["message"])
+        wrong_cap = self.flow_result(F200_CROSS / "control.lua", F210_FINITE_RELAXED / "control.lua", "",
+                                     {**options, "disabled_limit": 40})
+        self.assertFalse(wrong_cap["ok"])
+        self.assertIn("settings are not the verified positive-cap", wrong_cap["message"])
+
+    def test_first_finite_hold_keeps_an_enabled_prototype_and_independent_row_preflight(self):
+        settings = self.settings_result(F210_FINITE_HELD / "settings-updates.lua")
+        self.assertEqual((True, True, 1, 2), tuple(settings[k] for k in ("ok", "enabled", "effect", "cap")))
+        for role, version in ((F210_FINITE_HELD, "0.12.0"), (F210_FINITE_RELAXED, "0.13.0")):
+            row = self.f210_row()
+            result = self.data_result(role / "data-final-fixes.lua", "2.1.23", "5.0.21000", version, row,
+                                      data_alias=FIXTURE / "successor/data-final-fixes.lua")
+            self.assertTrue(result["ok"], result["message"])
+            row = self.f210_row()
+            row["enabled"] = False
+            result = self.data_result(role / "data-final-fixes.lua", "2.1.23", "5.0.21000", version, row,
+                                      data_alias=FIXTURE / "successor/data-final-fixes.lua")
+            self.assertFalse(result["ok"])
+            self.assertIn("enabled state differs", result["message"])
             self.assertEqual(("8000*2^(L-1)", 60), tuple(result["row"]["unit"][k] for k in ("count_formula", "time")))
 
     def test_cross_engine_stage_guards_preflight_independent_f200_and_f210_gear_rows(self):
