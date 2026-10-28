@@ -27,7 +27,13 @@
       "version": "5.0.01300",
       "sha256": "C4E36AE31F5ED4F6F521FB389968C124C0178927B549409AAD8DAEE6D8CD8455",
       "bytes": 453595,
-      "profile_sha256": "11E529ABE241F753A889A48AB5C1AC2A6C7E6FF83D7E0F4114DBFE1847AFD30C"
+      "profile_sha256": "11E529ABE241F753A889A48AB5C1AC2A6C7E6FF83D7E0F4114DBFE1847AFD30C",
+      "source_commit": "f0dd9f62adc8bf0a8eaaf9babc1fcfef9f3241ea",
+      "player_tree": "0229b2bb3ad0c514fc4dca18c32fd544b9ba7d72",
+      "asset_readback": {
+        "path": "spec/evidence/current-assets-f0dd9f62-root-readback.json",
+        "sha256": "2BF5793D92C16ABD17F507884FE190BA74E1182F9979C8FBA2DA68E7BD10B121"
+      }
     },
     "fixture": {
       "name": "mir-fixture-mir5-historical-transition",
