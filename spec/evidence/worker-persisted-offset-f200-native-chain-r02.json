@@ -1,0 +1,160 @@
+{
+  "schema": 1,
+  "kind": "MIRWorkerPersistedOffsetF200NativeChainV1",
+  "status": "passed-named-native-worker-with-explicit-fixture-owned-contribution",
+  "scope": "Exact protected published4.7.20002 worker source90B2 to unchangedE9/source992c/playerfbb7/2.0.77/D3 using new0.3 fixture at278967b2. Independent pre-MIR entry and all native/foreign/work assertions precede the fixtures own persisted0.123 reconciliation; original absolute assertions,one actual new lab,save and two cold reloads pass. Original strict0.2 failure remains failed.",
+  "independent_protocol_review": "https://github.com/Julesc013/more-infinite-research/pull/1370#issuecomment-6481597952",
+  "controller_commit": "278967b2a4534ed2f09e2a51b24afc28ada1b66e",
+  "artifact_source_commit": "992c76ee24caf2d723b469c3db760cbebdf35eeb",
+  "player_tree": "fbb7e9135280ce7f69692e9b0c4a44d743793f45",
+  "candidate_sha256": "E9D349931E082AD77057C150E3D6093490E4086E84F0FAFECB0ED1257FD5ED4F",
+  "engine_sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B",
+  "protected_source": {
+    "path": "build/qualification/recovered-f200-worker-40018592992-r01/gameplay/published/write-data/saves/mir5-native-complete.zip",
+    "sha256": "90B23B42FA040368E7ED8E4D720D1682BD252A554A2DEB103CE60D8AF2930D82",
+    "bytes": 852821,
+    "original_published_receipt_sha256": "6A5C450AC547923D0AD3BAD0DC6F22406214C15ADB0F9B17F0483F603940AA5D"
+  },
+  "cases": [
+    {
+      "label": "order",
+      "status": "failed",
+      "controller_commit": "77831f09d23b7592fdc410d31c8097397230b11c",
+      "packet_sha256": "AB6A50162CCB0264267025D39E49479FC135F654AB466C3CB6444873CDE85484",
+      "caller_sha256": "C9624F1EFA73918C41462118F267A02B5297629D00F121C35B69293AEA830065",
+      "result_sha256": "CA41B957B78EA45685BC0F360424CBF0420F53F1BA0C3CA65E542D88E6DD95B0",
+      "fixture_sha256": "ECE4465F2955C2494F3060990B1940B36346DF57B64B3467CD44C8067B6F01FC",
+      "entry_observer_sha256": "AE0BFC231706D40B81988EDF4D99095860DDB92C2AEC73B00151862BE0F2107E",
+      "profile_sha256": "2454FDE4B2EAA8CEDC633DCC2AC75D7CDF73486E364D16C9D9D9AB44151D0057",
+      "mir_sha256": "757EF51EDC6CDDDC6D5CBD2866F6DDF295568EA8C001585162FAFA1A63EC07E0",
+      "files": 8,
+      "bytes_per_copy": 44422,
+      "new_labs": 0,
+      "cold_reloads": 0,
+      "native_processes": 1
+    },
+    {
+      "label": "settings-facade-adverse",
+      "status": "failed",
+      "controller_commit": "77831f09d23b7592fdc410d31c8097397230b11c",
+      "packet_sha256": "C713E18E8D42244A7A8CC8225F1D34C76A012BB5E1CFFAD94EF3CBB35BC1ED95",
+      "caller_sha256": "DC4D6B5CF85393A1130FFD108159FCD8FDB0404F17C355E3074A70691FF62B5B",
+      "result_sha256": "D8FA4AE4EE44038E3574A7FA2AB4A7C693E439233DA1323710FFC65BFC88FC50",
+      "fixture_sha256": "ECE4465F2955C2494F3060990B1940B36346DF57B64B3467CD44C8067B6F01FC",
+      "entry_observer_sha256": "AE0BFC231706D40B81988EDF4D99095860DDB92C2AEC73B00151862BE0F2107E",
+      "profile_sha256": "8DC1478C808F3CBA85581AA64A98936BE150FE8AC1BC9A6B0574AAB61182760A",
+      "mir_sha256": "E9D349931E082AD77057C150E3D6093490E4086E84F0FAFECB0ED1257FD5ED4F",
+      "files": 8,
+      "bytes_per_copy": 44443,
+      "new_labs": 0,
+      "cold_reloads": 0,
+      "native_processes": 1
+    },
+    {
+      "label": "accepted",
+      "status": "passed-private-native-fixture",
+      "controller_commit": "278967b2a4534ed2f09e2a51b24afc28ada1b66e",
+      "packet_sha256": "3BD3A5BD85DC4DD6B3E47D1648AC6E938CAF4FE28EED2BE1231174391620A936",
+      "caller_sha256": "EA9609AC6F20E7F1A0A37E163BCBB047803CB90FB3DBB2EA4134CC6516BF1DAA",
+      "result_sha256": "0852E7B04CC995824B1959EF8DB6F8F52ED41FEC9C0DB6CF8220084DDE4B7EDF",
+      "fixture_sha256": "9E57B5503ABD88A1C0BF1B4A6CF4088769813FA226D9290BA5A2CF1F549BBD0B",
+      "entry_observer_sha256": "AE0BFC231706D40B81988EDF4D99095860DDB92C2AEC73B00151862BE0F2107E",
+      "profile_sha256": "91E736DF03C92202F95DE8A59FB6E16F0F628FEC5A71BE46D5B6AED958B45956",
+      "mir_sha256": "E9D349931E082AD77057C150E3D6093490E4086E84F0FAFECB0ED1257FD5ED4F",
+      "files": 18,
+      "bytes_per_copy": 965941,
+      "initial": {
+        "stage": "initial",
+        "case": "f200-positive-legacy-worker",
+        "status": "passed",
+        "qualification": "native-runner-readback-required",
+        "witnesses": {
+          "source_mir": "4.7.20002",
+          "destination_mir": "5.0.20000",
+          "source_actual_lab_completions": 2,
+          "destination_actual_lab_completions": 1,
+          "native_owner": "worker-robots-speed-6",
+          "native_effect_modifier": 0.65,
+          "milestone": "actual2labs",
+          "next_level": 9,
+          "worker_speed_modifier": 4.473,
+          "independent_modifier_baseline": 2.5229999999999997,
+          "player_enabled": true,
+          "player_visible_when_disabled": true,
+          "foreign_queue_progress": 0.42000000000000004,
+          "science_consumed_units": 0.7333333333333333,
+          "science_remaining_ticks": 44,
+          "science_processing_ticks": 44,
+          "science_elapsed_ticks": 43,
+          "science_units_after": {
+            "automation-science-pack": 21.266666666666666,
+            "logistic-science-pack": 21.266666666666666,
+            "chemical-science-pack": 21.266666666666666,
+            "production-science-pack": 21.266666666666666,
+            "utility-science-pack": 21.266666666666666,
+            "space-science-pack": 21.266666666666666
+          },
+          "fixture_owned_offset": {
+            "schema": 1,
+            "amount": 0.123,
+            "reapplied": 0.123,
+            "native_entry_total": 3.6999999999999997,
+            "restored_total": 3.8229999999999995,
+            "native_entry_tick": 121,
+            "source_total": 3.8229999999999995
+          },
+          "on_load_read_only": false
+        }
+      },
+      "native_settings_observation": {
+        "stage": "fixture-owner-preflight",
+        "startup_type": "userdata",
+        "maximum_type": "table",
+        "profile_type": "table",
+        "maximum": 40,
+        "profile_import_empty": true
+      },
+      "completed_save": {
+        "path": "build/qualification/worker-owner-f200-r02-controller/native-successor/write-data/saves/mir5-native-complete.zip",
+        "sha256": "2F57A7C2E0C897C99F6642863049FDEA94BA3031F891C184DB3C0A0315E376BC",
+        "bytes": 854212
+      },
+      "new_labs": 1,
+      "cold_reloads": 2,
+      "native_processes": 3
+    }
+  ],
+  "source_recovery": "spec/evidence/worker-independent-offset-native-chain-r06.json",
+  "completed_save": {
+    "path": "build/qualification/worker-owner-f200-r02-controller/native-successor/write-data/saves/mir5-native-complete.zip",
+    "sha256": "2F57A7C2E0C897C99F6642863049FDEA94BA3031F891C184DB3C0A0315E376BC",
+    "bytes": 854212
+  },
+  "root_readback": {
+    "path": "build/qualification/worker-persisted-offset-f200-root-readback-r02.json",
+    "sha256": "CE5F3004C1E42418A13EFF6D0A96E15FE20689C192528A1C89353947C50EDC1A",
+    "files": 34,
+    "bytes_per_copy": 1054806
+  },
+  "lossless_receipts": {
+    "path": "spec/evidence/worker-persisted-offset-f200-native-receipts-r02.json.gz",
+    "sha256": "664BB3C31FB8B53A6656FC019DD25B792977351AB12B47EEFCBC99D611F3C89E",
+    "bytes": 41264,
+    "records": 10
+  },
+  "counts": {
+    "new_native_processes": 5,
+    "accepted_native_processes": 3,
+    "retained_failed_processes": 2,
+    "new_actual_labs": 1,
+    "new_cold_reloads": 2,
+    "original_source_labs_reused_once": 2
+  },
+  "preserved_limits": [
+    "The diagnostic private757 archive logs then deliberately stops before MIR body or fixture-owner work. Its raw native verdict is failed and never qualifies gameplay.",
+    "The R01 unchanged-player refusal occurs before fixture writes because settings.startup is native userdata. The faithful userdata control is red before correction; R02 observes userdata/table/table with max40 and empty import.",
+    "Only late offset-owner.lua changes after the order diagnostic;observer,dependency metadata,registration/data/settings and player ordering inputs are unchanged. Preserve both diagnostic and qualification identities.",
+    "The fixture replays only the exact contribution it already owns in its original storage. MIR does not infer or reconstruct arbitrary third-party offsets. The original0.2 failure and all six earlier contrasts retain their failed/diagnostic verdicts.",
+    "This qualifies only the named F200 native worker route. F210 item science,finite first-hold worker scenarios,other mod/client/performance and final release remain separate."
+  ]
+}
