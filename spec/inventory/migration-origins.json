@@ -2100,7 +2100,9 @@
         "sha256": "3918B10A0902FABD09BEA6D1F0E7EFF06B20B84F3D8CC5EC73E36FEDAAE64D4D",
         "bytes": 695785,
         "local_direct_library_status": "not-present-at-bounded-f013-direct-library-locator",
-        "native_status": "not_run"
+        "native_status": "passed-exact-published-source-to-f0dd-preservation-only-successor",
+        "native_evidence": "spec/evidence/historical-473-f013-f0dd-native-chain-r01.json",
+        "scope": "One source laboratory, one directly preserved successor and two unchanged-byte cold reloads per stage. Zero new successor labs; no catalogue, modpack, performance, client or later-source qualification."
       },
       {
         "edition": "f014",
@@ -2108,7 +2110,9 @@
         "sha256": "85C7798BD6DC80FAA021AB0F33519B57A740B8D3969E695A82BA55634BA1C87A",
         "bytes": 695784,
         "local_direct_library_status": "not-present-at-bounded-f014-direct-library-locator",
-        "native_status": "not_run"
+        "native_status": "passed-exact-published-source-to-f0dd-preservation-only-successor",
+        "native_evidence": "spec/evidence/historical-473-f014-f0dd-native-chain-r01.json",
+        "scope": "One source laboratory, one directly preserved successor and two unchanged-byte cold reloads per stage. Zero new successor labs; no catalogue, modpack, performance, client or later-source qualification."
       },
       {
         "edition": "f015",
@@ -2260,6 +2264,48 @@
       "sha256": "C9BCCAC54903586119169F5628DA2819185B401022E319E34805A79DAD9CB0C3",
       "status": "passed-exact-a575-Base-policy-v1-source-F200-and-direct-F210-only",
       "reuse": "Exact4.0.20000 source/8DB+7CE successor fixture inputs only; not full origin, other origins or later changed inputs."
+    },
+    {
+      "path": "spec/evidence/migration-origin-110-f200-source-native-chain-r05.json",
+      "sha256": "CE2D69921C3792238AD369DE7576376C4778542C5C89AAA4708A10FC789974D8",
+      "status": "passed-exact-published-mir1-f200-source-stage",
+      "reuse": "Only the exact named source, candidate, engine/profile/fixture and state contract; broader or later applicability requires VER-06 review or affected execution."
+    },
+    {
+      "path": "spec/evidence/migration-origin-110-direct-c74-native-chain-r01.json",
+      "sha256": "51545C6E77262CBC6CDA4336449C8F8B62F18E28BF6030B107013488DB271700",
+      "status": "passed-bounded-direct-successors-from-one-protected-published-mir1-f200-source",
+      "reuse": "Only the exact named source, candidate, engine/profile/fixture and state contract; broader or later applicability requires VER-06 review or affected execution."
+    },
+    {
+      "path": "spec/evidence/disabled-module-reset-f0dd-native-chain-r01.json",
+      "sha256": "C9D9E2846077378002F174210D748499992997D22ACDA092DCDEAD7A2852C930",
+      "status": "passed-exact-f210-disabled-module-reset-regression",
+      "reuse": "Only the exact named source, candidate, engine/profile/fixture and state contract; broader or later applicability requires VER-06 review or affected execution."
+    },
+    {
+      "path": "spec/evidence/migration-origin-120-f200-source-native-chain-r06.json",
+      "sha256": "7B3010BE4BF66F98E3F2F2C9EA6BBD1CDEBA8C5DAF689BC65AEC10E7EA34208C",
+      "status": "passed-exact-published-mir1-f200-source-stage",
+      "reuse": "Only the exact named source, candidate, engine/profile/fixture and state contract; broader or later applicability requires VER-06 review or affected execution."
+    },
+    {
+      "path": "spec/evidence/migration-origin-120-575e-direct-native-chain-r01.json",
+      "sha256": "8B42D0FEC713CB6DD6CEC57C9C3BCA70ACA05E09ECE1228B36AE4F041733E240",
+      "status": "passed-two-exact-base-direct-successors",
+      "reuse": "Only the exact named source, candidate, engine/profile/fixture and state contract; broader or later applicability requires VER-06 review or affected execution."
+    },
+    {
+      "path": "spec/evidence/historical-473-f013-f0dd-native-chain-r01.json",
+      "sha256": "08D8CDAD2D1CB7AAECE3847F46A94A975C8B40FB0C05D884DF34CC2255E7FCFD",
+      "status": "passed-bounded-f013-published-to-f0dd-preservation-chain",
+      "reuse": "Only the exact named source, candidate, engine/profile/fixture and state contract; broader or later applicability requires VER-06 review or affected execution."
+    },
+    {
+      "path": "spec/evidence/historical-473-f014-f0dd-native-chain-r01.json",
+      "sha256": "FB053A1208DD2D0410EC90D71B0953985CD9C1D4A9D9EB2E9056C89E31B03C7B",
+      "status": "passed-bounded-f014-published-to-f0dd-preservation-chain",
+      "reuse": "Only the exact named source, candidate, engine/profile/fixture and state contract; broader or later applicability requires VER-06 review or affected execution."
     }
   ],
   "migration_execution_matrix": {
@@ -2280,9 +2326,11 @@
           "origin_tag": "1.1.0",
           "factorio_version": "2.0",
           "archive_sha256": "6395C4A5A0F74C67729746D0FBF6162329978B47C5C29D54CC0045F2977C7E44",
-          "source_case": "source-stage-passed-r05-direct-successors-pending",
-          "final_5_x_case": "not_run",
-          "disposition": "protected-r05-source-save-88fc8e98-requires-independent-f200-and-f210-successors"
+          "source_case": "passed-exact-f200-published-source-r05",
+          "final_5_x_case": "passed-exact-c74-f210-and-f200-base-direct-successors",
+          "disposition": "protected-original-88FC-source-reused-for-two-direct-destinations-current-candidate-applicability-pending",
+          "successor_evidence": "spec/evidence/migration-origin-110-direct-c74-native-chain-r01.json",
+          "current_candidate_applicability": "The separate f0dd disabled-module F210 reset/save/reload case is scoped independently; no automatic c74-to-current reuse or F200 disabled-module pass."
         },
         {
           "origin_tag": "1.1.5",
@@ -2296,9 +2344,11 @@
           "origin_tag": "1.2.0",
           "factorio_version": "2.0",
           "archive_sha256": "880C137F7AB35FE7AF1DA5538BFA91F620C80785134DB488800352DD6154AB22",
-          "source_case": "not_run",
-          "final_5_x_case": "not_run",
-          "disposition": "archive-verified-requires-native-source-save-and-successor-qualification"
+          "source_case": "passed-exact-f200-published-source-r06",
+          "final_5_x_case": "passed-exact-575e-f210-and-f200-base-direct-successors",
+          "disposition": "protected-original-FDC9-source-reused-for-two-direct-destinations-prior-f0dd-cannon-loss-retained",
+          "successor_evidence": "spec/evidence/migration-origin-120-575e-direct-native-chain-r01.json",
+          "current_candidate_applicability": "Bound only to exact575e source/player5ba53a and named Base profile/engine/fixture inputs; no Space Age, arbitrary-settings or later-source qualification."
         },
         {
           "origin_tag": "1.2.5",
