@@ -1,5 +1,6 @@
 local KEY = "mir5_f200_legacy_cap"
 local MIR5_CASE = "f200-positive-legacy-cap"
+local MIR5_473_CASE = "f200-positive-legacy-cap-473"
 local PUBLISHED_RELAXED_CASE = "published-relaxed-control"
 local CROSS_ENGINE_CASE = "f200-f210-positive-legacy-cap"
 local CROSS_ENGINE_DISABLED_CASE = "f200-f210-positive-legacy-cap-disabled"
@@ -150,6 +151,10 @@ local function destination_mode()
   local mir, fixture = script.active_mods["more-infinite-research"], script.active_mods[FIXTURE]
   if base == "2.0.77" and mir == "5.0.20000" and fixture == "0.2.0" then
     return {case = MIR5_CASE, label = "MIR5", source_mir = "4.7.20002", source_fixture = "0.1.0", science_type = "tool"}
+  end
+  if base == "2.0.77" and mir == "5.0.20000" and fixture == "0.8.0" then
+    return {case = MIR5_473_CASE, label = "MIR5 F200 published4.7.3",
+      source_mir = "4.7.20003", source_fixture = "0.4.0", science_type = "tool"}
   end
   if base == "2.0.77" and mir == "4.7.20002" and fixture == "0.3.0" then
     return {case = PUBLISHED_RELAXED_CASE, label = "published relaxed", source_mir = "4.7.20002", source_fixture = "0.1.0", science_type = "tool"}
