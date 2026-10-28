@@ -179,7 +179,9 @@ class MigrationOriginF200120SourceControls(unittest.TestCase):
         self.assertIn("foreign_finite_weapon_owner_seeds", control)
         self.assertIn("CATALOGUE.finite_weapon_seed_sets.player", control)
         self.assertIn("source_cannon_gun_speed", control)
-        self.assertIn("foreign.research_queue, foreign.research_progress = {direct, probe}, .42", control)
+        self.assertIn("foreign.research_queue = {direct, probe}", control)
+        self.assertIn("foreign.research_progress = .42", control)
+        self.assertNotIn("foreign.research_queue, foreign.research_progress", control)
         self.assertIn("saved_progress = .27", control)
         self.assertIn("game.server_save(SAVE)", control)
         self.assertIn('marker("reload", value)', control)
@@ -187,6 +189,51 @@ class MigrationOriginF200120SourceControls(unittest.TestCase):
         self.assertIn("force.get_gun_speed_modifier(category)", control)
         self.assertNotIn('more-infinite-research"] ~= "5.', control)
         self.assertNotIn("count_formula = nil\n  direct.unit.count = 1\n  direct.unit.time = 60", control)
+
+    def test_foreign_queue_installation_precedes_native_progress_write(self):
+        self.lua.execute(r'''
+          function migration_origin_120_foreign_queue_write_order()
+            local direct,probe={name="recipe-prod-research_gears-1"},{name="recipe-prod-research_plastic-1"}
+            local function proxy()
+              local state={research_queue={},research_progress=0,current_research=nil}
+              return setmetatable({}, {
+                __index=function(_,key) return state[key] end,
+                __newindex=function(_,key,value)
+                  if key=="research_progress" then
+                    if state.current_research==nil then error("No research in progress") end
+                    state.research_progress=value
+                  elseif key=="research_queue" then
+                    state.research_queue=value
+                    state.current_research=value[1]
+                  else
+                    state[key]=value
+                  end
+                end
+              })
+            end
+            local old=proxy()
+            local old_ok,old_message=pcall(function()
+              old.research_queue,old.research_progress={direct,probe},.42
+            end)
+            local current=proxy()
+            local current_ok,current_message=pcall(function()
+              current.research_queue={direct,probe}
+              if current.current_research~=direct or #current.research_queue~=2 then error("queue installation differs") end
+              current.research_progress=.42
+            end)
+            return {old_ok=old_ok,old_message=tostring(old_message),current_ok=current_ok,
+              current_message=tostring(current_message),current=current.current_research and current.current_research.name,
+              queue={current.research_queue[1] and current.research_queue[1].name,current.research_queue[2] and current.research_queue[2].name},
+              progress=current.research_progress}
+          end
+        ''')
+        result = py(self.lua.eval("migration_origin_120_foreign_queue_write_order")())
+        self.assertFalse(result["old_ok"])
+        self.assertIn("No research in progress", result["old_message"])
+        self.assertTrue(result["current_ok"], result["current_message"])
+        self.assertEqual(("recipe-prod-research_gears-1",
+                          ["recipe-prod-research_gears-1", "recipe-prod-research_plastic-1"], .42),
+                         (result["current"], result["queue"], result["progress"]))
 
     def test_runtime_effect_scalars_admit_only_the_known_float32_spellings(self):
         self.lua.globals().fixture_control_path = (FIXTURE / "control.lua").as_posix()
@@ -196,6 +243,13 @@ class MigrationOriginF200120SourceControls(unittest.TestCase):
             local env={script={on_init=function(fn)callbacks.init=fn end,on_load=function()end,
               on_event=function(event,fn)callbacks.events[event]=fn end},
               defines={events={on_research_finished=1,on_tick=2},inventory={lab_input=1}}}
+            if case=="recipe-short-format" then
+              local host_string=string
+              env.string=setmetatable({format=function(pattern,value)
+                if pattern=="%.17g" and value==.1 then return "0.1" end
+                return host_string.format(pattern,value)
+              end},{__index=host_string})
+            end
             env.require=function(name)
               assert(name=="__mir-fixture-mir5-migration-origin-f200-120-source__/catalogue")
               return assert(loadfile(catalogue_path,"t",env))()
@@ -252,13 +306,23 @@ class MigrationOriginF200120SourceControls(unittest.TestCase):
             local ok,message=pcall(function()
               if case:sub(1,6)=="recipe" then source_rows(force) else weapon_rows(force) end
             end)
-            return {ok=ok,message=tostring(message)}
+            local legacy_actual={
+              ["0.10000000149011612"]="0.10000000000000001"
+            }
+            local actual_text=(case=="recipe-short-format" and env.string.format("%.17g",0.10000000149011612)
+              or string.format("%.17g",0.10000000149011612))
+            local expected_text=(case=="recipe-short-format" and env.string.format("%.17g",.1)
+              or string.format("%.17g",.1))
+            return {ok=ok,message=tostring(message),legacy_actual=legacy_actual[actual_text],legacy_expected=expected_text}
           end
         ''')
         invoke = self.lua.eval("migration_origin_120_runtime_effect_scalars")
         for case in ("recipe-native", "gun-native"):
             accepted = py(invoke(case))
             self.assertTrue(accepted["ok"], accepted["message"])
+        shortened = py(invoke("recipe-short-format"))
+        self.assertNotEqual(shortened["legacy_actual"], shortened["legacy_expected"])
+        self.assertTrue(shortened["ok"], shortened["message"])
         for case, expected in (("recipe-nearby", "source runtime effects differ"),
                                ("recipe-duplicate", "source runtime effects differ"),
                                ("gun-nearby", "finite weapon effects differ"),
@@ -267,6 +331,8 @@ class MigrationOriginF200120SourceControls(unittest.TestCase):
                 rejected = py(invoke(case))
                 self.assertFalse(rejected["ok"])
                 self.assertIn(expected, rejected["message"])
+                self.assertIn("actual=", rejected["message"])
+                self.assertIn("expected=", rejected["message"])
 
     def test_runtime_snapshot_refuses_an_incomplete_cannon_contribution(self):
         self.lua.globals().fixture_control_path = (FIXTURE / "control.lua").as_posix()
@@ -533,7 +599,6 @@ class MigrationOriginF200120SourceControls(unittest.TestCase):
                 self.assertEqual(0.42, observation["foreign"]["queue"]["progress"])
                 self.assertEqual(1, sum("[MIR5_MIGRATION_ORIGIN_F200_120_SOURCE] SNAPSHOT" in line
                                         for line in result["logs"]))
-
     def test_profile_and_fixture_are_source_only_preparation(self):
         info = json.loads((FIXTURE / "info.json").read_text(encoding="utf-8"))
         self.assertEqual((FIXTURE_NAME, "0.1.0", "2.0"), (info["name"], info["version"], info["factorio_version"]))
@@ -544,7 +609,7 @@ class MigrationOriginF200120SourceControls(unittest.TestCase):
                           "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B"),
                          (profile["origin_tag"], profile["origin_source_commit"], profile["engine"]["version"], profile["engine"]["sha256"]))
         self.assertEqual(ORIGINAL_ARCHIVE, profile["archive_sha256"]["more-infinite-research_1.2.0.zip"])
-        self.assertEqual("725FB5E6F3E3BD1D2D1BC23C4290B76A969779763109272A95E20E64CF6F55CC",
+        self.assertEqual("529B53C63715905849DC27D042BDBD9FD4778DC137BC58630A49578E4FD3C659",
                          profile["archive_sha256"]["mir-fixture-mir5-migration-origin-f200-120-source_0.1.0.zip"])
         self.assertEqual("723D1E7721449FC26040E5E6629416767BDC20AD79CF8723115846DB662A1F87",
                          profile["archive_sha256"]["mir-fixture-mir5-active-mods-observer_0.1.0.zip"])

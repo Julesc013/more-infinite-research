@@ -36,34 +36,38 @@ local function signature(value)
   return tostring(value.type) .. "|unexpected"
 end
 
--- Data-stage facts retain their exact published decimal spelling. Runtime
--- technology prototypes expose the six known authored scalar values through
--- float32. This is a finite representation admission, not a tolerance: any
--- other nearby spelling remains a different effect.
-local RUNTIME_EFFECT_SCALARS = {
-  ["0.02"] = "0.02",
-  ["0.019999999552965164"] = "0.02",
-  ["0.050000000000000003"] = "0.050000000000000003",
-  ["0.05000000074505806"] = "0.050000000000000003",
-  ["0.10000000000000001"] = "0.10000000000000001",
-  ["0.10000000149011612"] = "0.10000000000000001",
-  ["0.20000000000000001"] = "0.20000000000000001",
-  ["0.20000000298023224"] = "0.20000000000000001",
-  ["0.29999999999999999"] = "0.29999999999999999",
-  ["0.30000001192092896"] = "0.29999999999999999",
-  ["0.40000000000000002"] = "0.40000000000000002",
-  ["0.40000000596046448"] = "0.40000000000000002"
+-- Data-stage facts and saved source snapshots retain their exact published
+-- decimal values. Runtime technology prototypes expose only these six finite
+-- amounts, either as that authored number or as its exact float32 value.
+-- Map numeric aliases before formatting either side; Factorio's formatter is
+-- not the Lupa formatter. This is not a tolerance or a rounded comparison.
+local RUNTIME_EFFECT_SCALAR_ALIASES = {
+  {raw = .02, float32 = 0.019999999552965164},
+  {raw = .05, float32 = 0.05000000074505806},
+  {raw = .1, float32 = 0.10000000149011612},
+  {raw = .2, float32 = 0.20000000298023224},
+  {raw = .3, float32 = 0.30000001192092896},
+  {raw = .4, float32 = 0.40000000596046448}
 }
 
-local function runtime_scalar(value)
-  local text = string.format("%.17g", value)
-  return RUNTIME_EFFECT_SCALARS[text] or text
+local function canonical_runtime_scalar(value)
+  if type(value) ~= "number" then return nil end
+  for _, alias in ipairs(RUNTIME_EFFECT_SCALAR_ALIASES) do
+    if value == alias.raw or value == alias.float32 then return alias.raw end
+  end
+  return nil
+end
+
+local function runtime_scalar_text(value)
+  local canonical = canonical_runtime_scalar(value)
+  if canonical == nil then return "unrecognized:" .. tostring(value) end
+  return string.format("%.17g", canonical)
 end
 
 local function runtime_signature(value)
-  if value.type == "change-recipe-productivity" then return value.type .. "|" .. tostring(value.recipe) .. "|" .. runtime_scalar(value.change) end
-  if value.type == "worker-robot-battery" then return value.type .. "|" .. runtime_scalar(value.modifier) end
-  if value.type == "gun-speed" then return value.type .. "|" .. tostring(value.ammo_category) .. "|" .. runtime_scalar(value.modifier) end
+  if value.type == "change-recipe-productivity" then return value.type .. "|" .. tostring(value.recipe) .. "|" .. runtime_scalar_text(value.change) end
+  if value.type == "worker-robot-battery" then return value.type .. "|" .. runtime_scalar_text(value.modifier) end
+  if value.type == "gun-speed" then return value.type .. "|" .. tostring(value.ammo_category) .. "|" .. runtime_scalar_text(value.modifier) end
   return tostring(value.type) .. "|unexpected"
 end
 
@@ -81,9 +85,9 @@ local function runtime_effects_signature(value)
   return table.concat(rows, ",")
 end
 
-local function expected_signature(effects)
+local function expected_runtime_signature(effects)
   local rows = {}
-  for _, effect in ipairs(effects or {}) do rows[#rows + 1] = signature(effect) end
+  for _, effect in ipairs(effects or {}) do rows[#rows + 1] = runtime_signature(effect) end
   table.sort(rows)
   return table.concat(rows, ",")
 end
@@ -96,7 +100,8 @@ local function source_rows(force)
       if expected == nil or name:sub(-#CATALOGUE.technology_suffix) ~= CATALOGUE.technology_suffix
           or value == nil or value.valid == false or value.prototype.level ~= expected.level
           or value.prototype.max_level ~= UINT32_MAX then fail("source runtime roster identity differs: " .. tostring(name)) end
-      if runtime_effects_signature(value) ~= expected_signature(expected.effects) then fail("source runtime effects differ: " .. name) end
+      local actual, wanted = runtime_effects_signature(value), expected_runtime_signature(expected.effects)
+      if actual ~= wanted then fail("source runtime effects differ: " .. name .. " actual=" .. actual .. " expected=" .. wanted) end
       rows[#rows + 1], seen[name] = name, true
     end
   end
@@ -115,7 +120,8 @@ local function weapon_rows(force)
         or value.prototype.max_level ~= runtime.max_level then
       fail("finite weapon runtime level differs: " .. name)
     end
-    if runtime_effects_signature(value) ~= expected_signature(expected.effects) then fail("finite weapon effects differ: " .. name) end
+    local actual, wanted = runtime_effects_signature(value), expected_runtime_signature(expected.effects)
+    if actual ~= wanted then fail("finite weapon effects differ: " .. name .. " actual=" .. actual .. " expected=" .. wanted) end
     rows[#rows + 1] = name
   end
   table.sort(rows)
@@ -129,7 +135,8 @@ local function prerequisites(value, seen)
   seen[value.name] = true
   for _, prerequisite in pairs(value.prerequisites or {}) do
     prerequisites(prerequisite, seen)
-    prerequisite.enabled, prerequisite.researched = true, true
+    prerequisite.enabled = true
+    prerequisite.researched = true
   end
 end
 
@@ -202,7 +209,9 @@ local function seed_rows(force, rows, weapons, label, preserve, finite_seeds, fi
   for _, name in ipairs(finite_seeds) do
     local owner = technology(force, name)
     prerequisites(owner)
-    owner.enabled, owner.researched, seeded[name] = true, true, true
+    owner.enabled = true
+    owner.researched = true
+    seeded[name] = true
   end
   for _, name in ipairs(weapons) do
     local value = technology(force, name)
@@ -282,8 +291,18 @@ local function establish_foreign(rows, weapons)
     CATALOGUE.finite_weapon_seed_sets.foreign, CATALOGUE.finite_owner_gun_speed.foreign)
   local direct, probe = technology(foreign, CATALOGUE.direct), technology(foreign, "recipe-prod-research_plastic-1")
   prerequisites(direct); prerequisites(probe)
-  direct.saved_progress, probe.saved_progress = .42, 0
-  foreign.research_queue, foreign.research_progress = {direct, probe}, .42
+  direct.saved_progress = .42
+  probe.saved_progress = 0
+  -- Lua assigns a property tuple right-to-left. LuaForce rejects a progress
+  -- write until the queue has installed its current research, so keep these
+  -- native writes as two ordered statements.
+  foreign.research_queue = {direct, probe}
+  local installed = queue_snapshot(foreign)
+  if installed.current ~= CATALOGUE.direct or #installed.queue ~= 2
+      or installed.queue[1] ~= CATALOGUE.direct or installed.queue[2] ~= probe.name then
+    fail("foreign queue installation differs before progress")
+  end
+  foreign.research_progress = .42
   return foreign.index, snapshot(foreign, rows, weapons), {current=CATALOGUE.direct, queue={CATALOGUE.direct, probe.name}, progress=.42}
 end
 
@@ -319,7 +338,6 @@ local function emit_source_observation(value)
     detached = value.detached_snapshot,
   }))
 end
-
 local function marker(stage, value)
   local player = game.forces.player
   log("[MIR5_NATIVE_FIXTURE] RESULT {"
