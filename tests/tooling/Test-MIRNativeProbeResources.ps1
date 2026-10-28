@@ -137,6 +137,20 @@ Write-Output 'PASS owned child exit race'
 }
 try {
   [IO.Directory]::CreateDirectory($root)|Out-Null
+  $scan=Join-Path $root 'scan-diagnostics';$scanTarget=Join-Path $root 'scan-target'
+  [IO.Directory]::CreateDirectory($scan)|Out-Null;[IO.Directory]::CreateDirectory($scanTarget)|Out-Null
+  [IO.File]::WriteAllBytes((Join-Path $scan 'regular.bin'),[byte[]]@(1,2,3))
+  [IO.File]::WriteAllBytes((Join-Path $scanTarget 'excluded.bin'),[byte[]]::new(9))
+  $usage=Get-MIR441TreeUsage -Path $scan
+  Assert-Probe ($usage.complete-and$usage.files-eq1-and$usage.bytes-eq3-and$null-eq$usage.stopped_by-and$usage.elapsed_ms-ge0-and$usage.reparse_points-eq0) 'complete-scan-diagnostics'
+  $scanLink=Join-Path $scan 'excluded'
+  try {
+    New-Item -ItemType $(if($IsWindows){'Junction'}else{'SymbolicLink'}) -Path $scanLink -Target $scanTarget|Out-Null
+    $usage=Get-MIR441TreeUsage -Path $scan
+    Assert-Probe (-not$usage.complete-and$usage.files-eq1-and$usage.bytes-eq3-and$usage.stopped_by-ceq'reparse-point'-and$usage.reparse_points-eq1-and$usage.elapsed_ms-ge0) 'reparse-scan-diagnostics'
+    $scanError='';try{Get-MIRNativeProbeRemainingOutputBytes -Context ([pscustomobject]@{aliases=@();root=$scan})|Out-Null}catch{$scanError=$_.Exception.Message}
+    Assert-Probe ($scanError.StartsWith('[mir441-resource-output-scan-incomplete] ')-and$scanError.Contains('"stopped_by":"reparse-point"')-and$scanError.Contains('"reparse_points":1')) 'incomplete-scan-refusal-diagnostics'
+  } finally {if(Test-Path -LiteralPath $scanLink){[IO.Directory]::Delete($scanLink)}}
   Assert-ImportBoundary
   Assert-OwnedChildExitRace
   $child=(Get-Command pwsh -ErrorAction Stop).Source
