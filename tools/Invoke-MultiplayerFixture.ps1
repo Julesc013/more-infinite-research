@@ -31,6 +31,8 @@ function Assert-MultiplayerFixtureSelection {
     [Parameter(Mandatory)][System.Collections.IDictionary]$Selection,
     [Parameter(Mandatory)][string]$EngineSha256,
     [Parameter(Mandatory)][string]$FixtureCase,
+    [string]$ExpectedMIRArchiveSha256,
+    [int]$SessionExpectedPeakMemoryMiB=0,
     [switch]$StandaloneIdentityDiscovery
   )
   # These are the only fixed two-client selections admitted by this harness.
@@ -84,6 +86,20 @@ function Assert-MultiplayerFixtureSelection {
         'mir-fixture-mir5-api-beta_0.1.0.zip'='690004F145E8B0DD52B4030BD8B27F7B581495EEFAAC5CB3A2F30A23FCA08951'
       }
       standalone_f210=$true;api_client_consumers=$true
+    }
+    [ordered]@{
+      fixture_case='library-multiplayer';target='f210-standalone'
+      kind='mir5-library-api-consumers-current-standalone-f210-native-selection';factorio_line='2.1';base='2.1.23'
+      engine_sha256='8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38';mir='5.0.21000';build_version=87750
+      observer_sha256='A15A7D628D66953D2E0C4D4FA288F47CBF9C5678327C7EB3D23ADB5DC78331C0'
+      mir_archive_sha256='A8D0A4590154F3106E59BDB269F1AEB3ED8CC523F18F00ED7D76DC89059F5B8D'
+      fixture_mods=@('mir-fixture-mir5-library-multiplayer@0.1.0','mir-fixture-mir5-api-alpha@0.1.0','mir-fixture-mir5-api-beta@0.1.0')
+      optional_archives=@('more-infinite-research_5.0.21000.zip','mir-fixture-mir5-library-multiplayer_0.1.0.zip','mir-fixture-mir5-api-alpha_0.1.0.zip','mir-fixture-mir5-api-beta_0.1.0.zip')
+      api_consumer_archive_sha256=[ordered]@{
+        'mir-fixture-mir5-api-alpha_0.1.0.zip'='DB5ED843FA9D85A1ABDC22595E62D315CA1A2191C846208079F85D4D016CE904'
+        'mir-fixture-mir5-api-beta_0.1.0.zip'='690004F145E8B0DD52B4030BD8B27F7B581495EEFAAC5CB3A2F30A23FCA08951'
+      }
+      session_expected_peak_memory_mib=7168;standalone_f210=$true;api_client_consumers=$true
     }
     [ordered]@{
       fixture_case='library-multiplayer';target='standalone-identity-discovery'
@@ -158,6 +174,13 @@ function Assert-MultiplayerFixtureSelection {
   if($target.Contains('mir_archive_sha256')){
     $mirArchive='more-infinite-research_'+$target.mir+'.zip'
     Assert-Session ($target.mir_archive_sha256 -is [string] -and $target.mir_archive_sha256 -cmatch '^[A-F0-9]{64}$' -and $archives.Contains($mirArchive) -and $archives[$mirArchive] -ceq $target.mir_archive_sha256) 'multiplayer fixture MIR archive differs'
+    if($PSBoundParameters.ContainsKey('ExpectedMIRArchiveSha256')){
+      Assert-Session ($ExpectedMIRArchiveSha256 -cmatch '^[A-Fa-f0-9]{64}$' -and $ExpectedMIRArchiveSha256.ToUpperInvariant() -ceq [string]$target.mir_archive_sha256) 'multiplayer fixture expected MIR archive differs'
+    }
+  }
+  if($target.Contains('session_expected_peak_memory_mib')){
+    Assert-Session ($Selection.Contains('session_expected_peak_memory_mib') -and ($Selection['session_expected_peak_memory_mib'] -is [int] -or $Selection['session_expected_peak_memory_mib'] -is [long]) -and [int64]$Selection['session_expected_peak_memory_mib'] -eq [int64]$target.session_expected_peak_memory_mib) 'multiplayer fixture session admission differs'
+    Assert-Session ($SessionExpectedPeakMemoryMiB -eq [int]$target.session_expected_peak_memory_mib) 'multiplayer fixture expected session admission differs'
   }
   if($target.Contains('fixture_archive_required')){
     $fixtureArchive='mir-fixture-mir5-library-multiplayer_0.1.1.zip'
@@ -542,7 +565,7 @@ if($StandaloneIdentityDiscovery){
   $profile=Join-Path $output 'standalone-identity-selection.json'
   [IO.File]::WriteAllText($profile,($selection|ConvertTo-Json -Depth 8)+[Environment]::NewLine,[Text.UTF8Encoding]::new($false))
 }
-$target=Assert-MultiplayerFixtureSelection -Selection $selection -EngineSha256 (Get-FileHash -LiteralPath $engine).Hash -FixtureCase $FixtureCase -StandaloneIdentityDiscovery:$StandaloneIdentityDiscovery
+$target=Assert-MultiplayerFixtureSelection -Selection $selection -EngineSha256 (Get-FileHash -LiteralPath $engine).Hash -FixtureCase $FixtureCase -ExpectedMIRArchiveSha256 $ExpectedMIRArchiveSha256 -SessionExpectedPeakMemoryMiB $SessionExpectedPeakMemoryMiB -StandaloneIdentityDiscovery:$StandaloneIdentityDiscovery
 $standaloneF210=($target.PSObject.Properties['standalone_f210'] -and $target.standalone_f210 -eq $true)
 if($standaloneF210){
   # The normal standalone route keeps the original 0.1.0 Library fixture and

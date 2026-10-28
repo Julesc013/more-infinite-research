@@ -6,6 +6,30 @@ The shared control has exactly two admitted native closures: F200 base2.0.77/MIR
 
 The separate F210 API-client selection admits one additional exact closure: the same Library members plus the independently packaged `mir-fixture-mir5-api-alpha` and `mir-fixture-mir5-api-beta` consumers at 0.1.0. It excludes partial consumer selections, changed versions, extra mods, and the beta physical-production fixture. The existing clients must each emit one alpha and one beta `on_load` marker after every initial join, rejoin, and host-restart join; the session reader uses only the new bytes of that client’s own log, whether Factorio appends or replaces the file. This is a read-only runtime-query route, not a cable-production qualification.
 
+The [current-candidate API-client selection](../../profiles/library-api-consumers-current-standalone-f210-2123.json) separately pins the `575e`/`ba8` player tree and F210 archive `A8D0A459`, retaining the same standalone 2.1.23 engine, observer, two consumers and Base-only protocol. Its exact archive hashes are independent of the [earlier D5/2ABA selection](../../profiles/library-api-consumers-standalone-f210-2123.json), which remains unchanged. This is prepared input, not a current native result: the selected package still requires its actual two-client initial/rejoin/restart, laboratory, saved-state and rendered-view observations. Neither selection enables Space Age or qualifies its client behavior; the 7168 MiB session budget remains an admission estimate rather than a measured peak.
+
+From the reviewed frozen checkout, the native owner supplies its existing direct `$ArchiveLibrary` and verified standalone `$FactorioBin` paths, then runs this typed invocation with a fresh output directory. The library must supply the selection's exact current MIR, observer and consumer archives through the existing owned-slot custody workflow; preserve and restore any previous archive slot as well as the runner-owned mod-list/settings controls. The wrapper does not select a different MIR package on the owner's behalf. The explicit 7168 MiB argument is required; the wrapper's generic 8192 MiB default is not this selection's budget.
+
+```powershell
+$apiSession = @{
+  ArchiveLibrary = $ArchiveLibrary
+  FactorioBin = $FactorioBin
+  ProfilePath = 'tests/profiles/library-api-consumers-current-standalone-f210-2123.json'
+  FixtureSources = [string[]]@(
+    'tests/fixtures/library-multiplayer'
+    'tests/fixtures/active-mods-observer'
+    'tests/fixtures/api-alpha'
+    'tests/fixtures/api-beta'
+  )
+  ExpectedMIRArchiveSha256 = 'A8D0A4590154F3106E59BDB269F1AEB3ED8CC523F18F00ED7D76DC89059F5B8D'
+  OutputRoot = 'build/tmp/library-api-current-a8-r01'
+  FixtureCase = 'library-multiplayer'
+  SessionExpectedPeakMemoryMiB = 7168
+  RepoRoot = (Resolve-Path '.').Path
+}
+.\tools\Invoke-MultiplayerFixture.ps1 @apiSession
+```
+
 The four latency observations are emitted directly to each executing process's native log as `[MIR5_LIBRARY_PROFILE] first_open`, `search`, `refresh` and `reopen`, followed by the engine-rendered profiler. Saved state and JSON witnesses contain only deterministic completion flags for those labels. Read the actual native log records to qualify timings; flags, profiler object identities and host mocks are not measured latency. No profiler value selects a gameplay or fixture-state transition.
 
 The control requests ten GUI screenshots under `script-output/mir5-library-multiplayer/`: Availability, initial personal view, settled initial view, rejoin and host restart for each client. The initial Availability view contains exactly two terminal Space Age requirement explanations and stays open for 60 ticks before ordinary personal views replace it. After the original initial captures, the same roots, queries and native state are held for 60 ticks before the settled pair is requested, without reopening the Library. A further 60 ticks lets that pair render before `rejoin-ready` permits client disconnection. This separates a persistent layout defect from a transient initial capture; it does not declare either image correct. Screenshots become rendering evidence only after external PNG readback confirms the files; a headless request is not a rendering result.
