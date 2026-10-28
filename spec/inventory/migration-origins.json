@@ -2329,10 +2329,11 @@
           "factorio_version": "2.0",
           "archive_sha256": "C328D8F958BEC2A44297E94E83B1A956D76BEA5E333601A42FDDE60F4155472F",
           "source_case": "passed-exact-f200-source-stage-r02",
-          "final_5_x_case": "passed-frozen-bd1-f200-and-58f-f210-direct-successors-r08",
-          "disposition": "original-source-reused-two-direct-successors-passed-later-candidate-pending",
-          "successor_evidence": "spec/evidence/migration-origin-100-direct-successor-native-chain.json",
-          "current_candidate_applicability": "not-adopted-without-VER-06-review-or-affected-native-execution"
+          "final_5_x_case": "passed-exact-current-7a2-f210-and-f200-base-direct-successors",
+          "disposition": "protected-original-F8-source-reused-directly-for-both-current-destinations-no-source-recreation",
+          "successor_evidence": "spec/evidence/migration-origin-100-7a2-direct-native-chain-r01.json",
+          "current_candidate_applicability": "Actual frozenf9c9 native execution on7a2/player505: F210005D/standalone2.1.23 and F20065FC/2.0.77, strict current fixture, one new lab and two unchanged-byte cold reloads per destination. Named Base route only; original7ac execution remains separately retained.",
+          "prior_successor_evidence": "spec/evidence/migration-origin-100-direct-successor-native-chain.json"
         },
         {
           "origin_tag": "1.1.0",
@@ -3619,13 +3620,17 @@
       "older_contract_cases": [
         {
           "boundary": "MIR1.0 data-only identities",
-          "status": "needs-correction",
-          "problem": "Separate F200/BD1 and F210/58F routes passed from one protected F8B3 original; current505 consumed-path review is not complete.",
-          "next_action": "Compare intervening loaded members against the actual source/save/fixture contract; reuse exact unchanged checks or prepare only affected successor execution. No runtime decoder exists to reconstruct.",
+          "status": "closed",
+          "problem": "Current005D/65FC direct successors both pass from protected originalF8 with all21 retained rows/effects, one new lab per target and two unchanged-byte cold reloads. The current stricter fixture preflights source state before its owned sentinel restoration.",
+          "next_action": "Reuse the named current Base pair and unchanged protected original source. Retain earlier native/adverse identities and fixture-owned-sentinel limits; no arbitrary settings, Space Age, GUI, other origins or whole-product pass is implied.",
           "evidence": [
             {
               "path": "spec/evidence/migration-origin-100-direct-successor-native-chain.json",
               "sha256": "F7088432C89DEE88323F2478368A0453770AF4799B75D98485823ADC53A16211"
+            },
+            {
+              "path": "spec/evidence/migration-origin-100-7a2-direct-native-chain-r01.json",
+              "sha256": "C2A15915ED7ADEEBC82C20EFB006C23B5A13E4B8670E2D9C28A67E1F3E61D568"
             }
           ]
         },
