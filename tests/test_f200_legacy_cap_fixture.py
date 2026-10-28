@@ -27,6 +27,7 @@ EA41_READBACK = ROOT / "spec/evidence/current-assets-ea41cbc6-readback.json"
 CROSS_SUCCESSOR_PROFILE = ROOT / "tests/profiles/f200-legacy-cap-cross-f210-mir5-2123.json"
 PUBLISHED_CONTROL_INFO = FIXTURE / "published-control-info.json"
 F200_CROSS = FIXTURE / "f200/cross-to-f210"
+F200_473 = FIXTURE / "f200/same-from-473"
 F210_CROSS = FIXTURE / "f210/cross-from-f200"
 F210_DISABLED = FIXTURE / "f210/disabled-after-f200"
 F210_REENABLED = FIXTURE / "f210/reenabled-after-f200"
@@ -524,6 +525,53 @@ class F200LegacyCapFixtureTests(unittest.TestCase):
         for stage, enabled in ((F210_DISABLED, False), (F210_REENABLED, True)):
             self.assertEqual((True, enabled, 1, 40), tuple(self.settings_result(stage / "settings-updates.lua")[field]
                                                            for field in ("ok", "enabled", "effect", "cap")))
+
+    def test_f200_473_same_engine_mode_keeps_the_historical_source_guard_distinct(self):
+        options = {
+            "source_base": "2.0.77", "source_mir": "4.7.20003", "source_fixture": "0.4.0",
+            "source_control_alias": str(FIXTURE / "published/control.lua"),
+            "destination_base": "2.0.77", "destination_mir": "5.0.20000",
+            "destination_fixture": "0.8.0", "destination_control_alias": str(FIXTURE / "successor/control.lua"),
+            "ordinary_completed_ticks": 3,
+        }
+        result = self.flow_result(F200_CROSS / "control.lua", F200_473 / "control.lua", "", options)
+        self.assertTrue(result["ok"], result["message"])
+        self.assertEqual(("completed", 2, 1, 4, .03), (result["phase"], result["source_labs"],
+                         result["destination_labs"], result["player_level"], result["bonus"]))
+        self.assertEqual((False, .42, 2, 6), (result["foreign_enabled"], result["foreign_progress"],
+                                            result["saves"], result["markers"]))
+        self.assertEqual(["f200-f210-positive-legacy-cap-source"] * 3
+                         + ["f200-positive-legacy-cap-473"] * 3, plain(result["marker_cases"]))
+        historical = self.flow_result(F200_CROSS / "control.lua", FIXTURE / "successor/control.lua", "",
+                                      {**options, "destination_fixture": "0.2.0", "destination_control_alias": None})
+        self.assertFalse(historical["ok"])
+        self.assertIn("published positive-cap source witness is absent or malformed", historical["message"])
+        wrong_source = self.flow_result(F200_CROSS / "control.lua", F200_473 / "control.lua", "",
+                                       {**options, "source_mir": "4.7.20002", "source_fixture": "0.1.0"})
+        self.assertFalse(wrong_source["ok"])
+        self.assertIn("published positive-cap source witness is absent or malformed", wrong_source["message"])
+
+    def test_f200_473_same_engine_profile_and_preflight_pin_only_the_new_exact_mode(self):
+        info = json.loads((F200_473 / "info.json").read_text(encoding="utf-8"))
+        self.assertEqual((NAME, "0.8.0", "2.0"), (info["name"], info["version"], info["factorio_version"]))
+        self.assertEqual(["base = 2.0.77", "more-infinite-research = 5.0.20000"], info["dependencies"])
+        profile = json.loads((ROOT / "tests/profiles/f200-legacy-cap-473-current0822-f200-2077.json").read_text(encoding="utf-8"))
+        self.assertEqual("0.8.0", profile["mods"][3]["version"])
+        self.assertEqual("0822F3A3F94492A58DD876AD67C1B450833DF761A519899E59580BFA610D90A2",
+                         profile["archive_sha256"]["more-infinite-research_5.0.20000.zip"])
+        self.assertNotIn("space-age", [row["name"] for row in profile["mods"]])
+        result = self.data_result(F200_473 / "data-final-fixes.lua", "2.0.77", "5.0.20000", "0.8.0",
+                                  self.row(), data_alias=FIXTURE / "successor/data-final-fixes.lua")
+        self.assertTrue(result["ok"], result["message"])
+        self.assertEqual(("1", 1), (result["row"]["unit"]["count_formula"], result["row"]["unit"]["time"]))
+        bad = self.row()
+        bad["effects"][1]["change"] = .02
+        refused = self.data_result(F200_473 / "data-final-fixes.lua", "2.0.77", "5.0.20000", "0.8.0", bad,
+                                   data_alias=FIXTURE / "successor/data-final-fixes.lua")
+        self.assertFalse(refused["ok"])
+        self.assertIn("1% fixture-selected effect changed", refused["message"])
+        self.assertEqual(("8000*2^(L-1)", 60),
+                         (refused["row"]["unit"]["count_formula"], refused["row"]["unit"]["time"]))
 
     def test_cross_engine_stage_guards_preflight_independent_f200_and_f210_gear_rows(self):
         source_row = self.row()
