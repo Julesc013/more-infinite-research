@@ -319,6 +319,38 @@ class LifecycleTests(unittest.TestCase):
             "unlimited agricultural setting did not restore only its own cap transition")
         ''')
 
+    def test_unlimited_disabled_prototype_survives_effects_reset_and_force_boundaries(self):
+        self.lua.execute('''
+          local name = "recipe-prod-research_gears-1"
+          local disabled = technology(name, 2, false)
+          disabled.prototype.enabled, disabled.saved_progress = false, .27
+          local foreign = technology("foreign-research", 4, false)
+          local queue = {foreign}
+          local f = force(34, {[name] = disabled, [foreign.name] = foreign}, queue, foreign, .42)
+          disabled.force, foreign.force = f, f
+          boot({[34] = f}, 0, "", nil, nil, 0, nil, nil,
+            {["ips-enable-research_gears"] = false})
+          local lifecycle = require("runtime.lifecycle")
+          assert(not lifecycle.caps_active(), "control unexpectedly enabled finite caps")
+          handlers.init()
+          assert(not disabled.enabled and storage.mir_caps == nil,
+            "already-disabled prototype allocated restoration rights")
+          for _, id in ipairs({8, 2, 1, 3}) do
+            assert(type(handlers.events[id]) == "function", "missing native boundary " .. id)
+            -- The native engine re-enabled a retained disabled prototype. MIR
+            -- must enforce its prototype policy without finite-cap callbacks.
+            disabled.enabled = true
+            handlers.events[id]({force=f, destination=f, source_index=999})
+            assert(disabled.enabled == false, "native boundary re-enabled disabled research: " .. id)
+            assert(disabled.level == 2 and disabled.researched == false and disabled.saved_progress == .27
+              and disabled.visible_when_disabled == false, "native boundary changed earned technology state")
+            assert(f.research_queue == queue and f.current_research == foreign and f.research_progress == .42
+              and foreign.enabled == false and f.cancelled == 0, "native boundary changed unrelated work")
+            assert(storage.mir_caps.owned_disabled[34][name].disabled == true,
+              "actual policy write was not retained")
+          end
+        ''')
+
     def test_policy_disabled_generated_prototype_reconciles_only_proven_mir_disablement(self):
         self.lua.execute('''
           local name = "recipe-prod-research_gears-1"

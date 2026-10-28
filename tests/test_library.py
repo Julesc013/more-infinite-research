@@ -243,12 +243,14 @@ class LibraryTests(unittest.TestCase):
           function route_native_events(reload_library, caps_active)
             native_handlers, native_ticks = {events={}}, {}
             native_cap_completions = 0
+            native_policy_reset_force = nil
             caps_active = caps_active == true
             package.loaded["runtime.lifecycle"] = nil
             package.preload["runtime.lifecycle"] = function()
               return {caps_active=function() return caps_active end,cap_limits=function() return {} end,
                 on_init=function() end,on_configuration_changed=function() end,on_load=function() end,
                 on_research_finished=function() native_cap_completions=native_cap_completions+1 end,
+                on_technology_effects_reset=function(event) native_policy_reset_force=event.force end,
                 on_force_created=function() end,on_force_reset=function() end,on_forces_merged=function() end}
             end
             script = {active_mods={base="2.1.23"},
@@ -378,6 +380,10 @@ class LibraryTests(unittest.TestCase):
             open_routed({status=4})
             player.force.research_queue, player.force.current_research, player.force.research_progress = {},nil,0
             native_handlers.events[id]({research=gear,force=player.force,destination=player.force,source_index=2})
+            if id == 8 then
+              assert(native_policy_reset_force == player.force,
+                "open-view effects reset displaced prototype-policy cleanup")
+            end
             assert(type(native_ticks[1]) == "function", "native boundary did not schedule view refresh: "..id)
             native_ticks[1]({tick=1})
             assert(queued_rows() == 0 and native_ticks[1] == nil)

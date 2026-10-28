@@ -15,6 +15,7 @@ import zipfile
 
 ROOT = Path(__file__).resolve().parents[1]
 FIXTURE = ROOT / "tests/fixtures/historical-transition"
+FIXTURE_473 = FIXTURE / "metadata-473-f013-f016.json"
 RUNNER = ROOT / "tools/Invoke-NativeFixture.ps1"
 DIRECT_ORACLE = ROOT / "tests/fixtures/historical-direct-native-oracle.json"
 
@@ -113,6 +114,8 @@ class HistoricalTransitionFixtureControls(unittest.TestCase):
           $literal=ConvertTo-HistoricalTransitionFixtureTargetLiteral $mir5
           if($literal -notmatch 'id="f017"' -or $literal -notmatch 'stage="mir5"' -or $literal -notmatch 'queue_probe="braking-force-1"'){throw 'literal differs'}
           $early=Get-HistoricalTransitionFixtureTarget -Target f013 -MetadataPath $env:MIR_TEST_METADATA -Stage mir5
+          $earlyPublished=Get-HistoricalTransitionFixtureTarget -Target f013 -MetadataPath $env:MIR_TEST_METADATA -Stage published
+          if($earlyPublished.mir_version -cne '4.7.01302' -or $early.mir_version -cne '5.0.01300'){throw 'default predecessor tuple differs'}
           $earlyLiteral=ConvertTo-HistoricalTransitionFixtureTargetLiteral $early
           if($earlyLiteral -notmatch 'successor_mode="preservation-only"' -or $earlyLiteral -match 'partial_progress'){throw 'early literal invented a successor state'}
           $f018=Get-HistoricalTransitionFixtureTarget -Target f018 -MetadataPath $env:MIR_TEST_METADATA -Stage published
@@ -124,6 +127,126 @@ class HistoricalTransitionFixtureControls(unittest.TestCase):
         env = dict(os.environ, MIR_TEST_RUNNER=str(RUNNER), MIR_TEST_METADATA=str(FIXTURE / "metadata.json"))
         result = subprocess.run(["pwsh", "-NoProfile", "-Command", functions], cwd=ROOT,
                                 text=True, capture_output=True, env=env, check=False)
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+
+        # The explicit 4.7.3 predecessor variant shares this target-resolver
+        # contract, while retaining the existing 4.7.2/F018 adverses below.
+        expected = {
+            "f013": ("4.7.01303", "5.0.01300", "3918B10A0902FABD09BEA6D1F0E7EFF06B20B84F3D8CC5EC73E36FEDAAE64D4D"),
+            "f014": ("4.7.01403", "5.0.01400", "85C7798BD6DC80FAA021AB0F33519B57A740B8D3969E695A82BA55634BA1C87A"),
+            "f015": ("4.7.01503", "5.0.01500", "0F8DD4DD21B8D1542FF5EDF96FDC38F75C9AB3CE577DF29C5E9DE99E0643B510"),
+            "f016": ("4.7.01603", "5.0.01600", "DAC63B9B14278C952B1020F9AE600C1437A9812C79CBBA17DE3CB15AF0CED6BD"),
+        }
+        metadata = json.loads(FIXTURE_473.read_text(encoding="utf-8"))
+        self.assertEqual((metadata["schema"], metadata["kind"], metadata["name"], metadata["version"],
+                          metadata["predecessor_release"]),
+                         (1, "MIR5HistoricalTransitionFixtureV1", "mir-fixture-mir5-historical-transition", "0.1.0", "v4.7.3"))
+        self.assertEqual((metadata["published_release_id"], metadata["published_tag_source"]),
+                         (422732162, "8643cc91bc915e008556a5315dbb0a743247e7ab"))
+        self.assertEqual(set(metadata["targets"]), set(expected))
+        for target, (published, mir5, archive) in expected.items():
+            with self.subTest(metadata_target=target):
+                fact = metadata["targets"][target]
+                self.assertEqual((fact["published_mir_version"], fact["mir_version"], fact["published_archive_sha256"]),
+                                 (published, mir5, archive))
+                retained = self.metadata["targets"][target]
+                changed_identity = {"published_mir_version", "published_archive_sha256"}
+                self.assertEqual({key: value for key, value in fact.items() if key not in changed_identity},
+                                 {key: value for key, value in retained.items() if key not in changed_identity})
+                profile = json.loads((ROOT / f"tests/profiles/historical-transition-473-published-{target}.json")
+                                     .read_text(encoding="utf-8"))
+                self.assertEqual(profile["mods"], [
+                    {"name": "base", "version": retained["minimum_base"], "enabled": True},
+                    {"name": "more-infinite-research", "version": published, "enabled": True},
+                    {"name": "mir-fixture-mir5-historical-transition", "version": "0.1.0", "enabled": True},
+                ])
+        v473_functions = r'''
+          $ErrorActionPreference='Stop';Set-StrictMode -Version Latest
+          $tokens=$null;$errors=$null
+          $ast=[Management.Automation.Language.Parser]::ParseFile($env:MIR_TEST_RUNNER,[ref]$tokens,[ref]$errors)
+          if($errors.Count){throw 'parse failed'}
+          foreach($name in @('Assert-Fixture','Get-FixtureSha','Get-HistoricalTransitionFixtureTarget','ConvertTo-HistoricalTransitionFixtureTargetLiteral')){
+            $node=@($ast.FindAll({param($n) $n -is [Management.Automation.Language.FunctionDefinitionAst] -and $n.Name -ceq $name},$true))
+            if($node.Count -ne 1){throw ('missing '+$name)}
+            Invoke-Expression $node[0].Extent.Text
+          }
+          $expected=@{
+            f013=@{published='4.7.01303';mir5='5.0.01300';archive='3918B10A0902FABD09BEA6D1F0E7EFF06B20B84F3D8CC5EC73E36FEDAAE64D4D'}
+            f014=@{published='4.7.01403';mir5='5.0.01400';archive='85C7798BD6DC80FAA021AB0F33519B57A740B8D3969E695A82BA55634BA1C87A'}
+            f015=@{published='4.7.01503';mir5='5.0.01500';archive='0F8DD4DD21B8D1542FF5EDF96FDC38F75C9AB3CE577DF29C5E9DE99E0643B510'}
+            f016=@{published='4.7.01603';mir5='5.0.01600';archive='DAC63B9B14278C952B1020F9AE600C1437A9812C79CBBA17DE3CB15AF0CED6BD'}
+          }
+          foreach($target in @('f013','f014','f015','f016')){
+            $published=Get-HistoricalTransitionFixtureTarget -Target $target -MetadataPath $env:MIR_TEST_473 -Stage published
+            $mir5=Get-HistoricalTransitionFixtureTarget -Target $target -MetadataPath $env:MIR_TEST_473 -Stage mir5
+            $fact=$expected[$target]
+            if($published.mir_version -cne $fact.published -or $mir5.mir_version -cne $fact.mir5 -or $published.definition.published_archive_sha256 -cne $fact.archive){throw ('v4.7.3 admission differs: '+$target)}
+            $publishedLiteral=ConvertTo-HistoricalTransitionFixtureTargetLiteral $published
+            $mir5Literal=ConvertTo-HistoricalTransitionFixtureTargetLiteral $mir5
+            if($publishedLiteral -notmatch ('id="'+$target+'"') -or $publishedLiteral -notmatch 'stage="published"' -or $publishedLiteral -notmatch ('mir_version="'+$fact.published+'"')){throw ('v4.7.3 published literal differs: '+$target)}
+            if($mir5Literal -notmatch ('id="'+$target+'"') -or $mir5Literal -notmatch 'stage="mir5"' -or $mir5Literal -notmatch ('mir_version="'+$fact.mir5+'"')){throw ('v4.7.3 MIR5 literal differs: '+$target)}
+          }
+        '''
+        wrong_release = json.loads(json.dumps(metadata))
+        wrong_release["predecessor_release"] = "v4.7.2"
+        wrong_release_id = json.loads(json.dumps(metadata))
+        wrong_release_id["published_release_id"] = 422732163
+        wrong_release_id_type = json.loads(json.dumps(metadata))
+        wrong_release_id_type["published_release_id"] = "422732162"
+        wrong_tag_source = json.loads(json.dumps(metadata))
+        wrong_tag_source["published_tag_source"] = "0" * 40
+        wrong_hash = json.loads(json.dumps(metadata))
+        wrong_hash["targets"]["f014"]["published_archive_sha256"] = "0" * 64
+        stale_version = json.loads(json.dumps(metadata))
+        stale_version["targets"]["f015"]["published_mir_version"] = "4.7.01502"
+        extra_target = json.loads(json.dumps(metadata))
+        extra_target["targets"]["f017"] = self.metadata["targets"]["f017"]
+        with tempfile.TemporaryDirectory(prefix="mir5-historical-transition-473-") as work:
+            root = Path(work)
+            paths = {
+                "release": root / "wrong-release.json",
+                "release_id": root / "wrong-release-id.json",
+                "release_id_type": root / "wrong-release-id-type.json",
+                "tag_source": root / "wrong-tag-source.json",
+                "hash": root / "wrong-hash.json",
+                "version": root / "stale-version.json",
+                "extra": root / "extra-target.json",
+            }
+            for key, value in (("release", wrong_release), ("release_id", wrong_release_id),
+                               ("release_id_type", wrong_release_id_type), ("tag_source", wrong_tag_source), ("hash", wrong_hash),
+                               ("version", stale_version), ("extra", extra_target)):
+                paths[key].write_text(json.dumps(value), encoding="utf-8")
+            v473_rejection = v473_functions + r'''
+              $checks=@(
+                @{path=$env:MIR_TEST_473_WRONG_RELEASE;target='f013';message='predecessor release'},
+                @{path=$env:MIR_TEST_473_WRONG_RELEASE_ID;target='f013';message='published release id'},
+                @{path=$env:MIR_TEST_473_WRONG_RELEASE_ID_TYPE;target='f013';message='published release id'},
+                @{path=$env:MIR_TEST_473_WRONG_TAG_SOURCE;target='f013';message='published tag source'},
+                @{path=$env:MIR_TEST_473_WRONG_HASH;target='f014';message='published archive hash'},
+                @{path=$env:MIR_TEST_473_STALE_VERSION;target='f015';message='MIR versions differ'},
+                @{path=$env:MIR_TEST_473_EXTRA_TARGET;target='f013';message='target set differs'}
+              )
+              foreach($check in $checks){
+                $refused=$false
+                try { Get-HistoricalTransitionFixtureTarget -Target $check.target -MetadataPath $check.path -Stage published | Out-Null }
+                catch { if($_.Exception.Message -match $check.message){$refused=$true}else{throw} }
+                if(-not $refused){throw ('invalid v4.7.3 metadata accepted: '+$check.message)}
+              }
+              $wrongTarget=$false
+              try { Get-HistoricalTransitionFixtureTarget -Target f017 -MetadataPath $env:MIR_TEST_473 -Stage published | Out-Null }
+              catch { if($_.Exception.Message -match 'target is unsupported'){$wrongTarget=$true}else{throw} }
+              if(-not $wrongTarget){throw 'v4.7.3 admitted unreviewed target'}
+            '''
+            v473_env = dict(os.environ, MIR_TEST_RUNNER=str(RUNNER), MIR_TEST_473=str(FIXTURE_473),
+                            MIR_TEST_473_WRONG_RELEASE=str(paths["release"]), MIR_TEST_473_WRONG_RELEASE_ID=str(paths["release_id"]),
+                            MIR_TEST_473_WRONG_RELEASE_ID_TYPE=str(paths["release_id_type"]), MIR_TEST_473_WRONG_TAG_SOURCE=str(paths["tag_source"]),
+                            MIR_TEST_473_WRONG_HASH=str(paths["hash"]),
+                            MIR_TEST_473_STALE_VERSION=str(paths["version"]), MIR_TEST_473_EXTRA_TARGET=str(paths["extra"]))
+            result = subprocess.run(["pwsh", "-NoProfile", "-Command", v473_functions], cwd=ROOT,
+                                    text=True, capture_output=True, env=v473_env, check=False)
+            self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+            result = subprocess.run(["pwsh", "-NoProfile", "-Command", v473_rejection], cwd=ROOT,
+                                    text=True, capture_output=True, env=v473_env, check=False)
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
 
         broken = json.loads((FIXTURE / "metadata.json").read_text(encoding="utf-8"))

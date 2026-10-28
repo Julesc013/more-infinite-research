@@ -461,7 +461,7 @@ local function on_research_reversed(event)
 end
 
 local function on_technology_effects_reset(event)
-  if lifecycle.caps_active() then lifecycle.on_technology_effects_reset(event) end
+  lifecycle.on_technology_effects_reset(event)
   if native_credits then native_credits.on_technology_effects_reset(event) end
   if competing_productivity then competing_productivity.on_technology_effects_reset(event) end
   if scripted_effects then scripted_effects.on_technology_effects_reset(event) end
