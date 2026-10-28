@@ -3854,8 +3854,8 @@
         {
           "boundary": "Published F200 cap disabled/re-enabled and V3 F210 worker tails",
           "status": "needs-correction",
-          "problem": "Exact473 source81AF and current005D/8DC direct0.5 successor pass one new lab,44 processing ticks,one physical item per pack,save/two cold reloads. Disabled0.6 reaches initial assertions but times out180s before a save; reenabled0.7 is not launched. Earlier tool-only adverse remains preserved; missing lifecycle-corrected stages and distinct F200/V3/worker routes remain open.",
-          "next_action": "Retain direct R03 evidence without rerunning it. Correct/review the disabled fixture configuration-versus-first-tick save lifecycle, then run only disabled/reenabled stages from protected81AF. Do not infer same-engine F200, earlierV3 or worker closure.",
+          "problem": "Current005D/8DC directR03 passes and disabledR04 now saves/two-cold-reloads from81AF. Reenabled0.7 from protectedDBF98 fails before newlab/save: actualenabledfalse despite settingtrue; level3,bonus.02,visibilitytrue,max andsaved.27 match. A read-only log-only native probe isolates the flag; required reenabling remains a release blocker.",
+          "next_action": "Trace and correct the exact proven-disable ownership path with opposing current/foreign-negative controls, then qualify only affected stages from protected originals. Keep successful direct/disabled and all native/zero-native adverses. Do not weaken enabled expectation or infer earlierV3/worker/F200 same-engine closure.",
           "evidence": [
             {
               "path": "spec/evidence/f200-foreign-cap-baseline-f0dd-native-chain-r01.json",
@@ -3868,6 +3868,10 @@
             {
               "path": "spec/evidence/cap-473-f210-direct-and-disabled-adverse-chain-r03.json",
               "scope": "Actual direct pass and disabled timeout at f5 controller; reenabled unexecuted."
+            },
+            {
+              "path": "spec/evidence/cap-473-disabled-reenabled-native-chain-r04.json",
+              "scope": "Actual disabled save/two-reload pass and later reenable false flag isolated by unchanged-assertion read-only probe."
             }
           ],
           "protected_473_cap_source": {
