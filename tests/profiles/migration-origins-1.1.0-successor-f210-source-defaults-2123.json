@@ -1,0 +1,37 @@
+{
+  "schema": 1,
+  "kind": "mir5-migration-origin-direct-successor-engine-hop-prepared",
+  "variant": "published-source-defaults-input",
+  "origin_tag": "1.1.0",
+  "origin_source_commit": "2fb64822b82569e3b50f0653e361fb7148f18b63",
+  "source_fixture_commit": "bec37fb87a05d17cf4cf0225e0458218830fef63",
+  "source_fixture_controller_commit": "3ae2711867cd60f6c871f641c331349d941dd8c3",
+  "successor_fixture_commit": "713ff517c5fc846a24a0a768229a55f991e2852c",
+  "target": "f210_source_defaults",
+  "factorio_line": "2.1",
+  "engine": {
+    "version": "2.1.23",
+    "sha256": "FE4A1DA30F322A0D0B8AEB3DF7276332222BAAA143E2352569B723E84B2B9060"
+  },
+  "settings_mode": "Defaults",
+  "source_save": {
+    "sha256": "88FC8E9891040275E001930C3E6AA0A4A7A28C31D81DF30E3F08AEDD98E5019A",
+    "source_result_sha256": "4FBD622144E3B69E39C0530385AA70C92971208584CA32D4A10B1FCC1A978997"
+  },
+  "candidate": {
+    "source_commit": "c74b7c4680545f3ccf27f38016d1144fefe8eee3",
+    "player_tree": "f81c63afca2e6eb5b7e46dffe892548553899db3"
+  },
+  "mods": [
+    {"name": "base", "version": "2.1.23", "enabled": true},
+    {"name": "mir-fixture-mir5-active-mods-observer", "version": "0.1.0", "enabled": true},
+    {"name": "more-infinite-research", "version": "5.0.21000", "enabled": true},
+    {"name": "mir-fixture-mir5-migration-origin-f200-110-source", "version": "0.4.0", "enabled": true}
+  ],
+  "archive_sha256": {
+    "mir-fixture-mir5-active-mods-observer_0.1.0.zip": "A15A7D628D66953D2E0C4D4FA288F47CBF9C5678327C7EB3D23ADB5DC78331C0",
+    "mir-fixture-mir5-migration-origin-f200-110-source_0.4.0.zip": "3597682FF6AC7A7BFBA9B62B38A9E3958A1BCA04692750B4DDE18B746346B871",
+    "more-infinite-research_5.0.21000.zip": "625756F9E2536383954A121EB24FFB3AE0C0A540B7557E3F03A79C2D8A6A0D59"
+  },
+  "scope": "Prepared direct F200-to-F210 Base successor of the protected passed MIR 1.1.0 F200 r05 source stage under coherent c74b7c46 MIR5 F210. This arm uses Defaults plus its own settings-updates stage to supply only the independently verified published source defaults ips-require-space-gate=true and ips-enable-research_inventory_capacity=false. It does not claim persisted player mod-settings recovery. Native execution remains pending. Space Age, caps, and planet repair are outside this selected input."
+}

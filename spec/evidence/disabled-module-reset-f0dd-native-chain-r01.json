@@ -1,0 +1,109 @@
+{
+  "schema": 1,
+  "kind": "MIR5DisabledModuleResetNativeChainV1",
+  "status": "passed-exact-f210-disabled-module-reset-regression",
+  "scope": "One exact Base F210 successor from the protected published MIR1.1 F200 source. This demonstrates the selected disabled-module native effects-reset correction; it is not arbitrary settings-file, F200 disabled-module, Space Age, client, performance or final-release qualification.",
+  "source_stage_reused": {
+    "chain": "spec/evidence/migration-origin-110-f200-source-native-chain-r05.json",
+    "original_save_sha256": "88FC8E9891040275E001930C3E6AA0A4A7A28C31D81DF30E3F08AEDD98E5019A",
+    "original_save_bytes": 793858,
+    "original_result_sha256": "4FBD622144E3B69E39C0530385AA70C92971208584CA32D4A10B1FCC1A978997",
+    "source_world_recreated": false,
+    "source_actual_laboratories": 1,
+    "source_laboratory_counted_once": true
+  },
+  "frozen_execution": {
+    "controller_commit": "67170de8b49e2ecbcd4a46f12b231771d6aa8a06",
+    "candidate_source_commit": "f0dd9f62adc8bf0a8eaaf9babc1fcfef9f3241ea",
+    "player_tree": "0229b2bb3ad0c514fc4dca18c32fd544b9ba7d72",
+    "asset_readback": "spec/evidence/current-assets-f0dd9f62-root-readback.json",
+    "candidate_archive_sha256": "654C57DDCE2E994C1E8DDC4F808198D4FAC7EAB6284B18C4A628E6DA5465DE23",
+    "candidate_archive_bytes": 686080,
+    "engine_version": "2.1.23",
+    "engine_sha256": "FE4A1DA30F322A0D0B8AEB3DF7276332222BAAA143E2352569B723E84B2B9060",
+    "observer_archive_sha256": "A15A7D628D66953D2E0C4D4FA288F47CBF9C5678327C7EB3D23ADB5DC78331C0",
+    "profile": "tests/profiles/migration-origins-1.1.0-successor-f210-source-defaults-modules-disabled-f0dd-2123.json",
+    "profile_sha256": "D0759682194E8FAF432A50AA09370C3588EED7F6321D28129DE50612F61CA429",
+    "fixture_raw_git_commit": "41ee18a087dc6adabd70a2457a44a8aed76f46db",
+    "fixture_archive_sha256": "34A5EC5015CB63296A767EBD249AEEA499B934FA74286B5FDE6B837937629A35",
+    "fixture_archive_bytes": 11060,
+    "prepared_packet_sha256": "63BC131AA745023DF9C00F6AF5982A167D8E2F3413AAD838F967D5C888F0DB83",
+    "caller_sha256": "6C64475E4578E92006C1DAF1FAF4FD383D37679AA06E0793A6111DA9AA2D29B7"
+  },
+  "explicit_fixture_default_inputs": {
+    "mode": "Defaults",
+    "values": {
+      "ips-require-space-gate": true,
+      "ips-enable-research_inventory_capacity": false,
+      "ips-enable-research_modules": false
+    },
+    "interpretation": "The first two values recover the independent original defaults; modules=false is the sole deliberate destination exception. The fixture checks all42 original source settings with only that exception. This does not qualify persisted player mod-settings.dat recovery."
+  },
+  "retained_original_adverse": {
+    "candidate_source_commit": "c74b7c4680545f3ccf27f38016d1144fefe8eee3",
+    "candidate_archive_sha256": "625756F9E2536383954A121EB24FFB3AE0C0A540B7557E3F03A79C2D8A6A0D59",
+    "fixture_unchanged": true,
+    "result_sha256": "E93CBB43320F1B196065956D98EB059C8137AF8E6CC2E48A186FB944D9920F24",
+    "terminal_sha256": "8B89A374229AC21D7915BB00E42F36039B806BF1A81494807850ABC7C1F93AE8",
+    "log_sha256": "901801B71E495097ECF8062A5966907172B235ADFCB73F7EB03611B25C6908F0",
+    "disposition": "The native effects-reset boundary re-enabled the public module row and the unchanged fixture rejected its enabled=true state against the required destination false. This actual native failure remains retained; no successful result replaces its bytes."
+  },
+  "passing_native_observation": {
+    "result_sha256": "34E4F3BF84776515B58E5A975DAED6050764617004235D2F6EC7AD3D017A7E45",
+    "result_bytes": 36208,
+    "terminal_sha256": "19ACB4A6734A28FE5B310648AA2BE8BABE262414E883D62476B6197953C7159F",
+    "status": "passed-private-native-fixture",
+    "processes": 3,
+    "serialized_initial_marker": {
+      "case": "migration-origin-1.1.0-f210_source_defaults_modules_disabled-successor",
+      "stage": "initial",
+      "status": "passed",
+      "source_origin": "1.1.0",
+      "source_rows": 31,
+      "source_actual_labs": 1,
+      "candidate_actual_labs": 1,
+      "source_direct_level": 2,
+      "candidate_direct_level": 3,
+      "source_gear_bonus": 0.10000000149012,
+      "candidate_gear_bonus": 0.2,
+      "source_robot_battery": 0.1,
+      "candidate_robot_battery": 0.1,
+      "foreign_queue_progress": 0.42,
+      "detached_progress": 0.27,
+      "manual_mining_baseline": 0,
+      "on_load_read_only": false
+    },
+    "strict_fixture_assertions": "The unchanged raw41ee fixture requires the normal public9-effect module row disabled, all3 earned historical hidden holders, source approximately.11 tier-one module totals, and all retained source rows/queue/effects before and after one new gear lab, native reset_technology_effects, save and reload. These are passed fixture assertions, not additional independently serialized marker fields.",
+    "successor_save_sha256": "80107A707899B0A379E235E72CEC0DCD0D5D16EDD21BFA5AFFD977A92C37AFEC",
+    "successor_save_bytes": 814167,
+    "cold_reloads": 2,
+    "cold_reloads_read_only_and_same_save_bytes": true
+  },
+  "custody_and_restoration": {
+    "primary_root": "build/qualification/migration-origins/migration-origin-110-f210-source-defaults-modules-disabled-f0dd-r02",
+    "raw_root": "D:/Projects/Factorio/mir5-origin110-disabled-f0dd-rebind-r01/build/tmp/migration-origin-110-f210-source-defaults-modules-disabled-f0dd-r02",
+    "members": 17,
+    "bytes": 933997,
+    "root_original_and_primary_file_checks": 34,
+    "terminal_custody_entries_independently_verified": true,
+    "root_sorted_lf_manifest_sha256": "A8EDBDB5AE63010C31917D04FE8B76F92F19064983FFADAD0AABC6432F3FB488",
+    "manifest_encoding": "UTF-8 case-sensitive sorted forward-slash relative_path|bytes|UPPERCASE_SHA256 lines with final LF",
+    "original_source_save_rehashed_unchanged": true,
+    "published_mir_slot_restored_sha256": "C563CB5B96C9E64CB3373BDB60CF5C8B7D3C97E93EADB8F924443C703CDC024D",
+    "observer_preserved_sha256": "A15A7D628D66953D2E0C4D4FA288F47CBF9C5678327C7EB3D23ADB5DC78331C0",
+    "own_fixture_restored_to_absent": true,
+    "controls_before_after_exact": true,
+    "factorio_processes_after_terminal": 0
+  },
+  "preparation_limit": "The earlier f0dd r01 receipt650B00F2 named no materialized executing-checkout source/ZIP. Root rejected that incomplete locator before native admission. Its bytes remain; r02 supplies exact raw41ee/source/archive bytes. No native run or pass is credited to r01.",
+  "receipts": {
+    "path": "spec/evidence/disabled-module-reset-f0dd-native-receipts-r01.json.gz",
+    "sha256": "0D10557691BBEFB242E6C3670AD337F32B05A63494370F1D5713AA8688B34FC3",
+    "bytes": 10886,
+    "uncompressed_sha256": "297034DAAFB6818272E577D1CE84E8653D6FBF0E2A88D2BA89823A175C385E1B",
+    "uncompressed_bytes": 59501,
+    "exact_original_native_results": 2,
+    "strict_utf8_base64_gzip_roundtrip_verified": true
+  },
+  "remaining": "Only this selected F210 reset regression is qualified. The separate F200 cap chain, other affected settings/provider/DLC/modpack/save/client/performance scenarios, final exports, delivery and release gates remain open."
+}
