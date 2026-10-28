@@ -1,0 +1,70 @@
+{
+  "schema": 1,
+  "kind": "MIRV3440PublishedCapSourceNativeChainV1",
+  "status": "passed-published-source-not-MIR5-successor",
+  "controller_commit": "c889c49c04afb486548c4da1ae49da5e8f17e9f0",
+  "scope": "Exact published4.4.20000/29D85A53 on2.0.77/D3,thinfixture0.9. Independent full row/effect preflight precedes count/time acceleration. Two actual gear labs,capped level3/.02 and .27 suspended work,foreign disabled gear/.42 unrelated queue,save/two read-only unchanged-byte cold reloads. No MIR5 code executes in this source leg.",
+  "published": {
+    "tag": "v4.4.0",
+    "tag_commit": "72b5c72eab810baf74c9a785ac4ebbc0d438c94a",
+    "release_id": 413564113,
+    "asset_id": 643184818,
+    "archive_sha256": "29D85A53ABC69A6B3FDC0E4EA58C77FC9B53E5671B84441192AEE5E65A4CFBD4",
+    "archive_bytes": 1403874,
+    "cap_writer": {
+      "member": "more-infinite-research_4.4.20000/prototypes/mir/runtime/maximum_level_control.lua",
+      "sha256": "05315ADA92D1FAC91669CC6564E7BB293082F9919E5CE4D97F88EE8FCC0C4B46",
+      "bytes": 42409,
+      "policy_version": 3
+    }
+  },
+  "engine": {
+    "path": "D:\\Games\\Factorio\\2.0\\bin\\x64\\factorio.exe",
+    "sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B",
+    "file_version": "2.0.77.84539",
+    "product_version": "2.0.77",
+    "base_version": "2.0.77"
+  },
+  "fixture_sha256": "399BDB43B3E3CF481BE276498B9926E75DE3CD6D5EED47C4B3DCDF54A6922715",
+  "profile_sha256": "05B804A6283C3143B7304B02C424C67B58C0AC2ADE63422BC059F7452B6F66FD",
+  "initial_witnesses": {
+    "source_mir": "4.4.20000",
+    "actual_lab_completions": 2,
+    "milestone": "actual2labs",
+    "seededpartial": "after-actual2labs",
+    "next_level": 3,
+    "productivity_bonus": 0.019999999552965164,
+    "player_enabled": false,
+    "player_visible_when_disabled": true,
+    "saved_progress": 0.27,
+    "foreign_queue_progress": 0.42000000000000004,
+    "foreign_disabled": true,
+    "on_load_read_only": false
+  },
+  "protected_source": {
+    "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\v3-440-cap-published-source-r01-controller\\native-published-440\\write-data\\saves\\mir5-native-complete.zip",
+    "sha256": "CE8F6E6A34C8FCD94A25BCA38CA6755F86C7BA084C407B4BF5DE3D603D334DB6",
+    "bytes": 820385
+  },
+  "packet_sha256": "F0DF24571AB8D8E8B07F9D166B0360DBA74CA887FECF2FD7CEAD8877EA314B5A",
+  "caller_sha256": "10D157EE88910806AFAAD159EFC6EE764F1CFB9A3B58A143C814F46104642340",
+  "result_sha256": "2AD6E498358BA4D15F715085E63EF7D2CEFBA153C6404AEEFA87175DB4E2C3D6",
+  "root_readback": {
+    "path": "build/qualification/v3-440-cap-published-source-r01-controller/root-readback-r01.json",
+    "sha256": "9EB5568AE3EF9915384E0FA31F2EF4195905C1F3D2E515B069D6922F75483D23",
+    "files": 23,
+    "bytes_per_copy": 1912739
+  },
+  "lossless_receipts": {
+    "path": "spec/evidence/v3-440-cap-published-source-native-receipts-r01.json.gz",
+    "sha256": "ECD812E31104DA9863417FA0E910AA2AC59FCF9A6C02EE72EFE61ABC97A65AD2",
+    "bytes": 14174,
+    "records": 3
+  },
+  "counts": {
+    "new_native_processes": 4,
+    "new_actual_labs": 2,
+    "new_cold_reloads": 2
+  },
+  "limits": "Source-only evidence for this exact earlier structured-V3 representative. Reuse protectedCE8F for separately pinned F200/F210 successors; no source recreation or native result for unrun4.2/4.4 labels,worker tails,label collision,adjacent enabled finitecap,GUI/performance or release."
+}
