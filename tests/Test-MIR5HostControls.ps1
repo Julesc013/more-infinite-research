@@ -18,6 +18,7 @@ $controls = @(
   [ordered]@{path='tests/test_migration_origins_f200_source_controls.py';lua=$true},
   [ordered]@{path='tests/test_migration_origins_f200_110_source_controls.py';lua=$true},
   [ordered]@{path='tests/test_migration_origins_f200_110_successor_controls.py';lua=$true},
+  [ordered]@{path='tests/test_migration_origins_f200_120_source_controls.py';lua=$true},
   [ordered]@{path='tests/test_migration_origins_successor_controls.py';lua=$true},
   [ordered]@{path='tests/test_modern_targets.py';lua=$true},
   [ordered]@{path='tests/test_k2_base_catalogue.py';lua=$true},

@@ -48,6 +48,7 @@ class HostControlsTests(unittest.TestCase):
             "tests/test_migration_origins_f200_source_controls.py",
             "tests/test_migration_origins_f200_110_source_controls.py",
             "tests/test_migration_origins_f200_110_successor_controls.py",
+            "tests/test_migration_origins_f200_120_source_controls.py",
             "tests/test_migration_origins_successor_controls.py",
             "tests/test_modern_targets.py",
             "tests/test_k2_base_catalogue.py",
