@@ -3788,8 +3788,12 @@
         {
           "boundary": "K2 Imersite public/carrier identities",
           "status": "needs-correction",
-          "problem": "Direct4.6 to frozen MIR5 matching-cost chain passes; the published4.7.2 intermediate fails before MIR5. K2SE is a separate prepared closure.",
-          "next_action": "Review direct-route505 applicability, then qualify the distinct K2SE published-origin carrier case. Keep failed staged4.7.2 route explicit; do not patch an old archive or manufacture state to make it pass.",
+          "problem": "Direct4.6 to AFCAF/R05 matching-cost chain passes under its original FE4 inputs; later b251/E3A was preparation only. Current005D/8DC direct inputs are now pinned and guarded, awaiting native-owner resource/input admission. Published4.7.2 intermediate still fails before MIR5; K2SE is a distinct unqualified published-origin carrier closure.",
+          "next_action": "The sole native owner can adopt the prepared current direct route from unchanged protected538B, with original five source labs reused, one new tail lab, retained42-percent work, save and two cold reloads. Bind actual source/engine/library/caller/output and resource admission first. Separately qualify the K2SE published-origin carrier case. Keep failed staged4.7.2 explicit; no old archive patch or manufactured original state. This prepared record creates no additional native assignment.",
+          "prepared_inputs": {
+            "path": "spec/evidence/k2-imersite-current005d-prepared-inputs-r01.json",
+            "sha256": "02C6BFFB4CD524A11BF90DEC1269639963B61765027AE0D60A6A56E9C068EC56"
+          },
           "evidence": [
             {
               "path": "spec/evidence/native-recovery-wave-r05-chain.json",
