@@ -8,6 +8,8 @@ The original [metadata](metadata.json) retains the exact 4.7.2 predecessors and 
 
 The separate [4.7.3 metadata](metadata-473-f013-f016.json) selects only the published F013–F016 archives already identified in the [migration-origin inventory](../../../spec/inventory/migration-origins.json). Its explicit `predecessor_release` selects an exact version/hash tuple; another patch, target or archive is refused. This is prepared input selection, not evidence that an engine has loaded it or a save has migrated.
 
+The [prepared-input receipt](../../../spec/evidence/historical-473-f013-f016-prepared-inputs-r01.json) records the four rehashed original archives, exact source/profile/controller identities and four generated six-member fixture archives. Independent readback verifies those members and repeats the existing archive guards; no native result follows from those checks.
+
 Use the matching published-source profile:
 
 - [F013 / 0.13.20](../../profiles/historical-transition-473-published-f013.json)
