@@ -330,6 +330,7 @@ class HistoricalTransitionFixtureControls(unittest.TestCase):
                                           MIR_TEST_METADATA=str(FIXTURE / "metadata.json"))).stdout.strip() + "\n"
         info = {
             "name": self.metadata["name"], "version": self.metadata["version"], "factorio_version": "0.13",
+            "title": "MIR historical save-transition fixture", "author": "MIR maintainers",
             "dependencies": ["base >= 0.13.20", "more-infinite-research = 4.7.01302"],
         }
         members = {name: (FIXTURE / name).read_bytes() for name in
@@ -347,15 +348,36 @@ class HistoricalTransitionFixtureControls(unittest.TestCase):
                 with zipfile.ZipFile(path, "w") as archive:
                     for name, value in payload.items():
                         archive.writestr(archive_root + name, value)
+            for field in ("title", "author"):
+                for defect in ("absent", "blank", "array"):
+                    bad = dict(info)
+                    if defect == "absent":
+                        del bad[field]
+                    else:
+                        bad[field] = "  " if defect == "blank" else ["invalid"]
+                    payload = dict(members)
+                    payload["info.json"] = json.dumps(bad).encode("utf-8")
+                    with zipfile.ZipFile(root / (field + "-" + defect + ".zip"), "w") as archive:
+                        for name, value in payload.items():
+                            archive.writestr(archive_root + name, value)
             check = r'''
               Assert-HistoricalTransitionFixtureArchive -Archive $env:MIR_TEST_GOOD -SourceDirectory $env:MIR_TEST_SOURCE -Fixture $fixture
               $refused=$false
               try { Assert-HistoricalTransitionFixtureArchive -Archive $env:MIR_TEST_WRONG -SourceDirectory $env:MIR_TEST_SOURCE -Fixture $fixture }
               catch { if($_.Exception.Message -match 'dependencies differ'){$refused=$true}else{throw} }
               if(-not $refused){throw 'wrong stage dependency accepted'}
+              foreach($field in @('title','author')){
+                foreach($defect in @('absent','blank','array')){
+                  $refused=$false
+                  try { Assert-HistoricalTransitionFixtureArchive -Archive (Join-Path $env:MIR_TEST_ARCHIVE_ROOT ($field+'-'+$defect+'.zip')) -SourceDirectory $env:MIR_TEST_SOURCE -Fixture $fixture }
+                  catch { if($_.Exception.Message -match ('info '+$field+' must be a nonempty string')){$refused=$true}else{throw} }
+                  if(-not $refused){throw ('invalid metadata accepted: '+$field+'-'+$defect)}
+                }
+              }
             '''
             env = dict(os.environ, MIR_TEST_RUNNER=str(RUNNER), MIR_TEST_METADATA=str(FIXTURE / "metadata.json"),
-                       MIR_TEST_GOOD=str(good), MIR_TEST_WRONG=str(wrong), MIR_TEST_SOURCE=str(FIXTURE))
+                       MIR_TEST_GOOD=str(good), MIR_TEST_WRONG=str(wrong), MIR_TEST_SOURCE=str(FIXTURE),
+                       MIR_TEST_ARCHIVE_ROOT=str(root))
             result = subprocess.run(["pwsh", "-NoProfile", "-Command", functions + check], cwd=ROOT,
                                     text=True, capture_output=True, env=env, check=False)
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
@@ -393,6 +415,7 @@ class HistoricalTransitionFixtureControls(unittest.TestCase):
                 payload["target-literal.lua"] = literal
                 payload["info.json"] = json.dumps({
                     "name": self.metadata["name"], "version": self.metadata["version"], "factorio_version": "0.18",
+                    "title": "MIR historical save-transition fixture", "author": "MIR maintainers",
                     "dependencies": ["base >= 0.18.47", expected_dependency],
                 }).encode("utf-8")
                 archive_root = self.metadata["name"] + "_" + self.metadata["version"] + "/"
