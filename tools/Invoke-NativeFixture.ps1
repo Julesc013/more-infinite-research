@@ -327,13 +327,21 @@ function Get-HistoricalTransitionFixtureTarget([string]$Target,[string]$Metadata
     Assert-Fixture ($value.ContainsKey('published_release_id') -and (($value.published_release_id -is [int]) -or ($value.published_release_id -is [long])) -and [long]$value.published_release_id -eq 422732162) 'historical transition published release id differs'
     Assert-Fixture ($value.ContainsKey('published_tag_source') -and $value.published_tag_source -is [string] -and $value.published_tag_source -ceq '8643cc91bc915e008556a5315dbb0a743247e7ab') 'historical transition published tag source differs'
     $predecessorRelease=[string]$value.predecessor_release
-    $expectedTargets=[ordered]@{
-      f013=@{factorio_version='0.13';published_mir_version='4.7.01303';mir_version='5.0.01300';published_archive_sha256='3918B10A0902FABD09BEA6D1F0E7EFF06B20B84F3D8CC5EC73E36FEDAAE64D4D'}
-      f014=@{factorio_version='0.14';published_mir_version='4.7.01403';mir_version='5.0.01400';published_archive_sha256='85C7798BD6DC80FAA021AB0F33519B57A740B8D3969E695A82BA55634BA1C87A'}
-      f015=@{factorio_version='0.15';published_mir_version='4.7.01503';mir_version='5.0.01500';published_archive_sha256='0F8DD4DD21B8D1542FF5EDF96FDC38F75C9AB3CE577DF29C5E9DE99E0643B510'}
-      f016=@{factorio_version='0.16';published_mir_version='4.7.01603';mir_version='5.0.01600';published_archive_sha256='DAC63B9B14278C952B1020F9AE600C1437A9812C79CBBA17DE3CB15AF0CED6BD'}
+    $expected473TargetSets=[ordered]@{
+      'f013,f014,f015,f016'=[ordered]@{
+        f013=@{factorio_version='0.13';published_mir_version='4.7.01303';mir_version='5.0.01300';published_archive_sha256='3918B10A0902FABD09BEA6D1F0E7EFF06B20B84F3D8CC5EC73E36FEDAAE64D4D'}
+        f014=@{factorio_version='0.14';published_mir_version='4.7.01403';mir_version='5.0.01400';published_archive_sha256='85C7798BD6DC80FAA021AB0F33519B57A740B8D3969E695A82BA55634BA1C87A'}
+        f015=@{factorio_version='0.15';published_mir_version='4.7.01503';mir_version='5.0.01500';published_archive_sha256='0F8DD4DD21B8D1542FF5EDF96FDC38F75C9AB3CE577DF29C5E9DE99E0643B510'}
+        f016=@{factorio_version='0.16';published_mir_version='4.7.01603';mir_version='5.0.01600';published_archive_sha256='DAC63B9B14278C952B1020F9AE600C1437A9812C79CBBA17DE3CB15AF0CED6BD'}
+      }
+      'f017,f100'=[ordered]@{
+        f017=@{factorio_version='0.17';minimum_base='0.17.79';published_mir_version='4.7.01703';mir_version='5.0.01700';published_archive_sha256='9BCF1813BBDCBBD90088D74672CEF639FBC96689604673E529CF3AA8FC8D89AF'}
+        f100=@{factorio_version='1.0';minimum_base='1.0.0';published_mir_version='4.7.10003';mir_version='5.0.10000';published_archive_sha256='C04F3543EBF99D2B76B2C9193EA0886381B7CDDF2F2C1610310E7961B24BE0E1'}
+      }
     }
-    Assert-Fixture ((@($value.targets.Keys|Sort-Object)-join ',') -ceq 'f013,f014,f015,f016') '4.7.3 historical transition target set differs'
+    $targetSet=@($value.targets.Keys|Sort-Object)-join ','
+    Assert-Fixture ($expected473TargetSets.Contains($targetSet)) '4.7.3 historical transition target set differs'
+    $expectedTargets=$expected473TargetSets[$targetSet]
   }
   $allowed=@($expectedTargets.Keys)
   Assert-Fixture ($Target -in $allowed) 'historical transition target is unsupported'
@@ -345,6 +353,7 @@ function Get-HistoricalTransitionFixtureTarget([string]$Target,[string]$Metadata
   }
   $expected=$expectedTargets[$Target]
   Assert-Fixture ([string]$selected.factorio_version -ceq [string]$expected.factorio_version) 'historical transition factorio version differs'
+  if($expected.ContainsKey('minimum_base')){Assert-Fixture ([string]$selected.minimum_base -ceq [string]$expected.minimum_base) 'historical transition minimum base differs'}
   Assert-Fixture ([string]$selected.published_mir_version -ceq [string]$expected.published_mir_version -and [string]$selected.mir_version -ceq [string]$expected.mir_version) 'historical transition MIR versions differ'
   Assert-Fixture ([string]$selected.published_archive_sha256 -cmatch '^[A-Fa-f0-9]{64}$') 'historical transition published archive hash differs'
   if($null -ne $predecessorRelease){Assert-Fixture ([string]$selected.published_archive_sha256 -ceq [string]$expected.published_archive_sha256) 'historical transition published archive hash differs'}

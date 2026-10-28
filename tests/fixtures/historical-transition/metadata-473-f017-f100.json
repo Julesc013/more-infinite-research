@@ -1,0 +1,46 @@
+{
+  "schema": 1,
+  "kind": "MIR5HistoricalTransitionFixtureV1",
+  "name": "mir-fixture-mir5-historical-transition",
+  "version": "0.1.0",
+  "predecessor_release": "v4.7.3",
+  "published_release_id": 422732162,
+  "published_tag_source": "8643cc91bc915e008556a5315dbb0a743247e7ab",
+  "scope": "Prepared F017 and F100 published-source selections only. Existing direct character-mining expectations remain strict fixture checks; an actual 4.7.3 source save, successor, gameplay and release result are not claimed.",
+  "targets": {
+    "f017": {
+      "factorio_version": "0.17",
+      "minimum_base": "0.17.79",
+      "published_mir_version": "4.7.01703",
+      "mir_version": "5.0.01700",
+      "published_archive_sha256": "9BCF1813BBDCBBD90088D74672CEF639FBC96689604673E529CF3AA8FC8D89AF",
+      "direct": "recipe-prod-research_character_mining_speed-1",
+      "direct_effect": 0.05,
+      "direct_science": [
+        "utility-science-pack",
+        "military-science-pack"
+      ],
+      "partial_progress": 0.42,
+      "queue_api": true,
+      "queue_probe": "braking-force-1",
+      "successor_mode": "lab"
+    },
+    "f100": {
+      "factorio_version": "1.0",
+      "minimum_base": "1.0.0",
+      "published_mir_version": "4.7.10003",
+      "mir_version": "5.0.10000",
+      "published_archive_sha256": "C04F3543EBF99D2B76B2C9193EA0886381B7CDDF2F2C1610310E7961B24BE0E1",
+      "direct": "recipe-prod-research_character_mining_speed-1",
+      "direct_effect": 0.05,
+      "direct_science": [
+        "military-science-pack",
+        "utility-science-pack"
+      ],
+      "partial_progress": 0.42,
+      "queue_api": true,
+      "queue_probe": "braking-force-1",
+      "successor_mode": "lab"
+    }
+  }
+}
