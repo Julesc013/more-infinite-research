@@ -6,6 +6,8 @@ the twelve deliberately added signed carrier pairs and three historical module
 credit holders field-for-field.
 """
 
+import math
+
 NATIVE_CREDIT_DESCRIPTORS = (
     ("research_copper", "recipe-prod-research_copper-1", "copper-plate"),
     ("research_iron", "recipe-prod-research_iron-1", "iron-plate"),
@@ -95,10 +97,45 @@ def legacy_module_credit_rows(captured_recipes):
     return expected
 
 
+def legacy_cannon_credit_rows(public_rows):
+    """One finite MIR1.2 preservation holder, tied to the public rocket stream.
+
+    The cannon credit is deliberately not a public progression row.  Its
+    scalar follows the already-captured rocket effect so a valid custom rocket
+    setting cannot silently become the default ten percent on migration.
+    """
+    main = public_rows.get("recipe-prod-research_rocket_shooting_speed-1")
+    if main is None:
+        return {}
+    effects = main.get("effects")
+    if not isinstance(effects, list) or len(effects) != 1:
+        raise AssertionError("legacy cannon credit requires one public rocket effect")
+    effect = effects[0]
+    scalar = effect.get("modifier") if isinstance(effect, dict) else None
+    if (not isinstance(effect, dict) or effect.get("type") != "gun-speed"
+            or effect.get("ammo_category") != "rocket"
+            or isinstance(scalar, bool) or not isinstance(scalar, (int, float))
+            or not math.isfinite(scalar) or scalar < 0):
+        raise AssertionError("legacy cannon credit requires a finite nonnegative rocket scalar")
+    name = "mir-legacy-cannon-credit-rocket-shooting-speed"
+    return {
+        name: {
+            "type": "technology", "name": name,
+            "icon": NATIVE_CREDIT_ICON, "icon_size": 256,
+            "level": 1, "upgrade": True, "hidden": True, "enabled": False,
+            "visible_when_disabled": False, "max_level": "infinite",
+            "order": "zz[mir-legacy-cannon-credit]-rocket-shooting-speed",
+            "effects": [{"type": "gun-speed", "ammo_category": "cannon-shell", "modifier": scalar}],
+            "unit": {"count": 1, "time": 1, "ingredients": [["automation-science-pack", 1]]},
+        }
+    }
+
+
 def current_native_credit_rows(public_rows, captured_recipes):
     return {**native_credit_carrier_rows(public_rows, captured_recipes),
             **(legacy_module_credit_rows(captured_recipes)
-               if "recipe-prod-research_modules-1" in public_rows else {})}
+               if "recipe-prod-research_modules-1" in public_rows else {}),
+            **legacy_cannon_credit_rows(public_rows)}
 
 
 def captured_public_productivity_recipes(public_rows):
@@ -115,7 +152,8 @@ def split_public_and_native_credit_rows(rows):
     """Partition outputs without accepting unknown carrier identities."""
     public, credit = {}, {}
     for name, row in rows.items():
-        destination = credit if name.startswith(("mir-native-credit-", "mir-legacy-module-credit-")) else public
+        destination = credit if name.startswith((
+            "mir-native-credit-", "mir-legacy-module-credit-", "mir-legacy-cannon-credit-")) else public
         destination[name] = row
     return public, credit
 

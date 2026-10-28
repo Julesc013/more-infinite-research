@@ -97,6 +97,7 @@ class HostControlsTests(unittest.TestCase):
             "tests/test_native_credit_definitions.py",
             "tests/test_native_credits.py",
             "tests/test_legacy_module_credits.py",
+            "tests/test_legacy_cannon_credits.py",
             "tests/test_legacy_preference_transition_fixture.py",
             "tests/test_competing_epr_native_fixture.py",
             "tests/test_competing_fixed_reference.py",
