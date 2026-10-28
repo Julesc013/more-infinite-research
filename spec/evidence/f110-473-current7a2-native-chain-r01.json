@@ -1,0 +1,170 @@
+{
+  "schema": 1,
+  "kind": "MIRF110473CurrentSuccessorNativeChainV1",
+  "status": "passed-current-f110-same-edition-protected473-source-successor",
+  "scope": "Exact published4.7.11003 protectedD524 directly to current7a2/player505 F1101C3D on actual1.1.110/B7B4. Retain17 declared source rows/effects, source42-percent queued investment,27-percent detached work and foreign disablement; complete one new mining lab/+10-percent total, preserve expected capacity2/4 and post-completion braking queue, save and two read-only unchanged-byte cold reloads. Named migration only, not complete edition/client/ordinary-tuning/performance/release acceptance.",
+  "controller_commit": "f93b1108d3801b6d03a60ffe72d94d1e9aa0b55a",
+  "candidate_source": "7a2f93224c846b86261b2da709f50ea683fc708d",
+  "player_tree": "5058373348e9049f8b67ec4dbb79b400a904acd6",
+  "candidate_archive_sha256": "1C3D982CD048D3C83BF75108F1F9AC769CE0DC833A2DE056CDE16EF8AE2925A9",
+  "preparation": {
+    "path": "spec/evidence/f110-473-current-successor-prepared-inputs-r01.json",
+    "sha256": "284DA5415D74EE13FDCFED11BFB804755725DB7A7D4A58C8123C1A38864B49FB"
+  },
+  "source_chain": {
+    "path": "spec/evidence/f110-f200-published-source-r05-native-chain.json",
+    "sha256": "BFF56165FCB7B3F5F5FACA29EE9A4E244DCA92833C0A6CE247BE40CF67E83CE2"
+  },
+  "protected_original_source": {
+    "path": "build/mir5/recovery-historical/f110-f200-transition-published-f110-source-r05/native-output/write-data/saves/mir5-native-complete.zip",
+    "bytes": 821571,
+    "sha256": "D524AA78440F242B179A1E9BC40BF89B87C1A66E99F64C14D3250DEAEBB69253"
+  },
+  "source_actual_lab_completions_reused_not_new": 1,
+  "packet": {
+    "path": "build/qualification/f110-473-current7a2-r01-controller/packet.json",
+    "bytes": 4409,
+    "sha256": "D094F6702E2173BA3A1577B67CE9EB3E1A718C3DF02B55E032F65BC97E9DD480"
+  },
+  "caller": {
+    "path": "build/qualification/f110-473-current7a2-r01-controller/Invoke-OwnedF110Successor.ps1",
+    "bytes": 3720,
+    "sha256": "4FE595390B136EF9F3AAB07CC5EA6D95EFC3A3964F8542B41FE38AD08D416B66"
+  },
+  "terminal": {
+    "path": "build/qualification/f110-473-current7a2-r01-controller/execution-record/terminal.json",
+    "bytes": 15571,
+    "sha256": "0636C3A6C388C12E8EB0910CCC03AC868ACBA0C08C8062FC7EFCDFF4DCC7A26D"
+  },
+  "readback": {
+    "path": "build/qualification/f110-473-current7a2-r01-controller/root-readback-r01.json",
+    "bytes": 12635,
+    "sha256": "084C19AEF9A5BB76E6481C5F3822B03BA439C0077FB2EA812779D1567F5FBFA6",
+    "files": 71,
+    "bytes_per_copy": 2226107
+  },
+  "receipt_capsule": {
+    "path": "spec/evidence/f110-473-current7a2-native-receipts-r01.json.gz",
+    "sha256": "22E15E011273CC41AE4182DFA5E2F2F6541843E1396BCD8CEBC5896815380CD3",
+    "bytes": 8415,
+    "records": 1,
+    "uncompressed_bytes": 44129,
+    "original_exact_bytes_round_trip": true
+  },
+  "native_observation": {
+    "result": {
+      "path": "build/qualification/f110-473-current7a2-r01-controller/native-output/result.json",
+      "bytes": 32892,
+      "sha256": "13C0F3618F7BC64A8541AC1699F9D26B5CE0CB14EB91C21DB319369372FADE1E"
+    },
+    "engine": {
+      "path": "D:\\Games\\Factorio\\1.1\\bin\\x64\\factorio.exe",
+      "sha256": "B7B4B834FCA2E32AFA9D3476EB42CC09B02F1205BE97F688DC6FC6ACE7BA8FE1",
+      "file_version": "1.1.110.62357",
+      "product_version": "1.1.110",
+      "base_version": "1.1.110"
+    },
+    "profile": {
+      "sha256": "EFF8363309F4B95924C1E31ED617C44EA5CF3209C1FF10825E308FA15D69FCF0",
+      "path": "D:\\Projects\\Factorio\\mir5-legacy-cannon-credit-r01\\tests\\profiles\\f110-473-current-successor-11110.json"
+    },
+    "fixtures": [
+      {
+        "source": "D:\\Projects\\Factorio\\mir5-legacy-cannon-credit-r01\\build\\qualification\\f110-473-current7a2-r01-inputs\\fixture",
+        "archive": "D:\\Projects\\Factorio\\testmods\\1.1\\mir-fixture-mir5-f110-f200-transition_0.3.0.zip",
+        "sha256": "5D265E1FC24BA77806D7CF57AD6A6EEDD90EBDAA060575835E62EBA932E458F2"
+      }
+    ],
+    "initial": {
+      "case": "f110-f200-transition",
+      "stage": "initial",
+      "status": "passed",
+      "source_direct_lab_completions": 1,
+      "successor_direct_lab_completions": 1,
+      "seeded_catalogue_rows": 16,
+      "retained_catalogue_rows": 17,
+      "queued_progress": 0.42,
+      "suspended_progress": 0.27,
+      "foreign_disabled": true,
+      "inserter_stack_size_bonus": 2,
+      "stack_inserter_capacity_bonus": 4,
+      "on_load_read_only": false
+    },
+    "completed_save": {
+      "path": "build/qualification/f110-473-current7a2-r01-controller/native-output/write-data/saves/mir5-native-complete.zip",
+      "bytes": 822187,
+      "sha256": "FE1C8E726D0E532B1494A19769D9AB7E2C918C0C35914DAB047CAE09C87336B9"
+    },
+    "cold_reloads": [
+      {
+        "ordinal": 1,
+        "save_sha256": "FE1C8E726D0E532B1494A19769D9AB7E2C918C0C35914DAB047CAE09C87336B9",
+        "save_byte_identical": true,
+        "observation": {
+          "case": "f110-f200-transition",
+          "stage": "reload",
+          "status": "passed",
+          "source_direct_lab_completions": 1,
+          "successor_direct_lab_completions": 1,
+          "seeded_catalogue_rows": 16,
+          "retained_catalogue_rows": 17,
+          "queued_progress": 0.42,
+          "suspended_progress": 0.27,
+          "foreign_disabled": true,
+          "inserter_stack_size_bonus": 2,
+          "stack_inserter_capacity_bonus": 4,
+          "on_load_read_only": true
+        }
+      },
+      {
+        "ordinal": 2,
+        "save_sha256": "FE1C8E726D0E532B1494A19769D9AB7E2C918C0C35914DAB047CAE09C87336B9",
+        "save_byte_identical": true,
+        "observation": {
+          "case": "f110-f200-transition",
+          "stage": "reload",
+          "status": "passed",
+          "source_direct_lab_completions": 1,
+          "successor_direct_lab_completions": 1,
+          "seeded_catalogue_rows": 16,
+          "retained_catalogue_rows": 17,
+          "queued_progress": 0.42,
+          "suspended_progress": 0.27,
+          "foreign_disabled": true,
+          "inserter_stack_size_bonus": 2,
+          "stack_inserter_capacity_bonus": 4,
+          "on_load_read_only": true
+        }
+      }
+    ],
+    "native_startup_logs": [
+      {
+        "path": "build/qualification/f110-473-current7a2-r01-controller/native-output/production.factorio.log",
+        "bytes": 7515,
+        "sha256": "D5FE34C5CCE7D5EEB3FDDC19FB20C4B469FBBE7470B534C89AD89B774BF76F46",
+        "actual_native_startup": "   0.000 2026-10-29 01:24:57; Factorio 1.1.110 (build 62357, win64, full)"
+      },
+      {
+        "path": "build/qualification/f110-473-current7a2-r01-controller/native-output/reload-1.factorio.log",
+        "bytes": 6605,
+        "sha256": "F029E14686324560AFFF103DA15A2ADE0C3C3266FB3327D29D5162766A8F54CF",
+        "actual_native_startup": "   0.000 2026-10-29 01:25:04; Factorio 1.1.110 (build 62357, win64, full)"
+      },
+      {
+        "path": "build/qualification/f110-473-current7a2-r01-controller/native-output/reload-2.factorio.log",
+        "bytes": 6605,
+        "sha256": "D782251D08D333049F55671043926973CC3F7553E8E9FF3D049E132D0303E273",
+        "actual_native_startup": "   0.000 2026-10-29 01:25:05; Factorio 1.1.110 (build 62357, win64, full)"
+      }
+    ]
+  },
+  "actual_native_processes": 3,
+  "actual_new_successor_lab_completions": 1,
+  "actual_read_only_cold_reloads": 2,
+  "factorio_processes_after_restoration": 0,
+  "limits": [
+    "Original sourceD524 is reused unchanged; its historical source lab is counted once, not once per marker or cold reload. Earlier F110-to-F200 results retain their own destination identity.",
+    "The frozen runtime checks the new mining effect and post-completion braking queue through reloads. Source queued42-percent marker describes imported work, not the current post-lab queue progress; no unrecorded state snapshot is invented.",
+    "The fixture preflights exact default unit/science/effect fields before acceleration. Ordinary research cost/tuning, other settings/mod closures, physical production, multiplayer/Library, performance and wider cross-engine routes remain independent."
+  ]
+}

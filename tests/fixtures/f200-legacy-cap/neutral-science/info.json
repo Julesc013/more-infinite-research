@@ -1,0 +1,9 @@
+{
+  "name": "mir-fixture-native-science-consumption",
+  "version": "0.1.0",
+  "title": "Native F210 partial-research science control",
+  "author": "MIR maintainers",
+  "description": "Disposable MIR-absent control for exact 2.1.23 science item consumption after 27 percent saved research.",
+  "factorio_version": "2.1",
+  "dependencies": ["base = 2.1.23"]
+}

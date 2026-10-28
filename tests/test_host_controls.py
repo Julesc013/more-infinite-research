@@ -162,6 +162,7 @@ class HostControlsTests(unittest.TestCase):
             "tests/test_locale_catalogue.py",
             "tests/test_library_profile_reader.py",
             "tests/test_f110_f200_runner.py",
+            "tests/test_native_fixture_modes.py",
             "tests/test_package.py",
             "tests/test_early_package.py",
             "tests/test_changelog.py",

@@ -16,6 +16,7 @@ FIXTURE = ROOT / "tests/fixtures/f110-f200-transition"
 SHARED = FIXTURE / "shared"
 SOURCE = FIXTURE / "f110/published-4.7.3"
 SUCCESSOR = FIXTURE / "f200/successor"
+F110_SUCCESSOR = FIXTURE / "f110/successor"
 DIRECT = "recipe-prod-research_character_mining_speed-1"
 CONTINUATION = "inserter-capacity-bonus-8"
 
@@ -75,13 +76,15 @@ class F110F200TransitionFixtureTests(unittest.TestCase):
     def test_catalogue_is_exact_f110_direct_and_continuation_union(self):
         source = self.load_catalogue(SOURCE / "catalogue.lua")
         successor = self.load_catalogue(SUCCESSOR / "catalogue.lua")
+        same = self.load_catalogue(F110_SUCCESSOR / "catalogue.lua")
+        self.assertEqual("f110", same["successor_engine"])
         direct = json.loads((ROOT / "tests/fixtures/historical-direct-native-oracle.json").read_text(encoding="utf-8"))
         continuations = json.loads((ROOT / "tests/fixtures/historical-continuation-native-oracle.json").read_text(encoding="utf-8"))
         direct_rows = next(row for row in direct["captures"] if row["target"] == "f110")["technologies"]
         continuation_rows = next(row for row in continuations["captures"] if row["target"] == "f110")["technologies"]
         expected = {row["id"] for row in direct_rows} | {row["id"] for row in continuation_rows}
         self.assertEqual(17, len(expected))
-        for plan, stage in ((source, "source"), (successor, "successor")):
+        for plan, stage in ((source, "source"), (successor, "successor"), (same, "successor")):
             with self.subTest(stage=stage):
                 self.assertEqual(stage, plan["stage"])
                 self.assertEqual((DIRECT, CONTINUATION, "braking-force-1"),
@@ -158,15 +161,17 @@ class F110F200TransitionFixtureTests(unittest.TestCase):
             "source_control_path": SOURCE / "control.lua", "source_catalogue_path": SOURCE / "catalogue.lua",
             "successor_control_path": SUCCESSOR / "control.lua", "successor_catalogue_path": SUCCESSOR / "catalogue.lua",
             "shared_control_path": SHARED / "control.lua",
+            "same_control_path": F110_SUCCESSOR / "control.lua", "same_catalogue_path": F110_SUCCESSOR / "catalogue.lua",
         }
         for name, path in paths.items():
             self.lua.globals()[name] = path.as_posix()
         self.lua.execute(r'''
-          function f110_f200_callbacks(mutate_capacity, omit_row, mutate_effect)
+          function f110_f200_callbacks(mutate_capacity, omit_row, mutate_effect, same_edition, mutate_progress, disable_queue, mutate_reload_queue)
             local function read_plan(path)
               return assert(loadfile(path))()
             end
-            local source_plan, successor_plan = read_plan(source_catalogue_path), read_plan(successor_catalogue_path)
+            local source_plan, successor_plan = read_plan(source_catalogue_path),
+              read_plan(same_edition and same_catalogue_path or successor_catalogue_path)
             local names={};for _, name in ipairs(source_plan.rows) do names[name]=true end
             local next_force_index=1
             local function force(index, engine)
@@ -225,7 +230,7 @@ class F110F200TransitionFixtureTests(unittest.TestCase):
               values.set_saved_technology_progress=function(item,progress)
                 assert(values.engine == "f110" and item.force == value and values.current_research ~= item)
                 assert(type(progress) == "number" and progress >= 0 and progress < 1)
-                saved[item.name]=progress
+                saved[item.name]=progress ~= 0 and progress or nil
               end
               values._migrate_to_f200=function()
                 values.engine="f200";values.research_queue_enabled=nil;values.stack_inserter_capacity_bonus=nil
@@ -297,27 +302,55 @@ class F110F200TransitionFixtureTests(unittest.TestCase):
             if not ok then return {ok=false,message=tostring(message),logs=logs} end
             local direct=player.technologies[source_plan.direct]
             local state=legacy.mir5_f110_f200_transition
-            if mutate_capacity then player.bulk_inserter_capacity_bonus=3 end
-            for _,item in pairs(game.forces) do item._migrate_to_f200() end
+            if mutate_capacity then
+              if same_edition then player.stack_inserter_capacity_bonus=3 else player.bulk_inserter_capacity_bonus=3 end
+            end
+            if not same_edition then
+              for _,item in pairs(game.forces) do item._migrate_to_f200() end
+            end
+            if mutate_progress then
+              local paused=game.forces[state.suspended_index]
+              if same_edition then paused.set_saved_technology_progress(paused.technologies[source_plan.direct],.26)
+              else paused.technologies[source_plan.direct].saved_progress=.26 end
+            end
+            if disable_queue then player.research_queue_enabled=false end
             if mutate_effect then
               game.forces.player.technologies["recipe-prod-research_character_walking_speed-1"].prototype.effects[1].modifier=.04
             end
-            local successor=load_stage(successor_control_path,successor_catalogue_path,
-              {base="2.0.77",["more-infinite-research"]="5.0.20000",["mir-fixture-mir5-f110-f200-transition"]="0.2.0"},true)
+            local successor=load_stage(same_edition and same_control_path or successor_control_path,
+              same_edition and same_catalogue_path or successor_catalogue_path,
+              {base=same_edition and "1.1.110" or "2.0.77",
+                ["more-infinite-research"]=same_edition and "5.0.11000" or "5.0.20000",
+                ["mir-fixture-mir5-f110-f200-transition"]=same_edition and "0.3.0" or "0.2.0"},not same_edition)
             ok,message=pcall(successor.configuration)
             if not ok then return {ok=false,message=tostring(message),logs=logs,state=state} end
             state.lab.energy=0;successor.events[2]();state.successor_energized=state.lab.energy
-            direct.level=3;direct.saved_progress=0;player.manual_mining_speed_modifier=.1
+            direct.level=3
+            if same_edition then
+              player.current_research=nil;player.set_saved_technology_progress(direct,0)
+              -- F110 force getter exposes no retained work as nil.
+            else direct.saved_progress=0 end
+            player.manual_mining_speed_modifier=.1
             player.research_queue={player.technologies[source_plan.probe]};player.research_progress=0
             successor.events[1]{research=direct};successor.events[2]()
             local before={phase=state.phase,source=state.source_direct_labs,successor=state.successor_direct_labs,
               rows=state.seeded_catalogue_rows,save=game.saved,logs=#logs}
-            successor.load();successor.events[2]();successor.load();successor.events[2]()
-            return {ok=true,phase=state.phase,source=state.source_direct_labs,successor=state.successor_direct_labs,
+            ok,message=pcall(function()
+              successor.load();successor.events[2]()
+              if mutate_reload_queue then player.research_progress=.01 end
+              successor.load();successor.events[2]()
+            end)
+            if not ok then return {ok=false,message=tostring(message),state=state} end
+            local configuration_ok,configuration_message=pcall(successor.configuration)
+            return {ok=true,configuration_refused=not configuration_ok,
+              configuration_message=tostring(configuration_message),phase=state.phase,source=state.source_direct_labs,successor=state.successor_direct_labs,
               rows=state.seeded_catalogue_rows,save=game.saved,logs=logs,before=before,
               stack=player.inserter_stack_size_bonus,bulk=player.bulk_inserter_capacity_bonus,
               current=player.current_research and player.current_research.name,foreign=game.forces[state.foreign_index].technologies[source_plan.direct].enabled,
-              paused=game.forces[state.suspended_index].technologies[source_plan.direct].saved_progress,
+              paused=same_edition and game.forces[state.suspended_index].get_saved_technology_progress(
+                game.forces[state.suspended_index].technologies[source_plan.direct])
+                or game.forces[state.suspended_index].technologies[source_plan.direct].saved_progress,
+              same_stack=player.stack_inserter_capacity_bonus,
               source_energy=state.source_energized,successor_energy=state.successor_energized}
           end
         ''')
@@ -364,6 +397,78 @@ class F110F200TransitionFixtureTests(unittest.TestCase):
         self.assertFalse(wrong_effect["ok"])
         self.assertIn("retained technology state differs", wrong_effect["message"])
         self.assertEqual("source-complete", wrong_effect["state"]["phase"])
+        same = py(self.lua.eval("f110_f200_callbacks")(False, False, False, True))
+        self.assertTrue(same["ok"], same.get("message", same))
+        self.assertEqual(("successor-complete", 1, 1, 16, "mir5-native-complete"),
+                         (same["phase"], same["source"], same["successor"], same["rows"], same["save"]))
+        self.assertEqual((2, 4, "braking-force-1", False, .27),
+                         (same["stack"], same["same_stack"], same["current"], same["foreign"], same["paused"]))
+        same_markers = [json.loads(row.split(" RESULT ")[1]) for row in same["logs"]
+                        if row.startswith("[MIR5_NATIVE_FIXTURE] RESULT ")]
+        self.assertEqual(4, len(same_markers))
+        self.assertTrue(all(row["stack_inserter_capacity_bonus"] == 4 for row in same_markers))
+        self.assertTrue(all("bulk_inserter_capacity_bonus" not in row for row in same_markers))
+        self.assertTrue(same["configuration_refused"])
+        self.assertIn("successor lacks complete published F110 source witness", same["configuration_message"])
+        changed_reload = py(self.lua.eval("f110_f200_callbacks")(False, False, False, True, False, False, True))
+        self.assertFalse(changed_reload["ok"])
+        self.assertIn("successor reload queue/progress differs", changed_reload["message"])
+        self.assertEqual("successor-complete", changed_reload["state"]["phase"])
+        for capacity, effect, progress, queue, message in (
+            (True, False, False, False, "stack inserter effects differ"),
+            (False, True, False, False, "retained technology state differs"),
+            (False, False, True, False, "retained technology state differs"),
+            (False, False, False, True, "queue/progress differs"),
+        ):
+            with self.subTest(f110_opponent=message):
+                refused = py(self.lua.eval("f110_f200_callbacks")(capacity, False, effect, True, progress, queue))
+                self.assertFalse(refused["ok"])
+                self.assertIn(message, refused["message"])
+                self.assertEqual("source-complete", refused["state"]["phase"])
+
+    def test_same_edition_preflight_retains_native_f110_cost_science_and_effect(self):
+        # Independent F110 expectations also exercised by the historical fixture.
+        raw = {"technology": {DIRECT: {
+            "name": DIRECT, "level": 1, "upgrade": True, "max_level": "infinite",
+            "unit": {"count_formula": "1*(8000*2^(L-1))", "time": 60,
+                     "ingredients": [["military-science-pack", 1], ["utility-science-pack", 1]]},
+            "effects": [{"type": "character-mining-speed", "modifier": .05}],
+        }}, "sentinel": {"value": 17}}
+        mods = {"base": "1.1.110", "more-infinite-research": "5.0.11000",
+                "mir-fixture-mir5-f110-f200-transition": "0.3.0"}
+        for enabled in (None, True):
+            candidate = copy.deepcopy(raw)
+            if enabled is not None:
+                candidate["technology"][DIRECT]["enabled"] = enabled
+            accepted = self.run_data(F110_SUCCESSOR / "data-final-fixes.lua",
+                                     F110_SUCCESSOR / "catalogue.lua", candidate, mods)
+            self.assertTrue(accepted["ok"], accepted["message"])
+            observed = py(accepted["raw"])
+            self.assertEqual((1, None, 1), tuple(observed["technology"][DIRECT]["unit"].get(key)
+                                                 for key in ("count", "count_formula", "time")))
+            self.assertEqual(raw["technology"][DIRECT]["effects"], observed["technology"][DIRECT]["effects"])
+            self.assertEqual(17, observed["sentinel"]["value"])
+        for field, value in (("enabled", False), ("enabled", "true"), ("level", 2),
+                             ("effects", [{"type": "character-mining-speed", "modifier": .1}]),
+                             ("unit", {"count_formula": "8000*2^(L-1)", "time": 60,
+                                       "ingredients": raw["technology"][DIRECT]["unit"]["ingredients"]}),
+                             ("unit", {"count_formula": "1*(8000*2^(L-1))", "time": 60,
+                                       "ingredients": [["utility-science-pack", 1], ["military-science-pack", 1]]})):
+            candidate = copy.deepcopy(raw)
+            candidate["technology"][DIRECT][field] = value
+            before = copy.deepcopy(candidate)
+            with self.subTest(field=field, value=value):
+                rejected = self.run_data(F110_SUCCESSOR / "data-final-fixes.lua",
+                                         F110_SUCCESSOR / "catalogue.lua", candidate, mods)
+                self.assertFalse(rejected["ok"])
+                self.assertEqual(before, py(rejected["raw"]))
+        for field, value in (("base", "2.0.77"), ("more-infinite-research", "4.7.11003"),
+                             ("mir-fixture-mir5-f110-f200-transition", "0.2.0")):
+            rejected = self.run_data(F110_SUCCESSOR / "data-final-fixes.lua",
+                                     F110_SUCCESSOR / "catalogue.lua", raw, {**mods, field: value})
+            self.assertFalse(rejected["ok"])
+            self.assertEqual(raw, py(rejected["raw"]))
+
 
     def test_profiles_and_stage_aliases_bind_only_declared_inputs(self):
         source_profile = json.loads((ROOT / "tests/profiles/f110-f200-transition-published-f110-11110.json").read_text(encoding="utf-8"))
@@ -381,7 +486,7 @@ class F110F200TransitionFixtureTests(unittest.TestCase):
         self.assertEqual(("f200", "2.0", "2.0.77", "8BA029A01E1F08C311C6A127C81313D7664F0ABADAF3C79F84157775D35ADFD7"),
                          (successor_profile["target"], successor_profile["factorio_line"], successor_profile["engine"]["version"],
                           successor_profile["archive_sha256"]["more-infinite-research_5.0.20000.zip"]))
-        for stage in (SOURCE, SUCCESSOR):
+        for stage in (SOURCE, SUCCESSOR, F110_SUCCESSOR):
             self.assertEqual('require("__mir-fixture-mir5-f110-f200-transition__/fixture_control")\n',
                              stage.joinpath("control.lua").read_text(encoding="utf-8"))
             self.assertIn('fixture_data_final', stage.joinpath("data-final-fixes.lua").read_text(encoding="utf-8"))
