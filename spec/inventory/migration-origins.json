@@ -2792,22 +2792,26 @@
         {
           "edition": "f110",
           "origin_archive_sha256": "66C127D8BFC1919FA88F19D2D9B3047316A1B90401CAA05A6D05979B7A099D1E",
-          "source_case": "published-source-qualified-current-5-x-successor-not-yet-bound",
-          "final_5_x_case": "not_run",
+          "source_case": "qualified-protected-published473-f110-source-reused-unchanged",
+          "final_5_x_case": "passed-current-same-edition-f110-successor",
           "disposition": "not-a-cartesian-modset-matrix",
           "current_archive_sha256": "1C3D982CD048D3C83BF75108F1F9AC769CE0DC833A2DE056CDE16EF8AE2925A9",
           "current_completion": {
-            "status": "ready-to-execute",
-            "problem": "Protected published4.7.3 source is qualified and the current same-edition successor is prepared; its native result remains unrun.",
-            "next_action": "Black Glass verifies unchanged D524, uses the prepared seven-member0.3.0 F110 successor/current1C3D profile and -F110SameEditionSuccessor at committed controllerd614, then completes one new mining lab/save/two closed read-only reloads. Keep original cross-engine observations separate.",
+            "status": "closed",
+            "problem": "Actual current1C3D same-edition successor passes all17 retained rows/effects, source42-percent investment/27-percent detached work, foreign disablement, one new mining lab/capacity2-and4, save and two read-only unchanged-byte cold reloads on1.1.110/B7B4.",
+            "next_action": "Reuse the named current same-edition result and unchangedD524 original. Preserve older F110-to-F200 results and source lab counted once. Full settings/modpack/client/physical/tuning/performance and other engine routes remain independent.",
             "source_evidence": {
               "path": "spec/evidence/f110-f200-published-source-r05-native-chain.json",
               "sha256": "BFF56165FCB7B3F5F5FACA29EE9A4E244DCA92833C0A6CE247BE40CF67E83CE2"
             },
-            "command_status": "ready: exact fixture/profile/package/source-save pins; native owner must bind actual engine/library/output/caller",
+            "command_status": "completed: exactf93/controller891C, originalD524/current1C3D/fixture5D265E/profileEFF836; one new native lab and two cold reloads",
             "preparation_evidence": {
               "path": "spec/evidence/f110-473-current-successor-prepared-inputs-r01.json",
               "sha256": "284DA5415D74EE13FDCFED11BFB804755725DB7A7D4A58C8123C1A38864B49FB"
+            },
+            "evidence": {
+              "path": "spec/evidence/f110-473-current7a2-native-chain-r01.json",
+              "sha256": "C1EAC174C79F5DD2F10843769F683F66A3416CBBCE1B7D1A9CA4812DC2B8039B"
             }
           }
         },
@@ -3658,7 +3662,7 @@
         "explicitly-unverified-deferred": "Permitted uncertain/unavailable older history; no pass or guessed repair.",
         "not-applicable": "Capability, absent predecessor or unsupported route is explicitly identified."
       },
-      "same_edition_cases": "published_4_7_3_origins.cases above: nine editions, with separate Base/Space Age scenarios for F200/F210. Four closed named historical mining routes do not imply four fully qualified editions.",
+      "same_edition_cases": "published_4_7_3_origins.cases above: nine named edition routes closed under their individual native/applicability scopes, including selected F200/F210 Base/Space Age scenarios. This is not nine fully qualified editions or a whole-product verdict; complete affected catalogue/settings/modpack/client/physical/performance gates remain independent.",
       "selection_rule": "Resolve consumed-path reviews first, then freeze one useful next native packet. Keep at most one active and one pending native assignment. Preserve original sources/adverses; no every-tag or every-permutation campaign.",
       "older_contract_cases": [
         {
