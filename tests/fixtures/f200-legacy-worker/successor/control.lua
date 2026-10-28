@@ -192,14 +192,14 @@ local function assert_source_witness(state)
   end
 end
 
-local function assert_restored(state)
+local function assert_restored(state, independently_observed_bonus)
   assert_source_witness(state)
   local player = status(game.forces.player)
   -- The source controller captured the positive-cap presentation value after
   -- its data-stage patch. MIR5 restores that owned force presentation even
   -- though the successor prototype itself keeps the Base default.
   assert_status(player, {level = 8, researched = false, enabled = true, visible = true,
-    maximum = UINT32_MAX, bonus = state.player_with_independent + 2 * MODIFIER,
+    maximum = UINT32_MAX, bonus = independently_observed_bonus or state.player_with_independent + 2 * MODIFIER,
     saved_progress = 0.27}, "MIR5 restored native worker")
   assert_native_owner(technology(game.forces.player, WORKER))
   assert_acceleration(technology(game.forces.player, WORKER))
@@ -261,6 +261,7 @@ local function marker(stage, state)
       science_processing_ticks = state.destination_processing_ticks,
       science_elapsed_ticks = state.destination_elapsed_ticks,
       science_units_after = state.destination_science_units_after,
+      fixture_owned_offset = state.fixture_owned_offset,
       on_load_read_only = stage == "reload",
     },
   }))
@@ -283,9 +284,11 @@ local function finish_diagnostic(state, accounting)
   }))
 end
 
-script.on_configuration_changed(function()
+local function on_configuration_changed(_event, fixture_version)
+  fixture_version = fixture_version or "0.2.0"
+  if fixture_version ~= "0.2.0" and fixture_version ~= "0.3.0" then fail("unsupported successor fixture role") end
   if script.active_mods.base ~= "2.0.77" or script.active_mods["more-infinite-research"] ~= "5.0.20000"
-      or script.active_mods[FIXTURE] ~= "0.2.0" then
+      or script.active_mods[FIXTURE] ~= fixture_version then
     fail("successor requires MIR 5.0.20000 and fixture 0.2.0 on Factorio 2.0.77")
   end
   if settings.startup["mir-max-level-worker-robots-speed"].value ~= 40
@@ -323,7 +326,8 @@ script.on_configuration_changed(function()
   state.destination_research_start_tick = game.tick
   state.destination_processing_ticks = 0
   state.destination_elapsed_ticks = nil
-end)
+end
+script.on_configuration_changed(on_configuration_changed)
 
 script.on_event(defines.events.on_research_finished, function(event)
   local state = storage[KEY]
@@ -382,3 +386,5 @@ script.on_event(defines.events.on_tick, function()
     game.server_save(SAVE)
   end
 end)
+
+return {configuration_changed=on_configuration_changed, assert_restored=assert_restored}

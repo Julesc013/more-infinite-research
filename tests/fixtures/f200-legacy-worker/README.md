@@ -1,0 +1,15 @@
+---
+title: "Published native-worker cap and fixture-owned contribution"
+---
+
+The original `published`0.1 fixture earns two real native worker levels on exact MIR4.7.20002/Factorio2.0.77, records its own independent `+0.123` contribution, cap ownership,27% suspended work and a foreign disabled worker/42% queue, then saves and cold reloads twice. Reuse protected source90B23B42 from the retained exact worker artifact instead of recreating it. The original strict `successor`0.2 route and its current-package failure retain their exact identities.
+
+The [six native contrasts](../../../spec/evidence/worker-independent-offset-native-chain-r06.json) show that a prototype change can discard that manual aggregate contribution before MIR configuration, including with the same published MIR version/runtime. The foreign2.4 native baseline remains intact. Player code cannot reconstruct an arbitrary discarded foreign contribution; `RUN-03` and `MIG-01` apply. No MIR implementation change follows from this fixture boundary.
+
+The distinct `persisted-offset-owner`0.3 role lets the fixture reconcile only the exact contribution it already owns and persists. A separate Base-only `entry-observer` captures primitive native state before MIR; establish this callback order in an explicitly diagnostic native run before acceptance. Its getter returns detached records and never writes native state. Alphabetical naming alone is not native order evidence.
+
+Before any contribution write, the owner requires the exact original two-lab source, no prior reconciliation, the pinned engine/MIR/fixture/settings tuple, a fresh independent observation and the expected force identities. MIR must leave the observed aggregate unchanged. Entry must equal either the original3.823 total or the known native-only3.7 total; unknown differences are refused. All original worker/effect/work/foreign assertions run against that independently observed aggregate before the owner replays its own0.123 if needed. The original absolute3.823 restoration assertion then runs unchanged before any new lab. A later real lab must reach4.473 and the successor must save and cold reload twice.
+
+Compose the role's five files with `successor/control.lua` as `fixture_control.lua`, `successor/data-final-fixes.lua` as `fixture_data_final.lua` and `successor/settings-updates.lua` as `fixture_settings.lua`. The two-file entry observer is a separate fixture archive. Keep canonical source bytes, profiles, exact archives and raw results pinned under the existing governed direct-library runner; no dependency copying or player-package instrumentation is used for acceptance. The active-mods observer remains a separate declared input.
+
+The logging/order diagnostic is not a player qualification result. Preserve its private archive and failure separately. The original strict0.2 failure is never relabelled a pass; the new role qualifies native MIR ownership and an explicitly maintained fixture contribution, not universal recovery of untracked offsets. F210 and finite first-hold cases retain their own affected qualification boundaries.

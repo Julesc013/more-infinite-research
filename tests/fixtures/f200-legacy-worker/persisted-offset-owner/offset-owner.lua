@@ -1,0 +1,62 @@
+-- This fixture owns the +0.123 it recorded in its original source storage.
+-- MIR never reads this ledger. Reconcile only after the independent entry
+-- observer and all original native/foreign assertions pass without writes.
+local M = {}
+local AMOUNT, MODIFIER = .123, .65
+local FIXTURE = "mir-fixture-mir5-f200-legacy-worker"
+local function fail(message) error("[mir-worker-fixture-offset-owner] " .. message) end
+local function close(a, b)
+  return type(a) == "number" and type(b) == "number" and a == a and b == b and math.abs(a - b) < 1e-9
+end
+
+function M.reconcile(state, entry, world, mods, startup, assert_restored)
+  if type(state) ~= "table" or state.source_mir ~= "4.7.20002" or state.fixture_version ~= "0.1.0"
+      or state.actual_lab_completions ~= 2 or state.milestone ~= "actual2labs" or state.phase ~= "completed"
+      or state.destination_lab_completions ~= nil or state.fixture_owned_offset ~= nil
+      or type(state.player_cap) ~= "table" or type(state.player_baseline) ~= "number"
+      or type(state.player_with_independent) ~= "number" or not state.lab or state.lab.valid == false then
+    fail("requires the original two-lab source and no prior fixture-owner reconciliation")
+  end
+  if type(startup) ~= "table" or type(startup["mir-max-level-worker-robots-speed"]) ~= "table"
+      or type(startup["mir-settings-profile-import"]) ~= "table"
+      or mods.base ~= "2.0.77" or mods["more-infinite-research"] ~= "5.0.20000"
+      or mods[FIXTURE] ~= "0.3.0" or mods["a-mir-fixture-worker-entry"] ~= "0.1.0"
+      or startup["mir-max-level-worker-robots-speed"].value ~= 40
+      or startup["mir-settings-profile-import"].value ~= "" then fail("exact fixture-owner closure/settings differ") end
+  local expected = state.player_with_independent + 2 * MODIFIER
+  if not close(state.player_baseline, 2.4) or not close(state.foreign_baseline, 2.4)
+      or not close(state.player_with_independent - state.player_baseline, AMOUNT)
+      or not close(state.player_cap.bonus, expected) then fail("persisted fixture contribution differs") end
+  if type(entry) ~= "table" or entry.schema ~= 1 or entry.tick ~= world.tick
+      or entry.base ~= mods.base or entry.mir ~= mods["more-infinite-research"]
+      or entry.fixture ~= mods[FIXTURE] or entry.observer ~= mods["a-mir-fixture-worker-entry"]
+      or type(entry.player) ~= "table" or type(entry.foreign) ~= "table" then
+    fail("independent native entry observation is absent or stale")
+  end
+  local player, foreign = world.forces.player, world.forces[state.foreign_force_index]
+  if not player or not foreign or entry.player.index ~= player.index or entry.player.name ~= player.name
+      or entry.foreign.index ~= foreign.index or entry.foreign.name ~= foreign.name
+      or foreign.name ~= "mir5-f200-legacy-worker-foreign" or entry.player.level ~= 8
+      or entry.player.researched ~= false or not close(entry.player.saved_progress, .27)
+      or entry.foreign.level ~= 6 or entry.foreign.researched ~= false
+      or entry.foreign.enabled ~= false or entry.foreign.visible ~= false
+      or not close(entry.foreign.bonus, state.foreign_baseline) then fail("native entry identity/state differs") end
+  if not close(player.worker_robots_speed_modifier, entry.player.bonus)
+      or not close(foreign.worker_robots_speed_modifier, entry.foreign.bonus) then
+    fail("aggregate changed between independent entry and fixture owner")
+  end
+  local amount
+  if close(entry.player.bonus, expected) then amount = 0
+  elseif close(entry.player.bonus, expected - AMOUNT) then amount = AMOUNT
+  else fail("native entry contains an unknown aggregate difference") end
+  -- Reuse every original read-only native-owner, earned level, work, foreign
+  -- queue and effect assertion against the independently observed aggregate.
+  assert_restored(state, entry.player.bonus)
+  if amount ~= 0 then player.worker_robots_speed_modifier = player.worker_robots_speed_modifier + amount end
+  if not close(player.worker_robots_speed_modifier, expected) then fail("fixture-owned contribution did not restore") end
+  state.fixture_owned_offset = {schema=1, amount=AMOUNT, reapplied=amount,
+    native_entry_total=entry.player.bonus, restored_total=player.worker_robots_speed_modifier,
+    native_entry_tick=entry.tick, source_total=state.player_cap.bonus}
+  return state.fixture_owned_offset
+end
+return M
