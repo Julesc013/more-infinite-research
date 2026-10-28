@@ -9,7 +9,7 @@
     "public_custody": "https://github.com/Julesc013/more-infinite-research/pull/1272#issuecomment-6454806929",
     "verbatim_request": "yeah i mean it would be nive if all old saves wera appropriately migrated to new technology and settings and ids and mods and etc, but if we just dont know for certain what to do then we can leave it for later but ideally we have migration support from each breaking change or known change or major version or minor release or patches known to change things and etc... i dont really know what i want, i just want mir 5.0.0 to work, and this may or may not be a good idea",
     "ambiguous_lock_decision": {
-      "question": "One migration policy needs your decision: a save that skipped MIR 3.2.2 can retain a researched-but-locked planet, but there is no saved marker distinguishing the old MIR defect from an intentional lock by another mod. For these ambiguous later saves, should MIR preserve the lock and offer an explicit one-time repair, or automatically restore every researched discovery? The first choice best preserves other modsÃ¢â‚¬â„¢ intent.",
+      "question": "One migration policy needs your decision: a save that skipped MIR 3.2.2 can retain a researched-but-locked planet, but there is no saved marker distinguishing the old MIR defect from an intentional lock by another mod. For these ambiguous later saves, should MIR preserve the lock and offer an explicit one-time repair, or automatically restore every researched discovery? The first choice best preserves other mods’ intent.",
       "verbatim_answer": "Preserve ambiguous locks; explicit repair",
       "question_reference": "call_9764f59cb97144bb888d664c095eef63:0"
     },
