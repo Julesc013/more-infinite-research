@@ -1,0 +1,20 @@
+{
+  "schema": 1,
+  "kind": "mir5-f100-f110-laser-bridge-source",
+  "target": "f100",
+  "factorio_line": "1.0",
+  "engine": {
+    "version": "1.0.0",
+    "sha256": "99F1CE207A04296EF7D797E4A98AA98DDE4F02EE653C9DF736AC33A676FD4F70"
+  },
+  "settings_mode": "Defaults",
+  "mods": [
+    {"name": "base", "version": "1.0.0", "enabled": true},
+    {"name": "more-infinite-research", "version": "5.0.10000", "enabled": true},
+    {"name": "mir-fixture-mir5-f100-f110-laser-transition", "version": "0.1.0", "enabled": true}
+  ],
+  "archive_sha256": {
+    "more-infinite-research_5.0.10000.zip": "51EE1EFB685CE7EFF76E1CD671FF0E5AFBA9DC5357B54694E8F5CC24C1B12AA5"
+  },
+  "scope": "Prepared fresh current MIR5 F100 source for the separately pinned F100-to-F110 forward laser intent bridge. It is not the protected published4.7.10003 mining save, native result or release qualification."
+}

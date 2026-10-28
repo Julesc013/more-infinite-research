@@ -1,0 +1,20 @@
+{
+  "schema": 1,
+  "kind": "mir5-f100-f110-laser-bridge-successor",
+  "target": "f110",
+  "factorio_line": "1.1",
+  "engine": {
+    "version": "1.1.110",
+    "sha256": "B7B4B834FCA2E32AFA9D3476EB42CC09B02F1205BE97F688DC6FC6ACE7BA8FE1"
+  },
+  "settings_mode": "Defaults",
+  "mods": [
+    {"name": "base", "version": "1.1.110", "enabled": true},
+    {"name": "more-infinite-research", "version": "5.0.11000", "enabled": true},
+    {"name": "mir-fixture-mir5-f100-f110-laser-transition", "version": "0.2.0", "enabled": true}
+  ],
+  "archive_sha256": {
+    "more-infinite-research_5.0.11000.zip": "0BBA35402356C14FA0339632E63F8602E39969D4E635E28FA2450CFF24939A95"
+  },
+  "scope": "Prepared current MIR5 F110 successor for a fresh separately hash-pinned F100 forward-laser source save. No published4.7 laser history, native result or release qualification is claimed."
+}

@@ -1,0 +1,7 @@
+{
+  "name": "mir-fixture-mir5-f100-f110-laser-transition",
+  "version": "0.2.0",
+  "title": "MIR5 F100 to F110 laser transition fixture",
+  "factorio_version": "1.1",
+  "dependencies": ["base >= 1.1.110", "more-infinite-research = 5.0.11000"]
+}
