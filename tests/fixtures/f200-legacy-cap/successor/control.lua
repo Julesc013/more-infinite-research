@@ -401,6 +401,9 @@ script.on_configuration_changed(function()
   end
   if mode.reenabled then assert_disabled_stage_witness(state, mode) end
   assert_restored(state, mode) -- required before this fixture queues any successor lab work.
+  -- The accepted configuration supersedes the disabled source's on_load
+  -- witness. A later cold load reconstructs its own completed-stage witness.
+  if mode.reenabled then loaded_snapshot = nil end
   local inventory = lab(state)
   local before_units = {}
   for _, item in ipairs(SCIENCE) do

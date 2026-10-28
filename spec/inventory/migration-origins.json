@@ -3866,8 +3866,8 @@
         {
           "boundary": "Published F200 cap disabled/re-enabled and V3 F210 worker tails",
           "status": "needs-correction",
-          "problem": "Direct0.5 and disabled0.6 save/two reloads pass at005D; reenabled0.7 fails nativeenabledfalse. R08 proves current negative already persisted inDBF98. First-disabled R10 trace from81AF now observes nativeenabledtrue/prototypefalse,no currentrow,validated legacy visibility-only import,and authored disablement stamping disabledfalse while writing nativefalse. Private read-only diagnostic only; no repaired player qualification.",
-          "next_action": "R10 in Issue1350 confirms first-off liveenabledtrue/prototypefalse plus exactpositiveV3 becomes visibility-only import and then negative on MIR's actual policy write. The focused source correction carries only a new exact-row V3 signal within that configuration; currentnegative/foreign/unproven rows stay unchanged. Complete source review/CI, freeze corrected committed bytes and replay affected disabled/re-enabled stages from original81AF. RetainDBF98 and all diagnostics as originals; no negative override, source recreation or unrelated campaigns. Host controls are not a corrected native pass; separate F200/earlierV3/worker obligations remain.",
+          "problem": "Reviewed cap source correction1357 is merged. Corrected1246 disabled stage passes save07C/two colds; reenable restores owned research and completes one actual lab/initialmarker but fails a stale disabled-stage fixture on_load witness on its next ordinary completed tick. Raw failure/unqualified save0FA remain protected; F200 direct notrun. Actual V3 worker/earlier structured cases remain distinct.",
+          "next_action": "Commit/review the small fixture-only local witness correction and19 opposing controls,then retry only reenabling from accepted07C and the unrun F200 direct case from original81AF. Do not recreate source or rerun disabled stage. Preserve oldDBF98 negatives and every adverse. The adjacent enabled/prototype-true finite V3 and worker-tail restoration question is assigned to Aero host review separately; no new rights are inferred.",
           "evidence": [
             {
               "path": "spec/evidence/f200-foreign-cap-baseline-f0dd-native-chain-r01.json",
@@ -3892,6 +3892,10 @@
             {
               "path": "spec/evidence/cap-first-disabled-owner-trace-chain-r10.json",
               "scope": "One MIR-context first-disabled diagnostic startup; exact import-to-negative classification observed,not product acceptance."
+            },
+            {
+              "path": "spec/evidence/cap-corrected-first-batch-partial-chain-r01.json",
+              "scope": "Corrected1246 disabled/save/two-cold pass; reenabling lab reaches expected result but stale fixture witness fails; F200 notrun."
             }
           ],
           "protected_473_cap_source": {

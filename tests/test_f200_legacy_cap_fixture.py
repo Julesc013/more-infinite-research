@@ -398,7 +398,17 @@ class F200LegacyCapFixtureTests(unittest.TestCase):
             ok,result=complete_player(destination,4,.03,consumed_units);if not ok then return rejected(result) end
             if opponent=="duplicate-lab"then state.destination_lab_completions=2 end
             ok,result=tick(destination);if not ok then return rejected(result) end
-            for _=1,2 do ok,result=invoke(destination,"load");if not ok then return rejected(result) end;ok,result=tick(destination);if not ok then return rejected(result) end end
+            if opponent=="unexpected-reenabled-config-completed" then
+              ok,result=invoke(destination,"changed");if not ok then return rejected(result) end
+            end
+            for _=1,(options.ordinary_completed_ticks or 0) do
+              ok,result=tick(destination);if not ok then return rejected(result) end
+            end
+            for reload=1,2 do
+              ok,result=invoke(destination,"load");if not ok then return rejected(result) end
+              if opponent=="completed-reload-drift" and reload==1 then player.technologies[GEAR].saved_progress=.26 end
+              ok,result=tick(destination);if not ok then return rejected(result) end
+            end
             return {ok=true,message="",phase=state.phase,source_labs=state.actual_lab_completions,destination_labs=state.destination_lab_completions,
               player_level=player.technologies[GEAR].level,bonus=player.recipes['iron-gear-wheel'].productivity_bonus,
               player_enabled=player.technologies[GEAR].enabled,player_visible=player.technologies[GEAR].visible_when_disabled,
@@ -802,6 +812,35 @@ class F200LegacyCapFixtureTests(unittest.TestCase):
                 self.assertIn(phrase, rejected["message"])
                 self.assertEqual(observed, rejected["disabled_intermediate_observed"])
                 self.assertEqual((0, 0), (rejected["queue_entries"], rejected["destination_labs"]))
+
+    def test_reenabled_completion_drops_only_the_previous_load_witness(self):
+        options = {
+            "source_base": "2.0.77", "source_mir": "4.7.20003", "source_fixture": "0.4.0",
+            "source_control_alias": str(FIXTURE / "published/control.lua"),
+            "disabled_path": str(F210_DISABLED / "control.lua"), "disabled_base": "2.1.23",
+            "disabled_mir": "5.0.21000", "disabled_fixture": "0.6.0",
+            "disabled_control_alias": str(FIXTURE / "successor/control.lua"),
+            "reenabled_path": str(F210_REENABLED / "control.lua"), "reenabled_base": "2.1.23",
+            "reenabled_mir": "5.0.21000", "reenabled_fixture": "0.7.0",
+            "reenabled_control_alias": str(FIXTURE / "successor/control.lua"),
+            "ordinary_completed_ticks": 3,
+        }
+        result = self.flow_result(F200_CROSS / "control.lua", F210_REENABLED / "control.lua", "", options)
+        self.assertTrue(result["ok"], result["message"])
+        self.assertEqual((2, 1, 4, .03), (result["source_labs"], result["destination_labs"],
+                                         result["player_level"], result["bonus"]))
+        self.assertEqual((9, 3), (result["markers"], result["saves"]))
+        self.assertFalse(result["foreign_enabled"])
+        for opponent, phrase in (
+            ("completed-reload-drift", "successor cold reload player saved progress differs"),
+            ("unexpected-reenabled-config-completed", "required disabled intermediate witness"),
+        ):
+            with self.subTest(opponent=opponent):
+                refused = self.flow_result(F200_CROSS / "control.lua", F210_REENABLED / "control.lua",
+                                          opponent, options)
+                self.assertFalse(refused["ok"])
+                self.assertIn(phrase, refused["message"])
+                self.assertEqual(1, refused["destination_labs"])
 
     def test_disabled_intermediate_saves_once_on_first_tick_then_only_reports_cold_reloads(self):
         options = {
