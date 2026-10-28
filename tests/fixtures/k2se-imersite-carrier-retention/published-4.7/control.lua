@@ -117,16 +117,20 @@ script.on_init(function()
   local early, tail = carrier(player, EARLY, 1, "200*2^(L-1)", "source"), carrier(player, TAIL, 4, "1600+200*(L-4)", "source")
   -- Infinite-technology `level` is the next level.  Four on the first
   -- carrier plus six on the tail retains three plus two 2%-effect levels.
-  early.level, tail.level, tail.saved_progress = 4, 6, 0.42
-  if player.add_research(tail) ~= true or player.add_research(tail) ~= true then fail("could not queue native saved tail") end
+  early.level, tail.level = 4, 6
   local foreign = game.forces[FOREIGN] or game.create_force(FOREIGN)
   foreign.enable_all_prototypes()
   local foreign_early, foreign_tail = carrier(foreign, EARLY, 1, "200*2^(L-1)", "foreign"), carrier(foreign, TAIL, 4, "1600+200*(L-4)", "foreign")
-  foreign_early.level, foreign_tail.level, foreign_tail.saved_progress = 4, 6, 0.27
-  foreign_early.enabled, foreign_tail.enabled = false, false
-  foreign_early.visible_when_disabled, foreign_tail.visible_when_disabled = false, false
+  foreign_early.level, foreign_tail.level = 4, 6
   player.reset_technology_effects()
   foreign.reset_technology_effects()
+  -- Establish this deliberately seeded source only after force/effect setup.
+  -- Nothing in the successor or cold-reload callbacks repairs investment.
+  if player.add_research(tail) ~= true or player.add_research(tail) ~= true then fail("could not queue native saved tail") end
+  player.research_progress = 0.42
+  foreign_tail.saved_progress = 0.27
+  foreign_early.enabled, foreign_tail.enabled = false, false
+  foreign_early.visible_when_disabled, foreign_tail.visible_when_disabled = false, false
   storage[KEY] = {phase="source-ready", seed_kind="native-saved-state-not-lab-earned",
     actual_lab_completions=0, k2so_runtime_bridge_exercised=false, source_mir="4.7.21003",
     fixture_version="0.1.0", foreign_force=FOREIGN}
