@@ -93,7 +93,7 @@
         "v4.0.0": { "f200": "4.0.20000", "f210": "4.0.21000" },
         "v4.1.0": { "f200": "4.1.20000", "f210": "4.1.21000" },
         "v4.2.0-rc.1": { "f200": "4.2.20000", "f210": "4.2.21000" },
-        "v4.2.0-stable": { "f200": "4.2.20000", "f210": "4.2.20000" },
+        "v4.2.0-stable": { "f200": "4.2.20000", "f210": "4.2.21000" },
         "v4.2.1": { "f200": "4.2.20001", "f210": "4.2.21001" },
         "v4.2.2": { "f200": "4.2.20002", "f210": "4.2.21002" },
         "v4.3.0": { "f200": "4.3.20000", "f210": "4.3.21000" },
@@ -126,7 +126,7 @@
         "4.7.20002",
         "4.7.20003"
       ],
-      "v4_2_stable_f210_version_exception": "The archive named more-infinite-research_4.2.21000.zip retains its original expected digest and filename, but its actual info.json version is 4.2.20000. This is an observed archive identity, not a filename correction.",
+      "v4_2_stable_f210_version_exception": "The earlier eight-archive receipt reported4.2.20000 for F210, but independent Python/.NET reads of the same DE45F114 archive prove its sole info.json is4.2.21000. Preserve that receipt as contradicted on this field; no actual published codec collision is established. See spec/evidence/f210-420-exact-info-correction-r01.json.",
       "limits": "Only archive bytes, sole info.json and sole maximum_level_control.lua were inspected. This does not qualify source saves, settings, migration state, current reader behavior or native upgrades."
     }
   },
@@ -3753,7 +3753,7 @@
           "boundary": "Structured-V3 cap ownership and F200/F210 label collision",
           "status": "needs-correction",
           "problem": "Published-byte inspection and host tuple/collision controls exist; an earlier-V3 native finite-cap source/successor route remains missing.",
-          "next_action": "Select one byte-verified4.2/4.4 F200 representative, prepare/protect the owned/foreign worker-tail source and same/direct-F210 successor cases. Ordinary current-target reader and current literal-false ownership must win. Do not execute all15 version labels.",
+          "next_action": "Qualify the named earlier structured-V3 representative and actual native worker-tail boundaries. The already pushed PR1365 carries the exact4.4 source and both modern successor results for review. Preserve per-row/current-negative/foreign ownership defenses; the exact F2104.2 archive has no codec collision per the correction record. Do not execute every version label or fabricate a mislabeled source.",
           "evidence": [
             {
               "path": "spec/evidence/historical-structured-cap-archive-metadata.json",
@@ -3762,8 +3762,17 @@
             {
               "path": "spec/evidence/historical-remaining-cap-archive-metadata.json",
               "sha256": "92B6A83A887B615394CD4AB9C1A26AE737261657F98F530D8325C4D998DCFDA5"
+            },
+            {
+              "path": "spec/evidence/f210-420-exact-info-correction-r01.json",
+              "scope": "Exact archive/raw info/Python/.NET correction; supposed published F2104.2 label-collision case is not applicable."
             }
-          ]
+          ],
+          "label_collision_disposition": {
+            "status": "not-applicable-for-the-exact-published-archive",
+            "evidence": "spec/evidence/f210-420-exact-info-correction-r01.json",
+            "reason": "DE45F114 actual sole info version4.2.21000 contradicts the older receipt field. Keep synthetic host defenses; no falsified source or native collision campaign."
+          }
         },
         {
           "boundary": "MIR3.2 researched discovery and foreign locks",
