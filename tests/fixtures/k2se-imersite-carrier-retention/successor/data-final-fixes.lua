@@ -7,7 +7,9 @@ local POWDER = "kr-imersite-powder"
 assert(mods.base == "2.1.23" and mods.Krastorio2 == "2.1.4"
   and mods["space-exploration"] == "0.7.63" and mods["Krastorio2-spaced-out"] == nil
   and mods["more-infinite-research"] == "5.0.21000"
-  and mods["mir-fixture-mir5-k2se-imersite-carrier-retention"] == "0.2.0",
+  and (mods["mir-fixture-mir5-k2se-imersite-carrier-retention"] == "0.2.0"
+    or (mods["mir-fixture-mir5-k2se-imersite-carrier-retention"] == "0.3.0"
+      and mods["a-mir-fixture-k2se-foreign-owner"] == "0.1.0")),
   "unexpected current K2SE Imersite carrier closure")
 
 local function carrier(name, first, formula)

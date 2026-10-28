@@ -62,7 +62,8 @@ class K2SEImersiteCarrierFixtureTests(unittest.TestCase):
             if opponent=="missing-tail" then raw.technology["mir-k2-imersite-continuation-state-4"]=nil end
             local mods={base="2.1.23",Krastorio2="2.1.4",["space-exploration"]="0.7.63",
               ["more-infinite-research"]=stage=="published" and "4.7.21003" or "5.0.21000",
-              ["mir-fixture-mir5-k2se-imersite-carrier-retention"]=stage=="published" and "0.1.0" or "0.2.0"}
+              ["mir-fixture-mir5-k2se-imersite-carrier-retention"]=stage=="published" and "0.1.0" or (stage=="owned" and "0.3.0" or "0.2.0"),
+              ["a-mir-fixture-k2se-foreign-owner"]=stage=="owned" and "0.1.0" or nil}
             local env={mods=mods,data={raw=raw}};env._G=env
             setmetatable(env,{__index=function(_,key)return _G[key]end})
             local chunk,message=loadfile(path,"t",env);assert(chunk,message)
@@ -70,7 +71,7 @@ class K2SEImersiteCarrierFixtureTests(unittest.TestCase):
             return {ok=ok,message=tostring(result),early=early,tail=tail}
           end
 
-          function carrier_parse(path, stage)
+          function carrier_parse(path, stage, shared_path)
             local callbacks,reads={events={}},{game=0,storage=0}
             local env={script={active_mods={base="2.1.23",Krastorio2="2.1.4",["space-exploration"]="0.7.63",
               ["more-infinite-research"]=stage=="published" and "4.7.21003" or "5.0.21000",
@@ -78,6 +79,11 @@ class K2SEImersiteCarrierFixtureTests(unittest.TestCase):
               on_init=function(f)callbacks.init=f end,on_configuration_changed=function(f)callbacks.changed=f end,
               on_load=function(f)callbacks.load=f end,on_event=function(e,f)callbacks.events[e]=f end},
               defines={events={on_tick=1}}}
+            env.remote={add_interface=function()end}
+            env.require=function(name)
+              assert(name=="successor-control" and shared_path)
+              local chunk,message=loadfile(shared_path,"t",env);assert(chunk,message);return chunk()
+            end
             env._G=env;setmetatable(env,{__index=function(_,key)
               if key=="game" or key=="storage" then reads[key]=reads[key]+1 end
               return _G[key]
@@ -87,13 +93,18 @@ class K2SEImersiteCarrierFixtureTests(unittest.TestCase):
             return {ok=ok,message=tostring(result),callbacks=callbacks,reads=reads}
           end
 
-          function carrier_flow(source_path, successor_path, opponent)
+          function carrier_flow(source_path, successor_path, opponent, owner_path, early_path)
             local markers,saves,callbacks={},0,nil
+            local interfaces,owner_storage,observations={},{},{}
+            local enabled_writes,writes_before_owner,writes_after_owner=0,nil,nil
             local function tech(name, first)
-              return {name=name,valid=true,level=first,researched=false,enabled=true,
+              local enabled=true
+              return setmetatable({name=name,valid=true,level=first,researched=false,
                 visible_when_disabled=false,saved_progress=0,
                 prototype={hidden=true,max_level=4294967295,level=first,upgrade=false,
-                  effects={{type="change-recipe-productivity",recipe="kr-imersite-powder",change=.02}}}}
+                  effects={{type="change-recipe-productivity",recipe="kr-imersite-powder",change=.02}}}},
+                {__index=function(_,key)if key=="enabled" then return enabled end end,
+                 __newindex=function(t,key,v)if key=="enabled" then enabled=v;enabled_writes=enabled_writes+1 else rawset(t,key,v) end end})
             end
             local function make_force(name)
               local value={name=name,valid=true,technologies={
@@ -117,9 +128,10 @@ class K2SEImersiteCarrierFixtureTests(unittest.TestCase):
               return value
             end
             local player=make_force("player")
+            player.index=1
             local game={forces={player=player},tick=0}
             function game.create_force(name)
-              local value=make_force(name);game.forces[name]=value
+              local value=make_force(name);value.index=2;game.forces[name]=value
               if opponent=="force-created-clears-player-investment" then
                 player.current_research=nil;player.research_queue={};player.research_progress=0
               end
@@ -137,15 +149,28 @@ class K2SEImersiteCarrierFixtureTests(unittest.TestCase):
               ["ips-effect-per-level-research_material_imersite"]={value=2}}}
             local function load_control(path, stage)
               local result={events={}}
-              local env={game=game,storage=storage,settings=settings,defines={events={on_tick=1}},
-                helpers={table_to_json=function(row) markers[#markers+1]=row;return "{}" end},log=function(value)
-                  assert(value:match("^%[MIR5_NATIVE_FIXTURE%] RESULT "))end,
+              local env={game=game,storage=stage=="owner" and owner_storage or storage,settings=settings,defines={events={on_tick=1}},
+                helpers={table_to_json=function(row)
+                  if row.case then markers[#markers+1]=row else observations[#observations+1]=row end
+                  return "{}" end},log=function(value)
+                  assert(value:match("^%[MIR5_NATIVE_FIXTURE%] RESULT ") or value:match("^%[MIR_K2SE_EARLY_OWNER%] "))end,
+                remote={add_interface=function(name,methods)assert(interfaces[name]==nil);interfaces[name]=methods end,
+                  call=function(name,method,...)
+                    local v=interfaces[name][method](...)
+                    if opponent=="stale-entry" and name=="mir-k2se-fixture-seed" then v.tick=v.tick-1 end
+                    return v
+                  end},
                 script={active_mods={base="2.1.23",Krastorio2="2.1.4",["space-exploration"]="0.7.63",
                   ["more-infinite-research"]=stage=="published" and "4.7.21003" or "5.0.21000",
-                  ["mir-fixture-mir5-k2se-imersite-carrier-retention"]=stage=="published" and "0.1.0" or "0.2.0"},
+                  ["mir-fixture-mir5-k2se-imersite-carrier-retention"]=stage=="published" and "0.1.0" or (owner_path and "0.3.0" or "0.2.0"),
+                  ["a-mir-fixture-k2se-foreign-owner"]=owner_path and "0.1.0" or nil},
                   on_init=function(f)result.init=f end,on_configuration_changed=function(f)result.changed=f end,
                   on_load=function(f)result.load=f end,on_event=function(e,f)result.events[e]=f end}}
               env._G=env;setmetatable(env,{__index=function(_,key)return _G[key]end})
+              env.require=function(name)
+                assert(name=="successor-control")
+                local chunk,message=loadfile(successor_path,"t",env);assert(chunk,message);return chunk()
+              end
               local chunk,message=loadfile(path,"t",env);assert(chunk,message);chunk()
               return result
             end
@@ -156,20 +181,135 @@ class K2SEImersiteCarrierFixtureTests(unittest.TestCase):
             game.tick=game.tick+1;ok,message=pcall(source.events[1]);if not ok then return {ok=false,message=tostring(message),markers=markers,saves=saves,storage=storage} end
             if opponent=="foreign-enabled" then game.forces["mir5-k2se-imersite-carrier-foreign"].technologies["mir-k2-imersite-continuation-state-4"].enabled=true end
             if opponent=="lost-successor-progress" then player.research_progress=0 end
-            local successor=load_control(successor_path,"successor")
+            local foreign=game.forces["mir5-k2se-imersite-carrier-foreign"]
+            local source_state=storage.mir5_k2se_imersite_carrier_retention
+            if opponent=="native-reset" or opponent=="mir-reenables" or opponent=="repeat-owner" then
+              foreign.technologies["mir-k2-imersite-staged-state-1"].enabled=true
+              foreign.technologies["mir-k2-imersite-continuation-state-4"].enabled=true
+            end
+            if opponent=="foreign-work" then foreign.technologies["mir-k2-imersite-continuation-state-4"].saved_progress=.28 end
+            if opponent=="foreign-bonus" then foreign.recipes['kr-imersite-powder'].productivity_bonus=.11 end
+            if opponent=="stale-source" then source_state.phase="successor-complete" end
+            if opponent=="wrong-owner" then source_state.foreign_force="some-other-force" end
+            local successor=load_control(owner_path or successor_path,"successor")
+            if owner_path then
+              local owner=load_control(early_path,"owner")
+              writes_before_owner=enabled_writes
+              ok,message=pcall(owner.changed);writes_after_owner=enabled_writes
+              if ok and opponent=="repeat-owner" then ok,message=pcall(owner.changed) end
+              if not ok then return {ok=false,message=tostring(message),markers=markers,saves=saves,storage=storage,
+                foreign=foreign,owner_storage=owner_storage,writes_before_owner=writes_before_owner,writes_after_owner=writes_after_owner} end
+              local copy=interfaces['mir-k2se-foreign-owner'].get();copy.enabled_after_owner=true
+              assert(interfaces['mir-k2se-foreign-owner'].get().enabled_after_owner==false)
+              if opponent=="mir-reenables" then foreign.technologies["mir-k2-imersite-continuation-state-4"].enabled=true end
+            end
             ok,message=pcall(successor.changed)
-            if not ok then return {ok=false,message=tostring(message),markers=markers,saves=saves,storage=storage} end
+            if not ok then return {ok=false,message=tostring(message),markers=markers,saves=saves,storage=storage,
+              owner_storage=owner_storage,writes_before_owner=writes_before_owner,writes_after_owner=writes_after_owner} end
             game.tick=game.tick+1;ok,message=pcall(successor.events[1]);if not ok then return {ok=false,message=tostring(message),markers=markers,saves=saves,storage=storage} end
+            if opponent=="cold-foreign-enable" then foreign.technologies["mir-k2-imersite-continuation-state-4"].enabled=true end
             ok,message=pcall(successor.load);if not ok then return {ok=false,message=tostring(message),markers=markers,saves=saves,storage=storage} end
             game.tick=game.tick+1;ok,message=pcall(successor.events[1])
             return {ok=ok,message=tostring(message),markers=markers,saves=saves,storage=storage,
-              player=player,foreign=game.forces["mir5-k2se-imersite-carrier-foreign"]}
+              player=player,foreign=foreign,owner_storage=owner_storage,observations=observations,
+              writes_before_owner=writes_before_owner,writes_after_owner=writes_after_owner}
           end
         ''')
 
     def _data(self, stage, opponent=""):
         return self.lua.eval("carrier_data")(
             str(FIXTURE / fixture_role(stage) / "data-final-fixes.lua"), "published" if stage == "published-4.7" else "mir5", opponent)
+
+    def _owned_flow(self, opponent=""):
+        return self.lua.eval("carrier_flow")(
+            str(FIXTURE / "published-4.7/control.lua"), str(FIXTURE / "successor/control.lua"), opponent,
+            str(FIXTURE / "persisted-foreign-owner/control.lua"), str(FIXTURE / "early-foreign-owner/control.lua"))
+
+    def test_distinct_fixture_owner_admits_only_the_two_known_native_flag_states(self):
+        for opponent, writes in (("", 0), ("native-reset", 2)):
+            with self.subTest(opponent=opponent):
+                result = self._owned_flow(opponent)
+                self.assertTrue(result["ok"], result["message"])
+                self.assertEqual(writes, result["writes_after_owner"] - result["writes_before_owner"])
+                self.assertEqual(2, result["saves"])
+                markers = [as_plain(result["markers"][index]) for index in range(1, 5)]
+                for marker in markers[2:]:
+                    witness = marker["witnesses"]
+                    self.assertFalse(witness["successor_retained_before_fixture_writes"])
+                    self.assertTrue(witness["foreign_disabled"])
+                    owner = witness["explicit_fixture_owner_before_mir"]
+                    self.assertEqual(bool(writes), owner["reasserted"])
+                    self.assertFalse(owner["enabled_after_owner"])
+                    self.assertEqual((TAIL, 2, .42, .27, .1),
+                                     (witness["player_current"], witness["player_queue_count"],
+                                      witness["player_research_progress"], witness["foreign_tail_saved_progress"],
+                                      witness["foreign_powder_productivity"]))
+
+    def test_fixture_owner_refuses_unknown_source_or_native_drift_before_native_writes(self):
+        for opponent, phrase in (("stale-source", "exact original fixture source"),
+                                  ("wrong-owner", "exact original fixture source"),
+                                  ("foreign-enabled", "unexpected native foreign flag combination"),
+                                  ("foreign-work", "independently disabled foreign carrier differs"),
+                                  ("foreign-bonus", "independently disabled foreign carrier differs"),
+                                  ("lost-successor-progress", "player current queue differs"),
+                                  ("stale-entry", "source owner preflight differs")):
+            with self.subTest(opponent=opponent):
+                result = self._owned_flow(opponent)
+                self.assertFalse(result["ok"])
+                self.assertIn(phrase, result["message"])
+                self.assertEqual(result["writes_before_owner"], result["writes_after_owner"])
+                self.assertEqual(1, result["saves"])
+                self.assertIsNone(result["storage"]["mir5_k2se_imersite_carrier_retention"]["fixture_foreign_owner"])
+                self.assertIsNone(result["owner_storage"]["report"])
+
+    def test_repeated_owner_and_mir_reenablement_cannot_be_hidden_by_the_fixture(self):
+        for opponent, phrase in (("repeat-owner", "repeated fixture-owner configuration"),
+                                  ("mir-reenables", "independently disabled foreign carrier differs")):
+            with self.subTest(opponent=opponent):
+                result = self._owned_flow(opponent)
+                self.assertFalse(result["ok"])
+                self.assertIn(phrase, result["message"])
+                self.assertEqual(2, result["writes_after_owner"] - result["writes_before_owner"])
+                self.assertEqual(1, result["saves"])
+                state = result["storage"]["mir5_k2se_imersite_carrier_retention"]
+                self.assertEqual("source-complete", state["phase"])
+                self.assertIsNone(state["fixture_foreign_owner"])
+
+    def test_cold_load_does_not_reassert_foreign_locks(self):
+        result = self._owned_flow("cold-foreign-enable")
+        self.assertFalse(result["ok"])
+        self.assertIn("independently disabled foreign carrier differs", result["message"])
+        self.assertEqual(result["writes_before_owner"], result["writes_after_owner"])
+        self.assertEqual(2, result["saves"])
+        self.assertTrue(result["foreign"]["technologies"][TAIL]["enabled"])
+
+    def test_new_owner_metadata_uses_shared_checks_and_exact_current_inputs(self):
+        main = json.loads((FIXTURE / "persisted-foreign-owner/info.json").read_bytes())
+        early = json.loads((FIXTURE / "early-foreign-owner/info.json").read_bytes())
+        self.assertEqual("0.3.0", main["version"])
+        self.assertIn("a-mir-fixture-k2se-foreign-owner = 0.1.0", main["dependencies"])
+        self.assertIn("more-infinite-research = 5.0.21000", main["dependencies"])
+        self.assertFalse(any("more-infinite-research" in dependency for dependency in early["dependencies"]))
+        self.assertEqual('require("successor-data")\n', (FIXTURE / "persisted-foreign-owner/data-final-fixes.lua").read_text())
+        result = self.lua.eval("carrier_data")(str(FIXTURE / "successor/data-final-fixes.lua"), "owned", "")
+        self.assertTrue(result["ok"], result["message"])
+        profile = json.loads((ROOT / "tests/profiles/k2se-imersite-foreign-owner-f210-2123.json").read_bytes())
+        rows = {row["name"]: row["version"] for row in profile["mods"]}
+        self.assertEqual("0.3.0", rows.pop(main["name"]))
+        self.assertEqual("0.1.0", rows.pop(early["name"]))
+        self.assertEqual("5.0.21000", rows.pop("more-infinite-research"))
+        self.assertEqual({row["name"]: row["version"] for row in json.loads(BASE_PROFILE.read_bytes())["mods"]}, rows)
+        self.assertEqual("8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38", profile["engine"]["sha256"])
+        self.assertEqual("38C84CCBC4BFDA62FCB078772C4690AB81228484744A36D9EA303F5A75B16447",
+                         profile["archive_sha256"]["more-infinite-research_5.0.21000.zip"])
+
+    def test_owner_registration_reads_no_native_or_saved_state(self):
+        for role in ("persisted-foreign-owner", "early-foreign-owner"):
+            with self.subTest(role=role):
+                parsed = self.lua.eval("carrier_parse")(str(FIXTURE / role / "control.lua"), "successor",
+                                                        str(FIXTURE / "successor/control.lua"))
+                self.assertTrue(parsed["ok"], parsed["message"])
+                self.assertEqual((0, 0), (parsed["reads"]["game"], parsed["reads"]["storage"]))
 
     def test_profiles_preserve_exact_q013_closure_and_select_only_two_mir_fixture_arms(self):
         base = json.loads(BASE_PROFILE.read_text(encoding="utf-8"))
