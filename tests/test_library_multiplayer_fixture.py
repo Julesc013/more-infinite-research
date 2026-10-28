@@ -19,6 +19,7 @@ F210_PROFILE = ROOT / "tests/profiles/library-multiplayer-f210-2123.json"
 STANDALONE_F210_PROFILE = ROOT / "tests/profiles/library-multiplayer-standalone-f210-2123.json"
 F210_API_CONSUMERS_PROFILE = ROOT / "tests/profiles/library-api-consumers-f210-2123.json"
 STANDALONE_F210_API_CONSUMERS_PROFILE = ROOT / "tests/profiles/library-api-consumers-standalone-f210-2123.json"
+CURRENT_STANDALONE_F210_API_CONSUMERS_PROFILE = ROOT / "tests/profiles/library-api-consumers-current-standalone-f210-2123.json"
 PAIRED_PUBLISHED_PROFILE = ROOT / "tests/profiles/library-paired-browser-published-f200-2077.json"
 PAIRED_MIR5_PROFILE = ROOT / "tests/profiles/library-paired-browser-mir5-f200-2077.json"
 SCRIPTED_EFFECTS_PROFILE = ROOT / "tests/profiles/scripted-effects-multiplayer-f200-sa-2077.json"
@@ -581,6 +582,36 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
         })
         self.assertNotIn("mir-fixture-mir5-api-beta-production", {row["name"] for row in profile["mods"]})
 
+    def test_current_standalone_f210_api_client_profile_binds_the_new_current_archive_and_six_mod_closure(self):
+        profile = json.loads(CURRENT_STANDALONE_F210_API_CONSUMERS_PROFILE.read_text(encoding="utf-8"))
+        self.assertEqual(profile["kind"], "mir5-library-api-consumers-current-standalone-f210-native-selection")
+        self.assertEqual((profile["target"], profile["factorio_line"], profile["settings_mode"],
+                          profile["session_expected_peak_memory_mib"]),
+                         ("f210-standalone", "2.1", "Defaults", 7168))
+        self.assertEqual(profile["engine"], {
+            "version": "2.1.23",
+            "sha256": "8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38",
+        })
+        self.assertEqual([(row["name"], row["version"], row["enabled"]) for row in profile["mods"]], [
+            ("base", "2.1.23", True),
+            ("mir-fixture-mir5-active-mods-observer", "0.1.0", True),
+            ("more-infinite-research", "5.0.21000", True),
+            ("mir-fixture-mir5-library-multiplayer", "0.1.0", True),
+            ("mir-fixture-mir5-api-alpha", "0.1.0", True),
+            ("mir-fixture-mir5-api-beta", "0.1.0", True),
+        ])
+        self.assertEqual(profile["archive_sha256"], {
+            "mir-fixture-mir5-active-mods-observer_0.1.0.zip":
+                "A15A7D628D66953D2E0C4D4FA288F47CBF9C5678327C7EB3D23ADB5DC78331C0",
+            "more-infinite-research_5.0.21000.zip":
+                "A8D0A4590154F3106E59BDB269F1AEB3ED8CC523F18F00ED7D76DC89059F5B8D",
+            "mir-fixture-mir5-api-alpha_0.1.0.zip":
+                "DB5ED843FA9D85A1ABDC22595E62D315CA1A2191C846208079F85D4D016CE904",
+            "mir-fixture-mir5-api-beta_0.1.0.zip":
+                "690004F145E8B0DD52B4030BD8B27F7B581495EEFAAC5CB3A2F30A23FCA08951",
+        })
+        self.assertNotIn("mir-fixture-mir5-api-beta-production", {row["name"] for row in profile["mods"]})
+
     def test_multiplayer_wrapper_admits_only_the_exact_standalone_api_client_profile(self):
         script = r'''
           $ErrorActionPreference='Stop'; Set-StrictMode -Version Latest
@@ -617,6 +648,45 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
             capture_output=True, text=True,
             env=dict(os.environ, MIR_TEST_WRAPPER=str(WRAPPER),
                      MIR_TEST_STANDALONE_API_CLIENT_PROFILE=str(STANDALONE_F210_API_CONSUMERS_PROFILE)),
+            check=False,
+        )
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+
+    def test_multiplayer_wrapper_admits_only_the_exact_current_standalone_api_client_profile_before_admission(self):
+        script = r'''
+          $ErrorActionPreference='Stop'; Set-StrictMode -Version Latest
+          $tokens=$null;$errors=$null
+          $ast=[Management.Automation.Language.Parser]::ParseFile($env:MIR_TEST_WRAPPER,[ref]$tokens,[ref]$errors)
+          if($errors.Count){throw $errors[0].Message}
+          function Assert-Session([bool]$Condition,[string]$Message){if(-not$Condition){throw $Message}}
+          $node=@($ast.FindAll({param($candidate)
+            $candidate -is [Management.Automation.Language.FunctionDefinitionAst] -and $candidate.Name -ceq 'Assert-MultiplayerFixtureSelection'
+          },$true))
+          if($node.Count-ne1){throw 'selection function is absent or ambiguous'}
+          Invoke-Expression $node[0].Extent.Text
+          function Read-Profile {Get-Content -LiteralPath $env:MIR_TEST_CURRENT_STANDALONE_API_CLIENT_PROFILE -Raw|ConvertFrom-Json -AsHashtable}
+          $engine='8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38'
+          $current='A8D0A4590154F3106E59BDB269F1AEB3ED8CC523F18F00ED7D76DC89059F5B8D'
+          $old='2ABAF369E020D8AD18A0C04940A8811BECFA5E63E5B479C668E2D3A3123D032B'
+          $selected=Assert-MultiplayerFixtureSelection -Selection (Read-Profile) -EngineSha256 $engine -FixtureCase 'library-multiplayer' -ExpectedMIRArchiveSha256 $current -SessionExpectedPeakMemoryMiB 7168
+          if($selected.kind-cne'mir5-library-api-consumers-current-standalone-f210-native-selection'-or$selected.standalone_f210-ne$true-or$selected.api_client_consumers-ne$true){throw 'current standalone API client target differs'}
+          function Assert-Rejected([string]$Name,[scriptblock]$Mutate,[string]$Expected=$current,[int]$Peak=7168){
+            $selection=Read-Profile;&$Mutate $selection
+            try{$null=Assert-MultiplayerFixtureSelection -Selection $selection -EngineSha256 $engine -FixtureCase 'library-multiplayer' -ExpectedMIRArchiveSha256 $Expected -SessionExpectedPeakMemoryMiB $Peak}catch{return}
+            throw "current standalone API client profile accepted opponent: $Name"
+          }
+          Assert-Rejected 'old MIR archive argument' {} $old
+          Assert-Rejected 'old MIR archive profile binding' {param($s)$s['archive_sha256']['more-infinite-research_5.0.21000.zip']=$old}
+          Assert-Rejected 'wrong session admission' {} $current 8192
+          Assert-Rejected 'alpha missing' {param($s)$s['mods']=@($s['mods']|Where-Object {$_.name-cne'mir-fixture-mir5-api-alpha'})}
+          Assert-Rejected 'unexpected Space Age closure' {param($s)$s['mods']=@($s['mods'])+@([ordered]@{name='space-age';version='2.1.23';enabled=$true})}
+          Assert-Rejected 'wrong beta consumer archive' {param($s)$s['archive_sha256']['mir-fixture-mir5-api-beta_0.1.0.zip']='A'*64}
+        '''
+        result = subprocess.run(
+            ["pwsh", "-NoLogo", "-NoProfile", "-Command", script],
+            capture_output=True, text=True,
+            env=dict(os.environ, MIR_TEST_WRAPPER=str(WRAPPER),
+                     MIR_TEST_CURRENT_STANDALONE_API_CLIENT_PROFILE=str(CURRENT_STANDALONE_F210_API_CONSUMERS_PROFILE)),
             check=False,
         )
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
