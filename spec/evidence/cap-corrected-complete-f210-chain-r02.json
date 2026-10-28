@@ -1,0 +1,99 @@
+{
+  "schema": 1,
+  "kind": "MIRCorrectedCapCompleteF210NativeChainV1",
+  "status": "F210-disabled-reenabled-chain-passes-F200-protocol-mismatch-retained",
+  "scope": "Exact corrected1246/376eed79/player9461 on standalone2.1.23/8DC Base. Original81AF→unchanged0.6→accepted07C/two colds is reused once,then committed3c1f0.7 local-witness correction completes reenabling/newlab/save/two colds. The subsequent0822 F200 attempt pairs a4.7.3/0.4 source with historical0.2 expecting4.7.2/0.1 and refuses before fixture writes/lab/save. It is not product-defect evidence or a same-engine pass.",
+  "controller_commit": "3c1f11cc91d5bbd63a6878bcbf6e5667ff17ad87",
+  "artifact_source_commit": "376eed796c5d1e8e7519c65cd3934710fda54b8c",
+  "player_tree": "9461d8608eb77a230fbb313080be93c32ea05336",
+  "candidate_f210_sha256": "12462A867726C4B9549177E91F9B37C6C5CC30E201401374F26366903F9B2DF2",
+  "original_source": {
+    "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\cap-473-current7a2-r02-controller\\native-published\\write-data\\saves\\mir5-native-complete.zip",
+    "sha256": "81AFD312CB2391C7B0CF92C82CD022F93751E9E3FC99D181795078FC9651E4F9"
+  },
+  "accepted_disabled_source": {
+    "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\cap-corrected-376eed79-native-r01-controller\\native-disabled\\write-data\\saves\\mir5-native-complete.zip",
+    "sha256": "07C05394C20E20C44152C789D5B68D046036C308E9510CC1899BB9B8E8D12ACA"
+  },
+  "disabled_original_result": {
+    "path": "build/qualification/cap-corrected-376eed79-native-r01-controller/native-disabled/result.json",
+    "sha256": "D52263F4CB430358D9B88A83329902713591339072A1507668E80D228F991586",
+    "reused_processes": 3,
+    "cold_reloads": 2
+  },
+  "reenabled": {
+    "initial_witnesses": {
+      "source_mir": "4.7.20003",
+      "destination_mir": "5.0.21000",
+      "source_actual_lab_completions": 2,
+      "destination_actual_lab_completions": 1,
+      "milestone": "actual2labs",
+      "next_level": 4,
+      "productivity_bonus": 0.03,
+      "player_enabled": true,
+      "player_visible_when_disabled": true,
+      "foreign_queue_progress": 0.42000000000000004,
+      "science_consumed_units": 0.7333333333333333,
+      "science_inventory_consumed_units": 1,
+      "science_type": "item",
+      "science_remaining_ticks": 44,
+      "science_processing_ticks": 44,
+      "science_elapsed_ticks": 43,
+      "science_units_after": {
+        "automation-science-pack": 21,
+        "logistic-science-pack": 21,
+        "chemical-science-pack": 21,
+        "production-science-pack": 21
+      },
+      "on_load_read_only": false
+    },
+    "result_sha256": "358FA6890A84DF8779EAF8120E9409BC652CB3336CB508698903C07AB00CDCEB",
+    "fixture_sha256": "6DF59138A30025926B5EF0FBF2CBB3B209A1ACC299587332E43637F62BBCAADB",
+    "profile_sha256": "8C87103D1181B8DBD83603B34A9A2F477B83234D3B8EE4ED2E79F13A1FFB8984",
+    "completed_save": {
+      "sha256": "0FA045D1C27195DBFC38DD3DC73AA9B04063641A33057EA07BE9FB64D578AEEC",
+      "bytes": 935635
+    },
+    "cold_reloads": 2,
+    "foreign_preservation": "Original frozen native assertions preserve foreign-disabled state and42-percent queue. Marker serializes queue progress,not a separate foreign-enabled scalar.",
+    "same_saved_bytes_as_prior_failed_stage": {
+      "sha256": "0FA045D1C27195DBFC38DD3DC73AA9B04063641A33057EA07BE9FB64D578AEEC",
+      "meaning": "R01 save bytes are identical to newly qualified R02 save. R01 native verdict remains failed; R02 separately executes corrected fixture and both cold reloads. Local witness correction changes no persistent state. Retain both original execution identities and actual lab counts."
+    }
+  },
+  "f200_adverse": {
+    "result_sha256": "4DAB418B2E63F370F7F7FF9A19CE6547C410D00FFD4B8B9520BB8B6CEB36F81B",
+    "fixture_sha256": "4139BCC239C3BBE5F9858BB4414AD13B0C51B5D450EFD5B46BC9C6019774871C",
+    "actual_source": "4.7.20003/0.4",
+    "expected_historical_fixture_source": "4.7.20002/0.1",
+    "reason": "Root preparation mismatch; original witness refusal retained. Use a separate exact4.7.3 F200 fixture,never weaken the old0.2 protocol or recreate the valid source.",
+    "actual_processes": 1,
+    "labs": 0,
+    "saves": 0
+  },
+  "packet_sha256": "EF10286E98E9E30645041B48FC632C8FE37C2BE12A8D74D2E09231B63FD619A4",
+  "caller_sha256": "C465EA365AAE732DF868A7F2DF435927BCE8291CE916CEED594AD1833A60D531",
+  "root_readback": {
+    "path": "build/qualification/cap-corrected-376eed79-retry-r02-controller/root-readback-r01.json",
+    "sha256": "9E27CA2120F9CEB1BFFAF68137C19776FF4AAAC77992EF8F341114012270012A",
+    "files": 26,
+    "bytes_per_copy": 1102840
+  },
+  "lossless_receipts": {
+    "path": "spec/evidence/cap-corrected-complete-f210-receipts-r02.json.gz",
+    "sha256": "7EC31CB165B9F6A35A9F0E24CAED1F01A2CACDB4191A7FC92333028FB60DD1A3",
+    "bytes": 25788,
+    "records": 5
+  },
+  "counts": {
+    "new_accepted_reenabled_processes": 3,
+    "new_accepted_reenabled_labs": 1,
+    "new_cold_reloads": 2,
+    "reused_disabled_processes_once": 3,
+    "reused_disabled_cold_reloads_once": 2,
+    "original_source_labs_reused_once": 2,
+    "previous_failed_reenabled_stage_labs_separate": 1,
+    "new_F200_mismatch_processes": 1
+  },
+  "limits": "Only named F210 Base published finite-cap disabled/re-enabled route closes. Keep old005D failure/DBF98,R01 failed firsttick/save0FA and R02 mismatched F200 refusal. Distinct F200473,earlier structuredV3/worker,adjacent enabled finitecap,modded/DLC/client/performance/final release obligations remain."
+}

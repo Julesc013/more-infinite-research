@@ -3866,8 +3866,8 @@
         {
           "boundary": "Published F200 cap disabled/re-enabled and V3 F210 worker tails",
           "status": "needs-correction",
-          "problem": "Reviewed cap source correction1357 is merged. Corrected1246 disabled stage passes save07C/two colds; reenable restores owned research and completes one actual lab/initialmarker but fails a stale disabled-stage fixture on_load witness on its next ordinary completed tick. Raw failure/unqualified save0FA remain protected; F200 direct notrun. Actual V3 worker/earlier structured cases remain distinct.",
-          "next_action": "Commit/review the small fixture-only local witness correction and19 opposing controls,then retry only reenabling from accepted07C and the unrun F200 direct case from original81AF. Do not recreate source or rerun disabled stage. Preserve oldDBF98 negatives and every adverse. The adjacent enabled/prototype-true finite V3 and worker-tail restoration question is assigned to Aero host review separately; no new rights are inferred.",
+          "problem": "Named1246 F210 first-disabled/reenabled route now passes from81AF through07C/save/two colds,one new reenabled lab/save/two colds. Original DBF98/R01 fixture failure stay separate. F2000.2 refuses an intentionally different historical source contract because root incorrectly supplied4.7.3/0.4; no product verdict. Distinct earlierV3/worker and adjacent enabled finitecap remain open.",
+          "next_action": "Retain qualified F210 route at its exact1246/8DC inputs. Prepare an explicit F2004.7.3 thin fixture for protected81AF,keeping historical0.2/4.7.2 guard unchanged and reusing source. Then qualify same-engine lab/save/two reloads. Continue separate Aero enabled/prototype-true finiteV3/worker host review; no negative ownership override,source recreation or unrelated rerun.",
           "evidence": [
             {
               "path": "spec/evidence/f200-foreign-cap-baseline-f0dd-native-chain-r01.json",
@@ -3896,6 +3896,10 @@
             {
               "path": "spec/evidence/cap-corrected-first-batch-partial-chain-r01.json",
               "scope": "Corrected1246 disabled/save/two-cold pass; reenabling lab reaches expected result but stale fixture witness fails; F200 notrun."
+            },
+            {
+              "path": "spec/evidence/cap-corrected-complete-f210-chain-r02.json",
+              "scope": "Qualified named F210 Base disabled/reenabled route; F200 mismatched-source refusal and other V3 cases remain separate."
             }
           ],
           "protected_473_cap_source": {
