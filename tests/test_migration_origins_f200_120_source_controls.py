@@ -609,7 +609,7 @@ class MigrationOriginF200120SourceControls(unittest.TestCase):
                           "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B"),
                          (profile["origin_tag"], profile["origin_source_commit"], profile["engine"]["version"], profile["engine"]["sha256"]))
         self.assertEqual(ORIGINAL_ARCHIVE, profile["archive_sha256"]["more-infinite-research_1.2.0.zip"])
-        self.assertEqual("3B2A1F6536EAB31EB7B8BE2463BF6310E289F4762F3007F1D4706A92AD7F6713",
+        self.assertEqual("529B53C63715905849DC27D042BDBD9FD4778DC137BC58630A49578E4FD3C659",
                          profile["archive_sha256"]["mir-fixture-mir5-migration-origin-f200-120-source_0.1.0.zip"])
         self.assertEqual("723D1E7721449FC26040E5E6629416767BDC20AD79CF8723115846DB662A1F87",
                          profile["archive_sha256"]["mir-fixture-mir5-active-mods-observer_0.1.0.zip"])
