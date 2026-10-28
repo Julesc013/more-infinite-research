@@ -102,11 +102,6 @@ end
 -- no foreign prototype collection and leaves the public row untouched.
 function M.append(technologies, target, raw)
   if type(target) ~= "table" or target.recipe_productivity ~= true then return {} end
-  -- This optional preservation row has no valid prototype without its exact
-  -- named ammunition category. Do not substitute a foreign category or
-  -- invent a default; runtime will refuse an admitted historical import when
-  -- its required holder is absent.
-  if not cannon_category_available(raw) then return {} end
   local rows = named_current_rows(technologies)
   if rows[MAIN_ID] == nil then return {} end
   if rows[ID] ~= nil then error("MIR legacy cannon credit identity is already owned", 2) end
@@ -116,6 +111,13 @@ function M.append(technologies, target, raw)
   -- preflight.  Do not turn this detached migration holder into an earlier
   -- data-stage error or manufacture a replacement scalar from a default.
   if change == nil or science == nil then return {} end
+  -- This optional preservation row has no valid prototype without its exact
+  -- named ammunition category. Defer that bounded raw read until the public
+  -- row is genuinely selected, so inactive configurations retain their
+  -- existing no-raw-read boundary. Do not substitute a foreign category or
+  -- invent a default; runtime will refuse an admitted historical import when
+  -- its required holder is absent.
+  if not cannon_category_available(raw) then return {} end
   local staged = {holder(change, science)}
   for index = 1, #staged do technologies[#technologies + 1] = staged[index] end
   return staged
