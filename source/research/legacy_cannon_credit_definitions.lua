@@ -27,6 +27,12 @@ function M.descriptor()
   return copy_descriptor()
 end
 
+local function cannon_category_available(raw)
+  if type(raw) ~= "table" then return false end
+  local categories = raw["ammo-category"]
+  return type(categories) == "table" and categories["cannon-shell"] ~= nil
+end
+
 local function rocket_scalar(technology)
   if type(technology) ~= "table" or technology.name ~= MAIN_ID
       or type(technology.effects) ~= "table" or #technology.effects ~= 1 then
@@ -38,6 +44,23 @@ local function rocket_scalar(technology)
     return nil
   end
   return effect.modifier
+end
+
+local function selected_public_science(technology)
+  local unit = type(technology) == "table" and technology.unit or nil
+  local ingredients = type(unit) == "table" and unit.ingredients or nil
+  if type(ingredients) ~= "table" or #ingredients < 1 then return nil end
+  local selected = nil
+  for index = 1, #ingredients do
+    local ingredient = ingredients[index]
+    local name, amount = type(ingredient) == "table" and ingredient[1] or nil,
+      type(ingredient) == "table" and ingredient[2] or nil
+    if type(name) ~= "string" or name == "" or not finite_nonnegative(amount) or amount <= 0 then
+      return nil
+    end
+    if selected == nil or name < selected then selected = name end
+  end
+  return selected
 end
 
 local function named_current_rows(technologies)
@@ -56,7 +79,7 @@ local function named_current_rows(technologies)
   return found
 end
 
-local function holder(change)
+local function holder(change, science)
   return {
     type = "technology",
     name = ID,
@@ -70,24 +93,30 @@ local function holder(change)
     max_level = "infinite",
     order = "zz[mir-legacy-cannon-credit]-rocket-shooting-speed",
     effects = {{type = "gun-speed", ammo_category = "cannon-shell", modifier = change}},
-    unit = {count = 1, time = 1, ingredients = {{"automation-science-pack", 1}}},
+    unit = {count = 1, time = 1, ingredients = {{science, 1}}},
   }
 end
 
 -- Appends the one detached holder only when the matching current public
 -- rocket stream is already part of this explicit output batch.  It indexes
 -- no foreign prototype collection and leaves the public row untouched.
-function M.append(technologies, target)
+function M.append(technologies, target, raw)
   if type(target) ~= "table" or target.recipe_productivity ~= true then return {} end
+  -- This optional preservation row has no valid prototype without its exact
+  -- named ammunition category. Do not substitute a foreign category or
+  -- invent a default; runtime will refuse an admitted historical import when
+  -- its required holder is absent.
+  if not cannon_category_available(raw) then return {} end
   local rows = named_current_rows(technologies)
   if rows[MAIN_ID] == nil then return {} end
   if rows[ID] ~= nil then error("MIR legacy cannon credit identity is already owned", 2) end
   local change = rocket_scalar(rows[MAIN_ID])
+  local science = selected_public_science(rows[MAIN_ID])
   -- Generator retains malformed owned rows for its own complete local
   -- preflight.  Do not turn this detached migration holder into an earlier
   -- data-stage error or manufacture a replacement scalar from a default.
-  if change == nil then return {} end
-  local staged = {holder(change)}
+  if change == nil or science == nil then return {} end
+  local staged = {holder(change, science)}
   for index = 1, #staged do technologies[#technologies + 1] = staged[index] end
   return staged
 end

@@ -35,7 +35,7 @@ end
 
 local function active_target()
   local active = script and script.active_mods
-  if type(active) ~= "table" or active["space-age"] ~= nil then return nil end
+  if type(active) ~= "table" then return nil end
   if platform_target.recipe_productivity ~= true
       or (platform_target.id ~= "f200" and platform_target.id ~= "f210")
       or type(platform_target.distribution_version) ~= "string"
@@ -67,6 +67,21 @@ local function completed(technology)
   return technology.level - 1 + (technology.researched and 1 or 0)
 end
 
+local function selected_public_science(ingredients)
+  if type(ingredients) ~= "table" or #ingredients < 1 then return nil end
+  local selected = nil
+  for index = 1, #ingredients do
+    local ingredient = ingredients[index]
+    local name, amount = type(ingredient) == "table" and ingredient.name or nil,
+      type(ingredient) == "table" and ingredient.amount or nil
+    if type(name) ~= "string" or name == "" or not finite_nonnegative(amount) or amount <= 0 then
+      return nil
+    end
+    if selected == nil or name < selected then selected = name end
+  end
+  return selected
+end
+
 local function public_rocket(technology)
   local prototype = technology and technology.prototype
   local effects = prototype and prototype.effects
@@ -83,17 +98,18 @@ local function public_rocket(technology)
     return nil
   end
   local count = completed(technology)
-  if count == nil then return nil end
-  return count, effect.modifier
+  local science = selected_public_science(technology.research_unit_ingredients)
+  if count == nil or science == nil then return nil end
+  return count, effect.modifier, science
 end
 
-local function one_automation_pack(ingredients)
+local function one_selected_public_science(ingredients, science)
   if type(ingredients) ~= "table" or #ingredients ~= 1 then return false end
   local item = ingredients[1]
-  return type(item) == "table" and item.name == "automation-science-pack" and item.amount == 1
+  return type(item) == "table" and item.name == science and item.amount == 1
 end
 
-local function exact_holder_shape(technology, scalar)
+local function exact_holder_shape(technology, scalar, science)
   local prototype = technology and technology.prototype
   local effects = prototype and prototype.effects
   if technology == nil or technology.valid == false or technology.name ~= DESCRIPTOR.id
@@ -103,7 +119,7 @@ local function exact_holder_shape(technology, scalar)
       or type(effects) ~= "table" or #effects ~= 1
       -- The authored unit.time is one second; LuaTechnology exposes 60 ticks.
       or technology.research_unit_count ~= 1 or technology.research_unit_energy ~= 60
-      or not one_automation_pack(technology.research_unit_ingredients)
+      or not one_selected_public_science(technology.research_unit_ingredients, science)
       or type(technology.enabled) ~= "boolean" or type(technology.visible_when_disabled) ~= "boolean" then
     return false
   end
@@ -121,10 +137,10 @@ end
 
 local function force_plan(force)
   if not valid_force(force) or force.technologies == nil then return nil end
-  local completed_levels, scalar = public_rocket(force.technologies[DESCRIPTOR.main_id])
+  local completed_levels, scalar, science = public_rocket(force.technologies[DESCRIPTOR.main_id])
   if completed_levels == nil then return nil end
   local holder = force.technologies[DESCRIPTOR.id]
-  if not exact_holder_shape(holder, scalar) or holder.enabled ~= false
+  if not exact_holder_shape(holder, scalar, science) or holder.enabled ~= false
       or holder.visible_when_disabled ~= false or holder.researched ~= false then
     return nil
   end
@@ -218,9 +234,9 @@ end
 function M.on_technology_effects_reset(event)
   local force = event and event.force
   if not valid_force(force) or force.technologies == nil then return false end
-  local _, scalar = public_rocket(force.technologies[DESCRIPTOR.main_id])
+  local _, scalar, science = public_rocket(force.technologies[DESCRIPTOR.main_id])
   local holder = force.technologies[DESCRIPTOR.id]
-  if scalar == nil or not exact_holder_shape(holder, scalar) then return false end
+  if scalar == nil or science == nil or not exact_holder_shape(holder, scalar, science) then return false end
   holder.enabled = false
   holder.visible_when_disabled = false
   return true

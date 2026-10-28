@@ -382,6 +382,7 @@ class GeneratorTests(unittest.TestCase):
             table.sort(lab_inputs)
             local items = source_copy(sources.item); items.spoilage = {}
             return {raw = {technology = technologies, tool = tools, item = items, recipe = recipes,
+              ["ammo-category"] = {["cannon-shell"] = {}},
               lab = {fixture = {inputs=lab_inputs}}}, writes = 0,
               extend = function(self, values) self.writes = self.writes + 1; self.emitted = values end}
           end
@@ -831,6 +832,34 @@ class GeneratorTests(unittest.TestCase):
                 or effect.recipe ~= 'efficiency-module', row.name)
             end
           end
+        ''')
+
+    def test_missing_cannon_category_omits_only_the_optional_legacy_holder_without_mutating_the_public_rocket_row(self):
+        self.lua.execute('''
+          local function row_by_name(rows, name)
+            for _, row in ipairs(rows) do if row.name == name then return row end end
+            return nil
+          end
+          local function same(left, right)
+            if type(left) ~= type(right) then return false end
+            if type(left) ~= "table" then return left == right end
+            for key, value in pairs(left) do if not same(value, right[key]) then return false end end
+            for key, value in pairs(right) do if not same(value, left[key]) then return false end end
+            return true
+          end
+          settings, mods, helpers, log = {startup=defaults()}, {}, nil, function() end
+          data = full_world(mods)
+          assert(dofile(data_final_path) == nil and data.writes == 1)
+          local expected = row_by_name(data.emitted, 'recipe-prod-research_rocket_shooting_speed-1')
+          assert(expected and expected.effects[1].ammo_category == 'rocket')
+
+          data = full_world(mods)
+          data.raw['ammo-category']['cannon-shell'] = nil
+          assert(dofile(data_final_path) == nil and data.writes == 1)
+          local rocket = row_by_name(data.emitted, 'recipe-prod-research_rocket_shooting_speed-1')
+          assert(same(rocket, expected), 'missing cannon category changed public rocket output')
+          assert(row_by_name(data.emitted, 'mir-legacy-cannon-credit-rocket-shooting-speed') == nil,
+            'missing cannon category emitted an invalid detached holder')
         ''')
 
     def test_disabled_modern_module_main_emits_exact_holders_and_runtime_credit_preserves_public_state(self):

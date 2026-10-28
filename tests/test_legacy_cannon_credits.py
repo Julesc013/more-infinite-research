@@ -41,11 +41,12 @@ class LegacyCannonCreditTests(unittest.TestCase):
             })
           end
 
-          local function public_rocket(level, researched, scalar, prototype_enabled, runtime_enabled)
+          local function public_rocket(level, researched, scalar, prototype_enabled, runtime_enabled, ingredients)
             local state = {
               valid = true, name = "recipe-prod-research_rocket_shooting_speed-1",
               level = level, researched = researched, enabled = runtime_enabled,
               saved_progress = .27, writes = {},
+              research_unit_ingredients = ingredients,
               prototype = {
                 name = "recipe-prod-research_rocket_shooting_speed-1", level = 1,
                 max_level = UINT32_MAX, hidden = false, upgrade = true,
@@ -56,12 +57,12 @@ class LegacyCannonCreditTests(unittest.TestCase):
             return native_technology(state), state
           end
 
-          local function holder(descriptor, scalar)
+          local function holder(descriptor, scalar, science)
             local state = {
               valid = true, name = descriptor.id, level = 1, researched = false,
               enabled = false, visible_when_disabled = false, writes = {},
               research_unit_count = 1, research_unit_energy = 60,
-              research_unit_ingredients = {{name = "automation-science-pack", amount = 1}},
+              research_unit_ingredients = {{name = science, amount = 1}},
               prototype = {
                 name = descriptor.id, level = 1, max_level = UINT32_MAX,
                 hidden = true, upgrade = true, enabled = false, visible_when_disabled = false,
@@ -71,9 +72,9 @@ class LegacyCannonCreditTests(unittest.TestCase):
             return native_technology(state), state
           end
 
-          local function force(index, level, researched, descriptor, scalar, prototype_enabled, runtime_enabled)
-            local rocket, rocket_state = public_rocket(level, researched, scalar, prototype_enabled, runtime_enabled)
-            local credit, credit_state = holder(descriptor, scalar)
+          local function force(index, level, researched, descriptor, scalar, prototype_enabled, runtime_enabled, ingredients, science)
+            local rocket, rocket_state = public_rocket(level, researched, scalar, prototype_enabled, runtime_enabled, ingredients)
+            local credit, credit_state = holder(descriptor, scalar, science)
             return {
               valid = true, index = index, technologies = {
                 [descriptor.main_id] = rocket,
@@ -84,7 +85,7 @@ class LegacyCannonCreditTests(unittest.TestCase):
             }
           end
 
-          function legacy_cannon_environment(target, scalar, prototype_enabled, runtime_enabled)
+          function legacy_cannon_environment(target, scalar, prototype_enabled, runtime_enabled, ingredients)
             local env = {storage = {}}
             env.script = {active_mods = {}}
             if target == "f200" then
@@ -117,9 +118,14 @@ class LegacyCannonCreditTests(unittest.TestCase):
             scalar = scalar == nil and .1 or scalar
             prototype_enabled = prototype_enabled == nil and true or prototype_enabled
             runtime_enabled = runtime_enabled == nil and prototype_enabled or runtime_enabled
-            local player = force(1, 2, false, descriptor, scalar, prototype_enabled, runtime_enabled)
-            local foreign = force(2, 2, false, descriptor, scalar, prototype_enabled, runtime_enabled)
-            local detached = force(3, 1, false, descriptor, scalar, prototype_enabled, runtime_enabled)
+            ingredients = ingredients or {{name = "automation-science-pack", amount = 1}}
+            local science = nil
+            for _, ingredient in ipairs(ingredients) do
+              if science == nil or ingredient.name < science then science = ingredient.name end
+            end
+            local player = force(1, 2, false, descriptor, scalar, prototype_enabled, runtime_enabled, ingredients, science)
+            local foreign = force(2, 2, false, descriptor, scalar, prototype_enabled, runtime_enabled, ingredients, science)
+            local detached = force(3, 1, false, descriptor, scalar, prototype_enabled, runtime_enabled, ingredients, science)
             env.game = {forces = {player = player, foreign = foreign, detached = detached}}
             local event = {mod_changes = {
               ["more-infinite-research"] = {old_version = "1.2.0", new_version = env.script.active_mods["more-infinite-research"]},
@@ -131,20 +137,34 @@ class LegacyCannonCreditTests(unittest.TestCase):
           function legacy_cannon_definition_rows()
             local definitions = assert(loadfile(definitions_path))()
             local target = {id = "f210", recipe_productivity = true}
+            local inputs = { ["ammo-category"] = {["cannon-shell"] = {}} }
             local rows = {{name = "recipe-prod-research_rocket_shooting_speed-1", effects = {
               {type = "gun-speed", ammo_category = "rocket", modifier = .23},
-            }}}
-            local first = definitions.append(rows, target)
+            }, unit = {ingredients = {{"automation-science-pack", 1}, {"utility-science-pack", 1}}}}}
+            local first = definitions.append(rows, target, inputs)
             first[1].effects[1].modifier = .4
             local fresh = {{name = "recipe-prod-research_rocket_shooting_speed-1", effects = {
               {type = "gun-speed", ammo_category = "rocket", modifier = .23},
-            }}}
-            local second = definitions.append(fresh, target)
+            }, unit = {ingredients = {{"automation-science-pack", 1}, {"utility-science-pack", 1}}}}}
+            local second = definitions.append(fresh, target, inputs)
             local zero = {{name = "recipe-prod-research_rocket_shooting_speed-1", enabled = false, effects = {
               {type = "gun-speed", ammo_category = "rocket", modifier = 0},
-            }}}
-            local zero_rows = definitions.append(zero, target)
-            return {first = first, second = second, zero = zero_rows, descriptor = definitions.descriptor()}
+            }, unit = {ingredients = {{"automation-science-pack", 1}}}}}
+            local zero_rows = definitions.append(zero, target, inputs)
+            local missing_category = {{name = "recipe-prod-research_rocket_shooting_speed-1", effects = {
+              {type = "gun-speed", ammo_category = "rocket", modifier = .23},
+            }, unit = {ingredients = {{"foreign-science", 1}}}}}
+            local missing_category_rows = definitions.append(missing_category, target,
+              { ["ammo-category"] = {} })
+            local reordered = {{name = "recipe-prod-research_rocket_shooting_speed-1", effects = {
+              {type = "gun-speed", ammo_category = "rocket", modifier = .23},
+            }, unit = {ingredients = {{"zeta-science", 1}, {"alpha-science", 3}}}}}
+            local reordered_rows = definitions.append(reordered, target,
+              { ["ammo-category"] = {["cannon-shell"] = {}} })
+            return {first = first, second = second, zero = zero_rows,
+              missing_category = missing_category_rows, missing_category_source = missing_category,
+              reordered = reordered_rows,
+              descriptor = definitions.descriptor()}
           end
 
           function legacy_cannon_success(target, scalar, level, old_version)
@@ -208,6 +228,33 @@ class LegacyCannonCreditTests(unittest.TestCase):
               zero_completed_writes = zero.detached.holder_state.writes.level or 0,
               unknown = no_plan, unknown_writes = unknown.player.holder_state.writes.level or 0}
           end
+
+          function legacy_cannon_base_to_space_age()
+            local value = legacy_cannon_environment("f210")
+            assert(value.runtime.on_configuration_changed(value.event) == true)
+            local holder = value.player.holder_state
+            local writes_before = holder.writes.level or 0
+            value.env.script.active_mods["space-age"] = "2.0.77"
+            local transition = {mod_changes = {
+              ["more-infinite-research"] = {old_version = "5.0.21000", new_version = "5.0.21000"},
+              ["space-age"] = {old_version = nil, new_version = "2.0.77"},
+            }}
+            local again = value.runtime.on_configuration_changed(transition)
+            holder.enabled, holder.visible_when_disabled = true, true
+            local cleaned = value.runtime.on_technology_effects_reset({force = value.player})
+            return {again = again, cleaned = cleaned, writes_before = writes_before,
+              writes_after = holder.writes.level or 0, holder = holder,
+              rocket = value.player.rocket_state, queue = value.player.research_queue[1],
+              progress = value.player.research_progress}
+          end
+
+          function legacy_cannon_reordered_science()
+            local ingredients = {{name = "zeta-science", amount = 1}, {name = "alpha-science", amount = 3}}
+            local value = legacy_cannon_environment("f210", nil, nil, nil, ingredients)
+            local plan = value.runtime.preflight(value.event)
+            assert(plan and value.runtime.apply(plan) == true)
+            return {holder = value.player.holder_state, rocket = value.player.rocket_state}
+          end
         ''')
 
     def test_definition_stages_one_detached_cannon_holder_from_the_rocket_scalar(self):
@@ -221,10 +268,16 @@ class LegacyCannonCreditTests(unittest.TestCase):
         self.assertEqual(("gun-speed", "cannon-shell", .23),
                          (holder["effects"][0]["type"], holder["effects"][0]["ammo_category"],
                           holder["effects"][0]["modifier"]))
+        self.assertEqual(("automation-science-pack", 1), tuple(holder["unit"]["ingredients"][0]))
         self.assertEqual(0, result["zero"][0]["effects"][0]["modifier"])
+        self.assertEqual({}, result["missing_category"])
+        self.assertEqual("recipe-prod-research_rocket_shooting_speed-1",
+                         result["missing_category_source"][0]["name"])
+        self.assertEqual("rocket", result["missing_category_source"][0]["effects"][0]["ammo_category"])
+        self.assertEqual(("alpha-science", 1), tuple(result["reordered"][0]["unit"]["ingredients"][0]))
 
     def test_exact_old_versions_credit_only_completed_combined_levels_for_both_modern_targets(self):
-        for target in ("f200", "f200-forward", "f210", "f210-portal"):
+        for target in ("f200", "f200-forward", "f210", "f210-portal", "f210-space-age"):
             for old_version in ("1.2.0", "1.2.5", "1.2.9"):
                 with self.subTest(target=target, old_version=old_version):
                     result = py(self.lua.eval("legacy_cannon_success")(target, .1, None, old_version))
@@ -261,6 +314,14 @@ class LegacyCannonCreditTests(unittest.TestCase):
                          (result["holder"]["level"], result["holder"]["enabled"], result["holder"]["visible_when_disabled"]))
         self.assertGreaterEqual(result["writes"]["level"], 1)
 
+    def test_holder_uses_the_same_lexicographic_public_science_input_after_runtime_order_changes(self):
+        result = py(self.lua.eval("legacy_cannon_reordered_science")())
+        self.assertEqual(("alpha-science", 1),
+                         (result["holder"]["research_unit_ingredients"][0]["name"],
+                          result["holder"]["research_unit_ingredients"][0]["amount"]))
+        self.assertEqual(2, result["holder"]["level"])
+        self.assertEqual(2, result["rocket"]["level"])
+
     def test_invalid_or_changed_named_shapes_reject_before_any_holder_write(self):
         cases = {
             "missing holder": 'function(value) value.player.technologies[value.descriptor.id] = nil end',
@@ -268,6 +329,7 @@ class LegacyCannonCreditTests(unittest.TestCase):
             "foreign added effect": 'function(value) table.insert(value.player.technologies[value.descriptor.main_id].prototype.effects,{type="gun-speed",ammo_category="rocket",modifier=.1}) end',
             "changed source scalar": 'function(value) value.detached.technologies[value.descriptor.main_id].prototype.effects[1].modifier=-.1 end',
             "one tick holder": 'function(value) value.foreign.technologies[value.descriptor.id].research_unit_energy=1 end',
+            "other holder science": 'function(value) value.foreign.technologies[value.descriptor.id].research_unit_ingredients[1].name="other-science" end',
             "enabled holder": 'function(value) value.detached.technologies[value.descriptor.id].enabled=true end',
         }
         for label, mutation in cases.items():
@@ -282,15 +344,20 @@ class LegacyCannonCreditTests(unittest.TestCase):
         self.assertIn("plan no longer matches", drift["message"])
         self.assertEqual((0, 0), (drift["player"], drift["foreign"]))
 
-    def test_unknown_old_version_and_space_age_do_not_grant_credit(self):
+    def test_unknown_old_version_does_not_grant_credit_and_base_to_space_age_never_double_grants(self):
         unknown = py(self.lua.eval("legacy_cannon_zero_and_inactive")())
         self.assertNotIn("unknown", unknown)
         self.assertEqual(0, unknown["unknown_writes"])
-        self.lua.execute(r'''
-          local value = legacy_cannon_environment("f210-space-age")
-          assert(value.runtime.preflight(value.event) == nil)
-          assert((value.player.holder_state.writes.level or 0) == 0)
-        ''')
+        result = py(self.lua.eval("legacy_cannon_base_to_space_age")())
+        self.assertFalse(result["again"])
+        self.assertTrue(result["cleaned"])
+        self.assertEqual(result["writes_before"], result["writes_after"])
+        self.assertEqual((2, False, False),
+                         (result["holder"]["level"], result["holder"]["enabled"],
+                          result["holder"]["visible_when_disabled"]))
+        self.assertEqual((2, True, "0.27", "preserved", .42),
+                         (result["rocket"]["level"], result["rocket"]["enabled"],
+                          str(result["rocket"]["saved_progress"]), result["queue"], result["progress"]))
 
     def test_runtime_remains_one_time_named_carrier_logic_without_storage_or_ordinary_research_work(self):
         source = RUNTIME.read_text(encoding="utf-8")

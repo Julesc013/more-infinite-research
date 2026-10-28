@@ -117,6 +117,19 @@ def legacy_cannon_credit_rows(public_rows):
             or isinstance(scalar, bool) or not isinstance(scalar, (int, float))
             or not math.isfinite(scalar) or scalar < 0):
         raise AssertionError("legacy cannon credit requires a finite nonnegative rocket scalar")
+    unit = main.get("unit")
+    ingredients = unit.get("ingredients") if isinstance(unit, dict) else None
+    if not isinstance(ingredients, list) or not ingredients:
+        raise AssertionError("legacy cannon credit requires current public science")
+    names = []
+    for ingredient in ingredients:
+        if (not isinstance(ingredient, list) or len(ingredient) != 2
+                or not isinstance(ingredient[0], str) or not ingredient[0]
+                or isinstance(ingredient[1], bool) or not isinstance(ingredient[1], (int, float))
+                or not math.isfinite(ingredient[1]) or ingredient[1] <= 0):
+            raise AssertionError("legacy cannon credit requires finite public science ingredients")
+        names.append(ingredient[0])
+    science = min(names)
     name = "mir-legacy-cannon-credit-rocket-shooting-speed"
     return {
         name: {
@@ -126,7 +139,7 @@ def legacy_cannon_credit_rows(public_rows):
             "visible_when_disabled": False, "max_level": "infinite",
             "order": "zz[mir-legacy-cannon-credit]-rocket-shooting-speed",
             "effects": [{"type": "gun-speed", "ammo_category": "cannon-shell", "modifier": scalar}],
-            "unit": {"count": 1, "time": 1, "ingredients": [["automation-science-pack", 1]]},
+            "unit": {"count": 1, "time": 1, "ingredients": [[science, 1]]},
         }
     }
 

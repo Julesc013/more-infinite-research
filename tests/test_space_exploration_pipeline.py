@@ -91,6 +91,8 @@ class SpaceExplorationPipelineTests(unittest.TestCase):
           settings = {startup = startup_values}
           emitted = {}; publications = 0
           data = {raw = captured_raw}
+          data.raw["ammo-category"] = data.raw["ammo-category"] or { ["cannon-shell"] = {} }
+          data.raw["ammo-category"]["cannon-shell"] = data.raw["ammo-category"]["cannon-shell"] or {}
           function data:extend(rows)
             publications = publications + 1
             for _, row in ipairs(rows) do
