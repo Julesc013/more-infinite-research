@@ -19,9 +19,9 @@
     "source_result_sha256": "C7FE9F69963FFCF27686A4F0C0E5F2C79079BCD4698CF25158997AC00A619E9A"
   },
   "candidate": {
-    "source_commit": "f0dd9f62adc8bf0a8eaaf9babc1fcfef9f3241ea",
-    "player_tree": "0229b2bb3ad0c514fc4dca18c32fd544b9ba7d72",
-    "package_root": "build/packages/f0dd9f62-root-r01"
+    "source_commit": "575e418c72eff2970fa5f6274956f6e8944d4e19",
+    "player_tree": "5ba53a8514b4641c749e91c0a68f32521fb3fee7",
+    "package_root": "build/packages/575e418c-root-r01"
   },
   "mods": [
     {"name": "base", "version": "2.1.23", "enabled": true},
@@ -32,7 +32,7 @@
   "archive_sha256": {
     "mir-fixture-mir5-active-mods-observer_0.1.0.zip": "A15A7D628D66953D2E0C4D4FA288F47CBF9C5678327C7EB3D23ADB5DC78331C0",
     "mir-fixture-mir5-migration-origin-f200-120-source_0.2.0.zip": "3E4E51C3E67DFF85A721BAE94D30106D90C9A74DC56387DE89AE48EB2D44AFF3",
-    "more-infinite-research_5.0.21000.zip": "654C57DDCE2E994C1E8DDC4F808198D4FAC7EAB6284B18C4A628E6DA5465DE23"
+    "more-infinite-research_5.0.21000.zip": "A8D0A4590154F3106E59BDB269F1AEB3ED8CC523F18F00ED7D76DC89059F5B8D"
   },
   "scope": "Prepared direct published MIR 1.2.0 F200-to-current F210 Base successor using the passed protected R06 source save. The fixture checks the protected 34-row, recipe, worker-battery, queue and detached state, validates separately pinned current Base finite weapon vectors, and requires the old combined rocket/cannon .1 contribution before its one real current gear laboratory, reset, successor save and two read-only cold reloads. Native execution is pending. This profile does not select a repair, qualify Space Age or arbitrary persisted mod-settings inputs."
 }
