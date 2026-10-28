@@ -2172,7 +2172,9 @@
         "sha256": "B6EB9430056ABD384DB00F94929FE7DAC0A37441ACF4BC277946689682628852",
         "bytes": 1463293,
         "local_direct_library_status": "retained-local-copy-reported",
-        "native_status": "source-transition-chain-exists-for-prior-candidates-not-final-current-5-x"
+        "native_status": "passed-exact-473-to-current7a2-base-and-space-age-level-native-owner-routes",
+        "native_evidence": "spec/evidence/full-catalogue-473-current7a2-native-chain-r01.json",
+        "scope": "Protected original4.7.3 Base/Space Age saves reused; all declared level-backed/native-owner snapshots, one new candidate lab and two unchanged-byte cold reloads per destination. Two scripted Space Age rows remain presence-only; not their earned/runtime migration, arbitrary settings/mods, clients, performance or release."
       }
     ],
     "inapplicable_current_target": {
@@ -2843,37 +2845,51 @@
         {
           "edition": "f210",
           "origin_archive_sha256": "B6EB9430056ABD384DB00F94929FE7DAC0A37441ACF4BC277946689682628852",
-          "source_case": "source-transition-chain-exists-for-prior-candidates-not-final-current-5-x",
-          "final_5_x_case": "not_run",
+          "source_case": "passed-protected-exact473-base-and-space-age-original-sources",
+          "final_5_x_case": "closed-named-level-backed-native-owner-base-space-age-routes",
           "disposition": "not-a-cartesian-modset-matrix",
           "current_archive_sha256": "005D420671270306155CB4AC25E9CF77541202DFA16B206DCC016237619C9AA2",
           "current_completion": {
-            "status": "needs-correction",
-            "problem": "Current consumed-path applicability or successor packet is incomplete; older passes retain their original inputs. This is not a declared current-package failure.",
+            "status": "closed",
+            "problem": "Current005D/player505 Base and Space Age successors pass from the exact protected original4.7.3 saves; unchanged full-catalogue fixture024E, real new labs and two cold reloads per closure.",
             "scenarios": [
               {
                 "closure": "base",
-                "status": "needs-correction",
+                "status": "closed",
                 "current_archive_sha256": "005D420671270306155CB4AC25E9CF77541202DFA16B206DCC016237619C9AA2",
                 "existing_evidence": {
                   "path": "spec/evidence/full-catalogue-473-8f-native-chain.json",
                   "sha256": "E52C9BF84969E33D1C7132E97832CFAA29305FFEDBDE08DEC5C61E058997F60F"
                 },
-                "next_action": "Review all intervening consumed members from8F to current005D for this exact protected Base or Space Age save. Reuse only proven unchanged checks; otherwise bind the existing source save to current profile/fixture/independent expectations and execute the affected successor. Never recreate a valid source merely for a new candidate.",
-                "command_status": "not-ready: explicit consumed-path verdict or current successor packet"
+                "next_action": "Reuse the current exact named route under its original execution identity. Keep scripted earned-state, configured/provider/modpack/client/physical/performance coverage separate; do not recreate either valid source save.",
+                "command_status": "closed exact owner binding and native execution; packet/caller/source/result hashes are in the current chain",
+                "native_evidence": {
+                  "path": "spec/evidence/full-catalogue-473-current7a2-native-chain-r01.json",
+                  "sha256": "D5C756DCF181A2F81B9BCA5DD2F0D152A1B9B46AA13BFB9BF0B0B8CD86AD1359"
+                }
               },
               {
                 "closure": "space-age",
-                "status": "needs-correction",
+                "status": "closed",
                 "current_archive_sha256": "005D420671270306155CB4AC25E9CF77541202DFA16B206DCC016237619C9AA2",
                 "existing_evidence": {
                   "path": "spec/evidence/full-catalogue-473-8f-native-chain.json",
                   "sha256": "E52C9BF84969E33D1C7132E97832CFAA29305FFEDBDE08DEC5C61E058997F60F"
                 },
-                "next_action": "Review all intervening consumed members from8F to current005D for this exact protected Base or Space Age save. Reuse only proven unchanged checks; otherwise bind the existing source save to current profile/fixture/independent expectations and execute the affected successor. Never recreate a valid source merely for a new candidate.",
-                "command_status": "not-ready: explicit consumed-path verdict or current successor packet"
+                "next_action": "Reuse the current exact named route under its original execution identity. Keep scripted earned-state, configured/provider/modpack/client/physical/performance coverage separate; do not recreate either valid source save.",
+                "command_status": "closed exact owner binding and native execution; packet/caller/source/result hashes are in the current chain",
+                "native_evidence": {
+                  "path": "spec/evidence/full-catalogue-473-current7a2-native-chain-r01.json",
+                  "sha256": "D5C756DCF181A2F81B9BCA5DD2F0D152A1B9B46AA13BFB9BF0B0B8CD86AD1359"
+                }
               }
-            ]
+            ],
+            "scope": "Complete declared level-backed snapshots and source-read native owners for these two profiles. Scripted Space Age rows are presence-only and their earned/runtime migration remains a separate required subject.",
+            "native_evidence": {
+              "path": "spec/evidence/full-catalogue-473-current7a2-native-chain-r01.json",
+              "sha256": "D5C756DCF181A2F81B9BCA5DD2F0D152A1B9B46AA13BFB9BF0B0B8CD86AD1359"
+            },
+            "remaining_state_coverage": "Retain separate earned spoilage/agriculture migration/runtime requirements; presence of their two carrier rows is not a pass for those states."
           }
         }
       ]
