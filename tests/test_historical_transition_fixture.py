@@ -141,6 +141,8 @@ class HistoricalTransitionFixtureControls(unittest.TestCase):
         self.assertEqual((metadata["schema"], metadata["kind"], metadata["name"], metadata["version"],
                           metadata["predecessor_release"]),
                          (1, "MIR5HistoricalTransitionFixtureV1", "mir-fixture-mir5-historical-transition", "0.1.0", "v4.7.3"))
+        self.assertEqual((metadata["published_release_id"], metadata["published_tag_source"]),
+                         (422732162, "8643cc91bc915e008556a5315dbb0a743247e7ab"))
         self.assertEqual(set(metadata["targets"]), set(expected))
         for target, (published, mir5, archive) in expected.items():
             with self.subTest(metadata_target=target):
@@ -187,6 +189,12 @@ class HistoricalTransitionFixtureControls(unittest.TestCase):
         '''
         wrong_release = json.loads(json.dumps(metadata))
         wrong_release["predecessor_release"] = "v4.7.2"
+        wrong_release_id = json.loads(json.dumps(metadata))
+        wrong_release_id["published_release_id"] = 422732163
+        wrong_release_id_type = json.loads(json.dumps(metadata))
+        wrong_release_id_type["published_release_id"] = "422732162"
+        wrong_tag_source = json.loads(json.dumps(metadata))
+        wrong_tag_source["published_tag_source"] = "0" * 40
         wrong_hash = json.loads(json.dumps(metadata))
         wrong_hash["targets"]["f014"]["published_archive_sha256"] = "0" * 64
         stale_version = json.loads(json.dumps(metadata))
@@ -197,16 +205,23 @@ class HistoricalTransitionFixtureControls(unittest.TestCase):
             root = Path(work)
             paths = {
                 "release": root / "wrong-release.json",
+                "release_id": root / "wrong-release-id.json",
+                "release_id_type": root / "wrong-release-id-type.json",
+                "tag_source": root / "wrong-tag-source.json",
                 "hash": root / "wrong-hash.json",
                 "version": root / "stale-version.json",
                 "extra": root / "extra-target.json",
             }
-            for key, value in (("release", wrong_release), ("hash", wrong_hash),
+            for key, value in (("release", wrong_release), ("release_id", wrong_release_id),
+                               ("release_id_type", wrong_release_id_type), ("tag_source", wrong_tag_source), ("hash", wrong_hash),
                                ("version", stale_version), ("extra", extra_target)):
                 paths[key].write_text(json.dumps(value), encoding="utf-8")
             v473_rejection = v473_functions + r'''
               $checks=@(
                 @{path=$env:MIR_TEST_473_WRONG_RELEASE;target='f013';message='predecessor release'},
+                @{path=$env:MIR_TEST_473_WRONG_RELEASE_ID;target='f013';message='published release id'},
+                @{path=$env:MIR_TEST_473_WRONG_RELEASE_ID_TYPE;target='f013';message='published release id'},
+                @{path=$env:MIR_TEST_473_WRONG_TAG_SOURCE;target='f013';message='published tag source'},
                 @{path=$env:MIR_TEST_473_WRONG_HASH;target='f014';message='published archive hash'},
                 @{path=$env:MIR_TEST_473_STALE_VERSION;target='f015';message='MIR versions differ'},
                 @{path=$env:MIR_TEST_473_EXTRA_TARGET;target='f013';message='target set differs'}
@@ -223,7 +238,9 @@ class HistoricalTransitionFixtureControls(unittest.TestCase):
               if(-not $wrongTarget){throw 'v4.7.3 admitted unreviewed target'}
             '''
             v473_env = dict(os.environ, MIR_TEST_RUNNER=str(RUNNER), MIR_TEST_473=str(FIXTURE_473),
-                            MIR_TEST_473_WRONG_RELEASE=str(paths["release"]), MIR_TEST_473_WRONG_HASH=str(paths["hash"]),
+                            MIR_TEST_473_WRONG_RELEASE=str(paths["release"]), MIR_TEST_473_WRONG_RELEASE_ID=str(paths["release_id"]),
+                            MIR_TEST_473_WRONG_RELEASE_ID_TYPE=str(paths["release_id_type"]), MIR_TEST_473_WRONG_TAG_SOURCE=str(paths["tag_source"]),
+                            MIR_TEST_473_WRONG_HASH=str(paths["hash"]),
                             MIR_TEST_473_STALE_VERSION=str(paths["version"]), MIR_TEST_473_EXTRA_TARGET=str(paths["extra"]))
             result = subprocess.run(["pwsh", "-NoProfile", "-Command", v473_functions], cwd=ROOT,
                                     text=True, capture_output=True, env=v473_env, check=False)

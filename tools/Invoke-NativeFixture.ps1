@@ -321,6 +321,8 @@ function Get-HistoricalTransitionFixtureTarget([string]$Target,[string]$Metadata
   $predecessorRelease=$null
   if($value.ContainsKey('predecessor_release')){
     Assert-Fixture ($value.predecessor_release -is [string] -and $value.predecessor_release -ceq 'v4.7.3') 'historical transition predecessor release is unsupported'
+    Assert-Fixture ($value.ContainsKey('published_release_id') -and (($value.published_release_id -is [int]) -or ($value.published_release_id -is [long])) -and [long]$value.published_release_id -eq 422732162) 'historical transition published release id differs'
+    Assert-Fixture ($value.ContainsKey('published_tag_source') -and $value.published_tag_source -is [string] -and $value.published_tag_source -ceq '8643cc91bc915e008556a5315dbb0a743247e7ab') 'historical transition published tag source differs'
     $predecessorRelease=[string]$value.predecessor_release
     $expectedTargets=[ordered]@{
       f013=@{factorio_version='0.13';published_mir_version='4.7.01303';mir_version='5.0.01300';published_archive_sha256='3918B10A0902FABD09BEA6D1F0E7EFF06B20B84F3D8CC5EC73E36FEDAAE64D4D'}
