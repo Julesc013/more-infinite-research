@@ -1,0 +1,273 @@
+{
+  "schema": 1,
+  "kind": "MIRCapF210DirectAndDisabledAdverseNativeChainV1",
+  "status": "direct-passed-disabled-save-timeout-reenabled-not-executed",
+  "controller_commit": "f5e34fd84d1cb87248137986662f45f90ceaeb97",
+  "candidate_source": "7a2f93224c846b86261b2da709f50ea683fc708d",
+  "player_tree": "5058373348e9049f8b67ec4dbb79b400a904acd6",
+  "protected_source": {
+    "path": "build/qualification/cap-473-current7a2-r02-controller/native-published/write-data/saves/mir5-native-complete.zip",
+    "bytes": 932284,
+    "sha256": "81AFD312CB2391C7B0CF92C82CD022F93751E9E3FC99D181795078FC9651E4F9"
+  },
+  "source_actual_lab_completions_reused_not_new": 2,
+  "packet": {
+    "path": "build/qualification/cap-473-current7a2-successors-r03-controller/packet.json",
+    "bytes": 15534,
+    "sha256": "8A20FADA4BBCAFFAD988B5C2424B44D42E81B8F47B3EA9662E4AF354982039A4"
+  },
+  "caller": {
+    "path": "build/qualification/cap-473-current7a2-successors-r03-controller/Invoke-OwnedCap473.ps1",
+    "bytes": 7219,
+    "sha256": "4250B0B2601759BD312E82C36660A6A2690521BF38092C99AE7BE9971A5EFDCB"
+  },
+  "terminal": {
+    "path": "build/qualification/cap-473-current7a2-successors-r03-controller/execution-record/terminal.json",
+    "bytes": 21362,
+    "sha256": "C2007D27D26D419E8E35C3286F385E935E47B5F87ABF355D0A32BA7BA16A6F21"
+  },
+  "readback": {
+    "path": "build/qualification/cap-473-current7a2-successors-r03-controller/root-readback-r01.json",
+    "bytes": 24449,
+    "sha256": "89C815AB1FF4B1E4BD0BA585C21B831E481DC053241DC43FA70537EA8BDAE8D2"
+  },
+  "receipt_capsule": {
+    "path": "spec/evidence/cap-473-f210-direct-and-disabled-adverse-receipts-r03.json.gz",
+    "bytes": 16846,
+    "sha256": "BE967E95E74A56C751020196DF254B5BF8B0574FD2D5FCF38D891698F5E9A47A",
+    "records": 3,
+    "original_exact_bytes_round_trip": true
+  },
+  "cases": [
+    {
+      "id": "direct",
+      "result": {
+        "path": "build/qualification/cap-473-current7a2-successors-r03-controller/native-direct/result.json",
+        "bytes": 36065,
+        "sha256": "9CED02977CFFECD2457F416D318ADAE3F697792977947274B915D1805F5BAB2D"
+      },
+      "engine": {
+        "path": "D:\\Games\\Factorio\\2.1\\bin\\x64\\factorio.exe",
+        "sha256": "8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38",
+        "file_version": "2.1.23.87750",
+        "product_version": "2.1.23",
+        "base_version": "2.1.23"
+      },
+      "fixtures": [
+        {
+          "source": "D:\\Projects\\Factorio\\mir5-legacy-cannon-credit-r01\\build\\qualification\\cap-473-current7a2-successors-r03-inputs\\direct",
+          "sha256": "4CF3D3DF61F204748849AEA703B32C689406BA51937ED4E68BB11CE7DFE08526",
+          "archive": "D:\\Projects\\Factorio\\testmods\\2.1\\mir-fixture-mir5-f200-legacy-cap_0.5.0.zip"
+        },
+        {
+          "source": "D:\\Projects\\Factorio\\mir5-legacy-cannon-credit-r01\\build\\qualification\\cap-473-current7a2-r01-inputs\\observer-f210",
+          "sha256": "A15A7D628D66953D2E0C4D4FA288F47CBF9C5678327C7EB3D23ADB5DC78331C0",
+          "archive": "D:\\Projects\\Factorio\\testmods\\2.1\\mir-fixture-mir5-active-mods-observer_0.1.0.zip"
+        }
+      ],
+      "profile": {
+        "path": "D:\\Projects\\Factorio\\mir5-legacy-cannon-credit-r01\\build\\qualification\\cap-473-current7a2-successors-r03-inputs\\direct-profile.json",
+        "sha256": "648B32D079154D93C5B37C29E287653436F20C7B1B9D46C164C0A619B2EAF249"
+      },
+      "files": 18,
+      "bytes_per_copy": 1059585,
+      "initial": {
+        "stage": "initial",
+        "case": "f200-f210-positive-legacy-cap",
+        "status": "passed",
+        "qualification": "native-runner-readback-required",
+        "witnesses": {
+          "source_mir": "4.7.20003",
+          "destination_mir": "5.0.21000",
+          "source_actual_lab_completions": 2,
+          "destination_actual_lab_completions": 1,
+          "milestone": "actual2labs",
+          "next_level": 4,
+          "productivity_bonus": 0.03,
+          "player_enabled": true,
+          "player_visible_when_disabled": true,
+          "foreign_queue_progress": 0.42000000000000004,
+          "science_consumed_units": 0.7333333333333333,
+          "science_inventory_consumed_units": 1,
+          "science_type": "item",
+          "science_remaining_ticks": 44,
+          "science_processing_ticks": 44,
+          "science_elapsed_ticks": 43,
+          "science_units_after": {
+            "automation-science-pack": 21,
+            "logistic-science-pack": 21,
+            "chemical-science-pack": 21,
+            "production-science-pack": 21
+          },
+          "on_load_read_only": false
+        }
+      },
+      "completed_save": {
+        "path": "build/qualification/cap-473-current7a2-successors-r03-controller/native-direct/write-data/saves/mir5-native-complete.zip",
+        "bytes": 935489,
+        "sha256": "EDC7145BF4777E397E4083AFF049F6AE75F7358D07302167D86D3FB00EB33FBD"
+      },
+      "cold_reloads": [
+        {
+          "ordinal": 1,
+          "save_sha256": "EDC7145BF4777E397E4083AFF049F6AE75F7358D07302167D86D3FB00EB33FBD",
+          "save_byte_identical": true,
+          "observation": {
+            "stage": "reload",
+            "case": "f200-f210-positive-legacy-cap",
+            "status": "passed",
+            "qualification": "native-runner-readback-required",
+            "witnesses": {
+              "source_mir": "4.7.20003",
+              "destination_mir": "5.0.21000",
+              "source_actual_lab_completions": 2,
+              "destination_actual_lab_completions": 1,
+              "milestone": "actual2labs",
+              "next_level": 4,
+              "productivity_bonus": 0.03,
+              "player_enabled": true,
+              "player_visible_when_disabled": true,
+              "foreign_queue_progress": 0.42000000000000004,
+              "science_consumed_units": 0.7333333333333333,
+              "science_inventory_consumed_units": 1,
+              "science_type": "item",
+              "science_remaining_ticks": 44,
+              "science_processing_ticks": 44,
+              "science_elapsed_ticks": 43,
+              "science_units_after": {
+                "automation-science-pack": 21,
+                "logistic-science-pack": 21,
+                "chemical-science-pack": 21,
+                "production-science-pack": 21
+              },
+              "on_load_read_only": true
+            }
+          }
+        },
+        {
+          "ordinal": 2,
+          "save_sha256": "EDC7145BF4777E397E4083AFF049F6AE75F7358D07302167D86D3FB00EB33FBD",
+          "save_byte_identical": true,
+          "observation": {
+            "stage": "reload",
+            "case": "f200-f210-positive-legacy-cap",
+            "status": "passed",
+            "qualification": "native-runner-readback-required",
+            "witnesses": {
+              "source_mir": "4.7.20003",
+              "destination_mir": "5.0.21000",
+              "source_actual_lab_completions": 2,
+              "destination_actual_lab_completions": 1,
+              "milestone": "actual2labs",
+              "next_level": 4,
+              "productivity_bonus": 0.03,
+              "player_enabled": true,
+              "player_visible_when_disabled": true,
+              "foreign_queue_progress": 0.42000000000000004,
+              "science_consumed_units": 0.7333333333333333,
+              "science_inventory_consumed_units": 1,
+              "science_type": "item",
+              "science_remaining_ticks": 44,
+              "science_processing_ticks": 44,
+              "science_elapsed_ticks": 43,
+              "science_units_after": {
+                "automation-science-pack": 21,
+                "logistic-science-pack": 21,
+                "chemical-science-pack": 21,
+                "production-science-pack": 21
+              },
+              "on_load_read_only": true
+            }
+          }
+        }
+      ],
+      "startup_logs": [
+        {
+          "path": "build/qualification/cap-473-current7a2-successors-r03-controller/native-direct/production.factorio.log",
+          "bytes": 14497,
+          "sha256": "502E007D29BF1C3FA3656624ED38D0076F7A590E7BE647A497E9E5180ACF0FD3"
+        },
+        {
+          "path": "build/qualification/cap-473-current7a2-successors-r03-controller/native-direct/reload-1.factorio.log",
+          "bytes": 12622,
+          "sha256": "0365AEFE93F12ECCE2CC587C99ED77270101AB567512200B980C42A31BD3CF09"
+        },
+        {
+          "path": "build/qualification/cap-473-current7a2-successors-r03-controller/native-direct/reload-2.factorio.log",
+          "bytes": 12622,
+          "sha256": "B9EF842B36844C16BFAB959CCDA59F7E610FAA23E5C2AD1BFF5BCFE3669A08AF"
+        }
+      ]
+    },
+    {
+      "id": "disabled",
+      "result": {
+        "path": "build/qualification/cap-473-current7a2-successors-r03-controller/native-disabled/result.json",
+        "bytes": 6829,
+        "sha256": "E920EB253FC283A4D52D8E6115C09D0DACF8B9F1E449EE27E17F9AD68D2B7675"
+      },
+      "engine": {
+        "path": "D:\\Games\\Factorio\\2.1\\bin\\x64\\factorio.exe",
+        "sha256": "8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38",
+        "file_version": "2.1.23.87750",
+        "product_version": "2.1.23",
+        "base_version": "2.1.23"
+      },
+      "fixtures": [
+        {
+          "source": "D:\\Projects\\Factorio\\mir5-legacy-cannon-credit-r01\\build\\qualification\\cap-473-current7a2-successors-r03-inputs\\disabled",
+          "sha256": "3F089FE5F708BD6CDC77CFB127B51F6421708EF64310D7516707B6EC7851001F",
+          "archive": "D:\\Projects\\Factorio\\testmods\\2.1\\mir-fixture-mir5-f200-legacy-cap_0.6.0.zip"
+        },
+        {
+          "source": "D:\\Projects\\Factorio\\mir5-legacy-cannon-credit-r01\\build\\qualification\\cap-473-current7a2-r01-inputs\\observer-f210",
+          "sha256": "A15A7D628D66953D2E0C4D4FA288F47CBF9C5678327C7EB3D23ADB5DC78331C0",
+          "archive": "D:\\Projects\\Factorio\\testmods\\2.1\\mir-fixture-mir5-active-mods-observer_0.1.0.zip"
+        }
+      ],
+      "profile": {
+        "path": "D:\\Projects\\Factorio\\mir5-legacy-cannon-credit-r01\\build\\qualification\\cap-473-current7a2-successors-r03-inputs\\disabled-profile.json",
+        "sha256": "F0D0008F7F13E13CD6D6F6E655A29607CB3833AFA4A7DD9D7AF27125505BD4D4"
+      },
+      "files": 61,
+      "bytes_per_copy": 8933646,
+      "status": "failed-timeout-no-saved-intermediate",
+      "initial_marker_not_completion": {
+        "stage": "initial",
+        "case": "f200-f210-positive-legacy-cap-disabled",
+        "status": "passed",
+        "qualification": "native-runner-readback-required",
+        "witnesses": {
+          "source_mir": "4.7.20003",
+          "destination_mir": "5.0.21000",
+          "source_actual_lab_completions": 2,
+          "destination_actual_lab_completions": 0,
+          "disabled_intermediate_observed": true,
+          "next_level": 3,
+          "productivity_bonus": 0.02,
+          "player_enabled": false,
+          "player_visible_when_disabled": true,
+          "saved_progress": 0.27,
+          "foreign_queue_progress": 0.42000000000000004,
+          "foreign_disabled": true,
+          "on_load_read_only": false
+        }
+      },
+      "log": {
+        "path": "build/qualification/cap-473-current7a2-successors-r03-controller/native-disabled/write-data/factorio-current.log",
+        "bytes": 13570,
+        "sha256": "CBEC88B81D8C144AB1B711C69B4E62DCB166108D99158C7AE5AE69552628A690"
+      }
+    }
+  ],
+  "actual_native_processes": 4,
+  "actual_new_successor_lab_completions": 1,
+  "actual_read_only_cold_reloads": 2,
+  "factorio_processes_after_restoration": 0,
+  "limits": [
+    "Direct0.5 alone qualifies the demonstrated81AF/005D/8DC route and its saved successor. Earlier original tool-only fixture adverse3F3F remains preserved.",
+    "Disabled0.6 initial configuration assertions pass, but no save is produced before180s timeout. This is not a completed disabled migration or reload pass. Reenabled0.7 was not launched.",
+    "Disabled fixture invokes server_save inside configuration callback and has no initial-save action in its completed on_tick branch. Lifecycle correction/host review and missing disabled/reenabled native stages remain required; no product defect is inferred from this timeout alone.",
+    "F200 same-engine, earlier structured-V3/worker tails, other settings/providers, ordinary tuning, physical output, clients and performance remain separate."
+  ]
+}
