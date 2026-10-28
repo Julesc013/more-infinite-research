@@ -28,6 +28,7 @@ GEAR = "recipe-prod-research_gears-1"
 ENGINE_SHA = "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B"
 OBSERVER_SHA = "723D1E7721449FC26040E5E6629416767BDC20AD79CF8723115846DB662A1F87"
 MIR_SHA = "050AC35BAB6BA1F01E160DB612B73A03E58E0ABE6A291D18109FAB1B235B63B5"
+F0DD_MIR_SHA = "20A200883EFB29F8D216EA408C688F1862C80612D536DCD4FCDDC1E47768541D"
 STAGES = {"source": ("0.1.0", 0), "finite": ("0.2.0", 1), "relaxed": ("0.3.0", 0)}
 FIXTURE_REVISION = "24dd0497e8f550b8b2bc2dc74b885d7a606dcf08"
 INPUT_RECEIPT = ROOT / "spec" / "evidence" / "f200-foreign-cap-baseline-c74-prepared-inputs-r02.json"
@@ -35,6 +36,11 @@ PROFILES = {
     "source": ROOT / "tests" / "profiles" / "f200-foreign-cap-baseline-source-2077.json",
     "finite": ROOT / "tests" / "profiles" / "f200-foreign-cap-baseline-finite-2077.json",
     "relaxed": ROOT / "tests" / "profiles" / "f200-foreign-cap-baseline-relaxed-2077.json",
+}
+F0DD_PROFILES = {
+    "source": ROOT / "tests" / "profiles" / "f200-foreign-cap-baseline-source-f0dd-2077.json",
+    "finite": ROOT / "tests" / "profiles" / "f200-foreign-cap-baseline-finite-f0dd-2077.json",
+    "relaxed": ROOT / "tests" / "profiles" / "f200-foreign-cap-baseline-relaxed-f0dd-2077.json",
 }
 PACKAGE_SPEC = importlib.util.spec_from_file_location("mir_package", ROOT / "tools" / "package.py")
 PACKAGE = importlib.util.module_from_spec(PACKAGE_SPEC)
@@ -315,6 +321,42 @@ end
                     self.assertNotIn("InputSavePath", profile["scope"])
                 else:
                     self.assertIn("InputSavePath/ExpectedInputSaveSha256", profile["scope"])
+
+    def test_f0dd_rebind_profiles_change_only_the_current_f200_archive(self):
+        fixture_hashes = {
+            "source": "3D514CCF22CD1B42DB28DEE2DE928D5A8DBC73E9E1A8B45BBBC32F87F1601651",
+            "finite": "71440309308B3E82F23E21597CC1AE49C79E9BFF4A69388F104B86FB5DCA304E",
+            "relaxed": "E76721DC9C0EE5858366ED2C4C589862572303B0616EE8B5E5DE249B7F9CE875",
+        }
+        for stage, (version, _) in STAGES.items():
+            with self.subTest(stage=stage):
+                old = json.loads(PROFILES[stage].read_text(encoding="utf-8"))
+                profile = json.loads(F0DD_PROFILES[stage].read_text(encoding="utf-8"))
+                self.assertEqual(old["schema"], profile["schema"])
+                self.assertEqual(old["kind"], profile["kind"])
+                self.assertEqual(old["target"], profile["target"])
+                self.assertEqual(old["factorio_line"], profile["factorio_line"])
+                self.assertEqual(old["engine"], profile["engine"])
+                self.assertEqual(old["settings_mode"], profile["settings_mode"])
+                self.assertEqual(old["mods"], profile["mods"])
+                old_archives = dict(old["archive_sha256"])
+                f0dd_archives = dict(profile["archive_sha256"])
+                self.assertEqual(set(old_archives), set(f0dd_archives))
+                self.assertEqual(MIR_SHA, old_archives.pop("more-infinite-research_5.0.20000.zip"))
+                self.assertEqual(F0DD_MIR_SHA,
+                                 f0dd_archives.pop("more-infinite-research_5.0.20000.zip"))
+                self.assertEqual(old_archives, f0dd_archives)
+                self.assertEqual(OBSERVER_SHA,
+                                 profile["archive_sha256"]["mir-fixture-mir5-active-mods-observer_0.1.0.zip"])
+                self.assertEqual(fixture_hashes[stage],
+                                 profile["archive_sha256"][f"{NAME}_{version}.zip"])
+                self.assertEqual(F0DD_MIR_SHA,
+                                 profile["archive_sha256"]["more-infinite-research_5.0.20000.zip"])
+                self.assertIn("f0dd9f62", profile["scope"])
+                self.assertIn("no native pass", profile["scope"])
+                self.assertIn("c74b7c46", old["scope"])
+                self.assertEqual(MIR_SHA,
+                                 old["archive_sha256"]["more-infinite-research_5.0.20000.zip"])
 
     def test_prepared_input_receipt_binds_raw_git_members_and_generic_fixture_archives(self):
         receipt = json.loads(INPUT_RECEIPT.read_text(encoding="utf-8"))
