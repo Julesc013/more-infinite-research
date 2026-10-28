@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "kind": "MIRResponsiveMenuRepeatabilityDiagnosisV1",
-  "status": "retained-adverse-analyzed-diagnostic-not-executed",
+  "status": "retained-adverse-original-body-review-complete-diagnostic-not-executed",
   "reviewed_against_commit": "22c2f9a8e49047a03ea8d1d844d68a79c11bc749",
   "source_evidence": {
     "path": "spec/evidence/f210-575e-menu-native-chain-r01.json",
@@ -25,32 +25,88 @@
     "original_cohort_changed": false
   },
   "phase_readback": {
-    "source": "https://github.com/Julesc013/more-infinite-research/pull/1318#issuecomment-6467420956",
-    "provenance": "Black Glass reports retained private actor/log observations. Aero has independently checked endpoint values in the portable capsule but has not received the actor/log bodies. Treat the phase values as reported readback, not independently rehashed raw observations.",
+    "source": {
+      "source_commit": "be420eddff5a0e5d6ea6795d7f557eb901807d79",
+      "index": {
+        "path": "spec/evidence/f210-menu-aa-pilot-source-records-r01.json",
+        "sha256": "F1D3483D5BD1A7F4F0DBC1664E4DF7346EDC59231D27CB0A7D081DAE5D82E610"
+      },
+      "capsule": {
+        "path": "spec/evidence/f210-menu-aa-pilot-source-records-r01.json.gz",
+        "sha256": "10B29368299A2BF78E3A83EC113A156E0C68445D5A40A64AC19455E47CDC8A89",
+        "bytes": 38485
+      },
+      "independently_rehashed_records": 6,
+      "all_record_lengths_and_hashes_match": true,
+      "review": "https://github.com/Julesc013/more-infinite-research/pull/1328#issuecomment-6470803995",
+      "private_scope": "Only the six transported original actor/log/resource bodies were reviewed, not the entire469-file private campaign custody."
+    },
+    "provenance": "Aero independently decoded and rehashed both original actor JSONs, both Factorio logs and both process-resource ledgers delivered in PR1328. Actor2358/5A735 identities match the original cohort. No new native observation was collected.",
     "capture_attempts": [
       2,
       6
     ],
-    "segments_seconds": {
-      "initialised_seconds": [
-        30.126,
-        29.91
+    "same_qpc_segments_seconds": {
+      "launch_to_successful_main_capture": [
+        30.2866794,
+        32.0378456
       ],
-      "initialised_to_first_render_seconds": [
-        0.778038,
-        2.5393239
+      "successful_main_capture_duration": [
+        0.2754208,
+        0.2204742
       ],
-      "first_render_to_endpoint_seconds": [
+      "capture_end_to_first_render_observation": [
+        0.3419378,
+        0.1910041
+      ],
+      "launch_to_first_render_observation": [
+        30.904038,
+        32.4493239
+      ],
+      "first_render_to_endpoint": [
         0.8033633,
         1.141278
       ]
     },
-    "deltas_seconds": {
-      "initialised_seconds": -0.216,
-      "initialised_to_first_render_seconds": 1.7612859,
-      "first_render_to_endpoint_seconds": 0.3379147
+    "same_qpc_deltas_seconds": {
+      "endpoint_seconds": 1.8832006,
+      "first_render_observed_seconds": 1.5452859,
+      "post_first_render_seconds": 0.3379147,
+      "successful_main_capture_started_seconds": 1.7511662,
+      "successful_main_capture_duration_seconds": -0.0549466,
+      "successful_main_capture_end_to_observation_seconds": -0.1509337
     },
-    "inference": "Most of the observed A/A difference lies between engine-initialised and first-render observation. Capture attempts correlate with that interval but do not prove OCR, rendering, CPU, cache, thermal, power or background-process cause. Factorio log time and actor QPC time use different origins; segment arithmetic assumes comparable elapsed origins and requires raw launch-bracket/log review."
+    "separate_engine_log_clock": {
+      "initialised_seconds": [
+        30.126,
+        29.91
+      ],
+      "difference_seconds": -0.216,
+      "limitation": "Same-QPC endpoint delta decomposes exactly into first-render-observation and subsequent response deltas. Engine log elapsed clocks have separate origins; no exact mixed-clock causal decomposition is asserted."
+    },
+    "observer_controls": {
+      "windows_pixels": [
+        [
+          2560,
+          1440
+        ],
+        [
+          2560,
+          1440
+        ]
+      ],
+      "resource_ledger_rows": [
+        26,
+        27
+      ],
+      "recorded_visibility_foreground_geometry_occlusion_rejections_all_zero": true,
+      "captured_frames": [
+        2,
+        6
+      ],
+      "limitation": "No recorded rejection is not proof that OS/background activity was absent; per-attempt states and CPU/GPU/disk/thermal cause remain unavailable."
+    },
+    "inference": "No recorded capture/visibility/foreground/occlusion rejection counter is nonzero. Pilot6 captures6 versus2 frames, but no per-attempt state/timeline is retained. Its eventual successful main capture is faster, not slower; the added delay occurs before that capture/recognition and partly after first-menu observation. Cause remains unestablished."
   },
   "known_controls": {
     "same_engine_sha256": "8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38",
@@ -97,10 +153,10 @@
     }
   ],
   "next_diagnostic": {
-    "status": "preparation-required-before-native-assignment",
-    "owner": "Black Glass sole native owner, after its active Library assignment; Aero prepares/reviews",
+    "status": "host-prepared-original-body-review-complete-owner-quiet-preflight-and-freeze-pending",
+    "owner": "Black Glass sole native owner; respects its one-active/one-pending schedule. Aero completed original-body review.",
     "purpose": "One bounded quiet identical-published experiment to explain the observed control noise. It cannot replace the retained failed38-sample cohort or establish final505 product speed.",
-    "first_action": "Export the already-retained two pilot actor-result.json, factorio.log and process resource records with original hashes; review launch clocks, attempt timestamps, endpoint/capture state and recorded activity before new execution. Request is PR1318 comment6467804073. No new run is required to supply existing records.",
+    "first_action": "Body delivery/review is complete at phase_readback.source above. When the sole native lane permits, reserve a quiet block, bind exact owner locators and retain actual preflight plus committed caller/plan before one fixed5 diagnostic. No further original-body export or decoding is pending.",
     "fixed_new_schedule": [
       "published-warmup",
       "published-diagnostic-1",
@@ -111,8 +167,8 @@
     "maximum_factorio_launches": 5,
     "existing_helper": "tools/lib/validation/DirectLibraryStartupMeasurement.ps1::Invoke-MIRDirectLibraryResponsiveMenuSample",
     "helper_sha256": "D069C014D74E883C249928E812A258E2A2CB34AFE499219CB46A513345C2EC34",
-    "command_template": "Invoke-MIRDirectLibraryResponsiveMenuSample -RepoRoot $Repo -FactorioBin $FactorioBin -LibraryDirectory $Library -EngineDataDirectory $EngineData -BaseRows $PinnedRows -RunRoot $UniqueRun -WriteDataRoot $SharedWriteData -Label $FrozenLabel -Resources $GovernedContext -MirArchive $PublishedVersion -TimeoutSeconds 300 -OrdinaryPlayerConfig $PinnedOrdinaryConfig -OrdinaryMenuPreparation $PinnedSeedPreparation -ActiveModsObserver mir-fixture-mir5-active-mods-observer",
-    "preparation_gap": "Freeze and review a small caller plus exact selected-archive map from the original retained inputs. Initialize the shared write-data once with the existing credential-free seed helper, use the existing resource context/admission and direct-library activation/restoration, then invoke this existing helper exactly five times. No new CLI switch, AST-extracted runner or unchecked hand launch. This template is not claimed to be a ready executable packet.",
+    "command_template": "tools/Invoke-MenuComparison.ps1 -RepeatabilityDiagnostic with the exact parameters in spec/evidence/f210-menu-repeatability-prepared-command-r01.json; inspect -PlanOnly and retain actual -Preflight before the owner freezes execution.",
+    "preparation_gap": "Only owner quiet-window scheduling, actual input/preflight readback and committed caller freeze remain before execution. The accepted1324 mode reuses the existing guarded runner/sample helper; do not revive the unadopted duplicate controller prototypes.",
     "input_bindings": {
       "factorio": {
         "path": "D:\\Games\\Factorio\\2.1\\bin\\x64\\factorio.exe",
@@ -166,7 +222,7 @@
     },
     "stop_rule": "Stop on first governed refusal, endpoint failure, input drift or unsafe control restoration; retain partial/adverse observations. Do not extend five launches or loop unchanged runs.",
     "after_diagnostic": "If observations establish repeatability under a valid method, freeze one complete final-candidate comparison with the unchanged endpoint/acceptance policy using tools/Invoke-MenuComparison.ps1. If the method is demonstrably unsuitable, review an explicit protocol correction before collecting a replacement acceptance dataset; preserve original failure.",
-    "protocol_boundary": "The existing comparison CLI remains unchanged and admits8/64 full blocks. This separately proposed diagnostic schedule uses its existing guarded sample helper; it is not a shortened acceptance campaign. The maintainer requested a bounded quiet identical-build diagnostic before another complete comparison. Caller/exact-input review is still required before this preparation becomes executable."
+    "protocol_boundary": "The accepted1324 runner has one fixed5 published-only diagnostic mode. Ordinary8/64-block comparison behavior remains unchanged. Diagnostic plan/result kinds are distinct and cannot become shortened product acceptance. The old no-new-CLI proposal is retained only in original_diagnosis history."
   },
   "claims": {
     "new_native_execution": false,
@@ -175,5 +231,10 @@
     "memory_acceptance": false,
     "release_qualification": false
   },
-  "complete_cohort_retained_at_original_source_evidence": true
+  "complete_cohort_retained_at_original_source_evidence": true,
+  "original_diagnosis": {
+    "source_commit": "6ae667ad208eec0d125b9cd05db0db501c14a4ea",
+    "sha256": "3164DC8DEFC2B4E0B60C08FD526284113164848A38E0872B5DFEE9F17E1C1E9D",
+    "scope": "Preserves the original reported-phase interpretation and preparation proposal in Git; current body review below supersedes its untransported/readiness statements, not the original failed native verdict."
+  }
 }

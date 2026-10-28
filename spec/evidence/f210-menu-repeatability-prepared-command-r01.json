@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "kind": "MIRResponsiveMenuRepeatabilityPreparedCommandV1",
-  "status": "host-validated-packet-native-body-review-and-owner-preflight-pending",
+  "status": "host-validated-packet-original-body-review-complete-owner-preflight-pending",
   "review_unit_base": "ba750fd662a03b8233c717ed58714b3e92772f37",
   "script": {
     "path": "tools/Invoke-MenuComparison.ps1",
@@ -9,7 +9,8 @@
   },
   "retained_diagnosis": {
     "path": "spec/evidence/f210-menu-repeatability-diagnosis-r01.json",
-    "sha256": "3164DC8DEFC2B4E0B60C08FD526284113164848A38E0872B5DFEE9F17E1C1E9D"
+    "sha256": "77AF8C228BB05283CB3B03439E9C1EA434A719391834FCA6DF147CFAC1A3B0A8",
+    "original_review_sha256": "3164DC8DEFC2B4E0B60C08FD526284113164848A38E0872B5DFEE9F17E1C1E9D"
   },
   "original_frozen_plan": {
     "path": "build/qualification/f210-performance-575e-menu-r01/plan.json",
@@ -52,7 +53,7 @@
     "archive_authority": "Use the existing profile05F278 and its32 declared external hashes plus exact B6. The runner now checks that existing declaration against measured selected inputs before output/launch. There is no second editable archive-map authority.",
     "preconditions": [
       "Black Glass owns the sole native lane and must reserve a quiet block after its current assignment, with builds/host suites/other Factorio/heavy jobs held.",
-      "First deliver and independently review the already-retained two original pilot actor-result.json, per-pilot factorio.log and resource ledger bodies against original custody. The source diagnosis/PR1318 comment6467804073 records the request; do not rerun to supply existing files.",
+      "Satisfied: original two-pilot actor/log/resource bodies were delivered in PR1328 and independently rehashed/reviewed. See original_body_review; retain the original failed cohort. No additional body export or new run is needed for this prerequisite.",
       "Freeze exact committed script/parameters/output root; inspect the verification plan and development health; run -Preflight and retain its result. Preflight presence alone does not attest native inputs.",
       "Use a fresh empty checkout-local output root. Stop on refusal/input drift/endpoint failure/control restoration failure; retain adverse and partial output."
     ],
@@ -71,5 +72,11 @@
     "release_qualification": false
   },
   "path_policy": "Profile and output are checkout-relative. Other original BG paths may be replaced only by owner locators for the exact same pinned bytes before freezing; no moving source or archive substitution.",
-  "default_plan_equivalence": "All parsed fields of the ordinary8-block plan exactly equal the retained original38-sample native-output plan under the same declared policy."
+  "default_plan_equivalence": "All parsed fields of the ordinary8-block plan exactly equal the retained original38-sample native-output plan under the same declared policy.",
+  "original_body_review": {
+    "status": "complete",
+    "evidence_path": "spec/evidence/f210-menu-aa-pilot-source-records-r01.json",
+    "independent_review": "https://github.com/Julesc013/more-infinite-research/pull/1328#issuecomment-6470803995",
+    "scope": "Six original bodies match declared hashes/lengths. The hash-bound retained_diagnosis contains the independent phase readback and limits."
+  }
 }
