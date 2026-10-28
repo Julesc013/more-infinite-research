@@ -1,0 +1,132 @@
+{
+  "schema": 1,
+  "kind": "MIRMigrationConsumedInputApplicabilityV1",
+  "status": "scoped-VER06-reuse-no-new-native-execution",
+  "reviewed_commit": "22c2f9a8e49047a03ea8d1d844d68a79c11bc749",
+  "current_source": "7a2f93224c846b86261b2da709f50ea683fc708d",
+  "current_player_tree": "5058373348e9049f8b67ec4dbb79b400a904acd6",
+  "original_evidence": {
+    "path": "spec/evidence/migration-origin-120-575e-direct-native-chain-r01.json",
+    "sha256": "8B42D0FEC713CB6DD6CEC57C9C3BCA70ACA05E09ECE1228B36AE4F041733E240"
+  },
+  "protected_original_save": {
+    "path": "build/qualification/migration-origins/migration-origin-120-f200-source-r06-native/native-output/write-data/saves/mir5-native-complete.zip",
+    "sha256": "FDC9BA445B17716CAE7C021959B9B3BF4E1C7EE9F6485AA76DBCC59D70101CAC",
+    "bytes": 817810
+  },
+  "package_readback": [
+    {
+      "target": "f200",
+      "original_archive_sha256": "EF66506789F1C81F7E15ECF7048311865C2AB2B3D803E2736CD6B9567C6A3D2C",
+      "current_archive_sha256": "65FC7E907FE3198B7290167989FE2564C1474190D06DAD49860063BEC418EC60",
+      "members": 218,
+      "changed_members": [
+        {
+          "path": "changelog.txt",
+          "old_sha256": "9823A95AF154CD2443E20702DE926B3AD6DD089BF797D306AC436DA993F9F08A",
+          "current_sha256": "AD122D376100DE3DE84833CAA5289FDCCD2511CDE1670C1B9FA9644B29A22A77"
+        },
+        {
+          "path": "presentation/library_model.lua",
+          "old_sha256": "A69C5B5FB4FC37A03D29B2848F55EA26DC69489F066ECBC81A1AA30172420360",
+          "current_sha256": "591F69FDB536CF1F750AA711F876408617C2BE89A0BA4AB53AE6B99C43C94381"
+        },
+        {
+          "path": "research/catalogue.lua",
+          "old_sha256": "6E6600786BB2E58C90C505E5A10FDD8BBD62CA3B114EF377446C07B2ADFF66B7",
+          "current_sha256": "EACCBED9C41C08FE8236991FC92F7AED78B1CCD3D7BFBDD6729487342BA8CA2C"
+        },
+        {
+          "path": "runtime/library.lua",
+          "old_sha256": "2D76CCE7E46F6BB93EDEAC29ECC6DD265F00C401BF33DC9A5BA74F9E2D37532C",
+          "current_sha256": "24A7CC1A0D501BEDA5533FD19385B087D5FEB50629706B97CC12E723219E3EBB"
+        }
+      ],
+      "unchanged_payloads": 214,
+      "unchanged_payload_map_sha256": "9D5ABE466226390572DD26E472DDAE92576378B2B13E2B32722E1AA809B86F4D",
+      "original_engine_sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B",
+      "original_profile_sha256": "03DCE3D2518787C00A49DC383086F134952C9CDE4B3F994ABC2A54C885702528",
+      "original_fixture_sha256": "FE670CD6DE44FE3164F65C9D7A1702483E4A7EC2D59351519169B63A4BA4F078"
+    },
+    {
+      "target": "f210",
+      "original_archive_sha256": "A8D0A4590154F3106E59BDB269F1AEB3ED8CC523F18F00ED7D76DC89059F5B8D",
+      "current_archive_sha256": "005D420671270306155CB4AC25E9CF77541202DFA16B206DCC016237619C9AA2",
+      "members": 219,
+      "changed_members": [
+        {
+          "path": "changelog.txt",
+          "old_sha256": "9823A95AF154CD2443E20702DE926B3AD6DD089BF797D306AC436DA993F9F08A",
+          "current_sha256": "AD122D376100DE3DE84833CAA5289FDCCD2511CDE1670C1B9FA9644B29A22A77"
+        },
+        {
+          "path": "presentation/library_model.lua",
+          "old_sha256": "A69C5B5FB4FC37A03D29B2848F55EA26DC69489F066ECBC81A1AA30172420360",
+          "current_sha256": "591F69FDB536CF1F750AA711F876408617C2BE89A0BA4AB53AE6B99C43C94381"
+        },
+        {
+          "path": "research/catalogue.lua",
+          "old_sha256": "6E6600786BB2E58C90C505E5A10FDD8BBD62CA3B114EF377446C07B2ADFF66B7",
+          "current_sha256": "EACCBED9C41C08FE8236991FC92F7AED78B1CCD3D7BFBDD6729487342BA8CA2C"
+        },
+        {
+          "path": "runtime/library.lua",
+          "old_sha256": "2D76CCE7E46F6BB93EDEAC29ECC6DD265F00C401BF33DC9A5BA74F9E2D37532C",
+          "current_sha256": "24A7CC1A0D501BEDA5533FD19385B087D5FEB50629706B97CC12E723219E3EBB"
+        }
+      ],
+      "unchanged_payloads": 215,
+      "unchanged_payload_map_sha256": "F537BA48A9598C75438EB2BDB88FD14901D66C2894B1652F62991A33C26FA980",
+      "original_engine_sha256": "FE4A1DA30F322A0D0B8AEB3DF7276332222BAAA143E2352569B723E84B2B9060",
+      "original_profile_sha256": "0A33C8B9BA8A1B6EBE24B2E919F4B44AB3C27FE0A943721B1333B168935A54A4",
+      "original_fixture_sha256": "3E4E51C3E67DFF85A721BAE94D30106D90C9A74DC56387DE89AE48EB2D44AFF3"
+    }
+  ],
+  "unchanged_loaded_recovery_members": [
+    {
+      "path": "source/data-final-fixes.lua",
+      "sha256": "F907FA9EE1EFEBEAAE57D915FFB49C62B322CF8A13B540D9BDB0B4C95539B758"
+    },
+    {
+      "path": "source/research/generator.lua",
+      "sha256": "88626C760C43D51FEDB3C7233523FAD3355404C3548A79F872940E6B019FE526"
+    },
+    {
+      "path": "source/runtime/bootstrap.lua",
+      "sha256": "9082E729CAC88C38182576DE88B5B2C378ECD0333339BAAE0A93DAD0DDFB8EDB"
+    },
+    {
+      "path": "source/runtime/legacy_cannon_credits.lua",
+      "sha256": "60FEE07DBFC9590F5426925E05CA287FC386DCDE5C2BF8EC405B99D2BA920DCD"
+    },
+    {
+      "path": "source/runtime/lifecycle.lua",
+      "sha256": "85276D06C5C1842D5E8D98AA01FC6D96E6F7BC82F139602487356BC2DA103FFA"
+    },
+    {
+      "path": "source/runtime/native_credits.lua",
+      "sha256": "5A0B690558BA86805D9416FB7BA0EC049EDC28045EE10799B1D73A24E8CACBDB"
+    }
+  ],
+  "fixture_consumption_review": [
+    {
+      "path": "tests/fixtures/migration-origins/f200-120-source/control.lua",
+      "sha256": "6CC47608354C104159B5C4FB0389168AD08960CC673398A6AC156ACF4B79DE41",
+      "consumes": "Forces, native technology/effect state, labs, queues, fixture-local persistence and reset_effects. No real player, GUI, translation, render or Library interaction is created.",
+      "matches_original_fixture_commit": "e26bb227bf46f626964d1f3bfe272a6b36832c4d"
+    },
+    {
+      "path": "tests/fixtures/migration-origins/f200-120-successor/control.lua",
+      "sha256": "51BD85B127D850191998669DE2DA8F44E23A10F76D32F775D0619FDD266F9DCA",
+      "consumes": "Forces, native technology/effect state, labs, queues, fixture-local persistence and reset_effects. No real player, GUI, translation, render or Library interaction is created.",
+      "matches_original_fixture_commit": "a715adbe89468ba6d6a88526920d2d93af611244"
+    }
+  ],
+  "changed_code_review": "The four-ID catalogue addition allocates a detached private map without modifying prototypes/state. Every changed library_model/runtime Library branch is presentation, translation, detail/action or queue-display filtering. These headless source/successor fixtures create no players or Library operations, and the data-only1.2 producer has no MIR4 Library saved-state contract. All migration/emission/lifecycle/credit bytes and exact fixture/harness/engine/settings/save inputs remain those of the original chain. Changed control-parse map allocation does not change native force state. This is semantic applicability for the named headless checks, not whole-runtime byte equality.",
+  "qualified_scope": "Protected published1.2.0 FDC9 source to the original575e F200 and F210 Base routes:34 source rows, new lab, finite native weapon owners, legacy rocket/cannon credit, foreign queued42%/detached27%, reset_effects, saved successor and two cold reloads each. Original execution identities/receipts/adverses are unchanged.",
+  "excluded_scope": [
+    "No1.2.5 or1.2.9 native execution is inferred.",
+    "No Space Age, MIR Library persisted-player state, current GUI/client/queue display or arbitrary settings/save qualification.",
+    "No new timings, memory result, native launch or release verdict."
+  ]
+}
