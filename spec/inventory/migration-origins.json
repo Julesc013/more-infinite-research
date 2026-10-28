@@ -3767,13 +3767,17 @@
         },
         {
           "boundary": "MIR3.2 researched discovery and foreign locks",
-          "status": "needs-correction",
-          "problem": "Exact3.2.0 EC0E to a575/7CE no-helper R05 passed; current505 applicability is not yet pinned.",
-          "next_action": "Review unchanged native grant/queued-cost/state paths before reuse. Preserve ambiguous later foreign locks and offer explicit operator repair; no automatic helper or inferred3.2.1 pass.",
+          "status": "ready-to-execute",
+          "problem": "Protected3.2.0 EC0E and original7CE R05 result remain qualified at their original inputs. Current005D successor/profile/fixture/observer/runner inputs are separately prepared; the current native route is unrun.",
+          "next_action": "When the native owner has a free assignment slot, bind actual EC0E/8DC/library/output and both verified A7E successor plus2E1 observer FixtureSources, then run the current005D R05 no-helper gear/save/two-reload case. Preserve iron unit/42% queue, foreign27%/lock and ambiguous later locks; no inferred3.2.1 pass or automatic repair.",
           "evidence": [
             {
               "path": "spec/evidence/discovery-recovery-a575-native-chain-r05.json",
               "sha256": "BA4FF5A3CD12904B9EEC3A60193C11DC6E314C2DD7130BD75BD6E1E0CAD6EF08"
+            },
+            {
+              "path": "spec/evidence/discovery-recovery-current005d-prepared-inputs-r01.json",
+              "sha256": "99419065B9E62F38327C241644D65F76BF888E3C79DB60EB8808E5C3833FE403"
             }
           ]
         },
@@ -3842,8 +3846,8 @@
         {
           "boundary": "Published F200 cap disabled/re-enabled and V3 F210 worker tails",
           "status": "needs-correction",
-          "problem": "Actual exact4.7.20003 positive-cap source81AF now passes. Current005D F210 direct fixture fails before new lab/save because its science counter reads durability on2.1 ordinary items. Independent MIR-absent2.1.23 control confirms exactly one item consumed per pack from27-percent one-unit research; source/control cold reloads pass. Full cap successors remain open.",
-          "next_action": "Preserve source81AF and direct adverse3F3F; correct the bounded science counter with actual item/tool-specific accounting and independent under/over-consumption controls. Reuse81AF for missing direct, disabled0.6 and reenabled0.7 F210 successors after the separate stage-enablement fixture correction. Retain all ownership/foreign/progress/lab/save/two-reload expectations; earlierV3/worker and same-engine cases are not inferred.",
+          "problem": "Exact473 source81AF and current005D/8DC direct0.5 successor pass one new lab,44 processing ticks,one physical item per pack,save/two cold reloads. Disabled0.6 reaches initial assertions but times out180s before a save; reenabled0.7 is not launched. Earlier tool-only adverse remains preserved; missing lifecycle-corrected stages and distinct F200/V3/worker routes remain open.",
+          "next_action": "Retain direct R03 evidence without rerunning it. Correct/review the disabled fixture configuration-versus-first-tick save lifecycle, then run only disabled/reenabled stages from protected81AF. Do not infer same-engine F200, earlierV3 or worker closure.",
           "evidence": [
             {
               "path": "spec/evidence/f200-foreign-cap-baseline-f0dd-native-chain-r01.json",
@@ -3852,6 +3856,10 @@
             {
               "path": "spec/evidence/cap-473-f210-science-item-control-chain-r01.json",
               "sha256": "48CB8F1CBA162D2E1AB0A74BE4715AD56F6163AEE569C34465DFB253F14F7D0F"
+            },
+            {
+              "path": "spec/evidence/cap-473-f210-direct-and-disabled-adverse-chain-r03.json",
+              "scope": "Actual direct pass and disabled timeout at f5 controller; reenabled unexecuted."
             }
           ],
           "protected_473_cap_source": {
