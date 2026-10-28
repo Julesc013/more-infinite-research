@@ -3866,7 +3866,7 @@
         {
           "boundary": "Published F200 cap disabled/re-enabled and V3 F210 worker tails",
           "status": "needs-correction",
-          "problem": "R04 disabled-state save/two-reload stage passes,but reenabling staysdisabled. Correct-context R08 instrumented diagnostic observes current mir_caps playerrow disabledfalse already persisted in DBF98 despite retained legacy policy3/positive enabled_before_cap true/cap2/nil-prefix ownershipkey. Reenabling consumes the current negative row without enabling. R07 fixture-context nils are excluded from MIR ownership inference.",
+          "problem": "Direct0.5 and disabled0.6 save/two reloads pass at005D; reenabled0.7 fails nativeenabledfalse. R08 proves current negative already persisted inDBF98. First-disabled R10 trace from81AF now observes nativeenabledtrue/prototypefalse,no currentrow,validated legacy visibility-only import,and authored disablement stamping disabledfalse while writing nativefalse. Private read-only diagnostic only; no repaired player qualification.",
           "next_action": "R10 in Issue1350 confirms first-off liveenabledtrue/prototypefalse plus exactpositiveV3 becomes visibility-only import and then negative on MIR's actual policy write. The focused source correction carries only a new exact-row V3 signal within that configuration; currentnegative/foreign/unproven rows stay unchanged. Complete source review/CI, freeze corrected committed bytes and replay affected disabled/re-enabled stages from original81AF. RetainDBF98 and all diagnostics as originals; no negative override, source recreation or unrelated campaigns. Host controls are not a corrected native pass; separate F200/earlierV3/worker obligations remain.",
           "evidence": [
             {
@@ -3888,6 +3888,10 @@
             {
               "path": "spec/evidence/cap-owner-context-diagnostic-chain-r08.json",
               "scope": "Read-only instrumented MIR-own-context diagnosis; not ordinary005D acceptance. Earlier fixture-scope nils excluded."
+            },
+            {
+              "path": "spec/evidence/cap-first-disabled-owner-trace-chain-r10.json",
+              "scope": "One MIR-context first-disabled diagnostic startup; exact import-to-negative classification observed,not product acceptance."
             }
           ],
           "protected_473_cap_source": {
