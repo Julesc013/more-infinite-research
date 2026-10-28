@@ -7,7 +7,11 @@ assert(row.type == "technology" and row.name == plan.laser and row.level == 8
   "laser fixture native identity/progression differs")
 assert(data.raw.technology[plan.old_or_new_absent] == nil, "obsolete/forward laser identity present")
 local unit = assert(row.unit, "laser continuation unit absent")
-assert(unit.count == nil and unit.count_formula == "1*(1*1^(L-8))" and unit.time == 1,
+log("[MIR_LASER_PREFLIGHT] role=" .. plan.role .. " formula=" .. tostring(unit.count_formula)
+  .. " time=" .. tostring(unit.time) .. " level=" .. tostring(row.level) .. " maximum=" .. tostring(row.max_level))
+-- The independent selected settings specify constant cost1. The retained
+-- canonical formatter omits multiplication/exponentiation by one.
+assert(unit.count == nil and unit.count_formula == "1*(1)" and unit.time == 1,
   "laser fixture configured formula/time differs")
 local packs = {"automation-science-pack", "chemical-science-pack", "logistic-science-pack",
   "military-science-pack", "utility-science-pack"}

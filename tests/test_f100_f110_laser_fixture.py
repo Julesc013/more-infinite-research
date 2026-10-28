@@ -26,7 +26,7 @@ class LaserFixtureControls(unittest.TestCase):
           function laser_data(path, stage_path, row)
             local stage=assert(loadfile(stage_path))()
             local env={mods={base=stage.base,["more-infinite-research"]=stage.mir},
-              data={raw={technology={[stage.laser]=row}}},require=function(name)
+              data={raw={technology={[stage.laser]=row}}},log=function()end,require=function(name)
                 assert(name=="stage");return stage
               end}
             env._G=env;setmetatable(env,{__index=_G})
@@ -153,7 +153,7 @@ class LaserFixtureControls(unittest.TestCase):
         prefix = "laser-turret-speed-" if old else "laser-shooting-speed-"
         return {
             "type": "technology", "name": prefix + "8", "level": 8, "max_level": 12, "upgrade": True,
-            "unit": {"count_formula": "1*(1*1^(L-8))", "time": 1, "ingredients": [[n, 1] for n in PACKS]},
+            "unit": {"count_formula": "1*(1)", "time": 1, "ingredients": [[n, 1] for n in PACKS]},
             "effects": [{"type": "gun-speed", "ammo_category": "laser-turret" if old else "laser", "modifier": .01}],
             "prerequisites": ["chemical-science-pack", prefix + "6", prefix + "7", "logistic-science-pack",
                               "military-science-pack", "utility-science-pack"],
