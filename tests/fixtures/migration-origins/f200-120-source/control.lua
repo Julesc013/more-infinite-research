@@ -145,7 +145,7 @@ local function assert_same_snapshot(force, rows, weapons, expected, label)
   return actual
 end
 
-local function seed_rows(force, rows, weapons, label, preserve)
+local function seed_rows(force, rows, weapons, label, preserve, finite_seeds, finite_speed)
   force.enable_all_prototypes()
   for _, name in ipairs(rows) do
     local value = technology(force, name)
@@ -155,12 +155,15 @@ local function seed_rows(force, rows, weapons, label, preserve)
       if value.researched then fail(label .. " source row level seed unexpectedly researched: " .. name) end
     end
   end
-  local owner = technology(force, CATALOGUE.finite_weapon_seed)
-  prerequisites(owner)
-  owner.enabled, owner.researched = true, true
+  local seeded = {}
+  for _, name in ipairs(finite_seeds) do
+    local owner = technology(force, name)
+    prerequisites(owner)
+    owner.enabled, owner.researched, seeded[name] = true, true, true
+  end
   for _, name in ipairs(weapons) do
     local value = technology(force, name)
-    if name == CATALOGUE.finite_weapon_seed then
+    if seeded[name] then
       if value.level ~= 1 or value.researched ~= true then fail(label .. " finite weapon owner seed differs") end
     elseif value.researched ~= false then fail(label .. " finite weapon owner unexpectedly researched: " .. name) end
   end
@@ -168,7 +171,7 @@ local function seed_rows(force, rows, weapons, label, preserve)
   for category, expected in pairs(CATALOGUE.direct_gun_speed) do
     if not close(force.get_gun_speed_modifier(category), expected) then fail(label .. " source gun speed differs: " .. category) end
   end
-  for category, expected in pairs(CATALOGUE.finite_owner_gun_speed) do
+  for category, expected in pairs(finite_speed) do
     if not close(force.get_gun_speed_modifier(category), expected) then fail(label .. " finite weapon contribution differs: " .. category) end
   end
   if not close(force.worker_robots_battery_modifier, .1) then fail(label .. " robot battery contribution differs") end
@@ -227,7 +230,8 @@ end
 
 local function establish_foreign(rows, weapons)
   local foreign = game.create_force("mir5-migration-origin-f200-120-foreign")
-  seed_rows(foreign, rows, weapons, "foreign", CATALOGUE.direct)
+  seed_rows(foreign, rows, weapons, "foreign", CATALOGUE.direct,
+    CATALOGUE.finite_weapon_seed_sets.foreign, CATALOGUE.finite_owner_gun_speed.foreign)
   local direct, probe = technology(foreign, CATALOGUE.direct), technology(foreign, "recipe-prod-research_plastic-1")
   prerequisites(direct); prerequisites(probe)
   direct.saved_progress, probe.saved_progress = .42, 0
@@ -237,7 +241,8 @@ end
 
 local function establish_detached(rows, weapons)
   local detached = game.create_force("mir5-migration-origin-f200-120-detached")
-  seed_rows(detached, rows, weapons, "detached", CATALOGUE.direct)
+  seed_rows(detached, rows, weapons, "detached", CATALOGUE.direct,
+    CATALOGUE.finite_weapon_seed_sets.detached, CATALOGUE.finite_owner_gun_speed.detached)
   technology(detached, CATALOGUE.direct).saved_progress = .27
   return detached.index, snapshot(detached, rows, weapons)
 end
@@ -247,7 +252,7 @@ local function marker(stage, value)
   log("[MIR5_NATIVE_FIXTURE] RESULT {"
     .. "\"case\":\"migration-origin-f200-120-source\","
     .. "\"stage\":\"" .. stage .. "\",\"status\":\"passed\",\"origin_tag\":\"1.2.0\","
-    .. "\"source_roster_rows\":34,\"player_scripted_row_seeds\":33,\"finite_weapon_owner_seeds\":1,"
+    .. "\"source_roster_rows\":34,\"player_scripted_row_seeds\":33,\"player_finite_weapon_owner_seeds\":6,\"foreign_finite_weapon_owner_seeds\":1,"
     .. "\"source_direct_lab_completions\":" .. tostring(value.source_labs or 0) .. ","
     .. "\"foreign_queue_progress\":0.42,\"detached_progress\":0.27,"
     .. "\"source_gear_productivity\":" .. tostring(player.recipes["iron-gear-wheel"].productivity_bonus) .. ","
@@ -262,7 +267,8 @@ local function init()
   local player = game.forces.player
   local rows, weapons = source_rows(player), weapon_rows(player)
   game.speed = 16
-  seed_rows(player, rows, weapons, "source player", CATALOGUE.direct)
+  seed_rows(player, rows, weapons, "source player", CATALOGUE.direct,
+    CATALOGUE.finite_weapon_seed_sets.player, CATALOGUE.finite_owner_gun_speed.player)
   local direct = technology(player, CATALOGUE.direct)
   prerequisites(direct)
   direct.enabled = true

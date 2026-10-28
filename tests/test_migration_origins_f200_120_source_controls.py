@@ -16,7 +16,7 @@ FACTS_SHA256 = "A017240FA9AF6E438462F5417397DBC3768AE1CC0BDB0DF5EE9D5313E593F98F
 # This is the complete static fixture catalogue rendered once from the
 # independently captured 7714/C512 selected-native-facts projection.  It is
 # deliberately pinned here rather than reconstructed from current MIR code.
-CATALOGUE_SHA256 = "FAA7EA3CFE3FD0657845F4697A7214F442621A1AC1C380EAC18BAC3A1BF91A51"
+CATALOGUE_SHA256 = "C1E20AAF89944FF483C032FD0092783110CA38C5EDA3D7E1F0503480F25EE8E1"
 FIXTURE_NAME = "mir-fixture-mir5-migration-origin-f200-120-source"
 
 
@@ -106,9 +106,13 @@ class MigrationOriginF200120SourceControls(unittest.TestCase):
         self.assertEqual({"bool-setting": 45, "int-setting": 88, "double-setting": 44}, self.catalogue["setting_counts"])
         self.assertEqual(177, len(self.catalogue["settings"]))
         self.assertEqual("recipe-prod-research_gears-1", self.catalogue["direct"])
-        self.assertEqual("weapon-shooting-speed-1", self.catalogue["finite_weapon_seed"])
+        self.assertEqual(tuple(f"weapon-shooting-speed-{level}" for level in range(1, 7)),
+                         tuple(self.catalogue["finite_weapon_seed_sets"]["player"]))
+        self.assertEqual(("weapon-shooting-speed-1",), tuple(self.catalogue["finite_weapon_seed_sets"]["foreign"]))
+        self.assertEqual({}, self.catalogue["finite_weapon_seed_sets"]["detached"])
         self.assertEqual(("rocket", "cannon-shell", "electric", "flamethrower"), tuple(self.catalogue["gun_categories"]))
-        self.assertEqual({"bullet": .1, "shotgun-shell": .1}, self.catalogue["finite_owner_gun_speed"])
+        self.assertEqual({"bullet": 1.5, "shotgun-shell": 1.6}, self.catalogue["finite_owner_gun_speed"]["player"])
+        self.assertEqual({"bullet": .1, "shotgun-shell": .1}, self.catalogue["finite_owner_gun_speed"]["foreign"])
         self.assertEqual(7, len(self.catalogue["weapons"]))
         self.assertEqual("8000 * 2^(L-1)", self.catalogue["source_formula"])
         self.assertEqual(60, self.catalogue["source_time"])
@@ -152,7 +156,9 @@ class MigrationOriginF200120SourceControls(unittest.TestCase):
 
     def test_control_retains_full_gun_snapshot_and_source_only_boundaries(self):
         control = (FIXTURE / "control.lua").read_text(encoding="utf-8")
-        self.assertIn("finite_weapon_owner_seeds", control)
+        self.assertIn("player_finite_weapon_owner_seeds", control)
+        self.assertIn("foreign_finite_weapon_owner_seeds", control)
+        self.assertIn("CATALOGUE.finite_weapon_seed_sets.player", control)
         self.assertIn("source_cannon_gun_speed", control)
         self.assertIn("foreign.research_queue, foreign.research_progress = {direct, probe}, .42", control)
         self.assertIn("saved_progress = .27", control)
@@ -202,7 +208,7 @@ class MigrationOriginF200120SourceControls(unittest.TestCase):
             end
             local force={technologies=technologies,recipes=recipes,worker_robots_battery_modifier=.1,guns={}}
             for category,value in pairs(catalogue.direct_gun_speed) do force.guns[category]=value end
-            for category,value in pairs(catalogue.finite_owner_gun_speed) do force.guns[category]=value end
+            for category,value in pairs(catalogue.finite_owner_gun_speed.player) do force.guns[category]=value end
             force.get_gun_speed_modifier=function(category) return force.guns[category] or 0 end
             local completed=upvalue(callbacks.events[2],"assert_completed")
             local same=upvalue(completed,"assert_same_snapshot")

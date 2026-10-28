@@ -2578,7 +2578,20 @@ return {
       }
     }
   },
-  finite_weapon_seed = "weapon-shooting-speed-1",
+  finite_weapon_seed_sets = {
+    player = {
+      "weapon-shooting-speed-1",
+      "weapon-shooting-speed-2",
+      "weapon-shooting-speed-3",
+      "weapon-shooting-speed-4",
+      "weapon-shooting-speed-5",
+      "weapon-shooting-speed-6"
+    },
+    foreign = {
+      "weapon-shooting-speed-1"
+    },
+    detached = {}
+  },
   gun_categories = {
     "rocket",
     "cannon-shell",
@@ -2592,8 +2605,18 @@ return {
     flamethrower = 0.10000000000000001
   },
   finite_owner_gun_speed = {
-    bullet = 0.10000000000000001,
-    ["shotgun-shell"] = 0.10000000000000001
+    player = {
+      bullet = 1.5,
+      ["shotgun-shell"] = 1.6000000000000001
+    },
+    foreign = {
+      bullet = 0.10000000000000001,
+      ["shotgun-shell"] = 0.10000000000000001
+    },
+    detached = {
+      bullet = 0,
+      ["shotgun-shell"] = 0
+    }
   },
   source_formula = "8000 * 2^(L-1)",
   source_time = 60
