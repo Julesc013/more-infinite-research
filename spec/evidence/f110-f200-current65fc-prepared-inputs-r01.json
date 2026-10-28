@@ -1,0 +1,232 @@
+{
+  "schema": 1,
+  "kind": "MIRF110F200CurrentPreparedInputsV1",
+  "status": "prepared-no-native-result",
+  "prepared_against_commit": "90e3e23cf4374ea5e8f9a4da65be7b2caf24607b",
+  "runner": {
+    "path": "tools/Invoke-NativeFixture.ps1",
+    "sha256": "744A6F27B1F23D350B283268AABA076D17B3D2145C27624CE938217BDB64A1F8",
+    "bytes": 69485
+  },
+  "profile": {
+    "path": "tests/profiles/f110-f200-transition-current65fc-f200-2077.json",
+    "sha256": "0B20051A3422C6FC393043DF005D7030A2096A48D4175747D32737BD75AC2393",
+    "bytes": 1283
+  },
+  "original_profile": {
+    "path": "tests/profiles/f110-f200-transition-mir5-f200-2077.json",
+    "sha256": "118702D87FB229D6C1095477922C97AF1F820E9190BF80D621E5CFA3E1357E9E",
+    "bytes": 1031,
+    "disposition": "Original a1fd/8BA selection and result retained unchanged; not relabelled."
+  },
+  "candidate": {
+    "source_commit": "7a2f93224c846b86261b2da709f50ea683fc708d",
+    "player_tree": "5058373348e9049f8b67ec4dbb79b400a904acd6",
+    "path": "build/qualification/current-assets-7a2-aero-independent-r01/more-infinite-research_5.0.20000.zip",
+    "sha256": "65FC7E907FE3198B7290167989FE2564C1474190D06DAD49860063BEC418EC60",
+    "bytes": 691666,
+    "filename": "more-infinite-research_5.0.20000.zip"
+  },
+  "engine": {
+    "version": "2.0.77",
+    "sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B"
+  },
+  "source": {
+    "chain": {
+      "path": "spec/evidence/f110-f200-published-source-r05-native-chain.json",
+      "sha256": "BFF56165FCB7B3F5F5FACA29EE9A4E244DCA92833C0A6CE247BE40CF67E83CE2",
+      "bytes": 6561
+    },
+    "published_version": "4.7.11003",
+    "published_archive_sha256": "66C127D8BFC1919FA88F19D2D9B3047316A1B90401CAA05A6D05979B7A099D1E",
+    "protected_save_sha256": "D524AA78440F242B179A1E9BC40BF89B87C1A66E99F64C14D3250DEAEBB69253",
+    "bytes": 821571,
+    "source_actual_labs_reused": 1,
+    "source_recreated": false,
+    "custody_limit": "Original save remains Black Glass custody and is not independently rehashed here."
+  },
+  "previous_successor": {
+    "chain": {
+      "path": "spec/evidence/f110-f200-a1fd-successor-recovery-chain.json",
+      "sha256": "BA37B082C7AE2261423A1AA0C86D57FE8738601F27BF73A6D7B69FBC1B981948",
+      "bytes": 11108
+    },
+    "candidate_source": "a1fd431bd25e646f801e68a8ad00a8abb49ee094",
+    "archive_sha256": "8BA029A01E1F08C311C6A127C81313D7664F0ABADAF3C79F84157775D35ADFD7",
+    "applicability": "Reuse the original source save only. Five F200 stage payloads and shared data-final match their a1fd sources. Current shared control differs: it adds inactive F110 same-edition branches and an applicable read-only saved-successor-queue check on cold reloads. Changed current player data/control and current fixture paths require fresh native execution; no VER-06 reuse of the old successor is claimed. Current F110 same-edition or another F200 source does not establish this bridge.",
+    "changed_consumed_scope": "Independent review found72 changed materialized F200 members, including data/catalogue/science/settings and bootstrap/lifecycle/caps/legacy_caps/cap_admission/native_credits/Library; presentation-only differences do not explain all consumed changes. This packet makes no old-successor reuse claim."
+  },
+  "fixture": {
+    "name": "mir-fixture-mir5-f110-f200-transition",
+    "version": "0.2.0",
+    "path": "build/qualification/f110-f200-current65fc-inputs-aero-r01/mir-fixture-mir5-f110-f200-transition_0.2.0.zip",
+    "sha256": "75A539F694DA4E2603CA74A3945E188169ACE4239EE9774D73F1F6713DAD9587",
+    "bytes": 8160,
+    "source": "build/qualification/f110-f200-current65fc-inputs-aero-r01/source",
+    "source_member_revision": "90e3e23cf4374ea5e8f9a4da65be7b2caf24607b",
+    "composition": {
+      "catalogue.lua": "tests/fixtures/f110-f200-transition/f200/successor/catalogue.lua",
+      "control.lua": "tests/fixtures/f110-f200-transition/f200/successor/control.lua",
+      "data-final-fixes.lua": "tests/fixtures/f110-f200-transition/f200/successor/data-final-fixes.lua",
+      "info.json": "tests/fixtures/f110-f200-transition/f200/successor/info.json",
+      "settings-updates.lua": "tests/fixtures/f110-f200-transition/f200/successor/settings-updates.lua",
+      "fixture_control.lua": "tests/fixtures/f110-f200-transition/shared/control.lua",
+      "fixture_data_final.lua": "tests/fixtures/f110-f200-transition/shared/data-final-fixes.lua"
+    },
+    "members": [
+      {
+        "path": "catalogue.lua",
+        "source_path": "tests/fixtures/f110-f200-transition/f200/successor/catalogue.lua",
+        "sha256": "2798D422DA96233AA1B034CE17D0CA91F5B1F9E657BC6D0AD52886E5AB2D620D",
+        "bytes": 867
+      },
+      {
+        "path": "control.lua",
+        "source_path": "tests/fixtures/f110-f200-transition/f200/successor/control.lua",
+        "sha256": "241F2A3287C9FCF7C32C0A1C85553E1D3FEC674234CFD1FB1809FFE0D2D12A35",
+        "bytes": 69
+      },
+      {
+        "path": "data-final-fixes.lua",
+        "source_path": "tests/fixtures/f110-f200-transition/f200/successor/data-final-fixes.lua",
+        "sha256": "F7610000ED8055FCDA3C842A4C45DFBE7AF94D6F67BBD1EF52E166FFD967D4C4",
+        "bytes": 1657
+      },
+      {
+        "path": "fixture_control.lua",
+        "source_path": "tests/fixtures/f110-f200-transition/shared/control.lua",
+        "sha256": "5EE5E4DA4673B4D1D92FD3F3B0D484B4B61EC235BAA52DD0CC3230EB954E473B",
+        "bytes": 23139
+      },
+      {
+        "path": "fixture_data_final.lua",
+        "source_path": "tests/fixtures/f110-f200-transition/shared/data-final-fixes.lua",
+        "sha256": "7800724E366BB792AA4EDA0CE834C943463A83AA439D91F6B2A1F2D900ED6426",
+        "bytes": 233
+      },
+      {
+        "path": "info.json",
+        "source_path": "tests/fixtures/f110-f200-transition/f200/successor/info.json",
+        "sha256": "92D434B7F6EDAEA47B2DEEC63CAD8DC59D69765312F5A7DF20E90AB87E9FD89C",
+        "bytes": 355
+      },
+      {
+        "path": "settings-updates.lua",
+        "source_path": "tests/fixtures/f110-f200-transition/f200/successor/settings-updates.lua",
+        "sha256": "190999CD0DDA458EAC183EA918AC9CDCE43AF66F2DCC6CAD68183DE5C3AF8444",
+        "bytes": 152
+      }
+    ],
+    "container_disposition": "New deterministic local container of seven pinned raw Git members; not relabelled as the old executed fixture ZIP.",
+    "a1fd_raw_git_comparison": [
+      {
+        "member": "catalogue.lua",
+        "original_path": "tests/fixtures/f110-f200-transition/f200/mir5/catalogue.lua",
+        "original_sha256": "2798D422DA96233AA1B034CE17D0CA91F5B1F9E657BC6D0AD52886E5AB2D620D",
+        "current_sha256": "2798D422DA96233AA1B034CE17D0CA91F5B1F9E657BC6D0AD52886E5AB2D620D",
+        "byte_identical": true
+      },
+      {
+        "member": "control.lua",
+        "original_path": "tests/fixtures/f110-f200-transition/f200/mir5/control.lua",
+        "original_sha256": "241F2A3287C9FCF7C32C0A1C85553E1D3FEC674234CFD1FB1809FFE0D2D12A35",
+        "current_sha256": "241F2A3287C9FCF7C32C0A1C85553E1D3FEC674234CFD1FB1809FFE0D2D12A35",
+        "byte_identical": true
+      },
+      {
+        "member": "data-final-fixes.lua",
+        "original_path": "tests/fixtures/f110-f200-transition/f200/mir5/data-final-fixes.lua",
+        "original_sha256": "F7610000ED8055FCDA3C842A4C45DFBE7AF94D6F67BBD1EF52E166FFD967D4C4",
+        "current_sha256": "F7610000ED8055FCDA3C842A4C45DFBE7AF94D6F67BBD1EF52E166FFD967D4C4",
+        "byte_identical": true
+      },
+      {
+        "member": "fixture_control.lua",
+        "original_path": "tests/fixtures/f110-f200-transition/shared/control.lua",
+        "original_sha256": "520E234E7C7DBDCE35BC0A1926D5E317FAB8812713042661C1F695714D7F7E12",
+        "current_sha256": "5EE5E4DA4673B4D1D92FD3F3B0D484B4B61EC235BAA52DD0CC3230EB954E473B",
+        "byte_identical": false
+      },
+      {
+        "member": "fixture_data_final.lua",
+        "original_path": "tests/fixtures/f110-f200-transition/shared/data-final-fixes.lua",
+        "original_sha256": "7800724E366BB792AA4EDA0CE834C943463A83AA439D91F6B2A1F2D900ED6426",
+        "current_sha256": "7800724E366BB792AA4EDA0CE834C943463A83AA439D91F6B2A1F2D900ED6426",
+        "byte_identical": true
+      },
+      {
+        "member": "info.json",
+        "original_path": "tests/fixtures/f110-f200-transition/f200/mir5/info.json",
+        "original_sha256": "92D434B7F6EDAEA47B2DEEC63CAD8DC59D69765312F5A7DF20E90AB87E9FD89C",
+        "current_sha256": "92D434B7F6EDAEA47B2DEEC63CAD8DC59D69765312F5A7DF20E90AB87E9FD89C",
+        "byte_identical": true
+      },
+      {
+        "member": "settings-updates.lua",
+        "original_path": "tests/fixtures/f110-f200-transition/f200/mir5/settings-updates.lua",
+        "original_sha256": "190999CD0DDA458EAC183EA918AC9CDCE43AF66F2DCC6CAD68183DE5C3AF8444",
+        "current_sha256": "190999CD0DDA458EAC183EA918AC9CDCE43AF66F2DCC6CAD68183DE5C3AF8444",
+        "byte_identical": true
+      }
+    ]
+  },
+  "arguments": {
+    "ArchiveLibrary": "<owner exclusive2.0 direct library>",
+    "FactorioBin": "<owner exact2.0.77/D3 executable>",
+    "ProfilePath": "tests/profiles/f110-f200-transition-current65fc-f200-2077.json",
+    "FixtureSources": [
+      "build/qualification/f110-f200-current65fc-inputs-aero-r01/source"
+    ],
+    "CaseName": "f110-f200-transition",
+    "InputSavePath": "<owner protectedD524 source ZIP>",
+    "ExpectedInputSaveSha256": "D524AA78440F242B179A1E9BC40BF89B87C1A66E99F64C14D3250DEAEBB69253",
+    "ExpectedMIRArchiveSha256": "65FC7E907FE3198B7290167989FE2564C1474190D06DAD49860063BEC418EC60",
+    "OutputRoot": "<fresh governor-admitted checkout-local output>",
+    "ExpectedPeakMemoryMiB": 4096,
+    "TimeoutSeconds": 180,
+    "AdmissionWaitSeconds": 30
+  },
+  "mode": "Generic F200 input-save path. Leave F110PublishedCrossSource, F110SameEditionSuccessor, historical, create-only, MIR-absent, active-seed and observer modes unset.",
+  "independent_expectation": {
+    "retained_rows": 17,
+    "source_seeded_rows": 16,
+    "new_mining_labs": 1,
+    "mining_total_effect": 0.1,
+    "inserter_stack_size_bonus": 2,
+    "bulk_inserter_capacity_bonus": 4,
+    "initial_queued_progress": 0.42,
+    "detached_progress": 0.27,
+    "foreign_direct_disabled": true,
+    "post_lab_queue": [
+      "braking-force-1"
+    ],
+    "cold_reloads": 2,
+    "reload_save_byte_identical": true
+  },
+  "preparation_controls": {
+    "raw_git_fixture_members": true,
+    "current_package_bytes_rehashed": true,
+    "owner_freeze": "Before scheduling bind private D524, actual engine/library/output, install only own prepared fixture under exclusive ownership, verify exact bytes, inspect health/plan and freeze committed caller/runner. This packet is not another active or pending native assignment.",
+    "existing_host_guard_readback": {
+      "fixture_archive_guard_passed": true,
+      "declared_current_inputs_guard_passed": true,
+      "fixture_member_mutation_refused": true,
+      "old_package_refused": true,
+      "original_fixture_source_restored": true,
+      "opponents": {
+        "fixture_member": "[mir-library-fixture-member] control.lua",
+        "old_package": "[aero-prepared-only] profile selected archive hash differs: more-infinite-research_5.0.20000.zip"
+      },
+      "native_execution": false,
+      "library_activation": false
+    },
+    "independent_review": "Scoped approval after correcting the shared-control provenance wording; current package, profile, seven members, own ZIP and existing guard readback independently verified. Current shared control is explicitly different and native remains required."
+  },
+  "claims": {
+    "native_execution": false,
+    "library_activation": false,
+    "migration_pass": false,
+    "performance_pass": false,
+    "release_qualification": false
+  }
+}
