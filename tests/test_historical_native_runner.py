@@ -1093,6 +1093,7 @@ class HistoricalNativeFixtureControls(unittest.TestCase):
             cwd=ROOT, text=True, capture_output=True, check=True,
         ).stdout.strip() + "\n"
         info = {"name": self.metadata["name"], "version": self.metadata["version"],
+                "title": "MIR historical native fixture", "author": "MIR maintainers",
                 "factorio_version": "0.13",
                 "dependencies": ["base >= 0.13.20", "more-infinite-research = 5.0.01300"]}
         members = {name: (FIXTURE / name).read_bytes() for name in
@@ -1105,25 +1106,37 @@ class HistoricalNativeFixtureControls(unittest.TestCase):
             folder = Path(folder).resolve()
             self.assertTrue(folder.is_relative_to(temporary_root.resolve()))
             archive_root = self.metadata["name"] + "_" + self.metadata["version"] + "/"
-            for label in ("good", "merged", "missing"):
+            labels = ["good", "merged", "missing"] + [
+                field + "-" + defect for field in ("title", "author")
+                for defect in ("absent", "blank", "array")]
+            for label in labels:
                 rows = dict(members)
                 if label == "merged":
                     bad = dict(info, dependencies=[" ".join(info["dependencies"])])
                     rows["info.json"] = json.dumps(bad).encode("utf-8")
                 if label == "missing":
                     del rows["data-final-fixes.lua"]
+                if "-" in label:
+                    field, defect = label.split("-", 1)
+                    bad = dict(info)
+                    if defect == "absent":
+                        del bad[field]
+                    else:
+                        bad[field] = "  " if defect == "blank" else ["invalid"]
+                    rows["info.json"] = json.dumps(bad).encode("utf-8")
                 with zipfile.ZipFile(folder / (label + ".zip"), "w") as archive:
                     for name, content in rows.items():
                         archive.writestr(archive_root + name, content)
             check = r'''
               Assert-HistoricalFixtureArchive -Archive (Join-Path $env:MIR5_GUARD_ROOT 'good.zip') -SourceDirectory $source -Fixture $selected
-              foreach($case in @('merged','missing')){
+              foreach($case in @('merged','missing','title-absent','title-blank','title-array','author-absent','author-blank','author-array')){
                 $refused=$false
                 try{Assert-HistoricalFixtureArchive -Archive (Join-Path $env:MIR5_GUARD_ROOT ($case+'.zip')) -SourceDirectory $source -Fixture $selected}
                 catch{
                   $message=$_.Exception.Message
                   if(($case -eq 'merged' -and $message -notmatch 'dependencies differ') -or
-                    ($case -eq 'missing' -and $message -notmatch 'membership differs')){throw}
+                    ($case -eq 'missing' -and $message -notmatch 'membership differs') -or
+                    ($case -match '^(title|author)-' -and $message -notmatch ('info '+$Matches[1]+' must be a nonempty string'))){throw}
                   $refused=$true
                 }
                 if(-not $refused){throw ('invalid archive accepted: '+$case)}

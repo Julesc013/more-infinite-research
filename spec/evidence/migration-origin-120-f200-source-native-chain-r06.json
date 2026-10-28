@@ -1,0 +1,179 @@
+{
+  "schema": 1,
+  "kind": "MIR5MigrationOrigin120F200SourceNativeChainV1",
+  "status": "passed-exact-published-mir1-f200-source-stage",
+  "scope": "One exact published MIR 1.2.0 F200 source-stage fixture on Factorio 2.0.77. R04 and R05 are retained native adverse observations; R06 establishes one protected published source save and two read-only cold reloads only. This is not a MIR5 successor, current-candidate, multiplayer, performance, release, or complete migration-matrix qualification.",
+  "origin": {
+    "tag": "1.2.0",
+    "tag_commit": "b80413b2aa225529a236b7b00a7cee9420af65bc",
+    "edition": "F200",
+    "engine": {
+      "product_version": "2.0.77",
+      "file_version": "2.0.77.84539",
+      "sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B"
+    },
+    "published_mir": {
+      "version": "1.2.0",
+      "archive_sha256": "880C137F7AB35FE7AF1DA5538BFA91F620C80785134DB488800352DD6154AB22",
+      "bytes": 92638
+    },
+    "observer": {
+      "archive_sha256": "723D1E7721449FC26040E5E6629416767BDC20AD79CF8723115846DB662A1F87",
+      "bytes": 834
+    }
+  },
+  "runner": {
+    "path": "tools/Invoke-NativeFixture.ps1",
+    "sha256": "205C01C461E2BD9AD2757C84BB55828D4E5931890FD175D052DABA485D97288E"
+  },
+  "attempts": {
+    "r04": {
+      "status": "native-adverse-before-source-save",
+      "controller_commit": "485503ded25a37a61eb1330c9a99383565335fcb",
+      "fixture_raw_git_commit": "f6606cf05400f02252e0f49bea9dd0a5653645dc",
+      "fixture_archive_sha256": "725FB5E6F3E3BD1D2D1BC23C4290B76A969779763109272A95E20E64CF6F55CC",
+      "profile_sha256": "E0B231B3E7B0CA210B7DC36E7BCCE466769DDFA8F58F16E664C0A7B22845F8D7",
+      "caller_sha256": "1FFE8E0032C4DFEC313572C6D4AB54F1344FFE97F6540C618478F676732BDB60",
+      "preflight_sha256": "B171CF7EA62626A0BFAB11929A49720111D182922622CC4BE5B8FBB0F6283035",
+      "result_sha256": "070FBE8CEE940A272BAE39766325FF5D954D3B24FCF3FECA5F0407D10E2E3C39",
+      "result_bytes": 6143,
+      "terminal_sha256": "8DF5B8177CEC2F52FD90CF5E1463BD3A126C1821394208931EAC95C660C6FB36",
+      "terminal_bytes": 138427,
+      "safe_diagnostic_locator": {
+        "path": "build/qualification/migration-origins/migration-origin-120-f200-source-r04/native-output/write-data/factorio-current.log",
+        "sha256": "A8001768A2F5AA74947762FF867ECD3627D2512C7EFABCDFF578BEF4B668AD9E",
+        "bytes": 12962
+      },
+      "disposition": "Preserved native adverse before a source save; its formatter-dependent runtime effect comparison did not establish a replacement source baseline."
+    },
+    "r05": {
+      "status": "native-adverse-after-one-source-lab-before-protected-completion",
+      "controller_commit": "a5dbe59d6f69395d4a45b7b964ff6d8cf468e7bd",
+      "fixture_raw_git_commit": "17d83ab9e30baae2a3d64d9d5d52536aa20371c9",
+      "fixture_archive_sha256": "3B2A1F6536EAB31EB7B8BE2463BF6310E289F4762F3007F1D4706A92AD7F6713",
+      "profile_sha256": "252BBA29C27D1CED6557D0533499702C64CDD2F539C6DD2DA81140D9748EF863",
+      "caller_sha256": "60FB4E2FAAF4730E3DC9308F96F49D308148A8CD1BC06CA7F6412B10E5B1A421",
+      "preflight_sha256": "1EBD88F5658FA8F3036884A2DB8C75992D0103C54F08C63E858F0E0CFE109E1D",
+      "result_sha256": "700284C295CF93E73F51B6B027680D3EDB7C3186A7868F83B2D1329AB2F5F584",
+      "result_bytes": 15178,
+      "terminal_sha256": "A5A302DEA1AD55FC423857B3794BA43248FB3C220F51A3C60A9F5C1799ADB7BC",
+      "terminal_bytes": 150136,
+      "safe_diagnostic_locator": {
+        "path": "build/qualification/migration-origins/migration-origin-120-f200-source-r05-final-native/native-output/write-data/factorio-current.log",
+        "sha256": "57371BE81EA7A6D57225FB46AC0B3E1C90E3E8E167722220BC21CEF00178F07F",
+        "bytes": 15417
+      },
+      "disposition": "The run reached one actual player source gear-lab completion, then failed during foreign queue setup before a protected completion marker, save, or cold reload."
+    },
+    "r06": {
+      "status": "passed-private-native-fixture",
+      "controller_commit": "2eb20527ce3063fde0c7151985a021afc29bf7ca",
+      "fixture_raw_git_commit": "e26bb227bf46f626964d1f3bfe272a6b36832c4d",
+      "fixture_archive_sha256": "529B53C63715905849DC27D042BDBD9FD4778DC137BC58630A49578E4FD3C659",
+      "fixture_archive_bytes": 11555,
+      "profile_sha256": "F5FA9FFC47A6A7BF25F0BA7DD5D1126DE16494152659D337D1D673C30B749BDA",
+      "projection_members": {
+        "fixture": 5,
+        "observer": 2
+      },
+      "caller_sha256": "4085703D85D82B1D94883A3F5F5342A77A78DC83F14D37384781F59311DDDEB4",
+      "preflight_sha256": "DAF956C3D335EDCADCDF277E23F2E57CB0EFF73BD0533E942C3D9A85A80F6449",
+      "result_sha256": "C7FE9F69963FFCF27686A4F0C0E5F2C79079BCD4698CF25158997AC00A619E9A",
+      "result_bytes": 42829,
+      "terminal_sha256": "C9DD94A19C9F1CA9764B69E142201F95EFBB772E03CE618195B3F88948282C3C",
+      "terminal_bytes": 141200
+    }
+  },
+  "native_observation": {
+    "source_roster_rows": 34,
+    "player_scripted_row_seeds": 33,
+    "finite_owner_states": {
+      "player": 6,
+      "foreign": 1,
+      "detached": 0
+    },
+    "real_source_gear_laboratory_completions": 1,
+    "foreign_queue_progress": 0.42,
+    "detached_progress": 0.27,
+    "source_gear_productivity": 0.10000000149012,
+    "source_rocket_gun_speed": 0.1,
+    "source_cannon_gun_speed": 0.1,
+    "protected_source_save": {
+      "sha256": "FDC9BA445B17716CAE7C021959B9B3BF4E1C7EE9F6485AA76DBCC59D70101CAC",
+      "bytes": 817810,
+      "primary_path": "build/qualification/migration-origins/migration-origin-120-f200-source-r06-native/native-output/write-data/saves/mir5-native-complete.zip"
+    },
+    "cold_reloads": {
+      "count": 2,
+      "on_load_read_only": true,
+      "save_byte_identical": true,
+      "save_sha256": "FDC9BA445B17716CAE7C021959B9B3BF4E1C7EE9F6485AA76DBCC59D70101CAC"
+    },
+    "snapshot_locator": {
+      "marker": "[MIR5_MIGRATION_ORIGIN_F200_120_SOURCE] SNAPSHOT",
+      "path": "build/qualification/migration-origins/migration-origin-120-f200-source-r06-native/native-output/process-2.stdout.txt",
+      "line": 118,
+      "sha256": "B1FD59E3FA2DCFD15027CC051C068350ED44BEB8971A95346629E3CF8612C6F0",
+      "bytes": 65847,
+      "disposition": "The exact emitted JSON remains private custody because it is a full log payload; this locator binds later migration review to its immutable native source."
+    }
+  },
+  "controls": {
+    "direct_library_controls": "restored-direct-library-controls",
+    "factorio_processes_after_terminal": 0,
+    "archive_extractions": 0,
+    "archive_links_created": 0,
+    "dependency_payload_bytes_copied": 0,
+    "published_mir_slot_restored_absent": true,
+    "owned_fixture_slot_restored_absent": true,
+    "observer_restored_sha256": "723D1E7721449FC26040E5E6629416767BDC20AD79CF8723115846DB662A1F87"
+  },
+  "custody": {
+    "r04": {
+      "primary_root": "build/qualification/migration-origins/migration-origin-120-f200-source-r04",
+      "members": 7,
+      "bytes": 47320,
+      "original_and_primary_file_hashes_checked": 14
+    },
+    "r05": {
+      "primary_root": "build/qualification/migration-origins/migration-origin-120-f200-source-r05-final-native",
+      "members": 65,
+      "bytes": 1584841,
+      "original_and_primary_file_hashes_checked": 130
+    },
+    "r06": {
+      "primary_root": "build/qualification/migration-origins/migration-origin-120-f200-source-r06-native",
+      "members": 23,
+      "bytes": 1893949,
+      "original_and_primary_file_hashes_checked": 46,
+      "all_member_hashes_matched": true
+    }
+  },
+  "retained_packet_erratum": {
+    "packet": "build/qualification/migration-origins/migration-origin-120-f200-source-prepared-r06/prepared-inputs-r06.json",
+    "packet_sha256": "C088633AB9256496504FEBC62ACF1926BB32DF3ED439E7EC33C0288118213C76",
+    "historical_field_value": "8DF5C9C928EFEBEA85963E0D11B67C26314E6B9AFBE8E465BA7EECDEACFE1A24",
+    "actual_r04_terminal_sha256": "8DF5B8177CEC2F52FD90CF5E1463BD3A126C1821394208931EAC95C660C6FB36",
+    "disposition": "The immutable R06 packet is preserved unchanged; this record supplies the independently rehashed actual R04 terminal identity."
+  },
+  "receipts": {
+    "path": "spec/evidence/migration-origin-120-f200-source-native-receipts-r06.json.gz",
+    "sha256": "47DBEB22B1745F20DCFEE28A006737941207E237F5B67C9C6DC6E856D4E780F1",
+    "bytes": 14286,
+    "uncompressed_sha256": "F084FFAFADD015C060B1FFF3F0C14A1D10CF80DB2DFC042754A4601A0420984A",
+    "uncompressed_bytes": 88051,
+    "lossless_safe_records": 3,
+    "derived_safe_marker_records": 1,
+    "roundtrip_verified": true,
+    "exclusions": "Saves, full logs, runtime configuration, player data, preflight payloads, library-control payloads, archive payloads and the full SNAPSHOT log line are excluded from the public capsule."
+  },
+  "claims": {
+    "exact_published_mir120_f200_source_stage": true,
+    "mir5_successor_execution": false,
+    "current_candidate_execution": false,
+    "multiplayer": false,
+    "performance": false,
+    "release_qualification": false
+  },
+  "limitations": "R06 is one historical published-source baseline. It does not establish any direct successor, current package, source-to-current migration, physical science production, arbitrary settings persistence, multiplayer behavior, release qualification or a complete origin matrix."
+}
