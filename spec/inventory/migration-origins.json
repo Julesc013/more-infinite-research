@@ -3805,8 +3805,8 @@
         {
           "boundary": "K2 Imersite public/carrier identities",
           "status": "needs-correction",
-          "problem": "R05 has no exact staged/cap ownership record. R06 unchangedB6 version-only entersforeignfalse; R09 sameB6 plus one inert unrelated technology entersforeigntrue beforeMIRbody. R07newJSONomission/R08oldiconcontrast do notfix005D. A native/upstream prototype-change boundary reproduces unknownflagsloss; actualengine-onlycallsite and independentoracle disposition remain open. OriginalMIR5 successor staysfailed.",
-          "next_action": "Independently review RUN-03/MIG-01 against exactR05/R06–09 bodies. Preserve currentforeignfalse at MIRentry and do not invent unknown pre-load rights from numerical snapshots. Prepare one meaningful persistedforeign-owner/native-entry regression and actualcurrent successor/save/two reloads after the bounded oracle/cause disposition. No invalidoldicon restoration,newJSONomission,source recreation,favorable rerun or broad campaign restart.",
+          "problem": "Separate0.3 K2SE explicit fixture-owned-lock successor passes unmodified38C/8DC/q013 from89023 after observed before-MIR owner action,strict post-MIR assertions,save/two colds. Original0.2 failure and published-runtime contrasts remain unchanged. Original source persists its own seed contract but no per-technology ledger; independent protocol/applicability review remains required.",
+          "next_action": "Review PR1376 exact fixture-owner boundary and13 lossless bodies. Only after that disposition adopt the named0.3 result with its source-contract limits; do not relabel original0.2 or infer arbitrary foreign rights. Preserve protected89023 and the separate K2 real-lab route. Keep final current-package and broader gameplay obligations separate.",
           "prepared_inputs": {
             "path": "spec/evidence/k2-imersite-current005d-prepared-inputs-r01.json",
             "sha256": "02C6BFFB4CD524A11BF90DEC1269639963B61765027AE0D60A6A56E9C068EC56"
@@ -3831,6 +3831,10 @@
             {
               "path": "spec/evidence/k2se-prototype-contrast-native-chain-r09.json",
               "scope": "Four bounded contrasts reproduce pre-MIR flag change via unrelated prototypeaddition under publishedruntime; no accepted successor or core-only attribution."
+            },
+            {
+              "path": "spec/evidence/k2se-fixture-owned-locks-native-chain-r01.json",
+              "scope": "Named explicit fixture-owner scenario passes current38C/save/two colds;independent protocol review pending,old0.2 failure unchanged."
             }
           ]
         }
