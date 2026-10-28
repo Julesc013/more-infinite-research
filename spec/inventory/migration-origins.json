@@ -3788,8 +3788,12 @@
         {
           "boundary": "K2 Imersite public/carrier identities",
           "status": "needs-correction",
-          "problem": "Direct4.6 matching-cost route passes at original inputs; staged published4.7.2 remains adverse. Exact published4.7.3 K2SE carrier source89023 now passes save/two reloads; current005D fails foreign carrier enablement before fixture writes. Logging-only native fields retain levels/bonus/progress but both foreign flags become true.",
-          "next_action": "Use protected89023 without recreation. Trace earliest MIR-context carrier flags and reuse existing data captures to distinguish engine/prototype changes from player lifecycle writes. Preserve foreign disablement and every original successor assertion; execute affected corrected successor/save/two reloads. No K2SO/public handoff or source-lab claim follows.",
+          "problem": "Direct4.6 AFCAF/R05 passes under its original FE4 inputs; E3A/b251 was later preparation. Current005D/8DC direct inputs are separately pinned and guarded. Exact published4.7.3 K2SE source89023 passes seeded state/save/two reloads, but current005D enables both foreign carriers before fixture writes. Published4.7.2 intermediate remains adverse.",
+          "next_action": "Reuse protected89023 to trace earliest MIR-context carrier flags and distinguish engine/prototype transition from callback writes. Preserve every successor/foreign assertion and qualify affected corrected successor/save/two reloads. The separate protected538B/current direct route has prepared inputs below; native-owner custody/resource admission and current result remain separate. No source recreation, published-archive patch, K2SO/public handoff or source-lab claim follows.",
+          "prepared_inputs": {
+            "path": "spec/evidence/k2-imersite-current005d-prepared-inputs-r01.json",
+            "sha256": "02C6BFFB4CD524A11BF90DEC1269639963B61765027AE0D60A6A56E9C068EC56"
+          },
           "evidence": [
             {
               "path": "spec/evidence/native-recovery-wave-r05-chain.json",
@@ -3866,8 +3870,8 @@
         {
           "boundary": "Published F200 cap disabled/re-enabled and V3 F210 worker tails",
           "status": "needs-correction",
-          "problem": "R04 disabled-state save/two-reload stage passes,but reenabling staysdisabled. Correct-context R08 instrumented diagnostic observes current mir_caps playerrow disabledfalse already persisted in DBF98 despite retained legacy policy3/positive enabled_before_cap true/cap2/nil-prefix ownershipkey. Reenabling consumes the current negative row without enabling. R07 fixture-context nils are excluded from MIR ownership inference.",
-          "next_action": "Trace the initial disabled import/classification with actual policy3 records and preserve current/foreign negative authority. Do not repair by overriding current false at reenabling. Qualify affected corrected candidate stages from original81AF after independent source/host review; retain originalDBF98/adverses and separate F200/earlierV3/worker obligations.",
+          "problem": "Direct0.5 and disabled0.6 save/two reloads pass at005D; reenabled0.7 fails nativeenabledfalse. R08 proves current negative already persisted inDBF98. First-disabled R10 trace from81AF now observes nativeenabledtrue/prototypefalse,no currentrow,validated legacy visibility-only import,and authored disablement stamping disabledfalse while writing nativefalse. Private read-only diagnostic only; no repaired player qualification.",
+          "next_action": "Aero implement the smallest proven first-disabled import/classification correction with currentfalse/foreign/science-policy opponents. Do not override existingDBF98 negative using old ledger rights. Black Glass then qualifies affected fresh disabled0.6 plus reenabled0.7 from unchanged81AF against a new frozen current package. Preserve all prior direct/disabled passes and reenable failures; actual V3 worker-tail native case remains separate.",
           "evidence": [
             {
               "path": "spec/evidence/f200-foreign-cap-baseline-f0dd-native-chain-r01.json",
@@ -3888,6 +3892,10 @@
             {
               "path": "spec/evidence/cap-owner-context-diagnostic-chain-r08.json",
               "scope": "Read-only instrumented MIR-own-context diagnosis; not ordinary005D acceptance. Earlier fixture-scope nils excluded."
+            },
+            {
+              "path": "spec/evidence/cap-first-disabled-owner-trace-chain-r10.json",
+              "scope": "One MIR-context first-disabled diagnostic startup; exact import-to-negative classification observed,not product acceptance."
             }
           ],
           "protected_473_cap_source": {
