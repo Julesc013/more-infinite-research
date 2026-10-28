@@ -2346,10 +2346,11 @@
           "factorio_version": "2.0",
           "archive_sha256": "6395C4A5A0F74C67729746D0FBF6162329978B47C5C29D54CC0045F2977C7E44",
           "source_case": "passed-exact-f200-published-source-r05",
-          "final_5_x_case": "passed-exact-c74-f210-and-f200-base-direct-successors",
-          "disposition": "protected-original-88FC-source-reused-for-two-direct-destinations-current-candidate-applicability-pending",
-          "successor_evidence": "spec/evidence/migration-origin-110-direct-c74-native-chain-r01.json",
-          "current_candidate_applicability": "The separate f0dd disabled-module F210 reset/save/reload case is scoped independently; no automatic c74-to-current reuse or F200 disabled-module pass."
+          "final_5_x_case": "passed-current-7a2-f210-f200-base-default-and-f210-disabled-module-direct-successors",
+          "disposition": "protected-original-88FC-reused-for-three-current-successors-no-source-recreation",
+          "successor_evidence": "spec/evidence/migration-origin-110-7a2-direct-native-chain-r01.json",
+          "current_candidate_applicability": "Actual frozen537 native execution on7a2/player505: default F210005D/standalone2.1.23 and F20065FC/2.0.77 plus explicit disabled-module F210. Each retains31 rows, credits, three-force/queue state, completes one new lab, resets effects, saves and passes two read-only unchanged-byte cold reloads. Fixture-declared defaults only; no F200 disabled/Space Age/GUI pass. Originalc74/f0dd observations and both current preflight adverses remain separate.",
+          "prior_successor_evidence": "spec/evidence/migration-origin-110-direct-c74-native-chain-r01.json"
         },
         {
           "origin_tag": "1.1.5",
@@ -3666,9 +3667,9 @@
         },
         {
           "boundary": "MIR1.1 module credits and disabled public row",
-          "status": "needs-correction",
-          "problem": "The data-stage fixture used raw enabled==true and rejects a valid omitted native default. That false-positive predicate is corrected/host-verified;0609 did not serialize its actual raw field, so current native resolution remains unverified.",
-          "next_action": "Adopt the bounded fixture correction and rebuild/pin its own archive. Run the affected005D/8DC successor from unchanged88FC, retaining strictdisabled/opposite/malformed and allcredit/science/state checks; record actualnewlab/save/two-reloads. Keep0609adverse. Then qualify the separately pendingF200currentarm.",
+          "status": "closed",
+          "problem": "Current005D/65FC default direct successors and explicit disabled-module005D pass from original88FC after the reviewed fixture-only omitted-enabled-default correction. All31 rows/credits/three-force state and native battery effects survive lab, reset, save and two cold reloads per case.",
+          "next_action": "Reuse the three named current Base routes and protected original. Keep0609 and logging-only actual=nil diagnostic as adverse startups, not saved-state failures or passes. Arbitrary user settings, F200 disabled-module, Space Age, earned Library GUI and other closures remain unverified.",
           "evidence": [
             {
               "path": "spec/evidence/migration-origin-110-direct-c74-native-chain-r01.json",
@@ -3677,6 +3678,10 @@
             {
               "path": "spec/evidence/disabled-module-reset-f0dd-native-chain-r01.json",
               "sha256": "C9D9E2846077378002F174210D748499992997D22ACDA092DCDEAD7A2852C930"
+            },
+            {
+              "path": "spec/evidence/migration-origin-110-7a2-direct-native-chain-r01.json",
+              "sha256": "796A466F6267E0585A2FD7D1287ECBEF276317A84647F92B065D3EA93A170EDB"
             }
           ],
           "current_adverse": {
@@ -3689,7 +3694,8 @@
           "fixture_correction": {
             "path": "spec/evidence/migration-origin-110-enabled-preflight-correction-r01.json",
             "sha256": "718BB44C428204245DC5547A356A702D417E0FC80045A4C4C38281A9A7448590"
-          }
+          },
+          "diagnostic_raw_nil": "Separate unchanged-assertion native probe6EA6 observes expected=true actual=nil type=nil before source map load; original0609 did not serialize the raw value. Both original result/log pairs are retained in the new seven-record capsule."
         },
         {
           "boundary": "MIR1.2 combined rocket/cannon credit",
