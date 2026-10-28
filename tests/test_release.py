@@ -73,9 +73,11 @@ class ReleaseTests(unittest.TestCase):
             self.assertEqual(len(inventory["assets"]), 10)
             f018 = next(asset for asset in inventory["assets"] if asset["target"] == "f018")
             self.assertEqual(
-                {key: f018[key] for key in ("version", "factorio_version", "minimum_base")},
-                {"version": "5.0.01800", "factorio_version": "0.18", "minimum_base": "0.18.47"},
+                {key: f018[key] for key in ("version", "factorio_version", "minimum_base", "support")},
+                {"version": "5.0.01800", "factorio_version": "0.18", "minimum_base": "0.18.47",
+                 "support": "experimental-best-effort-github-only"},
             )
+            self.assertTrue(all("support" not in asset for asset in inventory["assets"] if asset["target"] != "f018"))
             for asset in inventory["assets"]:
                 with self.subTest(target=asset["target"]), zipfile.ZipFile(first_output / asset["name"]) as archive:
                     self.assertEqual(archive.namelist()[0], asset["root"] + "/" + asset["members"][0]["path"])
@@ -114,6 +116,11 @@ class ReleaseTests(unittest.TestCase):
                         | {release.SUMS_NAME, release.EARLY_SUMS_NAME, release.INVENTORY_NAME})
             self.assertEqual({path.name for path in frozen.iterdir()}, expected)
             self.assertEqual([asset["target"] for asset in inventory["assets"]], list(self.NORMAL_TARGETS))
+            self.assertEqual(
+                next(asset["support"] for asset in inventory["assets"] if asset["target"] == "f018"),
+                "experimental-best-effort-github-only",
+            )
+            self.assertTrue(all("support" not in asset for asset in inventory["assets"] if asset["target"] != "f018"))
             cohort = inventory["early_cohort"]
             self.assertEqual(cohort["kind"], release.EARLY_COHORT_KIND)
             self.assertEqual(cohort["qualification"], release.EARLY_QUALIFICATION)
@@ -130,6 +137,7 @@ class ReleaseTests(unittest.TestCase):
                     self.assertEqual(asset["name"], release._archive_name(asset["target"]))
                     self.assertEqual(info["version"], asset["version"])
                     self.assertEqual(info["dependencies"][0], "base >= " + asset["minimum_base"])
+                    self.assertNotIn("support", asset)
             self.assertEqual(release.verify(source, frozen), inventory)
             self.assertEqual(
                 release.verify(source, frozen, early_target_record=release.package.EARLY_TARGET_RECORD),
@@ -248,6 +256,27 @@ class ReleaseTests(unittest.TestCase):
             "info-title": (("assets", 0, "info", "title"), "Wrong title"),
             "distribution-codec": (("assets", 0, "version"), "5.0.00000"),
         })
+
+    def test_verification_rejects_absent_or_changed_f018_support_disposition(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            temporary = Path(temporary)
+            repository = temporary / "repository"
+            repository.mkdir()
+            source, commit = self._repository(repository)
+            frozen = temporary / "frozen"
+            release.freeze(source, frozen, revision=commit)
+            for name, mutate in {
+                "missing": lambda asset: asset.pop("support"),
+                "changed": lambda asset: asset.__setitem__("support", "stable"),
+            }.items():
+                with self.subTest(name=name):
+                    output = temporary / ("f018-support-" + name)
+                    shutil.copytree(frozen, output)
+                    body = self._body(output)
+                    asset = next(asset for asset in body["assets"] if asset["target"] == "f018")
+                    mutate(asset)
+                    self._write_body(output, body)
+                    self._assert_refused(source, output)
 
     def _assert_asset_inventory_mutations(self, cases):
         with tempfile.TemporaryDirectory() as temporary:
