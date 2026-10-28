@@ -3796,8 +3796,8 @@
         {
           "boundary": "K2 Imersite public/carrier identities",
           "status": "needs-correction",
-          "problem": "Current005D/8DC direct538B recovery passes at its own published proofPR1356; preserve oldAFCAF/FE4 and staged4.7.2 adverse. K2SE source89023 passes,but005D foreign flags aretrue before MIR configuration body and unchangedafter; unchangedB6 fixture-only control passes. Exact version/prototype/earlier lifecycle cause remains unresolved,not a proven MIR callback write.",
-          "next_action": "Reuse protected89023. Distinguish MIR-version/prototype migration or earlier lifecycle events and exact recoverable ownership; no missing optional field or old ledger overrides current/foreign rights. Preserve all original successor assertions and qualify actual corrected-current save/two reloads. Do not repeat the completed first-entry trace or fixture-only control unchanged; source recreation,K2SO/public handoff and lab-earned K2SE remain separate.",
+          "problem": "R05 has no exact staged/cap ownership record. R06 unchangedB6 version-only entersforeignfalse; R09 sameB6 plus one inert unrelated technology entersforeigntrue beforeMIRbody. R07newJSONomission/R08oldiconcontrast do notfix005D. A native/upstream prototype-change boundary reproduces unknownflagsloss; actualengine-onlycallsite and independentoracle disposition remain open. OriginalMIR5 successor staysfailed.",
+          "next_action": "Independently review RUN-03/MIG-01 against exactR05/R06–09 bodies. Preserve currentforeignfalse at MIRentry and do not invent unknown pre-load rights from numerical snapshots. Prepare one meaningful persistedforeign-owner/native-entry regression and actualcurrent successor/save/two reloads after the bounded oracle/cause disposition. No invalidoldicon restoration,newJSONomission,source recreation,favorable rerun or broad campaign restart.",
           "prepared_inputs": {
             "path": "spec/evidence/k2-imersite-current005d-prepared-inputs-r01.json",
             "sha256": "02C6BFFB4CD524A11BF90DEC1269639963B61765027AE0D60A6A56E9C068EC56"
@@ -3814,6 +3814,14 @@
             {
               "path": "spec/evidence/k2se-entry-and-published-control-chain-r04.json",
               "scope": "MIR-context pre/post body diagnostic plus unchanged-published passing control; current K2SE successor still open."
+            },
+            {
+              "path": "spec/evidence/k2se-own-records-native-chain-r05.json",
+              "scope": "Exact own staged/cap record absence and pre-configuration native flags; one failed diagnostic,not a successor pass."
+            },
+            {
+              "path": "spec/evidence/k2se-prototype-contrast-native-chain-r09.json",
+              "scope": "Four bounded contrasts reproduce pre-MIR flag change via unrelated prototypeaddition under publishedruntime; no accepted successor or core-only attribution."
             }
           ]
         }
