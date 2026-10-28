@@ -593,7 +593,7 @@ if($f110PublishedCrossSource -or $f110SameEditionSuccessor){
 }
 $mir=@()
 if($MIRAbsent){
-  Assert-Fixture ($CreateOnly -and $mirRows.Count -eq 0 -and $ExpectedMIRArchiveSha256 -ceq '') 'MIR absence requires a create-only profile without MIR or its hash'
+  Assert-Fixture ($mirRows.Count -eq 0 -and $ExpectedMIRArchiveSha256 -ceq '') 'MIR absence requires a profile without MIR or its hash'
 }else{
   Assert-Fixture ($mirRows.Count -eq 1 -and $ExpectedMIRArchiveSha256 -match '^[a-fA-F0-9]{64}$') 'one pinned MIR selection is required'
   $mir=@($inventory | Where-Object {$_.name -ceq 'more-infinite-research' -and $_.version -ceq $mirRows[0].version})
