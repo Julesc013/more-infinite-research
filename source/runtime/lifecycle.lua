@@ -254,7 +254,7 @@ end
 -- A record exists only after this runtime changed an enabled technology to
 -- disabled, so later cap relaxation can restore neither a data-stage default
 -- nor foreign pre-disablement.
-local function reconcile_authored_prototype_disablement(force, owned_disabled)
+local function reconcile_authored_prototype_disablement(force, owned_disabled, imported_reenabled)
   if not valid_force(force) then return false end
   for index = 1, #ORDERED_DECLARATIONS do
     local row = ORDERED_DECLARATIONS[index]
@@ -274,9 +274,10 @@ local function reconcile_authored_prototype_disablement(force, owned_disabled)
           record = {disabled = true}
           owned[row.id] = record
         elseif record.disabled == nil then
-          -- A prior visibility-only cap row preserves foreign disablement;
-          -- a native reset cannot grant this policy a new restoration right.
-          record.disabled = false
+          -- Only a newly imported, exact V3 positive proof can accompany this
+          -- first policy write. Existing visibility-only/negative decisions
+          -- remain foreign; resets cannot manufacture a restoration right.
+          record.disabled = imported_reenabled ~= nil and imported_reenabled[row.id] == record
         end
         technology.enabled = false
       end
@@ -426,7 +427,7 @@ local function force_for_index(index)
   return nil
 end
 
-local function reconcile_all(clean_stale_forces, selected_owners)
+local function reconcile_all(clean_stale_forces, selected_owners, imported_reenabled)
   if not game or not game.forces then return end
   -- Unlimited startup settings need no state unless a previous finite setting
   -- left an ownership transition that has to be restored exactly once, or an
@@ -445,7 +446,8 @@ local function reconcile_all(clean_stale_forces, selected_owners)
       owned_disabled = current.owned_disabled
     end
     if current then
-      reconcile_authored_prototype_disablement(force, owned_disabled)
+      reconcile_authored_prototype_disablement(force, owned_disabled,
+        imported_reenabled and imported_reenabled[force.index])
     end
     local owner = valid_force(force) and selected_owners and selected_owners[force.index] or nil
     if current then reconcile_force(force, owned_disabled, owner, selected_owners ~= nil) end
@@ -506,7 +508,7 @@ local function legacy_candidates(force, worker_name, direct_f200_hop)
   return candidates
 end
 
-local function merge_legacy_rows(owned_disabled, force_index, rows)
+local function merge_legacy_rows(owned_disabled, force_index, rows, facts, imported_reenabled)
   local owned = owned_disabled[force_index]
   if owned ~= nil and type(owned) ~= "table" then
     error("MIR invalid caps ownership row", 2)
@@ -516,6 +518,7 @@ local function merge_legacy_rows(owned_disabled, force_index, rows)
     owned = {}
     owned_disabled[force_index] = owned
   end
+  local created = {}
   for name, row in pairs(rows) do
     -- The pure importer has already rejected an existing MIR5 row. Keep this
     -- guard at the persistence boundary so MIR5 ownership always wins.
@@ -524,8 +527,27 @@ local function merge_legacy_rows(owned_disabled, force_index, rows)
         disabled = row.disabled == true and true or nil,
         visible_when_disabled = row.visible_when_disabled
       }
+      created[name] = owned[name]
       if name == WORKER_TAIL_NAMES[1] or name == WORKER_TAIL_NAMES[2] then
         owned[name].worker_effect_modifier = worker_modifier(name)
+      end
+    end
+  end
+  -- This signal lasts only through this configuration callback. Bind it to
+  -- the table actually created here, never a pre-existing row or just a name.
+  -- The decoder still imports no enablement right for a live-enabled row;
+  -- the authored policy below must make its own observed true -> false write.
+  if facts.legacy_policy3 then
+    for _, decision in ipairs(facts.decisions) do
+      local record = created[decision.name]
+      if decision.outcome == "visibility_imported_enablement_reenabled"
+          and record and record.disabled == nil then
+        local force_rows = imported_reenabled[force_index]
+        if force_rows == nil then
+          force_rows = {}
+          imported_reenabled[force_index] = force_rows
+        end
+        force_rows[decision.name] = record
       end
     end
   end
@@ -556,7 +578,7 @@ local function import_legacy_caps_on_configuration(event)
   -- ordinary control parsing, cold loads and subsequent configurations.
   local f200_allowlist = direct_f200_hop and legacy_caps.f200_direct_hop_allowlist(DECLARATIONS)
 
-  local selected_owners = {}
+  local selected_owners, imported_reenabled = {}, {}
   if not game or not game.forces then return selected_owners end
   for _, force in pairs(game.forces) do
     if valid_force(force) then
@@ -573,17 +595,18 @@ local function import_legacy_caps_on_configuration(event)
       -- version label cannot manufacture a restoration right.
       local import_for_force = type(legacy_bucket) == "table" and legacy_bucket.policy_version == 1
         and legacy_caps.import_boolean_for_force or legacy_caps.import_for_force
-      local rows = import_for_force(legacy_bucket, force,
+      local rows, facts = import_for_force(legacy_bucket, force,
         legacy_candidates(force, owner, false), owned, LEGACY_ALLOWLIST)
-      merge_legacy_rows(current.owned_disabled, force.index, rows)
+      merge_legacy_rows(current.owned_disabled, force.index, rows, facts, imported_reenabled)
       if direct_f200_hop then
-        local predecessor_rows = legacy_caps.import_for_force(legacy_bucket, force,
+        local predecessor_rows, predecessor_facts = legacy_caps.import_for_force(legacy_bucket, force,
           legacy_candidates(force, owner, true), current.owned_disabled[force.index], f200_allowlist)
-        merge_legacy_rows(current.owned_disabled, force.index, predecessor_rows)
+        merge_legacy_rows(current.owned_disabled, force.index, predecessor_rows,
+          predecessor_facts, imported_reenabled)
       end
     end
   end
-  return selected_owners
+  return selected_owners, imported_reenabled
 end
 
 local function event_force(event)
@@ -628,7 +651,8 @@ function M.on_init()
 end
 
 function M.on_configuration_changed(event)
-  reconcile_all(true, import_legacy_caps_on_configuration(event))
+  local owners, imported_reenabled = import_legacy_caps_on_configuration(event)
+  reconcile_all(true, owners, imported_reenabled)
 end
 
 function M.on_force_created(event)
