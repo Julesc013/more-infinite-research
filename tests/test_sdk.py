@@ -162,8 +162,10 @@ class SdkTests(unittest.TestCase):
     def test_example_metadata_declares_required_and_optional_dependencies(self):
         required = json.loads((SDK_ROOT / "examples/required/info.json").read_text(encoding="utf-8"))
         optional = json.loads((SDK_ROOT / "examples/optional/info.json").read_text(encoding="utf-8"))
-        self.assertIn("more-infinite-research >= 5.0.21000", required["dependencies"])
-        self.assertIn("? more-infinite-research >= 5.0.21000", optional["dependencies"])
+        self.assertEqual(["base >= 2.1.23", "more-infinite-research >= 5.0.0"], required["dependencies"])
+        self.assertEqual(["base >= 2.1.23", "? more-infinite-research >= 5.0.0"], optional["dependencies"])
+        self.assertEqual("2.1", required["factorio_version"])
+        self.assertEqual("2.1", optional["factorio_version"])
         self.assertNotEqual(required["name"], optional["name"])
 
     def test_required_and_optional_final_fixes_publish_distinct_native_effects(self):
