@@ -245,9 +245,12 @@ class F200LegacyWorkerFixtureTests(unittest.TestCase):
               elseif opponent=="owner-stale"then entry.tick=entry.tick-1
               elseif opponent=="owner-unknown"then entry.player.bonus=entry.player.bonus-.01;player.worker_robots_speed_modifier=entry.player.bonus
               elseif opponent=="owner-unknown-ledger"then state.player_with_independent=state.player_with_independent+.001
+              elseif opponent=="owner-missing-ledger"then state.player_with_independent=nil
               elseif opponent=="owner-repeated"then state.fixture_owned_offset={schema=1}
               elseif opponent=="owner-force"then entry.player.index=99
-              elseif opponent=="owner-foreign-queue"then foreign.research_progress=.41 end
+              elseif opponent=="owner-foreign-queue"then foreign.research_progress=.41
+              elseif opponent=="owner-foreign-enable"then foreign.technologies[WORKER].enabled=true
+              elseif opponent=="owner-effect"then player.technologies[WORKER].prototype.effects[1].modifier=.6 end
             end
             if opponent=="stale-enable"then player.technologies[WORKER].enabled=false
             elseif opponent=="native-level"then player.technologies[WORKER].level=7
@@ -264,6 +267,11 @@ class F200LegacyWorkerFixtureTests(unittest.TestCase):
             ok,result=invoke(destination,"load");if not ok then return {ok=false,message=result}end
             local before_owner=player.worker_robots_speed_modifier
             ok,result=invoke(destination,"changed");if not ok then return {ok=false,message=result,before_owner=before_owner,after_owner=player.worker_robots_speed_modifier}end
+            if owner_root and opponent=="owner-duplicate-config"then
+              local before_repeat=player.worker_robots_speed_modifier
+              ok,result=invoke(destination,"changed")
+              return {ok=ok,message=result,before_owner=before_repeat,after_owner=player.worker_robots_speed_modifier}
+            end
             local consumed_units=state.destination_science_accounting.consumed_units
             local processing_ticks=state.destination_science_accounting.remaining_ticks
             if opponent=="wrong-tick-span" then processing_ticks=processing_ticks-1 end
@@ -273,7 +281,8 @@ class F200LegacyWorkerFixtureTests(unittest.TestCase):
             ok,result=complete(destination,9,state.player_with_independent+1.95,consumed_units);if not ok then return {ok=false,message=result}end
             if opponent=="duplicate-lab"then state.destination_lab_completions=2 end
             ok,result=tick(destination);if not ok then return {ok=false,message=result}end
-            for _=1,2 do ok,result=invoke(destination,"load");if not ok then return {ok=false,message=result}end;ok,result=tick(destination);if not ok then return {ok=false,message=result}end end
+            if owner_root and opponent=="owner-cold-drift"then player.worker_robots_speed_modifier=player.worker_robots_speed_modifier-.01 end
+            for _=1,2 do ok,result=invoke(destination,"load");if not ok then return {ok=false,message=result}end;ok,result=tick(destination);if not ok then return {ok=false,message=result,after_reload_bonus=player.worker_robots_speed_modifier}end end
             return {ok=true,message="",phase=state.phase,source_labs=state.actual_lab_completions,destination_labs=state.destination_lab_completions,
               player_level=player.technologies[WORKER].level,bonus=player.worker_robots_speed_modifier,
               player_enabled=player.technologies[WORKER].enabled,player_visible=player.technologies[WORKER].visible_when_disabled,
@@ -407,13 +416,22 @@ class F200LegacyWorkerFixtureTests(unittest.TestCase):
 
     def test_fixture_owner_refuses_unknown_stale_foreign_and_post_entry_changes_before_writes(self):
         owner = FIXTURE / "persisted-offset-owner"
-        for opponent in ("owner-native-loss", "owner-stale", "owner-unknown", "owner-unknown-ledger",
-                         "owner-repeated", "owner-force", "owner-foreign-queue", "stale-enable", "native-level"):
+        for opponent in ("owner-native-loss", "owner-stale", "owner-unknown", "owner-unknown-ledger", "owner-missing-ledger",
+                         "owner-repeated", "owner-force", "owner-foreign-queue", "owner-foreign-enable", "owner-effect",
+                         "owner-duplicate-config", "stale-enable", "native-level", "saved-progress"):
             with self.subTest(opponent=opponent):
                 r = self.lua.eval("worker_flow")(str(FIXTURE / "published/control.lua"), str(owner / "control.lua"),
                                                  opponent, str(owner))
                 self.assertFalse(r["ok"])
                 self.assertEqual(r["before_owner"], r["after_owner"], "rejected input changed the native aggregate")
+
+    def test_fixture_owner_never_repairs_a_changed_bonus_on_cold_load(self):
+        owner = FIXTURE / "persisted-offset-owner"
+        r = self.lua.eval("worker_flow")(str(FIXTURE / "published/control.lua"), str(owner / "control.lua"),
+                                         "owner-cold-drift", str(owner))
+        self.assertFalse(r["ok"])
+        self.assertIn("native worker state differs", r["message"])
+        self.assertAlmostEqual(r["after_reload_bonus"], 4.463)
 
     def test_entry_observer_is_read_only_for_native_state_and_returns_detached_records(self):
         self.lua.execute(r'''
