@@ -2156,7 +2156,7 @@
         "sha256": "66C127D8BFC1919FA88F19D2D9B3047316A1B90401CAA05A6D05979B7A099D1E",
         "bytes": 709749,
         "local_direct_library_status": "retained-local-copy-reported",
-        "native_status": "published-source-qualified-current-5-x-successor-not-yet-bound"
+        "native_status": "published-source-qualified-current-same-edition-successor-prepared-native-pending"
       },
       {
         "edition": "f200",
@@ -2797,14 +2797,18 @@
           "disposition": "not-a-cartesian-modset-matrix",
           "current_archive_sha256": "1C3D982CD048D3C83BF75108F1F9AC769CE0DC833A2DE056CDE16EF8AE2925A9",
           "current_completion": {
-            "status": "needs-correction",
-            "problem": "The exact4.7.3 F110 source exists, but its qualified successor is F200, not a direct same-edition F110 successor.",
-            "next_action": "Use the exact source-save identity from the source chain, prepare a direct F110 successor profile/fixture/current-archive binding, then execute the named F110 save/lab/two-reload case. Verify the full save hash in the original chain before launch.",
+            "status": "ready-to-execute",
+            "problem": "Protected published4.7.3 source is qualified and the current same-edition successor is prepared; its native result remains unrun.",
+            "next_action": "Black Glass verifies unchanged D524, uses the prepared seven-member0.3.0 F110 successor/current1C3D profile and -F110SameEditionSuccessor at committed controllerd614, then completes one new mining lab/save/two closed read-only reloads. Keep original cross-engine observations separate.",
             "source_evidence": {
               "path": "spec/evidence/f110-f200-published-source-r05-native-chain.json",
               "sha256": "BFF56165FCB7B3F5F5FACA29EE9A4E244DCA92833C0A6CE247BE40CF67E83CE2"
             },
-            "command_status": "not-ready: same-edition successor binding missing"
+            "command_status": "ready: exact fixture/profile/package/source-save pins; native owner must bind actual engine/library/output/caller",
+            "preparation_evidence": {
+              "path": "spec/evidence/f110-473-current-successor-prepared-inputs-r01.json",
+              "sha256": "284DA5415D74EE13FDCFED11BFB804755725DB7A7D4A58C8123C1A38864B49FB"
+            }
           }
         },
         {
