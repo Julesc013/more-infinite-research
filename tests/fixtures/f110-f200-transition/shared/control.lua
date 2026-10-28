@@ -7,6 +7,9 @@ local SOURCE = "source"
 local SUCCESSOR = "successor"
 local loaded, reload_reported = false, false
 local plan = require("__mir-fixture-mir5-f110-f200-transition__/catalogue")
+-- Stage selects the saved-state transition; engine selects native field names.
+-- A same-engine successor still must prove the full successor transition.
+local f110 = plan.stage == SOURCE or plan.successor_engine == "f110"
 
 local function fail(message)
   error("[mir5-f110-f200-transition] " .. message)
@@ -41,14 +44,14 @@ local function technology(force, name)
 end
 
 local function saved_progress(force, value)
-  if plan.stage == SOURCE then
+  if f110 then
     return force.get_saved_technology_progress(value)
   end
   return value.saved_progress
 end
 
 local function set_saved_progress(force, value, progress)
-  if plan.stage == SOURCE then
+  if f110 then
     force.set_saved_technology_progress(value, progress)
   else
     value.saved_progress = progress
@@ -58,7 +61,7 @@ end
 local function same_saved_progress(actual, expected)
   -- F110 represents no saved progress as nil via the force getter. F200's
   -- retained technology property can represent that same absence as nil or 0.
-  if expected == nil and plan.stage == SUCCESSOR then return actual == nil or close(actual, 0) end
+  if expected == nil and not f110 then return actual == nil or close(actual, 0) end
   if actual == nil or expected == nil then return actual == expected end
   return close(actual, expected)
 end
@@ -71,7 +74,7 @@ end
 local function queue_enabled(force)
   -- F110 exposes the queue opt-in. F200's native queue is always available
   -- and has no research_queue_enabled member to inspect.
-  if plan.stage == SOURCE then return force.research_queue_enabled end
+  if f110 then return force.research_queue_enabled end
   return true
 end
 
@@ -86,7 +89,7 @@ local function effect_vector(value)
     local type_name = effect.type
     -- This is the only F110/F200 effect-token translation in the retained
     -- catalogue. The values remain independently observed as 2/4 below.
-    if plan.stage == SUCCESSOR and value.name == plan.continuation
+    if not f110 and value.name == plan.continuation
         and type_name == "bulk-inserter-capacity-bonus" then
       type_name = "stack-inserter-capacity-bonus"
     end
@@ -125,6 +128,13 @@ local function check_closure()
       fail("published F110 source closure differs")
     end
   elseif plan.stage == SUCCESSOR then
+    if plan.successor_engine == "f110" then
+      if mods.base ~= "1.1.110" or mods["more-infinite-research"] ~= "5.0.11000"
+          or mods[FIXTURE] ~= "0.3.0" then
+        fail("MIR5 F110 successor closure differs")
+      end
+      return
+    end
     if mods.base ~= "2.0.77" or mods["more-infinite-research"] ~= "5.0.20000"
         or mods[FIXTURE] ~= "0.2.0" then
       fail("MIR5 F200 successor closure differs")
@@ -268,6 +278,7 @@ local function assert_capacity_source(force)
 end
 
 local function assert_capacity_successor(force)
+  if f110 then return assert_capacity_source(force) end
   if not close(force.inserter_stack_size_bonus, 2)
       or not close(force.bulk_inserter_capacity_bonus, 4) then
     fail("F200 bulk inserter effects differ")
@@ -333,8 +344,8 @@ local function assert_suspended(state, label)
 end
 
 local function marker(stage, state)
-  local capacity = plan.stage == SOURCE and "stack_inserter_capacity_bonus" or "bulk_inserter_capacity_bonus"
-  local capacity_value = plan.stage == SOURCE and game.forces.player.stack_inserter_capacity_bonus
+  local capacity = f110 and "stack_inserter_capacity_bonus" or "bulk_inserter_capacity_bonus"
+  local capacity_value = f110 and game.forces.player.stack_inserter_capacity_bonus
     or game.forces.player.bulk_inserter_capacity_bonus
   log("[MIR5_NATIVE_FIXTURE] RESULT {"
     .. "\"case\":\"f110-f200-transition\","
@@ -488,6 +499,7 @@ local function finish_successor(state)
   if queue.current ~= plan.probe or #queue.queue ~= 1 or queue.queue[1] ~= plan.probe then
     fail("successor did not retain queued probe")
   end
+  state.successor_queue = queue
   state.phase = "successor-complete"
   marker("initial", state); game.server_save(SAVE)
 end
@@ -497,6 +509,7 @@ local function successor_tick()
   if type(state) ~= "table" then fail("successor state is absent") end
   if state.phase == "successor-complete" then
     assert_snapshot(game.forces.player, state.player_snapshot, "successor reload", true)
+    assert_queue(game.forces.player, state.successor_queue, "successor reload")
     assert_capacity_successor(game.forces.player); assert_suspended(state, "successor reload"); assert_foreign(state)
     if loaded and not reload_reported then marker("reload", state); reload_reported = true end
     return

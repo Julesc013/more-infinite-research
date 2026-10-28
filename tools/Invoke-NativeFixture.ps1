@@ -22,6 +22,8 @@ param(
   # The one fresh published F110 source leg for the F110 -> F200 engine hop.
   # It uses the F110 process path without becoming a historical fixture protocol.
   [switch]$F110PublishedCrossSource,
+  # Direct protected4.7.3 F110 save to the current same-edition successor.
+  [switch]$F110SameEditionSuccessor,
   [switch]$CreateOnly,
   # Active runtime seeds are earned by the selected fixture before the
   # benchmark loads the save.  This is deliberately narrower than CreateOnly:
@@ -63,19 +65,27 @@ function Test-F110PublishedCrossSourceRelativePath([string]$Path) {
     -not [IO.Path]::IsPathFullyQualified($Path)
   )
 }
-function Get-F110PublishedCrossSourceFixture([string]$Repo,[hashtable]$ProfileDefinition,[object[]]$ProfileRows,[string[]]$Sources,[string]$EngineData,[string]$Engine,[string]$ExpectedMIRSha256,[string]$Case,[bool]$Historical,[bool]$HistoricalTransition,[bool]$Create,[bool]$Absent,[bool]$Active,[string]$ActiveKind,[string]$InputSave,[string]$InputSaveSha256,[string]$Observer,[object[]]$Markers,[string]$HistoricalTarget,[string]$HistoricalMetadata,[string]$TransitionStage,[string]$TransitionMetadata,[string]$ExpectedEngineSha256='B7B4B834FCA2E32AFA9D3476EB42CC09B02F1205BE97F688DC6FC6ACE7BA8FE1') {
+function Get-F110PublishedCrossSourceFixture([string]$Repo,[hashtable]$ProfileDefinition,[object[]]$ProfileRows,[string[]]$Sources,[string]$EngineData,[string]$Engine,[string]$ExpectedMIRSha256,[string]$Case,[bool]$Historical,[bool]$HistoricalTransition,[bool]$Create,[bool]$Absent,[bool]$Active,[string]$ActiveKind,[string]$InputSave,[string]$InputSaveSha256,[string]$Observer,[object[]]$Markers,[string]$HistoricalTarget,[string]$HistoricalMetadata,[string]$TransitionStage,[string]$TransitionMetadata,[string]$ExpectedEngineSha256='B7B4B834FCA2E32AFA9D3476EB42CC09B02F1205BE97F688DC6FC6ACE7BA8FE1',[bool]$SameEditionSuccessor=$false) {
   Assert-Fixture (-not $Historical -and -not $HistoricalTransition -and -not $Create -and -not $Absent -and -not $Active) 'F110 published cross source permits only a fresh installed-MIR source run'
-  Assert-Fixture ([string]::IsNullOrWhiteSpace($ActiveKind) -and [string]::IsNullOrWhiteSpace($InputSave) -and [string]::IsNullOrWhiteSpace($InputSaveSha256)) 'F110 published cross source does not accept active or input-save modes'
+  if($SameEditionSuccessor){
+    Assert-Fixture ([string]::IsNullOrWhiteSpace($ActiveKind) -and -not [string]::IsNullOrWhiteSpace($InputSave) -and $InputSaveSha256.ToUpperInvariant() -ceq 'D524AA78440F242B179A1E9BC40BF89B87C1A66E99F64C14D3250DEAEBB69253') 'F110 same-edition successor requires the protected D524 source save'
+  }else{
+    Assert-Fixture ([string]::IsNullOrWhiteSpace($ActiveKind) -and [string]::IsNullOrWhiteSpace($InputSave) -and [string]::IsNullOrWhiteSpace($InputSaveSha256)) 'F110 published cross source does not accept active or input-save modes'
+  }
+  $mirVersion=if($SameEditionSuccessor){'5.0.11000'}else{'4.7.11003'}
+  $fixtureVersion=if($SameEditionSuccessor){'0.3.0'}else{'0.1.0'}
+  $profileKind=if($SameEditionSuccessor){'mir5-f110-same-edition-successor'}else{'mir5-f110-f200-transition-source'}
+  $mirSha=if($SameEditionSuccessor){'1C3D982CD048D3C83BF75108F1F9AC769CE0DC833A2DE056CDE16EF8AE2925A9'}else{'66C127D8BFC1919FA88F19D2D9B3047316A1B90401CAA05A6D05979B7A099D1E'}
   Assert-Fixture ([string]::IsNullOrWhiteSpace($Observer) -and $Markers.Count -eq 0) 'F110 published cross source does not accept modern observers or consumers'
   Assert-Fixture ([string]::IsNullOrWhiteSpace($HistoricalTarget) -and [string]::IsNullOrWhiteSpace($HistoricalMetadata) -and [string]::IsNullOrWhiteSpace($TransitionStage) -and [string]::IsNullOrWhiteSpace($TransitionMetadata)) 'F110 published cross source does not accept historical fixture parameters'
   Assert-Fixture ($Case -ceq 'f110-f200-transition') 'F110 published cross source case differs'
-  Assert-Fixture ($ExpectedMIRSha256.ToUpperInvariant() -ceq '66C127D8BFC1919FA88F19D2D9B3047316A1B90401CAA05A6D05979B7A099D1E') 'F110 published cross source MIR archive hash differs'
-  $expectedRows=@('base|1.1.110|True','more-infinite-research|4.7.11003|True','mir-fixture-mir5-f110-f200-transition|0.1.0|True')
+  Assert-Fixture ($ExpectedMIRSha256.ToUpperInvariant() -ceq $mirSha) 'F110 published cross source MIR archive hash differs'
+  $expectedRows=@('base|1.1.110|True',('more-infinite-research|'+$mirVersion+'|True'),('mir-fixture-mir5-f110-f200-transition|'+$fixtureVersion+'|True'))
   $actualRows=@($ProfileRows|ForEach-Object {[string]$_.name+'|'+[string]$_.version+'|'+[string]$_.enabled})
   Assert-Fixture ($actualRows.Count -eq $expectedRows.Count -and (($actualRows -join "`n") -ceq ($expectedRows -join "`n"))) 'F110 published cross source profile differs'
-  Assert-Fixture ($ProfileDefinition.schema -eq 1 -and [string]$ProfileDefinition.kind -ceq 'mir5-f110-f200-transition-source' -and [string]$ProfileDefinition.target -ceq 'f110' -and [string]$ProfileDefinition.factorio_line -ceq '1.1' -and [string]$ProfileDefinition.settings_mode -ceq 'Defaults') 'F110 published cross source profile metadata differs'
+  Assert-Fixture ($ProfileDefinition.schema -eq 1 -and [string]$ProfileDefinition.kind -ceq $profileKind -and [string]$ProfileDefinition.target -ceq 'f110' -and [string]$ProfileDefinition.factorio_line -ceq '1.1' -and [string]$ProfileDefinition.settings_mode -ceq 'Defaults') 'F110 published cross source profile metadata differs'
   Assert-Fixture ($ProfileDefinition.engine -is [Collections.IDictionary] -and [string]$ProfileDefinition.engine.version -ceq '1.1.110' -and [string]$ProfileDefinition.engine.sha256 -ceq $ExpectedEngineSha256) 'F110 published cross source profile engine differs'
-  Assert-Fixture ($ProfileDefinition.archive_sha256 -is [Collections.IDictionary] -and $ProfileDefinition.archive_sha256.Count -eq 1 -and [string]$ProfileDefinition.archive_sha256['more-infinite-research_4.7.11003.zip'] -ceq $ExpectedMIRSha256.ToUpperInvariant()) 'F110 published cross source profile archive differs'
+  Assert-Fixture ($ProfileDefinition.archive_sha256 -is [Collections.IDictionary] -and $ProfileDefinition.archive_sha256.Count -eq 1 -and [string]$ProfileDefinition.archive_sha256['more-infinite-research_'+$mirVersion+'.zip'] -ceq $ExpectedMIRSha256.ToUpperInvariant()) 'F110 published cross source profile archive differs'
   $base=Get-Content -LiteralPath (Join-Path $EngineData 'base/info.json') -Raw|ConvertFrom-Json -AsHashtable
   Assert-Fixture ([string]$base.version -ceq '1.1.110') 'F110 published cross source base differs'
   Assert-Fixture ((Get-FixtureSha $Engine) -ceq $ExpectedEngineSha256) 'F110 published cross source executable differs'
@@ -84,7 +94,7 @@ function Get-F110PublishedCrossSourceFixture([string]$Repo,[hashtable]$ProfileDe
   $source=(Resolve-Path -LiteralPath $Sources[0]).Path
   $sourceRelative=[IO.Path]::GetRelativePath($repoRoot,$source)
   Assert-Fixture (Test-F110PublishedCrossSourceRelativePath $sourceRelative) 'F110 published cross source fixture must remain inside executing checkout'
-  $canonical=Join-Path $repoRoot 'tests/fixtures/f110-f200-transition/f110/published-4.7.3'
+  $canonical=Join-Path $repoRoot $(if($SameEditionSuccessor){'tests/fixtures/f110-f200-transition/f110/successor'}else{'tests/fixtures/f110-f200-transition/f110/published-4.7.3'})
   $shared=Join-Path $repoRoot 'tests/fixtures/f110-f200-transition/shared'
   $authoritative=[ordered]@{
     'catalogue.lua'=Join-Path $canonical 'catalogue.lua'
@@ -113,8 +123,8 @@ function Get-F110PublishedCrossSourceFixture([string]$Repo,[hashtable]$ProfileDe
     Assert-Fixture ((Get-FixtureSha $resolvedActual) -ceq (Get-FixtureSha $resolvedExpected)) "F110 published cross source stage member differs: $relative"
   }
   $info=Get-Content -LiteralPath (Join-Path $source 'info.json') -Raw|ConvertFrom-Json -AsHashtable
-  Assert-Fixture ([string]$info.name -ceq 'mir-fixture-mir5-f110-f200-transition' -and [string]$info.version -ceq '0.1.0' -and [string]$info.factorio_version -ceq '1.1') 'F110 published cross source fixture identity differs'
-  Assert-Fixture ((@($info.dependencies) -join "`n") -ceq (('base >= 1.1.110','more-infinite-research = 4.7.11003') -join "`n")) 'F110 published cross source fixture dependencies differ'
+  Assert-Fixture ([string]$info.name -ceq 'mir-fixture-mir5-f110-f200-transition' -and [string]$info.version -ceq $fixtureVersion -and [string]$info.factorio_version -ceq '1.1') 'F110 published cross source fixture identity differs'
+  Assert-Fixture ((@($info.dependencies) -join "`n") -ceq (('base >= 1.1.110',('more-infinite-research = '+$mirVersion)) -join "`n")) 'F110 published cross source fixture dependencies differ'
   [pscustomobject][ordered]@{source=$source;name=[string]$info.name;version=[string]$info.version}
 }
 function Read-FixtureResult([string]$Text,[string]$Stage) {
@@ -514,18 +524,20 @@ $engineData=Join-Path (Get-Item -LiteralPath $engine).Directory.Parent.Parent.Fu
 $historical=-not [string]::IsNullOrWhiteSpace($HistoricalTarget)
 $historicalTransition=-not [string]::IsNullOrWhiteSpace($HistoricalTransitionStage)
 $f110PublishedCrossSource=[bool]$F110PublishedCrossSource
-$historicalProcess=$historical -or $f110PublishedCrossSource
+$f110SameEditionSuccessor=[bool]$F110SameEditionSuccessor
+Assert-Fixture (-not ($f110PublishedCrossSource -and $f110SameEditionSuccessor)) 'select only one F110 transition stage'
+$historicalProcess=$historical -or $f110PublishedCrossSource -or $f110SameEditionSuccessor
 $historicalProcessVersion=''
 $historicalFixture=$null
 $activeSeed=[bool]$ActiveSeedOnly
 if($activeSeed){
   Assert-Fixture ($ActiveSeedKind -in @('repair-stress','agriculture-scale')) 'active seed kind differs'
-  Assert-Fixture (-not $historical -and -not $historicalTransition -and -not $f110PublishedCrossSource -and -not $CreateOnly -and -not $MIRAbsent) 'active seed requires a modern installed-MIR fixture run'
+  Assert-Fixture (-not $historical -and -not $historicalTransition -and -not $f110PublishedCrossSource -and -not $f110SameEditionSuccessor -and -not $CreateOnly -and -not $MIRAbsent) 'active seed requires a modern installed-MIR fixture run'
   Assert-Fixture (-not $InputSavePath -and -not $ExpectedInputSaveSha256) 'active seed must begin from its own fresh fixture save'
   $expectedCase=if($ActiveSeedKind -ceq 'repair-stress'){'repair-stress-active'}else{'agriculture-scale-active'}
   Assert-Fixture ($CaseName -ceq $expectedCase) 'active seed case differs'
 }
-if($f110PublishedCrossSource){
+if($f110PublishedCrossSource -or $f110SameEditionSuccessor){
   $historicalProcessVersion='1.1'
 }elseif($historicalTransition){
   Assert-Fixture $historical 'historical transition requires a historical target'
@@ -576,8 +588,8 @@ $rows=@($profileDefinition.mods)
 $inventory=@(Get-MIRLibraryInventory -LibraryDirectory $library -EngineDataDirectory $engineData)
 $mirRows=@($rows | Where-Object {$_.name -ceq 'more-infinite-research' -and $_.enabled})
 $f110CrossSourceFixture=$null
-if($f110PublishedCrossSource){
-  $f110CrossSourceFixture=Get-F110PublishedCrossSourceFixture -Repo $repo -ProfileDefinition $profileDefinition -ProfileRows $rows -Sources $FixtureSources -EngineData $engineData -Engine $engine -ExpectedMIRSha256 $ExpectedMIRArchiveSha256 -Case $CaseName -Historical $historical -HistoricalTransition $historicalTransition -Create $CreateOnly -Absent $MIRAbsent -Active $activeSeed -ActiveKind $ActiveSeedKind -InputSave $InputSavePath -InputSaveSha256 $ExpectedInputSaveSha256 -Observer $activeModsObserverName -Markers $ConsumerMarkers -HistoricalTarget $HistoricalTarget -HistoricalMetadata $HistoricalFixtureMetadataPath -TransitionStage $HistoricalTransitionStage -TransitionMetadata $HistoricalTransitionFixtureMetadataPath
+if($f110PublishedCrossSource -or $f110SameEditionSuccessor){
+  $f110CrossSourceFixture=Get-F110PublishedCrossSourceFixture -Repo $repo -ProfileDefinition $profileDefinition -ProfileRows $rows -Sources $FixtureSources -EngineData $engineData -Engine $engine -ExpectedMIRSha256 $ExpectedMIRArchiveSha256 -Case $CaseName -Historical $historical -HistoricalTransition $historicalTransition -Create $CreateOnly -Absent $MIRAbsent -Active $activeSeed -ActiveKind $ActiveSeedKind -InputSave $InputSavePath -InputSaveSha256 $ExpectedInputSaveSha256 -Observer $activeModsObserverName -Markers $ConsumerMarkers -HistoricalTarget $HistoricalTarget -HistoricalMetadata $HistoricalFixtureMetadataPath -TransitionStage $HistoricalTransitionStage -TransitionMetadata $HistoricalTransitionFixtureMetadataPath -SameEditionSuccessor $f110SameEditionSuccessor
 }
 $mir=@()
 if($MIRAbsent){
@@ -622,7 +634,7 @@ if($historical){
     $fixtureBindings+=@{name=[string]$info.name;version=[string]$info.version;source=$source;archive=$archive;sha256=$archiveSha}
   }
 }
-if($f110PublishedCrossSource){
+if($f110PublishedCrossSource -or $f110SameEditionSuccessor){
   Assert-Fixture ($fixtureBindings.Count -eq 1 -and [string]$fixtureBindings[0].name -ceq $f110CrossSourceFixture.name -and [string]$fixtureBindings[0].version -ceq $f110CrossSourceFixture.version -and [string]$fixtureBindings[0].source -ceq $f110CrossSourceFixture.source) 'F110 published cross source fixture selection differs'
 }
 $activeModsObserverBinding=Get-FixtureActiveModsObserver -Name $activeModsObserverName -ProfileRows $rows -FixtureInputs $fixtureBindings
@@ -738,7 +750,7 @@ try{
     try{$text=$reader.ReadToEnd()}finally{$reader.Dispose();$stream.Dispose()}
     if([regex]::IsMatch($text,'(?im)^\s*\d+[.]\d+\s+Error\b|^Error while running event\b|\bException at tick\b|\bnon-recoverable error\b|^stack traceback:$')){throw 'fatal native production diagnostic'}
     if(-not $text.Contains('[MIR5_NATIVE_FIXTURE] RESULT ')){return $false}
-    if($f110PublishedCrossSource -and -not $text.Contains('[MIR5_NATIVE_FIXTURE] RESULT {"case":"f110-f200-transition","stage":"initial"')){return $false}
+    if(($f110PublishedCrossSource -or $f110SameEditionSuccessor) -and -not $text.Contains('[MIR5_NATIVE_FIXTURE] RESULT {"case":"f110-f200-transition","stage":"initial"')){return $false}
     if($historicalProcess){return & $historicalSaveComplete $complete}
     return (Test-Path -LiteralPath $complete -PathType Leaf) -and $text.Contains('Saving finished')
   }.GetNewClosure()
@@ -768,7 +780,7 @@ try{
         $reader=[IO.StreamReader]::new($stream)
         try{$text=$reader.ReadToEnd()}finally{$reader.Dispose();$stream.Dispose()}
         if([regex]::IsMatch($text,'(?im)^\s*\d+[.]\d+\s+Error\b|^Error while running event\b|\bException at tick\b|\bnon-recoverable error\b|^stack traceback:$')){throw 'fatal native historical reload diagnostic'}
-        $reloadCase=if($f110PublishedCrossSource){'f110-f200-transition'}elseif($historicalTransition){'historical-transition'}else{'historical-native'}
+        $reloadCase=if($f110PublishedCrossSource -or $f110SameEditionSuccessor){'f110-f200-transition'}elseif($historicalTransition){'historical-transition'}else{'historical-native'}
         $reloadTransition=if($historicalTransition){',"transition_stage":"'+$HistoricalTransitionStage+'"'}else{''}
         return $text.Contains('[MIR5_NATIVE_FIXTURE] RESULT {"case":"'+$reloadCase+'","stage":"reload"'+$reloadTransition)
       }.GetNewClosure()
