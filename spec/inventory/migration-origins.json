@@ -2136,7 +2136,9 @@
         "sha256": "9BCF1813BBDCBBD90088D74672CEF639FBC96689604673E529CF3AA8FC8D89AF",
         "bytes": 695297,
         "local_direct_library_status": "retained-local-copy-reported",
-        "native_status": "4.7.2-source-chain-only-not-4.7.3-origin-qualification"
+        "native_status": "passed-exact-published-473-to-current-7a2-named-mining-queue-route",
+        "native_evidence": "spec/evidence/historical-473-f017-f100-7a2-native-chain-r01.json",
+        "scope": "One source mining lab and one distinct current successor lab, queue/partial-work assertions, protected source reused directly and two unchanged-byte cold reloads per stage. Named Base route only, not full catalogue/settings/modpack/client/performance or release."
       },
       {
         "edition": "f100",
@@ -2144,7 +2146,9 @@
         "sha256": "C04F3543EBF99D2B76B2C9193EA0886381B7CDDF2F2C1610310E7961B24BE0E1",
         "bytes": 709722,
         "local_direct_library_status": "retained-local-copy-reported",
-        "native_status": "4.7.2-source-chain-only-not-4.7.3-origin-qualification"
+        "native_status": "passed-exact-published-473-to-current-7a2-named-mining-queue-route",
+        "native_evidence": "spec/evidence/historical-473-f017-f100-7a2-native-chain-r01.json",
+        "scope": "One source mining lab and one distinct current successor lab, queue/partial-work assertions, protected source reused directly and two unchanged-byte cold reloads per stage. Named Base route only, not full catalogue/settings/modpack/client/performance or release."
       },
       {
         "edition": "f110",
@@ -2729,16 +2733,16 @@
         {
           "edition": "f017",
           "origin_archive_sha256": "9BCF1813BBDCBBD90088D74672CEF639FBC96689604673E529CF3AA8FC8D89AF",
-          "source_case": "published-4.7.3-archive-verified-source-save-not-yet-qualified",
-          "final_5_x_case": "not_run",
+          "source_case": "passed-exact-published-4.7.3-source-with-protected-save",
+          "final_5_x_case": "closed-named-mining-queue-route-only",
           "disposition": "not-a-cartesian-modset-matrix",
           "current_archive_sha256": "95228385A0862A807DB20A73F56CA0113693A1CDB3437410187303C598D784C7",
           "current_completion": {
-            "status": "needs-correction",
-            "problem": "Exact4.7.3 metadata/profiles, archive-byte comparison and both six-member fixture-stage ZIPs are prepared/guarded. Exact owner engine/library/caller binding and protected4.7.3 source/save execution remain; this is not an observed product defect.",
-            "next_action": "Adopt the named prepared fixture hashes, bind exact installed engine/direct-library controls and freeze the existing native caller. Execute the published4.7.3 source stage and protect its save after two reloads, then execute the current successor from that source. Retain strict science/effect assertions and original adverses.",
+            "status": "closed",
+            "problem": "The named exact4.7.3 source/current7a2 successor route now passes with one distinct source and successor mining lab, queue/partial-work checks and two unchanged-byte cold reloads at each stage.",
+            "next_action": "Reuse this named current result under its original execution identity; review complete relevant catalogue/settings/runtime cases separately. No newer documentation commit requires a duplicate native run.",
             "existing_command": "tools/Invoke-NativeFixture.ps1 -CaseName historical-transition -HistoricalTarget f017 -HistoricalTransitionStage published|mir5 -HistoricalTransitionFixtureMetadataPath tests/fixtures/historical-transition/metadata-473-f017-f100.json",
-            "command_status": "not-ready: native owner engine/library/caller binding and protected4.7.3 source execution remain",
+            "command_status": "closed exact owner packet/source/candidate/engine binding and native execution; see the new native chain",
             "prior_evidence": {
               "path": "spec/evidence/historical-transition-017-100-110-chain.json",
               "sha256": "759C19C45C9B3100769B39DCA8CD843C295C8C610FF59FEA8D399CFAD6191E82"
@@ -2746,22 +2750,27 @@
             "prepared_inputs": {
               "path": "spec/evidence/historical-473-f017-f100-prepared-inputs-r01.json",
               "sha256": "620AAECF422D0E11C38B6C28512B05BF206FBE1206687B2C4B611F62B33CCCB2"
-            }
+            },
+            "native_evidence": {
+              "path": "spec/evidence/historical-473-f017-f100-7a2-native-chain-r01.json",
+              "sha256": "8FB420F70AC828312664AF1EB3388E04996C9571B2A538474E3B343248865B31"
+            },
+            "applicability": "Actual same-edition current7a2/player505 native execution; no relabelling of the retained4.7.2 source chain."
           }
         },
         {
           "edition": "f100",
           "origin_archive_sha256": "C04F3543EBF99D2B76B2C9193EA0886381B7CDDF2F2C1610310E7961B24BE0E1",
-          "source_case": "published-4.7.3-archive-verified-source-save-not-yet-qualified",
-          "final_5_x_case": "not_run",
+          "source_case": "passed-exact-published-4.7.3-source-with-protected-save",
+          "final_5_x_case": "closed-named-mining-queue-route-only",
           "disposition": "not-a-cartesian-modset-matrix",
           "current_archive_sha256": "6BAE382DBD0AEC7199474921887CFBAC61016B8BF5E8FB990656493A8A174B6C",
           "current_completion": {
-            "status": "needs-correction",
-            "problem": "Exact4.7.3 metadata/profiles, archive-byte comparison and both six-member fixture-stage ZIPs are prepared/guarded. Exact owner engine/library/caller binding and protected4.7.3 source/save execution remain; this is not an observed product defect.",
-            "next_action": "Adopt the named prepared fixture hashes, bind exact installed engine/direct-library controls and freeze the existing native caller. Execute the published4.7.3 source stage and protect its save after two reloads, then execute the current successor from that source. Retain strict science/effect assertions and original adverses.",
+            "status": "closed",
+            "problem": "The named exact4.7.3 source/current7a2 successor route now passes with one distinct source and successor mining lab, queue/partial-work checks and two unchanged-byte cold reloads at each stage.",
+            "next_action": "Reuse this named current result under its original execution identity; review complete relevant catalogue/settings/runtime cases separately. No newer documentation commit requires a duplicate native run.",
             "existing_command": "tools/Invoke-NativeFixture.ps1 -CaseName historical-transition -HistoricalTarget f100 -HistoricalTransitionStage published|mir5 -HistoricalTransitionFixtureMetadataPath tests/fixtures/historical-transition/metadata-473-f017-f100.json",
-            "command_status": "not-ready: native owner engine/library/caller binding and protected4.7.3 source execution remain",
+            "command_status": "closed exact owner packet/source/candidate/engine binding and native execution; see the new native chain",
             "prior_evidence": {
               "path": "spec/evidence/historical-transition-017-100-110-chain.json",
               "sha256": "759C19C45C9B3100769B39DCA8CD843C295C8C610FF59FEA8D399CFAD6191E82"
@@ -2769,7 +2778,12 @@
             "prepared_inputs": {
               "path": "spec/evidence/historical-473-f017-f100-prepared-inputs-r01.json",
               "sha256": "620AAECF422D0E11C38B6C28512B05BF206FBE1206687B2C4B611F62B33CCCB2"
-            }
+            },
+            "native_evidence": {
+              "path": "spec/evidence/historical-473-f017-f100-7a2-native-chain-r01.json",
+              "sha256": "8FB420F70AC828312664AF1EB3388E04996C9571B2A538474E3B343248865B31"
+            },
+            "applicability": "Actual same-edition current7a2/player505 native execution; no relabelling of the retained4.7.2 source chain."
           }
         },
         {
@@ -3637,8 +3651,8 @@
         {
           "boundary": "MIR1.1 module credits and disabled public row",
           "status": "needs-correction",
-          "problem": "F200/F210 c74 direct routes and the f0dd disabled-module reset regression passed at their exact inputs; current applicability remains to be pinned.",
-          "next_action": "Review current bootstrap/reset/credit and Library separation. Keep the three historical .01 holders, disabled-public-row decision, source defaults and current native-owner credit expectations. Reuse unchanged cases; execute only affected paths.",
+          "problem": "A new current005D/F210 data-stage fixture preflight stops at candidate module enabled state differs before the source world loads. Existing c74/f0dd native results remain scoped; current product-versus-fixture diagnosis is unresolved.",
+          "next_action": "Aero independently diagnoses the explicit enabled/default representation against actual passed fixture bytes; retain enabled/disabled/module-credit/reset expectations and original88FC. Correct and rerun only the affected fixture if justified, without reflexive player changes. The pending F200 arm did not start.",
           "evidence": [
             {
               "path": "spec/evidence/migration-origin-110-direct-c74-native-chain-r01.json",
@@ -3648,7 +3662,14 @@
               "path": "spec/evidence/disabled-module-reset-f0dd-native-chain-r01.json",
               "sha256": "C9D9E2846077378002F174210D748499992997D22ACDA092DCDEAD7A2852C930"
             }
-          ]
+          ],
+          "current_adverse": {
+            "result_sha256": "0609D354BA1D4782DA8218654CF4679572DBD516AFF6D737C6B2C27242FBE133",
+            "primary_root": "build/qualification/migration-origin-110-current-7a2-r01-controller",
+            "github_exact_result_and_log": "https://github.com/Julesc013/more-infinite-research/pull/1322#issuecomment-6468897954",
+            "capsule_sha256": "1E6728D36D7D2AE1D06B5C5F2153865BDCDF6C884621C9D1B51263DB6F4125B4",
+            "scope": "One actual startup; no source world load/new lab/save/reload. Original88FC and all archives/controls restore; Factorio0."
+          }
         },
         {
           "boundary": "MIR1.2 combined rocket/cannon credit",
