@@ -196,6 +196,13 @@ class MigrationOriginF200120SourceControls(unittest.TestCase):
             local env={script={on_init=function(fn)callbacks.init=fn end,on_load=function()end,
               on_event=function(event,fn)callbacks.events[event]=fn end},
               defines={events={on_research_finished=1,on_tick=2},inventory={lab_input=1}}}
+            if case=="recipe-short-format" then
+              local host_string=string
+              env.string=setmetatable({format=function(pattern,value)
+                if pattern=="%.17g" and value==.1 then return "0.1" end
+                return host_string.format(pattern,value)
+              end},{__index=host_string})
+            end
             env.require=function(name)
               assert(name=="__mir-fixture-mir5-migration-origin-f200-120-source__/catalogue")
               return assert(loadfile(catalogue_path,"t",env))()
@@ -252,13 +259,23 @@ class MigrationOriginF200120SourceControls(unittest.TestCase):
             local ok,message=pcall(function()
               if case:sub(1,6)=="recipe" then source_rows(force) else weapon_rows(force) end
             end)
-            return {ok=ok,message=tostring(message)}
+            local legacy_actual={
+              ["0.10000000149011612"]="0.10000000000000001"
+            }
+            local actual_text=(case=="recipe-short-format" and env.string.format("%.17g",0.10000000149011612)
+              or string.format("%.17g",0.10000000149011612))
+            local expected_text=(case=="recipe-short-format" and env.string.format("%.17g",.1)
+              or string.format("%.17g",.1))
+            return {ok=ok,message=tostring(message),legacy_actual=legacy_actual[actual_text],legacy_expected=expected_text}
           end
         ''')
         invoke = self.lua.eval("migration_origin_120_runtime_effect_scalars")
         for case in ("recipe-native", "gun-native"):
             accepted = py(invoke(case))
             self.assertTrue(accepted["ok"], accepted["message"])
+        shortened = py(invoke("recipe-short-format"))
+        self.assertNotEqual(shortened["legacy_actual"], shortened["legacy_expected"])
+        self.assertTrue(shortened["ok"], shortened["message"])
         for case, expected in (("recipe-nearby", "source runtime effects differ"),
                                ("recipe-duplicate", "source runtime effects differ"),
                                ("gun-nearby", "finite weapon effects differ"),
@@ -267,6 +284,8 @@ class MigrationOriginF200120SourceControls(unittest.TestCase):
                 rejected = py(invoke(case))
                 self.assertFalse(rejected["ok"])
                 self.assertIn(expected, rejected["message"])
+                self.assertIn("actual=", rejected["message"])
+                self.assertIn("expected=", rejected["message"])
 
     def test_runtime_snapshot_refuses_an_incomplete_cannon_contribution(self):
         self.lua.globals().fixture_control_path = (FIXTURE / "control.lua").as_posix()
