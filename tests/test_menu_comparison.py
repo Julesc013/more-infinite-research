@@ -216,6 +216,53 @@ if($null-ne$clear-or[MIROwnedMenuNative]::FixtureIdentityReads-ne0){throw 'clear
             self.assertEqual(sorted(row["block"] for row in primary if row["arm"] == arm), list(range(1, 9)))
             self.assertEqual(sorted(row["position"] for row in primary if row["arm"] == arm), [1, 1, 2, 2, 3, 3, 4, 4])
 
+    def test_published_only_repeatability_diagnostic_is_fixed_five_launches_and_not_a_comparison_plan(self):
+        record = invoke_as_json(f"-PlanOnly -RepeatabilityDiagnostic {DECLARED_POLICY}")
+        self.assertEqual(record["kind"], "MIR5ResponsiveMenuRepeatabilityDiagnosticPlanV1")
+        self.assertEqual(record["status"], "planned-not-executed")
+        self.assertEqual(record["endpoint"], "ordinary-responsive-menu")
+        self.assertTrue(record["fixed_before_execution"])
+        self.assertEqual(record["diagnostic"], {
+            "mode": "published-only-repeatability",
+            "warmup_samples": 1,
+            "observation_samples": 4,
+            "comparison": False,
+            "release_qualification": False,
+        })
+        self.assertFalse(record["claims"]["native_execution"])
+        self.assertFalse(record["claims"]["performance_comparison"])
+        self.assertFalse(record["claims"]["release_qualification"])
+        self.assertEqual(record["tolerance_policy"]["control_regression_tolerance_seconds"], 0.5)
+        self.assertEqual(record["tolerance_policy"]["same_version_aa_pilot"]["relative_tolerance_percent"], 5)
+        self.assertEqual(record["tolerance_policy"]["diagnostic_pair_count"], 2)
+        self.assertNotIn("primary_samples_per_arm", record["tolerance_policy"])
+        self.assertNotIn("counterbalanced_blocks", record["tolerance_policy"])
+        self.assertEqual(
+            record["samples"],
+            [
+                {"ordinal": 1, "phase": "repeatability-warmup", "arm": "published-4.7", "block": 0,
+                 "position": 1, "label": "01-repeatability-warmup-published-4.7"},
+                *[
+                    {"ordinal": ordinal, "phase": "repeatability-observation", "arm": "published-4.7", "block": 1,
+                     "position": ordinal - 1,
+                     "label": f"{ordinal:02d}-repeatability-observation-published-4.7"}
+                    for ordinal in range(2, 6)
+                ],
+            ],
+        )
+        refused = invoke_failure(f"-PlanOnly -RepeatabilityDiagnostic -CounterbalancedBlocks 64 {DECLARED_POLICY}")
+        self.assertNotEqual(refused.returncode, 0)
+        self.assertIn("repeatability-diagnostic-sample-count", refused.stderr + refused.stdout)
+
+    def test_repeatability_preflight_does_not_require_replay_or_candidate_inputs(self):
+        record = invoke_as_json(f"-Preflight -RepeatabilityDiagnostic {DECLARED_POLICY}")
+        self.assertEqual(record["kind"], "MIR5ResponsiveMenuRepeatabilityDiagnosticPreflightV1")
+        self.assertEqual(len(record["plan"]), 5)
+        missing = {row["name"]: row["reason"] for row in record["missing"]}
+        self.assertIn("PublishedArchive", missing)
+        self.assertNotIn("ReplayArchive", missing)
+        self.assertNotIn("CandidateArchive", missing)
+
     def test_sixty_four_block_plan_repeats_the_fixed_latin_cycle_with_balanced_positions(self):
         record = invoke_as_json(f"-PlanOnly -CounterbalancedBlocks 64 -MaxNewOutputMiB 8192 {DECLARED_POLICY}")
         self.assertEqual(record["tolerance_policy"]["counterbalanced_blocks"], 64)
@@ -349,6 +396,48 @@ if($null-ne$clear-or[MIROwnedMenuNative]::FixtureIdentityReads-ne0){throw 'clear
         self.assertEqual(record["tolerance_policy"]["status"], "declared-before-execution")
         self.assertEqual(len(record["plan"]), 38)
 
+    def test_fully_present_repeatability_preflight_needs_no_replay_or_candidate_bytes(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            library = root / "library"
+            library.mkdir()
+            files = {
+                "factorio": root / "factorio.exe",
+                "profile": root / "profile.json",
+                "published": root / "published.zip",
+                "ordinary": root / "player-config.ini",
+                "player_data": root / "player-data.json",
+            }
+            for path in files.values():
+                path.write_text("present", encoding="utf-8")
+            digest = "A" * 64
+            arguments = " ".join(
+                [
+                    "-Preflight -RepeatabilityDiagnostic",
+                    "-ExpectedEngineVersion 2.0.77",
+                    "-ExpectedFactorioLine 2.0",
+                    f"-FactorioBin {powershell_literal(files['factorio'])}",
+                    f"-ExpectedFactorioSha256 {digest}",
+                    f"-ArchiveLibrary {powershell_literal(library)}",
+                    f"-ProfilePath {powershell_literal(files['profile'])}",
+                    f"-ExpectedProfileSha256 {digest}",
+                    f"-PublishedArchive {powershell_literal(files['published'])}",
+                    f"-ExpectedPublishedSha256 {digest}",
+                    f"-OrdinaryPlayerConfigPath {powershell_literal(files['ordinary'])}",
+                    f"-ExpectedOrdinaryPlayerConfigSha256 {digest}",
+                    f"-PlayerDataPath {powershell_literal(files['player_data'])}",
+                    f"-ExpectedPlayerDataSha256 {digest}",
+                    f"-OutputRoot {powershell_literal(root / 'output')}",
+                    DECLARED_POLICY,
+                ]
+            )
+            record = invoke_as_json(arguments)
+
+        self.assertEqual(record["status"], "inputs-present-not-executed")
+        self.assertEqual(record["missing"], [])
+        self.assertEqual(record["kind"], "MIR5ResponsiveMenuRepeatabilityDiagnosticPreflightV1")
+        self.assertEqual(len(record["plan"]), 5)
+
     def test_candidate_and_control_use_direct_library_selection_while_only_replay_swaps(self):
         result = invoke_dispatch_as_json()
         self.assertEqual(
@@ -381,6 +470,13 @@ if($null-ne$clear-or[MIROwnedMenuNative]::FixtureIdentityReads-ne0){throw 'clear
         self.assertIn("-Execute only with exclusive native ownership", source)
         self.assertIn("CandidateArchive", source)
         self.assertIn("candidate-mir5", source)
+        self.assertIn("RepeatabilityDiagnostic", source)
+        self.assertIn("MIR5ResponsiveMenuRepeatabilityDiagnosticObservationV1", source)
+        self.assertIn(
+            "Assert-MIRDirectLibraryStartupDeclaredInputs -ProfileDefinition $profileRaw "
+            "-EngineIdentity $engine -ArchiveHashes $profileArchiveHashes -ErrorPrefix 'mir5-menu'",
+            source,
+        )
         self.assertIn("ExpectedFactorioLine", source)
         self.assertNotIn("Invoke-PrototypeCapture", source)
         self.assertNotIn("Invoke-NativeFixture", source)

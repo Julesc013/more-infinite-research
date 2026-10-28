@@ -176,6 +176,22 @@ Return exact changed files/responsibilities, real commands/results, active regre
 
 Release and branch/control permissions remain explicit. Documentation adoption is not permission to publish or change repository security controls.
 
+## Bounded menu repeatability diagnostic
+
+The [prepared command](../spec/evidence/f210-menu-repeatability-prepared-command-r01.json) investigates the retained failed A/A control. Black Glass first supplies the original actor/log/resource bodies for independent review, freezes a quiet native window and verifies actual pinned inputs. No new run is needed to export existing records. This packet remains unexecuted; presence preflight is not native acceptance.
+
+Use `tools/Invoke-MenuComparison.ps1 -RepeatabilityDiagnostic` for one published warmup and four published observations. It uses the same resource/direct-library/actor helpers and endpoint, validates the existing profile’s declared archives, and gives the result a distinct diagnostic kind. The ordinary8/64-block comparison remains the separate acceptance path; no diagnostic observation can substitute for its retained failed pilot. Replay and candidate parameters are unnecessary in diagnostic mode.
+
+The plan-only command starts no Factorio process:
+
+```powershell
+.\tools\Invoke-MenuComparison.ps1 -PlanOnly -RepeatabilityDiagnostic `
+  -AaAbsoluteToleranceSeconds 0.5 -AaRelativeTolerancePercent 5 `
+  -ControlRegressionToleranceSeconds 0.5 -MinimumMirAddedTimeReductionPercent 50
+```
+
+On the native owner, read the prepared command’s `parameters` as the splatted argument table; first use `-Preflight`, then `-Execute` only after its body-review/quiet-window/input/custody conditions are satisfied. Preserve all five outcomes and any adverse/partial record. Compare adjacent observation pairs1/2 and3/4 without selection or extension. Retain full actor JSONs, per-sample engine logs, owned captures and governed ledgers. The actor records aggregate capture attempts and first-render/action/response, not a per-attempt timeline. Uncollected activity/thermal telemetry stays unobserved. A reviewed diagnostic precedes one complete final-candidate comparison; changing a demonstrably unsuitable method requires an explicit protocol correction with the original failure preserved.
+
 ## Offline player asset freeze
 
 Keep the existing extended-version build and qualification workflow. After acceptance, follow [final Portal copies](../spec/targets.md#final-portal-copies) to export selected finished packages for the maintainer, preserving the GitHub originals. This final output operation does not introduce a source/runtime codec or another build configuration.
