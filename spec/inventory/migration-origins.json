@@ -3788,12 +3788,16 @@
         {
           "boundary": "K2 Imersite public/carrier identities",
           "status": "needs-correction",
-          "problem": "Direct4.6 to frozen MIR5 matching-cost chain passes; the published4.7.2 intermediate fails before MIR5. K2SE is a separate prepared closure.",
-          "next_action": "Review direct-route505 applicability, then qualify the distinct K2SE published-origin carrier case. Keep failed staged4.7.2 route explicit; do not patch an old archive or manufacture state to make it pass.",
+          "problem": "Direct4.6 matching-cost route passes at original inputs; staged published4.7.2 remains adverse. Exact published4.7.3 K2SE carrier source89023 now passes save/two reloads; current005D fails foreign carrier enablement before fixture writes. Logging-only native fields retain levels/bonus/progress but both foreign flags become true.",
+          "next_action": "Use protected89023 without recreation. Trace earliest MIR-context carrier flags and reuse existing data captures to distinguish engine/prototype changes from player lifecycle writes. Preserve foreign disablement and every original successor assertion; execute affected corrected successor/save/two reloads. No K2SO/public handoff or source-lab claim follows.",
           "evidence": [
             {
               "path": "spec/evidence/native-recovery-wave-r05-chain.json",
               "sha256": "36B34E7CCB41BFF138B41B9602DDEAB9C56502020EDE4CC9699F300667609F6B"
+            },
+            {
+              "path": "spec/evidence/k2se-carrier-current005d-native-chain-r01.json",
+              "scope": "Protected zero-lab source passes; actual005D successor foreign-enablement failure and logging-only fields remain open."
             }
           ]
         }
