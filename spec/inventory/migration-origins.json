@@ -3727,9 +3727,9 @@
         },
         {
           "boundary": "Policy-v1 literal-boolean cap ownership",
-          "status": "needs-correction",
-          "problem": "Exact4.0.20000 to a575 F200/direct F210 passed. Tag bodies differ from published controller bytes; no later candidate verdict is automatic.",
-          "next_action": "Review actual V1 reader/owner/effect/visibility consumed paths against505 and retain positive versus absent/false markers. Execute the affected representative only if equivalence cannot be proved.",
+          "status": "closed",
+          "problem": "The exact4.0.20000 Base source and direct a575 F200/F210 results retain their original execution identities. Scoped VER-06 review establishes current505 applicability for that representative, not a new native execution or every V1 origin.",
+          "next_action": "Reuse only the named CEEB/4.0.20000 Base gear-cap observations at their original D3 F200 and SteamFE4 F210 engine/fixture/profile inputs. Preserve adverse and absent/false/foreign ownership limits; other origins, standalone8DC, Library, new credits, reset behavior and full-product qualification are separate.",
           "evidence": [
             {
               "path": "spec/evidence/legacy-boolean-cap-a575-native-chain.json",
@@ -3738,6 +3738,10 @@
             {
               "path": "spec/evidence/historical-boolean-cap-archive-metadata.json",
               "sha256": "F56981D287F8BA9E21B06C7238078FA17D14BB307E2700346904815FCE74617B"
+            },
+            {
+              "path": "spec/evidence/legacy-boolean-cap-505-applicability-r01.json",
+              "sha256": "DD89A9C30C2C8B0DA7F1A6724ED026F09376321517E5B4D6BEA3C1D806F99499"
             }
           ]
         },
