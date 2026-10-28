@@ -1,0 +1,8 @@
+{
+  "name": "mir-fixture-f100-f110-laser",
+  "version": "0.1.0",
+  "title": "MIR F100 laser migration source",
+  "author": "MIR maintainers",
+  "factorio_version": "1.0",
+  "dependencies": ["base >= 1.0.0", "more-infinite-research = 5.0.10000"]
+}

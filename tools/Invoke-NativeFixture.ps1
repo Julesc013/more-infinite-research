@@ -24,6 +24,8 @@ param(
   [switch]$F110PublishedCrossSource,
   # Direct protected4.7.3 F110 save to the current same-edition successor.
   [switch]$F110SameEditionSuccessor,
+  # The MIR5 F100 -> F110 laser identity/effect-category boundary.
+  [ValidateSet('','source','successor')][string]$F100F110LaserStage='',
   [switch]$CreateOnly,
   # Active runtime seeds are earned by the selected fixture before the
   # benchmark loads the save.  This is deliberately narrower than CreateOnly:
@@ -126,6 +128,54 @@ function Get-F110PublishedCrossSourceFixture([string]$Repo,[hashtable]$ProfileDe
   Assert-Fixture ([string]$info.name -ceq 'mir-fixture-mir5-f110-f200-transition' -and [string]$info.version -ceq $fixtureVersion -and [string]$info.factorio_version -ceq '1.1') 'F110 published cross source fixture identity differs'
   Assert-Fixture ((@($info.dependencies) -join "`n") -ceq (('base >= 1.1.110',('more-infinite-research = '+$mirVersion)) -join "`n")) 'F110 published cross source fixture dependencies differ'
   [pscustomobject][ordered]@{source=$source;name=[string]$info.name;version=[string]$info.version}
+}
+function Get-F100F110LaserFixture([string]$Repo,[hashtable]$Profile,[string[]]$Sources,[string]$EngineData,[string]$Engine,[string]$MIRSha,[string]$Case,[string]$Stage,[bool]$OtherModes,[string]$InputSave,[string]$InputSha,[string]$ExpectedEngineSha='') {
+  Assert-Fixture ($Stage -cin @('source','successor') -and -not $OtherModes) 'laser transition requires one exclusive full fixture stage'
+  Assert-Fixture ($Case -ceq 'f100-f110-laser-transition') 'laser transition case differs'
+  $sourceStage=$Stage -ceq 'source'
+  $target=if($sourceStage){'f100'}else{'f110'}
+  $line=if($sourceStage){'1.0'}else{'1.1'}
+  $baseVersion=if($sourceStage){'1.0.0'}else{'1.1.110'}
+  $mirVersion=if($sourceStage){'5.0.10000'}else{'5.0.11000'}
+  $fixtureVersion=if($sourceStage){'0.1.0'}else{'0.2.0'}
+  if(-not $ExpectedEngineSha){$ExpectedEngineSha=if($sourceStage){'99F1CE207A04296EF7D797E4A98AA98DDE4F02EE653C9DF736AC33A676FD4F70'}else{'B7B4B834FCA2E32AFA9D3476EB42CC09B02F1205BE97F688DC6FC6ACE7BA8FE1'}}
+  if($sourceStage){
+    Assert-Fixture (-not $InputSave -and -not $InputSha) 'laser source must create its own fresh save'
+  }else{
+    Assert-Fixture ($InputSave -and $InputSha -cmatch '^[A-Fa-f0-9]{64}$' -and $Profile.ContainsKey('protected_source_sha256') -and $InputSha.ToUpperInvariant() -ceq [string]$Profile.protected_source_sha256) 'laser successor requires the pinned protected source save'
+  }
+  Assert-Fixture ($Profile.schema -eq 1 -and [string]$Profile.kind -ceq 'mir-f100-f110-laser-transition' -and [string]$Profile.stage -ceq $Stage -and [string]$Profile.target -ceq $target -and [string]$Profile.factorio_line -ceq $line -and [string]$Profile.settings_mode -ceq 'Defaults') 'laser profile metadata differs'
+  $expectedRows=@(('base|'+$baseVersion+'|True'),('more-infinite-research|'+$mirVersion+'|True'),('mir-fixture-f100-f110-laser|'+$fixtureVersion+'|True'))
+  $actualRows=@($Profile.mods|ForEach-Object {[string]$_.name+'|'+[string]$_.version+'|'+[string]$_.enabled})
+  Assert-Fixture ($actualRows.Count -eq 3 -and ($actualRows -join "`n") -ceq ($expectedRows -join "`n")) 'laser selected closure differs'
+  Assert-Fixture ($MIRSha -cmatch '^[A-Fa-f0-9]{64}$' -and $Profile.archive_sha256 -is [Collections.IDictionary] -and $Profile.archive_sha256.Count -eq 1 -and [string]$Profile.archive_sha256['more-infinite-research_'+$mirVersion+'.zip'] -ceq $MIRSha.ToUpperInvariant()) 'laser MIR archive pin differs'
+  $base=Get-Content -LiteralPath (Join-Path $EngineData 'base/info.json') -Raw|ConvertFrom-Json -AsHashtable
+  Assert-Fixture ([string]$base.version -ceq $baseVersion -and [string]$Profile.engine.version -ceq $baseVersion -and [string]$Profile.engine.sha256 -ceq $ExpectedEngineSha -and (Get-FixtureSha $Engine) -ceq $ExpectedEngineSha) 'laser engine pin differs'
+  Assert-Fixture ($Sources.Count -eq 1) 'laser transition requires one composed fixture'
+  $repoRoot=(Resolve-Path -LiteralPath $Repo).Path
+  $source=(Resolve-Path -LiteralPath $Sources[0]).Path
+  Assert-Fixture (Test-F110PublishedCrossSourceRelativePath ([IO.Path]::GetRelativePath($repoRoot,$source))) 'laser fixture leaves executing checkout'
+  $canonical=Join-Path $repoRoot ('tests/fixtures/f100-f110-laser/'+$Stage)
+  $shared=Join-Path $repoRoot 'tests/fixtures/f100-f110-laser/shared'
+  $members=[ordered]@{}
+  foreach($name in @('info.json','stage.lua','control.lua','data-final-fixes.lua','settings-updates.lua')){$members[$name]=Join-Path $canonical $name}
+  $members['fixture_control.lua']=Join-Path $shared 'control.lua'
+  $members['fixture_data_final.lua']=Join-Path $shared 'data-final-fixes.lua'
+  $members['fixture_settings.lua']=Join-Path $shared 'settings-updates.lua'
+  $files=@(Get-ChildItem -LiteralPath $source -File -Force)
+  Assert-Fixture ($files.Count -eq $members.Count -and @(Get-ChildItem -LiteralPath $source -Directory -Force).Count -eq 0) 'laser fixture membership differs'
+  foreach($name in $members.Keys){
+    $actual=Join-Path $source $name
+    Assert-Fixture (Test-Path -LiteralPath $actual -PathType Leaf) 'laser composed member absent'
+    $resolved=(Resolve-Path -LiteralPath $actual).Path
+    Assert-Fixture (Test-F110PublishedCrossSourceRelativePath ([IO.Path]::GetRelativePath($source,$resolved))) 'laser composed member leaves fixture'
+    $expected=(Resolve-Path -LiteralPath $members[$name]).Path
+    Assert-Fixture (Test-F110PublishedCrossSourceRelativePath ([IO.Path]::GetRelativePath($repoRoot,$expected))) 'laser canonical member leaves checkout'
+    Assert-Fixture ((Get-FixtureSha $actual) -ceq (Get-FixtureSha $members[$name])) ('laser canonical member differs: '+$name)
+  }
+  $info=Get-Content -LiteralPath (Join-Path $source 'info.json') -Raw|ConvertFrom-Json -AsHashtable
+  Assert-Fixture ([string]$info.name -ceq 'mir-fixture-f100-f110-laser' -and [string]$info.version -ceq $fixtureVersion -and [string]$info.factorio_version -ceq $line) 'laser fixture info differs'
+  return [pscustomobject]@{source=$source;name=[string]$info.name;version=$fixtureVersion;stage=$Stage;factorio_version=$line}
 }
 function Read-FixtureResult([string]$Text,[string]$Stage) {
   $rows=@([regex]::Matches($Text,'\[MIR5_NATIVE_FIXTURE\] RESULT (\{[^\r\n]+\})') | ForEach-Object {$_.Groups[1].Value | ConvertFrom-Json} | Where-Object {$_.case -ceq $CaseName -and $_.stage -ceq $Stage})
@@ -525,19 +575,23 @@ $historical=-not [string]::IsNullOrWhiteSpace($HistoricalTarget)
 $historicalTransition=-not [string]::IsNullOrWhiteSpace($HistoricalTransitionStage)
 $f110PublishedCrossSource=[bool]$F110PublishedCrossSource
 $f110SameEditionSuccessor=[bool]$F110SameEditionSuccessor
+$laserTransition=-not [string]::IsNullOrWhiteSpace($F100F110LaserStage)
 Assert-Fixture (-not ($f110PublishedCrossSource -and $f110SameEditionSuccessor)) 'select only one F110 transition stage'
-$historicalProcess=$historical -or $f110PublishedCrossSource -or $f110SameEditionSuccessor
+$historicalProcess=$historical -or $f110PublishedCrossSource -or $f110SameEditionSuccessor -or $laserTransition
 $historicalProcessVersion=''
 $historicalFixture=$null
 $activeSeed=[bool]$ActiveSeedOnly
 if($activeSeed){
   Assert-Fixture ($ActiveSeedKind -in @('repair-stress','agriculture-scale')) 'active seed kind differs'
-  Assert-Fixture (-not $historical -and -not $historicalTransition -and -not $f110PublishedCrossSource -and -not $f110SameEditionSuccessor -and -not $CreateOnly -and -not $MIRAbsent) 'active seed requires a modern installed-MIR fixture run'
+  Assert-Fixture (-not $historical -and -not $historicalTransition -and -not $f110PublishedCrossSource -and -not $f110SameEditionSuccessor -and -not $laserTransition -and -not $CreateOnly -and -not $MIRAbsent) 'active seed requires a modern installed-MIR fixture run'
   Assert-Fixture (-not $InputSavePath -and -not $ExpectedInputSaveSha256) 'active seed must begin from its own fresh fixture save'
   $expectedCase=if($ActiveSeedKind -ceq 'repair-stress'){'repair-stress-active'}else{'agriculture-scale-active'}
   Assert-Fixture ($CaseName -ceq $expectedCase) 'active seed case differs'
 }
-if($f110PublishedCrossSource -or $f110SameEditionSuccessor){
+if($laserTransition){
+  Assert-Fixture (-not $historical -and -not $historicalTransition -and -not $f110PublishedCrossSource -and -not $f110SameEditionSuccessor -and -not $CreateOnly -and -not $MIRAbsent -and -not $activeSeed -and -not $ActiveSeedKind -and -not $activeModsObserverName -and $ConsumerMarkers.Count -eq 0 -and -not $HistoricalFixtureMetadataPath -and -not $HistoricalTransitionFixtureMetadataPath) 'laser transition modes are exclusive'
+  $historicalProcessVersion=if($F100F110LaserStage -ceq 'source'){'1.0'}else{'1.1'}
+}elseif($f110PublishedCrossSource -or $f110SameEditionSuccessor){
   $historicalProcessVersion='1.1'
 }elseif($historicalTransition){
   Assert-Fixture $historical 'historical transition requires a historical target'
@@ -585,6 +639,10 @@ Import-Module $identityModule -Force
 $profile=(Resolve-Path -LiteralPath $ProfilePath).Path
 $profileDefinition=Get-Content -LiteralPath $profile -Raw | ConvertFrom-Json -AsHashtable
 $rows=@($profileDefinition.mods)
+$laserFixture=$null
+if($laserTransition){
+  $laserFixture=Get-F100F110LaserFixture -Repo $repo -Profile $profileDefinition -Sources $FixtureSources -EngineData $engineData -Engine $engine -MIRSha $ExpectedMIRArchiveSha256 -Case $CaseName -Stage $F100F110LaserStage -OtherModes:$false -InputSave $InputSavePath -InputSha $ExpectedInputSaveSha256
+}
 $inventory=@(Get-MIRLibraryInventory -LibraryDirectory $library -EngineDataDirectory $engineData)
 $mirRows=@($rows | Where-Object {$_.name -ceq 'more-infinite-research' -and $_.enabled})
 $f110CrossSourceFixture=$null
@@ -637,6 +695,7 @@ if($historical){
 if($f110PublishedCrossSource -or $f110SameEditionSuccessor){
   Assert-Fixture ($fixtureBindings.Count -eq 1 -and [string]$fixtureBindings[0].name -ceq $f110CrossSourceFixture.name -and [string]$fixtureBindings[0].version -ceq $f110CrossSourceFixture.version -and [string]$fixtureBindings[0].source -ceq $f110CrossSourceFixture.source) 'F110 published cross source fixture selection differs'
 }
+if($laserTransition){Assert-Fixture ($fixtureBindings.Count -eq 1 -and [string]$fixtureBindings[0].name -ceq $laserFixture.name -and [string]$fixtureBindings[0].version -ceq $laserFixture.version -and [string]$fixtureBindings[0].source -ceq $laserFixture.source) 'laser fixture selection differs'}
 $activeModsObserverBinding=Get-FixtureActiveModsObserver -Name $activeModsObserverName -ProfileRows $rows -FixtureInputs $fixtureBindings
 $engineIdentity=Get-MIRDirectLibraryStartupEngineIdentity -FactorioBin $engine -EngineDataDirectory $engineData
 $archiveHashes=Get-MIRDirectLibraryStartupArchiveHashes -LibraryDirectory $library -EngineDataDirectory $engineData -BaseRows $rows -MirArchive $null
@@ -659,6 +718,7 @@ $record=[ordered]@{
   input_save=if($inputSave){@{path=$inputSave;sha256=$ExpectedInputSaveSha256.ToUpperInvariant()}}else{$null}
   release_qualification=$false
 }
+if($laserTransition){$record.f100_f110_laser_transition=@{stage=$F100F110LaserStage;factorio_version=$historicalProcessVersion}}
 try{
   # Compile the governor's native memory reader before releasing temporary
   # host allocations; its first Add-Type call otherwise occurs inside wait.
@@ -751,6 +811,7 @@ try{
     if([regex]::IsMatch($text,'(?im)^\s*\d+[.]\d+\s+Error\b|^Error while running event\b|\bException at tick\b|\bnon-recoverable error\b|^stack traceback:$')){throw 'fatal native production diagnostic'}
     if(-not $text.Contains('[MIR5_NATIVE_FIXTURE] RESULT ')){return $false}
     if(($f110PublishedCrossSource -or $f110SameEditionSuccessor) -and -not $text.Contains('[MIR5_NATIVE_FIXTURE] RESULT {"case":"f110-f200-transition","stage":"initial"')){return $false}
+    if($laserTransition -and -not $text.Contains('[MIR5_NATIVE_FIXTURE] RESULT {"case":"f100-f110-laser-transition","stage":"initial","role":"'+$F100F110LaserStage+'"')){return $false}
     if($historicalProcess){return & $historicalSaveComplete $complete}
     return (Test-Path -LiteralPath $complete -PathType Leaf) -and $text.Contains('Saving finished')
   }.GetNewClosure()
@@ -767,6 +828,7 @@ try{
   }
   $record.production.consumers=Read-ConsumerResults ([IO.File]::ReadAllText($record.production.log)) $ProductionConsumerStage
   $record.initial=Read-FixtureResult ([IO.File]::ReadAllText($record.production.log)) 'initial'
+  if($laserTransition){Assert-Fixture ([string]$record.initial.role -ceq $F100F110LaserStage) 'laser initial role differs'}
   if($historicalTransition){Assert-Fixture ([string]$record.initial.transition_stage -ceq $HistoricalTransitionStage) 'historical transition predecessor or successor witness differs'}
   $saveHash=Get-FixtureSha $complete
   $record.reloads=@()
@@ -780,13 +842,14 @@ try{
         $reader=[IO.StreamReader]::new($stream)
         try{$text=$reader.ReadToEnd()}finally{$reader.Dispose();$stream.Dispose()}
         if([regex]::IsMatch($text,'(?im)^\s*\d+[.]\d+\s+Error\b|^Error while running event\b|\bException at tick\b|\bnon-recoverable error\b|^stack traceback:$')){throw 'fatal native historical reload diagnostic'}
-        $reloadCase=if($f110PublishedCrossSource -or $f110SameEditionSuccessor){'f110-f200-transition'}elseif($historicalTransition){'historical-transition'}else{'historical-native'}
+        $reloadCase=if($f110PublishedCrossSource -or $f110SameEditionSuccessor){'f110-f200-transition'}elseif($laserTransition){'f100-f110-laser-transition'}elseif($historicalTransition){'historical-transition'}else{'historical-native'}
         $reloadTransition=if($historicalTransition){',"transition_stage":"'+$HistoricalTransitionStage+'"'}else{''}
         return $text.Contains('[MIR5_NATIVE_FIXTURE] RESULT {"case":"'+$reloadCase+'","stage":"reload"'+$reloadTransition)
       }.GetNewClosure()
     }
     $stage=Invoke-FixtureStage ('reload-'+$ordinal) $reloadArguments $reloadCompletion
     $result=Read-FixtureResult ([IO.File]::ReadAllText($stage.log)) 'reload'
+    if($laserTransition){Assert-Fixture ([string]$result.role -ceq $F100F110LaserStage) 'laser reload role differs'}
     if($historicalTransition){Assert-Fixture ([string]$result.transition_stage -ceq $HistoricalTransitionStage) 'historical transition reload witness differs'}
     $stage.consumers=Read-ConsumerResults ([IO.File]::ReadAllText($stage.log)) 'load'
     Assert-Fixture ((Get-FixtureSha $complete) -ceq $saveHash) 'cold reload changed completed save bytes'
