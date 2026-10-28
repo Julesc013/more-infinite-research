@@ -3788,8 +3788,8 @@
         {
           "boundary": "K2 Imersite public/carrier identities",
           "status": "needs-correction",
-          "problem": "Direct4.6 to AFCAF/R05 matching-cost chain passes under its original FE4 inputs; later b251/E3A was preparation only. Current005D/8DC direct inputs are now pinned and guarded, awaiting native-owner resource/input admission. Published4.7.2 intermediate still fails before MIR5; K2SE is a distinct unqualified published-origin carrier closure.",
-          "next_action": "The sole native owner can adopt the prepared current direct route from unchanged protected538B, with original five source labs reused, one new tail lab, retained42-percent work, save and two cold reloads. Bind actual source/engine/library/caller/output and resource admission first. Separately qualify the K2SE published-origin carrier case. Keep failed staged4.7.2 explicit; no old archive patch or manufactured original state. This prepared record creates no additional native assignment.",
+          "problem": "Current005D/8DC direct538B recovery passes at its own published proofPR1356; preserve oldAFCAF/FE4 and staged4.7.2 adverse. K2SE source89023 passes,but005D foreign flags aretrue before MIR configuration body and unchangedafter; unchangedB6 fixture-only control passes. Exact version/prototype/earlier lifecycle cause remains unresolved,not a proven MIR callback write.",
+          "next_action": "Reuse protected89023. Distinguish MIR-version/prototype migration or earlier lifecycle events and exact recoverable ownership; no missing optional field or old ledger overrides current/foreign rights. Preserve all original successor assertions and qualify actual corrected-current save/two reloads. Do not repeat the completed first-entry trace or fixture-only control unchanged; source recreation,K2SO/public handoff and lab-earned K2SE remain separate.",
           "prepared_inputs": {
             "path": "spec/evidence/k2-imersite-current005d-prepared-inputs-r01.json",
             "sha256": "02C6BFFB4CD524A11BF90DEC1269639963B61765027AE0D60A6A56E9C068EC56"
@@ -3798,6 +3798,14 @@
             {
               "path": "spec/evidence/native-recovery-wave-r05-chain.json",
               "sha256": "36B34E7CCB41BFF138B41B9602DDEAB9C56502020EDE4CC9699F300667609F6B"
+            },
+            {
+              "path": "spec/evidence/k2se-carrier-current005d-native-chain-r01.json",
+              "scope": "Protected zero-lab source passes; actual005D successor foreign-enablement failure and logging-only fields remain open."
+            },
+            {
+              "path": "spec/evidence/k2se-entry-and-published-control-chain-r04.json",
+              "scope": "MIR-context pre/post body diagnostic plus unchanged-published passing control; current K2SE successor still open."
             }
           ]
         }
@@ -3866,8 +3874,8 @@
         {
           "boundary": "Published F200 cap disabled/re-enabled and V3 F210 worker tails",
           "status": "needs-correction",
-          "problem": "Reviewed cap source correction1357 is merged. Corrected1246 disabled stage passes save07C/two colds; reenable restores owned research and completes one actual lab/initialmarker but fails a stale disabled-stage fixture on_load witness on its next ordinary completed tick. Raw failure/unqualified save0FA remain protected; F200 direct notrun. Actual V3 worker/earlier structured cases remain distinct.",
-          "next_action": "Commit/review the small fixture-only local witness correction and19 opposing controls,then retry only reenabling from accepted07C and the unrun F200 direct case from original81AF. Do not recreate source or rerun disabled stage. Preserve oldDBF98 negatives and every adverse. The adjacent enabled/prototype-true finite V3 and worker-tail restoration question is assigned to Aero host review separately; no new rights are inferred.",
+          "problem": "Named1246 F210 first-disabled/reenabled route now passes from81AF through07C/save/two colds,one new reenabled lab/save/two colds. Original DBF98/R01 fixture failure stay separate. F2000.2 refuses an intentionally different historical source contract because root incorrectly supplied4.7.3/0.4; no product verdict. Distinct earlierV3/worker and adjacent enabled finitecap remain open.",
+          "next_action": "Retain qualified F210 route at its exact1246/8DC inputs. Prepare an explicit F2004.7.3 thin fixture for protected81AF,keeping historical0.2/4.7.2 guard unchanged and reusing source. Then qualify same-engine lab/save/two reloads. Continue separate Aero enabled/prototype-true finiteV3/worker host review; no negative ownership override,source recreation or unrelated rerun.",
           "evidence": [
             {
               "path": "spec/evidence/f200-foreign-cap-baseline-f0dd-native-chain-r01.json",
@@ -3896,6 +3904,10 @@
             {
               "path": "spec/evidence/cap-corrected-first-batch-partial-chain-r01.json",
               "scope": "Corrected1246 disabled/save/two-cold pass; reenabling lab reaches expected result but stale fixture witness fails; F200 notrun."
+            },
+            {
+              "path": "spec/evidence/cap-corrected-complete-f210-chain-r02.json",
+              "scope": "Qualified named F210 Base disabled/reenabled route; F200 mismatched-source refusal and other V3 cases remain separate."
             }
           ],
           "protected_473_cap_source": {
