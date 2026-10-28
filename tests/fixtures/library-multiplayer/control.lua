@@ -10,12 +10,16 @@ local BROWSER = "more-infinite-research-browser"
 local ROOT = "mir_research_browser"
 local FILTERS = "mir_library_filters"
 local QUERY = "mir_library_query"
+local FAMILY = "mir_library_family"
 local SORT = "mir_library_sort"
 local TABS = "mir_library_tabs"
 local RESEARCH_CONTENT = "mir_library_research_content"
 local RESULTS = "mir_library_results"
 local DETAIL = "mir_library_detail"
 local DETAIL_TITLE = "mir_library_detail_title"
+local DETAIL_EMPTY = "mir_library_detail_empty"
+local ACTIONS = "mir_library_actions"
+local OPEN_NATIVE = "mir_library_open_native"
 local AVAILABILITY = {"mir_library_availability_1", "mir_library_availability_2"}
 local AVAILABILITY_FAMILIES = {
   "research_agricultural_growth_speed",
@@ -27,9 +31,21 @@ local NATIVE_LAB_PRODUCTIVITY = "laboratory-productivity"
 
 local GEAR = "recipe-prod-research_gears-1"
 local MINING = "recipe-prod-research_mining_drill-1"
+local AUTOMATION = "automation"
 local TECHNOLOGIES = {GEAR, MINING}
+local PRIVATE_CREDIT_IDS = {
+  "mir-legacy-module-credit-speed-module",
+  "mir-legacy-module-credit-productivity-module",
+  "mir-legacy-module-credit-efficiency-module",
+  "mir-legacy-cannon-credit-rocket-shooting-speed",
+}
 local function space_age_library()
   return script ~= nil and script.active_mods ~= nil and script.active_mods[SPACE_AGE] == "2.1.23"
+end
+
+local function private_credit_browser_probe()
+  return script ~= nil and script.active_mods ~= nil
+    and script.active_mods["mir-fixture-mir5-library-multiplayer"] == "0.3.0"
 end
 
 local GEAR_RECIPES = space_age_library()
@@ -139,12 +155,72 @@ local function assert_native(state, force)
   end
 end
 
+local function private_credit_snapshot(force)
+  local technologies = valid(force) and force.technologies or nil
+  if technologies == nil then fail("private credit force technologies are absent") end
+  local result, count = {}, 0
+  for _, id in ipairs(PRIVATE_CREDIT_IDS) do
+    local technology = technologies[id]
+    if not valid(technology) then fail("private credit holder is absent: " .. id) end
+    if type(technology.level) ~= "number" or type(technology.researched) ~= "boolean"
+        or type(technology.enabled) ~= "boolean" or type(technology.visible_when_disabled) ~= "boolean" then
+      fail("private credit holder state is not scalar: " .. id)
+    end
+    result[id] = {
+      level=technology.level, researched=technology.researched, enabled=technology.enabled,
+      visible_when_disabled=technology.visible_when_disabled,
+    }
+    count = count + 1
+  end
+  if count ~= #PRIVATE_CREDIT_IDS then fail("private credit holder count differs") end
+  return result
+end
+
+local function same_private_credit_snapshot(left, right)
+  if type(left) ~= "table" or type(right) ~= "table" then return false end
+  local left_count, right_count = 0, 0
+  for id in pairs(left) do
+    if left[id] == nil or right[id] == nil then return false end
+    left_count = left_count + 1
+  end
+  for id in pairs(right) do
+    if left[id] == nil or right[id] == nil then return false end
+    right_count = right_count + 1
+  end
+  if left_count ~= #PRIVATE_CREDIT_IDS or right_count ~= #PRIVATE_CREDIT_IDS then return false end
+  for _, id in ipairs(PRIVATE_CREDIT_IDS) do
+    local a, b = left[id], right[id]
+    if type(a) ~= "table" or type(b) ~= "table" or a.level ~= b.level
+        or a.researched ~= b.researched or a.enabled ~= b.enabled
+        or a.visible_when_disabled ~= b.visible_when_disabled then return false end
+  end
+  return true
+end
+
 local function open(player, view)
   if not (remote.interfaces and remote.interfaces[BROWSER]) then fail("shipped public browser interface is absent") end
   if remote.call(BROWSER, "open", player.index, {
     search=view.query, family="mir", selected=view.selected, sort=view.sort, tab="research", visibility=1
   }) ~= true then
     fail("public browser interface did not open for connected client")
+  end
+end
+
+local function open_private_credit(player, family, id)
+  if not (remote.interfaces and remote.interfaces[BROWSER]) then fail("shipped public browser interface is absent") end
+  if remote.call(BROWSER, "open", player.index, {
+    search=id, family=family, selected=id, sort="progression", tab="research", visibility=1
+  }) ~= true then
+    fail("public browser interface did not open a private-credit query")
+  end
+end
+
+local function open_public_browser_query(player, family, query, selected)
+  if not (remote.interfaces and remote.interfaces[BROWSER]) then fail("shipped public browser interface is absent") end
+  if remote.call(BROWSER, "open", player.index, {
+    search=query, family=family, selected=selected, sort="progression", tab="research", visibility=1
+  }) ~= true then
+    fail("public browser interface did not open an ordinary query")
   end
 end
 
@@ -206,6 +282,135 @@ local function assert_personal_views(english, german)
   if en_root == de_root or en_query == de_query or en_query.text == de_query.text then
     fail("two clients share a browser root or query")
   end
+end
+
+local function assert_private_credit_empty_view(player, family, id)
+  local screen = player.gui and player.gui.screen
+  local root = screen and screen[ROOT]
+  local filters = valid(root) and root[FILTERS] or nil
+  local query = valid(filters) and filters[QUERY] or nil
+  local family_picker = valid(filters) and filters[FAMILY] or nil
+  local tabs = valid(root) and root[TABS] or nil
+  local content = valid(tabs) and tabs[RESEARCH_CONTENT] or nil
+  local results = valid(content) and content[RESULTS] or nil
+  local detail = valid(content) and content[DETAIL] or nil
+  local actions = valid(content) and content[ACTIONS] or nil
+  local native_open = valid(actions) and actions[OPEN_NATIVE] or nil
+  local family_index = family == "all" and 2 or (family == "external" and 3 or nil)
+  if family_index == nil or not valid(root) or root.type ~= "frame" or root.visible ~= true
+      or not valid(query) or query.type ~= "textfield" or query.text ~= id
+      or not valid(family_picker) or family_picker.type ~= "drop-down" or family_picker.selected_index ~= family_index
+      or not valid(results) or results.type ~= "list-box" or #results.items ~= 0 or results.selected_index ~= 0
+      or not valid(detail) or valid(detail[DETAIL_TITLE]) or not valid(detail[DETAIL_EMPTY])
+      or not valid(native_open) or native_open.type ~= "button" or native_open.enabled ~= false then
+    fail("private credit query exposed a public result or native action: " .. family .. "/" .. id)
+  end
+end
+
+local function assert_private_credit_personal_families(english, german)
+  for _, player in ipairs({english, german}) do
+    local screen = player.gui and player.gui.screen
+    local root = screen and screen[ROOT]
+    local filters = valid(root) and root[FILTERS] or nil
+    local family_picker = valid(filters) and filters[FAMILY] or nil
+    if not valid(family_picker) or family_picker.type ~= "drop-down" or family_picker.selected_index ~= 1 then
+      fail("private credit browse did not restore the personal mir family filter")
+    end
+  end
+end
+
+local function assert_public_browser_result(player, family, query)
+  local screen = player.gui and player.gui.screen
+  local root = screen and screen[ROOT]
+  local filters = valid(root) and root[FILTERS] or nil
+  local query_field = valid(filters) and filters[QUERY] or nil
+  local family_picker = valid(filters) and filters[FAMILY] or nil
+  local tabs = valid(root) and root[TABS] or nil
+  local content = valid(tabs) and tabs[RESEARCH_CONTENT] or nil
+  local results = valid(content) and content[RESULTS] or nil
+  local detail = valid(content) and content[DETAIL] or nil
+  local actions = valid(content) and content[ACTIONS] or nil
+  local native_open = valid(actions) and actions[OPEN_NATIVE] or nil
+  local family_index = family == "all" and 2 or (family == "external" and 3 or nil)
+  if family_index == nil or not valid(root) or root.type ~= "frame" or root.visible ~= true
+      or not valid(query_field) or query_field.type ~= "textfield" or query_field.text ~= query
+      or not valid(family_picker) or family_picker.type ~= "drop-down" or family_picker.selected_index ~= family_index
+      or not valid(results) or results.type ~= "list-box" or #results.items < 1 or results.selected_index < 1
+      or not valid(detail) or not valid(detail[DETAIL_TITLE])
+      or not valid(native_open) or native_open.type ~= "button" or native_open.enabled ~= true then
+    fail("public Library " .. family .. " query did not expose a selected ordinary result: " .. query)
+  end
+end
+
+local function automation_snapshot(force)
+  local technology = valid(force) and force.technologies and force.technologies[AUTOMATION] or nil
+  if not valid(technology) then fail("ordinary native automation technology is absent") end
+  if type(technology.level) ~= "number" or type(technology.researched) ~= "boolean"
+      or type(technology.enabled) ~= "boolean" or type(technology.visible_when_disabled) ~= "boolean" then
+    fail("ordinary native automation state is not scalar")
+  end
+  return {
+    level=technology.level, researched=technology.researched, enabled=technology.enabled,
+    visible_when_disabled=technology.visible_when_disabled,
+  }
+end
+
+local function same_automation_snapshot(left, right)
+  return type(left) == "table" and type(right) == "table" and left.level == right.level
+    and left.researched == right.researched and left.enabled == right.enabled
+    and left.visible_when_disabled == right.visible_when_disabled
+end
+
+local function assert_probe_ready(state)
+  for _, label in ipairs({"first_open", "search", "refresh", "reopen"}) do
+    if state.measurements[label] ~= true then fail("private credit probe ran before all Library measurements") end
+  end
+  if state.screenshot_calls ~= 10 then fail("private credit probe ran before all Library screenshots") end
+end
+
+local function probe_private_credit_visibility(state, english, german)
+  if not private_credit_browser_probe() then return end
+  assert_probe_ready(state)
+  assert_personal_views(english, german)
+  assert_native(state, english.force)
+  local native_before = native_snapshot(english.force)
+  local automation_before = automation_snapshot(english.force)
+  local before = private_credit_snapshot(english.force)
+  for _, player in ipairs({english, german}) do
+    for _, family in ipairs({"all", "external"}) do
+      for _, id in ipairs(PRIVATE_CREDIT_IDS) do
+        open_private_credit(player, family, id)
+        assert_private_credit_empty_view(player, family, id)
+      end
+    end
+  end
+  local native_after = native_snapshot(english.force)
+  local after = private_credit_snapshot(english.force)
+  if not same_snapshot(native_before, native_after) or not same_private_credit_snapshot(before, after) then
+    fail("private credit browse mutated native research state")
+  end
+  for _, player in ipairs({english, german}) do
+    open_public_browser_query(player, "all", GEAR, GEAR)
+    assert_public_browser_result(player, "all", GEAR)
+    open_public_browser_query(player, "external", AUTOMATION, AUTOMATION)
+    assert_public_browser_result(player, "external", AUTOMATION)
+  end
+  if not same_automation_snapshot(automation_before, automation_snapshot(english.force)) then
+    fail("public Library browse mutated the automation native state")
+  end
+  open(english, VIEWS.en)
+  open(german, VIEWS.de)
+  assert_personal_views(english, german)
+  assert_private_credit_personal_families(english, german)
+  assert_native(state, english.force)
+  if not same_private_credit_snapshot(after, private_credit_snapshot(english.force)) then
+    fail("private credit browse did not restore private holder state")
+  end
+  state.private_credit_visibility = {
+    ids_checked=#PRIVATE_CREDIT_IDS, clients_checked=2, families_checked={"all", "external"},
+    private_selection_not_exposed=true, native_state_unchanged=true, personal_views_restored=true,
+    before=before, after=after,
+  }
 end
 
 -- LuaObjects remain process-local evidence only. The durable fixture state
@@ -508,6 +713,9 @@ local function marker(stage, state)
     screenshot_requests_are_not_headless_rendering_proof=true,
   }
   if space_age_library() then witnesses.space_age_library=true end
+  if stage == "completed" and private_credit_browser_probe() then
+    witnesses.private_credit_visibility = state.private_credit_visibility
+  end
   log("[MIR5_LIBRARY_MULTIPLAYER] RESULT " .. helpers.table_to_json({
     case=CASE, stage=stage, status="passed",
     witnesses=witnesses
@@ -792,14 +1000,18 @@ local function closure()
   -- its hidden startup flag; accepting either here keeps the fixture closure
   -- explicit instead of treating a staged archive as an unbound extra mod.
   local space_age = space_age_library()
+  local private_credit = private_credit_browser_probe()
   if space_age and standalone_identity_discovery() then
     fail("Space Age Library fixture cannot use standalone identity discovery")
   end
-  local fixture_version = space_age and "0.2.0" or (standalone_identity_discovery() and "0.1.1" or "0.1.0")
+  if private_credit and (target.label ~= "F210" or standalone_identity_discovery()) then
+    fail("private-credit Library fixture requires the current F210 API closure")
+  end
+  local fixture_version = private_credit and "0.3.0" or (space_age and "0.2.0" or (standalone_identity_discovery() and "0.1.1" or "0.1.0"))
   local allowed = {base=script.active_mods.base, ["more-infinite-research"]=target.mir_version,
     ["mir-fixture-mir5-active-mods-observer"]="0.1.0",
     ["mir-fixture-mir5-library-multiplayer"]=fixture_version}
-  local closures = {allowed}
+  local closures = private_credit and {} or {allowed}
   if target.label == "F210" then
     closures[#closures + 1] = {
       base=script.active_mods.base, ["more-infinite-research"]=target.mir_version,
@@ -1006,6 +1218,8 @@ script.on_event(defines.events.on_tick, function()
     game.server_save(RESTART_SAVE)
     marker("restart-ready", state)
   elseif state.phase == "capturing-restart" and game.tick >= state.capture_after_tick then
+    local english, german = live_players(state)
+    probe_private_credit_visibility(state, english, german)
     state.phase = "completed"
     state.capture_after_tick = nil
     marker("completed", state)
