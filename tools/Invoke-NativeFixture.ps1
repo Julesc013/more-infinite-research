@@ -300,6 +300,9 @@ function Assert-HistoricalFixtureArchive([string]$Archive,[string]$SourceDirecto
     $infoEntry=$zip.GetEntry($root+'/info.json');Assert-Fixture ($null -ne $infoEntry -and $infoEntry.Length -le 64KB) 'historical fixture info is absent'
     $reader=[IO.StreamReader]::new($infoEntry.Open());try{$info=$reader.ReadToEnd()|ConvertFrom-Json -AsHashtable}finally{$reader.Dispose()}
     Assert-Fixture ([string]$info.name -ceq $expectedInfo.name -and [string]$info.version -ceq $expectedInfo.version -and [string]$info.factorio_version -ceq $expectedInfo.factorio_version) 'historical fixture info identity differs'
+    foreach($field in @('title','author')){
+      Assert-Fixture ($info.ContainsKey($field) -and $info[$field] -is [string] -and -not [string]::IsNullOrWhiteSpace($info[$field])) "historical fixture info $field must be a nonempty string"
+    }
     Assert-Fixture ((@($info.dependencies) -join "`n") -ceq ($expectedInfo.dependencies -join "`n")) 'historical fixture dependencies differ'
   } finally {$zip.Dispose()}
 }
@@ -425,6 +428,9 @@ function Assert-HistoricalTransitionFixtureArchive([string]$Archive,[string]$Sou
     $infoEntry=$zip.GetEntry($root+'/info.json');Assert-Fixture ($null -ne $infoEntry -and $infoEntry.Length -le 64KB) 'historical transition fixture info is absent'
     $reader=[IO.StreamReader]::new($infoEntry.Open());try{$info=$reader.ReadToEnd()|ConvertFrom-Json -AsHashtable}finally{$reader.Dispose()}
     Assert-Fixture ([string]$info.name -ceq $expectedInfo.name -and [string]$info.version -ceq $expectedInfo.version -and [string]$info.factorio_version -ceq $expectedInfo.factorio_version) 'historical transition fixture info identity differs'
+    foreach($field in @('title','author')){
+      Assert-Fixture ($info.ContainsKey($field) -and $info[$field] -is [string] -and -not [string]::IsNullOrWhiteSpace($info[$field])) "historical transition fixture info $field must be a nonempty string"
+    }
     Assert-Fixture ((@($info.dependencies) -join "`n") -ceq ($expectedInfo.dependencies -join "`n")) 'historical transition fixture dependencies differ'
   } finally {$zip.Dispose()}
 }
