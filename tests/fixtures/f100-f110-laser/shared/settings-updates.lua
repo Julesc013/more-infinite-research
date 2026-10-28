@@ -7,9 +7,11 @@ local values = {
     ["mir-cost-linear-increment-" .. family] = 0,
     ["mir-max-level-" .. family] = 12,
     ["mir-research-time-" .. family] = 1,
+  },
+  ["double-setting"] = {
+    ["mir-cost-growth-" .. family] = 1,
     ["mir-effect-per-level-" .. family] = 1,
   },
-  ["double-setting"] = {["mir-cost-growth-" .. family] = 1},
 }
 for kind, rows in pairs(values) do
   for name, value in pairs(rows) do

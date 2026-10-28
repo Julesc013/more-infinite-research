@@ -164,6 +164,22 @@ class LaserFixtureControls(unittest.TestCase):
             str(FIXTURE / "shared/control.lua"), str(FIXTURE / "source/stage.lua"),
             str(FIXTURE / "successor/stage.lua"), opponent)
 
+    def test_acceleration_uses_the_retained_double_effect_setting(self):
+        self.lua.execute('''
+          data={raw={}}
+          local fields={
+            ["bool-setting"]={"mir-enable-laser-shooting-speed"},
+            ["int-setting"]={"mir-cost-base-laser-shooting-speed","mir-cost-linear-increment-laser-shooting-speed",
+              "mir-max-level-laser-shooting-speed","mir-research-time-laser-shooting-speed"},
+            ["double-setting"]={"mir-cost-growth-laser-shooting-speed","mir-effect-per-level-laser-shooting-speed"}}
+          for kind,names in pairs(fields)do
+            data.raw[kind]={}
+            for _,name in ipairs(names)do data.raw[kind][name]={setting_type="startup",default_value=0}end
+          end
+        ''')
+        self.lua.execute(f'assert(loadfile({str(FIXTURE / "shared/settings-updates.lua")!r}))()')
+        self.assertEqual(self.lua.eval('data.raw["double-setting"]["mir-effect-per-level-laser-shooting-speed"].default_value'), 1)
+
     def test_preflight_validates_exact_rows_without_mutating_them(self):
         for role in ("source", "successor"):
             row = self.row(role)
