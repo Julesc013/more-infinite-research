@@ -3842,14 +3842,25 @@
         {
           "boundary": "Published F200 cap disabled/re-enabled and V3 F210 worker tails",
           "status": "needs-correction",
-          "problem": "The zero-lab f0dd foreign-cap regression is a different seeded case, not a published-origin upgrade. Same/cross-engine published fixture routes are prepared only.",
-          "next_action": "Bind tests/fixtures/f200-legacy-cap and its existing same/cross-engine profiles to actual4.7.3 protected source, current65FC/005D, disabled0.6 and re-enabled0.7. Assert owned restoration, foreign disablement, .27/.42, actual re-enabled lab and two reloads per saved stage.",
+          "problem": "Actual exact4.7.20003 positive-cap source81AF now passes. Current005D F210 direct fixture fails before new lab/save because its science counter reads durability on2.1 ordinary items. Independent MIR-absent2.1.23 control confirms exactly one item consumed per pack from27-percent one-unit research; source/control cold reloads pass. Full cap successors remain open.",
+          "next_action": "Preserve source81AF and direct adverse3F3F; correct the bounded science counter with actual item/tool-specific accounting and independent under/over-consumption controls. Reuse81AF for missing direct, disabled0.6 and reenabled0.7 F210 successors after the separate stage-enablement fixture correction. Retain all ownership/foreign/progress/lab/save/two-reload expectations; earlierV3/worker and same-engine cases are not inferred.",
           "evidence": [
             {
               "path": "spec/evidence/f200-foreign-cap-baseline-f0dd-native-chain-r01.json",
               "sha256": "8AFA0A785034D9C3C0D9F5A0E92B11BF827898CE57DB5AD795516B88FDABD33B"
+            },
+            {
+              "path": "spec/evidence/cap-473-f210-science-item-control-chain-r01.json",
+              "sha256": "48CB8F1CBA162D2E1AB0A74BE4715AD56F6163AEE569C34465DFB253F14F7D0F"
             }
-          ]
+          ],
+          "protected_473_cap_source": {
+            "path": "build/qualification/cap-473-current7a2-r02-controller/native-published/write-data/saves/mir5-native-complete.zip",
+            "sha256": "81AFD312CB2391C7B0CF92C82CD022F93751E9E3FC99D181795078FC9651E4F9",
+            "source_actual_labs": 2,
+            "cold_reloads": 2,
+            "recreate": false
+          }
         },
         {
           "boundary": "F200 Space Age first-upgrade provider/preference",

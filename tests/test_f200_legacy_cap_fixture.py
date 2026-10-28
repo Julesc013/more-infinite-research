@@ -133,12 +133,19 @@ class F200LegacyCapFixtureTests(unittest.TestCase):
             local callbacks,markers,diagnostics,saves,marker_cases={events={}},0,0,0,{}
             local GEAR="recipe-prod-research_gears-1"
             local science={"automation-science-pack","logistic-science-pack","chemical-science-pack","production-science-pack"}
+            local science_type="tool"
             local function inventory()
               local value={items={},slots={},slot_by_name={}}
               local function stack(name)
                 local current=value.slot_by_name[name]
                 if current==nil then
-                  current={valid_for_read=true,name=name,count=0,quality={name="normal"},durability=1}
+                  current=setmetatable({valid_for_read=true,name=name,count=0,quality={name="normal"},durability=1,
+                    type="tool",is_tool=true},{__index=function(stack,key)
+                      if key=="durability" and stack.type=="item" then error("tool-only stack durability read") end
+                    end,__newindex=function(stack,key,item)
+                      if key=="durability" and stack.type=="item" then error("tool-only stack durability write") end
+                      rawset(stack,key,item)
+                    end})
                   value.slot_by_name[name]=current;value.slots[#value.slots+1]=current
                 end
                 return current
@@ -151,8 +158,11 @@ class F200LegacyCapFixtureTests(unittest.TestCase):
                 local current=value.slot_by_name[name];return current and current.count or 0
               end
               function value.consume(name,amount)
-                local current=stack(name);assert(current.count>=1 and current.durability>0)
-                if amount==1 then
+                local current=stack(name);assert(current.count>=1)
+                if science_type=="item" then
+                  assert(amount>=0 and amount%1==0 and amount<=current.count)
+                  current.count=current.count-amount;current.valid_for_read=current.count>0
+                elseif amount==1 then
                   assert(math.abs(current.durability-1)<.000001)
                   current.count=current.count-1;current.valid_for_read=current.count>0
                 else
@@ -169,9 +179,11 @@ class F200LegacyCapFixtureTests(unittest.TestCase):
             end
             local item_prototypes={}
             for _,name in ipairs(science) do
-              item_prototypes[name]={get_durability=function(quality)
+              item_prototypes[name]=setmetatable({type="tool",get_durability=function(quality)
                 assert(quality and quality.name=="normal");return 1
-              end}
+              end},{__index=function(prototype,key)
+                if key=="get_durability" and prototype.type=="item" then error("tool-only prototype durability read") end
+              end})
             end
             local input=inventory();local modules=setmetatable({},{__len=function()return 0 end})
             local lab={valid=true,energy=0,quality={name="normal"},prototype={get_researching_speed=function(quality)
@@ -215,6 +227,7 @@ class F200LegacyCapFixtureTests(unittest.TestCase):
             local function rejected(message)
               local state=storage.mir5_f200_legacy_cap or {}
               return {ok=false,message=message,queue_entries=#player.research_queue,
+                saves=saves,
                 destination_labs=state.destination_lab_completions or 0,
                 disabled_intermediate_observed=state.disabled_stage_observed == true,
                 disabled_destination_labs=state.disabled_stage_destination_lab_completions or 0}
@@ -287,6 +300,23 @@ class F200LegacyCapFixtureTests(unittest.TestCase):
             elseif opponent=="saved-progress" then player.technologies[GEAR].saved_progress=.26
             elseif opponent=="lab-count" then state.actual_lab_completions=1 end
             local three_stage=options.disabled_path~=nil or options.reenabled_path~=nil
+            if destination_base=="2.1.23" or three_stage then
+              science_type="item"
+              for _,name in ipairs(science) do
+                local stack=input.slot_by_name[name]
+                stack.durability=nil;stack.type="item";stack.is_tool=false
+                item_prototypes[name].get_durability=nil;item_prototypes[name].type="item"
+              end
+            end
+            local first=input.slot_by_name[science[1]]
+            if opponent=="science-stack-type" then first.is_tool=not first.is_tool end
+            if opponent=="science-prototype-type" then item_prototypes[science[1]].type="capsule" end
+            if opponent=="science-quality" then first.quality={name="uncommon"} end
+            if opponent=="science-count" then first.count=first.count+.5 end
+            if opponent=="tool-no-api" then item_prototypes[science[1]].get_durability=false end
+            if opponent=="tool-max" then item_prototypes[science[1]].get_durability=function()return 2 end end
+            if opponent=="tool-empty" then first.durability=0 end
+            if opponent=="tool-overfull" then first.durability=1.5 end
             if three_stage and (options.disabled_path==nil or options.reenabled_path==nil) then
               return rejected("three-stage flow requires both F210 successors")
             end
@@ -318,12 +348,18 @@ class F200LegacyCapFixtureTests(unittest.TestCase):
             -- Native upgrade loads the old fixture state before configuration_changed.
             ok,result=invoke(destination,"load");if not ok then return rejected(result) end
             ok,result=invoke(destination,"changed");if not ok then return rejected(result) end
-            local consumed_units=state.destination_science_accounting.consumed_units
-            local processing_ticks=state.destination_science_accounting.remaining_ticks
+            -- Independent fixed-input physics: one unit/60 energy, .27 saved,
+            -- normal speed/no bonus. Item consumption is the native neutral
+            -- control's whole unit; tool durability retains 44/60 work units.
+            local consumed_units=science_type=="item" and 1 or 44/60
+            local processing_ticks=44
             if opponent=="wrong-tick-span" then processing_ticks=processing_ticks-1 end
             if opponent=="raw-elapsed-offset" then game.tick=game.tick+1 end
+            if opponent=="raw-elapsed-minus-one" then game.tick=game.tick-1 end
             for _=1,processing_ticks do ok,result=tick(destination);if not ok then return rejected(result) end end
             if opponent=="consumption-overshoot" then consumed_units=consumed_units+1/60 end
+            if opponent=="item-consumption-under" then consumed_units=0 end
+            if opponent=="item-consumption-over" then consumed_units=2 end
             ok,result=complete_player(destination,4,.03,consumed_units);if not ok then return rejected(result) end
             if opponent=="duplicate-lab"then state.destination_lab_completions=2 end
             ok,result=tick(destination);if not ok then return rejected(result) end
@@ -332,7 +368,9 @@ class F200LegacyCapFixtureTests(unittest.TestCase):
               player_level=player.technologies[GEAR].level,bonus=player.recipes['iron-gear-wheel'].productivity_bonus,
               player_enabled=player.technologies[GEAR].enabled,player_visible=player.technologies[GEAR].visible_when_disabled,
               science_before=state.destination_science_units_before[science[1]],science_after=state.destination_science_units_after[science[1]],
-              consumed_units=state.destination_science_accounting.consumed_units,remaining_ticks=state.destination_science_accounting.remaining_ticks,
+              consumed_units=state.destination_science_accounting.consumed_units,
+              inventory_consumed_units=state.destination_science_accounting.inventory_consumed_units,
+              science_type=state.destination_science_accounting.science_type,remaining_ticks=state.destination_science_accounting.remaining_ticks,
               processing_ticks=state.destination_processing_ticks,elapsed_ticks=state.destination_elapsed_ticks,current_progress=state.destination_science_accounting.progress,foreign_progress=foreign.research_progress,foreign_enabled=foreign.technologies[GEAR].enabled,
               source_mir=source_mir,destination_mir=destination_mir,source_base=source_base,destination_base=destination_base,
               source_case=state.source_case,marker_cases=marker_cases,markers=markers,diagnostics=diagnostics,saves=saves,
@@ -748,6 +786,8 @@ class F200LegacyCapFixtureTests(unittest.TestCase):
         self.assertAlmostEqual(22, result["science_before"], places=6)
         self.assertAlmostEqual(22 - 44 / 60, result["science_after"], places=6)
         self.assertAlmostEqual(44 / 60, result["consumed_units"], places=6)
+        self.assertAlmostEqual(44 / 60, result["inventory_consumed_units"], places=6)
+        self.assertEqual("tool", result["science_type"])
         self.assertEqual(44, result["remaining_ticks"])
         self.assertEqual(44, result["processing_ticks"])
         self.assertEqual(44, result["elapsed_ticks"])
@@ -763,6 +803,63 @@ class F200LegacyCapFixtureTests(unittest.TestCase):
         self.assertEqual((44, 44, 45),
                          (result["remaining_ticks"], result["processing_ticks"], result["elapsed_ticks"]))
         self.assertEqual(1, result["diagnostics"])
+
+    def test_f210_item_science_counts_whole_items_without_tool_durability_access(self):
+        options = {
+            "source_base": "2.0.77", "source_mir": "4.7.20003", "source_fixture": "0.4.0",
+            "destination_base": "2.1.23", "destination_mir": "5.0.21000", "destination_fixture": "0.5.0",
+            "source_control_alias": str(FIXTURE / "published/control.lua"),
+            "destination_control_alias": str(FIXTURE / "successor/control.lua"),
+        }
+        result = self.flow_result(F200_CROSS / "control.lua", F210_CROSS / "control.lua", "", options)
+        self.assertTrue(result["ok"], result["message"])
+        # Independent MIR-absent neutral control: one complete ordinary item,
+        # even though only .73 research work remains. Item mocks trap both
+        # prototype and stack durability access rather than emulating tools.
+        self.assertEqual(("item", 22, 21, 1),
+                         (result["science_type"], result["science_before"], result["science_after"],
+                          result["inventory_consumed_units"]))
+        self.assertAlmostEqual(44 / 60, result["consumed_units"], places=6)
+        shifted = self.flow_result(F200_CROSS / "control.lua", F210_CROSS / "control.lua",
+                                   "raw-elapsed-minus-one", options)
+        self.assertTrue(shifted["ok"], shifted["message"])
+        self.assertEqual((44, 44, 43),
+                         (shifted["remaining_ticks"], shifted["processing_ticks"], shifted["elapsed_ticks"]))
+        for opponent in ("item-consumption-under", "item-consumption-over"):
+            with self.subTest(opponent=opponent):
+                refused = self.flow_result(F200_CROSS / "control.lua", F210_CROSS / "control.lua", opponent, options)
+                self.assertFalse(refused["ok"])
+                self.assertIn("successor real lab consumption differs", refused["message"])
+                self.assertIn("expected_units=21", refused["message"])
+                self.assertIn("inventory_consumed_units=1", refused["message"])
+                self.assertEqual((1, 1), (refused["destination_labs"], refused["saves"]))
+
+    def test_science_type_quality_count_and_tool_durability_opponents_fail_before_queue(self):
+        cross = {
+            "source_base": "2.0.77", "source_mir": "4.7.20003", "source_fixture": "0.4.0",
+            "destination_base": "2.1.23", "destination_mir": "5.0.21000", "destination_fixture": "0.5.0",
+            "source_control_alias": str(FIXTURE / "published/control.lua"),
+            "destination_control_alias": str(FIXTURE / "successor/control.lua"),
+        }
+        for item_mode in (False, True):
+            source, destination, options = (F200_CROSS / "control.lua", F210_CROSS / "control.lua", cross) if item_mode else (
+                FIXTURE / "published/control.lua", FIXTURE / SUCCESSOR_ROLE / "control.lua", {})
+            opponents = {"science-stack-type": "native science stack type changed",
+                         "science-prototype-type": "native science prototype type changed",
+                         "science-quality": "native science quality changed",
+                         "science-count": "native science count changed"}
+            if not item_mode:
+                opponents.update({"tool-no-api": "native science durability API is absent",
+                                  "tool-max": "native science durability changed",
+                                  "tool-empty": "native science durability changed",
+                                  "tool-overfull": "native science durability changed"})
+            for opponent, message in opponents.items():
+                with self.subTest(item_mode=item_mode, opponent=opponent):
+                    refused = self.flow_result(source, destination, opponent, options)
+                    self.assertFalse(refused["ok"])
+                    self.assertIn(message, refused["message"])
+                    self.assertEqual((0, 0, 1),
+                                     (refused["queue_entries"], refused["destination_labs"], refused["saves"]))
 
     def test_published_relaxation_uses_the_same_tick_accounting_without_claiming_mir5_runtime(self):
         result = self.flow_result(FIXTURE / "published" / "control.lua", FIXTURE / SUCCESSOR_ROLE / "control.lua", "",

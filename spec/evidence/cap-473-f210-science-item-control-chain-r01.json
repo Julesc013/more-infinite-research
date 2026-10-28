@@ -1,0 +1,315 @@
+{
+  "schema": 1,
+  "kind": "MIRCapScienceItemIndependentControlChainV1",
+  "status": "source-and-independent-science-control-passed-cap-successors-still-open",
+  "scope": "Protect exact4.7.20003 positive-cap source81AF; preserve current005D F210 fixture Item-is-not-tool failure before new research/save. Independently qualify actual2.1.23/8DC ordinary-item science consumption without MIR: one native lab from27-percent progress consumes exactly one of each four ordinary science items, saves and cold-reloads twice. This is not a MIR cap successor, recovery, gameplay or performance verdict.",
+  "player_tree": "5058373348e9049f8b67ec4dbb79b400a904acd6",
+  "cap_controller": "00dfcfc2b349103534ec2a61690ebd3fba52034c",
+  "neutral_controller": "037df196300fb2b17363b5901e8bf2e5f549fbe7",
+  "readback": {
+    "path": "build/qualification/f210-native-science-calibration-r02-controller/root-readback-r01.json",
+    "bytes": 10012,
+    "sha256": "8F5D9EAA35F29EA3D1706EA6FA1469C2A505608C07FE89795016AC14F5AAA735",
+    "files": 54,
+    "bytes_per_copy": 4069489
+  },
+  "receipt_capsule": {
+    "path": "spec/evidence/cap-473-f210-science-item-control-receipts-r01.json.gz",
+    "sha256": "5412F1F93C77999D8328E8AE311ED4A89989853E4245834D14FC3BD05BFE249B",
+    "bytes": 23906,
+    "records": 5,
+    "uncompressed_bytes": 142456,
+    "all_original_exact_bytes_round_trip": true
+  },
+  "observations": [
+    {
+      "kind": "exact-473-f200-positive-cap-source-only",
+      "result": {
+        "path": "build/qualification/cap-473-current7a2-r02-controller/native-published/result.json",
+        "bytes": 42925,
+        "sha256": "1F382AC095889AC24D8DD82FF1C80F0955AB1678A9ADB8D8D276776FF987E33A"
+      },
+      "initial_observation": {
+        "stage": "initial",
+        "case": "f200-f210-positive-legacy-cap-source",
+        "status": "passed",
+        "qualification": "native-runner-readback-required",
+        "witnesses": {
+          "source_mir": "4.7.20003",
+          "actual_lab_completions": 2,
+          "milestone": "actual2labs",
+          "seededpartial": "after-actual2labs",
+          "next_level": 3,
+          "productivity_bonus": 0.019999999552965164,
+          "player_enabled": false,
+          "player_visible_when_disabled": true,
+          "saved_progress": 0.27,
+          "foreign_queue_progress": 0.42000000000000004,
+          "foreign_disabled": true,
+          "on_load_read_only": false
+        }
+      },
+      "completed_save": {
+        "path": "build/qualification/cap-473-current7a2-r02-controller/native-published/write-data/saves/mir5-native-complete.zip",
+        "bytes": 932284,
+        "sha256": "81AFD312CB2391C7B0CF92C82CD022F93751E9E3FC99D181795078FC9651E4F9"
+      },
+      "cold_reloads": [
+        {
+          "ordinal": 1,
+          "save_sha256": "81AFD312CB2391C7B0CF92C82CD022F93751E9E3FC99D181795078FC9651E4F9",
+          "save_byte_identical": true,
+          "observation": {
+            "stage": "reload",
+            "case": "f200-f210-positive-legacy-cap-source",
+            "status": "passed",
+            "qualification": "native-runner-readback-required",
+            "witnesses": {
+              "source_mir": "4.7.20003",
+              "actual_lab_completions": 2,
+              "milestone": "actual2labs",
+              "seededpartial": "after-actual2labs",
+              "next_level": 3,
+              "productivity_bonus": 0.019999999552965164,
+              "player_enabled": false,
+              "player_visible_when_disabled": true,
+              "saved_progress": 0.27,
+              "foreign_queue_progress": 0.42000000000000004,
+              "foreign_disabled": true,
+              "on_load_read_only": true
+            }
+          }
+        },
+        {
+          "ordinal": 2,
+          "save_sha256": "81AFD312CB2391C7B0CF92C82CD022F93751E9E3FC99D181795078FC9651E4F9",
+          "save_byte_identical": true,
+          "observation": {
+            "stage": "reload",
+            "case": "f200-f210-positive-legacy-cap-source",
+            "status": "passed",
+            "qualification": "native-runner-readback-required",
+            "witnesses": {
+              "source_mir": "4.7.20003",
+              "actual_lab_completions": 2,
+              "milestone": "actual2labs",
+              "seededpartial": "after-actual2labs",
+              "next_level": 3,
+              "productivity_bonus": 0.019999999552965164,
+              "player_enabled": false,
+              "player_visible_when_disabled": true,
+              "saved_progress": 0.27,
+              "foreign_queue_progress": 0.42000000000000004,
+              "foreign_disabled": true,
+              "on_load_read_only": true
+            }
+          }
+        }
+      ],
+      "native_startup_logs": [
+        {
+          "path": "build/qualification/cap-473-current7a2-r02-controller/native-published/create.factorio.log",
+          "bytes": 29472,
+          "sha256": "5FD0F2218ED4056E35E966FB014456D28AFEA6FE5C41007BA08941591CA14238",
+          "actual_native_startup": "   0.000 2026-10-29 01:04:23; Factorio 2.0.77 (build 84539, win64, full, space-age)"
+        },
+        {
+          "path": "build/qualification/cap-473-current7a2-r02-controller/native-published/production.factorio.log",
+          "bytes": 30713,
+          "sha256": "09631187DE34DA829397340128789A0965A4FB13280D8B2E5DF2CF3CD5F31B3E",
+          "actual_native_startup": "   0.000 2026-10-29 01:04:27; Factorio 2.0.77 (build 84539, win64, full, space-age)"
+        },
+        {
+          "path": "build/qualification/cap-473-current7a2-r02-controller/native-published/reload-1.factorio.log",
+          "bytes": 28945,
+          "sha256": "A5702FC30E0AC749FDC6DD5A96EF0FB5AF37A76D950FA357FD8D28A7D8F3EDB3",
+          "actual_native_startup": "   0.000 2026-10-29 01:04:31; Factorio 2.0.77 (build 84539, win64, full, space-age)"
+        },
+        {
+          "path": "build/qualification/cap-473-current7a2-r02-controller/native-published/reload-2.factorio.log",
+          "bytes": 28945,
+          "sha256": "19AA3713A482FEE0F27B631F25BBE9C818698096716A5AB575BFC0FBCD27F884",
+          "actual_native_startup": "   0.000 2026-10-29 01:04:34; Factorio 2.0.77 (build 84539, win64, full, space-age)"
+        }
+      ],
+      "actual_native_processes": 4
+    },
+    {
+      "kind": "current-f210-cap-fixture-science-getter-adverse",
+      "result": {
+        "path": "build/qualification/cap-473-current7a2-r02-controller/native-direct/result.json",
+        "bytes": 6784,
+        "sha256": "3F3F9E0D2FBF45899E66F3C2690E7466BA5EE9AE57719C6928B8DF56761AE42F"
+      },
+      "native_log": {
+        "path": "build/qualification/cap-473-current7a2-r02-controller/native-direct/write-data/factorio-current.log",
+        "bytes": 13584,
+        "sha256": "25FF655FC7B5F8D6E5CBF6530DFFD9FA94BF2161201732DA41ED5185A35F0307"
+      },
+      "actual_native_processes": 1,
+      "new_labs": 0,
+      "successor_saves": 0,
+      "cold_reloads": 0
+    },
+    {
+      "kind": "mir-absent-independent-science-control",
+      "result": {
+        "path": "build/qualification/f210-native-science-calibration-r02-controller/native-output/result.json",
+        "bytes": 42114,
+        "sha256": "02394303EF3838E48D32D63C88E4B738B7079305D8E407CB7F7E11587DB65163"
+      },
+      "initial_observation": {
+        "case": "native-science-consumption",
+        "stage": "initial",
+        "status": "passed",
+        "mir_absent": true,
+        "source_progress": 0.27,
+        "research_unit_count": 1,
+        "research_unit_energy": 60,
+        "inserted_per_pack": 16,
+        "consumed_per_pack": 1,
+        "remaining": {
+          "automation-science-pack": 15,
+          "logistic-science-pack": 15,
+          "chemical-science-pack": 15,
+          "production-science-pack": 15
+        },
+        "actual_lab_completions": 1,
+        "next_level": 2,
+        "raw_elapsed_ticks": 43,
+        "on_load_read_only": false
+      },
+      "completed_save": {
+        "path": "build/qualification/f210-native-science-calibration-r02-controller/native-output/write-data/saves/mir5-native-complete.zip",
+        "bytes": 868456,
+        "sha256": "7BE1F0A4BF9C9CBB9E8868F15F3A614A5D816DCB601161008EAE0E052FFDA974"
+      },
+      "cold_reloads": [
+        {
+          "ordinal": 1,
+          "save_sha256": "7BE1F0A4BF9C9CBB9E8868F15F3A614A5D816DCB601161008EAE0E052FFDA974",
+          "save_byte_identical": true,
+          "observation": {
+            "case": "native-science-consumption",
+            "stage": "reload",
+            "status": "passed",
+            "mir_absent": true,
+            "source_progress": 0.27,
+            "research_unit_count": 1,
+            "research_unit_energy": 60,
+            "inserted_per_pack": 16,
+            "consumed_per_pack": 1,
+            "remaining": {
+              "automation-science-pack": 15,
+              "logistic-science-pack": 15,
+              "chemical-science-pack": 15,
+              "production-science-pack": 15
+            },
+            "actual_lab_completions": 1,
+            "next_level": 2,
+            "raw_elapsed_ticks": 43,
+            "on_load_read_only": true
+          }
+        },
+        {
+          "ordinal": 2,
+          "save_sha256": "7BE1F0A4BF9C9CBB9E8868F15F3A614A5D816DCB601161008EAE0E052FFDA974",
+          "save_byte_identical": true,
+          "observation": {
+            "case": "native-science-consumption",
+            "stage": "reload",
+            "status": "passed",
+            "mir_absent": true,
+            "source_progress": 0.27,
+            "research_unit_count": 1,
+            "research_unit_energy": 60,
+            "inserted_per_pack": 16,
+            "consumed_per_pack": 1,
+            "remaining": {
+              "automation-science-pack": 15,
+              "logistic-science-pack": 15,
+              "chemical-science-pack": 15,
+              "production-science-pack": 15
+            },
+            "actual_lab_completions": 1,
+            "next_level": 2,
+            "raw_elapsed_ticks": 43,
+            "on_load_read_only": true
+          }
+        }
+      ],
+      "native_startup_logs": [
+        {
+          "path": "build/qualification/f210-native-science-calibration-r02-controller/native-output/create.factorio.log",
+          "bytes": 11201,
+          "sha256": "AAF28FB5E127D6D7D542993AB825A031BFFFD6D2A0F5108DE81605C436487AFA",
+          "actual_native_startup": "   0.000 2026-10-29 01:17:31; Factorio 2.1.23 (build 87750, win64, full, space-age)"
+        },
+        {
+          "path": "build/qualification/f210-native-science-calibration-r02-controller/native-output/production.factorio.log",
+          "bytes": 13587,
+          "sha256": "C791949D01EBE1F285F2A57072561854FD4B99DC1596C6170519FDE2A3B45EE4",
+          "actual_native_startup": "   0.000 2026-10-29 01:17:36; Factorio 2.1.23 (build 87750, win64, full, space-age)"
+        },
+        {
+          "path": "build/qualification/f210-native-science-calibration-r02-controller/native-output/reload-1.factorio.log",
+          "bytes": 11914,
+          "sha256": "E66A77CFFC4AA1D5DFA7A5680423E12B5430C3C5E6D5B624131E6CBC9096162E",
+          "actual_native_startup": "   0.000 2026-10-29 01:17:41; Factorio 2.1.23 (build 87750, win64, full, space-age)"
+        },
+        {
+          "path": "build/qualification/f210-native-science-calibration-r02-controller/native-output/reload-2.factorio.log",
+          "bytes": 11914,
+          "sha256": "B733CD9AD3545DF72E24544DC61A3347E70FC26B7C428510B92F3C65BA590CA7",
+          "actual_native_startup": "   0.000 2026-10-29 01:17:43; Factorio 2.1.23 (build 87750, win64, full, space-age)"
+        }
+      ],
+      "actual_native_processes": 4
+    }
+  ],
+  "preserved_callers": {
+    "cap_packet": {
+      "path": "build/qualification/cap-473-current7a2-r02-controller/packet.json",
+      "bytes": 18580,
+      "sha256": "A25F2EA0B96F0BEDB57F9D4E91290C930FA27BD447A9FB1E9E68A6CE227032F5"
+    },
+    "cap_caller": {
+      "path": "build/qualification/cap-473-current7a2-r02-controller/Invoke-OwnedCap473.ps1",
+      "bytes": 7219,
+      "sha256": "DEB5552BE5A9AEAAD11D8B914E21B581E7C57C78C461B5630C224A72BB0992B3"
+    },
+    "cap_terminal": {
+      "path": "build/qualification/cap-473-current7a2-r02-controller/execution-record/terminal.json",
+      "bytes": 9378,
+      "sha256": "5A5DAC7E574CF286A159394323CDA2E3A9DC4E5C83B83AA7D56FFC407ACCF604"
+    },
+    "neutral_packet": {
+      "path": "build/qualification/f210-native-science-calibration-r02-controller/packet.json",
+      "bytes": 3571,
+      "sha256": "01F8108A7D22E5EB43B6D5318EC34C20DD59BD071A9CE9CC6ADD149AE6A45E57"
+    },
+    "neutral_caller": {
+      "path": "build/qualification/f210-native-science-calibration-r02-controller/Invoke-OwnedCalibration.ps1",
+      "bytes": 3374,
+      "sha256": "20E6101166C60AAA94E1B73D84354D3F5BE47CA8306C245EF05334480B000BF4"
+    },
+    "neutral_terminal": {
+      "path": "build/qualification/f210-native-science-calibration-r02-controller/execution-record/terminal.json",
+      "bytes": 4981,
+      "sha256": "2C44E52DBE75AD78F2660C563AA42F7B2537662C4072F88B5712BD047D29739F"
+    },
+    "first_neutral_mode_refusal": {
+      "path": "build/qualification/f210-native-science-calibration-r01-controller/execution-record/terminal.json",
+      "bytes": 576,
+      "sha256": "1A1D37D8C55F5CE3D0FE6B555745A092E9B68578C6FB7543C78EA9D8F7A490EA"
+    }
+  },
+  "next_action": "Retain durable-tool accounting for actual F200 tools; use an explicit ordinary-item counter for actual F210 item stacks, preserving exact one-unit consumption and all cap/foreign/progress/tick/lab assertions. Prove opposing under/over-consumption controls and rerun only missing successors from protected81AF. Do not create a new source or copy observations from the candidate into an oracle.",
+  "limits": [
+    "The neutral control uses an independently authored one-unit research and no MIR. Its observed43 raw elapsed ticks is a separate endpoint from the cap fixture processing-tick counter; do not substitute it as a migration timing threshold.",
+    "The original cap direct adverse reaches science_units after frozen pre-lab cap/foreign assertions, but no passed initial marker, new lab, saved successor or reload exists. Individual state snapshots are not invented.",
+    "The first neutral caller was refused for the old create-only restriction before any engine process. Existing runner mode admission was separately amended/host-opposed, retaining no-MIR/no-hash/input-save/resource/library protections.",
+    "The three positive-cap successor routes and wider F200/earlierV3/worker-tail cases remain open. This science observation is not a universal quantity rule for other packs, labs, qualities, research unit counts or engine versions."
+  ],
+  "factorio_processes_after_restoration": 0
+}
