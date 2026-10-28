@@ -3797,9 +3797,9 @@
       "additional_transition_cases": [
         {
           "boundary": "F1104.7.3 to F200",
-          "status": "ready-to-execute",
-          "problem": "Protected D524 source and original a1fd/8BA successor remain exact original results. A separate current65FC/7a2/player505 profile and seven-member raw Git fixture are now prepared and guarded. Material changed data/control paths require fresh current bridge execution; old successor reuse is not claimed.",
-          "next_action": "The sole native owner binds the retained D524 save, D3/2.0.77 engine, current65FC archive, prepared0.2 fixture and committed generic input-save caller. Require17 rows/effects, stack-to-bulk capacity2/4,42-percent queued/27-percent detached work, foreign disablement, one new mining lab/save/two unchanged-byte cold reloads. Reuse the original source; do not recreate it or infer this bridge from a same-edition pass. This input packet is not another active or pending native assignment.",
+          "status": "closed",
+          "problem": "Actual D524 to current65FC on2.0.77/D3 passes17retained/16seeded rows,effects/capacity2and4,source42% queued27%detached/foreignfalse,one new mininglab+.1,saved successor/two unchanged-byte read-only cold reloads.",
+          "next_action": "Retain exact current7a2/F200 bridge alongside original source and a1fd/8BA recovery/adverse. Apply consumed-path review to later changes; other engine/DLC/mod closures,ordinary tuning,physical output,clients and release remain separate.",
           "evidence": [
             {
               "path": "spec/evidence/f110-f200-published-source-r05-native-chain.json",
@@ -3808,6 +3808,10 @@
             {
               "path": "spec/evidence/f110-f200-a1fd-successor-recovery-chain.json",
               "sha256": "BA37B082C7AE2261423A1AA0C86D57FE8738601F27BF73A6D7B69FBC1B981948"
+            },
+            {
+              "path": "spec/evidence/f110-f200-current7a2-native-chain-r01.json",
+              "scope": "Actual current65FC successor of unchanged publishedF110473 D524,one newlab/save/two colds."
             }
           ],
           "prepared_inputs": {
