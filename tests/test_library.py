@@ -19,6 +19,7 @@ class LibraryTests(unittest.TestCase):
           package.preload["research.catalogue"] = function()
             return {
               gear_id = function() return "recipe-prod-research_gears-1" end,
+              internal_credit_ids = function() return library_private_credit_ids or {} end,
               declared = function()
                 return library_declarations or {
                   {id = "recipe-prod-research_gears-1", name = "Iron gear wheel productivity",
@@ -207,6 +208,7 @@ class LibraryTests(unittest.TestCase):
             storage = {}
             settings = {startup = {}}
             library_declarations = nil
+            library_private_credit_ids = library_private_credit_ids or {}
             screen = gui_container(nil)
             gear = {valid = true, name = "recipe-prod-research_gears-1", level = 3,
               researched = true, enabled = false, visible_when_disabled = true,
@@ -965,6 +967,105 @@ class LibraryTests(unittest.TestCase):
           assert(research_content(root)["mir_library_results"].items[1] == "Gear translated")
         ''')
 
+    def test_private_credit_holders_stay_out_of_library_selection_translation_and_native_open(self):
+        self.lua.execute(r'''
+          package.preload["presentation.library_model"] = nil
+          package.loaded["presentation.library_model"] = nil
+          local credits = {
+            "mir-legacy-module-credit-speed-module",
+            "mir-legacy-module-credit-productivity-module",
+            "mir-legacy-module-credit-efficiency-module",
+            "mir-legacy-cannon-credit-rocket-shooting-speed"
+          }
+          library_private_credit_ids = {}
+          for _, id in ipairs(credits) do library_private_credit_ids[id] = true end
+          boot()
+
+          for index, id in ipairs(credits) do
+            player.force.technologies[id] = {
+              valid = true, name = id, level = index + 1, researched = true,
+              enabled = false, visible_when_disabled = false, localised_name = "Private credit " .. index,
+              prototype = {max_level = 4294967295}
+            }
+          end
+          local original_queue = {credits[1], foreign.name, credits[2], gear.name, credits[3], credits[4]}
+          player.force.research_queue, player.force.current_research, player.force.research_progress =
+            original_queue, credits[1], .42
+          local before_queue = {}
+          for index, id in ipairs(original_queue) do before_queue[index] = id end
+          local before_current, before_progress = player.force.current_research, player.force.research_progress
+
+          local function assert_private_rows(root, label)
+            local listed = {}
+            for _, item in ipairs(research_content(root)["mir_library_results"].items) do listed[item] = true end
+            assert(listed[gear.name] and listed[foreign.name], label .. " dropped ordinary rows")
+            for _, id in ipairs(credits) do
+              assert(not listed[id], label .. " exposed private credit: " .. id)
+            end
+          end
+
+          local root = library.open(player, {family = "all", selected = foreign.name})
+          local view = storage.mir_library.players[1]
+          assert(view.selected == foreign.name, "ordinary foreign selection was not retained")
+          assert_private_rows(root, "no cap provider")
+          assert(#player.translation_requests == 2,
+            "private credit received a translation request")
+          for _, request in ipairs(player.translation_requests) do
+            for index = 1, #credits do
+              assert(request.localised ~= "Private credit " .. index,
+                "private credit translation was dispatched")
+            end
+          end
+
+          library.set_cap_provider(function() error("unavailable cap provider") end)
+          root = library.open(player)
+          assert_private_rows(root, "failing cap provider")
+          library.set_cap_provider(function() return "malformed caps" end)
+          root = library.open(player)
+          assert_private_rows(root, "malformed cap provider")
+          library.set_cap_provider(function(force)
+            assert(force == player.force)
+            return {}
+          end)
+          root = library.open(player)
+          assert_private_rows(root, "successful cap provider")
+
+          library.open(player, {hidden = {foreign.name}})
+          library.open(player, {selected = credits[1], hidden = {credits[2]}})
+          view = storage.mir_library.players[1]
+          assert(view.selected == foreign.name and view.hidden[foreign.name] == true
+            and view.hidden[credits[2]] == nil,
+            "private remote selection or hidden input replaced retained foreign state")
+
+          root = library.open(player, {tab = "queue"})
+          local queue_items = root["mir_library_tabs"]["mir_library_queue_content"]["mir_library_queue_list"].items
+          assert(#queue_items == 2 and queue_items[1] == foreign.localised_name
+            and queue_items[2] == gear.localised_name,
+            "queue projection exposed private credit or changed ordinary native order")
+
+          library.close(player)
+          storage.mir_library.players[1].selected = credits[1]
+          root = library.open(player, {tab = "research"})
+          local actions = research_content(root)["mir_library_actions"]
+          assert(storage.mir_library.players[1].selected == credits[1]
+            and actions["mir_library_open_native"].enabled == false,
+            "stale private selection was repaired or exposed as an openable row")
+          library.on_gui_click({player_index = 1, element = actions["mir_library_open_native"]})
+          assert(player.gui.screen["mir_research_browser"] == root and player.opened_technology == nil,
+            "stale private selection opened native research or closed the Library")
+
+          assert(player.force.research_queue == original_queue and #player.force.research_queue == #before_queue
+            and player.force.current_research == before_current and player.force.research_progress == before_progress)
+          for index, id in ipairs(before_queue) do
+            assert(player.force.research_queue[index] == id, "Library changed native queue order")
+          end
+          for index, id in ipairs(credits) do
+            local holder = player.force.technologies[id]
+            assert(holder.level == index + 1 and holder.researched == true and holder.enabled == false,
+              "Library changed private credit state")
+          end
+        ''')
+
     def test_all_view_native_translation_scan_is_bounded_before_request_dispatch(self):
         self.lua.execute('''
           boot()
@@ -1687,7 +1788,7 @@ class LibraryTests(unittest.TestCase):
     def test_real_model_host_preserves_hidden_visibility_and_full_family_callbacks(self):
         self.lua.execute('''
           package.preload["research.catalogue"] = function()
-            return {declared = function()
+            return {internal_credit_ids = function() return {} end, declared = function()
               return {
                 {id = "recipe-prod-research_gears-1", family = "research_gears", progression = 1,
                   native_order = "p[research_gears]"},
