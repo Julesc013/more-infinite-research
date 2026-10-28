@@ -308,10 +308,20 @@ end)
 
 script.on_configuration_changed(function()
   -- A source save can load immediately before its successor configuration.
-  -- Only a completed save is a cold-reload witness; never carry a source
-  -- witness into the successor stage.
+  -- Preserve only an unreported completed-successor load. Some historical
+  -- engines re-enter configuration while loading that save; validate its
+  -- completed state instead of importing the published state a second time.
+  local completed_load = loaded == "mir5-complete" and not reported
   loaded, reported = false, false
-  if target.stage == "mir5" then initialize_mir5() end
+  if target.stage == "mir5" then
+    local state = global[KEY]
+    if state and state.phase == "mir5-complete" then
+      assert_candidate_complete(state)
+      if completed_load then loaded = "mir5-complete" end
+    else
+      initialize_mir5()
+    end
+  end
 end)
 
 script.on_event(defines.events.on_research_finished, function(event)

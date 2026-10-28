@@ -440,7 +440,7 @@ class HistoricalTransitionFixtureControls(unittest.TestCase):
             )
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
 
-    def test_published_to_mir5_mock_preserves_partial_progress_and_queue_until_real_successor_event(self):
+    def _install_transition_mock(self):
         self.lua.globals().fixture = FIXTURE.as_posix()
         self.lua.globals().control = (FIXTURE / "control.lua").as_posix()
         self.lua.execute(r'''
@@ -557,6 +557,8 @@ class HistoricalTransitionFixtureControls(unittest.TestCase):
             return table.concat(messages,"\n")
           end
         ''')
+    def test_published_to_mir5_mock_preserves_partial_progress_and_queue_until_real_successor_event(self):
+        self._install_transition_mock()
         for queue, old_lab in ((False, False), (False, True), (True, False)):
             with self.subTest(queue_api=queue, old_lab=old_lab):
                 witness = self.lua.eval("execute_transition")(queue, old_lab)
@@ -584,6 +586,59 @@ class HistoricalTransitionFixtureControls(unittest.TestCase):
           local ok,message=pcall(function()callbacks.configuration({})end)
           assert(not ok and tostring(message):find("lacks the published fixture state",1,true))
         ''')
+
+    def test_completed_successor_configuration_reentry_is_observational_and_rejects_corruption(self):
+        self._install_transition_mock()
+        self.lua.execute(r'''
+          function reenter_completed(queue, old_lab, load_first, corruption)
+            execute_transition(queue, old_lab)
+            local force, state = game.forces.player, global.mir5_historical_transition
+            local direct = force.technologies[fixture_target.direct]
+            if corruption == "effect" then force.manual_mining_speed_modifier = 0 end
+            if corruption == "level" then
+              if queue or old_lab then direct.level = 4 else direct.researched = false end
+            end
+            if corruption == "completions" then state.successor_direct_finished = 2 end
+            if corruption == "queue" then
+              if queue then force.research_queue = {}
+              else force.current_research = force.technologies["braking-force-1"] end
+            end
+            local phase, level, researched = state.phase, direct.level, direct.researched
+            local completions, bonus = state.successor_direct_finished, force.manual_mining_speed_modifier
+            local current, progress, queue_before = force.current_research, force.research_progress, force.research_queue
+            local save_count, message_count = #saves, #messages
+            game.surfaces[1].create_entity = function() error("configuration created an extra lab") end
+            force.add_research = function() error("configuration started extra research") end
+            if load_first then callbacks.load() end
+            local ok, message = pcall(callbacks.configuration, {})
+            if corruption then
+              assert(not ok, "completed-state corruption was accepted: " .. corruption)
+              assert(tostring(message):find("MIR5", 1, true), tostring(message))
+            else
+              assert(ok, "completed successor was imported again: " .. tostring(message))
+              callbacks.events[defines.events.on_tick]()
+              assert(#messages == message_count + (load_first and 1 or 0),
+                "configuration fabricated or lost a completed-load observation")
+              if load_first then assert(messages[#messages]:find('"stage":"reload"', 1, true)) end
+              callbacks.events[defines.events.on_tick]()
+              assert(#messages == message_count + (load_first and 1 or 0), "reload reported twice")
+            end
+            assert(global.mir5_historical_transition == state and state.phase == phase
+              and direct.level == level and direct.researched == researched
+              and state.successor_direct_finished == completions
+              and force.manual_mining_speed_modifier == bonus and force.current_research == current
+              and force.research_progress == progress and #saves == save_count,
+              "configuration changed completed native/fixture state or wrote a save")
+            local queue_after = force.research_queue
+            assert(#queue_after == #queue_before)
+            for index, technology in ipairs(queue_before) do assert(queue_after[index] == technology) end
+          end
+        ''')
+        for queue, old_lab in ((False, False), (False, True), (True, False)):
+            for load_first in (False, True):
+                for corruption in (None, "effect", "level", "completions", "queue"):
+                    with self.subTest(queue=queue, old_lab=old_lab, load_first=load_first, corruption=corruption):
+                        self.lua.eval("reenter_completed")(queue, old_lab, load_first, corruption)
 
     def test_f018_same_engine_transition_uses_force_saved_progress_and_refuses_foreign_state_before_successor_write(self):
         self.lua.globals().fixture = FIXTURE.as_posix()
