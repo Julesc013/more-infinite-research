@@ -3788,8 +3788,8 @@
         {
           "boundary": "K2 Imersite public/carrier identities",
           "status": "needs-correction",
-          "problem": "Direct4.6 matching-cost route passes at original inputs; staged published4.7.2 remains adverse. Exact published4.7.3 K2SE carrier source89023 now passes save/two reloads; current005D fails foreign carrier enablement before fixture writes. Logging-only native fields retain levels/bonus/progress but both foreign flags become true.",
-          "next_action": "Use protected89023 without recreation. Trace earliest MIR-context carrier flags and reuse existing data captures to distinguish engine/prototype changes from player lifecycle writes. Preserve foreign disablement and every original successor assertion; execute affected corrected successor/save/two reloads. No K2SO/public handoff or source-lab claim follows.",
+          "problem": "Direct4.6 AFCAF/R05 passes under its original FE4 inputs; E3A/b251 was later preparation. Current005D/8DC direct inputs are separately pinned and guarded. Exact published4.7.3 K2SE source89023 passes seeded state/save/two reloads, but current005D enables both foreign carriers before fixture writes. Published4.7.2 intermediate remains adverse.",
+          "next_action": "Reuse protected89023 to trace earliest MIR-context carrier flags and distinguish engine/prototype transition from callback writes. Preserve every successor/foreign assertion and qualify affected corrected successor/save/two reloads. The separate protected538B/current direct route has prepared inputs below; native-owner custody/resource admission and current result remain separate. No source recreation, published-archive patch, K2SO/public handoff or source-lab claim follows.",
           "prepared_inputs": {
             "path": "spec/evidence/k2-imersite-current005d-prepared-inputs-r01.json",
             "sha256": "02C6BFFB4CD524A11BF90DEC1269639963B61765027AE0D60A6A56E9C068EC56"
