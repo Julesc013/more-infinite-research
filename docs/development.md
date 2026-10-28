@@ -182,6 +182,8 @@ The [prepared command](../spec/evidence/f210-menu-repeatability-prepared-command
 
 Use `tools/Invoke-MenuComparison.ps1 -RepeatabilityDiagnostic` for one published warmup and four published observations. It uses the same resource/direct-library/actor helpers and endpoint, validates the existing profile’s declared archives, and gives the result a distinct diagnostic kind. The ordinary8/64-block comparison remains the separate acceptance path; no diagnostic observation can substitute for its retained failed pilot. Replay and candidate parameters are unnecessary in diagnostic mode.
 
+The [six original pilot actor/log/resource bodies](../spec/evidence/f210-menu-aa-pilot-source-records-r01.json) have now been independently rehashed and reviewed; the [retained diagnosis](../spec/evidence/f210-menu-repeatability-diagnosis-r01.json) records same-clock phase arithmetic and its limits. Body delivery/review is complete. Owner scheduling, actual preflight and caller freeze remain pending; the original failed A/A verdict and full final-candidate performance requirement remain unchanged.
+
 The plan-only command starts no Factorio process:
 
 ```powershell
