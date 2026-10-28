@@ -1,0 +1,443 @@
+{
+  "schema": 1,
+  "kind": "MIRWorkerIndependentOffsetNativeBoundaryV1",
+  "status": "diagnosed-native-boundary-worker-qualification-open",
+  "scope": "Protected exact4.7.20002 worker source90B2 to currentE9 fails strict0.2 restoration before fixture research. Read-only contrasts locate player-only .123 loss before MIR configuration and reproduce it with the same published MIR version plus one inert companion technology. No expectation,player source or historical receipt changes.",
+  "controller_commit": "7c105ca62256738e2a3cec99277917d1185e4676",
+  "artifact_source_commit": "992c76ee24caf2d723b469c3db760cbebdf35eeb",
+  "player_tree": "fbb7e9135280ce7f69692e9b0c4a44d743793f45",
+  "candidate_sha256": "E9D349931E082AD77057C150E3D6093490E4086E84F0FAFECB0ED1257FD5ED4F",
+  "engine_sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B",
+  "source_recovery": {
+    "run_id": 40018592992,
+    "artifact_id": 12530180800,
+    "artifact_digest": "sha256:cf1f1c167cb4d608d4d9f7b937d7d08685f64e44559e3be5836398426ddbd9d4",
+    "manifest_sha256": "6A7A20A8FFA360B818A275A1B5A3A87EB0B78D9845228E9B5A1DE323BED767CA",
+    "verified_members": 63,
+    "original_published_receipt_sha256": "6A5C450AC547923D0AD3BAD0DC6F22406214C15ADB0F9B17F0483F603940AA5D",
+    "original_published_mir_sha256": "F3943EB4D69CCDAC41BD9F922AD03A5C78F34F22D8E7FA5A88A7A658AB1010B7",
+    "source_labs_reused": 2
+  },
+  "protected_source": {
+    "path": "build/qualification/recovered-f200-worker-40018592992-r01/gameplay/published/write-data/saves/mir5-native-complete.zip",
+    "sha256": "90B23B42FA040368E7ED8E4D720D1682BD252A554A2DEB103CE60D8AF2930D82",
+    "bytes": 852821
+  },
+  "cases": [
+    {
+      "id": "r01",
+      "status": "failed-preserved-native-adverse",
+      "files": 8,
+      "bytes_per_copy": 42116,
+      "packet_sha256": "294719DAFEE8D3CEBC5A9CE2BC3700604DCB13360F7B832AE4950E2FE93B7BB9",
+      "caller_sha256": "6B2592D1980C60DBFF60877B71312F35E7760EAC64FF40513FA4CB12102947BB",
+      "mir_sha256": "E9D349931E082AD77057C150E3D6093490E4086E84F0FAFECB0ED1257FD5ED4F",
+      "fixture_sha256": "37C2EA747412A94E4007A4E659E0126BE6B78160C9768E1A2F764FE6D3CF7E15",
+      "profile_sha256": "64E15C1BDFDDFAB930AB8901532C860A98FD55D6AF977EB022369535F70A42FC",
+      "result_sha256": "6892570234AEBC323985B2843A9992F7B65CC66F2FA9FF3D023D43AD13B15BDC",
+      "observations": [],
+      "private_variant": null
+    },
+    {
+      "id": "r02",
+      "status": "diagnostic-native-failure-not-qualification",
+      "files": 8,
+      "bytes_per_copy": 43845,
+      "packet_sha256": "FC885A4F3448C63DE5B02084A9FF001E7358107FD230EE70BE163E3DE2B54FD6",
+      "caller_sha256": "19DB49F9DB9702020790FD0468036D1EAED3C60C0942B5028DF541C86E4A4FE5",
+      "mir_sha256": "E9D349931E082AD77057C150E3D6093490E4086E84F0FAFECB0ED1257FD5ED4F",
+      "fixture_sha256": "2B63FD32800CC70B17461560BE4E76DA475CCB32EF1A74D415615C1D3AD2369A",
+      "profile_sha256": "09654F9326DC466A5F570690BD12263B308DE22C91BE6CC2758C865DC6627531",
+      "result_sha256": "BADF89C0B28ED54699BA8ECEE753A00EB97D947BD4B996E7DFD941C89ABDEC1F",
+      "observations": [
+        {
+          "prefix": "[MIR5_NATIVE_FIXTURE] DIAGNOSTIC",
+          "value": {
+            "stage": "worker-before-restored-assert",
+            "player": {
+              "level": 8,
+              "researched": false,
+              "enabled": true,
+              "visible": true,
+              "maximum": 4294967295,
+              "bonus": 3.6999999999999997,
+              "saved_progress": 0.27
+            },
+            "source_player_cap": {
+              "level": 8,
+              "researched": false,
+              "enabled": false,
+              "visible": true,
+              "maximum": 4294967295,
+              "bonus": 3.8229999999999995,
+              "saved_progress": 0.27
+            },
+            "independent_baseline": 2.5229999999999997,
+            "source_lab_count": 2,
+            "foreign": {
+              "level": 6,
+              "researched": false,
+              "enabled": false,
+              "visible": false,
+              "maximum": 4294967295,
+              "bonus": 2.4,
+              "saved_progress": 0
+            }
+          }
+        }
+      ],
+      "private_variant": null
+    },
+    {
+      "id": "r03",
+      "status": "diagnostic-native-failure-not-qualification",
+      "files": 8,
+      "bytes_per_copy": 45929,
+      "packet_sha256": "79C965664127FA24A93F21036B52050180D34954F4532178D41940718CF26F8B",
+      "caller_sha256": "835ED28BCAA36C42866D386F6B306A46B84BA51203E4F3099E47E0141C83D27C",
+      "mir_sha256": "37238E1E5538529E15FA553E44CD9723720A4F49951A94AF5A05776FF74191CD",
+      "fixture_sha256": "2B63FD32800CC70B17461560BE4E76DA475CCB32EF1A74D415615C1D3AD2369A",
+      "profile_sha256": "AFCA6EA4C5B0D6362B8FDB870F038E841DEE306618CFB0A4A770BB8C47D5A871",
+      "result_sha256": "551999AFEEE10B319EF5BCEC194CB741D4E2780D063B4D34274DC01C37868E60",
+      "observations": [
+        {
+          "prefix": "[MIR_WORKER_BOUNDARY]",
+          "value": {
+            "phase": "configuration-entry",
+            "player": {
+              "index": 1,
+              "name": "player",
+              "level": 8,
+              "enabled": true,
+              "visible": true,
+              "bonus": 3.6999999999999997,
+              "saved_progress": 0.27
+            },
+            "foreign": {
+              "index": 4,
+              "name": "mir5-f200-legacy-worker-foreign",
+              "level": 6,
+              "enabled": false,
+              "visible": false,
+              "bonus": 2.4,
+              "saved_progress": 0
+            }
+          }
+        },
+        {
+          "prefix": "[MIR_WORKER_BOUNDARY]",
+          "value": {
+            "phase": "configuration-exit",
+            "player": {
+              "index": 1,
+              "name": "player",
+              "level": 8,
+              "enabled": true,
+              "visible": true,
+              "bonus": 3.6999999999999997,
+              "saved_progress": 0.27
+            },
+            "foreign": {
+              "index": 4,
+              "name": "mir5-f200-legacy-worker-foreign",
+              "level": 6,
+              "enabled": false,
+              "visible": false,
+              "bonus": 2.4,
+              "saved_progress": 0
+            }
+          }
+        },
+        {
+          "prefix": "[MIR5_NATIVE_FIXTURE] DIAGNOSTIC",
+          "value": {
+            "stage": "worker-before-restored-assert",
+            "player": {
+              "level": 8,
+              "researched": false,
+              "enabled": true,
+              "visible": true,
+              "maximum": 4294967295,
+              "bonus": 3.6999999999999997,
+              "saved_progress": 0.27
+            },
+            "source_player_cap": {
+              "level": 8,
+              "researched": false,
+              "enabled": false,
+              "visible": true,
+              "maximum": 4294967295,
+              "bonus": 3.8229999999999995,
+              "saved_progress": 0.27
+            },
+            "independent_baseline": 2.5229999999999997,
+            "source_lab_count": 2,
+            "foreign": {
+              "level": 6,
+              "researched": false,
+              "enabled": false,
+              "visible": false,
+              "maximum": 4294967295,
+              "bonus": 2.4,
+              "saved_progress": 0
+            }
+          }
+        }
+      ],
+      "private_variant": {
+        "original_sha256": "E9D349931E082AD77057C150E3D6093490E4086E84F0FAFECB0ED1257FD5ED4F",
+        "variant_sha256": "37238E1E5538529E15FA553E44CD9723720A4F49951A94AF5A05776FF74191CD",
+        "changed_members": [
+          "more-infinite-research_5.0.20000/runtime/bootstrap.lua"
+        ],
+        "removed_members": [],
+        "scope": "Read-only entry/exit logs; private diagnostic archive only. No acceptance or shippable product claim."
+      }
+    },
+    {
+      "id": "r04",
+      "status": "diagnostic-native-failure-not-qualification",
+      "files": 8,
+      "bytes_per_copy": 45672,
+      "packet_sha256": "EA5F5217CD0F9176E764C65639A4ED6E46FCA8762DD4EE2D1654B70007F5A52C",
+      "caller_sha256": "6C120BB6EAED3B177EA33ACAD973990F223FDF67849A9D9719904BE1BB74CAC6",
+      "mir_sha256": "8F0FBAD382DED304A94F9773F60B2D9A6498A1838929B28BB08AE6892DF1F98E",
+      "fixture_sha256": "2B63FD32800CC70B17461560BE4E76DA475CCB32EF1A74D415615C1D3AD2369A",
+      "profile_sha256": "5564138DE0D0B123B245BB28880572F0BD3D9F31F5E22386ED6FAE65FB52A20C",
+      "result_sha256": "D917FA4E63342A5E094941DCEEF5F946E5335596F0D594806874BB4A88B50E1E",
+      "observations": [
+        {
+          "prefix": "[MIR_WORKER_BOUNDARY]",
+          "value": {
+            "phase": "configuration-entry",
+            "player": {
+              "index": 1,
+              "name": "player",
+              "level": 8,
+              "enabled": true,
+              "visible": true,
+              "bonus": 3.6999999999999997,
+              "saved_progress": 0.27
+            },
+            "foreign": {
+              "index": 4,
+              "name": "mir5-f200-legacy-worker-foreign",
+              "level": 6,
+              "enabled": false,
+              "visible": false,
+              "bonus": 2.4,
+              "saved_progress": 0
+            }
+          }
+        },
+        {
+          "prefix": "[MIR_WORKER_BOUNDARY]",
+          "value": {
+            "phase": "configuration-exit",
+            "player": {
+              "index": 1,
+              "name": "player",
+              "level": 8,
+              "enabled": true,
+              "visible": true,
+              "bonus": 3.6999999999999997,
+              "saved_progress": 0.27
+            },
+            "foreign": {
+              "index": 4,
+              "name": "mir5-f200-legacy-worker-foreign",
+              "level": 6,
+              "enabled": false,
+              "visible": false,
+              "bonus": 2.4,
+              "saved_progress": 0
+            }
+          }
+        },
+        {
+          "prefix": "[MIR5_NATIVE_FIXTURE] DIAGNOSTIC",
+          "value": {
+            "stage": "worker-before-restored-assert",
+            "player": {
+              "level": 8,
+              "researched": false,
+              "enabled": true,
+              "visible": true,
+              "maximum": 4294967295,
+              "bonus": 3.6999999999999997,
+              "saved_progress": 0.27
+            },
+            "source_player_cap": {
+              "level": 8,
+              "researched": false,
+              "enabled": false,
+              "visible": true,
+              "maximum": 4294967295,
+              "bonus": 3.8229999999999995,
+              "saved_progress": 0.27
+            },
+            "independent_baseline": 2.5229999999999997,
+            "source_lab_count": 2,
+            "foreign": {
+              "level": 6,
+              "researched": false,
+              "enabled": false,
+              "visible": false,
+              "maximum": 4294967295,
+              "bonus": 2.4,
+              "saved_progress": 0
+            }
+          }
+        }
+      ],
+      "private_variant": {
+        "original_sha256": "E9D349931E082AD77057C150E3D6093490E4086E84F0FAFECB0ED1257FD5ED4F",
+        "variant_sha256": "8F0FBAD382DED304A94F9773F60B2D9A6498A1838929B28BB08AE6892DF1F98E",
+        "changed_members": [
+          "more-infinite-research_5.0.20000/runtime/bootstrap.lua"
+        ],
+        "removed_members": [
+          "more-infinite-research_5.0.20000/migrations/more-infinite-research_5.0.11000.json"
+        ],
+        "scope": "Read-only entry/exit logs; private diagnostic archive only. No acceptance or shippable product claim."
+      }
+    },
+    {
+      "id": "r05",
+      "status": "diagnostic-native-failure-not-qualification",
+      "files": 8,
+      "bytes_per_copy": 87880,
+      "packet_sha256": "66881C17AC944993E4AB43D210EF5BE460F18A58AAE4B837689188D4A94DD8F8",
+      "caller_sha256": "AF70837F5CDBF0866B7CFA0DE42FEF1714F199F95071ADB46AAD39FF81D897C1",
+      "mir_sha256": "2DE1FA79676AE1C671395A1AC39956F037C2345BE40AE2CE6139ECC9F97A33D5",
+      "fixture_sha256": "AF15CC34C8A70F9FBF292FC850CFB77B1FA298C49B86F24C1601D3A1B1A33804",
+      "profile_sha256": "917328F940A9ED18587ABDA6D7376F9E9BB66FB328943DD2ACD1F139B2A7C9B6",
+      "result_sha256": "236496DCBCE4454DED70A0717B4649A44F153FF3F407A1CF002C9F3680C6BB27",
+      "observations": [
+        {
+          "prefix": "[MIR_WORKER_PUBLISHED_ENTRY]",
+          "value": {
+            "player_bonus": 3.8229999999999995,
+            "foreign_bonus": 2.4
+          }
+        },
+        {
+          "prefix": "[MIR_WORKER_PUBLISHED_FIXTURE_ENTRY]",
+          "value": {
+            "player": {
+              "level": 8,
+              "researched": false,
+              "enabled": true,
+              "visible": true,
+              "maximum": 4294967295,
+              "bonus": 3.8229999999999995,
+              "saved_progress": 0.27
+            },
+            "foreign": {
+              "level": 6,
+              "researched": false,
+              "enabled": false,
+              "visible": false,
+              "maximum": 4294967295,
+              "bonus": 2.4,
+              "saved_progress": 0
+            }
+          }
+        }
+      ],
+      "private_variant": {
+        "original_sha256": "F3943EB4D69CCDAC41BD9F922AD03A5C78F34F22D8E7FA5A88A7A658AB1010B7",
+        "variant_sha256": "2DE1FA79676AE1C671395A1AC39956F037C2345BE40AE2CE6139ECC9F97A33D5",
+        "changed_members": [
+          "more-infinite-research_4.7.20002/prototypes/mir/runtime/scripted_techs.lua"
+        ],
+        "source_mir_version_unchanged": "4.7.20002",
+        "inert_companion_technology": false,
+        "scope": "Private published-runtime control; entry log is the only MIR payload change. No gameplay or release pass."
+      }
+    },
+    {
+      "id": "r06",
+      "status": "diagnostic-native-failure-not-qualification",
+      "files": 8,
+      "bytes_per_copy": 87886,
+      "packet_sha256": "2801434DB3213F0033549D99E86467A65DD51EDA4013224C5EC93966A772F49E",
+      "caller_sha256": "939490B60E034BD46ABE30FE812FD13A9D89914E546D6846C7A13034669BA706",
+      "mir_sha256": "2DE1FA79676AE1C671395A1AC39956F037C2345BE40AE2CE6139ECC9F97A33D5",
+      "fixture_sha256": "5059DBBCD0802EC7706E641C5F35567CA37D596C275D2E4665202199874F6596",
+      "profile_sha256": "2FF74DE6C6BFD1E4F12CC2CEAA8C2F01EB02447A296E5AA9197BA28187B4A6FC",
+      "result_sha256": "A6B57CD8AB7E8C90DB5ACE2B995A2C16B7172C4BE0FE941628A80A7EFA31B5BF",
+      "observations": [
+        {
+          "prefix": "[MIR_WORKER_PUBLISHED_ENTRY]",
+          "value": {
+            "player_bonus": 3.6999999999999997,
+            "foreign_bonus": 2.4
+          }
+        },
+        {
+          "prefix": "[MIR_WORKER_PUBLISHED_FIXTURE_ENTRY]",
+          "value": {
+            "player": {
+              "level": 8,
+              "researched": false,
+              "enabled": true,
+              "visible": true,
+              "maximum": 4294967295,
+              "bonus": 3.6999999999999997,
+              "saved_progress": 0.27
+            },
+            "foreign": {
+              "level": 6,
+              "researched": false,
+              "enabled": false,
+              "visible": false,
+              "maximum": 4294967295,
+              "bonus": 2.4,
+              "saved_progress": 0
+            }
+          }
+        }
+      ],
+      "private_variant": {
+        "original_sha256": "F3943EB4D69CCDAC41BD9F922AD03A5C78F34F22D8E7FA5A88A7A658AB1010B7",
+        "variant_sha256": "2DE1FA79676AE1C671395A1AC39956F037C2345BE40AE2CE6139ECC9F97A33D5",
+        "changed_members": [
+          "more-infinite-research_4.7.20002/prototypes/mir/runtime/scripted_techs.lua"
+        ],
+        "source_mir_version_unchanged": "4.7.20002",
+        "inert_companion_technology": true,
+        "scope": "Private published-runtime control; entry log is the only MIR payload change. No gameplay or release pass."
+      }
+    }
+  ],
+  "findings": [
+    "R01 fails the unchanged original successor assertion before any new lab/save.",
+    "R02 reads player level8/enabled/visible/.27 and3.7 bonus versus protected3.823; foreign level6/disabled/hidden/2.4 remains correct. The .123 offset is player-only.",
+    "R03 shows the same3.7 at current MIR configuration entry and exit with native state otherwise unchanged.",
+    "R04 omits only new5.0.11000 JSON in a private instrumented contrast; the same pre-callback offset loss remains. That migration alone is not the cause or a proposed fix.",
+    "R05 andR06 use identical private published4.7.20002 MIR bytes/version/runtime, differing only in one inert no-effects companion technology. Published configuration entry is3.823 without it and3.7 with it; foreign2.4 stays unchanged. These deliberately stop at the original successor-version guard.",
+    "The native prototype-change boundary can discard this manually seeded aggregate offset independently of MIR5. No player module can infer an arbitrary lost foreign contribution from earned MIR levels; RUN-03/MIG-01 limits apply. Exact engine internals and every possible upstream caller are not inferred."
+  ],
+  "next_action": "Review the existing fixture-owner boundary and prepare a distinct independently checked native-worker protocol that retains ownership/native-effect/foreign/work/lab/save/two-reload assertions without claiming automatic reconstruction of an engine-discarded untracked contribution. Preserve0.1 source,strict0.2 failure and every contrast; do not simply lower the expected bonus or alter production native effects. F210 still needs its actual worker route.",
+  "root_readback": {
+    "path": "build/qualification/worker-independent-offset-root-readback-r06.json",
+    "sha256": "3BDF95EA0A9AA30B85E02CA2581118F1AA830E603BA06091024EA279656B9090",
+    "files": 48,
+    "bytes_per_copy": 353328
+  },
+  "lossless_receipts": {
+    "path": "spec/evidence/worker-independent-offset-native-receipts-r06.json.gz",
+    "sha256": "FF780F28E27B0346D96CE4E9E1180A535A30B18EAC25F847E232A9414112C582",
+    "bytes": 172361,
+    "records": 31
+  },
+  "counts": {
+    "new_native_processes": 6,
+    "new_labs": 0,
+    "new_saves": 0,
+    "new_cold_reloads": 0,
+    "original_source_labs_reused_once": 2
+  },
+  "limits": "All six native invocations remain failed or diagnostic; no new lab,save,cold-reload or release pass. Original published source evidence retains its own identity. No fixture oracle waiver,production offset reconstruction,universal compatibility or final freeze/publication claim."
+}
