@@ -314,13 +314,25 @@ function Get-HistoricalTransitionFixtureTarget([string]$Target,[string]$Metadata
     f100=@{factorio_version='1.0';published_mir_version='4.7.10002';mir_version='5.0.10000'}
     f110=@{factorio_version='1.1';published_mir_version='4.7.11002';mir_version='5.0.11000'}
   }
-  $allowed=@($expectedTargets.Keys)
-  Assert-Fixture ($Target -in $allowed) 'historical transition target is unsupported'
-  Assert-Fixture ($Stage -in @('published','mir5')) 'historical transition stage is unsupported'
   $metadata=(Resolve-Path -LiteralPath $MetadataPath).Path
   $value=Get-Content -LiteralPath $metadata -Raw|ConvertFrom-Json -AsHashtable
   Assert-Fixture ($value.kind -ceq 'MIR5HistoricalTransitionFixtureV1' -and $value.schema -eq 1) 'historical transition fixture metadata differs'
   Assert-Fixture ([string]$value.name -ceq 'mir-fixture-mir5-historical-transition' -and [string]$value.version -ceq '0.1.0') 'historical transition fixture identity differs'
+  $predecessorRelease=$null
+  if($value.ContainsKey('predecessor_release')){
+    Assert-Fixture ($value.predecessor_release -is [string] -and $value.predecessor_release -ceq 'v4.7.3') 'historical transition predecessor release is unsupported'
+    $predecessorRelease=[string]$value.predecessor_release
+    $expectedTargets=[ordered]@{
+      f013=@{factorio_version='0.13';published_mir_version='4.7.01303';mir_version='5.0.01300';published_archive_sha256='3918B10A0902FABD09BEA6D1F0E7EFF06B20B84F3D8CC5EC73E36FEDAAE64D4D'}
+      f014=@{factorio_version='0.14';published_mir_version='4.7.01403';mir_version='5.0.01400';published_archive_sha256='85C7798BD6DC80FAA021AB0F33519B57A740B8D3969E695A82BA55634BA1C87A'}
+      f015=@{factorio_version='0.15';published_mir_version='4.7.01503';mir_version='5.0.01500';published_archive_sha256='0F8DD4DD21B8D1542FF5EDF96FDC38F75C9AB3CE577DF29C5E9DE99E0643B510'}
+      f016=@{factorio_version='0.16';published_mir_version='4.7.01603';mir_version='5.0.01600';published_archive_sha256='DAC63B9B14278C952B1020F9AE600C1437A9812C79CBBA17DE3CB15AF0CED6BD'}
+    }
+    Assert-Fixture ((@($value.targets.Keys|Sort-Object)-join ',') -ceq 'f013,f014,f015,f016') '4.7.3 historical transition target set differs'
+  }
+  $allowed=@($expectedTargets.Keys)
+  Assert-Fixture ($Target -in $allowed) 'historical transition target is unsupported'
+  Assert-Fixture ($Stage -in @('published','mir5')) 'historical transition stage is unsupported'
   $selected=$value.targets[$Target]
   Assert-Fixture ($null -ne $selected) 'historical transition fixture lacks selected target'
   foreach($field in @('factorio_version','minimum_base','published_mir_version','mir_version','published_archive_sha256','direct','direct_effect','successor_mode')){
@@ -330,6 +342,7 @@ function Get-HistoricalTransitionFixtureTarget([string]$Target,[string]$Metadata
   Assert-Fixture ([string]$selected.factorio_version -ceq [string]$expected.factorio_version) 'historical transition factorio version differs'
   Assert-Fixture ([string]$selected.published_mir_version -ceq [string]$expected.published_mir_version -and [string]$selected.mir_version -ceq [string]$expected.mir_version) 'historical transition MIR versions differ'
   Assert-Fixture ([string]$selected.published_archive_sha256 -cmatch '^[A-Fa-f0-9]{64}$') 'historical transition published archive hash differs'
+  if($null -ne $predecessorRelease){Assert-Fixture ([string]$selected.published_archive_sha256 -ceq [string]$expected.published_archive_sha256) 'historical transition published archive hash differs'}
   Assert-Fixture ([string]$selected.direct -cmatch '^[a-z0-9][a-z0-9_-]*$') 'historical transition direct is not a literal-safe identifier'
   $directScience=@($selected.direct_science)
   Assert-Fixture ($directScience.Count -gt 0) 'historical transition target lacks direct science'
