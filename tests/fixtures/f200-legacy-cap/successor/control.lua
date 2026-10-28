@@ -95,11 +95,14 @@ local function lab(state)
   return inventory
 end
 
-local function science_units(inventory, item, label)
+local function science_units(inventory, item, label, science_type)
   local total, stacks = 0, 0
   local prototype = prototypes.item[item]
-  if prototype == nil or type(prototype.get_durability) ~= "function" then
+  if prototype == nil then
     fail(label .. " native science item prototype is absent: " .. item)
+  end
+  if (science_type ~= "tool" and science_type ~= "item") or prototype.type ~= science_type then
+    fail(label .. " native science prototype type changed for " .. item)
   end
   for index = 1, #inventory do
     local stack = inventory[index]
@@ -108,13 +111,27 @@ local function science_units(inventory, item, label)
       if quality == nil or quality.name ~= "normal" then
         fail(label .. " native science quality changed for " .. item)
       end
-      local maximum = prototype.get_durability(quality)
-      local durability = stack.durability
-      if not close(maximum, 1) or type(durability) ~= "number"
-          or durability <= 0 or durability > maximum or type(stack.count) ~= "number" or stack.count < 1 then
-        fail(label .. " native science durability changed for " .. item)
+      if stack.is_tool ~= (science_type == "tool") or stack.type ~= science_type then
+        fail(label .. " native science stack type changed for " .. item)
       end
-      total = total + stack.count - 1 + durability / maximum
+      if type(stack.count) ~= "number" or stack.count < 1 or stack.count % 1 ~= 0 then
+        fail(label .. " native science count changed for " .. item)
+      end
+      if science_type == "tool" then
+        if type(prototype.get_durability) ~= "function" then
+          fail(label .. " native science durability API is absent: " .. item)
+        end
+        local maximum = prototype.get_durability(quality)
+        local durability = stack.durability
+        if not close(maximum, 1) or type(durability) ~= "number"
+            or durability <= 0 or durability > maximum then
+          fail(label .. " native science durability changed for " .. item)
+        end
+        total = total + stack.count - 1 + durability / maximum
+      else
+        -- Ordinary items expose no tool durability and are counted whole.
+        total = total + stack.count
+      end
       stacks = stacks + 1
     end
   end
@@ -132,26 +149,26 @@ local function destination_mode()
   local base = script.active_mods.base
   local mir, fixture = script.active_mods["more-infinite-research"], script.active_mods[FIXTURE]
   if base == "2.0.77" and mir == "5.0.20000" and fixture == "0.2.0" then
-    return {case = MIR5_CASE, label = "MIR5", source_mir = "4.7.20002", source_fixture = "0.1.0"}
+    return {case = MIR5_CASE, label = "MIR5", source_mir = "4.7.20002", source_fixture = "0.1.0", science_type = "tool"}
   end
   if base == "2.0.77" and mir == "4.7.20002" and fixture == "0.3.0" then
-    return {case = PUBLISHED_RELAXED_CASE, label = "published relaxed", source_mir = "4.7.20002", source_fixture = "0.1.0"}
+    return {case = PUBLISHED_RELAXED_CASE, label = "published relaxed", source_mir = "4.7.20002", source_fixture = "0.1.0", science_type = "tool"}
   end
   if base == "2.1.23" and mir == "5.0.21000" and fixture == "0.5.0" then
-    return {case = CROSS_ENGINE_CASE, label = "MIR5 F210 cross-engine", source_mir = "4.7.20003", source_fixture = "0.4.0"}
+    return {case = CROSS_ENGINE_CASE, label = "MIR5 F210 cross-engine", source_mir = "4.7.20003", source_fixture = "0.4.0", science_type = "item"}
   end
   if base == "2.1.23" and mir == "5.0.21000" and fixture == "0.6.0" then
     return {case = CROSS_ENGINE_DISABLED_CASE, label = "MIR5 F210 disabled intermediate",
-      source_mir = "4.7.20003", source_fixture = "0.4.0", disabled_intermediate = true}
+      source_mir = "4.7.20003", source_fixture = "0.4.0", disabled_intermediate = true, science_type = "item"}
   end
   if base == "2.1.23" and mir == "5.0.21000" and fixture == "0.7.0" then
     return {case = CROSS_ENGINE_REENABLED_CASE, label = "MIR5 F210 re-enabled cross-engine",
-      source_mir = "4.7.20003", source_fixture = "0.4.0", reenabled = true}
+      source_mir = "4.7.20003", source_fixture = "0.4.0", reenabled = true, science_type = "item"}
   end
   fail("successor requires the exact F200 MIR5/published fixture or F210 5.0.21000 cross-engine stage")
 end
 
-local function expected_science_consumption(force, value, lab_entity, saved_progress)
+local function expected_science_consumption(force, value, lab_entity, saved_progress, science_type)
   if force.current_research ~= value or #force.research_queue ~= 1 then
     fail("successor research is not singly current")
   end
@@ -187,7 +204,10 @@ local function expected_science_consumption(force, value, lab_entity, saved_prog
   if ticks <= 0 or consumed_units <= 0 or consumed_units > 1 then fail("successor native science timing differs") end
   return {progress = progress, energy = energy, researching_speed = researching_speed,
     laboratory_speed = laboratory_speed, remaining_work = remaining_work, remaining_ticks = ticks,
-    consumed_units = consumed_units}
+    consumed_units = consumed_units, science_type = science_type,
+    -- The independent MIR-absent F210 control spends one whole item for this
+    -- partial one-unit completion. F200 tools retain fractional durability.
+    inventory_consumed_units = science_type == "item" and 1 or consumed_units}
 end
 
 local function assert_source_witness(state, mode)
@@ -267,12 +287,13 @@ local function assert_completed(state, label)
   end
   state.destination_science_units_after = state.destination_science_units_after or {}
   for _, item in ipairs(SCIENCE) do
-    local expected = expected_units[item] - accounting.consumed_units
-    local observed = science_units(inventory, item, "successor post-lab")
+    local expected = expected_units[item] - accounting.inventory_consumed_units
+    local observed = science_units(inventory, item, "successor post-lab", accounting.science_type)
     if not close(observed, expected) then
       fail("successor real lab consumption differs for " .. item
         .. ": observed_units=" .. tostring(observed) .. " expected_units=" .. tostring(expected)
         .. " consumed_units=" .. tostring(accounting.consumed_units)
+        .. " inventory_consumed_units=" .. tostring(accounting.inventory_consumed_units)
         .. " remaining_ticks=" .. tostring(accounting.remaining_ticks))
     end
     local prior = state.destination_science_units_after[item]
@@ -296,7 +317,10 @@ local function marker(stage, state)
       milestone = state.milestone, next_level = player.level, productivity_bonus = player.bonus,
       player_enabled = player.enabled, player_visible_when_disabled = player.visible,
       foreign_queue_progress = state.foreign_queue.progress,
+      -- Retain the work-unit witness separately from physical inventory use.
       science_consumed_units = state.destination_science_accounting.consumed_units,
+      science_inventory_consumed_units = state.destination_science_accounting.inventory_consumed_units,
+      science_type = state.destination_science_accounting.science_type,
       science_remaining_ticks = state.destination_science_accounting.remaining_ticks,
       science_processing_ticks = state.destination_processing_ticks,
       science_elapsed_ticks = state.destination_elapsed_ticks,
@@ -329,7 +353,7 @@ local function finish_diagnostic(state, accounting)
   local observed = {}
   local inventory = lab(state)
   for _, item in ipairs(SCIENCE) do
-    observed[item] = science_units(inventory, item, "successor finish")
+    observed[item] = science_units(inventory, item, "successor finish", accounting.science_type)
   end
   log("[MIR5_NATIVE_FIXTURE] DIAGNOSTIC " .. helpers.table_to_json({
     stage = "finish-before-assertion", case = state.destination_case,
@@ -376,10 +400,10 @@ script.on_configuration_changed(function()
   local inventory = lab(state)
   local before_units = {}
   for _, item in ipairs(SCIENCE) do
-    local prior = science_units(inventory, item, "successor pre-insert")
+    local prior = science_units(inventory, item, "successor pre-insert", mode.science_type)
     local inserted = inventory.insert{name = item, count = DESTINATION_PACKS}
     if inserted ~= DESTINATION_PACKS then fail("could not insert successor science " .. item) end
-    local observed = science_units(inventory, item, "successor pre-lab")
+    local observed = science_units(inventory, item, "successor pre-lab", mode.science_type)
     local expected = prior + DESTINATION_PACKS
     if not close(observed, expected) then
       fail("fixture-added normal-durability science changed for " .. item
@@ -400,7 +424,7 @@ script.on_configuration_changed(function()
   end
   if #game.forces.player.research_queue ~= 1 then fail("successor gear research was not queued singly") end
   state.destination_science_accounting = expected_science_consumption(game.forces.player,
-    technology(game.forces.player, GEAR), state.lab, 0.27)
+    technology(game.forces.player, GEAR), state.lab, 0.27, mode.science_type)
   state.destination_research_start_tick = game.tick
   state.destination_processing_ticks = 0
   state.destination_elapsed_ticks = nil
