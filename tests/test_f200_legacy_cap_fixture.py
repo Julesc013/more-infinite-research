@@ -131,6 +131,7 @@ class F200LegacyCapFixtureTests(unittest.TestCase):
           function legacy_cap_flow(source_path, destination_path, opponent, options)
             options=options or {}
             local callbacks,markers,diagnostics,saves,marker_cases={events={}},0,0,0,{}
+            local active_callback,configuration_save_requests,disabled_lifecycle=nil,0,{}
             local GEAR="recipe-prod-research_gears-1"
             local science={"automation-science-pack","logistic-science-pack","chemical-science-pack","production-science-pack"}
             local science_type="tool"
@@ -215,7 +216,13 @@ class F200LegacyCapFixtureTests(unittest.TestCase):
             local game={tick=0,speed=1,forces={player=player,[1]=player},surfaces={}}
             game.surfaces[1]={create_entity=function(row)assert(row.name=="lab" and row.force==player);return lab end}
             function game.create_force(name)foreign=force(name,2);game.forces[name]=foreign;game.forces[2]=foreign;return foreign end
-            function game.server_save(name)assert(name=="mir5-native-complete");saves=saves+1 end
+            function game.server_save(name)
+              assert(name=="mir5-native-complete")
+              -- Reproduce the observed disabled-startup failure: a request
+              -- during configuration does not produce a saved archive.
+              if active_callback=="changed" then configuration_save_requests=configuration_save_requests+1;return end
+              saves=saves+1
+            end
             local storage={}
             local function startup(cap, enabled)
               return {startup={
@@ -227,7 +234,7 @@ class F200LegacyCapFixtureTests(unittest.TestCase):
             local function rejected(message)
               local state=storage.mir5_f200_legacy_cap or {}
               return {ok=false,message=message,queue_entries=#player.research_queue,
-                saves=saves,
+                saves=saves,configuration_save_requests=configuration_save_requests,disabled_lifecycle=disabled_lifecycle,
                 destination_labs=state.destination_lab_completions or 0,
                 disabled_intermediate_observed=state.disabled_stage_observed == true,
                 disabled_destination_labs=state.disabled_stage_destination_lab_completions or 0}
@@ -262,7 +269,8 @@ class F200LegacyCapFixtureTests(unittest.TestCase):
             local function invoke(control, kind, event)
               local callback=kind=="tick" and control.events[1] or (kind=="finished" and control.events[2] or control[kind])
               if type(callback)~="function"then return false,"missing "..kind.." callback"end
-              local ok,result=pcall(callback,event);return ok,tostring(result)
+              local previous_callback=active_callback;active_callback=kind
+              local ok,result=pcall(callback,event);active_callback=previous_callback;return ok,tostring(result)
             end
             local function tick(control)
               game.tick=game.tick+1;return invoke(control,"tick")
@@ -325,13 +333,40 @@ class F200LegacyCapFixtureTests(unittest.TestCase):
                 options.disabled_mir or "5.0.21000",options.disabled_fixture or "0.6.0",startup(40,opponent=="wrong-disabled-setting"),options.disabled_control_alias)
               if not disabled then return rejected(message) end
               ok,result=invoke(disabled,"load");if not ok then return rejected(result) end
+              local before_saves,before_markers=saves,markers
               ok,result=invoke(disabled,"changed");if not ok then return rejected(result) end
+              disabled_lifecycle.configuration_phase=state.phase
+              disabled_lifecycle.configuration_observed=state.disabled_stage_observed
+              disabled_lifecycle.configuration_saves=saves-before_saves
+              disabled_lifecycle.configuration_markers=markers-before_markers
+              if options.load_pending_before_tick then
+                local phase,observed=state.phase,state.disabled_stage_observed
+                ok,result=invoke(disabled,"load");if not ok then return rejected(result) end
+                disabled_lifecycle.pending_load_read_only=state.phase==phase and state.disabled_stage_observed==observed
+                  and saves==before_saves and markers==before_markers
+              end
+              if opponent=="unexpected-disabled-config-pending" then
+                ok,result=invoke(disabled,"changed");if not ok then return rejected(result) end
+              end
+              if opponent=="disabled-pending-drift" then player.technologies[GEAR].saved_progress=.26 end
               ok,result=tick(disabled);if not ok then return rejected(result) end
+              disabled_lifecycle.first_tick_phase=state.phase
+              disabled_lifecycle.first_tick_observed=state.disabled_stage_observed
+              disabled_lifecycle.first_tick_saves=saves-before_saves
+              disabled_lifecycle.first_tick_markers=markers-before_markers
+              if opponent=="unexpected-disabled-config-completed" then
+                ok,result=invoke(disabled,"changed");if not ok then return rejected(result) end
+              end
+              local completed_saves,completed_markers=saves,markers
+              ok,result=tick(disabled);if not ok then return rejected(result) end
+              disabled_lifecycle.repeated_tick_writes=saves~=completed_saves or markers~=completed_markers
               for reload=1,2 do
                 ok,result=invoke(disabled,"load");if not ok then return rejected(result) end
                 if opponent=="disabled-reload-drift" and reload==1 then player.technologies[GEAR].saved_progress=.26 end
                 ok,result=tick(disabled);if not ok then return rejected(result) end
               end
+              disabled_lifecycle.reload_saves=saves-completed_saves
+              disabled_lifecycle.reload_markers=markers-completed_markers
             end
             -- This is the candidate lifecycle result under test, not a fixture write.
             if opponent~="stale-enable" and opponent~="old-disabled-right" then
@@ -374,6 +409,7 @@ class F200LegacyCapFixtureTests(unittest.TestCase):
               processing_ticks=state.destination_processing_ticks,elapsed_ticks=state.destination_elapsed_ticks,current_progress=state.destination_science_accounting.progress,foreign_progress=foreign.research_progress,foreign_enabled=foreign.technologies[GEAR].enabled,
               source_mir=source_mir,destination_mir=destination_mir,source_base=source_base,destination_base=destination_base,
               source_case=state.source_case,marker_cases=marker_cases,markers=markers,diagnostics=diagnostics,saves=saves,
+              configuration_save_requests=configuration_save_requests,disabled_lifecycle=disabled_lifecycle,
               disabled_intermediate_observed=state.disabled_stage_observed == true,
               disabled_destination_labs=state.disabled_stage_destination_lab_completions or 0}
           end
@@ -766,6 +802,49 @@ class F200LegacyCapFixtureTests(unittest.TestCase):
                 self.assertIn(phrase, rejected["message"])
                 self.assertEqual(observed, rejected["disabled_intermediate_observed"])
                 self.assertEqual((0, 0), (rejected["queue_entries"], rejected["destination_labs"]))
+
+    def test_disabled_intermediate_saves_once_on_first_tick_then_only_reports_cold_reloads(self):
+        options = {
+            "source_base": "2.0.77", "source_mir": "4.7.20003", "source_fixture": "0.4.0",
+            "source_control_alias": str(FIXTURE / "published/control.lua"),
+            "disabled_path": str(F210_DISABLED / "control.lua"), "disabled_base": "2.1.23",
+            "disabled_mir": "5.0.21000", "disabled_fixture": "0.6.0",
+            "disabled_control_alias": str(FIXTURE / "successor/control.lua"),
+            "reenabled_path": str(F210_REENABLED / "control.lua"), "reenabled_base": "2.1.23",
+            "reenabled_mir": "5.0.21000", "reenabled_fixture": "0.7.0",
+            "reenabled_control_alias": str(FIXTURE / "successor/control.lua"),
+        }
+        for pending_load in (False, True):
+            result = self.flow_result(F200_CROSS / "control.lua", F210_REENABLED / "control.lua", "",
+                                      {**options, "load_pending_before_tick": pending_load})
+            self.assertTrue(result["ok"], result["message"])
+            observed = result["disabled_lifecycle"]
+            self.assertEqual(0, result["configuration_save_requests"])
+            self.assertEqual("disabled-intermediate-pending-save", observed["configuration_phase"])
+            self.assertFalse(observed["configuration_observed"])
+            self.assertEqual((0, 0), (observed["configuration_saves"], observed["configuration_markers"]))
+            self.assertEqual("disabled-intermediate-completed", observed["first_tick_phase"])
+            self.assertTrue(observed["first_tick_observed"])
+            self.assertEqual((1, 1), (observed["first_tick_saves"], observed["first_tick_markers"]))
+            self.assertFalse(observed["repeated_tick_writes"])
+            self.assertEqual((0, 2), (observed["reload_saves"], observed["reload_markers"]))
+            if pending_load:
+                self.assertTrue(observed["pending_load_read_only"])
+            self.assertEqual((2, 1, 3, .27, .42, False),
+                             (result["source_labs"], result["destination_labs"], result["saves"],
+                              result["current_progress"], result["foreign_progress"], result["foreign_enabled"]))
+        for opponent, message, saved in (
+            ("unexpected-disabled-config-pending", "requires an untouched source completion", 1),
+            ("unexpected-disabled-config-completed", "requires an untouched source completion", 2),
+            ("disabled-pending-drift", "saved progress differs", 1),
+        ):
+            with self.subTest(opponent=opponent):
+                refused = self.flow_result(F200_CROSS / "control.lua", F210_REENABLED / "control.lua", opponent, options)
+                self.assertFalse(refused["ok"])
+                self.assertIn(message, refused["message"])
+                self.assertEqual((0, 0, saved, 0),
+                                 (refused["queue_entries"], refused["destination_labs"], refused["saves"],
+                                  refused["configuration_save_requests"]))
 
     def test_published_completed_v010_source_save_uses_only_the_exact_old_case_fallback_on_cold_reload(self):
         result = self.flow_result(FIXTURE / "published" / "control.lua", FIXTURE / SUCCESSOR_ROLE / "control.lua", "",
