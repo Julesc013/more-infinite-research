@@ -38,6 +38,7 @@ This is the authoritative product changelog. Each MIR 1–3 master release appea
 - Preserve the earned cannon component of admitted MIR 1.2 combined rocket shooting speed through one hidden native credit using the retained rocket setting; new cannon research remains independent.
 - Keep hidden migration credits out of Research Library lists, translation requests and native research actions while preserving earned bonuses and ordinary foreign research inspection.
 - Keep authored disabled research unavailable after technology-effects resets and force lifecycle changes, including unlimited-cap configurations.
+- Preserve proven MIR cap ownership when a published save is first upgraded with a research family disabled, so later re-enabling restores only MIR-owned disablement.
 - Restore the published visibility of all twenty retained Bob/Angel material setting families for admitted Factorio 2.1 Base and Space Age profiles.
 - Restore the seven published Bob/Angel Factorio 2.1 productivity technology icons from their direct native prototype references.
 - Restore omitted research names and descriptions across the shipped locales while preserving existing translations.
