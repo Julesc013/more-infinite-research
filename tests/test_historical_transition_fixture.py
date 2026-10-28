@@ -16,6 +16,7 @@ import zipfile
 ROOT = Path(__file__).resolve().parents[1]
 FIXTURE = ROOT / "tests/fixtures/historical-transition"
 FIXTURE_473 = FIXTURE / "metadata-473-f013-f016.json"
+FIXTURE_473_LATE = FIXTURE / "metadata-473-f017-f100.json"
 RUNNER = ROOT / "tools/Invoke-NativeFixture.ps1"
 DIRECT_ORACLE = ROOT / "tests/fixtures/historical-direct-native-oracle.json"
 
@@ -305,6 +306,113 @@ class HistoricalTransitionFixtureControls(unittest.TestCase):
             env["MIR_TEST_F018_WRONG_HASH"] = str(wrong_hash_path)
             env["MIR_TEST_F018_WRONG_MIR_HASH"] = str(wrong_mir_hash_path)
             env["MIR_TEST_F018_WRONG_TARGET"] = str(wrong_target_path)
+            result = subprocess.run(["pwsh", "-NoProfile", "-Command", rejection], cwd=ROOT,
+                                    text=True, capture_output=True, env=env, check=False)
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+
+    def test_473_f017_f100_metadata_selects_only_exact_late_published_origins(self):
+        expected = {
+            "f017": ("0.17.79", "4.7.01703", "5.0.01700",
+                     "9BCF1813BBDCBBD90088D74672CEF639FBC96689604673E529CF3AA8FC8D89AF"),
+            "f100": ("1.0.0", "4.7.10003", "5.0.10000",
+                     "C04F3543EBF99D2B76B2C9193EA0886381B7CDDF2F2C1610310E7961B24BE0E1"),
+        }
+        metadata = json.loads(FIXTURE_473_LATE.read_text(encoding="utf-8"))
+        self.assertEqual((metadata["schema"], metadata["kind"], metadata["name"], metadata["version"],
+                          metadata["predecessor_release"], metadata["published_release_id"],
+                          metadata["published_tag_source"]),
+                         (1, "MIR5HistoricalTransitionFixtureV1", "mir-fixture-mir5-historical-transition", "0.1.0",
+                          "v4.7.3", 422732162, "8643cc91bc915e008556a5315dbb0a743247e7ab"))
+        self.assertEqual(set(metadata["targets"]), set(expected))
+        for target, (base, published, mir5, archive) in expected.items():
+            with self.subTest(target=target):
+                fact = metadata["targets"][target]
+                self.assertEqual((fact["minimum_base"], fact["published_mir_version"], fact["mir_version"],
+                                  fact["published_archive_sha256"]), (base, published, mir5, archive))
+                retained = self.metadata["targets"][target]
+                changed_identity = {"published_mir_version", "published_archive_sha256"}
+                self.assertEqual({key: value for key, value in fact.items() if key not in changed_identity},
+                                 {key: value for key, value in retained.items() if key not in changed_identity})
+                published_profile = json.loads(
+                    (ROOT / f"tests/profiles/historical-transition-473-published-{target}.json").read_text(encoding="utf-8"))
+                self.assertEqual(published_profile["mods"], [
+                    {"name": "base", "version": base, "enabled": True},
+                    {"name": "more-infinite-research", "version": published, "enabled": True},
+                    {"name": "mir-fixture-mir5-historical-transition", "version": "0.1.0", "enabled": True},
+                ])
+                successor_profile = json.loads(
+                    (ROOT / f"tests/profiles/historical-transition-mir5-{target}.json").read_text(encoding="utf-8"))
+                self.assertEqual(successor_profile["mods"][1],
+                                 {"name": "more-infinite-research", "version": mir5, "enabled": True})
+
+        functions = r'''
+          $ErrorActionPreference='Stop';Set-StrictMode -Version Latest
+          $tokens=$null;$errors=$null
+          $ast=[Management.Automation.Language.Parser]::ParseFile($env:MIR_TEST_RUNNER,[ref]$tokens,[ref]$errors)
+          if($errors.Count){throw 'parse failed'}
+          foreach($name in @('Assert-Fixture','Get-FixtureSha','Get-HistoricalTransitionFixtureTarget','ConvertTo-HistoricalTransitionFixtureTargetLiteral')){
+            $node=@($ast.FindAll({param($n) $n -is [Management.Automation.Language.FunctionDefinitionAst] -and $n.Name -ceq $name},$true))
+            if($node.Count -ne 1){throw ('missing '+$name)}
+            Invoke-Expression $node[0].Extent.Text
+          }
+          $expected=@{
+            f017=@{published='4.7.01703';mir5='5.0.01700';archive='9BCF1813BBDCBBD90088D74672CEF639FBC96689604673E529CF3AA8FC8D89AF'}
+            f100=@{published='4.7.10003';mir5='5.0.10000';archive='C04F3543EBF99D2B76B2C9193EA0886381B7CDDF2F2C1610310E7961B24BE0E1'}
+          }
+          foreach($target in @('f017','f100')){
+            $published=Get-HistoricalTransitionFixtureTarget -Target $target -MetadataPath $env:MIR_TEST_473_LATE -Stage published
+            $mir5=Get-HistoricalTransitionFixtureTarget -Target $target -MetadataPath $env:MIR_TEST_473_LATE -Stage mir5
+            $fact=$expected[$target]
+            if($published.mir_version -cne $fact.published -or $mir5.mir_version -cne $fact.mir5 -or $published.definition.published_archive_sha256 -cne $fact.archive){throw ('late v4.7.3 admission differs: '+$target)}
+            $literal=ConvertTo-HistoricalTransitionFixtureTargetLiteral $mir5
+            if($literal -notmatch ('id="'+$target+'"') -or $literal -notmatch 'stage="mir5"' -or $literal -notmatch ('mir_version="'+$fact.mir5+'"')){throw ('late v4.7.3 literal differs: '+$target)}
+          }
+        '''
+        wrong_version = json.loads(json.dumps(metadata))
+        wrong_version["targets"]["f017"]["published_mir_version"] = "4.7.01702"
+        wrong_hash = json.loads(json.dumps(metadata))
+        wrong_hash["targets"]["f100"]["published_archive_sha256"] = "0" * 64
+        wrong_minimum = json.loads(json.dumps(metadata))
+        wrong_minimum["targets"]["f017"]["minimum_base"] = "0.17.0"
+        extra_target = json.loads(json.dumps(metadata))
+        extra_target["targets"]["f013"] = self.metadata["targets"]["f013"]
+        with tempfile.TemporaryDirectory(prefix="mir5-historical-transition-473-late-") as work:
+            root = Path(work)
+            paths = {
+                "version": root / "wrong-version.json",
+                "hash": root / "wrong-hash.json",
+                "minimum": root / "wrong-minimum.json",
+                "extra": root / "extra-target.json",
+            }
+            for key, value in (("version", wrong_version), ("hash", wrong_hash),
+                               ("minimum", wrong_minimum), ("extra", extra_target)):
+                paths[key].write_text(json.dumps(value), encoding="utf-8")
+            rejection = functions + r'''
+              $checks=@(
+                @{path=$env:MIR_TEST_473_LATE_WRONG_VERSION;target='f017';message='MIR versions differ'},
+                @{path=$env:MIR_TEST_473_LATE_WRONG_HASH;target='f100';message='published archive hash differs'},
+                @{path=$env:MIR_TEST_473_LATE_WRONG_MINIMUM;target='f017';message='minimum base differs'},
+                @{path=$env:MIR_TEST_473_LATE_EXTRA_TARGET;target='f017';message='target set differs'}
+              )
+              foreach($check in $checks){
+                $refused=$false
+                try { Get-HistoricalTransitionFixtureTarget -Target $check.target -MetadataPath $check.path -Stage published | Out-Null }
+                catch { if($_.Exception.Message -match $check.message){$refused=$true}else{throw} }
+                if(-not $refused){throw ('invalid late v4.7.3 metadata accepted: '+$check.message)}
+              }
+              $wrongTarget=$false
+              try { Get-HistoricalTransitionFixtureTarget -Target f016 -MetadataPath $env:MIR_TEST_473_LATE -Stage published | Out-Null }
+              catch { if($_.Exception.Message -match 'target is unsupported'){$wrongTarget=$true}else{throw} }
+              if(-not $wrongTarget){throw 'late v4.7.3 metadata admitted an unreviewed target'}
+            '''
+            env = dict(os.environ, MIR_TEST_RUNNER=str(RUNNER), MIR_TEST_473_LATE=str(FIXTURE_473_LATE),
+                       MIR_TEST_473_LATE_WRONG_VERSION=str(paths["version"]),
+                       MIR_TEST_473_LATE_WRONG_HASH=str(paths["hash"]),
+                       MIR_TEST_473_LATE_WRONG_MINIMUM=str(paths["minimum"]),
+                       MIR_TEST_473_LATE_EXTRA_TARGET=str(paths["extra"]))
+            result = subprocess.run(["pwsh", "-NoProfile", "-Command", functions], cwd=ROOT,
+                                    text=True, capture_output=True, env=env, check=False)
+            self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
             result = subprocess.run(["pwsh", "-NoProfile", "-Command", rejection], cwd=ROOT,
                                     text=True, capture_output=True, env=env, check=False)
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)

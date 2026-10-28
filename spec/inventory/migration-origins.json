@@ -2734,13 +2734,17 @@
           "current_archive_sha256": "95228385A0862A807DB20A73F56CA0113693A1CDB3437410187303C598D784C7",
           "current_completion": {
             "status": "needs-correction",
-            "problem": "Preparation gap, not an observed MIR5 product defect: the existing historical-transition chain used4.7.2, not this4.7.3 archive.",
-            "next_action": "Extend the explicit4.7.3 historical metadata/profile selection to this target, validate the existing six-member projection, create/protect the exact4.7.3 source, then bind this current archive and run the direct successor/save/two-reload route.",
-            "existing_command": "tools/Invoke-NativeFixture.ps1 -CaseName historical-transition -HistoricalTarget f017 -HistoricalTransitionStage published|mir5 -HistoricalTransitionFixtureMetadataPath <reviewed explicit4.7.3 metadata>",
-            "command_status": "not-ready: metadata/profile/protected4.7.3 source must be prepared first",
+            "problem": "Exact4.7.3 metadata/profiles, archive-byte comparison and both six-member fixture-stage ZIPs are prepared/guarded. Exact owner engine/library/caller binding and protected4.7.3 source/save execution remain; this is not an observed product defect.",
+            "next_action": "Adopt the named prepared fixture hashes, bind exact installed engine/direct-library controls and freeze the existing native caller. Execute the published4.7.3 source stage and protect its save after two reloads, then execute the current successor from that source. Retain strict science/effect assertions and original adverses.",
+            "existing_command": "tools/Invoke-NativeFixture.ps1 -CaseName historical-transition -HistoricalTarget f017 -HistoricalTransitionStage published|mir5 -HistoricalTransitionFixtureMetadataPath tests/fixtures/historical-transition/metadata-473-f017-f100.json",
+            "command_status": "not-ready: native owner engine/library/caller binding and protected4.7.3 source execution remain",
             "prior_evidence": {
               "path": "spec/evidence/historical-transition-017-100-110-chain.json",
               "sha256": "759C19C45C9B3100769B39DCA8CD843C295C8C610FF59FEA8D399CFAD6191E82"
+            },
+            "prepared_inputs": {
+              "path": "spec/evidence/historical-473-f017-f100-prepared-inputs-r01.json",
+              "sha256": "620AAECF422D0E11C38B6C28512B05BF206FBE1206687B2C4B611F62B33CCCB2"
             }
           }
         },
@@ -2753,13 +2757,17 @@
           "current_archive_sha256": "6BAE382DBD0AEC7199474921887CFBAC61016B8BF5E8FB990656493A8A174B6C",
           "current_completion": {
             "status": "needs-correction",
-            "problem": "Preparation gap, not an observed MIR5 product defect: the existing historical-transition chain used4.7.2, not this4.7.3 archive.",
-            "next_action": "Extend the explicit4.7.3 historical metadata/profile selection to this target, validate the existing six-member projection, create/protect the exact4.7.3 source, then bind this current archive and run the direct successor/save/two-reload route.",
-            "existing_command": "tools/Invoke-NativeFixture.ps1 -CaseName historical-transition -HistoricalTarget f100 -HistoricalTransitionStage published|mir5 -HistoricalTransitionFixtureMetadataPath <reviewed explicit4.7.3 metadata>",
-            "command_status": "not-ready: metadata/profile/protected4.7.3 source must be prepared first",
+            "problem": "Exact4.7.3 metadata/profiles, archive-byte comparison and both six-member fixture-stage ZIPs are prepared/guarded. Exact owner engine/library/caller binding and protected4.7.3 source/save execution remain; this is not an observed product defect.",
+            "next_action": "Adopt the named prepared fixture hashes, bind exact installed engine/direct-library controls and freeze the existing native caller. Execute the published4.7.3 source stage and protect its save after two reloads, then execute the current successor from that source. Retain strict science/effect assertions and original adverses.",
+            "existing_command": "tools/Invoke-NativeFixture.ps1 -CaseName historical-transition -HistoricalTarget f100 -HistoricalTransitionStage published|mir5 -HistoricalTransitionFixtureMetadataPath tests/fixtures/historical-transition/metadata-473-f017-f100.json",
+            "command_status": "not-ready: native owner engine/library/caller binding and protected4.7.3 source execution remain",
             "prior_evidence": {
               "path": "spec/evidence/historical-transition-017-100-110-chain.json",
               "sha256": "759C19C45C9B3100769B39DCA8CD843C295C8C610FF59FEA8D399CFAD6191E82"
+            },
+            "prepared_inputs": {
+              "path": "spec/evidence/historical-473-f017-f100-prepared-inputs-r01.json",
+              "sha256": "620AAECF422D0E11C38B6C28512B05BF206FBE1206687B2C4B611F62B33CCCB2"
             }
           }
         },
