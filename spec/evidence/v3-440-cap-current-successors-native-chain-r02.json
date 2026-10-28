@@ -1,0 +1,117 @@
+{
+  "schema": 1,
+  "kind": "MIRV3440CurrentCapSuccessorsNativeChainV1",
+  "status": "passed-named-same-and-forward-engine-V3-representative",
+  "controller_commit": "c889c49c04afb486548c4da1ae49da5e8f17e9f0",
+  "artifact_source_commit": "376eed796c5d1e8e7519c65cd3934710fda54b8c",
+  "player_tree": "9461d8608eb77a230fbb313080be93c32ea05336",
+  "scope": "The same protected published4.4.20000 sourceCE8F is separately loaded by0822/D3 F200 and1246/8DC F210. Both retain level3/.02/.27 and foreign-disabled42percent queue,restore only owned gear,complete one actual newlab tolevel4/.03,save and cold-reload twice without save-byte writes. Exact source tuple and full independent effect/data/science guards retained.",
+  "protected_source": {
+    "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\v3-440-cap-published-source-r01-controller\\native-published-440\\write-data\\saves\\mir5-native-complete.zip",
+    "sha256": "CE8F6E6A34C8FCD94A25BCA38CA6755F86C7BA084C407B4BF5DE3D603D334DB6"
+  },
+  "source_evidence": "spec/evidence/v3-440-cap-published-source-native-chain-r01.json",
+  "cases": [
+    {
+      "id": "f200",
+      "candidate_sha256": "0822F3A3F94492A58DD876AD67C1B450833DF761A519899E59580BFA610D90A2",
+      "engine_sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B",
+      "fixture_sha256": "7376D928E0383EC76A37B08B65368EAEC4AEB5F304A13D907DCC986EEFB08C73",
+      "profile_sha256": "1ECC6124C5EC31007E1C07B786CADC4E3886A1BABEF964BC9C20309FF669F56F",
+      "result_sha256": "27652B0CC2D000CBFD47033296888E9869321BE5BD3BE9AE5A319B7945582A53",
+      "initial_witnesses": {
+        "source_mir": "4.4.20000",
+        "destination_mir": "5.0.20000",
+        "source_actual_lab_completions": 2,
+        "destination_actual_lab_completions": 1,
+        "milestone": "actual2labs",
+        "next_level": 4,
+        "productivity_bonus": 0.029999999329447746,
+        "player_enabled": true,
+        "player_visible_when_disabled": true,
+        "foreign_queue_progress": 0.42000000000000004,
+        "science_consumed_units": 0.7333333333333333,
+        "science_inventory_consumed_units": 0.7333333333333333,
+        "science_type": "tool",
+        "science_remaining_ticks": 44,
+        "science_processing_ticks": 44,
+        "science_elapsed_ticks": 43,
+        "science_units_after": {
+          "automation-science-pack": 21.266666666666666,
+          "logistic-science-pack": 21.266666666666666,
+          "chemical-science-pack": 21.266666666666666,
+          "production-science-pack": 21.266666666666666
+        },
+        "on_load_read_only": false
+      },
+      "completed_save": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\v3-440-cap-current-successors-r02-controller\\native-f200\\write-data\\saves\\mir5-native-complete.zip",
+        "sha256": "AED85DB08D65D3F1244C987CA64A686837CF08940C4E982FB3B1168C13077D4E",
+        "bytes": 821494
+      },
+      "cold_reloads": 2
+    },
+    {
+      "id": "f210",
+      "candidate_sha256": "12462A867726C4B9549177E91F9B37C6C5CC30E201401374F26366903F9B2DF2",
+      "engine_sha256": "8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38",
+      "fixture_sha256": "715AF461D2769C5B3C987F1A7D4FEF21CD2CDE439CE24CF51A427E7A483878AE",
+      "profile_sha256": "254C1F3241B935D74122B0A515BF2D439FCC72D84EC88CC66C0D8B45A98D4640",
+      "result_sha256": "1F30504B2CB7BCC216CB5143A77D4080F141199C66F642E1D38E06E83CEAE2EA",
+      "initial_witnesses": {
+        "source_mir": "4.4.20000",
+        "destination_mir": "5.0.21000",
+        "source_actual_lab_completions": 2,
+        "destination_actual_lab_completions": 1,
+        "milestone": "actual2labs",
+        "next_level": 4,
+        "productivity_bonus": 0.03,
+        "player_enabled": true,
+        "player_visible_when_disabled": true,
+        "foreign_queue_progress": 0.42000000000000004,
+        "science_consumed_units": 0.7333333333333333,
+        "science_inventory_consumed_units": 1,
+        "science_type": "item",
+        "science_remaining_ticks": 44,
+        "science_processing_ticks": 44,
+        "science_elapsed_ticks": 43,
+        "science_units_after": {
+          "automation-science-pack": 21,
+          "logistic-science-pack": 21,
+          "chemical-science-pack": 21,
+          "production-science-pack": 21
+        },
+        "on_load_read_only": false
+      },
+      "completed_save": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\v3-440-cap-current-successors-r02-controller\\native-f210\\write-data\\saves\\mir5-native-complete.zip",
+        "sha256": "5DACDB1CE589BA67110352EA36D0DEBAFAA144CA2748D2EF5DD29FFADEDAA39A",
+        "bytes": 823888
+      },
+      "cold_reloads": 2
+    }
+  ],
+  "packet_sha256": "40A1A66E6121BAD71E98C04C009AC0CAC5E1D4590D77F1227EE991429E9914BF",
+  "caller_sha256": "1513B977D420DB2339B68F1A81C170BFD47643C083703FA2204C1EE2B686268E",
+  "root_readback": {
+    "path": "build/qualification/v3-440-cap-current-successors-r02-controller/root-readback-r01.json",
+    "sha256": "F0CBFC28A1972567EEBCB8349371C1F0D55C7DBDFE7A9CBD1A834F809D85C530",
+    "files": 36,
+    "bytes_per_copy": 1872611
+  },
+  "lossless_receipts": {
+    "path": "spec/evidence/v3-440-cap-current-successors-native-receipts-r02.json.gz",
+    "sha256": "D9E4674629082948660533DEDA992459F8B80BBEDBC9F18F404591D44575DEE3",
+    "bytes": 19801,
+    "records": 3
+  },
+  "counts": {
+    "new_native_processes": 6,
+    "new_actual_labs": 2,
+    "new_cold_reloads": 4,
+    "source_processes_reused_once": 4,
+    "source_actual_labs_reused_once": 2,
+    "source_cold_reloads_reused_once": 2
+  },
+  "limits": "Only these exact named earlier structured-V3 same/forward-engine gear routes close. Source stages count once,not once per successor. F2104.2 mislabeled source,worker tails,adjacent first-enabled finitecap,other older tags/mod/DLC profiles,GUI/performance and final changed packages remain separate. No broad historical group or release verdict follows."
+}

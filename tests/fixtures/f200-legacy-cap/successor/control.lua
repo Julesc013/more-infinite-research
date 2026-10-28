@@ -156,6 +156,14 @@ local function destination_mode()
     return {case = MIR5_473_CASE, label = "MIR5 F200 published4.7.3",
       source_mir = "4.7.20003", source_fixture = "0.4.0", science_type = "tool"}
   end
+  if base == "2.0.77" and mir == "5.0.20000" and fixture == "0.10.0" then
+    return {case = "f200-v3-440-positive-cap", label = "MIR5 F200 published4.4.0",
+      source_mir = "4.4.20000", source_fixture = "0.9.0", science_type = "tool"}
+  end
+  if base == "2.1.23" and mir == "5.0.21000" and fixture == "0.11.0" then
+    return {case = "f200-f210-v3-440-positive-cap", label = "MIR5 F210 published4.4.0",
+      source_mir = "4.4.20000", source_fixture = "0.9.0", science_type = "item"}
+  end
   if base == "2.0.77" and mir == "4.7.20002" and fixture == "0.3.0" then
     return {case = PUBLISHED_RELAXED_CASE, label = "published relaxed", source_mir = "4.7.20002", source_fixture = "0.1.0", science_type = "tool"}
   end

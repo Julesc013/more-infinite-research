@@ -31,6 +31,9 @@ F200_473 = FIXTURE / "f200/same-from-473"
 F210_CROSS = FIXTURE / "f210/cross-from-f200"
 F210_DISABLED = FIXTURE / "f210/disabled-after-f200"
 F210_REENABLED = FIXTURE / "f210/reenabled-after-f200"
+V3_SOURCE = FIXTURE / "f200/v3-440-source"
+V3_F200 = FIXTURE / "f200/v3-440-successor"
+V3_F210 = FIXTURE / "f210/v3-440-successor"
 NAME = "mir-fixture-mir5-f200-legacy-cap"
 GEAR = "recipe-prod-research_gears-1"
 SCIENCE = ("automation-science-pack", "logistic-science-pack",
@@ -572,6 +575,50 @@ class F200LegacyCapFixtureTests(unittest.TestCase):
         self.assertIn("1% fixture-selected effect changed", refused["message"])
         self.assertEqual(("8000*2^(L-1)", 60),
                          (refused["row"]["unit"]["count_formula"], refused["row"]["unit"]["time"]))
+
+    def test_440_structured_v3_source_and_successors_keep_exact_protocols(self):
+        source = dict(source_base="2.0.77", source_mir="4.4.20000", source_fixture="0.9.0",
+                      source_control_alias=str(FIXTURE / "published/control.lua"), ordinary_completed_ticks=3)
+        for role, base, version, mir, science_type, case in (
+                (V3_F200, "2.0.77", "0.10.0", "5.0.20000", "tool", "f200-v3-440-positive-cap"),
+                (V3_F210, "2.1.23", "0.11.0", "5.0.21000", "item", "f200-f210-v3-440-positive-cap")):
+            options = {**source, "destination_base": base, "destination_mir": mir,
+                       "destination_fixture": version, "destination_control_alias": str(FIXTURE / "successor/control.lua")}
+            with self.subTest(target=role.parent.name):
+                result = self.flow_result(V3_SOURCE / "control.lua", role / "control.lua", "", options)
+                self.assertTrue(result["ok"], result["message"])
+                self.assertEqual((2, 1, 4, .03, False, .42, 2, 6, science_type),
+                                 tuple(result[k] for k in ("source_labs", "destination_labs", "player_level", "bonus",
+                                                          "foreign_enabled", "foreign_progress", "saves", "markers", "science_type")))
+                self.assertEqual(["f200-v3-440-positive-cap-source"] * 3 + [case] * 3, plain(result["marker_cases"]))
+                wrong = self.flow_result(V3_SOURCE / "control.lua", role / "control.lua", "",
+                                         {**options, "source_mir": "4.7.20003", "source_fixture": "0.4.0"})
+                self.assertFalse(wrong["ok"])
+                self.assertIn("published positive-cap source witness is absent or malformed", wrong["message"])
+                drift = self.flow_result(V3_SOURCE / "control.lua", role / "control.lua", "foreign-queue", options)
+                self.assertFalse(drift["ok"])
+                self.assertIn("foreign queue or progress changed", drift["message"])
+
+    def test_440_structured_v3_row_preflight_preserves_effect_and_closure_guards(self):
+        row = self.row()
+        row["visible_when_disabled"] = True
+        result = self.data_result(V3_SOURCE / "data-final-fixes.lua", "2.0.77", "4.4.20000", "0.9.0", row,
+                                  data_alias=FIXTURE / "published/data-final-fixes.lua")
+        self.assertTrue(result["ok"], result["message"])
+        self.assertEqual((None, "1", 1), tuple(result["row"]["unit"][k] for k in ("count", "count_formula", "time")))
+        for role, base, version, mir in ((V3_F200, "2.0.77", "0.10.0", "5.0.20000"),
+                                          (V3_F210, "2.1.23", "0.11.0", "5.0.21000")):
+            good = self.row() if role == V3_F200 else self.f210_row()
+            result = self.data_result(role / "data-final-fixes.lua", base, mir, version, good,
+                                      data_alias=FIXTURE / "successor/data-final-fixes.lua")
+            self.assertTrue(result["ok"], result["message"])
+            bad = self.row() if role == V3_F200 else self.f210_row()
+            bad["effects"][1]["change"] = .02
+            result = self.data_result(role / "data-final-fixes.lua", base, mir, version, bad,
+                                      data_alias=FIXTURE / "successor/data-final-fixes.lua")
+            self.assertFalse(result["ok"])
+            self.assertIn("1% fixture-selected effect changed", result["message"])
+            self.assertEqual(("8000*2^(L-1)", 60), tuple(result["row"]["unit"][k] for k in ("count_formula", "time")))
 
     def test_cross_engine_stage_guards_preflight_independent_f200_and_f210_gear_rows(self):
         source_row = self.row()

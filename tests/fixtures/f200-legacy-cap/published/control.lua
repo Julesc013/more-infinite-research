@@ -1,6 +1,7 @@
 local KEY = "mir5_f200_legacy_cap"
 local CASE = "f200-positive-legacy-cap"
 local CROSS_ENGINE_SOURCE_CASE = "f200-f210-positive-legacy-cap-source"
+local V3_SOURCE_CASE = "f200-v3-440-positive-cap-source"
 local SAVE = "mir5-native-complete"
 local FIXTURE = "mir-fixture-mir5-f200-legacy-cap"
 local GEAR = "recipe-prod-research_gears-1"
@@ -33,7 +34,10 @@ local function source_mode()
   if base == "2.0.77" and mir == "4.7.20003" and fixture == "0.4.0" then
     return {case = CROSS_ENGINE_SOURCE_CASE}
   end
-  fail("source requires published F200 4.7.20002 fixture 0.1.0 or 4.7.20003 fixture 0.4.0")
+  if base == "2.0.77" and mir == "4.4.20000" and fixture == "0.9.0" then
+    return {case = V3_SOURCE_CASE}
+  end
+  fail("source requires an exact published F200 4.7.2/0.1, 4.7.3/0.4 or 4.4.0/0.9 tuple")
 end
 
 local function technology(force, name)
@@ -165,7 +169,8 @@ local function assert_published_cap(state)
 end
 
 local function marker_case(state)
-  if state.source_case == CASE or state.source_case == CROSS_ENGINE_SOURCE_CASE then
+  if state.source_case == CASE or state.source_case == CROSS_ENGINE_SOURCE_CASE
+      or state.source_case == V3_SOURCE_CASE then
     return state.source_case
   end
   if state.source_case == nil and state.source_mir == "4.7.20002" and state.fixture_version == "0.1.0" then
