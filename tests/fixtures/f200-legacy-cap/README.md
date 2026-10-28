@@ -1,4 +1,10 @@
+---
+title: F200 positive-cap save transition
+---
+
 # F200 positive-cap save transition
+
+The separate `f200/same-from-473` 0.8.0 successor consumes the protected published4.7.20003/0.4.0 source directly on Factorio2.0.77. Keep the historical0.2.0 successor restricted to its original4.7.20002/0.1.0 source; using81AF with0.2.0 is an input mismatch, not a player defect. The [current0822 selection](../../profiles/f200-legacy-cap-473-current0822-f200-2077.json) pins the same-engine candidate and observer, requires preserved level3/.02/.27 and foreign-disabled42% queue, then one real successor lab/save/two cold reloads. Compose `info.json`, `control.lua` and `data-final-fixes.lua` from `f200/same-from-473`, `settings-updates.lua` from `successor`, and the shared successor control/data as `fixture_control.lua`/`fixture_data_final.lua`. Retain the original source bytes; no source recreation or historical guard relaxation is needed. Preparation and host controls alone do not qualify this native route.
 
 Run the published profile with MIR 4.7.20002, then the successor profile with MIR 5.0.20000 and that exact saved world. Both use Factorio 2.0.77, Base and the active-mod observer. No overhaul resets research during the transition.
 
