@@ -54,8 +54,8 @@ class F110F200RunnerControls(unittest.TestCase):
         shutil.copyfile(shared / "data-final-fixes.lua", source / "fixture_data_final.lua")
         return source
 
-    def _compose_actual_fixture_source(self, source: Path) -> None:
-        canonical = ROOT / "tests" / "fixtures" / "f110-f200-transition" / "f110" / "published-4.7.3"
+    def _compose_actual_fixture_source(self, source: Path, successor=False) -> None:
+        canonical = ROOT / "tests" / "fixtures" / "f110-f200-transition" / "f110" / ("successor" if successor else "published-4.7.3")
         shared = ROOT / "tests" / "fixtures" / "f110-f200-transition" / "shared"
         for name in ("catalogue.lua", "control.lua", "data-final-fixes.lua", "info.json", "settings-updates.lua"):
             shutil.copyfile(canonical / name, source / name)
@@ -172,16 +172,17 @@ class F110F200RunnerControls(unittest.TestCase):
             result = _run_powershell(script, env)
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
 
-    def test_ast_extracted_preflight_accepts_the_actual_fixture_profile_composition(self):
+    def _assert_actual_fixture_profile_composition(self, successor=False):
         """The caller-composed seven-file stage is bound to real tracked bytes."""
         with tempfile.TemporaryDirectory(prefix=".mir5-f110-composed-", dir=ROOT) as composed_work, \
                 tempfile.TemporaryDirectory(prefix="mir5-f110-cross-actual-composition-") as work:
             source = Path(composed_work)
-            self._compose_actual_fixture_source(source)
-            archive = Path(work) / f"{FIXTURE}_0.1.0.zip"
+            self._compose_actual_fixture_source(source, successor)
+            fixture_version = "0.3.0" if successor else "0.1.0"
+            archive = Path(work) / f"{FIXTURE}_{fixture_version}.zip"
             with zipfile.ZipFile(archive, "w") as output:
                 for member in sorted(source.iterdir()):
-                    output.writestr(f"{FIXTURE}_0.1.0/{member.name}", member.read_bytes())
+                    output.writestr(f"{FIXTURE}_{fixture_version}/{member.name}", member.read_bytes())
             engine_data = Path(work) / "engine" / "data"
             (engine_data / "base").mkdir(parents=True)
             (engine_data / "base" / "info.json").write_text(json.dumps({"version": "1.1.110"}), encoding="utf-8")
@@ -204,19 +205,47 @@ class F110F200RunnerControls(unittest.TestCase):
                 return (Get-FileHash -LiteralPath $Path -Algorithm SHA256).Hash.ToUpperInvariant()
               }
               $profile=Get-Content -LiteralPath $env:MIR_TEST_PROFILE -Raw|ConvertFrom-Json -AsHashtable
-              $result=Get-F110PublishedCrossSourceFixture -Repo $env:MIR_TEST_REPO -ProfileDefinition $profile -ProfileRows @($profile.mods) -Sources @($env:MIR_TEST_SOURCE) -EngineData $env:MIR_TEST_ENGINE_DATA -Engine $env:MIR_TEST_ENGINE -ExpectedMIRSha256 $env:MIR_TEST_MIR_SHA -Case 'f110-f200-transition' -Historical:$false -HistoricalTransition:$false -Create:$false -Absent:$false -Active:$false -ActiveKind '' -InputSave '' -InputSaveSha256 '' -Observer '' -Markers @() -HistoricalTarget '' -HistoricalMetadata '' -TransitionStage '' -TransitionMetadata '' -ExpectedEngineSha256 $env:MIR_TEST_ENGINE_SHA
+              $result=Get-F110PublishedCrossSourceFixture -Repo $env:MIR_TEST_REPO -ProfileDefinition $profile -ProfileRows @($profile.mods) -Sources @($env:MIR_TEST_SOURCE) -EngineData $env:MIR_TEST_ENGINE_DATA -Engine $env:MIR_TEST_ENGINE -ExpectedMIRSha256 $env:MIR_TEST_MIR_SHA -Case 'f110-f200-transition' -Historical:$false -HistoricalTransition:$false -Create:$false -Absent:$false -Active:$false -ActiveKind '' -InputSave $env:MIR_TEST_INPUT_SAVE -InputSaveSha256 $env:MIR_TEST_INPUT_SHA -Observer '' -Markers @() -HistoricalTarget '' -HistoricalMetadata '' -TransitionStage '' -TransitionMetadata '' -ExpectedEngineSha256 $env:MIR_TEST_ENGINE_SHA -SameEditionSuccessor:($env:MIR_TEST_SAME -ceq 'true')
+              if($env:MIR_TEST_SAME -ceq 'true'){
+                function Expect-SuccessorRefusal([hashtable]$Changes,[string]$Message){
+                  $p=@{Repo=$env:MIR_TEST_REPO;ProfileDefinition=$profile;ProfileRows=@($profile.mods);Sources=@($env:MIR_TEST_SOURCE);EngineData=$env:MIR_TEST_ENGINE_DATA;Engine=$env:MIR_TEST_ENGINE;ExpectedMIRSha256=$env:MIR_TEST_MIR_SHA;Case='f110-f200-transition';Historical=$false;HistoricalTransition=$false;Create=$false;Absent=$false;Active=$false;ActiveKind='';InputSave=$env:MIR_TEST_INPUT_SAVE;InputSaveSha256=$env:MIR_TEST_INPUT_SHA;Observer='';Markers=@();HistoricalTarget='';HistoricalMetadata='';TransitionStage='';TransitionMetadata='';ExpectedEngineSha256=$env:MIR_TEST_ENGINE_SHA;SameEditionSuccessor=$true}
+                  foreach($key in $Changes.Keys){$p[$key]=$Changes[$key]}
+                  $refused=$false;try{Get-F110PublishedCrossSourceFixture @p|Out-Null}catch{$refused=$_.Exception.Message.Contains($Message)}
+                  if(-not $refused){throw ('successor opponent accepted: '+$Message)}
+                }
+                Expect-SuccessorRefusal @{InputSave=''} 'protected D524 source save'
+                Expect-SuccessorRefusal @{InputSaveSha256=('0'*64)} 'protected D524 source save'
+                Expect-SuccessorRefusal @{ExpectedMIRSha256=('0'*64)} 'MIR archive hash differs'
+                Expect-SuccessorRefusal @{Observer='modern-observer'} 'modern observers or consumers'
+                Expect-SuccessorRefusal @{Historical=$true} 'fresh installed-MIR source run'
+                Expect-SuccessorRefusal @{Create=$true} 'fresh installed-MIR source run'
+                $originalVersion=$profile.mods[1].version;$profile.mods[1].version='4.7.11003'
+                Expect-SuccessorRefusal @{} 'profile differs'
+                $profile.mods[1].version=$originalVersion
+              }
               if($result.source -cne (Resolve-Path -LiteralPath $env:MIR_TEST_SOURCE).Path){throw 'actual source refused'}
               . (Join-Path $env:MIR_TEST_REPO 'tools/lib/validation/ImmutableInputStaging.ps1')
               . (Join-Path $env:MIR_TEST_REPO 'tools/lib/compatibility/LibraryActivation.ps1')
               Assert-MIRLibraryFixtureArchive -Archive $env:MIR_TEST_ARCHIVE -SourceDirectory $env:MIR_TEST_SOURCE
             '''
             env = dict(os.environ, MIR_TEST_RUNNER=str(RUNNER), MIR_TEST_REPO=str(ROOT),
-                       MIR_TEST_PROFILE=str(ROOT / "tests/profiles/f110-f200-transition-published-f110-11110.json"),
+                       MIR_TEST_PROFILE=str(ROOT / ("tests/profiles/f110-473-current-successor-11110.json" if successor
+                                                  else "tests/profiles/f110-f200-transition-published-f110-11110.json")),
                        MIR_TEST_SOURCE=str(source), MIR_TEST_ARCHIVE=str(archive),
                        MIR_TEST_ENGINE_DATA=str(engine_data), MIR_TEST_ENGINE=str(engine),
-                       MIR_TEST_ENGINE_SHA=ENGINE_SHA, MIR_TEST_MIR_SHA=MIR_SHA)
+                       MIR_TEST_ENGINE_SHA=ENGINE_SHA,
+                       MIR_TEST_MIR_SHA="1C3D982CD048D3C83BF75108F1F9AC769CE0DC833A2DE056CDE16EF8AE2925A9" if successor else MIR_SHA,
+                       MIR_TEST_SAME="true" if successor else "false",
+                       MIR_TEST_INPUT_SAVE="protected-source.zip" if successor else "",
+                       MIR_TEST_INPUT_SHA="D524AA78440F242B179A1E9BC40BF89B87C1A66E99F64C14D3250DEAEBB69253" if successor else "")
             result = _run_powershell(script, env)
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+
+    def test_ast_extracted_preflight_accepts_the_actual_fixture_profile_composition(self):
+        self._assert_actual_fixture_profile_composition()
+
+    def test_same_edition_successor_requires_the_exact_protected_input_and_composition(self):
+        self._assert_actual_fixture_profile_composition(successor=True)
 
     def test_generic_fixture_byte_verifier_remains_the_cross_source_archive_guard(self):
         source = RUNNER.read_text(encoding="utf-8")
@@ -245,14 +274,14 @@ class F110F200RunnerControls(unittest.TestCase):
 
     def test_ast_keeps_f110_process_mode_and_exact_case_stage_reload_prefixes(self):
         source = RUNNER.read_text(encoding="utf-8")
-        self.assertIn("$historicalProcess=$historical -or $f110PublishedCrossSource", source)
+        self.assertIn("$historicalProcess=$historical -or $f110PublishedCrossSource -or $f110SameEditionSuccessor", source)
         self.assertIn("$historicalProcessVersion='1.1'", source)
         self.assertIn("if($historicalProcess){\n    # Older engines use the retained direct-library minimal form.", source)
         self.assertIn("New-HistoricalFixtureServerSettings (Join-Path $resources.root 'server-settings.json') $engineData $historicalProcessVersion", source)
         self.assertIn("$historicalServerArguments+@('--start-server',$seed)", source)
         self.assertIn("$reloadArguments=if($historicalProcess){$historicalServerArguments+@('--start-server',$complete)}", source)
         self.assertIn('[MIR5_NATIVE_FIXTURE] RESULT {"case":"f110-f200-transition","stage":"initial"', source)
-        self.assertIn("$reloadCase=if($f110PublishedCrossSource){'f110-f200-transition'}", source)
+        self.assertIn("$reloadCase=if($f110PublishedCrossSource -or $f110SameEditionSuccessor){'f110-f200-transition'}", source)
         script = r'''
           $ErrorActionPreference='Stop';Set-StrictMode -Version Latest
           $tokens=$null;$errors=$null
@@ -261,6 +290,25 @@ class F110F200RunnerControls(unittest.TestCase):
           foreach($name in @('Assert-Fixture','Read-FixtureResult')){
             $node=@($ast.FindAll({param($n) $n -is [Management.Automation.Language.FunctionDefinitionAst] -and $n.Name -ceq $name},$true))
             if($node.Count -ne 1){throw "helper missing: $name"};Invoke-Expression $node[0].Extent.Text
+          }
+          $processSelection=@($ast.FindAll({param($n)
+            $n -is [Management.Automation.Language.AssignmentStatementAst] -and $n.Left.Extent.Text -ceq '$historicalProcess'
+          },$true))
+          $versionSelection=@($ast.FindAll({param($n)
+            $n -is [Management.Automation.Language.IfStatementAst] -and
+            $n.Clauses[0].Item2.Extent.Text.Contains('$historicalProcessVersion=')
+          },$true))
+          if($processSelection.Count -ne 1 -or $versionSelection.Count -ne 1){throw 'ambiguous F110 process routing'}
+          $processRoute=[scriptblock]::Create($processSelection[0].Extent.Text)
+          $versionRoute=[scriptblock]::Create($versionSelection[0].Extent.Text)
+          foreach($mode in @('source','same-edition','neither')){
+            $historical=$false;$f110PublishedCrossSource=$mode -ceq 'source';$f110SameEditionSuccessor=$mode -ceq 'same-edition'
+            . $processRoute
+            if($historicalProcess -ne ($mode -cne 'neither')){throw ('F110 process routing differs: '+$mode)}
+            if($mode -cne 'neither'){
+              $historicalProcessVersion='';. $versionRoute
+              if($historicalProcessVersion -cne '1.1'){throw ('F110 server version differs: '+$mode)}
+            }
           }
           $CaseName='f110-f200-transition'
           foreach($stage in @('initial','reload')){
