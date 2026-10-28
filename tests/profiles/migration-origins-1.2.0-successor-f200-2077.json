@@ -19,9 +19,9 @@
     "source_result_sha256": "C7FE9F69963FFCF27686A4F0C0E5F2C79079BCD4698CF25158997AC00A619E9A"
   },
   "candidate": {
-    "source_commit": "f0dd9f62adc8bf0a8eaaf9babc1fcfef9f3241ea",
-    "player_tree": "0229b2bb3ad0c514fc4dca18c32fd544b9ba7d72",
-    "package_root": "build/packages/f0dd9f62-root-r01"
+    "source_commit": "575e418c72eff2970fa5f6274956f6e8944d4e19",
+    "player_tree": "5ba53a8514b4641c749e91c0a68f32521fb3fee7",
+    "package_root": "build/packages/575e418c-root-r01"
   },
   "mods": [
     {"name": "base", "version": "2.0.77", "enabled": true},
@@ -32,7 +32,7 @@
   "archive_sha256": {
     "mir-fixture-mir5-active-mods-observer_0.1.0.zip": "723D1E7721449FC26040E5E6629416767BDC20AD79CF8723115846DB662A1F87",
     "mir-fixture-mir5-migration-origin-f200-120-source_0.3.0.zip": "FE670CD6DE44FE3164F65C9D7A1702483E4A7EC2D59351519169B63A4BA4F078",
-    "more-infinite-research_5.0.20000.zip": "20A200883EFB29F8D216EA408C688F1862C80612D536DCD4FCDDC1E47768541D"
+    "more-infinite-research_5.0.20000.zip": "EF66506789F1C81F7E15ECF7048311865C2AB2B3D803E2736CD6B9567C6A3D2C"
   },
   "scope": "Prepared direct published MIR 1.2.0 F200-to-current F200 Base successor using the same passed protected R06 source save as the F210 arm. It is prepared only; no F200 native assignment is selected. Its preservation checks and one-real-lab/save/reload protocol are identical in purpose to the F210 arm, while its engine and observer bindings remain exact F200 inputs."
 }
