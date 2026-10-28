@@ -1,0 +1,1192 @@
+{
+  "schema": 1,
+  "kind": "MIR5CurrentApiPairNativeChainV1",
+  "status": "passed-current-f210-base-and-space-age-two-real-clients",
+  "scope": "Exact F210575e/A8 Base and Space Age disposable worlds on standalone2.1.23 only. Genuine English/German clients, two new gear labs, API consumer read-only load queries, join/rejoin/host restart, saved-state and20 externally viewed1280x720 screenshots. Not old-save migration, physical production, ordinary tuning, arbitrary modpacks, full API stability, performance or release qualification.",
+  "candidate": {
+    "source_commit": "575e418c72eff2970fa5f6274956f6e8944d4e19",
+    "player_tree": "5ba53a8514b4641c749e91c0a68f32521fb3fee7",
+    "archive_sha256": "A8D0A4590154F3106E59BDB269F1AEB3ED8CC523F18F00ED7D76DC89059F5B8D",
+    "bytes": 691382
+  },
+  "controller_commit": "70fbe101415caabc073a88c99ea68bf8ecccddf2",
+  "controller_files": {
+    "tools/Invoke-MultiplayerFixture.ps1": "B6FCF9323431B5C63DDA3E558A11A18E8679D88D781750F197B92C8B98809D9A",
+    "tools/Invoke-MultiplayerSession.ps1": "4FB93D56476E6748A6564B9D93A71E9EC1BAE63CDC20FB7B0501CF6B1B9677BB",
+    "tests/fixtures/library-multiplayer/control.lua": "34307B524B053FFF4FA4D56B0975E433A61F64860577A429B70B44CF63F83A61",
+    "tools/Invoke-NativeFixture.ps1": "B9E4685187C4B172FBF16D4359FFCB320C99F443643B6F16E0861AF9E8641489"
+  },
+  "packet": {
+    "path": "build/qualification/library-api-575e-r02-controller/packet.json",
+    "bytes": 2483,
+    "sha256": "91EAFAA18332EB7105C08BB915D50E323AE379396455E46C620AE19BE5187786"
+  },
+  "caller": {
+    "path": "build/qualification/library-api-575e-r02-controller/Invoke-OwnedApiPair.ps1",
+    "bytes": 4754,
+    "sha256": "B41857E3AA2F1420EB4E16219AC25B2B3F00CBCA0EF1A373D65DFB13B35ACB91"
+  },
+  "terminal": {
+    "path": "build/qualification/library-api-575e-r02-controller/execution-record/terminal.json",
+    "bytes": 102603,
+    "sha256": "E4DD15FF29D60E7E72C7FADDB23A484170DE76C2C621854809B8625549E7010F"
+  },
+  "retained_zero_engine_refusal": {
+    "path": "build/qualification/library-api-575e-r01-controller/execution-record/terminal.json",
+    "bytes": 1863,
+    "sha256": "A841675E4FC4B273F7515721FD58B43F18AFE9FCD12F35CB23ECA504D1574AEE",
+    "cause": "Primary Windows CRLF observer source did not byte-match exact A15 LF member; guard stopped before native launch and restored owned slots. The unchanged committed inputs then executed in the existing clean LF checkout; no guard relaxed."
+  },
+  "readback": {
+    "path": "build/qualification/library-api-575e-r02-controller/root-readback-r01.json",
+    "bytes": 87347,
+    "sha256": "4BE89A9F03572C7A2E8421AED8D320CEE139FB18F94DDE60C0A6A122C367DBA4",
+    "files": 448,
+    "bytes_per_copy": 44178204
+  },
+  "receipt_capsule": {
+    "path": "spec/evidence/library-api-575e-native-receipts-r01.json.gz",
+    "bytes": 27714,
+    "sha256": "28F730BFA47AD2F65EF18B37356B75F13D1C32BCC6BA0EC09B0FAACE3BE75D4B",
+    "records": 6,
+    "uncompressed_bytes": 162021,
+    "round_trip": "all original exact bytes verified"
+  },
+  "stages": [
+    {
+      "arm": "base",
+      "result": {
+        "path": "build/qualification/library-api-575e-r02-controller/native-base/session/result.json",
+        "bytes": 34662,
+        "sha256": "C2EDED2F8D99E55B688BA18967534B1FA1A76BC26E62E353AE9961BD9D31548E"
+      },
+      "status": "passed-private-two-client-fixture",
+      "engine": {
+        "path": "D:\\Games\\Factorio\\2.1\\bin\\x64\\factorio.exe",
+        "sha256": "8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38",
+        "file_version": "2.1.23.87750",
+        "product_version": "2.1.23",
+        "base_version": "2.1.23"
+      },
+      "profile": {
+        "path": "D:\\Projects\\Factorio\\mir5-legacy-cannon-credit-r01\\tests\\profiles\\library-api-consumers-current-standalone-f210-2123.json",
+        "sha256": "0A78A6EC057A4A105A2ABEF8390FE235520C32CCAF03957D22B869E5FFBC2424"
+      },
+      "fixtures": [
+        {
+          "archive": "D:\\Projects\\Factorio\\testmods\\2.1\\mir-fixture-mir5-library-multiplayer_0.1.0.zip",
+          "source": "D:\\Projects\\Factorio\\mir5-legacy-cannon-credit-r01\\build\\tmp\\library-api-base-575e-r02\\standalone-f210-library-fixture-source",
+          "sha256": "0D364E2234109A902FDD86DC819992FA944808A2D35C4BCB5BEDB18B294E28BD"
+        },
+        {
+          "archive": "D:\\Projects\\Factorio\\testmods\\2.1\\mir-fixture-mir5-active-mods-observer_0.1.0.zip",
+          "source": "D:\\Projects\\Factorio\\mir5-legacy-cannon-credit-r01\\build\\tmp\\library-api-base-575e-r02\\standalone-identity-observer-source",
+          "sha256": "A15A7D628D66953D2E0C4D4FA288F47CBF9C5678327C7EB3D23ADB5DC78331C0"
+        },
+        {
+          "archive": "D:\\Projects\\Factorio\\testmods\\2.1\\mir-fixture-mir5-api-alpha_0.1.0.zip",
+          "source": "D:\\Projects\\Factorio\\mir5-legacy-cannon-credit-r01\\build\\tmp\\library-api-base-575e-r02\\standalone-f210-api-alpha-fixture-source",
+          "sha256": "DB5ED843FA9D85A1ABDC22595E62D315CA1A2191C846208079F85D4D016CE904"
+        },
+        {
+          "archive": "D:\\Projects\\Factorio\\testmods\\2.1\\mir-fixture-mir5-api-beta_0.1.0.zip",
+          "source": "D:\\Projects\\Factorio\\mir5-legacy-cannon-credit-r01\\build\\tmp\\library-api-base-575e-r02\\standalone-f210-api-beta-fixture-source",
+          "sha256": "690004F145E8B0DD52B4030BD8B27F7B581495EEFAAC5CB3A2F30A23FCA08951"
+        }
+      ],
+      "budget_mib": 7168,
+      "api_client_load_markers": [
+        {
+          "phase": "initial",
+          "client": "MIR5English",
+          "MIR5_API_ALPHA": {
+            "stage": "load",
+            "tick": 827,
+            "reload_researched": true,
+            "reload_level": 1,
+            "reload_manual_crafting_speed_modifier": 0.05
+          },
+          "MIR5_API_BETA": {
+            "stage": "load",
+            "tick": 827,
+            "reload_level": 1,
+            "reload_researched": false,
+            "reload_manual_crafting_speed_modifier": 0.05
+          }
+        },
+        {
+          "phase": "initial",
+          "client": "MIR5Deutsch",
+          "MIR5_API_ALPHA": {
+            "stage": "load",
+            "tick": 1608,
+            "reload_researched": true,
+            "reload_level": 1,
+            "reload_manual_crafting_speed_modifier": 0.05
+          },
+          "MIR5_API_BETA": {
+            "stage": "load",
+            "tick": 1608,
+            "reload_level": 1,
+            "reload_researched": false,
+            "reload_manual_crafting_speed_modifier": 0.05
+          }
+        },
+        {
+          "phase": "rejoin",
+          "client": "MIR5English",
+          "MIR5_API_ALPHA": {
+            "stage": "load",
+            "tick": 2601,
+            "reload_researched": true,
+            "reload_level": 1,
+            "reload_manual_crafting_speed_modifier": 0.05
+          },
+          "MIR5_API_BETA": {
+            "stage": "load",
+            "tick": 2601,
+            "reload_level": 1,
+            "reload_researched": false,
+            "reload_manual_crafting_speed_modifier": 0.05
+          }
+        },
+        {
+          "phase": "rejoin",
+          "client": "MIR5Deutsch",
+          "MIR5_API_ALPHA": {
+            "stage": "load",
+            "tick": 3120,
+            "reload_researched": true,
+            "reload_level": 1,
+            "reload_manual_crafting_speed_modifier": 0.05
+          },
+          "MIR5_API_BETA": {
+            "stage": "load",
+            "tick": 3120,
+            "reload_level": 1,
+            "reload_researched": false,
+            "reload_manual_crafting_speed_modifier": 0.05
+          }
+        },
+        {
+          "phase": "restart",
+          "client": "MIR5English",
+          "MIR5_API_ALPHA": {
+            "stage": "load",
+            "tick": 3809,
+            "reload_researched": true,
+            "reload_level": 1,
+            "reload_manual_crafting_speed_modifier": 0.05
+          },
+          "MIR5_API_BETA": {
+            "stage": "load",
+            "tick": 3809,
+            "reload_level": 1,
+            "reload_researched": false,
+            "reload_manual_crafting_speed_modifier": 0.05
+          }
+        },
+        {
+          "phase": "restart",
+          "client": "MIR5Deutsch",
+          "MIR5_API_ALPHA": {
+            "stage": "load",
+            "tick": 4324,
+            "reload_researched": true,
+            "reload_level": 1,
+            "reload_manual_crafting_speed_modifier": 0.05
+          },
+          "MIR5_API_BETA": {
+            "stage": "load",
+            "tick": 4324,
+            "reload_level": 1,
+            "reload_researched": false,
+            "reload_manual_crafting_speed_modifier": 0.05
+          }
+        }
+      ],
+      "native_witnesses": [
+        {
+          "log": "phase-server-initial.stdout.log",
+          "witness": {
+            "case": "library-multiplayer",
+            "stage": "ready",
+            "status": "passed",
+            "witnesses": {
+              "base_version": "2.1.23",
+              "mir_version": "5.0.21000",
+              "actual_join_events": 0,
+              "screenshot_calls": 0,
+              "initial_settled_without_reopen": false,
+              "measurement_output": "native-localised-profiler-log",
+              "timing_values_stored": false,
+              "two_connected_clients_required": true,
+              "locales_required": [
+                "en",
+                "de"
+              ],
+              "distinct_personal_query_and_selection": true,
+              "initial_native_snapshot_immutable": true,
+              "live_refresh": {
+                "native_laboratory_completion_by_script": false,
+                "queue_lengths_observed": {},
+                "gear_level": 1,
+                "gear_productivity": 0,
+                "science_consumed_per_named_pack": 2,
+                "fixture_accelerates_gear_count_and_time_only": true,
+                "ordinary_tuning_qualified": false,
+                "root_and_query_identity_preserved": true,
+                "cross_force_view_state_preserved": true
+              },
+              "availability_terminal_labels_checked": false,
+              "host_restart_observed": false,
+              "on_load_read_only": false,
+              "rendering_pending_external_png_readback": true,
+              "screenshot_requests_are_not_headless_rendering_proof": true
+            }
+          }
+        },
+        {
+          "log": "phase-server-initial.stdout.log",
+          "witness": {
+            "case": "library-multiplayer",
+            "stage": "rejoin-ready",
+            "status": "passed",
+            "witnesses": {
+              "base_version": "2.1.23",
+              "mir_version": "5.0.21000",
+              "actual_join_events": 2,
+              "screenshot_calls": 6,
+              "initial_settled_without_reopen": true,
+              "initial_settle_ticks": 60,
+              "first_open": true,
+              "search": true,
+              "refresh": true,
+              "measurement_output": "native-localised-profiler-log",
+              "timing_values_stored": false,
+              "two_connected_clients_required": true,
+              "locales_required": [
+                "en",
+                "de"
+              ],
+              "distinct_personal_query_and_selection": true,
+              "initial_native_snapshot_immutable": true,
+              "live_refresh": {
+                "real_lab_completions": 2,
+                "native_laboratory_completion_by_script": false,
+                "native_research_started_events": 3,
+                "queue_lengths_observed": [
+                  2,
+                  1,
+                  0
+                ],
+                "native_research_cancelled_events": 1,
+                "native_foreign_force_created_events": 1,
+                "gear_level": 3,
+                "gear_productivity": 0.2,
+                "science_consumed_per_named_pack": 2,
+                "fixture_accelerates_gear_count_and_time_only": true,
+                "ordinary_tuning_qualified": false,
+                "root_and_query_identity_preserved": true,
+                "cross_force_view_state_preserved": true
+              },
+              "availability_terminal_labels_checked": true,
+              "host_restart_observed": false,
+              "on_load_read_only": false,
+              "rendering_pending_external_png_readback": true,
+              "screenshot_requests_are_not_headless_rendering_proof": true
+            }
+          }
+        },
+        {
+          "log": "phase-server-initial.stdout.log",
+          "witness": {
+            "case": "library-multiplayer",
+            "stage": "restart-ready",
+            "status": "passed",
+            "witnesses": {
+              "base_version": "2.1.23",
+              "mir_version": "5.0.21000",
+              "actual_join_events": 4,
+              "screenshot_calls": 8,
+              "initial_settled_without_reopen": true,
+              "initial_settle_ticks": 60,
+              "first_open": true,
+              "search": true,
+              "refresh": true,
+              "reopen": true,
+              "measurement_output": "native-localised-profiler-log",
+              "timing_values_stored": false,
+              "two_connected_clients_required": true,
+              "locales_required": [
+                "en",
+                "de"
+              ],
+              "distinct_personal_query_and_selection": true,
+              "initial_native_snapshot_immutable": true,
+              "live_refresh": {
+                "real_lab_completions": 2,
+                "native_laboratory_completion_by_script": false,
+                "native_research_started_events": 3,
+                "queue_lengths_observed": [
+                  2,
+                  1,
+                  0
+                ],
+                "native_research_cancelled_events": 1,
+                "native_foreign_force_created_events": 1,
+                "gear_level": 3,
+                "gear_productivity": 0.2,
+                "science_consumed_per_named_pack": 2,
+                "fixture_accelerates_gear_count_and_time_only": true,
+                "ordinary_tuning_qualified": false,
+                "root_and_query_identity_preserved": true,
+                "cross_force_view_state_preserved": true
+              },
+              "availability_terminal_labels_checked": true,
+              "host_restart_observed": false,
+              "on_load_read_only": false,
+              "rendering_pending_external_png_readback": true,
+              "screenshot_requests_are_not_headless_rendering_proof": true
+            }
+          }
+        },
+        {
+          "log": "phase-server-restart.stdout.log",
+          "witness": {
+            "case": "library-multiplayer",
+            "stage": "completed",
+            "status": "passed",
+            "witnesses": {
+              "base_version": "2.1.23",
+              "mir_version": "5.0.21000",
+              "actual_join_events": 6,
+              "screenshot_calls": 10,
+              "initial_settled_without_reopen": true,
+              "initial_settle_ticks": 60,
+              "first_open": true,
+              "search": true,
+              "refresh": true,
+              "reopen": true,
+              "measurement_output": "native-localised-profiler-log",
+              "timing_values_stored": false,
+              "two_connected_clients_required": true,
+              "locales_required": [
+                "en",
+                "de"
+              ],
+              "distinct_personal_query_and_selection": true,
+              "initial_native_snapshot_immutable": true,
+              "live_refresh": {
+                "real_lab_completions": 2,
+                "native_laboratory_completion_by_script": false,
+                "native_research_started_events": 3,
+                "queue_lengths_observed": [
+                  2,
+                  1,
+                  0
+                ],
+                "native_research_cancelled_events": 1,
+                "native_foreign_force_created_events": 1,
+                "gear_level": 3,
+                "gear_productivity": 0.2,
+                "science_consumed_per_named_pack": 2,
+                "fixture_accelerates_gear_count_and_time_only": true,
+                "ordinary_tuning_qualified": false,
+                "root_and_query_identity_preserved": true,
+                "cross_force_view_state_preserved": true
+              },
+              "availability_terminal_labels_checked": true,
+              "host_restart_observed": true,
+              "on_load_read_only": true,
+              "rendering_pending_external_png_readback": true,
+              "screenshot_requests_are_not_headless_rendering_proof": true
+            }
+          }
+        }
+      ],
+      "native_profiler_lines": [
+        {
+          "log": "phase-client-initial-de.stdout.log",
+          "line": "  16.517 Script @__mir-fixture-mir5-library-multiplayer__/control.lua:454: [MIR5_LIBRARY_PROFILE] first_open Dauer: 2.624300 ms"
+        },
+        {
+          "log": "phase-client-initial-de.stdout.log",
+          "line": "  16.520 Script @__mir-fixture-mir5-library-multiplayer__/control.lua:454: [MIR5_LIBRARY_PROFILE] search Dauer: 2.891600 ms"
+        },
+        {
+          "log": "phase-client-initial-de.stdout.log",
+          "line": "  16.522 Script @__mir-fixture-mir5-library-multiplayer__/control.lua:454: [MIR5_LIBRARY_PROFILE] refresh Dauer: 2.268600 ms"
+        },
+        {
+          "log": "phase-client-initial-en.stdout.log",
+          "line": "  30.359 Script @__mir-fixture-mir5-library-multiplayer__/control.lua:454: [MIR5_LIBRARY_PROFILE] first_open Duration: 4.111500ms"
+        },
+        {
+          "log": "phase-client-initial-en.stdout.log",
+          "line": "  30.361 Script @__mir-fixture-mir5-library-multiplayer__/control.lua:454: [MIR5_LIBRARY_PROFILE] search Duration: 2.583100ms"
+        },
+        {
+          "log": "phase-client-initial-en.stdout.log",
+          "line": "  30.364 Script @__mir-fixture-mir5-library-multiplayer__/control.lua:454: [MIR5_LIBRARY_PROFILE] refresh Duration: 2.542300ms"
+        },
+        {
+          "log": "phase-client-rejoin-de.stdout.log",
+          "line": "  10.646 Script @__mir-fixture-mir5-library-multiplayer__/control.lua:454: [MIR5_LIBRARY_PROFILE] reopen Dauer: 7.323300 ms"
+        },
+        {
+          "log": "phase-client-rejoin-en.stdout.log",
+          "line": "  19.520 Script @__mir-fixture-mir5-library-multiplayer__/control.lua:454: [MIR5_LIBRARY_PROFILE] reopen Duration: 4.584800ms"
+        },
+        {
+          "log": "phase-server-initial.stdout.log",
+          "line": "  31.818 Script @__mir-fixture-mir5-library-multiplayer__/control.lua:454: [MIR5_LIBRARY_PROFILE] first_open Duration: 2.686400ms"
+        },
+        {
+          "log": "phase-server-initial.stdout.log",
+          "line": "  31.821 Script @__mir-fixture-mir5-library-multiplayer__/control.lua:454: [MIR5_LIBRARY_PROFILE] search Duration: 2.759600ms"
+        },
+        {
+          "log": "phase-server-initial.stdout.log",
+          "line": "  31.823 Script @__mir-fixture-mir5-library-multiplayer__/control.lua:454: [MIR5_LIBRARY_PROFILE] refresh Duration: 2.405500ms"
+        },
+        {
+          "log": "phase-server-initial.stdout.log",
+          "line": "  55.805 Script @__mir-fixture-mir5-library-multiplayer__/control.lua:454: [MIR5_LIBRARY_PROFILE] reopen Duration: 5.708600ms"
+        }
+      ],
+      "logs": [
+        {
+          "path": "build/qualification/library-api-575e-r02-controller/native-base/session/phase-client-initial-de.stdout.log",
+          "bytes": 22270,
+          "sha256": "C1FA30F3A9D910E85BBA0183EFE1342025EABA8762B006E3FA0EF39A362FE586"
+        },
+        {
+          "path": "build/qualification/library-api-575e-r02-controller/native-base/session/phase-client-initial-en.stdout.log",
+          "bytes": 22636,
+          "sha256": "3534511521B4339BD88900AA98EB488083BA732BCA4A8BED3381060392FB4788"
+        },
+        {
+          "path": "build/qualification/library-api-575e-r02-controller/native-base/session/phase-client-rejoin-de.stdout.log",
+          "bytes": 20111,
+          "sha256": "7BB9AF5E2EE021F1637BA49E109E3887739266EB49F6A1CBAF519A87688647C0"
+        },
+        {
+          "path": "build/qualification/library-api-575e-r02-controller/native-base/session/phase-client-rejoin-en.stdout.log",
+          "bytes": 20484,
+          "sha256": "D6A78771EA59B32DA722BBEE61BCC832B8B6B708AA1519C379914483A2061998"
+        },
+        {
+          "path": "build/qualification/library-api-575e-r02-controller/native-base/session/phase-client-restart-de.stdout.log",
+          "bytes": 19979,
+          "sha256": "A876FAA0F958956098B3CED30F86491A245B049352C031263CFB78B52854E3B6"
+        },
+        {
+          "path": "build/qualification/library-api-575e-r02-controller/native-base/session/phase-client-restart-en.stdout.log",
+          "bytes": 20352,
+          "sha256": "A7E08082A6F74FD36555EA52F1F79AFF65F589656AA14687A66C5DA1DC44457D"
+        },
+        {
+          "path": "build/qualification/library-api-575e-r02-controller/native-base/session/phase-server-initial.stdout.log",
+          "bytes": 28350,
+          "sha256": "779B979FAEF96AAD4D6539386ADA38AD7BE236642037888A4F46B1EB3D2E95D3"
+        },
+        {
+          "path": "build/qualification/library-api-575e-r02-controller/native-base/session/phase-server-restart.stdout.log",
+          "bytes": 19688,
+          "sha256": "7BB22A710BF65F00B19B2ADD3A06C0A776AAD272711943F9FECF934D0820418B"
+        }
+      ],
+      "saves": [
+        {
+          "path": "build/qualification/library-api-575e-r02-controller/native-base/preparation/write-data/saves/seed.zip",
+          "bytes": 494125,
+          "sha256": "933C8B7E327603ED9F42315AC3D064090991C15CDDB99073569FDCC247FE194E"
+        },
+        {
+          "path": "build/qualification/library-api-575e-r02-controller/native-base/session/server/saves/mir5-library-multiplayer-restart.zip",
+          "bytes": 561016,
+          "sha256": "026E3F61E171096E143D9810B815E1A43C863B7FFADB7735A5D5E2A00ED93EE2"
+        },
+        {
+          "path": "build/qualification/library-api-575e-r02-controller/native-base/session/server/saves/mir5-native-complete.zip",
+          "bytes": 566790,
+          "sha256": "7380F210E7145E6705BB06A5F6F69BC4815A5C9781C23462152E035007338B6D"
+        }
+      ],
+      "screenshots": [
+        {
+          "path": "build/qualification/library-api-575e-r02-controller/native-base/session/client-en/script-output/mir5-library-multiplayer/availability-1.png",
+          "bytes": 867558,
+          "sha256": "507ABD493CF999BF1A5EAF680231C6A3E9A3B5F216D18C805777F99B1F70CC42",
+          "width": 1280,
+          "height": 720,
+          "externally_viewed": true
+        },
+        {
+          "path": "build/qualification/library-api-575e-r02-controller/native-base/session/client-en/script-output/mir5-library-multiplayer/initial-1.png",
+          "bytes": 947622,
+          "sha256": "E93F9F3CBAF7D7C5904F954DAD6E767E4E8E0B31A4242EE056A04FC445F54AA4",
+          "width": 1280,
+          "height": 720,
+          "externally_viewed": true
+        },
+        {
+          "path": "build/qualification/library-api-575e-r02-controller/native-base/session/client-en/script-output/mir5-library-multiplayer/settled-1.png",
+          "bytes": 947343,
+          "sha256": "471D48AE2155D3124215231B852B47B1E89F100A771214F0CCA4DF92B22C663A",
+          "width": 1280,
+          "height": 720,
+          "externally_viewed": true
+        },
+        {
+          "path": "build/qualification/library-api-575e-r02-controller/native-base/session/client-en/script-output/mir5-library-multiplayer/rejoin-1.png",
+          "bytes": 783155,
+          "sha256": "9AD568CAD6E40EEB770858810C080D27C7B3CA06C66219084BC905DCA9D2FCBE",
+          "width": 1280,
+          "height": 720,
+          "externally_viewed": true
+        },
+        {
+          "path": "build/qualification/library-api-575e-r02-controller/native-base/session/client-en/script-output/mir5-library-multiplayer/restart-1.png",
+          "bytes": 826961,
+          "sha256": "BABE51202EDD3428AAC84AED23B6BFAFA1B3A14435666A470FD45919C70B3E8B",
+          "width": 1280,
+          "height": 720,
+          "externally_viewed": true
+        },
+        {
+          "path": "build/qualification/library-api-575e-r02-controller/native-base/session/client-de/script-output/mir5-library-multiplayer/availability-2.png",
+          "bytes": 879277,
+          "sha256": "6699EEE91A6105C1E8D7E372412790FAAF51293A73E9B9A164A2B680DBF623C8",
+          "width": 1280,
+          "height": 720,
+          "externally_viewed": true
+        },
+        {
+          "path": "build/qualification/library-api-575e-r02-controller/native-base/session/client-de/script-output/mir5-library-multiplayer/initial-2.png",
+          "bytes": 890920,
+          "sha256": "2BB56DCE2B5DE3477A59D7ACBAECE4EEEED64AA39E7FC0BCADC10D1F7D05E6A3",
+          "width": 1280,
+          "height": 720,
+          "externally_viewed": true
+        },
+        {
+          "path": "build/qualification/library-api-575e-r02-controller/native-base/session/client-de/script-output/mir5-library-multiplayer/settled-2.png",
+          "bytes": 893152,
+          "sha256": "D47DE68D3B884CACE210EC5B17DC63FD1FEB6908269BECD01A6019AEBCD1A90B",
+          "width": 1280,
+          "height": 720,
+          "externally_viewed": true
+        },
+        {
+          "path": "build/qualification/library-api-575e-r02-controller/native-base/session/client-de/script-output/mir5-library-multiplayer/rejoin-2.png",
+          "bytes": 786238,
+          "sha256": "EE561B52D192CF677454A5B9497306142F20A0DB368CD57D126DAFCA24EAA7D8",
+          "width": 1280,
+          "height": 720,
+          "externally_viewed": true
+        },
+        {
+          "path": "build/qualification/library-api-575e-r02-controller/native-base/session/client-de/script-output/mir5-library-multiplayer/restart-2.png",
+          "bytes": 826194,
+          "sha256": "0BA64955D038840F712706E959F6AF1425A773C76731010DD600E83B6B743E74",
+          "width": 1280,
+          "height": 720,
+          "externally_viewed": true
+        }
+      ],
+      "client_graphics_arguments": [],
+      "actual_factorio_processes": 9
+    },
+    {
+      "arm": "space-age",
+      "result": {
+        "path": "build/qualification/library-api-575e-r02-controller/native-space-age/session/result.json",
+        "bytes": 37878,
+        "sha256": "C151EDE1FDA415B1A76CFBD95EE4CD2246BE64976C9DC3D89D5EA1515A5DCBCC"
+      },
+      "status": "passed-private-two-client-fixture",
+      "engine": {
+        "path": "D:\\Games\\Factorio\\2.1\\bin\\x64\\factorio.exe",
+        "sha256": "8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38",
+        "file_version": "2.1.23.87750",
+        "product_version": "2.1.23",
+        "base_version": "2.1.23"
+      },
+      "profile": {
+        "path": "D:\\Projects\\Factorio\\mir5-legacy-cannon-credit-r01\\tests\\profiles\\library-api-consumers-current-space-age-standalone-f210-2123.json",
+        "sha256": "C1D5E404260B19EE8A7B2E3CF002FFEBC15F7B6EB1C6FE1FEF15C0853E0112E4"
+      },
+      "fixtures": [
+        {
+          "archive": "D:\\Projects\\Factorio\\testmods\\2.1\\mir-fixture-mir5-library-multiplayer_0.2.0.zip",
+          "source": "D:\\Projects\\Factorio\\mir5-legacy-cannon-credit-r01\\build\\tmp\\library-api-space-age-575e-r02\\standalone-f210-library-fixture-source",
+          "sha256": "26EE1861255F641F6A113ACE56B0F9630130C1AF417C705D43BEFC40AAF14DFA"
+        },
+        {
+          "archive": "D:\\Projects\\Factorio\\testmods\\2.1\\mir-fixture-mir5-active-mods-observer_0.1.0.zip",
+          "source": "D:\\Projects\\Factorio\\mir5-legacy-cannon-credit-r01\\build\\tmp\\library-api-space-age-575e-r02\\standalone-identity-observer-source",
+          "sha256": "A15A7D628D66953D2E0C4D4FA288F47CBF9C5678327C7EB3D23ADB5DC78331C0"
+        },
+        {
+          "archive": "D:\\Projects\\Factorio\\testmods\\2.1\\mir-fixture-mir5-api-alpha_0.1.0.zip",
+          "source": "D:\\Projects\\Factorio\\mir5-legacy-cannon-credit-r01\\build\\tmp\\library-api-space-age-575e-r02\\standalone-f210-api-alpha-fixture-source",
+          "sha256": "DB5ED843FA9D85A1ABDC22595E62D315CA1A2191C846208079F85D4D016CE904"
+        },
+        {
+          "archive": "D:\\Projects\\Factorio\\testmods\\2.1\\mir-fixture-mir5-api-beta_0.1.0.zip",
+          "source": "D:\\Projects\\Factorio\\mir5-legacy-cannon-credit-r01\\build\\tmp\\library-api-space-age-575e-r02\\standalone-f210-api-beta-fixture-source",
+          "sha256": "690004F145E8B0DD52B4030BD8B27F7B581495EEFAAC5CB3A2F30A23FCA08951"
+        }
+      ],
+      "budget_mib": 8192,
+      "api_client_load_markers": [
+        {
+          "phase": "initial",
+          "client": "MIR5English",
+          "MIR5_API_ALPHA": {
+            "stage": "load",
+            "tick": 1654,
+            "reload_researched": true,
+            "reload_level": 1,
+            "reload_manual_crafting_speed_modifier": 0.05
+          },
+          "MIR5_API_BETA": {
+            "stage": "load",
+            "tick": 1654,
+            "reload_level": 1,
+            "reload_researched": false,
+            "reload_manual_crafting_speed_modifier": 0.05
+          }
+        },
+        {
+          "phase": "initial",
+          "client": "MIR5Deutsch",
+          "MIR5_API_ALPHA": {
+            "stage": "load",
+            "tick": 3333,
+            "reload_researched": true,
+            "reload_level": 1,
+            "reload_manual_crafting_speed_modifier": 0.05
+          },
+          "MIR5_API_BETA": {
+            "stage": "load",
+            "tick": 3333,
+            "reload_level": 1,
+            "reload_researched": false,
+            "reload_manual_crafting_speed_modifier": 0.05
+          }
+        },
+        {
+          "phase": "rejoin",
+          "client": "MIR5English",
+          "MIR5_API_ALPHA": {
+            "stage": "load",
+            "tick": 4817,
+            "reload_researched": true,
+            "reload_level": 1,
+            "reload_manual_crafting_speed_modifier": 0.05
+          },
+          "MIR5_API_BETA": {
+            "stage": "load",
+            "tick": 4817,
+            "reload_level": 1,
+            "reload_researched": false,
+            "reload_manual_crafting_speed_modifier": 0.05
+          }
+        },
+        {
+          "phase": "rejoin",
+          "client": "MIR5Deutsch",
+          "MIR5_API_ALPHA": {
+            "stage": "load",
+            "tick": 5875,
+            "reload_researched": true,
+            "reload_level": 1,
+            "reload_manual_crafting_speed_modifier": 0.05
+          },
+          "MIR5_API_BETA": {
+            "stage": "load",
+            "tick": 5875,
+            "reload_level": 1,
+            "reload_researched": false,
+            "reload_manual_crafting_speed_modifier": 0.05
+          }
+        },
+        {
+          "phase": "restart",
+          "client": "MIR5English",
+          "MIR5_API_ALPHA": {
+            "stage": "load",
+            "tick": 7089,
+            "reload_researched": true,
+            "reload_level": 1,
+            "reload_manual_crafting_speed_modifier": 0.05
+          },
+          "MIR5_API_BETA": {
+            "stage": "load",
+            "tick": 7089,
+            "reload_level": 1,
+            "reload_researched": false,
+            "reload_manual_crafting_speed_modifier": 0.05
+          }
+        },
+        {
+          "phase": "restart",
+          "client": "MIR5Deutsch",
+          "MIR5_API_ALPHA": {
+            "stage": "load",
+            "tick": 8141,
+            "reload_researched": true,
+            "reload_level": 1,
+            "reload_manual_crafting_speed_modifier": 0.05
+          },
+          "MIR5_API_BETA": {
+            "stage": "load",
+            "tick": 8141,
+            "reload_level": 1,
+            "reload_researched": false,
+            "reload_manual_crafting_speed_modifier": 0.05
+          }
+        }
+      ],
+      "native_witnesses": [
+        {
+          "log": "phase-server-initial.stdout.log",
+          "witness": {
+            "case": "library-multiplayer",
+            "stage": "ready",
+            "status": "passed",
+            "witnesses": {
+              "base_version": "2.1.23",
+              "mir_version": "5.0.21000",
+              "actual_join_events": 0,
+              "screenshot_calls": 0,
+              "initial_settled_without_reopen": false,
+              "measurement_output": "native-localised-profiler-log",
+              "timing_values_stored": false,
+              "two_connected_clients_required": true,
+              "locales_required": [
+                "en",
+                "de"
+              ],
+              "distinct_personal_query_and_selection": true,
+              "initial_native_snapshot_immutable": true,
+              "live_refresh": {
+                "native_laboratory_completion_by_script": false,
+                "queue_lengths_observed": {},
+                "gear_level": 1,
+                "gear_productivity": 0,
+                "science_consumed_per_named_pack": 2,
+                "fixture_accelerates_gear_count_and_time_only": true,
+                "ordinary_tuning_qualified": false,
+                "root_and_query_identity_preserved": true,
+                "cross_force_view_state_preserved": true,
+                "casting_gear_productivity": 0
+              },
+              "availability_terminal_labels_checked": false,
+              "host_restart_observed": false,
+              "on_load_read_only": false,
+              "rendering_pending_external_png_readback": true,
+              "screenshot_requests_are_not_headless_rendering_proof": true,
+              "space_age_library": true
+            }
+          }
+        },
+        {
+          "log": "phase-server-initial.stdout.log",
+          "witness": {
+            "case": "library-multiplayer",
+            "stage": "rejoin-ready",
+            "status": "passed",
+            "witnesses": {
+              "base_version": "2.1.23",
+              "mir_version": "5.0.21000",
+              "actual_join_events": 2,
+              "screenshot_calls": 6,
+              "initial_settled_without_reopen": true,
+              "initial_settle_ticks": 60,
+              "first_open": true,
+              "search": true,
+              "refresh": true,
+              "measurement_output": "native-localised-profiler-log",
+              "timing_values_stored": false,
+              "two_connected_clients_required": true,
+              "locales_required": [
+                "en",
+                "de"
+              ],
+              "distinct_personal_query_and_selection": true,
+              "initial_native_snapshot_immutable": true,
+              "live_refresh": {
+                "real_lab_completions": 2,
+                "native_laboratory_completion_by_script": false,
+                "native_research_started_events": 3,
+                "queue_lengths_observed": [
+                  2,
+                  1,
+                  0
+                ],
+                "native_research_cancelled_events": 1,
+                "native_foreign_force_created_events": 1,
+                "gear_level": 3,
+                "gear_productivity": 0.2,
+                "science_consumed_per_named_pack": 2,
+                "fixture_accelerates_gear_count_and_time_only": true,
+                "ordinary_tuning_qualified": false,
+                "root_and_query_identity_preserved": true,
+                "cross_force_view_state_preserved": true,
+                "casting_gear_productivity": 0.2
+              },
+              "availability_terminal_labels_checked": true,
+              "host_restart_observed": false,
+              "on_load_read_only": false,
+              "rendering_pending_external_png_readback": true,
+              "screenshot_requests_are_not_headless_rendering_proof": true,
+              "space_age_library": true
+            }
+          }
+        },
+        {
+          "log": "phase-server-initial.stdout.log",
+          "witness": {
+            "case": "library-multiplayer",
+            "stage": "restart-ready",
+            "status": "passed",
+            "witnesses": {
+              "base_version": "2.1.23",
+              "mir_version": "5.0.21000",
+              "actual_join_events": 4,
+              "screenshot_calls": 8,
+              "initial_settled_without_reopen": true,
+              "initial_settle_ticks": 60,
+              "first_open": true,
+              "search": true,
+              "refresh": true,
+              "reopen": true,
+              "measurement_output": "native-localised-profiler-log",
+              "timing_values_stored": false,
+              "two_connected_clients_required": true,
+              "locales_required": [
+                "en",
+                "de"
+              ],
+              "distinct_personal_query_and_selection": true,
+              "initial_native_snapshot_immutable": true,
+              "live_refresh": {
+                "real_lab_completions": 2,
+                "native_laboratory_completion_by_script": false,
+                "native_research_started_events": 3,
+                "queue_lengths_observed": [
+                  2,
+                  1,
+                  0
+                ],
+                "native_research_cancelled_events": 1,
+                "native_foreign_force_created_events": 1,
+                "gear_level": 3,
+                "gear_productivity": 0.2,
+                "science_consumed_per_named_pack": 2,
+                "fixture_accelerates_gear_count_and_time_only": true,
+                "ordinary_tuning_qualified": false,
+                "root_and_query_identity_preserved": true,
+                "cross_force_view_state_preserved": true,
+                "casting_gear_productivity": 0.2
+              },
+              "availability_terminal_labels_checked": true,
+              "host_restart_observed": false,
+              "on_load_read_only": false,
+              "rendering_pending_external_png_readback": true,
+              "screenshot_requests_are_not_headless_rendering_proof": true,
+              "space_age_library": true
+            }
+          }
+        },
+        {
+          "log": "phase-server-restart.stdout.log",
+          "witness": {
+            "case": "library-multiplayer",
+            "stage": "completed",
+            "status": "passed",
+            "witnesses": {
+              "base_version": "2.1.23",
+              "mir_version": "5.0.21000",
+              "actual_join_events": 6,
+              "screenshot_calls": 10,
+              "initial_settled_without_reopen": true,
+              "initial_settle_ticks": 60,
+              "first_open": true,
+              "search": true,
+              "refresh": true,
+              "reopen": true,
+              "measurement_output": "native-localised-profiler-log",
+              "timing_values_stored": false,
+              "two_connected_clients_required": true,
+              "locales_required": [
+                "en",
+                "de"
+              ],
+              "distinct_personal_query_and_selection": true,
+              "initial_native_snapshot_immutable": true,
+              "live_refresh": {
+                "real_lab_completions": 2,
+                "native_laboratory_completion_by_script": false,
+                "native_research_started_events": 3,
+                "queue_lengths_observed": [
+                  2,
+                  1,
+                  0
+                ],
+                "native_research_cancelled_events": 1,
+                "native_foreign_force_created_events": 1,
+                "gear_level": 3,
+                "gear_productivity": 0.2,
+                "science_consumed_per_named_pack": 2,
+                "fixture_accelerates_gear_count_and_time_only": true,
+                "ordinary_tuning_qualified": false,
+                "root_and_query_identity_preserved": true,
+                "cross_force_view_state_preserved": true,
+                "casting_gear_productivity": 0.2
+              },
+              "availability_terminal_labels_checked": true,
+              "host_restart_observed": true,
+              "on_load_read_only": true,
+              "rendering_pending_external_png_readback": true,
+              "screenshot_requests_are_not_headless_rendering_proof": true,
+              "space_age_library": true
+            }
+          }
+        }
+      ],
+      "native_profiler_lines": [
+        {
+          "log": "phase-client-initial-de.stdout.log",
+          "line": "  31.014 Script @__mir-fixture-mir5-library-multiplayer__/control.lua:454: [MIR5_LIBRARY_PROFILE] first_open Dauer: 4.503800 ms"
+        },
+        {
+          "log": "phase-client-initial-de.stdout.log",
+          "line": "  31.018 Script @__mir-fixture-mir5-library-multiplayer__/control.lua:454: [MIR5_LIBRARY_PROFILE] search Dauer: 3.642900 ms"
+        },
+        {
+          "log": "phase-client-initial-de.stdout.log",
+          "line": "  31.021 Script @__mir-fixture-mir5-library-multiplayer__/control.lua:454: [MIR5_LIBRARY_PROFILE] refresh Dauer: 2.888600 ms"
+        },
+        {
+          "log": "phase-client-initial-en.stdout.log",
+          "line": "  58.833 Script @__mir-fixture-mir5-library-multiplayer__/control.lua:454: [MIR5_LIBRARY_PROFILE] first_open Duration: 4.192900ms"
+        },
+        {
+          "log": "phase-client-initial-en.stdout.log",
+          "line": "  58.837 Script @__mir-fixture-mir5-library-multiplayer__/control.lua:454: [MIR5_LIBRARY_PROFILE] search Duration: 3.480300ms"
+        },
+        {
+          "log": "phase-client-initial-en.stdout.log",
+          "line": "  58.840 Script @__mir-fixture-mir5-library-multiplayer__/control.lua:454: [MIR5_LIBRARY_PROFILE] refresh Duration: 3.628300ms"
+        },
+        {
+          "log": "phase-client-rejoin-de.stdout.log",
+          "line": "  19.548 Script @__mir-fixture-mir5-library-multiplayer__/control.lua:454: [MIR5_LIBRARY_PROFILE] reopen Dauer: 7.872400 ms"
+        },
+        {
+          "log": "phase-client-rejoin-en.stdout.log",
+          "line": "  36.817 Script @__mir-fixture-mir5-library-multiplayer__/control.lua:454: [MIR5_LIBRARY_PROFILE] reopen Duration: 6.880400ms"
+        },
+        {
+          "log": "phase-server-initial.stdout.log",
+          "line": "  60.720 Script @__mir-fixture-mir5-library-multiplayer__/control.lua:454: [MIR5_LIBRARY_PROFILE] first_open Duration: 4.097800ms"
+        },
+        {
+          "log": "phase-server-initial.stdout.log",
+          "line": "  60.724 Script @__mir-fixture-mir5-library-multiplayer__/control.lua:454: [MIR5_LIBRARY_PROFILE] search Duration: 3.132400ms"
+        },
+        {
+          "log": "phase-server-initial.stdout.log",
+          "line": "  60.727 Script @__mir-fixture-mir5-library-multiplayer__/control.lua:454: [MIR5_LIBRARY_PROFILE] refresh Duration: 2.926100ms"
+        },
+        {
+          "log": "phase-server-initial.stdout.log",
+          "line": " 102.257 Script @__mir-fixture-mir5-library-multiplayer__/control.lua:454: [MIR5_LIBRARY_PROFILE] reopen Duration: 7.060300ms"
+        }
+      ],
+      "logs": [
+        {
+          "path": "build/qualification/library-api-575e-r02-controller/native-space-age/session/phase-client-initial-de.stdout.log",
+          "bytes": 27600,
+          "sha256": "9BB967FB2AD841F7DF70F4BB158E3F59B4C1C4169B056150247E4D684A3C336D"
+        },
+        {
+          "path": "build/qualification/library-api-575e-r02-controller/native-space-age/session/phase-client-initial-en.stdout.log",
+          "bytes": 27973,
+          "sha256": "D82B492EE8306A4D98CD54EF1F7D335AB972BDE82D6C5B00C667CF72A32129D8"
+        },
+        {
+          "path": "build/qualification/library-api-575e-r02-controller/native-space-age/session/phase-client-rejoin-de.stdout.log",
+          "bytes": 25388,
+          "sha256": "954DEE2677272870006134CF8B02974D518EBC3A9679288EA6627236FAD264A4"
+        },
+        {
+          "path": "build/qualification/library-api-575e-r02-controller/native-space-age/session/phase-client-rejoin-en.stdout.log",
+          "bytes": 25759,
+          "sha256": "70FE0BE5B377493E07905E5CFB3D9CD10B92865A1F2B06C8A492FDB7AC896BAC"
+        },
+        {
+          "path": "build/qualification/library-api-575e-r02-controller/native-space-age/session/phase-client-restart-de.stdout.log",
+          "bytes": 23868,
+          "sha256": "9A97B9811DD26EB78E6769B494E6E51F3322D57BE65656D9F3FFA89C1D5512E1"
+        },
+        {
+          "path": "build/qualification/library-api-575e-r02-controller/native-space-age/session/phase-client-restart-en.stdout.log",
+          "bytes": 25629,
+          "sha256": "83D3CAD622C6724FEAA6119970BCD105236BD53431293496997EC70BE52284F3"
+        },
+        {
+          "path": "build/qualification/library-api-575e-r02-controller/native-space-age/session/phase-server-initial.stdout.log",
+          "bytes": 29255,
+          "sha256": "FC193232529D18EAD60451ED75709BF257F6FA02A6C6B2CA1E07473E6EF8DE6A"
+        },
+        {
+          "path": "build/qualification/library-api-575e-r02-controller/native-space-age/session/phase-server-restart.stdout.log",
+          "bytes": 20462,
+          "sha256": "EB337183571005FFD4B5F8984D6E6A21EC90B3D0106BED8E99D8863E6E6B9A8C"
+        }
+      ],
+      "saves": [
+        {
+          "path": "build/qualification/library-api-575e-r02-controller/native-space-age/preparation/write-data/saves/seed.zip",
+          "bytes": 861166,
+          "sha256": "B03AD22C716E7B3ABD1859D26C45CBC7FB9745F627494A66DCD04B15ABCF2AEB"
+        },
+        {
+          "path": "build/qualification/library-api-575e-r02-controller/native-space-age/session/server/saves/mir5-library-multiplayer-restart.zip",
+          "bytes": 1011495,
+          "sha256": "0911B200C589DC2AE94087CA90EE1BDEC56756BC3BB6E861066B6AD605A296FE"
+        },
+        {
+          "path": "build/qualification/library-api-575e-r02-controller/native-space-age/session/server/saves/mir5-native-complete.zip",
+          "bytes": 1033879,
+          "sha256": "153FC9F6781958E3277DA37A909E1C366B74BC09A328633E3F6833CC640FEFB7"
+        }
+      ],
+      "screenshots": [
+        {
+          "path": "build/qualification/library-api-575e-r02-controller/native-space-age/session/client-en/script-output/mir5-library-multiplayer/availability-1.png",
+          "bytes": 1096755,
+          "sha256": "5D2D8B456518D64F628EF95C563996BD80C63DD2E1F39A119F8D7F24964894C4",
+          "width": 1280,
+          "height": 720,
+          "externally_viewed": true
+        },
+        {
+          "path": "build/qualification/library-api-575e-r02-controller/native-space-age/session/client-en/script-output/mir5-library-multiplayer/initial-1.png",
+          "bytes": 1196891,
+          "sha256": "584597A9B047A218FF19290ED135C93999BC7689176EB991B01FCF0F16D17DE4",
+          "width": 1280,
+          "height": 720,
+          "externally_viewed": true
+        },
+        {
+          "path": "build/qualification/library-api-575e-r02-controller/native-space-age/session/client-en/script-output/mir5-library-multiplayer/settled-1.png",
+          "bytes": 1198643,
+          "sha256": "E9E1462087617AF2AE550F41FEEE4AC41E0918020914C17DDC6BCE8409B547A5",
+          "width": 1280,
+          "height": 720,
+          "externally_viewed": true
+        },
+        {
+          "path": "build/qualification/library-api-575e-r02-controller/native-space-age/session/client-en/script-output/mir5-library-multiplayer/rejoin-1.png",
+          "bytes": 1136919,
+          "sha256": "D5EE0427A0FA972879BF6C9273DA4D3DB5250FE013D472BD089D13E8FB38F4B9",
+          "width": 1280,
+          "height": 720,
+          "externally_viewed": true
+        },
+        {
+          "path": "build/qualification/library-api-575e-r02-controller/native-space-age/session/client-en/script-output/mir5-library-multiplayer/restart-1.png",
+          "bytes": 1136902,
+          "sha256": "0650CBCA55F99DB76F04998AEB09D4937EDB9CAFA606ED33FD259A31ECC8355E",
+          "width": 1280,
+          "height": 720,
+          "externally_viewed": true
+        },
+        {
+          "path": "build/qualification/library-api-575e-r02-controller/native-space-age/session/client-de/script-output/mir5-library-multiplayer/availability-2.png",
+          "bytes": 1100222,
+          "sha256": "7F4DF5AFCB1D2C3CBC6024B1772BBE950CF8799922E85244D8368B6015B633B6",
+          "width": 1280,
+          "height": 720,
+          "externally_viewed": true
+        },
+        {
+          "path": "build/qualification/library-api-575e-r02-controller/native-space-age/session/client-de/script-output/mir5-library-multiplayer/initial-2.png",
+          "bytes": 1133838,
+          "sha256": "CCED78B1F45767A319F0131E231F49310A891C13AADD2A5B6E150D738552828A",
+          "width": 1280,
+          "height": 720,
+          "externally_viewed": true
+        },
+        {
+          "path": "build/qualification/library-api-575e-r02-controller/native-space-age/session/client-de/script-output/mir5-library-multiplayer/settled-2.png",
+          "bytes": 1134518,
+          "sha256": "6952F3A5D63378F6AD95B15561ED3FB21C5EC9DF3D2F728532A313515DAF9F39",
+          "width": 1280,
+          "height": 720,
+          "externally_viewed": true
+        },
+        {
+          "path": "build/qualification/library-api-575e-r02-controller/native-space-age/session/client-de/script-output/mir5-library-multiplayer/rejoin-2.png",
+          "bytes": 1142035,
+          "sha256": "193538B118EA9E339D96C91DEA9B0577C3936D83CA32B7DA14CC77950573805D",
+          "width": 1280,
+          "height": 720,
+          "externally_viewed": true
+        },
+        {
+          "path": "build/qualification/library-api-575e-r02-controller/native-space-age/session/client-de/script-output/mir5-library-multiplayer/restart-2.png",
+          "bytes": 1142034,
+          "sha256": "287AF66CF5526CC16DDA4E087831A69993E7C88F2A08B2C1F6345542D364AECB",
+          "width": 1280,
+          "height": 720,
+          "externally_viewed": true
+        }
+      ],
+      "client_graphics_arguments": [
+        "--force-graphics-preset",
+        "low",
+        "--video-memory-usage",
+        "low"
+      ],
+      "actual_factorio_processes": 9
+    }
+  ],
+  "total_actual_factorio_processes": 18,
+  "actual_lab_completions": 4,
+  "factorio_processes_after_restoration": 0,
+  "visual_readback": {
+    "files": 20,
+    "locales": [
+      "en",
+      "de"
+    ],
+    "stages": [
+      "availability",
+      "initial",
+      "settled",
+      "rejoin",
+      "restart"
+    ],
+    "findings": [
+      "Base Availability renders two terminal Space Age requirement labels; Space Age renders the single native laboratory-productivity explanation in both locales.",
+      "Distinct English gear and German mining selections survive reconnect and host restart. Headers, filters and visible text fit the observed1280x720 views; lower detail rows remain vertically scrollable.",
+      "Native achievement popups cover part of the English initial and60-tick-settled details in both editions. The subsequent rejoin/restart views are unobscured. These retained images do not prove the covered text was visible earlier.",
+      "English fallback strings and raw prototype IDs remain visible in parts of the German detail, consistent with incomplete translation coverage; this is not full localization acceptance."
+    ]
+  },
+  "limitations": [
+    "Fixture-only gear count/time acceleration qualifies two genuine native lab completions and resulting effects, not ordinary costs or elapsed research time.",
+    "Space Age observes both iron-gear-wheel and casting-iron-gear-wheel native productivity at+20% and foreign-force isolation; no manufacturing output is measured.",
+    "Native Library profiler lines are retained as per-process observations. No statistical latency or memory comparison/acceptance is asserted.",
+    "Original seed archives remain byte-identical and the host restarts from its new saved state. This is not a predecessor migration or a substitute for required original-save cold-reload routes.",
+    "All original/primary raw logs, saves, screenshots, configs and private session specifications are retained; public receipts omit private configuration payloads rather than pretending they are required release assets."
+  ]
+}
