@@ -10,6 +10,8 @@ ROOT = Path(__file__).resolve().parents[1]
 FIXTURE = ROOT / "tests/fixtures/migration-origins/f200-120-successor"
 SOURCE_FIXTURE = ROOT / "tests/fixtures/migration-origins/f200-120-source"
 FIXTURE_NAME = "mir-fixture-mir5-migration-origin-f200-120-source"
+F210_PROFILE = ROOT / "tests/profiles/migration-origins-1.2.0-successor-f210-2123.json"
+F200_PROFILE = ROOT / "tests/profiles/migration-origins-1.2.0-successor-f200-2077.json"
 
 
 def py(value):
@@ -179,6 +181,27 @@ class MigrationOriginF200120SuccessorControls(unittest.TestCase):
                          (f210["version"], f210["factorio_version"], f210["dependencies"][1]))
         self.assertEqual(("0.3.0", "2.0", "more-infinite-research = 5.0.20000"),
                          (f200["version"], f200["factorio_version"], f200["dependencies"][1]))
+
+    def test_profiles_bind_the_passed_source_once_and_keep_f200_prepared_only(self):
+        f210, f200 = json.loads(F210_PROFILE.read_text(encoding="utf-8")), json.loads(F200_PROFILE.read_text(encoding="utf-8"))
+        source = ("FDC9BA445B17716CAE7C021959B9B3BF4E1C7EE9F6485AA76DBCC59D70101CAC", 817810,
+                  "C7FE9F69963FFCF27686A4F0C0E5F2C79079BCD4698CF25158997AC00A619E9A")
+        for profile, target, version, fixture_hash, player_hash in (
+            (f210, "f210", "0.2.0", "3D808C2DB15BD57FEE3FE798FC796148CE7C91D26A5BF220905F3E03A8E64B64",
+             "654C57DDCE2E994C1E8DDC4F808198D4FAC7EAB6284B18C4A628E6DA5465DE23"),
+            (f200, "f200", "0.3.0", "D326BC8C4F493C8F8A27482C93F141E725B4705358267530C77AE84C452156A8",
+             "20A200883EFB29F8D216EA408C688F1862C80612D536DCD4FCDDC1E47768541D"),
+        ):
+            with self.subTest(target=target):
+                self.assertEqual(target, profile["target"])
+                self.assertEqual(source, (profile["source_save"]["sha256"], profile["source_save"]["bytes"],
+                                          profile["source_save"]["source_result_sha256"]))
+                self.assertEqual("f0dd9f62adc8bf0a8eaaf9babc1fcfef9f3241ea", profile["candidate"]["source_commit"])
+                self.assertEqual("0229b2bb3ad0c514fc4dca18c32fd544b9ba7d72", profile["candidate"]["player_tree"])
+                self.assertEqual(fixture_hash, profile["archive_sha256"][f"{FIXTURE_NAME}_{version}.zip"])
+                self.assertEqual(player_hash, profile["archive_sha256"][f"more-infinite-research_5.0.{21000 if target == 'f210' else 20000}.zip"])
+        self.assertIn("prepared only", f200["scope"])
+        self.assertIn("Native execution is pending", f210["scope"])
 
     def test_control_declares_non_scripted_lab_reset_and_two_cold_reload_boundary(self):
         control = (FIXTURE / "control.lua").read_text(encoding="utf-8")
