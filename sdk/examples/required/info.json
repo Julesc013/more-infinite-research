@@ -6,7 +6,7 @@
   "factorio_version": "2.1",
   "dependencies": [
     "base >= 2.1.23",
-    "more-infinite-research >= 5.0.21000"
+    "more-infinite-research >= 5.0.0"
   ],
   "description": "Draft required public API example for the current 2.1 slice. Not native-qualified or for production saves."
 }
