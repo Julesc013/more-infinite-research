@@ -1,0 +1,903 @@
+{
+  "schema": 1,
+  "kind": "MIRK2SEOwnRecordsNativeChainV1",
+  "status": "original-assertion-fails-no-exact-staged-or-cap-records",
+  "scope": "One read-only private bootstrap005D copy/17d6/SteamFE4/protected89023/original0FAE successor. Exact own-context on_load storage-only reads and before/after configuration reads,not companion storage. No product patch,expectation waiver,saved successor or release qualification.",
+  "controller_commit": "17d6a5413bd86cb7ab6ded23356f7187174814cf",
+  "baseline_mir_sha256": "005D420671270306155CB4AC25E9CF77541202DFA16B206DCC016237619C9AA2",
+  "instrumented_mir_sha256": "DE6DBED24EFADD9A743FF678BA6CAE444763E61D56D6C94949D8C30CCC6DCF13",
+  "engine_sha256": "FE4A1DA30F322A0D0B8AEB3DF7276332222BAAA143E2352569B723E84B2B9060",
+  "fixture_sha256": "0FAE20D3DC6FBA813177BDFDDB322C05F38E1A0863E0D2A141781AFC090D8728",
+  "profile_sha256": "BC8E6289AA07211CBC017AD74692FF268D6C158171A2F30038EC5435CD935050",
+  "source": {
+    "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\k2se-carrier-published-source-r02-controller\\native-published\\write-data\\saves\\mir5-native-complete.zip",
+    "sha256": "89023ABD70EC6B72B693F6BB5AA0D1506C3BABEF032B674A5621FB8F26F8BC92"
+  },
+  "observations": [
+    {
+      "stage": "before-MIR-on-load-body",
+      "context": "more-infinite-research",
+      "read_only_load": true,
+      "namespace_type": "table",
+      "adoption_type": "table",
+      "staged_type": "table",
+      "maximum_level_control_type": "table",
+      "current_caps_type": "nil",
+      "player_saved": {
+        "force_index": 1,
+        "staged_record": {
+          "present": false,
+          "type": "nil"
+        },
+        "cap_rows": {
+          "mir-k2-imersite-staged-state-1": {
+            "current_owned": {
+              "present": false,
+              "type": "nil"
+            },
+            "legacy_disabled": {
+              "present": false,
+              "type": "nil"
+            },
+            "legacy_visibility": {
+              "present": false,
+              "type": "nil"
+            },
+            "legacy_unowned": {
+              "present": false,
+              "type": "nil"
+            }
+          },
+          "mir-k2-imersite-continuation-state-4": {
+            "current_owned": {
+              "present": false,
+              "type": "nil"
+            },
+            "legacy_disabled": {
+              "present": false,
+              "type": "nil"
+            },
+            "legacy_visibility": {
+              "present": false,
+              "type": "nil"
+            },
+            "legacy_unowned": {
+              "present": false,
+              "type": "nil"
+            }
+          },
+          "recipe-prod-research_material_imersite-1": {
+            "current_owned": {
+              "present": false,
+              "type": "nil"
+            },
+            "legacy_disabled": {
+              "present": false,
+              "type": "nil"
+            },
+            "legacy_visibility": {
+              "present": false,
+              "type": "nil"
+            },
+            "legacy_unowned": {
+              "present": false,
+              "type": "nil"
+            }
+          },
+          "recipe-prod-research_material_imersite-4": {
+            "current_owned": {
+              "present": false,
+              "type": "nil"
+            },
+            "legacy_disabled": {
+              "present": false,
+              "type": "nil"
+            },
+            "legacy_visibility": {
+              "present": false,
+              "type": "nil"
+            },
+            "legacy_unowned": {
+              "present": false,
+              "type": "nil"
+            }
+          }
+        }
+      },
+      "foreign_saved": {
+        "force_index": 9,
+        "staged_record": {
+          "present": false,
+          "type": "nil"
+        },
+        "cap_rows": {
+          "mir-k2-imersite-staged-state-1": {
+            "current_owned": {
+              "present": false,
+              "type": "nil"
+            },
+            "legacy_disabled": {
+              "present": false,
+              "type": "nil"
+            },
+            "legacy_visibility": {
+              "present": false,
+              "type": "nil"
+            },
+            "legacy_unowned": {
+              "present": false,
+              "type": "nil"
+            }
+          },
+          "mir-k2-imersite-continuation-state-4": {
+            "current_owned": {
+              "present": false,
+              "type": "nil"
+            },
+            "legacy_disabled": {
+              "present": false,
+              "type": "nil"
+            },
+            "legacy_visibility": {
+              "present": false,
+              "type": "nil"
+            },
+            "legacy_unowned": {
+              "present": false,
+              "type": "nil"
+            }
+          },
+          "recipe-prod-research_material_imersite-1": {
+            "current_owned": {
+              "present": false,
+              "type": "nil"
+            },
+            "legacy_disabled": {
+              "present": false,
+              "type": "nil"
+            },
+            "legacy_visibility": {
+              "present": false,
+              "type": "nil"
+            },
+            "legacy_unowned": {
+              "present": false,
+              "type": "nil"
+            }
+          },
+          "recipe-prod-research_material_imersite-4": {
+            "current_owned": {
+              "present": false,
+              "type": "nil"
+            },
+            "legacy_disabled": {
+              "present": false,
+              "type": "nil"
+            },
+            "legacy_visibility": {
+              "present": false,
+              "type": "nil"
+            },
+            "legacy_unowned": {
+              "present": false,
+              "type": "nil"
+            }
+          }
+        }
+      }
+    },
+    {
+      "stage": "after-MIR-on-load-body",
+      "context": "more-infinite-research",
+      "read_only_load": true,
+      "namespace_type": "table",
+      "adoption_type": "table",
+      "staged_type": "table",
+      "maximum_level_control_type": "table",
+      "current_caps_type": "nil",
+      "player_saved": {
+        "force_index": 1,
+        "staged_record": {
+          "present": false,
+          "type": "nil"
+        },
+        "cap_rows": {
+          "mir-k2-imersite-staged-state-1": {
+            "current_owned": {
+              "present": false,
+              "type": "nil"
+            },
+            "legacy_disabled": {
+              "present": false,
+              "type": "nil"
+            },
+            "legacy_visibility": {
+              "present": false,
+              "type": "nil"
+            },
+            "legacy_unowned": {
+              "present": false,
+              "type": "nil"
+            }
+          },
+          "mir-k2-imersite-continuation-state-4": {
+            "current_owned": {
+              "present": false,
+              "type": "nil"
+            },
+            "legacy_disabled": {
+              "present": false,
+              "type": "nil"
+            },
+            "legacy_visibility": {
+              "present": false,
+              "type": "nil"
+            },
+            "legacy_unowned": {
+              "present": false,
+              "type": "nil"
+            }
+          },
+          "recipe-prod-research_material_imersite-1": {
+            "current_owned": {
+              "present": false,
+              "type": "nil"
+            },
+            "legacy_disabled": {
+              "present": false,
+              "type": "nil"
+            },
+            "legacy_visibility": {
+              "present": false,
+              "type": "nil"
+            },
+            "legacy_unowned": {
+              "present": false,
+              "type": "nil"
+            }
+          },
+          "recipe-prod-research_material_imersite-4": {
+            "current_owned": {
+              "present": false,
+              "type": "nil"
+            },
+            "legacy_disabled": {
+              "present": false,
+              "type": "nil"
+            },
+            "legacy_visibility": {
+              "present": false,
+              "type": "nil"
+            },
+            "legacy_unowned": {
+              "present": false,
+              "type": "nil"
+            }
+          }
+        }
+      },
+      "foreign_saved": {
+        "force_index": 9,
+        "staged_record": {
+          "present": false,
+          "type": "nil"
+        },
+        "cap_rows": {
+          "mir-k2-imersite-staged-state-1": {
+            "current_owned": {
+              "present": false,
+              "type": "nil"
+            },
+            "legacy_disabled": {
+              "present": false,
+              "type": "nil"
+            },
+            "legacy_visibility": {
+              "present": false,
+              "type": "nil"
+            },
+            "legacy_unowned": {
+              "present": false,
+              "type": "nil"
+            }
+          },
+          "mir-k2-imersite-continuation-state-4": {
+            "current_owned": {
+              "present": false,
+              "type": "nil"
+            },
+            "legacy_disabled": {
+              "present": false,
+              "type": "nil"
+            },
+            "legacy_visibility": {
+              "present": false,
+              "type": "nil"
+            },
+            "legacy_unowned": {
+              "present": false,
+              "type": "nil"
+            }
+          },
+          "recipe-prod-research_material_imersite-1": {
+            "current_owned": {
+              "present": false,
+              "type": "nil"
+            },
+            "legacy_disabled": {
+              "present": false,
+              "type": "nil"
+            },
+            "legacy_visibility": {
+              "present": false,
+              "type": "nil"
+            },
+            "legacy_unowned": {
+              "present": false,
+              "type": "nil"
+            }
+          },
+          "recipe-prod-research_material_imersite-4": {
+            "current_owned": {
+              "present": false,
+              "type": "nil"
+            },
+            "legacy_disabled": {
+              "present": false,
+              "type": "nil"
+            },
+            "legacy_visibility": {
+              "present": false,
+              "type": "nil"
+            },
+            "legacy_unowned": {
+              "present": false,
+              "type": "nil"
+            }
+          }
+        }
+      }
+    },
+    {
+      "stage": "before-MIR-configuration-body",
+      "context": "more-infinite-research",
+      "read_only_load": false,
+      "namespace_type": "table",
+      "adoption_type": "table",
+      "staged_type": "table",
+      "maximum_level_control_type": "table",
+      "current_caps_type": "nil",
+      "player_saved": {
+        "force_index": 1,
+        "staged_record": {
+          "present": false,
+          "type": "nil"
+        },
+        "cap_rows": {
+          "mir-k2-imersite-staged-state-1": {
+            "current_owned": {
+              "present": false,
+              "type": "nil"
+            },
+            "legacy_disabled": {
+              "present": false,
+              "type": "nil"
+            },
+            "legacy_visibility": {
+              "present": false,
+              "type": "nil"
+            },
+            "legacy_unowned": {
+              "present": false,
+              "type": "nil"
+            }
+          },
+          "mir-k2-imersite-continuation-state-4": {
+            "current_owned": {
+              "present": false,
+              "type": "nil"
+            },
+            "legacy_disabled": {
+              "present": false,
+              "type": "nil"
+            },
+            "legacy_visibility": {
+              "present": false,
+              "type": "nil"
+            },
+            "legacy_unowned": {
+              "present": false,
+              "type": "nil"
+            }
+          },
+          "recipe-prod-research_material_imersite-1": {
+            "current_owned": {
+              "present": false,
+              "type": "nil"
+            },
+            "legacy_disabled": {
+              "present": false,
+              "type": "nil"
+            },
+            "legacy_visibility": {
+              "present": false,
+              "type": "nil"
+            },
+            "legacy_unowned": {
+              "present": false,
+              "type": "nil"
+            }
+          },
+          "recipe-prod-research_material_imersite-4": {
+            "current_owned": {
+              "present": false,
+              "type": "nil"
+            },
+            "legacy_disabled": {
+              "present": false,
+              "type": "nil"
+            },
+            "legacy_visibility": {
+              "present": false,
+              "type": "nil"
+            },
+            "legacy_unowned": {
+              "present": false,
+              "type": "nil"
+            }
+          }
+        }
+      },
+      "foreign_saved": {
+        "force_index": 9,
+        "staged_record": {
+          "present": false,
+          "type": "nil"
+        },
+        "cap_rows": {
+          "mir-k2-imersite-staged-state-1": {
+            "current_owned": {
+              "present": false,
+              "type": "nil"
+            },
+            "legacy_disabled": {
+              "present": false,
+              "type": "nil"
+            },
+            "legacy_visibility": {
+              "present": false,
+              "type": "nil"
+            },
+            "legacy_unowned": {
+              "present": false,
+              "type": "nil"
+            }
+          },
+          "mir-k2-imersite-continuation-state-4": {
+            "current_owned": {
+              "present": false,
+              "type": "nil"
+            },
+            "legacy_disabled": {
+              "present": false,
+              "type": "nil"
+            },
+            "legacy_visibility": {
+              "present": false,
+              "type": "nil"
+            },
+            "legacy_unowned": {
+              "present": false,
+              "type": "nil"
+            }
+          },
+          "recipe-prod-research_material_imersite-1": {
+            "current_owned": {
+              "present": false,
+              "type": "nil"
+            },
+            "legacy_disabled": {
+              "present": false,
+              "type": "nil"
+            },
+            "legacy_visibility": {
+              "present": false,
+              "type": "nil"
+            },
+            "legacy_unowned": {
+              "present": false,
+              "type": "nil"
+            }
+          },
+          "recipe-prod-research_material_imersite-4": {
+            "current_owned": {
+              "present": false,
+              "type": "nil"
+            },
+            "legacy_disabled": {
+              "present": false,
+              "type": "nil"
+            },
+            "legacy_visibility": {
+              "present": false,
+              "type": "nil"
+            },
+            "legacy_unowned": {
+              "present": false,
+              "type": "nil"
+            }
+          }
+        }
+      },
+      "player": {
+        "present": true,
+        "force_index": 1,
+        "technologies": {
+          "mir-k2-imersite-staged-state-1": {
+            "present": true,
+            "level": 4,
+            "researched": false,
+            "enabled": true,
+            "visible_when_disabled": false,
+            "saved_progress": 0,
+            "prototype_enabled": true,
+            "prototype_hidden": true,
+            "prototype_max_level": 4294967295
+          },
+          "mir-k2-imersite-continuation-state-4": {
+            "present": true,
+            "level": 6,
+            "researched": false,
+            "enabled": true,
+            "visible_when_disabled": false,
+            "saved_progress": 0,
+            "prototype_enabled": true,
+            "prototype_hidden": true,
+            "prototype_max_level": 4294967295
+          },
+          "recipe-prod-research_material_imersite-1": {
+            "present": false
+          },
+          "recipe-prod-research_material_imersite-4": {
+            "present": false
+          }
+        },
+        "queue": [
+          "mir-k2-imersite-continuation-state-4",
+          "mir-k2-imersite-continuation-state-4"
+        ],
+        "powder_bonus": 0.1,
+        "current": "mir-k2-imersite-continuation-state-4",
+        "research_progress": 0.42000000000000004
+      },
+      "foreign": {
+        "present": true,
+        "force_index": 9,
+        "technologies": {
+          "mir-k2-imersite-staged-state-1": {
+            "present": true,
+            "level": 4,
+            "researched": false,
+            "enabled": true,
+            "visible_when_disabled": false,
+            "saved_progress": 0,
+            "prototype_enabled": true,
+            "prototype_hidden": true,
+            "prototype_max_level": 4294967295
+          },
+          "mir-k2-imersite-continuation-state-4": {
+            "present": true,
+            "level": 6,
+            "researched": false,
+            "enabled": true,
+            "visible_when_disabled": false,
+            "saved_progress": 0.27,
+            "prototype_enabled": true,
+            "prototype_hidden": true,
+            "prototype_max_level": 4294967295
+          },
+          "recipe-prod-research_material_imersite-1": {
+            "present": false
+          },
+          "recipe-prod-research_material_imersite-4": {
+            "present": false
+          }
+        },
+        "queue": {},
+        "powder_bonus": 0.1,
+        "current": false,
+        "research_progress": 0
+      },
+      "mir_change": {
+        "old_version": "4.7.21003",
+        "new_version": "5.0.21000"
+      },
+      "fixture_change": {
+        "old_version": "0.1.0",
+        "new_version": "0.2.0"
+      }
+    },
+    {
+      "stage": "after-MIR-configuration-body",
+      "context": "more-infinite-research",
+      "read_only_load": false,
+      "namespace_type": "table",
+      "adoption_type": "table",
+      "staged_type": "table",
+      "maximum_level_control_type": "table",
+      "current_caps_type": "table",
+      "player_saved": {
+        "force_index": 1,
+        "staged_record": {
+          "present": false,
+          "type": "nil"
+        },
+        "cap_rows": {
+          "mir-k2-imersite-staged-state-1": {
+            "current_owned": {
+              "present": false,
+              "type": "nil"
+            },
+            "legacy_disabled": {
+              "present": false,
+              "type": "nil"
+            },
+            "legacy_visibility": {
+              "present": false,
+              "type": "nil"
+            },
+            "legacy_unowned": {
+              "present": false,
+              "type": "nil"
+            }
+          },
+          "mir-k2-imersite-continuation-state-4": {
+            "current_owned": {
+              "present": false,
+              "type": "nil"
+            },
+            "legacy_disabled": {
+              "present": false,
+              "type": "nil"
+            },
+            "legacy_visibility": {
+              "present": false,
+              "type": "nil"
+            },
+            "legacy_unowned": {
+              "present": false,
+              "type": "nil"
+            }
+          },
+          "recipe-prod-research_material_imersite-1": {
+            "current_owned": {
+              "present": false,
+              "type": "nil"
+            },
+            "legacy_disabled": {
+              "present": false,
+              "type": "nil"
+            },
+            "legacy_visibility": {
+              "present": false,
+              "type": "nil"
+            },
+            "legacy_unowned": {
+              "present": false,
+              "type": "nil"
+            }
+          },
+          "recipe-prod-research_material_imersite-4": {
+            "current_owned": {
+              "present": false,
+              "type": "nil"
+            },
+            "legacy_disabled": {
+              "present": false,
+              "type": "nil"
+            },
+            "legacy_visibility": {
+              "present": false,
+              "type": "nil"
+            },
+            "legacy_unowned": {
+              "present": false,
+              "type": "nil"
+            }
+          }
+        }
+      },
+      "foreign_saved": {
+        "force_index": 9,
+        "staged_record": {
+          "present": false,
+          "type": "nil"
+        },
+        "cap_rows": {
+          "mir-k2-imersite-staged-state-1": {
+            "current_owned": {
+              "present": false,
+              "type": "nil"
+            },
+            "legacy_disabled": {
+              "present": false,
+              "type": "nil"
+            },
+            "legacy_visibility": {
+              "present": false,
+              "type": "nil"
+            },
+            "legacy_unowned": {
+              "present": false,
+              "type": "nil"
+            }
+          },
+          "mir-k2-imersite-continuation-state-4": {
+            "current_owned": {
+              "present": false,
+              "type": "nil"
+            },
+            "legacy_disabled": {
+              "present": false,
+              "type": "nil"
+            },
+            "legacy_visibility": {
+              "present": false,
+              "type": "nil"
+            },
+            "legacy_unowned": {
+              "present": false,
+              "type": "nil"
+            }
+          },
+          "recipe-prod-research_material_imersite-1": {
+            "current_owned": {
+              "present": false,
+              "type": "nil"
+            },
+            "legacy_disabled": {
+              "present": false,
+              "type": "nil"
+            },
+            "legacy_visibility": {
+              "present": false,
+              "type": "nil"
+            },
+            "legacy_unowned": {
+              "present": false,
+              "type": "nil"
+            }
+          },
+          "recipe-prod-research_material_imersite-4": {
+            "current_owned": {
+              "present": false,
+              "type": "nil"
+            },
+            "legacy_disabled": {
+              "present": false,
+              "type": "nil"
+            },
+            "legacy_visibility": {
+              "present": false,
+              "type": "nil"
+            },
+            "legacy_unowned": {
+              "present": false,
+              "type": "nil"
+            }
+          }
+        }
+      },
+      "player": {
+        "present": true,
+        "force_index": 1,
+        "technologies": {
+          "mir-k2-imersite-staged-state-1": {
+            "present": true,
+            "level": 4,
+            "researched": false,
+            "enabled": true,
+            "visible_when_disabled": false,
+            "saved_progress": 0,
+            "prototype_enabled": true,
+            "prototype_hidden": true,
+            "prototype_max_level": 4294967295
+          },
+          "mir-k2-imersite-continuation-state-4": {
+            "present": true,
+            "level": 6,
+            "researched": false,
+            "enabled": true,
+            "visible_when_disabled": false,
+            "saved_progress": 0,
+            "prototype_enabled": true,
+            "prototype_hidden": true,
+            "prototype_max_level": 4294967295
+          },
+          "recipe-prod-research_material_imersite-1": {
+            "present": false
+          },
+          "recipe-prod-research_material_imersite-4": {
+            "present": false
+          }
+        },
+        "queue": [
+          "mir-k2-imersite-continuation-state-4",
+          "mir-k2-imersite-continuation-state-4"
+        ],
+        "powder_bonus": 0.1,
+        "current": "mir-k2-imersite-continuation-state-4",
+        "research_progress": 0.42000000000000004
+      },
+      "foreign": {
+        "present": true,
+        "force_index": 9,
+        "technologies": {
+          "mir-k2-imersite-staged-state-1": {
+            "present": true,
+            "level": 4,
+            "researched": false,
+            "enabled": true,
+            "visible_when_disabled": false,
+            "saved_progress": 0,
+            "prototype_enabled": true,
+            "prototype_hidden": true,
+            "prototype_max_level": 4294967295
+          },
+          "mir-k2-imersite-continuation-state-4": {
+            "present": true,
+            "level": 6,
+            "researched": false,
+            "enabled": true,
+            "visible_when_disabled": false,
+            "saved_progress": 0.27,
+            "prototype_enabled": true,
+            "prototype_hidden": true,
+            "prototype_max_level": 4294967295
+          },
+          "recipe-prod-research_material_imersite-1": {
+            "present": false
+          },
+          "recipe-prod-research_material_imersite-4": {
+            "present": false
+          }
+        },
+        "queue": {},
+        "powder_bonus": 0.1,
+        "current": false,
+        "research_progress": 0
+      },
+      "mir_change": {
+        "old_version": "4.7.21003",
+        "new_version": "5.0.21000"
+      },
+      "fixture_change": {
+        "old_version": "0.1.0",
+        "new_version": "0.2.0"
+      }
+    }
+  ],
+  "packet_sha256": "8F6DCB730F57E13F43F4DEBDFF48C2C86AFD8AFCB92BC86877190A4E08CC5CB1",
+  "caller_sha256": "441BFEC2BD948CA6B623B86EBC8815030E0542A0CD556F73168BC334661D8D9E",
+  "result_sha256": "35ACC486BF799EADDAED221321B30CE405045A8B5A7E628A3072A54E24C882A3",
+  "root_readback": {
+    "path": "build/qualification/k2se-own-records-trace-r05-controller/root-readback-r01.json",
+    "sha256": "ADACAA09AC9B86178C677D67CD21634171BDAAF17D137DF192F19C719E031168",
+    "files": 7,
+    "bytes_per_copy": 97937
+  },
+  "lossless_receipts": {
+    "path": "spec/evidence/k2se-own-records-native-receipts-r05.json.gz",
+    "sha256": "400E40A1D5C268A332829301144D1EB05FC322D7C987C505154848453A06F145",
+    "bytes": 19468,
+    "records": 4
+  },
+  "counts": {
+    "actual_native_processes": 1,
+    "labs": 0,
+    "saves": 0,
+    "cold_reloads": 0
+  },
+  "interpretation": "The exact PFA staged[1]/[9] records and all selected holder/public-ID literal cap rows are absent at all four stages; false-versus-missing representation is preserved. Both public IDs are absent. Holder levels4/6,effect.10,player duplicatequeue/.42 and foreign tail.27 survive; both foreign enabledflags aretrue before MIR configuration and unchangedafter. No observed staged/cap record authorizes guessed restoration.",
+  "remaining": "Isolate the earlier native mod/version/prototype/migration reset using a bounded unchanged-payload published control. Do not infer enabled state from old numerical holder_snapshot or run the old finite-only policy as if it had run in fixture-only R04. Preserve originalforeign assertion until independent cause/oracle review; actual corrected-current successor/save/two reloads remain open."
+}
