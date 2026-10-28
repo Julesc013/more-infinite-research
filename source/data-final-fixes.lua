@@ -171,6 +171,13 @@ if require("platform.target").recipe_productivity == true then
   end
 end
 
+-- Published MIR 1.2 combined rocket/cannon levels retain their rocket effect
+-- publicly.  Stage one explicit cannon-only holder beside that already-built
+-- row so runtime can preserve earned levels without changing either public
+-- stream or inspecting foreign prototypes.
+require("research.legacy_cannon_credit_definitions").append(
+  technologies, require("platform.target"), data.raw)
+
 local function finite_effect_number(value)
   return type(value) == "number" and value == value and value > -math.huge and value < math.huge
 end

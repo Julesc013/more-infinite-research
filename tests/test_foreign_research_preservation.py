@@ -450,7 +450,7 @@ class ForeignResearchPreservationTests(unittest.TestCase):
           end})
           local original_effects, original_unit = foreign.effects,foreign.unit
           settings,mods,data,helpers,log={startup=defaults()},{},environment,nil,function() end
-          assert(dofile(data_final_path) == nil and environment.writes == 1 and #environment.emitted == 77)
+          assert(dofile(data_final_path) == nil and environment.writes == 1 and #environment.emitted == 78)
           local science_pack_productivity
           for _, row in ipairs(environment.emitted) do
             if row.name == "recipe-prod-research_science_pack_productivity-1" then

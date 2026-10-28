@@ -13,10 +13,11 @@ local settings_commands = require("runtime.settings_commands")
 local passive_repair = require("runtime.passive_repair")
 local effective = require("runtime.configuration")
 local target = require("platform.target")
-local native_credits, legacy_module_credits
+local native_credits, legacy_module_credits, legacy_cannon_credits
 if target.recipe_productivity == true then
   native_credits = require("runtime.native_credits")
   legacy_module_credits = require("runtime.legacy_module_credits")
+  legacy_cannon_credits = require("runtime.legacy_cannon_credits")
 end
 local spoilage_contribution = require("runtime.spoilage_contribution")
 local repair_config = {enabled = effective.passive_repair_enabled == true}
@@ -330,6 +331,7 @@ local function on_configuration_changed(event)
     native_credits.preflight_legacy_preference_transition(event, relevant_competing_provider_transition(event))
   end
   local module_credit_plan = legacy_module_credits and legacy_module_credits.preflight(event)
+  local cannon_credit_plan = legacy_cannon_credits and legacy_cannon_credits.preflight(event)
   reconcile_imersite()
   lifecycle.on_configuration_changed(event)
   if native_credits then native_credits.on_configuration_changed(event) end
@@ -355,6 +357,7 @@ local function on_configuration_changed(event)
     end
   end
   if legacy_module_credits then legacy_module_credits.apply(module_credit_plan) end
+  if legacy_cannon_credits then legacy_cannon_credits.apply(cannon_credit_plan) end
   library.on_configuration_changed(event)
   reconcile_repair()
   reconcile_translations()
@@ -466,6 +469,7 @@ local function on_technology_effects_reset(event)
   if competing_productivity then competing_productivity.on_technology_effects_reset(event) end
   if scripted_effects then scripted_effects.on_technology_effects_reset(event) end
   if legacy_module_credits then legacy_module_credits.on_technology_effects_reset(event) end
+  if legacy_cannon_credits then legacy_cannon_credits.on_technology_effects_reset(event) end
   request_library_refresh(event)
 end
 
@@ -521,6 +525,9 @@ local function on_forces_merged(event)
   if scripted_effects then scripted_effects.on_forces_merged(event) end
   if legacy_module_credits and event and event.destination then
     legacy_module_credits.on_technology_effects_reset({force=event.destination})
+  end
+  if legacy_cannon_credits and event and event.destination then
+    legacy_cannon_credits.on_technology_effects_reset({force=event.destination})
   end
   request_library_refresh(event)
 end

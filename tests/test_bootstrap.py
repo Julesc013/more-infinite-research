@@ -27,6 +27,7 @@ class BootstrapTests(unittest.TestCase):
             NATIVE_CREDIT_ACTIVE = native_credit_active == true
             credit_calls = {}
             module_credit_calls = {}
+            cannon_credit_calls = {}
             configuration_order = {}
             package.preload["platform.target"] = function()
               local target = dofile(player_root .. "/platform/target.lua")
@@ -69,6 +70,23 @@ class BootstrapTests(unittest.TestCase):
                 end,
                 on_technology_effects_reset = function(event)
                   module_credit_calls.reset = event
+                end
+              }
+            end
+            package.preload["runtime.legacy_cannon_credits"] = function()
+              return {
+                preflight = function(event)
+                  cannon_credit_calls.preflight = event
+                  table.insert(configuration_order, "cannon-credit-preflight")
+                  if CANNON_CREDIT_PREFLIGHT_ERROR then error(CANNON_CREDIT_PREFLIGHT_ERROR) end
+                  return {snapshot = true}
+                end,
+                apply = function(plan)
+                  cannon_credit_calls.plan = plan
+                  table.insert(configuration_order, "cannon-credit-apply")
+                end,
+                on_technology_effects_reset = function(event)
+                  cannon_credit_calls.reset = event
                 end
               }
             end
@@ -216,6 +234,7 @@ class BootstrapTests(unittest.TestCase):
             package.loaded["platform.target"] = nil
             package.loaded["runtime.native_credits"] = nil
             package.loaded["runtime.legacy_module_credits"] = nil
+            package.loaded["runtime.legacy_cannon_credits"] = nil
             package.loaded["runtime.configuration"] = nil
             package.loaded["runtime.lifecycle"] = nil
             package.loaded["runtime.scripted_effects"] = nil
@@ -364,9 +383,11 @@ class BootstrapTests(unittest.TestCase):
             and credit_calls.on_load == 1)
           assert(configuration_order[1] == "native-credit-preflight"
             and configuration_order[2] == "module-credit-preflight"
-            and configuration_order[3] == "lifecycle"
-            and configuration_order[4] == "native-credit-reconcile"
-            and configuration_order[5] == "module-credit-apply")
+            and configuration_order[3] == "cannon-credit-preflight"
+            and configuration_order[4] == "lifecycle"
+            and configuration_order[5] == "native-credit-reconcile"
+            and configuration_order[6] == "module-credit-apply"
+            and configuration_order[7] == "cannon-credit-apply")
           assert(credit_calls.last_preflight_provider_relevant == false,
             "ordinary Base upgrade was marked as a competing-provider transition")
           for _, id in ipairs({1, 2, 3, 20}) do assert(type(handlers.events[id]) == "function") end
@@ -393,6 +414,20 @@ class BootstrapTests(unittest.TestCase):
           local ok, message = pcall(handlers.configuration, event)
           assert(not ok and tostring(message):find(MODULE_CREDIT_PREFLIGHT_ERROR, 1, true))
           assert(module_credit_calls.preflight == event and module_credit_calls.plan == nil)
+          assert(next(cannon_credit_calls) == nil)
+          assert(lifecycle_calls.configuration == nil and credit_calls.on_configuration_changed == nil
+            and library_calls.configuration == nil)
+        ''')
+
+    def test_cannon_credit_preflight_precedes_all_configuration_writes(self):
+        self.lua.execute('''
+          install_modules(false, false, false, true); install_runtime(); load_control()
+          CANNON_CREDIT_PREFLIGHT_ERROR = "invalid legacy cannon shape"
+          local event = {mod_changes={}}
+          local ok, message = pcall(handlers.configuration, event)
+          assert(not ok and tostring(message):find(CANNON_CREDIT_PREFLIGHT_ERROR, 1, true))
+          assert(module_credit_calls.preflight == event and module_credit_calls.plan == nil)
+          assert(cannon_credit_calls.preflight == event and cannon_credit_calls.plan == nil)
           assert(lifecycle_calls.configuration == nil and credit_calls.on_configuration_changed == nil
             and library_calls.configuration == nil)
         ''')
@@ -402,17 +437,22 @@ class BootstrapTests(unittest.TestCase):
           install_modules(false, false, false, true); install_runtime(); load_control()
           handlers.init(); handlers.load()
           assert(next(module_credit_calls) == nil)
+          assert(next(cannon_credit_calls) == nil)
           local event = {mod_changes={}}
           handlers.configuration(event)
           assert(module_credit_calls.preflight == event and module_credit_calls.plan.snapshot == true)
+          assert(cannon_credit_calls.preflight == event and cannon_credit_calls.plan.snapshot == true)
           handlers.events[20]({force=player.force})
           assert(module_credit_calls.reset.force == player.force)
+          assert(cannon_credit_calls.reset.force == player.force)
           handlers.events[3]({destination=player.force, source_index=2})
           assert(module_credit_calls.reset.force == player.force)
+          assert(cannon_credit_calls.reset.force == player.force)
           for _, id in ipairs({4, 5, 6, 19}) do assert(handlers.events[id] == nil) end
           install_modules(false, false, false, false); remote.interfaces = {}; load_control()
           handlers.init(); handlers.configuration(event); handlers.load()
           assert(next(module_credit_calls) == nil)
+          assert(next(cannon_credit_calls) == nil)
         ''')
 
     def test_native_credit_preflight_marks_a_named_removed_provider_relevant(self):

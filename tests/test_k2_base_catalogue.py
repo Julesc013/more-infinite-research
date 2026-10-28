@@ -265,6 +265,7 @@ class K2BaseCatalogueTests(unittest.TestCase):
         raw = {
             "technology": {name: {} for name in subset["native_technology_names"]},
             "recipe": {name: {} for name in subset["native_recipe_names"]},
+            "ammo-category": {"cannon-shell": {}},
             "tool": {name: {} for name in cls.facts["standard_science"]},
             "lab": {cls.facts["advanced_lab"]["name"]: {"inputs": cls.facts["advanced_lab"]["inputs"]}},
             "item": {},
