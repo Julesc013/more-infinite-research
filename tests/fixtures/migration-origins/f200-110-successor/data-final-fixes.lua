@@ -46,8 +46,15 @@ assert(gear == 1 and type(direct.unit) == "table" and type(direct.unit.ingredien
 
 local modules = assert(data.raw.technology["recipe-prod-research_modules-1"],
   "[mir5-migration-origin-f200-110-successor] candidate module technology is absent")
-assert(modules.enabled == selected_target.modules_enabled,
-  "[mir5-migration-origin-f200-110-successor] candidate module enabled state differs")
+-- TechnologyPrototype's enabled default is true.  Current MIR deliberately
+-- omits the raw field for that default, while the disabled sibling authors
+-- the only non-default representation explicitly.
+local module_enabled = modules.enabled
+if module_enabled == nil then module_enabled = true end
+assert(type(module_enabled) == "boolean" and module_enabled == selected_target.modules_enabled,
+  "[mir5-migration-origin-f200-110-successor] candidate module enabled state differs expected="
+    .. tostring(selected_target.modules_enabled) .. " raw-type=" .. type(modules.enabled)
+    .. " effective=" .. (type(module_enabled) == "boolean" and tostring(module_enabled) or "invalid"))
 
 -- The protected source has its own historical cost/time. Accelerate only the
 -- one new candidate lab after validating the candidate's native definition.

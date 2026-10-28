@@ -68,17 +68,20 @@ def lua(runtime, value):
 
 class MigrationOriginF200110SuccessorControls(unittest.TestCase):
     def candidate_raw(self, modules_enabled=True):
+        modules = {"type": "technology", "name": MODULES, "level": 1, "upgrade": True,
+                   "max_level": "infinite",
+                   "unit": {"count_formula": "9000*1.2^(L-1)", "time": 120,
+                            "ingredients": [["automation-science-pack", 1]]},
+                   "effects": [{"type": "change-recipe-productivity", "recipe": "speed-module", "change": .10}]}
+        if not modules_enabled:
+            modules["enabled"] = False
         return {"technology": {
             DIRECT: {"type": "technology", "name": DIRECT, "level": 1, "upgrade": True,
                      "max_level": "infinite", "enabled": True,
                      "unit": {"count_formula": "9000*1.2^(L-1)", "time": 120,
                               "ingredients": [["automation-science-pack", 1]]},
                      "effects": [{"type": "change-recipe-productivity", "recipe": "iron-gear-wheel", "change": .10}]},
-            MODULES: {"type": "technology", "name": MODULES, "level": 1, "upgrade": True,
-                      "max_level": "infinite", "enabled": modules_enabled,
-                      "unit": {"count_formula": "9000*1.2^(L-1)", "time": 120,
-                               "ingredients": [["automation-science-pack", 1]]},
-                      "effects": [{"type": "change-recipe-productivity", "recipe": "speed-module", "change": .10}]},
+            MODULES: modules,
         }, "sentinel": {"unchanged": 43}}
 
     def source_settings(self):
@@ -248,6 +251,11 @@ class MigrationOriginF200110SuccessorControls(unittest.TestCase):
         self.assertEqual((1, None, 1), (accepted["raw"]["technology"][DIRECT]["unit"].get("count"),
                                          accepted["raw"]["technology"][DIRECT]["unit"].get("count_formula"),
                                          accepted["raw"]["technology"][DIRECT]["unit"]["time"]))
+        explicit_true = self.candidate_raw()
+        explicit_true["technology"][MODULES]["enabled"] = True
+        accepted = self.run_data(explicit_true, f210_source_defaults, source_settings)
+        self.assertTrue(accepted["ok"], accepted["message"])
+        self.assertTrue(accepted["raw"]["technology"][MODULES]["enabled"])
         variants = []
         wrong_target = dict(f200); wrong_target["base"] = "2.1.23"; variants.append(("target", self.candidate_raw(), wrong_target))
         missing_observer = dict(f200); missing_observer.pop("mir-fixture-mir5-active-mods-observer"); variants.append(("observer", self.candidate_raw(), missing_observer))
@@ -262,7 +270,17 @@ class MigrationOriginF200110SuccessorControls(unittest.TestCase):
         wrong_module = dict(disabled_settings); wrong_module["ips-enable-research_modules"] = True
         variants.append(("disabled-setting", self.candidate_raw(False), disabled, wrong_module,
                          "ips-enable-research_modules expected=false actual=true"))
-        variants.append(("disabled-public", self.candidate_raw(True), disabled, disabled_settings,
+        disabled_public = self.candidate_raw()
+        disabled_public["technology"][MODULES]["enabled"] = True
+        variants.append(("disabled-public", disabled_public, disabled, disabled_settings,
+                         "candidate module enabled state differs"))
+        variants.append(("disabled-nil", self.candidate_raw(), disabled, disabled_settings,
+                         "candidate module enabled state differs"))
+        variants.append(("enabled-false", self.candidate_raw(False), f210_source_defaults, source_settings,
+                         "candidate module enabled state differs"))
+        malformed_enabled = self.candidate_raw()
+        malformed_enabled["technology"][MODULES]["enabled"] = "true"
+        variants.append(("enabled-malformed", malformed_enabled, f210_source_defaults, source_settings,
                          "candidate module enabled state differs"))
         for variant in variants:
             label, raw, mods = variant[:3]
