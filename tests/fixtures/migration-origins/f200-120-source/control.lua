@@ -36,9 +36,47 @@ local function signature(value)
   return tostring(value.type) .. "|unexpected"
 end
 
+-- Data-stage facts retain their exact published decimal spelling. Runtime
+-- technology prototypes expose the six known authored scalar values through
+-- float32. This is a finite representation admission, not a tolerance: any
+-- other nearby spelling remains a different effect.
+local RUNTIME_EFFECT_SCALARS = {
+  ["0.02"] = "0.02",
+  ["0.019999999552965164"] = "0.02",
+  ["0.050000000000000003"] = "0.050000000000000003",
+  ["0.05000000074505806"] = "0.050000000000000003",
+  ["0.10000000000000001"] = "0.10000000000000001",
+  ["0.10000000149011612"] = "0.10000000000000001",
+  ["0.20000000000000001"] = "0.20000000000000001",
+  ["0.20000000298023224"] = "0.20000000000000001",
+  ["0.29999999999999999"] = "0.29999999999999999",
+  ["0.30000001192092896"] = "0.29999999999999999",
+  ["0.40000000000000002"] = "0.40000000000000002",
+  ["0.40000000596046448"] = "0.40000000000000002"
+}
+
+local function runtime_scalar(value)
+  local text = string.format("%.17g", value)
+  return RUNTIME_EFFECT_SCALARS[text] or text
+end
+
+local function runtime_signature(value)
+  if value.type == "change-recipe-productivity" then return value.type .. "|" .. tostring(value.recipe) .. "|" .. runtime_scalar(value.change) end
+  if value.type == "worker-robot-battery" then return value.type .. "|" .. runtime_scalar(value.modifier) end
+  if value.type == "gun-speed" then return value.type .. "|" .. tostring(value.ammo_category) .. "|" .. runtime_scalar(value.modifier) end
+  return tostring(value.type) .. "|unexpected"
+end
+
 local function effects_signature(value)
   local rows = {}
   for _, effect in pairs(value.prototype.effects or {}) do rows[#rows + 1] = signature(effect) end
+  table.sort(rows)
+  return table.concat(rows, ",")
+end
+
+local function runtime_effects_signature(value)
+  local rows = {}
+  for _, effect in pairs(value.prototype.effects or {}) do rows[#rows + 1] = runtime_signature(effect) end
   table.sort(rows)
   return table.concat(rows, ",")
 end
@@ -58,7 +96,7 @@ local function source_rows(force)
       if expected == nil or name:sub(-#CATALOGUE.technology_suffix) ~= CATALOGUE.technology_suffix
           or value == nil or value.valid == false or value.prototype.level ~= expected.level
           or value.prototype.max_level ~= UINT32_MAX then fail("source runtime roster identity differs: " .. tostring(name)) end
-      if effects_signature(value) ~= expected_signature(expected.effects) then fail("source runtime effects differ: " .. name) end
+      if runtime_effects_signature(value) ~= expected_signature(expected.effects) then fail("source runtime effects differ: " .. name) end
       rows[#rows + 1], seen[name] = name, true
     end
   end
@@ -77,7 +115,7 @@ local function weapon_rows(force)
         or value.prototype.max_level ~= runtime.max_level then
       fail("finite weapon runtime level differs: " .. name)
     end
-    if effects_signature(value) ~= expected_signature(expected.effects) then fail("finite weapon effects differ: " .. name) end
+    if runtime_effects_signature(value) ~= expected_signature(expected.effects) then fail("finite weapon effects differ: " .. name) end
     rows[#rows + 1] = name
   end
   table.sort(rows)

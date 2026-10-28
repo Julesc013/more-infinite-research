@@ -188,6 +188,86 @@ class MigrationOriginF200120SourceControls(unittest.TestCase):
         self.assertNotIn('more-infinite-research"] ~= "5.', control)
         self.assertNotIn("count_formula = nil\n  direct.unit.count = 1\n  direct.unit.time = 60", control)
 
+    def test_runtime_effect_scalars_admit_only_the_known_float32_spellings(self):
+        self.lua.globals().fixture_control_path = (FIXTURE / "control.lua").as_posix()
+        self.lua.execute(r'''
+          function migration_origin_120_runtime_effect_scalars(case)
+            local callbacks={events={}}
+            local env={script={on_init=function(fn)callbacks.init=fn end,on_load=function()end,
+              on_event=function(event,fn)callbacks.events[event]=fn end},
+              defines={events={on_research_finished=1,on_tick=2},inventory={lab_input=1}}}
+            env.require=function(name)
+              assert(name=="__mir-fixture-mir5-migration-origin-f200-120-source__/catalogue")
+              return assert(loadfile(catalogue_path,"t",env))()
+            end
+            env._G=env;setmetatable(env,{__index=_G})
+            assert(loadfile(fixture_control_path,"t",env))()
+            local function upvalue(fn, wanted)
+              for index=1,64 do
+                local name,value=debug.getupvalue(fn,index)
+                if name==nil then break end
+                if name==wanted then return value end
+              end
+              error("missing upvalue " .. wanted)
+            end
+            local catalogue=env.require("__mir-fixture-mir5-migration-origin-f200-120-source__/catalogue")
+            local float32={
+              ["0.02"]=0.019999999552965164,["0.050000000000000003"]=0.05000000074505806,
+              ["0.10000000000000001"]=0.10000000149011612,["0.20000000000000001"]=0.20000000298023224,
+              ["0.29999999999999999"]=0.30000001192092896,["0.40000000000000002"]=0.40000000596046448}
+            local function native_effects(source)
+              local out={}
+              for index,effect in ipairs(source) do
+                local copy={};for key,value in pairs(effect) do copy[key]=value end
+                local field=copy.change~=nil and "change" or (copy.modifier~=nil and "modifier" or nil)
+                if field~=nil then copy[field]=float32[string.format("%.17g",copy[field])] or copy[field] end
+                out[index]=copy
+              end
+              return out
+            end
+            local technologies={}
+            for name,row in pairs(catalogue.rows) do
+              technologies[name]={name=name,valid=true,level=row.level,researched=false,enabled=true,
+                prototype={level=row.level,max_level=4294967295,effects=native_effects(row.effects)}}
+            end
+            for name,row in pairs(catalogue.weapons) do
+              local runtime=catalogue.weapon_runtime[name]
+              technologies[name]={name=name,valid=true,level=runtime.level,researched=false,enabled=true,
+                prototype={level=runtime.level,max_level=runtime.max_level,effects=native_effects(row.effects)}}
+            end
+            if case=="recipe-nearby" then
+              technologies[catalogue.direct].prototype.effects[1].change=0.10000000149011613
+            elseif case=="recipe-duplicate" then
+              local effect=technologies[catalogue.direct].prototype.effects[1]
+              table.insert(technologies[catalogue.direct].prototype.effects,{type=effect.type,recipe=effect.recipe,change=effect.change})
+            elseif case=="gun-nearby" then
+              technologies["weapon-shooting-speed-1"].prototype.effects[1].modifier=0.10000000149011613
+            elseif case=="gun-duplicate" then
+              local effect=technologies["weapon-shooting-speed-1"].prototype.effects[1]
+              table.insert(technologies["weapon-shooting-speed-1"].prototype.effects,{type=effect.type,ammo_category=effect.ammo_category,modifier=effect.modifier})
+            end
+            local force={technologies=technologies}
+            local source_rows=upvalue(callbacks.init,"source_rows")
+            local weapon_rows=upvalue(callbacks.init,"weapon_rows")
+            local ok,message=pcall(function()
+              if case:sub(1,6)=="recipe" then source_rows(force) else weapon_rows(force) end
+            end)
+            return {ok=ok,message=tostring(message)}
+          end
+        ''')
+        invoke = self.lua.eval("migration_origin_120_runtime_effect_scalars")
+        for case in ("recipe-native", "gun-native"):
+            accepted = py(invoke(case))
+            self.assertTrue(accepted["ok"], accepted["message"])
+        for case, expected in (("recipe-nearby", "source runtime effects differ"),
+                               ("recipe-duplicate", "source runtime effects differ"),
+                               ("gun-nearby", "finite weapon effects differ"),
+                               ("gun-duplicate", "finite weapon effects differ")):
+            with self.subTest(case=case):
+                rejected = py(invoke(case))
+                self.assertFalse(rejected["ok"])
+                self.assertIn(expected, rejected["message"])
+
     def test_runtime_snapshot_refuses_an_incomplete_cannon_contribution(self):
         self.lua.globals().fixture_control_path = (FIXTURE / "control.lua").as_posix()
         self.lua.execute(r'''
