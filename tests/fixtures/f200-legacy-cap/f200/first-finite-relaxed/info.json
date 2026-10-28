@@ -1,0 +1,9 @@
+{
+  "name": "mir-fixture-mir5-f200-legacy-cap",
+  "version": "0.15.0",
+  "title": "MIR F200 relaxation after its first enabled finite-cap hold",
+  "author": "MIR maintainers",
+  "description": "Disposable cap40 successor of the exact0.14 F200 enabled-family cap2 hold.",
+  "factorio_version": "2.0",
+  "dependencies": ["base = 2.0.77", "more-infinite-research = 5.0.20000"]
+}
