@@ -109,7 +109,10 @@ end
 -- result for event owners that want diagnostics. `unresolved_current` exposes
 -- an over-cap current technology that the supplied queue did not remove;
 -- callers must not guess a different native cancellation API from this module.
-function M.reconcile(force, limits, owned_disabled, targets)
+-- `imported_reenabled` is an optional configuration-local map of exact newly
+-- imported record identities. It authorizes only this new enabled -> disabled
+-- write, never replacing an existing negative or persisting the proof itself.
+function M.reconcile(force, limits, owned_disabled, targets, imported_reenabled)
   local caps = checked_limits(limits)
   if type(owned_disabled) ~= "table" then
     error("MIR caps owned_disabled must be a table", 2)
@@ -145,10 +148,16 @@ function M.reconcile(force, limits, owned_disabled, targets)
       local previously_observed = type(record) == "table"
       owned, record = ensure_record(owned_disabled, force.index, owned, name)
       if record.disabled == nil then
-        -- A legacy visibility-only row already proves foreign disablement.
+        -- A visibility-only row normally retains its foreign baseline.
         -- Record the first baseline once: native resets/reconfiguration can
         -- re-enable this row while the same finite cap is still in force.
-        record.disabled = not previously_observed and technology.enabled == true
+        -- The configuration owner may identify an exact newly imported row
+        -- whose validated positive proof accompanied this live re-enablement.
+        -- Bind that transient exception to its table identity and this actual
+        -- new write; existing negatives and ordinary visibility rows win.
+        local first_import_write = type(imported_reenabled) == "table"
+          and imported_reenabled[name] == record
+        record.disabled = technology.enabled == true and (not previously_observed or first_import_write)
       end
       if technology.visible_when_disabled ~= true then
         if record.visible_when_disabled == nil then
