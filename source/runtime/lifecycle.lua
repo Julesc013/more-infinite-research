@@ -249,8 +249,8 @@ local function retained_authored_prototype_disablement(force, name)
   return authored_generated_prototype_disabled(force, row) ~= nil
 end
 
--- This runs only during initialization/configuration, over the compact
--- authored declaration list. It does not enumerate a force's technologies.
+-- This runs at configuration and rare force/effects-reset boundaries over
+-- the compact authored list. It never enumerates a force's technologies.
 -- A record exists only after this runtime changed an enabled technology to
 -- disabled, so later cap relaxation can restore neither a data-stage default
 -- nor foreign pre-disablement.
@@ -597,10 +597,16 @@ end
 local function reconcile_event(event, research_only)
   local force = event_force(event)
   if not force then return end
-  -- These callbacks are registered only while finite caps are active. Keep
-  -- the defensive direct-call path allocation-free for an unlimited fresh
-  -- save, while still restoring a retained owned or legacy-marker state.
+  -- Named research callbacks need only cap reconciliation. Rare force/reset
+  -- events also enforce authored disabled prototypes, even without a finite
+  -- cap or prior ledger. Allocate only when an actual policy write is needed.
   local current = CAPS_ACTIVE and ensure_state() or existing_state()
+  if not research_only then
+    if current == nil and reconcile_authored_prototype_disablement(force, nil) then
+      current = ensure_state()
+    end
+    if current then reconcile_authored_prototype_disablement(force, current.owned_disabled) end
+  end
   if not current then return end
   local research = event and event.research
   local name = research_only and research and research.name or nil

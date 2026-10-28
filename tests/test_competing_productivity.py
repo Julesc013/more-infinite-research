@@ -476,7 +476,7 @@ class CompetingProductivityTests(unittest.TestCase):
           package.preload["runtime.lifecycle"] = function()
             local module = {caps_active=function() return false end, cap_limits=function() return {} end,
               on_init=function() end, on_configuration_changed=function() end, on_load=function() end}
-            for _, name in ipairs({"on_force_created", "on_force_reset", "on_forces_merged"}) do
+            for _, name in ipairs({"on_force_created", "on_force_reset", "on_forces_merged", "on_technology_effects_reset"}) do
               module[name] = function(event) cleanup_calls[name] = (cleanup_calls[name] or 0) + 1 end
             end
             return module
@@ -529,7 +529,7 @@ class CompetingProductivityTests(unittest.TestCase):
           for _, name in ipairs({"on_init", "on_configuration_changed", "on_load", "on_force_created", "on_force_reset",
             "on_forces_merged", "on_research_finished", "on_research_started", "on_research_cancelled",
             "on_research_reversed", "on_technology_effects_reset"}) do assert(calls[name] == 1, name) end
-          for _, name in ipairs({"on_force_created", "on_force_reset", "on_forces_merged"}) do
+          for _, name in ipairs({"on_force_created", "on_force_reset", "on_forces_merged", "on_technology_effects_reset"}) do
             assert(cleanup_calls[name] == 1, "competing provider displaced force-ownership cleanup: " .. name)
           end
 

@@ -378,7 +378,8 @@ class BootstrapTests(unittest.TestCase):
             and lifecycle_calls.force_reset.force == player.force
             and lifecycle_calls.forces_merged.force == player.force,
             "registered force boundaries skipped retained cap-ownership cleanup")
-          assert(lifecycle_calls.effects_reset == nil)
+          assert(lifecycle_calls.effects_reset.force == player.force,
+            "unlimited effects reset skipped authored-prototype disablement")
           assert(storage.mir_native_credits == nil and handlers.nth[60] == nil and handlers.nth[61] == nil)
           install_modules(false, false, false, false); remote.interfaces = {}; load_control()
           for _, id in ipairs({1, 2, 3, 4, 5, 6, 19, 20}) do assert(handlers.events[id] == nil) end
@@ -551,7 +552,8 @@ class BootstrapTests(unittest.TestCase):
             and lifecycle_calls.forces_merged.source_index == 31
             and lifecycle_calls.forces_merged.destination == destination,
             "scripted force callbacks skipped retained cap-ownership cleanup")
-          assert(lifecycle_calls.research_reversed == nil and lifecycle_calls.effects_reset == nil)
+          assert(lifecycle_calls.research_reversed == nil and lifecycle_calls.effects_reset.force == destination,
+            "unlimited effects reset skipped authored-prototype disablement")
           assert(scripted_calls.research_reversed.research.name == "scripted"
             and scripted_calls.effects_reset.force == destination)
         ''')
