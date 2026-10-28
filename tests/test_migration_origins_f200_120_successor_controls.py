@@ -199,9 +199,9 @@ class MigrationOriginF200120SuccessorControls(unittest.TestCase):
         source = ("FDC9BA445B17716CAE7C021959B9B3BF4E1C7EE9F6485AA76DBCC59D70101CAC", 817810,
                   "C7FE9F69963FFCF27686A4F0C0E5F2C79079BCD4698CF25158997AC00A619E9A")
         for profile, target, version, fixture_hash, player_hash in (
-            (f210, "f210", "0.2.0", "3D808C2DB15BD57FEE3FE798FC796148CE7C91D26A5BF220905F3E03A8E64B64",
+            (f210, "f210", "0.2.0", "3E4E51C3E67DFF85A721BAE94D30106D90C9A74DC56387DE89AE48EB2D44AFF3",
              "654C57DDCE2E994C1E8DDC4F808198D4FAC7EAB6284B18C4A628E6DA5465DE23"),
-            (f200, "f200", "0.3.0", "D326BC8C4F493C8F8A27482C93F141E725B4705358267530C77AE84C452156A8",
+            (f200, "f200", "0.3.0", "FE670CD6DE44FE3164F65C9D7A1702483E4A7EC2D59351519169B63A4BA4F078",
              "20A200883EFB29F8D216EA408C688F1862C80612D536DCD4FCDDC1E47768541D"),
         ):
             with self.subTest(target=target):
@@ -210,6 +210,7 @@ class MigrationOriginF200120SuccessorControls(unittest.TestCase):
                                           profile["source_save"]["source_result_sha256"]))
                 self.assertEqual("f0dd9f62adc8bf0a8eaaf9babc1fcfef9f3241ea", profile["candidate"]["source_commit"])
                 self.assertEqual("0229b2bb3ad0c514fc4dca18c32fd544b9ba7d72", profile["candidate"]["player_tree"])
+                self.assertEqual("a715adbe89468ba6d6a88526920d2d93af611244", profile["successor_fixture_commit"])
                 self.assertEqual(fixture_hash, profile["archive_sha256"][f"{FIXTURE_NAME}_{version}.zip"])
                 self.assertEqual(player_hash, profile["archive_sha256"][f"more-infinite-research_5.0.{21000 if target == 'f210' else 20000}.zip"])
         self.assertIn("prepared only", f200["scope"])
