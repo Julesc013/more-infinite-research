@@ -3797,9 +3797,9 @@
       "additional_transition_cases": [
         {
           "boundary": "F1104.7.3 to F200",
-          "status": "needs-correction",
-          "problem": "Source r05 and a1fd/8BA recovered successor pass at exact older inputs.",
-          "next_action": "Compare consumed package members/save bridge before reusing, or execute the existing protected D524 source against current65FC with the existing bridge fixture. Retain outer-caller adverse.",
+          "status": "ready-to-execute",
+          "problem": "Protected D524 source and original a1fd/8BA successor remain exact original results. A separate current65FC/7a2/player505 profile and seven-member raw Git fixture are now prepared and guarded. Material changed data/control paths require fresh current bridge execution; old successor reuse is not claimed.",
+          "next_action": "The sole native owner binds the retained D524 save, D3/2.0.77 engine, current65FC archive, prepared0.2 fixture and committed generic input-save caller. Require17 rows/effects, stack-to-bulk capacity2/4,42-percent queued/27-percent detached work, foreign disablement, one new mining lab/save/two unchanged-byte cold reloads. Reuse the original source; do not recreate it or infer this bridge from a same-edition pass. This input packet is not another active or pending native assignment.",
           "evidence": [
             {
               "path": "spec/evidence/f110-f200-published-source-r05-native-chain.json",
@@ -3809,7 +3809,15 @@
               "path": "spec/evidence/f110-f200-a1fd-successor-recovery-chain.json",
               "sha256": "BA37B082C7AE2261423A1AA0C86D57FE8738601F27BF73A6D7B69FBC1B981948"
             }
-          ]
+          ],
+          "prepared_inputs": {
+            "path": "spec/evidence/f110-f200-current65fc-prepared-inputs-r01.json",
+            "sha256": "E634CBA6EDD2F834AD8277B006133950B980034FBEB9EADBCA08104D216E9728"
+          },
+          "current_profile": {
+            "path": "tests/profiles/f110-f200-transition-current65fc-f200-2077.json",
+            "sha256": "0B20051A3422C6FC393043DF005D7030A2096A48D4175747D32737BD75AC2393"
+          }
         },
         {
           "boundary": "F100 to F110 legacy-laser rename",
