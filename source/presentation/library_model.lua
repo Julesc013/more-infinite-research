@@ -150,6 +150,17 @@ local function declarations(catalogue)
   return rows, by_id
 end
 
+-- The runtime host supplies this compact exact set from its authored
+-- catalogue. It intentionally names only MIR's hidden migration-credit
+-- holders: foreign hidden technologies remain available to all/external
+-- views, and this pure model never imports emission or recovery modules.
+local function private_credit(context, id)
+  local ids = type(context) == "table" and context.private_credit_ids or nil
+  if type(ids) ~= "table" then return false end
+  local ok, value = pcall(function() return ids[id] end)
+  return ok and value == true
+end
+
 local function technology_for(force, id)
   return native_read(native_read(force, "technologies"), id)
 end
@@ -373,7 +384,7 @@ function M.rows(force, catalogue, view, translations, context)
     -- technology can be unavailable on the current platform; that is not a
     -- synthetic "missing" row or an availability state.  Detail still
     -- reports technology_not_found for a direct selection.
-    if technology ~= nil then
+    if technology ~= nil and not private_credit(context, id) then
       local row = row_for(force, by_id[id], id, technology, queue_count, queue_index, current, translations, context)
       row.hidden = normalized.hidden[id] == true
       if row_matches(row, normalized) then selected[#selected + 1] = row end
@@ -443,6 +454,7 @@ function M.detail(force, catalogue, view, translations, context)
   local normalized = M.normalize(view)
   local id = normalized.selected
   if id == nil then return nil, "no_selection" end
+  if private_credit(context, id) then return nil, "technology_not_found" end
   local declared, by_id = declarations(catalogue)
   local queue_count, queue_index, current = queue_facts(force)
   local technology = technology_for(force, id)

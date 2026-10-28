@@ -50,6 +50,11 @@ local TAB_INDEX = {research = 1, queue = 2, settings = 3, help = 4}
 -- Closing a view drops that working cache and retains only issued native IDs.
 local translation_caches = {}
 local declaration_cache
+-- Credit carriers are genuine native technologies for migration/runtime
+-- accounting, but never Library research. The catalogue supplies this small
+-- exact identity map at control parse; it is not inferred from hidden flags
+-- or native names.
+local private_credit_ids = catalogue.internal_credit_ids()
 
 -- Authored metadata is immutable within a loaded configuration. Build its
 -- private copy only for actual UI use; force/research/cap facts stay live.
@@ -73,6 +78,10 @@ end
 
 local function valid(value)
   return value ~= nil and value.valid ~= false
+end
+
+local function private_credit_id(id)
+  return type(id) == "string" and private_credit_ids[id] == true
 end
 
 local function player_for(index)
@@ -219,7 +228,7 @@ local function sort_from_index(value)
 end
 
 local function known_technology(player, id)
-  if not valid(player) or id == nil then return nil end
+  if not valid(player) or id == nil or private_credit_id(id) then return nil end
   local ok, technology = pcall(function()
     local force = player.force
     local technologies = force and force.technologies
@@ -455,11 +464,13 @@ local function ordered_translation_ids(player, family)
     if type(row) ~= "table" or type(row.id) ~= "string" or row.id == ""
         or #row.id > translation_queue.label_limit then return nil end
     declarations[row.id] = row
-    local declared_family = technology_id(row.family) or "mir"
-    local include_declared = family == "all"
-      or family == "mir" and declared_family ~= "external"
-      or family == declared_family
-    if include_declared and technology_exists(row.id) and not add_id(row.id) then return nil end
+    if not private_credit_id(row.id) then
+      local declared_family = technology_id(row.family) or "mir"
+      local include_declared = family == "all"
+        or family == "mir" and declared_family ~= "external"
+        or family == declared_family
+      if include_declared and technology_exists(row.id) and not add_id(row.id) then return nil end
+    end
   end
   if family ~= "all" and family ~= "external" then return ids end
 
@@ -480,10 +491,12 @@ local function ordered_translation_ids(player, family)
   if not scanned_ok or overflow then return nil end
   table.sort(native)
   for _, id in ipairs(native) do
-    local declaration = declarations[id]
-    local declared_family = declaration and technology_id(declaration.family) or "mir"
-    if family ~= "external" or declaration == nil or declared_family == "external" then
-      if not add_id(id) then return nil end
+    if not private_credit_id(id) then
+      local declaration = declarations[id]
+      local declared_family = declaration and technology_id(declaration.family) or "mir"
+      if family ~= "external" or declaration == nil or declared_family == "external" then
+        if not add_id(id) then return nil end
+      end
     end
   end
   return ids
@@ -651,15 +664,17 @@ local function model_view(view)
 end
 
 local function context_for(force)
-  if type(cap_provider) ~= "function" then return nil end
+  local context = {private_credit_ids = private_credit_ids}
+  if type(cap_provider) ~= "function" then return context end
   local ok, caps = pcall(cap_provider, force)
-  if not ok or type(caps) ~= "table" then return nil end
+  if not ok or type(caps) ~= "table" then return context end
   -- The model may ask this closure about several rows. It receives the same
   -- already-read snapshot and never causes another lifecycle/settings lookup.
-  return {cap_provider = function(observed_force)
+  context.cap_provider = function(observed_force)
     if observed_force ~= force then return nil end
     return caps
-  end}
+  end
+  return context
 end
 
 local EMPTY_TRANSLATIONS = {}
@@ -790,7 +805,8 @@ local function current_tick()
 end
 
 local function request_translation(player, key)
-  if not valid(player) or player.connected ~= true or type(player.request_translation) ~= "function" then return nil end
+  if private_credit_id(key) or not valid(player) or player.connected ~= true
+      or type(player.request_translation) ~= "function" then return nil end
   local ok, request_id = pcall(function()
     local force = player.force
     local technologies = force and force.technologies
@@ -1182,7 +1198,7 @@ local function queue_entries(force)
     for index, entry in ipairs(queue) do
       if index > MAX_PAGE then error("MIR Library queue limit") end
       local id = queue_name(entry)
-      if id then result[#result + 1] = id end
+      if id and not private_credit_id(id) then result[#result + 1] = id end
     end
   end)
   return complete and result or {}
@@ -1627,7 +1643,7 @@ function M.on_gui_click(event)
   }) then return end
   local view = view_for(player.index)
   local selected = technology_id(view.selected)
-  if selected == nil then return end
+  if selected == nil or private_credit_id(selected) then return end
   local technologies = player.force and player.force.technologies
   if technologies == nil then return end
   local ok, technology = pcall(function() return technologies[selected] end)

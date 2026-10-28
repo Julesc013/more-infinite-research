@@ -49,6 +49,8 @@ Version: 5.0.0
       new module research uses the corrected effects.
     - Preserve the earned cannon component of admitted MIR 1.2 combined rocket shooting speed through one hidden native credit using
       the retained rocket setting; new cannon research remains independent.
+    - Keep hidden migration credits out of Research Library lists, translation requests and native research actions while preserving
+      earned bonuses and ordinary foreign research inspection.
     - Keep authored disabled research unavailable after technology-effects resets and force lifecycle changes, including
       unlimited-cap configurations.
     - Restore the published visibility of all twenty retained Bob/Angel material setting families for admitted Factorio 2.1 Base and

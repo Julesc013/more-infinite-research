@@ -123,6 +123,30 @@ class LibraryModelTests(unittest.TestCase):
             and second_by_id["recipe-prod-research_gears-1"].settings[1] == "ips-enable-research_gears")
         ''')
 
+    def test_internal_credit_id_metadata_is_exact_and_detached(self):
+        self.lua.execute('''
+          local expected = {}
+          for _, descriptor in ipairs(require("research.legacy_module_credit_definitions").descriptors()) do
+            expected[descriptor.id] = true
+          end
+          expected[require("research.legacy_cannon_credit_definitions").descriptor().id] = true
+          local first, second = catalogue.internal_credit_ids(), catalogue.internal_credit_ids()
+          local count = 0
+          for id, value in pairs(first) do
+            assert(value == true and expected[id] == true, "unexpected private credit identity: " .. tostring(id))
+            count = count + 1
+          end
+          assert(count == 4)
+          for id in pairs(expected) do assert(first[id] == true and second[id] == true) end
+          local changed = "mir-legacy-module-credit-speed-module"
+          first[changed] = false
+          assert(second[changed] == true and catalogue.internal_credit_ids()[changed] == true,
+            "private credit metadata aliases caller state")
+          for _, row in ipairs(catalogue.declared()) do
+            assert(expected[row.id] == nil, "private credit leaked into authored Library declarations")
+          end
+        ''')
+
     def test_availability_is_small_authored_detached_and_checks_only_the_named_lab_owner(self):
         self.lua.execute('''
           local availability = require("presentation.availability")
@@ -392,6 +416,54 @@ class LibraryModelTests(unittest.TestCase):
             [id] = "Gear", [alpha.name] = "Alpha", [beta.name] = "Beta"
           })
           assert(scans == 2 and #all == 3 and all[1].id == id and all[2].id == beta.name and all[3].id == alpha.name)
+        ''')
+
+    def test_exact_private_credits_stay_out_of_library_views_and_detail(self):
+        self.lua.execute('''
+          local gear_id = "recipe-prod-research_gears-1"
+          local gear = technology(gear_id, {order = "p[gear]"})
+          local foreign = technology("foreign-hidden-technology", {order = "a[foreign]"})
+          foreign.prototype.hidden = true
+          local ids = {
+            "mir-legacy-module-credit-speed-module",
+            "mir-legacy-module-credit-productivity-module",
+            "mir-legacy-module-credit-efficiency-module",
+            "mir-legacy-cannon-credit-rocket-shooting-speed",
+          }
+          local technologies = {[gear_id] = gear, [foreign.name] = foreign}
+          for index, id in ipairs(ids) do
+            local holder = technology(id, {level = index + 1, enabled = false,
+              visible_when_disabled = false, order = "zz[private]-" .. index})
+            holder.prototype.hidden = true
+            holder.saved_progress = .27
+            technologies[id] = holder
+          end
+          local force = {technologies = technologies, research_queue = {gear}}
+          local context = {private_credit_ids = catalogue.internal_credit_ids()}
+          local function names(rows)
+            local out = {}
+            for index, row in ipairs(rows) do out[index] = row.id end
+            return table.concat(out, ",")
+          end
+          local external = model.rows(force, catalogue.declared(), {family = "external", sort = "native"}, {}, context)
+          assert(names(external) == foreign.name,
+            "only a known MIR private credit, not a foreign hidden row, may be excluded from external")
+          local all = model.rows(force, catalogue.declared(), {family = "all", sort = "native"}, {}, context)
+          assert(names(all) == foreign.name .. "," .. gear_id,
+            "known private credits leaked into the all-research view")
+          local declared = {{id = ids[1], family = "research_modules"}}
+          assert(#model.rows(force, declared, {family = "mir"}, {}, context) == 0,
+            "a private credit declaration must not create an ordinary Library row")
+          for index, id in ipairs(ids) do
+            local detail, reason = model.detail(force, catalogue.declared(), {selected = id}, {}, context)
+            assert(detail == nil and reason == "technology_not_found", "private credit detail admitted: " .. id)
+            local holder = technologies[id]
+            assert(holder.level == index + 1 and holder.enabled == false
+              and holder.visible_when_disabled == false and holder.saved_progress == .27,
+              "Library inspection changed earned private credit state: " .. id)
+          end
+          assert(model.detail(force, catalogue.declared(), {selected = foreign.name}, {}, context) ~= nil,
+            "foreign hidden technology detail was incorrectly excluded")
         ''')
 
     def test_name_sort_is_strict_for_both_directions_and_casefold_ties(self):

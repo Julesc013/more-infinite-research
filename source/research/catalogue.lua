@@ -8,6 +8,12 @@ local M = {}
 local GEAR_ID = "recipe-prod-research_gears-1"
 local AGRICULTURE_ID = "recipe-prod-research_agricultural_growth_speed-1"
 local SPOILAGE_ID = "recipe-prod-research_spoilage_preservation-1"
+local INTERNAL_CREDIT_IDS = {
+  ["mir-legacy-module-credit-speed-module"] = true,
+  ["mir-legacy-module-credit-productivity-module"] = true,
+  ["mir-legacy-module-credit-efficiency-module"] = true,
+  ["mir-legacy-cannon-credit-rocket-shooting-speed"] = true,
+}
 
 function M.gear_id() return GEAR_ID end
 
@@ -33,6 +39,13 @@ local function copy(value, seen)
   for key, item in pairs(value) do out[key] = copy(item, seen) end
   seen[value] = nil
   return out
+end
+
+-- These detached historical holders preserve earned effects during one-time
+-- recovery. They are not authored Library research rows or foreign catalogue
+-- entries. Return a copy so callers cannot alter this identity boundary.
+function M.internal_credit_ids()
+  return copy(INTERNAL_CREDIT_IDS)
 end
 
 local function stream_settings(family)
