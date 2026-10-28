@@ -1,0 +1,50 @@
+{
+  "schema": 1,
+  "kind": "MIRK2SECarrierPublishedSourceAdverseNativeChainV1",
+  "status": "source-fixture-initial-investment-failed-before-MIR5",
+  "scope": "One published4.7.3 K2SE source initialization process. The source preflight admits both original carriers; fixture setup reaches the duplicated tailqueue but intended42-percent current work is observed aszero. No MIR5 loaded,no source save,no labs or reloads. This does not identify which initialization operation reset investment and is not a product migration result.",
+  "controller_commit": "9c17ab875540e2972fca5ed6bbac344f3d3ddbd7",
+  "published_mir_sha256": "B6EB9430056ABD384DB00F94929FE7DAC0A37441ACF4BC277946689682628852",
+  "engine": {
+    "path": "D:\\Games\\Steam\\steamapps\\common\\Factorio\\bin\\x64\\factorio.exe",
+    "sha256": "FE4A1DA30F322A0D0B8AEB3DF7276332222BAAA143E2352569B723E84B2B9060",
+    "file_version": "2.1.23.87750",
+    "product_version": "2.1.23",
+    "base_version": "2.1.23"
+  },
+  "profile": {
+    "path": "D:\\Projects\\Factorio\\mir5-legacy-cannon-credit-r01\\build\\qualification\\k2se-carrier-published-source-r01-inputs\\profile.json",
+    "sha256": "FDFB2CDFD9BDB4A47A98A62B850A7095DC39230C5832B078815E7B473A3DC284"
+  },
+  "packet_sha256": "856CA2CBBFCE9672FB9300AFBF93198D32975E00FBF39B5A51B6127C79BE786F",
+  "caller_sha256": "7BE1DD9DF960323A7394196170A8BC41BA1680B2FAD466EFBDD0C04FFDCE51EE",
+  "fixture_archive_sha256": "23DB8BDF4EC0383F13B29F20DF2AA5B834BD67E5133A8F7A444FA7B5C689F1A6",
+  "original_output": "D:\\Projects\\Factorio\\mir5-legacy-cannon-credit-r01\\build\\tmp\\k2se-carrier-published-source-r01",
+  "retained_output": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\k2se-carrier-published-source-r01-controller\\native-published",
+  "result_sha256": "39C8E062B13F6082419F6A4B04AC7009DEE555CC21EA7E58E2FC4C420E1F5E9E",
+  "root_readback": {
+    "path": "build/qualification/k2se-carrier-published-source-r01-controller/root-readback-r01.json",
+    "sha256": "241744A984914CC694F4B2CBC132AE56459E2228E179781A928FFF40293E8CC4",
+    "files": 6,
+    "bytes_per_copy": 121812
+  },
+  "lossless_receipts": {
+    "path": "spec/evidence/k2se-carrier-published-source-adverse-receipts-r01.json.gz",
+    "sha256": "ECAE13148ABBA1BA49FDE4D5E1660046B51CF790831408E4D15A61B929A8F63B",
+    "bytes": 20793,
+    "records": 3
+  },
+  "correction": "Only the disposable source fixture now establishes queue/current42-percent and foreign detached27-percent after force/effect setup. Opposing host setup controls failed before this change and pass after; actual lost successor investment remains a refusal before writes. Published MIR,successor assertions,carrier identities/cost/effects and player code are unchanged. Native corrected source and successor remain required.",
+  "counts": {
+    "actual_processes": 1,
+    "labs": 0,
+    "saves": 0,
+    "cold_reloads": 0
+  },
+  "restoration": "All original owned archives and library controls rehashed; terminal Factorio countzero. No dependency archive copies,links or extractions.",
+  "remaining": [
+    "Corrected protected source/save/two cold reloads",
+    "Current candidate successor from the protected source",
+    "Lab-earned Imersite/public handoff/K2SO and other gameplay remain separate"
+  ]
+}
