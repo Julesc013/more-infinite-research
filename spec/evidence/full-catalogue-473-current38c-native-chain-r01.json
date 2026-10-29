@@ -1,0 +1,170 @@
+{
+  "schema": 1,
+  "kind": "MIRCurrent38CFullCatalogue473NativeChainV1",
+  "status": "passed-named-current-F210-Base-SpaceAge-full-catalogue-upgrades",
+  "controller_commit": "c6993940cfb9a717001ae2ef64ea68852c687cdd",
+  "candidate": {
+    "source_commit": "b3bbd8d37b37bfee2e258b3e8a2f223dcf3860b3",
+    "player_tree": "fbb7e9135280ce7f69692e9b0c4a44d743793f45",
+    "archive_sha256": "38C84CCBC4BFDA62FCB078772C4690AB81228484744A36D9EA303F5A75B16447",
+    "bytes": 692759
+  },
+  "engine_sha256": "8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38",
+  "fixture_sha256": "024E533026E96AB5A02AD500FC8C1AF7757DD32AC2083A381197C30CE519D0FA",
+  "unchanged_canonical_fixture_members": 7,
+  "packet": {
+    "path": "build/qualification/full-catalogue-473-current38c-r01-controller/packet.json",
+    "sha256": "35B31626CC20DAB3DC88197FB0579F5951BABF6066F969A0D41E9D755178DBB9"
+  },
+  "caller": {
+    "path": "build/qualification/full-catalogue-473-current38c-r01-controller/Invoke-OwnedCurrentFullCatalogue.ps1",
+    "sha256": "56061137AE0E9F3461CEDE810FE63EFF55CA4E1346D0B5711D9817166AAE1B78"
+  },
+  "root_readback": {
+    "path": "build/qualification/full-catalogue-473-current38c-r01-controller/root-readback-r01.json",
+    "sha256": "1A5992549D7BFECECE6606F85EBC951A2E911059BFA65CAE9AB5EE5C0422568B",
+    "files": 36,
+    "bytes_per_copy": 1684300
+  },
+  "receipt_capsule": {
+    "path": "spec/evidence/full-catalogue-473-current38c-native-receipts-r01.json.gz",
+    "sha256": "37B975FF4B7FB542D179678BC74EED5DAAE71B727EFAD139A7611804273BAAEF",
+    "bytes": 47963,
+    "records": 14
+  },
+  "cases": [
+    {
+      "closure": "base",
+      "initial": {
+        "case": "full-catalogue-upgrade",
+        "stage": "initial",
+        "status": "passed",
+        "profile": "base",
+        "qualification": "native-runner-readback-required",
+        "witnesses": {
+          "public_rows": 53,
+          "level_backed_rows": 53,
+          "native_owner_rows": 0,
+          "scripted_rows_not_seeded": 0,
+          "zero_credit_rows": 20,
+          "source_gear_lab": 1,
+          "successor_gear_lab": 1,
+          "queued_progress": 0.42000000000000004,
+          "paused_progress": 0.27,
+          "save_name": "mir5-native-complete",
+          "on_load_read_only": false
+        }
+      },
+      "completed_save": {
+        "path": "build/qualification/full-catalogue-473-current38c-r01-controller/native-base/write-data/saves/mir5-native-complete.zip",
+        "bytes": 667414,
+        "sha256": "623AB7A90FDEAD5E28C27C33324B46D032898255C254E6AF1CE3478C02095729"
+      },
+      "protected_source": {
+        "path": "build/mir5/recovery-historical/full-catalogue-473-current8f-r01/native-output/native/base/published-4.7.3/write-data/saves/mir5-native-complete.zip",
+        "sha256": "6B57C3F1A8EE7517923757CF363256D7604669638377CFCB4F78103D9B577AE2"
+      },
+      "result_sha256": "180151359EA2E499C7D568F43B7334642C1A5948FC21055543B4C8D6E7EFB7DF",
+      "profile_sha256": "05DE071FCCF54846781E0DDC2A4826330240DAE352FAC8A6CA406E8836D03A0A",
+      "native_logs": [
+        {
+          "path": "build/qualification/full-catalogue-473-current38c-r01-controller/native-base/production.factorio.log",
+          "bytes": 14242,
+          "sha256": "A265D899A0BED873ABF373813C31DCEA97655E9CE081A11D498CE6252C7F9875",
+          "actual_native_startup": "   0.000 2026-10-29 11:45:00; Factorio 2.1.23 (build 87750, win64, full, space-age)"
+        },
+        {
+          "path": "build/qualification/full-catalogue-473-current38c-r01-controller/native-base/reload-1.factorio.log",
+          "bytes": 12254,
+          "sha256": "AE77FBC054482252AC386583DFAABF38F15C355DCCE81B3390CA4B3E54AE0F97",
+          "actual_native_startup": "   0.000 2026-10-29 11:45:04; Factorio 2.1.23 (build 87750, win64, full, space-age)"
+        },
+        {
+          "path": "build/qualification/full-catalogue-473-current38c-r01-controller/native-base/reload-2.factorio.log",
+          "bytes": 12254,
+          "sha256": "325A62491D8513809196CA682630D778BB33C21B85D503DCA100F39B84CEDB8A",
+          "actual_native_startup": "   0.000 2026-10-29 11:45:06; Factorio 2.1.23 (build 87750, win64, full, space-age)"
+        }
+      ],
+      "new_processes": 3,
+      "new_labs": 1,
+      "new_saves": 1,
+      "new_cold_reloads": 2,
+      "source_labs_reused_not_new": 1
+    },
+    {
+      "closure": "space-age",
+      "initial": {
+        "case": "full-catalogue-upgrade",
+        "stage": "initial",
+        "status": "passed",
+        "profile": "space-age",
+        "qualification": "native-runner-readback-required",
+        "witnesses": {
+          "public_rows": 71,
+          "level_backed_rows": 69,
+          "native_owner_rows": 5,
+          "scripted_rows_not_seeded": 2,
+          "zero_credit_rows": 24,
+          "source_gear_lab": 1,
+          "successor_gear_lab": 1,
+          "queued_progress": 0.42000000000000004,
+          "paused_progress": 0.27,
+          "save_name": "mir5-native-complete",
+          "on_load_read_only": false
+        }
+      },
+      "completed_save": {
+        "path": "build/qualification/full-catalogue-473-current38c-r01-controller/native-space-age/write-data/saves/mir5-native-complete.zip",
+        "bytes": 766057,
+        "sha256": "E7D7EF97F3B9CBDB58446CBD54B85E14FBB58A4CDA478437BBF51364761CAF8B"
+      },
+      "protected_source": {
+        "path": "build/mir5/recovery-historical/full-catalogue-473-current8f-r01/native-output/native/space-age/published-4.7.3/write-data/saves/mir5-native-complete.zip",
+        "sha256": "3467CBF7D90F79C3B5A0A0A773AE78CC62DF7F3B1DB1CFAEA8A90B3554633D59"
+      },
+      "result_sha256": "4D62FB4003992E59E046FA8DACFD9B5812D234E7E1FFC87197D9EDE829D5046A",
+      "profile_sha256": "A888A4938DE1FF14B08F311B5DC07369CA18BBDB3FC930755E003C81CC0A7B5F",
+      "native_logs": [
+        {
+          "path": "build/qualification/full-catalogue-473-current38c-r01-controller/native-space-age/production.factorio.log",
+          "bytes": 14945,
+          "sha256": "1E4800330EAD279ED67DB15AAA04B50DFA7F07D60EDFCF378F69F66718710A90",
+          "actual_native_startup": "   0.000 2026-10-29 11:45:11; Factorio 2.1.23 (build 87750, win64, full, space-age)"
+        },
+        {
+          "path": "build/qualification/full-catalogue-473-current38c-r01-controller/native-space-age/reload-1.factorio.log",
+          "bytes": 12942,
+          "sha256": "E9C65AD634EFF4337982EB5D554CEB6E2E919077DF5D6E9B4F3C68F2A1DE1F8C",
+          "actual_native_startup": "   0.351 2026-10-29 11:45:16; Factorio 2.1.23 (build 87750, win64, full, space-age)"
+        },
+        {
+          "path": "build/qualification/full-catalogue-473-current38c-r01-controller/native-space-age/reload-2.factorio.log",
+          "bytes": 12942,
+          "sha256": "B37BF1CDE2EB6F8A192F54A77C014096CB7174325C3C8D3C7433F893A84607D9",
+          "actual_native_startup": "   0.000 2026-10-29 11:45:19; Factorio 2.1.23 (build 87750, win64, full, space-age)"
+        }
+      ],
+      "new_processes": 3,
+      "new_labs": 1,
+      "new_saves": 1,
+      "new_cold_reloads": 2,
+      "source_labs_reused_not_new": 1
+    }
+  ],
+  "counts": {
+    "new_native_processes": 6,
+    "new_actual_labs": 2,
+    "new_saves": 2,
+    "new_cold_reloads": 4,
+    "source_labs_reused_once": 2
+  },
+  "independent_expected_rowset": "spec/evidence/f210-vanilla-published-b6-default-native-chain.json",
+  "retained_previous_result": "spec/evidence/full-catalogue-473-current7a2-native-chain-r01.json",
+  "scope": "Exact original published4.7.3 Base6B57/SpaceAge3467 source saves to unchanged current38C/8DC. Existing independent fixture/oracle checks every declared level-backed row,native owners,recipe/force/gun effects,paused force and42% queued/27% detached work before new lab. Hidden zero-credit carriers remain disabled. Source worlds/labs are reused. Two new real gear labs,save/two colds each.",
+  "limits": [
+    "53 Base/71 SpaceAge public rows,including69 level-backed SpaceAge rows and5 native-owner rows,are distinct fixture counts;do not sum overlapping native classes as extra research.",
+    "Two scripted SpaceAge rows are checked for presence,not fabricated earned levels or physical runtime acceptance. This pair does not establish Base/SpaceAge switching,F200/cross-engine,modpack,client,elapsed-time or final release qualification.",
+    "Candidate changes from previous005D are only changelog/caps/lifecycle. This is a new affected-path native execution;the earlier005D result retains its own controller,inputs,verdict and counts."
+  ]
+}
