@@ -3703,6 +3703,11 @@
     },
     "completion_queue_5_0_0": {
       "reviewed_commit": "740a571b32e87c59beecbea3fb54c60fcc4ac911",
+      "current_7b0_scope_review": {
+        "path": "spec/evidence/current-7b0-nongui-aero-applicability-r01.json",
+        "status": "named-non-GUI-migration-paths-retain-applicability",
+        "disposition": "The bounded display-name/unused-German-string delta changes no earned-state,effect,cap,configuration,migration or non-GUI lifecycle path. Preserve each original execution/applicability identity;this is not a new7b0 native run,connected Library state,unselected transition or release verdict."
+      },
       "player_tree": "fbb7e9135280ce7f69692e9b0c4a44d743793f45",
       "package_freeze": {
         "path": "spec/evidence/current-fbb7-coherent17-package-chain-r01.json",
