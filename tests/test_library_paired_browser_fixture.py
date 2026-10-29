@@ -333,6 +333,12 @@ class LibraryPairedBrowserFixtureTests(unittest.TestCase):
             if not ok then return {ok=false,message=message,markers=markers,load_writes=load_writes} end
             if env.storage["mir5_library_paired_browser"] ~= durable then return {ok=false,message="on_load replaced fixture state",markers=markers} end
             en.connected=false; de.connected=false
+            local restart_marker_count_before_event=#markers
+            env.game.tick=env.game.tick+1
+            ok,message=invoke(callbacks.events[2],{tick=env.game.tick})
+            if not ok then return {ok=false,message=message,markers=markers,load_writes=load_writes} end
+            local restart_first_event={markers_before=restart_marker_count_before_event,markers_after=#markers,
+              calls=#calls,screenshots=#screenshots,joins=durable.join_events}
             if opponent == "late-restart-locale" then de.locale="en" end
             en.connected=true
             ok,message=invoke(callbacks.events[1],{player_index=1})
@@ -360,7 +366,7 @@ class LibraryPairedBrowserFixtureTests(unittest.TestCase):
             end
             return {
               ok=ok,message=message,markers=markers,profiler_labels=profiler_labels,screenshots=screenshots,
-              saves=saves,calls=calls,joins=joins,load_writes=load_writes,readiness=readiness,action_ticks=action_ticks,restart_wait=restart_wait,
+              saves=saves,calls=calls,joins=joins,load_writes=load_writes,readiness=readiness,action_ticks=action_ticks,restart_wait=restart_wait,restart_first_event=restart_first_event,
               ready_markers_before_tick=ready_markers_before_tick,
               ready_markers_after_tick=ready_markers_after_tick,
               state=env.storage["mir5_library_paired_browser"]
@@ -472,9 +478,9 @@ class LibraryPairedBrowserFixtureTests(unittest.TestCase):
                 self.assertEqual(result["ready_markers_before_tick"], 1)
                 self.assertEqual(result["ready_markers_after_tick"], 2)
                 self.assertEqual([row["stage"] for row in result["markers"]], [
-                    "ready", "ready", "first-open", "search", "refresh", "restart-ready", "reopen", "completed",
+                    "ready", "ready", "first-open", "search", "refresh", "restart-ready", "ready", "reopen", "completed",
                 ])
-                self.assertEqual([row["join_events"] for row in result["markers"]], [0, 0, 2, 2, 2, 2, 4, 4])
+                self.assertEqual([row["join_events"] for row in result["markers"]], [0, 0, 2, 2, 2, 2, 2, 4, 4])
                 self.assertEqual(result["joins"], [
                     {"name": "MIR5English", "ordinal": 1},
                     {"name": "MIR5Deutsch", "ordinal": 2},
@@ -539,7 +545,9 @@ class LibraryPairedBrowserFixtureTests(unittest.TestCase):
                     {"phase": "initial", "calls": 0, "screenshots": 0},
                     {"phase": "restart", "calls": 6, "screenshots": 6},
                 ])
-                self.assertEqual(result["action_ticks"], [151,151,211,211,271,271,481,481])
+                # One simulated post-load tick now precedes the cold joins;
+                # the 120-tick wait after the latest staggered join is intact.
+                self.assertEqual(result["action_ticks"], [151,151,211,211,271,271,481+1,481+1])
 
     def test_restart_ready_waits_without_actions_until_the_host_actually_restarts(self):
         for arm in ARMS:
@@ -554,6 +562,18 @@ class LibraryPairedBrowserFixtureTests(unittest.TestCase):
                 self.assertEqual(len(result["screenshots"]), 8)
                 self.assertEqual(result["state"]["join_events"], 4)
                 self.assertEqual(result["load_writes"], 0)
+
+    def test_cold_load_emits_one_ready_on_first_event_before_any_new_client_action(self):
+        for arm in ARMS:
+            with self.subTest(arm=arm):
+                result = self.runtime_result(arm)
+                self.assertTrue(result['ok'], result['message'])
+                self.assertEqual(result['restart_first_event'], {
+                    'markers_before': 6, 'markers_after': 7,
+                    'calls': 6, 'screenshots': 6, 'joins': 2,
+                })
+                self.assertEqual(sum(row['stage'] == 'ready' for row in result['markers']), 3)
+                self.assertEqual(result['load_writes'], 0)
 
     def test_runtime_rejects_malformed_closure_seed_public_call_shape_and_restart_boundary(self):
         cases = (
