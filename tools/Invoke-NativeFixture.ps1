@@ -238,7 +238,7 @@ function Read-PublishedF100DirectRefusal([string]$Repo,[Collections.IDictionary]
   $running=@($ledger|Where-Object {$_.Contains('process') -and $_.process.phase -ceq 'running' -and ($_.process.id -is [int] -or $_.process.id -is [long]) -and $_.process.id -gt 0})
   Assert-Fixture ($running.Count -gt 0 -and $ledger[-1].phase -ceq 'interrupted' -and $ledger[-1].timed_out -is [bool] -and -not $ledger[-1].timed_out -and $ledger[-1].error -ceq $run.error) 'direct refusal lacks a governed native start/failure'
   $header='(?m)^\s*\d+[.]\d+\s+\d{4}-\d{2}-\d{2}[^\r\n]*; Factorio '+[regex]::Escape($base)+' \('
-  $format='(?im)^\s*\d+[.]\d+\s+Error[^\r\n]*Map version 1[.]0[.]0(?:-\d+)? cannot be loaded[^\r\n]*minimum supported (?:map )?version[^\r\n]*$'
+  $format='(?im)^\s*\d+[.]\d+\s+Error[^\r\n]*Map version 1[.]0[.]0(?:-\d+)? cannot be loaded because it is lower than the minimum input version \(\d+[.]\d+[.]\d+(?:-\d+)?\)[.][^\r\n]*$'
   Assert-Fixture ($stdoutBody.text -match $header -and $stdoutBody.text -match $format) 'direct refusal is not an actual native engine save-format diagnostic'
   [pscustomobject]@{target=$endpoint.target;input_sha256=$InputSha;result_sha256=$Binding.result.sha256;profile_sha256=$Binding.profile.sha256;stdout_sha256=$Binding.stdout.sha256;ledger_sha256=$Binding.ledger.sha256;engine_sha256=$engineSha;mir_sha256=$endpoint.mir_sha256;fixture_sha256=$endpoint.fixture_sha256;process_id=$running[0].process.id}
 }

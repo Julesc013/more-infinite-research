@@ -312,7 +312,7 @@ end
                 $folder=Join-Path $repo 'build/host-refusal';[void][IO.Directory]::CreateDirectory($folder)
                 $profilePath=Join-Path $folder 'direct-profile.json';$stdoutPath=Join-Path $folder 'process-1.stdout.txt';$ledgerPath=Join-Path $folder 'process-1.resources.jsonl';$resultPath=Join-Path $folder 'result.json'
                 $direct=@{schema=1;kind='published-f100-forward';stage='f210';target='f210';factorio_line='2.1';settings_mode='Defaults';predecessor_origin='published-f100-4.7.10003';protected_source_sha256=('A'*64);engine=@{version='2.1.23';sha256='8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38'};mods=@(@{name='base';version='2.1.23';enabled=$true},@{name='more-infinite-research';version='5.0.21000';enabled=$true},@{name='mir-fixture-mir5-historical-transition';version='0.5.0';enabled=$true});archive_sha256=@{'more-infinite-research_5.0.21000.zip'=('D'*64);'mir-fixture-mir5-historical-transition_0.5.0.zip'=('E'*64)}}
-                $stdout="  0.000 2026-10-30 00:00:00; Factorio 2.1.23 (build host-double, win64, full)`n  0.500 Error Util.cpp:81: Map version 1.0.0-0 cannot be loaded with this version of the game. The minimum supported map version is 1.1.0-0.`n"
+                $stdout="  0.000 2026-10-30 00:00:00; Factorio 2.1.23 (build host-double, win64, full)`n  0.500 Error Util.cpp:81: Map version 1.0.0-0 cannot be loaded because it is lower than the minimum input version (1.1.0-0).`n"
                 $failure='[mir441-process-exit] 1'
                 $ledger=@(@{process=@{id=4242;phase='running'}},@{phase='interrupted';timed_out=$false;error=$failure})
                 $result=@{kind='MIR5NativeFixtureV1';status='failed';case='published-f100-forward';source_dirty=$false;source_head=('e'*40);input_save=@{sha256=('A'*64)};input_save_byte_identical=$true;engine=@{base_version='2.1.23';sha256=$direct.engine.sha256};mir_archive=@{sha256=('D'*64)};fixtures=@(@{sha256=('E'*64)});published_f100_forward=@{stage='f210';target='f210';role='successor';predecessor_origin='published-f100-4.7.10003';protected_input_sha256=('A'*64)};failure=$failure;process_runs=@(@{status='interrupted';stdout=$stdoutPath;ledger=$ledgerPath;error=$failure})}
@@ -329,6 +329,8 @@ end
                 if($Opponent -ceq 'bridge-timeout'){$ledger[1].timed_out=$true}
                 if($Opponent -ceq 'bridge-resource'){$failure='[mir441-resource-process-budget]';$result.failure=$failure;$result.process_runs[0].error=$failure;$ledger[1].error=$failure}
                 if($Opponent -ceq 'bridge-non-format'){$stdout="  0.000 2026-10-30 00:00:00; Factorio 2.1.23 (build host-double, win64, full)`n  0.500 Error Util.cpp:81: Missing recipe.`n"}
+                if($Opponent -ceq 'bridge-invented-phrase'){$stdout=$stdout.Replace('because it is lower than the minimum input version (1.1.0-0).','with this version of the game. The minimum supported map version is 1.1.0-0.')}
+                if($Opponent -ceq 'bridge-bad-minimum'){$stdout=$stdout.Replace('(1.1.0-0).','(unknown).')}
                 if($Opponent -ceq 'bridge-header'){$stdout=$stdout.Replace('Factorio 2.1.23','Factorio 1.1.110')}
                 if($Opponent -ceq 'bridge-success'){$result.status='passed'}
                 if($Opponent -ceq 'bridge-changed-input'){$result.input_save_byte_identical=$false}
@@ -371,7 +373,7 @@ end
                 @{version=$base}|ConvertTo-Json|Set-Content -LiteralPath (Join-Path $engineData 'base/info.json')
                 $profile=@{schema=1;kind='published-f100-forward';stage=$stage;target=$target;factorio_line=$line;settings_mode='Defaults';predecessor_origin='published-f100-4.7.10003';protected_source_sha256=$inputSha;engine=@{version=$base;sha256=$script:engineSha};mods=@(@{name='base';version=$base;enabled=$true},@{name='more-infinite-research';version=$mir;enabled=$true},@{name='mir-fixture-mir5-historical-transition';version=$version;enabled=$true});archive_sha256=@{('more-infinite-research_'+$mir+'.zip')=$mirSha;('mir-fixture-mir5-historical-transition_'+$version+'.zip')=('E'*64)}}
                 $source=Join-Path $repo ('build/'+$stage)
-                foreach($opponent in @('','input','origin','engine','archive','extra-mod','member','bridge-refusal','bridge-invented','bridge-missing','bridge-source','bridge-engine','bridge-mir','bridge-fixture','bridge-profile','bridge-route','bridge-no-native','bridge-no-pid','bridge-timeout','bridge-resource','bridge-non-format','bridge-header','bridge-duplicate','bridge-success','bridge-changed-input','bridge-profile-archive','bridge-harness','bridge-source-revision')){
+                foreach($opponent in @('','input','origin','engine','archive','extra-mod','member','bridge-refusal','bridge-invented','bridge-missing','bridge-source','bridge-engine','bridge-mir','bridge-fixture','bridge-profile','bridge-route','bridge-no-native','bridge-no-pid','bridge-timeout','bridge-resource','bridge-non-format','bridge-invented-phrase','bridge-bad-minimum','bridge-header','bridge-duplicate','bridge-success','bridge-changed-input','bridge-profile-archive','bridge-harness','bridge-source-revision')){
                   if($opponent.StartsWith('bridge-') -and $stage -cne 'bridge'){continue}
                   $changed=($profile|ConvertTo-Json -Depth 10)|ConvertFrom-Json -AsHashtable
                   if($stage -ceq 'bridge'){$changed.engine_bridge_refusal=New-HostRefusalBinding $opponent}
@@ -397,7 +399,7 @@ end
             env = {**os.environ, "MIR_FORWARD_REPO": str(repo), "MIR_FORWARD_RUNNER": str(ROOT / "tools/Invoke-NativeFixture.ps1")}
             result = subprocess.run(["pwsh", "-NoProfile", "-Command", script], env=env, capture_output=True, text=True)
             self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
-            self.assertEqual(json.loads(result.stdout), {"accepted": 4, "refused": 45, "native_processes": 0})
+            self.assertEqual(json.loads(result.stdout), {"accepted": 4, "refused": 47, "native_processes": 0})
 
 
 if __name__ == "__main__":
