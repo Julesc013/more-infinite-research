@@ -1,0 +1,675 @@
+{
+  "schema": 1,
+  "kind": "MIRBaseF210MenuR03NativeChainV1",
+  "status": "valid-complete-base-fresh-process-as-shipped-dataset",
+  "source_commit": "b7caa8df9141523a556bb57ca8faf7c43d250c3d",
+  "private_source": "bfa17e373ce98eeac31e6bd22af8ecd39005a6f8",
+  "player_package_source": "42032477d45ced683e72736a4fe30a7a3195b995",
+  "engine": {
+    "path": "D:\\Games\\Factorio\\2.1\\bin\\x64\\factorio.exe",
+    "bytes": 49398736,
+    "sha256": "8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38",
+    "version": "2.1.23"
+  },
+  "profile": {
+    "path": "D:\\Projects\\Factorio\\mir5-whole-product-capture-fixed-r01\\build\\tmp\\whole-product-base-f210-menu-inputs-r01\\base-f210.json",
+    "bytes": 1188,
+    "sha256": "95E0DF366DF0914493B7BAC46A5D930EB15813AFA845AC29547209EAC0F9C467"
+  },
+  "arms": [
+    {
+      "id": "control-without-mir",
+      "archive": null
+    },
+    {
+      "id": "published-mir3",
+      "archive": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\whole-product-base-f210-menu-r01-controller\\owned-source-archives\\more-infinite-research_3.2.11.zip",
+        "bytes": 1067720,
+        "sha256": "5B0252C3E1B8A20FF8E31F408F0217DDC77D2DF0D1C15F59653E948472870A5A",
+        "name": "more-infinite-research",
+        "version": "3.2.11"
+      }
+    },
+    {
+      "id": "published-mir4.7",
+      "archive": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\whole-product-base-f210-menu-r01-controller\\owned-source-archives\\more-infinite-research_4.7.21003.zip",
+        "bytes": 1463293,
+        "sha256": "B6EB9430056ABD384DB00F94929FE7DAC0A37441ACF4BC277946689682628852",
+        "name": "more-infinite-research",
+        "version": "4.7.21003"
+      }
+    },
+    {
+      "id": "candidate-mir5",
+      "archive": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\whole-product-base-f210-menu-r01-controller\\owned-source-archives\\more-infinite-research_5.0.21000.zip",
+        "bytes": 696972,
+        "sha256": "B63743C36432E4C41CC0F56D5A48CABE81924D426EF11045095A9D5ED0430D7B",
+        "name": "more-infinite-research",
+        "version": "5.0.21000"
+      }
+    }
+  ],
+  "resources": {
+    "expected_peak_memory_mib": 8192,
+    "maximum_new_output_mib": 2048,
+    "per_launch_timeout_seconds": 300,
+    "admission_wait_seconds": 30
+  },
+  "packet_sha256": "D9C2C371183F036905976275FE0582C6152A68655EDBC52ECDC291E069E42609",
+  "caller_sha256": "C425691F54370867F7F49680A202CCF0E703D216929AB0A2B4826F7F1BB0E3C5",
+  "result_sha256": "1D856C90FA57CE6D4C40935D0028F3204E783C6153976045200C277B84C8F96B",
+  "readback": {
+    "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\whole-product-base-f210-menu-r03-controller\\root-readback.json",
+    "sha256": "192D1288CE7AE9ED94C347E03C82C1DEC71BF931D37C69618F59DEC34C448871"
+  },
+  "observation": {
+    "kind": "MIRBaseF210MenuR03RootReadbackV1",
+    "packet_sha256": "D9C2C371183F036905976275FE0582C6152A68655EDBC52ECDC291E069E42609",
+    "analysis_sha256": "C01236BD9C4EED1371E2D219D0A3F1DB597E85AB92F5AED3FD2A8F2A8229CA4F",
+    "native_processes": 38,
+    "process_identities_distinct": 38,
+    "serial_numeric_pid_reuse": {
+      "63320": [
+        7,
+        33
+      ]
+    },
+    "warmups": 4,
+    "aa_observations": 2,
+    "comparison_observations": 32,
+    "declared_validity_controls_pass": true,
+    "native_files_per_copy": 423,
+    "native_bytes_per_copy": 1036849695,
+    "controller_files_per_copy": 5,
+    "controller_bytes_per_copy": 2387202,
+    "root_validation": "Exact frozen reader13DA completed successfully before later direct-library work;all source/copy manifest hashes,114 full PNG streams,actor/log/stdout/ledger/config/player/schedule/restoration controls admitted.",
+    "independent_validation": "Independent review rehashes304 source/copied small raw bodies,checks836 referenced-file stats including114PNG references,full423/1036849695B inventories,all38 native/actor/ledger/tuple bindings and arithmetic. It does not claim a second full binary rehash.",
+    "pngs_strictly_decoded": 114,
+    "root_original_pngs_viewed": 5,
+    "views_private_commit": "634fed8bed8a2b262b12a1462f4442735830b4aa",
+    "views_manifest_sha256": "E50EC9098F150D258ED0F5A5A0299DF5212F89193E1C6757AC05DD37FA5FE9A4",
+    "observations": [
+      {
+        "plan": {
+          "ordinal": 1,
+          "id": "01-warmup-control-without-mir",
+          "phase": "warmup",
+          "arm": "control-without-mir",
+          "block": 0,
+          "position": 1
+        },
+        "elapsed_seconds": 64.2919372,
+        "factorio_pid": 84800,
+        "factorio_start_utc": "2026-10-29T17:16:45.0947721Z"
+      },
+      {
+        "plan": {
+          "ordinal": 2,
+          "id": "02-warmup-published-mir3",
+          "phase": "warmup",
+          "arm": "published-mir3",
+          "block": 0,
+          "position": 2
+        },
+        "elapsed_seconds": 12.6706469,
+        "factorio_pid": 69900,
+        "factorio_start_utc": "2026-10-29T17:17:53.5936829Z"
+      },
+      {
+        "plan": {
+          "ordinal": 3,
+          "id": "03-warmup-published-mir4.7",
+          "phase": "warmup",
+          "arm": "published-mir4.7",
+          "block": 0,
+          "position": 3
+        },
+        "elapsed_seconds": 11.3822413,
+        "factorio_pid": 3920,
+        "factorio_start_utc": "2026-10-29T17:18:09.7100050Z"
+      },
+      {
+        "plan": {
+          "ordinal": 4,
+          "id": "04-warmup-candidate-mir5",
+          "phase": "warmup",
+          "arm": "candidate-mir5",
+          "block": 0,
+          "position": 4
+        },
+        "elapsed_seconds": 12.4370846,
+        "factorio_pid": 72236,
+        "factorio_start_utc": "2026-10-29T17:18:24.6416612Z"
+      },
+      {
+        "plan": {
+          "ordinal": 5,
+          "id": "05-published-aa-published-mir4.7",
+          "phase": "published-aa",
+          "arm": "published-mir4.7",
+          "block": 0,
+          "position": 1
+        },
+        "elapsed_seconds": 11.3424122,
+        "factorio_pid": 68920,
+        "factorio_start_utc": "2026-10-29T17:18:40.5180876Z"
+      },
+      {
+        "plan": {
+          "ordinal": 6,
+          "id": "06-published-aa-published-mir4.7",
+          "phase": "published-aa",
+          "arm": "published-mir4.7",
+          "block": 0,
+          "position": 2
+        },
+        "elapsed_seconds": 11.2074521,
+        "factorio_pid": 75164,
+        "factorio_start_utc": "2026-10-29T17:18:55.2095058Z"
+      },
+      {
+        "plan": {
+          "ordinal": 7,
+          "id": "07-latin-comparison-control-without-mir",
+          "phase": "latin-comparison",
+          "arm": "control-without-mir",
+          "block": 1,
+          "position": 1
+        },
+        "elapsed_seconds": 10.4351146,
+        "factorio_pid": 63320,
+        "factorio_start_utc": "2026-10-29T17:19:12.7365948Z"
+      },
+      {
+        "plan": {
+          "ordinal": 8,
+          "id": "08-latin-comparison-published-mir3",
+          "phase": "latin-comparison",
+          "arm": "published-mir3",
+          "block": 1,
+          "position": 2
+        },
+        "elapsed_seconds": 11.0099946,
+        "factorio_pid": 51252,
+        "factorio_start_utc": "2026-10-29T17:19:26.6009452Z"
+      },
+      {
+        "plan": {
+          "ordinal": 9,
+          "id": "09-latin-comparison-published-mir4.7",
+          "phase": "latin-comparison",
+          "arm": "published-mir4.7",
+          "block": 1,
+          "position": 3
+        },
+        "elapsed_seconds": 11.1067245,
+        "factorio_pid": 44108,
+        "factorio_start_utc": "2026-10-29T17:19:41.0528134Z"
+      },
+      {
+        "plan": {
+          "ordinal": 10,
+          "id": "10-latin-comparison-candidate-mir5",
+          "phase": "latin-comparison",
+          "arm": "candidate-mir5",
+          "block": 1,
+          "position": 4
+        },
+        "elapsed_seconds": 10.7473704,
+        "factorio_pid": 84240,
+        "factorio_start_utc": "2026-10-29T17:19:55.4966879Z"
+      },
+      {
+        "plan": {
+          "ordinal": 11,
+          "id": "11-latin-comparison-published-mir3",
+          "phase": "latin-comparison",
+          "arm": "published-mir3",
+          "block": 2,
+          "position": 1
+        },
+        "elapsed_seconds": 11.2464654,
+        "factorio_pid": 84696,
+        "factorio_start_utc": "2026-10-29T17:20:09.5520786Z"
+      },
+      {
+        "plan": {
+          "ordinal": 12,
+          "id": "12-latin-comparison-published-mir4.7",
+          "phase": "latin-comparison",
+          "arm": "published-mir4.7",
+          "block": 2,
+          "position": 2
+        },
+        "elapsed_seconds": 11.204079,
+        "factorio_pid": 86832,
+        "factorio_start_utc": "2026-10-29T17:20:24.2924913Z"
+      },
+      {
+        "plan": {
+          "ordinal": 13,
+          "id": "13-latin-comparison-candidate-mir5",
+          "phase": "latin-comparison",
+          "arm": "candidate-mir5",
+          "block": 2,
+          "position": 3
+        },
+        "elapsed_seconds": 10.6887173,
+        "factorio_pid": 82312,
+        "factorio_start_utc": "2026-10-29T17:20:38.8954403Z"
+      },
+      {
+        "plan": {
+          "ordinal": 14,
+          "id": "14-latin-comparison-control-without-mir",
+          "phase": "latin-comparison",
+          "arm": "control-without-mir",
+          "block": 2,
+          "position": 4
+        },
+        "elapsed_seconds": 10.5338759,
+        "factorio_pid": 78036,
+        "factorio_start_utc": "2026-10-29T17:20:53.6964422Z"
+      },
+      {
+        "plan": {
+          "ordinal": 15,
+          "id": "15-latin-comparison-published-mir4.7",
+          "phase": "latin-comparison",
+          "arm": "published-mir4.7",
+          "block": 3,
+          "position": 1
+        },
+        "elapsed_seconds": 11.1740764,
+        "factorio_pid": 18484,
+        "factorio_start_utc": "2026-10-29T17:21:07.5784241Z"
+      },
+      {
+        "plan": {
+          "ordinal": 16,
+          "id": "16-latin-comparison-candidate-mir5",
+          "phase": "latin-comparison",
+          "arm": "candidate-mir5",
+          "block": 3,
+          "position": 2
+        },
+        "elapsed_seconds": 11.8595486,
+        "factorio_pid": 37080,
+        "factorio_start_utc": "2026-10-29T17:21:22.5464377Z"
+      },
+      {
+        "plan": {
+          "ordinal": 17,
+          "id": "17-latin-comparison-control-without-mir",
+          "phase": "latin-comparison",
+          "arm": "control-without-mir",
+          "block": 3,
+          "position": 3
+        },
+        "elapsed_seconds": 11.1749333,
+        "factorio_pid": 86516,
+        "factorio_start_utc": "2026-10-29T17:21:38.4109326Z"
+      },
+      {
+        "plan": {
+          "ordinal": 18,
+          "id": "18-latin-comparison-published-mir3",
+          "phase": "latin-comparison",
+          "arm": "published-mir3",
+          "block": 3,
+          "position": 4
+        },
+        "elapsed_seconds": 11.7775063,
+        "factorio_pid": 83868,
+        "factorio_start_utc": "2026-10-29T17:21:53.2693043Z"
+      },
+      {
+        "plan": {
+          "ordinal": 19,
+          "id": "19-latin-comparison-candidate-mir5",
+          "phase": "latin-comparison",
+          "arm": "candidate-mir5",
+          "block": 4,
+          "position": 1
+        },
+        "elapsed_seconds": 10.5340229,
+        "factorio_pid": 74416,
+        "factorio_start_utc": "2026-10-29T17:22:08.5900184Z"
+      },
+      {
+        "plan": {
+          "ordinal": 20,
+          "id": "20-latin-comparison-control-without-mir",
+          "phase": "latin-comparison",
+          "arm": "control-without-mir",
+          "block": 4,
+          "position": 2
+        },
+        "elapsed_seconds": 10.5558386,
+        "factorio_pid": 28008,
+        "factorio_start_utc": "2026-10-29T17:22:22.6663958Z"
+      },
+      {
+        "plan": {
+          "ordinal": 21,
+          "id": "21-latin-comparison-published-mir3",
+          "phase": "latin-comparison",
+          "arm": "published-mir3",
+          "block": 4,
+          "position": 3
+        },
+        "elapsed_seconds": 11.4791914,
+        "factorio_pid": 85436,
+        "factorio_start_utc": "2026-10-29T17:22:36.6604379Z"
+      },
+      {
+        "plan": {
+          "ordinal": 22,
+          "id": "22-latin-comparison-published-mir4.7",
+          "phase": "latin-comparison",
+          "arm": "published-mir4.7",
+          "block": 4,
+          "position": 4
+        },
+        "elapsed_seconds": 11.7889714,
+        "factorio_pid": 19992,
+        "factorio_start_utc": "2026-10-29T17:22:51.6498627Z"
+      },
+      {
+        "plan": {
+          "ordinal": 23,
+          "id": "23-latin-comparison-control-without-mir",
+          "phase": "latin-comparison",
+          "arm": "control-without-mir",
+          "block": 5,
+          "position": 1
+        },
+        "elapsed_seconds": 12.9759417,
+        "factorio_pid": 65556,
+        "factorio_start_utc": "2026-10-29T17:23:06.7540584Z"
+      },
+      {
+        "plan": {
+          "ordinal": 24,
+          "id": "24-latin-comparison-published-mir3",
+          "phase": "latin-comparison",
+          "arm": "published-mir3",
+          "block": 5,
+          "position": 2
+        },
+        "elapsed_seconds": 15.5080511,
+        "factorio_pid": 77860,
+        "factorio_start_utc": "2026-10-29T17:23:23.5246836Z"
+      },
+      {
+        "plan": {
+          "ordinal": 25,
+          "id": "25-latin-comparison-published-mir4.7",
+          "phase": "latin-comparison",
+          "arm": "published-mir4.7",
+          "block": 5,
+          "position": 3
+        },
+        "elapsed_seconds": 11.2889826,
+        "factorio_pid": 45488,
+        "factorio_start_utc": "2026-10-29T17:23:42.4490004Z"
+      },
+      {
+        "plan": {
+          "ordinal": 26,
+          "id": "26-latin-comparison-candidate-mir5",
+          "phase": "latin-comparison",
+          "arm": "candidate-mir5",
+          "block": 5,
+          "position": 4
+        },
+        "elapsed_seconds": 10.2597283,
+        "factorio_pid": 19668,
+        "factorio_start_utc": "2026-10-29T17:23:57.3072617Z"
+      },
+      {
+        "plan": {
+          "ordinal": 27,
+          "id": "27-latin-comparison-published-mir3",
+          "phase": "latin-comparison",
+          "arm": "published-mir3",
+          "block": 6,
+          "position": 1
+        },
+        "elapsed_seconds": 11.3915151,
+        "factorio_pid": 11952,
+        "factorio_start_utc": "2026-10-29T17:24:10.8764679Z"
+      },
+      {
+        "plan": {
+          "ordinal": 28,
+          "id": "28-latin-comparison-published-mir4.7",
+          "phase": "latin-comparison",
+          "arm": "published-mir4.7",
+          "block": 6,
+          "position": 2
+        },
+        "elapsed_seconds": 11.3598328,
+        "factorio_pid": 1760,
+        "factorio_start_utc": "2026-10-29T17:24:25.7127271Z"
+      },
+      {
+        "plan": {
+          "ordinal": 29,
+          "id": "29-latin-comparison-candidate-mir5",
+          "phase": "latin-comparison",
+          "arm": "candidate-mir5",
+          "block": 6,
+          "position": 3
+        },
+        "elapsed_seconds": 10.4357934,
+        "factorio_pid": 75124,
+        "factorio_start_utc": "2026-10-29T17:24:40.5957949Z"
+      },
+      {
+        "plan": {
+          "ordinal": 30,
+          "id": "30-latin-comparison-control-without-mir",
+          "phase": "latin-comparison",
+          "arm": "control-without-mir",
+          "block": 6,
+          "position": 4
+        },
+        "elapsed_seconds": 11.1621166,
+        "factorio_pid": 80356,
+        "factorio_start_utc": "2026-10-29T17:24:54.4864003Z"
+      },
+      {
+        "plan": {
+          "ordinal": 31,
+          "id": "31-latin-comparison-published-mir4.7",
+          "phase": "latin-comparison",
+          "arm": "published-mir4.7",
+          "block": 7,
+          "position": 1
+        },
+        "elapsed_seconds": 12.7146519,
+        "factorio_pid": 77388,
+        "factorio_start_utc": "2026-10-29T17:25:09.2130165Z"
+      },
+      {
+        "plan": {
+          "ordinal": 32,
+          "id": "32-latin-comparison-candidate-mir5",
+          "phase": "latin-comparison",
+          "arm": "candidate-mir5",
+          "block": 7,
+          "position": 2
+        },
+        "elapsed_seconds": 10.6478995,
+        "factorio_pid": 67476,
+        "factorio_start_utc": "2026-10-29T17:25:25.5289266Z"
+      },
+      {
+        "plan": {
+          "ordinal": 33,
+          "id": "33-latin-comparison-control-without-mir",
+          "phase": "latin-comparison",
+          "arm": "control-without-mir",
+          "block": 7,
+          "position": 3
+        },
+        "elapsed_seconds": 10.5356956,
+        "factorio_pid": 63320,
+        "factorio_start_utc": "2026-10-29T17:25:39.6744906Z"
+      },
+      {
+        "plan": {
+          "ordinal": 34,
+          "id": "34-latin-comparison-published-mir3",
+          "phase": "latin-comparison",
+          "arm": "published-mir3",
+          "block": 7,
+          "position": 4
+        },
+        "elapsed_seconds": 11.759631,
+        "factorio_pid": 78272,
+        "factorio_start_utc": "2026-10-29T17:25:53.5805432Z"
+      },
+      {
+        "plan": {
+          "ordinal": 35,
+          "id": "35-latin-comparison-candidate-mir5",
+          "phase": "latin-comparison",
+          "arm": "candidate-mir5",
+          "block": 8,
+          "position": 1
+        },
+        "elapsed_seconds": 11.5983547,
+        "factorio_pid": 51028,
+        "factorio_start_utc": "2026-10-29T17:26:08.6636296Z"
+      },
+      {
+        "plan": {
+          "ordinal": 36,
+          "id": "36-latin-comparison-control-without-mir",
+          "phase": "latin-comparison",
+          "arm": "control-without-mir",
+          "block": 8,
+          "position": 2
+        },
+        "elapsed_seconds": 10.54064,
+        "factorio_pid": 41608,
+        "factorio_start_utc": "2026-10-29T17:26:23.9670337Z"
+      },
+      {
+        "plan": {
+          "ordinal": 37,
+          "id": "37-latin-comparison-published-mir3",
+          "phase": "latin-comparison",
+          "arm": "published-mir3",
+          "block": 8,
+          "position": 3
+        },
+        "elapsed_seconds": 11.7986971,
+        "factorio_pid": 79172,
+        "factorio_start_utc": "2026-10-29T17:26:37.7636260Z"
+      },
+      {
+        "plan": {
+          "ordinal": 38,
+          "id": "38-latin-comparison-published-mir4.7",
+          "phase": "latin-comparison",
+          "arm": "published-mir4.7",
+          "block": 8,
+          "position": 4
+        },
+        "elapsed_seconds": 11.1965918,
+        "factorio_pid": 80516,
+        "factorio_start_utc": "2026-10-29T17:26:53.2194447Z"
+      }
+    ],
+    "analysis": {
+      "published_aa": {
+        "values_seconds": [
+          11.3424122,
+          11.2074521
+        ],
+        "difference_seconds": 0.1349601000000007,
+        "allowance_seconds": 0.5637466075,
+        "within_declared_allowance": true
+      },
+      "latin_medians_seconds": {
+        "control-without-mir": 10.548239299999999,
+        "published-mir3": 11.6194112,
+        "published-mir4.7": 11.2465308,
+        "candidate-mir5": 10.6683084
+      },
+      "drift": {
+        "control-without-mir": {
+          "first_cycle_median": 10.54485725,
+          "second_cycle_median": 10.8513783,
+          "difference": 0.3065210500000006,
+          "within_seconds": true
+        },
+        "published-mir3": {
+          "first_cycle_median": 11.3628284,
+          "second_cycle_median": 11.77916405,
+          "difference": 0.4163356500000006,
+          "within_seconds": true
+        },
+        "published-mir4.7": {
+          "first_cycle_median": 11.1890777,
+          "second_cycle_median": 11.3244077,
+          "difference": 0.13532999999999973,
+          "within_seconds": true
+        },
+        "candidate-mir5": {
+          "first_cycle_median": 10.71804385,
+          "second_cycle_median": 10.54184645,
+          "difference": -0.17619740000000128,
+          "within_seconds": true
+        }
+      },
+      "historical_mir3": {
+        "interpretation": "as-shipped-historical-comparison-only",
+        "equal_work_established": false,
+        "mir3_minus_published_mir4_7_seconds": 0.37288039999999967
+      },
+      "mir_added_objective": {
+        "applicable": false,
+        "published_mir_added_seconds": 0.6982915000000016,
+        "candidate_mir_added_seconds": 0.12006910000000204,
+        "status": "not-applicable-profile-not-declared-high-cost"
+      }
+    },
+    "factorio_processes_after": 0,
+    "performance_acceptance": false,
+    "release_qualification": false
+  },
+  "receipt_capsule": {
+    "path": "spec/evidence/whole-product-base-f210-menu-receipts-r03.json.gz",
+    "sha256": "B075C0F78BCC795BA4446404537B8765650CF76C27E223EDDD2EE5D1B270BD74",
+    "bytes": 804988,
+    "bodies": 279
+  },
+  "scope_completed": [
+    "Declared Base2.1.23/8DC four-arm fresh-process-to-owned-responsive-Settings observations",
+    "Early A/A and all declared late-drift validity controls",
+    "Exact source/copy custody,all114 strict PNG streams,original library restoration"
+  ],
+  "scope_open": [
+    "Reboot-cold inputs",
+    "SpaceAge/heavy profiles",
+    "Large active factories,useful work,spikes,queues,save-load and retained memory",
+    "Equal-useful-work or MIR-exclusive cost attribution",
+    "Whole-product performance and release acceptance"
+  ],
+  "limits": [
+    "Historical3.2.11 is as-shipped,not same-metadata replay.",
+    "The50% MIR-added objective is inapplicable for this predeclared low-cost profile;no percentage/score/equivalence result is manufactured.",
+    "Eight-GiB is this new cohort ceiling;all38 were fresh and earlier attempts/probes/gates are not pooled. Earlier failed/adverse records remain unchanged.",
+    "Numeric PID reuse with a distinct process start is ordinary;38 PID/start/window identities are distinct. Governed ledger PIDs identify wrappers,not independent child creation.",
+    "Five viewed originals are pushed unchanged in private634fed8;other109 images are strict byte/decode-only. The common bottom logo is native Wube art."
+  ],
+  "performance_acceptance": false,
+  "release_qualification": false
+}
