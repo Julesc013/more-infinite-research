@@ -42,8 +42,10 @@ function Set-MIROwnedProcessMemoryNextDue {
 function New-MIROwnedProcessMemorySampler {
   param(
     [Parameter(Mandatory)][object[]]$ExpectedSlots,
-    [ValidateSet('multiplayer', 'benchmark')][string]$Context = 'multiplayer'
+    [ValidateSet('multiplayer', 'benchmark')][string]$Context = 'multiplayer',
+    [switch]$IncludeLifetimePeaks
   )
+  if ($IncludeLifetimePeaks -and $Context -cne 'multiplayer') { throw '[mir5-owned-process-memory-peak-context]' }
   $allowedSlots = @(Get-MIROwnedProcessMemoryAllowedSlots -Context $Context)
   $maximumSlots = $allowedSlots.Count
   if ($ExpectedSlots.Count -lt 1 -or $ExpectedSlots.Count -gt $maximumSlots) { throw '[mir5-owned-process-memory-slot-count]' }
@@ -58,6 +60,7 @@ function New-MIROwnedProcessMemorySampler {
     if ($expected.ContainsKey($key)) { throw '[mir5-owned-process-memory-duplicate-slot]' }
     $expected.Add($key, [pscustomobject][ordered]@{ phase=$phase; role=$role })
   }
+  $peakClockReference = if ($IncludeLifetimePeaks) { [DateTime]::UtcNow.ToString('o') } else { $null }
   $clock = [Diagnostics.Stopwatch]::StartNew()
   $sampler = [ordered]@{
     kind = 'MIR5OwnedProcessMemoryObservationV1'
@@ -74,6 +77,8 @@ function New-MIROwnedProcessMemorySampler {
     clock = $clock
     next_due_monotonic_milliseconds = 0.0
     cycle = 0
+    include_lifetime_peaks = $IncludeLifetimePeaks.IsPresent
+    peak_clock_reference_utc_before_start = $peakClockReference
   }
   if ($Context -ceq 'benchmark') {
     $sampler.context = 'benchmark'
@@ -99,6 +104,7 @@ function Register-MIROwnedProcessMemoryProcess {
       phase = $Phase; role = $Role; process = $Process; pid = [int]$Process.Id
       start_utc = $Process.StartTime.ToUniversalTime().ToString('o')
       closed = $false; observation_count = 0
+      lifetime_peak_counters = $null
     }
     $Sampler.registrations.Add($key, $registration)
     return $registration
@@ -163,6 +169,32 @@ function Complete-MIROwnedProcessMemoryProcess {
   if (-not $NaturalExit) {
     Add-MIROwnedProcessMemorySample -Sampler $Sampler
   }
+  if ($Sampler.include_lifetime_peaks) {
+    try {
+      $process = $Registration.process
+      if ($NaturalExit -or $process.HasExited) { throw 'peak-process-exited' }
+      $process.Refresh()
+      if ([int]$process.Id -ne [int]$Registration.pid -or
+          $process.StartTime.ToUniversalTime().ToString('o') -cne [string]$Registration.start_utc) {
+        throw 'peak-process-identity'
+      }
+      $workingPeak = [int64]$process.PeakWorkingSet64
+      $pagedPeak = [int64]$process.PeakPagedMemorySize64
+      if ($workingPeak -le 0 -or $pagedPeak -lt 0) { throw 'peak-counter-unavailable' }
+      # Read the OS high-water values at the existing close boundary. This
+      # does not insert a sub-250ms sample into the periodic observations.
+      $Registration.lifetime_peak_counters = [pscustomobject][ordered]@{
+        phase = [string]$Registration.phase; role = [string]$Registration.role
+        pid = [int]$Registration.pid; start_utc = [string]$Registration.start_utc
+        observed_utc = [DateTime]::UtcNow.ToString('o')
+        elapsed_monotonic_milliseconds = [Math]::Round([double]$Sampler.clock.Elapsed.TotalMilliseconds, 3)
+        working_set_peak_bytes = $workingPeak
+        paged_memory_peak_bytes = $pagedPeak
+      }
+    } catch {
+      Set-MIROwnedProcessMemoryIncomplete -Sampler $Sampler -Reason 'lifetime-peak-unavailable-or-identity-drift'
+    }
+  }
   $Registration.closed = $true
   if ([int]$Registration.observation_count -lt 1) {
     Set-MIROwnedProcessMemoryIncomplete -Sampler $Sampler -Reason 'missing-process-observation'
@@ -201,6 +233,25 @@ function Get-MIROwnedProcessMemoryObservationReceipt {
     maximum_serialized_bytes = [int64]$script:MIROwnedProcessMemoryMaximumOutputBytes
     observations = @($Sampler.observations)
     incomplete_reasons = @($Sampler.incomplete_reasons)
+  }
+  if ($Sampler.include_lifetime_peaks) {
+    $peaks = @(
+      foreach ($registration in @($Sampler.registrations.Values | Sort-Object phase, role)) {
+        if ($null -eq $registration.lifetime_peak_counters) {
+          Set-MIROwnedProcessMemoryIncomplete -Sampler $Sampler -Reason 'missing-lifetime-peak-counters'
+        } else { $registration.lifetime_peak_counters }
+      }
+    )
+    $receipt.lifetime_peak_counters = $peaks
+    $receipt.lifetime_peak_observer = [ordered]@{
+      utc_reference_before_stopwatch_start = $Sampler.peak_clock_reference_utc_before_start
+      cutoff = 'OS high-water counters read before the owned stop;later exit/deinitialization is excluded'
+      working_set_peak_bytes = 'System.Diagnostics.Process.PeakWorkingSet64'
+      paged_memory_peak_bytes = 'System.Diagnostics.Process.PeakPagedMemorySize64;not sampled private_bytes'
+      changes_periodic_observations = $false
+    }
+    $receipt.status = if ($Sampler.incomplete) { 'incomplete-observation' } else { 'complete-observation' }
+    $receipt.incomplete_reasons = @($Sampler.incomplete_reasons)
   }
   if ($null -ne $Sampler.PSObject.Properties['context'] -and $Sampler.context -ceq 'benchmark') {
     $receipt.context = 'benchmark'
