@@ -1305,7 +1305,7 @@
               "tests/profiles/space-exploration-base-f210-2123.json"
             ],
             "current_candidate_verdict": "not-established-for-full-family",
-            "coverage_gap": "New exact AAI Industry0.7.5 Base/Space Age input profiles are pinned; no native result exists yet. Complete the individual Industry and admitted full AAI-suite axes.",
+            "coverage_gap": "AAI Industry0.7.5 has six earlier data captures and named Base/Space Age source-to-successor lab/save chains in spec/evidence/aai-base-space-age-e3-native-chain.json. The latter retain their exact E3 player/source identities, inherited source physical output and preserved adverse terminal; they do not qualify a new successor crafting batch, the full AAI suite or current data parity. Existing575e q043/q044 captures need complete technology/settings comparison before their current consumed-path disposition; broader combined/client/configuration outcomes remain open.",
             "current_data_observation": {
               "source_commit": "7767026b540211a680c058cb30ab656d42e96ba8",
               "engine": "2.1.23",
@@ -1352,7 +1352,7 @@
               "tests/profiles/py-suite-with-productivity-space-age-f210-2123.json"
             ],
             "current_candidate_verdict": "not-established-for-full-family",
-            "coverage_gap": "Current F210 input profiles now pin the available exact individual/combined or full-suite closures; native, research/physical, migration and client outcomes remain to be established per selected profile. Older named receipts retain their original scopes."
+            "coverage_gap": "Named F200 PyCoal and PyAlienLife/HighTech earned-owner/lab/save checks exist in spec/evidence/py-coal-full-gameplay-adverse-native-chain.json and spec/evidence/py-alien-full-gameplay-native-chain.json. Coal passes its separate offline reconciliation while the original workflow remains failed; AlienLife adopts its original failed-workflow source under the recorded finite exception. These narrow routes retain their original identities and do not qualify the full Py suite, current F210 output comparisons, physical batches, clients or arbitrary mod combinations."
           },
           {
             "family": "K2",
