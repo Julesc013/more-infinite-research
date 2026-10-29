@@ -1,0 +1,97 @@
+{
+  "schema": 1,
+  "kind": "MIRLibraryPositiveStateF210NativeAdverseV1",
+  "status": "fixture-init-positive-holder-mismatch-before-clients",
+  "source_commit": "d14a668e9a866ff0a1abf3dede1d3c0edec43403",
+  "private_commit": "faef69376ef82ebe5bec1d80f15c95c5ef3d70fd",
+  "driver_sha256": "48A504200ACD98A8D4E06AEEA0FEEF85A8BD0951593D897B9B8B4BA612A320AB",
+  "packet_sha256": "3118D42F0155FC7700CA6ABC3E2DFC2CE560D95261C3E11FD15D8B1E4C1CCA2D",
+  "plan_sha256": "82733F75E324FCA78AE323EC4830F27F69A3ED7696BFE54147FE4804B3F45264",
+  "prepared_sha256": "E29BBF53F45646FB1DBD09B99DEA30846B23782387EB43CFA0098AE43AAAE6BD",
+  "engine": {
+    "path": "D:\\Games\\Factorio\\2.1\\bin\\x64\\factorio.exe",
+    "sha256": "8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38"
+  },
+  "candidate": {
+    "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\packages\\7b0-all17-r01\\more-infinite-research_5.0.21000.zip",
+    "sha256": "2DDD2A4C967BEF07830218442AE4441BEECD5B9ECE0AC86B09A5F6586BBA80E5"
+  },
+  "fixture": {
+    "sha256": "4FCF314C3D95E22C2F0CB4D2793DCC1E059756163E9F20240DDFE53AA9970912",
+    "bytes": 16922,
+    "members": [
+      {
+        "source": "tests/fixtures/library-multiplayer/control.lua",
+        "source_revision": "3e24a28dc660cdeaaef1bf73226899fbc93dbf11",
+        "sha256": "B756A4EA2DA9BE3C769470A1279461B6DEDCED6FFC3B519CE0ECB9C40D4EE76D",
+        "bytes": 58563,
+        "destination": "control.lua"
+      },
+      {
+        "source": "tests/fixtures/library-multiplayer/settings-updates.lua",
+        "source_revision": "3e24a28dc660cdeaaef1bf73226899fbc93dbf11",
+        "sha256": "AA3C818050FD927BEADBA7FEBC483FB4BC42668911888852E4CF6996B7F5C0FD",
+        "bytes": 1678,
+        "destination": "settings-updates.lua"
+      },
+      {
+        "source": "tests/fixtures/library-positive-state/data.lua",
+        "source_revision": "3e24a28dc660cdeaaef1bf73226899fbc93dbf11",
+        "sha256": "932D8019CE93A29AAABCA27A227547B8AD1FC41BC4A565592501724C62318357",
+        "bytes": 423,
+        "destination": "data.lua"
+      },
+      {
+        "source": "tests/fixtures/library-positive-state/positive-state.lua",
+        "source_revision": "3e24a28dc660cdeaaef1bf73226899fbc93dbf11",
+        "sha256": "400F302A8ADD039129D7A3FFA9BCAD57311E3CFA0FB52046129B1E0BD7DEEBDA",
+        "bytes": 7248,
+        "destination": "positive-state.lua"
+      },
+      {
+        "source": "tests/fixtures/library-positive-state/info-f210.json",
+        "source_revision": "3e24a28dc660cdeaaef1bf73226899fbc93dbf11",
+        "sha256": "F6EC127A4EBE19473688C92CDA53FC07C332708FC4432A4748A932998755BDC0",
+        "bytes": 260,
+        "destination": "info.json"
+      }
+    ]
+  },
+  "failure": {
+    "stage": "native CreateOnly on_init after fixture-owned seeding and reset_technology_effects",
+    "actual_error": "positive native holder changed: mir-legacy-module-credit-speed-module",
+    "location": "positive-state.lua:23",
+    "actual_holder_scalars": "not emitted by this fixture;cause remains a hypothesis until observed",
+    "product_fault_established": false
+  },
+  "root_readback": {
+    "primary_custody": "build/qualification/library-positive-state-f210-r01-controller",
+    "files": 22,
+    "bytes_per_copy": 129219,
+    "every_original_and_primary_hash_verified": true,
+    "all_original_archives_and_controls_restored": true
+  },
+  "receipt_capsule": {
+    "path": "spec/evidence/library-positive-state-f210-native-adverse-receipts-r01.json.gz",
+    "sha256": "0762B6DE139D512804FD9D043455CC5BAE8CEC0B84D351E760B7882BC2753E0D",
+    "bytes": 18583,
+    "bodies": 7
+  },
+  "counts": {
+    "actual_engine_processes": 1,
+    "joined_clients": 0,
+    "lab_completions": 0,
+    "completed_screenshots": 0,
+    "completed_successor_saves": 0
+  },
+  "pending_f200": "not launched;stopped after first failure;its166F74FD packet and inputs remain prepared",
+  "next_action": "Aero owns bounded fixture diagnosis with actual scalar observations around level/researched/effect-reset operations and corresponding host-double opponent. Preserve intended positive levels/effects and fresh-state guard;root executes only a newly frozen reviewed change.",
+  "factorio_processes_remaining": 0,
+  "controls_restored": true,
+  "dependency_payload_bytes_copied": 0,
+  "archive_links_created": 0,
+  "archive_extractions": 0,
+  "imported_earnings": false,
+  "performance_acceptance": false,
+  "release_qualification": false
+}
