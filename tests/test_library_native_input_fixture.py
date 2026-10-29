@@ -380,7 +380,7 @@ class LibrarySupportExportObserverControls(unittest.TestCase):
               end
               if action=="en-restart-full"then
                 if opponent~="early-server-commands"then
-                  callbacks[3]({command="mir-settings-export"})
+                  callbacks[3]({command="mir-settings-export",player_index=opponent=="zero-server-index"and 0 or nil})
                   callbacks[3]({command=opponent=="duplicate-settings-command"and"mir-settings-export"or"mir-diagnostics-export"})
                 end
                 api.checkpoint()
@@ -459,6 +459,12 @@ class LibrarySupportExportObserverControls(unittest.TestCase):
                 with self.subTest(target=target, opponent=opponent):
                     with self.assertRaises(Exception):
                         self.lua.globals().run_export_observer(target, opponent)
+
+    def test_zero_player_index_cannot_impersonate_absent_server_event_origin(self):
+        for target in ("f200", "f210"):
+            with self.subTest(target=target):
+                with self.assertRaises(Exception):
+                    self.lua.globals().run_export_observer(target, "zero-server-index")
 
 
 if __name__ == "__main__":
