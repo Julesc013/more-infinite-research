@@ -5,7 +5,7 @@ applies_to: "MIR development"
 audience: developer
 doc_type: specification
 owner: mir-maintainers
-last_reviewed: 2026-10-29
+last_reviewed: 2026-10-30
 supersedes: []
 superseded_by: []
 source_of_truth_for:
@@ -20,7 +20,7 @@ source_of_truth_for:
 
 Before retiring a real externally consumed old contract, record its consumers, preserved fields, explicit converter/adapter or documented major-version transition. Unconsumed previews retain their history and unresolved status without their platform being copied into the player mod. No new parallel `mep/` subsystem.
 
-This file specifies **MIR API 1.0.0-draft.3**, not a released API. The new native interface uses `api/v1/` and `more-infinite-research.api.v1`; this major-version boundary is independent of the product staging directory. It does not reuse the old `MIR4ApiResponseV1` wire contract. The supplied earlier pack's unversioned candidate paths are superseded before implementation; no deployed consumer compatibility is asserted. Product `5.0.0`, API `1.0`, target engine and SDK versions are distinct. Additive compatible capability changes can increment an API minor; changed meaning/removal requires a major transition. Preserve existing externally consumed identifiers where their audit establishes an obligation.
+This file freezes **MIR API 1.0.0** for the pending MIR5 release. The [scoped qualification decision](evidence/api1-documented-subset-qualification-r01.json) reconciles actual F2002.0.77/D3 and F2102.1.23/8DC present-MIR boundary, physical/save and client evidence, exact original absence guards and combined host admission budgets. MIR5 remains unreleased; this contract decision does not grant whole-product acceptance. The new native interface uses `api/v1/` and `more-infinite-research.api.v1`; this major-version boundary is independent of the product staging directory. It does not reuse the old `MIR4ApiResponseV1` wire contract. The supplied earlier pack's unversioned candidate paths are superseded before implementation; no deployed consumer compatibility is asserted. Product `5.0.0`, API `1.0`, target engine and SDK versions are distinct. Additive compatible capability changes can increment an API minor; changed meaning/removal requires a major transition. Preserve existing externally consumed identifiers where their audit establishes an obligation.
 
 ## Two surfaces, native settings
 
@@ -38,7 +38,7 @@ The `mods` guard belongs to settings/data stages. A runtime optional consumer ch
 
 Use fully qualified internal imports for modules reachable from external callers where needed, and test loading from two differently named extension mods. Do not assume one private registry instance or a shared mutable module cache across callers makes registration reliable.
 
-## Minimal candidate surface
+## Qualified documented surface
 
 | Function | Signature and result | Status |
 |---|---|---|
@@ -49,11 +49,11 @@ Use fully qualified internal imports for modules reachable from external callers
 | `add_productivity` | `(prototype, recipe_names, change) -> technology_name` | Data; admitted numeric unit/prerequisite fields; append named recipe-productivity effects |
 | `get_research` | `(force_index, technology_name) -> status or nil, error_code` | Runtime; read-only, no whole-catalogue traversal |
 
-Capabilities describe implemented target operations, not claimed modpack compatibility. Do not return `true` because a test was planned. API 1.0 is not frozen until two independently installable consumer mods pass on applicable targets, including late data-stage use and optional absence.
+Capabilities describe implemented target operations, not claimed modpack compatibility. Do not return `true` because a test was planned. The scoped qualification records two independently installable consumers, late data-stage use, physical/save and actual client behavior. Optional absence retains its exact F200/D3 and F210/FE4 no-MIR identities; it is not a new standalone8DC absence run.
 
 `add_productivity` takes an admitted technology declaration with no caller effects, a dense ordered list of distinct recipe names, and a positive native `change` no greater than `1`. It appends the fresh productivity effects itself. Its supported engine/effect range is advertised; it does not emulate unavailable native productivity on old targets. The extension resolves its own settings before the call. Both inputs and returned queries are isolated from internal mutable state.
 
-The unreleased API1.0.0-draft.3 declaration subset is deliberately not a general native prototype pass-through: it accepts only `type="technology"`, control-byte-free native IDs, optional ordered prerequisites, a `unit` with positive numeric `count`, nonempty distinct ingredients and finite positive `time`, and (for ordinary creation) exact bounded `character-crafting-speed` effects. F200 ingredients must name existing `ToolPrototype`s. F210 ingredients may name existing entries in the explicit concrete `ItemPrototype` categories `ammo`, `armor`, `blueprint`, `blueprint-book`, `capsule`, `copy-paste-tool`, `deconstruction-item`, `gun`, `item`, `item-with-entity-data`, `item-with-inventory`, `item-with-label`, `item-with-tags`, `module`, `rail-planner`, `repair-tool`, `selection-tool`, `space-platform-starter-pack`, `spidertron-remote`, `tool`, or `upgrade-item`. Its count is a lossless Lua integer at most `9007199254740991`; ingredient amounts are `1..65535`; time is `1/60..3600000` seconds; effect values are in `(0, 1]`. It rejects formulas, caller icons/localization/triggers/flags, arbitrary fields and every other effect before intended writes. MIR supplies its own packaged thumbnail, so caller asset paths cannot reach the generated prototype. The subset is implemented on F200/F210 only; native qualification remains separate. This is a safety admission contract, not a reimplementation of Factorio's full schema or a new declaration DSL.
+The API1.0.0 declaration subset is deliberately not a general native prototype pass-through: it accepts only `type="technology"`, control-byte-free native IDs, optional ordered prerequisites, a `unit` with positive numeric `count`, nonempty distinct ingredients and finite positive `time`, and (for ordinary creation) exact bounded `character-crafting-speed` effects. F200 ingredients must name existing `ToolPrototype`s. F210 ingredients may name existing entries in the explicit concrete `ItemPrototype` categories `ammo`, `armor`, `blueprint`, `blueprint-book`, `capsule`, `copy-paste-tool`, `deconstruction-item`, `gun`, `item`, `item-with-entity-data`, `item-with-inventory`, `item-with-label`, `item-with-tags`, `module`, `rail-planner`, `repair-tool`, `selection-tool`, `space-platform-starter-pack`, `spidertron-remote`, `tool`, or `upgrade-item`. Its count is a lossless Lua integer at most `9007199254740991`; ingredient amounts are `1..65535`; time is `1/60..3600000` seconds; effect values are in `(0, 1]`. It rejects formulas, caller icons/localization/triggers/flags, arbitrary fields and every other effect before intended writes. MIR supplies its own packaged thumbnail, so caller asset paths cannot reach the generated prototype. The subset is qualified only within the exact modern scope of the linked decision; other engines and arbitrary consumers retain their own obligations. This is a safety admission contract, not a reimplementation of Factorio's full schema or a new declaration DSL.
 
 ## Deliberately not part of the initial general API
 
@@ -63,7 +63,7 @@ No universal `extend_technology(name, arbitrary_changes)` patch language, owners
 
 ## Types and errors
 
-Use Lua strings for stable IDs; booleans for actual flags; finite numbers with explicit native units; dense arrays where order/multiplicity matters; ordinary maps for named lookup. Do not convert all integer fields to a new ID/handle system. Avoid LuaObjects, callbacks, metatables and persistent-state references in public result records. At the public input boundary, reject cycles/executable values; limits should bound only the submitted record, not scan the world. Establish measured size/depth limits before API stabilization, without excluding historical valid data silently. The implemented draft3 admission currently combines64 family rows,512 traversed definition entries,depth16 and4096 bytes per string/key,with at most64 recipe targets. All limits apply together;the row ceiling does not override the shared entry budget. The [host boundary observation](evidence/api-boundary-host-aero-measurement-r01.json) records bounded named-shape measurements without changing these limits or claiming native timing/API stability.
+Use Lua strings for stable IDs; booleans for actual flags; finite numbers with explicit native units; dense arrays where order/multiplicity matters; ordinary maps for named lookup. Do not convert all integer fields to a new ID/handle system. Avoid LuaObjects, callbacks, metatables and persistent-state references in public result records. At the public input boundary, reject cycles/executable values; limits should bound only the submitted record, not scan the world. The existing measured admission contract combines64 family rows,512 traversed definition entries,depth16 and4096 bytes per string/key,with at most64 recipe targets. All limits apply together;the row ceiling does not override the shared entry budget. The [host boundary observation](evidence/api-boundary-host-aero-measurement-r01.json) records bounded named-shape measurements without changing these limits or claiming native timing. The aggregate qualification adopts only these combined host admission limits.
 
 Runtime `ResearchStatus` exposes native semantics explicitly:
 
