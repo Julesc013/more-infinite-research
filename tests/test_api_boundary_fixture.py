@@ -56,6 +56,28 @@ class ApiBoundaryFixtureTests(unittest.TestCase):
                 with self.assertRaises(LuaError):
                     lua.execute('assert(loadfile(boundary_data))()')
 
+    def test_expected_rejection_cannot_hide_in_place_changes_to_named_fields(self):
+        for target in ("f200", "f210"):
+            for opponent in ("single-count", "automation-count"):
+                with self.subTest(target=target, opponent=opponent):
+                    lua = self.world(target)
+                    lua.globals().mutation_opponent = opponent
+                    lua.execute('''
+                    local actual=api.add_technology
+                    api.add_technology=function(row)
+                      local existing=data.raw.technology[row.name]
+                      if existing then
+                        local changed=mutation_opponent=="single-count" and existing or data.raw.technology.automation
+                        changed.unit=changed.unit or {}
+                        changed.unit.count=11
+                        error("MIR_API:duplicate_identity")
+                      end
+                      return actual(row)
+                    end
+                    ''')
+                    with self.assertRaises(LuaError):
+                        lua.execute('assert(loadfile(boundary_data))()')
+
     def native(self, base, opponent=""):
         lua = LuaRuntime(unpack_returned_tuples=True)
         lua.globals().control = str(FIXTURE / "control.lua")
