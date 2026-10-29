@@ -1,0 +1,11 @@
+{
+  "name": "mir-fixture-mir5-historical-transition",
+  "version": "0.2.0",
+  "title": "Published F100 forward-route witness",
+  "author": "MIR contributors",
+  "factorio_version": "1.0",
+  "dependencies": [
+    "base >= 1.0.0",
+    "more-infinite-research = 4.7.10003"
+  ]
+}
