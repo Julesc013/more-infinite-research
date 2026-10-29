@@ -1,0 +1,173 @@
+{
+  "schema": 1,
+  "kind": "MIRLibraryDiagnosticR02IndependentAeroReviewV1",
+  "status": "reviewed-diagnostic-retains-five-memory-control-failures",
+  "original_chain": "spec/evidence/library-repeatability-diagnostic-r02-native-chain.json",
+  "source_commit": "5dd429cc6f8080953096fc0d2630da073efb57e9",
+  "capsule": {
+    "path": "spec/evidence/library-repeatability-diagnostic-r02-native-receipts.json.gz",
+    "sha256": "950162E6EE13800737EA883D87A7C517A5124BDB39DB435E8BEED71A120BD21B",
+    "bytes": 662790,
+    "independently_verified_bodies": 86
+  },
+  "independent_replay": {
+    "metrics": 156,
+    "same_published_controls": 52,
+    "ui_and_save_controls_passed": 28,
+    "failed_memory_controls": {
+      "1": [
+        "memory/restart/server/working_set_bytes",
+        "memory/restart/server/private_bytes",
+        "memory/restart/client-en/working_set_bytes"
+      ],
+      "2": [
+        "memory/initial/client-en/working_set_bytes",
+        "memory/restart/client-de/working_set_bytes"
+      ]
+    },
+    "original_limits_unchanged": true,
+    "memory_samples": 3643,
+    "system_samples": 438,
+    "os_lifetimes": 42,
+    "profiler_values": 72,
+    "primary_custody_inventory_files": 1272,
+    "primary_custody_inventory_bytes": 140319822,
+    "controls_restored": true,
+    "factorio_after": 0
+  },
+  "systems": [
+    {
+      "case": "01-warmup-published",
+      "samples": 78,
+      "min_inferred_collection_start_interval_s": 1.004801699999998,
+      "max_collection_ms": 80.7754,
+      "collector_cpu_seconds": 3.296875,
+      "minimum_available_physical_bytes": 15020027904,
+      "maximum_commit_fraction": 0.6765555932963806,
+      "ac_statuses": [
+        1
+      ],
+      "power_plan": [
+        "Power Scheme GUID: e9a42b02-d5df-448d-aa00-03f14749eb61  (Ultimate Performance)"
+      ],
+      "max_abs_utc_monotonic_drift_s": 0.0017864000000000005
+    },
+    {
+      "case": "02-diagnostic-published",
+      "samples": 74,
+      "min_inferred_collection_start_interval_s": 0.999516100000001,
+      "max_collection_ms": 103.9121,
+      "collector_cpu_seconds": 3.5,
+      "minimum_available_physical_bytes": 15260196864,
+      "maximum_commit_fraction": 0.6677712086596093,
+      "ac_statuses": [
+        1
+      ],
+      "power_plan": [
+        "Power Scheme GUID: e9a42b02-d5df-448d-aa00-03f14749eb61  (Ultimate Performance)"
+      ],
+      "max_abs_utc_monotonic_drift_s": 0.0017167000000000016
+    },
+    {
+      "case": "03-diagnostic-published",
+      "samples": 73,
+      "min_inferred_collection_start_interval_s": 1.002722600000002,
+      "max_collection_ms": 142.3079,
+      "collector_cpu_seconds": 3.46875,
+      "minimum_available_physical_bytes": 15298457600,
+      "maximum_commit_fraction": 0.6689748549215927,
+      "ac_statuses": [
+        1
+      ],
+      "power_plan": [
+        "Power Scheme GUID: e9a42b02-d5df-448d-aa00-03f14749eb61  (Ultimate Performance)"
+      ],
+      "max_abs_utc_monotonic_drift_s": 0.0017385999999999999
+    },
+    {
+      "case": "04-diagnostic-published",
+      "samples": 72,
+      "min_inferred_collection_start_interval_s": 1.0044903999999981,
+      "max_collection_ms": 83.3718,
+      "collector_cpu_seconds": 3.609375,
+      "minimum_available_physical_bytes": 15257022464,
+      "maximum_commit_fraction": 0.6674505500609897,
+      "ac_statuses": [
+        1
+      ],
+      "power_plan": [
+        "Power Scheme GUID: e9a42b02-d5df-448d-aa00-03f14749eb61  (Ultimate Performance)"
+      ],
+      "max_abs_utc_monotonic_drift_s": 0.0023211999999999955
+    },
+    {
+      "case": "05-diagnostic-published",
+      "samples": 73,
+      "min_inferred_collection_start_interval_s": 1.0023679999999988,
+      "max_collection_ms": 145.3578,
+      "collector_cpu_seconds": 3.46875,
+      "minimum_available_physical_bytes": 15307677696,
+      "maximum_commit_fraction": 0.6712677253844697,
+      "ac_statuses": [
+        1
+      ],
+      "power_plan": [
+        "Power Scheme GUID: e9a42b02-d5df-448d-aa00-03f14749eb61  (Ultimate Performance)"
+      ],
+      "max_abs_utc_monotonic_drift_s": 0.0018909999999999969
+    },
+    {
+      "case": "06-functional-current",
+      "samples": 68,
+      "min_inferred_collection_start_interval_s": 1.0041340999999875,
+      "max_collection_ms": 105.1151,
+      "collector_cpu_seconds": 3.515625,
+      "minimum_available_physical_bytes": 15032393728,
+      "maximum_commit_fraction": 0.6788209655542535,
+      "ac_statuses": [
+        1
+      ],
+      "power_plan": [
+        "Power Scheme GUID: e9a42b02-d5df-448d-aa00-03f14749eb61  (Ultimate Performance)"
+      ],
+      "max_abs_utc_monotonic_drift_s": 0.0018489999999999965
+    }
+  ],
+  "phase_observations": [
+    "Failing graphical-client maxima precede Library actions. Pair2 initial EN maxima1883.25/1610.29MiB occur12.214/12.227s after each first role sample,while first-open occurs around30s. Pair2 restart DE maxima1837.25/1613.90MiB occur8.234/8.262s after first samples,while reopen occurs around12.4s.",
+    "Pair1 server restart high private349.87MiB occurs1.981s after its first sample near loading;its final sample is250.75MiB. Final samples are descriptive only and do not replace peaks.",
+    "The memory sampler retains a shared monotonic elapsed time but no UTC origin. These relative first-sample offsets are not exact OS process ages.",
+    "AC and recorded Ultimate Performance plans are unchanged. No trustworthy thermal/frequency or hard-fault data is available;available RAM and commit counters do not prove absence of memory pressure.",
+    "Readable surviving Code/remoting/PowerShell CPU counters continue to increase. New/exited/unreadable processes and possible PID reuse limit complete attribution. No causal explanation or rejected sample follows."
+  ],
+  "visual_review": {
+    "private_commit": "7a2b11f8df19c6d59c0d05c56564c8afa443b62f",
+    "directory": "evidence/library-diagnostic-r02-views",
+    "manifest_sha256": "7A41DF545D86B6071D831E6415953A57966518A2DD6D14B6CD77851CA492FF47",
+    "unchanged_images_hash_verified_and_viewed": 10,
+    "bytes": 10670182,
+    "findings": [
+      "Both current late first-open frames and published EN show the following query. The submitted screenshot is rendered after the same-tick search. This does not establish unchanged settled-first-open translation behavior.",
+      "Both current cold-reopen immediate/late frames keep gears/mining and show localized EN/DE titles.",
+      "Settled current details retain internal group/science/prerequisite IDs and several English German-view strings;published EN shows native science/prerequisite sprites. Presentation parity remains open.",
+      "Current omitted-family fallback is MIR research;published fallback is All research. Old values cannot become matched-output evidence."
+    ]
+  },
+  "separate_method_correction": "spec/evidence/library-explicit-family-method-aero-r01.json",
+  "next_method_review": [
+    "Freeze exact native workload including actual map-generation inputs. Current separate create calls specify no explicit map settings;different save hashes/sizes alone do not establish a seed difference.",
+    "Assess lifetime peak counters alongside original250ms samples for transient startup/load maxima. Keep original practical budgets and all adverse data. This is a proposal,not a selected replacement endpoint or tolerance.",
+    "Collect separate declared retained windows/churn where required;retained memory does not substitute for peak controls.",
+    "Require actual rendered-query and native family=all verification in both exact-engine arms before a separately reviewed scored dataset."
+  ],
+  "local_reproduction": {
+    "root": "build/qualification/library-diagnostic-r02-aero-review-r01",
+    "independent_program_sha256": "B265D34341D0F370ECD32F64082C12EA7CC44A94BFC368F3542A87C44009A8D5",
+    "independent_readback_sha256": "7C992645129F2C53B34F730304ECAB42554F0912005F10B60F5EC2C263AEB3D7",
+    "existing_portable_replay": "tests/test_library_profile_reader.py:test_actual_six_session_diagnostic_keeps_failed_memory_controls_unaccepted"
+  },
+  "native_processes_by_this_review": 0,
+  "player_source_changed": false,
+  "performance_acceptance": false,
+  "release_qualification": false
+}
