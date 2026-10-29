@@ -361,7 +361,9 @@ class LibrarySupportExportObserverControls(unittest.TestCase):
             local api=register();callbacks.init();assert(api.report().phase=="ready")
             local en,de=player(1,"en"),player(2,"de")
             game.players,game.connected_players={en,de},{en,de}
-            callbacks[1]({player_index=1});callbacks[1]({player_index=2})
+            if opponent=="reverse-role-order"then
+              callbacks[1]({player_index=2});callbacks[1]({player_index=1})
+            else callbacks[1]({player_index=1});callbacks[1]({player_index=2})end
             if opponent=="duplicate-initial-join"then callbacks[1]({player_index=1})end
             local sequence={"en-full","en-compact","en-diagnostics","de-full","de-compact","de-diagnostics",
               "en-foreign","en-full-before-failure","en-settings-failure","en-diagnostics-before-failure",
@@ -386,8 +388,12 @@ class LibrarySupportExportObserverControls(unittest.TestCase):
                   api=register();local saved=env.game;env.game=setmetatable({},{__index=function()error("on_load game access")end})
                   local before=fingerprint(store);callbacks.load();assert(fingerprint(store)==before);env.game=saved
                   if opponent=="post-load-server-command"then callbacks[3]({command="mir-settings-export"})end
-                  callbacks[1]({player_index=1})
-                  if opponent~="duplicate-rejoin"then callbacks[1]({player_index=opponent=="duplicate-restart-role"and 1 or 2})end
+                  if opponent=="reverse-role-order"then
+                    callbacks[1]({player_index=2});callbacks[1]({player_index=1})
+                  else
+                    callbacks[1]({player_index=1})
+                    if opponent~="duplicate-rejoin"then callbacks[1]({player_index=opponent=="duplicate-restart-role"and 1 or 2})end
+                  end
                 end
               end
               api.prepare(action)
@@ -418,6 +424,11 @@ class LibrarySupportExportObserverControls(unittest.TestCase):
             end
             local before=fingerprint(store);local result=api.report();assert(fingerprint(store)==before)
             assert(result.phase=="completed"and result.actual_clicks==13 and result.actual_joins==5 and saves==2 and logs==13 and write_calls==0)
+            assert(result.server_commands==2 and result.server_command_counts["mir-settings-export"]==1
+              and result.server_command_counts["mir-diagnostics-export"]==1)
+            assert(result.joins_by_phase.initial.en==1 and result.joins_by_phase.initial.de==1
+              and result.joins_by_phase.rejoin.en==0 and result.joins_by_phase.rejoin.de==1
+              and result.joins_by_phase.restart.en==1 and result.joins_by_phase.restart.de==1)
             return result.actual_clicks,result.actual_joins,saves,write_calls
           end
         ''')
@@ -426,6 +437,11 @@ class LibrarySupportExportObserverControls(unittest.TestCase):
         for target in ("f200", "f210"):
             with self.subTest(target=target):
                 self.assertEqual(self.lua.globals().run_export_observer(target, ""), (13, 5, 2, 0))
+
+    def test_initial_and_restart_roles_can_arrive_in_either_order(self):
+        for target in ("f200", "f210"):
+            with self.subTest(target=target):
+                self.assertEqual(self.lua.globals().run_export_observer(target, "reverse-role-order"), (13, 5, 2, 0))
 
     def test_missing_clicks_wrong_player_values_mutation_and_missing_lifecycle_are_rejected(self):
         for target in ("f200", "f210"):

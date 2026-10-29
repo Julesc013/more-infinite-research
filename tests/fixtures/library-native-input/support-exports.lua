@@ -74,7 +74,8 @@ function M.register(context)
       end
     end
     return {case=s.case,phase=s.phase,cursor=s.cursor,expected=actions[s.cursor] and actions[s.cursor][1] or false,
-      actual_clicks=s.clicks,actual_joins=s.joins,server_commands=s.server_commands,completed=s.completed,
+      actual_clicks=s.clicks,actual_joins=s.joins,joins_by_phase=s.joins_by_phase,
+      server_commands=s.server_commands,server_command_counts=s.server_command_counts,completed=s.completed,
       native_and_settings_unchanged=true,geometry=geometry,load_observed=loaded,
       files_require_external_readback=true,engine_log_exported=false,performance_acceptance=false,release_qualification=false}
   end
@@ -82,8 +83,14 @@ function M.register(context)
     local s=state();local expected=actions[s.cursor]
     if not expected or action~=expected[1] or s.phase~="ready" then fail("action order differs") end
     unchanged();local en,de=pair();local p=expected[2]=="en" and en or de
-    if action=="de-rejoin-full" and s.joins<3 then fail("actual client rejoin missing") end
-    if action=="en-restart-full" and (not loaded or s.joins<5) then fail("actual saved-host restart/rejoins missing") end
+    if s.joins_by_phase.initial.en~=1 or s.joins_by_phase.initial.de~=1 then fail("actual initial role joins missing") end
+    if action=="de-rejoin-full" then
+      if loaded or s.joins~=3 or s.joins_by_phase.rejoin.de~=1 then fail("actual DE rejoin missing") end
+    elseif action=="en-restart-full" then
+      if not loaded or s.joins~=5 or s.joins_by_phase.restart.en~=1 or s.joins_by_phase.restart.de~=1 then
+        fail("actual saved-host restart role joins missing")
+      end
+    elseif loaded or s.joins~=2 then fail("unexpected client lifecycle before action") end
     local kind=expected[3]
     if kind=="foreign" then
       if valid(p.gui.screen[ROOT]) then fail("close MIR with actual native input before foreign control") end
@@ -157,7 +164,9 @@ function M.register(context)
   end
   local function checkpoint()
     local s=state();unchanged();pair()
-    if s.cursor~=13 or s.phase~="ready" or s.server_commands~=2 then fail("pre-restart actions/server exports incomplete") end
+    if loaded or s.cursor~=13 or s.phase~="ready" or s.joins~=3 or s.joins_by_phase.rejoin.de~=1
+        or s.server_commands~=2 or s.server_command_counts["mir-settings-export"]~=1
+        or s.server_command_counts["mir-diagnostics-export"]~=1 then fail("pre-restart actions/server exports incomplete") end
     s.phase="await-restart";game.server_save("mir5-library-support-exports-restart")
     return report()
   end
@@ -174,7 +183,9 @@ function M.register(context)
     for _ in pairs(game.players) do fail("protected headless source must have no existing players") end
     if storage[context.key]~=nil then fail("observer state already exists") end
     storage[context.key]={schema=1,case="library-support-exports",phase="ready",cursor=1,native=context.world(),
-      settings=startup(),clicks=0,joins=0,server_commands=0,completed={}}
+      settings=startup(),clicks=0,joins=0,server_commands=0,completed={},
+      joins_by_phase={initial={en=0,de=0},rejoin={en=0,de=0},restart={en=0,de=0}},
+      server_command_counts={["mir-settings-export"]=0,["mir-diagnostics-export"]=0}}
     unchanged()
   end)
   script.on_load(function()
@@ -183,10 +194,20 @@ function M.register(context)
   script.on_event(defines.events.on_player_joined_game,function(event)
     local s=state();local p=game.get_player(event.player_index)
     if not valid(p) or (p.locale~="en" and p.locale~="de") then fail("joined client differs") end
-    local key=p.locale.."_index"
+    local role=p.locale
+    local key=role.."_index"
     if s[key] and s[key]~=p.index then fail("export client identity changed") end
+    local phase
+    if not loaded and s.phase=="ready" and s.cursor==1 then phase="initial"
+    elseif not loaded and s.phase=="ready" and s.cursor==12 and role=="de"
+        and s.joins_by_phase.initial.en==1 and s.joins_by_phase.initial.de==1 then phase="rejoin"
+    elseif loaded and s.phase=="await-restart" and s.cursor==13
+        and s.joins_by_phase.rejoin.de==1 then phase="restart"
+    else fail("unexpected client join role or phase") end
+    if s.joins_by_phase[phase][role]~=0 then fail("duplicate client join for role/phase") end
+    s.joins_by_phase[phase][role]=1
     s[key]=p.index;s.joins=s.joins+1
-    if loaded and s.phase=="await-restart" then s.phase="ready" end
+    if phase=="restart" and s.joins_by_phase.restart.en==1 and s.joins_by_phase.restart.de==1 then s.phase="ready" end
     unchanged()
   end)
   script.on_event(defines.events.on_gui_click,function(event)
@@ -198,7 +219,12 @@ function M.register(context)
   script.on_event(defines.events.on_console_command,function(event)
     if event.command~="mir-settings-export" and event.command~="mir-diagnostics-export" then return end
     if event.player_index~=nil and event.player_index~=0 then fail("expected explicit server-console export") end
-    local s=state();s.server_commands=s.server_commands+1;unchanged()
+    local s=state()
+    if loaded or s.phase~="ready" or s.cursor~=13 or s.joins~=3 or s.joins_by_phase.rejoin.de~=1 then
+      fail("server export command outside pre-restart phase")
+    end
+    if s.server_command_counts[event.command]~=0 then fail("duplicate server export command") end
+    s.server_command_counts[event.command]=1;s.server_commands=s.server_commands+1;unchanged()
   end)
 end
 return M
