@@ -196,11 +196,11 @@ try {{
                 text=True, capture_output=True, check=True,
             )
             result = json.loads(completed.stdout)
-        self.assertEqual(Path(result["path"]), target)
-        self.assertLess(result["bytes"], 65536)
-        self.assertTrue(result["iend_is_terminal"])
-        self.assertTrue(result["pixels_preserved"])
-        self.assertFalse(result["native_execution"])
+            self.assertTrue(target.samefile(result["path"]))
+            self.assertLess(result["bytes"], 65536)
+            self.assertTrue(result["iend_is_terminal"])
+            self.assertTrue(result["pixels_preserved"])
+            self.assertFalse(result["native_execution"])
 
     def test_fixed_four_arm_two_cycle_plan_keeps_warmups_aa_pilot_and_latin_square(self):
         record = invoke_as_json(f"-PlanOnly {DECLARED_POLICY}")
