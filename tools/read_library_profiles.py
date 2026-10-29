@@ -5,16 +5,22 @@ The direct command line accepts exactly one explicit server, English-client,
 and German-client log. An optional small manifest retains the native process
 phase for up to three selected logs per role. Neither input form computes a
 threshold, aggregate, or performance verdict.
+
+The explicit retained-window helper separately reads fixed fixture windows
+from already collected native peer logs and memory observations. Its medians
+are observations, not comparison thresholds or an acceptance verdict.
 """
 from __future__ import annotations
 
 import argparse
 from dataclasses import dataclass
+from datetime import datetime, timedelta
 import hashlib
 import json
 import math
 from pathlib import Path
 import re
+from statistics import median
 import sys
 from typing import Any, Iterable
 
@@ -44,6 +50,134 @@ GERMAN = re.compile(r"^(?P<action>first_open|search|refresh|reopen) Dauer: "
 
 class LibraryProfileError(ValueError):
     """A profiler input is absent, malformed, or outside this narrow contract."""
+
+
+def read_retained_windows(memory: dict, logs: dict[str, str], arm: str) -> dict:
+    """Read the explicitly opted-in paired fixture windows; never score them.
+
+    Logs are the three exact restart peer stdout bodies. The caller retains
+    their hashes and the complete collector body alongside this observation.
+    Native elapsed timestamps are aligned to the existing owned process start
+    and sampler reference, with the protocol's fixed boundary trims.
+    """
+    def require(condition: bool, message: str) -> None:
+        if not condition:
+            raise LibraryProfileError("retained window: " + message)
+
+    def utc(value: str) -> datetime:
+        require(isinstance(value, str) and len(value) <= 64, "invalid UTC identity")
+        try:
+            parsed = datetime.fromisoformat(value.replace("Z", "+00:00"))
+        except ValueError as error:
+            raise LibraryProfileError("retained window: invalid UTC identity") from error
+        require(parsed.utcoffset() == timedelta(0), "UTC offset is absent or nonzero")
+        return parsed
+
+    def unique_object(pairs: list) -> dict:
+        result = {}
+        for key, value in pairs:
+            require(key not in result, "duplicate marker field")
+            result[key] = value
+        return result
+
+    roles = ("server", "client-en", "client-de")
+    require(type(logs) is dict and set(logs) == set(roles), "three exact peer logs required")
+    require(arm in ("published", "mir5"), "unknown arm")
+    require(type(memory) is dict and memory.get("kind") == "MIR5OwnedProcessMemoryObservationV1"
+            and memory.get("status") == "complete-observation" and memory.get("incomplete_reasons") == []
+            and memory.get("performance_acceptance") is False,
+            "collector is incomplete or unknown")
+    observer = memory.get("lifetime_peak_observer")
+    require(type(observer) is dict and observer.get("changes_periodic_observations") is False,
+            "owned collector clock is absent")
+    reference = utc(observer.get("utc_reference_before_stopwatch_start"))
+    observations, peaks = memory.get("observations"), memory.get("lifetime_peak_counters")
+    require(type(observations) is list and 1 <= len(observations) <= 12000,
+            "observation count exceeds collector bound")
+    require(type(peaks) is list and len(peaks) == 6, "six owned phase counters required")
+    require(all(type(row) is dict for row in observations + peaks), "malformed collector row")
+    stages = ["baseline-start", "baseline-end", "post-refresh-start", "post-refresh-end"]
+    token = "[MIR5_LIBRARY_RETAINED] "
+    fields = {"schema", "case", "stage", "arm", "tick", "refresh_iterations", "public_calls_per_iteration",
+              "window_ticks", "native_snapshot_unchanged", "actual_keyboard_input", "performance_acceptance"}
+    results, metrics, growth = [], {}, {}
+    for role in roles:
+        matches = [row for row in peaks if row.get("phase") == "restart" and row.get("role") == role]
+        require(len(matches) == 1, "restart identity is missing or duplicated")
+        peak = matches[0]
+        require(type(peak.get("pid")) is int and peak["pid"] > 0, "invalid PID")
+        process_start = utc(peak.get("start_utc"))
+        offset_ms = (process_start - reference).total_seconds() * 1000
+        text = logs[role]
+        require(type(text) is str and len(text.encode("utf-8")) <= MAX_LOG_BYTES, "peer log exceeds bound")
+        markers = []
+        for line in text.splitlines():
+            if token.rstrip() not in line:
+                continue
+            require(len(line) <= MAX_LINE_CHARACTERS and len(markers) < 4, "marker count/line exceeds bound")
+            match = re.fullmatch(r"\s*([0-9]+(?:\.[0-9]+)?)\s+.*?\[MIR5_LIBRARY_RETAINED\] (.+)", line)
+            require(match is not None, "malformed native elapsed marker")
+            try:
+                row = json.loads(match[2], object_pairs_hook=unique_object)
+            except LibraryProfileError:
+                raise
+            except (ValueError, TypeError, RecursionError) as error:
+                raise LibraryProfileError("retained window: malformed marker JSON") from error
+            require(type(row) is dict and set(row) == fields and type(row["schema"]) is int
+                    and row["schema"] == 1 and row["case"] == "library-paired-browser" and row["arm"] == arm,
+                    "marker identity differs")
+            require(type(row["tick"]) is int and row["tick"] >= 0
+                    and type(row["refresh_iterations"]) is int
+                    and type(row["public_calls_per_iteration"]) is int and row["public_calls_per_iteration"] == 2
+                    and type(row["window_ticks"]) is int and row["window_ticks"] == 600
+                    and row["native_snapshot_unchanged"] is True and row["actual_keyboard_input"] is False
+                    and row["performance_acceptance"] is False, "marker assertion differs")
+            seconds = float(match[1])
+            require(math.isfinite(seconds) and 0 <= seconds <= 900, "invalid native elapsed time")
+            markers.append({"row": row, "elapsed_ms": offset_ms + seconds * 1000, "raw_line": line})
+        require([x["row"]["stage"] for x in markers] == stages, "missing/duplicate/unordered stages")
+        require([x["row"]["refresh_iterations"] for x in markers] == [0, 0, 32, 32], "refresh count differs")
+        require([markers[i + 1]["row"]["tick"] - markers[i]["row"]["tick"] for i in range(3)]
+                == [600, 960, 600], "native tick windows differ")
+        require(all(b["elapsed_ms"] > a["elapsed_ms"] for a, b in zip(markers, markers[1:])),
+                "native elapsed stages are unordered")
+        samples = [x for x in observations if x.get("phase") == "restart" and x.get("role") == role]
+        require(len(samples) >= 8, "missing restart observations")
+        previous = -1
+        for sample in samples:
+            elapsed = sample.get("elapsed_monotonic_milliseconds")
+            require(type(sample.get("pid")) is int and sample["pid"] == peak["pid"]
+                    and sample.get("start_utc") == peak["start_utc"],
+                    "sample process identity differs")
+            require(type(elapsed) in (int, float) and 0 <= elapsed <= 900000 and math.isfinite(elapsed)
+                    and previous < elapsed,
+                    "sample clock differs")
+            require(all(type(sample.get(key)) is int and 0 <= sample[key] < 2**63
+                        for key in ("working_set_bytes", "private_bytes")), "invalid sampled memory")
+            previous = elapsed
+        windows = {}
+        for label, a, b in (("baseline", 0, 1), ("post_refresh", 2, 3)):
+            start, end = markers[a]["elapsed_ms"] + 1000, markers[b]["elapsed_ms"] - 1000
+            selected = [x for x in samples if start <= x["elapsed_monotonic_milliseconds"] <= end]
+            require(len(selected) >= 8, "too few eligible samples")
+            times = [x["elapsed_monotonic_milliseconds"] for x in selected]
+            require(times[-1] - times[0] >= 2000 and times[0] - start <= 500 and end - times[-1] <= 500
+                    and max(b - a for a, b in zip(times, times[1:])) <= 1000,
+                    "eligible window coverage is incomplete")
+            cutoff = peak.get("elapsed_monotonic_milliseconds")
+            require(type(cutoff) in (int, float) and end <= cutoff <= 900000 and math.isfinite(cutoff),
+                    "owned cutoff does not cover the window")
+            values = {key: median(x[key] for x in selected) for key in ("working_set_bytes", "private_bytes")}
+            windows[label] = {"eligible_start_ms": start, "eligible_end_ms": end, "samples": len(selected),
+                              "first_sample_ms": times[0], "last_sample_ms": times[-1], "medians": values}
+            for key, value in values.items():
+                metrics[f"retained/{label}/{role}/{key}"] = value
+        for key in ("working_set_bytes", "private_bytes"):
+            growth[f"retained_growth/{role}/{key}"] = windows["post_refresh"]["medians"][key] - windows["baseline"]["medians"][key]
+        results.append({"role": role, "phase": "restart", "pid": peak["pid"], "start_utc": peak["start_utc"],
+                        "markers": markers, "windows": windows})
+    return {"kind": "MIRLibraryRetainedWindowObservationV1", "complete": True, "arm": arm,
+            "roles": results, "metrics": metrics, "growth": growth, "performance_acceptance": False}
 
 
 @dataclass(frozen=True)

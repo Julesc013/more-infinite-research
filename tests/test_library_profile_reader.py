@@ -1,6 +1,7 @@
 """Controls for the bounded offline native Library profiler reader."""
 from __future__ import annotations
 
+import copy
 import hashlib
 import base64
 import gzip
@@ -599,6 +600,106 @@ class LibraryProfileReaderTests(unittest.TestCase):
         self.assertNotIn("percent", completed.stdout.lower())
         self.assertNotIn("threshold", completed.stdout.lower())
         self.assertEqual(expected_server_hash, result["roles"][0]["log_sha256"])
+
+
+class RetainedWindowReaderTests(unittest.TestCase):
+    def inputs(self):
+        roles = ("server", "client-en", "client-de")
+        memory = {"kind": "MIR5OwnedProcessMemoryObservationV1", "status": "complete-observation",
+                  "incomplete_reasons": [], "performance_acceptance": False,
+                  "lifetime_peak_observer": {"changes_periodic_observations": False,
+                                             "utc_reference_before_stopwatch_start": "2026-10-29T00:00:00Z"},
+                  "observations": [], "lifetime_peak_counters": []}
+        logs = {}
+        for index, role in enumerate(roles):
+            start = f"2026-10-29T00:00:0{index}Z"
+            for phase in ("initial", "restart"):
+                memory["lifetime_peak_counters"].append({"phase": phase, "role": role, "pid": 100+index,
+                    "start_utc": start, "elapsed_monotonic_milliseconds": 45000})
+            for elapsed in range(0, 45001, 250):
+                memory["observations"].append({"phase": "restart", "role": role, "pid": 100+index,
+                    "start_utc": start, "elapsed_monotonic_milliseconds": elapsed,
+                    "working_set_bytes": (101 if elapsed < 20000 else 202)+index,
+                    "private_bytes": (303 if elapsed < 20000 else 404)+index})
+            lines = []
+            for stage, seconds, tick, iterations in [("baseline-start", 5, 100, 0),
+                    ("baseline-end", 15, 700, 0), ("post-refresh-start", 31, 1660, 32),
+                    ("post-refresh-end", 41, 2260, 32)]:
+                row = {"schema": 1, "case": "library-paired-browser", "stage": stage, "arm": "published",
+                       "tick": tick, "refresh_iterations": iterations, "public_calls_per_iteration": 2,
+                       "window_ticks": 600, "native_snapshot_unchanged": True, "actual_keyboard_input": False,
+                       "performance_acceptance": False}
+                lines.append(f"  {seconds-index:.3f} Script @fixture: [MIR5_LIBRARY_RETAINED] {json.dumps(row)}")
+            logs[role] = "\n".join(lines)
+        return memory, logs
+
+    def test_aligns_each_process_clock_and_preserves_distinct_observations_without_scoring(self):
+        memory, logs = self.inputs()
+        before = copy.deepcopy((memory, logs))
+        result = reader.read_retained_windows(memory, logs, "published")
+        self.assertTrue(result["complete"])
+        self.assertFalse(result["performance_acceptance"])
+        self.assertEqual(len(result["metrics"]), 12)
+        for index, role in enumerate(("server", "client-en", "client-de")):
+            self.assertEqual(result["metrics"][f"retained/baseline/{role}/working_set_bytes"], 101+index)
+            self.assertEqual(result["metrics"][f"retained/post_refresh/{role}/private_bytes"], 404+index)
+            self.assertEqual(result["growth"][f"retained_growth/{role}/working_set_bytes"], 101)
+            self.assertEqual(result["roles"][index]["windows"]["baseline"]["samples"], 33)
+        self.assertEqual((memory, logs), before)
+        self.assertNotIn("threshold", result)
+
+    def test_rejects_short_burst_missing_edges_and_internal_sampling_gaps(self):
+        for opponent in ("short-burst", "missing-first-edge", "missing-last-edge", "internal-gap"):
+            with self.subTest(opponent=opponent):
+                memory, logs = self.inputs()
+                def keep(row):
+                    if row["role"] != "server":
+                        return True
+                    elapsed = row["elapsed_monotonic_milliseconds"]
+                    if opponent == "short-burst":
+                        return not 6000 <= elapsed <= 14000 or 8000 <= elapsed <= 10000
+                    if opponent == "missing-first-edge":
+                        return not 6000 <= elapsed <= 6500
+                    if opponent == "missing-last-edge":
+                        return not 13500 <= elapsed <= 14000
+                    return not 8000 <= elapsed <= 8750
+                memory["observations"] = [row for row in memory["observations"] if keep(row)]
+                with self.assertRaisesRegex(reader.LibraryProfileError, "coverage"):
+                    reader.read_retained_windows(memory, logs, "published")
+
+    def test_rejects_incomplete_or_changed_process_and_counter_inputs(self):
+        for opponent in ("incomplete", "missing-counter", "pid", "start", "clock", "nan", "memory-type", "cutoff"):
+            with self.subTest(opponent=opponent):
+                memory, logs = self.inputs()
+                sample = memory["observations"][32]
+                if opponent == "incomplete": memory["status"] = "incomplete-observation"
+                elif opponent == "missing-counter": memory["lifetime_peak_counters"].pop()
+                elif opponent == "pid": sample["pid"] = 999
+                elif opponent == "start": sample["start_utc"] = "2026-10-29T00:00:01Z"
+                elif opponent == "clock": sample["elapsed_monotonic_milliseconds"] = 0
+                elif opponent == "nan": sample["elapsed_monotonic_milliseconds"] = float("nan")
+                elif opponent == "memory-type": sample["private_bytes"] = "303"
+                else: memory["lifetime_peak_counters"][1]["elapsed_monotonic_milliseconds"] = 10000
+                with self.assertRaises(reader.LibraryProfileError):
+                    reader.read_retained_windows(memory, logs, "published")
+
+    def test_rejects_missing_duplicate_malformed_or_wrong_workload_peer_markers(self):
+        for opponent in ("missing", "duplicate", "tick", "iterations", "native-state", "arm", "fields", "elapsed", "duplicate-key"):
+            with self.subTest(opponent=opponent):
+                memory, logs = self.inputs()
+                text = logs["server"]
+                if opponent == "missing": text = "\n".join(text.splitlines()[:-1])
+                elif opponent == "duplicate": text += "\n" + text.splitlines()[-1]
+                elif opponent == "tick": text = text.replace('"tick": 1660', '"tick": 1659')
+                elif opponent == "iterations": text = text.replace('"refresh_iterations": 32', '"refresh_iterations": 31')
+                elif opponent == "native-state": text = text.replace('"native_snapshot_unchanged": true', '"native_snapshot_unchanged": false')
+                elif opponent == "arm": text = text.replace('"arm": "published"', '"arm": "mir5"')
+                elif opponent == "fields": text = text.replace('"schema": 1', '"unknown": 1, "schema": 1')
+                elif opponent == "elapsed": text = text.replace('  5.000', '  invalid')
+                else: text = text.replace('"schema": 1', '"schema": 1, "schema": 1')
+                logs["server"] = text
+                with self.assertRaises(reader.LibraryProfileError):
+                    reader.read_retained_windows(memory, logs, "published")
 
 
 if __name__ == "__main__":
