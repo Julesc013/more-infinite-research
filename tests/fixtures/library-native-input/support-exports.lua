@@ -118,7 +118,12 @@ function M.register(context)
       local box=preview(p,kind)
       if valid(refs.previous) then fail("previous export preview was not retired") end
       if kind=="settings-failure" or kind=="diagnostics-failure" then
-        if valid(box) then fail("failed export retained a preview") end
+        -- Targeted I/O is local to its requesting peer. Preserve each native
+        -- peer's GUI projection; the external reader must check the target
+        -- peer's actual failure message/files, not infer them from the host.
+        result.failure_preview_present=valid(box)
+        result.failure_target_player_index=p.index
+        result.failure_requires_target_peer_readback=true
         result.native_failure_message_requires_screenshot=true
       else
         if not valid(box) or box.type~="text-box" or box.read_only~=true or type(box.text)~="string"
