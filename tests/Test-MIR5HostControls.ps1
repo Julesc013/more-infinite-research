@@ -16,6 +16,7 @@ $controls = @(
   [ordered]@{path='tests/test_historical_transition_fixture.py';lua=$true},
   [ordered]@{path='tests/test_f110_f200_transition_fixture.py';lua=$true},
   [ordered]@{path='tests/test_f100_f110_laser_fixture.py';lua=$true},
+  [ordered]@{path='tests/test_published_f100_forward_fixture.py';lua=$true},
   [ordered]@{path='tests/test_migration_origins_f200_source_controls.py';lua=$true},
   [ordered]@{path='tests/test_migration_origins_f200_110_source_controls.py';lua=$true},
   [ordered]@{path='tests/test_migration_origins_f200_110_successor_controls.py';lua=$true},
