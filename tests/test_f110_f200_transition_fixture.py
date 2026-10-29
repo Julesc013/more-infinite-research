@@ -17,6 +17,7 @@ SHARED = FIXTURE / "shared"
 SOURCE = FIXTURE / "f110/published-4.7.3"
 SUCCESSOR = FIXTURE / "f200/successor"
 F110_SUCCESSOR = FIXTURE / "f110/successor"
+F210_SUCCESSOR = FIXTURE / "f210/successor"
 DIRECT = "recipe-prod-research_character_mining_speed-1"
 CONTINUATION = "inserter-capacity-bonus-8"
 
@@ -153,20 +154,25 @@ class F110F200TransitionFixtureTests(unittest.TestCase):
                 self.assertFalse(rejected["ok"])
                 self.assertEqual(before, py(rejected["raw"]))
 
-    def test_callbacks_preserve_17_rows_and_translate_only_capacity_token(self):
+    def test_callbacks_preserve_17_rows_and_translate_only_capacity_token(
+            self, successor_dir=SUCCESSOR, modern_base="2.0.77",
+            modern_mir="5.0.20000", modern_fixture="0.2.0"):
         effects = self.f110_effects()
         self.assertEqual(17, len(effects))
         self.lua.globals().source_effects = lua(self.lua, effects)
         paths = {
             "source_control_path": SOURCE / "control.lua", "source_catalogue_path": SOURCE / "catalogue.lua",
-            "successor_control_path": SUCCESSOR / "control.lua", "successor_catalogue_path": SUCCESSOR / "catalogue.lua",
+            "successor_control_path": successor_dir / "control.lua", "successor_catalogue_path": successor_dir / "catalogue.lua",
             "shared_control_path": SHARED / "control.lua",
             "same_control_path": F110_SUCCESSOR / "control.lua", "same_catalogue_path": F110_SUCCESSOR / "catalogue.lua",
         }
         for name, path in paths.items():
             self.lua.globals()[name] = path.as_posix()
+        self.lua.globals().fixture_modern_base = modern_base
+        self.lua.globals().fixture_modern_mir = modern_mir
+        self.lua.globals().fixture_modern_version = modern_fixture
         self.lua.execute(r'''
-          function f110_f200_callbacks(mutate_capacity, omit_row, mutate_effect, same_edition, mutate_progress, disable_queue, mutate_reload_queue)
+          function f110_f200_callbacks(mutate_capacity, omit_row, mutate_effect, same_edition, mutate_progress, disable_queue, mutate_reload_queue, mutate_laser)
             local function read_plan(path)
               return assert(loadfile(path))()
             end
@@ -317,11 +323,14 @@ class F110F200TransitionFixtureTests(unittest.TestCase):
             if mutate_effect then
               game.forces.player.technologies["recipe-prod-research_character_walking_speed-1"].prototype.effects[1].modifier=.04
             end
+            if mutate_laser then
+              game.forces.player.technologies["laser-shooting-speed-8"].prototype.effects[1].ammo_category="laser-turret"
+            end
             local successor=load_stage(same_edition and same_control_path or successor_control_path,
               same_edition and same_catalogue_path or successor_catalogue_path,
-              {base=same_edition and "1.1.110" or "2.0.77",
-                ["more-infinite-research"]=same_edition and "5.0.11000" or "5.0.20000",
-                ["mir-fixture-mir5-f110-f200-transition"]=same_edition and "0.3.0" or "0.2.0"},not same_edition)
+              {base=same_edition and "1.1.110" or fixture_modern_base,
+                ["more-infinite-research"]=same_edition and "5.0.11000" or fixture_modern_mir,
+                ["mir-fixture-mir5-f110-f200-transition"]=same_edition and "0.3.0" or fixture_modern_version},not same_edition)
             ok,message=pcall(successor.configuration)
             if not ok then return {ok=false,message=tostring(message),logs=logs,state=state} end
             state.lab.energy=0;successor.events[2]();state.successor_energized=state.lab.energy
@@ -486,7 +495,7 @@ class F110F200TransitionFixtureTests(unittest.TestCase):
         self.assertEqual(("f200", "2.0", "2.0.77", "8BA029A01E1F08C311C6A127C81313D7664F0ABADAF3C79F84157775D35ADFD7"),
                          (successor_profile["target"], successor_profile["factorio_line"], successor_profile["engine"]["version"],
                           successor_profile["archive_sha256"]["more-infinite-research_5.0.20000.zip"]))
-        for stage in (SOURCE, SUCCESSOR, F110_SUCCESSOR):
+        for stage in (SOURCE, SUCCESSOR, F110_SUCCESSOR, F210_SUCCESSOR):
             self.assertEqual('require("__mir-fixture-mir5-f110-f200-transition__/fixture_control")\n',
                              stage.joinpath("control.lua").read_text(encoding="utf-8"))
             self.assertIn('fixture_data_final', stage.joinpath("data-final-fixes.lua").read_text(encoding="utf-8"))
@@ -494,6 +503,46 @@ class F110F200TransitionFixtureTests(unittest.TestCase):
         readme = FIXTURE.joinpath("README.md").read_text(encoding="utf-8")
         self.assertIn("not a native result", readme)
         self.assertIn("must be rebound", readme)
+
+
+    def test_f210_callbacks_retain_all_source_assertions_and_reject_laser_drift(self):
+        self.test_callbacks_preserve_17_rows_and_translate_only_capacity_token(
+            F210_SUCCESSOR, "2.1.23", "5.0.21000", "0.4.0")
+        passed = py(self.lua.eval("f110_f200_callbacks")())
+        self.assertTrue(passed["ok"])
+        markers = [json.loads(row.split(" RESULT ")[1]) for row in passed["logs"]
+                   if row.startswith("[MIR5_NATIVE_FIXTURE] RESULT ")]
+        target = [row for row in markers if row.get("target") == "f210"]
+        self.assertEqual(["initial", "reload", "reload"], [row["stage"] for row in target])
+        self.assertTrue(all(row["origin"] == "published-f110-4.7.11003" and row["base_version"] == "2.1.23"
+                            for row in target))
+        wrong = py(self.lua.eval("f110_f200_callbacks")(
+            False, False, False, False, False, False, False, True))
+        self.assertFalse(wrong["ok"])
+        self.assertIn("retained technology state differs", wrong["message"])
+        self.assertEqual("source-complete", wrong["state"]["phase"])
+
+    def test_f210_preflight_pins_destination_and_preserves_ordinary_settings(self):
+        raw = {"technology": {DIRECT: {
+            "name": DIRECT, "level": 1, "upgrade": True, "max_level": "infinite", "enabled": True,
+            "unit": {"count_formula": "8000*2^(L-1)", "time": 60,
+                     "ingredients": [["utility-science-pack", 1], ["military-science-pack", 1]]},
+            "effects": [{"type": "character-mining-speed", "modifier": .05}],
+        }}, "sentinel": {"value": 17}}
+        mods = {"base": "2.1.23", "more-infinite-research": "5.0.21000",
+                "mir-fixture-mir5-f110-f200-transition": "0.4.0"}
+        accepted = self.run_data(F210_SUCCESSOR / "data-final-fixes.lua", F210_SUCCESSOR / "catalogue.lua", raw, mods)
+        self.assertTrue(accepted["ok"], accepted["message"])
+        self.assertEqual({"count": 1, "time": 1,
+                          "ingredients": [["utility-science-pack", 1], ["military-science-pack", 1]]},
+                         py(accepted["raw"])["technology"][DIRECT]["unit"])
+        self.assertEqual({"value": 17}, py(accepted["raw"])["sentinel"])
+        for key, bad in [("base", "2.0.77"), ("more-infinite-research", "5.0.20000"),
+                         ("mir-fixture-mir5-f110-f200-transition", "0.2.0")]:
+            changed = dict(mods, **{key: bad})
+            refused = self.run_data(F210_SUCCESSOR / "data-final-fixes.lua", F210_SUCCESSOR / "catalogue.lua", raw, changed)
+            self.assertFalse(refused["ok"])
+            self.assertEqual(raw, py(refused["raw"]))
 
 
 if __name__ == "__main__":
