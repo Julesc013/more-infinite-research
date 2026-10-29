@@ -2806,11 +2806,11 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
           $rows=@(
             @{schema=1;case='library-paired-browser';stage='ready';status='ready';arm='published';join_events=0;action_call_count=0;screenshot_calls=0;native_snapshot_unchanged=$true;profiler_observation_only=$true;performance_acceptance=$false},
             @{schema=1;case='library-paired-browser';stage='first-open';status='observed';arm='published';join_events=2;action_call_count=2;screenshot_calls=2;native_snapshot_unchanged=$true;profiler_observation_only=$true;performance_acceptance=$false},
-            @{schema=1;case='library-paired-browser';stage='search';status='observed';arm='published';join_events=2;action_call_count=2;screenshot_calls=4;native_snapshot_unchanged=$true;profiler_observation_only=$true;performance_acceptance=$false},
-            @{schema=1;case='library-paired-browser';stage='refresh';status='observed';arm='published';join_events=2;action_call_count=2;screenshot_calls=6;native_snapshot_unchanged=$true;profiler_observation_only=$true;performance_acceptance=$false},
-            @{schema=1;case='library-paired-browser';stage='restart-ready';status='ready';arm='published';join_events=2;action_call_count=2;screenshot_calls=6;native_snapshot_unchanged=$true;profiler_observation_only=$true;performance_acceptance=$false},
-            @{schema=1;case='library-paired-browser';stage='reopen';status='observed';arm='published';join_events=4;action_call_count=2;screenshot_calls=8;native_snapshot_unchanged=$true;profiler_observation_only=$true;performance_acceptance=$false},
-            @{schema=1;case='library-paired-browser';stage='completed';status='passed';arm='published';join_events=4;action_call_count=2;screenshot_calls=8;native_snapshot_unchanged=$true;profiler_observation_only=$true;performance_acceptance=$false}
+            @{schema=1;case='library-paired-browser';stage='search';status='observed';arm='published';join_events=2;action_call_count=2;screenshot_calls=6;native_snapshot_unchanged=$true;profiler_observation_only=$true;performance_acceptance=$false},
+            @{schema=1;case='library-paired-browser';stage='refresh';status='observed';arm='published';join_events=2;action_call_count=2;screenshot_calls=8;native_snapshot_unchanged=$true;profiler_observation_only=$true;performance_acceptance=$false},
+            @{schema=1;case='library-paired-browser';stage='restart-ready';status='ready';arm='published';join_events=2;action_call_count=2;screenshot_calls=8;native_snapshot_unchanged=$true;profiler_observation_only=$true;performance_acceptance=$false},
+            @{schema=1;case='library-paired-browser';stage='reopen';status='observed';arm='published';join_events=4;action_call_count=2;screenshot_calls=10;native_snapshot_unchanged=$true;profiler_observation_only=$true;performance_acceptance=$false},
+            @{schema=1;case='library-paired-browser';stage='completed';status='passed';arm='published';join_events=4;action_call_count=2;screenshot_calls=12;native_snapshot_unchanged=$true;profiler_observation_only=$true;performance_acceptance=$false}
           )
           function MarkerText($InputRows){return (($InputRows|ForEach-Object {'[MIR5_LIBRARY_PAIRED_BROWSER] '+($_|ConvertTo-Json -Compress)})-join "`n")+"`n"}
           $text=MarkerText $rows
@@ -3073,12 +3073,12 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
         session = SESSION.read_text(encoding="utf-8")
         self.assertIn("'library-paired-browser'", wrapper)
         self.assertIn("'MIR5LibraryPairedBrowserNativeResultV1'", wrapper)
-        self.assertIn("@('first-open','search','refresh','reopen')", wrapper)
+        self.assertIn("@('first-open','first-open-settled','search','refresh','reopen','reopen-settled')", wrapper)
         self.assertIn("MIR5LibraryPairedBrowserSessionV1", session)
         self.assertIn("Get-PairedBrowserStageMarker", session)
         self.assertIn("Get-PairedBrowserProfilerMarkers", session)
         self.assertIn("@('initial','restart')", session)
-        self.assertIn("$screenshots.Count -eq 8", session)
+        self.assertIn("$screenshots.Count -eq 12", session)
         self.assertIn("Start-Clients 'initial'", session)
         self.assertIn("Start-Clients 'restart'", session)
         self.assertIn("Invoke-LoopbackRconKicks", session)
@@ -3201,7 +3201,8 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
             return @($rows)
           }
           function Find-Screenshots([string[]]$Stages){
-            $count=if($Stages.Count-eq4){8}else{6}
+            $count=2*$Stages.Count
+            if($Stages.Count-eq6 -and $script:mode-ceq'missing-settled-capture'){$count--}
             return [pscustomobject]@{files=@(1..$count|ForEach-Object {Join-Path $output ("paired-capture-"+$_.ToString()+'.png')})}
           }
           function Invoke-LoopbackRconKicks {param($Port,$Password)}
@@ -3284,12 +3285,12 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
               })}
             }
             if($Description -eq 'paired Browser final save and client screenshots'){
-              return Find-Screenshots @('first-open','search','refresh','reopen')
+              return Find-Screenshots @('first-open','first-open-settled','search','refresh','reopen','reopen-settled')
             }
             return $true
           }
           foreach($fixtureCase in @('library-multiplayer','library-paired-browser','scripted-effects-multiplayer')){
-            $modes=if($fixtureCase-ceq'library-paired-browser'){@('success','appended-phase','cleanup','primary-and-cleanup','missing-phase')}else{@('success','cleanup','primary-and-cleanup')}
+            $modes=if($fixtureCase-ceq'library-paired-browser'){@('success','appended-phase','cleanup','primary-and-cleanup','missing-phase','missing-settled-capture')}else{@('success','cleanup','primary-and-cleanup')}
             foreach($script:mode in $modes){
               $output=Join-Path $env:MIR_TEST_WORK ($fixtureCase+'-'+$script:mode)
               $null=New-Item -ItemType Directory -Path $output
@@ -3318,7 +3319,7 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
                 if($fixtureCase -cin @('library-multiplayer','library-paired-browser') -and ($script:memoryWrites -ne 1 -or -not(Test-Path -LiteralPath $processMemoryObservationPath) -or $receipt.process_memory_observations.status -cne 'complete-observation' -or $receipt.process_memory_observations.performance_acceptance -ne $false)){
                   throw 'successful opt-in session lost its bounded memory receipt'
                 }
-                $expectedCaptures=switch($fixtureCase){'library-multiplayer'{10};'library-paired-browser'{8};default{0}}
+                $expectedCaptures=switch($fixtureCase){'library-multiplayer'{10};'library-paired-browser'{12};default{0}}
                 if($receipt.screenshots.Count -ne $expectedCaptures){
                   throw 'successful teardown lost a required capture'
                 }
@@ -3354,6 +3355,7 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
                 $expected=switch($script:mode){
                   'cleanup'{'late native cleanup failure'}
                   'missing-phase'{'paired Browser initial phase log lacks refresh stage'}
+                  'missing-settled-capture'{'paired Browser final screenshot inventory differs'}
                   default{'original session failure'}
                 }
                 if($caught.Exception.Message -cne $expected){throw 'original session/cleanup failure was replaced'}

@@ -630,11 +630,11 @@ function Get-PairedBrowserStageMarker([string]$Text, [string]$Stage, [string]$Ex
   $expectations = @{
     'ready' = @{ status='ready'; joins=0; actions=0; screenshots=0 }
     'first-open' = @{ status='observed'; joins=2; actions=2; screenshots=2 }
-    'search' = @{ status='observed'; joins=2; actions=2; screenshots=4 }
-    'refresh' = @{ status='observed'; joins=2; actions=2; screenshots=6 }
-    'restart-ready' = @{ status='ready'; joins=2; actions=2; screenshots=6 }
-    'reopen' = @{ status='observed'; joins=4; actions=2; screenshots=8 }
-    'completed' = @{ status='passed'; joins=4; actions=2; screenshots=8 }
+    'search' = @{ status='observed'; joins=2; actions=2; screenshots=6 }
+    'refresh' = @{ status='observed'; joins=2; actions=2; screenshots=8 }
+    'restart-ready' = @{ status='ready'; joins=2; actions=2; screenshots=8 }
+    'reopen' = @{ status='observed'; joins=4; actions=2; screenshots=10 }
+    'completed' = @{ status='passed'; joins=4; actions=2; screenshots=12 }
   }
   Assert-Session $expectations.ContainsKey($Stage) "unsupported paired Browser stage: $Stage"
   $rows = [Collections.Generic.List[object]]::new()
@@ -704,7 +704,7 @@ function Find-Screenshots([string[]]$Stages) {
     if ($matches.Count -ne 1) { return $null }
     $path = Resolve-BuildInput $matches[0].FullName 'Leaf' 'captured screenshot'
     if (-not (Test-Png1280x720 $path)) { return $null }
-    $filenamePattern = if($fixtureCase -ceq 'library-paired-browser'){'^(first-open|search|refresh|reopen)-([12])[.]png$'}else{'^(availability|initial|settled|rejoin|restart)-([12])[.]png$'}
+    $filenamePattern = if($fixtureCase -ceq 'library-paired-browser'){'^(first-open|first-open-settled|search|refresh|reopen|reopen-settled)-([12])[.]png$'}else{'^(availability|initial|settled|rejoin|restart)-([12])[.]png$'}
     $match = [regex]::Match($matches[0].Name, $filenamePattern)
     Assert-Session $match.Success 'captured screenshot filename differs'
     if ($indices.ContainsKey($expected.client) -and $indices[$expected.client] -ne $match.Groups[2].Value) {
@@ -863,25 +863,25 @@ if($fixtureCase-ceq'library-multiplayer' -and -not $standaloneIdentityDiscovery)
 } elseif($fixtureCase-ceq'library-multiplayer') {
  Assert-Session ($patterns.Count-eq0) 'standalone identity discovery must not stage GUI screenshots'
 } elseif($fixtureCase-ceq'library-paired-browser') {
-  Assert-Session ($patterns.Count -eq 8 -and (@($patterns | Select-Object -Unique)).Count -eq 8) 'paired Browser session requires eight distinct screenshot patterns'
+  Assert-Session ($patterns.Count -eq 12 -and (@($patterns | Select-Object -Unique)).Count -eq 12) 'paired Browser session requires twelve distinct screenshot patterns'
   foreach ($client in $clients) {
     $root = [IO.Path]::GetFullPath((Join-Path $client.write_data 'script-output/mir5-library-paired-browser'))
     $clientPatterns = @($patterns | Where-Object { Test-Within $root $_ })
-    Assert-Session ($clientPatterns.Count -eq 4) "client $($client.name) requires four local paired Browser screenshot patterns"
+    Assert-Session ($clientPatterns.Count -eq 6) "client $($client.name) requires six local paired Browser screenshot patterns"
     $stages = [Collections.Generic.List[string]]::new()
     foreach ($pattern in $clientPatterns) {
       $relative = [IO.Path]::GetRelativePath($root, $pattern)
       $leaf = [IO.Path]::GetFileName($pattern)
-      $name = [regex]::Match($leaf, '^(first-open|search|refresh|reopen)-[*][.]png$')
+      $name = [regex]::Match($leaf, '^(first-open|first-open-settled|search|refresh|reopen|reopen-settled)-[*][.]png$')
       Assert-Session ($name.Success -and $relative -ceq $leaf) "paired Browser screenshot pattern differs for $($client.name)"
       $null = $stages.Add($name.Groups[1].Value)
       $parent = [IO.Path]::GetDirectoryName($pattern)
       if(Test-Path -LiteralPath $parent -PathType Container){Assert-Session (@(Get-ChildItem -LiteralPath $parent -File | Where-Object { $_.Name -like $leaf }).Count -eq 0) "fresh paired Browser screenshot output already exists: $pattern"}
       $screenshotPatterns.Add([pscustomobject]@{client=$client.name;stage=$name.Groups[1].Value;path=$pattern;leaf=$leaf})
     }
-    Assert-Session ((@($stages | Sort-Object) -join ',') -ceq 'first-open,refresh,reopen,search') "client $($client.name) paired Browser screenshot stages differ"
+    Assert-Session ((@($stages | Sort-Object) -join ',') -ceq 'first-open,first-open-settled,refresh,reopen,reopen-settled,search') "client $($client.name) paired Browser screenshot stages differ"
   }
-  Assert-Session ($screenshotPatterns.Count -eq 8) 'paired Browser screenshot patterns do not map exactly to two clients'
+  Assert-Session ($screenshotPatterns.Count -eq 12) 'paired Browser screenshot patterns do not map exactly to two clients'
 } else {
  Assert-Session ($patterns.Count-eq0) 'scripted-effects gameplay case must not claim Library screenshots'
 }
@@ -971,7 +971,7 @@ try {
     foreach ($stage in @('first-open','search','refresh')) {
       [void](Wait-For ("paired Browser $stage marker") { param($ignored) Get-PairedBrowserStageMarker (Read-LogText (Join-Path $serverWriteData 'factorio-current.log')) $stage $pairedArm })
     }
-    [void](Wait-For 'paired Browser initial client screenshots' { Find-Screenshots @('first-open','search','refresh') })
+    [void](Wait-For 'paired Browser initial client screenshots' { Find-Screenshots @('first-open','first-open-settled','search','refresh') })
     [void](Wait-For 'paired Browser restart-ready marker' { param($ignored) Get-PairedBrowserStageMarker (Read-LogText (Join-Path $serverWriteData 'factorio-current.log')) 'restart-ready' $pairedArm })
     [void](Wait-For 'paired Browser restart save' { if (Test-SaveReady $restartSave) { return $true }; return $false })
     $restartHash = Get-SessionHash $restartSave
@@ -1000,12 +1000,12 @@ try {
     [void](Wait-For 'paired Browser reopen marker' { param($ignored) Get-PairedBrowserStageMarker (Read-LogText (Join-Path $serverWriteData 'factorio-current.log')) 'reopen' $pairedArm })
     $completed = Wait-For 'paired Browser completed marker' { param($ignored) Get-PairedBrowserStageMarker (Read-LogText (Join-Path $serverWriteData 'factorio-current.log')) 'completed' $pairedArm }
     $captures = Wait-For 'paired Browser final save and client screenshots' {
-      $screens = Find-Screenshots @('first-open','search','refresh','reopen')
+      $screens = Find-Screenshots @('first-open','first-open-settled','search','refresh','reopen','reopen-settled')
       if ((Test-SaveReady $finalSave) -and $null -ne $screens) { return $screens }
       return $false
     }
     $screenshots = @($captures.files)
-    Assert-Session ($screenshots.Count -eq 8) 'paired Browser final screenshot inventory differs'
+    Assert-Session ($screenshots.Count -eq 12) 'paired Browser final screenshot inventory differs'
     foreach ($client in $activeClients) { Stop-Record $client }
     $activeClients = @()
     Stop-Record $server

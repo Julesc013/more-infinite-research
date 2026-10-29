@@ -24,10 +24,7 @@ host. Each real client join is recorded as the bounded ordered sequence
 each of `first-open`, `search`, and `refresh` wraps exactly two public open
 calls in one native profiler record, then requests one screenshot per client.
 The fixture saves a restart point, requires an actual cold host restart and
-rejoin, then performs `reopen` the same way. This yields exactly eight requested
-PNGs under `script-output/mir5-library-paired-browser/` and four raw profiler
-markers. The capture labels remain `first-open`, `search`, `refresh`, and
-`reopen`; the shared profiler reader's first action token is `first_open`.
+rejoin, then performs `reopen` the same way. The original eight immediate PNGs and four raw profiler markers remain. The current diagnostic fixture additionally captures both unchanged first-open roots after 60 ticks, before search, and both unchanged reopened roots after 60 ticks, before completion. These four extra captures occur outside the profiler, without another public open call; native state, query and selected detail are checked again. A replaced or invalid root fails explicitly. Exactly twelve PNGs are now required under `script-output/mir5-library-paired-browser/`, with `first-open-settled` and `reopen-settled` added to the original labels. The shared profiler reader's first action token remains `first_open`. Earlier eight-image datasets retain their original fixture and verdict; the new protocol is a changed diagnostic input requiring its own freeze.
 
 The R01 native performance dataset exposed a missing cold-load readiness witness: the original fixture queued `ready` only for its initial saved world. The current fixture queues exactly one `ready` marker on the first runtime event after either actual load, using local flags only during `on_load`; it still waits for the two new clients and the original settlement delay before reopening. This observation correction qualifies no old missing measurement, changes no player code, and requires its own declared input hash before a replacement native experiment.
 
