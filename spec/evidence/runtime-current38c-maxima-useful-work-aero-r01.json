@@ -1,0 +1,1262 @@
+{
+  "schema": 1,
+  "kind": "MIRRetainedActiveRuntimeMaximumAndUsefulWorkAeroReadbackV1",
+  "status": "existing-native-observations-diagnostic-readback-not-new-score",
+  "original_chain": {
+    "path": "spec/evidence/runtime-current38c-complete-native-chain-r01.json",
+    "sha256": "8353045BC60BEBCFA6F3DE072FB600EF3CF93AE610BE80C8C194D99F701D45C0"
+  },
+  "capsule": {
+    "path": "spec/evidence/runtime-current38c-observation-analysis-receipts-r01.json.gz",
+    "sha256": "D499884F0FE7A548F8F391EE1DCA0874F7269E0030383143E391DD9686FD3FEF",
+    "bytes": 686180,
+    "members": 145,
+    "contents": "Observed/prepared inputs,declared plan,root packet/caller/terminal/quiet snapshot,root readback,exact analysis and all136 per-launch stdout/fixture logs. All661 raw files,including copies of owned saves,remain in hash-verified original/primary custody."
+  },
+  "candidate": {
+    "source_commit": "b3bbd8d37b37bfee2e258b3e8a2f223dcf3860b3",
+    "player_tree": "fbb7e9135280ce7f69692e9b0c4a44d743793f45",
+    "archive_sha256": "38C84CCBC4BFDA62FCB078772C4690AB81228484744A36D9EA303F5A75B16447",
+    "bytes": 692759
+  },
+  "published": {
+    "version": "4.7.21002",
+    "archive_sha256": "A4BB8F47232C689B267EF434F557187A8795C47280FA464169DE917FB579517F"
+  },
+  "engine": {
+    "version": "2.1.23",
+    "sha256": "8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38"
+  },
+  "reader": {
+    "path": "build/qualification/runtime38c-aero-review-r01/spike_readback.py",
+    "sha256": "30EBD33C6E15858B1D7ABD2A8035C5E461FAFF75A071969089F31259A03E2767"
+  },
+  "verified_bodies": 145,
+  "verified_actual_native_logs": 136,
+  "observations": [
+    {
+      "id": "repair-warmup-published-1",
+      "scored": false,
+      "scenario": "repair-active",
+      "tier": 0,
+      "arm": "published",
+      "average_ms_per_update": 0.131,
+      "minimum_ms_per_update": 0.027,
+      "maximum_ms_per_update": 16.273,
+      "stdout_sha256": "025DA8878AB92F7BB2F4A8E6D22E79F69C2BA7D170657067AC8CF480CAD2BE8C",
+      "fixture_log_sha256": "14440B4FF92C0051FA0409CCF69F0058B4D39D0B417787D757093E13BD48DB82",
+      "completed_work": {
+        "initial_repairs": 256,
+        "reactivation_repairs": 8,
+        "capacity": 256,
+        "eligible_overflow_not_pending": 744
+      }
+    },
+    {
+      "id": "repair-warmup-published-2",
+      "scored": false,
+      "scenario": "repair-active",
+      "tier": 0,
+      "arm": "published",
+      "average_ms_per_update": 0.131,
+      "minimum_ms_per_update": 0.027,
+      "maximum_ms_per_update": 16.9,
+      "stdout_sha256": "FAD25DF1C1D88BBF2CA0FCA60A1C0B21A05A8A72F9440EE909C9741F0CA05373",
+      "fixture_log_sha256": "1F331795F38D163EA7B1821D29D91E1E36860BF9F28B43E156D95B1F104BD249",
+      "completed_work": {
+        "initial_repairs": 256,
+        "reactivation_repairs": 8,
+        "capacity": 256,
+        "eligible_overflow_not_pending": 744
+      }
+    },
+    {
+      "id": "repair-warmup-candidate-1",
+      "scored": false,
+      "scenario": "repair-active",
+      "tier": 0,
+      "arm": "candidate",
+      "average_ms_per_update": 0.129,
+      "minimum_ms_per_update": 0.027,
+      "maximum_ms_per_update": 14.827,
+      "stdout_sha256": "B1FFC71017C7E863E8E3644A778913D53067E7D4232C8CB755E64F6C44F30AF5",
+      "fixture_log_sha256": "03299D34B44C0308A2A33F05D1BBA6B5248226E2BF117D61EE794224865854D5",
+      "completed_work": {
+        "initial_repairs": 256,
+        "reactivation_repairs": 8,
+        "capacity": 256,
+        "eligible_overflow_not_pending": 744
+      }
+    },
+    {
+      "id": "repair-warmup-candidate-2",
+      "scored": false,
+      "scenario": "repair-active",
+      "tier": 0,
+      "arm": "candidate",
+      "average_ms_per_update": 0.129,
+      "minimum_ms_per_update": 0.027,
+      "maximum_ms_per_update": 15.294,
+      "stdout_sha256": "69A7091CE2B4CAD75F2AA65EF02166172B0339CCF7D52776F0F70C99A0358857",
+      "fixture_log_sha256": "C74BE5F8111F11749519D130DBE6A4D72885BBA2CD0521A600CEF2850C0DF8B7",
+      "completed_work": {
+        "initial_repairs": 256,
+        "reactivation_repairs": 8,
+        "capacity": 256,
+        "eligible_overflow_not_pending": 744
+      }
+    },
+    {
+      "id": "repair-b1-1-published",
+      "scored": true,
+      "scenario": "repair-active",
+      "tier": 0,
+      "arm": "published",
+      "average_ms_per_update": 0.132,
+      "minimum_ms_per_update": 0.028,
+      "maximum_ms_per_update": 17.238,
+      "stdout_sha256": "AD19C51A17B9747D1ACABCCA890E394EE3444B908317124827F129DF52B4FC1F",
+      "fixture_log_sha256": "9606F517A5E834341310299C050583FD0CD9586CBE1843AEC93B53BDA551DD1B",
+      "completed_work": {
+        "initial_repairs": 256,
+        "reactivation_repairs": 8,
+        "capacity": 256,
+        "eligible_overflow_not_pending": 744
+      }
+    },
+    {
+      "id": "repair-b1-2-candidate",
+      "scored": true,
+      "scenario": "repair-active",
+      "tier": 0,
+      "arm": "candidate",
+      "average_ms_per_update": 0.127,
+      "minimum_ms_per_update": 0.028,
+      "maximum_ms_per_update": 14.637,
+      "stdout_sha256": "0CB5EDDDA1EDBCEBE50D3276118E81185D043F7F257A524B19FA843B863BA2E1",
+      "fixture_log_sha256": "EDAE23D8939F169A7B91D3761136997E0BDA18143349AAAFAFADB1A06C370515",
+      "completed_work": {
+        "initial_repairs": 256,
+        "reactivation_repairs": 8,
+        "capacity": 256,
+        "eligible_overflow_not_pending": 744
+      }
+    },
+    {
+      "id": "repair-b2-1-candidate",
+      "scored": true,
+      "scenario": "repair-active",
+      "tier": 0,
+      "arm": "candidate",
+      "average_ms_per_update": 0.129,
+      "minimum_ms_per_update": 0.027,
+      "maximum_ms_per_update": 15.022,
+      "stdout_sha256": "014B2668E09EE2641E1458C0A8D875EDBEF0714F368B716E20B33EF6E9DB0500",
+      "fixture_log_sha256": "2CA0611FD853436FE54B8086D665BD3FAD28BDDFFB2213A246213884770D6C50",
+      "completed_work": {
+        "initial_repairs": 256,
+        "reactivation_repairs": 8,
+        "capacity": 256,
+        "eligible_overflow_not_pending": 744
+      }
+    },
+    {
+      "id": "repair-b2-2-published",
+      "scored": true,
+      "scenario": "repair-active",
+      "tier": 0,
+      "arm": "published",
+      "average_ms_per_update": 0.129,
+      "minimum_ms_per_update": 0.026,
+      "maximum_ms_per_update": 16.369,
+      "stdout_sha256": "0C2CE3E021D8FC937A340FEB9643AE18AA838809B5200C7A08FAB7212333F845",
+      "fixture_log_sha256": "78CC264291155CC1A876F0DE61E67F79FB1CC60338614BA8904B64787F4B33B6",
+      "completed_work": {
+        "initial_repairs": 256,
+        "reactivation_repairs": 8,
+        "capacity": 256,
+        "eligible_overflow_not_pending": 744
+      }
+    },
+    {
+      "id": "repair-b3-1-published",
+      "scored": true,
+      "scenario": "repair-active",
+      "tier": 0,
+      "arm": "published",
+      "average_ms_per_update": 0.13,
+      "minimum_ms_per_update": 0.027,
+      "maximum_ms_per_update": 16.795,
+      "stdout_sha256": "5AC26503645A79719EA78548D23B843CB1547BD33C289C22D30903F6C8651C8C",
+      "fixture_log_sha256": "41F5ED3BC9D902DCF0ED078482B50E07BF1B72D2724069487E9299EEAFD2B924",
+      "completed_work": {
+        "initial_repairs": 256,
+        "reactivation_repairs": 8,
+        "capacity": 256,
+        "eligible_overflow_not_pending": 744
+      }
+    },
+    {
+      "id": "repair-b3-2-candidate",
+      "scored": true,
+      "scenario": "repair-active",
+      "tier": 0,
+      "arm": "candidate",
+      "average_ms_per_update": 0.13,
+      "minimum_ms_per_update": 0.026,
+      "maximum_ms_per_update": 15.253,
+      "stdout_sha256": "71D612B62EAC22976E1A87050ABD81694C95EC35A2081F832D0A3577AF36483C",
+      "fixture_log_sha256": "1CE5B66419CE987E5DC5140A842452BEA466A4883636215176F57507AEF58AE3",
+      "completed_work": {
+        "initial_repairs": 256,
+        "reactivation_repairs": 8,
+        "capacity": 256,
+        "eligible_overflow_not_pending": 744
+      }
+    },
+    {
+      "id": "repair-b4-1-candidate",
+      "scored": true,
+      "scenario": "repair-active",
+      "tier": 0,
+      "arm": "candidate",
+      "average_ms_per_update": 0.126,
+      "minimum_ms_per_update": 0.027,
+      "maximum_ms_per_update": 14.988,
+      "stdout_sha256": "CCE699A6E845FE8D11B901B919CD6FD5BC5DB669B3A318F9F71DFA2D85A53855",
+      "fixture_log_sha256": "E11110B8BF6C0FFBD819E20C32085B94041B5774B10D264B80FDA32904571E0B",
+      "completed_work": {
+        "initial_repairs": 256,
+        "reactivation_repairs": 8,
+        "capacity": 256,
+        "eligible_overflow_not_pending": 744
+      }
+    },
+    {
+      "id": "repair-b4-2-published",
+      "scored": true,
+      "scenario": "repair-active",
+      "tier": 0,
+      "arm": "published",
+      "average_ms_per_update": 0.133,
+      "minimum_ms_per_update": 0.025,
+      "maximum_ms_per_update": 17.331,
+      "stdout_sha256": "A8533575544662739F7B233147A1BEBFF7DEF1CF6AFEC741E2B8CD8EC9F84D73",
+      "fixture_log_sha256": "0F8026D4B6C4856D4E0E7E3CE8D7691A420FAD866E637B0B52B76C7770718B16",
+      "completed_work": {
+        "initial_repairs": 256,
+        "reactivation_repairs": 8,
+        "capacity": 256,
+        "eligible_overflow_not_pending": 744
+      }
+    },
+    {
+      "id": "repair-b5-1-published",
+      "scored": true,
+      "scenario": "repair-active",
+      "tier": 0,
+      "arm": "published",
+      "average_ms_per_update": 0.131,
+      "minimum_ms_per_update": 0.026,
+      "maximum_ms_per_update": 16.814,
+      "stdout_sha256": "95C4FC22CA21484449461FBA222C34F95D8BE7292FF0D93BA3B3DD3D13EC6BCB",
+      "fixture_log_sha256": "88133F08B3B7B0C782EBCC42F7966A85828E9B4677F87039280B87CEE896C256",
+      "completed_work": {
+        "initial_repairs": 256,
+        "reactivation_repairs": 8,
+        "capacity": 256,
+        "eligible_overflow_not_pending": 744
+      }
+    },
+    {
+      "id": "repair-b5-2-candidate",
+      "scored": true,
+      "scenario": "repair-active",
+      "tier": 0,
+      "arm": "candidate",
+      "average_ms_per_update": 0.128,
+      "minimum_ms_per_update": 0.026,
+      "maximum_ms_per_update": 15.32,
+      "stdout_sha256": "BC4C41E3195A17421AFBE92A23973DE8E0EEE622D0D3345ECAC5F0DDD0EDD425",
+      "fixture_log_sha256": "85429154FF755B6EBE8D1B8009FD654DE7D5716698A9BFC6483B71B7A65CB596",
+      "completed_work": {
+        "initial_repairs": 256,
+        "reactivation_repairs": 8,
+        "capacity": 256,
+        "eligible_overflow_not_pending": 744
+      }
+    },
+    {
+      "id": "repair-b6-1-candidate",
+      "scored": true,
+      "scenario": "repair-active",
+      "tier": 0,
+      "arm": "candidate",
+      "average_ms_per_update": 0.129,
+      "minimum_ms_per_update": 0.026,
+      "maximum_ms_per_update": 15.007,
+      "stdout_sha256": "2B106937B674060A13D003BAEC203E4261A8E7EC474CAA39C2294672938EAA1B",
+      "fixture_log_sha256": "3374B1D15E2E5F3CF2BA74AAB9CD1D8A26BFDA66DDE89F98ECA4B06A4B25374B",
+      "completed_work": {
+        "initial_repairs": 256,
+        "reactivation_repairs": 8,
+        "capacity": 256,
+        "eligible_overflow_not_pending": 744
+      }
+    },
+    {
+      "id": "repair-b6-2-published",
+      "scored": true,
+      "scenario": "repair-active",
+      "tier": 0,
+      "arm": "published",
+      "average_ms_per_update": 0.129,
+      "minimum_ms_per_update": 0.026,
+      "maximum_ms_per_update": 16.904,
+      "stdout_sha256": "E0E777C790C87948734AE114B48B91171804CF32F25B480BB9EFC05FFB169BB3",
+      "fixture_log_sha256": "1625D12B7DAA68E9B4CDDC68CC6AA669776302B37B25994135D1C8DCE5D53DCA",
+      "completed_work": {
+        "initial_repairs": 256,
+        "reactivation_repairs": 8,
+        "capacity": 256,
+        "eligible_overflow_not_pending": 744
+      }
+    },
+    {
+      "id": "repair-b7-1-published",
+      "scored": true,
+      "scenario": "repair-active",
+      "tier": 0,
+      "arm": "published",
+      "average_ms_per_update": 0.128,
+      "minimum_ms_per_update": 0.025,
+      "maximum_ms_per_update": 16.752,
+      "stdout_sha256": "9F3E4B654562B10A21078E3D5D7832CF112DB38D88CC969ADBDC2D5835BA5927",
+      "fixture_log_sha256": "1FD1E8ABCBB43447C46A3A97E335BFE842D82E4555029D7C849E503308FE5B11",
+      "completed_work": {
+        "initial_repairs": 256,
+        "reactivation_repairs": 8,
+        "capacity": 256,
+        "eligible_overflow_not_pending": 744
+      }
+    },
+    {
+      "id": "repair-b7-2-candidate",
+      "scored": true,
+      "scenario": "repair-active",
+      "tier": 0,
+      "arm": "candidate",
+      "average_ms_per_update": 0.127,
+      "minimum_ms_per_update": 0.026,
+      "maximum_ms_per_update": 15.36,
+      "stdout_sha256": "EA7FA004400F4F580B9E651A36E1B38DEA414B5E3D612944EDE453779589E958",
+      "fixture_log_sha256": "2F5606B46E86A3121E60DDB1C59C1E1BAA5AC55F7179F641F13DBAE078C28521",
+      "completed_work": {
+        "initial_repairs": 256,
+        "reactivation_repairs": 8,
+        "capacity": 256,
+        "eligible_overflow_not_pending": 744
+      }
+    },
+    {
+      "id": "repair-b8-1-candidate",
+      "scored": true,
+      "scenario": "repair-active",
+      "tier": 0,
+      "arm": "candidate",
+      "average_ms_per_update": 0.129,
+      "minimum_ms_per_update": 0.025,
+      "maximum_ms_per_update": 15.407,
+      "stdout_sha256": "00D0CC97FCE00CBBE9B01956FCBC27A8897A43CF16A46FB4975F594ED8E5A29A",
+      "fixture_log_sha256": "7701A78E4D044CD908A551025266A8B3CECD31805AEF2E6235BC8F6132BD98E4",
+      "completed_work": {
+        "initial_repairs": 256,
+        "reactivation_repairs": 8,
+        "capacity": 256,
+        "eligible_overflow_not_pending": 744
+      }
+    },
+    {
+      "id": "repair-b8-2-published",
+      "scored": true,
+      "scenario": "repair-active",
+      "tier": 0,
+      "arm": "published",
+      "average_ms_per_update": 0.129,
+      "minimum_ms_per_update": 0.025,
+      "maximum_ms_per_update": 16.457,
+      "stdout_sha256": "58241DD1C36BC969512C7AEF99A67D32282689E86775B96C1C20B4CDA7F6E118",
+      "fixture_log_sha256": "91D7311AD5EE7E2FBBD20458684DAFFFA82130F2F2FF9E3F4DA65E51FECC627F",
+      "completed_work": {
+        "initial_repairs": 256,
+        "reactivation_repairs": 8,
+        "capacity": 256,
+        "eligible_overflow_not_pending": 744
+      }
+    },
+    {
+      "id": "agriculture-1-warmup-published-1",
+      "scored": false,
+      "scenario": "agriculture-active",
+      "tier": 1,
+      "arm": "published",
+      "average_ms_per_update": 0.068,
+      "minimum_ms_per_update": 0.027,
+      "maximum_ms_per_update": 0.431,
+      "stdout_sha256": "9609EACD2771F414A6F32D3FEF5DACABEC1B1F54B9243E2766572242E6076305",
+      "fixture_log_sha256": "226ADAC654D565D3D36A2010F2FDB5825BBB8C4A9892378517F41B4DAEDD2EBB",
+      "completed_work": {
+        "native_planting_events": 2,
+        "native_towers_per_force": 1
+      }
+    },
+    {
+      "id": "agriculture-1-warmup-published-2",
+      "scored": false,
+      "scenario": "agriculture-active",
+      "tier": 1,
+      "arm": "published",
+      "average_ms_per_update": 0.065,
+      "minimum_ms_per_update": 0.026,
+      "maximum_ms_per_update": 0.453,
+      "stdout_sha256": "69024A5D2D814B64F75E6376C22AED4A9ABE562E434591FF8B8DEBE0EAF5862C",
+      "fixture_log_sha256": "98A65CB244B03217BE2C22303A452F091318AF884FD6CC1AA8D73A9830448582",
+      "completed_work": {
+        "native_planting_events": 2,
+        "native_towers_per_force": 1
+      }
+    },
+    {
+      "id": "agriculture-1-warmup-candidate-defaults-1",
+      "scored": false,
+      "scenario": "agriculture-active",
+      "tier": 1,
+      "arm": "candidate-defaults",
+      "average_ms_per_update": 0.061,
+      "minimum_ms_per_update": 0.026,
+      "maximum_ms_per_update": 0.396,
+      "stdout_sha256": "C6C85FEEA936888C5F289FBB766CB6A5E45DAAE9FF4B28898D6DB805076CBC14",
+      "fixture_log_sha256": "18F462058E45C72F83307140E760EFA5E60873DEACC768F9AF12E127340B0765",
+      "completed_work": {
+        "native_planting_events": 2,
+        "native_towers_per_force": 1
+      }
+    },
+    {
+      "id": "agriculture-1-warmup-candidate-defaults-2",
+      "scored": false,
+      "scenario": "agriculture-active",
+      "tier": 1,
+      "arm": "candidate-defaults",
+      "average_ms_per_update": 0.064,
+      "minimum_ms_per_update": 0.027,
+      "maximum_ms_per_update": 0.432,
+      "stdout_sha256": "502C97B419084B5E2621361F6B589BE00E0C740920490925F77E166B14CE53FE",
+      "fixture_log_sha256": "2922B0066EC2B98FE9CAEAD7C039F7FC021C962F60B6884032B52F5041953FBE",
+      "completed_work": {
+        "native_planting_events": 2,
+        "native_towers_per_force": 1
+      }
+    },
+    {
+      "id": "agriculture-1-b1-1-published",
+      "scored": true,
+      "scenario": "agriculture-active",
+      "tier": 1,
+      "arm": "published",
+      "average_ms_per_update": 0.065,
+      "minimum_ms_per_update": 0.027,
+      "maximum_ms_per_update": 0.471,
+      "stdout_sha256": "F201853E06DD72D247AE4A0134AC75512E1F52C2C7FB980AD42726FCD24BAE3B",
+      "fixture_log_sha256": "A733F665C271A7579164F060898C466549D10C12E5A30F4D6681BFDD3ECD0A3D",
+      "completed_work": {
+        "native_planting_events": 2,
+        "native_towers_per_force": 1
+      }
+    },
+    {
+      "id": "agriculture-1-b1-2-candidate-defaults",
+      "scored": true,
+      "scenario": "agriculture-active",
+      "tier": 1,
+      "arm": "candidate-defaults",
+      "average_ms_per_update": 0.065,
+      "minimum_ms_per_update": 0.027,
+      "maximum_ms_per_update": 0.394,
+      "stdout_sha256": "714E3D0AFB6A214E18AD4A52474EAF2A2E4F88C16B90DD3A46F8B4A9135B0516",
+      "fixture_log_sha256": "8232ACB3032B17DE2940316BC7F8F0D57EDF023E31107D5ED87A131EF1497305",
+      "completed_work": {
+        "native_planting_events": 2,
+        "native_towers_per_force": 1
+      }
+    },
+    {
+      "id": "agriculture-1-b2-1-candidate-defaults",
+      "scored": true,
+      "scenario": "agriculture-active",
+      "tier": 1,
+      "arm": "candidate-defaults",
+      "average_ms_per_update": 0.063,
+      "minimum_ms_per_update": 0.028,
+      "maximum_ms_per_update": 0.434,
+      "stdout_sha256": "86EF462F0FB9872DEFF25B62686BBDD83E461CDBD86D9EDD9854625FA4E7DEA9",
+      "fixture_log_sha256": "8A2A0609B63973BE0555C64C41BCF6AFC20AFE31E852C9B702279552A8688547",
+      "completed_work": {
+        "native_planting_events": 2,
+        "native_towers_per_force": 1
+      }
+    },
+    {
+      "id": "agriculture-1-b2-2-published",
+      "scored": true,
+      "scenario": "agriculture-active",
+      "tier": 1,
+      "arm": "published",
+      "average_ms_per_update": 0.065,
+      "minimum_ms_per_update": 0.027,
+      "maximum_ms_per_update": 0.479,
+      "stdout_sha256": "6A832776FA0B3B0309226B69A6ED164A2E5A86835308F0D3118047886235A921",
+      "fixture_log_sha256": "25616F3D547DBEA6EAADAC63B89CD3E549E6C4C313075FC24C0992FF8D02C3F0",
+      "completed_work": {
+        "native_planting_events": 2,
+        "native_towers_per_force": 1
+      }
+    },
+    {
+      "id": "agriculture-1-b3-1-published",
+      "scored": true,
+      "scenario": "agriculture-active",
+      "tier": 1,
+      "arm": "published",
+      "average_ms_per_update": 0.065,
+      "minimum_ms_per_update": 0.027,
+      "maximum_ms_per_update": 2.043,
+      "stdout_sha256": "318B22576CF0C53BF3B9AAF294D2C94459C60D99B4A83ABD32BA9951F7DA8FE6",
+      "fixture_log_sha256": "08B3C95C17323D72CE44460732EB6B766E703778A8648CE568B813C6840E3A67",
+      "completed_work": {
+        "native_planting_events": 2,
+        "native_towers_per_force": 1
+      }
+    },
+    {
+      "id": "agriculture-1-b3-2-candidate-defaults",
+      "scored": true,
+      "scenario": "agriculture-active",
+      "tier": 1,
+      "arm": "candidate-defaults",
+      "average_ms_per_update": 0.066,
+      "minimum_ms_per_update": 0.027,
+      "maximum_ms_per_update": 0.442,
+      "stdout_sha256": "E09A7E57A1813E2495533B91CAFC34CFECE9969251D399BEE7F86E7415ED83C1",
+      "fixture_log_sha256": "DA155C457726AA60EEF25A3EE95C7D92AE245037251961A028B73C50DAEEB099",
+      "completed_work": {
+        "native_planting_events": 2,
+        "native_towers_per_force": 1
+      }
+    },
+    {
+      "id": "agriculture-1-b4-1-candidate-defaults",
+      "scored": true,
+      "scenario": "agriculture-active",
+      "tier": 1,
+      "arm": "candidate-defaults",
+      "average_ms_per_update": 0.063,
+      "minimum_ms_per_update": 0.027,
+      "maximum_ms_per_update": 0.44,
+      "stdout_sha256": "5DC3E52FDE45368C79D7A769E0E8501B1CA8C1447BEC8A4FC22DEE190C013C57",
+      "fixture_log_sha256": "3208C3050129D878C3A3B426E1CEB58FBE7E4C6FE59CB9DEF4216F87EAD401CD",
+      "completed_work": {
+        "native_planting_events": 2,
+        "native_towers_per_force": 1
+      }
+    },
+    {
+      "id": "agriculture-1-b4-2-published",
+      "scored": true,
+      "scenario": "agriculture-active",
+      "tier": 1,
+      "arm": "published",
+      "average_ms_per_update": 0.065,
+      "minimum_ms_per_update": 0.027,
+      "maximum_ms_per_update": 0.404,
+      "stdout_sha256": "482656046B4A528EF99A005EABF458273DEA386E0D494290987D53CBE446068B",
+      "fixture_log_sha256": "CDED9EA83CA89733F6B34B98CC4F1F3D8F870DCBD0F549A38670E3978307E07B",
+      "completed_work": {
+        "native_planting_events": 2,
+        "native_towers_per_force": 1
+      }
+    },
+    {
+      "id": "agriculture-1-b5-1-published",
+      "scored": true,
+      "scenario": "agriculture-active",
+      "tier": 1,
+      "arm": "published",
+      "average_ms_per_update": 0.069,
+      "minimum_ms_per_update": 0.026,
+      "maximum_ms_per_update": 2.84,
+      "stdout_sha256": "8E7F4F360F423FD5E1E2C65C62CC4FCD565DBCBD6E21F93200B6BBFC759ACD0E",
+      "fixture_log_sha256": "BB1D98E2F7B91748275B1F4EF95712F298FDC97C364555FDE43A7CB118C86D8F",
+      "completed_work": {
+        "native_planting_events": 2,
+        "native_towers_per_force": 1
+      }
+    },
+    {
+      "id": "agriculture-1-b5-2-candidate-defaults",
+      "scored": true,
+      "scenario": "agriculture-active",
+      "tier": 1,
+      "arm": "candidate-defaults",
+      "average_ms_per_update": 0.066,
+      "minimum_ms_per_update": 0.025,
+      "maximum_ms_per_update": 2.416,
+      "stdout_sha256": "129A8892C92FE8E9BF647D466ED50F01B886FAB90FF97D4455A05800BF445CBF",
+      "fixture_log_sha256": "D0B9BB58D174FEB66D6F14FA410F4074C145F04BF76EEBDAF70D9914E7237EBC",
+      "completed_work": {
+        "native_planting_events": 2,
+        "native_towers_per_force": 1
+      }
+    },
+    {
+      "id": "agriculture-1-b6-1-candidate-defaults",
+      "scored": true,
+      "scenario": "agriculture-active",
+      "tier": 1,
+      "arm": "candidate-defaults",
+      "average_ms_per_update": 0.063,
+      "minimum_ms_per_update": 0.026,
+      "maximum_ms_per_update": 0.395,
+      "stdout_sha256": "DE0A6FF89FE9FECDC3D086FEC148DA4E419D85EA06811C745AAD00A7FD5CD543",
+      "fixture_log_sha256": "2439706FDC9FCBC6A59490A45CB98D0BBE8DF7C41311AA4C6AEDAA42AFE322BC",
+      "completed_work": {
+        "native_planting_events": 2,
+        "native_towers_per_force": 1
+      }
+    },
+    {
+      "id": "agriculture-1-b6-2-published",
+      "scored": true,
+      "scenario": "agriculture-active",
+      "tier": 1,
+      "arm": "published",
+      "average_ms_per_update": 0.065,
+      "minimum_ms_per_update": 0.026,
+      "maximum_ms_per_update": 0.536,
+      "stdout_sha256": "F0B04AE5742AF2DBDF1141C9E198CE8860B95CE81BC217E8B7444E31E7B3E21E",
+      "fixture_log_sha256": "51DFDB41C55680A063D1EEA4569E83F6680AE669B9B60ADDCD3FF34696E30CB2",
+      "completed_work": {
+        "native_planting_events": 2,
+        "native_towers_per_force": 1
+      }
+    },
+    {
+      "id": "agriculture-32-warmup-published-1",
+      "scored": false,
+      "scenario": "agriculture-active",
+      "tier": 32,
+      "arm": "published",
+      "average_ms_per_update": 0.069,
+      "minimum_ms_per_update": 0.03,
+      "maximum_ms_per_update": 0.51,
+      "stdout_sha256": "CF5FE8B5BC50DA4CC9F7DDD285C06F700404C002304C199C834EA79339E4D9B5",
+      "fixture_log_sha256": "AD802492249FB8EB10353139CD13FC15780D32862426810A960EB3128EF3E49A",
+      "completed_work": {
+        "native_planting_events": 64,
+        "native_towers_per_force": 32
+      }
+    },
+    {
+      "id": "agriculture-32-warmup-published-2",
+      "scored": false,
+      "scenario": "agriculture-active",
+      "tier": 32,
+      "arm": "published",
+      "average_ms_per_update": 0.069,
+      "minimum_ms_per_update": 0.029,
+      "maximum_ms_per_update": 0.557,
+      "stdout_sha256": "8BB5C2E1525D4CEC3E151FFA2B3ADA45884404E3B751D4C5B0C5DC366B91A5EB",
+      "fixture_log_sha256": "83F33B98DD86C0624D52656A511BE2E6D5B0E3D3731F0773CF238E2625DCD24E",
+      "completed_work": {
+        "native_planting_events": 64,
+        "native_towers_per_force": 32
+      }
+    },
+    {
+      "id": "agriculture-32-warmup-candidate-defaults-1",
+      "scored": false,
+      "scenario": "agriculture-active",
+      "tier": 32,
+      "arm": "candidate-defaults",
+      "average_ms_per_update": 0.065,
+      "minimum_ms_per_update": 0.029,
+      "maximum_ms_per_update": 0.541,
+      "stdout_sha256": "D87765F30BE54E44927A343A88BC708AAD1DC618D49886D39AADC4DD2E5FA5EB",
+      "fixture_log_sha256": "473ECC57DA830805D991CF6C8ACCBAE1DD0314DAAC5CD4C6E054B4C86CE5AD3D",
+      "completed_work": {
+        "native_planting_events": 64,
+        "native_towers_per_force": 32
+      }
+    },
+    {
+      "id": "agriculture-32-warmup-candidate-defaults-2",
+      "scored": false,
+      "scenario": "agriculture-active",
+      "tier": 32,
+      "arm": "candidate-defaults",
+      "average_ms_per_update": 0.067,
+      "minimum_ms_per_update": 0.028,
+      "maximum_ms_per_update": 0.541,
+      "stdout_sha256": "A43839F3FF0EE73B458982180E6CC536CE812D5EEA63973E516A004882FA600B",
+      "fixture_log_sha256": "C34647D05B04517778870A76BB8AAEE600AA51AC298AAF7CB0135CF1E557FA3E",
+      "completed_work": {
+        "native_planting_events": 64,
+        "native_towers_per_force": 32
+      }
+    },
+    {
+      "id": "agriculture-32-b1-1-published",
+      "scored": true,
+      "scenario": "agriculture-active",
+      "tier": 32,
+      "arm": "published",
+      "average_ms_per_update": 0.068,
+      "minimum_ms_per_update": 0.03,
+      "maximum_ms_per_update": 0.599,
+      "stdout_sha256": "6A8CB8AB6156F921F85C935178F7C0AED9337460EB06116E3CAD678495D1D6CB",
+      "fixture_log_sha256": "B0D38521B7D1360D03C1D587791357EC5F2A29D6C96F9C2E63790E967B6A80D1",
+      "completed_work": {
+        "native_planting_events": 64,
+        "native_towers_per_force": 32
+      }
+    },
+    {
+      "id": "agriculture-32-b1-2-candidate-defaults",
+      "scored": true,
+      "scenario": "agriculture-active",
+      "tier": 32,
+      "arm": "candidate-defaults",
+      "average_ms_per_update": 0.069,
+      "minimum_ms_per_update": 0.029,
+      "maximum_ms_per_update": 1.681,
+      "stdout_sha256": "B7AF41C0E2EC91F718524DAD42D611448B71063467B8B104B43793949D70677D",
+      "fixture_log_sha256": "B2CB8ABF75FB109BC15E3A16D40F6D2A7B8635CAB826B5EA95858D6D583DD774",
+      "completed_work": {
+        "native_planting_events": 64,
+        "native_towers_per_force": 32
+      }
+    },
+    {
+      "id": "agriculture-32-b2-1-candidate-defaults",
+      "scored": true,
+      "scenario": "agriculture-active",
+      "tier": 32,
+      "arm": "candidate-defaults",
+      "average_ms_per_update": 0.065,
+      "minimum_ms_per_update": 0.029,
+      "maximum_ms_per_update": 0.548,
+      "stdout_sha256": "BF2FB36E21E624D3DA93D4B7440E0A571A3135849564D5E06AEDAFFD4F104A2B",
+      "fixture_log_sha256": "5189ECFFCACB073B9C5018C31932242E6B89675C995C29DC65DEF022EF778F3D",
+      "completed_work": {
+        "native_planting_events": 64,
+        "native_towers_per_force": 32
+      }
+    },
+    {
+      "id": "agriculture-32-b2-2-published",
+      "scored": true,
+      "scenario": "agriculture-active",
+      "tier": 32,
+      "arm": "published",
+      "average_ms_per_update": 0.069,
+      "minimum_ms_per_update": 0.029,
+      "maximum_ms_per_update": 0.615,
+      "stdout_sha256": "CAE1C0B5E30490063E285A3B767575E1E9E70B73876C10721C63E3EF7101905F",
+      "fixture_log_sha256": "771812BF587058C65D7AD56214121384F9D102673098124239402A36A047EEC1",
+      "completed_work": {
+        "native_planting_events": 64,
+        "native_towers_per_force": 32
+      }
+    },
+    {
+      "id": "agriculture-32-b3-1-published",
+      "scored": true,
+      "scenario": "agriculture-active",
+      "tier": 32,
+      "arm": "published",
+      "average_ms_per_update": 0.071,
+      "minimum_ms_per_update": 0.028,
+      "maximum_ms_per_update": 0.609,
+      "stdout_sha256": "B839CFF9B1093DA6F153A98916AC141B9591EAABA1C3DEC0C3B81BBEE4D442A1",
+      "fixture_log_sha256": "2090831821952690A31D3ACCFF11540AC5BEB58C4B190C7E08B00A079BDBFBA7",
+      "completed_work": {
+        "native_planting_events": 64,
+        "native_towers_per_force": 32
+      }
+    },
+    {
+      "id": "agriculture-32-b3-2-candidate-defaults",
+      "scored": true,
+      "scenario": "agriculture-active",
+      "tier": 32,
+      "arm": "candidate-defaults",
+      "average_ms_per_update": 0.066,
+      "minimum_ms_per_update": 0.032,
+      "maximum_ms_per_update": 0.59,
+      "stdout_sha256": "40F3A28B671D3D3B239A78288FD6B21F6B47C3D79482BA0FE77D8CAE30F138FB",
+      "fixture_log_sha256": "4D84B34155BCC14418490432B3F51920E875DE33C907926D7CB3440536D6C7A1",
+      "completed_work": {
+        "native_planting_events": 64,
+        "native_towers_per_force": 32
+      }
+    },
+    {
+      "id": "agriculture-32-b4-1-candidate-defaults",
+      "scored": true,
+      "scenario": "agriculture-active",
+      "tier": 32,
+      "arm": "candidate-defaults",
+      "average_ms_per_update": 0.067,
+      "minimum_ms_per_update": 0.029,
+      "maximum_ms_per_update": 0.572,
+      "stdout_sha256": "57515108E8AD93FC635CBB757295A623B38D8547F3C93F55250496B3238F741C",
+      "fixture_log_sha256": "4744B27A06698008AA4C9098DDB40C9E9F3FE3CB03DF4BAEC8616681BE658C9A",
+      "completed_work": {
+        "native_planting_events": 64,
+        "native_towers_per_force": 32
+      }
+    },
+    {
+      "id": "agriculture-32-b4-2-published",
+      "scored": true,
+      "scenario": "agriculture-active",
+      "tier": 32,
+      "arm": "published",
+      "average_ms_per_update": 0.067,
+      "minimum_ms_per_update": 0.029,
+      "maximum_ms_per_update": 0.568,
+      "stdout_sha256": "AB7AF554403295D56BCAFE65CF9F9EE8749D0231854D718DC31CBA32F4BD7095",
+      "fixture_log_sha256": "1B0D2E05F3E9562D0742664139DF795EAC0AD4F36496E6477DBF08287CF0431B",
+      "completed_work": {
+        "native_planting_events": 64,
+        "native_towers_per_force": 32
+      }
+    },
+    {
+      "id": "agriculture-32-b5-1-published",
+      "scored": true,
+      "scenario": "agriculture-active",
+      "tier": 32,
+      "arm": "published",
+      "average_ms_per_update": 0.069,
+      "minimum_ms_per_update": 0.029,
+      "maximum_ms_per_update": 0.646,
+      "stdout_sha256": "A6DA7A3AAD04F924EC7E751CF57D9A387247CDB937629AC0C0B673AE0DFACB93",
+      "fixture_log_sha256": "8BD6C8FF11836B6A50F9912EB1F346B898BBC8519CB2C8E2A381DF1FE897B167",
+      "completed_work": {
+        "native_planting_events": 64,
+        "native_towers_per_force": 32
+      }
+    },
+    {
+      "id": "agriculture-32-b5-2-candidate-defaults",
+      "scored": true,
+      "scenario": "agriculture-active",
+      "tier": 32,
+      "arm": "candidate-defaults",
+      "average_ms_per_update": 0.067,
+      "minimum_ms_per_update": 0.032,
+      "maximum_ms_per_update": 4.579,
+      "stdout_sha256": "F7CA2CF5534484DF7E4E2BCD611B654CAFB5E91F8776A744CFA40951B45D8E3C",
+      "fixture_log_sha256": "55A40CA976F101DEA0D3A68CAC6F7F8CA8BDB1D51975D5D978086862CA9EC51A",
+      "completed_work": {
+        "native_planting_events": 64,
+        "native_towers_per_force": 32
+      }
+    },
+    {
+      "id": "agriculture-32-b6-1-candidate-defaults",
+      "scored": true,
+      "scenario": "agriculture-active",
+      "tier": 32,
+      "arm": "candidate-defaults",
+      "average_ms_per_update": 0.066,
+      "minimum_ms_per_update": 0.03,
+      "maximum_ms_per_update": 0.553,
+      "stdout_sha256": "A2D83656A5386D38E38BFC73740A0AB1C10539B53F6197D8440F31C905E9E45A",
+      "fixture_log_sha256": "10AA3F699CFF97905AA98E140F40979F2FF8CD9F33C13A48D6374DE779220613",
+      "completed_work": {
+        "native_planting_events": 64,
+        "native_towers_per_force": 32
+      }
+    },
+    {
+      "id": "agriculture-32-b6-2-published",
+      "scored": true,
+      "scenario": "agriculture-active",
+      "tier": 32,
+      "arm": "published",
+      "average_ms_per_update": 0.069,
+      "minimum_ms_per_update": 0.029,
+      "maximum_ms_per_update": 3.549,
+      "stdout_sha256": "0C79892E53EF22922F923BAEF3C00227BA0D72FE4A226B22DC802570822C9B1D",
+      "fixture_log_sha256": "B9713C795DEA737100A8B8ABA45A547ECBA83E7944870CC48A53CAEF0D632C1B",
+      "completed_work": {
+        "native_planting_events": 64,
+        "native_towers_per_force": 32
+      }
+    },
+    {
+      "id": "agriculture-128-warmup-published-1",
+      "scored": false,
+      "scenario": "agriculture-active",
+      "tier": 128,
+      "arm": "published",
+      "average_ms_per_update": 0.076,
+      "minimum_ms_per_update": 0.035,
+      "maximum_ms_per_update": 0.911,
+      "stdout_sha256": "60188D2A9D5E89809885D974AE9C03478A1CE1F73F4059180408981B7607EC00",
+      "fixture_log_sha256": "28AF27C1729B32856D5D7AF828799C56AF4A873C3585BAB7C33B0698E0AAB444",
+      "completed_work": {
+        "native_planting_events": 256,
+        "native_towers_per_force": 128
+      }
+    },
+    {
+      "id": "agriculture-128-warmup-published-2",
+      "scored": false,
+      "scenario": "agriculture-active",
+      "tier": 128,
+      "arm": "published",
+      "average_ms_per_update": 0.077,
+      "minimum_ms_per_update": 0.034,
+      "maximum_ms_per_update": 0.948,
+      "stdout_sha256": "097593516F53F1DD2E8520236063911E08D27B985FBFC2000247AA3C6D719DA3",
+      "fixture_log_sha256": "3D5184D1192E855862A10E37900AB365EB741F747C01E0C38D439F0A5BA23147",
+      "completed_work": {
+        "native_planting_events": 256,
+        "native_towers_per_force": 128
+      }
+    },
+    {
+      "id": "agriculture-128-warmup-candidate-defaults-1",
+      "scored": false,
+      "scenario": "agriculture-active",
+      "tier": 128,
+      "arm": "candidate-defaults",
+      "average_ms_per_update": 0.076,
+      "minimum_ms_per_update": 0.037,
+      "maximum_ms_per_update": 0.924,
+      "stdout_sha256": "986D7F228A19DFD0DE0035C1F1745F5F574BD1C96221290858EF1816FDF05343",
+      "fixture_log_sha256": "CAE98EC249173EB230904FBD31BD578E6EE14C9AEF80BCBE7F9CDCA6F35F7D5C",
+      "completed_work": {
+        "native_planting_events": 256,
+        "native_towers_per_force": 128
+      }
+    },
+    {
+      "id": "agriculture-128-warmup-candidate-defaults-2",
+      "scored": false,
+      "scenario": "agriculture-active",
+      "tier": 128,
+      "arm": "candidate-defaults",
+      "average_ms_per_update": 0.079,
+      "minimum_ms_per_update": 0.036,
+      "maximum_ms_per_update": 3.538,
+      "stdout_sha256": "7A7A253AAA0AC308114E0A1F6C8DA2B80EF4B12DE1B28B75DFB82F24AC1DC15F",
+      "fixture_log_sha256": "B12B874A78AE02FD06EBF19DBB9B5AEA323886EBA9D5F10601757E8C1F18E3D2",
+      "completed_work": {
+        "native_planting_events": 256,
+        "native_towers_per_force": 128
+      }
+    },
+    {
+      "id": "agriculture-128-b1-1-published",
+      "scored": true,
+      "scenario": "agriculture-active",
+      "tier": 128,
+      "arm": "published",
+      "average_ms_per_update": 0.077,
+      "minimum_ms_per_update": 0.036,
+      "maximum_ms_per_update": 0.94,
+      "stdout_sha256": "13EEBD9C53C8DA2FF7EFD24E58D1B6811B4D5E3ED31EDCBDCBD1A634D65C7B5B",
+      "fixture_log_sha256": "19B83ED0C86A05FE34CB982A97BF5933583C86098D2335490D119CB941C4F330",
+      "completed_work": {
+        "native_planting_events": 256,
+        "native_towers_per_force": 128
+      }
+    },
+    {
+      "id": "agriculture-128-b1-2-candidate-defaults",
+      "scored": true,
+      "scenario": "agriculture-active",
+      "tier": 128,
+      "arm": "candidate-defaults",
+      "average_ms_per_update": 0.078,
+      "minimum_ms_per_update": 0.039,
+      "maximum_ms_per_update": 0.928,
+      "stdout_sha256": "B23DAE716CC03088943C19DF97B9B7127655D27EBD4269F273E3138802F75775",
+      "fixture_log_sha256": "D2B2409B49F1DB6EDFC5EAF3664C119D1D3474E7D65947CD26CBDE181D224716",
+      "completed_work": {
+        "native_planting_events": 256,
+        "native_towers_per_force": 128
+      }
+    },
+    {
+      "id": "agriculture-128-b2-1-candidate-defaults",
+      "scored": true,
+      "scenario": "agriculture-active",
+      "tier": 128,
+      "arm": "candidate-defaults",
+      "average_ms_per_update": 0.077,
+      "minimum_ms_per_update": 0.038,
+      "maximum_ms_per_update": 0.895,
+      "stdout_sha256": "6E43D06327D4BD8E2643887309999FEE09DB3EAE61ACCDD1342FD902C5649D91",
+      "fixture_log_sha256": "BC774069275EE9768B364852FD1FF9632651891A77E6A5DF9D4E88DBC41943C0",
+      "completed_work": {
+        "native_planting_events": 256,
+        "native_towers_per_force": 128
+      }
+    },
+    {
+      "id": "agriculture-128-b2-2-published",
+      "scored": true,
+      "scenario": "agriculture-active",
+      "tier": 128,
+      "arm": "published",
+      "average_ms_per_update": 0.077,
+      "minimum_ms_per_update": 0.037,
+      "maximum_ms_per_update": 1.019,
+      "stdout_sha256": "3777319F1BE6C00EC9816E73959C9C7C57D8F3ECE6BF683AEA457887B4AA1755",
+      "fixture_log_sha256": "009AEB2F61CA494E7C806C3451C8B35D937F151DDA2E56C03598C6D58017603D",
+      "completed_work": {
+        "native_planting_events": 256,
+        "native_towers_per_force": 128
+      }
+    },
+    {
+      "id": "agriculture-128-b3-1-published",
+      "scored": true,
+      "scenario": "agriculture-active",
+      "tier": 128,
+      "arm": "published",
+      "average_ms_per_update": 0.075,
+      "minimum_ms_per_update": 0.035,
+      "maximum_ms_per_update": 1.037,
+      "stdout_sha256": "E41DAD349ADF8F73448D519E077DBBF9D13BE0AE7B38A12A18833195B88C120A",
+      "fixture_log_sha256": "F316C09E074EAE6C9911E902DA9BC9998509608B32103B7EDC0740C60BE2DD74",
+      "completed_work": {
+        "native_planting_events": 256,
+        "native_towers_per_force": 128
+      }
+    },
+    {
+      "id": "agriculture-128-b3-2-candidate-defaults",
+      "scored": true,
+      "scenario": "agriculture-active",
+      "tier": 128,
+      "arm": "candidate-defaults",
+      "average_ms_per_update": 0.082,
+      "minimum_ms_per_update": 0.037,
+      "maximum_ms_per_update": 1.9,
+      "stdout_sha256": "FA36727E61B2CFE91D974335799E602F85D3EC29115D6518855BC53C337065E8",
+      "fixture_log_sha256": "FEC56BC57EC485DEB3F2171D6A763971E4F4F5ACD2D8EBDE646FD2E182465330",
+      "completed_work": {
+        "native_planting_events": 256,
+        "native_towers_per_force": 128
+      }
+    },
+    {
+      "id": "agriculture-128-b4-1-candidate-defaults",
+      "scored": true,
+      "scenario": "agriculture-active",
+      "tier": 128,
+      "arm": "candidate-defaults",
+      "average_ms_per_update": 0.077,
+      "minimum_ms_per_update": 0.038,
+      "maximum_ms_per_update": 0.909,
+      "stdout_sha256": "D85C69DCEFAE4E96736726AA4CE856C6E8DA86E82FAD33D969441818BF934EAA",
+      "fixture_log_sha256": "002333E11E3B79A8363550E19C78CF69839F72325D58B1D149D62D6D72FF62BC",
+      "completed_work": {
+        "native_planting_events": 256,
+        "native_towers_per_force": 128
+      }
+    },
+    {
+      "id": "agriculture-128-b4-2-published",
+      "scored": true,
+      "scenario": "agriculture-active",
+      "tier": 128,
+      "arm": "published",
+      "average_ms_per_update": 0.077,
+      "minimum_ms_per_update": 0.035,
+      "maximum_ms_per_update": 1.011,
+      "stdout_sha256": "7B6814C1095E3941E7FD2A4E7AA89F4997DA63CE8702DC96B5265E2C30D99FCD",
+      "fixture_log_sha256": "591FF886C24334B8F238E9BE692BF8ACEE08A1C4C489BE6F62871CDC9D7210AB",
+      "completed_work": {
+        "native_planting_events": 256,
+        "native_towers_per_force": 128
+      }
+    },
+    {
+      "id": "agriculture-128-b5-1-published",
+      "scored": true,
+      "scenario": "agriculture-active",
+      "tier": 128,
+      "arm": "published",
+      "average_ms_per_update": 0.078,
+      "minimum_ms_per_update": 0.036,
+      "maximum_ms_per_update": 2.066,
+      "stdout_sha256": "1C17B077B453C2AE1626CCD2492E3CE4F67DADEB9280793E8A19FBAB223DAAD4",
+      "fixture_log_sha256": "CBBED58E3071FC8E3F556E8C43FFB13D294AADEF4F1E1DDDCCAB9EF4D9B3B8F0",
+      "completed_work": {
+        "native_planting_events": 256,
+        "native_towers_per_force": 128
+      }
+    },
+    {
+      "id": "agriculture-128-b5-2-candidate-defaults",
+      "scored": true,
+      "scenario": "agriculture-active",
+      "tier": 128,
+      "arm": "candidate-defaults",
+      "average_ms_per_update": 0.076,
+      "minimum_ms_per_update": 0.037,
+      "maximum_ms_per_update": 1.737,
+      "stdout_sha256": "16C74C7C332A4264CC85FB9B00F61B37FFD1A381AB4BAC505F50D8033C87D584",
+      "fixture_log_sha256": "990AD74C7683A052009CE11CD70DC9508D6614C7A6F9A6DDEC35C3489934C630",
+      "completed_work": {
+        "native_planting_events": 256,
+        "native_towers_per_force": 128
+      }
+    },
+    {
+      "id": "agriculture-128-b6-1-candidate-defaults",
+      "scored": true,
+      "scenario": "agriculture-active",
+      "tier": 128,
+      "arm": "candidate-defaults",
+      "average_ms_per_update": 0.076,
+      "minimum_ms_per_update": 0.038,
+      "maximum_ms_per_update": 0.911,
+      "stdout_sha256": "25F047CBD7AC410960317EBE4943F605C3C4D4C57EA8256D3C238E404BDCDCC1",
+      "fixture_log_sha256": "2A149155BFC09828AEFB7D99EABE6861B52D8B8C81458813A91EA7DCCE53EA12",
+      "completed_work": {
+        "native_planting_events": 256,
+        "native_towers_per_force": 128
+      }
+    },
+    {
+      "id": "agriculture-128-b6-2-published",
+      "scored": true,
+      "scenario": "agriculture-active",
+      "tier": 128,
+      "arm": "published",
+      "average_ms_per_update": 0.08,
+      "minimum_ms_per_update": 0.035,
+      "maximum_ms_per_update": 0.983,
+      "stdout_sha256": "B83F95518069ACD34EABED1FEEEB92BA51ED5D4A977EDCCB930EE7A94D729E71",
+      "fixture_log_sha256": "ABBC847F409FB6E9F006C81AAB8EAFC457FC18DED6B52389B0EE797410999387",
+      "completed_work": {
+        "native_planting_events": 256,
+        "native_towers_per_force": 128
+      }
+    }
+  ],
+  "scored_group_summaries": [
+    {
+      "scenario": "repair-active",
+      "tier": 0,
+      "arm": "published",
+      "scored_runs": 8,
+      "minimum_of_run_maxima_ms": 16.369,
+      "median_of_run_maxima_ms": 16.8045,
+      "largest_observed_update_ms": 17.331,
+      "largest_observation_id": "repair-b4-2-published"
+    },
+    {
+      "scenario": "repair-active",
+      "tier": 0,
+      "arm": "candidate",
+      "scored_runs": 8,
+      "minimum_of_run_maxima_ms": 14.637,
+      "median_of_run_maxima_ms": 15.1375,
+      "largest_observed_update_ms": 15.407,
+      "largest_observation_id": "repair-b8-1-candidate"
+    },
+    {
+      "scenario": "agriculture-active",
+      "tier": 1,
+      "arm": "published",
+      "scored_runs": 6,
+      "minimum_of_run_maxima_ms": 0.404,
+      "median_of_run_maxima_ms": 0.5075,
+      "largest_observed_update_ms": 2.84,
+      "largest_observation_id": "agriculture-1-b5-1-published"
+    },
+    {
+      "scenario": "agriculture-active",
+      "tier": 1,
+      "arm": "candidate-defaults",
+      "scored_runs": 6,
+      "minimum_of_run_maxima_ms": 0.394,
+      "median_of_run_maxima_ms": 0.437,
+      "largest_observed_update_ms": 2.416,
+      "largest_observation_id": "agriculture-1-b5-2-candidate-defaults"
+    },
+    {
+      "scenario": "agriculture-active",
+      "tier": 32,
+      "arm": "published",
+      "scored_runs": 6,
+      "minimum_of_run_maxima_ms": 0.568,
+      "median_of_run_maxima_ms": 0.612,
+      "largest_observed_update_ms": 3.549,
+      "largest_observation_id": "agriculture-32-b6-2-published"
+    },
+    {
+      "scenario": "agriculture-active",
+      "tier": 32,
+      "arm": "candidate-defaults",
+      "scored_runs": 6,
+      "minimum_of_run_maxima_ms": 0.548,
+      "median_of_run_maxima_ms": 0.581,
+      "largest_observed_update_ms": 4.579,
+      "largest_observation_id": "agriculture-32-b5-2-candidate-defaults"
+    },
+    {
+      "scenario": "agriculture-active",
+      "tier": 128,
+      "arm": "published",
+      "scored_runs": 6,
+      "minimum_of_run_maxima_ms": 0.94,
+      "median_of_run_maxima_ms": 1.015,
+      "largest_observed_update_ms": 2.066,
+      "largest_observation_id": "agriculture-128-b5-1-published"
+    },
+    {
+      "scenario": "agriculture-active",
+      "tier": 128,
+      "arm": "candidate-defaults",
+      "scored_runs": 6,
+      "minimum_of_run_maxima_ms": 0.895,
+      "median_of_run_maxima_ms": 0.9195,
+      "largest_observed_update_ms": 1.9,
+      "largest_observation_id": "agriculture-128-b3-2-candidate-defaults"
+    }
+  ],
+  "interpretation": [
+    "These are original engine-reported whole-update maxima at printed0.001ms precision. Median of run maxima is not a per-tick percentile. No per-tick histogram, event attribution, graphical frame time or exclusive MIR script time can be reconstructed from aggregate output.",
+    "All68 original start/complete pairs and exact useful-work counts are retained. Repair completes256 initial and8 reactivation health writes;744 capacity-overflow objects are intentionally refused,not a pending queue or silently counted as repaired. Agriculture completes the declared2*tier planting events.",
+    "The existing repair fixture independently checks600quiet ticks,60tick services,eight writes per service and32 initial service batches. That implies1860ticks between first and last initial service. It does not supply an independently recorded per-object delay distribution or a large-factory queue-delay acceptance verdict.",
+    "Original means/process-memory criteria and decisions are unchanged. This readback introduces no posthoc stall threshold, pass/fail substitution, extension, rerun or candidateB measurement. Published runtime comparator remains actual4.7.21002,distinct from the4.7.21003 startup comparison."
+  ],
+  "next_native_observations": [
+    "Use the existing benchmark-verbose tick categories and external resource observer in the already declared large-active-save comparison;retain tick/category rows,mean/upper-percentile/max and existing workload-event ticks alongside actual useful output.",
+    "Keep ordinary native research/settled closed Library and disabled optional features distinct from active repair/agriculture/spoilage;record actual pending-work count/age/completion delay without adding per-tick diagnostic logging to scored product code.",
+    "Investigate any stall using its event/tick and baseline/candidate activity before assigning MIR causation. Preserve normal-release logging and resource headroom;do not rerun a complete campaign merely to obtain a lower maximum."
+  ],
+  "new_native_processes": 0,
+  "new_acceptance_dataset": false,
+  "release_qualification": false
+}
