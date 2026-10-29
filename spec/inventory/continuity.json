@@ -748,6 +748,11 @@
             "tests/test_bob_plates_f210_pipeline.py"
           ],
           "scope": "Accepted PR1063/source head9ceb272c centrally wires the finite F210 Bob Plates body through one shared profile. Seven host pipeline controls cover31 Base and16 Space Age row comparisons against independently captured published expectations, tuning, disabled-lead identity and bounded recipe-cap metadata. The host plan has113 controls and all four CI checks pass. This is source/host wiring only; freeze the current package and qualify native research/effects plus protected save/reload behavior separately."
+        },
+        {
+          "id": "q006-independent-full-data-current-applicability",
+          "evidence": "spec/evidence/q006-independent-current-data-aero-r01.json",
+          "scope": "Aero independently reproduces all13 transported full-Bob/Space-Age records:746 published technology identities retained,738 exact,eight explicit effect-order/presentation differences,39 separately classified additions and1022 retained settings. Relevant data-path function bodies,target transforms and packager remain unchanged through playerfbb7/current38C. Original575e/A8/FE4/profile47A538 execution retains its identity;this closes only the captured technology/settings comparison and scoped current data applicability. Eleven public additions,three presentation differences,changed runtime and other profiles keep their separate physical/save/client obligations."
         }
       ],
       "test_subjects": [

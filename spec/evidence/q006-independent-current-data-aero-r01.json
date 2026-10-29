@@ -1,0 +1,147 @@
+{
+  "schema": 1,
+  "kind": "MIRQ006IndependentAeroDataReadbackV1",
+  "status": "captured-data-comparison-independently-reproduced",
+  "transport_sha256": "D279B2AE549D326A719C82C47E1D42E3B55E55BFA7F8A01F47725FF371228595",
+  "transport_records": 13,
+  "technology_counts": {
+    "upstream": 673,
+    "published": 746,
+    "candidate": 785,
+    "a1fd": 781
+  },
+  "published_missing": 0,
+  "common_exact": 738,
+  "effect_permutations": [
+    "recipe-prod-research_carbon-1",
+    "recipe-prod-research_copper-1",
+    "recipe-prod-research_heavy_ammo-1",
+    "recipe-prod-research_inserters-1",
+    "recipe-prod-research_lithium-1",
+    "recipe-prod-research_modules-1"
+  ],
+  "presentation_changed_fields": {
+    "recipe-prod-research_inserters-1": [
+      "icons"
+    ],
+    "recipe-prod-research_mining_drill-1": [
+      "icons",
+      "localised_name"
+    ],
+    "recipe-prod-research_walls-1": [
+      "localised_name"
+    ]
+  },
+  "public_additions": [
+    "recipe-prod-research_material_bronze-1",
+    "recipe-prod-research_material_bronze-4",
+    "recipe-prod-research_material_copper_tungsten-1",
+    "recipe-prod-research_material_copper_tungsten-4",
+    "recipe-prod-research_material_gunmetal-1",
+    "recipe-prod-research_material_gunmetal-4",
+    "recipe-prod-research_material_invar-1",
+    "recipe-prod-research_material_invar-4",
+    "recipe-prod-research_material_nitinol-1",
+    "recipe-prod-research_material_nitinol-4",
+    "recipe-prod-research_science_pack_productivity-1"
+  ],
+  "hidden_disabled_additions": [
+    "mir-legacy-cannon-credit-rocket-shooting-speed",
+    "mir-legacy-module-credit-efficiency-module",
+    "mir-legacy-module-credit-productivity-module",
+    "mir-legacy-module-credit-speed-module",
+    "mir-native-credit-research_breeding-fish-breeding-negative",
+    "mir-native-credit-research_breeding-fish-breeding-positive",
+    "mir-native-credit-research_breeding-pentapod-egg-negative",
+    "mir-native-credit-research_breeding-pentapod-egg-positive",
+    "mir-native-credit-research_bullets-firearm-magazine-negative",
+    "mir-native-credit-research_bullets-firearm-magazine-positive",
+    "mir-native-credit-research_concrete-stone-brick-negative",
+    "mir-native-credit-research_concrete-stone-brick-positive",
+    "mir-native-credit-research_copper-copper-plate-negative",
+    "mir-native-credit-research_copper-copper-plate-positive",
+    "mir-native-credit-research_grenades-grenade-negative",
+    "mir-native-credit-research_grenades-grenade-positive",
+    "mir-native-credit-research_iron-iron-plate-negative",
+    "mir-native-credit-research_iron-iron-plate-positive",
+    "mir-native-credit-research_lubricant_productivity-lubricant-negative",
+    "mir-native-credit-research_lubricant_productivity-lubricant-positive",
+    "mir-native-credit-research_oil_processing_productivity-advanced-oil-processing-negative",
+    "mir-native-credit-research_oil_processing_productivity-advanced-oil-processing-positive",
+    "mir-native-credit-research_oil_processing_productivity-basic-oil-processing-negative",
+    "mir-native-credit-research_oil_processing_productivity-basic-oil-processing-positive",
+    "mir-native-credit-research_oil_processing_productivity-coal-liquefaction-negative",
+    "mir-native-credit-research_oil_processing_productivity-coal-liquefaction-positive",
+    "mir-native-credit-research_sulfuric_acid_productivity-sulfuric-acid-negative",
+    "mir-native-credit-research_sulfuric_acid_productivity-sulfuric-acid-positive"
+  ],
+  "settings": {
+    "identities": 1022,
+    "unchanged": 133,
+    "targets_metadata_removed": 889,
+    "maximum_1000": 123,
+    "other_changes": 0
+  },
+  "a1fd_to_575e": {
+    "added": [
+      "mir-legacy-cannon-credit-rocket-shooting-speed",
+      "mir-legacy-module-credit-efficiency-module",
+      "mir-legacy-module-credit-productivity-module",
+      "mir-legacy-module-credit-speed-module"
+    ],
+    "changed_fields": {
+      "recipe-prod-research_mining_drill-1": [
+        "localised_name"
+      ],
+      "recipe-prod-research_walls-1": [
+        "localised_name"
+      ]
+    },
+    "settings_bytes_identical": true
+  },
+  "current_data_applicability": {
+    "original_player_tree": "5ba53a8514b4641c749e91c0a68f32521fb3fee7",
+    "current_player_tree": "fbb7e9135280ce7f69692e9b0c4a44d743793f45",
+    "all_changed_paths": [
+      "changelog.txt",
+      "presentation/library_model.lua",
+      "research/catalogue.lua",
+      "runtime/caps.lua",
+      "runtime/library.lua",
+      "runtime/lifecycle.lua"
+    ],
+    "review": "All data entrypoints, settings paths, research builders and compatibility adapters are byte-identical. The only changed research module adds one private identity map and a detached accessor; removing those exact additions reproduces the complete original module bytes. Existing callable bodies are unchanged. The only consumer of that new accessor is runtime/library.lua, outside data/settings execution. Runtime lifecycle/cap/Library and presentation changes do not supply new data-stage qualification.",
+    "packaging": {
+      "original_source_commit": "575e418c72eff2970fa5f6274956f6e8944d4e19",
+      "current_source_commit": "b3bbd8d37b37bfee2e258b3e8a2f223dcf3860b3",
+      "unchanged": [
+        "tools/package.py",
+        "targets/"
+      ],
+      "release_tool_change": "Only inventory support text for experimental F018; no stable ZIP generation, target transform or membership changes.",
+      "current_f210_sha256": "38C84CCBC4BFDA62FCB078772C4690AB81228484744A36D9EA303F5A75B16447",
+      "independent_current_inventory": "spec/evidence/current-fbb7-aero-independent-readback-r01.json"
+    }
+  },
+  "limits": [
+    "Independent prototype/settings review only. Original captures retain575e/A8,FE4,profile47A538 and their original raw dump custody on Black Glass; no new native process or8DC execution is claimed.",
+    "Current source review establishes unchanged data-path behavior for these exact original inputs. It does not relabel captured bytes, qualify changed runtime or prove physical/save/client behavior.",
+    "Eleven public additions have no upstream/B6 identity. Existing original five-alloy/native chains retain their own scope; their affected current runtime applicability still needs explicit review.",
+    "Three icon/name differences remain explicit presentation dispositions requiring applicable rendered evidence.",
+    "No complete CONT-12,all-profile,performance or release acceptance."
+  ],
+  "review_method": [
+    "Verify all thirteen original body lengths/SHA256 before parsing. Never execute/import the transported historical script.",
+    "Parse native numbers as Decimal; compare key presence as well as values, all common fields and all identities.",
+    "Only six explicit recipe-productivity effect arrays are compared as complete payload multisets, retaining duplicate multiplicity. No numeric tolerance or hidden-technology filtering."
+  ],
+  "reader": {
+    "local_path": "build/qualification/q006-independent-aero-r01/review.py",
+    "sha256": "1CE680BBD0123B04F8C60BAE0FB1FAA865D5C0965B319517933EFC4E45966185",
+    "authority": "Independent read-only evidence extraction only; not a shipped/runtime module or new assurance framework."
+  },
+  "original_readback": {
+    "path": "spec/evidence/q006-full-capture-semantic-readback-r02.json",
+    "sha256": "EC94DE43E1F34B74FB4CDA58058644F6712F6111C2028B860ABB2DE04E46E367"
+  }
+}
