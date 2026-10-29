@@ -1,0 +1,84 @@
+{
+  "schema": 1,
+  "kind": "MIRF200APIOptionalAbsenceAeroApplicabilityV1",
+  "status": "original-absence-outcome-remains-applicable-current-mir-not-loaded",
+  "original_chain": "spec/evidence/api-optional-absence-current-native-chain.json",
+  "original_run": 40122806486,
+  "engine": {
+    "sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B",
+    "version": "2.0.77"
+  },
+  "original_source": "19a65f532757fda8f7db79e169e931a4530141d2",
+  "current_source": "b3bbd8d37b37bfee2e258b3e8a2f223dcf3860b3",
+  "current_player_tree": "fbb7e9135280ce7f69692e9b0c4a44d743793f45",
+  "raw_capsule_sha256": "FE805BE079D42145525C4D03DC771664B15AF2580678C78BA5A321CDB00032CC",
+  "original_bodies_verified": 5,
+  "original_fixture_members": [
+    {
+      "source": "tests/fixtures/api-beta/info-f200.json",
+      "member": "info.json",
+      "sha256": "40DA274C7B3A907BD9CB52561FB651D12A104BCDFA5DC28F2862C8EF9445E055",
+      "bytes": 380
+    },
+    {
+      "source": "tests/fixtures/api-beta/data-final-fixes.lua",
+      "member": "data-final-fixes.lua",
+      "sha256": "66502AB391A50F57D30150CDE9BDAEBE42ACDC2101A75AC15E54D9D8AC27B2B4",
+      "bytes": 952
+    },
+    {
+      "source": "tests/fixtures/api-beta/control.lua",
+      "member": "control.lua",
+      "sha256": "86C311E74FAAD7868AC875B32D800E333618086106F01524BCA4BA5E324082C8",
+      "bytes": 4218
+    },
+    {
+      "source": "tests/fixtures/api-beta/graphics/icon.png",
+      "member": "graphics/icon.png",
+      "sha256": "530F9250623036693D3E5A79F830B9C8A6D61E727C92219FD6A28EE62A424CCE",
+      "bytes": 137
+    },
+    {
+      "source": "tests/fixtures/api-optional-absence/info.json",
+      "member": "info.json",
+      "sha256": "E90BD332FC15DB108A65DA012B60A4B8BEBEA7382FF9994B52B2B6125AEDD138",
+      "bytes": 324
+    },
+    {
+      "source": "tests/fixtures/api-optional-absence/control.lua",
+      "member": "control.lua",
+      "sha256": "B9D11F345D346253E4CE22D012F8104EB4EA7D4A6844A055F4658B03226EDAA0",
+      "bytes": 1669
+    },
+    {
+      "source": "tests/fixtures/active-mods-observer/info-f200.json",
+      "member": "info.json",
+      "sha256": "5C4A351958060F5FED504AA86E8C201A2F50A36C2732E624727B5697F216475A",
+      "bytes": 231
+    },
+    {
+      "source": "tests/fixtures/active-mods-observer/data-final-fixes.lua",
+      "member": "data-final-fixes.lua",
+      "sha256": "89D364F0033A7EE036998E6C29A3558099C25AD2707CB24914790C49FB21555C",
+      "bytes": 477
+    }
+  ],
+  "actual_absence_marker": {
+    "case": "api-optional-absence",
+    "stage": "init",
+    "status": "passed",
+    "qualification": "optional-consumer-absence-startup-only",
+    "consumer": "mir-fixture-mir5-api-beta",
+    "mir_present": false,
+    "runtime_interface_present": false,
+    "optional_technology_present": false,
+    "cable_productivity_bonus": 0
+  },
+  "reason": "The native observer requires exactly base,Beta,absence witness and observer,with MIR/runtime interface/optional technology absent and cable bonus0. Current MIR implementation is not a consumed input in that case. Original native fixtures/profile/harness/engine retain their exact execution identity; no current archive is relabelled as tested.",
+  "current_beta_source_review": "Both original and current controls return on the first line when MIR is absent. The only five added lines are in the unreachable present-MIR tick-query callback. This does not claim native execution of the changed Beta archive.",
+  "limits": [
+    "F2002.0.77 CreateOnly optional-absence scope only; no F210 or Space Age claim.",
+    "No present-MIR API behavior,actual research/save/client/performance or overall API stability follows.",
+    "No new native launch; source/archive changes outside the absent case do not force its recreation."
+  ]
+}
