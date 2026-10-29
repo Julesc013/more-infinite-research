@@ -1,0 +1,61 @@
+{
+  "schema": 1,
+  "kind": "mir5-library-native-input-imported110-native-selection",
+  "target": "f210",
+  "factorio_line": "2.1",
+  "engine": {
+    "version": "2.1.23",
+    "sha256": "8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38"
+  },
+  "settings_mode": "Defaults",
+  "session_expected_peak_memory_mib": 7168,
+  "protected_input_save": {
+    "sha256": "8DCFC16FF929766D2E5CFEC4F7BC81367A9632CEB4B39558E40330FA43BD7F0C",
+    "bytes": 814068,
+    "original_chain": "spec/evidence/migration-origin-110-7a2-direct-native-chain-r01.json"
+  },
+  "mods": [
+    {
+      "name": "base",
+      "version": "2.1.23",
+      "enabled": true
+    },
+    {
+      "name": "mir-fixture-mir5-active-mods-observer",
+      "version": "0.1.0",
+      "enabled": true
+    },
+    {
+      "name": "more-infinite-research",
+      "version": "5.0.21000",
+      "enabled": true
+    },
+    {
+      "name": "mir-fixture-mir5-migration-origin-f200-110-source",
+      "version": "0.4.0",
+      "enabled": true
+    },
+    {
+      "name": "mir-fixture-mir5-library-native-input",
+      "version": "0.1.0",
+      "enabled": true
+    }
+  ],
+  "archive_sha256": {
+    "more-infinite-research_5.0.21000.zip": "2DDD2A4C967BEF07830218442AE4441BEECD5B9ECE0AC86B09A5F6586BBA80E5",
+    "mir-fixture-mir5-active-mods-observer_0.1.0.zip": "A15A7D628D66953D2E0C4D4FA288F47CBF9C5678327C7EB3D23ADB5DC78331C0"
+  },
+  "display": {
+    "requested_window": "1280x720",
+    "actual_owned_client_geometry_required": [
+      1280,
+      720
+    ],
+    "points": "Freeze from current native geometry and an owned desktop capture before input;Factorio screenshot request is not desktop geometry proof.",
+    "drag_delta": [
+      -30,
+      0
+    ]
+  },
+  "scope": "Prepared imported/save/native-input test definition,not an admitted fresh multiplayer wrapper mode or native result. Private caller must bind exact own fixture archive hashes and corrected original preservation fixture members before governed dispatch. Five actual joins include one newly created German test player removal/replacement plus both cold reconnects. No original player may be removed. Actual imported three-module credit/no-seeding/48private-query checks precede and follow actual input;native world state remains preserved. No actual imported cannon/predecessor-private-selection/private-queue/performance claim."
+}
