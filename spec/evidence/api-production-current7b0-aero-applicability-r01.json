@@ -1,0 +1,166 @@
+{
+  "schema": 1,
+  "kind": "MIRRetainedAPIProductionCurrentApplicabilityV1",
+  "status": "reviewed-scoped-current-applicability-original-executions-retained",
+  "original_chain": "spec/evidence/api-consumers-12c-native-chain.json",
+  "original_source_commit": "12c5d21fd7466299e7c3c7e316f2bae693145c20",
+  "original_player_tree": "e5044b712537c0a2f3edec71d935ddea4b994964",
+  "current_source_commit": "a95dbc6b35c165b46aa9991d2a0ef7274d4ec04a",
+  "current_player_tree": "7b0ede663e6fbcf486cd863e7d3719653aedc07a",
+  "current_package_readback": "spec/evidence/current-7b0-aero-independent-readback-r01.json",
+  "original_capsule": {
+    "path": "spec/evidence/api-consumers-12c-native-capsule.zip",
+    "sha256": "5378DF8AA3D3E381B9D2D36F265AD13781EA4CD939FFD874B1FA7917ACBAC86C",
+    "independently_verified_bodies": 9
+  },
+  "original_primary_custody_readback": [
+    {
+      "target": "f200",
+      "files": 46,
+      "bytes": 2588012
+    },
+    {
+      "target": "f210",
+      "files": 45,
+      "bytes": 1657229
+    }
+  ],
+  "package_pairs": [
+    {
+      "target": "f200",
+      "original_run": 40180277041,
+      "original_engine_sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B",
+      "original_archive_sha256": "87C0D71391B66B6BE608E1F0E9B2D638BA762CCF0D26CFE3F74BEC680B97A444",
+      "current_archive_sha256": "1D45A54DB6F911F665A019897518E46D6614AE7E56903B067F93E116DFC2554F",
+      "identical_core_payloads": [
+        {
+          "path": "api/v1/data.lua",
+          "sha256": "9CCDD2B5FFBE14156D002F50ECEB9799F70124CADA0A0A3767D84CA242413FA5",
+          "bytes": 12993
+        },
+        {
+          "path": "api/v1/runtime.lua",
+          "sha256": "5FA121E602EF99CC67DAE4C1E17C5334A8FB26BBEF97F00BF0AE9AE242D9C873",
+          "bytes": 3663
+        },
+        {
+          "path": "research/generator.lua",
+          "sha256": "88626C760C43D51FEDB3C7233523FAD3355404C3548A79F872940E6B019FE526",
+          "bytes": 5491
+        },
+        {
+          "path": "platform/target.lua",
+          "sha256": "C76444C8F5891C057082F6CDDD6DDA51BE91ADD1FE3369B8261EDC78578D852B",
+          "bytes": 396
+        },
+        {
+          "path": "data.lua",
+          "sha256": "F38FC47B1E731E517A4278DAD8E62A3D6ADEBF387F3FDA85C0D7EC9580508A2D",
+          "bytes": 243
+        },
+        {
+          "path": "control.lua",
+          "sha256": "17201196D4EB573265CE34C0599748ED78DF856EBFCB4229018C05C4E056C0C9",
+          "bytes": 248
+        },
+        {
+          "path": "runtime/configuration.lua",
+          "sha256": "21C832FF2C234C178D86DA51E24ABA34A51724A009E9E8299EBBF62F91EDAD5E",
+          "bytes": 347
+        }
+      ],
+      "original_profile_sha256": "1240337881A48BF7EB2E7917ADB35712C562C77D6A98736953EB7A1958607591",
+      "protected_completed_save_sha256": "96765301BD621DCB2A830003799B2A278336E419B611E70CC2D04506D991B49E",
+      "two_original_byte_identical_cold_reloads": true
+    },
+    {
+      "target": "f210",
+      "original_run": 40180070564,
+      "original_engine_sha256": "FE4A1DA30F322A0D0B8AEB3DF7276332222BAAA143E2352569B723E84B2B9060",
+      "original_archive_sha256": "4806BF2B9675DE2C4AE471D6C4F42F6ECE9CEFF68256562346026F086A7A8605",
+      "current_archive_sha256": "2DDD2A4C967BEF07830218442AE4441BEECD5B9ECE0AC86B09A5F6586BBA80E5",
+      "identical_core_payloads": [
+        {
+          "path": "api/v1/data.lua",
+          "sha256": "9CCDD2B5FFBE14156D002F50ECEB9799F70124CADA0A0A3767D84CA242413FA5",
+          "bytes": 12993
+        },
+        {
+          "path": "api/v1/runtime.lua",
+          "sha256": "5FA121E602EF99CC67DAE4C1E17C5334A8FB26BBEF97F00BF0AE9AE242D9C873",
+          "bytes": 3663
+        },
+        {
+          "path": "research/generator.lua",
+          "sha256": "88626C760C43D51FEDB3C7233523FAD3355404C3548A79F872940E6B019FE526",
+          "bytes": 5491
+        },
+        {
+          "path": "platform/target.lua",
+          "sha256": "4826A89FD40A9F0CEF385EC0B9F8CCE02CF1B7AE64A78AE431920A55DC56A601",
+          "bytes": 406
+        },
+        {
+          "path": "data.lua",
+          "sha256": "F38FC47B1E731E517A4278DAD8E62A3D6ADEBF387F3FDA85C0D7EC9580508A2D",
+          "bytes": 243
+        },
+        {
+          "path": "control.lua",
+          "sha256": "17201196D4EB573265CE34C0599748ED78DF856EBFCB4229018C05C4E056C0C9",
+          "bytes": 248
+        },
+        {
+          "path": "runtime/configuration.lua",
+          "sha256": "21C832FF2C234C178D86DA51E24ABA34A51724A009E9E8299EBBF62F91EDAD5E",
+          "bytes": 347
+        }
+      ],
+      "original_profile_sha256": "4E78C9DC5D745847916D628B87ADDF3E97D3B16B306B61D811FCC9B67BAD1350",
+      "protected_completed_save_sha256": "BB6DBA7D4F2CFB148FA563D0CC98CB113BA9799CE44D41A98942F1FFD0D331B6",
+      "two_original_byte_identical_cold_reloads": true
+    }
+  ],
+  "supported_reuse": [
+    "Immediate Alpha family publication during data and Beta cable-productivity publication during final fixes retain the exact public API/Generator payloads and exact unchanged declaration inputs. Their effects,unit,prerequisites,identities and returned order remain unchanged.",
+    "Read-only detached native runtime queries retain the exact runtime API payload. Original fixtures,profiles,engines,harnesses,save bytes and load scheduling remain the inputs to the reused evidence.",
+    "Actual original200 baseline and202 researched cables from equal100-plate inputs,zero assembler/module/beacon additions and native Beta+0.01 remain the named physical-effect proof. Research uses native setters,not labs.",
+    "Original completed saves and two unchanged-byte cold reloads per target remain the named continuity observations."
+  ],
+  "surrounding_path_review": [
+    "The exact six-mod Base closures contain no Bob/Angel,Py,K2,ATAN,Space Age or competing productivity provider. Changed overhaul-specific settings/compatibility branches therefore do not select. Default global-override implementations and relevant option defaults are unchanged.",
+    "MIR final-fixes constructs its own authored rows and named native-owner patches. The added missing-recipe compaction visits only that detached authored list;it cannot visit the independently named API technologies. Optional external prerequisite-repair imports are guarded by absent Angel/Astroponics/Muluna inputs.",
+    "Beta publishes after MIR final-fixes,then independently checks its one exact copper-cable+0.01 effect. Alpha declares its own names and costs;neither API consumer identity is in the authored cap catalogue. No changed catalogue branch grants these foreign rows MIR cap ownership.",
+    "Fresh creation and subsequent cold loads contain no imported MIR1/MIR4 bucket or configuration upgrade. Added legacy module/cannon preflights require exact old-version configuration events;the added V3 proof map requires the absent legacy bucket. They are not entered by these original fresh-MIR5 scenarios.",
+    "Current lifecycle init/rare reset work addresses admitted authored identities and five exact native owners. Research callbacks use the event technology name to restrict reconciliation;the API names have no authored cap row or worker-tail match. No new right to change their enabled/earned state follows.",
+    "No Library is opened in these production cases. The7b0 display fallback functions are defined at parse but are called only while constructing a requested view. Their German strings and changelog are not consumed by these physical/API assertions."
+  ],
+  "independent_expectations": {
+    "baseline_plates": 100,
+    "researched_plates": 100,
+    "baseline_cables": 200,
+    "researched_cables": 202,
+    "beta_recipe_productivity": 0.01,
+    "alpha_crafting_speed_modifier": 0.05,
+    "laboratory_research_claimed": false
+  },
+  "limits": [
+    "This is reasoned scoped reuse after actual archive/core-payload and surrounding-branch review,not a new execution of7b0. Other changed player paths do not inherit acceptance.",
+    "The original F210 engine is SteamFE4;this record does not relabel it as standalone8DC or assert a new physical run on that binary. F200 retainsD3.",
+    "The original older consumer control callbacks retain their original load/tick scheduling. Current extra tick queries and genuine client reconstruction have their separate native chains.",
+    "Fresh F200 private/API-client execution,current F210 Base/Space-Age client applicability,optional absence and host admission/mutation controls remain separately recorded.",
+    "No general arbitrary-prototype API,other modpack/Space-Age physical case,complete API1.0 stability,performance or release verdict."
+  ],
+  "native_processes_by_this_review": 0,
+  "player_source_changed": false,
+  "release_qualification": false,
+  "original_native_logs_independently_read": 8,
+  "local_readback": {
+    "root": "build/qualification/api-production-current-aero-review-r01",
+    "native_log_readback_sha256": "B9A659ACA3217560CC2C6CA9E98CCE7DAA24CF026C25D5FA8561222965147B57"
+  },
+  "unchanged_native_declaration_payloads": [
+    "Actual staged api-alpha/data.lua on both original targets is byte-identical to a95 canonical source.",
+    "Actual staged api-beta/data-final-fixes.lua on both original targets is byte-identical to a95 canonical source."
+  ]
+}
