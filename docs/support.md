@@ -5,7 +5,7 @@ applies_to: "MIR development"
 audience: maintainer
 doc_type: reference
 owner: mir-maintainers
-last_reviewed: 2026-10-28
+last_reviewed: 2026-10-29
 supersedes: []
 superseded_by: []
 source_of_truth_for:
@@ -57,11 +57,29 @@ Keep the original save, its pre-update backup, the selected mod archives and sta
 
 MIR 5 is still unreleased. Release qualification prioritizes 4.7.3 predecessor saves on all stable editions and older representatives covering known changes to identities, effects, settings, schemas and ownership. The complete modern-origin inventory remains, but an uncertain older route can be deferred explicitly instead of guessed; not every historical patch has passed a native upgrade. The [migration scope](../spec/migrations.md#required-origin-coverage) distinguishes qualified routes, engine bridges and deferred inputs. Future MIR 5 stable forward-upgrade obligations remain. Earlier pre-5 origins on 1.1 and below are best effort beyond the required 4.7.3 routes. Check the actual release evidence and limitations before adopting a candidate on a real factory.
 
-The candidate refuses a first published F2004.7 upgrade when earned overlapping productivity has no recorded MIR5 preference baseline, startup settings changed, and a known productivity provider is present or being removed. This also applies when moving directly from Factorio2.0 to2.1. Keep the original save: first evaluate the matching MIR5 F200 candidate on the original2.0 engine with the original mods and startup settings, then save and cold-reload that copy before changing the engine, provider or preference. The refusal protects research whose old preference cannot be inferred safely. The [migration policy](../spec/migrations.md#finite-transition-policy) distinguishes the observed4.7.2 two-step guard path, the separately passed C563 provider-free Base engine hop, and the still-unqualified4.7.3 settings/provider combinations. Each result retains its exact package and profile inputs.
+The candidate refuses a first published F2004.7 upgrade when earned overlapping productivity has no recorded MIR5 preference baseline, startup settings changed, and a known productivity provider is present or being removed. This also applies when moving directly from Factorio2.0 to2.1. Keep the original save: first evaluate the matching MIR5 F200 candidate on the original2.0 engine with the original mods and startup settings, then save and cold-reload that copy before changing the engine, provider or preference. The refusal protects research whose old preference cannot be inferred safely. The [exact4.7.3 two-step preference case](../spec/evidence/legacy-preference-473-current7a2-native-chain-r01.json) now observes both initial preferences with its four pinned providers: simultaneous first switches refuse, unchanged-settings upgrades save successfully, and later preference switches preserve earned credit while completing new research. Other provider/DLC/settings combinations remain unverified. The [migration policy](../spec/migrations.md#finite-transition-policy) keeps this route separate from the provider-free Base engine hop and the earlier4.7.2 observations; each retains its original package and profile inputs.
 
 A cap below earned research limits future work without erasing earned levels. MIR restores only disablement it owns; another mod's configuration callback can independently reset technology state. Hidden migration carriers preserve named historical investments and must not be removed as cosmetic clutter. The retained [recovery guidance](../README.md#save-compatibility) and original incident records remain relevant to previously resaved factories: restoring a missing definition cannot reconstruct history already erased from a save.
 
 Use the Research Library shortcut on modern targets to inspect research, queues, settings and availability. Its search/filter and language preferences belong to each player. Queue actions use native research behavior; the Library is not a second research planner. Startup settings take effect on the appropriate restart, and exporting a settings profile does not silently change the active game configuration.
+
+## Observed same-edition upgrade cases
+
+The following named cases have actual published4.7.3 source,successor-save and two cold-reload observations. They describe tested saved state,not complete qualification of nine editions or arbitrary factories. The [finite origin inventory](../spec/inventory/migration-origins.json) retains exact archives,engines,fixtures and original verdicts. The [current historical-package comparison](../spec/evidence/current-fbb7-historical-applicability-r01.json) verifies that the seven stable historical editions change only their changelog relative to those current baseline packages;their gameplay evidence keeps its original execution identity. Modern changed-runtime paths retain separate current-package qualification.
+
+| Edition | Observed saved-state case | Scope limit |
+|---|---|---|
+| F210 | [Base and Space Age catalogue/effects,queued and detached work,new research,save and reload](../spec/evidence/full-catalogue-473-current38c-native-chain-r01.json) | Separate exact profiles; no automatic DLC or provider-switch claim. |
+| F200 | [Base catalogue/effects and saved work](../spec/evidence/full-catalogue-473-f200-current7a2-native-chain-r01.json),plus the [selected Space Age preference/provider route](../spec/evidence/legacy-preference-473-current7a2-native-chain-r01.json) | The provider case exercises its selected breeding/preference boundary,not the complete Space Age catalogue. |
+| F110 | [Retained research/effects,capacity bonuses,queue and detached work,new mining research](../spec/evidence/f110-473-current7a2-native-chain-r01.json) | Broader settings,modpacks and physical production remain separate. |
+| F100 | [Mining preservation,new research,queue and partial work](../spec/evidence/historical-473-f017-f100-7a2-native-chain-r01.json) | This published-source case is separate from the [MIR5 F100-to-F110 laser bridge](../spec/evidence/f100-f110-laser-native-chain-r03.json). |
+| F017 | [Mining preservation,new research,queue and partial work](../spec/evidence/historical-473-f017-f100-7a2-native-chain-r01.json) | Named mining/state case,not a full historical modpack. |
+| F016 | [Mining preservation,new research and partial work](../spec/evidence/historical-473-f016-7a2-native-chain-r01.json) | This engine has no native research queue. |
+| F015 | [Mining preservation,new research and partial work](../spec/evidence/historical-473-f015-7a2-native-chain-r01.json) | This engine has no native research queue. |
+| F014 | [Mining-bonus preservation,save and reload](../spec/evidence/historical-473-f014-f0dd-native-chain-r01.json) | No later numeric infinite-level readback or invented continuation. |
+| F013 | [Mining-bonus preservation,save and reload](../spec/evidence/historical-473-f013-f0dd-native-chain-r01.json) | No later numeric infinite-level readback or invented continuation. |
+
+For engine changes,the separately observed [F110-to-F200](../spec/evidence/f110-f200-current7a2-native-chain-r01.json) and [F200-to-F210 Base](../spec/evidence/full-catalogue-473-f200-current7a2-native-chain-r01.json) routes reuse their protected originals. The [F100-to-F110 laser case](../spec/evidence/f100-f110-laser-native-chain-r03.json) starts from a fresh MIR5 F100 save and tests the laser identity/effect-category rename;it is not a published MIR4 laser save. Uncertain older histories,unselected DLC/provider permutations and best-effort editions retain their explicit limits.
 
 ## Researched planet still locked
 
