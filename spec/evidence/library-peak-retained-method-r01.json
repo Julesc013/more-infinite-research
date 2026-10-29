@@ -24,7 +24,7 @@
     "peak": "Separately named existing Process.PeakWorkingSet64 and Process.PeakPagedMemorySize64 at exact owned completion cutoff. Preserve field names;neither is relabelled sampled private bytes.",
     "periodic": "Retain all250ms raw observations,maxima and original26 control decisions as diagnostics,not native high-water values.",
     "retained": "Each restart server/clientEN/clientDE identity:median working_set_bytes and private_bytes in each explicit baseline/post-refresh window.",
-    "alignment": "Each peer emits four markers in its own stdout. Convert native-log elapsed via exact process startUTC to sampler monotonic reference;trim1second at both ends. Require at least8 samples and2seconds span per window,exact PID/start/phase/role and ordered complete markers. Missing or bad windows invalidate."
+    "alignment": "Each peer emits four markers in its own stdout. Convert native-log elapsed via exact process startUTC to sampler monotonic reference;trim1second at both ends. Derive eligible duration from actual native endpoints,not assumed60UPS. Require at least8 samples and2seconds span,first/last observations within500ms of the eligible boundaries,and no internal gap above1second,with exact PID/start/phase/role and ordered complete markers. A short surviving subsection,missing coverage or bad window invalidates."
   },
   "preflight": {"sessions": 2, "arms": ["published", "candidate"], "scored": false, "required": "Exact fixed map settings,opt-in,32iterations/64refresh calls,14UI/load+12OS+12retained endpoints,original26 diagnostics,twelve screenshots,closed saves and restoration. Independent readback precedes final freeze."},
   "schedule": {"inherit": "spec/evidence/library-current-e9-paired-plan-r01.json", "sessions": 12, "warmups": ["published", "candidate"], "same_published_controls": 2, "scored_blocks": [["published", "candidate"], ["candidate", "published"], ["published", "candidate"], ["candidate", "published"]], "extensions": 0},
@@ -39,6 +39,7 @@
   "counter_references": ["https://raw.githubusercontent.com/dotnet/runtime/v10.0.0/src/libraries/System.Diagnostics.Process/src/System/Diagnostics/Process.cs", "https://learn.microsoft.com/en-us/windows/win32/api/psapi/ns-psapi-process_memory_counters_ex"],
   "host_validation": {"runtime": "Explicit pinned lupa.lua52 from build/tmp/mir421-lua-runtime", "new_focused_controls": 3, "all_affected_controls": 20, "result": "All pass:both arms have exact600/960/600tick windows,32iterations,72total public calls,twelve screenshots,four original profiler actions and no load writes. Malformed Boolean,native mutation and lost final view reject."},
   "independent_review": false,
+  "initial_review": {"source": "https://github.com/Julesc013/more-infinite-research/pull/1414#issuecomment-6493283332", "owner": "Aero", "disposition": "Supports explicitly distinct future measurands and unchanged budgets. Tighten actual retained-window coverage before preflight;the500ms boundary and1second internal-gap requirements are now explicit. Final exact-source review and native window-reader controls remain open."},
   "native_preflight_observed": false,
   "final_packet_frozen": false,
   "metric_substitution_of_prior_data": false,
