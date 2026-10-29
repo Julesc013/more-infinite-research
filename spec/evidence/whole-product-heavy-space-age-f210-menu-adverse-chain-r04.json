@@ -100,9 +100,9 @@
   },
   "receipt_capsule": {
     "path": "spec/evidence/whole-product-heavy-space-age-f210-menu-adverse-receipts-r04.json.gz",
-    "sha256": "00DCC7256FFAC0726E7ADCE3EC5C6A4CB4AE177121FA62A89938A67E66445E86",
-    "bytes": 1234815,
-    "bodies": 208
+    "sha256": "8CAC18586AE136EBDA48565CB0E0A8F581F840B8E2BE745D86EF01C39C22C255",
+    "bytes": 1231708,
+    "bodies": 207
   },
   "omitted_binary_or_player_data_members": [
     {
@@ -474,6 +474,11 @@
       "path": "write-data/ordinary-menu-shared/player-data.json",
       "bytes": 16000,
       "sha256": "C1F59E175A2131B5609F1B556880B8FF12764853F6F06D2ED0817EABF42E1F97"
+    },
+    {
+      "path": "write-data/ordinary-menu-shared/achievements-modded.dat",
+      "bytes": 7086,
+      "sha256": "354DC831343BB9BE5B7EFAE5C63C2BB39D5581AB7DDD6E207B3321E4DB5075C1"
     }
   ],
   "preparation_lineage": {
@@ -503,5 +508,16 @@
     "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\whole-product-heavy-space-age-f210-menu-r04-controller\\focused-controls-r01\\receipt.json",
     "bytes": 11072,
     "sha256": "5E0F6BE9F96261D4060A8B3297730049732A4B8C78A2C70DEC8D721C28958CFB"
-  }
+  },
+  "public_text_allowlist": [
+    ".cfg",
+    ".ini",
+    ".json",
+    ".jsonl",
+    ".lock",
+    ".log",
+    ".ps1",
+    ".txt"
+  ],
+  "binary_scope_correction": "The first public projection accidentally admitted UTF8-decodable binary achievement state. The final capsule excludes it and all native player-data/achievement names plus non-allowlisted extensions;original local/native custody and earlier projection/commit history remain preserved."
 }
