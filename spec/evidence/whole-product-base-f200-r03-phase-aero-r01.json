@@ -482,7 +482,7 @@
       "50"
     ],
     "working_directory_on_native_owner": "D:/Projects/Factorio/more-infinite-research",
-    "source_review_reference": "2a0a560e4354d9580ad8615c54546d941577e98e;owner verifies actual unchanged command/helper bytes and freezes its exact executing commit before dispatch.",
+    "source_review_reference": "1d104429fb305fc00e66530f803b4212cf2e91b0",
     "materialized_plan": {
       "path": "build/qualification/whole-product-base-aero-review-r01/proposed-published-diagnostic-plan.json",
       "sha256": "B3E9374B7C2EFBE1F7A5F3631BDA943672671F99813395C9F049977D5735B5BF"
@@ -517,7 +517,22 @@
     "before_execute": "Native owner checks fresh output and exact existing archive/profile/config/player-data/engine/control ownership;run this same command first with -PlanOnly and -Preflight replacing -Execute. Do not replace an active frozen block.",
     "expected": "Five governed real processes with all raw ready endpoints,engine phases,capture counts and stage timings retained. No player source change or saved-game input;restore library/control bytes. This remains diagnostic even if its controls pass.",
     "if_failure": "Preserve all5 observations and the exact failed predicate;do not add runs or widen limits. If observer changes are needed,review a separate bounded protocol before replacement acceptance data. Keep ready migrations/export checks moving between protected timing blocks.",
-    "closes": "Preparation of a bounded repeatability diagnosis only. Actual whole-product Base/SpaceAge/heavy-profile performance acceptance remains open."
+    "closes": "Preparation of a bounded repeatability diagnosis only. Actual whole-product Base/SpaceAge/heavy-profile performance acceptance remains open.",
+    "command_and_changed_capture_pins": [
+      {
+        "path": "tools/Invoke-MenuComparison.ps1",
+        "source_revision": "1d104429fb305fc00e66530f803b4212cf2e91b0",
+        "sha256": "937FA4384F483F6DD1CFA901408FC45A45A467F5BAA0F876B0C0CD8B5366D919",
+        "bytes": 40357
+      },
+      {
+        "path": "tools/lib/validation/responsive-menu/OwnedMenuWindow.ps1",
+        "source_revision": "1d104429fb305fc00e66530f803b4212cf2e91b0",
+        "sha256": "AA2CD384725159C373CB48C34A352F2B41FF50BE2DC0477624475AB9EBD03C15",
+        "bytes": 18576
+      }
+    ],
+    "source_binding_limit": "The adverse evidence commit2a0a560e predates the PNG correction even though its PR base later advanced. Execute only from this reviewed1d104429f tree or an independently pinned descendant with identical consumed helpers;freeze the actual complete helper closure before native dispatch. OriginalR03 source/measurements remain unchanged."
   },
   "local_custody": "build/qualification/whole-product-base-aero-review-r01",
   "limits": [
