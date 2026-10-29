@@ -649,11 +649,27 @@
   "independent_review": "One exact D3 process/argv/3600 ticks/exit0,all10 native and2 controller members per original/copy,30 actual selected rows,three distinct physical EAF0 save files,completed copy lease/posthashes and original controls are independently verified.",
   "limits": [
     "The save header inferred2.0.32 and30mods;11 exact historical mod versions are unavailable. This deliberately uses declared current utility alternatives and2.0.77,not an exact historical replay.",
+    "A later bounded current level.dat0 audit reports35mods/2.0.55,distinct from the initial level-init30-mod table used here. The30-row alternative is not current-world or representative factory qualification;the current35-row inputs remain separate preparation.",
     "The input name and completed ticks do not establish a representative active factory. No activity counters,per-tick percentiles or stall attribution are available from sanitized aggregate stdout.",
     "Mean/min/max are original whole-engine printed observations from one unscored run,not a threshold,comparison,MIR-attribution,parity,gameplay,migration or release result.",
     "No MIR or test observer was selected. Protected source/owned/staged save bytes remain exact;no dependency copying,links or extractions occurred.",
     "Earlier472E/31516 preparation was never executed;its exact bytes and SHA/size manifest remain preserved before the final path-binding correction."
   ],
   "performance_acceptance": false,
-  "release_qualification": false
+  "release_qualification": false,
+  "later_current_world_input_review": {
+    "pull_request": "https://github.com/Julesc013/more-infinite-research/pull/1440",
+    "source_commit": "b207593f67df6b94a7a35c66b5223ddfb5c2c7f2",
+    "reported_current_header": {
+      "member": "level.dat0",
+      "engine": "2.0.55",
+      "mods": 35
+    },
+    "reported_initial_header": {
+      "member": "level-init.dat",
+      "engine": "2.0.32",
+      "mods": 30
+    },
+    "scope_correction": "This native admission selected30 rows from the initial header with11 available-version updates. It does not qualify the later current-world35-row table or representative factory activity. Preserve its raw result and original save unchanged. The separately prepared current table/14 available-version updates need their own reviewed input binding and affected native observations."
+  }
 }
