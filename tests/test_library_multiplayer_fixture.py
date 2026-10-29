@@ -830,7 +830,7 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
                     "mir-fixture-mir5-active-mods-observer_0.1.0.zip":
                         "A15A7D628D66953D2E0C4D4FA288F47CBF9C5678327C7EB3D23ADB5DC78331C0",
                     "more-infinite-research_5.0.21000.zip":
-                        "005D420671270306155CB4AC25E9CF77541202DFA16B206DCC016237619C9AA2",
+                        "2DDD2A4C967BEF07830218442AE4441BEECD5B9ECE0AC86B09A5F6586BBA80E5",
                     "mir-fixture-mir5-api-alpha_0.1.0.zip":
                         "DB5ED843FA9D85A1ABDC22595E62D315CA1A2191C846208079F85D4D016CE904",
                     "mir-fixture-mir5-api-beta_0.1.0.zip":
@@ -1041,7 +1041,7 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
           if($node.Count-ne1){throw 'selection function is absent or ambiguous'}
           Invoke-Expression $node[0].Extent.Text
           $engine='8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38'
-          $mir='005D420671270306155CB4AC25E9CF77541202DFA16B206DCC016237619C9AA2'
+          $mir='2DDD2A4C967BEF07830218442AE4441BEECD5B9ECE0AC86B09A5F6586BBA80E5'
           function Read-Profile([string]$Path){Get-Content -LiteralPath $Path -Raw|ConvertFrom-Json -AsHashtable}
           function Assert-Selected([string]$Path,[int]$Peak,[bool]$SpaceAge,[string]$Kind){
             $selected=Assert-MultiplayerFixtureSelection -Selection (Read-Profile $Path) -EngineSha256 $engine -FixtureCase 'library-multiplayer' -ExpectedMIRArchiveSha256 $mir -SessionExpectedPeakMemoryMiB $Peak
@@ -2820,6 +2820,112 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
             capture_output=True, text=True,
             env=dict(os.environ, MIR_TEST_SAMPLER=str(SAMPLER)), check=False,
         )
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+
+    def test_lifetime_peaks_read_owned_os_counters_at_close_without_extra_periodic_samples(self):
+        script = r'''
+          $ErrorActionPreference='Stop';Set-StrictMode -Version Latest
+          function Get-Process {throw 'no process rediscovery'}
+          function Get-CimInstance {throw 'no process tree discovery'}
+          . $env:MIR_TEST_SAMPLER
+          $process=[Diagnostics.Process]::GetCurrentProcess()
+          try {
+            $slot=@([pscustomobject]@{phase='initial';role='server'})
+            $ordinary=New-MIROwnedProcessMemorySampler -ExpectedSlots $slot
+            $ordinaryRegistration=Register-MIROwnedProcessMemoryProcess $ordinary initial server $process
+            Add-MIROwnedProcessMemorySample $ordinary
+            Complete-MIROwnedProcessMemoryProcess $ordinary $ordinaryRegistration
+            $ordinaryReceipt=Get-MIROwnedProcessMemoryObservationReceipt $ordinary
+            if($ordinaryReceipt.PSObject.Properties['lifetime_peak_counters']-or$ordinaryReceipt.PSObject.Properties['lifetime_peak_observer']){throw 'default receipt gained peak fields'}
+
+            $sampler=New-MIROwnedProcessMemorySampler -ExpectedSlots $slot -IncludeLifetimePeaks
+            $registration=Register-MIROwnedProcessMemoryProcess $sampler initial server $process
+            Add-MIROwnedProcessMemorySample $sampler
+            $firstWorkingSet=$sampler.observations[0].working_set_bytes
+            # No periodic sample is due. A final OS high-water read must still
+            # occur, without making an off-cadence periodic observation.
+            $sampler.next_due_monotonic_milliseconds=[double]::MaxValue
+            Complete-MIROwnedProcessMemoryProcess $sampler $registration
+            Complete-MIROwnedProcessMemoryProcess $sampler $registration
+            $receipt=Get-MIROwnedProcessMemoryObservationReceipt $sampler
+            if($receipt.status-cne'complete-observation'-or$receipt.performance_acceptance-or$receipt.observations.Count-ne1-or$receipt.lifetime_peak_counters.Count-ne1){throw 'opted-in close changed sampling or duplicated counters'}
+            $peak=$receipt.lifetime_peak_counters[0]
+            if($peak.phase-cne'initial'-or$peak.role-cne'server'-or$peak.pid-ne$process.Id-or$peak.start_utc-cne$registration.start_utc){throw 'peak identity differs'}
+            if($peak.working_set_peak_bytes-lt$firstWorkingSet-or$peak.paged_memory_peak_bytes-lt0-or$peak.elapsed_monotonic_milliseconds-lt$receipt.observations[0].elapsed_monotonic_milliseconds){throw 'invalid native high-water values'}
+            if([datetime]::Parse($peak.observed_utc).ToUniversalTime()-lt$process.StartTime.ToUniversalTime()){throw 'peak UTC precedes process creation'}
+            if($receipt.lifetime_peak_observer.changes_periodic_observations-ne$false-or$process.HasExited){throw 'observer changed process lifetime or periodic semantics'}
+
+            $drift=New-MIROwnedProcessMemorySampler -ExpectedSlots $slot -IncludeLifetimePeaks
+            $driftRegistration=Register-MIROwnedProcessMemoryProcess $drift initial server $process
+            Add-MIROwnedProcessMemorySample $drift
+            $drift.next_due_monotonic_milliseconds=[double]::MaxValue
+            $driftRegistration.start_utc='1970-01-01T00:00:00.0000000Z'
+            Complete-MIROwnedProcessMemoryProcess $drift $driftRegistration
+            $refused=Get-MIROwnedProcessMemoryObservationReceipt $drift
+            if($refused.status-cne'incomplete-observation'-or$refused.lifetime_peak_counters.Count-ne0-or$refused.incomplete_reasons-notcontains'lifetime-peak-unavailable-or-identity-drift'){throw 'final counter accepted changed process identity'}
+
+            $exited=New-MIROwnedProcessMemorySampler -ExpectedSlots $slot -IncludeLifetimePeaks
+            $exitedRegistration=Register-MIROwnedProcessMemoryProcess $exited initial server $process
+            Add-MIROwnedProcessMemorySample $exited
+            Complete-MIROwnedProcessMemoryProcess $exited $exitedRegistration -NaturalExit
+            if((Get-MIROwnedProcessMemoryObservationReceipt $exited).status-cne'incomplete-observation'){throw 'natural exit invented unavailable peaks'}
+            $caught=$false
+            try{New-MIROwnedProcessMemorySampler -Context benchmark -ExpectedSlots @([pscustomobject]@{phase='benchmark';role='factorio'}) -IncludeLifetimePeaks|Out-Null}catch{$caught=$true}
+            if(-not$caught){throw 'benchmark contract silently acquired lifetime peaks'}
+          } finally {$process.Dispose()}
+        '''
+        result = subprocess.run(['pwsh', '-NoProfile', '-NonInteractive', '-Command', script],
+                                capture_output=True, text=True, check=False,
+                                env=dict(os.environ, MIR_TEST_SAMPLER=str(SAMPLER)))
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+
+    def test_lifetime_peak_opt_in_requires_typed_library_memory_and_stays_absent_by_default(self):
+        script = r'''
+          $ErrorActionPreference='Stop';Set-StrictMode -Version Latest
+          $tokens=$null;$errors=$null
+          $ast=[Management.Automation.Language.Parser]::ParseFile($env:MIR_TEST_SESSION,[ref]$tokens,[ref]$errors)
+          if($errors.Count){throw 'session syntax differs'}
+          function Assert-Session([bool]$Condition,[string]$Message){if(-not$Condition){throw $Message}}
+          $function=@($ast.FindAll({param($n)$n-is[Management.Automation.Language.FunctionDefinitionAst]-and$n.Name-ceq'Get-ProcessLifetimePeakOptIn'},$true))
+          if($function.Count-ne1){throw 'typed lifetime opt-in missing'}
+          Invoke-Expression $function[0].Extent.Text
+          if(Get-ProcessLifetimePeakOptIn @{} 'library-multiplayer' $true){throw 'default activated lifetime counters'}
+          foreach($case in @('library-multiplayer','library-paired-browser')){
+            if(-not(Get-ProcessLifetimePeakOptIn @{process_memory_lifetime_peaks=$true} $case $true)){throw 'typed opt-in refused'}
+          }
+          foreach($bad in @('true',1,@{})){
+            $caught=$false;try{Get-ProcessLifetimePeakOptIn @{process_memory_lifetime_peaks=$bad} 'library-multiplayer' $true|Out-Null}catch{$caught=$true}
+            if(-not$caught){throw 'untyped peak flag accepted'}
+          }
+          foreach($row in @(@{case='library-multiplayer';memory=$false},@{case='scripted-effects-multiplayer';memory=$true})){
+            $caught=$false;try{Get-ProcessLifetimePeakOptIn @{process_memory_lifetime_peaks=$true} $row.case $row.memory|Out-Null}catch{$caught=$true}
+            if(-not$caught){throw 'unadmitted peak context accepted'}
+          }
+          $wrapper=[Management.Automation.Language.Parser]::ParseFile($env:MIR_TEST_WRAPPER,[ref]$tokens,[ref]$errors)
+          if($errors.Count){throw 'wrapper syntax differs'}
+          $forward=@($wrapper.FindAll({param($n)$n-is[Management.Automation.Language.IfStatementAst]-and$n.Extent.Text-ceq'if($CollectProcessLifetimePeaks){$spec.process_memory_lifetime_peaks=$true}'},$true))
+          if($forward.Count-ne1){throw 'explicit forwarding boundary missing'}
+          $CollectProcessLifetimePeaks=$false;$spec=@{};Invoke-Expression $forward[0].Extent.Text
+          if($spec.ContainsKey('process_memory_lifetime_peaks')){throw 'legacy spec gained a field'}
+          $CollectProcessLifetimePeaks=$true;Invoke-Expression $forward[0].Extent.Text
+          if($spec.process_memory_lifetime_peaks-isnot[bool]-or-not$spec.process_memory_lifetime_peaks){throw 'typed forwarding lost'}
+          $guard=@($wrapper.EndBlock.Statements|Where-Object {$_.Extent.Text.EndsWith("'lifetime peak counters require opted-in Library memory observations'",[StringComparison]::Ordinal)})
+          if($guard.Count-ne1){throw 'prelaunch lifetime peak guard missing'}
+          $check=[scriptblock]::Create($guard[0].Extent.Text)
+          $CollectProcessMemoryObservations=$true;$StandaloneIdentityDiscovery=$false;$FixtureCase='library-paired-browser';&$check
+          foreach($opponent in @('without-memory','discovery','different-case')){
+            $CollectProcessMemoryObservations=$true;$StandaloneIdentityDiscovery=$false;$FixtureCase='library-paired-browser'
+            switch($opponent){
+              'without-memory'{$CollectProcessMemoryObservations=$false}
+              'discovery'{$StandaloneIdentityDiscovery=$true}
+              'different-case'{$FixtureCase='scripted-effects-multiplayer'}
+            }
+            $caught=$false;try{&$check}catch{$caught=$true};if(-not$caught){throw "unadmitted wrapper context accepted:$opponent"}
+          }
+        '''
+        result = subprocess.run(['pwsh', '-NoProfile', '-NonInteractive', '-Command', script],
+                                capture_output=True, text=True, check=False,
+                                env=dict(os.environ, MIR_TEST_SESSION=str(SESSION), MIR_TEST_WRAPPER=str(WRAPPER)))
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
 
     def test_memory_observation_opt_in_is_strict_and_default_session_specs_remain_unchanged(self):

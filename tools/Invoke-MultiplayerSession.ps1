@@ -36,6 +36,14 @@ function Get-ProcessMemoryObservationOptIn([hashtable]$Spec,[string]$FixtureCase
   Assert-Session (-not $collect -or $FixtureCase -cin @('library-multiplayer','library-paired-browser')) 'process memory observations require a named Library fixture'
   return $collect
 }
+function Get-ProcessLifetimePeakOptIn([hashtable]$Spec,[string]$FixtureCase,[bool]$CollectMemory) {
+  if (-not $Spec.ContainsKey('process_memory_lifetime_peaks')) { return $false }
+  Assert-Session ($Spec.process_memory_lifetime_peaks -is [bool]) 'process lifetime peak flag must be Boolean'
+  $requested = [bool]$Spec.process_memory_lifetime_peaks
+  Assert-Session (-not $requested -or ($CollectMemory -and
+    $FixtureCase -cin @('library-multiplayer','library-paired-browser'))) 'process lifetime peaks require opted-in Library memory observations'
+  return $requested
+}
 function Test-Within([string]$Root, [string]$Path) {
   $relative = [IO.Path]::GetRelativePath($Root, $Path)
   return $relative -ne '..' -and -not $relative.StartsWith('..' + [IO.Path]::DirectorySeparatorChar) -and -not [IO.Path]::IsPathRooted($relative)
@@ -778,6 +786,7 @@ if($spec.ContainsKey('private_credit_checks')){
   Assert-Session ($fixtureCase-ceq'library-multiplayer' -and $spec.private_credit_checks -is [bool] -and $spec.private_credit_checks -and $apiClientConsumers -and -not $standaloneIdentityDiscovery) 'Private-credit Library mode differs'
 }
 $collectProcessMemoryObservations = Get-ProcessMemoryObservationOptIn -Spec $spec -FixtureCase $fixtureCase
+$collectProcessLifetimePeaks = Get-ProcessLifetimePeakOptIn -Spec $spec -FixtureCase $fixtureCase -CollectMemory $collectProcessMemoryObservations
 $markerPrefix=switch($fixtureCase){'library-multiplayer'{'MIR5_LIBRARY_MULTIPLAYER'};'library-paired-browser'{'MIR5_LIBRARY_PAIRED_BROWSER'};default{'MIR5_SCRIPTED_EFFECTS_MULTIPLAYER'}}
 $clientGraphics=@(if($fixtureCase-ceq'scripted-effects-multiplayer' -or $spaceAgeLibrary){'--force-graphics-preset';'low';'--video-memory-usage';'low'})
 foreach ($field in @('engine','engine_sha256','archive_library','workroot','seed_save','seed_sha256','server_config','server_settings','server_write_data','port','rcon_port','rcon_password','clients','expected_screenshots')) {
@@ -907,7 +916,7 @@ if ($collectProcessMemoryObservations) {
       [pscustomobject]@{ phase=$phase; role=$role }
     }
   }
-  $processMemorySampler = New-MIROwnedProcessMemorySampler -ExpectedSlots @($slots)
+  $processMemorySampler = New-MIROwnedProcessMemorySampler -ExpectedSlots @($slots) -IncludeLifetimePeaks:$collectProcessLifetimePeaks
 }
 $records = [Collections.Generic.List[object]]::new()
 $apiClientLoadMarkers = [Collections.Generic.List[object]]::new()
