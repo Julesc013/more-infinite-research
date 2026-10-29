@@ -362,19 +362,32 @@ class LibrarySupportExportObserverControls(unittest.TestCase):
             local en,de=player(1,"en"),player(2,"de")
             game.players,game.connected_players={en,de},{en,de}
             callbacks[1]({player_index=1});callbacks[1]({player_index=2})
+            if opponent=="duplicate-initial-join"then callbacks[1]({player_index=1})end
             local sequence={"en-full","en-compact","en-diagnostics","de-full","de-compact","de-diagnostics",
               "en-foreign","en-full-before-failure","en-settings-failure","en-diagnostics-before-failure",
               "en-diagnostics-failure","de-rejoin-full","en-restart-full"}
             for index,action in ipairs(sequence)do
               if action=="en-foreign"then en.gui.screen.mir_research_browser.destroy()end -- Host simulation of a separately required actual key.
-              if action=="de-rejoin-full"and opponent~="missing-rejoin"then callbacks[1]({player_index=2})end
-              if action=="en-restart-full"then
+              if index==1 and opponent=="early-server-commands"then
                 callbacks[3]({command="mir-settings-export"});callbacks[3]({command="mir-diagnostics-export"})
+              end
+              if index==5 and opponent=="early-rejoin"then callbacks[1]({player_index=2})end
+              if action=="de-rejoin-full"and opponent~="missing-rejoin"and opponent~="duplicate-initial-join"and opponent~="early-rejoin"then
+                callbacks[1]({player_index=opponent=="wrong-role-rejoin"and 1 or 2})
+                if opponent=="duplicate-rejoin"then callbacks[1]({player_index=2})end
+              end
+              if action=="en-restart-full"then
+                if opponent~="early-server-commands"then
+                  callbacks[3]({command="mir-settings-export"})
+                  callbacks[3]({command=opponent=="duplicate-settings-command"and"mir-settings-export"or"mir-diagnostics-export"})
+                end
                 api.checkpoint()
                 if opponent=="missing-restart"then store[key].phase="ready"else
                   api=register();local saved=env.game;env.game=setmetatable({},{__index=function()error("on_load game access")end})
                   local before=fingerprint(store);callbacks.load();assert(fingerprint(store)==before);env.game=saved
-                  callbacks[1]({player_index=1});callbacks[1]({player_index=2})
+                  if opponent=="post-load-server-command"then callbacks[3]({command="mir-settings-export"})end
+                  callbacks[1]({player_index=1})
+                  if opponent~="duplicate-rejoin"then callbacks[1]({player_index=opponent=="duplicate-restart-role"and 1 or 2})end
                 end
               end
               api.prepare(action)
@@ -418,6 +431,15 @@ class LibrarySupportExportObserverControls(unittest.TestCase):
         for target in ("f200", "f210"):
             for opponent in ("missing-click", "duplicate-click", "wrong-player", "invalid-profile", "false-zero",
                              "wrong-user", "editable", "stale-preview", "native-mutation", "setting-mutation", "missing-rejoin", "missing-restart"):
+                with self.subTest(target=target, opponent=opponent):
+                    with self.assertRaises(Exception):
+                        self.lua.globals().run_export_observer(target, opponent)
+
+    def test_distinct_server_commands_and_exact_client_role_phases_are_required(self):
+        for target in ("f200", "f210"):
+            for opponent in ("duplicate-settings-command", "early-server-commands", "post-load-server-command",
+                             "wrong-role-rejoin", "duplicate-initial-join", "duplicate-rejoin",
+                             "duplicate-restart-role", "early-rejoin"):
                 with self.subTest(target=target, opponent=opponent):
                     with self.assertRaises(Exception):
                         self.lua.globals().run_export_observer(target, opponent)
