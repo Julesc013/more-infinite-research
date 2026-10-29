@@ -218,7 +218,7 @@ function Read-PublishedF100DirectRefusal([string]$Repo,[Collections.IDictionary]
   $result=Read-RefusalJson $resultBody.text
   $direct=Read-RefusalJson $profileBody.text
   $endpoint=$Binding.endpoint
-  Assert-Fixture ($endpoint -is [Collections.IDictionary] -and $endpoint.target -cin @('f110','f210') -and $endpoint.mir_sha256 -cmatch '^[A-F0-9]{64}$' -and $endpoint.fixture_sha256 -cmatch '^[A-F0-9]{64}$') 'direct refusal endpoint pins differ'
+  Assert-Fixture ($endpoint -is [Collections.IDictionary] -and $endpoint.target -cin @('f110','f210') -and $endpoint.mir_sha256 -cmatch '^[A-F0-9]{64}$' -and $endpoint.fixture_sha256 -cmatch '^[A-F0-9]{64}$' -and $endpoint.source_revision -cmatch '^[a-f0-9]{40}$' -and $endpoint.harness_sha256 -cmatch '^[A-F0-9]{64}$') 'direct refusal endpoint pins differ'
   $tuple=if($endpoint.target -ceq 'f110'){@('1.1','1.1.110','5.0.11000','0.4.0','B7B4B834FCA2E32AFA9D3476EB42CC09B02F1205BE97F688DC6FC6ACE7BA8FE1')}else{@('2.1','2.1.23','5.0.21000','0.5.0','8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38')}
   $line,$base,$mir,$fixture,$engineSha=$tuple
   Assert-Fixture ($direct.schema -eq 1 -and $direct.kind -ceq 'published-f100-forward' -and $direct.stage -ceq $endpoint.target -and $direct.target -ceq $endpoint.target -and $direct.factorio_line -ceq $line -and $direct.settings_mode -ceq 'Defaults' -and $direct.predecessor_origin -ceq 'published-f100-4.7.10003' -and $direct.protected_source_sha256 -ceq $InputSha) 'direct refusal profile/source differs'
@@ -228,6 +228,7 @@ function Read-PublishedF100DirectRefusal([string]$Repo,[Collections.IDictionary]
   Assert-Fixture ($selected.Count -eq 3 -and ($selected-join "`n") -ceq ($wanted-join "`n") -and $direct.archive_sha256.Count -eq 2 -and $direct.archive_sha256['more-infinite-research_'+$mir+'.zip'] -ceq $endpoint.mir_sha256 -and $direct.archive_sha256['mir-fixture-mir5-historical-transition_'+$fixture+'.zip'] -ceq $endpoint.fixture_sha256) 'direct refusal selected archives differ'
   Assert-Fixture ($result.kind -ceq 'MIR5NativeFixtureV1' -and $result.status -ceq 'failed' -and $result.case -ceq 'published-f100-forward' -and $result.source_dirty -is [bool] -and -not $result.source_dirty -and $result.source_head -cmatch '^[a-f0-9]{40}$' -and $result.input_save.sha256 -ceq $InputSha -and $result.input_save_byte_identical -is [bool] -and $result.input_save_byte_identical) 'actual direct refusal result/source differs'
   Assert-Fixture ($result.profile.sha256 -ceq $Binding.profile.sha256 -and $result.mir_archive.sha256 -ceq $endpoint.mir_sha256 -and @($result.fixtures).Count -eq 1 -and $result.fixtures[0].sha256 -ceq $endpoint.fixture_sha256) 'actual direct refusal profile/archive result differs'
+  Assert-Fixture ($result.source_head -ceq $endpoint.source_revision -and $result.harness_sha256 -ceq $endpoint.harness_sha256) 'actual direct refusal source/harness differs'
   $route=$result.published_f100_forward
   Assert-Fixture ($route.stage -ceq $endpoint.target -and $route.target -ceq $endpoint.target -and $route.role -ceq 'successor' -and $route.predecessor_origin -ceq 'published-f100-4.7.10003' -and $route.protected_input_sha256 -ceq $InputSha) 'actual direct refusal route differs'
   Assert-Fixture (@($result.process_runs).Count -eq 1) 'direct refusal requires exactly one actual failed engine'

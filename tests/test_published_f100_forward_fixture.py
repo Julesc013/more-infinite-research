@@ -305,6 +305,9 @@ end
                 $failure='[mir441-process-exit] 1'
                 $ledger=@(@{process=@{id=4242;phase='running'}},@{phase='interrupted';timed_out=$false;error=$failure})
                 $result=@{kind='MIR5NativeFixtureV1';status='failed';case='published-f100-forward';source_dirty=$false;source_head=('e'*40);input_save=@{sha256=('A'*64)};input_save_byte_identical=$true;engine=@{base_version='2.1.23';sha256=$direct.engine.sha256};mir_archive=@{sha256=('D'*64)};fixtures=@(@{sha256=('E'*64)});published_f100_forward=@{stage='f210';target='f210';role='successor';predecessor_origin='published-f100-4.7.10003';protected_input_sha256=('A'*64)};failure=$failure;process_runs=@(@{status='interrupted';stdout=$stdoutPath;ledger=$ledgerPath;error=$failure})}
+                $result.harness_sha256='C'*64
+                if($Opponent -ceq 'bridge-harness'){$result.harness_sha256='F'*64}
+                if($Opponent -ceq 'bridge-source-revision'){$result.source_head='f'*40}
                 if($Opponent -ceq 'bridge-source'){$direct.protected_source_sha256='F'*64;$result.input_save.sha256='F'*64}
                 if($Opponent -ceq 'bridge-engine'){$result.engine.sha256='F'*64}
                 if($Opponent -ceq 'bridge-mir'){$result.mir_archive.sha256='F'*64}
@@ -327,7 +330,7 @@ end
                 [IO.File]::WriteAllText($stdoutPath,$stdout)
                 [IO.File]::WriteAllText($ledgerPath,(($ledger|ForEach-Object {$_|ConvertTo-Json -Depth 10 -Compress})-join "`n")+"`n")
                 [IO.File]::WriteAllText($resultPath,($result|ConvertTo-Json -Depth 15))
-                $binding=@{endpoint=@{target='f210';mir_sha256=('D'*64);fixture_sha256=('E'*64)}}
+                $binding=@{endpoint=@{target='f210';mir_sha256=('D'*64);fixture_sha256=('E'*64);source_revision=('e'*40);harness_sha256=('C'*64)}}
                 foreach($row in @(@('result',$resultPath),@('profile',$profilePath),@('stdout',$stdoutPath),@('ledger',$ledgerPath))){$binding[$row[0]]=@{path=$row[1];sha256=Get-FixtureSha $row[1]}}
                 if($Opponent -ceq 'bridge-invented'){$binding.result.sha256='B'*64}
                 if($Opponent -ceq 'bridge-missing'){$binding.result.path=Join-Path $folder 'missing.json'}
@@ -357,7 +360,7 @@ end
                 @{version=$base}|ConvertTo-Json|Set-Content -LiteralPath (Join-Path $engineData 'base/info.json')
                 $profile=@{schema=1;kind='published-f100-forward';stage=$stage;target=$target;factorio_line=$line;settings_mode='Defaults';predecessor_origin='published-f100-4.7.10003';protected_source_sha256=$inputSha;engine=@{version=$base;sha256=$script:engineSha};mods=@(@{name='base';version=$base;enabled=$true},@{name='more-infinite-research';version=$mir;enabled=$true},@{name='mir-fixture-mir5-historical-transition';version=$version;enabled=$true});archive_sha256=@{('more-infinite-research_'+$mir+'.zip')=$mirSha;('mir-fixture-mir5-historical-transition_'+$version+'.zip')=('E'*64)}}
                 $source=Join-Path $repo ('build/'+$stage)
-                foreach($opponent in @('','input','origin','engine','archive','extra-mod','member','bridge-refusal','bridge-invented','bridge-missing','bridge-source','bridge-engine','bridge-mir','bridge-fixture','bridge-profile','bridge-route','bridge-no-native','bridge-no-pid','bridge-timeout','bridge-resource','bridge-non-format','bridge-header','bridge-duplicate','bridge-success','bridge-changed-input','bridge-profile-archive')){
+                foreach($opponent in @('','input','origin','engine','archive','extra-mod','member','bridge-refusal','bridge-invented','bridge-missing','bridge-source','bridge-engine','bridge-mir','bridge-fixture','bridge-profile','bridge-route','bridge-no-native','bridge-no-pid','bridge-timeout','bridge-resource','bridge-non-format','bridge-header','bridge-duplicate','bridge-success','bridge-changed-input','bridge-profile-archive','bridge-harness','bridge-source-revision')){
                   if($opponent.StartsWith('bridge-') -and $stage -cne 'bridge'){continue}
                   $changed=($profile|ConvertTo-Json -Depth 10)|ConvertFrom-Json -AsHashtable
                   if($stage -ceq 'bridge'){$changed.engine_bridge_refusal=New-HostRefusalBinding $opponent}
@@ -383,7 +386,7 @@ end
             env = {**os.environ, "MIR_FORWARD_REPO": str(repo), "MIR_FORWARD_RUNNER": str(ROOT / "tools/Invoke-NativeFixture.ps1")}
             result = subprocess.run(["pwsh", "-NoProfile", "-Command", script], env=env, capture_output=True, text=True)
             self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
-            self.assertEqual(json.loads(result.stdout), {"accepted": 4, "refused": 43, "native_processes": 0})
+            self.assertEqual(json.loads(result.stdout), {"accepted": 4, "refused": 45, "native_processes": 0})
 
 
 if __name__ == "__main__":
