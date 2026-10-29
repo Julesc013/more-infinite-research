@@ -265,6 +265,13 @@ local function advance(step)
   log("[MIR5_LIBRARY_NATIVE_INPUT] "..helpers.table_to_json(report()))
   return report()
 end
+-- The separate0.2 observer reuses only these independent protected-save
+-- assertions. Frozen0.1 keyboard/drag packets keep their original behavior.
+if script.active_mods["mir-fixture-mir5-library-native-input"] == "0.2.0" then
+  require("support-exports").register({key=KEY,interface=INTERFACE,world=world,assert_world=assert_world,
+    imported=check_imported_literals,historical_fixture=historical.fixture})
+  return
+end
 remote.add_interface(INTERFACE,{report=report,advance=advance})
 script.on_init(function()
   local expected=script.active_mods.base=="2.0.77" and {mir="5.0.20000",fixture="0.3.0"}
