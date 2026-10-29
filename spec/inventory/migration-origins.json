@@ -3751,9 +3751,9 @@
         },
         {
           "boundary": "Structured-V3 cap ownership and F200/F210 label collision",
-          "status": "needs-correction",
-          "problem": "Known4.4 V3 gear pair,first-enabled finite gear pairs and the exact F2000.3/F2100.4 native-worker direct routes pass under their recorded inputs. Worker source90B2 now reaches current38C/8DC through a real lab/save/two colds with explicit fixture-owned0.123. Selected worker finite first-hold applicability remains separate. Published DE45F114 F2104.2 is really4.2.21000;no fabricated collision source is needed.",
-          "next_action": "Reuse exact named gear and direct-worker results without relabelling old failures. Qualify the selected worker first finite hold/relax route or resolve its affected applicability explicitly before closing this boundary;preserve per-row/current-negative/foreign defenses and synthetic collision controls. Do not recreate90B2 or rerun every patch label.",
+          "status": "closed",
+          "problem": "The named4.4 V3 gear routes,first-enabled finite gear pairs,direct F200/F210 native-worker routes and selected worker first-finite cap7→40 pairs now pass under their exact recorded inputs. Worker90B2 holds earnednext8/3.823/27% work without research/science loss through save/two colds,then actual next9/4.473 lab/save/two colds at38C/8DC and E9/D3. Original strict0.2 failures/contrasts remain preserved;the fixture reconciles only its own recorded0.123. Exact DE45F114 F2104.2 is4.2.21000;no fabricated label collision route is required.",
+          "next_action": "No additional native repetition for this selected boundary at these inputs. Preserve original saves,order proofs,adverse/direct/finite results and current-negative/per-row/foreign defenses. Apply VER-06 consumed-path review to the final package set and execute only affected changed paths;this boundary closure is not a final release or universal historical upgrade claim.",
           "evidence": [
             {
               "path": "spec/evidence/historical-structured-cap-archive-metadata.json",
@@ -3778,6 +3778,10 @@
             {
               "path": "spec/evidence/worker-persisted-offset-f210-native-chain-r01.json",
               "scope": "Exact F200 source to currentF2100.4 native worker,ordinary-item lab/save/two colds;not old0.2 or worker first-finite-hold acceptance."
+            },
+            {
+              "path": "spec/evidence/worker-first-finite-native-chain-r01.json",
+              "scope": "Exact protected90B2 first cap7 worker holds and saved cap40 relaxations on current F200/F210;zero hold labs/two cold reloads,then one actual lab/save/two colds per engine."
             }
           ],
           "label_collision_disposition": {
@@ -3906,9 +3910,9 @@
         },
         {
           "boundary": "Published F200 cap disabled/re-enabled and V3 F210 worker tails",
-          "status": "needs-correction",
-          "problem": "Both exact direct native-worker successors from protected90B2 now pass: F2000.3/E9/D3 and F2100.4/38C/8DC. Each uses independently observed native entry and explicit fixture-owned0.123,all original absolute/native/foreign/work assertions,one actual new lab/save/two colds. F210 ordinary items spend one whole pack;F200 retains fractional tools. Original strict0.2 and six contrasts remain failed/diagnostic;worker finite first-hold remains separate.",
-          "next_action": "Adopt the exact F200/F210 direct results without source recreation or changed historical verdicts. Next qualify the selected native-worker first finite hold/relax boundary with preserved owned/foreign state and source contribution,or document its exact affected applicability. Keep original90B2,order proofs and all adverses;no arbitrary offset reconstruction in player code.",
+          "status": "closed",
+          "problem": "The named4.4 V3 gear routes,first-enabled finite gear pairs,direct F200/F210 native-worker routes and selected worker first-finite cap7→40 pairs now pass under their exact recorded inputs. Worker90B2 holds earnednext8/3.823/27% work without research/science loss through save/two colds,then actual next9/4.473 lab/save/two colds at38C/8DC and E9/D3. Original strict0.2 failures/contrasts remain preserved;the fixture reconciles only its own recorded0.123. Exact DE45F114 F2104.2 is4.2.21000;no fabricated label collision route is required.",
+          "next_action": "No additional native repetition for this selected boundary at these inputs. Preserve original saves,order proofs,adverse/direct/finite results and current-negative/per-row/foreign defenses. Apply VER-06 consumed-path review to the final package set and execute only affected changed paths;this boundary closure is not a final release or universal historical upgrade claim.",
           "evidence": [
             {
               "path": "spec/evidence/f200-foreign-cap-baseline-f0dd-native-chain-r01.json",
@@ -3965,6 +3969,10 @@
             {
               "path": "spec/evidence/worker-persisted-offset-f210-native-chain-r01.json",
               "scope": "Exact F200 source to currentF2100.4 native worker,ordinary-item lab/save/two colds;not old0.2 or worker first-finite-hold acceptance."
+            },
+            {
+              "path": "spec/evidence/worker-first-finite-native-chain-r01.json",
+              "scope": "Exact protected90B2 first cap7 worker holds and saved cap40 relaxations on current F200/F210;zero hold labs/two cold reloads,then one actual lab/save/two colds per engine."
             }
           ],
           "protected_473_cap_source": {

@@ -61,9 +61,9 @@ class F200LegacyWorkerFixtureTests(unittest.TestCase):
     def setUp(self):
         self.lua = LuaRuntime(unpack_returned_tuples=True)
         self.lua.execute(r'''
-          function worker_data(path, mir, row, f210)
+          function worker_data(path, mir, row, f210, fixture)
             local env={mods={base=f210 and "2.1.23" or "2.0.77",["more-infinite-research"]=mir,
-              ["mir-fixture-mir5-f200-legacy-worker"]=f210 and "0.4.0" or nil,
+              ["mir-fixture-mir5-f200-legacy-worker"]=fixture or (f210 and "0.4.0" or nil),
               ["a-mir-fixture-worker-entry"]=f210 and "0.1.0" or nil},data={raw={technology={[row.name]=row}}}}
             env._G=env;setmetatable(env,{__index=function(_,key)return _G[key]end})
             local chunk,message=loadfile(path,"t",env);assert(chunk,message)
@@ -92,9 +92,12 @@ class F200LegacyWorkerFixtureTests(unittest.TestCase):
             local ok,result=pcall(chunk);return {ok=ok,message=tostring(result),callbacks=callbacks,reads=reads}
           end
 
-          function worker_flow(source_path, destination_path, opponent, owner_root, startup_facade, f210)
+          function worker_flow(source_path, destination_path, opponent, owner_root, startup_facade, f210, finite)
             local callbacks,markers,diagnostics,saves={events={}},0,0,0
             local science_type,item_durability_reads="tool",0
+            local held_role=f210 and "0.7.0"or"0.5.0"
+            local relax_role=f210 and "0.8.0"or"0.6.0"
+            local hold_result
             local WORKER="worker-robots-speed-6"
             local science={"automation-science-pack","logistic-science-pack","chemical-science-pack",
               "production-science-pack","utility-science-pack","space-science-pack"}
@@ -203,14 +206,14 @@ class F200LegacyWorkerFixtureTests(unittest.TestCase):
             local function load_control(path,mir,version,settings_values)
               if startup_facade and (version=="0.3.0"or version=="0.4.0")then settings_values.startup=startup_facade end
               local c={events={}}
-              local env={script={active_mods={base=version=="0.4.0"and"2.1.23"or"2.0.77",["more-infinite-research"]=mir,
+              local env={script={active_mods={base=(version=="0.4.0"or version=="0.7.0"or version=="0.8.0")and"2.1.23"or"2.0.77",["more-infinite-research"]=mir,
                 ["mir-fixture-mir5-f200-legacy-worker"]=version},on_init=function(f)c.init=f end,
                 on_configuration_changed=function(f)c.changed=f end,on_load=function(f)c.load=f end,
                 on_event=function(e,f)c.events[e]=f end},defines={events={on_tick=1,on_research_finished=2},inventory={lab_input=1}},
                 game=game,storage=storage,settings=settings_values,prototypes={item=item_prototypes},helpers={table_to_json=function(row)
                   if row.status=="passed" then assert(row.stage=="initial" or row.stage=="reload")
                   elseif row.stage=="fixture-owner-preflight"then
-                    assert(row.maximum==40 and row.profile_import_empty==true)
+                    assert((row.maximum==40 or (finite and row.maximum==7)) and row.profile_import_empty==true)
                     assert(type(row.startup_type)=="string" and type(row.maximum_type)=="string")
                   else
                     assert(row.stage=="finish-before-assertion");assert(type(row.research_start_tick)=="number")
@@ -224,14 +227,15 @@ class F200LegacyWorkerFixtureTests(unittest.TestCase):
                   else assert(row:match("^%[MIR5_NATIVE_FIXTURE%] DIAGNOSTIC "));diagnostics=diagnostics+1 end
                 end}
               if owner_root then
-                if version=="0.3.0"or version=="0.4.0"then env.script.active_mods["a-mir-fixture-worker-entry"]="0.1.0"end
+                if version~="0.1.0"and version~="0.2.0"then env.script.active_mods["a-mir-fixture-worker-entry"]="0.1.0"end
                 if version=="0.4.0"and opponent=="owner-wrong-mir"then env.script.active_mods["more-infinite-research"]="5.0.20000"end
                 if version=="0.4.0"and opponent=="owner-wrong-engine"then env.script.active_mods.base="2.1.24"end
                 env.remote={call=function(name,method)assert(name=="mir-fixture-worker-entry" and method=="get");return entry end}
                 env.require=function(name)
                   local relative=name=="fixture_control" and "/../successor/control.lua" or name=="offset-owner" and "/../persisted-offset-owner/offset-owner.lua"
                   assert(relative,"unexpected private fixture import")
-                  return assert(loadfile(owner_root..relative,"t",env))()
+                  local import_root=finite and owner_root:gsub("/f%d+/first%-finite%-held$","/persisted-offset-owner")or owner_root
+                  return assert(loadfile(import_root..relative,"t",env))()
                 end
               end
               env._G=env;setmetatable(env,{__index=function(_,key)return _G[key]end})
@@ -269,14 +273,15 @@ class F200LegacyWorkerFixtureTests(unittest.TestCase):
               science_type="item"
               for _,stack in ipairs(input.slots)do rawset(stack,"durability",nil)end
             end
+            local observed
             if owner_root then
               player.worker_robots_speed_modifier=state.player_cap.bonus-(opponent=="owner-retained" and 0 or .123)
-              local function observed(f)
+              observed=function(f)
                 local t=f.technologies[WORKER]
                 return {index=f.index,name=f.name,level=t.level,researched=t.researched,enabled=t.enabled,
                   visible=t.visible_when_disabled,bonus=f.worker_robots_speed_modifier,saved_progress=t.saved_progress}
               end
-              entry={schema=1,tick=game.tick,base=f210 and"2.1.23"or"2.0.77",mir=f210 and"5.0.21000"or"5.0.20000",fixture=f210 and"0.4.0"or"0.3.0",observer="0.1.0",player=observed(player),foreign=observed(foreign)}
+              entry={schema=1,tick=game.tick,base=f210 and"2.1.23"or"2.0.77",mir=f210 and"5.0.21000"or"5.0.20000",fixture=finite and held_role or(f210 and"0.4.0"or"0.3.0"),observer="0.1.0",player=observed(player),foreign=observed(foreign)}
               if opponent=="owner-native-loss"then player.worker_robots_speed_modifier=player.worker_robots_speed_modifier-.01
               elseif opponent=="owner-stale"then entry.tick=entry.tick-1
               elseif opponent=="owner-unknown"then entry.player.bonus=entry.player.bonus-.01;player.worker_robots_speed_modifier=entry.player.bonus
@@ -297,8 +302,9 @@ class F200LegacyWorkerFixtureTests(unittest.TestCase):
             -- The source state owns the published positive-cap presentation.
             -- The successor data-stage prototype independently returns to the
             -- Base default before its lifecycle restores the source value.
-            if opponent~="stale-enable"then player.technologies[WORKER].enabled=true;player.technologies[WORKER].visible_when_disabled=true;player.technologies[WORKER].prototype.visible_when_disabled=false end
-            local destination,message=load_control(destination_path,f210 and"5.0.21000"or"5.0.20000",f210 and"0.4.0"or(owner_root and"0.3.0"or"0.2.0"),startup(40));if not destination then return {ok=false,message=message}end
+            if opponent~="stale-enable"then player.technologies[WORKER].enabled=not finite;player.technologies[WORKER].visible_when_disabled=true;player.technologies[WORKER].prototype.visible_when_disabled=false
+            elseif finite then player.technologies[WORKER].enabled=true end
+            local destination,message=load_control(destination_path,f210 and"5.0.21000"or"5.0.20000",finite and held_role or(f210 and"0.4.0"or(owner_root and"0.3.0"or"0.2.0")),startup(finite and 7 or 40));if not destination then return {ok=false,message=message}end
             -- Native upgrade loads the old fixture state before configuration_changed.
             ok,result=invoke(destination,"load");if not ok then return {ok=false,message=result}end
             local before_owner=player.worker_robots_speed_modifier
@@ -307,6 +313,54 @@ class F200LegacyWorkerFixtureTests(unittest.TestCase):
               local before_repeat=player.worker_robots_speed_modifier
               ok,result=invoke(destination,"changed")
               return {ok=ok,message=result,before_owner=before_repeat,after_owner=player.worker_robots_speed_modifier}
+            end
+            if finite then
+              if opponent=="hold-duplicate-config"then
+                before_owner=player.worker_robots_speed_modifier
+                ok,result=invoke(destination,"changed")
+                return {ok=ok,message=result,before_owner=before_owner,after_owner=player.worker_robots_speed_modifier}
+              end
+              ok,result=tick(destination);if not ok then return {ok=false,message=result}end
+              if opponent=="hold-cold-enable"then player.technologies[WORKER].enabled=true end
+              if opponent=="hold-cold-bonus"then player.worker_robots_speed_modifier=3.813 end
+              if opponent=="hold-cold-science"then input.slots[1].count=input.slots[1].count+1 end
+              for _=1,2 do
+                before_owner=player.worker_robots_speed_modifier
+                ok,result=invoke(destination,"load");if ok then ok,result=tick(destination)end
+                if not ok then return {ok=false,message=result,before_owner=before_owner,after_owner=player.worker_robots_speed_modifier}end
+              end
+              hold_result={phase=state.phase,level=player.technologies[WORKER].level,
+                enabled=player.technologies[WORKER].enabled,bonus=player.worker_robots_speed_modifier,
+                source_labs=state.actual_lab_completions,destination_labs=state.destination_lab_completions,
+                science=input.slots[1].count,saved_progress=player.technologies[WORKER].saved_progress,
+                markers=markers,saves=saves}
+              if opponent=="relax-missing-proof"then state.finite_hold_witness=nil end
+              if opponent=="relax-bad-proof"then state.finite_hold_witness.maximum=8 end
+              if opponent=="relax-bad-offset"then state.fixture_owned_offset.amount=.124 end
+              if opponent=="relax-bad-phase"then state.phase="completed"end
+              if opponent=="relax-held-science"then input.slots[1].count=input.slots[1].count+1 end
+              -- Independent native reset and MIR cap relaxation; these writes
+              -- are outside the fixture under test, as in the direct mock.
+              player.worker_robots_speed_modifier=opponent=="owner-retained"and 3.823 or 3.7
+              entry={schema=1,tick=game.tick,base=f210 and"2.1.23"or"2.0.77",
+                mir=f210 and"5.0.21000"or"5.0.20000",fixture=relax_role,observer="0.1.0",
+                player=observed(player),foreign=observed(foreign)}
+              if opponent=="relax-stale-entry"then entry.tick=entry.tick-1 end
+              if opponent=="relax-unknown-entry"then entry.player.bonus=3.69;player.worker_robots_speed_modifier=3.69 end
+              player.technologies[WORKER].enabled=opponent~="relax-disabled"
+              if opponent=="relax-foreign-enable"then foreign.technologies[WORKER].enabled=true end
+              destination,message=load_control(destination_path:gsub("first%-finite%-held","first-finite-relaxed"),
+                f210 and"5.0.21000"or"5.0.20000",relax_role,startup(40))
+              if not destination then return {ok=false,message=message}end
+              ok,result=invoke(destination,"load");if not ok then return {ok=false,message=result}end
+              before_owner=player.worker_robots_speed_modifier
+              ok,result=invoke(destination,"changed")
+              if not ok then return {ok=false,message=result,before_owner=before_owner,after_owner=player.worker_robots_speed_modifier}end
+              if opponent=="relax-duplicate-config"then
+                before_owner=player.worker_robots_speed_modifier
+                ok,result=invoke(destination,"changed")
+                return {ok=ok,message=result,before_owner=before_owner,after_owner=player.worker_robots_speed_modifier}
+              end
             end
             local consumed_units=state.destination_science_accounting.consumed_units
             if f210 then consumed_units=1 end -- independent native item-inventory oracle
@@ -326,7 +380,7 @@ class F200LegacyWorkerFixtureTests(unittest.TestCase):
             return {ok=true,message="",phase=state.phase,source_labs=state.actual_lab_completions,destination_labs=state.destination_lab_completions,
               player_level=player.technologies[WORKER].level,bonus=player.worker_robots_speed_modifier,
               player_enabled=player.technologies[WORKER].enabled,player_visible=player.technologies[WORKER].visible_when_disabled,
-              fixture_owned_offset=state.fixture_owned_offset,
+              fixture_owned_offset=state.fixture_owned_offset,hold_result=hold_result,finite_hold_witness=state.finite_hold_witness,
               science_type=state.destination_science_accounting.science_type,
               inventory_consumed_units=state.destination_science_accounting.inventory_consumed_units,
               item_durability_reads=item_durability_reads,
@@ -343,6 +397,70 @@ class F200LegacyWorkerFixtureTests(unittest.TestCase):
         role = FIXTURE / "f210-owned-offset"
         return self.lua.eval("worker_flow")(str(FIXTURE / "published/control.lua"), str(role / "control.lua"),
                                             opponent, str(role), startup_facade, True)
+
+    def finite_flow(self, f210, opponent=""):
+        role = FIXTURE / ("f210" if f210 else "f200") / "first-finite-held"
+        return self.lua.eval("worker_flow")(str(FIXTURE / "published/control.lua"), str(role / "control.lua"),
+                                            opponent, role.as_posix(), None, f210, True)
+
+    def test_first_finite_hold_preserves_earned_work_then_relaxes_before_one_new_lab(self):
+        for f210 in (False, True):
+            for opponent, reapplied in (("", .123), ("owner-retained", 0)):
+                with self.subTest(f210=f210, opponent=opponent):
+                    r = self.finite_flow(f210, opponent)
+                    self.assertTrue(r["ok"], r["message"])
+                    held = r["hold_result"]
+                    self.assertEqual(("finite-held", 8, False, 2, 0, 14, 6, 2),
+                                     (held["phase"], held["level"], held["enabled"], held["source_labs"],
+                                      held["destination_labs"], held["science"], held["markers"], held["saves"]))
+                    self.assertAlmostEqual(3.823, held["bonus"])
+                    self.assertAlmostEqual(.27, held["saved_progress"])
+                    self.assertEqual(("completed", 2, 1, 9, True, 9, 3),
+                                     (r["phase"], r["source_labs"], r["destination_labs"], r["player_level"],
+                                      r["player_enabled"], r["markers"], r["saves"]))
+                    self.assertAlmostEqual(4.473, r["bonus"])
+                    self.assertEqual(7, r["finite_hold_witness"]["maximum"])
+                    self.assertEqual("relax", r["fixture_owned_offset"]["stage"])
+                    self.assertAlmostEqual(reapplied, r["fixture_owned_offset"]["reapplied"])
+                    self.assertAlmostEqual(21 if f210 else 22 - 44 / 60, r["science_after"])
+                    self.assertEqual(0, r["item_durability_reads"])
+                    self.assertFalse(r["foreign_enabled"])
+                    self.assertAlmostEqual(.42, r["foreign_progress"])
+
+    def test_finite_stages_refuse_missing_proof_foreign_or_cold_changes_before_owned_writes(self):
+        for f210 in (False, True):
+            for opponent in ("stale-enable", "saved-progress", "owner-native-loss", "owner-stale",
+                             "owner-unknown", "owner-missing-ledger", "owner-foreign-enable",
+                             "hold-duplicate-config", "hold-cold-enable", "hold-cold-bonus", "hold-cold-science",
+                             "relax-missing-proof", "relax-bad-proof", "relax-bad-offset", "relax-bad-phase",
+                             "relax-held-science", "relax-stale-entry", "relax-unknown-entry", "relax-disabled",
+                             "relax-foreign-enable", "relax-duplicate-config"):
+                with self.subTest(f210=f210, opponent=opponent):
+                    r = self.finite_flow(f210, opponent)
+                    self.assertFalse(r["ok"], opponent)
+                    self.assertRegex(r["message"], r"\[(?:mir-worker-fixture-offset-owner|mir5-f200-legacy-worker-successor)\]")
+                    self.assertEqual(r["before_owner"], r["after_owner"], r["message"])
+
+    def test_finite_roles_pin_exact_engine_stage_and_register_without_native_reads(self):
+        for target, base, mir, versions in (("f200", "2.0.77", "5.0.20000", ("0.5.0", "0.6.0")),
+                                            ("f210", "2.1.23", "5.0.21000", ("0.7.0", "0.8.0"))):
+            for stage, version in zip(("held", "relaxed"), versions):
+                with self.subTest(target=target, stage=stage):
+                    role = FIXTURE / target / ("first-finite-" + stage)
+                    info = json.loads((role / "info.json").read_bytes())
+                    self.assertEqual((NAME, version, base[:3]), (info["name"], info["version"], info["factorio_version"]))
+                    self.assertEqual([f"base = {base}", f"more-infinite-research = {mir}",
+                                      "a-mir-fixture-worker-entry = 0.1.0"], info["dependencies"])
+                    parsed = self.lua.eval("worker_parse")(str(role / "control.lua"), mir, version,
+                                                            str(FIXTURE / "persisted-offset-owner"), base)
+                    self.assertTrue(parsed["ok"], parsed["message"])
+                    self.assertEqual({}, plain(parsed["reads"]))
+                    if target == "f210":
+                        row = self.row()
+                        data = self.lua.eval("worker_data")(str(FIXTURE / "successor/data-final-fixes.lua"),
+                                                             mir, row, True, version)
+                        self.assertTrue(data["ok"], data["message"])
+                        self.assertEqual("1", row["unit"]["count_formula"])
 
     def test_f210_native_row_and_exact_role_metadata_keep_the_f200_source(self):
         role = FIXTURE / "f210-owned-offset"

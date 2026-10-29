@@ -1,0 +1,713 @@
+{
+  "schema": 1,
+  "kind": "MIRWorkerFirstFiniteNativeChainV1",
+  "status": "passed-named-first-finite-worker-F200-F210-hold-and-relax",
+  "controller_commit": "c6993940cfb9a717001ae2ef64ea68852c687cdd",
+  "source_commit": "518c73bd3313318f92b856b0027c324bd8cf201f",
+  "artifact_source_commit": "992c76ee24caf2d723b469c3db760cbebdf35eeb",
+  "player_tree": "fbb7e9135280ce7f69692e9b0c4a44d743793f45",
+  "scope": "Protected exact published4.7.20002 source90B2 to current38C/2.1.23/8DC or E9/2.0.77/D3;cap7 holds earnednext8/3.823/27% investment with no lab or science debit,save/two colds;that exact held save then cap40 owned enablement and one actual next9/4.473 lab/save/two colds. Foreign disabledhidden worker6/2.4 and42% braking queue remain. Explicit independently observed fixture-owned0.123 only;no player-source changes.",
+  "cases": [
+    {
+      "target": "f210",
+      "stage": "held",
+      "initial": {
+        "stage": "initial",
+        "case": "f200-positive-legacy-worker",
+        "status": "passed",
+        "qualification": "native-runner-readback-required",
+        "witnesses": {
+          "source_mir": "4.7.20002",
+          "destination_mir": "5.0.21000",
+          "source_actual_lab_completions": 2,
+          "destination_actual_lab_completions": 0,
+          "native_owner": "worker-robots-speed-6",
+          "native_effect_modifier": 0.65,
+          "milestone": "actual2labs",
+          "next_level": 8,
+          "worker_speed_modifier": 3.8229999999999995,
+          "independent_modifier_baseline": 2.5229999999999997,
+          "player_enabled": false,
+          "player_visible_when_disabled": true,
+          "foreign_queue_progress": 0.42000000000000004,
+          "science_consumed_units": 0,
+          "science_inventory_consumed_units": 0,
+          "science_type": "item",
+          "science_remaining_ticks": 0,
+          "science_processing_ticks": 0,
+          "science_elapsed_ticks": 0,
+          "science_units_after": {
+            "automation-science-pack": 14,
+            "logistic-science-pack": 14,
+            "chemical-science-pack": 14,
+            "production-science-pack": 14,
+            "utility-science-pack": 14,
+            "space-science-pack": 14
+          },
+          "fixture_owned_offset": {
+            "schema": 1,
+            "amount": 0.123,
+            "reapplied": 0.123,
+            "native_entry_total": 3.6999999999999997,
+            "restored_total": 3.8229999999999995,
+            "native_entry_tick": 121,
+            "source_total": 3.8229999999999995,
+            "stage": "hold"
+          },
+          "finite_hold_witness": {
+            "schema": 1,
+            "maximum": 7,
+            "level": 8,
+            "enabled": false,
+            "visible": true,
+            "bonus": 3.8229999999999995,
+            "saved_progress": 0.27,
+            "science_units": {
+              "automation-science-pack": 14,
+              "logistic-science-pack": 14,
+              "chemical-science-pack": 14,
+              "production-science-pack": 14,
+              "utility-science-pack": 14,
+              "space-science-pack": 14
+            }
+          },
+          "on_load_read_only": false
+        }
+      },
+      "diagnostics": [
+        {
+          "stage": "fixture-owner-preflight",
+          "startup_type": "userdata",
+          "maximum_type": "table",
+          "profile_type": "table",
+          "maximum": 7,
+          "profile_import_empty": true
+        }
+      ],
+      "input_save_sha256": "90B23B42FA040368E7ED8E4D720D1682BD252A554A2DEB103CE60D8AF2930D82",
+      "completed_save": {
+        "path": "build/qualification/worker-first-finite-f210-held-actual-r01-controller/native-held/write-data/saves/mir5-native-complete.zip",
+        "sha256": "7E4DA3EA19CC3E60F73AE05263C334D67AA5D701006850E10E1786D68D6D863C",
+        "bytes": 856690
+      },
+      "root_readback": {
+        "path": "build/qualification/worker-first-finite-f210-held-actual-r01-controller/root-readback.json",
+        "sha256": "D68F7475E1DB381FC14794F491DE28805EFB39C09C0BA35970657C1765BE1DA8"
+      },
+      "observations": [
+        {
+          "mode": "order",
+          "raw_status": "failed",
+          "packet_sha256": "827399E664C638FD417377CF204AA741B083F109E85B06C7871AB2C26E05790B",
+          "caller_sha256": "DDC5F359B153366E9DD96F424DEE76847C6D8B7C1691A54A1A2A43A39C096D43",
+          "result_sha256": "E9C181496DC4E2F22D84C8633D0AF4FF748EE2DDA44DA71B9D8649FA876938A7",
+          "mir_sha256": "84C07D721298CAB358FA698BF8D6DD3B3452220688E4580D103BA764FBA89EF6",
+          "fixture_sha256": "A567FE212BA47FDB11A3287BC2BD8C97B04E89C0BD9B10CD907F6474C32E913E",
+          "profile_sha256": "38C1F8900C8C1998F820424B91BF2472EC8176C21BD290811D10459106780215",
+          "native_files": 8,
+          "bytes_per_copy": 54625,
+          "native_order": {
+            "schema": 1,
+            "status": "expected-native-order-stop-proved",
+            "target": "f210",
+            "stage": "held",
+            "observer_line": 126,
+            "mir_entry_line": 127,
+            "entry": {
+              "schema": 1,
+              "tick": 121,
+              "base": "2.1.23",
+              "mir": "5.0.21000",
+              "fixture": "0.7.0",
+              "observer": "0.1.0",
+              "player": {
+                "index": 1,
+                "name": "player",
+                "level": 8,
+                "researched": false,
+                "enabled": true,
+                "visible": true,
+                "bonus": 3.6999999999999997,
+                "saved_progress": 0.27
+              },
+              "foreign": {
+                "index": 4,
+                "name": "mir5-f200-legacy-worker-foreign",
+                "level": 6,
+                "researched": false,
+                "enabled": false,
+                "visible": false,
+                "bonus": 2.4,
+                "saved_progress": 0
+              }
+            },
+            "raw_status": "failed",
+            "new_processes": 1,
+            "new_labs": 0,
+            "new_saves": 0,
+            "new_cold_reloads": 0,
+            "packet_sha256": "827399E664C638FD417377CF204AA741B083F109E85B06C7871AB2C26E05790B",
+            "caller_sha256": "DDC5F359B153366E9DD96F424DEE76847C6D8B7C1691A54A1A2A43A39C096D43",
+            "result_sha256": "E9C181496DC4E2F22D84C8633D0AF4FF748EE2DDA44DA71B9D8649FA876938A7",
+            "controls_restored": true,
+            "source_unchanged": true
+          }
+        },
+        {
+          "mode": "actual",
+          "raw_status": "passed-private-native-fixture",
+          "packet_sha256": "4F2D3DC0D6B086E6D3DC5C3DFCD7F4FFB8F79D3E99D042A8AF5A9FB95602B280",
+          "caller_sha256": "0D2309A292B08F8D1BD959E4DD5F5DF21397AA3F0A1CDFA6986948DC644C63B4",
+          "result_sha256": "4B78E35FF4F6454EAAF0D68BB22C0FFB4F5918EFC9BF3AC0A06BD3A8735AC27A",
+          "mir_sha256": "38C84CCBC4BFDA62FCB078772C4690AB81228484744A36D9EA303F5A75B16447",
+          "fixture_sha256": "A567FE212BA47FDB11A3287BC2BD8C97B04E89C0BD9B10CD907F6474C32E913E",
+          "profile_sha256": "A78D607B3C20201EA22F5EFAC95D2187D9C485A91D5661E6D7AE1E61F8890562",
+          "native_files": 18,
+          "bytes_per_copy": 992522,
+          "native_order": null
+        }
+      ]
+    },
+    {
+      "target": "f210",
+      "stage": "relaxed",
+      "initial": {
+        "stage": "initial",
+        "case": "f200-positive-legacy-worker",
+        "status": "passed",
+        "qualification": "native-runner-readback-required",
+        "witnesses": {
+          "source_mir": "4.7.20002",
+          "destination_mir": "5.0.21000",
+          "source_actual_lab_completions": 2,
+          "destination_actual_lab_completions": 1,
+          "native_owner": "worker-robots-speed-6",
+          "native_effect_modifier": 0.65,
+          "milestone": "actual2labs",
+          "next_level": 9,
+          "worker_speed_modifier": 4.473,
+          "independent_modifier_baseline": 2.5229999999999997,
+          "player_enabled": true,
+          "player_visible_when_disabled": true,
+          "foreign_queue_progress": 0.42000000000000004,
+          "science_consumed_units": 0.7333333333333333,
+          "science_inventory_consumed_units": 1,
+          "science_type": "item",
+          "science_remaining_ticks": 44,
+          "science_processing_ticks": 44,
+          "science_elapsed_ticks": 43,
+          "science_units_after": {
+            "automation-science-pack": 21,
+            "logistic-science-pack": 21,
+            "chemical-science-pack": 21,
+            "production-science-pack": 21,
+            "utility-science-pack": 21,
+            "space-science-pack": 21
+          },
+          "fixture_owned_offset": {
+            "schema": 1,
+            "amount": 0.123,
+            "reapplied": 0,
+            "native_entry_total": 3.8229999999999995,
+            "restored_total": 3.8229999999999995,
+            "native_entry_tick": 122,
+            "source_total": 3.8229999999999995,
+            "stage": "relax"
+          },
+          "finite_hold_witness": {
+            "schema": 1,
+            "maximum": 7,
+            "level": 8,
+            "enabled": false,
+            "visible": true,
+            "bonus": 3.8229999999999995,
+            "saved_progress": 0.27,
+            "science_units": {
+              "automation-science-pack": 14,
+              "logistic-science-pack": 14,
+              "chemical-science-pack": 14,
+              "production-science-pack": 14,
+              "utility-science-pack": 14,
+              "space-science-pack": 14
+            }
+          },
+          "on_load_read_only": false
+        }
+      },
+      "diagnostics": [
+        {
+          "stage": "fixture-owner-preflight",
+          "startup_type": "userdata",
+          "maximum_type": "table",
+          "profile_type": "table",
+          "maximum": 40,
+          "profile_import_empty": true
+        },
+        {
+          "stage": "finish-before-assertion",
+          "case": "f200-positive-legacy-worker",
+          "research_start_tick": 122,
+          "research_finished_tick": 165,
+          "raw_elapsed_ticks": 43,
+          "processing_ticks": 44,
+          "expected_processing_ticks": 44,
+          "science_units_observed": {
+            "automation-science-pack": 21,
+            "logistic-science-pack": 21,
+            "chemical-science-pack": 21,
+            "production-science-pack": 21,
+            "utility-science-pack": 21,
+            "space-science-pack": 21
+          }
+        }
+      ],
+      "input_save_sha256": "7E4DA3EA19CC3E60F73AE05263C334D67AA5D701006850E10E1786D68D6D863C",
+      "completed_save": {
+        "path": "build/qualification/worker-first-finite-f210-relaxed-actual-r01-controller/native-relaxed/write-data/saves/mir5-native-complete.zip",
+        "sha256": "E7D39B63634CD0B254FE3F9CDC390C73FFCC1718968443297EB56BBC1627AC29",
+        "bytes": 856630
+      },
+      "root_readback": {
+        "path": "build/qualification/worker-first-finite-f210-relaxed-actual-r01-controller/root-readback.json",
+        "sha256": "D7A60F427540E9049D266947A32AEDB096ABE3E81320EBAD9096CA7391955F2E"
+      },
+      "observations": [
+        {
+          "mode": "order",
+          "raw_status": "failed",
+          "packet_sha256": "F9ECB541FDCE2A64A280561B173020B5CD707F68F8172F24FB5A6373541F7BDA",
+          "caller_sha256": "240509025F7B49D81D52EA6CBCB715C360A43A1DDE31E394B6A77E040191CF80",
+          "result_sha256": "FFCAFE239815ABEED6493C60705827C50912CA85E8D9F492E593887C20AFD3C4",
+          "mir_sha256": "84C07D721298CAB358FA698BF8D6DD3B3452220688E4580D103BA764FBA89EF6",
+          "fixture_sha256": "579449018A809BB7EBFFD6A8A4322A6B3B597EA8E046EC22B5C7CFEE5770EFB9",
+          "profile_sha256": "224F38E7AC6D39F7C2C471CC1135EB54147A32B5A8DA4815A5A2CA54595098EF",
+          "native_files": 8,
+          "bytes_per_copy": 54210,
+          "native_order": {
+            "schema": 1,
+            "status": "expected-native-order-stop-proved",
+            "target": "f210",
+            "stage": "relaxed",
+            "observer_line": 124,
+            "mir_entry_line": 125,
+            "entry": {
+              "schema": 1,
+              "tick": 122,
+              "base": "2.1.23",
+              "mir": "5.0.21000",
+              "fixture": "0.8.0",
+              "observer": "0.1.0",
+              "player": {
+                "index": 1,
+                "name": "player",
+                "level": 8,
+                "researched": false,
+                "enabled": false,
+                "visible": true,
+                "bonus": 3.8229999999999995,
+                "saved_progress": 0.27
+              },
+              "foreign": {
+                "index": 4,
+                "name": "mir5-f200-legacy-worker-foreign",
+                "level": 6,
+                "researched": false,
+                "enabled": false,
+                "visible": false,
+                "bonus": 2.4,
+                "saved_progress": 0
+              }
+            },
+            "raw_status": "failed",
+            "new_processes": 1,
+            "new_labs": 0,
+            "new_saves": 0,
+            "new_cold_reloads": 0,
+            "packet_sha256": "F9ECB541FDCE2A64A280561B173020B5CD707F68F8172F24FB5A6373541F7BDA",
+            "caller_sha256": "240509025F7B49D81D52EA6CBCB715C360A43A1DDE31E394B6A77E040191CF80",
+            "result_sha256": "FFCAFE239815ABEED6493C60705827C50912CA85E8D9F492E593887C20AFD3C4",
+            "controls_restored": true,
+            "source_unchanged": true
+          }
+        },
+        {
+          "mode": "actual",
+          "raw_status": "passed-private-native-fixture",
+          "packet_sha256": "E2726DC2A042699DF13C9F45B18DCC39496E2EF6EEF52F48A6BF12AE4A71E884",
+          "caller_sha256": "EB2DF90A6053E6A1DFA12224BAF1E681F6C50F34F8615EC47847982731ABD050",
+          "result_sha256": "56FD08181A240BC561A8CFF25D5BB797E8719D8DAA6FC29597EF5B93E9624D8B",
+          "mir_sha256": "38C84CCBC4BFDA62FCB078772C4690AB81228484744A36D9EA303F5A75B16447",
+          "fixture_sha256": "579449018A809BB7EBFFD6A8A4322A6B3B597EA8E046EC22B5C7CFEE5770EFB9",
+          "profile_sha256": "489AEE25BD8BBB2049049A28C77E8ECC336429BB0322339A1D1E3FF614821383",
+          "native_files": 18,
+          "bytes_per_copy": 993188,
+          "native_order": null
+        }
+      ]
+    },
+    {
+      "target": "f200",
+      "stage": "held",
+      "initial": {
+        "stage": "initial",
+        "case": "f200-positive-legacy-worker",
+        "status": "passed",
+        "qualification": "native-runner-readback-required",
+        "witnesses": {
+          "source_mir": "4.7.20002",
+          "destination_mir": "5.0.20000",
+          "source_actual_lab_completions": 2,
+          "destination_actual_lab_completions": 0,
+          "native_owner": "worker-robots-speed-6",
+          "native_effect_modifier": 0.65,
+          "milestone": "actual2labs",
+          "next_level": 8,
+          "worker_speed_modifier": 3.8229999999999995,
+          "independent_modifier_baseline": 2.5229999999999997,
+          "player_enabled": false,
+          "player_visible_when_disabled": true,
+          "foreign_queue_progress": 0.42000000000000004,
+          "science_consumed_units": 0,
+          "science_inventory_consumed_units": 0,
+          "science_type": "tool",
+          "science_remaining_ticks": 0,
+          "science_processing_ticks": 0,
+          "science_elapsed_ticks": 0,
+          "science_units_after": {
+            "automation-science-pack": 14,
+            "logistic-science-pack": 14,
+            "chemical-science-pack": 14,
+            "production-science-pack": 14,
+            "utility-science-pack": 14,
+            "space-science-pack": 14
+          },
+          "fixture_owned_offset": {
+            "schema": 1,
+            "amount": 0.123,
+            "reapplied": 0.123,
+            "native_entry_total": 3.6999999999999997,
+            "restored_total": 3.8229999999999995,
+            "native_entry_tick": 121,
+            "source_total": 3.8229999999999995,
+            "stage": "hold"
+          },
+          "finite_hold_witness": {
+            "schema": 1,
+            "maximum": 7,
+            "level": 8,
+            "enabled": false,
+            "visible": true,
+            "bonus": 3.8229999999999995,
+            "saved_progress": 0.27,
+            "science_units": {
+              "automation-science-pack": 14,
+              "logistic-science-pack": 14,
+              "chemical-science-pack": 14,
+              "production-science-pack": 14,
+              "utility-science-pack": 14,
+              "space-science-pack": 14
+            }
+          },
+          "on_load_read_only": false
+        }
+      },
+      "diagnostics": [
+        {
+          "stage": "fixture-owner-preflight",
+          "startup_type": "userdata",
+          "maximum_type": "table",
+          "profile_type": "table",
+          "maximum": 7,
+          "profile_import_empty": true
+        }
+      ],
+      "input_save_sha256": "90B23B42FA040368E7ED8E4D720D1682BD252A554A2DEB103CE60D8AF2930D82",
+      "completed_save": {
+        "path": "build/qualification/worker-first-finite-f200-held-actual-r01-controller/native-held/write-data/saves/mir5-native-complete.zip",
+        "sha256": "47BAD26CC4D21FE7ED27C8B106D767295BAAC35C0F0AC23857825AE5A032F82F",
+        "bytes": 854165
+      },
+      "root_readback": {
+        "path": "build/qualification/worker-first-finite-f200-held-actual-r01-controller/root-readback.json",
+        "sha256": "8F049FDB1A2E6CD75F46FE83C437A8C82AA1EA4C268C534A988F7477664055C5"
+      },
+      "observations": [
+        {
+          "mode": "order",
+          "raw_status": "failed",
+          "packet_sha256": "9EE9501B83731602E5CDC2AD14651D6798736D5FCBCF6BB34A68880D16396650",
+          "caller_sha256": "9D3CF5D393D67AF09E6A04DFB1F53F423FFEF94581E56D7529A224103CBAF8E6",
+          "result_sha256": "EDDBCDADCB584466CEBD2CD062DA61AE6AA26786ED3D1B9A823CE455D5DEE8AB",
+          "mir_sha256": "A0ED145E8E8671B052D84C84C8F62A3B087634A34879D9DB404EAB6D9BDD46C4",
+          "fixture_sha256": "1D0DFFEC0148ADDF16AB8646080C9FE02C0C37E2CA34CD2FC25135A27AC41427",
+          "profile_sha256": "F95BC0A7AE71F31F46F3185E926F8F3EE7E967DF517EF5546142C356EC6EF105",
+          "native_files": 8,
+          "bytes_per_copy": 46701,
+          "native_order": {
+            "schema": 1,
+            "status": "expected-native-order-stop-proved",
+            "target": "f200",
+            "stage": "held",
+            "observer_line": 83,
+            "mir_entry_line": 84,
+            "entry": {
+              "schema": 1,
+              "tick": 121,
+              "base": "2.0.77",
+              "mir": "5.0.20000",
+              "fixture": "0.5.0",
+              "observer": "0.1.0",
+              "player": {
+                "index": 1,
+                "name": "player",
+                "level": 8,
+                "researched": false,
+                "enabled": true,
+                "visible": true,
+                "bonus": 3.6999999999999997,
+                "saved_progress": 0.27
+              },
+              "foreign": {
+                "index": 4,
+                "name": "mir5-f200-legacy-worker-foreign",
+                "level": 6,
+                "researched": false,
+                "enabled": false,
+                "visible": false,
+                "bonus": 2.4,
+                "saved_progress": 0
+              }
+            },
+            "raw_status": "failed",
+            "new_processes": 1,
+            "new_labs": 0,
+            "new_saves": 0,
+            "new_cold_reloads": 0,
+            "packet_sha256": "9EE9501B83731602E5CDC2AD14651D6798736D5FCBCF6BB34A68880D16396650",
+            "caller_sha256": "9D3CF5D393D67AF09E6A04DFB1F53F423FFEF94581E56D7529A224103CBAF8E6",
+            "result_sha256": "EDDBCDADCB584466CEBD2CD062DA61AE6AA26786ED3D1B9A823CE455D5DEE8AB",
+            "controls_restored": true,
+            "source_unchanged": true
+          }
+        },
+        {
+          "mode": "actual",
+          "raw_status": "passed-private-native-fixture",
+          "packet_sha256": "A3BB75D191C33F0955DD4719B1435616431623FBE63C2E197060B0992C971800",
+          "caller_sha256": "7C00310A7D79C55150E8DE5BA09D021E1789DAE30BA6EA029824C34ABBE5CA8A",
+          "result_sha256": "5F5963B8AE2348A345030973A21139BAC156BB2122DFA40E815A0E6BAF457290",
+          "mir_sha256": "E9D349931E082AD77057C150E3D6093490E4086E84F0FAFECB0ED1257FD5ED4F",
+          "fixture_sha256": "1D0DFFEC0148ADDF16AB8646080C9FE02C0C37E2CA34CD2FC25135A27AC41427",
+          "profile_sha256": "0BF676FB15E769587E931076CD1409A36D0EF00FF5E8B08060E413B74033F6B2",
+          "native_files": 18,
+          "bytes_per_copy": 967665,
+          "native_order": null
+        }
+      ]
+    },
+    {
+      "target": "f200",
+      "stage": "relaxed",
+      "initial": {
+        "stage": "initial",
+        "case": "f200-positive-legacy-worker",
+        "status": "passed",
+        "qualification": "native-runner-readback-required",
+        "witnesses": {
+          "source_mir": "4.7.20002",
+          "destination_mir": "5.0.20000",
+          "source_actual_lab_completions": 2,
+          "destination_actual_lab_completions": 1,
+          "native_owner": "worker-robots-speed-6",
+          "native_effect_modifier": 0.65,
+          "milestone": "actual2labs",
+          "next_level": 9,
+          "worker_speed_modifier": 4.473,
+          "independent_modifier_baseline": 2.5229999999999997,
+          "player_enabled": true,
+          "player_visible_when_disabled": true,
+          "foreign_queue_progress": 0.42000000000000004,
+          "science_consumed_units": 0.7333333333333333,
+          "science_inventory_consumed_units": 0.7333333333333333,
+          "science_type": "tool",
+          "science_remaining_ticks": 44,
+          "science_processing_ticks": 44,
+          "science_elapsed_ticks": 43,
+          "science_units_after": {
+            "automation-science-pack": 21.266666666666666,
+            "logistic-science-pack": 21.266666666666666,
+            "chemical-science-pack": 21.266666666666666,
+            "production-science-pack": 21.266666666666666,
+            "utility-science-pack": 21.266666666666666,
+            "space-science-pack": 21.266666666666666
+          },
+          "fixture_owned_offset": {
+            "schema": 1,
+            "amount": 0.123,
+            "reapplied": 0,
+            "native_entry_total": 3.8229999999999995,
+            "restored_total": 3.8229999999999995,
+            "native_entry_tick": 122,
+            "source_total": 3.8229999999999995,
+            "stage": "relax"
+          },
+          "finite_hold_witness": {
+            "schema": 1,
+            "maximum": 7,
+            "level": 8,
+            "enabled": false,
+            "visible": true,
+            "bonus": 3.8229999999999995,
+            "saved_progress": 0.27,
+            "science_units": {
+              "automation-science-pack": 14,
+              "logistic-science-pack": 14,
+              "chemical-science-pack": 14,
+              "production-science-pack": 14,
+              "utility-science-pack": 14,
+              "space-science-pack": 14
+            }
+          },
+          "on_load_read_only": false
+        }
+      },
+      "diagnostics": [
+        {
+          "stage": "fixture-owner-preflight",
+          "startup_type": "userdata",
+          "maximum_type": "table",
+          "profile_type": "table",
+          "maximum": 40,
+          "profile_import_empty": true
+        },
+        {
+          "stage": "finish-before-assertion",
+          "case": "f200-positive-legacy-worker",
+          "research_start_tick": 122,
+          "research_finished_tick": 165,
+          "raw_elapsed_ticks": 43,
+          "processing_ticks": 44,
+          "expected_processing_ticks": 44,
+          "science_units_observed": {
+            "automation-science-pack": 21.266666666666666,
+            "logistic-science-pack": 21.266666666666666,
+            "chemical-science-pack": 21.266666666666666,
+            "production-science-pack": 21.266666666666666,
+            "utility-science-pack": 21.266666666666666,
+            "space-science-pack": 21.266666666666666
+          }
+        }
+      ],
+      "input_save_sha256": "47BAD26CC4D21FE7ED27C8B106D767295BAAC35C0F0AC23857825AE5A032F82F",
+      "completed_save": {
+        "path": "build/qualification/worker-first-finite-f200-relaxed-actual-r01-controller/native-relaxed/write-data/saves/mir5-native-complete.zip",
+        "sha256": "7AC36DD1E67885BD5589FFAA937514B05003B36D424BF973820CA7D9EB9FDBEC",
+        "bytes": 854296
+      },
+      "root_readback": {
+        "path": "build/qualification/worker-first-finite-f200-relaxed-actual-r01-controller/root-readback.json",
+        "sha256": "42B57DAE1DC5ADD3747176E502C497940E496FE9539ED9B4F4C15B1B9CFB914B"
+      },
+      "observations": [
+        {
+          "mode": "order",
+          "raw_status": "failed",
+          "packet_sha256": "64D1BC4FECD866E42503ABAF2B80981A9921BEBDA3FB9E26F2107BC34BA235CC",
+          "caller_sha256": "38A93CB30D0E46EFA4F98E697B6BCD0AB3E466084DD2ED6C496DE787A4508B68",
+          "result_sha256": "A1CDE94C7532972DD99032C5F6DFA41C6D0E0DB54D28D06B89158D39DDDE7EBF",
+          "mir_sha256": "A0ED145E8E8671B052D84C84C8F62A3B087634A34879D9DB404EAB6D9BDD46C4",
+          "fixture_sha256": "BBEBEC545FC3B6C7C01E777513EC8208D324D4814DA040E26D58FFB592D11768",
+          "profile_sha256": "5EE1B82B8CBDE42BE033272B90B88D54BB76DFBBC130BFA1D13CE74A2D6051B9",
+          "native_files": 8,
+          "bytes_per_copy": 45326,
+          "native_order": {
+            "schema": 1,
+            "status": "expected-native-order-stop-proved",
+            "target": "f200",
+            "stage": "relaxed",
+            "observer_line": 82,
+            "mir_entry_line": 83,
+            "entry": {
+              "schema": 1,
+              "tick": 122,
+              "base": "2.0.77",
+              "mir": "5.0.20000",
+              "fixture": "0.6.0",
+              "observer": "0.1.0",
+              "player": {
+                "index": 1,
+                "name": "player",
+                "level": 8,
+                "researched": false,
+                "enabled": false,
+                "visible": true,
+                "bonus": 3.8229999999999995,
+                "saved_progress": 0.27
+              },
+              "foreign": {
+                "index": 4,
+                "name": "mir5-f200-legacy-worker-foreign",
+                "level": 6,
+                "researched": false,
+                "enabled": false,
+                "visible": false,
+                "bonus": 2.4,
+                "saved_progress": 0
+              }
+            },
+            "raw_status": "failed",
+            "new_processes": 1,
+            "new_labs": 0,
+            "new_saves": 0,
+            "new_cold_reloads": 0,
+            "packet_sha256": "64D1BC4FECD866E42503ABAF2B80981A9921BEBDA3FB9E26F2107BC34BA235CC",
+            "caller_sha256": "38A93CB30D0E46EFA4F98E697B6BCD0AB3E466084DD2ED6C496DE787A4508B68",
+            "result_sha256": "A1CDE94C7532972DD99032C5F6DFA41C6D0E0DB54D28D06B89158D39DDDE7EBF",
+            "controls_restored": true,
+            "source_unchanged": true
+          }
+        },
+        {
+          "mode": "actual",
+          "raw_status": "passed-private-native-fixture",
+          "packet_sha256": "5D03329868698506D9F9F16D4E58B27F9B557A088044F00DDECE0F8A298211C7",
+          "caller_sha256": "4A85D217F71F4FE0EF0DAA58D8FB36AB57B9037FEB1CC8F55F5D0B8F7C866B6B",
+          "result_sha256": "53E67C5F78E5339053E783A096F15380595B1B09009A8A84AE4D43C3D3E440FD",
+          "mir_sha256": "E9D349931E082AD77057C150E3D6093490E4086E84F0FAFECB0ED1257FD5ED4F",
+          "fixture_sha256": "BBEBEC545FC3B6C7C01E777513EC8208D324D4814DA040E26D58FFB592D11768",
+          "profile_sha256": "5EB363888FB8A78CCA4841696C5781E0D01789D73AFFAEBD5195BC67FB91C563",
+          "native_files": 18,
+          "bytes_per_copy": 971351,
+          "native_order": null
+        }
+      ]
+    }
+  ],
+  "counts": {
+    "new_native_processes": 16,
+    "expected_failed_order_processes": 4,
+    "accepted_stage_processes": 12,
+    "new_actual_labs": 2,
+    "new_saves": 4,
+    "new_cold_reloads": 8,
+    "source_lab_completions_reused_once": 2
+  },
+  "root_readback": {
+    "path": "build/qualification/worker-first-finite-native-root-readback-r01.json",
+    "sha256": "CA9DBC4B325F9024F1E137211F4C60F9BB2400E074D1C9BFDBBC3069FF54C5DF",
+    "files": 104,
+    "bytes_per_copy": 4125588
+  },
+  "lossless_receipts": {
+    "path": "spec/evidence/worker-first-finite-native-receipts-r01.json.gz",
+    "sha256": "FFC88D481E47B9564059E1235D3A62FF4DC8A04C834FF3CCDFD90C31AA5F75FA",
+    "bytes": 187534,
+    "records": 56
+  },
+  "limits": [
+    "Four private bootstrap first-entry/stop observations intentionally fail before MIR body or fixture ownership writes;zero lab/save/cold each. Actual acceptance always restores unmodified38C/E9 and keeps exact-stage order evidence.",
+    "The fixture replays only its own persisted0.123 after fresh independent entry,unchanged aggregate and every original native/effect/work/foreign assertion. Relaxation also requires the exact held stage proof and unchanged inventory. This is not arbitrary foreign offset reconstruction by MIR.",
+    "Two original source lab completions are reused once across all four accepted stages. Only the two relaxed stages earn a new lab;four saved successors receive eight independent unchanged-byte cold reloads. F210 whole-item and F200 fractional-tool accounting are independently checked.",
+    "Original strict0.2 failures,diagnostics and direct0.3/.4 passes keep their exact identities. This closes the selected finite worker boundary at its recorded inputs;K2SE review,affected current-package applicability and other release gates remain separate."
+  ]
+}
