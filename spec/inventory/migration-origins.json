@@ -3648,11 +3648,11 @@
       ]
     },
     "completion_queue_5_0_0": {
-      "reviewed_commit": "22c2f9a8e49047a03ea8d1d844d68a79c11bc749",
-      "player_tree": "5058373348e9049f8b67ec4dbb79b400a904acd6",
+      "reviewed_commit": "740a571b32e87c59beecbea3fb54c60fcc4ac911",
+      "player_tree": "fbb7e9135280ce7f69692e9b0c4a44d743793f45",
       "package_freeze": {
-        "path": "spec/evidence/current-assets-7a2f9322-root-readback.json",
-        "sha256": "286D2523C8489184171AEB3306338820BBE1634720D64CE3052CCB8FF5548084"
+        "path": "spec/evidence/current-fbb7-coherent17-package-chain-r01.json",
+        "sha256": "008D0779BC9385BC858339959556BF8A48BD2D8CDD48E80DB1354B5804BE88A5"
       },
       "native_owner": "Black Glass; Aero prepares/reviews without launching or mutating a direct library",
       "status_meanings": {
@@ -3813,8 +3813,8 @@
         {
           "boundary": "K2 Imersite public/carrier identities",
           "status": "needs-correction",
-          "problem": "Separate0.3 K2SE explicit fixture-owned-lock successor passes unmodified38C/8DC/q013 from89023 after observed before-MIR owner action,strict post-MIR assertions,save/two colds. Original0.2 failure and published-runtime contrasts remain unchanged. Original source persists its own seed contract but no per-technology ledger; independent protocol/applicability review remains required.",
-          "next_action": "Review PR1376 exact fixture-owner boundary and13 lossless bodies. Only after that disposition adopt the named0.3 result with its source-contract limits; do not relabel original0.2 or infer arbitrary foreign rights. Preserve protected89023 and the separate K2 real-lab route. Keep final current-package and broader gameplay obligations separate.",
+          "problem": "The explicit0.3 K2SE fixture-owned seeded-carrier boundary passes independent protocol/body review at unmodified38C;original strict0.2 failure remains. The distinct lab-earned K2SO direct recovery passes at005D,but affected current38C applicability still requires its declared successor execution.",
+          "next_action": "After the protected Library timing block,Black Glass validates and executes the current38C prepared direct successor from unchanged538B with original level/effect/work assertions,one actual new lab,save and two unchanged-byte cold reloads. Reuse the existing exact fixture projections and three reproduced own archives;no source recreation,threshold change or broad campaign restart.",
           "prepared_inputs": {
             "path": "spec/evidence/k2-imersite-current005d-prepared-inputs-r01.json",
             "sha256": "02C6BFFB4CD524A11BF90DEC1269639963B61765027AE0D60A6A56E9C068EC56"
@@ -3844,7 +3844,13 @@
               "path": "spec/evidence/k2se-fixture-owned-locks-native-chain-r01.json",
               "scope": "Named explicit fixture-owner scenario passes current38C/save/two colds;independent protocol review pending,old0.2 failure unchanged."
             }
-          ]
+          ],
+          "independent_owner_protocol_review": "https://github.com/Julesc013/more-infinite-research/pull/1376#pullrequestreview-5692177991",
+          "current_prepared_inputs": {
+            "path": "spec/evidence/k2-imersite-current38c-prepared-inputs-r01.json",
+            "sha256": "6BF6FCD6D312233A0569B91D6B6AA331B1B2335EC5D05658E7FCE1293976B025",
+            "status": "prepared-for-owner-preflight-not-native-qualified"
+          }
         }
       ],
       "additional_transition_cases": [
@@ -4034,7 +4040,15 @@
           "status": "explicitly-unverified-deferred",
           "reason": "Retain best-effort build/loader/engine-format limits. Missing native inputs are not passes and do not create stable-release campaigns."
         }
-      ]
+      ],
+      "prior_queue_input_identity": {
+        "reviewed_commit": "22c2f9a8e49047a03ea8d1d844d68a79c11bc749",
+        "player_tree": "5058373348e9049f8b67ec4dbb79b400a904acd6",
+        "package_freeze": {
+          "path": "spec/evidence/current-assets-7a2f9322-root-readback.json",
+          "sha256": "286D2523C8489184171AEB3306338820BBE1634720D64CE3052CCB8FF5548084"
+        }
+      }
     }
   },
   "known_gaps_and_retention": [
