@@ -1,0 +1,128 @@
+{
+  "schema": 1,
+  "kind": "MIRF210OptionalAbsenceRecoveredInputReviewV1",
+  "status": "original-two-mod-absence-native-result-recovered-scoped-reuse",
+  "original_result": "spec/evidence/api-beta-absence.json",
+  "original_source_head": "dd51f3a14518427aa4e87bcfef3236d13ac6f845",
+  "original_source_dirty": true,
+  "original_result_bytes_equal_to_tracked": true,
+  "actual_native_pid": 18188,
+  "exit_code": 0,
+  "engine": {
+    "path": "C:\\Program Files\\Steam\\steamapps\\common\\Factorio\\bin\\x64\\factorio.exe",
+    "sha256": "FE4A1DA30F322A0D0B8AEB3DF7276332222BAAA143E2352569B723E84B2B9060",
+    "file_version": "2.1.23.87750",
+    "product_version": "2.1.23",
+    "base_version": "2.1.23"
+  },
+  "actual_current_engine_bytes_sha256": "FE4A1DA30F322A0D0B8AEB3DF7276332222BAAA143E2352569B723E84B2B9060",
+  "loaded_selection": [
+    "base@2.1.23",
+    "mir-fixture-mir5-api-beta@0.1.0"
+  ],
+  "native_create_log": {
+    "sha256": "7610DA6834263A579FA25F168F47440FC3A0C65C0882FD3ED4B4AAB95428DA3D",
+    "bytes": 6449
+  },
+  "own_executed_fixture": {
+    "sha256": "AB93F88CB19F2475ACA174D8A23CA30EB6EBCA63E578270CA36D9EBD6D552DE3",
+    "bytes": 2717,
+    "members": [
+      {
+        "path": "mir-fixture-mir5-api-beta_0.1.0/control.lua",
+        "bytes": 4010,
+        "sha256": "3D0BE505175A60537CB2B4B4E5DCC0B317847A06A52AB980EE60E67E97951EC3",
+        "absent_MIR_guard_identical_to_current_source": "if not script.active_mods[\"more-infinite-research\"] then return end"
+      },
+      {
+        "path": "mir-fixture-mir5-api-beta_0.1.0/data-final-fixes.lua",
+        "bytes": 1045,
+        "sha256": "7A82C9CF21B511EFC989DAC0AD28FF8BD333F34F92C4B1E57341BDDF8CC6F0A2",
+        "absent_MIR_guard_identical_to_current_source": "if not mods[\"more-infinite-research\"] then return end"
+      },
+      {
+        "path": "mir-fixture-mir5-api-beta_0.1.0/graphics/icon.png",
+        "bytes": 137,
+        "sha256": "530F9250623036693D3E5A79F830B9C8A6D61E727C92219FD6A28EE62A424CCE"
+      },
+      {
+        "path": "mir-fixture-mir5-api-beta_0.1.0/info.json",
+        "bytes": 380,
+        "sha256": "5C2611225712DFD0B89B77DDCB13267F48AD5E6592BE535282C82015E8DB486C"
+      }
+    ]
+  },
+  "original_native_custody": {
+    "path": "build/tmp/mir5-api-beta-absence-r01",
+    "files": [
+      {
+        "path": "config.ini",
+        "bytes": 286,
+        "sha256": "276B067720E7DE94F1597E9BC9B093E68153E79B828FF5CD58E21721BF1585F0"
+      },
+      {
+        "path": "create.factorio.log",
+        "bytes": 6449,
+        "sha256": "7610DA6834263A579FA25F168F47440FC3A0C65C0882FD3ED4B4AAB95428DA3D"
+      },
+      {
+        "path": "process-1.resources.jsonl",
+        "bytes": 3800,
+        "sha256": "36425A25EB5979700DB55868226B63C82F155019F87C358C6DBF56F582AA9EC6"
+      },
+      {
+        "path": "process-1.stderr.txt",
+        "bytes": 0,
+        "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+      },
+      {
+        "path": "process-1.stdout.txt",
+        "bytes": 6525,
+        "sha256": "7042EB17268142BC567301FADB564244C92582D613A16090EB754BB18E68D8D4"
+      },
+      {
+        "path": "result.json",
+        "bytes": 11780,
+        "sha256": "5E195E7346139084ED98921BF4413C7DC10342697D8BE18089E2D659669FC072"
+      },
+      {
+        "path": "write-data/factorio-current.log",
+        "bytes": 6449,
+        "sha256": "7610DA6834263A579FA25F168F47440FC3A0C65C0882FD3ED4B4AAB95428DA3D"
+      },
+      {
+        "path": "write-data/saves/seed.zip",
+        "bytes": 736966,
+        "sha256": "7394EC8D967C0C60656690D7C794F3C9EAC1B8B85A436F42592C0881684B580B"
+      }
+    ]
+  },
+  "retained_copy": {
+    "path": "build/qualification/api-stability-matrix-aero-r01/f210-absence-original",
+    "original_files_unchanged": true,
+    "single_own_fixture_archive_preserved": true,
+    "dependency_library_cloned": false
+  },
+  "capsule": {
+    "path": "spec/evidence/api-optional-absence-f210-aero-receipts-r01.json.gz",
+    "sha256": "F03F5C8A12222A1975F19CCBD0564188CCEC1AAAA8B1AD83F49290062817FD3D",
+    "bytes": 14031,
+    "bodies": 8,
+    "round_trip": "All exact source bodies decoded, length/hash verified."
+  },
+  "consumed_path_review": [
+    "Actual two-mod native data-final-fixes and control script checksums are in the engine log. MIR is absent from actual loaded-mod rows; mere duplicate archive discovery lines are not treated as activation.",
+    "The executed own fixture is recovered byte-for-byte from its original recorded AB93 archive. Both absent-MIR guards remain byte-identical first lines in current Beta source and return before helper imports, settings, state, callback registration or any changed body.",
+    "Native log, ledger, result and actual archive/member identities establish the original executed absence closure despite the preserved dirty-checkout label. No current MIR package is consumed when MIR is absent."
+  ],
+  "qualification": "Optional Beta loads with MIR absent on original 2.1.23/FE4. This satisfies only its named absent-MIR behavior, without requiring a replacement solely for the later four-mod profile.",
+  "limits": [
+    "No new native execution, standalone8DC, explicit absence-state-marker, gameplay, save/reload, client, performance or release verdict.",
+    "Original profile bytes at the retired path were not recovered; its recorded hash is retained as metadata only. Actual loaded two-mod selection and executed own archive/engine are verified from raw custody. No four-mod profile identity is asserted.",
+    "The source_dirty=true field is retained and no whole dirty source tree is reconstructed or relabelled as current. Unconsumed fixture bodies have changed since this run; only the guards support current absent-MIR reuse.",
+    "Original resource/direct-library restoration records are retained; this review does not reconstruct missing pre-restoration control bytes."
+  ],
+  "native_execution_count": 0,
+  "player_source_changed": false,
+  "release_qualification": false
+}
