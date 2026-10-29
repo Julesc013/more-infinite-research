@@ -24,6 +24,8 @@ CURRENT_STANDALONE_F210_SPACE_AGE_API_CONSUMERS_PROFILE = ROOT / "tests/profiles
 PRIVATE_CREDITS_BASE_PROFILE = ROOT / "tests/profiles/library-api-consumers-private-credits-standalone-f210-2123.json"
 PRIVATE_CREDITS_SPACE_AGE_PROFILE = ROOT / "tests/profiles/library-api-consumers-private-credits-space-age-standalone-f210-2123.json"
 PRIVATE_CREDITS_INFO = ROOT / "tests/fixtures/library-multiplayer/info-f210-private-credits.json"
+F200_PRIVATE_CREDITS_PROFILE = ROOT / "tests/profiles/library-private-credits-current-f200-2077.json"
+F200_PRIVATE_CREDITS_INFO = ROOT / "tests/fixtures/library-private-credits-f200/info.json"
 PAIRED_PUBLISHED_PROFILE = ROOT / "tests/profiles/library-paired-browser-published-f200-2077.json"
 PAIRED_MIR5_PROFILE = ROOT / "tests/profiles/library-paired-browser-mir5-f200-2077.json"
 SCRIPTED_EFFECTS_PROFILE = ROOT / "tests/profiles/scripted-effects-multiplayer-f200-sa-2077.json"
@@ -835,6 +837,67 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
                         "690004F145E8B0DD52B4030BD8B27F7B581495EEFAAC5CB3A2F30A23FCA08951",
                 })
                 self.assertNotIn("mir-fixture-mir5-api-beta-production", {row["name"] for row in profile["mods"]})
+
+    def test_f200_private_profile_and_prelaunch_guards_require_exact_six_mod_inputs(self):
+        selection = json.loads(F200_PRIVATE_CREDITS_PROFILE.read_text(encoding='utf-8'))
+        info = json.loads(F200_PRIVATE_CREDITS_INFO.read_text(encoding='utf-8'))
+        self.assertEqual((info['name'], info['version'], info['factorio_version']),
+                         ('mir-fixture-mir5-library-multiplayer', '0.3.0', '2.0'))
+        self.assertEqual(info['dependencies'], ['base >= 2.0.77', 'more-infinite-research = 5.0.20000'])
+        self.assertEqual({r['name'] for r in selection['mods']}, {
+            'base', 'more-infinite-research', 'mir-fixture-mir5-active-mods-observer',
+            'mir-fixture-mir5-library-multiplayer', 'mir-fixture-mir5-api-alpha', 'mir-fixture-mir5-api-beta',
+        })
+        self.assertEqual(selection['archive_sha256']['more-infinite-research_5.0.20000.zip'],
+                         'E9D349931E082AD77057C150E3D6093490E4086E84F0FAFECB0ED1257FD5ED4F')
+        script = r'''
+          $ErrorActionPreference='Stop';Set-StrictMode -Version Latest
+          $tokens=$null;$errors=$null
+          $ast=[Management.Automation.Language.Parser]::ParseFile($env:MIR_TEST_WRAPPER,[ref]$tokens,[ref]$errors)
+          if($errors.Count){throw 'wrapper parse failed'}
+          $found=@($ast.FindAll({param($n)$n-is[Management.Automation.Language.FunctionDefinitionAst]-and$n.Name-ceq'Assert-MultiplayerFixtureSelection'},$true))
+          if($found.Count-ne1){throw 'selection guard missing'}
+          function Assert-Session([bool]$Condition,[string]$Message){if(-not$Condition){throw $Message}}
+          Invoke-Expression $found[0].Extent.Text
+          $original=Get-Content -LiteralPath $env:MIR_TEST_PROFILE -Raw|ConvertFrom-Json -AsHashtable
+          $engine='D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B'
+          $mir='E9D349931E082AD77057C150E3D6093490E4086E84F0FAFECB0ED1257FD5ED4F'
+          $accepted=Assert-MultiplayerFixtureSelection $original $engine 'library-multiplayer' $mir 7168
+          if($accepted.base-cne'2.0.77'-or-not$accepted.private_credit_checks-or-not$accepted.api_client_consumers){throw 'valid fixed F200 private selection rejected'}
+          foreach($opponent in @('wrong-engine','wrong-player','wrong-case','wrong-budget','no-private','missing-beta','extra-mod','wrong-api-archive','wrong-mir-version')){
+            $selection=$original|ConvertTo-Json -Depth 20|ConvertFrom-Json -AsHashtable
+            $actualEngine=$engine;$actualMir=$mir;$case='library-multiplayer';$budget=7168
+            switch($opponent){
+              'wrong-engine'{$actualEngine='A'*64}
+              'wrong-player'{$actualMir='B'*64}
+              'wrong-case'{$case='library-paired-browser'}
+              'wrong-budget'{$budget=8192}
+              'no-private'{$selection.private_credit_checks=$false}
+              'missing-beta'{$selection.mods=@($selection.mods|Where-Object name -CNE 'mir-fixture-mir5-api-beta')}
+              'extra-mod'{$selection.mods+=@{name='foreign-extra';version='1.0.0';enabled=$true}}
+              'wrong-api-archive'{$selection.archive_sha256['mir-fixture-mir5-api-alpha_0.1.0.zip']='C'*64}
+              'wrong-mir-version'{($selection.mods|Where-Object name -CEQ 'more-infinite-research').version='5.0.21000'}
+            }
+            $caught=$false
+            try{Assert-MultiplayerFixtureSelection $selection $actualEngine $case $actualMir $budget|Out-Null}catch{$caught=$true}
+            if(-not$caught){throw "invalid F200 private input admitted:$opponent"}
+          }
+          $session=[Management.Automation.Language.Parser]::ParseFile($env:MIR_TEST_SESSION,[ref]$tokens,[ref]$errors)
+          if($errors.Count){throw 'session parse failed'}
+          $guard=@($session.EndBlock.Statements|Where-Object {$_.Extent.Text.EndsWith("'API client consumer target differs'",[StringComparison]::Ordinal)})
+          if($guard.Count-ne1){throw 'API target guard missing'}
+          $check=[scriptblock]::Create($guard[0].Extent.Text)
+          $apiClientConsumers=$true;$libraryWitnessTarget=[pscustomobject]@{base='2.0.77';mir='5.0.20000'}
+          $spec=@{private_credit_checks=$true};&$check
+          foreach($spec in @(@{},@{private_credit_checks=$false})){
+            $caught=$false;try{&$check}catch{$caught=$true};if(-not$caught){throw 'ordinary F200 API-only mode admitted'}
+          }
+        '''
+        completed = subprocess.run(['pwsh', '-NoProfile', '-NonInteractive', '-Command', script],
+                                   capture_output=True, text=True, check=False,
+                                   env=dict(os.environ, MIR_TEST_WRAPPER=str(WRAPPER), MIR_TEST_SESSION=str(SESSION),
+                                            MIR_TEST_PROFILE=str(F200_PRIVATE_CREDITS_PROFILE)))
+        self.assertEqual(completed.returncode, 0, completed.stdout + completed.stderr)
 
     def test_multiplayer_wrapper_admits_only_the_exact_standalone_api_client_profile(self):
         script = r'''
@@ -1910,7 +1973,7 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
             for family in ("all", "external")
             for name in ids
         ]
-        for target in ("f210-private-credits", "f210-space-age-private-credits"):
+        for target in ("f200-private-credits", "f210-private-credits", "f210-space-age-private-credits"):
             with self.subTest(target=target):
                 accepted = self.run_case(target=target)
                 self.assertTrue(accepted["ok"], accepted["message"])
@@ -1950,16 +2013,18 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
             "private-credit-restore": "personal browser query or selected view differs",
             "private-credit-stale-external-family": "private credit browse did not restore the personal mir family filter",
             "private-credit-missing-api": "unexpected non-base F210 multiplayer closure",
-            "standalone-identity-discovery": "private-credit Library fixture requires the current F210 API closure",
+            "standalone-identity-discovery": "private-credit Library fixture cannot use standalone identity discovery",
         }
-        for opponent, message in opponents.items():
-            with self.subTest(opponent=opponent):
-                rejected = self.run_case(opponent, target="f210-private-credits")
-                self.assertFalse(rejected["ok"])
-                self.assertIn(message, rejected["message"])
-        rejected = self.run_case(target="f200-private-credits")
+        for target in ("f200-private-credits", "f210-private-credits"):
+            for opponent, message in opponents.items():
+                with self.subTest(target=target, opponent=opponent):
+                    rejected = self.run_case(opponent, target=target)
+                    self.assertFalse(rejected["ok"])
+                    expected = message.replace("F210", "F200") if target == "f200-private-credits" and opponent == "private-credit-missing-api" else message
+                    self.assertIn(expected, rejected["message"])
+        rejected = self.run_case("f210-api-consumers", target="f200")
         self.assertFalse(rejected["ok"])
-        self.assertIn("private-credit Library fixture requires the current F210 API closure", rejected["message"])
+        self.assertIn("unexpected non-base F200 multiplayer closure", rejected["message"])
 
     def test_two_real_client_join_rejoin_and_restart_state_machine(self):
         result = self.run_case()
@@ -2059,7 +2124,7 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
 
     def test_native_session_reader_accepts_actual_library_markers_and_rejects_mutations(self):
         results = {target: self.run_case(target=target) for target in (
-            "f200", "f210", "f210-space-age", "f210-private-credits", "f210-space-age-private-credits",
+            "f200", "f210", "f210-space-age", "f200-private-credits", "f210-private-credits", "f210-space-age-private-credits",
         )}
         for target, result in results.items():
             with self.subTest(target=target):
@@ -2094,6 +2159,7 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
           $expectedJoins=@{ready=0;'rejoin-ready'=2;'restart-ready'=4;completed=6}
           $targets=[ordered]@{
             f200=[ordered]@{engine_sha256='D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B';base='2.0.77';mir='5.0.20000'}
+            f200_private=[ordered]@{engine_sha256='D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B';base='2.0.77';mir='5.0.20000';private_credit_checks=$true}
             f210=[ordered]@{engine_sha256='FE4A1DA30F322A0D0B8AEB3DF7276332222BAAA143E2352569B723E84B2B9060';base='2.1.23';mir='5.0.21000'}
             standalone_normal=[ordered]@{engine_sha256='8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38';base='2.1.23';mir='5.0.21000';standalone_identity_discovery=$false}
             standalone_discovery=[ordered]@{engine_sha256='8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38';base='2.1.23';mir='5.0.21000';standalone_identity_discovery=$true}
@@ -2224,6 +2290,7 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
           if($null-ne$accepted){throw 'Base reader accepted a Space Age marker'}
 
           $privateTargets=[ordered]@{
+            'f200-private-credits'=$targets.f200_private
             'f210-private-credits'=$targets.standalone_private_base
             'f210-space-age-private-credits'=$targets.standalone_private_space_age
           }

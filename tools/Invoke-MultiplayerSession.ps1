@@ -383,7 +383,7 @@ function Get-LibraryWitnessTarget([hashtable]$Spec,[string]$EngineSha256) {
     Assert-Session (
       $Spec.private_credit_checks -is [bool] -and $Spec.private_credit_checks -and
       -not $requestedStandaloneIdentityDiscovery -and
-      $EngineSha256 -ceq '8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38' -and
+      $EngineSha256 -cin @('8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38','D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B') -and
       $Spec.ContainsKey('api_client_consumers') -and
       $Spec.api_client_consumers -is [bool] -and $Spec.api_client_consumers
     ) 'Private-credit Library witness mode differs'
@@ -790,7 +790,10 @@ if($fixtureCase-ceq'library-multiplayer'){$libraryWitnessTarget=Get-LibraryWitne
 if($fixtureCase-ceq'library-multiplayer'){
   Assert-LibraryWitnessIdentityMode $standaloneIdentityDiscovery $libraryWitnessTarget
 }
-Assert-Session (-not $apiClientConsumers -or ($libraryWitnessTarget.base -ceq '2.1.23' -and $libraryWitnessTarget.mir -ceq '5.0.21000')) 'API client consumer target differs'
+Assert-Session (-not $apiClientConsumers -or
+  ($libraryWitnessTarget.base -ceq '2.1.23' -and $libraryWitnessTarget.mir -ceq '5.0.21000') -or
+  ($spec.ContainsKey('private_credit_checks') -and $spec.private_credit_checks -and
+    $libraryWitnessTarget.base -ceq '2.0.77' -and $libraryWitnessTarget.mir -ceq '5.0.20000')) 'API client consumer target differs'
 $library = Resolve-Existing ([string]$spec.archive_library) 'Container' 'archive library'
 $workroot = Resolve-BuildInput ([string]$spec.workroot) 'Container' 'workroot'
 $seed = Resolve-BuildInput ([string]$spec.seed_save) 'Leaf' 'seed save'
