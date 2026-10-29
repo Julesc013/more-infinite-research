@@ -397,7 +397,44 @@ function Get-LibraryWitnessTarget([hashtable]$Spec,[string]$EngineSha256) {
     ) 'Private-credit Library witness mode differs'
     $expected.private_credit_checks=$true
   }
+  if($Spec.ContainsKey('positive_private_state_checks')){
+    Assert-Session ($Spec.positive_private_state_checks -is [bool] -and $Spec.positive_private_state_checks -and $Spec.ContainsKey('private_credit_checks') -and $Spec.private_credit_checks -and -not $Spec.ContainsKey('space_age_library')) 'Positive-state Library witness mode differs'
+    $expected.positive_private_state_checks=$true
+  }
   return [pscustomobject]$expected
+}
+function Assert-LibraryPositiveWitness([object]$Witness,[object]$Target,[string]$Stage){
+  $positive=$Witness.PSObject.Properties['positive_private_state']
+  if($null-eq$Target.PSObject.Properties['positive_private_state_checks']){
+    Assert-Session ($null-eq$positive) "$Stage unexpected positive-state witness"
+    return
+  }
+  Assert-Session ($null-ne$positive -and $positive.Value-is[pscustomobject]) "$Stage positive-state witness absent"
+  $value=$positive.Value
+  $fields=@('ownership','imported_earnings','seeded_once','native','persisted_personal_hidden_checked','foreign_inspection_queries')
+  Assert-Session (((@($value.PSObject.Properties.Name|Sort-Object)-join'|')-ceq(@($fields|Sort-Object)-join'|'))) "$Stage positive-state witness fields differ"
+  Assert-Session ($value.ownership-is[string] -and $value.ownership-ceq'fixture-seeded-disposable-world') "$Stage positive-state ownership differs"
+  Assert-LibraryWitnessBoolean $value 'imported_earnings' $false $Stage
+  Assert-LibraryWitnessBoolean $value 'seeded_once' $true $Stage
+  Assert-LibraryWitnessBoolean $value 'persisted_personal_hidden_checked' ($Stage-ceq'completed') $Stage
+  Assert-LibraryWitnessInteger $value 'foreign_inspection_queries' $(if($Stage-ceq'completed'){44}else{0}) $Stage
+  $native=$value.native
+  Assert-Session ($native-is[pscustomobject] -and ((@($native.PSObject.Properties.Name|Sort-Object)-join'|')-ceq'cannon_speed|holders|module_productivity')) "$Stage positive native witness differs"
+  $ids=@('mir-legacy-module-credit-speed-module','mir-legacy-module-credit-productivity-module','mir-legacy-module-credit-efficiency-module','mir-legacy-cannon-credit-rocket-shooting-speed')
+  Assert-Session ($native.holders-is[pscustomobject] -and ((@($native.holders.PSObject.Properties.Name|Sort-Object)-join'|')-ceq(@($ids|Sort-Object)-join'|'))) "$Stage positive holder identities differ"
+  for($index=0;$index-lt4;$index++){
+    $holder=$native.holders.PSObject.Properties[$ids[$index]].Value
+    Assert-Session ($holder-is[pscustomobject] -and ((@($holder.PSObject.Properties.Name|Sort-Object)-join'|')-ceq'enabled|level|researched|visible_when_disabled')) "$Stage positive holder fields differ"
+    Assert-LibraryWitnessInteger $holder 'level' ($index+2) $Stage
+    foreach($flag in @('researched','enabled','visible_when_disabled')){Assert-LibraryWitnessBoolean $holder $flag $false $Stage}
+  }
+  $recipes=@('speed-module','productivity-module','efficiency-module')
+  Assert-Session ($native.module_productivity-is[pscustomobject] -and ((@($native.module_productivity.PSObject.Properties.Name|Sort-Object)-join'|')-ceq(@($recipes|Sort-Object)-join'|'))) "$Stage positive recipe identities differ"
+  for($index=0;$index-lt3;$index++){
+    $bonus=$native.module_productivity.PSObject.Properties[$recipes[$index]].Value
+    Assert-Session ($bonus-is[double] -and [Math]::Abs($bonus-(($index+1)*0.01))-lt0.000001) "$Stage positive module effect differs"
+  }
+  Assert-Session ($native.cannon_speed-is[double] -and [Math]::Abs($native.cannon_speed-0.4)-lt0.000001) "$Stage positive cannon effect differs"
 }
 function Assert-LibraryWitnessIdentityMode([bool]$StandaloneIdentityDiscovery,[object]$LibraryWitnessTarget) {
   $identityTarget=$LibraryWitnessTarget.PSObject.Properties['standalone_identity_discovery']
@@ -445,6 +482,7 @@ function Get-StageMarker([string]$Text, [string]$Stage, [int]$ExpectedJoins, [ob
   $witness = $rows[0].witnesses
   if($fixtureCase-ceq'library-multiplayer') {
     Assert-Session ($null -ne $ExpectedLibraryWitness) "$Stage Library witness target is absent"
+    Assert-LibraryPositiveWitness $witness $ExpectedLibraryWitness $Stage
     Assert-LibraryWitnessInteger $witness 'actual_join_events' $ExpectedJoins $Stage
     Assert-LibraryWitnessBoolean $witness 'two_connected_clients_required' $true $Stage
     Assert-LibraryWitnessBoolean $witness 'distinct_personal_query_and_selection' $true $Stage

@@ -1,0 +1,129 @@
+{
+  "schema": 1,
+  "kind": "MIRImportedCompletedSuccessorConfigurationCorrectionV1",
+  "status": "host-diagnosis-and-fixture-correction-not-native-continuation",
+  "implementation_commit": "fbf9cd981ca5b898ac55ba1cd8edefbf7bebe808",
+  "changed_player_members": [],
+  "corrected_fixture": {
+    "path": "tests/fixtures/migration-origins/f200-110-successor/control.lua",
+    "sha256": "CF7C05066854105C1CBDE51876268F6AE685DC52170A732EBE051C3928D75E7F",
+    "bytes": 26440
+  },
+  "original_adverse_observations": {
+    "status": "original-completed-configuration-host-refusal-preserved",
+    "source_commit": "cfbfd49cb1e73f13c41098dbe7b476eff086b078",
+    "control_sha256": "B1B947F887C90C4FF03CBA52A8A8C4E87700B5626CDB1D5B344461AA296FE3F7",
+    "rows": [
+      {
+        "ok": false,
+        "message": "...ixtures/migration-origins/f200-110-successor/control.lua:5: [mir5-migration-origin-f200-110-successor] player retained source technology differs: recipe-prod-research_gears-1 source{level=2 researched=false enabled=true visible=false maximum=4294967295 saved=0} actual{level=3 researched=false enabled=true visible=false maximum=4294967295 saved=0}",
+        "created_labs": 1,
+        "player_add_calls": 1,
+        "player_reset_calls": 1,
+        "order": [
+          "reset:player",
+          "save"
+        ],
+        "player_level": 3,
+        "player_gear": 0.2,
+        "player_module_holders": [
+          2,
+          2,
+          2
+        ],
+        "marker_counts": {
+          "after_first_reload": 2
+        },
+        "target": "f200_source_defaults"
+      },
+      {
+        "ok": false,
+        "message": "...ixtures/migration-origins/f200-110-successor/control.lua:5: [mir5-migration-origin-f200-110-successor] player retained source technology differs: recipe-prod-research_gears-1 source{level=2 researched=false enabled=true visible=false maximum=4294967295 saved=0} actual{level=3 researched=false enabled=true visible=false maximum=4294967295 saved=0}",
+        "created_labs": 1,
+        "player_add_calls": 1,
+        "player_reset_calls": 1,
+        "order": [
+          "reset:player",
+          "save"
+        ],
+        "player_level": 3,
+        "player_gear": 0.2,
+        "player_module_holders": [
+          2,
+          2,
+          2
+        ],
+        "marker_counts": {
+          "after_first_reload": 2
+        },
+        "target": "f210_source_defaults"
+      }
+    ],
+    "native_execution": false
+  },
+  "diagnosis": "The prior configuration handler always called first-upgrade begin. Its unchanged source preflight required Gear2 before checking an existing successor record,so the valid completedGear3/.2 state failed despite one actual prior lab and preserved positive module holders. Host controls reproduce this exact refusal on both target models;this is not a new native observation.",
+  "correction": "A nil target successor retains original begin. A completed successor must pass the full existing complete contract and current direct-delta assertion. Malformed maps,non-table records,incomplete/unknown phases and changed native/source state fail. The completed branch logs only;it performs no lab/add/reset/save/durable write.",
+  "host_validation": {
+    "runtime": "Explicit pinned lupa.lua52",
+    "test_file": "tests/test_migration_origins_f200_110_successor_controls.py",
+    "controls_passed": 21,
+    "new_completed_arms": [
+      "f200_source_defaults",
+      "f210_source_defaults",
+      "f210_source_defaults_modules_disabled"
+    ],
+    "unchanged_configuration_calls_per_arm": 2,
+    "changed_state_opponents_per_arm": 11,
+    "opponents": [
+      "player-level",
+      "player-effect",
+      "module-holder",
+      "module-effect",
+      "foreign-queue",
+      "detached-progress",
+      "extra-lab",
+      "incomplete",
+      "unknown-phase",
+      "delta",
+      "target-version"
+    ],
+    "expected_total_lab_add_reset_save": [
+      1,
+      1,
+      1,
+      1
+    ],
+    "retained_native_result_markers": "Original initial plus two reloads;configuration validation emits a separately named diagnostic,not another native result marker.",
+    "native_execution": false
+  },
+  "native_handoff": {
+    "owner": "Black Glass",
+    "required_outcome": "Reopen exact protected completed successors on current7b0 with corrected fixture and a separately reviewed read-only Library observer,retaining every original source/lab/credit/force/queue/effect assertion. Do not recreate valid predecessors.",
+    "prepared_command_status": "Existing private origin controller and protected inputs remain available;completed-save Library continuation/controller binding is still required before dispatch. Generic initial-result production command is not claimed compatible with a completed-save reload-only result.",
+    "protected_inputs": [
+      {
+        "target": "f200_source_defaults",
+        "sha256": "029AA881F739457047B1E8318FA9A77508B28112757176B64CD0C3C31530638C",
+        "bytes": 811812,
+        "metadata": "tests/fixtures/migration-origins/f200-110-successor/info-f200-source-defaults.json",
+        "player_sha256": "1D45A54DB6F911F665A019897518E46D6614AE7E56903B067F93E116DFC2554F"
+      },
+      {
+        "target": "f210_source_defaults",
+        "sha256": "8DCFC16FF929766D2E5CFEC4F7BC81367A9632CEB4B39558E40330FA43BD7F0C",
+        "bytes": 814068,
+        "metadata": "tests/fixtures/migration-origins/f200-110-successor/info-f210-source-defaults.json",
+        "player_sha256": "2DDD2A4C967BEF07830218442AE4441BEECD5B9ECE0AC86B09A5F6586BBA80E5"
+      }
+    ],
+    "original_source_sha256": "88FC8E9891040275E001930C3E6AA0A4A7A28C31D81DF30E3F08AEDD98E5019A",
+    "prior_native_chain": "spec/evidence/migration-origin-110-7a2-direct-native-chain-r01.json",
+    "failure_path": "Retain the exact saved inputs and failed raw observations. A changed assertion is not harmless configuration churn;diagnose product versus fixture without skipping checks,resetting state or silently rebuilding the predecessor."
+  },
+  "limits": [
+    "No current7b0 native continuation,Library imported-credit view pass or new historical route is claimed.",
+    "The separate0.4 fresh Library fixture deliberately seeds credits and must not be installed as an imported-save observer.",
+    "MIR1.2 cannon-credit and a genuinely predecessor-persisted private selection remain separate exact inputs."
+  ],
+  "release_qualification": false
+}
