@@ -209,18 +209,49 @@ local function assert_source_witness(state)
   end
 end
 
-local function assert_restored(state, independently_observed_bonus)
+local function assert_restored(state, independently_observed_bonus, expected_enabled)
   assert_source_witness(state)
+  if expected_enabled == nil then expected_enabled = true end
   local player = status(game.forces.player)
   -- The source controller captured the positive-cap presentation value after
   -- its data-stage patch. MIR5 restores that owned force presentation even
   -- though the successor prototype itself keeps the Base default.
-  assert_status(player, {level = 8, researched = false, enabled = true, visible = true,
+  assert_status(player, {level = 8, researched = false, enabled = expected_enabled, visible = true,
     maximum = UINT32_MAX, bonus = independently_observed_bonus or state.player_with_independent + 2 * MODIFIER,
     saved_progress = 0.27}, "MIR5 restored native worker")
   assert_native_owner(technology(game.forces.player, WORKER))
   assert_acceleration(technology(game.forces.player, WORKER))
   assert_foreign(game.forces[state.foreign_force_index], state.foreign_queue, state.foreign_baseline)
+  return player
+end
+
+local function assert_held_inventory(state)
+  local held = state.finite_hold_witness
+  if type(held) ~= "table" or type(held.science_units) ~= "table"
+      or state.lab == nil or state.lab.valid == false then fail("finite hold inventory witness is absent") end
+  local inventory = state.lab.get_inventory(defines.inventory.lab_input)
+  if inventory == nil then fail("finite hold lab inventory is absent") end
+  for _, item in ipairs(SCIENCE) do
+    if not close(science_units(inventory, item, "finite hold"), held.science_units[item]) then
+      fail("finite hold changed science units for " .. item)
+    end
+  end
+end
+
+local function assert_held(state)
+  local held, offset = state.finite_hold_witness, state.fixture_owned_offset
+  if state.phase ~= "finite-held" or state.destination_lab_completions ~= 0
+      or type(held) ~= "table" or held.schema ~= 1 or held.maximum ~= 7
+      or held.level ~= 8 or held.enabled ~= false or held.visible ~= true
+      or not close(held.bonus, 3.823) or not close(held.saved_progress, .27)
+      or type(offset) ~= "table" or offset.stage ~= "hold" or not close(offset.restored_total, 3.823) then
+    fail("finite hold witness changed")
+  end
+  local player = assert_restored(state, nil, false)
+  if game.forces.player.current_research ~= nil or #game.forces.player.research_queue ~= 0 then
+    fail("finite hold unexpectedly queued player research")
+  end
+  assert_held_inventory(state)
   return player
 end
 
@@ -283,9 +314,40 @@ local function marker(stage, state)
       science_elapsed_ticks = state.destination_elapsed_ticks,
       science_units_after = state.destination_science_units_after,
       fixture_owned_offset = state.fixture_owned_offset,
+      finite_hold_witness = state.finite_hold_witness,
       on_load_read_only = stage == "reload",
     },
   }))
+end
+
+local function hold_configuration(fixture_version)
+  local active = script.active_mods
+  local f200 = fixture_version == "0.5.0" and active.base == "2.0.77"
+    and active["more-infinite-research"] == "5.0.20000"
+  local f210 = fixture_version == "0.7.0" and active.base == "2.1.23"
+    and active["more-infinite-research"] == "5.0.21000"
+  if not (f200 or f210) or active[FIXTURE] ~= fixture_version or active["space-age"] ~= nil
+      or active["a-mir-fixture-worker-entry"] ~= "0.1.0"
+      or settings.startup["mir-max-level-worker-robots-speed"].value ~= 7
+      or settings.startup["mir-settings-profile-import"].value ~= "" then fail("finite hold tuple differs") end
+  local state = storage[KEY]
+  local player = assert_restored(state, nil, false)
+  if state.phase ~= "completed" or state.destination_lab_completions ~= nil
+      or type(state.fixture_owned_offset) ~= "table" or state.fixture_owned_offset.stage ~= "hold" then
+    fail("finite hold requires the original source after its explicit owned contribution")
+  end
+  local units, inventory = {}, lab(state)
+  for _, item in ipairs(SCIENCE) do units[item] = science_units(inventory, item, "first finite hold") end
+  state.finite_hold_witness = {schema=1, maximum=7, level=player.level, enabled=player.enabled,
+    visible=player.visible, bonus=player.bonus, saved_progress=player.saved_progress, science_units=units}
+  state.destination_lab_completions = 0
+  state.destination_science_accounting = {consumed_units=0, inventory_consumed_units=0, remaining_ticks=0,
+    science_type=active.base == "2.1.23" and "item" or "tool"}
+  state.destination_science_units_after = units
+  state.destination_processing_ticks, state.destination_elapsed_ticks = 0, 0
+  state.phase = "finite-held"
+  state.held_player = copy_status(assert_held(state))
+  loaded_snapshot, reload_logged = nil, false
 end
 
 local function finish_diagnostic(state, accounting)
@@ -308,9 +370,9 @@ end
 local function on_configuration_changed(_event, fixture_version)
   fixture_version = fixture_version or "0.2.0"
   local active = script.active_mods
-  local f200 = (fixture_version == "0.2.0" or fixture_version == "0.3.0")
+  local f200 = (fixture_version == "0.2.0" or fixture_version == "0.3.0" or fixture_version == "0.6.0")
     and active.base == "2.0.77" and active["more-infinite-research"] == "5.0.20000"
-  local f210 = fixture_version == "0.4.0" and active.base == "2.1.23"
+  local f210 = (fixture_version == "0.4.0" or fixture_version == "0.8.0") and active.base == "2.1.23"
     and active["more-infinite-research"] == "5.0.21000" and active["a-mir-fixture-worker-entry"] == "0.1.0"
   if not (f200 or f210) or active[FIXTURE] ~= fixture_version or active["space-age"] ~= nil then
     fail("unsupported exact native-worker successor tuple")
@@ -320,7 +382,11 @@ local function on_configuration_changed(_event, fixture_version)
     fail("successor fixture settings are not the verified native-worker cap relaxation")
   end
   local state = storage[KEY]
+  if (fixture_version == "0.6.0" or fixture_version == "0.8.0")
+      and (state.phase ~= "finite-held" or type(state.fixture_owned_offset) ~= "table"
+        or state.fixture_owned_offset.stage ~= "relax") then fail("finite relaxation requires its exact held save") end
   assert_restored(state) -- Required before this fixture queues any successor lab work.
+  loaded_snapshot, reload_logged = nil, false
   local inventory = lab(state)
   local before_units = {}
   for _, item in ipairs(SCIENCE) do
@@ -371,7 +437,11 @@ end)
 
 script.on_load(function()
   local state = storage[KEY]
-  if type(state) == "table" and state.phase == "completed" and type(state.successor_player) == "table" then
+  if type(state) == "table" and state.phase == "finite-held" and type(state.held_player) == "table" then
+    loaded_snapshot = {player=copy_status(state.held_player), foreign=copy_queue(state.foreign_queue),
+      source=state.actual_lab_completions, destination=state.destination_lab_completions,
+      foreign_baseline=state.foreign_baseline}
+  elseif type(state) == "table" and state.phase == "completed" and type(state.successor_player) == "table" then
     loaded_snapshot = {player = copy_status(state.successor_player), foreign = copy_queue(state.foreign_queue),
       source = state.actual_lab_completions, destination = state.destination_lab_completions,
       foreign_baseline = state.foreign_baseline}
@@ -384,6 +454,21 @@ end)
 script.on_event(defines.events.on_tick, function()
   local state = storage[KEY]
   if type(state) ~= "table" then fail("successor native worker fixture storage is absent") end
+  if state.phase == "finite-held" then
+    local player = assert_held(state)
+    if loaded_snapshot and not reload_logged then
+      assert_status(player, loaded_snapshot.player, "finite hold cold reload")
+      if state.actual_lab_completions ~= loaded_snapshot.source
+          or state.destination_lab_completions ~= loaded_snapshot.destination then fail("finite hold changed lab counts") end
+      marker("reload", state)
+      reload_logged = true
+    elseif not loaded_snapshot and not reload_logged then
+      marker("initial", state)
+      game.server_save(SAVE)
+      reload_logged = true
+    end
+    return
+  end
   if state.phase == "completed" then
     if loaded_snapshot and not reload_logged then
       local player = assert_completed(state)
@@ -411,4 +496,5 @@ script.on_event(defines.events.on_tick, function()
   end
 end)
 
-return {configuration_changed=on_configuration_changed, assert_restored=assert_restored}
+return {configuration_changed=on_configuration_changed, assert_restored=assert_restored,
+  hold_configuration=hold_configuration, assert_held_inventory=assert_held_inventory}
