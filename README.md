@@ -93,7 +93,9 @@ For MIR 3 saves, follow [Upgrading from MIR 3 to MIR 4](https://github.com/Jules
 
 ## Research Library
 
-Modern editions provide the MIR shortcut and `/mir-research` browser. Research supports personal search, sorting, filters and hiding; Queue shows native research work; Settings presents effective values and export; Help explains use and availability. Personal views do not change force research. Queue actions use Factorio's native behavior, while startup-profile imports take effect through the normal restart/configuration lifecycle.
+Modern editions provide the MIR shortcut and `/mir-research` browser. Research supports personal search, sorting, filters and hiding; Queue shows native research work; Settings presents effective values and export; Debug explains use and availability. Personal views do not change force research. Queue actions use Factorio's native behavior, while startup-profile imports take effect through the normal restart/configuration lifecycle.
+
+For reproducible reports, use **Export Settings** for the full selectable MIRSET1 string and settings file, or **Export Diagnostics** in Debug for the latest bounded MIR snapshot. Attach `factorio-current.log` separately for complete startup/session failures. Exports are local and do not apply settings or change research; review usernames and paths before sharing. The [diagnostic guide](docs/support.md#safe-diagnosis) explains compact profiles, validation, file locations and the engine-log boundary.
 
 The candidate [MIR API and Lua SDK](docs/api.md) serve extensions and companions. Data-stage helpers publish checked declarations immediately; runtime queries return detached state. Use the documented version/capability subset and timing; do not import private implementation modules or assume every native prototype field is accepted.
 
