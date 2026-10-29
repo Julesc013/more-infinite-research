@@ -2157,6 +2157,70 @@ class LibraryTests(unittest.TestCase):
         self.assertIn("on_gui_selected_tab_changed", bootstrap)
 
 
+    def test_support_exports_are_owned_local_and_inactive_on_research_views(self):
+        def decode(text):
+            try:
+                value = json.loads(text)
+            except (ValueError, TypeError):
+                return None
+            return self.lua.table_from(value, recursive=True)
+
+        self.lua.globals().decode_export_json = decode
+        self.lua.execute('''
+          writes, messages = {}, {}
+          helpers={game_version="2.1.23",json_to_table=decode_export_json,
+            encode_string=function(text) return text end,decode_string=function(text) return text end,
+            write_file=function(path,data,append,index)
+              writes[#writes+1]={path=path,data=data,append=append,index=index}
+            end}
+          boot()
+          player.name="Alice"
+          player.print=function(message) messages[#messages+1]=message end
+          script={active_mods={base="2.1.23",["more-infinite-research"]="5.0.21000"}}
+          local before_level,before_enabled,before_progress=gear.level,gear.enabled,player.force.research_progress
+          local root=library.open(player,{tab="research"})
+          library.open(player,{tab="research"})
+          assert(#writes==0)
+          library.open(player,{tab="settings"})
+          local content=root.mir_library_tabs.mir_library_settings_content
+          local toolbar=content.mir_library_settings_toolbar
+          local full=toolbar.mir_library_export_settings
+          assert(full and toolbar.mir_library_export_compact and #writes==0)
+          library.on_gui_click({player_index=2,element=full})
+          assert(#writes==0)
+          library.on_gui_click({player_index=1,element=full})
+          assert(#writes==1 and writes[1].index==1 and writes[1].append==false)
+          local preview=content.mir_library_export_profile
+          assert(preview.read_only and preview.text .. "\\n"==writes[1].data)
+          library.on_gui_click({player_index=1,element=toolbar.mir_library_export_compact})
+          assert(#writes==2 and not preview.valid)
+          assert(content.mir_library_export_profile.text .. "\\n"==writes[2].data)
+          local compact_preview=content.mir_library_export_profile
+          local writer=helpers.write_file
+          helpers.write_file=function() error("disk denied") end
+          library.on_gui_click({player_index=1,element=full})
+          assert(#writes==2 and not compact_preview.valid and content.mir_library_export_profile==nil)
+          assert(messages[#messages]:find("export failed",1,true))
+          helpers.write_file=writer
+          local foreign_screen=gui_container(nil)
+          local foreign_root=foreign_screen.add({name="mir_research_browser",tags={}})
+          local tabs=foreign_root.add({name="mir_library_tabs"})
+          local settings_tab=tabs.add({name="mir_library_settings_content"})
+          local foreign_toolbar=settings_tab.add({name="mir_library_settings_toolbar"})
+          library.on_gui_click({player_index=1,element=foreign_toolbar.add({name="mir_library_export_settings"})})
+          assert(#writes==2)
+          library.open(player,{tab="help"})
+          local help=root.mir_library_tabs.mir_library_help_content
+          library.on_gui_click({player_index=1,element=help.mir_library_export_diagnostics})
+          assert(#writes==4 and writes[3].index==1 and writes[4].index==1)
+          assert(writes[4].path=="more-infinite-research/mir.log")
+          assert(gear.level==before_level and gear.enabled==before_enabled and player.force.research_progress==before_progress)
+          library.close(player)
+          library.on_gui_click({player_index=1,element=full})
+          assert(#writes==4)
+        ''')
+
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--lua-runtime-dir", type=Path, required=True)

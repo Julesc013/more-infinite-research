@@ -76,7 +76,7 @@ class SettingsCommandsTests(unittest.TestCase):
         self.assertEqual(profile["metadata"]["exported_by"], "server")
         # The shipped canonical codec serializes an empty table as [].
         self.assertEqual(profile["settings"], [])
-        self.assertIsNone(row["player_index"])
+        self.assertEqual(row["player_index"], 0)
         self.assertIn("[more-infinite-research]", self.lua.globals().messages[1])
 
     def test_non_compact_name_and_old_file_api_fallback(self):
@@ -114,6 +114,80 @@ class SettingsCommandsTests(unittest.TestCase):
         self.lua.globals().commands.validate(self.lua.table_from({"player_index": 1, "parameter": "bad"}))
         self.assertIn("Invalid MIR settings profile", self.lua.globals().messages[2])
         self.assertIsNone(self.lua.globals().writes[1])
+
+    def test_export_returns_the_same_string_and_catches_write_failure(self):
+        self.lua.execute('''
+          settings.startup["ips-enable-research_gears"].value=false
+          settings.startup["ips-max-level-research_gears"].value=0
+          local encoded, filename=commands.export({player_index=1})
+          assert(writes[1].data == encoded .. "\\n" and writes[1].path == filename)
+          local decoded=require("research.settings_profile").decode(encoded,helpers)
+          assert(decoded.settings["ips-enable-research_gears"] == false)
+          assert(decoded.settings["ips-max-level-research_gears"] == 0)
+          local compact=commands.export({player_index=1,parameter="--compact"})
+          assert(require("research.settings_profile").decode(compact,helpers).settings["ips-enable-research_gears"] == false)
+          helpers.write_file=function() error("disk denied") end
+          local failed, reason=commands.export({player_index=1})
+          assert(failed == nil and reason:find("disk denied",1,true))
+          assert(messages[#messages]:find("export failed",1,true))
+          assert(settings.startup["ips-enable-research_gears"].value == false)
+        ''')
+
+    def test_diagnostics_are_bounded_local_overwrites_with_exact_false_state(self):
+        self.lua.execute('''
+          player.index=1
+          local original={name="fixture-research",level=2,researched=false,enabled=false,visible_when_disabled=false}
+          local technology=setmetatable({},{__index=original,__newindex=function() error("native mutation") end})
+          player.force={name="fixture-force",index=7,technologies={[original.name]=technology},
+            current_research=technology,research_progress=.42,research_queue={technology},manual_mining_speed_modifier=0}
+          local before=settings.startup["ips-cost-base-research_gears"].value
+          local diagnostics=require("runtime.diagnostics")
+          for i=2,40 do player.force.research_queue[i]=technology end
+          local encoded=diagnostics.export(1,original.name)
+          assert(encoded and #writes==2)
+          assert(writes[1].player_index==1 and writes[2].player_index==1)
+          assert(writes[2].path=="more-infinite-research/mir.log" and writes[2].append==false)
+          assert(writes[2].data:find("Selected researched: false",1,true))
+          assert(writes[2].data:find("Native total manual_mining_speed_modifier: 0",1,true))
+          assert(writes[2].data:find("factorio-current.log separately",1,true))
+          assert(writes[2].data:find("remaining entries omitted after 32",1,true))
+          assert(#player.force.research_queue==40)
+          assert(writes[1].data==encoded .. "\\n")
+          if #encoded<=32768 then assert(writes[2].data:find(encoded,1,true))
+          else assert(writes[2].data:find("omitted here",1,true)) end
+          diagnostics.startup("configuration")
+          assert(#writes==3 and writes[3].player_index==0 and writes[3].append==false)
+          assert(not writes[3].data:find("MIRSET1 profile:",1,true))
+          for i=1,512 do script.active_mods[string.rep("m",170)..i]="1.2.3" end
+          diagnostics.startup("initialization")
+          assert(#writes[4].data<=65536 and writes[4].data:find("list omitted",1,true))
+          script.active_mods={}
+          for i=1,512 do script.active_mods[string.rep("m",170)..i]=string.rep("1",60) end
+          diagnostics.startup("initialization")
+          assert(#writes[5].data<=65536 and writes[5].data:find("Report truncated",1,true))
+          assert(settings.startup["ips-cost-base-research_gears"].value==before)
+          diagnostics.export(nil)
+          assert(writes[6].player_index==0 and writes[7].player_index==0)
+          local bob={name="Bob",force=player.force,print=player.print}
+          game.get_player=function(index) return index==1 and player or index==2 and bob end
+          diagnostics.export(2,original.name)
+          assert(writes[8].player_index==2 and writes[9].player_index==2)
+          assert(writes[8].data:find('"exported_by":"Bob"',1,true))
+        ''')
+
+    def test_diagnostics_report_failure_retains_full_settings_without_native_writes(self):
+        self.lua.execute('''
+          local diagnostics=require("runtime.diagnostics")
+          local old=helpers.write_file
+          helpers.write_file=function(path,...)
+            if path==diagnostics.filename then error("report denied") end
+            return old(path,...)
+          end
+          local encoded, err=diagnostics.export(1)
+          assert(encoded==nil and err:find("report denied",1,true))
+          assert(#writes==1 and writes[1].path:find("mir-settings-profile.txt",1,true))
+          assert(messages[#messages]:find("diagnostics export failed",1,true))
+        ''')
 
 
 if __name__ == "__main__":

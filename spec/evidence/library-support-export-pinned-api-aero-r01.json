@@ -1,0 +1,99 @@
+{
+  "schema": 1,
+  "kind": "MIRSupportExportPinnedHelpersReadbackV1",
+  "status": "exact-documentation-and-focused-host-checks-not-native-export-acceptance",
+  "observations": [
+    {
+      "engine_version": "2.0.77",
+      "api_file_bytes": 1878804,
+      "api_file_sha256": "594B4EC98CC5FBEE322D7380DB49A388AB38B0D69C06F00EAD877CFFBB37F578",
+      "source": "Pinned official2.0.77 API JSON retained in primary custody",
+      "method": "LuaHelpers.write_file",
+      "parameters": [
+        {
+          "name": "append",
+          "type": "boolean",
+          "optional": true
+        },
+        {
+          "name": "data",
+          "type": "LocalisedString",
+          "optional": false
+        },
+        {
+          "name": "filename",
+          "type": "string",
+          "optional": false
+        },
+        {
+          "name": "for_player",
+          "type": "uint32",
+          "optional": true
+        }
+      ],
+      "overwrite_append_false": true,
+      "server_only_for_player_zero": true,
+      "nonzero_player_targets_only_that_peer": true,
+      "for_player_invalid_in_settings_and_prototype": true,
+      "nonzero_target_skipped_in_runtime_main_chunk": false
+    },
+    {
+      "engine_version": "2.1.23",
+      "api_file_bytes": 2132310,
+      "api_file_sha256": "7660B692F1C199682DE4318250DE81B07B38266A935D1C37859DCB6A70E1D373",
+      "source": "Read-only installed Steam2.1.23 doc-html/runtime-api.json on Aero;no depot mutation",
+      "method": "LuaHelpers.write_file",
+      "parameters": [
+        {
+          "name": "append",
+          "type": "boolean",
+          "optional": true
+        },
+        {
+          "name": "data",
+          "type": "LocalisedString",
+          "optional": false
+        },
+        {
+          "name": "filename",
+          "type": "string",
+          "optional": false
+        },
+        {
+          "name": "for_player",
+          "type": "uint32",
+          "optional": true
+        }
+      ],
+      "overwrite_append_false": true,
+      "server_only_for_player_zero": true,
+      "nonzero_player_targets_only_that_peer": true,
+      "for_player_invalid_in_settings_and_prototype": true,
+      "nonzero_target_skipped_in_runtime_main_chunk": true
+    }
+  ],
+  "implementation_boundary": [
+    "Use the existing MIRSET1 settings exporter and one caught overwrite writer;server-console target is explicitly0.",
+    "Only existing init/configuration callbacks write automatic bounded headers;never on_load,translation maintenance,research events or prototype stages.",
+    "Manual Library/console exports target the requesting player orserver and never apply profiles or change research.",
+    "Diagnostics cannot read engine logs;bounded latest report is distinct from factorio-current.log."
+  ],
+  "host_validation": {
+    "settings_commands_and_diagnostics": 8,
+    "library": 59,
+    "bootstrap": 21,
+    "locale": 6,
+    "runtime": "Pinned Lua52 via build/tmp/mir421-lua-runtime",
+    "actual_desktop_or_factorio": false,
+    "changelog": 6,
+    "package": 17,
+    "package_membership": 5
+  },
+  "required_native": [
+    "Real F2002.0.77 andF2102.1.23 EN/DE clients:owned Settings/Compact/Diagnostics actions,one canonical full/compact string/file roundtrip,false/zero fields,per-player file targeting and no settings/native-state mutation.",
+    "Server-console output targets0;initialization/configuration header is bounded,ordinary load remains read-only,and write failure has explicit feedback.",
+    "Review changed parse/bootstrap/settings/help paths against retained measurements;keep each running experiment on its original frozen package."
+  ],
+  "performance_acceptance": false,
+  "release_qualification": false
+}

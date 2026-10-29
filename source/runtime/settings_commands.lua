@@ -31,6 +31,20 @@ local function export_options(parameter)
   return compact, "more-infinite-research/settings/" .. text
 end
 
+-- One file-output path for explicit exports and the bounded startup report.
+-- A missing player means the server, not every peer in a multiplayer game.
+function M.write_export_file(filename, data, player_index)
+  local write_file = helpers and helpers.write_file
+  if type(write_file) ~= "function" then
+    local ok, older = pcall(function() return game and game.write_file end)
+    if ok then write_file = older end
+  end
+  if type(write_file) ~= "function" then return nil, "file export API is not available" end
+  local ok, err = pcall(write_file, filename, data, false, player_index or 0)
+  if not ok then return nil, tostring(err) end
+  return true
+end
+
 function M.export(command)
   command = command or {}
   local compact, filename = export_options(command.parameter)
@@ -50,21 +64,15 @@ function M.export(command)
   })
   local encoded, err = codec.encode(profile, helpers)
   if not encoded then reply(command, "MIR settings export failed: " .. tostring(err)); return end
-  if helpers and helpers.write_file then
-    helpers.write_file(filename, encoded .. "\n", false, command.player_index)
-  else
-    -- Older supported engines expose this on game. Newer LuaObjects can
-    -- throw on unknown members, so a missing compatibility API is a reply.
-    local ok, write_file = pcall(function() return game and game.write_file end)
-    if not ok or type(write_file) ~= "function" then
-      reply(command, "MIR settings export failed: file export API is not available.")
-      return
-    end
-    write_file(filename, encoded .. "\n", false, command.player_index)
+  local written, write_error = M.write_export_file(filename, encoded .. "\n", command.player_index)
+  if not written then
+    reply(command, "MIR settings export failed: " .. tostring(write_error) .. ".")
+    return nil, write_error
   end
   reply(command, "MIR settings profile exported to script-output/" .. filename
     .. " (" .. tostring(codec.count_settings(profile)) .. " settings, "
     .. (compact and "compact" or "full") .. ").")
+  return encoded, filename
 end
 
 function M.validate(command)
