@@ -1,0 +1,45 @@
+{
+  "schema": 1,
+  "kind": "mir5-library-paired-browser-f200-native-selection",
+  "target": "f200",
+  "factorio_line": "2.0",
+  "engine": {
+    "version": "2.0.77",
+    "sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B"
+  },
+  "settings_mode": "Defaults",
+  "mods": [
+    {
+      "name": "base",
+      "version": "2.0.77",
+      "enabled": true
+    },
+    {
+      "name": "mir-fixture-mir5-active-mods-observer",
+      "version": "0.1.0",
+      "enabled": true
+    },
+    {
+      "name": "more-infinite-research",
+      "version": "5.0.20000",
+      "enabled": true
+    },
+    {
+      "name": "mir-fixture-mir5-library-paired-browser",
+      "version": "0.1.0",
+      "enabled": true
+    },
+    {
+      "name": "mir-fixture-mir5-library-paired-browser-arm-mir5",
+      "version": "0.1.0",
+      "enabled": true
+    }
+  ],
+  "archive_sha256": {
+    "more-infinite-research_5.0.20000.zip": "1D45A54DB6F911F665A019897518E46D6614AE7E56903B067F93E116DFC2554F",
+    "mir-fixture-mir5-active-mods-observer_0.1.0.zip": "723D1E7721449FC26040E5E6629416767BDC20AD79CF8723115846DB662A1F87",
+    "mir-fixture-mir5-library-paired-browser_0.1.0.zip": "8B96DE18F1B93DE256CABA4386731A08EF50112D28BEFD5D27440B4233076A07",
+    "mir-fixture-mir5-library-paired-browser-arm-mir5_0.1.0.zip": "86404548A3A72C993B1EAAFA8E27F6CAABC6D562128F1AFFEC570CEE002AD236"
+  },
+  "scope": "Exactly one unscored matched F200 retained-refresh preflight arm on fixed424242,actual All scope,original render grace and opt-in owned OS counters. Explicit fixture-only retained flag selects600/960/600tick windows and32refreshes perclient. Preserve original diagnostics;no comparison,repeatability or performance/release verdict."
+}

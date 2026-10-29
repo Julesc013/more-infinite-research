@@ -64,7 +64,7 @@ class LibraryPairedBrowserFixtureTests(unittest.TestCase):
         self.lua.globals().mir5_selector = (ARMS["mir5"]["selector"] / "settings-updates.lua").as_posix()
         self.lua.execute(r'''
           function paired_browser_setting(settings_path, selector_path, omit_setting)
-            local raw = { ["string-setting"] = {} }
+            local raw = { ["string-setting"] = {}, ["bool-setting"] = {} }
             local data = {raw = raw}
             function data:extend(rows)
               for _, row in ipairs(rows) do raw[row.type][row.name] = row end
@@ -230,6 +230,13 @@ class LibraryPairedBrowserFixtureTests(unittest.TestCase):
                 end
               end
             }
+            local retained_probe = opponent ~= nil and string.find(opponent, "retained-", 1, true) == 1
+            if retained_probe then
+              env.settings.startup["mir5-library-paired-browser-retained-refresh"] = {value=true}
+            end
+            if opponent == "retained-invalid-setting" then
+              env.settings.startup["mir5-library-paired-browser-retained-refresh"].value = "true"
+            end
             env.remote.call=function(interface, method, player_index, options)
               if interface ~= "more-infinite-research-browser" or method ~= "open" then error("unexpected public interface call") end
               local player = players[player_index]
@@ -419,6 +426,21 @@ class LibraryPairedBrowserFixtureTests(unittest.TestCase):
               ok,message=invoke(callbacks.events[2],{tick=tick})
               if not ok then return {ok=false,message=message,markers=markers,calls=calls} end
             end
+            if retained_probe then
+              for step=1,40 do
+                if durable.phase == "completed" then break end
+                if opponent == "retained-native-mutation" and durable.refresh_iterations == 7 then
+                  force.recipes["iron-gear-wheel"].productivity_bonus=.1
+                end
+                if opponent == "retained-lost-final-view" and durable.phase == "retained-after" then
+                  en.gui.screen["mir_research_browser"]=nil
+                end
+                env.game.tick=durable.capture_after_tick
+                ok,message=invoke(callbacks.events[2],{tick=env.game.tick})
+                if not ok then return {ok=false,message=message,markers=markers,calls=calls} end
+              end
+              if durable.phase ~= "completed" then return {ok=false,message="retained fixture did not terminate"} end
+            end
             return {
               ok=ok,message=message,markers=markers,profiler_labels=profiler_labels,screenshots=screenshots,
               saves=saves,save_ticks=save_ticks,calls=calls,joins=joins,load_writes=load_writes,readiness=readiness,action_ticks=action_ticks,restart_wait=restart_wait,restart_first_event=restart_first_event,
@@ -495,6 +517,48 @@ class LibraryPairedBrowserFixtureTests(unittest.TestCase):
         missing = self.setting_result("published", omit_setting=True)
         self.assertFalse(missing["ok"])
         self.assertIn("selector is absent", missing["message"])
+
+    def test_retained_refresh_is_explicitly_opted_in_and_uses_only_fixture_settings(self):
+        for arm in ARMS:
+            with self.subTest(arm=arm):
+                ordinary = self.setting_result(arm)
+                setting = ordinary["raw"]["bool-setting"]["mir5-library-paired-browser-retained-refresh"]
+                self.assertFalse(setting["default_value"])
+                selected = self.lua.globals().paired_browser_setting(
+                    SETTINGS.as_posix(), (ARMS[arm]["selector"] / "settings-updates-retained.lua").as_posix(), False)
+                self.assertTrue(selected["ok"], selected["message"])
+                self.assertTrue(selected["raw"]["bool-setting"]["mir5-library-paired-browser-retained-refresh"]["default_value"])
+                self.assertEqual(selected["raw"]["string-setting"]["mir5-library-paired-browser-arm"]["default_value"], arm)
+
+    def test_retained_refresh_has_exact_windows_32_iterations_and_unchanged_native_state(self):
+        for arm in ARMS:
+            with self.subTest(arm=arm):
+                result = self.runtime_result(arm, "retained-refresh")
+                self.assertTrue(result["ok"], result["message"])
+                markers = [row for row in result["markers"] if row.get("window_ticks") is not None]
+                self.assertEqual([row["stage"] for row in markers],
+                                 ["baseline-start", "baseline-end", "post-refresh-start", "post-refresh-end"])
+                self.assertEqual([row["refresh_iterations"] for row in markers], [0, 0, 32, 32])
+                ticks = [row["tick"] for row in markers]
+                self.assertEqual([ticks[1]-ticks[0], ticks[2]-ticks[1], ticks[3]-ticks[2]], [600, 960, 600])
+                self.assertEqual(len(result["calls"]), 72)
+                self.assertEqual(len(result["screenshots"]), 12)
+                self.assertEqual(result["profiler_labels"], ["first_open", "search", "refresh", "reopen"])
+                self.assertEqual(result["save_ticks"]["mir5-native-complete"], ticks[-1])
+                self.assertTrue(all(row["native_snapshot_unchanged"] for row in markers))
+                self.assertEqual(result["load_writes"], 0)
+
+    def test_retained_refresh_rejects_bad_setting_native_mutation_and_lost_final_view(self):
+        for arm in ARMS:
+            for opponent, reason in [
+                ("retained-invalid-setting", "not Boolean"),
+                ("retained-native-mutation", "mutated named native research"),
+                ("retained-lost-final-view", "root is absent or hidden"),
+            ]:
+                with self.subTest(arm=arm, opponent=opponent):
+                    result = self.runtime_result(arm, opponent)
+                    self.assertFalse(result["ok"])
+                    self.assertIn(reason, result["message"])
 
     def test_fixed_map_seed_is_observed_on_creation_initial_host_and_cold_restart(self):
         for arm in ARMS:
