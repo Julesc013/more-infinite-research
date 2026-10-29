@@ -100,9 +100,9 @@
   },
   "receipt_capsule": {
     "path": "spec/evidence/whole-product-heavy-space-age-f210-menu-adverse-receipts-r04.json.gz",
-    "sha256": "8F4D483ED8E9103A5E644F1D67364ADBF0F4E0254C0843213AA8BE1110F5FC8B",
-    "bytes": 1231343,
-    "bodies": 207
+    "sha256": "00DCC7256FFAC0726E7ADCE3EC5C6A4CB4AE177121FA62A89938A67E66445E86",
+    "bytes": 1234815,
+    "bodies": 208
   },
   "omitted_binary_or_player_data_members": [
     {
@@ -498,5 +498,10 @@
     "No runtime,gameplay,API-stability or release qualification follows."
   ],
   "performance_acceptance": false,
-  "release_qualification": false
+  "release_qualification": false,
+  "focused_controls_receipt": {
+    "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\whole-product-heavy-space-age-f210-menu-r04-controller\\focused-controls-r01\\receipt.json",
+    "bytes": 11072,
+    "sha256": "5E0F6BE9F96261D4060A8B3297730049732A4B8C78A2C70DEC8D721C28958CFB"
+  }
 }
