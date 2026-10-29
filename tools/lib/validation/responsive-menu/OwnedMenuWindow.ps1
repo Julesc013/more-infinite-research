@@ -195,6 +195,23 @@ function Get-MIROwnedMenuWindow {
   [pscustomobject]@{process_id=$Process.Id;start_utc=$ExpectedStartUtc.ToString('o');handle=$handle.ToInt64();x=$point.X;y=$point.Y;width=$width;height=$height}
 }
 
+function Save-MIROwnedMenuBitmapPng {
+  param([Parameter(Mandatory)][Drawing.Bitmap]$Bitmap,[Parameter(Mandatory)][string]$Path)
+  # The observer reuses this path on every capture.  Saving through an explicit
+  # Create stream prevents bytes from an earlier, longer PNG surviving after
+  # the new image's IEND chunk.
+  $stream=$null
+  $fullPath=[IO.Path]::GetFullPath($Path)
+  try {
+    $stream=[IO.File]::Open($fullPath,[IO.FileMode]::Create,[IO.FileAccess]::Write,[IO.FileShare]::None)
+    $Bitmap.Save($stream,[Drawing.Imaging.ImageFormat]::Png)
+    $stream.Flush($true)
+  } finally {
+    if($null-ne$stream){$stream.Dispose()}
+  }
+  return $fullPath
+}
+
 function Save-MIROwnedMenuCapture {
   param([Parameter(Mandatory)][Diagnostics.Process]$Process,[Parameter(Mandatory)][datetime]$ExpectedStartUtc,[Parameter(Mandatory)][string]$Path,[AllowNull()][Collections.IDictionary]$Diagnostics=$null)
   if ($null-ne$Diagnostics) { $Diagnostics.capture_requests=[int]$Diagnostics.capture_requests+1 }
@@ -213,9 +230,9 @@ function Save-MIROwnedMenuCapture {
     } finally { $graphics.ReleaseHdc($dc) }
     $after = Get-MIROwnedMenuWindow -Process $Process -ExpectedStartUtc $ExpectedStartUtc -Diagnostics $Diagnostics
     if ($null -eq $after -or ($before | ConvertTo-Json -Compress) -cne ($after | ConvertTo-Json -Compress)) { return $null }
-    $bitmap.Save([IO.Path]::GetFullPath($Path),[Drawing.Imaging.ImageFormat]::Png)
+    $capturedPath=Save-MIROwnedMenuBitmapPng -Bitmap $bitmap -Path $Path
     if ($null-ne$Diagnostics) { $Diagnostics.captured_frames=[int]$Diagnostics.captured_frames+1 }
-    [pscustomobject]@{window=$after;method='owned-hwnd-printwindow-client';capture_started_qpc=$startQpc;capture_completed_qpc=[Diagnostics.Stopwatch]::GetTimestamp();path=[IO.Path]::GetFullPath($Path)}
+    [pscustomobject]@{window=$after;method='owned-hwnd-printwindow-client';capture_started_qpc=$startQpc;capture_completed_qpc=[Diagnostics.Stopwatch]::GetTimestamp();path=$capturedPath}
   } finally { $graphics.Dispose(); $bitmap.Dispose() }
 }
 
