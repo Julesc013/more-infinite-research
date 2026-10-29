@@ -1,0 +1,228 @@
+{
+  "schema": 1,
+  "kind": "mir5-foundation-available-space-age-f200-activity-diagnostic-selection",
+  "target": "f200",
+  "factorio_line": "2.0",
+  "engine": {
+    "version": "2.0.77",
+    "sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B"
+  },
+  "settings_mode": "Defaults",
+  "mods": [
+    {
+      "name": "base",
+      "version": "2.0.77",
+      "enabled": true
+    },
+    {
+      "name": "elevated-rails",
+      "version": "2.0.77",
+      "enabled": true
+    },
+    {
+      "name": "quality",
+      "version": "2.0.77",
+      "enabled": true
+    },
+    {
+      "name": "space-age",
+      "version": "2.0.77",
+      "enabled": true
+    },
+    {
+      "name": "OilOutpostPlanner",
+      "version": "1.6.10",
+      "enabled": true
+    },
+    {
+      "name": "squeak-through-2",
+      "version": "0.1.5",
+      "enabled": true
+    },
+    {
+      "name": "VehicleSnap",
+      "version": "2.0.3",
+      "enabled": true
+    },
+    {
+      "name": "YARM",
+      "version": "1.0.5",
+      "enabled": true
+    },
+    {
+      "name": "Bottleneck",
+      "version": "0.12.1",
+      "enabled": true
+    },
+    {
+      "name": "Brighter-Lamps",
+      "version": "2.0.0",
+      "enabled": true
+    },
+    {
+      "name": "bullet-trails",
+      "version": "0.7.1",
+      "enabled": true
+    },
+    {
+      "name": "car-finder",
+      "version": "2.0.0",
+      "enabled": true
+    },
+    {
+      "name": "electric_pole_free_light",
+      "version": "0.0.3",
+      "enabled": true
+    },
+    {
+      "name": "even-distribution",
+      "version": "2.0.2",
+      "enabled": true
+    },
+    {
+      "name": "far-reach",
+      "version": "2.0.2",
+      "enabled": true
+    },
+    {
+      "name": "flib",
+      "version": "0.16.5",
+      "enabled": true
+    },
+    {
+      "name": "fluid_permutations_fixed",
+      "version": "0.6.0",
+      "enabled": true
+    },
+    {
+      "name": "Honk",
+      "version": "5.1.1",
+      "enabled": true
+    },
+    {
+      "name": "inventory-repair",
+      "version": "20.0.3",
+      "enabled": true
+    },
+    {
+      "name": "Kux-CoreLib",
+      "version": "3.17.8",
+      "enabled": true
+    },
+    {
+      "name": "light-overhaul",
+      "version": "0.2.2",
+      "enabled": true
+    },
+    {
+      "name": "lightorio",
+      "version": "2.0.1",
+      "enabled": true
+    },
+    {
+      "name": "MaxRateCalculator",
+      "version": "200.0.53",
+      "enabled": true
+    },
+    {
+      "name": "mining-patch-planner",
+      "version": "1.7.19",
+      "enabled": true
+    },
+    {
+      "name": "Shortcuts-ick",
+      "version": "2.0.7",
+      "enabled": true
+    },
+    {
+      "name": "stdlib2",
+      "version": "2.0.1",
+      "enabled": true
+    },
+    {
+      "name": "tree_collision",
+      "version": "2.0.0",
+      "enabled": true
+    },
+    {
+      "name": "factoryplanner",
+      "version": "2.0.50",
+      "enabled": true
+    },
+    {
+      "name": "Kux-ZoomRunning",
+      "version": "3.3.2",
+      "enabled": true
+    },
+    {
+      "name": "Milestones",
+      "version": "1.4.7",
+      "enabled": true
+    },
+    {
+      "name": "ModuleInserterEx",
+      "version": "7.4.1",
+      "enabled": true
+    },
+    {
+      "name": "RateCalculator",
+      "version": "3.3.8",
+      "enabled": true
+    },
+    {
+      "name": "EditorExtensions",
+      "version": "2.5.2",
+      "enabled": true
+    },
+    {
+      "name": "FactorySearch",
+      "version": "1.14.3",
+      "enabled": true
+    },
+    {
+      "name": "GUI_Unifyer",
+      "version": "2.0.1",
+      "enabled": true
+    },
+    {
+      "name": "mir-fixture-mir5-large-factory-activity",
+      "version": "0.1.0",
+      "enabled": true
+    }
+  ],
+  "archive_sha256": {
+    "OilOutpostPlanner_1.6.10.zip": "AA6C39E2008F0D854C9348682E9E3CC195BD239710BA97CDC8EA5A9DEB038300",
+    "squeak-through-2_0.1.5.zip": "7AD0FC4D6F329C79F70029D5A493448FFD71323ABB45C6AB87AF2449543BBD63",
+    "VehicleSnap_2.0.3.zip": "D5284048CF946FE5B46E5F97F8BA73064951C9DAD9C5C4603F826B0C082A6CD1",
+    "YARM_1.0.5.zip": "FE600AA76891BC5DD3C1BB8D17BB07719475EFEE824803ADF504E6BAC3EB96E0",
+    "Bottleneck_0.12.1.zip": "F2CBB713758D575976A62D787ABF418A635A849E23660E94967221543CB64BD7",
+    "Brighter-Lamps_2.0.0.zip": "DFF5861BBEAF703EF2AD7CB9F53E50A363A23A1A3C2C08E57C50AB3D6291F8A6",
+    "bullet-trails_0.7.1.zip": "8A47762422DD2C6EB183D65A23BC82E4FCB85AE3CA6DAE76211F50960F5E2C02",
+    "car-finder_2.0.0.zip": "6EB93EFF3ECFA0B976E4A464D23BF02EE3963F51B6F976B599FB3BB7A547FB02",
+    "electric_pole_free_light_0.0.3.zip": "3F1632D295BB6145DE116F6BE2BC62988F050E4A99DABEE7468F0B84B4B3C974",
+    "even-distribution_2.0.2.zip": "4343A01DBECCAFB1F879C8665918A5DE24553E4F74E13371AE17E19930C5064B",
+    "far-reach_2.0.2.zip": "927A813B607EB151B705AF5DDE490DC7937C8CEEAA78C11A03785BA88E3C83B8",
+    "flib_0.16.5.zip": "8FC5073D374A149620333777D959D2C204AB0AF0C59669BE94C5CAB7DE978627",
+    "fluid_permutations_fixed_0.6.0.zip": "B5C76E62041175E16B8D4BF31E8A04ADE958C201156EDD3DB07E6DE61074C25C",
+    "Honk_5.1.1.zip": "39766C918B9E9E64D0E493B6D2B1682B26F32CB5368DBE099F0E4544EA57708D",
+    "inventory-repair_20.0.3.zip": "5EEF301DAB76009242AAB1C6EAD3D55748C42E3F44F89D4EC8C58AC4410C762E",
+    "Kux-CoreLib_3.17.8.zip": "415C488610A5B1AA95F92D9E926527C78D4BE51ADB73834DD273EDECBF7EAC4D",
+    "light-overhaul_0.2.2.zip": "4A47A2093C6C646678C41E60E11DC03C3A86B9AB1FEE02361559D66CC0C3AAB4",
+    "lightorio_2.0.1.zip": "930E436AD35FED3CFA5C299F2473706344F0F0F5C405C3A51D1A7406FBBD6F75",
+    "MaxRateCalculator_200.0.53.zip": "8CD534B15CAB14D0447F4B828E7C904060A559E046F5F6D7010602984BD008F4",
+    "mining-patch-planner_1.7.19.zip": "F7523ADD1C9EFA17EBBA58C2451DBE4579B387E8BA007E183D21242B3E30B749",
+    "Shortcuts-ick_2.0.7.zip": "E1C3D36D6B953FB3DFFDC211D7E7612F2B633D0E588E9433CAD96CF7EC7D4780",
+    "stdlib2_2.0.1.zip": "A1889B7DE8FB23C0578A388C4180B0DD790934B8653BB9726F783D80E18DD829",
+    "tree_collision_2.0.0.zip": "D277AF47525BF43EB31F075E3D2D6B728BCB6ABC918491086EBB888037F06790",
+    "factoryplanner_2.0.50.zip": "7EA90A026C65E385786BA19258FB5282B008EE27A1B4F5ACBFC4AC68E98B22B3",
+    "Kux-ZoomRunning_3.3.2.zip": "2F4588BC9C315D976A4F11A4839AAFAE22BC98D8C128A81E526AD75D6785B774",
+    "Milestones_1.4.7.zip": "8116EED57B0C98B12F4B046B9906C712210FA1D8FED9808ABA1F819E51262261",
+    "ModuleInserterEx_7.4.1.zip": "1EA4288012EDB995BB0905C151E86C8C0D690F819931CDCE6D68E76C9F137E60",
+    "RateCalculator_3.3.8.zip": "FE6776D809E70F1B6D979D1EB7E47B11CACE0AEBC15BB6625631366CDD857635",
+    "EditorExtensions_2.5.2.zip": "F7CEB9407F7A765BAA8B262ABCFB4F375105E9D1056436F5E9D41D525FD18801",
+    "FactorySearch_1.14.3.zip": "4A47E05BCA0991FC7EA808B6BBEB0E40770394A692DDD722064724BCBBC19591",
+    "GUI_Unifyer_2.0.1.zip": "A56BC734CD41031D9D4B3E40EEE335D5AF0DCF6E607132691D9BC46386F74D19",
+    "mir-fixture-mir5-large-factory-activity_0.1.0.zip": "6E81303BECA10AD720251FF0921009FEDA26DDF6C8BB50F788AFC5D7F142E60D"
+  },
+  "scope": "Unscored read-only 600-tick activity diagnostic on a disposable copy of protected Foundation EAF0. Retains all 31 current third-party names using the 14 declared available-version updates. Replaces the data-stage active-mod observer with the runtime activity observer; it is not a data capture or accepted timing profile. Defaults is a profile declaration, not proof that actual inherited saved settings match. Independently verify actual settings, current-world load, source preservation and native COMPLETE log. Native admission, scale, save-state and performance verdicts remain open. Do not insert into an active timing block, patch historical MIR or downgrade a MIR5 save. One local window is armed per init/config/load activation; a later activation clears/restarts an unfinished window. Completion retires work until another activation."
+}
