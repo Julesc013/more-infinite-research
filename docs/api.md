@@ -5,7 +5,7 @@ applies_to: "MIR development"
 audience: developer
 doc_type: reference
 owner: mir-maintainers
-last_reviewed: 2026-10-29
+last_reviewed: 2026-10-30
 supersedes: []
 superseded_by: []
 source_of_truth_for:
@@ -53,6 +53,8 @@ The [current7b0 production applicability review](../spec/evidence/api-production
 The corrected [F200 client case](../spec/evidence/library-f200-native-names-private-native-chain-r01.json) and [F210 Base/Space Age cases](../spec/evidence/library-f210-native-names-private-native-chain-r01.json) now observe both independently installed consumers on1D45/2DDD. Across eighteen actual EN/DE client phases at initial join,rejoin and saved-host restart, each client log contains the Alpha/Beta read-only load-query pair with preserved native API research/effects. Queries run in the first game-available event after load; their on_load callbacks only register the pending local observation. These are current2.0.77/D3 and standalone2.1.23/8DC client observations, separate from the older production experiments. The [F200 optional-absence review](../spec/evidence/api-optional-absence-f200-aero-applicability-r01.json) retains its exact no-MIR CreateOnly result; an inactive MIR archive is not a consumed input.
 
 This covers the named draft3 consumers and tested lifecycle paths. It does not qualify arbitrary third-party methods,overhaul closures or historical target capabilities. The [available-archive consumer audit](../spec/evidence/api-consumer-available-archive-audit-chain.json) retains zero named old-interface/SDK/MEP matches in31 verified archives while preserving the runtime bridges; computed names and external consumers remain unknown. No old externally consumed contract is retired by these results. Before final stabilization, independently review the documented subset,existing boundary-budget controls and capability/version records against the accepted package; no API expansion is required for this release.
+
+The [bounded documented-subset matrix](../spec/evidence/api-documented-subset-matrix-aero-r01.json) separates retained native family/productivity, Base physical/save, modern client/query and F200 absence results from host boundary controls and remaining native questions. Candidate B has the same API/Generator payloads; the original executions retain their exact package and engine identities. Its finite completion groups are the single-call/data-boundary witness, Space Age physical production on both modern engines, with existing fixtures. The [recovered original F210 absence input](../spec/evidence/api-optional-absence-f210-aero-applicability-r01.json) retains its actual two-mod/FE4 native result and unchanged guards, with the dirty-source label and missing original profile bytes explicit; it is not the later four-mod observer. Review matching original inputs before dispatch. Budget observations remain host evidence, and API1.0 remains draft3 until independent subset and delivery review.
 
 ## What an extension can rely on
 

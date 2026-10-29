@@ -1,0 +1,280 @@
+{
+  "schema": 1,
+  "kind": "MIRApiDocumentedSubsetQualificationMatrixAeroV1",
+  "status": "bounded-evidence-audit-not-API-stabilization",
+  "api": "1.0.0-draft.3",
+  "candidate_source": "42032477d45ced683e72736a4fe30a7a3195b995",
+  "candidate_source_tree": "5a6adf0aab4e945aeca13420ddd045ad45f050a0",
+  "candidate_packages": [
+    {
+      "target": "f200",
+      "path": "build/packages/support-exports-aero-independent-r01/more-infinite-research_5.0.20000.zip",
+      "version": "5.0.20000",
+      "sha256": "7CAC54475107736106D84AF98D50A8622E095B6658F1E3682643FE0CBA8BAEF0",
+      "bytes": 696588,
+      "three_core_payloads_identical": true
+    },
+    {
+      "target": "f210",
+      "path": "build/packages/support-exports-aero-independent-r01/more-infinite-research_5.0.21000.zip",
+      "version": "5.0.21000",
+      "sha256": "B63743C36432E4C41CC0F56D5A48CABE81924D426EF11045095A9D5ED0430D7B",
+      "bytes": 696972,
+      "three_core_payloads_identical": true
+    }
+  ],
+  "identical_consumed_core_payloads": [
+    {
+      "path": "source/api/v1/data.lua",
+      "bytes": 12993,
+      "sha256": "9CCDD2B5FFBE14156D002F50ECEB9799F70124CADA0A0A3767D84CA242413FA5",
+      "identical_at": [
+        "554c5af31cc2986e3f0901f68909a447bd4c6304",
+        "12c5d21fd7466299e7c3c7e316f2bae693145c20",
+        "a95dbc6b35c165b46aa9991d2a0ef7274d4ec04a",
+        "42032477d45ced683e72736a4fe30a7a3195b995"
+      ]
+    },
+    {
+      "path": "source/api/v1/runtime.lua",
+      "bytes": 3663,
+      "sha256": "5FA121E602EF99CC67DAE4C1E17C5334A8FB26BBEF97F00BF0AE9AE242D9C873",
+      "identical_at": [
+        "554c5af31cc2986e3f0901f68909a447bd4c6304",
+        "12c5d21fd7466299e7c3c7e316f2bae693145c20",
+        "a95dbc6b35c165b46aa9991d2a0ef7274d4ec04a",
+        "42032477d45ced683e72736a4fe30a7a3195b995"
+      ]
+    },
+    {
+      "path": "source/research/generator.lua",
+      "bytes": 5491,
+      "sha256": "88626C760C43D51FEDB3C7233523FAD3355404C3548A79F872940E6B019FE526",
+      "identical_at": [
+        "554c5af31cc2986e3f0901f68909a447bd4c6304",
+        "12c5d21fd7466299e7c3c7e316f2bae693145c20",
+        "a95dbc6b35c165b46aa9991d2a0ef7274d4ec04a",
+        "42032477d45ced683e72736a4fe30a7a3195b995"
+      ]
+    }
+  ],
+  "reviewed_evidence": [
+    {
+      "path": "spec/evidence/api-production-current7b0-aero-applicability-r01.json",
+      "sha256": "C5A895F61128392F7C6DB62C85F431716BC1E2DE570BDECC3A9155B28663133C",
+      "bytes": 9254
+    },
+    {
+      "path": "spec/evidence/api-consumers-12c-native-chain.json",
+      "sha256": "DD1D1460194EEC7A7C7DD097F60B46F89A2A634410304040D4A301C2223926AA",
+      "bytes": 10787
+    },
+    {
+      "path": "spec/evidence/api-canonical-native-chain.json",
+      "sha256": "ABCC2AF3E9476E8BD5AADB3C4479D649EBFB9B7E7F9375BFF05AB6E35A51914E",
+      "bytes": 7171
+    },
+    {
+      "path": "spec/evidence/api-optional-absence-f200-aero-applicability-r01.json",
+      "sha256": "DF5773EE1A7EE7040D2A0FAFE64DE044ADFBED901B436D61836AD4901C46D8CF",
+      "bytes": 3774
+    },
+    {
+      "path": "spec/evidence/api-optional-absence-current-native-chain.json",
+      "sha256": "6D5F623E780AC596C43FCB1AF114DDDBCA0017D09266CBAC71953A1078BCF7F8",
+      "bytes": 2391
+    },
+    {
+      "path": "spec/evidence/api-beta-absence.json",
+      "sha256": "5E195E7346139084ED98921BF4413C7DC10342697D8BE18089E2D659669FC072",
+      "bytes": 11780
+    },
+    {
+      "path": "spec/evidence/api-boundary-host-aero-measurement-r01.json",
+      "sha256": "18A3687000620024F1CFD23B034DEB289D2C24DC73F6F08749778A6DA57D9121",
+      "bytes": 9414
+    },
+    {
+      "path": "spec/evidence/library-f200-native-names-private-native-chain-r01.json",
+      "sha256": "B37ECDE6449CD92568DD74C59994B414F3E932775787093174D44411C2FFBEE9",
+      "bytes": 9854
+    },
+    {
+      "path": "spec/evidence/library-f210-native-names-private-native-chain-r01.json",
+      "sha256": "BA1D597FE975FD24E204E5A44A9A22C99A549FBD882BA6A775AEE88D0863BB52",
+      "bytes": 43239
+    },
+    {
+      "path": "spec/evidence/library-api-1318-native-chain-r01.json",
+      "sha256": "27255E63BB641364B0B76A7C4F4443D973A078BD241CE6DC2E703C7676272153",
+      "bytes": 58367
+    },
+    {
+      "path": "spec/evidence/api-consumer-available-archive-audit-chain.json",
+      "sha256": "1AF7A2F4E1DD5D1159AF35C7DAF93F4CA3B506A37851B13C332FB0EBB1874447",
+      "bytes": 2269
+    },
+    {
+      "path": "spec/evidence/support-exports-consumed-path-applicability-aero-r01.json",
+      "sha256": "85D103F3E73535E3B5A30AFC33A1AB3B2369C6616DCBBE3F2C97F4C588B2DCF9",
+      "bytes": 47953
+    },
+    {
+      "path": "spec/evidence/api-optional-absence-f210-aero-applicability-r01.json",
+      "sha256": "A76C7F5A77A77D3F9AC612289A36A5510947AA601ACBC11FC6161EA4125C25DE",
+      "bytes": 5979
+    }
+  ],
+  "method": "Read current contract/guide and exact named native/applicability/budget receipts and fixture source; independently rehash core player payloads across four commits and both candidate ZIPs. Preserve native endpoint/source identities. No native execution or new host timing.",
+  "matrix": [
+    {
+      "subject": "get_version / get_capabilities",
+      "state": "closed-within-named-modern-consumer-scope",
+      "targets": "F200 Base; F210 Base and Space Age",
+      "evidence": [
+        "api-consumers-12c-native-chain.json",
+        "library-f200-native-names-private-native-chain-r01.json",
+        "library-f210-native-names-private-native-chain-r01.json"
+      ],
+      "observed": "Data imports check version/capability; actual runtime calls return detached records in required Alpha and optional Beta. Both EN/DE clients repeat read-only load queries at initial/rejoin/saved-host restart.",
+      "limit": "No generic support certificate, unknown capability or old-engine public-operation promise. API major/minor and product version remain distinct."
+    },
+    {
+      "subject": "add_technologies / immediate publication / local forward references / returned order",
+      "state": "closed-for-exact-Alpha-input",
+      "targets": "F200 Base; F210 Base; F210 Space Age data/client worlds",
+      "evidence": [
+        "api-consumers-12c-native-chain.json",
+        "api-production-current7b0-aero-applicability-r01.json",
+        "library-f210-native-names-private-native-chain-r01.json"
+      ],
+      "observed": "Alpha data.lua immediately creates two named rows, returns caller order, and permits its alpha-1 -> alpha-2 forward reference. Native +0.05 crafting modifier and public queries are observed. Two independently installed consumers share only the public API.",
+      "limit": "Original native research uses setters, not labs. Arbitrary family shapes are not native-qualified by this small family."
+    },
+    {
+      "subject": "add_productivity / late final-fixes / native physical effect",
+      "state": "closed-for-exact-Base-Beta-input; Space-Age-physical-pending",
+      "targets": "F200 Base D3; F210 Base Steam FE4; F210 Space Age data/runtime on standalone8DC",
+      "evidence": [
+        "api-consumers-12c-native-chain.json",
+        "api-production-current7b0-aero-applicability-r01.json",
+        "library-f210-native-names-private-native-chain-r01.json"
+      ],
+      "observed": "Beta optional consumer publishes copper-cable +0.01 during final-fixes and immediately inspects its result. Original Base worlds produce 200 then 202 cables from equal 100-plate batches, without modules or beacons; save and two unchanged-save cold reloads pass.",
+      "limit": "Retain D3/FE4 and original package identities. Space Age client/data presence does not establish physical cable output there. See N2."
+    },
+    {
+      "subject": "add_technology single wrapper",
+      "state": "host-qualified; exact-native-call-not-established-by-reviewed-receipts",
+      "targets": "F200/F210 documented declaration subset",
+      "evidence": [
+        "tests/test_api.py:test_single_creation_is_immediate_and_detached"
+      ],
+      "observed": "Host checks immediate single publication and detached submitted input. Source delegates to the same admitted bounded family path.",
+      "limit": "Native Alpha calls add_technologies and Beta calls add_productivity. Those are not relabelled as an executed single-wrapper call. See N1."
+    },
+    {
+      "subject": "duplicate/conflict/error/input-output isolation and pre-publication rejection",
+      "state": "host-qualified; bounded-native-boundary-receipt-pending",
+      "targets": "F200/F210 documented declaration subset",
+      "evidence": [
+        "tests/test_api.py",
+        "tests/test_runtime_api.py",
+        "tests/test_bootstrap.py"
+      ],
+      "observed": "Existing host opponents cover duplicate names and recipes, missing targets, cycles/metatables/executable/sparse inputs, arbitrary fields, formulas, invalid effects/native bounds, publication errors and mutation isolation. Runtime missing force/technology and detached outputs also have actual Alpha/Beta native observations.",
+      "limit": "Host before-write counts are not native prototype-write receipts. A small caught native data-stage conformance case can close the named single/duplicate/invalid/mutation cases together; do not turn every arbitrary schema into another native campaign. See N1. Foreign remote-interface collision has host-only no-replacement proof and remains explicit for independent freeze review."
+    },
+    {
+      "subject": "get_research / missing state / no mutation / native levels",
+      "state": "closed-within-named-native-consumer-queries; malformed-input host controls separate",
+      "targets": "F200 Base; F210 Base/Space Age clients",
+      "evidence": [
+        "api-consumers-12c-native-chain.json",
+        "library-f200-native-names-private-native-chain-r01.json",
+        "library-f210-native-names-private-native-chain-r01.json",
+        "tests/test_runtime_api.py"
+      ],
+      "observed": "Queries inspect exact finite/native fields, mutate detached response tables and query again, preserving force modifiers. Missing technology and unused uint32 force return distinct error codes. on_load only reconnects pending local work; game queries wait for game-available callbacks.",
+      "limit": "No derived completed-level promise. Host tests cover malformed force/technology and unavailable-game behavior. No whole-catalogue or foreign world scan is introduced."
+    },
+    {
+      "subject": "optional absence",
+      "state": "closed-for-exact-named-F200-and-recovered-F210-absence-scopes",
+      "targets": "F200 D3, F210 pinned2.1.23",
+      "evidence": [
+        "api-optional-absence-current-native-chain.json",
+        "api-optional-absence-f200-aero-applicability-r01.json",
+        "api-beta-absence.json",
+        "api-optional-absence-f210-aero-applicability-r01.json"
+      ],
+      "observed": "F200 exact four-mod CreateOnly witness confirms no MIR interface/technology/productivity and optional Beta guard. MIR is absent, so newer MIR player bytes are not consumed. Recovered F210 actual two-mod FE4 world loads the byte-exact AB93 optional Beta archive and exits0; its first-line absent-MIR guards match current source and return before every changed body/import/callback.",
+      "limit": "Original F210 dirty-source label and actual two-mod/FE4 scope remain explicit. It does not become the later four-mod explicit absence-state observer or a standalone8DC result. Original profile bytes were not recovered; actual loaded selection, own archive/member bytes, engine, native log and ledger are recovered. No replacement is required solely because the later profile exists."
+    },
+    {
+      "subject": "namespace and public imports / historical consumers",
+      "state": "named-native-namespace-proof-retained; external-consumer-universe-explicitly-unknown",
+      "targets": "F210 native namespace pair; F200/F210 normal Alpha/Beta",
+      "evidence": [
+        "api-canonical-native-chain.json",
+        "api-consumer-available-archive-audit-chain.json",
+        "spec/inventory/api-transition-baseline.json"
+      ],
+      "observed": "Two differently named native namespace consumers retain their own private platform.target and publish distinct gear/cable effects through public fully qualified API imports. The bounded 31-archive audit found zero literal old-interface/SDK/MEP matches. Historical browser/settings runtime interfaces remain implemented.",
+      "limit": "CreateOnly namespace result is not physical/save/client proof. Unknown computed names/external archives remain unknown. No consumed old contract is removed and no new adapter/history framework is required."
+    },
+    {
+      "subject": "combined submission budgets / deterministic cost",
+      "state": "closed-host-boundary-observation; no-native-speed-claim",
+      "targets": "F200/F210 host Lua5.2",
+      "evidence": [
+        "api-boundary-host-aero-measurement-r01.json",
+        "tests/test_api.py"
+      ],
+      "observed": "100 retained observations cover named family sizes and over-wide/deep refusals. Limits combine 64 family rows,512 definition entries,depth16,4096-byte strings/keys,64 recipe targets. Named 1/8/16/32-row shapes publish once; a populated64-row shape can exceed the shared entry budget.",
+      "limit": "Do not silently raise limits or promise all64 populated rows fit. Host elapsed includes observer overhead and excludes native internals. No API performance acceptance follows."
+    }
+  ],
+  "finite_missing_native_queue": [
+    {
+      "id": "N1",
+      "state": "needs-small-fixture-preparation-and-independent-review",
+      "outcome": "One bounded native data-stage conformance load on each pinned modern engine, using only the current public helper.",
+      "existing_inputs": [
+        "source/api/v1/data.lua",
+        "tests/test_api.py",
+        "tests/fixtures/api-alpha/data.lua",
+        "tests/fixtures/api-beta/data-final-fixes.lua",
+        "tools/Invoke-NativeFixture.ps1"
+      ],
+      "expected": "Call single add_technology for one independent native row; prove returned identity/immediate effect and detached submitted input. Catch a duplicate and one invalid-field family with pcall, require exact MIR_API code and no named intended technology writes; include detached metadata/returned-order check. Keep unrelated sentinels unchanged. Reuse independent Alpha/Beta; do not modify player helpers.",
+      "command_seam": "Existing Invoke-NativeFixture.ps1 -CreateOnly with exact frozen profile/FixtureSources/ConsumerMarkers; actual owned archives, pins, caller and preflight must be prepared first.",
+      "failure": "Preserve original engine log/selection/result. A native admission discrepancy requires a bounded correction and affected rerun; do not weaken the supported subset."
+    },
+    {
+      "id": "N2",
+      "state": "needs-exact-Space-Age-profile-binding; existing-production-fixture-reusable",
+      "outcome": "F200/F210 Space Age physical API Beta output, completion save and two cold reloads.",
+      "existing_inputs": [
+        "tests/fixtures/api-alpha",
+        "tests/fixtures/api-beta",
+        "tests/fixtures/api-beta-production",
+        "tests/profiles/api-consumers-f200-2077.json",
+        "tests/profiles/api-consumers-f210-2123.json",
+        "tools/Invoke-NativeFixture.ps1"
+      ],
+      "expected": "Retain equal100 plate inputs -> baseline200/researched202 cables, +0.01 native recipe effect, empty modules/no beacons, Alpha +0.05 and detached queries; use the actual official Space Age dependencies on D3/8DC. Do not open a Base/MIR5 save in an older comparator or mix DLC changes into a protected migration.",
+      "command_seam": "Existing Invoke-NativeFixture.ps1 -CaseName api-beta-production with Alpha/Beta consumer markers and separately pinned Space Age profile; existing create/production/save/two-cold path. No new runner.",
+      "failure": "Preserve run/log/save. Diagnose actual expansion recipe/effect or fixture assumption independently; original Base evidence remains unchanged."
+    }
+  ],
+  "release_decision": {
+    "frozen": false,
+    "required": "Independent reviewer reconciles this exact supported subset, retained evidence, final candidate and completed N1/N2 receipts before removing draft3. No API expansion is requested.",
+    "source_change_rule": "Thin test fixtures/profile metadata do not invalidate unrelated native production/migrations. Actual helper/schema/registration changes require their affected checks.",
+    "not_applicable": "Unsupported historical API operation is not advertised as implemented; this modern F200/F210 subset does not turn the nine stable player editions into API-general targets."
+  },
+  "native_execution_count": 0,
+  "player_source_changed": false,
+  "release_qualification": false
+}
