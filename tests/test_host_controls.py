@@ -156,6 +156,7 @@ class HostControlsTests(unittest.TestCase):
             "tests/test_repair_stress_fixture.py",
             "tests/test_agriculture.py",
             "tests/test_agriculture_scale_fixture.py",
+            "tests/test_large_factory_activity_fixture.py",
             "tests/test_spoilage.py",
             "tests/test_scripted_effects_lifecycle.py",
             "tests/test_settings_profile.py",
