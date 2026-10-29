@@ -49,7 +49,9 @@ local function settings_match()
     and startup["ips-research-time-research_material_imersite"].value == 30
     and startup["ips-effect-per-level-research_material_imersite"].value == 2
 end
-local function assert_retained(label)
+local function assert_retained(label, foreign_enabled)
+  if foreign_enabled == nil then foreign_enabled = false end
+  if type(foreign_enabled) ~= "boolean" then fail(label .. " invalid foreign observation") end
   local state = storage[KEY]
   if type(state) ~= "table" or state.seed_kind ~= "native-saved-state-not-lab-earned"
       or state.actual_lab_completions ~= 0 or state.k2so_runtime_bridge_exercised ~= false
@@ -70,7 +72,7 @@ local function assert_retained(label)
   local foreign = game.forces[FOREIGN]
   local foreign_early, foreign_tail = carrier(foreign, EARLY, 1, label .. " foreign early"), carrier(foreign, TAIL, 4, label .. " foreign tail")
   if foreign_early.level ~= 4 or foreign_tail.level ~= 6 or foreign_early.researched or foreign_tail.researched
-      or foreign_early.enabled or foreign_tail.enabled or foreign_early.visible_when_disabled
+      or foreign_early.enabled ~= foreign_enabled or foreign_tail.enabled ~= foreign_enabled or foreign_early.visible_when_disabled
       or foreign_tail.visible_when_disabled or not close(foreign_tail.saved_progress, 0.27)
       or not close(powder_bonus(foreign), 0.10) then
     fail(label .. " independently disabled foreign carrier differs")
@@ -84,11 +86,13 @@ local function assert_retained(label)
 end
 local function marker(stage)
   local snapshot = assert_retained("successor marker")
+  local owner = storage[KEY].fixture_foreign_owner
   log("[MIR5_NATIVE_FIXTURE] RESULT " .. helpers.table_to_json({
     case=CASE, stage=stage, status="passed", qualification="native-runner-readback-required",
     witnesses={source_mir="4.7.21003", destination_mir="5.0.21000", native_saved_state_seeds=true,
       source_actual_lab_completions=0, destination_actual_lab_completions=0,
-      k2so_runtime_bridge_exercised=false, successor_retained_before_fixture_writes=true,
+      k2so_runtime_bridge_exercised=false, successor_retained_before_fixture_writes=owner == nil,
+      explicit_fixture_owner_before_mir=owner,
       player_current=snapshot.player_queue.current, player_queue_count=#snapshot.player_queue.names,
       player_research_progress=snapshot.player_queue.progress, player_powder_productivity=snapshot.player_bonus,
       foreign_tail_saved_progress=snapshot.foreign_saved, foreign_disabled=true,
@@ -96,16 +100,19 @@ local function marker(stage)
   }))
 end
 
-script.on_configuration_changed(function()
+local function configuration_changed(event, expected_version)
+  expected_version = expected_version or "0.2.0"
+  if expected_version ~= "0.2.0" and expected_version ~= "0.3.0" then fail("unexpected fixture protocol") end
   if script.active_mods.base ~= "2.1.23" or script.active_mods.Krastorio2 ~= "2.1.4"
       or script.active_mods["space-exploration"] ~= "0.7.63" or script.active_mods["Krastorio2-spaced-out"] ~= nil
-      or script.active_mods["more-infinite-research"] ~= "5.0.21000" or script.active_mods[FIXTURE] ~= "0.2.0" then
+      or script.active_mods["more-infinite-research"] ~= "5.0.21000" or script.active_mods[FIXTURE] ~= expected_version then
     fail("successor requires exact current K2SE F210 input")
   end
   assert_retained("successor configuration before fixture state write")
   storage[KEY].phase = "successor-retained"
   storage[KEY].destination_mir = "5.0.21000"
-end)
+end
+script.on_configuration_changed(configuration_changed)
 
 script.on_load(function()
   loaded, reported = true, false
@@ -125,3 +132,5 @@ script.on_event(defines.events.on_tick, function()
     reported = true
   end
 end)
+
+return {assert_retained=assert_retained, configuration_changed=configuration_changed}
