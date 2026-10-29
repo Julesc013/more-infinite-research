@@ -1,0 +1,482 @@
+{
+  "schema": 1,
+  "kind": "MIRLibraryRetainedRefreshPreflightNativeChainV1",
+  "status": "passed-retained-refresh-data-and-render-preflight-not-performance",
+  "source_commit": "dfb0e45cb9e27cf9fea156a2c62c2d805f47c93e",
+  "player_tree": "7b0ede663e6fbcf486cd863e7d3719653aedc07a",
+  "controller": {
+    "commit": "98d67fbf43b2f725faec273acf1e50651fb1b17d",
+    "driver_sha256": "B8390A280596B43C295AAE6AE650BD42DCEE9DF07CF7F236E1B20A3D64C08A70",
+    "bridge_sha256": "F908463D738E49E0579F5C98C97314070F875E21DFB27C71F477C64C10E4BB74",
+    "system_sampler_sha256": "0E8658AB15FB8CA9B9F94F38A16C6BF8B2E9080209B07CA6704575FE717C4D6D"
+  },
+  "inputs": {
+    "engine": {
+      "version": "2.0.77",
+      "path": "D:/Games/Factorio/2.0/bin/x64/factorio.exe",
+      "sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B"
+    },
+    "published": {
+      "version": "4.7.20002",
+      "path": "D:/Projects/Factorio/testmods/2.0/more-infinite-research_4.7.20002.zip",
+      "sha256": "F3943EB4D69CCDAC41BD9F922AD03A5C78F34F22D8E7FA5A88A7A658AB1010B7",
+      "bytes": 1449338
+    },
+    "candidate": {
+      "version": "5.0.20000",
+      "source_commit": "a95dbc6b35c165b46aa9991d2a0ef7274d4ec04a",
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\packages\\7b0-all17-r01\\more-infinite-research_5.0.20000.zip",
+      "sha256": "1D45A54DB6F911F665A019897518E46D6614AE7E56903B067F93E116DFC2554F",
+      "bytes": 692743
+    },
+    "profiles": {
+      "published": {
+        "path": "tests/profiles/library-retained-refresh-published-f200-2077.json",
+        "sha256": "2629C84913490CE58A40CE6019D0C98891F8190E25E3BA20AB876AC78914FB95"
+      },
+      "candidate": {
+        "path": "tests/profiles/library-retained-refresh-current-f200-2077.json",
+        "sha256": "970687E27477C5BF2C31CFE0D600226E4C2054FB01F8ACF791DC9F55EB51BD92"
+      }
+    }
+  },
+  "plan": {
+    "path": "spec/evidence/library-retained-refresh-preflight-plan-r02.json",
+    "sha256": "A51C6D0A163BA1706242E2DBBF4329E3DCB309DDDD4C1609A6CC8E8A5B4FC220"
+  },
+  "packet": {
+    "primary_custody": "build/qualification/library-retained-refresh-preflight-r02-controller",
+    "sha256": "FD866129224F53D40FB06BF62A472F7EA4C7D512991AE4D881E5CD5B3F462524"
+  },
+  "prepared_sha256": "171DC3566945C2F249F82A9DBAD2B6DD99D19F1B295A5947097D6CF925F70249",
+  "root_readback": {
+    "path": "build/qualification/library-retained-refresh-preflight-r02-controller/root-readback.json",
+    "sha256": "3D9CF3761F5C1D54C3513ED5E7DCD0A3AB5E129C0FC7F495D01A64A978A8DF01",
+    "reader_sha256": "48756D69568F9C3A05ECA3B6D68E1BDD2ED7B27AB76529A756B1AC138614EB1C",
+    "files": 426,
+    "bytes_per_copy": 55151337
+  },
+  "receipt_capsule": {
+    "path": "spec/evidence/library-retained-refresh-preflight-native-receipts-r02.json.gz",
+    "sha256": "A767158BE23EF7FFA71935DF21B14A6F883208E2F35ACA1CDA2E209685D3F762",
+    "bytes": 275947,
+    "bodies": 41,
+    "round_trip": "All41 original exact bodies verified,including all14 actual native stdout logs,complete native map witnesses,periodic/owned OS/system counters,retained medians and independent readbacks. Four RCON arguments already contain private placeholders;zero exposed credential values."
+  },
+  "counts": {
+    "native_processes": 14,
+    "worlds": 2,
+    "two_real_client_sessions": 2,
+    "actual_join_events": 8,
+    "cold_host_restarts": 2,
+    "lab_completions": 0,
+    "screenshots": 24,
+    "externally_viewed_screenshots": 8,
+    "memory_samples": 2116,
+    "system_samples": 229,
+    "owned_os_peak_records": 12
+  },
+  "canonical_map_settings_sha256": "1A50F14879100043DEA9BC6EA35D5749D0E2BE1396AD1081E1BE8483512D1CAC",
+  "map_witnesses": [
+    {
+      "case": "01-published-retained-refresh",
+      "phase": "create",
+      "log_sha256": "F115C5EFDB0DEAF1456D823CFACFE88E024978978E17A933B49555DF601ECC1A"
+    },
+    {
+      "case": "01-published-retained-refresh",
+      "phase": "initial",
+      "log_sha256": "5537BF72E9642293C6B70AD3E7B2C2A3FED45D0D34CAD6878524A74BA15D84CB"
+    },
+    {
+      "case": "01-published-retained-refresh",
+      "phase": "restart",
+      "log_sha256": "1D96C7558E9BE108E6E62B0DC08B9E157E76661E58AAF841268D87DDCB563A3E"
+    },
+    {
+      "case": "02-current-retained-refresh",
+      "phase": "create",
+      "log_sha256": "B948D5248C7C3ED8EE755B351F1D79E29D05EDCF3DD6EC5A5B8D4814EF6E5460"
+    },
+    {
+      "case": "02-current-retained-refresh",
+      "phase": "initial",
+      "log_sha256": "D7BC337834B62B5362361A5D72B889FC5E9398E1BFA5E0A60FB8A721614B720B"
+    },
+    {
+      "case": "02-current-retained-refresh",
+      "phase": "restart",
+      "log_sha256": "9B133B01D887386C92F2AE3D4D8EB253661E6627A4097A2CCBA1FF5C0DEF269A"
+    }
+  ],
+  "cases": [
+    {
+      "id": "01-published-retained-refresh",
+      "arm": "published",
+      "memory_samples": 1080,
+      "system_samples": 123,
+      "retained_roles": [
+        {
+          "role": "server",
+          "windows": {
+            "baseline": {
+              "eligible_start_ms": 74204.234,
+              "eligible_end_ms": 82204.234,
+              "samples": 32,
+              "first_sample_ms": 74286.569,
+              "last_sample_ms": 82024.243,
+              "medians": {
+                "working_set_bytes": 264306688.0,
+                "private_bytes": 254238720.0
+              }
+            },
+            "post_refresh": {
+              "eligible_start_ms": 100208.234,
+              "eligible_end_ms": 108204.234,
+              "samples": 32,
+              "first_sample_ms": 100285.273,
+              "last_sample_ms": 108019.884,
+              "medians": {
+                "working_set_bytes": 268992512.0,
+                "private_bytes": 259383296.0
+              }
+            }
+          },
+          "marker_ticks": [
+            4077,
+            4677,
+            5637,
+            6237
+          ],
+          "refresh_iterations": [
+            0,
+            0,
+            32,
+            32
+          ]
+        },
+        {
+          "role": "client-en",
+          "windows": {
+            "baseline": {
+              "eligible_start_ms": 74932.015,
+              "eligible_end_ms": 82545.015,
+              "samples": 31,
+              "first_sample_ms": 75011.39,
+              "last_sample_ms": 82517.261,
+              "medians": {
+                "working_set_bytes": 433451008,
+                "private_bytes": 2250801152
+              }
+            },
+            "post_refresh": {
+              "eligible_start_ms": 100562.015,
+              "eligible_end_ms": 108478.015,
+              "samples": 31,
+              "first_sample_ms": 100761.311,
+              "last_sample_ms": 108264.532,
+              "medians": {
+                "working_set_bytes": 437243904,
+                "private_bytes": 2254295040
+              }
+            }
+          },
+          "marker_ticks": [
+            4077,
+            4677,
+            5637,
+            6237
+          ],
+          "refresh_iterations": [
+            0,
+            0,
+            32,
+            32
+          ]
+        },
+        {
+          "role": "client-de",
+          "windows": {
+            "baseline": {
+              "eligible_start_ms": 74929.082,
+              "eligible_end_ms": 82527.082,
+              "samples": 31,
+              "first_sample_ms": 75006.606,
+              "last_sample_ms": 82511.661,
+              "medians": {
+                "working_set_bytes": 432316416,
+                "private_bytes": 2246201344
+              }
+            },
+            "post_refresh": {
+              "eligible_start_ms": 100559.082,
+              "eligible_end_ms": 108305.082,
+              "samples": 31,
+              "first_sample_ms": 100756.309,
+              "last_sample_ms": 108259.686,
+              "medians": {
+                "working_set_bytes": 436436992,
+                "private_bytes": 2250534912
+              }
+            }
+          },
+          "marker_ticks": [
+            4077,
+            4677,
+            5637,
+            6237
+          ],
+          "refresh_iterations": [
+            0,
+            0,
+            32,
+            32
+          ]
+        }
+      ],
+      "retained_metrics": {
+        "retained/baseline/server/working_set_bytes": 264306688.0,
+        "retained/baseline/server/private_bytes": 254238720.0,
+        "retained/post_refresh/server/working_set_bytes": 268992512.0,
+        "retained/post_refresh/server/private_bytes": 259383296.0,
+        "retained/baseline/client-en/working_set_bytes": 433451008,
+        "retained/baseline/client-en/private_bytes": 2250801152,
+        "retained/post_refresh/client-en/working_set_bytes": 437243904,
+        "retained/post_refresh/client-en/private_bytes": 2254295040,
+        "retained/baseline/client-de/working_set_bytes": 432316416,
+        "retained/baseline/client-de/private_bytes": 2246201344,
+        "retained/post_refresh/client-de/working_set_bytes": 436436992,
+        "retained/post_refresh/client-de/private_bytes": 2250534912
+      },
+      "raw_growth": {
+        "retained_growth/server/working_set_bytes": 4685824.0,
+        "retained_growth/server/private_bytes": 5144576.0,
+        "retained_growth/client-en/working_set_bytes": 3792896,
+        "retained_growth/client-en/private_bytes": 3493888,
+        "retained_growth/client-de/working_set_bytes": 4120576,
+        "retained_growth/client-de/private_bytes": 4333568
+      },
+      "original_diagnostic_endpoint_count": 26,
+      "owned_os_peak_endpoint_count": 12,
+      "saves": [
+        {
+          "role": "seed_sha256",
+          "sha256": "DA50F52ECE78B4CAE3836C110A0CA2C8666B28FB3DAC8F20E0A2EF9BA9898DB5",
+          "bytes": 811285
+        },
+        {
+          "role": "restart_save_sha256",
+          "sha256": "609CBF0F94D3A8470C636054E780511A811BE3CB1EB926A474E8302FDCC7D439",
+          "bytes": 932806
+        },
+        {
+          "role": "final_save_sha256",
+          "sha256": "6B60C7AE98476D7B261F6A02AC0ED6CC548AE5418D7F7A683DC3B5A5286688B5",
+          "bytes": 1050778
+        }
+      ]
+    },
+    {
+      "id": "02-current-retained-refresh",
+      "arm": "candidate",
+      "memory_samples": 1036,
+      "system_samples": 106,
+      "retained_roles": [
+        {
+          "role": "server",
+          "windows": {
+            "baseline": {
+              "eligible_start_ms": 61026.668999999994,
+              "eligible_end_ms": 69026.669,
+              "samples": 32,
+              "first_sample_ms": 61279.079,
+              "last_sample_ms": 69015.816,
+              "medians": {
+                "working_set_bytes": 259985408.0,
+                "private_bytes": 246906880.0
+              }
+            },
+            "post_refresh": {
+              "eligible_start_ms": 87035.669,
+              "eligible_end_ms": 95026.669,
+              "samples": 32,
+              "first_sample_ms": 87263.022,
+              "last_sample_ms": 95013.279,
+              "medians": {
+                "working_set_bytes": 267192320.0,
+                "private_bytes": 254627840.0
+              }
+            }
+          },
+          "marker_ticks": [
+            3368,
+            3968,
+            4928,
+            5528
+          ],
+          "refresh_iterations": [
+            0,
+            0,
+            32,
+            32
+          ]
+        },
+        {
+          "role": "client-en",
+          "windows": {
+            "baseline": {
+              "eligible_start_ms": 61302.87300000001,
+              "eligible_end_ms": 69100.873,
+              "samples": 31,
+              "first_sample_ms": 61507.444,
+              "last_sample_ms": 69011.439,
+              "medians": {
+                "working_set_bytes": 427429888,
+                "private_bytes": 2243997696
+              }
+            },
+            "post_refresh": {
+              "eligible_start_ms": 87155.873,
+              "eligible_end_ms": 95051.873,
+              "samples": 32,
+              "first_sample_ms": 87258.233,
+              "last_sample_ms": 95008.977,
+              "medians": {
+                "working_set_bytes": 436105216.0,
+                "private_bytes": 2251644928.0
+              }
+            }
+          },
+          "marker_ticks": [
+            3368,
+            3968,
+            4928,
+            5528
+          ],
+          "refresh_iterations": [
+            0,
+            0,
+            32,
+            32
+          ]
+        },
+        {
+          "role": "client-de",
+          "windows": {
+            "baseline": {
+              "eligible_start_ms": 61302.488,
+              "eligible_end_ms": 69225.488,
+              "samples": 31,
+              "first_sample_ms": 61502.906,
+              "last_sample_ms": 69006.717,
+              "medians": {
+                "working_set_bytes": 428191744,
+                "private_bytes": 2245722112
+              }
+            },
+            "post_refresh": {
+              "eligible_start_ms": 87113.488,
+              "eligible_end_ms": 95175.488,
+              "samples": 32,
+              "first_sample_ms": 87253.028,
+              "last_sample_ms": 95004.266,
+              "medians": {
+                "working_set_bytes": 434774016.0,
+                "private_bytes": 2250829824.0
+              }
+            }
+          },
+          "marker_ticks": [
+            3368,
+            3968,
+            4928,
+            5528
+          ],
+          "refresh_iterations": [
+            0,
+            0,
+            32,
+            32
+          ]
+        }
+      ],
+      "retained_metrics": {
+        "retained/baseline/server/working_set_bytes": 259985408.0,
+        "retained/baseline/server/private_bytes": 246906880.0,
+        "retained/post_refresh/server/working_set_bytes": 267192320.0,
+        "retained/post_refresh/server/private_bytes": 254627840.0,
+        "retained/baseline/client-en/working_set_bytes": 427429888,
+        "retained/baseline/client-en/private_bytes": 2243997696,
+        "retained/post_refresh/client-en/working_set_bytes": 436105216.0,
+        "retained/post_refresh/client-en/private_bytes": 2251644928.0,
+        "retained/baseline/client-de/working_set_bytes": 428191744,
+        "retained/baseline/client-de/private_bytes": 2245722112,
+        "retained/post_refresh/client-de/working_set_bytes": 434774016.0,
+        "retained/post_refresh/client-de/private_bytes": 2250829824.0
+      },
+      "raw_growth": {
+        "retained_growth/server/working_set_bytes": 7206912.0,
+        "retained_growth/server/private_bytes": 7720960.0,
+        "retained_growth/client-en/working_set_bytes": 8675328.0,
+        "retained_growth/client-en/private_bytes": 7647232.0,
+        "retained_growth/client-de/working_set_bytes": 6582272.0,
+        "retained_growth/client-de/private_bytes": 5107712.0
+      },
+      "original_diagnostic_endpoint_count": 26,
+      "owned_os_peak_endpoint_count": 12,
+      "saves": [
+        {
+          "role": "seed_sha256",
+          "sha256": "99718787B31200DE5CC39A14A132F7E138F3BD3FAC87015F4AB4681F8F3025C6",
+          "bytes": 810757
+        },
+        {
+          "role": "restart_save_sha256",
+          "sha256": "86B7AC99F371DB6B487D162BE0F84415BC64EFBD6F6C0196C42AAB98001E9100",
+          "bytes": 939509
+        },
+        {
+          "role": "final_save_sha256",
+          "sha256": "42CE5E13C06D1571E30B0B7DEBE7A9EB09266B85B964690D3D30A3B5A6B075CC",
+          "bytes": 1037455
+        }
+      ]
+    }
+  ],
+  "visual_observations": [
+    "All eight original delayed first-open/reopen EN/DE frames were viewed. Both arms retain gears/mining queries,selected localized gear/mining title and All research scope.",
+    "All four late cold-reopen frames are unobscured by final-save or achievement modals.",
+    "The published side-by-side layout and current stacked layout extend lower details/actions beyond the720pixel viewport. This preflight does not claim every control is simultaneously visible or actual keyboard/drag input.",
+    "Native marker/readback,not image appearance alone,establishes named native-state preservation and fixed map-input equality."
+  ],
+  "images": {
+    "repository": "Julesc013/mir-native-worker",
+    "commit": "b5ee4b0515a193cb3101d2d1231dc44261fe3966",
+    "path": "evidence/library-retained-refresh-views-r02",
+    "manifest_sha256": "010F770059D9BA8273D06B1B343C43B36DC290E39A383A7DFC66F1C6CC032F8F",
+    "files": 8,
+    "bytes": 10447711,
+    "transformed": false
+  },
+  "review": {
+    "before_native": "Aero exact94cf review5696222367 plus local independent strict-JSON/six-slot correction review at publicdfb0e45/private98d67fb;23 independent reader controls and exact R02 VerifyOnly pass.",
+    "after_native": "Independent actual-data review pending;root full custody/window/median/native-map/counter/save/PNG/restoration readback passes."
+  },
+  "preserved_dispositions": [
+    "Original R01 packet522261830A32D2FA17F608B5506D3160E16B5D9738426480D1674DB36D4E7499 remains unchanged and zero-native. Independent review corrected only receipt-validity gaps before the R02 freeze.",
+    "Root mistyped ExpectedPacketSha256 once during VerifyOnly. Exact caller rejected at line6 before execution. The immutable packet stayed unchanged;the corrected reviewed literal was used for this sole two-arm native schedule. Exact refusal note is retained in the capsule.",
+    "All original sampled-memory repeatability failures and their exact datasets remain unchanged. This preflight makes no between-arm or A/A decision,does not pool older observations and does not substitute a new pass for an old failure."
+  ],
+  "controls_restored": true,
+  "comparisons_scored": 0,
+  "extensions": 0,
+  "performance_acceptance": false,
+  "release_qualification": false,
+  "limits": [
+    "F2002.0.77/D3,publishedF394 and current1D45 only. No F210/SpaceAge/modpack universal memory claim.",
+    "Fourteen actual UI/load plus12 owned OS-peak and12 retained endpoints perarm are observations only;all26 original diagnostics and raw negative/positive growth remain.",
+    "Thirty-two public refresh iterations make64 additional calls percase after cold reopen. This does not exercise actual keyboard/drag/player removal or imported historical earnings.",
+    "The final twelve-session protocol still requires exact frozen inputs,quiet conditions,all38 acceptance A/A controls before scoring,eight counterbalanced scored observations and independent final readback.",
+    "No product code or player package changed;no lab completion or release verdict."
+  ]
+}
