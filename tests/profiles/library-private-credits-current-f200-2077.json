@@ -11,18 +11,42 @@
   "session_expected_peak_memory_mib": 7168,
   "private_credit_checks": true,
   "mods": [
-    {"name": "base", "version": "2.0.77", "enabled": true},
-    {"name": "mir-fixture-mir5-active-mods-observer", "version": "0.1.0", "enabled": true},
-    {"name": "more-infinite-research", "version": "5.0.20000", "enabled": true},
-    {"name": "mir-fixture-mir5-library-multiplayer", "version": "0.3.0", "enabled": true},
-    {"name": "mir-fixture-mir5-api-alpha", "version": "0.1.0", "enabled": true},
-    {"name": "mir-fixture-mir5-api-beta", "version": "0.1.0", "enabled": true}
+    {
+      "name": "base",
+      "version": "2.0.77",
+      "enabled": true
+    },
+    {
+      "name": "mir-fixture-mir5-active-mods-observer",
+      "version": "0.1.0",
+      "enabled": true
+    },
+    {
+      "name": "more-infinite-research",
+      "version": "5.0.20000",
+      "enabled": true
+    },
+    {
+      "name": "mir-fixture-mir5-library-multiplayer",
+      "version": "0.3.0",
+      "enabled": true
+    },
+    {
+      "name": "mir-fixture-mir5-api-alpha",
+      "version": "0.1.0",
+      "enabled": true
+    },
+    {
+      "name": "mir-fixture-mir5-api-beta",
+      "version": "0.1.0",
+      "enabled": true
+    }
   ],
   "archive_sha256": {
     "mir-fixture-mir5-active-mods-observer_0.1.0.zip": "723D1E7721449FC26040E5E6629416767BDC20AD79CF8723115846DB662A1F87",
-    "more-infinite-research_5.0.20000.zip": "E9D349931E082AD77057C150E3D6093490E4086E84F0FAFECB0ED1257FD5ED4F",
+    "more-infinite-research_5.0.20000.zip": "1D45A54DB6F911F665A019897518E46D6614AE7E56903B067F93E116DFC2554F",
     "mir-fixture-mir5-api-alpha_0.1.0.zip": "C1A4DB67E8629B64882CF83B275346A3775CE0D93F62501890A778BEFC69DB12",
     "mir-fixture-mir5-api-beta_0.1.0.zip": "9A8ACE418C19CB868FF2A7CBCFC9A7424A2FBE12975842F768564D9B54F232CC"
   },
-  "scope": "Prepared F200 private-credit/action regression on exact currentE9 and2.0.77/D3 with two real EN/DE clients and both API consumers. Project shared library-multiplayer control.lua/settings-updates.lua with library-private-credits-f200/info.json as info.json. API consumer archives are deterministic raw Git7e48e1ac projections with their existing info-f200.json metadata,not copied third-party libraries. Observer remains canonical723. Use only verified three/four/four/two-member source projections under exclusive native custody;preserve and restore any previous own fixture archives. This prepared profile establishes no native or performance pass. The shared0.3 case observes four zero-credit holder identities and existing personal/action/native-state invariants;earned/persisted-positive private state,foreign-hidden inspection,actual keyboard/drag,retained memory and other target/mod scopes remain separate."
+  "scope": "Prepared F200 private-credit/action regression on exact native-name corrected1D45/sourcea95/player7b0 and2.0.77/D3 with two real EN/DE clients and both API consumers. Project shared library-multiplayer control.lua/settings-updates.lua with library-private-credits-f200/info.json as info.json. API consumer archives are deterministic raw Git7e48e1ac projections with their existing info-f200.json metadata,not copied third-party libraries. Observer remains canonical723. Use only verified three/four/four/two-member source projections under exclusive native custody;preserve and restore any previous own fixture archives. The earlier E9 packet was prepared but never executed;its source48a/packet2302898B and fixture projections remain preserved. This updated prepared profile establishes no native or performance pass. The shared0.3 case observes four zero-credit holder identities and existing personal/action/native-state invariants;earned/persisted-positive private state,foreign-hidden inspection,actual keyboard/drag,retained memory and other target/mod scopes remain separate."
 }

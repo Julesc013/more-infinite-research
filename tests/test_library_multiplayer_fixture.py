@@ -849,7 +849,7 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
             'mir-fixture-mir5-library-multiplayer', 'mir-fixture-mir5-api-alpha', 'mir-fixture-mir5-api-beta',
         })
         self.assertEqual(selection['archive_sha256']['more-infinite-research_5.0.20000.zip'],
-                         'E9D349931E082AD77057C150E3D6093490E4086E84F0FAFECB0ED1257FD5ED4F')
+                         '1D45A54DB6F911F665A019897518E46D6614AE7E56903B067F93E116DFC2554F')
         script = r'''
           $ErrorActionPreference='Stop';Set-StrictMode -Version Latest
           $tokens=$null;$errors=$null
@@ -861,7 +861,7 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
           Invoke-Expression $found[0].Extent.Text
           $original=Get-Content -LiteralPath $env:MIR_TEST_PROFILE -Raw|ConvertFrom-Json -AsHashtable
           $engine='D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B'
-          $mir='E9D349931E082AD77057C150E3D6093490E4086E84F0FAFECB0ED1257FD5ED4F'
+          $mir='1D45A54DB6F911F665A019897518E46D6614AE7E56903B067F93E116DFC2554F'
           $accepted=Assert-MultiplayerFixtureSelection $original $engine 'library-multiplayer' $mir 7168
           if($accepted.base-cne'2.0.77'-or-not$accepted.private_credit_checks-or-not$accepted.api_client_consumers){throw 'valid fixed F200 private selection rejected'}
           foreach($opponent in @('wrong-engine','wrong-player','wrong-case','wrong-budget','no-private','missing-beta','extra-mod','wrong-api-archive','wrong-mir-version')){

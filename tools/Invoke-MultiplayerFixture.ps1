@@ -61,7 +61,7 @@ function Assert-MultiplayerFixtureSelection {
       kind='mir5-library-api-consumers-private-credits-f200-native-selection';factorio_line='2.0';base='2.0.77'
       engine_sha256='D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B';mir='5.0.20000';build_version=84539
       observer_sha256='723D1E7721449FC26040E5E6629416767BDC20AD79CF8723115846DB662A1F87'
-      mir_archive_sha256='E9D349931E082AD77057C150E3D6093490E4086E84F0FAFECB0ED1257FD5ED4F'
+      mir_archive_sha256='1D45A54DB6F911F665A019897518E46D6614AE7E56903B067F93E116DFC2554F'
       fixture_mods=@('mir-fixture-mir5-library-multiplayer@0.3.0','mir-fixture-mir5-api-alpha@0.1.0','mir-fixture-mir5-api-beta@0.1.0')
       optional_archives=@('more-infinite-research_5.0.20000.zip','mir-fixture-mir5-library-multiplayer_0.3.0.zip','mir-fixture-mir5-api-alpha_0.1.0.zip','mir-fixture-mir5-api-beta_0.1.0.zip')
       api_consumer_archive_sha256=[ordered]@{

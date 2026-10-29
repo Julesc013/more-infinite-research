@@ -1,0 +1,193 @@
+{
+  "schema": 1,
+  "kind": "MIRNativeNamesCoherent17PackageReadbackV1",
+  "status": "built-repeat-verified-not-native-accepted",
+  "source_commit": "a95dbc6b35c165b46aa9991d2a0ef7274d4ec04a",
+  "player_tree": "7b0ede663e6fbcf486cd863e7d3719653aedc07a",
+  "prior_player_tree": "fbb7e9135280ce7f69692e9b0c4a44d743793f45",
+  "original_output": "D:\\Projects\\Factorio\\.task-builds\\7b0-all17-r01",
+  "primary_output": "D:\\Projects\\Factorio\\more-infinite-research\\build\\packages\\7b0-all17-r01",
+  "files": [
+    {
+      "name": "MIR5ReleaseAssetInventoryV1.json",
+      "bytes": 209701,
+      "sha256": "75DC321F4EEF59492449E9D3AABBF67936A2F737EFD863E36B359ECACF62536F"
+    },
+    {
+      "name": "more-infinite-research_5.0.00600.zip",
+      "bytes": 136373,
+      "sha256": "A531E3B91CB2E65FD6BE459A8BAF4A7F08363C6A5BA1604036B399C6FFF097C7"
+    },
+    {
+      "name": "more-infinite-research_5.0.00700.zip",
+      "bytes": 136373,
+      "sha256": "79E20CD5228CE9A386E734A7B4203FA07CE325CE2A8DFC599C6EA60D20527AC4"
+    },
+    {
+      "name": "more-infinite-research_5.0.00800.zip",
+      "bytes": 136371,
+      "sha256": "641771AFD8160A6DD2A0A7125816A45EA5556BF08146F874A63BB17B628E304A"
+    },
+    {
+      "name": "more-infinite-research_5.0.00900.zip",
+      "bytes": 136373,
+      "sha256": "0EFF80C9EC4BCEEB487FA997AFE5618ADDA3381E0AB1D0FAED8CDFEF8809CCDC"
+    },
+    {
+      "name": "more-infinite-research_5.0.01000.zip",
+      "bytes": 136373,
+      "sha256": "272BE0DC3663AC79205FCF09A132B565C95D60169631A0F0713219697372B232"
+    },
+    {
+      "name": "more-infinite-research_5.0.01100.zip",
+      "bytes": 136373,
+      "sha256": "E1D6D054E43A6B061E3848B4E8846675FB4F6B2E84BE45735A6EB24398F46ADE"
+    },
+    {
+      "name": "more-infinite-research_5.0.01200.zip",
+      "bytes": 136375,
+      "sha256": "9F634AF0B9237EB966F9A2FE4B567D85916D87263BA4F9DE30E041090198DB72"
+    },
+    {
+      "name": "more-infinite-research_5.0.01300.zip",
+      "bytes": 453925,
+      "sha256": "AF2BA29D8F7EBE1CC01312840CEC38D8B5D13185C9B8CA1016D93445AFF8A5C6"
+    },
+    {
+      "name": "more-infinite-research_5.0.01400.zip",
+      "bytes": 453927,
+      "sha256": "FE73C6D47FC04C744FE776F7DA7C55485E7E105E18272AA1BB04BE901ACFD86E"
+    },
+    {
+      "name": "more-infinite-research_5.0.01500.zip",
+      "bytes": 453926,
+      "sha256": "8BD09EC57D54EF684259AD5940236DAD0EE1F56D3949FC1A7EE088BC67EEDA97"
+    },
+    {
+      "name": "more-infinite-research_5.0.01600.zip",
+      "bytes": 453928,
+      "sha256": "50A1CE57F039180F1C9D873D383A7D11CF6C3F67B2B79F9D5D3DDA7B63DDE54C"
+    },
+    {
+      "name": "more-infinite-research_5.0.01700.zip",
+      "bytes": 453927,
+      "sha256": "CDBA1ED214671F3FB5827D3C283E3640E79344641ACC59DBDAA25D42050ED960"
+    },
+    {
+      "name": "more-infinite-research_5.0.01800.zip",
+      "bytes": 453928,
+      "sha256": "99F621193CC0E1885A2F1E0B168530F052BE1955451368B3BBB9C47D0E86F4F0"
+    },
+    {
+      "name": "more-infinite-research_5.0.10000.zip",
+      "bytes": 453919,
+      "sha256": "814910605AB023182BEE1FF30139E98C9A242572C3CFD0AC8D4DA86A147E9928"
+    },
+    {
+      "name": "more-infinite-research_5.0.11000.zip",
+      "bytes": 454230,
+      "sha256": "E709E0915CC3E679606852CF006B84BFCC6926DF99CAE0EA5515AA766BC5FF66"
+    },
+    {
+      "name": "more-infinite-research_5.0.20000.zip",
+      "bytes": 692743,
+      "sha256": "1D45A54DB6F911F665A019897518E46D6614AE7E56903B067F93E116DFC2554F"
+    },
+    {
+      "name": "more-infinite-research_5.0.21000.zip",
+      "bytes": 693127,
+      "sha256": "2DDD2A4C967BEF07830218442AE4441BEECD5B9ECE0AC86B09A5F6586BBA80E5"
+    },
+    {
+      "name": "SHA256SUMS-early.txt",
+      "bytes": 721,
+      "sha256": "1BFC903137E79C3026BC2FDEA0813870FF44C003034937CD0D4E2F404FA38986"
+    },
+    {
+      "name": "SHA256SUMS.txt",
+      "bytes": 1030,
+      "sha256": "B356FB619533B81C83868F211E38681D45522C958FFCE2E37EEEFE8B20590908"
+    }
+  ],
+  "zip_count": 17,
+  "zip_bytes": 5972191,
+  "inventory_file_sha256": "75DC321F4EEF59492449E9D3AABBF67936A2F737EFD863E36B359ECACF62536F",
+  "inventory_content_sha256": "1E8B72B1EB1915419BC0DC25214A4BC8D0964624A9FA707D30682E7101E9B244",
+  "root_readback_sha256": "2CB96E991FFDC5784DE70DEA01A91FC8EEF826BEA105D7CC54BAD632ADF52E43",
+  "build_command": "python -X utf8 -B tools/release.py --source source --revision a95dbc6b35c165b46aa9991d2a0ef7274d4ec04a --output D:/Projects/Factorio/.task-builds/7b0-all17-r01 --early-target-record targets/early-editions.json",
+  "repeat_verification": "Existing freeze invokes full verify,which rebuilds exact packages under temporary custody and compares them to the frozen inventory;all17pass. All20 original/primary files independently match lengths/hashes.",
+  "zip_member_differences_from_fbb7": {
+    "more-infinite-research_5.0.00600.zip": [
+      "more-infinite-research_5.0.00600/changelog.txt"
+    ],
+    "more-infinite-research_5.0.00700.zip": [
+      "more-infinite-research_5.0.00700/changelog.txt"
+    ],
+    "more-infinite-research_5.0.00800.zip": [
+      "more-infinite-research_5.0.00800/changelog.txt"
+    ],
+    "more-infinite-research_5.0.00900.zip": [
+      "more-infinite-research_5.0.00900/changelog.txt"
+    ],
+    "more-infinite-research_5.0.01000.zip": [
+      "more-infinite-research_5.0.01000/changelog.txt"
+    ],
+    "more-infinite-research_5.0.01100.zip": [
+      "more-infinite-research_5.0.01100/changelog.txt"
+    ],
+    "more-infinite-research_5.0.01200.zip": [
+      "more-infinite-research_5.0.01200/changelog.txt"
+    ],
+    "more-infinite-research_5.0.01300.zip": [
+      "more-infinite-research_5.0.01300/changelog.txt",
+      "more-infinite-research_5.0.01300/locale/de/mir-library.cfg"
+    ],
+    "more-infinite-research_5.0.01400.zip": [
+      "more-infinite-research_5.0.01400/changelog.txt",
+      "more-infinite-research_5.0.01400/locale/de/mir-library.cfg"
+    ],
+    "more-infinite-research_5.0.01500.zip": [
+      "more-infinite-research_5.0.01500/changelog.txt",
+      "more-infinite-research_5.0.01500/locale/de/mir-library.cfg"
+    ],
+    "more-infinite-research_5.0.01600.zip": [
+      "more-infinite-research_5.0.01600/changelog.txt",
+      "more-infinite-research_5.0.01600/locale/de/mir-library.cfg"
+    ],
+    "more-infinite-research_5.0.01700.zip": [
+      "more-infinite-research_5.0.01700/changelog.txt",
+      "more-infinite-research_5.0.01700/locale/de/mir-library.cfg"
+    ],
+    "more-infinite-research_5.0.01800.zip": [
+      "more-infinite-research_5.0.01800/changelog.txt",
+      "more-infinite-research_5.0.01800/locale/de/mir-library.cfg"
+    ],
+    "more-infinite-research_5.0.10000.zip": [
+      "more-infinite-research_5.0.10000/changelog.txt",
+      "more-infinite-research_5.0.10000/locale/de/mir-library.cfg"
+    ],
+    "more-infinite-research_5.0.11000.zip": [
+      "more-infinite-research_5.0.11000/changelog.txt",
+      "more-infinite-research_5.0.11000/locale/de/mir-library.cfg"
+    ],
+    "more-infinite-research_5.0.20000.zip": [
+      "more-infinite-research_5.0.20000/changelog.txt",
+      "more-infinite-research_5.0.20000/locale/de/mir-library.cfg",
+      "more-infinite-research_5.0.20000/runtime/library.lua"
+    ],
+    "more-infinite-research_5.0.21000.zip": [
+      "more-infinite-research_5.0.21000/changelog.txt",
+      "more-infinite-research_5.0.21000/locale/de/mir-library.cfg",
+      "more-infinite-research_5.0.21000/runtime/library.lua"
+    ]
+  },
+  "payload_interpretation": [
+    "EarlyF006-F012 change only changelog.",
+    "F013-F018/F100/F110 change only changelog and three German Research Library strings. No data/runtime/migration/settings members change.",
+    "ModernF200/F210 additionally change runtime/library.lua for guarded native display-name lookup. No Generator,technology effects,caps,migrations,API implementation,identity/search/sort/handler/queue mechanism changes."
+  ],
+  "native_status": "No package in this new17cohort is relabelled natively passed. Original results retain prior exact archive identities;review consumed paths and execute the affected modern Library/rendering/private/performance cases.",
+  "support": "Nine stable editions;F018 andF006-F012 retain existing best-effort/GitHub-only limits. No Portal copies,dist,tag or release is created.",
+  "performance_acceptance": false,
+  "release_qualification": false
+}
