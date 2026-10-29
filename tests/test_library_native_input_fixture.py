@@ -276,6 +276,8 @@ class LibraryNativeInputFixtureControls(unittest.TestCase):
                     result = self.run_case(target, opponent)
                     self.assertFalse(result["ok"], result["message"])
                     self.assertFalse(result["native_input_evidence"])
+                    if opponent in ("private-listed", "empty-ordinary", "foreign-library-root"):
+                        self.assertFalse(result["final"]["readonly_imported_probe"])
                     if opponent.startswith("cold-"):
                         self.assertEqual(result["cold_calls_before"], result["final_calls"])
         source = (FIXTURE / "control.lua").read_text(encoding="utf-8")

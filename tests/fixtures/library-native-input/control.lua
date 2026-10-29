@@ -172,7 +172,7 @@ local function report()
     actual_joins=s.joins,actual_text_events=s.text_events,actual_library_closed_events=s.closed_events,
     actual_drag_events=s.drag_events,actual_effect_reset_events=s.reset_events,requested_native_resets=s.requested_resets,actual_removed_events=s.removed_events,
     private_queries=s.private_queries,en_index=s.en_index or false,de_index=s.de_index or false,
-    removed_index=s.removed_index or false,readonly_imported_probe=s.private_queries>=16,
+    removed_index=s.removed_index or false,readonly_imported_probe=s.imported_probe_verified==true,
     imported_earnings=true,fixture_seeds_credit=false,load_observed=loaded_restart,
     en_geometry=s.en_index and geometry(game.get_player(s.en_index)) or nil,
     de_geometry=s.de_index and geometry(game.get_player(s.de_index)) or nil,
@@ -193,7 +193,7 @@ local function advance(step)
     phase("waiting-clients");local en,de=pair();assert_world();check_imported_literals()
     exclusion_probe(en,de);open(en,"",GEAR);open(de,MINING,MINING,"native")
     refs.en_root,refs.en_query,refs.de_root,refs.de_query=personal(en,de,"")
-    s.initial_location=location(refs.en_root);s.phase="text-prefix"
+    s.initial_location=location(refs.en_root);s.imported_probe_verified=true;s.phase="text-prefix"
   elseif step=="prefix" then
     phase("text-prefix");local en,de=pair();assert_retained(en,de,"ge")
     if s.query_clicks<1 or s.text_events<1 then fail("actual query click/text events are absent") end
@@ -278,7 +278,7 @@ script.on_init(function()
   for _ in pairs(game.players) do fail("protected headless source must contain no pre-existing players") end
   if storage[KEY]~=nil then fail("observer state already exists") end
   storage[KEY]={schema=1,phase="waiting-clients",native=world(),joins=0,text_events=0,closed_events=0,
-    drag_events=0,reset_events=0,requested_resets=0,removed_events=0,private_queries=0,query_clicks=0,other_clicks=0}
+    drag_events=0,reset_events=0,requested_resets=0,removed_events=0,private_queries=0,query_clicks=0,other_clicks=0,imported_probe_verified=false}
   check_imported_literals()
 end)
 script.on_load(function()local s=storage[KEY];loaded_restart=type(s)=="table" and s.phase=="awaiting-restart";refs={} end)
