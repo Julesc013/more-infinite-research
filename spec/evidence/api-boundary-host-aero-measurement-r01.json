@@ -1,0 +1,314 @@
+{
+  "schema": 1,
+  "kind": "MIRApiExistingBoundaryHostMeasurementAeroV1",
+  "status": "measured-host-only-existing-boundaries-not-api-stability",
+  "source_commit": "a95dbc6b35c165b46aa9991d2a0ef7274d4ec04a",
+  "host": "Aero-15X-Win10",
+  "python": "3.14.7",
+  "lua_runtime_binary": {
+    "name": "lua52.cp314-win_amd64.pyd",
+    "sha256": "FFD2BDD291C14548E5A92F1E77F08400E6C0D173D01D30C8CC0821E0AB10A899",
+    "bytes": 507904
+  },
+  "consumed_host_sources": [
+    {
+      "path": "source/api/v1/data.lua",
+      "sha256": "9CCDD2B5FFBE14156D002F50ECEB9799F70124CADA0A0A3767D84CA242413FA5",
+      "canonical_git_revision": "a95dbc6b35c165b46aa9991d2a0ef7274d4ec04a",
+      "canonical_git_sha256": "9CCDD2B5FFBE14156D002F50ECEB9799F70124CADA0A0A3767D84CA242413FA5",
+      "working_text_normalized_to_git": true
+    },
+    {
+      "path": "source/research/generator.lua",
+      "sha256": "88626C760C43D51FEDB3C7233523FAD3355404C3548A79F872940E6B019FE526",
+      "canonical_git_revision": "a95dbc6b35c165b46aa9991d2a0ef7274d4ec04a",
+      "canonical_git_sha256": "88626C760C43D51FEDB3C7233523FAD3355404C3548A79F872940E6B019FE526",
+      "working_text_normalized_to_git": true
+    },
+    {
+      "path": "tests/test_api.py",
+      "sha256": "6599F56E0ACCF4C9D39269C080865BDC28134EA5B109D780AC23D10697E0901F",
+      "canonical_git_revision": "a95dbc6b35c165b46aa9991d2a0ef7274d4ec04a",
+      "canonical_git_sha256": "6599F56E0ACCF4C9D39269C080865BDC28134EA5B109D780AC23D10697E0901F",
+      "working_text_normalized_to_git": true
+    }
+  ],
+  "actual_existing_limits": {
+    "family_rows_upper_bound": 64,
+    "combined_definition_entries": 512,
+    "table_nesting_depth": 16,
+    "string_bytes": 4096,
+    "recipe_targets": 64
+  },
+  "method": "Use the existing native-shaped host environment. Construct inputs before observation;count Lua VM hook intervals of100 around the actual API call with10-million-instruction observer safety ceiling. Host elapsed includes hook overhead;C/native engine cost is not represented. Five independent worlds per input/target. No API input/limit/product code changes.",
+  "independent_expected": "The valid1/8/16/32-row named shapes publish once with all returned IDs/effects;64-row shape exceeds combined512 entries,65 rows exceed the family ceiling,and scalar-wide/deep malformed inputs reject before writes. API/product code and limits are unchanged.",
+  "observations": [
+    {
+      "target": "f200",
+      "input_kind": "family",
+      "input_size": 1,
+      "independent_host_worlds": 5,
+      "accepted": true,
+      "publication_calls": 1,
+      "quantized_lua_instruction_range": [
+        2000,
+        2000
+      ]
+    },
+    {
+      "target": "f200",
+      "input_kind": "family",
+      "input_size": 8,
+      "independent_host_worlds": 5,
+      "accepted": true,
+      "publication_calls": 1,
+      "quantized_lua_instruction_range": [
+        15200,
+        15200
+      ]
+    },
+    {
+      "target": "f200",
+      "input_kind": "family",
+      "input_size": 16,
+      "independent_host_worlds": 5,
+      "accepted": true,
+      "publication_calls": 1,
+      "quantized_lua_instruction_range": [
+        30200,
+        30200
+      ]
+    },
+    {
+      "target": "f200",
+      "input_kind": "family",
+      "input_size": 32,
+      "independent_host_worlds": 5,
+      "accepted": true,
+      "publication_calls": 1,
+      "quantized_lua_instruction_range": [
+        60300,
+        60300
+      ]
+    },
+    {
+      "target": "f200",
+      "input_kind": "family",
+      "input_size": 64,
+      "independent_host_worlds": 5,
+      "accepted": false,
+      "publication_calls": 0,
+      "quantized_lua_instruction_range": [
+        28800,
+        28900
+      ]
+    },
+    {
+      "target": "f200",
+      "input_kind": "family",
+      "input_size": 65,
+      "independent_host_worlds": 5,
+      "accepted": false,
+      "publication_calls": 0,
+      "quantized_lua_instruction_range": [
+        900,
+        900
+      ]
+    },
+    {
+      "target": "f200",
+      "input_kind": "wide",
+      "input_size": 600,
+      "independent_host_worlds": 5,
+      "accepted": false,
+      "publication_calls": 0,
+      "quantized_lua_instruction_range": [
+        25700,
+        25700
+      ]
+    },
+    {
+      "target": "f200",
+      "input_kind": "wide",
+      "input_size": 6000,
+      "independent_host_worlds": 5,
+      "accepted": false,
+      "publication_calls": 0,
+      "quantized_lua_instruction_range": [
+        25700,
+        25700
+      ]
+    },
+    {
+      "target": "f200",
+      "input_kind": "deep",
+      "input_size": 20,
+      "independent_host_worlds": 5,
+      "accepted": false,
+      "publication_calls": 0,
+      "quantized_lua_instruction_range": [
+        900,
+        1400
+      ]
+    },
+    {
+      "target": "f200",
+      "input_kind": "deep",
+      "input_size": 200,
+      "independent_host_worlds": 5,
+      "accepted": false,
+      "publication_calls": 0,
+      "quantized_lua_instruction_range": [
+        900,
+        1400
+      ]
+    },
+    {
+      "target": "f210",
+      "input_kind": "family",
+      "input_size": 1,
+      "independent_host_worlds": 5,
+      "accepted": true,
+      "publication_calls": 1,
+      "quantized_lua_instruction_range": [
+        2100,
+        2100
+      ]
+    },
+    {
+      "target": "f210",
+      "input_kind": "family",
+      "input_size": 8,
+      "independent_host_worlds": 5,
+      "accepted": true,
+      "publication_calls": 1,
+      "quantized_lua_instruction_range": [
+        15700,
+        15700
+      ]
+    },
+    {
+      "target": "f210",
+      "input_kind": "family",
+      "input_size": 16,
+      "independent_host_worlds": 5,
+      "accepted": true,
+      "publication_calls": 1,
+      "quantized_lua_instruction_range": [
+        31300,
+        31300
+      ]
+    },
+    {
+      "target": "f210",
+      "input_kind": "family",
+      "input_size": 32,
+      "independent_host_worlds": 5,
+      "accepted": true,
+      "publication_calls": 1,
+      "quantized_lua_instruction_range": [
+        62500,
+        62500
+      ]
+    },
+    {
+      "target": "f210",
+      "input_kind": "family",
+      "input_size": 64,
+      "independent_host_worlds": 5,
+      "accepted": false,
+      "publication_calls": 0,
+      "quantized_lua_instruction_range": [
+        28800,
+        28900
+      ]
+    },
+    {
+      "target": "f210",
+      "input_kind": "family",
+      "input_size": 65,
+      "independent_host_worlds": 5,
+      "accepted": false,
+      "publication_calls": 0,
+      "quantized_lua_instruction_range": [
+        900,
+        900
+      ]
+    },
+    {
+      "target": "f210",
+      "input_kind": "wide",
+      "input_size": 600,
+      "independent_host_worlds": 5,
+      "accepted": false,
+      "publication_calls": 0,
+      "quantized_lua_instruction_range": [
+        25700,
+        25700
+      ]
+    },
+    {
+      "target": "f210",
+      "input_kind": "wide",
+      "input_size": 6000,
+      "independent_host_worlds": 5,
+      "accepted": false,
+      "publication_calls": 0,
+      "quantized_lua_instruction_range": [
+        25700,
+        25700
+      ]
+    },
+    {
+      "target": "f210",
+      "input_kind": "deep",
+      "input_size": 20,
+      "independent_host_worlds": 5,
+      "accepted": false,
+      "publication_calls": 0,
+      "quantized_lua_instruction_range": [
+        900,
+        1400
+      ]
+    },
+    {
+      "target": "f210",
+      "input_kind": "deep",
+      "input_size": 200,
+      "independent_host_worlds": 5,
+      "accepted": false,
+      "publication_calls": 0,
+      "quantized_lua_instruction_range": [
+        900,
+        1400
+      ]
+    }
+  ],
+  "raw_custody": {
+    "primary": "build/qualification/release-preparation-r01",
+    "capsule": "spec/evidence/api-boundary-host-aero-receipts-r01.json.gz",
+    "sha256": "6F91CD7B9C11EF95BBAF814F3C138933AE57A67DF164479A9075CD901C861EA0",
+    "bytes": 6321,
+    "bodies": 2,
+    "observation_rows": 100,
+    "observer_sha256": "033A3C00606AFC2E124AB2F7E58AE16FBF63AA2D678A460243491A67E932C0AA",
+    "raw_observation_sha256": "3419DE04B9F6E185FE4AC08CE68737268C03AA812819E61585703DD94B760699"
+  },
+  "interpretation": [
+    "The declared entry/depth budgets bound the observed rejection work when wide input grows600\u21926000 or depth grows20\u2192200. This is an observation on these host shapes,not proof for every adversarial input.",
+    "Family and combined-entry limits apply together;64 is an upper bound,not a promise that64 arbitrarily populated declarations fit512 entries.",
+    "Counts are Lua debug-hook intervals of100 and exclude native/C engine internals. Host elapsed fields include observer overhead and support no Factorio timing claim.",
+    "Existing tests and independently observed native consumers remain separate. No new declaration subset,capability,limit,tolerance or product implementation is introduced."
+  ],
+  "native_execution": false,
+  "api_stability": false,
+  "performance_acceptance": false,
+  "release_qualification": false,
+  "additional_consumed_path_readback": {
+    "path": "source/platform/target.lua",
+    "working_sha256": "9D0231B2F7643B9A3D3E5DC1406DC9B639AF4F799C33FDD0D4E32DD37452441A",
+    "canonical_git_sha256": "9D0231B2F7643B9A3D3E5DC1406DC9B639AF4F799C33FDD0D4E32DD37452441A",
+    "source_commit": "a95dbc6b35c165b46aa9991d2a0ef7274d4ec04a",
+    "timing": "Verified after collection;no changed player source during this documentation-only unit."
+  }
+}
