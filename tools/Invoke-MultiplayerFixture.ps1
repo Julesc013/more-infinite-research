@@ -205,6 +205,19 @@ function Assert-MultiplayerFixtureSelection {
       optional_archives=@('more-infinite-research_5.0.20000.zip','mir-fixture-mir5-scripted-effects-multiplayer_0.1.0.zip')
     }
   )
+  # Two explicit disposable positive-state variants reuse the exact corrected
+  # player/API/engine inputs, with separately named fixture0.4 metadata.
+  foreach($baseKind in @('mir5-library-api-consumers-private-credits-f200-native-selection','mir5-library-api-consumers-private-credits-standalone-f210-native-selection')){
+    $original=@($targets|Where-Object {$_.kind-ceq$baseKind})
+    Assert-Session ($original.Count-eq1) 'positive-state base admission is ambiguous'
+    $positive=[ordered]@{}
+    foreach($entry in $original[0].GetEnumerator()){$positive[$entry.Key]=$entry.Value}
+    $positive.kind=$baseKind.Replace('private-credits','positive-state')
+    $positive.fixture_mods=@($positive.fixture_mods|ForEach-Object {$_.Replace('multiplayer@0.3.0','multiplayer@0.4.0')})
+    $positive.optional_archives=@($positive.optional_archives|ForEach-Object {$_.Replace('multiplayer_0.3.0','multiplayer_0.4.0')})
+    $positive.positive_private_state_checks=$true
+    $targets+=,$positive
+  }
   Assert-Session ($Selection.Contains('target') -and $Selection['target'] -is [string] -and $Selection.Contains('kind') -and $Selection['kind'] -is [string]) 'requires an admitted multiplayer fixture target'
   $mirRows=@($Selection['mods']|Where-Object { $_ -is [System.Collections.IDictionary] -and $_['name'] -is [string] -and $_['name'] -ceq 'more-infinite-research' -and $_['version'] -is [string] })
   $matches=@($targets|Where-Object {
@@ -252,6 +265,11 @@ function Assert-MultiplayerFixtureSelection {
   if($target.Contains('fixture_archive_required')){
     $fixtureArchive='mir-fixture-mir5-library-multiplayer_0.1.1.zip'
     Assert-Session ($target.fixture_archive_required -is [bool] -and $target.fixture_archive_required -and $archives.Contains($fixtureArchive) -and $archives[$fixtureArchive] -is [string] -and $archives[$fixtureArchive] -cmatch '^[A-F0-9]{64}$') 'standalone identity discovery fixture archive differs'
+  }
+  if($target.Contains('positive_private_state_checks')){
+    Assert-Session ($Selection.Contains('positive_private_state_checks') -and $Selection.positive_private_state_checks -is [bool] -and $Selection.positive_private_state_checks) 'positive-state selection differs'
+  }else{
+    Assert-Session (-not $Selection.Contains('positive_private_state_checks')) 'unexpected positive-state selection'
   }
   if($target.Contains('api_consumer_archive_sha256')){
     $apiArchives=$target.api_consumer_archive_sha256
@@ -334,6 +352,36 @@ function New-StandaloneIdentityFixtureStage {
   $fixture=Assert-StandaloneIdentityFixtureSource -Sources @($stage)
   Assert-MIRLibraryFixtureArchive -Archive $archive -SourceDirectory $fixture.source
   return [pscustomobject]@{source=$fixture.source;archive=$archive;sha256=(Get-FileHash -LiteralPath $archive -Algorithm SHA256).Hash.ToUpperInvariant()}
+}
+function New-LibraryPositiveFixtureSourceProjection {
+  param([Parameter(Mandatory)][string]$RepoRoot,[Parameter(Mandatory)][string]$OutputRoot,[Parameter(Mandatory)][ValidateSet('f200','f210')][string]$Target)
+  $canonical=Join-Path $RepoRoot 'tests/fixtures/library-multiplayer'
+  $positive=Join-Path $RepoRoot 'tests/fixtures/library-positive-state'
+  $bindings=[ordered]@{
+    'control.lua'=(Join-Path $canonical 'control.lua')
+    'settings-updates.lua'=(Join-Path $canonical 'settings-updates.lua')
+    'data.lua'=(Join-Path $positive 'data.lua')
+    'positive-state.lua'=(Join-Path $positive 'positive-state.lua')
+    'info.json'=(Join-Path $positive ('info-'+$Target+'.json'))
+  }
+  $info=Get-Content -LiteralPath $bindings['info.json'] -Raw|ConvertFrom-Json -AsHashtable
+  $line=if($Target-ceq'f200'){'2.0'}else{'2.1'}
+  $base=if($Target-ceq'f200'){'2.0.77'}else{'2.1.23'}
+  $mir=if($Target-ceq'f200'){'5.0.20000'}else{'5.0.21000'}
+  Assert-Session ($info.name-ceq'mir-fixture-mir5-library-multiplayer' -and $info.version-ceq'0.4.0' -and $info.factorio_version-ceq$line -and ((@($info.dependencies)-join'|')-ceq('base >= '+$base+'|more-infinite-research = '+$mir))) 'positive-state metadata differs'
+  foreach($path in $bindings.Values){Assert-Session (Test-Path -LiteralPath $path -PathType Leaf) 'positive-state source member is absent'}
+  $stage=Join-Path $OutputRoot 'positive-state-library-fixture-source'
+  Assert-Session (-not(Test-Path -LiteralPath $stage)) 'positive-state source stage already exists'
+  $null=New-Item -ItemType Directory -Path $stage
+  $members=@(foreach($entry in $bindings.GetEnumerator()){
+    $destination=Join-Path $stage $entry.Key
+    [IO.File]::Copy($entry.Value,$destination,$false)
+    $expected=(Get-FileHash -LiteralPath $entry.Value -Algorithm SHA256).Hash
+    Assert-Session ((Get-FileHash -LiteralPath $destination -Algorithm SHA256).Hash-ceq$expected) 'positive-state source projection differs'
+    [ordered]@{path=$entry.Key;source=[IO.Path]::GetRelativePath($RepoRoot,$entry.Value).Replace('\','/');sha256=$expected}
+  })
+  Assert-Session (@(Get-ChildItem -LiteralPath $stage -File).Count-eq5) 'positive-state source member count differs'
+  return [pscustomobject]@{source=$stage;canonical_source=$canonical;members=$members;source_metadata=('info-'+$Target+'.json');excluded_canonical_members=@('README.md','info.json','info-f210.json','info-f210-space-age.json','info-f210-private-credits.json')}
 }
 function New-StandaloneF210LibraryFixtureSourceProjection {
   param(
@@ -657,10 +705,11 @@ $target=Assert-MultiplayerFixtureSelection -Selection $selection -EngineSha256 (
 $standaloneF210=($target.PSObject.Properties['standalone_f210'] -and $target.standalone_f210 -eq $true)
 $spaceAgeLibrary=($target.PSObject.Properties['space_age_library'] -and $target.space_age_library -eq $true)
 $privateCreditChecks=($target.PSObject.Properties['private_credit_checks'] -and $target.private_credit_checks -eq $true)
+$positivePrivateStateChecks=($target.PSObject.Properties['positive_private_state_checks'] -and $target.positive_private_state_checks -eq $true)
 if($standaloneF210){
   # Standalone Base and Space Age retain their 0.1.0/0.2.0 metadata; only the
   # two explicit private-credit selections stage the common 0.3.0 metadata.
-  $standaloneLibraryFixture=New-StandaloneF210LibraryFixtureSourceProjection -RepoRoot $repo -OutputRoot $output -SpaceAgeLibrary:$spaceAgeLibrary -PrivateCreditChecks:$privateCreditChecks
+  $standaloneLibraryFixture=if($positivePrivateStateChecks){New-LibraryPositiveFixtureSourceProjection -RepoRoot $repo -OutputRoot $output -Target 'f210'}else{New-StandaloneF210LibraryFixtureSourceProjection -RepoRoot $repo -OutputRoot $output -SpaceAgeLibrary:$spaceAgeLibrary -PrivateCreditChecks:$privateCreditChecks}
   $standaloneObserver=New-StandaloneIdentityObserverSourceProjection -RepoRoot $repo -ArchiveLibrary $library -OutputRoot $output -ExpectedArchiveSha256 ([string]$target.observer_sha256)
   if($target.PSObject.Properties['api_client_consumers']-and$target.api_client_consumers-eq$true){
     $apiConsumerSourceRevision=Resolve-StandaloneF210ApiConsumerSourceRevision -RepoRoot $repo
@@ -672,6 +721,18 @@ if($standaloneF210){
   }
   $canonicalLibrary=Join-Path $repo 'tests/fixtures/library-multiplayer'
   $fixtureSourcesForRun=Get-StandaloneIdentityFixtureSources -Sources $FixtureSources -LibraryFixtureSource $canonicalLibrary -StagedLibraryFixtureSource $standaloneLibraryFixture.source -StagedObserverSource $standaloneObserver.source -RepoRoot $repo -StagedApiConsumerSources $standaloneApiConsumerSources
+}elseif($positivePrivateStateChecks){
+  $positiveFixture=New-LibraryPositiveFixtureSourceProjection -RepoRoot $repo -OutputRoot $output -Target 'f200'
+  $positiveSourceCount=0
+  $fixtureSourcesForRun=@(foreach($candidate in $FixtureSources){
+    $resolved=(Resolve-Path -LiteralPath $candidate).Path
+    $info=Get-Content -LiteralPath (Join-Path $resolved 'info.json') -Raw|ConvertFrom-Json -AsHashtable
+    if($info.name-ceq'mir-fixture-mir5-library-multiplayer'){
+      Assert-Session ($resolved-ieq(Resolve-Path -LiteralPath (Join-Path $repo 'tests/fixtures/library-multiplayer')).Path) 'positive-state F200 requires the canonical Library template'
+      $positiveSourceCount++;$positiveFixture.source
+    }else{$resolved}
+  })
+  Assert-Session ($positiveSourceCount-eq1) 'positive-state F200 requires one canonical Library template'
 }
 # The normal standalone target remains the ordinary two-client Library
 # contract.  Only the explicitly environmental discovery route needs its
@@ -783,6 +844,7 @@ try {
     }
     if($spaceAgeLibrary){$spec.space_age_library=$true}
     if($privateCreditChecks){$spec.private_credit_checks=$true}
+    if($positivePrivateStateChecks){$spec.positive_private_state_checks=$true}
   }
   if($null -ne $pairedArm){$spec.paired_arm=$pairedArm}
   if($CollectProcessMemoryObservations){

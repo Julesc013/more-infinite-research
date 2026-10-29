@@ -45,8 +45,12 @@ end
 
 local function private_credit_browser_probe()
   return script ~= nil and script.active_mods ~= nil
-    and script.active_mods["mir-fixture-mir5-library-multiplayer"] == "0.3.0"
+    and (script.active_mods["mir-fixture-mir5-library-multiplayer"] == "0.3.0"
+      or script.active_mods["mir-fixture-mir5-library-multiplayer"] == "0.4.0")
 end
+local positive_state = script and script.active_mods
+  and script.active_mods["mir-fixture-mir5-library-multiplayer"] == "0.4.0"
+  and require("positive-state") or nil
 
 local GEAR_RECIPES = space_age_library()
   and {"casting-iron-gear-wheel", "iron-gear-wheel"}
@@ -143,6 +147,7 @@ local function same_snapshot(left, right)
 end
 
 local function assert_native(state, force)
+  if positive_state then positive_state.assert_credits(force) end
   if not same_snapshot(state.native_initial, state.native_initial_guard) then
     fail("stored initial native witness was overwritten")
   end
@@ -411,6 +416,13 @@ local function probe_private_credit_visibility(state, english, german)
     private_selection_not_exposed=true, native_state_unchanged=true, personal_views_restored=true,
     before=before, after=after,
   }
+  if positive_state then
+    state.positive_queries = positive_state.probe(english, german)
+    open(english, VIEWS.en)
+    open(german, VIEWS.de)
+    assert_personal_views(english, german)
+    assert_native(state, english.force)
+  end
 end
 
 -- LuaObjects remain process-local evidence only. The durable fixture state
@@ -716,6 +728,7 @@ local function marker(stage, state)
   if stage == "completed" and private_credit_browser_probe() then
     witnesses.private_credit_visibility = state.private_credit_visibility
   end
+  if positive_state then witnesses.positive_private_state = positive_state.witness(state, stage == "completed") end
   log("[MIR5_LIBRARY_MULTIPLAYER] RESULT " .. helpers.table_to_json({
     case=CASE, stage=stage, status="passed",
     witnesses=witnesses
@@ -1007,7 +1020,7 @@ local function closure()
   if private_credit and standalone_identity_discovery() then
     fail("private-credit Library fixture cannot use standalone identity discovery")
   end
-  local fixture_version = private_credit and "0.3.0" or (space_age and "0.2.0" or (standalone_identity_discovery() and "0.1.1" or "0.1.0"))
+  local fixture_version = positive_state and "0.4.0" or (private_credit and "0.3.0" or (space_age and "0.2.0" or (standalone_identity_discovery() and "0.1.1" or "0.1.0")))
   local allowed = {base=script.active_mods.base, ["more-infinite-research"]=target.mir_version,
     ["mir-fixture-mir5-active-mods-observer"]="0.1.0",
     ["mir-fixture-mir5-library-multiplayer"]=fixture_version}
@@ -1052,11 +1065,12 @@ script.on_init(function()
   if storage[KEY] ~= nil then fail("fixture state already exists") end
   local force, surface = game.forces.player, game.surfaces[1]
   if not valid(force) or not valid(surface) then fail("fresh disposable base world is absent") end
+  if positive_state then positive_state.seed(force) end
   local native = native_snapshot(force)
   storage[KEY] = {
     phase="waiting-initial-clients", world={force_index=force.index, surface_index=surface.index}, force_index=force.index,
     native=native, native_initial=copy_snapshot(native), native_initial_guard=copy_snapshot(native), clients={}, join_events=0,
-    screenshot_calls=0, measurements={}, availability_checked=false
+    screenshot_calls=0, measurements={}, availability_checked=false, positive_seeded=positive_state and true or nil
   }
   marker("ready", storage[KEY])
   ready_logged = true
@@ -1213,6 +1227,12 @@ script.on_event(defines.events.on_tick, function()
     local english, german = pair(state, 3)
     if english and german then run_restart(state, english, german) end
   elseif state.phase == "capturing-rejoin" and game.tick >= state.capture_after_tick then
+    if positive_state then
+      local english, german = live_players(state)
+      positive_state.prepare_restart(english, german)
+      assert_personal_views(english, german)
+      assert_native(state, english.force)
+    end
     state.phase = "awaiting-host-restart"
     state.capture_after_tick = nil
     game.server_save(RESTART_SAVE)

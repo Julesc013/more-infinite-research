@@ -1,0 +1,486 @@
+{
+  "schema": 1,
+  "kind": "MIRLibraryPositiveSeedNativeDiagnosticV1",
+  "status": "native-researched-false-setter-resets-positive-infinite-level-and-effect",
+  "source_commit": "b0d57b99fc1d7df328587cc91557d78c49cc4efa",
+  "private_commit": "5c55c55db5acce6e7082677cdaa5721729052365",
+  "driver_sha256": "55A811E6EF3A8B673EEDA3FB25E061CA3324482B27FBBB65A1EDA8F4F98C4E79",
+  "packet_sha256": "0EFD07C303C3F494F77635FA088C1AEFDC2D2AD7D7C0D26C5FC6E035E83706C7",
+  "prepared_sha256": "66DFC7AF882B2FC5421981DC2990155AE4E14E962DB3EEC4E72D2ACB4407B957",
+  "diagnostic_plan_sha256": "1CB89DBB072024C78E70C1A11F99935F9405D5F0954C5EC364FA9570E0705FA5",
+  "engine": {
+    "path": "D:\\Games\\Factorio\\2.1\\bin\\x64\\factorio.exe",
+    "sha256": "8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38"
+  },
+  "candidate": {
+    "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\packages\\7b0-all17-r01\\more-infinite-research_5.0.21000.zip",
+    "sha256": "2DDD2A4C967BEF07830218442AE4441BEECD5B9ECE0AC86B09A5F6586BBA80E5"
+  },
+  "observed_native_snapshots": [
+    {
+      "seed_stage": "before-assignments",
+      "holders": [
+        {
+          "id": "mir-legacy-module-credit-speed-module",
+          "level": 1,
+          "researched": false,
+          "enabled": false,
+          "visible_when_disabled": false
+        },
+        {
+          "id": "mir-legacy-module-credit-productivity-module",
+          "level": 1,
+          "researched": false,
+          "enabled": false,
+          "visible_when_disabled": false
+        },
+        {
+          "id": "mir-legacy-module-credit-efficiency-module",
+          "level": 1,
+          "researched": false,
+          "enabled": false,
+          "visible_when_disabled": false
+        },
+        {
+          "id": "mir-legacy-cannon-credit-rocket-shooting-speed",
+          "level": 1,
+          "researched": false,
+          "enabled": false,
+          "visible_when_disabled": false
+        }
+      ],
+      "module_productivity": {
+        "speed-module": 0,
+        "productivity-module": 0,
+        "efficiency-module": 0
+      },
+      "cannon_speed": 0
+    },
+    {
+      "seed_stage": "after-level-assignment",
+      "assigned_id": "mir-legacy-module-credit-speed-module",
+      "holders": [
+        {
+          "id": "mir-legacy-module-credit-speed-module",
+          "level": 2,
+          "researched": false,
+          "enabled": true,
+          "visible_when_disabled": false
+        },
+        {
+          "id": "mir-legacy-module-credit-productivity-module",
+          "level": 1,
+          "researched": false,
+          "enabled": false,
+          "visible_when_disabled": false
+        },
+        {
+          "id": "mir-legacy-module-credit-efficiency-module",
+          "level": 1,
+          "researched": false,
+          "enabled": false,
+          "visible_when_disabled": false
+        },
+        {
+          "id": "mir-legacy-cannon-credit-rocket-shooting-speed",
+          "level": 1,
+          "researched": false,
+          "enabled": false,
+          "visible_when_disabled": false
+        }
+      ],
+      "module_productivity": {
+        "speed-module": 0.01,
+        "productivity-module": 0,
+        "efficiency-module": 0
+      },
+      "cannon_speed": 0
+    },
+    {
+      "seed_stage": "after-researched-assignment",
+      "assigned_id": "mir-legacy-module-credit-speed-module",
+      "holders": [
+        {
+          "id": "mir-legacy-module-credit-speed-module",
+          "level": 1,
+          "researched": false,
+          "enabled": true,
+          "visible_when_disabled": false
+        },
+        {
+          "id": "mir-legacy-module-credit-productivity-module",
+          "level": 1,
+          "researched": false,
+          "enabled": false,
+          "visible_when_disabled": false
+        },
+        {
+          "id": "mir-legacy-module-credit-efficiency-module",
+          "level": 1,
+          "researched": false,
+          "enabled": false,
+          "visible_when_disabled": false
+        },
+        {
+          "id": "mir-legacy-cannon-credit-rocket-shooting-speed",
+          "level": 1,
+          "researched": false,
+          "enabled": false,
+          "visible_when_disabled": false
+        }
+      ],
+      "module_productivity": {
+        "speed-module": 0,
+        "productivity-module": 0,
+        "efficiency-module": 0
+      },
+      "cannon_speed": 0
+    },
+    {
+      "seed_stage": "after-level-assignment",
+      "assigned_id": "mir-legacy-module-credit-productivity-module",
+      "holders": [
+        {
+          "id": "mir-legacy-module-credit-speed-module",
+          "level": 1,
+          "researched": false,
+          "enabled": false,
+          "visible_when_disabled": false
+        },
+        {
+          "id": "mir-legacy-module-credit-productivity-module",
+          "level": 3,
+          "researched": false,
+          "enabled": true,
+          "visible_when_disabled": false
+        },
+        {
+          "id": "mir-legacy-module-credit-efficiency-module",
+          "level": 1,
+          "researched": false,
+          "enabled": false,
+          "visible_when_disabled": false
+        },
+        {
+          "id": "mir-legacy-cannon-credit-rocket-shooting-speed",
+          "level": 1,
+          "researched": false,
+          "enabled": false,
+          "visible_when_disabled": false
+        }
+      ],
+      "module_productivity": {
+        "speed-module": 0,
+        "productivity-module": 0.02,
+        "efficiency-module": 0
+      },
+      "cannon_speed": 0
+    },
+    {
+      "seed_stage": "after-researched-assignment",
+      "assigned_id": "mir-legacy-module-credit-productivity-module",
+      "holders": [
+        {
+          "id": "mir-legacy-module-credit-speed-module",
+          "level": 1,
+          "researched": false,
+          "enabled": false,
+          "visible_when_disabled": false
+        },
+        {
+          "id": "mir-legacy-module-credit-productivity-module",
+          "level": 1,
+          "researched": false,
+          "enabled": true,
+          "visible_when_disabled": false
+        },
+        {
+          "id": "mir-legacy-module-credit-efficiency-module",
+          "level": 1,
+          "researched": false,
+          "enabled": false,
+          "visible_when_disabled": false
+        },
+        {
+          "id": "mir-legacy-cannon-credit-rocket-shooting-speed",
+          "level": 1,
+          "researched": false,
+          "enabled": false,
+          "visible_when_disabled": false
+        }
+      ],
+      "module_productivity": {
+        "speed-module": 0,
+        "productivity-module": 0,
+        "efficiency-module": 0
+      },
+      "cannon_speed": 0
+    },
+    {
+      "seed_stage": "after-level-assignment",
+      "assigned_id": "mir-legacy-module-credit-efficiency-module",
+      "holders": [
+        {
+          "id": "mir-legacy-module-credit-speed-module",
+          "level": 1,
+          "researched": false,
+          "enabled": false,
+          "visible_when_disabled": false
+        },
+        {
+          "id": "mir-legacy-module-credit-productivity-module",
+          "level": 1,
+          "researched": false,
+          "enabled": false,
+          "visible_when_disabled": false
+        },
+        {
+          "id": "mir-legacy-module-credit-efficiency-module",
+          "level": 4,
+          "researched": false,
+          "enabled": true,
+          "visible_when_disabled": false
+        },
+        {
+          "id": "mir-legacy-cannon-credit-rocket-shooting-speed",
+          "level": 1,
+          "researched": false,
+          "enabled": false,
+          "visible_when_disabled": false
+        }
+      ],
+      "module_productivity": {
+        "speed-module": 0,
+        "productivity-module": 0,
+        "efficiency-module": 0.03
+      },
+      "cannon_speed": 0
+    },
+    {
+      "seed_stage": "after-researched-assignment",
+      "assigned_id": "mir-legacy-module-credit-efficiency-module",
+      "holders": [
+        {
+          "id": "mir-legacy-module-credit-speed-module",
+          "level": 1,
+          "researched": false,
+          "enabled": false,
+          "visible_when_disabled": false
+        },
+        {
+          "id": "mir-legacy-module-credit-productivity-module",
+          "level": 1,
+          "researched": false,
+          "enabled": false,
+          "visible_when_disabled": false
+        },
+        {
+          "id": "mir-legacy-module-credit-efficiency-module",
+          "level": 1,
+          "researched": false,
+          "enabled": true,
+          "visible_when_disabled": false
+        },
+        {
+          "id": "mir-legacy-cannon-credit-rocket-shooting-speed",
+          "level": 1,
+          "researched": false,
+          "enabled": false,
+          "visible_when_disabled": false
+        }
+      ],
+      "module_productivity": {
+        "speed-module": 0,
+        "productivity-module": 0,
+        "efficiency-module": 0
+      },
+      "cannon_speed": 0
+    },
+    {
+      "seed_stage": "after-level-assignment",
+      "assigned_id": "mir-legacy-cannon-credit-rocket-shooting-speed",
+      "holders": [
+        {
+          "id": "mir-legacy-module-credit-speed-module",
+          "level": 1,
+          "researched": false,
+          "enabled": false,
+          "visible_when_disabled": false
+        },
+        {
+          "id": "mir-legacy-module-credit-productivity-module",
+          "level": 1,
+          "researched": false,
+          "enabled": false,
+          "visible_when_disabled": false
+        },
+        {
+          "id": "mir-legacy-module-credit-efficiency-module",
+          "level": 1,
+          "researched": false,
+          "enabled": false,
+          "visible_when_disabled": false
+        },
+        {
+          "id": "mir-legacy-cannon-credit-rocket-shooting-speed",
+          "level": 5,
+          "researched": false,
+          "enabled": true,
+          "visible_when_disabled": false
+        }
+      ],
+      "module_productivity": {
+        "speed-module": 0,
+        "productivity-module": 0,
+        "efficiency-module": 0
+      },
+      "cannon_speed": 0.4
+    },
+    {
+      "seed_stage": "after-researched-assignment",
+      "assigned_id": "mir-legacy-cannon-credit-rocket-shooting-speed",
+      "holders": [
+        {
+          "id": "mir-legacy-module-credit-speed-module",
+          "level": 1,
+          "researched": false,
+          "enabled": false,
+          "visible_when_disabled": false
+        },
+        {
+          "id": "mir-legacy-module-credit-productivity-module",
+          "level": 1,
+          "researched": false,
+          "enabled": false,
+          "visible_when_disabled": false
+        },
+        {
+          "id": "mir-legacy-module-credit-efficiency-module",
+          "level": 1,
+          "researched": false,
+          "enabled": false,
+          "visible_when_disabled": false
+        },
+        {
+          "id": "mir-legacy-cannon-credit-rocket-shooting-speed",
+          "level": 1,
+          "researched": false,
+          "enabled": true,
+          "visible_when_disabled": false
+        }
+      ],
+      "module_productivity": {
+        "speed-module": 0,
+        "productivity-module": 0,
+        "efficiency-module": 0
+      },
+      "cannon_speed": 0
+    },
+    {
+      "seed_stage": "before-effect-reset",
+      "holders": [
+        {
+          "id": "mir-legacy-module-credit-speed-module",
+          "level": 1,
+          "researched": false,
+          "enabled": false,
+          "visible_when_disabled": false
+        },
+        {
+          "id": "mir-legacy-module-credit-productivity-module",
+          "level": 1,
+          "researched": false,
+          "enabled": false,
+          "visible_when_disabled": false
+        },
+        {
+          "id": "mir-legacy-module-credit-efficiency-module",
+          "level": 1,
+          "researched": false,
+          "enabled": false,
+          "visible_when_disabled": false
+        },
+        {
+          "id": "mir-legacy-cannon-credit-rocket-shooting-speed",
+          "level": 1,
+          "researched": false,
+          "enabled": false,
+          "visible_when_disabled": false
+        }
+      ],
+      "module_productivity": {
+        "speed-module": 0,
+        "productivity-module": 0,
+        "efficiency-module": 0
+      },
+      "cannon_speed": 0
+    },
+    {
+      "seed_stage": "after-effect-reset",
+      "holders": [
+        {
+          "id": "mir-legacy-module-credit-speed-module",
+          "level": 1,
+          "researched": false,
+          "enabled": false,
+          "visible_when_disabled": false
+        },
+        {
+          "id": "mir-legacy-module-credit-productivity-module",
+          "level": 1,
+          "researched": false,
+          "enabled": false,
+          "visible_when_disabled": false
+        },
+        {
+          "id": "mir-legacy-module-credit-efficiency-module",
+          "level": 1,
+          "researched": false,
+          "enabled": false,
+          "visible_when_disabled": false
+        },
+        {
+          "id": "mir-legacy-cannon-credit-rocket-shooting-speed",
+          "level": 1,
+          "researched": false,
+          "enabled": false,
+          "visible_when_disabled": false
+        }
+      ],
+      "module_productivity": {
+        "speed-module": 0,
+        "productivity-module": 0,
+        "efficiency-module": 0
+      },
+      "cannon_speed": 0
+    }
+  ],
+  "conclusion": "Each level assignment creates the intended positive level/effect with researched=false and enables that holder. The following explicit researched=false assignment resets its level to1 and removes its effect. The fixture then restores disabled flags. The later effect reset leaves already-zero state unchanged. This identifies a failed disposable fixture seed operation,not a player migration fault.",
+  "root_readback": {
+    "primary_custody": "build/qualification/library-positive-seed-diagnostic-r01-controller",
+    "reader_sha256": "A1A65158FDCBDB283F9D2D601591D30C72C04FEE97D97A8FC11B55F3115470A3",
+    "files": 7,
+    "bytes_per_copy": 64453,
+    "all_original_and_primary_hashes_verified": true,
+    "all_original_archives_and_controls_restored": true
+  },
+  "receipt_capsule": {
+    "path": "spec/evidence/library-positive-seed-native-diagnostic-receipts-r01.json.gz",
+    "sha256": "12C8DA7AFA65D9DBAB0C38C325EC2FD925F0F7C4459199900ED181B5F4B3D23A",
+    "bytes": 20529,
+    "bodies": 8
+  },
+  "counts": {
+    "actual_engine_processes": 1,
+    "joined_clients": 0,
+    "lab_completions": 0,
+    "completed_saves": 0,
+    "scalar_snapshots": 11
+  },
+  "prior_adverse": "spec/evidence/library-positive-state-f210-native-adverse-r01.json",
+  "correction_owner": "Aero;preserve intended levels/effects/hidden/fresh-state assertions and the actual coupled native setter in host double. Refreeze before retry.",
+  "controls_restored": true,
+  "imported_earnings": false,
+  "performance_acceptance": false,
+  "release_qualification": false
+}
