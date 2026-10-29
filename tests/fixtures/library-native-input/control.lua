@@ -170,7 +170,7 @@ local function report()
   local s=storage[KEY];if type(s)~="table" then return nil end
   return {schema=1,case="library-native-input-imported110",phase=s.phase,tick=game.tick,
     actual_joins=s.joins,actual_text_events=s.text_events,actual_library_closed_events=s.closed_events,
-    actual_drag_events=s.drag_events,actual_effect_reset_events=s.reset_events,actual_removed_events=s.removed_events,
+    actual_drag_events=s.drag_events,actual_effect_reset_events=s.reset_events,requested_native_resets=s.requested_resets,actual_removed_events=s.removed_events,
     private_queries=s.private_queries,en_index=s.en_index or false,de_index=s.de_index or false,
     removed_index=s.removed_index or false,readonly_imported_probe=s.private_queries>=16,
     imported_earnings=true,fixture_seeds_credit=false,load_observed=loaded_restart,
@@ -197,7 +197,8 @@ local function advance(step)
   elseif step=="prefix" then
     phase("text-prefix");local en,de=pair();assert_retained(en,de,"ge")
     if s.query_clicks<1 or s.text_events<1 then fail("actual query click/text events are absent") end
-    s.expected_reset_events=s.reset_events+1;en.force.reset_technology_effects();s.wait_tick=game.tick+60;s.phase="prefix-refresh"
+    s.requested_resets=s.requested_resets+1;s.expected_reset_events=s.reset_events+1
+    en.force.reset_technology_effects();s.wait_tick=game.tick+60;s.phase="prefix-refresh"
   elseif step=="refresh" then
     phase("prefix-refresh");local en,de=pair()
     if game.tick<s.wait_tick or s.reset_events~=s.expected_reset_events then fail("native refresh observation is not ready") end
@@ -224,7 +225,8 @@ local function advance(step)
   elseif step=="foreign-prefix" then
     phase("foreign-prefix");local en=player(s.en_index)
     if en.opened~=refs.other or refs.other_query.text~="focus" or s.other_clicks<1 then fail("actual foreign GUI input is absent") end
-    s.expected_reset_events=s.reset_events+1;en.force.reset_technology_effects();s.wait_tick=game.tick+60;s.phase="foreign-refresh"
+    s.requested_resets=s.requested_resets+1;s.expected_reset_events=s.reset_events+1
+    en.force.reset_technology_effects();s.wait_tick=game.tick+60;s.phase="foreign-refresh"
   elseif step=="foreign-refresh" then
     phase("foreign-refresh");local en=player(s.en_index)
     if game.tick<s.wait_tick or s.reset_events~=s.expected_reset_events or en.opened~=refs.other or valid(en.gui.screen[ROOT])
@@ -276,7 +278,7 @@ script.on_init(function()
   for _ in pairs(game.players) do fail("protected headless source must contain no pre-existing players") end
   if storage[KEY]~=nil then fail("observer state already exists") end
   storage[KEY]={schema=1,phase="waiting-clients",native=world(),joins=0,text_events=0,closed_events=0,
-    drag_events=0,reset_events=0,removed_events=0,private_queries=0,query_clicks=0,other_clicks=0}
+    drag_events=0,reset_events=0,requested_resets=0,removed_events=0,private_queries=0,query_clicks=0,other_clicks=0}
   check_imported_literals()
 end)
 script.on_load(function()local s=storage[KEY];loaded_restart=type(s)=="table" and s.phase=="awaiting-restart";refs={} end)
