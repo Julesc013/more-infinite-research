@@ -1,0 +1,66 @@
+{
+  "schema": 1,
+  "kind": "mir5-api-space-age-production-native-selection",
+  "target": "f200",
+  "factorio_line": "2.0",
+  "engine": {
+    "version": "2.0.77",
+    "sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B"
+  },
+  "settings_mode": "Defaults",
+  "mods": [
+    {
+      "name": "base",
+      "version": "2.0.77",
+      "enabled": true
+    },
+    {
+      "name": "elevated-rails",
+      "version": "2.0.77",
+      "enabled": true
+    },
+    {
+      "name": "quality",
+      "version": "2.0.77",
+      "enabled": true
+    },
+    {
+      "name": "space-age",
+      "version": "2.0.77",
+      "enabled": true
+    },
+    {
+      "name": "more-infinite-research",
+      "version": "5.0.20000",
+      "enabled": true
+    },
+    {
+      "name": "mir-fixture-mir5-active-mods-observer",
+      "version": "0.1.0",
+      "enabled": true
+    },
+    {
+      "name": "mir-fixture-mir5-api-alpha",
+      "version": "0.1.0",
+      "enabled": true
+    },
+    {
+      "name": "mir-fixture-mir5-api-beta",
+      "version": "0.1.0",
+      "enabled": true
+    },
+    {
+      "name": "mir-fixture-mir5-api-beta-production",
+      "version": "0.1.0",
+      "enabled": true
+    }
+  ],
+  "archive_sha256": {
+    "more-infinite-research_5.0.20000.zip": "7CAC54475107736106D84AF98D50A8622E095B6658F1E3682643FE0CBA8BAEF0",
+    "mir-fixture-mir5-active-mods-observer_0.1.0.zip": "9158D3B9CF68C0C857EF3974C85E459B6AFC838CCC70BEEAA2BA6B14709A7E73",
+    "mir-fixture-mir5-api-alpha_0.1.0.zip": "09317C92BA2C94AA18E3A67F68F8B961370673C22D288E04813CB5DB35041DE1",
+    "mir-fixture-mir5-api-beta_0.1.0.zip": "C7110EFD2C3D8BEC08B165789C6FFB6586BA1197E99FED739AD87EF2C70D0C3B",
+    "mir-fixture-mir5-api-beta-production_0.1.0.zip": "270F470FA6DC68D8B8762DC7DE549E3C6775CCE16F9D15B8DE11D4617D78676F"
+  },
+  "scope": "Fresh disposable public API qualification input only. Boundary uses CreateOnly; Space Age production uses the existing physical/save/two-cold path. Requires independent actual-input/profile/caller/native readback; no performance, API-stability or release pass."
+}
