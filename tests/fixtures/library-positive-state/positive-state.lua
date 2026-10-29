@@ -75,8 +75,8 @@ function M.seed(force)
     local technology = force.technologies[id]
     technology.level = index + 1
     seed_diagnostic(force, "after-level-assignment", id)
-    technology.researched = false
-    seed_diagnostic(force, "after-researched-assignment", id)
+    -- Native level assignment already leaves the infinite row unresearched.
+    -- Writing researched=false afterwards resets its level and earned effect.
     technology.enabled, technology.visible_when_disabled = false, false
   end
   seed_diagnostic(force, "before-effect-reset")

@@ -158,7 +158,7 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
               force.technologies["automation"]={valid=true,name="automation",force=force,level=1,
                 researched=true,enabled=true,visible_when_disabled=false}
             end
-            local reset_count=0
+            local reset_count, researched_set_calls=0, 0
             if selected.positive_state then
               for _,id in ipairs(private_credit_ids) do
                 local tech=force.technologies[id]
@@ -178,14 +178,23 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
                 end
                 force.cannon_speed=(force.technologies[private_credit_ids[4]].level-1)*.1
               end
-              if opponent=="positive-researched-setter-resets-level" then
-                for _,id in ipairs(private_credit_ids) do
+              do
+                for holder_index,id in ipairs(private_credit_ids) do
                   local values=force.technologies[id]
+                  local function update_effect()
+                    if holder_index<=3 then
+                      local recipe=({"speed-module","productivity-module","efficiency-module"})[holder_index]
+                      force.recipes[recipe].productivity_bonus=(values.level-1)*.01
+                    else force.cannon_speed=(values.level-1)*.1 end
+                  end
                   force.technologies[id]=setmetatable({}, {
                     __index=function(_,key)return values[key]end,
                     __newindex=function(_,key,value)
                       values[key]=value
-                      if key=="researched" and value==false then values.level=1 end
+                      if key=="researched" then
+                        researched_set_calls=researched_set_calls+1
+                        if value==false then values.level=1;update_effect() end
+                      elseif key=="level" then values.researched=false;update_effect() end
                     end,
                   })
                 end
@@ -580,6 +589,12 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
             environment._G=environment;setmetatable(environment,{__index=function(_,name)return _G[name]end})
             environment.require=function(name)
               assert(name=="positive-state" and selected.positive_state,"unexpected fixture import")
+              if opponent=="positive-researched-setter-resets-level" then
+                local stream=assert(io.open(positive_state_path,"r"));local body=stream:read("*a");stream:close()
+                local changed,count=body:gsub("technology.level = index %+ 1","technology.level = index + 1\n    technology.researched = false")
+                assert(count==1,"seed mutation did not target the single level assignment")
+                return assert(load(changed,"fixture-seed-opponent","t",environment))()
+              end
               local module,message=loadfile(positive_state_path,"t",environment);assert(module,message)
               return module()
             end
@@ -589,7 +604,7 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
               local success,value=pcall(callback,event)
               return success,tostring(value)
             end
-            ok,result=call(callbacks.init);if not ok then return {ok=false,message=result,seed_diagnostics=seed_diagnostics} end
+            ok,result=call(callbacks.init);if not ok then return {ok=false,message=result,seed_diagnostics=seed_diagnostics,researched_set_calls=researched_set_calls} end
             if opponent=="fake-connected" then
               ok,result=call(callbacks.events[2],{player_index=1})
               return {ok=ok,message=result,phase=storage[key].phase,markers=markers}
@@ -698,7 +713,7 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
               load_unchanged=load_unchanged,join_events=storage[key].join_events,measurements=storage[key].measurements,
               profiler_logs=profiler_logs,lab_diagnostics=lab_diagnostics,lab_insert_counts=insert_counts,
               rejected_bulk_inserts=rejected_bulk_inserts,private_query_calls=private_query_calls,
-              private_query_order=private_query_order,positive_seed_resets=reset_count,seed_diagnostics=seed_diagnostics}
+              private_query_order=private_query_order,positive_seed_resets=reset_count,seed_diagnostics=seed_diagnostics,researched_set_calls=researched_set_calls}
           end
         ''')
 
@@ -2251,7 +2266,7 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
             }, capture_output=True, text=True)
         self.assertEqual(process.returncode, 0, process.stdout + process.stderr)
 
-    def test_positive_seed_diagnostics_expose_a_native_setter_side_effect_without_relaxing_levels(self):
+    def test_positive_seed_avoids_the_native_level_resetting_researched_setter(self):
         ids = ["mir-legacy-module-credit-speed-module", "mir-legacy-module-credit-productivity-module",
                "mir-legacy-module-credit-efficiency-module", "mir-legacy-cannon-credit-rocket-shooting-speed"]
         for target in ("f200-positive-state", "f210-positive-state"):
@@ -2260,15 +2275,15 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
                     result = self.run_case(opponent, target=target)
                     self.assertEqual(result["ok"], opponent is None)
                     rows = result["seed_diagnostics"]
-                    self.assertEqual(len(rows), 11)
+                    self.assertEqual(len(rows), 7)
                     self.assertEqual([r["seed_stage"] for r in rows], ["before-assignments"] +
-                                     [stage for _ in ids for stage in ("after-level-assignment", "after-researched-assignment")] +
+                                     ["after-level-assignment"] * 4 +
                                      ["before-effect-reset", "after-effect-reset"])
                     for index, name in enumerate(ids):
-                        after_level, after_researched = rows[1+2*index:3+2*index]
+                        after_level = rows[1+index]
                         self.assertEqual(after_level["assigned_id"], name)
-                        self.assertEqual(after_level["holders"][index]["level"], index+2)
-                        self.assertEqual(after_researched["holders"][index]["level"], 1 if opponent else index+2)
+                        self.assertEqual(after_level["holders"][index]["level"], 1 if opponent else index+2)
+                    self.assertEqual(result["researched_set_calls"], 4 if opponent else 0)
                     if opponent:
                         self.assertIn("positive native holder changed", result["message"])
                         self.assertEqual([holder["level"] for holder in rows[-1]["holders"]], [1, 1, 1, 1])
