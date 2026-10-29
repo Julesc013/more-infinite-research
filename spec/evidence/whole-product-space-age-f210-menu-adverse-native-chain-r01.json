@@ -1,0 +1,143 @@
+{
+  "schema": 1,
+  "kind": "MIRSpaceAgeF210MenuR01AdverseChainV1",
+  "status": "failed-published-aa-before-scoring",
+  "source_commit": "b7caa8df9141523a556bb57ca8faf7c43d250c3d",
+  "private_source": "bfa17e373ce98eeac31e6bd22af8ecd39005a6f8",
+  "engine": {
+    "path": "D:\\Games\\Factorio\\2.1\\bin\\x64\\factorio.exe",
+    "bytes": 49398736,
+    "sha256": "8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38",
+    "version": "2.1.23"
+  },
+  "profile": {
+    "path": "D:\\Projects\\Factorio\\mir5-whole-product-capture-fixed-r01\\build\\tmp\\whole-product-space-age-f210-inputs-r01\\space-age-f210-standalone-derived.json",
+    "bytes": 1419,
+    "sha256": "10787C9728321EC877EF55EC1BBA8CD460888EDB312C73B61F155267F5A1EA40"
+  },
+  "arms": [
+    {
+      "id": "control-without-mir",
+      "archive": null
+    },
+    {
+      "id": "published-mir3",
+      "archive": {
+        "path": "D:\\Projects\\Factorio\\mir5-whole-product-capture-fixed-r01\\build\\tmp\\whole-product-space-age-f210-menu-inputs-r01\\owned-source-archives\\more-infinite-research_3.2.11.zip",
+        "bytes": 1067720,
+        "sha256": "5B0252C3E1B8A20FF8E31F408F0217DDC77D2DF0D1C15F59653E948472870A5A",
+        "name": "more-infinite-research",
+        "version": "3.2.11"
+      }
+    },
+    {
+      "id": "published-mir4.7",
+      "archive": {
+        "path": "D:\\Projects\\Factorio\\mir5-whole-product-capture-fixed-r01\\build\\tmp\\whole-product-space-age-f210-menu-inputs-r01\\owned-source-archives\\more-infinite-research_4.7.21003.zip",
+        "bytes": 1463293,
+        "sha256": "B6EB9430056ABD384DB00F94929FE7DAC0A37441ACF4BC277946689682628852",
+        "name": "more-infinite-research",
+        "version": "4.7.21003"
+      }
+    },
+    {
+      "id": "candidate-mir5",
+      "archive": {
+        "path": "D:\\Projects\\Factorio\\mir5-whole-product-capture-fixed-r01\\build\\tmp\\whole-product-space-age-f210-menu-inputs-r01\\owned-source-archives\\more-infinite-research_5.0.21000.zip",
+        "bytes": 696972,
+        "sha256": "B63743C36432E4C41CC0F56D5A48CABE81924D426EF11045095A9D5ED0430D7B",
+        "name": "more-infinite-research",
+        "version": "5.0.21000"
+      }
+    }
+  ],
+  "resources": {
+    "expected_peak_memory_mib": 8192,
+    "maximum_new_output_mib": 2048,
+    "per_launch_timeout_seconds": 300,
+    "admission_wait_seconds": 30
+  },
+  "tolerances": {
+    "aa_absolute_seconds": 0.5,
+    "aa_relative_fraction": 0.05,
+    "drift_seconds": 0.5,
+    "minimum_mir_added_reduction_fraction": 0.5,
+    "extensions": 0
+  },
+  "packet_sha256": "039919911ACC3DD71A4E499208149F9A238541E88899AD69C94745A51A6DC701",
+  "caller_sha256": "C425691F54370867F7F49680A202CCF0E703D216929AB0A2B4826F7F1BB0E3C5",
+  "readback": {
+    "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\whole-product-space-age-f210-menu-r01-controller\\root-readback.json",
+    "sha256": "B1475C64CA70B53129ED05EDE26434E0A119BAB37B5AA1EAE88292746F5BC8EC",
+    "observation": {
+      "kind": "MIRSpaceAgeF210MenuR01PartialRootReadbackV1",
+      "packet_sha256": "039919911ACC3DD71A4E499208149F9A238541E88899AD69C94745A51A6DC701",
+      "terminal_sha256": "9F8C02C3962BB349A883F5EDD7FD15F201AA24F53DDFB480584C6E5D7E9038A4",
+      "native_result_sha256": "49E1EF4FF74D0ECDED2F27FE85F9AE84765D5510C98C53F4B5C46AF4382C851D",
+      "completed_launches": 6,
+      "warmups": 4,
+      "published_aa_observations": 2,
+      "scored_observations": 0,
+      "aa_values_seconds": [
+        24.7968149,
+        23.053407
+      ],
+      "aa_reference_median_seconds": 23.92511095,
+      "aa_difference_seconds": 1.7434079000000011,
+      "aa_allowance_seconds": 1.1962555475,
+      "aa_pass": false,
+      "aa_refusal_reproduced": true,
+      "native_files_per_copy": 71,
+      "native_bytes_per_copy": 168409957,
+      "controller_files_per_copy": 4,
+      "controller_bytes_per_copy": 2088919,
+      "strict_png_streams_decoded": 18,
+      "actual_images_viewed": 0,
+      "validation": "Frozen13DA verify_inputs/check_custody/validate_restoration/validate_samples for exactly ordinals1..6;full read intentionally not claimed. All native/controller original-copy hashes and18 strict PNG streams checked;A/A refusal independently reproduced.",
+      "factorio_processes_after": 0,
+      "performance_acceptance": false,
+      "release_qualification": false
+    }
+  },
+  "independent_review": {
+    "scope": "All142 native source/copy and8 controller source/copy file hashes;18 strict PNG streams;all six actor/PID/start/HWND/engine/selection/ledger links;arithmetic and actual restoration.",
+    "status": "passed-adverse-preservation-only",
+    "native_files_per_copy": 71,
+    "native_bytes_per_copy": 168409957,
+    "controller_files_per_copy": 4,
+    "controller_bytes_per_copy": 2088919,
+    "distinct_pid_start_window_tuples": 6,
+    "max_working_set_bytes": 2962317312,
+    "max_sampled_private_bytes": 7669964800
+  },
+  "control_harness_adverse": {
+    "status": "original-false-green-preserved-and-superseded",
+    "original_claim_receipt": "controller/preflight-controls.json",
+    "cause": "An orchestration variable named args lost intended Start-Process arguments;bare Python REPL and Windows PowerShell banners did not execute the reader or caller.",
+    "effect": "Zero native engines or library/output/custody mutation;original stderr and stdout retained locally.",
+    "original_python_stderr": {
+      "bytes": 250717502,
+      "sha256": "201BF6C259B3B94C6A91FCC560DC15C858E231A3034EB6EFA7178E1162ED2EAD"
+    },
+    "corrected_proof": "controller/root-corrected-controls-r01/receipt.json",
+    "corrected_receipt_sha256": "FD45643DFA48DA3B68F2746AF11B2C833FBE5D7ACA1281C5FF8735A94070CCDC",
+    "corrected_result": "Direct full-path Python314 reader verify,PS7 VerifyOnly,and no-Execute guard returned0/0/1 with exact real outputs,unchanged protected files and absent output roots;independent readback passed before dispatch.",
+    "limit": "The250717502-byte original REPL stderr remains private local custody;its body is not included in this capsule."
+  },
+  "receipt_capsule": {
+    "path": "spec/evidence/whole-product-space-age-f210-menu-adverse-receipts-r01.json.gz",
+    "sha256": "745094A0ACEA7E9E00B0579C808362FCA9045BE3100DA3D55D7C21763BFCD46F",
+    "bytes": 166234,
+    "bodies": 62
+  },
+  "limits": [
+    "Only four warmups and two same-published controls completed;zero scored observations,extensions or comparison medians.",
+    "The A/A difference1.7434079s exceeds the unchanged1.1962555475s median-based allowance;the failure remains failed.",
+    "No A/A gate record or analysis was written;result.json is a failed-observation-retained prefix,not a full38-session result.",
+    "All18 PNGs were strictly decoded;no actual image viewing is claimed.",
+    "Fresh-process observations after selected-input hashing are not reboot-cold.",
+    "No cause,old-version parity,performance,whole-product acceptance or release verdict follows."
+  ],
+  "performance_acceptance": false,
+  "release_qualification": false
+}

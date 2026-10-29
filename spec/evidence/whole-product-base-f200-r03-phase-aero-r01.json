@@ -1,0 +1,1084 @@
+{
+  "schema": 1,
+  "kind": "MIRWholeProductBaseIndependentAdverseAndPhaseDiagnosisAeroV1",
+  "status": "existing-failed-controls-recomputed-next-diagnostic-prepared-no-acceptance",
+  "reviewed_source": "2a0a560e4354d9580ad8615c54546d941577e98e",
+  "capsules": [
+    {
+      "path": "spec/evidence/whole-product-base-f200-menu-adverse-receipts-r01.json.gz",
+      "sha256": "091D220C186B844E97380779E0D88F69DCD4C0F2E8385076CDB83C96BEE5628A",
+      "verified_bodies": 354
+    },
+    {
+      "path": "spec/evidence/whole-product-base-f210-admission-receipts-r01.json.gz",
+      "sha256": "2C1043BB70B2D60CFCE5273D72D471B112562851F497F66996A195543C1C94C9",
+      "verified_bodies": 26
+    }
+  ],
+  "f200_original_verdict": {
+    "r02": "Three actual starts;two complete warmups then4GiB actor/tree guard refusal. Original remains failed. Third start is established by a fresh shared engine log with published4.7.20003 marker,not by a wrapper PID.",
+    "r03": "38 PID/start identities and exact window PID/loaded-log selections agree;four warmups,two early published controls,32 diagnostic-phase observations. Independent early A/A arithmetic passes;NoMIR0.8932572s and published0.53703515s drift still fail unchanged0.5s. Zero accepted scores.",
+    "original_declared_arithmetic_recomputed": {
+      "published_aa": {
+        "values_seconds": [
+          10.930835,
+          11.1806478
+        ],
+        "difference_seconds": 0.24981279999999906,
+        "allowance_seconds": 0.5527870699999999,
+        "within_declared_allowance": true
+      },
+      "latin_medians_seconds": {
+        "control-without-mir": 10.4352445,
+        "published-mir3": 11.3236557,
+        "published-mir4.7": 11.62537315,
+        "candidate-mir5": 10.6609448
+      },
+      "drift": {
+        "control-without-mir": {
+          "first_cycle_median": 10.295704050000001,
+          "second_cycle_median": 11.18896125,
+          "difference": 0.893257199999999,
+          "within_seconds": false
+        },
+        "published-mir3": {
+          "first_cycle_median": 11.405690700000001,
+          "second_cycle_median": 11.21193835,
+          "difference": -0.19375235000000046,
+          "within_seconds": true
+        },
+        "published-mir4.7": {
+          "first_cycle_median": 11.3944013,
+          "second_cycle_median": 11.93143645,
+          "difference": 0.5370351499999995,
+          "within_seconds": false
+        },
+        "candidate-mir5": {
+          "first_cycle_median": 10.78313805,
+          "second_cycle_median": 10.5950908,
+          "difference": -0.18804725000000033,
+          "within_seconds": true
+        }
+      },
+      "historical_mir3": {
+        "interpretation": "as-shipped-historical-comparison-only",
+        "equal_work_established": false,
+        "mir3_minus_published_mir4_7_seconds": -0.30171744999999994
+      },
+      "mir_added_objective": {
+        "applicable": false,
+        "published_mir_added_seconds": 1.1901286500000001,
+        "candidate_mir_added_seconds": 0.22570029999999974,
+        "status": "not-applicable-profile-not-declared-high-cost"
+      }
+    },
+    "restoration": "All4 original control/archive descriptors equal the recorded final states;unchanged published archive is a valid restoration disposition.",
+    "png_limit": "Original images are not in the text capsule and have not been viewed/decoded on Aero. Root retains114 actual first-stream decodes and8 reported trailing artifacts;Aero does not promote those metadata reports into its own visual proof."
+  },
+  "phase_diagnosis": [
+    {
+      "arm": "control-without-mir",
+      "metrics": {
+        "external_ready_seconds": {
+          "first_cycle_median": 10.295704050000001,
+          "second_cycle_median": 11.18896125,
+          "second_minus_first": 0.893257199999999
+        },
+        "engine_initialised_log_seconds": {
+          "first_cycle_median": 8.8055,
+          "second_cycle_median": 8.7665,
+          "second_minus_first": -0.0389999999999997
+        },
+        "first_capture_start_seconds": {
+          "first_cycle_median": 8.9464362,
+          "second_cycle_median": 8.94670335,
+          "second_minus_first": 0.0002671499999991056
+        },
+        "first_capture_seconds": {
+          "first_cycle_median": 0.24992779999999998,
+          "second_cycle_median": 0.31257705,
+          "second_minus_first": 0.06264925000000005
+        },
+        "first_ocr_seconds": {
+          "first_cycle_median": 0.3317736,
+          "second_cycle_median": 0.4467805,
+          "second_minus_first": 0.11500690000000002
+        },
+        "first_menu_observed_seconds": {
+          "first_cycle_median": 9.6081504,
+          "second_cycle_median": 9.78748875,
+          "second_minus_first": 0.1793383500000001
+        },
+        "settings_capture_seconds": {
+          "first_cycle_median": 0.23530025,
+          "second_cycle_median": 0.41803899999999994,
+          "second_minus_first": 0.18273874999999995
+        },
+        "settings_ocr_seconds": {
+          "first_cycle_median": 0.255789,
+          "second_cycle_median": 0.3583877,
+          "second_minus_first": 0.10259869999999999
+        },
+        "settings_response_seconds": {
+          "first_cycle_median": 0.6072130499999999,
+          "second_cycle_median": 1.284497,
+          "second_minus_first": 0.6772839500000001
+        },
+        "maximum_observer_iteration_seconds": {
+          "first_cycle_median": 0.7535706,
+          "second_cycle_median": 1.01358455,
+          "second_minus_first": 0.26001395000000005
+        },
+        "capture_attempts": {
+          "first_cycle_median": 2.0,
+          "second_cycle_median": 2.5,
+          "second_minus_first": 0.5
+        },
+        "prelaunch_free_physical_bytes": {
+          "first_cycle_median": 16843087872.0,
+          "second_cycle_median": 16926410752.0,
+          "second_minus_first": 83322880.0
+        },
+        "prelaunch_committed_bytes": {
+          "first_cycle_median": 23656161280.0,
+          "second_cycle_median": 23595028480.0,
+          "second_minus_first": -61132800.0
+        }
+      }
+    },
+    {
+      "arm": "published-mir3",
+      "metrics": {
+        "external_ready_seconds": {
+          "first_cycle_median": 11.405690700000001,
+          "second_cycle_median": 11.21193835,
+          "second_minus_first": -0.19375235000000046
+        },
+        "engine_initialised_log_seconds": {
+          "first_cycle_median": 9.651499999999999,
+          "second_cycle_median": 9.706,
+          "second_minus_first": 0.05450000000000088
+        },
+        "first_capture_start_seconds": {
+          "first_cycle_median": 9.812443250000001,
+          "second_cycle_median": 9.88004815,
+          "second_minus_first": 0.06760489999999919
+        },
+        "first_capture_seconds": {
+          "first_cycle_median": 0.29372180000000003,
+          "second_cycle_median": 0.28099295,
+          "second_minus_first": -0.012728850000000014
+        },
+        "first_ocr_seconds": {
+          "first_cycle_median": 0.43585985,
+          "second_cycle_median": 0.3713332,
+          "second_minus_first": -0.06452665000000002
+        },
+        "first_menu_observed_seconds": {
+          "first_cycle_median": 10.5309848,
+          "second_cycle_median": 10.4761674,
+          "second_minus_first": -0.054817400000001015
+        },
+        "settings_capture_seconds": {
+          "first_cycle_median": 0.27746035,
+          "second_cycle_median": 0.2607655,
+          "second_minus_first": -0.01669485000000004
+        },
+        "settings_ocr_seconds": {
+          "first_cycle_median": 0.33142665,
+          "second_cycle_median": 0.26693239999999996,
+          "second_minus_first": -0.06449425000000003
+        },
+        "settings_response_seconds": {
+          "first_cycle_median": 0.74806895,
+          "second_cycle_median": 0.7182424000000001,
+          "second_minus_first": -0.029826549999999896
+        },
+        "maximum_observer_iteration_seconds": {
+          "first_cycle_median": 0.86734285,
+          "second_cycle_median": 0.76984225,
+          "second_minus_first": -0.09750060000000005
+        },
+        "capture_attempts": {
+          "first_cycle_median": 2.0,
+          "second_cycle_median": 2.0,
+          "second_minus_first": 0.0
+        },
+        "prelaunch_free_physical_bytes": {
+          "first_cycle_median": 16860295168.0,
+          "second_cycle_median": 16942888960.0,
+          "second_minus_first": 82593792.0
+        },
+        "prelaunch_committed_bytes": {
+          "first_cycle_median": 23681464320.0,
+          "second_cycle_median": 23551475712.0,
+          "second_minus_first": -129988608.0
+        }
+      }
+    },
+    {
+      "arm": "published-mir4.7",
+      "metrics": {
+        "external_ready_seconds": {
+          "first_cycle_median": 11.3944013,
+          "second_cycle_median": 11.93143645,
+          "second_minus_first": 0.5370351499999995
+        },
+        "engine_initialised_log_seconds": {
+          "first_cycle_median": 9.4765,
+          "second_cycle_median": 9.6385,
+          "second_minus_first": 0.1620000000000008
+        },
+        "first_capture_start_seconds": {
+          "first_cycle_median": 9.70869405,
+          "second_cycle_median": 9.802458,
+          "second_minus_first": 0.0937639499999996
+        },
+        "first_capture_seconds": {
+          "first_cycle_median": 0.2839642,
+          "second_cycle_median": 0.29609575,
+          "second_minus_first": 0.012131549999999991
+        },
+        "first_ocr_seconds": {
+          "first_cycle_median": 0.360284,
+          "second_cycle_median": 0.40466314999999997,
+          "second_minus_first": 0.04437914999999998
+        },
+        "first_menu_observed_seconds": {
+          "first_cycle_median": 10.352942250000002,
+          "second_cycle_median": 10.60770925,
+          "second_minus_first": 0.2547669999999975
+        },
+        "settings_capture_seconds": {
+          "first_cycle_median": 0.25000555,
+          "second_cycle_median": 0.2720128,
+          "second_minus_first": 0.022007249999999978
+        },
+        "settings_ocr_seconds": {
+          "first_cycle_median": 0.30509535,
+          "second_cycle_median": 0.3013286,
+          "second_minus_first": -0.0037667499999999854
+        },
+        "settings_response_seconds": {
+          "first_cycle_median": 1.0162973000000002,
+          "second_cycle_median": 0.7288191500000001,
+          "second_minus_first": -0.2874781500000001
+        },
+        "maximum_observer_iteration_seconds": {
+          "first_cycle_median": 0.7646624,
+          "second_cycle_median": 0.9039379999999999,
+          "second_minus_first": 0.13927559999999994
+        },
+        "capture_attempts": {
+          "first_cycle_median": 2.5,
+          "second_cycle_median": 2.0,
+          "second_minus_first": -0.5
+        },
+        "prelaunch_free_physical_bytes": {
+          "first_cycle_median": 16785045504.0,
+          "second_cycle_median": 16915484672.0,
+          "second_minus_first": 130439168.0
+        },
+        "prelaunch_committed_bytes": {
+          "first_cycle_median": 23693191168.0,
+          "second_cycle_median": 23553652736.0,
+          "second_minus_first": -139538432.0
+        }
+      }
+    },
+    {
+      "arm": "candidate-mir5",
+      "metrics": {
+        "external_ready_seconds": {
+          "first_cycle_median": 10.78313805,
+          "second_cycle_median": 10.5950908,
+          "second_minus_first": -0.18804725000000033
+        },
+        "engine_initialised_log_seconds": {
+          "first_cycle_median": 8.9315,
+          "second_cycle_median": 8.908999999999999,
+          "second_minus_first": -0.022500000000000853
+        },
+        "first_capture_start_seconds": {
+          "first_cycle_median": 9.115820450000001,
+          "second_cycle_median": 9.0824122,
+          "second_minus_first": -0.033408250000000805
+        },
+        "first_capture_seconds": {
+          "first_cycle_median": 0.29561725,
+          "second_cycle_median": 0.29952334999999997,
+          "second_minus_first": 0.003906099999999968
+        },
+        "first_ocr_seconds": {
+          "first_cycle_median": 0.42835725,
+          "second_cycle_median": 0.3972633,
+          "second_minus_first": -0.031093950000000037
+        },
+        "first_menu_observed_seconds": {
+          "first_cycle_median": 9.8290063,
+          "second_cycle_median": 9.795216,
+          "second_minus_first": -0.03379029999999972
+        },
+        "settings_capture_seconds": {
+          "first_cycle_median": 0.26742315,
+          "second_cycle_median": 0.27740604999999996,
+          "second_minus_first": 0.009982899999999961
+        },
+        "settings_ocr_seconds": {
+          "first_cycle_median": 0.33369285000000004,
+          "second_cycle_median": 0.34048885,
+          "second_minus_first": 0.006795999999999969
+        },
+        "settings_response_seconds": {
+          "first_cycle_median": 0.7870203,
+          "second_cycle_median": 0.7559641500000001,
+          "second_minus_first": -0.03105614999999995
+        },
+        "maximum_observer_iteration_seconds": {
+          "first_cycle_median": 0.8469666,
+          "second_cycle_median": 0.8507465999999999,
+          "second_minus_first": 0.0037799999999998946
+        },
+        "capture_attempts": {
+          "first_cycle_median": 2.0,
+          "second_cycle_median": 2.0,
+          "second_minus_first": 0.0
+        },
+        "prelaunch_free_physical_bytes": {
+          "first_cycle_median": 16801499136.0,
+          "second_cycle_median": 16902350848.0,
+          "second_minus_first": 100851712.0
+        },
+        "prelaunch_committed_bytes": {
+          "first_cycle_median": 23723929600.0,
+          "second_cycle_median": 23562434560.0,
+          "second_minus_first": -161495040.0
+        }
+      }
+    }
+  ],
+  "findings": [
+    "NoMIR engine-initialised log median changes−0.039s while total ready rises0.8932572s;the successful first-capture start median is essentially unchanged. Post-init Settings response/capture/OCR/retry behavior needs diagnosis;this does not prove whether the delay is actual UI rendering/transition or external observation.",
+    "NoMIR ordinals23/36 require3captures and1.80–2.02s Settings responses;usual cases use2captures/~0.5–0.8s. NoMIR has no reported trailing-PNG case,so truncation alone does not explain its failed drift.",
+    "Published ordinal31 has an engine-log data-final-fixes-to-checksum gap1.734→7.658s (~5.924s) versus~0.7s ordinarily. Published ordinal12 instead has8captures at ordinary9.409s initialization. These are distinct observations;no cause or MIR5 regression is assigned.",
+    "Prelaunch free physical memory rises~80–130MiB and commit falls between cycles;the supplied records do not establish growing pressure. All38 logs have the same18 unknown-control-input warnings. No thermal,CPU-frequency,background-process or paging attribution is inferred.",
+    "F200 R03 first/last process starts14:23:42Z/14:33:12Z;the four F210 admissions occur15:14:10–40Z,so those recorded jobs do not overlap the F200 timing block. Other background work is not excluded by these timestamps."
+  ],
+  "f210_loading_input_readback": [
+    {
+      "arm": "control-without-mir",
+      "native_pid": 13964,
+      "loaded_selection": [
+        "base@2.1.23",
+        "mir-fixture-mir5-active-mods-observer@0.1.0"
+      ],
+      "exit_code": 0,
+      "reported_technology_rows": 196,
+      "reported_setting_rows": 0,
+      "process_log_sha256": "4C5D9D022677DB20A91F82B9C928ED94DA19A1C118F6B168DF4A35A2F6AFFF8F",
+      "ledger_sha256": "5286522773FBBC1EC1C7DDBE210A22A725E1C8E02F77DB4C3AA088E2DA40AC23",
+      "restored": true
+    },
+    {
+      "arm": "terminal-mir3.2.11",
+      "native_pid": 71008,
+      "loaded_selection": [
+        "base@2.1.23",
+        "mir-fixture-mir5-active-mods-observer@0.1.0",
+        "more-infinite-research@3.2.11"
+      ],
+      "exit_code": 0,
+      "reported_technology_rows": 250,
+      "reported_setting_rows": 599,
+      "process_log_sha256": "BD6C5A786AA7E2CE7054A82F9F12BF5EF612B0DA32E34256B720AC1EBF9448DD",
+      "ledger_sha256": "401B13BF773D40CE9AA657934D2F508F28BB63FA2C9F8D1D580932B059251B18",
+      "restored": true
+    },
+    {
+      "arm": "published-mir4.7",
+      "native_pid": 53596,
+      "loaded_selection": [
+        "base@2.1.23",
+        "mir-fixture-mir5-active-mods-observer@0.1.0",
+        "more-infinite-research@4.7.21003"
+      ],
+      "exit_code": 0,
+      "reported_technology_rows": 249,
+      "reported_setting_rows": 889,
+      "process_log_sha256": "F6C2B659264AECB69A480E601E7B5064009EF0C80F601A4C707A4C49B1E5EDB6",
+      "ledger_sha256": "7B6FEF7CA0EE0217F7E4E44B25AB030ADD04EB2C863903A52A569CB259DBDD4E",
+      "restored": true
+    },
+    {
+      "arm": "candidate-mir5",
+      "native_pid": 83732,
+      "loaded_selection": [
+        "base@2.1.23",
+        "mir-fixture-mir5-active-mods-observer@0.1.0",
+        "more-infinite-research@5.0.21000"
+      ],
+      "exit_code": 0,
+      "reported_technology_rows": 274,
+      "reported_setting_rows": 889,
+      "process_log_sha256": "3E36E05C972A0B80765A82676AA55CEE39401E5C904C55EDD508F097E0636AB5",
+      "ledger_sha256": "728509DFD43836C6546C4221C5B0EE6C112F7D095FC3C5A72FD69C3B5DB074EC",
+      "restored": true
+    }
+  ],
+  "f210_limits": "Exact noMIR/published3.2.11/published4.7.21003/B637 Base loading only. Full prototype/settings dump bytes remain on Black Glass;reported row counts agree with chain/readback but are not independently recounted from raw objects here. No menu,shared-work,gameplay,save,client or performance verdict.",
+  "bounded_next_diagnostic": {
+    "existing_command": [
+      "pwsh",
+      "-NoProfile",
+      "-File",
+      "tools/Invoke-MenuComparison.ps1",
+      "-Execute",
+      "-RepeatabilityDiagnostic",
+      "-FactorioBin",
+      "D:\\Games\\Factorio\\2.0\\bin\\x64\\factorio.exe",
+      "-ExpectedFactorioSha256",
+      "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B",
+      "-ExpectedEngineVersion",
+      "2.0.77",
+      "-ExpectedFactorioLine",
+      "2.0",
+      "-ArchiveLibrary",
+      "D:\\Projects\\Factorio\\testmods\\2.0",
+      "-ProfilePath",
+      "D:\\Projects\\Factorio\\mir5-support-exports-freeze-r01\\build\\tmp\\whole-product-base-f200-menu-inputs-r02\\base-f200.json",
+      "-ExpectedProfileSha256",
+      "181D1983F21656437511567321EE8DCF054F16925016051C28B2D62837DCB398",
+      "-PublishedArchive",
+      "D:\\Projects\\Factorio\\mir5-support-exports-freeze-r01\\build\\tmp\\whole-product-base-f200-menu-inputs-r02\\owned-source-archives\\more-infinite-research_4.7.20003.zip",
+      "-ExpectedPublishedSha256",
+      "FBBA844DD04011A12BB6DA885745B0733AD37FAB181EAAD9EE4346B9B0D32647",
+      "-OrdinaryPlayerConfigPath",
+      "D:\\Projects\\Factorio\\mir5-support-exports-freeze-r01\\build\\tmp\\whole-product-base-f200-menu-inputs-r02\\ordinary-config.ini",
+      "-ExpectedOrdinaryPlayerConfigSha256",
+      "DA9A92AB9047EBD9F9640B34DC9EF6C084801DF85B8F75B1A490E786F40DD510",
+      "-PlayerDataPath",
+      "D:\\Projects\\Factorio\\mir5-support-exports-freeze-r01\\build\\tmp\\whole-product-base-f200-menu-inputs-r02\\player-data.json",
+      "-ExpectedPlayerDataSha256",
+      "B2BF04AD4E46C306BB9CFB2BFACF549307FD1E611B760C79F68080D79AC532A9",
+      "-OutputRoot",
+      "D:/Projects/Factorio/more-infinite-research/build/tmp/whole-product-base-published-control-aero-r01",
+      "-ActiveModsObserver",
+      "mir-fixture-mir5-active-mods-observer",
+      "-TimeoutSeconds",
+      "300",
+      "-ExpectedPeakMemoryMiB",
+      "9216",
+      "-MaxNewOutputMiB",
+      "2048",
+      "-AdmissionWaitSeconds",
+      "30",
+      "-AaAbsoluteToleranceSeconds",
+      "0.5",
+      "-AaRelativeTolerancePercent",
+      "5",
+      "-ControlRegressionToleranceSeconds",
+      "0.5",
+      "-MinimumMirAddedTimeReductionPercent",
+      "50"
+    ],
+    "working_directory_on_native_owner": "D:/Projects/Factorio/more-infinite-research",
+    "source_review_reference": "1d104429fb305fc00e66530f803b4212cf2e91b0",
+    "materialized_plan": {
+      "path": "build/qualification/whole-product-base-aero-review-r01/proposed-published-diagnostic-plan.json",
+      "sha256": "B3E9374B7C2EFBE1F7A5F3631BDA943672671F99813395C9F049977D5735B5BF"
+    },
+    "arguments": {
+      "FactorioBin": "D:\\Games\\Factorio\\2.0\\bin\\x64\\factorio.exe",
+      "ExpectedFactorioSha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B",
+      "ExpectedEngineVersion": "2.0.77",
+      "ExpectedFactorioLine": "2.0",
+      "ArchiveLibrary": "D:\\Projects\\Factorio\\testmods\\2.0",
+      "ProfilePath": "D:\\Projects\\Factorio\\mir5-support-exports-freeze-r01\\build\\tmp\\whole-product-base-f200-menu-inputs-r02\\base-f200.json",
+      "ExpectedProfileSha256": "181D1983F21656437511567321EE8DCF054F16925016051C28B2D62837DCB398",
+      "PublishedArchive": "D:\\Projects\\Factorio\\mir5-support-exports-freeze-r01\\build\\tmp\\whole-product-base-f200-menu-inputs-r02\\owned-source-archives\\more-infinite-research_4.7.20003.zip",
+      "ExpectedPublishedSha256": "FBBA844DD04011A12BB6DA885745B0733AD37FAB181EAAD9EE4346B9B0D32647",
+      "OrdinaryPlayerConfigPath": "D:\\Projects\\Factorio\\mir5-support-exports-freeze-r01\\build\\tmp\\whole-product-base-f200-menu-inputs-r02\\ordinary-config.ini",
+      "ExpectedOrdinaryPlayerConfigSha256": "DA9A92AB9047EBD9F9640B34DC9EF6C084801DF85B8F75B1A490E786F40DD510",
+      "PlayerDataPath": "D:\\Projects\\Factorio\\mir5-support-exports-freeze-r01\\build\\tmp\\whole-product-base-f200-menu-inputs-r02\\player-data.json",
+      "ExpectedPlayerDataSha256": "B2BF04AD4E46C306BB9CFB2BFACF549307FD1E611B760C79F68080D79AC532A9",
+      "OutputRoot": "D:/Projects/Factorio/more-infinite-research/build/tmp/whole-product-base-published-control-aero-r01",
+      "ActiveModsObserver": "mir-fixture-mir5-active-mods-observer",
+      "TimeoutSeconds": 300,
+      "ExpectedPeakMemoryMiB": 9216,
+      "MaxNewOutputMiB": 2048,
+      "AdmissionWaitSeconds": 30,
+      "AaAbsoluteToleranceSeconds": 0.5,
+      "AaRelativeTolerancePercent": 5,
+      "ControlRegressionToleranceSeconds": 0.5,
+      "MinimumMirAddedTimeReductionPercent": 50
+    },
+    "schedule": "Existing public published-only RepeatabilityDiagnostic:exactly1warmup+4observations;two declared same-build pairs. No candidate/MIR3/NoMIR comparison,score or extension.",
+    "purpose": "Repeat the identical published control in one protected quiet block,retaining the same responsive-menu endpoint and unchanged0.5s/5% control rules. Use existing raw capture/QPC/engine-log/memory records to isolate engine-vs-post-init variability. Record missing context rather than invent thermal/cache/CPU causes.",
+    "before_execute": "Native owner checks fresh output and exact existing archive/profile/config/player-data/engine/control ownership;run this same command first with -PlanOnly and -Preflight replacing -Execute. Do not replace an active frozen block.",
+    "expected": "Five governed real processes with all raw ready endpoints,engine phases,capture counts and stage timings retained. No player source change or saved-game input;restore library/control bytes. This remains diagnostic even if its controls pass.",
+    "if_failure": "Preserve all5 observations and the exact failed predicate;do not add runs or widen limits. If observer changes are needed,review a separate bounded protocol before replacement acceptance data. Keep ready migrations/export checks moving between protected timing blocks.",
+    "closes": "Preparation of a bounded repeatability diagnosis only. Actual whole-product Base/SpaceAge/heavy-profile performance acceptance remains open.",
+    "command_and_changed_capture_pins": [
+      {
+        "path": "tools/Invoke-MenuComparison.ps1",
+        "source_revision": "1d104429fb305fc00e66530f803b4212cf2e91b0",
+        "sha256": "937FA4384F483F6DD1CFA901408FC45A45A467F5BAA0F876B0C0CD8B5366D919",
+        "bytes": 40357
+      },
+      {
+        "path": "tools/lib/validation/responsive-menu/OwnedMenuWindow.ps1",
+        "source_revision": "1d104429fb305fc00e66530f803b4212cf2e91b0",
+        "sha256": "AA2CD384725159C373CB48C34A352F2B41FF50BE2DC0477624475AB9EBD03C15",
+        "bytes": 18576
+      }
+    ],
+    "source_binding_limit": "The adverse evidence commit2a0a560e predates the PNG correction even though its PR base later advanced. Execute only from this reviewed1d104429f tree or an independently pinned descendant with identical consumed helpers;freeze the actual complete helper closure before native dispatch. OriginalR03 source/measurements remain unchanged."
+  },
+  "local_custody": "build/qualification/whole-product-base-aero-review-r01",
+  "limits": [
+    "Medians of separate components need not sum to the median total.",
+    "Engine log and QPC time origins differ;their residual is not exclusively observer time.",
+    "No CPU-frequency,thermal,power or complete background-process traces are inferred.",
+    "No replacement threshold,score,extension or acceptance verdict is introduced."
+  ],
+  "new_native_processes": 0,
+  "new_accepted_scores": 0,
+  "performance_acceptance": false,
+  "release_qualification": false,
+  "phase_reader": {
+    "path": "build/qualification/whole-product-base-aero-review-r01/decompose.py",
+    "sha256": "87A9C8A3372EE76EC099F5F77586A85DAB64500204137DC9A8F19AD1C19480DD"
+  },
+  "f210_readback_method": "Standard-library SHA256/base64 checks for all26 transported bodies,exact native log/loaded-selection equality,engine8DC/version2.1.23,direct ledger PID,exit0/dump-descriptor/restoration comparisons. Complete dump bodies and binary artifacts stay native-owner custody.",
+  "relevant_sample_diagnostics": [
+    {
+      "ordinal": 1,
+      "id": "01-warmup-control-without-mir",
+      "phase": "warmup",
+      "arm": "control-without-mir",
+      "block": 0,
+      "position": 1,
+      "external_ready_seconds": 15.1497842,
+      "engine_initialised_log_seconds": 13.388,
+      "first_capture_start_seconds": 13.5212807,
+      "first_capture_seconds": 0.3120619,
+      "first_ocr_seconds": 0.4850998,
+      "first_menu_observed_seconds": 14.3184424,
+      "settings_capture_seconds": 0.2641433,
+      "settings_ocr_seconds": 0.3929768,
+      "settings_response_seconds": 0.7854816,
+      "maximum_observer_iteration_seconds": 0.9170473,
+      "capture_attempts": 2,
+      "process_start_utc": "2026-10-29T14:23:42.7573652Z",
+      "prelaunch_free_physical_bytes": 17284624384,
+      "prelaunch_committed_bytes": 23217741824,
+      "unknown_control_warnings": 18,
+      "actor_body_sha256": "37085F859484FF08A3BB014EF947F89F1352C849DFA142CA1CB69424F7A9495B"
+    },
+    {
+      "ordinal": 2,
+      "id": "02-warmup-published-mir3",
+      "phase": "warmup",
+      "arm": "published-mir3",
+      "block": 0,
+      "position": 2,
+      "external_ready_seconds": 11.5202681,
+      "engine_initialised_log_seconds": 9.889,
+      "first_capture_start_seconds": 10.0893251,
+      "first_capture_seconds": 0.3069103,
+      "first_ocr_seconds": 0.3825748,
+      "first_menu_observed_seconds": 10.7788102,
+      "settings_capture_seconds": 0.2764732,
+      "settings_ocr_seconds": 0.3067323,
+      "settings_response_seconds": 0.6978639,
+      "maximum_observer_iteration_seconds": 0.8065874,
+      "capture_attempts": 2,
+      "process_start_utc": "2026-10-29T14:24:02.1060194Z",
+      "prelaunch_free_physical_bytes": 16937553920,
+      "prelaunch_committed_bytes": 23576018944,
+      "unknown_control_warnings": 18,
+      "actor_body_sha256": "0FF51C9D28EB084539D8FF91A08D4BC0CFB1CDF6A627B201EA9B5A643B47D9FC"
+    },
+    {
+      "ordinal": 3,
+      "id": "03-warmup-published-mir4.7",
+      "phase": "warmup",
+      "arm": "published-mir4.7",
+      "block": 0,
+      "position": 3,
+      "external_ready_seconds": 11.2256518,
+      "engine_initialised_log_seconds": 9.407,
+      "first_capture_start_seconds": 9.7567256,
+      "first_capture_seconds": 0.2594929,
+      "first_ocr_seconds": 0.4421331,
+      "first_menu_observed_seconds": 10.4583516,
+      "settings_capture_seconds": 0.2507731,
+      "settings_ocr_seconds": 0.3451928,
+      "settings_response_seconds": 0.7233361,
+      "maximum_observer_iteration_seconds": 0.8252071,
+      "capture_attempts": 2,
+      "process_start_utc": "2026-10-29T14:24:17.4954640Z",
+      "prelaunch_free_physical_bytes": 16890580992,
+      "prelaunch_committed_bytes": 23669129216,
+      "unknown_control_warnings": 18,
+      "actor_body_sha256": "D271F2B1D9FDBD734620709693911D20897D00BCC5A24B2F3659EF89AA3C5C0D"
+    },
+    {
+      "ordinal": 4,
+      "id": "04-warmup-candidate-mir5",
+      "phase": "warmup",
+      "arm": "candidate-mir5",
+      "block": 0,
+      "position": 4,
+      "external_ready_seconds": 10.1136427,
+      "engine_initialised_log_seconds": 8.758,
+      "first_capture_start_seconds": 8.8834918,
+      "first_capture_seconds": 0.2554494,
+      "first_ocr_seconds": 0.3412269,
+      "first_menu_observed_seconds": 9.4801681,
+      "settings_capture_seconds": 0.2392777,
+      "settings_ocr_seconds": 0.2401842,
+      "settings_response_seconds": 0.592782,
+      "maximum_observer_iteration_seconds": 0.7151301999999999,
+      "capture_attempts": 2,
+      "process_start_utc": "2026-10-29T14:24:32.3315510Z",
+      "prelaunch_free_physical_bytes": 16901574656,
+      "prelaunch_committed_bytes": 23562752000,
+      "unknown_control_warnings": 18,
+      "actor_body_sha256": "751F389AEBF6AC96D2AD9F5AF7B03953A95ECD07A51778CA4AEBBAAC83785362"
+    },
+    {
+      "ordinal": 5,
+      "id": "05-published-aa-published-mir4.7",
+      "phase": "published-aa",
+      "arm": "published-mir4.7",
+      "block": 0,
+      "position": 1,
+      "external_ready_seconds": 10.930835,
+      "engine_initialised_log_seconds": 9.455,
+      "first_capture_start_seconds": 9.6375921,
+      "first_capture_seconds": 0.2726305,
+      "first_ocr_seconds": 0.3238357,
+      "first_menu_observed_seconds": 10.2340583,
+      "settings_capture_seconds": 0.2581853,
+      "settings_ocr_seconds": 0.2662806,
+      "settings_response_seconds": 0.6471272,
+      "maximum_observer_iteration_seconds": 0.7363012,
+      "capture_attempts": 2,
+      "process_start_utc": "2026-10-29T14:24:46.1141686Z",
+      "prelaunch_free_physical_bytes": 16866422784,
+      "prelaunch_committed_bytes": 23668625408,
+      "unknown_control_warnings": 18,
+      "actor_body_sha256": "6762BCC606D3510297021378494AE29DD6DF617916A7F49104BB74C10A586912"
+    },
+    {
+      "ordinal": 6,
+      "id": "06-published-aa-published-mir4.7",
+      "phase": "published-aa",
+      "arm": "published-mir4.7",
+      "block": 0,
+      "position": 2,
+      "external_ready_seconds": 11.1806478,
+      "engine_initialised_log_seconds": 9.614,
+      "first_capture_start_seconds": 9.7521237,
+      "first_capture_seconds": 0.2885146,
+      "first_ocr_seconds": 0.4007762,
+      "first_menu_observed_seconds": 10.4414145,
+      "settings_capture_seconds": 0.2582887,
+      "settings_ocr_seconds": 0.3120137,
+      "settings_response_seconds": 0.6836817,
+      "maximum_observer_iteration_seconds": 0.8238162,
+      "capture_attempts": 2,
+      "process_start_utc": "2026-10-29T14:25:00.7280848Z",
+      "prelaunch_free_physical_bytes": 16886628352,
+      "prelaunch_committed_bytes": 23649468416,
+      "unknown_control_warnings": 18,
+      "actor_body_sha256": "F582619A7733ABBBD6665850F72925E920930A17BDE57AFB4AF0AC25B56FBEB7"
+    },
+    {
+      "ordinal": 7,
+      "id": "07-latin-comparison-control-without-mir",
+      "phase": "latin-comparison",
+      "arm": "control-without-mir",
+      "block": 1,
+      "position": 1,
+      "external_ready_seconds": 10.2539418,
+      "engine_initialised_log_seconds": 8.97,
+      "first_capture_start_seconds": 9.111088,
+      "first_capture_seconds": 0.2420934,
+      "first_ocr_seconds": 0.314012,
+      "first_menu_observed_seconds": 9.6671934,
+      "settings_capture_seconds": 0.2228969,
+      "settings_ocr_seconds": 0.214086,
+      "settings_response_seconds": 0.5474114,
+      "maximum_observer_iteration_seconds": 0.6718082,
+      "capture_attempts": 2,
+      "process_start_utc": "2026-10-29T14:25:17.0513627Z",
+      "prelaunch_free_physical_bytes": 16856510464,
+      "prelaunch_committed_bytes": 23640281088,
+      "unknown_control_warnings": 18,
+      "actor_body_sha256": "1C277752B1BDAE6D81EDB712932B829ACE0D006169F4952F3E1F2B076F4E78D8"
+    },
+    {
+      "ordinal": 9,
+      "id": "09-latin-comparison-published-mir4.7",
+      "phase": "latin-comparison",
+      "arm": "published-mir4.7",
+      "block": 1,
+      "position": 3,
+      "external_ready_seconds": 11.1481767,
+      "engine_initialised_log_seconds": 9.5,
+      "first_capture_start_seconds": 9.69427,
+      "first_capture_seconds": 0.3090304,
+      "first_ocr_seconds": 0.3661776,
+      "first_menu_observed_seconds": 10.369478,
+      "settings_capture_seconds": 0.25634,
+      "settings_ocr_seconds": 0.3516231,
+      "settings_response_seconds": 0.7326306,
+      "maximum_observer_iteration_seconds": 0.7986983999999999,
+      "capture_attempts": 2,
+      "process_start_utc": "2026-10-29T14:25:46.2595584Z",
+      "prelaunch_free_physical_bytes": 16779984896,
+      "prelaunch_committed_bytes": 23663443968,
+      "unknown_control_warnings": 18,
+      "actor_body_sha256": "2FE2590EA96E9D8F072C434CCD25A297B128837A85FAA3AC51FF650941423BC9"
+    },
+    {
+      "ordinal": 12,
+      "id": "12-latin-comparison-published-mir4.7",
+      "phase": "latin-comparison",
+      "arm": "published-mir4.7",
+      "block": 2,
+      "position": 2,
+      "external_ready_seconds": 14.0145029,
+      "engine_initialised_log_seconds": 9.409,
+      "first_capture_start_seconds": 11.9269747,
+      "first_capture_seconds": 0.2030978,
+      "first_ocr_seconds": 0.2150892,
+      "first_menu_observed_seconds": 12.3451617,
+      "settings_capture_seconds": 0.2047921,
+      "settings_ocr_seconds": 0.2139199,
+      "settings_response_seconds": 1.6321719,
+      "maximum_observer_iteration_seconds": 0.6085031,
+      "capture_attempts": 8,
+      "process_start_utc": "2026-10-29T14:26:30.8019605Z",
+      "prelaunch_free_physical_bytes": 16741707776,
+      "prelaunch_committed_bytes": 23781617664,
+      "unknown_control_warnings": 18,
+      "actor_body_sha256": "4FA4355AC98685220B58F2D3CF11885D57EE90958BE83ED7ED3FE8BD88B6FC49"
+    },
+    {
+      "ordinal": 14,
+      "id": "14-latin-comparison-control-without-mir",
+      "phase": "latin-comparison",
+      "arm": "control-without-mir",
+      "block": 2,
+      "position": 4,
+      "external_ready_seconds": 9.8965859,
+      "engine_initialised_log_seconds": 8.668,
+      "first_capture_start_seconds": 8.8358807,
+      "first_capture_seconds": 0.2346746,
+      "first_ocr_seconds": 0.2733043,
+      "first_menu_observed_seconds": 9.3438596,
+      "settings_capture_seconds": 0.2109686,
+      "settings_ocr_seconds": 0.1758311,
+      "settings_response_seconds": 0.5080502,
+      "maximum_observer_iteration_seconds": 0.6306733,
+      "capture_attempts": 2,
+      "process_start_utc": "2026-10-29T14:27:02.7871735Z",
+      "prelaunch_free_physical_bytes": 16771993600,
+      "prelaunch_committed_bytes": 23757709312,
+      "unknown_control_warnings": 18,
+      "actor_body_sha256": "60E3D4534A5318BC121C46014BE33E38F5EE6A6D4ACCE67AE3A09B254CF75FCD"
+    },
+    {
+      "ordinal": 15,
+      "id": "15-latin-comparison-published-mir4.7",
+      "phase": "latin-comparison",
+      "arm": "published-mir4.7",
+      "block": 3,
+      "position": 1,
+      "external_ready_seconds": 11.627243,
+      "engine_initialised_log_seconds": 9.539,
+      "first_capture_start_seconds": 9.7231181,
+      "first_capture_seconds": 0.258898,
+      "first_ocr_seconds": 0.3543904,
+      "first_menu_observed_seconds": 10.3364065,
+      "settings_capture_seconds": 0.2436711,
+      "settings_ocr_seconds": 0.2585676,
+      "settings_response_seconds": 1.2501911,
+      "maximum_observer_iteration_seconds": 0.7306264,
+      "capture_attempts": 3,
+      "process_start_utc": "2026-10-29T14:27:16.2999692Z",
+      "prelaunch_free_physical_bytes": 16790106112,
+      "prelaunch_committed_bytes": 23722938368,
+      "unknown_control_warnings": 18,
+      "actor_body_sha256": "F7FBC80A2973C947C59F155BA11D2DB672F7573FF99A0161CE4054EACDBBC36B"
+    },
+    {
+      "ordinal": 17,
+      "id": "17-latin-comparison-control-without-mir",
+      "phase": "latin-comparison",
+      "arm": "control-without-mir",
+      "block": 3,
+      "position": 3,
+      "external_ready_seconds": 10.3545138,
+      "engine_initialised_log_seconds": 8.766,
+      "first_capture_start_seconds": 8.8697985,
+      "first_capture_seconds": 0.267175,
+      "first_ocr_seconds": 0.448956,
+      "first_menu_observed_seconds": 9.5859295,
+      "settings_capture_seconds": 0.2497742,
+      "settings_ocr_seconds": 0.3602453,
+      "settings_response_seconds": 0.7272064,
+      "maximum_observer_iteration_seconds": 0.835333,
+      "capture_attempts": 2,
+      "process_start_utc": "2026-10-29T14:27:46.3251465Z",
+      "prelaunch_free_physical_bytes": 16829665280,
+      "prelaunch_committed_bytes": 23672041472,
+      "unknown_control_warnings": 18,
+      "actor_body_sha256": "D961B8DB92D3B56AF7D01DA56AE613D32D958B83F13298E382FE0997708D2DBA"
+    },
+    {
+      "ordinal": 20,
+      "id": "20-latin-comparison-control-without-mir",
+      "phase": "latin-comparison",
+      "arm": "control-without-mir",
+      "block": 4,
+      "position": 2,
+      "external_ready_seconds": 10.3374663,
+      "engine_initialised_log_seconds": 8.845,
+      "first_capture_start_seconds": 9.0230739,
+      "first_capture_seconds": 0.2577622,
+      "first_ocr_seconds": 0.3495352,
+      "first_menu_observed_seconds": 9.6303713,
+      "settings_capture_seconds": 0.2477036,
+      "settings_ocr_seconds": 0.297492,
+      "settings_response_seconds": 0.6670147,
+      "maximum_observer_iteration_seconds": 0.8758305,
+      "capture_attempts": 2,
+      "process_start_utc": "2026-10-29T14:28:30.1126822Z",
+      "prelaunch_free_physical_bytes": 16968450048,
+      "prelaunch_committed_bytes": 23547981824,
+      "unknown_control_warnings": 18,
+      "actor_body_sha256": "7C0E18BD14C3E5AF1E99CD64EFDE863396AB3C7D787AA526D8BE42D04CBF6668"
+    },
+    {
+      "ordinal": 22,
+      "id": "22-latin-comparison-published-mir4.7",
+      "phase": "latin-comparison",
+      "arm": "published-mir4.7",
+      "block": 4,
+      "position": 4,
+      "external_ready_seconds": 11.1615596,
+      "engine_initialised_log_seconds": 9.453,
+      "first_capture_start_seconds": 9.6064255,
+      "first_capture_seconds": 0.3250754,
+      "first_ocr_seconds": 0.402297,
+      "first_menu_observed_seconds": 10.3337979,
+      "settings_capture_seconds": 0.2893909,
+      "settings_ocr_seconds": 0.3749641,
+      "settings_response_seconds": 0.7824035,
+      "maximum_observer_iteration_seconds": 0.8507005,
+      "capture_attempts": 2,
+      "process_start_utc": "2026-10-29T14:28:59.9424982Z",
+      "prelaunch_free_physical_bytes": 16958423040,
+      "prelaunch_committed_bytes": 23559323648,
+      "unknown_control_warnings": 18,
+      "actor_body_sha256": "3BD6FA1B482C3455D59F7CC9360540C632075292021DBD1F23414064C2E96222"
+    },
+    {
+      "ordinal": 23,
+      "id": "23-latin-comparison-control-without-mir",
+      "phase": "latin-comparison",
+      "arm": "control-without-mir",
+      "block": 5,
+      "position": 1,
+      "external_ready_seconds": 11.934328,
+      "engine_initialised_log_seconds": 8.696,
+      "first_capture_start_seconds": 8.8699909,
+      "first_capture_seconds": 0.569798,
+      "first_ocr_seconds": 0.4287839,
+      "first_menu_observed_seconds": 9.8685728,
+      "settings_capture_seconds": 0.5857148,
+      "settings_ocr_seconds": 0.3807182,
+      "settings_response_seconds": 2.0170119,
+      "maximum_observer_iteration_seconds": 1.1257503,
+      "capture_attempts": 3,
+      "process_start_utc": "2026-10-29T14:29:14.8460791Z",
+      "prelaunch_free_physical_bytes": 16933142528,
+      "prelaunch_committed_bytes": 23576891392,
+      "unknown_control_warnings": 18,
+      "actor_body_sha256": "9BFCAD3D8FD3EC4368149CDE955307DDD2EB1348D2719B22A9CC0823919B28E2"
+    },
+    {
+      "ordinal": 25,
+      "id": "25-latin-comparison-published-mir4.7",
+      "phase": "latin-comparison",
+      "arm": "published-mir4.7",
+      "block": 5,
+      "position": 3,
+      "external_ready_seconds": 12.2393696,
+      "engine_initialised_log_seconds": 9.467,
+      "first_capture_start_seconds": 9.6866113,
+      "first_capture_seconds": 0.2718479,
+      "first_ocr_seconds": 0.381295,
+      "first_menu_observed_seconds": 10.3397542,
+      "settings_capture_seconds": 0.6449692,
+      "settings_ocr_seconds": 0.2746671,
+      "settings_response_seconds": 1.8571913,
+      "maximum_observer_iteration_seconds": 0.9386532999999999,
+      "capture_attempts": 3,
+      "process_start_utc": "2026-10-29T14:29:45.5258360Z",
+      "prelaunch_free_physical_bytes": 16924360704,
+      "prelaunch_committed_bytes": 23542607872,
+      "unknown_control_warnings": 18,
+      "actor_body_sha256": "1BF6DF93444205405BED868144D08E0331CCC64A769B7E47AF9ACF7760D55D07"
+    },
+    {
+      "ordinal": 28,
+      "id": "28-latin-comparison-published-mir4.7",
+      "phase": "latin-comparison",
+      "arm": "published-mir4.7",
+      "block": 6,
+      "position": 2,
+      "external_ready_seconds": 10.9878744,
+      "engine_initialised_log_seconds": 9.581,
+      "first_capture_start_seconds": 9.7603414,
+      "first_capture_seconds": 0.2403444,
+      "first_ocr_seconds": 0.3334553,
+      "first_menu_observed_seconds": 10.3341411,
+      "settings_capture_seconds": 0.228154,
+      "settings_ocr_seconds": 0.2642942,
+      "settings_response_seconds": 0.612352,
+      "maximum_observer_iteration_seconds": 0.7068606,
+      "capture_attempts": 2,
+      "process_start_utc": "2026-10-29T14:30:31.6561247Z",
+      "prelaunch_free_physical_bytes": 16984895488,
+      "prelaunch_committed_bytes": 23450066944,
+      "unknown_control_warnings": 18,
+      "actor_body_sha256": "481379B8C89D677E9F52551963D53FDF4932A26734DD32E7ED1EAD71DB600710"
+    },
+    {
+      "ordinal": 30,
+      "id": "30-latin-comparison-control-without-mir",
+      "phase": "latin-comparison",
+      "arm": "control-without-mir",
+      "block": 6,
+      "position": 4,
+      "external_ready_seconds": 10.8734546,
+      "engine_initialised_log_seconds": 8.875,
+      "first_capture_start_seconds": 9.0710531,
+      "first_capture_seconds": 0.3245588,
+      "first_ocr_seconds": 0.4404308,
+      "first_menu_observed_seconds": 9.8360427,
+      "settings_capture_seconds": 0.2970443,
+      "settings_ocr_seconds": 0.3558791,
+      "settings_response_seconds": 0.7657987,
+      "maximum_observer_iteration_seconds": 1.1187277,
+      "capture_attempts": 2,
+      "process_start_utc": "2026-10-29T14:31:00.6046341Z",
+      "prelaunch_free_physical_bytes": 16988971008,
+      "prelaunch_committed_bytes": 23532732416,
+      "unknown_control_warnings": 18,
+      "actor_body_sha256": "22838D0CF99DBEC204D577F11ED1B1EA9ECC56560D904FA48163E35D62B4E4B8"
+    },
+    {
+      "ordinal": 31,
+      "id": "31-latin-comparison-published-mir4.7",
+      "phase": "latin-comparison",
+      "arm": "published-mir4.7",
+      "block": 7,
+      "position": 1,
+      "external_ready_seconds": 16.3945134,
+      "engine_initialised_log_seconds": 14.738,
+      "first_capture_start_seconds": 14.848573,
+      "first_capture_seconds": 0.3203436,
+      "first_ocr_seconds": 0.4296,
+      "first_menu_observed_seconds": 15.5985166,
+      "settings_capture_seconds": 0.2918476,
+      "settings_ocr_seconds": 0.3463533,
+      "settings_response_seconds": 0.7527103,
+      "maximum_observer_iteration_seconds": 0.8692227,
+      "capture_attempts": 2,
+      "process_start_utc": "2026-10-29T14:31:18.3668275Z",
+      "prelaunch_free_physical_bytes": 16906608640,
+      "prelaunch_committed_bytes": 23623213056,
+      "unknown_control_warnings": 18,
+      "actor_body_sha256": "77D5BADDEF90252DD85BBBFDB89C67FFCDD08DB50BEE4122B26D12730F624B22"
+    },
+    {
+      "ordinal": 33,
+      "id": "33-latin-comparison-control-without-mir",
+      "phase": "latin-comparison",
+      "arm": "control-without-mir",
+      "block": 7,
+      "position": 3,
+      "external_ready_seconds": 10.5159752,
+      "engine_initialised_log_seconds": 8.788,
+      "first_capture_start_seconds": 8.9875399,
+      "first_capture_seconds": 0.2844394,
+      "first_ocr_seconds": 0.4669555,
+      "first_menu_observed_seconds": 9.7389348,
+      "settings_capture_seconds": 0.2633222,
+      "settings_ocr_seconds": 0.3608963,
+      "settings_response_seconds": 0.736259,
+      "maximum_observer_iteration_seconds": 0.8864491999999999,
+      "capture_attempts": 2,
+      "process_start_utc": "2026-10-29T14:31:59.2616253Z",
+      "prelaunch_free_physical_bytes": 16919678976,
+      "prelaunch_committed_bytes": 23646400512,
+      "unknown_control_warnings": 18,
+      "actor_body_sha256": "6D0FD6714A44204FEE8598153A65D53E0F6843E3375566B66C5F1500E661492F"
+    },
+    {
+      "ordinal": 36,
+      "id": "36-latin-comparison-control-without-mir",
+      "phase": "latin-comparison",
+      "arm": "control-without-mir",
+      "block": 8,
+      "position": 2,
+      "external_ready_seconds": 11.5044679,
+      "engine_initialised_log_seconds": 8.745,
+      "first_capture_start_seconds": 8.9058668,
+      "first_capture_seconds": 0.3005953,
+      "first_ocr_seconds": 0.4531302,
+      "first_menu_observed_seconds": 9.6595923,
+      "settings_capture_seconds": 0.5390337,
+      "settings_ocr_seconds": 0.3491792,
+      "settings_response_seconds": 1.8031953,
+      "maximum_observer_iteration_seconds": 0.9084414,
+      "capture_attempts": 3,
+      "process_start_utc": "2026-10-29T14:32:42.5429186Z",
+      "prelaunch_free_physical_bytes": 16900575232,
+      "prelaunch_committed_bytes": 23613165568,
+      "unknown_control_warnings": 18,
+      "actor_body_sha256": "4AA38B72712B6795428D9CF94D7535E5465D40974D9DF36A89B61F7EA723374C"
+    },
+    {
+      "ordinal": 38,
+      "id": "38-latin-comparison-published-mir4.7",
+      "phase": "latin-comparison",
+      "arm": "published-mir4.7",
+      "block": 8,
+      "position": 4,
+      "external_ready_seconds": 11.6235033,
+      "engine_initialised_log_seconds": 9.696,
+      "first_capture_start_seconds": 9.8445746,
+      "first_capture_seconds": 0.6030584,
+      "first_ocr_seconds": 0.4280313,
+      "first_menu_observed_seconds": 10.8756643,
+      "settings_capture_seconds": 0.252178,
+      "settings_ocr_seconds": 0.3279901,
+      "settings_response_seconds": 0.704928,
+      "maximum_observer_iteration_seconds": 1.1533885,
+      "capture_attempts": 2,
+      "process_start_utc": "2026-10-29T14:33:12.7109373Z",
+      "prelaunch_free_physical_bytes": 16898822144,
+      "prelaunch_committed_bytes": 23564697600,
+      "unknown_control_warnings": 18,
+      "actor_body_sha256": "0B95BF26D97C01B65E9BCECE3BA78FDDA144E53440D4AFCCC6B51D1FA4A2DBC5"
+    }
+  ],
+  "complete_sample_diagnostic_custody": "build/qualification/whole-product-base-aero-review-r01/r03-phase-diagnostic.json"
+}
