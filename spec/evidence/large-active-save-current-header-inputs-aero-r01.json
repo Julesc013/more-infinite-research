@@ -1,0 +1,966 @@
+{
+  "schema": 1,
+  "kind": "MIRLargeActiveSaveAvailableInputPreparationV1",
+  "status": "current-header-and-existing-archives-reviewed-not-native-admitted",
+  "source_save": {
+    "primary_local_locator": "C:\\Users\\Jules\\AppData\\Roaming\\Factorio\\saves\\Foundation III 250616 0Y.zip",
+    "bytes": 108548262,
+    "sha256": "EAF0BF0877955312C7DE9E1309D6462535464FF2FDFEA7EF60BEE5CD18A04CDA",
+    "original_unchanged": true,
+    "raw_save_not_published": true
+  },
+  "bounded_header_review": {
+    "method": "Read at most256KiB of each member and at most64KiB zlib output from level.dat0;decode only this known freeplay prefix and35name/version/checksum rows. This is a one-save bounded read,not a general save parser or proof of current native activity. The first exploratory offset43 read zero rows;corrected offset44 and complete named table retained here.",
+    "headers": [
+      {
+        "member": "level-init.dat",
+        "raw_or_decompressed_version_u16_le": [
+          2,
+          0,
+          32,
+          0
+        ],
+        "prefix_through_mod_table_bytes": 665,
+        "prefix_sha256": "233FB03CCF5F4DCCC81E7DE76AB2FADDA90EE187F38355149ED874354B2166E5",
+        "mod_count": 30,
+        "mods": [
+          {
+            "name": "base",
+            "version": "2.0.32",
+            "checksum": 183736295
+          },
+          {
+            "name": "VehicleSnap",
+            "version": "2.0.2",
+            "checksum": 2430757830
+          },
+          {
+            "name": "YARM",
+            "version": "1.0.5",
+            "checksum": 2522938864
+          },
+          {
+            "name": "Automatic_Train_Painter",
+            "version": "2.0.1",
+            "checksum": 30014861
+          },
+          {
+            "name": "blueprint_flip_and_turn",
+            "version": "200.8.6",
+            "checksum": 1320428747
+          },
+          {
+            "name": "Bottleneck",
+            "version": "0.12.1",
+            "checksum": 1340424736
+          },
+          {
+            "name": "bullet-trails",
+            "version": "0.7.1",
+            "checksum": 3844283971
+          },
+          {
+            "name": "car-finder",
+            "version": "2.0.0",
+            "checksum": 1120809659
+          },
+          {
+            "name": "DiscoScience",
+            "version": "2.0.1",
+            "checksum": 2800209080
+          },
+          {
+            "name": "elevated-rails",
+            "version": "2.0.32",
+            "checksum": 2106445898
+          },
+          {
+            "name": "even-distribution",
+            "version": "2.0.2",
+            "checksum": 281457414
+          },
+          {
+            "name": "EvenMoreLight",
+            "version": "0.2.0",
+            "checksum": 1995928182
+          },
+          {
+            "name": "far-reach",
+            "version": "2.0.0",
+            "checksum": 2454916370
+          },
+          {
+            "name": "flib",
+            "version": "0.16.2",
+            "checksum": 728527376
+          },
+          {
+            "name": "fluid_permutations_fixed",
+            "version": "0.6.0",
+            "checksum": 1999680569
+          },
+          {
+            "name": "Honk",
+            "version": "5.1.0",
+            "checksum": 793290950
+          },
+          {
+            "name": "inventory-repair",
+            "version": "20.0.2",
+            "checksum": 2908806630
+          },
+          {
+            "name": "MaxRateCalculator",
+            "version": "200.0.53",
+            "checksum": 2782318027
+          },
+          {
+            "name": "mining-patch-planner",
+            "version": "1.6.33",
+            "checksum": 4059229973
+          },
+          {
+            "name": "ModuleInserterSimplified",
+            "version": "2.1.1",
+            "checksum": 2708727588
+          },
+          {
+            "name": "quality",
+            "version": "2.0.32",
+            "checksum": 3925140030
+          },
+          {
+            "name": "stdlib2",
+            "version": "2.0.1",
+            "checksum": 0
+          },
+          {
+            "name": "tree_collision",
+            "version": "2.0.0",
+            "checksum": 3231141521
+          },
+          {
+            "name": "factoryplanner",
+            "version": "2.0.16",
+            "checksum": 1350146402
+          },
+          {
+            "name": "Milestones",
+            "version": "1.4.4",
+            "checksum": 3589694464
+          },
+          {
+            "name": "Nanobots2",
+            "version": "3.3.1",
+            "checksum": 4229721665
+          },
+          {
+            "name": "RateCalculator",
+            "version": "3.3.6",
+            "checksum": 1295360039
+          },
+          {
+            "name": "space-age",
+            "version": "2.0.32",
+            "checksum": 3216343430
+          },
+          {
+            "name": "FactorySearch",
+            "version": "1.12.3",
+            "checksum": 4045460007
+          },
+          {
+            "name": "GUI_Unifyer",
+            "version": "2.0.1",
+            "checksum": 2230518269
+          }
+        ]
+      },
+      {
+        "member": "level.dat0",
+        "raw_or_decompressed_version_u16_le": [
+          2,
+          0,
+          55,
+          0
+        ],
+        "prefix_through_mod_table_bytes": 766,
+        "prefix_sha256": "BAA10B6C8AAE94C9D6B65E636CC5F8A2A56E68286E9B3634206245AE5F47065A",
+        "mod_count": 35,
+        "mods": [
+          {
+            "name": "base",
+            "version": "2.0.55",
+            "checksum": 2095342242
+          },
+          {
+            "name": "OilOutpostPlanner",
+            "version": "1.6.6",
+            "checksum": 3194361580
+          },
+          {
+            "name": "squeak-through-2",
+            "version": "0.1.2",
+            "checksum": 4145793603
+          },
+          {
+            "name": "VehicleSnap",
+            "version": "2.0.2",
+            "checksum": 2430757830
+          },
+          {
+            "name": "YARM",
+            "version": "1.0.5",
+            "checksum": 2522938864
+          },
+          {
+            "name": "Bottleneck",
+            "version": "0.12.1",
+            "checksum": 1340424736
+          },
+          {
+            "name": "Brighter-Lamps",
+            "version": "2.0.0",
+            "checksum": 367196118
+          },
+          {
+            "name": "bullet-trails",
+            "version": "0.7.1",
+            "checksum": 3844283971
+          },
+          {
+            "name": "car-finder",
+            "version": "2.0.0",
+            "checksum": 1120809659
+          },
+          {
+            "name": "electric_pole_free_light",
+            "version": "0.0.3",
+            "checksum": 4069636686
+          },
+          {
+            "name": "elevated-rails",
+            "version": "2.0.55",
+            "checksum": 755107374
+          },
+          {
+            "name": "even-distribution",
+            "version": "2.0.2",
+            "checksum": 281457414
+          },
+          {
+            "name": "far-reach",
+            "version": "2.0.0",
+            "checksum": 2454916370
+          },
+          {
+            "name": "flib",
+            "version": "0.16.2",
+            "checksum": 728527376
+          },
+          {
+            "name": "fluid_permutations_fixed",
+            "version": "0.6.0",
+            "checksum": 1999680569
+          },
+          {
+            "name": "Honk",
+            "version": "5.1.1",
+            "checksum": 793290950
+          },
+          {
+            "name": "inventory-repair",
+            "version": "20.0.3",
+            "checksum": 2908806630
+          },
+          {
+            "name": "Kux-CoreLib",
+            "version": "3.17.4",
+            "checksum": 3585433620
+          },
+          {
+            "name": "light-overhaul",
+            "version": "0.2.2",
+            "checksum": 528444255
+          },
+          {
+            "name": "lightorio",
+            "version": "2.0.1",
+            "checksum": 2217896319
+          },
+          {
+            "name": "MaxRateCalculator",
+            "version": "200.0.53",
+            "checksum": 2782318027
+          },
+          {
+            "name": "mining-patch-planner",
+            "version": "1.6.35",
+            "checksum": 4059229973
+          },
+          {
+            "name": "quality",
+            "version": "2.0.55",
+            "checksum": 3594706471
+          },
+          {
+            "name": "Shortcuts-ick",
+            "version": "2.0.7",
+            "checksum": 2605655975
+          },
+          {
+            "name": "stdlib2",
+            "version": "2.0.1",
+            "checksum": 0
+          },
+          {
+            "name": "tree_collision",
+            "version": "2.0.0",
+            "checksum": 3231141521
+          },
+          {
+            "name": "factoryplanner",
+            "version": "2.0.19",
+            "checksum": 1350146402
+          },
+          {
+            "name": "Kux-ZoomRunning",
+            "version": "3.2.8",
+            "checksum": 1047616988
+          },
+          {
+            "name": "Milestones",
+            "version": "1.4.5",
+            "checksum": 3738671663
+          },
+          {
+            "name": "ModuleInserterEx",
+            "version": "7.2.2",
+            "checksum": 4209473277
+          },
+          {
+            "name": "RateCalculator",
+            "version": "3.3.7",
+            "checksum": 1295360039
+          },
+          {
+            "name": "space-age",
+            "version": "2.0.55",
+            "checksum": 2561352795
+          },
+          {
+            "name": "EditorExtensions",
+            "version": "2.4.2",
+            "checksum": 2096892737
+          },
+          {
+            "name": "FactorySearch",
+            "version": "1.13.3",
+            "checksum": 2061526368
+          },
+          {
+            "name": "GUI_Unifyer",
+            "version": "2.0.1",
+            "checksum": 2230518269
+          }
+        ]
+      }
+    ],
+    "initial_header_is_not_current_dependency_selection": true,
+    "mir_name_present_in_either_header": false,
+    "native_confirmation_required": true
+  },
+  "profile": {
+    "path": "tests/profiles/foundation-available-space-age-f200-2077.json",
+    "bytes": 7426,
+    "sha256": "6A78405687485F7C8335304C3232EAE8284F741F5120E19720462DDDFFE5E537",
+    "selected_mods": 36,
+    "third_party_mods": 31,
+    "existing_archives": 32,
+    "dependency_payload_copies": 0,
+    "archive_links": 0,
+    "archive_extractions": 0
+  },
+  "archive_inputs": [
+    {
+      "name": "OilOutpostPlanner",
+      "source_saved_version": "1.6.6",
+      "selected_available_version": "1.6.10",
+      "filename": "OilOutpostPlanner_1.6.10.zip",
+      "bytes": 75229,
+      "sha256": "AA6C39E2008F0D854C9348682E9E3CC195BD239710BA97CDC8EA5A9DEB038300",
+      "info_sha256": "AE26F5E9B9E1BAAB7D3236324D51FA8768278DBA0B6C85C39E7193D01489D06B",
+      "exact_saved_version": false
+    },
+    {
+      "name": "squeak-through-2",
+      "source_saved_version": "0.1.2",
+      "selected_available_version": "0.1.5",
+      "filename": "squeak-through-2_0.1.5.zip",
+      "bytes": 50307,
+      "sha256": "7AD0FC4D6F329C79F70029D5A493448FFD71323ABB45C6AB87AF2449543BBD63",
+      "info_sha256": "2CF945DDB1443104E0A203F820B230F3F27FC27CDC9982C49ACCFE1F3B06A183",
+      "exact_saved_version": false
+    },
+    {
+      "name": "VehicleSnap",
+      "source_saved_version": "2.0.2",
+      "selected_available_version": "2.0.3",
+      "filename": "VehicleSnap_2.0.3.zip",
+      "bytes": 58361,
+      "sha256": "D5284048CF946FE5B46E5F97F8BA73064951C9DAD9C5C4603F826B0C082A6CD1",
+      "info_sha256": "1B988B5A10AEA5BA8C54A64DBAC78400BFA338EFE3B28C9D7A60D3C90533A1EA",
+      "exact_saved_version": false
+    },
+    {
+      "name": "YARM",
+      "source_saved_version": "1.0.5",
+      "selected_available_version": "1.0.5",
+      "filename": "YARM_1.0.5.zip",
+      "bytes": 131103,
+      "sha256": "FE600AA76891BC5DD3C1BB8D17BB07719475EFEE824803ADF504E6BAC3EB96E0",
+      "info_sha256": "48D3A29E0AE058526C9C54604F1E8AF3A68B89D525A14BBFBFE19696D2459B29",
+      "exact_saved_version": true
+    },
+    {
+      "name": "Bottleneck",
+      "source_saved_version": "0.12.1",
+      "selected_available_version": "0.12.1",
+      "filename": "Bottleneck_0.12.1.zip",
+      "bytes": 74493,
+      "sha256": "F2CBB713758D575976A62D787ABF418A635A849E23660E94967221543CB64BD7",
+      "info_sha256": "2DBEC4867AE6605B82C19B4069B9C3DB61B56BD6CB01E1655FA29F274B0C008C",
+      "exact_saved_version": true
+    },
+    {
+      "name": "Brighter-Lamps",
+      "source_saved_version": "2.0.0",
+      "selected_available_version": "2.0.0",
+      "filename": "Brighter-Lamps_2.0.0.zip",
+      "bytes": 57261,
+      "sha256": "DFF5861BBEAF703EF2AD7CB9F53E50A363A23A1A3C2C08E57C50AB3D6291F8A6",
+      "info_sha256": "483267D830EBAA5B3AB3ACC34F3C6895287A87DBC1C083B077E4C7F5D31C6177",
+      "exact_saved_version": true
+    },
+    {
+      "name": "bullet-trails",
+      "source_saved_version": "0.7.1",
+      "selected_available_version": "0.7.1",
+      "filename": "bullet-trails_0.7.1.zip",
+      "bytes": 71191,
+      "sha256": "8A47762422DD2C6EB183D65A23BC82E4FCB85AE3CA6DAE76211F50960F5E2C02",
+      "info_sha256": "A68C32828588AC9E6D57D328FE8D565DEF4E46FE4F056E4F6B5AB7F7BCFE9D11",
+      "exact_saved_version": true
+    },
+    {
+      "name": "car-finder",
+      "source_saved_version": "2.0.0",
+      "selected_available_version": "2.0.0",
+      "filename": "car-finder_2.0.0.zip",
+      "bytes": 40048,
+      "sha256": "6EB93EFF3ECFA0B976E4A464D23BF02EE3963F51B6F976B599FB3BB7A547FB02",
+      "info_sha256": "2F2ED25748A39220B70AC174BAEB1A40E54C64CA9B603CB9288B100378F6391C",
+      "exact_saved_version": true
+    },
+    {
+      "name": "electric_pole_free_light",
+      "source_saved_version": "0.0.3",
+      "selected_available_version": "0.0.3",
+      "filename": "electric_pole_free_light_0.0.3.zip",
+      "bytes": 39382,
+      "sha256": "3F1632D295BB6145DE116F6BE2BC62988F050E4A99DABEE7468F0B84B4B3C974",
+      "info_sha256": "6A19BA96D292B631979446E0514BAE0B9069F919D95521A4A1F753D88971D3E7",
+      "exact_saved_version": true
+    },
+    {
+      "name": "even-distribution",
+      "source_saved_version": "2.0.2",
+      "selected_available_version": "2.0.2",
+      "filename": "even-distribution_2.0.2.zip",
+      "bytes": 220393,
+      "sha256": "4343A01DBECCAFB1F879C8665918A5DE24553E4F74E13371AE17E19930C5064B",
+      "info_sha256": "7C8DD16461F237260594C9281A91393D94A31916D3CDE6F55C1E31BCEDFC3EA4",
+      "exact_saved_version": true
+    },
+    {
+      "name": "far-reach",
+      "source_saved_version": "2.0.0",
+      "selected_available_version": "2.0.2",
+      "filename": "far-reach_2.0.2.zip",
+      "bytes": 48987,
+      "sha256": "927A813B607EB151B705AF5DDE490DC7937C8CEEAA78C11A03785BA88E3C83B8",
+      "info_sha256": "2E1F5ADED1AF7211508873C590C4A6660719FE7211565BAE3E94FDAF5CE23CDC",
+      "exact_saved_version": false
+    },
+    {
+      "name": "flib",
+      "source_saved_version": "0.16.2",
+      "selected_available_version": "0.16.5",
+      "filename": "flib_0.16.5.zip",
+      "bytes": 453091,
+      "sha256": "8FC5073D374A149620333777D959D2C204AB0AF0C59669BE94C5CAB7DE978627",
+      "info_sha256": "EDB2CEE70358810DCA8C6CA81CC4396A52D0D3C959C8E7CE95C820DFE4045973",
+      "exact_saved_version": false
+    },
+    {
+      "name": "fluid_permutations_fixed",
+      "source_saved_version": "0.6.0",
+      "selected_available_version": "0.6.0",
+      "filename": "fluid_permutations_fixed_0.6.0.zip",
+      "bytes": 53643,
+      "sha256": "B5C76E62041175E16B8D4BF31E8A04ADE958C201156EDD3DB07E6DE61074C25C",
+      "info_sha256": "6BDE27A410D3B1D4C20FD52C3230DF133A6431C135E90466286B61DAB772C8C4",
+      "exact_saved_version": true
+    },
+    {
+      "name": "Honk",
+      "source_saved_version": "5.1.1",
+      "selected_available_version": "5.1.1",
+      "filename": "Honk_5.1.1.zip",
+      "bytes": 416914,
+      "sha256": "39766C918B9E9E64D0E493B6D2B1682B26F32CB5368DBE099F0E4544EA57708D",
+      "info_sha256": "D1EC2FB1DCE81B35240D3C46C0C7E331D729216D9CD80F220D12EE0A9FD63556",
+      "exact_saved_version": true
+    },
+    {
+      "name": "inventory-repair",
+      "source_saved_version": "20.0.3",
+      "selected_available_version": "20.0.3",
+      "filename": "inventory-repair_20.0.3.zip",
+      "bytes": 28513,
+      "sha256": "5EEF301DAB76009242AAB1C6EAD3D55748C42E3F44F89D4EC8C58AC4410C762E",
+      "info_sha256": "817382A12847FE0898770B51718332B901A35878FA32182499D26042B6D2B58A",
+      "exact_saved_version": true
+    },
+    {
+      "name": "Kux-CoreLib",
+      "source_saved_version": "3.17.4",
+      "selected_available_version": "3.17.8",
+      "filename": "Kux-CoreLib_3.17.8.zip",
+      "bytes": 344105,
+      "sha256": "415C488610A5B1AA95F92D9E926527C78D4BE51ADB73834DD273EDECBF7EAC4D",
+      "info_sha256": "577BC6A301E2045664ED75B7244386229F6679A551941849967322C2BE98373F",
+      "exact_saved_version": false
+    },
+    {
+      "name": "light-overhaul",
+      "source_saved_version": "0.2.2",
+      "selected_available_version": "0.2.2",
+      "filename": "light-overhaul_0.2.2.zip",
+      "bytes": 136028,
+      "sha256": "4A47A2093C6C646678C41E60E11DC03C3A86B9AB1FEE02361559D66CC0C3AAB4",
+      "info_sha256": "569A722A87AB44AEF832214C446FE318CD701F8C1CB2BA5D023EFA59F0205C73",
+      "exact_saved_version": true
+    },
+    {
+      "name": "lightorio",
+      "source_saved_version": "2.0.1",
+      "selected_available_version": "2.0.1",
+      "filename": "lightorio_2.0.1.zip",
+      "bytes": 620297,
+      "sha256": "930E436AD35FED3CFA5C299F2473706344F0F0F5C405C3A51D1A7406FBBD6F75",
+      "info_sha256": "478A50B9651F73C8B895B0696CAB0A34F51A710967865A43C2237B47AAD4EB3F",
+      "exact_saved_version": true
+    },
+    {
+      "name": "MaxRateCalculator",
+      "source_saved_version": "200.0.53",
+      "selected_available_version": "200.0.53",
+      "filename": "MaxRateCalculator_200.0.53.zip",
+      "bytes": 257907,
+      "sha256": "8CD534B15CAB14D0447F4B828E7C904060A559E046F5F6D7010602984BD008F4",
+      "info_sha256": "CC14190E3DA767B55A0CACCDA788C3CA1996B8029350F6D445DB5E6403051780",
+      "exact_saved_version": true
+    },
+    {
+      "name": "mining-patch-planner",
+      "source_saved_version": "1.6.35",
+      "selected_available_version": "1.7.19",
+      "filename": "mining-patch-planner_1.7.19.zip",
+      "bytes": 266583,
+      "sha256": "F7523ADD1C9EFA17EBBA58C2451DBE4579B387E8BA007E183D21242B3E30B749",
+      "info_sha256": "54FE3A830EA849A881A2C1F03C2D8C0CB6F727709066C888B921783FA4E774D3",
+      "exact_saved_version": false
+    },
+    {
+      "name": "Shortcuts-ick",
+      "source_saved_version": "2.0.7",
+      "selected_available_version": "2.0.7",
+      "filename": "Shortcuts-ick_2.0.7.zip",
+      "bytes": 112330,
+      "sha256": "E1C3D36D6B953FB3DFFDC211D7E7612F2B633D0E588E9433CAD96CF7EC7D4780",
+      "info_sha256": "488309F5EB63D72BF12D389BF9B7922B779CEAD5CAD0B4E6D9F211A5EF1B04CB",
+      "exact_saved_version": true
+    },
+    {
+      "name": "stdlib2",
+      "source_saved_version": "2.0.1",
+      "selected_available_version": "2.0.1",
+      "filename": "stdlib2_2.0.1.zip",
+      "bytes": 228767,
+      "sha256": "A1889B7DE8FB23C0578A388C4180B0DD790934B8653BB9726F783D80E18DD829",
+      "info_sha256": "1CFC874952DE035866060C2A6D3554297F6A4B0A09C5A6DBCB39430C63DD2515",
+      "exact_saved_version": true
+    },
+    {
+      "name": "tree_collision",
+      "source_saved_version": "2.0.0",
+      "selected_available_version": "2.0.0",
+      "filename": "tree_collision_2.0.0.zip",
+      "bytes": 46391,
+      "sha256": "D277AF47525BF43EB31F075E3D2D6B728BCB6ABC918491086EBB888037F06790",
+      "info_sha256": "586EF8A49AB6DA89533A04C21215C464CBE22F5C93870D251887D9173F17D5C1",
+      "exact_saved_version": true
+    },
+    {
+      "name": "factoryplanner",
+      "source_saved_version": "2.0.19",
+      "selected_available_version": "2.0.50",
+      "filename": "factoryplanner_2.0.50.zip",
+      "bytes": 507842,
+      "sha256": "7EA90A026C65E385786BA19258FB5282B008EE27A1B4F5ACBFC4AC68E98B22B3",
+      "info_sha256": "D6EC60C318E319A7E50574797E7A5E1B4E974255ECDB7C9677041FC4F2F37956",
+      "exact_saved_version": false
+    },
+    {
+      "name": "Kux-ZoomRunning",
+      "source_saved_version": "3.2.8",
+      "selected_available_version": "3.3.2",
+      "filename": "Kux-ZoomRunning_3.3.2.zip",
+      "bytes": 150154,
+      "sha256": "2F4588BC9C315D976A4F11A4839AAFAE22BC98D8C128A81E526AD75D6785B774",
+      "info_sha256": "5C9497BE69C0D3E781AE8C3A2F33AE2C7E86F7F2DC3C2A28024B7A3909B1222D",
+      "exact_saved_version": false
+    },
+    {
+      "name": "Milestones",
+      "source_saved_version": "1.4.5",
+      "selected_available_version": "1.4.7",
+      "filename": "Milestones_1.4.7.zip",
+      "bytes": 221956,
+      "sha256": "8116EED57B0C98B12F4B046B9906C712210FA1D8FED9808ABA1F819E51262261",
+      "info_sha256": "1F178F3A50354D2DDC90A58DA09024B82CCB30EDC800A1DCC9C224F2A4F1E0B9",
+      "exact_saved_version": false
+    },
+    {
+      "name": "ModuleInserterEx",
+      "source_saved_version": "7.2.2",
+      "selected_available_version": "7.4.1",
+      "filename": "ModuleInserterEx_7.4.1.zip",
+      "bytes": 102851,
+      "sha256": "1EA4288012EDB995BB0905C151E86C8C0D690F819931CDCE6D68E76C9F137E60",
+      "info_sha256": "6AAA7CC8DBB52D003009A67B2B22CCB3CFA7E3C5AD5F4B31229E06A4CB0EE190",
+      "exact_saved_version": false
+    },
+    {
+      "name": "RateCalculator",
+      "source_saved_version": "3.3.7",
+      "selected_available_version": "3.3.8",
+      "filename": "RateCalculator_3.3.8.zip",
+      "bytes": 92238,
+      "sha256": "FE6776D809E70F1B6D979D1EB7E47B11CACE0AEBC15BB6625631366CDD857635",
+      "info_sha256": "311DB12BD51364EE17F368EC08B2C333E7E23CF499251B1BFEF624041A5D2643",
+      "exact_saved_version": false
+    },
+    {
+      "name": "EditorExtensions",
+      "source_saved_version": "2.4.2",
+      "selected_available_version": "2.5.2",
+      "filename": "EditorExtensions_2.5.2.zip",
+      "bytes": 558878,
+      "sha256": "F7CEB9407F7A765BAA8B262ABCFB4F375105E9D1056436F5E9D41D525FD18801",
+      "info_sha256": "901755E5B2843AE8A29DFDB5C3F26D87C4FF06E17832319231F067E7FA3381DD",
+      "exact_saved_version": false
+    },
+    {
+      "name": "FactorySearch",
+      "source_saved_version": "1.13.3",
+      "selected_available_version": "1.14.3",
+      "filename": "FactorySearch_1.14.3.zip",
+      "bytes": 324942,
+      "sha256": "4A47E05BCA0991FC7EA808B6BBEB0E40770394A692DDD722064724BCBBC19591",
+      "info_sha256": "DAADC66EA7B59E06B8DDB54FE10FDEF4AA0A8F5B9308C231115ECA8007FE627B",
+      "exact_saved_version": false
+    },
+    {
+      "name": "GUI_Unifyer",
+      "source_saved_version": "2.0.1",
+      "selected_available_version": "2.0.1",
+      "filename": "GUI_Unifyer_2.0.1.zip",
+      "bytes": 5038826,
+      "sha256": "A56BC734CD41031D9D4B3E40EEE335D5AF0DCF6E607132691D9BC46386F74D19",
+      "info_sha256": "4D8A380E2FF6F0F093529D97FBEF21777BB3BC75F1731E99CAA9B8150890E1AD",
+      "exact_saved_version": true
+    }
+  ],
+  "version_updates": [
+    {
+      "name": "OilOutpostPlanner",
+      "saved": "1.6.6",
+      "available": "1.6.10"
+    },
+    {
+      "name": "squeak-through-2",
+      "saved": "0.1.2",
+      "available": "0.1.5"
+    },
+    {
+      "name": "VehicleSnap",
+      "saved": "2.0.2",
+      "available": "2.0.3"
+    },
+    {
+      "name": "far-reach",
+      "saved": "2.0.0",
+      "available": "2.0.2"
+    },
+    {
+      "name": "flib",
+      "saved": "0.16.2",
+      "available": "0.16.5"
+    },
+    {
+      "name": "Kux-CoreLib",
+      "saved": "3.17.4",
+      "available": "3.17.8"
+    },
+    {
+      "name": "mining-patch-planner",
+      "saved": "1.6.35",
+      "available": "1.7.19"
+    },
+    {
+      "name": "factoryplanner",
+      "saved": "2.0.19",
+      "available": "2.0.50"
+    },
+    {
+      "name": "Kux-ZoomRunning",
+      "saved": "3.2.8",
+      "available": "3.3.2"
+    },
+    {
+      "name": "Milestones",
+      "saved": "1.4.5",
+      "available": "1.4.7"
+    },
+    {
+      "name": "ModuleInserterEx",
+      "saved": "7.2.2",
+      "available": "7.4.1"
+    },
+    {
+      "name": "RateCalculator",
+      "saved": "3.3.7",
+      "available": "3.3.8"
+    },
+    {
+      "name": "EditorExtensions",
+      "saved": "2.4.2",
+      "available": "2.5.2"
+    },
+    {
+      "name": "FactorySearch",
+      "saved": "1.13.3",
+      "available": "1.14.3"
+    }
+  ],
+  "mandatory_dependency_checks": [
+    {
+      "mod": "squeak-through-2",
+      "incompatible_absent": "Squeak Through"
+    },
+    {
+      "mod": "VehicleSnap",
+      "incompatible_absent": "cardinal"
+    },
+    {
+      "mod": "Bottleneck",
+      "dependency": "base >= 2.0",
+      "selected": "base@2.0.77"
+    },
+    {
+      "mod": "Brighter-Lamps",
+      "dependency": "base >= 1.0.0",
+      "selected": "base@2.0.77"
+    },
+    {
+      "mod": "bullet-trails",
+      "dependency": "base >= 2.0.0",
+      "selected": "base@2.0.77"
+    },
+    {
+      "mod": "car-finder",
+      "dependency": "base",
+      "selected": "base@2.0.77"
+    },
+    {
+      "mod": "electric_pole_free_light",
+      "dependency": "base >= 2.0.0",
+      "selected": "base@2.0.77"
+    },
+    {
+      "mod": "even-distribution",
+      "dependency": "base >= 2.0.7",
+      "selected": "base@2.0.77"
+    },
+    {
+      "mod": "far-reach",
+      "dependency": "base >= 0.15.0",
+      "selected": "base@2.0.77"
+    },
+    {
+      "mod": "flib",
+      "dependency": "base >= 2.0.0",
+      "selected": "base@2.0.77"
+    },
+    {
+      "mod": "fluid_permutations_fixed",
+      "dependency": "base",
+      "selected": "base@2.0.77"
+    },
+    {
+      "mod": "Honk",
+      "dependency": "base",
+      "selected": "base@2.0.77"
+    },
+    {
+      "mod": "inventory-repair",
+      "dependency": "base >= 2.0.7",
+      "selected": "base@2.0.77"
+    },
+    {
+      "mod": "Kux-CoreLib",
+      "dependency": "base >= 2.0.55",
+      "selected": "base@2.0.77"
+    },
+    {
+      "mod": "light-overhaul",
+      "dependency": "base >= 2.0.0",
+      "selected": "base@2.0.77"
+    },
+    {
+      "mod": "lightorio",
+      "dependency": "base >= 2.0.0",
+      "selected": "base@2.0.77"
+    },
+    {
+      "mod": "MaxRateCalculator",
+      "dependency": "base >= 1.1.0",
+      "selected": "base@2.0.77"
+    },
+    {
+      "mod": "mining-patch-planner",
+      "dependency": "base >= 2.0.77",
+      "selected": "base@2.0.77"
+    },
+    {
+      "mod": "Shortcuts-ick",
+      "dependency": "base >= 2.0.18",
+      "selected": "base@2.0.77"
+    },
+    {
+      "mod": "stdlib2",
+      "dependency": "base >= 2.0.0",
+      "selected": "base@2.0.77"
+    },
+    {
+      "mod": "factoryplanner",
+      "dependency": "base >= 2.0.67",
+      "selected": "base@2.0.77"
+    },
+    {
+      "mod": "factoryplanner",
+      "dependency": "flib >= 0.15.0",
+      "selected": "flib@0.16.5"
+    },
+    {
+      "mod": "Kux-ZoomRunning",
+      "dependency": "base >= 2.0.46",
+      "selected": "base@2.0.77"
+    },
+    {
+      "mod": "Kux-ZoomRunning",
+      "dependency": "Kux-CoreLib >= 3.17.1",
+      "selected": "Kux-CoreLib@3.17.8"
+    },
+    {
+      "mod": "Milestones",
+      "dependency": "base >= 2.0.0",
+      "selected": "base@2.0.77"
+    },
+    {
+      "mod": "Milestones",
+      "dependency": "flib >= 0.16.0",
+      "selected": "flib@0.16.5"
+    },
+    {
+      "mod": "ModuleInserterEx",
+      "dependency": "base >= 2.0.67",
+      "selected": "base@2.0.77"
+    },
+    {
+      "mod": "ModuleInserterEx",
+      "dependency": "flib >= 0.15.0",
+      "selected": "flib@0.16.5"
+    },
+    {
+      "mod": "RateCalculator",
+      "dependency": "base >= 2.0.32",
+      "selected": "base@2.0.77"
+    },
+    {
+      "mod": "RateCalculator",
+      "dependency": "flib >= 0.15.0",
+      "selected": "flib@0.16.5"
+    },
+    {
+      "mod": "EditorExtensions",
+      "dependency": "base >= 2.0.42",
+      "selected": "base@2.0.77"
+    },
+    {
+      "mod": "EditorExtensions",
+      "dependency": "flib >= 0.16.2",
+      "selected": "flib@0.16.5"
+    },
+    {
+      "mod": "FactorySearch",
+      "dependency": "base >= 2.0.56",
+      "selected": "base@2.0.77"
+    },
+    {
+      "mod": "GUI_Unifyer",
+      "dependency": "base >= 2.0.0",
+      "selected": "base@2.0.77"
+    }
+  ],
+  "native_handoff": {
+    "outcome": "Admit the declared available-input-first no-MIR upstream selection,then inspect a disposable EAF0 copy for actual active machinery/production,research/effects,source startup settings and actual mods. This is preparation toward large active-save testing,not a new heavy-mod cohort.",
+    "existing_capture": "tools/Invoke-PrototypeCapture.ps1 -ArchiveLibrary <exclusive existing 2.0 direct library> -FactorioBin <actual D3 2.0.77> -ProfilePath tests/profiles/foundation-available-space-age-f200-2077.json -ActiveModsObserver mir-fixture-mir5-active-mods-observer -OutputRoot <fresh checkout-local build/tmp output>;native owner freezes actual command/resources/output before dispatch.",
+    "current_limits": [
+      "No native load or useful activity observed. Header mod absence does not prove no historical MIR/downgrade;native state must be checked.",
+      "Defaults prototype admission is separate from replaying source startup settings. Extract/retain actual settings before declaring runtime/shared work.",
+      "Match all available upstream bytes/settings within each engine comparison. MIR3/4/5 independently start from protected no-MIR source or verified equivalent worlds;never downgrade a MIR5 save.",
+      "Available mod version updates are declared,not historical fidelity. Recover exact old dependencies only for a concrete discrepancy,not automatically.",
+      "F210 counterparts/native shared behavior remain separately required;do not reuse this F200 selection there."
+    ],
+    "if_failure": "Preserve original/current headers,exact source/copy,log/result and selected archive metadata;classify actual engine/dependency/product/fixture failure. Keep original unchanged and do not count invalid startup or paging as benchmark samples.",
+    "release_obligation": "Prepare a real large active factory input for the whole-product acceptance already requested;this does not close Base/SpaceAge/heavy-startup,scripted-work,Library,migration or release gates."
+  },
+  "host_validation": {
+    "all31_archive_info_and_sha256": "verified",
+    "explicit_mandatory_dependency_and_incompatibility_checks": 34,
+    "observer_sha256": "723D1E7721449FC26040E5E6629416767BDC20AD79CF8723115846DB662A1F87",
+    "source_save_sha256_before_after_equal": true,
+    "native_processes": 0,
+    "existing_read_only_profile_reader": "pass:Read-MIRDirectLibraryStartupProfile accepts36 selected mods;all32 declared ZIP SHA256 pins match existing direct-library files;no activation or native process.",
+    "repository_static": "pass:73Markdown/1401JSON/753links",
+    "changelog_freshness": "pass",
+    "whitespace": "pass",
+    "profile_raw_git_readback": "Exact LF blob7426B/6A784056. An initial Windows CRLF working-copy pin57989AFC/7654B was corrected before native dispatch;original708a8ba commit remains preserved. Existing profile reader is rerun on canonical LF;selection/archive bytes are unchanged."
+  },
+  "player_source_delta": [],
+  "performance_acceptance": false,
+  "release_qualification": false
+}
