@@ -1,0 +1,33 @@
+{
+  "schema": 1,
+  "kind": "mir5-f110-f210-transition-successor",
+  "target": "f210",
+  "factorio_line": "2.1",
+  "engine": {
+    "version": "2.1.23",
+    "sha256": "8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38"
+  },
+  "settings_mode": "Defaults",
+  "mods": [
+    {
+      "name": "base",
+      "version": "2.1.23",
+      "enabled": true
+    },
+    {
+      "name": "more-infinite-research",
+      "version": "5.0.21000",
+      "enabled": true
+    },
+    {
+      "name": "mir-fixture-mir5-f110-f200-transition",
+      "version": "0.4.0",
+      "enabled": true
+    }
+  ],
+  "archive_sha256": {
+    "more-infinite-research_5.0.21000.zip": "B63743C36432E4C41CC0F56D5A48CABE81924D426EF11045095A9D5ED0430D7B",
+    "mir-fixture-mir5-f110-f200-transition_0.4.0.zip": "F0F852BCC4F48F12DDA0792B36828497C1CCDDF11FF216C3CAEFA16A7A21E49C"
+  },
+  "scope": "Prepared exact published4.7.3 F110 to export-enabled MIR5 F210 Base on pinned2.1.23/8DC. Reuse protectedD524;all17-row/laser/inserter2and4/queued42%/suspended27%/foreign/newlab/save/two-cold assertions remain in originalcb45 fixture. Exact4203/B637 player and reproducedF0F8 own fixture are explicit. Generic runnerCD2E atd67 uses InputSave with other modes unset. Direct endpoint first;engine bridge only after actual format refusal,without intermediate MIR5. Black Glass binds actual own container/controller before dispatch. No native result;the old2DDD preparation remains unchanged."
+}
