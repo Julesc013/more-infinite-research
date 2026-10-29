@@ -252,12 +252,12 @@
     "CollectProcessLifetimePeaks": true
   },
   "independent_expected": [
-    "All six create/initial-host/cold-host ready markers across both arms report seed424242. Compare complete parsed native map_gen_settings,not only requested CLI or seed;retain any mismatch as a preflight failure before scoring.",
-    "Inspect both current/published delayed reopen EN/DE frames after the new final grace. Original queries/selections/All scope remain and no final-save modal obscures the required Library view.",
-    "Both real EN/DE clients retain exact requested query/selection and actual verified family=all across firstopen/search/refresh/reopen;read all12 actual decoded PNGs perarm. First-open-settled must show original query before following search.",
+    "All nine create/initial-host/cold-host ready markers across three published sessions report seed424242. Compare complete parsed native map_gen_settings,not only requested CLI or seed;retain any mismatch before analysis.",
+    "Inspect all twelve delayed first-open/reopen EN/DE frames across the three published sessions after the final grace. Original queries/selections/All scope remain and no final-save modal obscures the required Library view.",
+    "Both real EN/DE clients retain exact requested query/selection and actual verified family=all across firstopen/search/refresh/reopen;decode all12 actual PNGs per session. First-open-settled must show original query before following search.",
     "Every existing initial/restart server/clientEN/clientDE identity has one positive working-set/nonnegative paged-memory OS peak at owned close;exact PID/startUTC,observerUTC/monotonic clock/cutoff retained. Each OS working-set peak covers every matching sampled working-set observation;do not equate paged peak with private bytes.",
     "Original periodic250ms observations,all26 original raw UI/readiness/sample-memory endpoints and original snapshots remain;no sampled value/failed control/threshold is rewritten.",
-    "Exactly two sessions,one active/one pending,stop at first failure,zero extension. Original direct-library slots/controls/saves are preserved and restored.",
+    "Exactly three published sessions,one warmup then one A/A pair,one active/one pending,stop at first native failure,zero extensions. Original direct-library slots/controls/saves are preserved and restored.",
     "The pair is analyzed once under the declared unchanged formulas;every original/additional failure remains visible. No full candidate comparison starts automatically from this pilot."
   ],
   "failure_path": "Preserve first actual refusal/failure;diagnose fixture/input/native boundary before any changed retry. No product change,assertion/counter/guard relaxation or favorable-score rerun.",
