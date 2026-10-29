@@ -5,7 +5,7 @@ applies_to: "MIR development"
 audience: maintainer
 doc_type: reference
 owner: mir-maintainers
-last_reviewed: 2026-10-29
+last_reviewed: 2026-10-30
 supersedes: []
 superseded_by: []
 source_of_truth_for:
@@ -16,7 +16,7 @@ source_of_truth_for:
 
 ## Current scope versus intention
 
-The replacement is under development. This documentation does not announce a released MIR 5 package, completed migration, universal mod support or measured speedup. Use the actual published release and its stated limitations until a qualified replacement is available.
+This guide records edition requirements and exact observed upgrade, compatibility and performance boundaries. Use the published release and its stated limitations; a source checkout, prepared fixture or package inventory does not announce completed acceptance. The [current release notes](release-notes.md) describe the proposed delivery, while [progress](progress.md) records open gates until the final verdict.
 
 Stable replacement scope must retain delivered applicable research, settings, effects, native continuations, prototype overrides, scripted features, the Library, bundled integrations and each supported engine edition's actual subset. New unimplemented ideas remain the original backlog; they are not silently marked complete.
 
@@ -55,7 +55,7 @@ F001/0.1.2 and F002/0.2.10 lack an evidenced standalone-mod format. F003/0.3.2, 
 
 Keep the original save, its pre-update backup, the selected mod archives and startup settings. Test a copy with the matching edition first. Preserve inherited settings for the first load; configuration changes and productivity-provider changes have separate transition requirements. Load, inspect earned research and bonuses, inspect current/queued or suspended work, save under a new name and cold-reload that copy before adopting it.
 
-MIR 5 is still unreleased. Release qualification prioritizes 4.7.3 predecessor saves on all stable editions and older representatives covering known changes to identities, effects, settings, schemas and ownership. The complete modern-origin inventory remains, but an uncertain older route can be deferred explicitly instead of guessed; not every historical patch has passed a native upgrade. The [migration scope](../spec/migrations.md#required-origin-coverage) distinguishes qualified routes, engine bridges and deferred inputs. Future MIR 5 stable forward-upgrade obligations remain. Earlier pre-5 origins on 1.1 and below are best effort beyond the required 4.7.3 routes. Check the actual release evidence and limitations before adopting a candidate on a real factory.
+Upgrade qualification prioritizes exact 4.7.3 predecessor saves on all stable editions and older representatives covering known changes to identities, effects, settings, schemas and ownership. The complete modern-origin inventory remains, but an uncertain older route can be deferred explicitly instead of guessed; not every historical patch has passed a native upgrade. The [migration scope](../spec/migrations.md#required-origin-coverage) distinguishes qualified routes, engine bridges and deferred inputs. Future MIR 5 stable forward-upgrade obligations remain. Earlier pre-5 origins on 1.1 and below are best effort beyond the required 4.7.3 routes. Check the actual release evidence and limitations before adopting a candidate on a real factory.
 
 The candidate refuses a first published F2004.7 upgrade when earned overlapping productivity has no recorded MIR5 preference baseline, startup settings changed, and a known productivity provider is present or being removed. This also applies when moving directly from Factorio2.0 to2.1. Keep the original save: first evaluate the matching MIR5 F200 candidate on the original2.0 engine with the original mods and startup settings, then save and cold-reload that copy before changing the engine, provider or preference. The refusal protects research whose old preference cannot be inferred safely. The [exact4.7.3 two-step preference case](../spec/evidence/legacy-preference-473-current7a2-native-chain-r01.json) now observes both initial preferences with its four pinned providers: simultaneous first switches refuse, unchanged-settings upgrades save successfully, and later preference switches preserve earned credit while completing new research. Other provider/DLC/settings combinations remain unverified. The [migration policy](../spec/migrations.md#finite-transition-policy) keeps this route separate from the provider-free Base engine hop and the earlier4.7.2 observations; each retains its original package and profile inputs.
 
@@ -139,5 +139,15 @@ The original request/issue IDs and independent expected behavior must remain dis
 Report whole-game startup separately from MIR-added startup. Headless creation/save, responsive menu, save load, first Library use and simulation are separate measurements. A one-technology demo or source-size reduction cannot establish the full replacement's performance. Missing data is inconclusive, not a proof of non-regression.
 
 The [accepted F210 Bob/Angel/Space Age startup experiment](../spec/evidence/f210-current38c-menu-native-chain-r01.json) records published4.7.3 mean30.9252 seconds and the tested MIR5 candidate mean28.3224 seconds: about2.60 seconds or8.42% less total startup time for that exact workload, with its declared repeatability/drift controls passing. Its MIR-added-time criterion is separate from that whole-process percentage. The [68-launch active repair/agriculture campaign](../spec/evidence/runtime-current38c-complete-native-chain-r01.json) also passes its declared timing/process-memory limits with actual useful work observed. Both retain their tested archive identities; they do not supply new timings for the export-enabled candidate.
+
+The newer observations keep their own input and endpoint identities:
+
+| Workload | Recorded result | Limit |
+|---|---|---|
+| F210 Base, four arms | [38 fresh launches pass declared A/A and drift controls](../spec/evidence/whole-product-base-f210-menu-native-chain-r03.json); median seconds: no MIR10.5482, MIR3-line11.6194, MIR4.7.3 11.2465, candidate B10.6683 | Low-cost profile; no high-cost reduction score, equal-work or reboot-cold claim. |
+| F200 Base | [Completed comparison remains adverse](../spec/evidence/whole-product-base-f200-menu-adverse-native-chain-r01.json): no-MIR and published drift exceed the frozen limit | Zero accepted comparison scores; later observer fixes do not rescore it. |
+| F210 Space Age | [Six-launch pilot stops on the identical-published control](../spec/evidence/whole-product-space-age-f210-menu-adverse-native-chain-r01.json):1.7434079 seconds exceeds1.1962555475 | No scored comparison or candidate performance cause. |
+| F210 full Bob/Angel/Space Age | [All four as-shipped data-stage arms load](../spec/evidence/whole-product-heavy-space-age-f210-admission-native-chain-r01.json) | Loading is separate from menu response, useful factory work and semantic parity. |
+| F210 heavy menu | [Two resource admissions refuse before an engine](../spec/evidence/whole-product-heavy-space-age-f210-menu-admission-adverse-chain-r01.json) under the unchanged9GiB peak and20% reserve | No timing sample, product failure or accepted performance result. |
 
 Final whole-product qualification uses the three declared workloads on the pinned2.0 and2.1 engines: Base, Space Age, and a finite selection of upstream-valid heavy Space Age configurations. Full process-start-to-responsive-menu, large active-factory simulation, spikes, useful-work/queue delays, save loading and peak/retained memory remain distinct endpoints; Library use is one component. First-after-reboot observations are distinguished from fresh-process repeat launches. The remaining Library/save-load/memory comparison and final affected measurements are unaccepted, so a startup result alone does not establish complete performance acceptance.

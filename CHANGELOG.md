@@ -11,9 +11,9 @@ This is the authoritative product changelog. Each MIR 1–3 master release appea
 - Preserve technology and setting identities, finite stages, native continuations, cost formulas and target-specific capability subsets.
 - Resolve startup settings and imported profiles once, preserving inherited defaults and explicit overrides.
 - Keep native bonuses separate from event-driven agriculture, spoilage and bounded passive repair.
-- Provide the MIR API for immediate data-stage publication and detached read-only runtime queries, with bounded copying of external definitions.
+- Provide the MIR API for immediate publication of its documented declaration subset and detached read-only runtime queries, with bounded copying of external definitions.
 - Retain the Research Library, personal views, settings export and translations; explain named unavailable features without reconstructing research at runtime.
-- Add modern Library full/compact settings exports and a bounded local diagnostic report through the existing MIRSET1 codec and file-output path.
+- Add modern Library full/compact settings exports and a bounded latest local diagnostic report through the existing MIRSET1 codec and file-output path, with no automatic uploads or engine-log copying.
 - Keep extended GitHub package numbers and unified source changelog history; prepare compact Portal numbers only on final copies of accepted builds.
 - Establish reusable historical migration inputs for the MIR5 baseline and retain cumulative migration steps for later direct upgrades.
 
@@ -29,7 +29,7 @@ This is the authoritative product changelog. Each MIR 1–3 master release appea
 - Preserve the disabled Bob/Angel oil-cracking identity and bind the selected science-pack productivity family to its admitted current lab inputs and captured combined progression.
 - Preserve Ironclad mortar shooting speed and native weapon categories when their dedicated streams are disabled or overlap removal is off.
 - Restore F210 Bob sulfur and sulfuric-acid research through the complete settings-to-publication path.
-- Provide the experimental Factorio 0.18.47 build from shared F100 research and fixtures, with separate startup and metadata checks.
+- Provide the experimental Factorio 0.18.47 build from shared F100 research and fixtures; exact-engine native load qualification remains unverified.
 - Preserve separate finite and infinite material stages, native recipe ownership and hidden Imersite migration carriers where supported.
 - Keep two historical runtime interfaces available; unconsumed developer previews do not become player APIs.
 

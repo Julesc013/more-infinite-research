@@ -1,0 +1,658 @@
+{
+  "schema": 1,
+  "kind": "MIR5ReleaseFreezePreparedAeroV1",
+  "status": "prepared-inputs-not-accepted",
+  "source": {
+    "commit": "c0617d884eb84a791b50f21a39a9be8b3cbd8909",
+    "mod_name": "more-infinite-research",
+    "mod_title": "More Infinite Research",
+    "path": "source",
+    "source_distribution_version": "5.0.21000",
+    "source_tree": "1b9b3c51c54196178e74575bdcec69af77658c95",
+    "tree": "017e59ecd5729497363744ce5cc16627e030debe"
+  },
+  "baseline_source": "42032477d45ced683e72736a4fe30a7a3195b995",
+  "baseline_inventory_file_sha256": "0601FDCFBE8C51615AF743A0DF6D1504EEF7B422406F6E48BEA779B810F9408C",
+  "inventory": {
+    "path": "build/packages/release-freeze-prepared-aero-r01/MIR5ReleaseAssetInventoryV1.json",
+    "original_output": "C:\\Projects\\Factorio\\mir5-release-inputs-aero-r01",
+    "sha256": "E3A43A20976BCA9085B2FC4423A1B604E664DEAA81F0725804AE903A24E71333",
+    "bytes": 209949,
+    "all_twenty_original_and_primary_files_equal": true
+  },
+  "public_manifest": {
+    "path": "public-assets-prepared-r01.json",
+    "sha256": "16238CC7E850A82C0BEFF41D97CE5B2F4E629EDB8B71FCF1A87E5E53982D030A",
+    "bytes": 5892
+  },
+  "public_assets": [
+    {
+      "name": "more-infinite-research_5.0.01300.zip",
+      "target": "f013",
+      "bytes": 455013,
+      "sha256": "A6361EC55CAF84FB308957E9E5BF2D5940D0CE7E743B7D3E3C8DC8CE39A30DDE",
+      "label": "Factorio 0.13.20; stable edition"
+    },
+    {
+      "name": "more-infinite-research_5.0.01400.zip",
+      "target": "f014",
+      "bytes": 455015,
+      "sha256": "6450F6F82BF50F10CE9B4472EC96159188FD78D73A044D177A6676A3F714EDEE",
+      "label": "Factorio 0.14.23; stable edition"
+    },
+    {
+      "name": "more-infinite-research_5.0.01500.zip",
+      "target": "f015",
+      "bytes": 455014,
+      "sha256": "8AE612804618D4867997DCC9D13169D6B4C247760ABF2335C988049ED50E97AE",
+      "label": "Factorio 0.15.40; stable edition"
+    },
+    {
+      "name": "more-infinite-research_5.0.01600.zip",
+      "target": "f016",
+      "bytes": 455016,
+      "sha256": "DEFE7E202E8A43862CB4B0589422CA3558CB9693B60EA84CF66B1A639038814C",
+      "label": "Factorio 0.16.51; stable edition"
+    },
+    {
+      "name": "more-infinite-research_5.0.01700.zip",
+      "target": "f017",
+      "bytes": 455015,
+      "sha256": "7C2D01E6DD18C8B105A65EBF796BDD947D97F2560BE244A2FD19B1B0290FC952",
+      "label": "Factorio 0.17.79; stable edition"
+    },
+    {
+      "name": "more-infinite-research_5.0.01800.zip",
+      "target": "f018",
+      "bytes": 455016,
+      "sha256": "53449F936DE66072E90F726117A00D59FA80E70DB73F1B7A53605197C13E6B1D",
+      "label": "Factorio 0.18.47; experimental best effort; GitHub-only; native smoke unverified"
+    },
+    {
+      "name": "more-infinite-research_5.0.10000.zip",
+      "target": "f100",
+      "bytes": 455007,
+      "sha256": "F0ECB709032A251998EA75B31BA407855A2CC9ECBEC667C4990DC126C7AC3B5F",
+      "label": "Factorio 1.0.0; stable edition"
+    },
+    {
+      "name": "more-infinite-research_5.0.11000.zip",
+      "target": "f110",
+      "bytes": 455318,
+      "sha256": "D6633FFB002FEF8991C23A6C46D121C1ACF848AE205ED4F4339E53E962815F2E",
+      "label": "Factorio 1.1.110; stable edition"
+    },
+    {
+      "name": "more-infinite-research_5.0.20000.zip",
+      "target": "f200",
+      "bytes": 696635,
+      "sha256": "BB9402453A65C5163D427768BEEEDEDDCA30B119F836D7DF46D67827E9B73511",
+      "label": "Factorio 2.0.77; stable edition"
+    },
+    {
+      "name": "more-infinite-research_5.0.21000.zip",
+      "target": "f210",
+      "bytes": 697019,
+      "sha256": "030E0D14E60BD2184AE0BCFEC4986A00055E8EFBB884063BA76F08DD104C755B",
+      "label": "Factorio 2.1.23; stable edition"
+    },
+    {
+      "name": "more-infinite-research_5.0.00600.zip",
+      "target": "f006",
+      "bytes": 136468,
+      "sha256": "F74BFC53083009A79AC59E2EBA7910DB31CC8CA4201CBE1C527FEB7704B723BF",
+      "label": "Factorio 0.6.4; best effort; not natively qualified; extract to mods folder"
+    },
+    {
+      "name": "more-infinite-research_5.0.00700.zip",
+      "target": "f007",
+      "bytes": 136468,
+      "sha256": "8D3CBA631AA2632E71F9A4A658B92D548486A139349E93D822018361ACA4C8E3",
+      "label": "Factorio 0.7.5; best effort; not natively qualified; extract to mods folder"
+    },
+    {
+      "name": "more-infinite-research_5.0.00800.zip",
+      "target": "f008",
+      "bytes": 136466,
+      "sha256": "F05AD1676761E74FE851E7ED95A31C8923C1D66FEB8EA7FAA5F1C93AA021CFD8",
+      "label": "Factorio 0.8.8; best effort; not natively qualified; extract to mods folder"
+    },
+    {
+      "name": "more-infinite-research_5.0.00900.zip",
+      "target": "f009",
+      "bytes": 136468,
+      "sha256": "F4D5A4078E498286987C04E8EBAF85026148020343713AF53C6952EA06E2AEC4",
+      "label": "Factorio 0.9.8; best effort; not natively qualified"
+    },
+    {
+      "name": "more-infinite-research_5.0.01000.zip",
+      "target": "f010",
+      "bytes": 136468,
+      "sha256": "6DFD95CB7377EECCA74351D431DF4B812EF7C76D429986B8C3215B6C5F54D224",
+      "label": "Factorio 0.10.12; best effort; not natively qualified"
+    },
+    {
+      "name": "more-infinite-research_5.0.01100.zip",
+      "target": "f011",
+      "bytes": 136468,
+      "sha256": "C221F821A417BD1A480D7A7F850EAF2919D644852B6357A177754B968228D9D7",
+      "label": "Factorio 0.11.22; best effort; not natively qualified"
+    },
+    {
+      "name": "more-infinite-research_5.0.01200.zip",
+      "target": "f012",
+      "bytes": 136470,
+      "sha256": "31DFDCF20D5819CC02BA8F9D78F8CABF63A74CE9BE6617CD40BC7A5C666F421A",
+      "label": "Factorio 0.12.35; best effort; not natively qualified"
+    },
+    {
+      "name": "SHA256SUMS.txt",
+      "bytes": 1030,
+      "sha256": "73A3BE14C277C8F493E5CB708147D7E7635E46CE63BE9241C74857840F97B514",
+      "label": "SHA256 checksums; unsigned"
+    },
+    {
+      "name": "SHA256SUMS-early.txt",
+      "bytes": 721,
+      "sha256": "97FD791E357F79CCA4183314FA32B43E63F3AD0FC4CB30F8EE7275451BFAFA46",
+      "label": "SHA256 checksums; unsigned"
+    }
+  ],
+  "package_readback": {
+    "zip_count": 17,
+    "members": 1526,
+    "archive_bytes": 5989344,
+    "public_count": 19,
+    "public_bytes": 5991095,
+    "comparisons": [
+      {
+        "target": "f013",
+        "name": "more-infinite-research_5.0.01300.zip",
+        "before_sha256": "62952705D14130C71596E0A6C85602AADD40498E05116EB51ED0495BBA5AD510",
+        "after_sha256": "A6361EC55CAF84FB308957E9E5BF2D5940D0CE7E743B7D3E3C8DC8CE39A30DDE",
+        "bytes": 455013,
+        "members": 127,
+        "changed_members": [
+          "more-infinite-research_5.0.01300/changelog.txt"
+        ],
+        "unchanged_members": 126,
+        "crc": "pass"
+      },
+      {
+        "target": "f014",
+        "name": "more-infinite-research_5.0.01400.zip",
+        "before_sha256": "2A24A3305E0E3FACD3AADFFFC2C97FD9B57FB79CCEAF3963B078F0A072EA614C",
+        "after_sha256": "6450F6F82BF50F10CE9B4472EC96159188FD78D73A044D177A6676A3F714EDEE",
+        "bytes": 455015,
+        "members": 127,
+        "changed_members": [
+          "more-infinite-research_5.0.01400/changelog.txt"
+        ],
+        "unchanged_members": 126,
+        "crc": "pass"
+      },
+      {
+        "target": "f015",
+        "name": "more-infinite-research_5.0.01500.zip",
+        "before_sha256": "FA6BA48538B1603E535356BA821962236FB24A9EA4AE81C75DC5B07F85FCF0CE",
+        "after_sha256": "8AE612804618D4867997DCC9D13169D6B4C247760ABF2335C988049ED50E97AE",
+        "bytes": 455014,
+        "members": 127,
+        "changed_members": [
+          "more-infinite-research_5.0.01500/changelog.txt"
+        ],
+        "unchanged_members": 126,
+        "crc": "pass"
+      },
+      {
+        "target": "f016",
+        "name": "more-infinite-research_5.0.01600.zip",
+        "before_sha256": "B2FD7945D6559CC3955ABB709AA2128CB80BDA7324AF1A5E9C31474A47CB39B7",
+        "after_sha256": "DEFE7E202E8A43862CB4B0589422CA3558CB9693B60EA84CF66B1A639038814C",
+        "bytes": 455016,
+        "members": 127,
+        "changed_members": [
+          "more-infinite-research_5.0.01600/changelog.txt"
+        ],
+        "unchanged_members": 126,
+        "crc": "pass"
+      },
+      {
+        "target": "f017",
+        "name": "more-infinite-research_5.0.01700.zip",
+        "before_sha256": "9BB9C0C268A3951BFECC3A3D98CD591AB05446C4B93B598DD100D3B2401A23CE",
+        "after_sha256": "7C2D01E6DD18C8B105A65EBF796BDD947D97F2560BE244A2FD19B1B0290FC952",
+        "bytes": 455015,
+        "members": 127,
+        "changed_members": [
+          "more-infinite-research_5.0.01700/changelog.txt"
+        ],
+        "unchanged_members": 126,
+        "crc": "pass"
+      },
+      {
+        "target": "f018",
+        "name": "more-infinite-research_5.0.01800.zip",
+        "before_sha256": "2A60B58C4BBB33C0F7318A3D8A9AEBE96D73F9771D61796AA70AD29B46E4073C",
+        "after_sha256": "53449F936DE66072E90F726117A00D59FA80E70DB73F1B7A53605197C13E6B1D",
+        "bytes": 455016,
+        "members": 127,
+        "changed_members": [
+          "more-infinite-research_5.0.01800/changelog.txt"
+        ],
+        "unchanged_members": 126,
+        "crc": "pass"
+      },
+      {
+        "target": "f100",
+        "name": "more-infinite-research_5.0.10000.zip",
+        "before_sha256": "AF60C55AEA2BE3E5D222097F9A932FB7D88CDA6F3DB6577B205F3856463E11AC",
+        "after_sha256": "F0ECB709032A251998EA75B31BA407855A2CC9ECBEC667C4990DC126C7AC3B5F",
+        "bytes": 455007,
+        "members": 127,
+        "changed_members": [
+          "more-infinite-research_5.0.10000/changelog.txt"
+        ],
+        "unchanged_members": 126,
+        "crc": "pass"
+      },
+      {
+        "target": "f110",
+        "name": "more-infinite-research_5.0.11000.zip",
+        "before_sha256": "2508F539998F4DABBB3F71DA0226F4AB70BD95C5572AD2D8531E63F6A673926A",
+        "after_sha256": "D6633FFB002FEF8991C23A6C46D121C1ACF848AE205ED4F4339E53E962815F2E",
+        "bytes": 455318,
+        "members": 128,
+        "changed_members": [
+          "more-infinite-research_5.0.11000/changelog.txt"
+        ],
+        "unchanged_members": 127,
+        "crc": "pass"
+      },
+      {
+        "target": "f200",
+        "name": "more-infinite-research_5.0.20000.zip",
+        "before_sha256": "7CAC54475107736106D84AF98D50A8622E095B6658F1E3682643FE0CBA8BAEF0",
+        "after_sha256": "BB9402453A65C5163D427768BEEEDEDDCA30B119F836D7DF46D67827E9B73511",
+        "bytes": 696635,
+        "members": 219,
+        "changed_members": [
+          "more-infinite-research_5.0.20000/changelog.txt"
+        ],
+        "unchanged_members": 218,
+        "crc": "pass"
+      },
+      {
+        "target": "f210",
+        "name": "more-infinite-research_5.0.21000.zip",
+        "before_sha256": "B63743C36432E4C41CC0F56D5A48CABE81924D426EF11045095A9D5ED0430D7B",
+        "after_sha256": "030E0D14E60BD2184AE0BCFEC4986A00055E8EFBB884063BA76F08DD104C755B",
+        "bytes": 697019,
+        "members": 220,
+        "changed_members": [
+          "more-infinite-research_5.0.21000/changelog.txt"
+        ],
+        "unchanged_members": 219,
+        "crc": "pass"
+      },
+      {
+        "target": "f006",
+        "name": "more-infinite-research_5.0.00600.zip",
+        "before_sha256": "FD4063849DFCF6B82002187DFD4533F67F71E2516E2DEF52C912A944E4F27C67",
+        "after_sha256": "F74BFC53083009A79AC59E2EBA7910DB31CC8CA4201CBE1C527FEB7704B723BF",
+        "bytes": 136468,
+        "members": 10,
+        "changed_members": [
+          "more-infinite-research_5.0.00600/changelog.txt"
+        ],
+        "unchanged_members": 9,
+        "crc": "pass"
+      },
+      {
+        "target": "f007",
+        "name": "more-infinite-research_5.0.00700.zip",
+        "before_sha256": "67CFDBD381D99DAFC7AF1A767B3D0403BAAB48C1171B59A047FB63E6BA4B0E01",
+        "after_sha256": "8D3CBA631AA2632E71F9A4A658B92D548486A139349E93D822018361ACA4C8E3",
+        "bytes": 136468,
+        "members": 10,
+        "changed_members": [
+          "more-infinite-research_5.0.00700/changelog.txt"
+        ],
+        "unchanged_members": 9,
+        "crc": "pass"
+      },
+      {
+        "target": "f008",
+        "name": "more-infinite-research_5.0.00800.zip",
+        "before_sha256": "1FCAE4DA9928DD337A6B606E3E196CE0AA69EF752CDD4DF9688FDBC67D201BD5",
+        "after_sha256": "F05AD1676761E74FE851E7ED95A31C8923C1D66FEB8EA7FAA5F1C93AA021CFD8",
+        "bytes": 136466,
+        "members": 10,
+        "changed_members": [
+          "more-infinite-research_5.0.00800/changelog.txt"
+        ],
+        "unchanged_members": 9,
+        "crc": "pass"
+      },
+      {
+        "target": "f009",
+        "name": "more-infinite-research_5.0.00900.zip",
+        "before_sha256": "A6957F731DC4140DDD0C946B45720199E232B32DF6ADA6BEB3A184B6CA7065C3",
+        "after_sha256": "F4D5A4078E498286987C04E8EBAF85026148020343713AF53C6952EA06E2AEC4",
+        "bytes": 136468,
+        "members": 10,
+        "changed_members": [
+          "more-infinite-research_5.0.00900/changelog.txt"
+        ],
+        "unchanged_members": 9,
+        "crc": "pass"
+      },
+      {
+        "target": "f010",
+        "name": "more-infinite-research_5.0.01000.zip",
+        "before_sha256": "9A8609123161D9469231F287072F75D366BD561AAB1C723685F8382B5DA18991",
+        "after_sha256": "6DFD95CB7377EECCA74351D431DF4B812EF7C76D429986B8C3215B6C5F54D224",
+        "bytes": 136468,
+        "members": 10,
+        "changed_members": [
+          "more-infinite-research_5.0.01000/changelog.txt"
+        ],
+        "unchanged_members": 9,
+        "crc": "pass"
+      },
+      {
+        "target": "f011",
+        "name": "more-infinite-research_5.0.01100.zip",
+        "before_sha256": "D989CA14B2A2B5E7973EC1114130C41FCD454ACA6ED06CF4F88A351C5CEA3A51",
+        "after_sha256": "C221F821A417BD1A480D7A7F850EAF2919D644852B6357A177754B968228D9D7",
+        "bytes": 136468,
+        "members": 10,
+        "changed_members": [
+          "more-infinite-research_5.0.01100/changelog.txt"
+        ],
+        "unchanged_members": 9,
+        "crc": "pass"
+      },
+      {
+        "target": "f012",
+        "name": "more-infinite-research_5.0.01200.zip",
+        "before_sha256": "79D1CCD9D2FFA43909B9A492A59D6039031D651577CAAC99CF5B02DA1C8D7963",
+        "after_sha256": "31DFDCF20D5819CC02BA8F9D78F8CABF63A74CE9BE6617CD40BC7A5C666F421A",
+        "bytes": 136470,
+        "members": 10,
+        "changed_members": [
+          "more-infinite-research_5.0.01200/changelog.txt"
+        ],
+        "unchanged_members": 9,
+        "crc": "pass"
+      }
+    ]
+  },
+  "source_consumed_path_review": {
+    "source_changes_since_B": [
+      "source/README.md",
+      "source/changelog.txt"
+    ],
+    "shipped_change": "only current changelog text; all other member paths/order/payloads match B",
+    "preserved": [
+      "complete authored README suffix from first details compared with this documentation unit parent",
+      "all master and packaged changelog history from 4.7.3",
+      "all gameplay/runtime/GUI/export/API/settings/cap/migration/asset/metadata/version payloads"
+    ],
+    "applicability": "Retain original results only within their actual consumed inputs and verdicts. New changelog parsing/presentation and final-version/package selection need affected checks; unchanged paths do not supply missing B native/performance evidence."
+  },
+  "portal_input_readback": {
+    "path": "portal-inputs-prepared-r01.json",
+    "sha256": "CEBDDDCF28116489D72D7E2C463EF3F2741D34D5091E825B3B2BA13C3ABF769E",
+    "bytes": 8214
+  },
+  "portal_inputs": [
+    {
+      "target": "f013",
+      "name": "more-infinite-research_5.0.01300.zip",
+      "sha256": "a6361ec55caf84fb308957e9e5bf2d5940d0ce7e743b7d3e3c8dc8ce39a30dde",
+      "members": 127,
+      "extended_version": "5.0.01300",
+      "expected_portal_version": "5.0.01",
+      "preserved_root": "more-infinite-research_5.0.01300",
+      "only_permitted_changed_members": [
+        "more-infinite-research_5.0.01300/info.json",
+        "more-infinite-research_5.0.01300/platform/target.lua"
+      ],
+      "command_after_acceptance": [
+        "python",
+        "-B",
+        "tools/export_portal.py",
+        "--input",
+        "C:\\Projects\\Factorio\\mir5-release-inputs-aero-r01\\more-infinite-research_5.0.01300.zip",
+        "--target",
+        "f013",
+        "--output",
+        "<fresh-final-portal-output>/more-infinite-research_5.0.01.zip"
+      ]
+    },
+    {
+      "target": "f014",
+      "name": "more-infinite-research_5.0.01400.zip",
+      "sha256": "6450f6f82bf50f10ce9b4472ec96159188fd78d73a044d177a6676a3f714edee",
+      "members": 127,
+      "extended_version": "5.0.01400",
+      "expected_portal_version": "5.0.02",
+      "preserved_root": "more-infinite-research_5.0.01400",
+      "only_permitted_changed_members": [
+        "more-infinite-research_5.0.01400/info.json",
+        "more-infinite-research_5.0.01400/platform/target.lua"
+      ],
+      "command_after_acceptance": [
+        "python",
+        "-B",
+        "tools/export_portal.py",
+        "--input",
+        "C:\\Projects\\Factorio\\mir5-release-inputs-aero-r01\\more-infinite-research_5.0.01400.zip",
+        "--target",
+        "f014",
+        "--output",
+        "<fresh-final-portal-output>/more-infinite-research_5.0.02.zip"
+      ]
+    },
+    {
+      "target": "f015",
+      "name": "more-infinite-research_5.0.01500.zip",
+      "sha256": "8ae612804618d4867997dcc9d13169d6b4c247760abf2335c988049ed50e97ae",
+      "members": 127,
+      "extended_version": "5.0.01500",
+      "expected_portal_version": "5.0.03",
+      "preserved_root": "more-infinite-research_5.0.01500",
+      "only_permitted_changed_members": [
+        "more-infinite-research_5.0.01500/info.json",
+        "more-infinite-research_5.0.01500/platform/target.lua"
+      ],
+      "command_after_acceptance": [
+        "python",
+        "-B",
+        "tools/export_portal.py",
+        "--input",
+        "C:\\Projects\\Factorio\\mir5-release-inputs-aero-r01\\more-infinite-research_5.0.01500.zip",
+        "--target",
+        "f015",
+        "--output",
+        "<fresh-final-portal-output>/more-infinite-research_5.0.03.zip"
+      ]
+    },
+    {
+      "target": "f016",
+      "name": "more-infinite-research_5.0.01600.zip",
+      "sha256": "defe7e202e8a43862cb4b0589422ca3558cb9693b60ea84cf66b1a639038814c",
+      "members": 127,
+      "extended_version": "5.0.01600",
+      "expected_portal_version": "5.0.04",
+      "preserved_root": "more-infinite-research_5.0.01600",
+      "only_permitted_changed_members": [
+        "more-infinite-research_5.0.01600/info.json",
+        "more-infinite-research_5.0.01600/platform/target.lua"
+      ],
+      "command_after_acceptance": [
+        "python",
+        "-B",
+        "tools/export_portal.py",
+        "--input",
+        "C:\\Projects\\Factorio\\mir5-release-inputs-aero-r01\\more-infinite-research_5.0.01600.zip",
+        "--target",
+        "f016",
+        "--output",
+        "<fresh-final-portal-output>/more-infinite-research_5.0.04.zip"
+      ]
+    },
+    {
+      "target": "f017",
+      "name": "more-infinite-research_5.0.01700.zip",
+      "sha256": "7c2d01e6dd18c8b105a65ebf796bdd947d97f2560be244a2fd19b1b0290fc952",
+      "members": 127,
+      "extended_version": "5.0.01700",
+      "expected_portal_version": "5.0.05",
+      "preserved_root": "more-infinite-research_5.0.01700",
+      "only_permitted_changed_members": [
+        "more-infinite-research_5.0.01700/info.json",
+        "more-infinite-research_5.0.01700/platform/target.lua"
+      ],
+      "command_after_acceptance": [
+        "python",
+        "-B",
+        "tools/export_portal.py",
+        "--input",
+        "C:\\Projects\\Factorio\\mir5-release-inputs-aero-r01\\more-infinite-research_5.0.01700.zip",
+        "--target",
+        "f017",
+        "--output",
+        "<fresh-final-portal-output>/more-infinite-research_5.0.05.zip"
+      ]
+    },
+    {
+      "target": "f100",
+      "name": "more-infinite-research_5.0.10000.zip",
+      "sha256": "f0ecb709032a251998ea75b31ba407855a2cc9ecbec667c4990dc126c7ac3b5f",
+      "members": 127,
+      "extended_version": "5.0.10000",
+      "expected_portal_version": "5.0.06",
+      "preserved_root": "more-infinite-research_5.0.10000",
+      "only_permitted_changed_members": [
+        "more-infinite-research_5.0.10000/info.json",
+        "more-infinite-research_5.0.10000/platform/target.lua"
+      ],
+      "command_after_acceptance": [
+        "python",
+        "-B",
+        "tools/export_portal.py",
+        "--input",
+        "C:\\Projects\\Factorio\\mir5-release-inputs-aero-r01\\more-infinite-research_5.0.10000.zip",
+        "--target",
+        "f100",
+        "--output",
+        "<fresh-final-portal-output>/more-infinite-research_5.0.06.zip"
+      ]
+    },
+    {
+      "target": "f110",
+      "name": "more-infinite-research_5.0.11000.zip",
+      "sha256": "d6633ffb002fef8991c23a6c46d121c1acf848ae205ed4f4339e53e962815f2e",
+      "members": 128,
+      "extended_version": "5.0.11000",
+      "expected_portal_version": "5.0.07",
+      "preserved_root": "more-infinite-research_5.0.11000",
+      "only_permitted_changed_members": [
+        "more-infinite-research_5.0.11000/info.json",
+        "more-infinite-research_5.0.11000/platform/target.lua"
+      ],
+      "command_after_acceptance": [
+        "python",
+        "-B",
+        "tools/export_portal.py",
+        "--input",
+        "C:\\Projects\\Factorio\\mir5-release-inputs-aero-r01\\more-infinite-research_5.0.11000.zip",
+        "--target",
+        "f110",
+        "--output",
+        "<fresh-final-portal-output>/more-infinite-research_5.0.07.zip"
+      ]
+    },
+    {
+      "target": "f200",
+      "name": "more-infinite-research_5.0.20000.zip",
+      "sha256": "bb9402453a65c5163d427768beeededdca30b119f836d7df46d67827e9b73511",
+      "members": 219,
+      "extended_version": "5.0.20000",
+      "expected_portal_version": "5.0.08",
+      "preserved_root": "more-infinite-research_5.0.20000",
+      "only_permitted_changed_members": [
+        "more-infinite-research_5.0.20000/info.json",
+        "more-infinite-research_5.0.20000/platform/target.lua"
+      ],
+      "command_after_acceptance": [
+        "python",
+        "-B",
+        "tools/export_portal.py",
+        "--input",
+        "C:\\Projects\\Factorio\\mir5-release-inputs-aero-r01\\more-infinite-research_5.0.20000.zip",
+        "--target",
+        "f200",
+        "--output",
+        "<fresh-final-portal-output>/more-infinite-research_5.0.08.zip"
+      ]
+    },
+    {
+      "target": "f210",
+      "name": "more-infinite-research_5.0.21000.zip",
+      "sha256": "030e0d14e60bd2184ae0bcfec4986a00055e8efbb884063ba76f08dd104c755b",
+      "members": 220,
+      "extended_version": "5.0.21000",
+      "expected_portal_version": "5.0.09",
+      "preserved_root": "more-infinite-research_5.0.21000",
+      "only_permitted_changed_members": [
+        "more-infinite-research_5.0.21000/info.json",
+        "more-infinite-research_5.0.21000/platform/target.lua"
+      ],
+      "command_after_acceptance": [
+        "python",
+        "-B",
+        "tools/export_portal.py",
+        "--input",
+        "C:\\Projects\\Factorio\\mir5-release-inputs-aero-r01\\more-infinite-research_5.0.21000.zip",
+        "--target",
+        "f210",
+        "--output",
+        "<fresh-final-portal-output>/more-infinite-research_5.0.09.zip"
+      ]
+    }
+  ],
+  "notes": {
+    "path": "release-notes-prepared-r01.txt",
+    "sha256": "A2F0465A54FAC2E291B9EE9F08F5E15DDC2D04C199E3DA8FC7D34B3FAE3FEC0B",
+    "bytes": 3108
+  },
+  "validation": [
+    "HostControls Plan inspected/materialized",
+    "six changelog controls pass",
+    "formatter freshness passes",
+    "repository static/link checks pass",
+    "git diff --check passes",
+    "existing release freeze and independent verify rebuild commands pass",
+    "17 ZIP CRCs and exact member comparison to B",
+    "read-only nine Portal inputs; two substitutions calculated in memory"
+  ],
+  "release_date": "Unreleased; set actual date only at qualified final freeze and regenerate affected assets",
+  "native_execution": false,
+  "player_code_changed": false,
+  "candidate_B_archives_changed": false,
+  "portal_copies_created": 0,
+  "dist_changed": false,
+  "release_qualified": false,
+  "publication_authorized_by_this_record": false,
+  "remaining": [
+    "complete required native routes/client/export/API/whole-product performance acceptance",
+    "independent final verdict and actual date/source/asset freeze",
+    "reconcile current source to retained exact evidence",
+    "immediate administration and distinct release-immutability probes",
+    "qualified main promotion, canonical v5.0.0, one complete mutable draft and publication by release ID",
+    "all 19 anonymous downloads and hash-matching clean/synchronized primary dist and release text"
+  ]
+}
