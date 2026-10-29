@@ -2,6 +2,8 @@
 from __future__ import annotations
 
 import hashlib
+import base64
+import gzip
 import io
 import json
 from pathlib import Path
@@ -121,6 +123,44 @@ def marker(action: str, milliseconds: str, *, role: str = "en") -> str:
 
 
 class LibraryProfileReaderTests(unittest.TestCase):
+    def test_actual_current_r01_roles_replay_without_promoting_failed_measurements(self):
+        payload = (ROOT / 'spec/evidence/library-current-e9-r01-native-receipts.json.gz').read_bytes()
+        self.assertEqual(hashlib.sha256(payload).hexdigest().upper(), '526F8B41EBD2208978EEA4E41598F800B6D18D91EF065520D2EE79A4B287B3AA')
+        files = {}
+        for row in json.loads(gzip.decompress(payload))['files']:
+            raw = base64.b64decode(row['base64'], validate=True)
+            self.assertEqual(len(raw), row['bytes'])
+            self.assertEqual(hashlib.sha256(raw).hexdigest().upper(), row['sha256'])
+            self.assertNotIn(row['path'], files)
+            files[row['path']] = raw
+        self.assertEqual(len(files), 103)
+        analysis = json.loads(files['derived/analysis-r04.json'])
+        self.assertEqual(analysis['status'], 'incomplete-predeclared-measurement')
+        self.assertEqual(analysis['missing_endpoints'], ['save_ready/restart'])
+        self.assertEqual({key for key, value in analysis['controls'].items() if not value['within']}, {
+            'library/server/refresh', 'library/server/reopen',
+            'memory/initial/client-en/working_set_bytes', 'memory/initial/client-de/working_set_bytes',
+        })
+        self.assertFalse(analysis['release_qualification'])
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            for observation in analysis['observations']:
+                logs = []
+                for role, actor, suffix in [('server', 'server', ''), ('en', 'client', '-en'), ('de', 'client', '-de')]:
+                    for phase in ('initial', 'restart'):
+                        name = f'phase-{actor}-{phase}{suffix}.stdout.log'
+                        path = root / observation['id'] / name
+                        path.parent.mkdir(exist_ok=True)
+                        path.write_bytes(files[f"original/{observation['id']}/{name}"])
+                        logs.append(reader.LogInput(role, phase, path, name))
+                actual = reader._read_profiles(logs)
+                self.assertTrue(actual['complete'])
+                self.assertFalse(actual['performance_acceptance'])
+                for role in actual['roles']:
+                    for metric in role['observations']:
+                        key = 'library/' + role['role'] + '/' + metric['action']
+                        self.assertEqual(metric['duration_ms'], observation['metrics'][key])
+
     def write_logs(self, root: Path, rows: dict[str, tuple[str, ...]]) -> list[tuple[str, Path]]:
         result = []
         for role in reader.ROLES:

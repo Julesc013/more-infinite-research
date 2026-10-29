@@ -1,0 +1,190 @@
+{
+  "schema": 1,
+  "kind": "MIRCurrentE9PairedLibraryR01NativeChainV1",
+  "status": "native-functional-complete-performance-unaccepted",
+  "plan": {
+    "path": "spec/evidence/library-current-e9-paired-plan-r01.json",
+    "declaration": "8e02ceeade0cb6be427bc093120a83c4b9dfccb4",
+    "sha256": "AC21549DBDCD7E08C034452B4252BF93105694342EDFF58EC87D2E09593D9AFD"
+  },
+  "candidate": {
+    "source_commit": "b3bbd8d37b37bfee2e258b3e8a2f223dcf3860b3",
+    "player_tree": "fbb7e9135280ce7f69692e9b0c4a44d743793f45",
+    "archive_sha256": "E9D349931E082AD77057C150E3D6093490E4086E84F0FAFECB0ED1257FD5ED4F"
+  },
+  "published": {
+    "version": "4.7.20002",
+    "archive_sha256": "F3943EB4D69CCDAC41BD9F922AD03A5C78F34F22D8E7FA5A88A7A658AB1010B7"
+  },
+  "engine": {
+    "version": "2.0.77",
+    "sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B"
+  },
+  "private_collector": {
+    "commit": "c898c6082fd2e228d9888eeb037d83cba674f59b",
+    "sha256": "BE3DC3272D344EA023529680C7175A3353B14D33CCE5AFF1EF01EFF4B40178C7"
+  },
+  "analysis_reader": {
+    "commit": "450677275eca6cfdceefbec482ac1461573a304c",
+    "original_sha256": "5D523D4F8B1908EE8E3905A51ABD87F461451A384809E1C958284782E649B084",
+    "executed_sha256": "B5F8988068CCE1AAEC66DECA035DC6CE47777C1952FF4FE059CD908C3843831F",
+    "result_sha256": "40CA5AAE83493C1F9EE91FEB06096014ADC158F7D828CD4CA38A183E8B3C8379",
+    "classification": "incomplete-predeclared-measurement",
+    "corrections": "Exact actor stdout filenames;explicit missing-measurement verdict. Original arithmetic/limits unchanged,original reader failures retained,no native restart."
+  },
+  "packet": {
+    "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\library-current-e9-r01-controller\\packet.json",
+    "sha256": "65BD93DACD12B062EA9F28A42980DA0493C1BE54922F977D26AD6F60C7552C54"
+  },
+  "root_readback": {
+    "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\library-current-e9-r01-controller\\root-readback.json",
+    "sha256": "C827C7755E1F2CECC174DFD7139AC02876E54C7B7154221F2FB86E3C5A6B2DAF",
+    "reader_sha256": "752DB7C974D837D7832FBDEED354C21C6070A4FB9A405959658ACA4D27059714",
+    "files": 2496,
+    "bytes_per_copy": 238582049
+  },
+  "receipt_capsule": {
+    "path": "spec/evidence/library-current-e9-r01-native-receipts.json.gz",
+    "sha256": "526F8B41EBD2208978EEA4E41598F800B6D18D91EF065520D2EE79A4B287B3AA",
+    "bytes": 996267,
+    "members": 103,
+    "contents": "All72 actor stdout logs,12 native results,12 complete process-memory receipts,analysis/root readback/plan/packet/terminal and both reader refusals. All2496 raw files and96 original PNGs remain in exact original/primary custody."
+  },
+  "counts": {
+    "native_processes": 84,
+    "seed_worlds": 12,
+    "two_real_client_sessions": 12,
+    "cold_host_restarts": 12,
+    "final_saves": 12,
+    "lab_completions": 0,
+    "screenshots": 96,
+    "observed_actor_identities": 72,
+    "memory_samples": 7907
+  },
+  "missing_endpoints": [
+    "save_ready/restart"
+  ],
+  "failed_control_details": {
+    "library/server/refresh": {
+      "published": 4.1665,
+      "candidate": 9.8134,
+      "allowance": 5.0,
+      "difference": 5.6469,
+      "within": false,
+      "published_range": [
+        4.1665,
+        4.1665
+      ],
+      "candidate_range": [
+        9.8134,
+        9.8134
+      ]
+    },
+    "library/server/reopen": {
+      "published": 3.5732,
+      "candidate": 21.1248,
+      "allowance": 5.0,
+      "difference": 17.5516,
+      "within": false,
+      "published_range": [
+        3.5732,
+        3.5732
+      ],
+      "candidate_range": [
+        21.1248,
+        21.1248
+      ]
+    },
+    "memory/initial/client-de/working_set_bytes": {
+      "published": 1951870976,
+      "candidate": 1684504576,
+      "allowance": 181818777.60000002,
+      "difference": -267366400,
+      "within": false,
+      "published_range": [
+        1951870976,
+        1951870976
+      ],
+      "candidate_range": [
+        1684504576,
+        1684504576
+      ]
+    },
+    "memory/initial/client-en/working_set_bytes": {
+      "published": 1986506752,
+      "candidate": 1693511680,
+      "allowance": 184000921.60000002,
+      "difference": -292995072,
+      "within": false,
+      "published_range": [
+        1986506752,
+        1986506752
+      ],
+      "candidate_range": [
+        1693511680,
+        1693511680
+      ]
+    }
+  },
+  "available_comparisons": {
+    "count": 25,
+    "within_original_limits": 25,
+    "accepted": false,
+    "reason": "A missing declared cold-load readiness endpoint and four failed identical-published controls prevent comparison acceptance."
+  },
+  "visual_readback": {
+    "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\library-current-e9-r01-controller\\visual-readback.json",
+    "sha256": "93ED9417ED652A0FD0D272C94CE4D51F9D4B797A86B4A05B2FC1DA043671F61A",
+    "images": [
+      {
+        "path": "D:\\Projects\\Factorio\\mir5-legacy-cannon-credit-r01\\build\\tmp\\library-current-e9-r01\\05-scored-published\\session\\client-en\\script-output\\mir5-library-paired-browser\\first-open-1.png",
+        "sha256": "7A55F976CAA431299A65156093FD9D81D1676C1BEEA5B05589533100543CECF5"
+      },
+      {
+        "path": "D:\\Projects\\Factorio\\mir5-legacy-cannon-credit-r01\\build\\tmp\\library-current-e9-r01\\05-scored-published\\session\\client-en\\script-output\\mir5-library-paired-browser\\reopen-1.png",
+        "sha256": "422387F1EE8C452E027EAE2D08D378B8086E491DF4243FA70CBF782CE23BF802"
+      },
+      {
+        "path": "D:\\Projects\\Factorio\\mir5-legacy-cannon-credit-r01\\build\\tmp\\library-current-e9-r01\\05-scored-published\\session\\client-de\\script-output\\mir5-library-paired-browser\\first-open-2.png",
+        "sha256": "326D679494BB8863C349F106D57558BAA406AC12961EE87B87EA025507CAFAE1"
+      },
+      {
+        "path": "D:\\Projects\\Factorio\\mir5-legacy-cannon-credit-r01\\build\\tmp\\library-current-e9-r01\\05-scored-published\\session\\client-de\\script-output\\mir5-library-paired-browser\\reopen-2.png",
+        "sha256": "4B487962BB272413DABA28378210EF547B5295A6B8267C30F11321425DA363F2"
+      },
+      {
+        "path": "D:\\Projects\\Factorio\\mir5-legacy-cannon-credit-r01\\build\\tmp\\library-current-e9-r01\\06-scored-candidate\\session\\client-en\\script-output\\mir5-library-paired-browser\\first-open-1.png",
+        "sha256": "B9C60180FEEE7C28F2CB914FE75FC6AA8EDB4FD4983A09F559075B495DC99FDA"
+      },
+      {
+        "path": "D:\\Projects\\Factorio\\mir5-legacy-cannon-credit-r01\\build\\tmp\\library-current-e9-r01\\06-scored-candidate\\session\\client-en\\script-output\\mir5-library-paired-browser\\reopen-1.png",
+        "sha256": "5D48871B9F3BA1992ACBA7D2F41EA52586182F839E52993C4CA61D3092C16D66"
+      },
+      {
+        "path": "D:\\Projects\\Factorio\\mir5-legacy-cannon-credit-r01\\build\\tmp\\library-current-e9-r01\\06-scored-candidate\\session\\client-de\\script-output\\mir5-library-paired-browser\\first-open-2.png",
+        "sha256": "6491E01A5F7A12EDC42E55036CA7DED50DF38206C7F9AA92333EA7BC9CD34895"
+      },
+      {
+        "path": "D:\\Projects\\Factorio\\mir5-legacy-cannon-credit-r01\\build\\tmp\\library-current-e9-r01\\06-scored-candidate\\session\\client-de\\script-output\\mir5-library-paired-browser\\reopen-2.png",
+        "sha256": "8AF7B6E8548015440ED3A47FA1E3953739EE54F1C49FD798FDC0CAF243DCE939"
+      }
+    ],
+    "observations": [
+      "Published first-open/reopen show native localized gear/mining titles and science icons.",
+      "Current first-open shows internal technology IDs in the selected rows/details at the captured early frame. This does not establish settled translation/presentation acceptance.",
+      "Current cold-reopen shows English Iron gear wheel productivity and German Erzf\u00f6rderer-Produktivit\u00e4t titles.",
+      "Current detail retains internal group and science/prerequisite identifiers in these frames;no complete localization/icon parity claim follows.",
+      "Research/status tabs,queries,selected detail,science/cost and native force snapshot checks are retained under the existing fixture assertions."
+    ]
+  },
+  "controls_restored": true,
+  "protected_sources_unchanged": true,
+  "limits": [
+    "No original observation is discarded,relabelled or counted as a passing26-endpoint comparison.",
+    "The two warmups,two A/A controls and eight scored sessions retain their declared roles.",
+    "Cold restart has no ready marker under the original fixture;Hosting game or a later reopen/join is not substituted.",
+    "Same-build refresh/reopen timing and initial EN/DE sampled working sets fail their original A/A limits. No product optimization follows from this alone.",
+    "First-open raw-title capture and internal detail identifiers remain presentation review obligations;settled/fully localized UI is not qualified by this fixture.",
+    "Base F200 only;no F210,Space Age,earned-private-credit,long-session/churn,retained-memory or release claim."
+  ]
+}
