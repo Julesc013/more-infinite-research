@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
-"""Analyze one complete, predeclared R06 active-runtime benchmark receipt.
+"""Analyze one complete, explicitly selected active-runtime benchmark cohort.
 
-The reader is intentionally limited to the R06 F210 cohort.  It checks the
+The reader admits only the frozen R06 and current38C F210 cohorts. It checks the
 immutable plan/result inputs, active-save and marker-pilot custody, then
 reports the predeclared median limits and the descriptive 128-minus-1 values.
 It neither prepares inputs nor launches Factorio, and it makes no release,
@@ -44,6 +44,43 @@ ACTIVE_SEED_CAPTURE_SHA256 = "883DF556BEB4D845929CD9FDAEA867FD01DAB72952CD70A849
 MARKER_PILOT_SHA256 = "89329DE94C32E1C9A5C0EDE13AE112C008172FFBB7E13928C203BA1974E50A47"
 ACTIVE_PREREQUISITES_CAPSULE = "spec/evidence/runtime-active-r06-physical-native-receipts.json.gz"
 ACTIVE_PREREQUISITES_CAPSULE_SHA256 = "23466064A3C2E376A93FAFD9D5772038186BF4FB5D993E56953F5B145AD5FE88"
+ASSET_ROOT = "D:/Projects/Factorio/mir5-current-assets-b2cf4c2d-r01"
+CANDIDATE_BYTES = 553767
+ANALYSIS_STATUS = "complete-predeclared-r06-analysis"
+REPAIR_PROFILE_PREFIX = "tests/profiles/repair-stress-active-"
+AGRICULTURE_PROFILE_PREFIX = "tests/profiles/agriculture-active-matched-"
+# Select one frozen input tuple per CLI invocation. R06 remains the default,
+# including its exact output bytes; neither selection changes the analysis.
+_R06_BINDINGS = {name: globals()[name] for name in (
+    "KIND", "PLAN_PATH", "PLAN_SHA256", "PLAN_REVISION", "PLAN_SOURCE", "PLAN_TREE",
+    "SOURCE", "SOURCE_TREE", "ENGINE_SHA256", "CANDIDATE_SHA256", "INVENTORY_SHA256",
+    "INVENTORY_CONTENT_SHA256", "ACTIVE_SEED_CAPTURE_SHA256", "MARKER_PILOT_SHA256",
+    "ACTIVE_PREREQUISITES_CAPSULE", "ACTIVE_PREREQUISITES_CAPSULE_SHA256",
+    "ASSET_ROOT", "CANDIDATE_BYTES", "ANALYSIS_STATUS", "REPAIR_PROFILE_PREFIX", "AGRICULTURE_PROFILE_PREFIX",
+)}
+_CURRENT38C_BINDINGS = {
+    "KIND": "MIR5RuntimeBenchmarkActiveCurrent38CAnalysisV1",
+    "PLAN_PATH": "spec/evidence/runtime-current38c-active-plan-r01.json",
+    "PLAN_SHA256": "9CA4F3A77784791827C7A70DA353ADAC9E2B9E46A5231341B40F0AB554F003F0",
+    "PLAN_REVISION": "5efe123bbae5c5c2168c52a35920aa9e16d3636a",
+    "PLAN_SOURCE": "5d6521e953b51207dd51b4d99bbdab8ec954655d",
+    "PLAN_TREE": "cb660c1393e6d8364c0e838e9d63ef151604dd95",
+    "SOURCE": "b3bbd8d37b37bfee2e258b3e8a2f223dcf3860b3",
+    "SOURCE_TREE": "fbb7e9135280ce7f69692e9b0c4a44d743793f45",
+    "ENGINE_SHA256": "8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38",
+    "CANDIDATE_SHA256": "38C84CCBC4BFDA62FCB078772C4690AB81228484744A36D9EA303F5A75B16447",
+    "INVENTORY_SHA256": "5EEE95F927897C3743B091F8930B60A96DAE516B36D704870C3CBE10EF66DFBD",
+    "INVENTORY_CONTENT_SHA256": "C66E61A535FF0BF333FB647E07B84AD53FA8CD707636BADB6A59C750FBFC8CAA",
+    "ACTIVE_SEED_CAPTURE_SHA256": "7CAD16B96FE400E511916C9B96646BBC552E75B9E6CB48D124E1A328A98C484C",
+    "MARKER_PILOT_SHA256": "A07F5D5366EE90931EE6E3CF700AE65E4D353C5DC65F93BCAD10DB755E168A6A",
+    "ACTIVE_PREREQUISITES_CAPSULE": "spec/evidence/runtime-current38c-physical-native-receipts-r01.json.gz",
+    "ACTIVE_PREREQUISITES_CAPSULE_SHA256": "621918B6B2382DF2A382ECD0E289EE1EB060436A265A743E4D409C465CE839F1",
+    "ASSET_ROOT": "D:\\Projects\\Factorio\\more-infinite-research\\build\\packages\\fbb7-all17-r01",
+    "CANDIDATE_BYTES": 692759,
+    "ANALYSIS_STATUS": "complete-predeclared-current38c-analysis",
+    "REPAIR_PROFILE_PREFIX": "tests/profiles/runtime-current38c-repair-",
+    "AGRICULTURE_PROFILE_PREFIX": "tests/profiles/runtime-current38c-agriculture-",
+}
 MAX_PLAN_BYTES = 1024 * 1024
 MAX_ACTIVE_PREREQUISITES_CAPSULE_BYTES = 128 * 1024
 # R06 permits a bounded 8 MiB serialized memory receipt per one of 68 samples.
@@ -66,7 +103,14 @@ METRICS = (
 
 
 class RuntimeBenchmarkAnalysisError(ValueError):
-    """The supplied R06 inputs are not admissible for analysis."""
+    """The supplied inputs do not match the selected frozen cohort."""
+
+
+def select_cohort(cohort: str) -> None:
+    """Choose an explicit frozen tuple before reading any plan or result."""
+    if cohort not in ("r06", "current38c"):
+        raise RuntimeBenchmarkAnalysisError("unknown frozen runtime cohort")
+    globals().update(_R06_BINDINGS if cohort == "r06" else _CURRENT38C_BINDINGS)
 
 
 def _reject_duplicate_object(pairs: list[tuple[str, Any]]) -> dict[str, Any]:
@@ -308,9 +352,11 @@ def _profiles(plan: dict[str, Any]) -> dict[tuple[str, int, str], dict[str, str]
     for entry in repair_profiles:
         row = _mapping(entry, "repair profile")
         path = _string(row.get("path"), "repair profile path")
-        arm = "published" if "published" in path else "candidate" if "mir5" in path else ""
-        if not arm or ("published" in path and "mir5" in path):
+        candidate_label = "mir5" if REPAIR_PROFILE_PREFIX == _R06_BINDINGS["REPAIR_PROFILE_PREFIX"] else "candidate"
+        match = re.fullmatch(re.escape(REPAIR_PROFILE_PREFIX) + r"(published|" + candidate_label + r")-f210-2123\.json", path)
+        if match is None:
             raise RuntimeBenchmarkAnalysisError("repair profile arm differs")
+        arm = "published" if match.group(1) == "published" else "candidate"
         key = ("repair-active", 0, arm)
         if key in answer:
             raise RuntimeBenchmarkAnalysisError("repair profile arm duplicates")
@@ -318,7 +364,7 @@ def _profiles(plan: dict[str, Any]) -> dict[tuple[str, int, str], dict[str, str]
     agriculture_profiles = _array(agriculture.get("profiles"), "agriculture profiles")
     if len(agriculture_profiles) != 6:
         raise RuntimeBenchmarkAnalysisError("agriculture profile count differs")
-    expression = re.compile(r"agriculture-active-matched-(published|candidate-defaults)-(1|32|128)-f210-2123\.json$")
+    expression = re.compile(re.escape(AGRICULTURE_PROFILE_PREFIX) + r"(published|candidate-defaults)-(1|32|128)-f210-2123\.json$")
     for entry in agriculture_profiles:
         row = _mapping(entry, "agriculture profile")
         path = _string(row.get("path"), "agriculture profile path")
@@ -362,12 +408,12 @@ def _validate_plan(plan: dict[str, Any], plan_sha256: str) -> dict[str, Any]:
     candidate = _mapping(plan.get("candidate"), "candidate")
     _same(_string(candidate.get("source_commit"), "candidate source"), SOURCE, "candidate source")
     _same(_string(candidate.get("source_tree"), "candidate tree"), SOURCE_TREE, "candidate tree")
-    _same(_string(candidate.get("asset_root"), "candidate asset root"), "D:/Projects/Factorio/mir5-current-assets-b2cf4c2d-r01", "candidate asset root")
+    _same(_string(candidate.get("asset_root"), "candidate asset root"), ASSET_ROOT, "candidate asset root")
     _expect_hash(candidate.get("asset_inventory_file_sha256"), INVENTORY_SHA256, "candidate inventory SHA-256")
     _expect_hash(candidate.get("asset_inventory_content_sha256"), INVENTORY_CONTENT_SHA256, "candidate inventory content SHA-256")
     candidate_archive = _mapping(candidate.get("f210_archive"), "candidate F210 archive")
     _same(_string(candidate_archive.get("name"), "candidate archive name"), "more-infinite-research_5.0.21000.zip", "candidate archive name")
-    _same(_integer(candidate_archive.get("bytes"), "candidate archive bytes", minimum=1), 553767, "candidate archive bytes")
+    _same(_integer(candidate_archive.get("bytes"), "candidate archive bytes", minimum=1), CANDIDATE_BYTES, "candidate archive bytes")
     _expect_hash(candidate_archive.get("sha256"), CANDIDATE_SHA256, "candidate archive SHA-256")
     published = _mapping(plan.get("published"), "published")
     published_archive = _mapping(published.get("f210_archive"), "published F210 archive")
@@ -1098,7 +1144,7 @@ def analyze(plan: dict[str, Any], plan_sha256: str, result: dict[str, Any], resu
     return {
         "schema": 1,
         "kind": KIND,
-        "status": "complete-predeclared-r06-analysis",
+        "status": ANALYSIS_STATUS,
         "raw_plan": {"path": PLAN_PATH, "revision": PLAN_REVISION, "sha256": plan_sha256, "source_reference": PLAN_SOURCE, "source_tree": PLAN_TREE},
         "raw_result": {"sha256": result_sha256},
         "identity": {
@@ -1153,6 +1199,7 @@ def _write_output(path: Path, document: dict[str, Any]) -> None:
 
 def parse_arguments(argv: list[str]) -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--cohort", choices=("r06", "current38c"), default="r06")
     parser.add_argument("--raw-plan", required=True, type=Path)
     parser.add_argument("--expected-plan-sha256", required=True)
     parser.add_argument("--result", required=True, type=Path)
@@ -1164,6 +1211,7 @@ def parse_arguments(argv: list[str]) -> argparse.Namespace:
 def main(argv: list[str] | None = None) -> int:
     arguments = parse_arguments(sys.argv[1:] if argv is None else argv)
     try:
+        select_cohort(arguments.cohort)
         expected_plan_sha256 = _sha256(arguments.expected_plan_sha256, "expected plan SHA-256")
         expected_result_sha256 = _sha256(arguments.expected_result_sha256, "expected result SHA-256")
         _expect_hash(expected_plan_sha256, PLAN_SHA256, "expected R06 plan SHA-256")
