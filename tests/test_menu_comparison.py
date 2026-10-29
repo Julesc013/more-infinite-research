@@ -165,6 +165,43 @@ if($null-ne$clear-or[MIROwnedMenuNative]::FixtureIdentityReads-ne0){throw 'clear
         self.assertTrue(result["clear_window_unchanged"])
         self.assertFalse(result["native_execution"])
 
+    def test_owned_capture_png_writer_replaces_an_existing_longer_file(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            target = Path(temporary) / "latest-owned-window.png"
+            command = rf'''
+Add-Type -AssemblyName System.Drawing
+. ./tools/lib/validation/responsive-menu/OwnedMenuWindow.ps1
+$target={powershell_literal(target)}
+[IO.File]::WriteAllBytes($target,[byte[]]::new(65536))
+$source=[Drawing.Bitmap]::new(2,2)
+$roundtrip=$null
+try {{
+  $source.SetPixel(0,0,[Drawing.Color]::FromArgb(255,17,34,51))
+  $source.SetPixel(1,1,[Drawing.Color]::FromArgb(255,68,85,102))
+  $written=Save-MIROwnedMenuBitmapPng -Bitmap $source -Path $target
+  $bytes=[IO.File]::ReadAllBytes($target)
+  $iend='0,0,0,0,73,69,78,68,174,66,96,130'
+  $tail=[int[]]$bytes[($bytes.Length-12)..($bytes.Length-1)]
+  if($bytes.Length-ge65536-or(($tail-join',')-cne$iend)){{throw 'capture image retained stale trailing bytes'}}
+  $roundtrip=[Drawing.Bitmap]::new($target)
+  if($roundtrip.GetPixel(0,0).ToArgb()-ne$source.GetPixel(0,0).ToArgb()-or$roundtrip.GetPixel(1,1).ToArgb()-ne$source.GetPixel(1,1).ToArgb()){{throw 'capture image pixels changed'}}
+  [ordered]@{{path=$written;bytes=$bytes.Length;iend_is_terminal=$true;pixels_preserved=$true;native_execution=$false}}|ConvertTo-Json -Compress
+}} finally {{
+  if($null-ne$roundtrip){{$roundtrip.Dispose()}}
+  $source.Dispose()
+}}
+'''
+            completed = subprocess.run(
+                ["pwsh", "-NoProfile", "-Command", command], cwd=ROOT,
+                text=True, capture_output=True, check=True,
+            )
+            result = json.loads(completed.stdout)
+            self.assertTrue(target.samefile(result["path"]))
+            self.assertLess(result["bytes"], 65536)
+            self.assertTrue(result["iend_is_terminal"])
+            self.assertTrue(result["pixels_preserved"])
+            self.assertFalse(result["native_execution"])
+
     def test_fixed_four_arm_two_cycle_plan_keeps_warmups_aa_pilot_and_latin_square(self):
         record = invoke_as_json(f"-PlanOnly {DECLARED_POLICY}")
         self.assertEqual(record["status"], "planned-not-executed")

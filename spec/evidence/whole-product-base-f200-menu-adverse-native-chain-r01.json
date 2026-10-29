@@ -1,0 +1,187 @@
+{
+  "schema": 1,
+  "kind": "MIRWholeProductBaseF200MenuAdverseNativeChainV1",
+  "status": "preserved-unaccepted-comparisons",
+  "source_commit": "42032477d45ced683e72736a4fe30a7a3195b995",
+  "private_commit": "1baf3251446fc45535d54f53ca195bfa7d325228",
+  "attempts": [
+    {
+      "revision": 2,
+      "packet_sha256": "D227E9CF9FE9D687CEC5755F80B94889111BA1EF71D0DDC3F65460C50D59BFB6",
+      "terminal_sha256": "3CF31EA92E52A44EA60F739D3202EBBE99B52B4E5E609D31D59817C1D1AE7FDB",
+      "native_processes": 3,
+      "completed_warmups": 2,
+      "aa_observations": 0,
+      "declared_scored_observations": 0,
+      "accepted_scores": 0,
+      "extensions": 0,
+      "exception": "[mir441-resource-process-budget]",
+      "native_custody": {
+        "members": 34,
+        "bytes_per_copy": 61839942
+      },
+      "controller_custody": {
+        "members": 4,
+        "bytes_per_copy": 2019450
+      },
+      "root_readback": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\whole-product-base-f200-menu-r02-controller\\root-adverse-readback.json",
+        "sha256": "EFD56521314D3AE63E3823974291E2327BC58F6948026AEA3F56E2DA00D1C968"
+      },
+      "png_count": 6,
+      "pngs_with_trailing_bytes": [],
+      "diagnostic_arithmetic": null
+    },
+    {
+      "revision": 3,
+      "packet_sha256": "AA3A8DDFBF39DE1F3659F7A0F0A2B72212AAAB3EC97817B4C1FC4104497360BC",
+      "terminal_sha256": "F18B98BF576DEA77BEA53011A77A66D941FFBE84D709F523393D27F9F0881F4D",
+      "native_processes": 38,
+      "completed_warmups": 4,
+      "aa_observations": 2,
+      "declared_scored_observations": 32,
+      "accepted_scores": 0,
+      "extensions": 0,
+      "exception": null,
+      "native_custody": {
+        "members": 423,
+        "bytes_per_copy": 1077712279
+      },
+      "controller_custody": {
+        "members": 5,
+        "bytes_per_copy": 2310711
+      },
+      "root_readback": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\whole-product-base-f200-menu-r03-controller\\root-adverse-readback.json",
+        "sha256": "318D3A29D7D46552B6CDD01FDCC5E54C520C1212CDBAD4FEE129F2E0F1ACE0AC"
+      },
+      "png_count": 114,
+      "pngs_with_trailing_bytes": [
+        {
+          "path": "runs/10-latin-comparison-candidate-mir5/responsive-menu-actor/latest-owned-window.png",
+          "width": 2560,
+          "height": 1440,
+          "trailing_bytes": 17768
+        },
+        {
+          "path": "runs/10-latin-comparison-candidate-mir5/responsive-menu-actor/settings-response.png",
+          "width": 2560,
+          "height": 1440,
+          "trailing_bytes": 17768
+        },
+        {
+          "path": "runs/22-latin-comparison-published-mir4.7/responsive-menu-actor/latest-owned-window.png",
+          "width": 2560,
+          "height": 1440,
+          "trailing_bytes": 15911
+        },
+        {
+          "path": "runs/22-latin-comparison-published-mir4.7/responsive-menu-actor/settings-response.png",
+          "width": 2560,
+          "height": 1440,
+          "trailing_bytes": 15911
+        },
+        {
+          "path": "runs/25-latin-comparison-published-mir4.7/responsive-menu-actor/latest-owned-window.png",
+          "width": 2560,
+          "height": 1440,
+          "trailing_bytes": 6162
+        },
+        {
+          "path": "runs/25-latin-comparison-published-mir4.7/responsive-menu-actor/settings-response.png",
+          "width": 2560,
+          "height": 1440,
+          "trailing_bytes": 6162
+        },
+        {
+          "path": "runs/27-latin-comparison-published-mir3/responsive-menu-actor/latest-owned-window.png",
+          "width": 2560,
+          "height": 1440,
+          "trailing_bytes": 10549
+        },
+        {
+          "path": "runs/27-latin-comparison-published-mir3/responsive-menu-actor/settings-response.png",
+          "width": 2560,
+          "height": 1440,
+          "trailing_bytes": 10549
+        }
+      ],
+      "diagnostic_arithmetic": {
+        "published_aa": {
+          "values_seconds": [
+            10.930835,
+            11.1806478
+          ],
+          "difference_seconds": 0.24981279999999906,
+          "allowance_seconds": 0.5527870699999999,
+          "within_declared_allowance": true
+        },
+        "latin_medians_seconds": {
+          "control-without-mir": 10.4352445,
+          "published-mir3": 11.3236557,
+          "published-mir4.7": 11.62537315,
+          "candidate-mir5": 10.6609448
+        },
+        "drift": {
+          "control-without-mir": {
+            "first_cycle_median": 10.295704050000001,
+            "second_cycle_median": 11.18896125,
+            "difference": 0.893257199999999,
+            "within_seconds": false
+          },
+          "published-mir3": {
+            "first_cycle_median": 11.405690700000001,
+            "second_cycle_median": 11.21193835,
+            "difference": -0.19375235000000046,
+            "within_seconds": true
+          },
+          "published-mir4.7": {
+            "first_cycle_median": 11.3944013,
+            "second_cycle_median": 11.93143645,
+            "difference": 0.5370351499999995,
+            "within_seconds": false
+          },
+          "candidate-mir5": {
+            "first_cycle_median": 10.78313805,
+            "second_cycle_median": 10.5950908,
+            "difference": -0.18804725000000033,
+            "within_seconds": true
+          }
+        },
+        "historical_mir3": {
+          "interpretation": "as-shipped-historical-comparison-only",
+          "equal_work_established": false,
+          "mir3_minus_published_mir4_7_seconds": -0.30171744999999994
+        },
+        "mir_added_objective": {
+          "applicable": false,
+          "published_mir_added_seconds": 1.1901286500000001,
+          "candidate_mir_added_seconds": 0.22570029999999974,
+          "status": "not-applicable-profile-not-declared-high-cost"
+        }
+      }
+    }
+  ],
+  "scope": "Base2.0.77/D3 fresh-process graphical startup only; historicalMIR3 as-shipped,not equal work.",
+  "interpretation": [
+    "R02 applies a4GiB preparation-sized guard to graphical work; third governed actor/tree exceeds it. Preserve the refusal;no MIR regression claim.",
+    "R03 uses the established9216MiB/300s menu policy and captures38 launches. A/A passes,but unchanged0.5s drift fails for NoMIR andpublished4.7;all32 scored-phase observations remain diagnostics,zero accepted scores.",
+    "R03 retains114 PNG first streams with CRC/decompressed rows;8 have nonempty trailing data after IEND,so strict standalone validity does not pass. Original bodies are not trimmed/replaced.",
+    "The frozen reader additionally refuses the valid unchanged-archive action;its initial validator only inspected PNG headers and omitted native log/ledger admission. Corrected privatea6e713a and publicPNG-writer PR1435 apply to future inputs only.",
+    "Ledgers measure governed actor+owned-child trees. Wrapper PIDs are not independent child creation proof. Native identities come from owned actor/window/log records.",
+    "No pooling,selective replacement,retries,percentage/equal-work/leak/cold/SpaceAge/factory/F210/release claim."
+  ],
+  "native_processes": 41,
+  "accepted_scores": 0,
+  "factorio_processes_after": 0,
+  "receipt_capsule": {
+    "path": "spec/evidence/whole-product-base-f200-menu-adverse-receipts-r01.json.gz",
+    "bytes": 1544894,
+    "sha256": "091D220C186B844E97380779E0D88F69DCD4C0F2E8385076CDB83C96BEE5628A",
+    "bodies": 354,
+    "scope": "Exact textual controller/native receipts;original PNGs and binary caches remain double-custodied/hash-pinned locally."
+  },
+  "independent_review": "Separate actual-data review verifies both full custodies,raw selections/actors/ledgers/PNG defects and failed drift;final public unit review remains required.",
+  "performance_acceptance": false,
+  "release_qualification": false
+}
