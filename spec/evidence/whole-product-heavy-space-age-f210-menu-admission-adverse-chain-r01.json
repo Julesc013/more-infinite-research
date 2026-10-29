@@ -1,0 +1,158 @@
+{
+  "schema": 1,
+  "kind": "MIRHeavyF210MenuAdmissionAdverseChainV1",
+  "status": "two-zero-engine-resource-admission-refusals-preserved",
+  "observations": [
+    {
+      "revision": "r01",
+      "packet_sha256": "50514032CA957228BFBD6BE0DD0D987807D8E97DC488D7DC48E0C167C1AFABC4",
+      "terminal_sha256": "A47D1BBFF6E84A8ED3542169293471E9BBD02BAF0C613C8537C0D8EAE9F10FE2",
+      "private_source": "bfa17e373ce98eeac31e6bd22af8ecd39005a6f8",
+      "public_source": "b7caa8df9141523a556bb57ca8faf7c43d250c3d",
+      "resource_policy": {
+        "expected_peak_memory_mib": 9216,
+        "maximum_new_output_mib": 2048,
+        "per_launch_timeout_seconds": 300,
+        "admission_wait_seconds": 30
+      },
+      "native_engines": 0,
+      "timing_observations": 0,
+      "actual_failure_evidence": {
+        "error": "[mir441-resource-admission-memory]",
+        "resource_admission": {
+          "snapshot": {
+            "observed_at": "2026-10-29T18:49:26.8753882+00:00",
+            "memory": {
+              "total_bytes": 34045980672,
+              "free_bytes": 16370397184,
+              "committed_bytes": 24009027584,
+              "commit_limit_bytes": 44388642816
+            },
+            "work_volume": {
+              "name": "D:\\",
+              "free_bytes": 163459563520,
+              "total_bytes": 1500099112960
+            },
+            "system_volume": {
+              "name": "C:\\",
+              "free_bytes": 197559173120,
+              "total_bytes": 599395090432
+            }
+          },
+          "limits": {
+            "physical_bytes": 6809196134,
+            "commit_bytes": 6809196134,
+            "system_bytes": 21474836480,
+            "work_bytes": 21474836480
+          },
+          "estimated_peak_bytes": 2147483648,
+          "expected_peak_memory_bytes": 9663676416
+        },
+        "prestart_admission_wait": null,
+        "exception_chain_truncated": false
+      },
+      "physical_headroom_shortfall_bytes": 102475366,
+      "restoration": [
+        {
+          "path": "D:\\Projects\\Factorio\\testmods\\2.1\\more-infinite-research_5.0.21000.zip",
+          "action": "restored-prior"
+        },
+        {
+          "path": "D:\\Projects\\Factorio\\testmods\\2.1\\more-infinite-research_4.7.21003.zip",
+          "action": "unchanged"
+        },
+        {
+          "path": "D:\\Projects\\Factorio\\testmods\\2.1\\more-infinite-research_3.2.11.zip",
+          "action": "removed-temporary"
+        }
+      ],
+      "controller_files_per_copy": 3,
+      "controller_bytes_per_copy": 2032656,
+      "restoration_source_and_copy_hashes_verified": true
+    },
+    {
+      "revision": "r02",
+      "packet_sha256": "E740D155BAB285089F0A57CD6840B36D375EEC49775D01559E427D1981AE5188",
+      "terminal_sha256": "40656ABBCC82C966CB7C380981501CCB51B6C5F50F47908B5ACEBBB756BDBF13",
+      "private_source": "bfa17e373ce98eeac31e6bd22af8ecd39005a6f8",
+      "public_source": "b7caa8df9141523a556bb57ca8faf7c43d250c3d",
+      "resource_policy": {
+        "expected_peak_memory_mib": 9216,
+        "maximum_new_output_mib": 2048,
+        "per_launch_timeout_seconds": 300,
+        "admission_wait_seconds": 30
+      },
+      "native_engines": 0,
+      "timing_observations": 0,
+      "actual_failure_evidence": {
+        "error": "[mir441-resource-admission-memory]",
+        "resource_admission": {
+          "snapshot": {
+            "observed_at": "2026-10-29T18:59:05.5076232+00:00",
+            "memory": {
+              "total_bytes": 34045980672,
+              "free_bytes": 15810744320,
+              "committed_bytes": 24491978752,
+              "commit_limit_bytes": 44388642816
+            },
+            "work_volume": {
+              "name": "D:\\",
+              "free_bytes": 163454853120,
+              "total_bytes": 1500099112960
+            },
+            "system_volume": {
+              "name": "C:\\",
+              "free_bytes": 198064930816,
+              "total_bytes": 599395090432
+            }
+          },
+          "limits": {
+            "physical_bytes": 6809196134,
+            "commit_bytes": 6809196134,
+            "system_bytes": 21474836480,
+            "work_bytes": 21474836480
+          },
+          "estimated_peak_bytes": 2147483648,
+          "expected_peak_memory_bytes": 9663676416
+        },
+        "prestart_admission_wait": null,
+        "exception_chain_truncated": false
+      },
+      "physical_headroom_shortfall_bytes": 662128230,
+      "restoration": [
+        {
+          "path": "D:\\Projects\\Factorio\\testmods\\2.1\\more-infinite-research_5.0.21000.zip",
+          "action": "restored-prior"
+        },
+        {
+          "path": "D:\\Projects\\Factorio\\testmods\\2.1\\more-infinite-research_4.7.21003.zip",
+          "action": "unchanged"
+        },
+        {
+          "path": "D:\\Projects\\Factorio\\testmods\\2.1\\more-infinite-research_3.2.11.zip",
+          "action": "removed-temporary"
+        }
+      ],
+      "controller_files_per_copy": 3,
+      "controller_bytes_per_copy": 2032656,
+      "restoration_source_and_copy_hashes_verified": true
+    }
+  ],
+  "receipt_capsule": {
+    "path": "spec/evidence/whole-product-heavy-space-age-f210-menu-admission-adverse-receipts-r01.json.gz",
+    "sha256": "7161B3D81652CA50B17DA6AFF445EAEA5026FF3DFC2D137BFB2C860C655DA528",
+    "bytes": 44562,
+    "bodies": 30
+  },
+  "method_context": "R01 used a nested explicit PS7 NonInteractive File launcher;R02 independently reviewed a direct tool-shell NoProfile Command,piped/tty=false,named-parameter C425 call. Both exact contexts and their real controls are retained;no wrapper-equivalence or cause claim follows.",
+  "preparation_adverses": "R01 two local proof wrappers mistyped expected success text;actual reader/caller returned0 before wrapper assertion and no native/mutation. R03 direct controls supersede those proof claims. R02 first direct-control array splat produced parameter-binding refusals before mutation;corrected named-parameter r03 controls passed on the final packet. All original local files and predecessor packet/prep copies remain preserved.",
+  "limits": [
+    "No Factorio process launched in either attempt;there is no menu,score,A/A,drift,performance,activity,save,parity or gameplay result.",
+    "The9GiB peak,20percent reserve,2GiB output,300s/30s,schedule and tolerances were not reduced.",
+    "The snapshots describe their actual refusals only;later free-memory readings neither explain nor repair either refusal.",
+    "No further heavy launch is authorized by this record;prepare and review genuinely adequate quiet host inputs before another distinct attempt.",
+    "The historical9635987456-byte cohort maximum motivates the established9GiB policy only;it is not attributed to a specific historical arm or used to predict a current one."
+  ],
+  "performance_acceptance": false,
+  "release_qualification": false
+}
