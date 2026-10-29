@@ -218,7 +218,7 @@ function M.register(context)
   end)
   script.on_event(defines.events.on_console_command,function(event)
     if event.command~="mir-settings-export" and event.command~="mir-diagnostics-export" then return end
-    if event.player_index~=nil and event.player_index~=0 then fail("expected explicit server-console export") end
+    if event.player_index~=nil then fail("expected absent player index for server-console export") end
     local s=state()
     if loaded or s.phase~="ready" or s.cursor~=13 or s.joins~=3 or s.joins_by_phase.rejoin.de~=1 then
       fail("server export command outside pre-restart phase")
