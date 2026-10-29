@@ -166,6 +166,10 @@ class LibraryTests(unittest.TestCase):
               value.force_auto_center_calls = (value.force_auto_center_calls or 0) + 1
             end
             value.add = function(spec)
+              if spec.type == "text-box" then
+                assert(spec.read_only == nil and spec.word_wrap == nil,
+                  "native text-box add accepts text/icon_selector; set read_only/word_wrap after creation")
+              end
               if spec.type == "tabbed-pane" and spec.name == "mir_library_tabs" then
                 assert(spec.selected_tab_index == nil, "MIR must select a tab only after add_tab entries exist")
               end

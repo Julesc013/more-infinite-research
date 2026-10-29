@@ -1302,7 +1302,8 @@ local function show_export_profile(content, encoded)
   local preview
   if #encoded <= 1048576 then
     preview = add(content, {type = "text-box", name = PREFIX .. "export_profile", text = encoded,
-      read_only = true, word_wrap = true, tooltip = {"mir-browser.export-sharing-guidance"}})
+      tooltip = {"mir-browser.export-sharing-guidance"}})
+    preview.read_only, preview.word_wrap = true, true
     if preview.style then
       preview.style.maximal_width = 650
       preview.style.horizontally_stretchable = true

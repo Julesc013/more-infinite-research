@@ -35,7 +35,12 @@
       "server_only_for_player_zero": true,
       "nonzero_player_targets_only_that_peer": true,
       "for_player_invalid_in_settings_and_prototype": true,
-      "nonzero_target_skipped_in_runtime_main_chunk": false
+      "nonzero_target_skipped_in_runtime_main_chunk": false,
+      "text_box_variant_constructor_parameters": [
+        "icon_selector",
+        "text"
+      ],
+      "readonly_and_word_wrap_set_after_creation": true
     },
     {
       "engine_version": "2.1.23",
@@ -69,7 +74,12 @@
       "server_only_for_player_zero": true,
       "nonzero_player_targets_only_that_peer": true,
       "for_player_invalid_in_settings_and_prototype": true,
-      "nonzero_target_skipped_in_runtime_main_chunk": true
+      "nonzero_target_skipped_in_runtime_main_chunk": true,
+      "text_box_variant_constructor_parameters": [
+        "icon_selector",
+        "text"
+      ],
+      "readonly_and_word_wrap_set_after_creation": true
     }
   ],
   "implementation_boundary": [
