@@ -109,6 +109,7 @@ class LibraryPairedBrowserFixtureTests(unittest.TestCase):
           function paired_browser_runtime(path, arm, opponent)
             local callbacks, markers, profiler_labels, screenshots, saves, calls, joins = {events = {}}, {}, {}, {}, {}, {}, {}
             local action_ticks = {}
+            local save_ticks = {}
             local profiling = false
             local gear = "recipe-prod-research_gears-1"
             local mining = "recipe-prod-research_mining_drill-1"
@@ -249,15 +250,29 @@ class LibraryPairedBrowserFixtureTests(unittest.TestCase):
             end
             env.game={
               players=players, tick=0,
+              surfaces={[1]={valid=true, name="nauvis", map_gen_settings={seed=424242, width=0, height=0}}},
               take_screenshot=function(row)
                 row.tick=env.game.tick;row.calls_seen=#calls;row.profiling=profiling
                 screenshots[#screenshots+1]=row
               end,
-              server_save=function(name) saves[#saves+1]=name end
+              server_save=function(name)
+                if opponent == "deferred-render" and name == "mir5-native-complete" then
+                  for _, capture in ipairs(screenshots) do
+                    if string.find(capture.path, "reopen-settled", 1, true) and capture.tick == env.game.tick then
+                      error("final save modal obscured pending settled screenshot render")
+                    end
+                  end
+                end
+                saves[#saves+1]=name
+                save_ticks[name]=env.game.tick
+              end
             }
             setmetatable(env.game,{__index=function(_, key)
               if key == "create_profiler" then error("removed game.create_profiler API was accessed") end
             end})
+            if opponent == "wrong-map-seed" then env.game.surfaces[1].map_gen_settings.seed=424243 end
+            if opponent == "missing-map-surface" then env.game.surfaces={} end
+            if opponent == "missing-map-settings" then env.game.surfaces[1].map_gen_settings=nil end
             env._G=env
             setmetatable(env,{__index=function(_, key) return _G[key] end})
             local function invoke(callback, event)
@@ -363,6 +378,7 @@ class LibraryPairedBrowserFixtureTests(unittest.TestCase):
               end
               return {ok=ok,message=message,markers=markers}
             end
+            if opponent == "changed-restart-map-seed" then env.game.surfaces[1].map_gen_settings={seed=424243} end
             ok,message=register_control()
             if not ok then return {ok=false,message=message,markers=markers} end
             ok,message=invoke_load_read_only()
@@ -395,14 +411,17 @@ class LibraryPairedBrowserFixtureTests(unittest.TestCase):
             end
             readiness[#readiness+1]={phase="restart",calls=#calls,screenshots=#screenshots}
             if opponent == "late-restart-locale" then de.locale="de" end
-            for _, tick in ipairs({restart_ready_tick,restart_ready_tick+60}) do
+            for _, tick in ipairs({restart_ready_tick,restart_ready_tick+60,restart_ready_tick+119,restart_ready_tick+120}) do
+              if tick == restart_ready_tick+120 and opponent == "changed-final-settled-root" then
+                en.gui.screen["mir_research_browser"]={valid=true}
+              end
               env.game.tick=tick
               ok,message=invoke(callbacks.events[2],{tick=tick})
               if not ok then return {ok=false,message=message,markers=markers,calls=calls} end
             end
             return {
               ok=ok,message=message,markers=markers,profiler_labels=profiler_labels,screenshots=screenshots,
-              saves=saves,calls=calls,joins=joins,load_writes=load_writes,readiness=readiness,action_ticks=action_ticks,restart_wait=restart_wait,restart_first_event=restart_first_event,
+              saves=saves,save_ticks=save_ticks,calls=calls,joins=joins,load_writes=load_writes,readiness=readiness,action_ticks=action_ticks,restart_wait=restart_wait,restart_first_event=restart_first_event,
               ready_markers_before_tick=ready_markers_before_tick,
               ready_markers_after_tick=ready_markers_after_tick,
               state=env.storage["mir5_library_paired_browser"]
@@ -476,6 +495,22 @@ class LibraryPairedBrowserFixtureTests(unittest.TestCase):
         missing = self.setting_result("published", omit_setting=True)
         self.assertFalse(missing["ok"])
         self.assertIn("selector is absent", missing["message"])
+
+    def test_fixed_map_seed_is_observed_on_creation_initial_host_and_cold_restart(self):
+        for arm in ARMS:
+            with self.subTest(arm=arm):
+                result = self.runtime_result(arm)
+                self.assertTrue(result["ok"], result["message"])
+                ready = [row for row in result["markers"] if row["stage"] == "ready"]
+                self.assertEqual(len(ready), 3)
+                self.assertEqual([row["map_gen_settings"] for row in ready],
+                                 [{"seed": 424242, "width": 0, "height": 0}] * 3)
+                for opponent in ("wrong-map-seed", "missing-map-surface", "missing-map-settings",
+                                 "changed-restart-map-seed"):
+                    with self.subTest(opponent=opponent):
+                        refused = self.runtime_result(arm, opponent)
+                        self.assertFalse(refused["ok"])
+                        self.assertIn("fixed map", refused["message"])
 
     def test_control_registers_without_runtime_access_or_imports(self):
         result = plain(self.lua.globals().paired_browser_parse(self.lua.globals().control_path))
@@ -559,6 +594,21 @@ class LibraryPairedBrowserFixtureTests(unittest.TestCase):
                 self.assertTrue(result['ok'], result['message'])
                 late = next(row for row in result['screenshots'] if row['path'].endswith('first-open-settled-2.png'))
                 self.assertEqual(result['action_ticks'][2] - late['tick'], 60)
+
+    def test_final_save_waits_for_reopen_render_and_retains_both_observed_roots(self):
+        for arm in ARMS:
+            with self.subTest(arm=arm):
+                result = self.runtime_result(arm, "deferred-render")
+                self.assertTrue(result["ok"], result["message"])
+                late = [r for r in result["screenshots"] if "reopen-settled" in r["path"]]
+                self.assertEqual(len(late), 2)
+                self.assertEqual([result["save_ticks"]["mir5-native-complete"] - r["tick"] for r in late], [60, 60])
+                self.assertEqual(result["saves"], ["mir5-library-paired-browser-restart", "mir5-native-complete"])
+                self.assertEqual(len(result["calls"]), 8)
+                self.assertEqual(result["state"]["screenshot_calls"], 12)
+                refused = self.runtime_result(arm, "changed-final-settled-root")
+                self.assertFalse(refused["ok"])
+                self.assertIn("final render grace lost the original public Browser root", refused["message"])
 
     def test_published_family_lookup_rejects_duplicate_or_unbounded_filter_layout(self):
         for opponent, message in [

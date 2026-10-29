@@ -362,6 +362,7 @@ def native_fixture_active_create_target_cases() -> dict:
     """Execute the wrapper's own save-target and create-call AST nodes only."""
     escaped = str(NATIVE_FIXTURE).replace("'", "''")
     command = rf"""
+$ErrorActionPreference='Stop';Set-StrictMode -Version Latest
 $tokens=$null;$errors=$null
 $ast=[System.Management.Automation.Language.Parser]::ParseFile('{escaped}',[ref]$tokens,[ref]$errors)
 if($errors.Count){{throw ($errors | ForEach-Object {{$_.ToString()}})}}
@@ -369,12 +370,17 @@ $assignments=@($ast.FindAll({{param($node) $node -is [System.Management.Automati
 $activeSave=@($assignments|Where-Object {{ $_.Left -is [System.Management.Automation.Language.VariableExpressionAst] -and $_.Left.VariablePath.UserPath -ceq 'activeSave' }})
 $seed=@($assignments|Where-Object {{ $_.Left -is [System.Management.Automation.Language.VariableExpressionAst] -and $_.Left.VariablePath.UserPath -ceq 'seed' -and $_.Extent.Text -match 'repair-stress' }})
 $create=@($assignments|Where-Object {{ $_.Extent.Text -match '^\$record\.create\s*=\s*Invoke-FixtureStage' }})
-if($activeSave.Count -ne 1 -or $seed.Count -ne 1 -or $create.Count -ne 1){{throw 'active save target assignments missing or ambiguous'}}
+$createArguments=@($assignments|Where-Object {{ $_.Left -is [System.Management.Automation.Language.VariableExpressionAst] -and $_.Left.VariablePath.UserPath -ceq 'createArguments' }})
+$selector=@($ast.FindAll({{param($node) $node -is [System.Management.Automation.Language.FunctionDefinitionAst] -and $node.Name -ceq 'Get-FixtureCreateArguments'}},$true))
+if($activeSave.Count -ne 1 -or $seed.Count -ne 1 -or $create.Count -ne 1 -or $createArguments.Count -ne 1 -or $selector.Count -ne 1){{throw 'active save target assignments missing or ambiguous'}}
+. ([scriptblock]::Create($selector[0].Extent.Text))
 function Invoke-TargetCase([bool]$Active,[string]$Kind) {{
   $activeSeed=$Active;$ActiveSeedKind=$Kind;$writeData='D:\owned-write-data';$record=[ordered]@{{}}
+  $CaseName=if($Active){{$Kind+'-active'}}else{{'ordinary'}};$CreateOnly=$false
   function Invoke-FixtureStage([string]$Stage,[object[]]$Arguments) {{[pscustomobject]@{{stage=$Stage;arguments=$Arguments;log='unused'}}}}
   . ([scriptblock]::Create($activeSave[0].Extent.Text))
   . ([scriptblock]::Create($seed[0].Extent.Text))
+  . ([scriptblock]::Create($createArguments[0].Extent.Text))
   . ([scriptblock]::Create($create[0].Extent.Text))
   [ordered]@{{active_save=$activeSave;seed=$seed;create=$record.create.arguments}}
 }}

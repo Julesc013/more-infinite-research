@@ -9,6 +9,35 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 class NativeFixtureModeControls(unittest.TestCase):
+    def test_only_paired_create_adds_fixed_map_seed_to_actual_stage_arguments(self):
+        script = r'''
+$ErrorActionPreference='Stop';Set-StrictMode -Version Latest
+$tokens=$null;$errors=$null
+$ast=[Management.Automation.Language.Parser]::ParseFile($env:MIR_TEST_RUNNER,[ref]$tokens,[ref]$errors)
+if($errors.Count){throw 'runner parse failed'}
+$function=@($ast.FindAll({param($n)$n-is[Management.Automation.Language.FunctionDefinitionAst]-and$n.Name-ceq'Get-FixtureCreateArguments'},$true))
+if($function.Count-ne1){throw 'create argument boundary missing'}
+Invoke-Expression $function[0].Extent.Text
+$seed='C:\owned checkout\seed.zip'
+foreach($case in @('library-paired-browser','library-multiplayer','repair-stress-active','historical-native')){
+ foreach($only in @($false,$true)){
+  $actual=@(Get-FixtureCreateArguments $seed $case $only)
+  $expected=@('--create',$seed)
+  if($case-ceq'library-paired-browser'-and$only){$expected+=@('--map-gen-seed','424242')}
+  if(($actual|ConvertTo-Json -Compress)-cne($expected|ConvertTo-Json -Compress)){throw 'creation inputs differ'}
+ }
+}
+$assignment=@($ast.FindAll({param($n)$n-is[Management.Automation.Language.AssignmentStatementAst]-and$n.Left.Extent.Text-ceq'$createArguments'},$true))
+if($assignment.Count-ne1-or-not$assignment[0].Right.Extent.Text.Contains('Get-FixtureCreateArguments -Seed $seed -Case $CaseName -OnlyCreate ([bool]$CreateOnly)')){throw 'actual creation bypasses seed selection'}
+$call=@($ast.FindAll({param($n)$n-is[Management.Automation.Language.CommandAst]-and$n.Extent.Text-ceq"Invoke-FixtureStage 'create' $"+'createArguments'},$true))
+if($call.Count-ne1){throw 'actual create stage bypasses selected arguments'}
+'PASS fixed paired creation arguments'
+'''
+        result = subprocess.run(['pwsh', '-NoProfile', '-NonInteractive', '-Command', script],
+                                env=dict(os.environ, MIR_TEST_RUNNER=str(ROOT / 'tools/Invoke-NativeFixture.ps1')),
+                                capture_output=True, text=True)
+        self.assertEqual(0, result.returncode, result.stdout + result.stderr)
+
     def test_absent_full_and_create_modes_refuse_any_mir_selection_or_hash(self):
         script = r'''
 $ErrorActionPreference='Stop'; Set-StrictMode -Version Latest

@@ -50,6 +50,15 @@ function Assert-Fixture([bool]$Condition,[string]$Message) {
 function Get-FixtureSha([string]$Path) {
   (Get-FileHash -LiteralPath $Path -Algorithm SHA256).Hash.ToUpperInvariant()
 }
+function Get-FixtureCreateArguments([string]$Seed,[string]$Case,[bool]$OnlyCreate) {
+  $arguments=@('--create',$Seed)
+  # The paired Library experiment needs an explicit common terrain input.
+  # Other fresh fixtures retain their existing creation arguments.
+  if($OnlyCreate -and $Case -ceq 'library-paired-browser') {
+    $arguments+=@('--map-gen-seed','424242')
+  }
+  return $arguments
+}
 function Assert-DeclaredFixtureInputs([Collections.IDictionary]$ProfileDefinition,$EngineIdentity,[Collections.IDictionary]$ArchiveHashes) {
   Assert-MIRDirectLibraryStartupDeclaredInputs -ProfileDefinition $ProfileDefinition -EngineIdentity $EngineIdentity -ArchiveHashes $ArchiveHashes -ErrorPrefix 'mir5-native-fixture'
 }
@@ -765,7 +774,8 @@ try{
     # sole closed pending save directly at the active-save destination.
     # Agriculture still creates seed.zip and has its existing server stage.
     $seed=if($activeSeed -and $ActiveSeedKind -ceq 'repair-stress'){$activeSave}else{Join-Path $writeData 'saves/seed.zip'}
-    $record.create=Invoke-FixtureStage 'create' @('--create',$seed)
+    $createArguments=@(Get-FixtureCreateArguments -Seed $seed -Case $CaseName -OnlyCreate ([bool]$CreateOnly))
+    $record.create=Invoke-FixtureStage 'create' $createArguments
     $record.create.consumers=Read-ConsumerResults ([IO.File]::ReadAllText($record.create.log)) 'init'
     Assert-Fixture (Test-Path -LiteralPath $seed -PathType Leaf) 'seed save absent'
   }
