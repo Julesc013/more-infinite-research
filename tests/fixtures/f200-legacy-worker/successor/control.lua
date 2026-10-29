@@ -106,9 +106,11 @@ end
 local function science_units(inventory, item, label)
   local total, stacks = 0, 0
   local prototype = prototypes.item[item]
-  if prototype == nil or type(prototype.get_durability) ~= "function" then
+  local science_type = script.active_mods.base == "2.1.23" and "item" or "tool"
+  if prototype == nil then
     fail(label .. " native science item prototype is absent: " .. item)
   end
+  if prototype.type ~= science_type then fail(label .. " native science prototype type changed for " .. item) end
   for index = 1, #inventory do
     local stack = inventory[index]
     if stack.valid_for_read and stack.name == item then
@@ -116,13 +118,26 @@ local function science_units(inventory, item, label)
       if quality == nil or quality.name ~= "normal" then
         fail(label .. " native science quality changed for " .. item)
       end
-      local maximum = prototype.get_durability(quality)
-      local durability = stack.durability
-      if not close(maximum, 1) or type(durability) ~= "number"
-          or durability <= 0 or durability > maximum or type(stack.count) ~= "number" or stack.count < 1 then
-        fail(label .. " native science durability changed for " .. item)
+      if stack.type ~= science_type or stack.is_tool ~= (science_type == "tool") then
+        fail(label .. " native science stack type changed for " .. item)
       end
-      total = total + stack.count - 1 + durability / maximum
+      if type(stack.count) ~= "number" or stack.count < 1 or stack.count % 1 ~= 0 then
+        fail(label .. " native science count changed for " .. item)
+      end
+      if science_type == "tool" then
+        if type(prototype.get_durability) ~= "function" then fail(label .. " native tool durability API is absent: " .. item) end
+        local maximum = prototype.get_durability(quality)
+        local durability = stack.durability
+        if not close(maximum, 1) or type(durability) ~= "number"
+            or durability <= 0 or durability > maximum then
+          fail(label .. " native science durability changed for " .. item)
+        end
+        total = total + stack.count - 1 + durability / maximum
+      else
+        -- Ordinary F210 items spend a whole item for a partial one-unit lab
+        -- completion. Never read either tool-only durability API on this arm.
+        total = total + stack.count
+      end
       stacks = stacks + 1
     end
   end
@@ -166,7 +181,9 @@ local function expected_science_consumption(force, value, lab_entity, saved_prog
   if ticks <= 0 or consumed_units <= 0 or consumed_units > 1 then fail("successor native worker science timing differs") end
   return {progress = progress, energy = energy, researching_speed = researching_speed,
     laboratory_speed = laboratory_speed, remaining_work = remaining_work, remaining_ticks = ticks,
-    consumed_units = consumed_units}
+    consumed_units = consumed_units,
+    science_type = script.active_mods.base == "2.1.23" and "item" or "tool",
+    inventory_consumed_units = script.active_mods.base == "2.1.23" and 1 or consumed_units}
 end
 
 local function assert_acceleration(value)
@@ -225,7 +242,8 @@ local function assert_completed(state)
   end
   state.destination_science_units_after = state.destination_science_units_after or {}
   for _, item in ipairs(SCIENCE) do
-    local expected = expected_units[item] - accounting.consumed_units
+    local inventory_spent = accounting.inventory_consumed_units or accounting.consumed_units
+    local expected = expected_units[item] - inventory_spent
     local observed = science_units(inventory, item, "successor post-lab")
     if not close(observed, expected) then
       fail("successor real native worker lab consumption differs for " .. item
@@ -257,6 +275,9 @@ local function marker(stage, state)
       player_enabled = player.enabled, player_visible_when_disabled = player.visible,
       foreign_queue_progress = state.foreign_queue.progress,
       science_consumed_units = state.destination_science_accounting.consumed_units,
+      science_inventory_consumed_units = state.destination_science_accounting.inventory_consumed_units
+        or state.destination_science_accounting.consumed_units,
+      science_type = state.destination_science_accounting.science_type or "tool",
       science_remaining_ticks = state.destination_science_accounting.remaining_ticks,
       science_processing_ticks = state.destination_processing_ticks,
       science_elapsed_ticks = state.destination_elapsed_ticks,
@@ -286,10 +307,13 @@ end
 
 local function on_configuration_changed(_event, fixture_version)
   fixture_version = fixture_version or "0.2.0"
-  if fixture_version ~= "0.2.0" and fixture_version ~= "0.3.0" then fail("unsupported successor fixture role") end
-  if script.active_mods.base ~= "2.0.77" or script.active_mods["more-infinite-research"] ~= "5.0.20000"
-      or script.active_mods[FIXTURE] ~= fixture_version then
-    fail("successor requires MIR 5.0.20000 and fixture 0.2.0 on Factorio 2.0.77")
+  local active = script.active_mods
+  local f200 = (fixture_version == "0.2.0" or fixture_version == "0.3.0")
+    and active.base == "2.0.77" and active["more-infinite-research"] == "5.0.20000"
+  local f210 = fixture_version == "0.4.0" and active.base == "2.1.23"
+    and active["more-infinite-research"] == "5.0.21000" and active["a-mir-fixture-worker-entry"] == "0.1.0"
+  if not (f200 or f210) or active[FIXTURE] ~= fixture_version or active["space-age"] ~= nil then
+    fail("unsupported exact native-worker successor tuple")
   end
   if settings.startup["mir-max-level-worker-robots-speed"].value ~= 40
       or settings.startup["mir-settings-profile-import"].value ~= "" then

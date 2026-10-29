@@ -24,8 +24,10 @@ function M.reconcile(state, entry, world, mods, startup, assert_restored)
   log("[MIR5_NATIVE_FIXTURE] DIAGNOSTIC " .. helpers.table_to_json({stage="fixture-owner-preflight",
     startup_type=type(startup), maximum_type=type(maximum), profile_type=type(profile),
     maximum=maximum and maximum.value or false, profile_import_empty=profile and profile.value == "" or false}))
-  if not maximum or not profile or mods.base ~= "2.0.77" or mods["more-infinite-research"] ~= "5.0.20000"
-      or mods[FIXTURE] ~= "0.3.0" or mods["a-mir-fixture-worker-entry"] ~= "0.1.0"
+  local f200 = mods.base == "2.0.77" and mods["more-infinite-research"] == "5.0.20000" and mods[FIXTURE] == "0.3.0"
+  local f210 = mods.base == "2.1.23" and mods["more-infinite-research"] == "5.0.21000" and mods[FIXTURE] == "0.4.0"
+  if not maximum or not profile or not (f200 or f210) or mods["space-age"] ~= nil
+      or mods["a-mir-fixture-worker-entry"] ~= "0.1.0"
       or maximum.value ~= 40 or profile.value ~= "" then fail("exact fixture-owner closure/settings differ") end
   local expected = state.player_with_independent + 2 * MODIFIER
   if not close(state.player_baseline, 2.4) or not close(state.foreign_baseline, 2.4)

@@ -1,0 +1,280 @@
+{
+  "schema": 1,
+  "kind": "MIRF210WorkerFixtureOwnerNativeChainV1",
+  "status": "passed-named-F200-source-to-current-F210-native-worker-with-explicit-fixture-contribution",
+  "scope": "Exact original90B2 published4.7.20002/2.0 source to unmodified38C/source992c/playerfbb7/standalone2.1.23/8DC using new0.4 fixture at49b6971d. Independent exact-engine observer order,unchanged aggregate guard and all original assertions precede the fixtures own persisted0.123 reconciliation. One actual new lab with ordinary-item science,save and two cold reloads pass. No original0.2/F200 verdict is relabelled.",
+  "controller_commit": "49b6971df1a436254f2e5017e054df294961db59",
+  "artifact_source_commit": "992c76ee24caf2d723b469c3db760cbebdf35eeb",
+  "player_tree": "fbb7e9135280ce7f69692e9b0c4a44d743793f45",
+  "candidate_sha256": "38C84CCBC4BFDA62FCB078772C4690AB81228484744A36D9EA303F5A75B16447",
+  "engine_sha256": "8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38",
+  "protected_source": {
+    "path": "build/qualification/recovered-f200-worker-40018592992-r01/gameplay/published/write-data/saves/mir5-native-complete.zip",
+    "sha256": "90B23B42FA040368E7ED8E4D720D1682BD252A554A2DEB103CE60D8AF2930D82",
+    "bytes": 852821,
+    "original_published_receipt_sha256": "6A5C450AC547923D0AD3BAD0DC6F22406214C15ADB0F9B17F0483F603940AA5D"
+  },
+  "cases": [
+    {
+      "label": "order",
+      "status": "failed",
+      "controller_commit": "49b6971df1a436254f2e5017e054df294961db59",
+      "packet_sha256": "EFB56409DD234E75CE77E37B4C6B8501FA886BA2ED139DDC7CECB2EF4DD935C4",
+      "caller_sha256": "42E80EA94FCDD32F1045956A6CD93465443230BA9DEA2BD71B42D12AE6E34FBB",
+      "result_sha256": "C8E1AA2228757CE2382384683DFB35E0EBC414D6CF8B2F7255D9F32626D6000B",
+      "engine_sha256": "8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38",
+      "mir_sha256": "317BAEDB9E15EB0A4557D75A00628814AD779A48E6D61841B6F5327FDEAAB471",
+      "profile_sha256": "F74578460A42AB8AEC810D4970B3D4D7CD077937433E65F1313DAC3BE2726DB2",
+      "fixture_sha256": "1A30BA285327F459ACBE966AAEB0BA5505EFD7F740EF57B3BFDC151393D78C9E",
+      "entry_observer_sha256": "53F6376FDA1F79AA9B14F6A600BA83B3E6F34026E03BED147C4D6E24870DD485",
+      "native_files": 8,
+      "bytes_per_copy": 54261,
+      "order_proof": {
+        "schema": 1,
+        "kind": "MIRF210WorkerFixtureOwnerNativeOrderReadbackV1",
+        "reader_sha256": "52CFAC3B15C641E7B3627670676C71AD43175314C415B1E5CB7F3205A507D1F0",
+        "controller_commit": "49b6971df1a436254f2e5017e054df294961db59",
+        "packet_sha256": "EFB56409DD234E75CE77E37B4C6B8501FA886BA2ED139DDC7CECB2EF4DD935C4",
+        "caller_sha256": "42E80EA94FCDD32F1045956A6CD93465443230BA9DEA2BD71B42D12AE6E34FBB",
+        "result_sha256": "C8E1AA2228757CE2382384683DFB35E0EBC414D6CF8B2F7255D9F32626D6000B",
+        "native_raw_status": "failed",
+        "diagnostic": "expected-explicit-stop-before-MIR-body-and-fixture-owner",
+        "observer": {
+          "schema": 1,
+          "tick": 121,
+          "base": "2.1.23",
+          "mir": "5.0.21000",
+          "fixture": "0.4.0",
+          "observer": "0.1.0",
+          "player": {
+            "index": 1,
+            "name": "player",
+            "level": 8,
+            "researched": false,
+            "enabled": true,
+            "visible": true,
+            "bonus": 3.6999999999999997,
+            "saved_progress": 0.27
+          },
+          "foreign": {
+            "index": 4,
+            "name": "mir5-f200-legacy-worker-foreign",
+            "level": 6,
+            "researched": false,
+            "enabled": false,
+            "visible": false,
+            "bonus": 2.4,
+            "saved_progress": 0
+          }
+        },
+        "mir_callback_entry": {
+          "tick": 121,
+          "player": {
+            "index": 1,
+            "name": "player",
+            "level": 8,
+            "researched": false,
+            "enabled": true,
+            "visible": true,
+            "bonus": 3.6999999999999997,
+            "saved_progress": 0.27
+          },
+          "foreign": {
+            "index": 4,
+            "name": "mir5-f200-legacy-worker-foreign",
+            "level": 6,
+            "researched": false,
+            "enabled": false,
+            "visible": false,
+            "bonus": 2.4,
+            "saved_progress": 0
+          }
+        },
+        "observer_log_line": 126,
+        "mir_entry_log_line": 127,
+        "files": 8,
+        "bytes_per_copy": 54261,
+        "members": [
+          {
+            "relative_path": "config.ini",
+            "bytes": 268,
+            "sha256": "DB27FF9BC89C7ADEE948A0C609BECAF8CBB8AFF1A8C830CD7D93729899F45F40"
+          },
+          {
+            "relative_path": "process-1.resources.jsonl",
+            "bytes": 2036,
+            "sha256": "B397C00D9C68730BFC2EAD4A31296D09841E0C54F6215D49162C181E4222E8E8"
+          },
+          {
+            "relative_path": "process-1.stderr.txt",
+            "bytes": 0,
+            "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+          },
+          {
+            "relative_path": "process-1.stdout.txt",
+            "bytes": 15020,
+            "sha256": "02D677826A63731A930EF5A4947A73E2C6FC9CA0CAF6861A9AF9615D5A6E481C"
+          },
+          {
+            "relative_path": "result.json",
+            "bytes": 7529,
+            "sha256": "C8E1AA2228757CE2382384683DFB35E0EBC414D6CF8B2F7255D9F32626D6000B"
+          },
+          {
+            "relative_path": "server-settings.json",
+            "bytes": 3679,
+            "sha256": "5B4C546FFCA63E1AEC8F67FFA5C32F3108CBC334DFA5AB1C5E2C212005639610"
+          },
+          {
+            "relative_path": "write-data/factorio-current.log",
+            "bytes": 14878,
+            "sha256": "4AE3413C82ACD88E5058B0FB0495FF2EA4DDD63B23A3E78C3D04DFCDCD518630"
+          },
+          {
+            "relative_path": "write-data/player-data.json",
+            "bytes": 10851,
+            "sha256": "285ED61F8778CFF44FA173F8EDCC5E417F4DF8C1019A3DDD02814729CEE56EF9"
+          }
+        ],
+        "controls_restored": true,
+        "source_unchanged": true,
+        "new_native_processes": 1,
+        "new_labs": 0,
+        "new_saves": 0,
+        "new_cold_reloads": 0
+      },
+      "new_native_processes": 1,
+      "new_actual_labs": 0,
+      "new_saves": 0,
+      "new_cold_reloads": 0
+    },
+    {
+      "label": "accepted",
+      "status": "passed-private-native-fixture",
+      "controller_commit": "49b6971df1a436254f2e5017e054df294961db59",
+      "packet_sha256": "A740C177B2EA01A6180B93C9C969AB88F92E68ACC2685CE53C9A3DABC3B15FF0",
+      "caller_sha256": "F24D75669ED6A2002F87CC49A706F16CC1BFF6FFCA95CB45D40884E999426831",
+      "result_sha256": "C66F2C79D06193C8687B603EE4D48B54B2CDEDF4F25C899D5B8564CAE982AADE",
+      "engine_sha256": "8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38",
+      "mir_sha256": "38C84CCBC4BFDA62FCB078772C4690AB81228484744A36D9EA303F5A75B16447",
+      "profile_sha256": "D9916088A3E37AF476702A6F9D58893827E507F4709D6123B4CBE9DC3EC00BBB",
+      "fixture_sha256": "1A30BA285327F459ACBE966AAEB0BA5505EFD7F740EF57B3BFDC151393D78C9E",
+      "entry_observer_sha256": "53F6376FDA1F79AA9B14F6A600BA83B3E6F34026E03BED147C4D6E24870DD485",
+      "native_files": 18,
+      "bytes_per_copy": 989398,
+      "initial": {
+        "stage": "initial",
+        "case": "f200-positive-legacy-worker",
+        "status": "passed",
+        "qualification": "native-runner-readback-required",
+        "witnesses": {
+          "source_mir": "4.7.20002",
+          "destination_mir": "5.0.21000",
+          "source_actual_lab_completions": 2,
+          "destination_actual_lab_completions": 1,
+          "native_owner": "worker-robots-speed-6",
+          "native_effect_modifier": 0.65,
+          "milestone": "actual2labs",
+          "next_level": 9,
+          "worker_speed_modifier": 4.473,
+          "independent_modifier_baseline": 2.5229999999999997,
+          "player_enabled": true,
+          "player_visible_when_disabled": true,
+          "foreign_queue_progress": 0.42000000000000004,
+          "science_consumed_units": 0.7333333333333333,
+          "science_inventory_consumed_units": 1,
+          "science_type": "item",
+          "science_remaining_ticks": 44,
+          "science_processing_ticks": 44,
+          "science_elapsed_ticks": 43,
+          "science_units_after": {
+            "automation-science-pack": 21,
+            "logistic-science-pack": 21,
+            "chemical-science-pack": 21,
+            "production-science-pack": 21,
+            "utility-science-pack": 21,
+            "space-science-pack": 21
+          },
+          "fixture_owned_offset": {
+            "schema": 1,
+            "amount": 0.123,
+            "reapplied": 0.123,
+            "native_entry_total": 3.6999999999999997,
+            "restored_total": 3.8229999999999995,
+            "native_entry_tick": 121,
+            "source_total": 3.8229999999999995
+          },
+          "on_load_read_only": false
+        }
+      },
+      "diagnostics": [
+        {
+          "stage": "fixture-owner-preflight",
+          "startup_type": "userdata",
+          "maximum_type": "table",
+          "profile_type": "table",
+          "maximum": 40,
+          "profile_import_empty": true
+        },
+        {
+          "stage": "finish-before-assertion",
+          "case": "f200-positive-legacy-worker",
+          "research_start_tick": 121,
+          "research_finished_tick": 164,
+          "raw_elapsed_ticks": 43,
+          "processing_ticks": 44,
+          "expected_processing_ticks": 44,
+          "science_units_observed": {
+            "automation-science-pack": 21,
+            "logistic-science-pack": 21,
+            "chemical-science-pack": 21,
+            "production-science-pack": 21,
+            "utility-science-pack": 21,
+            "space-science-pack": 21
+          }
+        }
+      ],
+      "completed_save": {
+        "path": "build/qualification/worker-owner-f210-successor-r01-controller/native-successor/write-data/saves/mir5-native-complete.zip",
+        "sha256": "95714C9D998302AF08AB36065A047F7185481719AD67B99272FF32B7486338EC",
+        "bytes": 856559
+      },
+      "new_native_processes": 3,
+      "new_actual_labs": 1,
+      "new_saves": 1,
+      "new_cold_reloads": 2
+    }
+  ],
+  "completed_save": {
+    "path": "build/qualification/worker-owner-f210-successor-r01-controller/native-successor/write-data/saves/mir5-native-complete.zip",
+    "sha256": "95714C9D998302AF08AB36065A047F7185481719AD67B99272FF32B7486338EC",
+    "bytes": 856559
+  },
+  "counts": {
+    "new_native_processes": 4,
+    "expected_failed_order_processes": 1,
+    "accepted_successor_processes": 3,
+    "new_actual_labs": 1,
+    "new_saves": 1,
+    "new_cold_reloads": 2,
+    "source_lab_completions_reused_once": 2
+  },
+  "root_readback": {
+    "path": "build/qualification/worker-owner-f210-native-root-readback-r01.json",
+    "sha256": "76CD66F17D5E3216BA5DC3A95ABC67AD34B8C0D280AF05BE1B19E273CD6921B2",
+    "files": 26,
+    "bytes_per_copy": 1043659
+  },
+  "lossless_receipts": {
+    "path": "spec/evidence/worker-persisted-offset-f210-native-receipts-r01.json.gz",
+    "sha256": "1E24A0CDB3DD816E045EAE3C373B82650AAE6C6D5861ED08DA80CC87716C64A5",
+    "bytes": 46146,
+    "records": 13
+  },
+  "limits": [
+    "The new exact2.1.23 diagnostic changes only one bootstrap entry log/stop. It remains a failed native process with zero lab/save/cold;it is order evidence only.",
+    "The accepted player archive is unchanged38C. The fixture replays only its own exact persisted0.123 after independent entry and all original native/foreign/work checks. MIR does not reconstruct arbitrary third-party offsets.",
+    "Source two lab completions are reused once. One actual successor lab spends one whole item from each of six packs,while logical work remains44/60;processing44 and raw event elapsed43 are separately preserved.",
+    "F2000.3 and original strict0.2/adverse contrasts retain their original identities. Finite first-hold worker,other closures,Library/performance and final release remain separate."
+  ]
+}
