@@ -700,7 +700,11 @@ function Find-Screenshots([string[]]$Stages) {
   foreach ($expected in @($screenshotPatterns | Where-Object { $_.stage -in $Stages })) {
     $parent = [IO.Path]::GetDirectoryName($expected.path)
     if (-not (Test-Path -LiteralPath $parent -PathType Container)) { return $null }
-    $matches = @(Get-ChildItem -LiteralPath $parent -File | Where-Object { $_.Name -like $expected.leaf })
+    # A wildcard such as first-open-*.png also matches the distinct
+    # first-open-settled-1.png stage. Require this exact stage and one native
+    # player index before counting; duplicate indexes still refuse below.
+    $exactStage = '^' + [regex]::Escape($expected.stage) + '-[12][.]png$'
+    $matches = @(Get-ChildItem -LiteralPath $parent -File | Where-Object { $_.Name -like $expected.leaf -and $_.Name -cmatch $exactStage })
     if ($matches.Count -ne 1) { return $null }
     $path = Resolve-BuildInput $matches[0].FullName 'Leaf' 'captured screenshot'
     if (-not (Test-Png1280x720 $path)) { return $null }
@@ -713,7 +717,7 @@ function Find-Screenshots([string[]]$Stages) {
     $indices[$expected.client] = $match.Groups[2].Value
     $files.Add($path)
   }
-  if (($fixtureCase -ceq 'library-multiplayer' -and $Stages.Count -eq 5) -or ($fixtureCase -ceq 'library-paired-browser' -and $Stages.Count -eq 4)) {
+  if (($fixtureCase -ceq 'library-multiplayer' -and $Stages.Count -eq 5) -or ($fixtureCase -ceq 'library-paired-browser' -and $Stages.Count -in @(4,6))) {
     Assert-Session ($indices.Count -eq 2 -and (@($indices.Values | Select-Object -Unique)).Count -eq 2) 'client screenshot player indexes are not distinct and stable'
   }
   return [pscustomobject]@{files=@($files);indexes=$indices}
