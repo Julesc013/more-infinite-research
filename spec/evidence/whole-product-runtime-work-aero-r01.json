@@ -1,0 +1,167 @@
+{
+  "schema": 1,
+  "kind": "whole-product-runtime-work-aero-review",
+  "status": "source-and-host-work-count-review-not-native-acceptance",
+  "source_revision": "42032477d45ced683e72736a4fe30a7a3195b995",
+  "host_control_revision": "59362313d04b0a943dd7a597df0c90295b098187",
+  "native_owner": "Black Glass;Aero native launches0",
+  "consumed_source": [
+    {
+      "path": "source/runtime/bootstrap.lua",
+      "revision": "42032477d45ced683e72736a4fe30a7a3195b995",
+      "sha256": "B414F06BBAEF3CFD43CE2E591020CFD3410C0581E869CECD0DEC265AD9790219",
+      "bytes": 28748
+    },
+    {
+      "path": "source/runtime/passive_repair.lua",
+      "revision": "42032477d45ced683e72736a4fe30a7a3195b995",
+      "sha256": "372C916BD649E7B0D2F27C75F91DDCDA9D04E822C697CFF6DA5AF1A64AB05EB9",
+      "bytes": 8942
+    },
+    {
+      "path": "source/runtime/scripted_effects.lua",
+      "revision": "42032477d45ced683e72736a4fe30a7a3195b995",
+      "sha256": "A4018142388F74050D51BF2E324A93972F4791363CDF72618478F7D03C3C271A",
+      "bytes": 5620
+    },
+    {
+      "path": "source/runtime/agriculture.lua",
+      "revision": "42032477d45ced683e72736a4fe30a7a3195b995",
+      "sha256": "F0DCA2B45C38A099CC92F91ED2BF6F59F3437C183F67B0B8FA6C9AA64F6376FA",
+      "bytes": 5652
+    },
+    {
+      "path": "source/runtime/spoilage.lua",
+      "revision": "42032477d45ced683e72736a4fe30a7a3195b995",
+      "sha256": "92EB26A9AB6143C16A115A3838818C9BAB5644D362B3D2C8F06C223B8FA3EC7D",
+      "bytes": 5031
+    },
+    {
+      "path": "source/runtime/library.lua",
+      "revision": "42032477d45ced683e72736a4fe30a7a3195b995",
+      "sha256": "19C0BBF4B88B5DE6A63C0D4D5CBAA4FBDF2389D9278449F08F5D8D56FBAC55A5",
+      "bytes": 91137
+    },
+    {
+      "path": "source/runtime/diagnostics.lua",
+      "revision": "42032477d45ced683e72736a4fe30a7a3195b995",
+      "sha256": "E2AEE356BF7FFF836A0930BC688E5206E5746BD2AE1544860F780F95BE24083F",
+      "bytes": 4759
+    }
+  ],
+  "controls": [
+    {
+      "path": "tests/test_bootstrap.py",
+      "revision": "59362313d04b0a943dd7a597df0c90295b098187",
+      "sha256": "34F8D8B9893656B9F0C75252AA623D4C75EBD4C743C4999E9A73C81815E35103",
+      "bytes": 53647
+    },
+    {
+      "path": "tests/test_passive_repair.py",
+      "revision": "59362313d04b0a943dd7a597df0c90295b098187",
+      "sha256": "3F3B6B7B5DB8ED43BE73AD76A22AF2CFAB348F6B9B9EE606CA1D29576901904D",
+      "bytes": 13027
+    },
+    {
+      "path": "tests/test_agriculture.py",
+      "revision": "59362313d04b0a943dd7a597df0c90295b098187",
+      "sha256": "690007BDFF6B51A425B039295161F01FB86E2373B4168F051446DEFC768C9EBD",
+      "bytes": 11478
+    }
+  ],
+  "results": {
+    "bootstrap": {
+      "passed": 22,
+      "new_observation": "100 open/close view cycles plus read-only load,with optional cap/script/repair/credit owners inactive,leave no nth-tick registrations or native-only research callbacks. Generic GUI/lifecycle interfaces remain event-driven. This test uses Library/lifecycle doubles;actual clients remain separate."
+    },
+    "repair": {
+      "passed": 9,
+      "new_observation": "Fixed256 one-HP relevant walls,actual0/1000/10000 unrelated synthetic domain entries,forbidden force/world/prototype enumeration;all256 accepted objects receive exactly one health write,queue/members empty and timer needfalse. The257th is explicitly capacity-refused. Counts match all three domains.",
+      "processed_queue_entries_including_quiet_visits": 328,
+      "completed_repairs": 256,
+      "first_completion_tick_after_damage": 600,
+      "last_completion_tick_after_damage": 2460,
+      "unrelated_domain_scans": 0,
+      "limit": "Synthetic deterministic source behavior,not native simulation cost or an accepted41second full-queue delay. Fixed8-per60tick service and256capacity are existing policies;ordinary small-queue1HP-per-second behavior does not imply every one of256 objects receives1HP each second."
+    },
+    "agriculture": {
+      "passed": 9,
+      "new_observation": "1/32/128/512 event bursts each make exactly one named technology lookup and useful plant write per event,with no force/world/catalogue scan. A level3 holder at15% per-level maps remaining60ticks to45,independently checked. Disabled/no-research paths retain existing no-read/no-write opponents."
+    }
+  },
+  "source_findings": [
+    {
+      "subject": "Native research and settled closed Library",
+      "finding": "No bootstrap on_tick subscription exists. Repair60,translation61,and Library native-refresh1 subscriptions are conditional;closed settled views require none. Cap/provider/scripted owners may retain necessary research/force EVENT callbacks;this is not a claim of zero callbacks or zero memory."
+    },
+    {
+      "subject": "Shared parse work",
+      "finding": "bootstrap constructs a shared authored browser-family set once at control parse. Library private credit exclusion is a four-ID shared map and declaration_cache is lazy. No eagerly built per-player native catalogue is found. Shared parse/modules/prototypes and requested GUI still consume memory."
+    },
+    {
+      "subject": "Repair",
+      "finding": "Damage events are native-filtered to walls/gates;only valid player/reciprocal-friendly relevant objects enter the256queue. A60tick pass processes at most8 queue rows,with bounded FIFO table removal and entity/force/surface revalidation. Overflow is a declared nonaccepted event,not completed work;native stress must retain counts and delay."
+    },
+    {
+      "subject": "Agriculture/spoilage",
+      "finding": "Agriculture touches the actual event plant/tower force and one named holder. Agriculture refresh and spoilage reconciliation enumerate forces on explicit lifecycle/relevant research events;they do not scan factory entities or run recurring per-tick handlers. Force-count and event-spike costs therefore remain distinct axes."
+    },
+    {
+      "subject": "Exports",
+      "finding": "New diagnostic automatic writes are confined to init/configuration. Settings/diagnostic GUI writes are explicit actions;no new scheduled output/history framework. Final parse/load/GUI/file and measured-input applicability remains to qualify."
+    }
+  ],
+  "native_handoff": {
+    "required_outcome": "Whole-product process-to-responsive-menu and large ACTIVE-save runtime on Base,SpaceAge,and a finite admitted heavy-SpaceAge cohort,each on exact2.0.77/D3 and2.1.23/8DC;Library is one component.",
+    "existing_endpoints": "Reuse the existing responsive-menu sample helper,NativeProbeResources/governor,Factorio--benchmark per-tick categories and active-runtime work-marker/reader conventions. No new runner/framework or whole121profile resweep.",
+    "finite_runtime_questions": [
+      "Native-only research/settled closed Library and disabled scripted features have no unnecessary periodic work on a large active factory.",
+      "Active repair/agriculture/spoilage complete useful work;retain burst capacity/refusals,queue size/age and completion latency.",
+      "Unrelated entity count versus relevant work,technology/recipe count,and players/open views are separate axes.",
+      "Research/force/blueprint/entity churn,save/load/longer cycles and incremental open-Library interaction retain tail/max/event/memory observations."
+    ],
+    "outputs": "Mean,upper percentiles,max and event association,attributable MIR script where available versus total simulation/frame costs,peak/retained/paging,actual outputs/queue-delay. Normal release logging for scored work;debug diagnostic runs separate.",
+    "remaining_bindings": "Black Glass binds coherent final packages,actual published comparator archives,exact valid profiles,equivalent controlled worlds,resource limits,fixed observer/sample schedule and predeclared acceptance rules before scoring. A large idle map or catalogue alone does not close active-factory work."
+  },
+  "cohort_readback": {
+    "chain": {
+      "path": "spec/evidence/broad-ecosystem-f210-575e-native-chain-r01.json",
+      "revision": "42032477d45ced683e72736a4fe30a7a3195b995",
+      "sha256": "8EB3408B377242C306181045936D981C9B4E5DD2593166C0A924DC1414DBA04A",
+      "bytes": 147712
+    },
+    "valid_at_original_F210_inputs": [
+      {
+        "id": "q010",
+        "profile": "tests/profiles/bob-angel-full-space-age-f210-2123.json",
+        "use": "Primary existing large heavy-SpaceAge workload;startup and one large active factory are distinct endpoints."
+      },
+      {
+        "id": "q044",
+        "profile": "tests/profiles/aai-industry-space-age-f210-2123.json",
+        "use": "Existing troublesome science/settings configuration;retain actual data/gameplay scope,not pretend many heavy mods."
+      },
+      {
+        "id": "q001",
+        "profile": "tests/profiles/py-suite-base-f210-2123.json",
+        "use": "Separate large catalogue Base-only case;never relabel as SpaceAge."
+      },
+      {
+        "id": "q013",
+        "profile": "tests/profiles/k2se-base-f210-2123.json",
+        "use": "Existing complex-progression Base-only profile;keep exact compatibility and ownership limits."
+      }
+    ],
+    "upstream_invalid_not_benchmark_samples": [
+      "q002 fullPy+SpaceAge",
+      "q004 fullPy+productivity+SpaceAge",
+      "q020 AAI+Bob/Angel+sixBZ+SpaceAge",
+      "q022 sixBZ+SpaceAge"
+    ],
+    "scope_limit": "Original broad campaign used its own source/engine/profile/archives. This readback is selection evidence,not a new standalone8DC or F200 pass. Test the fixed2.0 counterpart upstream before admitting it;never silently change a dependency closure."
+  },
+  "unchanged_evidence": "Retain accepted F210 startup and68launch active-runtime campaigns under their original exact identities and scoped applicability. These host counts neither invalidate them nor qualify final elapsed cost/large-factory performance.",
+  "native_execution": false,
+  "player_source_changed": false,
+  "release_qualified": false
+}

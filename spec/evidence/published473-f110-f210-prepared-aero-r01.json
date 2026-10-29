@@ -1,0 +1,181 @@
+{
+  "schema": 1,
+  "kind": "published473-f110-f210-prepared-inputs",
+  "status": "host-verified-preparation-not-native-qualified",
+  "fixture_source_revision": "cb45d0326404fc3cbd0617fdb7d7095001aa7899",
+  "profile_and_harness_revision": "d67aa095334bd7106b34569e3983dc834ae257bf",
+  "native_owner": "Black Glass; no Aero engine launch or direct-library mutation",
+  "required_outcome": "Exact published4.7.3 F110 to MIR5 F210 Base, not a MIR5-origin or transitive F110-to-F200 substitute.",
+  "protected_source": {
+    "path_on_native_owner": "build/mir5/recovery-historical/f110-f200-transition-published-f110-source-r05/native-output/write-data/saves/mir5-native-complete.zip",
+    "sha256": "D524AA78440F242B179A1E9BC40BF89B87C1A66E99F64C14D3250DEAEBB69253",
+    "bytes": 821571,
+    "source_engine": "1.1.110",
+    "source_engine_sha256": "B7B4B834FCA2E32AFA9D3476EB42CC09B02F1205BE97F688DC6FC6ACE7BA8FE1",
+    "published_mir": "4.7.11003",
+    "published_mir_sha256": "66C127D8BFC1919FA88F19D2D9B3047316A1B90401CAA05A6D05979B7A099D1E",
+    "original_chain": {
+      "path": "spec/evidence/f110-f200-published-source-r05-native-chain.json",
+      "source_revision": "d67aa095334bd7106b34569e3983dc834ae257bf",
+      "sha256": "BFF56165FCB7B3F5F5FACA29EE9A4E244DCA92833C0A6CE247BE40CF67E83CE2",
+      "bytes": 6561
+    },
+    "reuse": "Reuse unchanged;17 retained rows already include laser-shooting-speed-8 and inserter capacity2/4. Source has16 seeded rows and one actual mining lab; do not count the source lab again."
+  },
+  "destination": {
+    "target": "f210",
+    "engine": "2.1.23",
+    "engine_sha256": "8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38",
+    "profile": {
+      "path": "tests/profiles/published473-f110-f210-current7b0-base-r01.json",
+      "source_revision": "d67aa095334bd7106b34569e3983dc834ae257bf",
+      "sha256": "16F725CA13877ED4B83B4EA7E763BAF16B18F1F4839C13639F643702A1C5067B",
+      "bytes": 1462
+    },
+    "mir_archive": {
+      "name": "more-infinite-research_5.0.21000.zip",
+      "sha256": "2DDD2A4C967BEF07830218442AE4441BEECD5B9ECE0AC86B09A5F6586BBA80E5",
+      "bytes": 693127
+    },
+    "settings": "Inherited startup defaults;no DLC/provider/settings switch.",
+    "candidate_limit": "This profile explicitly pins candidateA/current7b0. Export correctionB was separately merged at42032477d45ced683e72736a4fe30a7a3195b995. Freeze its actual package before dispatch and declare a separate hash-bound profile/readback;never silently replace2DDD. Fixture version preflight remains5.0.21000."
+  },
+  "owned_fixture": {
+    "name": "mir-fixture-mir5-f110-f200-transition_0.4.0.zip",
+    "sha256": "F0F852BCC4F48F12DDA0792B36828497C1CCDDF11FF216C3CAEFA16A7A21E49C",
+    "bytes": 8274,
+    "members": [
+      {
+        "source": "tests/fixtures/f110-f200-transition/f210/successor/catalogue.lua",
+        "source_revision": "cb45d0326404fc3cbd0617fdb7d7095001aa7899",
+        "destination": "catalogue.lua",
+        "bytes": 892,
+        "sha256": "541F5C73F77D46C9272C9692E167D2FAC52AEAF28B33D42712A7310907664E83"
+      },
+      {
+        "source": "tests/fixtures/f110-f200-transition/f210/successor/control.lua",
+        "source_revision": "cb45d0326404fc3cbd0617fdb7d7095001aa7899",
+        "destination": "control.lua",
+        "bytes": 69,
+        "sha256": "241F2A3287C9FCF7C32C0A1C85553E1D3FEC674234CFD1FB1809FFE0D2D12A35"
+      },
+      {
+        "source": "tests/fixtures/f110-f200-transition/f210/successor/data-final-fixes.lua",
+        "source_revision": "cb45d0326404fc3cbd0617fdb7d7095001aa7899",
+        "destination": "data-final-fixes.lua",
+        "bytes": 1657,
+        "sha256": "1FE25258DC1DCC683C88A6EF065C800E042970AA3C7FF7F9F24BD3B474627921"
+      },
+      {
+        "source": "tests/fixtures/f110-f200-transition/shared/control.lua",
+        "source_revision": "cb45d0326404fc3cbd0617fdb7d7095001aa7899",
+        "destination": "fixture_control.lua",
+        "bytes": 23531,
+        "sha256": "EBC76313FB0E8A106DDF7291F3117C1EE15F042B021EB24A6BCB4BED11231149"
+      },
+      {
+        "source": "tests/fixtures/f110-f200-transition/shared/data-final-fixes.lua",
+        "source_revision": "cb45d0326404fc3cbd0617fdb7d7095001aa7899",
+        "destination": "fixture_data_final.lua",
+        "bytes": 233,
+        "sha256": "7800724E366BB792AA4EDA0CE834C943463A83AA439D91F6B2A1F2D900ED6426"
+      },
+      {
+        "source": "tests/fixtures/f110-f200-transition/f210/successor/info.json",
+        "source_revision": "cb45d0326404fc3cbd0617fdb7d7095001aa7899",
+        "destination": "info.json",
+        "bytes": 391,
+        "sha256": "FC0DF3EA5B4E82D18C395367A9BA17AF9292D9472565472622298F00B20C51A5"
+      },
+      {
+        "source": "tests/fixtures/f110-f200-transition/f210/successor/settings-updates.lua",
+        "source_revision": "cb45d0326404fc3cbd0617fdb7d7095001aa7899",
+        "destination": "settings-updates.lua",
+        "bytes": 152,
+        "sha256": "1B70E46CD61363FA15BEFC179124E14A4355A659BFE72FEBA6B93D69C279458C"
+      }
+    ]
+  },
+  "composition": "Five f210/successor members plus shared/control.lua as fixture_control.lua and shared/data-final-fixes.lua as fixture_data_final.lua;exactly seven raw Git payloads. ZIP root is mir-fixture-mir5-f110-f200-transition_0.4.0. No dependency library is copied/extracted.",
+  "container_reproduction": {
+    "timestamp": [
+      1980,
+      1,
+      1,
+      0,
+      0,
+      0
+    ],
+    "create_system": 3,
+    "external_attr": "0o100644 << 16",
+    "compression": "ZIP_DEFLATED",
+    "level": 9,
+    "readback": "Aero independently verifies all seven original raw-Git hashes,archive payload equality and CRC. Native owner must bind its actual container/profile;container equality is not inferred from payload equality."
+  },
+  "harness": {
+    "path": "tools/Invoke-NativeFixture.ps1",
+    "source_revision": "d67aa095334bd7106b34569e3983dc834ae257bf",
+    "sha256": "CD2E451F94BF2CFB4402192A9A0EE2F4C78F083E73AD3ECF6771BBED105804C8",
+    "bytes": 77077
+  },
+  "existing_command": {
+    "executable": "pwsh -NoProfile -File tools/Invoke-NativeFixture.ps1",
+    "arguments": {
+      "ArchiveLibrary": "<exclusive native-owner 2.1 archive library>",
+      "FactorioBin": "<hash-verified pinned2.1.23 executable>",
+      "ProfilePath": "tests/profiles/published473-f110-f210-current7b0-base-r01.json",
+      "FixtureSources": "<checkout-local exact seven-member composed fixture directory>",
+      "CaseName": "f110-f200-transition",
+      "InputSavePath": "<protected source path above>",
+      "ExpectedInputSaveSha256": "D524AA78440F242B179A1E9BC40BF89B87C1A66E99F64C14D3250DEAEBB69253",
+      "ExpectedMIRArchiveSha256": "2DDD2A4C967BEF07830218442AE4441BEECD5B9ECE0AC86B09A5F6586BBA80E5",
+      "OutputRoot": "<fresh checkout-local build/tmp output>",
+      "ExpectedPeakMemoryMiB": 4096,
+      "TimeoutSeconds": 180,
+      "AdmissionWaitSeconds": 30
+    },
+    "unset": [
+      "F110PublishedCrossSource",
+      "F110SameEditionSuccessor",
+      "F100F110LaserStage",
+      "HistoricalTarget",
+      "HistoricalFixtureMetadataPath",
+      "HistoricalTransitionStage",
+      "HistoricalTransitionFixtureMetadataPath",
+      "CreateOnly",
+      "ActiveSeedOnly",
+      "ActiveSeedKind",
+      "ActiveModsObserver",
+      "ConsumerMarkers",
+      "MIRAbsent"
+    ],
+    "case_identity": "Legacy fixture family name remains f110-f200-transition;targetf210 and exact2.1.23/5.0.21000/0.4.0 markers distinguish this new route. Never relabel an old F200 result.",
+    "observer": "Default empty. If the native owner requires a separate active-mod observer,add its actual archive and exact source members to a separately frozen profile/FixtureSources;never enable an undeclared observer."
+  },
+  "independent_expectation": [
+    "Before any fixture writes,all17 original literal rows retain native levels/flags/caps/effect vectors;laser identity/effects and stack-to-bulk token/field adaptation are explicit.",
+    "Initial42% current/queued work,27% suspended work,foreign disablement and capacity2/4 survive.",
+    "One actual new mining lab completes with expected+10% total;post-lab braking queue and every retained row/effect remain correct.",
+    "Write a new successor save;two independent read-only cold reloads preserve the same bytes and all assertions."
+  ],
+  "host_validation": {
+    "command": "python -B tests/test_f110_f200_transition_fixture.py --lua-runtime-dir build/tmp/mir421-lua-runtime",
+    "passed": 7,
+    "plan": "build/qualification/published-forward-routes-host-plan-r01.json",
+    "scope": "Original F110/F200 controls and new F210 exact closure/adverse-effect/preflight/reload controls;not native evidence."
+  },
+  "if_failure": "Preserve input/output/log/result and actual settings/mod selection. Attempt destination directly first. Only a real engine format refusal permits the necessary published-MIR engine bridge on a disposable copy;record that history and never insert MIR5 at an intermediate engine. Diagnose fixture versus product without dropping state/configuration assertions.",
+  "remaining_before_dispatch": [
+    "Black Glass independent exact-input review and actual archive/container/profile/controller binding",
+    "New correctionB package freeze and explicit scoped applicability/profile update if B is the admitted candidate",
+    "Sole-native-lane resource admission;do not start an additional live/pending assignment"
+  ],
+  "release_obligation": "One of the four expressly requested29October published4.7.3-origin engine journeys;no DLC/provider/settings or wider support inference.",
+  "native_execution": {
+    "processes": 0,
+    "new_labs": 0,
+    "new_saves": 0,
+    "cold_reloads": 0,
+    "verdict": "not-run"
+  }
+}

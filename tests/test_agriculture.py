@@ -179,6 +179,29 @@ class AgricultureTests(unittest.TestCase):
         self.assertNotIn("prototypes.mir", source)
         self.assertNotIn("Generator", source)
 
+    def test_active_bursts_do_one_useful_write_per_plant_without_world_or_catalogue_scan(self):
+        self.lua.execute('''
+          for _, count in ipairs({1,32,128,512}) do
+            local lookups,scans,writes=0,0,0
+            local owner=force("player",nil)
+            owner.technologies=setmetatable({}, {__index=function(_,name)
+              assert(name==agriculture.technology_name);lookups=lookups+1;return{level=3}
+            end,__pairs=function()error("technology catalogue enumerated")end})
+            local game={tick=1000}
+            local unrelated=setmetatable({}, {__pairs=function()scans=scans+1;error("factory enumerated")end,
+              __index=function()scans=scans+1;error("factory read")end})
+            game.forces,game.surfaces,game.entity_prototypes,game.technology_prototypes=unrelated,unrelated,unrelated,unrelated
+            for index=1,count do
+              local target=plant(owner,1060)
+              local _,facts=agriculture.on_tower_planted_seed(game,{enabled=true,per_level_percent=15},nil,
+                {tick=1000,plant=target,tower={valid=true,force=owner}})
+              assert(facts.applied and target.tick_grown==1045 and target.writes==1)
+              writes=writes+target.writes
+            end
+            assert(writes==count and lookups==count and scans==0)
+          end
+        ''')
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
