@@ -1,8 +1,18 @@
-# MIR 5 API v1 draft SDK
+---
+title: "MIR API SDK"
+status: current
+applies_to: "MIR API1.0"
+audience: developer
+doc_type: reference
+owner: mir-maintainers
+last_reviewed: 2026-10-30
+---
 
-This is developer material for the current MIR API v1 draft. It is not loaded by the player package and is not yet a released compatibility promise. Exact native consumer evidence is linked below; affected multiplayer and final-candidate API qualification remain separate. The [optional-absence native chain](../spec/evidence/api-optional-absence-chain.json) proves CreateOnly loading without MIR, without a save or gameplay claim.
+# MIR API 1.0 SDK (unreleased)
 
-The [canonical draft3 qualification](../spec/evidence/api-canonical-native-chain.json) binds the restricted API to exact source `554c5af3`: F200 independent consumers pass actual effects, physical production, save and two cold reloads; F210 independent namespace consumers pass CreateOnly loading. The F200 fixture completes research with native setters, without a laboratory claim. API stability still requires the affected joining-client and final-candidate checks.
+This is developer material for the [frozen documented MIR API1.0 subset](../spec/evidence/api1-documented-subset-qualification-r01.json), pending MIR5 release. It is not loaded by the player package. The scoped decision reconciles both modern native boundaries, physical/save cases, actual client evidence, exact absence guards and host admission budgets; whole-product acceptance and publication remain separate. The [optional-absence native chain](../spec/evidence/api-optional-absence-chain.json) proves CreateOnly loading without MIR, without a save or gameplay claim.
+
+The [canonical draft3 qualification](../spec/evidence/api-canonical-native-chain.json) binds the restricted API to exact source `554c5af3`: F200 independent consumers pass actual effects, physical production, save and two cold reloads; F210 independent namespace consumers pass CreateOnly loading. The F200 fixture completes research with native setters, without a laboratory claim. The final aggregate records later modern N1/N2 and client applicability; this older chain keeps its original inputs and limits.
 
 The annotation-only [Lua surface](api-v1.lua) follows the implemented data module `__more-infinite-research__.api.v1.data` and the runtime remote interface `more-infinite-research.api.v1`. It has no implementation code, registration, storage, or callbacks.
 

@@ -1,13 +1,13 @@
 ---@meta
 
----LuaLS annotations for the current MIR API v1 draft. These declarations do
+---LuaLS annotations for the frozen documented MIR API 1.0 subset (pending release). These declarations do
 ---not load MIR, register a remote interface, or provide a player implementation.
 ---The data module is returned by require("__more-infinite-research__.api.v1.data").
 ---The runtime module is exposed through remote.call("more-infinite-research.api.v1", ...).
 
 ---@class MIRApiVersion
----@field major integer @1 for this draft surface.
----@field minor integer @0 for this draft surface.
+---@field major integer @1 for this documented surface.
+---@field minor integer @0 for this documented surface.
 ---@field product string @Current product metadata: "5.0.21000".
 
 ---@class MIRDataCapabilities
