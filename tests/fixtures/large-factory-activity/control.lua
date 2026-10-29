@@ -1,4 +1,4 @@
--- One diagnostic window only. Exclude this fixture from acceptance timing.
+-- One diagnostic window per init/config/load activation; exclude from acceptance timing.
 -- Native entities, research, settings and saved storage are read-only here.
 local WINDOW = 600
 local MAX_SURFACES = 32
@@ -120,7 +120,7 @@ local function finish(tick)
     normal_item_counter_decreases = production_decreases,
     activity_observed = progress > 0 or produced > 0, large_factory_qualified = false,
     performance_acceptance = false, release_qualification = false,
-    limitations = {"One diagnostic 600-tick window; exclude this observer from acceptance timing.",
+    limitations = {"One diagnostic 600-tick window per init/config/load activation; exclude from acceptance timing.",
       "Entity counts cover the player force on selected initial surfaces; they do not prove activity.",
       "Machine samples are bounded native-order subsets, not random samples or a whole-factory estimate.",
       "Production counters cover the 15 named normal-quality items; other activity may be unobserved.",
