@@ -5,8 +5,12 @@ These tests exercise fixture transactions, not Factorio or release acceptance.
 import argparse
 from copy import deepcopy
 import json
+import os
 from pathlib import Path
 import sys
+import shutil
+import subprocess
+import tempfile
 import unittest
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -264,6 +268,83 @@ end
                     else:
                         self.assertIsNone(native["unit"]["count_formula"])
                         self.assertEqual((native["unit"]["count"], native["unit"]["time"]), (1, 1))
+
+    def test_runner_preflight_binds_four_exact_stages_and_rejects_opposing_inputs(self):
+        with tempfile.TemporaryDirectory(prefix="mir-published-f100-") as temporary:
+            repo = Path(temporary)
+            canonical = repo / "tests/fixtures/published-f100-forward"
+            shutil.copytree(FIXTURE, canonical)
+            for stage in ("source", "bridge", "f110", "f210"):
+                source = repo / "build" / stage
+                source.mkdir(parents=True)
+                for name in ("info.json", "stage.lua", "control.lua", "data-final-fixes.lua", "settings-updates.lua"):
+                    shutil.copyfile(canonical / stage / name, source / name)
+                for name, alias in (("control.lua", "fixture_control.lua"), ("data-final-fixes.lua", "fixture_data_final.lua")):
+                    shutil.copyfile(canonical / "shared" / name, source / alias)
+            engine_data = repo / "engine-data/base"
+            engine_data.mkdir(parents=True)
+            (repo / "engine.exe").write_bytes(b"host-only engine identity surrogate;never executed")
+            script = r'''
+              $ErrorActionPreference='Stop';Set-StrictMode -Version Latest
+              $tokens=$null;$errors=$null
+              $ast=[Management.Automation.Language.Parser]::ParseFile($env:MIR_FORWARD_RUNNER,[ref]$tokens,[ref]$errors)
+              if($errors.Count){throw 'runner parse failed'}
+              foreach($name in @('Assert-Fixture','Test-F110PublishedCrossSourceRelativePath','Get-PublishedF100ForwardFixture')){
+                $node=$ast.Find({param($n)$n -is [Management.Automation.Language.FunctionDefinitionAst] -and $n.Name -ceq $name},$true)
+                Invoke-Expression $node.Extent.Text
+              }
+              $repo=$env:MIR_FORWARD_REPO
+              $engine=Join-Path $repo 'engine.exe'
+              function Get-FixtureSha([string]$Path){if($Path -ceq $engine){return $script:engineSha};(Get-FileHash -LiteralPath $Path -Algorithm SHA256).Hash}
+              $cases=@(
+                @('source','f100','1.0','1.0.0','4.7.10003','0.2.0','99F1CE207A04296EF7D797E4A98AA98DDE4F02EE653C9DF736AC33A676FD4F70','C04F3543EBF99D2B76B2C9193EA0886381B7CDDF2F2C1610310E7961B24BE0E1'),
+                @('bridge','f110','1.1','1.1.110','4.7.11003','0.3.0','B7B4B834FCA2E32AFA9D3476EB42CC09B02F1205BE97F688DC6FC6ACE7BA8FE1','66C127D8BFC1919FA88F19D2D9B3047316A1B90401CAA05A6D05979B7A099D1E'),
+                @('f110','f110','1.1','1.1.110','5.0.11000','0.4.0','B7B4B834FCA2E32AFA9D3476EB42CC09B02F1205BE97F688DC6FC6ACE7BA8FE1',('C'*64)),
+                @('f210','f210','2.1','2.1.23','5.0.21000','0.5.0','8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38',('D'*64))
+              )
+              $accepted=0;$refused=0
+              $routeBase=$ast.Find({param($n)$n -is [Management.Automation.Language.AssignmentStatementAst] -and $n.Left.Extent.Text -ceq '$historicalProcess' -and $n.Right.Extent.Text.Contains('$historical -or')},$true)
+              $routeOverride=$ast.Find({param($n)$n -is [Management.Automation.Language.IfStatementAst] -and $n.Clauses[0].Item1.Extent.Text -ceq '$publishedF100Forward' -and $n.Clauses[0].Item2.Extent.Text.Contains('$historicalProcess=')},$true)
+              $versionRoute=$ast.Find({param($n)$n -is [Management.Automation.Language.IfStatementAst] -and $n.Clauses[0].Item1.Extent.Text -ceq '$publishedF100Forward' -and $n.Clauses[0].Item2.Extent.Text.Contains('published F100 forward modes are exclusive')},$true)
+              if(-not $routeBase -or -not $routeOverride -or -not $versionRoute){throw 'missing exact process routing'}
+              $historical=$false;$historicalTransition=$false;$f110PublishedCrossSource=$false;$f110SameEditionSuccessor=$false;$laserTransition=$false;$CreateOnly=$false;$MIRAbsent=$false;$activeSeed=$false
+              $ActiveSeedKind='';$activeModsObserverName='';$ConsumerMarkers=@();$HistoricalFixtureMetadataPath='';$HistoricalTransitionFixtureMetadataPath=''
+              foreach($case in $cases){
+                $stage,$target,$line,$base,$mir,$version,$script:engineSha,$mirSha=$case
+                $publishedF100Forward=$true;$PublishedF100ForwardStage=$stage;$historicalProcessVersion=''
+                Invoke-Expression $routeBase.Extent.Text;Invoke-Expression $routeOverride.Extent.Text;Invoke-Expression $versionRoute.Extent.Text
+                $expectedLine=if($stage -ceq 'f210'){''}else{$line}
+                if($historicalProcess -ne ($stage -cne 'f210') -or $historicalProcessVersion -cne $expectedLine){throw ('incorrect process route '+$stage)}
+                $inputSha=if($stage -ceq 'source'){'219EF20F63B4A85FA2386BD50A81228B28F006D9731F24E069A657BB13F45811'}else{'A'*64}
+                $engineData=Join-Path $repo 'engine-data'
+                @{version=$base}|ConvertTo-Json|Set-Content -LiteralPath (Join-Path $engineData 'base/info.json')
+                $profile=@{schema=1;kind='published-f100-forward';stage=$stage;target=$target;factorio_line=$line;settings_mode='Defaults';predecessor_origin='published-f100-4.7.10003';protected_source_sha256=$inputSha;engine_bridge_refusal_sha256=('B'*64);engine=@{version=$base;sha256=$script:engineSha};mods=@(@{name='base';version=$base;enabled=$true},@{name='more-infinite-research';version=$mir;enabled=$true},@{name='mir-fixture-mir5-historical-transition';version=$version;enabled=$true});archive_sha256=@{('more-infinite-research_'+$mir+'.zip')=$mirSha;('mir-fixture-mir5-historical-transition_'+$version+'.zip')=('E'*64)}}
+                $source=Join-Path $repo ('build/'+$stage)
+                foreach($opponent in @('','input','origin','engine','archive','extra-mod','member','bridge-refusal')){
+                  if($opponent -ceq 'bridge-refusal' -and $stage -cne 'bridge'){continue}
+                  $changed=($profile|ConvertTo-Json -Depth 10)|ConvertFrom-Json -AsHashtable
+                  $actualInput=$inputSha
+                  if($opponent -ceq 'input'){$actualInput='F'*64}
+                  if($opponent -ceq 'origin'){$changed.predecessor_origin='mir5-f100'}
+                  if($opponent -ceq 'engine'){$changed.engine.sha256='F'*64}
+                  if($opponent -ceq 'archive'){$changed.archive_sha256['more-infinite-research_'+$mir+'.zip']='F'*64}
+                  if($opponent -ceq 'extra-mod'){$changed.mods+=@{name='undeclared';version='1.0.0';enabled=$true}}
+                  if($opponent -ceq 'bridge-refusal'){$changed.engine_bridge_refusal_sha256=''}
+                  $member=Join-Path $source 'fixture_control.lua';$original=[IO.File]::ReadAllBytes($member)
+                  if($opponent -ceq 'member'){[IO.File]::AppendAllText($member,"`n-- opposing payload")}
+                  $ok=$true
+                  try{$null=Get-PublishedF100ForwardFixture -Repo $repo -Profile $changed -Sources @($source) -EngineData $engineData -Engine $engine -MIRSha $mirSha -Case 'published-f100-forward' -Stage $stage -InputSave 'protected.zip' -InputSha $actualInput}catch{$ok=$false}
+                  finally{[IO.File]::WriteAllBytes($member,$original)}
+                  if($ok -ne ($opponent -ceq '')){throw ('unexpected preflight result '+$stage+'/'+$opponent)}
+                  if($ok){$accepted++}else{$refused++}
+                }
+              }
+              @{accepted=$accepted;refused=$refused;native_processes=0}|ConvertTo-Json -Compress
+            '''
+            env = {**os.environ, "MIR_FORWARD_REPO": str(repo), "MIR_FORWARD_RUNNER": str(ROOT / "tools/Invoke-NativeFixture.ps1")}
+            result = subprocess.run(["pwsh", "-NoProfile", "-Command", script], env=env, capture_output=True, text=True)
+            self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+            self.assertEqual(json.loads(result.stdout), {"accepted": 4, "refused": 25, "native_processes": 0})
 
 
 if __name__ == "__main__":
