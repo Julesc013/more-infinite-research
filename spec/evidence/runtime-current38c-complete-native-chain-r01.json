@@ -1,0 +1,234 @@
+{
+  "schema": 1,
+  "kind": "MIRCurrent38CCompleteActiveRuntimeNativeChainV1",
+  "status": "passed-predeclared-current-runtime-time-and-process-memory-limits",
+  "plan": {
+    "path": "spec/evidence/runtime-current38c-active-plan-r01.json",
+    "declaration": "5efe123bbae5c5c2168c52a35920aa9e16d3636a",
+    "sha256": "9CA4F3A77784791827C7A70DA353ADAC9E2B9E46A5231341B40F0AB554F003F0"
+  },
+  "candidate": {
+    "source_commit": "b3bbd8d37b37bfee2e258b3e8a2f223dcf3860b3",
+    "player_tree": "fbb7e9135280ce7f69692e9b0c4a44d743793f45",
+    "archive_sha256": "38C84CCBC4BFDA62FCB078772C4690AB81228484744A36D9EA303F5A75B16447",
+    "bytes": 692759
+  },
+  "published": {
+    "version": "4.7.21002",
+    "archive_sha256": "A4BB8F47232C689B267EF434F557187A8795C47280FA464169DE917FB579517F"
+  },
+  "engine": {
+    "version": "2.1.23",
+    "sha256": "8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38"
+  },
+  "private_controller": {
+    "commit": "535d78b06c30c83a3a7e48e6c2cc40e5ca45aa46",
+    "driver_sha256": "9A037AA81DE662B52CC47750C945E268C35A20510F71E9C57C9322042937CB98"
+  },
+  "analysis_reader": {
+    "commit": "421072ebb260455d7cc33db3b7d5e904a1225ee0",
+    "path": "tools/analyze_runtime_benchmark.py",
+    "sha256": "63B920880BC58CE5F21EEA4795C6C67D094D723F597F0F8A4DCD495DDABE5F5B",
+    "cohort": "current38c"
+  },
+  "prerequisites": {
+    "chain": "spec/evidence/runtime-current38c-active-prerequisites-native-chain-r01.json",
+    "capture_sha256": "7CAD16B96FE400E511916C9B96646BBC552E75B9E6CB48D124E1A328A98C484C",
+    "unscored_pilot_sha256": "A07F5D5366EE90931EE6E3CF700AE65E4D353C5DC65F93BCAD10DB755E168A6A"
+  },
+  "packet": {
+    "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\runtime-current38c-scheduled-r01-controller\\packet.json",
+    "sha256": "88F36090EA0DDA77528FC7AF2AE58257D8B9B3004B6E141F26B9DE26EFC2D852"
+  },
+  "caller": {
+    "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\runtime-current38c-scheduled-r01-controller\\Invoke-CurrentScheduled.ps1",
+    "sha256": "4268D51A879AF2D451995AEC4C85201316E07FE53362EFD8A7454A10F3BD1810"
+  },
+  "original_output": "D:/Projects/Factorio/mir5-legacy-cannon-credit-r01/build/tmp/runtime-current38c-scheduled-r01",
+  "primary_custody": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\runtime-current38c-scheduled-r01-controller\\native-captures",
+  "root_readback": {
+    "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\runtime-current38c-scheduled-r01-controller\\root-readback.json",
+    "sha256": "2B5FB5111FFC2DA7DF3AE3E224994CAB7E48D0C87FF879E68544E30D2F106CE3",
+    "reader_sha256": "33B4102DF3E31F11E9F29EAF7DF56D380697B4EF8339EF4EB86AC78A781790EC",
+    "files": 661,
+    "bytes_per_copy": 66589782,
+    "controls_restored": true,
+    "protected_sources_unchanged": true,
+    "separate_owned_files": true
+  },
+  "receipt_capsule": {
+    "path": "spec/evidence/runtime-current38c-observation-analysis-receipts-r01.json.gz",
+    "sha256": "D499884F0FE7A548F8F391EE1DCA0874F7269E0030383143E391DD9686FD3FEF",
+    "bytes": 686180,
+    "members": 145,
+    "contents": "Observed/prepared inputs,declared plan,root packet/caller/terminal/quiet snapshot,root readback,exact analysis and all136 per-launch stdout/fixture logs. All661 raw files,including copies of owned saves,remain in hash-verified original/primary custody."
+  },
+  "counts": {
+    "new_native_processes": 68,
+    "warmups": 16,
+    "scored_observations": 52,
+    "updates_per_process": 25000,
+    "new_lab_completions": 0,
+    "carried_source_lab_completions_not_new": 12,
+    "native_planting_events": 5152
+  },
+  "analysis_verdict": {
+    "memory_rule": "each candidate median <= published median + max(10 percent of published median, 64 MiB)",
+    "status": "within-predeclared-limits",
+    "time_rule": "candidate median <= published median + max(10 percent of published median, 0.25 ms/tick)"
+  },
+  "comparisons": [
+    {
+      "scenario": "repair-active",
+      "tier": 0,
+      "metric": "engine_reported_average_milliseconds_per_tick",
+      "published": 0.1295,
+      "candidate": 0.1285,
+      "limit": 0.3795,
+      "within": true
+    },
+    {
+      "scenario": "repair-active",
+      "tier": 0,
+      "metric": "operating_system_peak_working_set_bytes",
+      "published": 626978816.0,
+      "candidate": 498305024.0,
+      "limit": 694087680.0,
+      "within": true
+    },
+    {
+      "scenario": "repair-active",
+      "tier": 0,
+      "metric": "maximum_sampled_working_set_bytes",
+      "published": 619960320.0,
+      "candidate": 419194880.0,
+      "limit": 687069184.0,
+      "within": true
+    },
+    {
+      "scenario": "repair-active",
+      "tier": 0,
+      "metric": "maximum_sampled_private_bytes",
+      "published": 619663360.0,
+      "candidate": 417755136.0,
+      "limit": 686772224.0,
+      "within": true
+    },
+    {
+      "scenario": "agriculture-active",
+      "tier": 1,
+      "metric": "engine_reported_average_milliseconds_per_tick",
+      "published": 0.065,
+      "candidate": 0.064,
+      "limit": 0.315,
+      "within": true
+    },
+    {
+      "scenario": "agriculture-active",
+      "tier": 1,
+      "metric": "operating_system_peak_working_set_bytes",
+      "published": 604096512.0,
+      "candidate": 527968256.0,
+      "limit": 671205376.0,
+      "within": true
+    },
+    {
+      "scenario": "agriculture-active",
+      "tier": 1,
+      "metric": "maximum_sampled_working_set_bytes",
+      "published": 600473600.0,
+      "candidate": 421089280.0,
+      "limit": 667582464.0,
+      "within": true
+    },
+    {
+      "scenario": "agriculture-active",
+      "tier": 1,
+      "metric": "maximum_sampled_private_bytes",
+      "published": 599166976.0,
+      "candidate": 417517568.0,
+      "limit": 666275840.0,
+      "within": true
+    },
+    {
+      "scenario": "agriculture-active",
+      "tier": 32,
+      "metric": "engine_reported_average_milliseconds_per_tick",
+      "published": 0.069,
+      "candidate": 0.0665,
+      "limit": 0.319,
+      "within": true
+    },
+    {
+      "scenario": "agriculture-active",
+      "tier": 32,
+      "metric": "operating_system_peak_working_set_bytes",
+      "published": 619352064.0,
+      "candidate": 510162944.0,
+      "limit": 686460928.0,
+      "within": true
+    },
+    {
+      "scenario": "agriculture-active",
+      "tier": 32,
+      "metric": "maximum_sampled_working_set_bytes",
+      "published": 614518784.0,
+      "candidate": 418742272.0,
+      "limit": 681627648.0,
+      "within": true
+    },
+    {
+      "scenario": "agriculture-active",
+      "tier": 32,
+      "metric": "maximum_sampled_private_bytes",
+      "published": 614318080.0,
+      "candidate": 414742528.0,
+      "limit": 681426944.0,
+      "within": true
+    },
+    {
+      "scenario": "agriculture-active",
+      "tier": 128,
+      "metric": "engine_reported_average_milliseconds_per_tick",
+      "published": 0.077,
+      "candidate": 0.077,
+      "limit": 0.327,
+      "within": true
+    },
+    {
+      "scenario": "agriculture-active",
+      "tier": 128,
+      "metric": "operating_system_peak_working_set_bytes",
+      "published": 640190464.0,
+      "candidate": 518008832.0,
+      "limit": 707299328.0,
+      "within": true
+    },
+    {
+      "scenario": "agriculture-active",
+      "tier": 128,
+      "metric": "maximum_sampled_working_set_bytes",
+      "published": 630235136.0,
+      "candidate": 421894144.0,
+      "limit": 697344000.0,
+      "within": true
+    },
+    {
+      "scenario": "agriculture-active",
+      "tier": 128,
+      "metric": "maximum_sampled_private_bytes",
+      "published": 630636544.0,
+      "candidate": 418643968.0,
+      "limit": 697745408.0,
+      "within": true
+    }
+  ],
+  "limits": [
+    "The runtime baseline is the exact published4.7.21002 archive,not a newly labelled4.7.3 result.",
+    "The fixed68-launch schedule retains all16 warmups and52 scores once;no extensions,selective exclusions or favorable retries.",
+    "Source preparation and unscored pilots are separate observations;the twelve original source labs count once,not as new benchmark lab completions.",
+    "Operating-system root peak working set and sampled working/private maxima have separate limits;sampling does not prove instantaneous private-memory peaks.",
+    "This is a named F210 matched-headless-active-workload time/process-memory comparison,not Library latency,save-load latency,retained-session memory,equivalence,universal speed or release acceptance.",
+    "Old accepted R06 results and all earlier adverse/menu cohorts retain their original inputs and verdicts."
+  ]
+}

@@ -633,6 +633,39 @@ class Current38CRuntimeBenchmarkAnalysisTests(unittest.TestCase):
     def tearDown(self) -> None:
         MODULE.select_cohort("r06")
 
+    def test_actual_current_capsule_replays_exact_complete_analysis(self) -> None:
+        payload = (ROOT / "spec/evidence/runtime-current38c-observation-analysis-receipts-r01.json.gz").read_bytes()
+        self.assertEqual(_hash(payload), "D499884F0FE7A548F8F391EE1DCA0874F7269E0030383143E391DD9686FD3FEF")
+        files: dict[str, bytes] = {}
+        for row in json.loads(gzip.decompress(payload))["files"]:
+            raw = base64.b64decode(row["base64"], validate=True)
+            self.assertEqual(len(raw), row["bytes"])
+            self.assertEqual(_hash(raw), row["sha256"])
+            self.assertNotIn(row["path"], files)
+            files[row["path"]] = raw
+        self.assertEqual(len(files), 145)
+        observed = files["original/runtime-benchmark-active-observed.json"]
+        expected = files["derived/analysis-result.json"]
+        self.assertEqual(_hash(observed), "78F2D9EACFC7588B725DDA427485724FF34405026997B6325CEDF38B7C49963D")
+        self.assertEqual(_hash(expected), "29D6093F76C826E8FC7D72C160008F9A173BFC4CF56B9AE7B4D45391AB6C89DA")
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            plan, result, output = root / "plan.json", root / "runtime-benchmark-active-observed.json", root / "analysis.json"
+            plan.write_bytes(files["original/runtime-current38c-active-plan-r01.json"])
+            result.write_bytes(observed)
+            (root / "runtime-benchmark-active-prepared.json").write_bytes(files["original/runtime-benchmark-active-prepared.json"])
+            completed = subprocess.run(
+                [sys.executable, str(TOOL_PATH), "--cohort", "current38c", "--raw-plan", str(plan),
+                 "--expected-plan-sha256", MODULE.PLAN_SHA256, "--result", str(result),
+                 "--expected-result-sha256", _hash(observed), "--output", str(output)],
+                capture_output=True, text=True, check=False,
+            )
+            self.assertEqual(completed.returncode, 0, completed.stderr)
+            self.assertEqual(output.read_bytes(), expected)
+        analysis = json.loads(expected)
+        self.assertEqual(analysis["analysis_verdict"]["status"], "within-predeclared-limits")
+        self.assertFalse(analysis["claims"]["release_qualification"])
+
     def test_current_plan_and_real_unscored_prerequisites_have_exact_closure(self) -> None:
         plan = _plan()
         contract = MODULE._validate_plan(plan, MODULE.PLAN_SHA256)
