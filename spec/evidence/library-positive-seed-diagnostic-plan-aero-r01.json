@@ -1,0 +1,77 @@
+{
+  "schema": 1,
+  "kind": "MIRLibraryPositiveSeedNativeDiagnosticPlanV1",
+  "status": "prepared-not-native-result",
+  "source_commit": "910605c6030c931b14f8b4cd842d33b3d88c4b9c",
+  "player_sha256": "2DDD2A4C967BEF07830218442AE4441BEECD5B9ECE0AC86B09A5F6586BBA80E5",
+  "engine_sha256": "8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38",
+  "fixture_members": [
+    {
+      "source": "tests/fixtures/library-multiplayer/control.lua",
+      "sha256": "B756A4EA2DA9BE3C769470A1279461B6DEDCED6FFC3B519CE0ECB9C40D4EE76D",
+      "bytes": 58563
+    },
+    {
+      "source": "tests/fixtures/library-multiplayer/settings-updates.lua",
+      "sha256": "AA3C818050FD927BEADBA7FEBC483FB4BC42668911888852E4CF6996B7F5C0FD",
+      "bytes": 1678
+    },
+    {
+      "source": "tests/fixtures/library-positive-state/positive-state.lua",
+      "sha256": "18300BBE7893DD90A9F2AC259F3894CC8A74117135AC14E532437DB1B7C40B9A",
+      "bytes": 8163
+    },
+    {
+      "source": "tests/fixtures/library-positive-state/data.lua",
+      "sha256": "932D8019CE93A29AAABCA27A227547B8AD1FC41BC4A565592501724C62318357",
+      "bytes": 423
+    },
+    {
+      "source": "tests/fixtures/library-positive-state/info-f210.json",
+      "sha256": "F6EC127A4EBE19473688C92CDA53FC07C332708FC4432A4748A932998755BDC0",
+      "bytes": 260
+    }
+  ],
+  "original_failure": {
+    "public_commit": "d14a668e9a866ff0a1abf3dede1d3c0edec43403",
+    "private_commit": "faef69376ef82ebe5bec1d80f15c95c5ef3d70fd",
+    "packet_prefix": "3118D42F",
+    "fixture_archive_prefix": "4FCF314C",
+    "reported_result": "CreateOnly on_init positive native holder changed:speed-module after seed/reset",
+    "engines": 1,
+    "clients": 0,
+    "labs": 0,
+    "completed_saves": 0,
+    "root_report": "https://github.com/Julesc013/more-infinite-research/pull/1411#issuecomment-6492741141"
+  },
+  "required_outcome": "Locate the first actual native holder/effect change without changing the failed seeding operations or relaxing intended assertions.",
+  "native_owner": "Black Glass",
+  "work_bound": {
+    "engines": 1,
+    "clients": 0,
+    "labs": 0,
+    "complete_saves": 0,
+    "pending_f200_launched": false,
+    "maximum_diagnostic_rows": 11
+  },
+  "expected_stages": [
+    "before-assignments",
+    "after-level-assignment",
+    "after-researched-assignment",
+    "after-level-assignment",
+    "after-researched-assignment",
+    "after-level-assignment",
+    "after-researched-assignment",
+    "after-level-assignment",
+    "after-researched-assignment",
+    "before-effect-reset",
+    "after-effect-reset"
+  ],
+  "observations": "All four exact native holder level/researched/enabled/visibility scalars,three native module productivity bonuses and cannon-shell speed at each stage;assigned_id on each per-holder row.",
+  "invariant": "Fresh zero-credit preflight and intended final levels2/3/4/5,researched=false,disabled/hidden,bonuses.01/.02/.03/.4 are unchanged.",
+  "failure_path": "Preserve raw logs and original adverse even if final check still fails. Compare successive actual native snapshots;do not assume researched setter or reset is causal beforehand. Stop after the one declared CreateOnly diagnosis;no client/candidate/performance campaign or favourable retry.",
+  "host_validation": "A coupled researched=false setter opponent resets levels and the unchanged seed visibly fails. Four focused Lua52 controls pass,including prior0.3 path. This model does not prove actual native semantics.",
+  "player_changes": false,
+  "native_execution": false,
+  "release_qualification": false
+}
