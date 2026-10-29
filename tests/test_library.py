@@ -539,6 +539,62 @@ class LibraryTests(unittest.TestCase):
             "metadata reuse changed native research state")
         ''')
 
+    def test_native_names_render_before_search_translation_and_in_selected_details(self):
+        self.lua.execute(r'''
+          boot()
+          local gear_name = {"technology-name.more-infinite-research.research_gears", {"item-name.iron-gear-wheel"}}
+          local science_name = {"item-name.fixture-science", "native parameter"}
+          local prerequisite_name = {"technology-name.fixture-prerequisite"}
+          gear.localised_name = gear_name
+          library_declarations = {{id=gear.name, name=gear.name, family="research_gears"}}
+          player.force.technologies["fixture-prerequisite"] = {valid=true, localised_name=prerequisite_name}
+          prototypes = {item = {["fixture-science"]={valid=true, localised_name=science_name}}}
+          require("presentation.library_model").detail = function()
+            return {cost={count=8000,time=60,ingredients={{name="fixture-science",amount=2}}},
+              prerequisites={"fixture-prerequisite"}, effects={}}
+          end
+          local native_queue = player.force.research_queue
+          local root = library.open(player,{selected=gear.name,family="all"})
+          local content = research_content(root)
+          local detail = content["mir_library_detail"]
+          assert(content["mir_library_results"].items[1] == gear_name,
+            "first-open display exposed an ID while native localized name was available")
+          assert(detail["mir_library_detail_title"].caption == gear_name)
+          assert(detail["mir_library_detail_family"].caption[2] == gear_name)
+          assert(detail["mir_library_science_1"].caption[2] == science_name)
+          assert(detail["mir_library_prerequisite_1"].caption == prerequisite_name)
+          assert(#player.translation_requests == 3, "display names changed existing search-translation scheduling")
+          assert(player.force.research_queue == native_queue)
+          -- The current force/prototype is authoritative after a refresh;
+          -- do not retain a new display cache or flatten localized parameters.
+          local replacement = {"technology-name.replaced-prerequisite", "second parameter"}
+          player.force.technologies["fixture-prerequisite"].localised_name = replacement
+          library.open(player)
+          assert(research_content(root)["mir_library_detail"]["mir_library_prerequisite_1"].caption == replacement)
+        ''')
+
+    def test_missing_or_invalid_native_detail_names_keep_identity_fallbacks(self):
+        self.lua.execute(r'''
+          boot()
+          library_declarations = {{id=gear.name, name=gear.name, family="research_gears"}}
+          gear.localised_name = nil
+          prototypes = {item=setmetatable({}, {__index=function() error("native item lookup unavailable") end})}
+          player.force.technologies["fixture-prerequisite"] = {valid=false,
+            localised_name={"technology-name.must-not-appear"}}
+          require("presentation.library_model").detail = function()
+            return {cost={count=1,time=60,ingredients={{name="missing-science",amount=2}}},
+              prerequisites={"fixture-prerequisite","missing-prerequisite"}, effects={}}
+          end
+          local root = library.open(player,{selected=gear.name,family="all"})
+          local content = research_content(root)
+          local detail = content["mir_library_detail"]
+          assert(content["mir_library_results"].items[1] == gear.name)
+          assert(detail["mir_library_detail_family"].caption[2] == "Gears")
+          assert(detail["mir_library_science_1"].caption[2] == "missing-science")
+          assert(detail["mir_library_prerequisite_1"].caption == "fixture-prerequisite")
+          assert(detail["mir_library_prerequisite_2"].caption == "missing-prerequisite")
+        ''')
+
     def test_requested_view_fits_scaled_display_wraps_details_and_converts_native_ticks(self):
         self.lua.execute(r'''
           boot()
@@ -998,9 +1054,9 @@ class LibraryTests(unittest.TestCase):
           local function assert_private_rows(root, label)
             local listed = {}
             for _, item in ipairs(research_content(root)["mir_library_results"].items) do listed[item] = true end
-            assert(listed[gear.name] and listed[foreign.name], label .. " dropped ordinary rows")
-            for _, id in ipairs(credits) do
-              assert(not listed[id], label .. " exposed private credit: " .. id)
+            assert(listed[gear.localised_name] and listed[foreign.localised_name], label .. " dropped ordinary rows")
+            for index, id in ipairs(credits) do
+              assert(not listed[id] and not listed["Private credit " .. index], label .. " exposed private credit: " .. id)
             end
           end
 
@@ -1594,7 +1650,7 @@ class LibraryTests(unittest.TestCase):
           library.on_gui_text_changed({player_index = 1, element = query})
           root = player.gui.screen["mir_research_browser"]
           local results = research_content(root)["mir_library_results"]
-          assert(#results.items == 1 and results.items[1] == "recipe-prod-research_gears-1")
+          assert(#results.items == 1 and results.items[1] == gear.localised_name)
           results.selected_index = 1
           library.on_gui_selection_state_changed({player_index = 1, element = results})
           assert(storage.mir_library.players[1].selected == gear.name)
@@ -1677,7 +1733,7 @@ class LibraryTests(unittest.TestCase):
           local query, mode = filters["mir_library_query"], filters["mir_library_mode"]
           assert(view.mode == 2 and view.page == 7 and mode.selected_index == 2)
           assert(#content["mir_library_results"].items == 1
-            and content["mir_library_results"].items[1] == foreign.name)
+            and content["mir_library_results"].items[1] == foreign.localised_name)
 
           mode.selected_index = 3
           library.on_gui_selection_state_changed({player_index = 1, element = mode})
@@ -1685,7 +1741,7 @@ class LibraryTests(unittest.TestCase):
           assert(view.mode == 3 and view.page == 1 and view.scroll == 1)
           assert(filters["mir_library_query"] == query and filters["mir_library_mode"] == mode)
           assert(#content["mir_library_results"].items == 1
-            and content["mir_library_results"].items[1] == gear.name)
+            and content["mir_library_results"].items[1] == gear.localised_name)
 
           library.open(player, {page = 7})
           for _, invalid in ipairs({0, 4, 1.5, "2", 0/0}) do
@@ -1733,7 +1789,7 @@ class LibraryTests(unittest.TestCase):
             and next(view.hidden) == nil and view.selected == gear.name)
           assert(root["mir_library_filters"]["mir_library_sort"].selected_index == 4)
           local rows = research_content(root)["mir_library_results"]
-          assert(#rows.items == 2 and rows.items[1] == gear.name and rows.items[2] == foreign.name)
+          assert(#rows.items == 2 and rows.items[1] == gear.localised_name and rows.items[2] == foreign.localised_name)
 
           -- The historical page value survives reopening, but it was never a
           -- player-list paginator: the continuous list retains both rows.
@@ -1743,7 +1799,7 @@ class LibraryTests(unittest.TestCase):
           root = player.gui.screen["mir_research_browser"]
           rows = research_content(root)["mir_library_results"]
           assert(view.page == 7 and #rows.items == 2
-            and rows.items[1] == gear.name and rows.items[2] == foreign.name)
+            and rows.items[1] == gear.localised_name and rows.items[2] == foreign.localised_name)
 
           -- The valid dense remote list changes actual rendering and an
           -- explicit valid page wins over the normal filter page reset.
@@ -1752,7 +1808,7 @@ class LibraryTests(unittest.TestCase):
           root = player.gui.screen["mir_research_browser"]
           rows = research_content(root)["mir_library_results"]
           assert(view.hidden[foreign.name] and view.page == 7
-            and #rows.items == 1 and rows.items[1] == gear.name)
+            and #rows.items == 1 and rows.items[1] == gear.localised_name)
 
           -- Invalid remote-style values leave each previously accepted field
           -- untouched, including unknown selected and hidden technologies.
@@ -1819,7 +1875,7 @@ class LibraryTests(unittest.TestCase):
             "authored family caption dropped the complete native localization parameters")
           assert(#player.translation_requests == 1)
           assert(#content["mir_library_results"].items == 1
-            and content["mir_library_results"].items[1] == gear.name)
+            and content["mir_library_results"].items[1] == gear.localised_name)
 
           library.close(player); library.on_load(); library.open(player)
           root = player.gui.screen["mir_research_browser"]
@@ -1828,7 +1884,7 @@ class LibraryTests(unittest.TestCase):
           assert(storage.mir_library.players[1].family == "research_gears"
             and filters["mir_library_family"].selected_index == 5
             and #content["mir_library_results"].items == 1
-            and content["mir_library_results"].items[1] == gear.name)
+            and content["mir_library_results"].items[1] == gear.localised_name)
 
           -- External is the published native scope. It is the only selector
           -- here that includes the actual foreign technology.
@@ -1838,7 +1894,7 @@ class LibraryTests(unittest.TestCase):
           view = storage.mir_library.players[1]
           assert(view.family == "external" and view.page == 1
             and #content["mir_library_results"].items == 1
-            and content["mir_library_results"].items[1] == foreign.name)
+            and content["mir_library_results"].items[1] == foreign.localised_name)
 
           -- Remote-style input stays strict and cannot replace a persisted
           -- hidden-only selection or its explicitly retained page.

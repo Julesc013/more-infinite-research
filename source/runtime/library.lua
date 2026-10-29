@@ -875,7 +875,30 @@ local function rebuild_owned_legacy_root(player, view)
   return true
 end
 
-local function caption(row)
+local function native_technology_name(player, id)
+  local ok, name = pcall(function()
+    local technology = player.force.technologies[id]
+    return valid(technology) and technology.localised_name or nil
+  end)
+  if ok and (type(name) == "table" or (type(name) == "string" and name ~= "")) then return name end
+  return nil
+end
+
+local function native_item_name(id)
+  local ok, name = pcall(function()
+    local item = prototypes.item[id]
+    return valid(item) and item.localised_name or nil
+  end)
+  if ok and (type(name) == "table" or (type(name) == "string" and name ~= "")) then return name end
+  return nil
+end
+
+local function caption(row, player)
+  if type(row.name) == "string" and row.name ~= "" and row.name ~= row.id then return row.name end
+  -- Native widgets can localize complete names before the asynchronous cache
+  -- supplies search/sort text. Keep that cache and its scheduling unchanged.
+  local native_name = native_technology_name(player, row.id)
+  if native_name ~= nil then return native_name end
   if type(row.name) == "string" and row.name ~= "" then return row.name end
   return row.id or ""
 end
@@ -913,14 +936,16 @@ local function research_seconds(cost)
   return cost.time or cost[2] or "?"
 end
 
-local function detail_lines(parent, row, detail)
+local function detail_lines(parent, row, detail, player)
   if not row then
     add(parent, {type = "label", name = PREFIX .. "detail_empty", caption = {"mir-browser.no-results"}})
     return
   end
 
-  add(parent, {type = "label", name = PREFIX .. "detail_title", caption = caption(row)})
-  add(parent, {type = "label", name = PREFIX .. "detail_family", caption = {"mir-browser.family", row.family or "mir"}})
+  add(parent, {type = "label", name = PREFIX .. "detail_title", caption = caption(row, player)})
+  local family = row.family or "mir"
+  local family_name = family_caption(family, {[family] = native_technology_name(player, row.id)})
+  add(parent, {type = "label", name = PREFIX .. "detail_family", caption = {"mir-browser.family", family_name}})
   local context = add(parent, {type = "flow", name = PREFIX .. "detail_context", direction = "vertical"})
   local status_key = {
     ready = "mir-browser.status-ready",
@@ -962,7 +987,7 @@ local function detail_lines(parent, row, detail)
       for index, ingredient in ipairs(detail.cost.ingredients) do
         if type(ingredient) == "table" then
           add(parent, {type = "label", name = PREFIX .. "science_" .. index,
-            caption = {"mir-browser.science-ingredient", tostring(ingredient.name or "?"), tostring(ingredient.amount or "?")}})
+            caption = {"mir-browser.science-ingredient", native_item_name(ingredient.name) or tostring(ingredient.name or "?"), tostring(ingredient.amount or "?")}})
         end
       end
     end
@@ -970,7 +995,8 @@ local function detail_lines(parent, row, detail)
   if type(detail) == "table" and type(detail.prerequisites) == "table" and #detail.prerequisites > 0 then
     add(parent, {type = "label", name = PREFIX .. "detail_prerequisites", caption = {"mir-browser.prerequisites"}})
     for index, prerequisite in ipairs(detail.prerequisites) do
-      add(parent, {type = "label", name = PREFIX .. "prerequisite_" .. index, caption = tostring(prerequisite)})
+      add(parent, {type = "label", name = PREFIX .. "prerequisite_" .. index,
+        caption = native_technology_name(player, prerequisite) or tostring(prerequisite)})
     end
   end
   if type(detail) == "table" and type(detail.effects) == "table" and #detail.effects > 0 then
@@ -1004,7 +1030,7 @@ local function update_research_content(content, player, view, context, translati
 
   local rows = rows_for(player, view, context, translations)
   local item_labels = {}
-  for index, row in ipairs(rows) do item_labels[index] = caption(row) end
+  for index, row in ipairs(rows) do item_labels[index] = caption(row, player) end
   local selected_index = row_index(rows, view.selected) or 0
   local results = add(content, {type = "list-box", name = PREFIX .. "results", items = item_labels, selected_index = selected_index})
   if view.scroll and view.scroll <= #item_labels and type(results.scroll_to_item) == "function" then
@@ -1024,7 +1050,7 @@ local function update_research_content(content, player, view, context, translati
   if detail_box.style and type(detail_width) == "number" and detail_width > 0 then
     detail_box.style.width = detail_width
   end
-  detail_lines(detail_box, selected, detail)
+  detail_lines(detail_box, selected, detail, player)
 
   local actions = add(content, {type = "flow", name = PREFIX .. "actions", direction = "horizontal"})
   add(actions, {type = "button", name = PREFIX .. "open_native", caption = {"mir-browser.open-research"}, enabled = selected ~= nil})
