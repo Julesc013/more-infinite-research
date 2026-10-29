@@ -1,0 +1,1239 @@
+{
+  "schema": 1,
+  "kind": "MIRSupportExportsConsumedPathApplicabilityAeroV1",
+  "status": "bounded-source-and-package-review-original-execution-identities-retained",
+  "previous_source": "a95dbc6b35c165b46aa9991d2a0ef7274d4ec04a",
+  "previous_source_tree": "7b0ede663e6fbcf486cd863e7d3719653aedc07a",
+  "current_source": "42032477d45ced683e72736a4fe30a7a3195b995",
+  "current_source_tree": "5a6adf0aab4e945aeca13420ddd045ad45f050a0",
+  "reader": {
+    "path": "build/qualification/support-exports-applicability-aero-r01/review.py",
+    "sha256": "B1458E2F6EA7EF13936A5BDA6E44FB8CCD00A95D574C382702CC6F10E575AAB2"
+  },
+  "source_delta": {
+    "added": [
+      "source/runtime/diagnostics.lua"
+    ],
+    "changed": [
+      "source/README.md",
+      "source/changelog.txt",
+      "source/locale/de/mir-library.cfg",
+      "source/locale/en/mir-library.cfg",
+      "source/runtime/bootstrap.lua",
+      "source/runtime/library.lua",
+      "source/runtime/settings_commands.lua"
+    ],
+    "removed": [],
+    "unchanged_files": 226,
+    "unchanged_file_pins": [
+      {
+        "path": "source/LICENSE",
+        "bytes": 16726,
+        "sha256": "3F3D9E0024B1921B067D6F7F88DEB4A60CBE7A78E76C64E3F1D7FC3B779B9D04"
+      },
+      {
+        "path": "source/adapters/early/data.lua",
+        "bytes": 623,
+        "sha256": "D9752DDA8E55D9250CAACABE76CB807D615B2E44ED84EE83BD4B77F79CE57EA0"
+      },
+      {
+        "path": "source/adapters/early/definitions.lua",
+        "bytes": 5826,
+        "sha256": "72A139069E67E057C440FD27D3D69E0C5D7A356D4446BB25A996552CD5EACF05"
+      },
+      {
+        "path": "source/adapters/early/locale/en/more-infinite-research.cfg",
+        "bytes": 4188,
+        "sha256": "038AB17AC78819F0953351B92B0B7CD53091DE380B97B744E35E2A68B7656B32"
+      },
+      {
+        "path": "source/adapters/reduced/control.lua",
+        "bytes": 1641,
+        "sha256": "9B1401495649BC0ACBC01370C670BE260E695592EE3690FD00FFD0E34F2740A7"
+      },
+      {
+        "path": "source/adapters/reduced/data-final-fixes.lua",
+        "bytes": 1410,
+        "sha256": "4A8B763F84A9836275B633EDB2DE10C9A59D0BF551A063B2E1B2DF2AC2408673"
+      },
+      {
+        "path": "source/adapters/reduced/data.lua",
+        "bytes": 266,
+        "sha256": "2A468BA76F10D91320AF34022143293CC02C90ECEC25AB104AC2882AB6B17724"
+      },
+      {
+        "path": "source/adapters/reduced/settings.lua",
+        "bytes": 579,
+        "sha256": "AFE80CD0E78FA0AF148BCC15A4E5F3C2B73C5C0BFA01CDC339ACD99AB1B2EFB4"
+      },
+      {
+        "path": "source/api/v1/data.lua",
+        "bytes": 12993,
+        "sha256": "9CCDD2B5FFBE14156D002F50ECEB9799F70124CADA0A0A3767D84CA242413FA5"
+      },
+      {
+        "path": "source/api/v1/runtime.lua",
+        "bytes": 3663,
+        "sha256": "5FA121E602EF99CC67DAE4C1E17C5334A8FB26BBEF97F00BF0AE9AE242D9C873"
+      },
+      {
+        "path": "source/compatibility/angel_f210_profile.lua",
+        "bytes": 895,
+        "sha256": "8967132019EFB46B135512C68C72BBAFDE46AE51BF1735BE83A447AB9375268D"
+      },
+      {
+        "path": "source/compatibility/atan_productivity.lua",
+        "bytes": 6514,
+        "sha256": "120B23E567C9A51967A8D7AF545259075D5A28D860B3FC7EF3FB0395D9E7B2D5"
+      },
+      {
+        "path": "source/compatibility/atan_profile.lua",
+        "bytes": 834,
+        "sha256": "27B48F933E7492F73F0F0DBF4EB283D2D0CCDC823CA4DAB71B20DD28DFF35A07"
+      },
+      {
+        "path": "source/compatibility/automatic_productivity.lua",
+        "bytes": 634,
+        "sha256": "96DF31C2CA79BA54C55011AD0078360EE32EE89E0D87BF6FC3F9D40285A74575"
+      },
+      {
+        "path": "source/compatibility/bob_angel_f210_profile.lua",
+        "bytes": 1531,
+        "sha256": "727A0EAB0EEC6DE9CD1FDE931D603BCBEAEEF373DE4FB541811B03E706ADA2F8"
+      },
+      {
+        "path": "source/compatibility/bob_angel_materials.lua",
+        "bytes": 6223,
+        "sha256": "5AE23646857AD0E2123EB4AECFD48C2F5407AD1AE992B3503C63D07E4AC6B435"
+      },
+      {
+        "path": "source/compatibility/bob_angel_profile.lua",
+        "bytes": 1814,
+        "sha256": "8ADBF32B11AE4FDD23233B9804D658E7A7506A037E0D0F40AA75AFD4A15A1D21"
+      },
+      {
+        "path": "source/compatibility/bob_core_materials.lua",
+        "bytes": 3147,
+        "sha256": "3FD63DA6419099ADBE886469D9306B308A720AA0243435675F71C15CC1363995"
+      },
+      {
+        "path": "source/compatibility/bob_core_profile.lua",
+        "bytes": 2425,
+        "sha256": "0BE5BBD8EA2C8403211A18A89A9CD284A6F9DC76BC5F4DE8A0AFDCC930917A41"
+      },
+      {
+        "path": "source/compatibility/bob_native_continuations.lua",
+        "bytes": 1215,
+        "sha256": "7CB3AB4B7BC821068EC3F3FA077E36B169C266F25C23245815433A5FAF5E3A88"
+      },
+      {
+        "path": "source/compatibility/bob_plates_materials.lua",
+        "bytes": 7386,
+        "sha256": "E8BC70F25456DCF49774DF9F76AF37CB6799EFE431B8D8BE02129BC5B30DF66E"
+      },
+      {
+        "path": "source/compatibility/bob_plates_profile.lua",
+        "bytes": 1581,
+        "sha256": "DC9D712DEE8C75C5A27374F2BED1CBD108A1C0CBAD7C35EBD2513917ABE53AFA"
+      },
+      {
+        "path": "source/compatibility/bob_productivity.lua",
+        "bytes": 3667,
+        "sha256": "B34334A161C014FAD4D79B33AA49C28878CB610204877041438350DC19C5FD80"
+      },
+      {
+        "path": "source/compatibility/bob_tech_materials.lua",
+        "bytes": 6398,
+        "sha256": "43326E45D2ED7528A1700488E1CA25B6459D63C6A6ACC7BD6EB267272C29AC5C"
+      },
+      {
+        "path": "source/compatibility/bob_tech_profile.lua",
+        "bytes": 1987,
+        "sha256": "D0B396F0B0A1D335714832A0DC169D5A16222F5CC84068249A66392072944809"
+      },
+      {
+        "path": "source/compatibility/bob_warfare_profile.lua",
+        "bytes": 916,
+        "sha256": "DCC3C2B72C771AD57238B6E34DE11BC7944C685F4BECC700050E75068F2C043D"
+      },
+      {
+        "path": "source/compatibility/competing_productivity.lua",
+        "bytes": 35926,
+        "sha256": "3752D846EC1A28A4A3478FC5109B5AF762B0A08E7C985A85E2AD7E4E86A4063F"
+      },
+      {
+        "path": "source/compatibility/gear_bindings.lua",
+        "bytes": 2811,
+        "sha256": "7F28E70409F91B44552CE23BB57EDD5218011CF446AF329216536D908CA057EA"
+      },
+      {
+        "path": "source/compatibility/gear_bindings/k2_base.lua",
+        "bytes": 1369,
+        "sha256": "7A5AFA3DCDCDA66702D664784BA180720C7091CA02F0841B87D892CCA7BF0F90"
+      },
+      {
+        "path": "source/compatibility/gear_bindings/k2so.lua",
+        "bytes": 257,
+        "sha256": "1914B2E49AC459E6ED20CAB80AE2E5E6FF4BCE44731EDB2C54C0221C1B30F13F"
+      },
+      {
+        "path": "source/compatibility/gear_bindings/space_age.lua",
+        "bytes": 156,
+        "sha256": "5B071730035A3F30DFC245C6BA9B925AD46105DAABC9163A47D3429A496C2AB5"
+      },
+      {
+        "path": "source/compatibility/gear_bindings/vanilla.lua",
+        "bytes": 127,
+        "sha256": "F1291D36F55D809652CD2401003E89AF2D7B9E6E320C716CBC3741FC2DA2C0CA"
+      },
+      {
+        "path": "source/compatibility/historical_continuations.lua",
+        "bytes": 9506,
+        "sha256": "9451C547B362829EA8FEE12F30B30C6C816D6831F8A24DBA9233FBE8EE9B04D8"
+      },
+      {
+        "path": "source/compatibility/historical_direct.lua",
+        "bytes": 8193,
+        "sha256": "FBFD9462E989213AA1993DDDAF85BF5505F9C5A0EBC07D2F53A632DA3B641484"
+      },
+      {
+        "path": "source/compatibility/ironclad.lua",
+        "bytes": 1444,
+        "sha256": "9DF97E3DB20C48CEB4F86AE2267A2A0AA0B8B053E51248BA7B6F98ED761C01F2"
+      },
+      {
+        "path": "source/compatibility/k2so_worker_speed.lua",
+        "bytes": 121,
+        "sha256": "F172E0160039254EC3EA0459171CEAC141D3B123DDA7B7D52530ACF6A4AE9C68"
+      },
+      {
+        "path": "source/compatibility/material_catalogue.lua",
+        "bytes": 5666,
+        "sha256": "21B2877E70C7C440086FA920084C34D75B12598F4DABBF936BCEB0027596BB91"
+      },
+      {
+        "path": "source/compatibility/material_routes.lua",
+        "bytes": 4171,
+        "sha256": "315D13113274E3B820F9AFA1F47019123A649B760C774244DD96A5874418EBEB"
+      },
+      {
+        "path": "source/compatibility/modern_catalogue.lua",
+        "bytes": 59250,
+        "sha256": "DCA31A41B34A2A7CE8A59E1206E6D71AD2CDB9637B0094ABEDDDDA959C05B89F"
+      },
+      {
+        "path": "source/compatibility/modern_catalogue/angel_f210.lua",
+        "bytes": 17157,
+        "sha256": "A0EBA1518A62636F54B75DF141FC0BE7398F2C84ABAD1B81343B29A96A5518F3"
+      },
+      {
+        "path": "source/compatibility/modern_catalogue/base.lua",
+        "bytes": 41971,
+        "sha256": "3D4B72D02863F84A27D3C7A57711FB534BCDC64D48B949669C77670519348782"
+      },
+      {
+        "path": "source/compatibility/modern_catalogue/bob_angel.lua",
+        "bytes": 10148,
+        "sha256": "3D0DDB417252ED89E904331AC7CB72CA7381B2ED02B6E8EB0539471136932628"
+      },
+      {
+        "path": "source/compatibility/modern_catalogue/bob_angel_f210.lua",
+        "bytes": 22000,
+        "sha256": "5D20BA357D62E37AFF4980B18212F576F14248904989F33F3FCD9BBA8DB138A9"
+      },
+      {
+        "path": "source/compatibility/modern_catalogue/bob_core.lua",
+        "bytes": 4118,
+        "sha256": "F956BB6AE010C14F618AFF09A12C8E70D9EFD002D0DF4C1576D3FCF59F26196F"
+      },
+      {
+        "path": "source/compatibility/modern_catalogue/bob_tech_progression.lua",
+        "bytes": 4245,
+        "sha256": "8DF6FB96E16A3520DB0F179A3896B38B2936AC2BB27CC21487BA609A79205E4C"
+      },
+      {
+        "path": "source/compatibility/modern_catalogue/bob_warfare.lua",
+        "bytes": 5707,
+        "sha256": "E2DFFAFEDD63A7A5AD2C131C0C8624A1B7C792380182E5EA49FB10A7993FC1F1"
+      },
+      {
+        "path": "source/compatibility/modern_catalogue/k2_base.lua",
+        "bytes": 2154,
+        "sha256": "CACDE0BF110A07ADE6A73DDD200DA3395502C69AAED33ED7766D9CF42EB5393A"
+      },
+      {
+        "path": "source/compatibility/modern_catalogue/k2_space_exploration.lua",
+        "bytes": 30195,
+        "sha256": "3CC7C41AE7861A374F8927B4A683DA83EE44DD2ED1FDA49C75F1F4A55C31F1B3"
+      },
+      {
+        "path": "source/compatibility/modern_catalogue/k2so.lua",
+        "bytes": 12020,
+        "sha256": "4C63E7069F5E8567CF270933539FA908E056AD200CE86F3F01305ED0F6F5EC2D"
+      },
+      {
+        "path": "source/compatibility/modern_catalogue/py.lua",
+        "bytes": 10178,
+        "sha256": "5A776880C0FFF64727AF5570A44809A9A36968818A6F0C6A65F4FF5793AEA669"
+      },
+      {
+        "path": "source/compatibility/modern_catalogue/py_f210.lua",
+        "bytes": 7974,
+        "sha256": "2CFB762A04AA02753A3911A83701305F0BCA7D3200BC3A66DCB314ADB231DCEF"
+      },
+      {
+        "path": "source/compatibility/modern_catalogue/space_age.lua",
+        "bytes": 42265,
+        "sha256": "07F356E13EDFEADADB005A11C15555E28D783C493B59F66E24C8A053A2CAFFA0"
+      },
+      {
+        "path": "source/compatibility/modern_catalogue/space_exploration.lua",
+        "bytes": 41892,
+        "sha256": "7D030096BC5E165CE204A2349ABF300FBAFCAE80D0B9774648551F3EE5655A3B"
+      },
+      {
+        "path": "source/compatibility/native_modded_continuations.lua",
+        "bytes": 19904,
+        "sha256": "CC6DF1899FB1C44002687686D20F8B2A5387B460781D235E6842170AE3321787"
+      },
+      {
+        "path": "source/compatibility/product_bindings.lua",
+        "bytes": 20125,
+        "sha256": "664C14FA9F3386AE26873D37B7E218265F36EE9D9B6F755A121FF7EC01D5EC1A"
+      },
+      {
+        "path": "source/compatibility/product_targets.lua",
+        "bytes": 21942,
+        "sha256": "E7E2911A5CA41D5CB39EEC39E4B962FF750D704DD3EFE03A98786A0A77A42772"
+      },
+      {
+        "path": "source/compatibility/py_materials.lua",
+        "bytes": 5096,
+        "sha256": "83B6ECE8FDBDF79EC7C1EB617DE7C60E5024377DBD07D30D551FD17FB6B0CF9C"
+      },
+      {
+        "path": "source/compatibility/py_profile.lua",
+        "bytes": 3275,
+        "sha256": "001619CB2ACFB2C4B15C2BA4720EB8BD35B47E6FFE40292290442CE166251F74"
+      },
+      {
+        "path": "source/compatibility/science_bindings.lua",
+        "bytes": 19364,
+        "sha256": "A892A27C1E00B748957CDB5AF5095756E5323874330F59342E383F34559B3CA4"
+      },
+      {
+        "path": "source/compatibility/space_age_scripted_effects.lua",
+        "bytes": 1979,
+        "sha256": "2F945A6206BB1BC63AF52C2DBE9E8D1BFEBA9C306FA7C0282CCBCD6F123EF057"
+      },
+      {
+        "path": "source/compatibility/space_age_scripted_effects/k2so.lua",
+        "bytes": 2441,
+        "sha256": "551184685EB0015C9E552D65A23E40CFD4369C13E1E184B89BE119F20DA2BC4C"
+      },
+      {
+        "path": "source/compatibility/space_age_scripted_effects/space_age.lua",
+        "bytes": 2612,
+        "sha256": "FE02D0D389D5BD484083EEC2EE9ACAC9EBCC3D2550CF55BC1CBEF938D3F5F6BF"
+      },
+      {
+        "path": "source/control.lua",
+        "bytes": 248,
+        "sha256": "17201196D4EB573265CE34C0599748ED78DF856EBFCB4229018C05C4E056C0C9"
+      },
+      {
+        "path": "source/data-final-fixes.lua",
+        "bytes": 13443,
+        "sha256": "F907FA9EE1EFEBEAAE57D915FFB49C62B322CF8A13B540D9BDB0B4C95539B758"
+      },
+      {
+        "path": "source/data.lua",
+        "bytes": 243,
+        "sha256": "F38FC47B1E731E517A4278DAD8E62A3D6ADEBF387F3FDA85C0D7EC9580508A2D"
+      },
+      {
+        "path": "source/info.json",
+        "bytes": 673,
+        "sha256": "9CC55B47FBFB826971831DBC9A43CCD2B08C787BAC25F4363C441EC79AB090DC"
+      },
+      {
+        "path": "source/locale/af/mir-library.cfg",
+        "bytes": 2774,
+        "sha256": "1F486CBEA6B671A66E69FD8528042C7A67CF3CE1993233F8C310308137CAD7EB"
+      },
+      {
+        "path": "source/locale/af/more-infinite-research.cfg",
+        "bytes": 11199,
+        "sha256": "E5822EE017B865E5D0810C2E4DE34BD8458686B0D2EAFA33F277116659F9BCFD"
+      },
+      {
+        "path": "source/locale/ar/mir-library.cfg",
+        "bytes": 3580,
+        "sha256": "500371A115F51C5508787879C4E4DC26CD7C74C6EFCC1521C51FC7A8DD46C6EF"
+      },
+      {
+        "path": "source/locale/ar/more-infinite-research.cfg",
+        "bytes": 14593,
+        "sha256": "B135FBA2FAC8833728BF0DEE96F19480EF4FA98CF1D243DFEBECDD003389133A"
+      },
+      {
+        "path": "source/locale/be/mir-library.cfg",
+        "bytes": 4346,
+        "sha256": "656D666F8A2566C533833CCCA8C6AD8CBDAF95B306503DC6F3EC4AAD6B1B8711"
+      },
+      {
+        "path": "source/locale/be/more-infinite-research.cfg",
+        "bytes": 17416,
+        "sha256": "CDD0760749364F4E33A7B2A30586D783E2DFED9CFF4F9C09FA15B838588B8565"
+      },
+      {
+        "path": "source/locale/bg/mir-library.cfg",
+        "bytes": 4421,
+        "sha256": "C4231133BD5BB33D52A73A627065889B2D27044DF01D4B9B0DD439B8302E3CFB"
+      },
+      {
+        "path": "source/locale/bg/more-infinite-research.cfg",
+        "bytes": 18161,
+        "sha256": "B64269C51B856AFF48C3FCC5E902BC299548551F71749C325C1AA70EA2B6D9A3"
+      },
+      {
+        "path": "source/locale/ca/mir-library.cfg",
+        "bytes": 2906,
+        "sha256": "D14ADA63AFA419B09A5CF801EFFAF8DC3F7CF93FBB642B1B0767FB4EA84ADF38"
+      },
+      {
+        "path": "source/locale/ca/more-infinite-research.cfg",
+        "bytes": 12363,
+        "sha256": "A4297B26CAE75E382191388A9EFAF41C3EE18C81B3BDCA312BF7A4B01CECEAC5"
+      },
+      {
+        "path": "source/locale/cs/mir-library.cfg",
+        "bytes": 2923,
+        "sha256": "E142872E640D5DE1D52EA38AE89372C82601FAB28B2CDDC1E12FFF10EB576503"
+      },
+      {
+        "path": "source/locale/cs/more-infinite-research.cfg",
+        "bytes": 11977,
+        "sha256": "739386A75D08C1885A659E5152C67B054DB0F4B68B0D76631265DCF6BF3BE458"
+      },
+      {
+        "path": "source/locale/da/mir-library.cfg",
+        "bytes": 2803,
+        "sha256": "FC7BFBF28564A26E39CE6A783DF9AF931BF0E9634DD4A8728A2F1B573B19E09D"
+      },
+      {
+        "path": "source/locale/da/more-infinite-research.cfg",
+        "bytes": 11288,
+        "sha256": "FD0D680A3F193B05866E84ED5F4717C18F6C63FBDB00DFA40F3683814FE557EF"
+      },
+      {
+        "path": "source/locale/de/more-infinite-research.cfg",
+        "bytes": 12193,
+        "sha256": "A13D2DE640E7DE62B54D269541FCF2BAB1119C72EA0F55A706DA0181A360AA39"
+      },
+      {
+        "path": "source/locale/el/mir-library.cfg",
+        "bytes": 4436,
+        "sha256": "6F04F55682AC276E69B6E5B862CDCD400270B655BEBF10CAABC3FC7C8D989B86"
+      },
+      {
+        "path": "source/locale/el/more-infinite-research.cfg",
+        "bytes": 18420,
+        "sha256": "B73BBB456D55BDC7199006DB377340A4C9DC320C7C6F658F8CC71F42E2D60F9F"
+      },
+      {
+        "path": "source/locale/en/more-infinite-research.cfg",
+        "bytes": 12823,
+        "sha256": "C25B86B5683B631BC1053AFAF9F862F67AA3268D2F28619CD00D0CBE8D49F86D"
+      },
+      {
+        "path": "source/locale/eo/mir-library.cfg",
+        "bytes": 2704,
+        "sha256": "D745F877D9C5FA87DFFD0EDB6D32A963F2CC616CDF68B293D64E2C5966800E25"
+      },
+      {
+        "path": "source/locale/eo/more-infinite-research.cfg",
+        "bytes": 11139,
+        "sha256": "C59ECFA9BCCEBC54461096B6465C103BA9DE63E7C438767825BA72D2B9F1B94F"
+      },
+      {
+        "path": "source/locale/es-ES/mir-library.cfg",
+        "bytes": 3127,
+        "sha256": "8A020712FEF27028F2383CB1C81B74BB6C26D637D284461A89B0B9B710785CB6"
+      },
+      {
+        "path": "source/locale/es-ES/more-infinite-research.cfg",
+        "bytes": 12493,
+        "sha256": "136BE8EF419BB9AD8453CA4096A68186E6B7FADA7E514799A2A0B2DB864F0355"
+      },
+      {
+        "path": "source/locale/et/mir-library.cfg",
+        "bytes": 2769,
+        "sha256": "87D8170998587BBB4BDE13546FF2B927CF899CB50D5ED6830A3F2993E8C5B73E"
+      },
+      {
+        "path": "source/locale/et/more-infinite-research.cfg",
+        "bytes": 11197,
+        "sha256": "26751CB6320C813888BC4B8084D6EE33514FBF2E089DCCC8406968C8C810E7ED"
+      },
+      {
+        "path": "source/locale/eu/mir-library.cfg",
+        "bytes": 2856,
+        "sha256": "E4ABB5C5C55FC8DCEE89C37D2E86FB5F5AF4DFB92010CED3FB9E49DD84BBD49E"
+      },
+      {
+        "path": "source/locale/eu/more-infinite-research.cfg",
+        "bytes": 12057,
+        "sha256": "6F184D3C1C66DA4350286B98F5099490038E4C342D2DDEAB9EA23FFEDE77CEC2"
+      },
+      {
+        "path": "source/locale/fa/mir-library.cfg",
+        "bytes": 3605,
+        "sha256": "9DD5FF9B18DAAF281812D61ACAC84E08EB8356E6BDF8F00BC882F5E1804661A7"
+      },
+      {
+        "path": "source/locale/fa/more-infinite-research.cfg",
+        "bytes": 14656,
+        "sha256": "69FA6018BE7638B77301CFCA8352BA7E56B748FB50FFD40981994044B5DAE708"
+      },
+      {
+        "path": "source/locale/fi/mir-library.cfg",
+        "bytes": 2756,
+        "sha256": "C8879E184780010BF3B3953F9F8864B90E7E620CC21026C1B63B4A3BDC97F08E"
+      },
+      {
+        "path": "source/locale/fi/more-infinite-research.cfg",
+        "bytes": 11661,
+        "sha256": "3BE178D042F42DC678D6C0C5D553E21F898D3F06C8A54AB3CC30B5F20E44047B"
+      },
+      {
+        "path": "source/locale/fil/mir-library.cfg",
+        "bytes": 3265,
+        "sha256": "5FBCB71666B521BCC9838DFDEFE8B8DB10443AEAB023E1817AA67397C37A6633"
+      },
+      {
+        "path": "source/locale/fil/more-infinite-research.cfg",
+        "bytes": 12503,
+        "sha256": "7C7F558730BB29DFECE43BB3B095F7845DA72DD3CE5EE1096FFB3BE2EF55D12F"
+      },
+      {
+        "path": "source/locale/fr/mir-library.cfg",
+        "bytes": 3099,
+        "sha256": "20BEC3A550A8A35F05A0FB3FD895758254C60323AE6B146AA5AA520015A87B04"
+      },
+      {
+        "path": "source/locale/fr/more-infinite-research.cfg",
+        "bytes": 12741,
+        "sha256": "60A4ACFB8BFC34685966C18D8AF275DA0B640C271177368508EEB1D031AC41B5"
+      },
+      {
+        "path": "source/locale/fy-NL/mir-library.cfg",
+        "bytes": 2848,
+        "sha256": "B114B035FDBADD70FF0C45A167039D29105D7FEDA916D9097EFE3EB39C67C83C"
+      },
+      {
+        "path": "source/locale/fy-NL/more-infinite-research.cfg",
+        "bytes": 11471,
+        "sha256": "7145A2802706D2863018064D6033A849C8800FE4BBD0A65C4ACED76E457CBD6E"
+      },
+      {
+        "path": "source/locale/ga-IE/mir-library.cfg",
+        "bytes": 2967,
+        "sha256": "42C51D7C807F98714C95B53B499D92CE1471941E043F0381B2E50DD43FF99314"
+      },
+      {
+        "path": "source/locale/ga-IE/more-infinite-research.cfg",
+        "bytes": 12495,
+        "sha256": "D1D9E3BDA7C807DB06A256FB10433FC55D681E9389A592DD067BA64A85FA5796"
+      },
+      {
+        "path": "source/locale/he/mir-library.cfg",
+        "bytes": 3109,
+        "sha256": "0285FCD43C459AD34C96F78D69D9B8AD1D52CF420B0CDBE2E411124AB433FD0C"
+      },
+      {
+        "path": "source/locale/he/more-infinite-research.cfg",
+        "bytes": 14144,
+        "sha256": "2E55B263C6FAC0DE28B0267917A70530017D0BE783713B74D8DBC8C76BA7ADC2"
+      },
+      {
+        "path": "source/locale/hr/mir-library.cfg",
+        "bytes": 3004,
+        "sha256": "1C79199BFA567907AEE236A1130D1097DE30784B879E56FA4E703A8C5A8D4983"
+      },
+      {
+        "path": "source/locale/hr/more-infinite-research.cfg",
+        "bytes": 11625,
+        "sha256": "6D5A4617D92DE166D596D8C4F8C867DBD0054F8AFAAD011FFF8CA29D10767BA1"
+      },
+      {
+        "path": "source/locale/hu/mir-library.cfg",
+        "bytes": 3039,
+        "sha256": "14E34F74CEAD98B88FBBC04EE65CEB3015ECF7EE2540A13194B0E1C42D840B36"
+      },
+      {
+        "path": "source/locale/hu/more-infinite-research.cfg",
+        "bytes": 12445,
+        "sha256": "C2F3F27413310DE6452D2C64AA2D7BDA15AF33B9BA6EE6583F44DFF687DF5A2B"
+      },
+      {
+        "path": "source/locale/id/mir-library.cfg",
+        "bytes": 2814,
+        "sha256": "C7C822ED4963B8FCA50400BBFCC260032E6469419D9583AD84E7A6DF6D3966E9"
+      },
+      {
+        "path": "source/locale/id/more-infinite-research.cfg",
+        "bytes": 11453,
+        "sha256": "0BA44479526C22A2C90B905253ECF6EF1CDFE929E9809BFF09A5C67C5D5BE613"
+      },
+      {
+        "path": "source/locale/is/mir-library.cfg",
+        "bytes": 2828,
+        "sha256": "94C05D45E24123498C95E84CB1F0C2F3CB4DB9F5E9C28B1F417BA36995F534B6"
+      },
+      {
+        "path": "source/locale/is/more-infinite-research.cfg",
+        "bytes": 11367,
+        "sha256": "5C5695995BB0CB4FD653062A41B82D37907C4D653036836B04B7E3EC72D33A5B"
+      },
+      {
+        "path": "source/locale/it/mir-library.cfg",
+        "bytes": 2897,
+        "sha256": "3208AEF7DEFE765286CF43FC4F8511F1D869896D5C8AEEBADD148C3EC5C0C845"
+      },
+      {
+        "path": "source/locale/it/more-infinite-research.cfg",
+        "bytes": 12465,
+        "sha256": "C111BD6E3797C217662FB607E5032F93B1067E3C1E6AB84C345A3D334B77F25E"
+      },
+      {
+        "path": "source/locale/ja/mir-library.cfg",
+        "bytes": 3201,
+        "sha256": "62CD3C4A4A475AA96252F18E09B275CCC394B4EA22CA43AB81E3781D43A13823"
+      },
+      {
+        "path": "source/locale/ja/more-infinite-research.cfg",
+        "bytes": 12774,
+        "sha256": "24EE7DAAB7B4B8037581F57C1211E697B592B380B0B083440F7A625E32C92195"
+      },
+      {
+        "path": "source/locale/ka/mir-library.cfg",
+        "bytes": 5587,
+        "sha256": "AF4CA78AD90FA66B782452941C74BBFEF264F267BD0D3C306512689218C5DB44"
+      },
+      {
+        "path": "source/locale/ka/more-infinite-research.cfg",
+        "bytes": 23225,
+        "sha256": "2CC4CF930B1D8553724BC6E4ABE8881530210CDF60EC148DA6E83805D1CF41BD"
+      },
+      {
+        "path": "source/locale/kk/mir-library.cfg",
+        "bytes": 4182,
+        "sha256": "3317974864BFCA3EB1F7284A7B94E9BDC7B9AFE61A3EADBE6696C20CFD230FAF"
+      },
+      {
+        "path": "source/locale/kk/more-infinite-research.cfg",
+        "bytes": 16796,
+        "sha256": "5C3CC5395398415816CE0B598A0C3F5C591129F35F70774AD3AFCA8EA4D1B8D3"
+      },
+      {
+        "path": "source/locale/ko/mir-library.cfg",
+        "bytes": 2814,
+        "sha256": "3CBF10CD76CB9F1939F316B5143F7DD9A0315A5A7632B6FB6E14A3ED3E692A50"
+      },
+      {
+        "path": "source/locale/ko/more-infinite-research.cfg",
+        "bytes": 11632,
+        "sha256": "91D0D6DF024630D82D0EC87A728EA1EA078DDA4E6FF8992366517BE0B4A461BA"
+      },
+      {
+        "path": "source/locale/lt/mir-library.cfg",
+        "bytes": 2846,
+        "sha256": "3E413606F1DEDA1EB4EC837661CB20CA1F08F9C0D9DAFD979AD37212BD1E4FAA"
+      },
+      {
+        "path": "source/locale/lt/more-infinite-research.cfg",
+        "bytes": 11666,
+        "sha256": "FABDF01BF2114A9C94C4BDC4C73BC49532948CB37B0E3A0CE9968DDA4E415656"
+      },
+      {
+        "path": "source/locale/lv/mir-library.cfg",
+        "bytes": 2999,
+        "sha256": "303FB3B42412848157F8DB6991E4AD4B76894B13EF8BD7AD6B98A0ACB19AE203"
+      },
+      {
+        "path": "source/locale/lv/more-infinite-research.cfg",
+        "bytes": 12167,
+        "sha256": "53D3C94493DEC16CD564CC40B3FE90F8AD115D3E01DC5A99123C4A0975CFB07B"
+      },
+      {
+        "path": "source/locale/nl/mir-library.cfg",
+        "bytes": 2894,
+        "sha256": "54701AEBB0E53B7285EFCD4A84C090A0703720C53DF37860EDB96903D14BCC5A"
+      },
+      {
+        "path": "source/locale/nl/more-infinite-research.cfg",
+        "bytes": 11977,
+        "sha256": "A7D0373D928C9BE8BE59D072477A7F5C2F7EA37BC527EFAE1F8E00CA3F2081DA"
+      },
+      {
+        "path": "source/locale/no/mir-library.cfg",
+        "bytes": 2801,
+        "sha256": "00F7BE83D39DC0F48E85D22A89AB01C6B173DA3E65AE0D285B4440CDB9342D8D"
+      },
+      {
+        "path": "source/locale/no/more-infinite-research.cfg",
+        "bytes": 11139,
+        "sha256": "1383A84FCACD53D08C50398C89478962205758A19028CD9C87F090ACBF14CCF8"
+      },
+      {
+        "path": "source/locale/pl/mir-library.cfg",
+        "bytes": 2899,
+        "sha256": "900710E504827A18B7273238E616338A2A57A7211ECC5326C255F1EC6EDAAE66"
+      },
+      {
+        "path": "source/locale/pl/more-infinite-research.cfg",
+        "bytes": 12147,
+        "sha256": "60936F618D5CA91B6E7152EC5BE6F09CF29804D1E0BCAA003D547F8785527020"
+      },
+      {
+        "path": "source/locale/pt-BR/mir-library.cfg",
+        "bytes": 2949,
+        "sha256": "887C3269F3C811A3C4A44B5F3BD141CD822D377F3640613D9F79015183A03C7E"
+      },
+      {
+        "path": "source/locale/pt-BR/more-infinite-research.cfg",
+        "bytes": 12204,
+        "sha256": "8377F72385F8956AC1BC697C5359419477C3446C4576386E9067CBC5AACD06FA"
+      },
+      {
+        "path": "source/locale/pt-PT/mir-library.cfg",
+        "bytes": 2949,
+        "sha256": "887C3269F3C811A3C4A44B5F3BD141CD822D377F3640613D9F79015183A03C7E"
+      },
+      {
+        "path": "source/locale/pt-PT/more-infinite-research.cfg",
+        "bytes": 12187,
+        "sha256": "32EA098ED66598265527A597EA649C262FCAE30634BD4C9D115958873F951BBE"
+      },
+      {
+        "path": "source/locale/ro/mir-library.cfg",
+        "bytes": 2923,
+        "sha256": "40CE91F1CC137F44D3613EAA820E91651964CDB9E497DD884E790E6619FEBD16"
+      },
+      {
+        "path": "source/locale/ro/more-infinite-research.cfg",
+        "bytes": 12349,
+        "sha256": "E0E759934D2E4D399763CD7F5A99FCB6198CD88CBA4A082438AE99AD0D2C87DC"
+      },
+      {
+        "path": "source/locale/ru/mir-library.cfg",
+        "bytes": 4669,
+        "sha256": "39D2EFBF7E53C77A4B8D9F4CB210B96F9D1E0519249A12C5E57C7534B6149DE0"
+      },
+      {
+        "path": "source/locale/ru/more-infinite-research.cfg",
+        "bytes": 18239,
+        "sha256": "420BA8C2FAA249206D68CDA50AD427784FD793368AFB1E3172E87A4F2E799654"
+      },
+      {
+        "path": "source/locale/sk/mir-library.cfg",
+        "bytes": 2912,
+        "sha256": "6F45C9A59FB5DD356DC9A3022342B466520D64BF8A88D9DB51590B5A05D3DCB5"
+      },
+      {
+        "path": "source/locale/sk/more-infinite-research.cfg",
+        "bytes": 11952,
+        "sha256": "55AEA1BD4CF6B6D5499932F39B982A43FC42938C3793E0FA519459747C6E9DEA"
+      },
+      {
+        "path": "source/locale/sl/mir-library.cfg",
+        "bytes": 2919,
+        "sha256": "04F3F057FD3DC5836F6D583127B89FBD4B2C5C4B51CDCF488E475A6CB91FA9D7"
+      },
+      {
+        "path": "source/locale/sl/more-infinite-research.cfg",
+        "bytes": 11490,
+        "sha256": "2DEA9F291EF27A45815FA37FC6674CAA417887E1D79095BD4DBC959F1BB1EBD7"
+      },
+      {
+        "path": "source/locale/sq/mir-library.cfg",
+        "bytes": 2954,
+        "sha256": "BECCE6ADAA7CA9CC4F2F48CA46BBB9DFE2EFFC97557FECA52745C30067458F01"
+      },
+      {
+        "path": "source/locale/sq/more-infinite-research.cfg",
+        "bytes": 12450,
+        "sha256": "438A720EC436F75C98E59EBC796E56932C3525CCF611801712B51812899FEE03"
+      },
+      {
+        "path": "source/locale/sr/mir-library.cfg",
+        "bytes": 4358,
+        "sha256": "4B4B7DC9684C81CDA0D1E3640F0A91B4E2B8B89373EF9909739013EA2C7F6239"
+      },
+      {
+        "path": "source/locale/sr/more-infinite-research.cfg",
+        "bytes": 16733,
+        "sha256": "C17C1A544C31C4FBB64188B4F99607FA64289112BE90BC52ACDFB8B0BC2DAA1B"
+      },
+      {
+        "path": "source/locale/sv-SE/mir-library.cfg",
+        "bytes": 2788,
+        "sha256": "0978A20B45DF4691D1A974F0885F7A084A72655FFBC58B7990258FF06D590A6C"
+      },
+      {
+        "path": "source/locale/sv-SE/more-infinite-research.cfg",
+        "bytes": 11313,
+        "sha256": "28F24804C591D03B3F0CA38FCBA3E53FEC21DBAB9B6A3F142A234A3587A6F32E"
+      },
+      {
+        "path": "source/locale/th/mir-library.cfg",
+        "bytes": 5112,
+        "sha256": "09EA8C1D30DC331C28002975F2B98B1A5E0342111AB4B54ECE9030C01F74D081"
+      },
+      {
+        "path": "source/locale/th/more-infinite-research.cfg",
+        "bytes": 20838,
+        "sha256": "89B5A5C55B17EAB5B2C6D90E699C5576B0A5FB7D5BCF3B5908729A62A1DFB537"
+      },
+      {
+        "path": "source/locale/tr/mir-library.cfg",
+        "bytes": 2974,
+        "sha256": "AC17C0A0890908708E6CB13E17D38047790D6F39679CF36902D59F71119CE6DC"
+      },
+      {
+        "path": "source/locale/tr/more-infinite-research.cfg",
+        "bytes": 11669,
+        "sha256": "C1A593703DF7B02AE39E21745870643C2DCA81820E6C19F4A7F225E3FC85FAE8"
+      },
+      {
+        "path": "source/locale/uk/mir-library.cfg",
+        "bytes": 4315,
+        "sha256": "F74C2B8611990BD8A8B0B306FEA4EF6FE40A586EE46AAF712E102699439C1057"
+      },
+      {
+        "path": "source/locale/uk/more-infinite-research.cfg",
+        "bytes": 17516,
+        "sha256": "62F09724923D9015B013EDB354BDCE96F046342F394B32F9BDEF25C40EFEA8F6"
+      },
+      {
+        "path": "source/locale/vi/mir-library.cfg",
+        "bytes": 3359,
+        "sha256": "A081816F382D8F7595C45B046D39ED848359FAD9D78A7086B30B8DC3FA546155"
+      },
+      {
+        "path": "source/locale/vi/more-infinite-research.cfg",
+        "bytes": 13169,
+        "sha256": "0F084A0C5CC24D6240A0916567490EE7065DCDCFEC942A9D0465FF1AED227FA4"
+      },
+      {
+        "path": "source/locale/zh-CN/mir-library.cfg",
+        "bytes": 2452,
+        "sha256": "E778154365265977A6F85D2C4F93F0A6FB713A1EB10EEF25115C8BC06A29985A"
+      },
+      {
+        "path": "source/locale/zh-CN/more-infinite-research.cfg",
+        "bytes": 9874,
+        "sha256": "43EDC3DB939A1A638BBEEC606C0109EE244EC68356F074839DF246E83C2A9B6F"
+      },
+      {
+        "path": "source/locale/zh-TW/mir-library.cfg",
+        "bytes": 2449,
+        "sha256": "3A8A2DC901B81C16838F3EFB0CC51884288D8D84934A2971AFE3B38F1CC4C2EC"
+      },
+      {
+        "path": "source/locale/zh-TW/more-infinite-research.cfg",
+        "bytes": 10036,
+        "sha256": "E4230505F8B0AC07A0DBF734CDE5FC10C3CEE6909822FA41AE4BC8020A1DFF84"
+      },
+      {
+        "path": "source/migrations/more-infinite-research_2.0.5.json",
+        "bytes": 142,
+        "sha256": "07A2759B963321A87B1047029AE426C7B2784033BC7C4F899D2640C037C5EEE2"
+      },
+      {
+        "path": "source/migrations/more-infinite-research_2.1.0.json",
+        "bytes": 125,
+        "sha256": "F427B215D77BC86608010ADC1D0D1A1C98BE61F0D7140EF716D77E46DAB8092D"
+      },
+      {
+        "path": "source/migrations/more-infinite-research_4.7.0.json",
+        "bytes": 235,
+        "sha256": "0980B0B6F1675F6827A8E4151F778143EA74C9C6C3440CC2318129DBCE63C379"
+      },
+      {
+        "path": "source/migrations/more-infinite-research_5.0.11000.json",
+        "bytes": 99,
+        "sha256": "C26C6B21D777F3C20410C9C9ECDAFFE8ADF8DDDEAE556FE8B044146CEC40117D"
+      },
+      {
+        "path": "source/overrides/module_permissions.lua",
+        "bytes": 3781,
+        "sha256": "098B6F744239C102E2978AA71E0AF20360498FCA1101B52327AF6F186765EE4D"
+      },
+      {
+        "path": "source/overrides/pipeline_extent.lua",
+        "bytes": 2383,
+        "sha256": "0553462EB0187C1F24932083AE0AEAD1791E4C33CC16CF27F6F104D9AEC1E7C5"
+      },
+      {
+        "path": "source/overrides/prerequisite_repairs.lua",
+        "bytes": 4356,
+        "sha256": "56A939D99E16A34D35A1C1D9671E77970D9B2B37D8FBF974644CD1B86D491B57"
+      },
+      {
+        "path": "source/overrides/prototype_limits.lua",
+        "bytes": 8797,
+        "sha256": "1D7B023D8D9EBD018A6BC198A7D11819FB0D29CFBFD162B558DE9FEABB76B91C"
+      },
+      {
+        "path": "source/overrides/recipe_schema.lua",
+        "bytes": 4036,
+        "sha256": "2A7D3687CCD1ABA3EAF8E95C25B13FFDE32F78E610AAAB79D936AC69E512499C"
+      },
+      {
+        "path": "source/overrides/recycling_scope.lua",
+        "bytes": 7080,
+        "sha256": "ED6314A0D29048A46F13E292470E357A08CC4D19EBEB58991A11F2ACC7D0B02C"
+      },
+      {
+        "path": "source/platform/target.lua",
+        "bytes": 502,
+        "sha256": "9D0231B2F7643B9A3D3E5DC1406DC9B639AF4F799C33FDD0D4E32DD37452441A"
+      },
+      {
+        "path": "source/presentation/availability.lua",
+        "bytes": 11760,
+        "sha256": "C2912E212702DD3E8409716C8AB38CBB3F31478D40C3D7B14C312BD397BE5A20"
+      },
+      {
+        "path": "source/presentation/library_model.lua",
+        "bytes": 19512,
+        "sha256": "591F69FDB536CF1F750AA711F876408617C2BE89A0BA4AB53AE6B99C43C94381"
+      },
+      {
+        "path": "source/presentation/shortcut.lua",
+        "bytes": 1019,
+        "sha256": "7D1B5C6AE0FAB4711884999E0EF4B8DE6953B23C38568C08F62B74FEB72D3E1E"
+      },
+      {
+        "path": "source/research/atan_productivity.lua",
+        "bytes": 7730,
+        "sha256": "4F88C803783ADDF924F5E5C96EB0039FF175C9693AC362E38FDCA640498CAEAB"
+      },
+      {
+        "path": "source/research/bob_angel_materials.lua",
+        "bytes": 16991,
+        "sha256": "916316E08B1400EEEFB902CEA2CD504926E1D616B820D62944F78FE53D3D4F15"
+      },
+      {
+        "path": "source/research/bob_core_materials.lua",
+        "bytes": 10274,
+        "sha256": "C10E1A0C34D6A3BB71C0C006F1920B1A30724AC030E8A0BC6FFAF173D3D50529"
+      },
+      {
+        "path": "source/research/bob_plates_materials.lua",
+        "bytes": 18117,
+        "sha256": "4E8B308CCA58F724A0C1884C0D8E84EDDC54239EA4375C24238F810943A3C3CE"
+      },
+      {
+        "path": "source/research/bob_tech_materials.lua",
+        "bytes": 5236,
+        "sha256": "A93011630B1E92C7C2A7D87CD318F5EA1C5A90ED2D272ED19886FF8DFBA8AD0D"
+      },
+      {
+        "path": "source/research/catalogue.lua",
+        "bytes": 13752,
+        "sha256": "EACCBED9C41C08FE8236991FC92F7AED78B1CCD3D7BFBDD6729487342BA8CA2C"
+      },
+      {
+        "path": "source/research/cost.lua",
+        "bytes": 3218,
+        "sha256": "044978690FEB3863D790019A89356496AE442AB0C803BEE92503945C8385CBE2"
+      },
+      {
+        "path": "source/research/generator.lua",
+        "bytes": 5491,
+        "sha256": "88626C760C43D51FEDB3C7233523FAD3355404C3548A79F872940E6B019FE526"
+      },
+      {
+        "path": "source/research/historical_continuations.lua",
+        "bytes": 9416,
+        "sha256": "69D6C5CB7BBCD6FAE2BAF29C2D06B6D4AB6FCED4FA10CE0584CE40932C4F0FDC"
+      },
+      {
+        "path": "source/research/historical_direct.lua",
+        "bytes": 7690,
+        "sha256": "A351C925CF0C679F4695EA87D85C4670785E79A36EE0A1FBF78BF084A1B66CB8"
+      },
+      {
+        "path": "source/research/historical_direct_settings.lua",
+        "bytes": 14262,
+        "sha256": "2FD088016B5F4D9F769467DAD648066FDE63D759709E799FB27FF06928AFEECC"
+      },
+      {
+        "path": "source/research/historical_settings.lua",
+        "bytes": 54552,
+        "sha256": "F23AABE1910B6624C7B885E127AE5390063FB3E0381BA0EC71BB5829F3D0DBB7"
+      },
+      {
+        "path": "source/research/k2_imersite.lua",
+        "bytes": 1162,
+        "sha256": "5E8295C131C1E55F82351C23A1ABEFD98C3C4570531D6F3B095F9A41BE6A8CDD"
+      },
+      {
+        "path": "source/research/k2_materials.lua",
+        "bytes": 2289,
+        "sha256": "1D809D89C77826126AF8C2BF7986AE087197CBE227E067B39755DABA77DB4A84"
+      },
+      {
+        "path": "source/research/legacy_cannon_credit_definitions.lua",
+        "bytes": 4991,
+        "sha256": "9B16B3151F996016DA0CD155BF33281EE69AB6E3FE6D0B0B8B34E564C15E7028"
+      },
+      {
+        "path": "source/research/legacy_module_credit_definitions.lua",
+        "bytes": 2011,
+        "sha256": "98182E7F7C8294678DDFC01CE45C2CC23616B622039D8FDB952E5CCACB567AC7"
+      },
+      {
+        "path": "source/research/material_stages.lua",
+        "bytes": 3263,
+        "sha256": "FD170F26D1D8F61E2B419278AA73930B623F5453B67CBE3372AA5E51B9F5B8C1"
+      },
+      {
+        "path": "source/research/modern.lua",
+        "bytes": 23218,
+        "sha256": "C1F94193BF11F625655D6B02C630C0FECF195066D40FABF0186DCDF073DA1EE2"
+      },
+      {
+        "path": "source/research/native_credit_definitions.lua",
+        "bytes": 6026,
+        "sha256": "A37E2C88CC0ACC17F14C36E89AE92FC7F4A949096E4DC4C0005391E3FABB75DC"
+      },
+      {
+        "path": "source/research/native_direct_definitions.lua",
+        "bytes": 12321,
+        "sha256": "A954E044434783685A92D61E23C49712A31FD0FABC5929FE10667BF43AF16369"
+      },
+      {
+        "path": "source/research/native_owners.lua",
+        "bytes": 2842,
+        "sha256": "ED5C11CC2873F18F00A142997B7BCACCE0D2DD96D57D06C28DAD5B75ED6F1A8A"
+      },
+      {
+        "path": "source/research/product_target_extension.lua",
+        "bytes": 14165,
+        "sha256": "9A8499EA5363F8A70A319E346BEE9447BEC4A5E9D358E9AC1F35DC7BF333D897"
+      },
+      {
+        "path": "source/research/productivity.lua",
+        "bytes": 2797,
+        "sha256": "60C725ADF4DEE5EEFCF3F597ACA68CCAAF7B66BBB24002B0F2015A868F332B56"
+      },
+      {
+        "path": "source/research/py_materials.lua",
+        "bytes": 1258,
+        "sha256": "C7946DE06186E5EB3EFC9824886DF46B6C50E2F2513611EBA5AAC98A91B67403"
+      },
+      {
+        "path": "source/research/science.lua",
+        "bytes": 52836,
+        "sha256": "8E93E4D857E21EE3E3417B7118EC3D21A94BBB571759674D8A79AC2B9858F03B"
+      },
+      {
+        "path": "source/research/scripted_effects.lua",
+        "bytes": 3822,
+        "sha256": "95709A47B52780AA731825E727F42CF1C82A1E471CCE9EEB786A399F48A10859"
+      },
+      {
+        "path": "source/research/settings.lua",
+        "bytes": 17134,
+        "sha256": "EC6C86948246D0BE078D84E0B5DCE3419C83075355184E7E21AF4F6819F484D2"
+      },
+      {
+        "path": "source/research/settings/space_age_scripted.lua",
+        "bytes": 1232,
+        "sha256": "F4DBACC656FCFEC925BB0286AD9F337CA4ADDCBDF8BE9D954FA306EC3274E5B5"
+      },
+      {
+        "path": "source/research/settings_profile.lua",
+        "bytes": 6931,
+        "sha256": "5280984D6E0EF574A115F31DAF783EA3BCDA7EF923851F260F81F6FAB71EB584"
+      },
+      {
+        "path": "source/runtime/agriculture.lua",
+        "bytes": 5652,
+        "sha256": "F0DCA2B45C38A099CC92F91ED2BF6F59F3437C183F67B0B8FA6C9AA64F6376FA"
+      },
+      {
+        "path": "source/runtime/cap_admission.lua",
+        "bytes": 2692,
+        "sha256": "BB0D9B0B62AC0DD8012CC424C3403B303E18347FBFCE0E250A65A81D5B9D1E54"
+      },
+      {
+        "path": "source/runtime/caps.lua",
+        "bytes": 8525,
+        "sha256": "BD56C4B19095B9EC39ECE9F8BDE5A3D5E38F2587D825EB14DA37E264E071D918"
+      },
+      {
+        "path": "source/runtime/competing_productivity.lua",
+        "bytes": 11645,
+        "sha256": "55B924C996C8901081C0E9B1F4DF5478ADCF4BDA7BAAEF91C2953048ED9BE05C"
+      },
+      {
+        "path": "source/runtime/configuration.lua",
+        "bytes": 347,
+        "sha256": "21C832FF2C234C178D86DA51E24ABA34A51724A009E9E8299EBBF62F91EDAD5E"
+      },
+      {
+        "path": "source/runtime/k2_imersite_migration.lua",
+        "bytes": 13832,
+        "sha256": "D16D44917D4A92EFF19A27A4F3A984F8819149AD0D22EBB35B1DC995A363ECCB"
+      },
+      {
+        "path": "source/runtime/legacy_cannon_credits.lua",
+        "bytes": 10384,
+        "sha256": "60FEE07DBFC9590F5426925E05CA287FC386DCDE5C2BF8EC405B99D2BA920DCD"
+      },
+      {
+        "path": "source/runtime/legacy_caps.lua",
+        "bytes": 23297,
+        "sha256": "C13466CF0416461F298217D897D060BA1AE916A571A51CA8A663371A3747EA18"
+      },
+      {
+        "path": "source/runtime/legacy_module_credits.lua",
+        "bytes": 10964,
+        "sha256": "EB6E25EA62C46D8B104F6C6218FD42EF156D863B31C052EDF879E86A25067B81"
+      },
+      {
+        "path": "source/runtime/library_translations.lua",
+        "bytes": 16237,
+        "sha256": "2F988BDE25CEA126465FD8E400361FB40352E2B0419D617EB2AEAC6AA9FC5FDF"
+      },
+      {
+        "path": "source/runtime/lifecycle.lua",
+        "bytes": 30843,
+        "sha256": "60A06504D5627DE232417DBC6FF569B94523A2C654DDA7AE375FD51F85BD815C"
+      },
+      {
+        "path": "source/runtime/native_credits.lua",
+        "bytes": 13393,
+        "sha256": "5A0B690558BA86805D9416FB7BA0EC049EDC28045EE10799B1D73A24E8CACBDB"
+      },
+      {
+        "path": "source/runtime/passive_repair.lua",
+        "bytes": 8942,
+        "sha256": "372C916BD649E7B0D2F27C75F91DDCDA9D04E822C697CFF6DA5AF1A64AB05EB9"
+      },
+      {
+        "path": "source/runtime/scripted_effects.lua",
+        "bytes": 5620,
+        "sha256": "A4018142388F74050D51BF2E324A93972F4791363CDF72618478F7D03C3C271A"
+      },
+      {
+        "path": "source/runtime/settings_profile.lua",
+        "bytes": 1551,
+        "sha256": "8FD62FA72627DD36DD555AB315057DB40B10DDAA9739B6199110258B3C0658F1"
+      },
+      {
+        "path": "source/runtime/spoilage.lua",
+        "bytes": 5031,
+        "sha256": "92EB26A9AB6143C16A115A3838818C9BAB5644D362B3D2C8F06C223B8FA3EC7D"
+      },
+      {
+        "path": "source/runtime/spoilage_contribution.lua",
+        "bytes": 3017,
+        "sha256": "310902911FC91B920CB2111D81B72D756EE37A2FD059830CBA4FD0A14E4EF4C9"
+      },
+      {
+        "path": "source/settings.lua",
+        "bytes": 55,
+        "sha256": "74CA40A95F0B4F96F2D05F4ABC46725E761F8EDC4E142F82DCDB7643257A2121"
+      },
+      {
+        "path": "source/thumbnail.png",
+        "bytes": 90975,
+        "sha256": "65FDEC0B0B30967B0EDBC3B340D87B01D6A2E6D971A731734673023C02331FAB"
+      }
+    ]
+  },
+  "bootstrap_readback": {
+    "old_bytes": 28235,
+    "old_sha256": "9082E729CAC88C38182576DE88B5B2C378ECD0333339BAAE0A93DAD0DDFB8EDB",
+    "all_existing_bytes_reproduced_after_removing_exact_additions": true,
+    "additions": [
+      "Conditional diagnostic-module import",
+      "Explicit diagnostic command registration",
+      "One bounded server-targeted report after initialization",
+      "One bounded server-targeted report after configuration reconciliation"
+    ],
+    "review": "Existing init/config reconcilers, on_load, event registration, timer reconciliation and handler bodies retain exact prior bytes. The new report writes are real changed lifecycle behavior and remain native checks, not a reason to relabel earlier reload observations."
+  },
+  "retained_inputs": [
+    {
+      "path": "spec/evidence/support-exports-coherent17-aero-reproduction-r01.json",
+      "sha256": "7F4308328EBFF603BEFE2F689616AAB9735A8DC2211218D066FB49DBC73A948F",
+      "bytes": 14664
+    },
+    {
+      "path": "spec/evidence/current-7b0-nongui-aero-applicability-r01.json",
+      "sha256": "552C495EB545F38597528FC020752105CEC2D9698CB2414A9116FABAE70C5572",
+      "bytes": 13913
+    },
+    {
+      "path": "spec/evidence/aai-complete-data-independent-aero-r01.json",
+      "sha256": "6A58EC94EB52FF36CB5E1BFDF5D52209AE366A055CAF372B68C37B2825A885CB",
+      "bytes": 7243
+    },
+    {
+      "path": "spec/evidence/q006-independent-current-data-aero-r01.json",
+      "sha256": "36FC2582E0C266037571551BC2D0833068DF7290E4F7DDE24134485574BE3B74",
+      "bytes": 7411
+    },
+    {
+      "path": "spec/evidence/f210-current38c-menu-native-chain-r01.json",
+      "sha256": "4EE86E3B24891D8C499A601F91AB0211CF1EED3E6BFAE454C0F0F30C8DDB1918",
+      "bytes": 181314
+    },
+    {
+      "path": "spec/evidence/runtime-current38c-complete-native-chain-r01.json",
+      "sha256": "8353045BC60BEBCFA6F3DE072FB600EF3CF93AE610BE80C8C194D99F701D45C0",
+      "bytes": 8629
+    }
+  ],
+  "data_and_settings": {
+    "review": "All data/settings entrypoints, settings schema/codec, Generator, research catalogue/builders, compatibility adapters, platform adapters, migrations and runtime research/effect owners are byte-identical across this delta. AAI q043/q044 and Bob/Angel q006 captured comparisons retain their prior scoped data-path applicability, original575e/A8/FE4 engine/profile identity and explicit added/presentation dispositions. No new native data, useful effect, physical output or complete-family verdict is inferred.",
+    "broad_startup": "Original broad startup observations are retained. This delta does not change their data-stage inputs, but different archive/localization parsing and runtime exports do not establish a newly timed or newly executed final-package boot. No redundant broad sweep is required solely by these export controls."
+  },
+  "historical_stable_editions": {
+    "targets": [
+      "f013",
+      "f014",
+      "f015",
+      "f016",
+      "f017",
+      "f100",
+      "f110"
+    ],
+    "package_delta": [
+      "changelog.txt",
+      "locale/de/mir-library.cfg",
+      "locale/en/mir-library.cfg"
+    ],
+    "review": "Independent actual ZIP readback records these exact three changed payloads for each of seven stable historical editions. They do not ship the modern runtime modules or Library. Existing named same-edition gameplay/upgrade observations retain prior applicability and original execution identity; these unused strings introduce no historical research/migration rerun. This does not close the three new missing published forward journeys."
+  },
+  "modern_gameplay_and_routes": {
+    "review": "Native research, cap, ownership, migration, repair/agriculture/spoilage work and event handlers have unchanged implementations. Preserve named original saved-state and useful-work results, including the protected publishedF200-to-F210 Base route. The only bootstrap additions occur after existing init/config reconciliation and do not add on_load or periodic callbacks. New header/file targeting and error handling need native lifecycle observation. The two F100-origin and F110-to-F210 routes still need their actual protected-origin runs; adjacent passes and fixture controls are not substitutes.",
+    "measurement_limit": "Original68-launch repair/agriculture timing and memory observations retain their original candidate/archive identity. Newly imported modules, retained code footprint and file writes mean no new full-process startup, save-load, peak/retained memory or Library elapsed values are inferred."
+  },
+  "affected_native_checks": [
+    "F200/F210 actual EN/DE full/compact/diagnostic controls, exact preview/file equality and requesting-peer/server-only output destinations",
+    "Existing earned/private/foreign research and startup settings unchanged through actions, write failures, rejoin and saved-host restart",
+    "Actual init/config header behavior, clear local failures and no unsolicited on_load/rejoin/periodic output",
+    "Final whole-product Base/SpaceAge/heavy-profile startup, active-factory, save-load and applicable Library/peak/retained-memory acceptance under their declared observers"
+  ],
+  "new_native_execution": false,
+  "new_scored_dataset": false,
+  "release_qualification": false
+}

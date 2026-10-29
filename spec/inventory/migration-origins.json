@@ -4106,12 +4106,17 @@
             "origin": "published4.7.3 F110",
             "destination": "MIR5 F210",
             "status": "needs-correction",
-            "problem": "preparation/native-owner binding:new exact F210 fixture/profile has7 passing host controls and a seven-member reproduced container;Black Glass actual caller/container binding and correctionB package freeze remain. Existing F110-to-F200 pass is not this route.",
+            "problem": "preparation/native-owner binding:exact F210 fixture has7 passing host controls and a seven-member reproduced container;candidateB is now independently reproduced and its exact B637 successor profile is committed. Black Glass actual caller/container binding and execution remain. Existing F110-to-F200 pass is not this route.",
             "next_action": "Review the prepared handoff,bind actual final modern bytes/container/controller,then execute unchanged protectedD524 directly with one new lab/save/two cold reloads. No source recreation or blanket configuration bypass.",
             "source_sha256": "D524AA78440F242B179A1E9BC40BF89B87C1A66E99F64C14D3250DEAEBB69253",
             "prepared_inputs": {
               "path": "spec/evidence/published473-f110-f210-prepared-aero-r01.json",
               "sha256": "4310DC0CD8ABC4EB6FC465897C06315BBA5DE9A9906E5B936D594B01BFB52FD8"
+            },
+            "prepared_final_candidate_profile": {
+              "path": "tests/profiles/published473-f110-f210-support-exports-base-r01.json",
+              "sha256": "B473BABB93A54857ADE9E3773668F9F17E13CC2A1AD0EE198CB0D70360EB62C6",
+              "package_readback": "spec/evidence/support-exports-coherent17-aero-reproduction-r01.json"
             }
           },
           {
@@ -4137,7 +4142,7 @@
             ]
           }
         ],
-        "final_package_review": "Required separately for every named route after correctionB/final freeze;none of the new required missing journeys is deferred. Fixture/packet preparation is not a native pass or an instruction to occupy more than the sole admitted native lane."
+        "final_package_review": "Required separately for every named route after final freeze. CandidateB package/member readback and bounded prior-result applicability are recorded in spec/evidence/support-exports-coherent17-aero-reproduction-r01.json and spec/evidence/support-exports-consumed-path-applicability-aero-r01.json;affected modern header/export/lifecycle and performance observations remain. None of the three new missing journeys is deferred. Fixture/packet preparation is not a native pass or authorization to occupy more than the sole admitted native lane."
       },
       "permitted_limits": [
         {

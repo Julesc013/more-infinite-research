@@ -81,6 +81,21 @@ The following named cases have actual published4.7.3 source,successor-save and t
 
 For engine changes,the separately observed [F110-to-F200](../spec/evidence/f110-f200-current7a2-native-chain-r01.json) and [F200-to-F210 Base](../spec/evidence/full-catalogue-473-f200-current7a2-native-chain-r01.json) routes reuse their protected originals. The [F100-to-F110 laser case](../spec/evidence/f100-f110-laser-native-chain-r03.json) starts from a fresh MIR5 F100 save and tests the laser identity/effect-category rename;it is not a published MIR4 laser save. Uncertain older histories,unselected DLC/provider permutations and best-effort editions retain their explicit limits.
 
+## Requested published cross-edition routes
+
+The four requested published4.7.3 histories are separate obligations. Passing adjacent upgrades does not establish a skipped-engine destination. The [four-route inventory](../spec/inventory/migration-origins.json) retains exact protected sources, expected research/effects and remaining execution work.
+
+| Published origin | MIR5 destination | Current evidence and next check |
+|---|---|---|
+| F100 | F110 | Native result pending. The [bounded shared-source preparation](https://github.com/Julesc013/more-infinite-research/pull/1427) adds laser/inserter witnesses to one disposable copy of the protected published source while retaining its actual mining work. The older MIR5-origin laser pass does not satisfy this route. |
+| F100 | F210 | Native result pending. Reuse that same enhanced published source; attempt the destination directly before admitting any engine-required bridge. Do not substitute the MIR5 F110 destination save. |
+| F110 | F210 | [Exact fixture and protected source prepared](../spec/evidence/published473-f110-f210-prepared-aero-r01.json), with the [export-candidate profile](../tests/profiles/published473-f110-f210-support-exports-base-r01.json) pinned. Actual native-owner binding and the new research/save/two-reload run remain. The observed F110-to-F200 route is distinct. |
+| F200 Base | F210 Base | The [protected published-origin route passes](../spec/evidence/full-catalogue-473-f200-current7a2-native-chain-r01.json) at its recorded inputs. Retain that result and check only affected final-package paths; no DLC/provider/settings switch is implied. |
+
+Each new destination must retain earned levels/bonuses, caps, queued and suspended work and foreign state, then complete useful new research, save and cold-reload twice. The two F100 destinations share one enhanced source, rather than recreating historical worlds. An intermediate engine save is allowed only after preserving an actual direct engine-format refusal, without unnecessarily installing MIR5 on that intermediate engine.
+
+The [export-package reproduction](../spec/evidence/support-exports-coherent17-aero-reproduction-r01.json) and [consumed-path review](../spec/evidence/support-exports-consumed-path-applicability-aero-r01.json) identify the current candidate separately from original native results. Historical player logic, data construction, migrations and research/effect handlers are unchanged by the thin export controls. Modern initialization/configuration report writes, GUI/file targeting, failure handling and affected performance still need their native observations; package integrity is not release acceptance.
+
 ## Researched planet still locked
 
 MIR preserves ambiguous locks rather than deciding that another mod was wrong. For a deliberately chosen one-time repair on Factorio 2.1 Space Age, first confirm that no active mod intends that lock. The following player-console example targets only your current force and Vulcanus, and only when the current researched technology contains the matching native unlock effect. It leaves unresearched discoveries and other forces alone. The [LuaForce API](https://lua-api.factorio.com/latest/classes/LuaForce.html#unlock_space_location) provides the operation; the methods are also present in the locally inspected 2.1.23 API documentation. This is operator recovery guidance, not a MIR migration qualification result.
@@ -122,3 +137,7 @@ The original request/issue IDs and independent expected behavior must remain dis
 ## Performance claims
 
 Report whole-game startup separately from MIR-added startup. Headless creation/save, responsive menu, save load, first Library use and simulation are separate measurements. A one-technology demo or source-size reduction cannot establish the full replacement's performance. Missing data is inconclusive, not a proof of non-regression.
+
+The [accepted F210 Bob/Angel/Space Age startup experiment](../spec/evidence/f210-current38c-menu-native-chain-r01.json) records published4.7.3 mean30.9252 seconds and the tested MIR5 candidate mean28.3224 seconds: about2.60 seconds or8.42% less total startup time for that exact workload, with its declared repeatability/drift controls passing. Its MIR-added-time criterion is separate from that whole-process percentage. The [68-launch active repair/agriculture campaign](../spec/evidence/runtime-current38c-complete-native-chain-r01.json) also passes its declared timing/process-memory limits with actual useful work observed. Both retain their tested archive identities; they do not supply new timings for the export-enabled candidate.
+
+Final whole-product qualification uses the three declared workloads on the pinned2.0 and2.1 engines: Base, Space Age, and a finite selection of upstream-valid heavy Space Age configurations. Full process-start-to-responsive-menu, large active-factory simulation, spikes, useful-work/queue delays, save loading and peak/retained memory remain distinct endpoints; Library use is one component. First-after-reboot observations are distinguished from fresh-process repeat launches. The remaining Library/save-load/memory comparison and final affected measurements are unaccepted, so a startup result alone does not establish complete performance acceptance.

@@ -1,0 +1,138 @@
+{
+  "schema": 1,
+  "kind": "MIRBaseF210MenuInitializationAdverseNativeChainV1",
+  "status": "stopped-first-warmup-before-native-initialization",
+  "public_source": "b7caa8df9141523a556bb57ca8faf7c43d250c3d",
+  "private_source": "a6e713a94945cafe8e727fd1fabb16ec4352ff49",
+  "packet_sha256": "82818524D212ADB216B267DD658044A638929B80C85B83B280A84880C210FF72",
+  "caller_sha256": "EE972A80DBB75E9C935F13D9283D4ACD289FB466328ED6DD1C7C0478782A92D9",
+  "engine": {
+    "path": "D:\\Games\\Factorio\\2.1\\bin\\x64\\factorio.exe",
+    "bytes": 49398736,
+    "sha256": "8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38",
+    "version": "2.1.23"
+  },
+  "profile": {
+    "path": "D:\\Projects\\Factorio\\mir5-whole-product-capture-fixed-r01\\build\\tmp\\whole-product-base-f210-menu-inputs-r01\\base-f210.json",
+    "bytes": 1188,
+    "sha256": "95E0DF366DF0914493B7BAC46A5D930EB15813AFA845AC29547209EAC0F9C467"
+  },
+  "launch": {
+    "kind": "MIRDirectLibraryOwnedMenuLaunchV1",
+    "factorio_path": "D:\\Games\\Factorio\\2.1\\bin\\x64\\factorio.exe",
+    "factorio_sha256": "8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38",
+    "arguments": [
+      "--config",
+      "D:\\Projects\\Factorio\\mir5-whole-product-capture-fixed-r01\\build\\tmp\\whole-product-base-f210-menu-r01\\runs\\01-warmup-control-without-mir\\config.ini",
+      "--mod-directory",
+      "D:\\Projects\\Factorio\\testmods\\2.1",
+      "--no-log-rotation"
+    ],
+    "engine_current_log": "D:\\Projects\\Factorio\\mir5-whole-product-capture-fixed-r01\\build\\tmp\\whole-product-base-f210-menu-r01\\write-data\\ordinary-menu-shared\\factorio-current.log",
+    "timeout_seconds": 300
+  },
+  "native_processes": 1,
+  "completed_warmups": 0,
+  "aa_observations": 0,
+  "scored_observations": 0,
+  "accepted_observations": 0,
+  "observation": {
+    "kind": "MIRBaseF210MenuInitializationAdverseRootReadbackV1",
+    "packet_sha256": "82818524D212ADB216B267DD658044A638929B80C85B83B280A84880C210FF72",
+    "terminal_sha256": "046725E91597461C0B39F7720817101C88F7371889C9C39A27617D4494D65851",
+    "custody": {
+      "custody": {
+        "files_per_copy": 11,
+        "bytes_per_copy": 231268
+      },
+      "controller_custody": {
+        "files_per_copy": 3,
+        "bytes_per_copy": 2032656
+      }
+    },
+    "native_processes": 1,
+    "factorio_pid": 17256,
+    "factorio_start_utc": "2026-10-29T15:58:53.6368883Z",
+    "governed_parent_pid": 66500,
+    "completed_warmups": 0,
+    "aa_observations": 0,
+    "scored_observations": 0,
+    "accepted_observations": 0,
+    "capture_requests": 0,
+    "frames": 0,
+    "initialization_line_observed": false,
+    "last_native_log_line": "  19.684 Loading sounds...",
+    "actor": {
+      "kind": "MIRDirectLibraryOwnedMenuObservationV1",
+      "status": "failed",
+      "launch_spec_sha256": "A30DD36F3934F9A07C475105968391BE6049DE0EB3BF1363714982053F5C8F66",
+      "factorio_sha256": "8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38",
+      "process_id": 17256,
+      "process_start_utc": "2026-10-29T15:58:53.6368883Z",
+      "launch_before_qpc": 22799760262258,
+      "launch_after_qpc": 22799760314677,
+      "clock_frequency": 10000000,
+      "process_start_bracket_seconds": 0.0052419,
+      "observation": null,
+      "observer_diagnostics": {
+        "schema": 1,
+        "capture_requests": 0,
+        "captured_frames": 0,
+        "no_main_window": 0,
+        "not_visible_or_minimized": 0,
+        "foreground_mismatch": 0,
+        "foreground_request_attempts": 0,
+        "foreground_request_refused": 0,
+        "foreground_request_not_acquired": 0,
+        "client_geometry_unavailable": 0,
+        "offscreen": 0,
+        "occluded": 0,
+        "last_occlusion": null,
+        "last_rejection": ""
+      },
+      "failure": "[mir-menu-main-menu-not-observed]",
+      "cleanup": "owned-process-forced-stop",
+      "observation_finished_qpc": 22802761366789,
+      "cleanup_finished_qpc": 22802787239393,
+      "shutdown_cleanup_seconds": 2.5872604,
+      "full_engine_cycle_seconds": 302.6977135,
+      "claims_library_selection_validation": false,
+      "claims_final_acceptance": false
+    },
+    "resource_ledger_rows": 227,
+    "resource_terminal": {
+      "observed_at": "2026-10-29T16:03:56.7626622+00:00",
+      "phase": "interrupted",
+      "timed_out": false,
+      "error": "[mir441-process-exit] 1",
+      "resource_admission": null,
+      "peak_working_set_bytes": 704028672,
+      "peak_sampled_private_bytes": 852574208
+    },
+    "original_archives_controls_restored": true,
+    "factorio_processes_after": 0,
+    "cause_identified": false,
+    "performance_acceptance": false,
+    "release_qualification": false
+  },
+  "readback": {
+    "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\whole-product-base-f210-menu-r01-controller\\root-adverse-readback.json",
+    "sha256": "3926A39EF71B08936E99644C00FFB4E14D1816E6C401F08AD0AF6CFB9A0AF5D8"
+  },
+  "receipt_capsule": {
+    "path": "spec/evidence/whole-product-base-f210-menu-initialization-adverse-receipts-r01.json.gz",
+    "sha256": "C22779CDAA848A2CF1991F6173C3FCA886B6728733645E0F465BDE1962725750",
+    "bytes": 36705,
+    "bodies": 16
+  },
+  "independent_review": "Actual raw-data review confirms the one NoMIR engine, missing initialization line, zero capture attempts, owned forced stop, exact original/copied custody and complete restoration. Cause remains unidentified.",
+  "limits": [
+    "The actor waits for Factorio initialised before attempting HWND or capture checks. Zero window counters do not prove that no window existed.",
+    "Loading sounds is the last logged stage, not an established audio cause. No engine crash, MIR regression or candidate failure is inferred.",
+    "The new PNG writer was never invoked. Its correction is neither tested nor implicated by this run.",
+    "The internal 300-second actor observation limit expired; the parent governor did not report its own timeout or memory breach.",
+    "This was a fresh-process observation, not reboot-cold. No responsive-menu, runtime, gameplay or release result exists."
+  ],
+  "performance_acceptance": false,
+  "release_qualification": false
+}
