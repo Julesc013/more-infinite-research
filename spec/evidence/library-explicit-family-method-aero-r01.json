@@ -1,0 +1,56 @@
+{
+  "schema": 1,
+  "kind": "MIRPairedLibraryExplicitFamilyMethodCorrectionV1",
+  "status": "host-verified-method-preparation-not-native-acceptance",
+  "base": "5eac2235e74a2b30e5b2ac7b5eb6636fcb25ddba",
+  "original_result": "spec/evidence/library-current-e9-r01-native-chain.json",
+  "unchanged_diagnostic": "spec/evidence/library-current-e9-repeatability-diagnostic-plan-r02.json",
+  "problem": "Original public calls omit the family option. Captured default views differ:published All research,current MIR research. Passing same-input timing arithmetic would not establish matched view/output.",
+  "correction": {
+    "public_option": {
+      "family": "all"
+    },
+    "actual_gui_value": "mir-browser.scope-all",
+    "published_shape": "The family dropdown is unnamed but tagged mir_browser=family within the existing body/mir_browser_filters flows. Inspect at most8 direct fields and3 children per field;require one matching picker.",
+    "current_shape": "The family dropdown is root/mir_library_filters/mir_library_family.",
+    "bounds": "Require a valid drop-down,integral selected index within at most512 items and one exact LocalisedString key for All research. No private MIR storage or player module imports.",
+    "action_markers": {
+      "requested_family": "all",
+      "native_family_verified": "true only for the four action records that immediately follow both actual GUI checks;false for readiness/completion records."
+    },
+    "post_capture_render_grace": "After the late first-open request,wait a further60 ticks before search changes the GUI. All profiler intervals exclude this grace. Original R02 images remain adverse query-boundary evidence.",
+    "scope": "All four actions and both unchanged-root delayed capture boundaries preserve the chosen family,queries,selections and native snapshots. Existing12 PNGs,profilers and settlement remain."
+  },
+  "independent_expectation": {
+    "published_git_object": "v4.7.2:source/prototypes/mir/runtime/research_browser.lua",
+    "published_source_sha256": "FF0F10494B38753BD17609CA5FE8ABBFD8BF967D54C23F24CEFFECB4FCCF56C0",
+    "current_paths": [
+      "source/runtime/bootstrap.lua",
+      "source/runtime/library.lua"
+    ],
+    "basis": "Both published and current public interfaces accept family=all,and their native dropdown captions use the existing scope-all localization key. The test checks actual GUI output after the public request rather than assuming the requested option was applied."
+  },
+  "host_opponents": [
+    "Before correction,the new explicit-option assertion fails in both arms:all eight recorded calls omit family.",
+    "Correct query/detail with wrong MIR family must fail.",
+    "Missing family picker must fail.",
+    "A same-root late reset to MIR family must fail.",
+    "Published duplicate or unbounded filter layouts must fail.",
+    "Session reader rejects wrong requested family,unverified native output and string-valued proof flags.",
+    "Before the render-grace fix,a deferred-render opponent fails both arms when search changes GUI in the same tick as the late first-open request. After correction,search starts60 ticks later."
+  ],
+  "native_execution": false,
+  "replacement_acceptance_dataset_declared": false,
+  "player_source_changed": false,
+  "before_any_acceptance_dataset": [
+    "Complete and independently read back the existing fixed diagnostic,without changing its pins or relabelling original outcomes.",
+    "Freeze a separate reviewed method/schedule,including the new helper/fixture hashes and all original practical limits.",
+    "Run bounded exact-engine preflight for both actual arms;verify requested/actual All scope and all role/phase outputs before scored data.",
+    "If native GUI getters/layout differ from this declared projection,retain the refusal and correct only the demonstrated projection before a separately reviewed dataset. Do not admit MIR scope or silently remove the native check."
+  ],
+  "limits": [
+    "No old result is promoted to matched-view evidence.",
+    "No player code,settings,tolerance,complete comparison or runtime optimization is introduced.",
+    "This record does not resolve same-build noise,retained memory or functional private-state gaps."
+  ]
+}

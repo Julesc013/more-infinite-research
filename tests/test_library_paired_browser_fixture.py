@@ -139,6 +139,13 @@ class LibraryPairedBrowserFixtureTests(unittest.TestCase):
             local function render_public(player, options)
               local root = element("frame", "mir_research_browser")
               root.visible = true
+              local family = element("drop-down", "fixture-family")
+              family.items = arm == "published" and {{"mir-browser.scope-all"},{"mir-browser.scope-mir"}}
+                or {{"mir-browser.scope-mir"},{"mir-browser.scope-all"}}
+              local requested_family = options.family or (arm == "published" and "all" or "mir")
+              local choose_all = requested_family == "all" and opponent ~= "wrong-family"
+              family.selected_index = arm == "published" and (choose_all and 1 or 2) or (choose_all and 2 or 1)
+              player.fixture_family_picker = family
               if arm == "published" then
                 local tabs = element("tabbed-pane", "mir_browser_tabs")
                 local content = element("flow", "mir_browser_research_content")
@@ -150,6 +157,14 @@ class LibraryPairedBrowserFixtureTests(unittest.TestCase):
                 panes["mir_browser_research_list"] = list_column
                 panes["mir_browser_research_detail"] = element("flow", "mir_browser_research_detail")
                 body["mir_browser_research_results"] = panes
+                local filters = element("table", "mir_browser_filters")
+                family.tags = {mir_browser="family"}
+                filters.children = opponent == "missing-family" and {} or {{valid=true,children={family}}}
+                if opponent == "duplicate-family" then filters.children[2] = {valid=true,children={family}} end
+                if opponent == "unbounded-family-fields" then
+                  for index=2,9 do filters.children[index]={valid=true,children={}} end
+                end
+                body["mir_browser_filters"] = filters
                 content["mir_browser_body"] = body
                 tabs["mir_browser_research_content"] = content
                 root["mir_browser_tabs"] = tabs
@@ -158,6 +173,7 @@ class LibraryPairedBrowserFixtureTests(unittest.TestCase):
                 local tabs = element("tabbed-pane", "mir_library_tabs")
                 local content = element("flow", "mir_library_research_content")
                 filters["mir_library_query"] = {valid=true, type="textfield", text=options.search}
+                if opponent ~= "missing-family" then filters["mir_library_family"] = family end
                 content["mir_library_results"] = listbox("mir_library_results")
                 content["mir_library_detail"] = element("flow", "mir_library_detail")
                 tabs["mir_library_research_content"] = content
@@ -217,7 +233,14 @@ class LibraryPairedBrowserFixtureTests(unittest.TestCase):
               if interface ~= "more-infinite-research-browser" or method ~= "open" then error("unexpected public interface call") end
               local player = players[player_index]
               if player == nil then return false end
-              calls[#calls+1]={player=player_index, query=options.search, selected=options.selected, tab=options.tab, sort=options.sort}
+              if opponent == "deferred-render" then
+                for _, capture in ipairs(screenshots) do
+                  if string.find(capture.path, "first-open-settled", 1, true) and capture.tick == env.game.tick then
+                    error("next action changed GUI before settled screenshot render")
+                  end
+                end
+              end
+              calls[#calls+1]={player=player_index, query=options.search, selected=options.selected, tab=options.tab, sort=options.sort, family=options.family}
               action_ticks[#action_ticks+1]=env.game.tick
               if opponent == "remote-false" then return false end
               if opponent == "native-mutation" then force.recipes["iron-gear-wheel"].productivity_bonus=.1 end
@@ -300,12 +323,15 @@ class LibraryPairedBrowserFixtureTests(unittest.TestCase):
             end
             readiness[#readiness+1]={phase="initial",calls=#calls,screenshots=#screenshots}
             if opponent == "late-initial-locale" then de.locale="de" end
-            for _, tick in ipairs({initial_ready_tick,initial_ready_tick+60,initial_ready_tick+120,initial_ready_tick+180}) do
+            for _, tick in ipairs({initial_ready_tick,initial_ready_tick+60,initial_ready_tick+120,initial_ready_tick+180,initial_ready_tick+240}) do
               if tick == initial_ready_tick+60 and opponent == "changed-settled-root" then
                 en.gui.screen["mir_research_browser"] = {valid=true}
               end
               if tick == initial_ready_tick+60 and opponent == "settled-native-mutation" then
                 force.recipes["iron-gear-wheel"].productivity_bonus=.1
+              end
+              if tick == initial_ready_tick+60 and opponent == "late-family-reset" then
+                en.fixture_family_picker.selected_index = arm == "published" and 2 or 1
               end
               env.game.tick=tick
               ok,message=invoke(callbacks.events[2],{tick=tick})
@@ -502,6 +528,9 @@ class LibraryPairedBrowserFixtureTests(unittest.TestCase):
                 self.assertEqual([row["action_call_count"] for row in action_markers], [2, 2, 2, 2])
                 self.assertTrue(all(row["profiler_observation_only"] for row in result["markers"]))
                 self.assertTrue(all(row["performance_acceptance"] is False for row in result["markers"]))
+                self.assertTrue(all(row['requested_family'] == 'all' for row in result['markers']))
+                self.assertEqual([row['stage'] for row in result['markers'] if row['native_family_verified']],
+                                 ['first-open', 'search', 'refresh', 'reopen'])
                 self.assertEqual([row["path"] for row in result["screenshots"]], [
                     f"mir5-library-paired-browser/{stage}-{player}.png"
                     for stage in ("first-open", "first-open-settled", "search", "refresh", "reopen", "reopen-settled") for player in (1, 2)
@@ -515,6 +544,31 @@ class LibraryPairedBrowserFixtureTests(unittest.TestCase):
                 for early, late in zip(immediate[:2] + immediate[-2:], settled):
                     self.assertEqual(late["tick"] - early["tick"], 60)
                     self.assertEqual(late["calls_seen"], early["calls_seen"])
+
+    def test_each_public_call_explicitly_selects_all_research(self):
+        for arm in ARMS:
+            with self.subTest(arm=arm):
+                result = self.runtime_result(arm)
+                self.assertTrue(result['ok'], result['message'])
+                self.assertEqual([row.get('family') for row in result['calls']], ['all'] * 8)
+
+    def test_next_action_waits_after_the_settled_screenshot_request(self):
+        for arm in ARMS:
+            with self.subTest(arm=arm):
+                result = self.runtime_result(arm, 'deferred-render')
+                self.assertTrue(result['ok'], result['message'])
+                late = next(row for row in result['screenshots'] if row['path'].endswith('first-open-settled-2.png'))
+                self.assertEqual(result['action_ticks'][2] - late['tick'], 60)
+
+    def test_published_family_lookup_rejects_duplicate_or_unbounded_filter_layout(self):
+        for opponent, message in [
+            ('duplicate-family', 'public browser family selector is duplicated'),
+            ('unbounded-family-fields', 'public browser family selector layout differs'),
+        ]:
+            with self.subTest(opponent=opponent):
+                result = self.runtime_result('published', opponent)
+                self.assertFalse(result['ok'])
+                self.assertIn(message, result['message'])
 
     def test_emitted_profiler_actions_match_the_shared_reader_contract(self):
         for arm in ARMS:
@@ -564,7 +618,7 @@ class LibraryPairedBrowserFixtureTests(unittest.TestCase):
                 ])
                 # One simulated post-load tick now precedes the cold joins;
                 # the 120-tick wait after the latest staggered join is intact.
-                self.assertEqual(result["action_ticks"], [151,151,211,211,271,271,481+1,481+1])
+                self.assertEqual(result["action_ticks"], [151,151,271,271,331,331,541+1,541+1])
 
     def test_restart_ready_waits_without_actions_until_the_host_actually_restarts(self):
         for arm in ARMS:
@@ -599,6 +653,9 @@ class LibraryPairedBrowserFixtureTests(unittest.TestCase):
             ("queued-research", "fresh paired Browser seed research queue is not empty"),
             ("remote-false", "public browser interface did not open"),
             ("bad-shape", "public browser detail differs"),
+            ("wrong-family", "public browser family scope differs from declared all research"),
+            ("missing-family", "public browser family scope differs from declared all research"),
+            ("late-family-reset", "public browser family scope differs from declared all research"),
             ("native-mutation", "public Browser actions mutated named native research, queue, or recipes"),
             ("changed-settled-root", "settled capture lost the original public Browser root"),
             ("settled-native-mutation", "public Browser actions mutated named native research, queue, or recipes"),

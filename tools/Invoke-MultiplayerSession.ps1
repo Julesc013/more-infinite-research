@@ -657,6 +657,9 @@ function Get-PairedBrowserStageMarker([string]$Text, [string]$Stage, [string]$Ex
   $expected = $expectations[$Stage]
   Assert-Session ($row.status -is [string] -and $row.status -ceq $expected.status) "$Stage paired Browser status differs"
   Assert-Session ($row.arm -is [string] -and $row.arm -ceq $ExpectedArm) "$Stage paired Browser arm differs"
+  Assert-Session ($row.requested_family -is [string] -and $row.requested_family -ceq 'all') "$Stage paired Browser requested family differs"
+  $familyVerified = $Stage -cin @('first-open','search','refresh','reopen')
+  Assert-PairedBrowserBoolean $row.native_family_verified $familyVerified 'native_family_verified' $Stage
   Assert-PairedBrowserInteger $row.join_events $expected.joins 'join_events' $Stage
   Assert-PairedBrowserInteger $row.action_call_count $expected.actions 'action_call_count' $Stage
   Assert-PairedBrowserInteger $row.screenshot_calls $expected.screenshots 'screenshot_calls' $Stage

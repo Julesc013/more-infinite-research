@@ -30,6 +30,7 @@ local ARMS = {
       query = "mir_browser_search",
       body = "mir_browser_body",
       results = "mir_browser_research_results",
+      family_filters = "mir_browser_filters",
       list_column = "mir_browser_research_list",
       list = "mir_browser_research_entries",
       detail = "mir_browser_research_detail"
@@ -44,6 +45,7 @@ local ARMS = {
       tabs = "mir_library_tabs",
       content = "mir_library_research_content",
       query = "mir_library_query",
+      family = "mir_library_family",
       results = "mir_library_results",
       detail = "mir_library_detail"
     }
@@ -209,16 +211,50 @@ local function child(parent, name)
   return valid(parent) and parent[name] or nil
 end
 
+local function published_family_picker(filters)
+  if not valid(filters) then return nil end
+  local fields = filters.children
+  if type(fields) ~= "table" or #fields > 8 then fail("public browser family selector layout differs") end
+  local found
+  for _, field in ipairs(fields) do
+    local elements = valid(field) and field.children or nil
+    if type(elements) ~= "table" or #elements > 3 then fail("public browser family selector layout differs") end
+    for _, element in ipairs(elements) do
+      local tags = valid(element) and element.tags or nil
+      if valid(element) and element.type == "drop-down" and type(tags) == "table"
+          and tags.mir_browser == "family" then
+        if found ~= nil then fail("public browser family selector is duplicated") end
+        found = element
+      end
+    end
+  end
+  return found
+end
+
+local function assert_all_family(picker)
+  local items = valid(picker) and picker.items or nil
+  local index = valid(picker) and picker.selected_index or nil
+  if not valid(picker) or picker.type ~= "drop-down" or type(items) ~= "table" or #items > 512
+      or type(index) ~= "number" or index ~= math.floor(index) or index < 1 or index > #items then
+    fail("public browser family scope differs from declared all research")
+  end
+  local selected = items[index]
+  if type(selected) ~= "table" or #selected ~= 1 or selected[1] ~= "mir-browser.scope-all" then
+    fail("public browser family scope differs from declared all research")
+  end
+end
+
 local function assert_shape(player, arm, view)
   local root = player.gui and player.gui.screen and player.gui.screen[ROOT]
   if not valid(root) or root.type ~= "frame" or root.visible ~= true then
     fail("public browser root is absent or hidden")
   end
-  local shape, query, results, detail
+  local shape, query, results, detail, family
   shape = arm.shape
   if shape.filters then
     local filters = child(root, shape.filters)
     query = child(filters, shape.query)
+    family = child(filters, shape.family)
     local tabs = child(root, shape.tabs)
     local content = child(tabs, shape.content)
     results, detail = child(content, shape.results), child(content, shape.detail)
@@ -227,10 +263,12 @@ local function assert_shape(player, arm, view)
     local content = child(tabs, shape.content)
     query = child(content, shape.query)
     local body = child(content, shape.body)
+    family = published_family_picker(child(body, shape.family_filters))
     local panes = child(body, shape.results)
     results = child(child(panes, shape.list_column), shape.list)
     detail = child(panes, shape.detail)
   end
+  assert_all_family(family)
   if not valid(query) or query.type ~= "textfield" or query.text ~= view.query then
     fail("public browser query differs from the submitted public search")
   end
@@ -243,7 +281,7 @@ end
 local function open(player, view)
   if not (remote.interfaces and remote.interfaces[BROWSER]) then fail("shipped public browser interface is absent") end
   local opened = remote.call(BROWSER, "open", player.index, {
-    tab = "research", search = view.query, selected = view.selected, sort = "progression"
+    tab = "research", search = view.query, selected = view.selected, sort = "progression", family = "all"
   })
   if opened ~= true then fail("public browser interface did not open") end
 end
@@ -260,6 +298,8 @@ local function marker(stage, state, status)
     join_events = state.join_events or 0,
     native_snapshot_unchanged = true,
     profiler_observation_only = true,
+    requested_family = "all",
+    native_family_verified = VIEWS[stage] ~= nil,
     performance_acceptance = false
   }))
 end
@@ -431,6 +471,11 @@ script.on_event(defines.events.on_tick, function()
   assert_snapshot(state, players.en.force)
   if state.phase == "first-open-capture" then
     capture_settled(state, "first-open", players)
+    -- Native screenshots render after this event. Keep the same GUI through
+    -- a separate render grace before the next public action changes it.
+    state.phase = "first-open-settled-render"
+    state.capture_after_tick = game.tick + CAPTURE_DELAY
+  elseif state.phase == "first-open-settled-render" then
     run_action(state, "search", players)
   elseif state.phase == "search-capture" then
     run_action(state, "refresh", players)

@@ -28,6 +28,8 @@ rejoin, then performs `reopen` the same way. The original eight immediate PNGs a
 
 The R01 native performance dataset exposed a missing cold-load readiness witness: the original fixture queued `ready` only for its initial saved world. The current fixture queues exactly one `ready` marker on the first runtime event after either actual load, using local flags only during `on_load`; it still waits for the two new clients and the original settlement delay before reopening. This observation correction qualifies no old missing measurement, changes no player code, and requires its own declared input hash before a replacement native experiment.
 
+The later matched-view fixture explicitly submits `family="all"` to both public interfaces. Their defaults differ: the original R01 screenshots show published All research and candidate MIR research. After each action and at both delayed captures, the fixture checks the actual native family dropdown's selected `mir-browser.scope-all` value. The published unnamed dropdown is found only within its bounded existing filter flows; missing, duplicate, wrong or changed scope refuses. Action markers carry the requested family and a strict native-verification flag that the session reader requires. This changes future fixture/method inputs only. Frozen R01/R02 diagnostic runs keep their original source, default-view discrepancy, stopping rules and unaccepted status; no replacement acceptance dataset is declared by this correction. Native preflight and independent protocol review must precede any new scored dataset.
+
 The R01 native performance dataset exposed a missing cold-load readiness witness: the original fixture queued `ready` only for its initial saved world. The current fixture queues exactly one `ready` marker on the first runtime event after either actual load, using local flags only during `on_load`; it still waits for the two new clients and the original settlement delay before reopening. This observation correction qualifies no old missing measurement, changes no player code, and requires its own declared input hash before a replacement native experiment.
 
 At every action boundary it compares a bounded public snapshot of two named
@@ -38,3 +40,5 @@ they do not establish live Library refresh, product tuning, screenshot rendering
 process memory, timing acceptance, or a release result. The existing
 `library-multiplayer` fixture remains the separate current-candidate functional
 scenario with its lab, queue, foreign-force, and ten-capture obligations.
+
+The delayed first-open screenshot request is followed by a separate60-tick render grace before search changes the GUI. Native R02 showed that changing the GUI in the screenshot-request tick renders the following query in that image;the original images and adverse interpretation remain retained. This preparation needs native confirmation of the captured query before a replacement dataset.

@@ -2812,6 +2812,10 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
             @{schema=1;case='library-paired-browser';stage='reopen';status='observed';arm='published';join_events=4;action_call_count=2;screenshot_calls=10;native_snapshot_unchanged=$true;profiler_observation_only=$true;performance_acceptance=$false},
             @{schema=1;case='library-paired-browser';stage='completed';status='passed';arm='published';join_events=4;action_call_count=2;screenshot_calls=12;native_snapshot_unchanged=$true;profiler_observation_only=$true;performance_acceptance=$false}
           )
+          foreach($row in $rows){
+            $row.requested_family='all'
+            $row.native_family_verified=$row.stage -cin @('first-open','search','refresh','reopen')
+          }
           function MarkerText($InputRows){return (($InputRows|ForEach-Object {'[MIR5_LIBRARY_PAIRED_BROWSER] '+($_|ConvertTo-Json -Compress)})-join "`n")+"`n"}
           $text=MarkerText $rows
           foreach($row in $rows){$accepted=Get-PairedBrowserStageMarker $text $row.stage 'published';if($accepted.stage-cne$row.stage){throw 'valid paired stage rejected'}}
@@ -2821,6 +2825,9 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
           function Assert-Rejects([scriptblock]$Block,[string]$Name){$rejected=$false;try{&$Block}catch{$rejected=$true};if(-not$rejected){throw "paired reader accepted invalid $Name"}}
           $duplicate=@($rows)+@($rows[-1]);Assert-Rejects {Get-PairedBrowserStageMarker (MarkerText $duplicate) 'completed' 'published'|Out-Null} 'duplicate stage'
           $wrongArm=$rows|ForEach-Object {$_|ConvertTo-Json -Compress|ConvertFrom-Json -AsHashtable};$wrongArm[1].arm='mir5';Assert-Rejects {Get-PairedBrowserStageMarker (MarkerText $wrongArm) 'first-open' 'published'|Out-Null} 'wrong arm'
+          $wrongFamily=$rows|ForEach-Object {$_|ConvertTo-Json -Compress|ConvertFrom-Json -AsHashtable};$wrongFamily[1].requested_family='mir';Assert-Rejects {Get-PairedBrowserStageMarker (MarkerText $wrongFamily) 'first-open' 'published'|Out-Null} 'wrong family'
+          $unverifiedFamily=$rows|ForEach-Object {$_|ConvertTo-Json -Compress|ConvertFrom-Json -AsHashtable};$unverifiedFamily[1].native_family_verified=$false;Assert-Rejects {Get-PairedBrowserStageMarker (MarkerText $unverifiedFamily) 'first-open' 'published'|Out-Null} 'unverified actual family'
+          $stringFamily=$rows|ForEach-Object {$_|ConvertTo-Json -Compress|ConvertFrom-Json -AsHashtable};$stringFamily[1].native_family_verified='true';Assert-Rejects {Get-PairedBrowserStageMarker (MarkerText $stringFamily) 'first-open' 'published'|Out-Null} 'nonboolean family proof'
           $stringJoin=$rows|ForEach-Object {$_|ConvertTo-Json -Compress|ConvertFrom-Json -AsHashtable};$stringJoin[2].join_events='2';Assert-Rejects {Get-PairedBrowserStageMarker (MarkerText $stringJoin) 'search' 'published'|Out-Null} 'string join count'
           $unknownStage=$rows|ForEach-Object {$_|ConvertTo-Json -Compress|ConvertFrom-Json -AsHashtable};$unknownStage[3].stage='unexpected';Assert-Rejects {Get-PairedBrowserStageMarker (MarkerText $unknownStage) 'ready' 'published'|Out-Null} 'unknown stage'
           Assert-Rejects {Get-PairedBrowserProfilerMarkers ($profiles+'[MIR5_LIBRARY_PROFILE] search Duration: 1.000000ms'+"`n") @('first_open','search','refresh','reopen')|Out-Null} 'duplicate profiler action'
