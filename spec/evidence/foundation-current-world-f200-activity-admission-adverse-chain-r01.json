@@ -1,0 +1,65 @@
+{
+  "schema": 1,
+  "kind": "MIRFoundationActivityAdmissionAdverseChainV1",
+  "status": "zero-engine-memory-admission-label-and-singleton-custody-failure-preserved",
+  "source_commit": "26815ee25b1775147f1c34eb118afe7d4538d8d0",
+  "packet_sha256": "982E548096339D8926540751AE8DE330D47843A8DC796E3E6ED0D10DE9704F02",
+  "caller_sha256": "48DE10C7CBF3E03840B116FFE3614034C928FB54A1800869B0044A7452F95C24",
+  "terminal_sha256": "3D96B0059042FE9F484C8FA703DC3DEDEC102D37A3BF656DDD9B8511273FDF51",
+  "exception": "[mir441-resource-admission-memory];controller custody:The property 'relative_path' cannot be found on this object. Verify that the property exists.",
+  "native_processes": 0,
+  "native_output_created": false,
+  "lease_or_staged_save_created": false,
+  "start_or_complete_observations": 0,
+  "source_and_owned_save": {
+    "source": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\whole-product-inputs-r01\\protected-saves\\foundation-iii-original.zip",
+      "bytes": 108548262,
+      "sha256": "EAF0BF0877955312C7DE9E1309D6462535464FF2FDFEA7EF60BEE5CD18A04CDA",
+      "file_identity": "1B6DF063:00580000000D9A79",
+      "reparse_point": false
+    },
+    "owned_copy": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\foundation-current-world-f200-activity-r01-controller\\owned-inputs\\foundation-iii-original.zip",
+      "bytes": 108548262,
+      "sha256": "EAF0BF0877955312C7DE9E1309D6462535464FF2FDFEA7EF60BEE5CD18A04CDA",
+      "file_identity": "1B6DF063:00050000000E2814",
+      "reparse_point": false
+    },
+    "staged": null
+  },
+  "library_before_after_equal": true,
+  "library_control_count": 4,
+  "controller_custody": {
+    "source_members": [
+      "before.json",
+      "terminal.json"
+    ],
+    "partially_copied_members": [
+      "before.json"
+    ],
+    "terminal_manifest": null
+  },
+  "resource_context": {
+    "actual_retained_fact": "[mir441-resource-admission-memory]",
+    "original_structured_snapshot_retained": false,
+    "later_memory_is_original_evidence": false
+  },
+  "private_helper_defect": "Copy-Custody assigned singleton Manifest output without array capture, so indexed comparison dereferenced an OrderedDictionary value. Prospective R02 array-captures both manifests and separately carries the approved existing-Exception.Data evidence pattern;R01 is unchanged.",
+  "independent_review": "Four control states and both unchanged distinct EAF0 bodies;zero engine/output/staging;partial before copy and missing terminal custody verified. Refusal preservation only.",
+  "receipt_capsule": {
+    "path": "spec/evidence/foundation-current-world-f200-activity-admission-adverse-receipts-r01.json.gz",
+    "sha256": "5ACF1C0420E8DA9E3F1EE8A97EC15AE72A5533DC462BE0174DCC33D2B6A48D22",
+    "bytes": 31369,
+    "bodies": 9
+  },
+  "limits": [
+    "No native engine launched;there is no activity,preservation,save-load,gameplay,performance or release result.",
+    "The original memory snapshot was dropped;no original shortfall or cause is reconstructed from later RAM readings.",
+    "Controller custody is explicitly partial;the exact original source before/terminal bodies remain intact and are transported here.",
+    "The original8GiB/20percent policy is unchanged;future inputs require their own matching controls and actual resource admission.",
+    "All pre-execution correction directories/readbacks and original R01 files remain local custody;no completed output is repaired or reused as an observation."
+  ],
+  "performance_acceptance": false,
+  "release_qualification": false
+}
