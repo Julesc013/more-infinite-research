@@ -3990,6 +3990,11 @@
           "id": "fresh-client-functional-current-non-v3-applicability",
           "evidence": "spec/evidence/client-7a2-fbb7-aero-applicability-r01.json",
           "scope": "Reviewed reuse of original normal F20065FC and F210005D Base/Space-Age private-credit/API-client sessions for currentE9/38C. All12 relevant Library/API/bootstrap/catalogue/decoder blobs are identical;only changelog and cap/lifecycle change. The new transient proof map is unreachable without the MIR4 V3 bucket,absent in these fresh create/init scenarios;with nil proof the existing native decisions are equivalent. Nine original metadata bodies and all three session identities are checked. Original engines,profiles,fixtures,harnesses,saves,asserted behaviors and visual limits retain their identities;no new native process or broader private-state/performance verdict."
+        },
+        {
+          "id": "retained-production-current7b0-scoped-applicability",
+          "evidence": "spec/evidence/api-production-current7b0-aero-applicability-r01.json",
+          "scope": "Aero verifies nine portable JSON bodies,all91 original custody members and eight actual native logs for the12c F200/F210 API production cases. Seven entrypoint/API/Generator/config/target payloads match per actual old/current ZIP;changed surrounding branches do not affect these fresh six-mod Base,no-GUI,no-legacy cases. Reuse retains actual200/202 cables from equal100-plate inputs and two read-only cold reloads per target,under original12c fixtures/harnesses/D3 or SteamFE4 identities. This is a scoped consumed-path decision,not a new7b0 or standalone8DC execution,lab research,modpack or complete API/release verdict."
         }
       ],
       "test_subjects": [
