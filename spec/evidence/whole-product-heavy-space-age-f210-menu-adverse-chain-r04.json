@@ -1,0 +1,523 @@
+{
+  "schema": 1,
+  "kind": "MIRHeavyF210MenuR04AdverseChainV1",
+  "status": "twenty-four-launch-prefix-incomplete-memory-admission-refusal-before25",
+  "public_source": "78ff2e6273825ded39a0c1acc8f82ae9149c8aae",
+  "private_source": "67498eaa1db8b8328d93922324df70ac86e4da9d",
+  "packet_sha256": "D2E8BABC54038967BFD6A22DCBAA76CEAA38D8437595E0621570C6A38C2F8C9F",
+  "caller_sha256": "C425691F54370867F7F49680A202CCF0E703D216929AB0A2B4826F7F1BB0E3C5",
+  "terminal_sha256": "1B33DF11FCCD2B0B661026993C325063D89A573A7E205A6F9022DF21C779FF3D",
+  "root_readback_sha256": "8E7FEC9043B09BD39BE0269639F3A05925E036A3C8D87D6C27B6615E33D14C4A",
+  "native_launches": 24,
+  "warmups": 4,
+  "aa_observations": 2,
+  "comparison_phase_observations": 18,
+  "accepted_comparisons": 0,
+  "failed_ordinal": 25,
+  "aa_gate": {
+    "values_seconds": [
+      31.760128,
+      33.0191158
+    ],
+    "difference_seconds": 1.2589877999999999,
+    "allowance_seconds": 1.6194810950000003,
+    "within_declared_allowance": true
+  },
+  "actual_captured_refusal": {
+    "snapshot": {
+      "observed_at": "2026-10-29T22:49:41.8307377+00:00",
+      "memory": {
+        "total_bytes": 34045980672,
+        "free_bytes": 16461000704,
+        "committed_bytes": 24135729152,
+        "commit_limit_bytes": 44388642816
+      },
+      "work_volume": {
+        "name": "D:\\",
+        "free_bytes": 161434636288,
+        "total_bytes": 1500099112960
+      },
+      "system_volume": {
+        "name": "C:\\",
+        "free_bytes": 200127844352,
+        "total_bytes": 599395090432
+      }
+    },
+    "limits": {
+      "physical_bytes": 6809196134,
+      "commit_bytes": 6809196134,
+      "system_bytes": 21474836480,
+      "work_bytes": 21474836480
+    },
+    "estimated_peak_bytes": 1534054119,
+    "expected_peak_memory_bytes": 9663676416
+  },
+  "admission_required_bytes": 16472872550,
+  "actual_shortfall_bytes": 11871846,
+  "original_terminal_result_sha256_field": "",
+  "failed_result_sha256_bound_by_custody": "F29903D44F40A1FB640DFC3B5CA6476E121E46DDAD75D20D559D6250CF055DEC",
+  "custody": {
+    "custody": {
+      "members": 271,
+      "bytes_per_copy": 613633574,
+      "all_original_copy_sha256_equal": true,
+      "terminal_manifest_linked": true
+    },
+    "controller_custody": {
+      "members": 5,
+      "bytes_per_copy": 2366914,
+      "all_original_copy_sha256_equal": true,
+      "terminal_manifest_linked": true
+    }
+  },
+  "images": {
+    "count": 72,
+    "bytes": 600021032,
+    "strict_crc_and_decompression_pass": true,
+    "dimensions": [
+      "(2560, 1440)"
+    ],
+    "actual_image_viewing_claimed": false
+  },
+  "maximum_combined_actor_and_factorio_private_bytes": 9462423552,
+  "maximum_combined_actor_and_factorio_ws_bytes": 3335303168,
+  "metric_scope": "Owned observer actor root plus owned Factorio child tree;not individually attributable to Factorio,observer,controller,MIR or whole-system.",
+  "library_before_after_equal": true,
+  "factorio_processes_after": 0,
+  "original_schedule": {
+    "launches": 38,
+    "warmups": 4,
+    "aa": 2,
+    "counterbalanced_observations": 32,
+    "extensions": 0
+  },
+  "resources": {
+    "expected_peak_memory_bytes": 9663676416,
+    "reserve_bytes": 6809196134,
+    "maximum_new_output_mib": 2048,
+    "timeout_seconds": 300,
+    "admission_wait_seconds": 30
+  },
+  "receipt_capsule": {
+    "path": "spec/evidence/whole-product-heavy-space-age-f210-menu-adverse-receipts-r04.json.gz",
+    "sha256": "8CAC18586AE136EBDA48565CB0E0A8F581F840B8E2BE745D86EF01C39C22C255",
+    "bytes": 1231708,
+    "bodies": 207
+  },
+  "omitted_binary_or_player_data_members": [
+    {
+      "path": "runs/01-warmup-control-without-mir/responsive-menu-actor/latest-owned-window.png",
+      "bytes": 7691640,
+      "sha256": "D30F41D0D966F4AEDDC99564AAAF3071D0516C691BEA3A0DB1A12F25595FC7AE"
+    },
+    {
+      "path": "runs/01-warmup-control-without-mir/responsive-menu-actor/main-menu.png",
+      "bytes": 7614733,
+      "sha256": "672EF0F390491375ED2C93146E3E76D9A725710F1E54AB2F630D5A1395837FAA"
+    },
+    {
+      "path": "runs/01-warmup-control-without-mir/responsive-menu-actor/settings-response.png",
+      "bytes": 7691640,
+      "sha256": "D30F41D0D966F4AEDDC99564AAAF3071D0516C691BEA3A0DB1A12F25595FC7AE"
+    },
+    {
+      "path": "runs/02-warmup-published-mir3/responsive-menu-actor/latest-owned-window.png",
+      "bytes": 9001659,
+      "sha256": "362F1AFB677AF6F0071B5216A26F1E66CD396E2DFE9BB4DE9DEE4F6908BEA110"
+    },
+    {
+      "path": "runs/02-warmup-published-mir3/responsive-menu-actor/main-menu.png",
+      "bytes": 8978374,
+      "sha256": "CFF0F62D4C102AA7DAC49BEC746F8886F6CD9EDE3AF68D0DB600D2A9518EDDFA"
+    },
+    {
+      "path": "runs/02-warmup-published-mir3/responsive-menu-actor/settings-response.png",
+      "bytes": 9001659,
+      "sha256": "362F1AFB677AF6F0071B5216A26F1E66CD396E2DFE9BB4DE9DEE4F6908BEA110"
+    },
+    {
+      "path": "runs/03-warmup-published-mir4.7/responsive-menu-actor/latest-owned-window.png",
+      "bytes": 8836681,
+      "sha256": "266D708D41789E4A20480E849449EF880DDEF85AD823D0DBAB6059C850237DF4"
+    },
+    {
+      "path": "runs/03-warmup-published-mir4.7/responsive-menu-actor/main-menu.png",
+      "bytes": 8814386,
+      "sha256": "F253B1C625DC5A94BC5F5DBBD7DA6417D685E9A227F821EAF84141B24EA0E901"
+    },
+    {
+      "path": "runs/03-warmup-published-mir4.7/responsive-menu-actor/settings-response.png",
+      "bytes": 8836681,
+      "sha256": "266D708D41789E4A20480E849449EF880DDEF85AD823D0DBAB6059C850237DF4"
+    },
+    {
+      "path": "runs/04-warmup-candidate-mir5/responsive-menu-actor/latest-owned-window.png",
+      "bytes": 9689948,
+      "sha256": "34E9A2647C62C6F15EE6F0C3540FA5A766D9E89A44CF68B246468C0832A206DB"
+    },
+    {
+      "path": "runs/04-warmup-candidate-mir5/responsive-menu-actor/main-menu.png",
+      "bytes": 9673435,
+      "sha256": "75861B0BDEDDC4E7C3158CAF3C6180A15154348255211AED05D44988292F76DF"
+    },
+    {
+      "path": "runs/04-warmup-candidate-mir5/responsive-menu-actor/settings-response.png",
+      "bytes": 9689948,
+      "sha256": "34E9A2647C62C6F15EE6F0C3540FA5A766D9E89A44CF68B246468C0832A206DB"
+    },
+    {
+      "path": "runs/05-published-aa-published-mir4.7/responsive-menu-actor/latest-owned-window.png",
+      "bytes": 8386758,
+      "sha256": "A0E48CED661194847839BE74BC88AC6C0CFDE9EB1FA8EE20C2E9119746CA5DB1"
+    },
+    {
+      "path": "runs/05-published-aa-published-mir4.7/responsive-menu-actor/main-menu.png",
+      "bytes": 8371068,
+      "sha256": "E5EF177F248B89724D0D68B0B9EBD6B4F396997511969F095A2B66F1B784FAB2"
+    },
+    {
+      "path": "runs/05-published-aa-published-mir4.7/responsive-menu-actor/settings-response.png",
+      "bytes": 8386758,
+      "sha256": "A0E48CED661194847839BE74BC88AC6C0CFDE9EB1FA8EE20C2E9119746CA5DB1"
+    },
+    {
+      "path": "runs/06-published-aa-published-mir4.7/responsive-menu-actor/latest-owned-window.png",
+      "bytes": 5755187,
+      "sha256": "0923FC0BA5FE346DAA8F5CEBA1656059CCA0BF69AB3C3598C768FC3E68627634"
+    },
+    {
+      "path": "runs/06-published-aa-published-mir4.7/responsive-menu-actor/main-menu.png",
+      "bytes": 5755855,
+      "sha256": "5A690DA8D744B86883CE359DA124BD5691ECBD33A83FA2F289E600425D913770"
+    },
+    {
+      "path": "runs/06-published-aa-published-mir4.7/responsive-menu-actor/settings-response.png",
+      "bytes": 5755187,
+      "sha256": "0923FC0BA5FE346DAA8F5CEBA1656059CCA0BF69AB3C3598C768FC3E68627634"
+    },
+    {
+      "path": "runs/07-latin-comparison-control-without-mir/responsive-menu-actor/latest-owned-window.png",
+      "bytes": 6436163,
+      "sha256": "C2F55CAC223BFAEB96EB00E291813994CD3043C531D256DC0CF58202674F67B9"
+    },
+    {
+      "path": "runs/07-latin-comparison-control-without-mir/responsive-menu-actor/main-menu.png",
+      "bytes": 6327464,
+      "sha256": "9301504795A7ACD82DBD416B2282A52B514A4C010AF121CB2149612C6F61A8A6"
+    },
+    {
+      "path": "runs/07-latin-comparison-control-without-mir/responsive-menu-actor/settings-response.png",
+      "bytes": 6436163,
+      "sha256": "C2F55CAC223BFAEB96EB00E291813994CD3043C531D256DC0CF58202674F67B9"
+    },
+    {
+      "path": "runs/08-latin-comparison-published-mir3/responsive-menu-actor/latest-owned-window.png",
+      "bytes": 8818391,
+      "sha256": "4AEC4C07F2B5028077B2E516EC4CB548316A58158980B173D1D0282E0F3240CE"
+    },
+    {
+      "path": "runs/08-latin-comparison-published-mir3/responsive-menu-actor/main-menu.png",
+      "bytes": 8824325,
+      "sha256": "9A600F50246059B646FFB3851AFF7A8D7850AC0FDFD2B64E84E1064B861B24DC"
+    },
+    {
+      "path": "runs/08-latin-comparison-published-mir3/responsive-menu-actor/settings-response.png",
+      "bytes": 8818391,
+      "sha256": "4AEC4C07F2B5028077B2E516EC4CB548316A58158980B173D1D0282E0F3240CE"
+    },
+    {
+      "path": "runs/09-latin-comparison-published-mir4.7/responsive-menu-actor/latest-owned-window.png",
+      "bytes": 8151347,
+      "sha256": "5DFCF98C977543443ED73551D9FB3BC2AF1A2340D53B8A7C0477588CC93D452F"
+    },
+    {
+      "path": "runs/09-latin-comparison-published-mir4.7/responsive-menu-actor/main-menu.png",
+      "bytes": 8124746,
+      "sha256": "8F78D2441AFC515702C40E4348B956A5067EB158E190B047AD347E053A6B0680"
+    },
+    {
+      "path": "runs/09-latin-comparison-published-mir4.7/responsive-menu-actor/settings-response.png",
+      "bytes": 8151347,
+      "sha256": "5DFCF98C977543443ED73551D9FB3BC2AF1A2340D53B8A7C0477588CC93D452F"
+    },
+    {
+      "path": "runs/10-latin-comparison-candidate-mir5/responsive-menu-actor/latest-owned-window.png",
+      "bytes": 7960413,
+      "sha256": "E08BD54A736CF2A314EBC8639035257D91C26F3EFB066E8FAC363CD50A08C497"
+    },
+    {
+      "path": "runs/10-latin-comparison-candidate-mir5/responsive-menu-actor/main-menu.png",
+      "bytes": 7937888,
+      "sha256": "ACAAFC23363C47D43A3BEA417E214C7DBEF05D173249541B188102CBED826105"
+    },
+    {
+      "path": "runs/10-latin-comparison-candidate-mir5/responsive-menu-actor/settings-response.png",
+      "bytes": 7960413,
+      "sha256": "E08BD54A736CF2A314EBC8639035257D91C26F3EFB066E8FAC363CD50A08C497"
+    },
+    {
+      "path": "runs/11-latin-comparison-published-mir3/responsive-menu-actor/latest-owned-window.png",
+      "bytes": 8398310,
+      "sha256": "EABED275B3CAB83DAFE0C3F127A9E229E2ACEE45D6F3D2B421C3C61DB7768909"
+    },
+    {
+      "path": "runs/11-latin-comparison-published-mir3/responsive-menu-actor/main-menu.png",
+      "bytes": 8372696,
+      "sha256": "E9054D36202F470F57941F325FEB319431933D9086924B9B23A82177C2713013"
+    },
+    {
+      "path": "runs/11-latin-comparison-published-mir3/responsive-menu-actor/settings-response.png",
+      "bytes": 8398310,
+      "sha256": "EABED275B3CAB83DAFE0C3F127A9E229E2ACEE45D6F3D2B421C3C61DB7768909"
+    },
+    {
+      "path": "runs/12-latin-comparison-published-mir4.7/responsive-menu-actor/latest-owned-window.png",
+      "bytes": 7092351,
+      "sha256": "7367F90A1A0B432F47DC7EA367D1CEF9E9A8A14EE8499CFBAA916A6E177DC491"
+    },
+    {
+      "path": "runs/12-latin-comparison-published-mir4.7/responsive-menu-actor/main-menu.png",
+      "bytes": 7070029,
+      "sha256": "ACAB9AC13E076718EA60FCF79A1A9A96A53F2DDEEC2842CBBC91DF842AF3E167"
+    },
+    {
+      "path": "runs/12-latin-comparison-published-mir4.7/responsive-menu-actor/settings-response.png",
+      "bytes": 7092351,
+      "sha256": "7367F90A1A0B432F47DC7EA367D1CEF9E9A8A14EE8499CFBAA916A6E177DC491"
+    },
+    {
+      "path": "runs/13-latin-comparison-candidate-mir5/responsive-menu-actor/latest-owned-window.png",
+      "bytes": 8775429,
+      "sha256": "1C9EE8E9651C9FB70493A66D45152F31B146DA6FA2C45347BEEA4C16E3D7B5A9"
+    },
+    {
+      "path": "runs/13-latin-comparison-candidate-mir5/responsive-menu-actor/main-menu.png",
+      "bytes": 8763158,
+      "sha256": "ADFBFCF459304954527565D4EE66CCF6B0EF4C072359FF2078AD0C0167AA2610"
+    },
+    {
+      "path": "runs/13-latin-comparison-candidate-mir5/responsive-menu-actor/settings-response.png",
+      "bytes": 8775429,
+      "sha256": "1C9EE8E9651C9FB70493A66D45152F31B146DA6FA2C45347BEEA4C16E3D7B5A9"
+    },
+    {
+      "path": "runs/14-latin-comparison-control-without-mir/responsive-menu-actor/latest-owned-window.png",
+      "bytes": 9037305,
+      "sha256": "236DC4A995100278A0ECA0170B86B646E1C8A02186EC82D9F2AE8C865DBCA3FF"
+    },
+    {
+      "path": "runs/14-latin-comparison-control-without-mir/responsive-menu-actor/main-menu.png",
+      "bytes": 9040401,
+      "sha256": "49FEFE879BBD1BAAF69418C273AE830ED6665F138F277E10DCA4A39BABF37717"
+    },
+    {
+      "path": "runs/14-latin-comparison-control-without-mir/responsive-menu-actor/settings-response.png",
+      "bytes": 9037305,
+      "sha256": "236DC4A995100278A0ECA0170B86B646E1C8A02186EC82D9F2AE8C865DBCA3FF"
+    },
+    {
+      "path": "runs/15-latin-comparison-published-mir4.7/responsive-menu-actor/latest-owned-window.png",
+      "bytes": 8838488,
+      "sha256": "87B3F3178915EA4CC2DB500EEFB61FEE9E5F4CE2963BB5688DAAEF562E82684F"
+    },
+    {
+      "path": "runs/15-latin-comparison-published-mir4.7/responsive-menu-actor/main-menu.png",
+      "bytes": 8827754,
+      "sha256": "E61BFD79865939B562B02664B98E1344F1BE977F8847C699DC01572D39FEBE65"
+    },
+    {
+      "path": "runs/15-latin-comparison-published-mir4.7/responsive-menu-actor/settings-response.png",
+      "bytes": 8838488,
+      "sha256": "87B3F3178915EA4CC2DB500EEFB61FEE9E5F4CE2963BB5688DAAEF562E82684F"
+    },
+    {
+      "path": "runs/16-latin-comparison-candidate-mir5/responsive-menu-actor/latest-owned-window.png",
+      "bytes": 9805778,
+      "sha256": "0D34E0C78EECE04640FAFEBF899617EDC798BE5EF478028FE211915986321912"
+    },
+    {
+      "path": "runs/16-latin-comparison-candidate-mir5/responsive-menu-actor/main-menu.png",
+      "bytes": 9794879,
+      "sha256": "8DF0DBB19CF12E5973F52D535909F053ACA245753C9A39760A55EAF5DCA8B55E"
+    },
+    {
+      "path": "runs/16-latin-comparison-candidate-mir5/responsive-menu-actor/settings-response.png",
+      "bytes": 9805778,
+      "sha256": "0D34E0C78EECE04640FAFEBF899617EDC798BE5EF478028FE211915986321912"
+    },
+    {
+      "path": "runs/17-latin-comparison-control-without-mir/responsive-menu-actor/latest-owned-window.png",
+      "bytes": 7678811,
+      "sha256": "573D123BA651C7CF9344668EDFDBC81216D7A024F42C4795A83ED39F194B8BE6"
+    },
+    {
+      "path": "runs/17-latin-comparison-control-without-mir/responsive-menu-actor/main-menu.png",
+      "bytes": 7595518,
+      "sha256": "33FE601294501FEFED7A05B9B646797334EB38EC951A5A7076C6EA05A90A9CB5"
+    },
+    {
+      "path": "runs/17-latin-comparison-control-without-mir/responsive-menu-actor/settings-response.png",
+      "bytes": 7678811,
+      "sha256": "573D123BA651C7CF9344668EDFDBC81216D7A024F42C4795A83ED39F194B8BE6"
+    },
+    {
+      "path": "runs/18-latin-comparison-published-mir3/responsive-menu-actor/latest-owned-window.png",
+      "bytes": 8901847,
+      "sha256": "DCCA7549750DD8D0A4D08A9BEFDF8BE72D995D3287E860529276635148E34430"
+    },
+    {
+      "path": "runs/18-latin-comparison-published-mir3/responsive-menu-actor/main-menu.png",
+      "bytes": 8062716,
+      "sha256": "821628FDC62C3B3DBEB42FDA8C0012B731CD09D14C812C44BFBB26C389F6E998"
+    },
+    {
+      "path": "runs/18-latin-comparison-published-mir3/responsive-menu-actor/settings-response.png",
+      "bytes": 8901847,
+      "sha256": "DCCA7549750DD8D0A4D08A9BEFDF8BE72D995D3287E860529276635148E34430"
+    },
+    {
+      "path": "runs/19-latin-comparison-candidate-mir5/responsive-menu-actor/latest-owned-window.png",
+      "bytes": 9259875,
+      "sha256": "603D93D5EA1784E734AF90CD1331A4C70485B6741C85589C5BC45D02EA60A2BA"
+    },
+    {
+      "path": "runs/19-latin-comparison-candidate-mir5/responsive-menu-actor/main-menu.png",
+      "bytes": 9265861,
+      "sha256": "FC407E0298CB561A14A51E4843369222B338CBF1BE0A8C43ED645526DE2104C0"
+    },
+    {
+      "path": "runs/19-latin-comparison-candidate-mir5/responsive-menu-actor/settings-response.png",
+      "bytes": 9259875,
+      "sha256": "603D93D5EA1784E734AF90CD1331A4C70485B6741C85589C5BC45D02EA60A2BA"
+    },
+    {
+      "path": "runs/20-latin-comparison-control-without-mir/responsive-menu-actor/latest-owned-window.png",
+      "bytes": 8176683,
+      "sha256": "886F77A6C5EFA6ED1C0E31BF094B050C6456C2DE43D695D728BD79B3BD45F64A"
+    },
+    {
+      "path": "runs/20-latin-comparison-control-without-mir/responsive-menu-actor/main-menu.png",
+      "bytes": 8172112,
+      "sha256": "CB0AE43C3E79CC45176C85AFD71641451EFE60F3D756A49029F4BBC600C920F2"
+    },
+    {
+      "path": "runs/20-latin-comparison-control-without-mir/responsive-menu-actor/settings-response.png",
+      "bytes": 8176683,
+      "sha256": "886F77A6C5EFA6ED1C0E31BF094B050C6456C2DE43D695D728BD79B3BD45F64A"
+    },
+    {
+      "path": "runs/21-latin-comparison-published-mir3/responsive-menu-actor/latest-owned-window.png",
+      "bytes": 9375045,
+      "sha256": "7CA0CC9FF87B9EDBF02C3572814C5878597C53B4EEB270EB5D9A5EAD8DA4B005"
+    },
+    {
+      "path": "runs/21-latin-comparison-published-mir3/responsive-menu-actor/main-menu.png",
+      "bytes": 9337671,
+      "sha256": "E6C476457F55204B2D186FC342FD99C777FDF080477449F0F84D9754EE378F5D"
+    },
+    {
+      "path": "runs/21-latin-comparison-published-mir3/responsive-menu-actor/settings-response.png",
+      "bytes": 9375045,
+      "sha256": "7CA0CC9FF87B9EDBF02C3572814C5878597C53B4EEB270EB5D9A5EAD8DA4B005"
+    },
+    {
+      "path": "runs/22-latin-comparison-published-mir4.7/responsive-menu-actor/latest-owned-window.png",
+      "bytes": 7763429,
+      "sha256": "87F60D8C73596F4F919E12C43D193AE516FD00518C39BAB73D5B449BF581A85B"
+    },
+    {
+      "path": "runs/22-latin-comparison-published-mir4.7/responsive-menu-actor/main-menu.png",
+      "bytes": 7766470,
+      "sha256": "576DB0089C3868B26A511425B2B80F02196A932C6BDFDABEBC7C19CF2DEC3D5B"
+    },
+    {
+      "path": "runs/22-latin-comparison-published-mir4.7/responsive-menu-actor/settings-response.png",
+      "bytes": 7763429,
+      "sha256": "87F60D8C73596F4F919E12C43D193AE516FD00518C39BAB73D5B449BF581A85B"
+    },
+    {
+      "path": "runs/23-latin-comparison-control-without-mir/responsive-menu-actor/latest-owned-window.png",
+      "bytes": 7707259,
+      "sha256": "00FF51456DD7D70CFCA6E52E14DEE670CA8F0BA8C30993FF563885A15535E003"
+    },
+    {
+      "path": "runs/23-latin-comparison-control-without-mir/responsive-menu-actor/main-menu.png",
+      "bytes": 7704110,
+      "sha256": "60695442D8C09F1AD3D418318A0CB1ACFCE112E41177A7006CFBB5A44911658E"
+    },
+    {
+      "path": "runs/23-latin-comparison-control-without-mir/responsive-menu-actor/settings-response.png",
+      "bytes": 7707259,
+      "sha256": "00FF51456DD7D70CFCA6E52E14DEE670CA8F0BA8C30993FF563885A15535E003"
+    },
+    {
+      "path": "runs/24-latin-comparison-published-mir3/responsive-menu-actor/latest-owned-window.png",
+      "bytes": 8923488,
+      "sha256": "8A5785CA7B35C7C680C1CBF530AADFBA130A8B02DEAABDD7C37722D8AE50152C"
+    },
+    {
+      "path": "runs/24-latin-comparison-published-mir3/responsive-menu-actor/main-menu.png",
+      "bytes": 8900813,
+      "sha256": "40C680597B052B4958953910C9D4B59A9BFB38D4CA757D8C39EAC0F706C41FE3"
+    },
+    {
+      "path": "runs/24-latin-comparison-published-mir3/responsive-menu-actor/settings-response.png",
+      "bytes": 8923488,
+      "sha256": "8A5785CA7B35C7C680C1CBF530AADFBA130A8B02DEAABDD7C37722D8AE50152C"
+    },
+    {
+      "path": "write-data/ordinary-menu-shared/crop-cache.dat",
+      "bytes": 8992169,
+      "sha256": "78B813D3097FE20FEFF124876788FC4A5D29850ED8C8EFA8686EB340393DD4E7"
+    },
+    {
+      "path": "write-data/ordinary-menu-shared/player-data.json",
+      "bytes": 16000,
+      "sha256": "C1F59E175A2131B5609F1B556880B8FF12764853F6F06D2ED0817EABF42E1F97"
+    },
+    {
+      "path": "write-data/ordinary-menu-shared/achievements-modded.dat",
+      "bytes": 7086,
+      "sha256": "354DC831343BB9BE5B7EFAE5C63C2BB39D5581AB7DDD6E207B3321E4DB5075C1"
+    }
+  ],
+  "preparation_lineage": {
+    "r03_packet_sha256": "F2494C312650DEDBE5A5AA03276CFE91F515422A68F1694CBBFFB49134F378C4",
+    "r03_native_launches": 0,
+    "r03_review_disposition": "Refused before dispatch because the old reader did not consume the source-to-owned materialization receipt. Original bytes and positive controls remain,not a native pass.",
+    "prospective_correction_private_commit": "67498eaa1db8b8328d93922324df70ac86e4da9d",
+    "correction_scope": "Only reader/tests change;mandatory receipt hash/schema/kind/status/flags/source-copy/provenance/direct-archive checks and20 controls. Caller remains C425 with rawGit-identical LF bytes.",
+    "all_earlier_zero_native_and_partial_adverses_unchanged": true
+  },
+  "raw_reader_limitation": "Full C7 raw-artifact validator refuses the now-absent shared current log referenced by launch specs;ordinal25 preparation removed it before admission. All24 immutable per-run logs and the complete terminal-linked271-file custody remain. No original file is recreated to satisfy that check.",
+  "limits": [
+    "All24 launch records remain diagnostic;A/A passes but the38-launch cohort is incomplete and no scored/performance comparison is accepted.",
+    "Ordinal25 has prepared config/selection/launch specification only;no observer actor,Factorio PID,log,stdout or resource ledger was created.",
+    "The real global admission snapshot is retained. Later free RAM,static code review and a separate host-only polling diagnostic do not establish the cause. No candidate memory regression,engine timeout/crash or root/controller leak is inferred.",
+    "Peaks sum each observer-actor process and its owned Factorio child;there is no per-child or controller-root series for attribution.",
+    "Both native and controller custody are fully terminal-manifest-linked. The dedicated result_sha256 field is empty,but the actual failed result is independently pinned in custody.members.",
+    "Attempt25 preparation removed the mutable shared current log;all24 immutable per-run logs remain. Full raw-reader admission refuses that missing source;no original file is recreated to satisfy it.",
+    "No observation is pooled,substituted,extended,rescored or retried. Original9GiB/2GiB/300s/30s/20percent thresholds remain.",
+    "All72 PNGs have strict CRC/decompression proof;no actual pixel viewing is claimed by this record.",
+    "Fresh-process observations are not reboot-cold. Source/player candidateB remains unchanged.",
+    "No runtime,gameplay,API-stability or release qualification follows."
+  ],
+  "performance_acceptance": false,
+  "release_qualification": false,
+  "focused_controls_receipt": {
+    "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\whole-product-heavy-space-age-f210-menu-r04-controller\\focused-controls-r01\\receipt.json",
+    "bytes": 11072,
+    "sha256": "5E0F6BE9F96261D4060A8B3297730049732A4B8C78A2C70DEC8D721C28958CFB"
+  },
+  "public_text_allowlist": [
+    ".cfg",
+    ".ini",
+    ".json",
+    ".jsonl",
+    ".lock",
+    ".log",
+    ".ps1",
+    ".txt"
+  ],
+  "binary_scope_correction": "The first public projection accidentally admitted UTF8-decodable binary achievement state. The final capsule excludes it and all native player-data/achievement names plus non-allowlisted extensions;original local/native custody and earlier projection/commit history remain preserved."
+}
