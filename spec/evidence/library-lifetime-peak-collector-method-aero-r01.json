@@ -1,0 +1,65 @@
+{
+  "schema": 1,
+  "kind": "MIRLibraryLifetimePeakCollectorPreparationV1",
+  "status": "host-verified-collector-requires-independent-method-review-and-native-preflight",
+  "prepared_from_commit": "6ae87438599cf0af094a84108a28e32c6edf23ce",
+  "original_evidence_retained": [
+    "spec/evidence/library-current-e9-r01-native-chain.json",
+    "spec/evidence/library-repeatability-diagnostic-r01-adverse-chain.json",
+    "spec/evidence/library-repeatability-diagnostic-r02-native-chain.json",
+    "spec/evidence/library-diagnostic-r02-aero-independent-review-r01.json"
+  ],
+  "reason": "A maximum of periodic observations does not establish the process lifetime high-water value. R02 retains five failed sampled-memory identical-build controls. This collector prepares a separate native high-water observation; it does not establish that sampling caused those failures.",
+  "opt_in": {
+    "wrapper_switch": "CollectProcessLifetimePeaks",
+    "requires_wrapper_switch": "CollectProcessMemoryObservations",
+    "session_spec_boolean": "process_memory_lifetime_peaks",
+    "allowed_cases": ["library-multiplayer", "library-paired-browser"],
+    "benchmark_context_refused": true,
+    "standalone_identity_discovery_refused": true,
+    "default_receipt_and_spec_fields_unchanged": true
+  },
+  "collector": {
+    "ownership": "Existing registered Process object, exact PID and start UTC; no process discovery or tree enumeration",
+    "cutoff": "Read once at the existing owned completion boundary, before stop/kill; subsequent exit and deinitialization are excluded",
+    "working_set_peak_bytes": "System.Diagnostics.Process.PeakWorkingSet64",
+    "paged_memory_peak_bytes": "System.Diagnostics.Process.PeakPagedMemorySize64; distinct from sampled private_bytes",
+    "clock": "UTC reference immediately before sampler stopwatch start, with observation UTC and monotonic elapsed milliseconds",
+    "missing_or_exited_or_changed_identity": "Incomplete observation; no fabricated zero or fallback to sampled maximum",
+    "periodic_interval_milliseconds_unchanged": 250,
+    "periodic_samples_unchanged": true,
+    "maximum_registered_processes": 9,
+    "existing_duration_sample_and_serialization_bounds_unchanged": true,
+    "additional_processes": 0,
+    "additional_polling_loops": 0
+  },
+  "host_validation": {
+    "lua_runtime": "Explicit pinned lupa.lua52 from build/tmp/mir421-lua-runtime",
+    "controls": [
+      "Final OS counter read even when no periodic sample is due; existing sample count unchanged",
+      "Default receipt has no peak fields; duplicate completion is idempotent",
+      "Exact PID/start UTC, positive working-set peak and nonnegative paged peak",
+      "Changed identity and natural exit retain incomplete status",
+      "Benchmark context refuses opt-in",
+      "Typed session Boolean and wrapper prelaunch opponents for missing memory, discovery and unsupported case"
+    ],
+    "native_factorio_processes": 0,
+    "performance_acceptance": false
+  },
+  "required_before_replacement_acceptance_dataset": [
+    "Independent review of the method and collector",
+    "Bind an actual fixed map workload rather than inferring identical maps from default creation",
+    "Use explicit matched All scope and the separately reviewed render grace",
+    "Native preflight establishes counter availability and the exact capture cutoff on each actual arm",
+    "Separately reviewed protocol declares whether and how these counters inform acceptance; paged peak cannot be relabelled private bytes",
+    "Predeclare retained-memory and churn windows, quiet conditions, schedule, endpoints and practical budgets",
+    "Preserve every prior failure; do not replace failed sampled controls with this unaccepted observation"
+  ],
+  "documentation": {
+    "working_set_counter": "https://learn.microsoft.com/en-us/dotnet/api/system.diagnostics.process.peakworkingset64?view=net-9.0"
+  },
+  "new_scored_dataset": false,
+  "changed_product_source": false,
+  "changed_acceptance_tolerance": false,
+  "release_qualification": false
+}

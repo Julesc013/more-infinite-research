@@ -13,6 +13,7 @@ param(
   # Other multiplayer fixtures retain the existing 8 GiB process-tree ceiling.
   [ValidateSet(7168,8192)][int]$SessionExpectedPeakMemoryMiB=8192,
   [switch]$CollectProcessMemoryObservations,
+  [switch]$CollectProcessLifetimePeaks,
   # This is an environment-only stop after the fixture's real 120-tick
   # two-client predicate.  It is deliberately opt-in so the qualified Library
   # session continues to use its original profile, identities and GUI path.
@@ -26,6 +27,8 @@ $repo=(Resolve-Path -LiteralPath $RepoRoot).Path
 function Assert-Session([bool]$Condition,[string]$Message) {
   if(-not $Condition){throw "[mir5-multiplayer-fixture] $Message"}
 }
+Assert-Session (-not $CollectProcessLifetimePeaks -or ($CollectProcessMemoryObservations -and
+  -not $StandaloneIdentityDiscovery -and $FixtureCase -cin @('library-multiplayer','library-paired-browser'))) 'lifetime peak counters require opted-in Library memory observations'
 function Assert-MultiplayerFixtureSelection {
   param(
     [Parameter(Mandatory)][System.Collections.IDictionary]$Selection,
@@ -786,6 +789,7 @@ try {
     Assert-Session ($FixtureCase -cin @('library-multiplayer','library-paired-browser')) 'process memory observations require a named Library fixture'
     $spec.process_memory_observations=$true
   }
+  if($CollectProcessLifetimePeaks){$spec.process_memory_lifetime_peaks=$true}
   $specPath=Join-Path $resources.root 'session-spec.json'
   [IO.File]::WriteAllText($specPath,($spec|ConvertTo-Json -Depth 8),[Text.UTF8Encoding]::new($false))
   $record.session_spec_sha256=(Get-FileHash -LiteralPath $specPath).Hash
