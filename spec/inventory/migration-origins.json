@@ -90,24 +90,78 @@
         "policy_v3_structured": 32
       },
       "actual_archive_info_by_release": {
-        "v4.0.0": { "f200": "4.0.20000", "f210": "4.0.21000" },
-        "v4.1.0": { "f200": "4.1.20000", "f210": "4.1.21000" },
-        "v4.2.0-rc.1": { "f200": "4.2.20000", "f210": "4.2.21000" },
-        "v4.2.0-stable": { "f200": "4.2.20000", "f210": "4.2.21000" },
-        "v4.2.1": { "f200": "4.2.20001", "f210": "4.2.21001" },
-        "v4.2.2": { "f200": "4.2.20002", "f210": "4.2.21002" },
-        "v4.3.0": { "f200": "4.3.20000", "f210": "4.3.21000" },
-        "v4.4.0": { "f200": "4.4.20000", "f210": "4.4.21000" },
-        "v4.4.1": { "f200": "4.4.20001", "f210": "4.4.21001" },
-        "v4.4.2": { "f200": "4.4.20002", "f210": "4.4.21002" },
-        "v4.5.0": { "f200": "4.5.20000", "f210": "4.5.21000" },
-        "v4.5.1": { "f200": "4.5.20001", "f210": "4.5.21001" },
-        "v4.5.2": { "f200": "4.5.20002", "f210": "4.5.21002" },
-        "v4.6.0": { "f200": "4.6.20000", "f210": "4.6.21000" },
-        "v4.7.0": { "f200": "4.7.20000", "f210": "4.7.21000" },
-        "v4.7.1": { "f200": "4.7.20001", "f210": "4.7.21001" },
-        "v4.7.2": { "f200": "4.7.20002", "f210": "4.7.21002" },
-        "v4.7.3": { "f200": "4.7.20003", "f210": "4.7.21003" }
+        "v4.0.0": {
+          "f200": "4.0.20000",
+          "f210": "4.0.21000"
+        },
+        "v4.1.0": {
+          "f200": "4.1.20000",
+          "f210": "4.1.21000"
+        },
+        "v4.2.0-rc.1": {
+          "f200": "4.2.20000",
+          "f210": "4.2.21000"
+        },
+        "v4.2.0-stable": {
+          "f200": "4.2.20000",
+          "f210": "4.2.21000"
+        },
+        "v4.2.1": {
+          "f200": "4.2.20001",
+          "f210": "4.2.21001"
+        },
+        "v4.2.2": {
+          "f200": "4.2.20002",
+          "f210": "4.2.21002"
+        },
+        "v4.3.0": {
+          "f200": "4.3.20000",
+          "f210": "4.3.21000"
+        },
+        "v4.4.0": {
+          "f200": "4.4.20000",
+          "f210": "4.4.21000"
+        },
+        "v4.4.1": {
+          "f200": "4.4.20001",
+          "f210": "4.4.21001"
+        },
+        "v4.4.2": {
+          "f200": "4.4.20002",
+          "f210": "4.4.21002"
+        },
+        "v4.5.0": {
+          "f200": "4.5.20000",
+          "f210": "4.5.21000"
+        },
+        "v4.5.1": {
+          "f200": "4.5.20001",
+          "f210": "4.5.21001"
+        },
+        "v4.5.2": {
+          "f200": "4.5.20002",
+          "f210": "4.5.21002"
+        },
+        "v4.6.0": {
+          "f200": "4.6.20000",
+          "f210": "4.6.21000"
+        },
+        "v4.7.0": {
+          "f200": "4.7.20000",
+          "f210": "4.7.21000"
+        },
+        "v4.7.1": {
+          "f200": "4.7.20001",
+          "f210": "4.7.21001"
+        },
+        "v4.7.2": {
+          "f200": "4.7.20002",
+          "f210": "4.7.21002"
+        },
+        "v4.7.3": {
+          "f200": "4.7.20003",
+          "f210": "4.7.21003"
+        }
       },
       "structured_f200_actual_info_versions": [
         "4.2.20000",
@@ -3812,9 +3866,9 @@
         },
         {
           "boundary": "K2 Imersite public/carrier identities",
-          "status": "needs-correction",
-          "problem": "The explicit0.3 K2SE fixture-owned seeded-carrier boundary passes independent protocol/body review at unmodified38C;original strict0.2 failure remains. The distinct lab-earned K2SO direct recovery passes at005D,but affected current38C applicability still requires its declared successor execution.",
-          "next_action": "After the protected Library timing block,Black Glass validates and executes the current38C prepared direct successor from unchanged538B with original level/effect/work assertions,one actual new lab,save and two unchanged-byte cold reloads. Reuse the existing exact fixture projections and three reproduced own archives;no source recreation,threshold change or broad campaign restart.",
+          "status": "closed",
+          "problem": "The independent review qualifies only the explicit0.3 fixture-owned K2SE seeded-carrier boundary at unmodified38C. The distinct direct K2SO lab-earned recovery now also passes current38C from the unchanged protected538B source:original next6/.42 work,one actual lab to next7/.12 bonus,save and two unchanged-byte cold reloads. Original strict0.2 and published4.7 intermediate failures remain preserved.",
+          "next_action": "Reuse both exact named38C results and the independent owner-protocol review under their stated scopes. Keep original five source labs counted once,protected originals,owner intervention and earlier adverse identities. No arbitrary foreign-rights repair,ordinary tuning,K2SE whole-pack gameplay or release verdict follows.",
           "prepared_inputs": {
             "path": "spec/evidence/k2-imersite-current005d-prepared-inputs-r01.json",
             "sha256": "02C6BFFB4CD524A11BF90DEC1269639963B61765027AE0D60A6A56E9C068EC56"
@@ -3842,7 +3896,12 @@
             },
             {
               "path": "spec/evidence/k2se-fixture-owned-locks-native-chain-r01.json",
-              "scope": "Named explicit fixture-owner scenario passes current38C/save/two colds;independent protocol review pending,old0.2 failure unchanged."
+              "scope": "Named explicit fixture-owner scenario passes current38C/save/two colds;independent review5692177991 approves its exact seeded scope. Original0.2 failure and lab-earned direct route retain separate identities."
+            },
+            {
+              "path": "spec/evidence/k2-direct-current38c-native-chain-r01.json",
+              "sha256": "962404D89F78014CF0DEF6998A36EED8348D47FA2A98F2D5434508B60DB47E90",
+              "scope": "Affected current38C direct matching-cost K2SO recovery;one new lab/save/two read-only cold reloads from a separate byte-identical owned538B copy."
             }
           ],
           "independent_owner_protocol_review": "https://github.com/Julesc013/more-infinite-research/pull/1376#pullrequestreview-5692177991",
@@ -3850,6 +3909,11 @@
             "path": "spec/evidence/k2-imersite-current38c-prepared-inputs-r01.json",
             "sha256": "6BF6FCD6D312233A0569B91D6B6AA331B1B2335EC5D05658E7FCE1293976B025",
             "status": "prepared-for-owner-preflight-not-native-qualified"
+          },
+          "current_native_evidence": {
+            "path": "spec/evidence/k2-direct-current38c-native-chain-r01.json",
+            "sha256": "962404D89F78014CF0DEF6998A36EED8348D47FA2A98F2D5434508B60DB47E90",
+            "scope": "Affected current38C direct matching-cost K2SO recovery;one new lab/save/two read-only cold reloads from a separate byte-identical owned538B copy."
           }
         }
       ],
