@@ -530,6 +530,11 @@
             "60d10b53ae56ee1865d4003ba65d87843671b820"
           ],
           "scope": "Accepted PR1026 restores the published native Esc/E opened target and descendant drag handle only on explicit open, preserving other GUI focus during background refresh. Accepted PR1027 retires vanished-root subscription flags and resumes an already-open connected replacement view only after its final retired translation request drains. Both exact reviewed heads pass four required checks;54 combined Library host controls pass at60d10b53. These are implementation/host observations, not native keyboard, drag, rendering or client qualification."
+        },
+        {
+          "id": "fresh-client-functional-current-non-v3-applicability",
+          "evidence": "spec/evidence/client-7a2-fbb7-aero-applicability-r01.json",
+          "scope": "Reviewed reuse of original normal F20065FC and F210005D Base/Space-Age private-credit/API-client sessions for currentE9/38C. All12 relevant Library/API/bootstrap/catalogue/decoder blobs are identical;only changelog and cap/lifecycle change. The new transient proof map is unreachable without the MIR4 V3 bucket,absent in these fresh create/init scenarios;with nil proof the existing native decisions are equivalent. Nine original metadata bodies and all three session identities are checked. Original engines,profiles,fixtures,harnesses,saves,asserted behaviors and visual limits retain their identities;no new native process or broader private-state/performance verdict."
         }
       ],
       "test_subjects": [
@@ -538,9 +543,10 @@
       ],
       "remaining_implementation": [],
       "remaining_qualification": [
-        "Run numeric UI timing, affected runtime interaction and final-candidate stress cases; second-host coverage is optional and must be reported if obtained.",
+        "Resolve the paired Library control/missing-readiness failures through the separately reviewed bounded diagnostic,then complete accepted Library/save-load timing and retained-session/churn memory. Preserve original fresh F200/F210 client results under the scoped current applicability review;no rerun merely for a V3-only cap-import correction.",
         "Observe the named Space Age native lab explanation in a rendered client; Base absence rows are already observed. Preserve inherited locale fallback limitations.",
-        "Qualify the accepted1026/1027 Library corrections on the final coherent F200/F210 player packages: actual Esc/E close and dragging/location retention, foreign GUI focus during asynchronous refresh, vanished-root subscription retirement and removed-player translation resumption. Preserve earlier client receipts at their original inputs."
+        "Qualify the accepted1026/1027 Library corrections on the final coherent F200/F210 player packages: actual Esc/E close and dragging/location retention, foreign GUI focus during asynchronous refresh, vanished-root subscription retirement and removed-player translation resumption. Preserve earlier client receipts at their original inputs.",
+        "F200 private-credit action/visibility,earned or persisted private selection/queue state and foreign hidden-row inspection are not covered by the reused normal F200 or level1 F210 probes. Prepare and execute the required affected native cases;do not count the paired timing fixture as those results."
       ]
     },
     {
@@ -748,6 +754,11 @@
             "tests/test_bob_plates_f210_pipeline.py"
           ],
           "scope": "Accepted PR1063/source head9ceb272c centrally wires the finite F210 Bob Plates body through one shared profile. Seven host pipeline controls cover31 Base and16 Space Age row comparisons against independently captured published expectations, tuning, disabled-lead identity and bounded recipe-cap metadata. The host plan has113 controls and all four CI checks pass. This is source/host wiring only; freeze the current package and qualify native research/effects plus protected save/reload behavior separately."
+        },
+        {
+          "id": "q006-independent-full-data-current-applicability",
+          "evidence": "spec/evidence/q006-independent-current-data-aero-r01.json",
+          "scope": "Aero independently reproduces all13 transported full-Bob/Space-Age records:746 published technology identities retained,738 exact,eight explicit effect-order/presentation differences,39 separately classified additions and1022 retained settings. Relevant data-path function bodies,target transforms and packager remain unchanged through playerfbb7/current38C. Original575e/A8/FE4/profile47A538 execution retains its identity;this closes only the captured technology/settings comparison and scoped current data applicability. Eleven public additions,three presentation differences,changed runtime and other profiles keep their separate physical/save/client obligations."
         }
       ],
       "test_subjects": [
@@ -3969,6 +3980,16 @@
             "sdk/README.md"
           ],
           "scope": "Frozen-source exact-literal audit hash-verifies31 archives from five admitted reference selections and reads3322 text members (20027358bytes), with zero named old browser/settings or SDK/MEP consumer matches. Computed names and outside consumers remain unknown; both runtime bridges are retained, and no historical V0 preview removal or consumer migration is claimed."
+        },
+        {
+          "id": "f200-optional-absence-current-mir-unconsumed",
+          "evidence": "spec/evidence/api-optional-absence-f200-aero-applicability-r01.json",
+          "scope": "Aero verifies all five original bodies,eight canonical fixture members and the native F2002.0.77 absence marker from run40122806486. That exact four-mod closure excludes MIR,its runtime interface and optional technology,with cable bonus0. Current MIR implementation is not consumed;the absence result retains its original fixture/profile/harness/engine identity and requires no newer-MIR rerun. The current Beta control still returns at its first line when MIR is absent;its five later tick-query additions are outside that case. No present-MIR API,client,save,F210 or complete API verdict follows."
+        },
+        {
+          "id": "fresh-client-functional-current-non-v3-applicability",
+          "evidence": "spec/evidence/client-7a2-fbb7-aero-applicability-r01.json",
+          "scope": "Reviewed reuse of original normal F20065FC and F210005D Base/Space-Age private-credit/API-client sessions for currentE9/38C. All12 relevant Library/API/bootstrap/catalogue/decoder blobs are identical;only changelog and cap/lifecycle change. The new transient proof map is unreachable without the MIR4 V3 bucket,absent in these fresh create/init scenarios;with nil proof the existing native decisions are equivalent. Nine original metadata bodies and all three session identities are checked. Original engines,profiles,fixtures,harnesses,saves,asserted behaviors and visual limits retain their identities;no new native process or broader private-state/performance verdict."
         }
       ],
       "test_subjects": [
@@ -3977,7 +3998,7 @@
       ],
       "remaining_implementation": [],
       "remaining_qualification": [
-        "Run affected multiplayer/final-source API and independent-consumer cases."
+        "Review retained native data/production-consumer cases and current consumed-input applicability for the documented API subset verdict. The original F210 Base/Space-Age two-consumer client flows and F200 optional-absence case have scoped current applicability;their reuse does not qualify unobserved API methods or a different engine/modset/scenario."
       ]
     },
     {
