@@ -108,11 +108,13 @@
   "release_qualification": false,
   "window_reader_validation": {
     "path": "tools/read_library_profiles.py:read_retained_windows",
-    "new_focused_controls": 4,
-    "all_reader_controls": 22,
+    "new_focused_controls": 5,
+    "all_reader_controls": 23,
     "paired_fixture_controls": 20,
     "result": "All pass. Three process clock offsets yield exact known medians and12 distinct endpoints without input mutation/scoring. Reject short surviving burst,missing first/last coverage,internal gaps,changed PID/start,nonmonotonic/nonfinite clock,incomplete counters,wrong sampled type/cutoff and missing/duplicate/malformed/wrong workload markers.",
     "bounds": "Three restart peer logs,8MiB/log,16KiB/marker line,four markers/role,at most12000 periodic rows and six owned phase counters. Native600/960/600tick protocol and actual eligible edge/gap coverage required.",
-    "native_observations": 0
+    "native_observations": 0,
+    "review_fix": "Independent read-only94cf/1ec review found permissive raw-memory JSON and count-only OS-peak closure. Reject duplicate/nonfinite raw JSON in the private bridge and require exactly initial/restart x server/client-en/client-de with unique owned identities,UTC/clock fields and typed bounded WS/paged endpoints before pending arm. Original preflight522 remains zero-native;refreeze these validity fixes as R02 without changing workload,budgets or acceptance tolerances.",
+    "additional_opponents": "Twelve initial-counter drift variants reject even with valid restart triples. Actual bridge valid input returns12medians;duplicate status field and unused NaN/Infinity/-Infinity exit without observation output. Five focused and all23 reader controls pass. No native observation follows from these host controls."
   }
 }

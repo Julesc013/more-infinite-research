@@ -614,8 +614,11 @@ class RetainedWindowReaderTests(unittest.TestCase):
         for index, role in enumerate(roles):
             start = f"2026-10-29T00:00:0{index}Z"
             for phase in ("initial", "restart"):
-                memory["lifetime_peak_counters"].append({"phase": phase, "role": role, "pid": 100+index,
-                    "start_utc": start, "elapsed_monotonic_milliseconds": 45000})
+                memory["lifetime_peak_counters"].append({"phase": phase, "role": role,
+                    "pid": (200 if phase == "initial" else 100)+index,
+                    "start_utc": start, "observed_utc": "2026-10-29T00:00:45Z",
+                    "elapsed_monotonic_milliseconds": 45000,
+                    "working_set_peak_bytes": 1000, "paged_memory_peak_bytes": 2000})
             for elapsed in range(0, 45001, 250):
                 memory["observations"].append({"phase": "restart", "role": role, "pid": 100+index,
                     "start_utc": start, "elapsed_monotonic_milliseconds": elapsed,
@@ -698,6 +701,28 @@ class RetainedWindowReaderTests(unittest.TestCase):
                 elif opponent == "elapsed": text = text.replace('  5.000', '  invalid')
                 else: text = text.replace('"schema": 1', '"schema": 1, "schema": 1')
                 logs["server"] = text
+                with self.assertRaises(reader.LibraryProfileError):
+                    reader.read_retained_windows(memory, logs, "published")
+
+    def test_requires_every_initial_and_restart_os_peak_endpoint_before_pending_arm(self):
+        for opponent in ("unknown-phase", "unknown-role", "duplicate-slot", "missing-working-set",
+                         "nonfinite-working-set", "boolean-paged", "negative-paged", "missing-utc",
+                         "naive-utc", "reused-identity", "observation-before-start", "nonfinite-clock"):
+            with self.subTest(opponent=opponent):
+                memory, logs = self.inputs()
+                peak = memory["lifetime_peak_counters"][0]  # initial/server; restart triples remain valid
+                if opponent == "unknown-phase": peak["phase"] = "unrelated"
+                elif opponent == "unknown-role": peak["role"] = "other"
+                elif opponent == "duplicate-slot": peak["role"] = "client-en"
+                elif opponent == "missing-working-set": del peak["working_set_peak_bytes"]
+                elif opponent == "nonfinite-working-set": peak["working_set_peak_bytes"] = float("nan")
+                elif opponent == "boolean-paged": peak["paged_memory_peak_bytes"] = True
+                elif opponent == "negative-paged": peak["paged_memory_peak_bytes"] = -1
+                elif opponent == "missing-utc": del peak["observed_utc"]
+                elif opponent == "naive-utc": peak["observed_utc"] = "2026-10-29T00:00:45"
+                elif opponent == "reused-identity": peak["pid"] = 100
+                elif opponent == "observation-before-start": peak["observed_utc"] = "2026-10-28T00:00:00Z"
+                else: peak["elapsed_monotonic_milliseconds"] = float("nan")
                 with self.assertRaises(reader.LibraryProfileError):
                     reader.read_retained_windows(memory, logs, "published")
 

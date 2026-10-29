@@ -96,6 +96,28 @@ def read_retained_windows(memory: dict, logs: dict[str, str], arm: str) -> dict:
             "observation count exceeds collector bound")
     require(type(peaks) is list and len(peaks) == 6, "six owned phase counters required")
     require(all(type(row) is dict for row in observations + peaks), "malformed collector row")
+    slots, identities = set(), set()
+    for peak in peaks:
+        require(type(peak.get("phase")) is str and peak["phase"] in ("initial", "restart")
+                and type(peak.get("role")) is str and peak["role"] in roles, "unknown peak phase/role")
+        slot = (peak["phase"], peak["role"])
+        require(slot not in slots, "duplicate peak phase/role")
+        slots.add(slot)
+        require(type(peak.get("pid")) is int and 0 < peak["pid"] < 2**32, "invalid peak PID")
+        start = utc(peak.get("start_utc"))
+        observed = utc(peak.get("observed_utc"))
+        require(observed >= start, "peak observation precedes process start")
+        identity = (peak["pid"], start)
+        require(identity not in identities, "peak process identity reused across slots")
+        identities.add(identity)
+        elapsed = peak.get("elapsed_monotonic_milliseconds")
+        require(type(elapsed) in (int, float) and 0 <= elapsed <= 900000 and math.isfinite(elapsed),
+                "invalid peak clock")
+        require(type(peak.get("working_set_peak_bytes")) is int and 0 < peak["working_set_peak_bytes"] < 2**63
+                and type(peak.get("paged_memory_peak_bytes")) is int and 0 <= peak["paged_memory_peak_bytes"] < 2**63,
+                "invalid peak memory endpoint")
+    require(slots == {(phase, role) for phase in ("initial", "restart") for role in roles},
+            "owned peak closure differs")
     stages = ["baseline-start", "baseline-end", "post-refresh-start", "post-refresh-end"]
     token = "[MIR5_LIBRARY_RETAINED] "
     fields = {"schema", "case", "stage", "arm", "tick", "refresh_iterations", "public_calls_per_iteration",
