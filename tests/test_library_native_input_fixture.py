@@ -285,11 +285,193 @@ class LibraryNativeInputFixtureControls(unittest.TestCase):
             self.assertNotIn(forbidden, source)
 
 
+class LibrarySupportExportObserverControls(unittest.TestCase):
+    def setUp(self):
+        self.lua = LuaRuntime(unpack_returned_tuples=True)
+        self.lua.globals().support_path = (FIXTURE / "support-exports.lua").as_posix()
+        self.lua.globals().fingerprint = lambda value: json.dumps(plain(value), sort_keys=True)
+        self.lua.execute(r'''
+          function run_export_observer(target,opponent)
+            local key="mir5_library_native_input"
+            local base=target=="f200"and"2.0.77"or"2.1.23"
+            local mir=target=="f200"and"5.0.20000"or"5.0.21000"
+            local original="mir-fixture-mir5-migration-origin-f200-110-source"
+            local fixture=target=="f200"and"0.3.0"or"0.4.0"
+            local callbacks,interfaces,store,players,decoded={},{},{},{},{}
+            local native,logs,saves,write_calls=1,0,0,0
+            local env={storage=store,settings={startup={disabled={value=false},zero={value=0},normal={value=15}}}}
+            env._G=env;setmetatable(env,{__index=_G})
+            local game={players={},connected_players={},forces={player={}}}
+            env.game=game
+            function game.get_player(index)assert(index~=nil);return players[index]end
+            function game.server_save(name)assert(name=="mir5-library-support-exports-restart"or name=="mir5-native-complete");saves=saves+1 end
+            local function node(parent,spec,mod)
+              local value={valid=true,type=spec.type,name=spec.name,parent=parent,tags=spec.tags or{},children={},style={},
+                location={x=140,y=16},text=spec.text,read_only=spec.read_only}
+              if parent then parent[spec.name]=value;parent.children[#parent.children+1]=value end
+              function value.get_mod()return mod end
+              function value.add(s)return node(value,s,mod)end
+              function value.destroy()
+                value.valid=false
+                for _,child in ipairs(value.children)do if child.valid then child.destroy()end end
+                if parent and parent[value.name]==value then parent[value.name]=nil end
+              end
+              return value
+            end
+            local function player(index,locale)
+              local p={index=index,locale=locale,name="Native-"..locale,valid=true,connected=true,force=game.forces.player,
+                display_scale=1,display_resolution={width=1280,height=720},gui={screen=node(nil,{type="screen",name="screen"},"fixture")}}
+              players[index]=p;return p
+            end
+            local function browser(index,options)
+              local p=players[index];local root=p.gui.screen.mir_research_browser
+              if not root then
+                root=node(p.gui.screen,{type="frame",name="mir_research_browser",tags={["more-infinite-research.library-root.v1"]=true}},"more-infinite-research")
+                local tabs=node(root,{type="tabbed-pane",name="mir_library_tabs"},"more-infinite-research")
+                local settings=node(tabs,{type="flow",name="mir_library_settings_content"},"more-infinite-research")
+                local toolbar=node(settings,{type="flow",name="mir_library_settings_toolbar"},"more-infinite-research")
+                for _,name in ipairs({"settings","compact"})do node(toolbar,{type="button",name="mir_library_export_"..name},"more-infinite-research")end
+                local help=node(tabs,{type="flow",name="mir_library_help_content"},"more-infinite-research")
+                node(help,{type="button",name="mir_library_export_diagnostics"},"more-infinite-research")
+              end
+              root.mir_library_tabs.selected_tab_index=options.tab=="help"and 4 or 3
+              return true
+            end
+            env.helpers={table_to_json=function()return"host-only projection"end,decode_string=function(x)return x end,
+              json_to_table=function(x)return decoded[x]end,write_file=function()write_calls=write_calls+1;error("observer must not write export files")end}
+            env.remote={add_interface=function(n,m)interfaces[n]=m end,call=function(n,method,...)
+              if n=="more-infinite-research-browser"then return browser(...)end
+              assert(n=="more-infinite-research-settings"and method=="validate_string")
+              return{valid=opponent~="invalid-profile",recognized=2,invalid=0,unknown=0}
+            end}
+            env.log=function()logs=logs+1 end
+            env.defines={events={on_player_joined_game=1,on_gui_click=2,on_console_command=3}}
+            env.script={active_mods={base=base,["more-infinite-research"]=mir,[original]=fixture,
+              ["mir-fixture-mir5-active-mods-observer"]="0.1.0",["mir-fixture-mir5-library-native-input"]="0.2.0"},
+              on_init=function(f)callbacks.init=f end,on_load=function(f)callbacks.load=f end,
+              on_event=function(id,f)callbacks[id]=f end}
+            local context={key=key,interface="mir5-library-native-input",historical_fixture=original,
+              world=function()return{serial=native}end,
+              assert_world=function()assert(store[key].native.serial==native,"protected native state changed")end,
+              imported=function()assert(native==1,"actual imported credit changed")end}
+            local function register()
+              assert(loadfile(support_path,"t",env))().register(context)
+              return interfaces[context.interface]
+            end
+            local api=register();callbacks.init();assert(api.report().phase=="ready")
+            local en,de=player(1,"en"),player(2,"de")
+            game.players,game.connected_players={en,de},{en,de}
+            if opponent=="reverse-role-order"then
+              callbacks[1]({player_index=2});callbacks[1]({player_index=1})
+            else callbacks[1]({player_index=1});callbacks[1]({player_index=2})end
+            if opponent=="duplicate-initial-join"then callbacks[1]({player_index=1})end
+            local sequence={"en-full","en-compact","en-diagnostics","de-full","de-compact","de-diagnostics",
+              "en-foreign","en-full-before-failure","en-settings-failure","en-diagnostics-before-failure",
+              "en-diagnostics-failure","de-rejoin-full","en-restart-full"}
+            for index,action in ipairs(sequence)do
+              if action=="en-foreign"then en.gui.screen.mir_research_browser.destroy()end -- Host simulation of a separately required actual key.
+              if index==1 and opponent=="early-server-commands"then
+                callbacks[3]({command="mir-settings-export"});callbacks[3]({command="mir-diagnostics-export"})
+              end
+              if index==5 and opponent=="early-rejoin"then callbacks[1]({player_index=2})end
+              if action=="de-rejoin-full"and opponent~="missing-rejoin"and opponent~="duplicate-initial-join"and opponent~="early-rejoin"then
+                callbacks[1]({player_index=opponent=="wrong-role-rejoin"and 1 or 2})
+                if opponent=="duplicate-rejoin"then callbacks[1]({player_index=2})end
+              end
+              if action=="en-restart-full"then
+                if opponent~="early-server-commands"then
+                  callbacks[3]({command="mir-settings-export",player_index=opponent=="zero-server-index"and 0 or nil})
+                  callbacks[3]({command=opponent=="duplicate-settings-command"and"mir-settings-export"or"mir-diagnostics-export"})
+                end
+                api.checkpoint()
+                if opponent=="missing-restart"then store[key].phase="ready"else
+                  api=register();local saved=env.game;env.game=setmetatable({},{__index=function()error("on_load game access")end})
+                  local before=fingerprint(store);callbacks.load();assert(fingerprint(store)==before);env.game=saved
+                  if opponent=="post-load-server-command"then callbacks[3]({command="mir-settings-export"})end
+                  if opponent=="reverse-role-order"then
+                    callbacks[1]({player_index=2});callbacks[1]({player_index=1})
+                  else
+                    callbacks[1]({player_index=1})
+                    if opponent~="duplicate-rejoin"then callbacks[1]({player_index=opponent=="duplicate-restart-role"and 1 or 2})end
+                  end
+                end
+              end
+              api.prepare(action)
+              local p=action:sub(1,2)=="en"and en or de
+              local root=p.gui.screen.mir_research_browser
+              local button,content,kind
+              if action=="en-foreign"then button=p.gui.screen.mir_export_foreign.mir_library_export_settings
+              else
+                local help=action:find("diagnostics",1,true)~=nil
+                content=root.mir_library_tabs[help and"mir_library_help_content"or"mir_library_settings_content"]
+                kind=help and"diagnostics"or(action:find("compact",1,true)and"compact"or"full")
+                button=(help and content or content.mir_library_settings_toolbar)["mir_library_export_"..(kind=="full"and"settings"or kind)]
+                local old=content.mir_library_export_profile
+                if old and opponent~="stale-preview"then old.destroy()end
+                if action~="en-settings-failure"and action~="en-diagnostics-failure"then
+                  local token=p.locale.."-"..index
+                  local values=kind=="compact"and{}or{disabled=false,zero=0,normal=15}
+                  if opponent=="false-zero"then values.zero=false end
+                  decoded[token]={metadata={exported_by=opponent=="wrong-user"and"other"or p.name,mir_version=mir},settings=values}
+                  node(content,{type="text-box",name="mir_library_export_profile",text="MIRSET1:"..token,read_only=opponent~="editable"},"more-infinite-research")
+                end
+              end
+              if opponent=="native-mutation"then native=2 end
+              if opponent=="setting-mutation"then env.settings.startup.zero.value=1 end
+              if opponent~="missing-click"then callbacks[2]({element=button,player_index=opponent=="wrong-player"and 3 or p.index})end
+              if opponent=="duplicate-click"then callbacks[2]({element=button,player_index=p.index})end
+              api.check(action)
+            end
+            local before=fingerprint(store);local result=api.report();assert(fingerprint(store)==before)
+            assert(result.phase=="completed"and result.actual_clicks==13 and result.actual_joins==5 and saves==2 and logs==13 and write_calls==0)
+            assert(result.server_commands==2 and result.server_command_counts["mir-settings-export"]==1
+              and result.server_command_counts["mir-diagnostics-export"]==1)
+            assert(result.joins_by_phase.initial.en==1 and result.joins_by_phase.initial.de==1
+              and result.joins_by_phase.rejoin.en==0 and result.joins_by_phase.rejoin.de==1
+              and result.joins_by_phase.restart.en==1 and result.joins_by_phase.restart.de==1)
+            return result.actual_clicks,result.actual_joins,saves,write_calls
+          end
+        ''')
+
+    def test_export_sequence_uses_real_event_observations_and_read_only_restart_contract(self):
+        for target in ("f200", "f210"):
+            with self.subTest(target=target):
+                self.assertEqual(self.lua.globals().run_export_observer(target, ""), (13, 5, 2, 0))
+
+    def test_initial_and_restart_roles_can_arrive_in_either_order(self):
+        for target in ("f200", "f210"):
+            with self.subTest(target=target):
+                self.assertEqual(self.lua.globals().run_export_observer(target, "reverse-role-order"), (13, 5, 2, 0))
+
+    def test_missing_clicks_wrong_player_values_mutation_and_missing_lifecycle_are_rejected(self):
+        for target in ("f200", "f210"):
+            for opponent in ("missing-click", "duplicate-click", "wrong-player", "invalid-profile", "false-zero",
+                             "wrong-user", "editable", "stale-preview", "native-mutation", "setting-mutation", "missing-rejoin", "missing-restart"):
+                with self.subTest(target=target, opponent=opponent):
+                    with self.assertRaises(Exception):
+                        self.lua.globals().run_export_observer(target, opponent)
+
+    def test_distinct_server_commands_and_exact_client_role_phases_are_required(self):
+        for target in ("f200", "f210"):
+            for opponent in ("duplicate-settings-command", "early-server-commands", "post-load-server-command",
+                             "wrong-role-rejoin", "duplicate-initial-join", "duplicate-rejoin",
+                             "duplicate-restart-role", "early-rejoin"):
+                with self.subTest(target=target, opponent=opponent):
+                    with self.assertRaises(Exception):
+                        self.lua.globals().run_export_observer(target, opponent)
+
+    def test_zero_player_index_cannot_impersonate_absent_server_event_origin(self):
+        for target in ("f200", "f210"):
+            with self.subTest(target=target):
+                with self.assertRaises(Exception):
+                    self.lua.globals().run_export_observer(target, "zero-server-index")
+
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--lua-runtime-dir", type=Path, required=True)
     args = parser.parse_args()
     sys.path.insert(0, str(args.lua_runtime_dir.resolve(strict=True)))
     from lupa.lua52 import LuaRuntime
-    result = unittest.TextTestRunner(verbosity=2).run(unittest.defaultTestLoader.loadTestsFromTestCase(LibraryNativeInputFixtureControls))
+    result = unittest.TextTestRunner(verbosity=2).run(unittest.defaultTestLoader.loadTestsFromModule(sys.modules[__name__]))
     sys.exit(0 if result.wasSuccessful() else 1)

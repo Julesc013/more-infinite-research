@@ -1,0 +1,390 @@
+{
+  "schema": 1,
+  "kind": "library-support-exports-imported110-prepared-inputs",
+  "status": "host-verified-preparation-not-native-qualified",
+  "fixture_revision": "3c83ee84ad77bbf4b8dcca2c0b25017b02c18012",
+  "player_source_commit": "42032477d45ced683e72736a4fe30a7a3195b995",
+  "player_source_tree": "5a6adf0aab4e945aeca13420ddd045ad45f050a0",
+  "package_evidence": "spec/evidence/support-exports-coherent17-aero-reproduction-r01.json",
+  "native_owner": "Black Glass;no Aero engine launch or input/direct-library mutation",
+  "profiles": [
+    {
+      "target": "f200",
+      "profile": {
+        "path": "tests/profiles/library-support-exports-imported110-f200-2077.json",
+        "sha256": "609740033F261C07FAF6600E55FC36A216D564DE820DC54B56826AB65BFABE40",
+        "bytes": 2516
+      },
+      "protected_input_save": {
+        "sha256": "029AA881F739457047B1E8318FA9A77508B28112757176B64CD0C3C31530638C",
+        "bytes": 811812,
+        "original_chain": "spec/evidence/migration-origin-110-7a2-direct-native-chain-r01.json"
+      },
+      "engine": {
+        "version": "2.0.77",
+        "sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B"
+      },
+      "archive_sha256": {
+        "more-infinite-research_5.0.20000.zip": "7CAC54475107736106D84AF98D50A8622E095B6658F1E3682643FE0CBA8BAEF0",
+        "mir-fixture-mir5-active-mods-observer_0.1.0.zip": "723D1E7721449FC26040E5E6629416767BDC20AD79CF8723115846DB662A1F87",
+        "mir-fixture-mir5-migration-origin-f200-110-source_0.3.0.zip": "D30D00A0D57A2A8195565E52DCEFDF94B92DCBA37DC85A83B37245336157E9C0",
+        "mir-fixture-mir5-library-native-input_0.2.0.zip": "9F82842328909D1C1ECD1A10AC42E8525A91783F664D738CF6324500C57347A8"
+      },
+      "owned_preservation_fixture": {
+        "name": "mir-fixture-mir5-migration-origin-f200-110-source_0.3.0.zip",
+        "sha256": "D30D00A0D57A2A8195565E52DCEFDF94B92DCBA37DC85A83B37245336157E9C0",
+        "bytes": 11465,
+        "source": "build/qualification/library-support-exports-imported110-prepared-aero-r01/f200/preservation/source",
+        "members": [
+          {
+            "source": "tests/fixtures/migration-origins/f200-110-successor/control.lua",
+            "source_revision": "dc3bb5899bac55396fd865fb2a504ce213b07bec",
+            "sha256": "CF7C05066854105C1CBDE51876268F6AE685DC52170A732EBE051C3928D75E7F",
+            "bytes": 26440,
+            "destination": "control.lua"
+          },
+          {
+            "source": "tests/fixtures/migration-origins/f200-110-successor/catalogue.lua",
+            "source_revision": "dc3bb5899bac55396fd865fb2a504ce213b07bec",
+            "sha256": "39BC46FC931CD178756FC47E499744C92A58D4C725B62403B06254F57A7FFA26",
+            "bytes": 9263,
+            "destination": "catalogue.lua"
+          },
+          {
+            "source": "tests/fixtures/migration-origins/f200-110-successor/data-final-fixes.lua",
+            "source_revision": "dc3bb5899bac55396fd865fb2a504ce213b07bec",
+            "sha256": "D5D8AA96AF9AADC3FDDA3D485E87E78F81CF15D36BDF9CB090E32F8E7AA4BB5B",
+            "bytes": 3846,
+            "destination": "data-final-fixes.lua"
+          },
+          {
+            "source": "tests/fixtures/migration-origins/f200-110-successor/settings-updates.lua",
+            "source_revision": "dc3bb5899bac55396fd865fb2a504ce213b07bec",
+            "sha256": "3429707833D111634156F95ADAD458A453137D9B800771C9DEFCA6DF2DC9ECEB",
+            "bytes": 1357,
+            "destination": "settings-updates.lua"
+          },
+          {
+            "source": "tests/fixtures/migration-origins/f200-110-successor/info-f200-source-defaults.json",
+            "source_revision": "dc3bb5899bac55396fd865fb2a504ce213b07bec",
+            "sha256": "5D05C5252AF6ABAA29957A9D85EC910A0D74F11FA47DEBD573F90DFA00BB1575",
+            "bytes": 521,
+            "destination": "info.json"
+          }
+        ]
+      },
+      "owned_export_observer": {
+        "name": "mir-fixture-mir5-library-native-input_0.2.0.zip",
+        "sha256": "9F82842328909D1C1ECD1A10AC42E8525A91783F664D738CF6324500C57347A8",
+        "bytes": 10262,
+        "source": "build/qualification/library-support-exports-imported110-prepared-aero-r01/f200/exports/source",
+        "members": [
+          {
+            "source": "tests/fixtures/library-native-input/control.lua",
+            "source_revision": "3c83ee84ad77bbf4b8dcca2c0b25017b02c18012",
+            "destination": "control.lua",
+            "sha256": "7F962902A663CD4BDEB99A8001F862A1B3C9C5A64C7DA951B3EC8BDBC8CA9BD2",
+            "bytes": 20490
+          },
+          {
+            "source": "tests/fixtures/library-native-input/support-exports.lua",
+            "source_revision": "3c83ee84ad77bbf4b8dcca2c0b25017b02c18012",
+            "destination": "support-exports.lua",
+            "sha256": "A326E38D15D7C59CBFD6215D430568CC79BED9B9AB71542D4B7AD8ACCC049305",
+            "bytes": 12592
+          },
+          {
+            "source": "tests/fixtures/library-native-input/info-exports-f200.json",
+            "source_revision": "3c83ee84ad77bbf4b8dcca2c0b25017b02c18012",
+            "destination": "info.json",
+            "sha256": "C23352E05F62F13343DEFB09DAE1DC017E2B4FE5B046BED4989B315689AD2B9A",
+            "bytes": 348
+          }
+        ]
+      }
+    },
+    {
+      "target": "f210",
+      "profile": {
+        "path": "tests/profiles/library-support-exports-imported110-f210-2123.json",
+        "sha256": "E5C7CEB7BC325D93EFC3864B620F0DD2D7837EB7E0590DB5C9BEF4D41A2C589B",
+        "bytes": 2516
+      },
+      "protected_input_save": {
+        "sha256": "8DCFC16FF929766D2E5CFEC4F7BC81367A9632CEB4B39558E40330FA43BD7F0C",
+        "bytes": 814068,
+        "original_chain": "spec/evidence/migration-origin-110-7a2-direct-native-chain-r01.json"
+      },
+      "engine": {
+        "version": "2.1.23",
+        "sha256": "8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38"
+      },
+      "archive_sha256": {
+        "more-infinite-research_5.0.21000.zip": "B63743C36432E4C41CC0F56D5A48CABE81924D426EF11045095A9D5ED0430D7B",
+        "mir-fixture-mir5-active-mods-observer_0.1.0.zip": "A15A7D628D66953D2E0C4D4FA288F47CBF9C5678327C7EB3D23ADB5DC78331C0",
+        "mir-fixture-mir5-migration-origin-f200-110-source_0.4.0.zip": "E07DF42B2FBFACEA5BA32F3E616AF5BBFAB4E355B116187DC023252CFCD09B43",
+        "mir-fixture-mir5-library-native-input_0.2.0.zip": "8DD9BBC792C2225EBC594D3BC8920384DB19AC4A8261A7C67748A3F49A6E768B"
+      },
+      "owned_preservation_fixture": {
+        "name": "mir-fixture-mir5-migration-origin-f200-110-source_0.4.0.zip",
+        "sha256": "E07DF42B2FBFACEA5BA32F3E616AF5BBFAB4E355B116187DC023252CFCD09B43",
+        "bytes": 11472,
+        "source": "build/qualification/library-support-exports-imported110-prepared-aero-r01/f210/preservation/source",
+        "members": [
+          {
+            "source": "tests/fixtures/migration-origins/f200-110-successor/control.lua",
+            "source_revision": "dc3bb5899bac55396fd865fb2a504ce213b07bec",
+            "sha256": "CF7C05066854105C1CBDE51876268F6AE685DC52170A732EBE051C3928D75E7F",
+            "bytes": 26440,
+            "destination": "control.lua"
+          },
+          {
+            "source": "tests/fixtures/migration-origins/f200-110-successor/catalogue.lua",
+            "source_revision": "dc3bb5899bac55396fd865fb2a504ce213b07bec",
+            "sha256": "39BC46FC931CD178756FC47E499744C92A58D4C725B62403B06254F57A7FFA26",
+            "bytes": 9263,
+            "destination": "catalogue.lua"
+          },
+          {
+            "source": "tests/fixtures/migration-origins/f200-110-successor/data-final-fixes.lua",
+            "source_revision": "dc3bb5899bac55396fd865fb2a504ce213b07bec",
+            "sha256": "D5D8AA96AF9AADC3FDDA3D485E87E78F81CF15D36BDF9CB090E32F8E7AA4BB5B",
+            "bytes": 3846,
+            "destination": "data-final-fixes.lua"
+          },
+          {
+            "source": "tests/fixtures/migration-origins/f200-110-successor/settings-updates.lua",
+            "source_revision": "dc3bb5899bac55396fd865fb2a504ce213b07bec",
+            "sha256": "3429707833D111634156F95ADAD458A453137D9B800771C9DEFCA6DF2DC9ECEB",
+            "bytes": 1357,
+            "destination": "settings-updates.lua"
+          },
+          {
+            "source": "tests/fixtures/migration-origins/f200-110-successor/info-f210-source-defaults.json",
+            "source_revision": "dc3bb5899bac55396fd865fb2a504ce213b07bec",
+            "sha256": "92FDBA41067B51984C1F90BC98E9A17F215548E89AB8D550B60ED401F6AA2C8D",
+            "bytes": 526,
+            "destination": "info.json"
+          }
+        ]
+      },
+      "owned_export_observer": {
+        "name": "mir-fixture-mir5-library-native-input_0.2.0.zip",
+        "sha256": "8DD9BBC792C2225EBC594D3BC8920384DB19AC4A8261A7C67748A3F49A6E768B",
+        "bytes": 10264,
+        "source": "build/qualification/library-support-exports-imported110-prepared-aero-r01/f210/exports/source",
+        "members": [
+          {
+            "source": "tests/fixtures/library-native-input/control.lua",
+            "source_revision": "3c83ee84ad77bbf4b8dcca2c0b25017b02c18012",
+            "destination": "control.lua",
+            "sha256": "7F962902A663CD4BDEB99A8001F862A1B3C9C5A64C7DA951B3EC8BDBC8CA9BD2",
+            "bytes": 20490
+          },
+          {
+            "source": "tests/fixtures/library-native-input/support-exports.lua",
+            "source_revision": "3c83ee84ad77bbf4b8dcca2c0b25017b02c18012",
+            "destination": "support-exports.lua",
+            "sha256": "A326E38D15D7C59CBFD6215D430568CC79BED9B9AB71542D4B7AD8ACCC049305",
+            "bytes": 12592
+          },
+          {
+            "source": "tests/fixtures/library-native-input/info-exports-f210.json",
+            "source_revision": "3c83ee84ad77bbf4b8dcca2c0b25017b02c18012",
+            "destination": "info.json",
+            "sha256": "59301D40D7266BA0BAB66E3C64162D91FFFB249FC49AE1134D9E0B783942E005",
+            "bytes": 348
+          }
+        ]
+      }
+    }
+  ],
+  "public_helper_pins": [
+    {
+      "source": "tools/Invoke-MultiplayerFixture.ps1",
+      "source_revision": "dc3bb5899bac55396fd865fb2a504ce213b07bec",
+      "sha256": "8435922655C9AD81A196F2E5121850B372B4BFDEC0F4467909230C20E9E42643",
+      "bytes": 78240
+    },
+    {
+      "source": "tools/Invoke-MultiplayerSession.ps1",
+      "source_revision": "dc3bb5899bac55396fd865fb2a504ce213b07bec",
+      "sha256": "0F55E7C2C17B15FF698CDD3C396CABCD5A85B0B49433951096401A8DDFE92CB8",
+      "bytes": 82309
+    },
+    {
+      "source": "tools/Invoke-NativeFixture.ps1",
+      "source_revision": "dc3bb5899bac55396fd865fb2a504ce213b07bec",
+      "sha256": "CD2E451F94BF2CFB4402192A9A0EE2F4C78F083E73AD3ECF6771BBED105804C8",
+      "bytes": 77077
+    },
+    {
+      "source": "tools/commands/workspace/Invoke-MIRDevelopmentHealthHook.ps1",
+      "source_revision": "dc3bb5899bac55396fd865fb2a504ce213b07bec",
+      "sha256": "3C9D435EA1A592570AFB2A609705D54747D76FF127FCE05FBE43E10D1A9E21E2",
+      "bytes": 3124
+    },
+    {
+      "source": "tools/commands/workspace/Optimize-MIRArtifactStorage.ps1",
+      "source_revision": "dc3bb5899bac55396fd865fb2a504ce213b07bec",
+      "sha256": "069D52E62E57249451E23F048BFC3C0DE7A3376F1460F2458A4E0DBDD0C76151",
+      "bytes": 16786
+    },
+    {
+      "source": "tools/commands/workspace/Remove-MIRStaleArtifacts.ps1",
+      "source_revision": "dc3bb5899bac55396fd865fb2a504ce213b07bec",
+      "sha256": "5120FAF2D8435D801F8A5252A8FF93756468CE9F6DCC39234E6D81DBA152F80C",
+      "bytes": 55384
+    },
+    {
+      "source": "tools/commands/workspace/Test-MIRDevelopmentHealth.ps1",
+      "source_revision": "dc3bb5899bac55396fd865fb2a504ce213b07bec",
+      "sha256": "D610BE142BF948C2CE5C5BAE4FE29822D84C75114EC5A7BF0A9D6F719CB7CDE1",
+      "bytes": 20656
+    },
+    {
+      "source": "tools/lib/compatibility/LibraryActivation.ps1",
+      "source_revision": "dc3bb5899bac55396fd865fb2a504ce213b07bec",
+      "sha256": "123A2241B895B57217AA969A677FF21BBFB268FE55E9734287883B4D6AE25099",
+      "bytes": 32133
+    },
+    {
+      "source": "tools/lib/compatibility/ModPortal.ps1",
+      "source_revision": "dc3bb5899bac55396fd865fb2a504ce213b07bec",
+      "sha256": "A16344F66A9124C0792614AAD83702603D4C0AD4FE977392C73710B745E74B08",
+      "bytes": 5897
+    },
+    {
+      "source": "tools/lib/validation/DirectLibraryStartupMeasurement.ps1",
+      "source_revision": "dc3bb5899bac55396fd865fb2a504ce213b07bec",
+      "sha256": "D069C014D74E883C249928E812A258E2A2CB34AFE499219CB46A513345C2EC34",
+      "bytes": 27662
+    },
+    {
+      "source": "tools/lib/validation/ImmutableInputStaging.ps1",
+      "source_revision": "dc3bb5899bac55396fd865fb2a504ce213b07bec",
+      "sha256": "B5FBFAC8537B08F9790BD3EE8ACEAAB38EE5CBB8EF005E67E8375DE568BBC12C",
+      "bytes": 25710
+    },
+    {
+      "source": "tools/lib/validation/NativeProbeCommon.ps1",
+      "source_revision": "dc3bb5899bac55396fd865fb2a504ce213b07bec",
+      "sha256": "CC8462A39DE12D0746C8F985D1F86F761CF3EF261B4FA551CFFD092F76D64D71",
+      "bytes": 4079
+    },
+    {
+      "source": "tools/lib/validation/NativeProbeResources.ps1",
+      "source_revision": "dc3bb5899bac55396fd865fb2a504ce213b07bec",
+      "sha256": "A34BD5FE79466B3EDA96F46EC132562192E6A70280901381C8AF560E7AB23328",
+      "bytes": 13233
+    },
+    {
+      "source": "tools/lib/validation/OwnedProcessMemorySampler.ps1",
+      "source_revision": "dc3bb5899bac55396fd865fb2a504ce213b07bec",
+      "sha256": "BED20276B381B3F8573CD0D7789678843080819FDBF2FDCD32496E9FE32FFE1E",
+      "bytes": 13442
+    },
+    {
+      "source": "tools/lib/validation/ResourceGovernor.ps1",
+      "source_revision": "dc3bb5899bac55396fd865fb2a504ce213b07bec",
+      "sha256": "B811A1548A6D789F2A7E618999D5087C70E0151E751CCF4C51635D54E6BF04ED",
+      "bytes": 25471
+    },
+    {
+      "source": "tools/lib/validation/ResponsiveMenuRecord.ps1",
+      "source_revision": "dc3bb5899bac55396fd865fb2a504ce213b07bec",
+      "sha256": "7F74EF416DC4C06B85B3479C02DEF13837F9D69420BBE2F88ADAFB8E5E18DFFB",
+      "bytes": 5418
+    },
+    {
+      "source": "tools/lib/validation/responsive-menu/Invoke-MIRResponsiveMenuActor.ps1",
+      "source_revision": "dc3bb5899bac55396fd865fb2a504ce213b07bec",
+      "sha256": "DC4816352962EC14ED443E5865F71FF3F2A989B47DCF4F45916048F1B5A55D55",
+      "bytes": 4876
+    },
+    {
+      "source": "tools/lib/validation/responsive-menu/MenuObservation.ps1",
+      "source_revision": "dc3bb5899bac55396fd865fb2a504ce213b07bec",
+      "sha256": "8423C41478F7AB329E7A385BBD13BB39490E42FB4F98B1D53AA508B583DEC2EC",
+      "bytes": 6341
+    },
+    {
+      "source": "tools/lib/validation/responsive-menu/OwnedMenuWindow.ps1",
+      "source_revision": "dc3bb5899bac55396fd865fb2a504ce213b07bec",
+      "sha256": "554324FF12A7EAC51DAA5438B48CE79A10FC095E546844127F02590A7772ED43",
+      "bytes": 17944
+    },
+    {
+      "source": "tools/read_library_profiles.py",
+      "source_revision": "dc3bb5899bac55396fd865fb2a504ce213b07bec",
+      "sha256": "2C99D50668AB90E3329649447FD156578F1377DA95E6998699D6D401DF583292",
+      "bytes": 13723
+    },
+    {
+      "source": "tools/Invoke-LibraryNativeInput.ps1",
+      "source_revision": "dc3bb5899bac55396fd865fb2a504ce213b07bec",
+      "sha256": "620E0BF8A2B174107E6ABCFEB0DB48167EFA66B47EEC9C0497CBCCC3CAB46D6D",
+      "bytes": 9664
+    }
+  ],
+  "previous_preparation": "spec/evidence/library-native-input-imported110-prepared-aero-r02.json",
+  "original_protocol": "Frozen0.1 keyboard/private-earned-state packets retain their source/actor/profile identities and pending native obligations. This is a separately selected0.2 functional export protocol,not a substitute or performance result.",
+  "required_outcome": "Actual modern F200/F210 client settings/diagnostic exports,target isolation and relevant lifecycle on protected earned-state copies,with unchanged research/settings/native state.",
+  "commands": {
+    "actor": "pwsh -NoProfile -File tools/Invoke-LibraryNativeInput.ps1 -SpecPath <exact-spec> -SpecSha256 <actual-sha> -OutputRoot <fresh-owned-output>;use-ValidateOnly first for schema only",
+    "observer": "remote.call(\"mir5-library-native-input\",\"prepare\",ACTION),actual owned native click,then remote.call(\"mir5-library-native-input\",\"check\",ACTION)",
+    "server_console": [
+      "/mir-settings-export",
+      "/mir-diagnostics-export"
+    ],
+    "restart": "After de-rejoin-full and two explicit server exports,remote.call(\"mir5-library-native-input\",\"checkpoint\");retain closed/hash-pinned mir5-library-support-exports-restart,clients-first stop/restart,rejoin both,then en-restart-full.",
+    "restriction": "The old first-upgrade/fresh Library readers and0.1 advance sequence do not consume this new protocol. Black Glass must bind/review its narrow existing private client caller/reader and actual geometry before native dispatch."
+  },
+  "ordered_actions": [
+    "en-full",
+    "en-compact",
+    "en-diagnostics",
+    "de-full",
+    "de-compact",
+    "de-diagnostics",
+    "en-foreign",
+    "en-full-before-failure",
+    "en-settings-failure",
+    "en-diagnostics-before-failure",
+    "en-diagnostics-failure",
+    "de-rejoin-full",
+    "en-restart-full"
+  ],
+  "independent_expected": [
+    "Original preserved MIG110 fixture retains its full31row/effect/credit/configuration/cold assertions. Observer retains35native rows/recipe contributions/queue/progress/three-force bonuses and every startup scalar without MIR-private storage access.",
+    "Actual owned EN/DE buttons create bounded readonly native text-box previews;public existing validation passes;metadata and full false/zero types/values match. Each successful file equals its exact preview plus one newline. Compact inherits unspecified defaults and never applies settings.",
+    "Distinct role write-data roots prove requesting-client-only output;server commands target server only. Retain before/after manifests and original outputs for every terminal action before later overwrite.",
+    "mir.log is latest bounded diagnostic report,not engine/current-log copying. Check version/edition/engine/mods/settings/selected-state/limits and sharing guidance. Explicit diagnostic export also writes a full profile.",
+    "Foreign matching-name native click writes no MIR output. Repeated success/failure retires prior previews. Actual target-peer failure text/screenshot/files must be read externally;host projection/observer marker alone grants no I/O verdict.",
+    "Use only disposable owned output path controls after preserving original files;verify resolved paths remain inside the explicitly owned run,perform no recursive cleanup and restore exact controls. Report failure may leave a valid successfully written settings profile.",
+    "Actual DE rejoin and saved-host restart/rejoin both preserve native/settings state. Before explicit exports,ordinary load/rejoin must not rewrite server startup header. Init/configuration header writes require their own actual callback observation;this imported-save scenario does not fabricate a fresh MIR on_init.",
+    "No sync error,crash,unintended peer file,native research/settings mutation or missing meaningful expected output is accepted. Keep all failed native receipts before correcting fixtures/product."
+  ],
+  "host_validation": {
+    "observer_controls": 4,
+    "old_actor_controls": 2,
+    "opposing_export_variants": 24,
+    "plan": "build/qualification/library-support-export-native-host-plan-r01.json",
+    "native_evidence": false
+  },
+  "zip_policy": "1980-01-01T00:00:00,create_system3,0o100644<<16,ZIP_DEFLATED9,sorted member paths;each own container/payload/CRC independently read back",
+  "before_dispatch": [
+    "Independent exact fixture/profile/helper/container review",
+    "Black Glass actual own archive/controller/reader/geometry/process identity and role-output binding",
+    "Existing sole native-lane/resource admission;functional observations remain outside scored timings"
+  ],
+  "limits": "Prepared Base-only modern paths;SpaceAge effective-settings/report membership remains scoped to its actual applicable observations. Original source labs count once;no new labs/credit seeds/cannon-origin coverage or broad performance/compatibility/release claim.",
+  "native_execution": {
+    "processes": 0,
+    "joins": 0,
+    "actual_clicks": 0,
+    "new_labs": 0,
+    "new_saves": 0,
+    "verdict": "not-run"
+  }
+}
