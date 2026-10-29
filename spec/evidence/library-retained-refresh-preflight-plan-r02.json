@@ -1,0 +1,287 @@
+{
+  "schema": 1,
+  "kind": "MIRLibraryRetainedRefreshPreflightPlanV1",
+  "status": "prepared-reviewed-validity-corrections-not-native-result",
+  "review_base_commit": "2fa62c6cc07b9b975873d790211c30f6e9b5eaf7",
+  "player_tree": "7b0ede663e6fbcf486cd863e7d3719653aedc07a",
+  "collector_method": "spec/evidence/library-lifetime-peak-collector-method-aero-r01.json",
+  "prior_diagnostic": "spec/evidence/library-repeatability-diagnostic-r02-native-chain.json",
+  "required_outcome": "Observe both exact arms once under the native-qualified fixed map/All/render/OS mechanism with explicit32refreshes and full covered retained windows. No between-arm score or repeatability result.",
+  "engine": {
+    "version": "2.0.77",
+    "path": "D:/Games/Factorio/2.0/bin/x64/factorio.exe",
+    "sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B"
+  },
+  "library": "D:/Projects/Factorio/testmods/2.0",
+  "published": {
+    "version": "4.7.20002",
+    "path": "D:/Projects/Factorio/testmods/2.0/more-infinite-research_4.7.20002.zip",
+    "sha256": "F3943EB4D69CCDAC41BD9F922AD03A5C78F34F22D8E7FA5A88A7A658AB1010B7",
+    "bytes": 1449338
+  },
+  "candidate": {
+    "version": "5.0.20000",
+    "source_commit": "a95dbc6b35c165b46aa9991d2a0ef7274d4ec04a",
+    "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\packages\\7b0-all17-r01\\more-infinite-research_5.0.20000.zip",
+    "sha256": "1D45A54DB6F911F665A019897518E46D6614AE7E56903B067F93E116DFC2554F",
+    "bytes": 692743
+  },
+  "observer": {
+    "name": "mir-fixture-mir5-active-mods-observer_0.1.0.zip",
+    "sha256": "723D1E7721449FC26040E5E6629416767BDC20AD79CF8723115846DB662A1F87"
+  },
+  "profiles": {
+    "published": {
+      "path": "tests/profiles/library-retained-refresh-published-f200-2077.json",
+      "sha256": "2629C84913490CE58A40CE6019D0C98891F8190E25E3BA20AB876AC78914FB95"
+    },
+    "candidate": {
+      "path": "tests/profiles/library-retained-refresh-current-f200-2077.json",
+      "sha256": "970687E27477C5BF2C31CFE0D600226E4C2054FB01F8ACF791DC9F55EB51BD92"
+    }
+  },
+  "public_helpers": [
+    {
+      "path": "tools/Invoke-MultiplayerFixture.ps1",
+      "sha256": "8435922655C9AD81A196F2E5121850B372B4BFDEC0F4467909230C20E9E42643"
+    },
+    {
+      "path": "tools/Invoke-MultiplayerSession.ps1",
+      "sha256": "0F55E7C2C17B15FF698CDD3C396CABCD5A85B0B49433951096401A8DDFE92CB8"
+    },
+    {
+      "path": "tools/Invoke-NativeFixture.ps1",
+      "sha256": "CD2E451F94BF2CFB4402192A9A0EE2F4C78F083E73AD3ECF6771BBED105804C8"
+    },
+    {
+      "path": "tools/commands/workspace/Invoke-MIRDevelopmentHealthHook.ps1",
+      "sha256": "3C9D435EA1A592570AFB2A609705D54747D76FF127FCE05FBE43E10D1A9E21E2"
+    },
+    {
+      "path": "tools/commands/workspace/Optimize-MIRArtifactStorage.ps1",
+      "sha256": "069D52E62E57249451E23F048BFC3C0DE7A3376F1460F2458A4E0DBDD0C76151"
+    },
+    {
+      "path": "tools/commands/workspace/Remove-MIRStaleArtifacts.ps1",
+      "sha256": "5120FAF2D8435D801F8A5252A8FF93756468CE9F6DCC39234E6D81DBA152F80C"
+    },
+    {
+      "path": "tools/commands/workspace/Test-MIRDevelopmentHealth.ps1",
+      "sha256": "D610BE142BF948C2CE5C5BAE4FE29822D84C75114EC5A7BF0A9D6F719CB7CDE1"
+    },
+    {
+      "path": "tools/lib/compatibility/LibraryActivation.ps1",
+      "sha256": "123A2241B895B57217AA969A677FF21BBFB268FE55E9734287883B4D6AE25099"
+    },
+    {
+      "path": "tools/lib/compatibility/ModPortal.ps1",
+      "sha256": "A16344F66A9124C0792614AAD83702603D4C0AD4FE977392C73710B745E74B08"
+    },
+    {
+      "path": "tools/lib/validation/DirectLibraryStartupMeasurement.ps1",
+      "sha256": "D069C014D74E883C249928E812A258E2A2CB34AFE499219CB46A513345C2EC34"
+    },
+    {
+      "path": "tools/lib/validation/ImmutableInputStaging.ps1",
+      "sha256": "B5FBFAC8537B08F9790BD3EE8ACEAAB38EE5CBB8EF005E67E8375DE568BBC12C"
+    },
+    {
+      "path": "tools/lib/validation/NativeProbeCommon.ps1",
+      "sha256": "CC8462A39DE12D0746C8F985D1F86F761CF3EF261B4FA551CFFD092F76D64D71"
+    },
+    {
+      "path": "tools/lib/validation/NativeProbeResources.ps1",
+      "sha256": "A34BD5FE79466B3EDA96F46EC132562192E6A70280901381C8AF560E7AB23328"
+    },
+    {
+      "path": "tools/lib/validation/OwnedProcessMemorySampler.ps1",
+      "sha256": "BED20276B381B3F8573CD0D7789678843080819FDBF2FDCD32496E9FE32FFE1E"
+    },
+    {
+      "path": "tools/lib/validation/ResourceGovernor.ps1",
+      "sha256": "B811A1548A6D789F2A7E618999D5087C70E0151E751CCF4C51635D54E6BF04ED"
+    },
+    {
+      "path": "tools/lib/validation/ResponsiveMenuRecord.ps1",
+      "sha256": "7F74EF416DC4C06B85B3479C02DEF13837F9D69420BBE2F88ADAFB8E5E18DFFB"
+    },
+    {
+      "path": "tools/lib/validation/responsive-menu/Invoke-MIRResponsiveMenuActor.ps1",
+      "sha256": "DC4816352962EC14ED443E5865F71FF3F2A989B47DCF4F45916048F1B5A55D55"
+    },
+    {
+      "path": "tools/lib/validation/responsive-menu/MenuObservation.ps1",
+      "sha256": "8423C41478F7AB329E7A385BBD13BB39490E42FB4F98B1D53AA508B583DEC2EC"
+    },
+    {
+      "path": "tools/lib/validation/responsive-menu/OwnedMenuWindow.ps1",
+      "sha256": "554324FF12A7EAC51DAA5438B48CE79A10FC095E546844127F02590A7772ED43"
+    },
+    {
+      "path": "tools/read_library_profiles.py",
+      "sha256": "58EE3BBDB5ED88C504E178F5F83303086687C67317021786C1A338944BC4DF90"
+    }
+  ],
+  "fixture_sources": [
+    {
+      "role": "paired",
+      "name": "mir-fixture-mir5-library-paired-browser",
+      "version": "0.1.0",
+      "canonical_library_archive": false,
+      "members": [
+        {
+          "source": "tests/fixtures/library-paired-browser/info.json",
+          "destination": "info.json",
+          "sha256": "8904B01C651A43C6516B6A91882CD2FCBA09FAE81CB3E0927E3983A59B6C66E1",
+          "bytes": 334,
+          "source_revision": "29656594be26c9219bee2e644023cd86a34598d1"
+        },
+        {
+          "source": "tests/fixtures/library-paired-browser/settings.lua",
+          "destination": "settings.lua",
+          "sha256": "110C21AE6C294B22DFE9E46F64B96ACAC26E790A11609541652198BFB66EC162",
+          "bytes": 386,
+          "source_revision": "29656594be26c9219bee2e644023cd86a34598d1"
+        },
+        {
+          "source": "tests/fixtures/library-paired-browser/control.lua",
+          "destination": "control.lua",
+          "sha256": "4B6E277B4A492F95831A13C32515DE3A8D38F68130550F7AAD5B1E8006035282",
+          "bytes": 22295,
+          "source_revision": "29656594be26c9219bee2e644023cd86a34598d1"
+        }
+      ],
+      "archive_sha256": "8B96DE18F1B93DE256CABA4386731A08EF50112D28BEFD5D27440B4233076A07",
+      "archive_bytes": 6606
+    },
+    {
+      "role": "arm-published",
+      "name": "mir-fixture-mir5-library-paired-browser-arm-published",
+      "version": "0.1.0",
+      "canonical_library_archive": false,
+      "members": [
+        {
+          "source": "tests/fixtures/library-paired-browser/arm-published/info.json",
+          "destination": "info.json",
+          "sha256": "DE1C333CE7820FCEEB4B87F69E4AA04607D36D577C45D839ED9E368C26C4AE16",
+          "bytes": 474,
+          "source_revision": "29656594be26c9219bee2e644023cd86a34598d1"
+        },
+        {
+          "source": "tests/fixtures/library-paired-browser/arm-published/settings-updates-retained.lua",
+          "destination": "settings-updates.lua",
+          "sha256": "C006542D0036DBF065C6E30950571D16E2ED409F1230799853052B0879EE209F",
+          "bytes": 557,
+          "source_revision": "29656594be26c9219bee2e644023cd86a34598d1"
+        }
+      ],
+      "archive_sha256": "0347AA704BA9584E71E316AB4633D006F723B2E2E1B9C824E79ADD07C8565244",
+      "archive_bytes": 937
+    },
+    {
+      "role": "arm-mir5",
+      "name": "mir-fixture-mir5-library-paired-browser-arm-mir5",
+      "version": "0.1.0",
+      "canonical_library_archive": false,
+      "members": [
+        {
+          "source": "tests/fixtures/library-paired-browser/arm-mir5/info.json",
+          "destination": "info.json",
+          "sha256": "2BC58CCFD9CF778F664A4C19BD8139C02D4E40C5FD0217C7DDF586DBA9B20D7B",
+          "bytes": 459,
+          "source_revision": "29656594be26c9219bee2e644023cd86a34598d1"
+        },
+        {
+          "source": "tests/fixtures/library-paired-browser/arm-mir5/settings-updates-retained.lua",
+          "destination": "settings-updates.lua",
+          "sha256": "6E65B62DF635C547C158819B7392D3A47D2BAE78E0443FFD82C2570B2D83BC3F",
+          "bytes": 518,
+          "source_revision": "29656594be26c9219bee2e644023cd86a34598d1"
+        }
+      ],
+      "archive_sha256": "86404548A3A72C993B1EAAFA8E27F6CAABC6D562128F1AFFEC570CEE002AD236",
+      "archive_bytes": 901
+    },
+    {
+      "role": "observer",
+      "name": "mir-fixture-mir5-active-mods-observer",
+      "version": "0.1.0",
+      "canonical_library_archive": true,
+      "members": [
+        {
+          "source": "tests/fixtures/active-mods-observer/info-f200.json",
+          "destination": "info.json",
+          "sha256": "5C4A351958060F5FED504AA86E8C201A2F50A36C2732E624727B5697F216475A",
+          "bytes": 231,
+          "source_revision": "29656594be26c9219bee2e644023cd86a34598d1"
+        },
+        {
+          "source": "tests/fixtures/active-mods-observer/data-final-fixes.lua",
+          "destination": "data-final-fixes.lua",
+          "sha256": "89D364F0033A7EE036998E6C29A3558099C25AD2707CB24914790C49FB21555C",
+          "bytes": 477,
+          "source_revision": "29656594be26c9219bee2e644023cd86a34598d1"
+        }
+      ],
+      "archive_sha256": "723D1E7721449FC26040E5E6629416767BDC20AD79CF8723115846DB662A1F87"
+    }
+  ],
+  "schedule": [
+    {
+      "ordinal": 1,
+      "id": "01-published-retained-refresh",
+      "arm": "published",
+      "role": "unscored-native-preflight"
+    },
+    {
+      "ordinal": 2,
+      "id": "02-current-retained-refresh",
+      "arm": "candidate",
+      "role": "unscored-native-preflight"
+    }
+  ],
+  "resources": {
+    "session_expected_peak_memory_mib": 8192,
+    "preparation_peak_memory_mib": 4096,
+    "existing_resource_governor": true,
+    "exclusive_direct_library": true
+  },
+  "native_options": {
+    "CollectProcessMemoryObservations": true,
+    "CollectProcessLifetimePeaks": true
+  },
+  "independent_expected": [
+    "All six create/initial/cold native ready records report seed424242 and identical complete parsed map_gen_settings. No whole-save/entity equality inference.",
+    "Each actual EN/DE peer retains original query/selection/All scope and native snapshots through initial actions and cold restart;all24PNG bodies decode and eight delayed first-open/reopen frames are inspected.",
+    "Each restart peer emits exactly four retained markers at600/960/600tick intervals with32refresh iterations and two public calls periteration. All original profiler actions/screenshots/native assertions remain.",
+    "Read all twelve retained-window medians only after exact PID/start/phase/role/clock alignment,one-second trims,500ms edge coverage and no internal gap above1second. Missing or incomplete coverage stops before the pending arm.",
+    "Retain original26 UI/load/periodic endpoints and additional12 distinct OS peaks percase. New12retained medians and six raw growth differences are observations,not a control or comparative verdict.",
+    "One active and one pending arm,zero extensions,stop on first native/data-validity error. Preserve closed saves,exact original archives/controls and all raw/adverse custody."
+  ],
+  "failure_path": "Retain first actual refusal/error and raw inputs. Diagnose before a changed reviewed retry;never relax assertions,coverage,budgets or practical tolerances.",
+  "limits": [
+    "Exactly two unscored F200 arms;no candidate performance,repeatability,future full schedule or release verdict.",
+    "Native lifecycle/GUI-construction and process counters remain distinct from actual keyboard/frame latency,imported earnings,other engines and modpacks.",
+    "Original sampled-memory control failures retain their original identities and verdicts. The proposed future OS/retained method does not substitute or rewrite them."
+  ],
+  "scored_dataset": false,
+  "performance_acceptance": false,
+  "release_qualification": false,
+  "prior_preflight": "spec/evidence/library-counter-render-preflight-native-chain-r01.json",
+  "fixed_map_seed": 424242,
+  "method": "spec/evidence/library-peak-retained-method-r01.json",
+  "prior_preflight_plan": "spec/evidence/library-retained-refresh-preflight-plan-r01.json",
+  "prelaunch_review_corrections": {
+    "old_public": "94cf142f23bf6735082d32bea420341ce423875b",
+    "old_private": "1ec56910e133166cc663a89f7df64bacb41f0d68",
+    "old_packet_sha256": "522261830A32D2FA17F608B5506D3160E16B5D9738426480D1674DB36D4E7499",
+    "old_native_launches": 0,
+    "corrected_public_implementation": "2fa62c6cc07b9b975873d790211c30f6e9b5eaf7",
+    "corrected_private": "98d67fbf43b2f725faec273acf1e50651fb1b17d",
+    "fixes": [
+      "Strict duplicate-key/nonfinite raw-memory JSON rejection",
+      "Exact six initial/restart role counters with unique owned identities and typed/bounded OS endpoints"
+    ],
+    "unchanged": "Workload,profile/fixture/player/engine bytes,schedule,resource safeguards,coverage and practical allowances. No scored observations or prior-control substitution."
+  }
+}
