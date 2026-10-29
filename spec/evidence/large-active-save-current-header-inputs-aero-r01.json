@@ -372,8 +372,8 @@
   },
   "profile": {
     "path": "tests/profiles/foundation-available-space-age-f200-2077.json",
-    "bytes": 7654,
-    "sha256": "57989AFC46BAE915F8C8760D13DABE939377754A2FD05E70F2E6DAC463100AF8",
+    "bytes": 7426,
+    "sha256": "6A78405687485F7C8335304C3232EAE8284F741F5120E19720462DDDFFE5E537",
     "selected_mods": 36,
     "third_party_mods": 31,
     "existing_archives": 32,
@@ -957,7 +957,8 @@
     "existing_read_only_profile_reader": "pass:Read-MIRDirectLibraryStartupProfile accepts36 selected mods;all32 declared ZIP SHA256 pins match existing direct-library files;no activation or native process.",
     "repository_static": "pass:73Markdown/1401JSON/753links",
     "changelog_freshness": "pass",
-    "whitespace": "pass"
+    "whitespace": "pass",
+    "profile_raw_git_readback": "Exact LF blob7426B/6A784056. An initial Windows CRLF working-copy pin57989AFC/7654B was corrected before native dispatch;original708a8ba commit remains preserved. Existing profile reader is rerun on canonical LF;selection/archive bytes are unchanged."
   },
   "player_source_delta": [],
   "performance_acceptance": false,
