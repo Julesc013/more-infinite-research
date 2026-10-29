@@ -135,6 +135,13 @@ local function check_closure()
       end
       return
     end
+    if plan.successor_engine == "f210" then
+      if mods.base ~= "2.1.23" or mods["more-infinite-research"] ~= "5.0.21000"
+          or mods[FIXTURE] ~= "0.4.0" then
+        fail("MIR5 F210 successor closure differs")
+      end
+      return
+    end
     if mods.base ~= "2.0.77" or mods["more-infinite-research"] ~= "5.0.20000"
         or mods[FIXTURE] ~= "0.2.0" then
       fail("MIR5 F200 successor closure differs")
@@ -359,6 +366,7 @@ local function marker(stage, state)
     .. "\"foreign_disabled\":true,"
     .. "\"inserter_stack_size_bonus\":" .. tostring(game.forces.player.inserter_stack_size_bonus) .. ","
     .. "\"" .. capacity .. "\":" .. tostring(capacity_value) .. ","
+    .. (plan.successor_engine == "f210" and "\"target\":\"f210\",\"base_version\":\"2.1.23\",\"origin\":\"published-f110-4.7.11003\"," or "")
     .. "\"on_load_read_only\":" .. tostring(stage == "reload") .. "}")
 end
 

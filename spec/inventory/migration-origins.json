@@ -4083,6 +4083,62 @@
           ]
         }
       ],
+      "explicit_published_forward_routes_2026_10_29": {
+        "maintainer_request_2026_10_29": "Add the four exact published4.7.3-origin routes below. Reuse protected sources and matching results;MIR5 origins and adjacent transitions are not substitutes. Preserve all prior nine same-edition/seven older-contract/five named-transition dispositions under their actual scopes.",
+        "routes": [
+          {
+            "origin": "published4.7.3 F100",
+            "destination": "MIR5 F110",
+            "status": "needs-correction",
+            "problem": "preparation:protected219EF20F source retains mining/queue but lacks the requested laser/inserter witnesses. ExistingFA0CF605 laser source starts from MIR5 and is not matching evidence.",
+            "next_action": "Prepare one enhanced copy of219EF20F with actual published native laser/inserter witnesses,retaining mining/queue/caps/foreign assertions;reuse that same copy for both requested F100 destinations. Direct endpoint first;bridge only an actual engine refusal,without installing MIR5 at an intermediate engine.",
+            "source_sha256": "219EF20F63B4A85FA2386BD50A81228B28F006D9731F24E069A657BB13F45811"
+          },
+          {
+            "origin": "published4.7.3 F100",
+            "destination": "MIR5 F210",
+            "status": "needs-correction",
+            "problem": "preparation:no exact published-origin F210 result or enhanced laser/inserter source is qualified.",
+            "next_action": "Reuse the single enhanced protected F100 source prepared for F110;declare exact F210 inputs and expectations,then actual new research/save/two cold reloads. Do not use the MIR5 F110 destination save as this origin.",
+            "source_sha256": "219EF20F63B4A85FA2386BD50A81228B28F006D9731F24E069A657BB13F45811"
+          },
+          {
+            "origin": "published4.7.3 F110",
+            "destination": "MIR5 F210",
+            "status": "needs-correction",
+            "problem": "preparation/native-owner binding:new exact F210 fixture/profile has7 passing host controls and a seven-member reproduced container;Black Glass actual caller/container binding and correctionB package freeze remain. Existing F110-to-F200 pass is not this route.",
+            "next_action": "Review the prepared handoff,bind actual final modern bytes/container/controller,then execute unchanged protectedD524 directly with one new lab/save/two cold reloads. No source recreation or blanket configuration bypass.",
+            "source_sha256": "D524AA78440F242B179A1E9BC40BF89B87C1A66E99F64C14D3250DEAEBB69253",
+            "prepared_inputs": {
+              "path": "spec/evidence/published473-f110-f210-prepared-aero-r01.json",
+              "sha256": "4310DC0CD8ABC4EB6FC465897C06315BBA5DE9A9906E5B936D594B01BFB52FD8"
+            }
+          },
+          {
+            "origin": "published4.7.3 F200 Base",
+            "destination": "MIR5 F210 Base",
+            "status": "closed",
+            "problem": "Named actual current7a2/005D/8DC protected9D39 result already passes54 level-backed public rows including laser/inserter state,one new lab/save/two read-only cold reloads. Current7b0 non-GUI review retains scoped applicability;this is not a new7b0 or correctionB native result.",
+            "next_action": "Retain original execution identity. Review new export init/configuration/parse paths and final archive consumed inputs;run only any affected portions. No transitive DLC/provider/settings or all-engine claim.",
+            "source_sha256": "9D391DB311DA3C82E43648FAE5E6FE9C08D00F0592880B3160F35EE822FECA09",
+            "evidence": [
+              {
+                "path": "spec/evidence/full-catalogue-473-f200-current7a2-native-chain-r01.json",
+                "source_revision": "d67aa095334bd7106b34569e3983dc834ae257bf",
+                "sha256": "37DD13431E3E492F8ABB94C206B85365EA135710727DFB9B5C1AA6F0660F0C0A",
+                "bytes": 16653
+              },
+              {
+                "path": "spec/evidence/current-7b0-nongui-aero-applicability-r01.json",
+                "source_revision": "d67aa095334bd7106b34569e3983dc834ae257bf",
+                "sha256": "552C495EB545F38597528FC020752105CEC2D9698CB2414A9116FABAE70C5572",
+                "bytes": 13913
+              }
+            ]
+          }
+        ],
+        "final_package_review": "Required separately for every named route after correctionB/final freeze;none of the new required missing journeys is deferred. Fixture/packet preparation is not a native pass or an instruction to occupy more than the sole admitted native lane."
+      },
       "permitted_limits": [
         {
           "boundary": "Uncertain older1.9-3.x runtime writer histories",

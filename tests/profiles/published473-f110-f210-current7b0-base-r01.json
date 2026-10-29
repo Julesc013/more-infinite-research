@@ -1,0 +1,33 @@
+{
+  "schema": 1,
+  "kind": "mir5-f110-f210-transition-successor",
+  "target": "f210",
+  "factorio_line": "2.1",
+  "engine": {
+    "version": "2.1.23",
+    "sha256": "8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38"
+  },
+  "settings_mode": "Defaults",
+  "mods": [
+    {
+      "name": "base",
+      "version": "2.1.23",
+      "enabled": true
+    },
+    {
+      "name": "more-infinite-research",
+      "version": "5.0.21000",
+      "enabled": true
+    },
+    {
+      "name": "mir-fixture-mir5-f110-f200-transition",
+      "version": "0.4.0",
+      "enabled": true
+    }
+  ],
+  "archive_sha256": {
+    "more-infinite-research_5.0.21000.zip": "2DDD2A4C967BEF07830218442AE4441BEECD5B9ECE0AC86B09A5F6586BBA80E5",
+    "mir-fixture-mir5-f110-f200-transition_0.4.0.zip": "F0F852BCC4F48F12DDA0792B36828497C1CCDDF11FF216C3CAEFA16A7A21E49C"
+  },
+  "scope": "Prepared exact published4.7.3 F110 to MIR5 F210 Base journey on pinned2.1.23/8DC. Reuse protected D524 source;17 retained rows include laser and stack-to-bulk capacity state. Keep inherited startup defaults and all original state/effect/queue/suspended/foreign/new-lab/save/two-reload assertions. Attempt destination directly;record any native format refusal before a necessary published4.7.3 engine bridge. No intermediate MIR5 installation,no source recreation,no new native result. Current2DDD candidateA is explicit;final newer bytes require a separately declared freeze/applicability review."
+}
