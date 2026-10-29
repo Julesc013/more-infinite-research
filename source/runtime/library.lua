@@ -15,6 +15,11 @@ local library_model = require("presentation.library_model")
 local availability = require("presentation.availability")
 local target = require("platform.target")
 local translation_queue = require("runtime.library_translations")
+local support_exports
+if helpers and type(helpers.write_file) == "function" then
+  support_exports = require("runtime.settings_commands")
+end
+local diagnostics = support_exports and require("runtime.diagnostics")
 
 local M = {}
 
@@ -1164,6 +1169,12 @@ local function update_settings_content(content, view, preserve_query)
     toolbar = add(content, {type = "flow", name = PREFIX .. "settings_toolbar", direction = "horizontal"})
     add(toolbar, {type = "button", name = PREFIX .. "settings_research", caption = {"mir-browser.settings-scope-research"}})
     add(toolbar, {type = "button", name = PREFIX .. "settings_options", caption = {"mir-browser.settings-scope-options"}})
+    if support_exports then
+      add(toolbar, {type = "button", name = PREFIX .. "export_settings", caption = {"mir-browser.export-settings"},
+        tooltip = {"mir-browser.export-settings-tooltip"}})
+      add(toolbar, {type = "button", name = PREFIX .. "export_compact", caption = {"mir-browser.export-compact"},
+        tooltip = {"mir-browser.export-compact-tooltip"}})
+    end
   end
   local query = content[PREFIX .. "settings_query"]
   if not valid(query) then
@@ -1275,6 +1286,34 @@ local function update_help_content(content)
   content.clear()
   add(content, {type = "label", name = PREFIX .. "help_summary", caption = {"mir-browser.help-summary"}})
   add(content, {type = "label", name = PREFIX .. "help_queue", caption = {"mir-browser.native-queue-guidance"}})
+  if diagnostics then
+    add(content, {type = "button", name = PREFIX .. "export_diagnostics", caption = {"mir-browser.export-diagnostics"},
+      tooltip = {"mir-browser.export-diagnostics-tooltip"}})
+    local guidance = add(content, {type = "label", name = PREFIX .. "export_privacy", caption = {"mir-browser.export-sharing-guidance"}})
+    if guidance.style then guidance.style.single_line = false; guidance.style.maximal_width = 650 end
+  end
+end
+
+local function show_export_profile(content, encoded)
+  if not valid(content) then return end
+  local previous = content[PREFIX .. "export_profile"]
+  if valid(previous) then previous.destroy() end
+  if type(encoded) ~= "string" then return end
+  local preview
+  if #encoded <= 1048576 then
+    preview = add(content, {type = "text-box", name = PREFIX .. "export_profile", text = encoded,
+      tooltip = {"mir-browser.export-sharing-guidance"}})
+    preview.read_only, preview.word_wrap = true, true
+    if preview.style then
+      preview.style.maximal_width = 650
+      preview.style.horizontally_stretchable = true
+      preview.style.height = 100
+    end
+    if type(preview.focus) == "function" then preview.focus() end
+    if type(preview.select_all) == "function" then preview.select_all() end
+  else
+    add(content, {type = "label", name = PREFIX .. "export_profile", caption = {"mir-browser.export-profile-file-only"}})
+  end
 end
 
 local function create_frame(player, view)
@@ -1637,6 +1676,24 @@ function M.on_gui_click(event)
   if not valid(element) then return end
   local player = player_for(event and event.player_index)
   if not player then return end
+  if support_exports and (element.name == PREFIX .. "export_settings" or element.name == PREFIX .. "export_compact") then
+    if not owns_element(player, element, {
+      element.name, PREFIX .. "settings_toolbar", PREFIX .. "settings_content", PREFIX .. "tabs", ROOT
+    }) then return end
+    local encoded = support_exports.export({player_index = player.index,
+      parameter = element.name == PREFIX .. "export_compact" and "--compact" or nil})
+    show_export_profile(element.parent.parent, encoded)
+    return
+  end
+  if diagnostics and element.name == PREFIX .. "export_diagnostics" then
+    if not owns_element(player, element, {
+      element.name, PREFIX .. "help_content", PREFIX .. "tabs", ROOT
+    }) then return end
+    local view = view_for(player.index)
+    local encoded = diagnostics.export(player.index, view.selected)
+    show_export_profile(element.parent, encoded)
+    return
+  end
   if element.name == PREFIX .. "close" then
     if not owns_element(player, element, {
       PREFIX .. "close", PREFIX .. "actions", PREFIX .. "research_content", PREFIX .. "tabs", ROOT

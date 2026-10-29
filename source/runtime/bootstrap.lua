@@ -10,6 +10,7 @@ local catalogue = require("research.catalogue")
 local runtime_api = require("api.v1.runtime")
 local settings_profile = require("runtime.settings_profile")
 local settings_commands = require("runtime.settings_commands")
+local diagnostics = helpers and type(helpers.write_file) == "function" and require("runtime.diagnostics")
 local passive_repair = require("runtime.passive_repair")
 local effective = require("runtime.configuration")
 local target = require("platform.target")
@@ -296,6 +297,10 @@ local function add_command()
   commands.add_command("mir-settings-import-check",
     "Validate a MIR settings profile string before pasting it into the mir-settings-profile-import startup setting.",
     settings_commands.validate)
+  if diagnostics then
+    commands.add_command("mir-diagnostics-export", "Replace the bounded MIR report and export full MIR settings; attach factorio-current.log separately.",
+      function(command) diagnostics.export(command and command.player_index) end)
+  end
 end
 
 local function on_init()
@@ -307,6 +312,7 @@ local function on_init()
   library.on_init()
   reconcile_repair()
   reconcile_translations()
+  if diagnostics then diagnostics.startup("MIR initialization") end
 end
 
 -- The provider can be removed between saves. No native EPR technology can be
@@ -361,6 +367,7 @@ local function on_configuration_changed(event)
   library.on_configuration_changed(event)
   reconcile_repair()
   reconcile_translations()
+  if diagnostics then diagnostics.startup("MIR configuration change") end
 end
 
 local function on_load()

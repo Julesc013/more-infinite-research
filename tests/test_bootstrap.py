@@ -863,6 +863,33 @@ class BootstrapTests(unittest.TestCase):
         ''')
 
 
+    def test_diagnostic_headers_run_only_on_init_and_configuration(self):
+        self.lua.execute('''
+          install_modules(false); install_runtime()
+          headers, diagnostic_exports = {}, 0
+          helpers={write_file=function() end}
+          package.preload["runtime.diagnostics"]=function()
+            return {startup=function(stage) headers[#headers+1]=stage end,
+              export=function(index) diagnostic_exports=diagnostic_exports+1;diagnostic_player=index end}
+          end
+          load_control()
+          assert(#headers==0)
+          handlers.init();handlers.configuration({mod_changes={}})
+          assert(#headers==2 and headers[1]=="MIR initialization" and headers[2]=="MIR configuration change")
+          handlers.load()
+          library_pending=true
+          handlers.events[8]({player_index=1})
+          local maintenance=handlers.nth[61]
+          assert(type(maintenance)=="function")
+          maintenance({tick=61})
+          assert(#headers==2)
+          commands.registered["mir-diagnostics-export"].callback({player_index=1})
+          assert(diagnostic_exports==1 and diagnostic_player==1)
+          commands.registered["mir-diagnostics-export"].callback({})
+          assert(diagnostic_exports==2 and diagnostic_player==nil)
+        ''')
+
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--lua-runtime-dir", type=Path, required=True)
