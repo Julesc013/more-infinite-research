@@ -272,6 +272,11 @@ function Wait-MIROwnedMenuResponse {
   if ($null-eq$Diagnostics) { $Diagnostics=New-MIROwnedMenuObserverDiagnostics }
   $timer = [Diagnostics.Stopwatch]::StartNew()
   $firstMenu = $null; $action = $null; $response = $null; $attempts = 0; $maxObserverSeconds = 0.0
+  # Return the first 64 completed capture/classification attempts on success,
+  # without another capture, file or timed logging call. Ownership rejections
+  # remain in Diagnostics; endpoint records stay separate even after truncation.
+  $attemptDiagnostics=[Collections.Generic.List[object]]::new()
+  $attemptDiagnosticsLimit=64
   $path = Join-Path $OutputRoot 'latest-owned-window.png'
   $initialisedLogObserved = $false
   while ($timer.Elapsed.TotalSeconds -lt $TimeoutSeconds) {
@@ -288,8 +293,11 @@ function Wait-MIROwnedMenuResponse {
     $capture = Save-MIROwnedMenuCapture -Process $Process -ExpectedStartUtc $ExpectedStartUtc -Path $path -Diagnostics $Diagnostics
     if ($null -eq $capture) { Start-Sleep -Milliseconds 100; continue }
     $observation = Read-MIRMenuImage $Ocr $capture.path
+    $ocrCompletedQpc=[Diagnostics.Stopwatch]::GetTimestamp()
     $attempts++
     $state = Get-MIRMenuState $observation
+    $classifiedQpc=[Diagnostics.Stopwatch]::GetTimestamp()
+    $attemptPhase=if($null-eq$action){'await-main-menu'}else{'await-settings-response'}
     if ($state -eq 'blocked-or-loading') { throw '[mir-menu-blocked-or-loading-after-initialisation]' }
     if ($null -eq $action -and $state -eq 'main-menu') {
       $firstMenu = [pscustomobject]@{capture=$capture;ocr=$observation;observed_qpc=[Diagnostics.Stopwatch]::GetTimestamp()}
@@ -305,10 +313,13 @@ function Wait-MIROwnedMenuResponse {
       $response.capture.path = [IO.Path]::GetFullPath($responseImage)
       $response.capture | Add-Member -NotePropertyName sha256 -NotePropertyValue (Get-MIRMenuFileSha256 $responseImage)
     }
+    if($attemptDiagnostics.Count-lt$attemptDiagnosticsLimit){
+      $attemptDiagnostics.Add([pscustomobject][ordered]@{ordinal=$attempts;phase=$attemptPhase;state=$state;capture_started_qpc=[long]$capture.capture_started_qpc;capture_completed_qpc=[long]$capture.capture_completed_qpc;ocr_completed_qpc=$ocrCompletedQpc;classified_qpc=$classifiedQpc;iteration_finished_qpc=[Diagnostics.Stopwatch]::GetTimestamp()})
+    }
     $maxObserverSeconds = [Math]::Max($maxObserverSeconds,$observerTimer.Elapsed.TotalSeconds)
     if ($null -ne $response) {
       $frequency = [double][Diagnostics.Stopwatch]::Frequency
-      return [pscustomobject]@{status='owned-menu-settings-response-observed';process_id=$Process.Id;launch_qpc=$LaunchQpc;clock_frequency=$frequency;first_render_observed_seconds=($firstMenu.observed_qpc-$LaunchQpc)/$frequency;confirmed_response_seconds=($response.observed_qpc-$LaunchQpc)/$frequency;interaction_response_seconds=($response.observed_qpc-$action.posted_qpc)/$frequency;observer_max_iteration_seconds=$maxObserverSeconds;poll_interval_milliseconds=100;capture_attempts=$attempts;first_menu=$firstMenu;action=$action;response=$response;claims_factorio_acceptance=$false}
+      return [pscustomobject]@{status='owned-menu-settings-response-observed';process_id=$Process.Id;launch_qpc=$LaunchQpc;clock_frequency=$frequency;first_render_observed_seconds=($firstMenu.observed_qpc-$LaunchQpc)/$frequency;confirmed_response_seconds=($response.observed_qpc-$LaunchQpc)/$frequency;interaction_response_seconds=($response.observed_qpc-$action.posted_qpc)/$frequency;observer_max_iteration_seconds=$maxObserverSeconds;poll_interval_milliseconds=100;capture_attempts=$attempts;observer_attempt_diagnostics=[pscustomobject]@{limit=$attemptDiagnosticsLimit;omitted=($attempts-$attemptDiagnostics.Count);attempts=@($attemptDiagnostics.ToArray())};first_menu=$firstMenu;action=$action;response=$response;claims_factorio_acceptance=$false}
     }
     Start-Sleep -Milliseconds 100
   }
