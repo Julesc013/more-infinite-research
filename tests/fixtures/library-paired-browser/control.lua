@@ -12,6 +12,7 @@ local FINAL_SAVE = "mir5-native-complete"
 local CAPTURE_DELAY = 60
 local CLIENT_SETTLE_TICKS = 120
 local MAX_QUEUE = 8
+local MAP_SEED = 424242
 local settled_roots
 
 local GEAR = "recipe-prod-research_gears-1"
@@ -287,6 +288,15 @@ local function open(player, view)
 end
 
 local function marker(stage, state, status)
+  local map_gen_settings
+  if stage == "ready" then
+    local surface = game.surfaces[1]
+    if not valid(surface) then fail("fixed map surface is absent") end
+    map_gen_settings = surface.map_gen_settings
+    if type(map_gen_settings) ~= "table" or map_gen_settings.seed ~= MAP_SEED then
+      fail("fixed map seed differs from the declared paired workload")
+    end
+  end
   log("[MIR5_LIBRARY_PAIRED_BROWSER] " .. helpers.table_to_json({
     schema = 1,
     case = CASE,
@@ -300,6 +310,7 @@ local function marker(stage, state, status)
     profiler_observation_only = true,
     requested_family = "all",
     native_family_verified = VIEWS[stage] ~= nil,
+    map_gen_settings = map_gen_settings,
     performance_acceptance = false
   }))
 end
