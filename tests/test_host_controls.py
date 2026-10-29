@@ -145,6 +145,8 @@ class HostControlsTests(unittest.TestCase):
             "tests/test_bootstrap.py",
             "tests/test_library.py",
             "tests/test_library_multiplayer_fixture.py",
+            "tests/test_library_native_input.py",
+            "tests/test_library_native_input_fixture.py",
             "tests/test_library_paired_browser_fixture.py",
             "tests/test_scripted_effects_multiplayer_fixture.py",
             "tests/test_scripted_effects_toggle_fixture.py",
