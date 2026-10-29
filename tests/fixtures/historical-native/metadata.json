@@ -1,0 +1,73 @@
+{
+  "schema": 1,
+  "kind": "MIR5HistoricalNativeFixtureV1",
+  "name": "mir-fixture-mir5-historical-native",
+  "version": "0.1.0",
+  "targets": {
+    "f013": {
+      "factorio_version": "0.13", "minimum_base": "0.13.20", "mir_version": "5.0.01300",
+      "direct": "recipe-prod-research_character_mining_speed-1",
+      "direct_effect": 0.05,
+      "direct_science": ["alien-science-pack"],
+      "continuation": "inserter-capacity-bonus-8", "continuation_mode": "numeric-witness",
+      "continuation_count": 914489, "continuation_energy_ticks": 3600
+    },
+    "f014": {
+      "factorio_version": "0.14", "minimum_base": "0.14.23", "mir_version": "5.0.01400",
+      "direct": "recipe-prod-research_character_mining_speed-1",
+      "direct_effect": 0.05,
+      "direct_science": ["alien-science-pack"],
+      "continuation": "inserter-capacity-bonus-8", "continuation_mode": "numeric-witness",
+      "continuation_count": 914489, "continuation_energy_ticks": 3600
+    },
+    "f015": {
+      "factorio_version": "0.15", "minimum_base": "0.15.40", "mir_version": "5.0.01500",
+      "direct": "recipe-prod-research_character_mining_speed-1",
+      "direct_effect": 0.10,
+      "direct_science": ["high-tech-science-pack", "military-science-pack"],
+      "continuation": "inserter-capacity-bonus-8", "continuation_mode": "lab",
+      "continuation_science": ["high-tech-science-pack", "production-science-pack", "science-pack-1", "science-pack-2", "science-pack-3"]
+    },
+    "f016": {
+      "factorio_version": "0.16", "minimum_base": "0.16.51", "mir_version": "5.0.01600",
+      "direct": "recipe-prod-research_character_mining_speed-1",
+      "direct_effect": 0.10,
+      "direct_science": ["high-tech-science-pack", "military-science-pack"],
+      "continuation": "inserter-capacity-bonus-8", "continuation_mode": "lab",
+      "continuation_science": ["high-tech-science-pack", "production-science-pack", "science-pack-1", "science-pack-2", "science-pack-3"]
+    },
+    "f017": {
+      "factorio_version": "0.17", "minimum_base": "0.17.79", "mir_version": "5.0.01700", "queue_api": true,
+      "direct": "recipe-prod-research_character_mining_speed-1",
+      "direct_effect": 0.10,
+      "direct_science": ["military-science-pack", "utility-science-pack"],
+      "continuation": "inserter-capacity-bonus-8", "continuation_mode": "lab",
+      "continuation_science": ["automation-science-pack", "chemical-science-pack", "logistic-science-pack", "production-science-pack", "utility-science-pack"]
+    },
+    "f018": {
+      "factorio_version": "0.18", "minimum_base": "0.18.47", "mir_version": "5.0.01800", "queue_api": true,
+      "direct": "recipe-prod-research_character_mining_speed-1",
+      "direct_effect": 0.10,
+      "direct_science": ["military-science-pack", "utility-science-pack"],
+      "continuation": "laser-turret-speed-8", "continuation_mode": "lab",
+      "continuation_settings_family": "laser-shooting-speed", "continuation_gun_speed_ammo": "laser-turret", "continuation_effect_delta": 0.01,
+      "continuation_science": ["automation-science-pack", "chemical-science-pack", "logistic-science-pack", "military-science-pack", "utility-science-pack"]
+    },
+    "f100": {
+      "factorio_version": "1.0", "minimum_base": "1.0.0", "mir_version": "5.0.10000", "queue_api": true,
+      "direct": "recipe-prod-research_character_mining_speed-1",
+      "direct_effect": 0.10,
+      "direct_science": ["military-science-pack", "utility-science-pack"],
+      "continuation": "inserter-capacity-bonus-8", "continuation_mode": "lab",
+      "continuation_science": ["automation-science-pack", "chemical-science-pack", "logistic-science-pack", "production-science-pack", "utility-science-pack"]
+    },
+    "f110": {
+      "factorio_version": "1.1", "minimum_base": "1.1.110", "mir_version": "5.0.11000", "queue_api": true,
+      "direct": "recipe-prod-research_character_mining_speed-1",
+      "direct_effect": 0.10,
+      "direct_science": ["military-science-pack", "utility-science-pack"],
+      "continuation": "inserter-capacity-bonus-8", "continuation_mode": "lab",
+      "continuation_science": ["automation-science-pack", "chemical-science-pack", "logistic-science-pack", "production-science-pack", "utility-science-pack"]
+    }
+  }
+}

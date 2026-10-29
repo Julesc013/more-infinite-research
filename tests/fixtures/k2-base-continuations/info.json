@@ -1,0 +1,14 @@
+{
+  "name": "mir-fixture-mir5-k2-base-continuations",
+  "version": "0.1.0",
+  "title": "MIR 5 private K2 Base continuation fixture",
+  "author": "MIR maintainers",
+  "description": "Disposable F200 K2 Base lab queue for the six authored continuations and K2 gear productivity.",
+  "factorio_version": "2.0",
+  "dependencies": [
+    "base >= 2.0.77",
+    "Krastorio2 = 2.0.19",
+    "Krastorio2Assets = 2.0.5",
+    "more-infinite-research = 5.0.20000"
+  ]
+}

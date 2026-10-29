@@ -1,0 +1,13 @@
+{
+  "name": "mir-fixture-discovery-recovery",
+  "version": "0.1.1",
+  "title": "MIR 3.2.1 discovery-recovery source fixture",
+  "author": "MIR maintainers",
+  "description": "Disposable MIR 3.2.1 source-save preparation for the Vulcanus discovery recovery boundary.",
+  "factorio_version": "2.1",
+  "dependencies": [
+    "base = 2.1.23",
+    "space-age = 2.1.23",
+    "more-infinite-research = 3.2.1"
+  ]
+}

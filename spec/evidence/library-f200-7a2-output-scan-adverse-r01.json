@@ -1,0 +1,104 @@
+{
+  "schema": 1,
+  "kind": "MIR5F200LibraryOutputScanAdverseV1",
+  "status": "interrupted-current-f200-client-session-no-gameplay-pass",
+  "scope": "Exact current65FC/7a2 F200 Base four-mod Library protocol on2.0.77/D3. Preparation creates a seed, but the governed client session stops before the required two-client outcome. This adverse diagnoses neither a MIR gameplay defect nor the live scan guard cause.",
+  "candidate": {
+    "source_commit": "7a2f93224c846b86261b2da709f50ea683fc708d",
+    "player_tree": "5058373348e9049f8b67ec4dbb79b400a904acd6",
+    "archive_sha256": "65FC7E907FE3198B7290167989FE2564C1474190D06DAD49860063BEC418EC60"
+  },
+  "controller_commit": "4a253ba8a0764cd94b8ecf03f762ecd319630620",
+  "packet": {
+    "path": "build/qualification/library-f200-7a2-current-r01-controller/packet.json",
+    "bytes": 3004,
+    "sha256": "5243683DFD41E1E55EE301371B4123CB19F560BD898A821987638F72032C012C"
+  },
+  "caller": {
+    "path": "build/qualification/library-f200-7a2-current-r01-controller/Invoke-OwnedF200Session.ps1",
+    "bytes": 4040,
+    "sha256": "00723F79F0083E653D8DE9CF6C7F4F36BC52957727D04B34E3628ED84E093550"
+  },
+  "terminal": {
+    "path": "build/qualification/library-f200-7a2-current-r01-controller/execution-record/terminal.json",
+    "bytes": 17522,
+    "sha256": "F5BEE06663B60E50F3C1BACDD9DF431D18927694244D86A87284F17A311AF67E"
+  },
+  "preparation": {
+    "path": "build/qualification/library-f200-7a2-current-r01-controller/native-f200/preparation/result.json",
+    "bytes": 13965,
+    "sha256": "97A69069087EF0BFC27BDD55CBBF1F35E45F38D7490795FDCB9C949A0F7B9874",
+    "status": "passed-private-native-runtime-load-only"
+  },
+  "session": {
+    "path": "build/qualification/library-f200-7a2-current-r01-controller/native-f200/session/result.json",
+    "bytes": 19468,
+    "sha256": "164487D4C1CDBE020968B83C435820207C7BDD0658138A6D0577BBDAE072F85E",
+    "status": "failed",
+    "failure": "[mir441-resource-output-scan-incomplete]"
+  },
+  "seed": {
+    "path": "build/qualification/library-f200-7a2-current-r01-controller/native-f200/preparation/write-data/saves/seed.zip",
+    "bytes": 525737,
+    "sha256": "E68116B0C5836877A7EA1E0F162F19DE2C0CED2CAE998622F24CD216B04B77AF",
+    "byte_identical_after_interruption": true
+  },
+  "actual_native_processes_started": 3,
+  "actual_native_startup_logs": [
+    {
+      "path": "build/qualification/library-f200-7a2-current-r01-controller/native-f200/preparation/process-1.stdout.txt",
+      "bytes": 8272,
+      "sha256": "638FA73CFCE0E9CCF9EC8C13DFD4C5214BA6553D50927678E30B851989CF100A",
+      "native_startup": "   0.009 2026-10-28 22:30:39; Factorio 2.0.77 (build 84539, win64, full, space-age)"
+    },
+    {
+      "path": "build/qualification/library-f200-7a2-current-r01-controller/native-f200/session/phase-client-initial-en.stdout.log",
+      "bytes": 4096,
+      "sha256": "B7B81C7471DBD0BCD019D8B4A4EDB67F1187354C06266AC21A3A1C070C9E0E3F",
+      "native_startup": "   0.000 2026-10-28 22:30:49; Factorio 2.0.77 (build 84539, win64, full, space-age)"
+    },
+    {
+      "path": "build/qualification/library-f200-7a2-current-r01-controller/native-f200/session/phase-server-initial.stdout.log",
+      "bytes": 8192,
+      "sha256": "802883D7FB50F16578DB94A092FAD35579EEC93874F438E02D0270BAA7EEAED1",
+      "native_startup": "   0.000 2026-10-28 22:30:47; Factorio 2.0.77 (build 84539, win64, full, space-age)"
+    }
+  ],
+  "completed_lab_completions": 0,
+  "completed_two_client_protocols": 0,
+  "completed_screenshots": 0,
+  "factorio_processes_after_restoration": 0,
+  "readback": {
+    "path": "build/qualification/library-f200-7a2-current-r01-controller/root-adverse-readback-r01.json",
+    "bytes": 13929,
+    "sha256": "368EB5C56469136C10A4F59F98D59E93992020C04999F156356F0D5D206CA603",
+    "files": 79,
+    "bytes_per_copy": 1455953
+  },
+  "receipt_capsule": {
+    "path": "spec/evidence/library-f200-7a2-output-scan-adverse-receipts-r01.json.gz",
+    "bytes": 8819,
+    "sha256": "7F93D9B601F9B6942491D0F2589B64EAE3247F7A131ADF82A4E8707045BDE164",
+    "records": 2,
+    "uncompressed_bytes": 45088,
+    "all_exact_original_bytes_round_trip": true
+  },
+  "post_exit_scan_diagnostic": {
+    "path": "build/qualification/library-f200-7a2-current-r01-controller/post-exit-output-scan-diagnostic.json",
+    "bytes": 950,
+    "sha256": "42A4856BCDA3B1806C357A3919705D4815DA74BD784A118ABA98A3A6D5904116",
+    "runs": 8,
+    "files_each": 70,
+    "bytes_each": 876033,
+    "all_complete": true,
+    "elapsed_ms_range": [
+      1.2581,
+      41.3995
+    ]
+  },
+  "limits": [
+    "The original rejection does not distinguish the two-second,10000-file or reparse guard; post-exit scans cannot establish the original live cause.",
+    "No unchanged rerun is counted. The diagnostic-only correction retains the existing limits and records the actual reason/counts/elapsed time if a future scan is incomplete.",
+    "Source/create preparation ready marker is not a two-client, lab, rendered, performance or release pass. Private0.3 selection/earned/foreign-hidden cases remain separate."
+  ]
+}

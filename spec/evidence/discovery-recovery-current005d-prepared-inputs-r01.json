@@ -1,0 +1,136 @@
+{
+  "schema": 1,
+  "kind": "MIRDiscoveryRecoveryCurrentPreparedInputsV1",
+  "status": "prepared-current-inputs-not-native-result",
+  "prepared_against_commit": "14bc4eba8bc6639bc8cd6a844caaf03cadc543a6",
+  "runner": {
+    "path": "tools/Invoke-NativeFixture.ps1",
+    "sha256": "744A6F27B1F23D350B283268AABA076D17B3D2145C27624CE938217BDB64A1F8"
+  },
+  "profile": {
+    "path": "tests/profiles/discovery-recovery-successor-current005d-r05-f210-2123.json",
+    "sha256": "47A2F691BD3ED04685EF05DB68F87DDA98A9B05CFD9592370AC83EBCD7067E24"
+  },
+  "original_profile": {
+    "path": "tests/profiles/discovery-recovery-successor-control-a575-f210-2123.json",
+    "sha256": "E45982BFC96EB5620476B13BDC4A547F0CD8C1EE01A307AA7EF4D722F32B29AE",
+    "disposition": "Unchanged original7CE selection and execution identity; current005D selection is separate."
+  },
+  "source": {
+    "chain": "spec/evidence/discovery-recovery-a575-native-chain-r05.json",
+    "chain_sha256": "BA4FF5A3CD12904B9EEC3A60193C11DC6E314C2DD7130BD75BD6E1E0CAD6EF08",
+    "published_version": "3.2.0",
+    "published_archive_sha256": "35372EE6D16DA6765E8C30AEAAF5DA4A5D300F02C0A0A03648C80893A5394F32",
+    "protected_save_sha256": "EC0E42396591C1310AC6F39840C7F9309EBCFB7671FC5A9E0EDF44164B4889DF",
+    "bytes": 534441,
+    "owner_custody_limit": "Actual EC0E save/source/log bytes remain owner custody; no source world is recreated or independently rehashed here."
+  },
+  "candidate": {
+    "source_commit": "7a2f93224c846b86261b2da709f50ea683fc708d",
+    "player_tree": "5058373348e9049f8b67ec4dbb79b400a904acd6",
+    "filename": "more-infinite-research_5.0.21000.zip",
+    "sha256": "005D420671270306155CB4AC25E9CF77541202DFA16B206DCC016237619C9AA2",
+    "bytes": 692050,
+    "independent_primary_copy": "build/qualification/current-assets-7a2-aero-independent-r01/more-infinite-research_5.0.21000.zip"
+  },
+  "engine": {
+    "version": "2.1.23",
+    "sha256": "8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38"
+  },
+  "fixture": {
+    "name": "mir-fixture-discovery-recovery",
+    "version": "0.2.0",
+    "archive": "build/qualification/discovery-recovery-prepared-r05/successor/archive/mir-fixture-discovery-recovery_0.2.0.zip",
+    "sha256": "A7E0E2FDA3740BEB1273ECBEDD137A33AE5B8BB2E7E863FE2D88A8BFFDAB6CFB",
+    "bytes": 9777,
+    "members": {
+      "info.json": "92FCB2F900BA707702CB5A7CB533EC9AEAAC0A5AACDEFDEB6A9E2229321FBC60",
+      "control.lua": "B4EBB5F477117B9B045C96E8CB82E34B0DEB77B7C841A6CBCAA0D8F74DAC0365",
+      "data-final-fixes.lua": "61C5FDC8A20712BDA09C510D5B91C8A163FFEAF5252101356C8A2DBBD153D209",
+      "fixture_control.lua": "D1841B9E335BECD50A1B0E9F2EC69585D82EA73BF5355B2C739BDD2780477403",
+      "fixture_data_final.lua": "6AEAF0007700CE2CDF833D56B6D7FC199CFFB39DBE1CBFA9038291A9AA5096A7"
+    },
+    "composition": {
+      "info.json": "tests/fixtures/discovery-recovery/successor/info.json",
+      "control.lua": "tests/fixtures/discovery-recovery/successor/control.lua",
+      "data-final-fixes.lua": "tests/fixtures/discovery-recovery/successor/data-final-fixes.lua",
+      "fixture_control.lua": "tests/fixtures/discovery-recovery/fixture_control.lua",
+      "fixture_data_final.lua": "tests/fixtures/discovery-recovery/fixture_data_final.lua"
+    },
+    "source_revision": "14bc4eba8bc6639bc8cd6a844caaf03cadc543a6",
+    "source": "build/qualification/discovery-recovery-prepared-r05/successor/source"
+  },
+  "observer": {
+    "name": "mir-fixture-mir5-active-mods-observer",
+    "version": "0.1.0",
+    "archive": "build/qualification/discovery-recovery-prepared-r01/observer/mir-fixture-mir5-active-mods-observer_0.1.0.zip",
+    "sha256": "2E1BE5952D2A4CC5C74A0D149E075D247BA110A3FAE5B6768D3EAEBABCEF989C",
+    "bytes": 834,
+    "members": {
+      "info.json": "C37A55C4776F1B4DABA7E4D5C98CF22FD0E978A461D3E6FD8A95E238B97908BD",
+      "data-final-fixes.lua": "89D364F0033A7EE036998E6C29A3558099C25AD2707CB24914790C49FB21555C"
+    },
+    "source": "build/qualification/discovery-recovery-prepared-r01/observer/source",
+    "source_revision": "784d7985020f9d71f6af7a293238afb4c6d0dc68",
+    "composition": {
+      "info.json": "tests/fixtures/active-mods-observer/info.json",
+      "data-final-fixes.lua": "tests/fixtures/active-mods-observer/data-final-fixes.lua"
+    }
+  },
+  "arguments": {
+    "ArchiveLibrary": "<owner exact2.1 direct archive library>",
+    "FactorioBin": "<owner exact2.1.23/8DC engine path>",
+    "ProfilePath": "tests/profiles/discovery-recovery-successor-current005d-r05-f210-2123.json",
+    "FixtureSources": [
+      "build/qualification/discovery-recovery-prepared-r05/successor/source",
+      "build/qualification/discovery-recovery-prepared-r01/observer/source"
+    ],
+    "ExpectedMIRArchiveSha256": "005D420671270306155CB4AC25E9CF77541202DFA16B206DCC016237619C9AA2",
+    "ActiveModsObserver": "mir-fixture-mir5-active-mods-observer",
+    "CaseName": "discovery-recovery",
+    "OutputRoot": "<fresh governor-admitted checkout-local output; preserve old R05 custody>",
+    "InputSavePath": "<owner protectedEC0E ZIP>",
+    "ExpectedInputSaveSha256": "EC0E42396591C1310AC6F39840C7F9309EBCFB7671FC5A9E0EDF44164B4889DF",
+    "ExpectedPeakMemoryMiB": 4096,
+    "TimeoutSeconds": 180,
+    "AdmissionWaitSeconds": 30
+  },
+  "independent_expectation": {
+    "player_vulcanus_unlocked": true,
+    "foreign_vulcanus_locked": true,
+    "initial_iron_level": 3,
+    "initial_iron_plate_bonus": 0.2,
+    "initial_and_restored_player_iron_queue_progress": 0.42,
+    "foreign_iron_queue_progress": 0.27,
+    "source_discovery_labs_reused": 1,
+    "new_gear_labs": 1,
+    "new_gear_effect_increment": 0.1,
+    "cold_reloads": 2,
+    "successor_save_unchanged_by_reloads": true
+  },
+  "preparation_controls": {
+    "observer_source_included": "The original draft supplied only the successor source; existing observer admission refuses it. Corrected arguments supply both verified source directories.",
+    "source_code": "All five retained R05 successor blobs and two observer members match pinned Git and local archived bytes. No queued-unit/prototype/fixture assertion is changed.",
+    "owner_freeze": "Before dispatch bind actual save/engine/library/output, verify all selected bytes, inspect plan/health and freeze the actual committed caller/runner. This is not another active or pending native assignment.",
+    "verified_host_guards": {
+      "both_archive_member_guards_passed": true,
+      "both_fixture_sources_admitted": true,
+      "original_missing_observer_refused": true,
+      "duplicate_observer_refused": true,
+      "native_execution": false,
+      "library_activation": false
+    }
+  },
+  "limits": [
+    "OriginalR01/R04 refusals and a575/7CE R05 result keep their original identities. This does not infer3.2.1 or later ambiguous-lock repair.",
+    "Preserve the original source and exact A7E/2E1 fixture containers; private inputs are explicit owner locators. No dependency archive copy, library activation or native execution is performed by this preparation.",
+    "A current005D native successor, its saved earned state and two cold reloads remain required. No VER-06 reuse, whole product, performance or release verdict is claimed."
+  ],
+  "claims": {
+    "source_recreated": false,
+    "native_execution": false,
+    "migration_pass": false,
+    "performance_pass": false,
+    "release_qualification": false
+  }
+}

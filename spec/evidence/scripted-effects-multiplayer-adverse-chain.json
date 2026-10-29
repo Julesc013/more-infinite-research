@@ -1,0 +1,50 @@
+{
+  "schema": 1,
+  "kind": "MIR5ScriptedEffectsMultiplayerResourceAdverseV1",
+  "runs": [
+    {
+      "run": 40044508166,
+      "url": "https://github.com/Julesc013/mir-native-worker/actions/runs/40044508166",
+      "manifest_members_verified": 152,
+      "manifest_sha256": "7A3C855399A10A308B5220AB2253F55008FC1A645A204E20D6E94C7D808A8730",
+      "cases": [
+        {
+          "path": "multiplayer/preparation/result.json",
+          "status": "passed-private-native-runtime-load-only",
+          "source": "91b808ec472d0a6db962494ec4189a8fdf1ded2a",
+          "receipt": {
+            "gzip": "spec/mir5/evidence/scripted-effects-multiplayer-adverse-40044508166-multiplayer-preparation-native.json.gz",
+            "uncompressed_sha256": "748CAEBE8F3FC38EEBBF755B7286C1FEF0AA87F3AB28823433EF04ED8304A192"
+          }
+        },
+        {
+          "path": "multiplayer/session/result.json",
+          "status": "failed",
+          "source": "91b808ec472d0a6db962494ec4189a8fdf1ded2a",
+          "receipt": {
+            "gzip": "spec/mir5/evidence/scripted-effects-multiplayer-adverse-40044508166-multiplayer-session-native.json.gz",
+            "uncompressed_sha256": "AD0675A12F52491E6D7F0F8CDEEA0F0E696270E8F8EEB14938CED96BADB2772A"
+          },
+          "failure": "[mir441-resource-process-budget]"
+        }
+      ]
+    }
+  ],
+  "scope": [
+    "F2002.0.77 Space Age world creation and runtime load pass. The real multiplayer attempt is interrupted by its process governor during graphical startup, before gameplay acceptance;152 artifact members are verified.",
+    "The observed process-tree private bytes reach10,499,518,464 against a declared8GiB, with working set2,818,633,728 and approximately17.09GB physical memory still free. This is a process-budget refusal, not a gameplay failure or a performance sample.",
+    "Changed-input continuation uses the existing native low graphics/low video-memory options for scripted gameplay clients only, preserving the8GiB envelope, every system reserve and all gameplay/mod/profile assertions. Library and ordinary-menu controls are unchanged.",
+    "The restart repair observation is also anchored to the first host tick after reload, so client startup time cannot reset its baseline after the wall is fully repaired. No player production source changes are involved.",
+    "No scripted multiplayer, gameplay, save-transition, stress, rendered UI or release pass is claimed from this attempt."
+  ],
+  "release_qualification": false,
+  "resource_ledger": {
+    "gzip": "spec/mir5/evidence/scripted-effects-multiplayer-adverse-40044508166-resources.jsonl.gz",
+    "uncompressed_sha256": "1690A8A812C299DE018A5CD548B77EAA27A22444E67DF340DE366C0D3FB6CA71"
+  },
+  "observed_peak": {
+    "private_bytes": 10499518464,
+    "working_set_bytes": 2818633728,
+    "declared_memory_bytes": 8589934592
+  }
+}

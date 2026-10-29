@@ -1,0 +1,2 @@
+-- The F200 successor keeps ordinary startup defaults. Its isolated direct
+-- acceleration is local to data-final-fixes.lua and is not tuning evidence.

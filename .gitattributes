@@ -1,97 +1,51 @@
 /.gitattributes text eol=lf
 
-# This fixture is an exact raw-hash copy of the published 4.2.0 manifest.
+# Current package/release controller bytes are inventory-bound. Keep their
+# checkout form equal to the tracked LF blobs under every core.autocrlf mode.
+tools/package.py text eol=lf
+tools/release.py text eol=lf
+
+# MIR 5 evidence and custody indexes retain their exact authored bytes.
+spec/evidence/*.json -text -eol whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
+# Preserve the raw-hash portable extraction, including its authored CRLF.
+tests/fixtures/historical-direct-native-oracle.json -text -eol whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
+tests/fixtures/historical-continuation-native-oracle.json -text -eol whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
+tests/profiles/*.json text eol=lf
+# These portable facts are raw-hash referenced by the native evidence chains.
+tests/fixtures/competing-dynamic-f200-sa-captured-facts.json text eol=lf
+tests/fixtures/competing-dynamic-f200-sa-native-initial-levels.json text eol=lf
+tests/fixtures/create-research/* text eol=lf
+spec/inventory/*.json text eol=lf
+
 # Retain its CRLF bytes and the ordinary trailing-space/blank-line checks.
-fixtures/release-inputs/mir421-published-420-manifest.json -text -eol whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
-# Preserve the exact published 4.2.1 receipt bytes for 4.2.2 predecessor custody.
-fixtures/release-inputs/mir422-published-421-manifest.json -text -eol whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
-# Preserve the exact published 4.2.2 receipt bytes for 4.2.3 predecessor custody.
-fixtures/release-inputs/mir423-published-422-manifest.json -text -eol whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
-# Preserve the exact published 4.3.0 receipt bytes for 4.3.1 immediate-predecessor custody.
-fixtures/release-inputs/mir431-published-430-manifest.json -text -eol whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
-# Preserve both actual published predecessors for the 4.4.2 upgrade paths.
-fixtures/release-inputs/mir442-published-440-manifest.json -text -eol whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
-fixtures/release-inputs/mir442-published-441-manifest.json -text -eol whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
-# Preserve the actually published 4.4.2 construction asset for 4.5.0 predecessor custody.
-fixtures/release-inputs/mir450-published-442-r24-construction.json -text -eol whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
-# Preserve the exact published 4.5.1 construction bytes for 4.5.2 custody.
-fixtures/release-inputs/mir452-published-451-construction.json -text -eol whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
-# Preserve the exact published 4.5.2 construction bytes for 4.6.0 custody.
-fixtures/release-inputs/mir460-published-452-construction.json -text -eol whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
 
 # Emergency startup-profile inputs and their observation schema are raw-hash
 # pinned. Retain their CRLF bytes while still checking actual whitespace.
 fixtures/run-profiles/mir430-startup-bob-angel-f200.json -text -eol whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
 fixtures/run-profiles/mir430-startup-galore-space-age-f200.json -text -eol whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
 fixtures/run-profiles/mir430-startup-omni-bob-angel-46-f200.json -text -eol whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
-spec/schemas/mir430-classic-startup-stress-observation-v1.schema.json -text -eol whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
 
-.mir/evidence/**/*.md text eol=lf
-.mir/evidence/**/*.txt text eol=lf
-.mir/evidence/**/*-attestation.json text eol=lf
-.mir/evidence/archive/mir3-term-experiments/**/*.json -text
-.mir/evidence/2.5.5-manual-review-attestation.json -text
-.mir/evidence/terminal-protections/**/* -text -diff
 
 # Byte-compared generated terminal authorities and their generator must retain
 # canonical LF bytes even when a maintainer has core.autocrlf enabled globally.
-.mir/releases/terminal/**/*.json text eol=crlf
-.mir/evidence/terminal-publication/2026-08-15/**/*.json text eol=crlf
-.mir/evidence/terminal-publication/2026-08-15/*.json text eol=crlf
-.mir/releases/terminal/mod-portal-descriptions/*.md text eol=crlf
-.mir/releases/terminal/release-bodies/*.md text eol=crlf
-.mir/releases/terminal/baselines/**/*.json text eol=lf
 # The imported .5 bundle manifests are sealed historical CRLF inputs.
-.mir/releases/terminal/baselines/*.5/baseline-manifest.json text eol=crlf
-.mir/releases/terminal/closures/**/*.json text eol=lf
-.mir/releases/terminal/qualifications/*.json text eol=lf
-.mir/releases/terminal/MIR3-Compatibility-ClaimsV1.json text eol=lf
-.mir/releases/terminal/MIR3-FINAL-DEFECT-INDEX.json text eol=lf
-.mir/releases/terminal/MIR3-Mod-Interaction-MatrixV1.json text eol=lf
-.mir/releases/terminal/MIR3-ModPortal-Compatibility-CensusV1.json text eol=lf
-.mir/releases/terminal/MIR3-Settings-Scope-AuditV1.json text eol=lf
-.mir/releases/terminal/MIR3TerminalSuccessorBootstrapPolicyV1.json text eol=lf
 # This retained implementation receipt is sealed and referenced by the exact
 # CRLF raw SHA-256 recorded in MIR3TerminalProductImplementationReconciliationV1.
-.mir/releases/terminal/MIR3TerminalProductImplementationReceiptV1.json text eol=crlf
 # The foundation admission is later reused by its exact retained CRLF raw
 # SHA-256 in MIR3TerminalAssuranceCalibrationReceiptV1.
-.mir/releases/terminal/MIR3TerminalFoundationAdmissionV1.json text eol=crlf
 # Terminal target seals retain the raw CRLF identities of these two shared
 # qualification authorities.
-.mir/releases/terminal/MIR3TerminalFixedPointReceiptV1.json text eol=crlf
-.mir/releases/terminal/MIR3TerminalCandidateSettingsQualificationV1.json text eol=crlf
 # The admitted MIR 3 .5 wave index is bound by its exact retained CRLF raw
 # SHA-256 in MIR3TerminalFoundationAdmissionV1.
 docs/releases/archive/MIR-3.5-WAVE-INDEX.json text eol=crlf
 # The historical manual-review object is named for the exact CRLF attestation
 # bytes retained by MIR3TerminalAssuranceCalibrationReceiptV1.
-.mir/evidence/objects/sha256/83/83AC0C36C02F2C41E1080706B0CD7EF2FE688956D38D79D579DE32F273944748.json text eol=crlf
-.mir/evidence/terminal-publication/2026-08-16/mod-portal/MIR3-Dot9-ModPortal-CustodyObservationV1.json text eol=lf
-.mir/evidence/terminal-publication/2026-08-16/mod-portal/MIR3-Dot9-ModPortal-VisibilityRecheckV1.json text eol=lf
-.mir/evidence/terminal-publication/2026-08-16/mod-portal/MIR3-Dot9-ModPortal-Visibility-Canonicalization-ReconciliationV1.json text eol=lf
-.mir/evidence/mir4-r0/**/*.json text eol=lf
-.mir/targets.json text eol=lf
-.mir/releases/waves/mir4-r0/**/*.json text eol=lf
-.mir/releases/governance/mir4/*.json text eol=lf
 # Current F210 policy/admission receipts bind these exact LF bytes. Windows
 # checkout defaults must not rewrite their historical or current raw hashes.
-.mir/control/MIR4-F210-Current-Qualification-PolicyV2.json text eol=lf
-.mir/control/MIR4-F210-Current-Qualification-Policy-SuccessionV1.json text eol=lf
-.mir/control/MIR4-F210-Current-Engine-Cap-Harness-AdmissionV3.json text eol=lf
-spec/engines/mir4-factorio-2.1-experimental-channel-v1.json text eol=lf
-.mir/control/MIR4-F210-Current-Qualification-PolicyV3.json text eol=lf
-.mir/control/MIR4-F210-Current-Qualification-Policy-SuccessionV2.json text eol=lf
-spec/engines/mir4-factorio-2.1-experimental-channel-v2.json text eol=lf
 CHANGELOG.md text eol=lf
-spec/schemas/mir3-dot9-terminal-baseline-bundle-manifest.schema.json text eol=lf
-spec/schemas/mir4-terminal-normalized-snapshot.schema.json text eol=lf
-spec/schemas/mir4-terminal-baseline-import.schema.json text eol=lf
-spec/schemas/mir4-r0-authority.schema.json text eol=lf
 tools/commands/release/New-MIR3Dot9TerminalBaselines.ps1 text eol=lf
 tools/commands/release/Import-MIR3TerminalBaselines.ps1 text eol=lf
 
-# MIR 4 bootstrap capsule V2 copies and raw-hashes this reconstruction closure.
 # Pin checkout bytes so the same authority revision yields one capsule on every
 # core.autocrlf configuration.
 tools/commands/package/Build-MIRPackage.ps1 text eol=lf
@@ -99,27 +53,11 @@ tools/commands/release/Invoke-MIR4BootstrapCapsule.ps1 text eol=lf
 tools/lib/validation/PackageIdentity.ps1 text eol=lf
 tools/lib/validation/MIR4DistributionIdentity.ps1 text eol=lf
 tools/lib/mir4/BootstrapMaterialization.ps1 text eol=lf
-spec/schemas/mir4-bootstrap-local-candidate-plan.schema.json text eol=lf
-spec/schemas/mir4-bootstrap-local-candidate-manifest.schema.json text eol=lf
-spec/schemas/mir4-bootstrap-root-set.schema.json text eol=lf
-spec/schemas/mir4-bootstrap-source-capsule.schema.json text eol=lf
-spec/schemas/mir4-bootstrap-capsule-manifest.schema.json text eol=lf
-spec/schemas/mir4-bootstrap-toolchain-lock.schema.json text eol=lf
-spec/schemas/mir4-bootstrap-git-source-proof.schema.json text eol=lf
-spec/schemas/mir4-bootstrap-reconstruction-receipt.schema.json text eol=lf
-spec/schemas/mir4-r0-authority.schema.json text eol=lf
-spec/schemas/mir4-target-registry-v2.schema.json text eol=lf
-spec/schemas/mir4-versioning-distribution-identity-v2.schema.json text eol=lf
-.mir/releases/terminal/manifests/3.2.9-package.json text eol=crlf
-.mir/releases/terminal/seals/3.2.9.json text eol=crlf
 tools/commands/release/New-MIR3PostTerminalHotfixBaselineContinuation.ps1 text eol=lf
-spec/schemas/mir3-post-terminal-hotfix-baseline-continuation.schema.json text eol=lf
 
 # Post-terminal closure records bind the historical emergency JSON checkout
 # bytes. Preserve their sealed CRLF identities while keeping the 2.5.10
 # release record and continuation generator canonical LF on every runner.
-.mir/releases/emergency/*.json text eol=crlf
-.mir/releases/records/2.5.10.json text eol=lf
 tools/commands/release/New-MIR3Factorio20PostTerminalHotfixBaselineContinuation.ps1 text eol=lf
 
 # T15 runner/publisher confinement raw-hashes the complete workflow closure.
@@ -127,7 +65,6 @@ tools/commands/release/New-MIR3Factorio20PostTerminalHotfixBaselineContinuation.
 # under every core.autocrlf configuration and in independent audit worktrees.
 .github/workflows/*.yml text eol=lf
 
-# The experimental MIR 4 SDK compares generated bytes exactly. Keep its
 # generated reference, schemas, and language bindings invariant under the
 # maintainer's core.autocrlf setting.
 docs/reference/generated/mir4-experimental-api-v0.md text eol=lf
@@ -161,14 +98,7 @@ spec/platform/mir4-preview-v0/*.json text eol=lf
 spec/api/mir4-v0/contracts.json text eol=lf
 spec/api/mir4-v1/contracts.json text eol=lf
 spec/compatibility/*.json text eol=lf
-spec/schemas/mir4-*.schema.json text eol=lf
 spec/schemas/preview/mir4-*.schema.json text eol=lf
-.mir/compatibility.yml text eol=lf
-.mir/streams.yml text eol=lf
-.mir/fixtures.yml text eol=lf
-.mir/modules.yml text eol=lf
-.mir/technology-*.json text eol=lf
-.mir/control/repository-fixed-point.json text eol=lf
 .mir-root.json text eol=lf
 tools/lib/mir4/ExperimentalApiSdk.ps1 text eol=lf
 tools/lib/mir4/SafetyKernel.ps1 text eol=lf
@@ -211,6 +141,8 @@ tools/mir/** text eol=lf
 # The live composable player source is raw-byte hashed by the target
 # materializer. Pin all editable source bytes across checkout configurations.
 source/** text eol=lf
+# Factorio's root thumbnail is binary, including after the staging cutover.
+source/**/thumbnail.png -text
 # The editable target authority is raw-byte hashed by the deterministic
 # materializer. Pin every textual target source, including *.template and
 # target-specific Lua overlays, so Windows and hosted checkouts are identical.
@@ -226,7 +158,9 @@ tests/release/Test-MIR4PromotionRecovery.ps1 text eol=lf
 
 # Community receipts are compared by exact SHA-256 on every checkout.
 spec/programmes/evidence/community-2026-09-06/*.json text eol=lf
-fixtures/release-inputs/mir470-published-460-consolidated-construction.json -text -eol whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
-.mir/control/MIR4-F210-Current-Engine-Cap-Harness-AdmissionV4.json text eol=lf
 # Native observer receipts bind these authored CRLF bytes exactly.
 fixtures/assert-f210-current-bob-angel-gunmetal-invar-observer/* -text -eol whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
+# These native BobTech inputs are byte-hash-bound by the MIR5 recovery record.
+fixtures/run-profiles/f210-bob-angel-gunmetal-invar-2123.json -text -eol
+fixtures/assert-f210-current-bob-angel-gunmetal-invar-qualification/data-final-fixes.lua -text -eol
+fixtures/assert-f210-current-bob-angel-tin-route-observer/data-final-fixes.lua -text -eol

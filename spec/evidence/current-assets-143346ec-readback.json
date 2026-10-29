@@ -1,0 +1,307 @@
+{
+  "schema": 1,
+  "kind": "MIR5CurrentAssetFreezeReadbackV1",
+  "status": "nine-editions-rebuilt-byte-identical-not-native-acceptance",
+  "source": {
+    "commit": "143346ecfd520d47791cbd2c1a4e5ca8f5f60165",
+    "mod_name": "more-infinite-research",
+    "mod_title": "More Infinite Research",
+    "path": "source",
+    "source_distribution_version": "5.0.21000",
+    "source_tree": "b1d04b99e1988d76de2ea09f869020dc986982a6",
+    "tree": "c08053b39fa4caff9d00414585024e77bdc9ee42"
+  },
+  "accepted_dev": {
+    "commit": "5658246a7b8ea213d84496c420042c2ea9ad2eaa",
+    "tree": "c08053b39fa4caff9d00414585024e77bdc9ee42",
+    "full_tree_equal": true,
+    "original_review_ancestry_preserved": true
+  },
+  "inventory_file_sha256": "bf9095183e6e8d253c79220a69f94e87245a550d5bfb664982506465946207e0",
+  "inventory_content_sha256": "56dda76a1b718c870ea8ba21111f00fcfcb424932e919c3b61c6b32bcd8ba80c",
+  "controller": {
+    "package_tool": {
+      "path": "tools/package.py",
+      "sha256": "3f40c95979397cb8ba35150418389d88ffe28994d0858a6a4cbdcfa26dd91385"
+    },
+    "release_tool": {
+      "path": "tools/release.py",
+      "sha256": "291ab42469954f78c065d069c7eafc7df0c23e38555a587dc0e316dccfcb8763"
+    },
+    "runtime": {
+      "implementation": "cpython",
+      "version": [
+        3,
+        14,
+        7
+      ],
+      "zlib_build_version": "1.3.1.zlib-ng",
+      "zlib_runtime_version": "1.3.1.zlib-ng"
+    },
+    "zip_policy": {
+      "compression": "ZIP_DEFLATED",
+      "compresslevel": 9,
+      "member_create_system": 3,
+      "member_external_attr": 2175008768,
+      "member_timestamp": [
+        1980,
+        1,
+        1,
+        0,
+        0,
+        0
+      ]
+    }
+  },
+  "commands": [
+    "python tools/release.py --source source --revision 143346ecfd520d47791cbd2c1a4e5ca8f5f60165 --output ../mir5-current-assets-143346ec-r01",
+    "python tools/release.py --source source --output ../mir5-current-assets-143346ec-r01 --verify"
+  ],
+  "assets": [
+    {
+      "target": "f013",
+      "name": "more-infinite-research_5.0.01300.zip",
+      "bytes": 347271,
+      "archive_sha256": "3c12694e1bbf1b23d1d09b19652725546a72099c81684556bb9272cc62ccdb91",
+      "minimum_base": "0.13.20",
+      "factorio_version": "0.13",
+      "version": "5.0.01300"
+    },
+    {
+      "target": "f014",
+      "name": "more-infinite-research_5.0.01400.zip",
+      "bytes": 347271,
+      "archive_sha256": "37c007dc19f3337ce952495f0ee045f8ed70016016e704f977daee439f27f86a",
+      "minimum_base": "0.14.23",
+      "factorio_version": "0.14",
+      "version": "5.0.01400"
+    },
+    {
+      "target": "f015",
+      "name": "more-infinite-research_5.0.01500.zip",
+      "bytes": 347231,
+      "archive_sha256": "9d048e07f0c1a87e36c5e725331315e23055fdc44c53343437ebf7d2bac3b309",
+      "minimum_base": "0.15.40",
+      "factorio_version": "0.15",
+      "version": "5.0.01500"
+    },
+    {
+      "target": "f016",
+      "name": "more-infinite-research_5.0.01600.zip",
+      "bytes": 347222,
+      "archive_sha256": "a1a01c00928b8f641215b3211d2150509ceda91086404225b36d253eae218176",
+      "minimum_base": "0.16.51",
+      "factorio_version": "0.16",
+      "version": "5.0.01600"
+    },
+    {
+      "target": "f017",
+      "name": "more-infinite-research_5.0.01700.zip",
+      "bytes": 347111,
+      "archive_sha256": "d37bf4a1c52a4e14cc4746fd021bcfe20f6868bec76b662b9c72c0471e56e555",
+      "minimum_base": "0.17.79",
+      "factorio_version": "0.17",
+      "version": "5.0.01700"
+    },
+    {
+      "target": "f100",
+      "name": "more-infinite-research_5.0.10000.zip",
+      "bytes": 360903,
+      "archive_sha256": "f440eb67bded09d91b16f4f9cebdd01fcfe3d16b9e368a167f932294381f88f6",
+      "minimum_base": "1.0.0",
+      "factorio_version": "1.0",
+      "version": "5.0.10000"
+    },
+    {
+      "target": "f110",
+      "name": "more-infinite-research_5.0.11000.zip",
+      "bytes": 360900,
+      "archive_sha256": "d846237b678c4d34bdfd46f2eaa503893e5c8db74653c0512e465144db807a41",
+      "minimum_base": "1.1.110",
+      "factorio_version": "1.1",
+      "version": "5.0.11000"
+    },
+    {
+      "target": "f200",
+      "name": "more-infinite-research_5.0.20000.zip",
+      "bytes": 552716,
+      "archive_sha256": "b42baeb83233ba82c231c2162986c8d7ae19ad73c13196aa050f6ca06ad83982",
+      "minimum_base": "2.0.77",
+      "factorio_version": "2.0",
+      "version": "5.0.20000"
+    },
+    {
+      "target": "f210",
+      "name": "more-infinite-research_5.0.21000.zip",
+      "bytes": 553252,
+      "archive_sha256": "428a789ca03828d2f7f93ec65c49fd3157fd6d547cc569dda2c0129d6504647a",
+      "minimum_base": "2.1.23",
+      "factorio_version": "2.1",
+      "version": "5.0.21000"
+    }
+  ],
+  "checksums": {
+    "bytes": 927,
+    "name": "SHA256SUMS.txt",
+    "sha256": "c7cba71e6d9da1a03bd97440264414108a552cf304cdb632aa9c1c44da6ffdd8"
+  },
+  "previous_freeze": {
+    "source_commit": "fa1146e9778ecf7fc1b80449a2deec7ee0083ec3",
+    "comparison": [
+      {
+        "target": "f013",
+        "previous_archive_sha256": "d16dfee374d17a7b03c85ffe2a7ce5fb91cfe641b3a735a5e0cfe01c4cb82424",
+        "current_archive_sha256": "3c12694e1bbf1b23d1d09b19652725546a72099c81684556bb9272cc62ccdb91",
+        "added_members": [],
+        "changed_members": [
+          "compatibility/science_bindings.lua",
+          "research/science.lua"
+        ]
+      },
+      {
+        "target": "f014",
+        "previous_archive_sha256": "d5592982dbb16718727174c16d977a7b0fbe9c037f9a29bcc961e664ee9de150",
+        "current_archive_sha256": "37c007dc19f3337ce952495f0ee045f8ed70016016e704f977daee439f27f86a",
+        "added_members": [],
+        "changed_members": [
+          "compatibility/science_bindings.lua",
+          "research/science.lua"
+        ]
+      },
+      {
+        "target": "f015",
+        "previous_archive_sha256": "59d07b6187ddb46f0692878a9980738f2baf34588c4f4b84868c81e815d3c5e5",
+        "current_archive_sha256": "9d048e07f0c1a87e36c5e725331315e23055fdc44c53343437ebf7d2bac3b309",
+        "added_members": [],
+        "changed_members": [
+          "compatibility/science_bindings.lua",
+          "research/science.lua"
+        ]
+      },
+      {
+        "target": "f016",
+        "previous_archive_sha256": "6300f09b6a272f23501df7659584684a98d0bae54d0536db91947f1a0a5806be",
+        "current_archive_sha256": "a1a01c00928b8f641215b3211d2150509ceda91086404225b36d253eae218176",
+        "added_members": [],
+        "changed_members": [
+          "compatibility/science_bindings.lua",
+          "research/science.lua"
+        ]
+      },
+      {
+        "target": "f017",
+        "previous_archive_sha256": "04777cddf04b57ff97e94e4cc3b9c8c721c7afa66d5500f92e74d0c4e02d8eb3",
+        "current_archive_sha256": "d37bf4a1c52a4e14cc4746fd021bcfe20f6868bec76b662b9c72c0471e56e555",
+        "added_members": [],
+        "changed_members": [
+          "compatibility/science_bindings.lua",
+          "research/science.lua"
+        ]
+      },
+      {
+        "target": "f100",
+        "previous_archive_sha256": "1af8cf9b83fe17aeec35218f21afd5ce5e77adacd9fc6d6c61fc0d4bb7431a37",
+        "current_archive_sha256": "f440eb67bded09d91b16f4f9cebdd01fcfe3d16b9e368a167f932294381f88f6",
+        "added_members": [],
+        "changed_members": [
+          "compatibility/science_bindings.lua",
+          "research/science.lua"
+        ]
+      },
+      {
+        "target": "f110",
+        "previous_archive_sha256": "9fad85cb25a2741254ad897bcb671cbee21adc96dd99d86dfb30b34d9a3b1fab",
+        "current_archive_sha256": "d846237b678c4d34bdfd46f2eaa503893e5c8db74653c0512e465144db807a41",
+        "added_members": [],
+        "changed_members": [
+          "compatibility/science_bindings.lua",
+          "research/science.lua"
+        ]
+      },
+      {
+        "target": "f200",
+        "previous_archive_sha256": "76d4d21b12ea8ea939dffc599ec0746a1d9e13656326cacf5cb4a6d0303eb663",
+        "current_archive_sha256": "b42baeb83233ba82c231c2162986c8d7ae19ad73c13196aa050f6ca06ad83982",
+        "added_members": [],
+        "changed_members": [
+          "compatibility/science_bindings.lua",
+          "research/science.lua"
+        ]
+      },
+      {
+        "target": "f210",
+        "previous_archive_sha256": "4d5e32ce2e74c65259e5d3e085ce7be3bc37dc0a739308c6379bf621f7b5bda1",
+        "current_archive_sha256": "428a789ca03828d2f7f93ec65c49fd3157fd6d547cc569dda2c0129d6504647a",
+        "added_members": [],
+        "changed_members": [
+          "compatibility/science_bindings.lua",
+          "research/science.lua"
+        ]
+      }
+    ]
+  },
+  "primary_custody": "build/mir5/assets/143346ec-r01",
+  "primary_verified_files": [
+    {
+      "path": "MIR5ReleaseAssetInventoryV1.json",
+      "bytes": 175369,
+      "sha256": "bf9095183e6e8d253c79220a69f94e87245a550d5bfb664982506465946207e0"
+    },
+    {
+      "path": "SHA256SUMS.txt",
+      "bytes": 927,
+      "sha256": "c7cba71e6d9da1a03bd97440264414108a552cf304cdb632aa9c1c44da6ffdd8"
+    },
+    {
+      "path": "more-infinite-research_5.0.01300.zip",
+      "bytes": 347271,
+      "sha256": "3c12694e1bbf1b23d1d09b19652725546a72099c81684556bb9272cc62ccdb91"
+    },
+    {
+      "path": "more-infinite-research_5.0.01400.zip",
+      "bytes": 347271,
+      "sha256": "37c007dc19f3337ce952495f0ee045f8ed70016016e704f977daee439f27f86a"
+    },
+    {
+      "path": "more-infinite-research_5.0.01500.zip",
+      "bytes": 347231,
+      "sha256": "9d048e07f0c1a87e36c5e725331315e23055fdc44c53343437ebf7d2bac3b309"
+    },
+    {
+      "path": "more-infinite-research_5.0.01600.zip",
+      "bytes": 347222,
+      "sha256": "a1a01c00928b8f641215b3211d2150509ceda91086404225b36d253eae218176"
+    },
+    {
+      "path": "more-infinite-research_5.0.01700.zip",
+      "bytes": 347111,
+      "sha256": "d37bf4a1c52a4e14cc4746fd021bcfe20f6868bec76b662b9c72c0471e56e555"
+    },
+    {
+      "path": "more-infinite-research_5.0.10000.zip",
+      "bytes": 360903,
+      "sha256": "f440eb67bded09d91b16f4f9cebdd01fcfe3d16b9e368a167f932294381f88f6"
+    },
+    {
+      "path": "more-infinite-research_5.0.11000.zip",
+      "bytes": 360900,
+      "sha256": "d846237b678c4d34bdfd46f2eaa503893e5c8db74653c0512e465144db807a41"
+    },
+    {
+      "path": "more-infinite-research_5.0.20000.zip",
+      "bytes": 552716,
+      "sha256": "b42baeb83233ba82c231c2162986c8d7ae19ad73c13196aa050f6ca06ad83982"
+    },
+    {
+      "path": "more-infinite-research_5.0.21000.zip",
+      "bytes": 553252,
+      "sha256": "428a789ca03828d2f7f93ec65c49fd3157fd6d547cc569dda2c0129d6504647a"
+    }
+  ],
+  "native_acceptance": false,
+  "limits": [
+    "Aero PR962 restores the published4.7.3 named recipe replacement class through explicitly opted modern source contracts. Collection is bounded and context-scoped outside Generator; healthy canonical sources avoid a replacement pass.",
+    "All nine ZIPs change exactly compatibility/science_bindings.lua and research/science.lua. The historical contracts are unopted, but their changed archive identities are retained and require affected qualification; no old native receipt is relabelled.",
+    "The Generator, other Lua modules, settings, presentation, metadata, migrations and changelog member bytes match precedingFA. Root narrow controls passed31 science,18 product-target and6 named replacement fixture tests. These host/build results establish no native or performance verdict."
+  ]
+}

@@ -1,11 +1,11 @@
 # Contributing
 
-MIR 4.0 is a whole-platform source programme with a deliberately narrow authority model. Contributions are welcome when they preserve exact target identity, one writer per fact, one authorized emitter, and evidence-bound claims.
+MIR uses authored native research with a small deterministic Generator and explicit bounded compatibility bindings. Contributions are welcome when they preserve exact target identity, one writer per fact, one authorized emitter, and evidence-bound claims.
 
 ## Branch routing
 
 - Target protected `dev` for next-minor or next-major implementation, architecture, preview, shadow, target, and release-engine work.
-- Target protected `main` for bounded corrections to the latest stable MIR 4.x line, repository-governance maintenance, and exact qualified promotions from `dev`.
+- Target protected `main` for bounded corrections to the latest accepted stable line, repository-governance maintenance, and exact qualified promotions from `dev`.
 - Use a short-lived branch and a pull request. Do not leave completed work only in a local branch.
 - Use `release/4.0` only for admitted 4.0.x player corrections. Bind stable-line, current-main, and dev implementations with one finding identity and explicit forward-port dispositions.
 - Historical and backport branches change only under their explicit terminal programme.
@@ -18,12 +18,12 @@ Every change must identify its maturity: stable, preview, shadow, experimental, 
 
 - Compatibility policy describes decisions; it never mutates prototypes.
 - Only the admitted emitter creates or mutates generated technologies.
-- Every generated technology has a stable stream manifest row.
+- Every generated technology has a stable authored identity and checked native definition. Preserve published manifest facts where historical continuity depends on them; MIR5 does not recreate the retired compiler's global stream registry.
 - Every public compatibility claim names fixture or exact load-check evidence.
 - Target behavior needs an explicit disposition and target-local proof.
-- Changes to authorities must update their machine-readable manifests.
+- Update each fact's owning source, specification or target record and its affected checks. Do not restore retired generated MIR4 assurance manifests as new current dependencies.
 
-See [Governance](GOVERNANCE.md), [Extension Protocol](docs/EXTENSION-PROTOCOL.md), and [the module boundaries](docs/architecture/module-boundaries.md).
+See [Governance](GOVERNANCE.md), [Extension Protocol](docs/api.md), and [the module boundaries](docs/architecture.md).
 
 ## Development workflow
 
@@ -32,21 +32,17 @@ See [Governance](GOVERNANCE.md), [Extension Protocol](docs/EXTENSION-PROTOCOL.md
 3. Make one bounded change and classify its package visibility.
 4. Materialize or inspect the exact verification plan.
 5. Run the selected narrow checks, then the broader profile required by the risk.
-6. Regenerate governed projections through their writers; never hand-edit generated dashboards or queues.
-7. Open a PR, wait for the aggregate evidence gate, merge, and read back the protected branch.
+6. Update the current spec/docs/target records together; preserve pinned historical generated receipts without editing them.
+7. Open a PR, complete required branch checks and affected qualification, merge, and read back the protected branch.
 
-For documentation, edit Markdown front matter and regenerate:
-
-```powershell
-.\tools\commands\docs\Update-MIRDocumentationIndex.ps1
-.\tools\commands\docs\Update-MIRDocumentationIndex.ps1 -Check
-```
-
-For the static gate:
+Current MIR5 commands are in [Development](docs/development.md). Inspect the explicit host plan before running the selected controls:
 
 ```powershell
-.\scripts\Invoke-MIRValidation.ps1 -StaticOnly
+.\tests\Test-MIR5HostControls.ps1 -Plan
+python -B tools/check_repository.py
 ```
+
+Use an explicit pinned Lua runtime for the complete host driver. These checks do not launch Factorio or establish native/release acceptance. Current documentation uses front matter and one logical source line per paragraph; obsolete MIR4 generated indexes remain pinned history.
 
 Use the current Factorio 2.1 Steam engine only for F210. Use the preserved Factorio 2.0 installation for F200. Do not retarget Steam depots for historical testing.
 
@@ -62,7 +58,7 @@ A PR should state:
 - rollback or compensation boundary;
 - remaining human, credential, or external-service blockers.
 
-Release-changing PRs additionally require the phase-engine receipt and independent evidence specified by [the release runbook](docs/RELEASE-RUNBOOK.md).
+Release-changing PRs additionally require the phase-engine receipt and independent evidence specified by [the release runbook](docs/development.md#github-publication-after-acceptance).
 
 ## Changelog and player copy
 

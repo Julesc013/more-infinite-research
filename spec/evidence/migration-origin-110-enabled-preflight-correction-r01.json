@@ -1,0 +1,69 @@
+{
+  "schema": 1,
+  "kind": "MIRMigration110EnabledPreflightCorrectionV1",
+  "status": "fixture-corrected-host-verified-native-retry-required",
+  "review_unit_base": "824ab8d76bb3337c6840269e5984712d1cee1c19",
+  "original_adverse": {
+    "result_sha256": "0609D354BA1D4782DA8218654CF4679572DBD516AFF6D737C6B2C27242FBE133",
+    "primary_root": "build/qualification/migration-origin-110-current-7a2-r01-controller",
+    "github_exact_result_and_log": "https://github.com/Julesc013/more-infinite-research/pull/1322#issuecomment-6468897954",
+    "capsule_sha256": "1E6728D36D7D2AE1D06B5C5F2153865BDCDF6C884621C9D1B51263DB6F4125B4",
+    "scope": "One actual startup; no source world load/new lab/save/reload. Original88FC and all archives/controls restore; Factorio0."
+  },
+  "protected_source_save_sha256": "88FC8E9891040275E001930C3E6AA0A4A7A28C31D81DF30E3F08AEDD98E5019A",
+  "candidate_archive_sha256": "005D420671270306155CB4AC25E9CF77541202DFA16B206DCC016237619C9AA2",
+  "exact_packaged_source_readback": [
+    {
+      "member": "research/modern.lua",
+      "sha256": "C1F94193BF11F625655D6B02C630C0FECF195066D40FABF0186DCDF073DA1EE2",
+      "matches_source_commit": "7a2f93224c846b86261b2da709f50ea683fc708d"
+    },
+    {
+      "member": "research/generator.lua",
+      "sha256": "88626C760C43D51FEDB3C7233523FAD3355404C3548A79F872940E6B019FE526",
+      "matches_source_commit": "7a2f93224c846b86261b2da709f50ea683fc708d"
+    },
+    {
+      "member": "data-final-fixes.lua",
+      "sha256": "F907FA9EE1EFEBEAAE57D915FFB49C62B322CF8A13B540D9BDB0B4C95539B758",
+      "matches_source_commit": "7a2f93224c846b86261b2da709f50ea683fc708d"
+    }
+  ],
+  "diagnosis": {
+    "old_predicate": "modules.enabled == selected_target.modules_enabled",
+    "known_false_positive": "For expectedtrue, an omitted raw field is a valid native default but the old nil==true assertion rejects it. That exact old predicate was reproduced red with the faithful omitted-field host model.",
+    "provenance_limit": "The0609 native result/log does not serialize the actual raw field, so this correction does not claim its value was observed or that every possible cause is resolved. Exact005D active/available construction omits enabled; disabled/unavailable paths explicitly authorfalse. The native retry retains that opposingfalse check and reports rawtype/effectivevalue if it still fails.",
+    "native_default_authority": {
+      "url": "https://lua-api.factorio.com/latest/prototypes/TechnologyPrototype.html#enabled",
+      "observed_document_version": "2.1.24",
+      "observation": "enabled is optional with defaulttrue. This current documented contract corroborates the alias rule; it is not claimed as an exact2.1.23 native run.",
+      "existing_save_limit": "Prototype defaults do not establish existing saved force state; all later native-state/credit/reset assertions remain required."
+    },
+    "correction": "Normalize only absent/nil totrue in a local read; require a boolean equal to the target. Literaltrue and omitted enabled are equivalent for expectedtrue. Expectedfalse still requires explicitfalse. No prototype or saved-state write is added."
+  },
+  "changed_fixture": {
+    "path": "tests/fixtures/migration-origins/f200-110-successor/data-final-fixes.lua",
+    "sha256": "D5D8AA96AF9AADC3FDDA3D485E87E78F81CF15D36BDF9CB090E32F8E7AA4BB5B"
+  },
+  "focused_controls": {
+    "path": "tests/test_migration_origins_f200_110_successor_controls.py",
+    "sha256": "5E0DDF8207C57B9C95BAADAB56960EE7B0A8421403163804167AE06783370B36"
+  },
+  "controls": "Omitted/explicittrue enabled positives and explicitfalse disabled positive; opposite, omitted-disabled and malformed-string adverses refuse before the sole gear count/time acceleration. Every existing science/effect/settings/credit/source/state predicate remains.",
+  "native_continuation": "Black Glass rebuilds/pins the own0.4 successor fixture with corrected bytes, then consumes the unchanged protected88FC source on current005D/8DC. Keep0609/9C7A/profile099D as adverse. Newlab/effects/save/two-reload results must execute; the pending65FC/D3 F200 arm remains unrun until its exact packet is bound. No source world recreation or player-code correction follows from this fixture fix.",
+  "claims": {
+    "player_code_changed": false,
+    "native_retry_passed": false,
+    "original_adverse_relabelled": false,
+    "release_qualification": false
+  },
+  "prepared_f210_source_defaults_fixture": {
+    "source": "build/qualification/mir110-enabled-state-aero-diagnosis-r01/prepared-f210-source-defaults/source",
+    "archive": "build/qualification/mir110-enabled-state-aero-diagnosis-r01/prepared-f210-source-defaults/mir-fixture-mir5-migration-origin-f200-110-source_0.4.0.zip",
+    "sha256": "79DC5E7C8C66DF08415ABF16E41122B0613103C96C1E1A735BE6DB9C78CA109A",
+    "bytes": 11233,
+    "members": 5,
+    "all_payload_bytes_equal_selected_staged_git_blobs": true,
+    "native_execution": false
+  }
+}

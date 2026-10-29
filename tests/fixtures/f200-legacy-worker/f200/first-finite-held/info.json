@@ -1,0 +1,12 @@
+{
+  "name": "mir-fixture-mir5-f200-legacy-worker",
+  "version": "0.5.0",
+  "title": "MIR F200 native worker first finite cap held",
+  "author": "MIR maintainers",
+  "factorio_version": "2.0",
+  "dependencies": [
+    "base = 2.0.77",
+    "more-infinite-research = 5.0.20000",
+    "a-mir-fixture-worker-entry = 0.1.0"
+  ]
+}

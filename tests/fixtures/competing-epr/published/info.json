@@ -1,0 +1,13 @@
+{
+  "name": "mir-fixture-mir5-competing-epr",
+  "version": "0.1.0",
+  "title": "MIR published EPR continuity seed",
+  "author": "MIR maintainers",
+  "description": "Private Factorio 2.0 seed that earns two native EPR gear-tail levels.",
+  "factorio_version": "2.0",
+  "dependencies": [
+    "base >= 2.0.77",
+    "ExpandedProductivityResearch = 1.3.8",
+    "more-infinite-research = 4.7.20002"
+  ]
+}

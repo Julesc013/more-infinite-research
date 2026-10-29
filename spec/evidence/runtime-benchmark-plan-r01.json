@@ -1,0 +1,1061 @@
+{
+  "schema": 1,
+  "kind": "MIR5PredeclaredRuntimeBenchmarkPlanV1",
+  "status": "predeclared-not-executed-not-a-result",
+  "host": "BLACKGLASS-WIN1",
+  "plan_source": {
+    "commit": "7686a37390af863d923279ea1f33fc76de817a0c",
+    "tree": "efbe6e055f33928fae6dc527aa22990540594ba6"
+  },
+  "evidence_inputs": {
+    "repair_current_native_chain": {
+      "path": "spec/evidence/repair-current-native-chain.json",
+      "sha256": "675F8D59D0ADE58B26722DD4D9C54144BC6A83D20962CA0EFADEB4C5F2CEDD71",
+      "run": 40147383321,
+      "custody_primary_root": "build/mir5/recovery-historical/repair-stress/40147383321/black-glass-repair-stress-40147383321-1",
+      "manifest_sha256": "3CADB2C5BB74AF85018E757A3C754F18E840950FD111D3AEC26D218B51B1446D",
+      "members_verified": 66,
+      "fixture_source_reference": "a6ce2367f8a7ebca4d18d60591f5bf6afca453fb",
+      "raw_receipts": {
+        "path": "spec/evidence/repair-current-native-receipts.json.gz",
+        "gzip_sha256": "5C0E0354C33E34CA2555046102687BFE2F3644B11CF3970AE6448DA533056CD6",
+        "uncompressed_sha256": "8B2DCED013911105301DDEAEDF3CE38FF58108CA676768136F63989DC06B980C"
+      }
+    },
+    "agriculture_matched_defaults_native_chain": {
+      "path": "spec/evidence/agriculture-matched-defaults-native-chain.json",
+      "sha256": "2B56F22E63319CE683089C2B9A452EA7F42203062830DC97FB646F6DAF353B97",
+      "run": 40146799870,
+      "custody_primary_root": "build/mir5/recovery-historical/agriculture-matched-defaults/40146799870/black-glass-agriculture-matched-defaults-40146799870-1",
+      "manifest_sha256": "58E5D8D25D5DC42ADF3351905DFD7D90D7EF6A6E64CC36B901F3B75B41098370",
+      "members_verified": 266,
+      "fixture_source_reference": "a6ce2367f8a7ebca4d18d60591f5bf6afca453fb",
+      "raw_receipts": {
+        "path": "spec/evidence/agriculture-matched-defaults-native-receipts.json.gz",
+        "gzip_sha256": "F354F0E5110B263EF885A37CF7EE7379F763717C5AD69E653B4A7892D46CAD92",
+        "uncompressed_sha256": "B61644CD534ADAA2C0B161CBFFF1C35087D8DE5BE01C5C294AEC7871051C44C4"
+      }
+    }
+  },
+  "public_harness": {
+    "source_reference": "7686a37390af863d923279ea1f33fc76de817a0c",
+    "git_blob_sha256": [
+      {
+        "path": "tools/Invoke-NativeFixture.ps1",
+        "sha256": "CF3EB9F96DC8F0284678D7AEE57575FDB06FC7934549186E264F7327F51F41C1"
+      },
+      {
+        "path": "tools/lib/validation/NativeProbeResources.ps1",
+        "sha256": "2826EF1D491615C10B39F6D05C6BDEE5D4317EB10BBA753AD0BA159ED95B9311"
+      },
+      {
+        "path": "tools/lib/validation/ResourceGovernor.ps1",
+        "sha256": "50E5172BF9836B2742A9857F7A0F86DFF3E5FD6C40A4E149F42334A199302A6E"
+      },
+      {
+        "path": "tools/lib/validation/OwnedProcessMemorySampler.ps1",
+        "sha256": "8786DC06671A7B6ED6F48BD211275C4DA783F65BBB0FCDCE5562104BC3B28124"
+      },
+      {
+        "path": "tools/lib/validation/ImmutableInputStaging.ps1",
+        "sha256": "B5FBFAC8537B08F9790BD3EE8ACEAAB38EE5CBB8EF005E67E8375DE568BBC12C"
+      },
+      {
+        "path": "tools/lib/compatibility/LibraryActivation.ps1",
+        "sha256": "ED699BB77F4325E7967DC3B6E692D9796BF378BD9251B6D87146AFFF87181315"
+      }
+    ],
+    "private_controller_binding": "A later private receipt must bind the exact controller commit and raw script hashes before PrepareOnly or execution; this public plan contains no private controller result."
+  },
+  "benchmark_command": {
+    "arguments": [
+      "--benchmark",
+      "<fresh-owned-seed.zip>",
+      "--benchmark-ticks",
+      "25000",
+      "--benchmark-runs",
+      "1",
+      "--benchmark-sanitize"
+    ],
+    "fresh_owned_seed_per_launch": true,
+    "input_seed_hash_before_and_after_each_group": true,
+    "raw_stdout_retained": true,
+    "engine_reported_time_per_tick_required": true
+  },
+  "benchmark_stdout_grammar": {
+    "source": "Exact F200/F210 native benchmark stdout observed in the retained fixture reloads.",
+    "required_lines": [
+      "^\\s*Performed 25000 updates in (?<total_ms>[0-9]+(?:\\.[0-9]+)?) ms\\s*$",
+      "^\\s*avg: (?<average_ms_per_tick>[0-9]+(?:\\.[0-9]+)?) ms, min: (?<minimum_ms_per_tick>[0-9]+(?:\\.[0-9]+)?) ms, max: (?<maximum_ms_per_tick>[0-9]+(?:\\.[0-9]+)?) ms\\s*$"
+    ],
+    "refusal": "Require exactly one matching Performed line with exactly 25000 updates and exactly one matching avg/min/max line. Every parsed value must be finite, nonnegative milliseconds; duplicate, absent, malformed, nonfinite or unit-changed lines are adverse rather than samples.",
+    "prohibited_substitutes": [
+      "headless save creation duration",
+      "host wall-clock around preparation",
+      "fixture gameplay ticks outside --benchmark"
+    ]
+  },
+  "process_memory_observation": {
+    "context": "benchmark",
+    "expected_slot": {
+      "phase": "benchmark",
+      "role": "factorio"
+    },
+    "target_interval_milliseconds": 250,
+    "maximum_duration_seconds": 900,
+    "maximum_observations": 12000,
+    "maximum_serialized_bytes": 8388608,
+    "record": [
+      "monotonic_timestamp",
+      "phase",
+      "role",
+      "pid",
+      "start_utc",
+      "working_set_bytes",
+      "private_bytes"
+    ],
+    "interpretation": "The operating-system peak working set is distinct from the maximum sampled working/private bytes. Real gaps and incomplete observations are retained; sampled private bytes are not an instantaneous proven peak."
+  },
+  "resources": {
+    "expected_peak_memory_mib_per_factorio": 4096,
+    "maximum_new_output_mib_per_launch": 120,
+    "exclusive_native_lock": true,
+    "direct_existing_archive_library_only": true,
+    "no_dependency_copy_hardlink_or_extraction": true
+  },
+  "comparison_rules": {
+    "counterbalancing": "Within every scored pair, odd blocks run published then candidate and even blocks candidate then published. Warm-ups are unscored and retained separately.",
+    "candidate_time_per_tick_limit": {
+      "rule": "candidate median <= published median + max(10 percent of published median, 0.25 ms/tick)",
+      "relative_fraction": 0.1,
+      "absolute_milliseconds_per_tick": 0.25
+    },
+    "candidate_memory_limits": {
+      "metrics": [
+        "operating_system_peak_working_set_bytes",
+        "maximum_sampled_working_set_bytes",
+        "maximum_sampled_private_bytes"
+      ],
+      "rule": "candidate median <= published median + max(10 percent of published median, 64 MiB), evaluated separately for each metric",
+      "relative_fraction": 0.1,
+      "absolute_bytes": 67108864
+    },
+    "agriculture_within_arm_increment_128_minus_1": {
+      "metrics": [
+        "engine_reported_average_ms_per_tick",
+        "operating_system_peak_working_set_bytes",
+        "maximum_sampled_working_set_bytes",
+        "maximum_sampled_private_bytes"
+      ],
+      "rule": "Report candidate and published 128-minus-1 raw differences separately. A percentage comparison is permitted only when the matching published incremental denominator is finite and strictly positive; otherwise report raw differences only, with no percentage or inferred non-regression conclusion from noise.",
+      "scope": "This within-arm comparison supplements, and does not replace, direct published-versus-candidate limits at each tier."
+    },
+    "report": [
+      "all raw observations",
+      "paired block differences",
+      "per-arm median",
+      "spread",
+      "incomplete reasons"
+    ]
+  },
+  "scenarios": {
+    "repair_completed_idle": {
+      "engine": {
+        "version": "2.0.77",
+        "sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B"
+      },
+      "arms": [
+        {
+          "id": "published",
+          "native_arm": "published",
+          "profile_git_path": "tests/profiles/repair-stress-published-f200-2077.json",
+          "profile_sha256": "C199E2C964933B7889C5F51BE55329BB1C6614EC4271E74238FE799E3CE86CCF",
+          "player_sha256": "F3943EB4D69CCDAC41BD9F922AD03A5C78F34F22D8E7FA5A88A7A658AB1010B7",
+          "fixture_archives": {
+            "mir-fixture-mir5-active-mods-observer_0.1.0.zip": "723D1E7721449FC26040E5E6629416767BDC20AD79CF8723115846DB662A1F87",
+            "mir-fixture-mir5-repair-stress_0.1.0.zip": "1D7FA319F300001A5102E2CBECB0F5C87140C9A87ED81126C6D46DD04A3898BC"
+          },
+          "seed": {
+            "kind": "completed-idle-repair-stress-save",
+            "sha256": "6E3F09432C9DC8E44AC10A20E894F36BB581D5DC3272554E5922650B87AFAE39",
+            "source_result_path": "gameplay/published/result.json",
+            "source_result_sha256": "85E3E2974C278B9C3D3A2D7B44AC6A512F875599BE5429230E314608D693CE2A",
+            "physical_contract": {
+              "eligible_walls": 1000,
+              "admitted_walls": 256,
+              "overflow_walls": 744,
+              "maximum_repairs_per_service": 8,
+              "service_ticks": 60,
+              "reactivated_entries": 8
+            }
+          }
+        },
+        {
+          "id": "candidate",
+          "native_arm": "mir5",
+          "profile_git_path": "tests/profiles/repair-stress-mir5-f200-2077.json",
+          "profile_sha256": "CA8B6CF3305934AE173860BE003617E5D0D252FBCE4E8E2BF3ADEB36C46441A8",
+          "player_sha256": "2BBDBA9A0B816AC383CEA116CDF86D587BC34EFF7E1C5ACE2583F1DA98F9E842",
+          "fixture_archives": {
+            "mir-fixture-mir5-active-mods-observer_0.1.0.zip": "723D1E7721449FC26040E5E6629416767BDC20AD79CF8723115846DB662A1F87",
+            "mir-fixture-mir5-repair-stress_0.2.0.zip": "CCF0876C20B457F48FCEC6C05BA7E967CC00DA67147AA2D1BC7D61FD20178B64"
+          },
+          "seed": {
+            "kind": "completed-idle-repair-stress-save",
+            "sha256": "2ECDFDEC6FBEBC04D7896120C58268FFC2887651A26221C8B8E44C508D943014",
+            "source_result_path": "gameplay/mir5/result.json",
+            "source_result_sha256": "1D1A5708CEE47E59D961F90F277DC1F50765610D79C273125FB3973331A5DA6B",
+            "physical_contract": {
+              "eligible_walls": 1000,
+              "admitted_walls": 256,
+              "overflow_walls": 744,
+              "maximum_repairs_per_service": 8,
+              "service_ticks": 60,
+              "reactivated_entries": 8
+            }
+          }
+        }
+      ],
+      "warmups": [
+        {
+          "id": "repair-warmup-published-1",
+          "arm": "published",
+          "scored": false
+        },
+        {
+          "id": "repair-warmup-published-2",
+          "arm": "published",
+          "scored": false
+        },
+        {
+          "id": "repair-warmup-candidate-1",
+          "arm": "candidate",
+          "scored": false
+        },
+        {
+          "id": "repair-warmup-candidate-2",
+          "arm": "candidate",
+          "scored": false
+        }
+      ],
+      "scored_pairs": [
+        {
+          "block": 1,
+          "order": [
+            "published",
+            "candidate"
+          ],
+          "samples": [
+            {
+              "id": "repair-b1-1-published",
+              "arm": "published",
+              "scored": true
+            },
+            {
+              "id": "repair-b1-2-candidate",
+              "arm": "candidate",
+              "scored": true
+            }
+          ]
+        },
+        {
+          "block": 2,
+          "order": [
+            "candidate",
+            "published"
+          ],
+          "samples": [
+            {
+              "id": "repair-b2-1-candidate",
+              "arm": "candidate",
+              "scored": true
+            },
+            {
+              "id": "repair-b2-2-published",
+              "arm": "published",
+              "scored": true
+            }
+          ]
+        },
+        {
+          "block": 3,
+          "order": [
+            "published",
+            "candidate"
+          ],
+          "samples": [
+            {
+              "id": "repair-b3-1-published",
+              "arm": "published",
+              "scored": true
+            },
+            {
+              "id": "repair-b3-2-candidate",
+              "arm": "candidate",
+              "scored": true
+            }
+          ]
+        },
+        {
+          "block": 4,
+          "order": [
+            "candidate",
+            "published"
+          ],
+          "samples": [
+            {
+              "id": "repair-b4-1-candidate",
+              "arm": "candidate",
+              "scored": true
+            },
+            {
+              "id": "repair-b4-2-published",
+              "arm": "published",
+              "scored": true
+            }
+          ]
+        },
+        {
+          "block": 5,
+          "order": [
+            "published",
+            "candidate"
+          ],
+          "samples": [
+            {
+              "id": "repair-b5-1-published",
+              "arm": "published",
+              "scored": true
+            },
+            {
+              "id": "repair-b5-2-candidate",
+              "arm": "candidate",
+              "scored": true
+            }
+          ]
+        },
+        {
+          "block": 6,
+          "order": [
+            "candidate",
+            "published"
+          ],
+          "samples": [
+            {
+              "id": "repair-b6-1-candidate",
+              "arm": "candidate",
+              "scored": true
+            },
+            {
+              "id": "repair-b6-2-published",
+              "arm": "published",
+              "scored": true
+            }
+          ]
+        },
+        {
+          "block": 7,
+          "order": [
+            "published",
+            "candidate"
+          ],
+          "samples": [
+            {
+              "id": "repair-b7-1-published",
+              "arm": "published",
+              "scored": true
+            },
+            {
+              "id": "repair-b7-2-candidate",
+              "arm": "candidate",
+              "scored": true
+            }
+          ]
+        },
+        {
+          "block": 8,
+          "order": [
+            "candidate",
+            "published"
+          ],
+          "samples": [
+            {
+              "id": "repair-b8-1-candidate",
+              "arm": "candidate",
+              "scored": true
+            },
+            {
+              "id": "repair-b8-2-published",
+              "arm": "published",
+              "scored": true
+            }
+          ]
+        }
+      ],
+      "scored_samples": 16,
+      "endpoint": "completed idle repair-stress save benchmark",
+      "scope": "A completed-state peak/steady-state control. It must not be described as active processing of 1,000 walls or a 1,000-wall CPU-cost measurement."
+    },
+    "agriculture_completed_native_crop_steady_state": {
+      "engine": {
+        "version": "2.1.23",
+        "sha256": "FE4A1DA30F322A0D0B8AEB3DF7276332222BAAA143E2352569B723E84B2B9060"
+      },
+      "arms": [
+        {
+          "id": "published",
+          "native_arm": "published",
+          "tier": 1,
+          "profile_git_path": "tests/profiles/agriculture-matched-published-1-f210-2123.json",
+          "profile_sha256": "A3B49326426C0A71DAF74DB99CD6766E84809AA31D32EEE5F09F4DEB83E7ED78",
+          "player_sha256": "A4BB8F47232C689B267EF434F557187A8795C47280FA464169DE917FB579517F",
+          "fixture_archives": {
+            "mir-fixture-mir5-agriculture-scale_0.1.0.zip": "F4AD345E496976423EF351DA31F2CD9C2D249DE37FF4DC05E4B44F7B27BEA207",
+            "mir-fixture-mir5-active-mods-observer_0.1.0.zip": "2E1BE5952D2A4CC5C74A0D149E075D247BA110A3FAE5B6768D3EAEBABCEF989C",
+            "mir-fixture-mir5-agriculture-scale-paired_0.1.0.zip": "05D17B49A9C0C5112F601B5295C748E55B5F9AAA29E9829D589997B0DDC3D422",
+            "mir-fixture-mir5-agriculture-scale-arm-published_0.1.0.zip": "DC1F532220977C1F36B32874ED4006F34285484C217491D291626C3DAD5A7056",
+            "mir-fixture-mir5-agriculture-scale-matched-tier-1_0.1.0.zip": "176564869AD1210F281D5C211EDC551BFAEE979959B44C57D56006BBCFEA0349"
+          },
+          "seed": {
+            "kind": "completed-native-crop-steady-state-save",
+            "sha256": "6CE32472D47414AE773D5F7936FCC4C89777914F49F60E10649F90BACC79CCFA",
+            "source_result_path": "agd/p1/gameplay/result.json",
+            "source_result_sha256": "51483B2917CC4113E2CDDF4EF0C9A554915E8D48CE8CAA590C63A8017C25D06E",
+            "physical_contract": {
+              "real_lab_completions": 2,
+              "native_planting_events": 2,
+              "trained_remaining_ticks_at_plant_event": 17645,
+              "foreign_remaining_ticks_at_plant_event": 18000,
+              "native_spoilable_stacks": 4
+            }
+          }
+        },
+        {
+          "id": "candidate",
+          "native_arm": "candidate-defaults",
+          "tier": 1,
+          "profile_git_path": "tests/profiles/agriculture-matched-candidate-defaults-1-f210-2123.json",
+          "profile_sha256": "020B5E35B16AED0F3C84D3CD4AE5F9DDA4354A12146FDFF5ACEB7E13B9B8AA9C",
+          "player_sha256": "AF65E765FB095489A2EA3F7BCD2A4471C46687F8BB12CC4762C98AC98829E987",
+          "fixture_archives": {
+            "mir-fixture-mir5-agriculture-scale_0.1.0.zip": "F4AD345E496976423EF351DA31F2CD9C2D249DE37FF4DC05E4B44F7B27BEA207",
+            "mir-fixture-mir5-active-mods-observer_0.1.0.zip": "2E1BE5952D2A4CC5C74A0D149E075D247BA110A3FAE5B6768D3EAEBABCEF989C",
+            "mir-fixture-mir5-agriculture-scale-paired_0.1.0.zip": "05D17B49A9C0C5112F601B5295C748E55B5F9AAA29E9829D589997B0DDC3D422",
+            "mir-fixture-mir5-agriculture-scale-arm-candidate-defaults_0.1.0.zip": "8F1BCD0378E71A3CC9DF21AF1344AC6B88B64294A90DA03044BE7F7DC5A1EB12",
+            "mir-fixture-mir5-agriculture-scale-matched-tier-1_0.1.0.zip": "176564869AD1210F281D5C211EDC551BFAEE979959B44C57D56006BBCFEA0349"
+          },
+          "seed": {
+            "kind": "completed-native-crop-steady-state-save",
+            "sha256": "6001AC493AA54AC76952FCD465ACFEABB43B18CF87D2309BF1CF64667BB84C42",
+            "source_result_path": "agd/c1/gameplay/result.json",
+            "source_result_sha256": "63BCA44820A2C0AC5AC85239E48BF51818C002A3FAEE03D99349EF96BC365D4D",
+            "physical_contract": {
+              "real_lab_completions": 2,
+              "native_planting_events": 2,
+              "trained_remaining_ticks_at_plant_event": 17645,
+              "foreign_remaining_ticks_at_plant_event": 18000,
+              "native_spoilable_stacks": 4
+            }
+          }
+        },
+        {
+          "id": "published",
+          "native_arm": "published",
+          "tier": 32,
+          "profile_git_path": "tests/profiles/agriculture-matched-published-32-f210-2123.json",
+          "profile_sha256": "6F176DAC38EFEC9F4B6EB60CFF27C4D76C2E5E2E75628E48BF149CE37E4EAF93",
+          "player_sha256": "A4BB8F47232C689B267EF434F557187A8795C47280FA464169DE917FB579517F",
+          "fixture_archives": {
+            "mir-fixture-mir5-agriculture-scale_0.1.0.zip": "F4AD345E496976423EF351DA31F2CD9C2D249DE37FF4DC05E4B44F7B27BEA207",
+            "mir-fixture-mir5-active-mods-observer_0.1.0.zip": "2E1BE5952D2A4CC5C74A0D149E075D247BA110A3FAE5B6768D3EAEBABCEF989C",
+            "mir-fixture-mir5-agriculture-scale-paired_0.1.0.zip": "05D17B49A9C0C5112F601B5295C748E55B5F9AAA29E9829D589997B0DDC3D422",
+            "mir-fixture-mir5-agriculture-scale-arm-published_0.1.0.zip": "DC1F532220977C1F36B32874ED4006F34285484C217491D291626C3DAD5A7056",
+            "mir-fixture-mir5-agriculture-scale-matched-tier-32_0.1.0.zip": "736075D6F4A64CBD3E8C0369D307BB55BD400A6610B804DD02B5C87452A87688"
+          },
+          "seed": {
+            "kind": "completed-native-crop-steady-state-save",
+            "sha256": "9F8F8469B9D354D504B2BC47DE7DDEA9B249463972AE9E70FC67421BE10A9B98",
+            "source_result_path": "agd/p32/gameplay/result.json",
+            "source_result_sha256": "EEC2947BF6A658D060264FB66FB3D84DC4F9948C0EEF2FE707C968905F3A6E04",
+            "physical_contract": {
+              "real_lab_completions": 2,
+              "native_planting_events": 64,
+              "trained_remaining_ticks_at_plant_event": 17645,
+              "foreign_remaining_ticks_at_plant_event": 18000,
+              "native_spoilable_stacks": 4
+            }
+          }
+        },
+        {
+          "id": "candidate",
+          "native_arm": "candidate-defaults",
+          "tier": 32,
+          "profile_git_path": "tests/profiles/agriculture-matched-candidate-defaults-32-f210-2123.json",
+          "profile_sha256": "8E363EB0FEB951083AB8D9E0A0511F9D5B18326947E1E73999FB5CA3C4F88339",
+          "player_sha256": "AF65E765FB095489A2EA3F7BCD2A4471C46687F8BB12CC4762C98AC98829E987",
+          "fixture_archives": {
+            "mir-fixture-mir5-agriculture-scale_0.1.0.zip": "F4AD345E496976423EF351DA31F2CD9C2D249DE37FF4DC05E4B44F7B27BEA207",
+            "mir-fixture-mir5-active-mods-observer_0.1.0.zip": "2E1BE5952D2A4CC5C74A0D149E075D247BA110A3FAE5B6768D3EAEBABCEF989C",
+            "mir-fixture-mir5-agriculture-scale-paired_0.1.0.zip": "05D17B49A9C0C5112F601B5295C748E55B5F9AAA29E9829D589997B0DDC3D422",
+            "mir-fixture-mir5-agriculture-scale-arm-candidate-defaults_0.1.0.zip": "8F1BCD0378E71A3CC9DF21AF1344AC6B88B64294A90DA03044BE7F7DC5A1EB12",
+            "mir-fixture-mir5-agriculture-scale-matched-tier-32_0.1.0.zip": "736075D6F4A64CBD3E8C0369D307BB55BD400A6610B804DD02B5C87452A87688"
+          },
+          "seed": {
+            "kind": "completed-native-crop-steady-state-save",
+            "sha256": "8C76D33B271CFD793784A2D6A9F71327F8AB70974CBCB274CF914555B6AB2EE4",
+            "source_result_path": "agd/c32/gameplay/result.json",
+            "source_result_sha256": "8292A23A69340C83F8927DE058475528962BDEDF49BFFF0F7E9BF3E549E82E69",
+            "physical_contract": {
+              "real_lab_completions": 2,
+              "native_planting_events": 64,
+              "trained_remaining_ticks_at_plant_event": 17645,
+              "foreign_remaining_ticks_at_plant_event": 18000,
+              "native_spoilable_stacks": 4
+            }
+          }
+        },
+        {
+          "id": "published",
+          "native_arm": "published",
+          "tier": 128,
+          "profile_git_path": "tests/profiles/agriculture-matched-published-128-f210-2123.json",
+          "profile_sha256": "9656AB744408C016655570A3085345B05B826DCA6909170AFC2DDB796747D161",
+          "player_sha256": "A4BB8F47232C689B267EF434F557187A8795C47280FA464169DE917FB579517F",
+          "fixture_archives": {
+            "mir-fixture-mir5-agriculture-scale_0.1.0.zip": "F4AD345E496976423EF351DA31F2CD9C2D249DE37FF4DC05E4B44F7B27BEA207",
+            "mir-fixture-mir5-active-mods-observer_0.1.0.zip": "2E1BE5952D2A4CC5C74A0D149E075D247BA110A3FAE5B6768D3EAEBABCEF989C",
+            "mir-fixture-mir5-agriculture-scale-paired_0.1.0.zip": "05D17B49A9C0C5112F601B5295C748E55B5F9AAA29E9829D589997B0DDC3D422",
+            "mir-fixture-mir5-agriculture-scale-arm-published_0.1.0.zip": "DC1F532220977C1F36B32874ED4006F34285484C217491D291626C3DAD5A7056",
+            "mir-fixture-mir5-agriculture-scale-matched-tier-128_0.1.0.zip": "C97B2F698E34DB8A15C22CF13A02879AF792446E615C510E979EAADF23E50BF3"
+          },
+          "seed": {
+            "kind": "completed-native-crop-steady-state-save",
+            "sha256": "5E1955F9E03D4819AE2065205B39F26767D79E8DB2F668176447C976B53B7CC3",
+            "source_result_path": "agd/p128/gameplay/result.json",
+            "source_result_sha256": "CBB3BC874D606C4E2F20A914FE004C53C12BF12315F5E8DF8416296FAF5ED56A",
+            "physical_contract": {
+              "real_lab_completions": 2,
+              "native_planting_events": 256,
+              "trained_remaining_ticks_at_plant_event": 17645,
+              "foreign_remaining_ticks_at_plant_event": 18000,
+              "native_spoilable_stacks": 4
+            }
+          }
+        },
+        {
+          "id": "candidate",
+          "native_arm": "candidate-defaults",
+          "tier": 128,
+          "profile_git_path": "tests/profiles/agriculture-matched-candidate-defaults-128-f210-2123.json",
+          "profile_sha256": "C0D9F8991C551F01A04A2FD96E1A39ECFBAE6FF4695B3CE372ADD700DD745E02",
+          "player_sha256": "AF65E765FB095489A2EA3F7BCD2A4471C46687F8BB12CC4762C98AC98829E987",
+          "fixture_archives": {
+            "mir-fixture-mir5-agriculture-scale_0.1.0.zip": "F4AD345E496976423EF351DA31F2CD9C2D249DE37FF4DC05E4B44F7B27BEA207",
+            "mir-fixture-mir5-active-mods-observer_0.1.0.zip": "2E1BE5952D2A4CC5C74A0D149E075D247BA110A3FAE5B6768D3EAEBABCEF989C",
+            "mir-fixture-mir5-agriculture-scale-paired_0.1.0.zip": "05D17B49A9C0C5112F601B5295C748E55B5F9AAA29E9829D589997B0DDC3D422",
+            "mir-fixture-mir5-agriculture-scale-arm-candidate-defaults_0.1.0.zip": "8F1BCD0378E71A3CC9DF21AF1344AC6B88B64294A90DA03044BE7F7DC5A1EB12",
+            "mir-fixture-mir5-agriculture-scale-matched-tier-128_0.1.0.zip": "C97B2F698E34DB8A15C22CF13A02879AF792446E615C510E979EAADF23E50BF3"
+          },
+          "seed": {
+            "kind": "completed-native-crop-steady-state-save",
+            "sha256": "F156ACBE9FAFA59F2E7D4C9EAFBC43EE906798FF86771F1ACFBD12A888024016",
+            "source_result_path": "agd/c128/gameplay/result.json",
+            "source_result_sha256": "29DD5706C353BCDFC2705370BB23031BAA2DBC9C9EE373D019C3F8F34FB71645",
+            "physical_contract": {
+              "real_lab_completions": 2,
+              "native_planting_events": 256,
+              "trained_remaining_ticks_at_plant_event": 17645,
+              "foreign_remaining_ticks_at_plant_event": 18000,
+              "native_spoilable_stacks": 4
+            }
+          }
+        }
+      ],
+      "warmups": [
+        {
+          "id": "agriculture-1-warmup-published-1",
+          "tier": 1,
+          "arm": "published",
+          "scored": false
+        },
+        {
+          "id": "agriculture-1-warmup-published-2",
+          "tier": 1,
+          "arm": "published",
+          "scored": false
+        },
+        {
+          "id": "agriculture-1-warmup-candidate-1",
+          "tier": 1,
+          "arm": "candidate",
+          "scored": false
+        },
+        {
+          "id": "agriculture-1-warmup-candidate-2",
+          "tier": 1,
+          "arm": "candidate",
+          "scored": false
+        },
+        {
+          "id": "agriculture-32-warmup-published-1",
+          "tier": 32,
+          "arm": "published",
+          "scored": false
+        },
+        {
+          "id": "agriculture-32-warmup-published-2",
+          "tier": 32,
+          "arm": "published",
+          "scored": false
+        },
+        {
+          "id": "agriculture-32-warmup-candidate-1",
+          "tier": 32,
+          "arm": "candidate",
+          "scored": false
+        },
+        {
+          "id": "agriculture-32-warmup-candidate-2",
+          "tier": 32,
+          "arm": "candidate",
+          "scored": false
+        },
+        {
+          "id": "agriculture-128-warmup-published-1",
+          "tier": 128,
+          "arm": "published",
+          "scored": false
+        },
+        {
+          "id": "agriculture-128-warmup-published-2",
+          "tier": 128,
+          "arm": "published",
+          "scored": false
+        },
+        {
+          "id": "agriculture-128-warmup-candidate-1",
+          "tier": 128,
+          "arm": "candidate",
+          "scored": false
+        },
+        {
+          "id": "agriculture-128-warmup-candidate-2",
+          "tier": 128,
+          "arm": "candidate",
+          "scored": false
+        }
+      ],
+      "scored_pairs_by_tier": {
+        "1": [
+          {
+            "block": 1,
+            "order": [
+              "published",
+              "candidate"
+            ],
+            "samples": [
+              {
+                "id": "agriculture-1-b1-1-published",
+                "arm": "published",
+                "scored": true,
+                "tier": 1
+              },
+              {
+                "id": "agriculture-1-b1-2-candidate",
+                "arm": "candidate",
+                "scored": true,
+                "tier": 1
+              }
+            ]
+          },
+          {
+            "block": 2,
+            "order": [
+              "candidate",
+              "published"
+            ],
+            "samples": [
+              {
+                "id": "agriculture-1-b2-1-candidate",
+                "arm": "candidate",
+                "scored": true,
+                "tier": 1
+              },
+              {
+                "id": "agriculture-1-b2-2-published",
+                "arm": "published",
+                "scored": true,
+                "tier": 1
+              }
+            ]
+          },
+          {
+            "block": 3,
+            "order": [
+              "published",
+              "candidate"
+            ],
+            "samples": [
+              {
+                "id": "agriculture-1-b3-1-published",
+                "arm": "published",
+                "scored": true,
+                "tier": 1
+              },
+              {
+                "id": "agriculture-1-b3-2-candidate",
+                "arm": "candidate",
+                "scored": true,
+                "tier": 1
+              }
+            ]
+          },
+          {
+            "block": 4,
+            "order": [
+              "candidate",
+              "published"
+            ],
+            "samples": [
+              {
+                "id": "agriculture-1-b4-1-candidate",
+                "arm": "candidate",
+                "scored": true,
+                "tier": 1
+              },
+              {
+                "id": "agriculture-1-b4-2-published",
+                "arm": "published",
+                "scored": true,
+                "tier": 1
+              }
+            ]
+          },
+          {
+            "block": 5,
+            "order": [
+              "published",
+              "candidate"
+            ],
+            "samples": [
+              {
+                "id": "agriculture-1-b5-1-published",
+                "arm": "published",
+                "scored": true,
+                "tier": 1
+              },
+              {
+                "id": "agriculture-1-b5-2-candidate",
+                "arm": "candidate",
+                "scored": true,
+                "tier": 1
+              }
+            ]
+          },
+          {
+            "block": 6,
+            "order": [
+              "candidate",
+              "published"
+            ],
+            "samples": [
+              {
+                "id": "agriculture-1-b6-1-candidate",
+                "arm": "candidate",
+                "scored": true,
+                "tier": 1
+              },
+              {
+                "id": "agriculture-1-b6-2-published",
+                "arm": "published",
+                "scored": true,
+                "tier": 1
+              }
+            ]
+          }
+        ],
+        "32": [
+          {
+            "block": 1,
+            "order": [
+              "published",
+              "candidate"
+            ],
+            "samples": [
+              {
+                "id": "agriculture-32-b1-1-published",
+                "arm": "published",
+                "scored": true,
+                "tier": 32
+              },
+              {
+                "id": "agriculture-32-b1-2-candidate",
+                "arm": "candidate",
+                "scored": true,
+                "tier": 32
+              }
+            ]
+          },
+          {
+            "block": 2,
+            "order": [
+              "candidate",
+              "published"
+            ],
+            "samples": [
+              {
+                "id": "agriculture-32-b2-1-candidate",
+                "arm": "candidate",
+                "scored": true,
+                "tier": 32
+              },
+              {
+                "id": "agriculture-32-b2-2-published",
+                "arm": "published",
+                "scored": true,
+                "tier": 32
+              }
+            ]
+          },
+          {
+            "block": 3,
+            "order": [
+              "published",
+              "candidate"
+            ],
+            "samples": [
+              {
+                "id": "agriculture-32-b3-1-published",
+                "arm": "published",
+                "scored": true,
+                "tier": 32
+              },
+              {
+                "id": "agriculture-32-b3-2-candidate",
+                "arm": "candidate",
+                "scored": true,
+                "tier": 32
+              }
+            ]
+          },
+          {
+            "block": 4,
+            "order": [
+              "candidate",
+              "published"
+            ],
+            "samples": [
+              {
+                "id": "agriculture-32-b4-1-candidate",
+                "arm": "candidate",
+                "scored": true,
+                "tier": 32
+              },
+              {
+                "id": "agriculture-32-b4-2-published",
+                "arm": "published",
+                "scored": true,
+                "tier": 32
+              }
+            ]
+          },
+          {
+            "block": 5,
+            "order": [
+              "published",
+              "candidate"
+            ],
+            "samples": [
+              {
+                "id": "agriculture-32-b5-1-published",
+                "arm": "published",
+                "scored": true,
+                "tier": 32
+              },
+              {
+                "id": "agriculture-32-b5-2-candidate",
+                "arm": "candidate",
+                "scored": true,
+                "tier": 32
+              }
+            ]
+          },
+          {
+            "block": 6,
+            "order": [
+              "candidate",
+              "published"
+            ],
+            "samples": [
+              {
+                "id": "agriculture-32-b6-1-candidate",
+                "arm": "candidate",
+                "scored": true,
+                "tier": 32
+              },
+              {
+                "id": "agriculture-32-b6-2-published",
+                "arm": "published",
+                "scored": true,
+                "tier": 32
+              }
+            ]
+          }
+        ],
+        "128": [
+          {
+            "block": 1,
+            "order": [
+              "published",
+              "candidate"
+            ],
+            "samples": [
+              {
+                "id": "agriculture-128-b1-1-published",
+                "arm": "published",
+                "scored": true,
+                "tier": 128
+              },
+              {
+                "id": "agriculture-128-b1-2-candidate",
+                "arm": "candidate",
+                "scored": true,
+                "tier": 128
+              }
+            ]
+          },
+          {
+            "block": 2,
+            "order": [
+              "candidate",
+              "published"
+            ],
+            "samples": [
+              {
+                "id": "agriculture-128-b2-1-candidate",
+                "arm": "candidate",
+                "scored": true,
+                "tier": 128
+              },
+              {
+                "id": "agriculture-128-b2-2-published",
+                "arm": "published",
+                "scored": true,
+                "tier": 128
+              }
+            ]
+          },
+          {
+            "block": 3,
+            "order": [
+              "published",
+              "candidate"
+            ],
+            "samples": [
+              {
+                "id": "agriculture-128-b3-1-published",
+                "arm": "published",
+                "scored": true,
+                "tier": 128
+              },
+              {
+                "id": "agriculture-128-b3-2-candidate",
+                "arm": "candidate",
+                "scored": true,
+                "tier": 128
+              }
+            ]
+          },
+          {
+            "block": 4,
+            "order": [
+              "candidate",
+              "published"
+            ],
+            "samples": [
+              {
+                "id": "agriculture-128-b4-1-candidate",
+                "arm": "candidate",
+                "scored": true,
+                "tier": 128
+              },
+              {
+                "id": "agriculture-128-b4-2-published",
+                "arm": "published",
+                "scored": true,
+                "tier": 128
+              }
+            ]
+          },
+          {
+            "block": 5,
+            "order": [
+              "published",
+              "candidate"
+            ],
+            "samples": [
+              {
+                "id": "agriculture-128-b5-1-published",
+                "arm": "published",
+                "scored": true,
+                "tier": 128
+              },
+              {
+                "id": "agriculture-128-b5-2-candidate",
+                "arm": "candidate",
+                "scored": true,
+                "tier": 128
+              }
+            ]
+          },
+          {
+            "block": 6,
+            "order": [
+              "candidate",
+              "published"
+            ],
+            "samples": [
+              {
+                "id": "agriculture-128-b6-1-candidate",
+                "arm": "candidate",
+                "scored": true,
+                "tier": 128
+              },
+              {
+                "id": "agriculture-128-b6-2-published",
+                "arm": "published",
+                "scored": true,
+                "tier": 128
+              }
+            ]
+          }
+        ]
+      },
+      "scored_samples": 36,
+      "endpoint": "completed native-crop steady-state benchmark",
+      "scope": "The saved worlds preserve native crop/tower witnesses, but MIR work occurs on actual tower-planted-seed events. Native crop timers alone do not establish active MIR runtime work. This control is not an active agriculture workload and cannot close that runtime gate.",
+      "active_agriculture_requirement": "A separate plan must predeclare and independently verify actual native planting-event counts inside the timed interval before any active agriculture runtime claim."
+    }
+  },
+  "preconditions": [
+    "Run development health and retain the exact direct-library control snapshots before preparation.",
+    "Verify the selected engine executable, player archive, profile, fixture closure, input-save hashes, public harness blobs and later private controller binding before every arm group.",
+    "Use one host and one exclusive native job; preparation, source analysis, archive hashing and builds are outside timed launches.",
+    "Preserve the exact completed save and direct archive-library bytes before and after PrepareOnly and every arm group. A mutation/refusal/timeout/malformed benchmark output/lost fixture invariant/incomplete memory receipt is an adverse, not a timing sample.",
+    "Do not retry or replace a failed sample under this plan. A changed input or extension requires a separately identified plan."
+  ],
+  "non_claims": [
+    "No result, performance acceptance, release acceptance or active repair/agriculture runtime result is recorded by this plan.",
+    "The repair endpoint is idle completed-state only.",
+    "The agriculture endpoint is completed native-crop steady-state only; pending/maturing crops do not make it active MIR work.",
+    "Library/client latency and retained three-process memory remain separate endpoints."
+  ],
+  "execution_totals": {
+    "warmups": 16,
+    "scored_repair_samples": 16,
+    "scored_agriculture_samples": 36,
+    "scored_samples": 52
+  },
+  "performance_qualification": false,
+  "release_qualification": false
+}

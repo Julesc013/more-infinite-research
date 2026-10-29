@@ -1,0 +1,254 @@
+{
+  "schema": 1,
+  "kind": "MIR5BobAngelF210ScienceOilE3NativeReadbackV1",
+  "status": "two-independent-current-e3-fixtures-passed",
+  "controller_source_commit": "c0c95a0ce7678d7196a79618d69df4fdc7cf09f0",
+  "fixture_functional_commit": "32ddafc4fece8d0c3a998a897ee9de1a3e32053e",
+  "player_source_commit": "b251ae7a54104ace87cb0da4cf531cf53f03c93d",
+  "player_source_tree": "79b73a6a8e68987737e69bf2d95ec6555b49f901",
+  "engine": {
+    "version": "2.1.23",
+    "file_version": "2.1.23.87750",
+    "sha256": "FE4A1DA30F322A0D0B8AEB3DF7276332222BAAA143E2352569B723E84B2B9060"
+  },
+  "candidate": {
+    "sha256": "E3A65C08AC7798A66FB1BE30D24307B17C8B366DD901953BDE2A09BD6939C8CE",
+    "bytes": 679250,
+    "edition": "F210",
+    "product_version": "5.0.21000"
+  },
+  "fixture": {
+    "sha256": "CF59148489FE31A6974DC619A20CE41C28BD79DB3BE797F62324A4CD493C8F13",
+    "bytes": 8199,
+    "member_count": 4,
+    "members": [
+      { "path": "control.lua", "bytes": 13657, "sha256": "03E136971EFCEADEF5403A797D82F7ED15D3789383ED8D5218FC852637300CB5" },
+      { "path": "data-final-fixes.lua", "bytes": 5891, "sha256": "86E52AC92F101119B5522FD11D4C85E35F7BBAF9255C316E05E30384DF431F5E" },
+      { "path": "fixture_facts.lua", "bytes": 6031, "sha256": "B3366BEC2DCC068F1D27DF866912EB370E5245035D1B43E0882B3800983FFB81" },
+      { "path": "info.json", "bytes": 1663, "sha256": "821E183B76037BCFBC0D523686A3E46D3CD86AF04C0097B1C1A681D87233D342" }
+    ]
+  },
+  "prepared_input_receipt": {
+    "path": "spec/evidence/bob-angel-f210-science-oil-inputs-32ddafc4.json",
+    "sha256": "81CCB99E8D277CB3AA4E08A8F73ACDA6CE28D7B8F3F33587EE9E4765D4185F20",
+    "bytes": 5094
+  },
+  "direct_library_boundary": {
+    "prior_mir_sha256": "C563CB5B96C9E64CB3373BDB60CF5C8B7D3C97E93EADB8F924443C703CDC024D",
+    "prior_mir_bytes": 568598,
+    "observer_sha256": "A15A7D628D66953D2E0C4D4FA288F47CBF9C5678327C7EB3D23ADB5DC78331C0",
+    "observer_bytes": 835,
+    "science_oil_fixture_was_absent_before": true,
+    "restoration": "original-C563-A15-and-absent-32dd-fixture-restored",
+    "factorio_processes_after_each_case": 0,
+    "dependency_payload_bytes_copied": 0,
+    "archive_links_created": 0,
+    "archive_extractions": 0
+  },
+  "cases": [
+    {
+      "role": "base-current-e3",
+      "status": "passed-private-native-fixture",
+      "primary_root": "build/mir5/recovery-historical/bob-angel-f210-science-oil-32ddafc4-base-r02",
+      "profile": {
+        "path": "tests/profiles/bob-angel-f210-science-oil-mir5-base-f210-2123.json",
+        "sha256": "E830F5DD5A601D6FB4F23F48A8881A0B681E69EDF854AA738BFC56AAFB40DE10"
+      },
+      "terminal_sha256": "19EE07087CB77DAE4FFE543A191D91F10914AB93B5F281DFE8D7845C7CA44E63",
+      "preflight_sha256": "F0A4A822950B412FCD26569A4EFF003A10C9903BC13E3D1074EEDEB57571091B",
+      "native_result_sha256": "AA1D0A796E559E44AE5D3505103287232BD420A399F54C09D4DB319E9E08E20D",
+      "selected_mod_closure": [
+        "angelsaddons-mobility-graphics-crawler@2.1.0", "angelsaddons-mobility-graphics-petro@2.1.0", "angelsaddons-mobility-graphics-smelting@2.1.0", "angelsaddons-mobility@2.1.1", "angelsaddons-storage@2.1.1", "angelsbioprocessing@2.1.2", "angelsbioprocessinggraphics@2.1.0", "angelsinfiniteores@2.1.0", "angelspetrochem@2.1.3", "angelspetrochemgraphics@2.1.0", "angelsrefining@2.1.3", "angelsrefininggraphics@2.1.0", "angelssmelting@2.1.1", "angelssmeltinggraphics@2.1.1", "base@2.1.23", "bobassembly@3.0.2", "bobelectronics@3.0.1", "bobenemies@3.0.1", "bobequipment@3.0.0", "bobgreenhouse@3.0.1", "bobinserters@3.0.0", "boblibrary@3.0.1", "boblogistics@3.0.2", "bobmining@3.0.2", "bobmodules@3.0.1", "bobores@3.0.0", "bobplates@3.0.2", "bobpower@3.0.1", "bobrevamp@3.0.1", "bobtech@3.0.0", "bobvehicleequipment@3.0.0", "bobwarfare@3.0.2", "mir-fixture-mir5-active-mods-observer@0.1.0", "mir-fixture-mir5-bob-angel-f210-science-oil@0.1.0", "more-infinite-research@5.0.21000"
+      ],
+      "witness": {
+        "closure": "base",
+        "real_nonscripted_laboratory_completions": 2,
+        "ordered_data_preflight_inputs": ["automation-science-pack", "logistic-science-pack", "chemical-science-pack", "production-science-pack", "utility-science-pack", "military-science-pack", "angels-token-bio", "bob-advanced-logistic-science-pack"],
+        "runtime_api_unordered_input_multiset": [{ "name": "automation-science-pack", "amount": 1 }, { "name": "logistic-science-pack", "amount": 1 }, { "name": "military-science-pack", "amount": 1 }, { "name": "angels-token-bio", "amount": 1 }, { "name": "chemical-science-pack", "amount": 1 }, { "name": "bob-advanced-logistic-science-pack", "amount": 1 }, { "name": "production-science-pack", "amount": 1 }, { "name": "utility-science-pack", "amount": 1 }],
+        "admitted_producer_count": 21,
+        "science_level": 3,
+        "science_recipe_productivity_bonus": 0.2,
+        "oil_seeded_not_laboratory_earned": true,
+        "oil_level": 3,
+        "oil_saved_progress": 0.27,
+        "oil_effect_recipes": ["heavy-oil-cracking", "light-oil-cracking"],
+        "foreign_disabled": true,
+        "foreign_queue_progress": 0.42000000000000004,
+        "cold_reloads": 2,
+        "completed_save_sha256": "86F50C77207D5DC157541643FBF9AB19BE3B19E7FD46A53872F65B7AFE6B55A7",
+        "both_reload_save_byte_identical": true,
+        "both_reload_on_load_read_only": true
+      },
+      "custody": {
+        "original_root": "D:\\Projects\\Factorio\\mir5-cap-foreign-prerequisite-r01\\build\\tmp\\bob-angel-f210-science-oil-32ddafc4-base-r02",
+        "members": 22,
+        "bytes": 2110675,
+        "original_and_primary_copies_hash_verified": true,
+        "members_manifest": [
+          { "path": "config.ini", "bytes": 308, "sha256": "B52CE5ED3A08D701A5175B18373FA8834C6B8D68DF6D45EAE3641BB0AEAA79EB" },
+          { "path": "create.factorio.log", "bytes": 18720, "sha256": "60DCFB33B0CFB36E94862755080B2B7EDD6EF3279C299525F9AA1779EB940D25" },
+          { "path": "process-1.resources.jsonl", "bytes": 3838, "sha256": "F28568A84E4F7DD8B6A64247CF863A9A36571113CEFDA4A3FD3F623C81D01980" },
+          { "path": "process-1.stderr.txt", "bytes": 0, "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855" },
+          { "path": "process-1.stdout.txt", "bytes": 18962, "sha256": "3AA924BFF6E37EB37739236A195AC9257CCFA9747EED94233DAD843E78B59207" },
+          { "path": "process-2.resources.jsonl", "bytes": 3244, "sha256": "8E0CBFCAFC3983750EE5646D5EA8769CCD4AEA038734E57198BBE2E3086689F1" },
+          { "path": "process-2.stderr.txt", "bytes": 0, "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855" },
+          { "path": "process-2.stdout.txt", "bytes": 21659, "sha256": "098DFF31135BCD23CA6789F9C00BF2CA528BEF92E7B109ECFF4BCADF13737082" },
+          { "path": "process-3.resources.jsonl", "bytes": 3228, "sha256": "4935221F200763DE334F6FAA8DE77C9EF634483A19B3CA91E7C74C528AC1D36E" },
+          { "path": "process-3.stderr.txt", "bytes": 0, "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855" },
+          { "path": "process-3.stdout.txt", "bytes": 106, "sha256": "383153CDCAE696664CFFC5B4100620FF5F651C64C2FA178CAEFE2CD14EEFFDF1" },
+          { "path": "process-4.resources.jsonl", "bytes": 3228, "sha256": "4422C09E0CA9519190C7434DD7CA19705109143E0022773F33F7EBEB9AB9FB88" },
+          { "path": "process-4.stderr.txt", "bytes": 0, "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855" },
+          { "path": "process-4.stdout.txt", "bytes": 106, "sha256": "136D7FFDB05629D657A5E965DC4D5EA1454B48F6F04E3E3EEC67B1A732C36AC1" },
+          { "path": "production.factorio.log", "bytes": 21414, "sha256": "171B323ABADC6CE60B825E3F7AFFCC36B743BED4E04A29BA102F8073CC1899BB" },
+          { "path": "reload-1.factorio.log", "bytes": 20294, "sha256": "523D33036EDF7D552C48A1CDEFF46323F59DD8DA2E0084EB6A6E14C9D9DF4D8C" },
+          { "path": "reload-2.factorio.log", "bytes": 20294, "sha256": "7661B41BD2B3579D411480B5B32920A184C7A906FFC2EBC2954D7321971DDB08" },
+          { "path": "result.json", "bytes": 63440, "sha256": "AA1D0A796E559E44AE5D3505103287232BD420A399F54C09D4DB319E9E08E20D" },
+          { "path": "server-settings.json", "bytes": 3679, "sha256": "2FB3E97FE934B92B6C4CCC2403A90A16C357BEC9183E9BC7E550822AC57504E4" },
+          { "path": "write-data/factorio-current.log", "bytes": 20294, "sha256": "7661B41BD2B3579D411480B5B32920A184C7A906FFC2EBC2954D7321971DDB08" },
+          { "path": "write-data/saves/mir5-native-complete.zip", "bytes": 945612, "sha256": "86F50C77207D5DC157541643FBF9AB19BE3B19E7FD46A53872F65B7AFE6B55A7" },
+          { "path": "write-data/saves/seed.zip", "bytes": 942249, "sha256": "56782F41CEDF1969E0242D8E218FE167CBE28E534115B0E52C33D433F698D1A6" }
+        ]
+      }
+    },
+    {
+      "role": "space-age-current-e3",
+      "status": "passed-private-native-fixture",
+      "primary_root": "build/mir5/recovery-historical/bob-angel-f210-science-oil-32ddafc4-space-age-r02",
+      "profile": {
+        "path": "tests/profiles/bob-angel-f210-science-oil-mir5-space-age-f210-2123.json",
+        "sha256": "0FBC955931C76098919A80C955BF2B69A73B603E2122BFFB92A963B586D859CB"
+      },
+      "terminal_sha256": "2E92BD729840851EBA1EEEA5CF797EFB209925A2BF12E1D5672A46842E7A1A2E",
+      "preflight_sha256": "B8F04B3DB16929F386E6EF4B2680900AF034BEBBC9CBF0EB7B628BD524AD0D65",
+      "native_result_sha256": "AFA5C63CF3D3115018BACF0200BC4044F702FD836B5B550531A3EEFF2E7A5E7C",
+      "selected_mod_closure": [
+        "angelsaddons-mobility-graphics-crawler@2.1.0", "angelsaddons-mobility-graphics-petro@2.1.0", "angelsaddons-mobility-graphics-smelting@2.1.0", "angelsaddons-mobility@2.1.1", "angelsaddons-storage@2.1.1", "angelsbioprocessing@2.1.2", "angelsbioprocessinggraphics@2.1.0", "angelsinfiniteores@2.1.0", "angelspetrochem@2.1.3", "angelspetrochemgraphics@2.1.0", "angelsrefining@2.1.3", "angelsrefininggraphics@2.1.0", "angelssmelting@2.1.1", "angelssmeltinggraphics@2.1.1", "base@2.1.23", "bobassembly@3.0.2", "bobelectronics@3.0.1", "bobenemies@3.0.1", "bobequipment@3.0.0", "bobgreenhouse@3.0.1", "bobinserters@3.0.0", "boblibrary@3.0.1", "boblogistics@3.0.2", "bobmining@3.0.2", "bobmodules@3.0.1", "bobores@3.0.0", "bobplates@3.0.2", "bobpower@3.0.1", "bobrevamp@3.0.1", "bobtech@3.0.0", "bobvehicleequipment@3.0.0", "bobwarfare@3.0.2", "elevated-rails@2.1.23", "mir-fixture-mir5-active-mods-observer@0.1.0", "mir-fixture-mir5-bob-angel-f210-science-oil@0.1.0", "more-infinite-research@5.0.21000", "quality@2.1.23", "recycler@2.1.23", "space-age@2.1.23"
+      ],
+      "witness": {
+        "closure": "space-age",
+        "real_nonscripted_laboratory_completions": 2,
+        "ordered_data_preflight_inputs": ["automation-science-pack", "logistic-science-pack", "chemical-science-pack", "production-science-pack", "utility-science-pack", "military-science-pack", "space-science-pack", "agricultural-science-pack", "metallurgic-science-pack", "electromagnetic-science-pack", "cryogenic-science-pack", "promethium-science-pack", "angels-token-bio", "bob-advanced-logistic-science-pack"],
+        "runtime_api_unordered_input_multiset": [{ "name": "automation-science-pack", "amount": 1 }, { "name": "logistic-science-pack", "amount": 1 }, { "name": "military-science-pack", "amount": 1 }, { "name": "angels-token-bio", "amount": 1 }, { "name": "chemical-science-pack", "amount": 1 }, { "name": "bob-advanced-logistic-science-pack", "amount": 1 }, { "name": "production-science-pack", "amount": 1 }, { "name": "utility-science-pack", "amount": 1 }, { "name": "space-science-pack", "amount": 1 }, { "name": "metallurgic-science-pack", "amount": 1 }, { "name": "agricultural-science-pack", "amount": 1 }, { "name": "electromagnetic-science-pack", "amount": 1 }, { "name": "cryogenic-science-pack", "amount": 1 }, { "name": "promethium-science-pack", "amount": 1 }],
+        "admitted_producer_count": 27,
+        "science_level": 3,
+        "science_recipe_productivity_bonus": 0.2,
+        "oil_seeded_not_laboratory_earned": true,
+        "oil_level": 3,
+        "oil_saved_progress": 0.27,
+        "oil_effect_recipes": ["heavy-oil-cracking", "light-oil-cracking"],
+        "foreign_disabled": true,
+        "foreign_queue_progress": 0.42000000000000004,
+        "cold_reloads": 2,
+        "completed_save_sha256": "7D0C8CAA534A1170F2ACC3DD20729E466F9131FBC2F5156F831D7344D42DFE2B",
+        "both_reload_save_byte_identical": true,
+        "both_reload_on_load_read_only": true
+      },
+      "custody": {
+        "original_root": "D:\\Projects\\Factorio\\mir5-cap-foreign-prerequisite-r01\\build\\tmp\\bob-angel-f210-science-oil-32ddafc4-space-age-r02",
+        "members": 22,
+        "bytes": 1720723,
+        "original_and_primary_copies_hash_verified": true,
+        "members_manifest": [
+          { "path": "config.ini", "bytes": 313, "sha256": "62E5A55187C684C1B84A9AECF30B625144397062AD1061F750728FF3D1E472E8" },
+          { "path": "create.factorio.log", "bytes": 19402, "sha256": "A36214FAA2DB7535B31D5B429CF8AC4347C92CDA59304968B64AE5288DDBC2DC" },
+          { "path": "process-1.resources.jsonl", "bytes": 4458, "sha256": "617706F9D0FEF520D5FA828DA9B5A963D0C5D1C605C8B909A5977A94B9D3181F" },
+          { "path": "process-1.stderr.txt", "bytes": 0, "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855" },
+          { "path": "process-1.stdout.txt", "bytes": 19654, "sha256": "0C7509922586FBB442579696B9B331EFBE4F8F9A560DB41A34869E2C838ADF6C" },
+          { "path": "process-2.resources.jsonl", "bytes": 3862, "sha256": "7B2A942596267CFFFDB9806CE78743E299FF9A9F4347B970379CA9C28CAB65A8" },
+          { "path": "process-2.stderr.txt", "bytes": 0, "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855" },
+          { "path": "process-2.stdout.txt", "bytes": 22802, "sha256": "15DF85983E312D6B4D96CD92B00AF89948CADC6ECFCB537FEFDC014D7FBC06E9" },
+          { "path": "process-3.resources.jsonl", "bytes": 3846, "sha256": "9739FCF17895982733C29503F83E73FD67814A2E4814A76636406B9224A506A6" },
+          { "path": "process-3.stderr.txt", "bytes": 0, "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855" },
+          { "path": "process-3.stdout.txt", "bytes": 106, "sha256": "C9A0C44E26E72E0CD9EA61089F91F63CFF56A64C297085D74DD97812D17DA9B3" },
+          { "path": "process-4.resources.jsonl", "bytes": 3846, "sha256": "2812BEC9726AEA3676C1BF31543789D416739C34AA2DCF4F9F6F62F58A34654A" },
+          { "path": "process-4.stderr.txt", "bytes": 0, "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855" },
+          { "path": "process-4.stdout.txt", "bytes": 106, "sha256": "EF64800075100B9B041D639F1E271E951B255B5515F0EFE747811649DB92B22C" },
+          { "path": "production.factorio.log", "bytes": 22547, "sha256": "D5720A1556AF19831349512A9AD2DAF1354908D0BA4D7B1B7109F8AEC220159D" },
+          { "path": "reload-1.factorio.log", "bytes": 21417, "sha256": "5AF5DA3A6C10D657F880088381E01C8905DD5A9481CCCD8A593F8008AAAB1512" },
+          { "path": "reload-2.factorio.log", "bytes": 21417, "sha256": "C7B3613421737CDEC7B3EC7166A0298243C7FD33E74022C739C8978EB8021614" },
+          { "path": "result.json", "bytes": 68094, "sha256": "AFA5C63CF3D3115018BACF0200BC4044F702FD836B5B550531A3EEFF2E7A5E7C" },
+          { "path": "server-settings.json", "bytes": 3679, "sha256": "5B4C546FFCA63E1AEC8F67FFA5C32F3108CBC334DFA5AB1C5E2C212005639610" },
+          { "path": "write-data/factorio-current.log", "bytes": 21417, "sha256": "C7B3613421737CDEC7B3EC7166A0298243C7FD33E74022C739C8978EB8021614" },
+          { "path": "write-data/saves/mir5-native-complete.zip", "bytes": 743645, "sha256": "7D0C8CAA534A1170F2ACC3DD20729E466F9131FBC2F5156F831D7344D42DFE2B" },
+          { "path": "write-data/saves/seed.zip", "bytes": 740112, "sha256": "BBCAAB2E4BA328FD5D5C13D783CFD12AAFCEABC363AC7FFC01393B7205530F5C" }
+        ]
+      }
+    }
+  ],
+  "independent_custody": {
+    "declared_members_across_cases": 44,
+    "original_and_primary_file_hashes_checked": 88,
+    "total_member_bytes": 3831398,
+    "method": "Each terminal custody manifest SHA-256 was compared independently to its original run and primary recovered copy; no mismatch was found."
+  },
+  "retained_adverse_lineage": [
+    {
+      "stage": "c37-original-base-r03",
+      "primary_root": "build/mir5/recovery-historical/bob-angel-f210-science-oil-e3-base-r03",
+      "controller_source_commit": "c37fca88667d550660f5b9c0efd7f272b56d6025",
+      "outcome": "player oil saved identity differs before the production witness",
+      "terminal_sha256": "14D6FBBD3701FD45AD70111EDF1FFDDC691091D0068664BEA85CDFD9EC6DE636",
+      "preflight_sha256": "93ED77D6E74A5B139205BAD96AAA8AD91EF420DD1A170782AF8B8D000A1A33BC",
+      "native_result_sha256": "8C8659C0B7CE74D63B00FC0B37981533B19F887CB42F951F45D57C79B0F539FD",
+      "factorio_log_sha256": "86F615076CBFA07C88AF2E16C4B0DB786D566D9406B6202983DED6F46D9B3FCF"
+    },
+    {
+      "stage": "94c-private-diagnostic-r01",
+      "primary_root": "build/mir5/recovery-historical/bob-angel-f210-science-oil-diagnostic-r01",
+      "controller_source_commit": "94c68f7aab030a3ad16cf6e057b50c2a95663673",
+      "outcome": "diagnostic shows researched=false resetting player oil level3 to level1",
+      "terminal_sha256": "C83B646AAD595D091FD10A63EE0A9FD4311E28843894F30ABF784E51150086BA",
+      "preflight_sha256": "F95CD842C0E042872E086CABFF4D8E2EC4E71BD50BC1D27E3452BCF96A319EFF",
+      "native_result_sha256": "89BAAEA9DE7F65B8D014A475285F953AA11ED25E65AD9C6D2ED5952E75BE104C",
+      "factorio_log_sha256": "DD4F5C54EDE7C3632A32D8EC78CE61C7B16A9A1F73C214EC05CBA99DF2B184E1"
+    },
+    {
+      "stage": "a975-base-r01",
+      "primary_root": "build/mir5/recovery-historical/bob-angel-f210-science-oil-a9754abc-base-r01",
+      "controller_source_commit": "c02d5650a8e0e2488795b5461bb530567ec0843d",
+      "outcome": "player oil saved identity differs",
+      "terminal_sha256": "981609647DB0CBBFBBE4B7A02CDBE44FDBCAD9A6E67005D7D95CB839A0D7CDD4",
+      "preflight_sha256": "D5641E3247175D9FFA7A610AA273897EA19137446099FCD96E0C1BEE6DEE2E22",
+      "native_result_sha256": "708620ADB2816053C8ABE8CE513BB9123D1A2C580D7B024B41042169B32989A7",
+      "factorio_log_sha256": "E57369F44DA8DD9C5BFA5AFB29A73958E0DA51AB07059FEE756735C4B762535B"
+    },
+    {
+      "stage": "1d8-private-diagnostic-r02-base-r01",
+      "primary_root": "build/mir5/recovery-historical/bob-angel-f210-science-oil-diagnostic-r02-base-r01",
+      "controller_source_commit": "1d8bbcc98343a325eb6db6d35d9b4b3f4e89b0d1",
+      "outcome": "diagnostic shows reset_technology_effects changing enabled=false to enabled=true while preserving level3",
+      "terminal_sha256": "E9DE43C45694FA758E45B10C955E42493C8120ECF2853260C5251F40D7C3C743",
+      "preflight_sha256": "93F6B3631460E5B0221B6C06CBA352BBC924186B303101FAD977CE5C9880CB3C",
+      "native_result_sha256": "724D08808922399C7FBBB943B7E0CB501DB6498BCFF0737DBC79AA9A5D8FA48E",
+      "factorio_log_sha256": "36FCCA190B463DA91A3DFA969BC1E5606B862FA900C7EA6250053BBA3F5A7656"
+    },
+    {
+      "stage": "98bab-base-r01",
+      "primary_root": "build/mir5/recovery-historical/bob-angel-f210-science-oil-98bab2c2-base-r01",
+      "controller_source_commit": "3942dd3746d520543c41d6f7c8885719219eaa0a",
+      "outcome": "oil seed is fixed, then the old runtime ingredient-order guard fails at index3; this run did not log an API ingredient order",
+      "terminal_sha256": "38438F67B2B27F4CBFCCBB3FA15570F25E434C642C4916B72894380BF0E3D56E",
+      "preflight_sha256": "D5A2761A9EA06C42F56EA0700B8F45E8A46BBA92D85D22B639A0C65D81F24513",
+      "native_result_sha256": "99F15D44D6DD6E98589836245FC3F6A3E7C9413D61E9E7B8A43AAFE368862843",
+      "factorio_log_sha256": "4C6D061A0AC90B8A3BA94E6F8837BF477B2F034BCD965E96DC005A72B38063D0"
+    }
+  ],
+  "observations": [
+    "The two r02 cases are independent current E3 Base and Space Age fixtures, not a Base-to-Space-Age transition or a MIR4 migration.",
+    "Data-stage preflight retains its declared input order. The Factorio 2.1 runtime ResearchIngredient arrays are witnessed as exact name/amount multisets, without an unproved runtime ordering assertion.",
+    "Both cases use two real laboratory completions whose fixture event counter admits only event.by_script=false; the fixture accelerates only science count and time.",
+    "Oil is a seeded, disabled earned identity with saved27% progress and two named effects; it is deliberately not represented as a laboratory-earned oil result.",
+    "The foreign oil technology remains disabled while the foreign force retains its queued 42% automation state. Both completed saves survive two read-only cold reloads with identical bytes.",
+    "No ordinary science/oil tuning, physical science production, all-physics behavior, client behavior, performance, release, or broad migration qualification follows."
+  ],
+  "receipts": {
+    "path": "spec/evidence/bob-angel-f210-science-oil-e3-native-receipts.json.gz",
+    "bytes": 154099,
+    "sha256": "A3C61E311A7A3630E87B26E4CF7731E912F20B9CD996F8C6015C7394B36687AC",
+    "uncompressed_sha256": "7441CF836D6C62915490E534AE01C7139D09138B76C69BC904C52630575F968E",
+    "members": 22,
+    "contents": "prepared input receipt; terminal, preflight and native result for both passing cases; terminal, native result and Factorio current log for each retained adverse",
+    "excludes": ["saves", "config.ini", "player-data", "mod settings"]
+  },
+  "release_qualification": false
+}

@@ -1,0 +1,34 @@
+{
+  "schema": 1,
+  "kind": "MIR5CompleteHostControlObservationV1",
+  "status": "passed",
+  "controls": 80,
+  "lua_controls": 71,
+  "non_lua_controls": 9,
+  "player_source": "587400078ebc721d22a68e23f03b09da31ab1ab2",
+  "repository_tree": "5e3f6597412d26e3b1a034998c544699bcba769f",
+  "command": ".\\tests\\mir5\\Test-MIR5HostControls.ps1 -LuaRuntimeDir build/tmp/mir421-lua-runtime",
+  "scope": [
+    "All80 selected host commands passed against committed source5874000; shared product/test writers were held during execution.",
+    "Includes finite Bob material Availability, cached effective-setting precedence, offline nine-edition freeze and bounded Generator/science/product controls.",
+    "Optional metadata and developer-custody cases skipped as recorded below. Several obsolete Aero locators caused metadata/asset skips even though Black Glass inputs exist; their later correction and any focused reruns retain separate identities.",
+    "No native gameplay, responsive-menu timing, migration, final-layout or release qualification follows."
+  ],
+  "log": {
+    "gzip": "spec/mir5/evidence/host-controls-5874000-80.gz",
+    "compressed_sha256": "E0ECD8F205CC1936C830B48031E6C3C0D40836851E98EABE7439714ED7ED9335",
+    "uncompressed_sha256": "DF659D9A3D2D296B7235EA4F810994D3B384E9D39C51DE0DC98850FE74898EF9"
+  },
+  "skipped_cases": [
+    "test_f200_force_field_schema_when_local_api_is_available (__main__.FullCatalogueUpgradeFixtureTests.test_f200_force_field_schema_when_local_api_is_available) ... skipped 'F200 runtime API documentation is not installed'",
+    "test_local_matched_capture_proves_opt_in_and_no_generated_auto_ids_when_present (__main__.AutomaticFamilyNonEmissionTests.test_local_matched_capture_proves_opt_in_and_no_generated_auto_ids_when_present) ... skipped 'developer-custody raw captures are optional; portable facts remain checked'",
+    "test_carrier_icons_exist_in_f200_and_f210_base_assets_and_reject_the_missing_legacy_path (__main__.NativeCreditDefinitionTests.test_carrier_icons_exist_in_f200_and_f210_base_assets_and_reject_the_missing_legacy_path) (target='f200') ... skipped 'f200 native assets are unavailable on this host'",
+    "test_carrier_icons_exist_in_f200_and_f210_base_assets_and_reject_the_missing_legacy_path (__main__.NativeCreditDefinitionTests.test_carrier_icons_exist_in_f200_and_f210_base_assets_and_reject_the_missing_legacy_path) (target='f210') ... skipped 'f210 native assets are unavailable on this host'",
+    "test_local_archive_source_matches_portable_facts_when_the_pinned_library_is_present (__main__.FixedCompetingReferenceTests.test_local_archive_source_matches_portable_facts_when_the_pinned_library_is_present) ... skipped 'archive source verification requires --archive-library'",
+    "test_f200_documented_production_and_alpha_members_match_the_fixture_usage (__main__.FixtureControlHostStageTests.test_f200_documented_production_and_alpha_members_match_the_fixture_usage) ... skipped 'local Factorio 2.0 runtime API documentation is not installed'",
+    "test_lua_bootstrap_active_mods_is_the_pinned_runtime_dictionary (__main__.FixtureControlHostStageTests.test_lua_bootstrap_active_mods_is_the_pinned_runtime_dictionary) (version='2.0.77') ... skipped 'local Factorio runtime API documentation is not installed'",
+    "test_lua_bootstrap_active_mods_is_the_pinned_runtime_dictionary (__main__.FixtureControlHostStageTests.test_lua_bootstrap_active_mods_is_the_pinned_runtime_dictionary) (version='2.1.23') ... skipped 'local Factorio runtime API documentation is not installed'"
+  ],
+  "native_execution": false,
+  "release_qualification": false
+}

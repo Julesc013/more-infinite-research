@@ -1,0 +1,195 @@
+{
+  "schema": 1,
+  "kind": "MIR5BobAngelPhysicalPrototypeCapChainV1",
+  "runs": [
+    {
+      "run": 40036634154,
+      "url": "https://github.com/Julesc013/mir-native-worker/actions/runs/40036634154",
+      "manifest_members_verified": 29,
+      "manifest_sha256": "DC439F70B124C01B9D4875027871C508BF6DFD4D901124A7854ACFFA6299D1F2",
+      "cases": [
+        {
+          "path": "gameplay/prototype-cap125/result.json",
+          "status": "failed",
+          "source": "cadc3cc6968bcb256de3e7c8622db15dce4abb6d",
+          "receipt": {
+            "gzip": "spec/mir5/evidence/bob-angel-physical-caps-40036634154-gameplay-prototype-cap125-native.json.gz",
+            "uncompressed_sha256": "85AEA32CDFA5C5023A3CB7AF8384240DBE95FC69AF4A4F1E8F70039E0DCA20E2"
+          },
+          "failure": "[mir441-process-exit] 1"
+        }
+      ]
+    },
+    {
+      "run": 40037129041,
+      "url": "https://github.com/Julesc013/mir-native-worker/actions/runs/40037129041",
+      "manifest_members_verified": 33,
+      "manifest_sha256": "1044449FC830035398AE6F0FFFA160D9F3F1DCF2B17F5BEE0C902AE8660CAB30",
+      "cases": [
+        {
+          "path": "gameplay/prototype-cap125/result.json",
+          "status": "failed",
+          "source": "e400d6c765cd25748241d24e3353ab8cb9c7ade5",
+          "receipt": {
+            "gzip": "spec/mir5/evidence/bob-angel-physical-caps-40037129041-gameplay-prototype-cap125-native.json.gz",
+            "uncompressed_sha256": "EECEFE3830EF1E677283D9D79E2715BB495775A1E6182E99068E073CA3FA6806"
+          },
+          "failure": "[mir441-process-exit] 1"
+        }
+      ]
+    },
+    {
+      "run": 40037331827,
+      "url": "https://github.com/Julesc013/mir-native-worker/actions/runs/40037331827",
+      "manifest_members_verified": 33,
+      "manifest_sha256": "06C665028A3D9BD4839EA4DDCF8B9A6AF770BE260175B7F743DBD725CC66BB70",
+      "cases": [
+        {
+          "path": "gameplay/prototype-cap125/result.json",
+          "status": "failed",
+          "source": "5946cf475ae9e16c2b7f83ce838067fd56cd0815",
+          "receipt": {
+            "gzip": "spec/mir5/evidence/bob-angel-physical-caps-40037331827-gameplay-prototype-cap125-native.json.gz",
+            "uncompressed_sha256": "9121B4D7FAC871249B40E3EA7D7EBF861CB1569B58FC897713A5DEAF4192F042"
+          },
+          "failure": "[mir441-process-exit] 1"
+        }
+      ]
+    },
+    {
+      "run": 40037792331,
+      "url": "https://github.com/Julesc013/mir-native-worker/actions/runs/40037792331",
+      "manifest_members_verified": 67,
+      "manifest_sha256": "C9B81A11FCF8800B2A430357B323F5C8EE74514BE6E290B8E5B0DA431E052367",
+      "cases": [
+        {
+          "path": "gameplay/prototype-cap125/result.json",
+          "status": "passed-private-native-fixture",
+          "source": "f3d698de787baed3b9d87da9f776472f19d87520",
+          "receipt": {
+            "gzip": "spec/mir5/evidence/bob-angel-physical-caps-40037792331-gameplay-prototype-cap125-native.json.gz",
+            "uncompressed_sha256": "D4006E403205B6393522BE3ED7E33C769CC7DF02D22C57D23E46E2759E4F30BB"
+          },
+          "initial": {
+            "case": "bob-angel-prototype-cap125",
+            "stage": "initial",
+            "status": "passed",
+            "witnesses": {
+              "fixture_version": "0.5.0",
+              "default_rows_preflighted_before_mutation": true,
+              "native_cap_percent": 125,
+              "prototype_maximum_productivity": 1.25,
+              "effect_percent": 2,
+              "useful_level_headroom": 63,
+              "seeded_boundary_levels": true,
+              "seeded_tail_next_level": 63,
+              "seeded_earned_effect_bonus": 1.24,
+              "lab_completed_tail_levels": 5,
+              "tail_next_level_after_lab": 64,
+              "player_owned_tail_disabled": true,
+              "native_recipe_productivity_bonus": 1.2599999904632568,
+              "raw_completed_bonus_formula": 1.26,
+              "native_recipe_bonus_is_observed_separately_from_prototype_cap": true,
+              "physical_solid_recipe": "bob-copper-tungsten-alloy",
+              "physical_solid_crafts": 1000,
+              "physical_solid_base_output": 25000,
+              "physical_solid_effective_bonus": 1.25,
+              "physical_solid_expected_bonus_crafts_min": 1250,
+              "physical_solid_expected_bonus_crafts_max": 1250,
+              "physical_solid_expected_output_min": 56250,
+              "physical_solid_expected_output_max": 56250,
+              "physical_solid_bonus_crafts": 1250,
+              "physical_solid_output_mass_balance_progress": 0,
+              "physical_solid_native_bonus_progress": 2.220446049250313e-14,
+              "physical_solid_output": 56250,
+              "foreign_disabled_effect_and_queue_preserved": true,
+              "sequential_native_queue_entries": 5,
+              "on_load_read_only": false,
+              "qualification": "native-runner-readback-required"
+            }
+          },
+          "player": {
+            "path": "D:\\Projects\\Factorio\\testmods\\2.0\\more-infinite-research_5.0.20000.zip",
+            "sha256": "D7E914312D77E9B46ED90ECBDBEFEC57AF9BB5EDB89EBCB42164EF8EF92300DA"
+          },
+          "engine": {
+            "path": "D:\\Games\\Factorio\\2.0\\bin\\x64\\factorio.exe",
+            "sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B",
+            "file_version": "2.0.77.84539",
+            "product_version": "2.0.77",
+            "base_version": "2.0.77"
+          },
+          "two_cold_reloads_byte_identical": true
+        },
+        {
+          "path": "gameplay/prototype-cap400/result.json",
+          "status": "passed-private-native-fixture",
+          "source": "f3d698de787baed3b9d87da9f776472f19d87520",
+          "receipt": {
+            "gzip": "spec/mir5/evidence/bob-angel-physical-caps-40037792331-gameplay-prototype-cap400-native.json.gz",
+            "uncompressed_sha256": "9D750EA87CF52F26175D15E44E0BDB1B5C4476A5381134BE323C89C98C72D5DE"
+          },
+          "initial": {
+            "case": "bob-angel-prototype-cap400",
+            "stage": "initial",
+            "status": "passed",
+            "witnesses": {
+              "fixture_version": "0.6.0",
+              "default_rows_preflighted_before_mutation": true,
+              "native_cap_percent": 400,
+              "self_recycling_scope": false,
+              "prototype_maximum_productivity": 4,
+              "effect_percent": 2,
+              "useful_level_headroom": 200,
+              "inherited_cap125_tail_next_level": 64,
+              "restored_mir_owned_player_tail": true,
+              "prior_foreign_disable_erased_by_upstream": true,
+              "foreign_disable_preservation_qualified": false,
+              "lab_completed_tail_levels": 5,
+              "tail_next_level_after_lab": 65,
+              "native_recipe_productivity_bonus": 1.2799999713897705,
+              "raw_completed_bonus_formula": 1.28,
+              "native_recipe_bonus_is_observed_separately_from_prototype_cap": true,
+              "physical_solid_recipe": "bob-copper-tungsten-alloy",
+              "physical_solid_crafts": 1000,
+              "physical_solid_base_output": 25000,
+              "physical_solid_effective_bonus": 1.2799999713897705,
+              "physical_solid_expected_bonus_crafts_min": 1279,
+              "physical_solid_expected_bonus_crafts_max": 1280,
+              "physical_solid_expected_output_min": 56975,
+              "physical_solid_expected_output_max": 57000,
+              "physical_solid_bonus_crafts": 1279,
+              "physical_solid_output_mass_balance_progress": 0.9999713897705078,
+              "physical_solid_native_bonus_progress": 0.9999713897705442,
+              "physical_solid_output": 56975,
+              "foreign_queue_and_effects_preserved": true,
+              "sequential_native_queue_entries": 5,
+              "on_load_read_only": false,
+              "qualification": "native-runner-readback-required"
+            }
+          },
+          "player": {
+            "path": "D:\\Projects\\Factorio\\testmods\\2.0\\more-infinite-research_5.0.20000.zip",
+            "sha256": "D7E914312D77E9B46ED90ECBDBEFEC57AF9BB5EDB89EBCB42164EF8EF92300DA"
+          },
+          "engine": {
+            "path": "D:\\Games\\Factorio\\2.0\\bin\\x64\\factorio.exe",
+            "sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B",
+            "file_version": "2.0.77.84539",
+            "product_version": "2.0.77",
+            "base_version": "2.0.77"
+          },
+          "two_cold_reloads_byte_identical": true
+        }
+      ]
+    }
+  ],
+  "scope": [
+    "F2002.0.77 Bob/Angel: five actual material lab completions at125% recipe cap, then five further actual completions at400% cap, with inherited state/save/two cold reloads in each stage.",
+    "Each stage physically consumes exactly15000 tungsten powder and10000 copper powder in1000 actual crafts of the untouched25-item alloy recipe. At125% output is56250; at128% effective earned bonus the predeclared native float bound is56975\u201357000.",
+    "The native assembler bonus_progress is read independently and must match whole-recipe batch mass balance. No recipe/force bonus writes and no recipe mutation occur.",
+    "Three earlier fixture-only failures are retained: missing staged helpers, inherited next_upgrade on a nonminable private clone, and native ingredient order differing from authored order. The fixes retain exact named amounts and opponent checks.",
+    "The67-member passing run preserves all declared material effects/caps and queue witnesses. It does not establish broad BobTech/F210 or final-release acceptance."
+  ],
+  "release_qualification": false
+}

@@ -1,0 +1,125 @@
+{
+  "schema": 1,
+  "kind": "MIR5RuntimeR06PhysicalNativeChainV1",
+  "status": "eight-active-save-captures-and-eight-unscored-physical-pilots-pass",
+  "execution_kind": "direct-frozen-controller-local-native",
+  "host": "BLACKGLASS-WIN1",
+  "player": {
+    "source_reference": "b2cf4c2dac43727e2e93cb90b861d2301f7778cd",
+    "source_tree": "25442a5bd7838f124952507854426e3b8e868475",
+    "f210_sha256": "4F5BEE023930666FC0F921136A69B59861741BE44C311E03D46347D42018ECBC",
+    "published_f210_sha256": "A4BB8F47232C689B267EF434F557187A8795C47280FA464169DE917FB579517F",
+    "inventory_file_sha256": "4FD1A20E6C2E3D3F27D6158D60C931333B0E5053926019BD6C59493A9AF88498"
+  },
+  "engine": {
+    "version": "2.1.23",
+    "sha256": "FE4A1DA30F322A0D0B8AEB3DF7276332222BAAA143E2352569B723E84B2B9060"
+  },
+  "public_plan": {
+    "source_reference": "7dcd6d6df9e02f66e5eb00965a36d08daf54a856",
+    "path": "spec/evidence/runtime-benchmark-active-plan-r06.json",
+    "sha256": "816BA8FE3589967CC456F189F5F3F584289FB553DAFADBB64ACAEF32DD306C4F"
+  },
+  "public_harness": {
+    "source_reference": "8c078dbad90e0236c9e9fa777f6d776e03b48401",
+    "native_fixture_sha256": "10F3A00661A6E304EBADD66FF60450BAAEF5878EEA08A88F2F24B2D1CC6757F4",
+    "source_checkout_reference": "d30733898fefe20db3a39725ccdb4e711a468bb5"
+  },
+  "capture": {
+    "private_controller_reference": "0c66a643a5160b915c87ee8154775312d2174c32",
+    "frozen_remote_ref": "test/coherent-b2-runtime-r06-r01",
+    "controller_raw_and_executed_sha256": "A72E18811428C8D27947AC94A76723ADA6996CDF1CCE9EDAFBB3892F097E18D4",
+    "receipt_sha256": "883DF556BEB4D845929CD9FDAEA867FD01DAB72952CD70A849C17310249C28DB",
+    "cases": 8,
+    "scope": "Two repair and six agriculture prepared pending seeds; agriculture tiers1,32,128 for both arms. Preparation is outside scored timing."
+  },
+  "pilots": {
+    "private_controller_reference": "b139a4ca91ae617b70dd08a964edabcd07cb87dd",
+    "frozen_remote_ref": "test/coherent-b2-runtime-r06-pilot-r02",
+    "controller_raw_and_executed_sha256": "FB4EC48B4A4BA5336A7D73A2F5F4EB7B8C2B5A1D758A5AF251E8E6B996412C8F",
+    "receipt_sha256": "89329DE94C32E1C9A5C0EDE13AE112C008172FFBB7E13928C203BA1974E50A47",
+    "cases": 8,
+    "updates_per_case": 25000,
+    "scope": "Exactly one pending start and passed complete marker from each owned engine log, with unchanged strict repair/agriculture physical witnesses. Console remains the exact sanitized timing surface. Controls restore and protected/owned seed hashes remain unchanged."
+  },
+  "physical_witnesses": {
+    "repair": "Both arms damage1000 eligible walls after load, observe256 initial repairs and8 reactivation repairs while preserving744 overflow/foreign/non-wall requirements under the existing fixture oracle.",
+    "agriculture": "Both arms at tiers1,32,128 retain two real lab completions, equal player and zero-research foreign tower counts, zero initial planting events and exactly2N native tower planting events after load."
+  },
+  "primary_custody": {
+    "root": "build/mir5/recovery/runtime-active-r06-r02",
+    "trees": [
+      {
+        "path": "captures-r01",
+        "files": 613,
+        "bytes": 22612469,
+        "sorted_manifest_digest_sha256": "09F09F69BD177C278B11592B54BDB79B270C4259DA8882107F9328318B2F86A8"
+      },
+      {
+        "path": "pilots-r01-adverse",
+        "files": 54,
+        "bytes": 1272350,
+        "sorted_manifest_digest_sha256": "F036EA5653307413B695845BD95D374940C867753079EA4694B22E6CE51F3F75"
+      },
+      {
+        "path": "pilots-r02",
+        "files": 111,
+        "bytes": 8564056,
+        "sorted_manifest_digest_sha256": "1BE9FA036AC210BD1727629AD2E62CBA965B5C0F9DA2A728777F0BB29FE0669D"
+      }
+    ]
+  },
+  "adverse_observations": [
+    {
+      "id": "r06-pilots-r01",
+      "status": "reader-adverse-preserved",
+      "description": "First repair pilot naturally completed25000 updates with exit0 and restored controls, but the reader searched sanitized stdout and found no script start marker. The owned engine log retained exact start/complete witnesses. Private121 changes only that log surface selection and custody, retaining stdout for timing; committed repaired logic re-reads the original case offline before the fresh complete r02 batch.",
+      "stdout_sha256": "AD400CFAFC8E3D4166BBDEBB5F96FD30A8D55B1505DAD815712B05565C22E097",
+      "engine_log_sha256": "E9E80DEF39C1CEA46B98AD4EAC689A2F6C08D8C91CD0F6CD1264C1094924AE08"
+    }
+  ],
+  "portable_receipts": {
+    "path": "spec/evidence/runtime-active-r06-physical-native-receipts.json.gz",
+    "bytes": 48020,
+    "sha256": "23466064A3C2E376A93FAFD9D5772038186BF4FB5D993E56953F5B145AD5FE88",
+    "decoded_files": [
+      {
+        "path": "original/active-seed-captures.json",
+        "bytes": 100377,
+        "sha256": "883DF556BEB4D845929CD9FDAEA867FD01DAB72952CD70A849C17310249C28DB"
+      },
+      {
+        "path": "original/active-marker-pilots.json",
+        "bytes": 145276,
+        "sha256": "89329DE94C32E1C9A5C0EDE13AE112C008172FFBB7E13928C203BA1974E50A47"
+      },
+      {
+        "path": "derived/root-physical-readback.json",
+        "bytes": 5290,
+        "sha256": "4B74C99F16FB64547BD2DD513C29A7762B291E18A8FB4133A011A6241E69E655"
+      }
+    ]
+  },
+  "independent_root_readback": {
+    "sha256": "4B74C99F16FB64547BD2DD513C29A7762B291E18A8FB4133A011A6241E69E655",
+    "captures_verified": 8,
+    "protected_seed_files_rehashed": 8,
+    "capture_native_results_rehashed": 8,
+    "pilot_stdout_and_engine_logs_rehashed": 16,
+    "unique_physical_markers_verified": 16,
+    "controls_restored_in_all16_cases": true
+  },
+  "claims": {
+    "native_execution": true,
+    "active_preparation": true,
+    "physical_pilot_correctness": true,
+    "scored_runtime_launches": 0,
+    "performance_acceptance": false,
+    "memory_non_regression": false,
+    "release_qualification": false
+  },
+  "limitations": [
+    "These are preparation and unscored physical-work results, not accepted runtime timings. The complete68-launch schedule, independent median/memory analysis and other release gates remain required.",
+    "The earlier r05 partial native/scoping adverse and both zero-native refusals remain in their original primary custody and plan histories. No result is relabelled or erased."
+  ]
+}

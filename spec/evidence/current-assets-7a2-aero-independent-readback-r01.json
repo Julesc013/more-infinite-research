@@ -1,0 +1,124 @@
+{
+  "schema": 1,
+  "kind": "MIRIndependentCurrentAssetReproductionReadbackV1",
+  "source_commit": "7a2f93224c846b86261b2da709f50ea683fc708d",
+  "player_tree": "5058373348e9049f8b67ec4dbb79b400a904acd6",
+  "authority": {
+    "path": "spec/evidence/current-assets-7a2f9322-root-readback.json",
+    "sha256": "286D2523C8489184171AEB3306338820BBE1634720D64CE3052CCB8FF5548084"
+  },
+  "reproduction_custody": "C:\\Projects\\Factorio\\mir5-package-reproduction-7a2-aero-r01",
+  "primary_custody": "C:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\current-assets-7a2-aero-independent-r01",
+  "all17_zip_names_sizes_hashes_match_BG_freeze": true,
+  "files": [
+    {
+      "name": "MIR5ReleaseAssetInventoryV1.json",
+      "bytes": 209701,
+      "sha256": "17B41BA71293BA14941F1D4F12F40C858D7081C414E9C7AFAF0B1D6ED74DC4F3"
+    },
+    {
+      "name": "more-infinite-research_5.0.00600.zip",
+      "bytes": 136231,
+      "sha256": "B9DEC15E05D47F1BCFECEC8F754249FE48C979B29E1EA35D0A6AC374D4F244A0"
+    },
+    {
+      "name": "more-infinite-research_5.0.00700.zip",
+      "bytes": 136231,
+      "sha256": "E6004197A2F9E7A5AEDD01A05A726442FEE5351CFD6471837B702200BF98307C"
+    },
+    {
+      "name": "more-infinite-research_5.0.00800.zip",
+      "bytes": 136229,
+      "sha256": "83E1B90B1C7E3DFF1B421FE3E4C0702338B5416088636D3D62C031E6DBCF76E9"
+    },
+    {
+      "name": "more-infinite-research_5.0.00900.zip",
+      "bytes": 136231,
+      "sha256": "530FEA5E30ADA919199E811937BCA3F1183995DE0E2CD3BA3FB221E6443AA9FF"
+    },
+    {
+      "name": "more-infinite-research_5.0.01000.zip",
+      "bytes": 136231,
+      "sha256": "CAB9502F6A978D165F90C5A626479DDFBE42958874343C59C82BF83B64128D92"
+    },
+    {
+      "name": "more-infinite-research_5.0.01100.zip",
+      "bytes": 136231,
+      "sha256": "8CA02182FB0C8319312F239515D42CFEA197060A50BA5C2127E3918FD121B67D"
+    },
+    {
+      "name": "more-infinite-research_5.0.01200.zip",
+      "bytes": 136233,
+      "sha256": "38FB946D041D4DC7765D2964F81887434F56203291B9583034554F0D2DE209DA"
+    },
+    {
+      "name": "more-infinite-research_5.0.01300.zip",
+      "bytes": 453709,
+      "sha256": "4DB2D8848EBD2B4EECBF6D91CBEF8F69F5C31F634432496BB26AC40A3FC8964A"
+    },
+    {
+      "name": "more-infinite-research_5.0.01400.zip",
+      "bytes": 453711,
+      "sha256": "0A2BE7297D09DCCF084B8A10734651C1499FDE218FA3E2635873329F36250834"
+    },
+    {
+      "name": "more-infinite-research_5.0.01500.zip",
+      "bytes": 453710,
+      "sha256": "37F7AC276460BC37C82D2426983B89D87393C22DFF8D39ECA17ACC7753F1480D"
+    },
+    {
+      "name": "more-infinite-research_5.0.01600.zip",
+      "bytes": 453712,
+      "sha256": "35A8624065D3137E463EBC89DE21C06531F52F9E5E90632EC3C997CF52EEE839"
+    },
+    {
+      "name": "more-infinite-research_5.0.01700.zip",
+      "bytes": 453711,
+      "sha256": "95228385A0862A807DB20A73F56CA0113693A1CDB3437410187303C598D784C7"
+    },
+    {
+      "name": "more-infinite-research_5.0.01800.zip",
+      "bytes": 453712,
+      "sha256": "16B0F13A139AFC9D3E4A4F2FB277206661F356D8F708C8784A2F60052649CE66"
+    },
+    {
+      "name": "more-infinite-research_5.0.10000.zip",
+      "bytes": 453703,
+      "sha256": "6BAE382DBD0AEC7199474921887CFBAC61016B8BF5E8FB990656493A8A174B6C"
+    },
+    {
+      "name": "more-infinite-research_5.0.11000.zip",
+      "bytes": 454014,
+      "sha256": "1C3D982CD048D3C83BF75108F1F9AC769CE0DC833A2DE056CDE16EF8AE2925A9"
+    },
+    {
+      "name": "more-infinite-research_5.0.20000.zip",
+      "bytes": 691666,
+      "sha256": "65FC7E907FE3198B7290167989FE2564C1474190D06DAD49860063BEC418EC60"
+    },
+    {
+      "name": "more-infinite-research_5.0.21000.zip",
+      "bytes": 692050,
+      "sha256": "005D420671270306155CB4AC25E9CF77541202DFA16B206DCC016237619C9AA2"
+    },
+    {
+      "name": "SHA256SUMS-early.txt",
+      "bytes": 721,
+      "sha256": "83F5ECD2517FFEF482AA87F6255BAB3C673F5C8128FB5A3DA6D02905C91CF745"
+    },
+    {
+      "name": "SHA256SUMS.txt",
+      "bytes": 1030,
+      "sha256": "CA25E7FACD4768543F3DAF47BA2AB5E194C3F907C3FC6B6263637067D701E2C6"
+    }
+  ],
+  "native_execution": false,
+  "release_qualification": false,
+  "all20_file_names_sizes_hashes_match_BG_freeze": true,
+  "scope": "Independent full17-ZIP and20-file reproduction/copy readback of the existing7a2 freeze only. No package input or accepted BG asset is changed.",
+  "builder": {
+    "path": "tools/release.py",
+    "sha256": "07972040468B3646C8D85D5B238A8C0A920664EBFD540237B84CC9D44D698377"
+  },
+  "prior_refusal": "The existing release tool refused an in-checkout output before writing assets; the valid reproduction used a fresh sibling output, then hash-verified all20 files into primary qualification custody. No bypass or native launch."
+}

@@ -1,0 +1,65 @@
+{
+  "schema": 1,
+  "kind": "MIR5CryogenicNativeUnitHostRegressionV1",
+  "status": "twenty-one-science-and-thirty-one-generator-controls-pass",
+  "published_hotfix": {
+    "tag": "v4.7.2",
+    "source": "bd9774f323b6eb1561c1d9ff0c91ecc3f7acd1d1",
+    "input_fixture_members": {
+      "fixtures/assert-startup-cryogenic-472/data-updates.lua": "4162450D595A4826C6052DF30C7FE1D389CF34177F95FD3E7AA3C5106F9FBC17",
+      "fixtures/assert-startup-cryogenic-472/data-final-fixes.lua": "CCA16B6B7F9B0FDF9E0527A6884C385B66B4D42514FB111F48202D9156872A4D",
+      "fixtures/assert-startup-cryogenic-472/settings-updates.lua": "B270F2E3F0760D81F9FBDD7DB26E6291EB89042FB7E0DD5D0063CDFE173F94F1"
+    }
+  },
+  "input_members": [
+    {
+      "path": "source/mir5/compatibility/science_bindings.lua",
+      "sha256": "9B950D5691D96ABE1E34FCDE3E438610EF190BE9ECD27DB2827812F29F8E96EB"
+    },
+    {
+      "path": "source/mir5/research/science.lua",
+      "sha256": "611CEA273B6E7EC18CAA1992C09967C80BAF3DEC94BCDBA8352BA4E1FC6D957E"
+    },
+    {
+      "path": "tests/mir5/test_science.py",
+      "sha256": "F17E616DDE2EA78FE86FBF888729C6C3A0E6878A814B63D3125E87F66097F0DF"
+    },
+    {
+      "path": "source/mir5/compatibility/modern_catalogue.lua",
+      "sha256": "28E82A1A9157C19AD284BE726E414C11D72583575978468B2D42DE6D4AD92D09"
+    },
+    {
+      "path": "source/mir5/compatibility/product_targets.lua",
+      "sha256": "3DE6940AF2BFB328FA4604C22729331648DE0D3923C054F4C213E8073A8771F9"
+    },
+    {
+      "path": "source/mir5/research/generator.lua",
+      "sha256": "88626C760C43D51FEDB3C7233523FAD3355404C3548A79F872940E6B019FE526"
+    },
+    {
+      "path": "tests/mir5/test_generator.py",
+      "sha256": "E69906610D5702A34F6EA97DEF3AE999EB492F86FFFF219B43EA7E5C96E44DF3"
+    }
+  ],
+  "scope": "Explicit cryogenic-only ordinary-unit alternative preserves the native recipe/unlock/prerequisite and quantities when a mod replaces the trigger with foreign native science. It does not certify foreign transitive researchability or inspect optional cyclic producers. Source alternatives are a flat finite OR; nested alternatives are rejected without recursive evaluation.",
+  "opponents": [
+    "wrong non-nil trigger",
+    "missing named prerequisite or unlock",
+    "disabled owner",
+    "self pack",
+    "zero/nonfinite count or time",
+    "fluid/missing/zero/duplicate ingredient",
+    "count and formula simultaneously",
+    "blank formula",
+    "alternative for another pack",
+    "nested source alternatives rejected before native reads"
+  ],
+  "limits": [
+    "Native MIR5 reproduction remains pending. Published MIR4.7.2 evidence is an obligation, not a MIR5 test pass.",
+    "No exact reporter configuration, final candidate, migration or performance claim."
+  ],
+  "native_execution": false,
+  "release_qualification": false,
+  "base_source_commit": "da271adcd4eb5e6d626b6e1ed62b74ecca8e713c",
+  "input_binding": "Listed exact working bytes overlay base_source_commit; all other inputs use that committed source. Host controls only."
+}

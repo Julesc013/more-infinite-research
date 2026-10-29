@@ -1,0 +1,12 @@
+{
+  "name": "mir-fixture-mir5-module-permissions",
+  "version": "0.1.0",
+  "title": "MIR 5 unrestricted module permissions fixture",
+  "author": "MIR maintainers",
+  "description": "Private CreateOnly observation for MIR 5 unrestricted module permissions.",
+  "factorio_version": "2.1",
+  "dependencies": [
+    "base >= 2.1.23",
+    "more-infinite-research = 5.0.21000"
+  ]
+}

@@ -1,0 +1,113 @@
+{
+  "schema": 1,
+  "kind": "MIRK2DirectCurrent005dNativeChainV1",
+  "status": "passed-current-direct-recovery-one-lab-save-two-cold-reloads",
+  "scope": "Exact protected published4.6 source538B to current005D/player505 on standalone2.1.23/8DC and prepared K2SO closure. Reuse original five-lab predecessor once; no recreation. This is direct matching-cost recovery,not published4.7 intermediate repair,K2SE,ordinary tuning,client/performance or whole-product acceptance.",
+  "controller_commit": "2a9cdd168c5f6b77cee15734d0ed03e778ff85dc",
+  "prepared_inputs": {
+    "path": "spec/evidence/k2-imersite-current005d-prepared-inputs-r01.json",
+    "sha256": "02C6BFFB4CD524A11BF90DEC1269639963B61765027AE0D60A6A56E9C068EC56"
+  },
+  "source_save": {
+    "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\mir5\\recovery-historical\\k2-imersite-transition\\40071490977\\gameplay\\predecessor-4.6\\write-data\\saves\\mir5-native-complete.zip",
+    "sha256": "538B7321F57A79807371B4CE415A9EF97FA72DEA8BB0A9B05DC41D00D035F828"
+  },
+  "candidate_sha256": "005D420671270306155CB4AC25E9CF77541202DFA16B206DCC016237619C9AA2",
+  "engine_sha256": "8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38",
+  "profile": {
+    "path": "tests/profiles/k2-imersite-transition-direct-current005d-standalone-f210.json",
+    "sha256": "2E734FAA43B3593F044D880CF81369CCCEF0A2D2F6F27F3FEFBB5618ED696CAE"
+  },
+  "own_fixture_archives": {
+    "successor": {
+      "sha256": "E98A97B3CB6A9AC34F8C1D4EB5103F99252324A73774381AD6C555D2EAE39080",
+      "bytes": 5708
+    },
+    "direct_cost": {
+      "sha256": "74E5D9A50677BA6CE55A61D3B13AE588E57245938C43BE88639EEB604EFBEC3C",
+      "bytes": 1943
+    },
+    "observer": {
+      "sha256": "2E1BE5952D2A4CC5C74A0D149E075D247BA110A3FAE5B6768D3EAEBABCEF989C"
+    }
+  },
+  "fixture_members": {
+    "tests/fixtures/k2-imersite-transition/successor/control.lua": {
+      "sha256": "44EF021966099D58F024E80112237FB772E7AD2D2AA5BCCD9305A4F31BCB1954",
+      "bytes": 11033
+    },
+    "tests/fixtures/k2-imersite-transition/successor/data-final-fixes.lua": {
+      "sha256": "36AA69ACA6901338A54CCB13452C3B6E3052639A26728209117DA6D6F77D97AA",
+      "bytes": 4158
+    },
+    "tests/fixtures/k2-imersite-transition/successor/info.json": {
+      "sha256": "8E2971734D0B854263767D6E4F987A119372E8FA48F94A03BE6B0C2BA393B531",
+      "bytes": 420
+    },
+    "tests/fixtures/k2-imersite-transition/successor/settings-updates.lua": {
+      "sha256": "110A811A5F9F24527DBACD40793089763AE75EA504A7831F36EFB7246F3D530F",
+      "bytes": 406
+    },
+    "tests/fixtures/k2-imersite-transition/direct-cost/data-final-fixes.lua": {
+      "sha256": "D00B58D1EDD9F0DEA126329B23A0DA3A390953530514061D3DB10C0CFCD4E15E",
+      "bytes": 3504
+    },
+    "tests/fixtures/k2-imersite-transition/direct-cost/info.json": {
+      "sha256": "2621B2F744F7913540E95DB7511A3E5A0F7571F140E19CD3C8E6BC607D6D53D5",
+      "bytes": 484
+    }
+  },
+  "packet_sha256": "5A366BB5DF4E3E18D89744663C5A0102C6BE8020B59E4415B5B0A976AFD4663A",
+  "caller_sha256": "5821EFB757241E0089814BD9D38860BF68048376E2387CC0EEDA3768A6DB3D77",
+  "raw_result_sha256": "8F4A2A1B151F1E7E0D61DBF0157556DEFA1AA1714468B1C72F50D5CECC8D50EA",
+  "initial_witnesses": {
+    "source_mir": "4.6.21000",
+    "destination_mir": "5.0.21000",
+    "source_actual_lab_completions": 5,
+    "retained_source_next_level": 6,
+    "handoff_source": "direct-4.6",
+    "recovered_tail_saved_progress_before_lab": 0.42000000000000004,
+    "destination_actual_lab_completions": 1,
+    "tail_next_level": 7,
+    "powder_productivity": 0.12,
+    "public_continuation_readded": false,
+    "direct_predecessor_handoff": true,
+    "on_load_read_only": false
+  },
+  "completed_save": {
+    "sha256": "993E751581A7ECC53BCE4C6FE2C2B99F474AABD0366C33FFFF69390E4AADC3B4",
+    "bytes": 883647
+  },
+  "cold_reloads": [
+    {
+      "ordinal": 1,
+      "save_byte_identical": true,
+      "save_sha256": "993E751581A7ECC53BCE4C6FE2C2B99F474AABD0366C33FFFF69390E4AADC3B4"
+    },
+    {
+      "ordinal": 2,
+      "save_byte_identical": true,
+      "save_sha256": "993E751581A7ECC53BCE4C6FE2C2B99F474AABD0366C33FFFF69390E4AADC3B4"
+    }
+  ],
+  "root_readback": {
+    "path": "build/qualification/k2-direct-current005d-r01-controller/root-readback-r01.json",
+    "sha256": "ED719FEE4E074AB2BB23130F7E7A476203337D4BD549F0175E863E6C16828846",
+    "files": 18,
+    "bytes_per_copy": 1029874
+  },
+  "lossless_receipts": {
+    "path": "spec/evidence/k2-direct-current005d-native-receipts-r01.json.gz",
+    "sha256": "E0F5DF86B7EB9828F2AA9A15B889A1DDF7C8C103B564E6066808B44C96EE9D20",
+    "bytes": 12789,
+    "records": 2
+  },
+  "counts": {
+    "actual_new_processes": 3,
+    "new_labs": 1,
+    "cold_reloads": 2,
+    "predecessor_labs_reused_once": 5
+  },
+  "restoration": "Every original archive/control and protected source rehashed; terminal Factoriozero. Additional direct-cost owned archive and original2E1 observer temporarily installed/restored under exclusive direct-library locks; no dependency copies/links/extractions.",
+  "remaining": "Retain old AFCAF/8c14/FE4 result and published4.7.2 failure under their original identities. K2SE foreign-flag route remains open and separate; ordinary tuning/public carrier/client/performance qualification is unaffected."
+}

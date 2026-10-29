@@ -1,0 +1,200 @@
+{
+  "schema": 1,
+  "kind": "MIR5BobAngelMenuR23ObservationAnalysisChainV1",
+  "status": "completed-native-observation-analysis-inconclusive",
+  "scope": "ordinary responsive-menu endpoint only",
+  "claims": {
+    "native_execution": true,
+    "performance_measurement": true,
+    "performance_comparison": true,
+    "performance_qualification": false,
+    "runtime_qualification": false,
+    "memory_qualification": false,
+    "ui_fidelity_qualification": false,
+    "release_qualification": false
+  },
+  "execution": {
+    "original_workflow_run_id": 40206608163,
+    "original_workflow_url": "https://github.com/Julesc013/mir-native-worker/actions/runs/40206608163",
+    "original_workflow_status": "failure-before-direct-successor",
+    "execution_kind": "direct-frozen-controller-successor",
+    "direct_execution_id": "successor-2eac983c-r02",
+    "direct_controller_commit": "2eac983c278027bb11227472b1252c878b0f3edd",
+    "source_reference": "b2cf4c2dac43727e2e93cb90b861d2301f7778cd",
+    "source_tree": "25442a5bd7838f124952507854426e3b8e868475",
+    "engine": {
+      "version": "2.0.77",
+      "sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B"
+    },
+    "profile": {
+      "path": "tests/profiles/bob-angel-f200-2077.json",
+      "sha256": "A2F235B7CE1F18968E1D7D7913362694EA1916095852C1673300C68BA26DDE90"
+    },
+    "candidate": {
+      "version": "5.0.20000",
+      "root": "more-infinite-research_5.0.20000",
+      "sha256": "B67FF048860F2707579CF582C933ED46D7BF52769F5ABE1B0279DDCC2A0323BD",
+      "bytes": 553231,
+      "asset_inventory_sha256": "4FD1A20E6C2E3D3F27D6158D60C931333B0E5053926019BD6C59493A9AF88498"
+    },
+    "published": {
+      "version": "4.7.20002",
+      "root": "more-infinite-research_4.7.20002",
+      "sha256": "F3943EB4D69CCDAC41BD9F922AD03A5C78F34F22D8E7FA5A88A7A658AB1010B7"
+    },
+    "raw_result": {
+      "path": "build/mir5/recovery-historical/bob-angel-menu-comparison-r23/40206608163/successor-2eac983c-r02/native/result.json",
+      "sha256": "5171FF7A5BB93888F053D9254627D52DAA0FA85495E34C07593F4E148E93C7FA",
+      "bytes": 340831,
+      "status": "completed-observation-only",
+      "records": 38
+    },
+    "artifact_manifest": {
+      "path": "build/mir5/recovery-historical/bob-angel-menu-comparison-r23/40206608163/successor-2eac983c-r02/artifact-manifest.json",
+      "sha256": "66C4F9D3C066BB3F6BCC95C3920E21DE1D982AA6603BD7ECC5FEEBB8A6789F03",
+      "bytes": 90858,
+      "members": 436
+    }
+  },
+  "frozen_analysis_protocol": {
+    "initial_protocol_commit": "8db5e216103ab175994065db46596c22503d775c",
+    "initial_protocol_timing": "Selected after R23 launch started and before any R23 elapsed value was inspected.",
+    "initial_protocol_readback": {
+      "path": "build/mir5/recovery/menu-r23-analysis-protocol-readback-r01.json",
+      "sha256": "9537C39E7A81000FC629B094E69F2772AF1EF46F145055501C40D8D85F86F303",
+      "bytes": 709
+    },
+    "final_analyzer_commit": "88b426497273d67ba53d32525562a2543340c069",
+    "later_corrections": "The later a5e3a448, 0c7f6d016, e0af8db77 and 88b426497 corrections bind metadata and producer receipt shapes and add arithmetic adversaries. They retain the frozen raw-plan SHA, four arms, 38-row schedule, grouping, Student-t method, tolerances and objective rule.",
+    "raw_plan": {
+      "path": "spec/evidence/bob-angel-menu-plan-r23.json",
+      "sha256": "5E4B44DBC8B0C8F9F102CE4B6C08C4C2E9F549D25C8151A07D9C6F3A44528970"
+    },
+    "analysis_plan": {
+      "path": "build/mir5/recovery/menu-r23-analysis-88b42649-r01/analysis-plan.json",
+      "sha256": "92B5A4F428BABED2EB52180BA013831EEDBD99E2DB2D78F5A319B99B9E4FFA7C",
+      "bytes": 4609
+    },
+    "analysis_result": {
+      "path": "build/mir5/recovery/menu-r23-analysis-88b42649-r01/analysis-result.json",
+      "sha256": "DAF2E4F132B89D7E3448170BEA57CBA54DE728C1F30904C91B5EA63497A7F300",
+      "bytes": 11299
+    },
+    "analysis_inputs": {
+      "path": "build/mir5/recovery/menu-r23-analysis-88b42649-r01/analysis-inputs.json",
+      "sha256": "5BC95ED7C65CEFDB7F9889DCB2E897F843AF7F49A18129A64216A028B8426C6E",
+      "bytes": 2317
+    },
+    "assumption": "The eight paired blocks are treated as independent and roughly symmetric for the two-sided Student-t interval. This small sample remains uncertain; no bootstrap or equivalence inference is made."
+  },
+  "schedule_and_controls": {
+    "total_records": 38,
+    "excluded_warmups": 4,
+    "excluded_same_version_aa_records": 2,
+    "scored_counterbalanced_blocks": 8,
+    "scored_records_per_arm": 8,
+    "arms": [
+      "control-without-mir",
+      "published-4.7",
+      "replay",
+      "candidate-mir5"
+    ],
+    "same_version_aa": {
+      "absolute_difference_seconds": 0.1886495,
+      "allowed_difference_seconds": 0.6432381775,
+      "status": "within-predeclared-tolerance"
+    },
+    "late_control_drift": {
+      "late_minus_early_seconds": -0.89251955,
+      "allowed_seconds": 0.5,
+      "status": "within-predeclared-tolerance"
+    }
+  },
+  "independent_recomputation": {
+    "method": "Python standard-library statistics.fmean and statistics.stdev over the 8 scored paired blocks, with the predeclared two-sided t critical value 2.3646242510102993 at df=7.",
+    "raw_record_checks": "All 38 original records have unique sequential ordinals, the frozen schedule labels and arm/block shape, positive finite ordinary-responsive-menu elapsed values at or below the 300-second launch bound, and matching validated nested menu-response values.",
+    "paired_seconds": {
+      "published_added_time_d4": {
+        "arithmetic_mean": 0.7535424875,
+        "sample_standard_deviation": 1.0931938192764765,
+        "minimum": -1.2866901,
+        "maximum": 2.137932,
+        "student_t_95_interval": [
+          -0.16039041658629172,
+          1.6674753915862923
+        ]
+      },
+      "candidate_added_time_d5": {
+        "arithmetic_mean": -0.2615781375,
+        "sample_standard_deviation": 1.4978457397964227,
+        "minimum": -2.9326482,
+        "maximum": 2.0187002,
+        "student_t_95_interval": [
+          -1.513808513035276,
+          0.9906522380352762
+        ]
+      },
+      "direct_candidate_minus_published": {
+        "arithmetic_mean": -1.015120625,
+        "sample_standard_deviation": 0.9982976598228778,
+        "minimum": -2.098382,
+        "maximum": 0.9798411,
+        "student_t_95_interval": [
+          -1.8497183544203173,
+          -0.18052289557968304
+        ]
+      },
+      "candidate_minus_replay": {
+        "arithmetic_mean": 0.2281086375,
+        "sample_standard_deviation": 1.1007017239671018,
+        "minimum": -1.1232945,
+        "maximum": 2.4722157,
+        "student_t_95_interval": [
+          -0.6921010319837104,
+          1.1483183069837106
+        ]
+      },
+      "objective_transformed_q_d5_minus_half_d4": {
+        "arithmetic_mean": -0.63834938125,
+        "sample_standard_deviation": 1.1494789503470655,
+        "minimum": -2.28930315,
+        "maximum": 1.49927065,
+        "student_t_95_interval": [
+          -1.5993378324763836,
+          0.3226390699763836
+        ]
+      }
+    }
+  },
+  "outcome": {
+    "status": "inconclusive",
+    "percentage_reduction": null,
+    "percentage_disposition": "unresolved because the published added-time d4 mean has a nonpositive 95-percent lower bound",
+    "minimum_50_percent_objective": "not-supported because q's 95-percent upper bound is positive",
+    "result": "No R23 50-percent objective pass is claimed. The direct candidate-minus-published interval is reported independently and does not repair the unresolved percentage denominator or q criterion."
+  },
+  "retained_prior_adverse": {
+    "original_workflow_preparation_chain": "spec/evidence/bob-angel-menu-r23-preparation-adverse-chain.json",
+    "original_workflow_disposition": "The original workflow reader refused actual schema 2 after native preparation. Its adverse chain predates the later direct-successor refusal and is retained without alteration.",
+    "successor_7b_zero_native_refusal": {
+      "path": "build/mir5/recovery-historical/bob-angel-menu-comparison-r23/40206608163/successor-7b9698fc-r01/execution-refusal.json",
+      "sha256": "2F14944A49AB2580977B883460CC47DF0E3A84588A51EF1EB5C2111CDC3C73DA",
+      "bytes": 1308,
+      "status": "refused-after-packet-validation-before-native-wrapper",
+      "factorio_processes_started": 0
+    },
+    "disposition": "Neither prior refusal is rewritten as an R23 timing observation or superseded by this completed direct-successor analysis."
+  },
+  "next_campaign_proposal": {
+    "status": "proposal-only-not-an-r23-extension",
+    "campaign": "R24",
+    "design": "A separately frozen R24 may retain the same four arms, configuration, workload, tolerances and 50-percent objective while using 64 counterbalanced scored blocks: 64 scored observations per arm and 262 total launches after four warmups and two same-version A/A records.",
+    "inference": "Use df=63 and a two-sided 95-percent Student-t critical value fixed in the R24 declaration (approximately 1.99834); no R23 value is appended, relabelled or reused as an R24 sample.",
+    "budget": "Plan a bounded governed 70-to-90-minute same-host run only after a new exact plan/controller review, with a new explicit output budget of approximately 8 GiB. R23's 436-member artifact occupies 1,056,422,548 bytes, so R24 must not inherit a 2 GiB output allowance. This proposal is motivated by R23's d4 interval spanning zero and q upper bound remaining positive, not by any changed threshold or post-hoc rule."
+  },
+  "limits": [
+    "This chain records an endpoint-only R23 observation analysis. It does not qualify release, runtime, memory, active work, client fidelity, saves or general UI behavior.",
+    "The analysis retains all raw observations and spread; it does not replace records, select later samples, relax an A/A or drift control, or turn an inconclusive interval into equivalence.",
+    "R24 is a proposed separate campaign only. It must be independently predeclared and executed before it can make any new performance claim."
+  ]
+}

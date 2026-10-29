@@ -1,0 +1,195 @@
+{
+  "schema": 1,
+  "kind": "mir5-f210-bob-logistics-native-continuation-facts",
+  "evidence_scope": "Hash-verified F210 upstream/published data-stage observations only; this fixture is not a MIR5 native qualification or release claim.",
+  "target": {
+    "id": "f210",
+    "factorio_version": "2.1.23",
+    "engine_sha256": "FE4A1DA30F322A0D0B8AEB3DF7276332222BAAA143E2352569B723E84B2B9060"
+  },
+  "native_owner": {
+    "mod": "boblogistics",
+    "version": "3.0.2",
+    "archive": "boblogistics_3.0.2.zip",
+    "archive_sha256": "ADAEFF77E0C489C80AC83950BDDC5F7DE0230FEEEC5E29772AC1C2FA8175F339",
+    "source_member": "boblogistics/prototypes/technology-inserter.lua",
+    "source_lines": "285-324",
+    "data_entrypoint": "boblogistics/data.lua:59",
+    "unconditionally_authored": true
+  },
+  "worker_storage_native_owner": {
+    "mod": "boblogistics",
+    "version": "3.0.2",
+    "archive": "boblogistics_3.0.2.zip",
+    "archive_sha256": "ADAEFF77E0C489C80AC83950BDDC5F7DE0230FEEEC5E29772AC1C2FA8175F339",
+    "source_member": "boblogistics/prototypes/technology-logistics.lua",
+    "source_lines": "153-186",
+    "data_entrypoint": "boblogistics/data.lua:58",
+    "unconditionally_authored": true
+  },
+  "native_technologies": {
+    "inserter_capacity_bonus": "inserter-capacity-bonus-8",
+    "worker_robots_storage": "bob-infinite-worker-robots-storage-4"
+  },
+  "native_technology": {
+    "type": "technology",
+    "name": "inserter-capacity-bonus-8",
+    "icons": [
+      {
+        "icon": "__boblogistics__/graphics/icons/technology/green-inserter.png",
+        "icon_size": 128
+      },
+      {
+        "icon": "__core__/graphics/icons/technology/constants/constant-capacity.png",
+        "icon_size": 128,
+        "scale": 0.5,
+        "shift": [50, 50],
+        "floating": true
+      }
+    ],
+    "icon_size": 128,
+    "effects": [
+      {"type": "inserter-stack-size-bonus", "modifier": 1},
+      {"type": "bulk-inserter-capacity-bonus", "modifier": 3}
+    ],
+    "prerequisites": [
+      "inserter-capacity-bonus-7",
+      "inserter-stack-size-bonus-4",
+      "space-science-pack"
+    ],
+    "unit": {
+      "count_formula": "2^(L-8)*1000",
+      "time": 30,
+      "ingredients": [
+        ["automation-science-pack", 1],
+        ["logistic-science-pack", 1],
+        ["chemical-science-pack", 1],
+        ["utility-science-pack", 1],
+        ["space-science-pack", 1],
+        ["bob-advanced-logistic-science-pack", 1]
+      ]
+    },
+    "max_level": "infinite",
+    "upgrade": true
+  },
+  "worker_storage_native_technology": {
+    "type": "technology",
+    "name": "bob-infinite-worker-robots-storage-4",
+    "icons": [
+      {
+        "icon": "__base__/graphics/technology/worker-robots-storage.png",
+        "icon_size": 256
+      },
+      {
+        "icon": "__core__/graphics/icons/technology/constants/constant-capacity.png",
+        "icon_size": 128,
+        "scale": 0.5,
+        "shift": [50, 50],
+        "floating": true
+      }
+    ],
+    "effects": [
+      {"type": "worker-robot-storage", "modifier": 1}
+    ],
+    "prerequisites": [
+      "worker-robots-storage-3",
+      "space-science-pack"
+    ],
+    "unit": {
+      "count_formula": "2^(L-4)*800",
+      "time": 60,
+      "ingredients": [
+        ["automation-science-pack", 1],
+        ["logistic-science-pack", 1],
+        ["chemical-science-pack", 1],
+        ["production-science-pack", 1],
+        ["utility-science-pack", 1],
+        ["space-science-pack", 1],
+        ["bob-advanced-logistic-science-pack", 1]
+      ]
+    },
+    "max_level": "infinite",
+    "upgrade": true,
+    "order": "c-k-g-d",
+    "localised_name": ["technology-name.worker-robots-storage"],
+    "localised_description": ["technology-description.worker-robots-storage"]
+  },
+  "capture_provenance": [
+    {
+      "id": "q005-bob-full-base",
+      "profile": "tests/profiles/bob-full-base-f210-2123.json",
+      "profile_sha256": "61165C045E1D23AD7437E0D7E4B4925B8B95491BF6C8651BEA2E25622F12834E",
+      "upstream": {
+        "result_sha256": "A3BDB63E4A02517422180D14AC744475E19820BF63B18F60C42F0FE329B7F04D",
+        "data_raw_sha256": "E50A66C38427AE45765564D301085BF42BC17FB904BAF93EB296C4CF4B648D6F",
+        "settings_sha256": "3A8AAF233D7A24F20B7F3F91AC7B9E2E1B705BCF52E932D93412D590BEE262D7"
+      },
+      "published": {
+        "result_sha256": "D2EA633FB74D29192F1C35EB7019A427338E71F5A5C370876D922EFD53C88337",
+        "data_raw_sha256": "80462037B1982AF008B845D1389045C69E8D0BF58C0D7BC7A287BD4B4FC4024F",
+        "settings_sha256": "DD4E781CFFA9718CFDD30F0EBC332BD85489A16ACB584880384BA2F1CC403592",
+        "mir_archive": "more-infinite-research_4.7.21003.zip",
+        "mir_archive_sha256": "B6EB9430056ABD384DB00F94929FE7DAC0A37441ACF4BC277946689682628852"
+      },
+      "upstream_published_native_owner_equal": true,
+      "upstream_published_worker_storage_owner_equal": true
+    },
+    {
+      "id": "q006-bob-full-space-age",
+      "profile": "tests/profiles/bob-full-space-age-f210-2123.json",
+      "profile_sha256": "B9354B36838446C4B44ADF752A9B5CEC127BD687299CE708DD957497268D4989",
+      "upstream": {
+        "result_sha256": "54E06C838AD8F53F6D28DFBCE20B7228EAD446AA3CC366304CFA411AC4A67CDF",
+        "data_raw_sha256": "9850830424454DE5760C3CE0DB2A6D0055875339DE40B80EC08433E288EAFE2A",
+        "settings_sha256": "A66A00EB052466AE5615F921386024DDDB90B994DCD44FF61DAC83073CCC9219"
+      },
+      "published": {
+        "result_sha256": "37E78B8C197BC7BCBEC3554C0C234C39BD910B686C0B107FC710678F0160FACB",
+        "data_raw_sha256": "0419DF1FD2C5495B5BEC692268F30294F1E19C168D199CB9BF4C7569EF20E6A4",
+        "settings_sha256": "CBC3F12DD307DBF47BF3BB34ADDE664082842AF03D68681D4D16DAE47FE650BD",
+        "mir_archive": "more-infinite-research_4.7.21003.zip",
+        "mir_archive_sha256": "B6EB9430056ABD384DB00F94929FE7DAC0A37441ACF4BC277946689682628852"
+      },
+      "upstream_published_native_owner_equal": true,
+      "upstream_published_worker_storage_owner_equal": true
+    },
+    {
+      "id": "q009-bob-angel-full-base",
+      "profile": "tests/profiles/bob-angel-full-base-f210-2123.json",
+      "profile_sha256": "3AC0B9CBB82F0FA030AE4BAB910E1CBE1617B0873BD33A6348B17B82709285EB",
+      "upstream": {
+        "result_sha256": "C48037EE409BCC14BA9686EF55C7C8BB67FB13B688E5738535CBF42F0F989565",
+        "data_raw_sha256": "77EAA31B5BA3BC58915E717FD2243BAF1FD6ACFFD9EA9328CC7CFAB8998E1BD3",
+        "settings_sha256": "1DFB8DF7056EF62ECB6730D9E6C3F7477A920E23AAFF2D5DA4331C5A9EF4C55C"
+      },
+      "published": {
+        "result_sha256": "C2DEC7D83147410EAB1B9799FE83704F8EB3B7298AFA2085BC0DEBE1ED2760A5",
+        "data_raw_sha256": "742447E96872EE100F7ACF1131C16C89631057144E98AA1FBC5CC61C00FF4E55",
+        "settings_sha256": "E6B637555269C37B07108DE4F9342B6AEB9A55403F52DFCBE8403349647105B3",
+        "mir_archive": "more-infinite-research_4.7.21003.zip",
+        "mir_archive_sha256": "B6EB9430056ABD384DB00F94929FE7DAC0A37441ACF4BC277946689682628852"
+      },
+      "upstream_published_native_owner_equal": true,
+      "upstream_published_worker_storage_owner_equal": true
+    }
+  ],
+  "published_mir4_source_fact": {
+    "mir_archive": "more-infinite-research_4.7.21003.zip",
+    "mir_archive_sha256": "B6EB9430056ABD384DB00F94929FE7DAC0A37441ACF4BC277946689682628852",
+    "planner_member": "prototypes/mir/planner/base_continuations/plan.lua",
+    "discovery_member": "prototypes/mir/planner/base_continuations/discover.lua",
+    "already_infinite_disposition": "already_infinite",
+    "meaning": "The published planner skipped construction when the named continuation already had an infinite native owner; its scaling path did not run."
+  },
+  "published_mir4_worker_storage_owner_fact": {
+    "mir_archive": "more-infinite-research_4.7.21003.zip",
+    "mir_archive_sha256": "B6EB9430056ABD384DB00F94929FE7DAC0A37441ACF4BC277946689682628852",
+    "planner_member": "more-infinite-research_4.7.21003/prototypes/mir/planner/base_continuations/plan.lua",
+    "discovery_member": "more-infinite-research_4.7.21003/prototypes/mir/planner/base_continuations/discover.lua",
+    "base_prerequisite": "worker-robots-storage-3",
+    "owner_disposition": "competing_infinite_kept",
+    "lookup": "discover.find_any_infinite_extension(base_technology_name, new_name)",
+    "meaning": "The legacy planner retained the differently named Bob infinite owner through its exact base prerequisite rather than emitting worker-robots-storage-4."
+  },
+  "release_qualification": false
+}

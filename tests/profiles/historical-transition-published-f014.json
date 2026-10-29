@@ -1,0 +1,19 @@
+{
+  "mods": [
+    {
+      "name": "base",
+      "version": "0.14.23",
+      "enabled": true
+    },
+    {
+      "name": "more-infinite-research",
+      "version": "4.7.01402",
+      "enabled": true
+    },
+    {
+      "name": "mir-fixture-mir5-historical-transition",
+      "version": "0.1.0",
+      "enabled": true
+    }
+  ]
+}

@@ -1,0 +1,110 @@
+{
+  "schema": 1,
+  "kind": "MIR5PublishedLoadOrderMetadataV1",
+  "source_tag": "v4.7.0",
+  "source_commit": "84bd157ad7b63b7d171fac2311bf30de70429c11",
+  "native_execution": false,
+  "records": [
+    {
+      "target": "f013",
+      "archive": "dist/4.7.0/more-infinite-research_4.7.01300.zip",
+      "archive_sha256": "3567958FF79FEA3AD84232F506226F9DD99FE297821D565F7588837D811221E0",
+      "info_sha256": "3B9C33BA2F8FC83C12C64C51D1D4E38270C02A706368EF1798CB99A1E672D43E",
+      "dependencies": [
+        "base >= 0.13.20"
+      ]
+    },
+    {
+      "target": "f014",
+      "archive": "dist/4.7.0/more-infinite-research_4.7.01400.zip",
+      "archive_sha256": "44D26B38B0B2F19D5387F9845A7FBA4A105E107534AEB76DC8F1921074B7584E",
+      "info_sha256": "BB23370CAA9DF5DFE75FCBD56A87826D0B38ABC4CC817890000BE5093E0E5CF9",
+      "dependencies": [
+        "base >= 0.14.23"
+      ]
+    },
+    {
+      "target": "f015",
+      "archive": "dist/4.7.0/more-infinite-research_4.7.01500.zip",
+      "archive_sha256": "29CFD63B20B5649DA14C3C66BF236013B482C05BC98C268D549FDA4E1CC20B80",
+      "info_sha256": "3469A4F8EFED6D07F0E34996E12AF84891E973F56B3915C9F49D454D1B3624B2",
+      "dependencies": [
+        "base >= 0.15.40"
+      ]
+    },
+    {
+      "target": "f016",
+      "archive": "dist/4.7.0/more-infinite-research_4.7.01600.zip",
+      "archive_sha256": "EAFC3C2A3F49475531E2EF0DF8B6486ECC26D12D5D1673FBAE9BB2B1DF31E179",
+      "info_sha256": "A482E4F9615E50AD79CCCDAD267F57FBE58AA219CD945E554DF1A5D27BFAF5AE",
+      "dependencies": [
+        "base >= 0.16.51"
+      ]
+    },
+    {
+      "target": "f017",
+      "archive": "dist/4.7.0/more-infinite-research_4.7.01700.zip",
+      "archive_sha256": "9001AC9FD6802C9360E8A86DA8C96C67F6104B736473C227E2C2459BEF742835",
+      "info_sha256": "8456F5B04DAE7A908F7CF7AA0A6402A807CED250EB911C0D2D3EB68C9659B934",
+      "dependencies": [
+        "base >= 0.17.79"
+      ]
+    },
+    {
+      "target": "f100",
+      "archive": "dist/4.7.0/more-infinite-research_4.7.10000.zip",
+      "archive_sha256": "D909A97BCC3438C801A37B532224DCEB62F5611F574A6150E9BFD05A5D36CA32",
+      "info_sha256": "CA956C172B5293DF349DC1B21CC9ED4B5512736F1DA573DD594AD54ECDEB9081",
+      "dependencies": [
+        "base >= 1.0.0"
+      ]
+    },
+    {
+      "target": "f110",
+      "archive": "dist/4.7.0/more-infinite-research_4.7.11000.zip",
+      "archive_sha256": "D054E78F2C090E2B354A5D3945FD74380CF6C553BA9C08BA56D827550D58653A",
+      "info_sha256": "BCEF476A42A152FA9B5E9DF0D241ED75660B04455C701BB6814B1E2AA9077E16",
+      "dependencies": [
+        "base >= 1.1.110"
+      ]
+    },
+    {
+      "target": "f200",
+      "archive": "dist/4.7.0/more-infinite-research_4.7.20000.zip",
+      "archive_sha256": "7958731AAD672C7F16B9307E7B20F97B8E97B58CC57E5D1F9AE670018A8A1B5B",
+      "info_sha256": "EE5C42FBF36E75CD74599FCE6EAEF6AFC251336F60896B3FB674F90EC0065A3B",
+      "dependencies": [
+        "base >= 2.0.77",
+        "(?) bobelectronics",
+        "(?) bobtech",
+        "(?) elevated-rails",
+        "(?) angelssmelting",
+        "? recycler >= 2.0.77",
+        "(?) quality",
+        "(?) pypostprocessing",
+        "(?) space-exploration",
+        "? space-age >= 2.0.77"
+      ]
+    },
+    {
+      "target": "f210",
+      "archive": "dist/4.7.0/more-infinite-research_4.7.21000.zip",
+      "archive_sha256": "708A529F1F6D649E0A732216CD8D8FEFE68F2C6C2DF2B40DA030C2C4C51558D1",
+      "info_sha256": "5D751F57D43D48595619A20759758474DD86622934FABC657349571C821209B7",
+      "dependencies": [
+        "base >= 2.1.23",
+        "(?) bobelectronics",
+        "(?) bobtech",
+        "(?) elevated-rails",
+        "(?) angelssmelting",
+        "? recycler >= 2.1.18",
+        "(?) quality",
+        "(?) Krastorio2",
+        "(?) Krastorio2-spaced-out",
+        "(?) pypostprocessing",
+        "(?) space-exploration",
+        "? space-age >= 2.1.18"
+      ]
+    }
+  ]
+}

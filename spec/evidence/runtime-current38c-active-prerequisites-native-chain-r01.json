@@ -1,0 +1,109 @@
+{
+  "schema": 1,
+  "kind": "MIRCurrent38CActiveRuntimePrerequisitesNativeChainV1",
+  "status": "passed-matched-pending-saves-and-eight-unscored-physical-marker-pilots-not-performance-accepted",
+  "public_declaration": "5efe123bbae5c5c2168c52a35920aa9e16d3636a",
+  "public_harness": "5d6521e953b51207dd51b4d99bbdab8ec954655d",
+  "private_execution_controller": "968a1ff01d733dc63439003fa6efbebd6900eccd",
+  "plan": {
+    "path": "spec/evidence/runtime-current38c-active-plan-r01.json",
+    "sha256": "9CA4F3A77784791827C7A70DA353ADAC9E2B9E46A5231341B40F0AB554F003F0"
+  },
+  "candidate": {
+    "source_commit": "b3bbd8d37b37bfee2e258b3e8a2f223dcf3860b3",
+    "player_tree": "fbb7e9135280ce7f69692e9b0c4a44d743793f45",
+    "archive_sha256": "38C84CCBC4BFDA62FCB078772C4690AB81228484744A36D9EA303F5A75B16447",
+    "bytes": 692759
+  },
+  "published": {
+    "version": "4.7.21002",
+    "archive_sha256": "A4BB8F47232C689B267EF434F557187A8795C47280FA464169DE917FB579517F"
+  },
+  "engine": {
+    "version": "2.1.23",
+    "sha256": "8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38"
+  },
+  "receipt_capsule": {
+    "path": "spec/evidence/runtime-current38c-physical-native-receipts-r01.json.gz",
+    "sha256": "621918B6B2382DF2A382ECD0E289EE1EB060436A265A743E4D409C465CE839F1",
+    "bytes": 48552,
+    "members": 4,
+    "contents": "Exact capture/pilot receipts and both root readbacks; full raw files remain in separately hash-verified original and primary custody."
+  },
+  "phases": [
+    {
+      "phase": "capture",
+      "original_output": "D:\\Projects\\Factorio\\mir5-legacy-cannon-credit-r01\\build\\tmp\\runtime-current38c-captures-r02",
+      "primary_custody": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\runtime-current38c-capture-r02-controller\\native-captures",
+      "packet": {
+        "sha256": "834B0D538F9D0E70921559A62F505F09C2C8778915E21712D91963DC55475128"
+      },
+      "caller": {
+        "sha256": "D9B58FA1BF1EF015509CFA943CC69199CEFE56634A4F79BFDD170AA64F674577"
+      },
+      "terminal_sha256": "208CFD29512CF47AAADBD3D421FBF6A4BE412DF620A717E44082EE6F90AF6930",
+      "root_readback_sha256": "EFBBFC742C01D94F5A4BD28ABF8C63ED8A9E33E1893295DF3894221920492D13",
+      "counts": {
+        "new_native_processes": 14,
+        "new_lab_completions": 12,
+        "new_active_saves": 8,
+        "new_planting_events": 0,
+        "new_repair_events": 0,
+        "new_scored_samples": 0
+      },
+      "files": 592,
+      "bytes_per_copy": 20380864
+    },
+    {
+      "phase": "unscored_pilot",
+      "original_output": "D:\\Projects\\Factorio\\mir5-legacy-cannon-credit-r01\\build\\tmp\\runtime-current38c-pilots-r01",
+      "primary_custody": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\runtime-current38c-pilot-r01-controller\\native-captures",
+      "packet": {
+        "sha256": "3FC4423B970E9CC43C260173817EB9E29264F170F1F6D187057E94FB8118C8FA"
+      },
+      "caller": {
+        "sha256": "F70B36154B2D92F70C34166B3A563309095D5B047856D84A0922765FC5904F97"
+      },
+      "terminal_sha256": "DD808D45F98EA29EDE2B29AEB43B02099428ED281374632CEEC4AAAA91CB68AA",
+      "root_readback_sha256": "4B22569C3F5500A86F17CC7E74E04E73BBF5AD87D8EC1CDD1D32C3B12B15B572",
+      "counts": {
+        "new_native_processes": 8,
+        "updates_per_process": 25000,
+        "new_lab_completions": 0,
+        "carried_source_lab_completions_not_new": 12,
+        "native_planting_events": 644,
+        "new_scored_samples": 0
+      },
+      "files": 120,
+      "bytes_per_copy": 8090414
+    }
+  ],
+  "adverse": {
+    "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\runtime-current38c-capture-r01-controller\\execution-record\\terminal.json",
+    "sha256": "73AA5AD52E306AEE70C66C9A0F24BD0DAB47E76F56471E7F1303C4CD27CF3FDD",
+    "exception": "The variable '$case' cannot be retrieved because it has not been set.",
+    "new_native_processes": 0,
+    "disposition": "Outer custody caller omitted the helper case id; stopped before native execution or library mutation. Corrected caller supplies an explicit capture id; public/private controller, oracle and thresholds unchanged."
+  },
+  "counts": {
+    "new_native_processes": 22,
+    "source_lab_completions": 12,
+    "pending_saves": 8,
+    "unscored_marker_pilots": 8,
+    "pilot_updates_per_process": 25000,
+    "pilot_native_planting_events": 644,
+    "scored_samples": 0
+  },
+  "restoration": {
+    "controls_and_original_own_archives": true,
+    "published_and_player_keeper": true,
+    "protected_sources": true
+  },
+  "limits": [
+    "Preparation/pilots are not scheduled benchmark observations or a performance verdict.",
+    "Repair creation uses one native --create process per arm; agriculture uses create and source-server processes. The resulting fourteen preparation processes are not twenty-four or sixteen.",
+    "All sixteen warmups and fifty-two scored observations remain required in the fixed sixty-eight-launch schedule.",
+    "No current Library latency, save-load latency, retained-memory, broad compatibility or release qualification follows.",
+    "Old R06 results retain their original engine/candidate/controller identities."
+  ]
+}

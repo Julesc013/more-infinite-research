@@ -1,0 +1,2 @@
+-- This successor owns no configuration callback. Its migration restores only
+-- the actor-owned disabled flag before every mod's configuration callbacks.

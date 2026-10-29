@@ -1,0 +1,1943 @@
+{
+  "schema": 1,
+  "kind": "MIR5F210575ePerformanceNativeChainV1",
+  "status": "complete-native-observations-performance-repeatability-unresolved",
+  "scope": "One exact Bob/Angel/Space Age F210 standalone2.1.23 data/settings and ordinary responsive-menu workload on Black Glass. No save/gameplay/client/runtime/Portal or release qualification follows.",
+  "candidate": {
+    "source_commit": "575e418c72eff2970fa5f6274956f6e8944d4e19",
+    "player_tree": "5ba53a8514b4641c749e91c0a68f32521fb3fee7",
+    "sha256": "A8D0A4590154F3106E59BDB269F1AEB3ED8CC523F18F00ED7D76DC89059F5B8D",
+    "bytes": 691382
+  },
+  "frozen_controller": "6c274a9274edee68df7216d07353092770776c27",
+  "engine": {
+    "path": "D:\\Games\\Factorio\\2.1\\bin\\x64\\factorio.exe",
+    "sha256": "8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38",
+    "file_version": "2.1.23.87750",
+    "product_version": "2.1.23",
+    "base_version": "2.1.23"
+  },
+  "profile": {
+    "path": "D:\\Projects\\Factorio\\mir5-legacy-cannon-credit-r01\\tests\\profiles\\bob-angel-full-space-age-standalone-f210-2123.json",
+    "sha256": "05F2786E896B1F28C2E4239134BA370B0C2BCF6CCB1384E03999FB0E89C8B980"
+  },
+  "published": {
+    "path": "D:\\Projects\\Factorio\\testmods\\2.1\\more-infinite-research_4.7.21003.zip",
+    "sha256": "B6EB9430056ABD384DB00F94929FE7DAC0A37441ACF4BC277946689682628852",
+    "name": "more-infinite-research",
+    "version": "4.7.21003",
+    "root": "more-infinite-research_4.7.21003",
+    "factorio_version": "2.1",
+    "bytes": 1463293
+  },
+  "replay": {
+    "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\f210-performance-575e-capture-pending-r01\\replay-package-r01\\more-infinite-research_4.7.21003.zip",
+    "sha256": "1A921CA95C165A9D012F9CAA84BB873C6AB63F6B77D62AAE681CE1EF7C343E3E",
+    "name": "more-infinite-research",
+    "version": "4.7.21003",
+    "root": "more-infinite-research_4.7.21003",
+    "factorio_version": "2.1",
+    "bytes": 1532319
+  },
+  "plan": {
+    "path": "build/qualification/f210-performance-575e-menu-r01/plan.json",
+    "bytes": 4859,
+    "sha256": "64F172507CE1B57406BCB8D6B39E88A48E45CCB1DDBAB1B41CB802154E06D607"
+  },
+  "raw_result": {
+    "path": "build/qualification/f210-performance-575e-menu-r01/native-output/result.json",
+    "bytes": 385779,
+    "sha256": "8E94C2FB8BAEF5E3B10CD5B3ABBA7254EE31198521C2851BEC82A8D2F11F6828"
+  },
+  "caller": {
+    "path": "build/qualification/f210-performance-575e-menu-r01/Invoke-FrozenMenu.ps1",
+    "bytes": 5463,
+    "sha256": "261C76BEFBB308DD5BE3259418B84F0F020681BACBE013EE9EE9333B7C1610F8"
+  },
+  "terminal": {
+    "path": "build/qualification/f210-performance-575e-menu-r01/execution-record/terminal.json",
+    "bytes": 95821,
+    "sha256": "DB421A6E41A6F7FAD4E155622816C2C0AFF2923135EE9453C9C148A7F7458E97"
+  },
+  "semantic_prerequisites": {
+    "captures": [
+      {
+        "arm": "upstream",
+        "status": "completed-data-stage-observation-only",
+        "result": {
+          "path": "build/qualification/f210-performance-575e-capture-pending-r01/native-upstream/result.json",
+          "bytes": 38424,
+          "sha256": "9C405873A1514483766E4261CB0E6CB73300EA7C64A8D5CD089C11BEC5EFE2B5"
+        },
+        "dumps": {
+          "data_raw": {
+            "path": "write-data/script-output/data-raw-dump.json",
+            "bytes": 67302883,
+            "sha256": "3CEA9040B2ABCB5BD9E8615AC2866A798DACE7B6B31A999CB498B8CFCCA8AB92"
+          },
+          "mod_settings": {
+            "path": "write-data/script-output/mod-settings-dump.json",
+            "bytes": 36519,
+            "sha256": "3CED1BE6BBDDB651DE8D40CE5FAA76BCF41260B386238B0B1F3FA47C14C8B0AB"
+          }
+        },
+        "process_runs": 1
+      },
+      {
+        "arm": "published",
+        "status": "completed-data-stage-observation-only",
+        "result": {
+          "path": "build/qualification/f210-performance-575e-capture-pending-r01/native-published/result.json",
+          "bytes": 39585,
+          "sha256": "FAC74FA343CC894E71D68EE948694AF223E5BD630676BEEB3E55CFB4A6359C2E"
+        },
+        "dumps": {
+          "data_raw": {
+            "path": "write-data/script-output/data-raw-dump.json",
+            "bytes": 67953508,
+            "sha256": "A8935196FBF9A58DA01BB26EFD739CE74941DB2885C6A1514E9379F64A33C3C1"
+          },
+          "mod_settings": {
+            "path": "write-data/script-output/mod-settings-dump.json",
+            "bytes": 1078518,
+            "sha256": "5385BE2E5B4ADD9EC17FAFEB7AB2A01FA60987AAEA849C77347618BD5E8CBBA4"
+          }
+        },
+        "process_runs": 1
+      },
+      {
+        "arm": "candidate",
+        "status": "completed-data-stage-observation-only",
+        "result": {
+          "path": "build/qualification/f210-performance-575e-capture-pending-r01/native-candidate/result.json",
+          "bytes": 39579,
+          "sha256": "E9A800BDEAEFB998E8AB8B236D80AF35166C1E98CF5644FD4715014CC4265F84"
+        },
+        "dumps": {
+          "data_raw": {
+            "path": "write-data/script-output/data-raw-dump.json",
+            "bytes": 67505937,
+            "sha256": "DD2A57EE38D1038F5B76DC25F7C5B9296654C4CEB6117DE2036E774EA83093FA"
+          },
+          "mod_settings": {
+            "path": "write-data/script-output/mod-settings-dump.json",
+            "bytes": 783931,
+            "sha256": "83C3A4166488BFEF80225DE9818810DE4CE0DDD37760C6B17BEC810AC8162D17"
+          }
+        },
+        "process_runs": 1
+      },
+      {
+        "arm": "replay",
+        "status": "completed-data-stage-observation-only",
+        "result": {
+          "path": "build/qualification/f210-performance-575e-capture-pending-r01/native-replay-r01/result.json",
+          "bytes": 39543,
+          "sha256": "457BCA42A9436DE0BEC15CCE7D07065B12CC77F0BCFE8926923C86244064628C"
+        },
+        "dumps": {
+          "data_raw": {
+            "path": "write-data/script-output/data-raw-dump.json",
+            "bytes": 67953508,
+            "sha256": "D5514C623EB1925282D7F2950A00A77372C58815A73D9E32A00334E232E57F90"
+          },
+          "mod_settings": {
+            "path": "write-data/script-output/mod-settings-dump.json",
+            "bytes": 1078518,
+            "sha256": "BCC7E49EDA26DCACE46EC21A7E747FA999CC4042763B76D9403EDB595130F044"
+          }
+        },
+        "process_runs": 1
+      }
+    ],
+    "comparisons": [
+      {
+        "path": "build/qualification/f210-performance-575e-capture-pending-r01/replay-complete-output-comparison-r01.json",
+        "bytes": 20000,
+        "sha256": "643DBFD934E1875D3E7CD0FB11B4278850D0F67E431ACC888183F0C16A7B96B7",
+        "status": "equal-complete-native-output"
+      },
+      {
+        "path": "build/qualification/f210-performance-575e-capture-pending-r01/current-intent-comparison-r01.json",
+        "bytes": 15290,
+        "sha256": "6D6497EC83E45A02C5494D492F182EBD562F56F12A934AA75B1EF95C76C5FD56",
+        "status": "different-intended-native-output"
+      },
+      {
+        "path": "build/qualification/f210-performance-575e-capture-pending-r01/current-intent-comparison-r02.json",
+        "bytes": 15223,
+        "sha256": "AB5FB2034B9C9FB8045EAA3FF647C4ACA964C8E29199717C063B8108DDB3D631",
+        "status": "equal-intended-native-output"
+      }
+    ],
+    "retained_intent_adverse": "The original strict comparison detected four declared legacy-credit rows missing from the older independent intent. PR1308 independently authored those exact rows from published upstream/source-save obligations; all prior160 dispositions remain unchanged. R02 then equals the complete intended data/settings output.",
+    "intent_commit": "eb0c4d98fdb4aad3c96e0988cd45fbff606224b7",
+    "frozen_intent": {
+      "path": "build/qualification/f210-performance-575e-menu-r01/frozen-intent.json",
+      "bytes": 288804,
+      "sha256": "F9335DE6D17A55C378FFEB4026179DBA5F2837B4853059FC7572AB359EE2205E"
+    }
+  },
+  "restoration": {
+    "driver_controls_restored": true,
+    "outer_prior_candidate_restored": true,
+    "terminal_factorio_processes": 0,
+    "independent_next_assignment_before_record": {
+      "path": "build/qualification/library-api-575e-r02-controller/execution-record/before.json",
+      "bytes": 1258,
+      "sha256": "C111F2370C9EFF568871E001DF9F6D72D167A101AF5C19390AFCF1B5ADEB3D49"
+    },
+    "note": "The subsequent guarded assignment independently required original C563 keeper and A15 observer before staging. Current library is separately owned by that new assignment; no concurrent mutation/readback of its selected archives is performed here."
+  },
+  "readback": {
+    "path": "build/qualification/f210-performance-575e-menu-r01/root-readback-r01.json",
+    "bytes": 101645,
+    "sha256": "FC731A16A5AEB5C029FE1E53AC755684ABBAA63FF337105A0381B80E4365738D",
+    "files": 469,
+    "bytes_per_copy": 1264806723
+  },
+  "receipt_capsule": {
+    "path": "spec/evidence/f210-575e-menu-native-receipts-r01.json.gz",
+    "sha256": "63C7FCD2AE711BB530D5C441A66018A23AEEF57C0335C59EE8BAF201FC7ED06F",
+    "bytes": 137518,
+    "uncompressed_bytes": 812470,
+    "records": 10,
+    "round_trip": "all exact original bytes verified"
+  },
+  "analysis": {
+    "status": "analysis-complete-with-adverse-repeatability-control",
+    "method_recorded": "after execution; uses existing eight-block Student-t arithmetic and the unchanged pre-execution sample/tolerance plan; no samples discarded or extensions",
+    "arithmetic_source": {
+      "path": "tools/analyze_menu_comparison.py",
+      "bytes": 43342,
+      "sha256": "E21501403BB90A769B2806793B6930E00F2596ED2734E65352DDB1C257811371"
+    },
+    "degrees_of_freedom": 7,
+    "critical_value": 2.3646242510102993,
+    "assumption": "Eight paired blocks treated as independent and roughly symmetric. Small-sample intervals do not prove equivalence, universality or an acceptance pass.",
+    "arm_totals_seconds": {
+      "control-without-mir": {
+        "n": 8,
+        "arithmetic_mean_seconds": 28.82523915,
+        "sample_standard_deviation_seconds": 0.37907394571662134,
+        "minimum_seconds": 28.2821935,
+        "maximum_seconds": 29.529313,
+        "student_t_95_mean_interval_seconds": {
+          "lower": 28.508325400614247,
+          "upper": 29.142152899385756
+        }
+      },
+      "published-4.7": {
+        "n": 8,
+        "arithmetic_mean_seconds": 31.906296025,
+        "sample_standard_deviation_seconds": 0.48821167966924184,
+        "minimum_seconds": 31.4418196,
+        "maximum_seconds": 32.601,
+        "student_t_95_mean_interval_seconds": {
+          "lower": 31.498140846713074,
+          "upper": 32.31445120328693
+        }
+      },
+      "replay": {
+        "n": 8,
+        "arithmetic_mean_seconds": 29.1199110625,
+        "sample_standard_deviation_seconds": 0.4815054200383358,
+        "minimum_seconds": 28.5923744,
+        "maximum_seconds": 29.9679201,
+        "student_t_95_mean_interval_seconds": {
+          "lower": 28.717362457569013,
+          "upper": 29.52245966743099
+        }
+      },
+      "candidate-mir5": {
+        "n": 8,
+        "arithmetic_mean_seconds": 29.164194925,
+        "sample_standard_deviation_seconds": 0.6479959387158926,
+        "minimum_seconds": 28.53866,
+        "maximum_seconds": 30.4150147,
+        "student_t_95_mean_interval_seconds": {
+          "lower": 28.622456763235878,
+          "upper": 29.705933086764123
+        }
+      }
+    },
+    "paired_blocks": [
+      {
+        "block": 1,
+        "seconds": {
+          "control-without-mir": 29.0638322,
+          "published-4.7": 31.4642303,
+          "replay": 28.5923744,
+          "candidate-mir5": 29.222566
+        },
+        "d4_seconds": 2.4003981000000003,
+        "d5_seconds": 0.15873380000000026,
+        "q50_seconds": -1.04146525
+      },
+      {
+        "block": 2,
+        "seconds": {
+          "published-4.7": 32.601,
+          "replay": 29.0642689,
+          "candidate-mir5": 29.8612507,
+          "control-without-mir": 29.529313
+        },
+        "d4_seconds": 3.0716870000000007,
+        "d5_seconds": 0.331937700000001,
+        "q50_seconds": -1.2039057999999994
+      },
+      {
+        "block": 3,
+        "seconds": {
+          "replay": 29.6276094,
+          "candidate-mir5": 28.7326501,
+          "control-without-mir": 28.5058699,
+          "published-4.7": 32.1832937
+        },
+        "d4_seconds": 3.6774237999999997,
+        "d5_seconds": 0.22678020000000032,
+        "q50_seconds": -1.6119316999999995
+      },
+      {
+        "block": 4,
+        "seconds": {
+          "candidate-mir5": 28.8182333,
+          "control-without-mir": 28.8218309,
+          "published-4.7": 31.8267965,
+          "replay": 28.7928346
+        },
+        "d4_seconds": 3.004965600000002,
+        "d5_seconds": -0.0035975999999990904,
+        "q50_seconds": -1.5060804
+      },
+      {
+        "block": 5,
+        "seconds": {
+          "control-without-mir": 28.7344473,
+          "published-4.7": 32.5899799,
+          "replay": 29.9679201,
+          "candidate-mir5": 28.9187372
+        },
+        "d4_seconds": 3.8555326000000036,
+        "d5_seconds": 0.18428989999999956,
+        "q50_seconds": -1.7434764000000023
+      },
+      {
+        "block": 6,
+        "seconds": {
+          "published-4.7": 31.4418196,
+          "replay": 29.2746887,
+          "candidate-mir5": 30.4150147,
+          "control-without-mir": 28.2821935
+        },
+        "d4_seconds": 3.159626099999997,
+        "d5_seconds": 2.1328211999999986,
+        "q50_seconds": 0.5530081500000001
+      },
+      {
+        "block": 7,
+        "seconds": {
+          "replay": 28.6561023,
+          "candidate-mir5": 28.53866,
+          "control-without-mir": 28.987109,
+          "published-4.7": 31.5616662
+        },
+        "d4_seconds": 2.574557200000001,
+        "d5_seconds": -0.4484490000000001,
+        "q50_seconds": -1.7357276000000006
+      },
+      {
+        "block": 8,
+        "seconds": {
+          "candidate-mir5": 28.8064474,
+          "control-without-mir": 28.6773174,
+          "published-4.7": 31.581582,
+          "replay": 28.9834901
+        },
+        "d4_seconds": 2.904264600000001,
+        "d5_seconds": 0.12912999999999997,
+        "q50_seconds": -1.3230023000000006
+      }
+    ],
+    "d4_published_added_seconds": {
+      "n": 8,
+      "arithmetic_mean_seconds": 3.0810568750000007,
+      "sample_standard_deviation_seconds": 0.49549553189757967,
+      "minimum_seconds": 2.4003981000000003,
+      "maximum_seconds": 3.8555326000000036,
+      "student_t_95_mean_interval_seconds": {
+        "lower": 2.6668122438616244,
+        "upper": 3.495301506138377
+      }
+    },
+    "d5_candidate_added_seconds": {
+      "n": 8,
+      "arithmetic_mean_seconds": 0.33895577500000007,
+      "sample_standard_deviation_seconds": 0.7623612959977113,
+      "minimum_seconds": -0.4484490000000001,
+      "maximum_seconds": 2.1328211999999986,
+      "student_t_95_mean_interval_seconds": {
+        "lower": -0.2983942181378273,
+        "upper": 0.9763057681378274
+      }
+    },
+    "candidate_minus_published_seconds": {
+      "n": 8,
+      "arithmetic_mean_seconds": -2.7421011000000006,
+      "sample_standard_deviation_seconds": 0.8201934528523842,
+      "minimum_seconds": -3.671242700000004,
+      "maximum_seconds": -1.0268048999999984,
+      "student_t_95_mean_interval_seconds": {
+        "lower": -3.4277999861993957,
+        "upper": -2.0564022138006055
+      }
+    },
+    "candidate_minus_replay_seconds": {
+      "n": 8,
+      "arithmetic_mean_seconds": 0.04428386249999994,
+      "sample_standard_deviation_seconds": 0.78052136022914,
+      "minimum_seconds": -1.0491829000000017,
+      "maximum_seconds": 1.1403260000000017,
+      "student_t_95_mean_interval_seconds": {
+        "lower": -0.6082483242697013,
+        "upper": 0.6968160492697012
+      }
+    },
+    "q50_seconds": {
+      "n": 8,
+      "arithmetic_mean_seconds": -1.2015726625000003,
+      "sample_standard_deviation_seconds": 0.7520485804361289,
+      "minimum_seconds": -1.7434764000000023,
+      "maximum_seconds": 0.5530081500000001,
+      "student_t_95_mean_interval_seconds": {
+        "lower": -1.8303010096716523,
+        "upper": -0.5728443153283483
+      }
+    },
+    "same_version_pilot": {
+      "seconds": [
+        31.7074013,
+        33.5906019
+      ],
+      "absolute_difference_seconds": 1.8832006000000021,
+      "allowed_seconds": 1.6324500800000004,
+      "passed": false
+    },
+    "late_minus_early_control_seconds": -0.3099446999999991,
+    "control_drift_passed": true,
+    "estimated_added_time_reduction_percent": 88.99871736382666,
+    "numerical_50_percent_objective_interval_supported": true,
+    "performance_acceptance": false,
+    "adverse": [
+      "same-version-aa-outside-predeclared-tolerance"
+    ],
+    "memory": {
+      "control-without-mir": {
+        "max_peak_working_set_bytes": 3158106112,
+        "max_peak_sampled_private_bytes": 9247313920
+      },
+      "published-4.7": {
+        "max_peak_working_set_bytes": 3437076480,
+        "max_peak_sampled_private_bytes": 9510428672
+      },
+      "replay": {
+        "max_peak_working_set_bytes": 3260305408,
+        "max_peak_sampled_private_bytes": 9301483520
+      },
+      "candidate-mir5": {
+        "max_peak_working_set_bytes": 3305365504,
+        "max_peak_sampled_private_bytes": 9307852800
+      }
+    },
+    "memory_acceptance": "not determined by this endpoint analysis"
+  },
+  "observations": [
+    {
+      "schedule": {
+        "ordinal": 1,
+        "phase": "warmup",
+        "arm": "control-without-mir",
+        "block": 0,
+        "position": 1,
+        "label": "01-warmup-control-without-mir"
+      },
+      "elapsed_seconds": 195.9744,
+      "menu_response": {
+        "status": "validated-recorded-menu-interaction-response",
+        "endpoint_class": "ordinary-responsive-menu",
+        "elapsed_seconds": 195.9744,
+        "elapsed_lower_bound_seconds": 195.9699503,
+        "process_start_bracket_seconds": 0.0044497,
+        "response_observed_qpc": 21694931772494,
+        "clock_frequency": 10000000,
+        "process_id": 14864,
+        "first_menu_sha256": "43643098B888E7A3D073F6C5BD01F2E4F4E6D4B9F5896EFF195A165D90253AC1",
+        "settings_response_sha256": "49BE92DF9A08FBCB94086F5BED2F7C2E028E2E5C81A112CA8E3B2B5E903DE615",
+        "interaction_response_seconds": 0.4332741,
+        "observer_max_iteration_seconds": 0.5439258,
+        "poll_interval_milliseconds": 100,
+        "shutdown_and_cleanup_included": false,
+        "claims_live_process_or_native_acceptance": false
+      },
+      "process_memory": {
+        "peak_working_set_bytes": 3204726784,
+        "peak_sampled_private_bytes": 9487613952,
+        "measurement": "NativeProbeResources monitored the governed actor and its owned Factorio child; values are not whole-system memory"
+      },
+      "actor_sha256": "E7798942269A3ACC7301B9738E87B57513ECF95E65367181295F8060718AF791",
+      "resource_ledger": {
+        "path": "build/qualification/f210-performance-575e-menu-r01/native-output/process-1.resources.jsonl",
+        "bytes": 95159,
+        "sha256": "B1B707C2ECC49DE5F24454151CDF6B0A2865759A3EC384913525CB5E7C36F006"
+      }
+    },
+    {
+      "schedule": {
+        "ordinal": 2,
+        "phase": "warmup",
+        "arm": "published-4.7",
+        "block": 0,
+        "position": 2,
+        "label": "02-warmup-published-4.7"
+      },
+      "elapsed_seconds": 32.5783137,
+      "menu_response": {
+        "status": "validated-recorded-menu-interaction-response",
+        "endpoint_class": "ordinary-responsive-menu",
+        "elapsed_seconds": 32.5783137,
+        "elapsed_lower_bound_seconds": 32.5740038,
+        "process_start_bracket_seconds": 0.0043099,
+        "response_observed_qpc": 21695311546372,
+        "clock_frequency": 10000000,
+        "process_id": 13008,
+        "first_menu_sha256": "549C2043F8AF31549CED8556B8C85E3B0F7EA78F22D32FBFC7D3A45954606A0D",
+        "settings_response_sha256": "AF9D7742922D3732BD96DC0455CE40E1FB1CB173888E7A74E501825ECEBCC9A1",
+        "interaction_response_seconds": 0.902836,
+        "observer_max_iteration_seconds": 0.8036346999999999,
+        "poll_interval_milliseconds": 100,
+        "shutdown_and_cleanup_included": false,
+        "claims_live_process_or_native_acceptance": false
+      },
+      "process_memory": {
+        "peak_working_set_bytes": 2840612864,
+        "peak_sampled_private_bytes": 8974213120,
+        "measurement": "NativeProbeResources monitored the governed actor and its owned Factorio child; values are not whole-system memory"
+      },
+      "actor_sha256": "A2F126C06022E0A04B1ED69876CFFEB7071C572D89E699AC48A9B412BA224275",
+      "resource_ledger": {
+        "path": "build/qualification/f210-performance-575e-menu-r01/native-output/process-2.resources.jsonl",
+        "bytes": 15506,
+        "sha256": "E4F0DC7AB6987EE91A9D21C1802CF374A53859227D4C7FD1FBC8D9A2FD57BDD2"
+      }
+    },
+    {
+      "schedule": {
+        "ordinal": 3,
+        "phase": "warmup",
+        "arm": "replay",
+        "block": 0,
+        "position": 3,
+        "label": "03-warmup-replay"
+      },
+      "elapsed_seconds": 28.9461553,
+      "menu_response": {
+        "status": "validated-recorded-menu-interaction-response",
+        "endpoint_class": "ordinary-responsive-menu",
+        "elapsed_seconds": 28.9461553,
+        "elapsed_lower_bound_seconds": 28.9416726,
+        "process_start_bracket_seconds": 0.0044827,
+        "response_observed_qpc": 21695650519222,
+        "clock_frequency": 10000000,
+        "process_id": 30024,
+        "first_menu_sha256": "A8433A946634B154E8D8D883FDA0DEDC096C0E2ADCC5519BAEDC2D885B1804AB",
+        "settings_response_sha256": "5EAF3D4A3D808607E73E41A30E0D58EABFF81F5ACE26BC62FFA59AF6665112F9",
+        "interaction_response_seconds": 0.643858,
+        "observer_max_iteration_seconds": 0.7031428,
+        "poll_interval_milliseconds": 100,
+        "shutdown_and_cleanup_included": false,
+        "claims_live_process_or_native_acceptance": false
+      },
+      "process_memory": {
+        "peak_working_set_bytes": 3232083968,
+        "peak_sampled_private_bytes": 9506402304,
+        "measurement": "NativeProbeResources monitored the governed actor and its owned Factorio child; values are not whole-system memory"
+      },
+      "actor_sha256": "8D7654A6C5E6AD5BD4959C738285E36D7C6FFFA64B6D50B5F305E8A375CF1C6A",
+      "resource_ledger": {
+        "path": "build/qualification/f210-performance-575e-menu-r01/native-output/process-3.resources.jsonl",
+        "bytes": 14284,
+        "sha256": "7B550A6DB8DA7F7E6A4853DDEA190D5903D3BF8298B6417497CDBDAA34FDF085"
+      }
+    },
+    {
+      "schedule": {
+        "ordinal": 4,
+        "phase": "warmup",
+        "arm": "candidate-mir5",
+        "block": 0,
+        "position": 4,
+        "label": "04-warmup-candidate-mir5"
+      },
+      "elapsed_seconds": 29.4663727,
+      "menu_response": {
+        "status": "validated-recorded-menu-interaction-response",
+        "endpoint_class": "ordinary-responsive-menu",
+        "elapsed_seconds": 29.4663727,
+        "elapsed_lower_bound_seconds": 29.4619299,
+        "process_start_bracket_seconds": 0.0044428,
+        "response_observed_qpc": 21695991856808,
+        "clock_frequency": 10000000,
+        "process_id": 84912,
+        "first_menu_sha256": "DD51F95346E729FF8E3D3991673364C399D7C00671AB220276FEFE83513FB8B2",
+        "settings_response_sha256": "2B6474D6AD8179C941872BFAF8F253F85953309727DF0EEA9AFF4B0A3B6DEFA7",
+        "interaction_response_seconds": 1.4290803,
+        "observer_max_iteration_seconds": 0.7742684999999999,
+        "poll_interval_milliseconds": 100,
+        "shutdown_and_cleanup_included": false,
+        "claims_live_process_or_native_acceptance": false
+      },
+      "process_memory": {
+        "peak_working_set_bytes": 3075268608,
+        "peak_sampled_private_bytes": 9031544832,
+        "measurement": "NativeProbeResources monitored the governed actor and its owned Factorio child; values are not whole-system memory"
+      },
+      "actor_sha256": "2DAFB452E6231B8EA67D00C38C9D201E390874806807C47CA28452452452763F",
+      "resource_ledger": {
+        "path": "build/qualification/f210-performance-575e-menu-r01/native-output/process-4.resources.jsonl",
+        "bytes": 14284,
+        "sha256": "A6889BE5CACB0724FDA8ACB08B69D835E612DB08D3F713187C586553F33819C7"
+      }
+    },
+    {
+      "schedule": {
+        "ordinal": 5,
+        "phase": "aa-pilot",
+        "arm": "published-4.7",
+        "block": 0,
+        "position": 1,
+        "label": "05-aa-pilot-published-4.7"
+      },
+      "elapsed_seconds": 31.7074013,
+      "menu_response": {
+        "status": "validated-recorded-menu-interaction-response",
+        "endpoint_class": "ordinary-responsive-menu",
+        "elapsed_seconds": 31.7074013,
+        "elapsed_lower_bound_seconds": 31.7032079,
+        "process_start_bracket_seconds": 0.0041934,
+        "response_observed_qpc": 21696363453049,
+        "clock_frequency": 10000000,
+        "process_id": 17284,
+        "first_menu_sha256": "8751A736A8CF5CD72D2FC900F1ADD0B0D2DC4041159BCD0AC0214DE811141F62",
+        "settings_response_sha256": "9BC71550E5111A26EFD7A1C145A91856F374616B091878CEBEC912A676F722A0",
+        "interaction_response_seconds": 0.7583188,
+        "observer_max_iteration_seconds": 0.7386826,
+        "poll_interval_milliseconds": 100,
+        "shutdown_and_cleanup_included": false,
+        "claims_live_process_or_native_acceptance": false
+      },
+      "process_memory": {
+        "peak_working_set_bytes": 3270533120,
+        "peak_sampled_private_bytes": 9484595200,
+        "measurement": "NativeProbeResources monitored the governed actor and its owned Factorio child; values are not whole-system memory"
+      },
+      "actor_sha256": "2358F6096B214293356DE73B29CA641350B24C6FBE041B36606604C684140C1F",
+      "resource_ledger": {
+        "path": "build/qualification/f210-performance-575e-menu-r01/native-output/process-5.resources.jsonl",
+        "bytes": 15506,
+        "sha256": "BD93A0CC6A710CEA79A0E793CFA5EE3431BF259EA1B5F33ADAB92C6F86A39D4E"
+      }
+    },
+    {
+      "schedule": {
+        "ordinal": 6,
+        "phase": "aa-pilot",
+        "arm": "published-4.7",
+        "block": 0,
+        "position": 2,
+        "label": "06-aa-pilot-published-4.7"
+      },
+      "elapsed_seconds": 33.5906019,
+      "menu_response": {
+        "status": "validated-recorded-menu-interaction-response",
+        "endpoint_class": "ordinary-responsive-menu",
+        "elapsed_seconds": 33.5906019,
+        "elapsed_lower_bound_seconds": 33.5864758,
+        "process_start_bracket_seconds": 0.0041261,
+        "response_observed_qpc": 21696745959652,
+        "clock_frequency": 10000000,
+        "process_id": 43452,
+        "first_menu_sha256": "ACDDD42257B8E9DA14AC42B3B626E68AE362C2329E33D5133581522547E2A4F3",
+        "settings_response_sha256": "88C7FB11EBF6F7A315CF7BF6C7ED0D895E6F87F1F0572B51EC8657D783993BAE",
+        "interaction_response_seconds": 1.104044,
+        "observer_max_iteration_seconds": 0.6750667,
+        "poll_interval_milliseconds": 100,
+        "shutdown_and_cleanup_included": false,
+        "claims_live_process_or_native_acceptance": false
+      },
+      "process_memory": {
+        "peak_working_set_bytes": 3129286656,
+        "peak_sampled_private_bytes": 9363836928,
+        "measurement": "NativeProbeResources monitored the governed actor and its owned Factorio child; values are not whole-system memory"
+      },
+      "actor_sha256": "5A735F68E28A9F813B06A6F48397BBA2790873BB499E1B2F5DBA70A040FF5324",
+      "resource_ledger": {
+        "path": "build/qualification/f210-performance-575e-menu-r01/native-output/process-6.resources.jsonl",
+        "bytes": 16118,
+        "sha256": "DAB35DB308DD321A37F0AE561FE2D2514FEC319DC34727EE6DE24ADE851CCC51"
+      }
+    },
+    {
+      "schedule": {
+        "ordinal": 7,
+        "phase": "counterbalanced-comparison",
+        "arm": "control-without-mir",
+        "block": 1,
+        "position": 1,
+        "label": "07-counterbalanced-comparison-control-without-mir"
+      },
+      "elapsed_seconds": 29.0638322,
+      "menu_response": {
+        "status": "validated-recorded-menu-interaction-response",
+        "endpoint_class": "ordinary-responsive-menu",
+        "elapsed_seconds": 29.0638322,
+        "elapsed_lower_bound_seconds": 29.0597026,
+        "process_start_bracket_seconds": 0.0041296,
+        "response_observed_qpc": 21697082600666,
+        "clock_frequency": 10000000,
+        "process_id": 83336,
+        "first_menu_sha256": "2F6BCD84C972D87285111159199E6AD7D46668C524460F5AD688E199030407F1",
+        "settings_response_sha256": "AF8A5C0425A32AE1B6B050F45A89B75DEDE59E73275F1C8891876684CF1C4BE7",
+        "interaction_response_seconds": 0.5076822,
+        "observer_max_iteration_seconds": 0.7051278,
+        "poll_interval_milliseconds": 100,
+        "shutdown_and_cleanup_included": false,
+        "claims_live_process_or_native_acceptance": false
+      },
+      "process_memory": {
+        "peak_working_set_bytes": 2774056960,
+        "peak_sampled_private_bytes": 8843087872,
+        "measurement": "NativeProbeResources monitored the governed actor and its owned Factorio child; values are not whole-system memory"
+      },
+      "actor_sha256": "08DC8F98B1938EF45388BE3650D9349ED4DAD0A462B7A7A6BDD743CC42DAAA42",
+      "resource_ledger": {
+        "path": "build/qualification/f210-performance-575e-menu-r01/native-output/process-7.resources.jsonl",
+        "bytes": 13670,
+        "sha256": "D6A1423514F4F2C808D41343FD0B4EBCE36DBD15DDA9806E1B5F6F4F3E9A7D8D"
+      }
+    },
+    {
+      "schedule": {
+        "ordinal": 8,
+        "phase": "counterbalanced-comparison",
+        "arm": "published-4.7",
+        "block": 1,
+        "position": 2,
+        "label": "08-counterbalanced-comparison-published-4.7"
+      },
+      "elapsed_seconds": 31.4642303,
+      "menu_response": {
+        "status": "validated-recorded-menu-interaction-response",
+        "endpoint_class": "ordinary-responsive-menu",
+        "elapsed_seconds": 31.4642303,
+        "elapsed_lower_bound_seconds": 31.4594807,
+        "process_start_bracket_seconds": 0.0047496,
+        "response_observed_qpc": 21697442911722,
+        "clock_frequency": 10000000,
+        "process_id": 87384,
+        "first_menu_sha256": "45126428F51DC86BB34A9EB2877C384536DC6B68333B1C408AEFB4C9B5528198",
+        "settings_response_sha256": "2BBD8B2EC9672940EE88DFA44713ED447B125C278D148713845D72C944B07320",
+        "interaction_response_seconds": 0.6858246,
+        "observer_max_iteration_seconds": 0.8001091,
+        "poll_interval_milliseconds": 100,
+        "shutdown_and_cleanup_included": false,
+        "claims_live_process_or_native_acceptance": false
+      },
+      "process_memory": {
+        "peak_working_set_bytes": 2955804672,
+        "peak_sampled_private_bytes": 9153105920,
+        "measurement": "NativeProbeResources monitored the governed actor and its owned Factorio child; values are not whole-system memory"
+      },
+      "actor_sha256": "677596FC1B47D5C9537BEB169AD023FF430B0622C8874A146618EE6CCE6F0886",
+      "resource_ledger": {
+        "path": "build/qualification/f210-performance-575e-menu-r01/native-output/process-8.resources.jsonl",
+        "bytes": 15480,
+        "sha256": "94D662EE4F4E4F791A1D09564E45361FCE7408BF08FBD00ABCCC08A32CF6DBF6"
+      }
+    },
+    {
+      "schedule": {
+        "ordinal": 9,
+        "phase": "counterbalanced-comparison",
+        "arm": "replay",
+        "block": 1,
+        "position": 3,
+        "label": "09-counterbalanced-comparison-replay"
+      },
+      "elapsed_seconds": 28.5923744,
+      "menu_response": {
+        "status": "validated-recorded-menu-interaction-response",
+        "endpoint_class": "ordinary-responsive-menu",
+        "elapsed_seconds": 28.5923744,
+        "elapsed_lower_bound_seconds": 28.5880903,
+        "process_start_bracket_seconds": 0.0042841,
+        "response_observed_qpc": 21697776090121,
+        "clock_frequency": 10000000,
+        "process_id": 87416,
+        "first_menu_sha256": "880D5D749B4F1F1983082B6F7701823C7EB57EB3CC4A5F1862A9284D36986B3E",
+        "settings_response_sha256": "373256E33AF2FDC77A56ADF4497B3826E4B9DA75883936D41D5DE49712FBF214",
+        "interaction_response_seconds": 0.6806631,
+        "observer_max_iteration_seconds": 0.7053915,
+        "poll_interval_milliseconds": 100,
+        "shutdown_and_cleanup_included": false,
+        "claims_live_process_or_native_acceptance": false
+      },
+      "process_memory": {
+        "peak_working_set_bytes": 2887016448,
+        "peak_sampled_private_bytes": 8881496064,
+        "measurement": "NativeProbeResources monitored the governed actor and its owned Factorio child; values are not whole-system memory"
+      },
+      "actor_sha256": "B9A21199BDC6527ECA4536397DFF7B65050A245A08C9809A0979C33D325D24BC",
+      "resource_ledger": {
+        "path": "build/qualification/f210-performance-575e-menu-r01/native-output/process-9.resources.jsonl",
+        "bytes": 13670,
+        "sha256": "3DD67F7CB6DB80A6B9E0C0C95CFB16CBF979D7586A6D3CA6B34047D586E6EAB5"
+      }
+    },
+    {
+      "schedule": {
+        "ordinal": 10,
+        "phase": "counterbalanced-comparison",
+        "arm": "candidate-mir5",
+        "block": 1,
+        "position": 4,
+        "label": "10-counterbalanced-comparison-candidate-mir5"
+      },
+      "elapsed_seconds": 29.222566,
+      "menu_response": {
+        "status": "validated-recorded-menu-interaction-response",
+        "endpoint_class": "ordinary-responsive-menu",
+        "elapsed_seconds": 29.222566,
+        "elapsed_lower_bound_seconds": 29.2183159,
+        "process_start_bracket_seconds": 0.0042501,
+        "response_observed_qpc": 21698117857040,
+        "clock_frequency": 10000000,
+        "process_id": 86440,
+        "first_menu_sha256": "0D383E039DCE1A0878720EE2C4E42FF82417E63BA5415B1112A5ED0659F4A8FA",
+        "settings_response_sha256": "E02D72DF91F0554F557E7088925186E0BC66E2519D1781FA00E66F8D45D4E01E",
+        "interaction_response_seconds": 0.6635643,
+        "observer_max_iteration_seconds": 0.563798,
+        "poll_interval_milliseconds": 100,
+        "shutdown_and_cleanup_included": false,
+        "claims_live_process_or_native_acceptance": false
+      },
+      "process_memory": {
+        "peak_working_set_bytes": 2914676736,
+        "peak_sampled_private_bytes": 9073238016,
+        "measurement": "NativeProbeResources monitored the governed actor and its owned Factorio child; values are not whole-system memory"
+      },
+      "actor_sha256": "44AB00A3184DED6E9E3ECE1FD58248656711BA5B76CDB053B8C20F034D3AC5FB",
+      "resource_ledger": {
+        "path": "build/qualification/f210-performance-575e-menu-r01/native-output/process-10.resources.jsonl",
+        "bytes": 14283,
+        "sha256": "B2F50291DC4A82980DEB92F5C9258FAFF9F7901FE4F49BFEB8BCB15A44D6F1D6"
+      }
+    },
+    {
+      "schedule": {
+        "ordinal": 11,
+        "phase": "counterbalanced-comparison",
+        "arm": "published-4.7",
+        "block": 2,
+        "position": 1,
+        "label": "11-counterbalanced-comparison-published-4.7"
+      },
+      "elapsed_seconds": 32.601,
+      "menu_response": {
+        "status": "validated-recorded-menu-interaction-response",
+        "endpoint_class": "ordinary-responsive-menu",
+        "elapsed_seconds": 32.601,
+        "elapsed_lower_bound_seconds": 32.5968446,
+        "process_start_bracket_seconds": 0.0041554,
+        "response_observed_qpc": 21698492451405,
+        "clock_frequency": 10000000,
+        "process_id": 40176,
+        "first_menu_sha256": "1EE1900F97D2EB037E6CE0DC3D4FB3DDC169753E78A315B133541BA0054849E0",
+        "settings_response_sha256": "DFC6BBE04283AAD36B9E2FDE6ABF53345F6CC4AACECC6C9E4F326290A44715A4",
+        "interaction_response_seconds": 1.8568316,
+        "observer_max_iteration_seconds": 0.9039288,
+        "poll_interval_milliseconds": 100,
+        "shutdown_and_cleanup_included": false,
+        "claims_live_process_or_native_acceptance": false
+      },
+      "process_memory": {
+        "peak_working_set_bytes": 3246833664,
+        "peak_sampled_private_bytes": 9468026880,
+        "measurement": "NativeProbeResources monitored the governed actor and its owned Factorio child; values are not whole-system memory"
+      },
+      "actor_sha256": "E7053871BFAC96317086BBC163B7A149C8CAC97B1FD6A7D5A4C08A86990C3249",
+      "resource_ledger": {
+        "path": "build/qualification/f210-performance-575e-menu-r01/native-output/process-11.resources.jsonl",
+        "bytes": 16120,
+        "sha256": "216EB615857BD857F10655C4904CE13C21D419FF2FD317E2B489BF9A142B0C30"
+      }
+    },
+    {
+      "schedule": {
+        "ordinal": 12,
+        "phase": "counterbalanced-comparison",
+        "arm": "replay",
+        "block": 2,
+        "position": 2,
+        "label": "12-counterbalanced-comparison-replay"
+      },
+      "elapsed_seconds": 29.0642689,
+      "menu_response": {
+        "status": "validated-recorded-menu-interaction-response",
+        "endpoint_class": "ordinary-responsive-menu",
+        "elapsed_seconds": 29.0642689,
+        "elapsed_lower_bound_seconds": 29.0599297,
+        "process_start_bracket_seconds": 0.0043392,
+        "response_observed_qpc": 21698829374634,
+        "clock_frequency": 10000000,
+        "process_id": 9564,
+        "first_menu_sha256": "6DC2BBE3D5E866572A8084DFF2628840958F6B31AF47F0D6CA1A0A68DE1B2512",
+        "settings_response_sha256": "650E4EAA60B1B15844AF5C69CCF53DE20124D21B16DDCAA962E81C37E6C8CC46",
+        "interaction_response_seconds": 0.6724932,
+        "observer_max_iteration_seconds": 0.8144659,
+        "poll_interval_milliseconds": 100,
+        "shutdown_and_cleanup_included": false,
+        "claims_live_process_or_native_acceptance": false
+      },
+      "process_memory": {
+        "peak_working_set_bytes": 2760265728,
+        "peak_sampled_private_bytes": 8917708800,
+        "measurement": "NativeProbeResources monitored the governed actor and its owned Factorio child; values are not whole-system memory"
+      },
+      "actor_sha256": "5644C91D8501A22C50B3B62BB5E90E97CFC4A267779F4929AFCFDFFDC2973821",
+      "resource_ledger": {
+        "path": "build/qualification/f210-performance-575e-menu-r01/native-output/process-12.resources.jsonl",
+        "bytes": 14283,
+        "sha256": "A41626DA0D897BE5C8CA6A6D930831360A4E1D6877F126CC2D88B15105B868CA"
+      }
+    },
+    {
+      "schedule": {
+        "ordinal": 13,
+        "phase": "counterbalanced-comparison",
+        "arm": "candidate-mir5",
+        "block": 2,
+        "position": 3,
+        "label": "13-counterbalanced-comparison-candidate-mir5"
+      },
+      "elapsed_seconds": 29.8612507,
+      "menu_response": {
+        "status": "validated-recorded-menu-interaction-response",
+        "endpoint_class": "ordinary-responsive-menu",
+        "elapsed_seconds": 29.8612507,
+        "elapsed_lower_bound_seconds": 29.8570876,
+        "process_start_bracket_seconds": 0.0041631,
+        "response_observed_qpc": 21699178382852,
+        "clock_frequency": 10000000,
+        "process_id": 77760,
+        "first_menu_sha256": "7D12F5A2E78A56046A6D01CBCBB9E6AF009951A99EAF7417BA54A6FE90265F02",
+        "settings_response_sha256": "2B74DFA4523E905EBDAF3B7F72777D8376FB7CC023165A063ED6E7EC6E125643",
+        "interaction_response_seconds": 0.6274297,
+        "observer_max_iteration_seconds": 0.8247758,
+        "poll_interval_milliseconds": 100,
+        "shutdown_and_cleanup_included": false,
+        "claims_live_process_or_native_acceptance": false
+      },
+      "process_memory": {
+        "peak_working_set_bytes": 2962227200,
+        "peak_sampled_private_bytes": 9019080704,
+        "measurement": "NativeProbeResources monitored the governed actor and its owned Factorio child; values are not whole-system memory"
+      },
+      "actor_sha256": "A345AB715608E30E9B4F6011DD55C01FDEBF69ECA130304AD2E048C4CB9AB2F6",
+      "resource_ledger": {
+        "path": "build/qualification/f210-performance-575e-menu-r01/native-output/process-13.resources.jsonl",
+        "bytes": 14284,
+        "sha256": "174B68C377563EC6F51BF81A0BEF4B896FE796EF9619FA7BF2DB7D946E03265A"
+      }
+    },
+    {
+      "schedule": {
+        "ordinal": 14,
+        "phase": "counterbalanced-comparison",
+        "arm": "control-without-mir",
+        "block": 2,
+        "position": 4,
+        "label": "14-counterbalanced-comparison-control-without-mir"
+      },
+      "elapsed_seconds": 29.529313,
+      "menu_response": {
+        "status": "validated-recorded-menu-interaction-response",
+        "endpoint_class": "ordinary-responsive-menu",
+        "elapsed_seconds": 29.529313,
+        "elapsed_lower_bound_seconds": 29.5247335,
+        "process_start_bracket_seconds": 0.0045795,
+        "response_observed_qpc": 21699521056337,
+        "clock_frequency": 10000000,
+        "process_id": 49976,
+        "first_menu_sha256": "92EFF8FE3FB6D7435B4C1E2E3F48573B7D65E5E1D1B3FEEE78F615546867EB09",
+        "settings_response_sha256": "2709656D5BD55FD2253BB94F987DE803F3F5941511C98208578B7FE5EBD4890C",
+        "interaction_response_seconds": 1.2905863,
+        "observer_max_iteration_seconds": 0.6678972,
+        "poll_interval_milliseconds": 100,
+        "shutdown_and_cleanup_included": false,
+        "claims_live_process_or_native_acceptance": false
+      },
+      "process_memory": {
+        "peak_working_set_bytes": 3158106112,
+        "peak_sampled_private_bytes": 9247313920,
+        "measurement": "NativeProbeResources monitored the governed actor and its owned Factorio child; values are not whole-system memory"
+      },
+      "actor_sha256": "D96B39A21518E32FCFCE9AC2A36EC145CADD2E8093454BBAADB29D93903E316C",
+      "resource_ledger": {
+        "path": "build/qualification/f210-performance-575e-menu-r01/native-output/process-14.resources.jsonl",
+        "bytes": 14284,
+        "sha256": "1890D9893365CEDF2402E627E9309F502465775382A78681A6D6BBD32882D75E"
+      }
+    },
+    {
+      "schedule": {
+        "ordinal": 15,
+        "phase": "counterbalanced-comparison",
+        "arm": "replay",
+        "block": 3,
+        "position": 1,
+        "label": "15-counterbalanced-comparison-replay"
+      },
+      "elapsed_seconds": 29.6276094,
+      "menu_response": {
+        "status": "validated-recorded-menu-interaction-response",
+        "endpoint_class": "ordinary-responsive-menu",
+        "elapsed_seconds": 29.6276094,
+        "elapsed_lower_bound_seconds": 29.6234013,
+        "process_start_bracket_seconds": 0.0042081,
+        "response_observed_qpc": 21699864520185,
+        "clock_frequency": 10000000,
+        "process_id": 22448,
+        "first_menu_sha256": "4FD544406369FA7706C6305FA41ECD7FCA833813ABF6966C8C579DF2467803FA",
+        "settings_response_sha256": "444E516B0532254C510D39EFF4DEEECA5347EE980CE29F90DC03DCFD77039B8A",
+        "interaction_response_seconds": 0.7307528,
+        "observer_max_iteration_seconds": 0.7927923,
+        "poll_interval_milliseconds": 100,
+        "shutdown_and_cleanup_included": false,
+        "claims_live_process_or_native_acceptance": false
+      },
+      "process_memory": {
+        "peak_working_set_bytes": 2806919168,
+        "peak_sampled_private_bytes": 8956358656,
+        "measurement": "NativeProbeResources monitored the governed actor and its owned Factorio child; values are not whole-system memory"
+      },
+      "actor_sha256": "5026142FD16AAB70E1CE3DBD6FCAE52E45EDC77C78140EACB71D253A7E9953C4",
+      "resource_ledger": {
+        "path": "build/qualification/f210-performance-575e-menu-r01/native-output/process-15.resources.jsonl",
+        "bytes": 14284,
+        "sha256": "2C3988D62A6376605931543FEC92A6501EE65832A55D87BFEC46316CBECD7D6F"
+      }
+    },
+    {
+      "schedule": {
+        "ordinal": 16,
+        "phase": "counterbalanced-comparison",
+        "arm": "candidate-mir5",
+        "block": 3,
+        "position": 2,
+        "label": "16-counterbalanced-comparison-candidate-mir5"
+      },
+      "elapsed_seconds": 28.7326501,
+      "menu_response": {
+        "status": "validated-recorded-menu-interaction-response",
+        "endpoint_class": "ordinary-responsive-menu",
+        "elapsed_seconds": 28.7326501,
+        "elapsed_lower_bound_seconds": 28.72841,
+        "process_start_bracket_seconds": 0.0042401,
+        "response_observed_qpc": 21700199251357,
+        "clock_frequency": 10000000,
+        "process_id": 19864,
+        "first_menu_sha256": "67E86934ABABDC347CD74D3819F4D1F8498F953FC1D4D5F09E111486C047BD4E",
+        "settings_response_sha256": "624015A1C6F95A4C3203DC29DC3B7DFDDB108E2271A3B2B31D45F3143C0B61B4",
+        "interaction_response_seconds": 0.5458325,
+        "observer_max_iteration_seconds": 0.7544166999999999,
+        "poll_interval_milliseconds": 100,
+        "shutdown_and_cleanup_included": false,
+        "claims_live_process_or_native_acceptance": false
+      },
+      "process_memory": {
+        "peak_working_set_bytes": 2974031872,
+        "peak_sampled_private_bytes": 8960139264,
+        "measurement": "NativeProbeResources monitored the governed actor and its owned Factorio child; values are not whole-system memory"
+      },
+      "actor_sha256": "1955BF3361760BBFD60907C362841A7C3E6A28E9D75AA6A36B55D6A7A9CC22A6",
+      "resource_ledger": {
+        "path": "build/qualification/f210-performance-575e-menu-r01/native-output/process-16.resources.jsonl",
+        "bytes": 13670,
+        "sha256": "947432F6F7CEFA873196678FF02EB5633230D5F72AF62053E96DA544762A54BF"
+      }
+    },
+    {
+      "schedule": {
+        "ordinal": 17,
+        "phase": "counterbalanced-comparison",
+        "arm": "control-without-mir",
+        "block": 3,
+        "position": 3,
+        "label": "17-counterbalanced-comparison-control-without-mir"
+      },
+      "elapsed_seconds": 28.5058699,
+      "menu_response": {
+        "status": "validated-recorded-menu-interaction-response",
+        "endpoint_class": "ordinary-responsive-menu",
+        "elapsed_seconds": 28.5058699,
+        "elapsed_lower_bound_seconds": 28.5016241,
+        "process_start_bracket_seconds": 0.0042458,
+        "response_observed_qpc": 21700533120844,
+        "clock_frequency": 10000000,
+        "process_id": 78992,
+        "first_menu_sha256": "6F53D2BCF0CCC487DC0EA396A340C67721A848184BD123B3EA65FE63137698B0",
+        "settings_response_sha256": "F4245542A6D4662EC8267E500467B7020E42FC7E19791C084E31F858AB2F27E9",
+        "interaction_response_seconds": 0.4970778,
+        "observer_max_iteration_seconds": 0.6321106,
+        "poll_interval_milliseconds": 100,
+        "shutdown_and_cleanup_included": false,
+        "claims_live_process_or_native_acceptance": false
+      },
+      "process_memory": {
+        "peak_working_set_bytes": 2931802112,
+        "peak_sampled_private_bytes": 8847859712,
+        "measurement": "NativeProbeResources monitored the governed actor and its owned Factorio child; values are not whole-system memory"
+      },
+      "actor_sha256": "4FB67DF7F173511E857E5BE8411649ACBDEDBCA6A03BFFC14D935B23A9A87294",
+      "resource_ledger": {
+        "path": "build/qualification/f210-performance-575e-menu-r01/native-output/process-17.resources.jsonl",
+        "bytes": 13670,
+        "sha256": "1049C88D75874A1A367B273154D9D9A1192AA946FF5C2A98BA282C329E8787AC"
+      }
+    },
+    {
+      "schedule": {
+        "ordinal": 18,
+        "phase": "counterbalanced-comparison",
+        "arm": "published-4.7",
+        "block": 3,
+        "position": 4,
+        "label": "18-counterbalanced-comparison-published-4.7"
+      },
+      "elapsed_seconds": 32.1832937,
+      "menu_response": {
+        "status": "validated-recorded-menu-interaction-response",
+        "endpoint_class": "ordinary-responsive-menu",
+        "elapsed_seconds": 32.1832937,
+        "elapsed_lower_bound_seconds": 32.1791211,
+        "process_start_bracket_seconds": 0.0041726,
+        "response_observed_qpc": 21700901776802,
+        "clock_frequency": 10000000,
+        "process_id": 11680,
+        "first_menu_sha256": "486300AB1907A743CD906D75B55B82386E1F1FD278DEEB1C5C52B7829E9E8FCC",
+        "settings_response_sha256": "8BF19AF124E4E408BED5716B66BAE7395C9A4075AB0B7B7F1D581D7B33107F9C",
+        "interaction_response_seconds": 1.4813612,
+        "observer_max_iteration_seconds": 0.848459,
+        "poll_interval_milliseconds": 100,
+        "shutdown_and_cleanup_included": false,
+        "claims_live_process_or_native_acceptance": false
+      },
+      "process_memory": {
+        "peak_working_set_bytes": 3204636672,
+        "peak_sampled_private_bytes": 9346347008,
+        "measurement": "NativeProbeResources monitored the governed actor and its owned Factorio child; values are not whole-system memory"
+      },
+      "actor_sha256": "3BA56CF6B2D4CF96186D3A985AB846D8D5E351B1E0986E48B7796A2BDA7EA6C5",
+      "resource_ledger": {
+        "path": "build/qualification/f210-performance-575e-menu-r01/native-output/process-18.resources.jsonl",
+        "bytes": 15506,
+        "sha256": "5CAB39826F272F313F76EBC3A00C0A9CDB0C28A773D6BE66036E46F0A0F84AD6"
+      }
+    },
+    {
+      "schedule": {
+        "ordinal": 19,
+        "phase": "counterbalanced-comparison",
+        "arm": "candidate-mir5",
+        "block": 4,
+        "position": 1,
+        "label": "19-counterbalanced-comparison-candidate-mir5"
+      },
+      "elapsed_seconds": 28.8182333,
+      "menu_response": {
+        "status": "validated-recorded-menu-interaction-response",
+        "endpoint_class": "ordinary-responsive-menu",
+        "elapsed_seconds": 28.8182333,
+        "elapsed_lower_bound_seconds": 28.8139471,
+        "process_start_bracket_seconds": 0.0042862,
+        "response_observed_qpc": 21701237451092,
+        "clock_frequency": 10000000,
+        "process_id": 87496,
+        "first_menu_sha256": "1018472D0B74BE87BB0B61A72CD729C380874A4561CCEE65D0CCCE0BA8C0A3BC",
+        "settings_response_sha256": "1C64C6AF598F78AB782283D171A434DC3CC38697E32A4D8C7351D65599E5C2FB",
+        "interaction_response_seconds": 0.6673294,
+        "observer_max_iteration_seconds": 0.789051,
+        "poll_interval_milliseconds": 100,
+        "shutdown_and_cleanup_included": false,
+        "claims_live_process_or_native_acceptance": false
+      },
+      "process_memory": {
+        "peak_working_set_bytes": 2720317440,
+        "peak_sampled_private_bytes": 8718127104,
+        "measurement": "NativeProbeResources monitored the governed actor and its owned Factorio child; values are not whole-system memory"
+      },
+      "actor_sha256": "F98A026B248F2ECF8A3D78344201AD9A8F358618D93FD729309953D61225A262",
+      "resource_ledger": {
+        "path": "build/qualification/f210-performance-575e-menu-r01/native-output/process-19.resources.jsonl",
+        "bytes": 13670,
+        "sha256": "C59E7AA3BC1B1B4F7E4D15EDE177E494021F46F51676079B1A668C2EC338ABEB"
+      }
+    },
+    {
+      "schedule": {
+        "ordinal": 20,
+        "phase": "counterbalanced-comparison",
+        "arm": "control-without-mir",
+        "block": 4,
+        "position": 2,
+        "label": "20-counterbalanced-comparison-control-without-mir"
+      },
+      "elapsed_seconds": 28.8218309,
+      "menu_response": {
+        "status": "validated-recorded-menu-interaction-response",
+        "endpoint_class": "ordinary-responsive-menu",
+        "elapsed_seconds": 28.8218309,
+        "elapsed_lower_bound_seconds": 28.8175177,
+        "process_start_bracket_seconds": 0.0043132,
+        "response_observed_qpc": 21701572672851,
+        "clock_frequency": 10000000,
+        "process_id": 71540,
+        "first_menu_sha256": "9CDDF134423035077F9B921FAE936F7B747A1CE315CC62458EE2C60E43E1FD8A",
+        "settings_response_sha256": "0613D344D7B720CB2ED41975DABBA8461FB937C8B41682CE76356CFF408FCCC0",
+        "interaction_response_seconds": 0.5947306,
+        "observer_max_iteration_seconds": 0.7328214,
+        "poll_interval_milliseconds": 100,
+        "shutdown_and_cleanup_included": false,
+        "claims_live_process_or_native_acceptance": false
+      },
+      "process_memory": {
+        "peak_working_set_bytes": 3075923968,
+        "peak_sampled_private_bytes": 9214844928,
+        "measurement": "NativeProbeResources monitored the governed actor and its owned Factorio child; values are not whole-system memory"
+      },
+      "actor_sha256": "2A1B35E5035392A815D26CD4B7429E00DA507ED50EE524611875CE1B2CB630BA",
+      "resource_ledger": {
+        "path": "build/qualification/f210-performance-575e-menu-r01/native-output/process-20.resources.jsonl",
+        "bytes": 13670,
+        "sha256": "5B5251DB95BC49DA2A4568ACBBFF5281F31B3A61E81564F52A267C280692BFAC"
+      }
+    },
+    {
+      "schedule": {
+        "ordinal": 21,
+        "phase": "counterbalanced-comparison",
+        "arm": "published-4.7",
+        "block": 4,
+        "position": 3,
+        "label": "21-counterbalanced-comparison-published-4.7"
+      },
+      "elapsed_seconds": 31.8267965,
+      "menu_response": {
+        "status": "validated-recorded-menu-interaction-response",
+        "endpoint_class": "ordinary-responsive-menu",
+        "elapsed_seconds": 31.8267965,
+        "elapsed_lower_bound_seconds": 31.8226686,
+        "process_start_bracket_seconds": 0.0041279,
+        "response_observed_qpc": 21701938534849,
+        "clock_frequency": 10000000,
+        "process_id": 5396,
+        "first_menu_sha256": "67FF00B516D5D276F58A9C15917D4FB180A2D496D45B9596B95B2F10A1F740C5",
+        "settings_response_sha256": "0D0AE8CF5DE1ED4D619C3C04D3C408B4792D78A0B80A5A61CDF74C83FBA2E62D",
+        "interaction_response_seconds": 0.9051784,
+        "observer_max_iteration_seconds": 0.9089222,
+        "poll_interval_milliseconds": 100,
+        "shutdown_and_cleanup_included": false,
+        "claims_live_process_or_native_acceptance": false
+      },
+      "process_memory": {
+        "peak_working_set_bytes": 3096129536,
+        "peak_sampled_private_bytes": 9087492096,
+        "measurement": "NativeProbeResources monitored the governed actor and its owned Factorio child; values are not whole-system memory"
+      },
+      "actor_sha256": "32A208860044F30325ED8434550EF3CC8E2ED3EA4B22A71946D92A5DAD46EE3C",
+      "resource_ledger": {
+        "path": "build/qualification/f210-performance-575e-menu-r01/native-output/process-21.resources.jsonl",
+        "bytes": 15506,
+        "sha256": "64287C2B235392385B4F814CE9C81DEC317E929F111FAE3BD8E69236CA48D914"
+      }
+    },
+    {
+      "schedule": {
+        "ordinal": 22,
+        "phase": "counterbalanced-comparison",
+        "arm": "replay",
+        "block": 4,
+        "position": 4,
+        "label": "22-counterbalanced-comparison-replay"
+      },
+      "elapsed_seconds": 28.7928346,
+      "menu_response": {
+        "status": "validated-recorded-menu-interaction-response",
+        "endpoint_class": "ordinary-responsive-menu",
+        "elapsed_seconds": 28.7928346,
+        "elapsed_lower_bound_seconds": 28.7883516,
+        "process_start_bracket_seconds": 0.004483,
+        "response_observed_qpc": 21702276132163,
+        "clock_frequency": 10000000,
+        "process_id": 27444,
+        "first_menu_sha256": "57DF7CB8174987440D2E091E436BAC46C59E44FF76A514EAFAC52FFC23F602E3",
+        "settings_response_sha256": "D35A7CCE43ACAF05983361E876FFE608AF805788CDEA34793285E6371864A5E1",
+        "interaction_response_seconds": 0.5579634,
+        "observer_max_iteration_seconds": 0.8530852,
+        "poll_interval_milliseconds": 100,
+        "shutdown_and_cleanup_included": false,
+        "claims_live_process_or_native_acceptance": false
+      },
+      "process_memory": {
+        "peak_working_set_bytes": 2936520704,
+        "peak_sampled_private_bytes": 8906063872,
+        "measurement": "NativeProbeResources monitored the governed actor and its owned Factorio child; values are not whole-system memory"
+      },
+      "actor_sha256": "174B9628A54D576F38DF065102A4EB9235236090F33C9548DE1537EE1B1EA0CD",
+      "resource_ledger": {
+        "path": "build/qualification/f210-performance-575e-menu-r01/native-output/process-22.resources.jsonl",
+        "bytes": 13670,
+        "sha256": "DC2C863B05FE208A448ED87E6E544B4D31D3DD36F5B39BC104F4A1F5A940D30E"
+      }
+    },
+    {
+      "schedule": {
+        "ordinal": 23,
+        "phase": "counterbalanced-comparison",
+        "arm": "control-without-mir",
+        "block": 5,
+        "position": 1,
+        "label": "23-counterbalanced-comparison-control-without-mir"
+      },
+      "elapsed_seconds": 28.7344473,
+      "menu_response": {
+        "status": "validated-recorded-menu-interaction-response",
+        "endpoint_class": "ordinary-responsive-menu",
+        "elapsed_seconds": 28.7344473,
+        "elapsed_lower_bound_seconds": 28.7303348,
+        "process_start_bracket_seconds": 0.0041125,
+        "response_observed_qpc": 21702610121314,
+        "clock_frequency": 10000000,
+        "process_id": 18668,
+        "first_menu_sha256": "0C7342C3997179E56B69BB856497CF7B36CC3CB07E2C63E2D18A80B82218815C",
+        "settings_response_sha256": "162A0BBDE39A756787862B79CF52237780BCBDE1E8B56857103563E164D2F99D",
+        "interaction_response_seconds": 0.6280515,
+        "observer_max_iteration_seconds": 0.7495750999999999,
+        "poll_interval_milliseconds": 100,
+        "shutdown_and_cleanup_included": false,
+        "claims_live_process_or_native_acceptance": false
+      },
+      "process_memory": {
+        "peak_working_set_bytes": 2986704896,
+        "peak_sampled_private_bytes": 8959791104,
+        "measurement": "NativeProbeResources monitored the governed actor and its owned Factorio child; values are not whole-system memory"
+      },
+      "actor_sha256": "0843B323EF279200ECA4367E0703423F68F1C866F398316A9530E863ECE09171",
+      "resource_ledger": {
+        "path": "build/qualification/f210-performance-575e-menu-r01/native-output/process-23.resources.jsonl",
+        "bytes": 13670,
+        "sha256": "9A5C1872A4831FFBB20C8CE1D0102C99D5A6531BF3963FC1208C256D5F304CFD"
+      }
+    },
+    {
+      "schedule": {
+        "ordinal": 24,
+        "phase": "counterbalanced-comparison",
+        "arm": "published-4.7",
+        "block": 5,
+        "position": 2,
+        "label": "24-counterbalanced-comparison-published-4.7"
+      },
+      "elapsed_seconds": 32.5899799,
+      "menu_response": {
+        "status": "validated-recorded-menu-interaction-response",
+        "endpoint_class": "ordinary-responsive-menu",
+        "elapsed_seconds": 32.5899799,
+        "elapsed_lower_bound_seconds": 32.5858404,
+        "process_start_bracket_seconds": 0.0041395,
+        "response_observed_qpc": 21702984572796,
+        "clock_frequency": 10000000,
+        "process_id": 80656,
+        "first_menu_sha256": "361BCB67521F9CDAE954853BD0442C6D2503F85D50F47D7B5E4E90493BA460FA",
+        "settings_response_sha256": "AC280F0602D15A454977AB3963A3F77EF8D1F76431B19C84388B5ED3FF51884A",
+        "interaction_response_seconds": 1.8918644,
+        "observer_max_iteration_seconds": 0.8958676999999999,
+        "poll_interval_milliseconds": 100,
+        "shutdown_and_cleanup_included": false,
+        "claims_live_process_or_native_acceptance": false
+      },
+      "process_memory": {
+        "peak_working_set_bytes": 3391135744,
+        "peak_sampled_private_bytes": 9499705344,
+        "measurement": "NativeProbeResources monitored the governed actor and its owned Factorio child; values are not whole-system memory"
+      },
+      "actor_sha256": "0D5E469615DE416BDB60B01100E813B0A397BF0C80ABB25DA56B71E1E9909943",
+      "resource_ledger": {
+        "path": "build/qualification/f210-performance-575e-menu-r01/native-output/process-24.resources.jsonl",
+        "bytes": 16120,
+        "sha256": "3538920268F0C2E91E250A7A19736B41CDD02C708065FA412ED5E87F70A8056A"
+      }
+    },
+    {
+      "schedule": {
+        "ordinal": 25,
+        "phase": "counterbalanced-comparison",
+        "arm": "replay",
+        "block": 5,
+        "position": 3,
+        "label": "25-counterbalanced-comparison-replay"
+      },
+      "elapsed_seconds": 29.9679201,
+      "menu_response": {
+        "status": "validated-recorded-menu-interaction-response",
+        "endpoint_class": "ordinary-responsive-menu",
+        "elapsed_seconds": 29.9679201,
+        "elapsed_lower_bound_seconds": 29.9636309,
+        "process_start_bracket_seconds": 0.0042892,
+        "response_observed_qpc": 21703333617331,
+        "clock_frequency": 10000000,
+        "process_id": 79396,
+        "first_menu_sha256": "66091414AEF02021E0DCD46623B4A1B28AF092B86D476EFFABA96B425D717073",
+        "settings_response_sha256": "CF2C36711CEB05CD7C6CE9C140CF707736EBBA342D479B509DB14A03534E7524",
+        "interaction_response_seconds": 1.6643509,
+        "observer_max_iteration_seconds": 0.8324859,
+        "poll_interval_milliseconds": 100,
+        "shutdown_and_cleanup_included": false,
+        "claims_live_process_or_native_acceptance": false
+      },
+      "process_memory": {
+        "peak_working_set_bytes": 3260305408,
+        "peak_sampled_private_bytes": 9301483520,
+        "measurement": "NativeProbeResources monitored the governed actor and its owned Factorio child; values are not whole-system memory"
+      },
+      "actor_sha256": "62AAAFEBF96CB89852B5036000FCFBF5FF625D38E4CDA3ED38DC799BA149A6FC",
+      "resource_ledger": {
+        "path": "build/qualification/f210-performance-575e-menu-r01/native-output/process-25.resources.jsonl",
+        "bytes": 14897,
+        "sha256": "20E9443F3F937DB9E46B05D9CCE75C8D6E4802F8434B17F91271E7C2270066C6"
+      }
+    },
+    {
+      "schedule": {
+        "ordinal": 26,
+        "phase": "counterbalanced-comparison",
+        "arm": "candidate-mir5",
+        "block": 5,
+        "position": 4,
+        "label": "26-counterbalanced-comparison-candidate-mir5"
+      },
+      "elapsed_seconds": 28.9187372,
+      "menu_response": {
+        "status": "validated-recorded-menu-interaction-response",
+        "endpoint_class": "ordinary-responsive-menu",
+        "elapsed_seconds": 28.9187372,
+        "elapsed_lower_bound_seconds": 28.91463,
+        "process_start_bracket_seconds": 0.0041072,
+        "response_observed_qpc": 21703671307490,
+        "clock_frequency": 10000000,
+        "process_id": 85260,
+        "first_menu_sha256": "96A431B14AE2D909D47FD5B260ED8A70FB27FBDBAB8A12917BC8F2A90AC71C09",
+        "settings_response_sha256": "7DB599540EBAB6AAA81A16D43D4B83718C7017FD5270DDCFBAB7EE6D30153E43",
+        "interaction_response_seconds": 0.7108467,
+        "observer_max_iteration_seconds": 0.8278481,
+        "poll_interval_milliseconds": 100,
+        "shutdown_and_cleanup_included": false,
+        "claims_live_process_or_native_acceptance": false
+      },
+      "process_memory": {
+        "peak_working_set_bytes": 3029803008,
+        "peak_sampled_private_bytes": 9123721216,
+        "measurement": "NativeProbeResources monitored the governed actor and its owned Factorio child; values are not whole-system memory"
+      },
+      "actor_sha256": "D60F3A425685AACFED35A4F2A2C3B33A2D29F8E43450CC5B4309E9A785C51016",
+      "resource_ledger": {
+        "path": "build/qualification/f210-performance-575e-menu-r01/native-output/process-26.resources.jsonl",
+        "bytes": 13670,
+        "sha256": "BB31263A747687328A06F75EA9215F54F16F23504284C2B434182A6A54FBD69B"
+      }
+    },
+    {
+      "schedule": {
+        "ordinal": 27,
+        "phase": "counterbalanced-comparison",
+        "arm": "published-4.7",
+        "block": 6,
+        "position": 1,
+        "label": "27-counterbalanced-comparison-published-4.7"
+      },
+      "elapsed_seconds": 31.4418196,
+      "menu_response": {
+        "status": "validated-recorded-menu-interaction-response",
+        "endpoint_class": "ordinary-responsive-menu",
+        "elapsed_seconds": 31.4418196,
+        "elapsed_lower_bound_seconds": 31.4359651,
+        "process_start_bracket_seconds": 0.0058545,
+        "response_observed_qpc": 21704031525592,
+        "clock_frequency": 10000000,
+        "process_id": 88032,
+        "first_menu_sha256": "2C9053BF8BE24E0E455DAD36BDB646D8CC9B6F4BC49584D39482E2CE738002A9",
+        "settings_response_sha256": "5077AF45A193ECC67C175F096BCE5DC6C19423DEA9DD796A1EC1BCC295CD9FEA",
+        "interaction_response_seconds": 0.5719842,
+        "observer_max_iteration_seconds": 0.6942146,
+        "poll_interval_milliseconds": 100,
+        "shutdown_and_cleanup_included": false,
+        "claims_live_process_or_native_acceptance": false
+      },
+      "process_memory": {
+        "peak_working_set_bytes": 3048599552,
+        "peak_sampled_private_bytes": 9174880256,
+        "measurement": "NativeProbeResources monitored the governed actor and its owned Factorio child; values are not whole-system memory"
+      },
+      "actor_sha256": "B6871D18731D95387821136B373D5EF3A6370D2A6F05225A90B0C7C7477A1F7E",
+      "resource_ledger": {
+        "path": "build/qualification/f210-performance-575e-menu-r01/native-output/process-27.resources.jsonl",
+        "bytes": 15506,
+        "sha256": "6D0C264983CA021ADB1284B5409FADD0084958EBACDF2CBCF2981A13B5B2457A"
+      }
+    },
+    {
+      "schedule": {
+        "ordinal": 28,
+        "phase": "counterbalanced-comparison",
+        "arm": "replay",
+        "block": 6,
+        "position": 2,
+        "label": "28-counterbalanced-comparison-replay"
+      },
+      "elapsed_seconds": 29.2746887,
+      "menu_response": {
+        "status": "validated-recorded-menu-interaction-response",
+        "endpoint_class": "ordinary-responsive-menu",
+        "elapsed_seconds": 29.2746887,
+        "elapsed_lower_bound_seconds": 29.2704233,
+        "process_start_bracket_seconds": 0.0042654,
+        "response_observed_qpc": 21704371421528,
+        "clock_frequency": 10000000,
+        "process_id": 72404,
+        "first_menu_sha256": "C1DD3271FABB44D719D51C95DDB6C71021B944208085FD8EB3D3A921FBEBDDCF",
+        "settings_response_sha256": "8AA2D555E5D2617F070176B66C03DC77765F566E3F95CDDF4E754681C28AC630",
+        "interaction_response_seconds": 0.8339173,
+        "observer_max_iteration_seconds": 0.9837908,
+        "poll_interval_milliseconds": 100,
+        "shutdown_and_cleanup_included": false,
+        "claims_live_process_or_native_acceptance": false
+      },
+      "process_memory": {
+        "peak_working_set_bytes": 2823753728,
+        "peak_sampled_private_bytes": 8863137792,
+        "measurement": "NativeProbeResources monitored the governed actor and its owned Factorio child; values are not whole-system memory"
+      },
+      "actor_sha256": "9D64FEFCED326244D9377FC75857D146F005D8B3AD460526957257DD97F796CC",
+      "resource_ledger": {
+        "path": "build/qualification/f210-performance-575e-menu-r01/native-output/process-28.resources.jsonl",
+        "bytes": 14283,
+        "sha256": "3484BF2EA8C50363BBAA74E008CE53725571315C43FAB75EA4B392126FDD7ED5"
+      }
+    },
+    {
+      "schedule": {
+        "ordinal": 29,
+        "phase": "counterbalanced-comparison",
+        "arm": "candidate-mir5",
+        "block": 6,
+        "position": 3,
+        "label": "29-counterbalanced-comparison-candidate-mir5"
+      },
+      "elapsed_seconds": 30.4150147,
+      "menu_response": {
+        "status": "validated-recorded-menu-interaction-response",
+        "endpoint_class": "ordinary-responsive-menu",
+        "elapsed_seconds": 30.4150147,
+        "elapsed_lower_bound_seconds": 30.4106547,
+        "process_start_bracket_seconds": 0.00436,
+        "response_observed_qpc": 21704723192957,
+        "clock_frequency": 10000000,
+        "process_id": 45260,
+        "first_menu_sha256": "9C03E0509FFAAC38A6781193F2B482725E76693ACD72EAFF37C909D0EFDC1D18",
+        "settings_response_sha256": "0391D679D7217F5A499DFD489F7E5D7568BCBFDBB9D49845324D74806AB239B3",
+        "interaction_response_seconds": 1.9418256,
+        "observer_max_iteration_seconds": 0.9582432999999999,
+        "poll_interval_milliseconds": 100,
+        "shutdown_and_cleanup_included": false,
+        "claims_live_process_or_native_acceptance": false
+      },
+      "process_memory": {
+        "peak_working_set_bytes": 2952466432,
+        "peak_sampled_private_bytes": 8915398656,
+        "measurement": "NativeProbeResources monitored the governed actor and its owned Factorio child; values are not whole-system memory"
+      },
+      "actor_sha256": "FE2F6519315FC7A601EBF43F9BAE8AFFDE714C1ED1E28AFCD90EB10D2BE6E9EB",
+      "resource_ledger": {
+        "path": "build/qualification/f210-performance-575e-menu-r01/native-output/process-29.resources.jsonl",
+        "bytes": 14284,
+        "sha256": "C9A7E1C07D2B76D695263FF5774FD7640E7FE4B1D79E22F4B52B3E1D3F543DCD"
+      }
+    },
+    {
+      "schedule": {
+        "ordinal": 30,
+        "phase": "counterbalanced-comparison",
+        "arm": "control-without-mir",
+        "block": 6,
+        "position": 4,
+        "label": "30-counterbalanced-comparison-control-without-mir"
+      },
+      "elapsed_seconds": 28.2821935,
+      "menu_response": {
+        "status": "validated-recorded-menu-interaction-response",
+        "endpoint_class": "ordinary-responsive-menu",
+        "elapsed_seconds": 28.2821935,
+        "elapsed_lower_bound_seconds": 28.2779664,
+        "process_start_bracket_seconds": 0.0042271,
+        "response_observed_qpc": 21705053428277,
+        "clock_frequency": 10000000,
+        "process_id": 82380,
+        "first_menu_sha256": "12CCDAB8D431B17F9AB59861EB170D20AFF76D60004A10967B566FD065A1E1C6",
+        "settings_response_sha256": "9076F6099A423D4FA7FFC04A124F11C7AFD0F23C359F0A8D44E244732084093B",
+        "interaction_response_seconds": 0.4836144,
+        "observer_max_iteration_seconds": 0.5906570999999999,
+        "poll_interval_milliseconds": 100,
+        "shutdown_and_cleanup_included": false,
+        "claims_live_process_or_native_acceptance": false
+      },
+      "process_memory": {
+        "peak_working_set_bytes": 2809675776,
+        "peak_sampled_private_bytes": 9030615040,
+        "measurement": "NativeProbeResources monitored the governed actor and its owned Factorio child; values are not whole-system memory"
+      },
+      "actor_sha256": "4C2FE59B04B221ED7CAEDC2BE220C0B254FC35759DF0A007FC3729BA9D3C7F1F",
+      "resource_ledger": {
+        "path": "build/qualification/f210-performance-575e-menu-r01/native-output/process-30.resources.jsonl",
+        "bytes": 13648,
+        "sha256": "2FE623E1CC0FD647EA977117790C848464E47E0E390E8AC3391F5A79472DB6EC"
+      }
+    },
+    {
+      "schedule": {
+        "ordinal": 31,
+        "phase": "counterbalanced-comparison",
+        "arm": "replay",
+        "block": 7,
+        "position": 1,
+        "label": "31-counterbalanced-comparison-replay"
+      },
+      "elapsed_seconds": 28.6561023,
+      "menu_response": {
+        "status": "validated-recorded-menu-interaction-response",
+        "endpoint_class": "ordinary-responsive-menu",
+        "elapsed_seconds": 28.6561023,
+        "elapsed_lower_bound_seconds": 28.6518605,
+        "process_start_bracket_seconds": 0.0042418,
+        "response_observed_qpc": 21705387841530,
+        "clock_frequency": 10000000,
+        "process_id": 23492,
+        "first_menu_sha256": "AC619EC11DFDAD89CF92A11AE68C4C412DC8E4B60884B357473E83C604331E2D",
+        "settings_response_sha256": "52917C3B970F24F8E594D06416F5061DC07263BFB051134F4DAABC9FC0F1B9E4",
+        "interaction_response_seconds": 0.3922343,
+        "observer_max_iteration_seconds": 0.782837,
+        "poll_interval_milliseconds": 100,
+        "shutdown_and_cleanup_included": false,
+        "claims_live_process_or_native_acceptance": false
+      },
+      "process_memory": {
+        "peak_working_set_bytes": 3097731072,
+        "peak_sampled_private_bytes": 9139257344,
+        "measurement": "NativeProbeResources monitored the governed actor and its owned Factorio child; values are not whole-system memory"
+      },
+      "actor_sha256": "61FBE6FC7AC00DC567F92433DDC6C963426FA0DBB30E7D74D39645488AE7E59A",
+      "resource_ledger": {
+        "path": "build/qualification/f210-performance-575e-menu-r01/native-output/process-31.resources.jsonl",
+        "bytes": 13670,
+        "sha256": "D0E2CEB15F62904B68F1DB42319285EE7957C4351F8D3FC5FAAD6BEBACD8E6D0"
+      }
+    },
+    {
+      "schedule": {
+        "ordinal": 32,
+        "phase": "counterbalanced-comparison",
+        "arm": "candidate-mir5",
+        "block": 7,
+        "position": 2,
+        "label": "32-counterbalanced-comparison-candidate-mir5"
+      },
+      "elapsed_seconds": 28.53866,
+      "menu_response": {
+        "status": "validated-recorded-menu-interaction-response",
+        "endpoint_class": "ordinary-responsive-menu",
+        "elapsed_seconds": 28.53866,
+        "elapsed_lower_bound_seconds": 28.5345008,
+        "process_start_bracket_seconds": 0.0041592,
+        "response_observed_qpc": 21705720383597,
+        "clock_frequency": 10000000,
+        "process_id": 10044,
+        "first_menu_sha256": "D951DF1040B84648BC27D171639E76C4E9B62AA0582064785A55141E145657B6",
+        "settings_response_sha256": "73B19A5766B534DA05D0213D10B00C123D8EE13FEFEDF6CF9CDD33CA383F227A",
+        "interaction_response_seconds": 0.4240065,
+        "observer_max_iteration_seconds": 0.6358195,
+        "poll_interval_milliseconds": 100,
+        "shutdown_and_cleanup_included": false,
+        "claims_live_process_or_native_acceptance": false
+      },
+      "process_memory": {
+        "peak_working_set_bytes": 2774093824,
+        "peak_sampled_private_bytes": 8904589312,
+        "measurement": "NativeProbeResources monitored the governed actor and its owned Factorio child; values are not whole-system memory"
+      },
+      "actor_sha256": "1BF0781770B3FBAF755BD6F66D26C689F7BB7DD219E2F3A91F52EE06E379B0DF",
+      "resource_ledger": {
+        "path": "build/qualification/f210-performance-575e-menu-r01/native-output/process-32.resources.jsonl",
+        "bytes": 13670,
+        "sha256": "E66F6D80240BE58021F3C5F0490D795CE5AC2DB3F939D0E5354566ADF2203338"
+      }
+    },
+    {
+      "schedule": {
+        "ordinal": 33,
+        "phase": "counterbalanced-comparison",
+        "arm": "control-without-mir",
+        "block": 7,
+        "position": 3,
+        "label": "33-counterbalanced-comparison-control-without-mir"
+      },
+      "elapsed_seconds": 28.987109,
+      "menu_response": {
+        "status": "validated-recorded-menu-interaction-response",
+        "endpoint_class": "ordinary-responsive-menu",
+        "elapsed_seconds": 28.987109,
+        "elapsed_lower_bound_seconds": 28.9827639,
+        "process_start_bracket_seconds": 0.0043451,
+        "response_observed_qpc": 21706059694267,
+        "clock_frequency": 10000000,
+        "process_id": 24556,
+        "first_menu_sha256": "F422F7737B37F7105922A135339F8796F8869898683978F68326717A61A8B492",
+        "settings_response_sha256": "74EF1D15C5C8499B9DCE73DA5832EE0DA0EE0E9573A486A4EAF1C9A239E4A07D",
+        "interaction_response_seconds": 0.6301444,
+        "observer_max_iteration_seconds": 0.6084691999999999,
+        "poll_interval_milliseconds": 100,
+        "shutdown_and_cleanup_included": false,
+        "claims_live_process_or_native_acceptance": false
+      },
+      "process_memory": {
+        "peak_working_set_bytes": 2783502336,
+        "peak_sampled_private_bytes": 8928911360,
+        "measurement": "NativeProbeResources monitored the governed actor and its owned Factorio child; values are not whole-system memory"
+      },
+      "actor_sha256": "BC08329E275E61533B312B6256B1686341CE713693B8B327899B946D750FC6BF",
+      "resource_ledger": {
+        "path": "build/qualification/f210-performance-575e-menu-r01/native-output/process-33.resources.jsonl",
+        "bytes": 14260,
+        "sha256": "9D7F87C704BE75BC3D51A2FE874B6E3329FB071CAF033A555E83171316066D44"
+      }
+    },
+    {
+      "schedule": {
+        "ordinal": 34,
+        "phase": "counterbalanced-comparison",
+        "arm": "published-4.7",
+        "block": 7,
+        "position": 4,
+        "label": "34-counterbalanced-comparison-published-4.7"
+      },
+      "elapsed_seconds": 31.5616662,
+      "menu_response": {
+        "status": "validated-recorded-menu-interaction-response",
+        "endpoint_class": "ordinary-responsive-menu",
+        "elapsed_seconds": 31.5616662,
+        "elapsed_lower_bound_seconds": 31.5574896,
+        "process_start_bracket_seconds": 0.0041766,
+        "response_observed_qpc": 21706423556209,
+        "clock_frequency": 10000000,
+        "process_id": 82236,
+        "first_menu_sha256": "7E52ED344EC1746A9A96DE90D63B9E8862E1A41989E4AC939889A5AF1A9341D3",
+        "settings_response_sha256": "F94F8D18928DE47B65A54664AAF2D854339196A9FB1F59AB35416160565E0418",
+        "interaction_response_seconds": 0.8969041,
+        "observer_max_iteration_seconds": 0.7921108,
+        "poll_interval_milliseconds": 100,
+        "shutdown_and_cleanup_included": false,
+        "claims_live_process_or_native_acceptance": false
+      },
+      "process_memory": {
+        "peak_working_set_bytes": 3437076480,
+        "peak_sampled_private_bytes": 9415405568,
+        "measurement": "NativeProbeResources monitored the governed actor and its owned Factorio child; values are not whole-system memory"
+      },
+      "actor_sha256": "90DF36C7EA63B198BD00CF039173C78BB8C740B70F6A912ED3D339C4D2C27B23",
+      "resource_ledger": {
+        "path": "build/qualification/f210-performance-575e-menu-r01/native-output/process-34.resources.jsonl",
+        "bytes": 15506,
+        "sha256": "BAF6D8262F478ECAD607E4AA9E5162DEC80DDFD3541C4FDE9A9B2008E6748C18"
+      }
+    },
+    {
+      "schedule": {
+        "ordinal": 35,
+        "phase": "counterbalanced-comparison",
+        "arm": "candidate-mir5",
+        "block": 8,
+        "position": 1,
+        "label": "35-counterbalanced-comparison-candidate-mir5"
+      },
+      "elapsed_seconds": 28.8064474,
+      "menu_response": {
+        "status": "validated-recorded-menu-interaction-response",
+        "endpoint_class": "ordinary-responsive-menu",
+        "elapsed_seconds": 28.8064474,
+        "elapsed_lower_bound_seconds": 28.8023417,
+        "process_start_bracket_seconds": 0.0041057,
+        "response_observed_qpc": 21706759125723,
+        "clock_frequency": 10000000,
+        "process_id": 8288,
+        "first_menu_sha256": "486300AB1907A743CD906D75B55B82386E1F1FD278DEEB1C5C52B7829E9E8FCC",
+        "settings_response_sha256": "9AAEC68897BC491BC941562BCCEC79191450E92259A0C320CB8D00DCDE6E069F",
+        "interaction_response_seconds": 0.699303,
+        "observer_max_iteration_seconds": 0.8361917999999999,
+        "poll_interval_milliseconds": 100,
+        "shutdown_and_cleanup_included": false,
+        "claims_live_process_or_native_acceptance": false
+      },
+      "process_memory": {
+        "peak_working_set_bytes": 3305365504,
+        "peak_sampled_private_bytes": 9307852800,
+        "measurement": "NativeProbeResources monitored the governed actor and its owned Factorio child; values are not whole-system memory"
+      },
+      "actor_sha256": "A0B27D65292C13B5FF63DFD10478B6D4F4B7CA7256592CF460A00A4C06323E8D",
+      "resource_ledger": {
+        "path": "build/qualification/f210-performance-575e-menu-r01/native-output/process-35.resources.jsonl",
+        "bytes": 14284,
+        "sha256": "0651743FF349A4BC40CAB7773B8919CCA64E232C903CAD0B83FC94BCA39BCCA0"
+      }
+    },
+    {
+      "schedule": {
+        "ordinal": 36,
+        "phase": "counterbalanced-comparison",
+        "arm": "control-without-mir",
+        "block": 8,
+        "position": 2,
+        "label": "36-counterbalanced-comparison-control-without-mir"
+      },
+      "elapsed_seconds": 28.6773174,
+      "menu_response": {
+        "status": "validated-recorded-menu-interaction-response",
+        "endpoint_class": "ordinary-responsive-menu",
+        "elapsed_seconds": 28.6773174,
+        "elapsed_lower_bound_seconds": 28.6731774,
+        "process_start_bracket_seconds": 0.00414,
+        "response_observed_qpc": 21707094237753,
+        "clock_frequency": 10000000,
+        "process_id": 51576,
+        "first_menu_sha256": "37C07EDFC4C85BF4FA4356240ACC0A1817C06C4E2EC37ED9463E728E7B8802C6",
+        "settings_response_sha256": "6552D6CBC2F8026CD3EE9E2620AD6D3040130D55BEB03865E6C17744F8EC30DB",
+        "interaction_response_seconds": 0.6007611,
+        "observer_max_iteration_seconds": 0.7816252,
+        "poll_interval_milliseconds": 100,
+        "shutdown_and_cleanup_included": false,
+        "claims_live_process_or_native_acceptance": false
+      },
+      "process_memory": {
+        "peak_working_set_bytes": 2770014208,
+        "peak_sampled_private_bytes": 8743518208,
+        "measurement": "NativeProbeResources monitored the governed actor and its owned Factorio child; values are not whole-system memory"
+      },
+      "actor_sha256": "F11324158D6FF377AF7AE294236B3AB65D6A00DB4EC01679ACBB92490A6A2B06",
+      "resource_ledger": {
+        "path": "build/qualification/f210-performance-575e-menu-r01/native-output/process-36.resources.jsonl",
+        "bytes": 13670,
+        "sha256": "84983F0E09C6A891ACEA2834592795170C15108C97206588429DE1FD75F87034"
+      }
+    },
+    {
+      "schedule": {
+        "ordinal": 37,
+        "phase": "counterbalanced-comparison",
+        "arm": "published-4.7",
+        "block": 8,
+        "position": 3,
+        "label": "37-counterbalanced-comparison-published-4.7"
+      },
+      "elapsed_seconds": 31.581582,
+      "menu_response": {
+        "status": "validated-recorded-menu-interaction-response",
+        "endpoint_class": "ordinary-responsive-menu",
+        "elapsed_seconds": 31.581582,
+        "elapsed_lower_bound_seconds": 31.5772826,
+        "process_start_bracket_seconds": 0.0042994,
+        "response_observed_qpc": 21707457416968,
+        "clock_frequency": 10000000,
+        "process_id": 66028,
+        "first_menu_sha256": "CD05CE5E1BBDF2D7D910BD0BEE2ED441B6D9470C1EA49571A9E456272DB4B02F",
+        "settings_response_sha256": "CBE343175432CEF69A9F108EDA692B1EB6ABFE6BAE505239AE2D3B84FD4E73ED",
+        "interaction_response_seconds": 0.5712809,
+        "observer_max_iteration_seconds": 0.7659805,
+        "poll_interval_milliseconds": 100,
+        "shutdown_and_cleanup_included": false,
+        "claims_live_process_or_native_acceptance": false
+      },
+      "process_memory": {
+        "peak_working_set_bytes": 3303018496,
+        "peak_sampled_private_bytes": 9510428672,
+        "measurement": "NativeProbeResources monitored the governed actor and its owned Factorio child; values are not whole-system memory"
+      },
+      "actor_sha256": "D9F6B037B9C1B441251F01584D4BF44679DCE0FC50C30C2677496459E26F8E68",
+      "resource_ledger": {
+        "path": "build/qualification/f210-performance-575e-menu-r01/native-output/process-37.resources.jsonl",
+        "bytes": 15504,
+        "sha256": "4980471C89A89F039E59A682CADA7C71DE00F0FE3F85B3956B046218947F71C5"
+      }
+    },
+    {
+      "schedule": {
+        "ordinal": 38,
+        "phase": "counterbalanced-comparison",
+        "arm": "replay",
+        "block": 8,
+        "position": 4,
+        "label": "38-counterbalanced-comparison-replay"
+      },
+      "elapsed_seconds": 28.9834901,
+      "menu_response": {
+        "status": "validated-recorded-menu-interaction-response",
+        "endpoint_class": "ordinary-responsive-menu",
+        "elapsed_seconds": 28.9834901,
+        "elapsed_lower_bound_seconds": 28.9793551,
+        "process_start_bracket_seconds": 0.004135,
+        "response_observed_qpc": 21707796345732,
+        "clock_frequency": 10000000,
+        "process_id": 86760,
+        "first_menu_sha256": "04DDD3D0BCBE6DE3D906E3C3F1BC296C855DC2AAC9701E868532BC7CE2B39871",
+        "settings_response_sha256": "9E7F445F74549CE54FEECA387FD22F1908068CBE4432B42403ADC8A3AFE68540",
+        "interaction_response_seconds": 0.722286,
+        "observer_max_iteration_seconds": 0.8391888,
+        "poll_interval_milliseconds": 100,
+        "shutdown_and_cleanup_included": false,
+        "claims_live_process_or_native_acceptance": false
+      },
+      "process_memory": {
+        "peak_working_set_bytes": 2894917632,
+        "peak_sampled_private_bytes": 9157763072,
+        "measurement": "NativeProbeResources monitored the governed actor and its owned Factorio child; values are not whole-system memory"
+      },
+      "actor_sha256": "CABFF0357B100B9807A8CC1B1B26D57BC8B8083060137F8AB15B27B61632A92E",
+      "resource_ledger": {
+        "path": "build/qualification/f210-performance-575e-menu-r01/native-output/process-38.resources.jsonl",
+        "bytes": 13670,
+        "sha256": "47D9BCA57A296B65076C6D3D2F912313C5B4C2890F7D9FA3C5876C27FB7470EF"
+      }
+    }
+  ],
+  "limits": [
+    "All38 observations retained, including cold first warmup and the failed A/A tolerance. No adaptive extension or rerun is part of this frozen cohort.",
+    "The point estimate and numerical objective interval are conditional on this small noisy sample. The failed repeatability control keeps the performance gate open.",
+    "Near-zero candidate/replay gap is not equivalence. Memory observations cover owned processes, not whole-system memory; no release/runtime/Library memory verdict is made."
+  ]
+}

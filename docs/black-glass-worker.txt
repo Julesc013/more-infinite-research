@@ -1,0 +1,44 @@
+MIR 5 — Black Glass execution handoff
+
+Product: https://github.com/Julesc013/more-infinite-research
+Private runner control: https://github.com/Julesc013/mir-native-worker
+Development: dev. Stable: main. MIR3 preservation: legacy.
+
+READ CURRENT AUTHORITY
+Read AGENTS.md, spec/README.md, docs/development.md and the assigned task's focused contract. docs/progress.md owns the current candidate, executable release queue and exact evidence links. Follow the edition scheduling order in spec/targets.md: F210 has first claim on implementation and native capacity. Use source/ and the canonical spec/, docs/, tests/ and tools/ paths. Historical mir5-prefixed paths and old branch names in original receipts remain provenance, not current commands.
+
+OWNERSHIP
+Black Glass coordinates integration, the authorized native lane and release. Aero independently reviews, prepares disjoint corrections/fixtures, verifies packages and maintains agreed documentation. The root coordinator has the maintainer's standing checked integration and qualified GitHub release authorization. A bounded worker receives only its explicit assignment; it must not infer permission to publish, change controls or edit another worker's files. Maintainer-owned Mod Portal publication is outside agent release gates.
+
+ADOPT LIVE STATE
+Inspect hostname, Git status, actual jobs/processes and exclusive library ownership. Fetch without resets, force-pushes or overwritten dirty work. Preserve original commits, saves, adverse receipts and unique ignored custody. Adopt matching in-progress work; a timeout or lock file alone does not prove that work stopped. Reconcile an actual terminal result or missing process/job handle before restarting. Keep the primary checkout as the completed-work handoff.
+
+Resolve the selected frozen source, player tree, target/controller identities, ZIP hashes and exact engine/mod/settings/save inputs from the current inventory and task. Moving dev is not a frozen assignment. Preserve earlier packages and their results under their original identities. A newer documentation commit alone does not require rebuilding player bytes or repeating native work.
+
+RUNNER AND AUTHENTICATION
+Inspect the existing private control clone, ignored local configuration and listener/service before setup work. Preserve a working registered runner; do not create a second listener or replace useful active/pending jobs. Repair the existing installation only as needed using its current controller documentation. Retain actor/source admission, read-only credentials, fixed concurrency and enumerated tasks. Never add an arbitrary shell/repository/path dispatcher or an LLM polling loop.
+
+Verify read-only GitHub access in the real logged-in BLACKGLASS-WIN1\Jules context before drawing authentication conclusions. Isolated/service-context failures do not establish that the user's credentials failed. Never print, replace, switch or log out credentials. Follow AGENTS.md for any confirmed access failure. GUI acceptance requires the interactive desktop; a session0 service is insufficient.
+
+ENGINE AND LIBRARY INPUTS
+Read the assignment and current engine observations/configuration for actual paths, versions and hashes. Independently verify the executable, official mods, selected archive bytes, rooted metadata, dependency closure and settings before launch. Nearby engine versions are different inputs. Preserve Steam and historical installations; do not download, replace, retarget or update engines without the existing applicable authority.
+
+Use each engine-family direct archive library under exclusive ownership. Keep one exact archive copy per library, small portable profile selections and separate run output. Do not copy, hardlink or extract dependency libraries, create populated replacement profiles or reconstruct retired profiles. Preserve/recover prior mod-list/settings controls. Protect original saves; partial catalogues use disposable worlds only.
+
+EXECUTION
+One owned native assignment may run, with at most one genuinely ready successor. Its intended simultaneous multiplayer server/clients count as that single assignment. Inspect the existing queue before dispatch; do not replace a useful pending run. Prepare the next exact packet while the current one runs. Do not repeat completed K2 references, setup smoke tests or broad startup campaigns just because this is a new thread.
+
+Each packet names owner/permitted files, existing obligation, prerequisites, exact inputs, independent expected behavior, actual existing runner command, observations, failure action and invalidated checks. Choose the next ready packet from docs/progress.md. Resolve fixture/environment failures narrowly before another long scenario. A green startup or host suite does not complete gameplay, save, client, API or performance acceptance.
+
+Run tools/commands/workspace/Test-MIRDevelopmentHealth.ps1 before output batches and inspect tests/Test-MIR5HostControls.ps1 -Plan before selected host checks. Keep the existing resource governor, reserve and output budgets. Diagnose actual physical/commit/disk headroom and peaks; never fake budgets, lower gates, kill unrelated processes or repeat an unchanged refusal without a new cause or diagnostic purpose.
+
+Use isolated write-data/config/log/save directories beneath the owned run root, with the selected exact engine and direct archive library. Do not mutate Steam config-path.cfg, ordinary profiles or cloud controls. For GUI/menu observations keep the logged-in desktop available, inspect only the owned test window and record the real endpoint. Headless startup, window creation or simulation benchmarking cannot stand in for responsive-menu or rendered-client observations.
+
+During accepted timing, pause same-host builds, host suites, archive scans, local inference and competing work. Aero can continue independent preparation on its own machine. Preserve predeclared workloads, tolerances, sample rules and equivalent useful behavior. No optimization passes by dropping research, saved state or physical work.
+
+EVIDENCE AND HANDOFF
+Preserve exact receipts, original logs/dumps/disposable saves and complete member hashes, including adverse outcomes and verified control restoration. Keep large raw artifacts private. Never upload dependency archives, original player saves or secrets. Report through the existing GitHub PR/assignment interface with source/controller/engine/package identities, endpoint/result, custody and limits. A failed caller or transfer can coexist with a recovered native observation; retain both statuses rather than rewriting one.
+
+Reuse evidence only when consumed inputs are demonstrably unchanged under spec/verification.md; retain its original execution identity and explain applicability. No plan, fixture, static count, startup or archive hash supplies an unobserved native verdict. The small deterministic authored Generator remains the product design: no compiler, recursive discovery solver, speculative framework or general fork platform.
+
+Finish each completed unit through its required checks, independent review, checked dev integration and exact remote readback. Preserve unique material and synchronize the primary branch; remove only completed clean disposable work after its custody is verified. Publication is the coordinator's separate gated step after final parity, profiles, saves/clients, performance and delivery acceptance. Leave a live reusable runner listening after a bounded assignment; do not start unassigned work to keep it busy.

@@ -1,0 +1,167 @@
+{
+  "schema": 1,
+  "kind": "MIR5DiscoveryRecovery320NoHelperA575NativeChainR05V1",
+  "status": "passed-bounded-published-mir320-source-to-a575-no-helper-discovery-recovery",
+  "scope": "One protected published MIR 3.2.0 Space Age source world and one exact a575/5.0.21000 no-helper successor. The source discovery laboratory is counted once; the successor completes one new gear laboratory. Both stages save and pass two read-only cold reloads. This is not a current-c74, all-origins, release, performance, multiplayer, physical-factory, or general recovery qualification.",
+  "source_stage": {
+    "controller_commit": "11999752b804a7668463c1251034f46f155b13b9",
+    "fixture_source_commit": "c17bf7423d0884c05e39c0bad69de288aaf859db",
+    "caller_sha256": "EFBA405DF3159BDBB2C7B96E778072A47395B0B4207A7C236F906E2AA699374B",
+    "profile_sha256": "508214CE97DE19DA93FBEB579E343C05E5A0C851BF8EB5B41EBDB1BEFEB3D72A",
+    "source_mir": {
+      "version": "3.2.0",
+      "archive_sha256": "35372EE6D16DA6765E8C30AEAAF5DA4A5D300F02C0A0A03648C80893A5394F32"
+    },
+    "engine": {
+      "version": "2.1.23",
+      "sha256": "8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38"
+    },
+    "fixture_archive_sha256": "F316A9D1E7B5403C475B6811CEA24A9436F0C5C76FA09EDE1705D1A9E2B9706B",
+    "observer_archive_sha256": "2E1BE5952D2A4CC5C74A0D149E075D247BA110A3FAE5B6768D3EAEBABCEF989C",
+    "result_sha256": "0F7C46691807C2588031820C842FFA2A102CB795E28D6FD776E53C70B3D5F64D",
+    "terminal_sha256": "F9838810E48833E6ECAEAEE9BD50B800EAF73B7CB556C97691D414DC48E1D789",
+    "protected_save_sha256": "EC0E42396591C1310AC6F39840C7F9309EBCFB7671FC5A9E0EDF44164B4889DF",
+    "protected_save_bytes": 534441,
+    "native_witness": {
+      "actual_source_discovery_laboratories": 1,
+      "successor_laboratories": 0,
+      "source_iron_level": 3,
+      "source_iron_plate_bonus": 0.2,
+      "foreign_iron_progress": 0.27,
+      "source_discovery_researched": true,
+      "source_vulcanus_native_locked_after_discovery": true,
+      "player_vulcanus_unlocked": false,
+      "foreign_vulcanus_unresearched_locked": true,
+      "read_only_cold_reloads": 2,
+      "reload_save_byte_identical": true
+    }
+  },
+  "preserved_no_helper_adverses": {
+    "r01": {
+      "source_head": "ba4459d893e0ccf28cc2eea9a89c287477bdc32c",
+      "fixture_source_commit": "c17bf7423d0884c05e39c0bad69de288aaf859db",
+      "caller_sha256": "5206C7BF2806C48FB84E7AA3059782EFA5DE5E1EFE4DC05C009AF6DF85B94DD8",
+      "profile_sha256": "2E4C0652A695C5C7687567BA8B36E533B3F345795AA2F925D2149DFBAABC4DF4",
+      "fixture_archive_sha256": "93EFFF6FD0C740BCF7F77AA7A8EA1A90A211038AF53C0516A58B555252923380",
+      "native_result_sha256": "0337A7B24AABB0D7CB3D1044BA21FFB0BA7C718FCD39BC318A1871D10C8FF7A9",
+      "terminal_sha256": "F27186B41EB457D3AC5E32A593CC1AB7AE902DA8B3924DD37168D681528CEF7A",
+      "status": "failed",
+      "factorio_processes_after_terminal": 0
+    },
+    "r04": {
+      "source_head": "57aa342171270d6e02bfdbee0607ec75b1f22eb1",
+      "fixture_source_commit": "71c09dcd3f8f2271f670c2585814047d79df1c50",
+      "caller_sha256": "F55DF751924F1F4FB5ED954993CEEC114618E414D635D90703C604AD5875B5AD",
+      "profile_sha256": "2FCA4C25C10D3C488467843C5BE60851E76D5A40F049E3758BFA581942BE5B35",
+      "fixture_archive_sha256": "C466224C90E831C6E2A3FDED619A63904A3520D1162C9946DF343522BDC1DCB8",
+      "native_result_sha256": "9182F1BF3F7B133487B9CDC7B7DCECE9DB511C7FC43184258950BB39B260670D",
+      "terminal_sha256": "AEBDBAB1A0EEBE15936220F7F619D05BF9A6477BFD726CD564157C6C1B863229",
+      "status": "failed",
+      "factorio_processes_after_terminal": 0
+    },
+    "disposition": "Both native no-helper failures remain exact failed result receipts. They do not establish a broader discovery-repair cause or a helper requirement."
+  },
+  "pre_engine_refusals": {
+    "source_r03_raw_projection": {
+      "caller_sha256": "9BF0ADCE83AF64E6CC56ACC7016159EF60F9473291C275771B4C58609CF664F2",
+      "terminal_sha256": "36270F49F0F53B3769D13B1C7C106BE2C62203F4DFDAD15CC3324D40077023CF",
+      "status": "no-native-result",
+      "summary": "The caller refused before a native result because its raw-Git projection requested a path absent at the pinned fixture revision. No archive, control, or engine result is manufactured from this refusal."
+    }
+  },
+  "corrected_r05_successor": {
+    "execution_source_head": "05710224bf3215793471516590ba6a62479ab583",
+    "fixture_source_commit": "a3cbd1e7a9f5bbf5cc704ae70d961fd45d0315ad",
+    "caller_sha256": "1F38E10A28CB1B4F42B0E985A8743E3E10901AFCC357D294FA2715B9152CA07A",
+    "profile_sha256": "E45982BFC96EB5620476B13BDC4A547F0CD8C1EE01A307AA7EF4D722F32B29AE",
+    "candidate": {
+      "name": "a575",
+      "version": "5.0.21000",
+      "archive_sha256": "7CE6A4DF78019F6B98237E638A1C927C5FDB538D4A1442EE22D846DD962DDCDC"
+    },
+    "engine": {
+      "version": "2.1.23",
+      "sha256": "8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38"
+    },
+    "fixture_archive_sha256": "A7E0E2FDA3740BEB1273ECBEDD137A33AE5B8BB2E7E863FE2D88A8BFFDAB6CFB",
+    "observer_archive_sha256": "2E1BE5952D2A4CC5C74A0D149E075D247BA110A3FAE5B6768D3EAEBABCEF989C",
+    "immutable_source_save_sha256": "EC0E42396591C1310AC6F39840C7F9309EBCFB7671FC5A9E0EDF44164B4889DF",
+    "result_sha256": "4E388378F7885EF03691A4C5B8059918D6CD714E3CDB611BD1BC1C5BD340C872",
+    "terminal_sha256": "283E816AB9ABFAA0B476B5191EEFA51FFAE1770FFE7BE58F89802F9AD522D672",
+    "completed_save_sha256": "0A2281F0FAFA445149BAE9195216BDD7632ADE60F8FF1B65F58AD7D0F707B5A6",
+    "completed_save_bytes": 543681,
+    "input_save_byte_identical": true,
+    "native_witness": {
+      "source_actual_discovery_laboratories": 1,
+      "new_successor_gear_laboratories": 1,
+      "source_work_recreated": false,
+      "player_iron_queue": "recipe-prod-research_iron-1",
+      "player_iron_queue_progress": 0.42000000000000004,
+      "foreign_iron_progress": 0.27,
+      "source_vulcanus_native_locked_after_discovery": true,
+      "player_vulcanus_unlocked": true,
+      "foreign_vulcanus_unresearched_locked": true,
+      "gear_level_before": 1,
+      "gear_bonus_before": 0,
+      "gear_level_after": 2,
+      "gear_bonus_after": 0.1,
+      "gear_native_effect": 0.1,
+      "read_only_cold_reloads": 2,
+      "reload_save_byte_identical": true
+    },
+    "caller_kind_transparency": {
+      "internal_kind_string": "MIR5DiscoveryRecoveryA575NoHelperSuccessorCallerR04V1",
+      "actual_path_input_and_result_bindings": "r05",
+      "disposition": "The copied caller retained its internal R04 kind string. Its R05 path, immutable source save, profile, fixture, observer, candidate, result, terminal, and custody bindings are retained exactly; no receipt was renamed or rerun."
+    }
+  },
+  "restoration_and_custody": {
+    "r05_primary_root": "build/qualification/migration-origins/discovery-recovery-successor-a575-r05/native-output",
+    "r05_original_and_primary_members": 18,
+    "r05_total_bytes": 684339,
+    "r05_original_and_primary_file_hashes_checked": 36,
+    "r05_all_member_hashes_matched": true,
+    "restoration_status": "restored-direct-library-controls",
+    "prestate_and_poststate": {
+      "mir_keeper_sha256": "C563CB5B96C9E64CB3373BDB60CF5C8B7D3C97E93EADB8F924443C703CDC024D",
+      "observer_keeper_sha256": "A15A7D628D66953D2E0C4D4FA288F47CBF9C5678327C7EB3D23ADB5DC78331C0",
+      "successor_fixture_absent_before_and_after": true,
+      "mod_list_sha256": "48C46678CC8369DB15CC12CDFB23309EB076DC4433B76E9426083D0074BCCC91",
+      "mod_settings_sha256": "667897C514B66298A1E400058B65EA14EB36322D88864B98AE38E4C9B81387BC"
+    },
+    "factorio_processes_after_terminal": 0,
+    "private_custody": "Full saves, logs, configurations, player data, preflights, archive snapshots, and controls remain in discoverable primary custody and are not embedded here."
+  },
+  "receipts": {
+    "path": "spec/evidence/discovery-recovery-a575-native-receipts-r01.json.gz",
+    "sha256": "7BB06313FB9609F3CC014A0C14D272803943F638090F83D34CCDB954E18522FD",
+    "bytes": 21625,
+    "uncompressed_sha256": "EA6BDED53A81CB447F56A30E4E934FB0FA2259623DF52F66D497766F2912D485",
+    "uncompressed_bytes": 134013,
+    "exact_safe_native_result_receipts": 4,
+    "strict_utf8_base64_gzip_roundtrip_verified": true,
+    "exclusions": [
+      "save binaries",
+      "full logs",
+      "configuration payloads",
+      "settings payloads",
+      "player-data payloads",
+      "raw preflight payloads",
+      "library-control payloads",
+      "archives"
+    ]
+  },
+  "claims": {
+    "named_a575_case_only": true,
+    "current_c74_qualified": false,
+    "other_origins_qualified": false,
+    "current_release_qualified": false,
+    "source_recreated": false,
+    "helper_used": false,
+    "multiplayer": false,
+    "physical_factory": false,
+    "performance": false,
+    "release_qualification": false
+  },
+  "limitations": "This chain is limited to the named protected MIR 3.2.0 source save, the exact a575/5.0.21000 successor, one source discovery laboratory, and one new successor gear laboratory. It retains rather than erases the two no-helper native failures and the earlier zero-native raw-projection refusal. It does not qualify c74, another current package, another origin, a general repair mechanism, or a release."
+}

@@ -1,0 +1,9 @@
+{
+  "name": "mir-fixture-mir5-scripted-effects-toggle",
+  "version": "0.3.0",
+  "title": "MIR 5 private scripted-effects toggle fixture",
+  "author": "MIR maintainers",
+  "description": "Disposable F200 Space Age scripted-effects re-enabled stage.",
+  "factorio_version": "2.0",
+  "dependencies": ["base >= 2.0.77", "space-age >= 2.0.77", "more-infinite-research = 5.0.20000"]
+}

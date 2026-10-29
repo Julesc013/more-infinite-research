@@ -1,81 +1,40 @@
-# AGENTS.md
+# MIR contributor instructions
 
-## Project
+Read [spec/README.md](spec/README.md) and the task-specific contract. [docs/development.md](docs/development.md) owns current commands and coordination; [docs/progress.md](docs/progress.md) records exact evidence and remaining release work. MIR5 is incomplete until its acceptance and publication gates pass.
 
-More Infinite Research 4 is a proof-governed Factorio research product line. MIR 4.0.0 combines stable F210/F200 player targets, separately distributed developer previews, and executable package-excluded shadow architecture.
+## Source and architecture
 
-## Standing dev workflow authorization
+- `source/` is the sole canonical editable player source. Compose the nine stable editions and separately labelled best-effort historical builds, including F018, from shared components and narrow capability adapters. Do not create whole-version source copies.
+- Use authored native technologies and the small deterministic Generator: finite local preflight, stable manifest rows and one publication. No discovery solver, fixed-point planner or recursive technology/recipe traversal. Necessary bounded recipe collection stays outside the Generator. Compatibility policy never mutates prototypes; admitted emission code alone owns generated technology mutation.
+- Preserve technology/settings/API identities, published migration filenames, original request IDs/text/decisions, license notices and complete target histories. Retain the full authored README, including badges, catalogue, settings, examples and troubleshooting.
+- Keep docs, fixtures, tests, tools, SDK, guidance, CI, build and dist outside player ZIPs. No preview or developer tool gains mutation, release or support authority merely by existing.
+- Source owns implementation, spec owns requirements, tests own independent expectations and docs explain use. Preserve exact historical Git/artifact references; do not keep an obsolete active compiler/framework or a new history estate.
 
-- Creating implementation branches, pushing them to this repository, opening and merging PRs into `dev`, synchronizing the primary checkout with `origin/dev`, and removing completed disposable work branches are standing maintainer-authorized actions. Do not ask for confirmation for this routine dev workflow.
-- Complete required automated checks and obey enforced branch rules without treating them as a requirement for another maintainer approval. Changes to `main` and release publication retain their separate policy requirements.
+## Workflow and custody
 
-## Release identity and publication
+- `dev` is dedicated to MIR5 in the canonical layout. Future MIR4.7 maintenance uses separate task branches from published tags; follow [the development and maintenance policy](docs/development.md#development-line-and-maintenance-branches).
+- Maintainer standing authorization covers branches, pushes, PRs, normal checked merges into `dev`, local synchronization and removal of completed clean disposable work branches. No repeated permission is needed. Enforced branch rules and required checks remain mandatory.
+- Commit and push completed reviewable units with detailed validation and limitations; merge frequently through PRs and read back exact remote trees. Preserve Aero's original commits and separate review branches. Never reset, clean, force-push or rebase shared work as a synchronization shortcut.
+- Before output batches, run `tools/commands/workspace/Test-MIRDevelopmentHealth.ps1`. Resolve actual disk pressure through bounded batches or existing guarded cleanup. A dirty/unique checkpoint needs a commit/push or explicit preservation disposition; it never disables Git/GitHub.
+- Preserve dirty worktrees, unique commits, original saves, active evidence, adverse receipts and delivered packages. Only remove disposable clean worktrees after remote readback. Retain unique custody at a discoverable primary-checkout location.
+- The primary checkout is the final handoff: active branch clean and equal to its remote, accepted packages hash-verified in `dist`, matching release notes/upload text present. Main and dev may differ during next-release work.
+- Parallel agent work is limited to root plus two bounded workers with explicit file ownership. One worker owns heavy native execution; at most one active and one pending native assignment. Hold builds and host suites during accepted same-machine timing.
 
-- Release titles are exactly `MIR MAJOR.MINOR.PATCH`. Start the body with the summary, followed by the changes; do not repeat the release title as a heading in the body.
-- Keep release notes concise and scannable: lead with the largest changes, use bullets and short lists or tables, and avoid H1/H2 headings and long paragraphs. Give downloadable assets descriptive labels while preserving canonical filenames. Keep the complete, specific change list and prior history in each target's changelog.
-- Set each distribution's minimum `base >= x.y.z` dependency from its accepted exact-engine qualification. Keep `factorio_version` as the two-part family. Use that same declared patch minimum in package requirements, release copy and asset labels; never invent `.0` or append `+`. Public downloads contain the individual player ZIPs and useful integrity files; keep bundles, upload instructions and developer records in source/local custody unless specifically requested.
-- The numeric distribution codec is `100 * integer(CCC) + SOURCE_PATCH`, padded to five digits. The final two digits are never an RC counter, build number or packaging retry: source 4.2.0 uses CCC00 and source 4.2.1 uses CCC01. Validate the ZIP root, info.json, changelog, manifest, filename, tags and download copy together.
-- Keep GitHub releases mutable. Do not enable repository or organization release immutability, restore removed rulesets, or infer permission to change external controls. Run the existing GitHub administration preflight and require the separate release-immutability probe to pass before publication. Repository governance, exact-source review, checksums and readback enforce the release contract.
-- `v4.2.0-stable` is a one-time maintainer-authorized tag exception for source `6d19c874ea7d026d297865b96aa1b2b0916e9e61`, because GitHub permanently reserved the former immutable `v4.2.0` name. It changes no numeric version. Future final source tags use canonical `vMAJOR.MINOR.PATCH`; never infer another suffix exception.
-- Freeze the exact committed source and accepted assets before tagging. Stage the complete asset inventory in one draft, reconcile lost responses by release ID, verify names and hashes, publish, then verify anonymous downloads. Preserve historical receipts and reconcile existing remote objects before replacing anything.
+## Tests and engines
 
-## MIR Development housekeeping
+- Inspect/materialize `tests/Test-MIR5HostControls.ps1 -Plan` before tests; run the narrow selected controls first. Full host checks use that driver and an explicit pinned Lua runtime. Native, save, physical output, multiplayer/client and performance results require their affected exact scenarios. No fixture existence, host count or model agreement substitutes for gameplay evidence.
+- Reuse native evidence only for the exact trusted inputs; adopt matching in-progress work. Never relabel an old result as current or erase an earlier failure. Public claims name exact evidence and limits.
+- Test profiles contain small selections only. Use one exact archive per engine-family direct library under exclusive ownership, restore previous controls, keep outputs separate. Never copy/hardlink/extract dependency libraries or recreate retired populated profiles. Missing archives are missing inputs.
+- Never hardlink with either endpoint outside the executing checkout. External testmods paths are local input locators, not repository dependencies. Preserve portable definitions and unique reproducers.
+- The current Steam installation is for Factorio2.1 only; historical engines remain separate. Do not download, replace, retarget or mutate Steam depots for historical engines without explicit maintainer authority. Inspect actual exact engine versions/hashes before native work.
+- On Black Glass verify Windows identity and read-only GitHub status in real `BLACKGLASS-WIN1\Jules` context before authentication claims. Expected account is `Julesc013`. Isolated/service-context credential failures are non-authoritative. Never print, replace, switch or log out credentials. Do not request login unless two real-user read-only checks confirm failure.
 
-- Keep Git/GitHub execution available. Development health belongs in bounded observations, checkpoint requirements and the existing guarded cleanup commands; do not use housekeeping as a reason to deny commits, pushes, PRs or corrective Git actions.
-- Before a batch that creates engine stages, package copies, logs or linked worktrees, run `tools/commands/workspace/Test-MIRDevelopmentHealth.ps1`. Resolve observed disk pressure through an eligible storage audit/cleanup or a smaller bounded batch before creating more output. Treat incomplete sizes as lower bounds and reuse exact trusted or matching in-progress evidence instead of producing duplicate runs.
-- Commit and push each completed, reviewable unit with its validation and remaining limitations. Finish its required checks and PR merge into `dev` while later work continues; do not accumulate all completed changes until the end of MIR 4.2.
-- Respond to the development Stop checkpoint with a concrete commit/push, guarded cleanup, or explicit preservation disposition. Preserve dirty worktrees, unique commits, active evidence and delivered packages. Remove completed clean disposable branches/worktrees after remote readback, and retain unique material at a discoverable primary-checkout location. Older or partially scanned material requires review; age alone is never deletion authority.
-- Test mod profiles contain small selection definitions only. Keep each required exact archive once in its engine-family library and launch normal serial tests directly against that library. Switch only the active mod-list and settings under exclusive ownership, preserve and recover the previous controls, and keep run output separate. Do not create dependency copies, hard links, extracted mods or replacement populated profile directories. Retire old profile archive entries only after verified master membership and migration checks; retain unique fixtures and saves. This direct-library rule supersedes the earlier hard-link staging requirement.
-- Never create a hard link with either endpoint outside the executing Git checkout. External `testmods` paths are disposable machine-local input locators, not repository dependencies or reproducibility guarantees. Supply the selected archive library explicitly; retain portable profile definitions and unique reproducers in the checkout. Missing archives must be reported, never recovered by recreating retired profiles.
-- Select changed behavior and reported defects through the existing verification plan, source checks and captured prototypes. Reuse native evidence only for its exact trusted inputs. Do not rerun unrelated historical mod profiles. Required current-package, save, production and multiplayer evidence still needs its affected native scenario; source checks do not establish those results.
+## Release and documentation
 
-## Source layout: maintainer-directed cutover
-
-The maintainer has selected `source/` as the single canonical editable product-source root and authorized replacement of the era-based layout. This supersedes earlier project instructions to preserve `src/`, `src/mod/`, or parallel modern/legacy source families. It does not claim that the physical cutover is already complete.
-
-- Adopt the existing root-contraction checkpoint and active source-layout work. Preserve the maintainer's deletions/moves and unique or dirty worker material; never discard them merely to synchronize with remote.
-- Decompose by semantic responsibility and actual capability. Share research, ownership, progression, configuration, and presentation implementations; select narrowly scoped platform adapters by their real contracts. Do not rename the old split to `source/mod/`, `source/families/modern`, `source/families/legacy`, or equivalent whole-version copies.
-- Extend the existing package-source mapping and materializer to compose those components. Target records select capabilities and adapters; they are not alternate editable mod trees. Generated self-contained packages may contain the same shared bytes without creating duplicate source authorities.
-- Update active path/module authorities, generators, tests, command imports, editor/CI configuration, and documentation links with the cutover. Preserve published objects and validate historical references against their pinned source. Old path assertions are migration work, not a veto or a reason to restore obsolete root copies.
-- Preserve package import contracts, technology/settings identities, and published migration identities unless a separately reviewed semantic change requires a migration. Keep authored README/Portal prose intact apart from affected source-map facts and links.
-- Completion requires removal of superseded current source roots and parallel implementations, dependency-closure and collision checks, actual materialized-package parity or explicitly reviewed semantic differences, and verified adoption of the preserved local cleanup. A rename-only PR or this instruction change is not completion of the repository overhaul.
-
-## Local Factorio engine authority
-
-- Use `C:\Program Files\Steam\steamapps\common\Factorio` only for the current Factorio 2.1 engine.
-- Use `D:\Programs\Factorio\<version>` for Factorio 2.0 and every older engine; Factorio 2.0 is `D:\Programs\Factorio\2.0\bin\x64\factorio.exe`.
-- Never download, replace, retarget, or mutate Steam depots for historical engines without explicit maintainer authority.
-
-## Required reading by task
-
-- Documentation: Markdown front matter, generated `.mir/docs.yml`, and `docs/maintainer/documentation-governance.md`.
-- Architecture or repository roots: `.mir/modules.yml`, `.mir/control/paths.yml`, and `docs/architecture/module-boundaries.md`.
-- Compatibility: `.mir/compatibility.yml`, `.mir/streams.yml`, and `docs/compatibility/claim-levels.md`.
-- Generated streams: `.mir/streams.yml` and `docs/reference/schemas/stream-spec.md`.
-- Fixtures: `.mir/fixtures.yml` and `docs/maintainer/fixture-workflow.md`.
-- Release operations: `.mir/releases/waves/mir4-r0/MIR4-Pre-Freeze-Execution-ProgrammeV1.json` and `docs/RELEASE-RUNBOOK.md`.
-- Backports: `.mir/branches.yml`, `docs/releases/mir4-post-4.0-roadmap.md`, and the MIR 3 history in `docs/maintainer/backporting.md`.
-
-## Non-negotiable rules
-
-- Keep docs, fixtures, scripts, tests, `.mir`, `.codex`, `.github`, `build`, `dist`, and repository guidance out of player ZIPs.
-- Update the existing README in place: preserve its badges, sections, research catalog, settings explanations, examples, and troubleshooting detail unless the maintainer explicitly requests their removal. Repository/package documentation separation does not authorize shortening the repository README.
-- Use the primary checkout as the completed-work handoff. Synchronize its active branch with the target remote branch, copy accepted or published packages into its `dist` with hash verification, and make the matching release notes and upload text available there. External custody and temporary worktrees do not replace local delivery. Remove disposable clean worktrees after completion; retain dirty or unique material with an explicit reason and a discoverable location in the primary checkout.
-- Compatibility policy never mutates prototypes. Only admitted emission code may create or mutate generated technology prototypes.
-- Every generated technology needs a stable stream manifest row; every public claim needs named exact evidence.
-- Preserve one emitter and package-source parity unless a separately authorized cutover changes them.
-- Preview, shadow, and experimental systems do not gain player mutation, release, signing, publication, or support authority by implementation alone.
-- Regenerate `.mir` projections when authorities change. Never hand-edit generated queues, dashboards, indexes, or receipts.
-- Finish completed work through PR merge, remote readback, and every required forward-port or promotion disposition. Leave the active local branch clean and exactly equal to its remote; do not require `main` and `dev` tree equality while next-release work is active.
-
-## Verification
-
-Before tests, materialize or inspect the MIR verification plan. Reuse evidence only for its exact trusted fingerprint and adopt matching in-progress work rather than duplicating it.
-
-Run the narrowest selected checks first. The broad static fallback is:
-
-```powershell
-.\scripts\Invoke-MIRValidation.ps1 -StaticOnly
-```
-
-Treat GitHub failures from the offline sandbox identity as execution-context failures. Retry in the approved machine/network context and request reauthentication only if `gh auth status` fails there.
+- The maintainer authorizes completing MIR5, then qualified main promotion and canonical `v5.0.0` tagging, unsigned if the enrolled key is unavailable. Agent-managed publication is GitHub-only for all releases; the maintainer handles Mod Portal publication, credentials and readback. Mod Portal access is not an agent completion gate. Authorization never waives remaining acceptance. After verified5.0.0 delivery, continue authorized5.0.1 fixes/performance/stress work.
+- Freeze exact committed source and accepted assets before tagging. Reconcile existing remote objects and lost responses by release ID; stage the entire inventory in one draft, verify names/hashes, publish, then verify anonymous downloads and local delivery. Preserve published objects and historical receipts.
+- Keep GitHub releases mutable. Run existing `tools/commands/release/Test-MIRGitHubAdministration.ps1` and its distinct release-immutability probe immediately before publication; require both to pass. Never change repository/organization controls or enable immutability to bypass a gate.
+- Titles are exactly `MIR MAJOR.MINOR.PATCH`; notes begin with a summary then concise changes, without repeating the title as a heading. Public assets are individual player ZIPs and useful integrity files; keep bundles, inventories, upload instructions and developer records in source/local custody.
+- Set each stable edition's exact minimum `base >= x.y.z` from accepted qualification, keeping two-part `factorio_version`. Preserve F018's declared0.18.47 floor in its experimental package metadata and GitHub label without implying stable qualification. Authored source/changelog/tag versions stay source versions; GitHub distributions retain the numeric codec `100 * integer(CCC) + SOURCE_PATCH`, padded to five digits, whose final digits are source patch rather than a retry or RC counter. Portal numbering is confined to final maintainer copies of finished builds. Check ZIP root/info/changelog/manifest/filename/tag/copy together. The historical `v4.2.0-stable` tag exception grants no future suffix exception.
+- Markdown docs/specs use front matter and one logical source line per paragraph. Only Factorio changelogs have a132-column bound. Current repository checks replace the retired generated MIR4 documentation/assurance estate; do not hand-edit historical generated receipts or import that estate as a new dependency.
+- Root `CHANGELOG.md` is the authored master release history; `python -B tools/changelog.py --write` renders tracked `source/changelog.txt`. Commit both together. The formatter freshness and package controls enforce their agreement; never maintain separate editable edition histories.

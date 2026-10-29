@@ -1,0 +1,82 @@
+{
+  "schema": 1,
+  "kind": "MIRResponsiveMenuRepeatabilityPreparedCommandV1",
+  "status": "host-validated-packet-original-body-review-complete-owner-preflight-pending",
+  "review_unit_base": "ba750fd662a03b8233c717ed58714b3e92772f37",
+  "script": {
+    "path": "tools/Invoke-MenuComparison.ps1",
+    "sha256": "937FA4384F483F6DD1CFA901408FC45A45A467F5BAA0F876B0C0CD8B5366D919"
+  },
+  "retained_diagnosis": {
+    "path": "spec/evidence/f210-menu-repeatability-diagnosis-r01.json",
+    "sha256": "77AF8C228BB05283CB3B03439E9C1EA434A719391834FCA6DF147CFAC1A3B0A8",
+    "original_review_sha256": "3164DC8DEFC2B4E0B60C08FD526284113164848A38E0872B5DFEE9F17E1C1E9D"
+  },
+  "original_frozen_plan": {
+    "path": "build/qualification/f210-performance-575e-menu-r01/plan.json",
+    "sha256": "64F172507CE1B57406BCB8D6B39E88A48E45CCB1DDBAB1B41CB802154E06D607"
+  },
+  "host": "BLACKGLASS-WIN1",
+  "parameters": {
+    "FactorioBin": "D:/Games/Factorio/2.1/bin/x64/factorio.exe",
+    "ExpectedFactorioSha256": "8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38",
+    "ExpectedEngineVersion": "2.1.23",
+    "ExpectedFactorioLine": "2.1",
+    "ArchiveLibrary": "D:/Projects/Factorio/testmods/2.1",
+    "ProfilePath": "tests/profiles/bob-angel-full-space-age-standalone-f210-2123.json",
+    "ExpectedProfileSha256": "05F2786E896B1F28C2E4239134BA370B0C2BCF6CCB1384E03999FB0E89C8B980",
+    "PublishedArchive": "D:/Projects/Factorio/testmods/2.1/more-infinite-research_4.7.21003.zip",
+    "ExpectedPublishedSha256": "B6EB9430056ABD384DB00F94929FE7DAC0A37441ACF4BC277946689682628852",
+    "OrdinaryPlayerConfigPath": "D:\\Projects\\Factorio\\more-infinite-research\\build\\mir5\\recovery\\menu-f210-inputs-r01\\ordinary-config.ini",
+    "ExpectedOrdinaryPlayerConfigSha256": "DA9A92AB9047EBD9F9640B34DC9EF6C084801DF85B8F75B1A490E786F40DD510",
+    "PlayerDataPath": "D:\\Projects\\Factorio\\more-infinite-research\\build\\mir5\\recovery\\menu-f210-inputs-r01\\player-data.json",
+    "ExpectedPlayerDataSha256": "285ED61F8778CFF44FA173F8EDCC5E417F4DF8C1019A3DDD02814729CEE56EF9",
+    "OutputRoot": "build/tmp/f210-menu-repeatability-published-r01",
+    "ActiveModsObserver": "mir-fixture-mir5-active-mods-observer",
+    "TimeoutSeconds": 300,
+    "ExpectedPeakMemoryMiB": 9216,
+    "MaxNewOutputMiB": 2048,
+    "CounterbalancedBlocks": 8,
+    "AdmissionWaitSeconds": 30,
+    "LibraryIdleWaitMilliseconds": 5000,
+    "AaAbsoluteToleranceSeconds": 0.5,
+    "AaRelativeTolerancePercent": 5.0,
+    "ControlRegressionToleranceSeconds": 0.5,
+    "MinimumMirAddedTimeReductionPercent": 50.0,
+    "RepeatabilityDiagnostic": true
+  },
+  "execution_policy": {
+    "schedule": "One published warmup followed by four published observations; max5 launches, no extensions or retries. No replay or candidate is required/read/staged.",
+    "endpoint": "Existing ordinary owned-menu Settings-response endpoint and actor, unchanged.",
+    "pairing": "Observations1/2 and3/4 separately against max(.5s,5% pair mean); never pool/select favorable pairs or substitute for original failed pilot.",
+    "resource": "Original9216MiB/2048MiB/300s/30s policy and unchanged governor reserves. Current resource-helper scan diagnostics are from accepted PR1321; retain actual executing commit/helper hashes.",
+    "archive_authority": "Use the existing profile05F278 and its32 declared external hashes plus exact B6. The runner now checks that existing declaration against measured selected inputs before output/launch. There is no second editable archive-map authority.",
+    "preconditions": [
+      "Black Glass owns the sole native lane and must reserve a quiet block after its current assignment, with builds/host suites/other Factorio/heavy jobs held.",
+      "Satisfied: original two-pilot actor/log/resource bodies were delivered in PR1328 and independently rehashed/reviewed. See original_body_review; retain the original failed cohort. No additional body export or new run is needed for this prerequisite.",
+      "Freeze exact committed script/parameters/output root; inspect the verification plan and development health; run -Preflight and retain its result. Preflight presence alone does not attest native inputs.",
+      "Use a fresh empty checkout-local output root. Stop on refusal/input drift/endpoint failure/control restoration failure; retain adverse and partial output."
+    ],
+    "retention": [
+      "Plan/result/caller/controller identity and selected archive proof, actual engine/ordinary config/player-data hashes, unchanged failed original cohort.",
+      "Full actor JSONs, original per-sample engine logs and resource ledgers with PNG hashes; do not transport credentials.",
+      "Aggregate capture_attempts and actual first-render/action/response observations; per-attempt timeline is not recorded by the unchanged actor. Uncollected CPU/GPU/disk/thermal state remains unobserved."
+    ]
+  },
+  "plan_only_command": "tools/Invoke-MenuComparison.ps1 -PlanOnly -RepeatabilityDiagnostic -AaAbsoluteToleranceSeconds 0.5 -AaRelativeTolerancePercent 5 -ControlRegressionToleranceSeconds 0.5 -MinimumMirAddedTimeReductionPercent 50",
+  "unused_prototype_custody": "The duplicate preflight/helper caller prototypes remain unexecuted under build/qualification/menu-repeatability-diagnostic-preparation-r01, excluded from this packet and native acceptance.",
+  "claims": {
+    "new_native_execution": false,
+    "original_adverse_changed": false,
+    "performance_acceptance": false,
+    "release_qualification": false
+  },
+  "path_policy": "Profile and output are checkout-relative. Other original BG paths may be replaced only by owner locators for the exact same pinned bytes before freezing; no moving source or archive substitution.",
+  "default_plan_equivalence": "All parsed fields of the ordinary8-block plan exactly equal the retained original38-sample native-output plan under the same declared policy.",
+  "original_body_review": {
+    "status": "complete",
+    "evidence_path": "spec/evidence/f210-menu-aa-pilot-source-records-r01.json",
+    "independent_review": "https://github.com/Julesc013/more-infinite-research/pull/1328#issuecomment-6470803995",
+    "scope": "Six original bodies match declared hashes/lengths. The hash-bound retained_diagnosis contains the independent phase readback and limits."
+  }
+}

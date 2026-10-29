@@ -1,0 +1,78 @@
+{
+  "schema": 1,
+  "kind": "MIRCurrentF200RepairPhysicalNativeChainV1",
+  "status": "passed-named-current-F200-physical-repair-save-and-two-cold-reloads",
+  "scope": "CurrentE9/source992c/playerfbb7 on exact2.0.77/D3 with Base-only closure. Actual native one-point electric damage, queue capacity, cadence, exclusions, reactivation, saved witness and two cold reloads; not scored elapsed-performance or general memory acceptance.",
+  "controller_commit": "278967b2a4534ed2f09e2a51b24afc28ada1b66e",
+  "artifact_source_commit": "992c76ee24caf2d723b469c3db760cbebdf35eeb",
+  "player_tree": "fbb7e9135280ce7f69692e9b0c4a44d743793f45",
+  "candidate_sha256": "E9D349931E082AD77057C150E3D6093490E4086E84F0FAFECB0ED1257FD5ED4F",
+  "engine_sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B",
+  "fixture_sha256": "49633057B856347666E2EDF9414DE6224E0B8DCE833DF243D8FB645BDD172EB9",
+  "profile_sha256": "B6BFD79001801264CE738AD9FCB027602FEF0A2295A32232C064A939B6163889",
+  "packet_sha256": "09025CFCA2824984FA2F975E4D5C232335DF899F28CDC87056AEAD96A348E381",
+  "caller_sha256": "AB13ED042760FDD8A21644C592AAC091D4D98C41AB60E6D549BDD3C3C7E0BD26",
+  "initial": {
+    "stage": "initial",
+    "case": "repair-stress",
+    "status": "passed",
+    "qualification": "native-runner-readback-required",
+    "witnesses": {
+      "mode": "mir5-5.0.20000",
+      "total_eligible_walls": 1000,
+      "first_capacity_walls": 256,
+      "eligible_overflow_walls": 744,
+      "first_capacity_player_walls": 128,
+      "first_capacity_reciprocal_friend_walls": 128,
+      "quiet_ticks": 600,
+      "service_ticks": 60,
+      "repair_amount": 1,
+      "maximum_observed_repairs_per_service": 8,
+      "initial_first_repair_observed_tick": 601,
+      "initial_first_repair_service_tick": 600,
+      "reactivation_first_repair_observed_tick": 3121,
+      "reactivation_first_repair_service_tick": 3120,
+      "reactivation_count": 8,
+      "overflow_unchanged": true,
+      "nonfriendly_unchanged": true,
+      "nonwall_unchanged": true,
+      "native_damage_api": "LuaEntity.damage",
+      "native_damage_type": "electric",
+      "on_load_read_only": false,
+      "performance_qualified": false,
+      "runtime_elapsed_qualified": false,
+      "scope": "disposable-f200-passive-repair-queue-bound-only"
+    }
+  },
+  "completed_save": {
+    "path": "build/qualification/current-repair-f200-r01-controller/native-repair/write-data/saves/mir5-native-complete.zip",
+    "bytes": 900872,
+    "sha256": "F07BC40D4D36E8A8CDA223902A9E9211B1DF42B0C9CDCDC886574D0820BD4C07"
+  },
+  "counts": {
+    "native_processes": 4,
+    "actual_labs": 0,
+    "cold_reloads": 2,
+    "preparation_refusals": 0,
+    "preparation_native_processes": 0
+  },
+  "root_readback": {
+    "path": "build/qualification/current-repair-f200-root-readback-r01.json",
+    "sha256": "42917B26C76283A87D73FFFEE55687B9DE64ED4A69462A26329189B875418199",
+    "files": 23,
+    "bytes_per_copy": 2061483
+  },
+  "lossless_receipts": {
+    "path": "spec/evidence/current-f200-repair-physical-native-receipts-r01.json.gz",
+    "sha256": "DCBBFCA065352E17AF57934151F78153C580A14424E6122F7A01C53F771778C7",
+    "bytes": 18953,
+    "records": 5
+  },
+  "limits": [
+    "The original B2/SteamFE4 scored runtime dataset and prior F200 comparison retain their exact inputs. This run does not replace or relabel them.",
+    "Four native processes comprise fresh world creation,actual physical server run and two independent cold reloads; zero laboratory completions.",
+    "The shared caller changes only exact packet binding and target labels from the F210 run; no additional preparation refusal or native retry occurred.",
+    "The current run uses an unchanged canonical fixture with exact player/profile/engine pins; all original direct-library controls and owned archives were restored.",
+    "No speed,memory,Library,arbitrary modpack,other engine/edition or release acceptance follows."
+  ]
+}

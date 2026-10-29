@@ -1,0 +1,39 @@
+{
+  "schema": 1,
+  "kind": "mir5-armor-bobwarfare-f200-native-reference-selection",
+  "target": "f200",
+  "factorio_line": "2.0",
+  "engine": {
+    "version": "2.0.77",
+    "sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B"
+  },
+  "settings_mode": "Defaults",
+  "mods": [
+    {
+      "name": "base",
+      "version": "2.0.77",
+      "enabled": true
+    },
+    {
+      "name": "boblibrary",
+      "version": "2.1.0",
+      "enabled": true
+    },
+    {
+      "name": "bobwarfare",
+      "version": "2.1.0",
+      "enabled": true
+    },
+    {
+      "name": "mir-fixture-mir5-active-mods-observer",
+      "version": "0.1.0",
+      "enabled": true
+    }
+  ],
+  "archive_sha256": {
+    "boblibrary_2.1.0.zip": "1CB971B7A39F0805F14DD0F27F17CC832B7FFC6608CB2234E182062FC8DBF62B",
+    "bobwarfare_2.1.0.zip": "071C8DC3EBAE6D624A8E47BDDBA2C9432E1E2BF9D7E2EF151E95DF36788E9545",
+    "mir-fixture-mir5-active-mods-observer_0.1.0.zip": "723D1E7721449FC26040E5E6629416767BDC20AD79CF8723115846DB662A1F87"
+  },
+  "scope": "Independent upstream final-data reference for the conditional Bob Warfare mech armor plate route. It uses the default bobmods-warfare-spidertron-overhaul=true setting without a fixture override; native settings/raw capture must verify that assumption. No MIR5 admission, gameplay, save, or support qualification."
+}

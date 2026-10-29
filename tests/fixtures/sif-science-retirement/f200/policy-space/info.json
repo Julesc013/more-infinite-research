@@ -1,0 +1,12 @@
+{
+  "name": "mir-fixture-mir5-sif-policy-space-f200",
+  "version": "0.1.0",
+  "title": "MIR 5 private SIF space policy selector (F200)",
+  "author": "MIR maintainers",
+  "description": "Selects one exact startup science policy for the private SIF fixture.",
+  "factorio_version": "2.0",
+  "dependencies": [
+    "base = 2.0.77",
+    "mir-fixture-mir5-sif-science-retirement-f200 >= 0.1.0"
+  ]
+}

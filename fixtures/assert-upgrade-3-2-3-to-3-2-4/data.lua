@@ -1,1 +1,0 @@
--- Runtime upgrade fixture. Data-stage assertions live in data-final-fixes.lua.

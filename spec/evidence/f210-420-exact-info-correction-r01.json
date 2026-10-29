@@ -1,0 +1,60 @@
+{
+  "schema": 1,
+  "kind": "MIRF210420ExactArchiveInfoCorrectionV1",
+  "status": "same-published-archive-disproves-prior-version-field",
+  "scope": "Read-only exact published v4.2.0-stable F210 ZIP,not a native/save test. No archive modification,refetch,reissue inference,source patch or historical receipt rewrite.",
+  "published": {
+    "tag": "v4.2.0-stable",
+    "tag_commit": "6d19c874ea7d026d297865b96aa1b2b0916e9e61",
+    "release_id": 402577876,
+    "asset_id": 608069880,
+    "filename": "more-infinite-research_4.2.21000.zip",
+    "archive_sha256": "DE45F114931BEACF78F2CC6ABFBF3B2BDD7A79CC27E780A6E1A483FCA5ED9422",
+    "archive_bytes": 1244976
+  },
+  "actual_info": {
+    "entry": "more-infinite-research_4.2.21000/info.json",
+    "sole_info_member": true,
+    "bytes": 571,
+    "sha256": "3FACF3B451680BE8FD1214894E60F7973BC852F342BFC58C431CB408DAB8489F",
+    "name": "more-infinite-research",
+    "version": "4.2.21000",
+    "factorio_version": "2.1",
+    "raw_utf8_base64": "ewogICJuYW1lIjogIm1vcmUtaW5maW5pdGUtcmVzZWFyY2giLAogICJ2ZXJzaW9uIjogIjQuMi4yMTAwMCIsCiAgInRpdGxlIjogIk1vcmUgSW5maW5pdGUgUmVzZWFyY2giLAogICJhdXRob3IiOiAiSnVsZXNjMDEzIiwKICAiZGVzY3JpcHRpb24iOiAiQWRkcyBjb25maWd1cmFibGUgaW5maW5pdGUgcHJvZHVjdGl2aXR5IGFuZCBib251cyByZXNlYXJjaGVzIGZvciBpbnRlcm1lZGlhdGVzLCBsb2dpc3RpY3MsIGNvbWJhdCwgcGxheWVyIGJvbnVzZXMsIGFuZCBTcGFjZSBBZ2UgZ2Fwcy4iLAogICJmYWN0b3Jpb192ZXJzaW9uIjogIjIuMSIsCiAgImRlcGVuZGVuY2llcyI6IFsKICAgICJiYXNlID49IDIuMS4xOCIsCiAgICAiKD8pIGVsZXZhdGVkLXJhaWxzIiwKICAgICI/IHJlY3ljbGVyID49IDIuMS4xOCIsCiAgICAiKD8pIHF1YWxpdHkiLAogICAgIig/KSBLcmFzdG9yaW8yIiwKICAgICIoPykgS3Jhc3RvcmlvMi1zcGFjZWQtb3V0IiwKICAgICIoPykgcHlwb3N0cHJvY2Vzc2luZyIsCiAgICAiKD8pIHNwYWNlLWV4cGxvcmF0aW9uIiwKICAgICI/IHNwYWNlLWFnZSA+PSAyLjEuMTgiCiAgXQp9Cg=="
+  },
+  "independent_dotnet_readback": {
+    "path": "build/qualification/f210-420-dotnet-info-readback-r01.json",
+    "sha256": "125A4015B9F760FD0D4DAE23154E518FDEB03F02A4963B10B25EC95496F6F7E1",
+    "bytes": 455,
+    "raw_utf8_base64": "ew0KICAicmVhZGVyIjogIlN5c3RlbS5JTy5Db21wcmVzc2lvbi5aaXBGaWxlIGFuZCBDb252ZXJ0RnJvbS1Kc29uIiwNCiAgImFyY2hpdmVfc2hhMjU2IjogIkRFNDVGMTE0OTMxQkVBQ0Y3OEYyQ0M2QUJGQkYzQjJCREQ3QTc5Q0MyN0U3ODBBNkUxQTQ4M0ZDQTVFRDk0MjIiLA0KICAiYXJjaGl2ZV9ieXRlcyI6IDEyNDQ5NzYsDQogICJpbmZvX2VudHJ5IjogIm1vcmUtaW5maW5pdGUtcmVzZWFyY2hfNC4yLjIxMDAwL2luZm8uanNvbiIsDQogICJpbmZvX2J5dGVzIjogNTcxLA0KICAiaW5mb19zaGEyNTYiOiAiM0ZBQ0YzQjQ1MTY4MEJFOEZEMTIxNDg5NEU2MEY3OTczQkM4NTJGMzQyQkZDNThDNDMxQ0I0MDhEQUI4NDg5RiIsDQogICJuYW1lIjogIm1vcmUtaW5maW5pdGUtcmVzZWFyY2giLA0KICAidmVyc2lvbiI6ICI0LjIuMjEwMDAiLA0KICAiZmFjdG9yaW9fdmVyc2lvbiI6ICIyLjEiDQp9DQo=",
+    "parsed": {
+      "reader": "System.IO.Compression.ZipFile and ConvertFrom-Json",
+      "archive_sha256": "DE45F114931BEACF78F2CC6ABFBF3B2BDD7A79CC27E780A6E1A483FCA5ED9422",
+      "archive_bytes": 1244976,
+      "info_entry": "more-infinite-research_4.2.21000/info.json",
+      "info_bytes": 571,
+      "info_sha256": "3FACF3B451680BE8FD1214894E60F7973BC852F342BFC58C431CB408DAB8489F",
+      "name": "more-infinite-research",
+      "version": "4.2.21000",
+      "factorio_version": "2.1"
+    }
+  },
+  "python_readback": {
+    "reader_sha256": "BFA68F54485AC1B96E5513A1F529C472D7EC5A46BE4C582052A9855F931EF1B7",
+    "archive_sha256": "DE45F114931BEACF78F2CC6ABFBF3B2BDD7A79CC27E780A6E1A483FCA5ED9422",
+    "archive_zip_integrity": true,
+    "info_sha256": "3FACF3B451680BE8FD1214894E60F7973BC852F342BFC58C431CB408DAB8489F",
+    "version": "4.2.21000",
+    "factorio_version": "2.1"
+  },
+  "contradicted_record": {
+    "path": "spec/evidence/historical-structured-cap-archive-metadata.json",
+    "sha256": "EBD7141075DBF3BC6FEF2BDE250DC1E7CF907B05EBBD634942829E094B7AD054",
+    "asset_id": 608069880,
+    "reported_info_version": "4.2.20000",
+    "archive_digest_and_size_match_current_exact_bytes": true,
+    "original_receipt_preserved": true
+  },
+  "disposition": "Correct the active inventory and migration specification to actual4.2.21000. The supposed published F2104.2/4.2.20000 codec collision is not applicable to this exact archive. Keep ordinary current-target-first and per-row/current-negative/foreign ownership defenses; synthetic collision controls are defensive host cases,not evidence of a published collision.",
+  "limits": "This correction contradicts one metadata field only. It neither edits the original eight-archive receipt nor validates all other fields,source saves,worker tails,remaining V3/native routes or final release. Do not create a historical native source with falsified metadata to satisfy the disproven queue item."
+}

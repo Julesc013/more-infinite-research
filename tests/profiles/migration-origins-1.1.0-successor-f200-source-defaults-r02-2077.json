@@ -1,0 +1,37 @@
+{
+  "schema": 1,
+  "kind": "mir5-migration-origin-direct-successor-prepared",
+  "variant": "published-source-defaults-input-f200-r02-direct-token",
+  "origin_tag": "1.1.0",
+  "origin_source_commit": "2fb64822b82569e3b50f0653e361fb7148f18b63",
+  "source_fixture_commit": "bec37fb87a05d17cf4cf0225e0458218830fef63",
+  "source_fixture_controller_commit": "3ae2711867cd60f6c871f641c331349d941dd8c3",
+  "successor_fixture_commit": "b03a51351e44e943a50c7ead8f32a9ca89c75551",
+  "target": "f200_source_defaults",
+  "factorio_line": "2.0",
+  "engine": {
+    "version": "2.0.77",
+    "sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B"
+  },
+  "settings_mode": "Defaults",
+  "source_save": {
+    "sha256": "88FC8E9891040275E001930C3E6AA0A4A7A28C31D81DF30E3F08AEDD98E5019A",
+    "source_result_sha256": "4FBD622144E3B69E39C0530385AA70C92971208584CA32D4A10B1FCC1A978997"
+  },
+  "candidate": {
+    "source_commit": "c74b7c4680545f3ccf27f38016d1144fefe8eee3",
+    "player_tree": "f81c63afca2e6eb5b7e46dffe892548553899db3"
+  },
+  "mods": [
+    {"name": "base", "version": "2.0.77", "enabled": true},
+    {"name": "mir-fixture-mir5-active-mods-observer", "version": "0.1.0", "enabled": true},
+    {"name": "more-infinite-research", "version": "5.0.20000", "enabled": true},
+    {"name": "mir-fixture-mir5-migration-origin-f200-110-source", "version": "0.3.0", "enabled": true}
+  ],
+  "archive_sha256": {
+    "mir-fixture-mir5-active-mods-observer_0.1.0.zip": "723D1E7721449FC26040E5E6629416767BDC20AD79CF8723115846DB662A1F87",
+    "mir-fixture-mir5-migration-origin-f200-110-source_0.3.0.zip": "C47A1234C472202EEA11B69D34D8510D087BD6569F0BE7063607CB5830B7EB12",
+    "more-infinite-research_5.0.20000.zip": "050AC35BAB6BA1F01E160DB612B73A03E58E0ABE6A291D18109FAB1B235B63B5"
+  },
+  "scope": "Prepared direct F200 successor of the protected passed MIR 1.1.0 F200 r05 source stage under coherent c74b7c46 MIR5 F200. This R02 arm preserves the r01 Defaults-stage inputs ips-require-space-gate=true and ips-enable-research_inventory_capacity=false, and additionally accepts only the exact finite native float32 spelling of the candidate direct gear effect. It does not claim persisted player mod-settings recovery or native execution."
+}

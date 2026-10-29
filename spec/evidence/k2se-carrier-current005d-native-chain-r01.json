@@ -1,0 +1,150 @@
+{
+  "schema": 1,
+  "kind": "MIRK2SECarrierCurrent005dNativeChainV1",
+  "status": "protected-published-source-passes-current-successor-foreign-enablement-fails",
+  "scope": "Exact K2SE closure (Krastorio2 2.1.4,SE0.7.63,noK2SO),Steam2.1.23/FE4. Corrected disposable source fixture54bce,original B6 published MIR. Original first-source adverse retained separately. Current005D/player505 fails foreign enable flags before fixture writes. A separate logging-only fixture diagnostic leaves MIR/source/expectations unchanged; no player repair or migration pass follows.",
+  "controller_commit": "54bce939a557fe1fe8a9ec0299f3c94ad44e1181",
+  "source": {
+    "mir_sha256": "B6EB9430056ABD384DB00F94929FE7DAC0A37441ACF4BC277946689682628852",
+    "save": {
+      "sha256": "89023ABD70EC6B72B693F6BB5AA0D1506C3BABEF032B674A5621FB8F26F8BC92",
+      "bytes": 1590497
+    },
+    "actual_labs": 0,
+    "seeded_levels": [
+      4,
+      6
+    ],
+    "powder_productivity": 0.1,
+    "player_queue_count": 2,
+    "current_progress": 0.42,
+    "foreign_saved_progress": 0.27,
+    "foreign_enabled": false,
+    "cold_reloads": 2
+  },
+  "current": {
+    "mir_sha256": "005D420671270306155CB4AC25E9CF77541202DFA16B206DCC016237619C9AA2",
+    "raw_result_sha256": "35862DE2569DA7EF9784121D986F3F858DD6D2DCC44B5FBD4BD394A81A5E39EC",
+    "actual_processes": 1,
+    "save_created": false,
+    "original_assertion": "independently disabled foreign carrier differs"
+  },
+  "diagnostic": {
+    "raw_result_sha256": "5E3951143A6B084EB69C961C47B0496B2B4015143E2664DA726541C1E1F25695",
+    "fixture_patch": {
+      "member": "control.lua",
+      "added_helper": "local function log_carrier_diagnostic()\n  local ok, snapshot = pcall(function()\n    local function row(force)\n      local function tech(name)\n        local value = technology(force, name)\n        return {name=name,level=value.level,researched=value.researched,enabled=value.enabled,\n          visible_when_disabled=value.visible_when_disabled,saved_progress=value.saved_progress,\n          prototype_enabled=value.prototype.enabled,prototype_hidden=value.prototype.hidden,\n          prototype_level=value.prototype.level,prototype_upgrade=value.prototype.upgrade,\n          prototype_max_level=value.prototype.max_level}\n      end\n      return {force_index=force.index,early=tech(EARLY),tail=tech(TAIL),queue=queue(force),\n        powder_productivity=powder_bonus(force)}\n    end\n    return {player=row(game.forces.player),foreign=row(game.forces[FOREIGN])}\n  end)\n  pcall(function() log(\"[MIR5_K2SE_CARRIER_DIAGNOSTIC] \" .. helpers.table_to_json(\n    {stage=\"post-mir-pre-original-assert\",status=ok and \"observed\" or \"read-error\",\n      snapshot=ok and snapshot or nil,error=not ok and tostring(snapshot) or nil})) end)\nend\n\n",
+      "added_call": "  log_carrier_diagnostic()\n",
+      "baseline_sha256": "A6F331B0275378E5D2DA0E05C277A78B79D5223E16E3407368EC390E9BCC4743",
+      "instrumented_sha256": "445308B73E4B7D14082FE26EB92C8EF8974D92B12F957540392A69C8B0D2D15A",
+      "reverse_reconstructs_original": true,
+      "all_original_assertions_unchanged": true,
+      "player_source_unchanged": true
+    },
+    "observation": {
+      "stage": "post-mir-pre-original-assert",
+      "status": "observed",
+      "snapshot": {
+        "player": {
+          "force_index": 1,
+          "early": {
+            "name": "mir-k2-imersite-staged-state-1",
+            "level": 4,
+            "researched": false,
+            "enabled": true,
+            "visible_when_disabled": false,
+            "saved_progress": 0,
+            "prototype_enabled": true,
+            "prototype_hidden": true,
+            "prototype_level": 1,
+            "prototype_upgrade": false,
+            "prototype_max_level": 4294967295
+          },
+          "tail": {
+            "name": "mir-k2-imersite-continuation-state-4",
+            "level": 6,
+            "researched": false,
+            "enabled": true,
+            "visible_when_disabled": false,
+            "saved_progress": 0,
+            "prototype_enabled": true,
+            "prototype_hidden": true,
+            "prototype_level": 4,
+            "prototype_upgrade": false,
+            "prototype_max_level": 4294967295
+          },
+          "queue": {
+            "current": "mir-k2-imersite-continuation-state-4",
+            "names": [
+              "mir-k2-imersite-continuation-state-4",
+              "mir-k2-imersite-continuation-state-4"
+            ],
+            "progress": 0.42000000000000004
+          },
+          "powder_productivity": 0.1
+        },
+        "foreign": {
+          "force_index": 9,
+          "early": {
+            "name": "mir-k2-imersite-staged-state-1",
+            "level": 4,
+            "researched": false,
+            "enabled": true,
+            "visible_when_disabled": false,
+            "saved_progress": 0,
+            "prototype_enabled": true,
+            "prototype_hidden": true,
+            "prototype_level": 1,
+            "prototype_upgrade": false,
+            "prototype_max_level": 4294967295
+          },
+          "tail": {
+            "name": "mir-k2-imersite-continuation-state-4",
+            "level": 6,
+            "researched": false,
+            "enabled": true,
+            "visible_when_disabled": false,
+            "saved_progress": 0.27,
+            "prototype_enabled": true,
+            "prototype_hidden": true,
+            "prototype_level": 4,
+            "prototype_upgrade": false,
+            "prototype_max_level": 4294967295
+          },
+          "queue": {
+            "current": false,
+            "names": {},
+            "progress": 0
+          },
+          "powder_productivity": 0.1
+        }
+      }
+    },
+    "limits": "Post-MIR native state only; no MIR-private storage inference or first-callback cause verdict. No lab/save/reload."
+  },
+  "root_readback": {
+    "path": "build/qualification/k2se-carrier-current005d-diagnostic-r02-controller/root-readback-r01.json",
+    "sha256": "4977D8C116C2831768D23920488926F14538F4D8CB6BCD7315B20A90D0521991",
+    "files": 36,
+    "bytes_per_copy": 3712179
+  },
+  "lossless_receipts": {
+    "path": "spec/evidence/k2se-carrier-current005d-native-receipts-r01.json.gz",
+    "sha256": "FD62D881AACF162E850952DA69EBCE0322F366193B7787B39513C828EAB3CC99",
+    "bytes": 45129,
+    "records": 9
+  },
+  "counts": {
+    "source_processes": 4,
+    "successor_processes": 1,
+    "logging_diagnostic_processes": 1,
+    "labs": 0,
+    "accepted_cold_reloads": 2
+  },
+  "remaining": [
+    "Trace earliest MIR-context native flags to distinguish engine and player mutations",
+    "Resolve foreign-carrier enablement without enabling foreign research or weakening fixture assertions",
+    "Actual corrected-current successor/save/two cold reloads",
+    "Lab-earned/public/K2SO handoff and full product acceptance remain separate"
+  ]
+}

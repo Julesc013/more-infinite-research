@@ -1,0 +1,218 @@
+{
+  "schema": 1,
+  "kind": "MIRCorrectedCapFirstBatchPartialNativeChainV1",
+  "status": "disabled-passes-reenabled-lab-completes-stale-fixture-load-witness-fails",
+  "scope": "Corrected376eed79/player9461/F2101246 from original81AF/8DC. Disabled0.6 passes save07C/two cold reloads. Reenabled0.7 restores enabledtrue and completes one real lab/initialmarker/save0FA,but its first ordinary completed tick compares the disabled-stage on_load witness as a cold successor snapshot and fails. Raw failed verdict is retained; no accepted reenabling or F200 result.",
+  "controller_commit": "376eed796c5d1e8e7519c65cd3934710fda54b8c",
+  "player_tree": "9461d8608eb77a230fbb313080be93c32ea05336",
+  "candidate_f210_sha256": "12462A867726C4B9549177E91F9B37C6C5CC30E201401374F26366903F9B2DF2",
+  "protected_source": {
+    "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\cap-473-current7a2-r02-controller\\native-published\\write-data\\saves\\mir5-native-complete.zip",
+    "sha256": "81AFD312CB2391C7B0CF92C82CD022F93751E9E3FC99D181795078FC9651E4F9"
+  },
+  "disabled": {
+    "id": "disabled",
+    "status": "passed-private-native-fixture",
+    "result_sha256": "D52263F4CB430358D9B88A83329902713591339072A1507668E80D228F991586",
+    "files": 18,
+    "bytes_per_copy": 1056386,
+    "members": {
+      "config.ini": {
+        "bytes": 276,
+        "sha256": "3054B1AC1BE00182B5E4D393223DE13640E6A6FE43176DCBE7AF22352A8F06B0"
+      },
+      "process-1.resources.jsonl": {
+        "bytes": 2024,
+        "sha256": "404CAD8E4C7A81C9254FF526E0A7B7165C5C211226766E8BBCB10CECF55BD4FD"
+      },
+      "process-1.stderr.txt": {
+        "bytes": 0,
+        "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+      },
+      "process-1.stdout.txt": {
+        "bytes": 13957,
+        "sha256": "9A4CBBC8763E57B09ED99E57728FB091BDA43D6C0E785720AB2F00E142D96AFB"
+      },
+      "process-2.resources.jsonl": {
+        "bytes": 2008,
+        "sha256": "CE42447DACE9AFD9C5C808CCA1588E49F9E97E9D2A043CFF11F178861383908A"
+      },
+      "process-2.stderr.txt": {
+        "bytes": 0,
+        "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+      },
+      "process-2.stdout.txt": {
+        "bytes": 105,
+        "sha256": "41C040DD470B1E1E5F233CFCAE6B665BCD006EF4CB31BFA71F2664DE00F66FA1"
+      },
+      "process-3.resources.jsonl": {
+        "bytes": 2008,
+        "sha256": "26A9D5EDFAE030F9C87DE19D4DD667869D6D39FCB1B433CBBBFDC6B92BCBF5B8"
+      },
+      "process-3.stderr.txt": {
+        "bytes": 0,
+        "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+      },
+      "process-3.stdout.txt": {
+        "bytes": 105,
+        "sha256": "1F9D69B82B958B4CDB008198B7BD9D98EC3E7393A4E0FD2DFB58FF9F8AA8D11A"
+      },
+      "production.factorio.log": {
+        "bytes": 13827,
+        "sha256": "5D0892B332A828800A43121C62B2E49846DF2D5CC3D5640BC7A20276FA43DD72"
+      },
+      "reload-1.factorio.log": {
+        "bytes": 12409,
+        "sha256": "CC11D39518107676A93104C009EF57FF39EECDB0544DBC5B38A13218B17D6145"
+      },
+      "reload-2.factorio.log": {
+        "bytes": 12409,
+        "sha256": "8332A36B2345A06A85A4089BE0B6065605F8661EBCEF4585EDDB31302F6EDE93"
+      },
+      "result.json": {
+        "bytes": 35064,
+        "sha256": "D52263F4CB430358D9B88A83329902713591339072A1507668E80D228F991586"
+      },
+      "server-settings.json": {
+        "bytes": 3679,
+        "sha256": "5B4C546FFCA63E1AEC8F67FFA5C32F3108CBC334DFA5AB1C5E2C212005639610"
+      },
+      "write-data/factorio-current.log": {
+        "bytes": 12409,
+        "sha256": "8332A36B2345A06A85A4089BE0B6065605F8661EBCEF4585EDDB31302F6EDE93"
+      },
+      "write-data/player-data.json": {
+        "bytes": 10851,
+        "sha256": "285ED61F8778CFF44FA173F8EDCC5E417F4DF8C1019A3DDD02814729CEE56EF9"
+      },
+      "write-data/saves/mir5-native-complete.zip": {
+        "bytes": 935255,
+        "sha256": "07C05394C20E20C44152C789D5B68D046036C308E9510CC1899BB9B8E8D12ACA"
+      }
+    },
+    "save": {
+      "path": "build/qualification/cap-corrected-376eed79-native-r01-controller/native-disabled/write-data/saves/mir5-native-complete.zip",
+      "sha256": "07C05394C20E20C44152C789D5B68D046036C308E9510CC1899BB9B8E8D12ACA",
+      "bytes": 935255
+    },
+    "initial_witnesses": {
+      "source_mir": "4.7.20003",
+      "destination_mir": "5.0.21000",
+      "source_actual_lab_completions": 2,
+      "destination_actual_lab_completions": 0,
+      "disabled_intermediate_observed": true,
+      "next_level": 3,
+      "productivity_bonus": 0.02,
+      "player_enabled": false,
+      "player_visible_when_disabled": true,
+      "saved_progress": 0.27,
+      "foreign_queue_progress": 0.42000000000000004,
+      "foreign_disabled": true,
+      "on_load_read_only": false
+    }
+  },
+  "reenabled_adverse": {
+    "id": "reenabled",
+    "status": "failed",
+    "result_sha256": "4C864D8DE2F72C183952E065BE8D77E8EDA91684FE3329FF022569A28A4096F0",
+    "files": 9,
+    "bytes_per_copy": 993080,
+    "members": {
+      "config.ini": {
+        "bytes": 277,
+        "sha256": "105A33D5FC8B0051484A4ADF6AD9B93FE03B8A5065D4C789A9E22317642C2B7C"
+      },
+      "process-1.resources.jsonl": {
+        "bytes": 2037,
+        "sha256": "CEDF849754ED954E8D846E7FB3150120E546D0BA4EAD021BAF31DBF50910778D"
+      },
+      "process-1.stderr.txt": {
+        "bytes": 0,
+        "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+      },
+      "process-1.stdout.txt": {
+        "bytes": 16654,
+        "sha256": "C866E40452A5266DF0E03DDFA0D7E907F4B03AEC4ECA603D6CC7E279034E26DA"
+      },
+      "result.json": {
+        "bytes": 6852,
+        "sha256": "4C864D8DE2F72C183952E065BE8D77E8EDA91684FE3329FF022569A28A4096F0"
+      },
+      "server-settings.json": {
+        "bytes": 3679,
+        "sha256": "5B4C546FFCA63E1AEC8F67FFA5C32F3108CBC334DFA5AB1C5E2C212005639610"
+      },
+      "write-data/factorio-current.log": {
+        "bytes": 16496,
+        "sha256": "DC5AABB9FE10089D69D27C1666F9A50A036903EF6C7E9E7F01A8C5FA81357930"
+      },
+      "write-data/player-data.json": {
+        "bytes": 11450,
+        "sha256": "3AE45D055C3A62AA3F4FB4A25DE68DC2AE366BF472E55D4D6EEE51513CFABFC7"
+      },
+      "write-data/saves/mir5-native-complete.zip": {
+        "bytes": 935635,
+        "sha256": "0FA045D1C27195DBFC38DD3DC73AA9B04063641A33057EA07BE9FB64D578AEEC"
+      }
+    },
+    "save": {
+      "path": "build/qualification/cap-corrected-376eed79-native-r01-controller/native-reenabled/write-data/saves/mir5-native-complete.zip",
+      "sha256": "0FA045D1C27195DBFC38DD3DC73AA9B04063641A33057EA07BE9FB64D578AEEC",
+      "bytes": 935635
+    },
+    "unaccepted_initial_marker": {
+      "stage": "initial",
+      "case": "f200-f210-positive-legacy-cap-reenabled",
+      "status": "passed",
+      "qualification": "native-runner-readback-required",
+      "witnesses": {
+        "source_mir": "4.7.20003",
+        "destination_mir": "5.0.21000",
+        "source_actual_lab_completions": 2,
+        "destination_actual_lab_completions": 1,
+        "milestone": "actual2labs",
+        "next_level": 4,
+        "productivity_bonus": 0.03,
+        "player_enabled": true,
+        "player_visible_when_disabled": true,
+        "foreign_queue_progress": 0.42000000000000004,
+        "science_consumed_units": 0.7333333333333333,
+        "science_inventory_consumed_units": 1,
+        "science_type": "item",
+        "science_remaining_ticks": 44,
+        "science_processing_ticks": 44,
+        "science_elapsed_ticks": 43,
+        "science_units_after": {
+          "automation-science-pack": 21,
+          "logistic-science-pack": 21,
+          "chemical-science-pack": 21,
+          "production-science-pack": 21
+        },
+        "on_load_read_only": false
+      }
+    }
+  },
+  "packet_sha256": "177BAB4F55119B4BB6565DFA6FFD8829326BE702D162BBF840B220E3A39F4E6F",
+  "caller_sha256": "A17261FFD12D609874765428BBE46B4C646101BFAAA00520A377DD57C971A7DB",
+  "root_readback": {
+    "path": "build/qualification/cap-corrected-376eed79-native-r01-controller/root-readback-r01.json",
+    "sha256": "0EB71FBE2BCF4E03AEE35FD826F3F77850EF43E4702F0ACB4B5E77728C2C9EAE",
+    "files": 27,
+    "bytes_per_copy": 2049466
+  },
+  "lossless_receipts": {
+    "path": "spec/evidence/cap-corrected-first-batch-partial-receipts-r01.json.gz",
+    "sha256": "6DED6980BF564E43DEDD35C249FE7FB0E1522ED656A3AF37135D79A0D6AA5FAE",
+    "bytes": 21545,
+    "records": 4
+  },
+  "counts": {
+    "actual_processes": 4,
+    "disabled_cold_reloads": 2,
+    "reenabled_labs_in_failed_stage": 1,
+    "reenabled_cold_reloads": 0,
+    "f200_actual_processes": 0
+  },
+  "fixture_correction": "After all original reenable/source restoration assertions pass,discard only that superseded local on_load witness. Original live/cold/foreign/work/settings/configuration guards remain. Faithful host flow adds ordinary completed ticks before actual cold loads; its new control is red before the three-line correction and all19 controls pass afterward,including real cold drift and unexpected repeatedconfiguration opponents.",
+  "remaining": "Rebind a committed corrected0.7 fixture,then replay only reenabling from protected07C and the still-unrun F200 direct case from original81AF. Do not recreate or repeat the accepted disabled stage. Both original and failed-stage saves remain protected; no player/package change."
+}

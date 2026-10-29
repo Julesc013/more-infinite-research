@@ -1,0 +1,12 @@
+{
+  "name": "mir-fixture-mir5-f200-foreign-cap-baseline",
+  "version": "0.2.0",
+  "title": "MIR F200 foreign cap-baseline finite fixture",
+  "author": "MIR maintainers",
+  "description": "Disposable current-MIR F200 finite-cap observation of an external foreign disablement.",
+  "factorio_version": "2.0",
+  "dependencies": [
+    "base >= 2.0.77",
+    "more-infinite-research = 5.0.20000"
+  ]
+}

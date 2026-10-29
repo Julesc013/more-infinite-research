@@ -1,0 +1,139 @@
+{
+  "schema": 1,
+  "kind": "authored-private-native-worker-cap-custody-index-not-runner-receipt",
+  "scope": "F210 Space Age and K2SO native worker tail cap/effect scenarios",
+  "release_qualification": false,
+  "player_record": {
+    "path": "build/mir5/worker-owner-r01/packages/player.json",
+    "sha256": "A8F07A093C22F23FF6FDA67E2676E928F6D6ECE72C342118D927DAF7BE69D7E2"
+  },
+  "player_source_commit": "d2be4a08bc4ce683a94eadb82e76667b7251ed7f",
+  "player_sha256": "31EDAD840A721C313E25BBCE996BCC30E3D9B862E695B075F998B1186E9150EE",
+  "fixture_record": {
+    "path": "build/mir5/worker-owner-r01/packages/fixture.json",
+    "sha256": "33397E21E931D2EEAB6C12FAAC9A4364FBEA69D76F87DBA34F54C0E6225AD22B"
+  },
+  "scenarios": [
+    {
+      "profile": "k2so",
+      "receipt": "spec/mir5/evidence/worker-caps-k2so-native.json",
+      "receipt_sha256": "91FA470AB014401EAA97FFA7A59A077E30595C9D4E57607E5EFBDFDB253D40F8",
+      "engine": {
+        "path": "C:\\Program Files\\Steam\\steamapps\\common\\Factorio\\bin\\x64\\factorio.exe",
+        "sha256": "FE4A1DA30F322A0D0B8AEB3DF7276332222BAAA143E2352569B723E84B2B9060",
+        "file_version": "2.1.23.87750",
+        "product_version": "2.1.23",
+        "base_version": "2.1.23"
+      },
+      "harness_sha256": "00738675D162FDDE0F53567225A2022531C694FA87A14C59EC87F8CEE41ED050",
+      "fixtures": [
+        {
+          "sha256": "C9A538402C18A794D8002CA3AB6E454EB7AFE20DF608CBF48FB7C12059B78114",
+          "archive": "C:\\Projects\\Factorio\\testmods\\2.1\\mir-fixture-mir5-worker-caps_0.1.0.zip",
+          "source": "C:\\Projects\\Factorio\\more-infinite-research\\tests\\mir5\\fixtures\\worker-caps"
+        },
+        {
+          "sha256": "2E1BE5952D2A4CC5C74A0D149E075D247BA110A3FAE5B6768D3EAEBABCEF989C",
+          "archive": "C:\\Projects\\Factorio\\testmods\\2.1\\mir-fixture-mir5-active-mods-observer_0.1.0.zip",
+          "source": "C:\\Projects\\Factorio\\more-infinite-research\\tests\\mir5\\fixtures\\active-mods-observer"
+        }
+      ],
+      "profile_input": {
+        "sha256": "CBB620E7993132B6B12B36F5D44CD4A9AD334257317FD3F3B6A5AD09425CDED5",
+        "path": "C:\\Projects\\Factorio\\more-infinite-research\\tests\\mir5\\profiles\\worker-caps-k2so-f210.json"
+      },
+      "observed": {
+        "profile": "k2so",
+        "native_owner": "worker-robots-speed-7",
+        "native_effect_modifier": 0.6,
+        "cap": 8,
+        "next_level": 9,
+        "lab_completed_levels": 2,
+        "each_required_science_pack_consumed": 2,
+        "science_pack_names": [
+          "production-science-pack",
+          "utility-science-pack",
+          "space-science-pack",
+          "electromagnetic-science-pack"
+        ],
+        "before_bonus_with_independent_offset": 3.173,
+        "after_bonus": 4.373,
+        "independent_offset": 0.123,
+        "cap_disabled_owned_player": true,
+        "foreign_disable_preserved": true,
+        "foreign_force_bonus_unchanged": true,
+        "fixture_accelerates_cost_and_time": true,
+        "on_load_read_only": false,
+        "gameplay_scope": "disposable-native-worker-cap-only"
+      },
+      "completed_save_sha256": "5808D77E184A813FB75D62D2C4AB5C3F4DAC4C480B7469F81F9E21FBAED5E8EF",
+      "two_cold_reloads_byte_identical": true,
+      "library_controls_restored": true
+    },
+    {
+      "profile": "space-age",
+      "receipt": "spec/mir5/evidence/worker-caps-space-age-native.json",
+      "receipt_sha256": "2674699986C5F7ED5394FA3DE0492AEE70894E34A118160E244B63DAD0497AED",
+      "engine": {
+        "path": "C:\\Program Files\\Steam\\steamapps\\common\\Factorio\\bin\\x64\\factorio.exe",
+        "sha256": "FE4A1DA30F322A0D0B8AEB3DF7276332222BAAA143E2352569B723E84B2B9060",
+        "file_version": "2.1.23.87750",
+        "product_version": "2.1.23",
+        "base_version": "2.1.23"
+      },
+      "harness_sha256": "00738675D162FDDE0F53567225A2022531C694FA87A14C59EC87F8CEE41ED050",
+      "fixtures": [
+        {
+          "sha256": "C9A538402C18A794D8002CA3AB6E454EB7AFE20DF608CBF48FB7C12059B78114",
+          "source": "C:\\Projects\\Factorio\\more-infinite-research\\tests\\mir5\\fixtures\\worker-caps",
+          "archive": "C:\\Projects\\Factorio\\testmods\\2.1\\mir-fixture-mir5-worker-caps_0.1.0.zip"
+        },
+        {
+          "sha256": "2E1BE5952D2A4CC5C74A0D149E075D247BA110A3FAE5B6768D3EAEBABCEF989C",
+          "source": "C:\\Projects\\Factorio\\more-infinite-research\\tests\\mir5\\fixtures\\active-mods-observer",
+          "archive": "C:\\Projects\\Factorio\\testmods\\2.1\\mir-fixture-mir5-active-mods-observer_0.1.0.zip"
+        }
+      ],
+      "profile_input": {
+        "path": "C:\\Projects\\Factorio\\more-infinite-research\\tests\\mir5\\profiles\\worker-caps-space-age-f210.json",
+        "sha256": "B2C3356E613A6E9DBBFA531302F3D4AAF9260737BF90A860D938B93DB5006EEC"
+      },
+      "observed": {
+        "profile": "space-age",
+        "native_owner": "worker-robots-speed-7",
+        "native_effect_modifier": 0.65,
+        "cap": 8,
+        "next_level": 9,
+        "lab_completed_levels": 2,
+        "each_required_science_pack_consumed": 2,
+        "science_pack_names": [
+          "automation-science-pack",
+          "logistic-science-pack",
+          "chemical-science-pack",
+          "production-science-pack",
+          "utility-science-pack",
+          "space-science-pack",
+          "electromagnetic-science-pack"
+        ],
+        "before_bonus_with_independent_offset": 3.173,
+        "after_bonus": 4.473,
+        "independent_offset": 0.123,
+        "cap_disabled_owned_player": true,
+        "foreign_disable_preserved": true,
+        "foreign_force_bonus_unchanged": true,
+        "fixture_accelerates_cost_and_time": true,
+        "on_load_read_only": false,
+        "gameplay_scope": "disposable-native-worker-cap-only"
+      },
+      "completed_save_sha256": "46C9A3FB8113D686F8D3A9A7981983D4AD885552F08614FDEBCBF5C47CB68260",
+      "two_cold_reloads_byte_identical": true,
+      "library_controls_restored": true
+    }
+  ],
+  "limitations": [
+    "Fixture accelerates native cost/time; normal upstream definitions are characterized separately.",
+    "New disposable MIR5 worlds, not historical MIR4 save upgrades or production factories.",
+    "No worker-cap relaxation or profile-switch native transition in these scenarios; these have separate host controls.",
+    "No physical robot travel-speed, full-overhaul, multiplayer, menu, performance or release qualification."
+  ]
+}

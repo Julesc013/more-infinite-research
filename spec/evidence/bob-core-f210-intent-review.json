@@ -1,0 +1,150 @@
+{
+  "candidate_archive_sha256": "EDB20C82CCC9B80F0DB04FA8C88059E0AF5E67B8E6286881A23CF9BBDBBE2ED3",
+  "candidate_manifest_members_verified": 16,
+  "candidate_manifest_sha256": "06859D6FF615CB2D3871DB89D500AFEBCD3E0B6A2CB54B415BA94F0429E2C4EF",
+  "candidate_run": 40078452675,
+  "candidate_source": "e4b6814cf70acac17a8b90552048b24023d64844",
+  "caption_fix_source_controls": "Complete published names/descriptions for all14 rows replace hand-built nesting; six material and three progression controls pass after opposing failures.",
+  "comparison_tool_git_blob": "4bef3942f148900b115856bbe781e6c9f412718e",
+  "existing_retirement_contracts": {
+    "generic_metadata_ignore": false,
+    "other_setting_fields_removed": false,
+    "private_mod_data_rows": 7,
+    "setting_descriptors_with_one_targets_field_removed": 889
+  },
+  "gameplay_qualification": false,
+  "inventory": {
+    "candidate_output_read_during_derivation": false,
+    "derivation": "recover_modern_catalogue.recover_profile(bob-core-f210, upstream40069301778, published40069301778, expected_version=4.7.21002)",
+    "path": "spec/mir5/inventory/bob-core-f210-472.json",
+    "sha256": "85E6055FB5924AC35D3B58D67F6D87BA83DF36F82570494329DBFCB9CD38B47A"
+  },
+  "kind": "MIR5BobCoreF210IndependentIntentReviewV1",
+  "next_source_caption_fix": "e0a016744310fd4e0c586205446ee031d09f5a17",
+  "reference_run": 40069301778,
+  "release_qualification": false,
+  "required_next": "New complete candidate capture and zero unresolved intended-output differences before actual Bob laboratories/save/reloads.",
+  "reviewed_comparison": {
+    "baseline_receipt": {
+      "data_raw": {
+        "bytes": 31369979,
+        "path": "write-data/script-output/data-raw-dump.json",
+        "sha256": "BA5AC0732E0DB51EC13089F2F7728882B45BCB247A9DC3A9F9582D0CAD88D6E3"
+      },
+      "mod_settings": {
+        "bytes": 8706,
+        "path": "write-data/script-output/mod-settings-dump.json",
+        "sha256": "50786C334AA6B4540F6A2A1A149A630585A84F8B2F288FAC1104EA03920FBB6B"
+      },
+      "result": {
+        "bytes": 18475,
+        "path": "result.json",
+        "sha256": "F85E55C891D07A44F4ABEFEAAE6C3EDC0BCD586E2E108588D1EF75B8C3399733"
+      },
+      "selection": {
+        "bytes": 1076,
+        "path": "selection.json",
+        "sha256": "60B5F7508A964E6BC055FC75F6CE3C1E68B9A7F551954016CA70AA2EC04A85B8"
+      }
+    },
+    "candidate_receipt": {
+      "data_raw": {
+        "bytes": 31582693,
+        "path": "write-data/script-output/data-raw-dump.json",
+        "sha256": "B45712FFEBC2DA398B772EC411CC58F7F6594262BC6B0BF18CF41490DC1FD32D"
+      },
+      "mod_settings": {
+        "bytes": 753196,
+        "path": "write-data/script-output/mod-settings-dump.json",
+        "sha256": "1E18C16C25AC48D9CE2F56E1F3AFDB5B4503B29E2536DDF22687128398234CD7"
+      },
+      "result": {
+        "bytes": 19680,
+        "path": "result.json",
+        "sha256": "E446C842ECF05DBCE9267ABE0DDB95278018D23EC57DF060D09CB3862DBE906F"
+      },
+      "selection": {
+        "bytes": 1186,
+        "path": "selection.json",
+        "sha256": "F8BBBEC6DB068BF7A083F4A1FF9142902A4784017E39FE1405D290BBDE1D7ECF"
+      }
+    },
+    "differences": [
+      {
+        "domain": "data",
+        "names": [
+          "recipe-prod-research_material_bronze-4",
+          "recipe-prod-research_material_copper_tungsten-4",
+          "recipe-prod-research_material_gunmetal-4",
+          "recipe-prod-research_material_invar-4",
+          "recipe-prod-research_material_lead-4",
+          "recipe-prod-research_material_nitinol-4",
+          "recipe-prod-research_material_tin-4"
+        ],
+        "type": "technology"
+      }
+    ],
+    "inventory_sha256": "85E6055FB5924AC35D3B58D67F6D87BA83DF36F82570494329DBFCB9CD38B47A",
+    "kind": "MIR5ModernF210CandidateComparisonV1",
+    "profile": "bob-core-f210",
+    "profile_input_equivalence": {
+      "baseline": {
+        "capture_locator": "C:\\Users\\Jules\\AppData\\Local\\MIRWorker\\runner\\_work\\mir-native-worker\\mir-native-worker\\source\\tests\\mir5\\profiles\\bob-core-f210-2123.json",
+        "receipt_sha256": "74B91D91B65109FC5FCD252C406301EF292B79F1F5BD2B7474E6C5BB1DBA4F76",
+        "verified_sha256": "74B91D91B65109FC5FCD252C406301EF292B79F1F5BD2B7474E6C5BB1DBA4F76"
+      },
+      "candidate": {
+        "capture_locator": "C:\\Users\\Jules\\AppData\\Local\\MIRWorker\\runner\\_work\\mir-native-worker\\mir-native-worker\\source\\build\\tmp\\black-glass-40078452675-1\\bob-core-f210-candidate-profile.json",
+        "receipt_sha256": "5D0673A4327DEAD5BBF4ABB141949638F1A0BA1E4CBF8225540089A2E3E040A2",
+        "verified_sha256": "5D0673A4327DEAD5BBF4ABB141949638F1A0BA1E4CBF8225540089A2E3E040A2"
+      },
+      "canonical_full_document_sha256": "A466CECD4D8736F98903D0F61443C72B99E87B6508694C2D6C5D7277BDE74F5F",
+      "status": "accepted-format-and-locator-equivalence"
+    },
+    "reviewed_differences": [
+      "bob-core-base-first-effect-order-carbon",
+      "bob-core-base-first-effect-order-copper",
+      "bob-core-base-first-effect-order-lithium",
+      "bob-core-base-first-effect-order-sulfur",
+      "bob-core-base-first-effect-order-sulfuric_acid_productivity",
+      "bob-core-native-credit-mir-native-credit-research_copper-copper-plate-positive",
+      "bob-core-native-credit-mir-native-credit-research_copper-copper-plate-negative",
+      "bob-core-native-credit-mir-native-credit-research_iron-iron-plate-positive",
+      "bob-core-native-credit-mir-native-credit-research_iron-iron-plate-negative",
+      "bob-core-native-credit-mir-native-credit-research_breeding-fish-breeding-positive",
+      "bob-core-native-credit-mir-native-credit-research_breeding-fish-breeding-negative",
+      "bob-core-native-credit-mir-native-credit-research_oil_processing_productivity-advanced-oil-processing-positive",
+      "bob-core-native-credit-mir-native-credit-research_oil_processing_productivity-advanced-oil-processing-negative",
+      "bob-core-native-credit-mir-native-credit-research_oil_processing_productivity-basic-oil-processing-positive",
+      "bob-core-native-credit-mir-native-credit-research_oil_processing_productivity-basic-oil-processing-negative",
+      "bob-core-native-credit-mir-native-credit-research_oil_processing_productivity-coal-liquefaction-positive",
+      "bob-core-native-credit-mir-native-credit-research_oil_processing_productivity-coal-liquefaction-negative",
+      "bob-core-native-credit-mir-native-credit-research_bullets-firearm-magazine-positive",
+      "bob-core-native-credit-mir-native-credit-research_bullets-firearm-magazine-negative",
+      "bob-core-native-credit-mir-native-credit-research_grenades-grenade-positive",
+      "bob-core-native-credit-mir-native-credit-research_grenades-grenade-negative",
+      "bob-core-native-credit-mir-native-credit-research_lubricant_productivity-lubricant-positive",
+      "bob-core-native-credit-mir-native-credit-research_lubricant_productivity-lubricant-negative",
+      "bob-core-native-credit-mir-native-credit-research_breeding-pentapod-egg-positive",
+      "bob-core-native-credit-mir-native-credit-research_breeding-pentapod-egg-negative",
+      "bob-core-native-credit-mir-native-credit-research_concrete-stone-brick-positive",
+      "bob-core-native-credit-mir-native-credit-research_concrete-stone-brick-negative",
+      "bob-core-native-credit-mir-native-credit-research_sulfuric_acid_productivity-sulfuric-acid-positive",
+      "bob-core-native-credit-mir-native-credit-research_sulfuric_acid_productivity-sulfuric-acid-negative"
+    ],
+    "schema": 2,
+    "scope": "complete data/settings output only; no gameplay, menu, save, runtime, or release qualification",
+    "status": "different-intended-native-output"
+  },
+  "reviewed_differences": {
+    "candidate_effect_values_used_as_expectation": false,
+    "credit_effect_values": "one uniquely matched positive change-recipe-productivity effect from each named published main row",
+    "exact_signed_credit_descriptors": 24,
+    "named_complete_descriptors": 29,
+    "path": "spec/mir5/inventory/bob-core-f210-intended-differences.json",
+    "recipe_effect_order_only": 5,
+    "sha256": "902D8D2AB97836DF9C654BC3D98425751F0AE7334316704F07B38C8098FA220B"
+  },
+  "schema": 1,
+  "status": "independent-intent-recorded-seven-native-caption-differences-still-unqualified"
+}

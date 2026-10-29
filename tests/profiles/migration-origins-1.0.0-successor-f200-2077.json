@@ -1,0 +1,35 @@
+{
+  "schema": 1,
+  "kind": "mir5-migration-origin-successor",
+  "origin_tag": "1.0.0",
+  "origin_source_commit": "f0057a96847512b50acdd6e23fc21b5b41e75adb",
+  "target": "f200",
+  "factorio_line": "2.0",
+  "engine": {
+    "version": "2.0.77",
+    "sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B"
+  },
+  "settings_mode": "ProtectedSourceSave",
+  "fixture_startup_setting": {
+    "name": "ips-enable-research_breeding",
+    "value": false,
+    "delivery": "fixture-settings-updates-default-for-successor-load-only",
+    "persistence_claim": false
+  },
+  "source_save": {
+    "sha256": "F8B38209DA632C8B2EFA049C8F69CDB3E3EC01F6BEE0C5D03BAFF03C27989C54",
+    "source_result_sha256": "156DB224E0042D8D988E2CF127641E9AAE0FCF7430402A645F93A2BE41BC8A30"
+  },
+  "mods": [
+    {"name": "base", "version": "2.0.77", "enabled": true},
+    {"name": "mir-fixture-mir5-active-mods-observer", "version": "0.1.0", "enabled": true},
+    {"name": "more-infinite-research", "version": "5.0.20000", "enabled": true},
+    {"name": "mir-fixture-mir5-migration-origin-f200-100-source", "version": "0.2.0", "enabled": true}
+  ],
+  "archive_sha256": {
+    "mir-fixture-mir5-active-mods-observer_0.1.0.zip": "723D1E7721449FC26040E5E6629416767BDC20AD79CF8723115846DB662A1F87",
+    "mir-fixture-mir5-migration-origin-f200-100-source_0.2.0.zip": "2A4F3917A882816BE54C62CCF2CBDA8A1D6F618927E3C611D6BF70DF9CA17878",
+    "more-infinite-research_5.0.20000.zip": "BD1B88D7DE85489207F71C1B080FD61617FAEF9655370BF0332A51579308ECE3"
+  },
+  "scope": "Protected MIR 1.0.0 F200 source-save successor under the verified 98fb MIR5 F200 asset. It must preserve all retained source state before one actual current gear lab, then save and perform two read-only cold reloads. Its bounded fixture supplies the source's effective false breeding startup input but makes no claim that a user-authored override persists across a later default change. It is prepared input only."
+}

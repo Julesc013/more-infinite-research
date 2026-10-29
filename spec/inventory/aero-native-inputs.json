@@ -1,0 +1,201 @@
+{
+  "format": 1,
+  "kind": "mir5-aero-native-machine-inputs",
+  "status": "availability-observed-not-native-qualified",
+  "scope": {
+    "targets": [
+      "F013",
+      "F014",
+      "F015",
+      "F016",
+      "F017",
+      "F100",
+      "F110",
+      "F200",
+      "F210"
+    ],
+    "excluded_target": "F018",
+    "observation_boundary": "Executable paths, Windows file-version resources, SHA-256 values, and direct named archive-library membership were read without launching an engine or copying an archive.",
+    "not_a_claim": [
+      "Executable availability is not a native load, gameplay, save, performance, or compatibility qualification.",
+      "A named testmods library entry is machine-local input selection, not published archive custody or support evidence.",
+      "No MIR5 target package has been materialized or qualified by this record."
+    ]
+  },
+  "engine_inputs": [
+    {
+      "target": "F013",
+      "baseline_engine": "0.13.20",
+      "path": "D:/Programs/Factorio/0.13/bin/x64/factorio.exe",
+      "file_version": null,
+      "product_version": null,
+      "file_version_note": "The executable has no readable Windows version-resource metadata.",
+      "sha256": "f12c0df5a5ef0d72f50a24bd76e077dfc9cbeab4b31ee9ef0951a4a9c086b856"
+    },
+    {
+      "target": "F014",
+      "baseline_engine": "0.14.23",
+      "path": "D:/Programs/Factorio/0.14/bin/x64/factorio.exe",
+      "file_version": "0.14.23.25374",
+      "product_version": "0.14.23",
+      "sha256": "a2b7dc0fbc1d6d68cf4d71eb71d42952fbb3b0cf35eec6bf8b4ba16b9f79715f"
+    },
+    {
+      "target": "F015",
+      "baseline_engine": "0.15.40",
+      "path": "D:/Programs/Factorio/0.15/bin/x64/factorio.exe",
+      "file_version": "0.15.40.30950",
+      "product_version": "0.15.40",
+      "sha256": "a1c87043244beae8e5903fb7d4a96e7920189c6339f00e3a2398988b9c8e7dd6"
+    },
+    {
+      "target": "F016",
+      "baseline_engine": "0.16.51",
+      "path": "D:/Programs/Factorio/0.16/bin/x64/factorio.exe",
+      "file_version": "0.16.51.36654",
+      "product_version": "0.16.51",
+      "sha256": "acba4d8b766c8cb61cbb564e0d5041439df32d93c86127dcc3887eb329630966"
+    },
+    {
+      "target": "F017",
+      "baseline_engine": "0.17.79",
+      "path": "D:/Programs/Factorio/0.17/bin/x64/factorio.exe",
+      "file_version": "0.17.79.47865",
+      "product_version": "0.17.79",
+      "sha256": "e699d376d100a428b95243507fdbb39c372921577c6d7593203edf07caa12d06"
+    },
+    {
+      "target": "F100",
+      "baseline_engine": "1.0.0",
+      "path": "D:/Programs/Factorio/1.0/bin/x64/factorio.exe",
+      "file_version": "1.0.0.54889",
+      "product_version": "1.0.0",
+      "sha256": "99f1ce207a04296ef7d797e4a98aa98dde4f02ee653c9df736ac33a676fd4f70"
+    },
+    {
+      "target": "F110",
+      "baseline_engine": "1.1.110",
+      "path": "D:/Programs/Factorio/1.1/bin/x64/factorio.exe",
+      "file_version": "1.1.110.62357",
+      "product_version": "1.1.110",
+      "sha256": "b7b4b834fca2e32afa9d3476eb42cc09b02f1205be97f688dc6fc6ace7ba8fe1"
+    },
+    {
+      "target": "F200",
+      "baseline_engine": "2.0.77",
+      "path": "D:/Programs/Factorio/2.0/bin/x64/factorio.exe",
+      "file_version": "2.0.77.84539",
+      "product_version": "2.0.77",
+      "sha256": "d3bcfca4dbee407d472013b745ce2445d34af6f021aacc5753ee0dac54b56b0b"
+    },
+    {
+      "target": "F210",
+      "baseline_engine": "2.1.23",
+      "path": "C:/Program Files/Steam/steamapps/common/Factorio/bin/x64/factorio.exe",
+      "file_version": "2.1.23.87750",
+      "product_version": "2.1.23",
+      "sha256": "fe4a1da30f322a0d0b8aeb3df7276332222baaa143e2352569b723e84b2b9060",
+      "engine_authority": "current Steam Factorio 2.1 only"
+    }
+  ],
+  "direct_archive_library": {
+    "root": "C:/Projects/Factorio/testmods",
+    "named_directories_observed": [
+      "1.0",
+      "1.1",
+      "2.0",
+      "2.1",
+      "profiles",
+      "quarantine",
+      "unverified"
+    ],
+    "target_membership": [
+      {
+        "target": "F013",
+        "directory": "C:/Projects/Factorio/testmods/0.13",
+        "directory_present": false,
+        "expected_archive": "more-infinite-research_4.7.01300.zip",
+        "expected_archive_present": false
+      },
+      {
+        "target": "F014",
+        "directory": "C:/Projects/Factorio/testmods/0.14",
+        "directory_present": false,
+        "expected_archive": "more-infinite-research_4.7.01400.zip",
+        "expected_archive_present": false
+      },
+      {
+        "target": "F015",
+        "directory": "C:/Projects/Factorio/testmods/0.15",
+        "directory_present": false,
+        "expected_archive": "more-infinite-research_4.7.01500.zip",
+        "expected_archive_present": false
+      },
+      {
+        "target": "F016",
+        "directory": "C:/Projects/Factorio/testmods/0.16",
+        "directory_present": false,
+        "expected_archive": "more-infinite-research_4.7.01600.zip",
+        "expected_archive_present": false
+      },
+      {
+        "target": "F017",
+        "directory": "C:/Projects/Factorio/testmods/0.17",
+        "directory_present": false,
+        "expected_archive": "more-infinite-research_4.7.01700.zip",
+        "expected_archive_present": false
+      },
+      {
+        "target": "F100",
+        "directory": "C:/Projects/Factorio/testmods/1.0",
+        "directory_present": true,
+        "expected_archive": "more-infinite-research_4.7.10000.zip",
+        "expected_archive_present": false
+      },
+      {
+        "target": "F110",
+        "directory": "C:/Projects/Factorio/testmods/1.1",
+        "directory_present": true,
+        "expected_archive": "more-infinite-research_4.7.11000.zip",
+        "expected_archive_present": false
+      },
+      {
+        "target": "F200",
+        "directory": "C:/Projects/Factorio/testmods/2.0",
+        "directory_present": true,
+        "expected_archive": "more-infinite-research_4.7.20000.zip",
+        "expected_archive_present": true,
+        "observed_archive_sha256": "22af5fe3bf449ed026e3d22b8157079d154db1f3bc5674fda686390a384f8b55",
+        "expected_archive_sha256": "7958731aad672c7f16b9307e7b20f97b8e97b58cc57e5d1f9ae670018a8a1b5b",
+        "matches_accepted_published_archive": false
+      },
+      {
+        "target": "F210",
+        "directory": "C:/Projects/Factorio/testmods/2.1",
+        "directory_present": true,
+        "expected_archive": "more-infinite-research_4.7.21000.zip",
+        "expected_archive_present": true,
+        "observed_archive_sha256": "708a529f1f6d649e0a732216cd8d8fefe68f2c6c2df2b40da030c2c4c51558d1",
+        "expected_archive_sha256": "708a529f1f6d649e0a732216cd8d8fefe68f2c6c2df2b40da030c2c4c51558d1",
+        "matches_accepted_published_archive": true
+      }
+    ]
+  },
+  "accepted_published_custody": {
+    "source": "spec/mir5/inventory/targets-baseline.json",
+    "release_tag": "v4.7.0",
+    "archive_directory": "dist/4.7.0",
+    "hash_authorities": [
+      "dist/4.7.0/SHA256SUMS.txt",
+      "dist/4.7.0/RELEASE-MANIFEST.json"
+    ],
+    "fact": "All nine published target ZIPs are already present in primary published custody and were hash-validated when targets-baseline.json was recorded.",
+    "limitation": "That accepted custody does not populate or validate current machine-local direct archive-library membership."
+  },
+  "preparation_disposition": {
+    "F200": "Preserve the observed mismatching archive as prior local custody, then restore one hash-validated accepted F200 copy from dist/4.7.0 before selecting it for a direct-library run.",
+    "F013_to_F110": "Prepare matching direct-library membership later from the accepted published custody, with one verified archive per engine family; do not create or populate those libraries from this observation.",
+    "F210": "The existing direct-library archive matches the accepted published F210 hash.",
+    "no_user_input_required": true
+  }
+}

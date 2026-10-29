@@ -1,0 +1,122 @@
+{
+  "schema": 1,
+  "kind": "MIR5CompetingEPRFilteredPrototypeContinuityChainV1",
+  "runs": [
+    {
+      "id": 40022349056,
+      "url": "https://github.com/Julesc013/mir-native-worker/actions/runs/40022349056",
+      "manifest_members_verified": 86,
+      "custody": "build/mir5/black-glass/incoming/40022349056/black-glass-competing-epr-gameplay-40022349056-1",
+      "cases": [
+        {
+          "path": "gameplay/prefer-foreign/result.json",
+          "status": "passed-private-native-fixture",
+          "source": "d48d25b69d1d450910f697db4af1db9ebe48a50c",
+          "receipt": {
+            "gzip": "spec/mir5/evidence/competing-epr-overlap-filter-40022349056-gameplay-prefer-foreign-native.json.gz",
+            "uncompressed_sha256": "6893C7791A3D7FAD1B64A773B88AF08AFDC8FF1AD1A5596D74BF98443DBA5E78"
+          },
+          "two_cold_reloads_byte_identical": true,
+          "witnesses": {
+            "source_mir": "4.7.20002",
+            "destination_mir": "5.0.20000",
+            "source_actual_lab_completions": 2,
+            "tail": "epr_iron-gear-wheel-productivity-5",
+            "tail_next_level": 7,
+            "productivity_bonus": 0.6000000238418579,
+            "tail_saved_progress": 0.27,
+            "current_research_progress": 0.42000000000000004,
+            "player_reenabled": true,
+            "player_visible_when_disabled": false,
+            "braking_saved_progress": 0,
+            "player_queue": [
+              "braking-force-1"
+            ],
+            "foreign_still_disabled": true,
+            "retained_epr_tail_count": 30,
+            "lab_frozen": true,
+            "on_load_read_only": false
+          },
+          "player": {
+            "sha256": "1729105AEE6F743E04F4D89228DC4ACDFB24B97ADC33FF0484E0EB1ACC392CC7",
+            "path": "D:\\Projects\\Factorio\\testmods\\2.0\\more-infinite-research_5.0.20000.zip"
+          }
+        },
+        {
+          "path": "gameplay/prefer-mir/result.json",
+          "status": "passed-private-native-fixture",
+          "source": "d48d25b69d1d450910f697db4af1db9ebe48a50c",
+          "receipt": {
+            "gzip": "spec/mir5/evidence/competing-epr-overlap-filter-40022349056-gameplay-prefer-mir-native.json.gz",
+            "uncompressed_sha256": "5CFAD6DCD37CA6446FDCC75217C948C0C13CD940DC52182628B21C41DB88430C"
+          },
+          "two_cold_reloads_byte_identical": true,
+          "witnesses": {
+            "source_mir": "4.7.20002",
+            "destination_mir": "5.0.20000",
+            "source_actual_lab_completions": 2,
+            "tail": "epr_iron-gear-wheel-productivity-5",
+            "tail_next_level": 7,
+            "productivity_bonus": 0.6000000238418579,
+            "tail_saved_progress": 0.27,
+            "current_research_progress": 0.42000000000000004,
+            "player_disabled": true,
+            "player_visible_when_disabled": true,
+            "braking_saved_progress": 0,
+            "player_queue": [
+              "braking-force-1"
+            ],
+            "foreign_disabled": true,
+            "retained_epr_tail_count": 30,
+            "lab_frozen": true,
+            "on_load_read_only": false
+          },
+          "player": {
+            "sha256": "1729105AEE6F743E04F4D89228DC4ACDFB24B97ADC33FF0484E0EB1ACC392CC7",
+            "path": "D:\\Projects\\Factorio\\testmods\\2.0\\more-infinite-research_5.0.20000.zip"
+          }
+        },
+        {
+          "path": "gameplay/published/result.json",
+          "status": "passed-private-native-fixture",
+          "source": "d48d25b69d1d450910f697db4af1db9ebe48a50c",
+          "receipt": {
+            "gzip": "spec/mir5/evidence/competing-epr-overlap-filter-40022349056-gameplay-published-native.json.gz",
+            "uncompressed_sha256": "0C66D65A9D2121000ACB0B79FA1FEEEE9D4CD0E0B16B511EAA86B706DB436D6D"
+          },
+          "two_cold_reloads_byte_identical": true,
+          "witnesses": {
+            "source_mir": "4.7.20002",
+            "fixture_version": "0.1.0",
+            "actual_lab_completions": 2,
+            "prerequisite_seeding": "completed-before-native-tail-labs",
+            "tail": "epr_iron-gear-wheel-productivity-5",
+            "tail_next_level": 7,
+            "productivity_bonus": 0.6000000238418579,
+            "tail_saved_progress": 0,
+            "current_research_progress": 0.27,
+            "braking_saved_progress": 0.42000000000000004,
+            "player_queue": [
+              "epr_iron-gear-wheel-productivity-5",
+              "braking-force-1"
+            ],
+            "foreign_disabled": true,
+            "retained_epr_tail_count": 30,
+            "lab_frozen": true,
+            "on_load_read_only": false
+          },
+          "player": {
+            "sha256": "F3943EB4D69CCDAC41BD9F922AD03A5C78F34F22D8E7FA5A88A7A658AB1010B7",
+            "path": "D:\\Projects\\Factorio\\testmods\\2.0\\more-infinite-research_4.7.20002.zip"
+          }
+        }
+      ]
+    }
+  ],
+  "scope": [
+    "Repeat of the published false / MIR5 true / MIR5 false native EPR chain after the data-stage overlap filter.",
+    "Three stages retain earned foreign bonuses, paused/current work and foreign disablement; each saves and cold-reloads twice.",
+    "This fixture earns no MIR overlap before changing preference. It does not qualify preservation of an earned MIR effect removed from a prototype, future MIR exclusion, other providers or final release."
+  ],
+  "release_qualification": false
+}

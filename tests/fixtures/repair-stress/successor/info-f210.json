@@ -1,0 +1,13 @@
+{
+  "name": "mir-fixture-mir5-repair-stress",
+  "version": "0.2.0",
+  "title": "MIR 5 private F210 passive-repair fixture",
+  "author": "MIR maintainers",
+  "description": "Disposable physical passive-repair queue-bound fixture for the exact F210 MIR 5 player; never a player package.",
+  "factorio_version": "2.1",
+  "dependencies": [
+    "base = 2.1.23",
+    "space-age = 2.1.23",
+    "more-infinite-research = 5.0.21000"
+  ]
+}

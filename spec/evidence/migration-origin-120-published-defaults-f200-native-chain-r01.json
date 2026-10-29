@@ -1,0 +1,142 @@
+{
+  "schema": 1,
+  "kind": "MIR5MigrationOrigin120PublishedDefaultsCaptureNativeChainV1",
+  "status": "completed-data-stage-observation-only",
+  "scope": "One exact published MIR 1.2.0 Defaults data/settings capture on Factorio 2.0.77. This is a reference observation only: it created no map or save and makes no gameplay, migration, lab, performance, release, or current-candidate qualification claim.",
+  "frozen_execution": {
+    "published_origin": {
+      "tag": "1.2.0",
+      "source_commit": "b80413b2aa225529a236b7b00a7cee9420af65bc",
+      "archive": {
+        "name": "more-infinite-research_1.2.0.zip",
+        "sha256": "880C137F7AB35FE7AF1DA5538BFA91F620C80785134DB488800352DD6154AB22",
+        "bytes": 92638,
+        "root": "more-infinite-research_1.2.0"
+      }
+    },
+    "controller": {
+      "commit": "2f39ae5a25e7b0bfcfe43858f767b5854e3f42ca",
+      "caller_sha256": "80319DFE81FF08553F9541738B7B16679D76AAFA00BFABFB79700FFDF6AB0A74",
+      "prepared_r01_sha256": "469E6DAB98ACCC6E79764FB46BAED1096B1481892C754EAA6540FF3EA31922D9",
+      "prepared_r01_disposition": "Consumed original preparation; unchanged. The later 23C clarification is a separate r02 preparation and contributes no input or qualification to this r01 observation."
+    },
+    "capture_helper": {
+      "admission_commit": "736fa87449b99837ac0efe4f9aa5ab999c4aa8b7",
+      "path": "tools/Invoke-PrototypeCapture.ps1",
+      "sha256": "A7363640A13A87935829C9FF9276049F91DA9825475DCE472133E643133EB01E"
+    },
+    "profile": {
+      "path": "tests/profiles/migration-origins-1.2.0-published-defaults-f200-2077.json",
+      "sha256": "5A95C7A649A1F1B91E8E59AC199756818477C9627B536880E38013AAC7214E0A",
+      "upstream_selection": [
+        "base@2.0.77",
+        "mir-fixture-mir5-active-mods-observer@0.1.0"
+      ],
+      "actual_native_selection": [
+        "base@2.0.77",
+        "mir-fixture-mir5-active-mods-observer@0.1.0",
+        "more-infinite-research@1.2.0"
+      ]
+    },
+    "engine": {
+      "path": "D:/Games/Factorio/2.0/bin/x64/factorio.exe",
+      "sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B",
+      "base_version": "2.0.77"
+    },
+    "active_mods_observer": {
+      "sha256": "723D1E7721449FC26040E5E6629416767BDC20AD79CF8723115846DB662A1F87",
+      "bytes": 834
+    },
+    "limits": {
+      "timeout_seconds": 240,
+      "expected_peak_memory_mib": 1024,
+      "max_new_output_mib": 512,
+      "admission_wait_seconds": 30
+    }
+  },
+  "native_observation": {
+    "result": {
+      "path": "build/qualification/migration-origins/migration-origin-120-published-defaults-f200-r01/native-output/result.json",
+      "sha256": "37E1AD1B394A3DEC99AC6109B92ED12B6F9F017817B332885442B9D78CA817BF",
+      "bytes": 12699,
+      "status": "completed-data-stage-observation-only",
+      "process_exit_code": 0,
+      "timed_out": false
+    },
+    "data_raw_dump": {
+      "sha256": "7714C28BE891B81D3F8A598697F52DD0A678E3F3493600A96ECB7D7F1563745D",
+      "bytes": 13317178,
+      "public_embedding": false
+    },
+    "settings_dump": {
+      "sha256": "C512FBFDC2240D481B6A21E30764E1C82BAF2EC5238C01E6B2C4C80F0142C3C8",
+      "bytes": 134240,
+      "public_embedding": false
+    },
+    "independent_readback": {
+      "technology_rows": 34,
+      "module_effects": 9,
+      "scope": "Hash-bound native data/settings output readback only; it is not a saved-world or migration result."
+    }
+  },
+  "restoration_and_custody": {
+    "published_mir_slot": {
+      "before": "absent",
+      "after": "absent"
+    },
+    "observer_slot": {
+      "before_after_exact": true,
+      "sha256": "723D1E7721449FC26040E5E6629416767BDC20AD79CF8723115846DB662A1F87",
+      "bytes": 834
+    },
+    "library_controls": {
+      "before_after_exact": true,
+      "native_library_controls_restored": true
+    },
+    "factorio_processes_after_terminal": 0,
+    "raw_native_output": {
+      "members": 9,
+      "bytes": 13491736,
+      "member_manifest_sha256": "6EE26162C72F460D5569EEEC18CE024EDB2ADD87D223B7CC827010C373BB905D",
+      "manifest_encoding": "UTF-8 sorted path|bytes|sha256 lines with a final LF"
+    },
+    "primary_custody": {
+      "root": "build/qualification/migration-origins/migration-origin-120-published-defaults-f200-r01",
+      "members": 14,
+      "bytes": 13727341,
+      "member_manifest_sha256": "C12DB35C69343EB556693FDF6A090504DAC9AA90B4D8D2F0EA5113039B11F058",
+      "all_nine_raw_members_match_native_output": true,
+      "terminal_sha256": "09FF20B108F7C72F62774C559316EDDF6D3145450063C677736F1C2679794E63"
+    }
+  },
+  "receipts": {
+    "path": "spec/evidence/migration-origin-120-published-defaults-native-receipts-r01.json.gz",
+    "sha256": "EF7DA14A5F6F67B6687E2A9916EE93605F96D16551CF2B2BEA9BEFA5B8F5036A",
+    "bytes": 5573,
+    "uncompressed_sha256": "ACD335D0AAA7F9DC23D8BE690AB80B41287ABFDBA5C6827E2AABB2EED166A692",
+    "uncompressed_bytes": 17440,
+    "exact_safe_original_receipts": 1,
+    "strict_utf8_base64_gzip_roundtrip_verified": true,
+    "exclusions": [
+      "data dumps",
+      "settings dumps",
+      "full logs",
+      "configuration payloads",
+      "player data",
+      "preflight payloads",
+      "library-control payloads",
+      "save binaries",
+      "archive payloads"
+    ]
+  },
+  "claims": {
+    "native_execution": true,
+    "data_settings_capture": true,
+    "source_save": false,
+    "migration": false,
+    "gameplay": false,
+    "lab_completion": false,
+    "performance": false,
+    "release_qualification": false
+  }
+}

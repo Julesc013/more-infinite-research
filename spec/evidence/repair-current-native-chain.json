@@ -1,0 +1,83 @@
+{
+  "schema": 1,
+  "kind": "MIR5CurrentRepairNativeChainV1",
+  "status": "passed-two-native-capacity-cases-not-performance",
+  "run": 40147383321,
+  "run_url": "https://github.com/Julesc013/mir-native-worker/actions/runs/40147383321",
+  "controller_commit": "39603fa185abc74d2d34a4b0e8a31d4bf54c2cd4",
+  "fixture_source": "a6ce2367f8a7ebca4d18d60591f5bf6afca453fb",
+  "player_source_tree": "01f9d36ebe269c7ba9c6e3a52dca547a39eb8a16",
+  "engine": {
+    "version": "2.0.77",
+    "sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B"
+  },
+  "manifest": {
+    "members_verified": 66,
+    "sha256": "3CADB2C5BB74AF85018E757A3C754F18E840950FD111D3AEC26D218B51B1446D"
+  },
+  "cases": [
+    {
+      "arm": "published",
+      "player_sha256": "F3943EB4D69CCDAC41BD9F922AD03A5C78F34F22D8E7FA5A88A7A658AB1010B7",
+      "profile_git_path": "tests/profiles/repair-stress-published-f200-2077.json",
+      "profile_sha256": "C199E2C964933B7889C5F51BE55329BB1C6614EC4271E74238FE799E3CE86CCF",
+      "native_result_path": "gameplay/published/result.json",
+      "native_result_sha256": "85E3E2974C278B9C3D3A2D7B44AC6A512F875599BE5429230E314608D693CE2A",
+      "eligible_walls": 1000,
+      "admitted_walls": 256,
+      "overflow_walls": 744,
+      "maximum_repairs_per_service": 8,
+      "service_ticks": 60,
+      "reactivated_entries": 8,
+      "seed_sha256": "37BABD187479B06748C883A697A0396EB99FB2ECFA6E66A53EA57D957BDD0007",
+      "completed_save_sha256": "6E3F09432C9DC8E44AC10A20E894F36BB581D5DC3272554E5922650B87AFAE39",
+      "cold_reloads": 2,
+      "save_byte_identical": true,
+      "library_controls_restored": true
+    },
+    {
+      "arm": "mir5",
+      "player_sha256": "2BBDBA9A0B816AC383CEA116CDF86D587BC34EFF7E1C5ACE2583F1DA98F9E842",
+      "profile_git_path": "tests/profiles/repair-stress-mir5-f200-2077.json",
+      "profile_sha256": "CA8B6CF3305934AE173860BE003617E5D0D252FBCE4E8E2BF3ADEB36C46441A8",
+      "native_result_path": "gameplay/mir5/result.json",
+      "native_result_sha256": "1D1A5708CEE47E59D961F90F277DC1F50765610D79C273125FB3973331A5DA6B",
+      "eligible_walls": 1000,
+      "admitted_walls": 256,
+      "overflow_walls": 744,
+      "maximum_repairs_per_service": 8,
+      "service_ticks": 60,
+      "reactivated_entries": 8,
+      "seed_sha256": "E185DB27D72E816701B574093114CF2EF260493D3C4E0C0E4DDA6541CEA037FD",
+      "completed_save_sha256": "2ECDFDEC6FBEBC04D7896120C58268FFC2887651A26221C8B8E44C508D943014",
+      "cold_reloads": 2,
+      "save_byte_identical": true,
+      "library_controls_restored": true
+    }
+  ],
+  "observed_behavior_equal_except_version_label": true,
+  "raw_evidence": {
+    "path": "spec/evidence/repair-current-native-receipts.json.gz",
+    "members": 9,
+    "uncompressed_bytes": 203596,
+    "uncompressed_sha256": "8B2DCED013911105301DDEAEDF3CE38FF58108CA676768136F63989DC06B980C",
+    "gzip_bytes": 41622,
+    "gzip_sha256": "5C0E0354C33E34CA2555046102687BFE2F3644B11CF3970AE6448DA533056CD6"
+  },
+  "independent_readback": {
+    "reviewer": "root",
+    "result": "passed",
+    "native_stage_log_marker_observations": 6,
+    "cold_reloads": 4,
+    "protected_seeds_and_completed_saves_byte_identical": true,
+    "profile_and_fixture_raw_git_hashes_verified": true,
+    "all_eight_native_processes_passed": true
+  },
+  "limits": [
+    "Fresh disposable F200 Base capacity and lifecycle observation only; both arms damage1000 eligible walls, admit256, leave744 overflow and foreign/nonwall sentinels unchanged, then reactivate eight drained entries.",
+    "The four cold reloads preserve completed-save bytes and report read-only on_load; they carry the original counters and are not new repair workloads.",
+    "This current player observation supplements rather than replaces run40049722069. No matched elapsed CPU, peak/retained memory, long-running stress, multiplayer, removal/readdition, other scheduled-entity scaling or complete final-package release qualification follows."
+  ],
+  "performance_qualification": false,
+  "release_qualification": false
+}

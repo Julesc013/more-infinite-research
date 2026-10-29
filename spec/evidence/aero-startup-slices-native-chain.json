@@ -1,0 +1,240 @@
+{
+  "corrected": {
+    "artifact_manifest_sha256": "17250E606E5A6E5F9BF81AEC56ECC6804402149C25E5DF54F820FB211D2A26E9",
+    "artifact_members_verified": 42,
+    "cases": [
+      {
+        "case": "SCI-RESEARCH-01-unresolved",
+        "claims": {
+          "labs": false,
+          "multiplayer": false,
+          "performance": false,
+          "release_qualification": false,
+          "save_upgrade": false,
+          "two_cold_reloads": false
+        },
+        "controls_restored": true,
+        "endpoint": "native-create-runtime-load-only",
+        "engine": {
+          "base_version": "2.1.23",
+          "file_version": "2.1.23.87750",
+          "path": "D:\\Games\\Steam\\steamapps\\common\\Factorio\\bin\\x64\\factorio.exe",
+          "product_version": "2.1.23",
+          "sha256": "FE4A1DA30F322A0D0B8AEB3DF7276332222BAAA143E2352569B723E84B2B9060"
+        },
+        "fixtures": [
+          {
+            "canonical_library_archive": false,
+            "name": "mir-fixture-mir5-foreign-research-preservation",
+            "sha256": "2594654719DBC5B577892CF95F4205CFFA1550D7F5C259406503FAD756E2635E",
+            "source_members": [
+              {
+                "bytes": 439,
+                "member": "info.json",
+                "sha256": "D47002D61E3CB6B7E64E11B5C4385787F99AFFA3405DBE35862E3B0EF336C2BF",
+                "source": "tests/fixtures/foreign-research-preservation/mir5-unresolved/info.json"
+              },
+              {
+                "bytes": 2234,
+                "member": "data.lua",
+                "sha256": "EECDD8BB3E6D208BF486588A8FCB18379CCD5A57B6E579C0C5AB8A2A4CD1E5B6",
+                "source": "tests/fixtures/foreign-research-preservation/mir5-unresolved/data.lua"
+              },
+              {
+                "bytes": 393,
+                "member": "data-updates.lua",
+                "sha256": "899CD312C0226E716603219AEC5F5DBB750D430151C46612D3C86A611E29EC58",
+                "source": "tests/fixtures/foreign-research-preservation/mir5-unresolved/data-updates.lua"
+              },
+              {
+                "bytes": 1677,
+                "member": "data-final-fixes.lua",
+                "sha256": "608BBBFEB533F2AFE7954D986C926A6FBC995CB586A447109E942748CB5A5E21",
+                "source": "tests/fixtures/foreign-research-preservation/mir5-unresolved/data-final-fixes.lua"
+              },
+              {
+                "bytes": 2542,
+                "member": "control.lua",
+                "sha256": "4FC7808646E77C4B5EA65D6CD602435F090C25C02F9E559DD722ADAC38FD6DCA",
+                "source": "tests/fixtures/foreign-research-preservation/mir5-unresolved/control.lua"
+              }
+            ],
+            "source_revision": "efe57e74cf402655a0e1017b874098e675f47bb0",
+            "version": "0.3.0"
+          }
+        ],
+        "id": "foreign-unresolved",
+        "marker": {
+          "case": "SCI-RESEARCH-01-unresolved",
+          "foreign_level": 61,
+          "foreign_name": "Space-Lab-Research-61",
+          "foreign_pack": "mir5-foreign-astral-insight-pack",
+          "foreign_researched": false,
+          "gear_productivity_bonus": 0,
+          "laboratory_speed_modifier": 0,
+          "mir_level": 1,
+          "mir_name": "recipe-prod-research_gears-1",
+          "named_pack_recipe_absent": true,
+          "pending_name": "Space-Lab-Research-62",
+          "qualification": "representative-unresolved-source-startup-only",
+          "stage": "init",
+          "status": "passed"
+        },
+        "player": {
+          "bytes": 547137,
+          "sha256": "D48CC28AC0C70B12D105FE935D33DC95EF2B5F27149F735FCA7EBBDF9177F0F4",
+          "source_commit": "f5223e1fb755a0fe3669551a51cc08f207b7e1df"
+        },
+        "profile": {
+          "execution_sha256": "B11356E0FB328028D5DF180A049F7407B19B4698EEDF65D1946FA2266E0256A4",
+          "raw_sha256": "53982B698CD8EBD5EB595B968EFF82AD779837796AE3AF023B2428969A14607D"
+        },
+        "result_path": "native/foreign-unresolved/result.json",
+        "result_sha256": "1D732B712C1AAEF91B6F0D780CAAF5ACB3E91A13E08A2CAEBB0F36DAB2F2B4E3",
+        "target": "f210"
+      },
+      {
+        "case": "bob-angel-default-cap",
+        "claims": {
+          "labs": false,
+          "multiplayer": false,
+          "performance": false,
+          "release_qualification": false,
+          "save_upgrade": false,
+          "two_cold_reloads": false
+        },
+        "controls_restored": true,
+        "endpoint": "native-create-runtime-load-only",
+        "engine": {
+          "base_version": "2.0.77",
+          "file_version": "2.0.77.84539",
+          "path": "D:\\Games\\Factorio\\2.0\\bin\\x64\\factorio.exe",
+          "product_version": "2.0.77",
+          "sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B"
+        },
+        "fixtures": [
+          {
+            "canonical_library_archive": false,
+            "name": "mir-fixture-mir5-bob-angel-default-cap",
+            "sha256": "423EA1EE098A0107FDE56B56E2D1A89BBD0CBBAB707A18681CDB5115B00E7DC2",
+            "source_members": [
+              {
+                "bytes": 416,
+                "member": "info.json",
+                "sha256": "9C1286D3366BAC5F29B89C3665A72B8A02781BCF8403113BFE490E17F0584CC6",
+                "source": "tests/fixtures/bob-angel-default-cap/info.json"
+              },
+              {
+                "bytes": 567,
+                "member": "cases.lua",
+                "sha256": "AFDE89ABB6A767C36D3BB86D6884228D4AB6B7E5C527426E95A93B8BB192025D",
+                "source": "tests/fixtures/bob-angel-default-cap/cases.lua"
+              },
+              {
+                "bytes": 908,
+                "member": "data-updates.lua",
+                "sha256": "FE9D29D55F9704AF7DCD1384E29AC13BEBE92B631DCE2B0057B4C140429B769E",
+                "source": "tests/fixtures/bob-angel-default-cap/data-updates.lua"
+              },
+              {
+                "bytes": 1514,
+                "member": "data-final-fixes.lua",
+                "sha256": "63336754EAF41559E60DBD0CF3EF82AC8233A7C6C607F9A45259320F9E8F2D49",
+                "source": "tests/fixtures/bob-angel-default-cap/data-final-fixes.lua"
+              },
+              {
+                "bytes": 2447,
+                "member": "control.lua",
+                "sha256": "B4282C57F1A763692CBD079541185051887BA2F77E57C8685E4D875CE690251D",
+                "source": "tests/fixtures/bob-angel-default-cap/control.lua"
+              }
+            ],
+            "source_revision": "efe57e74cf402655a0e1017b874098e675f47bb0",
+            "version": "0.1.0"
+          },
+          {
+            "canonical_library_archive": true,
+            "name": "mir-fixture-mir5-active-mods-observer",
+            "sha256": "723D1E7721449FC26040E5E6629416767BDC20AD79CF8723115846DB662A1F87",
+            "source_members": [
+              {
+                "bytes": 231,
+                "member": "info.json",
+                "sha256": "5C4A351958060F5FED504AA86E8C201A2F50A36C2732E624727B5697F216475A",
+                "source": "tests/fixtures/active-mods-observer/info-f200.json"
+              },
+              {
+                "bytes": 477,
+                "member": "data-final-fixes.lua",
+                "sha256": "89D364F0033A7EE036998E6C29A3558099C25AD2707CB24914790C49FB21555C",
+                "source": "tests/fixtures/active-mods-observer/data-final-fixes.lua"
+              }
+            ],
+            "source_revision": "efe57e74cf402655a0e1017b874098e675f47bb0",
+            "version": "0.1.0"
+          }
+        ],
+        "id": "bob-angel-default-cap",
+        "marker": {
+          "case": "bob-angel-default-cap",
+          "families": 5,
+          "fresh_recipe_productivity_bonus": 0,
+          "qualification": "representative-native-default-cap-startup-only",
+          "recipes": 10,
+          "stage": "init",
+          "status": "passed",
+          "technologies": 10
+        },
+        "player": {
+          "bytes": 546601,
+          "sha256": "89DF8C29D1E03CB4237CCDCA61DA4F2F4295DE738DB74B4A0452EAF72CAA31A6",
+          "source_commit": "f5223e1fb755a0fe3669551a51cc08f207b7e1df"
+        },
+        "profile": {
+          "execution_sha256": "B20D91B1CD93FB57D91AD7AD1722376374ABA518859BD70C2F91976BA927ED1D",
+          "raw_sha256": "15CE4BF5B5010AAFFC6F33838C8EF00475D316FE0F322D78F01AA272158FF27E"
+        },
+        "result_path": "native/bob-angel-default-cap/result.json",
+        "result_sha256": "8431D21A9C2434E63DF845EEF9AE1C1D7B8927E2BB5F1BCB0BF44ED108ED0AE6",
+        "target": "f200"
+      }
+    ],
+    "controller_commit": "7dff02f2800971c35fceb87bbff9a0744efb2d80",
+    "fixture_source_commit": "efe57e74cf402655a0e1017b874098e675f47bb0",
+    "primary_custody": "build/mir5/recovery-historical/aero-startup-slices/40111662910/black-glass-aero-startup-slices-40111662910-1",
+    "run": 40111662910,
+    "run_url": "https://github.com/Julesc013/mir-native-worker/actions/runs/40111662910",
+    "workflow_conclusion": "success"
+  },
+  "kind": "MIR5AeroStartupSlicesNativeChainV1",
+  "limits": [
+    "Representative unresolved foreign-science startup only; the reporter provider/modpack remains unconfirmed.",
+    "The native-default ceiling case establishes five families/ten technologies/ten recipes, not earned research or ordinary production.",
+    "Both corrected cases use the exact frozen f522 player bytes. They do not establish other current-package scenarios, migration/reload/client or performance acceptance."
+  ],
+  "original_adverse": {
+    "artifact_manifest_sha256": "984143BC8DE186DB51300A124127772C006EFACC0463F5EBA44B37BDD4EDAF39",
+    "artifact_members_verified": 31,
+    "controller_commit": "6710711127396879a471ce75031c492d2a42e2ed",
+    "correction": "Fixture-only base-lab acceptance; pack acquisition remains unresolved. Player bytes, playable upgrade roles, foreign research definitions and effects are unchanged.",
+    "default_cap_case_executed": false,
+    "failure": "Foreign technology has no single lab accepting automation, utility and the declared foreign pack. Factorio rejected the invalid fixture before world creation.",
+    "fixture_source_commit": "f92d4f56d0a3444f8d563d752583a9497c78942a",
+    "log_sha256": "33CB9EE9A79DA3522067A4283AEB73011BF7D4E8610DF4E7C6C92E0A30A6D21A",
+    "primary_custody": "build/mir5/recovery-historical/aero-startup-slices/40110777151/black-glass-aero-startup-slices-40110777151-1",
+    "result_sha256": "4FE4B1AD392BC165D6CDD53F8912A851C26AE1B34D0B0C12B6FF54E968044B88",
+    "run": 40110777151,
+    "run_url": "https://github.com/Julesc013/mir-native-worker/actions/runs/40110777151",
+    "workflow_conclusion": "failure"
+  },
+  "player_source_commit": "f5223e1fb755a0fe3669551a51cc08f207b7e1df",
+  "raw_evidence": {
+    "gzip_bytes": 124147,
+    "gzip_sha256": "93EDA64C6D728FBE733D87796CC32A6C64730A60EB2F914B6D8BCDFC7B8D754C",
+    "members": 35,
+    "path": "spec/evidence/aero-startup-slices-native-receipts.json.gz",
+    "uncompressed_sha256": "E8AA667F189749D5C4F16E60DC9699A440FAA31A92296A9DC0503A04AFE3B5B7"
+  },
+  "schema": 1,
+  "status": "two-corrected-exact-native-startup-slices-pass-original-fixture-adverse-preserved"
+}

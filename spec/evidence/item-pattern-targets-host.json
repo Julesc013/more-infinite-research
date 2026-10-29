@@ -1,0 +1,179 @@
+{
+  "schema": 1,
+  "kind": "MIR5ItemPatternTargetHostControlsV1",
+  "status": "twelve-collector-nine-extension-thirty-generator-controls-pass",
+  "input_members": [
+    {
+      "path": "source/mir5/compatibility/product_bindings.lua",
+      "sha256": "7CEDABB17C400CE5EBE8B74EEAB75C35BE3188E4E327A5B8E4CFAEEB1FEBD915"
+    },
+    {
+      "path": "source/mir5/compatibility/product_targets.lua",
+      "sha256": "FBD2CCE3C42A2B6C34AF78B7EC41479D711B64E8469B3096A3C3B4A98C5F5197"
+    },
+    {
+      "path": "source/mir5/research/product_target_extension.lua",
+      "sha256": "2D3B2E34F99D0D61A27724A4E805F575A4660269CCAAFE5BD84C7328253BE548"
+    },
+    {
+      "path": "tests/mir5/test_product_targets.py",
+      "sha256": "6C2F153F0A6821F36A993DC56290E1ACDB40BD6270CCB8E27CEFBB8991A2777A"
+    },
+    {
+      "path": "tests/mir5/test_product_target_extension.py",
+      "sha256": "B9A15F77CB35ABF0B2FE78767CF682631BB6C524E77D41FB1229D5EE0E2F0541"
+    }
+  ],
+  "published_declaration_source": {
+    "archive": "dist/4.7.0/more-infinite-research_4.7.21000.zip",
+    "archive_sha256": "708A529F1F6D649E0A732216CD8D8FEFE68F2C6C2DF2B40DA030C2C4C51558D1",
+    "member": "more-infinite-research_4.7.21000/prototypes/streams/productivity.lua",
+    "member_sha256": "EA66B64C03943A99B877847FD6E3903A099C83AB0333A441A29957C1C2142853",
+    "current_read_only_member_equal": true
+  },
+  "semantics": "Expand selected authored Lua item patterns once over the known native item classes into the typed product index; retain first admitted group, current effect settings and all existing named effects. The shared recipe/product pass is unchanged.",
+  "covered_pattern_families": [
+    "research_explosives",
+    "research_furnace",
+    "research_mining_drill",
+    "research_bullets",
+    "research_heavy_ammo",
+    "research_rockets",
+    "research_belts",
+    "research_inserters",
+    "research_armor_components",
+    "research_artificial_soil"
+  ],
+  "captured_native_input_probe": [
+    {
+      "profile": "base-f210",
+      "differences": [],
+      "work": {
+        "items": 252,
+        "pattern_tests": 9547,
+        "ingredients": 523,
+        "recipes": 217,
+        "products": 219,
+        "matches": 81
+      }
+    },
+    {
+      "profile": "space-age-f210",
+      "differences": [
+        {
+          "family": "research_lithium",
+          "missing": [
+            "lithium"
+          ],
+          "extra": [],
+          "weights": []
+        }
+      ],
+      "work": {
+        "pattern_tests": 13625,
+        "items": 342,
+        "matches": 664,
+        "recipes": 662,
+        "ingredients": 1173,
+        "products": 1092
+      }
+    },
+    {
+      "profile": "k2so-f210",
+      "differences": [
+        {
+          "family": "research_belts",
+          "missing": [
+            "kr-advanced-loader",
+            "kr-loader",
+            "kr-superior-loader",
+            "kr-superior-splitter",
+            "kr-superior-transport-belt",
+            "kr-superior-underground-belt"
+          ],
+          "extra": [],
+          "weights": []
+        },
+        {
+          "family": "research_inserters",
+          "missing": [
+            "kr-superior-inserter",
+            "kr-superior-long-inserter"
+          ],
+          "extra": [],
+          "weights": []
+        },
+        {
+          "family": "research_lithium",
+          "missing": [
+            "lithium"
+          ],
+          "extra": [],
+          "weights": []
+        },
+        {
+          "family": "research_science_pack_productivity",
+          "missing": [
+            "kr-advanced-tech-card",
+            "kr-advanced-tech-card-cooling",
+            "kr-matter-tech-card",
+            "kr-matter-tech-card-cooling",
+            "kr-singularity-tech-card",
+            "kr-singularity-tech-card-cooling"
+          ],
+          "extra": [],
+          "weights": []
+        }
+      ],
+      "work": {
+        "items": 592,
+        "pattern_tests": 23623,
+        "products": 2166,
+        "matches": 850,
+        "recipes": 1883,
+        "ingredients": 2948
+      }
+    },
+    {
+      "profile": "base-f200",
+      "differences": [],
+      "work": {
+        "ingredients": 523,
+        "items": 251,
+        "recipes": 217,
+        "products": 219,
+        "pattern_tests": 9509,
+        "matches": 81
+      }
+    },
+    {
+      "profile": "space-age-f200",
+      "differences": [
+        {
+          "family": "research_lithium",
+          "missing": [
+            "lithium"
+          ],
+          "extra": [],
+          "weights": []
+        }
+      ],
+      "work": {
+        "recipes": 659,
+        "ingredients": 1167,
+        "products": 1084,
+        "items": 340,
+        "matches": 662,
+        "pattern_tests": 13545
+      }
+    }
+  ],
+  "scope": "Host replay of exact captured native recipe/item/module inputs; not a new Factorio execution. Reported missing collector routes remain existing named effects and open selector work, never discarded.",
+  "limits": [
+    "Native mod-added pattern effect/production/save qualification remains pending.",
+    "Structural place-result, recipe-name alternatives, native-owner expansion and undeclared material families remain open.",
+    "Current passes do not qualify the complete release or performance."
+  ],
+  "native_execution": false,
+  "release_qualification": false
+}

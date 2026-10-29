@@ -1,0 +1,325 @@
+{
+  "schema": 1,
+  "kind": "MIR5EarlyHistoricalPublishedUpgradeChainsV1",
+  "runs": [
+    {
+      "run": 40031523354,
+      "url": "https://github.com/Julesc013/mir-native-worker/actions/runs/40031523354",
+      "manifest_members_verified": 508,
+      "manifest_sha256": "F8FC15F46588FEBE5C6E10866CD1500DA52B5E46775A8F9898075166873D7588",
+      "cases": [
+        {
+          "path": "historical/f013/mir5/result.json",
+          "status": "passed-private-native-fixture",
+          "source": "9e486cb692fdf03a21d25d15f97db5ee40280f3f",
+          "receipt": {
+            "gzip": "spec/mir5/evidence/historical-transition-013-016-40031523354-historical-f013-mir5-native.json.gz",
+            "uncompressed_sha256": "643D1AAD7BB5F4EEAF36B66097CE6E306877523E42E8075B18D70D25B55BE798"
+          },
+          "initial": {
+            "case": "historical-transition",
+            "stage": "initial",
+            "transition_stage": "mir5",
+            "status": "passed",
+            "target": "f013",
+            "direct": "recipe-prod-research_character_mining_speed-1",
+            "source_direct_lab_completions": 1,
+            "successor_direct_lab_completions": 0,
+            "mining_bonus": 0.05,
+            "current_research": "nil",
+            "research_progress": 0,
+            "queue_api": false,
+            "research_queue_enabled": null,
+            "two_cold_reload_witness": false,
+            "on_load_read_only": false
+          },
+          "player": {
+            "sha256": "16D153B388CB1D307729C9E275AEA2C04C5D44961BC758A356948EFE1B38963E",
+            "path": "C:\\Users\\Jules\\AppData\\Local\\MIRWorker\\runner\\_work\\mir-native-worker\\mir-native-worker\\source\\build\\mir5\\engine-archive-libraries\\0.13\\more-infinite-research_5.0.01300.zip"
+          },
+          "engine": {
+            "path": "D:\\Games\\Factorio\\0.13\\bin\\x64\\factorio.exe",
+            "sha256": "F12C0DF5A5EF0D72F50A24BD76E077DFC9CBEAB4B31EE9EF0951A4A9C086B856",
+            "file_version": "",
+            "product_version": "",
+            "base_version": "0.13.20"
+          },
+          "two_cold_reloads_byte_identical": true
+        },
+        {
+          "path": "historical/f013/published/result.json",
+          "status": "passed-private-native-fixture",
+          "source": "9e486cb692fdf03a21d25d15f97db5ee40280f3f",
+          "receipt": {
+            "gzip": "spec/mir5/evidence/historical-transition-013-016-40031523354-historical-f013-published-native.json.gz",
+            "uncompressed_sha256": "936F735D3C43892FFFB89EAABBC8F47164B7BC35C72A6021100C01605644CB1E"
+          },
+          "initial": {
+            "case": "historical-transition",
+            "stage": "initial",
+            "transition_stage": "published",
+            "status": "passed",
+            "target": "f013",
+            "direct": "recipe-prod-research_character_mining_speed-1",
+            "source_direct_lab_completions": 1,
+            "successor_direct_lab_completions": 0,
+            "mining_bonus": 0.05,
+            "current_research": "nil",
+            "research_progress": 0,
+            "queue_api": false,
+            "research_queue_enabled": null,
+            "two_cold_reload_witness": false,
+            "on_load_read_only": false
+          },
+          "player": {
+            "sha256": "69D02F628F1278B5D161B61E39DB4E3D1A5978E31D01638E2AE23E28594637C8",
+            "path": "C:\\Users\\Jules\\AppData\\Local\\MIRWorker\\runner\\_work\\mir-native-worker\\mir-native-worker\\source\\build\\mir5\\engine-archive-libraries\\0.13\\more-infinite-research_4.7.01302.zip"
+          },
+          "engine": {
+            "path": "D:\\Games\\Factorio\\0.13\\bin\\x64\\factorio.exe",
+            "sha256": "F12C0DF5A5EF0D72F50A24BD76E077DFC9CBEAB4B31EE9EF0951A4A9C086B856",
+            "file_version": "",
+            "product_version": "",
+            "base_version": "0.13.20"
+          },
+          "two_cold_reloads_byte_identical": true
+        },
+        {
+          "path": "historical/f014/mir5/result.json",
+          "status": "passed-private-native-fixture",
+          "source": "9e486cb692fdf03a21d25d15f97db5ee40280f3f",
+          "receipt": {
+            "gzip": "spec/mir5/evidence/historical-transition-013-016-40031523354-historical-f014-mir5-native.json.gz",
+            "uncompressed_sha256": "8F5D3BDB2CADADFD86F0E5516697F15C9641847E0327518E46D31E1C2C258C80"
+          },
+          "initial": {
+            "case": "historical-transition",
+            "stage": "initial",
+            "transition_stage": "mir5",
+            "status": "passed",
+            "target": "f014",
+            "direct": "recipe-prod-research_character_mining_speed-1",
+            "source_direct_lab_completions": 1,
+            "successor_direct_lab_completions": 0,
+            "mining_bonus": 0.05,
+            "current_research": "nil",
+            "research_progress": 0,
+            "queue_api": false,
+            "research_queue_enabled": null,
+            "two_cold_reload_witness": false,
+            "on_load_read_only": false
+          },
+          "player": {
+            "sha256": "320A3EE8A05CF428E390954E49DE558CF91070215468633F04C2CA63156A227C",
+            "path": "C:\\Users\\Jules\\AppData\\Local\\MIRWorker\\runner\\_work\\mir-native-worker\\mir-native-worker\\source\\build\\mir5\\engine-archive-libraries\\0.14\\more-infinite-research_5.0.01400.zip"
+          },
+          "engine": {
+            "path": "D:\\Games\\Factorio\\0.14\\bin\\x64\\factorio.exe",
+            "sha256": "A2B7DC0FBC1D6D68CF4D71EB71D42952FBB3B0CF35EEC6BF8B4BA16B9F79715F",
+            "file_version": "0.14.23.25374",
+            "product_version": "0.14.23",
+            "base_version": "0.14.23"
+          },
+          "two_cold_reloads_byte_identical": true
+        },
+        {
+          "path": "historical/f014/published/result.json",
+          "status": "passed-private-native-fixture",
+          "source": "9e486cb692fdf03a21d25d15f97db5ee40280f3f",
+          "receipt": {
+            "gzip": "spec/mir5/evidence/historical-transition-013-016-40031523354-historical-f014-published-native.json.gz",
+            "uncompressed_sha256": "A8AA90A85FF33E804F66EEFEED16EB73CEFF89547B3A819CA209E1BFA47F85CD"
+          },
+          "initial": {
+            "case": "historical-transition",
+            "stage": "initial",
+            "transition_stage": "published",
+            "status": "passed",
+            "target": "f014",
+            "direct": "recipe-prod-research_character_mining_speed-1",
+            "source_direct_lab_completions": 1,
+            "successor_direct_lab_completions": 0,
+            "mining_bonus": 0.05,
+            "current_research": "nil",
+            "research_progress": 0,
+            "queue_api": false,
+            "research_queue_enabled": null,
+            "two_cold_reload_witness": false,
+            "on_load_read_only": false
+          },
+          "player": {
+            "sha256": "D34B6281A3815CD52AD91CABD1E1669650F2A2A761D9109DEDC07268D78D2CDE",
+            "path": "C:\\Users\\Jules\\AppData\\Local\\MIRWorker\\runner\\_work\\mir-native-worker\\mir-native-worker\\source\\build\\mir5\\engine-archive-libraries\\0.14\\more-infinite-research_4.7.01402.zip"
+          },
+          "engine": {
+            "path": "D:\\Games\\Factorio\\0.14\\bin\\x64\\factorio.exe",
+            "sha256": "A2B7DC0FBC1D6D68CF4D71EB71D42952FBB3B0CF35EEC6BF8B4BA16B9F79715F",
+            "file_version": "0.14.23.25374",
+            "product_version": "0.14.23",
+            "base_version": "0.14.23"
+          },
+          "two_cold_reloads_byte_identical": true
+        },
+        {
+          "path": "historical/f015/mir5/result.json",
+          "status": "passed-private-native-fixture",
+          "source": "9e486cb692fdf03a21d25d15f97db5ee40280f3f",
+          "receipt": {
+            "gzip": "spec/mir5/evidence/historical-transition-013-016-40031523354-historical-f015-mir5-native.json.gz",
+            "uncompressed_sha256": "04E9766A5E8D6DEFE830A440DE46D37776C0BA192562A3F848526B3F136AD647"
+          },
+          "initial": {
+            "case": "historical-transition",
+            "stage": "initial",
+            "transition_stage": "mir5",
+            "status": "passed",
+            "target": "f015",
+            "direct": "recipe-prod-research_character_mining_speed-1",
+            "source_direct_lab_completions": 1,
+            "successor_direct_lab_completions": 1,
+            "mining_bonus": 0.1,
+            "current_research": "nil",
+            "research_progress": 0,
+            "queue_api": false,
+            "research_queue_enabled": null,
+            "two_cold_reload_witness": false,
+            "on_load_read_only": false
+          },
+          "player": {
+            "sha256": "8ADB376C8DE1DFF424484875FAE07D5A2D4023E438F814B22A71DC679FB5CAC6",
+            "path": "C:\\Users\\Jules\\AppData\\Local\\MIRWorker\\runner\\_work\\mir-native-worker\\mir-native-worker\\source\\build\\mir5\\engine-archive-libraries\\0.15\\more-infinite-research_5.0.01500.zip"
+          },
+          "engine": {
+            "path": "D:\\Games\\Factorio\\0.15\\bin\\x64\\factorio.exe",
+            "sha256": "A1C87043244BEAE8E5903FB7D4A96E7920189C6339F00E3A2398988B9C8E7DD6",
+            "file_version": "0.15.40.30950",
+            "product_version": "0.15.40",
+            "base_version": "0.15.40"
+          },
+          "two_cold_reloads_byte_identical": true
+        },
+        {
+          "path": "historical/f015/published/result.json",
+          "status": "passed-private-native-fixture",
+          "source": "9e486cb692fdf03a21d25d15f97db5ee40280f3f",
+          "receipt": {
+            "gzip": "spec/mir5/evidence/historical-transition-013-016-40031523354-historical-f015-published-native.json.gz",
+            "uncompressed_sha256": "23499DC9937A4563465DAB9EADA4636D1F35211F771CBCA4F402ABAD50DEC31C"
+          },
+          "initial": {
+            "case": "historical-transition",
+            "stage": "initial",
+            "transition_stage": "published",
+            "status": "passed",
+            "target": "f015",
+            "direct": "recipe-prod-research_character_mining_speed-1",
+            "source_direct_lab_completions": 1,
+            "successor_direct_lab_completions": 0,
+            "mining_bonus": 0.05,
+            "current_research": "recipe-prod-research_character_mining_speed-1",
+            "research_progress": 0.42,
+            "queue_api": false,
+            "research_queue_enabled": null,
+            "two_cold_reload_witness": false,
+            "on_load_read_only": false
+          },
+          "player": {
+            "sha256": "758AA85BF41A10188DEA914AC456F672BAC7D3430E646CBDB6D761BE5ECC7B8A",
+            "path": "C:\\Users\\Jules\\AppData\\Local\\MIRWorker\\runner\\_work\\mir-native-worker\\mir-native-worker\\source\\build\\mir5\\engine-archive-libraries\\0.15\\more-infinite-research_4.7.01502.zip"
+          },
+          "engine": {
+            "path": "D:\\Games\\Factorio\\0.15\\bin\\x64\\factorio.exe",
+            "sha256": "A1C87043244BEAE8E5903FB7D4A96E7920189C6339F00E3A2398988B9C8E7DD6",
+            "file_version": "0.15.40.30950",
+            "product_version": "0.15.40",
+            "base_version": "0.15.40"
+          },
+          "two_cold_reloads_byte_identical": true
+        },
+        {
+          "path": "historical/f016/mir5/result.json",
+          "status": "passed-private-native-fixture",
+          "source": "9e486cb692fdf03a21d25d15f97db5ee40280f3f",
+          "receipt": {
+            "gzip": "spec/mir5/evidence/historical-transition-013-016-40031523354-historical-f016-mir5-native.json.gz",
+            "uncompressed_sha256": "A2E479A3AC509D64AADF6F017CA9537398FF7C87EEB6E16B39280B65AF197621"
+          },
+          "initial": {
+            "case": "historical-transition",
+            "stage": "initial",
+            "transition_stage": "mir5",
+            "status": "passed",
+            "target": "f016",
+            "direct": "recipe-prod-research_character_mining_speed-1",
+            "source_direct_lab_completions": 1,
+            "successor_direct_lab_completions": 1,
+            "mining_bonus": 0.1,
+            "current_research": "nil",
+            "research_progress": 0,
+            "queue_api": false,
+            "research_queue_enabled": null,
+            "two_cold_reload_witness": false,
+            "on_load_read_only": false
+          },
+          "player": {
+            "sha256": "5C5960EF8E8B460AA67AF99C0FA2B29D40EB6E890BA5331F64E224AE21AAFCC9",
+            "path": "C:\\Users\\Jules\\AppData\\Local\\MIRWorker\\runner\\_work\\mir-native-worker\\mir-native-worker\\source\\build\\mir5\\engine-archive-libraries\\0.16\\more-infinite-research_5.0.01600.zip"
+          },
+          "engine": {
+            "path": "D:\\Games\\Factorio\\0.16\\bin\\x64\\factorio.exe",
+            "sha256": "ACBA4D8B766C8CB61CBB564E0D5041439DF32D93C86127DCC3887EB329630966",
+            "file_version": "0.16.51.36654",
+            "product_version": "0.16.51",
+            "base_version": "0.16.51"
+          },
+          "two_cold_reloads_byte_identical": true
+        },
+        {
+          "path": "historical/f016/published/result.json",
+          "status": "passed-private-native-fixture",
+          "source": "9e486cb692fdf03a21d25d15f97db5ee40280f3f",
+          "receipt": {
+            "gzip": "spec/mir5/evidence/historical-transition-013-016-40031523354-historical-f016-published-native.json.gz",
+            "uncompressed_sha256": "05F26E92059B58167C87DDF37F5D6C6422082B7B3F8CAEF6268586BC8B4519D1"
+          },
+          "initial": {
+            "case": "historical-transition",
+            "stage": "initial",
+            "transition_stage": "published",
+            "status": "passed",
+            "target": "f016",
+            "direct": "recipe-prod-research_character_mining_speed-1",
+            "source_direct_lab_completions": 1,
+            "successor_direct_lab_completions": 0,
+            "mining_bonus": 0.05,
+            "current_research": "recipe-prod-research_character_mining_speed-1",
+            "research_progress": 0.42,
+            "queue_api": false,
+            "research_queue_enabled": null,
+            "two_cold_reload_witness": false,
+            "on_load_read_only": false
+          },
+          "player": {
+            "sha256": "00053C78EE854EB8AE0CB5318F7A41E3C81E62F29FEB6E6DCE317635743520DB",
+            "path": "C:\\Users\\Jules\\AppData\\Local\\MIRWorker\\runner\\_work\\mir-native-worker\\mir-native-worker\\source\\build\\mir5\\engine-archive-libraries\\0.16\\more-infinite-research_4.7.01602.zip"
+          },
+          "engine": {
+            "path": "D:\\Games\\Factorio\\0.16\\bin\\x64\\factorio.exe",
+            "sha256": "ACBA4D8B766C8CB61CBB564E0D5041439DF32D93C86127DCC3887EB329630966",
+            "file_version": "0.16.51.36654",
+            "product_version": "0.16.51",
+            "base_version": "0.16.51"
+          },
+          "two_cold_reloads_byte_identical": true
+        }
+      ]
+    }
+  ],
+  "scope": [
+    "F013/F014/F015/F016 exact existing engines: actual published4.7.2 mining lab completion and earned native bonus survive MIR5 upgrade/save/two cold reloads in each stage.",
+    "F015/F016 additionally complete one actual successor mining lab. F013/F014 lack numeric level readback and qualify native earned-effect preservation only; the fixture does not fabricate infinite-level semantics.",
+    "Older targets have no research queue API. Their JSON records explicitly contain queue_api=false and research_queue_enabled=null.",
+    "Together with historical-transition-017-100-110-chain.json these cover all seven bounded historical predecessor profiles. Full final-package/catalogue and historical save-state acceptance remains open."
+  ],
+  "release_qualification": false
+}

@@ -1,0 +1,17 @@
+{
+  "name": "mir-fixture-mir5-integration-catalogue-upgrade",
+  "version": "0.2.0",
+  "title": "MIR 5 private integration catalogue MIR5 successor",
+  "author": "MIR maintainers",
+  "description": "Disposable F200 integration catalogue upgrade assertion fixture; not player content.",
+  "factorio_version": "2.0",
+  "dependencies": [
+    "base = 2.0.77",
+    "? boblibrary = 2.1.0",
+    "? bobwarfare = 2.1.0",
+    "? pycoalprocessing = 3.0.44",
+    "? pyalienlife = 3.0.67",
+    "? pyhightech = 3.0.19",
+    "more-infinite-research = 5.0.20000"
+  ]
+}

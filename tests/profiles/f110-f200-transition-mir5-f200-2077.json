@@ -1,0 +1,20 @@
+{
+  "schema": 1,
+  "kind": "mir5-f110-f200-transition-successor",
+  "target": "f200",
+  "factorio_line": "2.0",
+  "engine": {
+    "version": "2.0.77",
+    "sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B"
+  },
+  "settings_mode": "Defaults",
+  "mods": [
+    {"name": "base", "version": "2.0.77", "enabled": true},
+    {"name": "more-infinite-research", "version": "5.0.20000", "enabled": true},
+    {"name": "mir-fixture-mir5-f110-f200-transition", "version": "0.2.0", "enabled": true}
+  ],
+  "archive_sha256": {
+    "more-infinite-research_5.0.20000.zip": "8BA029A01E1F08C311C6A127C81313D7664F0ABADAF3C79F84157775D35ADFD7"
+  },
+  "scope": "Prepared, unrun F200 successor bound to accepted a1fd431b/playerd4051e53, archive8BA029A0/601159 bytes, for the protected published F110 r05 source save. Earlier EA41 inputs and original failures remain preserved separately. Native execution, successor research/state and two cold reloads remain required; this input pin grants no transition or release result."
+}

@@ -1,0 +1,33 @@
+{
+  "schema": 1,
+  "kind": "mir5-popular-root-f210-native-reference-selection",
+  "target": "f210",
+  "factorio_line": "2.1",
+  "engine": {
+    "version": "2.1.23",
+    "sha256": "FE4A1DA30F322A0D0B8AEB3DF7276332222BAAA143E2352569B723E84B2B9060"
+  },
+  "settings_mode": "Defaults",
+  "mods": [
+    {
+      "name": "FNEI",
+      "version": "0.4.7",
+      "enabled": true
+    },
+    {
+      "name": "base",
+      "version": "2.1.23",
+      "enabled": true
+    },
+    {
+      "name": "mir-fixture-mir5-active-mods-observer",
+      "version": "0.1.0",
+      "enabled": true
+    }
+  ],
+  "archive_sha256": {
+    "FNEI_0.4.7.zip": "7E434373607A45B2F16BE0C4F6E593984606236FE619732F8DF9DA44451D3713",
+    "mir-fixture-mir5-active-mods-observer_0.1.0.zip": "2E1BE5952D2A4CC5C74A0D149E075D247BA110A3FAE5B6768D3EAEBABCEF989C"
+  },
+  "scope": "Exact FNEI ranked-root base input. Mandatory archived dependencies only; recommended providers are not automatically selected. Input metadata is not native engine admission, gameplay, save, client or support acceptance."
+}

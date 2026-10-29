@@ -1,0 +1,27 @@
+{
+  "schema": 1,
+  "kind": "MIR5BobAngelAdverseNativeChainV1",
+  "run": {
+    "id": 39989669400,
+    "url": "https://github.com/Julesc013/mir-native-worker/actions/runs/39989669400"
+  },
+  "source": "c6a99e7a4a646096eca96069aa71955aa694bc1d",
+  "custody": "build/mir5/black-glass/incoming/39989669400/black-glass-bob-angel-boundary-39989669400-1",
+  "cases": {
+    "published": {
+      "receipt": "spec/mir5/evidence/bob-angel-strengthened-boundary-adverse-published-native.json",
+      "status": "passed-private-native-fixture"
+    },
+    "upgrade": {
+      "receipt": "spec/mir5/evidence/bob-angel-strengthened-boundary-adverse-upgrade-native.json",
+      "status": "failed"
+    }
+  },
+  "release_qualification": false,
+  "diagnosis": [
+    "Source save proves explicit foreign true-to-false transition and passes two cold reloads.",
+    "Upgrade sees early enabled=true, tail next151 disabled=true visibility=true; no upgrade pass.",
+    "Exact upstream angelsrefining2.0.4 src/mod-config.lua calls reset_technologies then explicitly enables every technology whose prototype.enabled is true on every configuration change. An independent published-MIR4 reset control is being prepared.",
+    "The original diagnostic storage.mir_caps read belongs to the fixture, not MIR. Its reported absence is not evidence of MIR ownership. The diagnostic is corrected to report private state unavailable."
+  ]
+}

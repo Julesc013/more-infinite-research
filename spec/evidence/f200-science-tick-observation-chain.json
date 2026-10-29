@@ -1,0 +1,64 @@
+{
+  "schema": 1,
+  "kind": "MIR5F200WholeTickScienceAdverseObservationV1",
+  "observations": [
+    {
+      "run": 40010529095,
+      "url": "https://github.com/Julesc013/mir-native-worker/actions/runs/40010529095",
+      "source": "0ff2b8ef30e5a60ecd10ef765b0ff97a693af49c",
+      "family": "gear",
+      "manifest_members_verified": 104,
+      "published_receipt": {
+        "gzip": "spec/mir5/evidence/f200-gear-tick-observation-published-native.json.gz",
+        "uncompressed_sha256": "1244128A00739C2A027CC21D6AB2729AF814BB0CEAB5071DDBB8F803D164069B"
+      },
+      "successor_receipt": {
+        "gzip": "spec/mir5/evidence/f200-gear-tick-observation-adverse-native.json.gz",
+        "uncompressed_sha256": "4D8F05913E0388F4DBC435FF28C9CE963BFBB9041798C2B891351CAB2075C8D9"
+      },
+      "diagnostics": [
+        {
+          "path": "gameplay/upgrade/process-1.stdout.txt",
+          "sha256": "527928D05A6EF4B3673AC859AB677AE740C71AB7874AEC07409025F5E9063896",
+          "line": "__mir-fixture-mir5-f200-legacy-cap__/control.lua:20: [mir5-f200-legacy-cap-successor] successor real lab consumption differs for automation-science-pack: observed_units=21.266666666667 expected_units=21.27 remaining_invest=0.73"
+        },
+        {
+          "path": "gameplay/upgrade/process-1.stdout.txt",
+          "sha256": "527928D05A6EF4B3673AC859AB677AE740C71AB7874AEC07409025F5E9063896",
+          "line": "__mir-fixture-mir5-f200-legacy-cap__/control.lua:20: [mir5-f200-legacy-cap-successor] successor real lab consumption differs for automation-science-pack: observed_units=21.266666666667 expected_units=21.27 remaining_invest=0.73"
+        }
+      ]
+    },
+    {
+      "run": 40010949686,
+      "url": "https://github.com/Julesc013/mir-native-worker/actions/runs/40010949686",
+      "source": "0ff2b8ef30e5a60ecd10ef765b0ff97a693af49c",
+      "family": "worker",
+      "manifest_members_verified": 104,
+      "published_receipt": {
+        "gzip": "spec/mir5/evidence/f200-worker-tick-observation-published-native.json.gz",
+        "uncompressed_sha256": "52F5AD69129554DAE4BE9432C748D2B65C268258DE70554C69AB7B846FAF0B64"
+      },
+      "successor_receipt": {
+        "gzip": "spec/mir5/evidence/f200-worker-tick-observation-adverse-native.json.gz",
+        "uncompressed_sha256": "841874F2C83075403A8BAFADA247E98FAD82DE5670BDD6532477E003051F7CBD"
+      },
+      "diagnostics": [
+        {
+          "path": "gameplay/upgrade/process-1.stdout.txt",
+          "sha256": "BB95D8BCA009590551FACD4F2069430E1159DE107C6ACA9D9D81A53283CD15BA",
+          "line": "__mir-fixture-mir5-f200-legacy-worker__/control.lua:20: [mir5-f200-legacy-worker-successor] successor real native worker lab consumption differs for automation-science-pack: observed_units=21.266666666667 expected_units=21.27 remaining_invest=0.73"
+        },
+        {
+          "path": "gameplay/upgrade/process-1.stdout.txt",
+          "sha256": "BB95D8BCA009590551FACD4F2069430E1159DE107C6ACA9D9D81A53283CD15BA",
+          "line": "__mir-fixture-mir5-f200-legacy-worker__/control.lua:20: [mir5-f200-legacy-worker-successor] successor real native worker lab consumption differs for automation-science-pack: observed_units=21.266666666667 expected_units=21.27 remaining_invest=0.73"
+        }
+      ]
+    }
+  ],
+  "finding": "Both successors restore positive-cap ownership and complete a further native lab, then reject the fixture expectation of exact 0.73 science consumption. The native inventory corresponds to 44/60 science units.",
+  "next_check": "An independent published4.7.2-only relaxed-cap successor must verify the predicted whole-tick model before accepting corrected MIR5 observations.",
+  "native_pass": false,
+  "release_qualification": false
+}

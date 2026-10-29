@@ -1,0 +1,88 @@
+{
+  "schema": 1,
+  "kind": "authored-private-cap-api-custody-index-not-runner-receipt",
+  "scope": "Current private player cap/force/queue lifecycle and two independent API consumers",
+  "release_qualification": false,
+  "receipt": {
+    "path": "spec/mir5/evidence/caps-api-current-native.json",
+    "sha256": "1870B38B937A15AE4D4ADB5B4CD607501BC227F2C05ABE068BDEF5B1D85BAD76"
+  },
+  "player_archive": {
+    "path": "C:\\Projects\\Factorio\\testmods\\2.1\\more-infinite-research_5.0.21000.zip",
+    "sha256": "31EDAD840A721C313E25BBCE996BCC30E3D9B862E695B075F998B1186E9150EE"
+  },
+  "player_source_commit": "d2be4a08bc4ce683a94eadb82e76667b7251ed7f",
+  "input_save": {
+    "path": "C:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\mir5-caps-api-native-r08\\write-data\\saves\\seed.zip",
+    "sha256": "661F1FA005AE770A74A9C410A7687B9912B569A75E760D70CCA27AB76B50F0F4"
+  },
+  "original_seed_custody": "spec/mir5/evidence/caps-api-chain.json",
+  "input_save_byte_identical": true,
+  "fixtures": [
+    {
+      "archive": "C:\\Projects\\Factorio\\testmods\\2.1\\mir-fixture-mir5-caps-native_0.1.1.zip",
+      "sha256": "9C183408F75DCF30F90E0579078AE91E0AE6956558BC06B08B317ACFFA7F8282",
+      "source": "C:\\Projects\\Factorio\\more-infinite-research\\tests\\mir5\\fixtures\\caps"
+    },
+    {
+      "archive": "C:\\Projects\\Factorio\\testmods\\2.1\\mir-fixture-mir5-api-alpha_0.1.0.zip",
+      "sha256": "71ABA82B2B159CCA2B467CBDF5B31F09B4F6A14AA2CE9673ED76EBCF2FF58864",
+      "source": "C:\\Projects\\Factorio\\more-infinite-research\\tests\\mir5\\fixtures\\api-alpha"
+    },
+    {
+      "archive": "C:\\Projects\\Factorio\\testmods\\2.1\\mir-fixture-mir5-api-beta_0.1.0.zip",
+      "sha256": "AB93F88CB19F2475ACA174D8A23CA30EB6EBCA63E578270CA36D9EBD6D552DE3",
+      "source": "C:\\Projects\\Factorio\\more-infinite-research\\tests\\mir5\\fixtures\\api-beta"
+    }
+  ],
+  "profile": {
+    "path": "C:\\Projects\\Factorio\\more-infinite-research\\tests\\mir5\\profiles\\caps-api-f210.json",
+    "sha256": "072D4D21B9641CD63641DA43BDFF23DDAB37086F180D1949D224BD3806C60C3C"
+  },
+  "engine": {
+    "path": "C:\\Program Files\\Steam\\steamapps\\common\\Factorio\\bin\\x64\\factorio.exe",
+    "sha256": "FE4A1DA30F322A0D0B8AEB3DF7276332222BAAA143E2352569B723E84B2B9060",
+    "file_version": "2.1.23.87750",
+    "product_version": "2.1.23",
+    "base_version": "2.1.23"
+  },
+  "harness_sha256": "00738675D162FDDE0F53567225A2022531C694FA87A14C59EC87F8CEE41ED050",
+  "observed": {
+    "completed_levels": 2,
+    "next_level": 3,
+    "cap": 2,
+    "queue_before": 3,
+    "queue_after": 1,
+    "partial_progress": 0.016666666666666666,
+    "retained_progress": 0.016666666666666666,
+    "native_productivity_bonus": 0.2,
+    "lab_energy_seen": true,
+    "science_units_consumed": {
+      "automation-science-pack": 2,
+      "logistic-science-pack": 2,
+      "chemical-science-pack": 2,
+      "production-science-pack": 2
+    },
+    "foreign_enabled": false,
+    "foreign_visible": true,
+    "force_created_events": 3,
+    "force_reset_events": 1,
+    "merge_source_index": 6,
+    "merge_destination_index": 5,
+    "merge_source_retired": true,
+    "merge_destination_level": 1,
+    "merge_destination_enabled": true,
+    "merge_destination_productivity_bonus": 0,
+    "merge_ownership_note": "source-cap-rights-removed; destination-technology-not-inherited",
+    "qualification": "native-runner-readback-required",
+    "on_load_read_only": false
+  },
+  "both_consumer_configuration_markers": true,
+  "both_consumer_load_markers_on_two_cold_reloads": true,
+  "completed_save_sha256": "46F43BF9F491CEB3A9BB8BD36E7398A4DF3D7B5CD3AA8DE5F863D596EDD88EED",
+  "limitations": [
+    "Exact private source and disposable old MIR5 seed only, not historical MIR4 or production-save migration.",
+    "Beta declaration/query/lifecycle is observed here; its separate physical production case retains its original 8A player identity.",
+    "No rendered clients, multiplayer, full catalogue/target, menu/performance or release qualification."
+  ]
+}

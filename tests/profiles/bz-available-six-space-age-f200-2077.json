@@ -1,0 +1,34 @@
+{
+  "schema": 1,
+  "kind": "mir5-independent-mod-f200-native-reference-selection",
+  "target": "f200",
+  "factorio_line": "2.0",
+  "engine": {
+    "version": "2.0.77",
+    "sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B"
+  },
+  "settings_mode": "Defaults",
+  "mods": [
+    {"name": "base", "version": "2.0.77", "enabled": true},
+    {"name": "elevated-rails", "version": "2.0.77", "enabled": true},
+    {"name": "quality", "version": "2.0.77", "enabled": true},
+    {"name": "space-age", "version": "2.0.77", "enabled": true},
+    {"name": "bzcarbon", "version": "2.0.21", "enabled": true},
+    {"name": "bzlead", "version": "2.0.28", "enabled": true},
+    {"name": "bzsilicon", "version": "2.0.18", "enabled": true},
+    {"name": "bztin", "version": "2.1.15", "enabled": true},
+    {"name": "bztitanium", "version": "2.0.26", "enabled": true},
+    {"name": "bzzirconium", "version": "2.1.13", "enabled": true},
+    {"name": "mir-fixture-mir5-active-mods-observer", "version": "0.1.0", "enabled": true}
+  ],
+  "archive_sha256": {
+    "bzcarbon_2.0.21.zip": "55232190FC79C7EEAEE72A9F2507EB0253FCBC66B5B650624C7AA61E87037FA3",
+    "bzlead_2.0.28.zip": "694537B6EE7241B328BDD90B3E52A0531965CBE1203BA08C7955EBDC58147ABF",
+    "bzsilicon_2.0.18.zip": "B7B8A28DCBF8515EE42D457429A7BB056B5BC2E1BDDC0BA73CC34E8639997248",
+    "bztin_2.1.15.zip": "1E6DC5290B0956CCE278C0B38AA345A4A4E574C8CC3FCE7319E8C2B4890D5738",
+    "bztitanium_2.0.26.zip": "3C916AD9469ECF7453DFA1DFC44BDD2D417FD17BEEF44460A303970EE0484088",
+    "bzzirconium_2.1.13.zip": "63C35747BC6222DE6EF467D294F2726EC819E503E0612AC9AB0B930F5090B62B",
+    "mir-fixture-mir5-active-mods-observer_0.1.0.zip": "723D1E7721449FC26040E5E6629416767BDC20AD79CF8723115846DB662A1F87"
+  },
+  "scope": "Prepared, unrun F200 2.0.77 Space Age available-six BZ input for a separate upstream/published/current data-stage preflight. This no-MIR profile deliberately leaves MIR selection to the explicit Invoke-PrototypeCapture MIRArchive input. It preserves the failed F210 2.1 selections and establishes no compatibility, gameplay, save, migration, native, or release result."
+}

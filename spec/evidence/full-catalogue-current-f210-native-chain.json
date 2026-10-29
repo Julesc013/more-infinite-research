@@ -1,0 +1,226 @@
+{
+  "schema": 1,
+  "kind": "MIR5CurrentF210CatalogueUpgradeNativeReadbackV1",
+  "status": "exact-scenarios-passed-not-release-acceptance",
+  "derived": true,
+  "run": 40181631973,
+  "run_url": "https://github.com/Julesc013/mir-native-worker/actions/runs/40181631973",
+  "controller_commit": "5036c30fa5a999b9d6b8c21c437eed6ce5c2aab2",
+  "fixture_and_player_source": "fa1146e9778ecf7fc1b80449a2deec7ee0083ec3",
+  "player_tree": "41b78703f25bdceb1e05b57d7c725e0f6c9bef2c",
+  "candidate_sha256": "4D5E32CE2E74C65259E5D3E085CE7BE3BC37DC0A739308C6379BF621F7B5BDA1",
+  "published_version": "4.7.21002",
+  "published_sha256": "A4BB8F47232C689B267EF434F557187A8795C47280FA464169DE917FB579517F",
+  "engine_version": "2.1.23",
+  "engine_sha256": "FE4A1DA30F322A0D0B8AEB3DF7276332222BAAA143E2352569B723E84B2B9060",
+  "manifest_members_verified": 105,
+  "manifest_sha256": "52F9F046FB48EC0DF2B15CF89582D5C4FA0B39F6710B1E2FDEED808B2D87D0F8",
+  "raw_git_fixture_members_verified": 16,
+  "raw_git_profiles_verified": 4,
+  "actual_stage_log_markers_verified": 12,
+  "actual_cold_reload_processes": 8,
+  "stages": [
+    {
+      "profile": "base",
+      "role": "published",
+      "result_sha256": "633B9D9D6DA020D5B3C4E8E5ACF62339960FC0DFACD2E17543172A8AED2ECAD8",
+      "completed_save_sha256": "82DD9B62ED1A95AF841BFF4ACCE7E6EEA0D5C76EE48E830B4F969CCBCBE2C7E0",
+      "input_save_sha256": null,
+      "receipt_member": "base/published/result.json",
+      "initial_witnesses": {
+        "public_rows": 53,
+        "level_backed_rows": 53,
+        "native_owner_rows": 0,
+        "scripted_rows_not_seeded": 0,
+        "zero_credit_rows": 20,
+        "source_gear_lab": 1,
+        "successor_gear_lab": 0,
+        "queued_progress": 0.42000000000000004,
+        "paused_progress": 0.27,
+        "save_name": "mir5-native-complete",
+        "on_load_read_only": false
+      },
+      "native_logs": [
+        {
+          "path": "full-catalogue-upgrade-f210\\native\\f210\\base\\published\\production.factorio.log",
+          "sha256": "53D9D7963C9BB71D1E9AEC7569885AD3D580A97EFE2096DB2FD16552C6B07648",
+          "stage": "initial"
+        },
+        {
+          "path": "full-catalogue-upgrade-f210\\native\\f210\\base\\published\\reload-1.factorio.log",
+          "sha256": "BBBFBF4BDB6CB08D11E5E73DA12B1E108D9A2400167FCED96A37388E47E57724",
+          "stage": "reload"
+        },
+        {
+          "path": "full-catalogue-upgrade-f210\\native\\f210\\base\\published\\reload-2.factorio.log",
+          "sha256": "8433B2FEC97D442CACEF61B2C70475234EE2D5ED2833972AE3CEFAC41B321192",
+          "stage": "reload"
+        }
+      ],
+      "additional_same_process_markers_counted_as_cold_reloads": 0
+    },
+    {
+      "profile": "base",
+      "role": "mir5",
+      "result_sha256": "14A9E4A154E02345DC3F7C0406A3A3759096E590C751242F571629E07BDB0354",
+      "completed_save_sha256": "88F81268C58528A59151406E8FA2106C7D1404F79B2D3ABD60FB5EB91C8F4B7B",
+      "input_save_sha256": "82DD9B62ED1A95AF841BFF4ACCE7E6EEA0D5C76EE48E830B4F969CCBCBE2C7E0",
+      "receipt_member": "base/mir5/result.json",
+      "initial_witnesses": {
+        "public_rows": 53,
+        "level_backed_rows": 53,
+        "native_owner_rows": 0,
+        "scripted_rows_not_seeded": 0,
+        "zero_credit_rows": 20,
+        "source_gear_lab": 1,
+        "successor_gear_lab": 1,
+        "queued_progress": 0.42000000000000004,
+        "paused_progress": 0.27,
+        "save_name": "mir5-native-complete",
+        "on_load_read_only": false
+      },
+      "native_logs": [
+        {
+          "path": "full-catalogue-upgrade-f210\\native\\f210\\base\\mir5\\production.factorio.log",
+          "sha256": "6B5ACF58D88585D4AF3036B0F13A046670142754209F19C41382655BE59D1FBE",
+          "stage": "initial"
+        },
+        {
+          "path": "full-catalogue-upgrade-f210\\native\\f210\\base\\mir5\\reload-1.factorio.log",
+          "sha256": "9988B6FDB72C1554C716153510C2A4A78100D6A98F780B689F7C4F94AF764C80",
+          "stage": "reload"
+        },
+        {
+          "path": "full-catalogue-upgrade-f210\\native\\f210\\base\\mir5\\reload-2.factorio.log",
+          "sha256": "9BF6D413DBCAFE77559B9D94B0A1AB203A4B7DFAC449BCC8177AE0965B8AB007",
+          "stage": "reload"
+        }
+      ],
+      "additional_same_process_markers_counted_as_cold_reloads": 0
+    },
+    {
+      "profile": "space-age",
+      "role": "published",
+      "result_sha256": "F9632A11C6676045B36F7A3D9A83B16E960B93B1B4AC9CA2811FCC37641CFDD5",
+      "completed_save_sha256": "78747CB54904D96257E8A8E84F49FE465BBFAD22DE20DF82DEE436DB5D42957B",
+      "input_save_sha256": null,
+      "receipt_member": "space-age/published/result.json",
+      "initial_witnesses": {
+        "public_rows": 71,
+        "level_backed_rows": 69,
+        "native_owner_rows": 5,
+        "scripted_rows_not_seeded": 2,
+        "zero_credit_rows": 24,
+        "source_gear_lab": 1,
+        "successor_gear_lab": 0,
+        "queued_progress": 0.42000000000000004,
+        "paused_progress": 0.27,
+        "save_name": "mir5-native-complete",
+        "on_load_read_only": false
+      },
+      "native_logs": [
+        {
+          "path": "full-catalogue-upgrade-f210\\native\\f210\\space-age\\published\\production.factorio.log",
+          "sha256": "AFEBA2FDD3348BCFF3F2C689385F6AACFA354CB697C0B27353D9AB5C68DC8C23",
+          "stage": "initial"
+        },
+        {
+          "path": "full-catalogue-upgrade-f210\\native\\f210\\space-age\\published\\reload-1.factorio.log",
+          "sha256": "C872D759B7E4599A046F226534AA3C4F68FE385CD513763E70C05272478508A4",
+          "stage": "reload"
+        },
+        {
+          "path": "full-catalogue-upgrade-f210\\native\\f210\\space-age\\published\\reload-2.factorio.log",
+          "sha256": "F110B9BE2DD683130AA34EE8CA1374F029C5FE13FA2DA88BEB7621BE5FA3D7D5",
+          "stage": "reload"
+        }
+      ],
+      "additional_same_process_markers_counted_as_cold_reloads": 0
+    },
+    {
+      "profile": "space-age",
+      "role": "mir5",
+      "result_sha256": "2AFA8EE460710EBC3F0EBED09CBF27C42B5F89EAC40907CFBAA9494C7D3C16E2",
+      "completed_save_sha256": "BA80D8CCDF2B26510E2FA82A248F66D9F815D4E72D0B20CFCEDBDE7B15F41C22",
+      "input_save_sha256": "78747CB54904D96257E8A8E84F49FE465BBFAD22DE20DF82DEE436DB5D42957B",
+      "receipt_member": "space-age/mir5/result.json",
+      "initial_witnesses": {
+        "public_rows": 71,
+        "level_backed_rows": 69,
+        "native_owner_rows": 5,
+        "scripted_rows_not_seeded": 2,
+        "zero_credit_rows": 24,
+        "source_gear_lab": 1,
+        "successor_gear_lab": 1,
+        "queued_progress": 0.42000000000000004,
+        "paused_progress": 0.27,
+        "save_name": "mir5-native-complete",
+        "on_load_read_only": false
+      },
+      "native_logs": [
+        {
+          "path": "full-catalogue-upgrade-f210\\native\\f210\\space-age\\mir5\\production.factorio.log",
+          "sha256": "8222A218A8CC1D1D817052A86DA0350EDDC7992C8D96290F7A006F742B3F634E",
+          "stage": "initial"
+        },
+        {
+          "path": "full-catalogue-upgrade-f210\\native\\f210\\space-age\\mir5\\reload-1.factorio.log",
+          "sha256": "7F3E50BD2B06E140B8D3C05D317C92DBA72BF4D65535BBA01DA3A4271B738EAE",
+          "stage": "reload"
+        },
+        {
+          "path": "full-catalogue-upgrade-f210\\native\\f210\\space-age\\mir5\\reload-2.factorio.log",
+          "sha256": "97433A87A2DB89BBA91C81F7A7316C307FECB5311BB081AEC35B8F5E587578C2",
+          "stage": "reload"
+        }
+      ],
+      "additional_same_process_markers_counted_as_cold_reloads": 0
+    }
+  ],
+  "capsule": {
+    "path": "spec/evidence/full-catalogue-current-f210-native-capsule.zip",
+    "sha256": "20D19ED5384427CF9EAD157DB59C8CFB6122EF3A0A046B9B40037CAA548B20B6",
+    "members": [
+      {
+        "path": "artifact-manifest.json",
+        "bytes": 22659,
+        "sha256": "52F9F046FB48EC0DF2B15CF89582D5C4FA0B39F6710B1E2FDEED808B2D87D0F8"
+      },
+      {
+        "path": "base/mir5/result.json",
+        "bytes": 36100,
+        "sha256": "14A9E4A154E02345DC3F7C0406A3A3759096E590C751242F571629E07BDB0354"
+      },
+      {
+        "path": "base/published/result.json",
+        "bytes": 44670,
+        "sha256": "633B9D9D6DA020D5B3C4E8E5ACF62339960FC0DFACD2E17543172A8AED2ECAD8"
+      },
+      {
+        "path": "derived/aero-readback.json",
+        "bytes": 19780,
+        "sha256": "F03D0727328C1C5C809E0F9486CE75DA09302B2DCE749431E8E2897FC95D1EEE"
+      },
+      {
+        "path": "space-age/mir5/result.json",
+        "bytes": 38021,
+        "sha256": "2AFA8EE460710EBC3F0EBED09CBF27C42B5F89EAC40907CFBAA9494C7D3C16E2"
+      },
+      {
+        "path": "space-age/published/result.json",
+        "bytes": 46743,
+        "sha256": "F9632A11C6676045B36F7A3D9A83B16E960B93B1B4AC9CA2811FCC37641CFDD5"
+      }
+    ]
+  },
+  "primary_custody": "build/mir5/aero-full-catalogue-f210-40181631973",
+  "limitations": [
+    "This is one selected target and two fixed unmodded profiles; no F200, overhaul, arbitrary-mod or complete release verdict.",
+    "Non-scripted catalogue levels are explicitly seeded. Only the source and successor gear witnesses use actual lab completions: four total across the two profiles.",
+    "Space Age scripted carriers are presence-only and are not level-seeded or runtime-qualified by this scenario.",
+    "Successor production logs each also contain an on-load-labelled marker; these same-process markers are excluded from the eight separate cold-reload count.",
+    "The governed production servers stop after the live completion-and-saved-file predicate (recorded exit -1); the eight cold reloads exit naturally with zero.",
+    "Original saves, complete logs, configurations and packages remain in primary custody. The capsule carries four exact original result JSONs, the original manifest and one labelled derived readback.",
+    "No client, multiplayer, elapsed-time, memory performance or publication acceptance is established."
+  ]
+}

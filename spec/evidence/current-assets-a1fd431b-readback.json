@@ -1,0 +1,381 @@
+{
+  "schema": 1,
+  "kind": "MIR5CurrentAssetFreezeReadbackV1",
+  "status": "rebuilt-verified-not-native-qualified",
+  "source": {
+    "commit": "a1fd431bd25e646f801e68a8ad00a8abb49ee094",
+    "mod_name": "more-infinite-research",
+    "mod_title": "More Infinite Research",
+    "path": "source",
+    "source_distribution_version": "5.0.21000",
+    "source_tree": "d4051e5396d9b6389bdd2c680093cffd5752d09a",
+    "tree": "4cb724217bba25d23b251dfdadf7c5588c16a27b"
+  },
+  "controller": {
+    "package_tool": {
+      "path": "tools/package.py",
+      "sha256": "00ed00d66bd558554068405c8882419f852fc2f66646088052888d70e25da61e"
+    },
+    "release_tool": {
+      "path": "tools/release.py",
+      "sha256": "59beddf90a97e0a0141a87a50539fad5dc18e331ace675e79d43d9e0fab7cddf"
+    },
+    "runtime": {
+      "implementation": "cpython",
+      "version": [
+        3,
+        14,
+        7
+      ],
+      "zlib_build_version": "1.3.1.zlib-ng",
+      "zlib_runtime_version": "1.3.1.zlib-ng"
+    },
+    "zip_policy": {
+      "compression": "ZIP_DEFLATED",
+      "compresslevel": 9,
+      "member_create_system": 3,
+      "member_external_attr": 2175008768,
+      "member_timestamp": [
+        1980,
+        1,
+        1,
+        0,
+        0,
+        0
+      ]
+    }
+  },
+  "target_record": {
+    "blob": "b7c2a789e17b6726c341f8a3ff97d6a27d43c0d6",
+    "path": "targets/editions.json",
+    "sha256": "2a2e2a7e9c54224aece72366a1bb3ef7d9007a7bec92bb53c4d9b0276b6e33f6"
+  },
+  "early_cohort": {
+    "checksums": {
+      "bytes": 721,
+      "name": "SHA256SUMS-early.txt",
+      "sha256": "e8e0cee372cfafd40e6daa478fcfe730cbb21dc91135fd7744037d73b07c29d2"
+    },
+    "kind": "MIR5EarlyBestEffortAssetCohortV1",
+    "qualification": "best-effort-early-data-only-distributions-not-native-qualified",
+    "target_record": {
+      "blob": "101a1bd07ad0e5d32fbe2524e1f2c881643d57f6",
+      "path": "targets/early-editions.json",
+      "sha256": "cd8825f4ed2bf937d90a61484e4dc496d4208d1b307c09de7b07c79b4c6dbb72"
+    }
+  },
+  "normal_targets": [
+    "f013",
+    "f014",
+    "f015",
+    "f016",
+    "f017",
+    "f018",
+    "f100",
+    "f110",
+    "f200",
+    "f210"
+  ],
+  "best_effort_targets": [
+    "f006",
+    "f007",
+    "f008",
+    "f009",
+    "f010",
+    "f011",
+    "f012"
+  ],
+  "inventory_sha256": "13BC272F0043CEAD86A19676286FA471A5239E75DAD6726E7A1807BB7C5795D9",
+  "inventory_body_sha256": "0FB2C92F2ED61BB8EEEFABB31103D07BF03E4F5B3D482BDDB18F7B36A729B23B",
+  "primary_custody": "build/mir5/assets/a1fd431b-r01",
+  "files": [
+    {
+      "name": "MIR5ReleaseAssetInventoryV1.json",
+      "bytes": 208058,
+      "sha256": "13BC272F0043CEAD86A19676286FA471A5239E75DAD6726E7A1807BB7C5795D9"
+    },
+    {
+      "name": "SHA256SUMS-early.txt",
+      "bytes": 721,
+      "sha256": "E8E0CEE372CFAFD40E6DAA478FCFE730CBB21DC91135FD7744037D73B07C29D2"
+    },
+    {
+      "name": "SHA256SUMS.txt",
+      "bytes": 1030,
+      "sha256": "2620E81B3A4369CF06EDEAB420AAE947B32A132D1CA060EF8A60CFC58F6AFA58"
+    },
+    {
+      "name": "more-infinite-research_5.0.00600.zip",
+      "bytes": 135380,
+      "sha256": "D7289C4CA7C25CE6E56F4E5E95379F54F852E19F8D0AD848924510AC048614DD"
+    },
+    {
+      "name": "more-infinite-research_5.0.00700.zip",
+      "bytes": 135380,
+      "sha256": "BA018938CD3D2A4682F5D1118319D9AC88AECFD2F8F2F6BE16867E97C1D5EF66"
+    },
+    {
+      "name": "more-infinite-research_5.0.00800.zip",
+      "bytes": 135379,
+      "sha256": "828362161FABF8063078FA13F3A266C7FA884DFF1BAC386C48B36E4F66C1D61D"
+    },
+    {
+      "name": "more-infinite-research_5.0.00900.zip",
+      "bytes": 135380,
+      "sha256": "A295318FAD0EB66DE89034D72403C537637AFC5CE0088B52B908EE29EE33EB15"
+    },
+    {
+      "name": "more-infinite-research_5.0.01000.zip",
+      "bytes": 135378,
+      "sha256": "0A4B17E3987007223B6B9A1434BD660934DA5168B56E65DCEDC0BC340701732A"
+    },
+    {
+      "name": "more-infinite-research_5.0.01100.zip",
+      "bytes": 135380,
+      "sha256": "0B889377708C06351BC315BF60A12795DEF344866E061AA6239821C46CC3142C"
+    },
+    {
+      "name": "more-infinite-research_5.0.01200.zip",
+      "bytes": 135382,
+      "sha256": "52BBC8C3242DA1D0CB40A0322ABFCF4FB280759B8F3C0111418C5C10DA2FCFA7"
+    },
+    {
+      "name": "more-infinite-research_5.0.01300.zip",
+      "bytes": 376665,
+      "sha256": "1729CDD3E40F7E4309A7B84DADB5B5927E8B98EFA07C8A35539666E0A5D71151"
+    },
+    {
+      "name": "more-infinite-research_5.0.01400.zip",
+      "bytes": 376668,
+      "sha256": "A40FFF266F5754575D2ECF93435F5C5A3090A1B87230FDE01BC2D589A59AEC40"
+    },
+    {
+      "name": "more-infinite-research_5.0.01500.zip",
+      "bytes": 376667,
+      "sha256": "9B8AAF98DA1DC0283C47B3BF43CF99801FB5249D43D05F53A0BA4D8C50A191EE"
+    },
+    {
+      "name": "more-infinite-research_5.0.01600.zip",
+      "bytes": 376669,
+      "sha256": "4F1A23779C2DB4920EABE8B4DF68A6B047B511F79B5D13DDD2F2FE29B92E83B1"
+    },
+    {
+      "name": "more-infinite-research_5.0.01700.zip",
+      "bytes": 376668,
+      "sha256": "1C07449274872D31F9F8FEE6C5752379C1B860AC1E5377B497CF65DF41E8C563"
+    },
+    {
+      "name": "more-infinite-research_5.0.01800.zip",
+      "bytes": 376670,
+      "sha256": "8E0DA0029B37B1A28ECF317BBF0DAA60AFEDF2C8012B29A4D23E60A8E79CC7B1"
+    },
+    {
+      "name": "more-infinite-research_5.0.10000.zip",
+      "bytes": 376655,
+      "sha256": "E804AFC7C189A6F6A6E56C62A9F278408C555F129B3CEF2E0669DFBCEFCF6554"
+    },
+    {
+      "name": "more-infinite-research_5.0.11000.zip",
+      "bytes": 376967,
+      "sha256": "4422751A3F0854968E40654DA3B6E86233A7248D7C5FBD37AA431FD6EFD88783"
+    },
+    {
+      "name": "more-infinite-research_5.0.20000.zip",
+      "bytes": 601159,
+      "sha256": "8BA029A01E1F08C311C6A127C81313D7664F0ABADAF3C79F84157775D35ADFD7"
+    },
+    {
+      "name": "more-infinite-research_5.0.21000.zip",
+      "bytes": 601542,
+      "sha256": "6088CD88D4FD06DE01D71C8A1C3C7D32A55A55BE073C0888A84B2AC0C8C467D7"
+    }
+  ],
+  "verification": {
+    "command": "python -B tools/release.py --source source --output <frozen-output> --verify",
+    "result": "all-ten-normal-and-seven-best-effort-archives-rebuild-byte-identically"
+  },
+  "previous_freeze": "spec/evidence/current-assets-1c90ceb7-readback.json",
+  "previous_member_differences": {
+    "f013": {
+      "added": [],
+      "removed": [],
+      "changed": [
+        "more-infinite-research_5.0.01300/changelog.txt",
+        "more-infinite-research_5.0.01300/compatibility/historical_continuations.lua",
+        "more-infinite-research_5.0.01300/compatibility/historical_direct.lua",
+        "more-infinite-research_5.0.01300/compatibility/science_bindings.lua"
+      ]
+    },
+    "f014": {
+      "added": [],
+      "removed": [],
+      "changed": [
+        "more-infinite-research_5.0.01400/changelog.txt",
+        "more-infinite-research_5.0.01400/compatibility/historical_continuations.lua",
+        "more-infinite-research_5.0.01400/compatibility/historical_direct.lua",
+        "more-infinite-research_5.0.01400/compatibility/science_bindings.lua"
+      ]
+    },
+    "f015": {
+      "added": [],
+      "removed": [],
+      "changed": [
+        "more-infinite-research_5.0.01500/changelog.txt",
+        "more-infinite-research_5.0.01500/compatibility/historical_continuations.lua",
+        "more-infinite-research_5.0.01500/compatibility/historical_direct.lua",
+        "more-infinite-research_5.0.01500/compatibility/science_bindings.lua"
+      ]
+    },
+    "f016": {
+      "added": [],
+      "removed": [],
+      "changed": [
+        "more-infinite-research_5.0.01600/changelog.txt",
+        "more-infinite-research_5.0.01600/compatibility/historical_continuations.lua",
+        "more-infinite-research_5.0.01600/compatibility/historical_direct.lua",
+        "more-infinite-research_5.0.01600/compatibility/science_bindings.lua"
+      ]
+    },
+    "f017": {
+      "added": [],
+      "removed": [],
+      "changed": [
+        "more-infinite-research_5.0.01700/changelog.txt",
+        "more-infinite-research_5.0.01700/compatibility/historical_continuations.lua",
+        "more-infinite-research_5.0.01700/compatibility/historical_direct.lua",
+        "more-infinite-research_5.0.01700/compatibility/science_bindings.lua"
+      ]
+    },
+    "f018": {
+      "kind": "new-normal-edition-no-prior-archive"
+    },
+    "f100": {
+      "added": [],
+      "removed": [],
+      "changed": [
+        "more-infinite-research_5.0.10000/changelog.txt",
+        "more-infinite-research_5.0.10000/compatibility/historical_continuations.lua",
+        "more-infinite-research_5.0.10000/compatibility/historical_direct.lua",
+        "more-infinite-research_5.0.10000/compatibility/science_bindings.lua"
+      ]
+    },
+    "f110": {
+      "added": [
+        "more-infinite-research_5.0.11000/migrations/more-infinite-research_5.0.11000.json"
+      ],
+      "removed": [],
+      "changed": [
+        "more-infinite-research_5.0.11000/changelog.txt",
+        "more-infinite-research_5.0.11000/compatibility/historical_continuations.lua",
+        "more-infinite-research_5.0.11000/compatibility/historical_direct.lua",
+        "more-infinite-research_5.0.11000/compatibility/science_bindings.lua"
+      ]
+    },
+    "f200": {
+      "added": [
+        "more-infinite-research_5.0.20000/compatibility/angel_f210_profile.lua",
+        "more-infinite-research_5.0.20000/compatibility/bob_angel_f210_profile.lua",
+        "more-infinite-research_5.0.20000/compatibility/bob_plates_materials.lua",
+        "more-infinite-research_5.0.20000/compatibility/bob_plates_profile.lua",
+        "more-infinite-research_5.0.20000/compatibility/bob_productivity.lua",
+        "more-infinite-research_5.0.20000/compatibility/ironclad.lua",
+        "more-infinite-research_5.0.20000/compatibility/material_routes.lua",
+        "more-infinite-research_5.0.20000/compatibility/modern_catalogue/angel_f210.lua",
+        "more-infinite-research_5.0.20000/compatibility/modern_catalogue/bob_angel_f210.lua",
+        "more-infinite-research_5.0.20000/compatibility/modern_catalogue/bob_tech_progression.lua",
+        "more-infinite-research_5.0.20000/migrations/more-infinite-research_5.0.11000.json",
+        "more-infinite-research_5.0.20000/research/bob_plates_materials.lua"
+      ],
+      "removed": [],
+      "changed": [
+        "more-infinite-research_5.0.20000/changelog.txt",
+        "more-infinite-research_5.0.20000/compatibility/bob_core_materials.lua",
+        "more-infinite-research_5.0.20000/compatibility/bob_core_profile.lua",
+        "more-infinite-research_5.0.20000/compatibility/bob_tech_profile.lua",
+        "more-infinite-research_5.0.20000/compatibility/bob_warfare_profile.lua",
+        "more-infinite-research_5.0.20000/compatibility/gear_bindings.lua",
+        "more-infinite-research_5.0.20000/compatibility/modern_catalogue.lua",
+        "more-infinite-research_5.0.20000/compatibility/modern_catalogue/bob_warfare.lua",
+        "more-infinite-research_5.0.20000/compatibility/py_profile.lua",
+        "more-infinite-research_5.0.20000/compatibility/science_bindings.lua",
+        "more-infinite-research_5.0.20000/data-final-fixes.lua",
+        "more-infinite-research_5.0.20000/presentation/availability.lua",
+        "more-infinite-research_5.0.20000/research/catalogue.lua",
+        "more-infinite-research_5.0.20000/research/material_stages.lua",
+        "more-infinite-research_5.0.20000/research/modern.lua",
+        "more-infinite-research_5.0.20000/research/settings.lua"
+      ]
+    },
+    "f210": {
+      "added": [
+        "more-infinite-research_5.0.21000/compatibility/angel_f210_profile.lua",
+        "more-infinite-research_5.0.21000/compatibility/bob_angel_f210_profile.lua",
+        "more-infinite-research_5.0.21000/compatibility/bob_plates_materials.lua",
+        "more-infinite-research_5.0.21000/compatibility/bob_plates_profile.lua",
+        "more-infinite-research_5.0.21000/compatibility/bob_productivity.lua",
+        "more-infinite-research_5.0.21000/compatibility/ironclad.lua",
+        "more-infinite-research_5.0.21000/compatibility/material_routes.lua",
+        "more-infinite-research_5.0.21000/compatibility/modern_catalogue/angel_f210.lua",
+        "more-infinite-research_5.0.21000/compatibility/modern_catalogue/bob_angel_f210.lua",
+        "more-infinite-research_5.0.21000/compatibility/modern_catalogue/bob_tech_progression.lua",
+        "more-infinite-research_5.0.21000/migrations/more-infinite-research_5.0.11000.json",
+        "more-infinite-research_5.0.21000/research/bob_plates_materials.lua"
+      ],
+      "removed": [],
+      "changed": [
+        "more-infinite-research_5.0.21000/changelog.txt",
+        "more-infinite-research_5.0.21000/compatibility/bob_core_materials.lua",
+        "more-infinite-research_5.0.21000/compatibility/bob_core_profile.lua",
+        "more-infinite-research_5.0.21000/compatibility/bob_tech_profile.lua",
+        "more-infinite-research_5.0.21000/compatibility/bob_warfare_profile.lua",
+        "more-infinite-research_5.0.21000/compatibility/gear_bindings.lua",
+        "more-infinite-research_5.0.21000/compatibility/modern_catalogue.lua",
+        "more-infinite-research_5.0.21000/compatibility/modern_catalogue/bob_warfare.lua",
+        "more-infinite-research_5.0.21000/compatibility/py_profile.lua",
+        "more-infinite-research_5.0.21000/compatibility/science_bindings.lua",
+        "more-infinite-research_5.0.21000/data-final-fixes.lua",
+        "more-infinite-research_5.0.21000/info.json",
+        "more-infinite-research_5.0.21000/presentation/availability.lua",
+        "more-infinite-research_5.0.21000/research/catalogue.lua",
+        "more-infinite-research_5.0.21000/research/material_stages.lua",
+        "more-infinite-research_5.0.21000/research/modern.lua",
+        "more-infinite-research_5.0.21000/research/settings.lua"
+      ]
+    }
+  },
+  "independent_aero_rebuild": {
+    "original_readback_sha256": "0DA0D7E485E4B9E1F87AB78210CBC73A1BD0C77134F3AF88FCF37F36B5521620",
+    "source": {
+      "commit": "a1fd431bd25e646f801e68a8ad00a8abb49ee094",
+      "source_tree": "d4051e5396d9b6389bdd2c680093cffd5752d09a"
+    },
+    "controller_and_runtime_match_original_record": true,
+    "release_verify": "passed",
+    "output": {
+      "normal_archives": 10,
+      "best_effort_early_archives": 7,
+      "checksum_files": 2,
+      "total_files": 20,
+      "inventory_sha256": "13BC272F0043CEAD86A19676286FA471A5239E75DAD6726E7A1807BB7C5795D9",
+      "primary_custody": "build/mir5/assets/a1fd431b-r01",
+      "all_recorded_bytes_and_hashes_match": true
+    },
+    "claims": {
+      "independent_rebuild": true,
+      "primary_copy_hash_readback": true,
+      "native_qualification": false,
+      "gameplay_qualification": false,
+      "migration_qualification": false,
+      "client_qualification": false,
+      "performance_qualification": false,
+      "release_qualification": false
+    }
+  },
+  "limits": [
+    "Offline composition and byte verification only; no native, gameplay, migration, client, timing, memory or release acceptance follows.",
+    "F018 is a newly selected normal edition. Its engine, predecessor and forward-save qualification remain open.",
+    "F006-F012 are separately labelled fixed finite data-only best-effort packages, without claimed native qualification; F006-F008 require extraction.",
+    "Older C563 and historical native receipts retain their original source and archive identities. No old pass is relabelled as this freeze.",
+    "The canonical v5.0.0 label is intended metadata, not evidence that a tag or release has been published."
+  ]
+}

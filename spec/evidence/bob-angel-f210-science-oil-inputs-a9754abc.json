@@ -1,0 +1,110 @@
+{
+  "schema": 1,
+  "kind": "MIR5BobAngelF210ScienceOilPreparedInputsV1",
+  "status": "exact-source-fixture-built-not-native-qualified",
+  "fixture_source_commit": "a9754abcd7405e1ddffa9f4dc8051b71d00855fe",
+  "case_name": "bob-angel-f210-science-oil",
+  "package_tool": {
+    "path": "tools/package.py",
+    "committed_sha256": "00ED00D66BD558554068405C8882419F852FC2F66646088052888D70E25DA61E",
+    "executed_worktree_sha256": "00ED00D66BD558554068405C8882419F852FC2F66646088052888D70E25DA61E"
+  },
+  "runtime": {
+    "implementation": "cpython",
+    "version": [
+      3,
+      14,
+      7
+    ],
+    "zlib_build_version": "1.3.1.zlib-ng",
+    "zlib_runtime_version": "1.3.1.zlib-ng"
+  },
+  "custody_root": "build/mir5/bob-angel-f210-science-oil-a9754abc-root-r01",
+  "fixture": {
+    "name": "mir-fixture-mir5-bob-angel-f210-science-oil",
+    "version": "0.1.0",
+    "archive": "build/mir5/bob-angel-f210-science-oil-a9754abc-root-r01/mir-fixture-mir5-bob-angel-f210-science-oil_0.1.0.zip",
+    "sha256": "FEFEE3B8625E71FF50F1C0A193301D58394F8BA23AA937AAAA736B1A2D2349A7",
+    "bytes": 7893,
+    "projection": "build/mir5/bob-angel-f210-science-oil-a9754abc-root-r01/fixture-projection",
+    "members": [
+      {
+        "path": "control.lua",
+        "source_path": "tests/fixtures/bob-angel-f210-science-oil/control.lua",
+        "sha256": "C21282469EE6D4BF67D5F16C8ACDB28D535C0DC6D667300BD3F77F564B6676B9",
+        "bytes": 12616
+      },
+      {
+        "path": "data-final-fixes.lua",
+        "source_path": "tests/fixtures/bob-angel-f210-science-oil/data-final-fixes.lua",
+        "sha256": "86E52AC92F101119B5522FD11D4C85E35F7BBAF9255C316E05E30384DF431F5E",
+        "bytes": 5891
+      },
+      {
+        "path": "fixture_facts.lua",
+        "source_path": "tests/fixtures/bob-angel-f210-science-oil/fixture_facts.lua",
+        "sha256": "B3366BEC2DCC068F1D27DF866912EB370E5245035D1B43E0882B3800983FFB81",
+        "bytes": 6031
+      },
+      {
+        "path": "info.json",
+        "source_path": "tests/fixtures/bob-angel-f210-science-oil/info.json",
+        "sha256": "821E183B76037BCFBC0D523686A3E46D3CD86AF04C0097B1C1A681D87233D342",
+        "bytes": 1663
+      }
+    ]
+  },
+  "projection_contract": {
+    "member_count": 4,
+    "members": [
+      "info.json",
+      "control.lua",
+      "data-final-fixes.lua",
+      "fixture_facts.lua"
+    ],
+    "description": "Only the four selected runtime members are projected from raw Git; README and every unselected source path are excluded."
+  },
+  "profile_bindings": {
+    "tests/profiles/bob-angel-f210-science-oil-mir5-base-f210-2123.json": "FEFEE3B8625E71FF50F1C0A193301D58394F8BA23AA937AAAA736B1A2D2349A7",
+    "tests/profiles/bob-angel-f210-science-oil-mir5-space-age-f210-2123.json": "FEFEE3B8625E71FF50F1C0A193301D58394F8BA23AA937AAAA736B1A2D2349A7"
+  },
+  "mir_input": {
+    "source_commit": "b251ae7a54104ace87cb0da4cf531cf53f03c93d",
+    "player_tree": "79b73a6a8e68987737e69bf2d95ec6555b49f901",
+    "engine": {
+      "version": "2.1.23",
+      "sha256": "FE4A1DA30F322A0D0B8AEB3DF7276332222BAAA143E2352569B723E84B2B9060"
+    },
+    "archive": "more-infinite-research_5.0.21000.zip",
+    "sha256": "E3A65C08AC7798A66FB1BE30D24307B17C8B366DD901953BDE2A09BD6939C8CE",
+    "bytes": 679250,
+    "observer_archive": "mir-fixture-mir5-active-mods-observer_0.1.0.zip",
+    "observer_sha256": "A15A7D628D66953D2E0C4D4FA288F47CBF9C5678327C7EB3D23ADB5DC78331C0"
+  },
+  "archive_guard": {
+    "status": "four-member-raw-git-projection-passes-real-guard",
+    "command": "Assert-MIRLibraryFixtureArchive -Archive <selected archive> -SourceDirectory <four-member raw-Git projection>",
+    "helpers": [
+      {
+        "path": "tools/lib/validation/ImmutableInputStaging.ps1",
+        "committed_sha256": "B5FBFAC8537B08F9790BD3EE8ACEAAB38EE5CBB8EF005E67E8375DE568BBC12C",
+        "executed_worktree_sha256": "B5FBFAC8537B08F9790BD3EE8ACEAAB38EE5CBB8EF005E67E8375DE568BBC12C"
+      },
+      {
+        "path": "tools/lib/compatibility/LibraryActivation.ps1",
+        "committed_sha256": "123A2241B895B57217AA969A677FF21BBFB268FE55E9734287883B4D6AE25099",
+        "executed_worktree_sha256": "123A2241B895B57217AA969A677FF21BBFB268FE55E9734287883B4D6AE25099"
+      }
+    ]
+  },
+  "native_execution": false,
+  "library_mutation": false,
+  "laboratory_completion": false,
+  "saved_input_hashes": "pending actual native source/save and reload execution",
+  "release_qualification": false,
+  "supersedes_prepared_input": "spec/evidence/bob-angel-f210-science-oil-inputs-c37fca88.json",
+  "limits": [
+    "Prepared correction only: native researched=false clears the technology to its initial level, so it precedes level seeding.",
+    "Original prepared receipts and native adverses remain unchanged. No new native or release qualification."
+  ]
+}

@@ -1,0 +1,39 @@
+{
+  "schema": 1,
+  "kind": "mir5-popular-root-f210-native-reference-selection",
+  "target": "f210",
+  "factorio_line": "2.1",
+  "engine": {
+    "version": "2.1.23",
+    "sha256": "FE4A1DA30F322A0D0B8AEB3DF7276332222BAAA143E2352569B723E84B2B9060"
+  },
+  "settings_mode": "Defaults",
+  "mods": [
+    {
+      "name": "RateCalculator",
+      "version": "3.4.2",
+      "enabled": true
+    },
+    {
+      "name": "base",
+      "version": "2.1.23",
+      "enabled": true
+    },
+    {
+      "name": "flib",
+      "version": "0.17.2",
+      "enabled": true
+    },
+    {
+      "name": "mir-fixture-mir5-active-mods-observer",
+      "version": "0.1.0",
+      "enabled": true
+    }
+  ],
+  "archive_sha256": {
+    "RateCalculator_3.4.2.zip": "9B92849A4D95EC25910000748CBCACE2171098BDB3BEDC96C267F727FC7775B5",
+    "flib_0.17.2.zip": "0A48C15DC0FC6C13BB3FE8293BA6CB35A07F3B0F37D37ACB50AB30E32E8E019D",
+    "mir-fixture-mir5-active-mods-observer_0.1.0.zip": "2E1BE5952D2A4CC5C74A0D149E075D247BA110A3FAE5B6768D3EAEBABCEF989C"
+  },
+  "scope": "Exact RateCalculator ranked-root base input. Mandatory archived dependencies only; recommended providers are not automatically selected. Input metadata is not native engine admission, gameplay, save, client or support acceptance. Refreshed with the 2026-10-26 officially downloaded F210 archives; prior cohort remains bound to its original Git source and hashes."
+}

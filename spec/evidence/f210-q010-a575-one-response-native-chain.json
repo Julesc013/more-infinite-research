@@ -1,0 +1,199 @@
+{
+  "schema": 1,
+  "kind": "MIR5F210Q010A575OneResponseNativeChainV1",
+  "status": "completed-one-unscored-owned-settings-response",
+  "scope": "One exact a575 candidate ordinary owned-window Settings response. The observed elapsed interval is retained as one unscored response observation only; it is not a comparison, a timing cohort, a 50-percent-speed claim, gameplay, save, data-stage, performance, or release qualification.",
+  "frozen_execution": {
+    "executed_caller": {
+      "path": "D:/Projects/Factorio/mir5-q010-a575-menu-preflight-r01/build/qualification/q010-a575-one-response-menu-r01/Invoke-Q010A575CandidateOwnedMenu.ps1",
+      "sha256": "F88EB294883A048AF89853D42C30098902697C1E0EF45DB21C215018A060ADB4",
+      "preflight_sha256": "62FE51A0E4AD254A837E0E5EE5318A0C321360DB2D944A4B381B452D4E517C66",
+      "controller_commit": "728404053cf27b0e647e7b64e841622b5c8a3fde"
+    },
+    "candidate": {
+      "source_commit": "a575a4198807b6aea9e26963e3d9970fc5c068ae",
+      "player_tree": "398c79c687d2bc662c976355ced1436201c43f11",
+      "archive_sha256": "7CE6A4DF78019F6B98237E638A1C927C5FDB538D4A1442EE22D846DD962DDCDC",
+      "archive_bytes": 681347,
+      "version": "5.0.21000"
+    },
+    "engine": {
+      "path": "D:\\Games\\Factorio\\2.1\\bin\\x64\\factorio.exe",
+      "sha256": "8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38",
+      "base_version": "2.1.23"
+    },
+    "profile": {
+      "sha256": "05F2786E896B1F28C2E4239134BA370B0C2BCF6CCB1384E03999FB0E89C8B980",
+      "base_rows": 37,
+      "selected_archive_hashes": 32
+    },
+    "control_archive": {
+      "sha256": "C563CB5B96C9E64CB3373BDB60CF5C8B7D3C97E93EADB8F924443C703CDC024D",
+      "bytes": 568598
+    },
+    "observer": {
+      "sha256": "A15A7D628D66953D2E0C4D4FA288F47CBF9C5678327C7EB3D23ADB5DC78331C0",
+      "bytes": 835
+    }
+  },
+  "native_observation": {
+    "result": {
+      "status": "completed-one-untimed-owned-settings-response",
+      "sha256": "CC165DAAB203667C30D1B3B3DB75FB86BE276D310CAD6A44A9723E4CB3E57424",
+      "bytes": 23479
+    },
+    "actor": {
+      "status": "observed-response-awaiting-parent-selection-validation",
+      "sha256": "B3342DE5A0E75FC940B6BA9A688C983085027F72A0F32A2D0365AAAD1CA9A74C",
+      "bytes": 22351
+    },
+    "loaded_entries": {
+      "count": 38,
+      "canonical_profile_entries": 37,
+      "includes_candidate_mir": true,
+      "ordered_sha256": "8DCC4CF8C8F5FB004B3BF2CB9E66B0672772F05FCA6EEBA8337099FF709F3975",
+      "ordered": [
+        "angelsaddons-mobility-graphics-crawler@2.1.0",
+        "angelsaddons-mobility-graphics-petro@2.1.0",
+        "angelsaddons-mobility-graphics-smelting@2.1.0",
+        "angelsaddons-mobility@2.1.1",
+        "angelsaddons-storage@2.1.1",
+        "angelsbioprocessing@2.1.2",
+        "angelsbioprocessinggraphics@2.1.0",
+        "angelsinfiniteores@2.1.0",
+        "angelspetrochem@2.1.3",
+        "angelspetrochemgraphics@2.1.0",
+        "angelsrefining@2.1.3",
+        "angelsrefininggraphics@2.1.0",
+        "angelssmelting@2.1.1",
+        "angelssmeltinggraphics@2.1.1",
+        "base@2.1.23",
+        "bobassembly@3.0.2",
+        "bobelectronics@3.0.1",
+        "bobenemies@3.0.1",
+        "bobequipment@3.0.0",
+        "bobgreenhouse@3.0.1",
+        "bobinserters@3.0.0",
+        "boblibrary@3.0.1",
+        "boblogistics@3.0.2",
+        "bobmining@3.0.2",
+        "bobmodules@3.0.1",
+        "bobores@3.0.0",
+        "bobplates@3.0.2",
+        "bobpower@3.0.1",
+        "bobrevamp@3.0.1",
+        "bobtech@3.0.0",
+        "bobvehicleequipment@3.0.0",
+        "bobwarfare@3.0.2",
+        "elevated-rails@2.1.23",
+        "mir-fixture-mir5-active-mods-observer@0.1.0",
+        "more-infinite-research@5.0.21000",
+        "quality@2.1.23",
+        "recycler@2.1.23",
+        "space-age@2.1.23"
+      ]
+    },
+    "endpoint": {
+      "class": "ordinary-responsive-menu",
+      "observed_elapsed_seconds": 182.5488678,
+      "interaction_response_seconds": 0.738698,
+      "settings_response_sha256": "A9D4BAAC054B2C8D8C1DD83AEED01D00FC60257CCE233F4AB343AC32A02E40DB",
+      "main_menu_sha256": "3148FD946137DA088084A0AF4D8D9A4106676A546203625A0C22D72D04A1EDBC",
+      "dimensions": "2560x1440",
+      "screenshots_retained_only_in_primary_custody": true
+    }
+  },
+  "resources": {
+    "declared_peak_mib": 9216,
+    "declared_peak_bytes": 9663676416,
+    "declared_output_mib": 2048,
+    "declared_output_bytes": 2147483648,
+    "native_timeout_seconds": 300,
+    "admission": {
+      "status": "admitted-without-wait",
+      "attempt_count": 1,
+      "refusal_count": 0
+    },
+    "observed_peak_sampled_private_bytes": 8779673600,
+    "observed_peak_working_set_bytes": 2790940672,
+    "measurement_scope": "Governed actor and its owned Factorio child only; retained as one unscored observation, not a timing or performance verdict."
+  },
+  "restoration": {
+    "candidate_archive_restoration": "restored-control-after-one-owned-response",
+    "restored_control_archive_sha256": "C563CB5B96C9E64CB3373BDB60CF5C8B7D3C97E93EADB8F924443C703CDC024D",
+    "candidate_after_sha256": "7CE6A4DF78019F6B98237E638A1C927C5FDB538D4A1442EE22D846DD962DDCDC",
+    "active_profile_absent_before": true,
+    "active_profile_absent_after": true,
+    "controls": [
+      {
+        "name": "mod-list.json",
+        "before_sha256": "48C46678CC8369DB15CC12CDFB23309EB076DC4433B76E9426083D0074BCCC91",
+        "after_sha256": "48C46678CC8369DB15CC12CDFB23309EB076DC4433B76E9426083D0074BCCC91",
+        "before_bytes": 39201,
+        "after_bytes": 39201,
+        "exact": true
+      },
+      {
+        "name": "mod-settings.dat",
+        "before_sha256": "667897C514B66298A1E400058B65EA14EB36322D88864B98AE38E4C9B81387BC",
+        "after_sha256": "667897C514B66298A1E400058B65EA14EB36322D88864B98AE38E4C9B81387BC",
+        "before_bytes": 60744,
+        "after_bytes": 60744,
+        "exact": true
+      }
+    ],
+    "factorio_processes_after": 0
+  },
+  "custody": {
+    "primary_root": "build/qualification/q010-a575-one-response-menu-r01/native-output-r01",
+    "members": 19,
+    "bytes": 38985437,
+    "result_sha256": "CC165DAAB203667C30D1B3B3DB75FB86BE276D310CAD6A44A9723E4CB3E57424",
+    "custody_sha256": "E24F0CCADB9D720BB7987A832EB4010E58D083CED9772BDBE1587D3081BC339C",
+    "raw_and_primary_member_hashes_checked": 38,
+    "all_member_hashes_matched": true,
+    "full_originals": "Full output, screenshots, logs, configuration, player data, preflight, and library-control snapshots remain in primary custody and are not embedded here."
+  },
+  "preserved_zero_native_refusal": {
+    "classification": "pre-resource output-root refusal; no native process or result; rendered transcript is derived, not raw stdout",
+    "caller_sha256": "4D2A8CB39A25F23B55709018A4E4018BA79CEB36FC81B03C7FDC2AC168CB1BC4",
+    "preflight_sha256": "DD39428F5A862F39B61B424D0B10C9BB7E439117927AF4CB908344B042888825",
+    "rendered_transcript_sha256": "F4FCB8D2CE1CE9A96A526DF666B790FB898F0E65349A6C73CA84B8671FFAE582",
+    "rendered_transcript_bytes": 421,
+    "failure_code": "mir441-resource-output-root",
+    "disposition": "Preserved separately; it is not relabelled as a native result or a performance sample."
+  },
+  "receipts": {
+    "path": "spec/evidence/f210-q010-a575-one-response-native-receipts-r01.json.gz",
+    "sha256": "7577FCFC551FF4DD4BFB3B9A688E361FCF34156A32EDF2A82F24A79E90AEDBAE",
+    "bytes": 14675,
+    "uncompressed_sha256": "C53229CDB4FBB2548BA30FBA9DCF3CBA6E0E52903D81C91535EF55D3AE85663B",
+    "exact_safe_original_receipts": 2,
+    "derived_safe_metadata_records": 1,
+    "strict_utf8_decode_roundtrip_verified": true,
+    "exclusions": [
+      "save binaries",
+      "configuration payloads",
+      "player-data payloads",
+      "preflight payloads",
+      "library-control payloads",
+      "screenshots",
+      "full logs"
+    ]
+  },
+  "claims": {
+    "native_execution": true,
+    "data_stage": false,
+    "gameplay": false,
+    "save": false,
+    "timing_cohort": false,
+    "performance": false,
+    "release_qualification": false
+  },
+  "limitations": [
+    "The observed 182.5488678-second response is one unscored owned-window observation, not a speed comparison or threshold claim.",
+    "This case validates no data-stage, gameplay, save, performance, timing-cohort, or release outcome.",
+    "The prior output-root refusal remains a zero-native caller adverse with only a derived rendered transcript retained; it is not raw stdout.",
+    "Screenshots, full logs, configuration, player data, preflight and library-control payloads remain only in primary custody."
+  ]
+}

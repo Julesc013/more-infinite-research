@@ -1,0 +1,532 @@
+{
+  "kind": "MIR5NativeFixtureV1",
+  "status": "passed-private-native-fixture",
+  "case": "worker-speed-precap",
+  "source_head": "7590b92231b4d98d954448b0728bdfd9963de240",
+  "source_dirty": true,
+  "harness_sha256": "00738675D162FDDE0F53567225A2022531C694FA87A14C59EC87F8CEE41ED050",
+  "native_probe_sha256": "FF8E62687A8AA05080E3F9AFF45DED34BA7FCFDF1F309542A66893380B7D51E3",
+  "governor_sha256": "9E27C4DDCCC10028246F89A09A7663F7FCA1D7BD26444681A7A8635F74D9BE96",
+  "engine": {
+    "path": "C:\\Program Files\\Steam\\steamapps\\common\\Factorio\\bin\\x64\\factorio.exe",
+    "sha256": "FE4A1DA30F322A0D0B8AEB3DF7276332222BAAA143E2352569B723E84B2B9060",
+    "file_version": "2.1.23.87750",
+    "product_version": "2.1.23",
+    "base_version": "2.1.23"
+  },
+  "profile": {
+    "sha256": "ABA9BA3E2CDB893E2837078750E222BB375D6715808A0A8520ADCB0DE8627120",
+    "path": "C:\\Projects\\Factorio\\more-infinite-research\\tests\\mir5\\profiles\\worker-speed-precap-f210.json"
+  },
+  "fixtures": [
+    {
+      "sha256": "0F63673F8636C924D7E7589B8CA5E89F2F1EFBF9B08BA64B48FA6189150CCC39",
+      "archive": "C:\\Projects\\Factorio\\testmods\\2.1\\mir-fixture-mir5-worker-speed-cap_0.0.1.zip",
+      "source": "C:\\Projects\\Factorio\\more-infinite-research\\tests\\mir5\\fixtures\\worker-speed-precap"
+    }
+  ],
+  "mir_archive": {
+    "sha256": "31EDAD840A721C313E25BBCE996BCC30E3D9B862E695B075F998B1186E9150EE",
+    "path": "C:\\Projects\\Factorio\\testmods\\2.1\\more-infinite-research_5.0.21000.zip"
+  },
+  "observation": "native-fixture-production-and-two-cold-reloads",
+  "input_save": null,
+  "release_qualification": false,
+  "initial_admission_wait": {
+    "phase": "fixture-initial",
+    "admission_wait_seconds": 0,
+    "status": "not-requested",
+    "attempt_count": 0,
+    "refusal_count": 0,
+    "elapsed_seconds": 0.0,
+    "first_refusal": null,
+    "last_refusal": null,
+    "last_error": null,
+    "started_at": "2026-10-23T05:19:29.5326558+00:00",
+    "deadline_at": "2026-10-23T05:19:29.5326558+00:00",
+    "admission": null
+  },
+  "create": {
+    "process": {
+      "index": 1,
+      "status": "passed",
+      "ledger": "C:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\mir5-base-worker-precap-native-r01\\process-1.resources.jsonl",
+      "stdout": "C:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\mir5-base-worker-precap-native-r01\\process-1.stdout.txt",
+      "stderr": "C:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\mir5-base-worker-precap-native-r01\\process-1.stderr.txt",
+      "result": {
+        "status": "passed",
+        "exit_code": 0,
+        "timed_out": false,
+        "passed": true,
+        "completion_predicate_observed": false,
+        "duration_seconds": 5.80209,
+        "peak_working_set_bytes": 226938880,
+        "peak_sampled_private_bytes": 214892544,
+        "admission": {
+          "observed_at": "2026-10-23T05:19:34.6967149+00:00",
+          "memory": {
+            "total_bytes": 17047683072,
+            "free_bytes": 6458146816,
+            "committed_bytes": 13624209408,
+            "commit_limit_bytes": 20357242880
+          },
+          "work_volume": {
+            "name": "C:\\",
+            "free_bytes": 65673580544,
+            "total_bytes": 472446398464
+          },
+          "system_volume": {
+            "name": "C:\\",
+            "free_bytes": 65673580544,
+            "total_bytes": 472446398464
+          }
+        },
+        "duration_measurement": {
+          "scope": "direct-native-executable-start-to-exit",
+          "historical_scope": "governed-powershell-wrapper-tree-start-to-exit",
+          "comparability": "scope-changed; compare only fresh direct-native measurements; no product-speedup claim"
+        }
+      }
+    },
+    "log": "C:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\mir5-base-worker-precap-native-r01\\create.factorio.log",
+    "log_sha256": "E6AC986DFC785F37115702D53B7AE9B7010D80B80888ECF24B9B7223E8D368E6",
+    "loaded_selection": [
+      "base@2.1.23",
+      "mir-fixture-mir5-worker-speed-cap@0.0.1",
+      "more-infinite-research@5.0.21000"
+    ],
+    "consumers": {}
+  },
+  "seed_sha256": "13066DEFDB3D6371632AE7DAC313BDB08BCF97376C52B3DB6150B90CCDDCE935",
+  "server_settings": {
+    "path": "C:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\mir5-base-worker-precap-native-r01\\server-settings.json",
+    "sha256": "5B4C546FFCA63E1AEC8F67FFA5C32F3108CBC334DFA5AB1C5E2C212005639610",
+    "template_sha256": "61E85918C477D86D0B347F8BF3E41B43413EC53F284D37F2888F1648FCA0849A",
+    "template": "C:\\Program Files\\Steam\\steamapps\\common\\Factorio\\data\\server-settings.example.json"
+  },
+  "production": {
+    "process": {
+      "index": 2,
+      "status": "passed",
+      "ledger": "C:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\mir5-base-worker-precap-native-r01\\process-2.resources.jsonl",
+      "stdout": "C:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\mir5-base-worker-precap-native-r01\\process-2.stdout.txt",
+      "stderr": "C:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\mir5-base-worker-precap-native-r01\\process-2.stderr.txt",
+      "result": {
+        "status": "passed",
+        "exit_code": -1,
+        "timed_out": false,
+        "passed": true,
+        "completion_predicate_observed": true,
+        "duration_seconds": 4.646549,
+        "peak_working_set_bytes": 234582016,
+        "peak_sampled_private_bytes": 225193984,
+        "admission": {
+          "observed_at": "2026-10-23T05:19:42.2784018+00:00",
+          "memory": {
+            "total_bytes": 17047683072,
+            "free_bytes": 6547185664,
+            "committed_bytes": 13557313536,
+            "commit_limit_bytes": 20357242880
+          },
+          "work_volume": {
+            "name": "C:\\",
+            "free_bytes": 65671290880,
+            "total_bytes": 472446398464
+          },
+          "system_volume": {
+            "name": "C:\\",
+            "free_bytes": 65671290880,
+            "total_bytes": 472446398464
+          }
+        },
+        "duration_measurement": {
+          "scope": "direct-native-executable-start-to-exit",
+          "historical_scope": "governed-powershell-wrapper-tree-start-to-exit",
+          "comparability": "scope-changed; compare only fresh direct-native measurements; no product-speedup claim"
+        }
+      }
+    },
+    "log": "C:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\mir5-base-worker-precap-native-r01\\production.factorio.log",
+    "log_sha256": "FCFE0CD65DF340EC35CE2E1DB8ACBF331D3873C4BAD099EC8B6663A72AC3DF31",
+    "loaded_selection": [
+      "base@2.1.23",
+      "mir-fixture-mir5-worker-speed-cap@0.0.1",
+      "more-infinite-research@5.0.21000"
+    ],
+    "consumers": {}
+  },
+  "initial": {
+    "stage": "initial",
+    "case": "worker-speed-precap",
+    "status": "passed",
+    "witnesses": {
+      "owner": "worker-robots-speed-6",
+      "next_level": 8,
+      "cap": 0,
+      "completed_levels": 2,
+      "modifier_before": 2.4,
+      "modifier_after": 3.6999999999999997,
+      "native_researched_setter_observation": true,
+      "primary_enabled": true,
+      "primary_visible": false,
+      "foreign_enabled": false,
+      "foreign_visible": false,
+      "on_load_read_only": false
+    }
+  },
+  "reloads": [
+    {
+      "save_sha256": "9AE44FB4F347B72B19158B4F0F61613E0E85F60E125326FB942890E9DBEF1B64",
+      "ordinal": 1,
+      "stage": {
+        "process": {
+          "index": 3,
+          "status": "passed",
+          "ledger": "C:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\mir5-base-worker-precap-native-r01\\process-3.resources.jsonl",
+          "stdout": "C:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\mir5-base-worker-precap-native-r01\\process-3.stdout.txt",
+          "stderr": "C:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\mir5-base-worker-precap-native-r01\\process-3.stderr.txt",
+          "result": {
+            "status": "passed",
+            "exit_code": 0,
+            "timed_out": false,
+            "passed": true,
+            "completion_predicate_observed": false,
+            "duration_seconds": 3.807412,
+            "peak_working_set_bytes": 221401088,
+            "peak_sampled_private_bytes": 212123648,
+            "admission": {
+              "observed_at": "2026-10-23T05:19:48.5072206+00:00",
+              "memory": {
+                "total_bytes": 17047683072,
+                "free_bytes": 6524194816,
+                "committed_bytes": 13554700288,
+                "commit_limit_bytes": 20357242880
+              },
+              "work_volume": {
+                "name": "C:\\",
+                "free_bytes": 65669484544,
+                "total_bytes": 472446398464
+              },
+              "system_volume": {
+                "name": "C:\\",
+                "free_bytes": 65669484544,
+                "total_bytes": 472446398464
+              }
+            },
+            "duration_measurement": {
+              "scope": "direct-native-executable-start-to-exit",
+              "historical_scope": "governed-powershell-wrapper-tree-start-to-exit",
+              "comparability": "scope-changed; compare only fresh direct-native measurements; no product-speedup claim"
+            }
+          }
+        },
+        "log": "C:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\mir5-base-worker-precap-native-r01\\reload-1.factorio.log",
+        "log_sha256": "0372A4F1197D77453B0DDA5D6D7A78BF351A6C25A9BFD022F523F6B84CAB5936",
+        "loaded_selection": [
+          "base@2.1.23",
+          "mir-fixture-mir5-worker-speed-cap@0.0.1",
+          "more-infinite-research@5.0.21000"
+        ],
+        "consumers": {}
+      },
+      "save_byte_identical": true,
+      "result": {
+        "stage": "reload",
+        "case": "worker-speed-precap",
+        "status": "passed",
+        "witnesses": {
+          "owner": "worker-robots-speed-6",
+          "next_level": 8,
+          "cap": 0,
+          "completed_levels": 2,
+          "modifier_before": 2.4,
+          "modifier_after": 3.6999999999999997,
+          "native_researched_setter_observation": true,
+          "primary_enabled": true,
+          "primary_visible": false,
+          "foreign_enabled": false,
+          "foreign_visible": false,
+          "on_load_read_only": true
+        }
+      }
+    },
+    {
+      "save_sha256": "9AE44FB4F347B72B19158B4F0F61613E0E85F60E125326FB942890E9DBEF1B64",
+      "ordinal": 2,
+      "stage": {
+        "process": {
+          "index": 4,
+          "status": "passed",
+          "ledger": "C:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\mir5-base-worker-precap-native-r01\\process-4.resources.jsonl",
+          "stdout": "C:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\mir5-base-worker-precap-native-r01\\process-4.stdout.txt",
+          "stderr": "C:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\mir5-base-worker-precap-native-r01\\process-4.stderr.txt",
+          "result": {
+            "status": "passed",
+            "exit_code": 0,
+            "timed_out": false,
+            "passed": true,
+            "completion_predicate_observed": false,
+            "duration_seconds": 3.588998,
+            "peak_working_set_bytes": 266739712,
+            "peak_sampled_private_bytes": 254914560,
+            "admission": {
+              "observed_at": "2026-10-23T05:19:54.3726402+00:00",
+              "memory": {
+                "total_bytes": 17047683072,
+                "free_bytes": 5552263168,
+                "committed_bytes": 14636941312,
+                "commit_limit_bytes": 20357242880
+              },
+              "work_volume": {
+                "name": "C:\\",
+                "free_bytes": 65670500352,
+                "total_bytes": 472446398464
+              },
+              "system_volume": {
+                "name": "C:\\",
+                "free_bytes": 65670500352,
+                "total_bytes": 472446398464
+              }
+            },
+            "duration_measurement": {
+              "scope": "direct-native-executable-start-to-exit",
+              "historical_scope": "governed-powershell-wrapper-tree-start-to-exit",
+              "comparability": "scope-changed; compare only fresh direct-native measurements; no product-speedup claim"
+            }
+          }
+        },
+        "log": "C:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\mir5-base-worker-precap-native-r01\\reload-2.factorio.log",
+        "log_sha256": "7215FEBFD435AD38420DE1A763FA69783B8A19CE9AB864F058522D233185C4D5",
+        "loaded_selection": [
+          "base@2.1.23",
+          "mir-fixture-mir5-worker-speed-cap@0.0.1",
+          "more-infinite-research@5.0.21000"
+        ],
+        "consumers": {}
+      },
+      "save_byte_identical": true,
+      "result": {
+        "stage": "reload",
+        "case": "worker-speed-precap",
+        "status": "passed",
+        "witnesses": {
+          "owner": "worker-robots-speed-6",
+          "next_level": 8,
+          "cap": 0,
+          "completed_levels": 2,
+          "modifier_before": 2.4,
+          "modifier_after": 3.6999999999999997,
+          "native_researched_setter_observation": true,
+          "primary_enabled": true,
+          "primary_visible": false,
+          "foreign_enabled": false,
+          "foreign_visible": false,
+          "on_load_read_only": true
+        }
+      }
+    }
+  ],
+  "library_control_restoration": {
+    "status": "restored-direct-library-controls",
+    "profile_sha256": "ABA9BA3E2CDB893E2837078750E222BB375D6715808A0A8520ADCB0DE8627120",
+    "dependency_payload_bytes_copied": 0,
+    "archive_links_created": 0,
+    "archive_extractions": 0,
+    "owned_archive_names_temporarily_hidden": 0,
+    "selected": [
+      {
+        "name": "base",
+        "version": "2.1.23",
+        "path": "C:\\Program Files\\Steam\\steamapps\\common\\Factorio\\data\\base\\info.json",
+        "builtin": true,
+        "identity": "C65BE9DB:036C000000246719",
+        "sha256": "0DA4FCB137A0C38CD74EEB3A52462169F360F54B95AD0669270D08CFA9AA352F",
+        "bytes": 193
+      },
+      {
+        "name": "more-infinite-research",
+        "version": "5.0.21000",
+        "path": "C:\\Projects\\Factorio\\testmods\\2.1\\more-infinite-research_5.0.21000.zip",
+        "builtin": false,
+        "identity": "C65BE9DB:0050000000198946",
+        "sha256": "31EDAD840A721C313E25BBCE996BCC30E3D9B862E695B075F998B1186E9150EE",
+        "bytes": 212590
+      },
+      {
+        "name": "mir-fixture-mir5-worker-speed-cap",
+        "version": "0.0.1",
+        "path": "C:\\Projects\\Factorio\\testmods\\2.1\\mir-fixture-mir5-worker-speed-cap_0.0.1.zip",
+        "builtin": false,
+        "identity": "C65BE9DB:005700000020AFC3",
+        "sha256": "0F63673F8636C924D7E7589B8CA5E89F2F1EFBF9B08BA64B48FA6189150CCC39",
+        "bytes": 2703
+      }
+    ]
+  },
+  "process_runs": [
+    {
+      "index": 1,
+      "status": "passed",
+      "ledger": "C:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\mir5-base-worker-precap-native-r01\\process-1.resources.jsonl",
+      "stdout": "C:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\mir5-base-worker-precap-native-r01\\process-1.stdout.txt",
+      "stderr": "C:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\mir5-base-worker-precap-native-r01\\process-1.stderr.txt",
+      "result": {
+        "status": "passed",
+        "exit_code": 0,
+        "timed_out": false,
+        "passed": true,
+        "completion_predicate_observed": false,
+        "duration_seconds": 5.80209,
+        "peak_working_set_bytes": 226938880,
+        "peak_sampled_private_bytes": 214892544,
+        "admission": {
+          "observed_at": "2026-10-23T05:19:34.6967149+00:00",
+          "memory": {
+            "total_bytes": 17047683072,
+            "free_bytes": 6458146816,
+            "committed_bytes": 13624209408,
+            "commit_limit_bytes": 20357242880
+          },
+          "work_volume": {
+            "name": "C:\\",
+            "free_bytes": 65673580544,
+            "total_bytes": 472446398464
+          },
+          "system_volume": {
+            "name": "C:\\",
+            "free_bytes": 65673580544,
+            "total_bytes": 472446398464
+          }
+        },
+        "duration_measurement": {
+          "scope": "direct-native-executable-start-to-exit",
+          "historical_scope": "governed-powershell-wrapper-tree-start-to-exit",
+          "comparability": "scope-changed; compare only fresh direct-native measurements; no product-speedup claim"
+        }
+      }
+    },
+    {
+      "index": 2,
+      "status": "passed",
+      "ledger": "C:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\mir5-base-worker-precap-native-r01\\process-2.resources.jsonl",
+      "stdout": "C:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\mir5-base-worker-precap-native-r01\\process-2.stdout.txt",
+      "stderr": "C:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\mir5-base-worker-precap-native-r01\\process-2.stderr.txt",
+      "result": {
+        "status": "passed",
+        "exit_code": -1,
+        "timed_out": false,
+        "passed": true,
+        "completion_predicate_observed": true,
+        "duration_seconds": 4.646549,
+        "peak_working_set_bytes": 234582016,
+        "peak_sampled_private_bytes": 225193984,
+        "admission": {
+          "observed_at": "2026-10-23T05:19:42.2784018+00:00",
+          "memory": {
+            "total_bytes": 17047683072,
+            "free_bytes": 6547185664,
+            "committed_bytes": 13557313536,
+            "commit_limit_bytes": 20357242880
+          },
+          "work_volume": {
+            "name": "C:\\",
+            "free_bytes": 65671290880,
+            "total_bytes": 472446398464
+          },
+          "system_volume": {
+            "name": "C:\\",
+            "free_bytes": 65671290880,
+            "total_bytes": 472446398464
+          }
+        },
+        "duration_measurement": {
+          "scope": "direct-native-executable-start-to-exit",
+          "historical_scope": "governed-powershell-wrapper-tree-start-to-exit",
+          "comparability": "scope-changed; compare only fresh direct-native measurements; no product-speedup claim"
+        }
+      }
+    },
+    {
+      "index": 3,
+      "status": "passed",
+      "ledger": "C:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\mir5-base-worker-precap-native-r01\\process-3.resources.jsonl",
+      "stdout": "C:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\mir5-base-worker-precap-native-r01\\process-3.stdout.txt",
+      "stderr": "C:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\mir5-base-worker-precap-native-r01\\process-3.stderr.txt",
+      "result": {
+        "status": "passed",
+        "exit_code": 0,
+        "timed_out": false,
+        "passed": true,
+        "completion_predicate_observed": false,
+        "duration_seconds": 3.807412,
+        "peak_working_set_bytes": 221401088,
+        "peak_sampled_private_bytes": 212123648,
+        "admission": {
+          "observed_at": "2026-10-23T05:19:48.5072206+00:00",
+          "memory": {
+            "total_bytes": 17047683072,
+            "free_bytes": 6524194816,
+            "committed_bytes": 13554700288,
+            "commit_limit_bytes": 20357242880
+          },
+          "work_volume": {
+            "name": "C:\\",
+            "free_bytes": 65669484544,
+            "total_bytes": 472446398464
+          },
+          "system_volume": {
+            "name": "C:\\",
+            "free_bytes": 65669484544,
+            "total_bytes": 472446398464
+          }
+        },
+        "duration_measurement": {
+          "scope": "direct-native-executable-start-to-exit",
+          "historical_scope": "governed-powershell-wrapper-tree-start-to-exit",
+          "comparability": "scope-changed; compare only fresh direct-native measurements; no product-speedup claim"
+        }
+      }
+    },
+    {
+      "index": 4,
+      "status": "passed",
+      "ledger": "C:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\mir5-base-worker-precap-native-r01\\process-4.resources.jsonl",
+      "stdout": "C:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\mir5-base-worker-precap-native-r01\\process-4.stdout.txt",
+      "stderr": "C:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\mir5-base-worker-precap-native-r01\\process-4.stderr.txt",
+      "result": {
+        "status": "passed",
+        "exit_code": 0,
+        "timed_out": false,
+        "passed": true,
+        "completion_predicate_observed": false,
+        "duration_seconds": 3.588998,
+        "peak_working_set_bytes": 266739712,
+        "peak_sampled_private_bytes": 254914560,
+        "admission": {
+          "observed_at": "2026-10-23T05:19:54.3726402+00:00",
+          "memory": {
+            "total_bytes": 17047683072,
+            "free_bytes": 5552263168,
+            "committed_bytes": 14636941312,
+            "commit_limit_bytes": 20357242880
+          },
+          "work_volume": {
+            "name": "C:\\",
+            "free_bytes": 65670500352,
+            "total_bytes": 472446398464
+          },
+          "system_volume": {
+            "name": "C:\\",
+            "free_bytes": 65670500352,
+            "total_bytes": 472446398464
+          }
+        },
+        "duration_measurement": {
+          "scope": "direct-native-executable-start-to-exit",
+          "historical_scope": "governed-powershell-wrapper-tree-start-to-exit",
+          "comparability": "scope-changed; compare only fresh direct-native measurements; no product-speedup claim"
+        }
+      }
+    }
+  ]
+}

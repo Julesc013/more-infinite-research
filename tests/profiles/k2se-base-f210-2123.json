@@ -1,0 +1,153 @@
+{
+  "schema": 1,
+  "kind": "mir5-independent-mod-f210-native-reference-selection",
+  "target": "f210",
+  "factorio_line": "2.1",
+  "engine": {
+    "version": "2.1.23",
+    "sha256": "FE4A1DA30F322A0D0B8AEB3DF7276332222BAAA143E2352569B723E84B2B9060"
+  },
+  "settings_mode": "Defaults",
+  "mods": [
+    {
+      "name": "base",
+      "version": "2.1.23",
+      "enabled": true
+    },
+    {
+      "name": "ChangeInserterDropLane",
+      "version": "1.3.0",
+      "enabled": true
+    },
+    {
+      "name": "Krastorio2",
+      "version": "2.1.4",
+      "enabled": true
+    },
+    {
+      "name": "Krastorio2Assets",
+      "version": "2.1.0",
+      "enabled": true
+    },
+    {
+      "name": "Krastorio2MenuSimulations",
+      "version": "2.1.0",
+      "enabled": true
+    },
+    {
+      "name": "aai-containers",
+      "version": "0.4.0",
+      "enabled": true
+    },
+    {
+      "name": "aai-industry",
+      "version": "0.7.5",
+      "enabled": true
+    },
+    {
+      "name": "aai-signal-transmission",
+      "version": "0.6.0",
+      "enabled": true
+    },
+    {
+      "name": "alien-biomes",
+      "version": "0.8.0",
+      "enabled": true
+    },
+    {
+      "name": "alien-biomes-graphics",
+      "version": "0.8.0",
+      "enabled": true
+    },
+    {
+      "name": "flib",
+      "version": "0.17.2",
+      "enabled": true
+    },
+    {
+      "name": "informatron",
+      "version": "0.5.0",
+      "enabled": true
+    },
+    {
+      "name": "jetpack",
+      "version": "0.5.1",
+      "enabled": true
+    },
+    {
+      "name": "robot_attrition",
+      "version": "0.7.0",
+      "enabled": true
+    },
+    {
+      "name": "shield-projector",
+      "version": "0.3.0",
+      "enabled": true
+    },
+    {
+      "name": "space-exploration",
+      "version": "0.7.63",
+      "enabled": true
+    },
+    {
+      "name": "space-exploration-graphics",
+      "version": "0.7.7",
+      "enabled": true
+    },
+    {
+      "name": "space-exploration-graphics-2",
+      "version": "0.7.3",
+      "enabled": true
+    },
+    {
+      "name": "space-exploration-graphics-3",
+      "version": "0.7.3",
+      "enabled": true
+    },
+    {
+      "name": "space-exploration-graphics-4",
+      "version": "0.7.3",
+      "enabled": true
+    },
+    {
+      "name": "space-exploration-graphics-5",
+      "version": "0.7.5",
+      "enabled": true
+    },
+    {
+      "name": "mir-fixture-mir5-active-mods-observer",
+      "version": "0.1.0",
+      "enabled": true
+    },
+    {
+      "name": "space-exploration-postprocess",
+      "version": "0.7.7",
+      "enabled": true
+    }
+  ],
+  "archive_sha256": {
+    "aai-containers_0.4.0.zip": "E353A4108F98B7A0B59C9324095575B195E81512C41FA87347B29D717346F47C",
+    "aai-industry_0.7.5.zip": "DFB734B8B9B8BF847C90759E8A63D2DB4C24B5DF871D49E2A230E1AE58E7E829",
+    "aai-signal-transmission_0.6.0.zip": "F2B694BBE55DE33487D7039DA49BBB523FD583778CAF6B187373B17AC6BCB3D4",
+    "alien-biomes_0.8.0.zip": "5A2376B3A45AAE3001766576AFFC236F6C9CCA574811D04E895F9994B824AC0E",
+    "alien-biomes-graphics_0.8.0.zip": "41CC6D322343A3C1365AF495606ADB4400D358C4F1DFF97B66BD4EE95931FCE3",
+    "informatron_0.5.0.zip": "1E57DD0D86F8FAE8486E9AC3CF32DA8A2A463D5E7C2B2B5D257286CEF727D64B",
+    "jetpack_0.5.1.zip": "95C748D4627C864C9DF8E8BBC2F027375309486CAA3349EE947699EBC4426809",
+    "robot_attrition_0.7.0.zip": "6AE71B750B8021E1D7F53B7B035F104DDA7329567A38610B23DE055D6162EDAE",
+    "shield-projector_0.3.0.zip": "5AADBDC0B2AA9AD8AA13CFC4DE1972694D4ED8C3F417B7D0244E35E77C60533C",
+    "space-exploration_0.7.63.zip": "BF993DB8DCD75D368943A4499F9C3E7E518940D24025C236B7B43AB5BF91CBED",
+    "space-exploration-graphics_0.7.7.zip": "E474854307F5FB19A2F691D17CA5257796C6A4577462A3F362263BADA1C14BBB",
+    "space-exploration-graphics-2_0.7.3.zip": "9D45F0ADC27167A12E102B73AE9C899EB0E5426761A36F8EDB327A0E776E8019",
+    "space-exploration-graphics-3_0.7.3.zip": "27A9FABEFE1FC08F5C17AA605364BC855DAB3DAD71B867D84313D68F7BF7B187",
+    "space-exploration-graphics-4_0.7.3.zip": "4EBA9B0081A9E437B624F67E84EEC42320D60C74310EE1F32D65FDC97F5A4ECD",
+    "space-exploration-graphics-5_0.7.5.zip": "255DEB48E1C1F19083203603F6758BEEA952CE91F2430970188F59AE766C4ADA",
+    "ChangeInserterDropLane_1.3.0.zip": "BD5AEB1499DB015A3BAE3DF3D4D561911CE23A568626C1C244553E7981B3AF9B",
+    "flib_0.17.2.zip": "0A48C15DC0FC6C13BB3FE8293BA6CB35A07F3B0F37D37ACB50AB30E32E8E019D",
+    "Krastorio2_2.1.4.zip": "9E5A56AC52BA0DD96A2D9FFBEFB8B242270EC946159D3DBED77B24B3C1C7147E",
+    "Krastorio2Assets_2.1.0.zip": "39EF950EC8B21A40357DD0240EF8389501EE75CCA82717F2773B98554DA46E29",
+    "Krastorio2MenuSimulations_2.1.0.zip": "3A485B449B356DC4B3EB4233DE4E803B3A001259FBC251BDC9F9D9120B3C53A7",
+    "mir-fixture-mir5-active-mods-observer_0.1.0.zip": "A15A7D628D66953D2E0C4D4FA288F47CBF9C5678327C7EB3D23ADB5DC78331C0",
+    "space-exploration-postprocess_0.7.7.zip": "E23462598A34CAC81DB6420C443AC92EB7F5C295616A1192C90F2DE19D54312D"
+  },
+  "scope": "Exact k2se base input for separate upstream/published4.7.3/current data/settings captures. Available-six BZ is not a full BZ suite. SE explicitly excludes Space Age; its recommended menu-simulations provider is omitted and no menu claim follows. These inputs establish no native, gameplay, physical, migration, client or support verdict. The current observer binding names the exact A15 runtime container used in the completed EA41 sweep; prior canonical 2E1 container and identical member hashes remain in its r03 amendment."
+}

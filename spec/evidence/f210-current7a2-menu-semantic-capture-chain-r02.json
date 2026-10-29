@@ -1,0 +1,133 @@
+{
+  "schema": 1,
+  "status": "passed-current-data-and-settings-byte-identical-original-semantic-intent-applicable",
+  "basis": "Actual current005D/8DC/05F278 single data-stage capture byte-identical in full data.raw and mod-settings to original A8D0 semantic capture; original independently authored intent R02 and complete replay equality remain exact hash-bound prerequisites. No changed expectation or relabelled old execution.",
+  "controller_commit": "57178fb461492d4a697eb9c32713cc06196adc96",
+  "candidate_source": "7a2f93224c846b86261b2da709f50ea683fc708d",
+  "player_tree": "5058373348e9049f8b67ec4dbb79b400a904acd6",
+  "capture_result": {
+    "path": "build/qualification/f210-current7a2-menu-r01-controller/native-current-capture-r02/result.json",
+    "bytes": 39543,
+    "sha256": "2EB125C834D043A09CF794F5B62D4A088CA31469CB2A0EF530D5F2E467140BCF"
+  },
+  "capture_readback": {
+    "path": "build/qualification/f210-current7a2-menu-r01-controller/capture-root-readback-r02.json",
+    "bytes": 3179,
+    "sha256": "D893CC14D0EBE6B18B2A6FE282BC908589A1E865D3A57AD049A069768DDBA4D7"
+  },
+  "changed_package_members": {
+    "changelog.txt": {
+      "old_sha256": "9823A95AF154CD2443E20702DE926B3AD6DD089BF797D306AC436DA993F9F08A",
+      "current_sha256": "AD122D376100DE3DE84833CAA5289FDCCD2511CDE1670C1B9FA9644B29A22A77"
+    },
+    "presentation/library_model.lua": {
+      "old_sha256": "A69C5B5FB4FC37A03D29B2848F55EA26DC69489F066ECBC81A1AA30172420360",
+      "current_sha256": "591F69FDB536CF1F750AA711F876408617C2BE89A0BA4AB53AE6B99C43C94381"
+    },
+    "research/catalogue.lua": {
+      "old_sha256": "6E6600786BB2E58C90C505E5A10FDD8BBD62CA3B114EF377446C07B2ADFF66B7",
+      "current_sha256": "EACCBED9C41C08FE8236991FC92F7AED78B1CCD3D7BFBDD6729487342BA8CA2C"
+    },
+    "runtime/library.lua": {
+      "old_sha256": "2D76CCE7E46F6BB93EDEAC29ECC6DD265F00C401BF33DC9A5BA74F9E2D37532C",
+      "current_sha256": "24A7CC1A0D501BEDA5533FD19385B087D5FEB50629706B97CC12E723219E3EBB"
+    }
+  },
+  "unchanged_package_members": 215,
+  "equal_dumps": [
+    {
+      "kind": "data_raw",
+      "current": {
+        "path": "build/qualification/f210-current7a2-menu-r01-controller/native-current-capture-r02/write-data/script-output/data-raw-dump.json",
+        "bytes": 67505937,
+        "sha256": "DD2A57EE38D1038F5B76DC25F7C5B9296654C4CEB6117DE2036E774EA83093FA"
+      },
+      "previous": {
+        "path": "build/qualification/f210-performance-575e-capture-pending-r01/native-candidate/write-data/script-output/data-raw-dump.json",
+        "bytes": 67505937,
+        "sha256": "DD2A57EE38D1038F5B76DC25F7C5B9296654C4CEB6117DE2036E774EA83093FA"
+      },
+      "byte_identical": true
+    },
+    {
+      "kind": "mod_settings",
+      "current": {
+        "path": "build/qualification/f210-current7a2-menu-r01-controller/native-current-capture-r02/write-data/script-output/mod-settings-dump.json",
+        "bytes": 783931,
+        "sha256": "83C3A4166488BFEF80225DE9818810DE4CE0DDD37760C6B17BEC810AC8162D17"
+      },
+      "previous": {
+        "path": "build/qualification/f210-performance-575e-capture-pending-r01/native-candidate/write-data/script-output/mod-settings-dump.json",
+        "bytes": 783931,
+        "sha256": "83C3A4166488BFEF80225DE9818810DE4CE0DDD37760C6B17BEC810AC8162D17"
+      },
+      "byte_identical": true
+    }
+  ],
+  "old_semantic_prerequisites": {
+    "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\f210-performance-575e-capture-pending-r01\\replay-complete-output-comparison-r01.json": {
+      "sha256": "643DBFD934E1875D3E7CD0FB11B4278850D0F67E431ACC888183F0C16A7B96B7",
+      "bytes": 20000
+    },
+    "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\f210-performance-575e-capture-pending-r01\\current-intent-comparison-r01.json": {
+      "sha256": "6D6497EC83E45A02C5494D492F182EBD562F56F12A934AA75B1EF95C76C5FD56",
+      "bytes": 15290
+    },
+    "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\f210-performance-575e-capture-pending-r01\\current-intent-comparison-r02.json": {
+      "sha256": "AB5FB2034B9C9FB8045EAA3FF647C4ACA964C8E29199717C063B8108DDB3D631",
+      "bytes": 15223
+    },
+    "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\f210-performance-575e-menu-r01\\frozen-intent.json": {
+      "sha256": "F9335DE6D17A55C378FFEB4026179DBA5F2837B4853059FC7572AB359EE2205E",
+      "bytes": 288804
+    }
+  },
+  "diagnostic_body_review": "https://github.com/Julesc013/more-infinite-research/pull/1340#issuecomment-6472758035",
+  "limits": [
+    "One current candidate native process/dump, not gameplay, save, client, Library/runtime, timing or release acceptance.",
+    "Original upstream/published/replay captures,160-to164 intent dispositions and original failed38 timings keep their old identities and verdicts.",
+    "Only original semantic prerequisites are reused; current speed is measured by a new complete frozen38 sample set."
+  ],
+  "kind": "MIRCurrent7a2MenuSemanticCaptureNativeChainV1",
+  "prepared_inputs": {
+    "path": "build/qualification/f210-current7a2-menu-r01-controller/prepared-inputs.json",
+    "bytes": 6217,
+    "sha256": "EF0E4636E9EF97A9097DAE6FB495051E607F1C8DA6F215E2C6F84588B999E378"
+  },
+  "caller": {
+    "path": "build/qualification/f210-current7a2-menu-r01-controller/Invoke-CurrentCapture-R02.ps1",
+    "bytes": 3783,
+    "sha256": "5E497FEC6FE4C1C381686163770343673F2B9AA1DC6D5A553FDF6A9C619005B8"
+  },
+  "terminal": {
+    "path": "build/qualification/f210-current7a2-menu-r01-controller/capture-execution-record-r02/terminal.json",
+    "bytes": 2511,
+    "sha256": "469DF2601423FED785F581DEDA6D699845A5A80AB2B6066BA45E2D5EEB6708CA"
+  },
+  "receipt_capsule": {
+    "path": "spec/evidence/f210-current7a2-menu-semantic-capture-receipts-r02.json.gz",
+    "bytes": 12843,
+    "sha256": "62EEAB19CA39EB4646A325FF2FA616937699B9C803CAC73BB34EA13CFEBF0BCA",
+    "records": 2,
+    "original_exact_bytes_round_trip": true
+  },
+  "actual_native_processes": 1,
+  "actual_new_laboratories": 0,
+  "factorio_processes_after_restoration": 0,
+  "prelaunch_refusal": {
+    "caller": {
+      "path": "build/qualification/f210-current7a2-menu-r01-controller/Invoke-CurrentCapture.ps1",
+      "bytes": 3752,
+      "sha256": "02B2A4DFEFF63B0A543F2B94C58A06C27242A9801E6B7EAE43E3B72FE70396B4"
+    },
+    "terminal": {
+      "path": "build/qualification/f210-current7a2-menu-r01-controller/capture-execution-record/terminal.json",
+      "bytes": 459,
+      "sha256": "2252F1153E724ECBC15B1C68A6EE71BF65A0AE51B3A5A2C681E6C81452DE8B65"
+    },
+    "native_launches": 0,
+    "disposition": "Missing private wrapper backup-root variable; stopped before staging/output/engine. Original caller and terminal retained; R02 binds existing helper executionRoot and fresh output."
+  },
+  "performance_acceptance": false,
+  "release_qualification": false
+}

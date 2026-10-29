@@ -1,0 +1,212 @@
+{
+  "schema": 1,
+  "kind": "MIRK2SEExplicitFixtureOwnedLocksNativeChainV1",
+  "status": "named-private-scenario-passes-independent-protocol-review-pending",
+  "scope": "Separate0.3 fixture-owner scenario from unchanged89023 to unmodified current38C/source992c/playerfbb7 on standalone2.1.23/8DC/q013. Early owner explicitly reasserts only its original seeded two locks before MIR,complete strict state assertions hold after MIR,save and two cold reloads. Original0.2 failed preservation route remains failed. This is not arbitrary pre-load foreign-rights reconstruction.",
+  "controller_commit": "a4f79bf1d45c141a07418755165275a74dd23161",
+  "artifact_source_commit": "992c76ee24caf2d723b469c3db760cbebdf35eeb",
+  "player_tree": "fbb7e9135280ce7f69692e9b0c4a44d743793f45",
+  "candidate_sha256": "38C84CCBC4BFDA62FCB078772C4690AB81228484744A36D9EA303F5A75B16447",
+  "engine_sha256": "8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38",
+  "protected_source": {
+    "path": "build/qualification/k2se-carrier-published-source-r02-controller/native-published/write-data/saves/mir5-native-complete.zip",
+    "sha256": "89023ABD70EC6B72B693F6BB5AA0D1506C3BABEF032B674A5621FB8F26F8BC92",
+    "source_kind": "deliberately-seeded-native-state-not-lab-earned"
+  },
+  "cases": [
+    {
+      "label": "order",
+      "status": "failed",
+      "controller_commit": "a4f79bf1d45c141a07418755165275a74dd23161",
+      "packet_sha256": "311D20E158D5E076E4A0F9F4D3B5011D704F0D52302D4FBE1DD31D35ED6CE379",
+      "caller_sha256": "80B5BD7F809D3496AB791A42D65E3E7028DE595D8BE01602D6B57EF68CA96BAE",
+      "result_sha256": "6CF72F0AA9695C8BEF2BC5CBC6B4AF57F869956E5540286451D7EDD4318BA9B5",
+      "mir_sha256": "27C66B77F592438694A22645615C0AF4C539E24C958ABC53A69CBD9217B5E106",
+      "engine_sha256": "8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38",
+      "profile_sha256": "6A7FBE32F0525712B9AF3DB4ADA58ECAC8873436DFC5384BF40AB1A351D85E4F",
+      "main_fixture_sha256": "F6F0463F6424BB049122C1BE1C1C0EBBC47C00C1A42143E35E02084E161E163F",
+      "early_owner_sha256": "84189FDE3E26AE99A11985091802F4EC40572C45E7FAE2F8E67349CE13559AEA",
+      "native_files": 8,
+      "bytes_per_copy": 85614,
+      "order_proof": {
+        "schema": 1,
+        "kind": "MIRK2SEFixtureOwnerNativeOrderReadbackV1",
+        "controller_commit": "a4f79bf1d45c141a07418755165275a74dd23161",
+        "reader_sha256": "E3EF2D3BE08CBF21B90E659EA3F124CF46E252200D74265B2B2DD5AD8B83ABEA",
+        "packet_sha256": "311D20E158D5E076E4A0F9F4D3B5011D704F0D52302D4FBE1DD31D35ED6CE379",
+        "caller_sha256": "80B5BD7F809D3496AB791A42D65E3E7028DE595D8BE01602D6B57EF68CA96BAE",
+        "result_sha256": "6CF72F0AA9695C8BEF2BC5CBC6B4AF57F869956E5540286451D7EDD4318BA9B5",
+        "native_raw_status": "failed",
+        "diagnostic": "expected-explicit-stop-before-MIR-body",
+        "early_owner": {
+          "schema": 1,
+          "tick": 1,
+          "foreign_index": 9,
+          "foreign_name": "mir5-k2se-imersite-carrier-foreign",
+          "source_mir": "4.7.21003",
+          "source_fixture": "0.1.0",
+          "owner_version": "0.1.0",
+          "initial_enabled": true,
+          "reasserted": true,
+          "enabled_after_owner": false
+        },
+        "mir_callback_entry": {
+          "tick": 1,
+          "force_index": 9,
+          "early_enabled": false,
+          "tail_enabled": false,
+          "early_level": 4,
+          "tail_level": 6
+        },
+        "early_log_line": 275,
+        "mir_entry_log_line": 276,
+        "files": 8,
+        "bytes_per_copy": 85614,
+        "members": [
+          {
+            "relative_path": "config.ini",
+            "bytes": 269,
+            "sha256": "08184B896F022A54338662C6E8969D2D8C27E253930B6FACD4C667FBEFD6619B"
+          },
+          {
+            "relative_path": "process-1.resources.jsonl",
+            "bytes": 3858,
+            "sha256": "F719FB14ED54A3420E8FA435AB8E86F5BB9D0C879B61D092A1C8080DA6038125"
+          },
+          {
+            "relative_path": "process-1.stderr.txt",
+            "bytes": 0,
+            "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+          },
+          {
+            "relative_path": "process-1.stdout.txt",
+            "bytes": 25666,
+            "sha256": "6D48D515AFE2FF0FB9B3057C5A2EC36AA282001E276F4463FC0564FCB7B0654B"
+          },
+          {
+            "relative_path": "result.json",
+            "bytes": 15313,
+            "sha256": "6CF72F0AA9695C8BEF2BC5CBC6B4AF57F869956E5540286451D7EDD4318BA9B5"
+          },
+          {
+            "relative_path": "server-settings.json",
+            "bytes": 3679,
+            "sha256": "2FB3E97FE934B92B6C4CCC2403A90A16C357BEC9183E9BC7E550822AC57504E4"
+          },
+          {
+            "relative_path": "write-data/factorio-current.log",
+            "bytes": 25375,
+            "sha256": "7AA72E76BEFB689D73E793AED408CDBD3B0FE0D12A0FB81E820DA42572CA9BDB"
+          },
+          {
+            "relative_path": "write-data/player-data.json",
+            "bytes": 11454,
+            "sha256": "F0C7B90D9526D046BA8C9FA45D821DC6B8B90226BECD2D003CACD4613E4527C5"
+          }
+        ],
+        "controls_restored": true,
+        "source_unchanged": true,
+        "new_native_processes": 1,
+        "new_labs": 0,
+        "new_saves": 0,
+        "new_cold_reloads": 0
+      },
+      "new_native_processes": 1,
+      "new_labs": 0,
+      "new_saves": 0,
+      "new_cold_reloads": 0
+    },
+    {
+      "label": "successor",
+      "status": "passed-private-native-fixture",
+      "controller_commit": "a4f79bf1d45c141a07418755165275a74dd23161",
+      "packet_sha256": "9F58AFD225AB497A66C116BA85447859DDB5BCBC1A776D76CE6D02059C0A1442",
+      "caller_sha256": "E52BC94408F612CCA8B496B58641B3DC8BE832D07584EEB6282DF7CDC21F3107",
+      "result_sha256": "D58F73A795EE108EEB4F1714AA9F3D0D0FB755D9C325B1F8C6251C789368A2DA",
+      "mir_sha256": "38C84CCBC4BFDA62FCB078772C4690AB81228484744A36D9EA303F5A75B16447",
+      "engine_sha256": "8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38",
+      "profile_sha256": "BBEB16D0C95DC47D2879C020A6C1F5F89D3E30C388260DE7A4A1F92170373F97",
+      "main_fixture_sha256": "F6F0463F6424BB049122C1BE1C1C0EBBC47C00C1A42143E35E02084E161E163F",
+      "early_owner_sha256": "84189FDE3E26AE99A11985091802F4EC40572C45E7FAE2F8E67349CE13559AEA",
+      "native_files": 18,
+      "bytes_per_copy": 1791347,
+      "initial": {
+        "case": "k2se-imersite-carrier-retention-successor",
+        "stage": "initial",
+        "status": "passed",
+        "qualification": "native-runner-readback-required",
+        "witnesses": {
+          "source_mir": "4.7.21003",
+          "destination_mir": "5.0.21000",
+          "native_saved_state_seeds": true,
+          "source_actual_lab_completions": 0,
+          "destination_actual_lab_completions": 0,
+          "k2so_runtime_bridge_exercised": false,
+          "successor_retained_before_fixture_writes": false,
+          "explicit_fixture_owner_before_mir": {
+            "schema": 1,
+            "tick": 1,
+            "foreign_index": 9,
+            "foreign_name": "mir5-k2se-imersite-carrier-foreign",
+            "source_mir": "4.7.21003",
+            "source_fixture": "0.1.0",
+            "owner_version": "0.1.0",
+            "initial_enabled": true,
+            "reasserted": true,
+            "enabled_after_owner": false
+          },
+          "player_current": "mir-k2-imersite-continuation-state-4",
+          "player_queue_count": 2,
+          "player_research_progress": 0.42000000000000004,
+          "player_powder_productivity": 0.1,
+          "foreign_tail_saved_progress": 0.27,
+          "foreign_disabled": true,
+          "foreign_powder_productivity": 0.1,
+          "on_load_read_only": false
+        }
+      },
+      "completed_save": {
+        "path": "build/qualification/k2se-fixture-owner-successor-r01-controller/native-successor/write-data/saves/mir5-native-complete.zip",
+        "sha256": "EFA9B8F2E70C368D86AED8099520752AD15A3E6C41A208405B033A49CBB86BA8",
+        "bytes": 1592804
+      },
+      "new_native_processes": 3,
+      "new_labs": 0,
+      "new_saves": 1,
+      "new_cold_reloads": 2
+    }
+  ],
+  "completed_save": {
+    "path": "build/qualification/k2se-fixture-owner-successor-r01-controller/native-successor/write-data/saves/mir5-native-complete.zip",
+    "sha256": "EFA9B8F2E70C368D86AED8099520752AD15A3E6C41A208405B033A49CBB86BA8",
+    "bytes": 1592804
+  },
+  "counts": {
+    "new_native_processes": 4,
+    "expected_failed_diagnostics": 1,
+    "accepted_successor_processes": 3,
+    "new_actual_labs": 0,
+    "new_saves": 1,
+    "new_cold_reloads": 2
+  },
+  "root_readback": {
+    "path": "build/qualification/k2se-fixture-owner-native-root-readback-r01.json",
+    "sha256": "3858860EE0041B1BED29BA4EB7DB77F15FB57C8FB5203F5AE503F103AD1DEDE2",
+    "files": 26,
+    "bytes_per_copy": 1876961
+  },
+  "lossless_receipts": {
+    "path": "spec/evidence/k2se-fixture-owned-locks-native-receipts-r01.json.gz",
+    "sha256": "EB929C97842ECA887B3E4D2E7E069985D116721A44C4B923852D3FB8B2B2A0A7",
+    "bytes": 60052,
+    "records": 13
+  },
+  "review": "https://github.com/Julesc013/more-infinite-research/pull/1376",
+  "limits": [
+    "The original fixture created the exact force/seeded locks and persisted its source contract,but no per-technology ownership ledger. Independent review must decide applicability; this result alone does not close the original0.2 failure or release gate.",
+    "Only the early private fixture owner changes two enabled flags before MIR. The post-MIR fixture never repairs them and still refuses a MIR reenablement. Marker explicitly says successor_retained_before_fixture_writes=false.",
+    "Private27C66 is one expected failed native order stop before MIR body. It is not gameplay qualification. The accepted successor uses byte-identical original38C.",
+    "Source/successor lab counts are both zero; this is a seeded carrier/save case,no K2SO bridge or new lab. The separate K2 actual-lab route retains its original inputs.",
+    "No broad modpack,performance,Library,other engine/edition or release verdict follows; all originals and adverse receipts remain unchanged."
+  ]
+}

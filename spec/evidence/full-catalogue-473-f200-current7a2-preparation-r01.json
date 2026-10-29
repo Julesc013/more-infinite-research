@@ -1,0 +1,73 @@
+{
+  "schema": 1,
+  "kind": "MIRFullCatalogueF200473CurrentPreparationV1",
+  "status": "prepared-not-native-qualification",
+  "candidate_source": "7a2f93224c846b86261b2da709f50ea683fc708d",
+  "player_tree": "5058373348e9049f8b67ec4dbb79b400a904acd6",
+  "profile": "tests/profiles/full-catalogue-upgrade-mir5-from-4.7.3-base-f200-2077.json",
+  "profile_sha256": "3CA069FACE1631DF574BA3AB578BD366D6106F2693F0B748AEEB9ED3AE5DB90B",
+  "fixture": {
+    "archive_filename": "mir-fixture-mir5-full-catalogue-upgrade_0.2.0.zip",
+    "sha256": "010EBE8BC6012C9436237CE8A57685175AE691A1155C2D223592CACAF5A892C2",
+    "bytes": 10379,
+    "composition": {
+      "info.json": "tests/fixtures/full-catalogue-upgrade/successor/info.json",
+      "control.lua": "tests/fixtures/full-catalogue-upgrade/successor/control.lua",
+      "data-final-fixes.lua": "tests/fixtures/full-catalogue-upgrade/successor/data-final-fixes.lua",
+      "catalogue.lua": "tests/fixtures/full-catalogue-upgrade/f200/cross-to-f210/catalogue.lua",
+      "fixture_control.lua": "tests/fixtures/full-catalogue-upgrade/shared/control.lua",
+      "fixture_data_final.lua": "tests/fixtures/full-catalogue-upgrade/shared/data-final-fixes.lua",
+      "f210_catalogue.lua": "tests/fixtures/full-catalogue-upgrade/shared/f210-catalogue.lua"
+    },
+    "source_member_revision": "7f5916d274470433028384840b422f120b9af47e",
+    "members": [
+      {
+        "path": "catalogue.lua",
+        "sha256": "a2b45e2c7c633ed4dfafd7342fb4df510d512f05150fafde057ab1d4a2f9e087",
+        "bytes": 2426
+      },
+      {
+        "path": "control.lua",
+        "sha256": "17529cf29aa8192e72771512ac19ab1d76c02c4e6de8384a20b6c5ac7465a5e3",
+        "bytes": 71
+      },
+      {
+        "path": "data-final-fixes.lua",
+        "sha256": "0a05cd2fb14d2256d39efba308da3bf8fc7f461b439660ecb66e0d48734ef043",
+        "bytes": 74
+      },
+      {
+        "path": "f210_catalogue.lua",
+        "sha256": "8417719b7cecd7424b40582a778639bbae68590a1d4147052e80db5e2ef94bc4",
+        "bytes": 13375
+      },
+      {
+        "path": "fixture_control.lua",
+        "sha256": "006fc60260c4e5fea779a7470845174d7c2b88d0aaf33c8cc4d1d4de422edcff",
+        "bytes": 15808
+      },
+      {
+        "path": "fixture_data_final.lua",
+        "sha256": "3149ee8fa5c49f59285e2824d872fe574c2f51d67ce7acfbc08c88da0bd3139e",
+        "bytes": 2613
+      },
+      {
+        "path": "info.json",
+        "sha256": "593e1b5aecb221f8099c6ddb70d2429fd805f88071444c59ba030188ab740432",
+        "bytes": 488
+      }
+    ]
+  },
+  "protected_source": {
+    "path": "build/mir5/recovery-historical/published-source-saves-da93-r01/source-output-c125-r03/full-catalogue-f200-cross/write-data/saves/mir5-native-complete.zip",
+    "sha256": "9D391DB311DA3C82E43648FAE5E6FE9C08D00F0592880B3160F35EE822FECA09",
+    "source_chain": "spec/evidence/full-catalogue-f200-f210-c563-native-chain-r01.json"
+  },
+  "independent_expectation": "Retain the exact original54 level-backed rows and recipe/force/gun effects,20 zero credit holders, queued42-percent/detached27-percent and paused force state; source lab counted once. Complete one new gear lab, preserve new save through two independent read-only cold reloads. Do not recreate or alter the original.",
+  "composition_rationale": "All seven selected fixture blobs already exist. Exact F2004.7.3 source catalogue targets2.0.77/5.0.20000 and removes only F210-specific force fields; existing successor metadata selects0.2.0 so unchanged shared control executes successor logic. Its source_fixture_version0.2.1 is source-only. No assertion/data/control or player code changes.",
+  "limits": [
+    "Base only; separate F200 Space Age4.7.3/provider source remains required.",
+    "The original9D39 chain records actual published4.7.20003/FBBA and its original source lab/save. This preparation is not a new source result.",
+    "Full retained row-set and earned-effect checks require actual native execution; profile and host controls are preparation only."
+  ]
+}

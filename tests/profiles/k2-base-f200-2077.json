@@ -1,0 +1,56 @@
+{
+  "schema": 1,
+  "kind": "mir5-k2-base-f200-comparison-selection",
+  "target": "f200",
+  "factorio_line": "2.0",
+  "engine": {
+    "version": "2.0.77",
+    "sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B"
+  },
+  "settings_mode": "Defaults",
+  "mods": [
+    {
+      "name": "base",
+      "version": "2.0.77",
+      "enabled": true
+    },
+    {
+      "name": "Krastorio2",
+      "version": "2.0.19",
+      "enabled": true
+    },
+    {
+      "name": "Krastorio2Assets",
+      "version": "2.0.5",
+      "enabled": true
+    },
+    {
+      "name": "Krastorio2MenuSimulations",
+      "version": "2.0.2",
+      "enabled": true
+    },
+    {
+      "name": "ChangeInserterDropLane",
+      "version": "1.2.0",
+      "enabled": true
+    },
+    {
+      "name": "flib",
+      "version": "0.16.5",
+      "enabled": true
+    },
+    {
+      "name": "mir-fixture-mir5-active-mods-observer",
+      "version": "0.1.0",
+      "enabled": true
+    }
+  ],
+  "archive_sha256": {
+    "Krastorio2_2.0.19.zip": "1B1DBF55522AB8961037356844E24A8E47A85AD983954F01A768FFAFC9910C32",
+    "Krastorio2Assets_2.0.5.zip": "E8D9079BB5F99623EA81A425C5441B4F2FE21807766F893C9A4E90170110E92B",
+    "Krastorio2MenuSimulations_2.0.2.zip": "0ED38E61EE45DCBE6D94159F25C38F073A3EA47F0322D02B062036044EA95F7B",
+    "ChangeInserterDropLane_1.2.0.zip": "8773256DFDDBC2C504AA98E6C1323FBBCEE792A4240594FCCDB5BA2C07983C74",
+    "flib_0.16.5.zip": "8FC5073D374A149620333777D959D2C204AB0AF0C59669BE94C5CAB7DE978627",
+    "mir-fixture-mir5-active-mods-observer_0.1.0.zip": "723D1E7721449FC26040E5E6629416767BDC20AD79CF8723115846DB662A1F87"
+  }
+}

@@ -1,0 +1,91 @@
+{
+  "schema": 1,
+  "kind": "authored-private-scenario-custody-index-not-runner-receipt",
+  "scope": "F210 private beta API consumer recipe-productivity production and two cold reloads",
+  "release_qualification": false,
+  "player": {
+    "archive": "build/mir5/runtime-continuity-r03/packages/more-infinite-research_5.0.21000.zip",
+    "sha256": "8A4F7120E01C2902C60725CF0353AA46FFD6BE55A1E4795AD0A261D9BEE22D08",
+    "bytes": 209321,
+    "members": 128,
+    "source_commit": "5d4ddd91ebf0a4fb34ac5c408c6b4be7823470b7",
+    "package_record": "build/mir5/runtime-continuity-r03/packages/player.json",
+    "package_record_sha256": "7EAB1FBA73BFD27D3556932B215C3559D0C5ED753ACAC30AE48F368F9604E87C",
+    "package_record_kind": "native-package-members-not-gameplay-qualification"
+  },
+  "runner_receipts": {
+    "raw_receipt": {
+      "path": "spec/mir5/evidence/api-beta-production-native.json",
+      "sha256": "9E8F526EBA3C6F63054A3C1948D6D8DFC17C00EDA3EC3AE78FB633E8EF6E9CE6"
+    },
+    "result": {
+      "path": "build/tmp/mir5-beta-production-current-r04/result.json",
+      "sha256": "9E8F526EBA3C6F63054A3C1948D6D8DFC17C00EDA3EC3AE78FB633E8EF6E9CE6"
+    }
+  },
+  "exact_inputs": {
+    "runner_source_commit": "5d4ddd91ebf0a4fb34ac5c408c6b4be7823470b7",
+    "runner_source_dirty": false,
+    "engine": {
+      "family": "Factorio 2.1.23",
+      "sha256": "FE4A1DA30F322A0D0B8AEB3DF7276332222BAAA143E2352569B723E84B2B9060"
+    },
+    "profile": {
+      "path": "tests/mir5/profiles/api-beta-production-observed-f210.json",
+      "sha256": "B7A94139D5E83C5BE46E018B159FEA0E19184144BBB9A369C59D81716784092D"
+    },
+    "fixture_archives": [
+      {
+        "name": "mir-fixture-mir5-api-beta_0.1.0.zip",
+        "sha256": "AB93F88CB19F2475ACA174D8A23CA30EB6EBCA63E578270CA36D9EBD6D552DE3"
+      },
+      {
+        "name": "mir-fixture-mir5-api-beta-production_0.1.0.zip",
+        "sha256": "D3C5CFE02B5B71FD06490DB02B399F4F60C1923029085A7AA903D13E5A7F29D2"
+      },
+      {
+        "name": "mir-fixture-mir5-active-mods-observer_0.1.0.zip",
+        "sha256": "2E1BE5952D2A4CC5C74A0D149E075D247BA110A3FAE5B6768D3EAEBABCEF989C"
+      }
+    ],
+    "harness_sha256": "00738675D162FDDE0F53567225A2022531C694FA87A14C59EC87F8CEE41ED050",
+    "native_probe_sha256": "FF8E62687A8AA05080E3F9AFF45DED34BA7FCFDF1F309542A66893380B7D51E3",
+    "governor_sha256": "9E27C4DDCCC10028246F89A09A7663F7FCA1D7BD26444681A7A8635F74D9BE96"
+  },
+  "observed": {
+    "status": "passed-private-native-fixture",
+    "observation": "native-fixture-production-and-two-cold-reloads",
+    "beta_consumer": "MIR5_API_BETA",
+    "beta_consumer_init_marker": true,
+    "beta_consumer_load_marker_on_production_stage": true,
+    "beta_consumer_load_marker_on_each_cold_reload": true,
+    "technology": "mir-api-fixture-beta-cable-1",
+    "public_query_before_and_after_research": true,
+    "research_completed_by_native_setter": true,
+    "laboratory_research_used": false,
+    "native_recipe_productivity_change": 0.01,
+    "baseline": {
+      "copper_plates_inserted": 100,
+      "copper_cables_output": 200,
+      "recipe_productivity_bonus": 0,
+      "assembler_entity_productivity_aggregate": 0
+    },
+    "researched": {
+      "copper_plates_inserted": 100,
+      "copper_cables_output": 202,
+      "recipe_productivity_bonus": 0.01,
+      "assembler_entity_productivity_aggregate": 0
+    },
+    "modules_empty": true,
+    "beacons_created": false,
+    "cold_reloads": 2,
+    "completed_save_sha256": "D9CD283AB0022179E70B8A51D32519674D8E02B3D2CEB7CCD1613A2C1A790B27",
+    "completed_save_byte_identical_after_each_reload": true,
+    "direct_library_controls": "restored-direct-library-controls"
+  },
+  "limitations": [
+    "The staged run emitted beta consumer init and load markers; it did not execute a configuration-change stage, so no configuration-change marker is claimed.",
+    "Research completion used a native setter rather than laboratories.",
+    "This is a private, exact-input scenario only. It is not full-product, candidate, multiplayer, save-migration or performance qualification."
+  ]
+}

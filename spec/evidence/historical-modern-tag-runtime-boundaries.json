@@ -1,0 +1,207 @@
+{
+  "schema": "MIR5HistoricalModernTagRuntimeBoundariesV1",
+  "status": "tag-source-runtime-bodies-characterized-not-archive-or-save-or-native-qualification",
+  "scope": "The 39 direct-current-engine MIR1-MIR3 tag-source rows recorded in spec/inventory/migration-origins.json: 19 F200 and 20 F210. This is a bounded Git-object audit of runtime control paths and persistent writers, not an inspection of release archives, source saves, engines, or a migration decoder.",
+  "audit_reference": {
+    "dev_commit": "94de7eb1d05b1cecd0a768632fa618620fe26294",
+    "inventory_path": "spec/inventory/migration-origins.json",
+    "tag_source_rows": 39,
+    "direct_f200_rows": 19,
+    "direct_f210_rows": 20,
+    "older_engine_bridge_or_best_effort_rows_excluded": 25
+  },
+  "limits": [
+    "A tag-tree body is not proof that a matching published archive shipped that body. Archive identity, save shape, and source-to-successor applicability remain separately evidenced.",
+    "No result here proves a saved-state upgrade, native execution, or that a current MIR5 reader may safely import an observed field.",
+    "The seven data-only rows have no root control.lua. Their absent runtime code does not prove that their saves have no migration obligation.",
+    "The final-tag literal absence scan is intentionally narrow; it does not establish universal absence of a browser, credit, contribution, or other writer in every earlier tree."
+  ],
+  "control_topology": {
+    "data_only_without_root_control": {
+      "count": 7,
+      "tags": [ "1.0.0", "1.1.0", "1.1.5", "1.2.0", "1.2.5", "1.2.9", "2.0.0" ],
+      "finding": "No root control.lua is present in these tag trees. No runtime writer is inferred from this absence."
+    },
+    "legacy_root_wrapper": {
+      "count": 7,
+      "representative": {
+        "source_ref": "4e386ca6a3b54a1109bbd2a991c73e11ac920704",
+        "path": "control.lua",
+        "git_blob": "cb054c6beb77808d7a91e960c8c62907d4ce7344",
+        "raw_sha256": "20D025529C1A39F486F39652A4586370D876E22045030C79C2AFCF0D13B4E44D",
+        "bytes": 45,
+        "imports": [ "control.scripted-techs" ]
+      },
+      "tags": [ "1.9.0", "1.9.1", "1.9.2", "2.0.5", "2.1.0", "2.1.5", "2.2.0" ]
+    },
+    "stage_root_wrapper": {
+      "count": 25,
+      "representative": {
+        "source_ref": "64389779dedaf87ad6b2f0e2e0b12844b1b9585e",
+        "path": "control.lua",
+        "git_blob": "e2aa90fa4bc0b96f9f6d6d667f6dd6f5a7265758",
+        "raw_sha256": "91EC8A63FFEC27AACDDC9F6EC841A64E782EA923214AC5FB37C367A716E4ACE9",
+        "bytes": 46,
+        "imports": [ "prototypes.mir.stage.control" ]
+      },
+      "tags": [ "2.3.0", "2.3.5", "2.4.0", "2.4.5", "2.4.9", "2.5.0", "2.5.5", "2.5.9", "2.5.10", "2.5.11", "3.0.0", "3.0.5", "3.1.0", "3.1.1", "3.1.2", "3.1.5", "3.1.9", "3.2.0", "3.2.1", "3.2.2", "3.2.3", "3.2.5", "3.2.9", "3.2.10", "3.2.11" ]
+    }
+  },
+  "representative_writer_epochs": [
+    {
+      "epoch": "first-runtime-writers-1.9.0",
+      "source_ref": "4e386ca6a3b54a1109bbd2a991c73e11ac920704",
+      "writers": [
+        {
+          "path": "control/scripted-techs.lua",
+          "git_blob": "ab8eeec2de387f80440206c809ceae8d46da65c2",
+          "raw_sha256": "2EB97EBC063F8D26BD37F842D63F84F7DFA11BB14EFAF065D9E62C943CE134A0",
+          "bytes": 2089,
+          "semantics": "Initializes storage.mir.scripted_techs and dispatches init, configuration, research, effects-reset, and plant-seed handlers."
+        },
+        {
+          "path": "control/effects/spoilage-preservation.lua",
+          "git_blob": "bfe3288d97241a2b073d966c4bed033509c34d81",
+          "raw_sha256": "BED1165F2B259C2D18A0B8FC20D149F0C9D6654DFD5AA076A19A1063727432DE",
+          "bytes": 3936,
+          "bucket": "storage.mir.spoilage_preservation",
+          "fields": [ "baseline", "applied_multiplier", "last_applied_value", "effective_level" ],
+          "semantics": "Captures or rebases the shared spoil-time baseline and applies/restores the MIR multiplier."
+        },
+        {
+          "path": "control/effects/agricultural-growth-speed.lua",
+          "git_blob": "7fe9aac631f1a96097cde6a7e493f9194a215562",
+          "raw_sha256": "3A91B8783B76CBBA259078DC5831B46D02840ABF340064690E4D1C3AA0FADEB0",
+          "bytes": 3458,
+          "bucket": "storage.mir.agricultural_growth_speed",
+          "fields": [ "force_multipliers[force_name].level", "force_multipliers[force_name].multiplier" ],
+          "semantics": "Rebuilds a per-force multiplier snapshot and uses it only when handling a planted seed."
+        }
+      ]
+    },
+    {
+      "epoch": "productivity-adoption-signature-1.9.1-to-2.2.0",
+      "source_ref": "62a0015abe1a5dd4560c3e7a9a8c24b5a8609d1b",
+      "writer": {
+        "path": "control/productivity-family-adoption.lua",
+        "git_blob": "40bafe0068737b0edb1b16bba1c1d6af42669701",
+        "raw_sha256": "CBE4AD267A030A43249EA75E0EACAA1E4FF30DB6ABEF9A737BC68F65ABB188D7",
+        "bytes": 1970,
+        "bucket": "storage.mir.productivity_family_adoption",
+        "fields": [ "version", "adopted_count", "signature" ],
+        "semantics": "Persists the prototype adoption signature and resets technology effects when that signature changes."
+      }
+    },
+    {
+      "epoch": "stage-runtime-backend-2.3.5-and-3.0.5",
+      "source_ref": "9eabc5439d3743be10c6f76d5ee36d9804a60f25",
+      "writers": [
+        {
+          "path": "prototypes/mir/stage/control.lua",
+          "git_blob": "94c9dc0cbe2c2bddfd967d8b95dcd2c16379b156",
+          "raw_sha256": "F672C7C05F7AE0F916A08FF501DB841A2BB513B9358852BA641C9BB7DC04C0F3",
+          "bytes": 752,
+          "semantics": "Registers scripted technologies and settings-profile commands only when their target features are enabled."
+        },
+        {
+          "path": "prototypes/mir/platform/factorio/runtime_state.lua",
+          "git_blob": "7808b54f0f331e644bfac646859d398d9b2afbc0",
+          "raw_sha256": "2F36854B538F73291E8386BCFEFB708E9F96B2778DC350B54E22C11E38418706",
+          "bytes": 691,
+          "semantics": "Selects the target-declared storage or global backend; it does not itself transform existing state."
+        },
+        {
+          "path": "prototypes/mir/runtime/state.lua",
+          "git_blob": "d1a0f0c003333a38dd5b6bff1b4ac09283c6b154",
+          "raw_sha256": "72AE3AD63EDF56D4437CECEE68F6D0A62F7ED0F8F63F8C135FA9D55CFDB4D739",
+          "bytes": 367,
+          "semantics": "Creates backend.mir and named buckets lazily."
+        }
+      ]
+    },
+    {
+      "epoch": "productivity-adoption-binding-3.1.9",
+      "source_ref": "1b9c6f32fc2bb53c413a593534e103a6043b4be3",
+      "writer": {
+        "path": "prototypes/mir/runtime/productivity_family_adoption.lua",
+        "git_blob": "ff4fa85c1e0218018f3818215d4608c155c6b588",
+        "raw_sha256": "13C00B21862357F0F5AE6434328F2AA8692326C131858E005F4F2C048CA8D20B",
+        "bytes": 4217,
+        "bucket": "backend.mir.productivity_family_adoption",
+        "added_fields": [ "bindings[owner].input_unit", "bindings[owner].output_unit" ],
+        "semantics": "Uses the saved binding units to preserve current-research progress across an adoption signature change."
+      }
+    },
+    {
+      "epoch": "maximum-level-policy-v1-2.5.10-and-3.2.10",
+      "writers": [
+        {
+          "source_ref": "6bb483de9042a7ec4c93674933e7f6c1670d79aa",
+          "path": "prototypes/mir/runtime/maximum_level_control.lua",
+          "git_blob": "e01bd8828e0a09d7918cc4966cab55b071b3f928",
+          "raw_sha256": "0B498CF69738E2388101876A882A408399E7935A8CD13D8225C9428CA22179D9",
+          "bytes": 7637,
+          "edition": "f200"
+        },
+        {
+          "source_ref": "4cbea531a1043e0cacb9ac5c496731c8d77bbdb6",
+          "path": "prototypes/mir/runtime/maximum_level_control.lua",
+          "git_blob": "e6df945a7d5da6e34e07305723638c56cf3baddd",
+          "raw_sha256": "26CDF46CD6728F949A765D23F7C876846662E67E49FA6FA98BB6B498E5226CFE",
+          "bytes": 5298,
+          "edition": "f210"
+        }
+      ],
+      "bucket": "backend.mir.maximum_level_control",
+      "fields": [ "policy_version=1", "managed_technologies[name]={source,operation,setting,selected}", "disabled_by_cap[force.index][technology_name]" ],
+      "semantics": "Writes a positive disabled_by_cap marker only after observing technology.enabled and setting it false; it removes queued work above a configured cap and restores only a positive marker."
+    },
+    {
+      "epoch": "maximum-level-visibility-v1-2.5.11-and-3.2.11",
+      "source_ref": "e08e6b0a8c054c8e9d09a7081cec3bd65de0e3af",
+      "writer": {
+        "path": "prototypes/mir/runtime/maximum_level_control.lua",
+        "git_blob": "09eb6ece484c8e3c1bcdafaea31451ce84a27108",
+        "raw_sha256": "687E2EB214C7097C1691562ECE206AA69FDE24194164A8EF33F48AF14405C0EA",
+        "bytes": 9606,
+        "fields_added": [ "visibility_by_cap[force.index][technology_name]", "observations[tostring(force.index) .. '/' .. technology_name]" ],
+        "semantics": "Saves the pre-cap visible_when_disabled value independently, restores it only with a positive enablement marker, and records a diagnostic observation."
+      }
+    },
+    {
+      "epoch": "productivity-adoption-descriptors-3.2.10",
+      "source_ref": "4cbea531a1043e0cacb9ac5c496731c8d77bbdb6",
+      "writer": {
+        "path": "prototypes/mir/runtime/productivity_family_adoption.lua",
+        "git_blob": "9c4c43db1590507ca962364084b66e8939b12cb5",
+        "raw_sha256": "15DDCEE63ACB65D52DD7E345DFEA2FC2C92B7266698BF14EC78B003C87AB7C15",
+        "bytes": 4644,
+        "added_fields": [ "bindings[owner].input_descriptor", "bindings[owner].output_descriptor", "bindings[owner].operation", "bindings[owner].configured_fields", "bindings[owner].planned_max_level", "bindings[owner].observed_max_level" ],
+        "semantics": "Records richer adoption binding provenance and retains Factorio-normalized current-research progress rather than applying a second conversion."
+      }
+    },
+    {
+      "epoch": "space-location-recovery-3.2.2",
+      "source_ref": "1138ed55ad7ad42e38cf9e821d1d4e7de5df6378",
+      "writer": {
+        "path": "prototypes/mir/runtime/planet_discovery_recovery.lua",
+        "git_blob": "94ecc4ec773cf9a7429da1fa221c313a1fb49891",
+        "raw_sha256": "0E2FC69B9338F9A4A1B2ED7DC4495D2EE08F0D02135CF07491BB352222BC1098",
+        "bytes": 1911,
+        "semantics": "For exactly 3.2.0/3.2.1 to 3.2.2 configuration changes, scans researched unlock-space-location effects and calls force.unlock_space_location only for missing current locations. It creates no MIR persistent bucket."
+      }
+    }
+  ],
+  "bounded_absence_observation": {
+    "source_ref": "e3d787deb35ff30157bb2013fa1cc745a445e629",
+    "inspected_paths": [ "control/**", "prototypes/mir/runtime/**", "prototypes/mir/stage/**", "prototypes/mir/platform/**" ],
+    "literal_terms": [ "browser", "library", "credit", "contribution" ],
+    "result": "No matching runtime-path literal was found in this final direct F210 tag tree.",
+    "limit": "This is not a conclusion about all earlier control bodies and does not establish that current MIR5 browser, native-credit, or spoilage-contribution storage is recoverable from MIR1-MIR3 saves."
+  },
+  "remaining_recovery_boundary": {
+    "reconstructible_from_tag_source_only": [ "Named maximum_level_control policy-v1 buckets and their positive enablement/optional visibility markers", "Named scripted-effect and productivity-adoption bucket/field shapes in the stated representative bodies" ],
+    "not_safe_from_tag_source_only": [ "Any source-save value or ownership assertion", "Cross-backend state transport", "Browser/library ledger recovery", "Native-credit recovery", "Spoilage-contribution ownership recovery", "Publication/archive identity or native migration success" ],
+    "required_next_evidence": "For each selected migration origin, bind a protected source save and actual source archive/engine before admitting a field-specific reader or claiming recovery."
+  }
+}

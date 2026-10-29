@@ -1,0 +1,87 @@
+{
+  "schema": 1,
+  "kind": "MIR5BobAngelPrototypeCapRelaxationChainV1",
+  "source": "447bf669a680375239e5cb3fe42f8ec2980c9ebd",
+  "run": {
+    "id": 39994790473,
+    "url": "https://github.com/Julesc013/mir-native-worker/actions/runs/39994790473",
+    "conclusion": "success"
+  },
+  "custody": "C:/Projects/Factorio/more-infinite-research/build/mir5/black-glass/incoming/39994790473/black-glass-bob-angel-prototype-caps-39994790473-1",
+  "manifest_members_verified": 63,
+  "cases": {
+    "prototype-cap125": {
+      "receipt_gzip": "spec/mir5/evidence/bob-angel-prototype-caps-prototype-cap125-native.json.gz",
+      "uncompressed_receipt_sha256": "CE1550E538C094CD423CF02798719FC5DCBD8E09C4A849DF95E6A9FE00569D3E",
+      "player": {
+        "sha256": "D51312D2474E7DFAD09D5D6D190AADAB833A51C557F571B0A1FFDC3084AC56E3",
+        "path": "D:\\Projects\\Factorio\\testmods\\2.0\\more-infinite-research_5.0.20000.zip"
+      },
+      "witnesses": {
+        "fixture_version": "0.5.0",
+        "default_rows_preflighted_before_mutation": true,
+        "native_cap_percent": 125,
+        "prototype_maximum_productivity": 1.25,
+        "effect_percent": 2,
+        "useful_level_headroom": 63,
+        "seeded_boundary_levels": true,
+        "seeded_tail_next_level": 63,
+        "seeded_earned_effect_bonus": 1.24,
+        "lab_completed_tail_levels": 5,
+        "tail_next_level_after_lab": 64,
+        "player_owned_tail_disabled": true,
+        "native_recipe_productivity_bonus": 1.2599999904632568,
+        "raw_completed_bonus_formula": 1.26,
+        "native_recipe_bonus_is_observed_separately_from_prototype_cap": true,
+        "foreign_disabled_effect_and_queue_preserved": true,
+        "sequential_native_queue_entries": 5,
+        "on_load_read_only": false,
+        "qualification": "native-runner-readback-required"
+      },
+      "input_save": null,
+      "two_cold_reloads_byte_identical": true
+    },
+    "prototype-cap400": {
+      "receipt_gzip": "spec/mir5/evidence/bob-angel-prototype-caps-prototype-cap400-native.json.gz",
+      "uncompressed_receipt_sha256": "15B3A755240C4493C6F07A06594773A268D97244B7C3335BEC9B42791E661F0E",
+      "player": {
+        "sha256": "D51312D2474E7DFAD09D5D6D190AADAB833A51C557F571B0A1FFDC3084AC56E3",
+        "path": "D:\\Projects\\Factorio\\testmods\\2.0\\more-infinite-research_5.0.20000.zip"
+      },
+      "witnesses": {
+        "fixture_version": "0.6.0",
+        "default_rows_preflighted_before_mutation": true,
+        "native_cap_percent": 400,
+        "self_recycling_scope": false,
+        "prototype_maximum_productivity": 4,
+        "effect_percent": 2,
+        "useful_level_headroom": 200,
+        "inherited_cap125_tail_next_level": 64,
+        "restored_mir_owned_player_tail": true,
+        "prior_foreign_disable_erased_by_upstream": true,
+        "foreign_disable_preservation_qualified": false,
+        "lab_completed_tail_levels": 5,
+        "tail_next_level_after_lab": 65,
+        "native_recipe_productivity_bonus": 1.2799999713897705,
+        "raw_completed_bonus_formula": 1.28,
+        "native_recipe_bonus_is_observed_separately_from_prototype_cap": true,
+        "foreign_queue_and_effects_preserved": true,
+        "sequential_native_queue_entries": 5,
+        "on_load_read_only": false,
+        "qualification": "native-runner-readback-required"
+      },
+      "input_save": {
+        "sha256": "72906DBEC9122D2978B4F8AF0739BB180AE0932EDA44F3702D069EE2488883CD",
+        "path": "C:\\Users\\Jules\\AppData\\Local\\MIRWorker\\runner\\_work\\mir-native-worker\\mir-native-worker\\source\\build\\tmp\\black-glass-39994790473-1\\gameplay\\prototype-cap125\\write-data\\saves\\mir5-native-complete.zip"
+      },
+      "two_cold_reloads_byte_identical": true
+    }
+  },
+  "limits": [
+    "Before-boundary 62 earned levels are seeded; each cap then has five actual lab completions.",
+    "The independent upstream reset re-enables foreign-disabled rows; their prior disable is not claimed preserved.",
+    "Native aggregate recipe bonus and prototype cap are independently observed; physical smelting remains separate.",
+    "Final candidate, multiplayer and release acceptance remain separate."
+  ],
+  "release_qualification": false
+}

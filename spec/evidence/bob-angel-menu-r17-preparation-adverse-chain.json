@@ -1,0 +1,91 @@
+{
+  "schema": 1,
+  "kind": "MIR5BobAngelMenuR17PreparationAdverseChainV1",
+  "status": "control-prototype-capture-adverse-zero-timing-samples",
+  "run": 40144908366,
+  "run_url": "https://github.com/Julesc013/mir-native-worker/actions/runs/40144908366",
+  "controller_commit": "a7a5cc3559127ebbdc29e667167657336275b185",
+  "player": {
+    "source_commit": "eccbf09463db409abade3756bb93ca4cfe544a21",
+    "source_tree": "01f9d36ebe269c7ba9c6e3a52dca547a39eb8a16",
+    "sha256": "2BBDBA9A0B816AC383CEA116CDF86D587BC34EFF7E1C5ACE2583F1DA98F9E842",
+    "bytes": 548011,
+    "asset_inventory_sha256": "FFE002492686F0C88DB8C60C583A5BFCF7DDC54F37E50184318E82F1AD8D2A78"
+  },
+  "plan": {
+    "revision": "97a0750b842136355feb6e0038c4ebb790008120",
+    "path": "spec/evidence/bob-angel-menu-plan-r17.json",
+    "sha256": "D1B2093CBC0E47130C91789D8359981D5D11AB5E5B0BF51D4A344FDE2543D790"
+  },
+  "control_capture": {
+    "arm": "control-without-mir",
+    "endpoint_class": "factorio-data-stage-dump-only",
+    "engine": {
+      "base_version": "2.0.77",
+      "sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B"
+    },
+    "mir_archive": null,
+    "profile_sha256": "A2F235B7CE1F18968E1D7D7913362694EA1916095852C1673300C68BA26DDE90",
+    "selection_sha256": "37F03254ED53521993CAC7AEEA03673D18468DF3662118EF7411DD1D979C9CFC",
+    "selected_mods": 15,
+    "factorio_processes_started": 1,
+    "process_runs": 1,
+    "failure": "[mir441-process-exit] 1",
+    "engine_error": {
+      "raw_log_sha256": "9B66ADFFB7B615E04CA38977BE7927834655B89B8CF910FA2B6790D91C496478",
+      "raw_log_bytes": 6703,
+      "class": "native-write-failure-at-windows-path-boundary",
+      "filename": "mod-settings-dump.json",
+      "reason": "No such file or directory",
+      "native_path_characters": 260,
+      "source_precreates_parent_directory": true,
+      "path_boundary_diagnosis": "inference pending shorter-path native validation"
+    }
+  },
+  "observation": {
+    "single_job_status": "failed-retained",
+    "preparation_status": "failed-retained",
+    "native_preparation_completed": false,
+    "candidate_capture_started": false,
+    "published_replay_started": false,
+    "owned_window_diagnostic_started": false,
+    "timing_samples_started": 0,
+    "performance_qualification": false,
+    "release_qualification": false,
+    "library_controls_restored": true,
+    "dependency_archives_copied": 0
+  },
+  "custody": {
+    "workflow_artifact_manifest_sha256": "63F9C006017F1FD06DA7DB83C07A28FAE0F16BF741A8A81EBE61B46925E5C29F",
+    "workflow_manifest_members_verified": 46,
+    "primary_full_artifact_path": "build/mir5/recovery-historical/bob-angel-menu-r17/40144908366/black-glass-bob-angel-menu-comparison-r17-40144908366-1",
+    "git_pointer_excluded": true
+  },
+  "raw_evidence": {
+    "path": "spec/evidence/bob-angel-menu-r17-preparation-adverse-receipts.json.gz",
+    "members": 6,
+    "uncompressed_bytes": 40715,
+    "uncompressed_sha256": "5832C26CB891133BE269A46880F49166FD8109BD47DC645351CA68478229ABA9",
+    "gzip_bytes": 11640,
+    "gzip_sha256": "E73D6ECCFFD4D407A829CFDC893A2F61B60E46724236E4B640BDAEBBE9CDE59F"
+  },
+  "limits": [
+    "One no-MIR Factorio2.0.77 data-stage process fails opening its260-character mod-settings-dump.json target despite the exact helper creating script-output before launch. No other capture, owned-window diagnostic or timing phase starts.",
+    "The path-boundary diagnosis remains an inference until a changed shorter-path native attempt completes. Private PR52 shortens the owned sparse leaf and rejects unsafe paths for all four arms before native launch; player bytes, declaration,14 public helpers and every measurement/resource threshold remain unchanged.",
+    "Zero responsive-menu timing samples exist. There is no gameplay, save, performance or release qualification. Prior failures retain their original execution identities."
+  ],
+  "independent_readback": {
+    "reviewer": "root",
+    "result": "passed",
+    "verified_workflow_manifest_members": 46,
+    "verified_workflow_manifest_sha256": "63F9C006017F1FD06DA7DB83C07A28FAE0F16BF741A8A81EBE61B46925E5C29F",
+    "verified_source": "eccbf09463db409abade3756bb93ca4cfe544a21",
+    "verified_controller": "a7a5cc3559127ebbdc29e667167657336275b185",
+    "verified_control_mir_archive": null,
+    "verified_control_status": "failed",
+    "verified_library_controls_restored": true,
+    "verified_timing_samples_started": 0,
+    "verified_performance_qualification": false,
+    "note": "Rehashed all46 original members and separately read the single native dump-write failure. The260-character native target is not copied into the capsule. Raw configs/logs, player data and checkout pointer remain private."
+  }
+}

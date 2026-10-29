@@ -1,0 +1,910 @@
+{
+  "schema": 1,
+  "kind": "MIR473CurrentPreferenceNativeChainV1",
+  "status": "passed-exact-473-f200-space-age-four-provider-both-preference-directions",
+  "scope": "Exact published4.7.20003/FBBA F200 Space Age plus four pinned providers to current7a2/player50565FC on actual2.0.77/D3. Both source preferences earn two real labs and save/reload twice. Each simultaneous first preference switch is refused by the exact MIR guard with the protected source unchanged. Unchanged first upgrade saves/reloads; later opposite preference preserves old credit and completes one new lab/save/two cold reloads. No other-provider, complete-catalogue, engine hop, GUI, physical manufacturing, comparative performance or release verdict.",
+  "controller_commit": "cb1a22d8941eb5e629a82dc88e12f698ab21aafc",
+  "candidate_source": "7a2f93224c846b86261b2da709f50ea683fc708d",
+  "player_tree": "5058373348e9049f8b67ec4dbb79b400a904acd6",
+  "current_f200_archive_sha256": "65FC7E907FE3198B7290167989FE2564C1474190D06DAD49860063BEC418EC60",
+  "callers": [
+    {
+      "packet": {
+        "path": "build/qualification/legacy-preference-473-current7a2-r01-controller/packet.json",
+        "bytes": 24625,
+        "sha256": "CFE67675F56682325AFA40634B03A9CF832858CED6A7A597DE66950A9BE92D01"
+      },
+      "caller": {
+        "path": "build/qualification/legacy-preference-473-current7a2-r01-controller/Invoke-OwnedLegacyPreference473.ps1",
+        "bytes": 6564,
+        "sha256": "81208C004DF229CD4E6169D877A69B14DBE9C891E832FF3B0A1AC3F316579CC8"
+      },
+      "terminal": {
+        "path": "build/qualification/legacy-preference-473-current7a2-r01-controller/execution-record/terminal.json",
+        "bytes": 10693,
+        "sha256": "2F0A857D5A71F8B08D7AA64CDA304754F9CD3F273C88A278181EAD55885EEE74"
+      }
+    },
+    {
+      "packet": {
+        "path": "build/qualification/legacy-preference-473-current7a2-r03-controller/packet.json",
+        "bytes": 22177,
+        "sha256": "EEDEC4119568FB5F3BC2A6FBA8AD16938953371950CE854E34FD8921A0B90F89"
+      },
+      "caller": {
+        "path": "build/qualification/legacy-preference-473-current7a2-r03-controller/Invoke-OwnedLegacyPreference473.ps1",
+        "bytes": 7283,
+        "sha256": "CC751F9E152E209F78F11A2DA3A0EB41456239358938D2B9ACD5F86A77F32C8B"
+      },
+      "terminal": {
+        "path": "build/qualification/legacy-preference-473-current7a2-r03-controller/execution-record/terminal.json",
+        "bytes": 31233,
+        "sha256": "9BBBAABB262D3456F696EEB5358EE8E84C9EB25E2E9CC0CFADA207725907579C"
+      }
+    }
+  ],
+  "readback": {
+    "path": "build/qualification/legacy-preference-473-current7a2-r03-controller/root-readback-r01.json",
+    "bytes": 25194,
+    "sha256": "322387B58C57CE6ED0B24DF70A3A97A3511A64FB9784053812E204C7C2634EF5",
+    "files": 134,
+    "bytes_per_copy": 6458312
+  },
+  "receipt_capsule": {
+    "path": "spec/evidence/legacy-preference-473-current7a2-native-receipts-r01.json.gz",
+    "bytes": 67139,
+    "sha256": "885D6A7A694602911DA5B1643A07DA3A8680C3718EA4709CC84428312C524B94",
+    "records": 12,
+    "uncompressed_bytes": 404655,
+    "all_original_exact_bytes_round_trip": true
+  },
+  "saved_stages": [
+    {
+      "id": "false-published",
+      "result": {
+        "path": "build/qualification/legacy-preference-473-current7a2-r01-controller/native-false-published/result.json",
+        "bytes": 46655,
+        "sha256": "430F02ECA1CDB4F667E3052753AE14EE1E9E22D8B0E8E5F88F0715D5531D15A9"
+      },
+      "engine": {
+        "path": "D:\\Games\\Factorio\\2.0\\bin\\x64\\factorio.exe",
+        "sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B",
+        "file_version": "2.0.77.84539",
+        "product_version": "2.0.77",
+        "base_version": "2.0.77"
+      },
+      "profile": {
+        "path": "D:\\Projects\\Factorio\\mir5-legacy-cannon-credit-r01\\build\\qualification\\legacy-preference-473-current7a2-r01-inputs\\published-473-false-profile.json",
+        "sha256": "C19D5C9D9B83C94CB9FA5896524597CC682993CA093B386E8DC20AB2BA12FD56"
+      },
+      "fixtures": [
+        {
+          "sha256": "0DA9A6FFCD5EAE869194B7FFEEF5F50C2A8DEE03C84A3A8AA27C71F9C3C9290D",
+          "source": "D:\\Projects\\Factorio\\mir5-legacy-cannon-credit-r01\\build\\qualification\\legacy-preference-473-current7a2-r01-inputs\\published-473-false",
+          "archive": "D:\\Projects\\Factorio\\testmods\\2.0\\mir-fixture-mir5-legacy-preference-transition_0.1.2.zip"
+        },
+        {
+          "sha256": "723D1E7721449FC26040E5E6629416767BDC20AD79CF8723115846DB662A1F87",
+          "source": "D:\\Projects\\Factorio\\mir5-legacy-cannon-credit-r01\\build\\qualification\\legacy-preference-473-current7a2-r01-inputs\\observer",
+          "archive": "D:\\Projects\\Factorio\\testmods\\2.0\\mir-fixture-mir5-active-mods-observer_0.1.0.zip"
+        }
+      ],
+      "initial_observation": {
+        "case": "legacy-preference-transition",
+        "stage": "initial",
+        "status": "passed",
+        "source_preference": false,
+        "current_preference": false,
+        "actual_lab_completions": 2,
+        "actual_switch_labs": 0,
+        "next_level": 3,
+        "biter_egg_bonus": 0.20000000298023224,
+        "fish_breeding_bonus": 0,
+        "pentapod_egg_bonus": 0.20000000298023224,
+        "foreign_queue_current": "braking-force-1",
+        "foreign_queue_progress": 0.42000000000000004
+      },
+      "input_save": null,
+      "completed_save": {
+        "path": "build/qualification/legacy-preference-473-current7a2-r01-controller/native-false-published/write-data/saves/mir5-native-complete.zip",
+        "bytes": 535031,
+        "sha256": "557D90897EEB493C5DEFE7174E1007FA5D3C05C4A99D59074165773CE979CC7A"
+      },
+      "cold_reloads": [
+        {
+          "ordinal": 1,
+          "save_sha256": "557D90897EEB493C5DEFE7174E1007FA5D3C05C4A99D59074165773CE979CC7A",
+          "save_byte_identical": true,
+          "observation": {
+            "case": "legacy-preference-transition",
+            "stage": "reload",
+            "status": "passed",
+            "source_preference": false,
+            "current_preference": false,
+            "actual_lab_completions": 2,
+            "actual_switch_labs": 0,
+            "next_level": 3,
+            "biter_egg_bonus": 0.20000000298023224,
+            "fish_breeding_bonus": 0,
+            "pentapod_egg_bonus": 0.20000000298023224,
+            "foreign_queue_current": "braking-force-1",
+            "foreign_queue_progress": 0.42000000000000004
+          }
+        },
+        {
+          "ordinal": 2,
+          "save_sha256": "557D90897EEB493C5DEFE7174E1007FA5D3C05C4A99D59074165773CE979CC7A",
+          "save_byte_identical": true,
+          "observation": {
+            "case": "legacy-preference-transition",
+            "stage": "reload",
+            "status": "passed",
+            "source_preference": false,
+            "current_preference": false,
+            "actual_lab_completions": 2,
+            "actual_switch_labs": 0,
+            "next_level": 3,
+            "biter_egg_bonus": 0.20000000298023224,
+            "fish_breeding_bonus": 0,
+            "pentapod_egg_bonus": 0.20000000298023224,
+            "foreign_queue_current": "braking-force-1",
+            "foreign_queue_progress": 0.42000000000000004
+          }
+        }
+      ],
+      "native_startup_logs": [
+        {
+          "path": "build/qualification/legacy-preference-473-current7a2-r01-controller/native-false-published/create.factorio.log",
+          "bytes": 30729,
+          "sha256": "6CC3B0D16F7BCB335304F2C53C13AEEBC5383F0260C3D56CCCAF844CD2D1D5B5",
+          "actual_native_startup": "   0.005 2026-10-29 00:47:17; Factorio 2.0.77 (build 84539, win64, full, space-age)"
+        },
+        {
+          "path": "build/qualification/legacy-preference-473-current7a2-r01-controller/native-false-published/production.factorio.log",
+          "bytes": 32561,
+          "sha256": "AADC9D44487FC50281FA9DA3DCEF4861F7BBE2820FCA0E2BDA90AB07AC0CB813",
+          "actual_native_startup": "   0.000 2026-10-29 00:47:30; Factorio 2.0.77 (build 84539, win64, full, space-age)"
+        },
+        {
+          "path": "build/qualification/legacy-preference-473-current7a2-r01-controller/native-false-published/reload-1.factorio.log",
+          "bytes": 31434,
+          "sha256": "B8785CE0DC2F06E141D4784CE4488A0B3C49B018D57D6EBD0B4666552B9D847A",
+          "actual_native_startup": "   0.000 2026-10-29 00:47:36; Factorio 2.0.77 (build 84539, win64, full, space-age)"
+        },
+        {
+          "path": "build/qualification/legacy-preference-473-current7a2-r01-controller/native-false-published/reload-2.factorio.log",
+          "bytes": 31434,
+          "sha256": "B0A9B09E21AD747F650B4FEA41BE1FCADD054AA41149A02598DB5CA11FCF5ECE",
+          "actual_native_startup": "   0.000 2026-10-29 00:47:39; Factorio 2.0.77 (build 84539, win64, full, space-age)"
+        }
+      ],
+      "actual_native_processes": 4,
+      "actual_new_source_labs": 2,
+      "actual_new_candidate_labs": 0
+    },
+    {
+      "id": "false-unchanged-upgrade",
+      "result": {
+        "path": "build/qualification/legacy-preference-473-current7a2-r03-controller/native-false-unchanged-upgrade/result.json",
+        "bytes": 38738,
+        "sha256": "14DE262D947A2A404701806405D82B0E8AD71D10FABDBAE7E29830DAC74FAB5B"
+      },
+      "engine": {
+        "path": "D:\\Games\\Factorio\\2.0\\bin\\x64\\factorio.exe",
+        "sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B",
+        "file_version": "2.0.77.84539",
+        "product_version": "2.0.77",
+        "base_version": "2.0.77"
+      },
+      "profile": {
+        "sha256": "C4BAE1C878A27AC9A5DB965C22D0EA67E4706FD4EF3A9B84ECC605F3CE32B98D",
+        "path": "D:\\Projects\\Factorio\\mir5-legacy-cannon-credit-r01\\build\\qualification\\legacy-preference-473-current7a2-r01-inputs\\successor-false-profile.json"
+      },
+      "fixtures": [
+        {
+          "sha256": "FD31AB7CA787A9F6B423E4AFCE1178F2736A7B4210F0D32EC73B303BA9BE2E5A",
+          "source": "D:\\Projects\\Factorio\\mir5-legacy-cannon-credit-r01\\build\\qualification\\legacy-preference-473-current7a2-r01-inputs\\successor-false",
+          "archive": "D:\\Projects\\Factorio\\testmods\\2.0\\mir-fixture-mir5-legacy-preference-transition_0.2.0.zip"
+        },
+        {
+          "sha256": "723D1E7721449FC26040E5E6629416767BDC20AD79CF8723115846DB662A1F87",
+          "source": "D:\\Projects\\Factorio\\mir5-legacy-cannon-credit-r01\\build\\qualification\\legacy-preference-473-current7a2-r01-inputs\\observer",
+          "archive": "D:\\Projects\\Factorio\\testmods\\2.0\\mir-fixture-mir5-active-mods-observer_0.1.0.zip"
+        }
+      ],
+      "initial_observation": {
+        "case": "legacy-preference-transition",
+        "stage": "initial",
+        "status": "passed",
+        "source_preference": false,
+        "current_preference": false,
+        "actual_lab_completions": 2,
+        "actual_switch_labs": 0,
+        "next_level": 3,
+        "biter_egg_bonus": 0.20000000298023224,
+        "fish_breeding_bonus": 0,
+        "pentapod_egg_bonus": 0.20000000298023224,
+        "foreign_queue_current": "braking-force-1",
+        "foreign_queue_progress": 0.42000000000000004,
+        "event_mod_startup_settings_changed": false,
+        "negative_carrier_level": 1,
+        "positive_carrier_level": 1
+      },
+      "input_save": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\legacy-preference-473-current7a2-r01-controller\\native-false-published\\write-data\\saves\\mir5-native-complete.zip",
+        "sha256": "557D90897EEB493C5DEFE7174E1007FA5D3C05C4A99D59074165773CE979CC7A"
+      },
+      "completed_save": {
+        "path": "build/qualification/legacy-preference-473-current7a2-r03-controller/native-false-unchanged-upgrade/write-data/saves/mir5-native-complete.zip",
+        "bytes": 535739,
+        "sha256": "EDA3220317E2B6B5D4FEC19D8643BB7B0C661B54C2D35A5EEC64E908F56F9958"
+      },
+      "cold_reloads": [
+        {
+          "ordinal": 1,
+          "save_sha256": "EDA3220317E2B6B5D4FEC19D8643BB7B0C661B54C2D35A5EEC64E908F56F9958",
+          "save_byte_identical": true,
+          "observation": {
+            "case": "legacy-preference-transition",
+            "stage": "reload",
+            "status": "passed",
+            "source_preference": false,
+            "current_preference": false,
+            "actual_lab_completions": 2,
+            "actual_switch_labs": 0,
+            "next_level": 3,
+            "biter_egg_bonus": 0.20000000298023224,
+            "fish_breeding_bonus": 0,
+            "pentapod_egg_bonus": 0.20000000298023224,
+            "foreign_queue_current": "braking-force-1",
+            "foreign_queue_progress": 0.42000000000000004,
+            "event_mod_startup_settings_changed": false,
+            "negative_carrier_level": 1,
+            "positive_carrier_level": 1
+          }
+        },
+        {
+          "ordinal": 2,
+          "save_sha256": "EDA3220317E2B6B5D4FEC19D8643BB7B0C661B54C2D35A5EEC64E908F56F9958",
+          "save_byte_identical": true,
+          "observation": {
+            "case": "legacy-preference-transition",
+            "stage": "reload",
+            "status": "passed",
+            "source_preference": false,
+            "current_preference": false,
+            "actual_lab_completions": 2,
+            "actual_switch_labs": 0,
+            "next_level": 3,
+            "biter_egg_bonus": 0.20000000298023224,
+            "fish_breeding_bonus": 0,
+            "pentapod_egg_bonus": 0.20000000298023224,
+            "foreign_queue_current": "braking-force-1",
+            "foreign_queue_progress": 0.42000000000000004,
+            "event_mod_startup_settings_changed": false,
+            "negative_carrier_level": 1,
+            "positive_carrier_level": 1
+          }
+        }
+      ],
+      "native_startup_logs": [
+        {
+          "path": "build/qualification/legacy-preference-473-current7a2-r03-controller/native-false-unchanged-upgrade/production.factorio.log",
+          "bytes": 10540,
+          "sha256": "102775CB5C4D95E80F73428F887A757E8374D199F2B1A9A2B651C674926B849F",
+          "actual_native_startup": "   0.000 2026-10-29 00:51:11; Factorio 2.0.77 (build 84539, win64, full, space-age)"
+        },
+        {
+          "path": "build/qualification/legacy-preference-473-current7a2-r03-controller/native-false-unchanged-upgrade/reload-1.factorio.log",
+          "bytes": 9230,
+          "sha256": "8EAB3F0BDC5933591192BE45284596FB025220E413BD167E0E01FBECF95849E6",
+          "actual_native_startup": "   0.000 2026-10-29 00:51:14; Factorio 2.0.77 (build 84539, win64, full, space-age)"
+        },
+        {
+          "path": "build/qualification/legacy-preference-473-current7a2-r03-controller/native-false-unchanged-upgrade/reload-2.factorio.log",
+          "bytes": 9230,
+          "sha256": "648BBCC33007D61F861D3CC2161C95BC9D0B770F658318E99449BE43BE80A769",
+          "actual_native_startup": "   0.000 2026-10-29 00:51:17; Factorio 2.0.77 (build 84539, win64, full, space-age)"
+        }
+      ],
+      "actual_native_processes": 3,
+      "actual_new_source_labs": 0,
+      "actual_new_candidate_labs": 0
+    },
+    {
+      "id": "false-later-switch",
+      "result": {
+        "path": "build/qualification/legacy-preference-473-current7a2-r03-controller/native-false-later-switch/result.json",
+        "bytes": 38682,
+        "sha256": "F991D0B5EF405F37E531D74346B5AE577FF14F8970CEFE31CA56ADEA8F062566"
+      },
+      "engine": {
+        "path": "D:\\Games\\Factorio\\2.0\\bin\\x64\\factorio.exe",
+        "sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B",
+        "file_version": "2.0.77.84539",
+        "product_version": "2.0.77",
+        "base_version": "2.0.77"
+      },
+      "profile": {
+        "sha256": "F40AFD0A50D628810E4F2D298F644D14E7F22253283F810B3C5214448EA01363",
+        "path": "D:\\Projects\\Factorio\\mir5-legacy-cannon-credit-r01\\build\\qualification\\legacy-preference-473-current7a2-r01-inputs\\successor-true-profile.json"
+      },
+      "fixtures": [
+        {
+          "sha256": "6D19D0C605C718D5A3D60F48C7C3BFBECC47C02C89E42FC5097C9135DE23F594",
+          "source": "D:\\Projects\\Factorio\\mir5-legacy-cannon-credit-r01\\build\\qualification\\legacy-preference-473-current7a2-r01-inputs\\successor-true",
+          "archive": "D:\\Projects\\Factorio\\testmods\\2.0\\mir-fixture-mir5-legacy-preference-transition_0.2.1.zip"
+        },
+        {
+          "sha256": "723D1E7721449FC26040E5E6629416767BDC20AD79CF8723115846DB662A1F87",
+          "source": "D:\\Projects\\Factorio\\mir5-legacy-cannon-credit-r01\\build\\qualification\\legacy-preference-473-current7a2-r01-inputs\\observer",
+          "archive": "D:\\Projects\\Factorio\\testmods\\2.0\\mir-fixture-mir5-active-mods-observer_0.1.0.zip"
+        }
+      ],
+      "initial_observation": {
+        "case": "legacy-preference-transition",
+        "stage": "initial",
+        "status": "passed",
+        "source_preference": false,
+        "current_preference": true,
+        "actual_lab_completions": 2,
+        "actual_switch_labs": 1,
+        "next_level": 4,
+        "biter_egg_bonus": 0.30000001192092896,
+        "fish_breeding_bonus": 0.10000000149011612,
+        "pentapod_egg_bonus": 0.30000001192092896,
+        "foreign_queue_current": "braking-force-1",
+        "foreign_queue_progress": 0.42000000000000004,
+        "event_mod_startup_settings_changed": true,
+        "negative_carrier_level": 3,
+        "positive_carrier_level": 1
+      },
+      "input_save": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\legacy-preference-473-current7a2-r03-controller\\native-false-unchanged-upgrade\\write-data\\saves\\mir5-native-complete.zip",
+        "sha256": "EDA3220317E2B6B5D4FEC19D8643BB7B0C661B54C2D35A5EEC64E908F56F9958"
+      },
+      "completed_save": {
+        "path": "build/qualification/legacy-preference-473-current7a2-r03-controller/native-false-later-switch/write-data/saves/mir5-native-complete.zip",
+        "bytes": 536814,
+        "sha256": "C62A1891510EF9A72F16A712A0E9D9AA64C10071EE8A0AB3AFE91F404F01BA5C"
+      },
+      "cold_reloads": [
+        {
+          "ordinal": 1,
+          "save_sha256": "C62A1891510EF9A72F16A712A0E9D9AA64C10071EE8A0AB3AFE91F404F01BA5C",
+          "save_byte_identical": true,
+          "observation": {
+            "case": "legacy-preference-transition",
+            "stage": "reload",
+            "status": "passed",
+            "source_preference": false,
+            "current_preference": true,
+            "actual_lab_completions": 2,
+            "actual_switch_labs": 1,
+            "next_level": 4,
+            "biter_egg_bonus": 0.30000001192092896,
+            "fish_breeding_bonus": 0.10000000149011612,
+            "pentapod_egg_bonus": 0.30000001192092896,
+            "foreign_queue_current": "braking-force-1",
+            "foreign_queue_progress": 0.42000000000000004,
+            "event_mod_startup_settings_changed": true,
+            "negative_carrier_level": 3,
+            "positive_carrier_level": 1
+          }
+        },
+        {
+          "ordinal": 2,
+          "save_sha256": "C62A1891510EF9A72F16A712A0E9D9AA64C10071EE8A0AB3AFE91F404F01BA5C",
+          "save_byte_identical": true,
+          "observation": {
+            "case": "legacy-preference-transition",
+            "stage": "reload",
+            "status": "passed",
+            "source_preference": false,
+            "current_preference": true,
+            "actual_lab_completions": 2,
+            "actual_switch_labs": 1,
+            "next_level": 4,
+            "biter_egg_bonus": 0.30000001192092896,
+            "fish_breeding_bonus": 0.10000000149011612,
+            "pentapod_egg_bonus": 0.30000001192092896,
+            "foreign_queue_current": "braking-force-1",
+            "foreign_queue_progress": 0.42000000000000004,
+            "event_mod_startup_settings_changed": true,
+            "negative_carrier_level": 3,
+            "positive_carrier_level": 1
+          }
+        }
+      ],
+      "native_startup_logs": [
+        {
+          "path": "build/qualification/legacy-preference-473-current7a2-r03-controller/native-false-later-switch/production.factorio.log",
+          "bytes": 10424,
+          "sha256": "5D045CE4265B0D6BF37760AFBBADDB60C3303F50B0953BC97C51EEB5F6645671",
+          "actual_native_startup": "   0.000 2026-10-29 00:51:23; Factorio 2.0.77 (build 84539, win64, full, space-age)"
+        },
+        {
+          "path": "build/qualification/legacy-preference-473-current7a2-r03-controller/native-false-later-switch/reload-1.factorio.log",
+          "bytes": 9226,
+          "sha256": "83CBE81C303ECD47B489E8F225527528FED518ABBFCD577BC82B07FF3351C443",
+          "actual_native_startup": "   0.000 2026-10-29 00:51:27; Factorio 2.0.77 (build 84539, win64, full, space-age)"
+        },
+        {
+          "path": "build/qualification/legacy-preference-473-current7a2-r03-controller/native-false-later-switch/reload-2.factorio.log",
+          "bytes": 9226,
+          "sha256": "23FE3F747CBFB25C3B59E98D7F9B02EFB3A7D61DED3C9E5D58B7F56B97C5F105",
+          "actual_native_startup": "   0.000 2026-10-29 00:51:30; Factorio 2.0.77 (build 84539, win64, full, space-age)"
+        }
+      ],
+      "actual_native_processes": 3,
+      "actual_new_source_labs": 0,
+      "actual_new_candidate_labs": 1
+    },
+    {
+      "id": "true-published",
+      "result": {
+        "path": "build/qualification/legacy-preference-473-current7a2-r03-controller/native-true-published/result.json",
+        "bytes": 46670,
+        "sha256": "8ECFAC79C46975CCAA9646BA1FD5D13EF85CD220B60AFABB82EDD22640F693D8"
+      },
+      "engine": {
+        "path": "D:\\Games\\Factorio\\2.0\\bin\\x64\\factorio.exe",
+        "sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B",
+        "file_version": "2.0.77.84539",
+        "product_version": "2.0.77",
+        "base_version": "2.0.77"
+      },
+      "profile": {
+        "sha256": "7ADF08135D4CFF05E13D1912A3681144991FA25E11BB9DC1910725AA24E7F9D6",
+        "path": "D:\\Projects\\Factorio\\mir5-legacy-cannon-credit-r01\\build\\qualification\\legacy-preference-473-current7a2-r01-inputs\\published-473-true-profile.json"
+      },
+      "fixtures": [
+        {
+          "sha256": "93DD2CDEDD5AF53F56A5FD2D35AAE653F7E4DB7278C3EE62EA381FF95DF8743A",
+          "source": "D:\\Projects\\Factorio\\mir5-legacy-cannon-credit-r01\\build\\qualification\\legacy-preference-473-current7a2-r01-inputs\\published-473-true",
+          "archive": "D:\\Projects\\Factorio\\testmods\\2.0\\mir-fixture-mir5-legacy-preference-transition_0.1.3.zip"
+        },
+        {
+          "sha256": "723D1E7721449FC26040E5E6629416767BDC20AD79CF8723115846DB662A1F87",
+          "source": "D:\\Projects\\Factorio\\mir5-legacy-cannon-credit-r01\\build\\qualification\\legacy-preference-473-current7a2-r01-inputs\\observer",
+          "archive": "D:\\Projects\\Factorio\\testmods\\2.0\\mir-fixture-mir5-active-mods-observer_0.1.0.zip"
+        }
+      ],
+      "initial_observation": {
+        "case": "legacy-preference-transition",
+        "stage": "initial",
+        "status": "passed",
+        "source_preference": true,
+        "current_preference": true,
+        "actual_lab_completions": 2,
+        "actual_switch_labs": 0,
+        "next_level": 3,
+        "biter_egg_bonus": 0.20000000298023224,
+        "fish_breeding_bonus": 0.20000000298023224,
+        "pentapod_egg_bonus": 0.20000000298023224,
+        "foreign_queue_current": "braking-force-1",
+        "foreign_queue_progress": 0.42000000000000004
+      },
+      "input_save": null,
+      "completed_save": {
+        "path": "build/qualification/legacy-preference-473-current7a2-r03-controller/native-true-published/write-data/saves/mir5-native-complete.zip",
+        "bytes": 789089,
+        "sha256": "2E9F0462DFA4FD829E8DA5B87D7A5590196A0CAB246541EC98005DBB94794739"
+      },
+      "cold_reloads": [
+        {
+          "ordinal": 1,
+          "save_sha256": "2E9F0462DFA4FD829E8DA5B87D7A5590196A0CAB246541EC98005DBB94794739",
+          "save_byte_identical": true,
+          "observation": {
+            "case": "legacy-preference-transition",
+            "stage": "reload",
+            "status": "passed",
+            "source_preference": true,
+            "current_preference": true,
+            "actual_lab_completions": 2,
+            "actual_switch_labs": 0,
+            "next_level": 3,
+            "biter_egg_bonus": 0.20000000298023224,
+            "fish_breeding_bonus": 0.20000000298023224,
+            "pentapod_egg_bonus": 0.20000000298023224,
+            "foreign_queue_current": "braking-force-1",
+            "foreign_queue_progress": 0.42000000000000004
+          }
+        },
+        {
+          "ordinal": 2,
+          "save_sha256": "2E9F0462DFA4FD829E8DA5B87D7A5590196A0CAB246541EC98005DBB94794739",
+          "save_byte_identical": true,
+          "observation": {
+            "case": "legacy-preference-transition",
+            "stage": "reload",
+            "status": "passed",
+            "source_preference": true,
+            "current_preference": true,
+            "actual_lab_completions": 2,
+            "actual_switch_labs": 0,
+            "next_level": 3,
+            "biter_egg_bonus": 0.20000000298023224,
+            "fish_breeding_bonus": 0.20000000298023224,
+            "pentapod_egg_bonus": 0.20000000298023224,
+            "foreign_queue_current": "braking-force-1",
+            "foreign_queue_progress": 0.42000000000000004
+          }
+        }
+      ],
+      "native_startup_logs": [
+        {
+          "path": "build/qualification/legacy-preference-473-current7a2-r03-controller/native-true-published/create.factorio.log",
+          "bytes": 32912,
+          "sha256": "93A6FA20C1FD351AB5F524288091B52454582FA5EFC17476D307676AA82FA640",
+          "actual_native_startup": "   0.000 2026-10-29 00:51:36; Factorio 2.0.77 (build 84539, win64, full, space-age)"
+        },
+        {
+          "path": "build/qualification/legacy-preference-473-current7a2-r03-controller/native-true-published/production.factorio.log",
+          "bytes": 34767,
+          "sha256": "AF012F3868EEA28A862D2895C280F8038B62F46EEC9D9F897CE8E6D868B4D57D",
+          "actual_native_startup": "   0.000 2026-10-29 00:51:41; Factorio 2.0.77 (build 84539, win64, full, space-age)"
+        },
+        {
+          "path": "build/qualification/legacy-preference-473-current7a2-r03-controller/native-true-published/reload-1.factorio.log",
+          "bytes": 33642,
+          "sha256": "87F649CC4DB70D96FA809797627FDB8A68F5D19F15A0AB0C94C3FC3136AC03A7",
+          "actual_native_startup": "   0.000 2026-10-29 00:51:46; Factorio 2.0.77 (build 84539, win64, full, space-age)"
+        },
+        {
+          "path": "build/qualification/legacy-preference-473-current7a2-r03-controller/native-true-published/reload-2.factorio.log",
+          "bytes": 33642,
+          "sha256": "2056B9159162C82DA5930E684F6D123AD9D9F7748FD5A14895825D85F4FF39BF",
+          "actual_native_startup": "   0.000 2026-10-29 00:51:50; Factorio 2.0.77 (build 84539, win64, full, space-age)"
+        }
+      ],
+      "actual_native_processes": 4,
+      "actual_new_source_labs": 2,
+      "actual_new_candidate_labs": 0
+    },
+    {
+      "id": "true-unchanged-upgrade",
+      "result": {
+        "path": "build/qualification/legacy-preference-473-current7a2-r03-controller/native-true-unchanged-upgrade/result.json",
+        "bytes": 38759,
+        "sha256": "4614B4A300DCD6F85A0958653B18EECC96CA6BC94F3178613E92B41BD00AC938"
+      },
+      "engine": {
+        "path": "D:\\Games\\Factorio\\2.0\\bin\\x64\\factorio.exe",
+        "sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B",
+        "file_version": "2.0.77.84539",
+        "product_version": "2.0.77",
+        "base_version": "2.0.77"
+      },
+      "profile": {
+        "sha256": "F40AFD0A50D628810E4F2D298F644D14E7F22253283F810B3C5214448EA01363",
+        "path": "D:\\Projects\\Factorio\\mir5-legacy-cannon-credit-r01\\build\\qualification\\legacy-preference-473-current7a2-r01-inputs\\successor-true-profile.json"
+      },
+      "fixtures": [
+        {
+          "sha256": "6D19D0C605C718D5A3D60F48C7C3BFBECC47C02C89E42FC5097C9135DE23F594",
+          "source": "D:\\Projects\\Factorio\\mir5-legacy-cannon-credit-r01\\build\\qualification\\legacy-preference-473-current7a2-r01-inputs\\successor-true",
+          "archive": "D:\\Projects\\Factorio\\testmods\\2.0\\mir-fixture-mir5-legacy-preference-transition_0.2.1.zip"
+        },
+        {
+          "sha256": "723D1E7721449FC26040E5E6629416767BDC20AD79CF8723115846DB662A1F87",
+          "source": "D:\\Projects\\Factorio\\mir5-legacy-cannon-credit-r01\\build\\qualification\\legacy-preference-473-current7a2-r01-inputs\\observer",
+          "archive": "D:\\Projects\\Factorio\\testmods\\2.0\\mir-fixture-mir5-active-mods-observer_0.1.0.zip"
+        }
+      ],
+      "initial_observation": {
+        "case": "legacy-preference-transition",
+        "stage": "initial",
+        "status": "passed",
+        "source_preference": true,
+        "current_preference": true,
+        "actual_lab_completions": 2,
+        "actual_switch_labs": 0,
+        "next_level": 3,
+        "biter_egg_bonus": 0.20000000298023224,
+        "fish_breeding_bonus": 0.20000000298023224,
+        "pentapod_egg_bonus": 0.20000000298023224,
+        "foreign_queue_current": "braking-force-1",
+        "foreign_queue_progress": 0.42000000000000004,
+        "event_mod_startup_settings_changed": false,
+        "negative_carrier_level": 1,
+        "positive_carrier_level": 1
+      },
+      "input_save": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\legacy-preference-473-current7a2-r03-controller\\native-true-published\\write-data\\saves\\mir5-native-complete.zip",
+        "sha256": "2E9F0462DFA4FD829E8DA5B87D7A5590196A0CAB246541EC98005DBB94794739"
+      },
+      "completed_save": {
+        "path": "build/qualification/legacy-preference-473-current7a2-r03-controller/native-true-unchanged-upgrade/write-data/saves/mir5-native-complete.zip",
+        "bytes": 790502,
+        "sha256": "C3454E6A6FEF022EECA80EDDE3F5EDE4B3B135B81672E0AC645C871F6C47BE57"
+      },
+      "cold_reloads": [
+        {
+          "ordinal": 1,
+          "save_sha256": "C3454E6A6FEF022EECA80EDDE3F5EDE4B3B135B81672E0AC645C871F6C47BE57",
+          "save_byte_identical": true,
+          "observation": {
+            "case": "legacy-preference-transition",
+            "stage": "reload",
+            "status": "passed",
+            "source_preference": true,
+            "current_preference": true,
+            "actual_lab_completions": 2,
+            "actual_switch_labs": 0,
+            "next_level": 3,
+            "biter_egg_bonus": 0.20000000298023224,
+            "fish_breeding_bonus": 0.20000000298023224,
+            "pentapod_egg_bonus": 0.20000000298023224,
+            "foreign_queue_current": "braking-force-1",
+            "foreign_queue_progress": 0.42000000000000004,
+            "event_mod_startup_settings_changed": false,
+            "negative_carrier_level": 1,
+            "positive_carrier_level": 1
+          }
+        },
+        {
+          "ordinal": 2,
+          "save_sha256": "C3454E6A6FEF022EECA80EDDE3F5EDE4B3B135B81672E0AC645C871F6C47BE57",
+          "save_byte_identical": true,
+          "observation": {
+            "case": "legacy-preference-transition",
+            "stage": "reload",
+            "status": "passed",
+            "source_preference": true,
+            "current_preference": true,
+            "actual_lab_completions": 2,
+            "actual_switch_labs": 0,
+            "next_level": 3,
+            "biter_egg_bonus": 0.20000000298023224,
+            "fish_breeding_bonus": 0.20000000298023224,
+            "pentapod_egg_bonus": 0.20000000298023224,
+            "foreign_queue_current": "braking-force-1",
+            "foreign_queue_progress": 0.42000000000000004,
+            "event_mod_startup_settings_changed": false,
+            "negative_carrier_level": 1,
+            "positive_carrier_level": 1
+          }
+        }
+      ],
+      "native_startup_logs": [
+        {
+          "path": "build/qualification/legacy-preference-473-current7a2-r03-controller/native-true-unchanged-upgrade/production.factorio.log",
+          "bytes": 10558,
+          "sha256": "993381F208D07C8A72322CCB659FFAF45C688009CEED36A5D3A81C06076E18CB",
+          "actual_native_startup": "   0.000 2026-10-29 00:52:03; Factorio 2.0.77 (build 84539, win64, full, space-age)"
+        },
+        {
+          "path": "build/qualification/legacy-preference-473-current7a2-r03-controller/native-true-unchanged-upgrade/reload-1.factorio.log",
+          "bytes": 9250,
+          "sha256": "3FFFE3FE05EEEF74A50076DF6977A8312825523EF407A6CA8BBC08B1C4439372",
+          "actual_native_startup": "   0.000 2026-10-29 00:52:07; Factorio 2.0.77 (build 84539, win64, full, space-age)"
+        },
+        {
+          "path": "build/qualification/legacy-preference-473-current7a2-r03-controller/native-true-unchanged-upgrade/reload-2.factorio.log",
+          "bytes": 9250,
+          "sha256": "B203CA87B130D9AC37AB9EF07C94B0ADF779FF532A2C1ADC7C4B666BF97B89A5",
+          "actual_native_startup": "   0.000 2026-10-29 00:52:10; Factorio 2.0.77 (build 84539, win64, full, space-age)"
+        }
+      ],
+      "actual_native_processes": 3,
+      "actual_new_source_labs": 0,
+      "actual_new_candidate_labs": 0
+    },
+    {
+      "id": "true-later-switch",
+      "result": {
+        "path": "build/qualification/legacy-preference-473-current7a2-r03-controller/native-true-later-switch/result.json",
+        "bytes": 38661,
+        "sha256": "4F381D46C0CD9E46E9C784A2F3C9951D8E13BFCD77DC5714344E0D3D50C6CF9B"
+      },
+      "engine": {
+        "path": "D:\\Games\\Factorio\\2.0\\bin\\x64\\factorio.exe",
+        "sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B",
+        "file_version": "2.0.77.84539",
+        "product_version": "2.0.77",
+        "base_version": "2.0.77"
+      },
+      "profile": {
+        "sha256": "C4BAE1C878A27AC9A5DB965C22D0EA67E4706FD4EF3A9B84ECC605F3CE32B98D",
+        "path": "D:\\Projects\\Factorio\\mir5-legacy-cannon-credit-r01\\build\\qualification\\legacy-preference-473-current7a2-r01-inputs\\successor-false-profile.json"
+      },
+      "fixtures": [
+        {
+          "sha256": "FD31AB7CA787A9F6B423E4AFCE1178F2736A7B4210F0D32EC73B303BA9BE2E5A",
+          "source": "D:\\Projects\\Factorio\\mir5-legacy-cannon-credit-r01\\build\\qualification\\legacy-preference-473-current7a2-r01-inputs\\successor-false",
+          "archive": "D:\\Projects\\Factorio\\testmods\\2.0\\mir-fixture-mir5-legacy-preference-transition_0.2.0.zip"
+        },
+        {
+          "sha256": "723D1E7721449FC26040E5E6629416767BDC20AD79CF8723115846DB662A1F87",
+          "source": "D:\\Projects\\Factorio\\mir5-legacy-cannon-credit-r01\\build\\qualification\\legacy-preference-473-current7a2-r01-inputs\\observer",
+          "archive": "D:\\Projects\\Factorio\\testmods\\2.0\\mir-fixture-mir5-active-mods-observer_0.1.0.zip"
+        }
+      ],
+      "initial_observation": {
+        "case": "legacy-preference-transition",
+        "stage": "initial",
+        "status": "passed",
+        "source_preference": true,
+        "current_preference": false,
+        "actual_lab_completions": 2,
+        "actual_switch_labs": 1,
+        "next_level": 4,
+        "biter_egg_bonus": 0.30000001192092896,
+        "fish_breeding_bonus": 0.20000000298023224,
+        "pentapod_egg_bonus": 0.30000001192092896,
+        "foreign_queue_current": "braking-force-1",
+        "foreign_queue_progress": 0.42000000000000004,
+        "event_mod_startup_settings_changed": true,
+        "negative_carrier_level": 1,
+        "positive_carrier_level": 3
+      },
+      "input_save": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\legacy-preference-473-current7a2-r03-controller\\native-true-unchanged-upgrade\\write-data\\saves\\mir5-native-complete.zip",
+        "sha256": "C3454E6A6FEF022EECA80EDDE3F5EDE4B3B135B81672E0AC645C871F6C47BE57"
+      },
+      "completed_save": {
+        "path": "build/qualification/legacy-preference-473-current7a2-r03-controller/native-true-later-switch/write-data/saves/mir5-native-complete.zip",
+        "bytes": 790894,
+        "sha256": "375948EDBF1CF010EC6280AD2F860E44DAD9257BEC71BA5FF1C52C1653C55D6A"
+      },
+      "cold_reloads": [
+        {
+          "ordinal": 1,
+          "save_sha256": "375948EDBF1CF010EC6280AD2F860E44DAD9257BEC71BA5FF1C52C1653C55D6A",
+          "save_byte_identical": true,
+          "observation": {
+            "case": "legacy-preference-transition",
+            "stage": "reload",
+            "status": "passed",
+            "source_preference": true,
+            "current_preference": false,
+            "actual_lab_completions": 2,
+            "actual_switch_labs": 1,
+            "next_level": 4,
+            "biter_egg_bonus": 0.30000001192092896,
+            "fish_breeding_bonus": 0.20000000298023224,
+            "pentapod_egg_bonus": 0.30000001192092896,
+            "foreign_queue_current": "braking-force-1",
+            "foreign_queue_progress": 0.42000000000000004,
+            "event_mod_startup_settings_changed": true,
+            "negative_carrier_level": 1,
+            "positive_carrier_level": 3
+          }
+        },
+        {
+          "ordinal": 2,
+          "save_sha256": "375948EDBF1CF010EC6280AD2F860E44DAD9257BEC71BA5FF1C52C1653C55D6A",
+          "save_byte_identical": true,
+          "observation": {
+            "case": "legacy-preference-transition",
+            "stage": "reload",
+            "status": "passed",
+            "source_preference": true,
+            "current_preference": false,
+            "actual_lab_completions": 2,
+            "actual_switch_labs": 1,
+            "next_level": 4,
+            "biter_egg_bonus": 0.30000001192092896,
+            "fish_breeding_bonus": 0.20000000298023224,
+            "pentapod_egg_bonus": 0.30000001192092896,
+            "foreign_queue_current": "braking-force-1",
+            "foreign_queue_progress": 0.42000000000000004,
+            "event_mod_startup_settings_changed": true,
+            "negative_carrier_level": 1,
+            "positive_carrier_level": 3
+          }
+        }
+      ],
+      "native_startup_logs": [
+        {
+          "path": "build/qualification/legacy-preference-473-current7a2-r03-controller/native-true-later-switch/production.factorio.log",
+          "bytes": 10418,
+          "sha256": "C9194B5A6E1D7E5755746D5540D147E6CB7CBA277F7B8D5A9284373870A0A53C",
+          "actual_native_startup": "   0.000 2026-10-29 00:52:16; Factorio 2.0.77 (build 84539, win64, full, space-age)"
+        },
+        {
+          "path": "build/qualification/legacy-preference-473-current7a2-r03-controller/native-true-later-switch/reload-1.factorio.log",
+          "bytes": 9222,
+          "sha256": "033E76093E94DCE275D21CF68033188E75D584FB505CEE9C788D1BBBDC5E08B2",
+          "actual_native_startup": "   0.000 2026-10-29 00:52:20; Factorio 2.0.77 (build 84539, win64, full, space-age)"
+        },
+        {
+          "path": "build/qualification/legacy-preference-473-current7a2-r03-controller/native-true-later-switch/reload-2.factorio.log",
+          "bytes": 9222,
+          "sha256": "286AB019D442BA35CFD443DF422286E49DC68DA0F5B13CC5D3E2977471E0E59B",
+          "actual_native_startup": "   0.000 2026-10-29 00:52:23; Factorio 2.0.77 (build 84539, win64, full, space-age)"
+        }
+      ],
+      "actual_native_processes": 3,
+      "actual_new_source_labs": 0,
+      "actual_new_candidate_labs": 1
+    }
+  ],
+  "expected_native_refusals": [
+    {
+      "id": "false-simultaneous-refusal",
+      "result": {
+        "path": "build/qualification/legacy-preference-473-current7a2-r01-controller/native-false-simultaneous-refusal/result.json",
+        "bytes": 9552,
+        "sha256": "7D6F062B3182CE4AF031BD2DC262BB47266AAAD0B5EE8CC135B77281238E467A"
+      },
+      "native_log": {
+        "path": "build/qualification/legacy-preference-473-current7a2-r01-controller/native-false-simultaneous-refusal/write-data/factorio-current.log",
+        "bytes": 10627,
+        "sha256": "95D0B69A9F4DCD050B877ECD724C7036306E7801134799A93D2CEA55C8A613B8"
+      },
+      "protected_source": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\legacy-preference-473-current7a2-r01-controller\\native-false-published\\write-data\\saves\\mir5-native-complete.zip",
+        "sha256": "557D90897EEB493C5DEFE7174E1007FA5D3C05C4A99D59074165773CE979CC7A"
+      },
+      "actual_native_processes": 1,
+      "candidate_save_written": false,
+      "expected_refusal": "MIR cannot safely migrate published 4.7 competing productivity while startup settings changed."
+    },
+    {
+      "id": "true-simultaneous-refusal",
+      "result": {
+        "path": "build/qualification/legacy-preference-473-current7a2-r03-controller/native-true-simultaneous-refusal/result.json",
+        "bytes": 9549,
+        "sha256": "00E2B9E695BF26EA121BBDDA182B5959DD1CF380CBC21DF61BE19A2996215A69"
+      },
+      "native_log": {
+        "path": "build/qualification/legacy-preference-473-current7a2-r03-controller/native-true-simultaneous-refusal/write-data/factorio-current.log",
+        "bytes": 10623,
+        "sha256": "86E052785678DD48879546AB65FC9BDE561FD914D3778FD0E670BAC7AA814801"
+      },
+      "protected_source": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\legacy-preference-473-current7a2-r03-controller\\native-true-published\\write-data\\saves\\mir5-native-complete.zip",
+        "sha256": "2E9F0462DFA4FD829E8DA5B87D7A5590196A0CAB246541EC98005DBB94794739"
+      },
+      "actual_native_processes": 1,
+      "candidate_save_written": false,
+      "expected_refusal": "MIR cannot safely migrate published 4.7 competing productivity while startup settings changed."
+    }
+  ],
+  "actual_passed_native_processes": 20,
+  "actual_expected_refusal_processes": 2,
+  "actual_new_source_lab_completions": 4,
+  "actual_new_candidate_lab_completions": 2,
+  "actual_cold_reloads": 12,
+  "fixture_consumption": {
+    "all_selected_archive_members_match_frozen_raw_git_projections": true,
+    "host_controls_passed": 4,
+    "supported_lab_attribute": {
+      "engine_doc_path": "D:\\Games\\Factorio\\2.0\\doc-html\\runtime-api.json",
+      "sha256": "594B4EC98CC5FBEE322D7380DB49A388AB38B0D69C06F00EAD877CFFBB37F578",
+      "application_version": "2.0.77",
+      "attribute": "LuaEntity.disabled_by_script",
+      "write_type": "boolean"
+    },
+    "note": "Existing direct-library fixture containers predate the committed supported-modern-lab disablement correction62f29ea. Exact payload comparison finds only the three lab.active to lab.disabled_by_script operations in control.lua; current raw Git5-member projections are packaged/pinned separately. All state/effect/frozen assertions remain. Existing archives restore after the job. The first preparation refusal was before any native execution or library mutation."
+  },
+  "preserved_zero_native_callers": [
+    {
+      "terminal": {
+        "path": "build/qualification/legacy-preference-473-current7a2-r01-controller/execution-record/terminal.json",
+        "bytes": 10693,
+        "sha256": "2F0A857D5A71F8B08D7AA64CDA304754F9CD3F273C88A278181EAD55885EEE74"
+      },
+      "cause": "Per-batch archive snapshot name collided before third native launch; all prior results/source557D reused."
+    },
+    {
+      "terminal": {
+        "path": "build/qualification/legacy-preference-473-current7a2-r02-controller/execution-record/terminal.json",
+        "bytes": 2126,
+        "sha256": "10885934C6458D17582AF6C7904447F89AD501C50D9E460F24AE95528660C2F6"
+      },
+      "cause": "Wrong checkout component in output suffix rejected by existing governor before native launch; no wrong directory created. R03 changes only final component and validates bounds."
+    }
+  ],
+  "factorio_processes_after_restoration": 0,
+  "limits": [
+    "The same source is not recreated after a caller failure. False source557D is adopted by R03; two baseline and two switched saves are independently protected as well.",
+    "Source lab counts of2 are carried through baseline/switch/reloads and counted once per original. Only the separate switch counter1 is new MIR5 research.",
+    "Expected guard refusals retain raw status failed and exact native logs; they are successful safety checks, not gameplay/save passes. No successor save is written on refusal.",
+    "The old4.7.20002 campaigns and their source/candidate identities remain separate. This qualifies actual4.7.20003 only for the tested Space Age/four-provider closure and explicit preference transition.",
+    "All six saved stages have exact-byte cold-reload checks; read-only callback assertions are in the frozen fixture, not an invented marker field. Full ordinary catalogue/scripted/physical/client and performance acceptance remain independent."
+  ]
+}

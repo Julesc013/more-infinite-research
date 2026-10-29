@@ -1,0 +1,33 @@
+{
+  "schema": 1,
+  "kind": "MIR5NativeContinuityAdverseChainV1",
+  "run": {
+    "id": 39998659582,
+    "url": "https://github.com/Julesc013/mir-native-worker/actions/runs/39998659582",
+    "conclusion": "failure"
+  },
+  "source": "f6d106345fc37f1cf4cafc2aeae92bdc6dc0027b",
+  "player": {
+    "path": "D:\\Projects\\Factorio\\testmods\\2.0\\more-infinite-research_4.7.20002.zip",
+    "sha256": "F3943EB4D69CCDAC41BD9F922AD03A5C78F34F22D8E7FA5A88A7A658AB1010B7"
+  },
+  "receipt": {
+    "gzip": "spec/mir5/evidence/f200-legacy-cap-initial-visibility-adverse-native.json.gz",
+    "uncompressed_sha256": "4142318D99AEA73DC0DDEA512338627BFE30BE2670F8969F7A1EC490401967E5"
+  },
+  "logs": [
+    {
+      "gzip": "spec/mir5/evidence/f200-legacy-cap-initial-visibility-adverse-create.log.gz",
+      "uncompressed_sha256": "787B48D0094EE0782919D9A694E9DDC403F6D3B7CA34FBB868617F18EAC03577"
+    }
+  ],
+  "custody": "C:/Projects/Factorio/more-infinite-research/build/mir5/black-glass/incoming/39998659582/black-glass-f200-legacy-caps-39998659582-1",
+  "manifest_members_verified": 29,
+  "diagnosis": [
+    "Published MIR4.7.20002 sets visible_when_disabled=true during its own on_init as soon as a positive cap is active, before the dependent fixture initializes.",
+    "The fixture incorrectly expected false before labs; it failed during world creation. No predecessor save or MIR5 upgrade pass exists from this run.",
+    "The corrected source requires that observed initial true state and the independent immutable prototype's false default, never writes player presentation, and still requires actual cap disablement after two labs.",
+    "The successor still must restore enabled=true and visible_when_disabled=false, preserve earned bonuses/partial work/foreign state and finish one further actual lab."
+  ],
+  "release_qualification": false
+}

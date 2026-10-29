@@ -1,0 +1,32 @@
+{
+  "schema": 1,
+  "kind": "MIR5ProductTargetLoadOrderAdverseV1",
+  "status": "four-default-profiles-pass-k2so-load-order-defect-found",
+  "source_commit": "7a2cc5fe94b777476439ac2319e24f749d84fd82",
+  "player_sha256": "5DFCA9BF90D07CA33746B35292D00B48F7C867353C77276F3BEB8081B067C8D4",
+  "passed_profiles": [
+    "base-f200",
+    "space-age-f200",
+    "base-f210",
+    "space-age-f210"
+  ],
+  "failed_profile": "k2so-f210",
+  "unexpected_effect": {
+    "technology": "recipe-prod-research_bullets-1",
+    "recipe": "uranium-rounds-magazine",
+    "change": 0.02
+  },
+  "cause": "Private MIR5 metadata omitted published optional dependencies. Collection ran before Krastorio2-spaced-out final-fixes/enforce-rifle-ammo.lua replaced the typed output with kr-uranium-rifle-magazine.",
+  "correction": "Restore actual published target-specific optional dependency ordering, including K2SO, in source and composed metadata. Do not suppress the comparison or widen expected output.",
+  "records": [
+    {
+      "path": "spec/mir5/evidence/product-targets-k2so-load-order-adverse-native.json",
+      "sha256": "FF5D17904371BD0BE2122F33758A3FDF582F1007BAED4A0019ACE0EDFDF0B5C1"
+    },
+    {
+      "path": "spec/mir5/evidence/product-targets-k2so-load-order-adverse-comparison.json",
+      "sha256": "2482521CEF75CCBFDF10ACA58F4A40705C39CEC986AD008D9DAE9B787DED8EEE"
+    }
+  ],
+  "release_qualification": false
+}

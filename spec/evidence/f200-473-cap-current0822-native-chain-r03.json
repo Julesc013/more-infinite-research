@@ -1,0 +1,74 @@
+{
+  "schema": 1,
+  "kind": "MIRF200473CapCurrent0822NativeChainV1",
+  "status": "passed-exact-F200473-positive-cap-route",
+  "scope": "Original4.7.20003/0.4 source81AF to corrected0822 F200 on2.0.77/D3,using explicit0.8 fixture. Real newlab/save/two independent unchanged-byte cold reloads. Historical0.2/4.7.2 protocol remains unchanged; R02 mismatch remains adverse.",
+  "controller_commit": "17d6a5413bd86cb7ab6ded23356f7187174814cf",
+  "artifact_source_commit": "376eed796c5d1e8e7519c65cd3934710fda54b8c",
+  "player_tree": "9461d8608eb77a230fbb313080be93c32ea05336",
+  "engine": {
+    "path": "D:\\Games\\Factorio\\2.0\\bin\\x64\\factorio.exe",
+    "sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B",
+    "file_version": "2.0.77.84539",
+    "product_version": "2.0.77",
+    "base_version": "2.0.77"
+  },
+  "candidate_sha256": "0822F3A3F94492A58DD876AD67C1B450833DF761A519899E59580BFA610D90A2",
+  "fixture_sha256": "D4ECB11D0DC3AB8422B58115C104754592B14188D4FB331C42B492EC94FC5342",
+  "profile_sha256": "D7C798634CBD69A592074BA6A20FB2D1A659A79763895F697DD97DA44B3172D5",
+  "source": {
+    "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\cap-473-current7a2-r02-controller\\native-published\\write-data\\saves\\mir5-native-complete.zip",
+    "sha256": "81AFD312CB2391C7B0CF92C82CD022F93751E9E3FC99D181795078FC9651E4F9"
+  },
+  "initial_witnesses": {
+    "source_mir": "4.7.20003",
+    "destination_mir": "5.0.20000",
+    "source_actual_lab_completions": 2,
+    "destination_actual_lab_completions": 1,
+    "milestone": "actual2labs",
+    "next_level": 4,
+    "productivity_bonus": 0.029999999329447746,
+    "player_enabled": true,
+    "player_visible_when_disabled": true,
+    "foreign_queue_progress": 0.42000000000000004,
+    "science_consumed_units": 0.7333333333333333,
+    "science_inventory_consumed_units": 0.7333333333333333,
+    "science_type": "tool",
+    "science_remaining_ticks": 44,
+    "science_processing_ticks": 44,
+    "science_elapsed_ticks": 43,
+    "science_units_after": {
+      "automation-science-pack": 21.266666666666666,
+      "logistic-science-pack": 21.266666666666666,
+      "chemical-science-pack": 21.266666666666666,
+      "production-science-pack": 21.266666666666666
+    },
+    "on_load_read_only": false
+  },
+  "completed_save": {
+    "sha256": "A3CCF5173DFF3075BE9CB51ABE8273722969AD8383CC9304E9D9FD14E4AE5844",
+    "bytes": 933371
+  },
+  "packet_sha256": "C554D2EC6590798DFCF7B82D429EEE9E391698AAD6E1E81FF228C12C7B56400F",
+  "caller_sha256": "E4FFF00AF23B2840AE4C5D69598298D2C79C9F11CF9D70DD2F1F98CEB9F1FFAB",
+  "result_sha256": "98DA7538DE714D037A58FE4B6F9A8629CECC68B2E67B6416DF585C1A5D2C265D",
+  "root_readback": {
+    "path": "build/qualification/f200-473-cap-current0822-native-r03-controller/root-readback-r01.json",
+    "sha256": "CE9E0C70ECC33CC85B478EA6D3DDF354D37AA3B3B20E6EF2D0AEB87F81392236",
+    "files": 18,
+    "bytes_per_copy": 1037439
+  },
+  "lossless_receipts": {
+    "path": "spec/evidence/f200-473-cap-current0822-native-receipts-r03.json.gz",
+    "sha256": "4D47155D386B13B381CAD159BA20A7C760868191CDA9593025C41BC3655FF1C7",
+    "bytes": 14342,
+    "records": 3
+  },
+  "counts": {
+    "new_native_processes": 3,
+    "new_actual_labs": 1,
+    "new_cold_reloads": 2,
+    "source_actual_labs_reused_once": 2
+  },
+  "limits": "Original frozen assertions retain foreign-disabled native state and42-percent queue,source27-percent work,earned levels/effects and tool science. This closes only namedF200473 cap route,not earlierV3,label collision,worker,adjacent enabled finitecap,other mods,DLC,clients,performance or final release. PriorR02 input mismatch and F210R01 fixture failure are preserved under original identities."
+}

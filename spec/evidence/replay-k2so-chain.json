@@ -1,0 +1,53 @@
+{
+  "schema": 1,
+  "kind": "authored-private-large-profile-replay-custody-index-not-runner-receipt",
+  "release_qualification": false,
+  "published_source_commit": "84bd157ad7b63b7d171fac2311bf30de70429c11",
+  "published_archive_sha256": "708A529F1F6D649E0A732216CD8D8FEFE68F2C6C2DF2B40DA030C2C4C51558D1",
+  "private_composed_archive": {
+    "path": "build/mir5/replay-k2so-r01/composed-r01/more-infinite-research_4.7.21000.zip",
+    "sha256": "F22A88080A38FDD7738CC74A0FDC5EB6DD3FB48796E7D8AA54CA3C94D21C651C",
+    "bytes": 1531096
+  },
+  "comparison": {
+    "data_additions": 83,
+    "data_patches": 3,
+    "settings_additions": 889,
+    "settings_patches": 0,
+    "unfiltered_prototype_types": true,
+    "whole_prototype_deletions": 0
+  },
+  "records": [
+    {
+      "path": "spec/mir5/evidence/k2so-no-mir-native.json",
+      "sha256": "A19BF235D2A9FCD49C7C4F9AAE6E641050ACEA872E77ED274179C8C84324379B"
+    },
+    {
+      "path": "spec/mir5/evidence/k2so-published-native.json",
+      "sha256": "7B636E4CA5BFEEA14D00A11F31E647A5924637DD783797599C4A811C42570A10"
+    },
+    {
+      "path": "spec/mir5/evidence/k2so-replay-native.json",
+      "sha256": "7FFC7B01C1CA0718DAE490D7A92C48084D136A6CC6F57E70DFA3E5F0962BA719"
+    },
+    {
+      "path": "spec/mir5/evidence/replay-k2so-output-comparison.json",
+      "sha256": "6D64D953CE6A730661A8F839AAB3ED64AA59B47FAC39686132FB359AF70397CD"
+    },
+    {
+      "path": "build/mir5/replay-k2so-r01/comparison-receipt.json",
+      "sha256": "E234C19CB01332113527A5581FCEDE8FB5AF38CABCC594C9407740CC5CFC7230"
+    },
+    {
+      "path": "build/mir5/replay-k2so-r01/composed-r01/composition-receipt.json",
+      "sha256": "567F2F7F90745238BB8FE318F5ACCD56A84F4487F790904E874F8C0F02D09072"
+    }
+  ],
+  "observed": "The complete native data and settings output equals the published K2SO capture, preserving array order and JSON value types. Each native process exited naturally with code zero. Direct-library controls and the exact published archive were restored.",
+  "limitations": [
+    "Data-stage dumps are not responsive-menu startup, gameplay, save, runtime or release qualification.",
+    "These single start-to-exit observations do not establish spread, uncertainty, an improvement percentage, or PERF-04 acceptance.",
+    "The same-name/version replay is a profile-specific private diagnostic, not a player package.",
+    "The real replacement is still an incomplete slice; no complete product comparison is claimed."
+  ]
+}

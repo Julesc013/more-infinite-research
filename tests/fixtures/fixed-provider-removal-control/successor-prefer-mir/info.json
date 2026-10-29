@@ -1,0 +1,17 @@
+{
+  "name": "mir-fixture-mir5-fixed-provider-removal-control",
+  "author": "MIR maintainers",
+  "factorio_version": "2.0",
+  "version": "0.2.0",
+  "title": "MIR5 preferred fixed-provider removal control",
+  "description": "Private F200 Space Age successor that earns fully covered and partial MIR rows.",
+  "dependencies": [
+    "base >= 2.0.77",
+    "space-age = 2.0.77",
+    "more-infinite-research = 5.0.20000",
+    "plates-n-circuit-productivity = 0.0.2",
+    "Science_packs_productivity = 0.0.1",
+    "bioflux-productivity = 0.1.0",
+    "fish-productivity = 1.0.0"
+  ]
+}

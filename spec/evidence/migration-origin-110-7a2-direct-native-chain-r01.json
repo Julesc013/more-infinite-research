@@ -1,0 +1,572 @@
+{
+  "schema": 1,
+  "kind": "MIR5Origin110CurrentDirectNativeChainV1",
+  "status": "passed-current-7a2-default-f210-f200-and-disabled-module-f210-direct-successors",
+  "scope": "Protected original MIR1.1 F200 save directly to current005D/65FC Base. Three exact cases preserve31 source rows, module/native battery credits and three-force state through one new native gear lab, effect reset, save and two read-only cold reloads per case. No player changes.",
+  "source_chain": {
+    "path": "spec/evidence/migration-origin-110-f200-source-native-chain-r05.json",
+    "sha256": "CE2D69921C3792238AD369DE7576376C4778542C5C89AAA4708A10FC789974D8"
+  },
+  "fixture_correction": {
+    "path": "spec/evidence/migration-origin-110-enabled-preflight-correction-r01.json",
+    "sha256": "718BB44C428204245DC5547A356A702D417E0FC80045A4C4C38281A9A7448590"
+  },
+  "protected_source": {
+    "path": "build/qualification/migration-origins/migration-origin-110-f200-source-r05/native-output/write-data/saves/mir5-native-complete.zip",
+    "bytes": 793858,
+    "sha256": "88FC8E9891040275E001930C3E6AA0A4A7A28C31D81DF30E3F08AEDD98E5019A"
+  },
+  "source_actual_lab_completions_counted_once": 1,
+  "candidate_source": "7a2f93224c846b86261b2da709f50ea683fc708d",
+  "player_tree": "5058373348e9049f8b67ec4dbb79b400a904acd6",
+  "controller_commit": "537de33d6060af8046763da8b543399fd67efc82",
+  "host_controls": {
+    "command": "python -B tests/test_migration_origins_f200_110_successor_controls.py --lua-runtime-dir D:/Projects/Factorio/more-infinite-research/build/tmp/mir421-lua-runtime",
+    "passed": 20,
+    "seconds": 0.121,
+    "scope": "host-only no native result"
+  },
+  "assertion_source": {
+    "path": "tests/fixtures/migration-origins/f200-110-successor/control.lua",
+    "sha256": "B1B947F887C90C4FF03CBA52A8A8C4E87700B5626CDB1D5B344461AA296FE3F7",
+    "scope": "Frozen assert_source_before checks all31 rows/effects, allthree forces, public module enablement and private recipe credit holders, queues and detached work before/after lab/effect reset and on each read-only cold load. Holder snapshots are not separately serialized by result markers."
+  },
+  "readback": {
+    "path": "build/qualification/migration-origin-110-current-7a2-r03-controller/root-readback-r01.json",
+    "bytes": 13952,
+    "sha256": "8949F1169201C1BB78F18428149F3E043506B4E7AB81E0318A74CB7B62248F3F",
+    "files": 70,
+    "bytes_per_copy": 2867704
+  },
+  "receipt_capsule": {
+    "path": "spec/evidence/migration-origin-110-7a2-direct-native-receipts-r01.json.gz",
+    "bytes": 29839,
+    "sha256": "BBAE7409E2CCE86E0379A016659F8EF6678C31358535516453B8E3343B0B76A4",
+    "records": 7,
+    "uncompressed_bytes": 191003,
+    "all_original_exact_bytes_round_trip": true
+  },
+  "direct_successors": [
+    {
+      "scenario": "migration-origin-1.1.0-f210_source_defaults-successor",
+      "target": "f210",
+      "result": {
+        "path": "build/qualification/migration-origin-110-current-7a2-r03-controller/native-f210/result.json",
+        "bytes": 35058,
+        "sha256": "BDD7E404E4C822481ADF41749681287DE0E79F28E6BD622A2F68CF12DDD7CD31"
+      },
+      "engine": {
+        "path": "D:\\Games\\Factorio\\2.1\\bin\\x64\\factorio.exe",
+        "sha256": "8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38",
+        "file_version": "2.1.23.87750",
+        "product_version": "2.1.23",
+        "base_version": "2.1.23"
+      },
+      "profile": {
+        "sha256": "09917C294C045DD6A86C08107EE385AC05BD7F0DAC5717A717400DF7F5C53F29",
+        "path": "D:\\Projects\\Factorio\\mir5-legacy-cannon-credit-r01\\build\\qualification\\migration-origin-110-current-7a2-r03-inputs\\f210\\profile.json"
+      },
+      "fixtures": [
+        {
+          "sha256": "79DC5E7C8C66DF08415ABF16E41122B0613103C96C1E1A735BE6DB9C78CA109A",
+          "source": "D:\\Projects\\Factorio\\mir5-legacy-cannon-credit-r01\\build\\qualification\\migration-origin-110-current-7a2-r03-inputs\\f210\\successor",
+          "archive": "D:\\Projects\\Factorio\\testmods\\2.1\\mir-fixture-mir5-migration-origin-f200-110-source_0.4.0.zip"
+        },
+        {
+          "sha256": "A15A7D628D66953D2E0C4D4FA288F47CBF9C5678327C7EB3D23ADB5DC78331C0",
+          "source": "D:\\Projects\\Factorio\\mir5-legacy-cannon-credit-r01\\build\\qualification\\migration-origin-110-current-7a2-r03-inputs\\f210\\observer",
+          "archive": "D:\\Projects\\Factorio\\testmods\\2.1\\mir-fixture-mir5-active-mods-observer_0.1.0.zip"
+        }
+      ],
+      "fixture_archive": {
+        "path": "build/qualification/migration-origin-110-current-7a2-r03-controller/mir-fixture-mir5-migration-origin-f200-110-source_0.4.0.zip",
+        "bytes": 11233,
+        "sha256": "79DC5E7C8C66DF08415ABF16E41122B0613103C96C1E1A735BE6DB9C78CA109A"
+      },
+      "candidate_sha256": "005D420671270306155CB4AC25E9CF77541202DFA16B206DCC016237619C9AA2",
+      "packet": {
+        "path": "build/qualification/migration-origin-110-current-7a2-r03-controller/packet.json",
+        "bytes": 8871,
+        "sha256": "DC220A6578CCD8732CE9133989975803BF4F04282C198ED7A2F769C7809BA5DA"
+      },
+      "caller": {
+        "path": "build/qualification/migration-origin-110-current-7a2-r03-controller/Invoke-OwnedOrigin110Pair.ps1",
+        "bytes": 4819,
+        "sha256": "EC23C1AFA32C4F890023AC9A18FC9173FE9E453595DDA9BBA81E9B5B30D0B238"
+      },
+      "terminal": {
+        "path": "build/qualification/migration-origin-110-current-7a2-r03-controller/execution-record/terminal.json",
+        "bytes": 9559,
+        "sha256": "EFB5419CB8CBEC714127439E519138B357A587FA1BF408156B5D697C8DD36024"
+      },
+      "initial_observation": {
+        "case": "migration-origin-1.1.0-f210_source_defaults-successor",
+        "stage": "initial",
+        "status": "passed",
+        "source_origin": "1.1.0",
+        "source_rows": 31,
+        "source_actual_labs": 1,
+        "candidate_actual_labs": 1,
+        "source_direct_level": 2,
+        "candidate_direct_level": 3,
+        "source_gear_bonus": 0.10000000149012,
+        "candidate_gear_bonus": 0.2,
+        "source_robot_battery": 0.1,
+        "candidate_robot_battery": 0.1,
+        "foreign_queue_progress": 0.42,
+        "detached_progress": 0.27,
+        "manual_mining_baseline": 0,
+        "on_load_read_only": false
+      },
+      "native_startup_logs": [
+        {
+          "path": "build/qualification/migration-origin-110-current-7a2-r03-controller/native-f210/production.factorio.log",
+          "bytes": 15571,
+          "sha256": "051D1A8BAA94BB3077236E990496DAA883807B8090D54686A9498B6AB643E7D4",
+          "actual_native_startup": "   0.000 2026-10-29 00:09:25; Factorio 2.1.23 (build 87750, win64, full, space-age)"
+        },
+        {
+          "path": "build/qualification/migration-origin-110-current-7a2-r03-controller/native-f210/reload-1.factorio.log",
+          "bytes": 12881,
+          "sha256": "A3FDFD1376D61E1BF6A196C6E75966E926538E1580C0149FE2CC08C7AB578788",
+          "actual_native_startup": "   0.000 2026-10-29 00:09:28; Factorio 2.1.23 (build 87750, win64, full, space-age)"
+        },
+        {
+          "path": "build/qualification/migration-origin-110-current-7a2-r03-controller/native-f210/reload-2.factorio.log",
+          "bytes": 12881,
+          "sha256": "02CF9B3E7209EE8515823DC84D007A52A11679D02612E4FC751440C1122CDD0C",
+          "actual_native_startup": "   0.000 2026-10-29 00:09:30; Factorio 2.1.23 (build 87750, win64, full, space-age)"
+        }
+      ],
+      "completed_save": {
+        "path": "build/qualification/migration-origin-110-current-7a2-r03-controller/native-f210/write-data/saves/mir5-native-complete.zip",
+        "bytes": 814068,
+        "sha256": "8DCFC16FF929766D2E5CFEC4F7BC81367A9632CEB4B39558E40330FA43BD7F0C"
+      },
+      "reloads": [
+        {
+          "ordinal": 1,
+          "save_byte_identical": true,
+          "save_sha256": "8DCFC16FF929766D2E5CFEC4F7BC81367A9632CEB4B39558E40330FA43BD7F0C",
+          "observation": {
+            "case": "migration-origin-1.1.0-f210_source_defaults-successor",
+            "stage": "reload",
+            "status": "passed",
+            "source_origin": "1.1.0",
+            "source_rows": 31,
+            "source_actual_labs": 1,
+            "candidate_actual_labs": 1,
+            "source_direct_level": 2,
+            "candidate_direct_level": 3,
+            "source_gear_bonus": 0.10000000149012,
+            "candidate_gear_bonus": 0.2,
+            "source_robot_battery": 0.1,
+            "candidate_robot_battery": 0.1,
+            "foreign_queue_progress": 0.42,
+            "detached_progress": 0.27,
+            "manual_mining_baseline": 0,
+            "on_load_read_only": true
+          }
+        },
+        {
+          "ordinal": 2,
+          "save_byte_identical": true,
+          "save_sha256": "8DCFC16FF929766D2E5CFEC4F7BC81367A9632CEB4B39558E40330FA43BD7F0C",
+          "observation": {
+            "case": "migration-origin-1.1.0-f210_source_defaults-successor",
+            "stage": "reload",
+            "status": "passed",
+            "source_origin": "1.1.0",
+            "source_rows": 31,
+            "source_actual_labs": 1,
+            "candidate_actual_labs": 1,
+            "source_direct_level": 2,
+            "candidate_direct_level": 3,
+            "source_gear_bonus": 0.10000000149012,
+            "candidate_gear_bonus": 0.2,
+            "source_robot_battery": 0.1,
+            "candidate_robot_battery": 0.1,
+            "foreign_queue_progress": 0.42,
+            "detached_progress": 0.27,
+            "manual_mining_baseline": 0,
+            "on_load_read_only": true
+          }
+        }
+      ],
+      "new_candidate_actual_labs": 1,
+      "actual_native_processes": 3
+    },
+    {
+      "scenario": "migration-origin-1.1.0-f200_source_defaults-successor",
+      "target": "f200",
+      "result": {
+        "path": "build/qualification/migration-origin-110-current-7a2-r03-controller/native-f200/result.json",
+        "bytes": 35107,
+        "sha256": "B6BCD00ED7092BE2B67D23C52926DB9D2052958E874D77EFCCD13243B129E793"
+      },
+      "engine": {
+        "path": "D:\\Games\\Factorio\\2.0\\bin\\x64\\factorio.exe",
+        "sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B",
+        "file_version": "2.0.77.84539",
+        "product_version": "2.0.77",
+        "base_version": "2.0.77"
+      },
+      "profile": {
+        "sha256": "16ACE9065C709EEBD63305ABF63508C595F1DCFB561953821D49C5C308A5068C",
+        "path": "D:\\Projects\\Factorio\\mir5-legacy-cannon-credit-r01\\build\\qualification\\migration-origin-110-current-7a2-r03-inputs\\f200\\profile.json"
+      },
+      "fixtures": [
+        {
+          "sha256": "EB1AD800C1590C6822A7249F927ABB1D713B9D0CD7103098C056E8989666E419",
+          "source": "D:\\Projects\\Factorio\\mir5-legacy-cannon-credit-r01\\build\\qualification\\migration-origin-110-current-7a2-r03-inputs\\f200\\successor",
+          "archive": "D:\\Projects\\Factorio\\testmods\\2.0\\mir-fixture-mir5-migration-origin-f200-110-source_0.3.0.zip"
+        },
+        {
+          "sha256": "723D1E7721449FC26040E5E6629416767BDC20AD79CF8723115846DB662A1F87",
+          "source": "D:\\Projects\\Factorio\\mir5-legacy-cannon-credit-r01\\build\\qualification\\migration-origin-110-current-7a2-r03-inputs\\f200\\observer",
+          "archive": "D:\\Projects\\Factorio\\testmods\\2.0\\mir-fixture-mir5-active-mods-observer_0.1.0.zip"
+        }
+      ],
+      "fixture_archive": {
+        "path": "build/qualification/migration-origin-110-current-7a2-r03-controller/mir-fixture-mir5-migration-origin-f200-110-source_0.3.0.zip",
+        "bytes": 11226,
+        "sha256": "EB1AD800C1590C6822A7249F927ABB1D713B9D0CD7103098C056E8989666E419"
+      },
+      "candidate_sha256": "65FC7E907FE3198B7290167989FE2564C1474190D06DAD49860063BEC418EC60",
+      "packet": {
+        "path": "build/qualification/migration-origin-110-current-7a2-r03-controller/packet.json",
+        "bytes": 8871,
+        "sha256": "DC220A6578CCD8732CE9133989975803BF4F04282C198ED7A2F769C7809BA5DA"
+      },
+      "caller": {
+        "path": "build/qualification/migration-origin-110-current-7a2-r03-controller/Invoke-OwnedOrigin110Pair.ps1",
+        "bytes": 4819,
+        "sha256": "EC23C1AFA32C4F890023AC9A18FC9173FE9E453595DDA9BBA81E9B5B30D0B238"
+      },
+      "terminal": {
+        "path": "build/qualification/migration-origin-110-current-7a2-r03-controller/execution-record/terminal.json",
+        "bytes": 9559,
+        "sha256": "EFB5419CB8CBEC714127439E519138B357A587FA1BF408156B5D697C8DD36024"
+      },
+      "initial_observation": {
+        "case": "migration-origin-1.1.0-f200_source_defaults-successor",
+        "stage": "initial",
+        "status": "passed",
+        "source_origin": "1.1.0",
+        "source_rows": 31,
+        "source_actual_labs": 1,
+        "candidate_actual_labs": 1,
+        "source_direct_level": 2,
+        "candidate_direct_level": 3,
+        "source_gear_bonus": 0.10000000149012,
+        "candidate_gear_bonus": 0.20000000298023,
+        "source_robot_battery": 0.1,
+        "candidate_robot_battery": 0.1,
+        "foreign_queue_progress": 0.42,
+        "detached_progress": 0.27,
+        "manual_mining_baseline": 0,
+        "on_load_read_only": false
+      },
+      "native_startup_logs": [
+        {
+          "path": "build/qualification/migration-origin-110-current-7a2-r03-controller/native-f200/production.factorio.log",
+          "bytes": 11149,
+          "sha256": "6269F5262D43C8874625A635F6BE0E58048F8578EDD134D7D2A37A716B33B344",
+          "actual_native_startup": "   0.000 2026-10-29 00:09:36; Factorio 2.0.77 (build 84539, win64, full, space-age)"
+        },
+        {
+          "path": "build/qualification/migration-origin-110-current-7a2-r03-controller/native-f200/reload-1.factorio.log",
+          "bytes": 8533,
+          "sha256": "A1A6A9DB54608DA8F28402DC14A9D7D2D66F8EEDD3BCD76AA77208644B048011",
+          "actual_native_startup": "   0.000 2026-10-29 00:09:39; Factorio 2.0.77 (build 84539, win64, full, space-age)"
+        },
+        {
+          "path": "build/qualification/migration-origin-110-current-7a2-r03-controller/native-f200/reload-2.factorio.log",
+          "bytes": 8533,
+          "sha256": "7D409CD60F2592BB02DAA94AFF9711A031FE47BB8A153CFE96F936D6006F4A1F",
+          "actual_native_startup": "   0.000 2026-10-29 00:09:42; Factorio 2.0.77 (build 84539, win64, full, space-age)"
+        }
+      ],
+      "completed_save": {
+        "path": "build/qualification/migration-origin-110-current-7a2-r03-controller/native-f200/write-data/saves/mir5-native-complete.zip",
+        "bytes": 811812,
+        "sha256": "029AA881F739457047B1E8318FA9A77508B28112757176B64CD0C3C31530638C"
+      },
+      "reloads": [
+        {
+          "ordinal": 1,
+          "save_byte_identical": true,
+          "save_sha256": "029AA881F739457047B1E8318FA9A77508B28112757176B64CD0C3C31530638C",
+          "observation": {
+            "case": "migration-origin-1.1.0-f200_source_defaults-successor",
+            "stage": "reload",
+            "status": "passed",
+            "source_origin": "1.1.0",
+            "source_rows": 31,
+            "source_actual_labs": 1,
+            "candidate_actual_labs": 1,
+            "source_direct_level": 2,
+            "candidate_direct_level": 3,
+            "source_gear_bonus": 0.10000000149012,
+            "candidate_gear_bonus": 0.20000000298023,
+            "source_robot_battery": 0.1,
+            "candidate_robot_battery": 0.1,
+            "foreign_queue_progress": 0.42,
+            "detached_progress": 0.27,
+            "manual_mining_baseline": 0,
+            "on_load_read_only": true
+          }
+        },
+        {
+          "ordinal": 2,
+          "save_byte_identical": true,
+          "save_sha256": "029AA881F739457047B1E8318FA9A77508B28112757176B64CD0C3C31530638C",
+          "observation": {
+            "case": "migration-origin-1.1.0-f200_source_defaults-successor",
+            "stage": "reload",
+            "status": "passed",
+            "source_origin": "1.1.0",
+            "source_rows": 31,
+            "source_actual_labs": 1,
+            "candidate_actual_labs": 1,
+            "source_direct_level": 2,
+            "candidate_direct_level": 3,
+            "source_gear_bonus": 0.10000000149012,
+            "candidate_gear_bonus": 0.20000000298023,
+            "source_robot_battery": 0.1,
+            "candidate_robot_battery": 0.1,
+            "foreign_queue_progress": 0.42,
+            "detached_progress": 0.27,
+            "manual_mining_baseline": 0,
+            "on_load_read_only": true
+          }
+        }
+      ],
+      "new_candidate_actual_labs": 1,
+      "actual_native_processes": 3
+    },
+    {
+      "scenario": "migration-origin-1.1.0-f210_source_defaults_modules_disabled-successor",
+      "target": "f210",
+      "result": {
+        "path": "build/qualification/migration-origin-110-current-disabled-7a2-r01-controller/native-f210/result.json",
+        "bytes": 35234,
+        "sha256": "DEC4F0FE5CE0F594952DEA433FE8523DBFEA3F856FC8FCA6E54F1A9F1E9331CA"
+      },
+      "engine": {
+        "path": "D:\\Games\\Factorio\\2.1\\bin\\x64\\factorio.exe",
+        "sha256": "8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38",
+        "file_version": "2.1.23.87750",
+        "product_version": "2.1.23",
+        "base_version": "2.1.23"
+      },
+      "profile": {
+        "path": "D:\\Projects\\Factorio\\mir5-legacy-cannon-credit-r01\\build\\qualification\\migration-origin-110-current-disabled-7a2-r01-inputs\\profile.json",
+        "sha256": "EB7F7F3E2DDE14B6F39C4D7A07BCA55806EB6A4DFB3D4C93D6B0F2A97C6390D6"
+      },
+      "fixtures": [
+        {
+          "source": "D:\\Projects\\Factorio\\mir5-legacy-cannon-credit-r01\\build\\qualification\\migration-origin-110-current-disabled-7a2-r01-inputs\\successor",
+          "sha256": "17CF5885C145F4F27D38EF641E6812965236958CF2FFEF7D7803020F3E9209A0",
+          "archive": "D:\\Projects\\Factorio\\testmods\\2.1\\mir-fixture-mir5-migration-origin-f200-110-source_0.5.0.zip"
+        },
+        {
+          "source": "D:\\Projects\\Factorio\\mir5-legacy-cannon-credit-r01\\build\\qualification\\migration-origin-110-current-disabled-7a2-r01-inputs\\observer",
+          "sha256": "A15A7D628D66953D2E0C4D4FA288F47CBF9C5678327C7EB3D23ADB5DC78331C0",
+          "archive": "D:\\Projects\\Factorio\\testmods\\2.1\\mir-fixture-mir5-active-mods-observer_0.1.0.zip"
+        }
+      ],
+      "fixture_archive": {
+        "path": "build/qualification/migration-origin-110-current-disabled-7a2-r01-controller/mir-fixture-mir5-migration-origin-f200-110-source_0.5.0.zip",
+        "bytes": 11243,
+        "sha256": "17CF5885C145F4F27D38EF641E6812965236958CF2FFEF7D7803020F3E9209A0"
+      },
+      "candidate_sha256": "005D420671270306155CB4AC25E9CF77541202DFA16B206DCC016237619C9AA2",
+      "packet": {
+        "path": "build/qualification/migration-origin-110-current-disabled-7a2-r01-controller/packet.json",
+        "bytes": 5431,
+        "sha256": "C1583A43097C3A60879A7C1C04DAE8A500DF42E5A0F3E2BF46729D7BB7B5AD05"
+      },
+      "caller": {
+        "path": "build/qualification/migration-origin-110-current-disabled-7a2-r01-controller/Invoke-OwnedOrigin110Pair.ps1",
+        "bytes": 4819,
+        "sha256": "8D16CFDE516C9405B5358FBBB86E560593C9DD3752D109DF4AD9593706882145"
+      },
+      "terminal": {
+        "path": "build/qualification/migration-origin-110-current-disabled-7a2-r01-controller/execution-record/terminal.json",
+        "bytes": 4992,
+        "sha256": "0D8BD92D750EEC6BB86F5F1EAB3236EB020EAC0E1098E43225111A15E88D2B28"
+      },
+      "initial_observation": {
+        "case": "migration-origin-1.1.0-f210_source_defaults_modules_disabled-successor",
+        "stage": "initial",
+        "status": "passed",
+        "source_origin": "1.1.0",
+        "source_rows": 31,
+        "source_actual_labs": 1,
+        "candidate_actual_labs": 1,
+        "source_direct_level": 2,
+        "candidate_direct_level": 3,
+        "source_gear_bonus": 0.10000000149012,
+        "candidate_gear_bonus": 0.2,
+        "source_robot_battery": 0.1,
+        "candidate_robot_battery": 0.1,
+        "foreign_queue_progress": 0.42,
+        "detached_progress": 0.27,
+        "manual_mining_baseline": 0,
+        "on_load_read_only": false
+      },
+      "native_startup_logs": [
+        {
+          "path": "build/qualification/migration-origin-110-current-disabled-7a2-r01-controller/native-f210/production.factorio.log",
+          "bytes": 15608,
+          "sha256": "527A38D862483D9004CF007B68CAF8898E06E83D9ED68D843AD759DAAE3A16E4",
+          "actual_native_startup": "   0.000 2026-10-29 00:14:05; Factorio 2.1.23 (build 87750, win64, full, space-age)"
+        },
+        {
+          "path": "build/qualification/migration-origin-110-current-disabled-7a2-r01-controller/native-f210/reload-1.factorio.log",
+          "bytes": 12918,
+          "sha256": "4F5013510E2D7AB363D74DE84EDE8E90695B6E449FAA9348F07B8383C41D18F4",
+          "actual_native_startup": "   0.000 2026-10-29 00:14:09; Factorio 2.1.23 (build 87750, win64, full, space-age)"
+        },
+        {
+          "path": "build/qualification/migration-origin-110-current-disabled-7a2-r01-controller/native-f210/reload-2.factorio.log",
+          "bytes": 12918,
+          "sha256": "40E7B1A6FE0A83586C8C10CDF557ADCB7455003924E99F50A1AA63E1E6F906CF",
+          "actual_native_startup": "   0.000 2026-10-29 00:14:11; Factorio 2.1.23 (build 87750, win64, full, space-age)"
+        }
+      ],
+      "completed_save": {
+        "path": "build/qualification/migration-origin-110-current-disabled-7a2-r01-controller/native-f210/write-data/saves/mir5-native-complete.zip",
+        "bytes": 814189,
+        "sha256": "179AF0FAF0941204D1E4320777015BA2794AFC4A18BB745C437515226083C48F"
+      },
+      "reloads": [
+        {
+          "ordinal": 1,
+          "save_byte_identical": true,
+          "save_sha256": "179AF0FAF0941204D1E4320777015BA2794AFC4A18BB745C437515226083C48F",
+          "observation": {
+            "case": "migration-origin-1.1.0-f210_source_defaults_modules_disabled-successor",
+            "stage": "reload",
+            "status": "passed",
+            "source_origin": "1.1.0",
+            "source_rows": 31,
+            "source_actual_labs": 1,
+            "candidate_actual_labs": 1,
+            "source_direct_level": 2,
+            "candidate_direct_level": 3,
+            "source_gear_bonus": 0.10000000149012,
+            "candidate_gear_bonus": 0.2,
+            "source_robot_battery": 0.1,
+            "candidate_robot_battery": 0.1,
+            "foreign_queue_progress": 0.42,
+            "detached_progress": 0.27,
+            "manual_mining_baseline": 0,
+            "on_load_read_only": true
+          }
+        },
+        {
+          "ordinal": 2,
+          "save_byte_identical": true,
+          "save_sha256": "179AF0FAF0941204D1E4320777015BA2794AFC4A18BB745C437515226083C48F",
+          "observation": {
+            "case": "migration-origin-1.1.0-f210_source_defaults_modules_disabled-successor",
+            "stage": "reload",
+            "status": "passed",
+            "source_origin": "1.1.0",
+            "source_rows": 31,
+            "source_actual_labs": 1,
+            "candidate_actual_labs": 1,
+            "source_direct_level": 2,
+            "candidate_direct_level": 3,
+            "source_gear_bonus": 0.10000000149012,
+            "candidate_gear_bonus": 0.2,
+            "source_robot_battery": 0.1,
+            "candidate_robot_battery": 0.1,
+            "foreign_queue_progress": 0.42,
+            "detached_progress": 0.27,
+            "manual_mining_baseline": 0,
+            "on_load_read_only": true
+          }
+        }
+      ],
+      "new_candidate_actual_labs": 1,
+      "actual_native_processes": 3
+    }
+  ],
+  "original_adverses": [
+    {
+      "kind": "original-raw-boolean-preflight-failure",
+      "result": {
+        "path": "build/qualification/migration-origin-110-current-7a2-r01-controller/native-f210/result.json",
+        "bytes": 6992,
+        "sha256": "0609D354BA1D4782DA8218654CF4679572DBD516AFF6D737C6B2C27242FBE133"
+      },
+      "native_log": {
+        "path": "build/qualification/migration-origin-110-current-7a2-r01-controller/native-f210/write-data/factorio-current.log",
+        "bytes": 11231,
+        "sha256": "C93942B2BBB4978B77DF4E96FD91E40775767AFE7B294EAF25AC500A4A679F8A"
+      },
+      "packet": {
+        "path": "build/qualification/migration-origin-110-current-7a2-r01-controller/packet.json",
+        "bytes": 8805,
+        "sha256": "962ACF78392370F9B6FDFF97AF5645B155DD8F4F9C20FAA3A0EF7CA1C08AD6A5"
+      },
+      "terminal": {
+        "path": "build/qualification/migration-origin-110-current-7a2-r01-controller/execution-record/terminal.json",
+        "bytes": 2954,
+        "sha256": "7E79765592F42BC01F11929A493BDB700D151B4FF5159637A5B03CD936E35DE9"
+      },
+      "actual_native_processes": 1,
+      "source_world_loaded": false,
+      "actual_new_labs": 0,
+      "candidate_saves": 0,
+      "cold_reloads": 0,
+      "raw_nil_observed": false,
+      "protected_source_unchanged": true
+    },
+    {
+      "kind": "logging-only-unchanged-assertion-probe",
+      "result": {
+        "path": "build/qualification/migration-origin-110-enabled-diagnostic-r02-controller/native-f210/result.json",
+        "bytes": 7004,
+        "sha256": "6EA6F64484F39903B0DD361EF9CDB0DB7B1F907B9D479D18B3C11241471966F2"
+      },
+      "native_log": {
+        "path": "build/qualification/migration-origin-110-enabled-diagnostic-r02-controller/native-f210/write-data/factorio-current.log",
+        "bytes": 11392,
+        "sha256": "FC31B89CB81EBBDBB0A9EB6DCA485F3758841CA5FA2C2379510414F1EC63AC7E"
+      },
+      "packet": {
+        "path": "build/qualification/migration-origin-110-enabled-diagnostic-r02-controller/packet.json",
+        "bytes": 5294,
+        "sha256": "305237361F177E870C9941EB81F5388EE2D89043A71179D05BC92B3B27E4AB26"
+      },
+      "terminal": {
+        "path": "build/qualification/migration-origin-110-enabled-diagnostic-r02-controller/execution-record/terminal.json",
+        "bytes": 2963,
+        "sha256": "50B68E3D1C7D6FF449C4C31926236953C0062B1CBB94150EEEBD0BF369023AB6"
+      },
+      "actual_native_processes": 1,
+      "source_world_loaded": false,
+      "actual_new_labs": 0,
+      "candidate_saves": 0,
+      "cold_reloads": 0,
+      "raw_nil_observed": true,
+      "protected_source_unchanged": true
+    }
+  ],
+  "actual_accepted_native_processes": 9,
+  "actual_new_candidate_lab_completions": 3,
+  "actual_read_only_cold_reloads": 6,
+  "separate_original_adverse_startups": 2,
+  "factorio_processes_after_restoration": 0,
+  "limits": [
+    "The original0609 failure alone did not serialize its raw enabled value. The separate unchanged-assertion logging probe observes actual=nil. Corrected fixture normalizes only the omitted default and retains literal false, opposite and malformed-value rejections.",
+    "Two historical startup defaults are fixture-staged, not arbitrary persisted user-setting recovery. Disabled F210 additionally selects modules=false explicitly; no F200 disabled-module result is inferred.",
+    "Retained module credit is checked by the frozen runtime assertions including reset and reload. The markers do not serialize individual private-holder snapshots. There is no earned-state Library GUI claim.",
+    "New research is cost/time accelerated after native-definition preflight; ordinary tuning, physical output, Space Age, other mod closures, comparative performance and whole-product acceptance remain independent.",
+    "The historical source laboratory is counted once. All three destinations reuse original88FC unchanged; carried counters on reload do not add laboratory completions."
+  ]
+}

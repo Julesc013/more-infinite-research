@@ -1,0 +1,149 @@
+{
+  "schema": 1,
+  "kind": "mir5-independent-mod-f210-native-reference-selection",
+  "target": "f210",
+  "factorio_line": "2.1",
+  "engine": {
+    "version": "2.1.23",
+    "sha256": "FE4A1DA30F322A0D0B8AEB3DF7276332222BAAA143E2352569B723E84B2B9060"
+  },
+  "settings_mode": "Defaults",
+  "mods": [
+    {
+      "name": "base",
+      "version": "2.1.23",
+      "enabled": true
+    },
+    {
+      "name": "bobassembly",
+      "version": "3.0.2",
+      "enabled": true
+    },
+    {
+      "name": "bobelectronics",
+      "version": "3.0.1",
+      "enabled": true
+    },
+    {
+      "name": "bobenemies",
+      "version": "3.0.1",
+      "enabled": true
+    },
+    {
+      "name": "bobequipment",
+      "version": "3.0.0",
+      "enabled": true
+    },
+    {
+      "name": "bobgreenhouse",
+      "version": "3.0.1",
+      "enabled": true
+    },
+    {
+      "name": "bobinserters",
+      "version": "3.0.0",
+      "enabled": true
+    },
+    {
+      "name": "boblibrary",
+      "version": "3.0.1",
+      "enabled": true
+    },
+    {
+      "name": "boblogistics",
+      "version": "3.0.2",
+      "enabled": true
+    },
+    {
+      "name": "bobmining",
+      "version": "3.0.2",
+      "enabled": true
+    },
+    {
+      "name": "bobmodules",
+      "version": "3.0.1",
+      "enabled": true
+    },
+    {
+      "name": "bobores",
+      "version": "3.0.0",
+      "enabled": true
+    },
+    {
+      "name": "bobplates",
+      "version": "3.0.2",
+      "enabled": true
+    },
+    {
+      "name": "bobpower",
+      "version": "3.0.1",
+      "enabled": true
+    },
+    {
+      "name": "bobrevamp",
+      "version": "3.0.1",
+      "enabled": true
+    },
+    {
+      "name": "bobtech",
+      "version": "3.0.0",
+      "enabled": true
+    },
+    {
+      "name": "bobvehicleequipment",
+      "version": "3.0.0",
+      "enabled": true
+    },
+    {
+      "name": "bobwarfare",
+      "version": "3.0.2",
+      "enabled": true
+    },
+    {
+      "name": "elevated-rails",
+      "version": "2.1.23",
+      "enabled": true
+    },
+    {
+      "name": "mir-fixture-mir5-active-mods-observer",
+      "version": "0.1.0",
+      "enabled": true
+    },
+    {
+      "name": "quality",
+      "version": "2.1.23",
+      "enabled": true
+    },
+    {
+      "name": "recycler",
+      "version": "2.1.23",
+      "enabled": true
+    },
+    {
+      "name": "space-age",
+      "version": "2.1.23",
+      "enabled": true
+    }
+  ],
+  "archive_sha256": {
+    "bobassembly_3.0.2.zip": "872E973046FEFB716E899F74AB70A74E1811122B28074C454D7EFCB09A4A3AE7",
+    "bobelectronics_3.0.1.zip": "50C2718E38D507CF4D4ACA2DBFE3240997172309413397C9C70083BBAE6927BE",
+    "bobenemies_3.0.1.zip": "4B1A939F53B1A1AEC54026A2408D453DBBB6901D7DD3644DA890AC781E2211BD",
+    "bobequipment_3.0.0.zip": "608205C0B7FEDB7A400C6111E5857BF33EE14BA10DADBE5AD2B78E203FE8B5ED",
+    "bobgreenhouse_3.0.1.zip": "B0F107A8CDA879E2F3F974AAA592C9F3AC1DCA5DB34019558CE6999F49EE42C3",
+    "bobinserters_3.0.0.zip": "C84BB12D7B645871F252F466FB2400E6D1564370EA4FAD6365F7F7A96F4113C1",
+    "boblibrary_3.0.1.zip": "3DD83A195E120BAECC51A43B0B3EB965C0D419A09883F9DAA018B3921C12D51B",
+    "boblogistics_3.0.2.zip": "ADAEFF77E0C489C80AC83950BDDC5F7DE0230FEEEC5E29772AC1C2FA8175F339",
+    "bobmining_3.0.2.zip": "7F1B8BB34264E12EF9F0BE9427B672D37556A425D93D618B5341C90543C5822E",
+    "bobmodules_3.0.1.zip": "9AFE9E3E5766513D1542039F08E441C0EFD337468ADCE72D0C27E87C184AB63E",
+    "bobores_3.0.0.zip": "7F8E33E35F59BB3F2CD72E3AB2FED30D1C2AE9C117E3731324AC307D9965082B",
+    "bobplates_3.0.2.zip": "0C9A4910E2DCAA8DCABBE5BFFA67333F214EAB2EFD8C798D5EF84D90B691862D",
+    "bobpower_3.0.1.zip": "09F8AFA883C614DB2CA8F8CC5CAC803DEE384D009F79A26A25F9B9968A60C02A",
+    "bobrevamp_3.0.1.zip": "BE2D0EEA2DE65CF32218107EB1DB679BF0B826599C89C4E2892F60B234405F5F",
+    "bobtech_3.0.0.zip": "397D979976316C3CE082D2AD29A046CCBAA147E412A0AEB727230BDECF665E5B",
+    "bobvehicleequipment_3.0.0.zip": "BFAE596FFFCC88C3CDCB0A7FB07B72B2314D05AAEDED520F83292D35AB3B2146",
+    "bobwarfare_3.0.2.zip": "535CFECE8A712650959FA172290A43E9DBC290BA4F3CD21B9CC6DE621726A0EA",
+    "mir-fixture-mir5-active-mods-observer_0.1.0.zip": "A15A7D628D66953D2E0C4D4FA288F47CBF9C5678327C7EB3D23ADB5DC78331C0"
+  },
+  "scope": "Exact local bob-full space-age mandatory-closure input for independent upstream/published4.7.3/current data/settings captures. Latest numerically selected local archives require actual engine admission; these inputs establish no startup, research/physical, migration, client or support result. Refreshed with the 2026-10-26 officially downloaded F210 archives; prior cohort remains bound to its original Git source and hashes. The current observer binding names the exact A15 runtime container used in the completed EA41 sweep; prior canonical 2E1 container and identical member hashes remain in its r03 amendment."
+}

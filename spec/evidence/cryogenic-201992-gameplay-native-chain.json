@@ -1,0 +1,120 @@
+{
+  "schema": 1,
+  "kind": "MIR5Cryogenic201992GameplayNativeChainV1",
+  "status": "foreign-owner-and-all-official-real-labs-save-two-reloads-pass",
+  "player_source_commit": "20199257df89dc0fb76e7c86478d7a906def14e3",
+  "controller_commit": "5e63f26656c974ee0bcc852f1b35c368c02a62cd",
+  "engine": {
+    "sha256": "FE4A1DA30F322A0D0B8AEB3DF7276332222BAAA143E2352569B723E84B2B9060",
+    "file_version": "2.1.23.87750",
+    "product_version": "2.1.23",
+    "base_version": "2.1.23"
+  },
+  "player_sha256": "0D4C19C6A2C9FED241B77A9752132BA452D7357B8B86B1AA6CA7DB7372CD0FE6",
+  "profile_sha256": "322FF3275B60273E9007D3BF105B66ABF8D2F319B25D858C7EEBD6AC612C3F80",
+  "fixtures": [
+    {
+      "name": "mir-fixture-mir5-cryogenic-native_0.1.0.zip",
+      "sha256": "F60D84A5426FB5E3129D370C59BA59AAC63EDC8BEA07A18413E17DF2543B9A32"
+    },
+    {
+      "name": "mir-fixture-mir5-cryogenic-gameplay_0.1.0.zip",
+      "sha256": "8EA42E17BCBBA2B39A493DF9D80E0560C1EC35E06A7F813AA342AA956B26B9A8"
+    },
+    {
+      "name": "mir-fixture-mir5-active-mods-observer_0.1.0.zip",
+      "sha256": "A15A7D628D66953D2E0C4D4FA288F47CBF9C5678327C7EB3D23ADB5DC78331C0"
+    }
+  ],
+  "native_result_sha256": "698DF8CEC828B09ED1E224A8020BE0886ABC6727A936C863CA94C3F54FABB6B8",
+  "witnesses": {
+    "actual_lab_completions": 2,
+    "foreign_owner_input": "mir5-cryogenic-native-science",
+    "foreign_owner_science_consumed": 1,
+    "official_science_inputs": [
+      "automation-science-pack",
+      "logistic-science-pack",
+      "chemical-science-pack",
+      "production-science-pack",
+      "military-science-pack",
+      "utility-science-pack",
+      "space-science-pack",
+      "agricultural-science-pack",
+      "metallurgic-science-pack",
+      "electromagnetic-science-pack",
+      "cryogenic-science-pack",
+      "promethium-science-pack"
+    ],
+    "each_nonperishable_official_science_consumed": 1,
+    "agricultural_science_items_drawn": 2,
+    "agricultural_science": {
+      "inventory_count": 30,
+      "stored_durability": 0.9991712962962962,
+      "prototype_science_capacity": 1,
+      "prototype_spoil_ticks": 216000,
+      "stacks": [
+        {
+          "slot": 9,
+          "count": 30,
+          "spoil_percent": 0.0005555555555555314,
+          "spoil_tick": 216000
+        }
+      ],
+      "prototype_lab_ignores_spoil_percent": false
+    },
+    "native_gear_productivity": 0.1,
+    "laboratory_productivity": 0,
+    "gear": {
+      "technology": "recipe-prod-research_gears-1",
+      "level": 2,
+      "researched": false,
+      "recipe_effect_matches": 1,
+      "recipe_effect_change": 0.1
+    },
+    "policy": "all-official",
+    "on_load_read_only": false,
+    "fixture_accelerates_gear_count_and_time": true,
+    "ordinary_tuning_qualified": false,
+    "resource_mining_observed": false,
+    "exact_reporter_modpack": false
+  },
+  "cold_reloads": [
+    {
+      "ordinal": 1,
+      "save_byte_identical": true,
+      "save_sha256": "85D88DD56D6BD49F05D2655361C9F5D75F51F42CDAF872374A065338438951DF",
+      "on_load_read_only": true
+    },
+    {
+      "ordinal": 2,
+      "save_byte_identical": true,
+      "save_sha256": "85D88DD56D6BD49F05D2655361C9F5D75F51F42CDAF872374A065338438951DF",
+      "on_load_read_only": true
+    }
+  ],
+  "custody": {
+    "path": "build/mir5/recovery-historical/cryogenic-gameplay-r01",
+    "manifest_sha256": "8B99DA830C22D7B785695909FD27457042A0555B7FA6C012DF9991F8F800C135",
+    "original_and_primary_members_verified": 22,
+    "bytes": 1622883,
+    "mismatches": []
+  },
+  "restoration": {
+    "receipt_sha256": "EDCE012E38F9D1722146A0A06932824ABE342FFFCA5B1A32DB358375BCB523C2",
+    "native_control_status": "restored-direct-library-controls",
+    "factorio_process_count_at_restoration": 0,
+    "original_owned_archives_preserved": true
+  },
+  "raw_receipts": {
+    "path": "spec/evidence/cryogenic-201992-gameplay-native-receipts.json.gz",
+    "gzip_bytes": 26510,
+    "gzip_sha256": "88C18D6DBAE9A70127B2BE21CBAC541A69FB903B54559F4BC3B39220AC76A9B8",
+    "uncompressed_sha256": "CED16F8D82E14C62B37054C399A4C1DDF29DDE76B9E90380D1C6E5F39D70C513",
+    "members": 6
+  },
+  "limits": [
+    "The fixture recreates a bounded foreign-resource science research-unit replacement for the native cryogenic trigger; the reporter's unknown complete modpack remains unverified.",
+    "Agricultural science draws two slightly stale items and retains partial lab durability. It is not claimed to consume one whole ordinary agricultural item.",
+    "Gear count/time are accelerated; science manufacturing, resource mining, ordinary tuning, arbitrary modpack migration, clients, scored performance and release are not qualified."
+  ]
+}

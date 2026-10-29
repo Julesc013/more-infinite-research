@@ -1,0 +1,279 @@
+{
+  "schema": 1,
+  "kind": "MIR5BobTechF210PreMIRRouteRawDiagnosisV1",
+  "scope": "Exact F210 pre-MIR data.raw recipe fields for four finite BobTech/Angel material routes. It is not a gameplay, save, performance, or qualification result.",
+  "source_head": "39fe949400fc2573aed6038a234342c62904b515",
+  "endpoint": "Factorio --dump-data process exited zero; capture wrapper subsequently refused its loaded-selection log parsing because graphical dependency checksums were reported as zero. The retained dump is analyzed without promoting the wrapper result to qualification.",
+  "inputs": {
+    "profile_sha256": "45D832A832F32EA1C8FD8F65AA89EAF2C5DEBE8B7A6E865B73E0D52023C061C1",
+    "generated_selection_sha256": "1F3F25709044FEA10E6F6E607B9C6D834D8897A92E374CFD8104F1FBE56AD731",
+    "raw_dump_sha256": "416ACD11FED6D1F8E9C9F54A4BB247BF5D2FCEAAB867F1E43DF39C61180488B9",
+    "capture_result_sha256": "0950C8DADAEA78FB2E8D85167D109ADE7CC1E11BF610B1BF24FE9109C3BD4D82"
+  },
+  "rows": [
+    {
+      "recipe": "angels-plate-tin",
+      "raw": {
+        "exists": true,
+        "enabled": {
+          "present": true,
+          "value": false
+        },
+        "hidden": {
+          "present": false,
+          "value": null
+        },
+        "allow_productivity": {
+          "present": true,
+          "value": true
+        },
+        "maximum_productivity": {
+          "present": false,
+          "value": null
+        },
+        "ingredients_ordinary_exact": true,
+        "results_ordinary_exact": true,
+        "validation_as_39fe_guard": {
+          "enabled_false": true,
+          "not_hidden_true": true,
+          "allow_productivity_true": true,
+          "maximum_productivity_3": false,
+          "all": false
+        },
+        "raw_recipe_canonical_sha256": "DF92DDA7895DE46E4D934DEEBBF9CD383E092592A90F61B3A503C8EB46F090F3",
+        "raw_recipe_keys": [
+          "allow_productivity",
+          "auto_recycle",
+          "categories",
+          "enabled",
+          "energy_required",
+          "icons",
+          "ingredients",
+          "localised_name",
+          "name",
+          "order",
+          "results",
+          "subgroup",
+          "type"
+        ],
+        "ingredients": [
+          {
+            "type": "fluid",
+            "name": "angels-liquid-molten-tin",
+            "amount": 40
+          }
+        ],
+        "results": [
+          {
+            "type": "item",
+            "name": "bob-tin-plate",
+            "amount": 4
+          }
+        ]
+      }
+    },
+    {
+      "recipe": "angels-plate-tin-2",
+      "raw": {
+        "exists": true,
+        "enabled": {
+          "present": true,
+          "value": false
+        },
+        "hidden": {
+          "present": false,
+          "value": null
+        },
+        "allow_productivity": {
+          "present": true,
+          "value": true
+        },
+        "maximum_productivity": {
+          "present": false,
+          "value": null
+        },
+        "ingredients_ordinary_exact": true,
+        "results_ordinary_exact": true,
+        "validation_as_39fe_guard": {
+          "enabled_false": true,
+          "not_hidden_true": true,
+          "allow_productivity_true": true,
+          "maximum_productivity_3": false,
+          "all": false
+        },
+        "raw_recipe_canonical_sha256": "2EB8E09A97C9209A83B625C234E357345551154A346AF8905CC3BF9F76EDD557",
+        "raw_recipe_keys": [
+          "allow_decomposition",
+          "allow_productivity",
+          "auto_recycle",
+          "categories",
+          "enabled",
+          "energy_required",
+          "icons",
+          "ingredients",
+          "localised_name",
+          "name",
+          "order",
+          "results",
+          "subgroup",
+          "type"
+        ],
+        "ingredients": [
+          {
+            "type": "item",
+            "name": "angels-roll-tin",
+            "amount": 1
+          }
+        ],
+        "results": [
+          {
+            "type": "item",
+            "name": "bob-tin-plate",
+            "amount": 4
+          }
+        ]
+      }
+    },
+    {
+      "recipe": "angels-plate-gunmetal",
+      "raw": {
+        "exists": true,
+        "enabled": {
+          "present": true,
+          "value": false
+        },
+        "hidden": {
+          "present": false,
+          "value": null
+        },
+        "allow_productivity": {
+          "present": true,
+          "value": true
+        },
+        "maximum_productivity": {
+          "present": false,
+          "value": null
+        },
+        "ingredients_ordinary_exact": true,
+        "results_ordinary_exact": true,
+        "validation_as_39fe_guard": {
+          "enabled_false": true,
+          "not_hidden_true": true,
+          "allow_productivity_true": true,
+          "maximum_productivity_3": false,
+          "all": false
+        },
+        "raw_recipe_canonical_sha256": "D60561D48C8BD4A1539024B93212D2B152C9A7675881F9838FB9574C4AD7FC01",
+        "raw_recipe_keys": [
+          "allow_productivity",
+          "categories",
+          "enabled",
+          "energy_required",
+          "icons",
+          "ingredients",
+          "localised_name",
+          "name",
+          "order",
+          "results",
+          "subgroup",
+          "type"
+        ],
+        "ingredients": [
+          {
+            "type": "fluid",
+            "name": "angels-liquid-molten-gunmetal",
+            "amount": 40
+          }
+        ],
+        "results": [
+          {
+            "type": "item",
+            "name": "bob-gunmetal-alloy",
+            "amount": 4
+          }
+        ]
+      }
+    },
+    {
+      "recipe": "angels-plate-invar",
+      "raw": {
+        "exists": true,
+        "enabled": {
+          "present": true,
+          "value": false
+        },
+        "hidden": {
+          "present": false,
+          "value": null
+        },
+        "allow_productivity": {
+          "present": true,
+          "value": true
+        },
+        "maximum_productivity": {
+          "present": false,
+          "value": null
+        },
+        "ingredients_ordinary_exact": true,
+        "results_ordinary_exact": true,
+        "validation_as_39fe_guard": {
+          "enabled_false": true,
+          "not_hidden_true": true,
+          "allow_productivity_true": true,
+          "maximum_productivity_3": false,
+          "all": false
+        },
+        "raw_recipe_canonical_sha256": "033CE185EFD0A8E20CFC317C802BB531B861276B671C181EBFE7D0DE60416599",
+        "raw_recipe_keys": [
+          "allow_productivity",
+          "categories",
+          "enabled",
+          "energy_required",
+          "icons",
+          "ingredients",
+          "localised_name",
+          "name",
+          "order",
+          "results",
+          "subgroup",
+          "type"
+        ],
+        "ingredients": [
+          {
+            "type": "fluid",
+            "name": "angels-liquid-molten-invar",
+            "amount": 40
+          }
+        ],
+        "results": [
+          {
+            "type": "item",
+            "name": "bob-invar-alloy",
+            "amount": 4
+          }
+        ]
+      }
+    }
+  ],
+  "conclusion": "Every route has enabled=false, no hidden=true, allow_productivity=true, and exact ordinary ingredient/result rows. Each route omits maximum_productivity in data.raw; the current literal maximum_productivity==3 guard rejects all four solely on that raw omission. The exact installed F210 prototype API declares this property optional with default 3.0, while its runtime LuaRecipePrototype property is mandatory. The historical compact facts maximum_productivity=3 therefore remain a normalized/native prototype expectation, not raw-field presence.",
+  "engine_default_evidence": {
+    "prototype_api": {
+      "path": "D:/Games/Steam/steamapps/common/Factorio/doc-html/prototype-api.json",
+      "sha256": "03DB6BFFF8AB1DCF738A52F33331FB839E53DBAFCC576492CD297F94A4BA99F2",
+      "application_version": "2.1.23",
+      "api_version": 6,
+      "subject": "RecipePrototype.maximum_productivity",
+      "optional": true,
+      "default": 3.0
+    },
+    "runtime_api": {
+      "path": "D:/Games/Steam/steamapps/common/Factorio/doc-html/runtime-api.json",
+      "sha256": "7660B692F1C199682DE4318250DE81B07B38266A935D1C37859DCB6A70E1D373",
+      "application_version": "2.1.23",
+      "api_version": 6,
+      "subject": "LuaRecipePrototype.maximum_productivity",
+      "optional": false,
+      "read_type": "double"
+    }
+  }
+}

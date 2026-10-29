@@ -1,0 +1,32 @@
+{
+  "schema": 1,
+  "kind": "mir5-f110-same-edition-successor",
+  "target": "f110",
+  "factorio_line": "1.1",
+  "engine": {
+    "version": "1.1.110",
+    "sha256": "B7B4B834FCA2E32AFA9D3476EB42CC09B02F1205BE97F688DC6FC6ACE7BA8FE1"
+  },
+  "settings_mode": "Defaults",
+  "mods": [
+    {
+      "name": "base",
+      "version": "1.1.110",
+      "enabled": true
+    },
+    {
+      "name": "more-infinite-research",
+      "version": "5.0.11000",
+      "enabled": true
+    },
+    {
+      "name": "mir-fixture-mir5-f110-f200-transition",
+      "version": "0.3.0",
+      "enabled": true
+    }
+  ],
+  "archive_sha256": {
+    "more-infinite-research_5.0.11000.zip": "1C3D982CD048D3C83BF75108F1F9AC769CE0DC833A2DE056CDE16EF8AE2925A9"
+  },
+  "scope": "Prepared current7a2/player505 F110 same-edition successor from protected published4.7.11003 saveD524. Retain17 rows/effects,42% queue,27% detached work and foreign disablement; one new mining lab/save/two read-only cold reloads required. No native result or release qualification."
+}

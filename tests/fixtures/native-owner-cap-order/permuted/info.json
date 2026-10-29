@@ -1,0 +1,9 @@
+{
+  "name": "mir-fixture-mir5-native-owner-cap-order",
+  "version": "0.2.0",
+  "title": "MIR native-owner permuted cap-order fixture",
+  "author": "MIR maintainers",
+  "description": "Disposable F210 same-cap native-owner effect-order transition; seeded state only, not a lab claim.",
+  "factorio_version": "2.1",
+  "dependencies": ["base >= 2.1.23", "space-age = 2.1.23", "more-infinite-research = 5.0.21000"]
+}

@@ -1,0 +1,43 @@
+{
+  "schema": 1,
+  "kind": "mir-native-worker-first-finite-cap-relaxed",
+  "target": "f200",
+  "factorio_line": "2.0",
+  "engine": {
+    "version": "2.0.77",
+    "sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B"
+  },
+  "settings_mode": "Defaults",
+  "mods": [
+    {
+      "name": "base",
+      "version": "2.0.77",
+      "enabled": true
+    },
+    {
+      "name": "a-mir-fixture-worker-entry",
+      "version": "0.1.0",
+      "enabled": true
+    },
+    {
+      "name": "mir-fixture-mir5-active-mods-observer",
+      "version": "0.1.0",
+      "enabled": true
+    },
+    {
+      "name": "more-infinite-research",
+      "version": "5.0.20000",
+      "enabled": true
+    },
+    {
+      "name": "mir-fixture-mir5-f200-legacy-worker",
+      "version": "0.6.0",
+      "enabled": true
+    }
+  ],
+  "archive_sha256": {
+    "more-infinite-research_5.0.20000.zip": "E9D349931E082AD77057C150E3D6093490E4086E84F0FAFECB0ED1257FD5ED4F",
+    "mir-fixture-mir5-active-mods-observer_0.1.0.zip": "723D1E7721449FC26040E5E6629416767BDC20AD79CF8723115846DB662A1F87"
+  },
+  "scope": "Exact protected90B2 first finite native-worker relaxed on F200/2.0.77; cap40; original source two real labs reused once. Consume only the exact completed first-finite held save; restore owned player enablement,complete one actual new native lab,next9/4.473,save/two cold reloads. Explicit fixture-owned0.123 only. Prepared input,not native acceptance or relabelled direct0.3/.4 result."
+}

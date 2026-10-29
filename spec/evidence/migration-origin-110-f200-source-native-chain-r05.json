@@ -1,0 +1,116 @@
+{
+  "schema": 1,
+  "kind": "MIR5MigrationOrigin110F200SourceNativeChainV1",
+  "status": "passed-exact-published-mir1-f200-source-stage",
+  "scope": "One exact published MIR 1.1.0 source-stage fixture on Factorio 2.0.77. It establishes the protected published source save and its two read-only cold reloads only. It is not a MIR5 upgrade, current-candidate, multiplayer, performance, or release-qualification result.",
+  "origin": {
+    "tag": "1.1.0",
+    "tag_commit": "2fb64822b82569e3b50f0653e361fb7148f18b63",
+    "edition": "F200",
+    "engine": {
+      "product_version": "2.0.77",
+      "sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B"
+    },
+    "published_mir": {
+      "version": "1.1.0",
+      "archive_sha256": "6395C4A5A0F74C67729746D0FBF6162329978B47C5C29D54CC0045F2977C7E44",
+      "bytes": 60927,
+      "profile_sha256": "B40252DDF04882CEA7634D561F75D5F6BC7394962801DF6A9E6E96BE20882CE7"
+    }
+  },
+  "r05_controller_and_fixture": {
+    "controller_commit": "3ae2711867cd60f6c871f641c331349d941dd8c3",
+    "fixture_source_commit": "bec37fb87a05d17cf4cf0225e0458218830fef63",
+    "fixture_archive_sha256": "087952B335FEC82F1F32773323257789478B5A132AF7024E0D1434EE742E38ED",
+    "fixture_archive_bytes": 8862,
+    "caller_sha256": "B7650B932BA1B4A98CC440CED50E8EC0F4632D6D671B776AD3497F399D9E473C",
+    "preflight_sha256": "ED91A019043E8965B3CF77B900E74521BFA60CC996EBD6E3781FB840AB5406F9",
+    "terminal_sha256": "199C3347769BF7A839055E19BACEA5143E97A30C426C96B11AFF8AA18B4BE916"
+  },
+  "native_observation": {
+    "status": "passed-private-native-fixture",
+    "result_sha256": "4FBD622144E3B69E39C0530385AA70C92971208584CA32D4A10B1FCC1A978997",
+    "source_roster_rows": 31,
+    "player_seeded_rows": 30,
+    "real_source_gear_laboratory_completions": 1,
+    "source_gear_level": 2,
+    "source_gear_productivity_bonus": 0.10000000149012,
+    "source_robot_battery_bonus": 0.1,
+    "mir_gears_queue_progress": 0.42,
+    "separate_forced_detached_progress": 0.27,
+    "fixture_asserted_inventory_stream_absent": true,
+    "protected_source_save": {
+      "sha256": "88FC8E9891040275E001930C3E6AA0A4A7A28C31D81DF30E3F08AEDD98E5019A",
+      "bytes": 793858,
+      "primary_path": "build/qualification/migration-origins/migration-origin-110-f200-source-r05/native-output/write-data/saves/mir5-native-complete.zip"
+    },
+    "cold_reloads": [
+      {
+        "ordinal": 1,
+        "status": "passed",
+        "on_load_read_only": true,
+        "save_byte_identical": true,
+        "save_sha256": "88FC8E9891040275E001930C3E6AA0A4A7A28C31D81DF30E3F08AEDD98E5019A"
+      },
+      {
+        "ordinal": 2,
+        "status": "passed",
+        "on_load_read_only": true,
+        "save_byte_identical": true,
+        "save_sha256": "88FC8E9891040275E001930C3E6AA0A4A7A28C31D81DF30E3F08AEDD98E5019A"
+      }
+    ]
+  },
+  "controls": {
+    "direct_library_controls": "restored-direct-library-controls",
+    "factorio_processes_after_terminal": 0,
+    "archive_extractions": 0,
+    "archive_links_created": 0,
+    "dependency_payload_bytes_copied": 0,
+    "published_mir_slot_restored_absent": true,
+    "owned_fixture_slot_restored_absent": true
+  },
+  "custody": {
+    "primary_root": "build/qualification/migration-origins/migration-origin-110-f200-source-r05/native-output",
+    "original_root": "D:\\Projects\\Factorio\\mir5-migration-origin-110-source-settings-r01\\build\\tmp\\migration-origin-1.1.0-f200-source-native-r05",
+    "members": 23,
+    "bytes": 1699500,
+    "original_and_primary_file_hashes_checked": 46,
+    "native_manifest_sha256": "96330B71C2087BF99C321BBBBFB4378836A1649DAF86A25D754A93F24C374357",
+    "all_member_hashes_matched": true
+  },
+  "receipts": {
+    "path": "spec/evidence/migration-origin-110-f200-source-native-receipts-r05.json.gz",
+    "sha256": "A5E55078FDA593B9824E1EADA16C0055FB0535FE9FCEFB4DF942A7B3681DEB84",
+    "bytes": 9851,
+    "uncompressed_sha256": "9D96C76FEF87987C61109B0855ECBAD3DBCB709F8C6B39B87E3153E7B0F4E911",
+    "uncompressed_bytes": 57593,
+    "lossless_safe_records": 1,
+    "derived_safe_marker_records": 1,
+    "roundtrip_verified": true,
+    "exclusions": "Saves, full logs, runtime configuration, player data, preflight payloads, library-control payloads and archive payloads are excluded from the public capsule."
+  },
+  "retained_prior_packets": {
+    "r03": {
+      "status": "failed-before-source-save",
+      "fixture_archive_sha256": "82F954450AB7AB761686C288B23331E5C087C29F0846837810D1F3F96BD98A18",
+      "result_sha256": "1965F8E5B6D0772122833867C3C52F55C6318B82CDB34C63FCDCBC7E62FBD556",
+      "disposition": "The fixture queried raw bool-setting prototypes after the settings stage; no source save was produced."
+    },
+    "r04": {
+      "status": "superseded-never-executed",
+      "fixture_archive_sha256": "D1E92F0117AA89B3B20BB31EDEAFDE2654A63AEB08934D2C13CCEA589BF69C82",
+      "prepared_receipt_sha256": "B6C7F77CEA1A82692931F74754A6622E52CFD28648397A8C0D444712581F9C7C",
+      "disposition": "Independent source inspection showed that its unit-ingredient and prerequisite oracle conflated Space-gate behavior."
+    }
+  },
+  "claims": {
+    "exact_published_mir1_f200_source_stage": true,
+    "mir5_successor_execution": false,
+    "current_candidate_execution": false,
+    "multiplayer": false,
+    "performance": false,
+    "release_qualification": false
+  },
+  "limitations": "A separately reviewed current candidate must consume this unchanged source save directly before either F200 or F210 successor claim. This source-only evidence does not establish the migration matrix, physical science production, arbitrary user settings persistence, or preservation of legacy module-effect behavior by a current MIR5 candidate."
+}

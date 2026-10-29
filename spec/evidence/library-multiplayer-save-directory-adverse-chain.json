@@ -1,0 +1,37 @@
+{
+  "schema": 1,
+  "kind": "MIR5NativeContinuityAdverseChainV1",
+  "run": {
+    "id": 40002796325,
+    "url": "https://github.com/Julesc013/mir-native-worker/actions/runs/40002796325",
+    "conclusion": "failure"
+  },
+  "source": "62a666cd04d37aecafe3fec3dd775e21f503df70",
+  "player": {
+    "sha256": "FE521E81385146C735E8E98C3E5B3F38FDA3B8A70E648332D14B277980AD1C4D",
+    "path": "D:\\Projects\\Factorio\\testmods\\2.0\\more-infinite-research_5.0.20000.zip"
+  },
+  "receipt": {
+    "gzip": "spec/mir5/evidence/library-multiplayer-save-directory-adverse-native.json.gz",
+    "uncompressed_sha256": "B1512AA17A1DD4D9281ABEE34B576F5D0173B4B91C651D191CCD0CE04B276ED4"
+  },
+  "logs": [
+    {
+      "gzip": "spec/mir5/evidence/library-multiplayer-save-directory-adverse-server.log.gz",
+      "uncompressed_sha256": "5FAC008A0F42AE7EC79F68EE6BDF2E08A8383910ED5E73735CF42385EB2646EE"
+    },
+    {
+      "gzip": "spec/mir5/evidence/library-multiplayer-save-directory-adverse-actor.log.gz",
+      "uncompressed_sha256": "42C4796F3E9D5E26EEBD4AEC9AA401498978C8FA056C791445A96394254E8688"
+    }
+  ],
+  "custody": "C:/Projects/Factorio/more-infinite-research/build/mir5/black-glass/incoming/40002796325/black-glass-library-multiplayer-40002796325-1",
+  "manifest_members_verified": 209,
+  "diagnosis": [
+    "Both real clients passed initial/rejoin personal en/de GUI and unchanged gameplay-state checks; four native GUI PNGs exist. The corrected time label reads60seconds and the frame fits the viewport.",
+    "The headless host failed at game.server_save because the isolated server write-data saves directory did not exist. No host-restart/full-session pass is claimed.",
+    "The parent now creates that owned saves directory before starting the native process tree. Native fatal/desync rejection and all lifecycle witnesses remain unchanged.",
+    "Screenshot review also corrected the missing family-filter label and rounded native float noise for displayed productivity percentages only."
+  ],
+  "release_qualification": false
+}

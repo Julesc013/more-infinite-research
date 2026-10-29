@@ -1,0 +1,240 @@
+{
+  "schema": 1,
+  "kind": "MIRResponsiveMenuRepeatabilityDiagnosisV1",
+  "status": "retained-adverse-original-body-review-complete-diagnostic-not-executed",
+  "reviewed_against_commit": "22c2f9a8e49047a03ea8d1d844d68a79c11bc749",
+  "source_evidence": {
+    "path": "spec/evidence/f210-575e-menu-native-chain-r01.json",
+    "sha256": "A5D12894F3B834D7830491A7959FF65CC37EB65E1ABF9D5F7C30EE4C9AA292F5"
+  },
+  "lossless_capsule": {
+    "path": "spec/evidence/f210-575e-menu-native-receipts-r01.json.gz",
+    "sha256": "63C7FCD2AE711BB530D5C441A66018A23AEEF57C0335C59EE8BAF201FC7ED06F",
+    "independently_decoded_records": 10,
+    "all_record_lengths_and_sha256_match": true
+  },
+  "original_verdict": {
+    "aa_seconds": [
+      31.7074013,
+      33.5906019
+    ],
+    "absolute_difference_seconds": 1.8832006,
+    "frozen_allowed_seconds": 1.6324500800000004,
+    "excess_seconds": 0.25075052,
+    "performance_acceptance": false,
+    "original_cohort_changed": false
+  },
+  "phase_readback": {
+    "source": {
+      "source_commit": "be420eddff5a0e5d6ea6795d7f557eb901807d79",
+      "index": {
+        "path": "spec/evidence/f210-menu-aa-pilot-source-records-r01.json",
+        "sha256": "F1D3483D5BD1A7F4F0DBC1664E4DF7346EDC59231D27CB0A7D081DAE5D82E610"
+      },
+      "capsule": {
+        "path": "spec/evidence/f210-menu-aa-pilot-source-records-r01.json.gz",
+        "sha256": "10B29368299A2BF78E3A83EC113A156E0C68445D5A40A64AC19455E47CDC8A89",
+        "bytes": 38485
+      },
+      "independently_rehashed_records": 6,
+      "all_record_lengths_and_hashes_match": true,
+      "review": "https://github.com/Julesc013/more-infinite-research/pull/1328#issuecomment-6470803995",
+      "private_scope": "Only the six transported original actor/log/resource bodies were reviewed, not the entire469-file private campaign custody."
+    },
+    "provenance": "Aero independently decoded and rehashed both original actor JSONs, both Factorio logs and both process-resource ledgers delivered in PR1328. Actor2358/5A735 identities match the original cohort. No new native observation was collected.",
+    "capture_attempts": [
+      2,
+      6
+    ],
+    "same_qpc_segments_seconds": {
+      "launch_to_successful_main_capture": [
+        30.2866794,
+        32.0378456
+      ],
+      "successful_main_capture_duration": [
+        0.2754208,
+        0.2204742
+      ],
+      "capture_end_to_first_render_observation": [
+        0.3419378,
+        0.1910041
+      ],
+      "launch_to_first_render_observation": [
+        30.904038,
+        32.4493239
+      ],
+      "first_render_to_endpoint": [
+        0.8033633,
+        1.141278
+      ]
+    },
+    "same_qpc_deltas_seconds": {
+      "endpoint_seconds": 1.8832006,
+      "first_render_observed_seconds": 1.5452859,
+      "post_first_render_seconds": 0.3379147,
+      "successful_main_capture_started_seconds": 1.7511662,
+      "successful_main_capture_duration_seconds": -0.0549466,
+      "successful_main_capture_end_to_observation_seconds": -0.1509337
+    },
+    "separate_engine_log_clock": {
+      "initialised_seconds": [
+        30.126,
+        29.91
+      ],
+      "difference_seconds": -0.216,
+      "limitation": "Same-QPC endpoint delta decomposes exactly into first-render-observation and subsequent response deltas. Engine log elapsed clocks have separate origins; no exact mixed-clock causal decomposition is asserted."
+    },
+    "observer_controls": {
+      "windows_pixels": [
+        [
+          2560,
+          1440
+        ],
+        [
+          2560,
+          1440
+        ]
+      ],
+      "resource_ledger_rows": [
+        26,
+        27
+      ],
+      "recorded_visibility_foreground_geometry_occlusion_rejections_all_zero": true,
+      "captured_frames": [
+        2,
+        6
+      ],
+      "limitation": "No recorded rejection is not proof that OS/background activity was absent; per-attempt states and CPU/GPU/disk/thermal cause remain unavailable."
+    },
+    "inference": "No recorded capture/visibility/foreground/occlusion rejection counter is nonzero. Pilot6 captures6 versus2 frames, but no per-attempt state/timeline is retained. Its eventual successful main capture is faster, not slower; the added delay occurs before that capture/recognition and partly after first-menu observation. Cause remains unestablished."
+  },
+  "known_controls": {
+    "same_engine_sha256": "8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38",
+    "same_profile_sha256": "05F2786E896B1F28C2E4239134BA370B0C2BCF6CCB1384E03999FB0E89C8B980",
+    "same_published_sha256": "B6EB9430056ABD384DB00F94929FE7DAC0A37441ACF4BC277946689682628852",
+    "same_source_config_sha256": "DA9A92AB9047EBD9F9640B34DC9EF6C084801DF85B8F75B1A490E786F40DD510",
+    "same_private_config_sha256": "9DAA6901EA9D0161E2E5EAC893D4F63AB888F3215974FFCA8D2AFB0A66CF84A5",
+    "same_selection_sha256": "7A04137A1DFD6D1ECBC61FE1294C7052A2E6F991FA286F5F3A568827C1478EF1",
+    "prepared_player_data_sha256": "285ED61F8778CFF44FA173F8EDCC5E417F4DF8C1019A3DDD02814729CEE56EF9",
+    "player_data_policy": "One prepared seed initializes a shared ordinary-menu write-data root before the cohort. Live player-data changes between runs; do not describe the mutable runtime state as identical or silently reset it in a replacement acceptance run.",
+    "pilot_player_data_before": [
+      "CA543A42AC3FFD6B832A7EC72845680A3558045E12FADCB252640CA1AB55575A",
+      "606B2DACE142DEE9D79E4B4B78D665B5DA4D5C520D0B8B215556A0605733032C"
+    ],
+    "pilot_player_data_after": [
+      "606B2DACE142DEE9D79E4B4B78D665B5DA4D5C520D0B8B215556A0605733032C",
+      "C3509355E919D8A2952D3B9B2A0683258A73AF4405CD7C5F3A21C23820A5E82C"
+    ],
+    "argument_hash_limit": "Per-run output/config paths differ. Equal preserved settings and selection do not imply identical argument hashes.",
+    "memory_limit": "Both pilots were admitted without wait with about16.5GiB free. Coarse admission/owned-process peaks do not identify background CPU, GPU, disk or thermal activity."
+  },
+  "compact_retained_observations": [
+    {
+      "ordinal": 5,
+      "phase": "aa-pilot",
+      "arm": "published-4.7",
+      "endpoint_seconds": 31.7074013,
+      "interaction_response_seconds": 0.7583188,
+      "observer_max_iteration_seconds": 0.7386826,
+      "start_bracket_seconds": 0.0041934,
+      "free_memory_bytes_before": 17703038976,
+      "committed_bytes_before": 23122857984
+    },
+    {
+      "ordinal": 6,
+      "phase": "aa-pilot",
+      "arm": "published-4.7",
+      "endpoint_seconds": 33.5906019,
+      "interaction_response_seconds": 1.104044,
+      "observer_max_iteration_seconds": 0.6750667,
+      "start_bracket_seconds": 0.0041261,
+      "free_memory_bytes_before": 17672544256,
+      "committed_bytes_before": 23363219456
+    }
+  ],
+  "next_diagnostic": {
+    "status": "host-prepared-original-body-review-complete-owner-quiet-preflight-and-freeze-pending",
+    "owner": "Black Glass sole native owner; respects its one-active/one-pending schedule. Aero completed original-body review.",
+    "purpose": "One bounded quiet identical-published experiment to explain the observed control noise. It cannot replace the retained failed38-sample cohort or establish final505 product speed.",
+    "first_action": "Body delivery/review is complete at phase_readback.source above. When the sole native lane permits, reserve a quiet block, bind exact owner locators and retain actual preflight plus committed caller/plan before one fixed5 diagnostic. No further original-body export or decoding is pending.",
+    "fixed_new_schedule": [
+      "published-warmup",
+      "published-diagnostic-1",
+      "published-diagnostic-2",
+      "published-diagnostic-3",
+      "published-diagnostic-4"
+    ],
+    "maximum_factorio_launches": 5,
+    "existing_helper": "tools/lib/validation/DirectLibraryStartupMeasurement.ps1::Invoke-MIRDirectLibraryResponsiveMenuSample",
+    "helper_sha256": "D069C014D74E883C249928E812A258E2A2CB34AFE499219CB46A513345C2EC34",
+    "command_template": "tools/Invoke-MenuComparison.ps1 -RepeatabilityDiagnostic with the exact parameters in spec/evidence/f210-menu-repeatability-prepared-command-r01.json; inspect -PlanOnly and retain actual -Preflight before the owner freezes execution.",
+    "preparation_gap": "Only owner quiet-window scheduling, actual input/preflight readback and committed caller freeze remain before execution. The accepted1324 mode reuses the existing guarded runner/sample helper; do not revive the unadopted duplicate controller prototypes.",
+    "input_bindings": {
+      "factorio": {
+        "path": "D:\\Games\\Factorio\\2.1\\bin\\x64\\factorio.exe",
+        "sha256": "8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38",
+        "file_version": "2.1.23.87750",
+        "product_version": "2.1.23",
+        "base_version": "2.1.23"
+      },
+      "profile": {
+        "path": "D:\\Projects\\Factorio\\mir5-legacy-cannon-credit-r01\\tests\\profiles\\bob-angel-full-space-age-standalone-f210-2123.json",
+        "sha256": "05F2786E896B1F28C2E4239134BA370B0C2BCF6CCB1384E03999FB0E89C8B980"
+      },
+      "published": {
+        "path": "D:\\Projects\\Factorio\\testmods\\2.1\\more-infinite-research_4.7.21003.zip",
+        "sha256": "B6EB9430056ABD384DB00F94929FE7DAC0A37441ACF4BC277946689682628852",
+        "name": "more-infinite-research",
+        "version": "4.7.21003",
+        "root": "more-infinite-research_4.7.21003",
+        "factorio_version": "2.1",
+        "bytes": 1463293
+      },
+      "ordinary_player_config": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\mir5\\recovery\\menu-f210-inputs-r01\\ordinary-config.ini",
+        "sha256": "DA9A92AB9047EBD9F9640B34DC9EF6C084801DF85B8F75B1A490E786F40DD510",
+        "bytes": 66833
+      },
+      "player_data": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\mir5\\recovery\\menu-f210-inputs-r01\\player-data.json",
+        "sha256": "285ED61F8778CFF44FA173F8EDCC5E417F4DF8C1019A3DDD02814729CEE56EF9",
+        "bytes": 10851,
+        "engine_version": "2.1.23",
+        "kind": "actual-engine-prepared-player-data"
+      },
+      "active_mods_observer": "mir-fixture-mir5-active-mods-observer"
+    },
+    "quiet_conditions": [
+      "Hold builds, host suites, other Factorio sessions and unrelated heavy work on Black Glass for the declared block.",
+      "Record foreground/owned window, power mode and available recorded CPU/GPU/disk/background state without closing unrelated user applications or changing governor reserves automatically.",
+      "Keep identical engine/official mods/upstream archive bytes/settings/graphics, same existing actor and Settings-response endpoint, same shared-cache policy. Record seed/live player-data hashes and cache state per observation."
+    ],
+    "required_retention": [
+      "Full actor-result.json and original engine log for every sample, not only the projected endpoint.",
+      "Capture-attempt/first-render/action/response timestamps and owned PNG/hash identities.",
+      "Existing governed process resource ledger and prelaunch admission observations; mark absent telemetry unobserved.",
+      "Exact caller/plan/input hashes, selected archive map, terminal/adverse records and restored direct-library controls."
+    ],
+    "unchanged_tolerance": {
+      "absolute_seconds": 0.5,
+      "relative_percent": 5.0,
+      "rule": "For each predeclared adjacent diagnostic pair (1,2) and (3,4), report absolute difference and max(.5s,5% pair mean). This is explanatory only; never pool/select favorable pairs or substitute them for the original failed pilot."
+    },
+    "stop_rule": "Stop on first governed refusal, endpoint failure, input drift or unsafe control restoration; retain partial/adverse observations. Do not extend five launches or loop unchanged runs.",
+    "after_diagnostic": "If observations establish repeatability under a valid method, freeze one complete final-candidate comparison with the unchanged endpoint/acceptance policy using tools/Invoke-MenuComparison.ps1. If the method is demonstrably unsuitable, review an explicit protocol correction before collecting a replacement acceptance dataset; preserve original failure.",
+    "protocol_boundary": "The accepted1324 runner has one fixed5 published-only diagnostic mode. Ordinary8/64-block comparison behavior remains unchanged. Diagnostic plan/result kinds are distinct and cannot become shortened product acceptance. The old no-new-CLI proposal is retained only in original_diagnosis history."
+  },
+  "claims": {
+    "new_native_execution": false,
+    "causal_explanation_established": false,
+    "performance_gate_passed": false,
+    "memory_acceptance": false,
+    "release_qualification": false
+  },
+  "complete_cohort_retained_at_original_source_evidence": true,
+  "original_diagnosis": {
+    "source_commit": "6ae667ad208eec0d125b9cd05db0db501c14a4ea",
+    "sha256": "3164DC8DEFC2B4E0B60C08FD526284113164848A38E0872B5DFEE9F17E1C1E9D",
+    "scope": "Preserves the original reported-phase interpretation and preparation proposal in Git; current body review below supersedes its untransported/readiness statements, not the original failed native verdict."
+  }
+}

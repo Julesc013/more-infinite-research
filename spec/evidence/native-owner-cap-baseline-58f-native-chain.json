@@ -1,0 +1,441 @@
+{
+  "schema": 1,
+  "kind": "MIR5NativeCapBaselineReadbackV1",
+  "status": "corrected-source-regression-reproduced-on-e3-current-and-legacy-successors-pass",
+  "candidate": {
+    "source_commit": "98fbdd33fe47eb678a5e1aaf17fee903eba2a22a",
+    "player_tree": "ffc5f2e3359de4f326a184cf6a3c29a55941150a",
+    "archive_sha256": "58F04FB9D417F2726835F4A6740490DE3C1841665DAC81C2BA3DFA94050D9457",
+    "freeze_record": "spec/evidence/current-assets-98fbdd33-root-readback.json"
+  },
+  "engine": {
+    "version": "2.1.23",
+    "sha256": "FE4A1DA30F322A0D0B8AEB3DF7276332222BAAA143E2352569B723E84B2B9060"
+  },
+  "fixture_source_commit": "09a66acc9c613617f95074f23f3fd9a4aab4765b",
+  "current_prepared_inputs": {
+    "controller_commit": "7f04b99338d907083dddc6d12b52ca3245f9d1de",
+    "git_path": "spec/evidence/native-owner-cap-order-current-inputs-98fbdd33.json",
+    "prepared_pr": "https://github.com/Julesc013/more-infinite-research/pull/1186",
+    "publication_status": "Prepared receipt belongs to PR1186; the executed raw Git bytes are independently retained in this capsule.",
+    "sha256": "530238E48AC3B8108DCFAFD9F3392FE3E38360822437EE31C2644E839C52E4E0",
+    "raw_git_snapshot_in_capsule": "build/mir5/recovery/cap-baseline-current-inputs-7f04b993.json"
+  },
+  "prior_corrected_source_adverse": {
+    "primary_custody": "build/mir5/recovery-historical/native-owner-cap-order-pre-disabled-source-09a66acc9-r04-native-r02",
+    "terminal_status": "adverse-or-refused",
+    "terminal_sha256": "0A19FB82C2C6A6D3C1AEC22E68002184359543C32AAAFBB212105D1D83B3FC49",
+    "custody": {
+      "original_and_primary_members_verified": 63,
+      "bytes": 2705881,
+      "mismatches": []
+    },
+    "archive_restoration": "original-C563-A15-f01-and-absent-f00-f02-f03-restored",
+    "stages": [
+      {
+        "stage": "source",
+        "status": "passed-private-native-fixture",
+        "controller_commit": "57ad575024406e1a0dfb37835b76226dfc3850fc",
+        "result_sha256": "E6903CAF232E691B9E05E57B2D0F4D073038C2E1A7BB7B67BFB12EC1D5C54FF4",
+        "profile_sha256": "042D00BAACC4FDEF74B206A889D972CC46574531B01D8862FCEAD5CFCF68CF36",
+        "mir_archive_sha256": "E3A65C08AC7798A66FB1BE30D24307B17C8B366DD901953BDE2A09BD6939C8CE",
+        "input_save_sha256": null,
+        "completed_save_sha256": "C804033F523F3C4E91CE2E8E92E84B7568E53E3830C39A7663EBFC2C611EB843",
+        "cold_reloads": 2,
+        "initial_witness": {
+          "fixture_stage": "0.0.1",
+          "cap": 0,
+          "effect_order": [
+            "steel-plate",
+            "casting-steel"
+          ],
+          "actual_lab_completions": 0,
+          "native_state_seeded": true,
+          "player_level": 2,
+          "player_saved_progress": 0.27,
+          "player_enabled": true,
+          "foreign_enabled": false,
+          "foreign_queue_progress": 0.42000000000000004,
+          "on_load_read_only": false
+        },
+        "reload_witness": {
+          "fixture_stage": "0.0.1",
+          "cap": 0,
+          "effect_order": [
+            "steel-plate",
+            "casting-steel"
+          ],
+          "actual_lab_completions": 0,
+          "native_state_seeded": true,
+          "player_level": 2,
+          "player_saved_progress": 0.27,
+          "player_enabled": true,
+          "foreign_enabled": false,
+          "foreign_queue_progress": 0.42000000000000004,
+          "on_load_read_only": true
+        }
+      },
+      {
+        "stage": "canonical",
+        "status": "passed-private-native-fixture",
+        "controller_commit": "57ad575024406e1a0dfb37835b76226dfc3850fc",
+        "result_sha256": "BCD8674D0629671F59E6ACFE00343A377863AB98F6805CA944DB2358771C9B93",
+        "profile_sha256": "2AEA821FCA6F1003EBEA70FDFA635E8A7C2D7F272DE3403D73015A9B9242482D",
+        "mir_archive_sha256": "E3A65C08AC7798A66FB1BE30D24307B17C8B366DD901953BDE2A09BD6939C8CE",
+        "input_save_sha256": "C804033F523F3C4E91CE2E8E92E84B7568E53E3830C39A7663EBFC2C611EB843",
+        "completed_save_sha256": "CE0071971F0D3BBB37C80C2B11B4752896FC20145DF52ADACF77DF7E3D08A619",
+        "cold_reloads": 2,
+        "initial_witness": {
+          "fixture_stage": "0.1.0",
+          "cap": 1,
+          "effect_order": [
+            "steel-plate",
+            "casting-steel"
+          ],
+          "actual_lab_completions": 0,
+          "native_state_seeded": true,
+          "player_level": 2,
+          "player_saved_progress": 0.27,
+          "player_enabled": false,
+          "foreign_enabled": false,
+          "foreign_queue_progress": 0.42000000000000004,
+          "on_load_read_only": false
+        },
+        "reload_witness": {
+          "fixture_stage": "0.1.0",
+          "cap": 1,
+          "effect_order": [
+            "steel-plate",
+            "casting-steel"
+          ],
+          "actual_lab_completions": 0,
+          "native_state_seeded": true,
+          "player_level": 2,
+          "player_saved_progress": 0.27,
+          "player_enabled": false,
+          "foreign_enabled": false,
+          "foreign_queue_progress": 0.42000000000000004,
+          "on_load_read_only": true
+        }
+      },
+      {
+        "stage": "permuted",
+        "status": "passed-private-native-fixture",
+        "controller_commit": "57ad575024406e1a0dfb37835b76226dfc3850fc",
+        "result_sha256": "70B971FE7FC7486365246F27E191A55638BE3D77D9717C20F60C3EECD4C0CDA2",
+        "profile_sha256": "ED9C2455D14804DD6A5E512B93CB92F35332175931DBDDC6324AEB3AE0A39AE3",
+        "mir_archive_sha256": "E3A65C08AC7798A66FB1BE30D24307B17C8B366DD901953BDE2A09BD6939C8CE",
+        "input_save_sha256": "CE0071971F0D3BBB37C80C2B11B4752896FC20145DF52ADACF77DF7E3D08A619",
+        "completed_save_sha256": "3CFC770BF52C1982D98D19F11C9E60656B045AB7FE903B08C6C4A8FEB074C9CD",
+        "cold_reloads": 2,
+        "initial_witness": {
+          "fixture_stage": "0.2.0",
+          "cap": 1,
+          "effect_order": [
+            "casting-steel",
+            "steel-plate"
+          ],
+          "actual_lab_completions": 0,
+          "native_state_seeded": true,
+          "player_level": 2,
+          "player_saved_progress": 0.27,
+          "player_enabled": false,
+          "foreign_enabled": false,
+          "foreign_queue_progress": 0.42000000000000004,
+          "on_load_read_only": false
+        },
+        "reload_witness": {
+          "fixture_stage": "0.2.0",
+          "cap": 1,
+          "effect_order": [
+            "casting-steel",
+            "steel-plate"
+          ],
+          "actual_lab_completions": 0,
+          "native_state_seeded": true,
+          "player_level": 2,
+          "player_saved_progress": 0.27,
+          "player_enabled": false,
+          "foreign_enabled": false,
+          "foreign_queue_progress": 0.42000000000000004,
+          "on_load_read_only": true
+        }
+      },
+      {
+        "stage": "relaxed",
+        "status": "failed",
+        "controller_commit": "57ad575024406e1a0dfb37835b76226dfc3850fc",
+        "result_sha256": "58AF5CEF9C748994933190938D42683218A7FFBCD721B4BFB635A3AB2FBB53DE",
+        "profile_sha256": "5EE6499CE3B0F97B8595438AB3922AD20C745069D74BAB4927EE16CED335B80E",
+        "mir_archive_sha256": "E3A65C08AC7798A66FB1BE30D24307B17C8B366DD901953BDE2A09BD6939C8CE",
+        "input_save_sha256": "3CFC770BF52C1982D98D19F11C9E60656B045AB7FE903B08C6C4A8FEB074C9CD",
+        "failed_guard": [
+          "...ixture-mir5-native-owner-cap-order__/fixture_control.lua:23: [mir5-native-owner-cap-order] relaxed foreign foreign native state differs: level=2, researched=false, enabled=true, maximum=4294967295"
+        ],
+        "log_sha256": "6187885CFAB43E3512E2806E02B6DCCB894E5EE950B8983C4B80181A75EDA4FA"
+      }
+    ]
+  },
+  "current_successors": {
+    "primary_custody": "build/mir5/recovery-historical/native-owner-cap-order-current-58f-r02",
+    "terminal_status": "passed-private-native-fixture-chain",
+    "terminal_sha256": "514A47CE5317C3B21F2D2BD09A183D0B158577769E93331B14DB11BB3509B5C5",
+    "custody": {
+      "original_and_primary_members_verified": 51,
+      "bytes": 2055403,
+      "mismatches": []
+    },
+    "archive_restoration": "original-C563-A15-f01-and-absent-f02-f03-restored",
+    "stages": [
+      {
+        "stage": "canonical",
+        "status": "passed-private-native-fixture",
+        "controller_commit": "7f04b99338d907083dddc6d12b52ca3245f9d1de",
+        "result_sha256": "5A34B8D1C9E43668DBA401B9024AB17B3B08B7730E70F8E57EF9D0842F88C9F0",
+        "profile_sha256": "912846816940169985CC29A87F00D8CD95279B63DFC891FD61C71488156AE8C7",
+        "mir_archive_sha256": "58F04FB9D417F2726835F4A6740490DE3C1841665DAC81C2BA3DFA94050D9457",
+        "input_save_sha256": "C804033F523F3C4E91CE2E8E92E84B7568E53E3830C39A7663EBFC2C611EB843",
+        "completed_save_sha256": "594D729B2E8BB563DF5A68BF63FD82E40E01DAFD1B3616087CD8DCAA1B8FE0C3",
+        "cold_reloads": 2,
+        "initial_witness": {
+          "fixture_stage": "0.1.0",
+          "cap": 1,
+          "effect_order": [
+            "steel-plate",
+            "casting-steel"
+          ],
+          "actual_lab_completions": 0,
+          "native_state_seeded": true,
+          "player_level": 2,
+          "player_saved_progress": 0.27,
+          "player_enabled": false,
+          "foreign_enabled": false,
+          "foreign_queue_progress": 0.42000000000000004,
+          "on_load_read_only": false
+        },
+        "reload_witness": {
+          "fixture_stage": "0.1.0",
+          "cap": 1,
+          "effect_order": [
+            "steel-plate",
+            "casting-steel"
+          ],
+          "actual_lab_completions": 0,
+          "native_state_seeded": true,
+          "player_level": 2,
+          "player_saved_progress": 0.27,
+          "player_enabled": false,
+          "foreign_enabled": false,
+          "foreign_queue_progress": 0.42000000000000004,
+          "on_load_read_only": true
+        }
+      },
+      {
+        "stage": "permuted",
+        "status": "passed-private-native-fixture",
+        "controller_commit": "7f04b99338d907083dddc6d12b52ca3245f9d1de",
+        "result_sha256": "DAEE584906FCF440245675EB9F73683502758D9E20EDC5805FCD25888D75A06D",
+        "profile_sha256": "59130F68FE3EDCFE017738A77675C2A4787A58A2D3245BC05BE5CBA1615D110E",
+        "mir_archive_sha256": "58F04FB9D417F2726835F4A6740490DE3C1841665DAC81C2BA3DFA94050D9457",
+        "input_save_sha256": "594D729B2E8BB563DF5A68BF63FD82E40E01DAFD1B3616087CD8DCAA1B8FE0C3",
+        "completed_save_sha256": "C912BCEFBA383ED841AADFAE1D088377FEA9620A51317E948619D0B27AC102A4",
+        "cold_reloads": 2,
+        "initial_witness": {
+          "fixture_stage": "0.2.0",
+          "cap": 1,
+          "effect_order": [
+            "casting-steel",
+            "steel-plate"
+          ],
+          "actual_lab_completions": 0,
+          "native_state_seeded": true,
+          "player_level": 2,
+          "player_saved_progress": 0.27,
+          "player_enabled": false,
+          "foreign_enabled": false,
+          "foreign_queue_progress": 0.42000000000000004,
+          "on_load_read_only": false
+        },
+        "reload_witness": {
+          "fixture_stage": "0.2.0",
+          "cap": 1,
+          "effect_order": [
+            "casting-steel",
+            "steel-plate"
+          ],
+          "actual_lab_completions": 0,
+          "native_state_seeded": true,
+          "player_level": 2,
+          "player_saved_progress": 0.27,
+          "player_enabled": false,
+          "foreign_enabled": false,
+          "foreign_queue_progress": 0.42000000000000004,
+          "on_load_read_only": true
+        }
+      },
+      {
+        "stage": "relaxed",
+        "status": "passed-private-native-fixture",
+        "controller_commit": "7f04b99338d907083dddc6d12b52ca3245f9d1de",
+        "result_sha256": "3F9B8028F95F8697DC992A1764DE6C367AC25791AD3C4165F16D7C43D953CB56",
+        "profile_sha256": "E64B0C4189D23433BE57CF811DC11899AA96ED2ADC1B5CDBB7D3AC0BFA6AC916",
+        "mir_archive_sha256": "58F04FB9D417F2726835F4A6740490DE3C1841665DAC81C2BA3DFA94050D9457",
+        "input_save_sha256": "C912BCEFBA383ED841AADFAE1D088377FEA9620A51317E948619D0B27AC102A4",
+        "completed_save_sha256": "AD529B76D48C68F9664C387FEB964099F4F0BBAA363DDA7EC9CE782CEF345FD6",
+        "cold_reloads": 2,
+        "initial_witness": {
+          "fixture_stage": "0.3.0",
+          "cap": 0,
+          "effect_order": [
+            "steel-plate",
+            "casting-steel"
+          ],
+          "actual_lab_completions": 0,
+          "native_state_seeded": true,
+          "player_level": 2,
+          "player_saved_progress": 0.27,
+          "player_enabled": true,
+          "foreign_enabled": false,
+          "foreign_queue_progress": 0.42000000000000004,
+          "on_load_read_only": false
+        },
+        "reload_witness": {
+          "fixture_stage": "0.3.0",
+          "cap": 0,
+          "effect_order": [
+            "steel-plate",
+            "casting-steel"
+          ],
+          "actual_lab_completions": 0,
+          "native_state_seeded": true,
+          "player_level": 2,
+          "player_saved_progress": 0.27,
+          "player_enabled": true,
+          "foreign_enabled": false,
+          "foreign_queue_progress": 0.42000000000000004,
+          "on_load_read_only": true
+        }
+      }
+    ]
+  },
+  "legacy_visibility_only_successors": {
+    "primary_custody": "build/mir5/recovery-historical/native-owner-cap-order-current-58f-legacy-r01",
+    "terminal_status": "passed-private-native-fixture-chain",
+    "terminal_sha256": "9CDF55DE4446485B53DA1482DAAEAD2C5B75C73E345B6D472BF3F8DB3C7CF8E3",
+    "custody": {
+      "original_and_primary_members_verified": 34,
+      "bytes": 1370489,
+      "mismatches": []
+    },
+    "archive_restoration": "original-C563-A15-f01-and-absent-f02-f03-restored",
+    "stages": [
+      {
+        "stage": "permuted",
+        "status": "passed-private-native-fixture",
+        "controller_commit": "7f04b99338d907083dddc6d12b52ca3245f9d1de",
+        "result_sha256": "0EC7EAE0057594A0C31CCC4598708D1A1383716D69E73B4FE3CFA47DB34E6A50",
+        "profile_sha256": "59130F68FE3EDCFE017738A77675C2A4787A58A2D3245BC05BE5CBA1615D110E",
+        "mir_archive_sha256": "58F04FB9D417F2726835F4A6740490DE3C1841665DAC81C2BA3DFA94050D9457",
+        "input_save_sha256": "CE0071971F0D3BBB37C80C2B11B4752896FC20145DF52ADACF77DF7E3D08A619",
+        "completed_save_sha256": "88498AFFD4F4A269F17CD20541D945DA236743AF4ACAA9BD1EFE29B748325200",
+        "cold_reloads": 2,
+        "initial_witness": {
+          "fixture_stage": "0.2.0",
+          "cap": 1,
+          "effect_order": [
+            "casting-steel",
+            "steel-plate"
+          ],
+          "actual_lab_completions": 0,
+          "native_state_seeded": true,
+          "player_level": 2,
+          "player_saved_progress": 0.27,
+          "player_enabled": false,
+          "foreign_enabled": false,
+          "foreign_queue_progress": 0.42000000000000004,
+          "on_load_read_only": false
+        },
+        "reload_witness": {
+          "fixture_stage": "0.2.0",
+          "cap": 1,
+          "effect_order": [
+            "casting-steel",
+            "steel-plate"
+          ],
+          "actual_lab_completions": 0,
+          "native_state_seeded": true,
+          "player_level": 2,
+          "player_saved_progress": 0.27,
+          "player_enabled": false,
+          "foreign_enabled": false,
+          "foreign_queue_progress": 0.42000000000000004,
+          "on_load_read_only": true
+        }
+      },
+      {
+        "stage": "relaxed",
+        "status": "passed-private-native-fixture",
+        "controller_commit": "7f04b99338d907083dddc6d12b52ca3245f9d1de",
+        "result_sha256": "8F7E720CE4E62725867016710F254B94337F702FFD58375C01A7D7039BAB5D4F",
+        "profile_sha256": "E64B0C4189D23433BE57CF811DC11899AA96ED2ADC1B5CDBB7D3AC0BFA6AC916",
+        "mir_archive_sha256": "58F04FB9D417F2726835F4A6740490DE3C1841665DAC81C2BA3DFA94050D9457",
+        "input_save_sha256": "88498AFFD4F4A269F17CD20541D945DA236743AF4ACAA9BD1EFE29B748325200",
+        "completed_save_sha256": "AD529B76D48C68F9664C387FEB964099F4F0BBAA363DDA7EC9CE782CEF345FD6",
+        "cold_reloads": 2,
+        "initial_witness": {
+          "fixture_stage": "0.3.0",
+          "cap": 0,
+          "effect_order": [
+            "steel-plate",
+            "casting-steel"
+          ],
+          "actual_lab_completions": 0,
+          "native_state_seeded": true,
+          "player_level": 2,
+          "player_saved_progress": 0.27,
+          "player_enabled": true,
+          "foreign_enabled": false,
+          "foreign_queue_progress": 0.42000000000000004,
+          "on_load_read_only": false
+        },
+        "reload_witness": {
+          "fixture_stage": "0.3.0",
+          "cap": 0,
+          "effect_order": [
+            "steel-plate",
+            "casting-steel"
+          ],
+          "actual_lab_completions": 0,
+          "native_state_seeded": true,
+          "player_level": 2,
+          "player_saved_progress": 0.27,
+          "player_enabled": true,
+          "foreign_enabled": false,
+          "foreign_queue_progress": 0.42000000000000004,
+          "on_load_read_only": true
+        }
+      }
+    ]
+  },
+  "shared_final_save_sha256": "AD529B76D48C68F9664C387FEB964099F4F0BBAA363DDA7EC9CE782CEF345FD6",
+  "pre_engine_refusal": {
+    "path": "build/mir5/recovery-historical/native-owner-cap-order-current-58f-r01-launch/pre-engine-refusal-r01.json",
+    "sha256": "29F09149A0710A94118672DCECB8EBEFB6A013C4E8AA9EAB1CC2AFCCFEB21088",
+    "disposition": "Retain this zero-native caller-import failure. Its initial unused-helper explanation is superseded by the successful caller including the required transitive control-state dependency; no native verdict follows from that explanatory text."
+  },
+  "receipts": {
+    "path": "spec/evidence/native-owner-cap-baseline-58f-receipts.json.gz",
+    "bytes": 164533,
+    "sha256": "95FDB30AB01C57A5EBE4319F07C3F00CD2A90F8DA4A1BEB9D080355CBF367EEC",
+    "uncompressed_sha256": "0018EE914ECFED878165FF66211A22B36F9A27D4C283AA81BFF907753728B060",
+    "members": 20
+  },
+  "limits": [
+    "The earlier three-stage fixture setup diagnosis remains separate from this corrected uncapped-source reproduction.",
+    "Current canonical/permuted/relaxed and legacy permuted/relaxed each save and cold-reload twice: ten new cold reloads across five successor stages.",
+    "The protected E3 source/canonical saves are adopted under their original identities; neither source stage is rerun or relabelled as current.",
+    "All research state and native bonuses are explicitly seeded; actual laboratory completions are zero.",
+    "This closes the named F210 native cap-state regression, not F200, arbitrary foreign writers/modpacks, physical output, performance or release acceptance.",
+    "No earlier failed fixture, native execution or caller receipt is rewritten or declared passing."
+  ]
+}

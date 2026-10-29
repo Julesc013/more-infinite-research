@@ -1,0 +1,25 @@
+{
+  "schema": 1,
+  "kind": "MIR5CompleteHostControlObservationV1",
+  "status": "passed",
+  "controls": 75,
+  "lua_controls": 67,
+  "non_lua_controls": 8,
+  "player_source": "c4183a1b2a1c3346b734df182424dfc54f47a3e5",
+  "repository_metadata_after_start": "e1bc62df0e73eb79be5b71e9c4b47102214790bc",
+  "scope": [
+    "All75 host commands passed against unchanged player source. The r03 menu plan was added during execution; the concluding static pack scan includes that repository metadata.",
+    "This precedes the later fixture-only native data-stage correction and is not final-source, native gameplay or release qualification."
+  ],
+  "log": {
+    "gzip": "spec/mir5/evidence/host-controls-c418-75.gz",
+    "uncompressed_sha256": "719848F7CD66A2A7500FF96ACE651C24085E2BE0DAEB22652835DCEC1CFBA396"
+  },
+  "earlier_adverse": {
+    "gzip": "spec/mir5/evidence/host-controls-8e568-74-adverse.gz",
+    "uncompressed_sha256": "7BC727BC2B13BF5B360B5747F2A77F84C80BE480B2633EACDC632FA4DC18A280"
+  },
+  "earlier_adverse_scope": "Three obsolete test_pack assertions expected private-slice metadata, omitted recovered assets and omitted the data-only BobTech selector. Approved product boundaries were updated; the subsequent complete75-command run passed.",
+  "native_execution": false,
+  "release_qualification": false
+}

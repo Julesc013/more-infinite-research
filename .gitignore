@@ -7,3 +7,6 @@
 /artifacts/
 /out/
 /.mir/local/
+# Machine-local Python host-tool bytecode.
+__pycache__/
+*.py[cod]

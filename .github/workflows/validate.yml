@@ -1,551 +1,243 @@
-name: MIR
+name: MIR 5 host controls
 
 on:
   push:
     branches:
-      - main
       - dev
-      - legacy
-      - tmp/2.0
-      - factorio-2.0-lane
-      - 'release/**'
-      - 'port/**'
+      - main
   pull_request:
+    branches:
+      - dev
+      - main
   workflow_dispatch:
 
 permissions:
   contents: read
-  actions: read
-
-env:
-  MIR_VALIDATION_TARGET: ${{ (github.ref == 'refs/heads/tmp/2.0' || github.head_ref == 'tmp/2.0' || github.base_ref == 'tmp/2.0') && '2.0' || '2.1' }}
-  # Clean hosted runners validate the committed receipt closure. Exact private
-  # development evidence remains mandatory in the local integration gate.
-  MIR4_EXTERNAL_EVIDENCE_MODE: hosted-receipt
 
 jobs:
-  plan:
+  verification-plan:
     name: verification-plan
     runs-on: windows-latest
     outputs:
-      matrix: ${{ steps.matrix.outputs.matrix }}
-      mir4_bootstrap: ${{ steps.mode.outputs.mir4_bootstrap }}
-      plan_artifact: ${{ steps.artifact-names.outputs.plan_artifact }}
-      candidate_artifact: ${{ steps.artifact-names.outputs.candidate_artifact }}
+      plan_artifact: ${{ steps.artifact.outputs.plan_artifact }}
+      plan_sha256: ${{ steps.bind.outputs.plan_sha256 }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
-        with:
-          fetch-depth: 0
-      - id: mode
-        name: Resolve typed verification mode
+      - name: Fetch exact published historical sources
         shell: pwsh
         run: |
-          $mir4 = Test-Path -LiteralPath .mir/releases/waves/mir4-r0/MIR4-Approved-Bootstrap-Correction-MIR3-TERM-0033V1.json -PathType Leaf
-          "mir4_bootstrap=$($mir4.ToString().ToLowerInvariant())" | Out-File -FilePath $env:GITHUB_OUTPUT -Append -Encoding utf8
-      - name: Restore persistent evidence ledger
-        uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9
-        with:
-          path: build/results/assurance/evidence
-          key: mir-ledger-${{ runner.os }}-${{ github.ref_name }}-${{ github.run_id }}
-          restore-keys: |
-            mir-ledger-${{ runner.os }}-${{ github.ref_name }}-
-            mir-ledger-${{ runner.os }}-
-      - name: Diagnose verifier
-        shell: pwsh
-        run: ./tools/mir.ps1 assurance doctor --target $env:MIR_VALIDATION_TARGET --json
-      - name: Build byte-bound development archive
-        if: ${{ steps.mode.outputs.mir4_bootstrap != 'true' }}
-        shell: pwsh
-        run: ./tools/mir.ps1 assurance build --target $env:MIR_VALIDATION_TARGET --output build/results/assurance/development-build.json
-      - name: Resolve content-addressed development candidate
-        if: ${{ steps.mode.outputs.mir4_bootstrap != 'true' }}
-        shell: pwsh
-        run: |
-          $receipt = Get-Content -Raw -LiteralPath build/results/assurance/development-build.json | ConvertFrom-Json
-          $candidate = Join-Path $PWD ([string]$receipt.candidate)
-          $relative = [IO.Path]::GetRelativePath($PWD, $candidate).Replace("\", "/")
-          if ($relative -notmatch '^build/candidates/[0-9]+\.[0-9]+\.[0-9]+/(?:unassigned|C[1-9][0-9]*|[0-9]+\.[0-9]+-P[1-9][0-9]*)/[0-9a-f]{40}/[^/]+\.zip$' -or
-              -not (Test-Path -LiteralPath $candidate -PathType Leaf)) {
-            throw "Development candidate is not present at its governed content-addressed path: $relative"
-          }
-          "MIR_DEVELOPMENT_CANDIDATE=$candidate" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
-      - name: Bind absent MIR 4 hosted candidate
-        if: ${{ steps.mode.outputs.mir4_bootstrap == 'true' }}
+          git fetch --no-tags --depth=1 origin bd9774f323b6eb1561c1d9ff0c91ecc3f7acd1d1
+          if ($LASTEXITCODE -ne 0) { throw 'Exact published historical oracle fetch failed.' }
+          git fetch --no-tags --depth=1 origin 8643cc91bc915e008556a5315dbb0a743247e7ab
+          if ($LASTEXITCODE -ne 0) { throw 'Exact published 4.7.3 repair-source fetch failed.' }
+          git fetch --no-tags --depth=1 origin 5c51ed46d1762b4fca7480f05a057482bbbedb0a
+          if ($LASTEXITCODE -ne 0) { throw 'Exact captured F210 K2 profile-source fetch failed.' }
+          git fetch --no-tags --depth=1 origin a9754abcd7405e1ddffa9f4dc8051b71d00855fe
+          if ($LASTEXITCODE -ne 0) { throw 'Exact native fixture seed-order source fetch failed.' }
+          git fetch --no-tags --depth=1 origin 98bab2c2d346dc508c0f008d824ebc867d920595
+          if ($LASTEXITCODE -ne 0) { throw 'Exact oil reset fixture-source fetch failed.' }
+          git fetch --no-tags --depth=1 origin 32ddafc4fece8d0c3a998a897ee9de1a3e32053e
+          if ($LASTEXITCODE -ne 0) { throw 'Exact runtime science-input fixture-source fetch failed.' }
+          git fetch --no-tags --depth=1 origin c37fca88667d550660f5b9c0efd7f272b56d6025
+          if ($LASTEXITCODE -ne 0) { throw 'Exact captured Bob/Angel science-oil fixture-source fetch failed.' }
+          git fetch --no-tags --depth=1 origin 09a66acc9c613617f95074f23f3fd9a4aab4765b
+          if ($LASTEXITCODE -ne 0) { throw 'Exact pre-disabled native owner cap fixture-source fetch failed.' }
+          git fetch --no-tags --depth=1 origin ce48d0d78c68bc78779a8449f50e4dc0e6b0bc9c
+          if ($LASTEXITCODE -ne 0) { throw 'Exact F200 foreign cap baseline fixture-source fetch failed.' }
+          git fetch --no-tags --depth=1 origin 24dd0497e8f550b8b2bc2dc74b885d7a606dcf08
+          if ($LASTEXITCODE -ne 0) { throw 'Exact corrected F200 cap queue fixture-source fetch failed.' }
+          git fetch --no-tags --depth=1 origin 9ef64ff41e0c7140467df044dfe20837f1fa5a40
+          if ($LASTEXITCODE -ne 0) { throw 'Exact legacy boolean cap fixture-source fetch failed.' }
+      - id: bind
+        name: Bind the exact ordered host-control plan
         shell: pwsh
         run: |
+          $ErrorActionPreference = 'Stop'
+          $driver = 'tests/Test-MIR5HostControls.ps1'
+          $sourceCommit = (& git rev-parse HEAD).Trim().ToUpperInvariant()
           $sourceTree = (& git rev-parse 'HEAD^{tree}').Trim().ToUpperInvariant()
-          $candidate = Join-Path $PWD "build/packages/assurance/f210/MIR4-ASSURANCE-$sourceTree/more-infinite-research_4.0.21000.zip"
-          if (Test-Path -LiteralPath $candidate) { throw 'Hosted MIR 4 static planning must not fabricate or import a candidate.' }
-          "MIR_DEVELOPMENT_CANDIDATE=$candidate" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
-      - name: Materialize content-addressed verification plan
-        shell: pwsh
-        run: |
-          $postRelease = Test-Path -LiteralPath spec/programmes/mir4-4x-operating-programme-v1.json -PathType Leaf
-          $development = Test-Path -LiteralPath governance/repository/development-epoch-v1.json -PathType Leaf
-          $developmentEvent = (
-            ('${{ github.event_name }}' -eq 'push' -and '${{ github.ref }}' -eq 'refs/heads/dev') -or
-            ('${{ github.event_name }}' -eq 'pull_request' -and '${{ github.base_ref }}' -eq 'dev')
-          )
-          $baseline = if ('${{ github.event_name }}' -eq 'pull_request') {
-            '${{ github.event.pull_request.base.sha }}'
-          } elseif ('${{ github.event_name }}' -eq 'push') {
-            '${{ github.event.before }}'
-          } else {
-            ''
+          if ($LASTEXITCODE -ne 0 -or $sourceCommit -notmatch '^[0-9A-F]{40}$' -or $sourceTree -notmatch '^[0-9A-F]{40}$') {
+            throw 'Unable to resolve the checked-out source commit and tree.'
           }
-          if ($baseline -match '^0{40}$') { $baseline = '' }
-          $profile = if ($development) { 'mir4-development' } elseif ($postRelease) { 'mir4-post-release' } elseif ('${{ steps.mode.outputs.mir4_bootstrap }}' -eq 'true') { 'mir4-bootstrap' } else { 'fast' }
-          $planArguments = @('--target', $env:MIR_VALIDATION_TARGET, '--profile', $profile, '--output', 'build/results/assurance/verification-plan.json')
-          if ($development -and $developmentEvent) {
-            . ./tools/mir/application/assurance/DevelopmentValidation.ps1
-            $selection = Get-MIR4DevelopmentCISelection `
-              -RepoRoot $PWD `
-              -Mode hosted-development-affected `
-              -EventName '${{ github.event_name }}' `
-              -Baseline $baseline `
-              -ExpectedHead '${{ github.sha }}'
-            $planning = Get-MIR4DevelopmentInitialPlanProfile -Selection $selection
-            $profile = [string]$planning.profile
-            if ([bool]$planning.use_baseline) {
-              $planArguments = @('--target', $env:MIR_VALIDATION_TARGET, '--profile', $profile, '--baseline', $baseline, '--output', 'build/results/assurance/verification-plan.json')
+          $driverHash = (Get-FileHash -LiteralPath $driver -Algorithm SHA256).Hash.ToUpperInvariant()
+          $hostPlan = & $driver -Plan
+          if ($null -eq $hostPlan) { throw 'MIR5 host plan command produced no result.' }
+          if ([string]$hostPlan.kind -cne 'MIR5HostControlsPlanV1' -or
+              [bool]$hostPlan.native_execution -or [bool]$hostPlan.release_qualification) {
+            throw 'MIR5 host plan has an invalid execution boundary.'
+          }
+          $controls = @($hostPlan.controls)
+          if ($controls.Count -eq 0) { throw 'MIR5 host plan has no controls.' }
+          $seen = [Collections.Generic.HashSet[string]]::new([StringComparer]::Ordinal)
+          foreach ($control in $controls) {
+            $path = [string]$control.path
+            if ([string]::IsNullOrWhiteSpace($path) -or [IO.Path]::IsPathRooted($path) -or
+                $path.Contains('..') -or -not $seen.Add($path)) {
+              throw "MIR5 host plan has an invalid or duplicate control path: $path"
+            }
+            $tracked = @(& git ls-files --error-unmatch -- $path)
+            if ($LASTEXITCODE -ne 0 -or $tracked.Count -ne 1 -or [string]$tracked[0] -cne $path) {
+              throw "MIR5 host plan control is not one tracked checkout file: $path"
             }
           }
-          ./tools/mir.ps1 verify plan --candidate $env:MIR_DEVELOPMENT_CANDIDATE @planArguments
-      - id: matrix
-        name: Export required work
-        shell: pwsh
-        run: |
-          $plan = Get-Content -Raw -LiteralPath build/results/assurance/verification-plan.json | ConvertFrom-Json
-          $work = @($plan.work)
-          if ($work.Count -eq 0) {
-            $work = @([ordered]@{
-              test_id = "reuse-only"
-              safe_test_id = "reuse-only"
-              fingerprint = "reuse-only"
-              no_op = $true
-            })
+          $record = [ordered]@{
+            schema = 1
+            kind = 'MIR5HostGatePlanV1'
+            source = [ordered]@{ commit = $sourceCommit; tree = $sourceTree }
+            driver = [ordered]@{ path = $driver; sha256 = $driverHash }
+            controls = $controls
           }
-          $matrix = @{ include = $work } | ConvertTo-Json -Depth 10 -Compress
-          "matrix=$matrix" | Out-File -FilePath $env:GITHUB_OUTPUT -Append -Encoding utf8
-      - id: artifact-names
-        name: Bind plan artifact identities
+          $outputDirectory = Join-Path $PWD 'build/host-gate'
+          [IO.Directory]::CreateDirectory($outputDirectory) | Out-Null
+          $outputPath = Join-Path $outputDirectory 'plan.json'
+          [IO.File]::WriteAllText($outputPath, (($record | ConvertTo-Json -Depth 32) + "`n"), [Text.UTF8Encoding]::new($false))
+          $planHash = (Get-FileHash -LiteralPath $outputPath -Algorithm SHA256).Hash.ToUpperInvariant()
+          "plan_sha256=$planHash" | Out-File -FilePath $env:GITHUB_OUTPUT -Append -Encoding utf8
+      - id: artifact
+        name: Bind plan artifact identity
         shell: pwsh
         run: |
-          "plan_artifact=mir-verification-plan-${{ github.run_id }}-${{ github.run_attempt }}" | Out-File -FilePath $env:GITHUB_OUTPUT -Append -Encoding utf8
-          "candidate_artifact=mir-development-candidate-${{ github.run_id }}-${{ github.run_attempt }}" | Out-File -FilePath $env:GITHUB_OUTPUT -Append -Encoding utf8
-      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+          "plan_artifact=mir5-host-plan-${{ github.run_id }}-${{ github.run_attempt }}" | Out-File -FilePath $env:GITHUB_OUTPUT -Append -Encoding utf8
+      - name: Preserve the bound host-control plan
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         with:
           include-hidden-files: true
-          name: ${{ steps.artifact-names.outputs.plan_artifact }}
-          path: build/results/assurance/verification-plan.json
-          if-no-files-found: error
-      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
-        if: ${{ steps.mode.outputs.mir4_bootstrap != 'true' }}
-        with:
-          include-hidden-files: true
-          name: ${{ steps.artifact-names.outputs.candidate_artifact }}
-          path: ${{ env.MIR_DEVELOPMENT_CANDIDATE }}
+          name: ${{ steps.artifact.outputs.plan_artifact }}
+          path: build/host-gate/plan.json
           if-no-files-found: error
 
-  tests:
-    name: ${{ matrix.test_id }}
-    needs: plan
+  host-controls:
+    name: host-controls
+    needs: verification-plan
     runs-on: windows-latest
-    strategy:
-      fail-fast: false
-      max-parallel: 2
-      matrix: ${{ fromJSON(needs.plan.outputs.matrix) }}
-    concurrency:
-      # GitHub keeps at most one running and one pending job per concurrency
-      # group. Separate event/ref topologies so a protected-branch push cannot
-      # cancel a related cross-lane pull-request evidence row.
-      group: mir-${{ github.event_name }}-${{ github.ref }}-${{ matrix.safe_test_id }}-${{ matrix.fingerprint }}
-      cancel-in-progress: false
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
-        if: ${{ matrix.no_op != true }}
-        with:
-          fetch-depth: 0
-      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
-        if: ${{ matrix.no_op != true }}
-        with:
-          name: ${{ needs.plan.outputs.plan_artifact }}
-          path: build/results/assurance
-      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
-        if: ${{ matrix.no_op != true && needs.plan.outputs.mir4_bootstrap != 'true' }}
-        with:
-          name: ${{ needs.plan.outputs.candidate_artifact }}
-          path: build/candidate-transfer
-      - name: Resolve exact development candidate
-        if: ${{ matrix.no_op != true && needs.plan.outputs.mir4_bootstrap != 'true' }}
+      - name: Fetch exact published historical sources
         shell: pwsh
         run: |
-          $plan = Get-Content -Raw -LiteralPath build/results/assurance/verification-plan.json | ConvertFrom-Json
-          $candidateRelative = ([string]$plan.candidate_descriptor.path).Replace("\", "/")
-          if ([IO.Path]::IsPathRooted($candidateRelative) -or
-              $candidateRelative -notmatch '^build/candidates/[0-9]+\.[0-9]+\.[0-9]+/(?:unassigned|C[1-9][0-9]*|[0-9]+\.[0-9]+-P[1-9][0-9]*)/[0-9a-f]{40}/[^/]+\.zip$') {
-            throw "Plan candidate descriptor is not a governed repository-relative path: $candidateRelative"
-          }
-          $candidate = Join-Path $PWD $candidateRelative
-          $transferred = @(Get-ChildItem -LiteralPath build/candidate-transfer -Recurse -File -Filter *.zip)
-          if ($transferred.Count -ne 1) { throw "Expected one exact transferred candidate, found $($transferred.Count)." }
-          New-Item -ItemType Directory -Force -Path (Split-Path -Parent $candidate) | Out-Null
-          Copy-Item -LiteralPath $transferred[0].FullName -Destination $candidate -Force
-          if ((Get-FileHash -LiteralPath $candidate -Algorithm SHA256).Hash -ne [string]$plan.candidate_descriptor.sha256) {
-            throw "Transferred development candidate does not match the plan-bound archive identity."
-          }
-          "MIR_DEVELOPMENT_CANDIDATE=$candidate" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
-      - name: Restore absent MIR 4 candidate binding
-        if: ${{ matrix.no_op != true && needs.plan.outputs.mir4_bootstrap == 'true' }}
+          git fetch --no-tags --depth=1 origin bd9774f323b6eb1561c1d9ff0c91ecc3f7acd1d1
+          if ($LASTEXITCODE -ne 0) { throw 'Exact published historical oracle fetch failed.' }
+          git fetch --no-tags --depth=1 origin 8643cc91bc915e008556a5315dbb0a743247e7ab
+          if ($LASTEXITCODE -ne 0) { throw 'Exact published 4.7.3 repair-source fetch failed.' }
+          git fetch --no-tags --depth=1 origin 5c51ed46d1762b4fca7480f05a057482bbbedb0a
+          if ($LASTEXITCODE -ne 0) { throw 'Exact captured F210 K2 profile-source fetch failed.' }
+          git fetch --no-tags --depth=1 origin a9754abcd7405e1ddffa9f4dc8051b71d00855fe
+          if ($LASTEXITCODE -ne 0) { throw 'Exact native fixture seed-order source fetch failed.' }
+          git fetch --no-tags --depth=1 origin 98bab2c2d346dc508c0f008d824ebc867d920595
+          if ($LASTEXITCODE -ne 0) { throw 'Exact oil reset fixture-source fetch failed.' }
+          git fetch --no-tags --depth=1 origin 32ddafc4fece8d0c3a998a897ee9de1a3e32053e
+          if ($LASTEXITCODE -ne 0) { throw 'Exact runtime science-input fixture-source fetch failed.' }
+          git fetch --no-tags --depth=1 origin c37fca88667d550660f5b9c0efd7f272b56d6025
+          if ($LASTEXITCODE -ne 0) { throw 'Exact captured Bob/Angel science-oil fixture-source fetch failed.' }
+          git fetch --no-tags --depth=1 origin 09a66acc9c613617f95074f23f3fd9a4aab4765b
+          if ($LASTEXITCODE -ne 0) { throw 'Exact pre-disabled native owner cap fixture-source fetch failed.' }
+          git fetch --no-tags --depth=1 origin ce48d0d78c68bc78779a8449f50e4dc0e6b0bc9c
+          if ($LASTEXITCODE -ne 0) { throw 'Exact F200 foreign cap baseline fixture-source fetch failed.' }
+          git fetch --no-tags --depth=1 origin 24dd0497e8f550b8b2bc2dc74b885d7a606dcf08
+          if ($LASTEXITCODE -ne 0) { throw 'Exact corrected F200 cap queue fixture-source fetch failed.' }
+          git fetch --no-tags --depth=1 origin 9ef64ff41e0c7140467df044dfe20837f1fa5a40
+          if ($LASTEXITCODE -ne 0) { throw 'Exact legacy boolean cap fixture-source fetch failed.' }
+      - name: Restore the bound host-control plan
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
+        with:
+          name: ${{ needs.verification-plan.outputs.plan_artifact }}
+          path: build/host-gate
+      - name: Verify plan artifact readback against this checkout
         shell: pwsh
+        env:
+          MIR5_HOST_PLAN_SHA256: ${{ needs.verification-plan.outputs.plan_sha256 }}
         run: |
-          $plan = Get-Content -Raw -LiteralPath build/results/assurance/verification-plan.json | ConvertFrom-Json
+          $ErrorActionPreference = 'Stop'
+          $planPath = 'build/host-gate/plan.json'
+          if (-not (Test-Path -LiteralPath $planPath -PathType Leaf)) { throw 'Bound MIR5 host plan artifact is absent.' }
+          $actualPlanHash = (Get-FileHash -LiteralPath $planPath -Algorithm SHA256).Hash.ToUpperInvariant()
+          if ($actualPlanHash -cne $env:MIR5_HOST_PLAN_SHA256) { throw 'Bound MIR5 host plan artifact hash differs.' }
+          $bound = Get-Content -Raw -LiteralPath $planPath | ConvertFrom-Json -Depth 32
+          $sourceCommit = (& git rev-parse HEAD).Trim().ToUpperInvariant()
           $sourceTree = (& git rev-parse 'HEAD^{tree}').Trim().ToUpperInvariant()
-          $expectedCandidate = "build/packages/assurance/f210/MIR4-ASSURANCE-$sourceTree/more-infinite-research_4.0.21000.zip"
-          if ([string]$plan.candidate_descriptor.state -ne 'missing' -or
-              [string]$plan.candidate_descriptor.path -cne $expectedCandidate) {
-            throw 'Hosted MIR 4 plan does not preserve the exact absent-candidate boundary.'
+          if ($LASTEXITCODE -ne 0 -or [int]$bound.schema -ne 1 -or [string]$bound.kind -cne 'MIR5HostGatePlanV1' -or
+              [string]$bound.source.commit -cne $sourceCommit -or [string]$bound.source.tree -cne $sourceTree) {
+            throw 'Bound MIR5 host plan does not describe this checkout.'
           }
-          $candidate = Join-Path $PWD ([string]$plan.candidate_descriptor.path)
-          "MIR_DEVELOPMENT_CANDIDATE=$candidate" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
-      - name: Restore persistent evidence ledger
-        if: ${{ matrix.no_op != true }}
-        uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9
-        with:
-          path: build/results/assurance/evidence
-          key: mir-ledger-${{ runner.os }}-${{ github.ref_name }}-${{ github.run_id }}
-          restore-keys: |
-            mir-ledger-${{ runner.os }}-${{ github.ref_name }}-
-            mir-ledger-${{ runner.os }}-
-      - name: Select exact Python ABI for registered Lua 5.2 controls
-        if: ${{ matrix.no_op != true && (matrix.test_id == 'static.immutable-input-staging' || matrix.test_id == 'static.recipe-productivity-permissions' || matrix.test_id == 'static.approved-pack-bindings' || matrix.test_id == 'static.approved-lab-bindings' || matrix.test_id == 'static.provider-metrics-lazy' || matrix.test_id == 'static.settings-catalogue-lifecycle' || matrix.test_id == 'static.k2-owned-speed-sentinel' || matrix.test_id == 'static.upgrade-manifest-inputs') }}
+          $driver = [string]$bound.driver.path
+          if ($driver -cne 'tests/Test-MIR5HostControls.ps1' -or -not (Test-Path -LiteralPath $driver -PathType Leaf)) {
+            throw 'Bound MIR5 host plan has an invalid driver identity.'
+          }
+          $driverHash = (Get-FileHash -LiteralPath $driver -Algorithm SHA256).Hash.ToUpperInvariant()
+          if ([string]$bound.driver.sha256 -cne $driverHash) { throw 'Bound MIR5 host driver hash differs.' }
+          $current = & $driver -Plan
+          if ($null -eq $current -or [string]$current.kind -cne 'MIR5HostControlsPlanV1' -or
+              [bool]$current.native_execution -or [bool]$current.release_qualification) {
+            throw 'Current MIR5 host plan has an invalid execution boundary.'
+          }
+          $boundControls = @($bound.controls)
+          $currentControls = @($current.controls)
+          if ($boundControls.Count -eq 0 -or $boundControls.Count -ne $currentControls.Count) {
+            throw 'Bound MIR5 host control count differs.'
+          }
+          for ($index = 0; $index -lt $boundControls.Count; $index++) {
+            $boundControl = $boundControls[$index]
+            $currentControl = $currentControls[$index]
+            if ([string]$boundControl.path -cne [string]$currentControl.path -or
+                [bool]$boundControl.lua -ne [bool]$currentControl.lua) {
+              throw "Bound MIR5 host control differs at index $index."
+            }
+          }
+      - name: Select the pinned Python ABI
         uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
         with:
           python-version: '3.14'
-          architecture: 'x64'
+          architecture: x64
           check-latest: false
-      - name: Provision exact Lua 5.2 host for registered Lua 5.2 controls
-        if: ${{ matrix.no_op != true && (matrix.test_id == 'static.immutable-input-staging' || matrix.test_id == 'static.recipe-productivity-permissions' || matrix.test_id == 'static.approved-pack-bindings' || matrix.test_id == 'static.approved-lab-bindings' || matrix.test_id == 'static.provider-metrics-lazy' || matrix.test_id == 'static.settings-catalogue-lifecycle' || matrix.test_id == 'static.k2-owned-speed-sentinel' || matrix.test_id == 'static.upgrade-manifest-inputs') }}
+      - name: Provision the pinned Lua 5.2 host
         shell: pwsh
         run: |
-          $ErrorActionPreference='Stop'
-          $python=(Get-Command python -ErrorAction Stop).Source
-          $identityText=@(& $python -c 'import json, platform, sys; print(json.dumps({"implementation": sys.implementation.name, "major": sys.version_info.major, "minor": sys.version_info.minor, "architecture": platform.architecture()[0], "executable": sys.executable}, sort_keys=True))')
-          if($LASTEXITCODE-ne0-or$identityText.Count-ne1){throw '[mir-k2-lua-bootstrap-python-inspection]'}
-          $identity=$identityText[0]|ConvertFrom-Json
-          if([string]$identity.implementation-cne'cpython'-or[int]$identity.major-ne3-or[int]$identity.minor-ne14-or[string]$identity.architecture-cne'64bit'){
-            throw "[mir-k2-lua-bootstrap-python-unsupported] $($identity|ConvertTo-Json -Compress)"
-          }
-          $runtime=Join-Path $PWD 'build/tmp/mir421-lua-runtime'
-          if(Test-Path -LiteralPath $runtime){throw "[mir-k2-lua-bootstrap-runtime-preexists] $runtime"}
-          [IO.Directory]::CreateDirectory($runtime)|Out-Null
-          $requirements=Join-Path $runtime 'requirements.txt'
-          [IO.File]::WriteAllText($requirements,"lupa==2.6 --hash=sha256:b74f944fe46c421e25d0f8692aef1e842192f6f7f68034201382ac440ef9ea67`n",[Text.UTF8Encoding]::new($false))
+          $ErrorActionPreference = 'Stop'
+          $python = (Get-Command python -ErrorAction Stop).Source
+          $runtime = Join-Path $PWD 'build/tmp/mir5-lua52-runtime'
+          New-Item -ItemType Directory -Path $runtime -ErrorAction Stop | Out-Null
+          $requirements = Join-Path $runtime 'requirements.txt'
+          [IO.File]::WriteAllText($requirements, "lupa==2.6 --hash=sha256:b74f944fe46c421e25d0f8692aef1e842192f6f7f68034201382ac440ef9ea67`n", [Text.UTF8Encoding]::new($false))
           & $python -m pip --isolated install --disable-pip-version-check --no-cache-dir --no-deps --only-binary=:all: --require-hashes --target $runtime --requirement $requirements
-          if($LASTEXITCODE-ne0){throw '[mir-k2-lua-bootstrap-install]'}
-          $probe=@'
-          import json
+          if ($LASTEXITCODE -ne 0) { throw 'Pinned Lupa installation failed.' }
+          $probe = @'
           import sys
           from pathlib import Path
           runtime = Path(sys.argv[1]).resolve()
           sys.path.insert(0, str(runtime))
           import lupa
           from lupa import lua52
-          print(json.dumps({"implementation": sys.implementation.name, "python": sys.version,
-                            "lupa_version": getattr(lupa, "__version__", "unknown"),
-                            "lua52_module": str(Path(lua52.__file__).resolve())}, sort_keys=True))
+          assert lupa.__version__ == "2.6"
+          assert Path(lua52.__file__).name == "lua52.cp314-win_amd64.pyd"
           '@
-          $probeText=@(& $python -c $probe $runtime)
-          if($LASTEXITCODE-ne0-or$probeText.Count-ne1){throw '[mir-k2-lua-bootstrap-import]'}
-          $probeRecord=$probeText[0]|ConvertFrom-Json
-          if([string]$probeRecord.implementation-cne'cpython'-or[string]$probeRecord.lupa_version-cne'2.6'-or[string]$probeRecord.lua52_module-notmatch'lua52[.]cp314-win_amd64[.]pyd$'){
-            throw "[mir-k2-lua-bootstrap-backend-identity] $($probeRecord|ConvertTo-Json -Compress)"
-          }
-          $record=[ordered]@{schema=1;kind='MIRK2213LuaHostBootstrapV1';python=$identity;lupa=[ordered]@{version='2.6';wheel_sha256='B74F944FE46C421E25D0F8692AEF1E842192F6F7F68034201382AC440EF9EA67';lua52_module=$probeRecord.lua52_module};status='provisioned-private-workspace-only'}
-          [IO.File]::WriteAllText((Join-Path $runtime 'bootstrap.json'),(($record|ConvertTo-Json -Depth 8)+"`n"),[Text.UTF8Encoding]::new($false))
-          "MIR_K2_LUA_RUNTIME=$runtime"|Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
-          "MIR_K2_LUA_PYTHON=$python"|Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
-      - name: Reuse, adopt, or run exact test instance
-        id: verification-instance
-        if: ${{ matrix.no_op != true }}
-        shell: pwsh
-        run: ./tools/mir.ps1 verify run-one --target $env:MIR_VALIDATION_TARGET --candidate $env:MIR_DEVELOPMENT_CANDIDATE --plan build/results/assurance/verification-plan.json --test '${{ matrix.test_id }}' --fingerprint '${{ matrix.fingerprint }}'
-      - name: Preserve source-bound SDK generation repair after a stale projection failure
-        id: sdk-generation-repair
-        if: ${{ failure() && steps.verification-instance.outcome == 'failure' && matrix.test_id == 'static.mir4-platform-preview' }}
-        timeout-minutes: 15
-        shell: pwsh
-        env:
-          MIR_SDK_REPAIR_EVIDENCE: build/results/assurance/evidence/${{ matrix.safe_test_id }}/${{ matrix.fingerprint }}
-          MIR_SDK_REPAIR_HEAD: ${{ github.event.pull_request.head.sha || github.sha }}
-          MIR_SDK_REPAIR_FINGERPRINT: ${{ matrix.fingerprint }}
-        run: |
-          $ErrorActionPreference='Stop'
-          $logs=@(Get-ChildItem -LiteralPath $env:MIR_SDK_REPAIR_EVIDENCE -Recurse -File | Where-Object Name -in @('stdout.txt','stderr.txt'))
-          if(-not $logs.Count){return}
-          if(-not @(Select-String -LiteralPath $logs.FullName -Pattern '\[mir4-platform-stale\]' -Quiet | Where-Object {$_}).Count){return}
-          $repo=(Resolve-Path -LiteralPath '.').Path
-          $source=(& git rev-parse HEAD).Trim()
-          $tree=(& git rev-parse 'HEAD^{tree}').Trim()
-          if($LASTEXITCODE -ne 0 -or $source -cne $env:GITHUB_SHA -or @(& git status --porcelain).Count){throw 'SDK repair requires the exact clean hosted checkout'}
-          $output=Join-Path $repo 'build/results/mir4-sdk-generation-repair'
-          if(Test-Path -LiteralPath $output){throw 'SDK repair output already exists'}
-          . ./tools/lib/mir4/PlatformPreview.ps1
-          . ./tools/mir/application/package/TargetMaterializer.ps1
-          $playerSource=Get-MIR4CanonicalPackageSourceFingerprint -RepoRoot $repo
-          # Use the existing complete fixed-point writer. This never changes the
-          # failed verification result or grants an accepted evidence capsule.
-          $generated=@(Invoke-MIR4PlatformGenerate -RepoRoot $repo)
-          $changed=@(& git diff --name-only HEAD)+@(& git ls-files --others --exclude-standard)
-          if($LASTEXITCODE -ne 0 -or -not $changed.Count){throw 'SDK repair produced no changed projections'}
-          $paths=[Collections.Generic.HashSet[string]]::new([StringComparer]::Ordinal)
-          foreach($path in $generated){$null=$paths.Add([string]$path)}
-          $rows=@(foreach($relative in ($changed | Sort-Object -Unique)){
-            if(-not $paths.Contains($relative) -or [IO.Path]::IsPathRooted($relative) -or $relative -match '(^|/)\.\.(/|$)' -or $relative -match '\\'){throw "Unexpected SDK repair path: $relative"}
-            $path=Join-Path $repo $relative
-            $file=Get-Item -LiteralPath $path -Force
-            if($file.PSIsContainer -or ($file.Attributes -band [IO.FileAttributes]::ReparsePoint)){throw "Unsafe SDK repair file: $relative"}
-            [pscustomobject][ordered]@{path=$relative;bytes=$file.Length;sha256=(Get-FileHash -LiteralPath $path).Hash}
-          })
-          if(($rows | Measure-Object bytes -Sum).Sum -gt 16MB){throw 'SDK repair exceeds its 16 MiB artifact budget'}
-          if((Get-MIR4CanonicalPackageSourceFingerprint -RepoRoot $repo) -cne $playerSource){throw 'SDK generation changed player source'}
-          foreach($row in $rows){
-            $destination=Join-Path $output ('files/'+$row.path)
-            New-Item -ItemType Directory -Path (Split-Path -Parent $destination) -Force | Out-Null
-            Copy-Item -LiteralPath (Join-Path $repo $row.path) -Destination $destination
-            if((Get-FileHash -LiteralPath $destination).Hash -cne $row.sha256){throw 'SDK repair artifact readback differs'}
-          }
-          $record=[ordered]@{schema=1;kind='MIR4SdkGenerationRepairV1';source=[ordered]@{checkout_commit=$source;checkout_tree=$tree;head_commit=$env:MIR_SDK_REPAIR_HEAD;player_source_sha256=$playerSource};producer=[ordered]@{run_id=$env:GITHUB_RUN_ID;run_attempt=$env:GITHUB_RUN_ATTEMPT;workflow=$env:GITHUB_WORKFLOW;test_id='static.mir4-platform-preview';fingerprint=$env:MIR_SDK_REPAIR_FINGERPRINT};generator='tools/lib/mir4/PlatformPreview.ps1:Invoke-MIR4PlatformGenerate';fixed_point_completed=$true;files=$rows;original_verification_outcome='failure';accepted_evidence=$false;player_packages_built=$false;native_qualification=$false;publication_authorized=$false}
-          [IO.File]::WriteAllText((Join-Path $output 'repair.json'),(($record|ConvertTo-Json -Depth 15)+[char]10),[Text.UTF8Encoding]::new($false))
-          'artifact_ready=true' | Out-File -FilePath $env:GITHUB_OUTPUT -Append -Encoding utf8
-      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
-        if: ${{ always() && steps.sdk-generation-repair.outputs.artifact_ready == 'true' }}
-        with:
-          name: mir-sdk-generation-repair-${{ github.run_id }}-${{ github.run_attempt }}-${{ matrix.fingerprint }}
-          path: build/results/mir4-sdk-generation-repair
-          if-no-files-found: error
-      - name: Confirm reuse-only plan needs no worker
-        if: ${{ matrix.no_op == true }}
-        shell: pwsh
-        run: Write-Host "All required fingerprints were adopted from trusted reusable evidence."
-      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
-        if: ${{ always() && matrix.no_op != true }}
-        with:
-          include-hidden-files: true
-          name: mir-evidence-${{ github.run_id }}-${{ github.run_attempt }}-${{ matrix.safe_test_id }}-${{ matrix.fingerprint }}
-          path: build/results/assurance/evidence/${{ matrix.safe_test_id }}/${{ matrix.fingerprint }}
-          if-no-files-found: warn
-
-  upstream-plan-failure:
-    name: upstream-plan-failed
-    if: ${{ always() && needs.plan.result != 'success' }}
-    needs:
-      - plan
-    runs-on: windows-latest
-    steps:
-      - name: Record typed upstream failure
+          & $python -c $probe $runtime
+          if ($LASTEXITCODE -ne 0) { throw 'Pinned Lua 5.2 backend probe failed.' }
+          "MIR5_LUA_RUNTIME=$runtime" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
+      - name: Run the bound MIR5 host controls
         shell: pwsh
         run: |
-          New-Item -ItemType Directory -Force -Path build/results/assurance | Out-Null
-          $status = [ordered]@{
-            schema = 1
-            status = "upstream-plan-failed"
-            run_id = "${{ github.run_id }}"
-            run_attempt = "${{ github.run_attempt }}"
-            plan_result = "${{ needs.plan.result }}"
-          }
-          [IO.File]::WriteAllText(
-            "build/results/assurance/workflow-status.json",
-            (($status | ConvertTo-Json -Depth 10) + "`n"),
-            [Text.UTF8Encoding]::new($false)
-          )
-      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
-        with:
-          name: mir-verification-status-${{ github.run_id }}-${{ github.run_attempt }}
-          path: build/results/assurance/workflow-status.json
-          if-no-files-found: error
-      - name: Fail with the upstream classification
-        shell: pwsh
-        run: throw "upstream-plan-failed"
+          $ErrorActionPreference = 'Stop'
+          ./tests/Test-MIR5HostControls.ps1 -LuaRuntimeDir $env:MIR5_LUA_RUNTIME
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
-  verification-gate:
-    name: verification-gate
-    if: ${{ always() && needs.plan.result == 'success' }}
-    needs:
-      - plan
-      - tests
+  native-tooling-controls:
+    name: native-tooling-controls
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
-        with:
-          fetch-depth: 0
-      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
-        with:
-          name: ${{ needs.plan.outputs.plan_artifact }}
-          path: build/results/assurance
-      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
-        if: ${{ needs.plan.outputs.mir4_bootstrap != 'true' }}
-        with:
-          name: ${{ needs.plan.outputs.candidate_artifact }}
-          path: build/candidate-transfer
-      - name: Resolve exact development candidate
-        if: ${{ needs.plan.outputs.mir4_bootstrap != 'true' }}
+      - name: Run current native tooling guards without an engine
         shell: pwsh
         run: |
-          $plan = Get-Content -Raw -LiteralPath build/results/assurance/verification-plan.json | ConvertFrom-Json
-          $candidateRelative = ([string]$plan.candidate_descriptor.path).Replace("\", "/")
-          if ([IO.Path]::IsPathRooted($candidateRelative) -or
-              $candidateRelative -notmatch '^build/candidates/[0-9]+\.[0-9]+\.[0-9]+/(?:unassigned|C[1-9][0-9]*|[0-9]+\.[0-9]+-P[1-9][0-9]*)/[0-9a-f]{40}/[^/]+\.zip$') {
-            throw "Plan candidate descriptor is not a governed repository-relative path: $candidateRelative"
-          }
-          $candidate = Join-Path $PWD $candidateRelative
-          $transferred = @(Get-ChildItem -LiteralPath build/candidate-transfer -Recurse -File -Filter *.zip)
-          if ($transferred.Count -ne 1) { throw "Expected one exact transferred candidate, found $($transferred.Count)." }
-          New-Item -ItemType Directory -Force -Path (Split-Path -Parent $candidate) | Out-Null
-          Copy-Item -LiteralPath $transferred[0].FullName -Destination $candidate -Force
-          if ((Get-FileHash -LiteralPath $candidate -Algorithm SHA256).Hash -ne [string]$plan.candidate_descriptor.sha256) {
-            throw "Transferred development candidate does not match the plan-bound archive identity."
-          }
-          "MIR_DEVELOPMENT_CANDIDATE=$candidate" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
-      - name: Restore absent MIR 4 candidate binding
-        if: ${{ needs.plan.outputs.mir4_bootstrap == 'true' }}
-        shell: pwsh
-        run: |
-          $plan = Get-Content -Raw -LiteralPath build/results/assurance/verification-plan.json | ConvertFrom-Json
-          $sourceTree = (& git rev-parse 'HEAD^{tree}').Trim().ToUpperInvariant()
-          $expectedCandidate = "build/packages/assurance/f210/MIR4-ASSURANCE-$sourceTree/more-infinite-research_4.0.21000.zip"
-          if ([string]$plan.candidate_descriptor.state -ne 'missing' -or
-              [string]$plan.candidate_descriptor.path -cne $expectedCandidate) {
-            throw 'Hosted MIR 4 plan does not preserve the exact absent-candidate boundary.'
-          }
-          $candidate = Join-Path $PWD ([string]$plan.candidate_descriptor.path)
-          "MIR_DEVELOPMENT_CANDIDATE=$candidate" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
-      - name: Restore persistent evidence ledger
-        uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9
-        with:
-          path: build/results/assurance/evidence
-          key: mir-ledger-${{ runner.os }}-${{ github.ref_name }}-${{ github.run_id }}
-          restore-keys: |
-            mir-ledger-${{ runner.os }}-${{ github.ref_name }}-
-            mir-ledger-${{ runner.os }}-
-      - name: Resolve worker artifact download directory
-        id: worker-download-path
-        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3
-        with:
-          script: |
-            const root = 'build/results/assurance/worker-evidence';
-            const prefix = `mir-evidence-${context.runId}-`;
-            const artifacts = await github.paginate(github.rest.actions.listWorkflowRunArtifacts, {
-              ...context.repo, run_id: context.runId, per_page: 100
-            });
-            const workers = artifacts.filter(artifact => artifact.name.startsWith(prefix));
-            if (workers.some(artifact => !/^[A-Za-z0-9._-]+$/.test(artifact.name))) {
-              throw new Error('Unsafe worker artifact name');
-            }
-            core.setOutput('path', workers.length === 1 ? `${root}/${workers[0].name}` : root);
-      - name: Download isolated worker evidence
-        id: download-workers
-        continue-on-error: true
-        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
-        with:
-          # A partial rerun retains successful workers from earlier attempts in
-          # the same workflow run.  The importer verifies the plan, candidate,
-          # trust lineage and artifact attempt before selecting the latest
-          # contribution for each row; do not discard attempt-1 successes here.
-          pattern: mir-evidence-${{ github.run_id }}-*
-          path: ${{ steps.worker-download-path.outputs.path }}
-      - name: Record artifact transport classification
-        shell: pwsh
-        run: |
-          $transport = "${{ steps.download-workers.outcome }}"
-          $status = [ordered]@{
-            schema = 1
-            status = if ($transport -eq "success") { "worker-artifacts-received" } else { "infrastructure-failed" }
-            run_id = "${{ github.run_id }}"
-            run_attempt = "${{ github.run_attempt }}"
-            transport_outcome = $transport
-          }
-          [IO.File]::WriteAllText(
-            "build/results/assurance/workflow-status.json",
-            (($status | ConvertTo-Json -Depth 10) + "`n"),
-            [Text.UTF8Encoding]::new($false)
+          $ErrorActionPreference = 'Stop'
+          $controls = @(
+            'tests/tooling/Test-MIRNativeProbeResources.ps1',
+            'tests/tooling/Test-MIRImmutableInputStaging.ps1',
+            'tests/tooling/Test-MIRLibraryActivation.ps1',
+            'tests/tooling/Test-MIRDirectLibraryStartupMeasurement.ps1',
+            'tests/tooling/Test-MIRDevelopmentHealth.ps1',
+            'tests/tooling/Test-MIRArtifactStorageOptimization.ps1'
           )
-      - name: Import exact worker evidence deterministically
-        shell: pwsh
-        run: ./tools/mir.ps1 verify import-workers --target $env:MIR_VALIDATION_TARGET --candidate $env:MIR_DEVELOPMENT_CANDIDATE --plan build/results/assurance/verification-plan.json --workers build/results/assurance/worker-evidence --artifact-prefix mir-evidence-${{ github.run_id }}- --retry-across-attempts --current-run-attempt ${{ github.run_attempt }}
-      - name: Require exact trusted evidence for every planned instance
-        shell: pwsh
-        run: ./tools/mir.ps1 verify gate --target $env:MIR_VALIDATION_TARGET --candidate $env:MIR_DEVELOPMENT_CANDIDATE --plan build/results/assurance/verification-plan.json --output build/results/assurance/evidence-bundle.json
-      - name: Save updated persistent evidence ledger
-        if: always()
-        uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9
-        with:
-          path: build/results/assurance/evidence
-          key: mir-ledger-${{ runner.os }}-${{ github.ref_name }}-${{ github.run_id }}
-      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
-        if: always()
-        with:
-          include-hidden-files: true
-          name: mir-verification-evidence-${{ github.run_id }}-${{ github.run_attempt }}
-          path: |
-            build/results/assurance/verification-plan.json
-            build/results/assurance/worker-import.json
-            build/results/assurance/evidence-bundle.json
-            build/results/assurance/workflow-status.json
-          if-no-files-found: warn
-
-  # The plan job selects affected development rows before workers start. This
-  # authoring record follows the canonical gate to bind that exact plan result;
-  # it remains distinct from verification-gate and has no release authority.
-  development-static:
-    name: MIR / development-static-gate
-    if: >-
-      ${{ needs.plan.result == 'success' && needs.verification-gate.result == 'success' &&
-        ((github.event_name == 'push' && github.ref == 'refs/heads/dev') ||
-        (github.event_name == 'pull_request' && github.base_ref == 'dev')) }}
-    needs:
-      - plan
-      - verification-gate
-    runs-on: windows-latest
-    concurrency:
-      # Keep only truly identical event/base/merged-content requests together.
-      # A different pull-request merge tree is distinct evidence and must run.
-      group: mir-development-static-${{ github.event_name }}-${{ github.event.pull_request.base.sha || github.event.before }}-${{ github.sha }}
-      cancel-in-progress: false
-    steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
-        with:
-          fetch-depth: 0
-      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
-        with:
-          name: ${{ needs.plan.outputs.plan_artifact }}
-          path: build/results/assurance
-      - id: selection
-        name: Select affected development static checks and verify canonical coverage
-        shell: pwsh
-        run: |
-          $baseline = if ('${{ github.event_name }}' -eq 'pull_request') {
-            '${{ github.event.pull_request.base.sha }}'
-          } else {
-            '${{ github.event.before }}'
+          foreach ($control in $controls) {
+            & pwsh -NoLogo -NoProfile -File $control
+            if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           }
-          if ($baseline -match '^0{40}$') { $baseline = '' }
-          . ./tools/mir/application/assurance/DevelopmentValidation.ps1
-          $result = Invoke-MIR4DevelopmentCanonicalCoverage `
-            -RepoRoot $PWD `
-            -EventName '${{ github.event_name }}' `
-            -Baseline $baseline `
-            -ExpectedHead '${{ github.sha }}' `
-            -PlanPath build/results/assurance/verification-plan.json `
-            -CanonicalGateResult '${{ needs.verification-gate.result }}' `
-            -OutputPath build/results/assurance/development-ci-selection.json
-          if ($result.release_qualification -or $result.release_readiness_gate -or $result.reuse_allowed) {
-            throw 'Hosted development static selection must not claim release qualification, release readiness, or evidence reuse.'
-          }
-          "selection_identity=$($result.selection_identity)" | Out-File -FilePath $env:GITHUB_OUTPUT -Append -Encoding utf8
-      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
-        if: always()
-        with:
-          name: mir-development-static-selection-${{ github.run_id }}-${{ github.run_attempt }}
-          path: build/results/assurance/development-ci-selection.json
-          if-no-files-found: error

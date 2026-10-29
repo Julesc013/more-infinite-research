@@ -1,0 +1,12 @@
+{
+  "name": "mir-fixture-mir5-f200-legacy-worker",
+  "version": "0.1.0",
+  "title": "MIR F200 published native-worker positive-cap continuity fixture",
+  "author": "MIR maintainers",
+  "description": "Private Factorio 2.0 published-MIR seed with two real native worker lab completions and a positive cap.",
+  "factorio_version": "2.0",
+  "dependencies": [
+    "base >= 2.0.77",
+    "more-infinite-research = 4.7.20002"
+  ]
+}

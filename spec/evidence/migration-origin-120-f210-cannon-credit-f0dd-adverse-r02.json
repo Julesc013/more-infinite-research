@@ -1,0 +1,81 @@
+{
+  "schema": 1,
+  "kind": "MIR5MigrationOrigin120F210CannonCreditNativeAdverseV1",
+  "status": "confirmed-earned-cannon-credit-loss-before-successor-lab",
+  "scope": "One direct published MIR1.2.0 F200 save to frozen f0dd F210 Base on Factorio2.1.23. A strict fixture assertion intentionally stops the run before saving the observed loss; this is not a production Lua startup exception, a crash-immunity verdict or a qualified successor.",
+  "inputs": {
+    "controller": "8968c23c5dc119f9b61fda343811ae86ef176be5",
+    "fixture_raw_commit": "a715adbe89468ba6d6a88526920d2d93af611244",
+    "fixture_archive_sha256": "3E4E51C3E67DFF85A721BAE94D30106D90C9A74DC56387DE89AE48EB2D44AFF3",
+    "candidate_source": "f0dd9f62adc8bf0a8eaaf9babc1fcfef9f3241ea",
+    "candidate_player": "0229b2bb3ad0c514fc4dca18c32fd544b9ba7d72",
+    "candidate_archive_sha256": "654C57DDCE2E994C1E8DDC4F808198D4FAC7EAB6284B18C4A628E6DA5465DE23",
+    "profile": "tests/profiles/migration-origins-1.2.0-successor-f210-2123.json",
+    "profile_sha256": "E5AA454A4DF7EB5BB0FE981B10332A4375D9D2F4908C1420EC3B67F1BE1F231D",
+    "engine_version": "2.1.23",
+    "engine_sha256": "FE4A1DA30F322A0D0B8AEB3DF7276332222BAAA143E2352569B723E84B2B9060",
+    "observer_sha256": "A15A7D628D66953D2E0C4D4FA288F47CBF9C5678327C7EB3D23ADB5DC78331C0",
+    "source_chain": "spec/evidence/migration-origin-120-f200-source-native-chain-r06.json",
+    "source_save_sha256": "FDC9BA445B17716CAE7C021959B9B3BF4E1C7EE9F6485AA76DBCC59D70101CAC",
+    "source_save_unchanged": true
+  },
+  "native": {
+    "result_sha256": "968909EB2C66B4D6B341EB11E617E24042F83F4C5500DEDA2B497C0A5C5BDB5B",
+    "result_bytes": 7075,
+    "terminal_sha256": "3B0F334C43F00386B8330B093A5FEB6EAF7868AC49F67B9FC6A7E39F6756F36E",
+    "caller_sha256": "F70490705FFFB5D92D8F8D9F3E5EADBCC5A5D63D1DC08C13F54427B6E987067D",
+    "case_name": "migration-origin-1.2.0-f210-successor",
+    "failure": "player preserved gun contribution differs: cannon-shell expected=2.4 actual=2.3",
+    "actual_cannon": {
+      "player": 2.3,
+      "foreign": 0,
+      "detached": 0
+    },
+    "required_preserved_cannon": {
+      "player": 2.4,
+      "foreign": 0.1,
+      "detached": 0.1
+    },
+    "current_rocket_level_each": 2,
+    "current_cannon_public_level_each": 1,
+    "current_cannon_public_researched_each": false,
+    "candidate_laboratory_completions": 0,
+    "successor_save_produced": false,
+    "cold_reloads": 0
+  },
+  "custody": {
+    "primary_root": "build/qualification/migration-origins/migration-origin-120-f210-successor-r02-r03-native",
+    "native_files": 7,
+    "native_bytes": 63963,
+    "native_and_outer_members_before_root_readback": 12,
+    "native_and_outer_bytes_before_root_readback": 234441,
+    "independent_readback_sha256": "28B50549FC70C6BBCB763787ECD01723D8D95CF3EFCC0722AECB1371B19ABA80",
+    "original_and_primary_native_files_equal": true
+  },
+  "restoration": {
+    "direct_controls": "restored-direct-library-controls",
+    "prior_mir_sha256": "C563CB5B96C9E64CB3373BDB60CF5C8B7D3C97E93EADB8F924443C703CDC024D",
+    "observer_sha256": "A15A7D628D66953D2E0C4D4FA288F47CBF9C5678327C7EB3D23ADB5DC78331C0",
+    "temporary_fixture_restored_absent": true,
+    "factorio_processes_after": 0
+  },
+  "caller_notes": [
+    "Earlier import-scope and fresh-root refusals launched no engine; their original private callers/refusals remain retained separately.",
+    "Original packet0F6F remains unchanged. Caller uses actual marker CaseName1.2.0 rather than its120 spelling and checkout-local build/tmp instead of its illustrative output path."
+  ],
+  "receipts": {
+    "path": "spec/evidence/migration-origin-120-f210-cannon-credit-f0dd-adverse-receipts-r02.json.gz",
+    "sha256": "BB32661BC95B1BAE570D6AC97FF082D962B29E56B9D685907442B7BC218F5A76",
+    "bytes": 5049,
+    "uncompressed_sha256": "41D68A5D0592F95F1922055EC4AE0C174217F95B645A460A017A974E693E0702",
+    "uncompressed_bytes": 31112,
+    "lossless_original_results": 1,
+    "derived_current_observations": 1
+  },
+  "claims": {
+    "earned_state_loss_observed": true,
+    "corrected_player_qualified": false,
+    "release_qualified": false
+  },
+  "required_followup": "Preserve the strict oracle and originalFDC9; qualify a bounded earned-credit correction with a new candidate, one real successor lab, effects reset, save and two pure cold reloads. No fixture threshold is reduced."
+}

@@ -1,0 +1,547 @@
+{
+  "kind": "MIR5NativeFixtureV1",
+  "status": "passed-private-native-runtime-load-only",
+  "case": "science-ambiguity",
+  "source_head": "6c165040247a9205d0bac6f27716c18261bf63a2",
+  "source_dirty": true,
+  "harness_sha256": "9D4DD73C2F5325DD86ECCF6E121A16B770C54B87AD31891D03BEA33B68FDC53A",
+  "native_probe_sha256": "FF8E62687A8AA05080E3F9AFF45DED34BA7FCFDF1F309542A66893380B7D51E3",
+  "governor_sha256": "9E27C4DDCCC10028246F89A09A7663F7FCA1D7BD26444681A7A8635F74D9BE96",
+  "engine": {
+    "path": "C:\\Program Files\\Steam\\steamapps\\common\\Factorio\\bin\\x64\\factorio.exe",
+    "sha256": "FE4A1DA30F322A0D0B8AEB3DF7276332222BAAA143E2352569B723E84B2B9060",
+    "file_version": "2.1.23.87750",
+    "product_version": "2.1.23",
+    "base_version": "2.1.23"
+  },
+  "profile": {
+    "path": "C:\\Projects\\Factorio\\more-infinite-research\\tests\\mir5\\profiles\\science-ambiguity-f210.json",
+    "sha256": "AE76DC6968E4C66D2F846EACE4730504EA60D6F53AEDE08AA73F660479BA638F"
+  },
+  "fixtures": [
+    {
+      "sha256": "641F5D4EB0A9A4F4F3BF15B4B7DCA95D591B5C6454A4E86D1E69ACB81C5787BE",
+      "archive": "C:\\Projects\\Factorio\\testmods\\2.1\\mir-fixture-science-ambiguity_0.1.0.zip",
+      "source": "C:\\Projects\\Factorio\\more-infinite-research\\tests\\mir5\\fixtures\\science-ambiguity"
+    }
+  ],
+  "mir_archive": {
+    "path": "C:\\Projects\\Factorio\\testmods\\2.1\\more-infinite-research_5.0.21000.zip",
+    "sha256": "6F6817697CDA52C2D8B9576BD308E546FDCFBD9FFD795B63BADC9043592AC3C8"
+  },
+  "observation": "native-create-runtime-load-only",
+  "input_save": null,
+  "release_qualification": false,
+  "initial_admission_wait": {
+    "phase": "fixture-initial",
+    "admission_wait_seconds": 60,
+    "status": "admitted-after-wait",
+    "attempt_count": 87,
+    "refusal_count": 86,
+    "elapsed_seconds": 45.567,
+    "first_refusal": {
+      "observed_at": "2026-10-22T23:36:55.0337176+00:00",
+      "error": "[mir441-resource-admission-commit]",
+      "snapshot": {
+        "observed_at": "2026-10-22T23:36:55.0332133+00:00",
+        "memory": {
+          "total_bytes": 17047683072,
+          "free_bytes": 4702433280,
+          "committed_bytes": 17417687040,
+          "commit_limit_bytes": 20996300800
+        },
+        "work_volume": {
+          "name": "C:\\",
+          "free_bytes": 65786486784,
+          "total_bytes": 472446398464
+        },
+        "system_volume": {
+          "name": "C:\\",
+          "free_bytes": 65786486784,
+          "total_bytes": 472446398464
+        }
+      }
+    },
+    "last_refusal": {
+      "observed_at": "2026-10-22T23:37:39.8878666+00:00",
+      "error": "[mir441-resource-admission-commit]",
+      "snapshot": {
+        "observed_at": "2026-10-22T23:37:39.8876975+00:00",
+        "memory": {
+          "total_bytes": 17047683072,
+          "free_bytes": 4786561024,
+          "committed_bytes": 17203249152,
+          "commit_limit_bytes": 20996300800
+        },
+        "work_volume": {
+          "name": "C:\\",
+          "free_bytes": 65784139776,
+          "total_bytes": 472446398464
+        },
+        "system_volume": {
+          "name": "C:\\",
+          "free_bytes": 65784139776,
+          "total_bytes": 472446398464
+        }
+      }
+    },
+    "last_error": "[mir441-resource-admission-commit]",
+    "started_at": "2026-10-22T23:36:54.8491225+00:00",
+    "deadline_at": "2026-10-22T23:37:54.8491225+00:00",
+    "admission": {
+      "observed_at": "2026-10-22T23:37:40.4106936+00:00",
+      "memory": {
+        "total_bytes": 17047683072,
+        "free_bytes": 4874854400,
+        "committed_bytes": 17108066304,
+        "commit_limit_bytes": 20996300800
+      },
+      "work_volume": {
+        "name": "C:\\",
+        "free_bytes": 65784139776,
+        "total_bytes": 472446398464
+      },
+      "system_volume": {
+        "name": "C:\\",
+        "free_bytes": 65784139776,
+        "total_bytes": 472446398464
+      }
+    }
+  },
+  "create": {
+    "process": {
+      "index": 1,
+      "status": "passed",
+      "ledger": "C:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\mir5-science-ambiguity-native-r01\\process-1.resources.jsonl",
+      "stdout": "C:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\mir5-science-ambiguity-native-r01\\process-1.stdout.txt",
+      "stderr": "C:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\mir5-science-ambiguity-native-r01\\process-1.stderr.txt",
+      "result": {
+        "status": "passed",
+        "exit_code": 0,
+        "timed_out": false,
+        "passed": true,
+        "completion_predicate_observed": false,
+        "duration_seconds": 5.348489,
+        "peak_working_set_bytes": 240664576,
+        "peak_sampled_private_bytes": 229892096,
+        "admission": {
+          "observed_at": "2026-10-22T23:38:08.5954876+00:00",
+          "memory": {
+            "total_bytes": 17047683072,
+            "free_bytes": 4803735552,
+            "committed_bytes": 17168465920,
+            "commit_limit_bytes": 20996300800
+          },
+          "work_volume": {
+            "name": "C:\\",
+            "free_bytes": 65783332864,
+            "total_bytes": 472446398464
+          },
+          "system_volume": {
+            "name": "C:\\",
+            "free_bytes": 65783332864,
+            "total_bytes": 472446398464
+          }
+        },
+        "duration_measurement": {
+          "scope": "direct-native-executable-start-to-exit",
+          "historical_scope": "governed-powershell-wrapper-tree-start-to-exit",
+          "comparability": "scope-changed; compare only fresh direct-native measurements; no product-speedup claim"
+        },
+        "admission_wait": {
+          "phase": "fixture-create",
+          "admission_wait_seconds": 60,
+          "status": "admitted-after-wait",
+          "attempt_count": 46,
+          "refusal_count": 44,
+          "elapsed_seconds": 23.279,
+          "first_refusal": {
+            "observed_at": "2026-10-22T23:37:45.4552555+00:00",
+            "error": "[mir441-resource-admission-memory]",
+            "snapshot": {
+              "observed_at": "2026-10-22T23:37:45.4550754+00:00",
+              "memory": {
+                "total_bytes": 17047683072,
+                "free_bytes": 4617158656,
+                "committed_bytes": 17357393920,
+                "commit_limit_bytes": 20996300800
+              },
+              "work_volume": {
+                "name": "C:\\",
+                "free_bytes": 65783881728,
+                "total_bytes": 472446398464
+              },
+              "system_volume": {
+                "name": "C:\\",
+                "free_bytes": 65783881728,
+                "total_bytes": 472446398464
+              }
+            }
+          },
+          "last_refusal": {
+            "observed_at": "2026-10-22T23:38:08.0510375+00:00",
+            "error": "[mir441-resource-admission-commit]",
+            "snapshot": {
+              "observed_at": "2026-10-22T23:38:08.0508661+00:00",
+              "memory": {
+                "total_bytes": 17047683072,
+                "free_bytes": 4777070592,
+                "committed_bytes": 17190711296,
+                "commit_limit_bytes": 20996300800
+              },
+              "work_volume": {
+                "name": "C:\\",
+                "free_bytes": 65783332864,
+                "total_bytes": 472446398464
+              },
+              "system_volume": {
+                "name": "C:\\",
+                "free_bytes": 65783332864,
+                "total_bytes": 472446398464
+              }
+            }
+          },
+          "last_error": "[mir441-resource-admission-commit]",
+          "started_at": "2026-10-22T23:37:45.3166477+00:00",
+          "deadline_at": "2026-10-22T23:38:45.3166477+00:00",
+          "admission": {
+            "observed_at": "2026-10-22T23:38:08.5954876+00:00",
+            "memory": {
+              "total_bytes": 17047683072,
+              "free_bytes": 4803735552,
+              "committed_bytes": 17168465920,
+              "commit_limit_bytes": 20996300800
+            },
+            "work_volume": {
+              "name": "C:\\",
+              "free_bytes": 65783332864,
+              "total_bytes": 472446398464
+            },
+            "system_volume": {
+              "name": "C:\\",
+              "free_bytes": 65783332864,
+              "total_bytes": 472446398464
+            }
+          }
+        }
+      },
+      "admission_wait": {
+        "phase": "fixture-create",
+        "admission_wait_seconds": 60,
+        "status": "admitted-after-wait",
+        "attempt_count": 46,
+        "refusal_count": 44,
+        "elapsed_seconds": 23.279,
+        "first_refusal": {
+          "observed_at": "2026-10-22T23:37:45.4552555+00:00",
+          "error": "[mir441-resource-admission-memory]",
+          "snapshot": {
+            "observed_at": "2026-10-22T23:37:45.4550754+00:00",
+            "memory": {
+              "total_bytes": 17047683072,
+              "free_bytes": 4617158656,
+              "committed_bytes": 17357393920,
+              "commit_limit_bytes": 20996300800
+            },
+            "work_volume": {
+              "name": "C:\\",
+              "free_bytes": 65783881728,
+              "total_bytes": 472446398464
+            },
+            "system_volume": {
+              "name": "C:\\",
+              "free_bytes": 65783881728,
+              "total_bytes": 472446398464
+            }
+          }
+        },
+        "last_refusal": {
+          "observed_at": "2026-10-22T23:38:08.0510375+00:00",
+          "error": "[mir441-resource-admission-commit]",
+          "snapshot": {
+            "observed_at": "2026-10-22T23:38:08.0508661+00:00",
+            "memory": {
+              "total_bytes": 17047683072,
+              "free_bytes": 4777070592,
+              "committed_bytes": 17190711296,
+              "commit_limit_bytes": 20996300800
+            },
+            "work_volume": {
+              "name": "C:\\",
+              "free_bytes": 65783332864,
+              "total_bytes": 472446398464
+            },
+            "system_volume": {
+              "name": "C:\\",
+              "free_bytes": 65783332864,
+              "total_bytes": 472446398464
+            }
+          }
+        },
+        "last_error": "[mir441-resource-admission-commit]",
+        "started_at": "2026-10-22T23:37:45.3166477+00:00",
+        "deadline_at": "2026-10-22T23:38:45.3166477+00:00",
+        "admission": {
+          "observed_at": "2026-10-22T23:38:08.5954876+00:00",
+          "memory": {
+            "total_bytes": 17047683072,
+            "free_bytes": 4803735552,
+            "committed_bytes": 17168465920,
+            "commit_limit_bytes": 20996300800
+          },
+          "work_volume": {
+            "name": "C:\\",
+            "free_bytes": 65783332864,
+            "total_bytes": 472446398464
+          },
+          "system_volume": {
+            "name": "C:\\",
+            "free_bytes": 65783332864,
+            "total_bytes": 472446398464
+          }
+        }
+      }
+    },
+    "log": "C:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\mir5-science-ambiguity-native-r01\\create.factorio.log",
+    "log_sha256": "A909557B7C3576FE06E8427B4E7D9B1942BC2618AB912F73D8E49E1B53C444C9",
+    "loaded_selection": [
+      "base@2.1.23",
+      "mir-fixture-science-ambiguity@0.1.0",
+      "more-infinite-research@5.0.21000"
+    ],
+    "consumers": {}
+  },
+  "seed_sha256": "60F16CF3A9481BE8EC737380C706840FF6720DA11DAFF399AC001A5CE490B363",
+  "library_control_restoration": {
+    "status": "restored-direct-library-controls",
+    "profile_sha256": "AE76DC6968E4C66D2F846EACE4730504EA60D6F53AEDE08AA73F660479BA638F",
+    "dependency_payload_bytes_copied": 0,
+    "archive_links_created": 0,
+    "archive_extractions": 0,
+    "owned_archive_names_temporarily_hidden": 0,
+    "selected": [
+      {
+        "name": "base",
+        "version": "2.1.23",
+        "path": "C:\\Program Files\\Steam\\steamapps\\common\\Factorio\\data\\base\\info.json",
+        "builtin": true,
+        "identity": "C65BE9DB:036C000000246719",
+        "sha256": "0DA4FCB137A0C38CD74EEB3A52462169F360F54B95AD0669270D08CFA9AA352F",
+        "bytes": 193
+      },
+      {
+        "name": "more-infinite-research",
+        "version": "5.0.21000",
+        "path": "C:\\Projects\\Factorio\\testmods\\2.1\\more-infinite-research_5.0.21000.zip",
+        "builtin": false,
+        "identity": "C65BE9DB:0050000000198946",
+        "sha256": "6F6817697CDA52C2D8B9576BD308E546FDCFBD9FFD795B63BADC9043592AC3C8",
+        "bytes": 85876
+      },
+      {
+        "name": "mir-fixture-science-ambiguity",
+        "version": "0.1.0",
+        "path": "C:\\Projects\\Factorio\\testmods\\2.1\\mir-fixture-science-ambiguity_0.1.0.zip",
+        "builtin": false,
+        "identity": "C65BE9DB:00B50000001CC32A",
+        "sha256": "641F5D4EB0A9A4F4F3BF15B4B7DCA95D591B5C6454A4E86D1E69ACB81C5787BE",
+        "bytes": 2790
+      }
+    ]
+  },
+  "process_runs": [
+    {
+      "index": 1,
+      "status": "passed",
+      "ledger": "C:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\mir5-science-ambiguity-native-r01\\process-1.resources.jsonl",
+      "stdout": "C:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\mir5-science-ambiguity-native-r01\\process-1.stdout.txt",
+      "stderr": "C:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\mir5-science-ambiguity-native-r01\\process-1.stderr.txt",
+      "result": {
+        "status": "passed",
+        "exit_code": 0,
+        "timed_out": false,
+        "passed": true,
+        "completion_predicate_observed": false,
+        "duration_seconds": 5.348489,
+        "peak_working_set_bytes": 240664576,
+        "peak_sampled_private_bytes": 229892096,
+        "admission": {
+          "observed_at": "2026-10-22T23:38:08.5954876+00:00",
+          "memory": {
+            "total_bytes": 17047683072,
+            "free_bytes": 4803735552,
+            "committed_bytes": 17168465920,
+            "commit_limit_bytes": 20996300800
+          },
+          "work_volume": {
+            "name": "C:\\",
+            "free_bytes": 65783332864,
+            "total_bytes": 472446398464
+          },
+          "system_volume": {
+            "name": "C:\\",
+            "free_bytes": 65783332864,
+            "total_bytes": 472446398464
+          }
+        },
+        "duration_measurement": {
+          "scope": "direct-native-executable-start-to-exit",
+          "historical_scope": "governed-powershell-wrapper-tree-start-to-exit",
+          "comparability": "scope-changed; compare only fresh direct-native measurements; no product-speedup claim"
+        },
+        "admission_wait": {
+          "phase": "fixture-create",
+          "admission_wait_seconds": 60,
+          "status": "admitted-after-wait",
+          "attempt_count": 46,
+          "refusal_count": 44,
+          "elapsed_seconds": 23.279,
+          "first_refusal": {
+            "observed_at": "2026-10-22T23:37:45.4552555+00:00",
+            "error": "[mir441-resource-admission-memory]",
+            "snapshot": {
+              "observed_at": "2026-10-22T23:37:45.4550754+00:00",
+              "memory": {
+                "total_bytes": 17047683072,
+                "free_bytes": 4617158656,
+                "committed_bytes": 17357393920,
+                "commit_limit_bytes": 20996300800
+              },
+              "work_volume": {
+                "name": "C:\\",
+                "free_bytes": 65783881728,
+                "total_bytes": 472446398464
+              },
+              "system_volume": {
+                "name": "C:\\",
+                "free_bytes": 65783881728,
+                "total_bytes": 472446398464
+              }
+            }
+          },
+          "last_refusal": {
+            "observed_at": "2026-10-22T23:38:08.0510375+00:00",
+            "error": "[mir441-resource-admission-commit]",
+            "snapshot": {
+              "observed_at": "2026-10-22T23:38:08.0508661+00:00",
+              "memory": {
+                "total_bytes": 17047683072,
+                "free_bytes": 4777070592,
+                "committed_bytes": 17190711296,
+                "commit_limit_bytes": 20996300800
+              },
+              "work_volume": {
+                "name": "C:\\",
+                "free_bytes": 65783332864,
+                "total_bytes": 472446398464
+              },
+              "system_volume": {
+                "name": "C:\\",
+                "free_bytes": 65783332864,
+                "total_bytes": 472446398464
+              }
+            }
+          },
+          "last_error": "[mir441-resource-admission-commit]",
+          "started_at": "2026-10-22T23:37:45.3166477+00:00",
+          "deadline_at": "2026-10-22T23:38:45.3166477+00:00",
+          "admission": {
+            "observed_at": "2026-10-22T23:38:08.5954876+00:00",
+            "memory": {
+              "total_bytes": 17047683072,
+              "free_bytes": 4803735552,
+              "committed_bytes": 17168465920,
+              "commit_limit_bytes": 20996300800
+            },
+            "work_volume": {
+              "name": "C:\\",
+              "free_bytes": 65783332864,
+              "total_bytes": 472446398464
+            },
+            "system_volume": {
+              "name": "C:\\",
+              "free_bytes": 65783332864,
+              "total_bytes": 472446398464
+            }
+          }
+        }
+      },
+      "admission_wait": {
+        "phase": "fixture-create",
+        "admission_wait_seconds": 60,
+        "status": "admitted-after-wait",
+        "attempt_count": 46,
+        "refusal_count": 44,
+        "elapsed_seconds": 23.279,
+        "first_refusal": {
+          "observed_at": "2026-10-22T23:37:45.4552555+00:00",
+          "error": "[mir441-resource-admission-memory]",
+          "snapshot": {
+            "observed_at": "2026-10-22T23:37:45.4550754+00:00",
+            "memory": {
+              "total_bytes": 17047683072,
+              "free_bytes": 4617158656,
+              "committed_bytes": 17357393920,
+              "commit_limit_bytes": 20996300800
+            },
+            "work_volume": {
+              "name": "C:\\",
+              "free_bytes": 65783881728,
+              "total_bytes": 472446398464
+            },
+            "system_volume": {
+              "name": "C:\\",
+              "free_bytes": 65783881728,
+              "total_bytes": 472446398464
+            }
+          }
+        },
+        "last_refusal": {
+          "observed_at": "2026-10-22T23:38:08.0510375+00:00",
+          "error": "[mir441-resource-admission-commit]",
+          "snapshot": {
+            "observed_at": "2026-10-22T23:38:08.0508661+00:00",
+            "memory": {
+              "total_bytes": 17047683072,
+              "free_bytes": 4777070592,
+              "committed_bytes": 17190711296,
+              "commit_limit_bytes": 20996300800
+            },
+            "work_volume": {
+              "name": "C:\\",
+              "free_bytes": 65783332864,
+              "total_bytes": 472446398464
+            },
+            "system_volume": {
+              "name": "C:\\",
+              "free_bytes": 65783332864,
+              "total_bytes": 472446398464
+            }
+          }
+        },
+        "last_error": "[mir441-resource-admission-commit]",
+        "started_at": "2026-10-22T23:37:45.3166477+00:00",
+        "deadline_at": "2026-10-22T23:38:45.3166477+00:00",
+        "admission": {
+          "observed_at": "2026-10-22T23:38:08.5954876+00:00",
+          "memory": {
+            "total_bytes": 17047683072,
+            "free_bytes": 4803735552,
+            "committed_bytes": 17168465920,
+            "commit_limit_bytes": 20996300800
+          },
+          "work_volume": {
+            "name": "C:\\",
+            "free_bytes": 65783332864,
+            "total_bytes": 472446398464
+          },
+          "system_volume": {
+            "name": "C:\\",
+            "free_bytes": 65783332864,
+            "total_bytes": 472446398464
+          }
+        }
+      }
+    }
+  ]
+}

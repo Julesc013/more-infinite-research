@@ -1,0 +1,74 @@
+{
+  "schema": 1,
+  "kind": "MIRMenuAaPilotSourceBodyDeliveryV1",
+  "status": "six-exact-retained-source-records-portable-no-new-native",
+  "original_cohort": {
+    "path": "spec/evidence/f210-575e-menu-native-chain-r01.json",
+    "sha256": "A5D12894F3B834D7830491A7959FF65CC37EB65E1ABF9D5F7C30EE4C9AA292F5"
+  },
+  "original_private_readback": {
+    "path": "build/qualification/f210-performance-575e-menu-r01/root-readback-r01.json",
+    "sha256": "FC731A16A5AEB5C029FE1E53AC755684ABBAA63FF337105A0381B80E4365738D"
+  },
+  "capsule": {
+    "path": "spec/evidence/f210-menu-aa-pilot-source-records-r01.json.gz",
+    "sha256": "10B29368299A2BF78E3A83EC113A156E0C68445D5A40A64AC19455E47CDC8A89",
+    "bytes": 38485,
+    "records": 6,
+    "uncompressed_bytes": 228916
+  },
+  "records": [
+    {
+      "ordinal": 5,
+      "relative_path": "runs/05-aa-pilot-published-4.7/responsive-menu-actor/actor-result.json",
+      "bytes": 20899,
+      "sha256": "2358F6096B214293356DE73B29CA641350B24C6FBE041B36606604C684140C1F"
+    },
+    {
+      "ordinal": 5,
+      "relative_path": "runs/05-aa-pilot-published-4.7/factorio.log",
+      "bytes": 48618,
+      "sha256": "1665DEB8EEE5905FA92FB28B4028D78DB57AC37F206F39754EE126C161C59491"
+    },
+    {
+      "ordinal": 5,
+      "relative_path": "process-5.resources.jsonl",
+      "bytes": 15506,
+      "sha256": "BD93A0CC6A710CEA79A0E793CFA5EE3431BF259EA1B5F33ADAB92C6F86A39D4E"
+    },
+    {
+      "ordinal": 6,
+      "relative_path": "runs/06-aa-pilot-published-4.7/responsive-menu-actor/actor-result.json",
+      "bytes": 20943,
+      "sha256": "5A735F68E28A9F813B06A6F48397BBA2790873BB499E1B2F5DBA70A040FF5324"
+    },
+    {
+      "ordinal": 6,
+      "relative_path": "runs/06-aa-pilot-published-4.7/factorio.log",
+      "bytes": 48618,
+      "sha256": "5ACDDB9B0640A1DBF45E2D328E1515ED905AFB4B54F00A02812C50E0B8EB0621"
+    },
+    {
+      "ordinal": 6,
+      "relative_path": "process-6.resources.jsonl",
+      "bytes": 16118,
+      "sha256": "DAB35DB308DD321A37F0AE561FE2D2514FEC319DC34727EE6DE24ADE851CCC51"
+    }
+  ],
+  "verification": "Original and primary raw bodies matched original469-file custody map before delivery. All six lengths/hashes and lossless exact bytes rechecked from this committed capsule.",
+  "source_comment_delivery": "https://github.com/Julesc013/more-infinite-research/pull/1320#issuecomment-6468260310",
+  "native_execution": false,
+  "original_aa_seconds": [
+    31.7074013,
+    33.5906019
+  ],
+  "original_aa_difference_seconds": 1.8832006,
+  "original_allowed_seconds": 1.63245008,
+  "original_performance_acceptance": false,
+  "independent_review": "Pending actual actor/log/resource clock and capture review by Aero before the prepared fixed5 diagnostic. Delivery is not a review or a cause verdict.",
+  "limits": [
+    "This extends source evidence without rewriting the original ten-record capsule or38-sample cohort.",
+    "No screenshot, player-data/config credential body or new observation is included.",
+    "Capture-attempt aggregates and clocks are recorded by the original actor; uncollected per-attempt CPU/GPU/disk/thermal causes remain unobserved."
+  ]
+}

@@ -1,0 +1,9 @@
+{
+  "name": "mir-fixture-mir5-worker-caps",
+  "version": "0.1.0",
+  "title": "MIR 5 private native worker cap fixture",
+  "author": "MIR maintainers",
+  "description": "Disposable Space Age/K2SO worker tail lab completions, cap ownership and native bonus preservation.",
+  "factorio_version": "2.1",
+  "dependencies": ["base >= 2.1.23", "space-age", "more-infinite-research = 5.0.21000"]
+}

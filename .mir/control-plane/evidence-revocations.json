@@ -1,6 +1,0 @@
-{
-  "schema": 1,
-  "authority": "mir-control-plane-v5-evidence-revocations",
-  "default_disposition": "allow",
-  "rules": []
-}

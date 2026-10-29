@@ -1,0 +1,45 @@
+{
+  "schema": 1,
+  "kind": "mir5-py-coal-f200-native-reference-selection",
+  "target": "f200",
+  "factorio_line": "2.0",
+  "engine": {
+    "version": "2.0.77",
+    "sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B"
+  },
+  "settings_mode": "Defaults",
+  "mods": [
+    {
+      "name": "base",
+      "version": "2.0.77",
+      "enabled": true
+    },
+    {
+      "name": "pycoalprocessinggraphics",
+      "version": "3.0.9",
+      "enabled": true
+    },
+    {
+      "name": "pypostprocessing",
+      "version": "3.0.42",
+      "enabled": true
+    },
+    {
+      "name": "pycoalprocessing",
+      "version": "3.0.44",
+      "enabled": true
+    },
+    {
+      "name": "mir-fixture-mir5-active-mods-observer",
+      "version": "0.1.0",
+      "enabled": true
+    }
+  ],
+  "archive_sha256": {
+    "mir-fixture-mir5-active-mods-observer_0.1.0.zip": "723D1E7721449FC26040E5E6629416767BDC20AD79CF8723115846DB662A1F87",
+    "pycoalprocessing_3.0.44.zip": "E9E8C3B6385832A7B15BA4DE1EB37D0DCFAB42BE490BE88B6156463AA59EA9B2",
+    "pycoalprocessinggraphics_3.0.9.zip": "B154858EB935E21CA254E2C719D808D562EED15CCDAD2E2B905460018847671E",
+    "pypostprocessing_3.0.42.zip": "D5AF3599EB16247E669CCB029CCF710A238AFACA615E90AFBD73475FEE73E252"
+  },
+  "scope": "Independent upstream final-data reference for named Py Coal Processing material routes; no MIR5 admission, gameplay, save, or support qualification."
+}

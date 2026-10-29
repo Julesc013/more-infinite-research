@@ -1,0 +1,242 @@
+{
+  "schema": 1,
+  "kind": "MIR5CurrentAssetFreezeReadbackV1",
+  "status": "independent-aero-rebuild-verified-not-native-qualified",
+  "source": {
+    "commit": "61bc49e55cee121db75f300d5ae954d3f8488105",
+    "mod_name": "more-infinite-research",
+    "mod_title": "More Infinite Research",
+    "path": "source",
+    "source_distribution_version": "5.0.21000",
+    "source_tree": "44eadfad017440d384f0e932b0eecbcb991a5e40",
+    "tree": "ef09c5ecf435bc4b9b35e075e47f17fbccf3c063"
+  },
+  "controller": {
+    "package_tool": {
+      "path": "tools/package.py",
+      "sha256": "00ed00d66bd558554068405c8882419f852fc2f66646088052888d70e25da61e"
+    },
+    "release_tool": {
+      "path": "tools/release.py",
+      "sha256": "59beddf90a97e0a0141a87a50539fad5dc18e331ace675e79d43d9e0fab7cddf"
+    },
+    "runtime": {
+      "implementation": "cpython",
+      "version": [
+        3,
+        14,
+        7
+      ],
+      "zlib_build_version": "1.3.1.zlib-ng",
+      "zlib_runtime_version": "1.3.1.zlib-ng"
+    },
+    "zip_policy": {
+      "compression": "ZIP_DEFLATED",
+      "compresslevel": 9,
+      "member_create_system": 3,
+      "member_external_attr": 2175008768,
+      "member_timestamp": [
+        1980,
+        1,
+        1,
+        0,
+        0,
+        0
+      ]
+    }
+  },
+  "target_record": {
+    "blob": "b7c2a789e17b6726c341f8a3ff97d6a27d43c0d6",
+    "path": "targets/editions.json",
+    "sha256": "2a2e2a7e9c54224aece72366a1bb3ef7d9007a7bec92bb53c4d9b0276b6e33f6"
+  },
+  "normal_targets": [
+    "f013",
+    "f014",
+    "f015",
+    "f016",
+    "f017",
+    "f018",
+    "f100",
+    "f110",
+    "f200",
+    "f210"
+  ],
+  "best_effort_targets": [
+    "f006",
+    "f007",
+    "f008",
+    "f009",
+    "f010",
+    "f011",
+    "f012"
+  ],
+  "inventory_sha256": "290278B3A92EBDE4C4CF888A383B36B39BE6D92F82A401FE10877F5AFE0ED2F7",
+  "inventory_body_sha256": "6A8A9773235A9989A507606F212A6147262316FA9BFC6265B7DB1DA6B145AE33",
+  "primary_custody": "build/mir5/assets/61bc49e5-aero-r01",
+  "files": [
+    {
+      "name": "MIR5ReleaseAssetInventoryV1.json",
+      "bytes": 208528,
+      "sha256": "290278B3A92EBDE4C4CF888A383B36B39BE6D92F82A401FE10877F5AFE0ED2F7"
+    },
+    {
+      "name": "more-infinite-research_5.0.00600.zip",
+      "bytes": 135515,
+      "sha256": "CF230E44672C74A9E6712F76256DFDA96D26BD2D19D38FFCAE0BAF8A5AA92636"
+    },
+    {
+      "name": "more-infinite-research_5.0.00700.zip",
+      "bytes": 135516,
+      "sha256": "C1A093BC71321EA57901380D62BC19CF594E10F8D5DE3366F292008FD51763A2"
+    },
+    {
+      "name": "more-infinite-research_5.0.00800.zip",
+      "bytes": 135514,
+      "sha256": "85DC708AC5A10C9044B9028CD77F565540D2139B33767FB0FCBB181342483BC7"
+    },
+    {
+      "name": "more-infinite-research_5.0.00900.zip",
+      "bytes": 135516,
+      "sha256": "60060361C7DBFDE8C664DD59A23C3A231E469A3DC66187E088C8E343865F84CD"
+    },
+    {
+      "name": "more-infinite-research_5.0.01000.zip",
+      "bytes": 135514,
+      "sha256": "5F26E694879998110441B7275EED80E0699E5D4D0ECFCF0322FD7FFCFC9521D7"
+    },
+    {
+      "name": "more-infinite-research_5.0.01100.zip",
+      "bytes": 135515,
+      "sha256": "CE77AE62B4AF5CC6F284329C41BE6B65A4961693B61A0EDAAAA643FC78E351B8"
+    },
+    {
+      "name": "more-infinite-research_5.0.01200.zip",
+      "bytes": 135517,
+      "sha256": "EB8A8BDDAF4B875A31D6BDB2C278C4FC816A65FDFCA6202BD039A3D92CF507B6"
+    },
+    {
+      "name": "more-infinite-research_5.0.01300.zip",
+      "bytes": 452992,
+      "sha256": "BC2BF941A656F437C91A2C474DBB6D5557ADA00B320B515AD8BD1BA58929231A"
+    },
+    {
+      "name": "more-infinite-research_5.0.01400.zip",
+      "bytes": 452996,
+      "sha256": "B732D8780BDA0FE5654A69A2A5E85A28146335AF249F34A39B68E7DBFA9F70AE"
+    },
+    {
+      "name": "more-infinite-research_5.0.01500.zip",
+      "bytes": 452995,
+      "sha256": "F57C53CC87FBC0761993D893E31ED47198BF4E46C4A134EF03069EACCAFAF810"
+    },
+    {
+      "name": "more-infinite-research_5.0.01600.zip",
+      "bytes": 452997,
+      "sha256": "B7AD1ACF4F940D59FED191591D2B16664A05C2D1B456D56F271D93DFE6ED2F70"
+    },
+    {
+      "name": "more-infinite-research_5.0.01700.zip",
+      "bytes": 452995,
+      "sha256": "FD6AFC43003261EBD75087A723FDAE3E9B560D79A9BB5BBD05885FAC82E4FAC1"
+    },
+    {
+      "name": "more-infinite-research_5.0.01800.zip",
+      "bytes": 452997,
+      "sha256": "7803FC661DEFA441D1E9D508D1CA80029E619201BBECB0BF113D60D3D3ABEEB9"
+    },
+    {
+      "name": "more-infinite-research_5.0.10000.zip",
+      "bytes": 452982,
+      "sha256": "3CD9119CE8B620DE5AB51E56B1ECC97A9E4B27A17635E3C16F4B69BF0AF11F0F"
+    },
+    {
+      "name": "more-infinite-research_5.0.11000.zip",
+      "bytes": 453294,
+      "sha256": "F05918C69E7C619F38EF90EAB5C0FD99C905FAF121EC024F7CAD57E3988FB99D"
+    },
+    {
+      "name": "more-infinite-research_5.0.20000.zip",
+      "bytes": 677595,
+      "sha256": "EE94956EABA993051469AA3F06F7E144BD1410CB4F932FA525CB770B4E23A79F"
+    },
+    {
+      "name": "more-infinite-research_5.0.21000.zip",
+      "bytes": 677977,
+      "sha256": "8F858F6B7E604757DE84D960E7D7701021B956782C65A13978E3AFD711F7B071"
+    },
+    {
+      "name": "SHA256SUMS-early.txt",
+      "bytes": 721,
+      "sha256": "873E614AA533BDC38F8AB70148EA250DB2F2E28D1F527DEE9D91C37A53992225"
+    },
+    {
+      "name": "SHA256SUMS.txt",
+      "bytes": 1030,
+      "sha256": "D078A503227699FB842B6D6BA22405D678459555B922E1465E96F1D04A25AE54"
+    }
+  ],
+  "verification": {
+    "release_freeze_with_internal_independent_repeat_build": "passed",
+    "all_twenty_primary_files_hash_verified": true,
+    "all_seventeen_member_inventories_independently_read_back": true,
+    "root_info_filename_and_current_changelog_version_match": true,
+    "no_duplicate_or_private_developer_members": true,
+    "controller_and_runtime_match_prior_freeze": true,
+    "normal_player_archives": 10,
+    "separately_labelled_best_effort_archives": 7
+  },
+  "previous_freeze": {
+    "source_commit": "d1f7ca1f560c42863c7c0ceb6ca3746895a7773f",
+    "readback": "spec/evidence/current-assets-d1f7ca1f-readback.json"
+  },
+  "byte_identical_previous_archives": [
+    "more-infinite-research_5.0.01300.zip",
+    "more-infinite-research_5.0.01400.zip",
+    "more-infinite-research_5.0.01500.zip",
+    "more-infinite-research_5.0.01600.zip",
+    "more-infinite-research_5.0.01700.zip",
+    "more-infinite-research_5.0.01800.zip",
+    "more-infinite-research_5.0.10000.zip",
+    "more-infinite-research_5.0.11000.zip",
+    "more-infinite-research_5.0.00600.zip",
+    "more-infinite-research_5.0.00700.zip",
+    "more-infinite-research_5.0.00800.zip",
+    "more-infinite-research_5.0.00900.zip",
+    "more-infinite-research_5.0.01000.zip",
+    "more-infinite-research_5.0.01100.zip",
+    "more-infinite-research_5.0.01200.zip"
+  ],
+  "previous_member_differences": [
+    {
+      "name": "more-infinite-research_5.0.20000.zip",
+      "changed_members": [
+        "compatibility/modern_catalogue/base.lua"
+      ],
+      "old_member_sha256": "48448C8BF3B6ED64B6DAF03D8C4E4CB2DCE04762D2255AB1D9F03C668F76B2CF",
+      "new_member_sha256": "3D4B72D02863F84A27D3C7A57711FB534BCDC64D48B949669C77670519348782",
+      "difference": "only two unused invalid nested item-name arguments removed from literal MIR titles",
+      "all_other_member_bytes_identical": true
+    },
+    {
+      "name": "more-infinite-research_5.0.21000.zip",
+      "changed_members": [
+        "compatibility/modern_catalogue/base.lua"
+      ],
+      "old_member_sha256": "48448C8BF3B6ED64B6DAF03D8C4E4CB2DCE04762D2255AB1D9F03C668F76B2CF",
+      "new_member_sha256": "3D4B72D02863F84A27D3C7A57711FB534BCDC64D48B949669C77670519348782",
+      "difference": "only two unused invalid nested item-name arguments removed from literal MIR titles",
+      "all_other_member_bytes_identical": true
+    }
+  ],
+  "comparison_custody": "C:\\Projects\\Factorio\\mir5-freeze\\aero-61bc49e5-prior-modern-r01",
+  "limits": [
+    "The first offline inspector wrongly equated the inventory info projection with full info.json; declared fields match and extra author/description keys remain byte-bound by the complete member hash.",
+    "Offline build and member/hash provenance only; no native execution or archive-library mutation on Aero.",
+    "This inventory is bound to exact61bc source; another controller/source inventory requires explicit comparison even when player bytes match.",
+    "Corrected native rendering and expanded five-alloy gameplay/labs/save/two-reload acceptance remain open.",
+    "Earlier native receipts retain their original package inputs and are not relabelled.",
+    "No new gameplay, migration, multiplayer, performance, normal-target qualification or release verdict is granted.",
+    "F006-F012 remain separately labelled best-effort builds; F001-F005 are not invented distributions."
+  ]
+}

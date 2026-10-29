@@ -1,0 +1,90 @@
+Black Glass live worker handoff -- 2026-10-24 Australia/Sydney
+
+Control repository (private): https://github.com/Julesc013/mir-native-worker
+Workflow: https://github.com/Julesc013/mir-native-worker/actions/workflows/native.yml
+Control implementation: 3945b662481fdb66bec3210e48de21e52f6139cf
+Runner: mir5-black-glass; labels: mir5-native, black-glass; online.
+Official runner: v2.338.1, Windows x64, verified release-asset SHA256:
+478f533ac2c349040fbaea7e158f7f7d0235085cf35bc81f661af0c715207ff9
+Identity: BLACKGLASS-WIN1\Jules, non-elevated interactive user.
+Listening as a hidden background process, not a service. It survives this
+Codex turn but restart after reboot/logoff is not configured. Headless only;
+no rendered GUI, client, multiplayer or release authority is established.
+Local configuration: C:\Users\Jules\AppData\Local\MIRWorker\config.json
+Runner directory: C:\Users\Jules\AppData\Local\MIRWorker\runner
+Listener stdout/stderr and PID: siblings under MIRWorker.
+No LLM polling loop. Aero retains implementation, integration and releases.
+
+Frozen tested source: b26d45025c8e012951169724ecdf56ae632644e7
+Initial task packet: d348d76343479278cc8f8c1265791f7da88c15fb
+The primary checkout was preserved. Setup used an isolated worktree; readiness
+changes are based on dev and do not import the unmerged product branch.
+
+Smoke: PASSED
+https://github.com/Julesc013/mir-native-worker/actions/runs/39962439865
+Downloaded manifest SHA256:
+16CE68DB8150247F9BB0B812FB3381D1A097A3CC813DD83F149ABC76EF1607E0
+
+Independent no-MIR K2 Base F200 prototype capture: PASSED, data-stage only.
+https://github.com/Julesc013/mir-native-worker/actions/runs/39962601418
+Exact Factorio 2.0.77 executable:
+D:\Games\Factorio\2.0\bin\x64\factorio.exe
+D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B
+Direct library: D:\Projects\Factorio\testmods\2.0
+All five upstream archive hashes match tests/mir5/profiles/k2-base-f200-2077.json.
+Selected ZIP metadata/dependencies are retained in selected-archives.json;
+the existing activation code validated actual dependency closure and loaded set.
+Observer built from original Git blobs, using the packet's ZIP recipe:
+723D1E7721449FC26040E5E6629416767BDC20AD79CF8723115846DB662A1F87
+Original controls restored; zero copied dependency payload or archive links.
+Downloaded artifact manifest SHA256:
+E8A5BF6EC572E7B60658481CF24E661ECD7E4B69381F1C85EEE57AD534171EC6
+data-raw-dump.json SHA256:
+24023000F3FCC8916869ED49DC4341AB05DC5F6AF91DAD5DCEB1D9736C0C7390
+mod-settings-dump.json SHA256:
+2C60A465AA5CEC4E8B3A62578F7B5314D95D578F58413D439D7F16482829A17B
+
+Published MIR 4.7.0 matched reference: FAILED during native startup, exit 1.
+https://github.com/Julesc013/mir-native-worker/actions/runs/39962719955
+MIR approved science binding is unresolved: automation-science-pack
+(unresolved-approved-pack-dependencies:automation-science-pack).
+Failure originates in science_packs.lua:35 through context_construction.lua:82.
+Original diagnostics preserved; no successful published oracle is claimed.
+Library controls restored. Downloaded artifact manifest SHA256:
+D0B6F29D574A1739992B0ECED4E5430071873B506249C0773565B362267BA1E1
+Authenticated v4.7.0 inventory and SHA256SUMS.txt verified F200 archive:
+7958731AAD672C7F16B9307E7B20F97B8E97B58CC57E5D1F9AE670018A8A1B5B
+A differing same-name local archive was preserved with hash readback under
+C:\Users\Jules\AppData\Local\MIRWorker\preserved\ before installing that
+release archive under exclusive library ownership. Original SHA256:
+22AF5FE3BF449ED026E3D22B8157079D154DB1F3BC5674FDA686390A384F8B55
+Custody details: MIRWorker\published-custody.json.
+
+Available engine versions, each executable hashed in private readiness.json:
+0.6.4, 0.7.5, 0.8.8, 0.9.8, 0.10.12, 0.11.22, 0.12.35,
+0.13.20, 0.14.23, 0.15.40, 0.16.51, 0.17.79, 1.0.0, 1.1.110,
+2.0.77 and 2.1.14, under D:\Games\Factorio.
+Transferred libraries: D:\Projects\Factorio\testmods\1.0, 1.1, 2.0, 2.1.
+Only the assigned F200 selection is qualified here. The 2.1 installation is
+2.1.14, not required 2.1.23; no patch substitution or engine download occurred.
+Host: Windows 10 Enterprise 10.0.19045, about 31.7 GiB physical RAM.
+Actual physical/commit headroom, free disks, Git/gh/Python/PowerShell versions
+are captured by the smoke/native readiness artifacts. Workspace health passed.
+Resource admission, watchdog and exclusive activation policies were retained.
+
+Dispatch interface:
+gh workflow run native.yml --repo Julesc013/mir-native-worker \
+  -f source_sha=FULL_40_CHARACTER_SHA \
+  -f trusted_branch=feat/mir5-k2-catalogue-r01 -f task=k2-upstream
+Trusted branch choices: feat/mir5-k2-catalogue-r01 or dev.
+Task choices: smoke, k2-upstream, k2-published.
+Maintainer actor only, fixed source repository, verified branch ancestry,
+read-only job permissions, pinned official actions, one concurrency group.
+Upload occurs even on failure. Artifacts contain original logs, dumps, resource
+records and SHA256 manifests, not engine/dependency ZIPs or original saves.
+Future tasks require a bounded reviewed workflow change, not arbitrary commands.
+
+Local verified downloads are delivered under the primary checkout:
+build/mir5/black-glass-worker/{smoke,k2-upstream,k2-published}/
+Full artifacts remain private; no MIR5 candidate parity, gameplay, save upgrade,
+responsive-menu performance, client or release result is claimed.

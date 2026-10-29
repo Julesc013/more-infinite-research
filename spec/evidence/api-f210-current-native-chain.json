@@ -1,0 +1,112 @@
+{
+  "schema": 1,
+  "kind": "MIR5ApiF210CurrentNativeChainV1",
+  "status": "exact-source-two-consumers-native-production-and-reloads-passed",
+  "api": "1.0.0-draft.3",
+  "source_commit": "04c2684be262509ef6bb312e1dd0c60d9e11cc74",
+  "player_source_tree": "df9ab048fd16fe6411ea0311bd616521f9453329",
+  "controller_commit": "72039ff9b0dba2dea45514191a19d7e11c6cb460",
+  "controller_provenance": {
+    "kind": "external-github-actions-run-head",
+    "artifact_attested": false,
+    "source": "https://api.github.com/repos/Julesc013/mir-native-worker/actions/runs/40163191155",
+    "field": "head_sha",
+    "scope": "The external workflow record supplies controller_commit; the native artifact separately records executed public harness, probe and governor hashes."
+  },
+  "run": 40163191155,
+  "url": "https://github.com/Julesc013/mir-native-worker/actions/runs/40163191155",
+  "task": "api-consumers-f210-canonical",
+  "engine": {
+    "path": "D:\\Games\\Steam\\steamapps\\common\\Factorio\\bin\\x64\\factorio.exe",
+    "sha256": "FE4A1DA30F322A0D0B8AEB3DF7276332222BAAA143E2352569B723E84B2B9060",
+    "file_version": "2.1.23.87750",
+    "product_version": "2.1.23",
+    "base_version": "2.1.23"
+  },
+  "player_sha256": "C8E0C570213F41CA8C816A29D1556FD40A36896D31ED56B07856652B2DE7F32A",
+  "profile": "tests/profiles/api-consumers-f210-2123.json",
+  "profile_sha256": "4E78C9DC5D745847916D628B87ADDF3E97D3B16B306B61D811FCC9B67BAD1350",
+  "artifact_manifest_sha256": "74974E482F209B0C1D38B7562A2C9BD004016206712DC92FF7E2339AA91661C2",
+  "original_members_verified": 45,
+  "staged_raw_git_members_verified": 12,
+  "outcome_sha256": "CCEE72443B7BB422A18CDD7113B4B9742E49158C943844E953B0834DA240F8F8",
+  "native_result_sha256": "D5D3EC703225FFE1A347A41194EE85C83DE00813E68C2215EDDBD05ADFE81068",
+  "harness_executed_sha256": "672188E8CCC75007487206161235BFE777EF6C2D87722CA446992151BC46696B",
+  "native_probe_executed_sha256": "AC2B5C4F648F8A03D878FF209DAD97C7C2834519E2F4A7E9E07973DDBED14F83",
+  "governor_executed_sha256": "7426C9F38BA3D20F031B9CCBF8EB6B8FEF8C0532A5DF38D56E7FC1FE0B10A1F4",
+  "independent_readback_sha256": "0B46CAB8D6A842292B7E063C669A2FE49DD7B575F349448A70C700FA7A2E1491",
+  "observed": {
+    "required_alpha_native_crafting_speed": 0.05,
+    "optional_late_beta_native_recipe_productivity": 0.01,
+    "public_query_before_and_after": true,
+    "equal_copper_plates_per_phase": 100,
+    "baseline_copper_cables": 200,
+    "researched_copper_cables": 202,
+    "assembler_modules_empty": true,
+    "beacons_created": false,
+    "research_completion": "native setter; no laboratory completion",
+    "cold_reloads": 2,
+    "completed_save_sha256": "D650F14D3D52ADE48CA24D9000D82DE641FBDF6213AFE5146B6724CBF86D5295",
+    "reload_on_load_checks_deferred": true,
+    "direct_library_controls_restored": true
+  },
+  "native_stage_log_markers_verified": 3,
+  "primary_custody": "build/mir5/recovery-historical/api-consumers-f210/40163191155",
+  "portable_capsule": {
+    "path": "api-f210-current-native-capsule.zip",
+    "bytes": 22963,
+    "sha256": "F7CE00F9789C1F6B05474C37C69503B31A362329612954DEE114BD4BCE0BFEF4",
+    "members": [
+      {
+        "path": "api-canonical-outcome.json",
+        "bytes": 1458,
+        "sha256": "CCEE72443B7BB422A18CDD7113B4B9742E49158C943844E953B0834DA240F8F8",
+        "custody": "exact original artifact bytes"
+      },
+      {
+        "path": "artifact-manifest.json",
+        "bytes": 9058,
+        "sha256": "74974E482F209B0C1D38B7562A2C9BD004016206712DC92FF7E2339AA91661C2",
+        "custody": "exact original artifact bytes"
+      },
+      {
+        "path": "fixture-members.json",
+        "bytes": 6577,
+        "sha256": "395BE5CB977DA2AE04B969CCE228EE7E4BF8E9D67471B906E61FF5725A952DDB",
+        "custody": "exact original artifact bytes"
+      },
+      {
+        "path": "independent-readback.json",
+        "bytes": 5411,
+        "sha256": "0B46CAB8D6A842292B7E063C669A2FE49DD7B575F349448A70C700FA7A2E1491",
+        "custody": "derived independent native-marker readback"
+      },
+      {
+        "path": "native-result.json",
+        "bytes": 49227,
+        "sha256": "D5D3EC703225FFE1A347A41194EE85C83DE00813E68C2215EDDBD05ADFE81068",
+        "custody": "exact original artifact bytes"
+      },
+      {
+        "path": "player-package-record.json",
+        "bytes": 33540,
+        "sha256": "1FFF66B0C61A49F066248F3DD42B4EBC66BE2633DCF8C494054A99947C0C94F0",
+        "custody": "exact original artifact bytes"
+      },
+      {
+        "path": "selected-profile.json",
+        "bytes": 1266,
+        "sha256": "4E78C9DC5D745847916D628B87ADDF3E97D3B16B306B61D811FCC9B67BAD1350",
+        "custody": "exact original artifact bytes"
+      }
+    ]
+  },
+  "native_execution": true,
+  "release_qualification": false,
+  "limits": [
+    "This exact F210 source/package and fixture passes two independent public consumers, native effects, physical production, save and two cold reloads.",
+    "Research uses the native setter. Reload markers carry the completed production counters; they are not new production workloads or new lab completions.",
+    "No real joining client, optional-MIR absence, arbitrary-modpack, elapsed-time, memory non-regression, API1.0 stability or final release verdict follows.",
+    "Original saves, full logs, configurations, player/fixture ZIPs and all45 artifact members remain in primary custody; the portable capsule contains six original JSON receipts and one explicitly derived marker/readback record."
+  ]
+}

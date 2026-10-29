@@ -1,0 +1,85 @@
+{
+  "claims": {
+    "actual_lab_completions": true,
+    "global_prototype_cap_override_fix": false,
+    "historical_save_upgrade": false,
+    "multiplayer": false,
+    "native_recipe_bonus": true,
+    "performance": false,
+    "physical_smelting_output": false,
+    "release": false,
+    "save_two_cold_reloads": true
+  },
+  "custody": "build/mir5/black-glass/incoming/39986500264/black-glass-bob-angel-continuity-39986500264-1",
+  "engine": {
+    "base_version": "2.0.77",
+    "file_version": "2.0.77.84539",
+    "path": "D:\\Games\\Factorio\\2.0\\bin\\x64\\factorio.exe",
+    "product_version": "2.0.77",
+    "sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B"
+  },
+  "fixture_inputs": [
+    {
+      "archive": "D:\\Projects\\Factorio\\testmods\\2.0\\mir-fixture-mir5-bob-angel-continuity_0.2.0.zip",
+      "sha256": "40D16932D157FF65954A0AA2B0ED5C0682EF7CF6E6D3035310991B2DA64B18E0",
+      "source": "C:\\Users\\Jules\\AppData\\Local\\MIRWorker\\runner\\_work\\mir-native-worker\\mir-native-worker\\source\\build\\tmp\\black-glass-39986500264-1\\fixture-sources\\bob-angel-continuity\\mir5"
+    },
+    {
+      "archive": "D:\\Projects\\Factorio\\testmods\\2.0\\mir-fixture-mir5-active-mods-observer_0.1.0.zip",
+      "sha256": "723D1E7721449FC26040E5E6629416767BDC20AD79CF8723115846DB662A1F87",
+      "source": "C:\\Users\\Jules\\AppData\\Local\\MIRWorker\\runner\\_work\\mir-native-worker\\mir-native-worker\\source\\build\\tmp\\black-glass-39986500264-1\\fixture-sources\\active-mods-observer"
+    }
+  ],
+  "kind": "MIR5BobAngelMaterialsLabNativeChainV1",
+  "limitations": [
+    "Disposable accelerated research counts/time only; no ordinary-cost timing claim.",
+    "Seeded historical boundary/override settings use separate pending scenarios.",
+    "Frozen source precedes the later named native recipe-cap lookup change."
+  ],
+  "native_receipt": "spec/mir5/evidence/bob-angel-materials-lab-native.json",
+  "native_result": "passed-private-native-fixture",
+  "player": {
+    "path": "D:\\Projects\\Factorio\\testmods\\2.0\\more-infinite-research_5.0.20000.zip",
+    "sha256": "2F2DECBFDCFEAC49F45146F1CF754A5BA1B6D3EF55DCC023AA158D1E45A103B2"
+  },
+  "reloads": [
+    {
+      "byte_identical": true,
+      "ordinal": 1,
+      "save_sha256": "29221603DB227FC3EECEEE6DA90C8A42DE7AA2144CA844D79EE32EBF3E4F11DF"
+    },
+    {
+      "byte_identical": true,
+      "ordinal": 2,
+      "save_sha256": "29221603DB227FC3EECEEE6DA90C8A42DE7AA2144CA844D79EE32EBF3E4F11DF"
+    }
+  ],
+  "run": {
+    "id": 39986500264,
+    "reason": "Private wrapper rejected the exact successful passed-private-native-fixture verdict after the complete native case. Corrected wrapper resumes remaining historical cases separately.",
+    "url": "https://github.com/Julesc013/mir-native-worker/actions/runs/39986500264",
+    "workflow_conclusion": "failure-after-native-pass"
+  },
+  "schema": 1,
+  "source": "167dc79b123e2f7bd2c8bab8aed28e462613f7e0",
+  "status": "actual-labs-save-two-reloads-passed",
+  "witnesses": {
+    "default_rows_preflighted_before_mutation": true,
+    "early_levels_completed_by_lab": 15,
+    "fixture_version": "0.2.0",
+    "foreign_disabled_and_queued_preserved": true,
+    "native_recipe_bonus": 0.08,
+    "on_load_read_only": false,
+    "qualification": "native-runner-readback-required",
+    "real_lab_completed_levels": 20,
+    "science_consumed": {
+      "automation-science-pack": 20,
+      "logistic-science-pack": 16,
+      "utility-science-pack": 5
+    },
+    "seeded_boundary_levels": false,
+    "source_mir": "5.0.20000",
+    "tail_levels_completed_by_lab": 5
+  },
+  "worker_control_source": "8853cc59974295e0665d1ce0dae421c339a81bbf"
+}

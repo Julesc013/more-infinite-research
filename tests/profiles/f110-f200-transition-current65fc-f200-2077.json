@@ -1,0 +1,32 @@
+{
+  "schema": 1,
+  "kind": "mir5-f110-f200-transition-successor",
+  "target": "f200",
+  "factorio_line": "2.0",
+  "engine": {
+    "version": "2.0.77",
+    "sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B"
+  },
+  "settings_mode": "Defaults",
+  "mods": [
+    {
+      "name": "base",
+      "version": "2.0.77",
+      "enabled": true
+    },
+    {
+      "name": "more-infinite-research",
+      "version": "5.0.20000",
+      "enabled": true
+    },
+    {
+      "name": "mir-fixture-mir5-f110-f200-transition",
+      "version": "0.2.0",
+      "enabled": true
+    }
+  ],
+  "archive_sha256": {
+    "more-infinite-research_5.0.20000.zip": "65FC7E907FE3198B7290167989FE2564C1474190D06DAD49860063BEC418EC60"
+  },
+  "scope": "Prepared current7a2/player505 F200 successor of protected published F1104.7.11003 saveD524. Reuses the original source save. Six fixture payloads match the older bridge; current shared control additionally checks the saved successor queue on cold reloads. Materially changed player data/control and fixture paths require fresh native mining lab, saved-state and two cold reload checks. Original a1fd/8BA selection and result retain their original identities. This is preparation, not another assigned native job or a migration/release pass."
+}

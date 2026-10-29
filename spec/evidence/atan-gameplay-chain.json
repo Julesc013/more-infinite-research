@@ -1,0 +1,132 @@
+{
+  "schema": 1,
+  "kind": "MIR5AtanNativeGameplayChainV1",
+  "runs": [
+    {
+      "run": 40035916921,
+      "url": "https://github.com/Julesc013/mir-native-worker/actions/runs/40035916921",
+      "manifest_members_verified": 21,
+      "manifest_sha256": "19C4DF995072D61B21F0AE17428F69EBF00ECB18A8B8E43D88019BF788B6A4DC",
+      "cases": [
+        {
+          "path": "gameplay/base/result.json",
+          "status": "failed",
+          "source": "b4d0bf2c4f65ad098d53c969508923891fbe344f",
+          "receipt": {
+            "gzip": "spec/mir5/evidence/atan-gameplay-40035916921-gameplay-base-native.json.gz",
+            "uncompressed_sha256": "7BB05488FE9F49D0F64C6BDFA73975579BE2D7E44800E7BC4B232DC869877D8C"
+          },
+          "failure": "[mir441-process-exit] 1"
+        }
+      ]
+    },
+    {
+      "run": 40036588636,
+      "url": "https://github.com/Julesc013/mir-native-worker/actions/runs/40036588636",
+      "manifest_members_verified": 60,
+      "manifest_sha256": "54EE031FB394D939E755D4344AE6593C7752E2D888491829BF51B7BD3FBD327B",
+      "cases": [
+        {
+          "path": "gameplay/base/result.json",
+          "status": "passed-private-native-fixture",
+          "source": "cadc3cc6968bcb256de3e7c8622db15dce4abb6d",
+          "receipt": {
+            "gzip": "spec/mir5/evidence/atan-gameplay-40036588636-gameplay-base-native.json.gz",
+            "uncompressed_sha256": "C773814735FDC4A10DB275473D5F9FC8EEEE39DBE693D10D9A7B7C3A93F463F2"
+          },
+          "initial": {
+            "case": "f200-atan-gameplay",
+            "stage": "initial",
+            "status": "passed",
+            "qualification": "bounded-atan-gameplay",
+            "witnesses": {
+              "profile": "base",
+              "completed": 2,
+              "air_next_level": 2,
+              "ash_next_level": 2,
+              "air_effects": [
+                "atan-pollution-filter"
+              ],
+              "air_bonus": 0.05000000074505806,
+              "ash_bonus": 0.05000000074505806,
+              "queue": {
+                "current": "braking-force-1",
+                "queued": [
+                  "braking-force-1"
+                ],
+                "progress": 0
+              },
+              "detail": "two-owned-rows-one-shared-air-continuation"
+            }
+          },
+          "player": {
+            "sha256": "258720075B4B82F5307891FF9218CFC71F48F99D06DF2DC197932CD303940031",
+            "path": "D:\\Projects\\Factorio\\testmods\\2.0\\more-infinite-research_5.0.20000.zip"
+          },
+          "engine": {
+            "path": "D:\\Games\\Factorio\\2.0\\bin\\x64\\factorio.exe",
+            "sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B",
+            "file_version": "2.0.77.84539",
+            "product_version": "2.0.77",
+            "base_version": "2.0.77"
+          },
+          "two_cold_reloads_byte_identical": true
+        },
+        {
+          "path": "gameplay/space-age/result.json",
+          "status": "passed-private-native-fixture",
+          "source": "cadc3cc6968bcb256de3e7c8622db15dce4abb6d",
+          "receipt": {
+            "gzip": "spec/mir5/evidence/atan-gameplay-40036588636-gameplay-space-age-native.json.gz",
+            "uncompressed_sha256": "81B567D785650F15B9431EA373D9D83283F403EA21007DAEA2463B5509C459F1"
+          },
+          "initial": {
+            "case": "f200-atan-gameplay",
+            "stage": "initial",
+            "status": "passed",
+            "qualification": "bounded-atan-gameplay",
+            "witnesses": {
+              "profile": "space-age",
+              "completed": 2,
+              "air_next_level": 2,
+              "ash_next_level": 2,
+              "air_effects": [
+                "atan-pollution-filter",
+                "atan-spore-filter"
+              ],
+              "air_bonus": 0.05000000074505806,
+              "ash_bonus": 0.05000000074505806,
+              "queue": {
+                "current": "braking-force-1",
+                "queued": [
+                  "braking-force-1"
+                ],
+                "progress": 0
+              },
+              "detail": "two-owned-rows-one-shared-air-continuation"
+            }
+          },
+          "player": {
+            "sha256": "258720075B4B82F5307891FF9218CFC71F48F99D06DF2DC197932CD303940031",
+            "path": "D:\\Projects\\Factorio\\testmods\\2.0\\more-infinite-research_5.0.20000.zip"
+          },
+          "engine": {
+            "path": "D:\\Games\\Factorio\\2.0\\bin\\x64\\factorio.exe",
+            "sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B",
+            "file_version": "2.0.77.84539",
+            "product_version": "2.0.77",
+            "base_version": "2.0.77"
+          },
+          "two_cold_reloads_byte_identical": true
+        }
+      ]
+    }
+  ],
+  "scope": [
+    "F2002.0.77 Base and Space Age both complete the actual shared filter and ash MIR lab research, preserve named foreign state and the42% probe, then save and cold-reload twice.",
+    "Base filter adds0.05 to pollution-filter; Space Age shared filter adds0.05 to pollution-filter and spore-filter. Ash adds0.05 to its separately captured route.",
+    "The first native attempt rejected a captured omitted enabled field in its fixture. The corrected fixture accepts the native default and rejects explicit false; raw adverse receipt is retained.",
+    "No physical production, historical ATAN save, F210, or final-release claim."
+  ],
+  "release_qualification": false
+}

@@ -1,0 +1,22 @@
+{
+  "schema": 1,
+  "kind": "MIR5EnginePreparedMenuPlayerDataInputV1",
+  "run": 40022349056,
+  "source": "d48d25b69d1d450910f697db4af1db9ebe48a50c",
+  "engine": {
+    "path": "D:\\Games\\Factorio\\2.0\\bin\\x64\\factorio.exe",
+    "sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B",
+    "file_version": "2.0.77.84539",
+    "product_version": "2.0.77",
+    "base_version": "2.0.77"
+  },
+  "artifact_path": "gameplay/published/write-data/player-data.json",
+  "manifest_members_verified": 86,
+  "sha256": "B2BF04AD4E46C306BB9CFB2BFACF549307FD1E611B760C79F68080D79AC532A9",
+  "bytes": 10851,
+  "service_credentials_present": false,
+  "manually_modified": false,
+  "scope": "Actual native engine-created player-data from the disposable published fixture. Untimed credential-free seed only; no graphical menu observation or performance qualification is claimed.",
+  "gzip": "player-data.json.gz",
+  "gzip_sha256": "7A0AD2F47EB67FF39603BBF23287E54ABA9F3A1E1A5C1B65D751B452FC6A0B14"
+}

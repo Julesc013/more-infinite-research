@@ -1,0 +1,205 @@
+{
+  "schema": 1,
+  "kind": "MIR5CurrentAssetFreezeReadbackV1",
+  "status": "rebuilt-verified-not-native-qualified",
+  "source": {
+    "commit": "1c90ceb7f0096fa6ccbcb9fc369fae699889c866",
+    "mod_name": "more-infinite-research",
+    "mod_title": "More Infinite Research",
+    "path": "source",
+    "source_distribution_version": "5.0.21000",
+    "source_tree": "9e669e6ffea27dda3f9f17dfb2873daf23a8e187",
+    "tree": "90bf741ebdd74945267ee947293dde24fa70e9ca"
+  },
+  "controller": {
+    "package_tool": {
+      "path": "tools/package.py",
+      "sha256": "6f0a2b79bd567e1704a2732dcbe58a69e30770e4e22d8fa56752434d71ff727c"
+    },
+    "release_tool": {
+      "path": "tools/release.py",
+      "sha256": "291ab42469954f78c065d069c7eafc7df0c23e38555a587dc0e316dccfcb8763"
+    },
+    "runtime": {
+      "implementation": "cpython",
+      "version": [
+        3,
+        14,
+        7
+      ],
+      "zlib_build_version": "1.3.1.zlib-ng",
+      "zlib_runtime_version": "1.3.1.zlib-ng"
+    },
+    "zip_policy": {
+      "compression": "ZIP_DEFLATED",
+      "compresslevel": 9,
+      "member_create_system": 3,
+      "member_external_attr": 2175008768,
+      "member_timestamp": [
+        1980,
+        1,
+        1,
+        0,
+        0,
+        0
+      ]
+    }
+  },
+  "target_record": {
+    "blob": "8b514fd337d10c17d6662e84ef90b1f7f054eeb9",
+    "path": "targets/editions.json",
+    "sha256": "fade5578945b1d397ff55d600efdff167db590231b6408d84e87035b96ba4800"
+  },
+  "inventory_sha256": "951066760A1C1372AE9FD16B11BEE7CF11D10FC44A87E85A7DD70FABD765CA8E",
+  "primary_custody": "build/mir5/assets/1c90ceb7-r01",
+  "files": [
+    {
+      "name": "MIR5ReleaseAssetInventoryV1.json",
+      "bytes": 175413,
+      "sha256": "951066760A1C1372AE9FD16B11BEE7CF11D10FC44A87E85A7DD70FABD765CA8E"
+    },
+    {
+      "name": "more-infinite-research_5.0.01300.zip",
+      "bytes": 346921,
+      "sha256": "EA07770DDDFB34212198AB1D0676FF88206EFC801104BCF82A078FAAC22B892B"
+    },
+    {
+      "name": "more-infinite-research_5.0.01400.zip",
+      "bytes": 346921,
+      "sha256": "02B766A9A44DDB64C07B7F3A266A9BC5EE2EF44E3032B79438C2E3E30F7EAB17"
+    },
+    {
+      "name": "more-infinite-research_5.0.01500.zip",
+      "bytes": 346881,
+      "sha256": "BF9239C6C9951D5772611C6903796943E5CC7B196DD91F35C69600CC08895D11"
+    },
+    {
+      "name": "more-infinite-research_5.0.01600.zip",
+      "bytes": 346872,
+      "sha256": "220819CB68ABA461450DD02C5FD1CD18BD6152C2756E0506675CE0D5EFE404A7"
+    },
+    {
+      "name": "more-infinite-research_5.0.01700.zip",
+      "bytes": 346761,
+      "sha256": "1112B2E5E5C4AA6E750E3A8607B593652E87865415C017EACD3EAC1066898B88"
+    },
+    {
+      "name": "more-infinite-research_5.0.10000.zip",
+      "bytes": 360553,
+      "sha256": "9E253A00AFB0CF34E797F9B29341CAC1BF0B52360DAC65BC2DC37DD3ADF31361"
+    },
+    {
+      "name": "more-infinite-research_5.0.11000.zip",
+      "bytes": 360550,
+      "sha256": "3A1E72B92C2C7FC1554F24C5B54E686332B6617FF28FC414C6035DB9E0388E36"
+    },
+    {
+      "name": "more-infinite-research_5.0.20000.zip",
+      "bytes": 567712,
+      "sha256": "FA71CD2FBE8CAA2ABD9DE08829623FF7523D1F5B4AA1A6B0A3A6C6DC03E8D482"
+    },
+    {
+      "name": "more-infinite-research_5.0.21000.zip",
+      "bytes": 568598,
+      "sha256": "C563CB5B96C9E64CB3373BDB60CF5C8B7D3C97E93EADB8F924443C703CDC024D"
+    },
+    {
+      "name": "SHA256SUMS.txt",
+      "bytes": 927,
+      "sha256": "FB258ECCA1DCBE350A4F5C46F73B615AC27E8366F79D3514C8744974B429C73E"
+    }
+  ],
+  "unchanged_from_b2_targets": [],
+  "claims": {
+    "independent_rebuild": true,
+    "primary_copy_hash_readback": true,
+    "native_qualification": false,
+    "performance_qualification": false,
+    "release_qualification": false
+  },
+  "comparison_to_ea41": {
+    "f013": {
+      "added": [],
+      "removed": [
+        "more-infinite-research_5.0.01300/migrations/more-infinite-research_4.7.0.json"
+      ],
+      "changed": []
+    },
+    "f014": {
+      "added": [],
+      "removed": [
+        "more-infinite-research_5.0.01400/migrations/more-infinite-research_4.7.0.json"
+      ],
+      "changed": []
+    },
+    "f015": {
+      "added": [],
+      "removed": [
+        "more-infinite-research_5.0.01500/migrations/more-infinite-research_4.7.0.json"
+      ],
+      "changed": []
+    },
+    "f016": {
+      "added": [],
+      "removed": [
+        "more-infinite-research_5.0.01600/migrations/more-infinite-research_4.7.0.json"
+      ],
+      "changed": []
+    },
+    "f017": {
+      "added": [],
+      "removed": [
+        "more-infinite-research_5.0.01700/migrations/more-infinite-research_4.7.0.json"
+      ],
+      "changed": []
+    },
+    "f100": {
+      "added": [],
+      "removed": [
+        "more-infinite-research_5.0.10000/migrations/more-infinite-research_4.7.0.json"
+      ],
+      "changed": []
+    },
+    "f110": {
+      "added": [],
+      "removed": [
+        "more-infinite-research_5.0.11000/migrations/more-infinite-research_4.7.0.json"
+      ],
+      "changed": []
+    },
+    "f200": {
+      "added": [
+        "more-infinite-research_5.0.20000/compatibility/bob_native_continuations.lua",
+        "more-infinite-research_5.0.20000/compatibility/modern_catalogue/py_f210.lua"
+      ],
+      "removed": [
+        "more-infinite-research_5.0.20000/migrations/more-infinite-research_4.7.0.json"
+      ],
+      "changed": [
+        "more-infinite-research_5.0.20000/compatibility/modern_catalogue.lua",
+        "more-infinite-research_5.0.20000/compatibility/native_modded_continuations.lua",
+        "more-infinite-research_5.0.20000/compatibility/py_profile.lua",
+        "more-infinite-research_5.0.20000/compatibility/space_age_scripted_effects.lua",
+        "more-infinite-research_5.0.20000/data-final-fixes.lua",
+        "more-infinite-research_5.0.20000/research/modern.lua",
+        "more-infinite-research_5.0.20000/runtime/library.lua"
+      ]
+    },
+    "f210": {
+      "added": [
+        "more-infinite-research_5.0.21000/compatibility/bob_native_continuations.lua",
+        "more-infinite-research_5.0.21000/compatibility/modern_catalogue/py_f210.lua"
+      ],
+      "removed": [],
+      "changed": [
+        "more-infinite-research_5.0.21000/compatibility/modern_catalogue.lua",
+        "more-infinite-research_5.0.21000/compatibility/native_modded_continuations.lua",
+        "more-infinite-research_5.0.21000/compatibility/py_profile.lua",
+        "more-infinite-research_5.0.21000/compatibility/space_age_scripted_effects.lua",
+        "more-infinite-research_5.0.21000/data-final-fixes.lua",
+        "more-infinite-research_5.0.21000/research/modern.lua",
+        "more-infinite-research_5.0.21000/runtime/library.lua"
+      ]
+    }
+  }
+}

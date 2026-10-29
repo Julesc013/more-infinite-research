@@ -1,0 +1,12 @@
+{
+  "name": "mir-fixture-mir5-f110-f200-transition",
+  "version": "0.1.0",
+  "title": "MIR published F110 to F200 transition source",
+  "author": "MIR maintainers",
+  "description": "Disposable published F110 source save for the F200 continuity witness.",
+  "factorio_version": "1.1",
+  "dependencies": [
+    "base >= 1.1.110",
+    "more-infinite-research = 4.7.11003"
+  ]
+}

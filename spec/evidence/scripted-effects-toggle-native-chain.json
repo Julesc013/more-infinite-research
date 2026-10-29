@@ -1,0 +1,139 @@
+{
+  "schema": 1,
+  "kind": "MIR5ScriptedEffectsStartupToggleNativeChainV1",
+  "runs": [
+    {
+      "run": 40052530337,
+      "url": "https://github.com/Julesc013/mir-native-worker/actions/runs/40052530337",
+      "manifest_members_verified": 87,
+      "manifest_sha256": "CF7B1F1F1B54FD1A8529DA03493D0B8B85C504944E8BAB2CFF37E6598035F1AC",
+      "cases": [
+        {
+          "path": "gameplay/disabled/result.json",
+          "status": "passed-private-native-fixture",
+          "source": "9896cb3405372387f62b26a7c4ea3072bb4d85d4",
+          "receipt": {
+            "gzip": "spec/mir5/evidence/scripted-effects-toggle-native-40052530337-gameplay-disabled-native.json.gz",
+            "uncompressed_sha256": "2015DB24A320387B7D1C426CD9EDFCDFBBBF8F33183E20109B7943152BA5D909"
+          },
+          "initial": {
+            "case": "scripted-effects-toggle",
+            "stage": "initial",
+            "status": "passed",
+            "fixture_stage": "disabled",
+            "actual_labs": 2,
+            "agricultural_level": 2,
+            "spoilage_level": 2,
+            "spoil_time_modifier": 3,
+            "physical_label": "disabled",
+            "physical_growth_ticks": 18000,
+            "physical_spoil_ticks": 1200,
+            "external_baseline": 3,
+            "foreign_queue_current": "braking-force-1",
+            "foreign_queue_progress": 0.42000000000000004,
+            "on_load_read_only": false,
+            "gameplay_scope": "f200-space-age-scripted-effects-startup-toggle-only"
+          },
+          "player": {
+            "path": "D:\\Projects\\Factorio\\testmods\\2.0\\more-infinite-research_5.0.20000.zip",
+            "sha256": "D9B0265058B727B47B904E735DFE453F2E6C2589F8966CBD1106E92C81888253"
+          },
+          "engine": {
+            "path": "D:\\Games\\Factorio\\2.0\\bin\\x64\\factorio.exe",
+            "sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B",
+            "file_version": "2.0.77.84539",
+            "product_version": "2.0.77",
+            "base_version": "2.0.77"
+          },
+          "two_cold_reloads_byte_identical": true
+        },
+        {
+          "path": "gameplay/enabled/result.json",
+          "status": "passed-private-native-fixture",
+          "source": "9896cb3405372387f62b26a7c4ea3072bb4d85d4",
+          "receipt": {
+            "gzip": "spec/mir5/evidence/scripted-effects-toggle-native-40052530337-gameplay-enabled-native.json.gz",
+            "uncompressed_sha256": "44F35222116EDCFD973E819688BF44DD29830EA8DD76B138E69BDAEDCFD7C82D"
+          },
+          "initial": {
+            "case": "scripted-effects-toggle",
+            "stage": "initial",
+            "status": "passed",
+            "fixture_stage": "enabled",
+            "actual_labs": 2,
+            "agricultural_level": 2,
+            "spoilage_level": 2,
+            "spoil_time_modifier": 2.02,
+            "physical_label": "enabled",
+            "physical_growth_ticks": 17821,
+            "physical_spoil_ticks": 1212,
+            "foreign_queue_current": "braking-force-1",
+            "foreign_queue_progress": 0.42000000000000004,
+            "on_load_read_only": false,
+            "gameplay_scope": "f200-space-age-scripted-effects-startup-toggle-only"
+          },
+          "player": {
+            "path": "D:\\Projects\\Factorio\\testmods\\2.0\\more-infinite-research_5.0.20000.zip",
+            "sha256": "D9B0265058B727B47B904E735DFE453F2E6C2589F8966CBD1106E92C81888253"
+          },
+          "engine": {
+            "path": "D:\\Games\\Factorio\\2.0\\bin\\x64\\factorio.exe",
+            "sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B",
+            "file_version": "2.0.77.84539",
+            "product_version": "2.0.77",
+            "base_version": "2.0.77"
+          },
+          "two_cold_reloads_byte_identical": true
+        },
+        {
+          "path": "gameplay/reenabled/result.json",
+          "status": "passed-private-native-fixture",
+          "source": "9896cb3405372387f62b26a7c4ea3072bb4d85d4",
+          "receipt": {
+            "gzip": "spec/mir5/evidence/scripted-effects-toggle-native-40052530337-gameplay-reenabled-native.json.gz",
+            "uncompressed_sha256": "3CBEA1FC22183E2B9A2D554DCAF262686F00F23FDB30568C3C57C56F12928217"
+          },
+          "initial": {
+            "case": "scripted-effects-toggle",
+            "stage": "initial",
+            "status": "passed",
+            "fixture_stage": "reenabled",
+            "actual_labs": 2,
+            "agricultural_level": 2,
+            "spoilage_level": 2,
+            "spoil_time_modifier": 3.0300000000000002,
+            "physical_label": "reenabled",
+            "physical_growth_ticks": 17821,
+            "physical_spoil_ticks": 1818,
+            "external_baseline": 3,
+            "foreign_queue_current": "braking-force-1",
+            "foreign_queue_progress": 0.42000000000000004,
+            "on_load_read_only": false,
+            "gameplay_scope": "f200-space-age-scripted-effects-startup-toggle-only"
+          },
+          "player": {
+            "path": "D:\\Projects\\Factorio\\testmods\\2.0\\more-infinite-research_5.0.20000.zip",
+            "sha256": "D9B0265058B727B47B904E735DFE453F2E6C2589F8966CBD1106E92C81888253"
+          },
+          "engine": {
+            "path": "D:\\Games\\Factorio\\2.0\\bin\\x64\\factorio.exe",
+            "sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B",
+            "file_version": "2.0.77.84539",
+            "product_version": "2.0.77",
+            "base_version": "2.0.77"
+          },
+          "two_cold_reloads_byte_identical": true
+        }
+      ]
+    }
+  ],
+  "scope": [
+    "Exact F2002.0.77 Space Age: one actual lab completion per scripted family establishes earned levels2 and spoil modifier2.02 from external baseline2; physical growth17821 and spoil1212 ticks.",
+    "Disabling both startup settings retains both earned levels, restores the matching spoilage baseline2 and removes benefits from new physical witnesses: growth18000 and spoil1200. The fixture then supplies external baseline3 while MIR is disabled.",
+    "Re-enabling retains both levels and applies its retained contribution to baseline3: observed3.0300000000000002, growth17821 and spoil1818. Unrelated foreign braking research remains queued at observed0.42000000000000004.",
+    "All three stages save and cold-reload twice with byte-identical saves and read-only load witnesses; both protected predecessors remain unchanged. All87 artifact members verified.",
+    "This is one exact startup-setting transition, not removal/readdition of Space Age or MIR, large-entity scaling, another engine, final-layout or release qualification."
+  ],
+  "release_qualification": false,
+  "control_source": "ef3d3b327b8d6afa71c8dba80b17aa5cc26188f4"
+}

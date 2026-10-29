@@ -1,0 +1,753 @@
+{
+  "schema": 2,
+  "kind": "mir5-f200-bob-angel-captured-material-facts",
+  "scope": "Exact F200 2.0.77 no-BobTech Bob/Angel material capture. The published 4.7.2 reference emits exactly five finite early material families and their five named 150-level continuations. The remaining eleven historical selectors are explicitly withheld; no compatibility, gameplay, save, or release claim follows.",
+  "target": {
+    "id": "f200",
+    "factorio_version": "2.0",
+    "minimum_base": "2.0.77"
+  },
+  "profile": "tests/mir5/profiles/bob-angel-f200-2077.json",
+  "profile_sha256": "A2F235B7CE1F18968E1D7D7913362694EA1916095852C1673300C68BA26DDE90",
+  "upstream_raw": {
+    "path": "build/mir5/black-glass/incoming/39974658753/black-glass-bob-angel-upstream-39974658753-1/capture/write-data/script-output/data-raw-dump.json",
+    "sha256": "E278C678ADB7DB6080749474002874D1091EF65DAD8AF82898DAAF50660ECA44"
+  },
+  "published_raw": {
+    "path": "build/mir5/black-glass/incoming/39975413692/black-glass-bob-angel-published-39975413692-1/capture/write-data/script-output/data-raw-dump.json",
+    "sha256": "5FDA1D83FA3BEB9E5A813B55319D7F893B8FA4F49F48F0468974D3FAE4C4F5E5",
+    "reference": {
+      "tag": "v4.7.2",
+      "asset": "more-infinite-research_4.7.20002.zip",
+      "sha256": "F3943EB4D69CCDAC41BD9F922AD03A5C78F34F22D8E7FA5A88A7A658AB1010B7",
+      "source": "bd9774f323b6eb1561c1d9ff0c91ecc3f7acd1d1"
+    }
+  },
+  "authored_selector_evidence": {
+    "path": "source/prototypes/streams/productivity.lua",
+    "sha256": "EA66B64C03943A99B877847FD6E3903A099C83AB0333A441A29957C1C2142853",
+    "published_reference": "v4.7.2"
+  },
+  "required_mods": {
+    "base": "2.0.77",
+    "angelsbioprocessing": "2.0.3",
+    "angelsbioprocessinggraphics": "2.0.0",
+    "angelspetrochem": "2.0.3",
+    "angelspetrochemgraphics": "2.0.1",
+    "angelsrefining": "2.0.4",
+    "angelsrefininggraphics": "2.0.0",
+    "angelssmelting": "2.0.5",
+    "angelssmeltinggraphics": "2.0.0",
+    "bobelectronics": "2.1.1",
+    "boblibrary": "2.1.0",
+    "bobores": "2.1.2",
+    "bobplates": "2.1.1",
+    "bobrevamp": "2.1.1"
+  },
+  "forbidden_mods": [
+    "space-age",
+    "bobtech"
+  ],
+  "standard_science": [
+    "automation-science-pack",
+    "logistic-science-pack",
+    "chemical-science-pack",
+    "production-science-pack",
+    "utility-science-pack"
+  ],
+  "lab": {
+    "name": "lab",
+    "inputs": [
+      "automation-science-pack",
+      "logistic-science-pack",
+      "military-science-pack",
+      "chemical-science-pack",
+      "production-science-pack",
+      "utility-science-pack",
+      "space-science-pack",
+      "angels-token-bio"
+    ]
+  },
+  "selected_families": [
+    {
+      "key": "research_material_aluminium",
+      "item": "bob-aluminium-plate",
+      "icon": "__angelssmeltinggraphics__/graphics/icons/plate-aluminium.png",
+      "icon_size": 32,
+      "routes": [
+        {
+          "recipe": "angels-plate-aluminium",
+          "owner": "angels-aluminium-smelting-1",
+          "ingredients": [
+            {
+              "type": "fluid",
+              "name": "angels-liquid-molten-aluminium",
+              "amount": 40
+            }
+          ],
+          "results": [
+            {
+              "type": "item",
+              "name": "bob-aluminium-plate",
+              "amount": 4
+            }
+          ],
+          "owner_prerequisites": [
+            "angels-ore-floatation",
+            "angels-powder-metallurgy-2",
+            "angels-chlorine-processing-1"
+          ],
+          "owner_science": [
+            {
+              "type": "item",
+              "name": "automation-science-pack",
+              "amount": 1
+            },
+            {
+              "type": "item",
+              "name": "logistic-science-pack",
+              "amount": 1
+            }
+          ],
+          "maximum_productivity": "omitted"
+        },
+        {
+          "recipe": "angels-plate-aluminium-2",
+          "owner": "angels-aluminium-casting-2",
+          "ingredients": [
+            {
+              "type": "item",
+              "name": "angels-roll-aluminium",
+              "amount": 1
+            }
+          ],
+          "results": [
+            {
+              "type": "item",
+              "name": "bob-aluminium-plate",
+              "amount": 4
+            }
+          ],
+          "owner_prerequisites": [
+            "angels-strand-casting-2",
+            "angels-aluminium-smelting-1",
+            "angels-manganese-smelting-2"
+          ],
+          "owner_science": [
+            {
+              "type": "item",
+              "name": "automation-science-pack",
+              "amount": 1
+            },
+            {
+              "type": "item",
+              "name": "logistic-science-pack",
+              "amount": 1
+            },
+            {
+              "type": "item",
+              "name": "chemical-science-pack",
+              "amount": 1
+            }
+          ],
+          "maximum_productivity": "omitted"
+        }
+      ],
+      "early": {
+        "id": "recipe-prod-research_material_aluminium-1",
+        "science": [
+          "automation-science-pack",
+          "logistic-science-pack"
+        ],
+        "prerequisites": [
+          "automation-science-pack",
+          "logistic-science-pack",
+          "angels-aluminium-smelting-1",
+          "angels-aluminium-casting-2"
+        ],
+        "max_level": 3
+      },
+      "continuation": {
+        "id": "recipe-prod-research_material_aluminium-4",
+        "science": [
+          "automation-science-pack",
+          "logistic-science-pack",
+          "utility-science-pack"
+        ],
+        "prerequisites": [
+          "angels-aluminium-casting-2",
+          "angels-aluminium-smelting-1",
+          "automation-science-pack",
+          "logistic-science-pack",
+          "recipe-prod-research_material_aluminium-1",
+          "utility-science-pack"
+        ],
+        "max_level": 150,
+        "first_level": 4,
+        "predecessor_count": 800,
+        "previous_count": 400
+      },
+      "productivity_ceiling": 3
+    },
+    {
+      "key": "research_material_copper_tungsten",
+      "item": "bob-copper-tungsten-alloy",
+      "icon": "__bobplates__/graphics/icons/plate/copper-tungsten-plate.png",
+      "icon_size": 32,
+      "routes": [
+        {
+          "recipe": "bob-copper-tungsten-alloy",
+          "owner": "angels-tungsten-smelting-1",
+          "ingredients": [
+            {
+              "type": "item",
+              "name": "bob-powdered-tungsten",
+              "amount": 15
+            },
+            {
+              "type": "item",
+              "name": "angels-powder-copper",
+              "amount": 10
+            }
+          ],
+          "results": [
+            {
+              "type": "item",
+              "name": "bob-copper-tungsten-alloy",
+              "amount": 25
+            }
+          ],
+          "owner_prerequisites": [
+            "angels-ore-refining",
+            "angels-powder-metallurgy-4",
+            "angels-cobalt-smelting-2",
+            "angels-chlorine-processing-2",
+            "angels-sulfur-processing-2",
+            "angels-copper-smelting-2"
+          ],
+          "owner_science": [
+            {
+              "type": "item",
+              "name": "automation-science-pack",
+              "amount": 1
+            },
+            {
+              "type": "item",
+              "name": "logistic-science-pack",
+              "amount": 1
+            },
+            {
+              "type": "item",
+              "name": "chemical-science-pack",
+              "amount": 1
+            },
+            {
+              "type": "item",
+              "name": "production-science-pack",
+              "amount": 1
+            }
+          ],
+          "maximum_productivity": "omitted"
+        }
+      ],
+      "early": {
+        "id": "recipe-prod-research_material_copper_tungsten-1",
+        "science": [
+          "automation-science-pack",
+          "logistic-science-pack"
+        ],
+        "prerequisites": [
+          "automation-science-pack",
+          "logistic-science-pack",
+          "angels-tungsten-smelting-1"
+        ],
+        "max_level": 3
+      },
+      "continuation": {
+        "id": "recipe-prod-research_material_copper_tungsten-4",
+        "science": [
+          "automation-science-pack",
+          "logistic-science-pack",
+          "utility-science-pack"
+        ],
+        "prerequisites": [
+          "angels-tungsten-smelting-1",
+          "automation-science-pack",
+          "logistic-science-pack",
+          "recipe-prod-research_material_copper_tungsten-1",
+          "utility-science-pack"
+        ],
+        "max_level": 150,
+        "first_level": 4,
+        "predecessor_count": 800,
+        "previous_count": 400
+      },
+      "productivity_ceiling": 3
+    },
+    {
+      "key": "research_material_gold",
+      "item": "bob-gold-plate",
+      "icon": "__angelssmeltinggraphics__/graphics/icons/plate-gold.png",
+      "icon_size": 32,
+      "routes": [
+        {
+          "recipe": "angels-plate-gold",
+          "owner": "angels-gold-smelting-1",
+          "ingredients": [
+            {
+              "type": "fluid",
+              "name": "angels-liquid-molten-gold",
+              "amount": 40
+            }
+          ],
+          "results": [
+            {
+              "type": "item",
+              "name": "bob-gold-plate",
+              "amount": 4
+            }
+          ],
+          "owner_prerequisites": [
+            "angels-ore-leaching",
+            "angels-metallurgy-3",
+            "angels-chlorine-processing-1"
+          ],
+          "owner_science": [
+            {
+              "type": "item",
+              "name": "automation-science-pack",
+              "amount": 1
+            },
+            {
+              "type": "item",
+              "name": "logistic-science-pack",
+              "amount": 1
+            },
+            {
+              "type": "item",
+              "name": "chemical-science-pack",
+              "amount": 1
+            }
+          ],
+          "maximum_productivity": "omitted"
+        },
+        {
+          "recipe": "angels-plate-gold-2",
+          "owner": "angels-gold-casting-2",
+          "ingredients": [
+            {
+              "type": "item",
+              "name": "angels-roll-gold",
+              "amount": 1
+            }
+          ],
+          "results": [
+            {
+              "type": "item",
+              "name": "bob-gold-plate",
+              "amount": 4
+            }
+          ],
+          "owner_prerequisites": [
+            "angels-strand-casting-3",
+            "angels-gold-smelting-1",
+            "angels-copper-casting-2"
+          ],
+          "owner_science": [
+            {
+              "type": "item",
+              "name": "automation-science-pack",
+              "amount": 1
+            },
+            {
+              "type": "item",
+              "name": "logistic-science-pack",
+              "amount": 1
+            },
+            {
+              "type": "item",
+              "name": "chemical-science-pack",
+              "amount": 1
+            },
+            {
+              "type": "item",
+              "name": "production-science-pack",
+              "amount": 1
+            }
+          ],
+          "maximum_productivity": "omitted"
+        },
+        {
+          "recipe": "angels-wire-gold-2",
+          "owner": "angels-gold-casting-2",
+          "ingredients": [
+            {
+              "type": "item",
+              "name": "angels-wire-coil-gold",
+              "amount": 4
+            }
+          ],
+          "results": [
+            {
+              "type": "item",
+              "name": "bob-gilded-copper-cable",
+              "amount": 16
+            }
+          ],
+          "owner_prerequisites": [
+            "angels-strand-casting-3",
+            "angels-gold-smelting-1",
+            "angels-copper-casting-2"
+          ],
+          "owner_science": [
+            {
+              "type": "item",
+              "name": "automation-science-pack",
+              "amount": 1
+            },
+            {
+              "type": "item",
+              "name": "logistic-science-pack",
+              "amount": 1
+            },
+            {
+              "type": "item",
+              "name": "chemical-science-pack",
+              "amount": 1
+            },
+            {
+              "type": "item",
+              "name": "production-science-pack",
+              "amount": 1
+            }
+          ],
+          "maximum_productivity": "omitted"
+        }
+      ],
+      "early": {
+        "id": "recipe-prod-research_material_gold-1",
+        "science": [
+          "automation-science-pack",
+          "logistic-science-pack"
+        ],
+        "prerequisites": [
+          "automation-science-pack",
+          "logistic-science-pack",
+          "angels-gold-smelting-1",
+          "angels-gold-casting-2"
+        ],
+        "max_level": 3
+      },
+      "continuation": {
+        "id": "recipe-prod-research_material_gold-4",
+        "science": [
+          "automation-science-pack",
+          "logistic-science-pack",
+          "utility-science-pack"
+        ],
+        "prerequisites": [
+          "angels-gold-casting-2",
+          "angels-gold-smelting-1",
+          "automation-science-pack",
+          "logistic-science-pack",
+          "recipe-prod-research_material_gold-1",
+          "utility-science-pack"
+        ],
+        "max_level": 150,
+        "first_level": 4,
+        "predecessor_count": 800,
+        "previous_count": 400
+      },
+      "productivity_ceiling": 3
+    },
+    {
+      "key": "research_material_tin",
+      "item": "bob-tin-plate",
+      "icon": "__angelssmeltinggraphics__/graphics/icons/plate-tin.png",
+      "icon_size": 32,
+      "routes": [
+        {
+          "recipe": "angels-plate-tin",
+          "owner": "angels-tin-smelting-1",
+          "ingredients": [
+            {
+              "type": "fluid",
+              "name": "angels-liquid-molten-tin",
+              "amount": 40
+            }
+          ],
+          "results": [
+            {
+              "type": "item",
+              "name": "bob-tin-plate",
+              "amount": 4
+            }
+          ],
+          "owner_prerequisites": [
+            "angels-metallurgy-1"
+          ],
+          "owner_science": [
+            {
+              "type": "item",
+              "name": "automation-science-pack",
+              "amount": 1
+            }
+          ],
+          "maximum_productivity": "omitted"
+        },
+        {
+          "recipe": "angels-plate-tin-2",
+          "owner": "angels-tin-casting-2",
+          "ingredients": [
+            {
+              "type": "item",
+              "name": "angels-roll-tin",
+              "amount": 1
+            }
+          ],
+          "results": [
+            {
+              "type": "item",
+              "name": "bob-tin-plate",
+              "amount": 4
+            }
+          ],
+          "owner_prerequisites": [
+            "angels-strand-casting-1",
+            "angels-tin-smelting-1",
+            "angels-copper-casting-2"
+          ],
+          "owner_science": [
+            {
+              "type": "item",
+              "name": "automation-science-pack",
+              "amount": 1
+            },
+            {
+              "type": "item",
+              "name": "logistic-science-pack",
+              "amount": 1
+            }
+          ],
+          "maximum_productivity": "omitted"
+        }
+      ],
+      "early": {
+        "id": "recipe-prod-research_material_tin-1",
+        "science": [
+          "automation-science-pack"
+        ],
+        "prerequisites": [
+          "automation-science-pack",
+          "angels-tin-smelting-1",
+          "angels-tin-casting-2"
+        ],
+        "max_level": 3
+      },
+      "continuation": {
+        "id": "recipe-prod-research_material_tin-4",
+        "science": [
+          "automation-science-pack",
+          "utility-science-pack"
+        ],
+        "prerequisites": [
+          "angels-tin-casting-2",
+          "angels-tin-smelting-1",
+          "automation-science-pack",
+          "recipe-prod-research_material_tin-1",
+          "utility-science-pack"
+        ],
+        "max_level": 150,
+        "first_level": 4,
+        "predecessor_count": 800,
+        "previous_count": 400
+      },
+      "productivity_ceiling": 3
+    },
+    {
+      "key": "research_material_titanium",
+      "item": "bob-titanium-plate",
+      "icon": "__angelssmeltinggraphics__/graphics/icons/plate-titanium.png",
+      "icon_size": 32,
+      "routes": [
+        {
+          "recipe": "angels-plate-titanium",
+          "owner": "angels-titanium-smelting-1",
+          "ingredients": [
+            {
+              "type": "fluid",
+              "name": "angels-liquid-molten-titanium",
+              "amount": 40
+            }
+          ],
+          "results": [
+            {
+              "type": "item",
+              "name": "bob-titanium-plate",
+              "amount": 4
+            }
+          ],
+          "owner_prerequisites": [
+            "angels-ore-leaching",
+            "angels-metallurgy-3",
+            "angels-coal-processing-2",
+            "angels-chlorine-processing-1"
+          ],
+          "owner_science": [
+            {
+              "type": "item",
+              "name": "automation-science-pack",
+              "amount": 1
+            },
+            {
+              "type": "item",
+              "name": "logistic-science-pack",
+              "amount": 1
+            },
+            {
+              "type": "item",
+              "name": "chemical-science-pack",
+              "amount": 1
+            }
+          ],
+          "maximum_productivity": "omitted"
+        },
+        {
+          "recipe": "angels-plate-titanium-2",
+          "owner": "angels-titanium-casting-2",
+          "ingredients": [
+            {
+              "type": "item",
+              "name": "angels-roll-titanium",
+              "amount": 1
+            }
+          ],
+          "results": [
+            {
+              "type": "item",
+              "name": "bob-titanium-plate",
+              "amount": 4
+            }
+          ],
+          "owner_prerequisites": [
+            "angels-strand-casting-3",
+            "angels-titanium-smelting-1",
+            "angels-manganese-smelting-3",
+            "angels-nickel-smelting-2"
+          ],
+          "owner_science": [
+            {
+              "type": "item",
+              "name": "automation-science-pack",
+              "amount": 1
+            },
+            {
+              "type": "item",
+              "name": "logistic-science-pack",
+              "amount": 1
+            },
+            {
+              "type": "item",
+              "name": "chemical-science-pack",
+              "amount": 1
+            },
+            {
+              "type": "item",
+              "name": "production-science-pack",
+              "amount": 1
+            }
+          ],
+          "maximum_productivity": "omitted"
+        }
+      ],
+      "early": {
+        "id": "recipe-prod-research_material_titanium-1",
+        "science": [
+          "automation-science-pack",
+          "logistic-science-pack"
+        ],
+        "prerequisites": [
+          "automation-science-pack",
+          "logistic-science-pack",
+          "angels-titanium-smelting-1",
+          "angels-titanium-casting-2"
+        ],
+        "max_level": 3
+      },
+      "continuation": {
+        "id": "recipe-prod-research_material_titanium-4",
+        "science": [
+          "automation-science-pack",
+          "logistic-science-pack",
+          "utility-science-pack"
+        ],
+        "prerequisites": [
+          "angels-titanium-casting-2",
+          "angels-titanium-smelting-1",
+          "automation-science-pack",
+          "logistic-science-pack",
+          "recipe-prod-research_material_titanium-1",
+          "utility-science-pack"
+        ],
+        "max_level": 150,
+        "first_level": 4,
+        "predecessor_count": 800,
+        "previous_count": 400
+      },
+      "productivity_ceiling": 3
+    }
+  ],
+  "withheld_families": [
+    {
+      "key": "research_material_lead",
+      "reason": "not-emitted-by-published-f200-reference"
+    },
+    {
+      "key": "research_material_nickel",
+      "reason": "not-emitted-by-published-f200-reference"
+    },
+    {
+      "key": "research_material_platinum",
+      "reason": "not-emitted-by-published-f200-reference"
+    },
+    {
+      "key": "research_material_silver",
+      "reason": "not-emitted-by-published-f200-reference"
+    },
+    {
+      "key": "research_material_zinc",
+      "reason": "not-emitted-by-published-f200-reference"
+    },
+    {
+      "key": "research_material_bronze",
+      "reason": "not-emitted-by-published-f200-reference"
+    },
+    {
+      "key": "research_material_brass",
+      "reason": "not-emitted-by-published-f200-reference"
+    },
+    {
+      "key": "research_material_gunmetal",
+      "reason": "not-emitted-by-published-f200-reference"
+    },
+    {
+      "key": "research_material_invar",
+      "reason": "not-emitted-by-published-f200-reference"
+    },
+    {
+      "key": "research_material_cobalt_steel",
+      "reason": "not-emitted-by-published-f200-reference"
+    },
+    {
+      "key": "research_material_nitinol",
+      "reason": "not-emitted-by-published-f200-reference"
+    }
+  ],
+  "totals": {
+    "families": 5,
+    "routes": 10,
+    "continuations": 5,
+    "technology_rows": 10,
+    "withheld_families": 11
+  }
+}
