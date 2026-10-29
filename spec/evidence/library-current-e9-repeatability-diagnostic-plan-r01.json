@@ -345,7 +345,7 @@
   "quiet_conditions": [
     "One owned native session at a time;no other Factorio jobs.",
     "Prepare own fixture archives and run host/build controls before the timed block.",
-    "No local builds,host suites,inference or unrelated heavy work during the complete12-session block.",
+    "No local builds,host suites,inference or unrelated heavy work during the complete six-session diagnostic block.",
     "Keep graphics,observer,engine,Defaults and existing per-client config template behavior unchanged."
   ],
   "resources": {
@@ -449,5 +449,6 @@
     "F210/Space Age/client/API applicability",
     "Any current complete release verdict",
     "Tagging or publication"
-  ]
+  ],
+  "comparability_limit": "The original R01 public Browser.open calls omit group;the retained screenshots show published All research versus candidate MIR research. Preserve this actual default/scope discrepancy. Do not retrospectively claim matched view/output or accept R01 comparisons. This six-session schedule diagnoses same-published repeatability and observes one current functional case only;any later acceptance protocol must explicitly match and assert the intended view scope before collecting its new dataset."
 }
