@@ -123,6 +123,77 @@ def marker(action: str, milliseconds: str, *, role: str = "en") -> str:
 
 
 class LibraryProfileReaderTests(unittest.TestCase):
+    def test_actual_six_session_diagnostic_keeps_failed_memory_controls_unaccepted(self):
+        import re
+        payload = (ROOT / 'spec/evidence/library-repeatability-diagnostic-r02-native-receipts.json.gz').read_bytes()
+        self.assertEqual(hashlib.sha256(payload).hexdigest().upper(), '950162E6EE13800737EA883D87A7C517A5124BDB39DB435E8BEED71A120BD21B')
+        files = {}
+        for row in json.loads(gzip.decompress(payload))['files']:
+            raw = base64.b64decode(row['base64'], validate=True)
+            self.assertEqual(len(raw), row['bytes'])
+            self.assertEqual(hashlib.sha256(raw).hexdigest().upper(), row['sha256'])
+            self.assertNotIn(row['path'], files)
+            files[row['path']] = raw
+        self.assertEqual(len(files), 86)
+        analysis = json.loads(files['controller/analysis.json'])
+        self.assertEqual(analysis['status'], 'diagnostic-observed-not-acceptance')
+        self.assertFalse(analysis['performance_acceptance'])
+        self.assertFalse(analysis['release_qualification'])
+        actual_metrics = []
+        with tempfile.TemporaryDirectory() as directory:
+            for observation in analysis['observations']:
+                metrics, logs = {}, []
+                root = Path(directory) / observation['id']
+                root.mkdir()
+                for role, actor, suffix in [('server', 'server', ''), ('en', 'client', '-en'), ('de', 'client', '-de')]:
+                    for phase in ('initial', 'restart'):
+                        name = f'phase-{actor}-{phase}{suffix}.stdout.log'
+                        path = root / name
+                        path.write_bytes(files[f"native/{observation['id']}/{name}"])
+                        logs.append(reader.LogInput(role, phase, path, name))
+                profiles = reader._read_profiles(logs)
+                self.assertTrue(profiles['complete'])
+                self.assertFalse(profiles['performance_acceptance'])
+                for role in profiles['roles']:
+                    for value in role['observations']:
+                        metrics['library/' + role['role'] + '/' + value['action']] = value['duration_ms']
+                for phase in ('initial', 'restart'):
+                    text = files[f"native/{observation['id']}/phase-server-{phase}.stdout.log"].decode('utf-8-sig')
+                    ready = [(line, json.loads(line.split('[MIR5_LIBRARY_PAIRED_BROWSER] ', 1)[1]))
+                             for line in text.splitlines() if '[MIR5_LIBRARY_PAIRED_BROWSER] ' in line]
+                    ready = [(line, row) for line, row in ready if row['stage'] == 'ready']
+                    self.assertEqual(len(ready), 1)
+                    self.assertIsNotNone(re.match(r'^\s*[0-9]+\.[0-9]+\s', ready[0][0]))
+                    metrics['save_ready/' + phase] = float(ready[0][0].split()[0])
+                memory = json.loads(files[f"native/{observation['id']}/process-memory-observations.json"])
+                self.assertEqual(memory['status'], 'complete-observation')
+                self.assertFalse(memory['incomplete_reasons'])
+                for phase in ('initial', 'restart'):
+                    for role in ('server', 'client-en', 'client-de'):
+                        rows = [r for r in memory['observations'] if r['phase'] == phase and r['role'] == role]
+                        self.assertGreaterEqual(len(rows), 2)
+                        for key in ('working_set_bytes', 'private_bytes'):
+                            metrics[f'memory/{phase}/{role}/{key}'] = max(r[key] for r in rows)
+                self.assertEqual(len(metrics), 26)
+                self.assertEqual(metrics, observation['metrics'])
+                actual_metrics.append(metrics)
+        self.assertEqual(len(actual_metrics), 6)
+        failures = {}
+        for pair, left, right in [('1', actual_metrics[1], actual_metrics[2]), ('2', actual_metrics[3], actual_metrics[4])]:
+            failed = []
+            for key in sorted(left):
+                floor = 5 if key.startswith('library/') else .25 if key.startswith('save_ready/') else 67108864
+                limit = max(.1 * ((left[key] + right[key]) / 2), floor)
+                within = abs(left[key] - right[key]) <= limit
+                self.assertEqual(within, analysis['pairs'][pair][key]['within'])
+                if not within:
+                    failed.append(key)
+            failures[pair] = failed
+        self.assertEqual(failures, {
+            '1': ['memory/restart/client-en/working_set_bytes', 'memory/restart/server/private_bytes', 'memory/restart/server/working_set_bytes'],
+            '2': ['memory/initial/client-en/working_set_bytes', 'memory/restart/client-de/working_set_bytes'],
+        })
+
     def test_actual_current_r01_roles_replay_without_promoting_failed_measurements(self):
         payload = (ROOT / 'spec/evidence/library-current-e9-r01-native-receipts.json.gz').read_bytes()
         self.assertEqual(hashlib.sha256(payload).hexdigest().upper(), '526F8B41EBD2208978EEA4E41598F800B6D18D91EF065520D2EE79A4B287B3AA')
