@@ -1,0 +1,84 @@
+{
+  "schema": 1,
+  "kind": "MIRPublishedF100ForwardNativeFormatRunnerPreparationV1",
+  "status": "pinned-engine-template-correction-host-only-not-native-refusal",
+  "runner": {
+    "path": "tools/Invoke-NativeFixture.ps1",
+    "revision": "c776a8b971a75d60eb8de780f3ae098b023b7995",
+    "sha256": "9EDFDB4EAEE88D3B4A5294E76E5F9F428320CDB4E99286FA38537F66F23B8711",
+    "bytes": 92240
+  },
+  "previous_preparation": {
+    "path": "spec/evidence/published-f100-forward-prepared-aero-r02.json",
+    "sha256": "1A51EEBBA5FDEBD139DAD8D80A999B84D4598F6C95B0013AC6BF755F8B045E1F",
+    "bytes": 19886,
+    "preserved_unchanged": true
+  },
+  "inspected_primary_engine_data": {
+    "host": "AERO-15X-WIN10",
+    "engine_path": "C:/Program Files/Steam/steamapps/common/Factorio/bin/x64/factorio.exe",
+    "engine_product_version": "2.1.23",
+    "engine_file_version": "2.1.23.87750",
+    "engine_sha256": "FE4A1DA30F322A0D0B8AEB3DF7276332222BAAA143E2352569B723E84B2B9060",
+    "base_info_version": "2.1.23",
+    "english_locale_path": "C:/Program Files/Steam/steamapps/common/Factorio/data/core/locale/en/core.cfg",
+    "english_locale_sha256": "75765F8908E0630BAB5B3D44B6B45DCE4408530C7E3B0E8D34FCFE9CFA77F004",
+    "english_locale_bytes": 266004,
+    "section": "invalid-map-version",
+    "key": "lower-than-minimum",
+    "exact_template": "Map version __1__ cannot be loaded because it is lower than the minimum input version (__2__).",
+    "native_execution": false
+  },
+  "correction": "Replace the invented minimum-supported phrasing with the exact installed lower-than-minimum template and numeric version placeholders. Retain all actual result/profile/stdout/ledger/process/engine/source/archive bindings;the template never authorizes a bridge without a real retained direct refusal. Unknown wording remains a review stop.",
+  "unchanged_source_profile": {
+    "path": "tests/profiles/published473-f100-forward-source-r02.json",
+    "sha256": "973631B91A105D56EEB2890CA4F2A6B9571CA5FBE2E1EAAB3A6501ACD3512509",
+    "bytes": 1334
+  },
+  "unchanged_fixture_archives_rehashed": [
+    {
+      "stage": "source",
+      "name": "mir-fixture-mir5-historical-transition_0.2.0.zip",
+      "sha256": "E2F1D24D3C878F6A3B58A6F38ADD045FB942C31599079FD837CAB5FCBB291280",
+      "bytes": 7081
+    },
+    {
+      "stage": "bridge",
+      "name": "mir-fixture-mir5-historical-transition_0.3.0.zip",
+      "sha256": "F2246B8A62B2968F00DC2213F12AC89D55E85ABACCD7C231BA339055543F2735",
+      "bytes": 7086
+    },
+    {
+      "stage": "f110",
+      "name": "mir-fixture-mir5-historical-transition_0.4.0.zip",
+      "sha256": "D391C8D431297979BC671CC873315B13294DBD44BA4C7889BDA81602D2C126AC",
+      "bytes": 7086
+    },
+    {
+      "stage": "f210",
+      "name": "mir-fixture-mir5-historical-transition_0.5.0.zip",
+      "sha256": "2276C67A15CED1B3E0607AE83AE83A8ABE67961ECD0099FE24DA10B408696B5E",
+      "bytes": 7089
+    }
+  ],
+  "fixture_payload_delta": [],
+  "player_source_delta": [],
+  "host_validation": {
+    "forward_lua52_controls": 7,
+    "ast_accepted_transactions": 4,
+    "ast_refused_transactions": 47,
+    "new_opponents": [
+      "old invented minimum-supported phrase",
+      "malformed minimum-input version"
+    ],
+    "existing_f110_runner_controls": 5,
+    "repository_static": "pass",
+    "whitespace": "pass",
+    "first_f110_command": "A nonexistent guessed test_f110_f200_native_runner.py path ran no control;the corrected existing test_f110_f200_runner.py passes."
+  },
+  "native_owner_required": "Black Glass verifies the actual8DC engine English template/identity and binds this exact new harness before a future dispatch. Do not change an active frozen stage. Reuse any accepted R02 enhanced source and all unchanged protected inputs;no predecessor recreation.",
+  "new_native_processes": 0,
+  "actual_engine_format_refusals": 0,
+  "bridge_authorized": false,
+  "release_qualification": false
+}
