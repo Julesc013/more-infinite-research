@@ -109,6 +109,7 @@ class LibraryPairedBrowserFixtureTests(unittest.TestCase):
           function paired_browser_runtime(path, arm, opponent)
             local callbacks, markers, profiler_labels, screenshots, saves, calls, joins = {events = {}}, {}, {}, {}, {}, {}, {}
             local action_ticks = {}
+            local save_ticks = {}
             local profiling = false
             local gear = "recipe-prod-research_gears-1"
             local mining = "recipe-prod-research_mining_drill-1"
@@ -254,7 +255,17 @@ class LibraryPairedBrowserFixtureTests(unittest.TestCase):
                 row.tick=env.game.tick;row.calls_seen=#calls;row.profiling=profiling
                 screenshots[#screenshots+1]=row
               end,
-              server_save=function(name) saves[#saves+1]=name end
+              server_save=function(name)
+                if opponent == "deferred-render" and name == "mir5-native-complete" then
+                  for _, capture in ipairs(screenshots) do
+                    if string.find(capture.path, "reopen-settled", 1, true) and capture.tick == env.game.tick then
+                      error("final save modal obscured pending settled screenshot render")
+                    end
+                  end
+                end
+                saves[#saves+1]=name
+                save_ticks[name]=env.game.tick
+              end
             }
             setmetatable(env.game,{__index=function(_, key)
               if key == "create_profiler" then error("removed game.create_profiler API was accessed") end
@@ -400,14 +411,17 @@ class LibraryPairedBrowserFixtureTests(unittest.TestCase):
             end
             readiness[#readiness+1]={phase="restart",calls=#calls,screenshots=#screenshots}
             if opponent == "late-restart-locale" then de.locale="de" end
-            for _, tick in ipairs({restart_ready_tick,restart_ready_tick+60}) do
+            for _, tick in ipairs({restart_ready_tick,restart_ready_tick+60,restart_ready_tick+119,restart_ready_tick+120}) do
+              if tick == restart_ready_tick+120 and opponent == "changed-final-settled-root" then
+                en.gui.screen["mir_research_browser"]={valid=true}
+              end
               env.game.tick=tick
               ok,message=invoke(callbacks.events[2],{tick=tick})
               if not ok then return {ok=false,message=message,markers=markers,calls=calls} end
             end
             return {
               ok=ok,message=message,markers=markers,profiler_labels=profiler_labels,screenshots=screenshots,
-              saves=saves,calls=calls,joins=joins,load_writes=load_writes,readiness=readiness,action_ticks=action_ticks,restart_wait=restart_wait,restart_first_event=restart_first_event,
+              saves=saves,save_ticks=save_ticks,calls=calls,joins=joins,load_writes=load_writes,readiness=readiness,action_ticks=action_ticks,restart_wait=restart_wait,restart_first_event=restart_first_event,
               ready_markers_before_tick=ready_markers_before_tick,
               ready_markers_after_tick=ready_markers_after_tick,
               state=env.storage["mir5_library_paired_browser"]
@@ -580,6 +594,21 @@ class LibraryPairedBrowserFixtureTests(unittest.TestCase):
                 self.assertTrue(result['ok'], result['message'])
                 late = next(row for row in result['screenshots'] if row['path'].endswith('first-open-settled-2.png'))
                 self.assertEqual(result['action_ticks'][2] - late['tick'], 60)
+
+    def test_final_save_waits_for_reopen_render_and_retains_both_observed_roots(self):
+        for arm in ARMS:
+            with self.subTest(arm=arm):
+                result = self.runtime_result(arm, "deferred-render")
+                self.assertTrue(result["ok"], result["message"])
+                late = [r for r in result["screenshots"] if "reopen-settled" in r["path"]]
+                self.assertEqual(len(late), 2)
+                self.assertEqual([result["save_ticks"]["mir5-native-complete"] - r["tick"] for r in late], [60, 60])
+                self.assertEqual(result["saves"], ["mir5-library-paired-browser-restart", "mir5-native-complete"])
+                self.assertEqual(len(result["calls"]), 8)
+                self.assertEqual(result["state"]["screenshot_calls"], 12)
+                refused = self.runtime_result(arm, "changed-final-settled-root")
+                self.assertFalse(refused["ok"])
+                self.assertIn("final render grace lost the original public Browser root", refused["message"])
 
     def test_published_family_lookup_rejects_duplicate_or_unbounded_filter_layout(self):
         for opponent, message in [

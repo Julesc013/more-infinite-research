@@ -494,6 +494,18 @@ script.on_event(defines.events.on_tick, function()
     restart_ready(state)
   elseif state.phase == "reopen-capture" then
     capture_settled(state, "reopen", players)
+    state.phase = "reopen-settled-render"
+    state.capture_after_tick = game.tick + CAPTURE_DELAY
+  elseif state.phase == "reopen-settled-render" then
+    -- The final save can display a native modal. Let the requested frame
+    -- render first, keeping both observed views intact during this grace.
+    for _, locale in ipairs({"en", "de"}) do
+      local root = players[locale].gui.screen[ROOT]
+      if settled_roots == nil or not valid(root) or root ~= settled_roots[locale] then
+        fail("final render grace lost the original public Browser root")
+      end
+      assert_shape(players[locale], ARMS[state.arm], VIEWS.reopen[locale])
+    end
     complete(state)
   else
     fail("fixture capture phase is unrecognized")
