@@ -1,0 +1,128 @@
+{
+  "schema": 1,
+  "kind": "MIRAAICompleteCaptureTransportChainV1",
+  "status": "existing-complete-captures-transported-not-compared",
+  "source_chain": "spec/evidence/broad-ecosystem-f210-575e-native-chain-r01.json",
+  "original_root_readback_sha256": "DFE297B19A1354EEAC8D62AC1FDE4FB7247B9AC6CF2D8B0F925C169EFDC674D0",
+  "transport": {
+    "path": "spec/evidence/aai-q043-q044-complete-captures-r01.json.gz",
+    "sha256": "9CF43317033E05244017E71FA75FFF96589A91EC9D87D0CCECAFF557C2BBDEF7",
+    "bytes": 516416,
+    "records": 27
+  },
+  "cases": [
+    {
+      "case": "q043",
+      "arm": "upstream",
+      "technology_rows": 216,
+      "original_data_dump": {
+        "path": "write-data/script-output/data-raw-dump.json",
+        "bytes": 14278012,
+        "sha256": "AEE44008FD8213C597AE08B13B4AC5BBD65F83A4BDE4672808B49DB929B4B429"
+      },
+      "original_settings_dump": {
+        "path": "write-data/script-output/mod-settings-dump.json",
+        "bytes": 2429,
+        "sha256": "5086F849C33057517D13803A2AC29C866264D9827CDCF8C9E16362A4DE3CBCB8"
+      },
+      "result_sha256": "2B8A7740BE5B0A2B6865776E23E68212A627100ED8C935B6194A68877B291F4E"
+    },
+    {
+      "case": "q043",
+      "arm": "published",
+      "technology_rows": 269,
+      "original_data_dump": {
+        "path": "write-data/script-output/data-raw-dump.json",
+        "bytes": 14784217,
+        "sha256": "A117AE289F546FF73D101B01254A11F14DA8F0E054D16B31E77766041C8FFA2B"
+      },
+      "original_settings_dump": {
+        "path": "write-data/script-output/mod-settings-dump.json",
+        "bytes": 1050925,
+        "sha256": "F8D3303B8D7274C2BC0957C362284F70F1AD00D8E2523D90486AE457BF22EC02"
+      },
+      "result_sha256": "01B4645AC44F9ED604B17B733C66AEC035BA805C0BCFBFFFBF9E1C663F8DBCB8"
+    },
+    {
+      "case": "q043",
+      "arm": "candidate",
+      "technology_rows": 294,
+      "original_data_dump": {
+        "path": "write-data/script-output/data-raw-dump.json",
+        "bytes": 14407430,
+        "sha256": "B6189679DAD808AD7FD8C2E77EE7DFEFE936FCBF81A9E1F1E499393E5224CB90"
+      },
+      "original_settings_dump": {
+        "path": "write-data/script-output/mod-settings-dump.json",
+        "bytes": 756338,
+        "sha256": "DCDBB76B070935745C0B2922E6344CBCF3886413FD8B2C3CD057C62FC2FE2F4E"
+      },
+      "result_sha256": "B2B9DA9505C0DF977CF846379609E9FB721FBFEBC8B1C1B073AF3B76D9877072"
+    },
+    {
+      "case": "q044",
+      "arm": "upstream",
+      "technology_rows": 297,
+      "original_data_dump": {
+        "path": "write-data/script-output/data-raw-dump.json",
+        "bytes": 30074186,
+        "sha256": "7E1DEC3804A659136448CAFBE6B0615B86B6718D795377D700473FA1E08F10DC"
+      },
+      "original_settings_dump": {
+        "path": "write-data/script-output/mod-settings-dump.json",
+        "bytes": 2429,
+        "sha256": "5086F849C33057517D13803A2AC29C866264D9827CDCF8C9E16362A4DE3CBCB8"
+      },
+      "result_sha256": "6A4D9813E0B5B930DBB4E1D3EB3B60BEE33AE07EDDCAAC831F0A221A409C0446"
+    },
+    {
+      "case": "q044",
+      "arm": "published",
+      "technology_rows": 368,
+      "original_data_dump": {
+        "path": "write-data/script-output/data-raw-dump.json",
+        "bytes": 30718921,
+        "sha256": "4FC7C2F41C1F2A5FDEBA6DBAF95970391C0291283A805DD60850B8BA2234E293"
+      },
+      "original_settings_dump": {
+        "path": "write-data/script-output/mod-settings-dump.json",
+        "bytes": 1047537,
+        "sha256": "B63F5B3ED667E3B3D96D9E248BE713EBE9D07373515C5134414C44064A19BEB8"
+      },
+      "result_sha256": "CE627870DB5F28F0274CE3B52672001DF6B9E8102CC139A9BF7627CED71DDB90"
+    },
+    {
+      "case": "q044",
+      "arm": "candidate",
+      "technology_rows": 396,
+      "original_data_dump": {
+        "path": "write-data/script-output/data-raw-dump.json",
+        "bytes": 30259685,
+        "sha256": "619D3362C318AADDB22EF083B82CF8B36BEA74F8265558CC42CB1BA16EEED48F"
+      },
+      "original_settings_dump": {
+        "path": "write-data/script-output/mod-settings-dump.json",
+        "bytes": 752950,
+        "sha256": "F254F3AF08B789EFD4D56C88DF236755EC61F3712358A904B91A8C84F4D6593E"
+      },
+      "result_sha256": "C506CBB6D52F8295A1A5E555DF8487FEEFB29E1C630F632D68BFAE76E5678101"
+    }
+  ],
+  "verification": [
+    "All six exact original native result lengths/hashes match the independently retained3351-member broad-campaign readback.",
+    "Each complete original data dump is rehashed against its native receipt before extracting the entire technology object,including hidden/private rows and all fields. Technology JSON is an explicitly derived serialization,not claimed byte-identical to the enclosing raw data dump. Array order and multiplicity are unchanged.",
+    "All six settings dumps,results and native stdout bodies,two exact profiles and original root readback are transported byte-for-byte. All27 envelope bodies round-trip exact length/SHA256. No native command is rerun.",
+    "Data-stage dumps and stdout contain no RCON password or credential tokens. Original9GB broad custody remains intact;no copying dependency archives or populated test profiles."
+  ],
+  "required_next": "Aero independently compares complete upstream/published/candidate technology and settings objects for q043 Base and q044 SpaceAge,then reviews exact consumed-path applicability to current7b0. Current transport grants no semantic/native/current-package acceptance.",
+  "comparison_performed": false,
+  "new_native_execution": false,
+  "gameplay_qualification": false,
+  "performance_acceptance": false,
+  "release_qualification": false,
+  "limits": [
+    "AAI Industry0.7.5 only,not full AAI suite or arbitrary combinations.",
+    "The candidate capture retains its actual575e/A8D0/SteamFE4 identity;no new current1D45/2DDD or standalone8DC execution is claimed.",
+    "Existing E3 lab/save chains retain their original scope and physical-output limits;this transport neither strengthens nor erases them."
+  ]
+}
