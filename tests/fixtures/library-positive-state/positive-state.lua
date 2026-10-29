@@ -13,6 +13,20 @@ local function fail(message) error("[mir5-library-positive-state] " .. message) 
 local function valid(value) return value ~= nil and value.valid ~= false end
 local function close(a, b) return type(a) == "number" and math.abs(a - b) < .000001 end
 
+local function seed_diagnostic(force, stage, id)
+  local holders, bonuses = {}, {}
+  for _, name in ipairs(IDS) do
+    local value = force.technologies[name]
+    holders[#holders + 1] = {id=name, level=value.level, researched=value.researched,
+      enabled=value.enabled, visible_when_disabled=value.visible_when_disabled}
+  end
+  for _, recipe in ipairs(RECIPES) do bonuses[recipe] = force.recipes[recipe].productivity_bonus end
+  log("[MIR5_LIBRARY_POSITIVE_SEED] " .. helpers.table_to_json({
+    seed_stage=stage, assigned_id=id, holders=holders, module_productivity=bonuses,
+    cannon_speed=force.get_gun_speed_modifier("cannon-shell"),
+  }))
+end
+
 function M.assert_credits(force)
   local holders, bonuses = {}, {}
   for index, id in ipairs(IDS) do
@@ -56,13 +70,18 @@ function M.seed(force)
     end
   end
   if not close(force.get_gun_speed_modifier("cannon-shell"), 0) then fail("seed requires zero cannon speed") end
+  seed_diagnostic(force, "before-assignments")
   for index, id in ipairs(IDS) do
     local technology = force.technologies[id]
     technology.level = index + 1
+    seed_diagnostic(force, "after-level-assignment", id)
     technology.researched = false
+    seed_diagnostic(force, "after-researched-assignment", id)
     technology.enabled, technology.visible_when_disabled = false, false
   end
+  seed_diagnostic(force, "before-effect-reset")
   force.reset_technology_effects()
+  seed_diagnostic(force, "after-effect-reset")
   return M.assert_credits(force)
 end
 

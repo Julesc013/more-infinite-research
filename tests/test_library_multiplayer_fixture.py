@@ -111,6 +111,7 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
             if opponent=="f210-wrong-mir-version" then mir_version="5.0.21001"
             elseif opponent=="unsupported-target-base" then base_version="2.1.24" end
             local players, markers, screenshots, saves, lab_diagnostics = {}, {}, {}, {}, {}
+            local seed_diagnostics={}
             local force={valid=true,index=1,name="player",technologies={},recipes={},research_queue={},research_progress=0,research_enabled=true}
             for _,name in ipairs({gear,mining}) do
               force.technologies[name]={valid=true,name=name,force=force,level=1,researched=false,enabled=true,visible_when_disabled=false,
@@ -176,6 +177,18 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
                   force.recipes[id].productivity_bonus=(force.technologies[private_credit_ids[index]].level-1)*.01
                 end
                 force.cannon_speed=(force.technologies[private_credit_ids[4]].level-1)*.1
+              end
+              if opponent=="positive-researched-setter-resets-level" then
+                for _,id in ipairs(private_credit_ids) do
+                  local values=force.technologies[id]
+                  force.technologies[id]=setmetatable({}, {
+                    __index=function(_,key)return values[key]end,
+                    __newindex=function(_,key,value)
+                      values[key]=value
+                      if key=="researched" and value==false then values.level=1 end
+                    end,
+                  })
+                end
               end
               if opponent=="positive-not-fresh" then force.technologies[private_credit_ids[1]].level=2 end
             end
@@ -542,7 +555,8 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
               game=game,storage=storage,remote=remote,
               settings={startup={ ["mir5-library-standalone-identity-discovery"]={value=discovery} }},
               helpers={table_to_json=function(value)
-                if value.science_counts then lab_diagnostics[#lab_diagnostics+1]=value
+                if value.seed_stage then seed_diagnostics[#seed_diagnostics+1]=value
+                elseif value.science_counts then lab_diagnostics[#lab_diagnostics+1]=value
                 else markers[#markers+1]=value end
                 return "{}"
               end,create_profiler=create_profiler},
@@ -558,6 +572,7 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
                     or value:match("^%[MIR5_LIBRARY_MULTIPLAYER_JOIN%] ")
                     or value:match("^%[MIR5_LIBRARY_MULTIPLAYER_LOCALE%] ")
                     or value:match("^%[MIR5_LIBRARY_STANDALONE_IDENTITY%] ")
+                    or value:match("^%[MIR5_LIBRARY_POSITIVE_SEED%] ")
                     or value:match("^%[MIR5_LIBRARY_LAB_DIAGNOSTIC%] "))
                 end
               end,
@@ -574,7 +589,7 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
               local success,value=pcall(callback,event)
               return success,tostring(value)
             end
-            ok,result=call(callbacks.init);if not ok then return {ok=false,message=result} end
+            ok,result=call(callbacks.init);if not ok then return {ok=false,message=result,seed_diagnostics=seed_diagnostics} end
             if opponent=="fake-connected" then
               ok,result=call(callbacks.events[2],{player_index=1})
               return {ok=ok,message=result,phase=storage[key].phase,markers=markers}
@@ -683,7 +698,7 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
               load_unchanged=load_unchanged,join_events=storage[key].join_events,measurements=storage[key].measurements,
               profiler_logs=profiler_logs,lab_diagnostics=lab_diagnostics,lab_insert_counts=insert_counts,
               rejected_bulk_inserts=rejected_bulk_inserts,private_query_calls=private_query_calls,
-              private_query_order=private_query_order,positive_seed_resets=reset_count}
+              private_query_order=private_query_order,positive_seed_resets=reset_count,seed_diagnostics=seed_diagnostics}
           end
         ''')
 
@@ -2235,6 +2250,29 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
                 "MIR_TEST_SESSION": str(SESSION), "MIR_TEST_POSITIVE_MARKERS": str(path), "MIR_TEST_TEMP": temporary,
             }, capture_output=True, text=True)
         self.assertEqual(process.returncode, 0, process.stdout + process.stderr)
+
+    def test_positive_seed_diagnostics_expose_a_native_setter_side_effect_without_relaxing_levels(self):
+        ids = ["mir-legacy-module-credit-speed-module", "mir-legacy-module-credit-productivity-module",
+               "mir-legacy-module-credit-efficiency-module", "mir-legacy-cannon-credit-rocket-shooting-speed"]
+        for target in ("f200-positive-state", "f210-positive-state"):
+            for opponent in (None, "positive-researched-setter-resets-level"):
+                with self.subTest(target=target, opponent=opponent):
+                    result = self.run_case(opponent, target=target)
+                    self.assertEqual(result["ok"], opponent is None)
+                    rows = result["seed_diagnostics"]
+                    self.assertEqual(len(rows), 11)
+                    self.assertEqual([r["seed_stage"] for r in rows], ["before-assignments"] +
+                                     [stage for _ in ids for stage in ("after-level-assignment", "after-researched-assignment")] +
+                                     ["before-effect-reset", "after-effect-reset"])
+                    for index, name in enumerate(ids):
+                        after_level, after_researched = rows[1+2*index:3+2*index]
+                        self.assertEqual(after_level["assigned_id"], name)
+                        self.assertEqual(after_level["holders"][index]["level"], index+2)
+                        self.assertEqual(after_researched["holders"][index]["level"], 1 if opponent else index+2)
+                    if opponent:
+                        self.assertIn("positive native holder changed", result["message"])
+                        self.assertEqual([holder["level"] for holder in rows[-1]["holders"]], [1, 1, 1, 1])
+                        self.assertEqual(rows[-1]["cannon_speed"], 0)
 
     def test_two_real_client_join_rejoin_and_restart_state_machine(self):
         result = self.run_case()
