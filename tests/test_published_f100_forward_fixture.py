@@ -330,6 +330,10 @@ end
                 if($Opponent -ceq 'bridge-resource'){$failure='[mir441-resource-process-budget]';$result.failure=$failure;$result.process_runs[0].error=$failure;$ledger[1].error=$failure}
                 if($Opponent -ceq 'bridge-non-format'){$stdout="  0.000 2026-10-30 00:00:00; Factorio 2.1.23 (build host-double, win64, full)`n  0.500 Error Util.cpp:81: Missing recipe.`n"}
                 if($Opponent -ceq 'bridge-invented-phrase'){$stdout=$stdout.Replace('because it is lower than the minimum input version (1.1.0-0).','with this version of the game. The minimum supported map version is 1.1.0-0.')}
+                if($Opponent -ceq 'bridge-format-suffix'){$stdout=$stdout.Replace('(1.1.0-0).','(1.1.0-0). invented bridge authorization')}
+                if($Opponent -ceq 'bridge-format-trailing-space'){$stdout=$stdout.Replace('(1.1.0-0).','(1.1.0-0). ')}
+                if($Opponent -ceq 'bridge-format-case'){$stdout=$stdout.Replace('Map version','map version')}
+                if($Opponent -ceq 'bridge-format-crlf'){$stdout=$stdout.Replace("`n","`r`n")}
                 if($Opponent -ceq 'bridge-bad-minimum'){$stdout=$stdout.Replace('(1.1.0-0).','(unknown).')}
                 if($Opponent -ceq 'bridge-header'){$stdout=$stdout.Replace('Factorio 2.1.23','Factorio 1.1.110')}
                 if($Opponent -ceq 'bridge-success'){$result.status='passed'}
@@ -373,7 +377,7 @@ end
                 @{version=$base}|ConvertTo-Json|Set-Content -LiteralPath (Join-Path $engineData 'base/info.json')
                 $profile=@{schema=1;kind='published-f100-forward';stage=$stage;target=$target;factorio_line=$line;settings_mode='Defaults';predecessor_origin='published-f100-4.7.10003';protected_source_sha256=$inputSha;engine=@{version=$base;sha256=$script:engineSha};mods=@(@{name='base';version=$base;enabled=$true},@{name='more-infinite-research';version=$mir;enabled=$true},@{name='mir-fixture-mir5-historical-transition';version=$version;enabled=$true});archive_sha256=@{('more-infinite-research_'+$mir+'.zip')=$mirSha;('mir-fixture-mir5-historical-transition_'+$version+'.zip')=('E'*64)}}
                 $source=Join-Path $repo ('build/'+$stage)
-                foreach($opponent in @('','input','origin','engine','archive','extra-mod','member','bridge-refusal','bridge-invented','bridge-missing','bridge-source','bridge-engine','bridge-mir','bridge-fixture','bridge-profile','bridge-route','bridge-no-native','bridge-no-pid','bridge-timeout','bridge-resource','bridge-non-format','bridge-invented-phrase','bridge-bad-minimum','bridge-header','bridge-duplicate','bridge-success','bridge-changed-input','bridge-profile-archive','bridge-harness','bridge-source-revision')){
+                foreach($opponent in @('','input','origin','engine','archive','extra-mod','member','bridge-refusal','bridge-invented','bridge-missing','bridge-source','bridge-engine','bridge-mir','bridge-fixture','bridge-profile','bridge-route','bridge-no-native','bridge-no-pid','bridge-timeout','bridge-resource','bridge-non-format','bridge-invented-phrase','bridge-format-suffix','bridge-format-trailing-space','bridge-format-case','bridge-format-crlf','bridge-bad-minimum','bridge-header','bridge-duplicate','bridge-success','bridge-changed-input','bridge-profile-archive','bridge-harness','bridge-source-revision')){
                   if($opponent.StartsWith('bridge-') -and $stage -cne 'bridge'){continue}
                   $changed=($profile|ConvertTo-Json -Depth 10)|ConvertFrom-Json -AsHashtable
                   if($stage -ceq 'bridge'){$changed.engine_bridge_refusal=New-HostRefusalBinding $opponent}
@@ -390,7 +394,7 @@ end
                   $message=''
                   try{$null=Get-PublishedF100ForwardFixture -Repo $repo -Profile $changed -Sources @($source) -EngineData $engineData -Engine $engine -MIRSha $mirSha -Case 'published-f100-forward' -Stage $stage -InputSave 'protected.zip' -InputSha $actualInput}catch{$ok=$false;$message=$_.Exception.Message}
                   finally{[IO.File]::WriteAllBytes($member,$original)}
-                  if($ok -ne ($opponent -ceq '')){throw ('unexpected preflight result '+$stage+'/'+$opponent+': '+$message)}
+                  if($ok -ne ($opponent -cin @('','bridge-format-crlf'))){throw ('unexpected preflight result '+$stage+'/'+$opponent+': '+$message)}
                   if($ok){$accepted++}else{$refused++}
                 }
               }
@@ -399,7 +403,7 @@ end
             env = {**os.environ, "MIR_FORWARD_REPO": str(repo), "MIR_FORWARD_RUNNER": str(ROOT / "tools/Invoke-NativeFixture.ps1")}
             result = subprocess.run(["pwsh", "-NoProfile", "-Command", script], env=env, capture_output=True, text=True)
             self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
-            self.assertEqual(json.loads(result.stdout), {"accepted": 4, "refused": 47, "native_processes": 0})
+            self.assertEqual(json.loads(result.stdout), {"accepted": 5, "refused": 50, "native_processes": 0})
 
 
 if __name__ == "__main__":
