@@ -1,8 +1,8 @@
 """Host controls for the governed MIR5 responsive-menu comparison plan.
 
-These checks execute only the PowerShell planning, prerequisite, and temporary
-archive-swap controls.  They never invoke ``-Execute``, Factorio, OCR, or
-package construction.
+These checks execute PowerShell planning, prerequisite, temporary archive-swap
+and observer-loop controls with synthetic capture/OCR boundaries. They never
+invoke ``-Execute``, Factorio, desktop capture/input, OCR or package construction.
 """
 import json
 from pathlib import Path
@@ -99,7 +99,115 @@ $replay=Invoke-MIR5MenuComparisonSample -PlanRow ([pscustomobject]@{{arm='replay
     return json.loads(completed.stdout)
 
 
+def invoke_observer_attempts(states: list[str], null_first: bool = False) -> subprocess.CompletedProcess[str]:
+    """Use the real loop/classifier with synthetic captures and no desktop APIs."""
+    with tempfile.TemporaryDirectory() as temporary:
+        command = r'''
+. ./tools/lib/validation/responsive-menu/MenuObservation.ps1
+. ./tools/lib/validation/responsive-menu/OwnedMenuWindow.ps1
+$traceFixtureRoot=__ROOT__
+$script:traceStates=[object[]](__STATES__|ConvertFrom-Json)
+$script:traceRead=0;$script:traceCaptures=0;$script:traceActions=0;$script:traceSleeps=0
+$script:nullFirst=__NULL_FIRST__
+$traceFixtureImage=Join-Path $traceFixtureRoot 'latest-owned-window.png'
+[IO.File]::WriteAllBytes($traceFixtureImage,[byte[]]@(17,34,51))
+function Start-Sleep {
+  param([int]$Milliseconds)
+  if($Milliseconds-ne100){throw 'poll interval changed'}
+  $script:traceSleeps++
+}
+function Save-MIROwnedMenuCapture {
+  param($Process,$ExpectedStartUtc,$Path,$Diagnostics)
+  $script:traceCaptures++;$Diagnostics.capture_requests++
+  if($script:nullFirst-and$script:traceCaptures-eq1){return $null}
+  $Diagnostics.captured_frames++
+  [pscustomobject]@{path=$Path;capture_started_qpc=[Diagnostics.Stopwatch]::GetTimestamp();capture_completed_qpc=[Diagnostics.Stopwatch]::GetTimestamp()}
+}
+function Read-MIRMenuImage {
+  param($Context,$ImagePath)
+  if($script:traceRead-ge$script:traceStates.Count){throw 'returned without recognized response'}
+  $state=$script:traceStates[$script:traceRead];$script:traceRead++
+  $lines=switch($state){
+    'main-menu' {@('main menu','single player','multiplayer','settings')}
+    'settings-menu' {@('graphics','controls','interface','sounds')}
+    'blocked' {@('error')}
+    default {@('unrecognized')}
+  }
+  [pscustomobject]@{lines=@($lines|ForEach-Object {[pscustomobject]@{normalized=$_}})}
+}
+function Send-MIROwnedMenuSettingsAction {
+  param($Process,$ExpectedStartUtc,$Capture,$Observation,$Diagnostics)
+  $script:traceActions++
+  [pscustomobject]@{kind='host-synthetic-action';posted_qpc=[Diagnostics.Stopwatch]::GetTimestamp()}
+}
+$hostProcess=[Diagnostics.Process]::GetCurrentProcess()
+try{
+  $launch=[Diagnostics.Stopwatch]::GetTimestamp()
+  $result=Wait-MIROwnedMenuResponse -Process $hostProcess -ExpectedStartUtc $hostProcess.StartTime.ToUniversalTime() -Ocr ([pscustomobject]@{}) -OutputRoot $traceFixtureRoot -LaunchQpc $launch -TimeoutSeconds 5
+  [ordered]@{observation=$result;captures=$script:traceCaptures;actions=$script:traceActions;sleeps=$script:traceSleeps;reads=$script:traceRead;native_execution=$false}|ConvertTo-Json -Depth 20 -Compress
+}finally{$hostProcess.Dispose()}
+'''
+        command = command.replace('__ROOT__', powershell_literal(temporary)).replace(
+            '__STATES__', powershell_literal(json.dumps(states))
+        ).replace('__NULL_FIRST__', '$true' if null_first else '$false')
+        return subprocess.run(
+            ['pwsh', '-NoProfile', '-Command', command], cwd=ROOT,
+            text=True, capture_output=True, check=False,
+        )
+
+
 class MenuComparisonTests(unittest.TestCase):
+    def test_attempt_diagnostics_preserve_retry_phases_and_the_response_endpoint(self):
+        states = ['unrecognized', 'main-menu', 'main-menu', 'settings-menu']
+        completed = invoke_observer_attempts(states, null_first=True)
+        self.assertEqual(completed.returncode, 0, completed.stderr)
+        result = json.loads(completed.stdout)
+        observation = result['observation']
+        trace = observation['observer_attempt_diagnostics']
+        self.assertEqual([r['state'] for r in trace['attempts']], states)
+        self.assertEqual([r['phase'] for r in trace['attempts']], [
+            'await-main-menu', 'await-main-menu',
+            'await-settings-response', 'await-settings-response',
+        ])
+        self.assertEqual([r['ordinal'] for r in trace['attempts']], [1, 2, 3, 4])
+        self.assertEqual(trace['limit'], 64)
+        self.assertEqual(trace['omitted'], 0)
+        self.assertEqual(result['captures'], 5)
+        self.assertEqual(result['reads'], 4)
+        self.assertEqual(result['actions'], 1)
+        self.assertEqual(observation['capture_attempts'], 4)
+        self.assertEqual(observation['poll_interval_milliseconds'], 100)
+        self.assertLess(observation['first_menu']['observed_qpc'], observation['action']['posted_qpc'])
+        self.assertLess(observation['action']['posted_qpc'], observation['response']['capture']['capture_started_qpc'])
+        self.assertEqual(observation['confirmed_response_seconds'], (
+            observation['response']['observed_qpc'] - observation['launch_qpc']
+        ) / observation['clock_frequency'])
+        for row in trace['attempts']:
+            clocks = [row[k] for k in ('capture_started_qpc', 'capture_completed_qpc',
+                                      'ocr_completed_qpc', 'classified_qpc', 'iteration_finished_qpc')]
+            self.assertEqual(clocks, sorted(clocks))
+            self.assertGreaterEqual(clocks[0], observation['launch_qpc'])
+        self.assertFalse(result['native_execution'])
+        self.assertFalse(observation['claims_factorio_acceptance'])
+
+    def test_attempt_diagnostics_bound_retention_without_shortening_the_work_or_accepting_blocked_frames(self):
+        completed = invoke_observer_attempts(['unrecognized'] * 70 + ['main-menu', 'settings-menu'])
+        self.assertEqual(completed.returncode, 0, completed.stderr)
+        result = json.loads(completed.stdout)
+        observation = result['observation']
+        trace = observation['observer_attempt_diagnostics']
+        self.assertEqual(len(trace['attempts']), 64)
+        self.assertEqual(trace['omitted'], 8)
+        self.assertEqual(result['reads'], 72)
+        self.assertEqual(result['actions'], 1)
+        self.assertEqual(observation['capture_attempts'], 72)
+        self.assertEqual(trace['attempts'][-1]['ordinal'], 64)
+        self.assertEqual(observation['status'], 'owned-menu-settings-response-observed')
+        for states in (['blocked'], ['main-menu', 'main-menu', 'blocked']):
+            refused = invoke_observer_attempts(states)
+            self.assertNotEqual(refused.returncode, 0)
+            self.assertIn('[mir-menu-blocked-or-loading-after-initialisation]', refused.stderr)
+
     def test_occlusion_reports_only_process_relation_and_rejects_every_other_root(self):
         command = r'''
 . ./tools/lib/validation/responsive-menu/OwnedMenuWindow.ps1
