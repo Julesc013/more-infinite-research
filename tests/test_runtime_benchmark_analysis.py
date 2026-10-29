@@ -1,4 +1,4 @@
-"""Independent controls for the R06 active-runtime benchmark result reader."""
+"""Independent controls for the two frozen active-runtime benchmark cohorts."""
 from __future__ import annotations
 
 import copy
@@ -624,6 +624,128 @@ class RuntimeBenchmarkAnalysisTests(unittest.TestCase):
                     )
                     self.assertEqual(refused.returncode, 1)
                     self.assertIn("expected R06 plan SHA-256 differs", refused.stderr)
+
+
+class Current38CRuntimeBenchmarkAnalysisTests(unittest.TestCase):
+    def setUp(self) -> None:
+        MODULE.select_cohort("current38c")
+
+    def tearDown(self) -> None:
+        MODULE.select_cohort("r06")
+
+    def test_actual_current_capsule_replays_exact_complete_analysis(self) -> None:
+        payload = (ROOT / "spec/evidence/runtime-current38c-observation-analysis-receipts-r01.json.gz").read_bytes()
+        self.assertEqual(_hash(payload), "D499884F0FE7A548F8F391EE1DCA0874F7269E0030383143E391DD9686FD3FEF")
+        files: dict[str, bytes] = {}
+        for row in json.loads(gzip.decompress(payload))["files"]:
+            raw = base64.b64decode(row["base64"], validate=True)
+            self.assertEqual(len(raw), row["bytes"])
+            self.assertEqual(_hash(raw), row["sha256"])
+            self.assertNotIn(row["path"], files)
+            files[row["path"]] = raw
+        self.assertEqual(len(files), 145)
+        observed = files["original/runtime-benchmark-active-observed.json"]
+        expected = files["derived/analysis-result.json"]
+        self.assertEqual(_hash(observed), "78F2D9EACFC7588B725DDA427485724FF34405026997B6325CEDF38B7C49963D")
+        self.assertEqual(_hash(expected), "29D6093F76C826E8FC7D72C160008F9A173BFC4CF56B9AE7B4D45391AB6C89DA")
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            plan, result, output = root / "plan.json", root / "runtime-benchmark-active-observed.json", root / "analysis.json"
+            plan.write_bytes(files["original/runtime-current38c-active-plan-r01.json"])
+            result.write_bytes(observed)
+            (root / "runtime-benchmark-active-prepared.json").write_bytes(files["original/runtime-benchmark-active-prepared.json"])
+            completed = subprocess.run(
+                [sys.executable, str(TOOL_PATH), "--cohort", "current38c", "--raw-plan", str(plan),
+                 "--expected-plan-sha256", MODULE.PLAN_SHA256, "--result", str(result),
+                 "--expected-result-sha256", _hash(observed), "--output", str(output)],
+                capture_output=True, text=True, check=False,
+            )
+            self.assertEqual(completed.returncode, 0, completed.stderr)
+            self.assertEqual(output.read_bytes(), expected)
+        analysis = json.loads(expected)
+        self.assertEqual(analysis["analysis_verdict"]["status"], "within-predeclared-limits")
+        self.assertFalse(analysis["claims"]["release_qualification"])
+
+    def test_current_plan_and_real_unscored_prerequisites_have_exact_closure(self) -> None:
+        plan = _plan()
+        contract = MODULE._validate_plan(plan, MODULE.PLAN_SHA256)
+        self.assertEqual(len(contract["profiles"]), 8)
+        self.assertEqual(len(contract["helpers"]), 12)
+        capture, pilot = MODULE._frozen_active_prerequisites()
+        self.assertEqual(len(capture["captures"]), 8)
+        self.assertEqual(len(pilot["observations"]), 8)
+        self.assertEqual(pilot["schedule_launches"], 0)
+        self.assertFalse(pilot["performance_acceptance"])
+        self.assertFalse(pilot["release_qualification"])
+        for field, mutate in {
+            "engine": lambda p: p["engine"].__setitem__("sha256", MODULE._R06_BINDINGS["ENGINE_SHA256"]),
+            "archive": lambda p: p["candidate"]["f210_archive"].__setitem__("sha256", MODULE._R06_BINDINGS["CANDIDATE_SHA256"]),
+            "schedule": lambda p: p["schedule"].__setitem__("total_launches", 67),
+        }.items():
+            with self.subTest(field=field):
+                bad = copy.deepcopy(plan)
+                mutate(bad)
+                with self.assertRaises(MODULE.RuntimeBenchmarkAnalysisError):
+                    MODULE._validate_plan(bad, MODULE.PLAN_SHA256)
+
+    def test_synthetic_current_scores_use_real_prerequisites_and_original_rules(self) -> None:
+        # These values exercise the reader; they are not native observations.
+        plan = _plan()
+        result, plan_sha = _result(plan)
+        analysis = MODULE.analyze(plan, plan_sha, result, _hash(_encode(result)))
+        self.assertEqual(analysis["kind"], "MIR5RuntimeBenchmarkActiveCurrent38CAnalysisV1")
+        self.assertEqual(analysis["analysis_verdict"]["status"], "within-predeclared-limits")
+        self.assertEqual(len(result["observations"]), 68)
+        self.assertFalse(analysis["claims"]["release_qualification"])
+        for label, mutate in {
+            "missing-score": lambda r: r["observations"].pop(),
+            "old-capture": lambda r: r["active_seed_capture"].__setitem__("sha256", MODULE._R06_BINDINGS["ACTIVE_SEED_CAPTURE_SHA256"]),
+            "old-pilot": lambda r: r["unscored_marker_pilot"].__setitem__("sha256", MODULE._R06_BINDINGS["MARKER_PILOT_SHA256"]),
+            "incomplete-work": lambda r: r["observations"][0]["physical_markers"]["complete"]["witnesses"].__setitem__("pending_physical_work", True),
+        }.items():
+            with self.subTest(label=label):
+                bad = copy.deepcopy(result)
+                mutate(bad)
+                with self.assertRaises(MODULE.RuntimeBenchmarkAnalysisError):
+                    MODULE.analyze(plan, plan_sha, bad, _hash(_encode(bad)))
+        # Crossing a declared limit must report failure rather than relax it.
+        for row in result["observations"]:
+            if row["arm"] == "candidate":
+                row["timing"]["average_milliseconds_per_tick"] = 1000.0
+        failed = MODULE.analyze(plan, plan_sha, result, _hash(_encode(result)))
+        self.assertEqual(failed["analysis_verdict"]["status"], "outside-predeclared-limits")
+
+    def test_current_cli_requires_explicit_cohort_and_bound_sidecar(self) -> None:
+        plan = _plan()
+        result, plan_sha = _result(plan)
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            raw_plan = root / "plan.json"
+            raw_result = root / "runtime-benchmark-active-observed.json"
+            raw_plan.write_bytes((ROOT / MODULE.PLAN_PATH).read_bytes())
+            prepared = _prepared_inputs(result)
+            (root / "runtime-benchmark-active-prepared.json").write_bytes(prepared)
+            result["prepared_inputs_sha256"] = _hash(prepared)
+            raw_result.write_bytes(_encode(result))
+            arguments = [sys.executable, str(TOOL_PATH), "--raw-plan", str(raw_plan),
+                         "--expected-plan-sha256", plan_sha, "--result", str(raw_result),
+                         "--expected-result-sha256", _hash(raw_result.read_bytes())]
+            refused = subprocess.run(arguments + ["--output", str(root / "default.json")], capture_output=True, text=True, check=False)
+            self.assertEqual(refused.returncode, 1)
+            self.assertFalse((root / "default.json").exists())
+            accepted = subprocess.run(arguments + ["--cohort", "current38c", "--output", str(root / "current.json")], capture_output=True, text=True, check=False)
+            self.assertEqual(accepted.returncode, 0, accepted.stderr)
+            self.assertEqual(json.loads((root / "current.json").read_bytes())["status"], "complete-predeclared-current38c-analysis")
+            (root / "runtime-benchmark-active-prepared.json").write_bytes(b"{}\n")
+            corrupt = subprocess.run(arguments + ["--cohort", "current38c", "--output", str(root / "corrupt.json")], capture_output=True, text=True, check=False)
+            self.assertEqual(corrupt.returncode, 1)
+            self.assertFalse((root / "corrupt.json").exists())
+
+    def test_unknown_cohort_cannot_change_selected_identity(self) -> None:
+        previous = MODULE.PLAN_SHA256
+        with self.assertRaisesRegex(MODULE.RuntimeBenchmarkAnalysisError, "unknown frozen"):
+            MODULE.select_cohort("latest")
+        self.assertEqual(MODULE.PLAN_SHA256, previous)
 
 
 if __name__ == "__main__":

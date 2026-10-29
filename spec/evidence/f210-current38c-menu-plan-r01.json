@@ -1,0 +1,426 @@
+{
+  "schema": 1,
+  "kind": "MIRCurrent38cPredeclaredMenuComparisonPlanV1",
+  "status": "predeclared-inputs-present-not-native-executed",
+  "host": "BLACKGLASS-WIN1",
+  "controller_commit": "a4f79bf1d45c141a07418755165275a74dd23161",
+  "candidate_source_commit": "992c76ee24caf2d723b469c3db760cbebdf35eeb",
+  "player_tree": "fbb7e9135280ce7f69692e9b0c4a44d743793f45",
+  "prepared_packet_sha256": "733C9DF5207B56714D3131A78CA85CDD70FE48F7B0BB9EF23A37F5DAD5C67260",
+  "caller_sha256": "ADA289F2A876C5E5AD39B693D144F1BA6143962D346D8DC209C70874CC8446CE",
+  "parameters": {
+    "FactorioBin": "D:/Games/Factorio/2.1/bin/x64/factorio.exe",
+    "ExpectedFactorioSha256": "8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38",
+    "ExpectedEngineVersion": "2.1.23",
+    "ExpectedFactorioLine": "2.1",
+    "ArchiveLibrary": "D:/Projects/Factorio/testmods/2.1",
+    "ProfilePath": "D:\\Projects\\Factorio\\mir5-legacy-cannon-credit-r01\\tests\\profiles\\bob-angel-full-space-age-standalone-f210-2123.json",
+    "ExpectedProfileSha256": "05F2786E896B1F28C2E4239134BA370B0C2BCF6CCB1384E03999FB0E89C8B980",
+    "PublishedArchive": "D:/Projects/Factorio/testmods/2.1/more-infinite-research_4.7.21003.zip",
+    "ExpectedPublishedSha256": "B6EB9430056ABD384DB00F94929FE7DAC0A37441ACF4BC277946689682628852",
+    "ReplayArchive": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\f210-performance-575e-capture-pending-r01\\replay-package-r01\\more-infinite-research_4.7.21003.zip",
+    "ExpectedReplaySha256": "1A921CA95C165A9D012F9CAA84BB873C6AB63F6B77D62AAE681CE1EF7C343E3E",
+    "CandidateArchive": "D:/Projects/Factorio/testmods/2.1/more-infinite-research_5.0.21000.zip",
+    "ExpectedCandidateSha256": "38C84CCBC4BFDA62FCB078772C4690AB81228484744A36D9EA303F5A75B16447",
+    "OrdinaryPlayerConfigPath": "D:\\Projects\\Factorio\\more-infinite-research\\build\\mir5\\recovery\\menu-f210-inputs-r01\\ordinary-config.ini",
+    "ExpectedOrdinaryPlayerConfigSha256": "DA9A92AB9047EBD9F9640B34DC9EF6C084801DF85B8F75B1A490E786F40DD510",
+    "PlayerDataPath": "D:\\Projects\\Factorio\\more-infinite-research\\build\\mir5\\recovery\\menu-f210-inputs-r01\\player-data.json",
+    "ExpectedPlayerDataSha256": "285ED61F8778CFF44FA173F8EDCC5E417F4DF8C1019A3DDD02814729CEE56EF9",
+    "OutputRoot": "D:\\Projects\\Factorio\\mir5-legacy-cannon-credit-r01\\build\\tmp\\f210-current38c-menu-r01",
+    "ActiveModsObserver": "mir-fixture-mir5-active-mods-observer",
+    "TimeoutSeconds": 300,
+    "ExpectedPeakMemoryMiB": 9216,
+    "MaxNewOutputMiB": 2048,
+    "CounterbalancedBlocks": 8,
+    "AdmissionWaitSeconds": 30,
+    "LibraryIdleWaitMilliseconds": 5000,
+    "AaAbsoluteToleranceSeconds": 0.5,
+    "AaRelativeTolerancePercent": 5.0,
+    "ControlRegressionToleranceSeconds": 0.5,
+    "MinimumMirAddedTimeReductionPercent": 50.0
+  },
+  "fixed_files": {
+    "tools/Invoke-MenuComparison.ps1": "937FA4384F483F6DD1CFA901408FC45A45A467F5BAA0F876B0C0CD8B5366D919",
+    "tools/lib/validation/DirectLibraryStartupMeasurement.ps1": "D069C014D74E883C249928E812A258E2A2CB34AFE499219CB46A513345C2EC34",
+    "tools/lib/validation/responsive-menu/Invoke-MIRResponsiveMenuActor.ps1": "DC4816352962EC14ED443E5865F71FF3F2A989B47DCF4F45916048F1B5A55D55",
+    "tools/lib/validation/ResourceGovernor.ps1": "B811A1548A6D789F2A7E618999D5087C70E0151E751CCF4C51635D54E6BF04ED",
+    "tools/lib/validation/NativeProbeResources.ps1": "A34BD5FE79466B3EDA96F46EC132562192E6A70280901381C8AF560E7AB23328"
+  },
+  "schedule": [
+    {
+      "ordinal": 1,
+      "phase": "warmup",
+      "arm": "control-without-mir",
+      "block": 0,
+      "position": 1,
+      "label": "01-warmup-control-without-mir"
+    },
+    {
+      "ordinal": 2,
+      "phase": "warmup",
+      "arm": "published-4.7",
+      "block": 0,
+      "position": 2,
+      "label": "02-warmup-published-4.7"
+    },
+    {
+      "ordinal": 3,
+      "phase": "warmup",
+      "arm": "replay",
+      "block": 0,
+      "position": 3,
+      "label": "03-warmup-replay"
+    },
+    {
+      "ordinal": 4,
+      "phase": "warmup",
+      "arm": "candidate-mir5",
+      "block": 0,
+      "position": 4,
+      "label": "04-warmup-candidate-mir5"
+    },
+    {
+      "ordinal": 5,
+      "phase": "aa-pilot",
+      "arm": "published-4.7",
+      "block": 0,
+      "position": 1,
+      "label": "05-aa-pilot-published-4.7"
+    },
+    {
+      "ordinal": 6,
+      "phase": "aa-pilot",
+      "arm": "published-4.7",
+      "block": 0,
+      "position": 2,
+      "label": "06-aa-pilot-published-4.7"
+    },
+    {
+      "ordinal": 7,
+      "phase": "counterbalanced-comparison",
+      "arm": "control-without-mir",
+      "block": 1,
+      "position": 1,
+      "label": "07-counterbalanced-comparison-control-without-mir"
+    },
+    {
+      "ordinal": 8,
+      "phase": "counterbalanced-comparison",
+      "arm": "published-4.7",
+      "block": 1,
+      "position": 2,
+      "label": "08-counterbalanced-comparison-published-4.7"
+    },
+    {
+      "ordinal": 9,
+      "phase": "counterbalanced-comparison",
+      "arm": "replay",
+      "block": 1,
+      "position": 3,
+      "label": "09-counterbalanced-comparison-replay"
+    },
+    {
+      "ordinal": 10,
+      "phase": "counterbalanced-comparison",
+      "arm": "candidate-mir5",
+      "block": 1,
+      "position": 4,
+      "label": "10-counterbalanced-comparison-candidate-mir5"
+    },
+    {
+      "ordinal": 11,
+      "phase": "counterbalanced-comparison",
+      "arm": "published-4.7",
+      "block": 2,
+      "position": 1,
+      "label": "11-counterbalanced-comparison-published-4.7"
+    },
+    {
+      "ordinal": 12,
+      "phase": "counterbalanced-comparison",
+      "arm": "replay",
+      "block": 2,
+      "position": 2,
+      "label": "12-counterbalanced-comparison-replay"
+    },
+    {
+      "ordinal": 13,
+      "phase": "counterbalanced-comparison",
+      "arm": "candidate-mir5",
+      "block": 2,
+      "position": 3,
+      "label": "13-counterbalanced-comparison-candidate-mir5"
+    },
+    {
+      "ordinal": 14,
+      "phase": "counterbalanced-comparison",
+      "arm": "control-without-mir",
+      "block": 2,
+      "position": 4,
+      "label": "14-counterbalanced-comparison-control-without-mir"
+    },
+    {
+      "ordinal": 15,
+      "phase": "counterbalanced-comparison",
+      "arm": "replay",
+      "block": 3,
+      "position": 1,
+      "label": "15-counterbalanced-comparison-replay"
+    },
+    {
+      "ordinal": 16,
+      "phase": "counterbalanced-comparison",
+      "arm": "candidate-mir5",
+      "block": 3,
+      "position": 2,
+      "label": "16-counterbalanced-comparison-candidate-mir5"
+    },
+    {
+      "ordinal": 17,
+      "phase": "counterbalanced-comparison",
+      "arm": "control-without-mir",
+      "block": 3,
+      "position": 3,
+      "label": "17-counterbalanced-comparison-control-without-mir"
+    },
+    {
+      "ordinal": 18,
+      "phase": "counterbalanced-comparison",
+      "arm": "published-4.7",
+      "block": 3,
+      "position": 4,
+      "label": "18-counterbalanced-comparison-published-4.7"
+    },
+    {
+      "ordinal": 19,
+      "phase": "counterbalanced-comparison",
+      "arm": "candidate-mir5",
+      "block": 4,
+      "position": 1,
+      "label": "19-counterbalanced-comparison-candidate-mir5"
+    },
+    {
+      "ordinal": 20,
+      "phase": "counterbalanced-comparison",
+      "arm": "control-without-mir",
+      "block": 4,
+      "position": 2,
+      "label": "20-counterbalanced-comparison-control-without-mir"
+    },
+    {
+      "ordinal": 21,
+      "phase": "counterbalanced-comparison",
+      "arm": "published-4.7",
+      "block": 4,
+      "position": 3,
+      "label": "21-counterbalanced-comparison-published-4.7"
+    },
+    {
+      "ordinal": 22,
+      "phase": "counterbalanced-comparison",
+      "arm": "replay",
+      "block": 4,
+      "position": 4,
+      "label": "22-counterbalanced-comparison-replay"
+    },
+    {
+      "ordinal": 23,
+      "phase": "counterbalanced-comparison",
+      "arm": "control-without-mir",
+      "block": 5,
+      "position": 1,
+      "label": "23-counterbalanced-comparison-control-without-mir"
+    },
+    {
+      "ordinal": 24,
+      "phase": "counterbalanced-comparison",
+      "arm": "published-4.7",
+      "block": 5,
+      "position": 2,
+      "label": "24-counterbalanced-comparison-published-4.7"
+    },
+    {
+      "ordinal": 25,
+      "phase": "counterbalanced-comparison",
+      "arm": "replay",
+      "block": 5,
+      "position": 3,
+      "label": "25-counterbalanced-comparison-replay"
+    },
+    {
+      "ordinal": 26,
+      "phase": "counterbalanced-comparison",
+      "arm": "candidate-mir5",
+      "block": 5,
+      "position": 4,
+      "label": "26-counterbalanced-comparison-candidate-mir5"
+    },
+    {
+      "ordinal": 27,
+      "phase": "counterbalanced-comparison",
+      "arm": "published-4.7",
+      "block": 6,
+      "position": 1,
+      "label": "27-counterbalanced-comparison-published-4.7"
+    },
+    {
+      "ordinal": 28,
+      "phase": "counterbalanced-comparison",
+      "arm": "replay",
+      "block": 6,
+      "position": 2,
+      "label": "28-counterbalanced-comparison-replay"
+    },
+    {
+      "ordinal": 29,
+      "phase": "counterbalanced-comparison",
+      "arm": "candidate-mir5",
+      "block": 6,
+      "position": 3,
+      "label": "29-counterbalanced-comparison-candidate-mir5"
+    },
+    {
+      "ordinal": 30,
+      "phase": "counterbalanced-comparison",
+      "arm": "control-without-mir",
+      "block": 6,
+      "position": 4,
+      "label": "30-counterbalanced-comparison-control-without-mir"
+    },
+    {
+      "ordinal": 31,
+      "phase": "counterbalanced-comparison",
+      "arm": "replay",
+      "block": 7,
+      "position": 1,
+      "label": "31-counterbalanced-comparison-replay"
+    },
+    {
+      "ordinal": 32,
+      "phase": "counterbalanced-comparison",
+      "arm": "candidate-mir5",
+      "block": 7,
+      "position": 2,
+      "label": "32-counterbalanced-comparison-candidate-mir5"
+    },
+    {
+      "ordinal": 33,
+      "phase": "counterbalanced-comparison",
+      "arm": "control-without-mir",
+      "block": 7,
+      "position": 3,
+      "label": "33-counterbalanced-comparison-control-without-mir"
+    },
+    {
+      "ordinal": 34,
+      "phase": "counterbalanced-comparison",
+      "arm": "published-4.7",
+      "block": 7,
+      "position": 4,
+      "label": "34-counterbalanced-comparison-published-4.7"
+    },
+    {
+      "ordinal": 35,
+      "phase": "counterbalanced-comparison",
+      "arm": "candidate-mir5",
+      "block": 8,
+      "position": 1,
+      "label": "35-counterbalanced-comparison-candidate-mir5"
+    },
+    {
+      "ordinal": 36,
+      "phase": "counterbalanced-comparison",
+      "arm": "control-without-mir",
+      "block": 8,
+      "position": 2,
+      "label": "36-counterbalanced-comparison-control-without-mir"
+    },
+    {
+      "ordinal": 37,
+      "phase": "counterbalanced-comparison",
+      "arm": "published-4.7",
+      "block": 8,
+      "position": 3,
+      "label": "37-counterbalanced-comparison-published-4.7"
+    },
+    {
+      "ordinal": 38,
+      "phase": "counterbalanced-comparison",
+      "arm": "replay",
+      "block": 8,
+      "position": 4,
+      "label": "38-counterbalanced-comparison-replay"
+    }
+  ],
+  "tolerance_policy": {
+    "status": "declared-before-execution",
+    "same_version_aa_pilot": {
+      "arm": "published-4.7",
+      "observations": 2,
+      "absolute_tolerance_seconds": 0.5,
+      "relative_tolerance_percent": 5.0
+    },
+    "control_regression_tolerance_seconds": 0.5,
+    "minimum_mir_added_time_reduction_percent": 50.0,
+    "primary_samples_per_arm": 8,
+    "counterbalanced_blocks": 8,
+    "extension_policy": "none; a refusal, error, or future extension requires a separately frozen plan and does not replace a declared sample",
+    "interpretation": "The runner records raw observations only. A separately reviewed analysis applies these declared tolerances and never treats a non-significant result as equivalence."
+  },
+  "semantic_equality": {
+    "schema": 1,
+    "kind": "MIRCurrent38cMenuSemanticInputEqualityV1",
+    "status": "derived-data-stage-equality-to-reviewed005D",
+    "reader_sha256": "50888D1C23B0CFEEA553D28104B2585B7EF7FE7D9ADE9F2CA3415153D966FEB2",
+    "candidate_source": "992c76ee24caf2d723b469c3db760cbebdf35eeb",
+    "player_tree": "fbb7e9135280ce7f69692e9b0c4a44d743793f45",
+    "previous_candidate_sha256": "005D420671270306155CB4AC25E9CF77541202DFA16B206DCC016237619C9AA2",
+    "candidate_sha256": "38C84CCBC4BFDA62FCB078772C4690AB81228484744A36D9EA303F5A75B16447",
+    "prior_review": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\f210-current7a2-menu-r01-controller\\semantic-applicability-review.json",
+      "sha256": "EC35592777A9907FC918497137FC0FA1E54680CE4CADC57CDBD8366BEC842A54",
+      "original_status": "approved-data-stage-consumed-input-applicability"
+    },
+    "member_count": 219,
+    "unchanged_members": 216,
+    "changed_members": [
+      {
+        "path": "more-infinite-research_5.0.21000/changelog.txt",
+        "previous_sha256": "AD122D376100DE3DE84833CAA5289FDCCD2511CDE1670C1B9FA9644B29A22A77",
+        "current_sha256": "C7EC7AAFE49F158D477FB0F204151FA16C806E7280572CE8F0775B2B18542F2F"
+      },
+      {
+        "path": "more-infinite-research_5.0.21000/runtime/caps.lua",
+        "previous_sha256": "C5EF3CC53A5CF77AA02A780286F45DD7FD3AB827DB37F233E9FCCC259C179DE6",
+        "current_sha256": "BD56C4B19095B9EC39ECE9F8BDE5A3D5E38F2587D825EB14DA37E264E071D918"
+      },
+      {
+        "path": "more-infinite-research_5.0.21000/runtime/lifecycle.lua",
+        "previous_sha256": "85276D06C5C1842D5E8D98AA01FC6D96E6F7BC82F139602487356BC2DA103FFA",
+        "current_sha256": "60A06504D5627DE232417DBC6FF569B94523A2C654DDA7AE375FD51F85BD815C"
+      }
+    ],
+    "reason": "All data/settings/declarations/compatibility/migrations/assets/locale/info payloads remain byte-identical to reviewed005D; two control-stage runtime members and changelog differ. Run one new complete fixed comparison for the actual current archive, preserving all prior observations. No old data is relabelled.",
+    "native_execution": false,
+    "performance_acceptance": false,
+    "release_qualification": false
+  },
+  "preflight": {
+    "status": "inputs-present-not-executed",
+    "missing": [],
+    "sha256": "BC0E6261FED536AB0D10CE55E0094CA50EF16815C2A9DA2EEE9740F1C9817181"
+  },
+  "prior_accepted_cohort": {
+    "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\f210-current7a2-menu-r01-controller\\native-output\\result.json",
+    "sha256": "B26BB7D771A9CBDFDA10A7D1C92B7769318E0F70ED52E7F12C2D2BD36D7C5547",
+    "source": "spec/evidence/f210-current7a2-menu-native-chain-r01.json",
+    "disposition": "Original38 accepted observations retain exact005D identity. No selective retries or result replacement."
+  },
+  "quiet_policy": "Hold all other local native,build,host-suite and heavy work for the full cohort. Remote review/CI may continue. Keep the original matched hardware/cache/graphics/observer/endpoint,38-launch fixed schedule and all thresholds. No selective retries or extensions.",
+  "claims": {
+    "native_execution": false,
+    "performance_acceptance": false,
+    "release_qualification": false
+  },
+  "purpose": "One complete comparison for exact current38C after two control-stage runtime members and changelog changed. All216 other package members match reviewed005D. Earlier accepted/failed cohorts retain their original exact execution identities."
+}
