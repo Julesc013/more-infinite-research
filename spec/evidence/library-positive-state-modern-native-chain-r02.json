@@ -1,0 +1,631 @@
+{
+  "schema": 1,
+  "kind": "MIRLibraryPositiveStateModernNativeChainV1",
+  "status": "passed-fixture-seeded-positive-credit-foreign-hidden-and-personal-hidden-reload-cases",
+  "source_commit": "e087474208776150bc1e9012191e04179d755ccb",
+  "player_source_commit": "a95dbc6b35c165b46aa9991d2a0ef7274d4ec04a",
+  "packaged_player_tree": "7b0ede663e6fbcf486cd863e7d3719653aedc07a",
+  "private_commit": "5c55c55db5acce6e7082677cdaa5721729052365",
+  "caller_sha256": "55A811E6EF3A8B673EEDA3FB25E061CA3324482B27FBBB65A1EDA8F4F98C4E79",
+  "cases": [
+    {
+      "target": "f210",
+      "packet_sha256": "954DEB53C171C01CDDA58B93788F589E53FFEB01AC865BAA97C7C35DB5A11F4B",
+      "prepared_sha256": "1F5E38508B6F48C017923086530A8F35B832BC85B189CAF6C3218E29246E7294",
+      "plan_sha256": "5036FF1A644A2ADE6CA67AE72713A7149892A0B948D7B7CE8E85FD5611A8AFF7",
+      "engine": {
+        "path": "D:\\Games\\Factorio\\2.1\\bin\\x64\\factorio.exe",
+        "sha256": "8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38"
+      },
+      "candidate": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\packages\\7b0-all17-r01\\more-infinite-research_5.0.21000.zip",
+        "sha256": "2DDD2A4C967BEF07830218442AE4441BEECD5B9ECE0AC86B09A5F6586BBA80E5"
+      },
+      "profile": {
+        "path": "tests/profiles/library-positive-state-standalone-f210-2123.json",
+        "sha256": "3E5CD5459128A2D843D55F0B79D35B484469C1B7D7D843ACA16B6A6478D38A4A"
+      },
+      "root_readback": {
+        "path": "build/qualification/library-positive-state-f210-r02-controller/root-readback.json",
+        "sha256": "4EE82163E4315130B3826446D5E48D7D8BAE852755C0D5544AA6C94AD34DA398",
+        "reader_sha256": "311DC0B4D419F7507746EA5906E6BBB6D608FC467C3835FB32E8A62ECCB3EF18",
+        "files": 226,
+        "bytes_per_copy": 21644211
+      },
+      "receipt_capsule": {
+        "path": "spec/evidence/library-positive-state-f210-native-receipts-r02.json.gz",
+        "sha256": "D0D9C330EFFCC558074098336ED4684377F097FDB6543AB64839DDCF7A075756",
+        "bytes": 89319,
+        "bodies": 19,
+        "actual_native_stdout_logs": 9,
+        "private_rcon_placeholders": 2,
+        "unparsed_or_exposed_rcon_values": 0
+      },
+      "counts": {
+        "native_processes": 9,
+        "worlds": 1,
+        "two_real_client_sessions": 1,
+        "real_laboratory_completions": 2,
+        "actual_join_events": 6,
+        "cold_host_restarts": 1,
+        "screenshots": 10,
+        "api_client_load_phase_witnesses": 6
+      },
+      "completed_native_witness": {
+        "base_version": "2.1.23",
+        "mir_version": "5.0.21000",
+        "actual_join_events": 6,
+        "screenshot_calls": 10,
+        "initial_settled_without_reopen": true,
+        "initial_settle_ticks": 60,
+        "first_open": true,
+        "search": true,
+        "refresh": true,
+        "reopen": true,
+        "measurement_output": "native-localised-profiler-log",
+        "timing_values_stored": false,
+        "two_connected_clients_required": true,
+        "locales_required": [
+          "en",
+          "de"
+        ],
+        "distinct_personal_query_and_selection": true,
+        "initial_native_snapshot_immutable": true,
+        "live_refresh": {
+          "real_lab_completions": 2,
+          "native_laboratory_completion_by_script": false,
+          "native_research_started_events": 3,
+          "queue_lengths_observed": [
+            2,
+            1,
+            0
+          ],
+          "native_research_cancelled_events": 1,
+          "native_foreign_force_created_events": 1,
+          "gear_level": 3,
+          "gear_productivity": 0.2,
+          "science_consumed_per_named_pack": 2,
+          "fixture_accelerates_gear_count_and_time_only": true,
+          "ordinary_tuning_qualified": false,
+          "root_and_query_identity_preserved": true,
+          "cross_force_view_state_preserved": true
+        },
+        "availability_terminal_labels_checked": true,
+        "host_restart_observed": true,
+        "on_load_read_only": true,
+        "rendering_pending_external_png_readback": true,
+        "screenshot_requests_are_not_headless_rendering_proof": true,
+        "private_credit_visibility": {
+          "ids_checked": 4,
+          "clients_checked": 2,
+          "families_checked": [
+            "all",
+            "external"
+          ],
+          "private_selection_not_exposed": true,
+          "native_state_unchanged": true,
+          "personal_views_restored": true,
+          "before": {
+            "mir-legacy-module-credit-speed-module": {
+              "level": 2,
+              "researched": false,
+              "enabled": false,
+              "visible_when_disabled": false
+            },
+            "mir-legacy-module-credit-productivity-module": {
+              "level": 3,
+              "researched": false,
+              "enabled": false,
+              "visible_when_disabled": false
+            },
+            "mir-legacy-module-credit-efficiency-module": {
+              "level": 4,
+              "researched": false,
+              "enabled": false,
+              "visible_when_disabled": false
+            },
+            "mir-legacy-cannon-credit-rocket-shooting-speed": {
+              "level": 5,
+              "researched": false,
+              "enabled": false,
+              "visible_when_disabled": false
+            }
+          },
+          "after": {
+            "mir-legacy-module-credit-speed-module": {
+              "level": 2,
+              "researched": false,
+              "enabled": false,
+              "visible_when_disabled": false
+            },
+            "mir-legacy-module-credit-productivity-module": {
+              "level": 3,
+              "researched": false,
+              "enabled": false,
+              "visible_when_disabled": false
+            },
+            "mir-legacy-module-credit-efficiency-module": {
+              "level": 4,
+              "researched": false,
+              "enabled": false,
+              "visible_when_disabled": false
+            },
+            "mir-legacy-cannon-credit-rocket-shooting-speed": {
+              "level": 5,
+              "researched": false,
+              "enabled": false,
+              "visible_when_disabled": false
+            }
+          }
+        },
+        "positive_private_state": {
+          "ownership": "fixture-seeded-disposable-world",
+          "imported_earnings": false,
+          "seeded_once": true,
+          "native": {
+            "holders": {
+              "mir-legacy-module-credit-speed-module": {
+                "level": 2,
+                "researched": false,
+                "enabled": false,
+                "visible_when_disabled": false
+              },
+              "mir-legacy-module-credit-productivity-module": {
+                "level": 3,
+                "researched": false,
+                "enabled": false,
+                "visible_when_disabled": false
+              },
+              "mir-legacy-module-credit-efficiency-module": {
+                "level": 4,
+                "researched": false,
+                "enabled": false,
+                "visible_when_disabled": false
+              },
+              "mir-legacy-cannon-credit-rocket-shooting-speed": {
+                "level": 5,
+                "researched": false,
+                "enabled": false,
+                "visible_when_disabled": false
+              }
+            },
+            "module_productivity": {
+              "speed-module": 0.01,
+              "productivity-module": 0.02,
+              "efficiency-module": 0.03
+            },
+            "cannon_speed": 0.4
+          },
+          "persisted_personal_hidden_checked": true,
+          "foreign_inspection_queries": 44
+        }
+      },
+      "closed_saves": [
+        {
+          "role": "seed_sha256",
+          "sha256": "8E734FD17C0028D423AA9C7C608DCA84B79C80C6FF1C14D5390EABA067C0AAA2",
+          "bytes": 773567
+        },
+        {
+          "role": "restart_save_sha256",
+          "sha256": "D34F33E6A04C3837550B0DD25EDC19FBA010A3164BFF236810310F11EB487B47",
+          "bytes": 887744
+        },
+        {
+          "role": "final_save_sha256",
+          "sha256": "337CDD90230934CA386A3F386E0EB8EA354F813188A397109F69C0196286030C",
+          "bytes": 893313
+        }
+      ],
+      "pngs": [
+        {
+          "path": "D:\\Projects\\Factorio\\mir5-legacy-cannon-credit-r01\\build\\tmp\\library-positive-state-f210-r02\\session\\client-en\\script-output\\mir5-library-multiplayer\\availability-1.png",
+          "sha256": "9FCAACCD0E288EDE6C735864FA227CF6A945BAB3E450202D1DF37F8EBEFDBCD7",
+          "bytes": 971405,
+          "crc_and_decompression": true,
+          "externally_inspected": true
+        },
+        {
+          "path": "D:\\Projects\\Factorio\\mir5-legacy-cannon-credit-r01\\build\\tmp\\library-positive-state-f210-r02\\session\\client-en\\script-output\\mir5-library-multiplayer\\initial-1.png",
+          "sha256": "6E523885519096632A29E3F10DCEC7F68BC632B425E2FA4E4BD9DAD4F131D7E9",
+          "bytes": 1067949,
+          "crc_and_decompression": true,
+          "externally_inspected": true
+        },
+        {
+          "path": "D:\\Projects\\Factorio\\mir5-legacy-cannon-credit-r01\\build\\tmp\\library-positive-state-f210-r02\\session\\client-en\\script-output\\mir5-library-multiplayer\\settled-1.png",
+          "sha256": "54CCC26CA6626EB8CC00C5CD5AF969C9B10A4F1DF3F0E3B6AC63D7B74CC34DBB",
+          "bytes": 1067708,
+          "crc_and_decompression": true,
+          "externally_inspected": true
+        },
+        {
+          "path": "D:\\Projects\\Factorio\\mir5-legacy-cannon-credit-r01\\build\\tmp\\library-positive-state-f210-r02\\session\\client-en\\script-output\\mir5-library-multiplayer\\rejoin-1.png",
+          "sha256": "8F23A49CEDD555B224CDAC1EF1C701281AEA519D61CD2E4A6B79A73229F8EC20",
+          "bytes": 982306,
+          "crc_and_decompression": true,
+          "externally_inspected": true
+        },
+        {
+          "path": "D:\\Projects\\Factorio\\mir5-legacy-cannon-credit-r01\\build\\tmp\\library-positive-state-f210-r02\\session\\client-en\\script-output\\mir5-library-multiplayer\\restart-1.png",
+          "sha256": "27F50CEAE715F9820B76DF288EF752ADA8B7081EDF9C26540CABA4AA1D27AADD",
+          "bytes": 983990,
+          "crc_and_decompression": true,
+          "externally_inspected": true
+        },
+        {
+          "path": "D:\\Projects\\Factorio\\mir5-legacy-cannon-credit-r01\\build\\tmp\\library-positive-state-f210-r02\\session\\client-de\\script-output\\mir5-library-multiplayer\\availability-2.png",
+          "sha256": "DBAE1105A5280A19006232678F36D7BF9092F0836EBE6981FB09D702A18F8831",
+          "bytes": 972495,
+          "crc_and_decompression": true,
+          "externally_inspected": true
+        },
+        {
+          "path": "D:\\Projects\\Factorio\\mir5-legacy-cannon-credit-r01\\build\\tmp\\library-positive-state-f210-r02\\session\\client-de\\script-output\\mir5-library-multiplayer\\initial-2.png",
+          "sha256": "BDB4C8809002E0797FCB83829F6D8F2FD47E42D058DD8E3270CF440CD46B9D8F",
+          "bytes": 1004549,
+          "crc_and_decompression": true,
+          "externally_inspected": true
+        },
+        {
+          "path": "D:\\Projects\\Factorio\\mir5-legacy-cannon-credit-r01\\build\\tmp\\library-positive-state-f210-r02\\session\\client-de\\script-output\\mir5-library-multiplayer\\settled-2.png",
+          "sha256": "E8C51EE4941C17A9CDFD1C0D084C5F01DED73211336C71DDE0061B648040BA6A",
+          "bytes": 1005493,
+          "crc_and_decompression": true,
+          "externally_inspected": true
+        },
+        {
+          "path": "D:\\Projects\\Factorio\\mir5-legacy-cannon-credit-r01\\build\\tmp\\library-positive-state-f210-r02\\session\\client-de\\script-output\\mir5-library-multiplayer\\rejoin-2.png",
+          "sha256": "6D1B5E2681B5EA0F4507F819FCFECB1A2E3F871C7B51444AF1A8CE23D464B46A",
+          "bytes": 992135,
+          "crc_and_decompression": true,
+          "externally_inspected": true
+        },
+        {
+          "path": "D:\\Projects\\Factorio\\mir5-legacy-cannon-credit-r01\\build\\tmp\\library-positive-state-f210-r02\\session\\client-de\\script-output\\mir5-library-multiplayer\\restart-2.png",
+          "sha256": "EA1DA33EBA7D491A120591F2222C3D0B7A65AA333617DBAAABABF9AB619091CF",
+          "bytes": 991848,
+          "crc_and_decompression": true,
+          "externally_inspected": true
+        }
+      ],
+      "visual_observations": [
+        "All10 actual1280x720 frames inspected. EN gear/DE mining names and science/prerequisite names render in native languages on first open,settled,rejoin and cold-host restart;no rawID fallback in those displayed captions/details.",
+        "Distinct original ID queries/group/order remain;terminal unavailable DLC labels are localized.",
+        "Initial/settled EN achievement toasts obscure part of the details. Rejoin/restart frames show those details unobscured. No broader language quality,scroll/actual keyboard/drag or imported earnings claim."
+      ],
+      "controls_restored": true
+    },
+    {
+      "target": "f200",
+      "packet_sha256": "977B1DE1904A64F141FA0AEF32F22A6C6FA3E6D502D82D987504D3D73FFFAC9C",
+      "prepared_sha256": "92E8541E8FD6E3079CD4AD9515CAC201740E2F82BF7F7FC9C1DC5F9EE223B68B",
+      "plan_sha256": "5036FF1A644A2ADE6CA67AE72713A7149892A0B948D7B7CE8E85FD5611A8AFF7",
+      "engine": {
+        "path": "D:\\Games\\Factorio\\2.0\\bin\\x64\\factorio.exe",
+        "sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B"
+      },
+      "candidate": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\packages\\7b0-all17-r01\\more-infinite-research_5.0.20000.zip",
+        "sha256": "1D45A54DB6F911F665A019897518E46D6614AE7E56903B067F93E116DFC2554F"
+      },
+      "profile": {
+        "path": "tests/profiles/library-positive-state-current-f200-2077.json",
+        "sha256": "AB895BBDFBCDE80E1F2094417292A8FB890B4E10F6ED3BC57F634B22E825E582"
+      },
+      "root_readback": {
+        "path": "build/qualification/library-positive-state-f200-r02-controller/root-readback.json",
+        "sha256": "038ACD8A20C14BCA77119766FE0B25DD92B4ADE7758BE08A75F43EF1D7E16EA6",
+        "reader_sha256": "311DC0B4D419F7507746EA5906E6BBB6D608FC467C3835FB32E8A62ECCB3EF18",
+        "files": 216,
+        "bytes_per_copy": 19896365
+      },
+      "receipt_capsule": {
+        "path": "spec/evidence/library-positive-state-f200-native-receipts-r02.json.gz",
+        "sha256": "EC85A84A2CE883093899C705996AE5CC19C439207960A4B402A06D937A5F71B0",
+        "bytes": 82633,
+        "bodies": 19,
+        "actual_native_stdout_logs": 9,
+        "private_rcon_placeholders": 2,
+        "unparsed_or_exposed_rcon_values": 0
+      },
+      "counts": {
+        "native_processes": 9,
+        "worlds": 1,
+        "two_real_client_sessions": 1,
+        "real_laboratory_completions": 2,
+        "actual_join_events": 6,
+        "cold_host_restarts": 1,
+        "screenshots": 10,
+        "api_client_load_phase_witnesses": 6
+      },
+      "completed_native_witness": {
+        "base_version": "2.0.77",
+        "mir_version": "5.0.20000",
+        "actual_join_events": 6,
+        "screenshot_calls": 10,
+        "initial_settled_without_reopen": true,
+        "initial_settle_ticks": 60,
+        "first_open": true,
+        "search": true,
+        "refresh": true,
+        "reopen": true,
+        "measurement_output": "native-localised-profiler-log",
+        "timing_values_stored": false,
+        "two_connected_clients_required": true,
+        "locales_required": [
+          "en",
+          "de"
+        ],
+        "distinct_personal_query_and_selection": true,
+        "initial_native_snapshot_immutable": true,
+        "live_refresh": {
+          "real_lab_completions": 2,
+          "native_laboratory_completion_by_script": false,
+          "native_research_started_events": 3,
+          "queue_lengths_observed": [
+            2,
+            1,
+            0
+          ],
+          "native_research_cancelled_events": 1,
+          "native_foreign_force_created_events": 1,
+          "gear_level": 3,
+          "gear_productivity": 0.20000000298023224,
+          "science_consumed_per_named_pack": 2,
+          "fixture_accelerates_gear_count_and_time_only": true,
+          "ordinary_tuning_qualified": false,
+          "root_and_query_identity_preserved": true,
+          "cross_force_view_state_preserved": true
+        },
+        "availability_terminal_labels_checked": true,
+        "host_restart_observed": true,
+        "on_load_read_only": true,
+        "rendering_pending_external_png_readback": true,
+        "screenshot_requests_are_not_headless_rendering_proof": true,
+        "private_credit_visibility": {
+          "ids_checked": 4,
+          "clients_checked": 2,
+          "families_checked": [
+            "all",
+            "external"
+          ],
+          "private_selection_not_exposed": true,
+          "native_state_unchanged": true,
+          "personal_views_restored": true,
+          "before": {
+            "mir-legacy-module-credit-speed-module": {
+              "level": 2,
+              "researched": false,
+              "enabled": false,
+              "visible_when_disabled": false
+            },
+            "mir-legacy-module-credit-productivity-module": {
+              "level": 3,
+              "researched": false,
+              "enabled": false,
+              "visible_when_disabled": false
+            },
+            "mir-legacy-module-credit-efficiency-module": {
+              "level": 4,
+              "researched": false,
+              "enabled": false,
+              "visible_when_disabled": false
+            },
+            "mir-legacy-cannon-credit-rocket-shooting-speed": {
+              "level": 5,
+              "researched": false,
+              "enabled": false,
+              "visible_when_disabled": false
+            }
+          },
+          "after": {
+            "mir-legacy-module-credit-speed-module": {
+              "level": 2,
+              "researched": false,
+              "enabled": false,
+              "visible_when_disabled": false
+            },
+            "mir-legacy-module-credit-productivity-module": {
+              "level": 3,
+              "researched": false,
+              "enabled": false,
+              "visible_when_disabled": false
+            },
+            "mir-legacy-module-credit-efficiency-module": {
+              "level": 4,
+              "researched": false,
+              "enabled": false,
+              "visible_when_disabled": false
+            },
+            "mir-legacy-cannon-credit-rocket-shooting-speed": {
+              "level": 5,
+              "researched": false,
+              "enabled": false,
+              "visible_when_disabled": false
+            }
+          }
+        },
+        "positive_private_state": {
+          "ownership": "fixture-seeded-disposable-world",
+          "imported_earnings": false,
+          "seeded_once": true,
+          "native": {
+            "holders": {
+              "mir-legacy-module-credit-speed-module": {
+                "level": 2,
+                "researched": false,
+                "enabled": false,
+                "visible_when_disabled": false
+              },
+              "mir-legacy-module-credit-productivity-module": {
+                "level": 3,
+                "researched": false,
+                "enabled": false,
+                "visible_when_disabled": false
+              },
+              "mir-legacy-module-credit-efficiency-module": {
+                "level": 4,
+                "researched": false,
+                "enabled": false,
+                "visible_when_disabled": false
+              },
+              "mir-legacy-cannon-credit-rocket-shooting-speed": {
+                "level": 5,
+                "researched": false,
+                "enabled": false,
+                "visible_when_disabled": false
+              }
+            },
+            "module_productivity": {
+              "speed-module": 0.009999999776482582,
+              "productivity-module": 0.019999999552965164,
+              "efficiency-module": 0.029999999329447746
+            },
+            "cannon_speed": 0.4
+          },
+          "persisted_personal_hidden_checked": true,
+          "foreign_inspection_queries": 44
+        }
+      },
+      "closed_saves": [
+        {
+          "role": "seed_sha256",
+          "sha256": "553D9E82194A7922245B4E5C83467E52921AA4ECD66105F6586F22EB46ECCDC4",
+          "bytes": 483490
+        },
+        {
+          "role": "restart_save_sha256",
+          "sha256": "C712EDCD1FF0AE1CD66F6B907B3BB77880786677A27D54A7590B9957F76C62B4",
+          "bytes": 550806
+        },
+        {
+          "role": "final_save_sha256",
+          "sha256": "A8E9E8D537D4F0DC31923DF1AD0286549782B6F78473C2E6B032792CEB16C7F1",
+          "bytes": 553276
+        }
+      ],
+      "pngs": [
+        {
+          "path": "D:\\Projects\\Factorio\\mir5-legacy-cannon-credit-r01\\build\\tmp\\library-positive-state-f200-r02\\session\\client-en\\script-output\\mir5-library-multiplayer\\availability-1.png",
+          "sha256": "C0B1AFB9B1CB9AB38ADE9D3AB6C7F6D93539427EE1FEB824724DA217CB85570C",
+          "bytes": 1021999,
+          "crc_and_decompression": true,
+          "externally_inspected": true
+        },
+        {
+          "path": "D:\\Projects\\Factorio\\mir5-legacy-cannon-credit-r01\\build\\tmp\\library-positive-state-f200-r02\\session\\client-en\\script-output\\mir5-library-multiplayer\\initial-1.png",
+          "sha256": "3B560CADD762AFB08875932D07EF46ED53B01681DAE9835FB2DA59DC1D1396B4",
+          "bytes": 1122010,
+          "crc_and_decompression": true,
+          "externally_inspected": true
+        },
+        {
+          "path": "D:\\Projects\\Factorio\\mir5-legacy-cannon-credit-r01\\build\\tmp\\library-positive-state-f200-r02\\session\\client-en\\script-output\\mir5-library-multiplayer\\settled-1.png",
+          "sha256": "F7A11508C85B77D92C85FD5E17E5C5DCD182B622C7242009000417D476F9BC75",
+          "bytes": 1118643,
+          "crc_and_decompression": true,
+          "externally_inspected": true
+        },
+        {
+          "path": "D:\\Projects\\Factorio\\mir5-legacy-cannon-credit-r01\\build\\tmp\\library-positive-state-f200-r02\\session\\client-en\\script-output\\mir5-library-multiplayer\\rejoin-1.png",
+          "sha256": "EC71CF030A0AD45BAE998FC395D5B9A75C1BCE6DA91D8DBDBF33280B172F2619",
+          "bytes": 1103800,
+          "crc_and_decompression": true,
+          "externally_inspected": true
+        },
+        {
+          "path": "D:\\Projects\\Factorio\\mir5-legacy-cannon-credit-r01\\build\\tmp\\library-positive-state-f200-r02\\session\\client-en\\script-output\\mir5-library-multiplayer\\restart-1.png",
+          "sha256": "5C10FC91525329CEE0CE3E4963ACEC47AE56F2EC822A01210221A7880CA6F8FC",
+          "bytes": 1006304,
+          "crc_and_decompression": true,
+          "externally_inspected": true
+        },
+        {
+          "path": "D:\\Projects\\Factorio\\mir5-legacy-cannon-credit-r01\\build\\tmp\\library-positive-state-f200-r02\\session\\client-de\\script-output\\mir5-library-multiplayer\\availability-2.png",
+          "sha256": "6FCCEDF3411FFDDFFE3B007BBA6091EC84C8097F2181D970F4815F068098522F",
+          "bytes": 1037660,
+          "crc_and_decompression": true,
+          "externally_inspected": true
+        },
+        {
+          "path": "D:\\Projects\\Factorio\\mir5-legacy-cannon-credit-r01\\build\\tmp\\library-positive-state-f200-r02\\session\\client-de\\script-output\\mir5-library-multiplayer\\initial-2.png",
+          "sha256": "A9EC66A7885CEE0B65C23A5B5C3ABFAD26C2BDA2469AF1A9F568E9C7D88E04F2",
+          "bytes": 1074702,
+          "crc_and_decompression": true,
+          "externally_inspected": true
+        },
+        {
+          "path": "D:\\Projects\\Factorio\\mir5-legacy-cannon-credit-r01\\build\\tmp\\library-positive-state-f200-r02\\session\\client-de\\script-output\\mir5-library-multiplayer\\settled-2.png",
+          "sha256": "BE9C3155A184FA794FB16EB0661DEEB0767153DD2C1B4D7B5A51EB8D8D81DEAD",
+          "bytes": 1069041,
+          "crc_and_decompression": true,
+          "externally_inspected": true
+        },
+        {
+          "path": "D:\\Projects\\Factorio\\mir5-legacy-cannon-credit-r01\\build\\tmp\\library-positive-state-f200-r02\\session\\client-de\\script-output\\mir5-library-multiplayer\\rejoin-2.png",
+          "sha256": "6242ED03209514281ED7310959073FEB86ADC124C344B7BF8EC48C06FEDAA185",
+          "bytes": 1122095,
+          "crc_and_decompression": true,
+          "externally_inspected": true
+        },
+        {
+          "path": "D:\\Projects\\Factorio\\mir5-legacy-cannon-credit-r01\\build\\tmp\\library-positive-state-f200-r02\\session\\client-de\\script-output\\mir5-library-multiplayer\\restart-2.png",
+          "sha256": "E740CAF0EB899C9904807DD7C44A5B9B1E081AB5CA91F03E8BA33F9C323F4EE2",
+          "bytes": 1015332,
+          "crc_and_decompression": true,
+          "externally_inspected": true
+        }
+      ],
+      "visual_observations": [
+        "All10 actual1280x720 frames inspected. EN gear/DE mining names and science/prerequisite names render in native languages on first open,settled,rejoin and cold-host restart;no rawID fallback in those displayed captions/details.",
+        "Distinct original ID queries/group/order remain;terminal unavailable DLC labels are localized.",
+        "Initial/settled EN achievement toasts obscure part of the details. Rejoin/restart frames show those details unobscured. No broader language quality,scroll/actual keyboard/drag or imported earnings claim."
+      ],
+      "controls_restored": true
+    }
+  ],
+  "totals": {
+    "native_processes": 18,
+    "worlds": 2,
+    "real_laboratory_completions": 4,
+    "actual_join_events": 12,
+    "cold_host_restarts": 2,
+    "screenshots_decoded_and_viewed": 20,
+    "api_client_load_phase_witnesses": 12,
+    "verified_custody_files": 442,
+    "bytes_per_copy": 41540576,
+    "actual_projected_members": 30,
+    "lossless_receipt_bodies": 38
+  },
+  "verified": [
+    "Each exact current package retains four fixture-owned native holders at levels2/3/4/5 with .01/.02/.03 module contributions and .4 cannon speed through actual lab/client/rejoin/saved-host restart behavior.",
+    "All/External private IDs remain excluded from ordinary selections/native-open actions,with exact before/after native holder state unchanged.",
+    "Forty-four explicit visibility queries percase preserve foreign hidden inspection under normal and personal-hidden filters. Distinct EN/DE personal hidden lists are observed after actual cold reload before replacement queries can mask a loss.",
+    "Both cases retain two actual Gear lab completions and +20% Gear bonus,live queue2/1/0,start/cancel/foreign-force assertions,distinct personal views and six actual independent two-consumer client-load phase witnesses.",
+    "All thirty actual projected own-fixture members match exact archive bytes. Every original/primary custody file,selected input and closed-save archive is verified;original direct-library archives/controls are restored."
+  ],
+  "private_image_custody": {
+    "repository": "Julesc013/mir-native-worker",
+    "commit": "6443b48191583f457080133ea6784974e60d2d62",
+    "path": "evidence/library-positive-state-modern-views-r02",
+    "manifest_sha256": "7CC2FC06FB6CD31E903B859CF5A083316BFAE5D2016D129709CBFB8C48179DB4",
+    "images": 20,
+    "image_bytes": 20731464,
+    "transformed": false
+  },
+  "retained_adverses": [
+    "spec/evidence/library-positive-state-f210-native-adverse-r01.json",
+    "spec/evidence/library-positive-seed-native-diagnostic-r01.json"
+  ],
+  "limits": [
+    "Positive holders are deliberately seeded once in disposable worlds;Gear research is the separate actually completed lab behavior. Do not call seeded positive credits historical imported earnings.",
+    "F210 Base and F200 only;no new SpaceAge positive-state,overhaul or arbitrary save qualification.",
+    "Native personal hidden filters persist here;genuinely predecessor-persisted private selection/queue states and imported earned credits require their own applicable inputs.",
+    "Actual Esc/E/drag/focus,retired-root/player-removal,retained/churn memory and final comparative performance/release verdict remain separate.",
+    "Initial/settled English achievement overlays obscure some details. Later rejoin/restart frames are unobscured;all twenty original frames are retained."
+  ],
+  "imported_earnings": false,
+  "performance_acceptance": false,
+  "release_qualification": false
+}
