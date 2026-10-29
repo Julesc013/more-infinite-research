@@ -182,6 +182,49 @@ class PassiveRepairTests(unittest.TestCase):
         self.assertNotIn("prototypes.mir", source)
         self.assertNotIn("Generator", source)
 
+    def test_fixed_relevant_burst_drains_without_scanning_unrelated_factory(self):
+        self.lua.execute('''
+          local expected
+          for _, unrelated_count in ipairs({0,1000,10000}) do
+            local game, player = game_with_forces()
+            local scans=0
+            local unrelated={}
+            for index=1,unrelated_count do unrelated[index]={type="assembling-machine",valid=true}end
+            setmetatable(unrelated, {
+              __len=function()scans=scans+1;error("unrelated factory length queried")end,
+              __pairs=function()scans=scans+1;error("unrelated factory enumerated")end,
+              __index=function()scans=scans+1;error("unrelated factory read")end})
+            game.surfaces,game.entity_prototypes,game.technology_prototypes=unrelated,unrelated,unrelated
+            setmetatable(game.forces,{__pairs=function()scans=scans+1;error("all forces enumerated")end})
+            local state,targets=nil,{}
+            for id=1,256 do
+              targets[id]=entity(id,player,1,1,2)
+              local facts
+              state,facts=damage(game,{enabled=true},state,targets[id],0)
+              assert(facts.accepted)
+            end
+            local _,overflow=damage(game,{enabled=true},state,entity(257,player,1,1,2),0)
+            assert(overflow.capacity_reached and not overflow.accepted)
+            local processed,repaired,first,last=0,0,nil,nil
+            for tick=60,2520,60 do
+              local facts
+              state,facts=repair.on_nth_tick(game,{enabled=true},state,{tick=tick})
+              assert(facts.processed<=8 and facts.dropped==0)
+              processed,repaired=processed+facts.processed,repaired+facts.repaired
+              if facts.repaired>0 then first=first or tick;last=tick end
+              if not facts.needs_schedule then break end
+            end
+            assert(repaired==256 and #state.queue==0 and next(state.members)==nil and not state.scheduled)
+            for _,target in ipairs(targets)do assert(target.health==2 and target.writes==1)end
+            assert(first>=600 and last<=2520 and scans==0)
+            local result={processed=processed,repaired=repaired,first=first,last=last,scans=scans}
+            if expected then for key,value in pairs(expected)do assert(result[key]==value)end else expected=result end
+          end
+          repair_work_counts=expected
+        ''')
+        result = self.lua.globals().repair_work_counts
+        self.assertEqual((result["repaired"], result["first"], result["last"], result["scans"]), (256, 600, 2460, 0))
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
