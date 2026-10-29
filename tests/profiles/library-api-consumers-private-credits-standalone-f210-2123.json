@@ -44,9 +44,9 @@
   ],
   "archive_sha256": {
     "mir-fixture-mir5-active-mods-observer_0.1.0.zip": "A15A7D628D66953D2E0C4D4FA288F47CBF9C5678327C7EB3D23ADB5DC78331C0",
-    "more-infinite-research_5.0.21000.zip": "005D420671270306155CB4AC25E9CF77541202DFA16B206DCC016237619C9AA2",
+    "more-infinite-research_5.0.21000.zip": "2DDD2A4C967BEF07830218442AE4441BEECD5B9ECE0AC86B09A5F6586BBA80E5",
     "mir-fixture-mir5-api-alpha_0.1.0.zip": "DB5ED843FA9D85A1ABDC22595E62D315CA1A2191C846208079F85D4D016CE904",
     "mir-fixture-mir5-api-beta_0.1.0.zip": "690004F145E8B0DD52B4030BD8B27F7B581495EEFAAC5CB3A2F30A23FCA08951"
   },
-  "scope": "Prepared current F210 Base two-client Library private-credit input with independently installable API alpha and late optional beta consumers. It pins MIR archive 005D420671270306155CB4AC25E9CF77541202DFA16B206DCC016237619C9AA2 from source 8260bc8f3e20ff9b06efac61b6db4889f9f811c2/player tree 5058373348e9049f8b67ec4dbb79b400a904acd6, the 0.3.0 private-credit fixture metadata, and the A15 observer. It is prepared input only: it does not establish a native API/client, Library, laboratory, saved-state, rendered-view, performance, or release result. The 7168 MiB bound is an admission ceiling, not a measured peak."
+  "scope": "Prepared current F210 Base two-client Library private-credit input with independently installable API alpha and late optional beta consumers. It pins MIR archive 2DDD2A4C967BEF07830218442AE4441BEECD5B9ECE0AC86B09A5F6586BBA80E5 from source a95dbc6b35c165b46aa9991d2a0ef7274d4ec04a/player tree 7b0ede663e6fbcf486cd863e7d3719653aedc07a, the 0.3.0 private-credit fixture metadata, and the A15 observer. It is prepared input only: it does not establish a native API/client, Library, laboratory, saved-state, rendered-view, performance, or release result. The 7168 MiB bound is an admission ceiling, not a measured peak."
 }

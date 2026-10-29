@@ -830,7 +830,7 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
                     "mir-fixture-mir5-active-mods-observer_0.1.0.zip":
                         "A15A7D628D66953D2E0C4D4FA288F47CBF9C5678327C7EB3D23ADB5DC78331C0",
                     "more-infinite-research_5.0.21000.zip":
-                        "005D420671270306155CB4AC25E9CF77541202DFA16B206DCC016237619C9AA2",
+                        "2DDD2A4C967BEF07830218442AE4441BEECD5B9ECE0AC86B09A5F6586BBA80E5",
                     "mir-fixture-mir5-api-alpha_0.1.0.zip":
                         "DB5ED843FA9D85A1ABDC22595E62D315CA1A2191C846208079F85D4D016CE904",
                     "mir-fixture-mir5-api-beta_0.1.0.zip":
@@ -1041,7 +1041,7 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
           if($node.Count-ne1){throw 'selection function is absent or ambiguous'}
           Invoke-Expression $node[0].Extent.Text
           $engine='8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38'
-          $mir='005D420671270306155CB4AC25E9CF77541202DFA16B206DCC016237619C9AA2'
+          $mir='2DDD2A4C967BEF07830218442AE4441BEECD5B9ECE0AC86B09A5F6586BBA80E5'
           function Read-Profile([string]$Path){Get-Content -LiteralPath $Path -Raw|ConvertFrom-Json -AsHashtable}
           function Assert-Selected([string]$Path,[int]$Peak,[bool]$SpaceAge,[string]$Kind){
             $selected=Assert-MultiplayerFixtureSelection -Selection (Read-Profile $Path) -EngineSha256 $engine -FixtureCase 'library-multiplayer' -ExpectedMIRArchiveSha256 $mir -SessionExpectedPeakMemoryMiB $Peak
