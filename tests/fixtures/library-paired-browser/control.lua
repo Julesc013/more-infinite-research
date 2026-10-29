@@ -377,6 +377,7 @@ script.on_load(function()
       pending_ready = true
     elseif state.phase == "awaiting-cold-restart" then
       loaded_for_restart = true
+      pending_ready = true
     end
   end
 end)

@@ -29,6 +29,8 @@ PNGs under `script-output/mir5-library-paired-browser/` and four raw profiler
 markers. The capture labels remain `first-open`, `search`, `refresh`, and
 `reopen`; the shared profiler reader's first action token is `first_open`.
 
+The R01 native performance dataset exposed a missing cold-load readiness witness: the original fixture queued `ready` only for its initial saved world. The current fixture queues exactly one `ready` marker on the first runtime event after either actual load, using local flags only during `on_load`; it still waits for the two new clients and the original settlement delay before reopening. This observation correction qualifies no old missing measurement, changes no player code, and requires its own declared input hash before a replacement native experiment.
+
 At every action boundary it compares a bounded public snapshot of two named
 technologies, two recipes, the current research/progress, and an at-most-eight
 entry queue. The ordinary fresh seed must have no active or queued research.
