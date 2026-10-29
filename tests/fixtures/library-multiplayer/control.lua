@@ -1004,15 +1004,15 @@ local function closure()
   if space_age and standalone_identity_discovery() then
     fail("Space Age Library fixture cannot use standalone identity discovery")
   end
-  if private_credit and (target.label ~= "F210" or standalone_identity_discovery()) then
-    fail("private-credit Library fixture requires the current F210 API closure")
+  if private_credit and standalone_identity_discovery() then
+    fail("private-credit Library fixture cannot use standalone identity discovery")
   end
   local fixture_version = private_credit and "0.3.0" or (space_age and "0.2.0" or (standalone_identity_discovery() and "0.1.1" or "0.1.0"))
   local allowed = {base=script.active_mods.base, ["more-infinite-research"]=target.mir_version,
     ["mir-fixture-mir5-active-mods-observer"]="0.1.0",
     ["mir-fixture-mir5-library-multiplayer"]=fixture_version}
   local closures = private_credit and {} or {allowed}
-  if target.label == "F210" then
+  if target.label == "F210" or private_credit then
     closures[#closures + 1] = {
       base=script.active_mods.base, ["more-infinite-research"]=target.mir_version,
       ["mir-fixture-mir5-active-mods-observer"]="0.1.0",

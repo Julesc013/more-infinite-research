@@ -1,0 +1,269 @@
+{
+  "schema": 1,
+  "kind": "MIRF200PrivateCreditNativePreparedInputsV1",
+  "status": "prepared-not-a-native-result",
+  "review_base_commit": "7e48e1ac681ee8f2db4221eeef20cc001ddee4ec",
+  "player_tree": "fbb7e9135280ce7f69692e9b0c4a44d743793f45",
+  "profile": {
+    "path": "tests/profiles/library-private-credits-current-f200-2077.json",
+    "sha256": "FDAB4AEE7E3366C4B6EB16BEFF3F41DA753F90129747742D6C790985FD60903D"
+  },
+  "engine": {
+    "version": "2.0.77",
+    "path": "D:/Games/Factorio/2.0/bin/x64/factorio.exe",
+    "sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B"
+  },
+  "candidate": {
+    "version": "5.0.20000",
+    "source_commit": "b3bbd8d37b37bfee2e258b3e8a2f223dcf3860b3",
+    "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\packages\\fbb7-all17-r01\\more-infinite-research_5.0.20000.zip",
+    "sha256": "E9D349931E082AD77057C150E3D6093490E4086E84F0FAFECB0ED1257FD5ED4F",
+    "bytes": 692375
+  },
+  "library": "D:/Projects/Factorio/testmods/2.0",
+  "observer": {
+    "name": "mir-fixture-mir5-active-mods-observer_0.1.0.zip",
+    "sha256": "723D1E7721449FC26040E5E6629416767BDC20AD79CF8723115846DB662A1F87"
+  },
+  "public_helpers": [
+    {
+      "path": "tools/Invoke-MultiplayerFixture.ps1",
+      "sha256": "A043DA7CC9D18575F65C7B6D30BA919A42D4561FA83F3C08BA26794DCADED39D"
+    },
+    {
+      "path": "tools/Invoke-MultiplayerSession.ps1",
+      "sha256": "A2FC37440B980B5B3DB53BE3132CC9E3C0301DE72B8B0CB17235139F4388BBE8"
+    },
+    {
+      "path": "tools/Invoke-NativeFixture.ps1",
+      "sha256": "2BA98D7AC02030E9E170714C2C153A198BD45900DE9C35F66F19080B2C4529AC"
+    },
+    {
+      "path": "tools/commands/workspace/Invoke-MIRDevelopmentHealthHook.ps1",
+      "sha256": "3C9D435EA1A592570AFB2A609705D54747D76FF127FCE05FBE43E10D1A9E21E2"
+    },
+    {
+      "path": "tools/commands/workspace/Optimize-MIRArtifactStorage.ps1",
+      "sha256": "069D52E62E57249451E23F048BFC3C0DE7A3376F1460F2458A4E0DBDD0C76151"
+    },
+    {
+      "path": "tools/commands/workspace/Remove-MIRStaleArtifacts.ps1",
+      "sha256": "5120FAF2D8435D801F8A5252A8FF93756468CE9F6DCC39234E6D81DBA152F80C"
+    },
+    {
+      "path": "tools/commands/workspace/Test-MIRDevelopmentHealth.ps1",
+      "sha256": "D610BE142BF948C2CE5C5BAE4FE29822D84C75114EC5A7BF0A9D6F719CB7CDE1"
+    },
+    {
+      "path": "tools/lib/compatibility/LibraryActivation.ps1",
+      "sha256": "123A2241B895B57217AA969A677FF21BBFB268FE55E9734287883B4D6AE25099"
+    },
+    {
+      "path": "tools/lib/compatibility/ModPortal.ps1",
+      "sha256": "A16344F66A9124C0792614AAD83702603D4C0AD4FE977392C73710B745E74B08"
+    },
+    {
+      "path": "tools/lib/validation/DirectLibraryStartupMeasurement.ps1",
+      "sha256": "D069C014D74E883C249928E812A258E2A2CB34AFE499219CB46A513345C2EC34"
+    },
+    {
+      "path": "tools/lib/validation/ImmutableInputStaging.ps1",
+      "sha256": "B5FBFAC8537B08F9790BD3EE8ACEAAB38EE5CBB8EF005E67E8375DE568BBC12C"
+    },
+    {
+      "path": "tools/lib/validation/NativeProbeCommon.ps1",
+      "sha256": "CC8462A39DE12D0746C8F985D1F86F761CF3EF261B4FA551CFFD092F76D64D71"
+    },
+    {
+      "path": "tools/lib/validation/NativeProbeResources.ps1",
+      "sha256": "A34BD5FE79466B3EDA96F46EC132562192E6A70280901381C8AF560E7AB23328"
+    },
+    {
+      "path": "tools/lib/validation/OwnedProcessMemorySampler.ps1",
+      "sha256": "8786DC06671A7B6ED6F48BD211275C4DA783F65BBB0FCDCE5562104BC3B28124"
+    },
+    {
+      "path": "tools/lib/validation/ResourceGovernor.ps1",
+      "sha256": "B811A1548A6D789F2A7E618999D5087C70E0151E751CCF4C51635D54E6BF04ED"
+    },
+    {
+      "path": "tools/lib/validation/ResponsiveMenuRecord.ps1",
+      "sha256": "7F74EF416DC4C06B85B3479C02DEF13837F9D69420BBE2F88ADAFB8E5E18DFFB"
+    },
+    {
+      "path": "tools/lib/validation/responsive-menu/Invoke-MIRResponsiveMenuActor.ps1",
+      "sha256": "DC4816352962EC14ED443E5865F71FF3F2A989B47DCF4F45916048F1B5A55D55"
+    },
+    {
+      "path": "tools/lib/validation/responsive-menu/MenuObservation.ps1",
+      "sha256": "8423C41478F7AB329E7A385BBD13BB39490E42FB4F98B1D53AA508B583DEC2EC"
+    },
+    {
+      "path": "tools/lib/validation/responsive-menu/OwnedMenuWindow.ps1",
+      "sha256": "554324FF12A7EAC51DAA5438B48CE79A10FC095E546844127F02590A7772ED43"
+    },
+    {
+      "path": "tools/read_library_profiles.py",
+      "sha256": "2C99D50668AB90E3329649447FD156578F1377DA95E6998699D6D401DF583292"
+    }
+  ],
+  "fixture_sources": [
+    {
+      "role": "library",
+      "name": "mir-fixture-mir5-library-multiplayer",
+      "version": "0.3.0",
+      "canonical_library_archive": false,
+      "members": [
+        {
+          "source": "tests/fixtures/library-private-credits-f200/info.json",
+          "destination": "info.json",
+          "source_revision": "declaration-commit",
+          "sha256": "C0382AAED6AA6CF53F10A803598E953229D40C071A8A7250DB277F36ECBCB29E",
+          "bytes": 422
+        },
+        {
+          "source": "tests/fixtures/library-multiplayer/control.lua",
+          "destination": "control.lua",
+          "source_revision": "declaration-commit",
+          "sha256": "0D0ACF26C79671A8F92C4192DA63B344A7C6766CFA009ADB00FD64285DC80307",
+          "bytes": 57534
+        },
+        {
+          "source": "tests/fixtures/library-multiplayer/settings-updates.lua",
+          "destination": "settings-updates.lua",
+          "source_revision": "declaration-commit",
+          "sha256": "AA3C818050FD927BEADBA7FEBC483FB4BC42668911888852E4CF6996B7F5C0FD",
+          "bytes": 1678
+        }
+      ]
+    },
+    {
+      "role": "alpha",
+      "name": "mir-fixture-mir5-api-alpha",
+      "version": "0.1.0",
+      "canonical_library_archive": false,
+      "members": [
+        {
+          "source": "tests/fixtures/api-alpha/info-f200.json",
+          "destination": "info.json",
+          "source_revision": "7e48e1ac681ee8f2db4221eeef20cc001ddee4ec",
+          "sha256": "8F1C8AD42C31C9FD3230E4446E0622D31B2780AAA8B3ED1C262CB0EA9E1D60CE",
+          "bytes": 375
+        },
+        {
+          "source": "tests/fixtures/api-alpha/control.lua",
+          "destination": "control.lua",
+          "source_revision": "7e48e1ac681ee8f2db4221eeef20cc001ddee4ec",
+          "sha256": "8C5531606C96A1B93DD7B2E72C46F239866FC1EB161728BCFD66635B9592C8DB",
+          "bytes": 4989
+        },
+        {
+          "source": "tests/fixtures/api-alpha/data.lua",
+          "destination": "data.lua",
+          "source_revision": "7e48e1ac681ee8f2db4221eeef20cc001ddee4ec",
+          "sha256": "EF8BF389DF2694649EBF70B2F94C00E964D0AAA43AD72CC6A930B85203E41881",
+          "bytes": 736
+        },
+        {
+          "source": "tests/fixtures/api-alpha/graphics/icon.png",
+          "destination": "graphics/icon.png",
+          "source_revision": "7e48e1ac681ee8f2db4221eeef20cc001ddee4ec",
+          "sha256": "AAEB6587D7BB7F5332AF05DAB446DF3DB3B100C0776E45FA078DE2A574DABB3D",
+          "bytes": 137
+        }
+      ]
+    },
+    {
+      "role": "beta",
+      "name": "mir-fixture-mir5-api-beta",
+      "version": "0.1.0",
+      "canonical_library_archive": false,
+      "members": [
+        {
+          "source": "tests/fixtures/api-beta/info-f200.json",
+          "destination": "info.json",
+          "source_revision": "7e48e1ac681ee8f2db4221eeef20cc001ddee4ec",
+          "sha256": "40DA274C7B3A907BD9CB52561FB651D12A104BCDFA5DC28F2862C8EF9445E055",
+          "bytes": 380
+        },
+        {
+          "source": "tests/fixtures/api-beta/control.lua",
+          "destination": "control.lua",
+          "source_revision": "7e48e1ac681ee8f2db4221eeef20cc001ddee4ec",
+          "sha256": "81994E94DE86BFBB303160196A3E6EA99A00FD527A552763E7F6EDC18FF8F729",
+          "bytes": 4428
+        },
+        {
+          "source": "tests/fixtures/api-beta/data-final-fixes.lua",
+          "destination": "data-final-fixes.lua",
+          "source_revision": "7e48e1ac681ee8f2db4221eeef20cc001ddee4ec",
+          "sha256": "66502AB391A50F57D30150CDE9BDAEBE42ACDC2101A75AC15E54D9D8AC27B2B4",
+          "bytes": 952
+        },
+        {
+          "source": "tests/fixtures/api-beta/graphics/icon.png",
+          "destination": "graphics/icon.png",
+          "source_revision": "7e48e1ac681ee8f2db4221eeef20cc001ddee4ec",
+          "sha256": "530F9250623036693D3E5A79F830B9C8A6D61E727C92219FD6A28EE62A424CCE",
+          "bytes": 137
+        }
+      ]
+    },
+    {
+      "role": "observer",
+      "name": "mir-fixture-mir5-active-mods-observer",
+      "version": "0.1.0",
+      "canonical_library_archive": true,
+      "members": [
+        {
+          "source": "tests/fixtures/active-mods-observer/info-f200.json",
+          "destination": "info.json",
+          "source_revision": "7e48e1ac681ee8f2db4221eeef20cc001ddee4ec",
+          "sha256": "5C4A351958060F5FED504AA86E8C201A2F50A36C2732E624727B5697F216475A",
+          "bytes": 231
+        },
+        {
+          "source": "tests/fixtures/active-mods-observer/data-final-fixes.lua",
+          "destination": "data-final-fixes.lua",
+          "source_revision": "7e48e1ac681ee8f2db4221eeef20cc001ddee4ec",
+          "sha256": "89D364F0033A7EE036998E6C29A3558099C25AD2707CB24914790C49FB21555C",
+          "bytes": 477
+        }
+      ]
+    }
+  ],
+  "required_outcome": "Close the missing F200 public Library private-credit/action/native-state regression through the existing two-client lab/rejoin/cold-restart protocol,without changing player code or importing MIR storage.",
+  "existing_command": {
+    "path": "tools/Invoke-MultiplayerFixture.ps1",
+    "fixed_parameters": {
+      "ArchiveLibrary": "D:/Projects/Factorio/testmods/2.0",
+      "FactorioBin": "D:/Games/Factorio/2.0/bin/x64/factorio.exe",
+      "ProfilePath": "tests/profiles/library-private-credits-current-f200-2077.json",
+      "ExpectedMIRArchiveSha256": "E9D349931E082AD77057C150E3D6093490E4086E84F0FAFECB0ED1257FD5ED4F",
+      "FixtureCase": "library-multiplayer",
+      "SessionExpectedPeakMemoryMiB": 7168
+    },
+    "source_rule": "Pass exactly the four verified checkout-local source projections above. Own ZIPs are deterministic epoch1980/deflate/sorted members, matching profile API hashes. Observer723 remains its existing canonical archive. Freeze public/private source and packet hashes before native launch;preserve/restore previous own archives and all library controls.",
+    "fresh_output": "build/tmp/library-f200-private-credits-r01"
+  },
+  "independent_expectations": [
+    "Exactly six selected mods,ordinary enabled Gear/All and Automation/External positive controls,two actual EN/DE clients and original ten screenshots.",
+    "Two genuine Gear laboratory completions and expected+20% native productivity;live queue/start/finish/cancel/foreign-force assertions unchanged.",
+    "Four exact private IDs absent from public results/details/actions in All/External;all native holder level/researched/enabled/visibility and force research/queue/recipe states unchanged before/after;personal views restored.",
+    "Both independent API consumers retain real read-only load-query witnesses for each client after initial/rejoin/cold-host-restart.",
+    "Requested restart/final saves close;original seed/control/archive bytes retain their original hashes;owned processes close."
+  ],
+  "failure_path": "Preserve the first actual refusal/failure and originals. Diagnose the relevant fixture/input/product boundary before any retry;no threshold or assertion relaxation and no source recreation.",
+  "resources": {
+    "session_expected_peak_memory_mib": 7168,
+    "exclusive_direct_library": true,
+    "active_native_assignments": 1
+  },
+  "limits": [
+    "Fresh0.3 holder state only;no imported historical earnings,persisted private selections or foreign-hidden inspection claim.",
+    "No actual Esc/E/drag input,retained/churn memory,comparative performance,other target/modpack or full API/release acceptance.",
+    "F210 original0.3 native observations keep their exact older source/archive identities. New source broadens only the explicit F200 six-mod admission;ordinary F200 API-only and malformed/unknown inputs still refuse."
+  ],
+  "performance_acceptance": false,
+  "release_qualification": false
+}
