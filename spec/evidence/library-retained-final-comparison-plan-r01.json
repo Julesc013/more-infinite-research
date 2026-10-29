@@ -154,7 +154,8 @@
           "source_revision": "29656594be26c9219bee2e644023cd86a34598d1"
         }
       ],
-      "archive_sha256": "723D1E7721449FC26040E5E6629416767BDC20AD79CF8723115846DB662A1F87"
+      "archive_sha256": "723D1E7721449FC26040E5E6629416767BDC20AD79CF8723115846DB662A1F87",
+      "archive_bytes": 834
     }
   ],
   "resources": {
