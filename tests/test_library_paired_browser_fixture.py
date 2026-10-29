@@ -109,6 +109,7 @@ class LibraryPairedBrowserFixtureTests(unittest.TestCase):
           function paired_browser_runtime(path, arm, opponent)
             local callbacks, markers, profiler_labels, screenshots, saves, calls, joins = {events = {}}, {}, {}, {}, {}, {}, {}
             local action_ticks = {}
+            local profiling = false
             local gear = "recipe-prod-research_gears-1"
             local mining = "recipe-prod-research_mining_drill-1"
             local force = {
@@ -199,7 +200,7 @@ class LibraryPairedBrowserFixtureTests(unittest.TestCase):
                 table_to_json=function(row) markers[#markers+1]=row; return "fixture-marker" end,
                 create_profiler=function(stopped)
                   if stopped ~= true then error("helpers.create_profiler must receive true") end
-                  return {restart=function() end, stop=function() end}
+                  return {restart=function() profiling=true end, stop=function() profiling=false end}
                 end
               },
               remote={interfaces={["more-infinite-research-browser"]={open=true}}},
@@ -225,7 +226,10 @@ class LibraryPairedBrowserFixtureTests(unittest.TestCase):
             end
             env.game={
               players=players, tick=0,
-              take_screenshot=function(row) screenshots[#screenshots+1]=row end,
+              take_screenshot=function(row)
+                row.tick=env.game.tick;row.calls_seen=#calls;row.profiling=profiling
+                screenshots[#screenshots+1]=row
+              end,
               server_save=function(name) saves[#saves+1]=name end
             }
             setmetatable(env.game,{__index=function(_, key)
@@ -297,6 +301,12 @@ class LibraryPairedBrowserFixtureTests(unittest.TestCase):
             readiness[#readiness+1]={phase="initial",calls=#calls,screenshots=#screenshots}
             if opponent == "late-initial-locale" then de.locale="de" end
             for _, tick in ipairs({initial_ready_tick,initial_ready_tick+60,initial_ready_tick+120,initial_ready_tick+180}) do
+              if tick == initial_ready_tick+60 and opponent == "changed-settled-root" then
+                en.gui.screen["mir_research_browser"] = {valid=true}
+              end
+              if tick == initial_ready_tick+60 and opponent == "settled-native-mutation" then
+                force.recipes["iron-gear-wheel"].productivity_bonus=.1
+              end
               env.game.tick=tick
               ok,message=invoke(callbacks.events[2],{tick=tick})
               if not ok then return {ok=false,message=message,markers=markers,calls=calls} end
@@ -453,14 +463,14 @@ class LibraryPairedBrowserFixtureTests(unittest.TestCase):
         self.assertNotIn("remote.add_interface", source)
         self.assertNotIn("on_research_finished", source)
 
-    def test_both_arms_follow_the_same_four_action_eight_png_cold_restart_protocol(self):
+    def test_both_arms_follow_four_actions_with_eight_immediate_and_four_settled_pngs(self):
         for arm in ARMS:
             with self.subTest(arm=arm):
                 result = self.runtime_result(arm)
                 self.assertTrue(result["ok"], result["message"])
                 self.assertEqual(result["state"]["phase"], "completed")
                 self.assertEqual(result["state"]["action_call_count"], 2)
-                self.assertEqual(result["state"]["screenshot_calls"], 8)
+                self.assertEqual(result["state"]["screenshot_calls"], 12)
                 self.assertEqual(result["profiler_labels"], ["first_open", "search", "refresh", "reopen"])
                 self.assertEqual([(row["player"], row["query"], row["selected"], row["tab"], row["sort"])
                                   for row in result["calls"]], [
@@ -494,10 +504,17 @@ class LibraryPairedBrowserFixtureTests(unittest.TestCase):
                 self.assertTrue(all(row["performance_acceptance"] is False for row in result["markers"]))
                 self.assertEqual([row["path"] for row in result["screenshots"]], [
                     f"mir5-library-paired-browser/{stage}-{player}.png"
-                    for stage in ("first-open", "search", "refresh", "reopen") for player in (1, 2)
+                    for stage in ("first-open", "first-open-settled", "search", "refresh", "reopen", "reopen-settled") for player in (1, 2)
                 ])
                 self.assertTrue(all(row["show_gui"] and row["force_render"] and row["resolution"] == [1280, 720]
                                     for row in result["screenshots"]))
+                self.assertTrue(all(row["profiling"] is False for row in result["screenshots"]))
+                immediate = [row for row in result["screenshots"] if "-settled-" not in row["path"]]
+                settled = [row for row in result["screenshots"] if "-settled-" in row["path"]]
+                self.assertEqual([row["calls_seen"] for row in settled], [2, 2, 8, 8])
+                for early, late in zip(immediate[:2] + immediate[-2:], settled):
+                    self.assertEqual(late["tick"] - early["tick"], 60)
+                    self.assertEqual(late["calls_seen"], early["calls_seen"])
 
     def test_emitted_profiler_actions_match_the_shared_reader_contract(self):
         for arm in ARMS:
@@ -531,9 +548,9 @@ class LibraryPairedBrowserFixtureTests(unittest.TestCase):
                     self.assertTrue(result["ok"], result["message"])
                     self.assertEqual(result["readiness"], [
                         {"phase": "initial", "calls": 0, "screenshots": 0},
-                        {"phase": "restart", "calls": 6, "screenshots": 6},
+                        {"phase": "restart", "calls": 6, "screenshots": 8},
                     ])
-                    self.assertEqual(len(result["screenshots"]), 8)
+                    self.assertEqual(len(result["screenshots"]), 12)
                     self.assertEqual(result["profiler_labels"], list(profile_reader.ACTIONS))
 
     def test_readiness_waits_for_the_latest_join_on_initial_and_cold_restart(self):
@@ -543,7 +560,7 @@ class LibraryPairedBrowserFixtureTests(unittest.TestCase):
                 self.assertTrue(result["ok"], result["message"])
                 self.assertEqual(result["readiness"], [
                     {"phase": "initial", "calls": 0, "screenshots": 0},
-                    {"phase": "restart", "calls": 6, "screenshots": 6},
+                    {"phase": "restart", "calls": 6, "screenshots": 8},
                 ])
                 # One simulated post-load tick now precedes the cold joins;
                 # the 120-tick wait after the latest staggered join is intact.
@@ -556,10 +573,10 @@ class LibraryPairedBrowserFixtureTests(unittest.TestCase):
                 self.assertTrue(result["ok"], result["message"])
                 self.assertEqual(result["restart_wait"], {
                     "phase": "awaiting-cold-restart", "joins": 2,
-                    "calls": 6, "screenshots": 6, "saved_state_unchanged": True,
+                    "calls": 6, "screenshots": 8, "saved_state_unchanged": True,
                 })
                 self.assertEqual(result["profiler_labels"], list(profile_reader.ACTIONS))
-                self.assertEqual(len(result["screenshots"]), 8)
+                self.assertEqual(len(result["screenshots"]), 12)
                 self.assertEqual(result["state"]["join_events"], 4)
                 self.assertEqual(result["load_writes"], 0)
 
@@ -570,7 +587,7 @@ class LibraryPairedBrowserFixtureTests(unittest.TestCase):
                 self.assertTrue(result['ok'], result['message'])
                 self.assertEqual(result['restart_first_event'], {
                     'markers_before': 6, 'markers_after': 7,
-                    'calls': 6, 'screenshots': 6, 'joins': 2,
+                    'calls': 6, 'screenshots': 8, 'joins': 2,
                 })
                 self.assertEqual(sum(row['stage'] == 'ready' for row in result['markers']), 3)
                 self.assertEqual(result['load_writes'], 0)
@@ -583,6 +600,8 @@ class LibraryPairedBrowserFixtureTests(unittest.TestCase):
             ("remote-false", "public browser interface did not open"),
             ("bad-shape", "public browser detail differs"),
             ("native-mutation", "public Browser actions mutated named native research, queue, or recipes"),
+            ("changed-settled-root", "settled capture lost the original public Browser root"),
+            ("settled-native-mutation", "public Browser actions mutated named native research, queue, or recipes"),
             ("bad-join-name", "fixture join identity or ordinal differs"),
             ("duplicate-locales", "fixture clients have duplicate locales"),
             ("unsupported-locale", "fixture requires exact en and de clients"),

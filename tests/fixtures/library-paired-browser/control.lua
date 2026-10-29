@@ -12,6 +12,7 @@ local FINAL_SAVE = "mir5-native-complete"
 local CAPTURE_DELAY = 60
 local CLIENT_SETTLE_TICKS = 120
 local MAX_QUEUE = 8
+local settled_roots
 
 local GEAR = "recipe-prod-research_gears-1"
 local MINING = "recipe-prod-research_mining_drill-1"
@@ -295,11 +296,24 @@ local function run_action(state, label, players)
   assert_shape(players.en, ARMS[state.arm], views.en)
   assert_shape(players.de, ARMS[state.arm], views.de)
   assert_snapshot(state, players.en.force)
+  settled_roots = {en = players.en.gui.screen[ROOT], de = players.de.gui.screen[ROOT]}
   screenshot(state, label, players.en)
   screenshot(state, label, players.de)
   state.capture_after_tick = game.tick + CAPTURE_DELAY
   state.phase = label .. "-capture"
   marker(label, state, "observed")
+end
+
+local function capture_settled(state, label, players)
+  local views = VIEWS[label]
+  for _, locale in ipairs({"en", "de"}) do
+    local root = players[locale].gui.screen[ROOT]
+    if settled_roots == nil or not valid(root) or root ~= settled_roots[locale] then
+      fail("settled capture lost the original public Browser root")
+    end
+    assert_shape(players[locale], ARMS[state.arm], views[locale])
+    screenshot(state, label .. "-settled", players[locale])
+  end
 end
 
 local function start_initial(state)
@@ -416,12 +430,14 @@ script.on_event(defines.events.on_tick, function()
   if players.en.force.index ~= state.force_index then fail("client force changed during Browser observation") end
   assert_snapshot(state, players.en.force)
   if state.phase == "first-open-capture" then
+    capture_settled(state, "first-open", players)
     run_action(state, "search", players)
   elseif state.phase == "search-capture" then
     run_action(state, "refresh", players)
   elseif state.phase == "refresh-capture" then
     restart_ready(state)
   elseif state.phase == "reopen-capture" then
+    capture_settled(state, "reopen", players)
     complete(state)
   else
     fail("fixture capture phase is unrecognized")
