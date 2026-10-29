@@ -13,6 +13,10 @@ local CAPTURE_DELAY = 60
 local CLIENT_SETTLE_TICKS = 120
 local MAX_QUEUE = 8
 local MAP_SEED = 424242
+local RETAINED_SETTING = "mir5-library-paired-browser-retained-refresh"
+local RETAINED_TICKS = 600
+local REFRESH_ITERATIONS = 32
+local REFRESH_INTERVAL = 30
 local settled_roots
 
 local GEAR = "recipe-prod-research_gears-1"
@@ -389,6 +393,17 @@ local function complete(state)
   game.server_save(FINAL_SAVE)
 end
 
+local function retained_marker(stage, state, players)
+  assert_snapshot(state, players.en.force)
+  log("[MIR5_LIBRARY_RETAINED] " .. helpers.table_to_json({
+    schema = 1, case = CASE, stage = stage, arm = state.arm, tick = game.tick,
+    refresh_iterations = state.refresh_iterations or 0,
+    public_calls_per_iteration = 2, window_ticks = RETAINED_TICKS,
+    native_snapshot_unchanged = true, actual_keyboard_input = false,
+    performance_acceptance = false
+  }))
+end
+
 local loaded_for_restart = false
 local pending_ready = false
 local ready_emitted = false
@@ -424,13 +439,16 @@ script.on_init(function()
   if storage[KEY] ~= nil then fail("fixture state already exists") end
   local arm = selected_arm()
   assert_closure(arm)
+  local retained = settings.startup[RETAINED_SETTING]
+  if retained ~= nil and type(retained.value) ~= "boolean" then fail("retained refresh setting is not Boolean") end
   storage[KEY] = {
     schema = 1,
     arm = arm.key,
     phase = "awaiting-clients",
     screenshot_calls = 0,
     action_call_count = 0,
-    join_events = 0
+    join_events = 0,
+    retained_refresh = retained ~= nil and retained.value == true
   }
   emit_ready(storage[KEY])
 end)
@@ -506,6 +524,45 @@ script.on_event(defines.events.on_tick, function()
       end
       assert_shape(players[locale], ARMS[state.arm], VIEWS.reopen[locale])
     end
+    if state.retained_refresh then
+      state.phase = "retained-before"
+      state.capture_after_tick = game.tick + RETAINED_TICKS
+      retained_marker("baseline-start", state, players)
+    else
+      complete(state)
+    end
+  elseif state.phase == "retained-before" then
+    for _, locale in ipairs({"en", "de"}) do
+      assert_shape(players[locale], ARMS[state.arm], VIEWS.reopen[locale])
+    end
+    retained_marker("baseline-end", state, players)
+    state.phase = "refresh-churn"
+    state.refresh_iterations = 0
+    state.capture_after_tick = game.tick + REFRESH_INTERVAL
+  elseif state.phase == "refresh-churn" then
+    local iteration = (state.refresh_iterations or 0) + 1
+    if iteration > REFRESH_ITERATIONS then fail("retained refresh exceeded its finite bound") end
+    local views = iteration % 2 == 0 and VIEWS.reopen or VIEWS.search
+    open(players.en, views.en)
+    open(players.de, views.de)
+    for _, locale in ipairs({"en", "de"}) do
+      assert_shape(players[locale], ARMS[state.arm], views[locale])
+    end
+    assert_snapshot(state, players.en.force)
+    state.refresh_iterations = iteration
+    if iteration == REFRESH_ITERATIONS then
+      state.phase = "retained-after"
+      state.capture_after_tick = game.tick + RETAINED_TICKS
+      retained_marker("post-refresh-start", state, players)
+    else
+      state.capture_after_tick = game.tick + REFRESH_INTERVAL
+    end
+  elseif state.phase == "retained-after" then
+    for _, locale in ipairs({"en", "de"}) do
+      assert_shape(players[locale], ARMS[state.arm], VIEWS.reopen[locale])
+    end
+    if state.refresh_iterations ~= REFRESH_ITERATIONS then fail("retained refresh is incomplete") end
+    retained_marker("post-refresh-end", state, players)
     complete(state)
   else
     fail("fixture capture phase is unrecognized")

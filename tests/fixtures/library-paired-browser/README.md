@@ -1,4 +1,18 @@
+---
+title: "Paired public Library browser fixture"
+status: current
+applies_to: "Private native verification"
+audience: developer
+doc_type: reference
+owner: mir-maintainers
+last_reviewed: 2026-10-29
+---
+
 # Paired public Library browser fixture
+
+The optional fixture-owned `mir5-library-paired-browser-retained-refresh` Boolean defaults false. An explicit arm projection may package `settings-updates-retained.lua` as `settings-updates.lua` to enable600 baseline ticks,32 alternating public refreshes at30-tick intervals and600 post-refresh ticks after the existing cold-reopen/render checks. Four peer markers preserve exact ticks,iteration counts and unchanged native state;the existing twelve screenshots and four profiled actions remain. This observes refresh churn,with actual keyboard close/open and player removal remaining separate.
+
+The proposed [measurement method](../../../spec/evidence/library-peak-retained-method-r01.json) distinctly names OS lifetime peaks,periodic diagnostics and retained-window medians under existing tolerances. Independent review,native preflight and a final exact-input freeze are required before scoring. Host controls and this file establish no native performance or release verdict;earlier failed controls remain unchanged.
 
 This F200 fixture is a future performance-input witness, not a timing result. It
 uses only the historical public `more-infinite-research-browser.open` interface

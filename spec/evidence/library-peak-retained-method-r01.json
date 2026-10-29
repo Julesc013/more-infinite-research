@@ -1,0 +1,47 @@
+{
+  "schema": 1,
+  "kind": "MIRLibraryPeakRetainedMethodProposalV1",
+  "status": "host-verified-requires-independent-review-native-preflight-and-exact-freeze",
+  "requirements": ["PERF-03", "PERF-04", "RUN-04"],
+  "reason": "Retained identical-build experiments fail periodic-memory repeatability. Those observations are sampled maxima rather than native lifetime peaks. The latest fixed-map pair passes all14 UI/load and12 separately named OS peak controls but fails three original sampled-memory controls. Preserve every failure;this proposes an explicit future measurement correction rather than replacing an old verdict.",
+  "prior_evidence": ["spec/evidence/library-current-e9-r01-native-chain.json", "spec/evidence/library-repeatability-diagnostic-r02-native-chain.json", "spec/evidence/library-same-build-fixed-input-pilot-native-chain-r01.json"],
+  "scope": "Existing F2002.0.77/D3 publishedF394/current1D45 public Browser workload,two real EN/DE clients and cold restart. No F210/SpaceAge/modpack/end-to-end input or universal leak claim.",
+  "player_changes": false,
+  "implementation": {
+    "opt_in": "Fixture startup Boolean defaults false. Explicit alternate arm projections enable it;ordinary profiles retain existing behavior.",
+    "refresh_iterations": 32,
+    "public_calls_per_iteration": 2,
+    "interval_ticks": 30,
+    "before_window_ticks": 600,
+    "after_window_ticks": 600,
+    "phase": "After cold reopen,settled screenshot and final render grace,before final save.",
+    "actions": "Alternate existing public search/reopen queries;restore final query/selection/All scope. Refresh churn is distinct from actual keyboard close/open or player removal.",
+    "native_preservation": "Existing named technology/recipe/queue/progress snapshots remain checked. No forced garbage collection,world reset or technology assignments."
+  },
+  "measurands": {
+    "ui": "Unchanged12 per-role first_open/search/refresh/reopen LuaProfiler durations,two public calls peraction. Not frame/input latency.",
+    "load": "Unchanged initial/restart server elapsed at first post-load ready marker.",
+    "peak": "Separately named existing Process.PeakWorkingSet64 and Process.PeakPagedMemorySize64 at exact owned completion cutoff. Preserve field names;neither is relabelled sampled private bytes.",
+    "periodic": "Retain all250ms raw observations,maxima and original26 control decisions as diagnostics,not native high-water values.",
+    "retained": "Each restart server/clientEN/clientDE identity:median working_set_bytes and private_bytes in each explicit baseline/post-refresh window.",
+    "alignment": "Each peer emits four markers in its own stdout. Convert native-log elapsed via exact process startUTC to sampler monotonic reference;trim1second at both ends. Require at least8 samples and2seconds span per window,exact PID/start/phase/role and ordered complete markers. Missing or bad windows invalidate."
+  },
+  "preflight": {"sessions": 2, "arms": ["published", "candidate"], "scored": false, "required": "Exact fixed map settings,opt-in,32iterations/64refresh calls,14UI/load+12OS+12retained endpoints,original26 diagnostics,twelve screenshots,closed saves and restoration. Independent readback precedes final freeze."},
+  "schedule": {"inherit": "spec/evidence/library-current-e9-paired-plan-r01.json", "sessions": 12, "warmups": ["published", "candidate"], "same_published_controls": 2, "scored_blocks": [["published", "candidate"], ["candidate", "published"], ["published", "candidate"], ["candidate", "published"]], "extensions": 0},
+  "allowances": {"library_milliseconds": 5, "save_ready_seconds": 0.25, "memory_bytes": 67108864, "relative_fraction": 0.1, "unchanged": true},
+  "rules": {
+    "aa": "Each14UI/load+12OS+12retained endpoint:abs(B-A)<=max(floor,.1*mean(A,B)). Original26 decisions also remain visible.",
+    "comparison": "Each acceptance endpoint compares four scored-session medians perarm:candidate<=published+max(floor,.1*published). Report all paired differences,min/max and controls;no bootstrap/equivalence/universal claim.",
+    "growth": "Each candidate role/metric:post median<=baseline median+max(64MiB,.1*baseline). Also compare nonnegative per-session growth medians between arms under the same allowance based on published baseline median. Report negative changes unchanged,not as reclaimed-leak proof.",
+    "stop": "Any native error/refusal or missing/failed A/A acceptance control stops before scored observations. Retain all data;never pool older pilots,preflights,warmups or controls into scored arms.",
+    "quiet": "One owned session;no local builds,host suites,inference or other Factorio during the complete timed block. Stage inputs beforehand. Existing exclusive library,8GiB session and4GiB preparation budgets remain."
+  },
+  "counter_references": ["https://raw.githubusercontent.com/dotnet/runtime/v10.0.0/src/libraries/System.Diagnostics.Process/src/System/Diagnostics/Process.cs", "https://learn.microsoft.com/en-us/windows/win32/api/psapi/ns-psapi-process_memory_counters_ex"],
+  "host_validation": {"runtime": "Explicit pinned lupa.lua52 from build/tmp/mir421-lua-runtime", "new_focused_controls": 3, "all_affected_controls": 20, "result": "All pass:both arms have exact600/960/600tick windows,32iterations,72total public calls,twelve screenshots,four original profiler actions and no load writes. Malformed Boolean,native mutation and lost final view reject."},
+  "independent_review": false,
+  "native_preflight_observed": false,
+  "final_packet_frozen": false,
+  "metric_substitution_of_prior_data": false,
+  "performance_acceptance": false,
+  "release_qualification": false
+}
