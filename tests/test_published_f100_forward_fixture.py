@@ -289,13 +289,50 @@ end
               $tokens=$null;$errors=$null
               $ast=[Management.Automation.Language.Parser]::ParseFile($env:MIR_FORWARD_RUNNER,[ref]$tokens,[ref]$errors)
               if($errors.Count){throw 'runner parse failed'}
-              foreach($name in @('Assert-Fixture','Test-F110PublishedCrossSourceRelativePath','Get-PublishedF100ForwardFixture')){
+              foreach($name in @('Assert-Fixture','Test-F110PublishedCrossSourceRelativePath','Read-PublishedF100DirectRefusal','Get-PublishedF100ForwardFixture')){
                 $node=$ast.Find({param($n)$n -is [Management.Automation.Language.FunctionDefinitionAst] -and $n.Name -ceq $name},$true)
                 Invoke-Expression $node.Extent.Text
               }
               $repo=$env:MIR_FORWARD_REPO
               $engine=Join-Path $repo 'engine.exe'
               function Get-FixtureSha([string]$Path){if($Path -ceq $engine){return $script:engineSha};(Get-FileHash -LiteralPath $Path -Algorithm SHA256).Hash}
+              function New-HostRefusalBinding([string]$Opponent){
+                # All bodies are synthetic temporary host controls, never native evidence.
+                $folder=Join-Path $repo 'build/host-refusal';[void][IO.Directory]::CreateDirectory($folder)
+                $profilePath=Join-Path $folder 'direct-profile.json';$stdoutPath=Join-Path $folder 'process-1.stdout.txt';$ledgerPath=Join-Path $folder 'process-1.resources.jsonl';$resultPath=Join-Path $folder 'result.json'
+                $direct=@{schema=1;kind='published-f100-forward';stage='f210';target='f210';factorio_line='2.1';settings_mode='Defaults';predecessor_origin='published-f100-4.7.10003';protected_source_sha256=('A'*64);engine=@{version='2.1.23';sha256='8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38'};mods=@(@{name='base';version='2.1.23';enabled=$true},@{name='more-infinite-research';version='5.0.21000';enabled=$true},@{name='mir-fixture-mir5-historical-transition';version='0.5.0';enabled=$true});archive_sha256=@{'more-infinite-research_5.0.21000.zip'=('D'*64);'mir-fixture-mir5-historical-transition_0.5.0.zip'=('E'*64)}}
+                $stdout="  0.000 2026-10-30 00:00:00; Factorio 2.1.23 (build host-double, win64, full)`n  0.500 Error Util.cpp:81: Map version 1.0.0-0 cannot be loaded with this version of the game. The minimum supported map version is 1.1.0-0.`n"
+                $failure='[mir441-process-exit] 1'
+                $ledger=@(@{process=@{id=4242;phase='running'}},@{phase='interrupted';timed_out=$false;error=$failure})
+                $result=@{kind='MIR5NativeFixtureV1';status='failed';case='published-f100-forward';source_dirty=$false;source_head=('e'*40);input_save=@{sha256=('A'*64)};input_save_byte_identical=$true;engine=@{base_version='2.1.23';sha256=$direct.engine.sha256};mir_archive=@{sha256=('D'*64)};fixtures=@(@{sha256=('E'*64)});published_f100_forward=@{stage='f210';target='f210';role='successor';predecessor_origin='published-f100-4.7.10003';protected_input_sha256=('A'*64)};failure=$failure;process_runs=@(@{status='interrupted';stdout=$stdoutPath;ledger=$ledgerPath;error=$failure})}
+                if($Opponent -ceq 'bridge-source'){$direct.protected_source_sha256='F'*64;$result.input_save.sha256='F'*64}
+                if($Opponent -ceq 'bridge-engine'){$result.engine.sha256='F'*64}
+                if($Opponent -ceq 'bridge-mir'){$result.mir_archive.sha256='F'*64}
+                if($Opponent -ceq 'bridge-fixture'){$result.fixtures[0].sha256='F'*64}
+                if($Opponent -ceq 'bridge-route'){$result.published_f100_forward.target='f110'}
+                if($Opponent -ceq 'bridge-no-native'){$result.process_runs=@()}
+                if($Opponent -ceq 'bridge-no-pid'){$ledger[0].process.id=0}
+                if($Opponent -ceq 'bridge-timeout'){$ledger[1].timed_out=$true}
+                if($Opponent -ceq 'bridge-resource'){$failure='[mir441-resource-process-budget]';$result.failure=$failure;$result.process_runs[0].error=$failure;$ledger[1].error=$failure}
+                if($Opponent -ceq 'bridge-non-format'){$stdout="  0.000 2026-10-30 00:00:00; Factorio 2.1.23 (build host-double, win64, full)`n  0.500 Error Util.cpp:81: Missing recipe.`n"}
+                if($Opponent -ceq 'bridge-header'){$stdout=$stdout.Replace('Factorio 2.1.23','Factorio 1.1.110')}
+                if($Opponent -ceq 'bridge-success'){$result.status='passed'}
+                if($Opponent -ceq 'bridge-changed-input'){$result.input_save_byte_identical=$false}
+                if($Opponent -ceq 'bridge-profile-archive'){$direct.archive_sha256['more-infinite-research_5.0.21000.zip']='F'*64}
+                $profileJson=$direct|ConvertTo-Json -Depth 15
+                if($Opponent -ceq 'bridge-duplicate'){$profileJson=$profileJson.Replace('"schema": 1','"schema": 1,"SCHEMA": 1')}
+                [IO.File]::WriteAllText($profilePath,$profileJson)
+                $result.profile=@{path=$profilePath;sha256=Get-FixtureSha $profilePath}
+                if($Opponent -ceq 'bridge-profile'){$result.profile.sha256='F'*64}
+                [IO.File]::WriteAllText($stdoutPath,$stdout)
+                [IO.File]::WriteAllText($ledgerPath,(($ledger|ForEach-Object {$_|ConvertTo-Json -Depth 10 -Compress})-join "`n")+"`n")
+                [IO.File]::WriteAllText($resultPath,($result|ConvertTo-Json -Depth 15))
+                $binding=@{endpoint=@{target='f210';mir_sha256=('D'*64);fixture_sha256=('E'*64)}}
+                foreach($row in @(@('result',$resultPath),@('profile',$profilePath),@('stdout',$stdoutPath),@('ledger',$ledgerPath))){$binding[$row[0]]=@{path=$row[1];sha256=Get-FixtureSha $row[1]}}
+                if($Opponent -ceq 'bridge-invented'){$binding.result.sha256='B'*64}
+                if($Opponent -ceq 'bridge-missing'){$binding.result.path=Join-Path $folder 'missing.json'}
+                return $binding
+              }
               $cases=@(
                 @('source','f100','1.0','1.0.0','4.7.10003','0.2.0','99F1CE207A04296EF7D797E4A98AA98DDE4F02EE653C9DF736AC33A676FD4F70','C04F3543EBF99D2B76B2C9193EA0886381B7CDDF2F2C1610310E7961B24BE0E1'),
                 @('bridge','f110','1.1','1.1.110','4.7.11003','0.3.0','B7B4B834FCA2E32AFA9D3476EB42CC09B02F1205BE97F688DC6FC6ACE7BA8FE1','66C127D8BFC1919FA88F19D2D9B3047316A1B90401CAA05A6D05979B7A099D1E'),
@@ -318,24 +355,26 @@ end
                 $inputSha=if($stage -ceq 'source'){'219EF20F63B4A85FA2386BD50A81228B28F006D9731F24E069A657BB13F45811'}else{'A'*64}
                 $engineData=Join-Path $repo 'engine-data'
                 @{version=$base}|ConvertTo-Json|Set-Content -LiteralPath (Join-Path $engineData 'base/info.json')
-                $profile=@{schema=1;kind='published-f100-forward';stage=$stage;target=$target;factorio_line=$line;settings_mode='Defaults';predecessor_origin='published-f100-4.7.10003';protected_source_sha256=$inputSha;engine_bridge_refusal_sha256=('B'*64);engine=@{version=$base;sha256=$script:engineSha};mods=@(@{name='base';version=$base;enabled=$true},@{name='more-infinite-research';version=$mir;enabled=$true},@{name='mir-fixture-mir5-historical-transition';version=$version;enabled=$true});archive_sha256=@{('more-infinite-research_'+$mir+'.zip')=$mirSha;('mir-fixture-mir5-historical-transition_'+$version+'.zip')=('E'*64)}}
+                $profile=@{schema=1;kind='published-f100-forward';stage=$stage;target=$target;factorio_line=$line;settings_mode='Defaults';predecessor_origin='published-f100-4.7.10003';protected_source_sha256=$inputSha;engine=@{version=$base;sha256=$script:engineSha};mods=@(@{name='base';version=$base;enabled=$true},@{name='more-infinite-research';version=$mir;enabled=$true},@{name='mir-fixture-mir5-historical-transition';version=$version;enabled=$true});archive_sha256=@{('more-infinite-research_'+$mir+'.zip')=$mirSha;('mir-fixture-mir5-historical-transition_'+$version+'.zip')=('E'*64)}}
                 $source=Join-Path $repo ('build/'+$stage)
-                foreach($opponent in @('','input','origin','engine','archive','extra-mod','member','bridge-refusal')){
-                  if($opponent -ceq 'bridge-refusal' -and $stage -cne 'bridge'){continue}
+                foreach($opponent in @('','input','origin','engine','archive','extra-mod','member','bridge-refusal','bridge-invented','bridge-missing','bridge-source','bridge-engine','bridge-mir','bridge-fixture','bridge-profile','bridge-route','bridge-no-native','bridge-no-pid','bridge-timeout','bridge-resource','bridge-non-format','bridge-header','bridge-duplicate','bridge-success','bridge-changed-input','bridge-profile-archive')){
+                  if($opponent.StartsWith('bridge-') -and $stage -cne 'bridge'){continue}
                   $changed=($profile|ConvertTo-Json -Depth 10)|ConvertFrom-Json -AsHashtable
+                  if($stage -ceq 'bridge'){$changed.engine_bridge_refusal=New-HostRefusalBinding $opponent}
                   $actualInput=$inputSha
                   if($opponent -ceq 'input'){$actualInput='F'*64}
                   if($opponent -ceq 'origin'){$changed.predecessor_origin='mir5-f100'}
                   if($opponent -ceq 'engine'){$changed.engine.sha256='F'*64}
                   if($opponent -ceq 'archive'){$changed.archive_sha256['more-infinite-research_'+$mir+'.zip']='F'*64}
                   if($opponent -ceq 'extra-mod'){$changed.mods+=@{name='undeclared';version='1.0.0';enabled=$true}}
-                  if($opponent -ceq 'bridge-refusal'){$changed.engine_bridge_refusal_sha256=''}
+                  if($opponent -ceq 'bridge-refusal'){$changed.engine_bridge_refusal=$null}
                   $member=Join-Path $source 'fixture_control.lua';$original=[IO.File]::ReadAllBytes($member)
                   if($opponent -ceq 'member'){[IO.File]::AppendAllText($member,"`n-- opposing payload")}
                   $ok=$true
-                  try{$null=Get-PublishedF100ForwardFixture -Repo $repo -Profile $changed -Sources @($source) -EngineData $engineData -Engine $engine -MIRSha $mirSha -Case 'published-f100-forward' -Stage $stage -InputSave 'protected.zip' -InputSha $actualInput}catch{$ok=$false}
+                  $message=''
+                  try{$null=Get-PublishedF100ForwardFixture -Repo $repo -Profile $changed -Sources @($source) -EngineData $engineData -Engine $engine -MIRSha $mirSha -Case 'published-f100-forward' -Stage $stage -InputSave 'protected.zip' -InputSha $actualInput}catch{$ok=$false;$message=$_.Exception.Message}
                   finally{[IO.File]::WriteAllBytes($member,$original)}
-                  if($ok -ne ($opponent -ceq '')){throw ('unexpected preflight result '+$stage+'/'+$opponent)}
+                  if($ok -ne ($opponent -ceq '')){throw ('unexpected preflight result '+$stage+'/'+$opponent+': '+$message)}
                   if($ok){$accepted++}else{$refused++}
                 }
               }
@@ -344,7 +383,7 @@ end
             env = {**os.environ, "MIR_FORWARD_REPO": str(repo), "MIR_FORWARD_RUNNER": str(ROOT / "tools/Invoke-NativeFixture.ps1")}
             result = subprocess.run(["pwsh", "-NoProfile", "-Command", script], env=env, capture_output=True, text=True)
             self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
-            self.assertEqual(json.loads(result.stdout), {"accepted": 4, "refused": 25, "native_processes": 0})
+            self.assertEqual(json.loads(result.stdout), {"accepted": 4, "refused": 43, "native_processes": 0})
 
 
 if __name__ == "__main__":
