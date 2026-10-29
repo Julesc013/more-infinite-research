@@ -1,0 +1,682 @@
+{
+  "schema": 1,
+  "kind": "MIRLibraryCounterRenderPreflightNativeChainV1",
+  "status": "counter-and-first-open-render-verified-final-reopen-capture-occluded",
+  "source_commit": "09601c52f834351db6cd0479dbcd2fdd1608bc39",
+  "player_tree": "7b0ede663e6fbcf486cd863e7d3719653aedc07a",
+  "controller": {
+    "commit": "69b8c159d918e22c145f0d70253d0a144e4ef84f",
+    "driver_sha256": "EDFDDCE85B85C0BAE2653D496A01D8B979C31E14CD38520B3DE517A6F45F8218",
+    "system_sampler_sha256": "0E8658AB15FB8CA9B9F94F38A16C6BF8B2E9080209B07CA6704575FE717C4D6D",
+    "legacy_reader_sha256_pinned_but_not_used_for_this_mode": "A219B69C8FAEF58E4AB478135D16E4C246DCC4BF01C2B7C6ECF91A21607662FD"
+  },
+  "inputs": {
+    "engine": {
+      "version": "2.0.77",
+      "path": "D:/Games/Factorio/2.0/bin/x64/factorio.exe",
+      "sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B"
+    },
+    "published": {
+      "version": "4.7.20002",
+      "path": "D:/Projects/Factorio/testmods/2.0/more-infinite-research_4.7.20002.zip",
+      "sha256": "F3943EB4D69CCDAC41BD9F922AD03A5C78F34F22D8E7FA5A88A7A658AB1010B7",
+      "bytes": 1449338
+    },
+    "candidate": {
+      "version": "5.0.20000",
+      "source_commit": "a95dbc6b35c165b46aa9991d2a0ef7274d4ec04a",
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\packages\\7b0-all17-r01\\more-infinite-research_5.0.20000.zip",
+      "sha256": "1D45A54DB6F911F665A019897518E46D6614AE7E56903B067F93E116DFC2554F",
+      "bytes": 692743
+    },
+    "profiles": {
+      "published": {
+        "path": "tests/profiles/library-paired-browser-published-f200-2077.json",
+        "sha256": "3CB271B67FCF73D9FB84EF0A5E8E366272288D20DB59159F509BAAEC7007B560"
+      },
+      "candidate": {
+        "path": "tests/profiles/library-paired-browser-native-names-f200-2077.json",
+        "sha256": "0D589D92F3ECFA62A99A4FE7101A607B07FD4F12B1C3E0A87FEB6A0033081C94"
+      }
+    }
+  },
+  "plan": {
+    "path": "spec/evidence/library-counter-render-preflight-plan-r01.json",
+    "sha256": "15EC7CC5EDFBC5C29DFAFBF34425C92A302CFB7EF3E62592726F9FA37A5C8D70"
+  },
+  "packet": {
+    "primary_custody": "build/qualification/library-counter-render-preflight-r01-controller",
+    "sha256": "BD098959A864EEB5D9FE4C154DA90DAE47E299B9E56A0CDC837A2904541E99A7"
+  },
+  "prepared_sha256": "DF4DACBEC974128D506A03BB71E0868A175D3BE0990748F14D4DCFE30F3C7742",
+  "root_readback": {
+    "path": "build/qualification/library-counter-render-preflight-r01-controller/root-readback.json",
+    "sha256": "1284CE995155559859D8CD28F51CFB2CD161C58595398DF3B4583930A7A2F1D5",
+    "reader_sha256": "2235F700DF0D99FA351794E99E66755739EFD80FB43C1E61C556C0D54510EABD",
+    "files": 424,
+    "bytes_per_copy": 49815108
+  },
+  "receipt_capsule": {
+    "path": "spec/evidence/library-counter-render-preflight-native-receipts-r01.json.gz",
+    "sha256": "03CE75FF1CE652272766C930D981CEE7CFEE4937D9E44B94B8F73B375DBDD4BB",
+    "bytes": 224665,
+    "bodies": 39,
+    "round_trip": "All39 original exact bodies verified;all14 actual native stdout logs,1222 memory/166system samples and all12OS peak records retained. Four RCON argument literals are already private placeholders;zero unparsed/unredacted arguments."
+  },
+  "counts": {
+    "native_processes": 14,
+    "worlds": 2,
+    "two_real_client_sessions": 2,
+    "actual_join_events": 8,
+    "cold_host_restarts": 2,
+    "lab_completions": 0,
+    "screenshots": 24,
+    "externally_viewed_screenshots": 12,
+    "memory_samples": 1222,
+    "system_samples": 166,
+    "owned_os_peak_records": 12
+  },
+  "cases": [
+    {
+      "id": "01-published-counter-render",
+      "arm": "published",
+      "native_actions": [
+        {
+          "schema": 1,
+          "case": "library-paired-browser",
+          "stage": "first-open",
+          "status": "observed",
+          "arm": "published",
+          "action_call_count": 2,
+          "screenshot_calls": 2,
+          "join_events": 2,
+          "native_snapshot_unchanged": true,
+          "profiler_observation_only": true,
+          "requested_family": "all",
+          "native_family_verified": true,
+          "performance_acceptance": false
+        },
+        {
+          "schema": 1,
+          "case": "library-paired-browser",
+          "stage": "search",
+          "status": "observed",
+          "arm": "published",
+          "action_call_count": 2,
+          "screenshot_calls": 6,
+          "join_events": 2,
+          "native_snapshot_unchanged": true,
+          "profiler_observation_only": true,
+          "requested_family": "all",
+          "native_family_verified": true,
+          "performance_acceptance": false
+        },
+        {
+          "schema": 1,
+          "case": "library-paired-browser",
+          "stage": "refresh",
+          "status": "observed",
+          "arm": "published",
+          "action_call_count": 2,
+          "screenshot_calls": 8,
+          "join_events": 2,
+          "native_snapshot_unchanged": true,
+          "profiler_observation_only": true,
+          "requested_family": "all",
+          "native_family_verified": true,
+          "performance_acceptance": false
+        },
+        {
+          "schema": 1,
+          "case": "library-paired-browser",
+          "stage": "reopen",
+          "status": "observed",
+          "arm": "published",
+          "action_call_count": 2,
+          "screenshot_calls": 10,
+          "join_events": 4,
+          "native_snapshot_unchanged": true,
+          "profiler_observation_only": true,
+          "requested_family": "all",
+          "native_family_verified": true,
+          "performance_acceptance": false
+        }
+      ],
+      "metrics": {
+        "library/server/first_open": 24.4073,
+        "library/server/search": 4.6254,
+        "library/server/refresh": 5.0821,
+        "library/server/reopen": 19.6834,
+        "library/en/first_open": 24.585,
+        "library/en/search": 3.744,
+        "library/en/refresh": 5.0463,
+        "library/en/reopen": 20.4147,
+        "library/de/first_open": 22.7553,
+        "library/de/search": 6.7238,
+        "library/de/refresh": 4.7091,
+        "library/de/reopen": 21.0942,
+        "save_ready/initial": 2.137,
+        "save_ready/restart": 2.167,
+        "memory/initial/client-de/working_set_bytes": 1785630720,
+        "memory/initial/client-de/private_bytes": 3943804928,
+        "memory/initial/client-en/working_set_bytes": 1710338048,
+        "memory/initial/client-en/private_bytes": 3900420096,
+        "memory/initial/server/working_set_bytes": 368513024,
+        "memory/initial/server/private_bytes": 363532288,
+        "memory/restart/client-de/working_set_bytes": 1754775552,
+        "memory/restart/client-de/private_bytes": 3835146240,
+        "memory/restart/client-en/working_set_bytes": 1746526208,
+        "memory/restart/client-en/private_bytes": 4147765248,
+        "memory/restart/server/working_set_bytes": 274702336,
+        "memory/restart/server/private_bytes": 272826368
+      },
+      "memory_samples": 638,
+      "system_samples": 97,
+      "lifetime_peaks": [
+        {
+          "phase": "initial",
+          "role": "client-de",
+          "pid": 62988,
+          "start_utc": "2026-10-29T07:12:41.2001833Z",
+          "observed_utc": "2026-10-29T07:13:01.6095841Z",
+          "elapsed_monotonic_milliseconds": 39164.29,
+          "working_set_peak_bytes": 2011078656,
+          "paged_memory_peak_bytes": 4106182656,
+          "sampled_working_set_max_bytes": 1785630720
+        },
+        {
+          "phase": "initial",
+          "role": "client-en",
+          "pid": 73076,
+          "start_utc": "2026-10-29T07:12:24.7132447Z",
+          "observed_utc": "2026-10-29T07:13:01.5161479Z",
+          "elapsed_monotonic_milliseconds": 39070.863,
+          "working_set_peak_bytes": 2016309248,
+          "paged_memory_peak_bytes": 4123914240,
+          "sampled_working_set_max_bytes": 1710338048
+        },
+        {
+          "phase": "initial",
+          "role": "server",
+          "pid": 73148,
+          "start_utc": "2026-10-29T07:12:22.4734358Z",
+          "observed_utc": "2026-10-29T07:13:01.6934615Z",
+          "elapsed_monotonic_milliseconds": 39248.166,
+          "working_set_peak_bytes": 394080256,
+          "paged_memory_peak_bytes": 384659456,
+          "sampled_working_set_max_bytes": 368513024
+        },
+        {
+          "phase": "restart",
+          "role": "client-de",
+          "pid": 73668,
+          "start_utc": "2026-10-29T07:13:14.2361484Z",
+          "observed_utc": "2026-10-29T07:13:27.5900081Z",
+          "elapsed_monotonic_milliseconds": 65144.716,
+          "working_set_peak_bytes": 1846038528,
+          "paged_memory_peak_bytes": 4009275392,
+          "sampled_working_set_max_bytes": 1754775552
+        },
+        {
+          "phase": "restart",
+          "role": "client-en",
+          "pid": 67300,
+          "start_utc": "2026-10-29T07:13:03.9761614Z",
+          "observed_utc": "2026-10-29T07:13:27.5033251Z",
+          "elapsed_monotonic_milliseconds": 65058.032,
+          "working_set_peak_bytes": 1937006592,
+          "paged_memory_peak_bytes": 4185501696,
+          "sampled_working_set_max_bytes": 1746526208
+        },
+        {
+          "phase": "restart",
+          "role": "server",
+          "pid": 16644,
+          "start_utc": "2026-10-29T07:13:01.7713836Z",
+          "observed_utc": "2026-10-29T07:13:27.6711337Z",
+          "elapsed_monotonic_milliseconds": 65225.84,
+          "working_set_peak_bytes": 337850368,
+          "paged_memory_peak_bytes": 327397376,
+          "sampled_working_set_max_bytes": 274702336
+        }
+      ],
+      "observer": {
+        "utc_reference_before_stopwatch_start": "2026-10-29T07:12:22.4435541Z",
+        "cutoff": "OS high-water counters read before the owned stop;later exit/deinitialization is excluded",
+        "working_set_peak_bytes": "System.Diagnostics.Process.PeakWorkingSet64",
+        "paged_memory_peak_bytes": "System.Diagnostics.Process.PeakPagedMemorySize64;not sampled private_bytes",
+        "changes_periodic_observations": false
+      },
+      "saves": [
+        {
+          "role": "seed_sha256",
+          "sha256": "AA8CBD8D39D29B95D088A8EC15F8EA5AFBC639C2CD4A5751B8173F0A6D3B585A",
+          "bytes": 726734
+        },
+        {
+          "role": "restart_save_sha256",
+          "sha256": "C571400E0E987FBDFA1421DB3E3B378D79807FF9D017A92671C043954C0B1BF2",
+          "bytes": 834728
+        },
+        {
+          "role": "final_save_sha256",
+          "sha256": "8290F7FB7269220EA2C64BFE791ABD13FB443128E4CF649A78AAC8BFA307554A",
+          "bytes": 840951
+        }
+      ]
+    },
+    {
+      "id": "02-current-counter-render",
+      "arm": "candidate",
+      "native_actions": [
+        {
+          "schema": 1,
+          "case": "library-paired-browser",
+          "stage": "first-open",
+          "status": "observed",
+          "arm": "mir5",
+          "action_call_count": 2,
+          "screenshot_calls": 2,
+          "join_events": 2,
+          "native_snapshot_unchanged": true,
+          "profiler_observation_only": true,
+          "requested_family": "all",
+          "native_family_verified": true,
+          "performance_acceptance": false
+        },
+        {
+          "schema": 1,
+          "case": "library-paired-browser",
+          "stage": "search",
+          "status": "observed",
+          "arm": "mir5",
+          "action_call_count": 2,
+          "screenshot_calls": 6,
+          "join_events": 2,
+          "native_snapshot_unchanged": true,
+          "profiler_observation_only": true,
+          "requested_family": "all",
+          "native_family_verified": true,
+          "performance_acceptance": false
+        },
+        {
+          "schema": 1,
+          "case": "library-paired-browser",
+          "stage": "refresh",
+          "status": "observed",
+          "arm": "mir5",
+          "action_call_count": 2,
+          "screenshot_calls": 8,
+          "join_events": 2,
+          "native_snapshot_unchanged": true,
+          "profiler_observation_only": true,
+          "requested_family": "all",
+          "native_family_verified": true,
+          "performance_acceptance": false
+        },
+        {
+          "schema": 1,
+          "case": "library-paired-browser",
+          "stage": "reopen",
+          "status": "observed",
+          "arm": "mir5",
+          "action_call_count": 2,
+          "screenshot_calls": 10,
+          "join_events": 4,
+          "native_snapshot_unchanged": true,
+          "profiler_observation_only": true,
+          "requested_family": "all",
+          "native_family_verified": true,
+          "performance_acceptance": false
+        }
+      ],
+      "metrics": {
+        "library/server/first_open": 11.2977,
+        "library/server/search": 11.2589,
+        "library/server/refresh": 9.4086,
+        "library/server/reopen": 9.7277,
+        "library/en/first_open": 12.9916,
+        "library/en/search": 14.6688,
+        "library/en/refresh": 11.8106,
+        "library/en/reopen": 10.6721,
+        "library/de/first_open": 12.8395,
+        "library/de/search": 14.4251,
+        "library/de/refresh": 12.9673,
+        "library/de/reopen": 10.9037,
+        "save_ready/initial": 1.465,
+        "save_ready/restart": 1.49,
+        "memory/initial/client-de/working_set_bytes": 1772978176,
+        "memory/initial/client-de/private_bytes": 3851202560,
+        "memory/initial/client-en/working_set_bytes": 1691717632,
+        "memory/initial/client-en/private_bytes": 3947409408,
+        "memory/initial/server/working_set_bytes": 265076736,
+        "memory/initial/server/private_bytes": 251645952,
+        "memory/restart/client-de/working_set_bytes": 1869316096,
+        "memory/restart/client-de/private_bytes": 3943796736,
+        "memory/restart/client-en/working_set_bytes": 1703559168,
+        "memory/restart/client-en/private_bytes": 3967479808,
+        "memory/restart/server/working_set_bytes": 270307328,
+        "memory/restart/server/private_bytes": 262455296
+      },
+      "memory_samples": 584,
+      "system_samples": 69,
+      "lifetime_peaks": [
+        {
+          "phase": "initial",
+          "role": "client-de",
+          "pid": 49624,
+          "start_utc": "2026-10-29T07:13:54.6209597Z",
+          "observed_utc": "2026-10-29T07:14:14.2529587Z",
+          "elapsed_monotonic_milliseconds": 34636.916,
+          "working_set_peak_bytes": 1938989056,
+          "paged_memory_peak_bytes": 4013576192,
+          "sampled_working_set_max_bytes": 1772978176
+        },
+        {
+          "phase": "initial",
+          "role": "client-en",
+          "pid": 69900,
+          "start_utc": "2026-10-29T07:13:41.1832635Z",
+          "observed_utc": "2026-10-29T07:14:14.1547418Z",
+          "elapsed_monotonic_milliseconds": 34538.714,
+          "working_set_peak_bytes": 1900158976,
+          "paged_memory_peak_bytes": 3980656640,
+          "sampled_working_set_max_bytes": 1691717632
+        },
+        {
+          "phase": "initial",
+          "role": "server",
+          "pid": 46772,
+          "start_utc": "2026-10-29T07:13:39.6458188Z",
+          "observed_utc": "2026-10-29T07:14:14.3410165Z",
+          "elapsed_monotonic_milliseconds": 34724.975,
+          "working_set_peak_bytes": 291127296,
+          "paged_memory_peak_bytes": 280051712,
+          "sampled_working_set_max_bytes": 265076736
+        },
+        {
+          "phase": "restart",
+          "role": "client-de",
+          "pid": 85320,
+          "start_utc": "2026-10-29T07:14:25.3755256Z",
+          "observed_utc": "2026-10-29T07:14:38.0210412Z",
+          "elapsed_monotonic_milliseconds": 58405.004,
+          "working_set_peak_bytes": 1904037888,
+          "paged_memory_peak_bytes": 4065771520,
+          "sampled_working_set_max_bytes": 1869316096
+        },
+        {
+          "phase": "restart",
+          "role": "client-en",
+          "pid": 76968,
+          "start_utc": "2026-10-29T07:14:16.1156499Z",
+          "observed_utc": "2026-10-29T07:14:37.9375265Z",
+          "elapsed_monotonic_milliseconds": 58321.487,
+          "working_set_peak_bytes": 1899601920,
+          "paged_memory_peak_bytes": 4030636032,
+          "sampled_working_set_max_bytes": 1703559168
+        },
+        {
+          "phase": "restart",
+          "role": "server",
+          "pid": 56840,
+          "start_utc": "2026-10-29T07:14:14.4089511Z",
+          "observed_utc": "2026-10-29T07:14:38.1055271Z",
+          "elapsed_monotonic_milliseconds": 58489.488,
+          "working_set_peak_bytes": 290979840,
+          "paged_memory_peak_bytes": 279838720,
+          "sampled_working_set_max_bytes": 270307328
+        }
+      ],
+      "observer": {
+        "utc_reference_before_stopwatch_start": "2026-10-29T07:13:39.6135467Z",
+        "cutoff": "OS high-water counters read before the owned stop;later exit/deinitialization is excluded",
+        "working_set_peak_bytes": "System.Diagnostics.Process.PeakWorkingSet64",
+        "paged_memory_peak_bytes": "System.Diagnostics.Process.PeakPagedMemorySize64;not sampled private_bytes",
+        "changes_periodic_observations": false
+      },
+      "saves": [
+        {
+          "role": "seed_sha256",
+          "sha256": "17F13DE42863D703FC9F1BC3CC37EA319BAA8481B351FF5CB85CBC15C4541150",
+          "bytes": 487191
+        },
+        {
+          "role": "restart_save_sha256",
+          "sha256": "22F44F17ED8654DCA1BF94C813E57B7A32D91B18EB483589E6E18204AD44CE28",
+          "bytes": 563347
+        },
+        {
+          "role": "final_save_sha256",
+          "sha256": "AF77092B599895688D7A012B19E006CFA306AF37A7152BF9410F016D1EEE59CE",
+          "bytes": 548506
+        }
+      ]
+    }
+  ],
+  "screenshots": [
+    {
+      "case": "01-published-counter-render",
+      "path": "D:\\Projects\\Factorio\\mir5-legacy-cannon-credit-r01\\build\\tmp\\library-counter-render-preflight-r01\\01-published-counter-render\\session\\client-en\\script-output\\mir5-library-paired-browser\\first-open-1.png",
+      "sha256": "7C32191CA935E432CDA153B36752B5F3C8DC7B5B8A6B17FEDB1DE8BCC7AC0661",
+      "bytes": 1209061,
+      "crc_and_decompression": true,
+      "externally_inspected": true
+    },
+    {
+      "case": "01-published-counter-render",
+      "path": "D:\\Projects\\Factorio\\mir5-legacy-cannon-credit-r01\\build\\tmp\\library-counter-render-preflight-r01\\01-published-counter-render\\session\\client-en\\script-output\\mir5-library-paired-browser\\first-open-settled-1.png",
+      "sha256": "53E76FA536AD65B563AAA7D7ABB5273550320684F01D03F5A8C56708098BCA94",
+      "bytes": 1184707,
+      "crc_and_decompression": true,
+      "externally_inspected": true
+    },
+    {
+      "case": "01-published-counter-render",
+      "path": "D:\\Projects\\Factorio\\mir5-legacy-cannon-credit-r01\\build\\tmp\\library-counter-render-preflight-r01\\01-published-counter-render\\session\\client-en\\script-output\\mir5-library-paired-browser\\search-1.png",
+      "sha256": "2073F9D950AD3F6D72E336EA2C11A899F0358BA5EA40B637CE882FB8E475949A",
+      "bytes": 1180392,
+      "crc_and_decompression": true,
+      "externally_inspected": false
+    },
+    {
+      "case": "01-published-counter-render",
+      "path": "D:\\Projects\\Factorio\\mir5-legacy-cannon-credit-r01\\build\\tmp\\library-counter-render-preflight-r01\\01-published-counter-render\\session\\client-en\\script-output\\mir5-library-paired-browser\\refresh-1.png",
+      "sha256": "B06E497CC0A46DB9E5DC72E838D311CB87DF3AF85EDCF43C163C8B4518137585",
+      "bytes": 1209968,
+      "crc_and_decompression": true,
+      "externally_inspected": false
+    },
+    {
+      "case": "01-published-counter-render",
+      "path": "D:\\Projects\\Factorio\\mir5-legacy-cannon-credit-r01\\build\\tmp\\library-counter-render-preflight-r01\\01-published-counter-render\\session\\client-en\\script-output\\mir5-library-paired-browser\\reopen-1.png",
+      "sha256": "473B1FE3D212738848F10E21641702589A489051CB3C7760F7C0AA3960134DA7",
+      "bytes": 1246682,
+      "crc_and_decompression": true,
+      "externally_inspected": false
+    },
+    {
+      "case": "01-published-counter-render",
+      "path": "D:\\Projects\\Factorio\\mir5-legacy-cannon-credit-r01\\build\\tmp\\library-counter-render-preflight-r01\\01-published-counter-render\\session\\client-en\\script-output\\mir5-library-paired-browser\\reopen-settled-1.png",
+      "sha256": "EF59DFD7A4D0FFB4CFCB1CE6B82716380F3BA415E1566684C7DA83DC27513FC8",
+      "bytes": 1243803,
+      "crc_and_decompression": true,
+      "externally_inspected": true
+    },
+    {
+      "case": "01-published-counter-render",
+      "path": "D:\\Projects\\Factorio\\mir5-legacy-cannon-credit-r01\\build\\tmp\\library-counter-render-preflight-r01\\01-published-counter-render\\session\\client-de\\script-output\\mir5-library-paired-browser\\first-open-2.png",
+      "sha256": "D2718199A5D81DB15872841819B0BC6424C4FB2226A7F288E8096A7ABB288CF2",
+      "bytes": 1225109,
+      "crc_and_decompression": true,
+      "externally_inspected": true
+    },
+    {
+      "case": "01-published-counter-render",
+      "path": "D:\\Projects\\Factorio\\mir5-legacy-cannon-credit-r01\\build\\tmp\\library-counter-render-preflight-r01\\01-published-counter-render\\session\\client-de\\script-output\\mir5-library-paired-browser\\first-open-settled-2.png",
+      "sha256": "9C7AE2DDCD14087035B9E3988BCF7517888E603DA7C4502D41146C1FDF5CEEC3",
+      "bytes": 1198781,
+      "crc_and_decompression": true,
+      "externally_inspected": true
+    },
+    {
+      "case": "01-published-counter-render",
+      "path": "D:\\Projects\\Factorio\\mir5-legacy-cannon-credit-r01\\build\\tmp\\library-counter-render-preflight-r01\\01-published-counter-render\\session\\client-de\\script-output\\mir5-library-paired-browser\\search-2.png",
+      "sha256": "9C8D2CDBD501044E4D51E2155AB329BAB58CC253E7CB78A19B2565F369AEFC0E",
+      "bytes": 1186085,
+      "crc_and_decompression": true,
+      "externally_inspected": false
+    },
+    {
+      "case": "01-published-counter-render",
+      "path": "D:\\Projects\\Factorio\\mir5-legacy-cannon-credit-r01\\build\\tmp\\library-counter-render-preflight-r01\\01-published-counter-render\\session\\client-de\\script-output\\mir5-library-paired-browser\\refresh-2.png",
+      "sha256": "F69DECAB78B24312B1F1C00D5F03D9349CF7B3E47ED76DE8C7B4D4DD23AB8792",
+      "bytes": 1211487,
+      "crc_and_decompression": true,
+      "externally_inspected": false
+    },
+    {
+      "case": "01-published-counter-render",
+      "path": "D:\\Projects\\Factorio\\mir5-legacy-cannon-credit-r01\\build\\tmp\\library-counter-render-preflight-r01\\01-published-counter-render\\session\\client-de\\script-output\\mir5-library-paired-browser\\reopen-2.png",
+      "sha256": "5EF893CE8429D1AD4A7C284873C20BB0C7979B198DE4826EDC30E88A0113386A",
+      "bytes": 1260725,
+      "crc_and_decompression": true,
+      "externally_inspected": false
+    },
+    {
+      "case": "01-published-counter-render",
+      "path": "D:\\Projects\\Factorio\\mir5-legacy-cannon-credit-r01\\build\\tmp\\library-counter-render-preflight-r01\\01-published-counter-render\\session\\client-de\\script-output\\mir5-library-paired-browser\\reopen-settled-2.png",
+      "sha256": "86BD7FB74E9B330506B4408A5654A81DCF8307FE72926CAB0FC5C4B3D28A5A4D",
+      "bytes": 1257216,
+      "crc_and_decompression": true,
+      "externally_inspected": true
+    },
+    {
+      "case": "02-current-counter-render",
+      "path": "D:\\Projects\\Factorio\\mir5-legacy-cannon-credit-r01\\build\\tmp\\library-counter-render-preflight-r01\\02-current-counter-render\\session\\client-en\\script-output\\mir5-library-paired-browser\\first-open-1.png",
+      "sha256": "E25D579F2D229C83781FA8E232CACB4E01E53973E36425C3141D1C506753EC50",
+      "bytes": 1217963,
+      "crc_and_decompression": true,
+      "externally_inspected": true
+    },
+    {
+      "case": "02-current-counter-render",
+      "path": "D:\\Projects\\Factorio\\mir5-legacy-cannon-credit-r01\\build\\tmp\\library-counter-render-preflight-r01\\02-current-counter-render\\session\\client-en\\script-output\\mir5-library-paired-browser\\first-open-settled-1.png",
+      "sha256": "E32F6E8AFDAA77AF7A54357B5870D7C4255E3A0F9952CFFFBCE981F167818255",
+      "bytes": 1224974,
+      "crc_and_decompression": true,
+      "externally_inspected": true
+    },
+    {
+      "case": "02-current-counter-render",
+      "path": "D:\\Projects\\Factorio\\mir5-legacy-cannon-credit-r01\\build\\tmp\\library-counter-render-preflight-r01\\02-current-counter-render\\session\\client-en\\script-output\\mir5-library-paired-browser\\search-1.png",
+      "sha256": "684DA55267F639FAD68A3838974A803383D5CC0A6FBDF3DAA2AEB9EFFAD217D8",
+      "bytes": 1228407,
+      "crc_and_decompression": true,
+      "externally_inspected": false
+    },
+    {
+      "case": "02-current-counter-render",
+      "path": "D:\\Projects\\Factorio\\mir5-legacy-cannon-credit-r01\\build\\tmp\\library-counter-render-preflight-r01\\02-current-counter-render\\session\\client-en\\script-output\\mir5-library-paired-browser\\refresh-1.png",
+      "sha256": "41E2334A469DF9658EF83E99D211F22CFB471BAA1FBB198FA1CEF124A5909E96",
+      "bytes": 1226684,
+      "crc_and_decompression": true,
+      "externally_inspected": false
+    },
+    {
+      "case": "02-current-counter-render",
+      "path": "D:\\Projects\\Factorio\\mir5-legacy-cannon-credit-r01\\build\\tmp\\library-counter-render-preflight-r01\\02-current-counter-render\\session\\client-en\\script-output\\mir5-library-paired-browser\\reopen-1.png",
+      "sha256": "87970D58FD5E4719D4C1B324CC7842A4F18FAD0079EACF3956694D245E7147BB",
+      "bytes": 1213728,
+      "crc_and_decompression": true,
+      "externally_inspected": false
+    },
+    {
+      "case": "02-current-counter-render",
+      "path": "D:\\Projects\\Factorio\\mir5-legacy-cannon-credit-r01\\build\\tmp\\library-counter-render-preflight-r01\\02-current-counter-render\\session\\client-en\\script-output\\mir5-library-paired-browser\\reopen-settled-1.png",
+      "sha256": "BB674B25FC93E7B7DD6AC696BB171D4D2D0FCC6B26AFF945719678BE6F99F022",
+      "bytes": 1217393,
+      "crc_and_decompression": true,
+      "externally_inspected": true
+    },
+    {
+      "case": "02-current-counter-render",
+      "path": "D:\\Projects\\Factorio\\mir5-legacy-cannon-credit-r01\\build\\tmp\\library-counter-render-preflight-r01\\02-current-counter-render\\session\\client-de\\script-output\\mir5-library-paired-browser\\first-open-2.png",
+      "sha256": "90B5EDB266799097C3E093E4DEBA2CC7033E5B0CB90E9BD25AAB6F537BC85354",
+      "bytes": 1237371,
+      "crc_and_decompression": true,
+      "externally_inspected": true
+    },
+    {
+      "case": "02-current-counter-render",
+      "path": "D:\\Projects\\Factorio\\mir5-legacy-cannon-credit-r01\\build\\tmp\\library-counter-render-preflight-r01\\02-current-counter-render\\session\\client-de\\script-output\\mir5-library-paired-browser\\first-open-settled-2.png",
+      "sha256": "AEA6AD3CABB5C7FF7B9E64E5E273022651A8F2AB489F18B20571BA3F5997F470",
+      "bytes": 1243301,
+      "crc_and_decompression": true,
+      "externally_inspected": true
+    },
+    {
+      "case": "02-current-counter-render",
+      "path": "D:\\Projects\\Factorio\\mir5-legacy-cannon-credit-r01\\build\\tmp\\library-counter-render-preflight-r01\\02-current-counter-render\\session\\client-de\\script-output\\mir5-library-paired-browser\\search-2.png",
+      "sha256": "140725E902DB23530AA1C7AFF5306E5A4E19CF868039BF1A00287E68C86F7694",
+      "bytes": 1247597,
+      "crc_and_decompression": true,
+      "externally_inspected": false
+    },
+    {
+      "case": "02-current-counter-render",
+      "path": "D:\\Projects\\Factorio\\mir5-legacy-cannon-credit-r01\\build\\tmp\\library-counter-render-preflight-r01\\02-current-counter-render\\session\\client-de\\script-output\\mir5-library-paired-browser\\refresh-2.png",
+      "sha256": "DF66D73A7E28C8895A315DAFA31409D1D97D78F516B0E597C5F4EDC96D6654A4",
+      "bytes": 1246609,
+      "crc_and_decompression": true,
+      "externally_inspected": false
+    },
+    {
+      "case": "02-current-counter-render",
+      "path": "D:\\Projects\\Factorio\\mir5-legacy-cannon-credit-r01\\build\\tmp\\library-counter-render-preflight-r01\\02-current-counter-render\\session\\client-de\\script-output\\mir5-library-paired-browser\\reopen-2.png",
+      "sha256": "3752B058076580F218D6319D5B90CAC59AA5EC1B4A7326FFEC8E1AC0BBE4C7C0",
+      "bytes": 1235952,
+      "crc_and_decompression": true,
+      "externally_inspected": false
+    },
+    {
+      "case": "02-current-counter-render",
+      "path": "D:\\Projects\\Factorio\\mir5-legacy-cannon-credit-r01\\build\\tmp\\library-counter-render-preflight-r01\\02-current-counter-render\\session\\client-de\\script-output\\mir5-library-paired-browser\\reopen-settled-2.png",
+      "sha256": "73BD6995EC9507033656AAFE95487B46FD08BB4846E4C62202F33AD54EF1BB37",
+      "bytes": 1238865,
+      "crc_and_decompression": true,
+      "externally_inspected": true
+    }
+  ],
+  "verified": [
+    "Both actual interfaces verify requested family=all at all four profiled actions;all bounded native snapshots remain unchanged.",
+    "Six owned completion-boundary OS counter records perarm retain exact PID/startUTC and observer clock/cutoff. Every working-set peak covers every corresponding sampled maximum;all periodic values are unchanged. Paged peak remains distinct from private bytes.",
+    "Both delayed first-open EN/DE frames preserve original gears/mining query and selected title before search. Immediate/delayed pairs are externally inspected on both actual arms.",
+    "All26 raw profiler/readiness/periodic-memory endpoints percase are present;52 values are recorded without any comparison,aggregation,A/A or performance verdict."
+  ],
+  "visual_observations": [
+    "Both actual All dropdowns and initial ENgears/DEmining selection/query match requested state on both arms;allfour immediate-versus-delayed first-open pairs viewed. Delayed first-open retains original query before search on both actual interfaces.",
+    "Both actual current settled cold-reopen frames contain Factorio final-save modal over the Library. Underlying query/selection remains,with native snapshots unchanged,but this visual method boundary still needs a separate screenshot-to-completion grace. Preserve original frames,not a player defect.",
+    "Both published settled cold-reopen views retain original query and localized selected title. Current title/detail localization is visible in the first-open comparisons.",
+    "Ordinary fresh worlds visibly differ in terrain;there is no identical-map claim or comparison in this preflight."
+  ],
+  "remaining_method_defect": "Both current settled cold-reopen images contain final-save modal. Independent fixture owner is asked to add bounded screenshot-to-completion/save render grace before scoring;preserve these original frames. This is not a player defect or another accepted comparison.",
+  "first_reader_input_refusal": {
+    "path": "build/qualification/library-counter-render-preflight-r01-controller/first-reader-refusal.json",
+    "sha256": "BAD939AA819AF823077AE2FE4F2ADE2B0C9D5E0507702B489B1D3CB7BC68CEE4",
+    "native_reruns": 0,
+    "correction": "Existing bounded public profiler reader refuses absolute manifest locators. Retain invalid first manifest/source and read hash-identical primary native copies through new portable Q-relative manifests;no native/raw data or metric changed."
+  },
+  "controls_restored": true,
+  "dependency_payload_bytes_copied": 0,
+  "archive_links_created": 0,
+  "archive_extractions": 0,
+  "limits": [
+    "Unscored endpoint/counter/render preflight only;two ordinary fresh worlds are not asserted to have identical map generation. No between-arm elapsed/memory comparison or A/A decision.",
+    "Future acceptance separately requires actual fixed-world inputs,retained/churn windows,predeclared quiet schedule/validity rules and existing tolerances.",
+    "Original R01/R02 sampled-memory controls remain failed/adverse. OS paged-memory peak is not a replacement private-bytes endpoint.",
+    "No imported private state,actual keyboard/drag,other profile/engine or release claim."
+  ],
+  "performance_acceptance": false,
+  "release_qualification": false
+}
