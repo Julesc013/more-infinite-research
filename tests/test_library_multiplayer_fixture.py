@@ -56,6 +56,7 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
     def setUp(self):
         self.lua = LuaRuntime(unpack_returned_tuples=True)
         self.lua.globals().control_path = CONTROL.as_posix()
+        self.lua.globals().positive_state_path = (ROOT / "tests/fixtures/library-positive-state/positive-state.lua").as_posix()
         self.lua.execute(r'''
           function run_library_multiplayer_fixture(path, opponent, target)
             local ROOT_NAME="mir_research_browser"
@@ -96,6 +97,8 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
               ["f210-private-credits"]={base="2.1.23",mir="5.0.21000",private_credits=true},
               ["f210-space-age-private-credits"]={base="2.1.23",mir="5.0.21000",space_age=true,private_credits=true},
               ["f200-private-credits"]={base="2.0.77",mir="5.0.20000",private_credits=true},
+              ["f200-positive-state"]={base="2.0.77",mir="5.0.20000",private_credits=true,positive_state=true},
+              ["f210-positive-state"]={base="2.1.23",mir="5.0.21000",private_credits=true,positive_state=true},
             }
             local selected=targets[target or "f200"]
             assert(selected,"unknown fixture target")
@@ -153,6 +156,28 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
             if selected.private_credits then
               force.technologies["automation"]={valid=true,name="automation",force=force,level=1,
                 researched=true,enabled=true,visible_when_disabled=false}
+            end
+            local reset_count=0
+            if selected.positive_state then
+              for _,id in ipairs(private_credit_ids) do
+                local tech=force.technologies[id]
+                tech.level,tech.researched,tech.prototype=1,false,{valid=true,hidden=true}
+              end
+              for _,id in ipairs({"speed-module","productivity-module","efficiency-module"}) do
+                force.recipes[id]={valid=true,productivity_bonus=0}
+              end
+              force.technologies["mir5-fixture-foreign-hidden-research"]={valid=true,level=1,researched=false,
+                enabled=true,visible_when_disabled=false,prototype={valid=true,hidden=true}}
+              force.cannon_speed=0
+              force.get_gun_speed_modifier=function(category) assert(category=="cannon-shell");return force.cannon_speed end
+              force.reset_technology_effects=function()
+                reset_count=reset_count+1
+                for index,id in ipairs({"speed-module","productivity-module","efficiency-module"}) do
+                  force.recipes[id].productivity_bonus=(force.technologies[private_credit_ids[index]].level-1)*.01
+                end
+                force.cannon_speed=(force.technologies[private_credit_ids[4]].level-1)*.1
+              end
+              if opponent=="positive-not-fresh" then force.technologies[private_credit_ids[1]].level=2 end
             end
             local function player(index, locale)
               local value={valid=true,index=index,name=index==1 and "MIR5English" or "MIR5Deutsch",locale=locale,connected=false,force=force,gui={screen={valid=true,type="screen"}}}
@@ -277,6 +302,8 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
               filters[QUERY].text=options.search
               filters[FAMILY]=element("drop-down",FAMILY)
               filters[FAMILY].selected_index=options.family=="all" and 2 or (options.family=="external" and 3 or 1)
+              filters.mir_library_visibility=element("drop-down","mir_library_visibility")
+              filters.mir_library_visibility.selected_index=options.visibility
               filters[SORT]=element("drop-down",SORT)
               filters[SORT].selected_index=options.sort=="native" and 2 or 1
               local tabs=element("tabbed-pane",TABS)
@@ -309,7 +336,29 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
                 target.gui.screen[ROOT_NAME]=root
                 return
               end
-              assert(options.visibility==1,"ordinary Library opens must reset Availability visibility")
+              assert(options.visibility==1 or selected.positive_state,"ordinary Library opens must reset Availability visibility")
+              if selected.positive_state then
+                if options.hidden~=nil then
+                  client.personal_hidden={}
+                  for _,id in ipairs(options.hidden) do client.personal_hidden[id]=true end
+                end
+                if options.search=="mir5-fixture-foreign-hidden-research" then
+                  local hidden=client.personal_hidden and client.personal_hidden[options.search]==true
+                  local present=(options.visibility==1 and not hidden) or (options.visibility==2 and hidden)
+                  if opponent=="positive-foreign-suppressed" then present=false end
+                  local results=element("list-box",RESULTS)
+                  results.items=present and {options.search} or {};results.selected_index=present and 1 or 0
+                  content[RESULTS]=results
+                  local detail=element("flow",DETAIL)
+                  detail[present and DETAIL_TITLE or DETAIL_EMPTY]=element("label",present and DETAIL_TITLE or DETAIL_EMPTY)
+                  content[DETAIL]=detail
+                  local actions=element("flow",ACTIONS)
+                  actions[OPEN_NATIVE]=element("button",OPEN_NATIVE);actions[OPEN_NATIVE].enabled=present
+                  content[ACTIONS]=actions
+                  target.gui.screen[ROOT_NAME]=root
+                  return
+                end
+              end
               local private_query=selected.private_credits and private_credit_id_set[options.selected]==true
                 and (options.family=="all" or options.family=="external") and options.search==options.selected
               if private_query then
@@ -455,7 +504,7 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
               return true
             end
             local discovery=opponent=="standalone-identity-discovery"
-            local fixture_version=selected.private_credits and "0.3.0" or (selected.space_age and "0.2.0" or (discovery and "0.1.1" or "0.1.0"))
+            local fixture_version=selected.positive_state and "0.4.0" or (selected.private_credits and "0.3.0" or (selected.space_age and "0.2.0" or (discovery and "0.1.1" or "0.1.0")))
             local active_mods={base=base_version,["more-infinite-research"]=mir_version,["mir-fixture-mir5-library-multiplayer"]=fixture_version,["mir-fixture-mir5-active-mods-observer"]="0.1.0"}
             if selected.space_age then
               active_mods["elevated-rails"]="2.1.23"
@@ -514,6 +563,11 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
               end,
             }
             environment._G=environment;setmetatable(environment,{__index=function(_,name)return _G[name]end})
+            environment.require=function(name)
+              assert(name=="positive-state" and selected.positive_state,"unexpected fixture import")
+              local module,message=loadfile(positive_state_path,"t",environment);assert(module,message)
+              return module()
+            end
             local chunk,message=loadfile(path,"t",environment);assert(chunk,message)
             local ok,result=pcall(chunk);if not ok then return {ok=false,message=tostring(result)} end
             local function call(callback,event)
@@ -602,6 +656,14 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
             local before_load={phase=storage[key].phase,joins=storage[key].join_events,screenshots=storage[key].screenshot_calls,
               availability=storage[key].availability_checked,first=storage[key].measurements.first_open,native=storage[key].native.recipes["iron-gear-wheel"]}
             ok,result=call(callbacks.load);if not ok then return {ok=false,message=result} end
+            if selected.positive_state then
+              if opponent=="positive-holder-lost" then force.technologies[private_credit_ids[1]].level=1
+              elseif opponent=="positive-holder-enabled" then force.technologies[private_credit_ids[4]].enabled=true
+              elseif opponent=="positive-module-lost" then force.recipes["productivity-module"].productivity_bonus=0
+              elseif opponent=="positive-cannon-lost" then force.cannon_speed=0
+              elseif opponent=="positive-foreign-flags" then force.technologies["mir5-fixture-foreign-hidden-research"].prototype.hidden=false
+              elseif opponent=="positive-personal-hidden-lost" then en.personal_hidden={} end
+            end
             local after_load={phase=storage[key].phase,joins=storage[key].join_events,screenshots=storage[key].screenshot_calls,
               availability=storage[key].availability_checked,first=storage[key].measurements.first_open,native=storage[key].native.recipes["iron-gear-wheel"]}
             local load_unchanged=before_load.phase==after_load.phase and before_load.joins==after_load.joins
@@ -621,7 +683,7 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
               load_unchanged=load_unchanged,join_events=storage[key].join_events,measurements=storage[key].measurements,
               profiler_logs=profiler_logs,lab_diagnostics=lab_diagnostics,lab_insert_counts=insert_counts,
               rejected_bulk_inserts=rejected_bulk_inserts,private_query_calls=private_query_calls,
-              private_query_order=private_query_order}
+              private_query_order=private_query_order,positive_seed_resets=reset_count}
           end
         ''')
 
@@ -2026,6 +2088,154 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
         self.assertFalse(rejected["ok"])
         self.assertIn("unexpected non-base F200 multiplayer closure", rejected["message"])
 
+    def test_positive_state_mode_preserves_seeded_effects_and_observes_saved_personal_filters(self):
+        for target in ("f200-positive-state", "f210-positive-state"):
+            with self.subTest(target=target):
+                result = self.run_case(target=target)
+                self.assertTrue(result["ok"], result["message"])
+                self.assertEqual(result["positive_seed_resets"], 1)
+                self.assertTrue(result["load_unchanged"])
+                self.assertEqual((result["join_events"], len(result["screenshots"]), len(result["saves"])), (6, 10, 2))
+                for marker in result["markers"]:
+                    witness = marker["witnesses"]["positive_private_state"]
+                    self.assertEqual(witness["ownership"], "fixture-seeded-disposable-world")
+                    self.assertFalse(witness["imported_earnings"])
+                    self.assertTrue(witness["seeded_once"])
+                    self.assertEqual(sorted(holder["level"] for holder in witness["native"]["holders"].values()), [2, 3, 4, 5])
+                    self.assertEqual(witness["native"]["module_productivity"], {
+                        "speed-module": .01, "productivity-module": .02, "efficiency-module": .03,
+                    })
+                    self.assertAlmostEqual(witness["native"]["cannon_speed"], .4)
+                    completed = marker["stage"] == "completed"
+                    self.assertEqual(witness["persisted_personal_hidden_checked"], completed)
+                    self.assertEqual(witness["foreign_inspection_queries"], 44 if completed else 0)
+        opponents = {
+            "positive-not-fresh": "seed requires fresh zero-credit holder",
+            "positive-holder-lost": "positive native holder changed",
+            "positive-holder-enabled": "positive native holder changed",
+            "positive-module-lost": "positive module contribution changed",
+            "positive-cannon-lost": "positive cannon contribution changed",
+            "positive-foreign-flags": "foreign hidden technology changed",
+            "positive-foreign-suppressed": "foreign hidden research was suppressed",
+            "positive-personal-hidden-lost": "excluded research or native action exposed",
+        }
+        for target in ("f200-positive-state", "f210-positive-state"):
+            for opponent, message in opponents.items():
+                with self.subTest(target=target, opponent=opponent):
+                    result = self.run_case(opponent, target=target)
+                    self.assertFalse(result["ok"])
+                    self.assertIn(message, result["message"])
+
+    def test_positive_state_admission_projection_and_typed_readback_refuse_drift(self):
+        markers = {target: self.run_case(target=target)["markers"] for target in ("f200-positive-state", "f210-positive-state")}
+        script = r'''
+          $ErrorActionPreference='Stop';Set-StrictMode -Version Latest
+          function Assert-Session([bool]$Condition,[string]$Message){if(-not$Condition){throw $Message}}
+          function Get-MIRImmutableInputSha256([string]$Path){(Get-FileHash -LiteralPath $Path -Algorithm SHA256).Hash.ToUpperInvariant()}
+          . (Join-Path $env:MIR_TEST_REPO 'tools/lib/compatibility/LibraryActivation.ps1')
+          foreach($file in @($env:MIR_TEST_WRAPPER,$env:MIR_TEST_SESSION)){
+            $tokens=$null;$errors=$null
+            $ast=[Management.Automation.Language.Parser]::ParseFile($file,[ref]$tokens,[ref]$errors)
+            if($errors.Count){throw 'native runner parse failed'}
+            foreach($name in @('Assert-MultiplayerFixtureSelection','New-LibraryPositiveFixtureSourceProjection','Get-LibraryWitnessTarget','Test-LibraryInteger','Assert-LibraryWitnessBoolean','Assert-LibraryWitnessInteger','Assert-LibraryPositiveWitness')){
+              $found=@($ast.FindAll({param($n)$n-is[Management.Automation.Language.FunctionDefinitionAst]-and$n.Name-ceq$name},$true))
+              if($found.Count-gt1){throw 'ambiguous definition'}
+              if($found.Count-eq1){Invoke-Expression $found[0].Extent.Text}
+            }
+          }
+          $sets=Get-Content -LiteralPath $env:MIR_TEST_POSITIVE_MARKERS -Raw|ConvertFrom-Json
+          foreach($edition in @('f200','f210')){
+            $profileName=if($edition-ceq'f200'){'library-positive-state-current-f200-2077.json'}else{'library-positive-state-standalone-f210-2123.json'}
+            $profile=Get-Content -LiteralPath (Join-Path $env:MIR_TEST_REPO ('tests/profiles/'+$profileName)) -Raw|ConvertFrom-Json -AsHashtable
+            $mirName=if($edition-ceq'f200'){'more-infinite-research_5.0.20000.zip'}else{'more-infinite-research_5.0.21000.zip'}
+            $target=Assert-MultiplayerFixtureSelection $profile $profile.engine.sha256 'library-multiplayer' $profile.archive_sha256[$mirName] 7168
+            if(-not$target.positive_private_state_checks){throw 'positive admission flag absent'}
+            $spec=@{library_witness_target=@{engine_sha256=$target.engine_sha256;base=$target.base;mir=$target.mir};api_client_consumers=$true;private_credit_checks=$true;positive_private_state_checks=$true}
+            $validated=Get-LibraryWitnessTarget $spec $target.engine_sha256
+            if(-not$validated.positive_private_state_checks){throw 'positive session flag absent'}
+            foreach($mutation in @('false','string','no-private','space-age')){
+              $bad=$spec|ConvertTo-Json -Depth 12|ConvertFrom-Json -AsHashtable
+              switch($mutation){
+                'false'{$bad.positive_private_state_checks=$false}
+                'string'{$bad.positive_private_state_checks='true'}
+                'no-private'{$bad.Remove('private_credit_checks')|Out-Null}
+                'space-age'{$bad.space_age_library=$true}
+              }
+              $rejected=$false
+              try{$null=Get-LibraryWitnessTarget $bad $target.engine_sha256}catch{$rejected=$true}
+              if(-not$rejected){throw "positive session accepted $mutation"}
+            }
+            foreach($mutation in @('no-positive','false-positive','string-positive','wrong-version','wrong-package','missing-beta','wrong-budget','wrong-case')){
+              $bad=$profile|ConvertTo-Json -Depth 20|ConvertFrom-Json -AsHashtable
+              $budget=7168;$case='library-multiplayer'
+              switch($mutation){
+                'no-positive'{$bad.Remove('positive_private_state_checks')|Out-Null}
+                'false-positive'{$bad.positive_private_state_checks=$false}
+                'string-positive'{$bad.positive_private_state_checks='true'}
+                'wrong-version'{@($bad.mods|Where-Object {$_.name-ceq'mir-fixture-mir5-library-multiplayer'})[0].version='0.3.0'}
+                'wrong-package'{$bad.archive_sha256[$mirName]='A'*64}
+                'missing-beta'{$bad.mods=@($bad.mods|Where-Object {$_.name-cne'mir-fixture-mir5-api-beta'})}
+                'wrong-budget'{$budget=8192}
+                'wrong-case'{$case='library-paired-browser'}
+              }
+              $rejected=$false
+              try{$null=Assert-MultiplayerFixtureSelection $bad $profile.engine.sha256 $case $profile.archive_sha256[$mirName] $budget}catch{$rejected=$true}
+              if(-not$rejected){throw "positive profile accepted $mutation"}
+            }
+            $projection=New-LibraryPositiveFixtureSourceProjection -RepoRoot $env:MIR_TEST_REPO -OutputRoot (Join-Path $env:MIR_TEST_TEMP $edition) -Target $edition
+            $files=@(Get-ChildItem -LiteralPath $projection.source -File|Sort-Object Name)
+            if(($files.Name-join'|')-cne'control.lua|data.lua|info.json|positive-state.lua|settings-updates.lua'){throw 'positive projection membership differs'}
+            foreach($member in $projection.members){
+              if((Get-FileHash -LiteralPath (Join-Path $projection.source $member.path)).Hash-cne(Get-FileHash -LiteralPath (Join-Path $env:MIR_TEST_REPO $member.source)).Hash){throw 'projected source bytes differ'}
+            }
+            $archive=Join-Path $env:MIR_TEST_TEMP ($edition+'-positive.zip')
+            $zip=[IO.Compression.ZipFile]::Open($archive,[IO.Compression.ZipArchiveMode]::Create)
+            try{foreach($file in $files){
+              $entry=$zip.CreateEntry('mir-fixture-mir5-library-multiplayer_0.4.0/'+$file.Name)
+              $stream=$entry.Open();try{$bytes=[IO.File]::ReadAllBytes($file.FullName);$stream.Write($bytes,0,$bytes.Length)}finally{$stream.Dispose()}
+            }}finally{$zip.Dispose()}
+            Assert-MIRLibraryFixtureArchive -Archive $archive -SourceDirectory $projection.source
+            $zip=[IO.Compression.ZipFile]::Open($archive,[IO.Compression.ZipArchiveMode]::Update)
+            try{$null=$zip.CreateEntry('mir-fixture-mir5-library-multiplayer_0.4.0/developer.txt')}finally{$zip.Dispose()}
+            $rejected=$false
+            try{Assert-MIRLibraryFixtureArchive -Archive $archive -SourceDirectory $projection.source}catch{$rejected=$true}
+            if(-not$rejected){throw 'positive archive accepted an extra developer member'}
+            $targetWitness=[pscustomobject]@{positive_private_state_checks=$true}
+            foreach($marker in $sets.PSObject.Properties[($edition+'-positive-state')].Value){
+              Assert-LibraryPositiveWitness $marker.witnesses $targetWitness $marker.stage
+            }
+            $complete=@($sets.PSObject.Properties[($edition+'-positive-state')].Value|Where-Object {$_.stage-ceq'completed'})[0].witnesses
+            foreach($mutation in @('missing','extra-field','import-claim','false-seeded','lost-holder','enabled-holder','lost-module','lost-cannon','lost-persistence','missing-query','unexpected-mode')){
+              $bad=$complete|ConvertTo-Json -Depth 30|ConvertFrom-Json
+              $actualTarget=$targetWitness
+              switch($mutation){
+                'missing'{$bad.PSObject.Properties.Remove('positive_private_state')}
+                'extra-field'{$bad.positive_private_state|Add-Member extra $true}
+                'import-claim'{$bad.positive_private_state.imported_earnings=$true}
+                'false-seeded'{$bad.positive_private_state.seeded_once=$false}
+                'lost-holder'{$bad.positive_private_state.native.holders.'mir-legacy-module-credit-speed-module'.level=1}
+                'enabled-holder'{$bad.positive_private_state.native.holders.'mir-legacy-cannon-credit-rocket-shooting-speed'.enabled=$true}
+                'lost-module'{$bad.positive_private_state.native.module_productivity.'productivity-module'=0.0}
+                'lost-cannon'{$bad.positive_private_state.native.cannon_speed=0.0}
+                'lost-persistence'{$bad.positive_private_state.persisted_personal_hidden_checked=$false}
+                'missing-query'{$bad.positive_private_state.foreign_inspection_queries=43}
+                'unexpected-mode'{$actualTarget=[pscustomobject]@{}}
+              }
+              $rejected=$false
+              try{Assert-LibraryPositiveWitness $bad $actualTarget 'completed'}catch{$rejected=$true}
+              if(-not$rejected){throw "positive witness accepted $mutation"}
+            }
+          }
+        '''
+        with tempfile.TemporaryDirectory() as temporary:
+            path = Path(temporary) / "markers.json"
+            path.write_text(json.dumps(markers), encoding="utf-8")
+            process = subprocess.run(["pwsh", "-NoProfile", "-Command", script], cwd=ROOT, env={
+                **os.environ, "MIR_TEST_REPO": str(ROOT), "MIR_TEST_WRAPPER": str(WRAPPER),
+                "MIR_TEST_SESSION": str(SESSION), "MIR_TEST_POSITIVE_MARKERS": str(path), "MIR_TEST_TEMP": temporary,
+            }, capture_output=True, text=True)
+        self.assertEqual(process.returncode, 0, process.stdout + process.stderr)
+
     def test_two_real_client_join_rejoin_and_restart_state_machine(self):
         result = self.run_case()
         self.assertTrue(result["ok"], result["message"])
@@ -2142,7 +2352,7 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
             $node -is [Management.Automation.Language.FunctionDefinitionAst]
           },$true))
           $names=@('Test-LibraryInteger','Get-LibraryWitnessTarget','Assert-LibraryWitnessIdentityMode','Assert-LibraryWitnessBoolean','Assert-LibraryWitnessInteger',
-            'Assert-LibraryLiveRefresh','Get-StageMarker')
+            'Assert-LibraryLiveRefresh','Assert-LibraryPositiveWitness','Get-StageMarker')
           $definitions=@{}
           foreach($name in $names){
             $matches=@($allDefinitions|Where-Object {$_.Name -ceq $name})
@@ -2617,7 +2827,12 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
         self.assertNotIn("game.create_profiler", source)
         self.assertIn("rendering_pending_external_png_readback=true", source)
         self.assertNotIn("game.create_player", source)
-        self.assertNotIn("require(", source)
+        self.assertEqual(source.count('require("positive-state")'), 1)
+        self.assertNotIn("require(", source.replace('require("positive-state")', ""))
+        self.assertLess(source.index('require("positive-state")'), source.index('local GEAR_RECIPES'))
+        positive = (ROOT / "tests/fixtures/library-positive-state/positive-state.lua").read_text(encoding="utf-8")
+        for forbidden in ("require(", "storage.", "storage[", "script.raise_event", "script.on_event"):
+            self.assertNotIn(forbidden, positive)
         self.assertNotIn("storage.mir_library", source)
         self.assertNotIn("script.raise_event", source)
         self.assertNotIn("research_queue_enabled", source)

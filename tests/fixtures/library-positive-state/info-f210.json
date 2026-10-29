@@ -1,0 +1,8 @@
+{
+  "name": "mir-fixture-mir5-library-multiplayer",
+  "version": "0.4.0",
+  "title": "MIR Library positive-state fixture",
+  "author": "MIR maintainers",
+  "factorio_version": "2.1",
+  "dependencies": ["base >= 2.1.23", "more-infinite-research = 5.0.21000"]
+}
