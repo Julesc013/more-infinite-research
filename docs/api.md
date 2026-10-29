@@ -5,7 +5,7 @@ applies_to: "MIR development"
 audience: developer
 doc_type: reference
 owner: mir-maintainers
-last_reviewed: 2026-10-27
+last_reviewed: 2026-10-29
 supersedes: []
 superseded_by: []
 source_of_truth_for:
@@ -16,7 +16,7 @@ source_of_truth_for:
 
 ## Implemented candidate interface
 
-The [API contract](../spec/api.md) defines one public name, two lifecycle surfaces and a Lua-first SDK. The candidate implements the [data helper](../source/api/v1/data.lua) and [runtime queries](../source/api/v1/runtime.lua). They have exact-source native consumer evidence, but API1.0 stability and MIR5 release acceptance still require the remaining affected client and final-candidate checks. Use the independent examples in disposable test worlds while qualification continues.
+The [API contract](../spec/api.md) defines one public name, two lifecycle surfaces and a Lua-first SDK. The candidate implements the [data helper](../source/api/v1/data.lua) and [runtime queries](../source/api/v1/runtime.lua). Two independently installed consumers have named native data, physical/save and current real-client evidence. API1.0 stability still requires the final documented-subset verdict and version freeze; the overall MIR5 release verdict remains separate. Use the independent examples in disposable test worlds while qualification continues.
 
 A required extension declares a normal dependency on MIR, calls the data helper only after its own references are available, and owns its runtime behavior. An optional extension checks for MIR and its capability before using it; its absent-MIR case must actually load.
 
@@ -45,6 +45,14 @@ api.add_productivity({
 The [SDK](../sdk/README.md) links the required alpha and optional late beta test mods. The [F200 native consumer chain](../spec/evidence/api-consumers-f200-chain.json) verifies immediate publication, detached queries, actual200 then202 cables from equal100-plate inputs, save and two cold reloads. That fixture uses native research setters rather than labs. The separate [optional-absence chain](../spec/evidence/api-optional-absence-chain.json) proves native loading without MIR; it is CreateOnly evidence, without save or gameplay coverage. Historical targets and final-candidate clients retain their own capability and qualification obligations.
 
 The [canonical draft3 native chain](../spec/evidence/api-canonical-native-chain.json) records source `554c5af31cc2986e3f0901f68909a447bd4c6304` on exact2.0.77 and2.1.23 with93 verified artifact members. Its two F200 consumers pass actual effects, physical200→202 cable production, save and two unchanged-save cold reloads using native research setters. F210 passes two independently named namespace consumers at native creation; the representative science-ambiguity case also loads and remains explicitly unqualified for the unknown reporter profile. These results exercise the restricted draft3 declaration boundary; they do not establish real joining-client or final-current-package acceptance. Earlier staging and nested-lock controller failures remain preserved separately.
+
+## Current consumer qualification boundary
+
+The [current7b0 production applicability review](../spec/evidence/api-production-current7b0-aero-applicability-r01.json) independently verifies nine portable bodies,91 original custody members and eight actual logs for the original12c F200/F210 Base production/save cases. Seven consumed entrypoint/API/Generator/config/target payloads match each actual current ZIP. The original200/202 cables from equal100-plate batches and two unchanged-save cold reloads per target retain their recorded2.0.77/D3 or2.1.23/SteamFE4 identities; this is no new2DDD or standalone8DC physical run. These fixtures use native research setters, not labs.
+
+The corrected [F200 client case](../spec/evidence/library-f200-native-names-private-native-chain-r01.json) and [F210 Base/Space Age cases](../spec/evidence/library-f210-native-names-private-native-chain-r01.json) now observe both independently installed consumers on1D45/2DDD. Across eighteen actual EN/DE client phases at initial join,rejoin and saved-host restart, each client log contains the Alpha/Beta read-only load-query pair with preserved native API research/effects. Queries run in the first game-available event after load; their on_load callbacks only register the pending local observation. These are current2.0.77/D3 and standalone2.1.23/8DC client observations, separate from the older production experiments. The [F200 optional-absence review](../spec/evidence/api-optional-absence-f200-aero-applicability-r01.json) retains its exact no-MIR CreateOnly result; an inactive MIR archive is not a consumed input.
+
+This covers the named draft3 consumers and tested lifecycle paths. It does not qualify arbitrary third-party methods,overhaul closures or historical target capabilities. The [available-archive consumer audit](../spec/evidence/api-consumer-available-archive-audit-chain.json) retains zero named old-interface/SDK/MEP matches in31 verified archives while preserving the runtime bridges; computed names and external consumers remain unknown. No old externally consumed contract is retired by these results. Before final stabilization, independently review the documented subset,existing boundary-budget controls and capability/version records against the accepted package; no API expansion is required for this release.
 
 ## What an extension can rely on
 
