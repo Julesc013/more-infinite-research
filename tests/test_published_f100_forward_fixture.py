@@ -33,9 +33,16 @@ function forward_flow(control_path, source_plan, target_plan, definitions, oppon
   local packs={"military-science-pack","utility-science-pack"}
   local function inventory(count)
     local inv={values={}}
-    for _,n in ipairs(packs)do inv.values[n]=count end
+    for _,n in ipairs(packs)do
+      inv.values[n]=count
+      inv[#inv+1]={name=n,valid_for_read=count>0,count=count,durability=1}
+    end
     function inv.get_item_count(n)return inv.values[n]or 0 end
-    function inv.insert(r)inv.values[r.name]=(inv.values[r.name]or 0)+r.count;return r.count end
+    function inv.insert(r)
+      inv.values[r.name]=(inv.values[r.name]or 0)+r.count
+      for _,stack in ipairs(inv)do if stack.name==r.name then stack.valid_for_read=true;stack.count=stack.count+r.count end end
+      return r.count
+    end
     return inv
   end
   local source_input=inventory(31)
@@ -149,13 +156,17 @@ function forward_flow(control_path, source_plan, target_plan, definitions, oppon
   callbacks.on_configuration_changed();assert(#labs==1 and original.forward.phase=="successor-lab")
   callbacks[1]();assert(labs[1].energy>0)
   player.technologies[direct].level=3;player.manual_mining_speed_modifier=.1
-  local inv=labs[1].get_inventory();for _,n in ipairs(packs)do inv.values[n]=31 end
+  local inv=labs[1].get_inventory()
+  -- Native tools retain their stack count during partial durability use.
+  for _,stack in ipairs(inv)do stack.durability=1-35/60 end
+  if opponent=="successor-science"then inv[1].durability=1 end
   callbacks[2]({research=player.technologies[direct]})
   table.remove(player.research_queue,1);player.current_research=player.research_queue[1];player.research_progress=0
   callbacks[1]();callbacks[1]()
   local expected_saves=bridge_plan==""and 2 or 3
   assert(saves==expected_saves and original.forward.successor_labs==1)
   if opponent=="completed-effect"then player.bonus=0 end
+  if opponent=="cold-science"then inv[1].durability=1 end
   for i=1,2 do
     callbacks=load_stage(target_plan,true)
     callbacks.on_configuration_changed() -- A completed reload still checks all state.
@@ -211,7 +222,7 @@ end
     def test_destination_faults_and_completed_configuration_drift_remain_failures(self):
         for target in ("f110", "f210"):
             for opponent in ("destination-level", "destination-cap", "destination-effect", "destination-laser",
-                             "destination-inserter", "destination-foreign", "destination-paused", "destination-queue", "completed-effect"):
+                             "destination-inserter", "destination-foreign", "destination-paused", "destination-queue", "completed-effect", "successor-science", "cold-science"):
                 with self.subTest(target=target, opponent=opponent):
                     self.setUp()
                     with self.assertRaises(Exception):

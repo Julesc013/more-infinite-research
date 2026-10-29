@@ -107,6 +107,26 @@ local function original_source(value, completed)
   if completed then queue(force,PROBE,nil,0)
   else queue(force,DIRECT,PROBE,.42) end
 end
+local function successor_science(saved)
+  local lab=saved.lab
+  if not lab or lab.valid~=true or lab.active~=false or lab.energy~=0
+      or not close(saved.successor_units,35/60) then fail("successor frozen lab/work differs") end
+  local input=lab.get_inventory(defines.inventory.lab_input)
+  for _, pack in ipairs({"military-science-pack","utility-science-pack"}) do
+    local units,found=0,false
+    for index=1,#input do
+      local stack=input[index]
+      if stack.valid_for_read and stack.name==pack then
+        if type(stack.count)~="number" or stack.count<1 or stack.count%1~=0
+            or type(stack.durability)~="number" or stack.durability<=0 or stack.durability>1 then
+          fail("successor native science stack differs")
+        end
+        units,found=units+stack.count-1+stack.durability,true
+      end
+    end
+    if not found or not close(units,32-saved.successor_units) then fail("successor actual fractional science consumption differs") end
+  end
+end
 local function witness(value, completed)
   original_source(value,completed)
   local saved = value.forward
@@ -114,6 +134,7 @@ local function witness(value, completed)
       or saved.seeded_finite_lasers ~= 7 or saved.seeded_inserter_levels ~= 1 then fail("enhanced source provenance differs") end
   if saved.successor_labs ~= (completed and 1 or 0)
       or (completed and value.successor_direct_finished ~= 1) then fail("successor real lab count differs") end
+  if completed then successor_science(saved) end
   local force, observed = game.forces.player, snapshot(game.forces.player)
   -- Completing one new mining level is the only earned-state delta permitted.
   if completed then
@@ -190,6 +211,8 @@ local function start_successor(value)
       or value.forward.successor_labs ~= 0 then fail("successor transition phase differs") end
   local force, surface = game.forces.player, game.surfaces[1]
   if not close(force.laboratory_speed_modifier,0) or not close(force.laboratory_productivity_bonus,0) then fail("native lab modifiers differ") end
+  local units=math.ceil((1-force.research_progress)*60)/60
+  if not close(units,35/60) then fail("successor partial work differs") end
   local position = force.get_spawn_position(surface)
   local lab = surface.create_entity{name="lab",position={x=position.x+8,y=position.y},force=force}
   if not lab or lab.valid ~= true then fail("successor real lab creation failed") end
@@ -198,6 +221,7 @@ local function start_successor(value)
     if inventory.insert{name=pack,count=32} ~= 32 then fail("successor lab science insertion failed") end
   end
   value.forward.lab, value.forward.phase, value.forward.deadline = lab,"successor-lab",game.tick+18000
+  value.forward.successor_units=units
   value.phase, value.successor_direct_finished = "mir5-successor",0
 end
 local function marker(stage, value)
@@ -249,10 +273,7 @@ script.on_event(defines.events.on_tick,function()
   end
   if saved.phase == "successor-observe" then
     saved.lab.active,saved.lab.energy = false,0
-    local inventory = saved.lab.get_inventory(defines.inventory.lab_input)
-    for _, pack in ipairs({"military-science-pack","utility-science-pack"}) do
-      if inventory.get_item_count(pack) >= 32 then fail("successor lab consumed no science") end
-    end
+    successor_science(saved)
     saved.phase,value.phase = "successor-complete","mir5-complete"
   end
   local completed = plan.role=="successor"
