@@ -126,6 +126,7 @@ $controls = @(
   [ordered]@{path='tests/test_repair_stress_fixture.py';lua=$true},
   [ordered]@{path='tests/test_agriculture.py';lua=$true},
   [ordered]@{path='tests/test_agriculture_scale_fixture.py';lua=$true},
+  [ordered]@{path='tests/test_large_factory_activity_fixture.py';lua=$true},
   [ordered]@{path='tests/test_spoilage.py';lua=$true},
   [ordered]@{path='tests/test_scripted_effects_lifecycle.py';lua=$true},
   [ordered]@{path='tests/test_settings_profile.py';lua=$true},
