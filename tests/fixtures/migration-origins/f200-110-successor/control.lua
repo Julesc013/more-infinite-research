@@ -433,7 +433,26 @@ local function reset_after_candidate_lab(target, target_config, state_value, suc
   complete(target, target_config, state_value, successor)
 end
 
-script.on_configuration_changed(begin)
+script.on_configuration_changed(function()
+  local target, target_config = exact_target()
+  local state_value = state()
+  if state_value.successors ~= nil and type(state_value.successors) ~= "table" then
+    fail("saved successor map is malformed")
+  end
+  local successor = state_value.successors and state_value.successors[target]
+  if successor == nil then return begin() end
+  -- Adding an observation fixture to a protected completed successor is a
+  -- configuration event, not another first upgrade. Recheck the entire
+  -- original preservation contract without a new lab, reset, save or write.
+  if type(successor) ~= "table" or successor.phase ~= "completed" then
+    fail("configuration changed an incomplete or unknown successor")
+  end
+  if successor.candidate_delta ~= direct_delta(technology(game.forces.player, catalogue.direct)) then
+    fail("completed successor direct effect differs")
+  end
+  complete(target, target_config, state_value, successor)
+  log("[MIR5_MIGRATION_110_COMPLETED_CONFIGURATION] verified " .. target)
+end)
 script.on_load(function()
   local value = storage and storage[KEY]
   loaded = type(value) == "table" and type(value.successors) == "table"

@@ -550,7 +550,7 @@ class MigrationOriginF200110SuccessorControls(unittest.TestCase):
         self.lua.globals().legacy_module_definitions_path = LEGACY_MODULE_DEFINITIONS.as_posix()
         self.lua.globals().legacy_module_runtime_path = LEGACY_MODULE_RUNTIME.as_posix()
         self.lua.execute(r'''
-          function migration_origin_110_successor_lifecycle(target, source_fixture_name, active_wrapper_name, catalogue_fixture_name, legacy_module_bonus, reset_drops_module_bonus, saved_battery_token, current_recipe_scalar, duplicate_current_recipe, foreign_saved, foreign_queue_progress, foreign_current_saved, foreign_current_technology, recipe_snapshot_variant, direct_recipe_scalar, duplicate_direct_recipe)
+          function migration_origin_110_successor_lifecycle(target, source_fixture_name, active_wrapper_name, catalogue_fixture_name, legacy_module_bonus, reset_drops_module_bonus, saved_battery_token, current_recipe_scalar, duplicate_current_recipe, foreign_saved, foreign_queue_progress, foreign_current_saved, foreign_current_technology, recipe_snapshot_variant, direct_recipe_scalar, duplicate_direct_recipe, completed_configuration)
             local callbacks={events={}}
             local env={storage={},logs={},created_labs=0,saved=false,
               script={active_mods={},on_configuration_changed=function(fn) callbacks.configuration=fn end,
@@ -797,6 +797,28 @@ class MigrationOriginF200110SuccessorControls(unittest.TestCase):
               local saved_phase=state.successors[target].phase
               callbacks.load();env.game.tick=2;callbacks.events[2]()
                marker_counts.after_first_reload=marker_count()
+              if completed_configuration~=nil then
+                local successor=state.successors[target]
+                if completed_configuration=="player-level" then player.technologies[catalogue.direct].level=4
+                elseif completed_configuration=="player-effect" then player.recipes[catalogue.gear_recipe].productivity_bonus=.25
+                elseif completed_configuration=="module-holder" then player.technologies[catalogue.module_credit.holders[1].id].level=1
+                elseif completed_configuration=="module-effect" then player.recipes["speed-module"].productivity_bonus=.10
+                elseif completed_configuration=="foreign-queue" then foreign.research_progress=.43
+                elseif completed_configuration=="detached-progress" then detached.technologies[catalogue.direct].saved_progress=.28
+                elseif completed_configuration=="extra-lab" then successor.candidate_actual_labs=2
+                elseif completed_configuration=="incomplete" then successor.phase="await-observation"
+                elseif completed_configuration=="unknown-phase" then successor.phase="unknown"
+                elseif completed_configuration=="delta" then successor.candidate_delta=.2
+                elseif completed_configuration=="target-version" then env.script.active_mods["more-infinite-research"]="5.0.21001" end
+                local before={labs=env.created_labs,adds=player.add_calls,resets=player.reset_calls,order=#order,
+                  direct=player.technologies[catalogue.direct].level,bonus=player.recipes[catalogue.gear_recipe].productivity_bonus}
+                callbacks.configuration({mod_changes={["mir-fixture-mir5-imported-library"]={new_version="0.1.0"}}})
+                callbacks.configuration({mod_changes={}})
+                assert(env.created_labs==before.labs and player.add_calls==before.adds and player.reset_calls==before.resets
+                  and #order==before.order and player.technologies[catalogue.direct].level==before.direct
+                  and player.recipes[catalogue.gear_recipe].productivity_bonus==before.bonus,
+                  "completed configuration mutated native fixture state")
+              end
                env.game.tick=3;callbacks.events[2]()
                marker_counts.after_ordinary_tick=marker_count()
                callbacks.load();env.game.tick=4;callbacks.events[2]()
@@ -893,6 +915,31 @@ class MigrationOriginF200110SuccessorControls(unittest.TestCase):
                                  result["marker_counts"])
                 self.assertTrue(result["source_state_changed"])
                 self.assertTrue(result["active_state_changed"])
+
+    def test_completed_successor_configuration_is_read_only_and_preserves_all_original_assertions(self):
+        self._install_lifecycle_model()
+        source = "mir-fixture-mir5-migration-origin-f200-110-source"
+        run = self.lua.eval("migration_origin_110_successor_lifecycle")
+        targets = ("f200_source_defaults", "f210_source_defaults", "f210_source_defaults_modules_disabled")
+        for target in targets:
+            def invoke(opponent):
+                return py(run(target, source, source, *([None] * 13), opponent))
+            with self.subTest(target=target):
+                result = invoke("unchanged")
+                self.assertTrue(result["ok"], result["message"])
+                self.assertEqual((1, 1, 1), (result["created_labs"], result["player_add_calls"], result["player_reset_calls"]))
+                self.assertEqual(["reset:player", "save"], result["order"])
+                self.assertEqual((3, .2, .42, .27), (result["player_level"], result["player_gear"], result["foreign_progress"], result["detached_progress"]))
+                self.assertEqual([2, 2, 2], result["player_module_holders"])
+                self.assertEqual("completed", result["state"]["successors"][target]["phase"])
+                self.assertEqual({"after_first_reload": 2, "after_ordinary_tick": 2, "after_second_reload": 3}, result["marker_counts"])
+            for opponent in ("player-level", "player-effect", "module-holder", "module-effect", "foreign-queue", "detached-progress", "extra-lab", "incomplete", "unknown-phase", "delta", "target-version"):
+                with self.subTest(target=target, opponent=opponent):
+                    result = invoke(opponent)
+                    self.assertFalse(result["ok"], result["message"])
+                    self.assertEqual((1, 1, 1), (result["created_labs"], result["player_add_calls"], result["player_reset_calls"]))
+                    self.assertEqual(["reset:player", "save"], result["order"])
+                    self.assertEqual(2, result["marker_counts"]["after_first_reload"])
 
     def test_modules_disabled_successor_keeps_source_rights_but_never_reenables_the_public_row(self):
         self._install_lifecycle_model()
