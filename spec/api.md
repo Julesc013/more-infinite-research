@@ -5,7 +5,7 @@ applies_to: "MIR development"
 audience: developer
 doc_type: specification
 owner: mir-maintainers
-last_reviewed: 2026-10-27
+last_reviewed: 2026-10-29
 supersedes: []
 superseded_by: []
 source_of_truth_for:
@@ -63,7 +63,7 @@ No universal `extend_technology(name, arbitrary_changes)` patch language, owners
 
 ## Types and errors
 
-Use Lua strings for stable IDs; booleans for actual flags; finite numbers with explicit native units; dense arrays where order/multiplicity matters; ordinary maps for named lookup. Do not convert all integer fields to a new ID/handle system. Avoid LuaObjects, callbacks, metatables and persistent-state references in public result records. At the public input boundary, reject cycles/executable values; limits should bound only the submitted record, not scan the world. Establish measured size/depth limits before API stabilization, without excluding historical valid data silently.
+Use Lua strings for stable IDs; booleans for actual flags; finite numbers with explicit native units; dense arrays where order/multiplicity matters; ordinary maps for named lookup. Do not convert all integer fields to a new ID/handle system. Avoid LuaObjects, callbacks, metatables and persistent-state references in public result records. At the public input boundary, reject cycles/executable values; limits should bound only the submitted record, not scan the world. Establish measured size/depth limits before API stabilization, without excluding historical valid data silently. The implemented draft3 admission currently combines64 family rows,512 traversed definition entries,depth16 and4096 bytes per string/key,with at most64 recipe targets. All limits apply together;the row ceiling does not override the shared entry budget. The [host boundary observation](evidence/api-boundary-host-aero-measurement-r01.json) records bounded named-shape measurements without changing these limits or claiming native timing/API stability.
 
 Runtime `ResearchStatus` exposes native semantics explicitly:
 
