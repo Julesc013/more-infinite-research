@@ -26,6 +26,8 @@ param(
   [switch]$F110SameEditionSuccessor,
   # The MIR5 F100 -> F110 laser identity/effect-category boundary.
   [ValidateSet('','source','successor')][string]$F100F110LaserStage='',
+  # Exact published4.7.3 F100 witness extension and its two forward endpoints.
+  [ValidateSet('','source','bridge','f110','f210')][string]$PublishedF100ForwardStage='',
   [switch]$CreateOnly,
   # Active runtime seeds are earned by the selected fixture before the
   # benchmark loads the save.  This is deliberately narrower than CreateOnly:
@@ -185,6 +187,105 @@ function Get-F100F110LaserFixture([string]$Repo,[hashtable]$Profile,[string[]]$S
   $info=Get-Content -LiteralPath (Join-Path $source 'info.json') -Raw|ConvertFrom-Json -AsHashtable
   Assert-Fixture ([string]$info.name -ceq 'mir-fixture-f100-f110-laser' -and [string]$info.version -ceq $fixtureVersion -and [string]$info.factorio_version -ceq $line) 'laser fixture info differs'
   return [pscustomobject]@{source=$source;name=[string]$info.name;version=$fixtureVersion;stage=$Stage;factorio_version=$line}
+}
+function Read-PublishedF100DirectRefusal([string]$Repo,[Collections.IDictionary]$Binding,[string]$InputSha) {
+  Assert-Fixture ($null -ne $Binding) 'published F100 bridge requires retained refusal bodies'
+  function Read-RefusalBody($Reference,[int]$MaximumBytes) {
+    Assert-Fixture ($Reference -is [Collections.IDictionary] -and $Reference.path -is [string] -and $Reference.sha256 -cmatch '^[A-F0-9]{64}$') 'refusal body reference differs'
+    $path=if([IO.Path]::IsPathRooted($Reference.path)){$Reference.path}else{Join-Path $Repo $Reference.path}
+    $file=Get-Item -LiteralPath $path -ErrorAction Stop
+    Assert-Fixture (-not $file.PSIsContainer -and $file.Length -gt 0 -and $file.Length -le $MaximumBytes -and (Get-FixtureSha $file.FullName) -ceq $Reference.sha256) 'retained refusal body length/hash differs'
+    [pscustomobject]@{path=$file.FullName;text=[IO.File]::ReadAllText($file.FullName)}
+  }
+  function Read-RefusalJson([string]$Text) {
+    $document=[Text.Json.JsonDocument]::Parse($Text,[Text.Json.JsonDocumentOptions]@{MaxDepth=32})
+    function Test-UniqueRefusalKeys($Element) {
+      if($Element.ValueKind -eq [Text.Json.JsonValueKind]::Object){
+        $keys=[Collections.Generic.HashSet[string]]::new([StringComparer]::OrdinalIgnoreCase)
+        foreach($property in $Element.EnumerateObject()){
+          Assert-Fixture ($keys.Add($property.Name)) 'duplicate refusal JSON property'
+          Test-UniqueRefusalKeys $property.Value
+        }
+      }elseif($Element.ValueKind -eq [Text.Json.JsonValueKind]::Array){foreach($item in $Element.EnumerateArray()){Test-UniqueRefusalKeys $item}}
+    }
+    try{Test-UniqueRefusalKeys $document.RootElement}finally{$document.Dispose()}
+    $Text|ConvertFrom-Json -AsHashtable -Depth 32
+  }
+  $resultBody=Read-RefusalBody $Binding.result 2MB
+  $profileBody=Read-RefusalBody $Binding.profile 128KB
+  $stdoutBody=Read-RefusalBody $Binding.stdout 2MB
+  $ledgerBody=Read-RefusalBody $Binding.ledger 2MB
+  $result=Read-RefusalJson $resultBody.text
+  $direct=Read-RefusalJson $profileBody.text
+  $endpoint=$Binding.endpoint
+  Assert-Fixture ($endpoint -is [Collections.IDictionary] -and $endpoint.target -cin @('f110','f210') -and $endpoint.mir_sha256 -cmatch '^[A-F0-9]{64}$' -and $endpoint.fixture_sha256 -cmatch '^[A-F0-9]{64}$' -and $endpoint.source_revision -cmatch '^[a-f0-9]{40}$' -and $endpoint.harness_sha256 -cmatch '^[A-F0-9]{64}$') 'direct refusal endpoint pins differ'
+  $tuple=if($endpoint.target -ceq 'f110'){@('1.1','1.1.110','5.0.11000','0.4.0','B7B4B834FCA2E32AFA9D3476EB42CC09B02F1205BE97F688DC6FC6ACE7BA8FE1')}else{@('2.1','2.1.23','5.0.21000','0.5.0','8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38')}
+  $line,$base,$mir,$fixture,$engineSha=$tuple
+  Assert-Fixture ($direct.schema -eq 1 -and $direct.kind -ceq 'published-f100-forward' -and $direct.stage -ceq $endpoint.target -and $direct.target -ceq $endpoint.target -and $direct.factorio_line -ceq $line -and $direct.settings_mode -ceq 'Defaults' -and $direct.predecessor_origin -ceq 'published-f100-4.7.10003' -and $direct.protected_source_sha256 -ceq $InputSha) 'direct refusal profile/source differs'
+  Assert-Fixture ($direct.engine.version -ceq $base -and $direct.engine.sha256 -ceq $engineSha -and $result.engine.base_version -ceq $base -and $result.engine.sha256 -ceq $engineSha) 'direct refusal destination engine differs'
+  $selected=@($direct.mods|ForEach-Object {[string]$_.name+'|'+[string]$_.version+'|'+[string]$_.enabled})
+  $wanted=@(('base|'+$base+'|True'),('more-infinite-research|'+$mir+'|True'),('mir-fixture-mir5-historical-transition|'+$fixture+'|True'))
+  Assert-Fixture ($selected.Count -eq 3 -and ($selected-join "`n") -ceq ($wanted-join "`n") -and $direct.archive_sha256.Count -eq 2 -and $direct.archive_sha256['more-infinite-research_'+$mir+'.zip'] -ceq $endpoint.mir_sha256 -and $direct.archive_sha256['mir-fixture-mir5-historical-transition_'+$fixture+'.zip'] -ceq $endpoint.fixture_sha256) 'direct refusal selected archives differ'
+  Assert-Fixture ($result.kind -ceq 'MIR5NativeFixtureV1' -and $result.status -ceq 'failed' -and $result.case -ceq 'published-f100-forward' -and $result.source_dirty -is [bool] -and -not $result.source_dirty -and $result.source_head -cmatch '^[a-f0-9]{40}$' -and $result.input_save.sha256 -ceq $InputSha -and $result.input_save_byte_identical -is [bool] -and $result.input_save_byte_identical) 'actual direct refusal result/source differs'
+  Assert-Fixture ($result.profile.sha256 -ceq $Binding.profile.sha256 -and $result.mir_archive.sha256 -ceq $endpoint.mir_sha256 -and @($result.fixtures).Count -eq 1 -and $result.fixtures[0].sha256 -ceq $endpoint.fixture_sha256) 'actual direct refusal profile/archive result differs'
+  Assert-Fixture ($result.source_head -ceq $endpoint.source_revision -and $result.harness_sha256 -ceq $endpoint.harness_sha256) 'actual direct refusal source/harness differs'
+  $route=$result.published_f100_forward
+  Assert-Fixture ($route.stage -ceq $endpoint.target -and $route.target -ceq $endpoint.target -and $route.role -ceq 'successor' -and $route.predecessor_origin -ceq 'published-f100-4.7.10003' -and $route.protected_input_sha256 -ceq $InputSha) 'actual direct refusal route differs'
+  Assert-Fixture (@($result.process_runs).Count -eq 1) 'direct refusal requires exactly one actual failed engine'
+  $run=$result.process_runs[0]
+  Assert-Fixture ($run.status -ceq 'interrupted' -and [IO.Path]::GetFullPath($run.stdout) -ceq $stdoutBody.path -and [IO.Path]::GetFullPath($run.ledger) -ceq $ledgerBody.path -and $run.error -ceq $result.failure -and $run.error -match '^(\[mir441-process-exit\]|fatal native production diagnostic)') 'direct refusal actual failed process differs'
+  $ledger=@($ledgerBody.text -split '\r?\n'|Where-Object {-not [string]::IsNullOrWhiteSpace($_)}|ForEach-Object {Read-RefusalJson $_})
+  $running=@($ledger|Where-Object {$_.Contains('process') -and $_.process.phase -ceq 'running' -and ($_.process.id -is [int] -or $_.process.id -is [long]) -and $_.process.id -gt 0})
+  Assert-Fixture ($running.Count -gt 0 -and $ledger[-1].phase -ceq 'interrupted' -and $ledger[-1].timed_out -is [bool] -and -not $ledger[-1].timed_out -and $ledger[-1].error -ceq $run.error) 'direct refusal lacks a governed native start/failure'
+  $header='(?m)^\s*\d+[.]\d+\s+\d{4}-\d{2}-\d{2}[^\r\n]*; Factorio '+[regex]::Escape($base)+' \('
+  $format='(?m)^\s*\d+[.]\d+\s+Error[^\r\n]*Map version 1[.]0[.]0(?:-\d+)? cannot be loaded because it is lower than the minimum input version \(\d+[.]\d+[.]\d+(?:-\d+)?\)[.]\r?$'
+  Assert-Fixture ($stdoutBody.text -match $header -and $stdoutBody.text -cmatch $format) 'direct refusal is not an actual native engine save-format diagnostic'
+  [pscustomobject]@{target=$endpoint.target;input_sha256=$InputSha;result_sha256=$Binding.result.sha256;profile_sha256=$Binding.profile.sha256;stdout_sha256=$Binding.stdout.sha256;ledger_sha256=$Binding.ledger.sha256;engine_sha256=$engineSha;mir_sha256=$endpoint.mir_sha256;fixture_sha256=$endpoint.fixture_sha256;process_id=$running[0].process.id}
+}
+function Get-PublishedF100ForwardFixture([string]$Repo,[hashtable]$Profile,[string[]]$Sources,[string]$EngineData,[string]$Engine,[string]$MIRSha,[string]$Case,[string]$Stage,[string]$InputSave,[string]$InputSha) {
+  Assert-Fixture ($Stage -cin @('source','bridge','f110','f210') -and $Case -ceq 'published-f100-forward') 'published F100 forward stage/case differs'
+  $tuple=switch -CaseSensitive ($Stage){
+    'source' {@('f100','1.0','1.0.0','4.7.10003','0.2.0','99F1CE207A04296EF7D797E4A98AA98DDE4F02EE653C9DF736AC33A676FD4F70')}
+    'bridge' {@('f110','1.1','1.1.110','4.7.11003','0.3.0','B7B4B834FCA2E32AFA9D3476EB42CC09B02F1205BE97F688DC6FC6ACE7BA8FE1')}
+    'f110' {@('f110','1.1','1.1.110','5.0.11000','0.4.0','B7B4B834FCA2E32AFA9D3476EB42CC09B02F1205BE97F688DC6FC6ACE7BA8FE1')}
+    'f210' {@('f210','2.1','2.1.23','5.0.21000','0.5.0','8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38')}
+  }
+  $target,$line,$baseVersion,$mirVersion,$fixtureVersion,$engineSha=$tuple
+  $refusalReadback=$null
+  Assert-Fixture ($InputSave -and $InputSha -cmatch '^[A-Fa-f0-9]{64}$' -and $Profile.protected_source_sha256 -ceq $InputSha.ToUpperInvariant()) 'published F100 forward requires its exact protected input'
+  if($Stage -ceq 'source'){
+    Assert-Fixture ($InputSha.ToUpperInvariant() -ceq '219EF20F63B4A85FA2386BD50A81228B28F006D9731F24E069A657BB13F45811' -and $MIRSha.ToUpperInvariant() -ceq 'C04F3543EBF99D2B76B2C9193EA0886381B7CDDF2F2C1610310E7961B24BE0E1') 'published F100 original source/MIR pin differs'
+  }elseif($Stage -ceq 'bridge'){
+    Assert-Fixture ($MIRSha.ToUpperInvariant() -ceq '66C127D8BFC1919FA88F19D2D9B3047316A1B90401CAA05A6D05979B7A099D1E') 'published F100 bridge requires exact published MIR'
+    $refusalReadback=Read-PublishedF100DirectRefusal -Repo $Repo -Binding $Profile.engine_bridge_refusal -InputSha $InputSha.ToUpperInvariant()
+  }
+  Assert-Fixture ($Profile.schema -eq 1 -and $Profile.kind -ceq 'published-f100-forward' -and $Profile.stage -ceq $Stage -and $Profile.target -ceq $target -and $Profile.factorio_line -ceq $line -and $Profile.settings_mode -ceq 'Defaults' -and $Profile.predecessor_origin -ceq 'published-f100-4.7.10003') 'published F100 forward profile metadata differs'
+  $expected=@(('base|'+$baseVersion+'|True'),('more-infinite-research|'+$mirVersion+'|True'),('mir-fixture-mir5-historical-transition|'+$fixtureVersion+'|True'))
+  $actual=@($Profile.mods|ForEach-Object {[string]$_.name+'|'+[string]$_.version+'|'+[string]$_.enabled})
+  Assert-Fixture ($actual.Count -eq 3 -and ($actual -join "`n") -ceq ($expected -join "`n")) 'published F100 forward selected closure differs'
+  $archives=$Profile.archive_sha256
+  Assert-Fixture ($MIRSha -cmatch '^[A-Fa-f0-9]{64}$' -and $archives -is [Collections.IDictionary] -and $archives.Count -eq 2 -and $archives['more-infinite-research_'+$mirVersion+'.zip'] -ceq $MIRSha.ToUpperInvariant() -and $archives['mir-fixture-mir5-historical-transition_'+$fixtureVersion+'.zip'] -cmatch '^[A-F0-9]{64}$') 'published F100 forward archive pins differ'
+  $base=Get-Content -LiteralPath (Join-Path $EngineData 'base/info.json') -Raw | ConvertFrom-Json -AsHashtable
+  Assert-Fixture ($base.version -ceq $baseVersion -and $Profile.engine.version -ceq $baseVersion -and $Profile.engine.sha256 -ceq $engineSha -and (Get-FixtureSha $Engine) -ceq $engineSha) 'published F100 forward engine pin differs'
+  Assert-Fixture ($Sources.Count -eq 1) 'published F100 forward requires one composed fixture'
+  $repoRoot=(Resolve-Path -LiteralPath $Repo).Path
+  $source=(Resolve-Path -LiteralPath $Sources[0]).Path
+  Assert-Fixture (Test-F110PublishedCrossSourceRelativePath ([IO.Path]::GetRelativePath($repoRoot,$source))) 'published F100 forward source leaves checkout'
+  $canonical=Join-Path $repoRoot ('tests/fixtures/published-f100-forward/'+$Stage)
+  $members=[ordered]@{}
+  foreach($name in @('info.json','stage.lua','control.lua','data-final-fixes.lua','settings-updates.lua')){$members[$name]=Join-Path $canonical $name}
+  $members['fixture_control.lua']=Join-Path $repoRoot 'tests/fixtures/published-f100-forward/shared/control.lua'
+  $members['fixture_data_final.lua']=Join-Path $repoRoot 'tests/fixtures/published-f100-forward/shared/data-final-fixes.lua'
+  Assert-Fixture (@(Get-ChildItem -LiteralPath $source -File -Force).Count -eq 7 -and @(Get-ChildItem -LiteralPath $source -Directory -Force).Count -eq 0) 'published F100 forward membership differs'
+  foreach($name in $members.Keys){
+    $path=(Resolve-Path -LiteralPath (Join-Path $source $name)).Path
+    $expectedPath=(Resolve-Path -LiteralPath $members[$name]).Path
+    Assert-Fixture ((Test-F110PublishedCrossSourceRelativePath ([IO.Path]::GetRelativePath($source,$path))) -and (Test-F110PublishedCrossSourceRelativePath ([IO.Path]::GetRelativePath($repoRoot,$expectedPath)))) 'published F100 forward member leaves checkout/composition'
+    Assert-Fixture ((Get-FixtureSha $path) -ceq (Get-FixtureSha $expectedPath)) ('published F100 forward canonical member differs: '+$name)
+  }
+  $info=Get-Content -LiteralPath (Join-Path $source 'info.json') -Raw|ConvertFrom-Json -AsHashtable
+  Assert-Fixture ($info.name -ceq 'mir-fixture-mir5-historical-transition' -and $info.version -ceq $fixtureVersion -and $info.factorio_version -ceq $line -and (@($info.dependencies)-join "`n") -ceq (@(('base >= '+$baseVersion),('more-infinite-research = '+$mirVersion))-join "`n")) 'published F100 forward fixture info differs'
+  [pscustomobject]@{source=$source;name=$info.name;version=$fixtureVersion;stage=$Stage;factorio_version=$line;target=$target;role=if($Stage -in @('f110','f210')){'successor'}else{$Stage};refusal_readback=$refusalReadback}
 }
 function Read-FixtureResult([string]$Text,[string]$Stage) {
   $rows=@([regex]::Matches($Text,'\[MIR5_NATIVE_FIXTURE\] RESULT (\{[^\r\n]+\})') | ForEach-Object {$_.Groups[1].Value | ConvertFrom-Json} | Where-Object {$_.case -ceq $CaseName -and $_.stage -ceq $Stage})
@@ -585,19 +686,24 @@ $historicalTransition=-not [string]::IsNullOrWhiteSpace($HistoricalTransitionSta
 $f110PublishedCrossSource=[bool]$F110PublishedCrossSource
 $f110SameEditionSuccessor=[bool]$F110SameEditionSuccessor
 $laserTransition=-not [string]::IsNullOrWhiteSpace($F100F110LaserStage)
+$publishedF100Forward=-not [string]::IsNullOrWhiteSpace($PublishedF100ForwardStage)
 Assert-Fixture (-not ($f110PublishedCrossSource -and $f110SameEditionSuccessor)) 'select only one F110 transition stage'
 $historicalProcess=$historical -or $f110PublishedCrossSource -or $f110SameEditionSuccessor -or $laserTransition
+if($publishedF100Forward){$historicalProcess=$PublishedF100ForwardStage -cne 'f210'}
 $historicalProcessVersion=''
 $historicalFixture=$null
 $activeSeed=[bool]$ActiveSeedOnly
 if($activeSeed){
   Assert-Fixture ($ActiveSeedKind -in @('repair-stress','agriculture-scale')) 'active seed kind differs'
-  Assert-Fixture (-not $historical -and -not $historicalTransition -and -not $f110PublishedCrossSource -and -not $f110SameEditionSuccessor -and -not $laserTransition -and -not $CreateOnly -and -not $MIRAbsent) 'active seed requires a modern installed-MIR fixture run'
+  Assert-Fixture (-not $historical -and -not $historicalTransition -and -not $f110PublishedCrossSource -and -not $f110SameEditionSuccessor -and -not $laserTransition -and -not $publishedF100Forward -and -not $CreateOnly -and -not $MIRAbsent) 'active seed requires a modern installed-MIR fixture run'
   Assert-Fixture (-not $InputSavePath -and -not $ExpectedInputSaveSha256) 'active seed must begin from its own fresh fixture save'
   $expectedCase=if($ActiveSeedKind -ceq 'repair-stress'){'repair-stress-active'}else{'agriculture-scale-active'}
   Assert-Fixture ($CaseName -ceq $expectedCase) 'active seed case differs'
 }
-if($laserTransition){
+if($publishedF100Forward){
+  Assert-Fixture (-not $historical -and -not $historicalTransition -and -not $f110PublishedCrossSource -and -not $f110SameEditionSuccessor -and -not $laserTransition -and -not $CreateOnly -and -not $MIRAbsent -and -not $activeSeed -and -not $ActiveSeedKind -and -not $activeModsObserverName -and $ConsumerMarkers.Count -eq 0 -and -not $HistoricalFixtureMetadataPath -and -not $HistoricalTransitionFixtureMetadataPath) 'published F100 forward modes are exclusive'
+  $historicalProcessVersion=if($PublishedF100ForwardStage -ceq 'source'){'1.0'}elseif($PublishedF100ForwardStage -ceq 'f210'){''}else{'1.1'}
+}elseif($laserTransition){
   Assert-Fixture (-not $historical -and -not $historicalTransition -and -not $f110PublishedCrossSource -and -not $f110SameEditionSuccessor -and -not $CreateOnly -and -not $MIRAbsent -and -not $activeSeed -and -not $ActiveSeedKind -and -not $activeModsObserverName -and $ConsumerMarkers.Count -eq 0 -and -not $HistoricalFixtureMetadataPath -and -not $HistoricalTransitionFixtureMetadataPath) 'laser transition modes are exclusive'
   $historicalProcessVersion=if($F100F110LaserStage -ceq 'source'){'1.0'}else{'1.1'}
 }elseif($f110PublishedCrossSource -or $f110SameEditionSuccessor){
@@ -648,6 +754,10 @@ Import-Module $identityModule -Force
 $profile=(Resolve-Path -LiteralPath $ProfilePath).Path
 $profileDefinition=Get-Content -LiteralPath $profile -Raw | ConvertFrom-Json -AsHashtable
 $rows=@($profileDefinition.mods)
+$publishedF100Fixture=$null
+if($publishedF100Forward){
+  $publishedF100Fixture=Get-PublishedF100ForwardFixture -Repo $repo -Profile $profileDefinition -Sources $FixtureSources -EngineData $engineData -Engine $engine -MIRSha $ExpectedMIRArchiveSha256 -Case $CaseName -Stage $PublishedF100ForwardStage -InputSave $InputSavePath -InputSha $ExpectedInputSaveSha256
+}
 $laserFixture=$null
 if($laserTransition){
   $laserFixture=Get-F100F110LaserFixture -Repo $repo -Profile $profileDefinition -Sources $FixtureSources -EngineData $engineData -Engine $engine -MIRSha $ExpectedMIRArchiveSha256 -Case $CaseName -Stage $F100F110LaserStage -OtherModes:$false -InputSave $InputSavePath -InputSha $ExpectedInputSaveSha256
@@ -705,6 +815,7 @@ if($f110PublishedCrossSource -or $f110SameEditionSuccessor){
   Assert-Fixture ($fixtureBindings.Count -eq 1 -and [string]$fixtureBindings[0].name -ceq $f110CrossSourceFixture.name -and [string]$fixtureBindings[0].version -ceq $f110CrossSourceFixture.version -and [string]$fixtureBindings[0].source -ceq $f110CrossSourceFixture.source) 'F110 published cross source fixture selection differs'
 }
 if($laserTransition){Assert-Fixture ($fixtureBindings.Count -eq 1 -and [string]$fixtureBindings[0].name -ceq $laserFixture.name -and [string]$fixtureBindings[0].version -ceq $laserFixture.version -and [string]$fixtureBindings[0].source -ceq $laserFixture.source) 'laser fixture selection differs'}
+if($publishedF100Forward){Assert-Fixture ($fixtureBindings.Count -eq 1 -and [string]$fixtureBindings[0].name -ceq $publishedF100Fixture.name -and [string]$fixtureBindings[0].version -ceq $publishedF100Fixture.version -and [string]$fixtureBindings[0].source -ceq $publishedF100Fixture.source) 'published F100 forward fixture selection differs'}
 $activeModsObserverBinding=Get-FixtureActiveModsObserver -Name $activeModsObserverName -ProfileRows $rows -FixtureInputs $fixtureBindings
 $engineIdentity=Get-MIRDirectLibraryStartupEngineIdentity -FactorioBin $engine -EngineDataDirectory $engineData
 $archiveHashes=Get-MIRDirectLibraryStartupArchiveHashes -LibraryDirectory $library -EngineDataDirectory $engineData -BaseRows $rows -MirArchive $null
@@ -728,6 +839,8 @@ $record=[ordered]@{
   release_qualification=$false
 }
 if($laserTransition){$record.f100_f110_laser_transition=@{stage=$F100F110LaserStage;factorio_version=$historicalProcessVersion}}
+if($publishedF100Forward){$record.published_f100_forward=@{stage=$PublishedF100ForwardStage;target=$publishedF100Fixture.target;role=$publishedF100Fixture.role;predecessor_origin='published-f100-4.7.10003';protected_input_sha256=$ExpectedInputSaveSha256.ToUpperInvariant()}}
+if($publishedF100Forward -and $PublishedF100ForwardStage -ceq 'bridge'){$record.published_f100_forward.engine_bridge_refusal_readback=$publishedF100Fixture.refusal_readback}
 try{
   # Compile the governor's native memory reader before releasing temporary
   # host allocations; its first Add-Type call otherwise occurs inside wait.
@@ -822,6 +935,7 @@ try{
     if(-not $text.Contains('[MIR5_NATIVE_FIXTURE] RESULT ')){return $false}
     if(($f110PublishedCrossSource -or $f110SameEditionSuccessor) -and -not $text.Contains('[MIR5_NATIVE_FIXTURE] RESULT {"case":"f110-f200-transition","stage":"initial"')){return $false}
     if($laserTransition -and -not $text.Contains('[MIR5_NATIVE_FIXTURE] RESULT {"case":"f100-f110-laser-transition","stage":"initial","role":"'+$F100F110LaserStage+'"')){return $false}
+    if($publishedF100Forward -and -not $text.Contains('[MIR5_NATIVE_FIXTURE] RESULT {"case":"published-f100-forward","stage":"initial","role":"'+$publishedF100Fixture.role+'","target":"'+$publishedF100Fixture.target+'"')){return $false}
     if($historicalProcess){return & $historicalSaveComplete $complete}
     return (Test-Path -LiteralPath $complete -PathType Leaf) -and $text.Contains('Saving finished')
   }.GetNewClosure()

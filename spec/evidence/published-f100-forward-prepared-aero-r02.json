@@ -1,0 +1,365 @@
+{
+  "schema": 1,
+  "kind": "published-f100-forward-prepared-inputs",
+  "status": "host-verified-preparation-not-native-qualified",
+  "source_revision": "e7c5675fbb50fc2b156de3eaf50bbf8fd5b5a72c",
+  "runner_revision": "e7c5675fbb50fc2b156de3eaf50bbf8fd5b5a72c",
+  "native_owner": "Black Glass;Aero performs no native execution or direct-library mutation",
+  "protected_original": {
+    "path_on_native_owner": "build/qualification/historical-473-f100-7a2-r01-controller/native-published/write-data/saves/mir5-native-complete.zip",
+    "sha256": "219EF20F63B4A85FA2386BD50A81228B28F006D9731F24E069A657BB13F45811",
+    "bytes": 656574,
+    "evidence": "spec/evidence/historical-473-f017-f100-7a2-native-chain-r01.json",
+    "actual_source_labs_reused": 1,
+    "new_source_labs": 0
+  },
+  "published_mir_source": {
+    "name": "more-infinite-research_4.7.10003.zip",
+    "sha256": "C04F3543EBF99D2B76B2C9193EA0886381B7CDDF2F2C1610310E7961B24BE0E1",
+    "bytes": 709722,
+    "aero_anonymous_download": "build/qualification/published-forward-routes-aero-r01/more-infinite-research_4.7.10003.zip"
+  },
+  "source_profile": {
+    "path": "tests/profiles/published473-f100-forward-source-r02.json",
+    "sha256": "973631B91A105D56EEB2890CA4F2A6B9571CA5FBE2E1EAAB3A6501ACD3512509",
+    "bytes": 1334
+  },
+  "runner": {
+    "path": "tools/Invoke-NativeFixture.ps1",
+    "source_revision": "e7c5675fbb50fc2b156de3eaf50bbf8fd5b5a72c",
+    "sha256": "660D44CE00BE3FAE05EA38A66A43F75485030B64026C72AB936183D1B2CEFC9D",
+    "bytes": 92199
+  },
+  "stages": [
+    {
+      "stage": "source",
+      "name": "mir-fixture-mir5-historical-transition_0.2.0.zip",
+      "sha256": "E2F1D24D3C878F6A3B58A6F38ADD045FB942C31599079FD837CAB5FCBB291280",
+      "bytes": 7081,
+      "members": [
+        {
+          "source": "tests/fixtures/published-f100-forward/source/control.lua",
+          "source_revision": "e7c5675fbb50fc2b156de3eaf50bbf8fd5b5a72c",
+          "destination": "control.lua",
+          "sha256": "1A0ED8A26C09447C61170923210BCCE255293A01A18F5D9174A31E90A27B7B03",
+          "bytes": 27
+        },
+        {
+          "source": "tests/fixtures/published-f100-forward/source/data-final-fixes.lua",
+          "source_revision": "e7c5675fbb50fc2b156de3eaf50bbf8fd5b5a72c",
+          "destination": "data-final-fixes.lua",
+          "sha256": "B193C566BDC17949E9082C258018BD57DADC37063377B0C12971988E9513E588",
+          "bytes": 30
+        },
+        {
+          "source": "tests/fixtures/published-f100-forward/shared/control.lua",
+          "source_revision": "e7c5675fbb50fc2b156de3eaf50bbf8fd5b5a72c",
+          "destination": "fixture_control.lua",
+          "sha256": "FF84FE4126672D19FB40345D25D50C81BF636F994B03B5E7BB1B131D897BD27E",
+          "bytes": 15849
+        },
+        {
+          "source": "tests/fixtures/published-f100-forward/shared/data-final-fixes.lua",
+          "source_revision": "e7c5675fbb50fc2b156de3eaf50bbf8fd5b5a72c",
+          "destination": "fixture_data_final.lua",
+          "sha256": "707E23A93EA60AAE395FE22206CDD785E6601D0CEF4B4C3ADE2F37302B50C511",
+          "bytes": 1196
+        },
+        {
+          "source": "tests/fixtures/published-f100-forward/source/info.json",
+          "source_revision": "e7c5675fbb50fc2b156de3eaf50bbf8fd5b5a72c",
+          "destination": "info.json",
+          "sha256": "E5E472BA37EDF30A88A1DAA4D933C87DFE5D14ECA1B39A5EC6F22E462DE8A304",
+          "bytes": 276
+        },
+        {
+          "source": "tests/fixtures/published-f100-forward/source/settings-updates.lua",
+          "source_revision": "e7c5675fbb50fc2b156de3eaf50bbf8fd5b5a72c",
+          "destination": "settings-updates.lua",
+          "sha256": "0C3C400CA97DF5B2A636FC77D16441E320EFF836C7787084F5E0CE3BCB9F1E30",
+          "bytes": 73
+        },
+        {
+          "source": "tests/fixtures/published-f100-forward/source/stage.lua",
+          "source_revision": "e7c5675fbb50fc2b156de3eaf50bbf8fd5b5a72c",
+          "destination": "stage.lua",
+          "sha256": "6DCF47AA2E5A5A07490CB29FACA3619C42E8CA00553BCD42E8E28BDA5147FAEE",
+          "bytes": 143
+        }
+      ],
+      "composed_source": "build/qualification/published-f100-forward-prepared-aero-r02/source/source"
+    },
+    {
+      "stage": "bridge",
+      "name": "mir-fixture-mir5-historical-transition_0.3.0.zip",
+      "sha256": "F2246B8A62B2968F00DC2213F12AC89D55E85ABACCD7C231BA339055543F2735",
+      "bytes": 7086,
+      "members": [
+        {
+          "source": "tests/fixtures/published-f100-forward/bridge/control.lua",
+          "source_revision": "e7c5675fbb50fc2b156de3eaf50bbf8fd5b5a72c",
+          "destination": "control.lua",
+          "sha256": "1A0ED8A26C09447C61170923210BCCE255293A01A18F5D9174A31E90A27B7B03",
+          "bytes": 27
+        },
+        {
+          "source": "tests/fixtures/published-f100-forward/bridge/data-final-fixes.lua",
+          "source_revision": "e7c5675fbb50fc2b156de3eaf50bbf8fd5b5a72c",
+          "destination": "data-final-fixes.lua",
+          "sha256": "B193C566BDC17949E9082C258018BD57DADC37063377B0C12971988E9513E588",
+          "bytes": 30
+        },
+        {
+          "source": "tests/fixtures/published-f100-forward/shared/control.lua",
+          "source_revision": "e7c5675fbb50fc2b156de3eaf50bbf8fd5b5a72c",
+          "destination": "fixture_control.lua",
+          "sha256": "FF84FE4126672D19FB40345D25D50C81BF636F994B03B5E7BB1B131D897BD27E",
+          "bytes": 15849
+        },
+        {
+          "source": "tests/fixtures/published-f100-forward/shared/data-final-fixes.lua",
+          "source_revision": "e7c5675fbb50fc2b156de3eaf50bbf8fd5b5a72c",
+          "destination": "fixture_data_final.lua",
+          "sha256": "707E23A93EA60AAE395FE22206CDD785E6601D0CEF4B4C3ADE2F37302B50C511",
+          "bytes": 1196
+        },
+        {
+          "source": "tests/fixtures/published-f100-forward/bridge/info.json",
+          "source_revision": "e7c5675fbb50fc2b156de3eaf50bbf8fd5b5a72c",
+          "destination": "info.json",
+          "sha256": "32D305BFA519B9F06EEC2EE7DABF3BB244BB4F24E7EE5F294BEC953E9EF048AB",
+          "bytes": 278
+        },
+        {
+          "source": "tests/fixtures/published-f100-forward/bridge/settings-updates.lua",
+          "source_revision": "e7c5675fbb50fc2b156de3eaf50bbf8fd5b5a72c",
+          "destination": "settings-updates.lua",
+          "sha256": "0C3C400CA97DF5B2A636FC77D16441E320EFF836C7787084F5E0CE3BCB9F1E30",
+          "bytes": 73
+        },
+        {
+          "source": "tests/fixtures/published-f100-forward/bridge/stage.lua",
+          "source_revision": "e7c5675fbb50fc2b156de3eaf50bbf8fd5b5a72c",
+          "destination": "stage.lua",
+          "sha256": "E74526A38E69F6595E82FD0B79F9F0C0B73670D3B9135FF6D50D89389BFA37F0",
+          "bytes": 140
+        }
+      ],
+      "composed_source": "build/qualification/published-f100-forward-prepared-aero-r02/bridge/source"
+    },
+    {
+      "stage": "f110",
+      "name": "mir-fixture-mir5-historical-transition_0.4.0.zip",
+      "sha256": "D391C8D431297979BC671CC873315B13294DBD44BA4C7889BDA81602D2C126AC",
+      "bytes": 7086,
+      "members": [
+        {
+          "source": "tests/fixtures/published-f100-forward/f110/control.lua",
+          "source_revision": "e7c5675fbb50fc2b156de3eaf50bbf8fd5b5a72c",
+          "destination": "control.lua",
+          "sha256": "1A0ED8A26C09447C61170923210BCCE255293A01A18F5D9174A31E90A27B7B03",
+          "bytes": 27
+        },
+        {
+          "source": "tests/fixtures/published-f100-forward/f110/data-final-fixes.lua",
+          "source_revision": "e7c5675fbb50fc2b156de3eaf50bbf8fd5b5a72c",
+          "destination": "data-final-fixes.lua",
+          "sha256": "B193C566BDC17949E9082C258018BD57DADC37063377B0C12971988E9513E588",
+          "bytes": 30
+        },
+        {
+          "source": "tests/fixtures/published-f100-forward/shared/control.lua",
+          "source_revision": "e7c5675fbb50fc2b156de3eaf50bbf8fd5b5a72c",
+          "destination": "fixture_control.lua",
+          "sha256": "FF84FE4126672D19FB40345D25D50C81BF636F994B03B5E7BB1B131D897BD27E",
+          "bytes": 15849
+        },
+        {
+          "source": "tests/fixtures/published-f100-forward/shared/data-final-fixes.lua",
+          "source_revision": "e7c5675fbb50fc2b156de3eaf50bbf8fd5b5a72c",
+          "destination": "fixture_data_final.lua",
+          "sha256": "707E23A93EA60AAE395FE22206CDD785E6601D0CEF4B4C3ADE2F37302B50C511",
+          "bytes": 1196
+        },
+        {
+          "source": "tests/fixtures/published-f100-forward/f110/info.json",
+          "source_revision": "e7c5675fbb50fc2b156de3eaf50bbf8fd5b5a72c",
+          "destination": "info.json",
+          "sha256": "CE73E09B62A242EB8F2358D4CB8A048D4EAC49CCE58F5AADEC761F0621E2CEA0",
+          "bytes": 278
+        },
+        {
+          "source": "tests/fixtures/published-f100-forward/f110/settings-updates.lua",
+          "source_revision": "e7c5675fbb50fc2b156de3eaf50bbf8fd5b5a72c",
+          "destination": "settings-updates.lua",
+          "sha256": "0C3C400CA97DF5B2A636FC77D16441E320EFF836C7787084F5E0CE3BCB9F1E30",
+          "bytes": 73
+        },
+        {
+          "source": "tests/fixtures/published-f100-forward/f110/stage.lua",
+          "source_revision": "e7c5675fbb50fc2b156de3eaf50bbf8fd5b5a72c",
+          "destination": "stage.lua",
+          "sha256": "23F99DEA7ECFB782A36AF30FE6F6669ADFD7C5510FCFADE245DF788D558DF3E1",
+          "bytes": 143
+        }
+      ],
+      "composed_source": "build/qualification/published-f100-forward-prepared-aero-r02/f110/source"
+    },
+    {
+      "stage": "f210",
+      "name": "mir-fixture-mir5-historical-transition_0.5.0.zip",
+      "sha256": "2276C67A15CED1B3E0607AE83AE83A8ABE67961ECD0099FE24DA10B408696B5E",
+      "bytes": 7089,
+      "members": [
+        {
+          "source": "tests/fixtures/published-f100-forward/f210/control.lua",
+          "source_revision": "e7c5675fbb50fc2b156de3eaf50bbf8fd5b5a72c",
+          "destination": "control.lua",
+          "sha256": "1A0ED8A26C09447C61170923210BCCE255293A01A18F5D9174A31E90A27B7B03",
+          "bytes": 27
+        },
+        {
+          "source": "tests/fixtures/published-f100-forward/f210/data-final-fixes.lua",
+          "source_revision": "e7c5675fbb50fc2b156de3eaf50bbf8fd5b5a72c",
+          "destination": "data-final-fixes.lua",
+          "sha256": "B193C566BDC17949E9082C258018BD57DADC37063377B0C12971988E9513E588",
+          "bytes": 30
+        },
+        {
+          "source": "tests/fixtures/published-f100-forward/shared/control.lua",
+          "source_revision": "e7c5675fbb50fc2b156de3eaf50bbf8fd5b5a72c",
+          "destination": "fixture_control.lua",
+          "sha256": "FF84FE4126672D19FB40345D25D50C81BF636F994B03B5E7BB1B131D897BD27E",
+          "bytes": 15849
+        },
+        {
+          "source": "tests/fixtures/published-f100-forward/shared/data-final-fixes.lua",
+          "source_revision": "e7c5675fbb50fc2b156de3eaf50bbf8fd5b5a72c",
+          "destination": "fixture_data_final.lua",
+          "sha256": "707E23A93EA60AAE395FE22206CDD785E6601D0CEF4B4C3ADE2F37302B50C511",
+          "bytes": 1196
+        },
+        {
+          "source": "tests/fixtures/published-f100-forward/f210/info.json",
+          "source_revision": "e7c5675fbb50fc2b156de3eaf50bbf8fd5b5a72c",
+          "destination": "info.json",
+          "sha256": "55B1FFFDD1F8C468D3340D01EA810974A743E72BB255149060EE3DCF883AF3B5",
+          "bytes": 277
+        },
+        {
+          "source": "tests/fixtures/published-f100-forward/f210/settings-updates.lua",
+          "source_revision": "e7c5675fbb50fc2b156de3eaf50bbf8fd5b5a72c",
+          "destination": "settings-updates.lua",
+          "sha256": "0C3C400CA97DF5B2A636FC77D16441E320EFF836C7787084F5E0CE3BCB9F1E30",
+          "bytes": 73
+        },
+        {
+          "source": "tests/fixtures/published-f100-forward/f210/stage.lua",
+          "source_revision": "e7c5675fbb50fc2b156de3eaf50bbf8fd5b5a72c",
+          "destination": "stage.lua",
+          "sha256": "14A5598FAE0289B1F250479AA1E8DEB99CBD0B2270703E0A3CF1675490DBDF61",
+          "bytes": 142
+        }
+      ],
+      "composed_source": "build/qualification/published-f100-forward-prepared-aero-r02/f210/source"
+    }
+  ],
+  "zip_policy": {
+    "timestamp": "1980-01-01T00:00:00",
+    "create_system": 3,
+    "external_attr": "0o100644 << 16",
+    "compression": "ZIP_DEFLATED level9;sorted payload names"
+  },
+  "source_command": {
+    "executable": "pwsh -NoProfile -File tools/Invoke-NativeFixture.ps1",
+    "arguments": {
+      "PublishedF100ForwardStage": "source",
+      "ArchiveLibrary": "<existing exclusive F100 direct library>",
+      "FactorioBin": "D:/Games/Factorio/1.0/bin/x64/factorio.exe",
+      "ProfilePath": "tests/profiles/published473-f100-forward-source-r02.json",
+      "FixtureSources": "<checkout-local seven-member source composition>",
+      "CaseName": "published-f100-forward",
+      "InputSavePath": "<unchanged protected219E original above>",
+      "ExpectedInputSaveSha256": "219EF20F63B4A85FA2386BD50A81228B28F006D9731F24E069A657BB13F45811",
+      "ExpectedMIRArchiveSha256": "C04F3543EBF99D2B76B2C9193EA0886381B7CDDF2F2C1610310E7961B24BE0E1",
+      "OutputRoot": "<fresh checkout-local build/tmp output>",
+      "ExpectedPeakMemoryMiB": 4096,
+      "TimeoutSeconds": 180,
+      "AdmissionWaitSeconds": 30
+    },
+    "all_other_fixture_modes": "unset;no historical metadata,old laser mode,F110 mode,observer,consumer,create or active seed"
+  },
+  "source_expectation": "Original published private state/lab/science/level2+.05/frozen lab/42% mining-braking queue before writes;7 seeded finite laser rows and one seeded inserter level give2.2/2and4 native totals;all16 retained MIR+7finite laser row levels/effects/caps/flags/investment snapshots;new27% suspended and foreign42% queued/disabled force;save and two read-only colds. No new source lab.",
+  "destination_expectation": "Both destinations reuse the same enhanced protected save;before fixture writes preserve all23 rows,laser identities/native2.2,inserter2and4,current/queued/suspended/caps/foreign/source lab. Only explicit old-to-new laser-name/ammo and stack-to-bulk mappings are normalized. One actual useful new mining lab gives level3+.1 total,retains braking queue,then new save/two read-only colds. Completed-config reentry revalidates all state. Exact35/60 fractional tool-unit consumption and frozen valid successor lab are checked initially and on completed cold/config reloads.",
+  "finite_definition_reference": {
+    "path": "build/tmp/mir442-postrelease-r22-qualification-r01/f100-upgrade-422/4.4.10002-upgrade-base-default-from-4.2.10002-full-state-upgrade.json",
+    "sha256": "7CE16492153276E76D94419169E5DFA4D14A33E6DF7294ACB6E8B1221B7F5CA6",
+    "scope": "Independent earlier native F100 source of finite laser1..7 effect vectors and inserter2/4. It is not a4.7.3 result. Actual4.7.3 preflight must confirm finite definitions and absence of laser8;otherwise preserve failure and review,never manufacture8."
+  },
+  "before_dispatch": [
+    "Independent Black Glass exact source/fixture/runner/profile review and actual library/container readback",
+    "Admit only within the existing sole-native lane"
+  ],
+  "after_source": [
+    "Retain original219E and new enhanced save separately with exact actual native receipt/hash/two colds",
+    "Bind one F110 and one F210 successor profile to this same enhanced hash and actual final package/container/engine",
+    "Attempt endpoints directly;only actual engine-format refusal permits published4.7.11003/1.1 bridge with a retained result/profile/stdout/ledger body bundle and exact endpoint/source/harness pins in the frozen profile",
+    "Do not use the MIR5 F110 completed destination as the F210 origin or mix DLC/provider/startup settings changes"
+  ],
+  "if_failure": "Preserve exact original inputs,failed result/log and native before-state;diagnose fixture versus product without weakening assertions. Unexpected published laser8 or differing native definitions is an explicit preparation failure for review,not permission to invent/update an expectation from the candidate.",
+  "host_validation": {
+    "forward_controls": 7,
+    "runner_positive_negative": "4 accepted/45 refused profiles,actual refusal body/endpoint binding and exact historical/modern process routing",
+    "other_controls": {
+      "F110_runner": 5,
+      "MIR5_origin_laser": 5,
+      "historical_transition": 11,
+      "host_plan": 3
+    },
+    "native_processes": 0
+  },
+  "release_scope": "Preparation for the two expressly requested4.7.3 F100-origin journeys. No source lab is recounted,no old MIR5-origin laser result is relabelled,no native/save/client/performance/release verdict follows.",
+  "supersedes_preparation": {
+    "path": "spec/evidence/published-f100-forward-prepared-aero-r01.json",
+    "revision": "9284f757111b8e76f0486ecabfb531747c36078d",
+    "sha256": "F56115DA47D6C438935347278269F901B66E71B7BBF81D62DC1B38380421BE2C",
+    "scope": "Preserve original source/containers/profile/native0 and the independently found hash-only bridge guard defect;only active future bridge admission and successor fractional science observation are corrected."
+  },
+  "review_finding": "https://github.com/Julesc013/more-infinite-research/pull/1427#issuecomment-6498350118",
+  "bridge_guard": {
+    "required_profile_field": "engine_bridge_refusal",
+    "body_references": [
+      "result",
+      "profile",
+      "stdout",
+      "ledger"
+    ],
+    "reference_shape": {
+      "path": "actual retained native-owner body locator",
+      "sha256": "uppercase actual SHA256"
+    },
+    "endpoint_fields": [
+      "target",
+      "mir_sha256",
+      "fixture_sha256",
+      "source_revision",
+      "harness_sha256"
+    ],
+    "validation": "Rehash all bounded bodies,reject duplicate JSON keys,match actual requested direct F110/F210 endpoint,the identical enhanced input,exact destination engine,selected MIR/fixture archives,committed native source/harness and failed result. Require one governed native process start/interruption with matching raw failure cause,actual engine header and explicit source1.0.0 save-format diagnostic. Success,non-format errors,resource/timeout failures,absent/mismatching/fabricated digest-only evidence and unrelated routes cannot admit a bridge.",
+    "budgets": {
+      "result": 2097152,
+      "profile": 131072,
+      "stdout": 2097152,
+      "ledger": 2097152,
+      "json_depth": 32
+    },
+    "normal_route": "A published1.1 bridge normally follows an actual failed direct F100-to-F210 attempt;an unrelated F110 pass/refusal is not substituted.",
+    "limits": "No actual direct refusal exists in this Aero preparation. Initial recognized native format wording is a narrow declared reader rule,not an observed engine result;unrecognized actual wording stops for preserved-body review without rerunning the same native failure."
+  },
+  "successor_science_correction": {
+    "problem": "The former integer get_item_count assertion and host double could reject correct partial native tool use.",
+    "assertion": "Retain count32 and observe durability;remaining tool units are count-minus-one-plus-durability.42% invested work with the accelerated60tick unit requires ceil(.58*60)/60=35/60 additional units. Verify exact consumed science,frozen valid successor lab and actual one-level/+5% effect on initial completion and completed cold/configuration checks.",
+    "opponents": "Whole-unit-only assumption is corrected;unchanged durability/consumption on successor or cold reload still fails.",
+    "source_reuse": "Source creation/seeding and all23-row snapshots are semantically unchanged. If Black Glass has already accepted a protected enhanced source from the original fixture,reuse that save with the corrected successor and retained native source receipt;do not recreate it solely for this successor observation correction."
+  }
+}
