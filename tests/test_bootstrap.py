@@ -370,6 +370,28 @@ class BootstrapTests(unittest.TestCase):
           for id = 15, 18 do assert(type(handlers.events[id]) == "function") end
         ''')
 
+    def test_settled_native_only_world_has_no_periodic_work_after_view_cycles_and_reload(self):
+        self.lua.execute('''
+          install_modules(false,false,false,false);install_runtime();load_control()
+          local browser=require("runtime.library")
+          local open,pending=false,false
+          browser.native_subscription_needs=function()return open,pending end
+          browser.on_gui_closed=function()open,pending=false,false end
+          for cycle=1,100 do
+            open,pending=true,true
+            handlers.events[15]({player_index=1,id=cycle,translated=false})
+            assert(type(handlers.nth[1])=="function")
+            handlers.events[12]({player_index=1})
+            assert(handlers.nth[1]==nil and handlers.nth[60]==nil and handlers.nth[61]==nil)
+          end
+          game=setmetatable({}, {__index=function()error("idle/reload world access")end,
+            __newindex=function()error("idle/reload world write")end})
+          handlers.load()
+          assert(next(handlers.nth)==nil)
+          for _,id in ipairs({4,5,6,19,20})do assert(handlers.events[id]==nil)end
+          assert(storage.mir==nil)
+        ''')
+
     def test_native_credit_lifecycle_survives_provider_absence_without_research_callbacks(self):
         self.lua.execute('''
           install_modules(false, false, false, true); install_runtime();
