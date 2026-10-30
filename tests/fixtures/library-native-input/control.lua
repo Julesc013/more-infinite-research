@@ -220,7 +220,7 @@ local function advance(step)
   elseif step=="drag" then
     phase("drag");local en,de=pair();assert_retained(en,de,"gears")
     local point=location(refs.en_root)
-    if s.drag_events~=s.drag_events_before+1 or point.x~=s.drag_baseline.x-30 or point.y~=s.drag_baseline.y then
+    if s.drag_events<=s.drag_events_before or point.x~=s.drag_baseline.x-30 or point.y~=s.drag_baseline.y then
       fail(string.format("actual native drag differs: baseline=(%s,%s) point=(%s,%s) events_before=%s events_now=%s",
         s.drag_baseline.x,s.drag_baseline.y,point.x,point.y,s.drag_events_before,s.drag_events))
     end

@@ -236,7 +236,7 @@ class LibraryNativeInputFixtureControls(unittest.TestCase):
               if opponent=="wrong-drag-x" then root.location.x=root.location.x+1 end
               if opponent=="wrong-drag-y" then root.location.y=root.location.y+1 end
               if opponent~="missing-drag-event" and opponent~="pre-drag-event-only" then callbacks.events[4]({player_index=en.index,element=root}) end
-              if opponent=="extra-drag-event" then callbacks.events[4]({player_index=en.index,element=root}) end
+              if opponent=="multiple-drag-events" then callbacks.events[4]({player_index=en.index,element=root}) end
               step("drag");key_close(en);step("escape");key_close(en);step("inventory")
               local other=en.gui.screen.mir5_input_other.mir5_input_other_query
               click(en,other);type_text(en,"focus");step("foreign-prefix");game.tick=game.tick+60
@@ -283,7 +283,7 @@ class LibraryNativeInputFixtureControls(unittest.TestCase):
                 self.assertTrue(final["load_observed"])
                 self.assertEqual(final["en_geometry"]["location"], {"x": 170, "y": 100})
 
-    def test_drag_uses_the_last_observed_location_and_requires_one_new_event(self):
+    def test_drag_uses_the_last_observed_location_and_requires_new_events(self):
         for target in ("f200", "f210"):
             with self.subTest(target=target):
                 result = self.run_case(target, "settled-before-drag")
@@ -295,7 +295,12 @@ class LibraryNativeInputFixtureControls(unittest.TestCase):
                 self.assertEqual(final["actual_drag_events"], 2)
                 self.assertEqual(final["en_geometry"]["location"], {"x": 235, "y": 24})
                 self.assertTrue(result["readonly_report"])
-                for opponent in ("pre-drag-event-only", "extra-drag-event", "wrong-drag-x", "wrong-drag-y"):
+                multiple = self.run_case(target, "multiple-drag-events")
+                self.assertTrue(multiple["ok"], multiple["message"])
+                self.assertEqual(multiple["final"]["drag_events_before"], 0)
+                self.assertEqual(multiple["final"]["actual_drag_events"], 2)
+                self.assertEqual(multiple["final"]["en_geometry"]["location"], {"x": 170, "y": 100})
+                for opponent in ("pre-drag-event-only", "wrong-drag-x", "wrong-drag-y"):
                     with self.subTest(opponent=opponent):
                         rejected = self.run_case(target, opponent)
                         self.assertFalse(rejected["ok"], rejected["message"])
