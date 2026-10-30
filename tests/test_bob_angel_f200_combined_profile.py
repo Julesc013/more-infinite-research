@@ -372,6 +372,55 @@ class BobAngelF200CombinedProfileTests(unittest.TestCase):
         self.assertEqual(plain(lua.globals().emitted), {})
         self.assertEqual(lua.globals().technology_publications, 0)
 
+    def test_recipe_activation_keeps_complete_authored_output_and_foreign_state(self):
+        expected = {name: row["row"] for name, row in self.oracle["technology"]["added"].items()}
+        for enabled in (False, True, None):
+            with self.subTest(enabled=enabled):
+                raw = deepcopy(self.context["raw"])
+                recipe = raw["recipe"]["bob-mech-armor-plate"]
+                if enabled is None:
+                    recipe.pop("enabled", None)
+                else:
+                    recipe["enabled"] = enabled
+                before_recipe = deepcopy(recipe)
+                before_owner = deepcopy(raw["technology"]["bob-tankotron"])
+                lua = self.data_final_stage(raw=raw)
+                emitted = plain(lua.globals().emitted)
+                self.assertEqual({name: emitted[name] for name in expected}, expected)
+                self.assertEqual(set(emitted), set(expected) | SEPARATE_CARRIER_IDS)
+                self.assertEqual(lua.globals().technology_publications, 1)
+                self.assertEqual(plain(lua.globals().data.raw.recipe["bob-mech-armor-plate"]),
+                                 plain(lua_value(lua, before_recipe)))
+                self.assertEqual(plain(lua.globals().data.raw.technology["bob-tankotron"]),
+                                 plain(lua_value(lua, before_owner)))
+
+    def test_armor_product_and_productivity_contracts_still_refuse_before_publication(self):
+        for changed in ("productivity-denied", "different-product"):
+            with self.subTest(changed=changed):
+                raw = deepcopy(self.context["raw"])
+                recipe = raw["recipe"]["bob-mech-armor-plate"]
+                recipe["enabled"] = True
+                if changed == "productivity-denied":
+                    recipe["allow_productivity"] = False
+                else:
+                    recipe["results"][0]["name"] = "iron-plate"
+                lua = self.data_final_stage(raw=raw, expect_failure=True)
+                self.assertIn("armor route changed", str(lua.globals().message))
+                self.assertEqual(plain(lua.globals().emitted), {})
+                self.assertEqual(lua.globals().technology_publications, 0)
+
+    def test_native_activation_witness_changes_only_the_named_foreign_flag(self):
+        raw = deepcopy(self.context["raw"])
+        lua = self.lua()
+        lua.globals().captured_raw = lua_value(lua, raw)
+        before = plain(lua_value(lua, raw))
+        lua.globals().fixture_path = (ROOT / "tests/fixtures/enabled-armor-f200/data-updates.lua").as_posix()
+        lua.execute("data={raw=captured_raw}; fixture_logs={}; log=function(line) fixture_logs[#fixture_logs+1]=line end; dofile(fixture_path)")
+        before["recipe"]["bob-mech-armor-plate"]["enabled"] = True
+        self.assertEqual(plain(lua.globals().data.raw), before)
+        self.assertEqual(plain(lua.globals().fixture_logs),
+                         ["[MIR_ARMOR_ACTIVATION] bob-mech-armor-plate enabled=true"])
+
     def test_actual_shape_adds_only_the_conditional_cannon_holder(self):
         reference = json.loads((ROOT / "tests/fixtures/bob-angel-f200-conditional-cannon-native-reference-r01.json").read_text(encoding="utf-8"))
         self.assertEqual(canonical_sha256(reference["old_Base_B_cannon_row"]), reference["old_Base_B_cannon_canonical_sha256"])

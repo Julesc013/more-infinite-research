@@ -35,6 +35,7 @@ This is the authoritative product changelog. Each MIR 1–3 master release appea
 
 ### Bugfixes
 
+- Accept an initially enabled armor-plate recipe in the Factorio 2.0 combined Bob/Angel binding without changing its authored research or foreign activation state.
 - Retain the extra tier-one module productivity already earned in admitted MIR 1.1 saves through hidden native credits, while new module research uses the corrected effects.
 - Preserve the earned cannon component of admitted MIR 1.2 combined rocket shooting speed through one hidden native credit using the retained rocket setting; new cannon research remains independent.
 - Keep hidden migration credits out of Research Library lists, translation requests and native research actions while preserving earned bonuses and ordinary foreign research inspection.
