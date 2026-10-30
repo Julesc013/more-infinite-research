@@ -1,6 +1,6 @@
 # Changelog
 
-This is the authoritative product changelog. Each MIR 1–3 master release appears once; reduced backport release logs are omitted. MIR 4 and later use source release versions here, while built packages encode their Factorio edition in the distribution version. Bracketed F-codes identify historical edition-specific changes; a historical entry does not promise that feature on every engine. The current entry remains unreleased until qualification and publication pass.
+This is the authoritative product changelog. Each MIR 1–3 master release appears once; reduced backport release logs are omitted. MIR 4 and later use source release versions here, while built packages encode their Factorio edition in the distribution version. Edition-specific changes name their Factorio version; a historical entry does not promise that feature on every engine. The current entry remains unreleased until qualification and publication pass.
 
 ## [5.0.0] - Unreleased
 
@@ -91,7 +91,7 @@ This is the authoritative product changelog. Each MIR 1–3 master release appea
 
 ### Historical qualification scope
 
-- All nine editions had the recorded upgrade and two-cold-reload observation; the separate F210 load/save scope covered Base and the pinned K2 2.1.4/K2 Spaced Out 2.0.19 combination.
+- All nine editions had the recorded upgrade and two-cold-reload observation; the separate Factorio 2.1 load/save scope covered Base and the pinned K2 2.1.4/K2 Spaced Out 2.0.19 combination.
 - The separate multi-producer fixture retained67 researches and199 positive recipe-productivity effects; it did not reproduce the reporter's full QoL set.
 - No new performance or multiplayer conclusion was recorded.
 
@@ -99,15 +99,15 @@ This is the authoritative product changelog. Each MIR 1–3 master release appea
 
 - Target package from source 4.7.3.
 - Retain the published 4.7.2 changelog and earlier history.
-- [F210] Require Factorio 2.1.23 or newer in this target line.
-- [F200] Require Factorio 2.0.77 or newer in this target line.
-- [F110] Require Factorio 1.1.110 or newer in this target line.
-- [F100] Require Factorio 1.0.0 or newer in this target line.
-- [F017] Require Factorio 0.17.79 or newer in this target line.
-- [F016] Require Factorio 0.16.51 or newer in this target line.
-- [F015] Require Factorio 0.15.40 or newer in this target line.
-- [F014] Require Factorio 0.14.23 or newer in this target line.
-- [F013] Require Factorio 0.13.20 or newer in this target line.
+- [Factorio 2.1] Require Factorio 2.1.23 or newer in this target line.
+- [Factorio 2.0] Require Factorio 2.0.77 or newer in this target line.
+- [Factorio 1.1] Require Factorio 1.1.110 or newer in this target line.
+- [Factorio 1.0] Require Factorio 1.0.0 or newer in this target line.
+- [Factorio 0.17] Require Factorio 0.17.79 or newer in this target line.
+- [Factorio 0.16] Require Factorio 0.16.51 or newer in this target line.
+- [Factorio 0.15] Require Factorio 0.15.40 or newer in this target line.
+- [Factorio 0.14] Require Factorio 0.14.23 or newer in this target line.
+- [Factorio 0.13] Require Factorio 0.13.20 or newer in this target line.
 
 ## [4.7.2]
 
@@ -125,15 +125,15 @@ This is the authoritative product changelog. Each MIR 1–3 master release appea
 
 - Target package from source 4.7.2.
 - Retain the published 4.7.1 changelog and earlier history.
-- [F210] Require Factorio 2.1.23 or newer in this target line.
-- [F200] Require Factorio 2.0.77 or newer in this target line.
-- [F110] Require Factorio 1.1.110 or newer in this target line.
-- [F100] Require Factorio 1.0.0 or newer in this target line.
-- [F017] Require Factorio 0.17.79 or newer in this target line.
-- [F016] Require Factorio 0.16.51 or newer in this target line.
-- [F015] Require Factorio 0.15.40 or newer in this target line.
-- [F014] Require Factorio 0.14.23 or newer in this target line.
-- [F013] Require Factorio 0.13.20 or newer in this target line.
+- [Factorio 2.1] Require Factorio 2.1.23 or newer in this target line.
+- [Factorio 2.0] Require Factorio 2.0.77 or newer in this target line.
+- [Factorio 1.1] Require Factorio 1.1.110 or newer in this target line.
+- [Factorio 1.0] Require Factorio 1.0.0 or newer in this target line.
+- [Factorio 0.17] Require Factorio 0.17.79 or newer in this target line.
+- [Factorio 0.16] Require Factorio 0.16.51 or newer in this target line.
+- [Factorio 0.15] Require Factorio 0.15.40 or newer in this target line.
+- [Factorio 0.14] Require Factorio 0.14.23 or newer in this target line.
+- [Factorio 0.13] Require Factorio 0.13.20 or newer in this target line.
 
 ## [4.7.1]
 
@@ -145,40 +145,40 @@ This is the authoritative product changelog. Each MIR 1–3 master release appea
 
 ### Historical qualification scope
 
-- All nine editions passed focused packaged-Lua controls and exact-engine loading; the eight editions from F013 through F200 recorded 4.7.0 upgrades with two cold reloads, while F210 retained its earlier Base and Space Age scope rather than establishing a generalized new result.
+- All nine editions passed focused packaged-Lua controls and exact-engine loading; the eight editions from Factorio 0.13 through Factorio 2.0 recorded 4.7.0 upgrades with two cold reloads, while Factorio 2.1 retained its earlier Base and Space Age scope rather than establishing a generalized new result.
 - Reporter mod closures were unavailable, and this release made no new performance claim.
 
 ### Info
 
 - Target package from source 4.7.1.
 - Retain the published 4.7.0 changelog and earlier history.
-- [F210] Require Factorio 2.1.23 or newer in this target line.
-- [F200] Require Factorio 2.0.77 or newer in this target line.
-- [F110] Require Factorio 1.1.110 or newer in this target line.
-- [F100] Require Factorio 1.0.0 or newer in this target line.
-- [F017] Require Factorio 0.17.79 or newer in this target line.
-- [F016] Require Factorio 0.16.51 or newer in this target line.
-- [F015] Require Factorio 0.15.40 or newer in this target line.
-- [F014] Require Factorio 0.14.23 or newer in this target line.
-- [F013] Require Factorio 0.13.20 or newer in this target line.
+- [Factorio 2.1] Require Factorio 2.1.23 or newer in this target line.
+- [Factorio 2.0] Require Factorio 2.0.77 or newer in this target line.
+- [Factorio 1.1] Require Factorio 1.1.110 or newer in this target line.
+- [Factorio 1.0] Require Factorio 1.0.0 or newer in this target line.
+- [Factorio 0.17] Require Factorio 0.17.79 or newer in this target line.
+- [Factorio 0.16] Require Factorio 0.16.51 or newer in this target line.
+- [Factorio 0.15] Require Factorio 0.15.40 or newer in this target line.
+- [Factorio 0.14] Require Factorio 0.14.23 or newer in this target line.
+- [Factorio 0.13] Require Factorio 0.13.20 or newer in this target line.
 
 ## [4.7.0]
 
 ### Performance
 
-- [F210, F200, F110, F100] Reuse owned Gate and provider inputs, and capture journal mutation before-state once with independent after checks.
-- [F210, F200, F110, F100] Prepare recipe semantics and full facts lazily; reuse normalized output, ingredient and category relationships.
+- [Factorio 2.1, Factorio 2.0, Factorio 1.1, Factorio 1.0] Reuse owned Gate and provider inputs, and capture journal mutation before-state once with independent after checks.
+- [Factorio 2.1, Factorio 2.0, Factorio 1.1, Factorio 1.0] Prepare recipe semantics and full facts lazily; reuse normalized output, ingredient and category relationships.
 
 ### Bugfixes
 
-- [F210, F200] Bind approved trigger-output science sources through positive typed outputs and required prerequisites.
-- [F210, F200] Keep disabled, cyclic and unseeded alternatives unresolved.
+- [Factorio 2.1, Factorio 2.0] Bind approved trigger-output science sources through positive typed outputs and required prerequisites.
+- [Factorio 2.1, Factorio 2.0] Keep disabled, cyclic and unseeded alternatives unresolved.
 
 ### Compatibility
 
-- [F210] Add finite Imersite levels 1-3 and a level 4+ powder continuation for K2 2.1.4 with K2SO 2.0.19.
-- [F210] Preserve separate native crystal ownership and saved research state through the Imersite migration.
-- [F210] Apply Gunmetal/Invar structural continuation mappings for Bob/Angel with BobsTech.
+- [Factorio 2.1] Add finite Imersite levels 1-3 and a level 4+ powder continuation for K2 2.1.4 with K2SO 2.0.19.
+- [Factorio 2.1] Preserve separate native crystal ownership and saved research state through the Imersite migration.
+- [Factorio 2.1] Apply Gunmetal/Invar structural continuation mappings for Bob/Angel with BobsTech.
 
 ### Historical qualification scope
 
@@ -189,51 +189,51 @@ This is the authoritative product changelog. Each MIR 1–3 master release appea
 
 - Target package from source 4.7.0.
 - Retain the exact published 4.6 entry and earlier history for this target.
-- [F210] Require Factorio 2.1.23 or newer in this target line, matching declared package metadata.
-- [F200] Require Factorio 2.0.77 or newer in this target line, matching declared package metadata.
-- [F110] Require Factorio 1.1.110 or newer in this target line, matching declared package metadata.
-- [F100] Require Factorio 1.0.0 or newer in this target line, matching declared package metadata.
-- [F017] Require Factorio 0.17.79 or newer in this target line, matching declared package metadata.
-- [F016] Require Factorio 0.16.51 or newer in this target line, matching declared package metadata.
-- [F015] Require Factorio 0.15.40 or newer in this target line, matching declared package metadata.
-- [F014] Require Factorio 0.14.23 or newer in this target line, matching declared package metadata.
-- [F013] Require Factorio 0.13.20 or newer in this target line, matching declared package metadata.
+- [Factorio 2.1] Require Factorio 2.1.23 or newer in this target line, matching declared package metadata.
+- [Factorio 2.0] Require Factorio 2.0.77 or newer in this target line, matching declared package metadata.
+- [Factorio 1.1] Require Factorio 1.1.110 or newer in this target line, matching declared package metadata.
+- [Factorio 1.0] Require Factorio 1.0.0 or newer in this target line, matching declared package metadata.
+- [Factorio 0.17] Require Factorio 0.17.79 or newer in this target line, matching declared package metadata.
+- [Factorio 0.16] Require Factorio 0.16.51 or newer in this target line, matching declared package metadata.
+- [Factorio 0.15] Require Factorio 0.15.40 or newer in this target line, matching declared package metadata.
+- [Factorio 0.14] Require Factorio 0.14.23 or newer in this target line, matching declared package metadata.
+- [Factorio 0.13] Require Factorio 0.13.20 or newer in this target line, matching declared package metadata.
 
 ## [4.6.0]
 
 ### Bugfixes
 
-- [F210, F200, F110, F100] Accept an independently available replacement science recipe when its named source has no usable unlock.
-- [F210, F200, F110, F100] Keep disabled and circular alternatives from inventing science availability.
+- [Factorio 2.1, Factorio 2.0, Factorio 1.1, Factorio 1.0] Accept an independently available replacement science recipe when its named source has no usable unlock.
+- [Factorio 2.1, Factorio 2.0, Factorio 1.1, Factorio 1.0] Keep disabled and circular alternatives from inventing science availability.
 
 ### Performance
 
-- [F210, F200, F110, F100] Reuse the prepared technology-selection fingerprint instead of encoding the same selection again.
+- [Factorio 2.1, Factorio 2.0, Factorio 1.1, Factorio 1.0] Reuse the prepared technology-selection fingerprint instead of encoding the same selection again.
 
 ### Info
 
 - Target package from source 4.6.0.
 - Restore the published 4.3, 4.4 and 4.5 changelog entries alongside the retained earlier history.
 - Retain the research, settings, cap and save-continuity repairs included in source 4.5.2.
-- [F210] Require Factorio 2.1.21 or newer in this target line, matching the accepted exact-engine tests.
-- [F200] Require Factorio 2.0.77 or newer in this target line, matching the accepted exact-engine tests.
-- [F110] Require Factorio 1.1.110 or newer in this target line, matching the accepted exact-engine tests.
-- [F100] Require Factorio 1.0.0 or newer in this target line, matching the accepted exact-engine tests.
-- [F017] Require Factorio 0.17.79 or newer in this target line, matching the accepted exact-engine tests.
-- [F016] Require Factorio 0.16.51 or newer in this target line, matching the accepted exact-engine tests.
-- [F015] Require Factorio 0.15.40 or newer in this target line, matching the accepted exact-engine tests.
-- [F014] Require Factorio 0.14.23 or newer in this target line, matching the accepted exact-engine tests.
-- [F013] Require Factorio 0.13.20 or newer in this target line, matching the accepted exact-engine tests.
+- [Factorio 2.1] Require Factorio 2.1.21 or newer in this target line, matching the accepted exact-engine tests.
+- [Factorio 2.0] Require Factorio 2.0.77 or newer in this target line, matching the accepted exact-engine tests.
+- [Factorio 1.1] Require Factorio 1.1.110 or newer in this target line, matching the accepted exact-engine tests.
+- [Factorio 1.0] Require Factorio 1.0.0 or newer in this target line, matching the accepted exact-engine tests.
+- [Factorio 0.17] Require Factorio 0.17.79 or newer in this target line, matching the accepted exact-engine tests.
+- [Factorio 0.16] Require Factorio 0.16.51 or newer in this target line, matching the accepted exact-engine tests.
+- [Factorio 0.15] Require Factorio 0.15.40 or newer in this target line, matching the accepted exact-engine tests.
+- [Factorio 0.14] Require Factorio 0.14.23 or newer in this target line, matching the accepted exact-engine tests.
+- [Factorio 0.13] Require Factorio 0.13.20 or newer in this target line, matching the accepted exact-engine tests.
 
 ### Compatibility
 
-- [F200] Restore staged Aluminium, Gold, Tin and Titanium manufacturing productivity for the qualified Bob/Angel inputs.
-- [F200] Check actual recipe outputs, permissions, ownership and progression through the shared material bindings.
-- [F200] Apply Gold wire productivity to its gilded copper cable output; retain Tin's established Automation science policy.
+- [Factorio 2.0] Restore staged Aluminium, Gold, Tin and Titanium manufacturing productivity for the qualified Bob/Angel inputs.
+- [Factorio 2.0] Check actual recipe outputs, permissions, ownership and progression through the shared material bindings.
+- [Factorio 2.0] Apply Gold wire productivity to its gilded copper cable output; retain Tin's established Automation science policy.
 
 ### Historical qualification scope
 
-- The F200 Bob/Angel-without-BobTech observation covered four material families, eight staged technologies and eighteen effect entries across nine recipes; four earned levels produced 108 plates from 100 and 432 gilded cables from 400, with saved next-level investment surviving both reloads.
+- The Factorio 2.0 Bob/Angel-without-BobTech observation covered four material families, eight staged technologies and eighteen effect entries across nine recipes; four earned levels produced 108 plates from 100 and 432 gilded cables from 400, with saved next-level investment surviving both reloads.
 - Three-run headless-creation medians were mixed and slower in named Base and Bob/Angel cases; no general speedup, ordinary-menu result or 10% target pass was claimed.
 
 ## [4.5.2]
@@ -260,7 +260,7 @@ This is the authoritative product changelog. Each MIR 1–3 master release appea
 
 ### Historical qualification scope
 
-- Twenty-two upgrades from published 4.5.1 and corrected 4.4.2 plus ten fresh-load scenarios were recorded with two cold reloads; the exact F210 package also had one graphical localhost join, rejoin, restart and Library-search observation, not two-client coverage.
+- Twenty-two upgrades from published 4.5.1 and corrected 4.4.2 plus ten fresh-load scenarios were recorded with two cold reloads; the exact Factorio 2.1 package also had one graphical localhost join, rejoin, restart and Library-search observation, not two-client coverage.
 - Matched Galore headless medians varied in both directions, so the release made no whole-run speedup or ordinary-menu claim.
 
 ## [4.5.1]
@@ -298,14 +298,14 @@ This is the authoritative product changelog. Each MIR 1–3 master release appea
 
 ### Historical qualification limits
 
-- The F200 Angel disabled-silver reproduction and Base-upgrade observation were scoped, with its first cold reload interrupted by the memory guard; final F210 Space Age and broader client qualification remained unfinished.
+- The Factorio 2.0 Angel disabled-silver reproduction and Base-upgrade observation were scoped, with its first cold reload interrupted by the memory guard; final Factorio 2.1 Space Age and broader client qualification remained unfinished.
 - Earlier development-byte headless comparisons were modest and mixed, not final-package or ordinary-menu timings.
 
 ## [4.4.2]
 
 ### Bugfixes
 
-- [F210, F200] Bind Dark Matter Replicators Reborn's mined tenemut lab input to its actual resource, preventing unresolved scoop science dependencies without restarting factory discovery.
+- [Factorio 2.1, Factorio 2.0] Bind Dark Matter Replicators Reborn's mined tenemut lab input to its actual resource, preventing unresolved scoop science dependencies without restarting factory discovery.
 
 ### Performance
 
@@ -314,22 +314,22 @@ This is the authoritative product changelog. Each MIR 1–3 master release appea
 
 ### Changes
 
-- [F210, F200] Add an explicit maximum-level setting for native infinite worker robot speed research, using the existing cap controller without changing earned bonuses, science or costs.
-- [F210, F200] Use the shared native-continuation planner and remove the obsolete Classic notice.
-- [F110, F100, F017, F016, F015, F014, F013] Remove the obsolete Classic notice module and its inactive lifecycle hooks.
+- [Factorio 2.1, Factorio 2.0] Add an explicit maximum-level setting for native infinite worker robot speed research, using the existing cap controller without changing earned bonuses, science or costs.
+- [Factorio 2.1, Factorio 2.0] Use the shared native-continuation planner and remove the obsolete Classic notice.
+- [Factorio 1.1, Factorio 1.0, Factorio 0.17, Factorio 0.16, Factorio 0.15, Factorio 0.14, Factorio 0.13] Remove the obsolete Classic notice module and its inactive lifecycle hooks.
 
 ### Info
 
-- [F110, F100, F017, F016, F015, F014, F013] Target package from source 4.4.2.
+- [Factorio 1.1, Factorio 1.0, Factorio 0.17, Factorio 0.16, Factorio 0.15, Factorio 0.14, Factorio 0.13] Target package from source 4.4.2.
 
 ### Fixes
 
-- [F016] Retain published Factorio 0.16 science progression prerequisites through checked declarations.
-- [F015] Recognize Factorio 0.15 satellite launch results and retain approved science progression prerequisites.
+- [Factorio 0.16] Retain published Factorio 0.16 science progression prerequisites through checked declarations.
+- [Factorio 0.15] Recognize Factorio 0.15 satellite launch results and retain approved science progression prerequisites.
 
 ### Historical qualification scope
 
-- Native F200 Base and F210 Space Age exercised the worker-speed cap from 0 to 10 to 0 and retained earned bonuses plus 42% progress; focused F200/F210 predecessor upgrades each used two cold reloads.
+- Native Factorio 2.0 Base and Factorio 2.1 Space Age exercised the worker-speed cap from 0 to 10 to 0 and retained earned bonuses plus 42% progress; focused Factorio 2.0/Factorio 2.1 predecessor upgrades each used two cold reloads.
 
 ### Historical qualification limits
 
@@ -362,13 +362,13 @@ This is the authoritative product changelog. Each MIR 1–3 master release appea
 
 ### Compatibility
 
-- A focused F200 Secretas 1.0.33 plus Pretty Frozeta 0.1.0 finite continuation passed; the original reporter save, F210 Secretas 1.0.37 incompatibility and reported mining-yield/core-drill behavior stayed outside that scope.
-- A focused F200 manufacturing observation measured drill-recipe productivity only; it did not establish ore yield, Space Exploration or client behavior.
+- A focused Factorio 2.0 Secretas 1.0.33 plus Pretty Frozeta 0.1.0 finite continuation passed; the original reporter save, Factorio 2.1 Secretas 1.0.37 incompatibility and reported mining-yield/core-drill behavior stayed outside that scope.
+- A focused Factorio 2.0 manufacturing observation measured drill-recipe productivity only; it did not establish ore yield, Space Exploration or client behavior.
 
 ### Historical qualification scope
 
-- The release recorded F200 Base and Galore/Space Age direct 4.2.2 and immediate 4.3.0 upgrades, F110 Base and F210 Space Age observations; the F200 paths used four actors and two cold reloads, not an all-scenario result.
-- Matched F200 Galore/Space Age headless creation observed 12.1377% and 11.4527% improvements against published 4.3.0, while remaining 38–39% above the no-MIR arm; this was not ordinary-menu, reporter-profile or client qualification.
+- The release recorded Factorio 2.0 Base and Galore/Space Age direct 4.2.2 and immediate 4.3.0 upgrades, Factorio 1.1 Base and Factorio 2.1 Space Age observations; the Factorio 2.0 paths used four actors and two cold reloads, not an all-scenario result.
+- Matched Factorio 2.0 Galore/Space Age headless creation observed 12.1377% and 11.4527% improvements against published 4.3.0, while remaining 38–39% above the no-MIR arm; this was not ordinary-menu, reporter-profile or client qualification.
 
 ### Historical qualification limits
 
@@ -387,7 +387,7 @@ This is the authoritative product changelog. Each MIR 1–3 master release appea
 
 ### Historical qualification scope
 
-- Published 4.2.2 upgrades on Base F200, Base F210 and Space Age F210 recorded definitions, saved investment, effects, queues, fractional progress and two cold reloads; zero row differences in named Galore and Bob/Angel captures did not prove modded-save migration.
+- Published 4.2.2 upgrades on Base Factorio 2.0, Base Factorio 2.1 and Space Age Factorio 2.1 recorded definitions, saved investment, effects, queues, fractional progress and two cold reloads; zero row differences in named Galore and Bob/Angel captures did not prove modded-save migration.
 - Matched headless create-and-save observations ranged from 4.98% to 59.47% shorter total runs in named profiles, not ordinary-menu, reporter-environment or first-Library-use qualification.
 
 ### Historical qualification limits
@@ -398,45 +398,45 @@ This is the authoritative product changelog. Each MIR 1–3 master release appea
 
 ### Bugfixes
 
-- [F210, F200] Honor declared surface-property defaults when admitting an acquired laboratory, while preserving explicit surface overrides.
-- [F210, F200] Continue eligible base research after a finite numeric upstream level range from its actual terminal technology, preserving the finite chain and true-infinite ownership checks.
-- [F210, F200] Refine recipe-productivity and science-route admission from completed recipe outputs, compatible fluid handling and valid acquisition routes.
-- [F210, F200] Keep unsafe return and recycling paths from admitting unreachable research while retaining verified native spoilage acquisition.
-- [F210] Adapt the Research Library to the supported Factorio 2.1 catalogue, recipe, statistics and event APIs.
-- [F200] Adapt the Research Library to the supported Factorio 2.0 catalogue, recipe, statistics and event APIs.
+- [Factorio 2.1, Factorio 2.0] Honor declared surface-property defaults when admitting an acquired laboratory, while preserving explicit surface overrides.
+- [Factorio 2.1, Factorio 2.0] Continue eligible base research after a finite numeric upstream level range from its actual terminal technology, preserving the finite chain and true-infinite ownership checks.
+- [Factorio 2.1, Factorio 2.0] Refine recipe-productivity and science-route admission from completed recipe outputs, compatible fluid handling and valid acquisition routes.
+- [Factorio 2.1, Factorio 2.0] Keep unsafe return and recycling paths from admitting unreachable research while retaining verified native spoilage acquisition.
+- [Factorio 2.1] Adapt the Research Library to the supported Factorio 2.1 catalogue, recipe, statistics and event APIs.
+- [Factorio 2.0] Adapt the Research Library to the supported Factorio 2.0 catalogue, recipe, statistics and event APIs.
 
 ### Changes
 
-- [F210, F200] Keep the Research Library available independently of optional settings-profile import tools.
-- [F210, F200] Show a force-wide science-production summary when this engine supplies force-wide statistics.
-- [F110] Update the Factorio 1.1 distribution identity and package guidance for source 4.2.2.
-- [F110, F100, F017, F016, F015, F014, F013] Preserve the reduced target research and settings surface.
-- [F110, F100, F017, F016, F015, F014, F013] Continue eligible base research after a finite numeric upstream level range from its actual terminal technology, preserving the finite chain and true-infinite ownership checks.
-- [F110, F100, F017, F016, F015, F014, F013] Research Library host adapters remain disabled on this target; this package does not enable a backport.
-- [F100] Update the Factorio 1.0 distribution identity and package guidance for source 4.2.2.
-- [F017] Update the Factorio 0.17 distribution identity and package guidance for source 4.2.2.
-- [F016] Update the Factorio 0.16 distribution identity and package guidance for source 4.2.2.
-- [F015] Update the Factorio 0.15 distribution identity and package guidance for source 4.2.2.
-- [F014] Update the Factorio 0.14 distribution identity and package guidance for source 4.2.2.
-- [F013] Update the Factorio 0.13 distribution identity and package guidance for source 4.2.2.
+- [Factorio 2.1, Factorio 2.0] Keep the Research Library available independently of optional settings-profile import tools.
+- [Factorio 2.1, Factorio 2.0] Show a force-wide science-production summary when this engine supplies force-wide statistics.
+- [Factorio 1.1] Update the Factorio 1.1 distribution identity and package guidance for source 4.2.2.
+- [Factorio 1.1, Factorio 1.0, Factorio 0.17, Factorio 0.16, Factorio 0.15, Factorio 0.14, Factorio 0.13] Preserve the reduced target research and settings surface.
+- [Factorio 1.1, Factorio 1.0, Factorio 0.17, Factorio 0.16, Factorio 0.15, Factorio 0.14, Factorio 0.13] Continue eligible base research after a finite numeric upstream level range from its actual terminal technology, preserving the finite chain and true-infinite ownership checks.
+- [Factorio 1.1, Factorio 1.0, Factorio 0.17, Factorio 0.16, Factorio 0.15, Factorio 0.14, Factorio 0.13] Research Library host adapters remain disabled on this target; this package does not enable a backport.
+- [Factorio 1.0] Update the Factorio 1.0 distribution identity and package guidance for source 4.2.2.
+- [Factorio 0.17] Update the Factorio 0.17 distribution identity and package guidance for source 4.2.2.
+- [Factorio 0.16] Update the Factorio 0.16 distribution identity and package guidance for source 4.2.2.
+- [Factorio 0.15] Update the Factorio 0.15 distribution identity and package guidance for source 4.2.2.
+- [Factorio 0.14] Update the Factorio 0.14 distribution identity and package guidance for source 4.2.2.
+- [Factorio 0.13] Update the Factorio 0.13 distribution identity and package guidance for source 4.2.2.
 
 ### Compatibility
 
-- [F210, F200] Route admission remains conditional on the actual enabled mod set and its completed data stage.
-- [F210, F200] Historical Research Library hosts remain disabled; this package does not enable a backport.
+- [Factorio 2.1, Factorio 2.0] Route admission remains conditional on the actual enabled mod set and its completed data stage.
+- [Factorio 2.1, Factorio 2.0] Historical Research Library hosts remain disabled; this package does not enable a backport.
 
 ### Info
 
-- [F210] Use 4.2.21002 for source 4.2.2. The final 02 identifies the source patch, not a packaging retry.
+- [Factorio 2.1] Use 4.2.21002 for source 4.2.2. The final 02 identifies the source patch, not a packaging retry.
 - Preserve original saves before upgrading from the published 4.2.1 package for the same Factorio target.
-- [F200] Use 4.2.20002 for source 4.2.2. The final 02 identifies the source patch, not a packaging retry.
-- [F110] Use 4.2.11002 for source 4.2.2. The final 02 identifies the source patch, not a packaging retry.
-- [F100] Use 4.2.10002 for source 4.2.2. The final 02 identifies the source patch, not a packaging retry.
-- [F017] Use 4.2.01702 for source 4.2.2. The final 02 identifies the source patch, not a packaging retry.
-- [F016] Use 4.2.01602 for source 4.2.2. The final 02 identifies the source patch, not a packaging retry.
-- [F015] Use 4.2.01502 for source 4.2.2. The final 02 identifies the source patch, not a packaging retry.
-- [F014] Use 4.2.01402 for source 4.2.2. The final 02 identifies the source patch, not a packaging retry.
-- [F013] Use 4.2.01302 for source 4.2.2. The final 02 identifies the source patch, not a packaging retry.
+- [Factorio 2.0] Use 4.2.20002 for source 4.2.2. The final 02 identifies the source patch, not a packaging retry.
+- [Factorio 1.1] Use 4.2.11002 for source 4.2.2. The final 02 identifies the source patch, not a packaging retry.
+- [Factorio 1.0] Use 4.2.10002 for source 4.2.2. The final 02 identifies the source patch, not a packaging retry.
+- [Factorio 0.17] Use 4.2.01702 for source 4.2.2. The final 02 identifies the source patch, not a packaging retry.
+- [Factorio 0.16] Use 4.2.01602 for source 4.2.2. The final 02 identifies the source patch, not a packaging retry.
+- [Factorio 0.15] Use 4.2.01502 for source 4.2.2. The final 02 identifies the source patch, not a packaging retry.
+- [Factorio 0.14] Use 4.2.01402 for source 4.2.2. The final 02 identifies the source patch, not a packaging retry.
+- [Factorio 0.13] Use 4.2.01302 for source 4.2.2. The final 02 identifies the source patch, not a packaging retry.
 
 ### Upgrade limits
 
@@ -446,59 +446,59 @@ This is the authoritative product changelog. Each MIR 1–3 master release appea
 
 ### Bugfixes
 
-- [F210, F200] Compile after Bob's Electronics and Technology finalizers when installed, so lab and science acquisition uses their completed progression.
-- [F210, F200] Remove retired space science from Weapon shooting speed 7 and Lab research speed 7 with Space Is Fake.
-- [F210] Restore Imersite powder continuation with K2 2.1.3/K2SO 2.0.13 on Factorio 2.1.21.
-- [F210, F200] Use base/MIR artwork when an optional DLC artwork provider is inactive, including saved or imported icon opt-ins.
-- [F210, F200] Apply the selected braking-force bonus and its correct badge to the native continuation.
-- [F210, F200] Reject continuations whose useful effects are zero after ownership resolution.
-- [F210, F200] Require an obtainable compatible laboratory and acquisition routes for selected science packs.
-- [F210, F200] Reject circular science acquisition before recursively selecting a laboratory.
-- [F210, F200] Account for machine, drill, pump, boiler and fluid-temperature requirements when checking acquisition routes.
-- [F210, F200] Respect typed outputs, result probabilities, productive quantities and productivity exclusions in route admission.
-- [F210, F200] Reject unsafe self-return routes without treating impossible return edges as reachable production.
-- [F210, F200] Include localized recipe and material names in Research Library discovery.
-- [F210, F200] Preserve Library close/position ownership and release obsolete source-force catalogue caches after a merge.
-- [F200] Preserve paid LDS, plastic, processing-unit, rocket-fuel and steel manufacturing bonuses with Space Is Fake 1.0.60.
-- [F200] Keep their retained technology IDs hidden from new research while preserving saved levels and queued progress.
+- [Factorio 2.1, Factorio 2.0] Compile after Bob's Electronics and Technology finalizers when installed, so lab and science acquisition uses their completed progression.
+- [Factorio 2.1, Factorio 2.0] Remove retired space science from Weapon shooting speed 7 and Lab research speed 7 with Space Is Fake.
+- [Factorio 2.1] Restore Imersite powder continuation with K2 2.1.3/K2SO 2.0.13 on Factorio 2.1.21.
+- [Factorio 2.1, Factorio 2.0] Use base/MIR artwork when an optional DLC artwork provider is inactive, including saved or imported icon opt-ins.
+- [Factorio 2.1, Factorio 2.0] Apply the selected braking-force bonus and its correct badge to the native continuation.
+- [Factorio 2.1, Factorio 2.0] Reject continuations whose useful effects are zero after ownership resolution.
+- [Factorio 2.1, Factorio 2.0] Require an obtainable compatible laboratory and acquisition routes for selected science packs.
+- [Factorio 2.1, Factorio 2.0] Reject circular science acquisition before recursively selecting a laboratory.
+- [Factorio 2.1, Factorio 2.0] Account for machine, drill, pump, boiler and fluid-temperature requirements when checking acquisition routes.
+- [Factorio 2.1, Factorio 2.0] Respect typed outputs, result probabilities, productive quantities and productivity exclusions in route admission.
+- [Factorio 2.1, Factorio 2.0] Reject unsafe self-return routes without treating impossible return edges as reachable production.
+- [Factorio 2.1, Factorio 2.0] Include localized recipe and material names in Research Library discovery.
+- [Factorio 2.1, Factorio 2.0] Preserve Library close/position ownership and release obsolete source-force catalogue caches after a merge.
+- [Factorio 2.0] Preserve paid LDS, plastic, processing-unit, rocket-fuel and steel manufacturing bonuses with Space Is Fake 1.0.60.
+- [Factorio 2.0] Keep their retained technology IDs hidden from new research while preserving saved levels and queued progress.
 
 ### Compatibility
 
-- [F210, F200] Extend guarded material continuation and science-frontier handling through the existing route and owner checks.
-- [F210, F200] Keep new Angel/Py subjects conditional; declarations alone do not establish supported overhaul profiles.
-- [F210, F200] Preserve existing community breeding and equipment-manufacturing fixes from 4.2.0.
+- [Factorio 2.1, Factorio 2.0] Extend guarded material continuation and science-frontier handling through the existing route and owner checks.
+- [Factorio 2.1, Factorio 2.0] Keep new Angel/Py subjects conditional; declarations alone do not establish supported overhaul profiles.
+- [Factorio 2.1, Factorio 2.0] Preserve existing community breeding and equipment-manufacturing fixes from 4.2.0.
 
 ### Changes
 
-- [F210, F200] Cache decoded startup profiles and index laboratory placement items during planning.
-- [F210, F200, F110, F100] Try initially obtainable crafting machines before exploring research-gated alternatives during acquisition planning.
-- [F210, F200] Optional DLC icon preferences no longer authorize reading files from inactive Space Age or Elevated Rails.
-- [F110] Update the Factorio 1.1 distribution identity and package guidance for source 4.2.1.
-- [F110, F100, F017, F016, F015, F014, F013] Preserve the reduced target research and settings surface; modern-only features remain excluded.
-- [F110, F100, F017, F016, F015, F014, F013] Research Library backports are not included in this package.
-- [F100] Update the Factorio 1.0 distribution identity and package guidance for source 4.2.1.
-- [F017] Update the Factorio 0.17 distribution identity and package guidance for source 4.2.1.
-- [F016] Update the Factorio 0.16 distribution identity and package guidance for source 4.2.1.
-- [F016, F015, F014, F013] Recognize the historical player prototype when checking handcraftable laboratory and science acquisition routes.
-- [F016, F015, F014, F013] Select the native historical science-pack names for default research and official science progression.
-- [F015] Update the Factorio 0.15 distribution identity and package guidance for source 4.2.1.
-- [F014] Update the Factorio 0.14 distribution identity and package guidance for source 4.2.1.
-- [F014, F013] Emit the singular technology icon field required by this engine, preserving the selected base artwork.
-- [F014, F013] Withhold robot-battery research because this engine does not support its native modifier.
-- [F013] Update the Factorio 0.13 distribution identity and package guidance for source 4.2.1.
+- [Factorio 2.1, Factorio 2.0] Cache decoded startup profiles and index laboratory placement items during planning.
+- [Factorio 2.1, Factorio 2.0, Factorio 1.1, Factorio 1.0] Try initially obtainable crafting machines before exploring research-gated alternatives during acquisition planning.
+- [Factorio 2.1, Factorio 2.0] Optional DLC icon preferences no longer authorize reading files from inactive Space Age or Elevated Rails.
+- [Factorio 1.1] Update the Factorio 1.1 distribution identity and package guidance for source 4.2.1.
+- [Factorio 1.1, Factorio 1.0, Factorio 0.17, Factorio 0.16, Factorio 0.15, Factorio 0.14, Factorio 0.13] Preserve the reduced target research and settings surface; modern-only features remain excluded.
+- [Factorio 1.1, Factorio 1.0, Factorio 0.17, Factorio 0.16, Factorio 0.15, Factorio 0.14, Factorio 0.13] Research Library backports are not included in this package.
+- [Factorio 1.0] Update the Factorio 1.0 distribution identity and package guidance for source 4.2.1.
+- [Factorio 0.17] Update the Factorio 0.17 distribution identity and package guidance for source 4.2.1.
+- [Factorio 0.16] Update the Factorio 0.16 distribution identity and package guidance for source 4.2.1.
+- [Factorio 0.16, Factorio 0.15, Factorio 0.14, Factorio 0.13] Recognize the historical player prototype when checking handcraftable laboratory and science acquisition routes.
+- [Factorio 0.16, Factorio 0.15, Factorio 0.14, Factorio 0.13] Select the native historical science-pack names for default research and official science progression.
+- [Factorio 0.15] Update the Factorio 0.15 distribution identity and package guidance for source 4.2.1.
+- [Factorio 0.14] Update the Factorio 0.14 distribution identity and package guidance for source 4.2.1.
+- [Factorio 0.14, Factorio 0.13] Emit the singular technology icon field required by this engine, preserving the selected base artwork.
+- [Factorio 0.14, Factorio 0.13] Withhold robot-battery research because this engine does not support its native modifier.
+- [Factorio 0.13] Update the Factorio 0.13 distribution identity and package guidance for source 4.2.1.
 
 ### Info
 
-- [F210] Use 4.2.21001 for source 4.2.1. The final 01 identifies the source patch, not a packaging retry.
+- [Factorio 2.1] Use 4.2.21001 for source 4.2.1. The final 01 identifies the source patch, not a packaging retry.
 - Preserve original saves before upgrading from the published 4.2.0 package for the same Factorio target.
-- [F200] Use 4.2.20001 for source 4.2.1. The final 01 identifies the source patch, not a packaging retry.
-- [F110] Use 4.2.11001 for source 4.2.1. The final 01 identifies the source patch, not a packaging retry.
-- [F100] Use 4.2.10001 for source 4.2.1. The final 01 identifies the source patch, not a packaging retry.
-- [F017] Use 4.2.01701 for source 4.2.1. The final 01 identifies the source patch, not a packaging retry.
-- [F016] Use 4.2.01601 for source 4.2.1. The final 01 identifies the source patch, not a packaging retry.
-- [F015] Use 4.2.01501 for source 4.2.1. The final 01 identifies the source patch, not a packaging retry.
-- [F014] Use 4.2.01401 for source 4.2.1. The final 01 identifies the source patch, not a packaging retry.
-- [F013] Use 4.2.01301 for source 4.2.1. The final 01 identifies the source patch, not a packaging retry.
+- [Factorio 2.0] Use 4.2.20001 for source 4.2.1. The final 01 identifies the source patch, not a packaging retry.
+- [Factorio 1.1] Use 4.2.11001 for source 4.2.1. The final 01 identifies the source patch, not a packaging retry.
+- [Factorio 1.0] Use 4.2.10001 for source 4.2.1. The final 01 identifies the source patch, not a packaging retry.
+- [Factorio 0.17] Use 4.2.01701 for source 4.2.1. The final 01 identifies the source patch, not a packaging retry.
+- [Factorio 0.16] Use 4.2.01601 for source 4.2.1. The final 01 identifies the source patch, not a packaging retry.
+- [Factorio 0.15] Use 4.2.01501 for source 4.2.1. The final 01 identifies the source patch, not a packaging retry.
+- [Factorio 0.14] Use 4.2.01401 for source 4.2.1. The final 01 identifies the source patch, not a packaging retry.
+- [Factorio 0.13] Use 4.2.01301 for source 4.2.1. The final 01 identifies the source patch, not a packaging retry.
 
 ### Superseded advisory
 
@@ -508,63 +508,63 @@ This is the authoritative product changelog. Each MIR 1–3 master release appea
 
 ### Changes
 
-- [F210, F200] Added a hideable research-browser shortcut with localized search, personal views, and native research-queue controls.
-- [F210, F200] Show MIR research in progression order with science, cost, prerequisites, and effect details.
-- [F210, F200] Added guarded finite ordinary-material productivity research with three +2% levels by default for eligible recipes.
-- [F210, F200] Added optional free wall/gate maintenance, disabled by default: up to 1 HP per second after 10 seconds without damage.
-- [F110] Rebuilt the retained Factorio 1.1 package from the current MIR 4.2 source.
-- [F110, F100] Kept the reduced eleven-stream research and settings surface.
-- [F110] Omitted the Factorio-2-only research-cost support artifact from this Factorio 1.1 package.
-- [F100] Rebuilt the retained Factorio 1.0 package from the current MIR 4.2 source.
-- [F100] Omitted the Factorio-2-only research-cost support artifact from this Factorio 1.0 package.
+- [Factorio 2.1, Factorio 2.0] Added a hideable research-browser shortcut with localized search, personal views, and native research-queue controls.
+- [Factorio 2.1, Factorio 2.0] Show MIR research in progression order with science, cost, prerequisites, and effect details.
+- [Factorio 2.1, Factorio 2.0] Added guarded finite ordinary-material productivity research with three +2% levels by default for eligible recipes.
+- [Factorio 2.1, Factorio 2.0] Added optional free wall/gate maintenance, disabled by default: up to 1 HP per second after 10 seconds without damage.
+- [Factorio 1.1] Rebuilt the retained Factorio 1.1 package from the current MIR 4.2 source.
+- [Factorio 1.1, Factorio 1.0] Kept the reduced eleven-stream research and settings surface.
+- [Factorio 1.1] Omitted the Factorio-2-only research-cost support artifact from this Factorio 1.1 package.
+- [Factorio 1.0] Rebuilt the retained Factorio 1.0 package from the current MIR 4.2 source.
+- [Factorio 1.0] Omitted the Factorio-2-only research-cost support artifact from this Factorio 1.0 package.
 
 ### Bugfixes
 
-- [F210, F200] Keep breeding research controls visible for eligible recipes without Space Age; existing setting values are retained.
-- [F210, F200] Exclude retired space science from MIR research when Space Is Fake is active.
-- [F210, F200] Cover AAI industrial furnace, SE solar-panel and accumulator tiers in existing manufacturing-productivity research.
-- [F210, F200] Cover Solar Matrix and Accumulator V2 manufacturing without changing upstream power, capacity, or unlocks.
-- [F210, F200] Preserve continuation effects when an existing native research owner overlaps MIR research.
-- [F210, F200] Preserve generic weapon-speed effects when weapon-overlap handling is set to off.
-- [F210, F200] Store science-route snapshots without copying live compiler service functions.
-- [F210, F200] Retain canonical serialization corrections without claiming an unmeasured overall speedup.
-- [F210, F200] Kept item and fluid identities distinct in material-route and self-return checks.
-- [F210] Recognized explicit offshore-pump sources, native water offsets, and actual lab inputs in science selection.
-- [F210] Restored Space Age productivity research lost through science selection while preserving technology identities and order.
-- [F210] Preserved a foreign-disabled technology through V2-to-V3 cap migration and subsequent cap relaxation.
-- [F210] Preserved native queues and force-owned state through cap transitions while refusing forged cap policies.
-- [F200] Preserved safe science exclusions when the locked Bob/Angel profile disables ordinary salt production.
-- [F200] Recognized explicit offshore-pump fluid sources and actual lab inputs when selecting science for generated research.
-- [F200] Corrected settings-derived maximum-level transitions while preserving completed research and MIR-owned cap state.
-- [F110] Restored package loading by keeping the Factorio-2-only support proof outside the Factorio 1.1 target.
-- [F100] Restored package loading by keeping the Factorio-2-only support proof outside the Factorio 1.0 target.
+- [Factorio 2.1, Factorio 2.0] Keep breeding research controls visible for eligible recipes without Space Age; existing setting values are retained.
+- [Factorio 2.1, Factorio 2.0] Exclude retired space science from MIR research when Space Is Fake is active.
+- [Factorio 2.1, Factorio 2.0] Cover AAI industrial furnace, SE solar-panel and accumulator tiers in existing manufacturing-productivity research.
+- [Factorio 2.1, Factorio 2.0] Cover Solar Matrix and Accumulator V2 manufacturing without changing upstream power, capacity, or unlocks.
+- [Factorio 2.1, Factorio 2.0] Preserve continuation effects when an existing native research owner overlaps MIR research.
+- [Factorio 2.1, Factorio 2.0] Preserve generic weapon-speed effects when weapon-overlap handling is set to off.
+- [Factorio 2.1, Factorio 2.0] Store science-route snapshots without copying live compiler service functions.
+- [Factorio 2.1, Factorio 2.0] Retain canonical serialization corrections without claiming an unmeasured overall speedup.
+- [Factorio 2.1, Factorio 2.0] Kept item and fluid identities distinct in material-route and self-return checks.
+- [Factorio 2.1] Recognized explicit offshore-pump sources, native water offsets, and actual lab inputs in science selection.
+- [Factorio 2.1] Restored Space Age productivity research lost through science selection while preserving technology identities and order.
+- [Factorio 2.1] Preserved a foreign-disabled technology through V2-to-V3 cap migration and subsequent cap relaxation.
+- [Factorio 2.1] Preserved native queues and force-owned state through cap transitions while refusing forged cap policies.
+- [Factorio 2.0] Preserved safe science exclusions when the locked Bob/Angel profile disables ordinary salt production.
+- [Factorio 2.0] Recognized explicit offshore-pump fluid sources and actual lab inputs when selecting science for generated research.
+- [Factorio 2.0] Corrected settings-derived maximum-level transitions while preserving completed research and MIR-owned cap state.
+- [Factorio 1.1] Restored package loading by keeping the Factorio-2-only support proof outside the Factorio 1.1 target.
+- [Factorio 1.0] Restored package loading by keeping the Factorio-2-only support proof outside the Factorio 1.0 target.
 
 ### Compatibility
 
-- [F210] Raised the F210 base, optional Recycler, and optional Space Age dependency floor to Factorio 2.1.18.
-- [F210, F200] Excluded unavailable, cyclic, externally owned, and productivity-denied material routes from generated research.
-- [F200] Preserved existing technology and setting identities while composing the Factorio 2.0 package from shared source.
+- [Factorio 2.1] Raised the Factorio 2.1 base, optional Recycler, and optional Space Age dependency floor to Factorio 2.1.18.
+- [Factorio 2.1, Factorio 2.0] Excluded unavailable, cyclic, externally owned, and productivity-denied material routes from generated research.
+- [Factorio 2.0] Preserved existing technology and setting identities while composing the Factorio 2.0 package from shared source.
 
 ### Playtest
 
-- [F017, F016, F015] Rebuilt the reduced eleven-stream research surface from current MIR 4.2 source.
-- [F017] Added the Factorio 0.17 target adapter and exact-engine package smoke coverage.
-- [F017, F016, F015, F014, F013] Kept Factorio-2-only research-cost support output out of this historical target.
-- [F016] Added the Factorio 0.16 old-science target adapter and exact-engine package smoke coverage.
-- [F015] Added the Factorio 0.15 old-science target adapter and exact-engine package smoke coverage.
-- [F014] Materialized a Factorio 0.14 private historical adapter from current MIR 4.2 source.
-- [F014, F013] Applied the target-native old-science and unsupported-effect dispositions discovered by exact-engine loading.
-- [F013] Materialized a Factorio 0.13 private historical adapter from current MIR 4.2 source.
+- [Factorio 0.17, Factorio 0.16, Factorio 0.15] Rebuilt the reduced eleven-stream research surface from current MIR 4.2 source.
+- [Factorio 0.17] Added the Factorio 0.17 target adapter and exact-engine package smoke coverage.
+- [Factorio 0.17, Factorio 0.16, Factorio 0.15, Factorio 0.14, Factorio 0.13] Kept Factorio-2-only research-cost support output out of this historical target.
+- [Factorio 0.16] Added the Factorio 0.16 old-science target adapter and exact-engine package smoke coverage.
+- [Factorio 0.15] Added the Factorio 0.15 old-science target adapter and exact-engine package smoke coverage.
+- [Factorio 0.14] Materialized a Factorio 0.14 private historical adapter from current MIR 4.2 source.
+- [Factorio 0.14, Factorio 0.13] Applied the target-native old-science and unsupported-effect dispositions discovered by exact-engine loading.
+- [Factorio 0.13] Materialized a Factorio 0.13 private historical adapter from current MIR 4.2 source.
 
 ### Status
 
-- [F017, F016, F015, F014, F013] Private historical playtest package. It is not a public compatibility claim or release asset.
+- [Factorio 0.17, Factorio 0.16, Factorio 0.15, Factorio 0.14, Factorio 0.13] Private historical playtest package. It is not a public compatibility claim or release asset.
 
 ## [4.1.0] - 2026-09-05
 
 ### Changes
 
-- [F210, F200] Prepared the four-target MIR 4.1 release through one resource-bounded production-readiness coordinator.
+- [Factorio 2.1, Factorio 2.0] Prepared the four-target MIR 4.1 release through one resource-bounded production-readiness coordinator.
 
 ### Repository Changes
 
@@ -576,17 +576,17 @@ This is the authoritative product changelog. Each MIR 1–3 master release appea
   - Completed pre-freeze records remain immutable history while generated current-state views route first to the live MIR 4.x programme.
   - An append-only reconciliation preserves the dated MIR 3 portal observation bytes while binding its legacy and lexical timestamp self-hash interpretations.
 - Adopted the rolling Factorio 2.1 experimental channel and passed the first F2D exact-runtime target replay. [MIR4-CHG-2026-0008]
-  - F210 now selects the latest installed official Factorio 2.1 experimental engine while every execution binds the exact patch, executable, runtime API, prototype API, and changelog identities.
+  - Factorio 2.1 now selects the latest installed official Factorio 2.1 experimental engine while every execution binds the exact patch, executable, runtime API, prototype API, and changelog identities.
   - Every observed 2.1 engine or API identity change materializes twelve review tasks covering new APIs, implementation and functionality opportunities, compatibility, fixtures, performance, documentation, and the eventual stable transition.
-  - The newly materialized 4.0.21000 F210 package passed fourteen exact-zip runtime scenarios and all five 3.2.11 upgrade archetypes, including first and second reloads, without authorizing package cutover.
+  - The newly materialized 4.0.21000 Factorio 2.1 package passed fourteen exact-zip runtime scenarios and all five 3.2.11 upgrade archetypes, including first and second reloads, without authorizing package cutover.
 - Passed the exact Factorio 2.0 F2D runtime replay and enforced fixed historical-engine locks. [MIR4-CHG-2026-0009]
-  - F200 now rejects any Factorio executable whose product version, governed file version, or SHA-256 differs from the exact target authority; the independent verifier repeats that check.
-  - The newly materialized 4.0.20000 F200 package passed its exact-package smoke scenario and the 2.5.11 base-default upgrade through first and second reloads.
-  - The reusable target receipt writer records F200 and can advance F110 and F100 without cloning target-specific implementations; package cutover and every release gate remain false.
+  - Factorio 2.0 now rejects any Factorio executable whose product version, governed file version, or SHA-256 differs from the exact target authority; the independent verifier repeats that check.
+  - The newly materialized 4.0.20000 Factorio 2.0 package passed its exact-package smoke scenario and the 2.5.11 base-default upgrade through first and second reloads.
+  - The reusable target receipt writer records Factorio 2.0 and can advance Factorio 1.1 and Factorio 1.0 without cloning target-specific implementations; package cutover and every release gate remain false.
 - Passed the exact Factorio 1.1 F2D runtime replay and bound the historical build observation. [MIR4-CHG-2026-0010]
-  - The shared fixed-engine resolver now treats optional fields in older release records explicitly and binds F110 to the accepted 1.1.110.62357 availability observation without weakening its executable digest lock.
-  - The newly materialized 4.0.11000 F110 package passed its exact-package smoke scenario and the 1.9.9 base-default upgrade through first and second reloads.
-  - Independent verification and external custody passed before expanded work was released; F100 and the four-target aggregate remain pending and every cutover and release gate remains false.
+  - The shared fixed-engine resolver now treats optional fields in older release records explicitly and binds Factorio 1.1 to the accepted 1.1.110.62357 availability observation without weakening its executable digest lock.
+  - The newly materialized 4.0.11000 Factorio 1.1 package passed its exact-package smoke scenario and the 1.9.9 base-default upgrade through first and second reloads.
+  - Independent verification and external custody passed before expanded work was released; Factorio 1.0 and the four-target aggregate remain pending and every cutover and release gate remains false.
 - Passed exact Factorio 1.0 F2D replay, completing all target lanes. [MIR4-CHG-2026-0011]
   - The materialized 4.0.10000 package matched the accepted 174-entry tree under exact Factorio 1.0.0.54889.
   - Its exact-package smoke and 1.8.9 base-default upgrade passed through two reloads, independent verification, and custody.
@@ -613,40 +613,40 @@ This is the authoritative product changelog. Each MIR 1–3 master release appea
   - Release workflows route through the release application entry point, stable required-check names are retained, the publisher still cannot build, and all release-transition gates remain false.
 - Split modern compilation-plan construction into explicit model, build, validation, fingerprint, and serialization owners. [MIR4-CHG-2026-0017]
   - The public compilation-plan module is now a five-line facade over one build owner and four bounded supporting responsibility modules.
-  - F210 and F200 gain five internal Lua module paths; F110 and F100 retain their independently governed legacy implementation.
+  - Factorio 2.1 and Factorio 2.0 gain five internal Lua module paths; Factorio 1.1 and Factorio 1.0 retain their independently governed legacy implementation.
   - The four-target current-source materializer records exact deterministic structural deltas while immutable 4.0 baseline custody remains unchanged.
-  - The materialized F210 archive passed space-age generation-integrity loading on the exact reviewed Factorio 2.1.17 engine; compact evidence is retained under external hashed custody.
+  - The materialized Factorio 2.1 archive passed space-age generation-integrity loading on the exact reviewed Factorio 2.1.17 engine; compact evidence is retained under external hashed custody.
   - No technology identity, plan disposition, mutation journal, setting, migration, save, compatibility claim, release gate, or publication authority changes.
 - Split modern base-continuation planning into explicit discovery, classification, qualification, and plan owners. [MIR4-CHG-2026-0018]
   - The stable base-continuations require path is now a thin facade over four bounded target-owned responsibility modules.
-  - F210 and F200 retain independent source authorities and their previously governed science-phase difference; common discovery and classification implementations remain byte-identical.
-  - Each modern target gains four internal Lua module paths, while F110 and F100 remain byte-identical to their accepted package baselines.
-  - The materialized F210 archive passed space-age generation-integrity on the exact currently reviewed rolling experimental engine, with compact redacted evidence under external hashed custody.
+  - Factorio 2.1 and Factorio 2.0 retain independent source authorities and their previously governed science-phase difference; common discovery and classification implementations remain byte-identical.
+  - Each modern target gains four internal Lua module paths, while Factorio 1.1 and Factorio 1.0 remain byte-identical to their accepted package baselines.
+  - The materialized Factorio 2.1 archive passed space-age generation-integrity on the exact currently reviewed rolling experimental engine, with compact redacted evidence under external hashed custody.
   - No technology identity, cost, science, prerequisite, plan disposition, mutation journal, setting, migration, save, compatibility claim, release gate, or publication authority changes.
 - Split modern stream compilation into explicit discovery, ownership, qualification, compilation, and diagnostics owners. [MIR4-CHG-2026-0019]
   - The stable stream-compiler require path is now a thin facade over five bounded target-owned responsibility modules.
-  - F210 and F200 retain independent qualification authorities and the governed F210 science-phase evidence difference; the other four responsibility implementations remain byte-identical.
-  - Each modern target gains five internal Lua module paths, while F110 and F100 remain byte-identical to their accepted package baselines.
-  - The materialized F210 archive passed space-age generation-integrity on the exact currently reviewed rolling experimental engine, with compact redacted evidence under external hashed custody.
+  - Factorio 2.1 and Factorio 2.0 retain independent qualification authorities and the governed Factorio 2.1 science-phase evidence difference; the other four responsibility implementations remain byte-identical.
+  - Each modern target gains five internal Lua module paths, while Factorio 1.1 and Factorio 1.0 remain byte-identical to their accepted package baselines.
+  - The materialized Factorio 2.1 archive passed space-age generation-integrity on the exact currently reviewed rolling experimental engine, with compact redacted evidence under external hashed custody.
   - No stream identity, effect, cost, science, prerequisite, ownership, diagnostic, plan, mutation journal, setting, migration, save, compatibility claim, release gate, or publication authority changes.
 - Split the modern technology catalogue into explicit model, index, query, build, and validation owners. [MIR4-CHG-2026-0020]
   - The stable technology-catalogue require path is now a thin facade over five bounded common responsibility modules.
   - The decomposition preserves the single trusted catalogue authority through Lua module caching and retains the complete public API.
-  - F210 and F200 gain five internal catalogue module paths; F110 and F100 remain byte-identical to their accepted package baselines.
+  - Factorio 2.1 and Factorio 2.0 gain five internal catalogue module paths; Factorio 1.1 and Factorio 1.0 remain byte-identical to their accepted package baselines.
   - A lazy compilation-plan fingerprint import exposed by the exact compiler-contracts fixture now binds at MIR module load time so fixture callers cannot redirect resolution into their own mod namespace.
-  - The corrected F210 archive passed compiler-contracts on the exact currently reviewed rolling experimental engine, with the failed attempt classified and compact passing evidence under external hashed custody.
+  - The corrected Factorio 2.1 archive passed compiler-contracts on the exact currently reviewed rolling experimental engine, with the failed attempt classified and compact passing evidence under external hashed custody.
   - No technology identity, effect, cost, science, prerequisite, ownership, diagnostic, plan, mutation journal, setting, migration, save, compatibility claim, release gate, or publication authority changes.
 - Split modern effect ownership into explicit fact, row-resolution, and planned-operation owners. [MIR4-CHG-2026-0021]
   - The stable effect-ownership require path is now a thin facade over three bounded responsibility modules.
   - Immutable row and operation facts, row-level owner resolution, and assembled-plan operation resolution now have separate owners without changing the public resolve or resolve_operations contracts.
-  - F210 and F200 gain three internal effect-ownership module paths; F110 and F100 remain byte-identical to their accepted package baselines.
-  - The fresh F210 archive passed compiler-contracts on the exact currently reviewed rolling experimental engine, with compact passing evidence under external hashed custody.
+  - Factorio 2.1 and Factorio 2.0 gain three internal effect-ownership module paths; Factorio 1.1 and Factorio 1.0 remain byte-identical to their accepted package baselines.
+  - The fresh Factorio 2.1 archive passed compiler-contracts on the exact currently reviewed rolling experimental engine, with compact passing evidence under external hashed custody.
   - No technology identity, effect, cost, science, prerequisite, ownership outcome, diagnostic, plan, mutation journal, setting, migration, save, compatibility claim, release gate, or publication authority changes.
 - Split the modern compiler orchestrator into bounded construction, invocation, contract, and publication owners. [MIR4-CHG-2026-0022]
   - The stable compiler-orchestrator require path remains a six-function facade over four bounded responsibility modules.
   - Run-context construction, admitted phase invocation, contract checking, and final artifact publication now have separate owners without changing the public compile, apply, snapshot, assertion, or publication contracts.
-  - F210 and F200 gain four internal compiler-orchestrator module paths; F110 and F100 remain byte-identical to their accepted package baselines.
-  - The fresh F210 archive passed compiler-contracts on the exact currently reviewed rolling experimental engine, with compact passing evidence under external hashed custody.
+  - Factorio 2.1 and Factorio 2.0 gain four internal compiler-orchestrator module paths; Factorio 1.1 and Factorio 1.0 remain byte-identical to their accepted package baselines.
+  - The fresh Factorio 2.1 archive passed compiler-contracts on the exact currently reviewed rolling experimental engine, with compact passing evidence under external hashed custody.
   - No technology identity, effect, cost, science, prerequisite, ownership outcome, diagnostic, plan, mutation journal, setting, migration, save, compatibility claim, release gate, or publication authority changes.
 - Bind the residual PowerShell maintainability work to a finite generated characterization and reconcile architecture validation with canonical package outputs. [MIR4-CHG-2026-0023]
   - The generated characterization classifies all 20 canonical internal PowerShell files at or above 600 lines, admitting 11 release-critical decompositions and recording nine explicit bounded waivers.
@@ -734,20 +734,20 @@ This is the authoritative product changelog. Each MIR 1–3 master release appea
   - One accepted change inventory now renders source, target, GitHub, Mod Portal, technical, and manifest views.
   - Historical MIR 4.0.0 and synthetic patch and multi-target corpora prove filtering, redaction, formatting, and determinism.
 - Bound the four published MIR 4.0 target packages as exact golden baselines and derived a minimal deterministic common/family/target overlay model. [MIR4-CHG-2026-0004]
-  - The generated authority inventories every F210, F200, F110, and F100 package path and byte hash together with metadata, lifecycle, setting, locale, asset, migration, runtime, stream, technology, and state-namespace surfaces.
+  - The generated authority inventories every Factorio 2.1, Factorio 2.0, Factorio 1.1, and Factorio 1.0 package path and byte hash together with metadata, lifecycle, setting, locale, asset, migration, runtime, stream, technology, and state-namespace surfaces.
   - Exact reconstruction uses 89 all-target common files, 202 modern-family files, 81 legacy-family files, and target overlays of 14, 12, 4, and 4 files without copying a full target tree.
   - Fresh load, reload, and upgrade replay remains mandatory before package-authority cutover; the baseline grants no source move, version allocation, tagging, signing, sealing, or publication authority.
 - Added the deterministic four-target shadow materializer and proved exact package-tree parity without changing package authority. [MIR4-CHG-2026-0005]
-  - The supported package-source command now reconstructs F210, F200, F110, and F100 from the accepted 89-file common layer, modern or legacy family layer, and minimal target overlay.
+  - The supported package-source command now reconstructs Factorio 2.1, Factorio 2.0, Factorio 1.1, and Factorio 1.0 from the accepted 89-file common layer, modern or legacy family layer, and minimal target overlay.
   - Two independent constructions per target produce byte-identical deterministic archives while every normalized path and raw file byte matches its immutable MIR 4.0 baseline.
   - Historical ZIP container bytes remain immutable bootstrap inputs and are deliberately distinguished from newly deterministic container bytes; runtime replay and a separate authority cutover remain mandatory.
 - Added the governed semantic source and target-overlay model for the four-target MIR 4.1 package-source cutover. [MIR4-CHG-2026-0006]
   - All 406 accepted package-layer bindings now have an explicit semantic class, historical comparison source, future editable authority, materialization rule, and proof obligation.
-  - All 264 target-specific absences are explicit overlay omissions rather than inferred differences, including independent F110 and F100 dispositions.
+  - All 264 target-specific absences are explicit overlay omissions rather than inferred differences, including independent Factorio 1.1 and Factorio 1.0 dispositions.
   - The model names the future src/mod, target registry, support policy, per-target overlay, and target materializer authorities while deliberately creating no editable package source and changing no current package writer.
 - Established editable canonical MIR package source and one deterministic materializer for all four public targets. [MIR4-CHG-2026-0007]
   - The governed source manifest selects 406 unique editable sources across common, family, generated, and explicit target layers without retaining a full target-specific source copy.
-  - The production materializer reads no historical package archive, verifies every source and output hash, and reconstructs F210, F200, F110, and F100 with exact normalized byte-tree parity to their accepted 4.0 baselines.
+  - The production materializer reads no historical package archive, verifies every source and output hash, and reconstructs Factorio 2.1, Factorio 2.0, Factorio 1.1, and Factorio 1.0 with exact normalized byte-tree parity to their accepted 4.0 baselines.
   - Independent A/B builds prove deterministic archive construction for every target while the existing root package writer remains unchanged pending exact-engine replay, rollback, and a separate cutover receipt.
 
 ### Repository Removed
@@ -762,15 +762,15 @@ This is the authoritative product changelog. Each MIR 1–3 master release appea
 
 ### Changes
 
-- [F210, F200] Began MIR 4 with independently generated target packages from one canonical source release.
-- [F210, F200] Preserved the proven player compiler and emitter behind explicit target and release boundaries.
+- [Factorio 2.1, Factorio 2.0] Began MIR 4 with independently generated target packages from one canonical source release.
+- [Factorio 2.1, Factorio 2.0] Preserved the proven player compiler and emitter behind explicit target and release boundaries.
 
 ### Compatibility
 
-- [F210] Preserved the direct Factorio 2.1 upgrade from MIR 3.2.11, technology IDs, settings, and runtime state.
-- [F210] Set the F210 package compatibility floor to Factorio 2.1.8 and kept optional features target-gated.
-- [F200] Preserved the direct Factorio 2.0 upgrade from MIR 2.5.11, technology IDs, settings, and runtime state.
-- [F200] Omitted Factorio 2.1-only effects, prototypes, transports, settings, and runtime handlers.
+- [Factorio 2.1] Preserved the direct Factorio 2.1 upgrade from MIR 3.2.11, technology IDs, settings, and runtime state.
+- [Factorio 2.1] Set the Factorio 2.1 package compatibility floor to Factorio 2.1.8 and kept optional features target-gated.
+- [Factorio 2.0] Preserved the direct Factorio 2.0 upgrade from MIR 2.5.11, technology IDs, settings, and runtime state.
+- [Factorio 2.0] Omitted Factorio 2.1-only effects, prototypes, transports, settings, and runtime handlers.
 
 ### Repository Changes
 
