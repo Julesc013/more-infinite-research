@@ -22,7 +22,7 @@ class PublishedF100ForwardControls(unittest.TestCase):
     def setUp(self):
         self.lua = LuaRuntime(unpack_returned_tuples=True)
         self.lua.execute(r'''
-function forward_flow(control_path, source_plan, target_plan, definitions, opponent, bridge_plan)
+function forward_flow(control_path, source_plan, target_plan, definitions, opponent, bridge_plan, work)
   local function clone(value)
     if type(value)~="table"then return value end
     local out={};for k,v in pairs(value)do out[k]=clone(v)end;return out
@@ -31,6 +31,7 @@ function forward_flow(control_path, source_plan, target_plan, definitions, oppon
   local current=plan
   local markers,saves={},0
   local science_logs={}
+  last_science_logs=science_logs
   local force_list={}
   local packs={"military-science-pack","utility-science-pack"}
   local function inventory(count)
@@ -190,7 +191,7 @@ function forward_flow(control_path, source_plan, target_plan, definitions, oppon
   for _,stack in ipairs(inv)do
     if current.target=="f210"then
       stack.count=31;inv.values[stack.name]=31
-      labs[1].stored[stack.name]={durability=1-35/60}
+      labs[1].stored[stack.name]={durability=work.stored_remainder}
     else stack.durability=1-35/60 end
   end
   local function invalidate_science()
@@ -201,6 +202,9 @@ function forward_flow(control_path, source_plan, target_plan, definitions, oppon
   if opponent=="science-stored-missing"then labs[1].stored[packs[1]]=nil end
   if opponent=="science-stored-nonfinite"then labs[1].stored[packs[1]].durability=math.huge end
   if opponent=="science-stored-negative"then labs[1].stored[packs[1]].durability=-.1 end
+  if opponent=="science-legacy-remainder"then labs[1].stored[packs[1]].durability=1-35/60 end
+  if opponent=="science-utility-stored-missing"then labs[1].stored[packs[2]]=nil end
+  if opponent=="science-utility-legacy-remainder"then labs[1].stored[packs[2]].durability=1-35/60 end
   callbacks[2]({research=player.technologies[direct]})
   table.remove(player.research_queue,1);player.current_research=player.research_queue[1];player.research_progress=0
   callbacks[1]();callbacks[1]()
@@ -208,12 +212,13 @@ function forward_flow(control_path, source_plan, target_plan, definitions, oppon
   assert(saves==expected_saves and original.forward.successor_labs==1)
   if current.target=="f210"then
     assert(labs[1].disabled_by_script==true,"F210 lab must be disabled")
+    assert(math.abs(original.forward.successor_units-work.units)<1e-12,"F210 work must match independent reference")
     assert(#science_logs>=2,"both actual science prefix records must be retained")
     for index,pack in ipairs(packs)do
       local row=science_logs[index]
       assert(row:find(pack,1,true)and tonumber(row:match("count=(%S+)"))==31)
       assert(tonumber(row:match("capacity=(%S+)"))==1)
-      assert(math.abs(tonumber(row:match("stored=(%S+)"))-25/60)<1e-12)
+      assert(math.abs(tonumber(row:match("stored=(%S+)"))-work.stored_remainder)<1e-12)
     end
   end
   if opponent=="completed-effect"then player.bonus=0 end
@@ -243,6 +248,10 @@ end
             definitions[f"laser-turret-speed-{i}"] = {"level": i, "max_level": i, "effects": [
                 {"type": "gun-speed", "ammo_category": "laser-turret", "modifier": modifier}]}
         self.definitions = self.to_lua(definitions)
+        self.work = json.loads((FIXTURE / "f210-work-reference-r02.json").read_text(encoding="utf-8"))["targets"]["f210"]
+        self.assertEqual(self.work["units"], .58)
+        self.assertEqual(self.work["stored_remainder"], .42)
+        self.assertAlmostEqual(self.work["units"] + self.work["stored_remainder"], 1)
 
     def to_lua(self, value):
         if isinstance(value, dict):
@@ -254,7 +263,7 @@ end
     def flow(self, target="f110", opponent="", bridge=False):
         return self.lua.globals().forward_flow(str(FIXTURE / "shared/control.lua"),
             str(FIXTURE / "source/stage.lua"), str(FIXTURE / target / "stage.lua"), self.definitions,
-            opponent, str(FIXTURE / "bridge/stage.lua") if bridge else "")
+            opponent, str(FIXTURE / "bridge/stage.lua") if bridge else "", self.to_lua(self.work))
 
     def test_both_exact_destinations_preserve_source_and_two_completed_reload_checks(self):
         for target in ("f110", "f210"):
@@ -295,11 +304,16 @@ end
 
     def test_f210_plain_item_science_rejects_unearned_or_malformed_stored_work(self):
         for opponent in ("science-count", "science-stored-missing", "science-stored-nonfinite",
-                         "science-stored-negative", "science-capacity"):
+                         "science-stored-negative", "science-capacity", "science-legacy-remainder",
+                         "science-utility-stored-missing", "science-utility-legacy-remainder"):
             with self.subTest(opponent=opponent):
                 self.setUp()
                 with self.assertRaises(Exception):
                     self.flow("f210", opponent)
+                logs = self.lua.globals().last_science_logs
+                self.assertGreaterEqual(len(logs), 2)
+                for index, pack in enumerate(("military-science-pack", "utility-science-pack"), 1):
+                    self.assertIn(pack, logs[index])
 
     def test_data_preflight_refuses_changed_meaning_before_acceleration(self):
         self.lua.execute(r'''
