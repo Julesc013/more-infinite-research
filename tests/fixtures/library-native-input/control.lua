@@ -178,6 +178,7 @@ local function report()
   return {schema=1,case="library-native-input-imported110",phase=s.phase,tick=game.tick,
     actual_joins=s.joins,actual_text_events=s.text_events,actual_library_closed_events=s.closed_events,
     actual_drag_events=s.drag_events,actual_effect_reset_events=s.reset_events,requested_native_resets=s.requested_resets,actual_removed_events=s.removed_events,
+    initial_location=s.initial_location,drag_baseline=s.drag_baseline,drag_events_before=s.drag_events_before,
     private_queries=s.private_queries,en_index=s.en_index or false,de_index=s.de_index or false,
     en_name=valid(en) and en.name or false,de_name=valid(de) and de.name or false,
     en_locale=valid(en) and en.locale or false,de_locale=valid(de) and de.locale or false,
@@ -214,11 +215,15 @@ local function advance(step)
     if game.tick<s.wait_tick or s.reset_events~=s.expected_reset_events then fail("native refresh observation is not ready") end
     assert_retained(en,de,"ge");s.phase="text-suffix"
   elseif step=="suffix" then
-    phase("text-suffix");local en,de=pair();assert_retained(en,de,"gears");s.phase="drag"
+    phase("text-suffix");local en,de=pair();assert_retained(en,de,"gears")
+    s.drag_baseline=location(refs.en_root);s.drag_events_before=s.drag_events;s.phase="drag"
   elseif step=="drag" then
     phase("drag");local en,de=pair();assert_retained(en,de,"gears")
     local point=location(refs.en_root)
-    if s.drag_events<1 or point.x~=s.initial_location.x-30 or point.y~=s.initial_location.y then fail("actual native drag differs") end
+    if s.drag_events~=s.drag_events_before+1 or point.x~=s.drag_baseline.x-30 or point.y~=s.drag_baseline.y then
+      fail(string.format("actual native drag differs: baseline=(%s,%s) point=(%s,%s) events_before=%s events_now=%s",
+        s.drag_baseline.x,s.drag_baseline.y,point.x,point.y,s.drag_events_before,s.drag_events))
+    end
     s.drag_location=point;s.phase="escape"
   elseif step=="escape" then
     phase("escape");local en=closed(1);local de=player(s.de_index);local old_root,old_query=refs.en_root,refs.en_query
