@@ -968,7 +968,9 @@ try{
         if([regex]::IsMatch($text,'(?im)^\s*\d+[.]\d+\s+Error\b|^Error while running event\b|\bException at tick\b|\bnon-recoverable error\b|^stack traceback:$')){throw 'fatal native historical reload diagnostic'}
         $reloadCase=if($f110PublishedCrossSource -or $f110SameEditionSuccessor){'f110-f200-transition'}elseif($laserTransition){'f100-f110-laser-transition'}elseif($historicalTransition){'historical-transition'}else{'historical-native'}
         $reloadTransition=if($historicalTransition){',"transition_stage":"'+$HistoricalTransitionStage+'"'}else{''}
-        return $text.Contains('[MIR5_NATIVE_FIXTURE] RESULT {"case":"'+$reloadCase+'","stage":"reload"'+$reloadTransition)
+        $reloadForward=''
+        if($publishedF100Forward){$reloadCase='published-f100-forward';$reloadForward=',"role":"'+$publishedF100Fixture.role+'","target":"'+$publishedF100Fixture.target+'"'}
+        return $text.Contains('[MIR5_NATIVE_FIXTURE] RESULT {"case":"'+$reloadCase+'","stage":"reload"'+$reloadTransition+$reloadForward)
       }.GetNewClosure()
     }
     $stage=Invoke-FixtureStage ('reload-'+$ordinal) $reloadArguments $reloadCompletion
