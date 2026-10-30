@@ -110,22 +110,31 @@ end
 local function successor_science(saved)
   local lab=saved.lab
   if not lab or lab.valid~=true or lab.active~=false or lab.energy~=0
-      or not close(saved.successor_units,35/60) then fail("successor frozen lab/work differs") end
+      or not close(saved.successor_units,modern and .58 or 35/60) then fail("successor frozen lab/work differs") end
   if modern and lab.disabled_by_script~=true then fail("successor scripted lab disablement differs") end
   local input=lab.get_inventory(defines.inventory.lab_input)
-  for _, pack in ipairs({"military-science-pack","utility-science-pack"}) do
-    if modern then
+  if modern then
+    local observations={}
+    for _, pack in ipairs({"military-science-pack","utility-science-pack"}) do
       local prototype=prototypes.item[pack]
       local stored=lab.get_stored_durability(pack)
-      log("[MIR5_FORWARD_SCIENCE] "..pack.." count="..tostring(input.get_item_count(pack))
+      local count=input.get_item_count(pack)
+      observations[#observations+1]={prototype=prototype,stored=stored,count=count}
+      log("[MIR5_FORWARD_SCIENCE] "..pack.." count="..tostring(count)
         .." stored="..tostring(stored and stored.durability).." capacity="..tostring(prototype and prototype.science_capacity))
+    end
+    for _,observed in ipairs(observations) do
+      local prototype,stored=observed.prototype,observed.stored
       if not prototype or prototype.type~="item" or prototype.science_capacity~=1
-          or input.get_item_count(pack)~=31 or type(stored)~="table"
+          or observed.count~=31 or type(stored)~="table"
           or type(stored.durability)~="number" or stored.durability<0 or stored.durability>1
           or not close(stored.durability,1-saved.successor_units) then
         fail("successor plain-item science consumption differs")
       end
-    else
+    end
+    return
+  end
+  for _, pack in ipairs({"military-science-pack","utility-science-pack"}) do
     local units,found=0,false
     for index=1,#input do
       local stack=input[index]
@@ -138,7 +147,6 @@ local function successor_science(saved)
       end
     end
     if not found or not close(units,32-saved.successor_units) then fail("successor actual fractional science consumption differs") end
-    end
   end
 end
 local function witness(value, completed)
@@ -225,8 +233,8 @@ local function start_successor(value)
       or value.forward.successor_labs ~= 0 then fail("successor transition phase differs") end
   local force, surface = game.forces.player, game.surfaces[1]
   if not close(force.laboratory_speed_modifier,0) or not close(force.laboratory_productivity_bonus,0) then fail("native lab modifiers differ") end
-  local units=math.ceil((1-force.research_progress)*60)/60
-  if not close(units,35/60) then fail("successor partial work differs") end
+  local units=modern and (1-force.research_progress) or math.ceil((1-force.research_progress)*60)/60
+  if not close(units,modern and .58 or 35/60) then fail("successor partial work differs") end
   local position = force.get_spawn_position(surface)
   local lab = surface.create_entity{name="lab",position={x=position.x+8,y=position.y},force=force}
   if not lab or lab.valid ~= true then fail("successor real lab creation failed") end
