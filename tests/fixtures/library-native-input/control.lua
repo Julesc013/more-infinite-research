@@ -171,6 +171,16 @@ local function geometry(p)
   if not valid(root) then return nil end
   return {location=location(root),style_maximal_width=root.style.maximal_width,display_scale=p.display_scale,display_resolution=p.display_resolution}
 end
+local function input_state(p)
+  if not valid(p) then return false end
+  local root=p.gui.screen[ROOT];local filters=valid(root) and root[FILTERS] or nil
+  local query=valid(filters) and filters[QUERY] or nil
+  local other=p.gui.screen[OTHER];local other_query=valid(other) and other[OTHER_QUERY] or nil
+  return {library_open=valid(root)==true,
+    library_query=valid(query) and query.type=="textfield" and query.text or false,
+    foreign_open=valid(other)==true and p.opened==other,
+    foreign_query=valid(other_query) and other_query.type=="textfield" and other_query.text or false}
+end
 local function report()
   local s=storage[KEY];if type(s)~="table" then return nil end
   local en=s.en_index~=nil and game.get_player(s.en_index) or nil
@@ -183,6 +193,7 @@ local function report()
     en_name=valid(en) and en.name or false,de_name=valid(de) and de.name or false,
     en_locale=valid(en) and en.locale or false,de_locale=valid(de) and de.locale or false,
     en_connected=valid(en) and en.connected or false,de_connected=valid(de) and de.connected or false,
+    en_input=input_state(en),de_input=input_state(de),
     removed_index=s.removed_index or false,readonly_imported_probe=s.imported_probe_verified==true,
     imported_earnings=true,fixture_seeds_credit=false,load_observed=loaded_restart,
     en_geometry=s.en_index and geometry(game.get_player(s.en_index)) or nil,

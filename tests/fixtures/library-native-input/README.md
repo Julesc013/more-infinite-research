@@ -22,6 +22,10 @@ The input report now exposes `en_name`, `de_name`, `en_locale`, `de_locale`, `en
 
 Compose input0.3 from current `control.lua` and `info-input-identity-f200.json` or `info-input-identity-f210.json`. Compose export0.4 from current `control.lua`, `support-exports.lua` and the corresponding `info-exports-identity-*.json`. ZIP roots are the unchanged observer name plus the declared0.3.0 or0.4.0 version. The prepared record pins all four reproducible containers and new profiles. Preserve the original31-row/75-effect/three-force source fixture and saved inputs; no source recreation, credit seeding or player-package change is required.
 
+## Native input delivery observation
+
+Read-only reports expose each joined player's current `library_open`, `library_query`, `foreign_open` and `foreign_query` under `en_input`/`de_input`. An absent player or textfield stays explicitly absent/false. After sending each declared desktop action once, the caller must await its exact native text, close or drag endpoint/event observation within a fixed bounded deadline before invoking the original assertion once. Keep the current phase, role/process identities, peer state, event counts and all original root/reference/world checks. Polling may only read reports; it must not repeat input, advance, refocus, reset effects or write state. A timeout or malformed observation remains adverse. This is functional multiplayer delivery synchronization, not a changed timing acceptance threshold or a pass for earlier failures.
+
 ## Drag baseline observation
 
 The [fresh drag-baseline preparation](../../../spec/evidence/library-input-drag-baseline-prepared-r02.json) pins the corrected input source, new reproducible observer ZIPs and separate r05 profiles for both engines. Existing input0.3/export0.4 archives and profiles retain their earlier bytes and source identities. Use only the newly pinned input archive under exclusive library ownership; this internal observer version is not a published MIR release.
