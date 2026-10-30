@@ -169,6 +169,7 @@ class HostControlsTests(unittest.TestCase):
             "tests/test_library_profile_reader.py",
             "tests/test_f110_f200_runner.py",
             "tests/test_f100_f110_laser_runner.py",
+            "tests/test_published_f100_forward_runner.py",
             "tests/test_native_fixture_modes.py",
             "tests/test_package.py",
             "tests/test_early_package.py",
