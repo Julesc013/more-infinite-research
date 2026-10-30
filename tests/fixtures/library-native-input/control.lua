@@ -211,10 +211,36 @@ local function closed(expected)
       or valid(refs.en_root) or valid(refs.en_query) or valid(en.gui.screen[ROOT]) then fail("actual key did not retire the Library root/query") end
   assert_world();return en
 end
+local function opened_scalar(value, getter)
+  local ok, result=pcall(getter)
+  if not ok then return "<getter-error>" end
+  if result==nil then return "<absent>" end
+  if type(result)=="string" then return result end
+  return "<"..type(result)..">"
+end
+local function opened_diagnostic(en, root)
+  local opened_ok, opened=pcall(function()return en.opened end)
+  if not opened_ok then return "opened_getter=<error>" end
+  local equal_ok, equal=pcall(function()return opened==root end)
+  local valid_ok, is_valid=pcall(function()return opened~=nil and opened.valid==true end)
+  local opened_name=opened_scalar(opened,function()return opened and opened.name end)
+  local opened_mod=opened_scalar(opened,function()
+    local getter=opened and opened.get_mod
+    return type(getter)=="function" and getter() or nil
+  end)
+  local root_name=opened_scalar(root,function()return root.name end)
+  local root_mod=opened_scalar(root,function()
+    local getter=root.get_mod
+    return type(getter)=="function" and getter() or nil
+  end)
+  return "opened_type="..type(opened).." opened_is_root="..tostring(equal_ok and equal==true)
+    .." opened_valid="..tostring(valid_ok and is_valid==true).." opened_name="..opened_name
+    .." opened_mod="..opened_mod.." root_name="..root_name.." root_mod="..root_mod
+end
 local function arm_close(en, expected_phase)
   local s=state()
   if s.close_expected~=nil or not valid(refs.en_root) or not valid(refs.en_query) or en.opened~=refs.en_root then
-    fail("declared key close has no owned opened Library")
+    fail("declared key close has no owned opened Library: "..opened_diagnostic(en,refs.en_root))
   end
   s.close_expected={phase=expected_phase,player_index=en.index,ordinal=s.closed_events+1}
 end
