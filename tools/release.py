@@ -5,6 +5,7 @@ import hashlib
 import importlib.util
 import json
 from pathlib import Path
+import re
 import subprocess
 import sys
 import tempfile
@@ -26,12 +27,11 @@ EARLY_SUMS_NAME = "SHA256SUMS-early.txt"
 EARLY_TARGETS = ("f006", "f007", "f008", "f009", "f010", "f011", "f012")
 EARLY_QUALIFICATION = "best-effort-early-data-only-distributions-not-native-qualified"
 MOD_NAME = "more-infinite-research"
-SOURCE_VERSION = "5.0.0"
-SOURCE_DISTRIBUTION_VERSION = "5.0.21000"
-SOURCE_LABEL = "source5.0.0"
-RELEASE_TAG = "v5.0.0"
-RELEASE_TITLE = "MIR 5.0.0"
-SOURCE_CHANGELOG_HEADER = (b"-" * 99) + b"\nVersion: " + SOURCE_VERSION.encode("ascii") + b"\n"
+SOURCE_DISTRIBUTION_CODEC = re.compile(
+    r"^(?P<major>0|[1-9]\d*)\.(?P<minor>0|[1-9]\d*)\.(?P<encoded>\d{5})$")
+FACTORIO_FAMILY = re.compile(r"^(?P<major>0|[1-9]\d*)\.(?P<minor>0|[1-9]\d*)$")
+BASE_DEPENDENCY = re.compile(
+    r"^base >= (?P<major>0|[1-9]\d*)\.(?P<minor>0|[1-9]\d*)\.(?P<patch>0|[1-9]\d*)$")
 
 
 def digest(data):
@@ -67,6 +67,58 @@ def _git(repository, *arguments):
     return subprocess.check_output(["git", "-C", str(repository), *arguments]).decode("utf-8").strip()
 
 
+def _release_identity(info, files):
+    """Derive the plain product/tag identity from the tracked FFFPP source codec."""
+    version = info.get("version")
+    match = SOURCE_DISTRIBUTION_CODEC.fullmatch(version if isinstance(version, str) else "")
+    if match is None:
+        raise ValueError("Frozen player source has an invalid distribution codec")
+    source_version = match.group("major") + "." + match.group("minor") + "." + str(
+        int(match.group("encoded")) % 100)
+    try:
+        header = package.source_changelog_header(files["changelog.txt"], version)
+    except (KeyError, ValueError) as error:
+        raise ValueError("Frozen player source has a mismatched unified changelog header") from error
+    expected_header = b"Version: " + source_version.encode("ascii") + b"\n"
+    if header != expected_header:
+        raise ValueError("Frozen player source has a mismatched unified changelog header")
+    return {
+        "source_version": source_version,
+        "source_label": "source" + source_version,
+        "tag": "v" + source_version,
+        "title": "MIR " + source_version,
+    }
+
+
+def _source_target(info, files):
+    """Require the authored target metadata to agree with the FFF portion."""
+    version = info.get("version")
+    match = SOURCE_DISTRIBUTION_CODEC.fullmatch(version if isinstance(version, str) else "")
+    target = files.get(package.SOURCE_TARGET_PATH)
+    if match is None or target is None:
+        raise ValueError("Frozen player source has invalid target metadata")
+    ids = list(package.SOURCE_TARGET_ID.finditer(target))
+    versions = list(package.SOURCE_DISTRIBUTION_VERSION.finditer(target))
+    if (len(ids) != 1 or len(versions) != 1
+            or len(package.SOURCE_TARGET_ID_ASSIGNMENT.findall(target)) != 1
+            or len(package.SOURCE_DISTRIBUTION_VERSION_ASSIGNMENT.findall(target)) != 1):
+        raise ValueError("Frozen player source has invalid target metadata")
+    target_id = "f" + str(int(match.group("encoded")) // 100).zfill(3)
+    if ids[0].group("id").decode("ascii") != target_id or versions[0].group("version").decode("ascii") != version:
+        raise ValueError("Frozen player source has mismatched target metadata")
+    return target_id
+
+
+def _source_base_floor(info):
+    dependencies = info.get("dependencies")
+    if not isinstance(dependencies, list) or not dependencies or not isinstance(dependencies[0], str):
+        raise ValueError("Frozen player source has invalid base dependency metadata")
+    match = BASE_DEPENDENCY.fullmatch(dependencies[0])
+    if match is None:
+        raise ValueError("Frozen player source has invalid base dependency metadata")
+    return match.group("major") + "." + match.group("minor") + "." + match.group("patch")
+
+
 def _source_identity(source, revision):
     source, repository = package.git_repository(source)
     commit = _git(repository, "rev-parse", "--verify", revision + "^{commit}")
@@ -82,9 +134,12 @@ def _source_identity(source, revision):
         info = json.loads(files["info.json"].decode("utf-8"))
     except (KeyError, UnicodeDecodeError, json.JSONDecodeError) as error:
         raise ValueError("Frozen player source has invalid info.json") from error
-    if (info.get("name") != MOD_NAME or info.get("version") != SOURCE_DISTRIBUTION_VERSION
-            or not isinstance(info.get("title"), str) or not info["title"]):
-        raise ValueError("Frozen player source is not the exact MIR 5.0.0 source identity")
+    if (info.get("name") != MOD_NAME or not isinstance(info.get("title"), str) or not info["title"]
+            or not isinstance(info.get("factorio_version"), str)):
+        raise ValueError("Frozen player source is not an exact MIR source identity")
+    release = _release_identity(info, files)
+    source_target = _source_target(info, files)
+    source_floor = _source_base_floor(info)
     return source, repository, files, {
         "commit": commit,
         "tree": tree,
@@ -92,11 +147,12 @@ def _source_identity(source, revision):
         "path": relative,
         "mod_name": MOD_NAME,
         "mod_title": info["title"],
-        "source_distribution_version": SOURCE_DISTRIBUTION_VERSION,
-    }
+        "source_distribution_version": info["version"],
+    }, release, source_target, info["factorio_version"], source_floor
 
 
-def _target_identity(source, repository, commit, target_record):
+def _target_identity(source, repository, commit, target_record, source_target, source_factorio_version,
+                     source_minimum_base):
     relative, raw = package.checked_target_record(source, target_record, commit)
     entry = _git(repository, "ls-tree", commit, "--", relative)
     try:
@@ -116,8 +172,19 @@ def _target_identity(source, repository, commit, target_record):
         edition = editions[target]
         if not isinstance(edition, dict) or not edition.get("source_available"):
             raise ValueError("Frozen target record has an unavailable edition: " + target)
-        if not isinstance(edition.get("factorio_version"), str) or not isinstance(edition.get("minimum_base"), str):
+        family = edition.get("factorio_version")
+        minimum_base = edition.get("minimum_base")
+        family_match = FACTORIO_FAMILY.fullmatch(family if isinstance(family, str) else "")
+        floor_match = BASE_DEPENDENCY.fullmatch("base >= " + minimum_base if isinstance(minimum_base, str) else "")
+        if (family_match is None or floor_match is None
+                or (family_match.group("major"), family_match.group("minor"))
+                != (floor_match.group("major"), floor_match.group("minor"))):
             raise ValueError("Frozen target record has invalid edition metadata: " + target)
+    source_edition = editions.get(source_target)
+    if (not isinstance(source_edition, dict)
+            or source_edition.get("factorio_version") != source_factorio_version
+            or source_edition.get("minimum_base") != source_minimum_base):
+        raise ValueError("Frozen player source has no matching declared edition")
     return editions, {
         "path": relative,
         "blob": blob,
@@ -159,20 +226,24 @@ def _early_target_identity(source, repository, commit, target_record):
     }
 
 
-def _version(target):
-    return "5.0." + target[1:] + "00"
+def _version(target, source_distribution_version):
+    match = SOURCE_DISTRIBUTION_CODEC.fullmatch(source_distribution_version)
+    if match is None or not re.fullmatch(r"f\d{3}", target):
+        raise ValueError("Invalid retained distribution codec")
+    return (match.group("major") + "." + match.group("minor") + "."
+            + str(int(target[1:]) * 100 + int(match.group("encoded")) % 100).zfill(5))
 
 
-def _archive_name(target):
-    return MOD_NAME + "_" + _version(target) + ".zip"
+def _archive_name(target, source_distribution_version):
+    return MOD_NAME + "_" + _version(target, source_distribution_version) + ".zip"
 
 
-def _asset(record, target, edition):
+def _asset(record, target, edition, source_distribution_version, source_version):
     path = Path(record["archive"])
-    version = _version(target)
+    version = _version(target, source_distribution_version)
     root = MOD_NAME + "_" + version
     if (record.get("target") != target or record.get("name") != MOD_NAME
-            or record.get("version") != version or path.name != _archive_name(target)):
+            or record.get("version") != version or path.name != _archive_name(target, source_distribution_version)):
         raise ValueError("Packager returned an unexpected MIR 5 asset identity")
     members = record.get("members")
     if not isinstance(members, list) or not members:
@@ -193,7 +264,7 @@ def _asset(record, target, edition):
             or not isinstance(dependencies, list) or not dependencies
             or dependencies[0] != "base >= " + edition["minimum_base"]):
         raise ValueError("Archive info.json differs from the declared edition")
-    if not changelog.startswith(SOURCE_CHANGELOG_HEADER):
+    if not changelog.startswith((b"-" * 99) + b"\nVersion: " + source_version.encode("ascii") + b"\n"):
         raise ValueError("Archive changelog does not retain the unified source header")
     asset = {
         "target": target,
@@ -218,11 +289,11 @@ def _asset(record, target, edition):
     return asset
 
 
-def _early_asset(record, target, edition):
+def _early_asset(record, target, edition, source_distribution_version, source_version):
     if (record.get("kind") != "early-data-only-package-members-not-gameplay-qualification"
             or record.get("delivery") != edition["delivery"]):
         raise ValueError("Packager returned an unexpected early MIR asset cohort")
-    asset = _asset(record, target, edition)
+    asset = _asset(record, target, edition, source_distribution_version, source_version)
     asset["delivery"] = edition["delivery"]
     return asset
 
@@ -231,16 +302,11 @@ def _sums(assets):
     return "".join(asset["archive_sha256"] + " *" + asset["name"] + "\n" for asset in assets).encode("ascii")
 
 
-def _body(source, target_record, controller, assets, sums, early_cohort=None):
+def _body(release, source, target_record, controller, assets, sums, early_cohort=None):
     body = {
         "schema": 1,
         "kind": KIND,
-        "release": {
-            "source_version": SOURCE_VERSION,
-            "source_label": SOURCE_LABEL,
-            "tag": RELEASE_TAG,
-            "title": RELEASE_TITLE,
-        },
+        "release": release,
         "source": source,
         "target_record": target_record,
         "controller": controller,
@@ -290,12 +356,12 @@ def _preflight_early_cohort(source, commit, target_record, editions):
                         target_record=target_record["path"])
 
 
-def _build_early_cohort(source, output, commit, target_record, editions):
+def _build_early_cohort(source, output, commit, target_record, editions, source_distribution_version, source_version):
     assets = []
     for target in EARLY_TARGETS:
-        record = package.build(source, output / _archive_name(target), revision=commit,
+        record = package.build(source, output / _archive_name(target, source_distribution_version), revision=commit,
                                target=target, target_record=target_record["path"])
-        assets.append(_early_asset(record, target, editions[target]))
+        assets.append(_early_asset(record, target, editions[target], source_distribution_version, source_version))
     if len({asset["target"] for asset in assets}) != len(EARLY_TARGETS):
         raise ValueError("Expected early release assets are not unique")
     sums = _sums(assets)
@@ -305,8 +371,10 @@ def _build_early_cohort(source, output, commit, target_record, editions):
 
 def freeze(source, output, revision="HEAD", target_record=package.TARGET_RECORD, early_target_record=None):
     """Freeze retained packages and an explicitly selected best-effort early cohort."""
-    source, repository, _, source_identity = _source_identity(Path(source), revision)
-    editions, target_identity = _target_identity(source, repository, source_identity["commit"], target_record)
+    source, repository, _, source_identity, release_identity, source_target, source_factorio, source_floor = _source_identity(
+        Path(source), revision)
+    editions, target_identity = _target_identity(
+        source, repository, source_identity["commit"], target_record, source_target, source_factorio, source_floor)
     early_editions, early_identity = (None, None)
     if early_target_record is not None:
         early_editions, early_identity = _early_target_identity(
@@ -316,14 +384,18 @@ def freeze(source, output, revision="HEAD", target_record=package.TARGET_RECORD,
     output = _new_output(source, output)
     assets = []
     for target in TARGETS:
-        record = package.build(source, output / _archive_name(target), revision=source_identity["commit"],
+        record = package.build(source, output / _archive_name(target, source_identity["source_distribution_version"]), revision=source_identity["commit"],
                                target=target, target_record=target_identity["path"])
-        assets.append(_asset(record, target, editions[target]))
+        assets.append(_asset(
+            record, target, editions[target], source_identity["source_distribution_version"],
+            release_identity["source_version"]))
     sums = _sums(assets)
     (output / SUMS_NAME).write_bytes(sums)
     early_cohort = (None if early_identity is None else _build_early_cohort(
-        source, output, source_identity["commit"], early_identity, early_editions))
-    body = _body(source_identity, target_identity, controller, assets, sums, early_cohort)
+        source, output, source_identity["commit"], early_identity, early_editions,
+        source_identity["source_distribution_version"],
+        release_identity["source_version"]))
+    body = _body(release_identity, source_identity, target_identity, controller, assets, sums, early_cohort)
     (output / INVENTORY_NAME).write_bytes(_inventory_bytes(body))
     return verify(source, output, target_record=target_identity["path"],
                   early_target_record=(None if early_identity is None else early_identity["path"]))
@@ -361,9 +433,6 @@ def verify(source, output, target_record=None, early_target_record=None):
             and (not isinstance(frozen_early, dict)
                  or not isinstance(frozen_early.get("target_record"), dict))):
         raise ValueError("Release inventory has an invalid early cohort")
-    if release != {"source_version": SOURCE_VERSION, "source_label": SOURCE_LABEL,
-                   "tag": RELEASE_TAG, "title": RELEASE_TITLE}:
-        raise ValueError("Release title, tag, or source version differs")
     if frozen_controller != _controller_identity():
         raise ValueError("Local release controller or compression runtime differs")
     record_path = frozen_record.get("path")
@@ -375,8 +444,10 @@ def verify(source, output, target_record=None, early_target_record=None):
                 != frozen_early.get("target_record", {}).get("path")):
             raise ValueError("Selected early target record differs from the frozen inventory")
     try:
-        source, repository, _, source_identity = _source_identity(source, frozen_source["commit"])
-        editions, target_identity = _target_identity(source, repository, source_identity["commit"], record_path)
+        source, repository, _, source_identity, release_identity, source_target, source_factorio, source_floor = _source_identity(
+            source, frozen_source["commit"])
+        editions, target_identity = _target_identity(
+            source, repository, source_identity["commit"], record_path, source_target, source_factorio, source_floor)
         early_editions, early_identity = (None, None)
         if frozen_early is not None:
             early_path = frozen_early.get("target_record", {}).get("path")
@@ -384,14 +455,20 @@ def verify(source, output, target_record=None, early_target_record=None):
                 source, repository, source_identity["commit"], early_path)
     except (KeyError, TypeError, ValueError, subprocess.CalledProcessError) as error:
         raise ValueError("Frozen source or target record cannot be resolved") from error
+    if release != release_identity:
+        raise ValueError("Release title, tag, or source version differs")
     if frozen_source != source_identity or frozen_record != target_identity:
         raise ValueError("Frozen source or target record identity differs")
     if frozen_early is not None:
         if frozen_early.get("target_record") != early_identity:
             raise ValueError("Frozen early target record identity differs")
-    expected_files = {_archive_name(target) for target in TARGETS} | {SUMS_NAME, INVENTORY_NAME}
+    expected_files = {
+        _archive_name(target, source_identity["source_distribution_version"]) for target in TARGETS
+    } | {SUMS_NAME, INVENTORY_NAME}
     if frozen_early is not None:
-        expected_files |= {_archive_name(target) for target in EARLY_TARGETS} | {EARLY_SUMS_NAME}
+        expected_files |= {
+            _archive_name(target, source_identity["source_distribution_version"]) for target in EARLY_TARGETS
+        } | {EARLY_SUMS_NAME}
     try:
         actual_files = {path.name for path in output.iterdir()}
     except OSError as error:
@@ -404,24 +481,28 @@ def verify(source, output, target_record=None, early_target_record=None):
         temporary = Path(temporary)
         expected_assets = []
         for target in TARGETS:
-            name = _archive_name(target)
+            name = _archive_name(target, source_identity["source_distribution_version"])
             expected_record = package.build(source, temporary / name, revision=source_identity["commit"],
                                             target=target, target_record=target_identity["path"])
             actual = output / name
             if actual.read_bytes() != (temporary / name).read_bytes():
                 raise ValueError("Archive bytes differ from the frozen source: " + name)
-            expected_assets.append(_asset(expected_record, target, editions[target]))
+            expected_assets.append(_asset(
+                expected_record, target, editions[target], source_identity["source_distribution_version"],
+                release_identity["source_version"]))
         expected_early = None
         if frozen_early is not None:
             early_assets = []
             for target in EARLY_TARGETS:
-                name = _archive_name(target)
+                name = _archive_name(target, source_identity["source_distribution_version"])
                 expected_record = package.build(source, temporary / name, revision=source_identity["commit"],
                                                 target=target, target_record=early_identity["path"])
                 actual = output / name
                 if actual.read_bytes() != (temporary / name).read_bytes():
                     raise ValueError("Archive bytes differ from the frozen source: " + name)
-                early_assets.append(_early_asset(expected_record, target, early_editions[target]))
+                early_assets.append(_early_asset(
+                    expected_record, target, early_editions[target], source_identity["source_distribution_version"],
+                    release_identity["source_version"]))
             if len({asset["target"] for asset in early_assets}) != len(EARLY_TARGETS):
                 raise ValueError("Expected early release assets are not unique")
             early_sums = _sums(early_assets)
@@ -433,7 +514,8 @@ def verify(source, output, target_record=None, early_target_record=None):
     sums = _sums(expected_assets)
     if (output / SUMS_NAME).read_bytes() != sums:
         raise ValueError("Checksum asset differs from the frozen archives")
-    expected = _body(source_identity, target_identity, frozen_controller, expected_assets, sums, expected_early)
+    expected = _body(
+        release_identity, source_identity, target_identity, frozen_controller, expected_assets, sums, expected_early)
     if inventory != expected:
         raise ValueError("Release inventory differs from frozen source or assets")
     return json.loads(_inventory_bytes(expected).decode("utf-8"))

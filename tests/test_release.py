@@ -3,6 +3,7 @@ import copy
 import importlib.util
 import json
 from pathlib import Path
+import re
 import shutil
 import subprocess
 import tempfile
@@ -18,6 +19,7 @@ SPEC.loader.exec_module(release)
 
 class ReleaseTests(unittest.TestCase):
     NORMAL_TARGETS = ("f013", "f014", "f015", "f016", "f017", "f018", "f100", "f110", "f200", "f210")
+    SOURCE_DISTRIBUTION_VERSION = "5.0.21000"
 
     @staticmethod
     def _git(repository, *arguments):
@@ -38,6 +40,73 @@ class ReleaseTests(unittest.TestCase):
         cls._git(root, "add", ".")
         cls._git(root, "commit", "-qm", "frozen player source")
         return root / "source", cls._git(root, "rev-parse", "HEAD").decode().strip()
+
+    @classmethod
+    def _set_source_release(cls, source, source_version):
+        match = re.fullmatch(r"(0|[1-9]\d*)\.(0|[1-9]\d*)\.(\d{1,2})", source_version)
+        if match is None:
+            raise AssertionError("test source version must be a plain patch release")
+        major, minor, patch = match.groups()
+        distribution = major + "." + minor + "." + str(21000 + int(patch)).zfill(5)
+        info_path = source / "info.json"
+        info = json.loads(info_path.read_text(encoding="utf-8"))
+        info["version"] = distribution
+        info_path.write_text(json.dumps(info, indent=2) + "\n", encoding="utf-8", newline="\n")
+        target_path = source / "platform/target.lua"
+        target = target_path.read_text(encoding="utf-8")
+        target, count = re.subn(r'distribution_version\s*=\s*"\d+\.\d+\.\d{5}"',
+                                 'distribution_version="' + distribution + '"', target)
+        if count != 1:
+            raise AssertionError("test target metadata did not have one distribution version")
+        target_path.write_text(target, encoding="utf-8", newline="\n")
+        changelog_path = source / "changelog.txt"
+        changelog = changelog_path.read_text(encoding="utf-8")
+        changelog, count = re.subn(r"(?m)^Version: 5\.0\.0$", "Version: " + source_version, changelog,
+                                   count=1)
+        if count != 1:
+            raise AssertionError("test changelog did not have the source header")
+        changelog_path.write_text(changelog, encoding="utf-8", newline="\n")
+        return distribution
+
+    @staticmethod
+    def _write_info_version(source, version):
+        path = source / "info.json"
+        info = json.loads(path.read_text(encoding="utf-8"))
+        info["version"] = version
+        path.write_text(json.dumps(info, indent=2) + "\n", encoding="utf-8", newline="\n")
+
+    @staticmethod
+    def _set_mismatched_target_version(source):
+        path = source / "platform/target.lua"
+        target = path.read_text(encoding="utf-8")
+        target, count = re.subn(r'distribution_version\s*=\s*"5\.0\.21001"',
+                                 'distribution_version="5.0.21000"', target)
+        if count != 1:
+            raise AssertionError("test target metadata did not have the expected version")
+        path.write_text(target, encoding="utf-8", newline="\n")
+
+    @staticmethod
+    def _set_mismatched_changelog_header(source):
+        path = source / "changelog.txt"
+        changelog = path.read_text(encoding="utf-8")
+        changelog, count = re.subn(r"(?m)^Version: 5\.0\.1$", "Version: 5.0.2", changelog, count=1)
+        if count != 1:
+            raise AssertionError("test changelog did not have the expected version")
+        path.write_text(changelog, encoding="utf-8", newline="\n")
+
+    @staticmethod
+    def _set_bad_source_floor(repository):
+        path = repository / "source" / "info.json"
+        info = json.loads(path.read_text(encoding="utf-8"))
+        info["dependencies"][0] = "base >= 2.1.0"
+        path.write_text(json.dumps(info, indent=2) + "\n", encoding="utf-8", newline="\n")
+
+    @staticmethod
+    def _set_invalid_floor(repository):
+        path = repository / release.package.TARGET_RECORD
+        record = json.loads(path.read_text(encoding="utf-8"))
+        record["targets"]["f210"]["minimum_base"] = "2.1.invalid"
+        path.write_text(json.dumps(record, indent=2) + "\n", encoding="utf-8", newline="\n")
 
     @staticmethod
     def _body(output):
@@ -62,7 +131,8 @@ class ReleaseTests(unittest.TestCase):
             first_output = temporary / "first-output"
             inventory = release.freeze(first_source, first_output, revision=commit)
             self.assertEqual(release.TARGETS, self.NORMAL_TARGETS)
-            expected = {release._archive_name(target) for target in self.NORMAL_TARGETS}
+            expected = {release._archive_name(target, self.SOURCE_DISTRIBUTION_VERSION)
+                        for target in self.NORMAL_TARGETS}
             self.assertEqual({path.name for path in first_output.iterdir()},
                              expected | {release.SUMS_NAME, release.INVENTORY_NAME})
             self.assertEqual(inventory["kind"], release.KIND)
@@ -97,6 +167,58 @@ class ReleaseTests(unittest.TestCase):
             for name in expected | {release.SUMS_NAME}:
                 self.assertEqual((first_output / name).read_bytes(), (second_output / name).read_bytes())
 
+    def test_freeze_derives_successive_plain_source_release_identities(self):
+        for source_version, expected_f013, expected_f210 in (
+                ("5.0.1", "5.0.01301", "5.0.21001"),
+                ("5.1.0", "5.1.01300", "5.1.21000")):
+            with self.subTest(source_version=source_version), tempfile.TemporaryDirectory() as temporary:
+                temporary = Path(temporary)
+                repository = temporary / "repository"
+                repository.mkdir()
+                source, _ = self._repository(repository)
+                distribution = self._set_source_release(source, source_version)
+                self._git(repository, "add", "source")
+                self._git(repository, "commit", "-qm", "successive source release")
+                commit = self._git(repository, "rev-parse", "HEAD").decode().strip()
+                frozen = temporary / "frozen"
+                inventory = release.freeze(source, frozen, revision=commit)
+                self.assertEqual(inventory["release"], {
+                    "source_version": source_version,
+                    "source_label": "source" + source_version,
+                    "tag": "v" + source_version,
+                    "title": "MIR " + source_version,
+                })
+                self.assertEqual(inventory["source"]["source_distribution_version"], distribution)
+                self.assertEqual(next(asset["version"] for asset in inventory["assets"]
+                                      if asset["target"] == "f013"), expected_f013)
+                self.assertEqual(next(asset["version"] for asset in inventory["assets"]
+                                      if asset["target"] == "f210"), expected_f210)
+                self.assertEqual(release.verify(source, frozen), inventory)
+
+    def test_freeze_refuses_malformed_mismatched_or_invalid_floor_release_metadata(self):
+        cases = {
+            "malformed-codec": lambda source, _: self._write_info_version(source, "5.1.2100"),
+            "target-version": lambda source, _: self._set_mismatched_target_version(source),
+            "changelog-header": lambda source, _: self._set_mismatched_changelog_header(source),
+            "source-floor": lambda source, repository: self._set_bad_source_floor(repository),
+            "invalid-floor": lambda source, repository: self._set_invalid_floor(repository),
+        }
+        for name, mutate in cases.items():
+            with self.subTest(name=name), tempfile.TemporaryDirectory() as temporary:
+                temporary = Path(temporary)
+                repository = temporary / "repository"
+                repository.mkdir()
+                source, _ = self._repository(repository)
+                self._set_source_release(source, "5.0.1")
+                mutate(source, repository)
+                self._git(repository, "add", ".")
+                self._git(repository, "commit", "-qm", "bad successive source release")
+                commit = self._git(repository, "rev-parse", "HEAD").decode().strip()
+                output = temporary / "output"
+                with self.assertRaises(ValueError):
+                    release.freeze(source, output, revision=commit)
+                self.assertFalse(output.exists())
+
     def test_opt_in_early_cohort_binds_exact_best_effort_assets_and_delivery(self):
         with tempfile.TemporaryDirectory() as temporary:
             temporary = Path(temporary)
@@ -111,8 +233,10 @@ class ReleaseTests(unittest.TestCase):
                 early_target_record=release.package.EARLY_TARGET_RECORD,
             )
             self.assertEqual(release.TARGETS, self.NORMAL_TARGETS)
-            expected = ({release._archive_name(target) for target in self.NORMAL_TARGETS}
-                        | {release._archive_name(target) for target in release.EARLY_TARGETS}
+            expected = ({release._archive_name(target, self.SOURCE_DISTRIBUTION_VERSION)
+                         for target in self.NORMAL_TARGETS}
+                        | {release._archive_name(target, self.SOURCE_DISTRIBUTION_VERSION)
+                           for target in release.EARLY_TARGETS}
                         | {release.SUMS_NAME, release.EARLY_SUMS_NAME, release.INVENTORY_NAME})
             self.assertEqual({path.name for path in frozen.iterdir()}, expected)
             self.assertEqual([asset["target"] for asset in inventory["assets"]], list(self.NORMAL_TARGETS))
@@ -134,7 +258,8 @@ class ReleaseTests(unittest.TestCase):
             for asset in cohort["assets"]:
                 with self.subTest(target=asset["target"]), zipfile.ZipFile(frozen / asset["name"]) as archive:
                     info = json.loads(archive.read(asset["root"] + "/info.json"))
-                    self.assertEqual(asset["name"], release._archive_name(asset["target"]))
+                    self.assertEqual(asset["name"], release._archive_name(
+                        asset["target"], self.SOURCE_DISTRIBUTION_VERSION))
                     self.assertEqual(info["version"], asset["version"])
                     self.assertEqual(info["dependencies"][0], "base >= " + asset["minimum_base"])
                     self.assertNotIn("support", asset)
@@ -173,7 +298,8 @@ class ReleaseTests(unittest.TestCase):
             release.freeze(source, frozen, revision=commit,
                            early_target_record=release.package.EARLY_TARGET_RECORD)
             for name, mutate in {
-                "missing": lambda output: (output / release._archive_name("f006")).unlink(),
+                "missing": lambda output: (output / release._archive_name(
+                    "f006", self.SOURCE_DISTRIBUTION_VERSION)).unlink(),
                 "delivery": lambda output: self._change_early_delivery(output),
             }.items():
                 with self.subTest(name=name):
@@ -194,9 +320,11 @@ class ReleaseTests(unittest.TestCase):
                 release.freeze(source, frozen, revision=commit)
 
             cases = {
-                "missing": lambda output: (output / release._archive_name("f013")).unlink(),
+                "missing": lambda output: (output / release._archive_name(
+                    "f013", self.SOURCE_DISTRIBUTION_VERSION)).unlink(),
                 "extra": lambda output: (output / "unexpected.txt").write_text("not an asset", encoding="utf-8"),
-                "changed": lambda output: (output / release._archive_name("f013")).write_bytes(b"changed"),
+                "changed": lambda output: (output / release._archive_name(
+                    "f013", self.SOURCE_DISTRIBUTION_VERSION)).write_bytes(b"changed"),
                 "duplicate": lambda output: self._duplicate_asset(output),
             }
             for name, mutate in cases.items():
@@ -314,7 +442,7 @@ class ReleaseTests(unittest.TestCase):
                 with self.subTest(name=name):
                     output = temporary / ("archive-" + name)
                     shutil.copytree(frozen, output)
-                    archive = output / release._archive_name("f013")
+                    archive = output / release._archive_name("f013", self.SOURCE_DISTRIBUTION_VERSION)
                     self._rewrite_archive(archive, transform)
                     body = self._body(output)
                     asset = body["assets"][0]
