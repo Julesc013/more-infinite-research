@@ -223,7 +223,7 @@ The historical 1.0.01 failure is retained verbatim as adverse evidence:
 The raw archive identity remains cr-extras `1.0.01`; Factorio reports its
 runtime version as `1.0.1`.
 
-From the Black Glass repository checkout, the existing capture tool can use
+From the native execution owner's repository checkout, the existing capture tool can use
 this selection without supplying `-MIRArchive`:
 
 ```powershell
