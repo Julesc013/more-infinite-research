@@ -85,7 +85,17 @@ function forward_flow(control_path, source_plan, target_plan, definitions, oppon
   function game.create_force(n)return make_force(n)end
   game.surfaces[1].create_entity=function(spec)
     assert(spec.name=="lab");local inv=inventory(0)
-    local lab={valid=true,active=true,energy=0,get_inventory=function()return inv end}
+    local lab={valid=true,energy=0,get_inventory=function()return inv end}
+    if current.target=="f210"then
+      lab.disabled_by_script=false
+      setmetatable(lab,{
+        __index=function(value,key)if key=="active"then return not value.disabled_by_script end end,
+        __newindex=function(value,key,item)
+          if key=="active"then error("LuaEntity::active is read only.")end
+          rawset(value,key,item)
+        end})
+      assert(not pcall(function()lab.active=false end),"F210 active must reject writes")
+    else lab.active=true end
     labs[#labs+1]=lab;return lab
   end
   function game.server_save(name)assert(name=="mir5-native-complete");saves=saves+1 end
@@ -166,8 +176,12 @@ function forward_flow(control_path, source_plan, target_plan, definitions, oppon
   callbacks[1]();callbacks[1]()
   local expected_saves=bridge_plan==""and 2 or 3
   assert(saves==expected_saves and original.forward.successor_labs==1)
+  if current.target=="f210"then assert(labs[1].disabled_by_script==true,"F210 lab must be disabled")end
   if opponent=="completed-effect"then player.bonus=0 end
   if opponent=="cold-science"then inv[1].durability=1 end
+  if opponent=="cold-lab-enabled"then
+    if current.target=="f210"then labs[1].disabled_by_script=false else labs[1].active=true end
+  end
   for i=1,2 do
     callbacks=load_stage(target_plan,true)
     callbacks.on_configuration_changed() -- A completed reload still checks all state.
@@ -223,7 +237,7 @@ end
     def test_destination_faults_and_completed_configuration_drift_remain_failures(self):
         for target in ("f110", "f210"):
             for opponent in ("destination-level", "destination-cap", "destination-effect", "destination-laser",
-                             "destination-inserter", "destination-foreign", "destination-paused", "destination-queue", "completed-effect", "successor-science", "cold-science"):
+                             "destination-inserter", "destination-foreign", "destination-paused", "destination-queue", "completed-effect", "successor-science", "cold-science", "cold-lab-enabled"):
                 with self.subTest(target=target, opponent=opponent):
                     self.setUp()
                     with self.assertRaises(Exception):

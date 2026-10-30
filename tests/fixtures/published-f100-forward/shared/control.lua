@@ -111,6 +111,7 @@ local function successor_science(saved)
   local lab=saved.lab
   if not lab or lab.valid~=true or lab.active~=false or lab.energy~=0
       or not close(saved.successor_units,35/60) then fail("successor frozen lab/work differs") end
+  if modern and lab.disabled_by_script~=true then fail("successor scripted lab disablement differs") end
   local input=lab.get_inventory(defines.inventory.lab_input)
   for _, pack in ipairs({"military-science-pack","utility-science-pack"}) do
     local units,found=0,false
@@ -272,7 +273,9 @@ script.on_event(defines.events.on_tick,function()
     return
   end
   if saved.phase == "successor-observe" then
-    saved.lab.active,saved.lab.energy = false,0
+    if modern then saved.lab.disabled_by_script = true
+    else saved.lab.active = false end
+    saved.lab.energy = 0
     successor_science(saved)
     saved.phase,value.phase = "successor-complete","mir5-complete"
   end
