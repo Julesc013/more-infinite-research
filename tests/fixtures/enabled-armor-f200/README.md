@@ -16,7 +16,7 @@ source_of_truth_for:
 
 This private fixture changes only `bob-mech-armor-plate.enabled` from `false` to `true` during data-updates. Factorio 2.0.77 documents `enabled` as an optional boolean defaulting to `true`. MIR's authored armor productivity output does not use that activation flag. The fixture adds no settings, technologies, runtime handler or save state.
 
-Use `tests/profiles/bob-angel-enabled-armor-f200-2077.json` with the exact engine/archive controls inherited from the existing combined selection. Build only `info.json` and `data-updates.lua` into the fixture ZIP; keep this README outside it. Black Glass retains exclusive staging, archive restoration and native execution.
+Use `tests/profiles/bob-angel-enabled-armor-f200-2077.json` with the exact engine/archive controls inherited from the existing combined selection. Build only `info.json` and `data-updates.lua` into the fixture ZIP; keep this README outside it. The native execution owner retains exclusive staging, archive restoration and native execution.
 
 Use the existing `tools/Invoke-PrototypeCapture.ps1`: first qualify the NoMIR arm, then retain the original guard's exact refusal, then capture the corrected candidate. Bind fresh output paths and actual MIR archive hashes in the native packet. Retain the prior combined-profile resource policy; this is a data-stage regression, not a new menu benchmark.
 
