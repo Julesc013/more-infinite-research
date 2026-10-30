@@ -23,6 +23,30 @@ def run_powershell(script: str, environment: dict[str, str]) -> subprocess.Compl
 
 
 class PublishedF100ForwardRunnerControls(unittest.TestCase):
+    def test_ast_extracted_parsed_published_forward_witness_rejects_duplicate_later_role_target(self):
+        script = r'''
+          $ErrorActionPreference='Stop';Set-StrictMode -Version Latest
+          $tokens=$null;$errors=$null;$ast=[Management.Automation.Language.Parser]::ParseFile($env:MIR_TEST_RUNNER,[ref]$tokens,[ref]$errors)
+          if($errors.Count){throw 'runner parse failed'}
+          foreach($name in @('Assert-Fixture','Read-FixtureResult','Assert-PublishedF100ForwardWitness')){
+            $definition=@($ast.FindAll({param($node) $node -is [Management.Automation.Language.FunctionDefinitionAst] -and $node.Name -ceq $name},$true))
+            if($definition.Count-ne1){throw 'published forward parsed witness helper differs'}
+            . ([scriptblock]::Create($definition[0].Extent.Text))
+          }
+          $CaseName='published-f100-forward';$fixture=[pscustomobject]@{role='source';target='f100'}
+          foreach($stage in @('initial','reload')){
+            $exact='[MIR5_NATIVE_FIXTURE] RESULT {"case":"published-f100-forward","stage":"'+$stage+'","role":"source","target":"f100","status":"passed"}'
+            $result=Read-FixtureResult $exact $stage;Assert-PublishedF100ForwardWitness $result $fixture $stage
+            $duplicate='[MIR5_NATIVE_FIXTURE] RESULT {"case":"published-f100-forward","stage":"'+$stage+'","role":"source","target":"f100","role":"bridge","target":"f110","status":"passed"}'
+            $parsed=Read-FixtureResult $duplicate $stage
+            if([string]$parsed.role-cne'bridge'-or[string]$parsed.target-cne'f110'){throw 'duplicate marker did not preserve its parsed later fields'}
+            $rejected=$false;try{Assert-PublishedF100ForwardWitness $parsed $fixture $stage}catch{$rejected=$_.Exception.Message.Contains('role/target differs')}
+            if(-not$rejected){throw 'duplicate marker later role/target was accepted'}
+          }
+        '''
+        result = run_powershell(script, dict(os.environ, MIR_TEST_RUNNER=str(RUNNER)))
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+
     def test_ast_extracted_reload_predicate_requires_exact_published_forward_case_stage_role_and_target(self):
         script = r'''
           $ErrorActionPreference='Stop';Set-StrictMode -Version Latest

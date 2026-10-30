@@ -292,6 +292,10 @@ function Read-FixtureResult([string]$Text,[string]$Stage) {
   Assert-Fixture ($rows.Count -eq 1 -and $rows[0].status -ceq 'passed') "missing unique passed $Stage witness for $CaseName"
   $rows[0]
 }
+function Assert-PublishedF100ForwardWitness($Result,$Fixture,[string]$Stage) {
+  Assert-Fixture ($Stage -in @('initial','reload') -and $null -ne $Result -and $null -ne $Fixture) 'published F100 forward witness declaration differs'
+  Assert-Fixture ([string]$Result.role -ceq [string]$Fixture.role -and [string]$Result.target -ceq [string]$Fixture.target) "published F100 forward $Stage role/target differs"
+}
 function Read-ActiveFixtureMarker([string]$Text,[string]$Kind,[string]$Stage) {
   Assert-Fixture ($Kind -in @('repair-stress','agriculture-scale') -and $Stage -in @('prepared','start','complete')) 'active fixture marker selector differs'
   $rows=@([regex]::Matches($Text,'\[MIR5_RUNTIME_ACTIVE\] (\{[^\r\n]+\})') | ForEach-Object {$_.Groups[1].Value | ConvertFrom-Json} | Where-Object {
@@ -952,6 +956,7 @@ try{
   }
   $record.production.consumers=Read-ConsumerResults ([IO.File]::ReadAllText($record.production.log)) $ProductionConsumerStage
   $record.initial=Read-FixtureResult ([IO.File]::ReadAllText($record.production.log)) 'initial'
+  if($publishedF100Forward){Assert-PublishedF100ForwardWitness $record.initial $publishedF100Fixture 'initial'}
   if($laserTransition){Assert-Fixture ([string]$record.initial.role -ceq $F100F110LaserStage) 'laser initial role differs'}
   if($historicalTransition){Assert-Fixture ([string]$record.initial.transition_stage -ceq $HistoricalTransitionStage) 'historical transition predecessor or successor witness differs'}
   $saveHash=Get-FixtureSha $complete
@@ -975,6 +980,7 @@ try{
     }
     $stage=Invoke-FixtureStage ('reload-'+$ordinal) $reloadArguments $reloadCompletion
     $result=Read-FixtureResult ([IO.File]::ReadAllText($stage.log)) 'reload'
+    if($publishedF100Forward){Assert-PublishedF100ForwardWitness $result $publishedF100Fixture 'reload'}
     if($laserTransition){Assert-Fixture ([string]$result.role -ceq $F100F110LaserStage) 'laser reload role differs'}
     if($historicalTransition){Assert-Fixture ([string]$result.transition_stage -ceq $HistoricalTransitionStage) 'historical transition reload witness differs'}
     $stage.consumers=Read-ConsumerResults ([IO.File]::ReadAllText($stage.log)) 'load'
