@@ -812,7 +812,7 @@ The required source/work-count audit checks that ordinary native research adds n
 
 ### J — Promote, tag, publish and deliver
 
-1. Follow [existing publication steps](development.md#github-publication-after-acceptance). Complete required dev/main promotion without reset/force or altering legacy/history. Read back main; its tree must equal the final qualified tree or differences need explicit review/applicability before release.
+1. Follow [existing publication steps](development.md#github-publication-after-a-reviewed-verdict). Complete required dev/main promotion without reset/force or altering legacy/history. Read back main; its tree must equal the final qualified tree or differences need explicit review/applicability before release.
 2. Verify frozen inventory without replacing accepted assets. Later package-excluded evidence/docs require separate tree review and proof consumed player/controller/fixture inputs are unchanged; do not rename old executions. Changed consumed inputs get new identity/affected tests.
 3. In real publisher context rerun health, administration and distinct release-immutability probe. Require authenticated permissions and both immutable flags false; never alter credentials/controls to pass. Authorized unsigned annotated tag is allowed if enrolled key is unavailable; checksums are not signatures.
 4. Reconcile existing v5.0.0/release by ID first; preserve unexpected objects. Tag only accepted/read-back main. Never move/suffix a final tag to retry.

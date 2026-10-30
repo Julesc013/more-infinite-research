@@ -1,28 +1,28 @@
 # Support
 
-Open a GitHub issue for reproducible player problems and extension-tooling defects. Security concerns use [the private security route](SECURITY.md).
+- Open a GitHub issue for a reproducible player problem. Use [SECURITY.md](SECURITY.md) for private security reports.
 
-## Include exact evidence
+## Before opening an issue
 
-Provide:
+- Preserve the original save and test only a copy.
+- State the Factorio version, MIR version and enabled mod list.
+- Describe what you expected, what happened and the exact steps to reproduce it.
+- Include relevant startup settings or a full exported settings profile.
+- Attach `factorio-current.log` and any crash message after removing secrets, usernames and private paths.
+- Include a small reproducible save if it is safe to share.
 
-- MIR player distribution version and exact edition/engine family;
-- Factorio version;
-- the exact mod list, inherited startup settings and relevant MIR diagnostics;
-- expected and observed behavior;
-- whether the issue reproduces in a new save;
-- relevant Factorio log and crash output with secrets and personal paths removed.
+## Useful exports
 
-Include the original input identities and preserve the failing log and save separately. Historical MIR4 SupportBundleV1 tooling is not the current MIR5 diagnostic contract. Do not upload save files, full mod archives, or private data unless a maintainer asks through an appropriate channel.
+- On Factorio 2.0 and 2.1, Library **Settings → Export Settings** provides the full MIRSET1 profile and settings file; this is the preferred support export. **Export Compact** omits defaults. **Debug → Export Diagnostics** replaces the latest MIR diagnostic report but does not replace Factorio's engine log.
 
-On modern MIR5 candidates, Library **Settings → Export Settings** shows the full MIRSET1 string and writes `script-output/more-infinite-research/settings/mir-settings-profile.txt`. Full export is the support default; compact profiles inherit omitted defaults. **Debug → Export Diagnostics** replaces the bounded `script-output/more-infinite-research/mir.log` snapshot and exports full settings through the same implementation. These exports do not apply settings or change research. Attach `factorio-current.log` separately for the complete engine session, especially failures before MIR loads. Review exports before sharing: settings metadata includes `exported_by`, and engine logs can contain usernames and local paths. No export uploads anything. See [safe diagnosis](docs/support.md#safe-diagnosis) for commands, validation and exact limits.
+- Exports are local and never upload anything automatically. They do not apply settings or change research. Review files before sharing because profile metadata can include your player name and logs can include local paths.
 
-If Factorio crashes before MIR loads, the optional repository [MIR support collector](scripts/Collect-MIRPlayerReport.cmd) can collect the engine-managed files. Keep it beside its [PowerShell script](scripts/Collect-MIRPlayerReport.ps1), then double-click it after the failed launch; it writes a `MIR-support-*.zip` beside the collector and copies its path to the clipboard. The PowerShell script also accepts `-FactorioUserData` for a custom user-data directory and `-OutputDirectory` for a chosen destination. It reads files without launching Factorio or requiring the MIR interface. The report contains redacted current/previous logs, the mod list, and MIR ZIP hashes. It records the binary startup-settings file's hash without including that file. Review the ZIP before sharing it. This small startup report helps triage a load failure; it is not a formal SupportBundleV1 or a substitute for exact settings when a maintainer needs them.
+- If Factorio fails before MIR loads, include the engine log and crash output. The optional repository [support collector](scripts/Collect-MIRPlayerReport.cmd) can package redacted startup information without launching Factorio:
 
-## Claim boundary
+- Keep [Collect-MIRPlayerReport.cmd](scripts/Collect-MIRPlayerReport.cmd) beside [Collect-MIRPlayerReport.ps1](scripts/Collect-MIRPlayerReport.ps1), then double-click the `.cmd` file after the failed launch.
+- It writes a `MIR-support-*.zip` beside the collector and copies its path to the clipboard; review the ZIP before sharing it.
+- Run the PowerShell script with `-FactorioUserData` for a custom Factorio user-data folder or `-OutputDirectory` for a different output folder.
 
-MIR does not claim universal modpack support. A support result is exact to its target, environment, MIR build, proposition, and evidence. The safe result may be applied, adopted, preserved, extension-required, review-required, omitted, or failed-hard-safety.
+## Support limits
 
-MEP/API/SDK/Inspector/ProcessIR are MIR 4.0 developer previews. Their contracts and conformance horizon are documented, but they do not grant player emission or stable public SDK 1.0 authority.
-
-The current [MIR5 support and upgrade guide](docs/support.md) describes candidate editions, first-upgrade precautions and exact evidence limits. Original published MIR4 preview contracts remain available through their pinned historical Git refs.
+- MIR does not claim universal modpack support. A report is evaluated for its exact Factorio version, MIR package, mods, settings, save and observed behavior. The [support and upgrade guide](docs/support.md) explains edition limits, safe upgrades, recovery and diagnostic commands.
