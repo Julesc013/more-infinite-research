@@ -4,6 +4,7 @@ These tests exercise fixture transactions, not Factorio or release acceptance.
 """
 import argparse
 from copy import deepcopy
+import hashlib
 import json
 import os
 from pathlib import Path
@@ -256,15 +257,19 @@ end
         for directory in ("source", "bridge", "f110", "f210"):
             row = {"level": 1, "max_level": "infinite", "upgrade": True,
                    "effects": [{"type": "character-mining-speed", "modifier": .05}],
-                   "unit": {"count_formula": "1*(8000*2^(L-1))" if directory in ("f110", "f210") else "8000*2^(L-1)",
+                   "unit": {"count_formula": "1*(8000*2^(L-1))" if directory == "f110" else "8000*2^(L-1)",
                             "time": 60, "ingredients": [["military-science-pack", 1], ["utility-science-pack", 1]]}}
-            for opponent in ("", "engine", "mir", "effect", "cost", "cap", "science"):
+            for opponent in ("", "engine", "mir", "effect", "cost", "formula", "cap", "science"):
                 with self.subTest(stage=directory, opponent=opponent):
                     changed = deepcopy(row)
                     if opponent == "effect":
                         changed["effects"][0]["modifier"] = .1
                     elif opponent == "cost":
                         changed["unit"]["time"] = 120
+                    elif opponent == "formula":
+                        changed["unit"]["count_formula"] = (
+                            "8000*2^(L-1)" if directory == "f110" else "1*(8000*2^(L-1))"
+                        )
                     elif opponent == "cap":
                         changed["max_level"] = 12
                     elif opponent == "science":
@@ -279,6 +284,25 @@ end
                     else:
                         self.assertIsNone(native["unit"]["count_formula"])
                         self.assertEqual((native["unit"]["count"], native["unit"]["time"]), (1, 1))
+
+        reference = json.loads((FIXTURE / "f210-mining-preflight-reference-r01.json").read_text(encoding="utf-8"))
+        raw = json.dumps(reference["published_row"], sort_keys=True, separators=(",", ":"), ensure_ascii=False).encode("utf-8")
+        self.assertEqual(hashlib.sha256(raw).hexdigest().upper(), reference["canonical_row_sha256"])
+        self.assertEqual(reference["published_row"], reference["candidate_row"])
+        for opponent in ("", "wrong-wrapped-formula"):
+            row = deepcopy(reference["published_row"])
+            if opponent:
+                row["unit"]["count_formula"] = "1*(8000*2^(L-1))"
+            native = self.to_lua(row)
+            ok, _ = self.lua.globals().preflight(str(FIXTURE / "shared/data-final-fixes.lua"),
+                str(FIXTURE / "f210/stage.lua"), native, "")
+            self.assertEqual(ok, not opponent)
+            if opponent:
+                self.assertEqual(native["unit"]["count_formula"], row["unit"]["count_formula"])
+                self.assertIsNone(native["unit"]["count"])
+            else:
+                self.assertIsNone(native["unit"]["count_formula"])
+                self.assertEqual((native["unit"]["count"], native["unit"]["time"]), (1, 1))
 
     def test_runner_preflight_binds_four_exact_stages_and_rejects_opposing_inputs(self):
         with tempfile.TemporaryDirectory(prefix="mir-published-f100-") as temporary:

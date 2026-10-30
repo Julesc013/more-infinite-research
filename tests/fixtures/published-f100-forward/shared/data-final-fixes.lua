@@ -4,7 +4,8 @@ assert(mods.base == plan.base and mods["more-infinite-research"] == plan.mir,
 local row = assert(data.raw.technology["recipe-prod-research_character_mining_speed-1"])
 assert(row.level==1 and row.max_level=="infinite" and row.upgrade==true and row.enabled~=false)
 local unit = assert(row.unit)
-local formula = plan.role=="successor" and "1*(8000*2^(L-1))" or "8000*2^(L-1)"
+local formula = plan.role=="successor" and plan.target=="f110"
+  and "1*(8000*2^(L-1))" or "8000*2^(L-1)"
 assert(unit.count_formula==formula and unit.time==60,"published forward mining cost differs")
 assert(#row.effects==1 and row.effects[1].type=="character-mining-speed" and row.effects[1].modifier==.05,
   "published forward mining effect differs")
