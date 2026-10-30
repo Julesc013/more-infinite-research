@@ -16,6 +16,8 @@ from pathlib import Path
 import sys
 import unittest
 
+from native_credit_oracle import current_native_credit_rows
+
 
 ROOT = Path(__file__).resolve().parents[1]
 SOURCE = ROOT / "source"
@@ -26,22 +28,6 @@ PROFILE = ROOT / "tests/profiles/bob-angel-full-space-age-f200-2077.json"
 PROFILE_SHA256 = "61CBE6299DD2708079EA80FB3871AC980C6FF7281DD126C61B3126A7FF294857"
 CONTEXT = ROOT / "tests/fixtures/bob-angel-f200-combined-upstream-context.json.gz"
 CONTEXT_SHA256 = "C5B76C07B66A305099412E2BDBD63855234692C9D5DFF32B3351D0A100A75C7D"
-
-# These are the reviewed current-MIR5 Base/Space Age differences from the
-# published oracle.  They are policy inputs to this control, not values read
-# from generated candidate rows.  All unlisted rows retain the historical
-# multiplicity for this finite source-stage admission check.
-ADOPTED_EFFECT_MULTIPLICITY = {
-    "laser-shooting-speed-8": 1,
-    "recipe-prod-research_carbon-1": 3,
-    "recipe-prod-research_lubricant_productivity-1": 4,
-    "recipe-prod-research_oil_processing_productivity-1": 4,
-    "recipe-prod-research_plastic-1": 2,
-    "recipe-prod-research_steel-1": 3,
-    "recipe-prod-research_sulfur-1": 5,
-    "recipe-prod-research_sulfuric_acid_productivity-1": 3,
-    "recipe-prod-research_tungsten-1": 3,
-}
 
 COMBINED_DELTA = {
     "research_armor_components": {
@@ -248,14 +234,6 @@ class BobAngelF200CombinedProfileTests(unittest.TestCase):
         for name, expected in rows.items():
             self.assertEqual(canonical_sha256(expected["row"]), expected["canonical_sha256"], name)
             self.assertEqual(len(expected["row"]["effects"]), len(effects[name]), name)
-        expected_multiplicity = {
-            name: len(row["row"]["effects"]) for name, row in rows.items()
-        }
-        expected_multiplicity.update(ADOPTED_EFFECT_MULTIPLICITY)
-        self.assertEqual(set(ADOPTED_EFFECT_MULTIPLICITY) - set(rows), set())
-        self.assertEqual(expected_multiplicity["recipe-prod-research_armor_components-1"], 1)
-        self.assertEqual(expected_multiplicity["recipe-prod-research_plastic-1"], 2)
-        self.assertEqual(expected_multiplicity["recipe-prod-research_steel-1"], 3)
         sections = self.oracle["settings"]["sections"]
         self.assertEqual(sum(len(section["added"]) for section in sections.values()), 875)
         self.assertTrue(all(section["changed"] == {} and section["removed_names"] == []
@@ -393,6 +371,30 @@ class BobAngelF200CombinedProfileTests(unittest.TestCase):
         self.assertIn("missing recipe bob-mech-armor-plate", str(lua.globals().message))
         self.assertEqual(plain(lua.globals().emitted), {})
         self.assertEqual(lua.globals().technology_publications, 0)
+
+    def test_actual_shape_adds_only_the_conditional_cannon_holder(self):
+        reference = json.loads((ROOT / "tests/fixtures/bob-angel-f200-conditional-cannon-native-reference-r01.json").read_text(encoding="utf-8"))
+        self.assertEqual(canonical_sha256(reference["old_Base_B_cannon_row"]), reference["old_Base_B_cannon_canonical_sha256"])
+        raw = deepcopy(self.context["raw"])
+        raw.setdefault("ammo-category", {})["cannon-shell"] = reference["ammo_category"]
+        lua = self.data_final_stage(raw=raw)
+        emitted = plain(lua.globals().emitted)
+        public = {name: row["row"] for name, row in self.oracle["technology"]["added"].items()}
+        self.assertIn("recipe-prod-research_rocket_shooting_speed-1", public)
+        expected_private = current_native_credit_rows(public, set(raw["recipe"]))
+        self.assertEqual(len(expected_private), 28)
+        self.assertEqual(set(emitted), set(public) | set(expected_private))
+        self.assertEqual({name: emitted[name] for name in expected_private}, expected_private)
+        cannon = "mir-legacy-cannon-credit-rocket-shooting-speed"
+        self.assertEqual(emitted[cannon], reference["old_Base_B_cannon_row"])
+
+        # The existing compact context remains a valid 27-holder case. The
+        # extra holder also needs its selected public rocket stream.
+        without_rocket = [deepcopy(row) for name, row in public.items()
+                          if name != "recipe-prod-research_rocket_shooting_speed-1"]
+        append_without_rocket = lua.eval("function(rows, raw) require('research.legacy_cannon_credit_definitions').append(rows, require('platform.target'), raw); return rows end")
+        result = plain(append_without_rocket(lua_value(lua, without_rocket), lua_value(lua, raw)))
+        self.assertEqual(result, without_rocket)
 
 
 if __name__ == "__main__":
