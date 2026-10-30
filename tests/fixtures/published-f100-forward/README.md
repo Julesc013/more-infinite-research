@@ -14,6 +14,8 @@ source_of_truth_for:
 
 # Published F100 forward-route witness
 
+The F210 successor freezes its completed lab through `disabled_by_script=true` and zero energy, then checks both script disablement and effective inactivity before save and on reload. F110 retains its writable legacy `active=false` API. The [R06 preparation](../../../spec/evidence/published-f100-f210-lab-api-prepared-r06.json) retains the actual prior direct-load/API failure and its exact corrected fixture members; it does not claim a replacement native pass or authorize a bridge.
+
 This bounded fixture retains the original `mir-fixture-mir5-historical-transition` mod identity and its private `mir5_historical_transition` saved state, rather than creating another predecessor world or borrowing the MIR5-origin laser source. It requires the protected published4.7.10003/1.0.0 source `219EF20F63B4A85FA2386BD50A81228B28F006D9731F24E069A657BB13F45811` and independently rechecks its actual mining lab, consumed science, level2/+5%, frozen lab and42% mining/braking queue before adding witnesses. Original saves and adverse receipts remain unchanged.
 
 Prepare one enhanced copy under published MIR4.7.10003. Seed the seven actual finite `laser-turret-speed-1` through `-7` rows and one inserter continuation level, with exact native effects and2.2 laser/2-and4 inserter totals. The retained F1004.4 native capture establishes these finite definitions and the absence of a published laser8 in that earlier closure; the actual4.7.3 preflight must confirm that absence rather than invent a technology. An unexpected laser8 stops preparation for review. The original actual mining lab is reused once; these additional laser/inserter states are explicitly seeded, not claimed as lab-earned.
