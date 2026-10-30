@@ -189,8 +189,8 @@ class CombinedSteelGameplayFixtureTests(unittest.TestCase):
               values=values,
             }
           end
-          local route_recipe={valid=true,enabled=false,productivity_bonus=0}
-          local owner_researched=false
+          local route_recipe={valid=true,enabled=opponent=="route-enabled",productivity_bonus=0}
+          local owner_researched=opponent=="owner-preseed"
           local owner={valid=true,name=owner_name}
           setmetatable(owner,{__index=function(_,key) if key=="researched" then return owner_researched end end,
             __newindex=function(_,key,value) if key=="researched" then owner_researched=value;if value and opponent~="owner" then route_recipe.enabled=true end end end})
@@ -198,7 +198,7 @@ class CombinedSteelGameplayFixtureTests(unittest.TestCase):
             prerequisites={{name="automation-science-pack"},{name="logistic-science-pack"}},prototype={name=target_name,level=1,upgrade=true,max_level=4294967295,order="p[research_steel]",effects={
               {type="change-recipe-productivity",recipe="angels-plate-steel",change=opponent=="effect" and .2 or .1},
               {type="change-recipe-productivity",recipe=route_name,change=.1},
-            }}}
+            }},research_unit_ingredients={{name="automation-science-pack",amount=opponent=="ingredients" and 2 or 1},{name="logistic-science-pack",amount=1}}}
           local force={technologies={
             [target_name]=target,[owner_name]=owner,
             ["automation-science-pack"]={valid=true,name="automation-science-pack",researched=false},
@@ -213,7 +213,8 @@ class CombinedSteelGameplayFixtureTests(unittest.TestCase):
               if spec.name=="biolab" then
                 local input=inventory();local lab={valid=true,name="biolab",energy=0,quality={name=opponent=="quality" and "uncommon" or "normal"},
                   prototype={name="biolab",researching_speed=2,science_pack_drain_rate_percent=opponent=="drain" and 100 or 50,module_inventory_size=4,
-                    allowed_module_categories={quality=true},surface_conditions={{property="pressure",min=opponent=="surface" and 999 or 1000,max=1000}}},
+                    allowed_module_categories={quality=true},surface_conditions={{property="pressure",min=opponent=="surface" and 999 or 1000,max=1000}},
+                    lab_inputs=opponent=="lab-input" and {{name="automation-science-pack"}} or {{name="automation-science-pack"},{name="logistic-science-pack"}}},
                   get_inventory=function(index) if index==1 then return input end return nil end}
                 labs[#labs+1]=lab;return lab
               end
@@ -255,15 +256,24 @@ class CombinedSteelGameplayFixtureTests(unittest.TestCase):
             if not tick_ok then return {loaded=loaded,init_ok=true,event_ok=true,physical_ok=false,message=tostring(tick_message)} end
           end
           local report=interfaces["mir5-bob-angel-f200-combined-gameplay"].report()
-          local load_one,load_one_message=pcall(callbacks.load)
+          if opponent=="saved-scalar" then environment.storage.mir5_bob_angel_f200_combined_gameplay.saved_target_level=nil end
+          local live_game=environment.game
+          local function storage_only_load()
+            environment.game=setmetatable({}, {__index=function() error("on_load game access") end,__newindex=function() error("on_load game write") end})
+            local ok,message=pcall(callbacks.load)
+            environment.game=live_game
+            return ok,message
+          end
+          local load_one,load_one_message=storage_only_load()
           local reload_one,reload_one_message=pcall(callbacks.events[1])
-          local load_two,load_two_message=pcall(callbacks.load)
+          local load_two,load_two_message=storage_only_load()
           local reload_two,reload_two_message=pcall(callbacks.events[1])
           return {loaded=loaded,init_ok=true,event_ok=true,research_tick=research_tick,physical_ok=true,
             load_one=load_one,load_one_message=tostring(load_one_message),reload_one=reload_one,reload_one_message=tostring(reload_one_message),
             load_two=load_two,load_two_message=tostring(load_two_message),reload_two=reload_two,reload_two_message=tostring(reload_two_message),
             logs=logs,saves=saves,labs=#labs,phase=environment.storage.mir5_bob_angel_f200_combined_gameplay.phase,
-            output=environment.storage.mir5_bob_angel_f200_combined_gameplay.physical_output,report=report}
+            output=environment.storage.mir5_bob_angel_f200_combined_gameplay.physical_output,
+            saved_target_level=environment.storage.mir5_bob_angel_f200_combined_gameplay.saved_target_level,report=report}
         ''')
 
     def test_runtime_uses_named_upstream_only_real_labs_real_route_and_two_read_only_reloads(self):
@@ -279,6 +289,7 @@ class CombinedSteelGameplayFixtureTests(unittest.TestCase):
         self.assertTrue(result["reload_two"], result["reload_two_message"])
         self.assertEqual((100, "complete", 440, 3, 1),
                          (result["labs"], result["phase"], result["output"], result["logs"], result["saves"]))
+        self.assertEqual(2, result["saved_target_level"])
         self.assertEqual("MIR5BobAngelF200CombinedGameplayReportV1", result["report"]["kind"])
         self.assertEqual("pending-fresh-en-de-library-observations", result["report"]["library_stage"]["status"])
         self.assertEqual(["MIR5English", "MIR5Deutsch"], [result["report"]["library_stage"]["required_roles"][index] for index in (1, 2)])
@@ -291,22 +302,37 @@ class CombinedSteelGameplayFixtureTests(unittest.TestCase):
     def test_runtime_refuses_independent_row_lab_owner_or_machine_drift_before_success(self):
         for opponent, phrase in (
             ("effect", "steel productivity effects differ"),
+            ("ingredients", "steel research science differs"),
             ("drain", "native biolab differs"),
+            ("lab-input", "native biolab differs"),
             ("quality", "native biolab differs"),
             ("surface", "native biolab differs"),
+            ("owner-preseed", "named upstream prerequisite was pre-researched"),
+            ("route-enabled", "fresh steel route differs"),
             ("owner", "steel force route differs"),
             ("category", "unchanged assembling-machine-1 differs"),
         ):
             with self.subTest(opponent=opponent):
                 result = self.runtime_protocol(opponent)
                 self.assertTrue(result["loaded"])
-                if opponent in ("effect", "drain", "quality", "surface", "owner"):
+                if opponent in ("effect", "ingredients", "drain", "lab-input", "quality", "surface", "owner-preseed", "route-enabled", "owner"):
                     self.assertFalse(result["init_ok"])
                 else:
                     self.assertTrue(result["init_ok"])
                     self.assertFalse(result["research_tick"])
                 self.assertIn(phrase, result["message"])
                 self.assertEqual((0, 0), (result["logs"] or 0, result["saves"] or 0))
+
+    def test_on_load_refuses_missing_storage_only_witness_without_game_access(self):
+        result = self.runtime_protocol("saved-scalar")
+        self.assertTrue(result["loaded"])
+        self.assertTrue(result["init_ok"])
+        self.assertTrue(result["event_ok"])
+        self.assertTrue(result["research_tick"])
+        self.assertTrue(result["physical_ok"])
+        self.assertFalse(result["load_one"])
+        self.assertIn("cold reload storage witness differs", result["load_one_message"])
+        self.assertNotIn("on_load game access", result["load_one_message"])
 
     def test_fixture_does_not_substitute_mir_research_recipe_enablement_or_library_input(self):
         source = (FIXTURE / "control.lua").read_text(encoding="utf-8")

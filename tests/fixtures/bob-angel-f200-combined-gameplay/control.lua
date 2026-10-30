@@ -109,6 +109,13 @@ local function exact_effects(value)
   if count ~= 2 or not found["angels-plate-steel"] or not found[ROUTE] then fail("steel productivity effects differ") end
 end
 
+local function has_lab_input(inputs, name)
+  for _, value in pairs(inputs or {}) do
+    if value ~= nil and value.name == name then return true end
+  end
+  return false
+end
+
 local function target(force)
   local value = technology(force, TARGET)
   if value.prototype == nil or value.prototype.max_level ~= UINT32_MAX or value.prototype.level ~= 1
@@ -117,6 +124,9 @@ local function target(force)
     fail("complete steel technology row differs")
   end
   exact_prerequisites(value)
+  exact_rows(value.research_unit_ingredients, {
+    {type="item", name=SCIENCE[1], amount=1}, {type="item", name=SCIENCE[2], amount=1},
+  }, "steel research science")
   exact_effects(value)
   return value
 end
@@ -146,6 +156,14 @@ local function assert_upstream(force)
   route(force, 0)
 end
 
+local function assert_fresh_upstream(force)
+  for _, name in ipairs(UPSTREAM) do
+    if technology(force, name).researched ~= false then fail("named upstream prerequisite was pre-researched: " .. name) end
+  end
+  local value = force.recipes[ROUTE]
+  if value == nil or value.valid == false or value.enabled ~= false then fail("fresh steel route differs") end
+end
+
 local function lab_inventory(value)
   local inventory = value and value.get_inventory(defines.inventory.lab_input)
   if inventory == nil then fail("native biolab input is absent") end
@@ -166,7 +184,9 @@ local function create_labs(force)
         or value.prototype.module_inventory_size ~= 4 or value.prototype.allowed_module_categories == nil
         or value.prototype.allowed_module_categories["quality"] ~= true or value.quality == nil or value.quality.name ~= "normal"
         or type(conditions) ~= "table" or #conditions ~= 1 or conditions[1].property ~= "pressure"
-        or conditions[1].min ~= 1000 or conditions[1].max ~= 1000 then
+        or conditions[1].min ~= 1000 or conditions[1].max ~= 1000
+        or not has_lab_input(value.prototype.lab_inputs, SCIENCE[1])
+        or not has_lab_input(value.prototype.lab_inputs, SCIENCE[2]) then
       fail("native biolab differs")
     end
     local modules = value.get_inventory(defines.inventory.lab_modules)
@@ -273,6 +293,9 @@ local function tick_physical(state)
     fail("real steel physical output or native bonus differs")
   end
   state.phase = "complete"
+  state.saved_actual_labs = state.actual_labs
+  state.saved_physical_output = state.physical_output
+  state.saved_target_level = target(game.forces.player).level
   marker("initial", state)
   game.server_save(SAVE)
 end
@@ -327,6 +350,7 @@ script.on_init(function()
   if storage[KEY] ~= nil then fail("fixture state already exists") end
   local force, value = game.forces.player, target(game.forces.player)
   if value.level ~= 1 or value.researched ~= false or value.enabled ~= true then fail("fresh steel technology state differs") end
+  assert_fresh_upstream(force)
   for _, name in ipairs(UPSTREAM) do technology(force, name).researched = true end
   assert_upstream(force)
   local state = {phase="researching", actual_labs=0, labs=create_labs(force), deadline=game.tick+DEADLINE}
@@ -349,7 +373,11 @@ end)
 script.on_load(function()
   local state = storage[KEY]
   if type(state) == "table" and state.phase == "complete" then
-    loaded = {actual_labs=state.actual_labs, output=state.physical_output, level=target(game.forces.player).level}
+    if type(state.saved_actual_labs) ~= "number" or type(state.saved_physical_output) ~= "number"
+        or type(state.saved_target_level) ~= "number" then
+      fail("cold reload storage witness differs")
+    end
+    loaded = {actual_labs=state.saved_actual_labs, output=state.saved_physical_output, level=state.saved_target_level}
   else
     loaded = nil
   end
@@ -362,10 +390,11 @@ script.on_event(defines.events.on_tick, function()
   if state.phase == "complete" then
     if loaded ~= nil and not reported then
       if loaded.actual_labs ~= state.actual_labs or loaded.output ~= state.physical_output
-          or loaded.level ~= target(game.forces.player).level then
+          or loaded.level ~= state.saved_target_level then
         fail("cold reload changed steel witness")
       end
       assert_complete(state)
+      if target(game.forces.player).level ~= loaded.level then fail("cold reload native steel level differs") end
       marker("reload", state)
       reported = true
     end
