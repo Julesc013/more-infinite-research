@@ -1,0 +1,177 @@
+{
+  "schema": 1,
+  "kind": "MIRPublished473F100SourceTimeoutAdverseChainV1",
+  "status": "failed-protocol-first-reload-timeout-positive-native-source-witnesses-retained",
+  "source_commit": "b2e9243dacf8c10f623fe90ddac957329fbf1d9e",
+  "frozen_runner_sha256": "61F391350E06E866AF02BEAE854695C69B192F80067C0EF134F4FF7C1276EA04",
+  "packet": {
+    "path": "D:/Projects/Factorio/more-infinite-research/build/qualification/published473-f100-forward-source-r01-controller/packet-r02.json",
+    "bytes": 11501,
+    "sha256": "FCC7C6FC9F8A221A1BB7A1ECBD2F128AA18F4EC6065B57CCD896185B8B79189C"
+  },
+  "caller": {
+    "path": "D:/Projects/Factorio/more-infinite-research/build/qualification/published473-f100-forward-source-r01-controller/Invoke-Owned.ps1",
+    "bytes": 18251,
+    "sha256": "5FD095E291F19F36725A4AB598F5E5051EE4A91EB131726AC0B987E95DC81170"
+  },
+  "profile": {
+    "path": "D:\\Projects\\Factorio\\mir5-api-boundary-f210-native-r01\\tests\\profiles\\published473-f100-forward-source-r02.json",
+    "bytes": 1334,
+    "sha256": "973631B91A105D56EEB2890CA4F2A6B9571CA5FBE2E1EAAB3A6501ACD3512509",
+    "repo": "D:\\Projects\\Factorio\\mir5-api-boundary-f210-native-r01",
+    "commit": "b2e9243dacf8c10f623fe90ddac957329fbf1d9e",
+    "relative_path": "tests/profiles/published473-f100-forward-source-r02.json"
+  },
+  "engine": {
+    "path": "D:\\Games\\Factorio\\1.0\\bin\\x64\\factorio.exe",
+    "bytes": 29181440,
+    "sha256": "99F1CE207A04296EF7D797E4A98AA98DDE4F02EE653C9DF736AC33A676FD4F70"
+  },
+  "published_mir": {
+    "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\published473-f100-forward-source-r01-controller\\owned-inputs\\more-infinite-research_4.7.10003.zip",
+    "bytes": 709722,
+    "sha256": "C04F3543EBF99D2B76B2C9193EA0886381B7CDDF2F2C1610310E7961B24BE0E1"
+  },
+  "input_materialization": {
+    "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\published473-f100-forward-source-r01-controller\\input-materialization.json",
+    "bytes": 4768,
+    "sha256": "1EA37D89D7810285CD68CE9B3D0E09D667693A0EBE5603C66BB2C5049FAEA59F"
+  },
+  "native_processes": 2,
+  "native_process_ids": [
+    51124,
+    9812
+  ],
+  "initial_source_witness": {
+    "case": "published-f100-forward",
+    "stage": "initial",
+    "role": "source",
+    "target": "f100",
+    "status": "passed",
+    "origin": "published-f100-4.7.10003",
+    "retained_rows": 23,
+    "reused_source_labs": 1,
+    "new_source_labs": 0,
+    "seeded_finite_lasers": 7,
+    "seeded_inserter_levels": 1,
+    "successor_labs": 0,
+    "laser_bonus": 2.2,
+    "inserter_bonus": 2,
+    "stack_or_bulk_bonus": 4,
+    "source_queued_progress": 0.42,
+    "suspended_progress": 0.27,
+    "foreign_disabled": true,
+    "on_load_read_only": false
+  },
+  "actual_first_reload_witness": {
+    "case": "published-f100-forward",
+    "stage": "reload",
+    "role": "source",
+    "target": "f100",
+    "status": "passed",
+    "origin": "published-f100-4.7.10003",
+    "retained_rows": 23,
+    "reused_source_labs": 1,
+    "new_source_labs": 0,
+    "seeded_finite_lasers": 7,
+    "seeded_inserter_levels": 1,
+    "successor_labs": 0,
+    "laser_bonus": 2.2,
+    "inserter_bonus": 2,
+    "stack_or_bulk_bonus": 4,
+    "source_queued_progress": 0.42,
+    "suspended_progress": 0.27,
+    "foreign_disabled": true,
+    "on_load_read_only": true
+  },
+  "accepted_reload_records": 0,
+  "new_source_labs": 0,
+  "reused_source_labs": 1,
+  "seeded_laser_rows": 7,
+  "seeded_inserter_levels": 1,
+  "custody": {
+    "native": {
+      "files": 60,
+      "bytes": 1977319,
+      "all_source_and_copy_hashes_verified": true
+    },
+    "controller": {
+      "files": 2,
+      "bytes": 710618,
+      "all_source_and_copy_hashes_verified": true
+    }
+  },
+  "save_crc_readback": {
+    "protected_original": {
+      "path": "D:/Projects/Factorio/mir5-migration-origin-120-source-evidence-r06/build/tmp/historical-473-f100-published-7a2-r01/write-data/saves/mir5-native-complete.zip",
+      "bytes": 656574,
+      "sha256": "219EF20F63B4A85FA2386BD50A81228B28F006D9731F24E069A657BB13F45811",
+      "crc_entries": 50
+    },
+    "owned_input_copy": {
+      "path": "D:/Projects/Factorio/more-infinite-research/build/qualification/published473-f100-forward-source-r01-controller/owned-inputs/published-f100-protected-original.zip",
+      "bytes": 656574,
+      "sha256": "219EF20F63B4A85FA2386BD50A81228B28F006D9731F24E069A657BB13F45811",
+      "crc_entries": 50
+    },
+    "enhanced_complete": {
+      "path": "D:/Projects/Factorio/more-infinite-research/build/qualification/published473-f100-forward-source-r01-controller/native-captures/write-data/saves/mir5-native-complete.zip",
+      "bytes": 674766,
+      "sha256": "0381F33BAC7F229D9697C486B68B6F14D975B1D79FE5C88D7EE663EBFEE4ACA9",
+      "crc_entries": 49
+    }
+  },
+  "enhanced_save_sha256": "0381F33BAC7F229D9697C486B68B6F14D975B1D79FE5C88D7EE663EBFEE4ACA9",
+  "enhanced_save_bytes": 674766,
+  "protected_source_sha256": "219EF20F63B4A85FA2386BD50A81228B28F006D9731F24E069A657BB13F45811",
+  "failure": "[mir441-process-timeout]",
+  "failed_reload_ledger_rows": 168,
+  "failed_reload_terminal": {
+    "observed_at": "2026-10-30T00:51:52.0891183+00:00",
+    "phase": "interrupted",
+    "timed_out": true,
+    "error": "[mir441-process-timeout]",
+    "resource_admission": null,
+    "peak_working_set_bytes": 224067584,
+    "peak_sampled_private_bytes": 217948160
+  },
+  "manual_process_stops": 0,
+  "verified_stop_check": "The owned process had already exited under the governor when root checked;no process was stopped manually.",
+  "factorio_processes_after": 0,
+  "original_library_states_restored": 5,
+  "root_readback": {
+    "path": "D:/Projects/Factorio/more-infinite-research/build/qualification/published473-f100-forward-source-r01-controller/native-root-readback.json",
+    "bytes": 4071,
+    "sha256": "0E31567D7E1C61235588A95F3F81618E055CB2701BB5FFA5DC9C01FE42652800"
+  },
+  "terminal_sha256": "EAE6F53C407C3620C0A62C1825E4414A84E330D1AF7DB6C23D0EBAF97E62782C",
+  "receipt_capsule": {
+    "path": "spec/evidence/published473-f100-source-timeout-adverse-receipts-r01.json.gz",
+    "bytes": 54131,
+    "sha256": "E65B966053C900868AE4D1A329F90172190C6F4036ED8162E129BF9CE94BA909",
+    "bodies": 21
+  },
+  "independent_actual_data_review": {
+    "reviewer": "/root/review_pending_evidence",
+    "verdict": "ADVERSE exact raw-data/custody/marker/CRC/restoration review;no completed source-stage acceptance",
+    "all60_native_and2_controller_members_verified": true
+  },
+  "cause": "The frozen historical reload predicate selects historical-native for this source stage;actual fixture emits published-f100-forward/reload/role source/target f100. The marker passes native assertions but never satisfies the wrong predicate,so the180-second governor timeout remains failed.",
+  "prospective_correction": {
+    "source_fix_commit": "afe1890eab9278e20fdfeefae0af52af99ed0556",
+    "host_plan_registration_commit": "41a732c946ef979d99b952b0e28ddfcfcce2ff89",
+    "runner_sha256": "C96C56A253C6E06B0F23F6516725361C6ADDA17C8B3ACADFF2EF75B00E54E7A1",
+    "scope": "Only historical PublishedF100Forward exact case/reload/role/target matcher;other historical modes unchanged. New AST predicate controls and existing host plan/runner controls pass. No old receipt changes."
+  },
+  "next_required": "Separately freeze/review a read-only TWO-COLD continuation from exact retained0381 with corrected public source/controller/governor inputs and fresh output/custody. Do not reseed/recreate source;do not accept the timed-out reload or infer a destination journey.",
+  "limits": [
+    "This is one enhanced published-F100 fixture source,not a completed two-cold source stage or either requested destination route.",
+    "Source production and one raw reload marker are positive native observations;the old assignment remains failed and no missing result flags are fabricated.",
+    "All60native/2controller source/copy members,saves,prior archive,configuration,player-data and extracted native temp files remain in local custody. The public capsule includes only21 explicitly selected text bodies.",
+    "Old5812/1234 missing-case context was a pre-dispatch static review defect and was not executed;its bytes remain preserved in the manifest.",
+    "No MIR5 player change,performance,gameplay/support generalization or release verdict follows."
+  ],
+  "source_stage_acceptance": false,
+  "performance_acceptance": false,
+  "release_qualification": false
+}
