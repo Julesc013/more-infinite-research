@@ -63,6 +63,7 @@ class HostControlsTests(unittest.TestCase):
             "tests/test_bob_angel_materials.py",
             "tests/test_bob_angel_catalogue.py",
             "tests/test_bob_angel_f200_combined_profile.py",
+            "tests/test_bob_angel_f200_combined_gameplay_fixture.py",
             "tests/test_angel_f210_catalogue.py",
             "tests/test_angel_f210_pipeline.py",
             "tests/test_bob_tech_materials.py",
