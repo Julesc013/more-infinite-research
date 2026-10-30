@@ -1,0 +1,270 @@
+{
+  "schema": 1,
+  "kind": "MIRPublished473F100F110NativeChainV1",
+  "status": "passed-exact-published473-f100-to-mir5-f110-only",
+  "route": {
+    "origin": "published4.7.3 F100",
+    "destination": "MIR5 F110",
+    "origin_engine": {
+      "version": "1.0.0",
+      "sha256": "99F1CE207A04296EF7D797E4A98AA98DDE4F02EE653C9DF736AC33A676FD4F70"
+    },
+    "destination_engine": {
+      "version": "1.1.110",
+      "sha256": "B7B4B834FCA2E32AFA9D3476EB42CC09B02F1205BE97F688DC6FC6ACE7BA8FE1"
+    },
+    "published_source": {
+      "bytes": 709722,
+      "sha256": "C04F3543EBF99D2B76B2C9193EA0886381B7CDDF2F2C1610310E7961B24BE0E1"
+    },
+    "candidate": {
+      "bytes": 455271,
+      "sha256": "2508F539998F4DABBB3F71DA0226F4AB70BD95C5572AD2D8531E63F6A673926A"
+    },
+    "public_head": "6392ba4849b22d8cd6e91e23cfeace41fed57a80",
+    "fixture_source_commit": "e7c5675fbb50fc2b156de3eaf50bbf8fd5b5a72c"
+  },
+  "retained_adverses": [
+    {
+      "id": "r06-live-log-sharing",
+      "status": "adverse-zero-accepted-colds",
+      "packet": {
+        "path": "packet-r06.json",
+        "bytes": 15255,
+        "sha256": "CFB33E45BD8BF47DEF763CAAEEEAFE8975831625310C8660EC8DC82F97EF07BF"
+      },
+      "caller": {
+        "path": "Invoke-Owned.ps1",
+        "bytes": 26322,
+        "sha256": "D3842E6AE600679131CF64006EC4F25EC1174A64476B28D3F0FCACD67673113D"
+      },
+      "root_readback": {
+        "path": "root-live-log-sharing-adverse-r06.json",
+        "bytes": 2369,
+        "sha256": "4F0CF6CDDC211983DD253CDE542B384205DC631D7602AD45F52B1B4FEE4DF82A"
+      },
+      "actual_engine_pids": [
+        25040
+      ],
+      "native_custody": {
+        "members_per_copy": 55,
+        "bytes_per_copy": 1838912
+      },
+      "controller_custody": {
+        "members_per_copy": 2,
+        "bytes_per_copy": 710618
+      },
+      "reason": "The private predicate used incompatible sharing while Factorio wrote the live current log;one actual engine ran but no cold is accepted or pooled."
+    },
+    {
+      "id": "r02-callback-scope",
+      "status": "adverse-zero-accepted-colds",
+      "packet": {
+        "path": "packet-r02.json",
+        "bytes": 17147,
+        "sha256": "88D2C86C3A60E498A4F9F9EC6CE31CAE14999F4CEA5F85C0A0EBBDFBD2D03338"
+      },
+      "caller": {
+        "path": "Invoke-Owned.ps1",
+        "bytes": 27733,
+        "sha256": "E39E576223D081917C58F7ECAA54946360A8115236C8CB07F7B37B76549A1707"
+      },
+      "root_readback": {
+        "path": "root-callback-scope-adverse-r02.json",
+        "bytes": 2271,
+        "sha256": "A8F6AFE25758495BA85DABAAFA2B7853B5D7476F67BFB1F4780C0161EB30C3BC"
+      },
+      "actual_engine_pids": [
+        82324
+      ],
+      "native_custody": {
+        "members_per_copy": 9,
+        "bytes_per_copy": 693654
+      },
+      "controller_custody": {
+        "members_per_copy": 3,
+        "bytes_per_copy": 710696
+      },
+      "reason": "The governed callback could not resolve the private predicate across the public governor boundary;one actual engine ran but no cold is accepted or pooled."
+    }
+  ],
+  "accepted_source_continuation": {
+    "packet": {
+      "path": "packet-r03.json",
+      "bytes": 18638,
+      "sha256": "E10EDC41F7E66791522CBD9DF77763B431FA5891BC6EF691A7EDC941FE471575"
+    },
+    "caller": {
+      "path": "Invoke-Owned.ps1",
+      "bytes": 28995,
+      "sha256": "2929268813626F7CE3CF06BF979E428CB39AC75184555001C73050694EB83B08"
+    },
+    "result": {
+      "path": "result.json",
+      "bytes": 23811,
+      "sha256": "B7F29A3FD3BDCAE2CDA21E77419213BE31C418AB982738199CE77CC2E109C7E7"
+    },
+    "terminal": {
+      "path": "terminal.json",
+      "bytes": 16599,
+      "sha256": "4DC7F2DD1B95A4B8B1CDE283FE3CF991BC2743E2CEF7E2DE82F1FC0023F2ACC1"
+    },
+    "root_readback": {
+      "path": "root-two-cold-readback-r03.json",
+      "bytes": 9213,
+      "sha256": "780D616623A8480BE907936A6F7B98605162B68694E860C291ABE8B6613A714F"
+    },
+    "actual_review": {
+      "path": "actual-source-qualification-review.json",
+      "bytes": 790,
+      "sha256": "9A5CADDA693B6C8854DCF6DC54F9EC5BE031D68B4059C8944385CAE3424A938E"
+    },
+    "actual_engine_pids": [
+      80668,
+      2172
+    ],
+    "accepted_colds": 2,
+    "source_recreated": false,
+    "source_save": {
+      "bytes": 674766,
+      "sha256": "0381F33BAC7F229D9697C486B68B6F14D975B1D79FE5C88D7EE663EBFEE4ACA9",
+      "zip_entries": 49,
+      "closed_save_byte_identical": true
+    },
+    "original_protected_source": {
+      "bytes": 656574,
+      "sha256": "219EF20F63B4A85FA2386BD50A81228B28F006D9731F24E069A657BB13F45811",
+      "zip_entries": 50,
+      "unchanged": true
+    },
+    "source_witness": {
+      "retained_rows": 23,
+      "laser_bonus": 2.2,
+      "inserter_bonus": 2,
+      "stack_or_bulk_bonus": 4,
+      "source_queued_progress": 0.42,
+      "suspended_progress": 0.27,
+      "foreign_disabled": true,
+      "reused_source_labs": 1,
+      "new_source_labs": 0
+    },
+    "custody": {
+      "native_members_per_copy": 61,
+      "native_bytes_per_copy": 2568010,
+      "controller_members_per_copy": 3,
+      "controller_bytes_per_copy": 710696,
+      "source_copy_hashes_verified": true
+    },
+    "enhancement_witnesses": {
+      "seeded_finite_lasers": 7,
+      "seeded_inserter_levels": 1,
+      "scope": "These are declared fixture enhancement witnesses,not newly claimed historical earnings. The original one source lab is reused once;zero new source labs."
+    }
+  },
+  "accepted_f110_destination": {
+    "packet": {
+      "path": "packet-r02.json",
+      "bytes": 13417,
+      "sha256": "85901F4D9C0EC034EB8734F38A797A68332BB65B984DB4413B595446203123E2"
+    },
+    "caller": {
+      "path": "Invoke-Owned.ps1",
+      "bytes": 19092,
+      "sha256": "02CC79562C0A9128B6823A021DCEB4FAD5BD61865723C29EF3FAD5CD167D2F88"
+    },
+    "result": {
+      "path": "result.json",
+      "bytes": 34144,
+      "sha256": "640E383BFF1E7F9E7804FC0B71547B7C4D1EF36112DB7F687F5A2EA23F6D7231"
+    },
+    "terminal": {
+      "path": "terminal.json",
+      "bytes": 17702,
+      "sha256": "67377C0F496AA6DEC7B89BA31FC831A63EE51FC73A5D667902DE447B91697A65"
+    },
+    "root_readback": {
+      "path": "root-readback-r01.json",
+      "bytes": 2769,
+      "sha256": "336C03C248A12CA1DC3216A22641566D1E3D8B76EAC2DA7709B9F34523757C22"
+    },
+    "actual_engine_pids": [
+      68436,
+      83980,
+      18780
+    ],
+    "actual_engines": 3,
+    "supervised_exit_minus_one_with_completion_predicate_observed": true,
+    "no_timeout": true,
+    "target_save": {
+      "bytes": 684468,
+      "sha256": "9E0F4AB87C0D9DD88BF69CE00778E0A3A106A48BF7F344D4A34C866FFA2A373A",
+      "zip_entries": 57,
+      "closed_save_byte_identical": true
+    },
+    "state": {
+      "retained_rows": 23,
+      "laser_bonus": 2.2,
+      "inserter_bonus": 2,
+      "stack_or_bulk_bonus": 4,
+      "source_queued_progress": 0.42,
+      "suspended_progress": 0.27,
+      "foreign_disabled": true,
+      "reused_source_labs": 1,
+      "new_source_labs": 0,
+      "new_useful_mining_labs": 1,
+      "lab_fractional_consumption": "35/60",
+      "mining_level": 3,
+      "mining_total_bonus": 0.1
+    },
+    "custody": {
+      "native_members_per_copy": 71,
+      "native_bytes_per_copy": 1942177,
+      "controller_members_per_copy": 2,
+      "controller_bytes_per_copy": 361040,
+      "source_copy_hashes_verified": true
+    }
+  },
+  "execution_count": {
+    "new_chain_engines": 7,
+    "retained_adverse_engines": 2,
+    "accepted_source_colds": 2,
+    "accepted_destination_processes": 3,
+    "excluded_from_count": "The earlier original-source two-engine timeout remains in published473-f100-source-timeout-adverse-chain-r01 and is only referenced,not recounted."
+  },
+  "static_never_executed_correction": {
+    "packet": {
+      "path": "packet-r01.json",
+      "bytes": 13410,
+      "sha256": "03EDB809976EBF9577A6D6A0851EF0E2415FEE430A25C7C3DB96135C29197FFA"
+    },
+    "caller": {
+      "path": "Invoke-Owned.ps1",
+      "bytes": 19092,
+      "sha256": "347AC31970DF16A661E02D80D758DB445ED2C04B3910B183B88C4D3FB98D353E"
+    },
+    "statement": "Packet03ED and caller347A preserve a pre-dispatch fixture-line correction. It was never executed and supplies no engine,result,cold or route acceptance."
+  },
+  "receipt_capsule": {
+    "path": "spec/evidence/published473-f100-f110-native-receipts-r01.json.gz",
+    "bytes": 231913,
+    "sha256": "C6E1E99F441CF2896033A6484BFD4AE330E46FCDAAFA0986586EEFFDFDF5C50B",
+    "bodies": 186
+  },
+  "limits": [
+    "This closes only the exact published4.7.3 F100 to MIR5 F110 route at the recorded source,engines,fixture,candidate and save inputs.",
+    "R06 and R02 remain actual adverse executions with zero accepted colds;their observations are not pooled with R03.",
+    "F100 to F210 remains open;this chain does not qualify its direct attempt or a bridge.",
+    "The original219E source remains unchanged;R03 continued byte-identical0381 and did not recreate source production.",
+    "No F018 route,other historical hop,DLC/provider/settings permutation,client,menu/startup comparison,performance,release or all-route claim follows.",
+    "The public receipt capsule is selected lossless text only. Save,archive,configuration,player-data,server-settings and scenario/binary bodies remain only in local hash-pinned custody."
+  ],
+  "performance_acceptance": false,
+  "release_qualification": false,
+  "original_source_production_and_timeout": {
+    "path": "spec/evidence/published473-f100-source-timeout-adverse-chain-r01.json",
+    "bytes": 8675,
+    "sha256": "25A4900E31BD6C7D01D1C814F067BE2E261A3F242C72DB2B6CCCDBBC3B1F6057",
+    "actual_engines": 2,
+    "disposition": "Original source creation and wrong-matcher timeout remain separately preserved;no old reload is accepted or counted again."
+  }
+}
