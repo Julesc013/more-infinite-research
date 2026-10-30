@@ -30,13 +30,24 @@ function forward_flow(control_path, source_plan, target_plan, definitions, oppon
   local plan=assert(loadfile(source_plan))()
   local current=plan
   local markers,saves={},0
+  local science_logs={}
   local force_list={}
   local packs={"military-science-pack","utility-science-pack"}
   local function inventory(count)
     local inv={values={}}
     for _,n in ipairs(packs)do
       inv.values[n]=count
-      inv[#inv+1]={name=n,valid_for_read=count>0,count=count,durability=1}
+      local stack={name=n,valid_for_read=count>0,count=count}
+      if current.target=="f210"then
+        setmetatable(stack,{
+          __index=function(_,key)if key=="durability"then error("Item is not tool.")end end,
+          __newindex=function(value,key,item)
+            if key=="durability"then error("Item is not tool.")end
+            rawset(value,key,item)
+          end})
+        assert(not pcall(function()return stack.durability end),"plain-item durability read must refuse")
+      else stack.durability=1 end
+      inv[#inv+1]=stack
     end
     function inv.get_item_count(n)return inv.values[n]or 0 end
     function inv.insert(r)
@@ -85,7 +96,8 @@ function forward_flow(control_path, source_plan, target_plan, definitions, oppon
   function game.create_force(n)return make_force(n)end
   game.surfaces[1].create_entity=function(spec)
     assert(spec.name=="lab");local inv=inventory(0)
-    local lab={valid=true,energy=0,get_inventory=function()return inv end}
+    local lab={valid=true,energy=0,stored={},get_inventory=function()return inv end}
+    function lab.get_stored_durability(name)return lab.stored[name]end
     if current.target=="f210"then
       lab.disabled_by_script=false
       setmetatable(lab,{
@@ -103,9 +115,14 @@ function forward_flow(control_path, source_plan, target_plan, definitions, oppon
     current=assert(loadfile(stage_path))()
     local callbacks={}
     local env={game=game,settings={startup={}},defines={inventory={lab_input=1},events={on_tick=1,on_research_finished=2}},
+      prototypes={item={}},
       script={active_mods={base=current.base,["more-infinite-research"]=current.mir,["mir-fixture-mir5-historical-transition"]=current.fixture}},
       require=function(n)assert(n=="stage");return current end,
-      log=function(s)markers[#markers+1]=s end}
+      log=function(s)
+        if s:find("[MIR5_NATIVE_FIXTURE] RESULT",1,true)then markers[#markers+1]=s
+        elseif s:find("[MIR5_FORWARD_SCIENCE]",1,true)then science_logs[#science_logs+1]=s end
+      end}
+    for _,name in ipairs(packs)do env.prototypes.item[name]={type="item",science_capacity=opponent=="science-capacity"and 2 or 1}end
     env._G=env
     if current.target=="f210"then env.storage=bucket else env.global=bucket end
     setmetatable(env,{__index=_G})
@@ -168,17 +185,39 @@ function forward_flow(control_path, source_plan, target_plan, definitions, oppon
   callbacks[1]();assert(labs[1].energy>0)
   player.technologies[direct].level=3;player.manual_mining_speed_modifier=.1
   local inv=labs[1].get_inventory()
-  -- Native tools retain their stack count during partial durability use.
-  for _,stack in ipairs(inv)do stack.durability=1-35/60 end
-  if opponent=="successor-science"then inv[1].durability=1 end
+  -- F110 tools retain partial stack durability; F210 labs consume a plain
+  -- item and retain the remaining science in the lab, outside inventory.
+  for _,stack in ipairs(inv)do
+    if current.target=="f210"then
+      stack.count=31;inv.values[stack.name]=31
+      labs[1].stored[stack.name]={durability=1-35/60}
+    else stack.durability=1-35/60 end
+  end
+  local function invalidate_science()
+    if current.target=="f210"then labs[1].stored[packs[1]].durability=1 else inv[1].durability=1 end
+  end
+  if opponent=="successor-science"then invalidate_science()end
+  if opponent=="science-count"then inv.values[packs[1]]=32;inv[1].count=32 end
+  if opponent=="science-stored-missing"then labs[1].stored[packs[1]]=nil end
+  if opponent=="science-stored-nonfinite"then labs[1].stored[packs[1]].durability=math.huge end
+  if opponent=="science-stored-negative"then labs[1].stored[packs[1]].durability=-.1 end
   callbacks[2]({research=player.technologies[direct]})
   table.remove(player.research_queue,1);player.current_research=player.research_queue[1];player.research_progress=0
   callbacks[1]();callbacks[1]()
   local expected_saves=bridge_plan==""and 2 or 3
   assert(saves==expected_saves and original.forward.successor_labs==1)
-  if current.target=="f210"then assert(labs[1].disabled_by_script==true,"F210 lab must be disabled")end
+  if current.target=="f210"then
+    assert(labs[1].disabled_by_script==true,"F210 lab must be disabled")
+    assert(#science_logs>=2,"both actual science prefix records must be retained")
+    for index,pack in ipairs(packs)do
+      local row=science_logs[index]
+      assert(row:find(pack,1,true)and tonumber(row:match("count=(%S+)"))==31)
+      assert(tonumber(row:match("capacity=(%S+)"))==1)
+      assert(math.abs(tonumber(row:match("stored=(%S+)"))-25/60)<1e-12)
+    end
+  end
   if opponent=="completed-effect"then player.bonus=0 end
-  if opponent=="cold-science"then inv[1].durability=1 end
+  if opponent=="cold-science"then invalidate_science()end
   if opponent=="cold-lab-enabled"then
     if current.target=="f210"then labs[1].disabled_by_script=false else labs[1].active=true end
   end
@@ -254,26 +293,44 @@ end
             self.assertIn("more-infinite-research = " + mir, info["dependencies"])
             self.assertNotIn("data", (path / "settings-updates.lua").read_text())
 
+    def test_f210_plain_item_science_rejects_unearned_or_malformed_stored_work(self):
+        for opponent in ("science-count", "science-stored-missing", "science-stored-nonfinite",
+                         "science-stored-negative", "science-capacity"):
+            with self.subTest(opponent=opponent):
+                self.setUp()
+                with self.assertRaises(Exception):
+                    self.flow("f210", opponent)
+
     def test_data_preflight_refuses_changed_meaning_before_acceleration(self):
         self.lua.execute(r'''
-          function preflight(path,stage_path,row,opponent)
+          function preflight(path,stage_path,row,opponent,science_items)
             local plan=assert(loadfile(stage_path))()
             local env={mods={base=plan.base,["more-infinite-research"]=plan.mir},
-              data={raw={technology={["recipe-prod-research_character_mining_speed-1"]=row}}},
+              data={raw={technology={["recipe-prod-research_character_mining_speed-1"]=row},item=science_items}},
               require=function(n)assert(n=="stage");return plan end}
             env._G=env;setmetatable(env,{__index=_G})
             if opponent=="engine"then env.mods.base="2.0.1"end
             if opponent=="mir"then env.mods["more-infinite-research"]="4.7.11002"end
+            if opponent=="science-item-type"then env.data.raw.item["military-science-pack"].type="tool"end
+            if opponent=="science-capacity"then env.data.raw.item["military-science-pack"].science_capacity=2 end
+            if opponent=="science-missing-item"then env.data.raw.item["military-science-pack"]=nil end
             local ok,message=pcall(assert(loadfile(path,"t",env)))
             return ok,tostring(message)
           end
         ''')
+        science_reference = json.loads((FIXTURE / "f210-plain-science-reference-r01.json").read_text(encoding="utf-8"))
+        science_items = science_reference["published_rows"]
+        self.assertTrue(science_reference["candidate_rows_equal"])
+        self.assertTrue(all(row["type"] == "item" and "science_capacity" not in row for row in science_items.values()))
         for directory in ("source", "bridge", "f110", "f210"):
             row = {"level": 1, "max_level": "infinite", "upgrade": True,
                    "effects": [{"type": "character-mining-speed", "modifier": .05}],
                    "unit": {"count_formula": "1*(8000*2^(L-1))" if directory == "f110" else "8000*2^(L-1)",
                             "time": 60, "ingredients": [["military-science-pack", 1], ["utility-science-pack", 1]]}}
-            for opponent in ("", "engine", "mir", "effect", "cost", "formula", "cap", "science"):
+            opponents = ("", "engine", "mir", "effect", "cost", "formula", "cap", "science")
+            if directory == "f210":
+                opponents += ("science-item-type", "science-capacity", "science-missing-item")
+            for opponent in opponents:
                 with self.subTest(stage=directory, opponent=opponent):
                     changed = deepcopy(row)
                     if opponent == "effect":
@@ -290,7 +347,7 @@ end
                         changed["unit"]["ingredients"][1][0] = "automation-science-pack"
                     native = self.to_lua(changed)
                     ok, _ = self.lua.globals().preflight(str(FIXTURE / "shared/data-final-fixes.lua"),
-                        str(FIXTURE / directory / "stage.lua"), native, opponent)
+                        str(FIXTURE / directory / "stage.lua"), native, opponent, self.to_lua(science_items))
                     self.assertEqual(ok, not opponent)
                     if opponent:
                         self.assertEqual(native["unit"]["count_formula"], changed["unit"]["count_formula"])
@@ -309,7 +366,7 @@ end
                 row["unit"]["count_formula"] = "1*(8000*2^(L-1))"
             native = self.to_lua(row)
             ok, _ = self.lua.globals().preflight(str(FIXTURE / "shared/data-final-fixes.lua"),
-                str(FIXTURE / "f210/stage.lua"), native, "")
+                str(FIXTURE / "f210/stage.lua"), native, "", self.to_lua(science_items))
             self.assertEqual(ok, not opponent)
             if opponent:
                 self.assertEqual(native["unit"]["count_formula"], row["unit"]["count_formula"])

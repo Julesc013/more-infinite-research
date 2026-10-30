@@ -16,5 +16,12 @@ for _, ingredient in ipairs(unit.ingredients) do
 end
 assert(#unit.ingredients==2 and science["military-science-pack"] and science["utility-science-pack"],
   "published forward mining science differs")
+if plan.target=="f210" then
+  for _,name in ipairs({"military-science-pack","utility-science-pack"}) do
+    local pack=data.raw.item and data.raw.item[name]
+    assert(pack and pack.type=="item" and (pack.science_capacity==nil or pack.science_capacity==1),
+      "published forward plain-item science capacity differs")
+  end
+end
 -- Acceleration follows exact semantic preflight; startup settings are unchanged.
 unit.count_formula,unit.count,unit.time = nil,1,1
