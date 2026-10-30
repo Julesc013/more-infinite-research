@@ -215,7 +215,7 @@ class CombinedSteelGameplayFixtureTests(unittest.TestCase):
                 local input=inventory();local lab={valid=true,name="biolab",energy=0,quality={name=opponent=="quality" and "uncommon" or "normal"},
                   prototype={name="biolab",researching_speed=2,science_pack_drain_rate_percent=opponent=="drain" and 100 or 50,module_inventory_size=4,
                     allowed_module_categories={quality=true},surface_conditions={{property="pressure",min=opponent=="surface" and 999 or 1000,max=1000}},
-                    lab_inputs=opponent=="lab-input" and {{name="automation-science-pack"}} or {{name="automation-science-pack"},{name="logistic-science-pack"}}},
+                    lab_inputs=opponent=="lab-input" and {"automation-science-pack"} or (opponent=="lab-input-table" and {{name="automation-science-pack"},{name="logistic-science-pack"}} or {"automation-science-pack","logistic-science-pack"})},
                   get_inventory=function(index) if index==1 then return input end return nil end}
                 labs[#labs+1]=lab;return lab
               end
@@ -307,6 +307,7 @@ class CombinedSteelGameplayFixtureTests(unittest.TestCase):
             ("ingredients-order", "steel research science differs"),
             ("drain", "native biolab differs"),
             ("lab-input", "native biolab differs"),
+            ("lab-input-table", "native lab input type differs"),
             ("quality", "native biolab differs"),
             ("surface", "native biolab differs"),
             ("owner-preseed", "named upstream prerequisite was pre-researched"),
@@ -317,7 +318,7 @@ class CombinedSteelGameplayFixtureTests(unittest.TestCase):
             with self.subTest(opponent=opponent):
                 result = self.runtime_protocol(opponent)
                 self.assertTrue(result["loaded"])
-                if opponent in ("effect", "ingredients-count", "ingredients-order", "drain", "lab-input", "quality", "surface", "owner-preseed", "route-enabled", "owner"):
+                if opponent in ("effect", "ingredients-count", "ingredients-order", "drain", "lab-input", "lab-input-table", "quality", "surface", "owner-preseed", "route-enabled", "owner"):
                     self.assertFalse(result["init_ok"])
                 else:
                     self.assertTrue(result["init_ok"])

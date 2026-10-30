@@ -110,10 +110,12 @@ local function exact_effects(value)
 end
 
 local function has_lab_input(inputs, name)
+  local found = false
   for _, value in pairs(inputs or {}) do
-    if value ~= nil and value.name == name then return true end
+    if type(value) ~= "string" then fail("native lab input type differs") end
+    if value == name then found = true end
   end
-  return false
+  return found
 end
 
 local function target(force)
