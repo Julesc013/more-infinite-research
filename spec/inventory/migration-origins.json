@@ -4090,16 +4090,16 @@
             "origin": "published4.7.3 F100",
             "destination": "MIR5 F110",
             "status": "needs-correction",
-            "problem": "preparation:protected219EF20F source retains mining/queue but lacks the requested laser/inserter witnesses. ExistingFA0CF605 laser source starts from MIR5 and is not matching evidence.",
-            "next_action": "Prepare one enhanced copy of219EF20F with actual published native laser/inserter witnesses,retaining mining/queue/caps/foreign assertions;reuse that same copy for both requested F100 destinations. Direct endpoint first;bridge only an actual engine refusal,without installing MIR5 at an intermediate engine.",
+            "problem": "Enhanced0381 now has the explicit published source laser/inserter/foreign witnesses and retained23 rows;source production passes,but wrong historical reload matcher times out after the first raw passing cold witness. The source-stage two-cold continuation remains required;this requested destination itself is unexecuted.",
+            "next_action": "Reuse the same exact0381 enhanced source after a separately reviewed two-read-only-cold continuation closes it;then bind this destination to actual final package/engine/fixture and execute new useful research/save/two cold reloads. Preserve219E and all adverses;no source recreation or intermediate MIR5.",
             "source_sha256": "219EF20F63B4A85FA2386BD50A81228B28F006D9731F24E069A657BB13F45811"
           },
           {
             "origin": "published4.7.3 F100",
             "destination": "MIR5 F210",
             "status": "needs-correction",
-            "problem": "preparation:no exact published-origin F210 result or enhanced laser/inserter source is qualified.",
-            "next_action": "Reuse the single enhanced protected F100 source prepared for F110;declare exact F210 inputs and expectations,then actual new research/save/two cold reloads. Do not use the MIR5 F110 destination save as this origin.",
+            "problem": "Enhanced0381 now has the explicit published source laser/inserter/foreign witnesses and retained23 rows;source production passes,but wrong historical reload matcher times out after the first raw passing cold witness. The source-stage two-cold continuation remains required;this requested destination itself is unexecuted.",
+            "next_action": "Reuse the same exact0381 enhanced source after a separately reviewed two-read-only-cold continuation closes it;then bind this destination to actual final package/engine/fixture and execute new useful research/save/two cold reloads. Preserve219E and all adverses;no source recreation or intermediate MIR5.",
             "source_sha256": "219EF20F63B4A85FA2386BD50A81228B28F006D9731F24E069A657BB13F45811"
           },
           {
@@ -4149,7 +4149,21 @@
             ]
           }
         ],
-        "final_package_review": "Required separately for every named route after final freeze. CandidateB package/member readback and bounded prior-result applicability are recorded in spec/evidence/support-exports-coherent17-aero-reproduction-r01.json and spec/evidence/support-exports-consumed-path-applicability-aero-r01.json;affected modern header/export/lifecycle and performance observations remain. The direct F110-to-F210 journey is now closed at its exact B637/8DC inputs;neither of the two still-missing F100-origin journeys is deferred. Fixture/packet preparation is not a native pass or authorization to occupy more than the sole admitted native lane."
+        "final_package_review": "Required separately for every named route after final freeze. CandidateB package/member readback and bounded prior-result applicability are recorded in spec/evidence/support-exports-coherent17-aero-reproduction-r01.json and spec/evidence/support-exports-consumed-path-applicability-aero-r01.json;affected modern header/export/lifecycle and performance observations remain. The direct F110-to-F210 journey is now closed at its exact B637/8DC inputs;neither of the two still-missing F100-origin journeys is deferred. Fixture/packet preparation is not a native pass or authorization to occupy more than the sole admitted native lane.",
+        "enhanced_f100_source_preparation": {
+          "status": "generated-closed-save-source-protocol-adverse-two-cold-continuation-required",
+          "original_sha256": "219EF20F63B4A85FA2386BD50A81228B28F006D9731F24E069A657BB13F45811",
+          "enhanced_sha256": "0381F33BAC7F229D9697C486B68B6F14D975B1D79FE5C88D7EE663EBFEE4ACA9",
+          "enhanced_bytes": 674766,
+          "source_labs_reused_once": 1,
+          "new_source_labs": 0,
+          "evidence": {
+            "path": "spec/evidence/published473-f100-source-timeout-adverse-chain-r01.json",
+            "bytes": 8675,
+            "sha256": "25A4900E31BD6C7D01D1C814F067BE2E261A3F242C72DB2B6CCCDBBC3B1F6057"
+          },
+          "required": "Correct only prospective historical reload matcher,then independently qualify two fresh read-only colds of0381. Preserve the old timeout;do not reseed/recreate or count its reload as accepted. Neither destination journey has run."
+        }
       },
       "permitted_limits": [
         {
