@@ -32,6 +32,7 @@ $controls = @(
   [ordered]@{path='tests/test_aai_parity_native_controls.py';lua=$true},
   [ordered]@{path='tests/test_bob_angel_materials.py';lua=$true},
   [ordered]@{path='tests/test_bob_angel_catalogue.py';lua=$true},
+  [ordered]@{path='tests/test_bob_angel_f200_combined_profile.py';lua=$true},
   [ordered]@{path='tests/test_angel_f210_catalogue.py';lua=$true},
   [ordered]@{path='tests/test_angel_f210_pipeline.py';lua=$true},
   [ordered]@{path='tests/test_bob_tech_materials.py';lua=$true},

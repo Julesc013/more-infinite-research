@@ -50,7 +50,7 @@ if ordinary_profile or modern_catalogue.is_k2_base(mods) or modern_catalogue.is_
       modern_selection.definitions[#modern_selection.definitions + 1] = definition
     end
   end
-  if modern_selection.bob_angel then
+  if modern_selection.bob_angel or modern_selection.bob_angel_f200_combined then
     gear.unit.ingredients = modern_catalogue.science_ingredients("science_automation_logistic")
     gear.prerequisites = modern_catalogue.science_names("science_automation_logistic")
   end
@@ -84,6 +84,9 @@ end
 if type(mods) == "table" and mods["space-age"] ~= nil
     and values.agricultural_growth_speed ~= nil and values.spoilage_preservation ~= nil then
   local bindings = require("compatibility.space_age_scripted_effects").select(mods, data.raw)
+  if modern_selection and modern_selection.bob_angel_f200_combined then
+    bindings = require("compatibility.modern_catalogue.bob_angel_f200_combined").scripted_effect_bindings()
+  end
   local scripted = require("research.scripted_effects").technologies(values, bindings)
   for index = 1, #scripted do technologies[#technologies + 1] = scripted[index] end
 end
@@ -98,6 +101,10 @@ require("research.product_target_extension").extend(technologies, values, {raw=d
   exact_product_target_families=modern_selection and modern_selection.exact_product_target_families,
   replacement_product_target_families=modern_selection and modern_selection.replacement_product_target_families,
   excluded_product_target_recipes=modern_selection and modern_selection.excluded_product_target_recipes})
+
+if modern_selection and modern_selection.bob_angel_f200_combined then
+  require("compatibility.modern_catalogue.bob_angel_f200_combined").apply_effect_order(technologies)
+end
 
 if modern_catalogue.is_k2so(mods) then
   local materials = require("compatibility.material_catalogue").technologies(values, data.raw, mods)
