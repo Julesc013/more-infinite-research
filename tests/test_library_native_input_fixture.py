@@ -300,6 +300,7 @@ class LibraryNativeInputFixtureControls(unittest.TestCase):
             with self.subTest(target=target):
                 result = self.run_case(target, "pending-locale")
                 self.assertTrue(result["ok"], result["message"])
+                self.assertIs(type(result["final"]["en_index"]), int)
                 self.assertEqual(result["final"]["en_index"], 0)
                 self.assertEqual(result["final"]["actual_joins"], 5)
 
