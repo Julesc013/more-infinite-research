@@ -146,8 +146,8 @@ end
 local function target_row_observation(value)
   local prototype = value.prototype
   local function field(name)
-    if type(prototype) ~= "table" then return name .. "=<prototype:" .. type(prototype) .. ">" end
-    return name .. "=" .. scalar(prototype[name])
+    local ok, result = pcall(function() return prototype[name] end)
+    return name .. "=" .. (ok and scalar(result) or "<getter-error>")
   end
   return table.concat({
     "prototype_type=" .. type(prototype), field("max_level"), field("level"), field("upgrade"), field("order"),
@@ -158,10 +158,7 @@ end
 local function target(force)
   local value = technology(force, TARGET)
   local prototype = value.prototype
-  if type(prototype) ~= "table" or type(prototype.max_level) ~= "number" or type(prototype.level) ~= "number"
-      or type(prototype.upgrade) ~= "boolean" or type(prototype.order) ~= "string"
-      or type(value.research_unit_count) ~= "number" or type(value.research_unit_energy) ~= "number"
-      or prototype.max_level ~= UINT32_MAX or prototype.level ~= 1 or prototype.upgrade ~= true
+  if prototype == nil or prototype.max_level ~= UINT32_MAX or prototype.level ~= 1 or prototype.upgrade ~= true
       or prototype.order ~= "p[research_steel]" or value.research_unit_count ~= RESEARCH_UNITS
       or not close(value.research_unit_energy, RESEARCH_UNIT_ENERGY) then
     fail("complete steel technology row differs: " .. target_row_observation(value))

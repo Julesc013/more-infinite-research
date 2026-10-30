@@ -200,6 +200,7 @@ class CombinedSteelGameplayFixtureTests(unittest.TestCase):
               {type="change-recipe-productivity",recipe="angels-plate-steel",change=opponent=="effect" and .2 or .1},
               {type="change-recipe-productivity",recipe=route_name,change=.1},
             }},research_unit_ingredients=research_ingredients}
+          if opponent=="prototype-absent" then target.prototype=nil end
           local force={technologies={
             [target_name]=target,[owner_name]=owner,
             ["automation-science-pack"]={valid=true,name="automation-science-pack",researched=false},
@@ -326,6 +327,7 @@ class CombinedSteelGameplayFixtureTests(unittest.TestCase):
     def test_runtime_refuses_independent_row_lab_owner_or_machine_drift_before_success(self):
         for opponent, phrase in (
             ("energy-seconds", "complete steel technology row differs: "),
+            ("prototype-absent", "complete steel technology row differs: prototype_type=nil;max_level=<getter-error>"),
             ("effect", "steel productivity effects differ"),
             ("ingredients-count", "steel research science differs"),
             ("ingredients-order", "steel research science differs"),
@@ -357,7 +359,7 @@ class CombinedSteelGameplayFixtureTests(unittest.TestCase):
             with self.subTest(opponent=opponent):
                 result = self.runtime_protocol(opponent)
                 self.assertTrue(result["loaded"])
-                if opponent in ("energy-seconds", "effect", "ingredients-count", "ingredients-order", "drain", "lab-input", "lab-input-table", "lab-speed-missing", "lab-speed-nil", "lab-speed", "route-category", "route-additional-category", "product-probability", "product-probability-missing", "product-extra", "product-ignored", "product-stats", "product-spoiled", "ingredient-ignored", "quality", "surface", "owner-preseed", "route-enabled", "owner"):
+                if opponent in ("energy-seconds", "prototype-absent", "effect", "ingredients-count", "ingredients-order", "drain", "lab-input", "lab-input-table", "lab-speed-missing", "lab-speed-nil", "lab-speed", "route-category", "route-additional-category", "product-probability", "product-probability-missing", "product-extra", "product-ignored", "product-stats", "product-spoiled", "ingredient-ignored", "quality", "surface", "owner-preseed", "route-enabled", "owner"):
                     self.assertFalse(result["init_ok"])
                 else:
                     self.assertTrue(result["init_ok"])
