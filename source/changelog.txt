@@ -31,16 +31,16 @@ Version: 5.0.0
     - Restore the published31 Base and16 Space Age Bob Plates rows through the complete settings-to-publication path, with separate
       sparse and full-Bob admission.
     - Preserve the named BobTech advanced and alien science vectors for the admitted native continuations.
-    - Restore the omitted F210 Angel catalogue and native Steel coverage through explicit bindings.
+    - Restore the omitted Factorio 2.1 Angel catalogue and native Steel coverage through explicit bindings.
     - Restore the combined Factorio 2.1 Bob/Angel breeding, material and native Steel bindings, including the published braking and
       laser continuation science and prerequisites.
     - Preserve the disabled Bob/Angel oil-cracking identity and bind the selected science-pack productivity family to its admitted
       current lab inputs and captured combined progression.
     - Preserve Ironclad mortar shooting speed and native weapon categories when their dedicated streams are disabled or overlap
       removal is off.
-    - Restore F210 Bob sulfur and sulfuric-acid research through the complete settings-to-publication path.
-    - Provide the experimental Factorio 0.18.47 build from shared F100 research and fixtures; exact-engine native load qualification
-      remains unverified.
+    - Restore Factorio 2.1 Bob sulfur and sulfuric-acid research through the complete settings-to-publication path.
+    - Provide the experimental Factorio 0.18.47 build from shared Factorio 1.0 research and fixtures; exact-engine native load
+      qualification remains unverified.
     - Preserve separate finite and infinite material stages, native recipe ownership and hidden Imersite migration carriers where
       supported.
     - Keep two historical runtime interfaces available; unconsumed developer previews do not become player APIs.
@@ -112,8 +112,8 @@ Version: 5.0.0
     - Use one shared master changelog for all editions; historical entries retain their original release and engine scope.
     - Keep local replacement build versions consistent across package metadata, changelog and public API queries; selecting another
       engine edition requires target adaptation.
-    - Offer optional fixed finite F006–F012 builds from the shared source, with readable museum research names and explicit
-      best-effort limits; current native and save qualification is absent.
+    - Offer optional fixed finite Factorio 0.6 through 0.12 builds from the shared source, with readable museum research names and
+      explicit best-effort limits; current native and save qualification is absent.
 
 ---------------------------------------------------------------------------------------------------
 Version: 4.7.3
