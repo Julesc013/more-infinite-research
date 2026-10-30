@@ -22,9 +22,18 @@ The input report now exposes `en_name`, `de_name`, `en_locale`, `de_locale`, `en
 
 Compose input0.3 from current `control.lua` and `info-input-identity-f200.json` or `info-input-identity-f210.json`. Compose export0.4 from current `control.lua`, `support-exports.lua` and the corresponding `info-exports-identity-*.json`. ZIP roots are the unchanged observer name plus the declared0.3.0 or0.4.0 version. The prepared record pins all four reproducible containers and new profiles. Preserve the original31-row/75-effect/three-force source fixture and saved inputs; no source recreation, credit seeding or player-package change is required.
 
+## Native input delivery observation
+
+- Prepared inputs: [native delivery record](../../../spec/evidence/library-input-native-delivery-prepared-r01.json), with new r06 profiles and separately hashed input archives. Earlier profiles/archives/adverses remain unchanged.
+- Reports expose `en_input`/`de_input`: actual Library open/query and foreign open/query values. Missing stays false; an actual empty query stays an empty string. Foreign open also requires `player.opened` to be that fixed GUI.
+- Send each desktop action once. Await exact native text, close or drag endpoint/events through report-only polling:10-second polling budget, at most50 reports,200ms between incomplete observations. An in-flight transport call retains its own bound.
+- Preserve phase, process/role/locale identity, peer state, unrelated counters and every original root/reference/world/focus/lifecycle assertion. Invoke each mutating assertion once after confirmation. Refuse malformed observations and timeouts; never resend, refocus, reset or retry advance.
+- This is functional delivery synchronization. Earlier failed runs remain adverse; no timing acceptance threshold or performance claim changes.
+
 ## Drag baseline observation
 
-The [fresh drag-baseline preparation](../../../spec/evidence/library-input-drag-baseline-prepared-r02.json) pins the corrected input source, new reproducible observer ZIPs and separate r05 profiles for both engines. Existing input0.3/export0.4 archives and profiles retain their earlier bytes and source identities. Use only the newly pinned input archive under exclusive library ownership; this internal observer version is not a published MIR release.
+- The [drag-baseline-only predecessor](../../../spec/evidence/library-input-drag-baseline-prepared-r02.json) retains its r05 profiles and exact archive/source hashes. Current dispatch uses the native-delivery preparation above.
+- Preserve all earlier input0.3/export0.4 archives and profiles. Use one exact archive under exclusive library ownership; this internal observer version is not a published MIR release.
 
 At the successful suffix transition, record the current native root location and cumulative location-event count immediately before the declared drag. Require at least one new native location event and exactly30pixels left with no vertical movement from that baseline. Retain the earlier inspection location and all pre-drag events; they cannot stand in for the actual drag. Reports expose both baselines/counts, and a drag refusal includes the actual compared point/counts. The prior stale-baseline adverse remains unchanged; fresh source/archive/profile/runtime inputs and actual native qualification are still required.
 

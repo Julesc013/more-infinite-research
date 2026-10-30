@@ -212,19 +212,24 @@ class LibraryNativeInputFixtureControls(unittest.TestCase):
               p.gui.screen[root_name]=nil;p.opened=nil;p.focused=nil
               if opponent~="missing-close-event" then callbacks.events[5]({player_index=p.index,element=root}) end
             end
-            local readonly_report,readonly_load,cold_calls_before,cold_calls_after
+            local readonly_report,readonly_load,cold_calls_before,cold_calls_after,initial_report,missing_query_report,missing_query_readonly
             local ok,message=pcall(function()
               parse()
               if opponent=="wrong-initial-credit" then forces.player.technologies[ids[1]].level=1 end
               if opponent=="preexisting-player" then game.players[9]={} end
               if opponent=="extra-mod" then active.extra="1.0.0" end
               callbacks.init()
-              local before=fingerprint(store);api().report();api().report();readonly_report=before==fingerprint(store)
+              local before=fingerprint(store);initial_report=api().report();api().report();readonly_report=before==fingerprint(store)
               en=join(0,"en");de=join(2,"de")
               if opponent=="duplicate-initial-join" then join(0,"en") end
               if opponent=="out-of-order" then step("prefix");return end
               step("inspect")
               if opponent=="join-during-input" then join(2,"de") end
+              if opponent=="observe-missing-query" then
+                local filters=en.gui.screen[root_name].mir_library_filters;local saved=filters.mir_library_query
+                filters.mir_library_query=nil;local before=fingerprint(store);missing_query_report=api().report()
+                missing_query_readonly=before==fingerprint(store);filters.mir_library_query=saved
+              end
               if opponent=="settled-before-drag" or opponent=="pre-drag-event-only" then
                 local root=en.gui.screen[root_name];root.location={x=265,y=24}
                 callbacks.events[4]({player_index=en.index,element=root})
@@ -257,6 +262,7 @@ class LibraryNativeInputFixtureControls(unittest.TestCase):
               game.tick=game.tick+60;step("complete-save")
             end)
             return {ok=ok,message=tostring(message),trace=trace,saves=game.saves,readonly_report=readonly_report,
+              initial_report=initial_report,missing_query_report=missing_query_report,missing_query_readonly=missing_query_readonly,
               readonly_load=readonly_load,resets=resets,calls=calls,cold_calls_before=cold_calls_before,cold_calls_after=cold_calls_after,
               final=store[key] and api().report(),native_input_evidence=false,final_calls=calls}
           end
@@ -282,6 +288,41 @@ class LibraryNativeInputFixtureControls(unittest.TestCase):
                 self.assertFalse(final["fixture_seeds_credit"])
                 self.assertTrue(final["load_observed"])
                 self.assertEqual(final["en_geometry"]["location"], {"x": 170, "y": 100})
+
+    def test_readonly_reports_expose_actual_library_and_foreign_input_state(self):
+        for target in ("f200", "f210"):
+            with self.subTest(target=target):
+                result = self.run_case(target)
+                self.assertTrue(result["ok"], result["message"])
+                self.assertTrue(result["readonly_report"])
+                self.assertTrue(result["readonly_load"])
+                self.assertIs(result["initial_report"]["en_input"], False)
+                self.assertIs(result["initial_report"]["de_input"], False)
+                phases = {row["phase"]: row for row in result["trace"]}
+                initial = phases["text-prefix"]
+                self.assertEqual(initial["en_input"], {"library_open": True, "library_query": "", "foreign_open": False, "foreign_query": False})
+                self.assertEqual(initial["de_input"]["library_query"], "recipe-prod-research_mining_drill-1")
+                self.assertEqual(phases["prefix-refresh"]["en_input"]["library_query"], "ge")
+                self.assertEqual(phases["drag"]["en_input"]["library_query"], "gears")
+                foreign = phases["foreign-prefix"]["en_input"]
+                self.assertEqual(foreign, {"library_open": False, "library_query": False, "foreign_open": True, "foreign_query": ""})
+                self.assertEqual(phases["foreign-refresh"]["en_input"]["foreign_query"], "focus")
+                self.assertEqual(phases["foreign-suffix"]["en_input"]["foreign_query"], "focus")
+                restored = phases["disconnect-de"]["en_input"]
+                self.assertEqual(restored, {"library_open": True, "library_query": "gears", "foreign_open": False, "foreign_query": False})
+
+    def test_report_distinguishes_missing_textfield_and_foreign_open_identity(self):
+        for target in ("f200", "f210"):
+            with self.subTest(target=target):
+                missing = self.run_case(target, "observe-missing-query")
+                self.assertTrue(missing["ok"], missing["message"])
+                self.assertTrue(missing["missing_query_readonly"])
+                self.assertIs(missing["missing_query_report"]["en_input"]["library_query"], False)
+                self.assertIs(missing["missing_query_report"]["en_input"]["library_open"], True)
+                stolen = self.run_case(target, "steal-other-focus")
+                self.assertFalse(stolen["ok"], stolen["message"])
+                self.assertIs(stolen["final"]["en_input"]["foreign_open"], False)
+                self.assertEqual(stolen["final"]["en_input"]["foreign_query"], "focus")
 
     def test_drag_uses_the_last_observed_location_and_requires_new_events(self):
         for target in ("f200", "f210"):
