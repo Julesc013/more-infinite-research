@@ -5,7 +5,7 @@ applies_to: "Exact MIR1.1 completed F200/F210 Base successor copies"
 audience: developer
 doc_type: test-fixture
 owner: mir-maintainers
-last_reviewed: 2026-10-30
+last_reviewed: 2026-10-31
 supersedes: []
 superseded_by: []
 ---
@@ -21,6 +21,12 @@ Join roles are the exact names `MIR5English` and `MIR5Deutsch`, with the permitt
 The input report now exposes `en_name`, `de_name`, `en_locale`, `de_locale`, `en_connected` and `de_connected`, alongside the retained role indices. The export report exposes the same observations under `geometry.en` and `geometry.de`. The caller must read those actual observations before input, not infer readiness from a join count. Absent indices remain distinct from numeric indices. Host doubles exercise Lua index0 as robustness only; R04's networking index0 did not establish a Lua player index0.
 
 Compose input0.3 from current `control.lua` and `info-input-identity-f200.json` or `info-input-identity-f210.json`. Compose export0.4 from current `control.lua`, `support-exports.lua` and the corresponding `info-exports-identity-*.json`. ZIP roots are the unchanged observer name plus the declared0.3.0 or0.4.0 version. The prepared record pins all four reproducible containers and new profiles. Preserve the original31-row/75-effect/three-force source fixture and saved inputs; no source recreation, credit seeding or player-package change is required.
+
+## Drag baseline observation
+
+The [fresh drag-baseline preparation](../../../spec/evidence/library-input-drag-baseline-prepared-r02.json) pins the corrected input source, new reproducible observer ZIPs and separate r05 profiles for both engines. Existing input0.3/export0.4 archives and profiles retain their earlier bytes and source identities. Use only the newly pinned input archive under exclusive library ownership; this internal observer version is not a published MIR release.
+
+At the successful suffix transition, record the current native root location and cumulative location-event count immediately before the declared drag. Require at least one new native location event and exactly30pixels left with no vertical movement from that baseline. Retain the earlier inspection location and all pre-drag events; they cannot stand in for the actual drag. Reports expose both baselines/counts, and a drag refusal includes the actual compared point/counts. The prior stale-baseline adverse remains unchanged; fresh source/archive/profile/runtime inputs and actual native qualification are still required.
 
 ## Frozen original protocols
 

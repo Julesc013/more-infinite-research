@@ -225,11 +225,18 @@ class LibraryNativeInputFixtureControls(unittest.TestCase):
               if opponent=="out-of-order" then step("prefix");return end
               step("inspect")
               if opponent=="join-during-input" then join(2,"de") end
+              if opponent=="settled-before-drag" or opponent=="pre-drag-event-only" then
+                local root=en.gui.screen[root_name];root.location={x=265,y=24}
+                callbacks.events[4]({player_index=en.index,element=root})
+              end
               click(en,query(en));type_text(en,"ge");step("prefix")
               if opponent~="short-refresh" then game.tick=game.tick+60 end
               step("refresh");type_text(en,"ars");step("suffix")
               local root=en.gui.screen[root_name];root.location={x=root.location.x-30,y=root.location.y}
-              if opponent~="missing-drag-event" then callbacks.events[4]({player_index=en.index,element=root}) end
+              if opponent=="wrong-drag-x" then root.location.x=root.location.x+1 end
+              if opponent=="wrong-drag-y" then root.location.y=root.location.y+1 end
+              if opponent~="missing-drag-event" and opponent~="pre-drag-event-only" then callbacks.events[4]({player_index=en.index,element=root}) end
+              if opponent=="multiple-drag-events" then callbacks.events[4]({player_index=en.index,element=root}) end
               step("drag");key_close(en);step("escape");key_close(en);step("inventory")
               local other=en.gui.screen.mir5_input_other.mir5_input_other_query
               click(en,other);type_text(en,"focus");step("foreign-prefix");game.tick=game.tick+60
@@ -275,6 +282,31 @@ class LibraryNativeInputFixtureControls(unittest.TestCase):
                 self.assertFalse(final["fixture_seeds_credit"])
                 self.assertTrue(final["load_observed"])
                 self.assertEqual(final["en_geometry"]["location"], {"x": 170, "y": 100})
+
+    def test_drag_uses_the_last_observed_location_and_requires_new_events(self):
+        for target in ("f200", "f210"):
+            with self.subTest(target=target):
+                result = self.run_case(target, "settled-before-drag")
+                self.assertTrue(result["ok"], result["message"])
+                final = result["final"]
+                self.assertEqual(final["initial_location"], {"x": 200, "y": 100})
+                self.assertEqual(final["drag_baseline"], {"x": 265, "y": 24})
+                self.assertEqual(final["drag_events_before"], 1)
+                self.assertEqual(final["actual_drag_events"], 2)
+                self.assertEqual(final["en_geometry"]["location"], {"x": 235, "y": 24})
+                self.assertTrue(result["readonly_report"])
+                multiple = self.run_case(target, "multiple-drag-events")
+                self.assertTrue(multiple["ok"], multiple["message"])
+                self.assertEqual(multiple["final"]["drag_events_before"], 0)
+                self.assertEqual(multiple["final"]["actual_drag_events"], 2)
+                self.assertEqual(multiple["final"]["en_geometry"]["location"], {"x": 170, "y": 100})
+                for opponent in ("pre-drag-event-only", "wrong-drag-x", "wrong-drag-y"):
+                    with self.subTest(opponent=opponent):
+                        rejected = self.run_case(target, opponent)
+                        self.assertFalse(rejected["ok"], rejected["message"])
+                        self.assertIn("actual native drag differs: baseline=", rejected["message"])
+                        self.assertEqual(rejected["final"]["phase"], "drag")
+                        self.assertEqual(rejected["saves"], {})
 
     def test_observer_rejects_missing_native_events_mutations_and_lost_cold_views(self):
         opponents = ("wrong-initial-credit", "preexisting-player", "extra-mod", "out-of-order", "private-listed", "empty-ordinary", "foreign-library-root",
