@@ -83,6 +83,19 @@ def _git(repository, *arguments):
     return subprocess.check_output(["git", "-C", str(repository), *arguments]).decode("utf-8").strip()
 
 
+def _source_minimum_base(info):
+    dependencies = info.get("dependencies")
+    if not isinstance(dependencies, list) or not dependencies or not isinstance(dependencies[0], str):
+        raise ValueError("Frozen player source has no base dependency metadata")
+    return dependencies[0]
+
+
+def _validate_source_minimum_base(source_minimum_base, editions):
+    expected = "base >= " + editions["f210"]["minimum_base"]
+    if source_minimum_base != expected:
+        raise ValueError("Frozen player source minimum base differs from canonical F210 metadata")
+
+
 def _source_identity(source, revision):
     source, repository = package.git_repository(source)
     commit = _git(repository, "rev-parse", "--verify", revision + "^{commit}")
@@ -110,6 +123,7 @@ def _source_identity(source, revision):
         package.render_local_mir_target_version(files, info["version"], info["version"], info["name"])
     except ValueError as error:
         raise ValueError("Frozen player source target metadata does not match canonical F210 metadata") from error
+    source_minimum_base = _source_minimum_base(info)
     return source, repository, files, {
         "commit": commit,
         "tree": tree,
@@ -118,7 +132,7 @@ def _source_identity(source, revision):
         "mod_name": MOD_NAME,
         "mod_title": info["title"],
         "source_distribution_version": info["version"],
-    }
+    }, source_minimum_base
 
 
 def _target_identity(source, repository, commit, target_record):
@@ -330,8 +344,9 @@ def _build_early_cohort(source, output, commit, target_record, editions, source_
 
 def freeze(source, output, revision="HEAD", target_record=package.TARGET_RECORD, early_target_record=None):
     """Freeze retained packages and an explicitly selected best-effort early cohort."""
-    source, repository, _, source_identity = _source_identity(Path(source), revision)
+    source, repository, _, source_identity, source_minimum_base = _source_identity(Path(source), revision)
     editions, target_identity = _target_identity(source, repository, source_identity["commit"], target_record)
+    _validate_source_minimum_base(source_minimum_base, editions)
     early_editions, early_identity = (None, None)
     if early_target_record is not None:
         early_editions, early_identity = _early_target_identity(
@@ -399,8 +414,10 @@ def verify(source, output, target_record=None, early_target_record=None):
                 != frozen_early.get("target_record", {}).get("path")):
             raise ValueError("Selected early target record differs from the frozen inventory")
     try:
-        source, repository, _, source_identity = _source_identity(source, frozen_source["commit"])
+        source, repository, _, source_identity, source_minimum_base = _source_identity(
+            source, frozen_source["commit"])
         editions, target_identity = _target_identity(source, repository, source_identity["commit"], record_path)
+        _validate_source_minimum_base(source_minimum_base, editions)
         early_editions, early_identity = (None, None)
         if frozen_early is not None:
             early_path = frozen_early.get("target_record", {}).get("path")

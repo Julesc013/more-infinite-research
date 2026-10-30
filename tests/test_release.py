@@ -238,10 +238,19 @@ class ReleaseTests(unittest.TestCase):
                 encoding="utf-8",
             )
 
+        def mismatched_source_minimum_base(source):
+            path = source / "info.json"
+            info = json.loads(path.read_text(encoding="utf-8"))
+            if info["dependencies"][0] != "base >= 2.1.23":
+                raise AssertionError("Fixture source lacks the canonical F210 base minimum")
+            info["dependencies"][0] = "base >= 2.1.0"
+            path.write_text(json.dumps(info, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+
         cases = {
             "wrong-edition-codec": lambda source: set_info_version(source, "5.0.21100"),
             "invalid-six-digit-codec": lambda source: set_info_version(source, "5.0.210100"),
             "mismatched-changelog": wrong_changelog,
+            "mismatched-source-minimum-base": mismatched_source_minimum_base,
             "missing-target-id": lambda source: replace_target(source, b'  id="f210",\n', b""),
             "duplicate-target-id": lambda source: duplicate_target(source, b'  id="f210",\n'),
             "mismatched-target-id": lambda source: replace_target(source, b'  id="f210",\n', b'  id="f200",\n'),
