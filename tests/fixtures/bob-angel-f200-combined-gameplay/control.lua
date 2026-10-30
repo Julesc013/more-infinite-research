@@ -329,6 +329,17 @@ local function setup_physical(state)
   state.machine, state.phase, state.physical_output = machine, "physical", 0
 end
 
+local function physical_completion_observation(state, machine, output)
+  return table.concat({
+    "physical_output=" .. scalar(state.physical_output),
+    "expected_output=" .. scalar(EXPECTED_OUTPUT),
+    "bonus_progress=" .. scalar(machine.bonus_progress),
+    "productivity_bonus=" .. scalar(machine.productivity_bonus),
+    "output_empty=" .. scalar(output.is_empty()),
+    "output_steel_plate=" .. scalar(output.get_item_count(PLATE)),
+  }, ";")
+end
+
 local function tick_physical(state)
   local machine = state.machine
   if machine == nil or machine.valid == false then fail("real steel machine disappeared") end
@@ -344,7 +355,7 @@ local function tick_physical(state)
   if input.get_item_count(ROLL) ~= 0 or machine.crafting_progress ~= 0 then return end
   if state.physical_output ~= EXPECTED_OUTPUT or not close(machine.bonus_progress, 0)
       or not close(machine.productivity_bonus, NATIVE_BONUS) or not output.is_empty() then
-    fail("real steel physical output or native bonus differs")
+    fail("real steel physical output or native bonus differs: " .. physical_completion_observation(state, machine, output))
   end
   state.phase = "complete"
   state.saved_actual_labs = state.actual_labs
