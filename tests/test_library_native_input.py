@@ -59,6 +59,11 @@ class LibraryNativeInputControls(unittest.TestCase):
           if($size-ne$(if([IntPtr]::Size-eq8){40}else{28})){throw 'native INPUT layout differs'}
           $physical=[MIRLibraryInputNative].GetMethod('SetAndReadPhysicalCursorPos')
           if($null-eq$physical-or$physical.ReturnType.FullName-ne'MIRLibraryInputNative+Point'){throw 'physical cursor contract differs'}
+          foreach($scan in @(1,0x12)){foreach($down in @($true,$false)){
+            $input=[MIRLibraryInputNative]::HardwareInput($scan,$down)
+            if($input.type-ne1-or$input.payload.key.vk-ne0-or$input.payload.key.scan-ne$scan-or$input.payload.key.flags-ne$(if($down){8}else{10})){throw 'hardware INPUT layout differs'}
+          }}
+          foreach($scan in @(0,0x101)){$refused=$false;try{$null=[MIRLibraryInputNative]::HardwareInput($scan,$true)}catch{$refused=$true};if(-not$refused){throw 'invalid hardware scan accepted'}}
           'PASS exact validators, native INPUT layout and physical cursor contract;zero desktop input'
         '''
         with tempfile.TemporaryDirectory() as temporary:
@@ -154,6 +159,7 @@ public static class MIRLibraryInputNative {
             $script:window=[pscustomobject]@{x=100;y=200;handle=42}
             $script:physicalPointerPositions=[System.Collections.Generic.List[object]]::new()
             $sent=0;$mouseHeld=$false;$failure='';$diagnostics=[ordered]@{}
+            $heldHardwareScan=[uint16]0;$hardwareKeyEvents=[Collections.Generic.List[object]]::new()
             $result=[ordered]@{status='started'};$receipt=$Receipt;$client=$null
             $failed=$false
             try {
@@ -165,6 +171,7 @@ public static class MIRLibraryInputNative {
             # scope exactly while executing the extracted production finally body.
             $script:mouseHeld=$mouseHeld;$script:sent=$sent;$script:failure=$failure;$script:result=$result
             $script:receipt=$receipt;$script:window=$window;$script:diagnostics=$diagnostics;$script:client=$client
+            $script:heldHardwareScan=$heldHardwareScan;$script:hardwareKeyEvents=$hardwareKeyEvents
             $null=Invoke-Expression $script:actualFinally
             [pscustomobject]@{
               failed=$failed;failure=$failure;sent=$sent;mouse_held=$mouseHeld
@@ -194,6 +201,79 @@ public static class MIRLibraryInputNative {
             'if($mouseHeld){$null=[MIRLibraryInputNative]::MouseButton($false)}'
           )){if(-not$actor.Contains($required)){throw "actual actor dispatch/teardown differs: $required"}}
           'PASS actual finite drag dispatch, physical receipt and mismatch cleanup;zero desktop input'
+        '''
+        with tempfile.TemporaryDirectory() as temporary:
+            result = subprocess.run(["pwsh", "-NoProfile", "-Command", script], cwd=ROOT,
+                                    env={**os.environ, "MIR_INPUT_ACTOR": str(ACTOR), "MIR_INPUT_OUTPUT": temporary},
+                                    capture_output=True, text=True)
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        self.assertIn("zero desktop input", result.stdout)
+
+    def test_actual_hardware_key_hold_and_finally_release_without_desktop_input(self):
+        script = r'''
+          $ErrorActionPreference='Stop';Set-StrictMode -Version Latest
+          Add-Type -TypeDefinition @'
+using System;
+using System.Collections.Generic;
+public static class MIRLibraryInputNative {
+  public static List<string> Events=new List<string>();
+  public static uint HardwareKey(ushort scan,bool down) { Events.Add("cleanup:"+scan+":"+down); return 1; }
+}
+'@
+          $tokens=$null;$errors=$null
+          $ast=[Management.Automation.Language.Parser]::ParseFile($env:MIR_INPUT_ACTOR,[ref]$tokens,[ref]$errors)
+          if($errors.Count){throw 'input actor parse failed'}
+          foreach($name in @('Assert-LibraryInput','Test-LibraryInputInteger','Invoke-LibraryInputHardwareKey')){
+            $node=@($ast.FindAll({param($n)$n-is[Management.Automation.Language.FunctionDefinitionAst]-and$n.Name-ceq$name},$true))
+            if($node.Count-ne1){throw 'hardware helper missing or ambiguous'};Invoke-Expression $node[0].Extent.Text
+          }
+          $try=@($ast.FindAll({param($n)$n-is[Management.Automation.Language.TryStatementAst]},$true))
+          if($try.Count-ne1){throw 'actor finally differs'}
+          $actualFinally=(@($try[0].Finally.Statements|ForEach-Object {$_.Extent.Text})-join"`n")
+          foreach($case in @('escape','inventory','lost-window','zero-map','down-failed','up-failed')){
+            [MIRLibraryInputNative]::Events.Clear();$script:checks=0
+            $action=if($case-ceq'inventory'){'inventory'}else{'escape'}
+            $script:sent=0;$script:heldHardwareScan=[uint16]0;$script:mouseHeld=$false
+            $script:hardwareKeyEvents=[Collections.Generic.List[object]]::new()
+            $script:physicalPointerPositions=[Collections.Generic.List[object]]::new()
+            $script:failure='';$script:result=[ordered]@{status='started'};$script:window=$null;$script:diagnostics=@{};$script:client=$null
+            $script:receipt=Join-Path $env:MIR_INPUT_OUTPUT ($case+'.json')
+            $failed=$false
+            try{
+              Invoke-LibraryInputHardwareKey -Action $action -ResolveScan {
+                param([uint16]$VirtualKey)
+                [MIRLibraryInputNative]::Events.Add("map:$VirtualKey")
+                if($case-ceq'zero-map'){return 0};if($VirtualKey-eq0x1b){return 1};if($VirtualKey-eq0x45){return 0x12};throw 'unexpected virtual key'
+              } -KeyEvent {
+                param([uint16]$Scan,[bool]$Down)
+                [MIRLibraryInputNative]::Events.Add("key:${Scan}:$Down")
+                if(($case-ceq'down-failed'-and$Down)-or($case-ceq'up-failed'-and-not$Down)){return 0};return 1
+              } -Pause {
+                param([int]$Milliseconds)
+                if($Milliseconds-ne100){throw 'hold differs'};[MIRLibraryInputNative]::Events.Add("pause:$Milliseconds")
+              } -AssertWindow {
+                $script:checks++;[MIRLibraryInputNative]::Events.Add('window')
+                if($case-ceq'lost-window'-and$script:checks-eq2){throw 'owned window changed'}
+              } -Sent ([ref]$script:sent) -HeldScan ([ref]$script:heldHardwareScan) -Events $script:hardwareKeyEvents
+            }catch{$failed=$true;$script:failure=$_.Exception.Message;$script:result.status='failed'}
+            $null=Invoke-Expression $actualFinally
+            $events=@([MIRLibraryInputNative]::Events.ToArray())-join'|'
+            $expected=switch($case){
+              'escape'{'window|map:27|key:1:True|pause:100|window|key:1:False'}
+              'inventory'{'window|map:69|key:18:True|pause:100|window|key:18:False'}
+              'lost-window'{'window|map:27|key:1:True|pause:100|window|cleanup:1:False'}
+              'zero-map'{'window|map:27'}
+              'down-failed'{'window|map:27|key:1:True'}
+              'up-failed'{'window|map:27|key:1:True|pause:100|window|key:1:False|cleanup:1:False'}
+            }
+            if($events-cne$expected){throw "hardware event order differs ${case}: $events"}
+            if($failed-ne($case-cnotin@('escape','inventory'))){throw 'hardware failure classification differs'}
+            $r=Get-Content -LiteralPath $script:receipt -Raw|ConvertFrom-Json
+            $expectedSent=if($case-cin@('zero-map','down-failed')){0}else{2}
+            if($r.input_events_sent-ne$expectedSent-or$r.hardware_key_still_held){throw 'hardware cleanup receipt differs'}
+            if($case-cin@('lost-window','up-failed')){if(-not$r.hardware_key_events[-1].cleanup){throw 'cleanup not recorded'}}
+          }
+          'PASS actual hardware key dispatch and finally cleanup;zero desktop input'
         '''
         with tempfile.TemporaryDirectory() as temporary:
             result = subprocess.run(["pwsh", "-NoProfile", "-Command", script], cwd=ROOT,

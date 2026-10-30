@@ -3,117 +3,105 @@ Version: 5.0.0
 
   Changes:
 
-    - Replace discovery and global research planning with authored native technologies, explicit compatibility bindings and a
-      deterministic Generator.
-    - Validate each submitted family before publication, including duplicate identities, missing references, invalid numeric values
-      and local prerequisite cycles.
-    - Preserve technology and setting identities, finite stages, native continuations, cost formulas and target-specific capability
-      subsets.
-    - Resolve startup settings and imported profiles once, preserving inherited defaults and explicit overrides.
-    - Keep native bonuses separate from event-driven agriculture, spoilage and bounded passive repair.
-    - Provide the MIR API for immediate publication of its documented declaration subset and detached read-only runtime queries,
-      with bounded copying of external definitions.
-    - Retain the Research Library, personal views, settings export and translations; explain named unavailable features without
-      reconstructing research at runtime.
-    - Add modern Library full/compact settings exports and a bounded latest local diagnostic report through the existing MIRSET1
-      codec and file-output path, with no automatic uploads or engine-log copying.
-    - Keep one source-release version and unified changelog history, with the same edition ZIPs on GitHub and stable Mod Portal
-      releases; mark prerelease maturity separately without build counters or version conversion.
-    - Establish reusable historical migration inputs for the MIR5 baseline and retain cumulative migration steps for later direct
-      upgrades.
+    - Simplify research generation to avoid unnecessary loading work while keeping existing research names, costs and progression.
+    - Check MIR research definitions before adding them, catching duplicate names, missing references, invalid values and circular
+      MIR prerequisites.
+    - Preserve research and setting identities, finite levels, infinite continuations and each Factorio version's supported
+      features.
+    - Preserve inherited defaults and explicit choices when importing settings profiles.
+    - Keep native research bonuses separate from repair, agriculture and spoilage processing.
+    - Add the documented MIR API for mod integrations and read-only research information.
+    - Keep personal Research Library views, search, settings export and translations; explain unavailable features without changing
+      research state.
+    - Add full and compact settings exports on Factorio 2.0/2.1, with copyable text and local text files.
+    - Add a local diagnostic report on Factorio 2.0/2.1 for support requests. Nothing uploads automatically; attach the engine log
+      separately.
+    - Preserve cumulative save migrations for supported direct upgrades from older releases.
 
   Compatibility:
 
-    - Retain authored Armor, Py, ATAN, Bob/Angel and K2 bindings for their admitted engine and mod profiles.
-    - Restore fourteen Tin, Lead, Bronze, Gunmetal, Invar, Nitinol and Copper Tungsten technologies for the Factorio 2.1 Bob-core
-      profile without Angel mods.
-    - Restore five Tin, Gunmetal and Invar native material stages for the Factorio 2.1 BobTech and Angel profile.
-    - Restore the published31 Base and16 Space Age Bob Plates rows through the complete settings-to-publication path, with separate
-      sparse and full-Bob admission.
-    - Preserve the named BobTech advanced and alien science vectors for the admitted native continuations.
-    - Restore the omitted Factorio 2.1 Angel catalogue and native Steel coverage through explicit bindings.
-    - Restore the combined Factorio 2.1 Bob/Angel breeding, material and native Steel bindings, including the published braking and
-      laser continuation science and prerequisites.
-    - Preserve the disabled Bob/Angel oil-cracking identity and bind the selected science-pack productivity family to its admitted
-      current lab inputs and captured combined progression.
-    - Preserve Ironclad mortar shooting speed and native weapon categories when their dedicated streams are disabled or overlap
-      removal is off.
-    - Restore Factorio 2.1 Bob sulfur and sulfuric-acid research through the complete settings-to-publication path.
-    - Provide the experimental Factorio 0.18.47 build from shared Factorio 1.0 research and fixtures; exact-engine native load
-      qualification remains unverified.
-    - Preserve separate finite and infinite material stages, native recipe ownership and hidden Imersite migration carriers where
-      supported.
-    - Keep two historical runtime interfaces available; unconsumed developer previews do not become player APIs.
+    - Retain supported Armor, Py, ATAN, Bob's/Angel's and Krastorio integrations.
+    - Restore fourteen Tin, Lead, Bronze, Gunmetal, Invar, Nitinol and Copper Tungsten technologies with Bob's mods on Factorio 2.1
+      without Angel's.
+    - Restore five Tin, Gunmetal and Invar material research stages with Bob's Tech and Angel's on Factorio 2.1.
+    - Restore 31 Base and 16 Space Age Bob's Plates research entries, including installations using only part of Bob's mods.
+    - Preserve advanced and alien science quantities for Bob's Tech research continuations.
+    - Restore missing Angel's research, including steel productivity, on Factorio 2.1.
+    - Restore breeding, material and steel research with Bob's/Angel's on Factorio 2.1, including braking and laser research
+      requirements.
+    - Restore missing research with the supported Space Age, Bob's Tech and Angel's combination on Factorio 2.0.
+    - Preserve disabled oil-cracking research and match science-pack productivity research to the supported Bob's/Angel's laboratory
+      inputs and progression.
+    - Preserve Ironclad mortar shooting speed and native weapon categories when dedicated weapon research is disabled or overlapping
+      research is retained.
+    - Restore sulfur and sulfuric-acid research with Bob's mods on Factorio 2.1.
+    - Keep separate finite and infinite material research, recipe ownership and hidden Imersite recovery research where supported.
+    - Keep both existing runtime integration interfaces available for other mods.
 
   Bugfixes:
 
-    - Accept an initially enabled armor-plate recipe in the Factorio 2.0 combined Bob/Angel binding without changing its authored
-      research or foreign activation state.
-    - Retain the extra tier-one module productivity already earned in admitted MIR 1.1 saves through hidden native credits, while
-      new module research uses the corrected effects.
-    - Preserve the earned cannon component of admitted MIR 1.2 combined rocket shooting speed through one hidden native credit using
-      the retained rocket setting; new cannon research remains independent.
-    - Keep hidden migration credits out of Research Library lists, translation requests and native research actions while preserving
-      earned bonuses and ordinary foreign research inspection.
-    - Display native localized Library titles, research groups, science and prerequisites while search translations are pending;
-      fill the observed German status and queue/cap explanations.
-    - Keep authored disabled research unavailable after technology-effects resets and force lifecycle changes, including
-      unlimited-cap configurations.
-    - Preserve proven MIR cap ownership when a published save is first upgraded with a family disabled or still above a finite cap,
-      including admitted native worker tails, so later relaxation restores only MIR-owned disablement.
-    - Restore the published visibility of all twenty retained Bob/Angel material setting families for admitted Factorio 2.1 Base and
-      Space Age profiles.
-    - Restore the seven published Bob/Angel Factorio 2.1 productivity technology icons from their direct native prototype
-      references.
-    - Restore omitted research names and descriptions across the shipped locales while preserving existing translations.
-    - Add missing titles for hidden Imersite state and unavailable material explanations.
-    - Preserve the combined Factorio 2.1 Bob/Angel Space Age carbon effect vector when its recipe named carbon produces Angel carbon
-      instead of the ordinary carbon item.
-    - Retain science amounts, prerequisites, effect counts, lab outcomes and icon sources in opt-in generation diagnostics.
-    - Keep retired space science and its prerequisite out of the two base level-seven continuations when Space Is Fake is active,
-      including expanded science policies; preserve the full remaining science vector and explicit progression requirements.
-    - Restrict public data declarations to checked native fields and MIR-owned presentation before publication.
-    - Accept Factorio's default recipe productivity ceiling when BobTech and Angel omit the optional raw field.
-    - Accept an explicit native 300% recipe ceiling as equivalent to omission in Factorio 2.0 Bob/Angel bindings.
-    - Keep graphics-only Krastorio asset mods from selecting an absent overhaul or suppressing unrelated compatibility bindings.
-    - Apply the existing growth-factor ceiling of 1000 to native setting bounds, preserving defaults and zero inheritance.
-    - Keep the first-upgrade preference safeguard when upgrading an earned Factorio 2.0 save from MIR 4.7.3, including same-name
-      local builds with a private distribution version.
-    - Refresh relevant open Research Library views after native research, queue and force events without changing research state.
-    - Preserve in-flight Library translations across client load and retry expired requests in deterministic order.
-    - Avoid global science-unlock and foreign-research discovery during ordinary research construction.
-    - Retain selected cryogenic science and its native unlock prerequisite when a mod replaces the native research trigger with an
-      ordinary research unit.
-    - Preserve earned-above-cap research, suspended work and queues through admitted save transitions; restore only disablement
-      owned by MIR.
-    - Recover MIR-owned cap disablement from historical boolean ledgers without granting foreign disablement or visibility records
-      an enablement right.
-    - Retain cap-restoration rights across published Factorio 2.0 MIR 4.2–4.7 upgrades into Factorio 2.1, preserving current MIR
-      decisions and foreign disablement.
-    - Preserve the original foreign disablement baseline across native resets and equivalent productivity-effect orderings; restore
-      only MIR-owned enablement transitions.
-    - Preserve unqueued foreign Imersite public disablement and visibility through its named hidden-carrier handoff.
-    - Reconcile scripted contributions against external baselines rather than overwrite aggregate foreign bonuses.
-    - Walk nested pipeline and receiver prototype fields without recursive Lua stack growth.
+    - Accept already-enabled armor-plate recipes with Bob's/Angel's on Factorio 2.0 without changing research or overriding another
+      mod's recipe settings.
+    - Preserve extra tier-one module productivity earned in supported MIR 1.1 saves; new module research uses the corrected effects.
+    - Preserve cannon bonuses earned through the old combined rocket research in supported MIR 1.2 saves, using the saved rocket
+      setting; new cannon research remains separate.
+    - Hide recovery research from Library lists, translation requests and native research actions while preserving its earned
+      bonuses and ordinary research from other mods.
+    - Show localized Library titles, research groups, science and prerequisites while search translations are loading; add missing
+      German status, queue and cap explanations.
+    - Keep disabled MIR research unavailable after research-effect resets and force changes, including when caps are unlimited.
+    - Restore only MIR-owned research disablement when relaxing caps or re-enabling a research family, including supported old
+      worker-robot research.
+    - Restore all twenty Bob's/Angel's material setting families on supported Factorio 2.1 Base and Space Age configurations.
+    - Restore seven Bob's/Angel's productivity research icons on Factorio 2.1.
+    - Restore missing research names and descriptions across included languages without replacing existing translations.
+    - Add missing names for Imersite recovery research and explanations for unavailable material research.
+    - Preserve the correct carbon productivity effects when the Bob's/Angel's Space Age recipe produces Angel's carbon.
+    - Include science quantities, prerequisites, effects, lab support and icons in optional research-generation diagnostics.
+    - Remove retired space-science requirements from Research speed 7 and Weapon shooting speed 7 when Space Is Fake is installed,
+      including expanded science settings.
+    - Reject invalid integration research before adding it to the game, and restrict changes to MIR-owned presentation.
+    - Accept the default recipe productivity limit when Bob's Tech and Angel's omit it.
+    - Accept an explicit 300% recipe productivity limit on Factorio 2.0 as equivalent to the default.
+    - Prevent graphics-only Krastorio add-ons from activating the overhaul integration or hiding unrelated integrations.
+    - Limit the growth-factor setting to 1000 while preserving defaults and zero inheritance.
+    - Require unchanged productivity-provider preferences for the first upgrade from MIR 4.7.3, including locally built copies.
+    - Refresh open Library views after relevant research, queue and force changes without changing research state.
+    - Preserve pending Library translations across client reloads and retry expired requests in a consistent order.
+    - Avoid scanning unrelated science unlocks and research trees during ordinary research generation.
+    - Preserve cryogenic science and its unlock requirement when another mod replaces the native research trigger with ordinary
+      research.
+    - Preserve earned levels above a cap, suspended research progress and queues on supported save upgrades.
+    - Recover old MIR cap ownership without enabling research disabled by another mod or treating visibility records as permission
+      to enable it.
+    - Preserve cap-restoration rights on supported MIR 4.2-4.7 upgrades from Factorio 2.0 to 2.1.
+    - Preserve other mods' original research-disablement choices through effect resets and equivalent productivity-effect orderings.
+    - Preserve disabled and hidden Imersite research through its supported recovery transition, including when it is not queued.
+    - Reconcile scripted bonuses with other mods' contributions rather than overwriting their combined values.
+    - Avoid Lua stack overflows when reading deeply nested pipeline and receiver definitions.
 
   Optimizations:
 
-    - Reuse authored Library declarations across views and coalesce relevant open-view refreshes on the next tick.
-    - Publish each checked family once; native effects require no recurring research or tick maintenance.
-    - Skip inactive adapters and default broad overrides before inspecting their prototype domains.
-    - Collect retained product targets in bounded passes and reuse immutable lab-compatibility decisions within one construction
-      stage.
+    - Share Research Library catalogue information between views and combine related refreshes on the next tick.
+    - Create each research family once; native research bonuses need no recurring Lua maintenance.
+    - Skip inactive integrations and disabled broad overrides before scanning prototypes.
+    - Avoid repeated recipe collection and reuse unchanged lab-compatibility information during research generation.
 
   Info:
 
-    - Supply nine stable target editions from one player-source tree; Factorio 0.18.47 and additional earlier editions are
-      experimental best-effort GitHub distributions as their adapters become buildable.
-    - Exact engine minimums and available features depend on the selected target; Factorio 2.1 requires base 2.1.23.
-    - Use one shared master changelog for all editions; historical entries retain their original release and engine scope.
-    - Keep local replacement build versions consistent across package metadata, changelog and public API queries; selecting another
-      engine edition requires target adaptation.
-    - Offer optional fixed finite Factorio 0.6 through 0.12 builds from the shared source, with readable museum research names and
-      explicit best-effort limits; current native and save qualification is absent.
+    - This is a GitHub community beta. Heavy-modpack, active-factory, save-loading and Library-memory performance testing remains
+      unfinished.
+    - Separate builds cover Factorio 0.13-0.17, 1.0, 1.1, 2.0 and 2.1; minimum versions and available features differ. Factorio 2.1
+      requires 2.1.23.
+    - Factorio 0.18.47 remains experimental and has not been tested on that exact engine.
+    - Factorio 0.6-0.12 builds provide basic finite research only and remain untested best effort; save upgrades are not supported
+      there.
+    - GitHub betas and stable releases use the same version format. Only stable releases go to the Mod Portal, using the same tested
+      ZIPs.
+    - Back up the save and matching mods/settings before upgrading. Test a copy with settings unchanged, then save and restart
+      before adopting it.
+    - All editions share this changelog; historical entries keep their original release and Factorio-version scope.
+    - Package metadata, changelog and public API version queries identify the matching release and Factorio build.
 
 ---------------------------------------------------------------------------------------------------
 Version: 4.7.3

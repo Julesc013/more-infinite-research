@@ -11,6 +11,32 @@ Set-StrictMode -Version Latest
 
 function Assert-LibraryInput([bool]$Condition,[string]$Message){if(-not$Condition){throw "[mir-library-input] $Message"}}
 function Test-LibraryInputInteger($Value){return $Value-is[int] -or $Value-is[long]}
+function Invoke-LibraryInputHardwareKey{
+  param(
+    [Parameter(Mandatory)][ValidateSet('escape','inventory')][string]$Action,
+    [Parameter(Mandatory)][scriptblock]$ResolveScan,
+    [Parameter(Mandatory)][scriptblock]$KeyEvent,
+    [Parameter(Mandatory)][scriptblock]$Pause,
+    [Parameter(Mandatory)][scriptblock]$AssertWindow,
+    [Parameter(Mandatory)][ref]$Sent,
+    [Parameter(Mandatory)][ref]$HeldScan,
+    [Parameter(Mandatory)][AllowEmptyCollection()][System.Collections.Generic.List[object]]$Events
+  )
+  & $AssertWindow
+  $virtualKey=if($Action-ceq'escape'){0x1b}else{0x45}
+  $scan=& $ResolveScan ([uint16]$virtualKey)
+  Assert-LibraryInput ((Test-LibraryInputInteger $scan)-and$scan-gt0-and$scan-le0xff) 'hardware key scan mapping differs'
+  $n=& $KeyEvent ([uint16]$scan) $true;$Sent.Value+=$n
+  $null=$Events.Add([ordered]@{scan_code=$scan;down=$true;sent=$n;cleanup=$false})
+  $HeldScan.Value=if($n-eq1){[uint16]$scan}else{[uint16]0}
+  Assert-LibraryInput ($n-eq1) 'hardware key down incomplete'
+  & $Pause 100
+  & $AssertWindow
+  $n=& $KeyEvent ([uint16]$scan) $false;$Sent.Value+=$n
+  $null=$Events.Add([ordered]@{scan_code=$scan;down=$false;sent=$n;cleanup=$false})
+  if($n-eq1){$HeldScan.Value=[uint16]0}
+  Assert-LibraryInput ($n-eq1) 'hardware key up incomplete'
+}
 function Get-LibraryInputDragSchedule([System.Collections.IDictionary]$Spec){
   # Keep the native drag finite and inspectable.  The two settled holds are an
   # asynchronous mouse-delivery hypothesis, not a native-game observation.
@@ -110,6 +136,7 @@ public static class MIRLibraryInputNative {
   [StructLayout(LayoutKind.Explicit)] public struct Payload { [FieldOffset(0)] public Mouse mouse; [FieldOffset(0)] public Key key; }
   [StructLayout(LayoutKind.Sequential)] public struct Input { public uint type; public Payload payload; }
   [DllImport("user32.dll",SetLastError=true)] public static extern uint SendInput(uint count,Input[] input,int size);
+  [DllImport("user32.dll",EntryPoint="MapVirtualKeyW")] public static extern uint ResolveHardwareScan(uint virtualKey,uint mapType);
   [StructLayout(LayoutKind.Sequential)] public struct Point { public int x,y; }
   [DllImport("user32.dll",SetLastError=true)] public static extern bool SetPhysicalCursorPos(int x,int y);
   [DllImport("user32.dll",SetLastError=true)] public static extern bool GetPhysicalCursorPos(out Point point);
@@ -120,9 +147,16 @@ public static class MIRLibraryInputNative {
     if(!GetPhysicalCursorPos(out actual)) throw new System.ComponentModel.Win32Exception(Marshal.GetLastWin32Error(),"GetPhysicalCursorPos");
     return actual;
   }
-  public static uint KeyPair(ushort value,bool unicode) {
-    Input down=new Input();down.type=1;
-    if(unicode){down.payload.key.scan=value;down.payload.key.flags=4;}else{down.payload.key.vk=value;}
+  public static Input HardwareInput(ushort scan,bool down) {
+    if(scan==0 || scan>0xff) throw new ArgumentOutOfRangeException("scan");
+    Input value=new Input();value.type=1;value.payload.key.scan=scan;value.payload.key.flags=down?8u:10u;
+    return value;
+  }
+  public static uint HardwareKey(ushort scan,bool down) {
+    return SendInput(1,new Input[]{HardwareInput(scan,down)},InputSize());
+  }
+  public static uint UnicodePair(ushort value) {
+    Input down=new Input();down.type=1;down.payload.key.scan=value;down.payload.key.flags=4;
     Input up=down;up.payload.key.flags|=2;
     return SendInput(2,new Input[]{down,up},InputSize());
   }
@@ -133,8 +167,9 @@ public static class MIRLibraryInputNative {
 }
 '@
 }
-$client=$null;$mouseHeld=$false;$sent=0;$failure='';$window=$null
+$client=$null;$mouseHeld=$false;$heldHardwareScan=[uint16]0;$sent=0;$failure='';$window=$null
 $physicalPointerPositions=[System.Collections.Generic.List[object]]::new()
+$hardwareKeyEvents=[System.Collections.Generic.List[object]]::new()
 $diagnostics=New-MIROwnedMenuObserverDiagnostics
 $result=[ordered]@{kind='MIRLibraryNativeInputReceiptV1';status='started';spec_sha256=$SpecSha256.ToUpperInvariant();role=$spec.role;process_id=$spec.process_id;process_start_utc=$spec.process_start_utc;engine_sha256=$spec.engine_sha256;action=$spec.action;native_game_observation=$false;release_qualification=$false}
 try{
@@ -158,10 +193,11 @@ try{
     Assert-LibraryInput ((Get-MIROwnedMenuPointRoot -X $absoluteX -Y $absoluteY)-eq[IntPtr]$window.handle) 'pointer target is not owned'
   }
   switch($spec.action){
-    'escape'{Assert-CurrentInputWindow;$n=[MIRLibraryInputNative]::KeyPair(0x1b,$false);$sent+=$n;Assert-LibraryInput ($n-eq2) 'Esc injection incomplete'}
-    'inventory'{Assert-CurrentInputWindow;$n=[MIRLibraryInputNative]::KeyPair(0x45,$false);$sent+=$n;Assert-LibraryInput ($n-eq2) 'E injection incomplete'}
+    {$_-cin@('escape','inventory')}{
+      Invoke-LibraryInputHardwareKey -Action $spec.action -ResolveScan {param([uint16]$VirtualKey)[int][MIRLibraryInputNative]::ResolveHardwareScan($VirtualKey,4)} -KeyEvent {param([uint16]$Scan,[bool]$Down)[MIRLibraryInputNative]::HardwareKey($Scan,$Down)} -Pause {param([int]$Milliseconds)Start-Sleep -Milliseconds $Milliseconds} -AssertWindow {Assert-CurrentInputWindow} -Sent ([ref]$sent) -HeldScan ([ref]$heldHardwareScan) -Events $hardwareKeyEvents
+    }
     'text'{foreach($character in $spec.text.ToCharArray()){
-      Assert-CurrentInputWindow;$n=[MIRLibraryInputNative]::KeyPair([uint16]$character,$true);$sent+=$n
+      Assert-CurrentInputWindow;$n=[MIRLibraryInputNative]::UnicodePair([uint16]$character);$sent+=$n
       Assert-LibraryInput ($n-eq2) 'text injection incomplete';Start-Sleep -Milliseconds 35
     }}
     'click'{
@@ -182,8 +218,14 @@ try{
   $failure=$_.Exception.Message;$result.status='failed';throw
 }finally{
   if($mouseHeld){$null=[MIRLibraryInputNative]::MouseButton($false)}
+  if($heldHardwareScan-ne0){
+    $n=[MIRLibraryInputNative]::HardwareKey($heldHardwareScan,$false);$sent+=$n
+    $null=$hardwareKeyEvents.Add([ordered]@{scan_code=$heldHardwareScan;down=$false;sent=$n;cleanup=$true})
+    if($n-eq1){$heldHardwareScan=[uint16]0}
+  }
   $result.failure=$failure;$result.input_events_sent=$sent;$result.window=$window;$result.window_diagnostics=$diagnostics;$result.physical_pointer_positions=$physicalPointerPositions.ToArray()
-  $result.input_method='Windows SendInput with physical-cursor readback;owned foreground PID/start/engine/geometry/hit-test checked;no Factorio events raised'
+  $result.hardware_key_events=$hardwareKeyEvents.ToArray();$result.hardware_key_still_held=($heldHardwareScan-ne0)
+  $result.input_method='Windows SendInput;Esc/E scan-code down,100ms hold,up;text Unicode;physical-cursor readback;owned foreground PID/start/engine/geometry/hit-test checked;no Factorio events raised'
   $result|ConvertTo-Json -Depth 12|Set-Content -LiteralPath $receipt -Encoding utf8
   if($null-ne$client){$client.Dispose()}
 }
