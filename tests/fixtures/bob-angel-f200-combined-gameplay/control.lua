@@ -143,6 +143,12 @@ local function scalar(value)
   return kind
 end
 
+local function expected_research_unit_count(level)
+  if level == 1 then return RESEARCH_UNITS end
+  if level == 2 then return RESEARCH_UNITS * 2 end
+  return nil
+end
+
 local function target_row_observation(value)
   local prototype = value.prototype
   local function field(name)
@@ -151,15 +157,17 @@ local function target_row_observation(value)
   end
   return table.concat({
     "prototype_type=" .. type(prototype), field("max_level"), field("level"), field("upgrade"), field("order"),
-    "research_unit_count=" .. scalar(value.research_unit_count), "research_unit_energy=" .. scalar(value.research_unit_energy),
+    "current_level=" .. scalar(value.level), "current_research_unit_count=" .. scalar(value.research_unit_count),
+    "current_research_unit_energy=" .. scalar(value.research_unit_energy),
   }, ";")
 end
 
 local function target(force)
   local value = technology(force, TARGET)
   local prototype = value.prototype
+  local expected_count = expected_research_unit_count(value.level)
   if prototype == nil or prototype.max_level ~= UINT32_MAX or prototype.level ~= 1 or prototype.upgrade ~= true
-      or prototype.order ~= "p[research_steel]" or value.research_unit_count ~= RESEARCH_UNITS
+      or prototype.order ~= "p[research_steel]" or expected_count == nil or value.research_unit_count ~= expected_count
       or not close(value.research_unit_energy, RESEARCH_UNIT_ENERGY) then
     fail("complete steel technology row differs: " .. target_row_observation(value))
   end

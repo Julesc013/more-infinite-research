@@ -195,11 +195,17 @@ class CombinedSteelGameplayFixtureTests(unittest.TestCase):
           setmetatable(owner,{__index=function(_,key) if key=="researched" then return owner_researched end end,
             __newindex=function(_,key,value) if key=="researched" then owner_researched=value;if value and opponent~="owner" then route_recipe.enabled=true end end end})
           local research_ingredients=opponent=="ingredients-order" and {{name="logistic-science-pack",amount=1},{name="automation-science-pack",amount=1}} or {{name="automation-science-pack",amount=opponent=="ingredients-count" and 2 or 1},{name="logistic-science-pack",amount=1}}
-          local target={valid=true,name=target_name,level=1,researched=false,enabled=true,research_unit_count=8000,research_unit_energy=opponent=="energy-seconds" and 60 or 3600,
+          local target={valid=true,name=target_name,level=1,researched=false,enabled=true,research_unit_energy=opponent=="energy-seconds" and 60 or 3600,
             prerequisites={{name="automation-science-pack"},{name="logistic-science-pack"}},prototype={name=target_name,level=1,upgrade=true,max_level=4294967295,order="p[research_steel]",effects={
               {type="change-recipe-productivity",recipe="angels-plate-steel",change=opponent=="effect" and .2 or .1},
               {type="change-recipe-productivity",recipe=route_name,change=.1},
             }},research_unit_ingredients=research_ingredients}
+          setmetatable(target,{__index=function(_,key)
+            if key=="research_unit_count" then
+              if opponent=="stale-count-after-level-two" and target.level==2 then return 8000 end
+              return 8000*(2^(target.level-1))
+            end
+          end})
           if opponent=="prototype-absent" then target.prototype=nil end
           local force={technologies={
             [target_name]=target,[owner_name]=owner,
@@ -260,9 +266,9 @@ class CombinedSteelGameplayFixtureTests(unittest.TestCase):
           route_recipe.productivity_bonus=.1
           for _, lab in ipairs(labs) do lab.get_inventory(1).values["automation-science-pack"]=0;lab.get_inventory(1).values["logistic-science-pack"]=0 end
           local event_ok,event_message=pcall(callbacks.events[2],{research=target,by_script=false})
-          if not event_ok then return {loaded=loaded,init_ok=true,event_ok=false,message=tostring(event_message)} end
+          if not event_ok then return {loaded=loaded,init_ok=true,event_ok=false,message=tostring(event_message),logs=logs,saves=saves} end
           local research_tick,research_message=pcall(callbacks.events[1])
-          if not research_tick then return {loaded=loaded,init_ok=true,event_ok=true,research_tick=false,message=tostring(research_message)} end
+          if not research_tick then return {loaded=loaded,init_ok=true,event_ok=true,research_tick=false,message=tostring(research_message),logs=logs,saves=saves} end
           for index=1,100 do
             machine.get_inventory(4).values["angels-roll-steel"]=100-index
             machine.get_inventory(5).values["steel-plate"]=(index%10==0) and 8 or 4
@@ -287,7 +293,8 @@ class CombinedSteelGameplayFixtureTests(unittest.TestCase):
             load_two=load_two,load_two_message=tostring(load_two_message),reload_two=reload_two,reload_two_message=tostring(reload_two_message),
             logs=logs,saves=saves,labs=#labs,phase=environment.storage.mir5_bob_angel_f200_combined_gameplay.phase,
             output=environment.storage.mir5_bob_angel_f200_combined_gameplay.physical_output,
-            saved_target_level=environment.storage.mir5_bob_angel_f200_combined_gameplay.saved_target_level,report=report}
+            saved_target_level=environment.storage.mir5_bob_angel_f200_combined_gameplay.saved_target_level,
+            current_research_unit_count=target.research_unit_count,current_research_unit_energy=target.research_unit_energy,report=report}
         ''')
 
     def test_runtime_uses_named_upstream_only_real_labs_real_route_and_two_read_only_reloads(self):
@@ -304,6 +311,8 @@ class CombinedSteelGameplayFixtureTests(unittest.TestCase):
         self.assertEqual((100, "complete", 440, 3, 1),
                          (result["labs"], result["phase"], result["output"], result["logs"], result["saves"]))
         self.assertEqual(2, result["saved_target_level"])
+        self.assertEqual((16000, 3600),
+                         (result["current_research_unit_count"], result["current_research_unit_energy"]))
         self.assertEqual("MIR5BobAngelF200CombinedGameplayReportV1", result["report"]["kind"])
         self.assertEqual("pending-fresh-en-de-library-observations", result["report"]["library_stage"]["status"])
         self.assertEqual(["MIR5English", "MIR5Deutsch"], [result["report"]["library_stage"]["required_roles"][index] for index in (1, 2)])
@@ -372,11 +381,24 @@ class CombinedSteelGameplayFixtureTests(unittest.TestCase):
                         "level=number:1",
                         "upgrade=boolean:true",
                         "order=string:p[research_steel]",
-                        "research_unit_count=number:8000",
-                        "research_unit_energy=number:60",
+                        "current_level=number:1",
+                        "current_research_unit_count=number:8000",
+                        "current_research_unit_energy=number:60",
                     ):
                         self.assertIn(detail, result["message"])
                 self.assertEqual((0, 0), (result["logs"] or 0, result["saves"] or 0))
+
+    def test_runtime_refuses_a_stale_level_one_cost_after_level_two_before_physical_or_save(self):
+        result = self.runtime_protocol("stale-count-after-level-two")
+        self.assertTrue(result["loaded"])
+        self.assertTrue(result["init_ok"])
+        self.assertTrue(result["event_ok"])
+        self.assertFalse(result["research_tick"])
+        self.assertIn("complete steel technology row differs: ", result["message"])
+        self.assertIn("current_level=number:2", result["message"])
+        self.assertIn("current_research_unit_count=number:8000", result["message"])
+        self.assertIn("current_research_unit_energy=number:3600", result["message"])
+        self.assertEqual((0, 0), (result["logs"] or 0, result["saves"] or 0))
 
     def test_on_load_refuses_missing_storage_only_witness_without_game_access(self):
         result = self.runtime_protocol("saved-scalar")
