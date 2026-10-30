@@ -4105,16 +4105,23 @@
           {
             "origin": "published4.7.3 F100",
             "destination": "MIR5 F210",
-            "status": "needs-native-qualification",
-            "problem": "The shared0381 source is now qualified by two fresh read-only cold reloads. The distinct F210 destination still requires qualified execution;its fixture data-cost preflight correction and every actual adverse remain separate from source acceptance.",
-            "next_action": "Use the same qualified0381 with reviewed exact F210 package/engine/fixture/controller and a fresh output. Correct the target-specific fixture preflight before the direct endpoint. Only an actual native save-format refusal permits a separately reviewed published4.7.11003 F110 bridge;no source recreation,intermediateMIR5,adverse pooling or assertion relaxation.",
+            "status": "closed",
+            "problem": "Reviewed unchanged0381 directly loads in2.1.23/8DC with B637/fixture3415,retains23 rows,laser2.2,inserter2/bulk4,42percent queue/27percent suspended work and foreign disablement,completes one useful mining lab with exact0.58 equivalents from both plain-item science packs,saves4CA6 and passes two byte-identical read-only one-update reloads. Root and independent actual-data/custody/CRC/restoration review pass. All four earlier direct adverses remain separate;source enhancement seeds stay labelled.",
+            "next_action": "Retain exact accepted inputs,shared source qualification,original219E/0381 and all prior failed receipts. Final consumed-path/package applicability,client/export,performance and release remain separate;no bridge was used.",
             "source_sha256": "219EF20F63B4A85FA2386BD50A81228B28F006D9731F24E069A657BB13F45811",
             "enhanced_source_sha256": "0381F33BAC7F229D9697C486B68B6F14D975B1D79FE5C88D7EE663EBFEE4ACA9",
             "source_qualification_evidence": {
               "path": "spec/evidence/published473-f100-f110-native-chain-r01.json",
               "bytes": 9769,
               "sha256": "F8AC8F7A74DD6A92AEEC42830D4B9CE018460C1615CBC11D7CC3A439F73888A3"
-            }
+            },
+            "evidence": [
+              {
+                "path": "spec/evidence/published473-f100-f210-native-chain-r05.json",
+                "bytes": 13431,
+                "sha256": "D20CD591F9364E44BB5747E0DD4BA6D505816E4C8B8B6760ADF975A072E135DB"
+              }
+            ]
           },
           {
             "origin": "published4.7.3 F110",
