@@ -5,7 +5,7 @@ applies_to: "MIR development"
 audience: developer
 doc_type: specification
 owner: mir-maintainers
-last_reviewed: 2026-10-24
+last_reviewed: 2026-10-31
 supersedes: []
 superseded_by: []
 source_of_truth_for:
@@ -36,7 +36,7 @@ On 2026-10-23 the maintainer directed batched implementation of the complete kno
 
 ## Measurement
 
-`PERF-03` — Match each arm on the same computer, engine binary/API/official mods, upstream archives, startup values, graphics/cache policy and observer. Run the complete comparison on one predeclared host; never subtract one machine's baseline from another's candidate. On 2026-10-23 the maintainer withdrew Black Glass from testing because it would not be available, authorizing completion without it. The subsequent maintainer instruction to offload heavy testing after transferring its archives, followed by the live private runner, supersedes the Aero-only host assignment. Black Glass is the selected host for the complete matched comparison; Aero retains administration and applicable exact-engine checks. This changes resource allocation, not acceptance. Separate complete comparisons on both machines remain optional. Report the actual tested machine and the absence of independent second-machine qualification; the endpoint, matched workload, controls, uncertainty, improvement objective and other release conditions remain unchanged.
+`PERF-03` — Match each arm on the same computer, engine binary/API/official mods, upstream archives, startup values, graphics/cache policy and observer. Run the complete comparison on one predeclared host; never subtract one machine's baseline from another's candidate. On 2026-10-23 the maintainer temporarily withdrew the dedicated native test host because it would not be available, authorizing completion without it. The subsequent instruction to offload heavy testing after transferring its archives, followed by the live private runner, supersedes that temporary allocation. The native execution owner runs the complete matched comparison on the declared native test host; the independent reviewer retains administration and applicable exact-engine checks. This changes resource allocation, not acceptance. Separate complete comparisons on both machines remain optional. Report the actual tested machine and the absence of independent second-machine qualification; the endpoint, matched workload, controls, uncertainty, improvement objective and other release conditions remain unchanged.
 
 Measure process start to observed response to a harmless main-menu action. Window creation, initialization logs, headless map creation/save, simulation `--benchmark`, save load and first Library open are different endpoints. Report all game startup seconds separately from the incremental MIR effect.
 
