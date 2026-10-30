@@ -262,7 +262,9 @@ function M.preflight(raw)
     if type(lab.inputs) ~= "table" then error("MIR F200 combined Bob/Angel preflight lab inputs changed: " .. name, 2) end
   end
   local armor = raw.recipe["bob-mech-armor-plate"]
-  if armor.enabled ~= false or armor.allow_productivity ~= true or not has_recipe_product(armor, "bob-mech-armor-plate") then error("MIR F200 combined Bob/Angel preflight armor route changed", 2) end
+  -- Recipe activation belongs to the foreign mod. The authored productivity
+  -- effect consumes the named product and productivity contract in either state.
+  if armor.allow_productivity ~= true or not has_recipe_product(armor, "bob-mech-armor-plate") then error("MIR F200 combined Bob/Angel preflight armor route changed", 2) end
   local tankotron, unlocked = raw.technology["bob-tankotron"], false
   for _, effect_row in ipairs(tankotron.effects or {}) do
     if type(effect_row) == "table" and effect_row.type == "unlock-recipe" and effect_row.recipe == "bob-mech-armor-plate" then unlocked = true end
