@@ -19,6 +19,10 @@ end
 -- Named bindings qualify this variant only; unrelated foreign technology is
 -- not reconstructed or certified here.
 function M.is_f200_bob_angel(active_mods)
+  -- The separately admitted F200 Space Age + BobTech selection has no
+  -- material-stage identities. Do not route a direct material consumer into
+  -- the retained no-BobTech selector or its explicit mixed-profile refusal.
+  if require("compatibility.bob_angel_f200_combined_profile").applies(active_mods) then return false end
   return require("compatibility.bob_angel_profile").applies(active_mods)
 end
 

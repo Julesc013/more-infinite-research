@@ -50,7 +50,7 @@ if ordinary_profile or modern_catalogue.is_k2_base(mods) or modern_catalogue.is_
       modern_selection.definitions[#modern_selection.definitions + 1] = definition
     end
   end
-  if modern_selection.bob_angel then
+  if modern_selection.bob_angel or modern_selection.bob_angel_f200_combined then
     gear.unit.ingredients = modern_catalogue.science_ingredients("science_automation_logistic")
     gear.prerequisites = modern_catalogue.science_names("science_automation_logistic")
   end

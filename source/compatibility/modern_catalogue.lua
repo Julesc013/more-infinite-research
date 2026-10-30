@@ -553,6 +553,11 @@ local function apply_k2_base(definitions)
 end
 
 function M.is_bob_angel(active_mods)
+  -- The F200 Space Age + BobTech profile has a separate selector and a
+  -- separate finite data-stage preflight. It must not fall through to the
+  -- no-BobTech legacy selector, whose explicit transition refusal remains
+  -- authoritative for every other mixed profile.
+  if M.bob_angel_f200_combined_profile(active_mods) ~= nil then return false end
   if type(active_mods) ~= "table" or not active_mods.bobplates or not active_mods.angelssmelting then return false end
   return require("compatibility.bob_angel_profile").applies(active_mods)
 end
@@ -568,6 +573,10 @@ end
 
 function M.bob_angel_f210_profile(active_mods)
   return require("compatibility.bob_angel_f210_profile").select(active_mods)
+end
+
+function M.bob_angel_f200_combined_profile(active_mods)
+  return require("compatibility.bob_angel_f200_combined_profile").select(active_mods)
 end
 
 local function material_definitions(stages)
@@ -756,7 +765,11 @@ function M.select(active_mods, raw)
   local recipe_patches = {}
   local profile, k2so = "base", nil
   local py = require("compatibility.py_profile").select(active_mods)
-  local bob_warfare = require("compatibility.bob_warfare_profile").applies(active_mods)
+  local bob_angel_f200_combined = M.bob_angel_f200_combined_profile(active_mods)
+  -- Bob Warfare's retained F200 selector intentionally refuses Space Age.
+  -- The combined F200 route consumes its one independently preflighted armor
+  -- identity through its own delta instead of weakening that older gate.
+  local bob_warfare = not bob_angel_f200_combined and require("compatibility.bob_warfare_profile").applies(active_mods)
   local bob_plates = require("compatibility.bob_plates_profile").select(active_mods)
   local bob_productivity = target.id == "f210" and type(active_mods) == "table"
     and active_mods.bobplates ~= nil and active_mods.bobrevamp ~= nil
@@ -795,6 +808,16 @@ function M.select(active_mods, raw)
     definitions, delta = apply_space_age(definitions)
     for index = 1, #delta.recipe_patches do recipe_patches[index] = delta.recipe_patches[index] end
     profile = "space-age"
+  end
+  if bob_angel_f200_combined then
+    local delta = require("compatibility.modern_catalogue.bob_angel_f200_combined")
+    local retained = {}
+    for _, definition in ipairs(definitions) do
+      if delta.omit[definition.key] ~= true then retained[#retained + 1] = definition end
+    end
+    definitions = retained
+    apply_authored_definitions(definitions, delta)
+    profile = "bob-angel-space-age-bobtech-f200"
   end
   if k2_base and target.id == "f200" then
     apply_k2_base(definitions)
@@ -922,7 +945,8 @@ function M.select(active_mods, raw)
     native_owners = M.native_owners(active_mods), recipe_patches = recipe_patches,
     k2_imersite = k2so and k2so.imersite or false,
     k2_imersite_carriers = target.id == "f210" and k2_base,
-    bob_angel = bob_angel, bob_core = bob_core, bob_plates_profile = bob_plates,
+    bob_angel = bob_angel, bob_angel_f200_combined = bob_angel_f200_combined,
+    bob_core = bob_core, bob_plates_profile = bob_plates,
     bob_tech_materials = bob_tech_materials,
     angel_f210_profile = angel_f210, angel_materials = M.angel_material_definitions(active_mods),
     bob_angel_f210_profile = bob_angel_f210,
@@ -957,7 +981,8 @@ end
 
 local function native_modded_continuations(active_mods)
   local py = require("compatibility.py_profile").select(active_mods)
-  local bob_warfare = require("compatibility.bob_warfare_profile").applies(active_mods)
+  local bob_warfare = M.bob_angel_f200_combined_profile(active_mods) == nil
+    and require("compatibility.bob_warfare_profile").applies(active_mods)
   if not py.coal and not py.hightech and not bob_warfare then return nil end
   return require("compatibility.native_modded_continuations")
 end
@@ -1004,6 +1029,7 @@ end
 function M.continuations(active_mods, raw)
   local rows = copy(CONTINUATIONS)
   local bob_angel_f210 = M.bob_angel_f210_profile(active_mods)
+  local bob_angel_f200_combined = M.bob_angel_f200_combined_profile(active_mods)
   if M.is_bob_angel(active_mods) then
     local science = require("compatibility.modern_catalogue.bob_angel").science
     for _, row in ipairs(rows) do row.science = assert(science[row.science]) end
@@ -1083,7 +1109,7 @@ function M.continuations(active_mods, raw)
       row.effects[#row.effects + 1] = require("compatibility.ironclad").continuation_effect()
     end
   end
-  if M.retains_bob_native_continuations(active_mods) then
+  if bob_angel_f200_combined or M.retains_bob_native_continuations(active_mods) then
     local retained = {}
     for _, row in ipairs(rows) do
       if row.id ~= "inserter-capacity-bonus-8" and row.id ~= "worker-robots-storage-4" then

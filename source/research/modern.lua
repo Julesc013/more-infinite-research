@@ -465,6 +465,9 @@ function M.preflight_recipe_patches(selection, raw)
   if selection.bob_angel_f210_profile ~= nil then
     require("compatibility.modern_catalogue.bob_angel_f210").preflight(raw, selection.bob_angel_f210_profile)
   end
+  if selection.bob_angel_f200_combined ~= nil then
+    require("compatibility.modern_catalogue.bob_angel_f200_combined").preflight(raw)
+  end
 end
 
 function M.apply_recipe_patches(selection, raw)
