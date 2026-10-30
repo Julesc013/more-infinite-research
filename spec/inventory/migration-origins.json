@@ -4089,18 +4089,32 @@
           {
             "origin": "published4.7.3 F100",
             "destination": "MIR5 F110",
-            "status": "needs-correction",
-            "problem": "Enhanced0381 now has the explicit published source laser/inserter/foreign witnesses and retained23 rows;source production passes,but wrong historical reload matcher times out after the first raw passing cold witness. The source-stage two-cold continuation remains required;this requested destination itself is unexecuted.",
-            "next_action": "Reuse the same exact0381 enhanced source after a separately reviewed two-read-only-cold continuation closes it;then bind this destination to actual final package/engine/fixture and execute new useful research/save/two cold reloads. Preserve219E and all adverses;no source recreation or intermediate MIR5.",
-            "source_sha256": "219EF20F63B4A85FA2386BD50A81228B28F006D9731F24E069A657BB13F45811"
+            "status": "closed",
+            "problem": "Reviewed retained0381 passes two fresh read-only source colds,then direct1.1.110/B7B4/B2508 destination passes23 retained rows,laser2.2,inserter2/stack4,42percent queue/27percent suspended work,foreign disablement,one new useful mining lab and new9E0F save/two unchanged-byte cold reloads. Source enhancement seeds remain labelled;one original source lab is reused once. Root and independent raw-data/custody/CRC/restoration review pass.",
+            "next_action": "Retain exact accepted inputs and original219E. Final package consumed-path review remains separate;this does not qualify F100-to-F210,DLC/provider switches,GUI,performance or release.",
+            "source_sha256": "219EF20F63B4A85FA2386BD50A81228B28F006D9731F24E069A657BB13F45811",
+            "enhanced_source_sha256": "0381F33BAC7F229D9697C486B68B6F14D975B1D79FE5C88D7EE663EBFEE4ACA9",
+            "evidence": [
+              {
+                "path": "spec/evidence/published473-f100-f110-native-chain-r01.json",
+                "bytes": 9769,
+                "sha256": "F8AC8F7A74DD6A92AEEC42830D4B9CE018460C1615CBC11D7CC3A439F73888A3"
+              }
+            ]
           },
           {
             "origin": "published4.7.3 F100",
             "destination": "MIR5 F210",
-            "status": "needs-correction",
-            "problem": "Enhanced0381 now has the explicit published source laser/inserter/foreign witnesses and retained23 rows;source production passes,but wrong historical reload matcher times out after the first raw passing cold witness. The source-stage two-cold continuation remains required;this requested destination itself is unexecuted.",
-            "next_action": "Reuse the same exact0381 enhanced source after a separately reviewed two-read-only-cold continuation closes it;then bind this destination to actual final package/engine/fixture and execute new useful research/save/two cold reloads. Preserve219E and all adverses;no source recreation or intermediate MIR5.",
-            "source_sha256": "219EF20F63B4A85FA2386BD50A81228B28F006D9731F24E069A657BB13F45811"
+            "status": "needs-native-qualification",
+            "problem": "The shared0381 source is now qualified by two fresh read-only cold reloads. The distinct F210 destination still requires qualified execution;its fixture data-cost preflight correction and every actual adverse remain separate from source acceptance.",
+            "next_action": "Use the same qualified0381 with reviewed exact F210 package/engine/fixture/controller and a fresh output. Correct the target-specific fixture preflight before the direct endpoint. Only an actual native save-format refusal permits a separately reviewed published4.7.11003 F110 bridge;no source recreation,intermediateMIR5,adverse pooling or assertion relaxation.",
+            "source_sha256": "219EF20F63B4A85FA2386BD50A81228B28F006D9731F24E069A657BB13F45811",
+            "enhanced_source_sha256": "0381F33BAC7F229D9697C486B68B6F14D975B1D79FE5C88D7EE663EBFEE4ACA9",
+            "source_qualification_evidence": {
+              "path": "spec/evidence/published473-f100-f110-native-chain-r01.json",
+              "bytes": 9769,
+              "sha256": "F8AC8F7A74DD6A92AEEC42830D4B9CE018460C1615CBC11D7CC3A439F73888A3"
+            }
           },
           {
             "origin": "published4.7.3 F110",
@@ -4149,9 +4163,9 @@
             ]
           }
         ],
-        "final_package_review": "Required separately for every named route after final freeze. CandidateB package/member readback and bounded prior-result applicability are recorded in spec/evidence/support-exports-coherent17-aero-reproduction-r01.json and spec/evidence/support-exports-consumed-path-applicability-aero-r01.json;affected modern header/export/lifecycle and performance observations remain. The direct F110-to-F210 journey is now closed at its exact B637/8DC inputs;neither of the two still-missing F100-origin journeys is deferred. Fixture/packet preparation is not a native pass or authorization to occupy more than the sole admitted native lane.",
+        "final_package_review": "Required separately for every named route after final freeze. CandidateB package/member readback and bounded prior-result applicability are recorded in spec/evidence/support-exports-coherent17-aero-reproduction-r01.json and spec/evidence/support-exports-consumed-path-applicability-aero-r01.json;affected modern header/export/lifecycle and performance observations remain. The direct F110-to-F210 journey is now closed at its exact B637/8DC inputs;the direct F100-to-F110 journey is also closed and the remaining F100-to-F210 journey is not deferred. Fixture/packet preparation is not a native pass or authorization to occupy more than the sole admitted native lane.",
         "enhanced_f100_source_preparation": {
-          "status": "generated-closed-save-source-protocol-adverse-two-cold-continuation-required",
+          "status": "qualified-retained-source-two-read-only-cold-continuation",
           "original_sha256": "219EF20F63B4A85FA2386BD50A81228B28F006D9731F24E069A657BB13F45811",
           "enhanced_sha256": "0381F33BAC7F229D9697C486B68B6F14D975B1D79FE5C88D7EE663EBFEE4ACA9",
           "enhanced_bytes": 674766,
@@ -4162,7 +4176,18 @@
             "bytes": 8675,
             "sha256": "25A4900E31BD6C7D01D1C814F067BE2E261A3F242C72DB2B6CCCDBBC3B1F6057"
           },
-          "required": "Correct only prospective historical reload matcher,then independently qualify two fresh read-only colds of0381. Preserve the old timeout;do not reseed/recreate or count its reload as accepted. Neither destination journey has run."
+          "required": "Preserve exact0381 and original219E plus all prior adverses. Source production is not recreated;the direct F110 destination is closed and F210 remains separate open qualification.",
+          "qualification_evidence": {
+            "path": "spec/evidence/published473-f100-f110-native-chain-r01.json",
+            "bytes": 9769,
+            "sha256": "F8AC8F7A74DD6A92AEEC42830D4B9CE018460C1615CBC11D7CC3A439F73888A3"
+          },
+          "accepted_cold_pids": [
+            80668,
+            2172
+          ],
+          "accepted_colds": 2,
+          "prior_adverse_colds_accepted": 0
         }
       },
       "permitted_limits": [
