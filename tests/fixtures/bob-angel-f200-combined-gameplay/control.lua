@@ -55,14 +55,31 @@ end
 local function entry_name(value) return type(value) == "table" and (value.name or value[1]) or nil end
 local function entry_amount(value) return type(value) == "table" and (value.amount or value[2]) or nil end
 
-local function exact_rows(actual, expected, label)
+local function zero_optional(value)
+  return value == nil or (type(value) == "number" and value == 0)
+end
+local function exact_rows(actual, expected, label, kind)
+  kind = kind or "ingredient"
   if type(actual) ~= "table" or #actual ~= #expected then fail(label .. " count differs") end
   for index, wanted in ipairs(expected) do
     local got = actual[index]
-    if type(got) ~= "table" or entry_name(got) ~= wanted.name or entry_amount(got) ~= wanted.amount
-        or (got.type or "item") ~= wanted.type or got.probability ~= nil or got.amount_min ~= nil
-        or got.amount_max ~= nil or got.extra_count_fraction ~= nil or got.independent_probability ~= nil
-        or got.ignored_by_productivity ~= nil or got.ignored_by_stats ~= nil then
+    if type(got) ~= "table" then fail(label .. " differs at " .. tostring(index)) end
+    local type_ok = got.type == wanted.type or (kind == "research" and got.type == nil and wanted.type == "item")
+    local probability_ok = (kind == "product" and got.probability == 1) or (kind ~= "product" and got.probability == nil)
+    local defaults_ok
+    if kind == "product" then
+      defaults_ok = zero_optional(got.extra_count_fraction) and zero_optional(got.ignored_by_productivity)
+        and zero_optional(got.ignored_by_stats) and zero_optional(got.percent_spoiled)
+    elseif kind == "ingredient" then
+      defaults_ok = zero_optional(got.ignored_by_stats) and got.extra_count_fraction == nil
+        and got.ignored_by_productivity == nil and got.percent_spoiled == nil
+    else
+      defaults_ok = got.ignored_by_stats == nil and got.extra_count_fraction == nil
+        and got.ignored_by_productivity == nil and got.percent_spoiled == nil
+    end
+    if entry_name(got) ~= wanted.name or entry_amount(got) ~= wanted.amount or not type_ok
+        or not probability_ok or not defaults_ok or got.amount_min ~= nil or got.amount_max ~= nil
+        or got.independent_probability ~= nil then
       fail(label .. " differs at " .. tostring(index))
     end
   end
@@ -128,7 +145,7 @@ local function target(force)
   exact_prerequisites(value)
   exact_rows(value.research_unit_ingredients, {
     {type="item", name=SCIENCE[1], amount=1}, {type="item", name=SCIENCE[2], amount=1},
-  }, "steel research science")
+  }, "steel research science", "research")
   exact_effects(value)
   return value
 end
@@ -136,12 +153,12 @@ end
 local function route(force, expected_bonus)
   local prototype = prototypes.recipe[ROUTE]
   if prototype == nil or prototype.name ~= ROUTE or not close(prototype.energy, .5)
-      or prototype.allow_productivity ~= true then
+      or prototype.category ~= "advanced-crafting" then
     fail("steel physical route identity differs")
   end
-  exact_names(prototype.categories, {"advanced-crafting"}, "steel physical category")
+  exact_names(prototype.additional_categories, {}, "steel physical additional category")
   exact_rows(prototype.ingredients, {{type="item", name=ROLL, amount=1}}, "steel physical input")
-  exact_rows(prototype.products, {{type="item", name=PLATE, amount=4}}, "steel physical output")
+  exact_rows(prototype.products, {{type="item", name=PLATE, amount=4}}, "steel physical output", "product")
   local value = force.recipes[ROUTE]
   if value == nil or value.valid == false or value.enabled ~= true
       or not close(value.productivity_bonus, expected_bonus) then
@@ -182,9 +199,12 @@ local function create_labs(force)
     local value = surface.create_entity{name="biolab", position={((index-1)%10)*7, math.floor((index-1)/10)*7}, force=force}
     local conditions = value and value.prototype and value.prototype.surface_conditions
     if value == nil or value.valid == false or value.prototype == nil or value.prototype.name ~= "biolab"
-        or not close(value.prototype.researching_speed, 2) or value.prototype.science_pack_drain_rate_percent ~= 50
+        or value.quality == nil or value.quality.name ~= "normal"
+        or type(value.prototype.get_researching_speed) ~= "function"
+        or not close(value.prototype.get_researching_speed(value.quality.name), 2)
+        or value.prototype.science_pack_drain_rate_percent ~= 50
         or value.prototype.module_inventory_size ~= 4 or value.prototype.allowed_module_categories == nil
-        or value.prototype.allowed_module_categories["quality"] ~= true or value.quality == nil or value.quality.name ~= "normal"
+        or value.prototype.allowed_module_categories["quality"] ~= true
         or type(conditions) ~= "table" or #conditions ~= 1 or conditions[1].property ~= "pressure"
         or conditions[1].min ~= 1000 or conditions[1].max ~= 1000
         or not has_lab_input(value.prototype.lab_inputs, SCIENCE[1])
@@ -260,7 +280,10 @@ local function setup_physical(state)
   local force, surface = game.forces.player, game.surfaces[1]
   local machine = surface.create_entity{name="assembling-machine-1", position={0, 84}, force=force}
   if machine == nil or machine.valid == false or machine.prototype == nil or machine.prototype.name ~= "assembling-machine-1"
-      or not close(machine.prototype.crafting_speed, .5) or machine.prototype.crafting_categories["advanced-crafting"] ~= true then
+      or machine.quality == nil or machine.quality.name ~= "normal"
+      or type(machine.prototype.get_crafting_speed) ~= "function"
+      or not close(machine.prototype.get_crafting_speed(machine.quality.name), .5)
+      or machine.prototype.crafting_categories["advanced-crafting"] ~= true then
     fail("unchanged assembling-machine-1 differs")
   end
   local modules = machine.get_inventory(defines.inventory.crafter_modules)

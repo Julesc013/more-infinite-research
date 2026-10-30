@@ -213,7 +213,7 @@ class CombinedSteelGameplayFixtureTests(unittest.TestCase):
             create_entity=function(spec)
               if spec.name=="biolab" then
                 local input=inventory();local lab={valid=true,name="biolab",energy=0,quality={name=opponent=="quality" and "uncommon" or "normal"},
-                  prototype={name="biolab",researching_speed=2,science_pack_drain_rate_percent=opponent=="drain" and 100 or 50,module_inventory_size=4,
+                  prototype={name="biolab",get_researching_speed=opponent~="lab-speed-missing" and function(quality) assert(quality=="normal");if opponent=="lab-speed-nil" then return nil end;return opponent=="lab-speed" and 1 or 2 end or nil,science_pack_drain_rate_percent=opponent=="drain" and 100 or 50,module_inventory_size=4,
                     allowed_module_categories={quality=true},surface_conditions={{property="pressure",min=opponent=="surface" and 999 or 1000,max=1000}},
                     lab_inputs=opponent=="lab-input" and {"automation-science-pack"} or (opponent=="lab-input-table" and {{name="automation-science-pack"},{name="logistic-science-pack"}} or {"automation-science-pack","logistic-science-pack"})},
                   get_inventory=function(index) if index==1 then return input end return nil end}
@@ -221,8 +221,8 @@ class CombinedSteelGameplayFixtureTests(unittest.TestCase):
               end
               assert(spec.name=="assembling-machine-1")
               local input, output=inventory(),inventory()
-              machine={valid=true,name="assembling-machine-1",energy=0,crafting_progress=0,bonus_progress=0,productivity_bonus=.1,
-                prototype={name="assembling-machine-1",crafting_speed=.5,crafting_categories={ ["advanced-crafting"]=opponent~="category" }},
+              machine={valid=true,name="assembling-machine-1",quality={name=opponent=="machine-quality" and "uncommon" or "normal"},energy=0,crafting_progress=0,bonus_progress=0,productivity_bonus=.1,
+                prototype={name="assembling-machine-1",get_crafting_speed=opponent~="machine-speed-missing" and function(quality) assert(quality=="normal");return opponent=="machine-speed" and .6 or .5 end or nil,crafting_categories={ ["advanced-crafting"]=opponent~="category" }},
                 get_inventory=function(index) if index==4 then return input elseif index==5 then return output end return nil end,
                 set_recipe=function(name) machine.recipe=name end,get_recipe=function() return machine.recipe and {name=machine.recipe} or nil end}
               return machine
@@ -233,12 +233,24 @@ class CombinedSteelGameplayFixtureTests(unittest.TestCase):
               on_event=function(event,callback)callbacks.events[event]=callback end},
             remote={add_interface=function(name,value) interfaces[name]=value end},
             defines={events={on_tick=1,on_research_finished=2},inventory={lab_input=1,lab_modules=2,crafter_modules=3,crafter_input=4,crafter_output=5}},
-            prototypes={recipe={[route_name]={name=route_name,energy=.5,allow_productivity=true,categories={"advanced-crafting"},
-              ingredients={{type="item",name="angels-roll-steel",amount=1}},products={{type="item",name="steel-plate",amount=4}}}}},
+            prototypes={recipe={[route_name]={name=route_name,energy=.5,category=opponent=="route-category" and "crafting" or "advanced-crafting",additional_categories=opponent=="route-additional-category" and {"crafting"} or {},
+              ingredients={{type="item",name="angels-roll-steel",amount=1}},products={{type="item",name="steel-plate",amount=4,probability=1,extra_count_fraction=0,ignored_by_productivity=0,ignored_by_stats=0,percent_spoiled=0}}}}},
             game={tick=1,speed=1,forces={player=force},surfaces={[1]=surface},server_save=function(name)assert(name=="mir5-native-complete");saves=saves+1 end},
             storage={},helpers={table_to_json=function(value) assert(value.case=="bob-angel-f200-combined-gameplay");return "{}" end},
             log=function(value)assert(value:match("^%[MIR5_NATIVE_FIXTURE%] RESULT "));logs=logs+1 end,
           }
+          local native_product=environment.prototypes.recipe[route_name].products[1]
+          environment.prototypes.recipe[route_name].ingredients[1].ignored_by_stats=opponent=="ingredient-ignored" and 1 or 0
+          if opponent=="product-probability" then native_product.probability=.5 end
+          if opponent=="product-probability-missing" then native_product.probability=nil end
+          if opponent=="product-extra" then native_product.extra_count_fraction=.1 end
+          if opponent=="product-ignored" then native_product.ignored_by_productivity=1 end
+          if opponent=="product-stats" then native_product.ignored_by_stats=1 end
+          if opponent=="product-spoiled" then native_product.percent_spoiled=.1 end
+          if opponent=="product-optional-omitted" then
+            native_product.extra_count_fraction=nil;native_product.ignored_by_productivity=nil
+            native_product.ignored_by_stats=nil;native_product.percent_spoiled=nil
+          end
           environment._G=environment;setmetatable(environment,{__index=function(_,key)return _G[key] end})
           local loaded=pcall(assert(loadfile(fixture_path,"t",environment)))
           local init_ok,init_message=pcall(callbacks.init)
@@ -300,6 +312,17 @@ class CombinedSteelGameplayFixtureTests(unittest.TestCase):
         self.assertFalse(result["report"]["library_stage"]["input_simulation"])
         self.assertFalse(result["report"]["library_stage"]["base_or_space_age_claim"])
 
+    def test_runtime_product_optional_zero_defaults_do_not_change_the_fixed_output(self):
+        result = self.runtime_protocol("product-optional-omitted")
+        self.assertTrue(result["loaded"])
+        self.assertTrue(result["init_ok"])
+        self.assertTrue(result["physical_ok"])
+        self.assertTrue(result["load_one"])
+        self.assertTrue(result["reload_one"])
+        self.assertTrue(result["load_two"])
+        self.assertTrue(result["reload_two"])
+        self.assertEqual((440, "complete"), (result["output"], result["phase"]))
+
     def test_runtime_refuses_independent_row_lab_owner_or_machine_drift_before_success(self):
         for opponent, phrase in (
             ("effect", "steel productivity effects differ"),
@@ -308,6 +331,21 @@ class CombinedSteelGameplayFixtureTests(unittest.TestCase):
             ("drain", "native biolab differs"),
             ("lab-input", "native biolab differs"),
             ("lab-input-table", "native lab input type differs"),
+            ("lab-speed-missing", "native biolab differs"),
+            ("lab-speed-nil", "native biolab differs"),
+            ("lab-speed", "native biolab differs"),
+            ("route-category", "steel physical route identity differs"),
+            ("product-probability", "steel physical output differs"),
+            ("product-probability-missing", "steel physical output differs"),
+            ("product-extra", "steel physical output differs"),
+            ("product-ignored", "steel physical output differs"),
+            ("product-stats", "steel physical output differs"),
+            ("product-spoiled", "steel physical output differs"),
+            ("ingredient-ignored", "steel physical input differs"),
+            ("route-additional-category", "steel physical additional category count differs"),
+            ("machine-speed-missing", "unchanged assembling-machine-1 differs"),
+            ("machine-speed", "unchanged assembling-machine-1 differs"),
+            ("machine-quality", "unchanged assembling-machine-1 differs"),
             ("quality", "native biolab differs"),
             ("surface", "native biolab differs"),
             ("owner-preseed", "named upstream prerequisite was pre-researched"),
@@ -318,7 +356,7 @@ class CombinedSteelGameplayFixtureTests(unittest.TestCase):
             with self.subTest(opponent=opponent):
                 result = self.runtime_protocol(opponent)
                 self.assertTrue(result["loaded"])
-                if opponent in ("effect", "ingredients-count", "ingredients-order", "drain", "lab-input", "lab-input-table", "quality", "surface", "owner-preseed", "route-enabled", "owner"):
+                if opponent in ("effect", "ingredients-count", "ingredients-order", "drain", "lab-input", "lab-input-table", "lab-speed-missing", "lab-speed-nil", "lab-speed", "route-category", "route-additional-category", "product-probability", "product-probability-missing", "product-extra", "product-ignored", "product-stats", "product-spoiled", "ingredient-ignored", "quality", "surface", "owner-preseed", "route-enabled", "owner"):
                     self.assertFalse(result["init_ok"])
                 else:
                     self.assertTrue(result["init_ok"])
