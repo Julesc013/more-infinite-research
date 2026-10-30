@@ -32,7 +32,8 @@ Version: 5.0.0
     - Restore missing research with the supported Space Age, Bob's Tech and Angel's combination on Factorio 2.0.
     - Preserve disabled oil-cracking research and match science-pack productivity research to the supported Bob's/Angel's laboratory
       inputs and progression.
-    - Preserve Ironclad mortar shooting speed when dedicated weapon research is disabled or overlapping research is retained.
+    - Preserve Ironclad mortar shooting speed and native weapon categories when dedicated weapon research is disabled or overlapping
+      research is retained.
     - Restore sulfur and sulfuric-acid research with Bob's mods on Factorio 2.1.
     - Keep separate finite and infinite material research, recipe ownership and hidden Imersite recovery research where supported.
     - Keep both existing runtime integration interfaces available for other mods.
