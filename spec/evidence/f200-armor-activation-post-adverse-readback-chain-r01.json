@@ -1,0 +1,399 @@
+{
+  "schema": 1,
+  "kind": "MIRF200ArmorActivationPostAdverseReadbackChainV1",
+  "status": "post-adverse-independent-data-settings-readback-passed-original-controller-adverse-retained",
+  "scope": "Post-adverse read-only reanalysis of the already captured F200/2.0.77 armor activation data stage only.",
+  "original_execution": {
+    "packet": {
+      "path": "controller/packet-r12.json",
+      "bytes": 23538,
+      "sha256": "55D473F6C1086BF0477BEA435960EB304466131E1F95B340FBD16F9D3790869A",
+      "kind": "MIRF200ArmorActivationPacketV1",
+      "status": "declared-not-executed"
+    },
+    "terminal": {
+      "path": "controller/execution-record/terminal.json",
+      "bytes": 12066,
+      "sha256": "4507FF178459D4B1DF29D875197017582E9BC9B7163DA706EE13B851B6F83956",
+      "status": "adverse",
+      "exception": "[f200-armor-activation] reader refused captured results",
+      "factorio_processes_after": 0
+    },
+    "caller": {
+      "raw_git_spec": "c9c7f2730d152911bfc002c55b9257fc841aa516:Invoke-F200ArmorActivation.ps1",
+      "source_commit": "c9c7f2730d152911bfc002c55b9257fc841aa516",
+      "bytes": 29088,
+      "sha256": "CEB0EF7F4FF02EAE589A87F897BCE0017C42F208B68E4D1EBE62357119E5ACD0"
+    },
+    "reader": {
+      "path": "private/raw-git/c9c7f2730d152911bfc002c55b9257fc841aa516/read_f200_armor_activation.py",
+      "source_commit": "c9c7f2730d152911bfc002c55b9257fc841aa516",
+      "bytes": 14163,
+      "sha256": "14C50C7DD190A6F59065BFAFE5529B82B02DFCC88EBA42D151F477016F269915"
+    },
+    "public_head": "82fae1c9edb56544d3c976ab838eff9ffde2bf87",
+    "engine": {
+      "path": "D:\\Games\\Factorio\\2.0\\bin\\x64\\factorio.exe",
+      "bytes": 43530192,
+      "sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B",
+      "version": "2.0.77"
+    },
+    "profile": {
+      "path": "D:\\Projects\\Factorio\\mir5-f200-armor-activation-r01\\tests\\profiles\\bob-angel-enabled-armor-f200-2077.json",
+      "bytes": 7623,
+      "sha256": "4AAC407EAEA7450B3B812074EB4C4311CA6AEC16B2EA6B54BAA789FADF624DF1",
+      "raw_git_bytes": 7623,
+      "raw_git_sha256": "4AAC407EAEA7450B3B812074EB4C4311CA6AEC16B2EA6B54BAA789FADF624DF1",
+      "source_commit": "82fae1c9edb56544d3c976ab838eff9ffde2bf87"
+    }
+  },
+  "actual_arms": [
+    {
+      "id": "control-without-mir",
+      "process_id": 9744,
+      "exit_code": 0,
+      "status": "completed-data-stage-observation-only",
+      "candidate": "NoMIR",
+      "result": {
+        "path": "native-captures/control-without-mir/result.json",
+        "bytes": 38592,
+        "sha256": "11F8E28984295D06249C851FE3F12980733156A260C89AF632705D05F6BB5FF2"
+      }
+    },
+    {
+      "id": "original-guard-refusal",
+      "process_id": 76108,
+      "exit_code": 1,
+      "status": "expected-original-native-armor-guard-refusal",
+      "candidate": {
+        "bytes": 704721,
+        "sha256": "8C93C7063B75E0811D1D27036F3596C05EE0A5A965BC259D276160F91D6274BB"
+      },
+      "message": "MIR F200 combined Bob/Angel preflight armor route changed",
+      "result": {
+        "path": "native-captures/original-guard-refusal/result.json",
+        "bytes": 32557,
+        "sha256": "A0B79248EAFCE606EA29A6200BAC3E8A3CC7BC043C3B5B947C54757CEB778BE6"
+      }
+    },
+    {
+      "id": "candidate-corrected",
+      "process_id": 55564,
+      "exit_code": 0,
+      "status": "completed-data-stage-observation-only",
+      "candidate": {
+        "bytes": 704823,
+        "sha256": "0AB0B0460DF34C917C3F9DB7E49FFBCAADA4FE1A52464FD8F5F1DBC3E73BEF4E"
+      },
+      "result": {
+        "path": "native-captures/candidate-corrected/result.json",
+        "bytes": 39749,
+        "sha256": "7A777C055FCA8C42F73180FEDD63F70294EEA045A49993C83AF2D5A3868682C3"
+      }
+    }
+  ],
+  "corrected_read_only_reader": {
+    "path": "private/raw-git/ed57a4497eff06dba563e17ac7146200c563becf/read_f200_armor_activation.py",
+    "source_commit": "ed57a4497eff06dba563e17ac7146200c563becf",
+    "bytes": 15372,
+    "sha256": "19CFE6F8799199D2C30C487D92E18C290B1913C73BFF4E09231F28591BA97F42",
+    "readback": {
+      "path": "controller/root-corrected-relative-settings-reader-r03.json",
+      "bytes": 880,
+      "sha256": "93677189CF1E94FF6642D4F78071478CDE03E80B467E720E4F8305A0F7DF3A2C",
+      "status": "verified-data-stage-regression-only"
+    }
+  },
+  "verified_data_settings": {
+    "independent_actual_data_review": "passed-limited-post-adverse-readback",
+    "corrected_candidate": {
+      "public_technology_rows": 69,
+      "private_credit_rows": 28,
+      "settings_rows": 875,
+      "fixture_recipe_enabled": true
+    },
+    "settings_policy": {
+      "source": "tests/test_bob_angel_f200_combined_profile.py:290-314 at public head 82fae1c9edb56544d3c976ab838eff9ffde2bf87",
+      "oracle": {
+        "path": "D:\\Projects\\Factorio\\mir5-f200-armor-activation-r01\\tests\\fixtures\\bob-angel-f200-combined-published-473-expectations.json.gz",
+        "bytes": 127685,
+        "sha256": "B80EDB79ABE75F3A19A3D7BD2B9CAB43343807D405C9E474E93219D542EDE633",
+        "raw_git_bytes": 127685,
+        "raw_git_sha256": "B80EDB79ABE75F3A19A3D7BD2B9CAB43343807D405C9E474E93219D542EDE633",
+        "source_commit": "82fae1c9edb56544d3c976ab838eff9ffde2bf87"
+      },
+      "rules": [
+        "drop observer metadata targets",
+        "dormant material hidden",
+        "growth cap 1000",
+        "all other keys exact after original-oracle validation"
+      ]
+    },
+    "derived_serializations": []
+  },
+  "custody": {
+    "native": {
+      "original_and_copy_members_verified": 26,
+      "bytes_per_copy": 130308818,
+      "manifest": {
+        "source": "D:\\Projects\\Factorio\\mir5-f200-armor-activation-r01\\build\\tmp\\f200-armor-activation-r05",
+        "destination": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\f200-armor-activation-r05-controller\\native-captures",
+        "member_count": 26,
+        "members": [
+          {
+            "relative_path": "candidate-corrected/config.ini",
+            "bytes": 287,
+            "sha256": "BD69ECB9E4E8634E9BC5AA0A53A3F2F637BD46BD6007393B0C7C0CCB0560D562"
+          },
+          {
+            "relative_path": "candidate-corrected/process-1.resources.jsonl",
+            "bytes": 5686,
+            "sha256": "51A0D8E5612B0D54BD98BBF823F5578A0FECF154C716894593BC00BB00970178"
+          },
+          {
+            "relative_path": "candidate-corrected/process-1.stderr.txt",
+            "bytes": 0,
+            "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+          },
+          {
+            "relative_path": "candidate-corrected/process-1.stdout.txt",
+            "bytes": 14954,
+            "sha256": "60200F9D1404F7B553082F1100F3DFAC7E97D97D44FBC9A5BF1888DE84637213"
+          },
+          {
+            "relative_path": "candidate-corrected/result.json",
+            "bytes": 39749,
+            "sha256": "7A777C055FCA8C42F73180FEDD63F70294EEA045A49993C83AF2D5A3868682C3"
+          },
+          {
+            "relative_path": "candidate-corrected/selection.json",
+            "bytes": 3859,
+            "sha256": "E3B9C92E2098E9DFDAF45BBE8E53FEC25A748ED3709115C28B97C7BF949F4842"
+          },
+          {
+            "relative_path": "candidate-corrected/write-data/factorio-current.log",
+            "bytes": 14755,
+            "sha256": "4F018D83AD6554471724E757D3452860476DE90A58DF6E8DFC79CFF6581E4A18"
+          },
+          {
+            "relative_path": "candidate-corrected/write-data/script-output/data-raw-dump.json",
+            "bytes": 64340064,
+            "sha256": "D9912FCEA98F046572A5D24E0E74D5895D22407B65D42B881756C71A185AE5F4"
+          },
+          {
+            "relative_path": "candidate-corrected/write-data/script-output/mod-settings-dump.json",
+            "bytes": 774815,
+            "sha256": "66CFE89EFA414B3A7F4E2A610AFF4D35A8A905FF98D360106D3A03891C92EA12"
+          },
+          {
+            "relative_path": "control-without-mir/config.ini",
+            "bytes": 287,
+            "sha256": "D8F5AC01731785A70E1EE750C7D7DB25E836125D2E2B3EF6B81BDE9047E34AED"
+          },
+          {
+            "relative_path": "control-without-mir/process-1.resources.jsonl",
+            "bytes": 5673,
+            "sha256": "485A4E461F108E60BF63279EEEF17404554A00BB99FAC6BF4DE7A17121636856"
+          },
+          {
+            "relative_path": "control-without-mir/process-1.stderr.txt",
+            "bytes": 0,
+            "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+          },
+          {
+            "relative_path": "control-without-mir/process-1.stdout.txt",
+            "bytes": 14641,
+            "sha256": "0FABDE879ACD37E609B485F124F5BA58E35580170DECA3543CFC5DC4849BEBC9"
+          },
+          {
+            "relative_path": "control-without-mir/result.json",
+            "bytes": 38592,
+            "sha256": "11F8E28984295D06249C851FE3F12980733156A260C89AF632705D05F6BB5FF2"
+          },
+          {
+            "relative_path": "control-without-mir/selection.json",
+            "bytes": 3749,
+            "sha256": "38D4F51E36A62DBEB472659084371F2F96331881ED796BD4F9CAB95777325599"
+          },
+          {
+            "relative_path": "control-without-mir/write-data/factorio-current.log",
+            "bytes": 14446,
+            "sha256": "D6BE0019EA70316C2730C663117E2A8ABA78CDC34179098726C67F80302EF7C6"
+          },
+          {
+            "relative_path": "control-without-mir/write-data/script-output/data-raw-dump.json",
+            "bytes": 64158856,
+            "sha256": "CD0CC1295BE5EE83163AA974D2E9D6C647C9B1A0DD5FEACB1A6476939AAB9DFC"
+          },
+          {
+            "relative_path": "control-without-mir/write-data/script-output/mod-settings-dump.json",
+            "bytes": 36794,
+            "sha256": "535503C6116EC6054AB1FE0EB2B30316DE945ACF497C5D2D9E1328140C36578F"
+          },
+          {
+            "relative_path": "original-guard-refusal/config.ini",
+            "bytes": 290,
+            "sha256": "3A04120D289830CFA776125B9EB072ABEF864F2C6328ED1333F93DDD499196DE"
+          },
+          {
+            "relative_path": "original-guard-refusal/process-1.resources.jsonl",
+            "bytes": 3256,
+            "sha256": "5554C1D7DF65A60B91027FEEEC6E3ABA2F2A7F9F70F67F7241E691C843D35294"
+          },
+          {
+            "relative_path": "original-guard-refusal/process-1.stderr.txt",
+            "bytes": 0,
+            "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+          },
+          {
+            "relative_path": "original-guard-refusal/process-1.stdout.txt",
+            "bytes": 13760,
+            "sha256": "632C4C73A233B25E972C10FE96F328470D6B6DD670C887F087936ECC54247A27"
+          },
+          {
+            "relative_path": "original-guard-refusal/result.json",
+            "bytes": 32557,
+            "sha256": "A0B79248EAFCE606EA29A6200BAC3E8A3CC7BC043C3B5B947C54757CEB778BE6"
+          },
+          {
+            "relative_path": "original-guard-refusal/selection.json",
+            "bytes": 3859,
+            "sha256": "E3B9C92E2098E9DFDAF45BBE8E53FEC25A748ED3709115C28B97C7BF949F4842"
+          },
+          {
+            "relative_path": "original-guard-refusal/write-data/factorio-current.log",
+            "bytes": 13074,
+            "sha256": "FF4697DE111730FA2DEBF89A0210ABED3D2F5B68F1298692A3B58D4EA5D2AAD4"
+          },
+          {
+            "relative_path": "original-guard-refusal/write-data/script-output/mod-settings-dump.json",
+            "bytes": 774815,
+            "sha256": "66CFE89EFA414B3A7F4E2A610AFF4D35A8A905FF98D360106D3A03891C92EA12"
+          }
+        ]
+      },
+      "omitted_full_data_raw_bodies": [
+        {
+          "path": "native-captures/candidate-corrected/write-data/script-output/data-raw-dump.json",
+          "bytes": 64340064,
+          "sha256": "D9912FCEA98F046572A5D24E0E74D5895D22407B65D42B881756C71A185AE5F4",
+          "reason": "full data-raw dump retained in original and copied custody; excluded from text-only capsule"
+        },
+        {
+          "path": "native-captures/control-without-mir/write-data/script-output/data-raw-dump.json",
+          "bytes": 64158856,
+          "sha256": "CD0CC1295BE5EE83163AA974D2E9D6C647C9B1A0DD5FEACB1A6476939AAB9DFC",
+          "reason": "full data-raw dump retained in original and copied custody; excluded from text-only capsule"
+        }
+      ]
+    },
+    "controller": {
+      "original_and_copy_members_verified": 7,
+      "bytes_per_copy": 1111736,
+      "manifest": {
+        "source": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\f200-armor-activation-r05-controller\\execution-record",
+        "destination": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\f200-armor-activation-r05-controller\\controller-captures",
+        "member_count": 7,
+        "members": [
+          {
+            "relative_path": "before.json",
+            "bytes": 893,
+            "sha256": "B0D07BB750491B2545ED207DDE7E69B438CB36D01266FCD74E21C451B5599855"
+          },
+          {
+            "relative_path": "candidate-corrected/prior-archives-f200-armor-activation-r01/more-infinite-research_5.0.20000.zip.B67FF048860F2707579CF582C933ED46D7BF52769F5ABE1B0279DDCC2A0323BD.zip",
+            "bytes": 553231,
+            "sha256": "B67FF048860F2707579CF582C933ED46D7BF52769F5ABE1B0279DDCC2A0323BD"
+          },
+          {
+            "relative_path": "original-guard-readback.json",
+            "bytes": 259,
+            "sha256": "DE0E4578A3D181E53467904EBF36442AF8BBACC97CD1506A7BCD09C20542A947"
+          },
+          {
+            "relative_path": "original-guard-refusal/prior-archives-f200-armor-activation-r01/more-infinite-research_5.0.20000.zip.B67FF048860F2707579CF582C933ED46D7BF52769F5ABE1B0279DDCC2A0323BD.zip",
+            "bytes": 553231,
+            "sha256": "B67FF048860F2707579CF582C933ED46D7BF52769F5ABE1B0279DDCC2A0323BD"
+          },
+          {
+            "relative_path": "progress-candidate-corrected.json",
+            "bytes": 2054,
+            "sha256": "A121D88F95A561EC57C28C6A77B1C38B2C223570174FC433D67EBE5E6140D931"
+          },
+          {
+            "relative_path": "progress-control-without-mir.json",
+            "bytes": 656,
+            "sha256": "646EFFB47801E8F077F5EACF038279022367F3F0CF282D89EF03B67925E37376"
+          },
+          {
+            "relative_path": "progress-original-guard-refusal.json",
+            "bytes": 1412,
+            "sha256": "19ADBC6873A56B998F77038D4310A43A98D7758E55C2B2574100CF9CD40EFA4E"
+          }
+        ]
+      },
+      "omitted_prior_archive_bodies": [
+        {
+          "path": "controller-captures/candidate-corrected/prior-archives-f200-armor-activation-r01/more-infinite-research_5.0.20000.zip.B67FF048860F2707579CF582C933ED46D7BF52769F5ABE1B0279DDCC2A0323BD.zip",
+          "bytes": 553231,
+          "sha256": "B67FF048860F2707579CF582C933ED46D7BF52769F5ABE1B0279DDCC2A0323BD",
+          "reason": "prior incumbent archive retained in original and copied custody; excluded from text-only capsule"
+        },
+        {
+          "path": "controller-captures/original-guard-refusal/prior-archives-f200-armor-activation-r01/more-infinite-research_5.0.20000.zip.B67FF048860F2707579CF582C933ED46D7BF52769F5ABE1B0279DDCC2A0323BD.zip",
+          "bytes": 553231,
+          "sha256": "B67FF048860F2707579CF582C933ED46D7BF52769F5ABE1B0279DDCC2A0323BD",
+          "reason": "prior incumbent archive retained in original and copied custody; excluded from text-only capsule"
+        }
+      ],
+      "terminal_excluded_from_controller_custody": true
+    }
+  },
+  "prior_adverses": [
+    {
+      "id": "r08",
+      "dir": "f200-armor-activation-r01-controller",
+      "kind": "missing-caller-scope-imports",
+      "note": "No engine; helper functions were not visible at caller scope."
+    },
+    {
+      "id": "r09",
+      "dir": "f200-armor-activation-r02-controller",
+      "kind": "resource-admission-memory-refusal",
+      "note": "No native observation; a memory snapshot absent from this record remains absent. Later stale-owned-process cleanup is not attributed retrospectively as its cause."
+    },
+    {
+      "id": "r10",
+      "dir": "f200-armor-activation-r03-controller",
+      "kind": "incumbent-backup-context-refusal",
+      "note": "One NoMIR engine completed; Install-Owned then refused before either original or corrected candidate engine because executionRoot was unset. Full restoration is retained."
+    },
+    {
+      "id": "r11",
+      "dir": "f200-armor-activation-r04-controller",
+      "kind": "original-guard-outer-exception-mismatch",
+      "note": "Original guard outcome was not accepted by the outer matcher."
+    }
+  ],
+  "receipt_capsule": {
+    "path": "spec/evidence/f200-armor-activation-post-adverse-readback-receipts-r01.json.gz",
+    "bytes": 217123,
+    "sha256": "269A4FE6705A25C5F3E900C1BC9ADB488394145CD110BBC1BCCA6417B6713E4D",
+    "bodies": 54,
+    "schema": 1,
+    "gzip_mtime": 0,
+    "round_trip_verified": true
+  },
+  "limits": [
+    "The original R12 terminal remains adverse because its original reader refused the captured results.",
+    "This is an independent post-adverse data/settings readback of the same retained bytes, not a normal controller completion.",
+    "No gameplay, responsive-menu, save, performance, severe-load, semantic-parity or release-qualification verdict follows.",
+    "Complete technology rows and settings dumps remain raw retained custody; this chain emits counts and policy only, with no derived row serialization.",
+    "R08 through R11 adverse history remains retained. R09 does not gain a missing memory snapshot, and later owned stale-process cleanup is not retroactively asserted as its cause.",
+    "No native inputs, output, candidate, oracle, packet, terminal or controller record was modified for this projection."
+  ],
+  "performance_acceptance": false,
+  "gameplay_acceptance": false,
+  "menu_acceptance": false,
+  "release_qualification": false
+}
