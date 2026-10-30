@@ -17,6 +17,8 @@ local PLATES_PER_CRAFT = 4
 local NATIVE_BONUS = .1
 local EXPECTED_OUTPUT = 440
 local RESEARCH_UNITS = 8000
+local RESEARCH_UNIT_TIME_SECONDS = 60
+local RESEARCH_UNIT_ENERGY = RESEARCH_UNIT_TIME_SECONDS * 60
 local SCIENCE_PER_LAB = 40
 local EXPECTED_SCIENCE_CONSUMPTION = 4000
 local DEADLINE = 288000
@@ -135,12 +137,34 @@ local function has_lab_input(inputs, name)
   return found
 end
 
+local function scalar(value)
+  local kind = type(value)
+  if kind == "boolean" or kind == "number" or kind == "string" then return kind .. ":" .. tostring(value) end
+  return kind
+end
+
+local function target_row_observation(value)
+  local prototype = value.prototype
+  local function field(name)
+    if type(prototype) ~= "table" then return name .. "=<prototype:" .. type(prototype) .. ">" end
+    return name .. "=" .. scalar(prototype[name])
+  end
+  return table.concat({
+    "prototype_type=" .. type(prototype), field("max_level"), field("level"), field("upgrade"), field("order"),
+    "research_unit_count=" .. scalar(value.research_unit_count), "research_unit_energy=" .. scalar(value.research_unit_energy),
+  }, ";")
+end
+
 local function target(force)
   local value = technology(force, TARGET)
-  if value.prototype == nil or value.prototype.max_level ~= UINT32_MAX or value.prototype.level ~= 1
-      or value.prototype.upgrade ~= true or value.prototype.order ~= "p[research_steel]"
-      or value.research_unit_count ~= RESEARCH_UNITS or not close(value.research_unit_energy, 60) then
-    fail("complete steel technology row differs")
+  local prototype = value.prototype
+  if type(prototype) ~= "table" or type(prototype.max_level) ~= "number" or type(prototype.level) ~= "number"
+      or type(prototype.upgrade) ~= "boolean" or type(prototype.order) ~= "string"
+      or type(value.research_unit_count) ~= "number" or type(value.research_unit_energy) ~= "number"
+      or prototype.max_level ~= UINT32_MAX or prototype.level ~= 1 or prototype.upgrade ~= true
+      or prototype.order ~= "p[research_steel]" or value.research_unit_count ~= RESEARCH_UNITS
+      or not close(value.research_unit_energy, RESEARCH_UNIT_ENERGY) then
+    fail("complete steel technology row differs: " .. target_row_observation(value))
   end
   exact_prerequisites(value)
   exact_rows(value.research_unit_ingredients, {

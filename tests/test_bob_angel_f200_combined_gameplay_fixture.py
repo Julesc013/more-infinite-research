@@ -195,7 +195,7 @@ class CombinedSteelGameplayFixtureTests(unittest.TestCase):
           setmetatable(owner,{__index=function(_,key) if key=="researched" then return owner_researched end end,
             __newindex=function(_,key,value) if key=="researched" then owner_researched=value;if value and opponent~="owner" then route_recipe.enabled=true end end end})
           local research_ingredients=opponent=="ingredients-order" and {{name="logistic-science-pack",amount=1},{name="automation-science-pack",amount=1}} or {{name="automation-science-pack",amount=opponent=="ingredients-count" and 2 or 1},{name="logistic-science-pack",amount=1}}
-          local target={valid=true,name=target_name,level=1,researched=false,enabled=true,research_unit_count=8000,research_unit_energy=60,
+          local target={valid=true,name=target_name,level=1,researched=false,enabled=true,research_unit_count=8000,research_unit_energy=opponent=="energy-seconds" and 60 or 3600,
             prerequisites={{name="automation-science-pack"},{name="logistic-science-pack"}},prototype={name=target_name,level=1,upgrade=true,max_level=4294967295,order="p[research_steel]",effects={
               {type="change-recipe-productivity",recipe="angels-plate-steel",change=opponent=="effect" and .2 or .1},
               {type="change-recipe-productivity",recipe=route_name,change=.1},
@@ -325,6 +325,7 @@ class CombinedSteelGameplayFixtureTests(unittest.TestCase):
 
     def test_runtime_refuses_independent_row_lab_owner_or_machine_drift_before_success(self):
         for opponent, phrase in (
+            ("energy-seconds", "complete steel technology row differs: "),
             ("effect", "steel productivity effects differ"),
             ("ingredients-count", "steel research science differs"),
             ("ingredients-order", "steel research science differs"),
@@ -356,12 +357,23 @@ class CombinedSteelGameplayFixtureTests(unittest.TestCase):
             with self.subTest(opponent=opponent):
                 result = self.runtime_protocol(opponent)
                 self.assertTrue(result["loaded"])
-                if opponent in ("effect", "ingredients-count", "ingredients-order", "drain", "lab-input", "lab-input-table", "lab-speed-missing", "lab-speed-nil", "lab-speed", "route-category", "route-additional-category", "product-probability", "product-probability-missing", "product-extra", "product-ignored", "product-stats", "product-spoiled", "ingredient-ignored", "quality", "surface", "owner-preseed", "route-enabled", "owner"):
+                if opponent in ("energy-seconds", "effect", "ingredients-count", "ingredients-order", "drain", "lab-input", "lab-input-table", "lab-speed-missing", "lab-speed-nil", "lab-speed", "route-category", "route-additional-category", "product-probability", "product-probability-missing", "product-extra", "product-ignored", "product-stats", "product-spoiled", "ingredient-ignored", "quality", "surface", "owner-preseed", "route-enabled", "owner"):
                     self.assertFalse(result["init_ok"])
                 else:
                     self.assertTrue(result["init_ok"])
                     self.assertFalse(result["research_tick"])
                 self.assertIn(phrase, result["message"])
+                if opponent == "energy-seconds":
+                    for detail in (
+                        "prototype_type=table",
+                        "max_level=number:4294967295",
+                        "level=number:1",
+                        "upgrade=boolean:true",
+                        "order=string:p[research_steel]",
+                        "research_unit_count=number:8000",
+                        "research_unit_energy=number:60",
+                    ):
+                        self.assertIn(detail, result["message"])
                 self.assertEqual((0, 0), (result["logs"] or 0, result["saves"] or 0))
 
     def test_on_load_refuses_missing_storage_only_witness_without_game_access(self):
