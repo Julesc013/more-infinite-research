@@ -36,9 +36,14 @@ local function player(index)
   if not valid(value) then fail("observed player is absent") end
   return value
 end
+local function client_role(p)
+  if p.name=="MIR5English" then return "en" end
+  if p.name=="MIR5Deutsch" then return "de" end
+  fail("unexpected native client name")
+end
 local function pair()
   local s=state();local en,de=player(s.en_index),player(s.de_index)
-  if not en.connected or not de.connected or en.locale~="en" or de.locale~="de" or en==de
+  if client_role(en)~="en" or client_role(de)~="de" or not en.connected or not de.connected or en.locale~="en" or de.locale~="de" or en==de
       or en.force~=game.forces.player or de.force~=en.force then fail("actual EN/DE pair differs") end
   local count=0;for _ in pairs(game.connected_players) do count=count+1 end
   if count~=2 then fail("exactly two connected native clients are required") end
@@ -168,10 +173,15 @@ local function geometry(p)
 end
 local function report()
   local s=storage[KEY];if type(s)~="table" then return nil end
+  local en=s.en_index~=nil and game.get_player(s.en_index) or nil
+  local de=s.de_index~=nil and game.get_player(s.de_index) or nil
   return {schema=1,case="library-native-input-imported110",phase=s.phase,tick=game.tick,
     actual_joins=s.joins,actual_text_events=s.text_events,actual_library_closed_events=s.closed_events,
     actual_drag_events=s.drag_events,actual_effect_reset_events=s.reset_events,requested_native_resets=s.requested_resets,actual_removed_events=s.removed_events,
     private_queries=s.private_queries,en_index=s.en_index or false,de_index=s.de_index or false,
+    en_name=valid(en) and en.name or false,de_name=valid(de) and de.name or false,
+    en_locale=valid(en) and en.locale or false,de_locale=valid(de) and de.locale or false,
+    en_connected=valid(en) and en.connected or false,de_connected=valid(de) and de.connected or false,
     removed_index=s.removed_index or false,readonly_imported_probe=s.imported_probe_verified==true,
     imported_earnings=true,fixture_seeds_credit=false,load_observed=loaded_restart,
     en_geometry=s.en_index and geometry(game.get_player(s.en_index)) or nil,
@@ -265,9 +275,9 @@ local function advance(step)
   log("[MIR5_LIBRARY_NATIVE_INPUT] "..helpers.table_to_json(report()))
   return report()
 end
--- The separate0.2 observer reuses only these independent protected-save
--- assertions. Frozen0.1 keyboard/drag packets keep their original behavior.
-if script.active_mods["mir-fixture-mir5-library-native-input"] == "0.2.0" then
+-- The separate0.4 observer reuses only these independent protected-save assertions.
+-- Original0.1/0.2 sources and packets remain pinned by their historical records.
+if script.active_mods["mir-fixture-mir5-library-native-input"] == "0.4.0" then
   require("support-exports").register({key=KEY,interface=INTERFACE,world=world,assert_world=assert_world,
     imported=check_imported_literals,historical_fixture=historical.fixture})
   return
@@ -279,26 +289,29 @@ script.on_init(function()
   if not expected or script.active_mods["more-infinite-research"]~=expected.mir
       or script.active_mods[historical.fixture]~=expected.fixture then fail("imported native target differs") end
   local allowed={base=script.active_mods.base,["more-infinite-research"]=expected.mir,[historical.fixture]=expected.fixture,
-    ["mir-fixture-mir5-active-mods-observer"]="0.1.0",["mir-fixture-mir5-library-native-input"]="0.1.0"}
+    ["mir-fixture-mir5-active-mods-observer"]="0.1.0",["mir-fixture-mir5-library-native-input"]="0.3.0"}
   for name,version in pairs(script.active_mods) do if allowed[name]~=version then fail("unexpected imported observer closure") end end
   for name,version in pairs(allowed) do if script.active_mods[name]~=version then fail("missing imported observer closure member") end end
   for _ in pairs(game.players) do fail("protected headless source must contain no pre-existing players") end
   if storage[KEY]~=nil then fail("observer state already exists") end
-  storage[KEY]={schema=1,phase="waiting-clients",native=world(),joins=0,text_events=0,closed_events=0,
+  storage[KEY]={schema=1,phase="waiting-clients",native=world(),joins=0,restart_joins={},text_events=0,closed_events=0,
     drag_events=0,reset_events=0,requested_resets=0,removed_events=0,private_queries=0,query_clicks=0,other_clicks=0,imported_probe_verified=false}
   check_imported_literals()
 end)
 script.on_load(function()local s=storage[KEY];loaded_restart=type(s)=="table" and s.phase=="awaiting-restart";refs={} end)
 script.on_event(defines.events.on_player_joined_game,function(event)
   local s=state();local p=player(event.player_index)
-  if p.connected~=true or (p.locale~="en" and p.locale~="de") then fail("actual joined client/locale differs") end
-  if p.locale=="en" then
-    if s.en_index and s.en_index~=p.index then fail("English identity changed") end
-    s.en_index=p.index
-  else
-    if s.de_index and s.de_index~=p.index then fail("German identity changed without removal") end
-    s.de_index=p.index
-  end
+  if p.connected~=true then fail("actual joined client is disconnected") end
+  local joined_role=client_role(p);local key=joined_role.."_index"
+  if not loaded_restart and s.phase=="waiting-clients" then
+    if s[key]~=nil then fail("duplicate initial client role") end
+  elseif not loaded_restart and s.phase=="replacement" and joined_role=="de" then
+    if s.de_index~=nil or s.removed_index==nil or p.index==s.removed_index or p.index==s.en_index then fail("replacement identity differs") end
+  elseif loaded_restart and s.phase=="awaiting-restart" then
+    if s[key]~=p.index or s.restart_joins[joined_role] then fail("saved client identity or restart role differs") end
+    s.restart_joins[joined_role]=true
+  else fail("unexpected client join role or phase") end
+  s[key]=p.index
   s.joins=s.joins+1
 end)
 script.on_event(defines.events.on_gui_text_changed,function(event)

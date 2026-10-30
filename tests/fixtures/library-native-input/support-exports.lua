@@ -17,6 +17,11 @@ function M.register(context)
   }
   local function fail(message) error("[mir-library-support-exports] " .. message) end
   local function valid(value) return value ~= nil and value.valid ~= false end
+  local function client_role(p)
+    if p.name=="MIR5English" then return "en" end
+    if p.name=="MIR5Deutsch" then return "de" end
+    fail("unexpected export client name")
+  end
   local function state()
     local value = storage[context.key]
     if type(value)~="table" or value.schema~=1 or value.case~="library-support-exports" then fail("observer state differs") end
@@ -41,7 +46,7 @@ function M.register(context)
   end
   local function pair()
     local s=state();local en=game.get_player(s.en_index);local de=game.get_player(s.de_index)
-    if not valid(en) or not valid(de) or not en.connected or not de.connected or en.locale~="en" or de.locale~="de"
+    if not valid(en) or not valid(de) or client_role(en)~="en" or client_role(de)~="de" or not en.connected or not de.connected or en.locale~="en" or de.locale~="de"
         or en==de or en.force~=game.forces.player or de.force~=en.force then fail("actual EN/DE pair differs") end
     local count=0;for _ in pairs(game.connected_players) do count=count+1 end
     if count~=2 then fail("exactly two connected native clients required") end
@@ -69,7 +74,7 @@ function M.register(context)
       local p=index and game.get_player(index) or nil
       if valid(p) then
         local root=p.gui.screen[ROOT]
-        geometry[role]={index=p.index,connected=p.connected,scale=p.display_scale,resolution=p.display_resolution,
+        geometry[role]={index=p.index,name=p.name,locale=p.locale,connected=p.connected,scale=p.display_scale,resolution=p.display_resolution,
           location=valid(root) and root.location or false}
       end
     end
@@ -177,7 +182,7 @@ function M.register(context)
       or (mods.base=="2.1.23" and {mir="5.0.21000",fixture="0.4.0"})
     if not tuple then fail("exact engine target differs") end
     local allowed={base=mods.base,["more-infinite-research"]=tuple.mir,[context.historical_fixture]=tuple.fixture,
-      ["mir-fixture-mir5-active-mods-observer"]="0.1.0",[NAME]="0.2.0"}
+      ["mir-fixture-mir5-active-mods-observer"]="0.1.0",[NAME]="0.4.0"}
     for name,version in pairs(mods) do if allowed[name]~=version then fail("unexpected export observer closure") end end
     for name,version in pairs(allowed) do if mods[name]~=version then fail("missing export observer closure") end end
     for _ in pairs(game.players) do fail("protected headless source must have no existing players") end
@@ -193,8 +198,8 @@ function M.register(context)
   end)
   script.on_event(defines.events.on_player_joined_game,function(event)
     local s=state();local p=game.get_player(event.player_index)
-    if not valid(p) or (p.locale~="en" and p.locale~="de") then fail("joined client differs") end
-    local role=p.locale
+    if not valid(p) or p.connected~=true then fail("joined client differs") end
+    local role=client_role(p)
     local key=role.."_index"
     if s[key] and s[key]~=p.index then fail("export client identity changed") end
     local phase
