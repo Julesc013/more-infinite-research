@@ -1,0 +1,235 @@
+{
+  "schema": 1,
+  "kind": "MIRHeavyF210Current164RetainedReadbackV1",
+  "status": "passed-current164-complete-data-settings-readback-zero-new-engines",
+  "scope": "Existing actual B637/8DC/05F heavy SpaceAge data/settings captures,complete expected baseline+published output+unmodified independently authored164 dispositions. No new engine,world,menu,gameplay or performance observation.",
+  "source_capture_chain": "spec/evidence/whole-product-heavy-space-age-f210-admission-native-chain-r01.json",
+  "declaration": {
+    "path": "D:/Projects/Factorio/more-infinite-research/build/qualification/heavy-f210-retained-semantic-readback-r01/packet.json",
+    "bytes": 10419,
+    "sha256": "C52953B4F243CFE85CE6DB03B525DF8DFC92640B58DE3151D69DD17C91D2E666"
+  },
+  "reader": {
+    "path": "D:/Projects/Factorio/more-infinite-research/tools/recover_modern_catalogue.py",
+    "bytes": 48028,
+    "sha256": "9660EF704379637C0A5E1F01DF16A15B0C928163CEED9B32890C71B7862CEFE0"
+  },
+  "parent_oracle": {
+    "path": "D:/Projects/Factorio/more-infinite-research/build/mir5/recovery/menu-f210-intent-r01/bob-angel-f210-8dc-b6-oracle-r01.json",
+    "bytes": 2733241,
+    "sha256": "6AEFF07252E2449ED049B0EDB8DFC17A0B4B4AEB19BF5E36D25A76DEA1F9E8AB"
+  },
+  "derived_actual_baseline_oracle": {
+    "path": "D:/Projects/Factorio/more-infinite-research/build/qualification/heavy-f210-retained-semantic-readback-r01/fresh-actual-baseline-bound-oracle.json",
+    "bytes": 2733248,
+    "sha256": "6485245877A5B28DE05D6A2B3045AE74D0F17734DBD9533F44E8338A9544A6C1"
+  },
+  "exact_baseline_metadata_deltas": [
+    {
+      "path": [
+        "files",
+        "result",
+        "bytes"
+      ],
+      "before": 38467,
+      "after": 38525
+    },
+    {
+      "path": [
+        "files",
+        "result",
+        "sha256"
+      ],
+      "before": "D41AD1D22012EC9FB4525D00C871222F8C276BC4FFE99C952716B1053329BCA7",
+      "after": "52E567464CEDCC2FC08F48B6DA1A94EAFD763E33A202C97B6ED563F419E2E6C6"
+    },
+    {
+      "path": [
+        "profile_input",
+        "path"
+      ],
+      "before": "D:\\Projects\\Factorio\\mir5-q010-standalone-prep-r01\\tests\\profiles\\bob-angel-full-space-age-standalone-f210-2123.json",
+      "after": "D:\\Projects\\Factorio\\mir5-whole-product-capture-fixed-r01\\tests\\profiles\\bob-angel-full-space-age-standalone-f210-2123.json"
+    }
+  ],
+  "all_other_parent_fields_unchanged": true,
+  "original_164_intent": {
+    "path": "D:/Projects/Factorio/more-infinite-research/spec/inventory/bob-angel-f210-intent-r01.json",
+    "bytes": 288804,
+    "sha256": "F9335DE6D17A55C378FFEB4026179DBA5F2837B4853059FC7572AB359EE2205E"
+  },
+  "original_164_intent_source_commit": "52afa26ed645abc247007dfa3d4f5784a0cdd357",
+  "original_160_intent": {
+    "path": "D:/Projects/Factorio/more-infinite-research/build/qualification/heavy-f210-retained-semantic-readback-r01/original-160-intent.json",
+    "bytes": 279208,
+    "sha256": "962DD9429C52A176989DFEF9401AB6772A130EF72F91F1DB7DF1683342DC249E"
+  },
+  "original_160_source_commit": "289bb68439b3f6097ab00cfc6f03fa54375a6cfb",
+  "actual_original_and_copied_capture_files": [
+    {
+      "relative_path": "candidate-mir5/result.json",
+      "bytes": 39664,
+      "sha256": "D35F83F95B393D0C49C6625F6371A0E1752D61D42A30F2310877C08FB7DA2C81",
+      "source": "D:/Projects/Factorio/mir5-whole-product-capture-fixed-r01/build/tmp/whole-product-heavy-space-age-f210-admission-r01/candidate-mir5/result.json",
+      "copy": "D:/Projects/Factorio/more-infinite-research/build/qualification/whole-product-heavy-space-age-f210-admission-r01-controller/native-captures/candidate-mir5/result.json"
+    },
+    {
+      "relative_path": "candidate-mir5/selection.json",
+      "bytes": 3833,
+      "sha256": "6B8538CAEC4BC027ACACBF4353F885FE4BA1C069C7BB8C4BB0926F0D52D87086",
+      "source": "D:/Projects/Factorio/mir5-whole-product-capture-fixed-r01/build/tmp/whole-product-heavy-space-age-f210-admission-r01/candidate-mir5/selection.json",
+      "copy": "D:/Projects/Factorio/more-infinite-research/build/qualification/whole-product-heavy-space-age-f210-admission-r01-controller/native-captures/candidate-mir5/selection.json"
+    },
+    {
+      "relative_path": "candidate-mir5/write-data/script-output/data-raw-dump.json",
+      "bytes": 67505937,
+      "sha256": "DD2A57EE38D1038F5B76DC25F7C5B9296654C4CEB6117DE2036E774EA83093FA",
+      "source": "D:/Projects/Factorio/mir5-whole-product-capture-fixed-r01/build/tmp/whole-product-heavy-space-age-f210-admission-r01/candidate-mir5/write-data/script-output/data-raw-dump.json",
+      "copy": "D:/Projects/Factorio/more-infinite-research/build/qualification/whole-product-heavy-space-age-f210-admission-r01-controller/native-captures/candidate-mir5/write-data/script-output/data-raw-dump.json"
+    },
+    {
+      "relative_path": "candidate-mir5/write-data/script-output/mod-settings-dump.json",
+      "bytes": 783931,
+      "sha256": "83C3A4166488BFEF80225DE9818810DE4CE0DDD37760C6B17BEC810AC8162D17",
+      "source": "D:/Projects/Factorio/mir5-whole-product-capture-fixed-r01/build/tmp/whole-product-heavy-space-age-f210-admission-r01/candidate-mir5/write-data/script-output/mod-settings-dump.json",
+      "copy": "D:/Projects/Factorio/more-infinite-research/build/qualification/whole-product-heavy-space-age-f210-admission-r01-controller/native-captures/candidate-mir5/write-data/script-output/mod-settings-dump.json"
+    },
+    {
+      "relative_path": "control-without-mir/result.json",
+      "bytes": 38525,
+      "sha256": "52E567464CEDCC2FC08F48B6DA1A94EAFD763E33A202C97B6ED563F419E2E6C6",
+      "source": "D:/Projects/Factorio/mir5-whole-product-capture-fixed-r01/build/tmp/whole-product-heavy-space-age-f210-admission-r01/control-without-mir/result.json",
+      "copy": "D:/Projects/Factorio/more-infinite-research/build/qualification/whole-product-heavy-space-age-f210-admission-r01-controller/native-captures/control-without-mir/result.json"
+    },
+    {
+      "relative_path": "control-without-mir/selection.json",
+      "bytes": 3723,
+      "sha256": "C69CFE17BECE4B8CC12CC8500F5E7F06AF425BF06748283C64D0B3C65E023BB2",
+      "source": "D:/Projects/Factorio/mir5-whole-product-capture-fixed-r01/build/tmp/whole-product-heavy-space-age-f210-admission-r01/control-without-mir/selection.json",
+      "copy": "D:/Projects/Factorio/more-infinite-research/build/qualification/whole-product-heavy-space-age-f210-admission-r01-controller/native-captures/control-without-mir/selection.json"
+    },
+    {
+      "relative_path": "control-without-mir/write-data/script-output/data-raw-dump.json",
+      "bytes": 67302883,
+      "sha256": "3CEA9040B2ABCB5BD9E8615AC2866A798DACE7B6B31A999CB498B8CFCCA8AB92",
+      "source": "D:/Projects/Factorio/mir5-whole-product-capture-fixed-r01/build/tmp/whole-product-heavy-space-age-f210-admission-r01/control-without-mir/write-data/script-output/data-raw-dump.json",
+      "copy": "D:/Projects/Factorio/more-infinite-research/build/qualification/whole-product-heavy-space-age-f210-admission-r01-controller/native-captures/control-without-mir/write-data/script-output/data-raw-dump.json"
+    },
+    {
+      "relative_path": "control-without-mir/write-data/script-output/mod-settings-dump.json",
+      "bytes": 36519,
+      "sha256": "3CED1BE6BBDDB651DE8D40CE5FAA76BCF41260B386238B0B1F3FA47C14C8B0AB",
+      "source": "D:/Projects/Factorio/mir5-whole-product-capture-fixed-r01/build/tmp/whole-product-heavy-space-age-f210-admission-r01/control-without-mir/write-data/script-output/mod-settings-dump.json",
+      "copy": "D:/Projects/Factorio/more-infinite-research/build/qualification/whole-product-heavy-space-age-f210-admission-r01-controller/native-captures/control-without-mir/write-data/script-output/mod-settings-dump.json"
+    }
+  ],
+  "candidate_mir_sha256": "B63743C36432E4C41CC0F56D5A48CABE81924D426EF11045095A9D5ED0430D7B",
+  "engine_sha256": "8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38",
+  "profile_sha256": "05F2786E896B1F28C2E4239134BA370B0C2BCF6CCB1384E03999FB0E89C8B980",
+  "outcome": {
+    "status": "equal-intended-native-output",
+    "reviewed_dispositions": 164,
+    "semantic_differences": 0,
+    "comparison": {
+      "path": "D:/Projects/Factorio/more-infinite-research/build/qualification/heavy-f210-retained-semantic-readback-r01/accepted-comparison.json",
+      "bytes": 14302,
+      "sha256": "0968B8120C868051EE76CC0E39DCEBF31F62304345D9AFA68F0FDDA985B8B81B"
+    }
+  },
+  "old160_outcome": {
+    "status": "different-intended-native-output",
+    "reviewed_dispositions": 160,
+    "differences": [
+      {
+        "domain": "data",
+        "names": [
+          "mir-legacy-cannon-credit-rocket-shooting-speed",
+          "mir-legacy-module-credit-efficiency-module",
+          "mir-legacy-module-credit-productivity-module",
+          "mir-legacy-module-credit-speed-module"
+        ],
+        "type": "technology"
+      }
+    ],
+    "comparison": {
+      "path": "D:/Projects/Factorio/more-infinite-research/build/qualification/heavy-f210-retained-semantic-readback-r01/old-160-differences.json",
+      "bytes": 14369,
+      "sha256": "5B8172C3F34564D3585DE32BB96558D23E915E917CBD6CBCC221E965EAF68B1C"
+    },
+    "original_record_changed": false,
+    "old160_adopted": false
+  },
+  "host_controls": [
+    {
+      "id": "old-parent-refusal",
+      "expected_exit": 2,
+      "actual_exit": 2,
+      "timed_out": false,
+      "host_python_sampled_peak_private_bytes": 164921344
+    },
+    {
+      "id": "wrong-result-refusal",
+      "expected_exit": 2,
+      "actual_exit": 2,
+      "timed_out": false,
+      "host_python_sampled_peak_private_bytes": 97865728
+    },
+    {
+      "id": "old-160-differences",
+      "expected_exit": 1,
+      "actual_exit": 1,
+      "timed_out": false,
+      "host_python_sampled_peak_private_bytes": 365309952
+    },
+    {
+      "id": "current-164",
+      "expected_exit": 0,
+      "actual_exit": 0,
+      "timed_out": false,
+      "host_python_sampled_peak_private_bytes": 365678592
+    }
+  ],
+  "host_memory_policy": "Existing20percent reserve and4GiB sampled child budget;observed Python reader memory is not MIR/Factorio footprint.",
+  "host_terminal": {
+    "path": "D:/Projects/Factorio/more-infinite-research/build/qualification/heavy-f210-retained-semantic-readback-r01/host-terminal-r02.json",
+    "bytes": 6655,
+    "sha256": "73CAFDA0A89A6752E8A0B6D5F43A2AF85DBD517ECAF625FA1796B7EEF21938BC"
+  },
+  "host_wrapper": {
+    "path": "D:/Projects/Factorio/more-infinite-research/build/qualification/heavy-f210-retained-semantic-readback-r01/Invoke-Readback.ps1",
+    "bytes": 5190,
+    "sha256": "60BE4F8647445ACEA58057181706A01AC569089FF83542379F720C317D4E08A0"
+  },
+  "independent_review": {
+    "reviewer": "/root/review_pending_evidence",
+    "mode": "exact packet/input then actual host-output/ledger review",
+    "verdict": "PASS for this separately declared zero-native164 data/settings readback only"
+  },
+  "preserved_host_wrapper_defect": {
+    "path": "controller/host-terminal.json",
+    "cause": "Initial one-off host wrapper imported ResourceGovernor without its existing NativeProbeCommon JSON writer dependency. No comparator case ran. Corrected wrapper imports existing NativeProbeResources;packet/reader/semantic inputs and intents unchanged.",
+    "preservation_manifest": {
+      "path": "D:/Projects/Factorio/more-infinite-research/build/qualification/heavy-f210-retained-semantic-readback-r01/pre-helper-import-correction-r01/manifest.json",
+      "bytes": 1390,
+      "sha256": "856FC69C1CD06A0F85927C89E4444DE4DD480625DF75F87D9CD7C3873DA8F3D6"
+    }
+  },
+  "receipt_capsule": {
+    "path": "spec/evidence/heavy-f210-current164-readback-receipts-r01.json.gz",
+    "bytes": 250717,
+    "sha256": "9C57A841C39C7337C8D1F84468BFC28EA08AD7322FF69204057A13343016E1A2",
+    "bodies": 22
+  },
+  "new_native_processes": 0,
+  "native_execution": false,
+  "gameplay_qualification": false,
+  "performance_acceptance": false,
+  "release_qualification": false,
+  "limits": [
+    "Do not relabel the original160/a575/90F observation:its baseline admission refusal and four real additional technology rows remain preserved.",
+    "Current164 contract already declares the three module and one cannon legacy-credit holders independently;no expected row is derived from candidateB.",
+    "Only three baseline receipt metadata fields change:result bytes,SHA and absolute profile locator. Engine,ordered selection,archives,loaded list,profile SHA,data/settings/selection bytes and every other oracle field remain exact.",
+    "Large raw native dumps and original input custody remain locally hash-verified;this capsule carries the separately declared oracle and selected host records,not the raw67MB data bodies.",
+    "Complete data/settings equality does not establish all-family physical effects,save/lifecycle,input/GUI,main-menu or process-memory acceptance."
+  ]
+}
