@@ -177,7 +177,7 @@ class CombinedSteelGameplayFixtureTests(unittest.TestCase):
     def runtime_protocol(self, opponent=""):
         self.lua.globals().opponent = opponent
         return self.lua.execute(r'''
-          local callbacks, interfaces, logs, saves = {events={}}, {}, 0, 0
+          local callbacks, interfaces, logs, saves, witnesses = {events={}}, {}, 0, 0, {}
           local target_name, route_name, owner_name = "recipe-prod-research_steel-1", "angels-plate-steel-2", "angels-steel-smelting-2"
           local function inventory()
             local values = {}
@@ -228,7 +228,7 @@ class CombinedSteelGameplayFixtureTests(unittest.TestCase):
               end
               assert(spec.name=="assembling-machine-1")
               local input, output=inventory(),inventory()
-              machine={valid=true,name="assembling-machine-1",quality={name=opponent=="machine-quality" and "uncommon" or "normal"},energy=0,crafting_progress=0,bonus_progress=0,productivity_bonus=.1,
+              machine={valid=true,name="assembling-machine-1",quality={name=opponent=="machine-quality" and "uncommon" or "normal"},energy=0,crafting_progress=0,bonus_progress=0,productivity_bonus=opponent=="entity-bonus" and .1 or 0,
                 prototype={name="assembling-machine-1",get_crafting_speed=opponent~="machine-speed-missing" and function(quality) assert(quality=="normal");return opponent=="machine-speed" and .6 or .5 end or nil,crafting_categories={ ["advanced-crafting"]=opponent~="category" }},
                 get_inventory=function(index) if index==4 then return input elseif index==5 then return output end return nil end,
                 set_recipe=function(name) machine.recipe=name end,get_recipe=function() return machine.recipe and {name=machine.recipe} or nil end}
@@ -243,7 +243,7 @@ class CombinedSteelGameplayFixtureTests(unittest.TestCase):
             prototypes={recipe={[route_name]={name=route_name,energy=.5,category=opponent=="route-category" and "crafting" or "advanced-crafting",additional_categories=opponent=="route-additional-category" and {"crafting"} or {},
               ingredients={{type="item",name="angels-roll-steel",amount=1}},products={{type="item",name="steel-plate",amount=4,probability=1,extra_count_fraction=0,ignored_by_productivity=0,ignored_by_stats=0,percent_spoiled=0}}}}},
             game={tick=1,speed=1,forces={player=force},surfaces={[1]=surface},server_save=function(name)assert(name=="mir5-native-complete");saves=saves+1 end},
-            storage={},helpers={table_to_json=function(value) assert(value.case=="bob-angel-f200-combined-gameplay");return "{}" end},
+            storage={},helpers={table_to_json=function(value) assert(value.case=="bob-angel-f200-combined-gameplay");witnesses[#witnesses+1]=value.witnesses;return "{}" end},
             log=function(value)assert(value:match("^%[MIR5_NATIVE_FIXTURE%] RESULT "));logs=logs+1 end,
           }
           local native_product=environment.prototypes.recipe[route_name].products[1]
@@ -264,6 +264,10 @@ class CombinedSteelGameplayFixtureTests(unittest.TestCase):
           if not init_ok then return {loaded=loaded,init_ok=false,message=tostring(init_message),logs=logs,saves=saves} end
           target.level,target.researched,force.current_research,force.research_queue=2,false,nil,{}
           route_recipe.productivity_bonus=.1
+          if opponent=="native-float" or opponent=="zero-residue" or opponent=="stale-residue" then
+            -- Independent observed native R05 values, not the fixture formula.
+            route_recipe.productivity_bonus=0.10000000149011612
+          end
           for _, lab in ipairs(labs) do lab.get_inventory(1).values["automation-science-pack"]=0;lab.get_inventory(1).values["logistic-science-pack"]=0 end
           local event_ok,event_message=pcall(callbacks.events[2],{research=target,by_script=false})
           if not event_ok then return {loaded=loaded,init_ok=true,event_ok=false,message=tostring(event_message),logs=logs,saves=saves} end
@@ -272,12 +276,26 @@ class CombinedSteelGameplayFixtureTests(unittest.TestCase):
           for index=1,100 do
             machine.get_inventory(4).values["angels-roll-steel"]=100-index
             machine.get_inventory(5).values["steel-plate"]=(index%10==0) and ((opponent=="physical-output" and index==100) and 4 or 8) or 4
+            if index==100 then
+              if opponent=="native-float" then machine.bonus_progress=1.4901165412695e-7 end
+              if opponent=="stale-residue" then machine.bonus_progress=.0001 end
+            end
             local tick_ok,tick_message=pcall(callbacks.events[1])
             if not tick_ok then return {loaded=loaded,init_ok=true,event_ok=true,physical_ok=false,message=tostring(tick_message)} end
           end
           local report=interfaces["mir5-bob-angel-f200-combined-gameplay"].report()
           if opponent=="saved-scalar" then environment.storage.mir5_bob_angel_f200_combined_gameplay.saved_target_level=nil end
           local live_game=environment.game
+          local cold_lab_energy_writes=0
+          for _,lab in ipairs(labs) do
+            local frozen_energy=lab.energy
+            lab.energy=nil
+            setmetatable(lab,{__index=function(_,key) if key=="energy" then return frozen_energy end end,
+              __newindex=function(value,key,item)
+                if key=="energy" then cold_lab_energy_writes=cold_lab_energy_writes+1;error("cold native lab energy write") end
+                rawset(value,key,item)
+              end})
+          end
           local function storage_only_load()
             environment.game=setmetatable({}, {__index=function() error("on_load game access") end,__newindex=function() error("on_load game write") end})
             local ok,message=pcall(callbacks.load)
@@ -294,7 +312,8 @@ class CombinedSteelGameplayFixtureTests(unittest.TestCase):
             logs=logs,saves=saves,labs=#labs,phase=environment.storage.mir5_bob_angel_f200_combined_gameplay.phase,
             output=environment.storage.mir5_bob_angel_f200_combined_gameplay.physical_output,
             saved_target_level=environment.storage.mir5_bob_angel_f200_combined_gameplay.saved_target_level,
-            current_research_unit_count=target.research_unit_count,current_research_unit_energy=target.research_unit_energy,report=report}
+            current_research_unit_count=target.research_unit_count,current_research_unit_energy=target.research_unit_energy,
+            cold_lab_energy_writes=cold_lab_energy_writes,witnesses=witnesses,report=report}
         ''')
 
     def test_runtime_uses_named_upstream_only_real_labs_real_route_and_two_read_only_reloads(self):
@@ -313,6 +332,7 @@ class CombinedSteelGameplayFixtureTests(unittest.TestCase):
         self.assertEqual(2, result["saved_target_level"])
         self.assertEqual((16000, 3600),
                          (result["current_research_unit_count"], result["current_research_unit_energy"]))
+        self.assertEqual(0, result["cold_lab_energy_writes"])
         self.assertEqual("MIR5BobAngelF200CombinedGameplayReportV1", result["report"]["kind"])
         self.assertEqual("pending-fresh-en-de-library-observations", result["report"]["library_stage"]["status"])
         self.assertEqual(["MIR5English", "MIR5Deutsch"], [result["report"]["library_stage"]["required_roles"][index] for index in (1, 2)])
@@ -410,9 +430,28 @@ class CombinedSteelGameplayFixtureTests(unittest.TestCase):
         self.assertIn("physical_output=number:436", result["message"])
         self.assertIn("expected_output=number:440", result["message"])
         self.assertIn("bonus_progress=number:0", result["message"])
-        self.assertIn("productivity_bonus=number:0.1", result["message"])
+        self.assertIn("productivity_bonus=number:0", result["message"])
         self.assertIn("output_empty=boolean:true", result["message"])
         self.assertIn("output_steel_plate=number:0", result["message"])
+
+    def test_native_float_credit_is_retained_through_both_read_only_colds_without_relaxing_output(self):
+        result = self.runtime_protocol("native-float")
+        for phase in ("physical_ok", "load_one", "reload_one", "load_two", "reload_two"):
+            self.assertTrue(result[phase], result[phase + "_message"] or "")
+        self.assertEqual((440, 0), (result["output"], result["cold_lab_energy_writes"]))
+        for index in (1, 2, 3):
+            row = result["witnesses"][index]
+            self.assertEqual(0, row["native_entity_productivity"])
+            self.assertEqual(0.10000000149011612, row["native_recipe_productivity"])
+            self.assertEqual(1.4901165412695e-7, row["native_bonus_progress"])
+            self.assertAlmostEqual(1.4901161193847656e-7, row["expected_native_bonus_progress"], places=14)
+
+    def test_wrong_entity_modifier_or_lost_native_fractional_credit_cannot_pass(self):
+        for opponent in ("entity-bonus", "zero-residue", "stale-residue"):
+            with self.subTest(opponent=opponent):
+                result = self.runtime_protocol(opponent)
+                self.assertFalse(result["physical_ok"])
+                self.assertIn("real steel physical output or native bonus differs:", result["message"])
 
     def test_on_load_refuses_missing_storage_only_witness_without_game_access(self):
         result = self.runtime_protocol("saved-scalar")
