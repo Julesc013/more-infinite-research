@@ -302,7 +302,6 @@ local function assert_research_complete(state)
   end
   route(force, NATIVE_BONUS)
   assert_science_consumption(state)
-  freeze_labs(state)
 end
 
 local function setup_physical(state)
@@ -329,7 +328,14 @@ local function setup_physical(state)
   state.machine, state.phase, state.physical_output = machine, "physical", 0
 end
 
-local function physical_completion_observation(state, machine, output)
+local function expected_bonus_progress(state, recipe)
+  local bonus_crafts = state.physical_output / PLATES_PER_CRAFT - BATCH
+  -- LuaRecipe exposes a float; retain its native fractional credit rather
+  -- than assuming the authored decimal has an exact binary representation.
+  return BATCH * recipe.productivity_bonus - bonus_crafts
+end
+
+local function physical_completion_observation(state, machine, output, recipe)
   return table.concat({
     "physical_output=" .. scalar(state.physical_output),
     "expected_output=" .. scalar(EXPECTED_OUTPUT),
@@ -337,13 +343,15 @@ local function physical_completion_observation(state, machine, output)
     "productivity_bonus=" .. scalar(machine.productivity_bonus),
     "output_empty=" .. scalar(output.is_empty()),
     "output_steel_plate=" .. scalar(output.get_item_count(PLATE)),
+    "recipe_productivity_bonus=" .. scalar(recipe.productivity_bonus),
+    "expected_bonus_progress=" .. scalar(expected_bonus_progress(state, recipe)),
   }, ";")
 end
 
 local function tick_physical(state)
   local machine = state.machine
   if machine == nil or machine.valid == false then fail("real steel machine disappeared") end
-  route(game.forces.player, NATIVE_BONUS)
+  local recipe = route(game.forces.player, NATIVE_BONUS)
   local input, output = machine.get_inventory(defines.inventory.crafter_input), machine.get_inventory(defines.inventory.crafter_output)
   if input == nil or output == nil then fail("real steel machine inventories disappeared") end
   machine.energy = ENERGY
@@ -353,9 +361,9 @@ local function tick_physical(state)
     state.physical_output = state.physical_output + made
   end
   if input.get_item_count(ROLL) ~= 0 or machine.crafting_progress ~= 0 then return end
-  if state.physical_output ~= EXPECTED_OUTPUT or not close(machine.bonus_progress, 0)
-      or not close(machine.productivity_bonus, NATIVE_BONUS) or not output.is_empty() then
-    fail("real steel physical output or native bonus differs: " .. physical_completion_observation(state, machine, output))
+  if state.physical_output ~= EXPECTED_OUTPUT or not close(machine.bonus_progress, expected_bonus_progress(state, recipe))
+      or not close(machine.productivity_bonus, 0) or not output.is_empty() then
+    fail("real steel physical output or native bonus differs: " .. physical_completion_observation(state, machine, output, recipe))
   end
   state.phase = "complete"
   state.saved_actual_labs = state.actual_labs
@@ -372,16 +380,18 @@ local function assert_complete(state)
       or state.machine.valid == false then
     fail("completed steel witness differs")
   end
+  local recipe = route(game.forces.player, NATIVE_BONUS)
   local input, output = state.machine.get_inventory(defines.inventory.crafter_input), state.machine.get_inventory(defines.inventory.crafter_output)
   if input == nil or output == nil or not input.is_empty() or not output.is_empty()
-      or state.machine.crafting_progress ~= 0 or not close(state.machine.bonus_progress, 0) then
+      or state.machine.crafting_progress ~= 0 or not close(state.machine.productivity_bonus, 0)
+      or not close(state.machine.bonus_progress, expected_bonus_progress(state, recipe)) then
     fail("completed steel physical state differs")
   end
-  route(game.forces.player, NATIVE_BONUS)
 end
 
 marker = function(stage, state)
   local value = target(game.forces.player)
+  local recipe = route(game.forces.player, NATIVE_BONUS)
   log("[MIR5_NATIVE_FIXTURE] RESULT " .. helpers.table_to_json({
     case=CASE, stage=stage, status="passed", qualification="native-runner-readback-required",
     witnesses={
@@ -390,7 +400,9 @@ marker = function(stage, state)
       biolab_count=LAB_COUNT, biolab_science_pack_drain_rate_percent=50,
       science_consumed={ [SCIENCE[1]]=EXPECTED_SCIENCE_CONSUMPTION, [SCIENCE[2]]=EXPECTED_SCIENCE_CONSUMPTION },
       physical_recipe=ROUTE, physical_roll_batch=BATCH, physical_steel_plate_output=state.physical_output,
-      native_recipe_productivity=NATIVE_BONUS, native_bonus_progress=state.machine.bonus_progress,
+      expected_native_recipe_productivity=NATIVE_BONUS, native_recipe_productivity=recipe.productivity_bonus,
+      native_entity_productivity=state.machine.productivity_bonus, native_bonus_progress=state.machine.bonus_progress,
+      expected_native_bonus_progress=expected_bonus_progress(state, recipe),
       on_load_read_only=stage == "reload", library_stage="pending-fresh-en-de-library-observations",
       library_input_simulation=false,
     },
@@ -473,6 +485,7 @@ script.on_event(defines.events.on_tick, function()
     end
   elseif state.phase == "research-observed" then
     assert_research_complete(state)
+    freeze_labs(state)
     setup_physical(state)
   elseif state.phase == "physical" then
     tick_physical(state)
