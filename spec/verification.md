@@ -5,7 +5,7 @@ applies_to: "MIR development"
 audience: developer
 doc_type: specification
 owner: mir-maintainers
-last_reviewed: 2026-10-28
+last_reviewed: 2026-10-30
 supersedes: []
 superseded_by: []
 source_of_truth_for:
@@ -48,7 +48,7 @@ The [required migration boundaries](migrations.md#required-origin-coverage) reta
 
 ## Release verdicts
 
-Keep these independent: feature parity; supported-profile correctness; migration/client safety; performance improvement; non-regression controls; package/delivery identity. A public release deadline or green host CI does not override a missing verdict. No native test is counted as passed when unavailable, refused or not run.
+Keep these independent: feature parity; supported-profile correctness; migration/client safety; performance improvement; non-regression controls; package/delivery identity. A public release deadline or green host CI does not override a missing stable-acceptance verdict. A separately reviewed community prerelease identifies its exact bytes, completed/failed/unverified gates and support limits; its GitHub prerelease flag does not claim stable acceptance. Stable publication still requires every applicable verdict. No native test is counted as passed when unavailable, refused or not run.
 
 Do not execute another local native job if the maintainer's worker already owns the same scenario. Three total agent slots and one heavy native workload per admitted machine remain the working capacity rule; a multiplayer scenario may require its intended simultaneous participants. Preserve and restore mod-list/settings controls.
 

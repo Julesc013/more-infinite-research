@@ -45,7 +45,7 @@ Modern targets expose recipe productivity and the Research Library. Expansion re
 
 ## Additional best-effort historical builds
 
-GitHub packages keep extended versions; only final copies of the nine stable editions receive Portal numbering. Both channels use the same qualified gameplay. Use one channel, or explicitly select/replace the intended package when switching:5.0.21000 sorts above5.0.09, so automatic update selection is not a channel-transfer guarantee.
+Source releases use versions such as5.0.2 and tags such asv5.0.2; edition ZIPs retain the existing codec, for example F2105.0.21002. GitHub marks prereleases separately; they are not Portal releases or a claim of stable qualification. For stable releases, the nine Portal editions use the identical tested GitHub ZIPs and version numbers. Check the selected release status and exact package hash; there is no channel conversion or separate Portal numbering.
 
 The separately selected [early-edition record](../targets/early-editions.json) builds F006/0.6.4, F007/0.7.5, F008/0.8.8, F009/0.9.8, F010/0.10.12, F011/0.11.22 and F012/0.12.35. These are data-only fixed finite research subsets recovered from the museum releases, with14/22/22/22/22/22/26 technologies respectively. They have no startup settings, runtime API, Library or migrations, and have not passed current native or save qualification. They are best-effort GitHub artifacts outside the normal-edition native acceptance claim. F006–F008 transport ZIPs require extraction into the engine mods folder; do not infer direct ZIP loading. Preserve original saves and installation files.
 

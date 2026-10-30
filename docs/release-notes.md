@@ -27,7 +27,7 @@ F018 requires 0.18.47 and is GitHub-only experimental, with exact-engine native 
 
 Preserve the original save, matching mods and startup settings before upgrading. Test a copy, inspect earned research and bonuses, save under a new name and cold-reload before adopting it. Read the [support and upgrade guide](https://github.com/Julesc013/more-infinite-research/blob/v5.0.0/docs/support.md), especially the separate productivity-provider/preference transition and historical 4.2.1 recovery limits. A MIR settings profile does not back up other mods, map settings or research.
 
-GitHub packages retain extended versions such as 5.0.21000. Compact Portal versions are separate final maintainer copies for the nine stable editions; channel switching can require explicit package selection. Mod Portal availability is maintained separately.
+Edition packages retain versions such as 5.0.21000 for source 5.0.0. GitHub marks prerelease or stable separately from that version and the canonical tag. Prereleases remain GitHub-only; stable Portal releases use the identical tested ZIPs for the nine supported editions. Mod Portal availability is maintained separately.
 
 Performance observations are specific to their tested engines, packages and workloads. Earlier accepted startup and active repair/agriculture comparisons are retained in the support guide; they do not establish universal speed, memory or compatibility gains for these final bytes.
 

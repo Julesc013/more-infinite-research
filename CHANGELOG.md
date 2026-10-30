@@ -14,7 +14,7 @@ This is the authoritative product changelog. Each MIR 1–3 master release appea
 - Provide the MIR API for immediate publication of its documented declaration subset and detached read-only runtime queries, with bounded copying of external definitions.
 - Retain the Research Library, personal views, settings export and translations; explain named unavailable features without reconstructing research at runtime.
 - Add modern Library full/compact settings exports and a bounded latest local diagnostic report through the existing MIRSET1 codec and file-output path, with no automatic uploads or engine-log copying.
-- Keep extended GitHub package numbers and unified source changelog history; prepare compact Portal numbers only on final copies of accepted builds.
+- Keep one source-release version and unified changelog history, with the same edition ZIPs on GitHub and stable Mod Portal releases; mark prerelease maturity separately without build counters or version conversion.
 - Establish reusable historical migration inputs for the MIR5 baseline and retain cumulative migration steps for later direct upgrades.
 
 ### Compatibility
