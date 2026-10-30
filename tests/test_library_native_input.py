@@ -50,13 +50,16 @@ class LibraryNativeInputControls(unittest.TestCase):
             if(-not$rejected){throw ('accepted an invalid input plan: '+($case|ConvertTo-Json -Compress))}
           }
           # Compile exactly the actor's interop definition, but call no input or
-          # window API. Verify the native INPUT union layout on this platform.
+          # window API. Verify the native INPUT union layout and the physical
+          # cursor contract on this platform.
           $typeCommand=@($ast.FindAll({param($n)$n-is[Management.Automation.Language.CommandAst]-and$n.GetCommandName()-ceq'Add-Type'-and$n.Extent.Text.Contains('public static class MIRLibraryInputNative')},$true))
           if($typeCommand.Count-ne1){throw 'input native declaration missing'}
           Add-Type -TypeDefinition $typeCommand[0].CommandElements[-1].Value
           $size=[MIRLibraryInputNative]::InputSize()
           if($size-ne$(if([IntPtr]::Size-eq8){40}else{28})){throw 'native INPUT layout differs'}
-          'PASS exact validators and native INPUT layout;zero desktop input'
+          $physical=[MIRLibraryInputNative].GetMethod('SetAndReadPhysicalCursorPos')
+          if($null-eq$physical-or$physical.ReturnType.FullName-ne'MIRLibraryInputNative+Point'){throw 'physical cursor contract differs'}
+          'PASS exact validators, native INPUT layout and physical cursor contract;zero desktop input'
         '''
         with tempfile.TemporaryDirectory() as temporary:
             path = Path(temporary) / "cases.json"
@@ -87,6 +90,117 @@ class LibraryNativeInputControls(unittest.TestCase):
             rejected = subprocess.run(bad, cwd=ROOT, capture_output=True, text=True)
             self.assertNotEqual(rejected.returncode, 0)
             self.assertIn("spec hash differs", rejected.stderr)
+
+    def test_actual_drag_schedule_holds_before_first_move_and_before_release_without_desktop_input(self):
+        script = r'''
+          $ErrorActionPreference='Stop';Set-StrictMode -Version Latest
+          Add-Type -TypeDefinition @'
+using System;
+using System.Collections.Generic;
+public static class MIRLibraryInputNative {
+  public struct Point { public int x,y; }
+  public static List<string> Events=new List<string>();
+  public static int Calls=0, MismatchOn=0;
+  public static void Reset(int mismatchOn) { Events.Clear(); Calls=0; MismatchOn=mismatchOn; }
+  public static Point SetAndReadPhysicalCursorPos(int x,int y) {
+    Calls++; Events.Add("point:"+x+","+y);
+    return new Point { x=(Calls==MismatchOn ? x+1 : x), y=y };
+  }
+  public static uint MouseButton(bool down) { Events.Add(down ? "down" : "up"); return 1; }
+  public static string[] ReadEvents() { return Events.ToArray(); }
+}
+'@
+          $tokens=$null;$errors=$null
+          $ast=[Management.Automation.Language.Parser]::ParseFile($env:MIR_INPUT_ACTOR,[ref]$tokens,[ref]$errors)
+          if($errors.Count){throw 'input actor parse failed'}
+          foreach($name in @('Assert-LibraryInput','Get-LibraryInputDragSchedule','Invoke-LibraryInputDragSchedule','Move-InputPointer')){
+            $node=@($ast.FindAll({param($n)$n-is[Management.Automation.Language.FunctionDefinitionAst]-and$n.Name-ceq$name},$true))
+            if($node.Count-ne1){throw "drag helper definition missing or ambiguous: $name"}
+            Invoke-Expression $node[0].Extent.Text
+          }
+          $try=@($ast.FindAll({param($n)$n-is[Management.Automation.Language.TryStatementAst]},$true))
+          if($try.Count-ne1-or$null-eq$try[0].Finally){throw 'actual actor finally missing or ambiguous'}
+          $actualFinally=(@($try[0].Finally.Statements|ForEach-Object {$_.Extent.Text})-join"`n")
+          $spec=[ordered]@{
+            schema=1;kind='MIRLibraryNativeInputV1';role='client-en';process_id=12345
+            process_start_utc='2026-10-29T09:00:00.1234567Z';engine_sha256=('A'*64)
+            action='drag';client_width=1280;client_height=720;x=950;y=130;target_x=920;target_y=100
+          }
+          $schedule=@(Get-LibraryInputDragSchedule $spec)
+          $expected=@(
+            @{operation='move';x=950;y=130},
+            @{operation='mouse';down=$true},
+            @{operation='pause';milliseconds=100},
+            @{operation='pause';milliseconds=40},@{operation='move';x=942;y=122},
+            @{operation='pause';milliseconds=40},@{operation='move';x=935;y=115},
+            @{operation='pause';milliseconds=40},@{operation='move';x=928;y=108},
+            @{operation='pause';milliseconds=40},@{operation='move';x=920;y=100},
+            @{operation='pause';milliseconds=100},
+            @{operation='assert-window'},
+            @{operation='mouse';down=$false}
+          )
+          if($schedule.Count-ne$expected.Count){throw "drag schedule count differs: $($schedule.Count)"}
+          for($index=0;$index-lt$expected.Count;$index++){
+            $actual=((@($schedule[$index].Keys|Sort-Object)|ForEach-Object {"$_=$($schedule[$index][$_])"})-join'|')
+            $want=((@($expected[$index].Keys|Sort-Object)|ForEach-Object {"$_=$($expected[$index][$_])"})-join'|')
+            if($actual-ne$want){throw "drag schedule differs at ${index}: $actual != $want"}
+          }
+          function Assert-CurrentInputWindow { $script:windowChecks++ }
+          function Get-MIROwnedMenuPointRoot { param([int]$X,[int]$Y) return [IntPtr]42 }
+          function Start-Sleep { param([int]$Milliseconds) [MIRLibraryInputNative]::Events.Add("pause:$Milliseconds") }
+          function Invoke-ActualDrag([int]$MismatchOn,[string]$Receipt) {
+            [MIRLibraryInputNative]::Reset($MismatchOn)
+            $script:windowChecks=0
+            $script:window=[pscustomobject]@{x=100;y=200;handle=42}
+            $script:physicalPointerPositions=[System.Collections.Generic.List[object]]::new()
+            $sent=0;$mouseHeld=$false;$failure='';$diagnostics=[ordered]@{}
+            $result=[ordered]@{status='started'};$receipt=$Receipt;$client=$null
+            $failed=$false
+            try {
+              $null=Invoke-LibraryInputDragSchedule -Spec $spec -MovePointer {param([int]$X,[int]$Y)Move-InputPointer $X $Y} -Pause {param([int]$Milliseconds)Start-Sleep -Milliseconds $Milliseconds} -AssertWindow {Assert-CurrentInputWindow} -MouseButton {param([bool]$Down)[MIRLibraryInputNative]::MouseButton($Down)} -Sent ([ref]$sent) -MouseHeld ([ref]$mouseHeld)
+            } catch {
+              $failed=$true;$failure=$_.Exception.Message;$result.status='failed'
+            }
+            # The production actor runs its finally at script scope.  Mirror that
+            # scope exactly while executing the extracted production finally body.
+            $script:mouseHeld=$mouseHeld;$script:sent=$sent;$script:failure=$failure;$script:result=$result
+            $script:receipt=$receipt;$script:window=$window;$script:diagnostics=$diagnostics;$script:client=$client
+            $null=Invoke-Expression $script:actualFinally
+            [pscustomobject]@{
+              failed=$failed;failure=$failure;sent=$sent;mouse_held=$mouseHeld
+              events=@([MIRLibraryInputNative]::ReadEvents());positions=$script:physicalPointerPositions.ToArray()
+              checks=$script:windowChecks;receipt=$Receipt
+            }
+          }
+          $normal=Invoke-ActualDrag -MismatchOn 0 -Receipt (Join-Path $env:MIR_INPUT_OUTPUT 'normal.json')
+          if($normal.failed-or$normal.sent-ne2-or$normal.mouse_held){throw "normal actual drag execution differs: failed=$($normal.failed) sent=$($normal.sent) held=$($normal.mouse_held) failure=$($normal.failure)"}
+          $normalExpected=@('point:1050,330','down','pause:100','pause:40','point:1042,322','pause:40','point:1035,315','pause:40','point:1028,308','pause:40','point:1020,300','pause:100','up')
+          if((@($normal.events)-join'|')-ne($normalExpected-join'|')){throw ('normal actual drag order differs: '+(@($normal.events)-join'|'))}
+          if($normal.positions.Count-ne5-or$normal.positions[-1].requested_physical.x-ne1020-or$normal.positions[-1].requested_physical.y-ne300-or$normal.positions[-1].observed_physical.x-ne1020-or$normal.positions[-1].observed_physical.y-ne300){throw 'normal physical position receipt differs'}
+          $mismatch=Invoke-ActualDrag -MismatchOn 2 -Receipt (Join-Path $env:MIR_INPUT_OUTPUT 'mismatch.json')
+          if(-not$mismatch.failed-or$mismatch.failure-notmatch'physical pointer readback differs' -or$mismatch.sent-ne1){throw "physical mismatch did not fail closed: failed=$($mismatch.failed) failure=$($mismatch.failure) sent=$($mismatch.sent) held=$($mismatch.mouse_held)"}
+          if((@($mismatch.events)-join'|')-ne'point:1050,330|down|pause:100|pause:40|point:1042,322|up'){throw ('physical mismatch did not release the held button exactly once: '+(@($mismatch.events)-join'|'))}
+          if($mismatch.positions.Count-ne2-or$mismatch.positions[1].requested_physical.x-ne1042-or$mismatch.positions[1].observed_physical.x-ne1043){throw 'physical mismatch receipt differs'}
+          $mismatchReceipt=Get-Content -LiteralPath $mismatch.receipt -Raw|ConvertFrom-Json
+          if($mismatchReceipt.status-ne'failed'-or$mismatchReceipt.input_events_sent-ne1-or$mismatchReceipt.physical_pointer_positions.Count-ne2){throw 'actual finally receipt differs'}
+          $actor=Get-Content -LiteralPath $env:MIR_INPUT_ACTOR -Raw
+          foreach($required in @(
+            "'drag'{",
+            'Invoke-LibraryInputDragSchedule -Spec $spec',
+            '$n=& $MouseButton ([bool]$entry.down);$Sent.Value+=$n',
+            '$physical=[MIRLibraryInputNative]::SetAndReadPhysicalCursorPos($absoluteX,$absoluteY)',
+            "'physical pointer readback differs'",
+            '$result.physical_pointer_positions=$physicalPointerPositions.ToArray()',
+            'if($mouseHeld){$null=[MIRLibraryInputNative]::MouseButton($false)}'
+          )){if(-not$actor.Contains($required)){throw "actual actor dispatch/teardown differs: $required"}}
+          'PASS actual finite drag dispatch, physical receipt and mismatch cleanup;zero desktop input'
+        '''
+        with tempfile.TemporaryDirectory() as temporary:
+            result = subprocess.run(["pwsh", "-NoProfile", "-Command", script], cwd=ROOT,
+                                    env={**os.environ, "MIR_INPUT_ACTOR": str(ACTOR), "MIR_INPUT_OUTPUT": temporary},
+                                    capture_output=True, text=True)
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        self.assertIn("zero desktop input", result.stdout)
 
 
 if __name__ == "__main__":

@@ -1,0 +1,73 @@
+{
+  "schema": 1,
+  "kind": "mir5-library-native-input-imported110-native-selection",
+  "target": "f200",
+  "factorio_line": "2.0",
+  "engine": {
+    "version": "2.0.77",
+    "sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B"
+  },
+  "settings_mode": "Defaults",
+  "session_expected_peak_memory_mib": 7168,
+  "protected_input_save": {
+    "sha256": "029AA881F739457047B1E8318FA9A77508B28112757176B64CD0C3C31530638C",
+    "bytes": 811812,
+    "original_chain": "spec/evidence/migration-origin-110-7a2-direct-native-chain-r01.json"
+  },
+  "mods": [
+    {
+      "name": "base",
+      "version": "2.0.77",
+      "enabled": true
+    },
+    {
+      "name": "mir-fixture-mir5-active-mods-observer",
+      "version": "0.1.0",
+      "enabled": true
+    },
+    {
+      "name": "more-infinite-research",
+      "version": "5.0.20000",
+      "enabled": true
+    },
+    {
+      "name": "mir-fixture-mir5-migration-origin-f200-110-source",
+      "version": "0.3.0",
+      "enabled": true
+    },
+    {
+      "name": "mir-fixture-mir5-library-native-input",
+      "version": "0.3.0",
+      "enabled": true
+    }
+  ],
+  "archive_sha256": {
+    "more-infinite-research_5.0.20000.zip": "7CAC54475107736106D84AF98D50A8622E095B6658F1E3682643FE0CBA8BAEF0",
+    "mir-fixture-mir5-active-mods-observer_0.1.0.zip": "723D1E7721449FC26040E5E6629416767BDC20AD79CF8723115846DB662A1F87",
+    "mir-fixture-mir5-migration-origin-f200-110-source_0.3.0.zip": "D30D00A0D57A2A8195565E52DCEFDF94B92DCBA37DC85A83B37245336157E9C0",
+    "mir-fixture-mir5-library-native-input_0.3.0.zip": "ECFC7ADB1168884663084F81EDADDF1C9D077B875B29A15D252DEA0B5DEF1772"
+  },
+  "display": {
+    "requested_window": "1280x720",
+    "actual_owned_client_geometry_required": [
+      1280,
+      720
+    ],
+    "points": "Freeze from current native geometry and an owned desktop capture before input;Factorio screenshot request is not desktop geometry proof.",
+    "drag_delta": [
+      -30,
+      0
+    ],
+    "drag_baseline": "Latest native root location and event count at successful suffix, not initial inspect.",
+    "required_new_location_events": 1
+  },
+  "scope": "Fresh input0.3 drag-baseline preparation on unchanged candidateB/protected imported110 save. Preserve original0.3 profile/archive/adverse bytes at prior refs. Actual input/lifecycle and both engines remain unqualified.",
+  "client_identity": {
+    "en": "MIR5English",
+    "de": "MIR5Deutsch",
+    "replacement": "MIR5Deutsch",
+    "join": "exact name plus permitted phase and retained index",
+    "readiness": "actual connected EN/DE locales before inspection/actions",
+    "zero_lua_index": "host-shaped robustness only; not observed by R04"
+  }
+}

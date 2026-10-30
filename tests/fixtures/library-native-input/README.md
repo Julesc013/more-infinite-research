@@ -5,7 +5,7 @@ applies_to: "Exact MIR1.1 completed F200/F210 Base successor copies"
 audience: developer
 doc_type: test-fixture
 owner: mir-maintainers
-last_reviewed: 2026-10-30
+last_reviewed: 2026-10-31
 supersedes: []
 superseded_by: []
 ---
@@ -21,6 +21,21 @@ Join roles are the exact names `MIR5English` and `MIR5Deutsch`, with the permitt
 The input report now exposes `en_name`, `de_name`, `en_locale`, `de_locale`, `en_connected` and `de_connected`, alongside the retained role indices. The export report exposes the same observations under `geometry.en` and `geometry.de`. The caller must read those actual observations before input, not infer readiness from a join count. Absent indices remain distinct from numeric indices. Host doubles exercise Lua index0 as robustness only; R04's networking index0 did not establish a Lua player index0.
 
 Compose input0.3 from current `control.lua` and `info-input-identity-f200.json` or `info-input-identity-f210.json`. Compose export0.4 from current `control.lua`, `support-exports.lua` and the corresponding `info-exports-identity-*.json`. ZIP roots are the unchanged observer name plus the declared0.3.0 or0.4.0 version. The prepared record pins all four reproducible containers and new profiles. Preserve the original31-row/75-effect/three-force source fixture and saved inputs; no source recreation, credit seeding or player-package change is required.
+
+## Native input delivery observation
+
+- Prepared inputs: [native delivery record](../../../spec/evidence/library-input-native-delivery-prepared-r01.json), with new r06 profiles and separately hashed input archives. Earlier profiles/archives/adverses remain unchanged.
+- Reports expose `en_input`/`de_input`: actual Library open/query and foreign open/query values. Missing stays false; an actual empty query stays an empty string. Foreign open also requires `player.opened` to be that fixed GUI.
+- Send each desktop action once. Await exact native text, close or drag endpoint/events through report-only polling:10-second polling budget, at most50 reports,200ms between incomplete observations. An in-flight transport call retains its own bound.
+- Preserve phase, process/role/locale identity, peer state, unrelated counters and every original root/reference/world/focus/lifecycle assertion. Invoke each mutating assertion once after confirmation. Refuse malformed observations and timeouts; never resend, refocus, reset or retry advance.
+- This is functional delivery synchronization. Earlier failed runs remain adverse; no timing acceptance threshold or performance claim changes.
+
+## Drag baseline observation
+
+- The [drag-baseline-only predecessor](../../../spec/evidence/library-input-drag-baseline-prepared-r02.json) retains its r05 profiles and exact archive/source hashes. Current dispatch uses the native-delivery preparation above.
+- Preserve all earlier input0.3/export0.4 archives and profiles. Use one exact archive under exclusive library ownership; this internal observer version is not a published MIR release.
+
+At the successful suffix transition, record the current native root location and cumulative location-event count immediately before the declared drag. Require at least one new native location event and exactly30pixels left with no vertical movement from that baseline. Retain the earlier inspection location and all pre-drag events; they cannot stand in for the actual drag. Reports expose both baselines/counts, and a drag refusal includes the actual compared point/counts. The prior stale-baseline adverse remains unchanged; fresh source/archive/profile/runtime inputs and actual native qualification are still required.
 
 ## Frozen original protocols
 
