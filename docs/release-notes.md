@@ -18,7 +18,7 @@ MIR 5 brings retained research and settings into one shared implementation, with
 - Add full and compact MIRSET1 settings exports to the modern Library, including selectable text and file output through the existing exporter.
 - Add a bounded latest diagnostic report, written locally on request. Factorio's session log remains separate; no automatic upload occurs.
 - Correct named compatibility bindings and migration ownership boundaries, including private credit research presentation. Retained credit stays separate from ordinary Library actions.
-- Provide the documented draft MIR API for immediate data-stage declarations and detached runtime inspection. Check its declared capabilities before using it.
+- Provide the documented modern MIR API 1.0 subset for immediate data-stage declarations and detached runtime inspection. Check its declared capabilities before using it.
 - Keep complete source-version changelog history and extended GitHub edition numbers.
 
 Choose the ZIP for your Factorio family. The nine stable-edition minimums are 0.13.20, 0.14.23, 0.15.40, 0.16.51, 0.17.79, 1.0.0, 1.1.110, 2.0.77 and 2.1.23. Each edition retains its actual supported subset; modern expansion research requires the relevant official mods.
