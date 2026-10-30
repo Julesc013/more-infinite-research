@@ -1,0 +1,334 @@
+{
+  "schema": 1,
+  "kind": "MIRLibraryClientIdentityPreparedInputsV1",
+  "status": "fixture-prepared-not-native-qualified",
+  "fixture_source": "439595ea754e1f158a0f1d6918bf18cb7bf06dfd",
+  "player_source": "42032477d45ced683e72736a4fe30a7a3195b995",
+  "player_tree": "5a6adf0aab4e945aeca13420ddd045ad45f050a0",
+  "changed_player_members": [],
+  "previous_preparations": [
+    {
+      "path": "spec/evidence/library-input-drag-baseline-prepared-r01.json",
+      "bytes": 20004,
+      "sha256": "1E18E9F900E7A7A0F557F23A43A8DC143E88E229D56569D3FFA9F0C00D1F874B"
+    },
+    {
+      "path": "spec/evidence/library-client-identity-prepared-aero-r01.json",
+      "bytes": 13908,
+      "sha256": "3FEC956F54CEED95FE1DD48CB9A011977CAA1DFA634DA8961C3870635F1C2341"
+    }
+  ],
+  "reported_adverse": {
+    "terminal_sha256": "85F1887068DD8B2FECE1B1492D8F02F06CD2D2663E06F9FC441521F86A305CD5",
+    "terminal_local_custody": "build/qualification/imported-library-native-input-runtime-r18-controller/execution-record/terminal.json",
+    "root_readback_sha256": "36B4D3BAC1C2FFBF7852A993D86B6F811E8BAA90B5769A1E22C4E22C3E002027",
+    "original_status": "adverse",
+    "factorio_zero": true,
+    "controls_restored": true,
+    "initial_location": {
+      "x": 0,
+      "y": 0
+    },
+    "pre_drag_native_location": {
+      "x": 265,
+      "y": 24
+    },
+    "pre_drag_observed_events": 1,
+    "scope": "The stored inspect baseline was stale before the declared drag. This does not prove the intended drag succeeded or establish the cause of the earlier location event. Original inputs, outputs and adverse receipts remain unchanged."
+  },
+  "profiles": [
+    {
+      "target": "f200",
+      "mode": "input",
+      "version": "0.3.0",
+      "profile": {
+        "path": "tests/profiles/library-native-input-imported110-f200-2077-r05.json",
+        "bytes": 2715,
+        "sha256": "14DC204353839011BF9A29BD2E8A62E6BB0E84BA4F51E389C6885D20EDD73B5A"
+      },
+      "protected_input_save": {
+        "sha256": "029AA881F739457047B1E8318FA9A77508B28112757176B64CD0C3C31530638C",
+        "bytes": 811812,
+        "original_chain": "spec/evidence/migration-origin-110-7a2-direct-native-chain-r01.json"
+      },
+      "engine": {
+        "version": "2.0.77",
+        "sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B"
+      },
+      "archive_sha256": {
+        "more-infinite-research_5.0.20000.zip": "7CAC54475107736106D84AF98D50A8622E095B6658F1E3682643FE0CBA8BAEF0",
+        "mir-fixture-mir5-active-mods-observer_0.1.0.zip": "723D1E7721449FC26040E5E6629416767BDC20AD79CF8723115846DB662A1F87",
+        "mir-fixture-mir5-migration-origin-f200-110-source_0.3.0.zip": "D30D00A0D57A2A8195565E52DCEFDF94B92DCBA37DC85A83B37245336157E9C0",
+        "mir-fixture-mir5-library-native-input_0.3.0.zip": "02019CDD0444EE916C593B159AAA9C921EC470A2144266A240E30E2F83360323"
+      },
+      "owned_fixture": {
+        "name": "mir-fixture-mir5-library-native-input_0.3.0.zip",
+        "bytes": 6481,
+        "sha256": "02019CDD0444EE916C593B159AAA9C921EC470A2144266A240E30E2F83360323",
+        "local_custody": "build/qualification/library-input-drag-baseline-prepared-r02/f200/input/mir-fixture-mir5-library-native-input_0.3.0.zip",
+        "members": [
+          {
+            "source": "tests/fixtures/library-native-input/control.lua",
+            "source_revision": "439595ea754e1f158a0f1d6918bf18cb7bf06dfd",
+            "destination": "control.lua",
+            "bytes": 21944,
+            "sha256": "4CCE9F318CC99FC2592B23EEED22B0E30687F1C96F6E4F3878A3C1FB8B5E99CE"
+          },
+          {
+            "source": "tests/fixtures/library-native-input/info-input-identity-f200.json",
+            "source_revision": "d9e6dd74427763b09d8f21da585b17e059dedd08",
+            "destination": "info.json",
+            "bytes": 345,
+            "sha256": "CC35B55624B2F95EAA2B198048C2C413D787F4EB3FD62EB0938E68CA2B5A7F81"
+          }
+        ]
+      }
+    },
+    {
+      "target": "f200",
+      "mode": "exports",
+      "version": "0.4.0",
+      "profile": {
+        "path": "tests/profiles/library-support-exports-imported110-f200-2077-r04.json",
+        "bytes": 2597,
+        "sha256": "11F56F05563F9DEE90F6CAC1CC8003C5A87784EFEA8209261AA1EFF41051811F"
+      },
+      "protected_input_save": {
+        "sha256": "029AA881F739457047B1E8318FA9A77508B28112757176B64CD0C3C31530638C",
+        "bytes": 811812,
+        "original_chain": "spec/evidence/migration-origin-110-7a2-direct-native-chain-r01.json"
+      },
+      "engine": {
+        "version": "2.0.77",
+        "sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B"
+      },
+      "archive_sha256": {
+        "more-infinite-research_5.0.20000.zip": "7CAC54475107736106D84AF98D50A8622E095B6658F1E3682643FE0CBA8BAEF0",
+        "mir-fixture-mir5-active-mods-observer_0.1.0.zip": "723D1E7721449FC26040E5E6629416767BDC20AD79CF8723115846DB662A1F87",
+        "mir-fixture-mir5-migration-origin-f200-110-source_0.3.0.zip": "D30D00A0D57A2A8195565E52DCEFDF94B92DCBA37DC85A83B37245336157E9C0",
+        "mir-fixture-mir5-library-native-input_0.4.0.zip": "6D6362DF9998F54B71D0BBCDC5DF82A800C5BE802CF8279E86C2ADA6A469845C"
+      },
+      "owned_fixture": {
+        "name": "mir-fixture-mir5-library-native-input_0.4.0.zip",
+        "bytes": 10918,
+        "sha256": "6D6362DF9998F54B71D0BBCDC5DF82A800C5BE802CF8279E86C2ADA6A469845C",
+        "local_custody": "build/qualification/library-fixture-client-identity-aero-r01/f200/exports/mir-fixture-mir5-library-native-input_0.4.0.zip",
+        "members": [
+          {
+            "source": "tests/fixtures/library-native-input/control.lua",
+            "source_revision": "d9e6dd74427763b09d8f21da585b17e059dedd08",
+            "destination": "control.lua",
+            "bytes": 21557,
+            "sha256": "C4FF383DA0CB163DF8C721B96DE97F2AB74BB70ECC5A6E76F9D08D7CE7D24971"
+          },
+          {
+            "source": "tests/fixtures/library-native-input/info-exports-identity-f200.json",
+            "source_revision": "d9e6dd74427763b09d8f21da585b17e059dedd08",
+            "destination": "info.json",
+            "bytes": 348,
+            "sha256": "CB5FC6B73C0F6E8C45EA5046F3334EFC03B0518EBEEA24C2FD9A02B595CCAD74"
+          },
+          {
+            "source": "tests/fixtures/library-native-input/support-exports.lua",
+            "source_revision": "d9e6dd74427763b09d8f21da585b17e059dedd08",
+            "destination": "support-exports.lua",
+            "bytes": 14591,
+            "sha256": "EF6EE15F0DFB790171323374EE0BB572606D16474AE2099004542EF70877FB9F"
+          }
+        ]
+      }
+    },
+    {
+      "target": "f210",
+      "mode": "input",
+      "version": "0.3.0",
+      "profile": {
+        "path": "tests/profiles/library-native-input-imported110-f210-2123-r05.json",
+        "bytes": 2715,
+        "sha256": "F093C1880330C6E32120F60B69730A8D873AB258D2DB4640F9ADBA11635F7D90"
+      },
+      "protected_input_save": {
+        "sha256": "8DCFC16FF929766D2E5CFEC4F7BC81367A9632CEB4B39558E40330FA43BD7F0C",
+        "bytes": 814068,
+        "original_chain": "spec/evidence/migration-origin-110-7a2-direct-native-chain-r01.json"
+      },
+      "engine": {
+        "version": "2.1.23",
+        "sha256": "8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38"
+      },
+      "archive_sha256": {
+        "more-infinite-research_5.0.21000.zip": "B63743C36432E4C41CC0F56D5A48CABE81924D426EF11045095A9D5ED0430D7B",
+        "mir-fixture-mir5-active-mods-observer_0.1.0.zip": "A15A7D628D66953D2E0C4D4FA288F47CBF9C5678327C7EB3D23ADB5DC78331C0",
+        "mir-fixture-mir5-migration-origin-f200-110-source_0.4.0.zip": "E07DF42B2FBFACEA5BA32F3E616AF5BBFAB4E355B116187DC023252CFCD09B43",
+        "mir-fixture-mir5-library-native-input_0.3.0.zip": "08D2C7EE6004166F9F0D9C115F6D9AE3796302670C9EFE2A2B369613182BA76E"
+      },
+      "owned_fixture": {
+        "name": "mir-fixture-mir5-library-native-input_0.3.0.zip",
+        "bytes": 6484,
+        "sha256": "08D2C7EE6004166F9F0D9C115F6D9AE3796302670C9EFE2A2B369613182BA76E",
+        "local_custody": "build/qualification/library-input-drag-baseline-prepared-r02/f210/input/mir-fixture-mir5-library-native-input_0.3.0.zip",
+        "members": [
+          {
+            "source": "tests/fixtures/library-native-input/control.lua",
+            "source_revision": "439595ea754e1f158a0f1d6918bf18cb7bf06dfd",
+            "destination": "control.lua",
+            "bytes": 21944,
+            "sha256": "4CCE9F318CC99FC2592B23EEED22B0E30687F1C96F6E4F3878A3C1FB8B5E99CE"
+          },
+          {
+            "source": "tests/fixtures/library-native-input/info-input-identity-f210.json",
+            "source_revision": "d9e6dd74427763b09d8f21da585b17e059dedd08",
+            "destination": "info.json",
+            "bytes": 345,
+            "sha256": "A9B20176471FF3D329306D199EEB02CB99492AC299FEDB63DA27C9429C0524B5"
+          }
+        ]
+      }
+    },
+    {
+      "target": "f210",
+      "mode": "exports",
+      "version": "0.4.0",
+      "profile": {
+        "path": "tests/profiles/library-support-exports-imported110-f210-2123-r04.json",
+        "bytes": 2597,
+        "sha256": "50988621122FF6B25725793EEED79D9198BC541B8F6BDCF877C508125B220AC5"
+      },
+      "protected_input_save": {
+        "sha256": "8DCFC16FF929766D2E5CFEC4F7BC81367A9632CEB4B39558E40330FA43BD7F0C",
+        "bytes": 814068,
+        "original_chain": "spec/evidence/migration-origin-110-7a2-direct-native-chain-r01.json"
+      },
+      "engine": {
+        "version": "2.1.23",
+        "sha256": "8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38"
+      },
+      "archive_sha256": {
+        "more-infinite-research_5.0.21000.zip": "B63743C36432E4C41CC0F56D5A48CABE81924D426EF11045095A9D5ED0430D7B",
+        "mir-fixture-mir5-active-mods-observer_0.1.0.zip": "A15A7D628D66953D2E0C4D4FA288F47CBF9C5678327C7EB3D23ADB5DC78331C0",
+        "mir-fixture-mir5-migration-origin-f200-110-source_0.4.0.zip": "E07DF42B2FBFACEA5BA32F3E616AF5BBFAB4E355B116187DC023252CFCD09B43",
+        "mir-fixture-mir5-library-native-input_0.4.0.zip": "20504B66CC353C6BBC9C60A1E99DB583654B3A9B9E4D1A958B9991CA142B44A1"
+      },
+      "owned_fixture": {
+        "name": "mir-fixture-mir5-library-native-input_0.4.0.zip",
+        "bytes": 10917,
+        "sha256": "20504B66CC353C6BBC9C60A1E99DB583654B3A9B9E4D1A958B9991CA142B44A1",
+        "local_custody": "build/qualification/library-fixture-client-identity-aero-r01/f210/exports/mir-fixture-mir5-library-native-input_0.4.0.zip",
+        "members": [
+          {
+            "source": "tests/fixtures/library-native-input/control.lua",
+            "source_revision": "d9e6dd74427763b09d8f21da585b17e059dedd08",
+            "destination": "control.lua",
+            "bytes": 21557,
+            "sha256": "C4FF383DA0CB163DF8C721B96DE97F2AB74BB70ECC5A6E76F9D08D7CE7D24971"
+          },
+          {
+            "source": "tests/fixtures/library-native-input/info-exports-identity-f210.json",
+            "source_revision": "d9e6dd74427763b09d8f21da585b17e059dedd08",
+            "destination": "info.json",
+            "bytes": 348,
+            "sha256": "53401B449105C11B80FF69667665EAB03E6FBC3D68A855D353D172A28D0FD78D"
+          },
+          {
+            "source": "tests/fixtures/library-native-input/support-exports.lua",
+            "source_revision": "d9e6dd74427763b09d8f21da585b17e059dedd08",
+            "destination": "support-exports.lua",
+            "bytes": 14591,
+            "sha256": "EF6EE15F0DFB790171323374EE0BB572606D16474AE2099004542EF70877FB9F"
+          }
+        ]
+      }
+    }
+  ],
+  "readiness": {
+    "roles": {
+      "en": "MIR5English",
+      "de": "MIR5Deutsch"
+    },
+    "input_report_fields": [
+      "en_index",
+      "de_index",
+      "en_name",
+      "de_name",
+      "en_locale",
+      "de_locale",
+      "en_connected",
+      "de_connected"
+    ],
+    "export_report_fields": [
+      "geometry.en.index",
+      "geometry.de.index",
+      "geometry.en.name",
+      "geometry.de.name",
+      "geometry.en.locale",
+      "geometry.de.locale",
+      "geometry.en.connected",
+      "geometry.de.connected"
+    ],
+    "rules": [
+      "Join callbacks bind exact names,phase and retained index; locale is not identity.",
+      "Caller waits for actual connected en/de locales before inspect or prepare; fixture pair assertions remain mandatory.",
+      "Input replacement uses the same declared German name with a new native player index; restart uses the saved replacement identity.",
+      "Numeric0 and absent false are distinct in Lua; host controls cover0 without claiming a native observation."
+    ]
+  },
+  "validation": {
+    "opponent_before": "Four retained host failures include English identity changed and unknown-name false acceptance.",
+    "focused_pinned_lua52_controls": 12,
+    "archives": "four tiny observer ZIPs repeat-reproduced; CRC,metadata,sorted members and raw-Git payloads verified",
+    "new_native_execution": false,
+    "nonfinal_metadata_commit": {
+      "commit": "e06bb5d6d040dc8b151ef713ad9ce9b4eb1c7b56",
+      "disposition": "Preserved local CRLF whitespace adverse before any archive build; corrected by d9e6dd7. Its native-index0 wording is not a demonstrated native fact; the explicit correction above applies.",
+      "adverse_readback": "build/qualification/library-fixture-client-identity-aero-r01/metadata-whitespace-adverse-readback-r01.log"
+    }
+  },
+  "native_owner_next": "Black Glass binds reviewed caller/new fixture hashes/profiles/actual locale readiness and original preserved save; no Aero dispatch or direct-library staging.",
+  "limits": [
+    "Original0.1/0.2 sources/records/ZIPs and R04 adverse are preserved under original refs.",
+    "The input protocol retains48 private probes,5 joins,2 effect resets,2 key closes,1 removal and2 new saves; export protocol retains13 clicks,5 joins,2 distinct server exports and2 saves.",
+    "Protected native rows/effects/queues/foreign forces and personal input/lifecycle assertions are unchanged.",
+    "A corrected fixture is not a native retry/pass; package provenance,upgrade safety and remaining functional gates still require their actual verdicts."
+  ],
+  "performance_acceptance": false,
+  "release_qualification": false,
+  "retained_adverse_reply_bodies": [
+    {
+      "step": "prefix",
+      "original_transport_native_relative": "server/factorio-current.log.prefix.rcon-a719ccc7b11745f2869b826539e356cc.json",
+      "original_transport_sha256": "9C4F67D6214AA5D6BB9D9E21C960FA5F9D6B4D4AF636CD469A7D632759FFE596",
+      "body_bytes": 1034,
+      "body_sha256": "B21E9CC9957831C98D1AA21ADE9DE9E051241957ECBCEFFAE7291701C1D35A60",
+      "body_utf8_base64": "eyJ0cmFuc3BvcnQiOiJNSVJJbXBvcnRlZEZpeHR1cmVSZXBseVYxIiwidmFsdWVfdHlwZSI6InRhYmxlIiwicmVwb3J0Ijp7InNjaGVtYSI6MSwiY2FzZSI6ImxpYnJhcnktbmF0aXZlLWlucHV0LWltcG9ydGVkMTEwIiwicGhhc2UiOiJwcmVmaXgtcmVmcmVzaCIsInRpY2siOjE4NzE3MSwiYWN0dWFsX2pvaW5zIjoyLCJhY3R1YWxfdGV4dF9ldmVudHMiOjIsImFjdHVhbF9saWJyYXJ5X2Nsb3NlZF9ldmVudHMiOjAsImFjdHVhbF9kcmFnX2V2ZW50cyI6MSwiYWN0dWFsX2VmZmVjdF9yZXNldF9ldmVudHMiOjEsInJlcXVlc3RlZF9uYXRpdmVfcmVzZXRzIjoxLCJhY3R1YWxfcmVtb3ZlZF9ldmVudHMiOjAsInByaXZhdGVfcXVlcmllcyI6MTYsImVuX2luZGV4IjoyLCJkZV9pbmRleCI6MSwiZW5fbmFtZSI6Ik1JUjVFbmdsaXNoIiwiZGVfbmFtZSI6Ik1JUjVEZXV0c2NoIiwiZW5fbG9jYWxlIjoiZW4iLCJkZV9sb2NhbGUiOiJkZSIsImVuX2Nvbm5lY3RlZCI6dHJ1ZSwiZGVfY29ubmVjdGVkIjp0cnVlLCJyZW1vdmVkX2luZGV4IjpmYWxzZSwicmVhZG9ubHlfaW1wb3J0ZWRfcHJvYmUiOnRydWUsImltcG9ydGVkX2Vhcm5pbmdzIjp0cnVlLCJmaXh0dXJlX3NlZWRzX2NyZWRpdCI6ZmFsc2UsImxvYWRfb2JzZXJ2ZWQiOmZhbHNlLCJlbl9nZW9tZXRyeSI6eyJsb2NhdGlvbiI6eyJ4IjoyNjUsInkiOjI0fSwic3R5bGVfbWF4aW1hbF93aWR0aCI6MTAwMCwiZGlzcGxheV9zY2FsZSI6MC43NSwiZGlzcGxheV9yZXNvbHV0aW9uIjp7IndpZHRoIjoxMjgwLCJoZWlnaHQiOjcyMH19LCJkZV9nZW9tZXRyeSI6eyJsb2NhdGlvbiI6eyJ4IjoyNjUsInkiOjYwfSwic3R5bGVfbWF4aW1hbF93aWR0aCI6MTAwMCwiZGlzcGxheV9zY2FsZSI6MC43NSwiZGlzcGxheV9yZXNvbHV0aW9uIjp7IndpZHRoIjoxMjgwLCJoZWlnaHQiOjcyMH19LCJvcmlnaW5hbF9wcmVzZXJ2YXRpb25fZml4dHVyZV9yZXF1aXJlZCI6dHJ1ZSwicGVyZm9ybWFuY2VfYWNjZXB0YW5jZSI6ZmFsc2UsInJlbGVhc2VfcXVhbGlmaWNhdGlvbiI6ZmFsc2V9fQo=",
+      "projection": "Exact native response payload bytes concatenated in original frame order; no parsed JSON reserialization."
+    },
+    {
+      "step": "suffix",
+      "original_transport_native_relative": "server/factorio-current.log.suffix.rcon-62a0ca3e1317475f89a07aa832e2744e.json",
+      "original_transport_sha256": "DC137EA2B5BFA02D12A4CF8D07327C293DD77F623274EA85F2C9366244B61104",
+      "body_bytes": 1024,
+      "body_sha256": "F269D6605808AE910ED354FA23A31F8ABA13AB62953F619DD478D5C1210ADEAE",
+      "body_utf8_base64": "eyJ0cmFuc3BvcnQiOiJNSVJJbXBvcnRlZEZpeHR1cmVSZXBseVYxIiwidmFsdWVfdHlwZSI6InRhYmxlIiwicmVwb3J0Ijp7InNjaGVtYSI6MSwiY2FzZSI6ImxpYnJhcnktbmF0aXZlLWlucHV0LWltcG9ydGVkMTEwIiwicGhhc2UiOiJkcmFnIiwidGljayI6MTg3NjQ4LCJhY3R1YWxfam9pbnMiOjIsImFjdHVhbF90ZXh0X2V2ZW50cyI6NSwiYWN0dWFsX2xpYnJhcnlfY2xvc2VkX2V2ZW50cyI6MCwiYWN0dWFsX2RyYWdfZXZlbnRzIjoxLCJhY3R1YWxfZWZmZWN0X3Jlc2V0X2V2ZW50cyI6MSwicmVxdWVzdGVkX25hdGl2ZV9yZXNldHMiOjEsImFjdHVhbF9yZW1vdmVkX2V2ZW50cyI6MCwicHJpdmF0ZV9xdWVyaWVzIjoxNiwiZW5faW5kZXgiOjIsImRlX2luZGV4IjoxLCJlbl9uYW1lIjoiTUlSNUVuZ2xpc2giLCJkZV9uYW1lIjoiTUlSNURldXRzY2giLCJlbl9sb2NhbGUiOiJlbiIsImRlX2xvY2FsZSI6ImRlIiwiZW5fY29ubmVjdGVkIjp0cnVlLCJkZV9jb25uZWN0ZWQiOnRydWUsInJlbW92ZWRfaW5kZXgiOmZhbHNlLCJyZWFkb25seV9pbXBvcnRlZF9wcm9iZSI6dHJ1ZSwiaW1wb3J0ZWRfZWFybmluZ3MiOnRydWUsImZpeHR1cmVfc2VlZHNfY3JlZGl0IjpmYWxzZSwibG9hZF9vYnNlcnZlZCI6ZmFsc2UsImVuX2dlb21ldHJ5Ijp7ImxvY2F0aW9uIjp7IngiOjI2NSwieSI6MjR9LCJzdHlsZV9tYXhpbWFsX3dpZHRoIjoxMDAwLCJkaXNwbGF5X3NjYWxlIjowLjc1LCJkaXNwbGF5X3Jlc29sdXRpb24iOnsid2lkdGgiOjEyODAsImhlaWdodCI6NzIwfX0sImRlX2dlb21ldHJ5Ijp7ImxvY2F0aW9uIjp7IngiOjI2NSwieSI6NjB9LCJzdHlsZV9tYXhpbWFsX3dpZHRoIjoxMDAwLCJkaXNwbGF5X3NjYWxlIjowLjc1LCJkaXNwbGF5X3Jlc29sdXRpb24iOnsid2lkdGgiOjEyODAsImhlaWdodCI6NzIwfX0sIm9yaWdpbmFsX3ByZXNlcnZhdGlvbl9maXh0dXJlX3JlcXVpcmVkIjp0cnVlLCJwZXJmb3JtYW5jZV9hY2NlcHRhbmNlIjpmYWxzZSwicmVsZWFzZV9xdWFsaWZpY2F0aW9uIjpmYWxzZX19Cg==",
+      "projection": "Exact native response payload bytes concatenated in original frame order; no parsed JSON reserialization."
+    },
+    {
+      "step": "drag",
+      "original_transport_native_relative": "server/factorio-current.log.drag.rcon-0fc778d9ccdf4730a60dd22e29d914dd.json",
+      "original_transport_sha256": "776D5AF50BE028186C63116EF1F649D72C7B88413E10DA9FC55075AC4D55FE0D",
+      "body_bytes": 521,
+      "body_sha256": "5C83734BEECF764ABEE77F8C16CA4B4BEAB1AC6DEB2F60B4B5244F21A5429A7B",
+      "body_utf8_base64": "eyJ0cmFuc3BvcnQiOiJNSVJJbXBvcnRlZEZpeHR1cmVFcnJvclYxIiwidmFsdWVfdHlwZSI6InN0cmluZyIsInJlcG9ydCI6IkVycm9yIHdoZW4gcnVubmluZyBpbnRlcmZhY2UgZnVuY3Rpb24gbWlyNS1saWJyYXJ5LW5hdGl2ZS1pbnB1dC5hZHZhbmNlOiBfX21pci1maXh0dXJlLW1pcjUtbGlicmFyeS1uYXRpdmUtaW5wdXRfXy9jb250cm9sLmx1YToyNjogW21pcjUtbGlicmFyeS1uYXRpdmUtaW5wdXRdIGFjdHVhbCBuYXRpdmUgZHJhZyBkaWZmZXJzXG5zdGFjayB0cmFjZWJhY2s6XG5cdFtDXTogaW4gZnVuY3Rpb24gJ2Vycm9yJ1xuXHRfX21pci1maXh0dXJlLW1pcjUtbGlicmFyeS1uYXRpdmUtaW5wdXRfXy9jb250cm9sLmx1YToyNjogaW4gZnVuY3Rpb24gJ2ZhaWwnXG5cdF9fbWlyLWZpeHR1cmUtbWlyNS1saWJyYXJ5LW5hdGl2ZS1pbnB1dF9fL2NvbnRyb2wubHVhOjIyMTogaW4gZnVuY3Rpb24gPF9fbWlyLWZpeHR1cmUtbWlyNS1saWJyYXJ5LW5hdGl2ZS1pbnB1dF9fL2NvbnRyb2wubHVhOjIwMD4ifQo=",
+      "projection": "Exact native response payload bytes concatenated in original frame order; no parsed JSON reserialization."
+    }
+  ],
+  "correction": {
+    "scope": "Test observer only; product, protected saves, original preservation fixture, candidateB and export0.4 inputs remain unchanged.",
+    "drag_baseline": "At successful suffix, record current native root location and cumulative event count immediately before drag.",
+    "drag_requirement": "At least one new native location event and exact -30,0 endpoint delta; retain all earlier and post-baseline events, plus the original inspect location.",
+    "diagnostics": "Reports expose initial_location, drag_baseline, drag_events_before; drag refusal includes actual baseline, point and counts.",
+    "internal_fixture_version": "Unpublished test observer0.3 identity retained with separately declared new ZIP/profile/source hashes in fresh custody. No prior archive/profile/receipt or published version is replaced.",
+    "native_execution": false,
+    "ready_assignment": false,
+    "superseded_zero_native_preparation": "r01 exact-one event condition superseded before dispatch; original declaration/profiles/M4 retained without native execution."
+  }
+}
