@@ -24,7 +24,11 @@ Compose input0.3 from current `control.lua` and `info-input-identity-f200.json` 
 
 ## Native input delivery observation
 
-Read-only reports expose each joined player's current `library_open`, `library_query`, `foreign_open` and `foreign_query` under `en_input`/`de_input`. An absent player or textfield stays explicitly absent/false. After sending each declared desktop action once, the caller must await its exact native text, close or drag endpoint/event observation within a fixed bounded deadline before invoking the original assertion once. Keep the current phase, role/process identities, peer state, event counts and all original root/reference/world checks. Polling may only read reports; it must not repeat input, advance, refocus, reset effects or write state. A timeout or malformed observation remains adverse. This is functional multiplayer delivery synchronization, not a changed timing acceptance threshold or a pass for earlier failures.
+- Prepared inputs: [native delivery record](../../../spec/evidence/library-input-native-delivery-prepared-r01.json), with new r06 profiles and separately hashed input archives. Earlier profiles/archives/adverses remain unchanged.
+- Reports expose `en_input`/`de_input`: actual Library open/query and foreign open/query values. Missing stays false; an actual empty query stays an empty string. Foreign open also requires `player.opened` to be that fixed GUI.
+- Send each desktop action once. Await exact native text, close or drag endpoint/events through report-only polling:10-second polling budget, at most50 reports,200ms between incomplete observations. An in-flight transport call retains its own bound.
+- Preserve phase, process/role/locale identity, peer state, unrelated counters and every original root/reference/world/focus/lifecycle assertion. Invoke each mutating assertion once after confirmation. Refuse malformed observations and timeouts; never resend, refocus, reset or retry advance.
+- This is functional delivery synchronization. Earlier failed runs remain adverse; no timing acceptance threshold or performance claim changes.
 
 ## Drag baseline observation
 
