@@ -1,0 +1,138 @@
+{
+  "schema": 1,
+  "kind": "MIRPublishedF100F210PlainScienceReferenceV1",
+  "status": "independent-native-prototypes-and-shipped-api-contract-not-forward-native-acceptance",
+  "published_raw": {
+    "path": "D:/Projects/Factorio/more-infinite-research/build/qualification/f210-vanilla-published-b6-default-capture-r02/native-output/base/write-data/script-output/data-raw-dump.json",
+    "bytes": 14286542,
+    "sha256": "FFCC1446621A55CC8B498685177F6FCE10D38E2C500CA3905F1CF2EF0DD5F7C4"
+  },
+  "candidate_raw": {
+    "path": "D:/Projects/Factorio/more-infinite-research/build/qualification/whole-product-base-f210-admission-r01-controller/native-captures/candidate-mir5/write-data/script-output/data-raw-dump.json",
+    "bytes": 13910097,
+    "sha256": "90CF2568E69BE8FB082DBFF4C95C20936B6B56797A1236E955AD4BB4FAA4309E"
+  },
+  "published_rows": {
+    "military-science-pack": {
+      "type": "item",
+      "name": "military-science-pack",
+      "localised_description": [
+        "item-description.science-pack"
+      ],
+      "icon": "__base__/graphics/icons/military-science-pack.png",
+      "subgroup": "science-pack",
+      "color_hint": {
+        "text": "M"
+      },
+      "order": "c[military-science-pack]",
+      "inventory_move_sound": {
+        "filename": "__base__/sound/item/science-inventory-move.ogg",
+        "volume": 0.6,
+        "aggregation": {
+          "max_count": 1,
+          "remove": true
+        }
+      },
+      "pick_sound": {
+        "filename": "__base__/sound/item/science-inventory-pickup.ogg",
+        "volume": 0.6,
+        "aggregation": {
+          "max_count": 1,
+          "remove": true
+        }
+      },
+      "drop_sound": {
+        "filename": "__base__/sound/item/science-inventory-move.ogg",
+        "volume": 0.6,
+        "aggregation": {
+          "max_count": 1,
+          "remove": true
+        }
+      },
+      "stack_size": 200,
+      "weight": 1000,
+      "random_tint_color": [
+        0.9200000000000002,
+        0.97,
+        0.97,
+        1
+      ]
+    },
+    "utility-science-pack": {
+      "type": "item",
+      "name": "utility-science-pack",
+      "localised_description": [
+        "item-description.science-pack"
+      ],
+      "icon": "__base__/graphics/icons/utility-science-pack.png",
+      "subgroup": "science-pack",
+      "color_hint": {
+        "text": "U"
+      },
+      "order": "f[utility-science-pack]",
+      "inventory_move_sound": {
+        "filename": "__base__/sound/item/science-inventory-move.ogg",
+        "volume": 0.6,
+        "aggregation": {
+          "max_count": 1,
+          "remove": true
+        }
+      },
+      "pick_sound": {
+        "filename": "__base__/sound/item/science-inventory-pickup.ogg",
+        "volume": 0.6,
+        "aggregation": {
+          "max_count": 1,
+          "remove": true
+        }
+      },
+      "drop_sound": {
+        "filename": "__base__/sound/item/science-inventory-move.ogg",
+        "volume": 0.6,
+        "aggregation": {
+          "max_count": 1,
+          "remove": true
+        }
+      },
+      "stack_size": 200,
+      "weight": 1000,
+      "random_tint_color": [
+        0.9200000000000002,
+        0.97,
+        0.97,
+        1
+      ]
+    }
+  },
+  "candidate_rows_equal": true,
+  "shipped_runtime_api": {
+    "path": "D:/Games/Factorio/2.1/doc-html/runtime-api.json",
+    "bytes": 2132310,
+    "sha256": "7660B692F1C199682DE4318250DE81B07B38266A935D1C37859DCB6A70E1D373"
+  },
+  "shipped_prototype_api": {
+    "path": "D:/Games/Factorio/2.1/doc-html/prototype-api.json",
+    "bytes": 1866585,
+    "sha256": "03DB6BFFF8AB1DCF738A52F33331FB839E53DBAFCC576492CD297F94A4BA99F2"
+  },
+  "shipped_api_version": "2.1.23",
+  "runtime_reader": "LuaEntity.get_stored_durability(ItemID).durability",
+  "prototype_capacity_default": 1,
+  "runtime_capacity_required": 1,
+  "science_type": "item",
+  "official_reference": "https://lua-api.factorio.com/latest/classes/LuaEntity.html#get_stored_durability",
+  "project_native_precedent": "tests/fixtures/cryogenic-gameplay/control.lua",
+  "expected_observation": {
+    "initial_inventory_each": 32,
+    "completed_inventory_each": 31,
+    "remaining_lab_durability_each": "1 - declared successor useful-work units",
+    "required_useful_work_units": "35/60 at existing exact zero-speed-modifier 60-tick contract;must pass new actual native observation",
+    "f110_reader": "Unchanged legacy tool stack durability accounting."
+  },
+  "limits": [
+    "Full raw item bodies are mechanically projected from independent published and earlier current-B native captures.",
+    "The exact shipped2.1.23 API admits item science with omitted science_capacity default1 and lab-held remaining durability.",
+    "No R03 successor science amount was captured before its unsupported ItemStack.durability access;do not label this reference a completed forward-route measurement.",
+    "A new actual run must report and satisfy the declared count/remainder/work and unchanged-state assertions before acceptance."
+  ]
+}

@@ -114,6 +114,18 @@ local function successor_science(saved)
   if modern and lab.disabled_by_script~=true then fail("successor scripted lab disablement differs") end
   local input=lab.get_inventory(defines.inventory.lab_input)
   for _, pack in ipairs({"military-science-pack","utility-science-pack"}) do
+    if modern then
+      local prototype=prototypes.item[pack]
+      local stored=lab.get_stored_durability(pack)
+      log("[MIR5_FORWARD_SCIENCE] "..pack.." count="..tostring(input.get_item_count(pack))
+        .." stored="..tostring(stored and stored.durability).." capacity="..tostring(prototype and prototype.science_capacity))
+      if not prototype or prototype.type~="item" or prototype.science_capacity~=1
+          or input.get_item_count(pack)~=31 or type(stored)~="table"
+          or type(stored.durability)~="number" or stored.durability<0 or stored.durability>1
+          or not close(stored.durability,1-saved.successor_units) then
+        fail("successor plain-item science consumption differs")
+      end
+    else
     local units,found=0,false
     for index=1,#input do
       local stack=input[index]
@@ -126,6 +138,7 @@ local function successor_science(saved)
       end
     end
     if not found or not close(units,32-saved.successor_units) then fail("successor actual fractional science consumption differs") end
+    end
   end
 end
 local function witness(value, completed)
