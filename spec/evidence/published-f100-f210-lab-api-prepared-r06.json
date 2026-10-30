@@ -1,0 +1,163 @@
+{
+  "schema": 1,
+  "kind": "MIRPublishedF100F210LabAPICorrectionPreparedV1",
+  "status": "host-verified-fixture-correction-no-replacement-native",
+  "implementation_commit": "48aee3825d5cf2a15f78e24cd4620a86b0ffdbe1",
+  "reason": "The direct F210 run loaded the protected 1.0 save and reached InGame, then failed at the fixture lab freeze because LuaEntity.active is read-only in2.1. This is a fixture API defect,not an engine save-format refusal or MIR player defect.",
+  "api_contract": {
+    "official_reference": "https://lua-api.factorio.com/latest/classes/LuaEntity.html",
+    "active": "read-only boolean",
+    "disabled_by_script": "read/write boolean",
+    "project_precedent": "tests/fixtures/aai-parity-native/shared/control.lua",
+    "precedent_control": "tests/test_aai_parity_native_controls.py"
+  },
+  "fixture": {
+    "stage": "f210",
+    "name": "mir-fixture-mir5-historical-transition",
+    "version": "0.5.0",
+    "archive": {
+      "path": "D:/Projects/Factorio/mir5-published-f100-f210-lab-fixture-r01/build/tmp/published-f100-f210-lab-api-correction-r06-inputs/mir-fixture-mir5-historical-transition_0.5.0.zip",
+      "bytes": 7142,
+      "sha256": "663DDA5DFEFF96908E1E9FC452DE9471021CB4A2F670D3116200D8C0577C9D00"
+    },
+    "members": [
+      {
+        "source_commit": "48aee3825d5cf2a15f78e24cd4620a86b0ffdbe1",
+        "source": "tests/fixtures/published-f100-forward/f210/control.lua",
+        "destination": "control.lua",
+        "bytes": 27,
+        "sha256": "1A0ED8A26C09447C61170923210BCCE255293A01A18F5D9174A31E90A27B7B03"
+      },
+      {
+        "source_commit": "48aee3825d5cf2a15f78e24cd4620a86b0ffdbe1",
+        "source": "tests/fixtures/published-f100-forward/f210/data-final-fixes.lua",
+        "destination": "data-final-fixes.lua",
+        "bytes": 30,
+        "sha256": "B193C566BDC17949E9082C258018BD57DADC37063377B0C12971988E9513E588"
+      },
+      {
+        "source_commit": "48aee3825d5cf2a15f78e24cd4620a86b0ffdbe1",
+        "source": "tests/fixtures/published-f100-forward/shared/control.lua",
+        "destination": "fixture_control.lua",
+        "bytes": 16024,
+        "sha256": "4A923E035BB12F5E16C772BEAE257FB2655DEAA528D21C28A0683F77312615AC"
+      },
+      {
+        "source_commit": "48aee3825d5cf2a15f78e24cd4620a86b0ffdbe1",
+        "source": "tests/fixtures/published-f100-forward/shared/data-final-fixes.lua",
+        "destination": "fixture_data_final.lua",
+        "bytes": 1222,
+        "sha256": "54F6657AEE09816264C448214F8FCD4EEBD2B913193DFD3AFCFA32C4422B5AB2"
+      },
+      {
+        "source_commit": "48aee3825d5cf2a15f78e24cd4620a86b0ffdbe1",
+        "source": "tests/fixtures/published-f100-forward/f210/info.json",
+        "destination": "info.json",
+        "bytes": 277,
+        "sha256": "55B1FFFDD1F8C468D3340D01EA810974A743E72BB255149060EE3DCF883AF3B5"
+      },
+      {
+        "source_commit": "48aee3825d5cf2a15f78e24cd4620a86b0ffdbe1",
+        "source": "tests/fixtures/published-f100-forward/f210/settings-updates.lua",
+        "destination": "settings-updates.lua",
+        "bytes": 73,
+        "sha256": "0C3C400CA97DF5B2A636FC77D16441E320EFF836C7787084F5E0CE3BCB9F1E30"
+      },
+      {
+        "source_commit": "48aee3825d5cf2a15f78e24cd4620a86b0ffdbe1",
+        "source": "tests/fixtures/published-f100-forward/f210/stage.lua",
+        "destination": "stage.lua",
+        "bytes": 142,
+        "sha256": "14A5598FAE0289B1F250479AA1E8DEB99CBD0B2270703E0A3CF1675490DBDF61"
+      }
+    ],
+    "projection": "D:/Projects/Factorio/mir5-published-f100-f210-lab-fixture-r01/build/tmp/published-f100-f210-lab-api-correction-r06-inputs/source"
+  },
+  "unchanged_semantics": [
+    "Only the F210 successor uses disabled_by_script=true with energy=0;the disabled boolean and inactive/zero-energy state are rechecked before save and on both reloads.",
+    "F100 source,F110 bridge and accepted F110 successor retain legacy active=false behavior. All23 retained rows,science consumption,one useful completion,effects,queues,foreign forces and read-only on_load requirements remain exact.",
+    "Player source/packages,settings and protected0381 input are unchanged. Source qualification B7F29 and its two accepted F100 cold reloads are reused,not recreated."
+  ],
+  "retained_adverse": {
+    "schema": 1,
+    "kind": "MIRPublishedF100F210LabAPIAdverseRootReadbackV1",
+    "status": "failed-fixture-api-after-direct-save-load",
+    "packet": {
+      "path": "D:/Projects/Factorio/more-infinite-research/build/qualification/published473-f100-f210-native-r02-controller/packet-r02.json",
+      "bytes": 13898,
+      "sha256": "1CFCC208E04695CDC9FD4CA49DE4D58CDD9C6E6AAFE71D0DCEFE6C85850BF69D"
+    },
+    "caller": {
+      "path": "D:/Projects/Factorio/more-infinite-research/build/qualification/published473-f100-f210-native-r02-controller/Invoke-Owned.ps1",
+      "bytes": 20742,
+      "sha256": "DC5F4BCBD7625C73E2FD2EBCAB06F17B4FCD9B0280454A2113805F80776419E9"
+    },
+    "terminal": {
+      "path": "D:/Projects/Factorio/more-infinite-research/build/qualification/published473-f100-f210-native-r02-controller/execution-record/terminal.json",
+      "bytes": 4811,
+      "sha256": "3EFDE737DA6D524CC32C9C686C1371ABF17452552C51EE63FA1F50D4BB1D6148"
+    },
+    "native_result": {
+      "path": "D:/Projects/Factorio/more-infinite-research/build/qualification/published473-f100-f210-native-r02-controller/native-captures/result.json",
+      "bytes": 5942,
+      "sha256": "E6DBB44706A5C1CB576AC117B6F3AEE0BAD03ECDE83D9921512120D20F1D6C8F"
+    },
+    "custody": {
+      "native_custody": {
+        "files": 9,
+        "bytes": 53792,
+        "all_original_copy_hashes_equal": true
+      },
+      "controller_custody": {
+        "files": 2,
+        "bytes": 569561,
+        "all_original_copy_hashes_equal": true
+      }
+    },
+    "actual_engine_pids": [
+      77892
+    ],
+    "actual_engines": 1,
+    "error": "LuaEntity::active is read only.",
+    "location": "fixture_control.lua:275",
+    "direct_original_save_loaded": true,
+    "in_game_reached": true,
+    "accepted_successor_labs": 0,
+    "completed_successor_saves": 0,
+    "accepted_cold_reloads": 0,
+    "source_input_unchanged": true,
+    "library_restoration_verified": true,
+    "factorio_processes": 0,
+    "bridge_authority": false,
+    "performance_acceptance": false,
+    "release_qualification": false
+  },
+  "receipt_capsule": {
+    "path": "spec/evidence/published-f100-f210-lab-api-adverse-receipts-r02.json.gz",
+    "bytes": 29625,
+    "sha256": "75A3F9F2B31B0D48E6392850EB8F09FD13D5D926EC107B22A1149BB15605A498",
+    "bodies": 12
+  },
+  "host_controls": {
+    "command": "python -X utf8 -B tests/test_published_f100_forward_fixture.py --lua-runtime-dir D:/Projects/Factorio/more-infinite-research/build/tmp/mir421-lua-runtime",
+    "tests": 7,
+    "status": "passed",
+    "scope": "F210 native-shaped lab rejects active writes;successful flow uses scripted disablement. Both destination cold-lab-enabled adversaries fail. Existing lifecycle/data/runner/source/science/effect controls remain. No Factorio process.",
+    "driver_plan": "tests/Test-MIR5HostControls.ps1 -Plan inspected before selected controls."
+  },
+  "old_failed_fixture": {
+    "sha256": "F18DCBB48B21E6BF64FC0F726AF3614D40E94F6EED39DAA02B9054F3B3748A83",
+    "bytes": 7103,
+    "source_commit": "d78ea51f045c14262bfda9b1e8dd7888652f4d89",
+    "disposition": "Keep exact R02 packet/caller/native result and restoration;zero accepted successor result or cold reloads. Previous R01 formula refusal also remains unchanged."
+  },
+  "remaining": [
+    "Independent review and four required exact-head checks.",
+    "Fresh packet must separately freeze the later clean committed declaration HEAD,the consumed implementation commit,the seven raw members/container/profile/caller/governor and a new output.",
+    "Execute the direct F100\u2192F210 route only after packet controls/review;the completed save load grants no bridge fallback authority."
+  ],
+  "bridge_authority": false,
+  "replacement_native_execution": false,
+  "performance_acceptance": false,
+  "release_qualification": false
+}
