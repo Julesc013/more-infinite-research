@@ -28,6 +28,33 @@ function Get-LibraryInputDragSchedule([System.Collections.IDictionary]$Spec){
   $null=$schedule.Add([ordered]@{operation='mouse';down=$false})
   return $schedule.ToArray()
 }
+function Invoke-LibraryInputDragSchedule{
+  param(
+    [Parameter(Mandatory)][System.Collections.IDictionary]$Spec,
+    [Parameter(Mandatory)][scriptblock]$MovePointer,
+    [Parameter(Mandatory)][scriptblock]$Pause,
+    [Parameter(Mandatory)][scriptblock]$AssertWindow,
+    [Parameter(Mandatory)][scriptblock]$MouseButton,
+    [Parameter(Mandatory)][ref]$Sent,
+    [Parameter(Mandatory)][ref]$MouseHeld
+  )
+  foreach($entry in @(Get-LibraryInputDragSchedule $Spec)){
+    switch([string]$entry.operation){
+      'move'{& $MovePointer ([int]$entry.x) ([int]$entry.y)}
+      'pause'{& $Pause ([int]$entry.milliseconds)}
+      'assert-window'{& $AssertWindow}
+      'mouse'{
+        $n=& $MouseButton ([bool]$entry.down);$Sent.Value+=$n
+        if([bool]$entry.down){
+          $MouseHeld.Value=($n-eq1);Assert-LibraryInput $MouseHeld.Value 'mouse down incomplete'
+        }else{
+          $MouseHeld.Value=($n-ne1);Assert-LibraryInput ($n-eq1) 'mouse up incomplete'
+        }
+      }
+      default{throw '[mir-library-input] drag schedule operation differs'}
+    }
+  }
+}
 function Assert-LibraryInputPlan([System.Collections.IDictionary]$Spec){
   $common=@('schema','kind','role','process_id','process_start_utc','engine_sha256','action','client_width','client_height')
   Assert-LibraryInput ($Spec.Contains('action') -and $Spec.action-is[string] -and $Spec.action-cin@('escape','inventory','text','click','drag')) 'action differs'
@@ -87,11 +114,10 @@ public static class MIRLibraryInputNative {
   [DllImport("user32.dll",SetLastError=true)] public static extern bool SetPhysicalCursorPos(int x,int y);
   [DllImport("user32.dll",SetLastError=true)] public static extern bool GetPhysicalCursorPos(out Point point);
   public static int InputSize() { return Marshal.SizeOf(typeof(Input)); }
-  public static Point SetAndVerifyPhysicalCursorPos(int x,int y) {
+  public static Point SetAndReadPhysicalCursorPos(int x,int y) {
     if(!SetPhysicalCursorPos(x,y)) throw new System.ComponentModel.Win32Exception(Marshal.GetLastWin32Error(),"SetPhysicalCursorPos");
     Point actual;
     if(!GetPhysicalCursorPos(out actual)) throw new System.ComponentModel.Win32Exception(Marshal.GetLastWin32Error(),"GetPhysicalCursorPos");
-    if(actual.x!=x || actual.y!=y) throw new InvalidOperationException("physical cursor readback differs");
     return actual;
   }
   public static uint KeyPair(ushort value,bool unicode) {
@@ -126,10 +152,10 @@ try{
   function Move-InputPointer([int]$X,[int]$Y){
     Assert-CurrentInputWindow
     $absoluteX=[int]($window.x+$X);$absoluteY=[int]($window.y+$Y)
-    $physical=[MIRLibraryInputNative]::SetAndVerifyPhysicalCursorPos($absoluteX,$absoluteY)
+    $physical=[MIRLibraryInputNative]::SetAndReadPhysicalCursorPos($absoluteX,$absoluteY)
+    $null=$physicalPointerPositions.Add([ordered]@{requested_physical=[ordered]@{x=$absoluteX;y=$absoluteY};observed_physical=[ordered]@{x=[int]$physical.x;y=[int]$physical.y}})
     Assert-LibraryInput ($physical.x-eq$absoluteX -and $physical.y-eq$absoluteY) 'physical pointer readback differs'
     Assert-LibraryInput ((Get-MIROwnedMenuPointRoot -X $absoluteX -Y $absoluteY)-eq[IntPtr]$window.handle) 'pointer target is not owned'
-    $null=$physicalPointerPositions.Add([ordered]@{requested_physical=[ordered]@{x=$absoluteX;y=$absoluteY};observed_physical=[ordered]@{x=[int]$physical.x;y=[int]$physical.y}})
   }
   switch($spec.action){
     'escape'{Assert-CurrentInputWindow;$n=[MIRLibraryInputNative]::KeyPair(0x1b,$false);$sent+=$n;Assert-LibraryInput ($n-eq2) 'Esc injection incomplete'}
@@ -147,23 +173,7 @@ try{
       Assert-LibraryInput ($n-eq1) 'mouse up incomplete'
     }
     'drag'{
-      $schedule=@(Get-LibraryInputDragSchedule $spec)
-      foreach($entry in $schedule){
-        switch([string]$entry.operation){
-          'move'{Move-InputPointer ([int]$entry.x) ([int]$entry.y)}
-          'pause'{Start-Sleep -Milliseconds ([int]$entry.milliseconds)}
-          'assert-window'{Assert-CurrentInputWindow}
-          'mouse'{
-            $n=[MIRLibraryInputNative]::MouseButton([bool]$entry.down);$sent+=$n
-            if([bool]$entry.down){
-              $mouseHeld=($n-eq1);Assert-LibraryInput $mouseHeld 'mouse down incomplete'
-            }else{
-              $mouseHeld=($n-ne1);Assert-LibraryInput ($n-eq1) 'mouse up incomplete'
-            }
-          }
-          default{throw '[mir-library-input] drag schedule operation differs'}
-        }
-      }
+      Invoke-LibraryInputDragSchedule -Spec $spec -MovePointer {param([int]$X,[int]$Y)Move-InputPointer $X $Y} -Pause {param([int]$Milliseconds)Start-Sleep -Milliseconds $Milliseconds} -AssertWindow {Assert-CurrentInputWindow} -MouseButton {param([bool]$Down)[MIRLibraryInputNative]::MouseButton($Down)} -Sent ([ref]$sent) -MouseHeld ([ref]$mouseHeld)
     }
   }
   Assert-CurrentInputWindow
@@ -172,7 +182,7 @@ try{
   $failure=$_.Exception.Message;$result.status='failed';throw
 }finally{
   if($mouseHeld){$null=[MIRLibraryInputNative]::MouseButton($false)}
-  $result.failure=$failure;$result.input_events_sent=$sent;$result.window=$window;$result.window_diagnostics=$diagnostics;$result.physical_pointer_positions=@($physicalPointerPositions)
+  $result.failure=$failure;$result.input_events_sent=$sent;$result.window=$window;$result.window_diagnostics=$diagnostics;$result.physical_pointer_positions=$physicalPointerPositions.ToArray()
   $result.input_method='Windows SendInput with physical-cursor readback;owned foreground PID/start/engine/geometry/hit-test checked;no Factorio events raised'
   $result|ConvertTo-Json -Depth 12|Set-Content -LiteralPath $receipt -Encoding utf8
   if($null-ne$client){$client.Dispose()}
