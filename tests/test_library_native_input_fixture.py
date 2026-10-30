@@ -178,7 +178,7 @@ class LibraryNativeInputFixtureControls(unittest.TestCase):
             local active={base=base,["more-infinite-research"]=target=="f200" and "5.0.20000" or "5.0.21000",
               [historical.fixture]=target=="f200" and "0.3.0" or "0.4.0",
               ["mir-fixture-mir5-active-mods-observer"]="0.1.0",["mir-fixture-mir5-library-native-input"]="0.3.0"}
-            local env={game=game,storage=store,defines={events=events},log=function()end,
+            local env={game=game,storage=store,defines={events=events,gui_type={custom=99}},log=function()end,
               helpers={table_to_json=function()return "{}"end},
               require=function(name)assert(name=="__mir-fixture-mir5-migration-origin-f200-110-source__/catalogue");return historical end,
               remote={add_interface=function(name,value)interfaces[name]=value end,
@@ -210,7 +210,14 @@ class LibraryNativeInputFixtureControls(unittest.TestCase):
               memory[p.index].search=query(p).text
               if opponent~="root-not-retired" then invalidate(root) end
               p.gui.screen[root_name]=nil;p.opened=nil;p.focused=nil
-              if opponent~="missing-close-event" then callbacks.events[5]({player_index=p.index,element=root}) end
+              local event_element=root
+              if opponent=="invalid-close-element" then event_element={valid=false}
+              elseif opponent=="absent-close-element" then event_element=nil
+              elseif opponent=="wrong-close-element" then event_element=element("frame","unrelated") end
+              if opponent~="missing-close-event" then callbacks.events[5]({
+                player_index=opponent=="wrong-close-player" and de.index or p.index,
+                gui_type=opponent=="wrong-close-type" and 1 or 99,element=event_element}) end
+              if opponent=="duplicate-close-event" then callbacks.events[5]({player_index=p.index,gui_type=99,element=root}) end
             end
             local readonly_report,readonly_load,cold_calls_before,cold_calls_after,initial_report,missing_query_report,missing_query_readonly
             local ok,message=pcall(function()
@@ -242,6 +249,7 @@ class LibraryNativeInputFixtureControls(unittest.TestCase):
               if opponent=="wrong-drag-y" then root.location.y=root.location.y+1 end
               if opponent~="missing-drag-event" and opponent~="pre-drag-event-only" then callbacks.events[4]({player_index=en.index,element=root}) end
               if opponent=="multiple-drag-events" then callbacks.events[4]({player_index=en.index,element=root}) end
+              if opponent=="unarmed-close-event" then callbacks.events[5]({player_index=en.index,gui_type=99,element={valid=false}}) end
               step("drag");key_close(en);step("escape");key_close(en);step("inventory")
               local other=en.gui.screen.mir5_input_other.mir5_input_other_query
               click(en,other);type_text(en,"focus");step("foreign-prefix");game.tick=game.tick+60
@@ -348,6 +356,25 @@ class LibraryNativeInputFixtureControls(unittest.TestCase):
                         self.assertIn("actual native drag differs: baseline=", rejected["message"])
                         self.assertEqual(rejected["final"]["phase"], "drag")
                         self.assertEqual(rejected["saves"], {})
+
+    def test_custom_close_observes_retired_elements_without_losing_event_requirement(self):
+        for target in ("f200", "f210"):
+            for opponent in ("invalid-close-element", "absent-close-element", "duplicate-close-event", "unarmed-close-event"):
+                with self.subTest(target=target, opponent=opponent):
+                    result = self.run_case(target, opponent)
+                    self.assertTrue(result["ok"], result["message"])
+                    self.assertEqual(result["final"]["actual_library_closed_events"], 2)
+                    observations = result["final"]["actual_library_close_observations"]
+                    self.assertEqual([row["ordinal"] for row in observations], [1, 2])
+                    self.assertTrue(all(row["accepted"] for row in observations))
+                    if opponent in ("invalid-close-element", "absent-close-element"):
+                        self.assertTrue(all(not row["element_valid"] for row in observations))
+            for opponent in ("missing-close-event", "wrong-close-player", "wrong-close-type", "wrong-close-element", "root-not-retired"):
+                with self.subTest(target=target, opponent=opponent):
+                    result = self.run_case(target, opponent)
+                    self.assertFalse(result["ok"], result["message"])
+                    self.assertIn("actual key did not retire", result["message"])
+                    self.assertEqual(result["saves"], {})
 
     def test_observer_rejects_missing_native_events_mutations_and_lost_cold_views(self):
         opponents = ("wrong-initial-credit", "preexisting-player", "extra-mod", "out-of-order", "private-listed", "empty-ordinary", "foreign-library-root",

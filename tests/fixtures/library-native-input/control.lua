@@ -187,6 +187,7 @@ local function report()
   local de=s.de_index~=nil and game.get_player(s.de_index) or nil
   return {schema=1,case="library-native-input-imported110",phase=s.phase,tick=game.tick,
     actual_joins=s.joins,actual_text_events=s.text_events,actual_library_closed_events=s.closed_events,
+    actual_library_close_observations=s.close_observations,
     actual_drag_events=s.drag_events,actual_effect_reset_events=s.reset_events,requested_native_resets=s.requested_resets,actual_removed_events=s.removed_events,
     initial_location=s.initial_location,drag_baseline=s.drag_baseline,drag_events_before=s.drag_events_before,
     private_queries=s.private_queries,en_index=s.en_index or false,de_index=s.de_index or false,
@@ -206,8 +207,16 @@ local function phase(expected)
 end
 local function closed(expected)
   local s=state();local en=player(s.en_index)
-  if s.closed_events~=expected or valid(refs.en_root) or valid(refs.en_query) or valid(en.gui.screen[ROOT]) then fail("actual key did not retire the Library root/query") end
+  if s.closed_events~=expected or s.close_expected~=nil or not s.last_close or s.last_close.ordinal~=expected
+      or valid(refs.en_root) or valid(refs.en_query) or valid(en.gui.screen[ROOT]) then fail("actual key did not retire the Library root/query") end
   assert_world();return en
+end
+local function arm_close(en, expected_phase)
+  local s=state()
+  if s.close_expected~=nil or not valid(refs.en_root) or not valid(refs.en_query) or en.opened~=refs.en_root then
+    fail("declared key close has no owned opened Library")
+  end
+  s.close_expected={phase=expected_phase,player_index=en.index,ordinal=s.closed_events+1}
 end
 local function advance(step)
   local s=state()
@@ -235,13 +244,13 @@ local function advance(step)
       fail(string.format("actual native drag differs: baseline=(%s,%s) point=(%s,%s) events_before=%s events_now=%s",
         s.drag_baseline.x,s.drag_baseline.y,point.x,point.y,s.drag_events_before,s.drag_events))
     end
-    s.drag_location=point;s.phase="escape"
+    s.drag_location=point;s.phase="escape";arm_close(en,"escape")
   elseif step=="escape" then
     phase("escape");local en=closed(1);local de=player(s.de_index);local old_root,old_query=refs.en_root,refs.en_query
     open(en,"gears",GEAR);refs.en_root,refs.en_query,refs.de_root,refs.de_query=personal(en,de,"gears")
     local point=location(refs.en_root)
     if refs.en_root==old_root or refs.en_query==old_query or point.x~=s.drag_location.x or point.y~=s.drag_location.y then fail("reopen lost location or reused retired root") end
-    s.phase="inventory"
+    s.phase="inventory";arm_close(en,"inventory")
   elseif step=="inventory" then
     phase("inventory");local en=closed(2)
     local other=en.gui.screen.add{type="frame",name=OTHER,direction="vertical",caption="MIR fixture focus observation"}
@@ -311,7 +320,7 @@ script.on_init(function()
   for _ in pairs(game.players) do fail("protected headless source must contain no pre-existing players") end
   if storage[KEY]~=nil then fail("observer state already exists") end
   storage[KEY]={schema=1,phase="waiting-clients",native=world(),joins=0,restart_joins={},text_events=0,closed_events=0,
-    drag_events=0,reset_events=0,requested_resets=0,removed_events=0,private_queries=0,query_clicks=0,other_clicks=0,imported_probe_verified=false}
+    drag_events=0,reset_events=0,requested_resets=0,removed_events=0,private_queries=0,query_clicks=0,other_clicks=0,imported_probe_verified=false,close_observations={}}
   check_imported_literals()
 end)
 script.on_load(function()local s=storage[KEY];loaded_restart=type(s)=="table" and s.phase=="awaiting-restart";refs={} end)
@@ -342,7 +351,26 @@ script.on_event(defines.events.on_gui_location_changed,function(event)
   local s=state();if event.player_index==s.en_index and event.element==refs.en_root then s.drag_events=s.drag_events+1 end
 end)
 script.on_event(defines.events.on_gui_closed,function(event)
-  local s=state();if event.player_index==s.en_index and event.element==refs.en_root then s.closed_events=s.closed_events+1 end
+  local s=state();local armed=s.close_expected
+  if not armed or event.player_index~=s.en_index or event.player_index~=armed.player_index
+      or s.phase~=armed.phase or event.gui_type~=defines.gui_type.custom then return end
+  -- The owning mod may have destroyed its root before this observer runs.
+  -- Retain the actual custom-close event before any optional element getter;
+  -- root disappearance without this armed same-player event cannot pass.
+  local row={phase=s.phase,player_index=event.player_index,gui_type=event.gui_type,ordinal=armed.ordinal,
+    element_present=event.element~=nil,accepted=false}
+  if #s.close_observations>=8 then fail("declared close observation bound exceeded") end
+  s.close_observations[#s.close_observations+1]=row
+  local ok,element_valid=pcall(function()return valid(event.element)end)
+  row.element_valid=ok and element_valid==true
+  local same_ok,same=pcall(function()return event.element==refs.en_root end)
+  row.same_root=same_ok and same==true
+  local name_ok,name=pcall(function()return event.element and event.element.name end)
+  row.element_name=name_ok and type(name)=="string" and name or false
+  if row.element_valid and not row.same_root then return end
+  local en=player(s.en_index)
+  if not row.element_valid and (valid(refs.en_root) or valid(refs.en_query) or valid(en.gui.screen[ROOT])) then return end
+  row.accepted=true;s.closed_events=s.closed_events+1;s.last_close=row;s.close_expected=nil
 end)
 script.on_event(defines.events.on_technology_effects_reset,function(event)
   local s=state();if event.force==game.forces.player then s.reset_events=s.reset_events+1 end

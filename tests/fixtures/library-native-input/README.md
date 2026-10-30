@@ -20,13 +20,15 @@ Join roles are the exact names `MIR5English` and `MIR5Deutsch`, with the permitt
 
 The input report now exposes `en_name`, `de_name`, `en_locale`, `de_locale`, `en_connected` and `de_connected`, alongside the retained role indices. The export report exposes the same observations under `geometry.en` and `geometry.de`. The caller must read those actual observations before input, not infer readiness from a join count. Absent indices remain distinct from numeric indices. Host doubles exercise Lua index0 as robustness only; R04's networking index0 did not establish a Lua player index0.
 
-Compose input0.3 from current `control.lua` and `info-input-identity-f200.json` or `info-input-identity-f210.json`. Compose export0.4 from current `control.lua`, `support-exports.lua` and the corresponding `info-exports-identity-*.json`. ZIP roots are the unchanged observer name plus the declared0.3.0 or0.4.0 version. The prepared record pins all four reproducible containers and new profiles. Preserve the original31-row/75-effect/three-force source fixture and saved inputs; no source recreation, credit seeding or player-package change is required.
+Compose each observer from the exact raw Git members and revisions in its prepared record. Input0.3 uses `control.lua` and the corresponding `info-input-identity-*.json`; export0.4 retains its separately pinned `control.lua`, `support-exports.lua` and `info-exports-identity-*.json`. An input-only correction does not retarget the export archive to current source. ZIP roots use the unchanged observer name and declared0.3.0 or0.4.0 version. Preserve the original31-row/75-effect/three-force source fixture and saved inputs; no source recreation, credit seeding or player-package change is required.
 
 ## Native input delivery observation
 
 - Prepared inputs: [native delivery record](../../../spec/evidence/library-input-native-delivery-prepared-r01.json), with new r06 profiles and separately hashed input archives. Earlier profiles/archives/adverses remain unchanged.
 - Reports expose `en_input`/`de_input`: actual Library open/query and foreign open/query values. Missing stays false; an actual empty query stays an empty string. Foreign open also requires `player.opened` to be that fixed GUI.
 - Send each desktop action once. Await exact native text, close or drag endpoint/events through report-only polling:10-second polling budget, at most50 reports,200ms between incomplete observations. An in-flight transport call retains its own bound.
+
+- Arm each Esc/E observation only while the expected EN-owned Library is actually open. Require an actual same-player custom-close event plus independently retired root/query state; another mod may have destroyed the event element before the observer runs. An absent root without that armed native event cannot pass. Retain the event's scalar observation and all earlier adverse results.
 - Preserve phase, process/role/locale identity, peer state, unrelated counters and every original root/reference/world/focus/lifecycle assertion. Invoke each mutating assertion once after confirmation. Refuse malformed observations and timeouts; never resend, refocus, reset or retry advance.
 - This is functional delivery synchronization. Earlier failed runs remain adverse; no timing acceptance threshold or performance claim changes.
 
