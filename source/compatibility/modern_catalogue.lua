@@ -617,6 +617,23 @@ local function apply_bob_angel(definitions)
   end
 end
 
+-- The F200 Space Age + BobTech tuple is not the retained no-BobTech profile.
+-- Its finite published vectors are selected only after the named provider
+-- gate and its own preflight. Do not relax the older selector or transport
+-- this binding into a different target/profile.
+local function apply_bob_angel_f200_combined(definitions, delta)
+  for _, definition in ipairs(definitions) do
+    local science = delta.science_rewrites[definition.science]
+    if type(science) ~= "string" then
+      error("MIR F200 combined Bob/Angel lacks authored science for " .. tostring(definition.key), 3)
+    end
+    definition.science = science
+    if delta.water_prerequisites[definition.key] == true then
+      table.insert(definition.prerequisites, 1, "angels-water-treatment")
+    end
+  end
+end
+
 local function apply_bob_core(definitions)
   local delta = require("compatibility.modern_catalogue.bob_core")
   local selected_by_key = {}
@@ -720,6 +737,8 @@ function M.science_names(key)
       vector = require("compatibility.modern_catalogue.k2_space_exploration").science[key]
     elseif key:match("^science_se_") then
       vector = require("compatibility.modern_catalogue.space_exploration").science[key]
+    elseif key:match("^science_bob_angel_f200_") then
+      vector = require("compatibility.modern_catalogue.bob_angel_f200_combined").science[key]
     elseif key:match("^science_bob_angel_") then
       vector = require("compatibility.modern_catalogue.bob_angel_f210").science[key]
     elseif key == "science_automation_logistic_chemical_production_military_utility_angel"
@@ -817,6 +836,11 @@ function M.select(active_mods, raw)
     end
     definitions = retained
     apply_authored_definitions(definitions, delta)
+    apply_bob_angel_f200_combined(definitions, delta)
+    exact_product_bindings = delta.product_bindings()
+    required_product_targets = delta.required_product_targets()
+    copy_true_fields(exact_product_target_families, delta.exact_product_target_families())
+    copy_true_fields(replacement_product_target_families, delta.replacement_product_target_families())
     profile = "bob-angel-space-age-bobtech-f200"
   end
   if k2_base and target.id == "f200" then
@@ -1090,6 +1114,12 @@ function M.continuations(active_mods, raw)
     for key, value in pairs(delta.continuation_overrides or {}) do
       overrides[key] = copy(value)
       if value.prerequisites ~= nil then overrides[key].exact_prerequisites = true end
+    end
+  end
+  if bob_angel_f200_combined then
+    local delta = require("compatibility.modern_catalogue.bob_angel_f200_combined")
+    for key, value in pairs(delta.continuation_overrides or {}) do
+      overrides[key] = copy(value)
     end
   end
   local adapter = native_modded_continuations(active_mods)

@@ -9,7 +9,7 @@ local M = {}
 local REQUIRED = {
   "base", "space-age",
   "angelsbioprocessing", "angelspetrochem", "angelsrefining", "angelssmelting",
-  "bobelectronics", "boblibrary", "bobores", "bobplates", "bobrevamp", "bobtech",
+  "bobelectronics", "boblibrary", "boblogistics", "bobores", "bobplates", "bobrevamp", "bobtech",
 }
 
 local INCOMPATIBLE = {
