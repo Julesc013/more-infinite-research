@@ -271,7 +271,7 @@ class CombinedSteelGameplayFixtureTests(unittest.TestCase):
           if not research_tick then return {loaded=loaded,init_ok=true,event_ok=true,research_tick=false,message=tostring(research_message),logs=logs,saves=saves} end
           for index=1,100 do
             machine.get_inventory(4).values["angels-roll-steel"]=100-index
-            machine.get_inventory(5).values["steel-plate"]=(index%10==0) and 8 or 4
+            machine.get_inventory(5).values["steel-plate"]=(index%10==0) and ((opponent=="physical-output" and index==100) and 4 or 8) or 4
             local tick_ok,tick_message=pcall(callbacks.events[1])
             if not tick_ok then return {loaded=loaded,init_ok=true,event_ok=true,physical_ok=false,message=tostring(tick_message)} end
           end
@@ -399,6 +399,20 @@ class CombinedSteelGameplayFixtureTests(unittest.TestCase):
         self.assertIn("current_research_unit_count=number:8000", result["message"])
         self.assertIn("current_research_unit_energy=number:3600", result["message"])
         self.assertEqual((0, 0), (result["logs"] or 0, result["saves"] or 0))
+
+    def test_runtime_retains_all_terminal_physical_scalars_when_the_real_output_guard_refuses(self):
+        result = self.runtime_protocol("physical-output")
+        self.assertTrue(result["loaded"])
+        self.assertTrue(result["init_ok"])
+        self.assertTrue(result["event_ok"])
+        self.assertFalse(result["physical_ok"])
+        self.assertIn("real steel physical output or native bonus differs: ", result["message"])
+        self.assertIn("physical_output=number:436", result["message"])
+        self.assertIn("expected_output=number:440", result["message"])
+        self.assertIn("bonus_progress=number:0", result["message"])
+        self.assertIn("productivity_bonus=number:0.1", result["message"])
+        self.assertIn("output_empty=boolean:true", result["message"])
+        self.assertIn("output_steel_plate=number:0", result["message"])
 
     def test_on_load_refuses_missing_storage_only_witness_without_game_access(self):
         result = self.runtime_protocol("saved-scalar")
