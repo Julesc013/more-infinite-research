@@ -32,7 +32,8 @@ Compose input0.3 from current `control.lua` and `info-input-identity-f200.json` 
 
 ## Drag baseline observation
 
-The [fresh drag-baseline preparation](../../../spec/evidence/library-input-drag-baseline-prepared-r02.json) pins the corrected input source, new reproducible observer ZIPs and separate r05 profiles for both engines. Existing input0.3/export0.4 archives and profiles retain their earlier bytes and source identities. Use only the newly pinned input archive under exclusive library ownership; this internal observer version is not a published MIR release.
+- The [drag-baseline-only predecessor](../../../spec/evidence/library-input-drag-baseline-prepared-r02.json) retains its r05 profiles and exact archive/source hashes. Current dispatch uses the native-delivery preparation above.
+- Preserve all earlier input0.3/export0.4 archives and profiles. Use one exact archive under exclusive library ownership; this internal observer version is not a published MIR release.
 
 At the successful suffix transition, record the current native root location and cumulative location-event count immediately before the declared drag. Require at least one new native location event and exactly30pixels left with no vertical movement from that baseline. Retain the earlier inspection location and all pre-drag events; they cannot stand in for the actual drag. Reports expose both baselines/counts, and a drag refusal includes the actual compared point/counts. The prior stale-baseline adverse remains unchanged; fresh source/archive/profile/runtime inputs and actual native qualification are still required.
 
