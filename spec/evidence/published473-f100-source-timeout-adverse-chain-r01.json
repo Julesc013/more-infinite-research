@@ -160,8 +160,9 @@
   "prospective_correction": {
     "source_fix_commit": "afe1890eab9278e20fdfeefae0af52af99ed0556",
     "host_plan_registration_commit": "41a732c946ef979d99b952b0e28ddfcfcce2ff89",
-    "runner_sha256": "C96C56A253C6E06B0F23F6516725361C6ADDA17C8B3ACADFF2EF75B00E54E7A1",
-    "scope": "Only historical PublishedF100Forward exact case/reload/role/target matcher;other historical modes unchanged. New AST predicate controls and existing host plan/runner controls pass. No old receipt changes."
+    "runner_sha256": "E728969544D5D7F3F061FFC9A76A2E505A3A602C43082F8BC7965E93D8BBF10A",
+    "scope": "Historical PublishedF100Forward exact case/reload/role/target marker plus parsed role/target assertions after initial and reload reads;other historical modes unchanged. AST predicate and duplicate-key parsed opponents,registered host plan and existing runner controls pass. No old receipt changes.",
+    "parsed_identity_guard_commit": "398b2685576380522d083dac74838eec7a7736ab"
   },
   "next_required": "Separately freeze/review a read-only TWO-COLD continuation from exact retained0381 with corrected public source/controller/governor inputs and fresh output/custody. Do not reseed/recreate source;do not accept the timed-out reload or infer a destination journey.",
   "limits": [
