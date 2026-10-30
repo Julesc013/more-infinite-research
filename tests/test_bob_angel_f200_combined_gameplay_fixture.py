@@ -194,11 +194,12 @@ class CombinedSteelGameplayFixtureTests(unittest.TestCase):
           local owner={valid=true,name=owner_name}
           setmetatable(owner,{__index=function(_,key) if key=="researched" then return owner_researched end end,
             __newindex=function(_,key,value) if key=="researched" then owner_researched=value;if value and opponent~="owner" then route_recipe.enabled=true end end end})
+          local research_ingredients=opponent=="ingredients-order" and {{name="logistic-science-pack",amount=1},{name="automation-science-pack",amount=1}} or {{name="automation-science-pack",amount=opponent=="ingredients-count" and 2 or 1},{name="logistic-science-pack",amount=1}}
           local target={valid=true,name=target_name,level=1,researched=false,enabled=true,research_unit_count=8000,research_unit_energy=60,
             prerequisites={{name="automation-science-pack"},{name="logistic-science-pack"}},prototype={name=target_name,level=1,upgrade=true,max_level=4294967295,order="p[research_steel]",effects={
               {type="change-recipe-productivity",recipe="angels-plate-steel",change=opponent=="effect" and .2 or .1},
               {type="change-recipe-productivity",recipe=route_name,change=.1},
-            }},research_unit_ingredients={{name="automation-science-pack",amount=opponent=="ingredients" and 2 or 1},{name="logistic-science-pack",amount=1}}}
+            }},research_unit_ingredients=research_ingredients}
           local force={technologies={
             [target_name]=target,[owner_name]=owner,
             ["automation-science-pack"]={valid=true,name="automation-science-pack",researched=false},
@@ -302,7 +303,8 @@ class CombinedSteelGameplayFixtureTests(unittest.TestCase):
     def test_runtime_refuses_independent_row_lab_owner_or_machine_drift_before_success(self):
         for opponent, phrase in (
             ("effect", "steel productivity effects differ"),
-            ("ingredients", "steel research science differs"),
+            ("ingredients-count", "steel research science differs"),
+            ("ingredients-order", "steel research science differs"),
             ("drain", "native biolab differs"),
             ("lab-input", "native biolab differs"),
             ("quality", "native biolab differs"),
@@ -315,7 +317,7 @@ class CombinedSteelGameplayFixtureTests(unittest.TestCase):
             with self.subTest(opponent=opponent):
                 result = self.runtime_protocol(opponent)
                 self.assertTrue(result["loaded"])
-                if opponent in ("effect", "ingredients", "drain", "lab-input", "quality", "surface", "owner-preseed", "route-enabled", "owner"):
+                if opponent in ("effect", "ingredients-count", "ingredients-order", "drain", "lab-input", "quality", "surface", "owner-preseed", "route-enabled", "owner"):
                     self.assertFalse(result["init_ok"])
                 else:
                     self.assertTrue(result["init_ok"])
