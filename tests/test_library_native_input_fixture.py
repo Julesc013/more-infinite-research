@@ -250,6 +250,10 @@ class LibraryNativeInputFixtureControls(unittest.TestCase):
               if opponent~="missing-drag-event" and opponent~="pre-drag-event-only" then callbacks.events[4]({player_index=en.index,element=root}) end
               if opponent=="multiple-drag-events" then callbacks.events[4]({player_index=en.index,element=root}) end
               if opponent=="unarmed-close-event" then callbacks.events[5]({player_index=en.index,gui_type=99,element={valid=false}}) end
+               if opponent=="opened-nil" then en.opened=nil
+               elseif opponent=="opened-foreign" then
+                 local foreign=element("frame","foreign-opened");foreign.get_mod=function()return "fixture"end;en.opened=foreign
+               end
               step("drag");key_close(en);step("escape");key_close(en);step("inventory")
               local other=en.gui.screen.mir5_input_other.mir5_input_other_query
               click(en,other);type_text(en,"focus");step("foreign-prefix");game.tick=game.tick+60
@@ -374,6 +378,23 @@ class LibraryNativeInputFixtureControls(unittest.TestCase):
                     result = self.run_case(target, opponent)
                     self.assertFalse(result["ok"], result["message"])
                     self.assertIn("actual key did not retire", result["message"])
+                    self.assertEqual(result["saves"], {})
+
+    def test_arm_close_retains_safe_opened_scalars_when_ownership_is_absent(self):
+        expected = {
+            "opened-nil": ("opened_type=nil", "opened_is_root=false", "opened_name=<absent>", "opened_mod=<absent>"),
+            "opened-foreign": ("opened_type=table", "opened_is_root=false", "opened_name=foreign-opened", "opened_mod=fixture"),
+        }
+        for target in ("f200", "f210"):
+            for opponent, scalars in expected.items():
+                with self.subTest(target=target, opponent=opponent):
+                    result = self.run_case(target, opponent)
+                    self.assertFalse(result["ok"], result["message"])
+                    self.assertIn("declared key close has no owned opened Library:", result["message"])
+                    for scalar in scalars:
+                        self.assertIn(scalar, result["message"])
+                    self.assertEqual(result["final"]["phase"], "escape")
+                    self.assertEqual(result["final"]["actual_library_closed_events"], 0)
                     self.assertEqual(result["saves"], {})
 
     def test_observer_rejects_missing_native_events_mutations_and_lost_cold_views(self):
