@@ -80,7 +80,7 @@ This is the authoritative product changelog. Each MIR 1–3 master release appea
 - Exact engine minimums and available features depend on the selected target; Factorio 2.1 requires base 2.1.23.
 - Use one shared master changelog for all editions; historical entries retain their original release and engine scope.
 - Keep local replacement build versions consistent across package metadata, changelog and public API queries; selecting another engine edition requires target adaptation.
-- Offer optional fixed finite Factorio 0.6–0.12 builds from the shared source, with readable museum research names and explicit best-effort limits; current native and save qualification is absent.
+- Offer optional fixed finite Factorio 0.6 through 0.12 builds from the shared source, with readable museum research names and explicit best-effort limits; current native and save qualification is absent.
 
 ## [4.7.3]
 

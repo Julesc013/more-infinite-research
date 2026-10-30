@@ -112,8 +112,8 @@ Version: 5.0.0
     - Use one shared master changelog for all editions; historical entries retain their original release and engine scope.
     - Keep local replacement build versions consistent across package metadata, changelog and public API queries; selecting another
       engine edition requires target adaptation.
-    - Offer optional fixed finite Factorio 0.6–0.12 builds from the shared source, with readable museum research names and explicit
-      best-effort limits; current native and save qualification is absent.
+    - Offer optional fixed finite Factorio 0.6 through 0.12 builds from the shared source, with readable museum research names and
+      explicit best-effort limits; current native and save qualification is absent.
 
 ---------------------------------------------------------------------------------------------------
 Version: 4.7.3
