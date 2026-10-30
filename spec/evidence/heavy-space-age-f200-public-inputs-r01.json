@@ -1,0 +1,794 @@
+{
+  "schema": 1,
+  "kind": "MIRHeavySpaceAgeF200PublicInputPreparationV1",
+  "status": "declared-metadata-admitted-no-native-profile-preparation-only",
+  "consumed_source_commit": "0b0c02bd453a27a69b118543ae4ac8234578d8e2",
+  "profile": {
+    "path": "tests/profiles/bob-angel-full-space-age-f200-2077.json",
+    "bytes": 7511,
+    "sha256": "61CBE6299DD2708079EA80FB3871AC980C6FF7281DD126C61B3126A7FF294857"
+  },
+  "engine": {
+    "version": "2.0.77",
+    "sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B"
+  },
+  "selection": {
+    "official_rows": 4,
+    "heavy_rows": 31,
+    "observer_rows": 1,
+    "nonbuiltin_archives": 32,
+    "base_rows": 36,
+    "with_MIR_rows": 37
+  },
+  "derived_family_names_from": {
+    "path": "tests/profiles/bob-angel-full-space-age-standalone-f210-2123.json",
+    "sha256": "05F2786E896B1F28C2E4239134BA370B0C2BCF6CCB1384E03999FB0E89C8B980",
+    "limit": "Names only;all31 heavy versions are independently read from the existing F200 archives,not relabelled F210 binaries. F200 does not select a separate recycler row."
+  },
+  "input_library_locator": "D:/Projects/Factorio/testmods/2.0",
+  "validator": {
+    "path": "tools/lib/compatibility/LibraryActivation.ps1",
+    "sha256": "123A2241B895B57217AA969A677FF21BBFB268FE55E9734287883B4D6AE25099",
+    "function": "Assert-MIRLibraryDependencies",
+    "result": "pass on exact36 selected metadata rows;no activation or native process"
+  },
+  "native_owner_audit": {
+    "path": "D:/Projects/Factorio/more-infinite-research/build/qualification/heavy-space-age-f200-existing-archive-metadata-audit-r01.json",
+    "bytes": 40716,
+    "sha256": "ED7E84F53130087BB277C36C8BAA1A52054F3BA4AA6915E3800E8AD3CCD468E6"
+  },
+  "selected_archives": [
+    {
+      "name": "angelsaddons-mobility",
+      "version": "2.0.1",
+      "bytes": 97491,
+      "sha256": "F596F3E0FF0322DCD7008F4EBDC173671E26967BDF8E3390FC4FBDEA9E414D88",
+      "metadata": {
+        "name": "angelsaddons-mobility",
+        "version": "2.0.1",
+        "factorio_version": "2.0",
+        "title": "Angel's Addons - Mass Transit",
+        "author": "Arch666Angel, lovely_santa, Kirazy",
+        "contact": "https://discord.gg/ff5p6KE",
+        "homepage": "https://forums.factorio.com/viewforum.php?f=185",
+        "description": "Add multiple tiers of trains across three different themes.",
+        "dependencies": [
+          "base >= 2.0.0",
+          "angelsaddons-mobility-graphics-crawler >= 2.0.0",
+          "angelsaddons-mobility-graphics-petro >= 2.0.0",
+          "angelsaddons-mobility-graphics-smelting >= 2.0.0",
+          "(?) angelsrefining >= 2.0.0"
+        ]
+      }
+    },
+    {
+      "name": "angelsaddons-mobility-graphics-crawler",
+      "version": "2.0.0",
+      "bytes": 205351307,
+      "sha256": "2876A3B426C895A474EF5B7BFA6C6DDAD5AC9AA48AD4B8AE46485C449CCE2745",
+      "metadata": {
+        "name": "angelsaddons-mobility-graphics-crawler",
+        "version": "2.0.0",
+        "factorio_version": "2.0",
+        "title": "Angel's Addons - Mass Transit - Crawler Graphics",
+        "author": "Arch666Angel",
+        "contact": "https://discord.gg/ff5p6KE",
+        "homepage": "https://forums.factorio.com/viewforum.php?f=185",
+        "description": "Crawler-themed train sprites for Mass Transit.",
+        "dependencies": []
+      }
+    },
+    {
+      "name": "angelsaddons-mobility-graphics-petro",
+      "version": "2.0.0",
+      "bytes": 130225666,
+      "sha256": "F4C7FD4097DEDB728D881C130FE77C78E36094859E4254FFCFF709452F6E13C7",
+      "metadata": {
+        "name": "angelsaddons-mobility-graphics-petro",
+        "version": "2.0.0",
+        "factorio_version": "2.0",
+        "title": "Angel's Addons - Mass Transit - Petrochemical Graphics",
+        "author": "Arch666Angel",
+        "contact": "https://discord.gg/ff5p6KE",
+        "homepage": "https://forums.factorio.com/viewforum.php?f=185",
+        "description": "Petrochemical-themed train sprites for Mass Transit.",
+        "dependencies": []
+      }
+    },
+    {
+      "name": "angelsaddons-mobility-graphics-smelting",
+      "version": "2.0.0",
+      "bytes": 163797396,
+      "sha256": "3D3347F7FB0BB607D873E45A2A0568021CC16174DEE301455F4177751A733BB2",
+      "metadata": {
+        "name": "angelsaddons-mobility-graphics-smelting",
+        "version": "2.0.0",
+        "factorio_version": "2.0",
+        "title": "Angel's Addons - Mass Transit - Smelting Graphics",
+        "author": "Arch666Angel",
+        "contact": "https://discord.gg/ff5p6KE",
+        "homepage": "https://forums.factorio.com/viewforum.php?f=185",
+        "description": "Smelting-themed train sprites for Mass Transit.",
+        "dependencies": []
+      }
+    },
+    {
+      "name": "angelsaddons-storage",
+      "version": "2.0.1",
+      "bytes": 2261342,
+      "sha256": "F8D2AA584EE344B9E74903AF5CED05A3A00B04C976F20C87F5128C0BD180A7EF",
+      "metadata": {
+        "name": "angelsaddons-storage",
+        "version": "2.0.1",
+        "factorio_version": "2.0",
+        "title": "Angel's Addons - Storage Options",
+        "author": "Arch666Angel",
+        "contact": "https://discord.gg/ff5p6KE",
+        "homepage": "https://forums.factorio.com/viewforum.php?f=185",
+        "description": "Adds pressure tanks (extremely large tanks), warehouses and silos.",
+        "dependencies": [
+          "base >= 2.0",
+          "(?) angelsrefining",
+          "? angelspetrochem >= 2.0.0"
+        ]
+      }
+    },
+    {
+      "name": "angelsbioprocessing",
+      "version": "2.0.3",
+      "bytes": 167665,
+      "sha256": "766B5784C3EB7A0B43D1B2C58ABCEC47EA69E4677129DC5C9255BEB66DC86B1B",
+      "metadata": {
+        "name": "angelsbioprocessing",
+        "version": "2.0.3",
+        "factorio_version": "2.0",
+        "title": "Angel's Bioprocessing",
+        "author": "Arch666Angel",
+        "contact": "https://discord.gg/ff5p6KE",
+        "homepage": "https://forums.factorio.com/viewforum.php?f=185",
+        "description": "Adds ways to recycle and process waste products through biological means and make use of biological processes and farming.",
+        "dependencies": [
+          "angelsrefining >= 2.0.3",
+          "angelspetrochem >= 2.0.2",
+          "angelssmelting >= 2.0.2",
+          "~ angelsbioprocessinggraphics >= 2.0.0",
+          "(?) bobmodules >= 2.1.0"
+        ]
+      }
+    },
+    {
+      "name": "angelsbioprocessinggraphics",
+      "version": "2.0.0",
+      "bytes": 28984409,
+      "sha256": "8C4DCBBF61772C4276A9B655FB9173A4D3B0FCE0872D8F60FD8600225A16AB66",
+      "metadata": {
+        "name": "angelsbioprocessinggraphics",
+        "version": "2.0.0",
+        "factorio_version": "2.0",
+        "title": "Angel's Bioprocessing Graphics",
+        "author": "Arch666Angel",
+        "contact": "https://discord.gg/ff5p6KE",
+        "homepage": "https://forums.factorio.com/viewforum.php?f=185",
+        "description": "",
+        "dependencies": []
+      }
+    },
+    {
+      "name": "angelsinfiniteores",
+      "version": "2.0.3",
+      "bytes": 25655344,
+      "sha256": "3AFBA78BAD970A6244208B348FC30B362E37C61043F78709772EB06868176C63",
+      "metadata": {
+        "name": "angelsinfiniteores",
+        "version": "2.0.3",
+        "factorio_version": "2.0",
+        "title": "Angel's Infinite Ores",
+        "author": "Arch666Angel",
+        "contact": "",
+        "homepage": "https://forums.factorio.com/viewforum.php?f=185",
+        "description": "Adds infinite ores for the base game, Bob's mods, Yuoki Industries and the base ores for Angel's Refining. Has config options to change the yield for all infinite resources including oil and gas.",
+        "dependencies": [
+          "base >= 2.0.0",
+          "? angelsrefining >= 2.0.3",
+          "(?) rso-mod >= 7.0.0",
+          "? bobores >= 2.1.0",
+          "? bobplates >= 2.1.0",
+          "? Yuoki >= 1.2.0",
+          "? pycoalprocessing",
+          "? pyrawores",
+          "? pypetroleumhandling"
+        ]
+      }
+    },
+    {
+      "name": "angelspetrochem",
+      "version": "2.0.3",
+      "bytes": 171774,
+      "sha256": "DFEBBC1F4E9F13016006071CBB064FF6289EFBAF92A7290D716C0D1E8C20430D",
+      "metadata": {
+        "name": "angelspetrochem",
+        "version": "2.0.3",
+        "factorio_version": "2.0",
+        "title": "Angel's Petrochemical Processing",
+        "author": "Arch666Angel",
+        "contact": "https://discord.gg/ff5p6KE",
+        "homepage": "https://forums.factorio.com/viewforum.php?f=185",
+        "description": "Angel's Petrochemical processing changes Oil processing and adds Gas processing, as well as a more complex web of chemical production. Includes overrides and tie-ins to Bob's technologies and recipes.",
+        "dependencies": [
+          "base >= 2.0.48",
+          "angelsrefining >= 2.0.3",
+          "~ angelspetrochemgraphics >= 2.0.0"
+        ]
+      }
+    },
+    {
+      "name": "angelspetrochemgraphics",
+      "version": "2.0.1",
+      "bytes": 21046201,
+      "sha256": "B8D877865D50E1157EED80CCE56F21174A69D81453075A825A837AB375CF3262",
+      "metadata": {
+        "name": "angelspetrochemgraphics",
+        "version": "2.0.1",
+        "factorio_version": "2.0",
+        "title": "Angel's Petrochemical Processing Graphics",
+        "author": "Arch666Angel",
+        "contact": "https://discord.gg/ff5p6KE",
+        "homepage": "https://forums.factorio.com/viewforum.php?f=185",
+        "description": "",
+        "dependencies": []
+      }
+    },
+    {
+      "name": "angelsrefining",
+      "version": "2.0.4",
+      "bytes": 524566,
+      "sha256": "8E78BA1FE453BA90999F6FECED81F9DBF41F1EF49EEB423BA6C4CE08C1DCDC42",
+      "metadata": {
+        "name": "angelsrefining",
+        "version": "2.0.4",
+        "factorio_version": "2.0",
+        "title": "Angel's Refining",
+        "author": "Arch666Angel",
+        "contact": "https://discord.gg/ff5p6KE",
+        "homepage": "https://forums.factorio.com/viewforum.php?f=185",
+        "description": "Adds ore refining to the game. Compound ores have to be refined before you are able to smelt and cast them into plates. Works best (has more functionality) in conjunction with Angel's industries and/or Bob's mods and supports additional mods like Yuoki Industries.",
+        "dependencies": [
+          "base >= 2.0.0",
+          "~ angelsrefininggraphics >= 2.0.0",
+          "(?) bobassembly >= 2.1.0",
+          "? bobelectronics >= 2.1.0",
+          "? bobenemies >= 2.1.0",
+          "? boblibrary >= 2.1.0",
+          "(?) boblogistics >= 2.1.0",
+          "(?) bobmodules >= 2.1.0",
+          "? bobplates >= 2.1.0",
+          "(?) bobpower >= 2.1.0",
+          "? bobrevamp >= 2.1.0",
+          "(?) bobtech >= 2.1.0",
+          "(?) bobvehicleequipment >= 2.1.0",
+          "? bobwarfare >= 2.1.0",
+          "(?) rso-mod >= 7.0.0",
+          "? Yuoki >= 1.2.0"
+        ]
+      }
+    },
+    {
+      "name": "angelsrefininggraphics",
+      "version": "2.0.0",
+      "bytes": 85675072,
+      "sha256": "0B09E4335640DC580F742B04F9C109ED544F74A685C11CB1878B33DB36D7AF25",
+      "metadata": {
+        "name": "angelsrefininggraphics",
+        "version": "2.0.0",
+        "factorio_version": "2.0",
+        "title": "Angel's Refining Graphics",
+        "author": "Arch666Angel",
+        "contact": "https://discord.gg/ff5p6KE",
+        "homepage": "https://forums.factorio.com/viewforum.php?f=185",
+        "description": "",
+        "dependencies": []
+      }
+    },
+    {
+      "name": "angelssmelting",
+      "version": "2.0.5",
+      "bytes": 198937,
+      "sha256": "6DDF5D7BAF4BACDE0398E47BF29EF3AECE41A34F33210439AD0C60C7ADE7FBB4",
+      "metadata": {
+        "name": "angelssmelting",
+        "version": "2.0.5",
+        "factorio_version": "2.0",
+        "title": "Angel's Smelting",
+        "author": "Arch666Angel",
+        "contact": "https://discord.gg/ff5p6KE",
+        "homepage": "https://forums.factorio.com/viewforum.php?f=185",
+        "description": "Angel's Smelting provides alternative ways to produce plate and increase ore yield at the expense of space and energy.",
+        "dependencies": [
+          "angelsrefining >= 2.0.3",
+          "angelspetrochem >= 2.0.2",
+          "~ angelssmeltinggraphics >= 2.0.0"
+        ]
+      }
+    },
+    {
+      "name": "angelssmeltinggraphics",
+      "version": "2.0.0",
+      "bytes": 43682108,
+      "sha256": "D638AA7A67405811279F96370BF5FC026CCE476048FDF16D91261354A858C6EF",
+      "metadata": {
+        "name": "angelssmeltinggraphics",
+        "version": "2.0.0",
+        "factorio_version": "2.0",
+        "title": "Angel's Smelting Graphics",
+        "author": "Arch666Angel",
+        "contact": "https://discord.gg/ff5p6KE",
+        "homepage": "https://forums.factorio.com/viewforum.php?f=185",
+        "description": "",
+        "dependencies": []
+      }
+    },
+    {
+      "name": "bobassembly",
+      "version": "2.1.0",
+      "bytes": 15786563,
+      "sha256": "CB839BB8381D26C9DA23109A31FB59AD8191068A3589D05AC8F051EC59ABBBDD",
+      "metadata": {
+        "name": "bobassembly",
+        "version": "2.1.0",
+        "factorio_version": "2.0",
+        "title": "Bob's Assembling machines mod",
+        "author": "Bobingabout",
+        "contact": "",
+        "homepage": "https://forums.factorio.com/viewforum.php?f=51",
+        "dependencies": [
+          "base >= 2.0.49",
+          "boblibrary >= 2.1.0",
+          "? bobplates >= 2.1.0",
+          "? space-age >= 2.0.0"
+        ],
+        "description": "Requires Bob's functions library mod\n\nThis mod adds assembling machines 4, 5 and 6, and updates the recipe for assembling machine 3 to fit my progression pattern.\nThe mod also adds higher tiers of Electric furnace, Chemical plant and Oil refinery.\nIt also includes the Electronic assembling machine chain, and additional tiers of machines added by Bob's Metals, Chemicals and Intermediates mod.\n\nDesigned to work best with my full mod pack.\nAll additional machine tiers other than assembling machines can be turned off in the mod options."
+      }
+    },
+    {
+      "name": "bobelectronics",
+      "version": "2.1.1",
+      "bytes": 464241,
+      "sha256": "BF11C8AB53F732564770DB0E7AAD24C07AF30196DA49394FA6E03E85939B38F3",
+      "metadata": {
+        "name": "bobelectronics",
+        "version": "2.1.1",
+        "factorio_version": "2.0",
+        "title": "Bob's Electronics mod",
+        "author": "Bobingabout",
+        "contact": "",
+        "homepage": "https://forums.factorio.com/viewforum.php?f=51",
+        "dependencies": [
+          "base >= 2.0.49",
+          "boblibrary >= 2.1.0",
+          "? bobplates >= 2.1.0"
+        ],
+        "description": "Requires Bob's functions library mod.\n\nThis mod changes the way you build electronics, making the process more realistic.\nFirst you have to assemble electronic components, then combine them into circuit boards.\nUnlike in the base game, each tier of circuit board does NOT require the previous tier.\nIt also adds a 4th tier of electronics used for high end machinery.\n\nAlthough it can work by itself, it is designed to function best with my entire set of mods installed."
+      }
+    },
+    {
+      "name": "bobenemies",
+      "version": "2.1.0",
+      "bytes": 1308485,
+      "sha256": "FAB90D7B0C57D4E35323D4036C5B1B0046BF30A9BCAFC8687F42270497DEDD62",
+      "metadata": {
+        "name": "bobenemies",
+        "version": "2.1.0",
+        "factorio_version": "2.0",
+        "title": "Bob's Enemies mod",
+        "author": "Bobingabout",
+        "contact": "",
+        "homepage": "https://forums.factorio.com/viewforum.php?f=51",
+        "dependencies": [
+          "base >= 2.0.33",
+          "boblibrary >= 2.1.0",
+          "? space-age >= 2.0.0",
+          "(?) combat-mechanics-overhaul >= 0.7.1"
+        ],
+        "description": "Re-adds Alien artifacts to the game.\nAdds 6 different coloured versions of artifacts to the game, each based on a different damage type.\nAdds small versions of artifacts dropped by biters and spitters.\nAdds six new breeds of enemies to the game, in addition to the original vanilla type.\nAll seven breeds have a full eight tiers of worms, biters, and spitters.\nEnemy bases will initially focus on a single breed, before eventually diversifying into having two or three together.\nNearby bases will tend to belong to the same breed, creating territories.\nEnemies may have quality boosts."
+      }
+    },
+    {
+      "name": "bobequipment",
+      "version": "2.1.0",
+      "bytes": 1466634,
+      "sha256": "046EB8090849A521F6A4740401E20111AEAC494FC4FE0610ABE5786D65A00304",
+      "metadata": {
+        "name": "bobequipment",
+        "version": "2.1.0",
+        "factorio_version": "2.0",
+        "title": "Bob's Personal Equipment mod",
+        "author": "Bobingabout",
+        "contact": "",
+        "homepage": "https://forums.factorio.com/viewforum.php?f=51",
+        "dependencies": [
+          "base >= 2.0.33",
+          "boblibrary >= 2.1.0",
+          "? bobenemies >= 2.1.0",
+          "? bobplates >= 2.1.0",
+          "? boblogistics >= 2.1.0",
+          "(?) space-age"
+        ],
+        "description": "Requires Bob's functions library mod.\n\nExpands the range of equipment available in base mod for the modular armor.\n\nAlthough it can function as a stand alone mod, it is intended to be used with the full Bob's Mods set."
+      }
+    },
+    {
+      "name": "bobgreenhouse",
+      "version": "2.1.0",
+      "bytes": 312315,
+      "sha256": "3DBFF76267D97ECFC73BD83F32B95EFB55159FA8B46DDCD4EFD0274D08DCBE3D",
+      "metadata": {
+        "name": "bobgreenhouse",
+        "version": "2.1.0",
+        "factorio_version": "2.0",
+        "title": "Bob's Greenhouse mod",
+        "author": "Bobingabout",
+        "contact": "",
+        "homepage": "https://forums.factorio.com/viewforum.php?f=51",
+        "dependencies": [
+          "base >= 2.0.0",
+          "boblibrary >= 2.1.0",
+          "? bobplates >= 2.1.0",
+          "? space-age >= 2.0.0"
+        ],
+        "description": "Requires Bob's functions library mod.\n\nThis mod adds a greenhouse, and recipes for it to make wood.\nAlso an advanced recipe that uses Fertiliser to make even more wood"
+      }
+    },
+    {
+      "name": "bobinserters",
+      "version": "2.0.3",
+      "bytes": 176163,
+      "sha256": "FC2A6FB6B9816FF1D37E304A0A714270839E3366C93D4859AEE0AB9A9AECF765",
+      "metadata": {
+        "name": "bobinserters",
+        "version": "2.0.3",
+        "factorio_version": "2.0",
+        "title": "Bob's Adjustable Inserters mod",
+        "author": "Bobingabout",
+        "contact": "",
+        "homepage": "https://forums.factorio.com/viewforum.php?f=51",
+        "dependencies": [
+          "base >= 2.0.0"
+        ],
+        "description": "Adds a GUI for customising inserter pickup/drop positions.\n\nAlso adds hot-keys.\n\nSHIFT + P: Change pickup range (Long inserters technology will allow short/long toggle.)\nSHIFT + O: Change drop range (Long inserters technology will allow short/long toggle.)\nSHIFT + L: Long Inserter toggle (Long inserters technology will allow short/long toggle on both input and output.)\nSHIFT + N: Drop location offset toggle (Near inserters technology will allow near/far side of belt toggle)\nCTRL + R: Change pickup rotation (4 step rotation by default, More inserters technology will unlock additional directions)\nSHIFT + E: Open GUI\n\nAll hotkeys can be remapped, and an option exists to open the GUI at the same time as the standard inserter GUI instead of with a hotkey.\nThis mod also adds in researches to unlock the more adjustment options.\n\nTutorial: https://www.youtube.com/watch?v=Zu9LmpZaVPg"
+      }
+    },
+    {
+      "name": "boblibrary",
+      "version": "2.1.0",
+      "bytes": 5538241,
+      "sha256": "1CB971B7A39F0805F14DD0F27F17CC832B7FFC6608CB2234E182062FC8DBF62B",
+      "metadata": {
+        "name": "boblibrary",
+        "version": "2.1.0",
+        "factorio_version": "2.0",
+        "title": "Bob's Functions Library mod",
+        "author": "Bobingabout",
+        "contact": "",
+        "homepage": "https://forums.factorio.com/viewforum.php?f=51",
+        "dependencies": [
+          "base >= 2.0.49"
+        ],
+        "description": "Adds a series of useful functions used by Bob's Mods. These can easilly be used by other mods too."
+      }
+    },
+    {
+      "name": "boblogistics",
+      "version": "2.1.1",
+      "bytes": 21919808,
+      "sha256": "07297FA72B1792C4483D30EA1705ECD4C7390B246E24B6B58663862445E500E5",
+      "metadata": {
+        "name": "boblogistics",
+        "version": "2.1.1",
+        "factorio_version": "2.0",
+        "title": "Bob's Logistics mod",
+        "author": "Bobingabout",
+        "contact": "",
+        "homepage": "https://forums.factorio.com/viewforum.php?f=51",
+        "dependencies": [
+          "base >= 2.0.49",
+          "boblibrary >= 2.1.0",
+          "? bobplates >= 2.1.0",
+          "? bobinserters >= 2.0.0",
+          "? space-age >= 2.0.0",
+          "? valves",
+          "(?) Krastorio2",
+          "(?) aai-loaders"
+        ],
+        "description": "Requires Bob's functions library mod.\n\nAdds lots logistic related things in all areas.\nAdds 2 higher tiers of belt and related entities.\nBelt overhaul will change all recipes to make better use of Bob mod resources, and add a Tier 0.\nAdds a higher tier of inserters.\nInserter overhaul will add more tiers of inserter, replace long handed inserter with a menu to make other inserters long handed, and change all recipes to make better use of Bob mod resources.\nIf suitable materials are available, it will add 2 higher tiers of chest, and logistic chests\nAdds 2 higher tiers of train set (Locomotive, Cargo wagon and Fluid wagon) that will have higher speed and storage. Also adds an armored train set, and Tier 2 version of it.\nAdds tier 2 to 4 pumps, and reduces the flow to make the progression work\nAdds tier 2 to 4 of Logistic and Construction robots.\nAdds tier 2 to 4 roboports, roboport parts (intermediates), and smaller specialised entities, such as the Logistic Zone Expander and Robochest.\nAdds tier 2 to 4 of storage tank.\nAdds many new pipes made from many different materials, spanning 5 tiers.\n\nAlthough it can function as a stand alone mod, it is intended to be used with the full Bob's Mods set."
+      }
+    },
+    {
+      "name": "bobmining",
+      "version": "2.1.0",
+      "bytes": 3487095,
+      "sha256": "4E6296035852433362705E7CB02E5CE5A8E4F48F4139A606B868AE56D5698782",
+      "metadata": {
+        "name": "bobmining",
+        "version": "2.1.0",
+        "factorio_version": "2.0",
+        "title": "Bob's Mining mod",
+        "author": "Bobingabout",
+        "contact": "",
+        "homepage": "https://forums.factorio.com/viewforum.php?f=51",
+        "dependencies": [
+          "base >= 2.0.33",
+          "boblibrary >= 2.1.0",
+          "? bobores >= 2.1.0",
+          "? bobplates >= 2.1.0"
+        ],
+        "description": "Requires Bob's functions library mod.\n\nAdds higher tiers of electric mining drill that increase mining speed.\nAdds an additional branch of electric mining drills that increase the mining area.\nAdds higher tiers of Pumpjacks\nAdds a full set of water mining drills, for use with the water patches added by Bob's Ores mod.\nAdds several tiers of steel-axe technology to further increase personal mining speed.\n\nAlthough it can function as a stand alone mod, it is intended to be used with the full Bob's Mods set."
+      }
+    },
+    {
+      "name": "bobmodules",
+      "version": "2.1.0",
+      "bytes": 4795684,
+      "sha256": "36E676ED16F67E01F4737778F8359CB72D04F0316ED21279138511935447CE60",
+      "metadata": {
+        "name": "bobmodules",
+        "version": "2.1.0",
+        "factorio_version": "2.0",
+        "title": "Bob's Modules mod",
+        "author": "Bobingabout",
+        "contact": "",
+        "homepage": "https://forums.factorio.com/viewforum.php?f=51",
+        "dependencies": [
+          "base >= 2.0.49",
+          "boblibrary >= 2.1.0",
+          "? bobplates >= 2.1.0",
+          "? bobelectronics >= 2.1.0",
+          "? DiscoScience"
+        ],
+        "description": "Requires Bob's functions library mod.\n\nExpansion to the Modules system.\nExpands the 3 types of base game module to be 5 tiers, not just 3\nAdjusts the bonuses each module gives, and allows you to customise them in mod settings.\nAdds Pollution creating and Pollution cleaning modules, 5 tiers.\nGod modules provide efficiency + speed + cleaning, with two variants that add either productivity or quality.\nAll recipes are completely reworked, making use of electronic components from Bob's Electronics mod.\n\nAlthough it can function as a stand alone mod, it is intended to be used with the full Bob's Mods set."
+      }
+    },
+    {
+      "name": "bobores",
+      "version": "2.1.2",
+      "bytes": 150993,
+      "sha256": "BB0916DC28C1DD2E4A62E3F102298F7C47B5E07930FA5C84302B0879D983DF94",
+      "metadata": {
+        "name": "bobores",
+        "version": "2.1.2",
+        "factorio_version": "2.0",
+        "title": "Bob's Ores mod",
+        "author": "Bobingabout",
+        "contact": "",
+        "homepage": "https://forums.factorio.com/viewforum.php?f=51",
+        "dependencies": [
+          "base >= 2.0.0",
+          "boblibrary >= 2.1.0"
+        ],
+        "description": "Requires Bob's functions library mod.\n\nAdds some useful ores, designed for use by Bob's Metals, Chemicals and Intermediates mod (MCI).\nAll ores are disabled by default, MCI will turn on the minimum required ores.\nOther mods may make use of these ores.\n\nOres include, Bauxite(Aluminium), Cobalt, Gems, Gold, Galena(Lead), Nickel, Quartz(Glass, Silicon), Rutile(Titanium), Silver, Sulfur, Thorium, Tin, Tungsten and Zinc.\nAlso includes Ground water and Lithia water mining fluid nodes, which function similar to Oil."
+      }
+    },
+    {
+      "name": "bobplates",
+      "version": "2.1.1",
+      "bytes": 7477119,
+      "sha256": "A6DBCA13C579E6E65E2A8E2D605AC97C789771F3C6E2660AA0F19AE1049FC77B",
+      "metadata": {
+        "name": "bobplates",
+        "version": "2.1.1",
+        "factorio_version": "2.0",
+        "title": "Bob's Metals, Chemicals and Intermediates mod",
+        "author": "Bobingabout",
+        "contact": "",
+        "homepage": "https://forums.factorio.com/viewforum.php?f=51",
+        "dependencies": [
+          "base >= 2.0.33",
+          "boblibrary >= 2.1.0",
+          "bobores >= 2.1.0",
+          "? bobenemies >= 2.1.0",
+          "? space-age >= 2.0.0"
+        ],
+        "description": "Requires Bob's functions library mod.\nDesigned to make use of resources provided by Bob's Ores mod to function as intended\nOther mods may provide an alternate method to obtain the required resources.\n\nThis mod is designed as a base to be used with the full Bob's Mods set.\n\nThis mod adds new production processes including:\n  Electrolysis: Seperation of a liquid using electricity.\n  Chemical furnace: Heat and a Fluid.\n  Mixing furnace: Heat with more than 1 ingredient.\n  Liquid pump: Mostly used for Barrelling.\n  Gas pump: Used for Bottling, a Barrelling alternative, but also produces the resource Compressed air.\n  Gas vent: Disposes of unwanted gasses into the void.\n\nThis mod adds a method to produce a metals from resource of the following:\nAluminium, Cobalt, Gold, Lead, Nickel, Glass, Silicon, Titanium, Silver, Tin, Tungsten, Lithium and Zinc.\nAlloys of the following:\nBronze, Brass, Gunmetal, Copper-tungsten, Tungsten carbide, Invar, Nitinol and Cobalt-steel.\nAlso adds a wide array of other materials including Ceramics, Gem processing, and a large array of Liquid and Gas chemicals.\nThis mod also provides intermediate products including Gear wheels and bearings of multiple materials, Advanced processing units, and 2 tiers of batteries."
+      }
+    },
+    {
+      "name": "bobpower",
+      "version": "2.1.0",
+      "bytes": 3038550,
+      "sha256": "5D9E82962B8F1780416B6759E583C674982CB000B578A286B60A75D072D49B5B",
+      "metadata": {
+        "name": "bobpower",
+        "version": "2.1.0",
+        "factorio_version": "2.0",
+        "title": "Bob's Power mod",
+        "author": "Bobingabout",
+        "contact": "",
+        "homepage": "https://forums.factorio.com/viewforum.php?f=51",
+        "dependencies": [
+          "base >= 2.0.33",
+          "boblibrary >= 2.1.0",
+          "? bobplates >= 2.1.0"
+        ],
+        "description": "Requires Bob's functions library mod.\n\nAdds a wide range of power objects, including, but not limited to:\n3 sizes and 3 tiers of solar panel.\nA full steam power rework so tier 1 of nuclear steam matches tier 3 of regular steam.\n5 tiers of steam power.\nOil (burning) boilers added which start at tier 2, and will power 3 steam engines.\nnuclear steam power starts at tier 3.\nAll boiler:steam engine ratios are 2:1 (1 boiler will power 2 steam engines, 1 heat exchanger will power 2 steam turbines)\nNuclear:regular ratios are 2:1. (1 heat exchanger will power 4 steam engines, or 1 boiler will power 1 steam turbine)\n4 tiers of medium and large power poles, and substations.\n3 tiers, and different types (fast, high capacity, and slow) of Accumulator.\nNew fluid burning generators that turn oils directly into Electricity.\n\nAlthough it can function as a stand alone mod, it is intended to be used with the full Bob's Mods set."
+      }
+    },
+    {
+      "name": "bobrevamp",
+      "version": "2.1.1",
+      "bytes": 289565,
+      "sha256": "CF9AD291B6135125E29CDF452DC363101FDDAAB759DC9F713FE51DC29F1B9EEB",
+      "metadata": {
+        "name": "bobrevamp",
+        "version": "2.1.1",
+        "factorio_version": "2.0",
+        "title": "Bob's Revamp mod",
+        "author": "Bobingabout",
+        "contact": "",
+        "homepage": "https://forums.factorio.com/viewforum.php?f=51",
+        "dependencies": [
+          "base >= 2.0.0",
+          "boblibrary >= 2.1.0",
+          "? bobplates >= 2.1.0"
+        ],
+        "description": "Requires Bob's functions library mod.\n\nThis mod changes some base game areas to better fit with Bob's Mods.\nRocket fuel has been changed to be based on Hydrazine.\nReworked all the rocket based recipes\nA rework to how you get Sulfur and Sulfuric acid.\nSplits up the oil chain a little, Pumpjack, Chemical plant and Oil refinery are on their own technologies, instead of all in one go.\n\nIntended to be used with the full Bob's Mods set."
+      }
+    },
+    {
+      "name": "bobtech",
+      "version": "2.1.0",
+      "bytes": 8217926,
+      "sha256": "7F721AFB56C7CF56D16DAF03E4582C7650381719C63F6DD7C714BE7FF83F2D25",
+      "metadata": {
+        "name": "bobtech",
+        "version": "2.1.0",
+        "factorio_version": "2.0",
+        "title": "Bob's Technology mod",
+        "author": "Bobingabout",
+        "contact": "",
+        "homepage": "https://forums.factorio.com/viewforum.php?f=51",
+        "dependencies": [
+          "base >= 2.0.33",
+          "boblibrary >= 2.1.0",
+          "? bobenemies >= 2.1.0",
+          "? bobplates >= 2.1.0",
+          "? space-age >= 2.0.0",
+          "? DiscoScience"
+        ],
+        "description": "Requires Bob's functions library mod.\n\nAdds a Lab MK2\nAdds Transport science pack, and changes advanced logistic based technologies to cost this new science pack.\nIf Alien artifacts are enabled from Bob's Enemies mod, an Alien lab and alien science packs are added, plus Science pack Gold made from Science packs 1, 2, 3 and Military.\nScience pack ingredients are also changed around, to include some more Bob's Mods resources.\n\nAlthough it can function as a stand alone mod, it is intended to be used with the full Bob's Mods set."
+      }
+    },
+    {
+      "name": "bobvehicleequipment",
+      "version": "2.1.1",
+      "bytes": 3584350,
+      "sha256": "81D91ADCD36C6721BB3EB83D155901953F6BF42D481D823533FB2F27978A92B1",
+      "metadata": {
+        "name": "bobvehicleequipment",
+        "version": "2.1.1",
+        "factorio_version": "2.0",
+        "title": "Bob's Vehicle Equipment mod",
+        "author": "Bobingabout",
+        "contact": "",
+        "homepage": "https://forums.factorio.com/viewforum.php?f=51",
+        "dependencies": [
+          "base >= 2.0.33",
+          "boblibrary >= 2.1.0",
+          "? boblogistics >= 2.1.0",
+          "? bobwarfare >= 2.1.0",
+          "? bobenemies >= 2.1.0",
+          "? bobplates >= 2.1.0"
+        ],
+        "description": "Requires Bob's functions library mod.\n\nA range of equipment based on all the modular armor equipment available in base mod.\nUp to 6 tiers on most items.\nEquipment can be used on the Tank, Locomotive, Cargo and Fluid wagons, and the Artillery wagon.\nIf Bob's Logistics mod is installed, the equipment can be used on all train vehicles added by it.\nIf Bob's Warfare mod is installed, the equipment can be used on all tanks and Artillery wagons added by it.\n\nAlthough it can function as a stand alone mod, it is intended to be used with the full Bob's Mods set."
+      }
+    },
+    {
+      "name": "bobwarfare",
+      "version": "2.1.0",
+      "bytes": 4500268,
+      "sha256": "071C8DC3EBAE6D624A8E47BDDBA2C9432E1E2BF9D7E2EF151E95DF36788E9545",
+      "metadata": {
+        "name": "bobwarfare",
+        "version": "2.1.0",
+        "factorio_version": "2.0",
+        "title": "Bob's Warfare mod",
+        "author": "Bobingabout",
+        "contact": "",
+        "homepage": "https://forums.factorio.com/viewforum.php?f=51",
+        "dependencies": [
+          "base >= 2.0.33",
+          "boblibrary >= 2.1.0",
+          "? bobplates >= 2.1.0",
+          "? bobenemies >= 2.1.0",
+          "(?) aai-programmable-vehicles"
+        ],
+        "description": "Requires Bob's functions library mod.\n\nThis mod adds a lot of things for warfare.\nAdds Nitroglycerine production chain, which is used to make intermediates for new ammo.\nAdds 7 new gun ammos, shotgun ammos, and rockets based on an improved normal, and 6 elemental ammos.\nAdds a laser rifle and 7 tiers of laser ammo using glass and the 6 gems.\nAdds Tanks to tier 3, and artillery wagons to tier 3.\nChanges the way you make combat robots, and adds a 4th combat robot capsule.\nAdds a Robot laser drone.\nAdds a higher tier wall and gate\nAdds a couple new mines.\nAdds Scatter tank ammo\nAdds a few new types of artillery ammo.\nAdds more tiers of Radar.\n\nAlthough it can function as a stand alone mod, it is intended to be used with the full Bob's Mods set."
+      }
+    },
+    {
+      "name": "mir-fixture-mir5-active-mods-observer",
+      "version": "0.1.0",
+      "bytes": 834,
+      "sha256": "723D1E7721449FC26040E5E6629416767BDC20AD79CF8723115846DB662A1F87",
+      "metadata": {
+        "name": "mir-fixture-mir5-active-mods-observer",
+        "version": "0.1.0",
+        "title": "MIR 5 active-mods observer fixture",
+        "author": "MIR maintainers",
+        "factorio_version": "2.0",
+        "dependencies": [
+          "base >= 2.0.77"
+        ]
+      }
+    }
+  ],
+  "arms": [
+    {
+      "id": "upstream",
+      "mir": null
+    },
+    {
+      "id": "legacy-terminal",
+      "mir": {
+        "path": "D:/Projects/Factorio/mir5-support-exports-freeze-r01/build/tmp/whole-product-space-age-f200-inputs-r02/owned-source-archives/more-infinite-research_2.5.11.zip",
+        "bytes": 1065193,
+        "sha256": "4AE3DA83C4F8CB7D084891065387B78032BB25B8E4ED3948058D9B773070847C",
+        "version": "2.5.11"
+      }
+    },
+    {
+      "id": "published-4.7.3",
+      "mir": {
+        "path": "D:/Projects/Factorio/testmods/2.0/more-infinite-research_4.7.20003.zip",
+        "bytes": 1449475,
+        "sha256": "FBBA844DD04011A12BB6DA885745B0733AD37FAB181EAAD9EE4346B9B0D32647",
+        "version": "4.7.20003"
+      }
+    },
+    {
+      "id": "candidate-B",
+      "mir": {
+        "path": "D:/Projects/Factorio/more-infinite-research/build/packages/support-exports-all17-r01/more-infinite-research_5.0.20000.zip",
+        "bytes": 696588,
+        "sha256": "7CAC54475107736106D84AF98D50A8622E095B6658F1E3682643FE0CBA8BAEF0",
+        "version": "5.0.20000"
+      }
+    }
+  ],
+  "legacy_arm_limit": "The available F200 terminal legacy arm is actual2.5.11. Keep that literal identity,or a real load refusal;never relabel it3.x or alter an old release.",
+  "remaining_before_native": [
+    "Independent input/profile review and required checked integration",
+    "Separate fresh owner packet binds later clean public HEAD,actual controller/helper/engine/arm bytes,governor resources/output and custody",
+    "Existing sole-native-lane admission;this preparation is not another active/ready native assignment"
+  ],
+  "dependency_archives_copied": false,
+  "archive_links_created": false,
+  "archives_extracted_to_disk": false,
+  "library_controls_mutated": false,
+  "native_execution": false,
+  "semantic_parity": false,
+  "performance_acceptance": false,
+  "release_qualification": false,
+  "adopted_legacy_input_packet": {
+    "path": "D:/Projects/Factorio/more-infinite-research/build/qualification/whole-product-space-age-f200-admission-r02-controller/packet.json",
+    "bytes": 10082,
+    "sha256": "DA2AFD95242AEEB4F252C07D8B72207923B22BCC0B18A18D6092748015AE1021",
+    "scope": "Reuse its actual2.5.11 archive locator and4AE3 bytes;no completed data admission is rerun or relabelled."
+  },
+  "public_input_guard_readback": {
+    "status": "passed-existing-public-profile-and-engine-archive-guards",
+    "tool_chunks": [
+      "967158",
+      "662fb7"
+    ],
+    "rows": 36,
+    "nonbuiltin_archives": 32,
+    "profile_sha256": "61CBE6299DD2708079EA80FB3871AC980C6FF7281DD126C61B3126A7FF294857",
+    "engine_sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B",
+    "native_execution": false,
+    "library_mutation": false
+  },
+  "preparation_locator_correction": {
+    "preservation_manifest_path": "D:/Projects/Factorio/more-infinite-research/build/qualification/heavy-space-age-f200-public-preparation-pre-locator-correction-r01/manifest.json",
+    "preservation_manifest_sha256": "7D8AD361D07A75E2AA26658C5AAE549AC7E420E635D9D0001C674D939223DA74",
+    "scope": "The initial guessed2.5.11 direct-library locator refused after writing the same provisional profile,before native/library work. Its original script/profile bytes remain preserved;the existing verified archive is adopted from its actual locator."
+  }
+}
