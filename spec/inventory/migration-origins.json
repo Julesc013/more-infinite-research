@@ -4105,9 +4105,9 @@
           {
             "origin": "published4.7.3 F110",
             "destination": "MIR5 F210",
-            "status": "needs-correction",
-            "problem": "preparation/native-owner binding:exact F210 fixture has7 passing host controls and a seven-member reproduced container;candidateB is now independently reproduced and its exact B637 successor profile is committed. Black Glass actual caller/container binding and execution remain. Existing F110-to-F200 pass is not this route.",
-            "next_action": "Review the prepared handoff,bind actual final modern bytes/container/controller,then execute unchanged protectedD524 directly with one new lab/save/two cold reloads. No source recreation or blanket configuration bypass.",
+            "status": "closed",
+            "problem": "Exact B637/8DC direct protectedD524 successor now passes one new mining lab,17 retained rows/laser/inserter2and4/42percent queued/27percent suspended/foreign disablement,new save and two unchanged-byte cold reloads at publicb2e/packetA804/caller5D24. Root and independent actual-data/custody review pass;no bridge/source recreation or source-lab double count.",
+            "next_action": "Retain exact execution identity and original protected source. Final delivery changes still require consumed-path review;this does not qualify F100 origins,DLC/provider switches,GUI/performance or whole release.",
             "source_sha256": "D524AA78440F242B179A1E9BC40BF89B87C1A66E99F64C14D3250DEAEBB69253",
             "prepared_inputs": {
               "path": "spec/evidence/published473-f110-f210-prepared-aero-r01.json",
@@ -4117,7 +4117,14 @@
               "path": "tests/profiles/published473-f110-f210-support-exports-base-r01.json",
               "sha256": "B473BABB93A54857ADE9E3773668F9F17E13CC2A1AD0EE198CB0D70360EB62C6",
               "package_readback": "spec/evidence/support-exports-coherent17-aero-reproduction-r01.json"
-            }
+            },
+            "evidence": [
+              {
+                "path": "spec/evidence/published473-f110-f210-native-chain-r01.json",
+                "sha256": "5F7765140938DF0CD99B958CB35AD134A69D7711D4977191A5161AF8C1143C6C",
+                "bytes": 11750
+              }
+            ]
           },
           {
             "origin": "published4.7.3 F200 Base",
@@ -4142,7 +4149,7 @@
             ]
           }
         ],
-        "final_package_review": "Required separately for every named route after final freeze. CandidateB package/member readback and bounded prior-result applicability are recorded in spec/evidence/support-exports-coherent17-aero-reproduction-r01.json and spec/evidence/support-exports-consumed-path-applicability-aero-r01.json;affected modern header/export/lifecycle and performance observations remain. None of the three new missing journeys is deferred. Fixture/packet preparation is not a native pass or authorization to occupy more than the sole admitted native lane."
+        "final_package_review": "Required separately for every named route after final freeze. CandidateB package/member readback and bounded prior-result applicability are recorded in spec/evidence/support-exports-coherent17-aero-reproduction-r01.json and spec/evidence/support-exports-consumed-path-applicability-aero-r01.json;affected modern header/export/lifecycle and performance observations remain. The direct F110-to-F210 journey is now closed at its exact B637/8DC inputs;neither of the two still-missing F100-origin journeys is deferred. Fixture/packet preparation is not a native pass or authorization to occupy more than the sole admitted native lane."
       },
       "permitted_limits": [
         {
