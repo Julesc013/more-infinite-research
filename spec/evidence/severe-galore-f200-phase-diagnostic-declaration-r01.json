@@ -1,0 +1,372 @@
+{
+  "schema": 1,
+  "kind": "MIRSevereGaloreF200PhaseDiagnosticDeclarationV1",
+  "status": "declared-not-prepared-or-executed",
+  "source": {
+    "commit": "44cf71d5c73e1ebb60f08c1ef49dcd7b5ba667b7",
+    "role": "Consumed public helpers; later private packet separately freezes clean committed declaration checkout HEAD."
+  },
+  "report": {
+    "url": "https://mods.factorio.com/mod/more-infinite-research/discussion/6acabc9e1ccfd8621529e70e",
+    "observed_on": "2026-10-30",
+    "basis": "Public reporter narrative,not measured timings or exact archived reporter inputs. Relative ages remain relative.",
+    "summary": "Gamer433 identifies slowing from4.0.20000/4.0.20002 with129mods. AuroraTransporter reports very long waits while upgrading4.1.20000 to4.2.20002,with313archives in the folder; removing Vanilla/Space Age Galore helps. The4.3follow-up reports another multi-hour abandonment and later names Dark Matter Replicators Reborn3.7.1. A Classic-path workaround is accompanied by lost research and is not adopted here.",
+    "unknown": [
+      "exact engine binary",
+      "full enabled mod versions and settings",
+      "native phase log for the long wait",
+      "cache/machine state",
+      "original save"
+    ]
+  },
+  "profile": {
+    "path": "tests/profiles/severe-galore-dmr-f200-2077-phase-r01.json",
+    "sha256": "3EC1EB674D269D6BF15AC18BE296E2FF11F634854848864E0E423BB96AFA2192",
+    "rows": 9,
+    "nonbuiltin_archives": 5
+  },
+  "direct_archive_inputs": [
+    {
+      "name": "galore_lib",
+      "version": "2.2.0",
+      "archive": "galore_lib_2.2.0.zip",
+      "bytes": 77415,
+      "sha256": "D473E10294091F45D77F181907FC777CEE181B18EB57B8B914D02E0D2C1C3FE2",
+      "info_sha256": "C363478FAA1B39304B1F2D0B7BB4D643BAC41F2F5E60B9A8C926BF9D7FCD6C82",
+      "dependencies": [
+        "base >= 2.0",
+        "(?) space-age",
+        "(?) wolfprod",
+        "(?) reskins-angels"
+      ]
+    },
+    {
+      "name": "vanilla_galore_continued",
+      "version": "1.4.2",
+      "archive": "vanilla_galore_continued_1.4.2.zip",
+      "bytes": 113591,
+      "sha256": "18ECF427C4671B7036C2AE278C19FF4E7853E68428D515F7A52095CB6D5DCF0C",
+      "info_sha256": "BC0FB37DD4310EE267B22DA9698D2ED19A1AE2EF0F01120D69808A443A0801D2",
+      "dependencies": [
+        "base >= 2.0",
+        "galore_lib",
+        "? space-age",
+        "? quality",
+        "? centrifuge-tint",
+        "(?) bobmodules",
+        "(?) bobassembly",
+        "(?) boblogistics",
+        "(?) bzcarbon",
+        "(?) bzlead",
+        "(?) bzsilicon",
+        "(?) bztin",
+        "(?) bztitanium",
+        "(?) bzzirconium",
+        "(?) James-Oil-Processing",
+        "(?) science-tab",
+        "(?) reskins-angels",
+        "(?) angelsaddons-mobility",
+        "(?) angelsaddons-storage",
+        "(?) angelsaddons-cab",
+        "(?) angelsaddons-bots",
+        "(?) angelsinfiniteores",
+        "(?) angelspetrochem",
+        "(?) angelsrefining",
+        "(?) angelssmelting",
+        "(?) angelsbioprocessing"
+      ]
+    },
+    {
+      "name": "space_age_galore",
+      "version": "1.6.3",
+      "archive": "space_age_galore_1.6.3.zip",
+      "bytes": 149753,
+      "sha256": "0C758F793E783082258F62705A17F40E917B9BBFC3B1D77ABF2A32E954CDE3B4",
+      "info_sha256": "6A65B3E87FEF87FAFF08AC1D22977B15DF91879EBBC8DCDE51782311697CAFF6",
+      "dependencies": [
+        "base >= 2.0",
+        "space-age",
+        "vanilla_galore_continued",
+        "? maraxsis",
+        "? wolfprod",
+        "(?) bzlead",
+        "(?) bzcarbon",
+        "(?) bzsilicon",
+        "(?) bztin",
+        "(?) bztitanium",
+        "(?) bzzirconium",
+        "(?) James-Oil-Processing",
+        "(?) DemolisherScales"
+      ]
+    },
+    {
+      "name": "dark-matter-replicators-reborn",
+      "version": "3.7.1",
+      "archive": "dark-matter-replicators-reborn_3.7.1.zip",
+      "bytes": 4706118,
+      "sha256": "AB1AA6FFB5DE93009F9F3087FC627E0BAAE381B149FAC0689A2360A487FCF276",
+      "info_sha256": "B66405CB9908547433946AC257EDB92824E96FCBC434F66B75E180E2556BA4D9",
+      "dependencies": [
+        "base",
+        "? space-age",
+        "? quality",
+        "? elevated-rails",
+        "? planetaris-hyarion",
+        "? moon-eneas",
+        "? bobplates",
+        "? bobassembly",
+        "? boblogistics",
+        "? bobtech",
+        "? bobmodules",
+        "? bobpower",
+        "? bobwarfare",
+        "? bobores",
+        "? bobmining",
+        "? bobelectronics",
+        "? bobequipment",
+        "? bobvehicleequipment",
+        "? bobinserters",
+        "? bobenemies",
+        "? boblibrary"
+      ]
+    },
+    {
+      "name": "mir-fixture-mir5-active-mods-observer",
+      "version": "0.1.0",
+      "archive": "mir-fixture-mir5-active-mods-observer_0.1.0.zip",
+      "bytes": 834,
+      "sha256": "723D1E7721449FC26040E5E6629416767BDC20AD79CF8723115846DB662A1F87",
+      "info_sha256": "5C4A351958060F5FED504AA86E8C201A2F50A36C2732E624727B5697F216475A",
+      "dependencies": [
+        "base >= 2.0.77"
+      ]
+    }
+  ],
+  "arms": [
+    {
+      "id": "control-without-mir",
+      "archive": null
+    },
+    {
+      "id": "candidate-mir5",
+      "archive": {
+        "name": "more-infinite-research_5.0.20000.zip",
+        "bytes": 704721,
+        "sha256": "8C93C7063B75E0811D1D27036F3596C05EE0A5A965BC259D276160F91D6274BB",
+        "source_commit": "0369bb2fa5ed2e3f2d3b88cd03a5e7e935c7149b"
+      }
+    },
+    {
+      "id": "reported-mir4.2.2",
+      "archive": {
+        "name": "more-infinite-research_4.2.20002.zip",
+        "version": "4.2.20002",
+        "bytes": 1421262,
+        "sha256": "14C2B23E0F4657F9F79585A982639463678D640C04916FEECC365D93B6894A65",
+        "metadata": {
+          "name": "more-infinite-research",
+          "version": "4.2.20002",
+          "title": "More Infinite Research",
+          "author": "Julesc013",
+          "description": "Adds configurable infinite productivity and bonus researches for intermediates, logistics, combat, player bonuses, and Space Age gaps.",
+          "factorio_version": "2.0",
+          "dependencies": [
+            "base >= 2.0.77",
+            "(?) bobelectronics",
+            "(?) bobtech",
+            "(?) elevated-rails",
+            "(?) angelssmelting",
+            "? recycler >= 2.0.77",
+            "(?) quality",
+            "(?) pypostprocessing",
+            "(?) space-exploration",
+            "? space-age >= 2.0.77"
+          ]
+        }
+      }
+    },
+    {
+      "id": "reported-followup-mir4.3",
+      "archive": {
+        "name": "more-infinite-research_4.3.20000.zip",
+        "version": "4.3.20000",
+        "bytes": 1456776,
+        "sha256": "856D81ACD0B25F24EB1DCC8B0FA4BCD68FE1A66DAFC8011A8807EF1F77F05C65",
+        "metadata": {
+          "name": "more-infinite-research",
+          "version": "4.3.20000",
+          "title": "More Infinite Research",
+          "author": "Julesc013",
+          "description": "Adds configurable infinite productivity and bonus researches for intermediates, logistics, combat, player bonuses, and Space Age gaps.",
+          "factorio_version": "2.0",
+          "dependencies": [
+            "base >= 2.0.77",
+            "(?) bobelectronics",
+            "(?) bobtech",
+            "(?) elevated-rails",
+            "(?) angelssmelting",
+            "? recycler >= 2.0.77",
+            "(?) quality",
+            "(?) pypostprocessing",
+            "(?) space-exploration",
+            "? space-age >= 2.0.77"
+          ]
+        }
+      }
+    }
+  ],
+  "public_helpers": [
+    {
+      "path": "tools/Invoke-MultiplayerFixture.ps1",
+      "bytes": 78240,
+      "sha256": "8435922655C9AD81A196F2E5121850B372B4BFDEC0F4467909230C20E9E42643",
+      "source_commit": "44cf71d5c73e1ebb60f08c1ef49dcd7b5ba667b7"
+    },
+    {
+      "path": "tools/Invoke-MultiplayerSession.ps1",
+      "bytes": 82309,
+      "sha256": "0F55E7C2C17B15FF698CDD3C396CABCD5A85B0B49433951096401A8DDFE92CB8",
+      "source_commit": "44cf71d5c73e1ebb60f08c1ef49dcd7b5ba667b7"
+    },
+    {
+      "path": "tools/Invoke-NativeFixture.ps1",
+      "bytes": 93076,
+      "sha256": "E728969544D5D7F3F061FFC9A76A2E505A3A602C43082F8BC7965E93D8BBF10A",
+      "source_commit": "44cf71d5c73e1ebb60f08c1ef49dcd7b5ba667b7"
+    },
+    {
+      "path": "tools/commands/workspace/Invoke-MIRDevelopmentHealthHook.ps1",
+      "bytes": 3124,
+      "sha256": "3C9D435EA1A592570AFB2A609705D54747D76FF127FCE05FBE43E10D1A9E21E2",
+      "source_commit": "44cf71d5c73e1ebb60f08c1ef49dcd7b5ba667b7"
+    },
+    {
+      "path": "tools/commands/workspace/Optimize-MIRArtifactStorage.ps1",
+      "bytes": 16786,
+      "sha256": "069D52E62E57249451E23F048BFC3C0DE7A3376F1460F2458A4E0DBDD0C76151",
+      "source_commit": "44cf71d5c73e1ebb60f08c1ef49dcd7b5ba667b7"
+    },
+    {
+      "path": "tools/commands/workspace/Remove-MIRStaleArtifacts.ps1",
+      "bytes": 55384,
+      "sha256": "5120FAF2D8435D801F8A5252A8FF93756468CE9F6DCC39234E6D81DBA152F80C",
+      "source_commit": "44cf71d5c73e1ebb60f08c1ef49dcd7b5ba667b7"
+    },
+    {
+      "path": "tools/commands/workspace/Test-MIRDevelopmentHealth.ps1",
+      "bytes": 20656,
+      "sha256": "D610BE142BF948C2CE5C5BAE4FE29822D84C75114EC5A7BF0A9D6F719CB7CDE1",
+      "source_commit": "44cf71d5c73e1ebb60f08c1ef49dcd7b5ba667b7"
+    },
+    {
+      "path": "tools/lib/compatibility/LibraryActivation.ps1",
+      "bytes": 32133,
+      "sha256": "123A2241B895B57217AA969A677FF21BBFB268FE55E9734287883B4D6AE25099",
+      "source_commit": "44cf71d5c73e1ebb60f08c1ef49dcd7b5ba667b7"
+    },
+    {
+      "path": "tools/lib/compatibility/ModPortal.ps1",
+      "bytes": 5897,
+      "sha256": "A16344F66A9124C0792614AAD83702603D4C0AD4FE977392C73710B745E74B08",
+      "source_commit": "44cf71d5c73e1ebb60f08c1ef49dcd7b5ba667b7"
+    },
+    {
+      "path": "tools/lib/validation/DirectLibraryStartupMeasurement.ps1",
+      "bytes": 27662,
+      "sha256": "D069C014D74E883C249928E812A258E2A2CB34AFE499219CB46A513345C2EC34",
+      "source_commit": "44cf71d5c73e1ebb60f08c1ef49dcd7b5ba667b7"
+    },
+    {
+      "path": "tools/lib/validation/ImmutableInputStaging.ps1",
+      "bytes": 25710,
+      "sha256": "B5FBFAC8537B08F9790BD3EE8ACEAAB38EE5CBB8EF005E67E8375DE568BBC12C",
+      "source_commit": "44cf71d5c73e1ebb60f08c1ef49dcd7b5ba667b7"
+    },
+    {
+      "path": "tools/lib/validation/NativeProbeCommon.ps1",
+      "bytes": 4079,
+      "sha256": "CC8462A39DE12D0746C8F985D1F86F761CF3EF261B4FA551CFFD092F76D64D71",
+      "source_commit": "44cf71d5c73e1ebb60f08c1ef49dcd7b5ba667b7"
+    },
+    {
+      "path": "tools/lib/validation/NativeProbeResources.ps1",
+      "bytes": 13233,
+      "sha256": "A34BD5FE79466B3EDA96F46EC132562192E6A70280901381C8AF560E7AB23328",
+      "source_commit": "44cf71d5c73e1ebb60f08c1ef49dcd7b5ba667b7"
+    },
+    {
+      "path": "tools/lib/validation/OwnedProcessMemorySampler.ps1",
+      "bytes": 13442,
+      "sha256": "BED20276B381B3F8573CD0D7789678843080819FDBF2FDCD32496E9FE32FFE1E",
+      "source_commit": "44cf71d5c73e1ebb60f08c1ef49dcd7b5ba667b7"
+    },
+    {
+      "path": "tools/lib/validation/ResourceGovernor.ps1",
+      "bytes": 25471,
+      "sha256": "B811A1548A6D789F2A7E618999D5087C70E0151E751CCF4C51635D54E6BF04ED",
+      "source_commit": "44cf71d5c73e1ebb60f08c1ef49dcd7b5ba667b7"
+    },
+    {
+      "path": "tools/lib/validation/ResponsiveMenuRecord.ps1",
+      "bytes": 5418,
+      "sha256": "7F74EF416DC4C06B85B3479C02DEF13837F9D69420BBE2F88ADAFB8E5E18DFFB",
+      "source_commit": "44cf71d5c73e1ebb60f08c1ef49dcd7b5ba667b7"
+    },
+    {
+      "path": "tools/lib/validation/responsive-menu/Invoke-MIRResponsiveMenuActor.ps1",
+      "bytes": 4876,
+      "sha256": "DC4816352962EC14ED443E5865F71FF3F2A989B47DCF4F45916048F1B5A55D55",
+      "source_commit": "44cf71d5c73e1ebb60f08c1ef49dcd7b5ba667b7"
+    },
+    {
+      "path": "tools/lib/validation/responsive-menu/MenuObservation.ps1",
+      "bytes": 6341,
+      "sha256": "8423C41478F7AB329E7A385BBD13BB39490E42FB4F98B1D53AA508B583DEC2EC",
+      "source_commit": "44cf71d5c73e1ebb60f08c1ef49dcd7b5ba667b7"
+    },
+    {
+      "path": "tools/lib/validation/responsive-menu/OwnedMenuWindow.ps1",
+      "bytes": 19702,
+      "sha256": "9CC7889CE46E6523631B2348AC17BCF84C9E590E4001802C358F16062E56209A",
+      "source_commit": "44cf71d5c73e1ebb60f08c1ef49dcd7b5ba667b7"
+    },
+    {
+      "path": "tools/read_library_profiles.py",
+      "bytes": 23951,
+      "sha256": "58EE3BBDB5ED88C504E178F5F83303086687C67317021786C1A338944BC4DF90",
+      "source_commit": "44cf71d5c73e1ebb60f08c1ef49dcd7b5ba667b7"
+    },
+    {
+      "path": "tools/Invoke-PrototypeCapture.ps1",
+      "bytes": 16206,
+      "sha256": "7ABE4FBFABBDF06A12AA51408352F1FEB9AB1E9929C25F21672BADF23A4A9F23",
+      "source_commit": "44cf71d5c73e1ebb60f08c1ef49dcd7b5ba667b7"
+    }
+  ],
+  "endpoint": "Factorio --dump-data with normal release logging; unscored coarse data-stage phase triage only. Subsequent graphical process-to-responsive-menu checks remain separate.",
+  "schedule": "Exactly once each in listed order;NoMIR then current candidate before the two original old releases. No warmup,score,extension,automatic retry or historical patch.",
+  "resources": {
+    "expected_peak_memory_mib": 8192,
+    "max_new_output_mib_per_arm": 512,
+    "timeout_seconds": 300,
+    "admission_wait_seconds": 30,
+    "physical_reserve_fraction": 0.2,
+    "exclusive_direct_library": true
+  },
+  "failure_policy": [
+    "Upstream NoMIR must succeed before any MIR arm.",
+    "Stop dispatch if candidate,governor custody,restoration or owned-process teardown is unsafe.",
+    "Retain each old-release native error/timeout without relabelling;continue to the next old release only after Factorio0 and exact controls/archive restoration.",
+    "A timeout yields the observed lower bound and last actual logged phase;never infer a completed hour-scale duration."
+  ],
+  "custody": "Existing direct engine-family library only;copy only MIR/own fixture archives,never dependency libraries. Preserve originals,normal native logs,full data/settings/results,resource ledgers,all controls and adverse records in distinct original/copy custody.",
+  "native_execution": false,
+  "private_caller_bound": false,
+  "performance_acceptance": false,
+  "release_qualification": false,
+  "limits": [
+    "Grounded reduced proxy only; full reporter313-mod/settings identity remains unknown.",
+    "This declaration establishes no severe-case reproduction,corrected timing,semantic parity,save/research preservation,menu or release acceptance.",
+    "No Classic fallback,disabled promised research,broad pcall or further architecture rewrite is authorized."
+  ]
+}
