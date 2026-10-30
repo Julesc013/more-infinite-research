@@ -140,7 +140,14 @@ class LibraryNativeInputFixtureControls(unittest.TestCase):
                 game.players[index]=p
               end
               p.connected=true;connected()
+              if locale=="de" and (opponent=="pending-locale" or opponent=="locale-never-ready") then p.locale="en" end
+              if opponent=="unexpected-client-name" and locale=="de" then p.name="UnexpectedDeutsch" end
               callbacks.events[1]({player_index=index})
+              if locale=="de" and opponent=="pending-locale" then
+                local observed=interfaces["mir5-library-native-input"].report()
+                assert(observed.en_index==0 and observed.de_index==index and observed.de_locale=="en")
+                p.locale="de"
+              end
               return p
             end
             game.remove_offline_players=function(indices)
@@ -170,7 +177,7 @@ class LibraryNativeInputFixtureControls(unittest.TestCase):
             local base=target=="f200" and "2.0.77" or "2.1.23"
             local active={base=base,["more-infinite-research"]=target=="f200" and "5.0.20000" or "5.0.21000",
               [historical.fixture]=target=="f200" and "0.3.0" or "0.4.0",
-              ["mir-fixture-mir5-active-mods-observer"]="0.1.0",["mir-fixture-mir5-library-native-input"]="0.1.0"}
+              ["mir-fixture-mir5-active-mods-observer"]="0.1.0",["mir-fixture-mir5-library-native-input"]="0.3.0"}
             local env={game=game,storage=store,defines={events=events},log=function()end,
               helpers={table_to_json=function()return "{}"end},
               require=function(name)assert(name=="__mir-fixture-mir5-migration-origin-f200-110-source__/catalogue");return historical end,
@@ -213,9 +220,11 @@ class LibraryNativeInputFixtureControls(unittest.TestCase):
               if opponent=="extra-mod" then active.extra="1.0.0" end
               callbacks.init()
               local before=fingerprint(store);api().report();api().report();readonly_report=before==fingerprint(store)
-              en=join(1,"en");de=join(2,"de")
+              en=join(0,"en");de=join(2,"de")
+              if opponent=="duplicate-initial-join" then join(0,"en") end
               if opponent=="out-of-order" then step("prefix");return end
               step("inspect")
+              if opponent=="join-during-input" then join(2,"de") end
               click(en,query(en));type_text(en,"ge");step("prefix")
               if opponent~="short-refresh" then game.tick=game.tick+60 end
               step("refresh");type_text(en,"ars");step("suffix")
@@ -226,12 +235,14 @@ class LibraryNativeInputFixtureControls(unittest.TestCase):
               click(en,other);type_text(en,"focus");step("foreign-prefix");game.tick=game.tick+60
               step("foreign-refresh");type_text(en," kept");step("foreign-suffix")
               if opponent~="remove-connected" then de.connected=false;connected() end
-              step("remove-de");de=join(3,"de");step("replacement");game.tick=game.tick+60;step("save")
+              step("remove-de");de=join(opponent=="removed-index-reused" and 2 or 3,"de");step("replacement");game.tick=game.tick+60;step("save")
               en.connected=false;de.connected=false;connected()
               for _,p in pairs(game.players) do for _,node in pairs(p.gui.screen) do invalidate(node) end;p.gui.screen=element("screen","screen") end
               parse();before=fingerprint(store);callbacks.load();readonly_load=before==fingerprint(store)
               -- Native-shaped MIR join restoration, not an observer open call.
-              build(en,memory[en.index]);build(de,memory[de.index]);join(1,"en");join(3,"de")
+              build(en,memory[en.index]);build(de,memory[de.index]);join(opponent=="changed-restart-index" and 4 or 0,"en")
+              if opponent=="duplicate-restart-role" then join(0,"en") end
+              join(3,"de")
               if opponent=="cold-lost-query" then query(en).text="wrong" end
               if opponent=="cold-lost-location" then en.gui.screen[root_name].location={x=999,y=100} end
               cold_calls_before=calls
@@ -284,6 +295,31 @@ class LibraryNativeInputFixtureControls(unittest.TestCase):
         for forbidden in ("script.raise_event", "game.create_player", "__more-infinite-research__", "storage.mir", "technology.level ="):
             self.assertNotIn(forbidden, source)
 
+    def test_join_identity_survives_pending_german_locale_with_zero_english_index(self):
+        for target in ("f200", "f210"):
+            with self.subTest(target=target):
+                result = self.run_case(target, "pending-locale")
+                self.assertTrue(result["ok"], result["message"])
+                self.assertIs(type(result["final"]["en_index"]), int)
+                self.assertEqual(result["final"]["en_index"], 0)
+                self.assertEqual(result["final"]["actual_joins"], 5)
+
+    def test_pending_locale_and_unknown_name_cannot_pass_inspection(self):
+        for target in ("f200", "f210"):
+            for opponent in ("locale-never-ready", "unexpected-client-name"):
+                with self.subTest(target=target, opponent=opponent):
+                    result = self.run_case(target, opponent)
+                    self.assertFalse(result["ok"], result["message"])
+                    self.assertEqual(result["final"]["private_queries"], 0)
+
+    def test_join_phase_and_retained_identity_are_required(self):
+        for target in ("f200", "f210"):
+            for opponent in ("duplicate-initial-join", "join-during-input", "removed-index-reused",
+                             "changed-restart-index", "duplicate-restart-role"):
+                with self.subTest(target=target, opponent=opponent):
+                    result = self.run_case(target, opponent)
+                    self.assertFalse(result["ok"], result["message"])
+
 
 class LibrarySupportExportObserverControls(unittest.TestCase):
     def setUp(self):
@@ -319,7 +355,7 @@ class LibrarySupportExportObserverControls(unittest.TestCase):
               return value
             end
             local function player(index,locale)
-              local p={index=index,locale=locale,name="Native-"..locale,valid=true,connected=true,force=game.forces.player,
+              local p={index=index,locale=locale,name=locale=="en"and"MIR5English"or"MIR5Deutsch",valid=true,connected=true,force=game.forces.player,
                 display_scale=1,display_resolution={width=1280,height=720},gui={screen=node(nil,{type="screen",name="screen"},"fixture")}}
               players[index]=p;return p
             end
@@ -347,7 +383,7 @@ class LibrarySupportExportObserverControls(unittest.TestCase):
             env.log=function()logs=logs+1 end
             env.defines={events={on_player_joined_game=1,on_gui_click=2,on_console_command=3}}
             env.script={active_mods={base=base,["more-infinite-research"]=mir,[original]=fixture,
-              ["mir-fixture-mir5-active-mods-observer"]="0.1.0",["mir-fixture-mir5-library-native-input"]="0.2.0"},
+              ["mir-fixture-mir5-active-mods-observer"]="0.1.0",["mir-fixture-mir5-library-native-input"]="0.4.0"},
               on_init=function(f)callbacks.init=f end,on_load=function(f)callbacks.load=f end,
               on_event=function(id,f)callbacks[id]=f end}
             local context={key=key,interface="mir5-library-native-input",historical_fixture=original,
@@ -359,12 +395,22 @@ class LibrarySupportExportObserverControls(unittest.TestCase):
               return interfaces[context.interface]
             end
             local api=register();callbacks.init();assert(api.report().phase=="ready")
-            local en,de=player(1,"en"),player(2,"de")
-            game.players,game.connected_players={en,de},{en,de}
+            local en,de=player(0,"en"),player(2,"de")
+            game.players,game.connected_players={[0]=en,[2]=de},{en,de}
+            local function joined(index)
+              local p=players[index]
+              if p==de and (opponent=="pending-locale"or opponent=="locale-never-ready")then p.locale="en"end
+              if p==de and opponent=="unexpected-client-name"then p.name="UnexpectedDeutsch"end
+              callbacks[1]({player_index=index})
+              if p==de and opponent=="pending-locale"then
+                assert(api.report().geometry.de.index==2 and api.report().geometry.de.locale=="en")
+                p.locale="de"
+              end
+            end
             if opponent=="reverse-role-order"then
-              callbacks[1]({player_index=2});callbacks[1]({player_index=1})
-            else callbacks[1]({player_index=1});callbacks[1]({player_index=2})end
-            if opponent=="duplicate-initial-join"then callbacks[1]({player_index=1})end
+              joined(2);joined(0)
+            else joined(0);joined(2)end
+            if opponent=="duplicate-initial-join"then joined(0)end
             local sequence={"en-full","en-compact","en-diagnostics","de-full","de-compact","de-diagnostics",
               "en-foreign","en-full-before-failure","en-settings-failure","en-diagnostics-before-failure",
               "en-diagnostics-failure","de-rejoin-full","en-restart-full"}
@@ -373,10 +419,10 @@ class LibrarySupportExportObserverControls(unittest.TestCase):
               if index==1 and opponent=="early-server-commands"then
                 callbacks[3]({command="mir-settings-export"});callbacks[3]({command="mir-diagnostics-export"})
               end
-              if index==5 and opponent=="early-rejoin"then callbacks[1]({player_index=2})end
+              if index==5 and opponent=="early-rejoin"then joined(2)end
               if action=="de-rejoin-full"and opponent~="missing-rejoin"and opponent~="duplicate-initial-join"and opponent~="early-rejoin"then
-                callbacks[1]({player_index=opponent=="wrong-role-rejoin"and 1 or 2})
-                if opponent=="duplicate-rejoin"then callbacks[1]({player_index=2})end
+                joined(opponent=="wrong-role-rejoin"and 0 or 2)
+                if opponent=="duplicate-rejoin"then joined(2)end
               end
               if action=="en-restart-full"then
                 if opponent~="early-server-commands"then
@@ -389,10 +435,10 @@ class LibrarySupportExportObserverControls(unittest.TestCase):
                   local before=fingerprint(store);callbacks.load();assert(fingerprint(store)==before);env.game=saved
                   if opponent=="post-load-server-command"then callbacks[3]({command="mir-settings-export"})end
                   if opponent=="reverse-role-order"then
-                    callbacks[1]({player_index=2});callbacks[1]({player_index=1})
+                    joined(2);joined(0)
                   else
-                    callbacks[1]({player_index=1})
-                    if opponent~="duplicate-rejoin"then callbacks[1]({player_index=opponent=="duplicate-restart-role"and 1 or 2})end
+                    joined(0)
+                    if opponent~="duplicate-rejoin"then joined(opponent=="duplicate-restart-role"and 0 or 2)end
                   end
                 end
               end
@@ -442,6 +488,18 @@ class LibrarySupportExportObserverControls(unittest.TestCase):
         for target in ("f200", "f210"):
             with self.subTest(target=target):
                 self.assertEqual(self.lua.globals().run_export_observer(target, "reverse-role-order"), (13, 5, 2, 0))
+
+    def test_named_export_client_can_join_before_its_locale_is_ready(self):
+        for target in ("f200", "f210"):
+            with self.subTest(target=target):
+                self.assertEqual(self.lua.globals().run_export_observer(target, "pending-locale"), (13, 5, 2, 0))
+
+    def test_export_pair_requires_ready_locales_and_declared_names(self):
+        for target in ("f200", "f210"):
+            for opponent in ("locale-never-ready", "unexpected-client-name"):
+                with self.subTest(target=target, opponent=opponent):
+                    with self.assertRaises(Exception):
+                        self.lua.globals().run_export_observer(target, opponent)
 
     def test_missing_clicks_wrong_player_values_mutation_and_missing_lifecycle_are_rejected(self):
         for target in ("f200", "f210"):

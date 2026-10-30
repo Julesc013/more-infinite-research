@@ -5,12 +5,26 @@ applies_to: "Exact MIR1.1 completed F200/F210 Base successor copies"
 audience: developer
 doc_type: test-fixture
 owner: mir-maintainers
-last_reviewed: 2026-10-29
+last_reviewed: 2026-10-30
 supersedes: []
 superseded_by: []
 ---
 
 # Imported Library native input and lifecycle observation
+
+## Corrected client identity observers
+
+The [identity-corrected preparation](../../../spec/evidence/library-client-identity-prepared-aero-r01.json) supplies new0.3 input/lifecycle and0.4 support-export observers for both pinned engines. It retains candidateB7CAC/B637 and the protected completed imported saves. Use the four new profiles and exact raw-Git metadata/member hashes from that record; original0.1/0.2 metadata, profiles, archives and adverse results remain frozen historical inputs. A corrected observer is preparation, not a native retry or pass.
+
+Join roles are the exact names `MIR5English` and `MIR5Deutsch`, with the permitted phase and retained index checked separately. The input replacement uses the same declared German name with a new player index; saved-host restart must reconnect that saved replacement. Locale at the join callback is not identity. The actual connected English/German locales must become `en`/`de` before inspection and GUI actions; all existing pair, force, imported-state and lifecycle assertions remain mandatory. An unready locale must stop advancement.
+
+The input report now exposes `en_name`, `de_name`, `en_locale`, `de_locale`, `en_connected` and `de_connected`, alongside the retained role indices. The export report exposes the same observations under `geometry.en` and `geometry.de`. The caller must read those actual observations before input, not infer readiness from a join count. Absent indices remain distinct from numeric indices. Host doubles exercise Lua index0 as robustness only; R04's networking index0 did not establish a Lua player index0.
+
+Compose input0.3 from current `control.lua` and `info-input-identity-f200.json` or `info-input-identity-f210.json`. Compose export0.4 from current `control.lua`, `support-exports.lua` and the corresponding `info-exports-identity-*.json`. ZIP roots are the unchanged observer name plus the declared0.3.0 or0.4.0 version. The prepared record pins all four reproducible containers and new profiles. Preserve the original31-row/75-effect/three-force source fixture and saved inputs; no source recreation, credit seeding or player-package change is required.
+
+## Frozen original protocols
+
+The original0.1/0.2 descriptions below retain their original package identities and protocol history. Reproduce their old inputs only from the exact source revisions in their prepared records; do not compose old metadata with the corrected current control code. The corrected versions retain their48-query/five-join input sequence and13-click/five-join export sequence, including the original native-state assertions and separately required actual input, file and restart observations.
 
 This test-only observer uses the existing protected completed MIR1.1 successor copies: F200029AA881F739457047B1E8318FA9A77508B28112757176B64CD0C3C31530638C/811812bytes or F2108DCFC16FF929766D2E5CFEC4F7BC81367A9632CEB4B39558E40330FA43BD7F0C/814068bytes. Reuse those copies unchanged; do not recreate88FC source saves. Project this `control.lua` and the selected metadata as `info.json`. Retain the original successor fixture, including the independently reviewed completed-configuration correction in PR1412, its exact engine metadata, data/settings members and historical catalogue. The observer imports only that finite test catalogue. It never imports MIR implementation, reads MIR storage or seeds/researches a technology.
 
