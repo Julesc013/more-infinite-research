@@ -305,7 +305,7 @@ public static class MIRLibraryInputNative {
           try {
             $targetHandle=[IntPtr]101;$peerHandle=[IntPtr]202
             $targetExe=[IO.Path]::GetFullPath([string]$script:targetProcess.MainModule.FileName);$peerExe=[IO.Path]::GetFullPath([string]$script:peerProcess.MainModule.FileName)
-            $script:foreground=$peerHandle;$script:attachEvents=[Collections.Generic.List[string]]::new();$script:setCalls=0;$script:activate=$true
+            $script:foreground=$peerHandle;$script:attachEvents=[Collections.Generic.List[string]]::new();$script:setCalls=0;$script:activate=$true;$script:driftAfterDetach=$false
             function Get-MIROwnedMenuMainWindowHandle { param([Diagnostics.Process]$Process) if($Process.Id-eq$script:targetProcess.Id){return $targetHandle};if($Process.Id-eq$script:peerProcess.Id){return $peerHandle};return [IntPtr]::Zero }
             function Get-MIROwnedMenuWindowProcessId { param([IntPtr]$Handle) if($Handle-eq$targetHandle){return [uint32]$script:targetProcess.Id};if($Handle-eq$peerHandle){return [uint32]$script:peerProcess.Id};return [uint32]0 }
             function Test-MIROwnedMenuWindowHandle { param([IntPtr]$Handle) return ($Handle-eq$targetHandle-or$Handle-eq$peerHandle) }
@@ -315,22 +315,24 @@ public static class MIRLibraryInputNative {
             function Get-MIROwnedMenuControllerThreadId { return [uint32]33 }
             function Get-MIROwnedMenuThreadDesktop { param([uint32]$ThreadId) return [IntPtr]99 }
             function Get-MIROwnedMenuForegroundHandle { return $script:foreground }
-            function Connect-MIROwnedMenuInputThread { param([uint32]$AttachingThread,[uint32]$AttachedThread,[bool]$Attach) $script:attachEvents.Add("$($AttachingThread):$($AttachedThread):$Attach");return $true }
+            function Connect-MIROwnedMenuInputThread { param([uint32]$AttachingThread,[uint32]$AttachedThread,[bool]$Attach) $script:attachEvents.Add("$($AttachingThread):$($AttachedThread):$Attach");if(-not$Attach-and$script:driftAfterDetach){$script:foreground=[IntPtr]303};return $true }
             function Set-MIROwnedMenuForegroundHandle { param([IntPtr]$Handle) $script:setCalls++;if($script:activate){$script:foreground=$Handle;return $true};return $false }
-            function Invoke-Case([datetime]$PeerStart,[IntPtr]$Foreground,[bool]$Activate){
-              $script:foreground=$Foreground;$script:activate=$Activate;$script:attachEvents.Clear();$script:setCalls=0;$diagnostics=New-MIROwnedMenuObserverDiagnostics
+            function Invoke-Case([datetime]$PeerStart,[IntPtr]$Foreground,[bool]$Activate,[bool]$DriftAfterDetach){
+              $script:foreground=$Foreground;$script:activate=$Activate;$script:driftAfterDetach=$DriftAfterDetach;$script:attachEvents.Clear();$script:setCalls=0;$diagnostics=New-MIROwnedMenuObserverDiagnostics
               $failure='';$value=$null
               try{$value=Invoke-MIROwnedMenuOwnedPeerForeground -TargetProcess $script:targetProcess -TargetExpectedStartUtc $script:targetProcess.StartTime.ToUniversalTime() -TargetExpectedExecutable $targetExe -TargetHandle $targetHandle -PeerProcess $script:peerProcess -PeerExpectedStartUtc $PeerStart -PeerExpectedExecutable $peerExe -PeerHandle $peerHandle -Diagnostics $diagnostics}catch{$failure=$_.Exception.Message}
               return [pscustomobject]@{value=$value;failure=$failure;events=@($script:attachEvents.ToArray());sets=$script:setCalls;diagnostics=$diagnostics}
             }
-            $ok=Invoke-Case $script:peerProcess.StartTime.ToUniversalTime() $peerHandle $true
-            if($ok.failure-or$ok.sets-ne1-or($ok.events-join'|')-ne'33:22:True|33:22:False'-or$ok.value.outcome-ne'activated'-or-not$ok.value.detached-or$ok.diagnostics.owned_peer_foreground_last.after_foreground-ne'target'){throw ('owned peer activation/detach differs: '+($ok|ConvertTo-Json -Depth 8 -Compress))}
-            $activationFailure=Invoke-Case $script:peerProcess.StartTime.ToUniversalTime() $peerHandle $false
+            $ok=Invoke-Case $script:peerProcess.StartTime.ToUniversalTime() $peerHandle $true $false
+            if($ok.failure-or$ok.sets-ne1-or($ok.events-join'|')-ne'33:22:True|33:22:False'-or$ok.value.outcome-ne'activated'-or-not$ok.value.detached-or$ok.diagnostics.owned_peer_foreground_last.after_foreground-ne'target-post-detach'){throw ('owned peer activation/detach differs: '+($ok|ConvertTo-Json -Depth 8 -Compress))}
+            $activationFailure=Invoke-Case $script:peerProcess.StartTime.ToUniversalTime() $peerHandle $false $false
             if($activationFailure.failure-notmatch'activation'-or$activationFailure.sets-ne1-or($activationFailure.events-join'|')-ne'33:22:True|33:22:False'-or$activationFailure.diagnostics.owned_peer_foreground_last.outcome-ne'activation-refused'){throw 'failed activation did not detach'}
-            $foreign=Invoke-Case $script:peerProcess.StartTime.ToUniversalTime() ([IntPtr]303) $true
+            $foreign=Invoke-Case $script:peerProcess.StartTime.ToUniversalTime() ([IntPtr]303) $true $false
             if($foreign.failure-notmatch'foreground'-or$foreign.sets-ne0-or$foreign.events.Count-ne0-or$foreign.diagnostics.owned_peer_foreground_last.outcome-ne'foreground-refused'){throw 'foreign foreground reached attachment'}
-            $stale=Invoke-Case ($script:peerProcess.StartTime.ToUniversalTime().AddSeconds(1)) $peerHandle $true
+            $stale=Invoke-Case ($script:peerProcess.StartTime.ToUniversalTime().AddSeconds(1)) $peerHandle $true $false
             if($stale.failure-notmatch'peer-identity'-or$stale.sets-ne0-or$stale.events.Count-ne0-or$stale.diagnostics.owned_peer_foreground_last.outcome-ne'identity-refused'){throw 'stale peer reached attachment'}
+            $drift=Invoke-Case $script:peerProcess.StartTime.ToUniversalTime() $peerHandle $true $true
+            if($drift.failure-notmatch'post-detach-foreground'-or$drift.sets-ne1-or($drift.events-join'|')-ne'33:22:True|33:22:False'-or$drift.diagnostics.owned_peer_foreground_last.outcome-ne'post-detach-not-target'-or$drift.diagnostics.owned_peer_foreground_post_detach_not_target-ne1){throw 'post-detach foreground drift did not fail closed'}
             $implementation=(Get-Content -LiteralPath $env:MIR_OWNED_MENU -Raw)
             $node=@($ast.FindAll({param($n)$n-is[Management.Automation.Language.FunctionDefinitionAst]-and$n.Name-ceq'Invoke-MIROwnedMenuOwnedPeerForeground'},$true))[0].Extent.Text
             if($node.Contains('PostMessage')-or$node.Contains('MouseButton')-or$node.Contains('keybd_event')){throw 'owned peer foreground helper contains desktop input'}

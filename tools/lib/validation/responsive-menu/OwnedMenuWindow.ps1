@@ -56,6 +56,7 @@ function New-MIROwnedMenuObserverDiagnostics {
     owned_peer_foreground_attach_refused=0
     owned_peer_foreground_activation_refused=0
     owned_peer_foreground_detach_refused=0
+    owned_peer_foreground_post_detach_not_target=0
     owned_peer_foreground_last=$null
     client_geometry_unavailable=0
     offscreen=0
@@ -200,6 +201,9 @@ function Invoke-MIROwnedMenuOwnedPeerForeground {
   )
   # This is an opt-in, one-shot capture-boundary fallback. It never grants
   # foreground permission generally and never attaches to an unknown window.
+  # AttachThreadInput resets queue key state: call only at a quiescent capture
+  # boundary after synchronous actor release, and always detach before capture.
+  # https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-attachthreadinput
   $attempted=$false;$attached=$false;$detached=$false;$setForeground=$false;$before='unobserved';$after='unobserved';$outcome='started';$failure=$null
   try {
     $target=Assert-MIROwnedMenuOwnedPeerWindow -Process $TargetProcess -ExpectedStartUtc $TargetExpectedStartUtc -ExpectedExecutable $TargetExpectedExecutable -ExpectedHandle $TargetHandle -Role target
@@ -230,8 +234,20 @@ function Invoke-MIROwnedMenuOwnedPeerForeground {
       if (Connect-MIROwnedMenuInputThread -AttachingThread $controllerThread -AttachedThread $peer.thread_id -Attach $false) { $detached=$true }
       else { Add-MIROwnedMenuRejection -Diagnostics $Diagnostics -Name 'owned_peer_foreground_detach_refused';$outcome='detach-refused';if($null-eq$failure){$failure='[mir-menu-owned-peer-detach]'} }
     }
-    $Diagnostics.owned_peer_foreground_last=[ordered]@{kind='MIROwnedMenuOwnedPeerForegroundV1';attempted=$attempted;before_foreground=$before;after_foreground=$after;attached=$attached;detached=$detached;set_foreground=$setForeground;outcome=$outcome}
   }
+  if($null-eq$failure-and$attached-and$detached){
+    try {
+      $null=Assert-MIROwnedMenuOwnedPeerWindow -Process $TargetProcess -ExpectedStartUtc $TargetExpectedStartUtc -ExpectedExecutable $TargetExpectedExecutable -ExpectedHandle $TargetHandle -Role target
+      $null=Assert-MIROwnedMenuOwnedPeerWindow -Process $PeerProcess -ExpectedStartUtc $PeerExpectedStartUtc -ExpectedExecutable $PeerExpectedExecutable -ExpectedHandle $PeerHandle -Role peer
+      if((Get-MIROwnedMenuForegroundHandle)-ne$TargetHandle){throw '[mir-menu-owned-peer-post-detach-foreground]'}
+      $after='target-post-detach'
+    } catch {
+      $failure=$_.Exception.Message
+      if($failure-match'post-detach-foreground'){Add-MIROwnedMenuRejection -Diagnostics $Diagnostics -Name 'owned_peer_foreground_post_detach_not_target';$outcome='post-detach-not-target'}
+      else{Add-MIROwnedMenuRejection -Diagnostics $Diagnostics -Name 'owned_peer_foreground_identity_refused';$outcome='post-detach-identity-refused'}
+    }
+  }
+  $Diagnostics.owned_peer_foreground_last=[ordered]@{kind='MIROwnedMenuOwnedPeerForegroundV1';attempted=$attempted;before_foreground=$before;after_foreground=$after;attached=$attached;detached=$detached;set_foreground=$setForeground;outcome=$outcome}
   if($null-ne$failure){throw $failure}
   return $Diagnostics.owned_peer_foreground_last
 }
