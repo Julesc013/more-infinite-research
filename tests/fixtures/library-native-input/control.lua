@@ -192,6 +192,13 @@ local function controller_type(p)
   local ok,value=pcall(function()return p.controller_type end)
   return ok and type(value)=="number" and value or false
 end
+local function controller_constants()
+  local ok,value=pcall(function()return defines.controllers end)
+  if not ok or type(value)~="table" then return false end
+  local character,cutscene=value.character,value.cutscene
+  if type(character)~="number" or type(cutscene)~="number" or character==cutscene then return false end
+  return {character=character,cutscene=cutscene}
+end
 local function inspect_opened_snapshot(en,de)
   return {tick=game.tick,en_input=input_state(en),de_input=input_state(de),
     en_controller_type=controller_type(en),de_controller_type=controller_type(de)}
@@ -211,6 +218,7 @@ local function report()
     en_connected=valid(en) and en.connected or false,de_connected=valid(de) and de.connected or false,
     en_input=input_state(en),de_input=input_state(de),
     en_controller_type=controller_type(en),de_controller_type=controller_type(de),
+    controller_constants=controller_constants(),
     inspect_opened_snapshots=refs.inspect_opened_snapshots or false,
     removed_index=s.removed_index or false,readonly_imported_probe=s.imported_probe_verified==true,
     imported_earnings=true,fixture_seeds_credit=false,load_observed=loaded_restart,

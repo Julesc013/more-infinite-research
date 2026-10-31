@@ -319,11 +319,13 @@ class LibraryNativeInputFixtureControls(unittest.TestCase):
                 self.assertIs(result["initial_report"]["en_input"], False)
                 self.assertIs(result["initial_report"]["de_input"], False)
                 self.assertEqual((result["initial_report"]["en_controller_type"], result["initial_report"]["de_controller_type"]), (False, False))
+                self.assertEqual(result["initial_report"]["controller_constants"], {"character": 7, "cutscene": 11})
                 phases = {row["phase"]: row for row in result["trace"]}
                 initial = phases["text-prefix"]
                 self.assertEqual(initial["en_input"], {"library_open": True, "library_query": "", "foreign_open": False, "foreign_query": False,
                                                        "opened_kind": "table", "opened_is_library_root": True})
                 self.assertEqual((initial["en_controller_type"], initial["de_controller_type"]), (7, 11))
+                self.assertEqual(initial["controller_constants"], {"character": 7, "cutscene": 11})
                 self.assertEqual(initial["de_input"]["library_query"], "recipe-prod-research_mining_drill-1")
                 self.assertEqual((initial["de_input"]["opened_kind"], initial["de_input"]["opened_is_library_root"]), ("table", True))
                 self.assertEqual(phases["prefix-refresh"]["en_input"]["library_query"], "ge")
