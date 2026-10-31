@@ -169,6 +169,7 @@ class BootstrapTests(unittest.TestCase):
               module.on_gui_click = function(event) library_calls.click = event end
               module.on_gui_location_changed = function(event) library_calls.location = event end
               module.on_gui_closed = function(event) library_calls.closed = event end
+              module.on_pre_player_removed = function(event) library_calls.pre_removed = event end
               module.on_player_removed = function(event) library_calls.removed = event end
               module.on_string_translated = function(event) library_calls.translated = event end
               module.on_player_locale_changed = function(event) library_calls.locale = event end
@@ -216,7 +217,8 @@ class BootstrapTests(unittest.TestCase):
               on_research_finished = 4, on_research_started = 5, on_research_cancelled = 6,
               on_lua_shortcut = 7, on_gui_text_changed = 8,
               on_gui_selection_state_changed = 9, on_gui_click = 10,
-              on_gui_location_changed = 11, on_gui_closed = 12, on_player_removed = 13,
+              on_gui_location_changed = 11, on_gui_closed = 12, on_pre_player_removed = 22,
+              on_player_removed = 13,
               on_entity_damaged = 14, on_string_translated = 15,
               on_player_locale_changed = 16, on_player_changed_force = 17,
               on_player_joined_game = 18, on_research_reversed = 19,
@@ -278,6 +280,7 @@ class BootstrapTests(unittest.TestCase):
           assert(handlers.events[1] == nil or handlers.events[1] ~= handlers.events[7])
           for id = 7, 13 do assert(type(handlers.events[id]) == "function") end
           assert(type(handlers.events[21]) == "function")
+          assert(type(handlers.events[22]) == "function")
           for id = 15, 18 do assert(type(handlers.events[id]) == "function") end
           for id = 15, 18 do assert(type(handlers.events[id]) == "function") end
           assert(handlers.events[14] == nil and handlers.nth[60] == nil and handlers.nth[61] == nil and storage.mir == nil)
@@ -288,6 +291,7 @@ class BootstrapTests(unittest.TestCase):
           handlers.events[10]({player_index = 1})
           handlers.events[11]({player_index = 1})
           handlers.events[12]({player_index = 1})
+          handlers.events[22]({player_index = 1})
           handlers.events[13]({player_index = 1})
           handlers.events[15]({player_index = 1, id = 1, translated = true, result = "Gear"})
           handlers.events[16]({player_index = 1})
@@ -299,7 +303,7 @@ class BootstrapTests(unittest.TestCase):
             and library_calls.tab.player_index == 1)
           assert(library_calls.selection.player_index == 1 and library_calls.click.player_index == 1)
           assert(library_calls.location.player_index == 1 and library_calls.closed.player_index == 1
-            and library_calls.removed.player_index == 1)
+            and library_calls.pre_removed.player_index == 1 and library_calls.removed.player_index == 1)
           assert(library_calls.translated.result == "Gear" and library_calls.locale.player_index == 1
             and library_calls.force.player_index == 1 and library_calls.joined.player_index == 1)
           assert(lifecycle_calls.research_reversed.research == known_technology

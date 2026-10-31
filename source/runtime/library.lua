@@ -2310,6 +2310,15 @@ function M.on_player_left_game(event)
   if index then discard_translation_cache(index) end
 end
 
+-- Player GUI references can outlive the LuaPlayer proxy when an offline
+-- player is deleted. Destroy only MIR's tagged window while the player still
+-- exists so retained GUI handles are invalidated before the removal event.
+function M.on_pre_player_removed(event)
+  if not event or not whole_number(event.player_index, 1) then return end
+  local player = player_for(event.player_index)
+  if player then M.close(player) end
+end
+
 -- Research callbacks can precede the engine's final queue/level transition.
 -- Mark only relevant owned open views and refresh once on the following tick.
 function M.on_native_state_changed(event)

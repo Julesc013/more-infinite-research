@@ -1327,6 +1327,21 @@ class LibraryTests(unittest.TestCase):
           assert(storage.mir_library.players[1] == nil)
         ''')
 
+    def test_pre_player_removal_destroys_only_the_owned_library_before_player_state_is_retired(self):
+        self.lua.execute('''
+          boot()
+          local root = library.open(player, {query = "gear"})
+          assert(root.valid and storage.mir_library.players[1].open == true)
+          library.on_pre_player_removed({player_index = 1})
+          assert(not root.valid and player.gui.screen["mir_research_browser"] == nil,
+            "the owned Library root must be destroyed while its player is still available")
+          assert(storage.mir_library.players[1].open == false,
+            "pre-removal must close the persisted view before the post-removal cleanup")
+          library.on_player_removed({player_index = 1})
+          assert(storage.mir_library.players[1] == nil,
+            "post-removal must retire the removed player's Library state")
+        ''')
+
     def test_translation_dispatch_is_open_connected_only_and_closed_callbacks_only_release(self):
         self.lua.execute('''
           boot()
