@@ -219,7 +219,7 @@ class LibraryNativeInputFixtureControls(unittest.TestCase):
                 gui_type=opponent=="wrong-close-type" and 1 or 99,element=event_element}) end
               if opponent=="duplicate-close-event" then callbacks.events[5]({player_index=p.index,gui_type=99,element=root}) end
             end
-            local readonly_report,readonly_load,cold_calls_before,cold_calls_after,initial_report,missing_query_report,missing_query_readonly
+            local readonly_report,readonly_load,cold_calls_before,cold_calls_after,initial_report,missing_query_report,missing_query_readonly,opened_getter_report,opened_getter_readonly
             local ok,message=pcall(function()
               parse()
               if opponent=="wrong-initial-credit" then forces.player.technologies[ids[1]].level=1 end
@@ -236,6 +236,12 @@ class LibraryNativeInputFixtureControls(unittest.TestCase):
                 local filters=en.gui.screen[root_name].mir_library_filters;local saved=filters.mir_library_query
                 filters.mir_library_query=nil;local before=fingerprint(store);missing_query_report=api().report()
                 missing_query_readonly=before==fingerprint(store);filters.mir_library_query=saved
+              end
+              if opponent=="observe-opened-getter-error" then
+                local saved=en.opened;en.opened=nil
+                setmetatable(en,{__index=function(_,key)if key=="opened" then error("fixture opened getter") end end})
+                local before=fingerprint(store);opened_getter_report=api().report()
+                opened_getter_readonly=before==fingerprint(store);setmetatable(en,nil);en.opened=saved
               end
               if opponent=="settled-before-drag" or opponent=="pre-drag-event-only" then
                 local root=en.gui.screen[root_name];root.location={x=265,y=24}
@@ -275,6 +281,7 @@ class LibraryNativeInputFixtureControls(unittest.TestCase):
             end)
             return {ok=ok,message=tostring(message),trace=trace,saves=game.saves,readonly_report=readonly_report,
               initial_report=initial_report,missing_query_report=missing_query_report,missing_query_readonly=missing_query_readonly,
+              opened_getter_report=opened_getter_report,opened_getter_readonly=opened_getter_readonly,
               readonly_load=readonly_load,resets=resets,calls=calls,cold_calls_before=cold_calls_before,cold_calls_after=cold_calls_after,
               final=store[key] and api().report(),native_input_evidence=false,final_calls=calls}
           end
@@ -312,16 +319,20 @@ class LibraryNativeInputFixtureControls(unittest.TestCase):
                 self.assertIs(result["initial_report"]["de_input"], False)
                 phases = {row["phase"]: row for row in result["trace"]}
                 initial = phases["text-prefix"]
-                self.assertEqual(initial["en_input"], {"library_open": True, "library_query": "", "foreign_open": False, "foreign_query": False})
+                self.assertEqual(initial["en_input"], {"library_open": True, "library_query": "", "foreign_open": False, "foreign_query": False,
+                                                       "opened_kind": "table", "opened_is_library_root": True})
                 self.assertEqual(initial["de_input"]["library_query"], "recipe-prod-research_mining_drill-1")
+                self.assertEqual((initial["de_input"]["opened_kind"], initial["de_input"]["opened_is_library_root"]), ("table", True))
                 self.assertEqual(phases["prefix-refresh"]["en_input"]["library_query"], "ge")
                 self.assertEqual(phases["drag"]["en_input"]["library_query"], "gears")
                 foreign = phases["foreign-prefix"]["en_input"]
-                self.assertEqual(foreign, {"library_open": False, "library_query": False, "foreign_open": True, "foreign_query": ""})
+                self.assertEqual(foreign, {"library_open": False, "library_query": False, "foreign_open": True, "foreign_query": "",
+                                           "opened_kind": "table", "opened_is_library_root": False})
                 self.assertEqual(phases["foreign-refresh"]["en_input"]["foreign_query"], "focus")
                 self.assertEqual(phases["foreign-suffix"]["en_input"]["foreign_query"], "focus")
                 restored = phases["disconnect-de"]["en_input"]
-                self.assertEqual(restored, {"library_open": True, "library_query": "gears", "foreign_open": False, "foreign_query": False})
+                self.assertEqual(restored, {"library_open": True, "library_query": "gears", "foreign_open": False, "foreign_query": False,
+                                            "opened_kind": "table", "opened_is_library_root": True})
 
     def test_report_distinguishes_missing_textfield_and_foreign_open_identity(self):
         for target in ("f200", "f210"):
@@ -331,6 +342,14 @@ class LibraryNativeInputFixtureControls(unittest.TestCase):
                 self.assertTrue(missing["missing_query_readonly"])
                 self.assertIs(missing["missing_query_report"]["en_input"]["library_query"], False)
                 self.assertIs(missing["missing_query_report"]["en_input"]["library_open"], True)
+                self.assertEqual((missing["missing_query_report"]["en_input"]["opened_kind"],
+                                  missing["missing_query_report"]["en_input"]["opened_is_library_root"]), ("table", True))
+                getter = self.run_case(target, "observe-opened-getter-error")
+                self.assertTrue(getter["ok"], getter["message"])
+                self.assertTrue(getter["opened_getter_readonly"])
+                self.assertEqual((getter["opened_getter_report"]["en_input"]["opened_kind"],
+                                  getter["opened_getter_report"]["en_input"]["opened_is_library_root"]),
+                                 ("getter-error", False))
                 stolen = self.run_case(target, "steal-other-focus")
                 self.assertFalse(stolen["ok"], stolen["message"])
                 self.assertIs(stolen["final"]["en_input"]["foreign_open"], False)
@@ -382,17 +401,21 @@ class LibraryNativeInputFixtureControls(unittest.TestCase):
 
     def test_arm_close_retains_safe_opened_scalars_when_ownership_is_absent(self):
         expected = {
-            "opened-nil": ("opened_type=nil", "opened_is_root=false", "opened_name=<absent>", "opened_mod=<absent>"),
-            "opened-foreign": ("opened_type=table", "opened_is_root=false", "opened_name=foreign-opened", "opened_mod=fixture"),
+            "opened-nil": (("opened_type=nil", "opened_is_root=false", "opened_name=<absent>", "opened_mod=<absent>"),
+                           ("nil", False)),
+            "opened-foreign": (("opened_type=table", "opened_is_root=false", "opened_name=foreign-opened", "opened_mod=fixture"),
+                               ("table", False)),
         }
         for target in ("f200", "f210"):
-            for opponent, scalars in expected.items():
+            for opponent, (scalars, report_state) in expected.items():
                 with self.subTest(target=target, opponent=opponent):
                     result = self.run_case(target, opponent)
                     self.assertFalse(result["ok"], result["message"])
                     self.assertIn("declared key close has no owned opened Library:", result["message"])
                     for scalar in scalars:
                         self.assertIn(scalar, result["message"])
+                    self.assertEqual((result["final"]["en_input"]["opened_kind"],
+                                      result["final"]["en_input"]["opened_is_library_root"]), report_state)
                     self.assertEqual(result["final"]["phase"], "escape")
                     self.assertEqual(result["final"]["actual_library_closed_events"], 0)
                     self.assertEqual(result["saves"], {})
