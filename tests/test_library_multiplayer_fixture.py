@@ -1028,6 +1028,9 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
         prepare_position = caller.index("if($Mode-ceq'Prepare')")
         self.assertLess(guard_position, prepare_position)
         self.assertLess(guard_position, caller.index("Start-MIRNativeArchiveLease -LibraryDirectory"))
+        self.assertIn("runner_invoked=$false;native_execution_succeeded=$false", caller)
+        self.assertLess(caller.index("$result.runner_invoked=$true"), caller.index("$runnerResult=& $runner"))
+        self.assertLess(caller.index("$runnerResult=& $runner"), caller.index("$result.native_execution_succeeded=$true"))
         script = r'''
           $ErrorActionPreference='Stop';Set-StrictMode -Version Latest
           $tokens=$null;$errors=$null
@@ -1036,9 +1039,16 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
           $node=@($ast.FindAll({param($candidate)
             $candidate -is [Management.Automation.Language.FunctionDefinitionAst] -and $candidate.Name -ceq 'Assert-PreviewRootsDisjoint'
           },$true))
-          if($node.Count-ne1){throw 'input/output root guard is absent or ambiguous'}
+          $pathNode=@($ast.FindAll({param($candidate)
+            $candidate -is [Management.Automation.Language.FunctionDefinitionAst] -and $candidate.Name -ceq 'Assert-PreviewBuildPath'
+          },$true))
+          if($node.Count-ne1-or$pathNode.Count-ne1){throw 'preview path guards are absent or ambiguous'}
           Invoke-Expression $node[0].Extent.Text
-          $root=$env:MIR_TEST_WORK
+          $root=$env:MIR_TEST_WORK;$repo=$root
+          foreach($path in @((Join-Path $repo 'build/qualification'),(Join-Path $repo 'build/tmp'),(Join-Path $repo 'build/p'))){[IO.Directory]::CreateDirectory($path)|Out-Null}
+          $script:libraryChecks=[Collections.Generic.List[string]]::new();$script:reparseTarget=''
+          function Assert-MIRLibraryPath([string]$Path){$full=[IO.Path]::GetFullPath($Path);$script:libraryChecks.Add($full);if($full-ceq$script:reparseTarget){throw '[test-reparse-target]'};$item=Get-Item -LiteralPath $full -Force;while($null-ne$item){if($item.Attributes-band[IO.FileAttributes]::ReparsePoint){throw 'unexpected reparse path'};$item=if($item -is [IO.DirectoryInfo]){$item.Parent}else{$item.Directory}}}
+          Invoke-Expression $pathNode[0].Extent.Text
           $packet=Join-Path $root 'packet';$native=Join-Path $packet 'native';$parent=Join-Path $root 'parent';$child=Join-Path $parent 'child'
           function Assert-OverlapRejected([string]$InputRoot,[string]$OutputRoot){
             $rejected=$false;try{Assert-PreviewRootsDisjoint -InputRoot $InputRoot -OutputRoot $OutputRoot}catch{$rejected=$_.Exception.Message -like '*must be separate, non-nested directories*'}
@@ -1048,6 +1058,18 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
           Assert-OverlapRejected $packet $native
           Assert-OverlapRejected $child $parent
           Assert-PreviewRootsDisjoint -InputRoot (Join-Path $root 'input') -OutputRoot (Join-Path $root 'output')
+          $nonce=[guid]::NewGuid().ToString('N')
+          $input=Assert-PreviewBuildPath -Path (Join-Path $repo ('build/qualification/'+$nonce+'-input')) -Context 'InputRoot'
+          $tmpOutput=Assert-PreviewBuildPath -Path (Join-Path $repo ('build/tmp/'+$nonce+'-output')) -Context 'OutputRoot'
+          $pOutput=Assert-PreviewBuildPath -Path (Join-Path $repo ('build/p/'+$nonce+'-output')) -Context 'OutputRoot'
+          foreach($bad in @(
+            [pscustomobject]@{path=(Join-Path $repo ('build/tmp/'+$nonce+'-input'));context='InputRoot'},
+            [pscustomobject]@{path=(Join-Path $repo ('build/qualification/'+$nonce+'-output'));context='OutputRoot'}
+          )){$rejected=$false;try{Assert-PreviewBuildPath -Path $bad.path -Context $bad.context|Out-Null}catch{$rejected=$true};if(-not$rejected){throw "preview path policy admitted $($bad.context): $($bad.path)"}}
+          $reparseTarget=Join-Path $repo ('build/qualification/'+$nonce+'-existing-input');[IO.Directory]::CreateDirectory($reparseTarget)|Out-Null;$script:reparseTarget=[IO.Path]::GetFullPath($reparseTarget);$script:libraryChecks.Clear()
+          $reparseRejected=$false;try{Assert-PreviewBuildPath -Path $reparseTarget -Context 'InputRoot'|Out-Null}catch{$reparseRejected=$_.Exception.Message -ceq'[test-reparse-target]'}
+          if(-not$reparseRejected-or-not($script:libraryChecks-contains$script:reparseTarget)){throw 'existing input-root target was not inspected for reparse state'}
+          if((Test-Path -LiteralPath $input)-or(Test-Path -LiteralPath $tmpOutput)-or(Test-Path -LiteralPath $pOutput)){throw 'preview path policy created a directory'}
         '''
         with tempfile.TemporaryDirectory(prefix="mir5-preview-roots-") as work:
             result = subprocess.run(
