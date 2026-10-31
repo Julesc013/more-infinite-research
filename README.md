@@ -6,7 +6,7 @@
 
 - Repeatable research for production, logistics, combat, character bonuses and robots, with extra research for Space Age and supported modded production chains.
 - Startup settings let you enable, disable, cap and rebalance research. Optional overrides adjust supported productivity, module, recycling and other native limits.
-- **MIR 5 status:** the first GitHub community beta is in preparation; performance testing continues. [Published downloads](https://github.com/Julesc013/more-infinite-research/releases) and the [MIR 4.7.3 predecessor](https://github.com/Julesc013/more-infinite-research/releases/tag/v4.7.3) remain separate from unfinished beta work.
+- **MIR 5 status:** the first GitHub community beta is in preparation; Library, export and performance qualification continues. [Published downloads](https://github.com/Julesc013/more-infinite-research/releases) and the [MIR 4.7.3 predecessor](https://github.com/Julesc013/more-infinite-research/releases/tag/v4.7.3) remain separate from unfinished beta work.
 - **Choose your Factorio version:** Factorio 2.1 is the primary target, with separate downloads for older supported versions. Use the [version and feature table](docs/support.md#candidate-editions). Factorio 0.18 and 0.6–0.12 builds are experimental/best effort. GitHub betas stay off the Mod Portal; stable Portal releases use the same tested ZIPs.
 - **Before upgrading:** preserve the original save and matching mods/settings, then follow the [upgrade instructions](docs/support.md#first-upgrade). Research erased during the 4.2.1 incident requires the [recovery procedure](docs/support.md#recovery-from-the-421-incident) and an older backup.
 - **Settings sharing:** on Factorio 2.0/2.1, the Library exports full or compact settings as a copyable string or text file. Full profiles are recommended for support; they do not back up other mods, the map or research.
@@ -682,7 +682,7 @@ python -B tools/check_repository.py
 python -B tools/package.py --source source --target f210 --revision <full-commit> --output build/packages/more-infinite-research_5.0.21000.zip
 ```
 
-Host checks and package construction do not publish or qualify gameplay. Follow the [release procedure](docs/development.md#github-publication-after-a-reviewed-verdict) after the acceptance gates for the declared release maturity pass. The first community beta may disclose unfinished performance testing; stable releases require complete applicable performance acceptance.
+Host checks and package construction do not publish or qualify gameplay. Follow the [release procedure](docs/development.md#github-publication-after-a-reviewed-verdict) after the acceptance gates for the declared release maturity pass. The first community beta may disclose unfinished Library input/export/client-lifecycle and performance/stress qualification; stable releases require every applicable acceptance verdict.
 
 <details>
 <summary>Historical MIR3/MIR4 validation commands; not current build steps</summary>
