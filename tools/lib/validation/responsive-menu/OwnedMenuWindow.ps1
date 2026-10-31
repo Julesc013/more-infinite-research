@@ -57,6 +57,7 @@ function New-MIROwnedMenuObserverDiagnostics {
     owned_peer_foreground_activation_refused=0
     owned_peer_foreground_detach_refused=0
     owned_peer_foreground_post_detach_not_target=0
+    owned_peer_foreground_already_target_drift=0
     owned_peer_foreground_last=$null
     client_geometry_unavailable=0
     offscreen=0
@@ -214,17 +215,27 @@ function Invoke-MIROwnedMenuOwnedPeerForeground {
     $controllerDesktop=Get-MIROwnedMenuThreadDesktop $controllerThread;$targetDesktop=Get-MIROwnedMenuThreadDesktop $target.thread_id;$peerDesktop=Get-MIROwnedMenuThreadDesktop $peer.thread_id
     if ($controllerDesktop -eq [IntPtr]::Zero -or $targetDesktop -eq [IntPtr]::Zero -or $peerDesktop -eq [IntPtr]::Zero -or $controllerDesktop -ne $targetDesktop -or $controllerDesktop -ne $peerDesktop) { throw '[mir-menu-owned-peer-desktop]' }
     $foreground=Get-MIROwnedMenuForegroundHandle
-    if ($foreground -ne $peer.handle) { throw '[mir-menu-owned-peer-foreground]' }
-    $before='peer';$attempted=$true
-    if (-not(Connect-MIROwnedMenuInputThread -AttachingThread $controllerThread -AttachedThread $peer.thread_id -Attach $true)) { throw '[mir-menu-owned-peer-attach]' }
-    $attached=$true
-    if (-not(Set-MIROwnedMenuForegroundHandle $target.handle)) { throw '[mir-menu-owned-peer-activation]' }
-    $setForeground=$true
-    if ((Get-MIROwnedMenuForegroundHandle) -ne $target.handle) { throw '[mir-menu-owned-peer-activation]' }
-    $after='target';$outcome='activated'
+    $before=if($foreground-eq$target.handle){'target'}elseif($foreground-eq$peer.handle){'peer'}elseif($foreground-eq[IntPtr]::Zero){'none'}else{'other'}
+    if($before-ceq'target'){
+      # The normal asynchronous request may have won the race. Revalidate only
+      # our two owned windows and foreground state; never attach in this path.
+      $null=Assert-MIROwnedMenuOwnedPeerWindow -Process $TargetProcess -ExpectedStartUtc $TargetExpectedStartUtc -ExpectedExecutable $TargetExpectedExecutable -ExpectedHandle $TargetHandle -Role target
+      $null=Assert-MIROwnedMenuOwnedPeerWindow -Process $PeerProcess -ExpectedStartUtc $PeerExpectedStartUtc -ExpectedExecutable $PeerExpectedExecutable -ExpectedHandle $PeerHandle -Role peer
+      if((Get-MIROwnedMenuForegroundHandle)-ne$target.handle){throw '[mir-menu-owned-peer-already-target-foreground]'}
+      $after='target-revalidated';$outcome='already-target'
+    }elseif($before-ceq'peer'){
+      $attempted=$true
+      if (-not(Connect-MIROwnedMenuInputThread -AttachingThread $controllerThread -AttachedThread $peer.thread_id -Attach $true)) { throw '[mir-menu-owned-peer-attach]' }
+      $attached=$true
+      if (-not(Set-MIROwnedMenuForegroundHandle $target.handle)) { throw '[mir-menu-owned-peer-activation]' }
+      $setForeground=$true
+      if ((Get-MIROwnedMenuForegroundHandle) -ne $target.handle) { throw '[mir-menu-owned-peer-activation]' }
+      $after='target';$outcome='activated'
+    }else{throw '[mir-menu-owned-peer-foreground]'}
   } catch {
     $failure=$_.Exception.Message
     if ($failure -match 'desktop') { Add-MIROwnedMenuRejection -Diagnostics $Diagnostics -Name 'owned_peer_foreground_desktop_refused';$outcome='desktop-refused' }
+    elseif ($failure -match 'already-target') { Add-MIROwnedMenuRejection -Diagnostics $Diagnostics -Name 'owned_peer_foreground_already_target_drift';$outcome='already-target-drift' }
     elseif ($failure -match 'foreground') { Add-MIROwnedMenuRejection -Diagnostics $Diagnostics -Name 'owned_peer_foreground_foreign_refused';$outcome='foreground-refused' }
     elseif ($failure -match 'attach') { Add-MIROwnedMenuRejection -Diagnostics $Diagnostics -Name 'owned_peer_foreground_attach_refused';$outcome='attach-refused' }
     elseif ($failure -match 'activation') { Add-MIROwnedMenuRejection -Diagnostics $Diagnostics -Name 'owned_peer_foreground_activation_refused';$outcome='activation-refused' }
