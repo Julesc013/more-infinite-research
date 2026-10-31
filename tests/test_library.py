@@ -852,6 +852,55 @@ class LibraryTests(unittest.TestCase):
           assert(queue == player.force.research_queue and gear.level == level)
         ''')
 
+    def test_legacy_engine_prototype_collections_supply_library_recipe_and_item_names(self):
+        self.lua.execute(r'''
+          boot()
+          prototypes = nil
+          local recipe_name = {"recipe-name.iron-gear-wheel"}
+          local item_name = {"item-name.automation-science-pack"}
+          local recipe = {valid=true, name="iron-gear-wheel", localised_name=recipe_name,
+            products={{type="item", name="automation-science-pack"}}}
+          game.recipe_prototypes = { [recipe.name] = recipe }
+          game.item_prototypes = { ["automation-science-pack"] = {
+            valid=true, name="automation-science-pack", localised_name=item_name
+          }}
+          game.fluid_prototypes = {}
+          gear.prototype.effects = {{type="unlock-recipe", recipe=recipe.name}}
+          gear.research_unit_ingredients = {{name="automation-science-pack", amount=1}}
+          gear.force = player.force
+          player.force.valid = true
+          player.force.item_production_statistics = {valid=true, get_flow_count=function(spec)
+            assert(type(spec.name) == "string" and spec.input ~= nil and spec.category == nil)
+            return spec.input and 12 or 4
+          end}
+          player.surface = {valid=true, index=1, name="nauvis"}
+          defines = {flow_precision_index={one_minute=1}}
+          game.tick = 600
+
+          local root = library.open(player, {selected=gear.name})
+          local function contains(value, target)
+            if value == target then return true end
+            if type(value) ~= "table" then return false end
+            for _, child in ipairs(value) do if contains(child, target) then return true end end
+            return false
+          end
+          assert(#player.translation_requests == 1
+            and contains(player.translation_requests[1].localised, recipe_name[1])
+            and contains(player.translation_requests[1].localised, item_name[1]),
+            "Factorio 1.x game prototype collections must supply localized search names")
+
+          local content = research_content(root)
+          local detail = content["mir_library_detail"]
+          local recipes = detail["mir_library_recipe_list"]
+          assert(recipes and #recipes.items == 1 and recipes.items[1][3] == recipe_name,
+            "the affected-recipe list must resolve through game.recipe_prototypes")
+          local check = detail["mir_library_production_check"]
+          library.on_gui_click({player_index=1, element=check})
+          local production = detail["mir_library_production_results"]["mir_library_production_row_1"]
+          assert(production and production.caption[2] == item_name,
+            "the science snapshot must resolve names through game.item_prototypes")
+        ''')
+
     def test_narrow_display_uses_a_scrollable_stacked_library(self):
         self.lua.execute(r'''
           boot()

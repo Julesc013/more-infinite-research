@@ -846,6 +846,29 @@ local function current_tick()
   return whole_number(value, 0) and value or 0
 end
 
+-- Factorio 2.x exposes the prototype collections globally. The supported
+-- 1.0/1.1 runtime exposes the same immutable collections through `game`.
+-- Keep this compatibility at the read boundary so localized search and
+-- selected detail work across the published edition range.
+local LEGACY_PROTOTYPE_COLLECTIONS = {
+  item = "item_prototypes",
+  fluid = "fluid_prototypes",
+  recipe = "recipe_prototypes"
+}
+
+local function prototype_collection(kind)
+  local modern_ok, modern = pcall(function()
+    return prototypes and prototypes[kind]
+  end)
+  if modern_ok and modern ~= nil then return modern end
+  local legacy_key = LEGACY_PROTOTYPE_COLLECTIONS[kind]
+  if legacy_key == nil then return nil end
+  local legacy_ok, legacy = pcall(function()
+    return game and game[legacy_key]
+  end)
+  return legacy_ok and legacy or nil
+end
+
 local function request_translation(player, key)
   if not valid(player) or player.connected ~= true
       or type(player.request_translation) ~= "function" then return nil end
@@ -862,13 +885,12 @@ local function request_translation(player, key)
     local technologies = force and force.technologies
     local technology = technologies and technologies[key] or nil
     if not valid(technology) then return nil end
-    local collections = {}
-    local collections_ok = pcall(function()
-      collections.recipe = prototypes and prototypes.recipe
-      collections.item = prototypes and prototypes.item
-      collections.fluid = prototypes and prototypes.fluid
-    end)
-    local payload = collections_ok and library_localization.search_request(technology, collections) or technology.localised_name
+    local collections = {
+      recipe = prototype_collection("recipe"),
+      item = prototype_collection("item"),
+      fluid = prototype_collection("fluid")
+    }
+    local payload = library_localization.search_request(technology, collections) or technology.localised_name
     return player.request_translation(payload)
   end)
   return ok and request_id or nil
@@ -943,7 +965,8 @@ end
 
 local function native_item_name(id)
   local ok, name = pcall(function()
-    local item = prototypes.item[id] or (prototypes.fluid and prototypes.fluid[id])
+    local items, fluids = prototype_collection("item"), prototype_collection("fluid")
+    local item = (items and items[id]) or (fluids and fluids[id])
     return valid(item) and item.localised_name or nil
   end)
   if ok and (type(name) == "table" or (type(name) == "string" and name ~= "")) then return name end
@@ -960,7 +983,8 @@ local function affected_recipe_rows(player, detail)
       local ok, recipe = pcall(function()
         local force_recipe = player.force and player.force.recipes and player.force.recipes[id]
         if valid(force_recipe) then return force_recipe end
-        return prototypes.recipe and prototypes.recipe[id]
+        local recipes = prototype_collection("recipe")
+        return recipes and recipes[id] or nil
       end)
       if ok and valid(recipe) then
         local ok_name, name = pcall(function()
@@ -1765,7 +1789,7 @@ function M.open(player, options)
     view.settings_scope, view.setting_selected = options.settings_scope, nil
   end
   if type(options.settings_search) == "string" then
-  view.settings_query, view.setting_selected = text(options.settings_search), nil
+    view.settings_query, view.setting_selected = text(options.settings_search), nil
   end
   if type(options.query) == "string" then
     view.query, reset_page = text(options.query), true
