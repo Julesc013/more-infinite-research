@@ -188,6 +188,72 @@ class LibraryNativeInputFixtureControls(unittest.TestCase):
                         )
                         self.assertNotEqual(crlf_output.read_bytes(), raw)
 
+    def test_support_export_report_tick_profiles_cross_bind_canonical_raw_archives(self):
+        record = json.loads(
+            (ROOT / "spec/evidence/library-support-exports-report-tick-prepared-r01.json").read_text(encoding="utf-8")
+        )
+        fixture = "mir-fixture-mir5-library-native-input_0.4.0"
+        self.assertEqual(record["fixture_implementation_commit"], "7122f73ee9ae50dc395e7b6d295ea7fda3e24117")
+
+        def raw_git(revision, path):
+            return subprocess.check_output(["git", "show", f"{revision}:{path}"], cwd=ROOT)
+
+        def canonical_archive(output, members):
+            with zipfile.ZipFile(output, "w", compression=zipfile.ZIP_DEFLATED, compresslevel=9) as archive:
+                for member, contents in members:
+                    entry = zipfile.ZipInfo(
+                        f"{fixture}/{member['destination']}", date_time=(1980, 1, 1, 0, 0, 0)
+                    )
+                    entry.create_system = 3
+                    entry.external_attr = 0o100644 << 16
+                    entry.compress_type = zipfile.ZIP_DEFLATED
+                    archive.writestr(entry, contents, compresslevel=9)
+
+        with tempfile.TemporaryDirectory() as temporary:
+            temporary = Path(temporary)
+            for row in record["profiles"]:
+                with self.subTest(target=row["target"]):
+                    profile_path = ROOT / row["profile"]["path"]
+                    profile_raw = profile_path.read_bytes()
+                    profile = json.loads(profile_raw)
+                    owned = row["owned_fixture"]
+                    self.assertEqual(len(profile_raw), row["profile"]["bytes"])
+                    self.assertEqual(hashlib.sha256(profile_raw).hexdigest().upper(), row["profile"]["sha256"])
+                    self.assertEqual(profile["archive_sha256"], row["archive_sha256"])
+                    self.assertEqual(profile["archive_sha256"][owned["name"]], owned["sha256"])
+                    self.assertEqual([member["destination"] for member in owned["members"]], [
+                        "control.lua", "support-exports.lua", "info.json"
+                    ])
+                    contents = []
+                    for member in owned["members"]:
+                        self.assertEqual(member["source_revision"], record["fixture_implementation_commit"])
+                        blob = subprocess.check_output(
+                            ["git", "rev-parse", f"{member['source_revision']}:{member['source']}"],
+                            cwd=ROOT,
+                            text=True,
+                        ).strip()
+                        raw = raw_git(member["source_revision"], member["source"])
+                        self.assertEqual(blob, member["git_blob"])
+                        self.assertEqual(len(raw), member["bytes"])
+                        self.assertEqual(hashlib.sha256(raw).hexdigest().upper(), member["sha256"])
+                        contents.append((member, raw))
+                    output = temporary / f"{row['target']}.zip"
+                    canonical_archive(output, contents)
+                    archive_raw = output.read_bytes()
+                    self.assertEqual(len(archive_raw), owned["bytes"])
+                    self.assertEqual(hashlib.sha256(archive_raw).hexdigest().upper(), owned["sha256"])
+                    with zipfile.ZipFile(output) as archive:
+                        infos = archive.infolist()
+                        self.assertEqual(
+                            [entry.filename for entry in infos],
+                            [f"{fixture}/{member['destination']}" for member in owned["members"]],
+                        )
+                        for entry in infos:
+                            self.assertEqual(entry.date_time, (1980, 1, 1, 0, 0, 0))
+                            self.assertEqual(entry.create_system, 3)
+                            self.assertEqual(entry.external_attr, 0o100644 << 16)
+                            self.assertEqual(entry.compress_type, zipfile.ZIP_DEFLATED)
+
     def setUp(self):
         self.lua = LuaRuntime(unpack_returned_tuples=True)
         self.lua.globals().observer_path = (FIXTURE / "control.lua").as_posix()
