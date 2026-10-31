@@ -1,0 +1,1051 @@
+{
+  "kind": "MIRBetaStartupSnapshotV1",
+  "status": "exploratory-single-pass-not-performance-acceptance",
+  "source_commit": "125fc7464414dbbe769fee160399e0cb5a9c9eed",
+  "source_tree": "0f5f0c63083e1aa15a1976494c83fb404fcc9d2c",
+  "tested_public_controller_commit": "19bd91859cbddb2107ffde033bd4823fa98eb24a",
+  "frozen_inventory_sha256": "2E263EF28AABA4660BFB490ABD4F4CD5CE5AB2AB875F3323DEDC4E9FB862FFBF",
+  "host": {
+    "cpu": "Intel Core i5-12600K",
+    "memory_gib": 32,
+    "os": "Windows 10 Enterprise 10.0.19045"
+  },
+  "method": [
+    "Normal graphical fresh processes; exact log initialization endpoint, no headless timing.",
+    "One included launch per MIR arm, initial and final no-MIR controls shown separately.",
+    "No reboot or cache clearing; ordinary desktop applications remained running.",
+    "Order: initial control, MIR5, MIR4, MIR3, MIR2, MIR1 where available, final control.",
+    "As-shipped comparisons; features differ. No randomized order, repeated-run average, noise exclusion or causal-overhead estimate.",
+    "Only three declared cohorts have independently observed menu/Settings endpoints.",
+    "The 2.1 heavy cohort preserves failed menu outcomes; log values are retrospective diagnostics only."
+  ],
+  "capsule": {
+    "path": "mir5-beta-00-startup-snapshot-bodies-r01.json.gz",
+    "bytes": 466263,
+    "sha256": "D424760AC7FECDA72D8939F6F0CF0C9F4EB78C8830C81DE4CB3EA7A0198F3FB1",
+    "body_count": 87
+  },
+  "groups": [
+    {
+      "engine": "2.0.77",
+      "workload": "Base",
+      "cohort": "descriptive-base-f200-r02",
+      "observation_kind": "menu-validated-with-separate-initialization-log",
+      "packet": {
+        "path": "build/qualification/descriptive-base-f200-r02-controller/packet.json",
+        "bytes": 10998,
+        "sha256": "DCDD5A366C008AB41F0CDB737BAC481E52467A8342FB93DAB633CD085E2A9DAA"
+      },
+      "profile": {
+        "path": "build/tmp/descriptive-base-f200-r02-inputs/profile.json",
+        "bytes": 1054,
+        "sha256": "181D1983F21656437511567321EE8DCF054F16925016051C28B2D62837DCB398"
+      },
+      "terminal": {
+        "path": "build/qualification/descriptive-base-f200-r02-controller/execution-record/terminal.json",
+        "bytes": 20270,
+        "sha256": "DB519CDB7E639859F0ED6EB80CCA26BC0629404AF81453638C81AD0776C5819C"
+      },
+      "result": {
+        "path": "build/tmp/descriptive-base-f200-r02/result.json",
+        "bytes": 49356,
+        "sha256": "97158694576CBADC3CC416D4C46ECC3787F574EFF90D3CDFAA179CABA8D5B6EE"
+      },
+      "rows": [
+        {
+          "arm": "control-before",
+          "archive_version": null,
+          "first_menu_seconds": 15.4558913,
+          "confirmed_settings_seconds": 16.2228938,
+          "engine_initialised_log_seconds": 14.463,
+          "post_render_verification_seconds": 0.767002500000002,
+          "actor_sha256": "86BA939D7770F8AA66E8D9FCCAAE19A0602A6F85412F6A4B626B242D61255DCF",
+          "log_sha256": "580D683A1D9ED2E1F7F1A322ED5163E09EBCA5ED51D810D64623E74E15DF2024",
+          "actor_path": "build/tmp/descriptive-base-f200-r02/runs/control-before/responsive-menu-actor/actor-result.json",
+          "log_path": "build/tmp/descriptive-base-f200-r02/runs/control-before/factorio.log",
+          "first_menu_delta_seconds": 5.559094799999999,
+          "engine_initialised_delta_seconds": 5.473999999999998,
+          "raw_log": {
+            "path": "build/tmp/descriptive-base-f200-r02/runs/control-before/factorio.log",
+            "bytes": 11771,
+            "sha256": "580D683A1D9ED2E1F7F1A322ED5163E09EBCA5ED51D810D64623E74E15DF2024"
+          },
+          "raw_menu_actor": {
+            "path": "build/tmp/descriptive-base-f200-r02/runs/control-before/responsive-menu-actor/actor-result.json",
+            "bytes": 24309,
+            "sha256": "86BA939D7770F8AA66E8D9FCCAAE19A0602A6F85412F6A4B626B242D61255DCF"
+          },
+          "initialization_delta_vs_final_no_mir_seconds": 5.473999999999998
+        },
+        {
+          "arm": "mir5",
+          "archive_version": "5.0.20000",
+          "first_menu_seconds": 10.1386745,
+          "confirmed_settings_seconds": 11.1124942,
+          "engine_initialised_log_seconds": 9.045,
+          "post_render_verification_seconds": 0.9738197,
+          "actor_sha256": "464DF2A8A95CD7196D4ADF62E94F2F019C4CDBD1E230649380E2FE6D138CA477",
+          "log_sha256": "99FF8C7131C4B675A40982C95398EA9ABC393231D11DBB2F7F1F1F2FE21F61F0",
+          "actor_path": "build/tmp/descriptive-base-f200-r02/runs/mir5/responsive-menu-actor/actor-result.json",
+          "log_path": "build/tmp/descriptive-base-f200-r02/runs/mir5/factorio.log",
+          "first_menu_delta_seconds": 0.24187799999999982,
+          "engine_initialised_delta_seconds": 0.05599999999999916,
+          "raw_log": {
+            "path": "build/tmp/descriptive-base-f200-r02/runs/mir5/factorio.log",
+            "bytes": 12056,
+            "sha256": "99FF8C7131C4B675A40982C95398EA9ABC393231D11DBB2F7F1F1F2FE21F61F0"
+          },
+          "raw_menu_actor": {
+            "path": "build/tmp/descriptive-base-f200-r02/runs/mir5/responsive-menu-actor/actor-result.json",
+            "bytes": 24915,
+            "sha256": "464DF2A8A95CD7196D4ADF62E94F2F019C4CDBD1E230649380E2FE6D138CA477"
+          },
+          "initialization_delta_vs_final_no_mir_seconds": 0.05599999999999916
+        },
+        {
+          "arm": "mir4",
+          "archive_version": "4.7.20003",
+          "first_menu_seconds": 11.0701252,
+          "confirmed_settings_seconds": 11.9215541,
+          "engine_initialised_log_seconds": 10.244,
+          "post_render_verification_seconds": 0.8514289000000002,
+          "actor_sha256": "698B1ACB2332811E24D7D265DB5CC7FB8E8859435B330B5027414459801C2AC8",
+          "log_sha256": "AFCAA1705EAFA5E7F224937E600C44A27B2E0D6F56E985F427CCAB7EAFA4F858",
+          "actor_path": "build/tmp/descriptive-base-f200-r02/runs/mir4/responsive-menu-actor/actor-result.json",
+          "log_path": "build/tmp/descriptive-base-f200-r02/runs/mir4/factorio.log",
+          "first_menu_delta_seconds": 1.173328699999999,
+          "engine_initialised_delta_seconds": 1.254999999999999,
+          "raw_log": {
+            "path": "build/tmp/descriptive-base-f200-r02/runs/mir4/factorio.log",
+            "bytes": 32911,
+            "sha256": "AFCAA1705EAFA5E7F224937E600C44A27B2E0D6F56E985F427CCAB7EAFA4F858"
+          },
+          "raw_menu_actor": {
+            "path": "build/tmp/descriptive-base-f200-r02/runs/mir4/responsive-menu-actor/actor-result.json",
+            "bytes": 24842,
+            "sha256": "698B1ACB2332811E24D7D265DB5CC7FB8E8859435B330B5027414459801C2AC8"
+          },
+          "initialization_delta_vs_final_no_mir_seconds": 1.254999999999999
+        },
+        {
+          "arm": "mir3",
+          "archive_version": "2.5.11",
+          "first_menu_seconds": 11.600613,
+          "confirmed_settings_seconds": 12.5339597,
+          "engine_initialised_log_seconds": 10.309,
+          "post_render_verification_seconds": 0.9333467000000013,
+          "actor_sha256": "F51DD6C725CDBC16C21FC5FD95AD2AF6A27270B9BCE813D808B7EFEEE450CBFA",
+          "log_sha256": "32E60F9F66777B1BD820CA65220C4452EAF8B725840F7A86ED2320E334CED89A",
+          "actor_path": "build/tmp/descriptive-base-f200-r02/runs/mir3/responsive-menu-actor/actor-result.json",
+          "log_path": "build/tmp/descriptive-base-f200-r02/runs/mir3/factorio.log",
+          "first_menu_delta_seconds": 1.7038164999999985,
+          "engine_initialised_delta_seconds": 1.3199999999999985,
+          "raw_log": {
+            "path": "build/tmp/descriptive-base-f200-r02/runs/mir3/factorio.log",
+            "bytes": 17866,
+            "sha256": "32E60F9F66777B1BD820CA65220C4452EAF8B725840F7A86ED2320E334CED89A"
+          },
+          "raw_menu_actor": {
+            "path": "build/tmp/descriptive-base-f200-r02/runs/mir3/responsive-menu-actor/actor-result.json",
+            "bytes": 24154,
+            "sha256": "F51DD6C725CDBC16C21FC5FD95AD2AF6A27270B9BCE813D808B7EFEEE450CBFA"
+          },
+          "initialization_delta_vs_final_no_mir_seconds": 1.3199999999999985
+        },
+        {
+          "arm": "mir2",
+          "archive_version": "1.9.2",
+          "first_menu_seconds": 10.0077431,
+          "confirmed_settings_seconds": 10.848544,
+          "engine_initialised_log_seconds": 8.984,
+          "post_render_verification_seconds": 0.8408008999999996,
+          "actor_sha256": "5B094EB24EB7FF414196E0B222E9274DFF3F100CB9392677CF3064909F36B797",
+          "log_sha256": "2B4FAD7E7D03B501F1FEA4EC8613C86EA480919AD7B2A5650E040D18CD603237",
+          "actor_path": "build/tmp/descriptive-base-f200-r02/runs/mir2/responsive-menu-actor/actor-result.json",
+          "log_path": "build/tmp/descriptive-base-f200-r02/runs/mir2/factorio.log",
+          "first_menu_delta_seconds": 0.11094660000000012,
+          "engine_initialised_delta_seconds": -0.005000000000000782,
+          "raw_log": {
+            "path": "build/tmp/descriptive-base-f200-r02/runs/mir2/factorio.log",
+            "bytes": 16538,
+            "sha256": "2B4FAD7E7D03B501F1FEA4EC8613C86EA480919AD7B2A5650E040D18CD603237"
+          },
+          "raw_menu_actor": {
+            "path": "build/tmp/descriptive-base-f200-r02/runs/mir2/responsive-menu-actor/actor-result.json",
+            "bytes": 23370,
+            "sha256": "5B094EB24EB7FF414196E0B222E9274DFF3F100CB9392677CF3064909F36B797"
+          },
+          "initialization_delta_vs_final_no_mir_seconds": -0.005000000000000782
+        },
+        {
+          "arm": "mir1",
+          "archive_version": "1.2.9",
+          "first_menu_seconds": 10.2368914,
+          "confirmed_settings_seconds": 11.1265062,
+          "engine_initialised_log_seconds": 9.168,
+          "post_render_verification_seconds": 0.8896148000000004,
+          "actor_sha256": "09B83BB37E5009889EB3EBDD792241AD25590C8382C6BCA5570F4B4F016EAC2B",
+          "log_sha256": "5D2F41F0075D43E2FB3653CDADA70CDDF2D84A8BA3321B8CB8A8B6D9DF5D071F",
+          "actor_path": "build/tmp/descriptive-base-f200-r02/runs/mir1/responsive-menu-actor/actor-result.json",
+          "log_path": "build/tmp/descriptive-base-f200-r02/runs/mir1/factorio.log",
+          "first_menu_delta_seconds": 0.34009489999999865,
+          "engine_initialised_delta_seconds": 0.1789999999999985,
+          "raw_log": {
+            "path": "build/tmp/descriptive-base-f200-r02/runs/mir1/factorio.log",
+            "bytes": 18570,
+            "sha256": "5D2F41F0075D43E2FB3653CDADA70CDDF2D84A8BA3321B8CB8A8B6D9DF5D071F"
+          },
+          "raw_menu_actor": {
+            "path": "build/tmp/descriptive-base-f200-r02/runs/mir1/responsive-menu-actor/actor-result.json",
+            "bytes": 24784,
+            "sha256": "09B83BB37E5009889EB3EBDD792241AD25590C8382C6BCA5570F4B4F016EAC2B"
+          },
+          "initialization_delta_vs_final_no_mir_seconds": 0.1789999999999985
+        },
+        {
+          "arm": "control-after",
+          "archive_version": null,
+          "first_menu_seconds": 9.8967965,
+          "confirmed_settings_seconds": 10.6917453,
+          "engine_initialised_log_seconds": 8.989,
+          "post_render_verification_seconds": 0.7949487999999985,
+          "actor_sha256": "F501B28C353C1DB13EB2889CE77C330897F8972CAD2215E0106F2382505BBBDE",
+          "log_sha256": "D6AD6ABDAFD2276210DFD1C0F76BD589B5F44071C06024F2BA3CDC0810C78DB9",
+          "actor_path": "build/tmp/descriptive-base-f200-r02/runs/control-after/responsive-menu-actor/actor-result.json",
+          "log_path": "build/tmp/descriptive-base-f200-r02/runs/control-after/factorio.log",
+          "first_menu_delta_seconds": 0.0,
+          "engine_initialised_delta_seconds": 0.0,
+          "raw_log": {
+            "path": "build/tmp/descriptive-base-f200-r02/runs/control-after/factorio.log",
+            "bytes": 11673,
+            "sha256": "D6AD6ABDAFD2276210DFD1C0F76BD589B5F44071C06024F2BA3CDC0810C78DB9"
+          },
+          "raw_menu_actor": {
+            "path": "build/tmp/descriptive-base-f200-r02/runs/control-after/responsive-menu-actor/actor-result.json",
+            "bytes": 24253,
+            "sha256": "F501B28C353C1DB13EB2889CE77C330897F8972CAD2215E0106F2382505BBBDE"
+          },
+          "initialization_delta_vs_final_no_mir_seconds": 0.0
+        }
+      ],
+      "no_mir_reference": "control-after; initial control separately retained, never pooled"
+    },
+    {
+      "engine": "2.0.77",
+      "workload": "Space Age",
+      "cohort": "descriptive-graphical-init-space-age-f200-r02",
+      "observation_kind": "prospective-graphical-initialization-only",
+      "packet": {
+        "path": "build/qualification/descriptive-space-age-f200-r04-controller/graphical-init-packet.json",
+        "bytes": 10921,
+        "sha256": "B83319EFAE3853197BB15AD4A9F2FD4EF4F5D81DB64D50F2C672A02BA460470A"
+      },
+      "profile": {
+        "path": "build/tmp/descriptive-space-age-f200-r04-inputs/profile.json",
+        "bytes": 658,
+        "sha256": "AF6148AE0EB6392AF86336F3E4DC66C1BBBE595EF037781C780860B47A3D1B7C"
+      },
+      "terminal": {
+        "path": "build/qualification/descriptive-space-age-f200-r04-controller/execution-record/terminal.json",
+        "bytes": 13155,
+        "sha256": "05295132A374D48DB6C9352D331D43D8BACD6604AA6723056BDA3215A2722A8D"
+      },
+      "result": {
+        "path": "build/tmp/descriptive-graphical-init-space-age-f200-r02/result.json",
+        "bytes": 32990,
+        "sha256": "36774692D70197279374ABFC7FF4AEEE9B5F4B8D0DAFE12600C232F39097976E"
+      },
+      "rows": [
+        {
+          "arm": "control-before",
+          "archive_version": null,
+          "engine_initialised_log_seconds": 45.722,
+          "raw_log": {
+            "path": "build/tmp/descriptive-graphical-init-space-age-f200-r02/runs/control-before/factorio.log",
+            "bytes": 13478,
+            "sha256": "D9D5604B05B2961AA32B678B7A7C13EAA269C0325C08D5404454541EF23B4F40"
+          },
+          "loaded_selection": [
+            "base@2.0.77",
+            "elevated-rails@2.0.77",
+            "mir-fixture-mir5-active-mods-observer@0.1.0",
+            "quality@2.0.77",
+            "space-age@2.0.77"
+          ],
+          "initialization_delta_vs_final_no_mir_seconds": 27.284000000000002
+        },
+        {
+          "arm": "mir5",
+          "archive_version": "5.0.20000",
+          "engine_initialised_log_seconds": 19.129,
+          "raw_log": {
+            "path": "build/tmp/descriptive-graphical-init-space-age-f200-r02/runs/mir5/factorio.log",
+            "bytes": 13764,
+            "sha256": "833E0624BFDECF29962A8FDDB68B66648DABCFF348595BBD9DDCAE4BF6EBBB5F"
+          },
+          "loaded_selection": [
+            "base@2.0.77",
+            "elevated-rails@2.0.77",
+            "mir-fixture-mir5-active-mods-observer@0.1.0",
+            "more-infinite-research@5.0.20000",
+            "quality@2.0.77",
+            "space-age@2.0.77"
+          ],
+          "initialization_delta_vs_final_no_mir_seconds": 0.6910000000000025
+        },
+        {
+          "arm": "mir4",
+          "archive_version": "4.7.20003",
+          "engine_initialised_log_seconds": 19.89,
+          "raw_log": {
+            "path": "build/tmp/descriptive-graphical-init-space-age-f200-r02/runs/mir4/factorio.log",
+            "bytes": 29847,
+            "sha256": "730E5290324A604CD6274864B348B3789CC560229AB1F570381B66348B075B81"
+          },
+          "loaded_selection": [
+            "base@2.0.77",
+            "elevated-rails@2.0.77",
+            "mir-fixture-mir5-active-mods-observer@0.1.0",
+            "more-infinite-research@4.7.20003",
+            "quality@2.0.77",
+            "space-age@2.0.77"
+          ],
+          "initialization_delta_vs_final_no_mir_seconds": 1.4520000000000017
+        },
+        {
+          "arm": "mir3",
+          "archive_version": "2.5.11",
+          "engine_initialised_log_seconds": 19.924,
+          "raw_log": {
+            "path": "build/tmp/descriptive-graphical-init-space-age-f200-r02/runs/mir3/factorio.log",
+            "bytes": 20344,
+            "sha256": "465955689A9EA8E19E85E5B9EEFE170466EA56D18B400276FE9FF4E24B67B95C"
+          },
+          "loaded_selection": [
+            "base@2.0.77",
+            "elevated-rails@2.0.77",
+            "mir-fixture-mir5-active-mods-observer@0.1.0",
+            "more-infinite-research@2.5.11",
+            "quality@2.0.77",
+            "space-age@2.0.77"
+          ],
+          "initialization_delta_vs_final_no_mir_seconds": 1.4860000000000007
+        },
+        {
+          "arm": "mir2",
+          "archive_version": "1.9.2",
+          "engine_initialised_log_seconds": 18.762,
+          "raw_log": {
+            "path": "build/tmp/descriptive-graphical-init-space-age-f200-r02/runs/mir2/factorio.log",
+            "bytes": 19139,
+            "sha256": "E67EA5F54D864C475C72E1905D6D719DD13DE80A047FED15C446B4A82FFA6505"
+          },
+          "loaded_selection": [
+            "base@2.0.77",
+            "elevated-rails@2.0.77",
+            "mir-fixture-mir5-active-mods-observer@0.1.0",
+            "more-infinite-research@1.9.2",
+            "quality@2.0.77",
+            "space-age@2.0.77"
+          ],
+          "initialization_delta_vs_final_no_mir_seconds": 0.3240000000000016
+        },
+        {
+          "arm": "mir1",
+          "archive_version": "1.2.9",
+          "engine_initialised_log_seconds": 18.436,
+          "raw_log": {
+            "path": "build/tmp/descriptive-graphical-init-space-age-f200-r02/runs/mir1/factorio.log",
+            "bytes": 20776,
+            "sha256": "6DA2EF5FCE29B07FD4E61FF91B7119847BFA87A1BBAA88304456ED63F1237861"
+          },
+          "loaded_selection": [
+            "base@2.0.77",
+            "elevated-rails@2.0.77",
+            "mir-fixture-mir5-active-mods-observer@0.1.0",
+            "more-infinite-research@1.2.9",
+            "quality@2.0.77",
+            "space-age@2.0.77"
+          ],
+          "initialization_delta_vs_final_no_mir_seconds": -0.0019999999999988916
+        },
+        {
+          "arm": "control-after",
+          "archive_version": null,
+          "engine_initialised_log_seconds": 18.438,
+          "raw_log": {
+            "path": "build/tmp/descriptive-graphical-init-space-age-f200-r02/runs/control-after/factorio.log",
+            "bytes": 13380,
+            "sha256": "6F091DAA3AE46C31F73D10223C17FCE84B4DD509ED92728CA9C2B89E056A5CB5"
+          },
+          "loaded_selection": [
+            "base@2.0.77",
+            "elevated-rails@2.0.77",
+            "mir-fixture-mir5-active-mods-observer@0.1.0",
+            "quality@2.0.77",
+            "space-age@2.0.77"
+          ],
+          "initialization_delta_vs_final_no_mir_seconds": 0.0
+        }
+      ],
+      "no_mir_reference": "control-after; initial control separately retained, never pooled"
+    },
+    {
+      "engine": "2.0.77",
+      "workload": "Heavy Space Age",
+      "cohort": "descriptive-heavy-f200-r02",
+      "observation_kind": "menu-validated-with-separate-initialization-log",
+      "packet": {
+        "path": "build/qualification/descriptive-heavy-f200-r02-controller/packet.json",
+        "bytes": 14200,
+        "sha256": "FB5A3C3C813EFFD6EDA5F4E112518E0DED275FDA8932DF96825EE32A70D5DC7B"
+      },
+      "profile": {
+        "path": "build/tmp/descriptive-heavy-f200-r02-inputs/profile.json",
+        "bytes": 7511,
+        "sha256": "61CBE6299DD2708079EA80FB3871AC980C6FF7281DD126C61B3126A7FF294857"
+      },
+      "terminal": {
+        "path": "build/qualification/descriptive-heavy-f200-r02-controller/execution-record/terminal.json",
+        "bytes": 20290,
+        "sha256": "ED207B8AB952B4F3BC95FE845D128AD301814F088B6ABA7BAEBD6B0164FA3910"
+      },
+      "result": {
+        "path": "build/tmp/descriptive-heavy-f200-r02/result.json",
+        "bytes": 58180,
+        "sha256": "E353FB728009FA116A10004F60DAA8EEC87E6EC9AA76A0058D6F538A40BB77DC"
+      },
+      "rows": [
+        {
+          "arm": "control-before",
+          "archive_version": null,
+          "first_menu_seconds": 40.9210442,
+          "confirmed_settings_seconds": 41.5583474,
+          "engine_initialised_log_seconds": 40.222,
+          "post_render_verification_seconds": 0.6373032000000052,
+          "actor_sha256": "BB46060EBC427BED27CA70112B608C06760EE8FC2F617A12386BBC62E8AEFAD6",
+          "log_sha256": "D729CB6C640AC35AE177C8EA1FB1230B77D212DE879236CA0EB1F7982FD07BEA",
+          "actor_path": "build/tmp/descriptive-heavy-f200-r02/runs/control-before/responsive-menu-actor/actor-result.json",
+          "log_path": "build/tmp/descriptive-heavy-f200-r02/runs/control-before/factorio.log",
+          "first_menu_delta_seconds": 12.945010899999996,
+          "engine_initialised_delta_seconds": 13.267000000000003,
+          "raw_log": {
+            "path": "build/tmp/descriptive-heavy-f200-r02/runs/control-before/factorio.log",
+            "bytes": 21571,
+            "sha256": "D729CB6C640AC35AE177C8EA1FB1230B77D212DE879236CA0EB1F7982FD07BEA"
+          },
+          "raw_menu_actor": {
+            "path": "build/tmp/descriptive-heavy-f200-r02/runs/control-before/responsive-menu-actor/actor-result.json",
+            "bytes": 24238,
+            "sha256": "BB46060EBC427BED27CA70112B608C06760EE8FC2F617A12386BBC62E8AEFAD6"
+          },
+          "initialization_delta_vs_final_no_mir_seconds": 13.267000000000003
+        },
+        {
+          "arm": "mir5",
+          "archive_version": "5.0.20000",
+          "first_menu_seconds": 28.9736314,
+          "confirmed_settings_seconds": 29.7823008,
+          "engine_initialised_log_seconds": 28.002,
+          "post_render_verification_seconds": 0.808669400000003,
+          "actor_sha256": "139DB31C7E9F8E998ED73683255C31214B11EE95A4A3B6C24F4DA17CBEAF5031",
+          "log_sha256": "8FDB9FEF233910088D3FA8CD0D71DC4038BB3B8D8D0C0D26FFDB01BBF5F744BD",
+          "actor_path": "build/tmp/descriptive-heavy-f200-r02/runs/mir5/responsive-menu-actor/actor-result.json",
+          "log_path": "build/tmp/descriptive-heavy-f200-r02/runs/mir5/factorio.log",
+          "first_menu_delta_seconds": 0.9975980999999976,
+          "engine_initialised_delta_seconds": 1.0470000000000006,
+          "raw_log": {
+            "path": "build/tmp/descriptive-heavy-f200-r02/runs/mir5/factorio.log",
+            "bytes": 21856,
+            "sha256": "8FDB9FEF233910088D3FA8CD0D71DC4038BB3B8D8D0C0D26FFDB01BBF5F744BD"
+          },
+          "raw_menu_actor": {
+            "path": "build/tmp/descriptive-heavy-f200-r02/runs/mir5/responsive-menu-actor/actor-result.json",
+            "bytes": 22032,
+            "sha256": "139DB31C7E9F8E998ED73683255C31214B11EE95A4A3B6C24F4DA17CBEAF5031"
+          },
+          "initialization_delta_vs_final_no_mir_seconds": 1.0470000000000006
+        },
+        {
+          "arm": "mir4",
+          "archive_version": "4.7.20003",
+          "first_menu_seconds": 30.6223157,
+          "confirmed_settings_seconds": 31.3723873,
+          "engine_initialised_log_seconds": 29.712,
+          "post_render_verification_seconds": 0.7500715999999983,
+          "actor_sha256": "E97CE99F783B00745D2125F4014DCBFD07BCDDE657F4BCCD75DB77DA88E83F61",
+          "log_sha256": "E751A345955F2EC5C15CA4C11FC0BA341C3447D716227413C9052F97F5C2A326",
+          "actor_path": "build/tmp/descriptive-heavy-f200-r02/runs/mir4/responsive-menu-actor/actor-result.json",
+          "log_path": "build/tmp/descriptive-heavy-f200-r02/runs/mir4/factorio.log",
+          "first_menu_delta_seconds": 2.6462824000000005,
+          "engine_initialised_delta_seconds": 2.7570000000000014,
+          "raw_log": {
+            "path": "build/tmp/descriptive-heavy-f200-r02/runs/mir4/factorio.log",
+            "bytes": 49186,
+            "sha256": "E751A345955F2EC5C15CA4C11FC0BA341C3447D716227413C9052F97F5C2A326"
+          },
+          "raw_menu_actor": {
+            "path": "build/tmp/descriptive-heavy-f200-r02/runs/mir4/responsive-menu-actor/actor-result.json",
+            "bytes": 24156,
+            "sha256": "E97CE99F783B00745D2125F4014DCBFD07BCDDE657F4BCCD75DB77DA88E83F61"
+          },
+          "initialization_delta_vs_final_no_mir_seconds": 2.7570000000000014
+        },
+        {
+          "arm": "mir3",
+          "archive_version": "2.5.11",
+          "first_menu_seconds": 32.438282,
+          "confirmed_settings_seconds": 33.284847,
+          "engine_initialised_log_seconds": 31.352,
+          "post_render_verification_seconds": 0.8465649999999982,
+          "actor_sha256": "FF440E2EF25E195EAB553181280C430D67702A1CF487769F5E1464210BB5542C",
+          "log_sha256": "67B139497DDC62D2723E9C048BBD3B237B5D0DBD69336872F41F4B56B8B697F8",
+          "actor_path": "build/tmp/descriptive-heavy-f200-r02/runs/mir3/responsive-menu-actor/actor-result.json",
+          "log_path": "build/tmp/descriptive-heavy-f200-r02/runs/mir3/factorio.log",
+          "first_menu_delta_seconds": 4.4622487,
+          "engine_initialised_delta_seconds": 4.397000000000002,
+          "raw_log": {
+            "path": "build/tmp/descriptive-heavy-f200-r02/runs/mir3/factorio.log",
+            "bytes": 28504,
+            "sha256": "67B139497DDC62D2723E9C048BBD3B237B5D0DBD69336872F41F4B56B8B697F8"
+          },
+          "raw_menu_actor": {
+            "path": "build/tmp/descriptive-heavy-f200-r02/runs/mir3/responsive-menu-actor/actor-result.json",
+            "bytes": 24878,
+            "sha256": "FF440E2EF25E195EAB553181280C430D67702A1CF487769F5E1464210BB5542C"
+          },
+          "initialization_delta_vs_final_no_mir_seconds": 4.397000000000002
+        },
+        {
+          "arm": "mir2",
+          "archive_version": "1.9.2",
+          "first_menu_seconds": 29.0950548,
+          "confirmed_settings_seconds": 29.9947158,
+          "engine_initialised_log_seconds": 28.171,
+          "post_render_verification_seconds": 0.8996610000000018,
+          "actor_sha256": "B0943DD169B119B51DCEF62B7DFE8FEB1F5EF93CC526CF09F721656C924CD5B5",
+          "log_sha256": "43B8CBCE47D0A2892095B3CF35A56CF73FCD8EB6DDBBD01FD1F73D977859F8BA",
+          "actor_path": "build/tmp/descriptive-heavy-f200-r02/runs/mir2/responsive-menu-actor/actor-result.json",
+          "log_path": "build/tmp/descriptive-heavy-f200-r02/runs/mir2/factorio.log",
+          "first_menu_delta_seconds": 1.1190214999999988,
+          "engine_initialised_delta_seconds": 1.216000000000001,
+          "raw_log": {
+            "path": "build/tmp/descriptive-heavy-f200-r02/runs/mir2/factorio.log",
+            "bytes": 28151,
+            "sha256": "43B8CBCE47D0A2892095B3CF35A56CF73FCD8EB6DDBBD01FD1F73D977859F8BA"
+          },
+          "raw_menu_actor": {
+            "path": "build/tmp/descriptive-heavy-f200-r02/runs/mir2/responsive-menu-actor/actor-result.json",
+            "bytes": 25626,
+            "sha256": "B0943DD169B119B51DCEF62B7DFE8FEB1F5EF93CC526CF09F721656C924CD5B5"
+          },
+          "initialization_delta_vs_final_no_mir_seconds": 1.216000000000001
+        },
+        {
+          "arm": "mir1",
+          "archive_version": "1.2.9",
+          "first_menu_seconds": 28.272859,
+          "confirmed_settings_seconds": 29.1943707,
+          "engine_initialised_log_seconds": 27.236,
+          "post_render_verification_seconds": 0.9215116999999999,
+          "actor_sha256": "19D8D95F3BAC6A276FC64E63C24D6ACE5543994B18248EFA21EF7303E35A4A06",
+          "log_sha256": "0820919BDE9490B52101E899E4F0BF12D30EB143A632C9C1053F37A4D1D110D2",
+          "actor_path": "build/tmp/descriptive-heavy-f200-r02/runs/mir1/responsive-menu-actor/actor-result.json",
+          "log_path": "build/tmp/descriptive-heavy-f200-r02/runs/mir1/factorio.log",
+          "first_menu_delta_seconds": 0.2968256999999994,
+          "engine_initialised_delta_seconds": 0.28100000000000236,
+          "raw_log": {
+            "path": "build/tmp/descriptive-heavy-f200-r02/runs/mir1/factorio.log",
+            "bytes": 28961,
+            "sha256": "0820919BDE9490B52101E899E4F0BF12D30EB143A632C9C1053F37A4D1D110D2"
+          },
+          "raw_menu_actor": {
+            "path": "build/tmp/descriptive-heavy-f200-r02/runs/mir1/responsive-menu-actor/actor-result.json",
+            "bytes": 24903,
+            "sha256": "19D8D95F3BAC6A276FC64E63C24D6ACE5543994B18248EFA21EF7303E35A4A06"
+          },
+          "initialization_delta_vs_final_no_mir_seconds": 0.28100000000000236
+        },
+        {
+          "arm": "control-after",
+          "archive_version": null,
+          "first_menu_seconds": 27.9760333,
+          "confirmed_settings_seconds": 28.887226,
+          "engine_initialised_log_seconds": 26.955,
+          "post_render_verification_seconds": 0.9111926999999973,
+          "actor_sha256": "C0032CE81753BC8816B70020858EE51C662944C3AF8D868113B77D8AA4099FCD",
+          "log_sha256": "5AFAEC8144ADFC713CB97329AA1079AC5919E7E789802448B758E44D4B67522D",
+          "actor_path": "build/tmp/descriptive-heavy-f200-r02/runs/control-after/responsive-menu-actor/actor-result.json",
+          "log_path": "build/tmp/descriptive-heavy-f200-r02/runs/control-after/factorio.log",
+          "first_menu_delta_seconds": 0.0,
+          "engine_initialised_delta_seconds": 0.0,
+          "raw_log": {
+            "path": "build/tmp/descriptive-heavy-f200-r02/runs/control-after/factorio.log",
+            "bytes": 21472,
+            "sha256": "5AFAEC8144ADFC713CB97329AA1079AC5919E7E789802448B758E44D4B67522D"
+          },
+          "raw_menu_actor": {
+            "path": "build/tmp/descriptive-heavy-f200-r02/runs/control-after/responsive-menu-actor/actor-result.json",
+            "bytes": 24937,
+            "sha256": "C0032CE81753BC8816B70020858EE51C662944C3AF8D868113B77D8AA4099FCD"
+          },
+          "initialization_delta_vs_final_no_mir_seconds": 0.0
+        }
+      ],
+      "no_mir_reference": "control-after; initial control separately retained, never pooled"
+    },
+    {
+      "engine": "2.1.23",
+      "workload": "Base",
+      "cohort": "descriptive-base-f210-r02",
+      "observation_kind": "menu-validated-with-separate-initialization-log",
+      "packet": {
+        "path": "build/qualification/descriptive-base-f210-r02-controller/packet.json",
+        "bytes": 9780,
+        "sha256": "C32EFE0CF914F07A0A053F209683697DE4FCB899BC87BF69A2882CDF1BF02D6B"
+      },
+      "profile": {
+        "path": "build/tmp/descriptive-base-f210-r02-inputs/profile.json",
+        "bytes": 1188,
+        "sha256": "95E0DF366DF0914493B7BAC46A5D930EB15813AFA845AC29547209EAC0F9C467"
+      },
+      "terminal": {
+        "path": "build/qualification/descriptive-base-f210-r02-controller/execution-record/terminal.json",
+        "bytes": 17897,
+        "sha256": "B3BC86E5E2E7384FCCECA4E597D19F771396919DA271DDA15418C85CA0EA67B5"
+      },
+      "result": {
+        "path": "build/tmp/descriptive-base-f210-r02/result.json",
+        "bytes": 42321,
+        "sha256": "6A8E7A503B29D5E44C8F90E35A76491988D741AA9F75316D1251361E1293A3F1"
+      },
+      "rows": [
+        {
+          "arm": "control-before",
+          "archive_version": null,
+          "first_menu_seconds": 14.0377899,
+          "confirmed_settings_seconds": 15.0466017,
+          "engine_initialised_log_seconds": 12.858,
+          "post_render_verification_seconds": 1.0088118000000001,
+          "actor_sha256": "F2C6167B924F9D93ADDACC5956AB6F90D5003C304C25D417C78D705D2507CBAC",
+          "log_sha256": "F9688A6C6C86A7F6B25358E509BF1EB983D0CBD91E20618B28A551A991246155",
+          "actor_path": "build/tmp/descriptive-base-f210-r02/runs/control-before/responsive-menu-actor/actor-result.json",
+          "log_path": "build/tmp/descriptive-base-f210-r02/runs/control-before/factorio.log",
+          "first_menu_delta_seconds": 4.6691392,
+          "engine_initialised_delta_seconds": 4.338000000000001,
+          "raw_log": {
+            "path": "build/tmp/descriptive-base-f210-r02/runs/control-before/factorio.log",
+            "bytes": 16497,
+            "sha256": "F9688A6C6C86A7F6B25358E509BF1EB983D0CBD91E20618B28A551A991246155"
+          },
+          "raw_menu_actor": {
+            "path": "build/tmp/descriptive-base-f210-r02/runs/control-before/responsive-menu-actor/actor-result.json",
+            "bytes": 24236,
+            "sha256": "F2C6167B924F9D93ADDACC5956AB6F90D5003C304C25D417C78D705D2507CBAC"
+          },
+          "initialization_delta_vs_final_no_mir_seconds": 4.338000000000001
+        },
+        {
+          "arm": "mir5",
+          "archive_version": "5.0.21000",
+          "first_menu_seconds": 9.3146691,
+          "confirmed_settings_seconds": 10.1805923,
+          "engine_initialised_log_seconds": 8.277,
+          "post_render_verification_seconds": 0.865923200000001,
+          "actor_sha256": "46FB74977F43A0FDB168096F5D3C5D37DF33D6E5CBFF6F63593305D82E3063E8",
+          "log_sha256": "7469917472FD75256FAD385EB6FA7E1F77D06EA03E27A70B3FE2CD66EB8AE834",
+          "actor_path": "build/tmp/descriptive-base-f210-r02/runs/mir5/responsive-menu-actor/actor-result.json",
+          "log_path": "build/tmp/descriptive-base-f210-r02/runs/mir5/factorio.log",
+          "first_menu_delta_seconds": -0.053981600000000185,
+          "engine_initialised_delta_seconds": -0.24300000000000033,
+          "raw_log": {
+            "path": "build/tmp/descriptive-base-f210-r02/runs/mir5/factorio.log",
+            "bytes": 16783,
+            "sha256": "7469917472FD75256FAD385EB6FA7E1F77D06EA03E27A70B3FE2CD66EB8AE834"
+          },
+          "raw_menu_actor": {
+            "path": "build/tmp/descriptive-base-f210-r02/runs/mir5/responsive-menu-actor/actor-result.json",
+            "bytes": 25642,
+            "sha256": "46FB74977F43A0FDB168096F5D3C5D37DF33D6E5CBFF6F63593305D82E3063E8"
+          },
+          "initialization_delta_vs_final_no_mir_seconds": -0.24300000000000033
+        },
+        {
+          "arm": "mir4",
+          "archive_version": "4.7.21003",
+          "first_menu_seconds": 10.0314635,
+          "confirmed_settings_seconds": 10.7840026,
+          "engine_initialised_log_seconds": 9.076,
+          "post_render_verification_seconds": 0.7525391000000017,
+          "actor_sha256": "FB33A8AF19EA79B8E8D9700821BD1F1FDCEA91B9C31F6D54E136B26226AEC344",
+          "log_sha256": "D798197C5FB3A152CAB8C0A8F0C76D415BC21B947CE637E946F4DABECBD04EA5",
+          "actor_path": "build/tmp/descriptive-base-f210-r02/runs/mir4/responsive-menu-actor/actor-result.json",
+          "log_path": "build/tmp/descriptive-base-f210-r02/runs/mir4/factorio.log",
+          "first_menu_delta_seconds": 0.6628127999999993,
+          "engine_initialised_delta_seconds": 0.5560000000000009,
+          "raw_log": {
+            "path": "build/tmp/descriptive-base-f210-r02/runs/mir4/factorio.log",
+            "bytes": 37954,
+            "sha256": "D798197C5FB3A152CAB8C0A8F0C76D415BC21B947CE637E946F4DABECBD04EA5"
+          },
+          "raw_menu_actor": {
+            "path": "build/tmp/descriptive-base-f210-r02/runs/mir4/responsive-menu-actor/actor-result.json",
+            "bytes": 24210,
+            "sha256": "FB33A8AF19EA79B8E8D9700821BD1F1FDCEA91B9C31F6D54E136B26226AEC344"
+          },
+          "initialization_delta_vs_final_no_mir_seconds": 0.5560000000000009
+        },
+        {
+          "arm": "mir3",
+          "archive_version": "3.2.11",
+          "first_menu_seconds": 10.0076847,
+          "confirmed_settings_seconds": 10.765871,
+          "engine_initialised_log_seconds": 9.055,
+          "post_render_verification_seconds": 0.7581863000000002,
+          "actor_sha256": "A147C641E65CEA1A7709D1A118281B2C710650410C459F3BAE2B450F85E01052",
+          "log_sha256": "E0AEF77E4D3434F1B164EDE7C89AFD786F317FF72043ED232C1A449A06B48DC0",
+          "actor_path": "build/tmp/descriptive-base-f210-r02/runs/mir3/responsive-menu-actor/actor-result.json",
+          "log_path": "build/tmp/descriptive-base-f210-r02/runs/mir3/factorio.log",
+          "first_menu_delta_seconds": 0.6390340000000005,
+          "engine_initialised_delta_seconds": 0.5350000000000001,
+          "raw_log": {
+            "path": "build/tmp/descriptive-base-f210-r02/runs/mir3/factorio.log",
+            "bytes": 22349,
+            "sha256": "E0AEF77E4D3434F1B164EDE7C89AFD786F317FF72043ED232C1A449A06B48DC0"
+          },
+          "raw_menu_actor": {
+            "path": "build/tmp/descriptive-base-f210-r02/runs/mir3/responsive-menu-actor/actor-result.json",
+            "bytes": 22777,
+            "sha256": "A147C641E65CEA1A7709D1A118281B2C710650410C459F3BAE2B450F85E01052"
+          },
+          "initialization_delta_vs_final_no_mir_seconds": 0.5350000000000001
+        },
+        {
+          "arm": "mir2",
+          "archive_version": "2.2.0",
+          "first_menu_seconds": 9.4042324,
+          "confirmed_settings_seconds": 10.1833179,
+          "engine_initialised_log_seconds": 8.474,
+          "post_render_verification_seconds": 0.7790855000000008,
+          "actor_sha256": "286A4AFC86549E9690D2261B4A2390F63DF6ADF3C4D54034DA992E629D4FE311",
+          "log_sha256": "41319DE4180982663A4F29FB3C9CEA223E05E0FBC3B5C5E9BFAA600DF13856F2",
+          "actor_path": "build/tmp/descriptive-base-f210-r02/runs/mir2/responsive-menu-actor/actor-result.json",
+          "log_path": "build/tmp/descriptive-base-f210-r02/runs/mir2/factorio.log",
+          "first_menu_delta_seconds": 0.03558169999999983,
+          "engine_initialised_delta_seconds": -0.045999999999999375,
+          "raw_log": {
+            "path": "build/tmp/descriptive-base-f210-r02/runs/mir2/factorio.log",
+            "bytes": 21454,
+            "sha256": "41319DE4180982663A4F29FB3C9CEA223E05E0FBC3B5C5E9BFAA600DF13856F2"
+          },
+          "raw_menu_actor": {
+            "path": "build/tmp/descriptive-base-f210-r02/runs/mir2/responsive-menu-actor/actor-result.json",
+            "bytes": 24944,
+            "sha256": "286A4AFC86549E9690D2261B4A2390F63DF6ADF3C4D54034DA992E629D4FE311"
+          },
+          "initialization_delta_vs_final_no_mir_seconds": -0.045999999999999375
+        },
+        {
+          "arm": "control-after",
+          "archive_version": null,
+          "first_menu_seconds": 9.3686507,
+          "confirmed_settings_seconds": 11.5739505,
+          "engine_initialised_log_seconds": 8.52,
+          "post_render_verification_seconds": 2.2052998000000006,
+          "actor_sha256": "BC896FA914C03A4C72674A2068D8F0E2C7C5F5FA5E7817BBDF857286E1075D94",
+          "log_sha256": "45BA8706935E5A4EE6CF886FCBF3878055A0CCB889A8F4BAF893DF58F7E6C3B3",
+          "actor_path": "build/tmp/descriptive-base-f210-r02/runs/control-after/responsive-menu-actor/actor-result.json",
+          "log_path": "build/tmp/descriptive-base-f210-r02/runs/control-after/factorio.log",
+          "first_menu_delta_seconds": 0.0,
+          "engine_initialised_delta_seconds": 0.0,
+          "raw_log": {
+            "path": "build/tmp/descriptive-base-f210-r02/runs/control-after/factorio.log",
+            "bytes": 16399,
+            "sha256": "45BA8706935E5A4EE6CF886FCBF3878055A0CCB889A8F4BAF893DF58F7E6C3B3"
+          },
+          "raw_menu_actor": {
+            "path": "build/tmp/descriptive-base-f210-r02/runs/control-after/responsive-menu-actor/actor-result.json",
+            "bytes": 27157,
+            "sha256": "BC896FA914C03A4C72674A2068D8F0E2C7C5F5FA5E7817BBDF857286E1075D94"
+          },
+          "initialization_delta_vs_final_no_mir_seconds": 0.0
+        }
+      ],
+      "no_mir_reference": "control-after; initial control separately retained, never pooled"
+    },
+    {
+      "engine": "2.1.23",
+      "workload": "Space Age",
+      "cohort": "descriptive-graphical-init-space-age-f210-r02",
+      "observation_kind": "prospective-graphical-initialization-only",
+      "packet": {
+        "path": "build/qualification/descriptive-space-age-f210-r04-controller/graphical-init-packet.json",
+        "bytes": 9695,
+        "sha256": "145405F66070B7892FE48F08593AC6808D43E59FA20B776AC2E174DCC66BAA0A"
+      },
+      "profile": {
+        "path": "build/tmp/descriptive-space-age-f210-r04-inputs/profile.json",
+        "bytes": 1419,
+        "sha256": "10787C9728321EC877EF55EC1BBA8CD460888EDB312C73B61F155267F5A1EA40"
+      },
+      "terminal": {
+        "path": "build/qualification/descriptive-space-age-f210-r04-controller/execution-record/terminal.json",
+        "bytes": 11827,
+        "sha256": "9D6279D1AFCBB095A333988AFDFC2BE45425FF841B89A43C0EC2994DF0ACD6EB"
+      },
+      "result": {
+        "path": "build/tmp/descriptive-graphical-init-space-age-f210-r02/result.json",
+        "bytes": 28461,
+        "sha256": "B533EB36960A983A78EBF9FFE737264FD8D89937DEA25E23CB904E3373727C67"
+      },
+      "rows": [
+        {
+          "arm": "control-before",
+          "archive_version": null,
+          "engine_initialised_log_seconds": 30.242,
+          "raw_log": {
+            "path": "build/tmp/descriptive-graphical-init-space-age-f210-r02/runs/control-before/factorio.log",
+            "bytes": 18716,
+            "sha256": "4CA79D35ED72D8F282D346A8B9D4DDE14BC29E87C61F2716C88CF643AB895AAA"
+          },
+          "loaded_selection": [
+            "base@2.1.23",
+            "elevated-rails@2.1.23",
+            "mir-fixture-mir5-active-mods-observer@0.1.0",
+            "quality@2.1.23",
+            "recycler@2.1.23",
+            "space-age@2.1.23"
+          ],
+          "initialization_delta_vs_final_no_mir_seconds": 9.7
+        },
+        {
+          "arm": "mir5",
+          "archive_version": "5.0.21000",
+          "engine_initialised_log_seconds": 20.655,
+          "raw_log": {
+            "path": "build/tmp/descriptive-graphical-init-space-age-f210-r02/runs/mir5/factorio.log",
+            "bytes": 19003,
+            "sha256": "2B8D3818D1AFC6D5B787ABFBA753FE3CB7DAB5FDA35EAF0B593494285DEA63EB"
+          },
+          "loaded_selection": [
+            "base@2.1.23",
+            "elevated-rails@2.1.23",
+            "mir-fixture-mir5-active-mods-observer@0.1.0",
+            "more-infinite-research@5.0.21000",
+            "quality@2.1.23",
+            "recycler@2.1.23",
+            "space-age@2.1.23"
+          ],
+          "initialization_delta_vs_final_no_mir_seconds": 0.11299999999999955
+        },
+        {
+          "arm": "mir4",
+          "archive_version": "4.7.21003",
+          "engine_initialised_log_seconds": 22.264,
+          "raw_log": {
+            "path": "build/tmp/descriptive-graphical-init-space-age-f210-r02/runs/mir4/factorio.log",
+            "bytes": 36139,
+            "sha256": "5A5E4B4AC87F05677D7B800A80303A5A43E6F4E5DC0A7B0496B0AE1990A4B5F8"
+          },
+          "loaded_selection": [
+            "base@2.1.23",
+            "elevated-rails@2.1.23",
+            "mir-fixture-mir5-active-mods-observer@0.1.0",
+            "more-infinite-research@4.7.21003",
+            "quality@2.1.23",
+            "recycler@2.1.23",
+            "space-age@2.1.23"
+          ],
+          "initialization_delta_vs_final_no_mir_seconds": 1.7219999999999978
+        },
+        {
+          "arm": "mir3",
+          "archive_version": "3.2.11",
+          "engine_initialised_log_seconds": 22.086,
+          "raw_log": {
+            "path": "build/tmp/descriptive-graphical-init-space-age-f210-r02/runs/mir3/factorio.log",
+            "bytes": 25411,
+            "sha256": "E75478D26B094DF57EF6A9A8FE7EE7BAAD394B684D4E5CE6C1BC6507F28888E7"
+          },
+          "loaded_selection": [
+            "base@2.1.23",
+            "elevated-rails@2.1.23",
+            "mir-fixture-mir5-active-mods-observer@0.1.0",
+            "more-infinite-research@3.2.11",
+            "quality@2.1.23",
+            "recycler@2.1.23",
+            "space-age@2.1.23"
+          ],
+          "initialization_delta_vs_final_no_mir_seconds": 1.543999999999997
+        },
+        {
+          "arm": "mir2",
+          "archive_version": "2.2.0",
+          "engine_initialised_log_seconds": 20.468,
+          "raw_log": {
+            "path": "build/tmp/descriptive-graphical-init-space-age-f210-r02/runs/mir2/factorio.log",
+            "bytes": 23576,
+            "sha256": "8B2E3F4D64029F80C8FFB247862ED169EA7535F37EB1955DDD2E8968623F9A56"
+          },
+          "loaded_selection": [
+            "base@2.1.23",
+            "elevated-rails@2.1.23",
+            "mir-fixture-mir5-active-mods-observer@0.1.0",
+            "more-infinite-research@2.2.0",
+            "quality@2.1.23",
+            "recycler@2.1.23",
+            "space-age@2.1.23"
+          ],
+          "initialization_delta_vs_final_no_mir_seconds": -0.07400000000000162
+        },
+        {
+          "arm": "control-after",
+          "archive_version": null,
+          "engine_initialised_log_seconds": 20.542,
+          "raw_log": {
+            "path": "build/tmp/descriptive-graphical-init-space-age-f210-r02/runs/control-after/factorio.log",
+            "bytes": 18618,
+            "sha256": "D36E3FEBCA4651AEDEACCC980736971FDB00B655C84BD53B8366A9A1DC6F01CA"
+          },
+          "loaded_selection": [
+            "base@2.1.23",
+            "elevated-rails@2.1.23",
+            "mir-fixture-mir5-active-mods-observer@0.1.0",
+            "quality@2.1.23",
+            "recycler@2.1.23",
+            "space-age@2.1.23"
+          ],
+          "initialization_delta_vs_final_no_mir_seconds": 0.0
+        }
+      ],
+      "no_mir_reference": "control-after; initial control separately retained, never pooled"
+    },
+    {
+      "engine": "2.1.23",
+      "workload": "Heavy Space Age",
+      "cohort": "descriptive-heavy-f210-r04",
+      "observation_kind": "retrospective-initialization-only-adverse-menu-retained",
+      "packet": {
+        "path": "build/qualification/descriptive-heavy-f210-r04-controller/packet.json",
+        "bytes": 12986,
+        "sha256": "C7A6BB648B5E5FA2270F3FBF0249722656BB4BDABEB09AF166837EBE15893214"
+      },
+      "profile": {
+        "path": "build/tmp/descriptive-heavy-f210-r04-inputs/profile.json",
+        "bytes": 8020,
+        "sha256": "05F2786E896B1F28C2E4239134BA370B0C2BCF6CCB1384E03999FB0E89C8B980"
+      },
+      "terminal": {
+        "path": "build/qualification/descriptive-heavy-f210-r04-controller/execution-record/terminal.json",
+        "bytes": 14775,
+        "sha256": "41FE98AC2783E50E0C984BBD48623A1DD67AD90687AA470D6090B5EC800B399A"
+      },
+      "result": {
+        "path": "build/tmp/descriptive-heavy-f210-r04/result.json",
+        "bytes": 11359,
+        "sha256": "C0DDB9D598A48DFB633C8F7ED0883C13CC699C4809C5EEA85E4A5CB3B4596F61"
+      },
+      "rows": [
+        {
+          "arm": "control-before",
+          "archive_version": null,
+          "engine_initialised_log_seconds": 42.062,
+          "menu_status": "observed",
+          "raw_log": {
+            "path": "build/tmp/descriptive-heavy-f210-r04/runs/control-before/factorio.log",
+            "bytes": 25545,
+            "sha256": "8CDC582AED1759361EFFB7BECC7FCA6B9CD0B3A59BB230501FE9086DC694D62B"
+          },
+          "initialization_delta_vs_final_no_mir_seconds": 13.383
+        },
+        {
+          "arm": "mir5",
+          "archive_version": "5.0.21000",
+          "engine_initialised_log_seconds": 28.884,
+          "menu_status": "failed-retained",
+          "raw_log": {
+            "path": "build/tmp/descriptive-heavy-f210-r04/runs/mir5/failed-factorio-current.log",
+            "bytes": 25831,
+            "sha256": "38B85885725CFA41575612DCB4616560458D264A200B9E1FBBA1D8E9F3D65B36"
+          },
+          "initialization_delta_vs_final_no_mir_seconds": 0.20500000000000185
+        },
+        {
+          "arm": "mir4",
+          "archive_version": "4.7.21003",
+          "engine_initialised_log_seconds": 31.769,
+          "menu_status": "failed-retained",
+          "raw_log": {
+            "path": "build/tmp/descriptive-heavy-f210-r04/runs/mir4/failed-factorio-current.log",
+            "bytes": 48543,
+            "sha256": "41D6662AE9B13520A8DDE8EDA67B0D224D3739A177BC3AB015D6C7ADCB90791F"
+          },
+          "operator_stop": {
+            "path": "build/qualification/descriptive-heavy-f210-r04-controller/operator-stops/mir4-25616-operator-stop-r01.json",
+            "bytes": 752,
+            "sha256": "9B7299D69AB57B60C9656330E2149F9B2FD4B72BF2F942731D63A11046784690"
+          },
+          "initialization_delta_vs_final_no_mir_seconds": 3.09
+        },
+        {
+          "arm": "mir3",
+          "archive_version": "3.2.11",
+          "engine_initialised_log_seconds": 32.997,
+          "menu_status": "failed-retained",
+          "raw_log": {
+            "path": "build/tmp/descriptive-heavy-f210-r04/runs/mir3/failed-factorio-current.log",
+            "bytes": 32967,
+            "sha256": "4C9013B52041B17F9DF7BB86AC159A0782F7EE553A21AB53BE392F3F509367B4"
+          },
+          "operator_stop": {
+            "path": "build/qualification/descriptive-heavy-f210-r04-controller/operator-stops/mir3-41632-operator-stop-r01.json",
+            "bytes": 640,
+            "sha256": "9C29C33FFA254CA597B8692447A77FB614BBD24104A8A7B8D5E843E36AB92569"
+          },
+          "initialization_delta_vs_final_no_mir_seconds": 4.318000000000001
+        },
+        {
+          "arm": "mir2",
+          "archive_version": "2.2.0",
+          "engine_initialised_log_seconds": 29.012,
+          "menu_status": "failed-retained",
+          "raw_log": {
+            "path": "build/tmp/descriptive-heavy-f210-r04/runs/mir2/failed-factorio-current.log",
+            "bytes": 31323,
+            "sha256": "5597FF95E6B2D70CA81CCDB1D3A05A3EB3C8B031888FE0153889741513DE80BB"
+          },
+          "operator_stop": {
+            "path": "build/qualification/descriptive-heavy-f210-r04-controller/operator-stops/mir2-9404-operator-stop-r01.json",
+            "bytes": 639,
+            "sha256": "B61D794C7D2184B2E36880B22BBFDFB79A63E9BDEF549F12CECA34EA9C77E731"
+          },
+          "initialization_delta_vs_final_no_mir_seconds": 0.33300000000000196
+        },
+        {
+          "arm": "control-after",
+          "archive_version": null,
+          "engine_initialised_log_seconds": 28.679,
+          "menu_status": "failed-retained",
+          "raw_log": {
+            "path": "build/tmp/descriptive-heavy-f210-r04/runs/control-after/failed-factorio-current.log",
+            "bytes": 25446,
+            "sha256": "4848E1C49646666DFEBC13FF08377D77003A632D0473B3794D00DC05B0088F1D"
+          },
+          "operator_stop": {
+            "path": "build/qualification/descriptive-heavy-f210-r04-controller/operator-stops/control-after-49652-operator-stop-r01.json",
+            "bytes": 670,
+            "sha256": "BB6F7A2CA8EEFC25AF049BA13BD12BEBC4B0E6AFED084FDB85FD1BC53935244B"
+          },
+          "initialization_delta_vs_final_no_mir_seconds": 0.0
+        }
+      ],
+      "no_mir_reference": "control-after; initial control separately retained, never pooled"
+    }
+  ],
+  "limits": [
+    "No inference of gameplay UPS/lag, long-save performance, reboot-cold behavior or universal improvements.",
+    "Small or negative signed differences are inconclusive and do not establish negative MIR overhead.",
+    "Engine initialization does not establish a rendered or responsive menu.",
+    "Original adverse native/controller/focus/resource records remain unchanged in primary custody."
+  ]
+}

@@ -29,17 +29,36 @@ source_of_truth_for:
 
 ## Startup snapshot
 
-- One included launch per MIR version/workload, with no-MIR launches before and after each group. No reboot or cache clearing; desktop applications stayed running.
-- Intel Core i5-12600K, 32 GB RAM, Windows 10. Engines: Factorio 2.0.77 and 2.1.23.
-- Seconds to the first observed main menu; a Settings interaction verifies responsiveness separately. Small differences are inconclusive in this single-pass snapshot. These are startup observations, not factory UPS measurements.
+- One included launch per MIR version/workload on Factorio 2.0.77 and 2.1.23; no reboot or cache clearing. Desktop applications stayed running. Intel Core i5-12600K, 32 GB RAM, Windows 10.
+- **Graphical initialization (seconds):** Factorio's normal graphical startup log, including mod, sound and graphics loading. This endpoint does not verify a responsive menu. The initial and final no-MIR launches are shown separately because cache/order effects were substantial.
+- Heavy means Space Age plus the selected Bob's/Angel's mod set, including graphics packs. These are single-pass observations with different release features; small differences are inconclusive.
 
-| MIR version | Factorio 2.1.23 Base: main menu (s) | Difference from no MIR (s) |
-| --- | ---: | ---: |
-| No MIR, final reference | 9.37 | — |
-| MIR 2.2.0 | 9.40 | +0.04, inconclusive |
-| MIR 3.2.11 | 10.01 | +0.64, inconclusive |
-| MIR 4.7.3 | 10.03 | +0.66, inconclusive |
-| MIR 5.0.0 beta | 9.31 | −0.05, inconclusive |
+| MIR version | 2.0 Base | 2.0 Space Age | 2.0 heavy | 2.1 Base | 2.1 Space Age | 2.1 heavy |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| No MIR, initial launch | 14.46 | 45.72 | 40.22 | 12.86 | 30.24 | 42.06 |
+| No MIR, final reference | 8.99 | 18.44 | 26.95 | 8.52 | 20.54 | 28.68 |
+| MIR 1 | 9.17 | 18.44 | 27.24 | — | — | — |
+| MIR 2 | 8.98 | 18.76 | 28.17 | 8.47 | 20.47 | 29.01 |
+| MIR 3 | 10.31 | 19.92 | 31.35 | 9.05 | 22.09 | 33.00 |
+| MIR 4.7.3 | 10.24 | 19.89 | 29.71 | 9.08 | 22.26 | 31.77 |
+| MIR 5.0.0 beta | 9.04 | 19.13 | 28.00 | 8.28 | 20.66 | 28.88 |
+| MIR 5 minus final no MIR | +0.06 | +0.69 | +1.05 | -0.24 | +0.11 | +0.21 |
+| Seconds saved: MIR 4 to MIR 5 | 1.20 | 0.76 | 1.71 | 0.80 | 1.61 | 2.88 |
+
+- The 2.1 heavy column uses retained initialization logs from runs whose menu checks failed. It remains a diagnostic comparison; those failures are not counted as menu passes.
+- Signed differences are descriptive: a small negative value does not mean MIR makes Factorio faster than running without it. This snapshot cannot resolve small overheads reliably.
+- **Observed main menu (seconds):** the following groups also passed a separate Settings response check. These times include the first observed menu, without adding the subsequent interaction-check delay.
+
+| MIR version | 2.0.77 Base | 2.0.77 heavy Space Age | 2.1.23 Base |
+| --- | ---: | ---: | ---: |
+| No MIR, final reference | 9.90 | 27.98 | 9.37 |
+| MIR 1 | 10.24 | 28.27 | — |
+| MIR 2 | 10.01 | 29.10 | 9.40 |
+| MIR 3 | 11.60 | 32.44 | 10.01 |
+| MIR 4.7.3 | 11.07 | 30.62 | 10.03 |
+| MIR 5.0.0 beta | 10.14 | 28.97 | 9.31 |
+
+- MIR 5 reaches the observed menu about 0.7–1.6 seconds sooner than MIR 4.7.3 in these three snapshots. These results do not establish typical added startup cost or factory UPS; repeated controlled measurements remain pending.
 
 ## Download and code size
 
