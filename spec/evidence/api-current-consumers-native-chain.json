@@ -1,0 +1,177 @@
+{
+  "artifact_manifest_sha256": "F4AC3328CDC131862D6A3F3C8009EA683E9EE2044F8B88386F799F46C9F7E798",
+  "artifact_members_verified": 46,
+  "controller_commit": "7dff02f2800971c35fceb87bbff9a0744efb2d80",
+  "controls_restored": true,
+  "earlier_evidence": "spec/evidence/api-canonical-native-chain.json",
+  "engine": {
+    "base_version": "2.0.77",
+    "file_version": "2.0.77.84539",
+    "path": "D:\\Games\\Factorio\\2.0\\bin\\x64\\factorio.exe",
+    "product_version": "2.0.77",
+    "sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B"
+  },
+  "initial": {
+    "case": "api-beta-production",
+    "stage": "initial",
+    "status": "passed",
+    "witnesses": {
+      "assembler_modules_empty": true,
+      "baseline_assembler_productivity_bonus": 0,
+      "baseline_copper_cables_output": 200,
+      "baseline_copper_plates_inserted": 100,
+      "baseline_recipe_productivity_bonus": 0,
+      "beacon_entities_created": false,
+      "beta_consumer_marker_required": "MIR5_API_BETA",
+      "beta_public_query_after_research": true,
+      "beta_public_query_before_research": true,
+      "beta_technology": "mir-api-fixture-beta-cable-1",
+      "fixture_on_load_defers_native_checks": false,
+      "laboratory_research_used": false,
+      "native_effect_change": 0.01,
+      "production_observation": "native-runner-readback-required",
+      "research_completed_by_native_setter": true,
+      "researched_assembler_productivity_bonus": 0,
+      "researched_copper_cables_output": 202,
+      "researched_copper_plates_inserted": 100,
+      "researched_recipe_productivity_bonus": 0.01
+    }
+  },
+  "kind": "MIR5CurrentAPIConsumersNativeChainV1",
+  "limits": [
+    "Both independent required alpha and optional beta consumers run with MIR present; the separate optional-absence profile is not qualified by this execution.",
+    "Research completes through explicit native setters. The observed native recipe effect produces202 versus200 cables from equal100 plates, with no modules/beacons; no real lab completion is claimed.",
+    "Save and two cold reloads preserve source save bytes and both consumer observations. Genuine joining-client, other editions/scenarios, elapsed performance and final release verdicts remain separate.",
+    "Earlier canonical executions and adverse nested-lock receipts retain their original identities and are not relabelled."
+  ],
+  "native_result_sha256": "A2DBB27B5A547F2893381DED7C6CCCC43311B1A5D191D0C05BB78720F45AE7F1",
+  "player": {
+    "bytes": 546601,
+    "sha256": "89DF8C29D1E03CB4237CCDCA61DA4F2F4295DE738DB74B4A0452EAF72CAA31A6"
+  },
+  "primary_custody": "build/mir5/recovery-historical/api-current-consumers/40112245000/black-glass-api-consumers-canonical-40112245000-1",
+  "production_consumers": {
+    "MIR5_API_ALPHA": {
+      "reload_level": 1,
+      "reload_manual_crafting_speed_modifier": 0.05,
+      "reload_researched": true,
+      "stage": "load",
+      "tick": 0
+    },
+    "MIR5_API_BETA": {
+      "reload_level": 1,
+      "reload_manual_crafting_speed_modifier": 0.05,
+      "stage": "load",
+      "tick": 0
+    }
+  },
+  "profile_sha256": "1240337881A48BF7EB2E7917ADB35712C562C77D6A98736953EB7A1958607591",
+  "raw_evidence": {
+    "gzip_bytes": 63189,
+    "gzip_sha256": "4707CB18120C9A7BC892FFC9D4CE9BA0EDD80A0A9E06E62E7622D838B3CF4B3B",
+    "members": 31,
+    "path": "spec/evidence/api-current-consumers-native-receipts.json.gz",
+    "uncompressed_sha256": "ACEEF5D7344200B3AB2BE12728553FEA538CB83AA74F97ABFC2AC8A3326D52CB"
+  },
+  "reloads": [
+    {
+      "consumers": {
+        "MIR5_API_ALPHA": {
+          "reload_level": 1,
+          "reload_manual_crafting_speed_modifier": 0.05,
+          "reload_researched": true,
+          "stage": "load",
+          "tick": 4803
+        },
+        "MIR5_API_BETA": {
+          "reload_level": 1,
+          "reload_manual_crafting_speed_modifier": 0.05,
+          "stage": "load",
+          "tick": 4803
+        }
+      },
+      "ordinal": 1,
+      "result": {
+        "case": "api-beta-production",
+        "stage": "reload",
+        "status": "passed",
+        "witnesses": {
+          "assembler_modules_empty": true,
+          "baseline_assembler_productivity_bonus": 0,
+          "baseline_copper_cables_output": 200,
+          "baseline_copper_plates_inserted": 100,
+          "baseline_recipe_productivity_bonus": 0,
+          "beacon_entities_created": false,
+          "beta_consumer_marker_required": "MIR5_API_BETA",
+          "beta_public_query_after_research": true,
+          "beta_public_query_before_research": true,
+          "beta_technology": "mir-api-fixture-beta-cable-1",
+          "fixture_on_load_defers_native_checks": true,
+          "laboratory_research_used": false,
+          "native_effect_change": 0.01,
+          "production_observation": "native-runner-readback-required",
+          "research_completed_by_native_setter": true,
+          "researched_assembler_productivity_bonus": 0,
+          "researched_copper_cables_output": 202,
+          "researched_copper_plates_inserted": 100,
+          "researched_recipe_productivity_bonus": 0.01
+        }
+      },
+      "save_byte_identical": true,
+      "save_sha256": "EDECE791E52A85A17C88806A0CCCE816ACBBC25C1FEAF339DCFC11CD25F17489"
+    },
+    {
+      "consumers": {
+        "MIR5_API_ALPHA": {
+          "reload_level": 1,
+          "reload_manual_crafting_speed_modifier": 0.05,
+          "reload_researched": true,
+          "stage": "load",
+          "tick": 4803
+        },
+        "MIR5_API_BETA": {
+          "reload_level": 1,
+          "reload_manual_crafting_speed_modifier": 0.05,
+          "stage": "load",
+          "tick": 4803
+        }
+      },
+      "ordinal": 2,
+      "result": {
+        "case": "api-beta-production",
+        "stage": "reload",
+        "status": "passed",
+        "witnesses": {
+          "assembler_modules_empty": true,
+          "baseline_assembler_productivity_bonus": 0,
+          "baseline_copper_cables_output": 200,
+          "baseline_copper_plates_inserted": 100,
+          "baseline_recipe_productivity_bonus": 0,
+          "beacon_entities_created": false,
+          "beta_consumer_marker_required": "MIR5_API_BETA",
+          "beta_public_query_after_research": true,
+          "beta_public_query_before_research": true,
+          "beta_technology": "mir-api-fixture-beta-cable-1",
+          "fixture_on_load_defers_native_checks": true,
+          "laboratory_research_used": false,
+          "native_effect_change": 0.01,
+          "production_observation": "native-runner-readback-required",
+          "research_completed_by_native_setter": true,
+          "researched_assembler_productivity_bonus": 0,
+          "researched_copper_cables_output": 202,
+          "researched_copper_plates_inserted": 100,
+          "researched_recipe_productivity_bonus": 0.01
+        }
+      },
+      "save_byte_identical": true,
+      "save_sha256": "EDECE791E52A85A17C88806A0CCCE816ACBBC25C1FEAF339DCFC11CD25F17489"
+    }
+  ],
+  "run": 40112245000,
+  "run_url": "https://github.com/Julesc013/mir-native-worker/actions/runs/40112245000",
+  "saved_archive_sha256": "EDECE791E52A85A17C88806A0CCCE816ACBBC25C1FEAF339DCFC11CD25F17489",
+  "schema": 1,
+  "source_commit": "f5223e1fb755a0fe3669551a51cc08f207b7e1df",
+  "status": "exact-f522-native-consumers-production-save-two-reloads-pass",
+  "workflow_conclusion": "success"
+}

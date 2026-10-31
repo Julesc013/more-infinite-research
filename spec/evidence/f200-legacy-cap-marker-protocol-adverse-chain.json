@@ -1,0 +1,28 @@
+{
+  "schema": 1,
+  "kind": "MIR5NativeContinuityAdverseChainV1",
+  "source": "5bb4f3e3175e45597168c6b14eef220ac9ef9d45",
+  "run": {
+    "id": 40003937461,
+    "url": "https://github.com/Julesc013/mir-native-worker/actions/runs/40003937461",
+    "conclusion": "failure"
+  },
+  "custody": "build/mir5/black-glass/incoming/40003937461/black-glass-f200-legacy-caps-40003937461-1",
+  "manifest_members_verified": 89,
+  "receipt": {
+    "gzip": "spec/mir5/evidence/f200-legacy-cap-marker-protocol-adverse-native.json.gz",
+    "uncompressed_sha256": "AFD58F9467CB91033A60037231B576A1FA6EA25A5F7A70226EE3C0CC146E0EB2"
+  },
+  "source_log": {
+    "gzip": "spec/mir5/evidence/f200-legacy-cap-marker-protocol-adverse-source.log.gz",
+    "uncompressed_sha256": "2FDE5496D428C96C82B53D8D01DFD986FF3E7275ADCEE98F1C7DDF975AB2A301"
+  },
+  "source_save_sha256": "2E2D701CBCED598BA648D0E49DC26C133E102625163FEA99AF5C944C0E7A227C",
+  "diagnosis": [
+    "Published source completed two actual native lab levels and saved the original disposable fixture world.",
+    "The wrapper correctly rejected stage actual2labs: its protocol requires initial for the first completion and reload for cold loads.",
+    "Fixture marker corrected to initial; milestone and actual completion counts remain separate witnesses. The harness acceptance gate is unchanged.",
+    "No complete source cold-reload or MIR5 upgrade pass is claimed from this failed wrapper."
+  ],
+  "release_qualification": false
+}

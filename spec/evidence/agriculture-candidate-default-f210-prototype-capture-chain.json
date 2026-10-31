@@ -1,0 +1,124 @@
+{
+  "schema": 1,
+  "kind": "MIR5AgricultureCandidateDefaultF210PrototypeCaptureChainV1",
+  "status": "defaults-only-candidate-data-stage-capture-matches-independent-published-facts",
+  "release_qualification": false,
+  "candidate_capture": {
+    "source_commit": "5bc3ae15e25f56e10c6cb6e88ac3a1a16fdfefd9",
+    "target": "f210",
+    "player": {
+      "version": "5.0.21000",
+      "sha256": "7B693B1715C46984AEC48EA84E7AA33D1A6ABFEBC36D1612BFF1B951B1227FB7",
+      "bytes": 547856
+    },
+    "engine": {
+      "base_version": "2.1.23",
+      "sha256": "FE4A1DA30F322A0D0B8AEB3DF7276332222BAAA143E2352569B723E84B2B9060"
+    },
+    "profile": {
+      "raw_git_path": "tests/profiles/agriculture-candidate-default-f210-2123.json",
+      "sha256": "2F334650CC4C6F4DB78E31C67AAB705EBEFEE858CB21523F49634F1CEBE8CDC8",
+      "settings_mode": "Defaults",
+      "no_agricore_or_policy_selector": true
+    },
+    "wrapper_sha256": "27B8A879A30F06EF782653AE51D1B33B75B5AD6F95A15D1CA74B29F15D91C3D6",
+    "result_sha256": "36CCE2500D9E7B822F8F957934A2ED7E755BBC74E82FAB71BD2F6C9E68CEB5CB",
+    "raw_data_sha256": "EE77416C2A177F14051CAC2B4692147F83D8E128BC91DCE2520D0D2058F8E403",
+    "settings_sha256": "9131BB9E24A416509C14962BB5C0299FC9613115FB12FEE5F795B85337F2588B",
+    "library_transaction_sha256": "C71D3F9308E9D811F742FC243526525902A2EC63C96F5C0E90CF5310B738E903",
+    "observer": {
+      "name": "mir-fixture-mir5-active-mods-observer",
+      "archive_sha256": "2E1BE5952D2A4CC5C74A0D149E075D247BA110A3FAE5B6768D3EAEBABCEF989C",
+      "canonical_library_archive": true,
+      "repacked": false
+    }
+  },
+  "independent_published_reference": {
+    "source_commit": "791f5b4ca3923c53aff212c80636db0d65eb978d",
+    "archive_sha256": "A4BB8F47232C689B267EF434F557187A8795C47280FA464169DE917FB579517F",
+    "result_sha256": "95B1A1FC1DE6B09757E266DA315A7C1A02DA509BF6207316D12ACB29D67B536C",
+    "raw_data_sha256": "27FBC90DB8D2D1E9D9E0EAEAD3E07B3380EB1C6CF9D3B86C13BCC51E27888072",
+    "facts_sha256": "8FA7A01FB3647A73D25609887438F3D266ED450077F1CE274A0D9F043312F80F"
+  },
+  "comparison": {
+    "corrected_receipt_sha256": "D02268F59CD163B44CCE17089F6C3647614F9771407B504484A8397CEC72472D",
+    "technology": {
+      "science_and_prerequisite_count": 7,
+      "ordered_packs": [
+        "automation-science-pack",
+        "logistic-science-pack",
+        "chemical-science-pack",
+        "production-science-pack",
+        "agricultural-science-pack",
+        "electromagnetic-science-pack",
+        "cryogenic-science-pack"
+      ],
+      "count_formula": "40000*1.5^(L-1)",
+      "time": 90,
+      "level_one_enabled_and_hidden_raw_omitted": true
+    },
+    "selected_prototypes": {
+      "count": 6,
+      "all_exact_equal": true,
+      "names": [
+        "technology/recipe-prod-research_agricultural_growth_speed-1",
+        "capsule/yumako",
+        "item/yumako-seed",
+        "item/agricultural-science-pack",
+        "agricultural-tower/agricultural-tower",
+        "plant/yumako-tree"
+      ]
+    },
+    "physical_semantics": {
+      "exact_equal": true,
+      "tower_input_inventory_size": 3,
+      "tower_radius": 3,
+      "yumako_growth_ticks": 18000,
+      "yumako_yield": 50,
+      "spoil_ticks": 216000
+    },
+    "metadata_or_prototype_differences": []
+  },
+  "custody": {
+    "primary_path": "build/mir5/recovery-historical/agriculture-candidate-default-f210/local-5bc3-8a-defaults-r03",
+    "manifest_sha256": "F6036BFCBACACD28544DD392E341CC2685361A2B92276D17BAEAFF7980D4EEFE",
+    "members": 19,
+    "root_independent_readback": "All 19 manifest members were rehashed; both raw prototype dumps were independently parsed and all six named canonical prototype objects, agricultural technology facts, crop, tower, and spoilable facts matched the independently published reference.",
+    "readback_sha256": "45D344D3359D8B3D46A8EB00DFE421F065820D4D079F3BFCF9519A5602E03141"
+  },
+  "retained_refusals_and_defects": [
+    {
+      "path": "preflight-refusals/r01/preflight-refusal.json",
+      "sha256": "6A1FDDB5EBC4F858C15F577B981E796AFB86734FE18B1B4A18D2A1810AD2CDE9",
+      "disposition": "Preserved wrapper refusal before library mutation and before any native process."
+    },
+    {
+      "path": "preflight-refusals/r02/preflight-refusal.json",
+      "sha256": "81DE35C0B0768D8D4D376F4F177DC30B57C2E55E658EC0DB9960EDC0109976DA",
+      "disposition": "Preserved wrapper refusal before library mutation and before any native process."
+    },
+    {
+      "path": "copy-attempt-r01.json",
+      "sha256": "9BFE31557A38B25C9F6A03DBECAE3CC80497A8073A611B737EABCFD721BD0F0B",
+      "disposition": "Preserved partial primary-custody copy attempt; the repaired r02 custody manifest is separate."
+    },
+    {
+      "path": "library-custody/agriculture-candidate-default-f210-facts-and-published-comparison-r01-extraction-defect.json",
+      "sha256": "A3BEB68C3FB4F25AA710BFC68A30589952EEC0538A8E59EDE0B5D52B9EF1FDA1",
+      "disposition": "Preserved derived extraction defect: a nonexistent root field was read; no native input, raw dump, process, or published fact changed."
+    }
+  ],
+  "raw_evidence": {
+    "path": "spec/evidence/agriculture-candidate-default-f210-prototype-capture-receipts.json.gz",
+    "members": 12,
+    "uncompressed_bytes": 78373,
+    "uncompressed_sha256": "0F8038B514C11DA9A734BEB72A44AC0296DBAD236DE55C0F4DD390A0D28C0A2B",
+    "gzip_bytes": 17424,
+    "gzip_sha256": "944A0333976E32EA6761EC9309CED9D4244E9014B50AF618C124CA5B2996CE2B"
+  },
+  "limits": [
+    "Defaults-only F210 data-stage observation; no agriculture fixture, selector, gameplay, crop production, save/reload, benchmark, performance, or release claim.",
+    "The separate forced-all-official twelve-pack agriculture stress arm is not substituted for this seven-pack Defaults capture.",
+    "The public capsule excludes full raw/settings dumps, Factorio logs, saves, archive bytes, process output, and credential-bearing classes; complete originals remain in named custody."
+  ]
+}

@@ -1,0 +1,75 @@
+{
+  "schema": 1,
+  "kind": "authored-private-settings-repair-custody-index-not-runner-receipt",
+  "scope": "Current F210 settings import/export/public validation and actual passive repair",
+  "release_qualification": false,
+  "receipt": {
+    "path": "spec/mir5/evidence/settings-repair-native.json",
+    "sha256": "6E3442DDC71E2F766808A561BC0D4B12C6DB60A31E169562537E4443B2989F68"
+  },
+  "player_archive": {
+    "sha256": "31EDAD840A721C313E25BBCE996BCC30E3D9B862E695B075F998B1186E9150EE",
+    "path": "C:\\Projects\\Factorio\\testmods\\2.1\\more-infinite-research_5.0.21000.zip"
+  },
+  "player_source_commit": "d2be4a08bc4ce683a94eadb82e76667b7251ed7f",
+  "player_record": {
+    "path": "build/mir5/worker-owner-r01/packages/player.json",
+    "sha256": "A8F07A093C22F23FF6FDA67E2676E928F6D6ECE72C342118D927DAF7BE69D7E2"
+  },
+  "fixture_record": {
+    "path": "build/mir5/settings-repair-r02/packages/fixture.json",
+    "sha256": "4324760F6551DF129B3556E8EAA45C44C7A3ACC1BB06EE9FD22217C03B6BD22B"
+  },
+  "profile": {
+    "sha256": "C795AD4AE5F5907CC9CF71170A06064A5B1099D2B879D54067BFA76A43974BE5",
+    "path": "C:\\Projects\\Factorio\\more-infinite-research\\tests\\mir5\\profiles\\settings-repair-f210.json"
+  },
+  "harness_sha256": "00738675D162FDDE0F53567225A2022531C694FA87A14C59EC87F8CEE41ED050",
+  "engine": {
+    "path": "C:\\Program Files\\Steam\\steamapps\\common\\Factorio\\bin\\x64\\factorio.exe",
+    "sha256": "FE4A1DA30F322A0D0B8AEB3DF7276332222BAAA143E2352569B723E84B2B9060",
+    "file_version": "2.1.23.87750",
+    "product_version": "2.1.23",
+    "base_version": "2.1.23"
+  },
+  "observed": {
+    "settings_remote_interface": "more-infinite-research-settings",
+    "full_effective_setting_count": 10,
+    "compact_effective_setting_count": 4,
+    "raw_profile_validated": true,
+    "mirset1_profile_validated": true,
+    "invalid_profile_value_reported": true,
+    "unknown_profile_value_reported": true,
+    "malformed_mirset1_rejected": true,
+    "imported_base_cost": 1,
+    "imported_growth_factor": 1,
+    "imported_research_time": 1,
+    "imported_passive_repair_enabled": true,
+    "native_level_one_count": 1,
+    "native_research_unit_energy": 60,
+    "native_productivity_change": 0.1,
+    "repair_damage_type": "electric",
+    "quiet_ticks": 600,
+    "repair_interval_ticks": 60,
+    "repair_amount": 1,
+    "player_wall_repaired": true,
+    "reciprocal_friendly_wall_repaired": true,
+    "foreign_wall_unchanged": true,
+    "non_wall_unchanged": true,
+    "queue_drain_inferred_after_full_health": true,
+    "idle_ticks_after_drain": 120,
+    "fixture_on_load_defers_native_checks": false,
+    "native_result_required": true,
+    "gui_qualified": false,
+    "multiplayer_qualified": false
+  },
+  "completed_save_sha256": "79D6F4D5F1688FE3B513805CF01C848E4766B2F727B3BDA05E17428BE977435F",
+  "two_cold_reloads_byte_identical": true,
+  "controls_restored": true,
+  "limitations": [
+    "Disposable new MIR5 save; no historical pending-repair queue upgrade is exercised.",
+    "Full export has all ten currently declared settings; the valid partial import contains nine recognized values and compact export has four deviations. This is not the complete retained MIR4 settings catalogue.",
+    "Queue draining is inferred from full-health/idle behavior; this fixture does not introspect another mods event handlers.",
+    "No rendered UI, real-client multiplayer, long-running stress/performance or complete-product qualification."
+  ]
+}

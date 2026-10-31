@@ -1,0 +1,47 @@
+{
+  "schema": 1,
+  "kind": "MIR5RemainingIntegrationsBaselineCandidateObservationV1",
+  "run": 40053265525,
+  "url": "https://github.com/Julesc013/mir-native-worker/actions/runs/40053265525",
+  "source": "464eadcc3fc29497a8557bfbbb7c89c34ad37081",
+  "control_source": "245ac932c6820c0eb7548b9f7aabb8f92cf5d15b",
+  "manifest_members_verified": 37,
+  "manifest_sha256": "9880194E1C5959A1666729856E2B0B8221586CDF4D2E75CD086F4E23B6C5AD0C",
+  "cases": [
+    {
+      "path": "capture/armor-bobwarfare/candidate/result.json",
+      "receipt": {
+        "gzip": "spec/mir5/evidence/integration-candidate-baseline-40053265525-armor-bobwarfare-native.json.gz",
+        "uncompressed_sha256": "FAB85A53FE2C809D9F6B1127F6B4EF87D19B3C6B179233ED297326ACA7024AA5"
+      }
+    },
+    {
+      "path": "capture/py-alienlife-hightech/candidate/result.json",
+      "receipt": {
+        "gzip": "spec/mir5/evidence/integration-candidate-baseline-40053265525-py-alienlife-hightech-native.json.gz",
+        "uncompressed_sha256": "41881B8CA6CB3135DD332D50C0C5CB9AF198C22B24D523DAE157F6D58F820587"
+      }
+    },
+    {
+      "path": "capture/py-coal/candidate/result.json",
+      "receipt": {
+        "gzip": "spec/mir5/evidence/integration-candidate-baseline-40053265525-py-coal-native.json.gz",
+        "uncompressed_sha256": "19F99DD137F65F10454FB95D8FB8CD4D6759C7CAC07EFC3BCD86391AC457399B"
+      }
+    }
+  ],
+  "comparison": {
+    "gzip": "spec/mir5/evidence/integration-candidate-baseline-40053265525-whole-output-comparison.json.gz",
+    "uncompressed_sha256": "D58647F86116CD0D83745CA64994AF817B191928E978DB7211A89DF26801EB90"
+  },
+  "comparison_helper": {
+    "gzip": "spec/mir5/evidence/integration-candidate-baseline-comparison-helper.py.gz",
+    "uncompressed_sha256": "9534B49ED6B622937BC3078BBF1BB7CA5CB282307D870DA864D195474C24D3D5"
+  },
+  "scope": [
+    "All three exact F2002.0.77 armor/Py candidate captures completed; every37 artifact member verified. This is capture success, not parity acceptance.",
+    "Complete independent upstream/published comparison reports254 differences:24 armor,72 Coal,158 HighTech. All60 native-credit occurrences retain the same20 hidden preservation carriers;194 other occurrences remain unresolved in this frozen source.",
+    "The authored follow-up batch is tested separately; this adverse baseline and its full differences are not rewritten by later fixes. No gameplay, save, performance or final release acceptance follows."
+  ],
+  "release_qualification": false
+}

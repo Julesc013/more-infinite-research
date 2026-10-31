@@ -1,0 +1,233 @@
+{
+  "schema": 1,
+  "kind": "MIRModernOriginFixtureNativeAdversesV1",
+  "status": "failed-native-runs-preserved-corrections-pending",
+  "scope": "Two test-fixture defects observed on exact installed engines. Neither run selected a MIR5 player archive. The API values are observed native facts; both generic runner verdicts remain failed.",
+  "cases": [
+    {
+      "id": "planet-discovery-api-r01",
+      "primary_root": "build/qualification/planet-discovery-api-native-r01",
+      "original_native_output": "D:\\Projects\\Factorio\\mir5-planet-discovery-api-e892-r01\\build\\tmp\\planet-discovery-api-r01",
+      "raw_primary_files_equal": 9,
+      "native_output_files": [
+        {
+          "path": "config.ini",
+          "sha256": "ED8C3C63B9DB96D3AE88E0470672CF119F5303C475548ECE50FF632CD47B6778",
+          "bytes": 270
+        },
+        {
+          "path": "create.factorio.log",
+          "sha256": "B3CDC62FC1481A2C3D0F58F17F543DF1F99074379FBAE13151BD83853BCE5AE8",
+          "bytes": 13927
+        },
+        {
+          "path": "process-1.resources.jsonl",
+          "sha256": "E075C968A31EA0BDC23342008D8116F69E8CEB22163C3996041BB77591FE55E8",
+          "bytes": 9322
+        },
+        {
+          "path": "process-1.stderr.txt",
+          "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+          "bytes": 0
+        },
+        {
+          "path": "process-1.stdout.txt",
+          "sha256": "4150501494CD96727400E6559677984AEE90D2F43CD2D92DA1E33B2A40786D69",
+          "bytes": 14056
+        },
+        {
+          "path": "result.json",
+          "sha256": "D1401514ED3E0D83F16FA21A98B326DB43169D92C57DD1D74D9FA4E5AAE9BDF8",
+          "bytes": 9068
+        },
+        {
+          "path": "write-data/factorio-current.log",
+          "sha256": "B3CDC62FC1481A2C3D0F58F17F543DF1F99074379FBAE13151BD83853BCE5AE8",
+          "bytes": 13927
+        },
+        {
+          "path": "write-data/player-data.json",
+          "sha256": "8A069BEF1C79B3E4645FA51F3B08D891A3FA7105C8CAAFC633F7BA6B9D8C4D67",
+          "bytes": 13757
+        },
+        {
+          "path": "write-data/saves/seed.zip",
+          "sha256": "0F968A64528D23ED42ECDEB2EC5825437A737D34887F91B51B250D08A542CACF",
+          "bytes": 521287
+        }
+      ],
+      "native_result_sha256": "D1401514ED3E0D83F16FA21A98B326DB43169D92C57DD1D74D9FA4E5AAE9BDF8",
+      "native_status": "failed",
+      "generic_failure": "[mir-library-loaded-selection] Actual mod names/versions differ from the profile.",
+      "source_head": "e892b3d575a6c6a6dbd511bb58b63c35d449927c",
+      "engine": {
+        "sha256": "8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38",
+        "base_version": "2.1.23"
+      },
+      "profile_sha256": "E8290046888ACE4413636CB4B8B6E890186996B6A036DEAAA026A954461AA320",
+      "selected_archives": [
+        {
+          "name": "mir-fixture-planet-discovery-api",
+          "version": "0.1.0",
+          "sha256": "509D8101BA47EE6047B588093AB2B0A18D03BB13EE79EA2D42E23112AFF188C4",
+          "bytes": 1909
+        }
+      ],
+      "outer_terminal_sha256": "3986C2906F7B0FF4CABCAB4E315672A81BAEA36935BA95B4721CBBD7400F46D3",
+      "library_controls_restored": true,
+      "factorio_processes_after_terminal": 0,
+      "production_or_cold_reload_completed": false,
+      "classification": "native-api-observation-then-loaded-selection-refusal",
+      "native_api_observation": {
+        "complete_selected_mods": 6,
+        "shapes": {
+          "game_forces": {
+            "lua_type": "userdata",
+            "native_object_name": "LuaCustomTable"
+          },
+          "player_force": {
+            "lua_type": "userdata",
+            "native_object_name": "LuaForce"
+          },
+          "player_technologies": {
+            "lua_type": "userdata",
+            "native_object_name": "LuaCustomTable"
+          },
+          "space_locations": {
+            "lua_type": "userdata",
+            "native_object_name": "LuaCustomTable"
+          }
+        },
+        "queries": [
+          {
+            "name": "nauvis",
+            "value": true,
+            "value_type": "boolean"
+          },
+          {
+            "name": "vulcanus",
+            "value": false,
+            "value_type": "boolean"
+          },
+          {
+            "name": "gleba",
+            "value": false,
+            "value_type": "boolean"
+          },
+          {
+            "name": "fulgora",
+            "value": false,
+            "value_type": "boolean"
+          },
+          {
+            "name": "aquilo",
+            "value": false,
+            "value_type": "boolean"
+          }
+        ],
+        "marker_log_sha256": "B3CDC62FC1481A2C3D0F58F17F543DF1F99074379FBAE13151BD83853BCE5AE8",
+        "marker_lines": [
+          119,
+          120,
+          121
+        ]
+      },
+      "diagnosis": "The unchanged exact verifier reads native data-stage Loading mod lines without a selected complete-table observer. This control-only fixture has no data-stage entrypoint, so the fixture identity is absent from those lines although its own native active table reports all six expected mods.",
+      "changed_mechanism": "PR1250 adds only an empty data.lua and pins its distinct2193-byte AFE06C fixture; one changed-input rerun remains required.",
+      "qualified_origin_save_created": false
+    },
+    {
+      "id": "origin110-source-r03",
+      "primary_root": "build/qualification/migration-origins/migration-origin-110-f200-source-r03",
+      "original_native_output": "D:\\Projects\\Factorio\\mir5-migration-origin-110-source-r01\\build\\tmp\\migration-origin-1.1.0-f200-source-native-r03",
+      "raw_primary_files_equal": 7,
+      "native_output_files": [
+        {
+          "path": "config.ini",
+          "sha256": "1D299849338EE3FE03448EA1943BB25F0411C12042FBE7C98577152C5BD0FF65",
+          "bytes": 293
+        },
+        {
+          "path": "process-1.resources.jsonl",
+          "sha256": "770EC9099E9399BC476D40B3110281142225C31C95E0DAD76D3962D69263A2F1",
+          "bytes": 3248
+        },
+        {
+          "path": "process-1.stderr.txt",
+          "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+          "bytes": 0
+        },
+        {
+          "path": "process-1.stdout.txt",
+          "sha256": "173ACBF738FC5F2EADCD2AC52B44CC72939C520E6263F0B9EAAA6F605320DF02",
+          "bytes": 6673
+        },
+        {
+          "path": "result.json",
+          "sha256": "1965F8E5B6D0772122833867C3C52F55C6318B82CDB34C63FCDCBC7E62FBD556",
+          "bytes": 4967
+        },
+        {
+          "path": "write-data/.lock",
+          "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+          "bytes": 0
+        },
+        {
+          "path": "write-data/factorio-current.log",
+          "sha256": "CFB5EE4723590CB526CB092E3AB2E754CF21213171502F538F99EF8E127F87D6",
+          "bytes": 6096
+        }
+      ],
+      "native_result_sha256": "1965F8E5B6D0772122833867C3C52F55C6318B82CDB34C63FCDCBC7E62FBD556",
+      "native_status": "failed",
+      "generic_failure": "[mir441-process-exit] 1",
+      "source_head": "d8e24b4a79b6064a373c03210c5ef6be0b013f79",
+      "engine": {
+        "sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B",
+        "base_version": "2.0.77"
+      },
+      "profile_sha256": "49B63264EF29198182F79F56802B4CF149176303922021A7659FDEEB23950376",
+      "selected_archives": [
+        {
+          "name": "more-infinite-research",
+          "version": "1.1.0",
+          "sha256": "6395C4A5A0F74C67729746D0FBF6162329978B47C5C29D54CC0045F2977C7E44",
+          "bytes": 60927
+        },
+        {
+          "name": "mir-fixture-mir5-migration-origin-f200-110-source",
+          "version": "0.1.0",
+          "sha256": "82F954450AB7AB761686C288B23331E5C087C29F0846837810D1F3F96BD98A18",
+          "bytes": 8059
+        }
+      ],
+      "outer_terminal_sha256": "29042BC5A217D499498C6CD33454F7BEB09AB342BEACECC3A876A2618672687A",
+      "library_controls_restored": true,
+      "factorio_processes_after_terminal": 0,
+      "production_or_cold_reload_completed": false,
+      "classification": "source-fixture-settings-namespace-error-no-save",
+      "native_error": "published setting default differs: ips-require-space-gate",
+      "diagnosis": "The original official6395 settings.lua authors true. The fixture incorrectly checks raw bool-setting prototypes from its game data-final-fixes stage; those raw definitions belong to the separate settings stage. The source default is not revised to fit this failure.",
+      "changed_mechanism": "Move raw setting/default/count validation into settings-final-fixes and retain effective startup values and technology guards in game data; corrected raw-Git inputs and a fresh source run remain required.",
+      "qualified_origin_save_created": false
+    }
+  ],
+  "receipts": {
+    "path": "spec/evidence/modern-origin-fixture-native-adverse-receipts-r01.json.gz",
+    "sha256": "C5D07C81982AD327F270ACF7A367826208D1CCE43E342170150195C268AD371D",
+    "bytes": 7325,
+    "uncompressed_sha256": "5FAFD06F4BA485C7B1B82E60B4F6BFE84A986C4C42A6DE0889E1B2360763DC2B",
+    "exact_original_results": 2,
+    "labelled_derived_records": 2,
+    "strict_roundtrip_verified": true
+  },
+  "claims": {
+    "native_execution": true,
+    "native_api_boolean_observation": true,
+    "native_fixture_pass": false,
+    "source_save_qualification": false,
+    "migration_qualification": false,
+    "performance": false,
+    "release_qualification": false
+  }
+}

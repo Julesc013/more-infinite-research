@@ -1,0 +1,173 @@
+{
+  "schema": 1,
+  "kind": "MIR5MenuPreparationAndAdverseObservationChainV1",
+  "release_qualification": false,
+  "accepted_timing_samples": 0,
+  "runs": [
+    {
+      "run": 40038355586,
+      "url": "https://github.com/Julesc013/mir-native-worker/actions/runs/40038355586",
+      "manifest_members_verified": 50,
+      "manifest_sha256": "74E88CF317CB5150D99EEA99D232ECA06F6CE8E089DF456C92258C65D8D9F129",
+      "receipts": [
+        {
+          "artifact_path": "menu-preparation/native-replay-equality.json",
+          "gzip": "spec/mir5/evidence/bob-angel-menu-40038355586-menu-preparation-native-replay-equality.json.gz",
+          "uncompressed_sha256": "6316EF79C820D2D0B5BE7852B246F5C286CB768B3015CE6B5159EF6356EE60DC"
+        },
+        {
+          "artifact_path": "menu-preparation/control/result.json",
+          "gzip": "spec/mir5/evidence/bob-angel-menu-40038355586-menu-preparation-control-result.json.gz",
+          "uncompressed_sha256": "2BA9DD65F74B930DA379434600BA0BE8AE970BE1CA8289D6BE14574C26405533"
+        },
+        {
+          "artifact_path": "menu-preparation/published/result.json",
+          "gzip": "spec/mir5/evidence/bob-angel-menu-40038355586-menu-preparation-published-result.json.gz",
+          "uncompressed_sha256": "3EA8606DA47E0EB0CD9F6BB0D230468E7046333CCA1FF30EB4D127CA40759E58"
+        },
+        {
+          "artifact_path": "menu-preparation/replay/result.json",
+          "gzip": "spec/mir5/evidence/bob-angel-menu-40038355586-menu-preparation-replay-result.json.gz",
+          "uncompressed_sha256": "F4373615C94EC4746FACB5A18A668390A8892747D10E81066CD01F71FE03A768"
+        }
+      ],
+      "result": "complete-data-settings-replay-equality-no-timing-started",
+      "cause": "The subsequent preflight rejected an empty mandatory diagnostic list; corrected without changing the experimental tolerance or native oracle."
+    },
+    {
+      "run": 40039053890,
+      "url": "https://github.com/Julesc013/mir-native-worker/actions/runs/40039053890",
+      "manifest_members_verified": 85,
+      "manifest_sha256": "589D92DB0E760E665F31956945295F934D1BF7EAC49CEB6D7FCA0E5BF6162EFF",
+      "receipts": [
+        {
+          "artifact_path": "menu-comparison/result.json",
+          "gzip": "spec/mir5/evidence/bob-angel-menu-40039053890-menu-comparison-result.json.gz",
+          "uncompressed_sha256": "D2B3BD4745EB4189E5AD91594359275A517F56D05785056CDDDDD9E1398903D7"
+        },
+        {
+          "artifact_path": "menu-comparison/runs/01-warmup-control-without-mir/responsive-menu-actor/actor-result.json",
+          "gzip": "spec/mir5/evidence/bob-angel-menu-40039053890-menu-comparison-runs-01-warmup-control-without-mir-responsive-menu-actor-actor-result.json.gz",
+          "uncompressed_sha256": "5990820A389C9A812C7ECB119E8377DEAD3EB5B129B93DA0668B573557ACA07C"
+        }
+      ],
+      "result": "first-control-warmup-failed-no-accepted-sample",
+      "independently_bound_nested_manifest": {
+        "artifact_path": "trusted-native-preparation/artifact-manifest.json",
+        "sha256": "74E88CF317CB5150D99EEA99D232ECA06F6CE8E089DF456C92258C65D8D9F129",
+        "reason": "The worker excluded all manifest basenames; every ordinary member is verified above and this exact nested metadata identity is verified separately."
+      },
+      "observer_diagnostics": null,
+      "actor_failure": "[mir-menu-main-menu-not-observed]"
+    },
+    {
+      "run": 40041470422,
+      "url": "https://github.com/Julesc013/mir-native-worker/actions/runs/40041470422",
+      "manifest_members_verified": 18,
+      "manifest_sha256": "A650CE72FA02419BA769F7316BD4D2B8F078EE8B41BC91B7BB7E26376E9A3066",
+      "receipts": [
+        {
+          "artifact_path": "menu-observer-readiness/result.json",
+          "gzip": "spec/mir5/evidence/bob-angel-menu-40041470422-menu-observer-readiness-result.json.gz",
+          "uncompressed_sha256": "C31C78E25C43B4CDEA0628CB5E750DA5724F5AC5C3458E87F152810A063955D4"
+        },
+        {
+          "artifact_path": "menu-observer-readiness/process-1.resources.jsonl",
+          "gzip": "spec/mir5/evidence/bob-angel-menu-40041470422-menu-observer-readiness-process-1.resources.jsonl.gz",
+          "uncompressed_sha256": "A124BB29DD23FD6E290B036E1D71D726233DDCD6471E80542A88390D2204873D"
+        }
+      ],
+      "source": "fb37b7c0ad57cbbec5c254f39ef38548ed7645e7",
+      "result": "process-budget-refusal"
+    },
+    {
+      "run": 40042024248,
+      "url": "https://github.com/Julesc013/mir-native-worker/actions/runs/40042024248",
+      "manifest_members_verified": 19,
+      "manifest_sha256": "5A1BD4FA41CEF818A3E5D858F78AA931973EBFE534B76C4EF5F4E156889FAD82",
+      "receipts": [
+        {
+          "artifact_path": "menu-observer-readiness/result.json",
+          "gzip": "spec/mir5/evidence/bob-angel-menu-40042024248-menu-observer-readiness-result.json.gz",
+          "uncompressed_sha256": "D4FCA2038D031C7F4E5B65D80C52A2E7C9F5CF81236B4C12C088CEE8F4366FBA"
+        },
+        {
+          "artifact_path": "menu-observer-readiness/control/responsive-menu-actor/actor-result.json",
+          "gzip": "spec/mir5/evidence/bob-angel-menu-40042024248-menu-observer-readiness-control-responsive-menu-actor-actor-result.json.gz",
+          "uncompressed_sha256": "DB4AA4FC29938932E6E30759544F9F397798A87787AEE404FB1E03FE8EDDF7B5"
+        }
+      ],
+      "source": "fb37b7c0ad57cbbec5c254f39ef38548ed7645e7",
+      "result": "owned-capture-occlusion-refusal",
+      "observer_diagnostics": {
+        "schema": 1,
+        "capture_requests": 688,
+        "captured_frames": 0,
+        "no_main_window": 0,
+        "not_visible_or_minimized": 0,
+        "foreground_mismatch": 0,
+        "foreground_request_attempts": 0,
+        "foreground_request_refused": 0,
+        "foreground_request_not_acquired": 0,
+        "client_geometry_unavailable": 0,
+        "offscreen": 0,
+        "occluded": 688,
+        "last_rejection": "occluded"
+      },
+      "actor_failure": "[mir-menu-main-menu-not-observed]"
+    },
+    {
+      "run": 40042710813,
+      "url": "https://github.com/Julesc013/mir-native-worker/actions/runs/40042710813",
+      "manifest_members_verified": 19,
+      "manifest_sha256": "7DAF45C80B779C4AB169DEFD2AF695905CFCC40EA1903D1D970B9BE54EA6DDBD",
+      "receipts": [
+        {
+          "artifact_path": "menu-observer-readiness/result.json",
+          "gzip": "spec/mir5/evidence/bob-angel-menu-40042710813-menu-observer-readiness-result.json.gz",
+          "uncompressed_sha256": "001E58C4F7CE8ABEDDA90359C8CB5681FAFE14C72325809AC6AC2F29D845F630"
+        },
+        {
+          "artifact_path": "menu-observer-readiness/control/responsive-menu-actor/actor-result.json",
+          "gzip": "spec/mir5/evidence/bob-angel-menu-40042710813-menu-observer-readiness-control-responsive-menu-actor-actor-result.json.gz",
+          "uncompressed_sha256": "E9966072BA4EFE3C63E2518358DED914D0DD438FDB6120EE60EDCB827DA3A21C"
+        }
+      ],
+      "source": "a1f2053f942c39cb347c0af9d7330f4728ca12f4",
+      "result": "owned-capture-occlusion-refusal",
+      "observer_diagnostics": {
+        "schema": 1,
+        "capture_requests": 678,
+        "captured_frames": 0,
+        "no_main_window": 0,
+        "not_visible_or_minimized": 0,
+        "foreground_mismatch": 0,
+        "foreground_request_attempts": 0,
+        "foreground_request_refused": 0,
+        "foreground_request_not_acquired": 0,
+        "client_geometry_unavailable": 0,
+        "offscreen": 0,
+        "occluded": 678,
+        "last_occlusion": {
+          "probe_index": 4,
+          "probe_x": 1280,
+          "probe_y": 720,
+          "owned_x": 0,
+          "owned_y": 0,
+          "owned_width": 2560,
+          "owned_height": 1440,
+          "hit": "other-window"
+        },
+        "last_rejection": "occluded"
+      },
+      "actor_failure": "[mir-menu-main-menu-not-observed]"
+    }
+  ],
+  "scope": [
+    "The complete exact-input published/control/replay native preparation is reusable only under its original execution identity and after every consumed input is verified again.",
+    "No responsive-menu performance result or percentage improvement has been established. Initialization logs and data/settings equality are not the responsive-menu endpoint.",
+    "The original r01 experiment freezes older player bytes. A later full campaign needs a separate changed-input plan for the new player, observer and measured resource envelope, retaining the positive tolerances and50% MIR-added objective.",
+    "The native process governor correctly rejected the4GiB envelope at4,331,765,760 private bytes. The later6GiB declaration preserves all physical/commit reserves; no system-pressure or native acceptance claim follows.",
+    "The final diagnostic identifies the centre point covered by another window, with all four corners owned by Factorio. No foreign title, identity, text, screenshot or global input is collected; resolution needs the desktop obstruction removed."
+  ]
+}

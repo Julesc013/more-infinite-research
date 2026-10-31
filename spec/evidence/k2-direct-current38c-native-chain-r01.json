@@ -1,0 +1,86 @@
+{
+  "schema": 1,
+  "kind": "MIRCurrent38CK2DirectNativeChainV1",
+  "status": "passed-current-direct-native-source-and-custody-intact",
+  "controller_commit": "5d3d1be2310c3640ab32f7b76d079ddca4145942",
+  "prepared_inputs": {
+    "path": "spec/evidence/k2-imersite-current38c-prepared-inputs-r01.json",
+    "sha256": "6BF6FCD6D312233A0569B91D6B6AA331B1B2335EC5D05658E7FCE1293976B025"
+  },
+  "candidate": {
+    "source_commit": "b3bbd8d37b37bfee2e258b3e8a2f223dcf3860b3",
+    "player_tree": "fbb7e9135280ce7f69692e9b0c4a44d743793f45",
+    "archive_sha256": "38C84CCBC4BFDA62FCB078772C4690AB81228484744A36D9EA303F5A75B16447"
+  },
+  "engine_sha256": "8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38",
+  "profile": {
+    "path": "tests/profiles/k2-imersite-transition-direct-current38c-standalone-f210.json",
+    "sha256": "618450CB03DEF5F0F60DF7D434A268AC1963046B727B21CF0BD7F9DD5F75637E"
+  },
+  "source": {
+    "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\mir5\\recovery-historical\\k2-imersite-transition\\40071490977\\gameplay\\predecessor-4.6\\write-data\\saves\\mir5-native-complete.zip",
+    "sha256": "538B7321F57A79807371B4CE415A9EF97FA72DEA8BB0A9B05DC41D00D035F828"
+  },
+  "owned_source": {
+    "path": "D:\\Projects\\Factorio\\mir5-legacy-cannon-credit-r01\\build\\qualification\\k2-direct-current38c-r01-inputs\\protected-538b-copy.zip",
+    "sha256": "538B7321F57A79807371B4CE415A9EF97FA72DEA8BB0A9B05DC41D00D035F828",
+    "separate_file": true
+  },
+  "packet_sha256": "3A2B383F8589A00F8ABA6A1B0EBB1F57EA914FC7281C60D470417C32F4C066DC",
+  "caller_sha256": "B9F71268C89A3C0CE29374FD8387F477E29C885E36197FE64549678A946D5CD4",
+  "raw_result_sha256": "0261E517A66511FEEC14BFA4A76014CB301BDEADC676DAF117023AB9E1FBE534",
+  "initial_witnesses": {
+    "source_mir": "4.6.21000",
+    "destination_mir": "5.0.21000",
+    "source_actual_lab_completions": 5,
+    "retained_source_next_level": 6,
+    "handoff_source": "direct-4.6",
+    "recovered_tail_saved_progress_before_lab": 0.42000000000000004,
+    "destination_actual_lab_completions": 1,
+    "tail_next_level": 7,
+    "powder_productivity": 0.12,
+    "public_continuation_readded": false,
+    "direct_predecessor_handoff": true,
+    "on_load_read_only": false
+  },
+  "completed_save": {
+    "sha256": "993E751581A7ECC53BCE4C6FE2C2B99F474AABD0366C33FFFF69390E4AADC3B4",
+    "bytes": 883647
+  },
+  "cold_reloads": [
+    {
+      "ordinal": 1,
+      "save_byte_identical": true,
+      "save_sha256": "993E751581A7ECC53BCE4C6FE2C2B99F474AABD0366C33FFFF69390E4AADC3B4"
+    },
+    {
+      "ordinal": 2,
+      "save_byte_identical": true,
+      "save_sha256": "993E751581A7ECC53BCE4C6FE2C2B99F474AABD0366C33FFFF69390E4AADC3B4"
+    }
+  ],
+  "root_readback": {
+    "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\k2-direct-current38c-r01-controller\\root-readback.json",
+    "sha256": "94B07892E32EFFAD917CE5560F2DD24E5CCD98D861C5D72CC9B0846221080552",
+    "files": 18,
+    "bytes_per_copy": 1027374
+  },
+  "receipt_capsule": {
+    "path": "spec/evidence/k2-direct-current38c-native-receipts-r01.json.gz",
+    "sha256": "E68DCAA8E1C1A4BD6152D3962A43B95CD3B13A3930B19F8D377E85229C7C3C90",
+    "bytes": 46172,
+    "members": 21
+  },
+  "counts": {
+    "actual_new_processes": 3,
+    "new_labs": 1,
+    "cold_reloads": 2,
+    "predecessor_labs_reused_once": 5
+  },
+  "restoration": "Original keeperC563,observerA15,own fixtures/direct-library controls and both538B source files rehashed;Factorio count zero. No dependency copies,links,extraction or metadata changes.",
+  "limits": [
+    "This closes the affected current38C direct matching-cost K2SO lab-earned recovery only.",
+    "Original five-lab source is reused as a byte-identical separate owned file;no predecessor recreation or new source labs.",
+    "Published4.7 intermediate and older adverse receipts remain distinct;no arbitrary carrier ownership repair,K2SE,ordinary tuning,clients,performance or whole release claim."
+  ]
+}

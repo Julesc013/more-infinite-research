@@ -1,0 +1,206 @@
+{
+  "kind": "MIR5GearNativeSliceV1",
+  "status": "passed-private-native-gear-slice",
+  "profile": {
+    "name": "default",
+    "fixture_version": "0.1.0",
+    "effect_change": 0.1,
+    "level_one_count": 8000,
+    "researched_output": 110,
+    "formula": "8000*2^(L-1)",
+    "time": 60
+  },
+  "run": "C:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\mir5-gear-native-r06\\default\\gear-native-30be4e7dba7f4677abbbe60c30ba960e",
+  "source_commit": "2fd6a08f040c2996fbbc14e16a97fc41a4b78b68",
+  "source_dirty": true,
+  "harness_sha256": "F9C13481DC78CD1167C4215FBA4DA0BC8BA62797507CA04579520478C8CBFE16",
+  "library_activation_sha256": "FA6D606C5CD1BCE9F262781C896853BAC0F1E9DCA2B396CB0B5548FA520D88D2",
+  "immutable_input_helpers_sha256": "B5FBFAC8537B08F9790BD3EE8ACEAAB38EE5CBB8EF005E67E8375DE568BBC12C",
+  "engine": {
+    "path": "C:\\Program Files\\Steam\\steamapps\\common\\Factorio\\bin\\x64\\factorio.exe",
+    "sha256": "FE4A1DA30F322A0D0B8AEB3DF7276332222BAAA143E2352569B723E84B2B9060",
+    "base_version": "2.1.23"
+  },
+  "player_archive": {
+    "input": "C:\\Projects\\Factorio\\more-infinite-research\\build\\mir5\\gear-r01\\packages\\more-infinite-research_5.0.21000.zip",
+    "installed": "C:\\Projects\\Factorio\\testmods\\2.1\\more-infinite-research_5.0.21000.zip",
+    "sha256": "3C832F5DE36B08746F4E277DC229798ECEAF526F5667CC1C95A5957849E6312D",
+    "name": "more-infinite-research",
+    "version": "5.0.21000"
+  },
+  "fixture_archive": {
+    "input": "C:\\Projects\\Factorio\\more-infinite-research\\build\\mir5\\gear-r06\\packages\\mir-fixture-mir5-gear-native_0.1.0.zip",
+    "installed": "C:\\Projects\\Factorio\\testmods\\2.1\\mir-fixture-mir5-gear-native_0.1.0.zip",
+    "sha256": "E0B8DC080743233963FF0D326316C1ECC9F9D2AEB5A57BED22A99F24BA890001",
+    "name": "mir-fixture-mir5-gear-native",
+    "version": "0.1.0"
+  },
+  "direct_library_selection": {
+    "mechanism": "exact-profile-name-version-and-sha256",
+    "same_name_version": "rejected-by-activation-inventory",
+    "distinct_mir_versions": "one-enabled-version-row-per-name",
+    "selected_mir_versions": [
+      "4.2.21000",
+      "4.2.21001",
+      "4.2.21002",
+      "4.2.21003",
+      "4.3.21000",
+      "4.4.21000",
+      "4.4.21001",
+      "4.4.21002",
+      "4.5.21000",
+      "4.5.21001",
+      "4.5.21002",
+      "4.6.21000",
+      "4.7.21000",
+      "5.0.21000"
+    ]
+  },
+  "dependency_payload_bytes_copied": 0,
+  "archive_links_created": 0,
+  "archive_extractions": 0,
+  "native_qualification": true,
+  "create": {
+    "stage": "create",
+    "log": "C:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\mir5-gear-native-r06\\default\\gear-native-30be4e7dba7f4677abbbe60c30ba960e\\create.factorio.log",
+    "log_sha256": "39642652849833FC2B89FA58E255A0F756534236D8FE972F6C2671090A4AF7F7",
+    "stdout_log": "C:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\mir5-gear-native-r06\\default\\gear-native-30be4e7dba7f4677abbbe60c30ba960e\\create.stdout.log",
+    "stderr_log": "C:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\mir5-gear-native-r06\\default\\gear-native-30be4e7dba7f4677abbbe60c30ba960e\\create.stderr.log",
+    "exit_code": 0,
+    "completion_observed": false,
+    "controlled_kill_after_completion": false,
+    "loaded": [
+      "base@2.1.23",
+      "mir-fixture-mir5-gear-native@0.1.0",
+      "more-infinite-research@5.0.21000"
+    ]
+  },
+  "production": {
+    "stage": "production",
+    "log": "C:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\mir5-gear-native-r06\\default\\gear-native-30be4e7dba7f4677abbbe60c30ba960e\\production.factorio.log",
+    "log_sha256": "6DFBD87718B8A903D8FEE301C95493F6EC2E11AE9EA11E55066F82CB2D4ABD48",
+    "stdout_log": "C:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\mir5-gear-native-r06\\default\\gear-native-30be4e7dba7f4677abbbe60c30ba960e\\production.stdout.log",
+    "stderr_log": "C:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\mir5-gear-native-r06\\default\\gear-native-30be4e7dba7f4677abbbe60c30ba960e\\production.stderr.log",
+    "exit_code": -1,
+    "completion_observed": true,
+    "controlled_kill_after_completion": true,
+    "loaded": [
+      "base@2.1.23",
+      "mir-fixture-mir5-gear-native@0.1.0",
+      "more-infinite-research@5.0.21000"
+    ]
+  },
+  "reloads": [
+    {
+      "ordinal": 1,
+      "stage": {
+        "stage": "reload-1",
+        "log": "C:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\mir5-gear-native-r06\\default\\gear-native-30be4e7dba7f4677abbbe60c30ba960e\\reload-1.factorio.log",
+        "log_sha256": "9FF3B130C8307475AA8DA63C9B53C94C34E2F6CDEA1976558C5EF49227E74D9A",
+        "stdout_log": "C:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\mir5-gear-native-r06\\default\\gear-native-30be4e7dba7f4677abbbe60c30ba960e\\reload-1.stdout.log",
+        "stderr_log": "C:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\mir5-gear-native-r06\\default\\gear-native-30be4e7dba7f4677abbbe60c30ba960e\\reload-1.stderr.log",
+        "exit_code": 0,
+        "completion_observed": false,
+        "controlled_kill_after_completion": false,
+        "loaded": [
+          "base@2.1.23",
+          "mir-fixture-mir5-gear-native@0.1.0",
+          "more-infinite-research@5.0.21000"
+        ]
+      },
+      "result": {
+        "stage": "reload",
+        "profile": "default",
+        "technology": "recipe-prod-research_gears-1",
+        "completed_level": 1,
+        "next_level": 2,
+        "effect_change": 0.1,
+        "level_one_count": 8000,
+        "level_two_count": 16000,
+        "level_three_count": 32000,
+        "baseline_output": 100,
+        "researched_output": 110,
+        "baseline_plates_inserted": 200,
+        "researched_plates_inserted": 200,
+        "baseline_refills": 49,
+        "researched_refills": 49
+      },
+      "save_sha256": "55E887839B19C533426674579850C898BA701CE14E9836182454C67C74E0EF4A",
+      "save_byte_identical": true
+    },
+    {
+      "ordinal": 2,
+      "stage": {
+        "stage": "reload-2",
+        "log": "C:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\mir5-gear-native-r06\\default\\gear-native-30be4e7dba7f4677abbbe60c30ba960e\\reload-2.factorio.log",
+        "log_sha256": "9BBC25E62414ED27C49D2CF6B1259B4ADFBA841E061C1EA46A16005D6C18FD60",
+        "stdout_log": "C:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\mir5-gear-native-r06\\default\\gear-native-30be4e7dba7f4677abbbe60c30ba960e\\reload-2.stdout.log",
+        "stderr_log": "C:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\mir5-gear-native-r06\\default\\gear-native-30be4e7dba7f4677abbbe60c30ba960e\\reload-2.stderr.log",
+        "exit_code": 0,
+        "completion_observed": false,
+        "controlled_kill_after_completion": false,
+        "loaded": [
+          "base@2.1.23",
+          "mir-fixture-mir5-gear-native@0.1.0",
+          "more-infinite-research@5.0.21000"
+        ]
+      },
+      "result": {
+        "stage": "reload",
+        "profile": "default",
+        "technology": "recipe-prod-research_gears-1",
+        "completed_level": 1,
+        "next_level": 2,
+        "effect_change": 0.1,
+        "level_one_count": 8000,
+        "level_two_count": 16000,
+        "level_three_count": 32000,
+        "baseline_output": 100,
+        "researched_output": 110,
+        "baseline_plates_inserted": 200,
+        "researched_plates_inserted": 200,
+        "baseline_refills": 49,
+        "researched_refills": 49
+      },
+      "save_sha256": "55E887839B19C533426674579850C898BA701CE14E9836182454C67C74E0EF4A",
+      "save_byte_identical": true
+    }
+  ],
+  "library_control_restoration": {
+    "status": "restored-direct-library-controls",
+    "profile_sha256": "7BE33714200245325C92F7BB38F8DDE0264D04FCFFEDBF4CC480F9EB331C4A55",
+    "dependency_payload_bytes_copied": 0,
+    "archive_links_created": 0,
+    "archive_extractions": 0,
+    "owned_archive_names_temporarily_hidden": 0,
+    "selected": [
+      {
+        "name": "base",
+        "version": "2.1.23",
+        "path": "C:\\Program Files\\Steam\\steamapps\\common\\Factorio\\data\\base\\info.json",
+        "builtin": true,
+        "identity": "C65BE9DB:036C000000246719",
+        "sha256": "0DA4FCB137A0C38CD74EEB3A52462169F360F54B95AD0669270D08CFA9AA352F",
+        "bytes": 193
+      },
+      {
+        "name": "more-infinite-research",
+        "version": "5.0.21000",
+        "path": "C:\\Projects\\Factorio\\testmods\\2.1\\more-infinite-research_5.0.21000.zip",
+        "builtin": false,
+        "identity": "C65BE9DB:0050000000198946",
+        "sha256": "3C832F5DE36B08746F4E277DC229798ECEAF526F5667CC1C95A5957849E6312D",
+        "bytes": 78593
+      },
+      {
+        "name": "mir-fixture-mir5-gear-native",
+        "version": "0.1.0",
+        "path": "C:\\Projects\\Factorio\\testmods\\2.1\\mir-fixture-mir5-gear-native_0.1.0.zip",
+        "builtin": false,
+        "identity": "C65BE9DB:00DD000000198947",
+        "sha256": "E0B8DC080743233963FF0D326316C1ECC9F9D2AEB5A57BED22A99F24BA890001",
+        "bytes": 5722
+      }
+    ]
+  }
+}

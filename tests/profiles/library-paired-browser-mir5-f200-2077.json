@@ -1,0 +1,23 @@
+{
+  "schema": 1,
+  "kind": "mir5-library-paired-browser-f200-native-selection",
+  "target": "f200",
+  "factorio_line": "2.0",
+  "engine": {
+    "version": "2.0.77",
+    "sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B"
+  },
+  "settings_mode": "Defaults",
+  "mods": [
+    {"name": "base", "version": "2.0.77", "enabled": true},
+    {"name": "mir-fixture-mir5-active-mods-observer", "version": "0.1.0", "enabled": true},
+    {"name": "more-infinite-research", "version": "5.0.20000", "enabled": true},
+    {"name": "mir-fixture-mir5-library-paired-browser", "version": "0.1.0", "enabled": true},
+    {"name": "mir-fixture-mir5-library-paired-browser-arm-mir5", "version": "0.1.0", "enabled": true}
+  ],
+  "archive_sha256": {
+    "more-infinite-research_5.0.20000.zip": "2BBDBA9A0B816AC383CEA116CDF86D587BC34EFF7E1C5ACE2583F1DA98F9E842",
+    "mir-fixture-mir5-active-mods-observer_0.1.0.zip": "723D1E7721449FC26040E5E6629416767BDC20AD79CF8723115846DB662A1F87"
+  },
+  "scope": "Predeclared F200 MIR 5 public Library open/search/refresh/reopen input with two real clients, bounded public GUI/native-state observations, one cold host restart, and eight requested screenshots. It establishes no timing, memory, rendering, or release result."
+}

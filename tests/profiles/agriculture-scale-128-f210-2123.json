@@ -1,0 +1,23 @@
+{
+  "schema": 1,
+  "kind": "mir5-agriculture-scale-native-selection",
+  "target": "f210",
+  "factorio_line": "2.1",
+  "engine": {
+    "version": "2.1.23",
+    "sha256": "FE4A1DA30F322A0D0B8AEB3DF7276332222BAAA143E2352569B723E84B2B9060"
+  },
+  "settings_mode": "Defaults",
+  "mods": [
+    {"name": "base", "version": "2.1.23", "enabled": true},
+    {"name": "elevated-rails", "version": "2.1.23", "enabled": true},
+    {"name": "quality", "version": "2.1.23", "enabled": true},
+    {"name": "recycler", "version": "2.1.23", "enabled": true},
+    {"name": "space-age", "version": "2.1.23", "enabled": true},
+    {"name": "more-infinite-research", "version": "5.0.21000", "enabled": true},
+    {"name": "mir-fixture-mir5-agriculture-scale", "version": "0.1.0", "enabled": true},
+    {"name": "mir-fixture-mir5-agriculture-scale-tier-128", "version": "0.1.0", "enabled": true},
+    {"name": "mir-fixture-mir5-active-mods-observer", "version": "0.1.0", "enabled": true}
+  ],
+  "scope": "Private F210 2.1.23 fixed 128-tower-per-force agricultural scale witness: two real MIR agricultural research completions, exact 2N native planting events, trained versus zero-research timing, bounded native yumako spoilage stacks, and two cold reloads. Native profiler output is recorded only; timing acceptance and published 4.7 parity require separate exact-package evidence."
+}

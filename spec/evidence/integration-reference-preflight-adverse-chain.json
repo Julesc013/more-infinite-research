@@ -1,0 +1,47 @@
+{
+  "schema": 1,
+  "kind": "MIR5IntegrationReferencePreflightAdverseV1",
+  "runs": [
+    {
+      "run": 40051383083,
+      "url": "https://github.com/Julesc013/mir-native-worker/actions/runs/40051383083",
+      "manifest_members_verified": 7,
+      "manifest_sha256": "30658FE7ACC13366F45FDB4DAE2C00BCE39706280471101BA0A3A9EF56ABF5A6",
+      "source": "80e4d17c93e982b4f48f9f515ad9b29bc3f7a3dd",
+      "control_source": "820de19b18e27d5e70dd6a7ae65785e2416c1c70",
+      "failures": [
+        {
+          "arm": "preflight",
+          "error": "[mir5-remaining-integration-reference-archive-root]",
+          "profile": "armor-bobwarfare"
+        },
+        {
+          "arm": "preflight",
+          "error": "[mir5-remaining-integration-reference-archive-root]",
+          "profile": "py-coal"
+        },
+        {
+          "arm": "preflight",
+          "error": "[mir5-remaining-integration-reference-archive-root]",
+          "profile": "py-alienlife-hightech"
+        }
+      ],
+      "failure_receipt": {
+        "gzip": "spec/mir5/evidence/integration-reference-root-adverse-40051383083-failures.json.gz",
+        "uncompressed_sha256": "C5CF3D335ADFC7ABB4D3824ED04194DAFE40659C6852CCB4FDC2D62CC4A6F30F"
+      },
+      "artifact_manifest": {
+        "gzip": "spec/mir5/evidence/integration-reference-root-adverse-40051383083-manifest.json.gz",
+        "uncompressed_sha256": "30658FE7ACC13366F45FDB4DAE2C00BCE39706280471101BA0A3A9EF56ABF5A6"
+      }
+    }
+  ],
+  "scope": [
+    "All three independent profile preflights rejected before Factorio launch. No data-stage, gameplay, save or integration admission pass.",
+    "The private checker incorrectly required internal ZIP folders to repeat name_version. Actual pinned Bob/Py ZIP bytes use both unversioned and versioned folders; Factorio imposes no ZIP-internal folder naming restriction.",
+    "Correction retains exact archive SHA256, unique bounded rooted info.json, selected name/version/Factorio line and engine/default-settings checks. Internal folder names are recorded as observations."
+  ],
+  "root_layout_authority": "https://lua-api.factorio.com/latest/auxiliary/mod-structure.html",
+  "native_execution": false,
+  "release_qualification": false
+}

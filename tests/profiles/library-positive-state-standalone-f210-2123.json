@@ -1,0 +1,53 @@
+{
+  "schema": 1,
+  "kind": "mir5-library-api-consumers-positive-state-standalone-f210-native-selection",
+  "target": "f210-standalone",
+  "factorio_line": "2.1",
+  "engine": {
+    "version": "2.1.23",
+    "sha256": "8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38"
+  },
+  "settings_mode": "Defaults",
+  "session_expected_peak_memory_mib": 7168,
+  "private_credit_checks": true,
+  "mods": [
+    {
+      "name": "base",
+      "version": "2.1.23",
+      "enabled": true
+    },
+    {
+      "name": "mir-fixture-mir5-active-mods-observer",
+      "version": "0.1.0",
+      "enabled": true
+    },
+    {
+      "name": "more-infinite-research",
+      "version": "5.0.21000",
+      "enabled": true
+    },
+    {
+      "name": "mir-fixture-mir5-library-multiplayer",
+      "version": "0.4.0",
+      "enabled": true
+    },
+    {
+      "name": "mir-fixture-mir5-api-alpha",
+      "version": "0.1.0",
+      "enabled": true
+    },
+    {
+      "name": "mir-fixture-mir5-api-beta",
+      "version": "0.1.0",
+      "enabled": true
+    }
+  ],
+  "archive_sha256": {
+    "mir-fixture-mir5-active-mods-observer_0.1.0.zip": "A15A7D628D66953D2E0C4D4FA288F47CBF9C5678327C7EB3D23ADB5DC78331C0",
+    "more-infinite-research_5.0.21000.zip": "2DDD2A4C967BEF07830218442AE4441BEECD5B9ECE0AC86B09A5F6586BBA80E5",
+    "mir-fixture-mir5-api-alpha_0.1.0.zip": "DB5ED843FA9D85A1ABDC22595E62D315CA1A2191C846208079F85D4D016CE904",
+    "mir-fixture-mir5-api-beta_0.1.0.zip": "690004F145E8B0DD52B4030BD8B27F7B581495EEFAAC5CB3A2F30A23FCA08951"
+  },
+  "scope": "Prepared disposable positive-state contrast on exact corrected7b0 player, engine, observer and independent API consumers. The five-member0.4 fixture projection seeds four native holders once (levels2/3/4/5), requires module productivity .01/.02/.03 and cannon-shell speed .4, and preserves them through actual joins/rejoin/cold-host restart. Foreign hidden inspection and distinct personal hidden-filter persistence use the public browser only. This is not actual imported earnings, pre-upgrade persisted private selection, native private-queue insertion, actual keyboard/drag or performance evidence. No native pass is claimed.",
+  "positive_private_state_checks": true
+}

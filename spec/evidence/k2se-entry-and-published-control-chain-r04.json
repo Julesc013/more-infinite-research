@@ -1,0 +1,221 @@
+{
+  "schema": 1,
+  "kind": "MIRK2SEEntryAndPublishedConfigurationControlNativeChainV1",
+  "status": "pre-MIR-body-flags-already-enabled-same-published-control-passes",
+  "scope": "Protected89023/SteamFE4/K2SE only. R03 adds bootstrap entry/exit reads to a private005D copy; unmodified fixture still fails foreign assertion. R04 retains original B6 unchanged and adapts only exact fixture expected-MIR-version literals; all native state assertions pass save/two reloads. No MIR5 corrected successor pass or product repair is claimed.",
+  "controller_commit": "2a9cdd168c5f6b77cee15734d0ed03e778ff85dc",
+  "observations": [
+    {
+      "stage": "before-MIR-configuration-body",
+      "context": "more-infinite-research",
+      "player": {
+        "force_index": 1,
+        "carriers": {
+          "mir-k2-imersite-staged-state-1": {
+            "level": 4,
+            "researched": false,
+            "enabled": true,
+            "visible_when_disabled": false,
+            "saved_progress": 0,
+            "prototype_enabled": true,
+            "prototype_hidden": true
+          },
+          "mir-k2-imersite-continuation-state-4": {
+            "level": 6,
+            "researched": false,
+            "enabled": true,
+            "visible_when_disabled": false,
+            "saved_progress": 0,
+            "prototype_enabled": true,
+            "prototype_hidden": true
+          }
+        },
+        "powder_bonus": 0.1,
+        "current": "mir-k2-imersite-continuation-state-4",
+        "research_progress": 0.42000000000000004
+      },
+      "foreign": {
+        "force_index": 9,
+        "carriers": {
+          "mir-k2-imersite-staged-state-1": {
+            "level": 4,
+            "researched": false,
+            "enabled": true,
+            "visible_when_disabled": false,
+            "saved_progress": 0,
+            "prototype_enabled": true,
+            "prototype_hidden": true
+          },
+          "mir-k2-imersite-continuation-state-4": {
+            "level": 6,
+            "researched": false,
+            "enabled": true,
+            "visible_when_disabled": false,
+            "saved_progress": 0.27,
+            "prototype_enabled": true,
+            "prototype_hidden": true
+          }
+        },
+        "powder_bonus": 0.1,
+        "current": false,
+        "research_progress": 0
+      },
+      "mir_change": {
+        "old_version": "4.7.21003",
+        "new_version": "5.0.21000"
+      },
+      "fixture_change": {
+        "old_version": "0.1.0",
+        "new_version": "0.2.0"
+      },
+      "startup_changed": false
+    },
+    {
+      "stage": "after-MIR-configuration-body",
+      "context": "more-infinite-research",
+      "player": {
+        "force_index": 1,
+        "carriers": {
+          "mir-k2-imersite-staged-state-1": {
+            "level": 4,
+            "researched": false,
+            "enabled": true,
+            "visible_when_disabled": false,
+            "saved_progress": 0,
+            "prototype_enabled": true,
+            "prototype_hidden": true
+          },
+          "mir-k2-imersite-continuation-state-4": {
+            "level": 6,
+            "researched": false,
+            "enabled": true,
+            "visible_when_disabled": false,
+            "saved_progress": 0,
+            "prototype_enabled": true,
+            "prototype_hidden": true
+          }
+        },
+        "powder_bonus": 0.1,
+        "current": "mir-k2-imersite-continuation-state-4",
+        "research_progress": 0.42000000000000004
+      },
+      "foreign": {
+        "force_index": 9,
+        "carriers": {
+          "mir-k2-imersite-staged-state-1": {
+            "level": 4,
+            "researched": false,
+            "enabled": true,
+            "visible_when_disabled": false,
+            "saved_progress": 0,
+            "prototype_enabled": true,
+            "prototype_hidden": true
+          },
+          "mir-k2-imersite-continuation-state-4": {
+            "level": 6,
+            "researched": false,
+            "enabled": true,
+            "visible_when_disabled": false,
+            "saved_progress": 0.27,
+            "prototype_enabled": true,
+            "prototype_hidden": true
+          }
+        },
+        "powder_bonus": 0.1,
+        "current": false,
+        "research_progress": 0
+      },
+      "mir_change": {
+        "old_version": "4.7.21003",
+        "new_version": "5.0.21000"
+      },
+      "fixture_change": {
+        "old_version": "0.1.0",
+        "new_version": "0.2.0"
+      },
+      "startup_changed": false
+    }
+  ],
+  "published_control": {
+    "mir_sha256": "B6EB9430056ABD384DB00F94929FE7DAC0A37441ACF4BC277946689682628852",
+    "fixture_sha256": "ECFC163EAF9AC878E33D98899A5E4F5AC820292860506A40BA879CFE076051F2",
+    "initial_witnesses": {
+      "source_mir": "4.7.21003",
+      "destination_mir": "4.7.21003",
+      "native_saved_state_seeds": true,
+      "source_actual_lab_completions": 0,
+      "destination_actual_lab_completions": 0,
+      "k2so_runtime_bridge_exercised": false,
+      "successor_retained_before_fixture_writes": true,
+      "player_current": "mir-k2-imersite-continuation-state-4",
+      "player_queue_count": 2,
+      "player_research_progress": 0.42000000000000004,
+      "player_powder_productivity": 0.1,
+      "foreign_tail_saved_progress": 0.27,
+      "foreign_disabled": true,
+      "foreign_powder_productivity": 0.1,
+      "on_load_read_only": false
+    },
+    "completed_save": {
+      "sha256": "69BDB1760AD7E73A1EBB316C4149096D594C43D4F21CD7A342F806642977DD7F",
+      "bytes": 1592201
+    },
+    "cold_reloads": 2,
+    "lab_completions": 0
+  },
+  "existing_prototype_comparison": {
+    "inputs": {
+      "published": {
+        "raw_dump_sha256": "95953A89CA8B03AEEB481219228DBBDC020EE1361CB0A646D39B8C99E5ABBCFC",
+        "raw_dump_bytes": 42335146,
+        "result_sha256": "2B2057E9029E53974A36D96E1BB3EB2A533CBC180AD8619B64C52BF5C7173CDE",
+        "mir_archive": {
+          "path": "D:\\Projects\\Factorio\\testmods\\2.1\\more-infinite-research_4.7.21003.zip",
+          "sha256": "B6EB9430056ABD384DB00F94929FE7DAC0A37441ACF4BC277946689682628852",
+          "name": "more-infinite-research",
+          "version": "4.7.21003",
+          "factorio_version": "2.1",
+          "root": "more-infinite-research_4.7.21003"
+        }
+      },
+      "candidate": {
+        "raw_dump_sha256": "9E2204224F5619BDAB43609E9903CCA63B4A780E2E13B6DC98ABA545298F3316",
+        "raw_dump_bytes": 41933501,
+        "result_sha256": "E3AE878774DC6159670FE84E98D7A3DBCA6AFA30600395604C2D463A0A7464B4",
+        "mir_archive": {
+          "path": "D:\\Projects\\Factorio\\testmods\\2.1\\more-infinite-research_5.0.21000.zip",
+          "sha256": "A8D0A4590154F3106E59BDB269F1AEB3ED8CC523F18F00ED7D76DC89059F5B8D",
+          "name": "more-infinite-research",
+          "version": "5.0.21000",
+          "factorio_version": "2.1",
+          "root": "more-infinite-research_5.0.21000"
+        }
+      }
+    },
+    "differing_fields_only": [
+      "icon"
+    ],
+    "full_named_objects_in_lossless_record": true,
+    "limits": "Original B6/A8D0 data observations only; no first-callback or005D full-dump claim."
+  },
+  "root_readback": {
+    "path": "build/qualification/k2se-mir-entry-trace-r03-controller/root-readback-r01.json",
+    "sha256": "7D65FA26A2C17B5CD5AAF0F51B92FBD108954AF098E0CDEC3463EB187D1E90DE",
+    "files": 24,
+    "bytes_per_copy": 1946331
+  },
+  "lossless_receipts": {
+    "path": "spec/evidence/k2se-entry-and-published-control-receipts-r04.json.gz",
+    "sha256": "9E39D70919CD057B9C7C30342ADD5C31EF37A8EB99D2C44C981F2D886D564E47",
+    "bytes": 33731,
+    "records": 8
+  },
+  "counts": {
+    "entry_trace_actual_processes": 1,
+    "published_control_actual_processes": 3,
+    "labs": 0,
+    "control_cold_reloads": 2
+  },
+  "interpretation": "The original005D post-MIR failure does not establish a write in MIR configuration body: flags are alreadytrue on entry and unchangedafter. A fixture-only configuration under unchanged publishedB6 does preserve foreignfalse. Thus fixture-only change is insufficient; MIR-version/prototype transition, earlier events/upstream lifecycle or recoverable ownership need a further bounded distinction. Optional missing ledger fields are not proof of absent/false ownership. No blind restoration or expectation waiver.",
+  "remaining": "Independently diagnose the still-failing MIR5 version/prototype transition and any recoverable owned state,then qualify actual corrected successor/save/two reloads without weakening foreign/current-rights opponents. Preserve both old/current failures and passing published control."
+}

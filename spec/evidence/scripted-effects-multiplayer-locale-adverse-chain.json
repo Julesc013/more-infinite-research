@@ -1,0 +1,44 @@
+{
+  "schema": 1,
+  "kind": "MIR5ScriptedEffectsMultiplayerLocaleDeliveryAdverseV1",
+  "runs": [
+    {
+      "run": 40045230883,
+      "url": "https://github.com/Julesc013/mir-native-worker/actions/runs/40045230883",
+      "manifest_members_verified": 203,
+      "manifest_sha256": "11B26B075230C00DDCB5E90F4334A079044083AC5EA10BFC70C0B7CA6F43AB37",
+      "cases": [
+        {
+          "path": "multiplayer/preparation/result.json",
+          "status": "passed-private-native-runtime-load-only",
+          "source": "deac98f387b37a0cf2c029190c669304a6ff70d8",
+          "receipt": {
+            "gzip": "spec/mir5/evidence/scripted-effects-multiplayer-locale-adverse-40045230883-multiplayer-preparation-native.json.gz",
+            "uncompressed_sha256": "33453DB58117DAD23E9632C324ADD96C03779BCF62F703E74FCDE21A44B92D52"
+          }
+        },
+        {
+          "path": "multiplayer/session/result.json",
+          "status": "failed",
+          "source": "deac98f387b37a0cf2c029190c669304a6ff70d8",
+          "receipt": {
+            "gzip": "spec/mir5/evidence/scripted-effects-multiplayer-locale-adverse-40045230883-multiplayer-session-native.json.gz",
+            "uncompressed_sha256": "FFCD19F5E0651F0FE40A009C48E79EFD301210B41B373283B6A8768EE5777C4E"
+          },
+          "failure": "[mir441-process-exit] 1"
+        }
+      ]
+    }
+  ],
+  "scope": [
+    "Exact F2002.0.77 Space Age: both real low-graphics clients start within the unchanged process budget;203 artifact members are verified, and world creation/runtime load pass.",
+    "The fixture aborts at tick2907 because it assumes the German LuaPlayer locale is already delivered at the first actual join tick. The client log itself is German; this is a fixture event-order assumption, not a MIR gameplay failure or acceptance.",
+    "The corrected fixture waits at most600 ticks from actual join for the native locale to arrive, still rejects a persistent mismatch and checks the exact en/de identities before proceeding. It does not synthesize a locale event, alter any client or loosen a product assertion.",
+    "No scripted gameplay, multiplayer/save completion, stress, menu-performance or release pass is claimed from the adverse attempt."
+  ],
+  "release_qualification": false,
+  "native_failure_log": {
+    "gzip": "spec/mir5/evidence/scripted-effects-multiplayer-locale-adverse-40045230883-server.log.gz",
+    "uncompressed_sha256": "FCD999DFDD442FD6BB88B058B514602B71A767C65389CFEA8431A61BA18A9FB5"
+  }
+}

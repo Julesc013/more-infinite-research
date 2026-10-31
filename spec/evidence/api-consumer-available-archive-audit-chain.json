@@ -1,0 +1,45 @@
+{
+  "schema": 1,
+  "kind": "MIR5BoundedHistoricalConsumerAuditObservationV1",
+  "status": "completed-within-named-search-scope",
+  "source_commit": "cd80371e57e53080601671c595a75cc3d0ea3538",
+  "observation": {
+    "archive_count": 31,
+    "text_members_scanned": 3322,
+    "text_bytes_scanned": 20027358,
+    "matched_archives": 0,
+    "archive_hash_verification": "Every outer SHA256 matched its frozen dependency-valid profile pin before text inspection.",
+    "exact_literals": [
+      "more-infinite-research-browser",
+      "more-infinite-research-settings",
+      "MIR4ApiResponseV1",
+      "mir4_api_v1",
+      "MIR4MEPEnvelopeV1",
+      "more-infinite-research-compatibility-pack"
+    ]
+  },
+  "receipts": [
+    {
+      "path": "spec/mir5/evidence/api-consumer-archive-audit-cd80371e.json.gz",
+      "compressed_sha256": "7A646BF2371E7ED1C62235937D40AC346AEAD44AF4356DC0CAD81F39B2547200",
+      "uncompressed_sha256": "0E4B22386BB3262BA53FCEE9C34473C6EFEB596803584F5935A022AB28F0E2FA",
+      "uncompressed_bytes": 10305
+    },
+    {
+      "path": "spec/mir5/evidence/audit-legacy-consumer-archives.py.gz",
+      "compressed_sha256": "573F2C14D05AA03E1B750DD7C04FED567841613BE5AFEBA4711F65A8D8E41BF9",
+      "uncompressed_sha256": "EEA7BFBF38BF673AACA29C8B8E2B5BCC8DCE0EAB8C2DF2CC13659984A9C41FEC",
+      "uncompressed_bytes": 3348
+    }
+  ],
+  "interpretation": [
+    "No literal historical browser/settings interface or named preview SDK/MEP consumer was identified in these31 exact third-party archives. This does not establish absence in computed interface names, other archives/versions or outside libraries.",
+    "The two historical runtime interface names remain implemented in MIR5; no external service or historical published preview is removed by this audit. Preserve their existing method and option contracts.",
+    "The pinned older source/package baseline and its V0 preview removal obligation retain their original status; this available-archive audit is not independent-consumer migration evidence.",
+    "Final-source native API/client qualification remains separate."
+  ],
+  "historical_baseline": "spec/mir5/inventory/api-transition-baseline.json",
+  "native_execution": false,
+  "player_mutation": false,
+  "release_qualification": false
+}

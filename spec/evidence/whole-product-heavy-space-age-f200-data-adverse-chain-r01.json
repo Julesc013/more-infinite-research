@@ -1,0 +1,234 @@
+{
+  "schema": 1,
+  "kind": "MIRWholeProductHeavySpaceAgeF200DataAdmissionAdverseChainV1",
+  "status": "actual-candidate-settings-load-failure-not-accepted",
+  "source": {
+    "commit": "43d4a03158ea4575973cf83fef533db3b3f9633e",
+    "checkout": "D:/Projects/Factorio/mir5-heavy-space-age-f200-admission-r01",
+    "profile": {
+      "path": "tests/profiles/bob-angel-full-space-age-f200-2077.json",
+      "bytes": 7511,
+      "sha256": "61CBE6299DD2708079EA80FB3871AC980C6FF7281DD126C61B3126A7FF294857"
+    },
+    "public_input": {
+      "path": "spec/evidence/heavy-space-age-f200-public-inputs-r01.json",
+      "bytes": 39104,
+      "sha256": "D7718886E004B02E8024FE1F0A9B6BA8126A8394D16D1DF3F8EB7816D9EA32DC"
+    }
+  },
+  "packet": {
+    "path": "D:/Projects/Factorio/more-infinite-research/build/qualification/whole-product-heavy-space-age-f200-admission-r01-controller/packet.json",
+    "bytes": 24495,
+    "sha256": "EAD7687A16A431F25BFFADD7794BBC6D34C7122FF809F21F99C2549C5D60856B"
+  },
+  "caller": {
+    "path": "D:/Projects/Factorio/more-infinite-research/build/qualification/whole-product-heavy-space-age-f200-admission-r01-controller/Invoke-Owned.ps1",
+    "bytes": 20007,
+    "sha256": "17C6D3880F860321B349389FD42356509AE358E80791B7A3DA309CAE353FEC5B"
+  },
+  "custody_helper": {
+    "path": "D:/Projects/Factorio/more-infinite-research/build/qualification/whole-product-heavy-space-age-f200-admission-r01-controller/Existing-OwnedArchiveFunctions.ps1",
+    "bytes": 4973,
+    "sha256": "65C8F23A4D9AA872CF0D6BD2BCCC35960162B358E1B87465303BF5658FEE2356"
+  },
+  "prepared_inputs": {
+    "path": "D:/Projects/Factorio/more-infinite-research/build/qualification/whole-product-heavy-space-age-f200-admission-r01-controller/preparation.json",
+    "bytes": 2438,
+    "sha256": "3DE050857DFFC106A9309853A4BD40DAC419CEF9C2DA9342454163655A756547"
+  },
+  "freeze": {
+    "path": "D:/Projects/Factorio/more-infinite-research/build/qualification/whole-product-heavy-space-age-f200-admission-r01-controller/frozen-readiness-r01.json",
+    "bytes": 1688,
+    "sha256": "F9187EABF2135E388926DF6E1DFDE5EAA53B13A348390ABD6916B92A9CC4EED2"
+  },
+  "controls": {
+    "path": "D:/Projects/Factorio/more-infinite-research/build/qualification/whole-product-heavy-space-age-f200-admission-r01-controller/controls-r01/result.json",
+    "bytes": 1103,
+    "sha256": "35F158B543105F2025A7DF848FEEED04552095587334C10EBB4658B7565A8CEE"
+  },
+  "engine": {
+    "path": "D:/Games/Factorio/2.0/bin/x64/factorio.exe",
+    "bytes": 43530192,
+    "sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B",
+    "version": "2.0.77"
+  },
+  "arms": [
+    {
+      "id": "control-without-mir",
+      "archive": null
+    },
+    {
+      "id": "legacy-mir2.5.11",
+      "archive": {
+        "path": "D:/Projects/Factorio/mir5-heavy-space-age-f200-admission-r01/build/tmp/whole-product-heavy-space-age-f200-inputs-r01/owned-source-archives/more-infinite-research_2.5.11.zip",
+        "bytes": 1065193,
+        "sha256": "4AE3DA83C4F8CB7D084891065387B78032BB25B8E4ED3948058D9B773070847C"
+      }
+    },
+    {
+      "id": "published-mir4.7",
+      "archive": {
+        "path": "D:/Projects/Factorio/mir5-heavy-space-age-f200-admission-r01/build/tmp/whole-product-heavy-space-age-f200-inputs-r01/owned-source-archives/more-infinite-research_4.7.20003.zip",
+        "bytes": 1449475,
+        "sha256": "FBBA844DD04011A12BB6DA885745B0733AD37FAB181EAAD9EE4346B9B0D32647"
+      }
+    },
+    {
+      "id": "candidate-mir5",
+      "archive": {
+        "path": "D:/Projects/Factorio/mir5-heavy-space-age-f200-admission-r01/build/tmp/whole-product-heavy-space-age-f200-inputs-r01/owned-source-archives/more-infinite-research_5.0.20000.zip",
+        "bytes": 696588,
+        "sha256": "7CAC54475107736106D84AF98D50A8622E095B6658F1E3682643FE0CBA8BAEF0"
+      }
+    }
+  ],
+  "actual_outcomes": [
+    {
+      "arm": "control-without-mir",
+      "result": {
+        "path": "D:/Projects/Factorio/more-infinite-research/build/qualification/whole-product-heavy-space-age-f200-admission-r01-controller/native-captures/control-without-mir/result.json",
+        "bytes": 37818,
+        "sha256": "41FC040FD8E919870B7C98EB792BD49D654A8CD87492568349D1AAE191DEF2A9"
+      },
+      "pid": 23768,
+      "status": "completed-data-stage-observation-only",
+      "failure": null,
+      "resource_terminal": {
+        "observed_at": "2026-10-30T01:39:07.6739874+00:00",
+        "phase": "completed",
+        "exit_code": 0,
+        "peak_working_set_bytes": 1018740736,
+        "peak_sampled_private_bytes": 1033146368,
+        "completion_predicate_observed": false
+      }
+    },
+    {
+      "arm": "legacy-mir2.5.11",
+      "result": {
+        "path": "D:/Projects/Factorio/more-infinite-research/build/qualification/whole-product-heavy-space-age-f200-admission-r01-controller/native-captures/legacy-mir2.5.11/result.json",
+        "bytes": 38940,
+        "sha256": "51B4D20203E9F09B10CCB3B99AC50D2FBD7905393420DAA1FC8DEFA09A48EED1"
+      },
+      "pid": 20088,
+      "status": "completed-data-stage-observation-only",
+      "failure": null,
+      "resource_terminal": {
+        "observed_at": "2026-10-30T01:39:26.6617187+00:00",
+        "phase": "completed",
+        "exit_code": 0,
+        "peak_working_set_bytes": 1529282560,
+        "peak_sampled_private_bytes": 1566937088,
+        "completion_predicate_observed": false
+      }
+    },
+    {
+      "arm": "published-mir4.7",
+      "result": {
+        "path": "D:/Projects/Factorio/more-infinite-research/build/qualification/whole-product-heavy-space-age-f200-admission-r01-controller/native-captures/published-mir4.7/result.json",
+        "bytes": 38968,
+        "sha256": "6A095D0AC64A4AB9213A8F61206664A909FD20AF0DF6DCC95BB02AB8987098AC"
+      },
+      "pid": 68264,
+      "status": "completed-data-stage-observation-only",
+      "failure": null,
+      "resource_terminal": {
+        "observed_at": "2026-10-30T01:39:42.8171588+00:00",
+        "phase": "completed",
+        "exit_code": 0,
+        "peak_working_set_bytes": 1339572224,
+        "peak_sampled_private_bytes": 1357217792,
+        "completion_predicate_observed": false
+      }
+    },
+    {
+      "arm": "candidate-mir5",
+      "result": {
+        "path": "D:/Projects/Factorio/more-infinite-research/build/qualification/whole-product-heavy-space-age-f200-admission-r01-controller/native-captures/candidate-mir5/result.json",
+        "bytes": 31807,
+        "sha256": "A494BEB860FE9FCDA43064C46F30FE67EC2948FA20B190D73812A5F1C3DAE338"
+      },
+      "pid": 69356,
+      "status": "failed",
+      "failure": "[mir441-process-exit] 1",
+      "resource_terminal": {
+        "observed_at": "2026-10-30T01:39:49.3094184+00:00",
+        "phase": "interrupted",
+        "timed_out": false,
+        "error": "[mir441-process-exit] 1",
+        "resource_admission": null,
+        "peak_working_set_bytes": 24817664,
+        "peak_sampled_private_bytes": 15560704
+      }
+    }
+  ],
+  "actual_engines": 4,
+  "candidate_failure": {
+    "stage": "settings.lua",
+    "location": "source/compatibility/bob_angel_profile.lua:27",
+    "observed_message": "MIR unsupported F200 Bob/Angel saved-profile transition: captured Bob/Angel closure has an unsupported Space Age, BobTech, or Krastorio selection",
+    "native_pid": 69356,
+    "native_exit_code": 1,
+    "governor_timeout": false,
+    "memory_admission_refusal": false,
+    "data_or_settings_dump_produced": false
+  },
+  "interpretation": "The no-MIR,actual2.5.11,and published4.7.20003 arms load this fresh upstream-valid36-row profile. The existing candidate guard intentionally excludes SpaceAge/BobTech from the previously qualified F200 no-SA/no-BobTech Bob/Angel subset and also rejects this new cohort at settings load. This is an actual newly selected compatibility/acceptance gap,not an old-subset regression or a performance sample. Do not remove the guard,borrow F210 bindings,patch old releases,substitute another profile,or relabel a failed candidate as supported. Supporting the combined F200 profile needs separately declared finite independent data/settings expectations and affected qualification.",
+  "native_custody": {
+    "source": "D:/Projects/Factorio/mir5-heavy-space-age-f200-admission-r01/build/tmp/whole-product-heavy-space-age-f200-admission-r01",
+    "destination": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\whole-product-heavy-space-age-f200-admission-r01-controller\\native-captures",
+    "files": 34,
+    "bytes": 194923388,
+    "all_original_copy_hashes_equal": true
+  },
+  "controller_preterminal_custody": {
+    "source": "D:/Projects/Factorio/more-infinite-research/build/qualification/whole-product-heavy-space-age-f200-admission-r01-controller/execution-record",
+    "destination": "D:/Projects/Factorio/more-infinite-research/build/qualification/whole-product-heavy-space-age-f200-admission-r01-controller/controller-captures",
+    "files": 4,
+    "bytes": 2133685,
+    "all_original_copy_hashes_equal": true
+  },
+  "terminal": {
+    "path": "D:/Projects/Factorio/more-infinite-research/build/qualification/whole-product-heavy-space-age-f200-admission-r01-controller/execution-record/terminal.json",
+    "bytes": 148218,
+    "sha256": "898263B587ED92E99C913663FA3BA8B6852B1B84CDF63A428E3FD2F5530705D8"
+  },
+  "root_readback": {
+    "path": "D:/Projects/Factorio/more-infinite-research/build/qualification/whole-product-heavy-space-age-f200-admission-r01-controller/root-readback-r01.json",
+    "bytes": 5345,
+    "sha256": "FE9ED357A1AD2721FA95056F84C5C92D52BE944255DACC98AC78DD7BA33BCF89"
+  },
+  "restoration": [
+    {
+      "path": "D:\\Projects\\Factorio\\testmods\\2.0\\more-infinite-research_5.0.20000.zip",
+      "action": "restored-prior"
+    },
+    {
+      "path": "D:\\Projects\\Factorio\\testmods\\2.0\\more-infinite-research_4.7.20003.zip",
+      "action": "unchanged"
+    },
+    {
+      "path": "D:\\Projects\\Factorio\\testmods\\2.0\\more-infinite-research_2.5.11.zip",
+      "action": "removed-temporary"
+    }
+  ],
+  "factorio_processes_after": 0,
+  "selected_text_capsule": {
+    "path": "spec/evidence/whole-product-heavy-space-age-f200-data-adverse-receipts-r01.json.gz",
+    "bytes": 170940,
+    "sha256": "AF3DD72C03F167A387496C5CDBBFCCC414E46514A3B321EC7831E8C1ECAD65A9",
+    "body_count": 34
+  },
+  "excluded_from_public_bodies": "All original data/settings dumps,configuration files and prior archive snapshots remain hash-bound in local original/copied custody;no engine dump is fabricated for the failed candidate.",
+  "native_data_acceptance": false,
+  "semantic_parity": false,
+  "responsive_menu_observed": false,
+  "performance_acceptance": false,
+  "release_qualification": false,
+  "absent_controller_files": [
+    "controller-output.log"
+  ],
+  "projection_preparation_refusal": {
+    "path": "D:/Projects/Factorio/more-infinite-research/build/qualification/whole-product-heavy-space-age-f200-admission-r01-controller/pre-public-projection-missing-output-log-r01/note.txt",
+    "scope": "The first projection expected an absent controller-output.log and refused before any public artifact;the original script and note remain preserved. No native input,result or output changed and no missing log is fabricated."
+  }
+}

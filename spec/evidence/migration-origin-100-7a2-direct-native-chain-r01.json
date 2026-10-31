@@ -1,0 +1,311 @@
+{
+  "schema": 1,
+  "kind": "MIR5Origin100CurrentDirectNativeChainV1",
+  "status": "passed-current-7a2-direct-original-mir100-f210-and-f200-base-successors",
+  "scope": "Same protected original MIR1.0 F200 save directly to current7a2/player505 F210005D and F20065FC Base. Original source is not recreated; each destination completes one new genuine gear lab and two unchanged-byte read-only cold reloads. Named saved-state contract only, not arbitrary settings, Space Age, GUI, physical output, comparative performance or release acceptance.",
+  "source_chain": {
+    "path": "spec/evidence/migration-origin-100-f200-source-native-chain.json",
+    "sha256": "E3DF4E5826F59FA46AF520241B048D06636FF0272790E416FC4B43572315B37C"
+  },
+  "protected_source": {
+    "path": "build/qualification/migration-origins/migration-origin-100-f200-source-r02/native-output/write-data/saves/mir5-native-complete.zip",
+    "bytes": 424681,
+    "sha256": "F8B38209DA632C8B2EFA049C8F69CDB3E3EC01F6BEE0C5D03BAFF03C27989C54"
+  },
+  "source_actual_lab_completions_counted_once": 1,
+  "candidate_source": "7a2f93224c846b86261b2da709f50ea683fc708d",
+  "player_tree": "5058373348e9049f8b67ec4dbb79b400a904acd6",
+  "controller_commit": "f9c9a7e99923254ec87dd3d1015cb4bdf3e98059",
+  "packet": {
+    "path": "build/qualification/migration-origin-100-current-7a2-r01-controller/packet.json",
+    "bytes": 8665,
+    "sha256": "4FBC07AC4F7A49702874AEC491671F168EA3865A4EF39015BDF68A8DFEC2FCD1"
+  },
+  "caller": {
+    "path": "build/qualification/migration-origin-100-current-7a2-r01-controller/Invoke-OwnedOrigin100Pair.ps1",
+    "bytes": 4830,
+    "sha256": "8127FA5970163300B5A366DA1695DF901A57519D062BF6C6A56C947EB3012AAC"
+  },
+  "terminal": {
+    "path": "build/qualification/migration-origin-100-current-7a2-r01-controller/execution-record/terminal.json",
+    "bytes": 9559,
+    "sha256": "3B9BB04D39EF62A2179A8E4CB98900BBAE11A56F1407A81148335A13D1252E92"
+  },
+  "fixture_scope": "Current frozen successor fixture atf9c9 validates all retained source rows/effects/queues before only its documented fixture-owned zero sentinel restoration. The six host controls pass. Original7ac native observations remain separate; this run qualifies the stricter later preflight. No candidate/player code was changed.",
+  "readback": {
+    "path": "build/qualification/migration-origin-100-current-7a2-r01-controller/root-readback-r01.json",
+    "bytes": 7062,
+    "sha256": "C3D4D3D1364BDC70785BD6F35391A1985925DE8772C68492C6A15402519396D6",
+    "files": 36,
+    "bytes_per_copy": 1113716
+  },
+  "receipt_capsule": {
+    "path": "spec/evidence/migration-origin-100-7a2-direct-native-receipts-r01.json.gz",
+    "bytes": 14574,
+    "sha256": "F6786983516C8B07E67D1C6D3BB3E969BD0809081F17CA3C959596B8D215A5E6",
+    "records": 2,
+    "uncompressed_bytes": 93508,
+    "all_original_exact_bytes_round_trip": true
+  },
+  "direct_successors": [
+    {
+      "target": "f210",
+      "result": {
+        "path": "build/qualification/migration-origin-100-current-7a2-r01-controller/native-f210/result.json",
+        "bytes": 34849,
+        "sha256": "BF414AC3F6431E6147738409B7005E96D7BB50FD3146C9DDA630120B3609F15B"
+      },
+      "status": "passed-private-native-fixture",
+      "engine": {
+        "path": "D:\\Games\\Factorio\\2.1\\bin\\x64\\factorio.exe",
+        "sha256": "8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38",
+        "file_version": "2.1.23.87750",
+        "product_version": "2.1.23",
+        "base_version": "2.1.23"
+      },
+      "profile": {
+        "sha256": "D90BB4724BEBF63AAC19DDFDE028CBE2B8E726E7ED0517375B383F605909D81D",
+        "path": "D:\\Projects\\Factorio\\mir5-legacy-cannon-credit-r01\\build\\qualification\\migration-origin-100-current-7a2-r01-inputs\\f210\\profile.json"
+      },
+      "fixtures": [
+        {
+          "archive": "D:\\Projects\\Factorio\\testmods\\2.1\\mir-fixture-mir5-migration-origin-f200-100-source_0.3.0.zip",
+          "sha256": "1958D4DB287175CA7A8E7EA4A3C20E551025DE319DE7AA351AA9240855AFB2E7",
+          "source": "D:\\Projects\\Factorio\\mir5-legacy-cannon-credit-r01\\build\\qualification\\migration-origin-100-current-7a2-r01-inputs\\f210\\successor"
+        },
+        {
+          "archive": "D:\\Projects\\Factorio\\testmods\\2.1\\mir-fixture-mir5-active-mods-observer_0.1.0.zip",
+          "sha256": "A15A7D628D66953D2E0C4D4FA288F47CBF9C5678327C7EB3D23ADB5DC78331C0",
+          "source": "D:\\Projects\\Factorio\\mir5-legacy-cannon-credit-r01\\build\\qualification\\migration-origin-100-current-7a2-r01-inputs\\f210\\observer"
+        }
+      ],
+      "candidate_sha256": "005D420671270306155CB4AC25E9CF77541202DFA16B206DCC016237619C9AA2",
+      "source_actual_labs_reused_not_new": 1,
+      "new_candidate_actual_labs": 1,
+      "actual_native_processes": 3,
+      "native_startup_logs": [
+        {
+          "path": "build/qualification/migration-origin-100-current-7a2-r01-controller/native-f210/production.factorio.log",
+          "bytes": 14529,
+          "sha256": "30789EB447128C0EA25BB7C0109755A52FA346CBC80EBC70A623766A4FDE95A1",
+          "actual_native_startup": "   0.000 2026-10-28 22:58:36; Factorio 2.1.23 (build 87750, win64, full, space-age)"
+        },
+        {
+          "path": "build/qualification/migration-origin-100-current-7a2-r01-controller/native-f210/reload-1.factorio.log",
+          "bytes": 12434,
+          "sha256": "41123161438AF9A8884B079FA720BF22A8B88EC50EF32CE664B79DE87B03DEC3",
+          "actual_native_startup": "   0.000 2026-10-28 22:58:40; Factorio 2.1.23 (build 87750, win64, full, space-age)"
+        },
+        {
+          "path": "build/qualification/migration-origin-100-current-7a2-r01-controller/native-f210/reload-2.factorio.log",
+          "bytes": 12434,
+          "sha256": "74B1BFBAA3511DE66037E3BFF9C25092E3A9CB894CCE9FB54CC497601A8457CD",
+          "actual_native_startup": "   0.000 2026-10-28 22:58:42; Factorio 2.1.23 (build 87750, win64, full, space-age)"
+        }
+      ],
+      "initial_observation": {
+        "case": "migration-origin-1.0.0-f210-successor",
+        "stage": "initial",
+        "status": "passed",
+        "source_origin": "1.0.0",
+        "source_rows": 21,
+        "source_actual_labs": 1,
+        "candidate_actual_labs": 1,
+        "source_direct_level": 2,
+        "candidate_direct_level": 3,
+        "source_gear_bonus": 0.10000000149011612,
+        "candidate_gear_bonus": 0.2,
+        "foreign_queue_progress": 0.42000000000000004,
+        "detached_progress": 0.27,
+        "effective_breeding_setting": false,
+        "on_load_read_only": false
+      },
+      "completed_save": {
+        "path": "build/qualification/migration-origin-100-current-7a2-r01-controller/native-f210/write-data/saves/mir5-native-complete.zip",
+        "bytes": 446571,
+        "sha256": "3852B637778F31B6DAC5284EDC11D20964C6563404531605361585D6B9AF9BBE"
+      },
+      "reloads": [
+        {
+          "ordinal": 1,
+          "save_byte_identical": true,
+          "save_sha256": "3852B637778F31B6DAC5284EDC11D20964C6563404531605361585D6B9AF9BBE",
+          "observation": {
+            "case": "migration-origin-1.0.0-f210-successor",
+            "stage": "reload",
+            "status": "passed",
+            "source_origin": "1.0.0",
+            "source_rows": 21,
+            "source_actual_labs": 1,
+            "candidate_actual_labs": 1,
+            "source_direct_level": 2,
+            "candidate_direct_level": 3,
+            "source_gear_bonus": 0.10000000149011612,
+            "candidate_gear_bonus": 0.2,
+            "foreign_queue_progress": 0.42000000000000004,
+            "detached_progress": 0.27,
+            "effective_breeding_setting": false,
+            "on_load_read_only": true
+          }
+        },
+        {
+          "ordinal": 2,
+          "save_byte_identical": true,
+          "save_sha256": "3852B637778F31B6DAC5284EDC11D20964C6563404531605361585D6B9AF9BBE",
+          "observation": {
+            "case": "migration-origin-1.0.0-f210-successor",
+            "stage": "reload",
+            "status": "passed",
+            "source_origin": "1.0.0",
+            "source_rows": 21,
+            "source_actual_labs": 1,
+            "candidate_actual_labs": 1,
+            "source_direct_level": 2,
+            "candidate_direct_level": 3,
+            "source_gear_bonus": 0.10000000149011612,
+            "candidate_gear_bonus": 0.2,
+            "foreign_queue_progress": 0.42000000000000004,
+            "detached_progress": 0.27,
+            "effective_breeding_setting": false,
+            "on_load_read_only": true
+          }
+        }
+      ]
+    },
+    {
+      "target": "f200",
+      "result": {
+        "path": "build/qualification/migration-origin-100-current-7a2-r01-controller/native-f200/result.json",
+        "bytes": 34900,
+        "sha256": "500F9127D2D31C6521C1101665D748A7B88237DC1D608AC774D0EE8CE084B6BA"
+      },
+      "status": "passed-private-native-fixture",
+      "engine": {
+        "path": "D:\\Games\\Factorio\\2.0\\bin\\x64\\factorio.exe",
+        "sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B",
+        "file_version": "2.0.77.84539",
+        "product_version": "2.0.77",
+        "base_version": "2.0.77"
+      },
+      "profile": {
+        "sha256": "92556AB9D16647692EE83567710B60D1B5DE7FDDA2D47E32D93D43A827250F12",
+        "path": "D:\\Projects\\Factorio\\mir5-legacy-cannon-credit-r01\\build\\qualification\\migration-origin-100-current-7a2-r01-inputs\\f200\\profile.json"
+      },
+      "fixtures": [
+        {
+          "archive": "D:\\Projects\\Factorio\\testmods\\2.0\\mir-fixture-mir5-migration-origin-f200-100-source_0.2.0.zip",
+          "sha256": "0877878E6026912C8ACA59287042D824B33099CBAAD4872E0C09BFDC0ABBEC0D",
+          "source": "D:\\Projects\\Factorio\\mir5-legacy-cannon-credit-r01\\build\\qualification\\migration-origin-100-current-7a2-r01-inputs\\f200\\successor"
+        },
+        {
+          "archive": "D:\\Projects\\Factorio\\testmods\\2.0\\mir-fixture-mir5-active-mods-observer_0.1.0.zip",
+          "sha256": "723D1E7721449FC26040E5E6629416767BDC20AD79CF8723115846DB662A1F87",
+          "source": "D:\\Projects\\Factorio\\mir5-legacy-cannon-credit-r01\\build\\qualification\\migration-origin-100-current-7a2-r01-inputs\\f200\\observer"
+        }
+      ],
+      "candidate_sha256": "65FC7E907FE3198B7290167989FE2564C1474190D06DAD49860063BEC418EC60",
+      "source_actual_labs_reused_not_new": 1,
+      "new_candidate_actual_labs": 1,
+      "actual_native_processes": 3,
+      "native_startup_logs": [
+        {
+          "path": "build/qualification/migration-origin-100-current-7a2-r01-controller/native-f200/production.factorio.log",
+          "bytes": 10011,
+          "sha256": "71D4B5CB6998ECF6789FE80AB25C88FA22A3A64886DB7A284A070AFA3F6E8288",
+          "actual_native_startup": "   0.000 2026-10-28 22:58:48; Factorio 2.0.77 (build 84539, win64, full, space-age)"
+        },
+        {
+          "path": "build/qualification/migration-origin-100-current-7a2-r01-controller/native-f200/reload-1.factorio.log",
+          "bytes": 8062,
+          "sha256": "2C467037993193EA87CAFF857BF138EE0C8F1DE53870B734891953852B8B05F0",
+          "actual_native_startup": "   0.000 2026-10-28 22:58:53; Factorio 2.0.77 (build 84539, win64, full, space-age)"
+        },
+        {
+          "path": "build/qualification/migration-origin-100-current-7a2-r01-controller/native-f200/reload-2.factorio.log",
+          "bytes": 8062,
+          "sha256": "5A667CA2443ED103EF702A93CCF2489A6472979651D2B7876048FF911AFFB833",
+          "actual_native_startup": "   0.000 2026-10-28 22:58:55; Factorio 2.0.77 (build 84539, win64, full, space-age)"
+        }
+      ],
+      "initial_observation": {
+        "case": "migration-origin-1.0.0-f200-successor",
+        "stage": "initial",
+        "status": "passed",
+        "source_origin": "1.0.0",
+        "source_rows": 21,
+        "source_actual_labs": 1,
+        "candidate_actual_labs": 1,
+        "source_direct_level": 2,
+        "candidate_direct_level": 3,
+        "source_gear_bonus": 0.10000000149011612,
+        "candidate_gear_bonus": 0.20000000298023224,
+        "foreign_queue_progress": 0.42000000000000004,
+        "detached_progress": 0.27,
+        "effective_breeding_setting": false,
+        "on_load_read_only": false
+      },
+      "completed_save": {
+        "path": "build/qualification/migration-origin-100-current-7a2-r01-controller/native-f200/write-data/saves/mir5-native-complete.zip",
+        "bytes": 443886,
+        "sha256": "DD65D37D5192CA621A6F1305B51B7AA1E92EABC2687BB6A06F496500396C9CFE"
+      },
+      "reloads": [
+        {
+          "ordinal": 1,
+          "save_byte_identical": true,
+          "save_sha256": "DD65D37D5192CA621A6F1305B51B7AA1E92EABC2687BB6A06F496500396C9CFE",
+          "observation": {
+            "case": "migration-origin-1.0.0-f200-successor",
+            "stage": "reload",
+            "status": "passed",
+            "source_origin": "1.0.0",
+            "source_rows": 21,
+            "source_actual_labs": 1,
+            "candidate_actual_labs": 1,
+            "source_direct_level": 2,
+            "candidate_direct_level": 3,
+            "source_gear_bonus": 0.10000000149011612,
+            "candidate_gear_bonus": 0.20000000298023224,
+            "foreign_queue_progress": 0.42000000000000004,
+            "detached_progress": 0.27,
+            "effective_breeding_setting": false,
+            "on_load_read_only": true
+          }
+        },
+        {
+          "ordinal": 2,
+          "save_byte_identical": true,
+          "save_sha256": "DD65D37D5192CA621A6F1305B51B7AA1E92EABC2687BB6A06F496500396C9CFE",
+          "observation": {
+            "case": "migration-origin-1.0.0-f200-successor",
+            "stage": "reload",
+            "status": "passed",
+            "source_origin": "1.0.0",
+            "source_rows": 21,
+            "source_actual_labs": 1,
+            "candidate_actual_labs": 1,
+            "source_direct_level": 2,
+            "candidate_direct_level": 3,
+            "source_gear_bonus": 0.10000000149011612,
+            "candidate_gear_bonus": 0.20000000298023224,
+            "foreign_queue_progress": 0.42000000000000004,
+            "detached_progress": 0.27,
+            "effective_breeding_setting": false,
+            "on_load_read_only": true
+          }
+        }
+      ]
+    }
+  ],
+  "actual_native_processes": 6,
+  "actual_new_candidate_lab_completions": 2,
+  "actual_read_only_cold_reloads": 4,
+  "factorio_processes_after_restoration": 0,
+  "limits": [
+    "The source fixture owns its saved .125 mining sentinel. Successor accepts only its saved value or the separately observed zero condition and restores zero after source preflight; cold reloads never reapply it. This does not reconstruct arbitrary foreign modifiers or identify reset cause.",
+    "The false breeding input is the fixture-declared source default; it does not qualify arbitrary persisted user override files.",
+    "Gear cost/time acceleration qualifies genuine completions and effects, not ordinary cost/science tuning or physical production.",
+    "F210 uses actual standalone2.1.23/8DC and A15 observer, not the older Steam/FE4/2E execution. Those prior exact results remain separate.",
+    "The source laboratory is counted once from its historical chain. Repeated carried source/candidate marker counters are not new work."
+  ]
+}

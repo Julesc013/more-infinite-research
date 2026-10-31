@@ -1,0 +1,43 @@
+{
+  "schema": 1,
+  "kind": "mir-native-worker-persisted-fixture-offset-successor",
+  "target": "f210",
+  "factorio_line": "2.1",
+  "engine": {
+    "version": "2.1.23",
+    "sha256": "8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38"
+  },
+  "settings_mode": "Defaults",
+  "mods": [
+    {
+      "name": "base",
+      "version": "2.1.23",
+      "enabled": true
+    },
+    {
+      "name": "a-mir-fixture-worker-entry",
+      "version": "0.1.0",
+      "enabled": true
+    },
+    {
+      "name": "mir-fixture-mir5-active-mods-observer",
+      "version": "0.1.0",
+      "enabled": true
+    },
+    {
+      "name": "more-infinite-research",
+      "version": "5.0.21000",
+      "enabled": true
+    },
+    {
+      "name": "mir-fixture-mir5-f200-legacy-worker",
+      "version": "0.4.0",
+      "enabled": true
+    }
+  ],
+  "archive_sha256": {
+    "more-infinite-research_5.0.21000.zip": "38C84CCBC4BFDA62FCB078772C4690AB81228484744A36D9EA303F5A75B16447",
+    "mir-fixture-mir5-active-mods-observer_0.1.0.zip": "A15A7D628D66953D2E0C4D4FA288F47CBF9C5678327C7EB3D23ADB5DC78331C0"
+  },
+  "scope": "Exact protected published F2004.7.20002 worker save90B23B42FA040368E7ED8E4D720D1682BD252A554A2DEB103CE60D8AF2930D82 to unchanged F21038C/2.1.23/8DC. Distinct0.4 explicit fixture-owned0.123 protocol;new exact-engine observer-order proof required. Original absolute/native/foreign/work assertions,one actual new lab with whole normal-quality science item debit,save/two cold reloads. No F200 or old strict0.2 verdict relabelling;not arbitrary offset recovery or finite first-hold qualification."
+}

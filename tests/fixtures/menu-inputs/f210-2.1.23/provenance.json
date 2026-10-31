@@ -1,0 +1,24 @@
+{
+  "schema": 1,
+  "kind": "MIR5EnginePreparedMenuPlayerDataInputV1",
+  "source": "581770246949882353cdac4e1f724a0556996b8c",
+  "engine": {
+    "path": "D:/Games/Factorio/2.1/bin/x64/factorio.exe",
+    "sha256": "8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38",
+    "file_version": "2.1.23.87750",
+    "product_version": "2.1.23",
+    "base_version": "2.1.23"
+  },
+  "artifact_path": "preparation/write-data/player-data.json",
+  "native_chain": "spec/evidence/library-literal-names-8f-native-chain.json",
+  "native_result_sha256": "377B1EAD0A49B0AFDEDC294AEF1AA3BB0F352CCF6D7C07D87E3541C590BE23C1",
+  "manifest_sha256": "EF6976FB2D94760ABBC094901C22E49C0207AAA1DC512495D038789359D35DFB",
+  "manifest_members_verified": 216,
+  "sha256": "285ED61F8778CFF44FA173F8EDCC5E417F4DF8C1019A3DDD02814729CEE56EF9",
+  "bytes": 10851,
+  "service_credentials_present": false,
+  "manually_modified": false,
+  "scope": "Actual standalone2.1.23 native engine-created player data from the disposable r08 preparation fixture. Untimed credential-free seed only; no ordinary-menu response, graphical rendering or performance result is claimed from this file.",
+  "gzip": "player-data.json.gz",
+  "gzip_sha256": "B0EA75C8D8F0370079C4731E021BD676573315D0DB1E112729FF30D4548090D8"
+}

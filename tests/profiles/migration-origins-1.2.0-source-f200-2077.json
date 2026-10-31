@@ -1,0 +1,41 @@
+{
+  "schema": 1,
+  "kind": "mir5-migration-origin-published-source",
+  "origin_tag": "1.2.0",
+  "origin_source_commit": "b80413b2aa225529a236b7b00a7cee9420af65bc",
+  "target": "f200",
+  "factorio_line": "2.0",
+  "engine": {
+    "version": "2.0.77",
+    "sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B"
+  },
+  "settings_mode": "Defaults",
+  "mods": [
+    {
+      "name": "base",
+      "version": "2.0.77",
+      "enabled": true
+    },
+    {
+      "name": "more-infinite-research",
+      "version": "1.2.0",
+      "enabled": true
+    },
+    {
+      "name": "mir-fixture-mir5-migration-origin-f200-120-source",
+      "version": "0.1.0",
+      "enabled": true
+    },
+    {
+      "name": "mir-fixture-mir5-active-mods-observer",
+      "version": "0.1.0",
+      "enabled": true
+    }
+  ],
+  "archive_sha256": {
+    "more-infinite-research_1.2.0.zip": "880C137F7AB35FE7AF1DA5538BFA91F620C80785134DB488800352DD6154AB22",
+    "mir-fixture-mir5-migration-origin-f200-120-source_0.1.0.zip": "529B53C63715905849DC27D042BDBD9FD4778DC137BC58630A49578E4FD3C659",
+    "mir-fixture-mir5-active-mods-observer_0.1.0.zip": "723D1E7721449FC26040E5E6629416767BDC20AD79CF8723115846DB662A1F87"
+  },
+  "scope": "Prepared exact published MIR 1.2.0 F200 source stage: the raw-Git five-runtime-member fixture is independently pinned to the selected 7714/C512 native facts (34 emitted MIR rows, seven finite shooting-speed rows and 177 settings). It validates source rows/defaults before work, including the Base runtime's suffix-derived finite weapon levels/maxima 1 through 6 and level-seven infinite tail, and accepts only the six independently known Factorio float32 runtime effect spellings alongside the authored data decimals. It records thirty-three scripted infinite-row seeds, player weapon-shooting-speed 1 through 6, a weapon-shooting-speed-1-only foreign witness, one real source gear laboratory, foreign queued .42 and detached .27 state, then saves and performs two read-only reloads. This profile is a source-origin preparation only, not a successor, migration, current-package, performance or release result."
+}

@@ -1,0 +1,73 @@
+{
+  "schema": 1,
+  "kind": "mir5-agriculture-matched-defaults-native-selection",
+  "target": "f210",
+  "factorio_line": "2.1",
+  "engine": {
+    "version": "2.1.23",
+    "sha256": "FE4A1DA30F322A0D0B8AEB3DF7276332222BAAA143E2352569B723E84B2B9060"
+  },
+  "settings_mode": "Defaults",
+  "mods": [
+    {
+      "name": "base",
+      "version": "2.1.23",
+      "enabled": true
+    },
+    {
+      "name": "elevated-rails",
+      "version": "2.1.23",
+      "enabled": true
+    },
+    {
+      "name": "quality",
+      "version": "2.1.23",
+      "enabled": true
+    },
+    {
+      "name": "recycler",
+      "version": "2.1.23",
+      "enabled": true
+    },
+    {
+      "name": "space-age",
+      "version": "2.1.23",
+      "enabled": true
+    },
+    {
+      "name": "more-infinite-research",
+      "version": "4.7.21002",
+      "enabled": true
+    },
+    {
+      "name": "mir-fixture-mir5-agriculture-scale",
+      "version": "0.1.0",
+      "enabled": true
+    },
+    {
+      "name": "mir-fixture-mir5-agriculture-scale-paired",
+      "version": "0.1.0",
+      "enabled": true
+    },
+    {
+      "name": "mir-fixture-mir5-agriculture-scale-arm-published",
+      "version": "0.1.0",
+      "enabled": true
+    },
+    {
+      "name": "mir-fixture-mir5-agriculture-scale-matched-tier-32",
+      "version": "0.1.0",
+      "enabled": true
+    },
+    {
+      "name": "mir-fixture-mir5-active-mods-observer",
+      "version": "0.1.0",
+      "enabled": true
+    }
+  ],
+  "scope": "Predeclared F210 2.1.23 matched Defaults agriculture physical witness, published arm at fixed 32-tower-per-force: seven independently captured science packs/prerequisites, two real lab levels, exact 2N native planting events, growth and spoilage witnesses, and two cold reloads. The tier selector changes only the fixture setting. No native or performance result is implied.",
+  "archive_sha256": {
+    "more-infinite-research_4.7.21002.zip": "A4BB8F47232C689B267EF434F557187A8795C47280FA464169DE917FB579517F",
+    "mir-fixture-mir5-active-mods-observer_0.1.0.zip": "2E1BE5952D2A4CC5C74A0D149E075D247BA110A3FAE5B6768D3EAEBABCEF989C"
+  }
+}

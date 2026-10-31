@@ -1,0 +1,35 @@
+{
+  "schema": 1,
+  "kind": "mir5-migration-origin-published-source",
+  "origin_tag": "1.1.0",
+  "origin_source_commit": "2fb64822b82569e3b50f0653e361fb7148f18b63",
+  "target": "f200",
+  "factorio_line": "2.0",
+  "engine": {
+    "version": "2.0.77",
+    "sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B"
+  },
+  "settings_mode": "Defaults",
+  "mods": [
+    {
+      "name": "base",
+      "version": "2.0.77",
+      "enabled": true
+    },
+    {
+      "name": "more-infinite-research",
+      "version": "1.1.0",
+      "enabled": true
+    },
+    {
+      "name": "mir-fixture-mir5-migration-origin-f200-110-source",
+      "version": "0.1.0",
+      "enabled": true
+    }
+  ],
+  "archive_sha256": {
+    "more-infinite-research_1.1.0.zip": "6395C4A5A0F74C67729746D0FBF6162329978B47C5C29D54CC0045F2977C7E44",
+    "mir-fixture-mir5-migration-origin-f200-110-source_0.1.0.zip": "087952B335FEC82F1F32773323257789478B5A132AF7024E0D1434EE742E38ED"
+  },
+  "scope": "Prepared r05 exact official MIR 1.1.0 F200 source stage: the raw-Git five-runtime-member fixture is independently matched against original D3/6395 native data/settings dumps (31 emitted rows and 42 startup bool defaults), validating separate unit ingredients and prerequisites, complete effect multisets, formula/time and raw-field identities. It then records thirty labelled seeds, one real gear laboratory completion, source recipe/robot-battery facts, queued and detached source state, save and two read-only reloads. Failed r03 and never-executed r04 remain distinct adverse/superseded custody. A same-engine or F210 MIR5 successor remains separately pending; this profile is not a migration or current-package pass."
+}

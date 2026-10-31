@@ -1,0 +1,204 @@
+{
+  "schema": 1,
+  "kind": "MIR5CompleteF200CatalogueUpgradeChainV1",
+  "runs": [
+    {
+      "run": 40037273668,
+      "url": "https://github.com/Julesc013/mir-native-worker/actions/runs/40037273668",
+      "manifest_members_verified": 29,
+      "manifest_sha256": "7CDF5641972F53C5318A77FA68061FDF68C81BE64A217E6ADD44A0F97D7A92C4",
+      "cases": [
+        {
+          "path": "gameplay/base/published-4.7/result.json",
+          "status": "failed",
+          "source": "4f8ecf17b6068ace21d3af2d49fa68443a5f1d6a",
+          "receipt": {
+            "gzip": "spec/mir5/evidence/full-catalogue-upgrade-40037273668-gameplay-base-published-4.7-native.json.gz",
+            "uncompressed_sha256": "7172D23701A0384C970721B172FFA44BDFDAB55B87349C841026955227B055C8"
+          },
+          "failure": "[mir441-process-exit] 1"
+        }
+      ]
+    },
+    {
+      "run": 40037789032,
+      "url": "https://github.com/Julesc013/mir-native-worker/actions/runs/40037789032",
+      "manifest_members_verified": 104,
+      "manifest_sha256": "21AA5EF50677D511FC3A22A873C00BE6038EE313A2B0DCDBADEBCB1E989AB29C",
+      "cases": [
+        {
+          "path": "gameplay/base/mir5/result.json",
+          "status": "passed-private-native-fixture",
+          "source": "f3d698de787baed3b9d87da9f776472f19d87520",
+          "receipt": {
+            "gzip": "spec/mir5/evidence/full-catalogue-upgrade-40037789032-gameplay-base-mir5-native.json.gz",
+            "uncompressed_sha256": "4D50ACA2007C28E7BFD8C2914ACFFA4E8C5358DC0A2A1F8879A3E2FE97EBCEDE"
+          },
+          "initial": {
+            "case": "full-catalogue-upgrade",
+            "stage": "initial",
+            "status": "passed",
+            "profile": "base",
+            "qualification": "native-runner-readback-required",
+            "witnesses": {
+              "public_rows": 54,
+              "level_backed_rows": 54,
+              "native_owner_rows": 0,
+              "scripted_rows_not_seeded": 0,
+              "zero_credit_rows": 20,
+              "source_gear_lab": 1,
+              "successor_gear_lab": 1,
+              "queued_progress": 0.42000000000000004,
+              "paused_progress": 0.27,
+              "save_name": "mir5-native-complete",
+              "on_load_read_only": false
+            }
+          },
+          "player": {
+            "sha256": "D7E914312D77E9B46ED90ECBDBEFEC57AF9BB5EDB89EBCB42164EF8EF92300DA",
+            "path": "D:\\Projects\\Factorio\\testmods\\2.0\\more-infinite-research_5.0.20000.zip"
+          },
+          "engine": {
+            "path": "D:\\Games\\Factorio\\2.0\\bin\\x64\\factorio.exe",
+            "sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B",
+            "file_version": "2.0.77.84539",
+            "product_version": "2.0.77",
+            "base_version": "2.0.77"
+          },
+          "two_cold_reloads_byte_identical": true
+        },
+        {
+          "path": "gameplay/base/published-4.7/result.json",
+          "status": "passed-private-native-fixture",
+          "source": "f3d698de787baed3b9d87da9f776472f19d87520",
+          "receipt": {
+            "gzip": "spec/mir5/evidence/full-catalogue-upgrade-40037789032-gameplay-base-published-4.7-native.json.gz",
+            "uncompressed_sha256": "BAC7FD2152BC5E45E5EFDD14FF7C633C4E8F9FA776ECA4545D77AB20239E6DD1"
+          },
+          "initial": {
+            "case": "full-catalogue-upgrade",
+            "stage": "initial",
+            "status": "passed",
+            "profile": "base",
+            "qualification": "native-runner-readback-required",
+            "witnesses": {
+              "public_rows": 54,
+              "level_backed_rows": 54,
+              "native_owner_rows": 0,
+              "scripted_rows_not_seeded": 0,
+              "zero_credit_rows": 20,
+              "source_gear_lab": 1,
+              "successor_gear_lab": 0,
+              "queued_progress": 0.42000000000000004,
+              "paused_progress": 0.27,
+              "save_name": "mir5-native-complete",
+              "on_load_read_only": false
+            }
+          },
+          "player": {
+            "sha256": "F3943EB4D69CCDAC41BD9F922AD03A5C78F34F22D8E7FA5A88A7A658AB1010B7",
+            "path": "D:\\Projects\\Factorio\\testmods\\2.0\\more-infinite-research_4.7.20002.zip"
+          },
+          "engine": {
+            "path": "D:\\Games\\Factorio\\2.0\\bin\\x64\\factorio.exe",
+            "sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B",
+            "file_version": "2.0.77.84539",
+            "product_version": "2.0.77",
+            "base_version": "2.0.77"
+          },
+          "two_cold_reloads_byte_identical": true
+        },
+        {
+          "path": "gameplay/space-age/mir5/result.json",
+          "status": "passed-private-native-fixture",
+          "source": "f3d698de787baed3b9d87da9f776472f19d87520",
+          "receipt": {
+            "gzip": "spec/mir5/evidence/full-catalogue-upgrade-40037789032-gameplay-space-age-mir5-native.json.gz",
+            "uncompressed_sha256": "38280BDAB41FAF674720E59A4B019D62A139091F6FB860A58F343A4E14A6D897"
+          },
+          "initial": {
+            "case": "full-catalogue-upgrade",
+            "stage": "initial",
+            "status": "passed",
+            "profile": "space-age",
+            "qualification": "native-runner-readback-required",
+            "witnesses": {
+              "public_rows": 69,
+              "level_backed_rows": 67,
+              "native_owner_rows": 5,
+              "scripted_rows_not_seeded": 2,
+              "zero_credit_rows": 24,
+              "source_gear_lab": 1,
+              "successor_gear_lab": 1,
+              "queued_progress": 0.42000000000000004,
+              "paused_progress": 0.27,
+              "save_name": "mir5-native-complete",
+              "on_load_read_only": false
+            }
+          },
+          "player": {
+            "sha256": "D7E914312D77E9B46ED90ECBDBEFEC57AF9BB5EDB89EBCB42164EF8EF92300DA",
+            "path": "D:\\Projects\\Factorio\\testmods\\2.0\\more-infinite-research_5.0.20000.zip"
+          },
+          "engine": {
+            "path": "D:\\Games\\Factorio\\2.0\\bin\\x64\\factorio.exe",
+            "sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B",
+            "file_version": "2.0.77.84539",
+            "product_version": "2.0.77",
+            "base_version": "2.0.77"
+          },
+          "two_cold_reloads_byte_identical": true
+        },
+        {
+          "path": "gameplay/space-age/published-4.7/result.json",
+          "status": "passed-private-native-fixture",
+          "source": "f3d698de787baed3b9d87da9f776472f19d87520",
+          "receipt": {
+            "gzip": "spec/mir5/evidence/full-catalogue-upgrade-40037789032-gameplay-space-age-published-4.7-native.json.gz",
+            "uncompressed_sha256": "29C0BD24870A3DE9663A4FD149F187F56793FC00EC3B375EF37E8CB50BB3E839"
+          },
+          "initial": {
+            "case": "full-catalogue-upgrade",
+            "stage": "initial",
+            "status": "passed",
+            "profile": "space-age",
+            "qualification": "native-runner-readback-required",
+            "witnesses": {
+              "public_rows": 69,
+              "level_backed_rows": 67,
+              "native_owner_rows": 5,
+              "scripted_rows_not_seeded": 2,
+              "zero_credit_rows": 24,
+              "source_gear_lab": 1,
+              "successor_gear_lab": 0,
+              "queued_progress": 0.42000000000000004,
+              "paused_progress": 0.27,
+              "save_name": "mir5-native-complete",
+              "on_load_read_only": false
+            }
+          },
+          "player": {
+            "sha256": "F3943EB4D69CCDAC41BD9F922AD03A5C78F34F22D8E7FA5A88A7A658AB1010B7",
+            "path": "D:\\Projects\\Factorio\\testmods\\2.0\\more-infinite-research_4.7.20002.zip"
+          },
+          "engine": {
+            "path": "D:\\Games\\Factorio\\2.0\\bin\\x64\\factorio.exe",
+            "sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B",
+            "file_version": "2.0.77.84539",
+            "product_version": "2.0.77",
+            "base_version": "2.0.77"
+          },
+          "two_cold_reloads_byte_identical": true
+        }
+      ]
+    }
+  ],
+  "scope": [
+    "F2002.0.77 Base/Space Age published4.7.2\u2192MIR5, with104 accepted-run artifact members verified. Every54 Base and67 level-backed Space Age public identity is explicitly level-seeded; the five Space Age native owners are included.",
+    "All declared recipe/native-force/gun effects and complete player/paused-force technology snapshots survive upgrade/save/two cold reloads. Current42% and detached27% gear investment survive. One actual source and one actual successor gear lab are separately witnessed.",
+    "Two Space Age scripted identities are presence-checked but not level-seeded or claimed as actual scripted research. Their separate runtime qualifications remain necessary.",
+    "The first source stage failed on a nonexistent F200 force property in the fixture; no successor acceptance was claimed. The unsupported write was removed without weakening any native queue assertion.",
+    "Disposable whole-catalogue states are not a representative player factory or final all-target qualification."
+  ],
+  "release_qualification": false
+}

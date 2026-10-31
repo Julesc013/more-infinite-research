@@ -1,0 +1,279 @@
+{
+  "schema": 1,
+  "kind": "MIRF210BaseInitializationDiagnosticsNativeChainV1",
+  "status": "two-unscored-initialization-line-observations-only",
+  "public_source": "b7caa8df9141523a556bb57ca8faf7c43d250c3d",
+  "engine_sha256": "8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38",
+  "preserved_original_adverse": "spec/evidence/whole-product-base-f210-menu-initialization-adverse-native-chain-r01.json",
+  "sequence": [
+    {
+      "mode": "audio-disabled",
+      "packet_sha256": "168A8F5F35B788402CADCD6F3A51E6572B372721C989BD0657A44CB9AD07CACC",
+      "caller_sha256": "41D7BAB86279DC56856AB618ED0C0885341062DF5BF6DC6C2FAD8B86536E7196",
+      "terminal_sha256": "6646333926A0B75E51194CB810C1C9C727E1DC2AC372B5DBAD1CDAAE0CADFBFD",
+      "native_pid": 74500,
+      "arguments": [
+        "--config",
+        "D:\\Projects\\Factorio\\mir5-whole-product-capture-fixed-r01\\build\\tmp\\f210-base-audio-initialization-diagnostic-r01\\initialization-config.ini",
+        "--mod-directory",
+        "D:\\Projects\\Factorio\\testmods\\2.1",
+        "--no-log-rotation",
+        "--disable-audio"
+      ],
+      "native_log_initialization_seconds": 52.588,
+      "resource_ledger_rows": 48,
+      "resource_terminal": {
+        "observed_at": "2026-10-29T16:26:34.1463584+00:00",
+        "phase": "completed",
+        "exit_code": 0,
+        "peak_working_set_bytes": 1399480320,
+        "peak_sampled_private_bytes": 3804332032,
+        "completion_predicate_observed": true
+      },
+      "native_process_result": {
+        "status": "passed",
+        "exit_code": 0,
+        "timed_out": false,
+        "passed": true,
+        "completion_predicate_observed": true,
+        "duration_seconds": 53.066966,
+        "peak_working_set_bytes": 1399480320,
+        "peak_sampled_private_bytes": 3804332032,
+        "admission": {
+          "observed_at": "2026-10-29T16:25:41.0426855+00:00",
+          "memory": {
+            "total_bytes": 34045980672,
+            "free_bytes": 16973266944,
+            "committed_bytes": 23545249792,
+            "commit_limit_bytes": 44388642816
+          },
+          "work_volume": {
+            "name": "D:\\",
+            "free_bytes": 168608821248,
+            "total_bytes": 1500099112960
+          },
+          "system_volume": {
+            "name": "C:\\",
+            "free_bytes": 197441081344,
+            "total_bytes": 599395090432
+          }
+        },
+        "duration_measurement": {
+          "scope": "direct-native-executable-start-to-exit",
+          "historical_scope": "governed-powershell-wrapper-tree-start-to-exit",
+          "comparability": "scope-changed; compare only fresh direct-native measurements; no product-speedup claim"
+        },
+        "admission_wait": {
+          "phase": "f210-base-audio-initialization",
+          "admission_wait_seconds": 30,
+          "status": "admitted-without-wait",
+          "attempt_count": 2,
+          "refusal_count": 0,
+          "elapsed_seconds": 0.131,
+          "first_refusal": null,
+          "last_refusal": null,
+          "last_error": null,
+          "started_at": "2026-10-29T16:25:40.9121696+00:00",
+          "deadline_at": "2026-10-29T16:26:10.9121696+00:00",
+          "admission": {
+            "observed_at": "2026-10-29T16:25:41.0426855+00:00",
+            "memory": {
+              "total_bytes": 34045980672,
+              "free_bytes": 16973266944,
+              "committed_bytes": 23545249792,
+              "commit_limit_bytes": 44388642816
+            },
+            "work_volume": {
+              "name": "D:\\",
+              "free_bytes": 168608821248,
+              "total_bytes": 1500099112960
+            },
+            "system_volume": {
+              "name": "C:\\",
+              "free_bytes": 197441081344,
+              "total_bytes": 599395090432
+            }
+          }
+        }
+      },
+      "native_custody_files_per_copy": 9,
+      "native_custody_bytes_per_copy": 2750164,
+      "controller_custody_files_per_copy": 2,
+      "controller_custody_bytes_per_copy": 3589,
+      "restoration": {
+        "status": "restored-direct-library-controls",
+        "profile_sha256": "95E0DF366DF0914493B7BAC46A5D930EB15813AFA845AC29547209EAC0F9C467",
+        "dependency_payload_bytes_copied": 0,
+        "archive_links_created": 0,
+        "archive_extractions": 0,
+        "owned_archive_names_temporarily_hidden": 0,
+        "selected": [
+          {
+            "name": "base",
+            "version": "2.1.23",
+            "path": "D:\\Games\\Factorio\\2.1\\data\\base\\info.json",
+            "builtin": true,
+            "identity": "1B6DF063:00CA000000065833",
+            "sha256": "0DA4FCB137A0C38CD74EEB3A52462169F360F54B95AD0669270D08CFA9AA352F",
+            "bytes": 193
+          },
+          {
+            "name": "mir-fixture-mir5-active-mods-observer",
+            "version": "0.1.0",
+            "path": "D:\\Projects\\Factorio\\testmods\\2.1\\mir-fixture-mir5-active-mods-observer_0.1.0.zip",
+            "builtin": false,
+            "identity": "1B6DF063:00060000000203D0",
+            "sha256": "A15A7D628D66953D2E0C4D4FA288F47CBF9C5678327C7EB3D23ADB5DC78331C0",
+            "bytes": 835
+          }
+        ]
+      },
+      "factorio_processes_after": 0,
+      "menu_observations": 0,
+      "accepted_scores": 0
+    },
+    {
+      "mode": "ordinary-audio",
+      "packet_sha256": "CED3C0F57240A0A2D4A533D9A0C13CDC8483D8B3E9BA96D4AC32F3D58A3CD2C3",
+      "caller_sha256": "7BE55CC5D8A1ADB94AB7501E736BAC93F11F2CF72ABCADF711A28141AC661990",
+      "terminal_sha256": "CF47B5463B0BF399E831A477924AC78A9A22D53D0EC97D35955E4CE13B124A25",
+      "native_pid": 29800,
+      "arguments": [
+        "--config",
+        "D:\\Projects\\Factorio\\mir5-whole-product-capture-fixed-r01\\build\\tmp\\f210-base-normal-initialization-diagnostic-r01\\initialization-config.ini",
+        "--mod-directory",
+        "D:\\Projects\\Factorio\\testmods\\2.1",
+        "--no-log-rotation"
+      ],
+      "native_log_initialization_seconds": 14.12,
+      "resource_ledger_rows": 15,
+      "resource_terminal": {
+        "observed_at": "2026-10-29T16:31:15.1508320+00:00",
+        "phase": "completed",
+        "exit_code": 0,
+        "peak_working_set_bytes": 1634369536,
+        "peak_sampled_private_bytes": 3682725888,
+        "completion_predicate_observed": true
+      },
+      "native_process_result": {
+        "status": "passed",
+        "exit_code": 0,
+        "timed_out": false,
+        "passed": true,
+        "completion_predicate_observed": true,
+        "duration_seconds": 15.488942,
+        "peak_working_set_bytes": 1634369536,
+        "peak_sampled_private_bytes": 3682725888,
+        "admission": {
+          "observed_at": "2026-10-29T16:30:59.6339471+00:00",
+          "memory": {
+            "total_bytes": 34045980672,
+            "free_bytes": 16946040832,
+            "committed_bytes": 23610376192,
+            "commit_limit_bytes": 44388642816
+          },
+          "work_volume": {
+            "name": "D:\\",
+            "free_bytes": 168602120192,
+            "total_bytes": 1500099112960
+          },
+          "system_volume": {
+            "name": "C:\\",
+            "free_bytes": 197445677056,
+            "total_bytes": 599395090432
+          }
+        },
+        "duration_measurement": {
+          "scope": "direct-native-executable-start-to-exit",
+          "historical_scope": "governed-powershell-wrapper-tree-start-to-exit",
+          "comparability": "scope-changed; compare only fresh direct-native measurements; no product-speedup claim"
+        },
+        "admission_wait": {
+          "phase": "f210-base-normal-initialization",
+          "admission_wait_seconds": 30,
+          "status": "admitted-without-wait",
+          "attempt_count": 2,
+          "refusal_count": 0,
+          "elapsed_seconds": 0.128,
+          "first_refusal": null,
+          "last_refusal": null,
+          "last_error": null,
+          "started_at": "2026-10-29T16:30:59.5061134+00:00",
+          "deadline_at": "2026-10-29T16:31:29.5061134+00:00",
+          "admission": {
+            "observed_at": "2026-10-29T16:30:59.6339471+00:00",
+            "memory": {
+              "total_bytes": 34045980672,
+              "free_bytes": 16946040832,
+              "committed_bytes": 23610376192,
+              "commit_limit_bytes": 44388642816
+            },
+            "work_volume": {
+              "name": "D:\\",
+              "free_bytes": 168602120192,
+              "total_bytes": 1500099112960
+            },
+            "system_volume": {
+              "name": "C:\\",
+              "free_bytes": 197445677056,
+              "total_bytes": 599395090432
+            }
+          }
+        }
+      },
+      "native_custody_files_per_copy": 9,
+      "native_custody_bytes_per_copy": 2730205,
+      "controller_custody_files_per_copy": 2,
+      "controller_custody_bytes_per_copy": 3573,
+      "restoration": {
+        "status": "restored-direct-library-controls",
+        "profile_sha256": "95E0DF366DF0914493B7BAC46A5D930EB15813AFA845AC29547209EAC0F9C467",
+        "dependency_payload_bytes_copied": 0,
+        "archive_links_created": 0,
+        "archive_extractions": 0,
+        "owned_archive_names_temporarily_hidden": 0,
+        "selected": [
+          {
+            "name": "base",
+            "version": "2.1.23",
+            "path": "D:\\Games\\Factorio\\2.1\\data\\base\\info.json",
+            "builtin": true,
+            "identity": "1B6DF063:00CA000000065833",
+            "sha256": "0DA4FCB137A0C38CD74EEB3A52462169F360F54B95AD0669270D08CFA9AA352F",
+            "bytes": 193
+          },
+          {
+            "name": "mir-fixture-mir5-active-mods-observer",
+            "version": "0.1.0",
+            "path": "D:\\Projects\\Factorio\\testmods\\2.1\\mir-fixture-mir5-active-mods-observer_0.1.0.zip",
+            "builtin": false,
+            "identity": "1B6DF063:00060000000203D0",
+            "sha256": "A15A7D628D66953D2E0C4D4FA288F47CBF9C5678327C7EB3D23ADB5DC78331C0",
+            "bytes": 835
+          }
+        ]
+      },
+      "factorio_processes_after": 0,
+      "menu_observations": 0,
+      "accepted_scores": 0
+    }
+  ],
+  "native_processes": 2,
+  "responsive_menu_observations": 0,
+  "accepted_scores": 0,
+  "receipt_capsule": {
+    "path": "spec/evidence/f210-base-initialization-diagnostics-receipts-r01.json.gz",
+    "sha256": "DF984FA4BDCFEC23612335EABD2850B52668BC1E09DB6ED3F32EFBA399B22744",
+    "bytes": 68199,
+    "bodies": 28
+  },
+  "independent_review": "Both exact packets received independent predispatch GO and actual post-run source/copy/process/log/resource/control-restoration review. No native menu, causal or performance verdict is inferred.",
+  "interpretation": "The later ordinary-audio probe also initialized,so the original stall did not recur. Cause remains unidentified. The sequential probes have uncontrolled OS/game caches and are not an isolated audio-effect estimate. Engine log offsets and governor durations are retained diagnostic facts,not the process-to-responsive-menu endpoint.",
+  "limits": [
+    "No HWND/capture/harmless interaction proof,gameplay,active-factory,parity,score or release acceptance.",
+    "Neither probe nor the original adverse is pooled into the fresh F210 menu cohort.",
+    "No MIR archive was selected or staged;no dependency copies,links or extractions. All direct-library controls restored and both engines closed."
+  ],
+  "performance_acceptance": false,
+  "release_qualification": false
+}

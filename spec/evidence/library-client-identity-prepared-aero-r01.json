@@ -1,0 +1,284 @@
+{
+  "schema": 1,
+  "kind": "MIRLibraryClientIdentityPreparedInputsV1",
+  "status": "fixture-prepared-not-native-qualified",
+  "fixture_source": "d9e6dd74427763b09d8f21da585b17e059dedd08",
+  "player_source": "42032477d45ced683e72736a4fe30a7a3195b995",
+  "player_tree": "5a6adf0aab4e945aeca13420ddd045ad45f050a0",
+  "changed_player_members": [],
+  "previous_preparations": [
+    {
+      "path": "spec/evidence/library-native-input-imported110-prepared-aero-r02.json",
+      "bytes": 17600,
+      "sha256": "CB68988B9CB163FD4C52ACC3680BBF7872B9F261A37C0E8CC30F59E854DBEF7C"
+    },
+    {
+      "path": "spec/evidence/library-support-exports-imported110-prepared-aero-r03.json",
+      "bytes": 12710,
+      "sha256": "1263FEF81E9DAB41B357A3277DCC50B895D196555B934C46B59B354D013A0FA4"
+    }
+  ],
+  "reported_adverse": {
+    "source": "https://github.com/Julesc013/more-infinite-research/pull/1416#issuecomment-6522550039",
+    "terminal_sha256": "DDF30FA54324027CE2FFBBE41E44D97331764184E99D33D82CC96C3FAF1883BA",
+    "scope": "Black Glass R04 fixture failure before inspection/input; original custody/restoration retained; no new Aero execution",
+    "index_correction": "https://github.com/Julesc013/more-infinite-research/pull/1416#issuecomment-6522835612",
+    "zero_lua_index_observed": false
+  },
+  "profiles": [
+    {
+      "target": "f200",
+      "mode": "input",
+      "version": "0.3.0",
+      "profile": {
+        "path": "tests/profiles/library-native-input-imported110-f200-2077-r03.json",
+        "bytes": 2619,
+        "sha256": "9C457681F75BC98F909B00DCB66F627A1086CCEE9FF76A94F9835649B1734BDA"
+      },
+      "protected_input_save": {
+        "sha256": "029AA881F739457047B1E8318FA9A77508B28112757176B64CD0C3C31530638C",
+        "bytes": 811812,
+        "original_chain": "spec/evidence/migration-origin-110-7a2-direct-native-chain-r01.json"
+      },
+      "engine": {
+        "version": "2.0.77",
+        "sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B"
+      },
+      "archive_sha256": {
+        "more-infinite-research_5.0.20000.zip": "7CAC54475107736106D84AF98D50A8622E095B6658F1E3682643FE0CBA8BAEF0",
+        "mir-fixture-mir5-active-mods-observer_0.1.0.zip": "723D1E7721449FC26040E5E6629416767BDC20AD79CF8723115846DB662A1F87",
+        "mir-fixture-mir5-migration-origin-f200-110-source_0.3.0.zip": "D30D00A0D57A2A8195565E52DCEFDF94B92DCBA37DC85A83B37245336157E9C0",
+        "mir-fixture-mir5-library-native-input_0.3.0.zip": "96499F1F3AB2F6AD721EEA7F3FAB532E5160731DF105ADF5E8489CA9341D2040"
+      },
+      "owned_fixture": {
+        "name": "mir-fixture-mir5-library-native-input_0.3.0.zip",
+        "bytes": 6379,
+        "sha256": "96499F1F3AB2F6AD721EEA7F3FAB532E5160731DF105ADF5E8489CA9341D2040",
+        "local_custody": "build/qualification/library-fixture-client-identity-aero-r01/f200/input/mir-fixture-mir5-library-native-input_0.3.0.zip",
+        "members": [
+          {
+            "source": "tests/fixtures/library-native-input/control.lua",
+            "source_revision": "d9e6dd74427763b09d8f21da585b17e059dedd08",
+            "destination": "control.lua",
+            "bytes": 21557,
+            "sha256": "C4FF383DA0CB163DF8C721B96DE97F2AB74BB70ECC5A6E76F9D08D7CE7D24971"
+          },
+          {
+            "source": "tests/fixtures/library-native-input/info-input-identity-f200.json",
+            "source_revision": "d9e6dd74427763b09d8f21da585b17e059dedd08",
+            "destination": "info.json",
+            "bytes": 345,
+            "sha256": "CC35B55624B2F95EAA2B198048C2C413D787F4EB3FD62EB0938E68CA2B5A7F81"
+          }
+        ]
+      }
+    },
+    {
+      "target": "f200",
+      "mode": "exports",
+      "version": "0.4.0",
+      "profile": {
+        "path": "tests/profiles/library-support-exports-imported110-f200-2077-r04.json",
+        "bytes": 2597,
+        "sha256": "11F56F05563F9DEE90F6CAC1CC8003C5A87784EFEA8209261AA1EFF41051811F"
+      },
+      "protected_input_save": {
+        "sha256": "029AA881F739457047B1E8318FA9A77508B28112757176B64CD0C3C31530638C",
+        "bytes": 811812,
+        "original_chain": "spec/evidence/migration-origin-110-7a2-direct-native-chain-r01.json"
+      },
+      "engine": {
+        "version": "2.0.77",
+        "sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B"
+      },
+      "archive_sha256": {
+        "more-infinite-research_5.0.20000.zip": "7CAC54475107736106D84AF98D50A8622E095B6658F1E3682643FE0CBA8BAEF0",
+        "mir-fixture-mir5-active-mods-observer_0.1.0.zip": "723D1E7721449FC26040E5E6629416767BDC20AD79CF8723115846DB662A1F87",
+        "mir-fixture-mir5-migration-origin-f200-110-source_0.3.0.zip": "D30D00A0D57A2A8195565E52DCEFDF94B92DCBA37DC85A83B37245336157E9C0",
+        "mir-fixture-mir5-library-native-input_0.4.0.zip": "6D6362DF9998F54B71D0BBCDC5DF82A800C5BE802CF8279E86C2ADA6A469845C"
+      },
+      "owned_fixture": {
+        "name": "mir-fixture-mir5-library-native-input_0.4.0.zip",
+        "bytes": 10918,
+        "sha256": "6D6362DF9998F54B71D0BBCDC5DF82A800C5BE802CF8279E86C2ADA6A469845C",
+        "local_custody": "build/qualification/library-fixture-client-identity-aero-r01/f200/exports/mir-fixture-mir5-library-native-input_0.4.0.zip",
+        "members": [
+          {
+            "source": "tests/fixtures/library-native-input/control.lua",
+            "source_revision": "d9e6dd74427763b09d8f21da585b17e059dedd08",
+            "destination": "control.lua",
+            "bytes": 21557,
+            "sha256": "C4FF383DA0CB163DF8C721B96DE97F2AB74BB70ECC5A6E76F9D08D7CE7D24971"
+          },
+          {
+            "source": "tests/fixtures/library-native-input/info-exports-identity-f200.json",
+            "source_revision": "d9e6dd74427763b09d8f21da585b17e059dedd08",
+            "destination": "info.json",
+            "bytes": 348,
+            "sha256": "CB5FC6B73C0F6E8C45EA5046F3334EFC03B0518EBEEA24C2FD9A02B595CCAD74"
+          },
+          {
+            "source": "tests/fixtures/library-native-input/support-exports.lua",
+            "source_revision": "d9e6dd74427763b09d8f21da585b17e059dedd08",
+            "destination": "support-exports.lua",
+            "bytes": 14591,
+            "sha256": "EF6EE15F0DFB790171323374EE0BB572606D16474AE2099004542EF70877FB9F"
+          }
+        ]
+      }
+    },
+    {
+      "target": "f210",
+      "mode": "input",
+      "version": "0.3.0",
+      "profile": {
+        "path": "tests/profiles/library-native-input-imported110-f210-2123-r03.json",
+        "bytes": 2619,
+        "sha256": "3691DBA7A2B6315515C78A0AB1771EE069379A20F3F0687F92C74E756E6A1435"
+      },
+      "protected_input_save": {
+        "sha256": "8DCFC16FF929766D2E5CFEC4F7BC81367A9632CEB4B39558E40330FA43BD7F0C",
+        "bytes": 814068,
+        "original_chain": "spec/evidence/migration-origin-110-7a2-direct-native-chain-r01.json"
+      },
+      "engine": {
+        "version": "2.1.23",
+        "sha256": "8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38"
+      },
+      "archive_sha256": {
+        "more-infinite-research_5.0.21000.zip": "B63743C36432E4C41CC0F56D5A48CABE81924D426EF11045095A9D5ED0430D7B",
+        "mir-fixture-mir5-active-mods-observer_0.1.0.zip": "A15A7D628D66953D2E0C4D4FA288F47CBF9C5678327C7EB3D23ADB5DC78331C0",
+        "mir-fixture-mir5-migration-origin-f200-110-source_0.4.0.zip": "E07DF42B2FBFACEA5BA32F3E616AF5BBFAB4E355B116187DC023252CFCD09B43",
+        "mir-fixture-mir5-library-native-input_0.3.0.zip": "25D597388770A5BE0333949216F05CD5182BCDB4725561998D5B3620338D046D"
+      },
+      "owned_fixture": {
+        "name": "mir-fixture-mir5-library-native-input_0.3.0.zip",
+        "bytes": 6382,
+        "sha256": "25D597388770A5BE0333949216F05CD5182BCDB4725561998D5B3620338D046D",
+        "local_custody": "build/qualification/library-fixture-client-identity-aero-r01/f210/input/mir-fixture-mir5-library-native-input_0.3.0.zip",
+        "members": [
+          {
+            "source": "tests/fixtures/library-native-input/control.lua",
+            "source_revision": "d9e6dd74427763b09d8f21da585b17e059dedd08",
+            "destination": "control.lua",
+            "bytes": 21557,
+            "sha256": "C4FF383DA0CB163DF8C721B96DE97F2AB74BB70ECC5A6E76F9D08D7CE7D24971"
+          },
+          {
+            "source": "tests/fixtures/library-native-input/info-input-identity-f210.json",
+            "source_revision": "d9e6dd74427763b09d8f21da585b17e059dedd08",
+            "destination": "info.json",
+            "bytes": 345,
+            "sha256": "A9B20176471FF3D329306D199EEB02CB99492AC299FEDB63DA27C9429C0524B5"
+          }
+        ]
+      }
+    },
+    {
+      "target": "f210",
+      "mode": "exports",
+      "version": "0.4.0",
+      "profile": {
+        "path": "tests/profiles/library-support-exports-imported110-f210-2123-r04.json",
+        "bytes": 2597,
+        "sha256": "50988621122FF6B25725793EEED79D9198BC541B8F6BDCF877C508125B220AC5"
+      },
+      "protected_input_save": {
+        "sha256": "8DCFC16FF929766D2E5CFEC4F7BC81367A9632CEB4B39558E40330FA43BD7F0C",
+        "bytes": 814068,
+        "original_chain": "spec/evidence/migration-origin-110-7a2-direct-native-chain-r01.json"
+      },
+      "engine": {
+        "version": "2.1.23",
+        "sha256": "8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38"
+      },
+      "archive_sha256": {
+        "more-infinite-research_5.0.21000.zip": "B63743C36432E4C41CC0F56D5A48CABE81924D426EF11045095A9D5ED0430D7B",
+        "mir-fixture-mir5-active-mods-observer_0.1.0.zip": "A15A7D628D66953D2E0C4D4FA288F47CBF9C5678327C7EB3D23ADB5DC78331C0",
+        "mir-fixture-mir5-migration-origin-f200-110-source_0.4.0.zip": "E07DF42B2FBFACEA5BA32F3E616AF5BBFAB4E355B116187DC023252CFCD09B43",
+        "mir-fixture-mir5-library-native-input_0.4.0.zip": "20504B66CC353C6BBC9C60A1E99DB583654B3A9B9E4D1A958B9991CA142B44A1"
+      },
+      "owned_fixture": {
+        "name": "mir-fixture-mir5-library-native-input_0.4.0.zip",
+        "bytes": 10917,
+        "sha256": "20504B66CC353C6BBC9C60A1E99DB583654B3A9B9E4D1A958B9991CA142B44A1",
+        "local_custody": "build/qualification/library-fixture-client-identity-aero-r01/f210/exports/mir-fixture-mir5-library-native-input_0.4.0.zip",
+        "members": [
+          {
+            "source": "tests/fixtures/library-native-input/control.lua",
+            "source_revision": "d9e6dd74427763b09d8f21da585b17e059dedd08",
+            "destination": "control.lua",
+            "bytes": 21557,
+            "sha256": "C4FF383DA0CB163DF8C721B96DE97F2AB74BB70ECC5A6E76F9D08D7CE7D24971"
+          },
+          {
+            "source": "tests/fixtures/library-native-input/info-exports-identity-f210.json",
+            "source_revision": "d9e6dd74427763b09d8f21da585b17e059dedd08",
+            "destination": "info.json",
+            "bytes": 348,
+            "sha256": "53401B449105C11B80FF69667665EAB03E6FBC3D68A855D353D172A28D0FD78D"
+          },
+          {
+            "source": "tests/fixtures/library-native-input/support-exports.lua",
+            "source_revision": "d9e6dd74427763b09d8f21da585b17e059dedd08",
+            "destination": "support-exports.lua",
+            "bytes": 14591,
+            "sha256": "EF6EE15F0DFB790171323374EE0BB572606D16474AE2099004542EF70877FB9F"
+          }
+        ]
+      }
+    }
+  ],
+  "readiness": {
+    "roles": {
+      "en": "MIR5English",
+      "de": "MIR5Deutsch"
+    },
+    "input_report_fields": [
+      "en_index",
+      "de_index",
+      "en_name",
+      "de_name",
+      "en_locale",
+      "de_locale",
+      "en_connected",
+      "de_connected"
+    ],
+    "export_report_fields": [
+      "geometry.en.index",
+      "geometry.de.index",
+      "geometry.en.name",
+      "geometry.de.name",
+      "geometry.en.locale",
+      "geometry.de.locale",
+      "geometry.en.connected",
+      "geometry.de.connected"
+    ],
+    "rules": [
+      "Join callbacks bind exact names,phase and retained index; locale is not identity.",
+      "Caller waits for actual connected en/de locales before inspect or prepare; fixture pair assertions remain mandatory.",
+      "Input replacement uses the same declared German name with a new native player index; restart uses the saved replacement identity.",
+      "Numeric0 and absent false are distinct in Lua; host controls cover0 without claiming a native observation."
+    ]
+  },
+  "validation": {
+    "opponent_before": "Four retained host failures include English identity changed and unknown-name false acceptance.",
+    "focused_pinned_lua52_controls": 12,
+    "archives": "four tiny observer ZIPs repeat-reproduced; CRC,metadata,sorted members and raw-Git payloads verified",
+    "new_native_execution": false,
+    "nonfinal_metadata_commit": {
+      "commit": "e06bb5d6d040dc8b151ef713ad9ce9b4eb1c7b56",
+      "disposition": "Preserved local CRLF whitespace adverse before any archive build; corrected by d9e6dd7. Its native-index0 wording is not a demonstrated native fact; the explicit correction above applies.",
+      "adverse_readback": "build/qualification/library-fixture-client-identity-aero-r01/metadata-whitespace-adverse-readback-r01.log"
+    }
+  },
+  "native_owner_next": "Black Glass binds reviewed caller/new fixture hashes/profiles/actual locale readiness and original preserved save; no Aero dispatch or direct-library staging.",
+  "limits": [
+    "Original0.1/0.2 sources/records/ZIPs and R04 adverse are preserved under original refs.",
+    "The input protocol retains48 private probes,5 joins,2 effect resets,2 key closes,1 removal and2 new saves; export protocol retains13 clicks,5 joins,2 distinct server exports and2 saves.",
+    "Protected native rows/effects/queues/foreign forces and personal input/lifecycle assertions are unchanged.",
+    "A corrected fixture is not a native retry/pass; package provenance,upgrade safety and remaining functional gates still require their actual verdicts."
+  ],
+  "performance_acceptance": false,
+  "release_qualification": false
+}

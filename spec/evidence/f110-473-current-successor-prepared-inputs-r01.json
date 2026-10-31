@@ -1,0 +1,169 @@
+{
+  "schema": 1,
+  "kind": "MIRF110473CurrentSuccessorPreparedInputsV1",
+  "status": "prepared-no-native-result",
+  "controller_source": "d614f18d6081f1df356ef2317fd493a9842208e6",
+  "candidate_source": "7a2f93224c846b86261b2da709f50ea683fc708d",
+  "player_tree": "5058373348e9049f8b67ec4dbb79b400a904acd6",
+  "controller": {
+    "path": "tools/Invoke-NativeFixture.ps1",
+    "sha256": "891C5D182BA684B0931E79CD6D88EB43234636A8693A2920BF7FF39E5AC57262"
+  },
+  "profile": {
+    "path": "tests/profiles/f110-473-current-successor-11110.json",
+    "sha256": "EFF8363309F4B95924C1E31ED617C44EA5CF3209C1FF10825E308FA15D69FCF0"
+  },
+  "candidate": {
+    "filename": "more-infinite-research_5.0.11000.zip",
+    "sha256": "1C3D982CD048D3C83BF75108F1F9AC769CE0DC833A2DE056CDE16EF8AE2925A9",
+    "bytes": 454014
+  },
+  "engine": {
+    "family": "1.1",
+    "base": "1.1.110",
+    "sha256": "B7B4B834FCA2E32AFA9D3476EB42CC09B02F1205BE97F688DC6FC6ACE7BA8FE1"
+  },
+  "protected_source": {
+    "chain": "spec/evidence/f110-f200-published-source-r05-native-chain.json",
+    "chain_sha256": "BFF56165FCB7B3F5F5FACA29EE9A4E244DCA92833C0A6CE247BE40CF67E83CE2",
+    "path": "build/mir5/recovery-historical/f110-f200-transition-published-f110-source-r05/native-output/write-data/saves/mir5-native-complete.zip",
+    "sha256": "D524AA78440F242B179A1E9BC40BF89B87C1A66E99F64C14D3250DEAEBB69253",
+    "origin_version": "4.7.11003",
+    "origin_archive_sha256": "66C127D8BFC1919FA88F19D2D9B3047316A1B90401CAA05A6D05979B7A099D1E",
+    "recreated": false,
+    "private_source_save_not_rehashed_on_aero": true
+  },
+  "fixture": {
+    "filename": "mir-fixture-mir5-f110-f200-transition_0.3.0.zip",
+    "sha256": "5D265E1FC24BA77806D7CF57AD6A6EEDD90EBDAA060575835E62EBA932E458F2",
+    "bytes": 8146,
+    "source_member_revision": "d614f18d6081f1df356ef2317fd493a9842208e6",
+    "composition": {
+      "catalogue.lua": "tests/fixtures/f110-f200-transition/f110/successor/catalogue.lua",
+      "control.lua": "tests/fixtures/f110-f200-transition/f110/successor/control.lua",
+      "data-final-fixes.lua": "tests/fixtures/f110-f200-transition/f110/successor/data-final-fixes.lua",
+      "info.json": "tests/fixtures/f110-f200-transition/f110/successor/info.json",
+      "settings-updates.lua": "tests/fixtures/f110-f200-transition/f110/successor/settings-updates.lua",
+      "fixture_control.lua": "tests/fixtures/f110-f200-transition/shared/control.lua",
+      "fixture_data_final.lua": "tests/fixtures/f110-f200-transition/shared/data-final-fixes.lua"
+    },
+    "members": [
+      {
+        "path": "catalogue.lua",
+        "source_path": "tests/fixtures/f110-f200-transition/f110/successor/catalogue.lua",
+        "sha256": "160CD96CC0FF632FFED523B397AB959566E2037C89ED6F21A51C0D10BBF9B7A8",
+        "bytes": 892
+      },
+      {
+        "path": "control.lua",
+        "source_path": "tests/fixtures/f110-f200-transition/f110/successor/control.lua",
+        "sha256": "241F2A3287C9FCF7C32C0A1C85553E1D3FEC674234CFD1FB1809FFE0D2D12A35",
+        "bytes": 69
+      },
+      {
+        "path": "data-final-fixes.lua",
+        "source_path": "tests/fixtures/f110-f200-transition/f110/successor/data-final-fixes.lua",
+        "sha256": "245BA7ECF6D89F38F3EAB6650A1F860E5C4EACF238A2F85E96F3183ABE135633",
+        "bytes": 1674
+      },
+      {
+        "path": "fixture_control.lua",
+        "source_path": "tests/fixtures/f110-f200-transition/shared/control.lua",
+        "sha256": "5EE5E4DA4673B4D1D92FD3F3B0D484B4B61EC235BAA52DD0CC3230EB954E473B",
+        "bytes": 23139
+      },
+      {
+        "path": "fixture_data_final.lua",
+        "source_path": "tests/fixtures/f110-f200-transition/shared/data-final-fixes.lua",
+        "sha256": "7800724E366BB792AA4EDA0CE834C943463A83AA439D91F6B2A1F2D900ED6426",
+        "bytes": 233
+      },
+      {
+        "path": "info.json",
+        "source_path": "tests/fixtures/f110-f200-transition/f110/successor/info.json",
+        "sha256": "65D005285EAF30C7B6F93A8FF0BA68BB41B666DA5EB59566621060E835D0FE6C",
+        "bytes": 383
+      },
+      {
+        "path": "settings-updates.lua",
+        "source_path": "tests/fixtures/f110-f200-transition/f110/successor/settings-updates.lua",
+        "sha256": "BFE0CC16FAF567AA7545EDF7A6410C78DD170D8CBDC22E881EAB935BAFE81EA7",
+        "bytes": 77
+      }
+    ]
+  },
+  "command": {
+    "entrypoint": "tools/Invoke-NativeFixture.ps1",
+    "mode": "F110SameEditionSuccessor",
+    "case_name": "f110-f200-transition",
+    "profile_path": "tests/profiles/f110-473-current-successor-11110.json",
+    "fixture_source": "build/qualification/f110-473-current-successor-prepared-r01/source",
+    "input_save": "protected_source.path above; verify actual unchanged D524 bytes before launch",
+    "expected_input_save_sha256": "D524AA78440F242B179A1E9BC40BF89B87C1A66E99F64C14D3250DEAEBB69253",
+    "expected_mir_archive_sha256": "1C3D982CD048D3C83BF75108F1F9AC769CE0DC833A2DE056CDE16EF8AE2925A9",
+    "timeout_seconds": 180,
+    "expected_peak_memory_mib": 4096,
+    "admission_wait_seconds": 30,
+    "owner_bindings_required": [
+      "actual exact engine locator",
+      "existing direct archive library under exclusive ownership",
+      "fresh checkout-local governor-admitted output path",
+      "frozen committed caller and actual fixture container pin"
+    ]
+  },
+  "independent_expected_result": {
+    "retained_rows": 17,
+    "source_seeded_rows": 16,
+    "source_lab_completions_reused": 1,
+    "new_successor_mining_lab_completions": 1,
+    "mining_total_effect": 0.1,
+    "inserter_stack_size_bonus": 2,
+    "stack_inserter_capacity_bonus": 4,
+    "source_queued_progress": 0.42,
+    "detached_progress": 0.27,
+    "foreign_direct_disabled": true,
+    "post_lab_queue": [
+      "braking-force-1"
+    ],
+    "cold_reloads": 2,
+    "completed_save_byte_identical_through_reloads": true
+  },
+  "preflight_expectations": {
+    "direct": "recipe-prod-research_character_mining_speed-1",
+    "count_formula": "1*(8000*2^(L-1))",
+    "time": 60,
+    "ingredients": [
+      [
+        "military-science-pack",
+        1
+      ],
+      [
+        "utility-science-pack",
+        1
+      ]
+    ],
+    "effect": {
+      "type": "character-mining-speed",
+      "modifier": 0.05
+    },
+    "basis": [
+      "tests/test_historical_transition_fixture.py F110 target contract",
+      "source/compatibility/historical_direct.lua reduced-target mapping",
+      "unchanged D524 saved snapshot remains authoritative for actual levels/effects"
+    ]
+  },
+  "validation": {
+    "host_fixture_controls": 5,
+    "host_runner_controls": 5,
+    "independent_read_only_review": "approved after AST process-routing guard was corrected",
+    "repository_static": "pass",
+    "seven_raw_git_members_match_fixture_archive_and_working_authorities": true,
+    "native_execution": false,
+    "resource_or_library_mutation": false
+  },
+  "limits": [
+    "Preserve original D524/source fixture and prior cross-engine results; this distinct0.3.0 successor is not a relabelled0.1/0.2 container.",
+    "Player archive unchanged. Preparation is not native save, client, complete-target catalogue, performance or release qualification.",
+    "Black Glass must verify private source bytes and actual controls, freeze its caller, then retain one successor lab/save/two-reload result and complete owner-side custody readback."
+  ]
+}

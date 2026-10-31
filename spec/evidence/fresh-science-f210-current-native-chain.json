@@ -1,0 +1,143 @@
+{
+  "schema": 1,
+  "kind": "MIR5FreshScienceF210CurrentNativeChainV1",
+  "status": "both-exact-source-create-only-retention-arms-passed",
+  "source_commit": "f683ced69ea14fd07ddb592f50cd84c682242ab6",
+  "controller_commit": "560643a1c67e04452741b56dd8434aad9886a664",
+  "controller_provenance": {
+    "source": "GitHub Actions run head_sha",
+    "artifact_attested": false,
+    "scope": "External workflow identity; native input and fixture identities are independently checked in artifact receipts."
+  },
+  "frozen_workflow_ref": "test/f210-fresh-science-noop-r02",
+  "run": 40166552270,
+  "url": "https://github.com/Julesc013/mir-native-worker/actions/runs/40166552270",
+  "task": "fresh-science-sources-canonical",
+  "engine": {
+    "version": "2.1.23",
+    "sha256": "FE4A1DA30F322A0D0B8AEB3DF7276332222BAAA143E2352569B723E84B2B9060"
+  },
+  "manifest_sha256": "1FA841E260041743C3EF935C22A178DB13136E5510D452F53CCA4CCFCA56CAEB",
+  "original_members_verified": 30,
+  "staged_raw_git_members_verified": 6,
+  "native_stage_log_markers_verified": 3,
+  "arms": [
+    {
+      "stage": "candidate",
+      "player_sha256": "C8E0C570213F41CA8C816A29D1556FD40A36896D31ED56B07856652B2DE7F32A",
+      "native_result_sha256": "1EA0C7D88144076D5C769210722FD89F68EE831724BE79942A779C3753043D82",
+      "create_log_sha256": "6D82A609DBCB9B74353F00A2584573C7FBC55C6CF15C7C3731DA0AD1BF7CB066",
+      "retained": 65,
+      "effects": 146,
+      "selected_owner": "mir473-seeded-planetary-owner",
+      "actual_observer_sha256": "2E1BE5952D2A4CC5C74A0D149E075D247BA110A3FAE5B6768D3EAEBABCEF989C",
+      "controls_restored": true
+    },
+    {
+      "stage": "published",
+      "player_sha256": "B6EB9430056ABD384DB00F94929FE7DAC0A37441ACF4BC277946689682628852",
+      "native_result_sha256": "18E51CF6A945069DF11088ABBD8128BEE5A6407A57ADD7A39D6AB1A4958039C7",
+      "create_log_sha256": "59B5FF00B4900CC45FD0407C92D78C8FD7307DF4138284E277079F4E70A91720",
+      "retained": 65,
+      "effects": 148,
+      "selected_owner": "mir473-seeded-planetary-owner",
+      "actual_observer_sha256": "2E1BE5952D2A4CC5C74A0D149E075D247BA110A3FAE5B6768D3EAEBABCEF989C",
+      "controls_restored": true
+    }
+  ],
+  "effect_count_comparison": {
+    "candidate": 146,
+    "published": 148,
+    "equal": false,
+    "disposition": "Separate observed counts; retention checks do not establish complete effect or catalogue parity."
+  },
+  "earlier_observation": {
+    "run": 40165708969,
+    "controller": "d6958a1aec7685d0712a4b248030c5adc5c5c2ef",
+    "original_members_verified": 22,
+    "manifest_sha256": "94CAF6BF1B01ECDD864F361D4282B254EEAE279DCDABA080208D9D1FC350B3B8",
+    "candidate_positive": {
+      "stage": "candidate",
+      "player_sha256": "C8E0C570213F41CA8C816A29D1556FD40A36896D31ED56B07856652B2DE7F32A",
+      "native_result_sha256": "8787AB5D5F865AB87C17A986BB3E96A3B018486BF30E08FF9E9132B08A3C05EA",
+      "create_log_sha256": "D2B619CDC28A4A8BD78FEBB1F7FAEACDBF017AA669F485803128B52E6B488649",
+      "retained": 65,
+      "effects": 146,
+      "selected_owner": "mir473-seeded-planetary-owner",
+      "actual_observer_sha256": "2E1BE5952D2A4CC5C74A0D149E075D247BA110A3FAE5B6768D3EAEBABCEF989C",
+      "controls_restored": true
+    },
+    "published": "unrun; same-path own-archive installer failed before its engine invocation",
+    "receipt_sha256": "0955072B6122F25D85039F6BA000F587C1EB42453116BB96E5FF2DB1D1B5550B",
+    "url": "https://github.com/Julesc013/mir-native-worker/actions/runs/40165708969",
+    "classification": "Candidate native positive followed by a pre-engine published-arm installer failure; original workflow remains failed.",
+    "correction_original_commit": "dbe47b2489a6c1ce66ea015deec107c25e9f9a22",
+    "correction_accepted_commit": "560643a1c67e04452741b56dd8434aad9886a664"
+  },
+  "primary_custody": "build/mir5/recovery-historical/fresh-science-sources-canonical",
+  "independent_readback_sha256": "BEF5B509017FC5FB2AE1D34DCD296FF06F298FB3CB099BA0A9A59E61929C45C4",
+  "portable_capsule": {
+    "path": "fresh-science-f210-current-native-capsule.zip",
+    "sha256": "ECD64F401E335053298DACFAD68A6B93FA482C6E5201CA8DA7569E9ECBA76B3E",
+    "bytes": 18011,
+    "members": [
+      {
+        "path": "artifact-manifest.json",
+        "bytes": 6253,
+        "sha256": "1FA841E260041743C3EF935C22A178DB13136E5510D452F53CCA4CCFCA56CAEB",
+        "custody": "exact original artifact bytes"
+      },
+      {
+        "path": "preparation-receipt.json",
+        "bytes": 6446,
+        "sha256": "95E71668F932D931985076023994AAF26241A1DDB3A7C59522A5CD56C547584B",
+        "custody": "exact original artifact bytes"
+      },
+      {
+        "path": "candidate-native-result.json",
+        "bytes": 16050,
+        "sha256": "1EA0C7D88144076D5C769210722FD89F68EE831724BE79942A779C3753043D82",
+        "custody": "exact original artifact bytes"
+      },
+      {
+        "path": "published-native-result.json",
+        "bytes": 16047,
+        "sha256": "18E51CF6A945069DF11088ABBD8128BEE5A6407A57ADD7A39D6AB1A4958039C7",
+        "custody": "exact original artifact bytes"
+      },
+      {
+        "path": "earlier-artifact-manifest.json",
+        "bytes": 4630,
+        "sha256": "94CAF6BF1B01ECDD864F361D4282B254EEAE279DCDABA080208D9D1FC350B3B8",
+        "custody": "exact original artifact bytes"
+      },
+      {
+        "path": "earlier-preparation-receipt.json",
+        "bytes": 6278,
+        "sha256": "0955072B6122F25D85039F6BA000F587C1EB42453116BB96E5FF2DB1D1B5550B",
+        "custody": "exact original artifact bytes"
+      },
+      {
+        "path": "earlier-candidate-native-result.json",
+        "bytes": 16044,
+        "sha256": "8787AB5D5F865AB87C17A986BB3E96A3B018486BF30E08FF9E9132B08A3C05EA",
+        "custody": "exact original artifact bytes"
+      },
+      {
+        "path": "independent-readback.json",
+        "bytes": 4132,
+        "sha256": "BEF5B509017FC5FB2AE1D34DCD296FF06F298FB3CB099BA0A9A59E61929C45C4",
+        "custody": "explicitly derived manifest, raw-Git fixture and actual native-marker readback"
+      }
+    ]
+  },
+  "native_execution": true,
+  "release_qualification": false,
+  "limits": [
+    "Exact Factorio2.1.23 CreateOnly worlds retain65 affected technologies with planetary data and the independently seeded native gate in each arm.",
+    "All30 passing and22 earlier artifact members are independently rehashed; six staged members equal raw Git; three actual create-log markers cover both current arms and the earlier candidate.",
+    "The previous published arm was unrun because installing an archive from its own library path attempted a self-copy. The guarded equal-hash no-op fix preserves that adverse; it does not rename the old run as passed.",
+    "The capsule has seven exact original JSON receipts and one explicitly derived readback. Original worlds, logs, configurations and all other artifact bytes remain in primary custody.",
+    "No full effect parity, complete catalogue, real lab, save upgrade, cold reload, joining client, performance or release verdict follows."
+  ]
+}

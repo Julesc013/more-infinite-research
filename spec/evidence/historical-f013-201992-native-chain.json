@@ -1,0 +1,119 @@
+{
+  "kind": "MIR5HistoricalF013CurrentNativeChainV1",
+  "source_head": "20199257df89dc0fb76e7c86478d7a906def14e3",
+  "scope": "One exact current F013 default-slice real mining lab, numeric-only continuation witness and two cold reloads. Not a historical upgrade, all-policy, multiplayer or other-edition qualification.",
+  "result_sha256": "656D0F7146F6B7F0EF7B7CE4ED1378346BEB66133E66961EC1E73114B1C20083",
+  "engine": {
+    "path": "D:\\Games\\Factorio\\0.13\\bin\\x64\\factorio.exe",
+    "sha256": "F12C0DF5A5EF0D72F50A24BD76E077DFC9CBEAB4B31EE9EF0951A4A9C086B856",
+    "file_version": "",
+    "product_version": "",
+    "base_version": "0.13.20"
+  },
+  "mir_archive": {
+    "sha256": "9A111448D353AD158ED3D44E496066B2E2DE8579570B8879A97B237B403D5BDE",
+    "path": "D:\\Projects\\Factorio\\mir5-broad-201992-candidate-r01\\build\\tmp\\historical-f013-owned-library-r03\\more-infinite-research_5.0.01300.zip"
+  },
+  "fixtures": [
+    {
+      "sha256": "021BC61A5B42C5110DA76B4B822032C1DCECFA87483C909D9F5F34583A21CBE2",
+      "archive": "D:\\Projects\\Factorio\\mir5-broad-201992-candidate-r01\\build\\tmp\\historical-f013-owned-library-r03\\mir-fixture-mir5-historical-native_0.1.0.zip",
+      "source": "D:\\Projects\\Factorio\\mir5-broad-201992-candidate-r01\\tests\\fixtures\\historical-native"
+    }
+  ],
+  "profile": {
+    "sha256": "C63A0763A1551C5C8947F5F0D3E0E4CA4E7F68BCB481BC39B7B92EFB4FEE2985",
+    "path": "D:\\Projects\\Factorio\\mir5-broad-201992-candidate-r01\\tests\\profiles\\historical-native-f013.json"
+  },
+  "initial": {
+    "case": "historical-native",
+    "stage": "initial",
+    "status": "passed",
+    "target": "f013",
+    "direct": "recipe-prod-research_character_mining_speed-1",
+    "direct_lab_completions": 1,
+    "direct_mining_bonus": 0.05,
+    "continuation": "inserter-capacity-bonus-8",
+    "continuation_witness": "numeric-finite-witness",
+    "continuation_lab_completions": 0,
+    "two_cold_reload_witness": false,
+    "on_load_read_only": false
+  },
+  "reloads": [
+    {
+      "result": {
+        "case": "historical-native",
+        "stage": "reload",
+        "status": "passed",
+        "target": "f013",
+        "direct": "recipe-prod-research_character_mining_speed-1",
+        "direct_lab_completions": 1,
+        "direct_mining_bonus": 0.05,
+        "continuation": "inserter-capacity-bonus-8",
+        "continuation_witness": "numeric-finite-witness",
+        "continuation_lab_completions": 0,
+        "two_cold_reload_witness": true,
+        "on_load_read_only": true
+      },
+      "save_sha256": "BA0780129E7D36512751851FD1D747032D3F483457EE4EC5445F30823541CED3",
+      "save_byte_identical": true
+    },
+    {
+      "result": {
+        "case": "historical-native",
+        "stage": "reload",
+        "status": "passed",
+        "target": "f013",
+        "direct": "recipe-prod-research_character_mining_speed-1",
+        "direct_lab_completions": 1,
+        "direct_mining_bonus": 0.05,
+        "continuation": "inserter-capacity-bonus-8",
+        "continuation_witness": "numeric-finite-witness",
+        "continuation_lab_completions": 0,
+        "two_cold_reload_witness": true,
+        "on_load_read_only": true
+      },
+      "save_sha256": "BA0780129E7D36512751851FD1D747032D3F483457EE4EC5445F30823541CED3",
+      "save_byte_identical": true
+    }
+  ],
+  "library_control_restoration_status": "restored-direct-library-controls",
+  "custody": {
+    "path": "build/mir5/recovery-historical/historical-f013-201992-r03",
+    "members": 61,
+    "bytes": 3714674,
+    "manifest_sha256": "5EA677DD66DC684F6CFCF3B2142C11162F19678E26BBFFCBC169423901879508",
+    "external_testmods_after": [
+      {
+        "path": "D:\\Projects\\Factorio\\testmods\\0.13\\more-infinite-research_5.0.01300.zip",
+        "exists": true,
+        "bytes": 344516,
+        "sha256": "F0B46DD0C3AE33FF3AB1F0CF1591E24D0E5E3B39AD1B43E3046A04503D6F0E48"
+      },
+      {
+        "path": "D:\\Projects\\Factorio\\testmods\\0.13\\mir-fixture-mir5-historical-native_0.1.0.zip",
+        "exists": true,
+        "bytes": 5484,
+        "sha256": "DDDAE0CFABAB785B7F1DA7BF057A74A6C30451964A72201068BEBBF37E603DE6"
+      }
+    ]
+  },
+  "library_protocol": "Checkout-local flat library containing only our exact player and own fixture archives. No dependency library copy, external hardlink or external testmods mutation.",
+  "prior_adverses": [
+    {
+      "path": "build/mir5/recovery-historical/historical-f013-201992-r01/terminal.json",
+      "sha256": "B07A440DB5B91B5E265321C1B2ABF86A6D1F8E31A24801B38B5EA92BE8A9CD73",
+      "status": "adverse",
+      "failure": "[mir5-native-fixture] historical fixture metadata is not beside its source",
+      "scope": "pre-engine harness refusal"
+    },
+    {
+      "path": "build/mir5/recovery-historical/historical-f013-201992-r02/terminal.json",
+      "sha256": "28A8B450DE9DC8C5BF87E1717AB3958FC3D0E4A0CF55DCD7399A2C6FEAAAD4A5",
+      "status": "adverse",
+      "failure": "[mir-library-owned-version-checkout] Legacy MIR version selection requires a checkout-local flat library.",
+      "scope": "pre-engine harness refusal"
+    }
+  ],
+  "priority": "Completed before the explicit priority update. Further lower-tier native work is deferred behind ready F210/F200 gates."
+}

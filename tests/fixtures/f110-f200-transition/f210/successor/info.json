@@ -1,0 +1,12 @@
+{
+  "name": "mir-fixture-mir5-f110-f200-transition",
+  "version": "0.4.0",
+  "title": "MIR published F110 save to F210 successor",
+  "author": "MIR maintainers",
+  "description": "Disposable direct published4.7.3 F110 to MIR5 F210 Base journey;protected source unchanged.",
+  "factorio_version": "2.1",
+  "dependencies": [
+    "base = 2.1.23",
+    "more-infinite-research = 5.0.21000"
+  ]
+}

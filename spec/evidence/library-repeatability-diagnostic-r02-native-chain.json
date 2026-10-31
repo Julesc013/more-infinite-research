@@ -1,0 +1,280 @@
+{
+  "schema": 1,
+  "kind": "MIRLibraryRepeatabilityDiagnosticR02NativeChainV1",
+  "status": "six-diagnostic-sessions-complete-five-memory-controls-fail",
+  "source_commit": "5dd429cc6f8080953096fc0d2630da073efb57e9",
+  "native_controller": {
+    "commit": "cfbb5cde0ae1f5929e6bddfe9cca5b4a83455507",
+    "driver_sha256": "051AFCC9DB4E01950D938344DBF87EEB214885A0911AA14DB8B0BBBA0C3C789E",
+    "sampler_sha256": "0E8658AB15FB8CA9B9F94F38A16C6BF8B2E9080209B07CA6704575FE717C4D6D",
+    "original_reader_sha256": "69AD3AF2E5E474086DAFA838E85A3C2701D684699400388B08600F24BE5E3F43"
+  },
+  "postprocessing": {
+    "reader_commit": "f14e5da50f602a947cd5bae39858e904dfb45ace",
+    "reader_sha256": "A219B69C8FAEF58E4AB478135D16E4C246DCC4BF01C2B7C6ECF91A21607662FD",
+    "analysis_sha256": "B08EE75CF3AA91AD128BD9130F286237F2C205A3D502E26ACD188CC2B71D8EE6",
+    "root_reader_sha256": "AD57FBBA10AA01EB30DF0C46ABFB62304B3CCC80566BCD1D4CD692DE9699757A",
+    "root_readback_sha256": "6B279436A1D054BB6AEBCD3579708C81A27877B417EC3E4025C96406D0195187",
+    "correction": "Original reader compared row timestamps taken after variable-duration collection;retained raw collection durations reconstruct collection-start estimates. The native loop still schedules one collection/second. Original refusal retained,no sample/endpoint/control/UI limit changes or native retry."
+  },
+  "declared_plan": {
+    "path": "spec/evidence/library-current-e9-repeatability-diagnostic-plan-r02.json",
+    "sha256": "42522B146397C34FA17FB33010FC21AA99920D24AAD0BFCA3031EDB26726EE65"
+  },
+  "packet_sha256": "6F7B7750D8641ED82605DB197C20BF9065F68F0904FD04A1716AAD84856C113D",
+  "prepared_sha256": "CF43181740F2465413D459194A819C44EF46A286CFC48D05D01E6501460BFB29",
+  "inputs": {
+    "engine": "2.0.77/D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B",
+    "published": "4.7.20002/F3943EB4D69CCDAC41BD9F922AD03A5C78F34F22D8E7FA5A88A7A658AB1010B7",
+    "candidate": "5.0.20000/E9D349931E082AD77057C150E3D6093490E4086E84F0FAFECB0ED1257FD5ED4F",
+    "public_helpers": 20,
+    "fixture_members": 9,
+    "settings": "Defaults",
+    "graphics": "Unchanged original per-client high-graphics policy;no cache flushing or product instrumentation."
+  },
+  "counts": {
+    "native_processes": 42,
+    "worlds": 6,
+    "two_real_client_sessions": 6,
+    "cold_host_restarts": 6,
+    "final_saves": 6,
+    "lab_completions": 0,
+    "actor_identities": 36,
+    "screenshots": 72,
+    "memory_samples": 3643,
+    "system_samples": 438
+  },
+  "schedule": [
+    {
+      "id": "01-warmup-published",
+      "arm": "published",
+      "role": "warmup"
+    },
+    {
+      "id": "02-diagnostic-published",
+      "arm": "published",
+      "role": "diagnostic-control"
+    },
+    {
+      "id": "03-diagnostic-published",
+      "arm": "published",
+      "role": "diagnostic-control"
+    },
+    {
+      "id": "04-diagnostic-published",
+      "arm": "published",
+      "role": "diagnostic-control"
+    },
+    {
+      "id": "05-diagnostic-published",
+      "arm": "published",
+      "role": "diagnostic-control"
+    },
+    {
+      "id": "06-functional-current",
+      "arm": "candidate",
+      "role": "functional-observation-only"
+    }
+  ],
+  "native_outcome": "All six actual two-client sessions pass their original native research/queue/recipe snapshots,queries,selected details,locale/join protocol,closed-save cold-host restart,12PNG and six-role memory observations. Those functional assertions do not establish complete visual parity or performance acceptance.",
+  "measurement_outcome": {
+    "endpoints_per_session": 26,
+    "missing_endpoints": [],
+    "same_published_comparisons": 52,
+    "library_duration_and_save_ready_comparisons": 28,
+    "library_duration_and_save_ready_failures": 0,
+    "failed_controls": {
+      "1": {
+        "memory/restart/client-en/working_set_bytes": {
+          "published": 1599307776,
+          "candidate": 1768775680,
+          "allowance": 168404172.8,
+          "difference": 169467904,
+          "within": false,
+          "published_range": [
+            1599307776,
+            1599307776
+          ],
+          "candidate_range": [
+            1768775680,
+            1768775680
+          ]
+        },
+        "memory/restart/server/private_bytes": {
+          "published": 276922368,
+          "candidate": 366866432,
+          "allowance": 67108864,
+          "difference": 89944064,
+          "within": false,
+          "published_range": [
+            276922368,
+            276922368
+          ],
+          "candidate_range": [
+            366866432,
+            366866432
+          ]
+        },
+        "memory/restart/server/working_set_bytes": {
+          "published": 276447232,
+          "candidate": 373293056,
+          "allowance": 67108864,
+          "difference": 96845824,
+          "within": false,
+          "published_range": [
+            276447232,
+            276447232
+          ],
+          "candidate_range": [
+            373293056,
+            373293056
+          ]
+        }
+      },
+      "2": {
+        "memory/initial/client-en/working_set_bytes": {
+          "published": 1974730752,
+          "candidate": 1688514560,
+          "allowance": 183162265.60000002,
+          "difference": -286216192,
+          "within": false,
+          "published_range": [
+            1974730752,
+            1974730752
+          ],
+          "candidate_range": [
+            1688514560,
+            1688514560
+          ]
+        },
+        "memory/restart/client-de/working_set_bytes": {
+          "published": 1926500352,
+          "candidate": 1692299264,
+          "allowance": 180939980.8,
+          "difference": -234201088,
+          "within": false,
+          "published_range": [
+            1926500352,
+            1926500352
+          ],
+          "candidate_range": [
+            1692299264,
+            1692299264
+          ]
+        }
+      }
+    },
+    "scope": "Both sides of every control are publishedF394;analysis keys published/candidate designate first/second only. The final current session is functional observation only and is not used to claim an improvement. No observations excluded/pooled,thresholds altered or extensions run."
+  },
+  "system_observations": {
+    "total_samples": 438,
+    "cadence_diagnostic": [
+      {
+        "case": "01-warmup-published",
+        "samples": 78,
+        "min_record_elapsed_interval": 0.9397193000000001,
+        "min_inferred_collection_start_interval": 1.004801699999998,
+        "record_intervals_under_099": 1,
+        "max_collection_ms": 80.7754,
+        "cpu_seconds": 3.296875
+      },
+      {
+        "case": "02-diagnostic-published",
+        "samples": 74,
+        "min_record_elapsed_interval": 0.9410382999999989,
+        "min_inferred_collection_start_interval": 0.999516100000001,
+        "record_intervals_under_099": 6,
+        "max_collection_ms": 103.9121,
+        "cpu_seconds": 3.5
+      },
+      {
+        "case": "03-diagnostic-published",
+        "samples": 73,
+        "min_record_elapsed_interval": 0.9300385999999996,
+        "min_inferred_collection_start_interval": 1.002722600000002,
+        "record_intervals_under_099": 3,
+        "max_collection_ms": 142.3079,
+        "cpu_seconds": 3.46875
+      },
+      {
+        "case": "04-diagnostic-published",
+        "samples": 72,
+        "min_record_elapsed_interval": 0.9499718,
+        "min_inferred_collection_start_interval": 1.0044903999999981,
+        "record_intervals_under_099": 3,
+        "max_collection_ms": 83.3718,
+        "cpu_seconds": 3.609375
+      },
+      {
+        "case": "05-diagnostic-published",
+        "samples": 73,
+        "min_record_elapsed_interval": 0.9398434000000009,
+        "min_inferred_collection_start_interval": 1.0023679999999988,
+        "record_intervals_under_099": 7,
+        "max_collection_ms": 145.3578,
+        "cpu_seconds": 3.46875
+      },
+      {
+        "case": "06-functional-current",
+        "samples": 68,
+        "min_record_elapsed_interval": 0.944454799999999,
+        "min_inferred_collection_start_interval": 1.0041340999999875,
+        "record_intervals_under_099": 7,
+        "max_collection_ms": 105.1151,
+        "cpu_seconds": 3.515625
+      }
+    ],
+    "method": "Native physical/commit/system CPU counters and owned-process CPU/total faults at target1Hz;actual OS process creation/exit UTC with monotonic observation bounds. Clock conversions are estimates and collection durations are retained. No trustworthy thermal/clock counter is available.",
+    "limits": "These additional observers change collection and are diagnostic only;total page faults are not hard faults. Association does not establish a cause."
+  },
+  "visual_observation": {
+    "viewed_images": 10,
+    "crc_decoded_images": 72,
+    "private_exact_png_commit": "7a2b11f8df19c6d59c0d05c56564c8afa443b62f",
+    "private_exact_png_directory": "evidence/library-diagnostic-r02-views",
+    "private_manifest_sha256": "7A41DF545D86B6071D831E6415953A57966518A2DD6D14B6CD77851CA492FF47",
+    "observations": [
+      "Current first-open EN/DE rows initially show internal IDs. EN first-open-settled title is localized; DE first-open-settled still shows raw selected ID. These first-open-settled frames do NOT prove the unchanged first-open view:both current clients and the viewed published EN frame show the following search query instead of gears/mining. The fixture queues a screenshot then changes the query in the same tick,so rendered capture sees the subsequent action. Preserve this observer defect;do not infer settled-first-open translation failure from that frame.",
+      "Current cold-reopen EN and DE immediate/60-tick frames keep the original gears/mining queries and selected IDs,and show localized Iron gear wheel productivity/Erzförderer-Produktivität titles. No following public action changes their query.",
+      "Current details retain internal group/science/prerequisite IDs;German view retains several English strings. Published EN has native science/prerequisite sprites and separate list/detail. These observations retain the presentation obligation;not a complete UI parity verdict.",
+      "Current omitted-group mode is MIR research;published mode All research. The already acknowledged source/fixture scope mismatch prevents a matched-output candidate speed claim."
+    ],
+    "required_correction": "Capture the late first-open frame and wait a separate bounded render grace before the next search action;opposing host test must reject a later public call on the same screenshot tick. Independently verify actual rendered query before accepting settled evidence."
+  },
+  "custody": {
+    "primary_root": "build/qualification/library-repeatability-diagnostic-r02-controller",
+    "original_output": "D:\\Projects\\Factorio\\mir5-legacy-cannon-credit-r01\\build\\tmp\\library-repeatability-diagnostic-r02",
+    "files": 1272,
+    "bytes_per_copy": 140319822,
+    "capsule": {
+      "path": "spec/evidence/library-repeatability-diagnostic-r02-native-receipts.json.gz",
+      "sha256": "950162E6EE13800737EA883D87A7C517A5124BDB39DB435E8BEED71A120BD21B",
+      "bytes": 662790,
+      "exact_bodies": 86,
+      "contents": "All36 native per-actor stdout logs,six result/memory/system records,before/after process/power snapshots,original terminal/packet/plan,reader refusal/cadence reconstruction,independent readback. Binary saves and72PNGs remain in both original and primary custody."
+    }
+  },
+  "credential_readback": {
+    "native_rcon_argument_occurrences": 12,
+    "redacted": 12,
+    "unparsed": 0,
+    "unredacted": 0,
+    "scope": "Exact native redacted stdout only;session-spec secrets excluded."
+  },
+  "original_failures_preserved": [
+    "spec/evidence/library-current-e9-r01-native-chain.json",
+    "spec/evidence/library-repeatability-diagnostic-r01-adverse-chain.json"
+  ],
+  "next_action": "Aero independently reviews raw controls/counter/phase data and exact PNGs. Correct the actual first-open settled capture ordering and explicit shared All scope in the separate fixture,then propose a bounded justified memory method/conditions correction. Do not optimize MIR from predecessor-versus-itself failures,lower tolerances or repeatedly run full comparisons.",
+  "controls_restored": true,
+  "factorio_processes_after": 0,
+  "performance_acceptance": false,
+  "release_qualification": false,
+  "remaining": [
+    "Retained/churn memory",
+    "Valid matched-output final Library/load/memory experiment",
+    "Actual settled-first-open observation",
+    "Remaining F200/F210 earned private/client/input cases",
+    "Whole product/delivery acceptance"
+  ]
+}

@@ -1,0 +1,72 @@
+{
+  "schema": 1,
+  "kind": "authored-private-native-gear-row-comparison-not-runner-receipt",
+  "scope": "Complete gear technology and its named recipe rows only; F210 k2so",
+  "release_qualification": false,
+  "published_receipt": {
+    "path": "spec/mir5/evidence/k2so-published-native.json",
+    "sha256": "7B636E4CA5BFEEA14D00A11F31E647A5924637DD783797599C4A811C42570A10"
+  },
+  "candidate_receipt": {
+    "path": "spec/mir5/evidence/profile-bindings-k2so-native.json",
+    "sha256": "F0E05999CC747B1FD57B3EE10062039AB0237D350F117580A62FE4BDFE037719"
+  },
+  "candidate_player_record": {
+    "path": "build/mir5/profile-bindings-r01/packages/player.json",
+    "sha256": "69AD4767BD25EDF20BE497B7676E2AFB89A1E56F0512F7E94DC5036D106E1911"
+  },
+  "comparison": {
+    "complete_technology_row_equal": true,
+    "technology": "recipe-prod-research_gears-1",
+    "canonical_row_sha256": "FD26CA3C2C28DC645BDCA3CBC12C61872318B414B038E137D59ED88BEC6B76F5",
+    "effects": [
+      {
+        "type": "change-recipe-productivity",
+        "recipe": "casting-iron-gear-wheel",
+        "change": 0.1
+      },
+      {
+        "type": "change-recipe-productivity",
+        "recipe": "iron-gear-wheel",
+        "change": 0.1
+      },
+      {
+        "type": "change-recipe-productivity",
+        "recipe": "kr-iron-gear-wheel-from-enriched-iron",
+        "change": 0.1
+      },
+      {
+        "type": "change-recipe-productivity",
+        "recipe": "kr-iron-gear-wheel-from-iron-ore",
+        "change": 0.1
+      }
+    ],
+    "icons": [
+      {
+        "icon": "__Krastorio2Assets__/icons/items/iron-gear-wheel.png",
+        "icon_size": 64
+      },
+      {
+        "icon": "__core__/graphics/icons/technology/constants/constant-recipe-productivity.png",
+        "icon_size": 128,
+        "scale": 0.5,
+        "shift": [
+          50,
+          50
+        ],
+        "floating": true
+      }
+    ],
+    "complete_named_recipe_rows_equal": [
+      "casting-iron-gear-wheel",
+      "iron-gear-wheel",
+      "kr-iron-gear-wheel-from-enriched-iron",
+      "kr-iron-gear-wheel-from-iron-ore"
+    ]
+  },
+  "limitations": [
+    "Private incomplete catalogue; no complete-output parity, gameplay, save, multiplayer, menu or release claim.",
+    "Data-stage row equality does not establish physical productivity for every named recipe.",
+    "Native-owner and other profile obligations remain separate."
+  ]
+}

@@ -1,0 +1,8 @@
+{
+  "name": "mir-fixture-mir5-large-factory-activity",
+  "version": "0.1.0",
+  "title": "MIR large-factory diagnostic activity observer",
+  "author": "MIR maintainers",
+  "factorio_version": "2.1",
+  "dependencies": ["base = 2.1.23", "? more-infinite-research"]
+}

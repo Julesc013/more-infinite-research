@@ -1,0 +1,194 @@
+{
+  "schema": 1,
+  "kind": "MIR5AAIBaseSpaceAgeSuccessorReadbackV1",
+  "status": "two-targeted-successor-chains-pass",
+  "controller_source": "b198be89679e796043011a54752e22da9beb11b3",
+  "player_source_commit": "b251ae7a54104ace87cb0da4cf531cf53f03c93d",
+  "player_source_tree": "79b73a6a8e68987737e69bf2d95ec6555b49f901",
+  "engine_version": "2.1.23",
+  "engine_sha256": "FE4A1DA30F322A0D0B8AEB3DF7276332222BAAA143E2352569B723E84B2B9060",
+  "cases": [
+    {
+      "role": "base-successor",
+      "status": "passed-private-native-fixture",
+      "profile": "aai-parity-native-mir5-base-f210-2123.json",
+      "profile_sha256": "588B1E9C90C04E7DA07CCA2CD659C7D01529EBC0F25E80E4750E959DDB254A4C",
+      "mir_sha256": "E3A65C08AC7798A66FB1BE30D24307B17C8B366DD901953BDE2A09BD6939C8CE",
+      "native_result_sha256": "BC615956E62E045A12883151E3C97B0D5F6219952A3273129F58DF3BD1BBBC43",
+      "outer_terminal_sha256": "3A59D5BC8B72B45C3AD4B2CB016BD1CA8EE6F59B7AD0E9A686E3872BE78848CF",
+      "outer_status": "passed-private-native-fixture",
+      "primary_root": "build/mir5/recovery-historical/aai-parity-native-e3-base-r02",
+      "original_and_primary_members_verified": 17,
+      "bytes": 982608,
+      "input_save": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\mir5\\recovery-historical\\aai-starting-trigger-93c-r02\\run-r08\\aai-base\\write-data\\saves\\mir5-native-complete.zip",
+        "sha256": "9F6B48D482BC9B19A03F44A36344771B6C37563E4780A3D745F9DEEBC495784E"
+      },
+      "input_save_byte_identical": true,
+      "completed_save_sha256": "B57C074068EF9CC02887832B7E95DD3405520FE815E314D5D0DDB6D83D4B8472",
+      "cold_reloads": 2,
+      "inherited_source_witness": {
+        "profile": "base",
+        "aai_actual_lab_completions": 6,
+        "aai_actual_progression": [
+          "fuel-processing",
+          "sand-processing",
+          "electricity",
+          "electronics",
+          "glass-processing",
+          "electric-lab"
+        ],
+        "mir_actual_lab_completions": 1,
+        "physical_before_output": 10,
+        "physical_after_output": 11,
+        "physical_batch_count": 10,
+        "source_queue_progress": 0.42000000000000004,
+        "paused_progress": 0.27,
+        "source_setup_external_science_prerequisites": true,
+        "source_setup_external_electric_engine_prerequisites": true,
+        "external_electric_engine_prerequisites": [
+          "advanced-oil-processing",
+          "lubricant",
+          "electric-engine"
+        ],
+        "on_load_read_only": false,
+        "base_space_age_transition_not_claimed": true
+      },
+      "new_lab_completions": 1,
+      "new_physical_batch": false
+    },
+    {
+      "role": "space-age-published-source",
+      "status": "passed-private-native-fixture",
+      "profile": "aai-parity-native-published-space-age-f210-2123.json",
+      "profile_sha256": "D3401FA9E23C12F0D10CFF684CC3F959A7A75F5D79A5F2F930192650CEB0E3DE",
+      "mir_sha256": "B6EB9430056ABD384DB00F94929FE7DAC0A37441ACF4BC277946689682628852",
+      "native_result_sha256": "A72883D323BEBF21610FE5E2C0F815ED87F70B7901621C367769EC276BAB00A8",
+      "outer_terminal_sha256": "4070B3DCBEAD6DDCF7D170CB25B7A872BD5D1EEFCBE1BCD3B1759051C51F15FF",
+      "outer_status": "failed-or-refused",
+      "primary_root": "build/mir5/recovery-historical/aai-parity-native-e3-space-age-r06",
+      "original_and_primary_members_verified": 22,
+      "bytes": 2304786,
+      "input_save": null,
+      "input_save_byte_identical": null,
+      "completed_save_sha256": "9D8E89615384F15E6303DA524DB90F60C69310F37B7EDCBD24F9671A22F9D796",
+      "cold_reloads": 2,
+      "inherited_source_witness": {
+        "profile": "space-age",
+        "aai_actual_lab_completions": 6,
+        "aai_actual_progression": [
+          "fuel-processing",
+          "sand-processing",
+          "electricity",
+          "electronics",
+          "glass-processing",
+          "electric-lab"
+        ],
+        "mir_actual_lab_completions": 1,
+        "physical_before_output": 10,
+        "physical_after_output": 11,
+        "physical_batch_count": 10,
+        "source_queue_progress": 0.42000000000000004,
+        "paused_progress": 0.27,
+        "source_setup_external_science_prerequisites": true,
+        "source_setup_external_electric_engine_prerequisites": true,
+        "external_electric_engine_prerequisites": [
+          "advanced-oil-processing",
+          "lubricant",
+          "electric-engine"
+        ],
+        "on_load_read_only": false,
+        "base_space_age_transition_not_claimed": true
+      },
+      "new_lab_completions": 7,
+      "new_physical_batch": true
+    },
+    {
+      "role": "space-age-successor",
+      "status": "passed-private-native-fixture",
+      "profile": "aai-parity-native-mir5-space-age-f210-2123.json",
+      "profile_sha256": "CC07D7A30DEFB6A861C91CC64FE0A582F78B95BF94CFAF533C4C5ECD9EB49B91",
+      "mir_sha256": "E3A65C08AC7798A66FB1BE30D24307B17C8B366DD901953BDE2A09BD6939C8CE",
+      "native_result_sha256": "B73E7F1370626C422726BA59D3B66D68C391FAE363C62A7C71BA315B65CFFC69",
+      "outer_terminal_sha256": "3DCDA6D66DD48737747265E2D656B7C1BB1D098D6F67A1DD930A03A5962EB163",
+      "outer_status": "passed-private-native-fixture",
+      "primary_root": "build/mir5/recovery-historical/aai-parity-native-e3-space-age-r07-successor",
+      "original_and_primary_members_verified": 17,
+      "bytes": 1128707,
+      "input_save": {
+        "sha256": "9D8E89615384F15E6303DA524DB90F60C69310F37B7EDCBD24F9671A22F9D796",
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\mir5\\recovery-historical\\aai-parity-native-e3-space-age-r06\\native-output\\published-source\\write-data\\saves\\mir5-native-complete.zip"
+      },
+      "input_save_byte_identical": true,
+      "completed_save_sha256": "2CAAF2B8BDA6E0291EB8EF80996D528476DF4F93C1844C9FDBCEC8BCB98A00D0",
+      "cold_reloads": 2,
+      "inherited_source_witness": {
+        "profile": "space-age",
+        "aai_actual_lab_completions": 6,
+        "aai_actual_progression": [
+          "fuel-processing",
+          "sand-processing",
+          "electricity",
+          "electronics",
+          "glass-processing",
+          "electric-lab"
+        ],
+        "mir_actual_lab_completions": 1,
+        "physical_before_output": 10,
+        "physical_after_output": 11,
+        "physical_batch_count": 10,
+        "source_queue_progress": 0.42000000000000004,
+        "paused_progress": 0.27,
+        "source_setup_external_science_prerequisites": true,
+        "source_setup_external_electric_engine_prerequisites": true,
+        "external_electric_engine_prerequisites": [
+          "advanced-oil-processing",
+          "lubricant",
+          "electric-engine"
+        ],
+        "on_load_read_only": false,
+        "base_space_age_transition_not_claimed": true
+      },
+      "new_lab_completions": 1,
+      "new_physical_batch": false
+    }
+  ],
+  "adopted_base_source": {
+    "result": "build/mir5/recovery-historical/aai-starting-trigger-93c-r02/run-r08/aai-base/result.json",
+    "sha256": "62F4DE44E942DDA7C852F3F2CDF3B2775AD0B60D32B692DD70DDDA85BE8591A4",
+    "observer_container_sha256": "A15A7D628D66953D2E0C4D4FA288F47CBF9C5678327C7EB3D23ADB5DC78331C0",
+    "note": "Original Base source uses A15; successors intentionally use exact 2E observer. Container identities remain distinct."
+  },
+  "independent_custody": {
+    "original_and_primary_members_verified": 56,
+    "bytes": 4416101,
+    "native_stage_logs_checked": 9
+  },
+  "observations": [
+    "Each MIR5 successor resumes the published owner queue and completes exactly one additional nonscripted real lab event; owner level3 and native productivity0.2 are guarded before save and on both reloads.",
+    "The six AAI and one MIR counts and physical10-to-11 values in successor witness JSON are inherited source counters, not newly repeated successor work.",
+    "Each successor checks the source queued42% and paused27% before resuming; the queued work is then consumed. The separate paused27% and21 saved physical output items remain guarded.",
+    "The new Space Age published source independently earns six AAI and one MIR lab completions, native starting crafts and physical10-to-11 output, then saves and reloads twice.",
+    "The Space Age source native result passed before an outer second-phase archive-backup collision. That adverse terminal is retained; the exact completed source save was adopted by a distinct successor-only run."
+  ],
+  "restoration": {
+    "mir_after_sha256": "C563CB5B96C9E64CB3373BDB60CF5C8B7D3C97E93EADB8F924443C703CDC024D",
+    "observer_after_sha256": "A15A7D628D66953D2E0C4D4FA288F47CBF9C5678327C7EB3D23ADB5DC78331C0",
+    "source_fixture_after_sha256": "AAE3E3A8FCACDD70A8FBEA9C2694AC2967B553FBC0DF0B6250D8DE085BE4D008",
+    "successor_fixture_absent_after": true,
+    "factorio_processes_after": 0
+  },
+  "limits": [
+    "Exact AAI Industry0.7.5 Base and all-official Space Age closures only; no Base-to-Space-Age, engine-version or arbitrary mod-combination migration verdict.",
+    "Fixture count/time acceleration and explicit external prerequisites do not qualify ordinary tuning or natural progression through every external prerequisite.",
+    "Successors verify preservation of earlier physical output; no new successor physical crafting batch was executed.",
+    "No client, stress, performance, full AAI suite, later-player-source or release qualification claim."
+  ],
+  "receipts": {
+    "path": "spec/evidence/aai-base-space-age-e3-native-receipts.json.gz",
+    "bytes": 45850,
+    "sha256": "04A7921AF06EFAB9F526577825BB9BD04908722361F66A64E0C98F1413FB0AE4",
+    "uncompressed_sha256": "5D786A868E7DEC1B3196330FB2998EB00EC4B5066FF38669D4E1A9139E8F3AE0",
+    "members": 12
+  }
+}

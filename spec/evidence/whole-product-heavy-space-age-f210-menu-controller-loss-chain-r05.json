@@ -1,0 +1,963 @@
+{
+  "schema": 1,
+  "kind": "MIRHeavyF210MenuR05ControllerLossChainV1",
+  "status": "thirty-eight-observations-recovered-original-controller-completion-unproven-adverse",
+  "public_source": "78ff2e6273825ded39a0c1acc8f82ae9149c8aae",
+  "private_source": "67498eaa1db8b8328d93922324df70ac86e4da9d",
+  "packet_sha256": "F89B2C90CE4F9563B25AB2E6D7ABBBC2F5158FBEF991E73419DF0DA7C5D0A94F",
+  "caller_sha256": "C425691F54370867F7F49680A202CCF0E703D216929AB0A2B4826F7F1BB0E3C5",
+  "reader_sha256": "919624B9FC793DD02A3B4F35C5E42157FC41DB065622D9427966D1C174CC13BD",
+  "original_result_sha256": "D5035137A97920ABF45AB6F9FC1ED61610DA0904EB6D251B38C99CF2179C569F",
+  "case_progress_sha256": "3A52926655E5BF65E6023935F0ADC8B0628A8AC1C7DCAF551351F15A7B8FAC98",
+  "aa_gate_sha256": "C5E72A2EE11EDDCD2FACD5CC4B6098327812B723677B42BE2EB5D20A8BF9B47F",
+  "native_launches": 38,
+  "warmups": 4,
+  "aa_observations": 2,
+  "comparison_phase_observations": 32,
+  "accepted_comparisons": 0,
+  "normal_controller_completion": false,
+  "original_terminal_present": false,
+  "original_exitcode_present": false,
+  "loss_cause": "unproven",
+  "independent_admissibility_verdict": "Adverse recovered raw observations only. Frozen read() requires original terminal/exit/custody linkage; post-loss current-state checks do not reconstruct it. No comparison/objective acceptance.",
+  "forensic_arithmetic_only": {
+    "published_aa": {
+      "values_seconds": [
+        30.7892608,
+        31.0690329
+      ],
+      "difference_seconds": 0.27977209999999886,
+      "allowance_seconds": 1.5464573425,
+      "within_declared_allowance": true
+    },
+    "latin_medians_seconds": {
+      "control-without-mir": 28.2841083,
+      "published-mir3": 32.3657303,
+      "published-mir4.7": 31.3246082,
+      "candidate-mir5": 28.494757550000003
+    },
+    "drift": {
+      "control-without-mir": {
+        "first_cycle_median": 28.351905600000002,
+        "second_cycle_median": 28.280266349999998,
+        "difference": -0.07163925000000404,
+        "within_seconds": true
+      },
+      "published-mir3": {
+        "first_cycle_median": 32.62498225,
+        "second_cycle_median": 32.32222455,
+        "difference": -0.3027577000000008,
+        "within_seconds": true
+      },
+      "published-mir4.7": {
+        "first_cycle_median": 31.3124531,
+        "second_cycle_median": 31.336761449999997,
+        "difference": 0.024308349999998313,
+        "within_seconds": true
+      },
+      "candidate-mir5": {
+        "first_cycle_median": 28.54892735,
+        "second_cycle_median": 28.287526200000002,
+        "difference": -0.26140114999999753,
+        "within_seconds": true
+      }
+    },
+    "historical_mir3": {
+      "interpretation": "as-shipped-historical-comparison-only",
+      "equal_work_established": false,
+      "mir3_minus_published_mir4_7_seconds": 1.0411221000000026
+    },
+    "mir_added_objective": {
+      "applicable": true,
+      "published_mir_added_seconds": 3.0404999000000004,
+      "candidate_mir_added_seconds": 0.210649250000003,
+      "status": "computed-high-cost-profile-only",
+      "reduction_fraction": 0.9307188761953247,
+      "minimum_fraction": 0.5,
+      "meets_declared_objective": true
+    }
+  },
+  "achieved_performance_objective": false,
+  "custody": {
+    "native": {
+      "member_count": 423,
+      "bytes_per_copy": 978387484,
+      "source_copy_source_after_sha256_equal": true,
+      "original_caller_terminal_linked": false,
+      "explicit_post_controller_manifest_sha256": "539C1744FDC8BF62E61BA4DC8F4B6FA30AD9BEAAA28086AFD1CE5BF57D0AE96B"
+    },
+    "controller": {
+      "member_count": 5,
+      "bytes_per_copy": 2559401,
+      "source_copy_source_after_sha256_equal": true,
+      "original_caller_terminal_linked": false,
+      "explicit_post_controller_manifest_sha256": "2BBBF5D999289FDA0EC8FEFCBFD6AEF8A67C37859EA34050C64220C528A2C6EF"
+    }
+  },
+  "images": {
+    "count": 114,
+    "bytes": 962254017,
+    "dimensions": [
+      "(2560, 1440)"
+    ],
+    "strict_crc_and_decompression": true,
+    "actually_viewed": 5,
+    "viewed_frames": [
+      {
+        "path": "runs/35-latin-comparison-candidate-mir5/responsive-menu-actor/main-menu.png",
+        "bytes": 9234199,
+        "sha256": "E997604E3986155EFE7ADD18A76233A35427E5A58E7B3D52BBE6C571A21A076B",
+        "actually_viewed": true,
+        "observation": "Correct2.1.23owned main menu or declared Settings response; no error/modal."
+      },
+      {
+        "path": "runs/35-latin-comparison-candidate-mir5/responsive-menu-actor/settings-response.png",
+        "bytes": 9229132,
+        "sha256": "55958BBC98DB5C4D9E0153EB336B3E6DC76544E117892E25BB55C8200190C604",
+        "actually_viewed": true,
+        "observation": "Correct2.1.23owned main menu or declared Settings response; no error/modal."
+      },
+      {
+        "path": "runs/36-latin-comparison-control-without-mir/responsive-menu-actor/main-menu.png",
+        "bytes": 9163734,
+        "sha256": "5CA986BD9EEA8854A147E0FAEE423782C0D24EC7960D241FFE9E51721B49FFFD",
+        "actually_viewed": true,
+        "observation": "Correct2.1.23owned main menu or declared Settings response; no error/modal."
+      },
+      {
+        "path": "runs/37-latin-comparison-published-mir3/responsive-menu-actor/main-menu.png",
+        "bytes": 9613966,
+        "sha256": "1018472D0B74BE87BB0B61A72CD729C380874A4561CCEE65D0CCCE0BA8C0A3BC",
+        "actually_viewed": true,
+        "observation": "Correct2.1.23owned main menu or declared Settings response; no error/modal."
+      },
+      {
+        "path": "runs/38-latin-comparison-published-mir4.7/responsive-menu-actor/main-menu.png",
+        "bytes": 9417931,
+        "sha256": "A74F47DD1CEC4B8B9D2921078F5F2286C833F78663501F800F4A1A933994A663",
+        "actually_viewed": true,
+        "observation": "Correct2.1.23owned main menu or declared Settings response; no error/modal."
+      }
+    ]
+  },
+  "current_original_library_states_equal": true,
+  "factorio_processes_after": 0,
+  "raw_resource_ledgers_completed_exit0": 38,
+  "original_schedule": {
+    "launches": 38,
+    "warmups": 4,
+    "aa": 2,
+    "counterbalanced_observations": 32,
+    "extensions": 0
+  },
+  "resources": {
+    "expected_peak_memory_mib": 9216,
+    "maximum_new_output_mib": 2048,
+    "per_launch_timeout_seconds": 300,
+    "admission_wait_seconds": 30
+  },
+  "root_readback_sha256": "8C3993B14EC8C93DB75DA724CF45BFB1F5165CA4758CBBCD98B7A4F604CA0756",
+  "root_loss_record_sha256": "98C47B1DB437FAF56E429C9D7CFFDAC285EBE421EC66E2EE23919DA1A326D445",
+  "root_activity_disclosure": {
+    "schema": 1,
+    "kind": "MIRHeavyF210R05RootActivityDisclosureV1",
+    "builds_and_host_suites": "Held until all38timed observations completed.",
+    "bounded_root_activity": "Small status reads,chat/tool communication,source review and one small retained-plan/profile draft generation during the scored portion (20 rawGithelper reads,two JSON drafts;tool walltime3.47seconds). No build,host suite,dependency materialization,native rival,cache clearing or archive replacement.",
+    "scope": "Retained for independent assessment of the same-machine quiet controls;no absolute quiescence or causal timing attribution is claimed."
+  },
+  "receipt_capsule": {
+    "path": "spec/evidence/whole-product-heavy-space-age-f210-menu-controller-loss-receipts-r05.json.gz",
+    "sha256": "3BA5788137FF36CE4A51E6A861FD79C00016508F492703B781EECF99DC7CEA1D",
+    "bytes": 1222172,
+    "bodies": 285
+  },
+  "omitted_binary_config_or_player_data_members": [
+    {
+      "relative_path": "runs/01-warmup-control-without-mir/config.ini",
+      "bytes": 66973,
+      "sha256": "0D7091BBDA35A42C092489FD926EF1FC5F9F9F641848E05CD03AF1C6851629E9"
+    },
+    {
+      "relative_path": "runs/01-warmup-control-without-mir/responsive-menu-actor/latest-owned-window.png",
+      "bytes": 9672323,
+      "sha256": "131CECBFF50BBE5976CAD1DC46645AC17255249DA665704920B9FACE54587020"
+    },
+    {
+      "relative_path": "runs/01-warmup-control-without-mir/responsive-menu-actor/main-menu.png",
+      "bytes": 9665879,
+      "sha256": "44C4B8D8950A3E4BBCEE141909DCE8F8751F9003F2FD8690A9CAEC3EA4A2278A"
+    },
+    {
+      "relative_path": "runs/01-warmup-control-without-mir/responsive-menu-actor/settings-response.png",
+      "bytes": 9672323,
+      "sha256": "131CECBFF50BBE5976CAD1DC46645AC17255249DA665704920B9FACE54587020"
+    },
+    {
+      "relative_path": "runs/02-warmup-published-mir3/config.ini",
+      "bytes": 66973,
+      "sha256": "0D7091BBDA35A42C092489FD926EF1FC5F9F9F641848E05CD03AF1C6851629E9"
+    },
+    {
+      "relative_path": "runs/02-warmup-published-mir3/responsive-menu-actor/latest-owned-window.png",
+      "bytes": 8146545,
+      "sha256": "1FF3A49F9E559B17F4AF7B435EC57C3D93F5536F90F5C78D76F958F4EECE42A2"
+    },
+    {
+      "relative_path": "runs/02-warmup-published-mir3/responsive-menu-actor/main-menu.png",
+      "bytes": 8128513,
+      "sha256": "C5DA3C5637392D929E70FAFA6E2296CCEA5789CC6B86E2A5315D10C1CBB29766"
+    },
+    {
+      "relative_path": "runs/02-warmup-published-mir3/responsive-menu-actor/settings-response.png",
+      "bytes": 8146545,
+      "sha256": "1FF3A49F9E559B17F4AF7B435EC57C3D93F5536F90F5C78D76F958F4EECE42A2"
+    },
+    {
+      "relative_path": "runs/03-warmup-published-mir4.7/config.ini",
+      "bytes": 66973,
+      "sha256": "0D7091BBDA35A42C092489FD926EF1FC5F9F9F641848E05CD03AF1C6851629E9"
+    },
+    {
+      "relative_path": "runs/03-warmup-published-mir4.7/responsive-menu-actor/latest-owned-window.png",
+      "bytes": 7660795,
+      "sha256": "AFA1F7EBA743AFCDEBFA24CAA752196093B018EE1AFC259993520F605830CB4C"
+    },
+    {
+      "relative_path": "runs/03-warmup-published-mir4.7/responsive-menu-actor/main-menu.png",
+      "bytes": 7661172,
+      "sha256": "2638E12C06FFF3BC944FCC24168CF958EC67C64D58C9101A9CA1C3D04A31E8C6"
+    },
+    {
+      "relative_path": "runs/03-warmup-published-mir4.7/responsive-menu-actor/settings-response.png",
+      "bytes": 7660795,
+      "sha256": "AFA1F7EBA743AFCDEBFA24CAA752196093B018EE1AFC259993520F605830CB4C"
+    },
+    {
+      "relative_path": "runs/04-warmup-candidate-mir5/config.ini",
+      "bytes": 66973,
+      "sha256": "0D7091BBDA35A42C092489FD926EF1FC5F9F9F641848E05CD03AF1C6851629E9"
+    },
+    {
+      "relative_path": "runs/04-warmup-candidate-mir5/responsive-menu-actor/latest-owned-window.png",
+      "bytes": 9009772,
+      "sha256": "BC940DF7C1CC6CB5B9FA236705319DB9ADF3B42742B086059CA9CA4BE2A332F5"
+    },
+    {
+      "relative_path": "runs/04-warmup-candidate-mir5/responsive-menu-actor/main-menu.png",
+      "bytes": 9010246,
+      "sha256": "A01A271B70D54B0307B77E648E3F921F60CAA6FA9AA648F7910E84C00E102B4D"
+    },
+    {
+      "relative_path": "runs/04-warmup-candidate-mir5/responsive-menu-actor/settings-response.png",
+      "bytes": 9009772,
+      "sha256": "BC940DF7C1CC6CB5B9FA236705319DB9ADF3B42742B086059CA9CA4BE2A332F5"
+    },
+    {
+      "relative_path": "runs/05-published-aa-published-mir4.7/config.ini",
+      "bytes": 66973,
+      "sha256": "0D7091BBDA35A42C092489FD926EF1FC5F9F9F641848E05CD03AF1C6851629E9"
+    },
+    {
+      "relative_path": "runs/05-published-aa-published-mir4.7/responsive-menu-actor/latest-owned-window.png",
+      "bytes": 6417143,
+      "sha256": "19557E69C7C7CCE473331804EC41D9A686133B8FAC7072A4CFC4959A4808CC22"
+    },
+    {
+      "relative_path": "runs/05-published-aa-published-mir4.7/responsive-menu-actor/main-menu.png",
+      "bytes": 5890423,
+      "sha256": "9FF0CBF8CAF15EAE02E0235ACD7D90E7D227C352A0AA88DA0B54E343C378BFCA"
+    },
+    {
+      "relative_path": "runs/05-published-aa-published-mir4.7/responsive-menu-actor/settings-response.png",
+      "bytes": 6417143,
+      "sha256": "19557E69C7C7CCE473331804EC41D9A686133B8FAC7072A4CFC4959A4808CC22"
+    },
+    {
+      "relative_path": "runs/06-published-aa-published-mir4.7/config.ini",
+      "bytes": 66973,
+      "sha256": "0D7091BBDA35A42C092489FD926EF1FC5F9F9F641848E05CD03AF1C6851629E9"
+    },
+    {
+      "relative_path": "runs/06-published-aa-published-mir4.7/responsive-menu-actor/latest-owned-window.png",
+      "bytes": 7662088,
+      "sha256": "FD2518E13BBEBF69FEF7AE7C7102AC21CC6C13D8AA4FEA65128FBD23818EED78"
+    },
+    {
+      "relative_path": "runs/06-published-aa-published-mir4.7/responsive-menu-actor/main-menu.png",
+      "bytes": 7595465,
+      "sha256": "AB0B5F9B6C15008E7B04B1D2AD2147893C73D3868BCFCE2C49BE052E57E468C1"
+    },
+    {
+      "relative_path": "runs/06-published-aa-published-mir4.7/responsive-menu-actor/settings-response.png",
+      "bytes": 7662088,
+      "sha256": "FD2518E13BBEBF69FEF7AE7C7102AC21CC6C13D8AA4FEA65128FBD23818EED78"
+    },
+    {
+      "relative_path": "runs/07-latin-comparison-control-without-mir/config.ini",
+      "bytes": 66973,
+      "sha256": "0D7091BBDA35A42C092489FD926EF1FC5F9F9F641848E05CD03AF1C6851629E9"
+    },
+    {
+      "relative_path": "runs/07-latin-comparison-control-without-mir/responsive-menu-actor/latest-owned-window.png",
+      "bytes": 6444057,
+      "sha256": "524C7C429066B089DCA03B4B6B140A51E09F4EB434E88427765924D16DBFA682"
+    },
+    {
+      "relative_path": "runs/07-latin-comparison-control-without-mir/responsive-menu-actor/main-menu.png",
+      "bytes": 6327508,
+      "sha256": "84B6B3B54740035DFCDFEEC0882F61E9A1AA19E4BF2E739632362AA2E06C1BAB"
+    },
+    {
+      "relative_path": "runs/07-latin-comparison-control-without-mir/responsive-menu-actor/settings-response.png",
+      "bytes": 6444057,
+      "sha256": "524C7C429066B089DCA03B4B6B140A51E09F4EB434E88427765924D16DBFA682"
+    },
+    {
+      "relative_path": "runs/08-latin-comparison-published-mir3/config.ini",
+      "bytes": 66973,
+      "sha256": "0D7091BBDA35A42C092489FD926EF1FC5F9F9F641848E05CD03AF1C6851629E9"
+    },
+    {
+      "relative_path": "runs/08-latin-comparison-published-mir3/responsive-menu-actor/latest-owned-window.png",
+      "bytes": 9806682,
+      "sha256": "1D8C341CB79331D549FC916FDB12C533547C278B98B66926BEAEE303DBE25B61"
+    },
+    {
+      "relative_path": "runs/08-latin-comparison-published-mir3/responsive-menu-actor/main-menu.png",
+      "bytes": 9760669,
+      "sha256": "DD51F95346E729FF8E3D3991673364C399D7C00671AB220276FEFE83513FB8B2"
+    },
+    {
+      "relative_path": "runs/08-latin-comparison-published-mir3/responsive-menu-actor/settings-response.png",
+      "bytes": 9806682,
+      "sha256": "1D8C341CB79331D549FC916FDB12C533547C278B98B66926BEAEE303DBE25B61"
+    },
+    {
+      "relative_path": "runs/09-latin-comparison-published-mir4.7/config.ini",
+      "bytes": 66973,
+      "sha256": "0D7091BBDA35A42C092489FD926EF1FC5F9F9F641848E05CD03AF1C6851629E9"
+    },
+    {
+      "relative_path": "runs/09-latin-comparison-published-mir4.7/responsive-menu-actor/latest-owned-window.png",
+      "bytes": 8998259,
+      "sha256": "EEE1D0F3569E8C126B0E902BB788051EDEE29482BD3BA9FA2351FF54F90198FC"
+    },
+    {
+      "relative_path": "runs/09-latin-comparison-published-mir4.7/responsive-menu-actor/main-menu.png",
+      "bytes": 8978281,
+      "sha256": "B731794E4D90CB48AF9167BE12DEA506F0A4EF65B47346847E0F8DBD14A44726"
+    },
+    {
+      "relative_path": "runs/09-latin-comparison-published-mir4.7/responsive-menu-actor/settings-response.png",
+      "bytes": 8998259,
+      "sha256": "EEE1D0F3569E8C126B0E902BB788051EDEE29482BD3BA9FA2351FF54F90198FC"
+    },
+    {
+      "relative_path": "runs/10-latin-comparison-candidate-mir5/config.ini",
+      "bytes": 66973,
+      "sha256": "0D7091BBDA35A42C092489FD926EF1FC5F9F9F641848E05CD03AF1C6851629E9"
+    },
+    {
+      "relative_path": "runs/10-latin-comparison-candidate-mir5/responsive-menu-actor/latest-owned-window.png",
+      "bytes": 9252720,
+      "sha256": "6157FEEB564AE22DE2158B24291B7D14450427D876738B444AA680E28A191E9E"
+    },
+    {
+      "relative_path": "runs/10-latin-comparison-candidate-mir5/responsive-menu-actor/main-menu.png",
+      "bytes": 9261540,
+      "sha256": "385A6CD2B74F07C6F4EE9486C0B8F854C347457D1BFD3647CF889A1D65946F6D"
+    },
+    {
+      "relative_path": "runs/10-latin-comparison-candidate-mir5/responsive-menu-actor/settings-response.png",
+      "bytes": 9252720,
+      "sha256": "6157FEEB564AE22DE2158B24291B7D14450427D876738B444AA680E28A191E9E"
+    },
+    {
+      "relative_path": "runs/11-latin-comparison-published-mir3/config.ini",
+      "bytes": 66973,
+      "sha256": "0D7091BBDA35A42C092489FD926EF1FC5F9F9F641848E05CD03AF1C6851629E9"
+    },
+    {
+      "relative_path": "runs/11-latin-comparison-published-mir3/responsive-menu-actor/latest-owned-window.png",
+      "bytes": 9478892,
+      "sha256": "86D3E26E1FBEAC43F69E83D9AFBB8FB1DAA3F4C3A3903CBE258DD0E74E6D6391"
+    },
+    {
+      "relative_path": "runs/11-latin-comparison-published-mir3/responsive-menu-actor/main-menu.png",
+      "bytes": 9431538,
+      "sha256": "9F6D107A40D5BB83A88F7B819474AF987A2416220EE4BA62E21B64407F9181AA"
+    },
+    {
+      "relative_path": "runs/11-latin-comparison-published-mir3/responsive-menu-actor/settings-response.png",
+      "bytes": 9478892,
+      "sha256": "86D3E26E1FBEAC43F69E83D9AFBB8FB1DAA3F4C3A3903CBE258DD0E74E6D6391"
+    },
+    {
+      "relative_path": "runs/12-latin-comparison-published-mir4.7/config.ini",
+      "bytes": 66973,
+      "sha256": "0D7091BBDA35A42C092489FD926EF1FC5F9F9F641848E05CD03AF1C6851629E9"
+    },
+    {
+      "relative_path": "runs/12-latin-comparison-published-mir4.7/responsive-menu-actor/latest-owned-window.png",
+      "bytes": 6556198,
+      "sha256": "F5FB4664DF5DC265585C74B5AA33CFEB2FF9A277BFB8282B6719AC9376ACD234"
+    },
+    {
+      "relative_path": "runs/12-latin-comparison-published-mir4.7/responsive-menu-actor/main-menu.png",
+      "bytes": 6351136,
+      "sha256": "B7EC2ABDACEF50486C5D44C8F3B4021DE39E78A58CD498C5ECC0AEF874B47DB1"
+    },
+    {
+      "relative_path": "runs/12-latin-comparison-published-mir4.7/responsive-menu-actor/settings-response.png",
+      "bytes": 6556198,
+      "sha256": "F5FB4664DF5DC265585C74B5AA33CFEB2FF9A277BFB8282B6719AC9376ACD234"
+    },
+    {
+      "relative_path": "runs/13-latin-comparison-candidate-mir5/config.ini",
+      "bytes": 66973,
+      "sha256": "0D7091BBDA35A42C092489FD926EF1FC5F9F9F641848E05CD03AF1C6851629E9"
+    },
+    {
+      "relative_path": "runs/13-latin-comparison-candidate-mir5/responsive-menu-actor/latest-owned-window.png",
+      "bytes": 8832210,
+      "sha256": "16A1368A92B0DF1124CE7DFC3E50DB7EDB35DFDC46D08AC00ED696F2E47D5501"
+    },
+    {
+      "relative_path": "runs/13-latin-comparison-candidate-mir5/responsive-menu-actor/main-menu.png",
+      "bytes": 8828760,
+      "sha256": "956DE3E1562F667ABFF41FF960AFD9369A96E9741C7AA7CB8B9947C00801FF97"
+    },
+    {
+      "relative_path": "runs/13-latin-comparison-candidate-mir5/responsive-menu-actor/settings-response.png",
+      "bytes": 8832210,
+      "sha256": "16A1368A92B0DF1124CE7DFC3E50DB7EDB35DFDC46D08AC00ED696F2E47D5501"
+    },
+    {
+      "relative_path": "runs/14-latin-comparison-control-without-mir/config.ini",
+      "bytes": 66973,
+      "sha256": "0D7091BBDA35A42C092489FD926EF1FC5F9F9F641848E05CD03AF1C6851629E9"
+    },
+    {
+      "relative_path": "runs/14-latin-comparison-control-without-mir/responsive-menu-actor/latest-owned-window.png",
+      "bytes": 9374969,
+      "sha256": "225A440FF5FA7C00C3DAD10FE6526AF0EBB74AE3F25890480D7AFBA89AAB2BEC"
+    },
+    {
+      "relative_path": "runs/14-latin-comparison-control-without-mir/responsive-menu-actor/main-menu.png",
+      "bytes": 9348765,
+      "sha256": "D2E169A9C0641F4E696AF7D1FA736D3AB8EBA7194B115ED4CD450C42452F3FB5"
+    },
+    {
+      "relative_path": "runs/14-latin-comparison-control-without-mir/responsive-menu-actor/settings-response.png",
+      "bytes": 9374969,
+      "sha256": "225A440FF5FA7C00C3DAD10FE6526AF0EBB74AE3F25890480D7AFBA89AAB2BEC"
+    },
+    {
+      "relative_path": "runs/15-latin-comparison-published-mir4.7/config.ini",
+      "bytes": 66973,
+      "sha256": "0D7091BBDA35A42C092489FD926EF1FC5F9F9F641848E05CD03AF1C6851629E9"
+    },
+    {
+      "relative_path": "runs/15-latin-comparison-published-mir4.7/responsive-menu-actor/latest-owned-window.png",
+      "bytes": 9655529,
+      "sha256": "3809F4FB7E3F09B648EF884250FA315C9C82895E2F66730F153A9667104BC834"
+    },
+    {
+      "relative_path": "runs/15-latin-comparison-published-mir4.7/responsive-menu-actor/main-menu.png",
+      "bytes": 9668393,
+      "sha256": "AAA526DB8F62C95A68E09F457AE5155CBF0A928B3966E98E2DE3895A9CA114C1"
+    },
+    {
+      "relative_path": "runs/15-latin-comparison-published-mir4.7/responsive-menu-actor/settings-response.png",
+      "bytes": 9655529,
+      "sha256": "3809F4FB7E3F09B648EF884250FA315C9C82895E2F66730F153A9667104BC834"
+    },
+    {
+      "relative_path": "runs/16-latin-comparison-candidate-mir5/config.ini",
+      "bytes": 66973,
+      "sha256": "0D7091BBDA35A42C092489FD926EF1FC5F9F9F641848E05CD03AF1C6851629E9"
+    },
+    {
+      "relative_path": "runs/16-latin-comparison-candidate-mir5/responsive-menu-actor/latest-owned-window.png",
+      "bytes": 9041736,
+      "sha256": "C6D55DE4BBF156CF4EA76F4AAD0F4A2AA2A37B6F8D31A0D7BF84ABFD71DF784F"
+    },
+    {
+      "relative_path": "runs/16-latin-comparison-candidate-mir5/responsive-menu-actor/main-menu.png",
+      "bytes": 9045454,
+      "sha256": "4C1CD41B153E222D2DB97112A9666B41A3E7B1E37611358FA75B03BA9C33F0C7"
+    },
+    {
+      "relative_path": "runs/16-latin-comparison-candidate-mir5/responsive-menu-actor/settings-response.png",
+      "bytes": 9041736,
+      "sha256": "C6D55DE4BBF156CF4EA76F4AAD0F4A2AA2A37B6F8D31A0D7BF84ABFD71DF784F"
+    },
+    {
+      "relative_path": "runs/17-latin-comparison-control-without-mir/config.ini",
+      "bytes": 66973,
+      "sha256": "0D7091BBDA35A42C092489FD926EF1FC5F9F9F641848E05CD03AF1C6851629E9"
+    },
+    {
+      "relative_path": "runs/17-latin-comparison-control-without-mir/responsive-menu-actor/latest-owned-window.png",
+      "bytes": 8836227,
+      "sha256": "5CC7B348618DA3364C8D528F66069A43476A91DD804146DB2A302F9270B9E739"
+    },
+    {
+      "relative_path": "runs/17-latin-comparison-control-without-mir/responsive-menu-actor/main-menu.png",
+      "bytes": 8816952,
+      "sha256": "FB77B8F4A2D4FE9D9BAC5E5BEE939FD1D73E5339FED0B967179C7EB6F865B62C"
+    },
+    {
+      "relative_path": "runs/17-latin-comparison-control-without-mir/responsive-menu-actor/settings-response.png",
+      "bytes": 8836227,
+      "sha256": "5CC7B348618DA3364C8D528F66069A43476A91DD804146DB2A302F9270B9E739"
+    },
+    {
+      "relative_path": "runs/18-latin-comparison-published-mir3/config.ini",
+      "bytes": 66973,
+      "sha256": "0D7091BBDA35A42C092489FD926EF1FC5F9F9F641848E05CD03AF1C6851629E9"
+    },
+    {
+      "relative_path": "runs/18-latin-comparison-published-mir3/responsive-menu-actor/latest-owned-window.png",
+      "bytes": 7598355,
+      "sha256": "2F583C29545092BAC2EF8A4E545047B1F6316E2C1471A4515CD094BD33F75D9E"
+    },
+    {
+      "relative_path": "runs/18-latin-comparison-published-mir3/responsive-menu-actor/main-menu.png",
+      "bytes": 7562508,
+      "sha256": "F43E042FF9A160E790A2F5F789A1D3627CC89D62FF7BC9E9C0C321386298E3E5"
+    },
+    {
+      "relative_path": "runs/18-latin-comparison-published-mir3/responsive-menu-actor/settings-response.png",
+      "bytes": 7598355,
+      "sha256": "2F583C29545092BAC2EF8A4E545047B1F6316E2C1471A4515CD094BD33F75D9E"
+    },
+    {
+      "relative_path": "runs/19-latin-comparison-candidate-mir5/config.ini",
+      "bytes": 66973,
+      "sha256": "0D7091BBDA35A42C092489FD926EF1FC5F9F9F641848E05CD03AF1C6851629E9"
+    },
+    {
+      "relative_path": "runs/19-latin-comparison-candidate-mir5/responsive-menu-actor/latest-owned-window.png",
+      "bytes": 9691294,
+      "sha256": "76BC12C1A64E1786281EEFA2B8CC9FD20AAAE4C5C5A901B372513F0FB7A1ADA5"
+    },
+    {
+      "relative_path": "runs/19-latin-comparison-candidate-mir5/responsive-menu-actor/main-menu.png",
+      "bytes": 9676609,
+      "sha256": "3DD0249EE6DEE3C3CACB94C3B6F058BF86CF0690B18FEF6DEB34959D2C850892"
+    },
+    {
+      "relative_path": "runs/19-latin-comparison-candidate-mir5/responsive-menu-actor/settings-response.png",
+      "bytes": 9691294,
+      "sha256": "76BC12C1A64E1786281EEFA2B8CC9FD20AAAE4C5C5A901B372513F0FB7A1ADA5"
+    },
+    {
+      "relative_path": "runs/20-latin-comparison-control-without-mir/config.ini",
+      "bytes": 66973,
+      "sha256": "0D7091BBDA35A42C092489FD926EF1FC5F9F9F641848E05CD03AF1C6851629E9"
+    },
+    {
+      "relative_path": "runs/20-latin-comparison-control-without-mir/responsive-menu-actor/latest-owned-window.png",
+      "bytes": 8774063,
+      "sha256": "F22D732D29A29F25E90661EE34AF3A70815530FA825A8366DED864EE795D65A2"
+    },
+    {
+      "relative_path": "runs/20-latin-comparison-control-without-mir/responsive-menu-actor/main-menu.png",
+      "bytes": 8763157,
+      "sha256": "9F0A1818882B1E83A6ACB9E3C712948140CDC6BD78AB3DAF0F84AB335E2E98B7"
+    },
+    {
+      "relative_path": "runs/20-latin-comparison-control-without-mir/responsive-menu-actor/settings-response.png",
+      "bytes": 8774063,
+      "sha256": "F22D732D29A29F25E90661EE34AF3A70815530FA825A8366DED864EE795D65A2"
+    },
+    {
+      "relative_path": "runs/21-latin-comparison-published-mir3/config.ini",
+      "bytes": 66973,
+      "sha256": "0D7091BBDA35A42C092489FD926EF1FC5F9F9F641848E05CD03AF1C6851629E9"
+    },
+    {
+      "relative_path": "runs/21-latin-comparison-published-mir3/responsive-menu-actor/latest-owned-window.png",
+      "bytes": 8399934,
+      "sha256": "ABAE15DB508720A18FF7EB45419DEFD5F4DC893B5AB04A41F6EFB0BF454E94B6"
+    },
+    {
+      "relative_path": "runs/21-latin-comparison-published-mir3/responsive-menu-actor/main-menu.png",
+      "bytes": 8373512,
+      "sha256": "334611B3814ED3D6C86A36D677706276859984A95FD3231603B7C8B595294B9A"
+    },
+    {
+      "relative_path": "runs/21-latin-comparison-published-mir3/responsive-menu-actor/settings-response.png",
+      "bytes": 8399934,
+      "sha256": "ABAE15DB508720A18FF7EB45419DEFD5F4DC893B5AB04A41F6EFB0BF454E94B6"
+    },
+    {
+      "relative_path": "runs/22-latin-comparison-published-mir4.7/config.ini",
+      "bytes": 66973,
+      "sha256": "0D7091BBDA35A42C092489FD926EF1FC5F9F9F641848E05CD03AF1C6851629E9"
+    },
+    {
+      "relative_path": "runs/22-latin-comparison-published-mir4.7/responsive-menu-actor/latest-owned-window.png",
+      "bytes": 5777789,
+      "sha256": "9B8163AAE3B45606DAC205BC9CB3DE4F68F5A3E619D8A990F2E54A0BEFF08064"
+    },
+    {
+      "relative_path": "runs/22-latin-comparison-published-mir4.7/responsive-menu-actor/main-menu.png",
+      "bytes": 5739610,
+      "sha256": "4489D54EC8BDDC191524F44BA54DC5A3F8C9792B33AB580E3DD2F85EBC5798DF"
+    },
+    {
+      "relative_path": "runs/22-latin-comparison-published-mir4.7/responsive-menu-actor/settings-response.png",
+      "bytes": 5777789,
+      "sha256": "9B8163AAE3B45606DAC205BC9CB3DE4F68F5A3E619D8A990F2E54A0BEFF08064"
+    },
+    {
+      "relative_path": "runs/23-latin-comparison-control-without-mir/config.ini",
+      "bytes": 66973,
+      "sha256": "0D7091BBDA35A42C092489FD926EF1FC5F9F9F641848E05CD03AF1C6851629E9"
+    },
+    {
+      "relative_path": "runs/23-latin-comparison-control-without-mir/responsive-menu-actor/latest-owned-window.png",
+      "bytes": 8174436,
+      "sha256": "8063405C377FD0C9D3EAA1E472C8812F95AD9F6AEED605AF79A236D4763B5B05"
+    },
+    {
+      "relative_path": "runs/23-latin-comparison-control-without-mir/responsive-menu-actor/main-menu.png",
+      "bytes": 8167755,
+      "sha256": "4C15B9F8ED873A9340A8E68AAF6AE2BB077AFE611749D406A227A5862457D022"
+    },
+    {
+      "relative_path": "runs/23-latin-comparison-control-without-mir/responsive-menu-actor/settings-response.png",
+      "bytes": 8174436,
+      "sha256": "8063405C377FD0C9D3EAA1E472C8812F95AD9F6AEED605AF79A236D4763B5B05"
+    },
+    {
+      "relative_path": "runs/24-latin-comparison-published-mir3/config.ini",
+      "bytes": 66973,
+      "sha256": "0D7091BBDA35A42C092489FD926EF1FC5F9F9F641848E05CD03AF1C6851629E9"
+    },
+    {
+      "relative_path": "runs/24-latin-comparison-published-mir3/responsive-menu-actor/latest-owned-window.png",
+      "bytes": 8264157,
+      "sha256": "48CA5406B65D1F58B7C6AEF1F933587AA517F1165BB87CD411FD2A03DD1F37C3"
+    },
+    {
+      "relative_path": "runs/24-latin-comparison-published-mir3/responsive-menu-actor/main-menu.png",
+      "bytes": 8209583,
+      "sha256": "00D963C8C9500E2EC0B6789B8D1249577967EFEA2D8332E2E8DB1BE4A69EB5E0"
+    },
+    {
+      "relative_path": "runs/24-latin-comparison-published-mir3/responsive-menu-actor/settings-response.png",
+      "bytes": 8264157,
+      "sha256": "48CA5406B65D1F58B7C6AEF1F933587AA517F1165BB87CD411FD2A03DD1F37C3"
+    },
+    {
+      "relative_path": "runs/25-latin-comparison-published-mir4.7/config.ini",
+      "bytes": 66973,
+      "sha256": "0D7091BBDA35A42C092489FD926EF1FC5F9F9F641848E05CD03AF1C6851629E9"
+    },
+    {
+      "relative_path": "runs/25-latin-comparison-published-mir4.7/responsive-menu-actor/latest-owned-window.png",
+      "bytes": 5127106,
+      "sha256": "9AE73A39F35EA38F1917C4E6D588A949A93CC021F44DF7EBC2315FAC92D1BE51"
+    },
+    {
+      "relative_path": "runs/25-latin-comparison-published-mir4.7/responsive-menu-actor/main-menu.png",
+      "bytes": 5135489,
+      "sha256": "9E38274A1E5FF716DB4D16E45C5A9CDC2D80DE63089DF346C498258CE77018EF"
+    },
+    {
+      "relative_path": "runs/25-latin-comparison-published-mir4.7/responsive-menu-actor/settings-response.png",
+      "bytes": 5127106,
+      "sha256": "9AE73A39F35EA38F1917C4E6D588A949A93CC021F44DF7EBC2315FAC92D1BE51"
+    },
+    {
+      "relative_path": "runs/26-latin-comparison-candidate-mir5/config.ini",
+      "bytes": 66973,
+      "sha256": "0D7091BBDA35A42C092489FD926EF1FC5F9F9F641848E05CD03AF1C6851629E9"
+    },
+    {
+      "relative_path": "runs/26-latin-comparison-candidate-mir5/responsive-menu-actor/latest-owned-window.png",
+      "bytes": 8820211,
+      "sha256": "C811F1A4992F2751B8006AD21C4D32496894A8E2178573EAE620E1EAE2286DE7"
+    },
+    {
+      "relative_path": "runs/26-latin-comparison-candidate-mir5/responsive-menu-actor/main-menu.png",
+      "bytes": 8824270,
+      "sha256": "4C3C474E72EB924F0AC1E9E2AD5EB0882C9D9E733B50191D29DA72F93006DCE9"
+    },
+    {
+      "relative_path": "runs/26-latin-comparison-candidate-mir5/responsive-menu-actor/settings-response.png",
+      "bytes": 8820211,
+      "sha256": "C811F1A4992F2751B8006AD21C4D32496894A8E2178573EAE620E1EAE2286DE7"
+    },
+    {
+      "relative_path": "runs/27-latin-comparison-published-mir3/config.ini",
+      "bytes": 66973,
+      "sha256": "0D7091BBDA35A42C092489FD926EF1FC5F9F9F641848E05CD03AF1C6851629E9"
+    },
+    {
+      "relative_path": "runs/27-latin-comparison-published-mir3/responsive-menu-actor/latest-owned-window.png",
+      "bytes": 7769234,
+      "sha256": "C75404714C6E06290CC47B5159BDC1AF080A13B69BFAB6328DBE227F8E1F6A21"
+    },
+    {
+      "relative_path": "runs/27-latin-comparison-published-mir3/responsive-menu-actor/main-menu.png",
+      "bytes": 7766140,
+      "sha256": "0FC16F0DC57857B1210BB608424B873D2C41D32C5106727DA1C3F92C54EACBAA"
+    },
+    {
+      "relative_path": "runs/27-latin-comparison-published-mir3/responsive-menu-actor/settings-response.png",
+      "bytes": 7769234,
+      "sha256": "C75404714C6E06290CC47B5159BDC1AF080A13B69BFAB6328DBE227F8E1F6A21"
+    },
+    {
+      "relative_path": "runs/28-latin-comparison-published-mir4.7/config.ini",
+      "bytes": 66973,
+      "sha256": "0D7091BBDA35A42C092489FD926EF1FC5F9F9F641848E05CD03AF1C6851629E9"
+    },
+    {
+      "relative_path": "runs/28-latin-comparison-published-mir4.7/responsive-menu-actor/latest-owned-window.png",
+      "bytes": 9547803,
+      "sha256": "C606D85BF4A9341779DF15FEC8EA1639ED6A963E7626AFCF0875B047D7A6C686"
+    },
+    {
+      "relative_path": "runs/28-latin-comparison-published-mir4.7/responsive-menu-actor/main-menu.png",
+      "bytes": 9513176,
+      "sha256": "FE04CFBB6F7BA7148CCA5B7AECD481EC486938DB01E3476417EAFC8FF298346A"
+    },
+    {
+      "relative_path": "runs/28-latin-comparison-published-mir4.7/responsive-menu-actor/settings-response.png",
+      "bytes": 9547803,
+      "sha256": "C606D85BF4A9341779DF15FEC8EA1639ED6A963E7626AFCF0875B047D7A6C686"
+    },
+    {
+      "relative_path": "runs/29-latin-comparison-candidate-mir5/config.ini",
+      "bytes": 66973,
+      "sha256": "0D7091BBDA35A42C092489FD926EF1FC5F9F9F641848E05CD03AF1C6851629E9"
+    },
+    {
+      "relative_path": "runs/29-latin-comparison-candidate-mir5/responsive-menu-actor/latest-owned-window.png",
+      "bytes": 7691882,
+      "sha256": "CBBDEA7AFC3A3EB21737856F9A0D0EA668F655B04036E9922A1C037AC1FBDDE8"
+    },
+    {
+      "relative_path": "runs/29-latin-comparison-candidate-mir5/responsive-menu-actor/main-menu.png",
+      "bytes": 7633632,
+      "sha256": "FE24B0F37A96A12ADC63868BD7426ACE43C5CDD238619FFCF23036C5B57CD890"
+    },
+    {
+      "relative_path": "runs/29-latin-comparison-candidate-mir5/responsive-menu-actor/settings-response.png",
+      "bytes": 7691882,
+      "sha256": "CBBDEA7AFC3A3EB21737856F9A0D0EA668F655B04036E9922A1C037AC1FBDDE8"
+    },
+    {
+      "relative_path": "runs/30-latin-comparison-control-without-mir/config.ini",
+      "bytes": 66973,
+      "sha256": "0D7091BBDA35A42C092489FD926EF1FC5F9F9F641848E05CD03AF1C6851629E9"
+    },
+    {
+      "relative_path": "runs/30-latin-comparison-control-without-mir/responsive-menu-actor/latest-owned-window.png",
+      "bytes": 7706251,
+      "sha256": "1AFDBA0E27F48E606856C17E226C9A942A8B11B1EECDB7AF785258CF22DB083F"
+    },
+    {
+      "relative_path": "runs/30-latin-comparison-control-without-mir/responsive-menu-actor/main-menu.png",
+      "bytes": 7702199,
+      "sha256": "BD10BA02C1EE2AC56C98223B7EA77EA5F81AC7A2203936D5635FDFA994A17FCF"
+    },
+    {
+      "relative_path": "runs/30-latin-comparison-control-without-mir/responsive-menu-actor/settings-response.png",
+      "bytes": 7706251,
+      "sha256": "1AFDBA0E27F48E606856C17E226C9A942A8B11B1EECDB7AF785258CF22DB083F"
+    },
+    {
+      "relative_path": "runs/31-latin-comparison-published-mir4.7/config.ini",
+      "bytes": 66973,
+      "sha256": "0D7091BBDA35A42C092489FD926EF1FC5F9F9F641848E05CD03AF1C6851629E9"
+    },
+    {
+      "relative_path": "runs/31-latin-comparison-published-mir4.7/responsive-menu-actor/latest-owned-window.png",
+      "bytes": 9678506,
+      "sha256": "7137E5C3D1F4D1B13A01F25A3FD997316D4C7F75ADEF1D2E33608A845042518B"
+    },
+    {
+      "relative_path": "runs/31-latin-comparison-published-mir4.7/responsive-menu-actor/main-menu.png",
+      "bytes": 9668406,
+      "sha256": "251F65831D61B6A660F1FCCC26C0BDA7DAF1E9AEAA8216156350AD5BB60B5D90"
+    },
+    {
+      "relative_path": "runs/31-latin-comparison-published-mir4.7/responsive-menu-actor/settings-response.png",
+      "bytes": 9678506,
+      "sha256": "7137E5C3D1F4D1B13A01F25A3FD997316D4C7F75ADEF1D2E33608A845042518B"
+    },
+    {
+      "relative_path": "runs/32-latin-comparison-candidate-mir5/config.ini",
+      "bytes": 66973,
+      "sha256": "0D7091BBDA35A42C092489FD926EF1FC5F9F9F641848E05CD03AF1C6851629E9"
+    },
+    {
+      "relative_path": "runs/32-latin-comparison-candidate-mir5/responsive-menu-actor/latest-owned-window.png",
+      "bytes": 8666711,
+      "sha256": "3DD8967C88D82BE09329DBE4C3235C7C6998A6A3B462E805D05718022834AF7D"
+    },
+    {
+      "relative_path": "runs/32-latin-comparison-candidate-mir5/responsive-menu-actor/main-menu.png",
+      "bytes": 8063389,
+      "sha256": "96BCEABB875279544E317F2B51086AF1323D2796F176BE49F35D4253D733DCF4"
+    },
+    {
+      "relative_path": "runs/32-latin-comparison-candidate-mir5/responsive-menu-actor/settings-response.png",
+      "bytes": 8666711,
+      "sha256": "3DD8967C88D82BE09329DBE4C3235C7C6998A6A3B462E805D05718022834AF7D"
+    },
+    {
+      "relative_path": "runs/33-latin-comparison-control-without-mir/config.ini",
+      "bytes": 66973,
+      "sha256": "0D7091BBDA35A42C092489FD926EF1FC5F9F9F641848E05CD03AF1C6851629E9"
+    },
+    {
+      "relative_path": "runs/33-latin-comparison-control-without-mir/responsive-menu-actor/latest-owned-window.png",
+      "bytes": 8423973,
+      "sha256": "595858307734DC4CD85E66B62A046ED3147B1AAEA4933B92C1D252ED52ECCC3A"
+    },
+    {
+      "relative_path": "runs/33-latin-comparison-control-without-mir/responsive-menu-actor/main-menu.png",
+      "bytes": 8440028,
+      "sha256": "0B8747BC2F5FF487D5FF1DE6947AD489056632F5E9DAA952C0328CCCE203389F"
+    },
+    {
+      "relative_path": "runs/33-latin-comparison-control-without-mir/responsive-menu-actor/settings-response.png",
+      "bytes": 8423973,
+      "sha256": "595858307734DC4CD85E66B62A046ED3147B1AAEA4933B92C1D252ED52ECCC3A"
+    },
+    {
+      "relative_path": "runs/34-latin-comparison-published-mir3/config.ini",
+      "bytes": 66973,
+      "sha256": "0D7091BBDA35A42C092489FD926EF1FC5F9F9F641848E05CD03AF1C6851629E9"
+    },
+    {
+      "relative_path": "runs/34-latin-comparison-published-mir3/responsive-menu-actor/latest-owned-window.png",
+      "bytes": 8967336,
+      "sha256": "02CFD89CEBC298FA459D4EC47A8CEA4AC3A729A1E58648D5F58AA911E87ED854"
+    },
+    {
+      "relative_path": "runs/34-latin-comparison-published-mir3/responsive-menu-actor/main-menu.png",
+      "bytes": 8965048,
+      "sha256": "DDD471E24914C24C407E4BB630CF1D938C0ED74AECE948D4D0BADD82E2F70A23"
+    },
+    {
+      "relative_path": "runs/34-latin-comparison-published-mir3/responsive-menu-actor/settings-response.png",
+      "bytes": 8967336,
+      "sha256": "02CFD89CEBC298FA459D4EC47A8CEA4AC3A729A1E58648D5F58AA911E87ED854"
+    },
+    {
+      "relative_path": "runs/35-latin-comparison-candidate-mir5/config.ini",
+      "bytes": 66973,
+      "sha256": "0D7091BBDA35A42C092489FD926EF1FC5F9F9F641848E05CD03AF1C6851629E9"
+    },
+    {
+      "relative_path": "runs/35-latin-comparison-candidate-mir5/responsive-menu-actor/latest-owned-window.png",
+      "bytes": 9229132,
+      "sha256": "55958BBC98DB5C4D9E0153EB336B3E6DC76544E117892E25BB55C8200190C604"
+    },
+    {
+      "relative_path": "runs/35-latin-comparison-candidate-mir5/responsive-menu-actor/main-menu.png",
+      "bytes": 9234199,
+      "sha256": "E997604E3986155EFE7ADD18A76233A35427E5A58E7B3D52BBE6C571A21A076B"
+    },
+    {
+      "relative_path": "runs/35-latin-comparison-candidate-mir5/responsive-menu-actor/settings-response.png",
+      "bytes": 9229132,
+      "sha256": "55958BBC98DB5C4D9E0153EB336B3E6DC76544E117892E25BB55C8200190C604"
+    },
+    {
+      "relative_path": "runs/36-latin-comparison-control-without-mir/config.ini",
+      "bytes": 66973,
+      "sha256": "0D7091BBDA35A42C092489FD926EF1FC5F9F9F641848E05CD03AF1C6851629E9"
+    },
+    {
+      "relative_path": "runs/36-latin-comparison-control-without-mir/responsive-menu-actor/latest-owned-window.png",
+      "bytes": 9218612,
+      "sha256": "2107AAF491245AADF4A1F7BF7D08D8E5BAAE93E43E9BEC36BE437F38969857CE"
+    },
+    {
+      "relative_path": "runs/36-latin-comparison-control-without-mir/responsive-menu-actor/main-menu.png",
+      "bytes": 9163734,
+      "sha256": "5CA986BD9EEA8854A147E0FAEE423782C0D24EC7960D241FFE9E51721B49FFFD"
+    },
+    {
+      "relative_path": "runs/36-latin-comparison-control-without-mir/responsive-menu-actor/settings-response.png",
+      "bytes": 9218612,
+      "sha256": "2107AAF491245AADF4A1F7BF7D08D8E5BAAE93E43E9BEC36BE437F38969857CE"
+    },
+    {
+      "relative_path": "runs/37-latin-comparison-published-mir3/config.ini",
+      "bytes": 66973,
+      "sha256": "0D7091BBDA35A42C092489FD926EF1FC5F9F9F641848E05CD03AF1C6851629E9"
+    },
+    {
+      "relative_path": "runs/37-latin-comparison-published-mir3/responsive-menu-actor/latest-owned-window.png",
+      "bytes": 9627356,
+      "sha256": "52AF6AFB0FCEEECE1CDCCCFEA3903978D51BF8D1A353B15401A407E5D920B983"
+    },
+    {
+      "relative_path": "runs/37-latin-comparison-published-mir3/responsive-menu-actor/main-menu.png",
+      "bytes": 9613966,
+      "sha256": "1018472D0B74BE87BB0B61A72CD729C380874A4561CCEE65D0CCCE0BA8C0A3BC"
+    },
+    {
+      "relative_path": "runs/37-latin-comparison-published-mir3/responsive-menu-actor/settings-response.png",
+      "bytes": 9627356,
+      "sha256": "52AF6AFB0FCEEECE1CDCCCFEA3903978D51BF8D1A353B15401A407E5D920B983"
+    },
+    {
+      "relative_path": "runs/38-latin-comparison-published-mir4.7/config.ini",
+      "bytes": 66973,
+      "sha256": "0D7091BBDA35A42C092489FD926EF1FC5F9F9F641848E05CD03AF1C6851629E9"
+    },
+    {
+      "relative_path": "runs/38-latin-comparison-published-mir4.7/responsive-menu-actor/latest-owned-window.png",
+      "bytes": 9424205,
+      "sha256": "F63167A81179D817D4B2857C9F5F6DDC11FAFB84997564B6EDE4100FF05E241E"
+    },
+    {
+      "relative_path": "runs/38-latin-comparison-published-mir4.7/responsive-menu-actor/main-menu.png",
+      "bytes": 9417931,
+      "sha256": "A74F47DD1CEC4B8B9D2921078F5F2286C833F78663501F800F4A1A933994A663"
+    },
+    {
+      "relative_path": "runs/38-latin-comparison-published-mir4.7/responsive-menu-actor/settings-response.png",
+      "bytes": 9424205,
+      "sha256": "F63167A81179D817D4B2857C9F5F6DDC11FAFB84997564B6EDE4100FF05E241E"
+    },
+    {
+      "relative_path": "write-data/ordinary-menu-shared/achievements-modded.dat",
+      "bytes": 7086,
+      "sha256": "354DC831343BB9BE5B7EFAE5C63C2BB39D5581AB7DDD6E207B3321E4DB5075C1"
+    },
+    {
+      "relative_path": "write-data/ordinary-menu-shared/crop-cache.dat",
+      "bytes": 8992171,
+      "sha256": "C0398199EEB59632CAF3FDA9874F2ED166F6DE8B544D9355D3A009D09D29085A"
+    },
+    {
+      "relative_path": "write-data/ordinary-menu-shared/player-data.json",
+      "bytes": 16407,
+      "sha256": "5E9A45CF958EB4FD900628E0CCB2C1F1E58BE6D70A86BBCA7FAF89CC3983B3E2"
+    }
+  ],
+  "limits": [
+    "All38observations are unaccepted forensic data because the normal original caller terminal/exit proof is absent. Passing arithmetic does not establish an achieved performance objective.",
+    "Fresh post-controller native/controller copies are byte/hash verified,with exact original state currently restored and Factorio0;these facts do not prove normal finally completion.",
+    "Do not fabricate terminal/exit files,change the frozen reader to admit missing completion,pool observations,retrospectively accept the cohort or infer why the controller disappeared.",
+    "All114PNGs have strict CRC/decompression checks;only the five explicitly listed original frames were actually viewed.",
+    "Medians and the93.0719percent formula are unaccepted descriptive calculations,not qualified performance claims,confidence bounds or MIR Lua time.",
+    "Existing R04prefix and earlier refusals remain separately preserved. No old observation is reused here or accepted for a later cohort.",
+    "Any future normal cohort needs a separately frozen declaration and controlled dispatch lifetime;this record authorizes no automatic retry.",
+    "Fresh-process as-shipped measurements are not reboot-cold,equal historical work,active-factory performance or resolution of the reported hour-scale loading case."
+  ],
+  "performance_acceptance": false,
+  "release_qualification": false
+}

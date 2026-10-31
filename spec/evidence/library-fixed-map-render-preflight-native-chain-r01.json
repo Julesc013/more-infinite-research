@@ -1,0 +1,3276 @@
+{
+  "schema": 1,
+  "kind": "MIRLibraryFixedMapRenderPreflightNativeChainV1",
+  "status": "passed-fixed-map-and-delayed-captures-preflight-not-performance",
+  "source_commit": "2ebf07f0efb68ccc6ef202ef7083131d30281f84",
+  "player_tree": "7b0ede663e6fbcf486cd863e7d3719653aedc07a",
+  "controller": {
+    "commit": "d12dbac74d480db8f26538baea939d5f53a3e1be",
+    "driver_sha256": "EDFDDCE85B85C0BAE2653D496A01D8B979C31E14CD38520B3DE517A6F45F8218",
+    "system_sampler_sha256": "0E8658AB15FB8CA9B9F94F38A16C6BF8B2E9080209B07CA6704575FE717C4D6D"
+  },
+  "inputs": {
+    "engine": {
+      "version": "2.0.77",
+      "path": "D:/Games/Factorio/2.0/bin/x64/factorio.exe",
+      "sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B"
+    },
+    "published": {
+      "version": "4.7.20002",
+      "path": "D:/Projects/Factorio/testmods/2.0/more-infinite-research_4.7.20002.zip",
+      "sha256": "F3943EB4D69CCDAC41BD9F922AD03A5C78F34F22D8E7FA5A88A7A658AB1010B7",
+      "bytes": 1449338
+    },
+    "candidate": {
+      "version": "5.0.20000",
+      "source_commit": "a95dbc6b35c165b46aa9991d2a0ef7274d4ec04a",
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\packages\\7b0-all17-r01\\more-infinite-research_5.0.20000.zip",
+      "sha256": "1D45A54DB6F911F665A019897518E46D6614AE7E56903B067F93E116DFC2554F",
+      "bytes": 692743
+    },
+    "profiles": {
+      "published": {
+        "path": "tests/profiles/library-paired-browser-published-f200-2077.json",
+        "sha256": "3CB271B67FCF73D9FB84EF0A5E8E366272288D20DB59159F509BAAEC7007B560"
+      },
+      "candidate": {
+        "path": "tests/profiles/library-paired-browser-native-names-f200-2077.json",
+        "sha256": "0D589D92F3ECFA62A99A4FE7101A607B07FD4F12B1C3E0A87FEB6A0033081C94"
+      }
+    }
+  },
+  "plan": {
+    "path": "spec/evidence/library-fixed-map-render-preflight-plan-r01.json",
+    "sha256": "87FB93AF404A6C6AF67AF6710B8E6B54CFA3A89D18BC6BBD3B04614295B76938"
+  },
+  "packet": {
+    "primary_custody": "build/qualification/library-fixed-map-render-preflight-r01-controller",
+    "sha256": "7E2194355801F3943BE9292D55D2A5E84E99CE87E1BF45974ECB18F595F852A0"
+  },
+  "prepared_sha256": "2C52AF458F78F86F58DB763B541970DF6614B0C5E4CE12E9EC013C1E60E4B97E",
+  "root_readback": {
+    "path": "build/qualification/library-fixed-map-render-preflight-r01-controller/root-readback.json",
+    "sha256": "AB32E746A6CCEE022AE6E223681532E595F8DF9FBC234AD8D9F7C0FCEAD1D966",
+    "reader_sha256": "AC201D882E4F69E952EA6A9294535110ECAF2835C06218C34FF466559F886FEE",
+    "files": 424,
+    "bytes_per_copy": 54643426
+  },
+  "receipt_capsule": {
+    "path": "spec/evidence/library-fixed-map-render-preflight-native-receipts-r01.json.gz",
+    "sha256": "C3C9639061216F519E88F6241A88EDB2A1CF8CD3F0E5D8E8A93592C1476D1EB8",
+    "bytes": 236939,
+    "bodies": 37,
+    "round_trip": "All37 original exact bodies verified,including all14 actual native stdout logs,complete map witnesses,periodic/OS/system counters and readbacks. Four RCON argument values are already private placeholders;zero unparsed/unredacted values."
+  },
+  "counts": {
+    "native_processes": 14,
+    "worlds": 2,
+    "two_real_client_sessions": 2,
+    "actual_join_events": 8,
+    "cold_host_restarts": 2,
+    "lab_completions": 0,
+    "screenshots": 24,
+    "externally_viewed_screenshots": 8,
+    "memory_samples": 1233,
+    "system_samples": 150,
+    "owned_os_peak_records": 12
+  },
+  "canonical_map_settings_sha256": "1A50F14879100043DEA9BC6EA35D5749D0E2BE1396AD1081E1BE8483512D1CAC",
+  "map_inputs": [
+    {
+      "case": "01-published-counter-render",
+      "phase": "create",
+      "log_sha256": "A35CBA8E566AAFED8708739584DF0083B6D457EB8327074A8ECAE1010687B423",
+      "map_gen_settings": {
+        "default_enable_all_autoplace_controls": false,
+        "autoplace_controls": {
+          "coal": {
+            "frequency": 1,
+            "size": 1,
+            "richness": 1
+          },
+          "copper-ore": {
+            "frequency": 1,
+            "size": 1,
+            "richness": 1
+          },
+          "crude-oil": {
+            "frequency": 1,
+            "size": 1,
+            "richness": 1
+          },
+          "enemy-base": {
+            "frequency": 1,
+            "size": 1,
+            "richness": 1
+          },
+          "iron-ore": {
+            "frequency": 1,
+            "size": 1,
+            "richness": 1
+          },
+          "nauvis_cliff": {
+            "frequency": 1,
+            "size": 1,
+            "richness": 1
+          },
+          "rocks": {
+            "frequency": 1,
+            "size": 1,
+            "richness": 1
+          },
+          "starting_area_moisture": {
+            "frequency": 1,
+            "size": 1,
+            "richness": 1
+          },
+          "stone": {
+            "frequency": 1,
+            "size": 1,
+            "richness": 1
+          },
+          "trees": {
+            "frequency": 1,
+            "size": 1,
+            "richness": 1
+          },
+          "uranium-ore": {
+            "frequency": 1,
+            "size": 1,
+            "richness": 1
+          },
+          "water": {
+            "frequency": 1,
+            "size": 1,
+            "richness": 1
+          }
+        },
+        "autoplace_settings": {
+          "decorative": {
+            "treat_missing_as_default": true,
+            "settings": {
+              "brown-asterisk": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "brown-asterisk-mini": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "brown-carpet-grass": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "brown-fluff": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "brown-fluff-dry": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "brown-hairy-grass": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "cracked-mud-decal": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "dark-mud-decal": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "garballo": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "garballo-mini-dry": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "green-asterisk": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "green-asterisk-mini": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "green-bush-mini": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "green-carpet-grass": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "green-croton": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "green-desert-bush": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "green-hairy-grass": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "green-pita": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "green-pita-mini": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "green-small-grass": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "light-mud-decal": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "medium-rock": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "medium-sand-rock": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "red-asterisk": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "red-croton": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "red-desert-bush": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "red-desert-decal": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "red-pita": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "sand-decal": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "sand-dune-decal": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "small-rock": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "small-sand-rock": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "tiny-rock": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "white-desert-bush": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              }
+            }
+          },
+          "entity": {
+            "treat_missing_as_default": true,
+            "settings": {
+              "big-rock": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "big-sand-rock": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "coal": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "copper-ore": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "crude-oil": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "fish": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "huge-rock": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "iron-ore": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "stone": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "uranium-ore": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              }
+            }
+          },
+          "tile": {
+            "treat_missing_as_default": true,
+            "settings": {
+              "deepwater": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "dirt-1": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "dirt-2": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "dirt-3": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "dirt-4": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "dirt-5": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "dirt-6": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "dirt-7": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "dry-dirt": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "grass-1": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "grass-2": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "grass-3": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "grass-4": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "red-desert-0": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "red-desert-1": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "red-desert-2": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "red-desert-3": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "sand-1": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "sand-2": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "sand-3": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "water": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              }
+            }
+          }
+        },
+        "property_expression_names": {},
+        "starting_points": [
+          {
+            "x": 0,
+            "y": 0
+          }
+        ],
+        "seed": 424242,
+        "width": 2000000,
+        "height": 2000000,
+        "starting_area": 1,
+        "peaceful_mode": false,
+        "no_enemies_mode": false,
+        "cliff_settings": {
+          "name": "cliff",
+          "control": "nauvis_cliff",
+          "cliff_elevation_0": 10,
+          "cliff_elevation_interval": 40,
+          "cliff_smoothing": 0,
+          "richness": 1
+        }
+      }
+    },
+    {
+      "case": "01-published-counter-render",
+      "phase": "initial",
+      "log_sha256": "F650289FED5A14FF835A09529C19E4F88F818A0E24A88872712FDD3DD6A9F002",
+      "map_gen_settings": {
+        "default_enable_all_autoplace_controls": false,
+        "autoplace_controls": {
+          "coal": {
+            "frequency": 1,
+            "size": 1,
+            "richness": 1
+          },
+          "copper-ore": {
+            "frequency": 1,
+            "size": 1,
+            "richness": 1
+          },
+          "crude-oil": {
+            "frequency": 1,
+            "size": 1,
+            "richness": 1
+          },
+          "enemy-base": {
+            "frequency": 1,
+            "size": 1,
+            "richness": 1
+          },
+          "iron-ore": {
+            "frequency": 1,
+            "size": 1,
+            "richness": 1
+          },
+          "nauvis_cliff": {
+            "frequency": 1,
+            "size": 1,
+            "richness": 1
+          },
+          "rocks": {
+            "frequency": 1,
+            "size": 1,
+            "richness": 1
+          },
+          "starting_area_moisture": {
+            "frequency": 1,
+            "size": 1,
+            "richness": 1
+          },
+          "stone": {
+            "frequency": 1,
+            "size": 1,
+            "richness": 1
+          },
+          "trees": {
+            "frequency": 1,
+            "size": 1,
+            "richness": 1
+          },
+          "uranium-ore": {
+            "frequency": 1,
+            "size": 1,
+            "richness": 1
+          },
+          "water": {
+            "frequency": 1,
+            "size": 1,
+            "richness": 1
+          }
+        },
+        "autoplace_settings": {
+          "decorative": {
+            "treat_missing_as_default": true,
+            "settings": {
+              "brown-asterisk": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "brown-asterisk-mini": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "brown-carpet-grass": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "brown-fluff": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "brown-fluff-dry": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "brown-hairy-grass": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "cracked-mud-decal": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "dark-mud-decal": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "garballo": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "garballo-mini-dry": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "green-asterisk": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "green-asterisk-mini": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "green-bush-mini": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "green-carpet-grass": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "green-croton": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "green-desert-bush": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "green-hairy-grass": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "green-pita": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "green-pita-mini": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "green-small-grass": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "light-mud-decal": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "medium-rock": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "medium-sand-rock": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "red-asterisk": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "red-croton": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "red-desert-bush": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "red-desert-decal": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "red-pita": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "sand-decal": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "sand-dune-decal": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "small-rock": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "small-sand-rock": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "tiny-rock": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "white-desert-bush": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              }
+            }
+          },
+          "entity": {
+            "treat_missing_as_default": true,
+            "settings": {
+              "big-rock": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "big-sand-rock": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "coal": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "copper-ore": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "crude-oil": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "fish": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "huge-rock": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "iron-ore": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "stone": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "uranium-ore": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              }
+            }
+          },
+          "tile": {
+            "treat_missing_as_default": true,
+            "settings": {
+              "deepwater": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "dirt-1": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "dirt-2": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "dirt-3": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "dirt-4": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "dirt-5": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "dirt-6": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "dirt-7": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "dry-dirt": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "grass-1": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "grass-2": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "grass-3": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "grass-4": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "red-desert-0": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "red-desert-1": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "red-desert-2": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "red-desert-3": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "sand-1": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "sand-2": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "sand-3": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "water": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              }
+            }
+          }
+        },
+        "property_expression_names": {},
+        "starting_points": [
+          {
+            "x": 0,
+            "y": 0
+          }
+        ],
+        "seed": 424242,
+        "width": 2000000,
+        "height": 2000000,
+        "starting_area": 1,
+        "peaceful_mode": false,
+        "no_enemies_mode": false,
+        "cliff_settings": {
+          "name": "cliff",
+          "control": "nauvis_cliff",
+          "cliff_elevation_0": 10,
+          "cliff_elevation_interval": 40,
+          "cliff_smoothing": 0,
+          "richness": 1
+        }
+      }
+    },
+    {
+      "case": "01-published-counter-render",
+      "phase": "restart",
+      "log_sha256": "022ACD2F65EDF822264E9EB43375F77B2B176FCF5867E303AF1B7E52C7484DD9",
+      "map_gen_settings": {
+        "default_enable_all_autoplace_controls": false,
+        "autoplace_controls": {
+          "coal": {
+            "frequency": 1,
+            "size": 1,
+            "richness": 1
+          },
+          "copper-ore": {
+            "frequency": 1,
+            "size": 1,
+            "richness": 1
+          },
+          "crude-oil": {
+            "frequency": 1,
+            "size": 1,
+            "richness": 1
+          },
+          "enemy-base": {
+            "frequency": 1,
+            "size": 1,
+            "richness": 1
+          },
+          "iron-ore": {
+            "frequency": 1,
+            "size": 1,
+            "richness": 1
+          },
+          "nauvis_cliff": {
+            "frequency": 1,
+            "size": 1,
+            "richness": 1
+          },
+          "rocks": {
+            "frequency": 1,
+            "size": 1,
+            "richness": 1
+          },
+          "starting_area_moisture": {
+            "frequency": 1,
+            "size": 1,
+            "richness": 1
+          },
+          "stone": {
+            "frequency": 1,
+            "size": 1,
+            "richness": 1
+          },
+          "trees": {
+            "frequency": 1,
+            "size": 1,
+            "richness": 1
+          },
+          "uranium-ore": {
+            "frequency": 1,
+            "size": 1,
+            "richness": 1
+          },
+          "water": {
+            "frequency": 1,
+            "size": 1,
+            "richness": 1
+          }
+        },
+        "autoplace_settings": {
+          "decorative": {
+            "treat_missing_as_default": true,
+            "settings": {
+              "brown-asterisk": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "brown-asterisk-mini": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "brown-carpet-grass": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "brown-fluff": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "brown-fluff-dry": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "brown-hairy-grass": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "cracked-mud-decal": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "dark-mud-decal": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "garballo": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "garballo-mini-dry": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "green-asterisk": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "green-asterisk-mini": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "green-bush-mini": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "green-carpet-grass": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "green-croton": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "green-desert-bush": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "green-hairy-grass": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "green-pita": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "green-pita-mini": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "green-small-grass": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "light-mud-decal": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "medium-rock": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "medium-sand-rock": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "red-asterisk": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "red-croton": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "red-desert-bush": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "red-desert-decal": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "red-pita": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "sand-decal": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "sand-dune-decal": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "small-rock": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "small-sand-rock": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "tiny-rock": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "white-desert-bush": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              }
+            }
+          },
+          "entity": {
+            "treat_missing_as_default": true,
+            "settings": {
+              "big-rock": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "big-sand-rock": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "coal": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "copper-ore": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "crude-oil": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "fish": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "huge-rock": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "iron-ore": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "stone": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "uranium-ore": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              }
+            }
+          },
+          "tile": {
+            "treat_missing_as_default": true,
+            "settings": {
+              "deepwater": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "dirt-1": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "dirt-2": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "dirt-3": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "dirt-4": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "dirt-5": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "dirt-6": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "dirt-7": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "dry-dirt": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "grass-1": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "grass-2": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "grass-3": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "grass-4": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "red-desert-0": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "red-desert-1": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "red-desert-2": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "red-desert-3": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "sand-1": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "sand-2": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "sand-3": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "water": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              }
+            }
+          }
+        },
+        "property_expression_names": {},
+        "starting_points": [
+          {
+            "x": 0,
+            "y": 0
+          }
+        ],
+        "seed": 424242,
+        "width": 2000000,
+        "height": 2000000,
+        "starting_area": 1,
+        "peaceful_mode": false,
+        "no_enemies_mode": false,
+        "cliff_settings": {
+          "name": "cliff",
+          "control": "nauvis_cliff",
+          "cliff_elevation_0": 10,
+          "cliff_elevation_interval": 40,
+          "cliff_smoothing": 0,
+          "richness": 1
+        }
+      }
+    },
+    {
+      "case": "02-current-counter-render",
+      "phase": "create",
+      "log_sha256": "188A85C37E57B5B3070A0E42B8103D97DD6E8C8AA90AAEF7A8C7C81CC0212272",
+      "map_gen_settings": {
+        "default_enable_all_autoplace_controls": false,
+        "autoplace_controls": {
+          "coal": {
+            "frequency": 1,
+            "size": 1,
+            "richness": 1
+          },
+          "copper-ore": {
+            "frequency": 1,
+            "size": 1,
+            "richness": 1
+          },
+          "crude-oil": {
+            "frequency": 1,
+            "size": 1,
+            "richness": 1
+          },
+          "enemy-base": {
+            "frequency": 1,
+            "size": 1,
+            "richness": 1
+          },
+          "iron-ore": {
+            "frequency": 1,
+            "size": 1,
+            "richness": 1
+          },
+          "nauvis_cliff": {
+            "frequency": 1,
+            "size": 1,
+            "richness": 1
+          },
+          "rocks": {
+            "frequency": 1,
+            "size": 1,
+            "richness": 1
+          },
+          "starting_area_moisture": {
+            "frequency": 1,
+            "size": 1,
+            "richness": 1
+          },
+          "stone": {
+            "frequency": 1,
+            "size": 1,
+            "richness": 1
+          },
+          "trees": {
+            "frequency": 1,
+            "size": 1,
+            "richness": 1
+          },
+          "uranium-ore": {
+            "frequency": 1,
+            "size": 1,
+            "richness": 1
+          },
+          "water": {
+            "frequency": 1,
+            "size": 1,
+            "richness": 1
+          }
+        },
+        "autoplace_settings": {
+          "decorative": {
+            "treat_missing_as_default": true,
+            "settings": {
+              "brown-asterisk": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "brown-asterisk-mini": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "brown-carpet-grass": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "brown-fluff": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "brown-fluff-dry": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "brown-hairy-grass": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "cracked-mud-decal": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "dark-mud-decal": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "garballo": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "garballo-mini-dry": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "green-asterisk": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "green-asterisk-mini": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "green-bush-mini": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "green-carpet-grass": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "green-croton": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "green-desert-bush": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "green-hairy-grass": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "green-pita": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "green-pita-mini": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "green-small-grass": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "light-mud-decal": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "medium-rock": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "medium-sand-rock": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "red-asterisk": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "red-croton": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "red-desert-bush": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "red-desert-decal": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "red-pita": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "sand-decal": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "sand-dune-decal": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "small-rock": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "small-sand-rock": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "tiny-rock": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "white-desert-bush": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              }
+            }
+          },
+          "entity": {
+            "treat_missing_as_default": true,
+            "settings": {
+              "big-rock": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "big-sand-rock": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "coal": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "copper-ore": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "crude-oil": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "fish": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "huge-rock": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "iron-ore": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "stone": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "uranium-ore": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              }
+            }
+          },
+          "tile": {
+            "treat_missing_as_default": true,
+            "settings": {
+              "deepwater": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "dirt-1": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "dirt-2": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "dirt-3": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "dirt-4": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "dirt-5": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "dirt-6": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "dirt-7": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "dry-dirt": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "grass-1": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "grass-2": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "grass-3": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "grass-4": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "red-desert-0": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "red-desert-1": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "red-desert-2": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "red-desert-3": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "sand-1": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "sand-2": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "sand-3": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "water": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              }
+            }
+          }
+        },
+        "property_expression_names": {},
+        "starting_points": [
+          {
+            "x": 0,
+            "y": 0
+          }
+        ],
+        "seed": 424242,
+        "width": 2000000,
+        "height": 2000000,
+        "starting_area": 1,
+        "peaceful_mode": false,
+        "no_enemies_mode": false,
+        "cliff_settings": {
+          "name": "cliff",
+          "control": "nauvis_cliff",
+          "cliff_elevation_0": 10,
+          "cliff_elevation_interval": 40,
+          "cliff_smoothing": 0,
+          "richness": 1
+        }
+      }
+    },
+    {
+      "case": "02-current-counter-render",
+      "phase": "initial",
+      "log_sha256": "3964F00CB6B6A4FF1ABC389BBA870BF1175220D7AD26CA2F0A9D11EF075ACB37",
+      "map_gen_settings": {
+        "default_enable_all_autoplace_controls": false,
+        "autoplace_controls": {
+          "coal": {
+            "frequency": 1,
+            "size": 1,
+            "richness": 1
+          },
+          "copper-ore": {
+            "frequency": 1,
+            "size": 1,
+            "richness": 1
+          },
+          "crude-oil": {
+            "frequency": 1,
+            "size": 1,
+            "richness": 1
+          },
+          "enemy-base": {
+            "frequency": 1,
+            "size": 1,
+            "richness": 1
+          },
+          "iron-ore": {
+            "frequency": 1,
+            "size": 1,
+            "richness": 1
+          },
+          "nauvis_cliff": {
+            "frequency": 1,
+            "size": 1,
+            "richness": 1
+          },
+          "rocks": {
+            "frequency": 1,
+            "size": 1,
+            "richness": 1
+          },
+          "starting_area_moisture": {
+            "frequency": 1,
+            "size": 1,
+            "richness": 1
+          },
+          "stone": {
+            "frequency": 1,
+            "size": 1,
+            "richness": 1
+          },
+          "trees": {
+            "frequency": 1,
+            "size": 1,
+            "richness": 1
+          },
+          "uranium-ore": {
+            "frequency": 1,
+            "size": 1,
+            "richness": 1
+          },
+          "water": {
+            "frequency": 1,
+            "size": 1,
+            "richness": 1
+          }
+        },
+        "autoplace_settings": {
+          "decorative": {
+            "treat_missing_as_default": true,
+            "settings": {
+              "brown-asterisk": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "brown-asterisk-mini": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "brown-carpet-grass": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "brown-fluff": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "brown-fluff-dry": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "brown-hairy-grass": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "cracked-mud-decal": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "dark-mud-decal": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "garballo": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "garballo-mini-dry": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "green-asterisk": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "green-asterisk-mini": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "green-bush-mini": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "green-carpet-grass": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "green-croton": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "green-desert-bush": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "green-hairy-grass": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "green-pita": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "green-pita-mini": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "green-small-grass": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "light-mud-decal": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "medium-rock": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "medium-sand-rock": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "red-asterisk": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "red-croton": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "red-desert-bush": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "red-desert-decal": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "red-pita": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "sand-decal": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "sand-dune-decal": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "small-rock": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "small-sand-rock": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "tiny-rock": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "white-desert-bush": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              }
+            }
+          },
+          "entity": {
+            "treat_missing_as_default": true,
+            "settings": {
+              "big-rock": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "big-sand-rock": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "coal": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "copper-ore": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "crude-oil": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "fish": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "huge-rock": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "iron-ore": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "stone": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "uranium-ore": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              }
+            }
+          },
+          "tile": {
+            "treat_missing_as_default": true,
+            "settings": {
+              "deepwater": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "dirt-1": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "dirt-2": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "dirt-3": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "dirt-4": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "dirt-5": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "dirt-6": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "dirt-7": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "dry-dirt": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "grass-1": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "grass-2": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "grass-3": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "grass-4": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "red-desert-0": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "red-desert-1": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "red-desert-2": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "red-desert-3": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "sand-1": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "sand-2": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "sand-3": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "water": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              }
+            }
+          }
+        },
+        "property_expression_names": {},
+        "starting_points": [
+          {
+            "x": 0,
+            "y": 0
+          }
+        ],
+        "seed": 424242,
+        "width": 2000000,
+        "height": 2000000,
+        "starting_area": 1,
+        "peaceful_mode": false,
+        "no_enemies_mode": false,
+        "cliff_settings": {
+          "name": "cliff",
+          "control": "nauvis_cliff",
+          "cliff_elevation_0": 10,
+          "cliff_elevation_interval": 40,
+          "cliff_smoothing": 0,
+          "richness": 1
+        }
+      }
+    },
+    {
+      "case": "02-current-counter-render",
+      "phase": "restart",
+      "log_sha256": "3ED7873C5842467A37B17269DF6CB1CD074F54DB6B0723D4BAAD9484725D4F5A",
+      "map_gen_settings": {
+        "default_enable_all_autoplace_controls": false,
+        "autoplace_controls": {
+          "coal": {
+            "frequency": 1,
+            "size": 1,
+            "richness": 1
+          },
+          "copper-ore": {
+            "frequency": 1,
+            "size": 1,
+            "richness": 1
+          },
+          "crude-oil": {
+            "frequency": 1,
+            "size": 1,
+            "richness": 1
+          },
+          "enemy-base": {
+            "frequency": 1,
+            "size": 1,
+            "richness": 1
+          },
+          "iron-ore": {
+            "frequency": 1,
+            "size": 1,
+            "richness": 1
+          },
+          "nauvis_cliff": {
+            "frequency": 1,
+            "size": 1,
+            "richness": 1
+          },
+          "rocks": {
+            "frequency": 1,
+            "size": 1,
+            "richness": 1
+          },
+          "starting_area_moisture": {
+            "frequency": 1,
+            "size": 1,
+            "richness": 1
+          },
+          "stone": {
+            "frequency": 1,
+            "size": 1,
+            "richness": 1
+          },
+          "trees": {
+            "frequency": 1,
+            "size": 1,
+            "richness": 1
+          },
+          "uranium-ore": {
+            "frequency": 1,
+            "size": 1,
+            "richness": 1
+          },
+          "water": {
+            "frequency": 1,
+            "size": 1,
+            "richness": 1
+          }
+        },
+        "autoplace_settings": {
+          "decorative": {
+            "treat_missing_as_default": true,
+            "settings": {
+              "brown-asterisk": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "brown-asterisk-mini": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "brown-carpet-grass": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "brown-fluff": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "brown-fluff-dry": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "brown-hairy-grass": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "cracked-mud-decal": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "dark-mud-decal": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "garballo": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "garballo-mini-dry": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "green-asterisk": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "green-asterisk-mini": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "green-bush-mini": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "green-carpet-grass": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "green-croton": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "green-desert-bush": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "green-hairy-grass": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "green-pita": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "green-pita-mini": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "green-small-grass": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "light-mud-decal": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "medium-rock": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "medium-sand-rock": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "red-asterisk": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "red-croton": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "red-desert-bush": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "red-desert-decal": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "red-pita": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "sand-decal": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "sand-dune-decal": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "small-rock": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "small-sand-rock": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "tiny-rock": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "white-desert-bush": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              }
+            }
+          },
+          "entity": {
+            "treat_missing_as_default": true,
+            "settings": {
+              "big-rock": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "big-sand-rock": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "coal": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "copper-ore": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "crude-oil": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "fish": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "huge-rock": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "iron-ore": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "stone": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "uranium-ore": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              }
+            }
+          },
+          "tile": {
+            "treat_missing_as_default": true,
+            "settings": {
+              "deepwater": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "dirt-1": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "dirt-2": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "dirt-3": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "dirt-4": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "dirt-5": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "dirt-6": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "dirt-7": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "dry-dirt": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "grass-1": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "grass-2": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "grass-3": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "grass-4": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "red-desert-0": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "red-desert-1": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "red-desert-2": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "red-desert-3": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "sand-1": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "sand-2": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "sand-3": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              },
+              "water": {
+                "frequency": 1,
+                "size": 1,
+                "richness": 1
+              }
+            }
+          }
+        },
+        "property_expression_names": {},
+        "starting_points": [
+          {
+            "x": 0,
+            "y": 0
+          }
+        ],
+        "seed": 424242,
+        "width": 2000000,
+        "height": 2000000,
+        "starting_area": 1,
+        "peaceful_mode": false,
+        "no_enemies_mode": false,
+        "cliff_settings": {
+          "name": "cliff",
+          "control": "nauvis_cliff",
+          "cliff_elevation_0": 10,
+          "cliff_elevation_interval": 40,
+          "cliff_smoothing": 0,
+          "richness": 1
+        }
+      }
+    }
+  ],
+  "cases": [
+    {
+      "id": "01-published-counter-render",
+      "arm": "published",
+      "native_actions": [
+        {
+          "schema": 1,
+          "case": "library-paired-browser",
+          "stage": "first-open",
+          "status": "observed",
+          "arm": "published",
+          "action_call_count": 2,
+          "screenshot_calls": 2,
+          "join_events": 2,
+          "native_snapshot_unchanged": true,
+          "profiler_observation_only": true,
+          "requested_family": "all",
+          "native_family_verified": true,
+          "performance_acceptance": false
+        },
+        {
+          "schema": 1,
+          "case": "library-paired-browser",
+          "stage": "search",
+          "status": "observed",
+          "arm": "published",
+          "action_call_count": 2,
+          "screenshot_calls": 6,
+          "join_events": 2,
+          "native_snapshot_unchanged": true,
+          "profiler_observation_only": true,
+          "requested_family": "all",
+          "native_family_verified": true,
+          "performance_acceptance": false
+        },
+        {
+          "schema": 1,
+          "case": "library-paired-browser",
+          "stage": "refresh",
+          "status": "observed",
+          "arm": "published",
+          "action_call_count": 2,
+          "screenshot_calls": 8,
+          "join_events": 2,
+          "native_snapshot_unchanged": true,
+          "profiler_observation_only": true,
+          "requested_family": "all",
+          "native_family_verified": true,
+          "performance_acceptance": false
+        },
+        {
+          "schema": 1,
+          "case": "library-paired-browser",
+          "stage": "reopen",
+          "status": "observed",
+          "arm": "published",
+          "action_call_count": 2,
+          "screenshot_calls": 10,
+          "join_events": 4,
+          "native_snapshot_unchanged": true,
+          "profiler_observation_only": true,
+          "requested_family": "all",
+          "native_family_verified": true,
+          "performance_acceptance": false
+        }
+      ],
+      "metrics": {
+        "library/server/first_open": 25.0972,
+        "library/server/search": 3.6222,
+        "library/server/refresh": 4.4307,
+        "library/server/reopen": 20.9498,
+        "library/en/first_open": 26.0403,
+        "library/en/search": 3.6131,
+        "library/en/refresh": 4.1788,
+        "library/en/reopen": 26.046,
+        "library/de/first_open": 23.7733,
+        "library/de/search": 6.3687,
+        "library/de/refresh": 4.2661,
+        "library/de/reopen": 24.603,
+        "save_ready/initial": 2.126,
+        "save_ready/restart": 2.103,
+        "memory/initial/client-de/working_set_bytes": 1609117696,
+        "memory/initial/client-de/private_bytes": 3811688448,
+        "memory/initial/client-en/working_set_bytes": 1674764288,
+        "memory/initial/client-en/private_bytes": 3876671488,
+        "memory/initial/server/working_set_bytes": 323108864,
+        "memory/initial/server/private_bytes": 316370944,
+        "memory/restart/client-de/working_set_bytes": 1661284352,
+        "memory/restart/client-de/private_bytes": 3940880384,
+        "memory/restart/client-en/working_set_bytes": 1882984448,
+        "memory/restart/client-en/private_bytes": 3931893760,
+        "memory/restart/server/working_set_bytes": 288509952,
+        "memory/restart/server/private_bytes": 282361856
+      },
+      "memory_samples": 626,
+      "system_samples": 80,
+      "lifetime_peaks": [
+        {
+          "phase": "initial",
+          "role": "client-de",
+          "pid": 72616,
+          "start_utc": "2026-10-29T07:55:40.1330373Z",
+          "observed_utc": "2026-10-29T07:56:00.5339631Z",
+          "elapsed_monotonic_milliseconds": 36669.477,
+          "working_set_peak_bytes": 2041430016,
+          "paged_memory_peak_bytes": 4092362752,
+          "sampled_working_set_max_bytes": 1609117696
+        },
+        {
+          "phase": "initial",
+          "role": "client-en",
+          "pid": 72088,
+          "start_utc": "2026-10-29T07:55:26.1407192Z",
+          "observed_utc": "2026-10-29T07:56:00.4300956Z",
+          "elapsed_monotonic_milliseconds": 36565.617,
+          "working_set_peak_bytes": 1861799936,
+          "paged_memory_peak_bytes": 4045963264,
+          "sampled_working_set_max_bytes": 1674764288
+        },
+        {
+          "phase": "initial",
+          "role": "server",
+          "pid": 37772,
+          "start_utc": "2026-10-29T07:55:23.9023506Z",
+          "observed_utc": "2026-10-29T07:56:00.6290520Z",
+          "elapsed_monotonic_milliseconds": 36764.564,
+          "working_set_peak_bytes": 354050048,
+          "paged_memory_peak_bytes": 343912448,
+          "sampled_working_set_max_bytes": 323108864
+        },
+        {
+          "phase": "restart",
+          "role": "client-de",
+          "pid": 84288,
+          "start_utc": "2026-10-29T07:56:12.8991848Z",
+          "observed_utc": "2026-10-29T07:56:27.0125797Z",
+          "elapsed_monotonic_milliseconds": 63148.09,
+          "working_set_peak_bytes": 2003501056,
+          "paged_memory_peak_bytes": 4094238720,
+          "sampled_working_set_max_bytes": 1661284352
+        },
+        {
+          "phase": "restart",
+          "role": "client-en",
+          "pid": 27228,
+          "start_utc": "2026-10-29T07:56:02.8580510Z",
+          "observed_utc": "2026-10-29T07:56:26.9270036Z",
+          "elapsed_monotonic_milliseconds": 63062.514,
+          "working_set_peak_bytes": 1936609280,
+          "paged_memory_peak_bytes": 4109783040,
+          "sampled_working_set_max_bytes": 1882984448
+        },
+        {
+          "phase": "restart",
+          "role": "server",
+          "pid": 86568,
+          "start_utc": "2026-10-29T07:56:00.7031190Z",
+          "observed_utc": "2026-10-29T07:56:27.0973201Z",
+          "elapsed_monotonic_milliseconds": 63232.829,
+          "working_set_peak_bytes": 354017280,
+          "paged_memory_peak_bytes": 344084480,
+          "sampled_working_set_max_bytes": 288509952
+        }
+      ],
+      "observer": {
+        "utc_reference_before_stopwatch_start": "2026-10-29T07:55:23.8622977Z",
+        "cutoff": "OS high-water counters read before the owned stop;later exit/deinitialization is excluded",
+        "working_set_peak_bytes": "System.Diagnostics.Process.PeakWorkingSet64",
+        "paged_memory_peak_bytes": "System.Diagnostics.Process.PeakPagedMemorySize64;not sampled private_bytes",
+        "changes_periodic_observations": false
+      },
+      "saves": [
+        {
+          "role": "seed_sha256",
+          "sha256": "36AAC4F954603202C6AA4736FCFFF9B8F43B1F106F346A0FB3E92EAB6705B74E",
+          "bytes": 811140
+        },
+        {
+          "role": "restart_save_sha256",
+          "sha256": "48147C1AC34E7D8F017CA641E3ACD56341104C0CE53304CCC0E10B9707742DDB",
+          "bytes": 943829
+        },
+        {
+          "role": "final_save_sha256",
+          "sha256": "5D741BC065245D6FAFD64DEE9975A72BAF097576F6E2BFE948A046EC2A236A56",
+          "bytes": 939070
+        }
+      ]
+    },
+    {
+      "id": "02-current-counter-render",
+      "arm": "candidate",
+      "native_actions": [
+        {
+          "schema": 1,
+          "case": "library-paired-browser",
+          "stage": "first-open",
+          "status": "observed",
+          "arm": "mir5",
+          "action_call_count": 2,
+          "screenshot_calls": 2,
+          "join_events": 2,
+          "native_snapshot_unchanged": true,
+          "profiler_observation_only": true,
+          "requested_family": "all",
+          "native_family_verified": true,
+          "performance_acceptance": false
+        },
+        {
+          "schema": 1,
+          "case": "library-paired-browser",
+          "stage": "search",
+          "status": "observed",
+          "arm": "mir5",
+          "action_call_count": 2,
+          "screenshot_calls": 6,
+          "join_events": 2,
+          "native_snapshot_unchanged": true,
+          "profiler_observation_only": true,
+          "requested_family": "all",
+          "native_family_verified": true,
+          "performance_acceptance": false
+        },
+        {
+          "schema": 1,
+          "case": "library-paired-browser",
+          "stage": "refresh",
+          "status": "observed",
+          "arm": "mir5",
+          "action_call_count": 2,
+          "screenshot_calls": 8,
+          "join_events": 2,
+          "native_snapshot_unchanged": true,
+          "profiler_observation_only": true,
+          "requested_family": "all",
+          "native_family_verified": true,
+          "performance_acceptance": false
+        },
+        {
+          "schema": 1,
+          "case": "library-paired-browser",
+          "stage": "reopen",
+          "status": "observed",
+          "arm": "mir5",
+          "action_call_count": 2,
+          "screenshot_calls": 10,
+          "join_events": 4,
+          "native_snapshot_unchanged": true,
+          "profiler_observation_only": true,
+          "requested_family": "all",
+          "native_family_verified": true,
+          "performance_acceptance": false
+        }
+      ],
+      "metrics": {
+        "library/server/first_open": 11.425,
+        "library/server/search": 11.4492,
+        "library/server/refresh": 14.7694,
+        "library/server/reopen": 11.2854,
+        "library/en/first_open": 12.3546,
+        "library/en/search": 9.9624,
+        "library/en/refresh": 14.517,
+        "library/en/reopen": 11.5987,
+        "library/de/first_open": 13.2261,
+        "library/de/search": 10.239,
+        "library/de/refresh": 15.769,
+        "library/de/reopen": 10.0532,
+        "save_ready/initial": 1.467,
+        "save_ready/restart": 1.579,
+        "memory/initial/client-de/working_set_bytes": 1552781312,
+        "memory/initial/client-de/private_bytes": 3883048960,
+        "memory/initial/client-en/working_set_bytes": 1943273472,
+        "memory/initial/client-en/private_bytes": 3933118464,
+        "memory/initial/server/working_set_bytes": 266641408,
+        "memory/initial/server/private_bytes": 255205376,
+        "memory/restart/client-de/working_set_bytes": 1742495744,
+        "memory/restart/client-de/private_bytes": 3805184000,
+        "memory/restart/client-en/working_set_bytes": 1922396160,
+        "memory/restart/client-en/private_bytes": 4081192960,
+        "memory/restart/server/working_set_bytes": 278925312,
+        "memory/restart/server/private_bytes": 270938112
+      },
+      "memory_samples": 607,
+      "system_samples": 70,
+      "lifetime_peaks": [
+        {
+          "phase": "initial",
+          "role": "client-de",
+          "pid": 1188,
+          "start_utc": "2026-10-29T07:56:54.2789081Z",
+          "observed_utc": "2026-10-29T07:57:14.6731551Z",
+          "elapsed_monotonic_milliseconds": 35642.968,
+          "working_set_peak_bytes": 1986822144,
+          "paged_memory_peak_bytes": 4101095424,
+          "sampled_working_set_max_bytes": 1552781312
+        },
+        {
+          "phase": "initial",
+          "role": "client-en",
+          "pid": 1932,
+          "start_utc": "2026-10-29T07:56:40.7906348Z",
+          "observed_utc": "2026-10-29T07:57:14.5752678Z",
+          "elapsed_monotonic_milliseconds": 35545.095,
+          "working_set_peak_bytes": 1947983872,
+          "paged_memory_peak_bytes": 4095942656,
+          "sampled_working_set_max_bytes": 1943273472
+        },
+        {
+          "phase": "initial",
+          "role": "server",
+          "pid": 26508,
+          "start_utc": "2026-10-29T07:56:39.0536524Z",
+          "observed_utc": "2026-10-29T07:57:14.7600631Z",
+          "elapsed_monotonic_milliseconds": 35729.878,
+          "working_set_peak_bytes": 288923648,
+          "paged_memory_peak_bytes": 278466560,
+          "sampled_working_set_max_bytes": 266641408
+        },
+        {
+          "phase": "restart",
+          "role": "client-de",
+          "pid": 71124,
+          "start_utc": "2026-10-29T07:57:25.7979083Z",
+          "observed_utc": "2026-10-29T07:57:39.4249433Z",
+          "elapsed_monotonic_milliseconds": 60394.755,
+          "working_set_peak_bytes": 2060619776,
+          "paged_memory_peak_bytes": 4162740224,
+          "sampled_working_set_max_bytes": 1742495744
+        },
+        {
+          "phase": "restart",
+          "role": "client-en",
+          "pid": 60760,
+          "start_utc": "2026-10-29T07:57:16.5212063Z",
+          "observed_utc": "2026-10-29T07:57:39.3458642Z",
+          "elapsed_monotonic_milliseconds": 60315.676,
+          "working_set_peak_bytes": 2022232064,
+          "paged_memory_peak_bytes": 4090392576,
+          "sampled_working_set_max_bytes": 1922396160
+        },
+        {
+          "phase": "restart",
+          "role": "server",
+          "pid": 62552,
+          "start_utc": "2026-10-29T07:57:14.8318819Z",
+          "observed_utc": "2026-10-29T07:57:39.5149736Z",
+          "elapsed_monotonic_milliseconds": 60484.788,
+          "working_set_peak_bytes": 287150080,
+          "paged_memory_peak_bytes": 275492864,
+          "sampled_working_set_max_bytes": 278925312
+        }
+      ],
+      "observer": {
+        "utc_reference_before_stopwatch_start": "2026-10-29T07:56:39.0283981Z",
+        "cutoff": "OS high-water counters read before the owned stop;later exit/deinitialization is excluded",
+        "working_set_peak_bytes": "System.Diagnostics.Process.PeakWorkingSet64",
+        "paged_memory_peak_bytes": "System.Diagnostics.Process.PeakPagedMemorySize64;not sampled private_bytes",
+        "changes_periodic_observations": false
+      },
+      "saves": [
+        {
+          "role": "seed_sha256",
+          "sha256": "78A2D86E1AD3D62AA11DFF09BAE1447649120E4CBEA07D1EAE322C71E2F72A56",
+          "bytes": 810636
+        },
+        {
+          "role": "restart_save_sha256",
+          "sha256": "F5B8A0814705F82B1832F22BDC4F1B634B7B4C5759AF6AA47038129909AE9D0B",
+          "bytes": 942386
+        },
+        {
+          "role": "final_save_sha256",
+          "sha256": "33DC2C7EDDFF250723C8C4E898776E3E298E1E5F855509C999736898A0A82AA8",
+          "bytes": 931622
+        }
+      ]
+    }
+  ],
+  "screenshots": [
+    {
+      "case": "01-published-counter-render",
+      "path": "D:\\Projects\\Factorio\\mir5-legacy-cannon-credit-r01\\build\\tmp\\library-fixed-map-render-preflight-r01\\01-published-counter-render\\session\\client-en\\script-output\\mir5-library-paired-browser\\first-open-1.png",
+      "sha256": "F746BF066FEFADA4B698D8B2157A8562121FBE65FCB651E2888157353F042772",
+      "bytes": 1187591,
+      "crc_and_decompression": true,
+      "externally_inspected": false
+    },
+    {
+      "case": "01-published-counter-render",
+      "path": "D:\\Projects\\Factorio\\mir5-legacy-cannon-credit-r01\\build\\tmp\\library-fixed-map-render-preflight-r01\\01-published-counter-render\\session\\client-en\\script-output\\mir5-library-paired-browser\\first-open-settled-1.png",
+      "sha256": "35C82F083266EFF231B5EDDFFA3691EC0EFD8C6F9AAA516E37F655A5C29C7983",
+      "bytes": 1197692,
+      "crc_and_decompression": true,
+      "externally_inspected": true
+    },
+    {
+      "case": "01-published-counter-render",
+      "path": "D:\\Projects\\Factorio\\mir5-legacy-cannon-credit-r01\\build\\tmp\\library-fixed-map-render-preflight-r01\\01-published-counter-render\\session\\client-en\\script-output\\mir5-library-paired-browser\\search-1.png",
+      "sha256": "FD34F42CD366ACC2174855B7EF66CC24206C36400B5FBFB5669F7AF5A25546BB",
+      "bytes": 1203158,
+      "crc_and_decompression": true,
+      "externally_inspected": false
+    },
+    {
+      "case": "01-published-counter-render",
+      "path": "D:\\Projects\\Factorio\\mir5-legacy-cannon-credit-r01\\build\\tmp\\library-fixed-map-render-preflight-r01\\01-published-counter-render\\session\\client-en\\script-output\\mir5-library-paired-browser\\refresh-1.png",
+      "sha256": "4CD32C9855D9FF69A2E49CC839ED74EB2F7CBB1C720D0838592D4FB4CB14855A",
+      "bytes": 1194895,
+      "crc_and_decompression": true,
+      "externally_inspected": false
+    },
+    {
+      "case": "01-published-counter-render",
+      "path": "D:\\Projects\\Factorio\\mir5-legacy-cannon-credit-r01\\build\\tmp\\library-fixed-map-render-preflight-r01\\01-published-counter-render\\session\\client-en\\script-output\\mir5-library-paired-browser\\reopen-1.png",
+      "sha256": "13A8D2BD6700344B9D7B698BD938D12C6573C37A2E978B72B9494A097D36D790",
+      "bytes": 1231261,
+      "crc_and_decompression": true,
+      "externally_inspected": false
+    },
+    {
+      "case": "01-published-counter-render",
+      "path": "D:\\Projects\\Factorio\\mir5-legacy-cannon-credit-r01\\build\\tmp\\library-fixed-map-render-preflight-r01\\01-published-counter-render\\session\\client-en\\script-output\\mir5-library-paired-browser\\reopen-settled-1.png",
+      "sha256": "DC685F245435BA7ECA5FB7A7C1D87E64030ABF00A7B8FC0B01C020EA198389F3",
+      "bytes": 1227495,
+      "crc_and_decompression": true,
+      "externally_inspected": true
+    },
+    {
+      "case": "01-published-counter-render",
+      "path": "D:\\Projects\\Factorio\\mir5-legacy-cannon-credit-r01\\build\\tmp\\library-fixed-map-render-preflight-r01\\01-published-counter-render\\session\\client-de\\script-output\\mir5-library-paired-browser\\first-open-2.png",
+      "sha256": "5E9633C6A0E705DC4114D617594A94946B7216359BE47032A01AD6189166461B",
+      "bytes": 1211410,
+      "crc_and_decompression": true,
+      "externally_inspected": false
+    },
+    {
+      "case": "01-published-counter-render",
+      "path": "D:\\Projects\\Factorio\\mir5-legacy-cannon-credit-r01\\build\\tmp\\library-fixed-map-render-preflight-r01\\01-published-counter-render\\session\\client-de\\script-output\\mir5-library-paired-browser\\first-open-settled-2.png",
+      "sha256": "CF1413299EB0D1D15AF72805DCD8C8B4B9A3A43170FB3C951BD7853227DED68B",
+      "bytes": 1220572,
+      "crc_and_decompression": true,
+      "externally_inspected": true
+    },
+    {
+      "case": "01-published-counter-render",
+      "path": "D:\\Projects\\Factorio\\mir5-legacy-cannon-credit-r01\\build\\tmp\\library-fixed-map-render-preflight-r01\\01-published-counter-render\\session\\client-de\\script-output\\mir5-library-paired-browser\\search-2.png",
+      "sha256": "38DE6676781859A138028275872E9F840BCA8DB8AF9AFCC2A5C5EC68B013642C",
+      "bytes": 1209908,
+      "crc_and_decompression": true,
+      "externally_inspected": false
+    },
+    {
+      "case": "01-published-counter-render",
+      "path": "D:\\Projects\\Factorio\\mir5-legacy-cannon-credit-r01\\build\\tmp\\library-fixed-map-render-preflight-r01\\01-published-counter-render\\session\\client-de\\script-output\\mir5-library-paired-browser\\refresh-2.png",
+      "sha256": "2240D2B0ACBFBBDD14B72826B538B5603021B2C728E6677C99838F218413B6D8",
+      "bytes": 1205013,
+      "crc_and_decompression": true,
+      "externally_inspected": false
+    },
+    {
+      "case": "01-published-counter-render",
+      "path": "D:\\Projects\\Factorio\\mir5-legacy-cannon-credit-r01\\build\\tmp\\library-fixed-map-render-preflight-r01\\01-published-counter-render\\session\\client-de\\script-output\\mir5-library-paired-browser\\reopen-2.png",
+      "sha256": "F4A6DBA966944CA329780B5C93BB85615971049FCA087679FE2550BC6A9F35DA",
+      "bytes": 1250460,
+      "crc_and_decompression": true,
+      "externally_inspected": false
+    },
+    {
+      "case": "01-published-counter-render",
+      "path": "D:\\Projects\\Factorio\\mir5-legacy-cannon-credit-r01\\build\\tmp\\library-fixed-map-render-preflight-r01\\01-published-counter-render\\session\\client-de\\script-output\\mir5-library-paired-browser\\reopen-settled-2.png",
+      "sha256": "1640CE3871FB9B8301BA4459311AC164A421A0CF289B0C7E1D8DFA2A66844027",
+      "bytes": 1246907,
+      "crc_and_decompression": true,
+      "externally_inspected": true
+    },
+    {
+      "case": "02-current-counter-render",
+      "path": "D:\\Projects\\Factorio\\mir5-legacy-cannon-credit-r01\\build\\tmp\\library-fixed-map-render-preflight-r01\\02-current-counter-render\\session\\client-en\\script-output\\mir5-library-paired-browser\\first-open-1.png",
+      "sha256": "B94E7F4056C9224EEC0411AA804BBC5889D236C558CDE2C12B3BD6C5A45AA219",
+      "bytes": 1350583,
+      "crc_and_decompression": true,
+      "externally_inspected": false
+    },
+    {
+      "case": "02-current-counter-render",
+      "path": "D:\\Projects\\Factorio\\mir5-legacy-cannon-credit-r01\\build\\tmp\\library-fixed-map-render-preflight-r01\\02-current-counter-render\\session\\client-en\\script-output\\mir5-library-paired-browser\\first-open-settled-1.png",
+      "sha256": "49F5939F16DADC94D3646DF1A6D0843E8926AF3F719F1CEC19DEF9DEFF9184B9",
+      "bytes": 1372314,
+      "crc_and_decompression": true,
+      "externally_inspected": true
+    },
+    {
+      "case": "02-current-counter-render",
+      "path": "D:\\Projects\\Factorio\\mir5-legacy-cannon-credit-r01\\build\\tmp\\library-fixed-map-render-preflight-r01\\02-current-counter-render\\session\\client-en\\script-output\\mir5-library-paired-browser\\search-1.png",
+      "sha256": "FB74CE166B36D062BED018D93106DFBCC0C7BB655600311F8026D1BE688916A2",
+      "bytes": 1375128,
+      "crc_and_decompression": true,
+      "externally_inspected": false
+    },
+    {
+      "case": "02-current-counter-render",
+      "path": "D:\\Projects\\Factorio\\mir5-legacy-cannon-credit-r01\\build\\tmp\\library-fixed-map-render-preflight-r01\\02-current-counter-render\\session\\client-en\\script-output\\mir5-library-paired-browser\\refresh-1.png",
+      "sha256": "0368058A321F7B5C74389312541B2C7AE86CCADFC9DAA8C471941A49915F68F8",
+      "bytes": 1356389,
+      "crc_and_decompression": true,
+      "externally_inspected": false
+    },
+    {
+      "case": "02-current-counter-render",
+      "path": "D:\\Projects\\Factorio\\mir5-legacy-cannon-credit-r01\\build\\tmp\\library-fixed-map-render-preflight-r01\\02-current-counter-render\\session\\client-en\\script-output\\mir5-library-paired-browser\\reopen-1.png",
+      "sha256": "73CA4540A4D25D3559B45A1071F6B6C4458C269620C55E63C4AD319FBA5913ED",
+      "bytes": 1411588,
+      "crc_and_decompression": true,
+      "externally_inspected": false
+    },
+    {
+      "case": "02-current-counter-render",
+      "path": "D:\\Projects\\Factorio\\mir5-legacy-cannon-credit-r01\\build\\tmp\\library-fixed-map-render-preflight-r01\\02-current-counter-render\\session\\client-en\\script-output\\mir5-library-paired-browser\\reopen-settled-1.png",
+      "sha256": "30A53FB5495C6E86852C16257553DF1F0B9FDAD42FC43CAA1BAAFBF02A1A0681",
+      "bytes": 1413601,
+      "crc_and_decompression": true,
+      "externally_inspected": true
+    },
+    {
+      "case": "02-current-counter-render",
+      "path": "D:\\Projects\\Factorio\\mir5-legacy-cannon-credit-r01\\build\\tmp\\library-fixed-map-render-preflight-r01\\02-current-counter-render\\session\\client-de\\script-output\\mir5-library-paired-browser\\first-open-2.png",
+      "sha256": "C1334D3281CF8D1BCE19153538EE521462E8839AE9EA4157791C28BDAC6F81FE",
+      "bytes": 1358517,
+      "crc_and_decompression": true,
+      "externally_inspected": false
+    },
+    {
+      "case": "02-current-counter-render",
+      "path": "D:\\Projects\\Factorio\\mir5-legacy-cannon-credit-r01\\build\\tmp\\library-fixed-map-render-preflight-r01\\02-current-counter-render\\session\\client-de\\script-output\\mir5-library-paired-browser\\first-open-settled-2.png",
+      "sha256": "6C2850EAE16BA8F99F7C2E85A4907224A4F3657D4F223BFAA23C1522D6614BF7",
+      "bytes": 1379280,
+      "crc_and_decompression": true,
+      "externally_inspected": true
+    },
+    {
+      "case": "02-current-counter-render",
+      "path": "D:\\Projects\\Factorio\\mir5-legacy-cannon-credit-r01\\build\\tmp\\library-fixed-map-render-preflight-r01\\02-current-counter-render\\session\\client-de\\script-output\\mir5-library-paired-browser\\search-2.png",
+      "sha256": "D5B8F699F80164C9A5FFF2752099976CD5C04FBF0B7309A4947D5DA95507AECF",
+      "bytes": 1382971,
+      "crc_and_decompression": true,
+      "externally_inspected": false
+    },
+    {
+      "case": "02-current-counter-render",
+      "path": "D:\\Projects\\Factorio\\mir5-legacy-cannon-credit-r01\\build\\tmp\\library-fixed-map-render-preflight-r01\\02-current-counter-render\\session\\client-de\\script-output\\mir5-library-paired-browser\\refresh-2.png",
+      "sha256": "CB0F7DD8533236ECD49B5A02BDF848093F02657A88B6AC5AAA982153451BDD4D",
+      "bytes": 1366777,
+      "crc_and_decompression": true,
+      "externally_inspected": false
+    },
+    {
+      "case": "02-current-counter-render",
+      "path": "D:\\Projects\\Factorio\\mir5-legacy-cannon-credit-r01\\build\\tmp\\library-fixed-map-render-preflight-r01\\02-current-counter-render\\session\\client-de\\script-output\\mir5-library-paired-browser\\reopen-2.png",
+      "sha256": "D41AF7AD6BEBCB5A61AFB3A253C99DAC8D3E1B95FEF0F7B2116557FFA04E2E4D",
+      "bytes": 1415661,
+      "crc_and_decompression": true,
+      "externally_inspected": false
+    },
+    {
+      "case": "02-current-counter-render",
+      "path": "D:\\Projects\\Factorio\\mir5-legacy-cannon-credit-r01\\build\\tmp\\library-fixed-map-render-preflight-r01\\02-current-counter-render\\session\\client-de\\script-output\\mir5-library-paired-browser\\reopen-settled-2.png",
+      "sha256": "C6365FC0236092E3277E1ED2759276FF72F9A32A60C785046FEDB664AEEA3410",
+      "bytes": 1417310,
+      "crc_and_decompression": true,
+      "externally_inspected": true
+    }
+  ],
+  "visual_observations": [
+    "Eight actual delayed first-open/reopen EN/DE frames viewed across both arms. All retain original gears/mining query,selected localized title and All scope.",
+    "All four late cold-reopen views are unobscured by final-save modal. The new bounded final grace is effective on both actual interfaces.",
+    "All six actual complete parsed map_gen_settings records across create/initial/cold phases and both arms are equal,seed424242. This establishes map input equality,not whole-save/entity/timing equality."
+  ],
+  "verified": [
+    "All six actual create/initial-host/cold-host ready witnesses report seed424242 and equal complete parsed native map_gen_settings across both arms.",
+    "Both actual interfaces verify All research at each profiled action;native preservation assertions remain unchanged.",
+    "All24 PNGs pass CRC/decompression;eight required delayed first-open/reopen EN/DE frames are viewed. Original gears/mining queries and localized selection remain,with all four late reopen frames unobscured by final-save modal.",
+    "All12 owned OS peak records retain exact sampled PID/startUTC and cover corresponding sampled WS maxima;all1233periodic/150system rows remain. All26 raw endpoints perarm exist,without comparison or A/A/performance verdict."
+  ],
+  "prior_preflight": "spec/evidence/library-counter-render-preflight-native-chain-r01.json",
+  "prior_failure_retention": "Original unseeded worlds,counter facts and final-save modal images keep their exact0960/69b8/BD09 identities;this new map/render result does not rewrite them or explain older memory failures.",
+  "controls_restored": true,
+  "dependency_payload_bytes_copied": 0,
+  "archive_links_created": 0,
+  "archive_extractions": 0,
+  "limits": [
+    "Unscored fixed-input/render preflight only. Equal parsed map-generation inputs do not assert equal whole saves,all transient entity states or between-arm/A-A timing/memory validity.",
+    "Future acceptance still requires separately reviewed retained/churn windows,quiet schedule,validity rules and existing tolerances. Original sampled-memory failures remain adverse.",
+    "Original R01/R02 sampled-memory controls remain failed/adverse. OS paged-memory peak is not a replacement private-bytes endpoint.",
+    "No imported private state,actual keyboard/drag,other profile/engine or release claim."
+  ],
+  "performance_acceptance": false,
+  "release_qualification": false
+}

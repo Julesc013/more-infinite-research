@@ -1,0 +1,240 @@
+{
+  "schema": 1,
+  "kind": "MIR5FullBobSpaceAgeFiveAlloyCurrentNativeChainV1",
+  "status": "passed-five-route-physical-labs-save-two-cold-reloads",
+  "controller_commit": "7f0502379340b833bb6ec6a2138b6f393e62d533",
+  "player_source_tree": "44eadfad017440d384f0e932b0eecbcb991a5e40",
+  "accepted_asset_readback": "spec/evidence/current-assets-61bc49e5-aero-readback.json",
+  "player_sha256": "8F858F6B7E604757DE84D960E7D7701021B956782C65A13978E3AFD711F7B071",
+  "engine_sha256": "FE4A1DA30F322A0D0B8AEB3DF7276332222BAAA143E2352569B723E84B2B9060",
+  "profile_sha256": "E863D01C7E45BBABE04A22BF352B39618259840340F8C8FF57F56C2E9FD1AF63",
+  "fixtures": [
+    {
+      "name": "mir-fixture-mir5-bob-core-gameplay_0.1.0.zip",
+      "sha256": "C51A77C317F41839ECBC3FECA3A548838642CE07D186E30635D6B8C78B03849D"
+    },
+    {
+      "name": "mir-fixture-mir5-active-mods-observer_0.1.0.zip",
+      "sha256": "A15A7D628D66953D2E0C4D4FA288F47CBF9C5678327C7EB3D23ADB5DC78331C0"
+    }
+  ],
+  "native_result_sha256": "32A94B35224DF1A9EA9A0C6F97003232963BEE9888776D8DB0474E7A6465EC95",
+  "initial_native_witness": {
+    "case": "bob-core-gameplay",
+    "stage": "initial",
+    "status": "passed",
+    "witnesses": {
+      "profile": "f210-bob-core-no-angel",
+      "selected_families": 7,
+      "named_technologies": 14,
+      "actual_lab_completions": 28,
+      "finite_levels_completed_by_lab": 21,
+      "continuation_levels_completed_by_lab": 7,
+      "science_consumed": {
+        "automation-science-pack": 28,
+        "logistic-science-pack": 20,
+        "chemical-science-pack": 16,
+        "production-science-pack": 8,
+        "space-science-pack": 10,
+        "metallurgic-science-pack": 4
+      },
+      "native_recipe_productivity_per_route": 0.08,
+      "native_effect_per_completed_level": 0.02,
+      "fixture_accelerates_count_and_time": true,
+      "physical_alloy_witness": true,
+      "physical_routes": [
+        "bob-bronze-alloy",
+        "bob-gunmetal-alloy",
+        "bob-invar-alloy",
+        "bob-nitinol-alloy",
+        "bob-copper-tungsten-alloy"
+      ],
+      "physical_crafts_per_route": 100,
+      "physical_before_mir_productivity": true,
+      "physical_after_mir_productivity": true,
+      "physical_mixing_routes": 4,
+      "physical_metallurgy_fluid_routes": 1,
+      "physical_foundry_inherent_productivity": 0.5,
+      "ordinary_tuning_qualified": false,
+      "candidate_full_catalogue_comparison_required": true,
+      "on_load_read_only": false,
+      "foreign_force_witness_not_claimed": true
+    }
+  },
+  "reloads": [
+    {
+      "ordinal": 1,
+      "save_sha256": "62F63EDA06BC8BC4B14E371A48B22B927E83D3FDE4FE2D34D6BE2A28859361F1",
+      "save_byte_identical": true,
+      "native_witness": {
+        "case": "bob-core-gameplay",
+        "stage": "reload",
+        "status": "passed",
+        "witnesses": {
+          "profile": "f210-bob-core-no-angel",
+          "selected_families": 7,
+          "named_technologies": 14,
+          "actual_lab_completions": 28,
+          "finite_levels_completed_by_lab": 21,
+          "continuation_levels_completed_by_lab": 7,
+          "science_consumed": {
+            "automation-science-pack": 28,
+            "logistic-science-pack": 20,
+            "chemical-science-pack": 16,
+            "production-science-pack": 8,
+            "space-science-pack": 10,
+            "metallurgic-science-pack": 4
+          },
+          "native_recipe_productivity_per_route": 0.08,
+          "native_effect_per_completed_level": 0.02,
+          "fixture_accelerates_count_and_time": true,
+          "physical_alloy_witness": true,
+          "physical_routes": [
+            "bob-bronze-alloy",
+            "bob-gunmetal-alloy",
+            "bob-invar-alloy",
+            "bob-nitinol-alloy",
+            "bob-copper-tungsten-alloy"
+          ],
+          "physical_crafts_per_route": 100,
+          "physical_before_mir_productivity": true,
+          "physical_after_mir_productivity": true,
+          "physical_mixing_routes": 4,
+          "physical_metallurgy_fluid_routes": 1,
+          "physical_foundry_inherent_productivity": 0.5,
+          "ordinary_tuning_qualified": false,
+          "candidate_full_catalogue_comparison_required": true,
+          "on_load_read_only": true,
+          "foreign_force_witness_not_claimed": true
+        }
+      }
+    },
+    {
+      "ordinal": 2,
+      "save_sha256": "62F63EDA06BC8BC4B14E371A48B22B927E83D3FDE4FE2D34D6BE2A28859361F1",
+      "save_byte_identical": true,
+      "native_witness": {
+        "case": "bob-core-gameplay",
+        "stage": "reload",
+        "status": "passed",
+        "witnesses": {
+          "profile": "f210-bob-core-no-angel",
+          "selected_families": 7,
+          "named_technologies": 14,
+          "actual_lab_completions": 28,
+          "finite_levels_completed_by_lab": 21,
+          "continuation_levels_completed_by_lab": 7,
+          "science_consumed": {
+            "automation-science-pack": 28,
+            "logistic-science-pack": 20,
+            "chemical-science-pack": 16,
+            "production-science-pack": 8,
+            "space-science-pack": 10,
+            "metallurgic-science-pack": 4
+          },
+          "native_recipe_productivity_per_route": 0.08,
+          "native_effect_per_completed_level": 0.02,
+          "fixture_accelerates_count_and_time": true,
+          "physical_alloy_witness": true,
+          "physical_routes": [
+            "bob-bronze-alloy",
+            "bob-gunmetal-alloy",
+            "bob-invar-alloy",
+            "bob-nitinol-alloy",
+            "bob-copper-tungsten-alloy"
+          ],
+          "physical_crafts_per_route": 100,
+          "physical_before_mir_productivity": true,
+          "physical_after_mir_productivity": true,
+          "physical_mixing_routes": 4,
+          "physical_metallurgy_fluid_routes": 1,
+          "physical_foundry_inherent_productivity": 0.5,
+          "ordinary_tuning_qualified": false,
+          "candidate_full_catalogue_comparison_required": true,
+          "on_load_read_only": true,
+          "foreign_force_witness_not_claimed": true
+        }
+      }
+    }
+  ],
+  "custody": {
+    "path": "build/mir5/recovery-historical/bob-full-sa-five-alloy-merged-r04",
+    "manifest_sha256": "6C930D19CD2F11D406289EF45C50A186D2B06B2F813ECBDCDE3A77066A521B74",
+    "original_and_primary_members_verified": 22,
+    "bytes": 1963496,
+    "mismatches": []
+  },
+  "restoration": {
+    "player_sha256": "C563CB5B96C9E64CB3373BDB60CF5C8B7D3C97E93EADB8F924443C703CDC024D",
+    "fixture_sha256": "F4BD6F63831ECB47D85835B17F3CC6CAEA5C33272A61A90543326C79AFA6698E",
+    "mod_list_sha256": "48C46678CC8369DB15CC12CDFB23309EB076DC4433B76E9426083D0074BCCC91",
+    "mod_settings_sha256": "667897C514B66298A1E400058B65EA14EB36322D88864B98AE38E4C9B81387BC",
+    "active_profile_marker_exists": false
+  },
+  "physical_expectations": {
+    "crafts_per_route_per_phase": 100,
+    "bronze_invar_nitinol": {
+      "before": 500,
+      "after": [
+        535,
+        540
+      ]
+    },
+    "gunmetal": {
+      "before": 1000,
+      "after": [
+        1070,
+        1080
+      ]
+    },
+    "copper_tungsten": {
+      "before": 750,
+      "after": [
+        785,
+        790
+      ],
+      "foundry_inherent_productivity": 0.5
+    },
+    "meaning": "Independent fixture-asserted bounds, not separately exported exact numeric totals."
+  },
+  "preserved_adverses": {
+    "first": "spec/evidence/bob-full-sa-five-alloy-ec7-adverse-chain.json",
+    "second": {
+      "status": "failed-fixture-runtime-storage-geometry-assumption",
+      "controller_commit": "97b269c2506bcfd42057369363ec0baad0fa1ad8",
+      "player_sha256": "EC7AD6B0E40C3209335912FDCFDC585726B32A235B5BAE3C59A090331163B107",
+      "fixture_sha256": "6382671EEEC87436A3EE3FB22E662B84B8E5928FD5DC5D46600A0F1DBF2A4993",
+      "result_sha256": "98BDE436E7246A92B3D585E8E66029DC7283C437FEA3313598B54A139B243FB5",
+      "custody": {
+        "path": "build/mir5/recovery-historical/bob-full-sa-five-alloy-fluid-r03",
+        "manifest_sha256": "4AA05210392369179E34867F814DB3E2B75C99C8B8954519152CD406CE703E1C",
+        "original_and_primary_members_verified": 12,
+        "bytes": 897051,
+        "mismatches": []
+      },
+      "original_diagnostic_line": "__mir-fixture-mir5-bob-core-gameplay__/control.lua:94: [mir5-bob-core-gameplay] physical-before bob-copper-tungsten-alloy native metallurgy fluid machine differs; before={recipe=<none>,fluids_count=0,capacities=[]}; after={recipe=bob-copper-tungsten-alloy,fluids_count=1,capacities=[80]}",
+      "restoration": {
+        "status": "original-C563-and-F4BD-restored",
+        "factorio_processes_after": 0
+      },
+      "aggregate_receipt_correction": {
+        "path": "primary-custody-readback-r01.json",
+        "sha256": "20414A3705A2FB3BD7BA09D4AAFAC9172DE4FD15BB2735AFAC300B3DB1D9A684",
+        "preserved_reason": "r01's per-member hashes remain valid; its aggregate copied_bytes producer expression returned null. r02 records the independently recomputed sum without modifying r01."
+      }
+    }
+  },
+  "correction": "PR1124 distinguishes dynamic native fluid storages from four static prototype connections. Every exposed storage must have finite positive capacity; the independent static prototype geometry guard is unchanged. The host model covers the actual one-storage/80-capacity case and invalid later storage. Fixed replenishment time permits the unchanged 100-craft fluid workload.",
+  "raw_receipts": {
+    "path": "spec/evidence/bob-full-sa-five-alloy-8f-native-receipts.json.gz",
+    "gzip_bytes": 49825,
+    "gzip_sha256": "9B5D3BC7057F9B1958953A0692E7C47545589FF4CEEB4F9224FFF01E9BA267D0",
+    "uncompressed_sha256": "3D88ED507A095037D7C1CBE5BD77840B7D3DD0A59407409A1B71BF58D8B9E16C",
+    "members": 10
+  },
+  "limits": [
+    "Exact selected seven families/14 named technologies in the 25-mod full-Bob plus Space Age closure; not whole-catalogue or every-combination acceptance.",
+    "Marker text retains its older core profile label; actual selected-mod records establish the full loaded closure.",
+    "Ordinary tuning, foreign-force behavior, upgrades, clients, scored performance and release gates remain open."
+  ]
+}

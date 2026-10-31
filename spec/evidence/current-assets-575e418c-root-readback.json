@@ -1,0 +1,187 @@
+{
+  "kind": "MIR5CurrentAssets575eRootReadbackV1",
+  "status": "private-candidate-no-native-acceptance",
+  "source": {
+    "commit": "575e418c72eff2970fa5f6274956f6e8944d4e19",
+    "mod_name": "more-infinite-research",
+    "mod_title": "More Infinite Research",
+    "path": "source",
+    "source_distribution_version": "5.0.21000",
+    "source_tree": "5ba53a8514b4641c749e91c0a68f32521fb3fee7",
+    "tree": "7a55631b7f1f076a57c50068918d0c1b5db31594"
+  },
+  "inventory_sha256": "EA6AA71B8DCB9E953C9EFB270ABCE51D8245FA66D95BB72364EF7942A3AA50F7",
+  "file_count": 20,
+  "bytes": 6176647,
+  "packages": [
+    {
+      "archive": "more-infinite-research_5.0.00600.zip",
+      "sha256": "EAB83133E10C048F773B93982D25583A4A6E2A5C19B7C35DCBBD939C2B159D23",
+      "bytes": 136182,
+      "added": [],
+      "changed": [
+        "changelog.txt"
+      ]
+    },
+    {
+      "archive": "more-infinite-research_5.0.00700.zip",
+      "sha256": "A7C59831B3F1D7B2ED4C1D91AED7CD5F8028ADC2BFD7025147EC8C7315DCD53E",
+      "bytes": 136182,
+      "added": [],
+      "changed": [
+        "changelog.txt"
+      ]
+    },
+    {
+      "archive": "more-infinite-research_5.0.00800.zip",
+      "sha256": "727A41F78D07A92FCE8FD3048DCCB6FFEB3758CCA059F61E270C31F712C3FE2E",
+      "bytes": 136180,
+      "added": [],
+      "changed": [
+        "changelog.txt"
+      ]
+    },
+    {
+      "archive": "more-infinite-research_5.0.00900.zip",
+      "sha256": "FE8030E97188E1468E5D4945B4C90CE25AB802E0D208A6BC6D4C72AD9C2B3B7A",
+      "bytes": 136182,
+      "added": [],
+      "changed": [
+        "changelog.txt"
+      ]
+    },
+    {
+      "archive": "more-infinite-research_5.0.01000.zip",
+      "sha256": "4F32C1069974A86E74EAA41E551C47C509171B5974B2FD58AC99AA1DFEF406A2",
+      "bytes": 136182,
+      "added": [],
+      "changed": [
+        "changelog.txt"
+      ]
+    },
+    {
+      "archive": "more-infinite-research_5.0.01100.zip",
+      "sha256": "EB8C5A454396E6C5AE177DD18B6BB2A3348E8BBC6C15BDDA81FCDB138D1A7E33",
+      "bytes": 136182,
+      "added": [],
+      "changed": [
+        "changelog.txt"
+      ]
+    },
+    {
+      "archive": "more-infinite-research_5.0.01200.zip",
+      "sha256": "666137BA295DF44180F15F21114FC9E6C86050290CA9552A5D790661649C0600",
+      "bytes": 136184,
+      "added": [],
+      "changed": [
+        "changelog.txt"
+      ]
+    },
+    {
+      "archive": "more-infinite-research_5.0.01300.zip",
+      "sha256": "149657E8DBC43EBD0F2EC7FE8BAF51014F40AEDAA8E415245BDEDA02DDB6890A",
+      "bytes": 453660,
+      "added": [],
+      "changed": [
+        "changelog.txt"
+      ]
+    },
+    {
+      "archive": "more-infinite-research_5.0.01400.zip",
+      "sha256": "A844046A80445D60471272B4AE3EEA4A2558D058EEE3F2F825C5BCB7E47F591B",
+      "bytes": 453662,
+      "added": [],
+      "changed": [
+        "changelog.txt"
+      ]
+    },
+    {
+      "archive": "more-infinite-research_5.0.01500.zip",
+      "sha256": "9108CAA9CC53720C429C3DA73A8D5322D22308BBFFD49286A93B77A00DC9AED4",
+      "bytes": 453661,
+      "added": [],
+      "changed": [
+        "changelog.txt"
+      ]
+    },
+    {
+      "archive": "more-infinite-research_5.0.01600.zip",
+      "sha256": "6F2C7C7A3FBD0791F416DC26766449127F2E9DF1F2F25CDAE8E34A19579A8FA4",
+      "bytes": 453663,
+      "added": [],
+      "changed": [
+        "changelog.txt"
+      ]
+    },
+    {
+      "archive": "more-infinite-research_5.0.01700.zip",
+      "sha256": "20156BA213DE92C41331B60C74501A56C5A0891357C01E8B1AE37FA0485D842A",
+      "bytes": 453662,
+      "added": [],
+      "changed": [
+        "changelog.txt"
+      ]
+    },
+    {
+      "archive": "more-infinite-research_5.0.01800.zip",
+      "sha256": "A6662CC61E93921DBEE54400351D2F471CF8E35BB5A4A0F6F268AD1198097FBE",
+      "bytes": 453663,
+      "added": [],
+      "changed": [
+        "changelog.txt"
+      ]
+    },
+    {
+      "archive": "more-infinite-research_5.0.10000.zip",
+      "sha256": "95976A3E0FAE95C6C8CB9E300F1DD279D22D987109AF801A0A1F6A9FC8EBF73A",
+      "bytes": 453654,
+      "added": [],
+      "changed": [
+        "changelog.txt"
+      ]
+    },
+    {
+      "archive": "more-infinite-research_5.0.11000.zip",
+      "sha256": "686D6A075470B9964B0C16BEB797886E4479D34EB66E9529DC6B64855BF5DAB0",
+      "bytes": 453965,
+      "added": [],
+      "changed": [
+        "changelog.txt"
+      ]
+    },
+    {
+      "archive": "more-infinite-research_5.0.20000.zip",
+      "sha256": "EF66506789F1C81F7E15ECF7048311865C2AB2B3D803E2736CD6B9567C6A3D2C",
+      "bytes": 690998,
+      "added": [
+        "research/legacy_cannon_credit_definitions.lua",
+        "runtime/legacy_cannon_credits.lua"
+      ],
+      "changed": [
+        "changelog.txt",
+        "data-final-fixes.lua",
+        "runtime/bootstrap.lua"
+      ]
+    },
+    {
+      "archive": "more-infinite-research_5.0.21000.zip",
+      "sha256": "A8D0A4590154F3106E59BDB269F1AEB3ED8CC523F18F00ED7D76DC89059F5B8D",
+      "bytes": 691382,
+      "added": [
+        "research/legacy_cannon_credit_definitions.lua",
+        "runtime/legacy_cannon_credits.lua"
+      ],
+      "changed": [
+        "changelog.txt",
+        "data-final-fixes.lua",
+        "runtime/bootstrap.lua"
+      ]
+    }
+  ],
+  "repeat_verification": {
+    "path": "build/qualification/current-assets-575e418c-repeat-verification-r01.json",
+    "sha256": "E6DFAFCD64F5118471C439E1D44B23C8F96278CE3793F011E76917C010EBAADF",
+    "exit_code": 0,
+    "scope": "same-controller deterministic rebuild of all seventeen archives; no independent-machine or native acceptance"
+  }
+}

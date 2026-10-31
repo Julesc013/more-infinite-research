@@ -1,0 +1,56 @@
+{
+  "schema": 1,
+  "kind": "MIR5AAIF210PublishedPresentationFactsV1",
+  "source_commit": "7767026b540211a680c058cb30ab656d42e96ba8",
+  "engine": "2.1.23",
+  "aai_industry_version": "0.7.5",
+  "published_mir_version": "4.7.21003",
+  "published_archive_sha256": "B6EB9430056ABD384DB00F94929FE7DAC0A37441ACF4BC277946689682628852",
+  "raw": [
+    {
+      "mode": "base",
+      "path": "build/mir5/recovery-historical/aai-industry-f210/local-7767026-r01/base-published-4.7.3/write-data/script-output/data-raw-dump.json",
+      "sha256": "A117AE289F546FF73D101B01254A11F14DA8F0E054D16B31E77766041C8FFA2B"
+    },
+    {
+      "mode": "space-age",
+      "path": "build/mir5/recovery-historical/aai-industry-f210/local-7767026-r01/space-age-published-4.7.3/write-data/script-output/data-raw-dump.json",
+      "sha256": "4FC7C2F41C1F2A5FDEBA6DBAF95970391C0291283A805DD60850B8BA2234E293"
+    }
+  ],
+  "icons": {
+    "recipe-prod-research_engine-1": [
+      {
+        "icon": "__aai-industry__/graphics/technology/multi-cylinder-engine.png",
+        "icon_size": 256
+      },
+      {
+        "icon": "__core__/graphics/icons/technology/constants/constant-recipe-productivity.png",
+        "icon_size": 128,
+        "scale": 0.5,
+        "shift": [
+          50,
+          50
+        ],
+        "floating": true
+      }
+    ],
+    "recipe-prod-research_electric_engine-1": [
+      {
+        "icon": "__aai-industry__/graphics/technology/electric-engine.png",
+        "icon_size": 256
+      },
+      {
+        "icon": "__core__/graphics/icons/technology/constants/constant-recipe-productivity.png",
+        "icon_size": 128,
+        "scale": 0.5,
+        "shift": [
+          50,
+          50
+        ],
+        "floating": true
+      }
+    ]
+  },
+  "scope": "Independent published Base/Space Age presentation inputs; no new native or UI qualification."
+}

@@ -1,0 +1,265 @@
+{
+  "schema": 1,
+  "kind": "MIRCapOwnershipCorrectedAssetFreezeRootReadbackV1",
+  "status": "17-candidate-ZIPs-repeat-reproduced-and-primary-custody-equal",
+  "reader_sha256": "4DD405EFB7E463061F211BF9413B5CC19F22632AE6A4A19E5207D3237692AABA",
+  "source": {
+    "commit": "376eed796c5d1e8e7519c65cd3934710fda54b8c",
+    "mod_name": "more-infinite-research",
+    "mod_title": "More Infinite Research",
+    "path": "source",
+    "source_distribution_version": "5.0.21000",
+    "source_tree": "9461d8608eb77a230fbb313080be93c32ea05336",
+    "tree": "a131b1716720bf555e9f8c64dc408e60fc3792a5"
+  },
+  "external": "D:\\Projects\\Factorio\\mir5-packages-cap-ownership-r01",
+  "primary_custody": "D:\\Projects\\Factorio\\more-infinite-research\\build\\packages\\cap-ownership-r01",
+  "files": {
+    "MIR5ReleaseAssetInventoryV1.json": {
+      "bytes": 209701,
+      "sha256": "92F804E998DA2A85AFF27B2B3A009D5D0D784ED2B8C49CE187E6235B9A306A27"
+    },
+    "more-infinite-research_5.0.00600.zip": {
+      "bytes": 136282,
+      "sha256": "8A28D2798E3BCC833557C6E82C53AD7591381BD2E4DEE1C652A5CC69979A8BFA"
+    },
+    "more-infinite-research_5.0.00700.zip": {
+      "bytes": 136282,
+      "sha256": "5BD42C4084567F15442584DECE6A7D556DB7D3680DCEC075672D4C89DA810E7B"
+    },
+    "more-infinite-research_5.0.00800.zip": {
+      "bytes": 136280,
+      "sha256": "F5E61877C8F20B9DF3C8FD197AAC3E7263C8CE53AF0E7D17E1493056553ECAD7"
+    },
+    "more-infinite-research_5.0.00900.zip": {
+      "bytes": 136282,
+      "sha256": "81C5ED77B9D05B3A47EE55A632D26EFD1A739454A373AEB2A84D66A410A8AAD9"
+    },
+    "more-infinite-research_5.0.01000.zip": {
+      "bytes": 136282,
+      "sha256": "9349DB5E918E4A8940F4A8351A89C86EA1BC2E4E1C8612768DD300BABA6B341F"
+    },
+    "more-infinite-research_5.0.01100.zip": {
+      "bytes": 136282,
+      "sha256": "E7E9B749BB9D75969BE532C3DEF1A4DA927CA17EBFD6806439DF5A94AF98B994"
+    },
+    "more-infinite-research_5.0.01200.zip": {
+      "bytes": 136284,
+      "sha256": "4BD36A91F73504353B1D4D2A600C35953E80F43367F18B89BD85BC699337493D"
+    },
+    "more-infinite-research_5.0.01300.zip": {
+      "bytes": 453760,
+      "sha256": "84DE9726EE826641CEF91CEA9DA8F97FD7FEDC08CDB318DCBAF35AD2AC531E1C"
+    },
+    "more-infinite-research_5.0.01400.zip": {
+      "bytes": 453762,
+      "sha256": "802AE31D098856D63D742EE64D37AAC7F76D05ADC1EF9E9783A8EA51534DA366"
+    },
+    "more-infinite-research_5.0.01500.zip": {
+      "bytes": 453761,
+      "sha256": "6A09DDF1A091004D84B59B97A315FB524494655B78AA2472C436127D053CDF97"
+    },
+    "more-infinite-research_5.0.01600.zip": {
+      "bytes": 453763,
+      "sha256": "835976288D7962FB9AB9E1DC898635D59095CCBA5BB6C223B596BCC6AB44BC76"
+    },
+    "more-infinite-research_5.0.01700.zip": {
+      "bytes": 453762,
+      "sha256": "ADF323397C12EF816CD600BD429D6BC46B08457715DC7E95A58AA7E4D9BA0316"
+    },
+    "more-infinite-research_5.0.01800.zip": {
+      "bytes": 453763,
+      "sha256": "07BD0386ED39FFE39A225EDB61AA4ED229CB8C79ABEDA1E58B44B51121F4269C"
+    },
+    "more-infinite-research_5.0.10000.zip": {
+      "bytes": 453754,
+      "sha256": "51EE1EFB685CE7EFF76E1CD671FF0E5AFBA9DC5357B54694E8F5CC24C1B12AA5"
+    },
+    "more-infinite-research_5.0.11000.zip": {
+      "bytes": 454065,
+      "sha256": "0BBA35402356C14FA0339632E63F8602E39969D4E635E28FA2450CFF24939A95"
+    },
+    "more-infinite-research_5.0.20000.zip": {
+      "bytes": 692050,
+      "sha256": "0822F3A3F94492A58DD876AD67C1B450833DF761A519899E59580BFA610D90A2"
+    },
+    "more-infinite-research_5.0.21000.zip": {
+      "bytes": 692434,
+      "sha256": "12462A867726C4B9549177E91F9B37C6C5CC30E201401374F26366903F9B2DF2"
+    },
+    "SHA256SUMS-early.txt": {
+      "bytes": 721,
+      "sha256": "88701E795B04CCA85895ABF87AC8EC23772BC77FBD568705D299444ECC7C520E"
+    },
+    "SHA256SUMS.txt": {
+      "bytes": 1030,
+      "sha256": "D478A45A82A75014B4CD130252B25A842753805C477A781E5217685FFA1AA33A"
+    }
+  },
+  "total_files": 20,
+  "total_bytes": 6180300,
+  "archives": {
+    "more-infinite-research_5.0.00600.zip": {
+      "bytes": 136282,
+      "sha256": "8A28D2798E3BCC833557C6E82C53AD7591381BD2E4DEE1C652A5CC69979A8BFA",
+      "members": 10,
+      "changed_payloads": [
+        "changelog.txt"
+      ]
+    },
+    "more-infinite-research_5.0.00700.zip": {
+      "bytes": 136282,
+      "sha256": "5BD42C4084567F15442584DECE6A7D556DB7D3680DCEC075672D4C89DA810E7B",
+      "members": 10,
+      "changed_payloads": [
+        "changelog.txt"
+      ]
+    },
+    "more-infinite-research_5.0.00800.zip": {
+      "bytes": 136280,
+      "sha256": "F5E61877C8F20B9DF3C8FD197AAC3E7263C8CE53AF0E7D17E1493056553ECAD7",
+      "members": 10,
+      "changed_payloads": [
+        "changelog.txt"
+      ]
+    },
+    "more-infinite-research_5.0.00900.zip": {
+      "bytes": 136282,
+      "sha256": "81C5ED77B9D05B3A47EE55A632D26EFD1A739454A373AEB2A84D66A410A8AAD9",
+      "members": 10,
+      "changed_payloads": [
+        "changelog.txt"
+      ]
+    },
+    "more-infinite-research_5.0.01000.zip": {
+      "bytes": 136282,
+      "sha256": "9349DB5E918E4A8940F4A8351A89C86EA1BC2E4E1C8612768DD300BABA6B341F",
+      "members": 10,
+      "changed_payloads": [
+        "changelog.txt"
+      ]
+    },
+    "more-infinite-research_5.0.01100.zip": {
+      "bytes": 136282,
+      "sha256": "E7E9B749BB9D75969BE532C3DEF1A4DA927CA17EBFD6806439DF5A94AF98B994",
+      "members": 10,
+      "changed_payloads": [
+        "changelog.txt"
+      ]
+    },
+    "more-infinite-research_5.0.01200.zip": {
+      "bytes": 136284,
+      "sha256": "4BD36A91F73504353B1D4D2A600C35953E80F43367F18B89BD85BC699337493D",
+      "members": 10,
+      "changed_payloads": [
+        "changelog.txt"
+      ]
+    },
+    "more-infinite-research_5.0.01300.zip": {
+      "bytes": 453760,
+      "sha256": "84DE9726EE826641CEF91CEA9DA8F97FD7FEDC08CDB318DCBAF35AD2AC531E1C",
+      "members": 127,
+      "changed_payloads": [
+        "changelog.txt"
+      ]
+    },
+    "more-infinite-research_5.0.01400.zip": {
+      "bytes": 453762,
+      "sha256": "802AE31D098856D63D742EE64D37AAC7F76D05ADC1EF9E9783A8EA51534DA366",
+      "members": 127,
+      "changed_payloads": [
+        "changelog.txt"
+      ]
+    },
+    "more-infinite-research_5.0.01500.zip": {
+      "bytes": 453761,
+      "sha256": "6A09DDF1A091004D84B59B97A315FB524494655B78AA2472C436127D053CDF97",
+      "members": 127,
+      "changed_payloads": [
+        "changelog.txt"
+      ]
+    },
+    "more-infinite-research_5.0.01600.zip": {
+      "bytes": 453763,
+      "sha256": "835976288D7962FB9AB9E1DC898635D59095CCBA5BB6C223B596BCC6AB44BC76",
+      "members": 127,
+      "changed_payloads": [
+        "changelog.txt"
+      ]
+    },
+    "more-infinite-research_5.0.01700.zip": {
+      "bytes": 453762,
+      "sha256": "ADF323397C12EF816CD600BD429D6BC46B08457715DC7E95A58AA7E4D9BA0316",
+      "members": 127,
+      "changed_payloads": [
+        "changelog.txt"
+      ]
+    },
+    "more-infinite-research_5.0.01800.zip": {
+      "bytes": 453763,
+      "sha256": "07BD0386ED39FFE39A225EDB61AA4ED229CB8C79ABEDA1E58B44B51121F4269C",
+      "members": 127,
+      "changed_payloads": [
+        "changelog.txt"
+      ]
+    },
+    "more-infinite-research_5.0.10000.zip": {
+      "bytes": 453754,
+      "sha256": "51EE1EFB685CE7EFF76E1CD671FF0E5AFBA9DC5357B54694E8F5CC24C1B12AA5",
+      "members": 127,
+      "changed_payloads": [
+        "changelog.txt"
+      ]
+    },
+    "more-infinite-research_5.0.11000.zip": {
+      "bytes": 454065,
+      "sha256": "0BBA35402356C14FA0339632E63F8602E39969D4E635E28FA2450CFF24939A95",
+      "members": 128,
+      "changed_payloads": [
+        "changelog.txt"
+      ]
+    },
+    "more-infinite-research_5.0.20000.zip": {
+      "bytes": 692050,
+      "sha256": "0822F3A3F94492A58DD876AD67C1B450833DF761A519899E59580BFA610D90A2",
+      "members": 218,
+      "changed_payloads": [
+        "changelog.txt",
+        "runtime/lifecycle.lua"
+      ]
+    },
+    "more-infinite-research_5.0.21000.zip": {
+      "bytes": 692434,
+      "sha256": "12462A867726C4B9549177E91F9B37C6C5CC30E201401374F26366903F9B2DF2",
+      "members": 219,
+      "changed_payloads": [
+        "changelog.txt",
+        "runtime/lifecycle.lua"
+      ]
+    }
+  },
+  "inventory_sha256": "92F804E998DA2A85AFF27B2B3A009D5D0D784ED2B8C49CE187E6235B9A306A27",
+  "verification": {
+    "command": "python -X utf8 -B tools/release.py --source source --output D:/Projects/Factorio/mir5-packages-cap-ownership-r01 --verify",
+    "actual_exit_code": 0,
+    "actual_execution": "Completed in exec session24874 after the17-edition freeze. Existing verifier rebuilt all frozen packages and compared exact bytes; no new verifier is introduced.",
+    "engine_execution": false
+  },
+  "health_preservation": {
+    "observed_checkpoint": "worktrees:review-1",
+    "primary_checkout": "D:/Projects/Factorio/more-infinite-research",
+    "disposition": "The long-lived primary checkout is the protected final handoff,observed cleanDev ca783. Retain it and all active/unique custody; it is not a disposable worktree. Current packaging branch376 is clean,pushed and equal to its remote. No deletion/reset/synchronization shortcut is authorized by an incomplete scan."
+  },
+  "scope": "Candidate only. Fifteen ZIPs change only authored changelog; F200/F210 additionally change only runtime/lifecycle.lua. Nine stable editions,experimentalF018 and seven early best-effort editions retain their exact classifications. Native corrected cap chain,affected final-input applicability and all other release gates remain open. Nothing is accepted into dist or published.",
+  "private_root_readback": {
+    "path": "build/qualification/cap-ownership-freeze-root-r01/root-readback-r01.json",
+    "sha256": "968E43CF0F98B1EB6A75FB79B538F3F620BF976AD166EE593174F2822CCA5F5C"
+  },
+  "source_fix": {
+    "pr": 1357,
+    "head_commit": "61e1111eb802bdf9bcc2cdad5203c1349872248e",
+    "unchanged_corrected_player_before_changelog": "6e604fab6b91efee0929279c7d210e2d2a42cfba",
+    "independent_review": "https://github.com/Julesc013/more-infinite-research/pull/1357#issuecomment-6477011177",
+    "native_acceptance": false
+  }
+}

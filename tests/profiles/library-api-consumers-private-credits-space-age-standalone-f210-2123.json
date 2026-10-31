@@ -1,0 +1,73 @@
+{
+  "schema": 1,
+  "kind": "mir5-library-api-consumers-private-credits-space-age-standalone-f210-native-selection",
+  "target": "f210-standalone",
+  "factorio_line": "2.1",
+  "engine": {
+    "version": "2.1.23",
+    "sha256": "8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38"
+  },
+  "settings_mode": "Defaults",
+  "session_expected_peak_memory_mib": 8192,
+  "space_age_library": true,
+  "private_credit_checks": true,
+  "mods": [
+    {
+      "name": "base",
+      "version": "2.1.23",
+      "enabled": true
+    },
+    {
+      "name": "elevated-rails",
+      "version": "2.1.23",
+      "enabled": true
+    },
+    {
+      "name": "quality",
+      "version": "2.1.23",
+      "enabled": true
+    },
+    {
+      "name": "recycler",
+      "version": "2.1.23",
+      "enabled": true
+    },
+    {
+      "name": "space-age",
+      "version": "2.1.23",
+      "enabled": true
+    },
+    {
+      "name": "mir-fixture-mir5-active-mods-observer",
+      "version": "0.1.0",
+      "enabled": true
+    },
+    {
+      "name": "more-infinite-research",
+      "version": "5.0.21000",
+      "enabled": true
+    },
+    {
+      "name": "mir-fixture-mir5-library-multiplayer",
+      "version": "0.3.0",
+      "enabled": true
+    },
+    {
+      "name": "mir-fixture-mir5-api-alpha",
+      "version": "0.1.0",
+      "enabled": true
+    },
+    {
+      "name": "mir-fixture-mir5-api-beta",
+      "version": "0.1.0",
+      "enabled": true
+    }
+  ],
+  "archive_sha256": {
+    "mir-fixture-mir5-active-mods-observer_0.1.0.zip": "A15A7D628D66953D2E0C4D4FA288F47CBF9C5678327C7EB3D23ADB5DC78331C0",
+    "more-infinite-research_5.0.21000.zip": "2DDD2A4C967BEF07830218442AE4441BEECD5B9ECE0AC86B09A5F6586BBA80E5",
+    "mir-fixture-mir5-api-alpha_0.1.0.zip": "DB5ED843FA9D85A1ABDC22595E62D315CA1A2191C846208079F85D4D016CE904",
+    "mir-fixture-mir5-api-beta_0.1.0.zip": "690004F145E8B0DD52B4030BD8B27F7B581495EEFAAC5CB3A2F30A23FCA08951"
+  },
+  "scope": "Prepared current F210 Space Age two-client Library private-credit input with the four official 2.1.23 Space Age companions and independently installable API alpha and late optional beta consumers. It pins MIR archive 2DDD2A4C967BEF07830218442AE4441BEECD5B9ECE0AC86B09A5F6586BBA80E5 from source a95dbc6b35c165b46aa9991d2a0ef7274d4ec04a/player tree 7b0ede663e6fbcf486cd863e7d3719653aedc07a, the shared 0.3.0 private-credit fixture metadata, and the A15 observer. Its planned 1280x720 functional client rendering uses low graphics settings. This is prepared input only: it does not establish a native API/client, Library, laboratory, saved-state, rendered-view, performance, or release result. The 8192 MiB bound is an admission ceiling, not a measured peak."
+}

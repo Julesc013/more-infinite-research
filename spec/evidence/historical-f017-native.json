@@ -1,0 +1,535 @@
+{
+  "kind": "MIR5NativeFixtureV1",
+  "status": "passed-private-native-fixture",
+  "case": "historical-native",
+  "source_head": "7cb0b8b2c0a9630875c19c2e97a3b26477d9c40f",
+  "source_dirty": false,
+  "harness_sha256": "1900095AE7745307E27724618D28ECD0F29E197EA60DAAB9D4CE69904C9B6725",
+  "native_probe_sha256": "FF8E62687A8AA05080E3F9AFF45DED34BA7FCFDF1F309542A66893380B7D51E3",
+  "governor_sha256": "9E27C4DDCCC10028246F89A09A7663F7FCA1D7BD26444681A7A8635F74D9BE96",
+  "engine": {
+    "path": "D:\\Programs\\Factorio\\0.17\\bin\\x64\\factorio.exe",
+    "sha256": "E699D376D100A428B95243507FDBB39C372921577C6D7593203EDF07CAA12D06",
+    "file_version": "0.17.79.47865",
+    "product_version": "0.17.79",
+    "base_version": "0.17.79"
+  },
+  "profile": {
+    "path": "C:\\Projects\\Factorio\\more-infinite-research\\tests\\mir5\\profiles\\historical-native-f017.json",
+    "sha256": "F1E03CB5E8A53C8F9A8AC737550383946A81C26B789987531899A4A21393B9AB"
+  },
+  "fixtures": [
+    {
+      "source": "C:\\Projects\\Factorio\\more-infinite-research\\tests\\mir5\\fixtures\\historical-native",
+      "archive": "C:\\Projects\\Factorio\\testmods\\0.17\\mir-fixture-mir5-historical-native_0.1.0.zip",
+      "sha256": "D9902449FC2B83D5BD181D13CEF2C3A79438E11E17E105BF6BF72EE55ECDBF60"
+    }
+  ],
+  "historical_target": {
+    "metadata_path": "C:\\Projects\\Factorio\\more-infinite-research\\tests\\mir5\\fixtures\\historical-native\\metadata.json",
+    "factorio_version": "0.17",
+    "minimum_base": "0.17.79",
+    "metadata_sha256": "F9BA6C05CBE2F41E590E5E9F46963DD369D837E80796002716D3E5332884B32F",
+    "id": "f017",
+    "mir_version": "5.0.01700"
+  },
+  "mir_archive": {
+    "path": "C:\\Projects\\Factorio\\testmods\\0.17\\more-infinite-research_5.0.01700.zip",
+    "sha256": "715CBD814B1FC06A662D35AF2A00AC1BD208A8669609F4D2758EB55CC0C92270"
+  },
+  "observation": "native-fixture-production-and-two-cold-reloads",
+  "input_save": null,
+  "release_qualification": false,
+  "initial_admission_wait": {
+    "phase": "fixture-initial",
+    "admission_wait_seconds": 0,
+    "status": "not-requested",
+    "attempt_count": 0,
+    "refusal_count": 0,
+    "elapsed_seconds": 0.0,
+    "first_refusal": null,
+    "last_refusal": null,
+    "last_error": null,
+    "started_at": "2026-10-23T12:47:55.3960420+00:00",
+    "deadline_at": "2026-10-23T12:47:55.3960420+00:00",
+    "admission": null
+  },
+  "create": {
+    "process": {
+      "index": 1,
+      "status": "passed",
+      "ledger": "C:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\mir5-historical-native-f017-r01\\process-1.resources.jsonl",
+      "stdout": "C:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\mir5-historical-native-f017-r01\\process-1.stdout.txt",
+      "stderr": "C:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\mir5-historical-native-f017-r01\\process-1.stderr.txt",
+      "result": {
+        "status": "passed",
+        "exit_code": 0,
+        "timed_out": false,
+        "passed": true,
+        "completion_predicate_observed": false,
+        "duration_seconds": 3.591268,
+        "peak_working_set_bytes": 97873920,
+        "peak_sampled_private_bytes": 88928256,
+        "admission": {
+          "observed_at": "2026-10-23T12:47:56.0524230+00:00",
+          "memory": {
+            "total_bytes": 17047683072,
+            "free_bytes": 5173526528,
+            "committed_bytes": 16144404480,
+            "commit_limit_bytes": 20357242880
+          },
+          "work_volume": {
+            "name": "C:\\",
+            "free_bytes": 62882840576,
+            "total_bytes": 472446398464
+          },
+          "system_volume": {
+            "name": "C:\\",
+            "free_bytes": 62882840576,
+            "total_bytes": 472446398464
+          }
+        },
+        "duration_measurement": {
+          "scope": "direct-native-executable-start-to-exit",
+          "historical_scope": "governed-powershell-wrapper-tree-start-to-exit",
+          "comparability": "scope-changed; compare only fresh direct-native measurements; no product-speedup claim"
+        }
+      }
+    },
+    "log": "C:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\mir5-historical-native-f017-r01\\create.factorio.log",
+    "log_sha256": "FCB90F9DF609D303875013E9A4BB1B6E42A5DE61C33F23C1FB7ADCA4799A9713",
+    "loaded_selection": [
+      "base@0.17.79",
+      "mir-fixture-mir5-historical-native@0.1.0",
+      "more-infinite-research@5.0.1700"
+    ],
+    "consumers": {}
+  },
+  "seed_sha256": "7A05BA5C69B32F56537E66F0FD8BA405DD085D16466A9B99D45205EF797CA4B6",
+  "historical_server_settings": {
+    "path": "C:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\mir5-historical-native-f017-r01\\server-settings.json",
+    "sha256": "824E53EE9D00997E37C843C810CF8423C8AEB8B184201DDC5EAFF2819368A141",
+    "visibility": {
+      "lan": false,
+      "public": false
+    },
+    "auto_pause": false,
+    "arguments": [
+      "--server-settings",
+      "C:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\mir5-historical-native-f017-r01\\server-settings.json",
+      "--bind",
+      "127.0.0.1"
+    ]
+  },
+  "production": {
+    "process": {
+      "index": 2,
+      "status": "passed",
+      "ledger": "C:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\mir5-historical-native-f017-r01\\process-2.resources.jsonl",
+      "stdout": "C:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\mir5-historical-native-f017-r01\\process-2.stdout.txt",
+      "stderr": "C:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\mir5-historical-native-f017-r01\\process-2.stderr.txt",
+      "result": {
+        "status": "passed",
+        "exit_code": -1,
+        "timed_out": false,
+        "passed": true,
+        "completion_predicate_observed": true,
+        "duration_seconds": 2.429756,
+        "peak_working_set_bytes": 116838400,
+        "peak_sampled_private_bytes": 104624128,
+        "admission": {
+          "observed_at": "2026-10-23T12:48:00.0439879+00:00",
+          "memory": {
+            "total_bytes": 17047683072,
+            "free_bytes": 5139095552,
+            "committed_bytes": 16385974272,
+            "commit_limit_bytes": 20357242880
+          },
+          "work_volume": {
+            "name": "C:\\",
+            "free_bytes": 62881992704,
+            "total_bytes": 472446398464
+          },
+          "system_volume": {
+            "name": "C:\\",
+            "free_bytes": 62881992704,
+            "total_bytes": 472446398464
+          }
+        },
+        "duration_measurement": {
+          "scope": "direct-native-executable-start-to-exit",
+          "historical_scope": "governed-powershell-wrapper-tree-start-to-exit",
+          "comparability": "scope-changed; compare only fresh direct-native measurements; no product-speedup claim"
+        }
+      }
+    },
+    "log": "C:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\mir5-historical-native-f017-r01\\production.factorio.log",
+    "log_sha256": "DF7D83B6AD86FE74AF08F35B4939D814225AE663A0DCEE4C862B42A4BC6309A6",
+    "loaded_selection": [
+      "base@0.17.79",
+      "mir-fixture-mir5-historical-native@0.1.0",
+      "more-infinite-research@5.0.1700"
+    ],
+    "consumers": {}
+  },
+  "historical_server_mode": "start-server-two-cold-reloads",
+  "initial": {
+    "case": "historical-native",
+    "stage": "initial",
+    "status": "passed",
+    "target": "f017",
+    "direct": "recipe-prod-research_character_mining_speed-1",
+    "direct_lab_completions": 1,
+    "direct_mining_bonus": 0.1,
+    "continuation": "inserter-capacity-bonus-8",
+    "continuation_witness": "lab-completed",
+    "continuation_lab_completions": 1,
+    "two_cold_reload_witness": false,
+    "on_load_read_only": false
+  },
+  "reloads": [
+    {
+      "save_byte_identical": true,
+      "ordinal": 1,
+      "stage": {
+        "process": {
+          "index": 3,
+          "status": "passed",
+          "ledger": "C:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\mir5-historical-native-f017-r01\\process-3.resources.jsonl",
+          "stdout": "C:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\mir5-historical-native-f017-r01\\process-3.stdout.txt",
+          "stderr": "C:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\mir5-historical-native-f017-r01\\process-3.stderr.txt",
+          "result": {
+            "status": "passed",
+            "exit_code": -1,
+            "timed_out": false,
+            "passed": true,
+            "completion_predicate_observed": true,
+            "duration_seconds": 2.781246,
+            "peak_working_set_bytes": 88588288,
+            "peak_sampled_private_bytes": 78499840,
+            "admission": {
+              "observed_at": "2026-10-23T12:48:02.7550524+00:00",
+              "memory": {
+                "total_bytes": 17047683072,
+                "free_bytes": 5302108160,
+                "committed_bytes": 15975272448,
+                "commit_limit_bytes": 20357242880
+              },
+              "work_volume": {
+                "name": "C:\\",
+                "free_bytes": 62880370688,
+                "total_bytes": 472446398464
+              },
+              "system_volume": {
+                "name": "C:\\",
+                "free_bytes": 62880370688,
+                "total_bytes": 472446398464
+              }
+            },
+            "duration_measurement": {
+              "scope": "direct-native-executable-start-to-exit",
+              "historical_scope": "governed-powershell-wrapper-tree-start-to-exit",
+              "comparability": "scope-changed; compare only fresh direct-native measurements; no product-speedup claim"
+            }
+          }
+        },
+        "log": "C:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\mir5-historical-native-f017-r01\\reload-1.factorio.log",
+        "log_sha256": "436AFC573521D97D141D846FBDC1D100F50E6272892812FF7B73337CE87AD110",
+        "loaded_selection": [
+          "base@0.17.79",
+          "mir-fixture-mir5-historical-native@0.1.0",
+          "more-infinite-research@5.0.1700"
+        ],
+        "consumers": {}
+      },
+      "result": {
+        "case": "historical-native",
+        "stage": "reload",
+        "status": "passed",
+        "target": "f017",
+        "direct": "recipe-prod-research_character_mining_speed-1",
+        "direct_lab_completions": 1,
+        "direct_mining_bonus": 0.1,
+        "continuation": "inserter-capacity-bonus-8",
+        "continuation_witness": "lab-completed",
+        "continuation_lab_completions": 1,
+        "two_cold_reload_witness": true,
+        "on_load_read_only": true
+      },
+      "save_sha256": "FB591211BD6FB06643C5DD126B1A7C2D6172AA4EA9C458B52A87312BDDA05551"
+    },
+    {
+      "save_byte_identical": true,
+      "ordinal": 2,
+      "stage": {
+        "process": {
+          "index": 4,
+          "status": "passed",
+          "ledger": "C:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\mir5-historical-native-f017-r01\\process-4.resources.jsonl",
+          "stdout": "C:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\mir5-historical-native-f017-r01\\process-4.stdout.txt",
+          "stderr": "C:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\mir5-historical-native-f017-r01\\process-4.stderr.txt",
+          "result": {
+            "status": "passed",
+            "exit_code": -1,
+            "timed_out": false,
+            "passed": true,
+            "completion_predicate_observed": true,
+            "duration_seconds": 2.569595,
+            "peak_working_set_bytes": 111951872,
+            "peak_sampled_private_bytes": 100724736,
+            "admission": {
+              "observed_at": "2026-10-23T12:48:06.3172094+00:00",
+              "memory": {
+                "total_bytes": 17047683072,
+                "free_bytes": 5099966464,
+                "committed_bytes": 16240279552,
+                "commit_limit_bytes": 20357242880
+              },
+              "work_volume": {
+                "name": "C:\\",
+                "free_bytes": 62879629312,
+                "total_bytes": 472446398464
+              },
+              "system_volume": {
+                "name": "C:\\",
+                "free_bytes": 62879629312,
+                "total_bytes": 472446398464
+              }
+            },
+            "duration_measurement": {
+              "scope": "direct-native-executable-start-to-exit",
+              "historical_scope": "governed-powershell-wrapper-tree-start-to-exit",
+              "comparability": "scope-changed; compare only fresh direct-native measurements; no product-speedup claim"
+            }
+          }
+        },
+        "log": "C:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\mir5-historical-native-f017-r01\\reload-2.factorio.log",
+        "log_sha256": "B90948F40FB7EB5450079603F5ED19520A40340687AFA125B1FF168316F61639",
+        "loaded_selection": [
+          "base@0.17.79",
+          "mir-fixture-mir5-historical-native@0.1.0",
+          "more-infinite-research@5.0.1700"
+        ],
+        "consumers": {}
+      },
+      "result": {
+        "case": "historical-native",
+        "stage": "reload",
+        "status": "passed",
+        "target": "f017",
+        "direct": "recipe-prod-research_character_mining_speed-1",
+        "direct_lab_completions": 1,
+        "direct_mining_bonus": 0.1,
+        "continuation": "inserter-capacity-bonus-8",
+        "continuation_witness": "lab-completed",
+        "continuation_lab_completions": 1,
+        "two_cold_reload_witness": true,
+        "on_load_read_only": true
+      },
+      "save_sha256": "FB591211BD6FB06643C5DD126B1A7C2D6172AA4EA9C458B52A87312BDDA05551"
+    }
+  ],
+  "library_control_restoration": {
+    "status": "restored-direct-library-controls",
+    "profile_sha256": "F1E03CB5E8A53C8F9A8AC737550383946A81C26B789987531899A4A21393B9AB",
+    "dependency_payload_bytes_copied": 0,
+    "archive_links_created": 0,
+    "archive_extractions": 0,
+    "owned_archive_names_temporarily_hidden": 0,
+    "selected": [
+      {
+        "name": "base",
+        "version": "0.17.79",
+        "path": "D:\\Programs\\Factorio\\0.17\\data\\base\\info.json",
+        "builtin": true,
+        "identity": "7B33D0CB:0001000000059B80",
+        "sha256": "D020C8FDF53A27DA490A69D3F3FA48ECF7FC1310046054CD8805F67F1EAF3037",
+        "bytes": 193
+      },
+      {
+        "name": "more-infinite-research",
+        "version": "5.0.01700",
+        "path": "C:\\Projects\\Factorio\\testmods\\0.17\\more-infinite-research_5.0.01700.zip",
+        "builtin": false,
+        "identity": "C65BE9DB:004400000024C029",
+        "sha256": "715CBD814B1FC06A662D35AF2A00AC1BD208A8669609F4D2758EB55CC0C92270",
+        "bytes": 240042
+      },
+      {
+        "name": "mir-fixture-mir5-historical-native",
+        "version": "0.1.0",
+        "path": "C:\\Projects\\Factorio\\testmods\\0.17\\mir-fixture-mir5-historical-native_0.1.0.zip",
+        "builtin": false,
+        "identity": "C65BE9DB:009400000024C02A",
+        "sha256": "D9902449FC2B83D5BD181D13CEF2C3A79438E11E17E105BF6BF72EE55ECDBF60",
+        "bytes": 5477
+      }
+    ]
+  },
+  "process_runs": [
+    {
+      "index": 1,
+      "status": "passed",
+      "ledger": "C:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\mir5-historical-native-f017-r01\\process-1.resources.jsonl",
+      "stdout": "C:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\mir5-historical-native-f017-r01\\process-1.stdout.txt",
+      "stderr": "C:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\mir5-historical-native-f017-r01\\process-1.stderr.txt",
+      "result": {
+        "status": "passed",
+        "exit_code": 0,
+        "timed_out": false,
+        "passed": true,
+        "completion_predicate_observed": false,
+        "duration_seconds": 3.591268,
+        "peak_working_set_bytes": 97873920,
+        "peak_sampled_private_bytes": 88928256,
+        "admission": {
+          "observed_at": "2026-10-23T12:47:56.0524230+00:00",
+          "memory": {
+            "total_bytes": 17047683072,
+            "free_bytes": 5173526528,
+            "committed_bytes": 16144404480,
+            "commit_limit_bytes": 20357242880
+          },
+          "work_volume": {
+            "name": "C:\\",
+            "free_bytes": 62882840576,
+            "total_bytes": 472446398464
+          },
+          "system_volume": {
+            "name": "C:\\",
+            "free_bytes": 62882840576,
+            "total_bytes": 472446398464
+          }
+        },
+        "duration_measurement": {
+          "scope": "direct-native-executable-start-to-exit",
+          "historical_scope": "governed-powershell-wrapper-tree-start-to-exit",
+          "comparability": "scope-changed; compare only fresh direct-native measurements; no product-speedup claim"
+        }
+      }
+    },
+    {
+      "index": 2,
+      "status": "passed",
+      "ledger": "C:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\mir5-historical-native-f017-r01\\process-2.resources.jsonl",
+      "stdout": "C:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\mir5-historical-native-f017-r01\\process-2.stdout.txt",
+      "stderr": "C:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\mir5-historical-native-f017-r01\\process-2.stderr.txt",
+      "result": {
+        "status": "passed",
+        "exit_code": -1,
+        "timed_out": false,
+        "passed": true,
+        "completion_predicate_observed": true,
+        "duration_seconds": 2.429756,
+        "peak_working_set_bytes": 116838400,
+        "peak_sampled_private_bytes": 104624128,
+        "admission": {
+          "observed_at": "2026-10-23T12:48:00.0439879+00:00",
+          "memory": {
+            "total_bytes": 17047683072,
+            "free_bytes": 5139095552,
+            "committed_bytes": 16385974272,
+            "commit_limit_bytes": 20357242880
+          },
+          "work_volume": {
+            "name": "C:\\",
+            "free_bytes": 62881992704,
+            "total_bytes": 472446398464
+          },
+          "system_volume": {
+            "name": "C:\\",
+            "free_bytes": 62881992704,
+            "total_bytes": 472446398464
+          }
+        },
+        "duration_measurement": {
+          "scope": "direct-native-executable-start-to-exit",
+          "historical_scope": "governed-powershell-wrapper-tree-start-to-exit",
+          "comparability": "scope-changed; compare only fresh direct-native measurements; no product-speedup claim"
+        }
+      }
+    },
+    {
+      "index": 3,
+      "status": "passed",
+      "ledger": "C:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\mir5-historical-native-f017-r01\\process-3.resources.jsonl",
+      "stdout": "C:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\mir5-historical-native-f017-r01\\process-3.stdout.txt",
+      "stderr": "C:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\mir5-historical-native-f017-r01\\process-3.stderr.txt",
+      "result": {
+        "status": "passed",
+        "exit_code": -1,
+        "timed_out": false,
+        "passed": true,
+        "completion_predicate_observed": true,
+        "duration_seconds": 2.781246,
+        "peak_working_set_bytes": 88588288,
+        "peak_sampled_private_bytes": 78499840,
+        "admission": {
+          "observed_at": "2026-10-23T12:48:02.7550524+00:00",
+          "memory": {
+            "total_bytes": 17047683072,
+            "free_bytes": 5302108160,
+            "committed_bytes": 15975272448,
+            "commit_limit_bytes": 20357242880
+          },
+          "work_volume": {
+            "name": "C:\\",
+            "free_bytes": 62880370688,
+            "total_bytes": 472446398464
+          },
+          "system_volume": {
+            "name": "C:\\",
+            "free_bytes": 62880370688,
+            "total_bytes": 472446398464
+          }
+        },
+        "duration_measurement": {
+          "scope": "direct-native-executable-start-to-exit",
+          "historical_scope": "governed-powershell-wrapper-tree-start-to-exit",
+          "comparability": "scope-changed; compare only fresh direct-native measurements; no product-speedup claim"
+        }
+      }
+    },
+    {
+      "index": 4,
+      "status": "passed",
+      "ledger": "C:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\mir5-historical-native-f017-r01\\process-4.resources.jsonl",
+      "stdout": "C:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\mir5-historical-native-f017-r01\\process-4.stdout.txt",
+      "stderr": "C:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\mir5-historical-native-f017-r01\\process-4.stderr.txt",
+      "result": {
+        "status": "passed",
+        "exit_code": -1,
+        "timed_out": false,
+        "passed": true,
+        "completion_predicate_observed": true,
+        "duration_seconds": 2.569595,
+        "peak_working_set_bytes": 111951872,
+        "peak_sampled_private_bytes": 100724736,
+        "admission": {
+          "observed_at": "2026-10-23T12:48:06.3172094+00:00",
+          "memory": {
+            "total_bytes": 17047683072,
+            "free_bytes": 5099966464,
+            "committed_bytes": 16240279552,
+            "commit_limit_bytes": 20357242880
+          },
+          "work_volume": {
+            "name": "C:\\",
+            "free_bytes": 62879629312,
+            "total_bytes": 472446398464
+          },
+          "system_volume": {
+            "name": "C:\\",
+            "free_bytes": 62879629312,
+            "total_bytes": 472446398464
+          }
+        },
+        "duration_measurement": {
+          "scope": "direct-native-executable-start-to-exit",
+          "historical_scope": "governed-powershell-wrapper-tree-start-to-exit",
+          "comparability": "scope-changed; compare only fresh direct-native measurements; no product-speedup claim"
+        }
+      }
+    }
+  ]
+}

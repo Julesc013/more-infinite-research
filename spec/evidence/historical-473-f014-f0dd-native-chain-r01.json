@@ -1,0 +1,192 @@
+{
+  "schema": 1,
+  "kind": "MIR5Historical473F014F0ddNativeChainV1",
+  "status": "passed-bounded-f014-published-to-f0dd-preservation-chain",
+  "scope": "One exact Factorio 0.14.23 F014 transition only: a published MIR 4.7.01403 source save followed directly by the named f0dd MIR 5.0.01400 preservation-only successor. It is not a complete catalogue, modpack, API, multiplayer, performance, release, or wider historical-origin qualification.",
+  "execution": {
+    "controller_commit": "c6eb150dc9edff3cbcebbafe5f5fd44776afa6ef",
+    "runner_sha256": "B9E4685187C4B172FBF16D4359FFCB320C99F443643B6F16E0861AF9E8641489",
+    "engine": {
+      "base_version": "0.14.23",
+      "path": "D:\\Games\\Factorio\\0.14\\bin\\x64\\factorio.exe",
+      "sha256": "A2B7DC0FBC1D6D68CF4D71EB71D42952FBB3B0CF35EEC6BF8B4BA16B9F79715F"
+    },
+    "published_predecessor": {
+      "archive": "more-infinite-research_4.7.01403.zip",
+      "version": "4.7.01403",
+      "sha256": "85C7798BD6DC80FAA021AB0F33519B57A740B8D3969E695A82BA55634BA1C87A",
+      "bytes": 695784,
+      "profile_path": "tests/profiles/historical-transition-473-published-f014.json",
+      "profile_sha256": "008FE77D980BD54092F31CC54275C48459F405D5791096A8B4C5C5F3F79B3EF1",
+      "official_release_id": 422732162,
+      "official_asset_id": 672267840,
+      "tag_source_commit": "8643cc91bc915e008556a5315dbb0a743247e7ab"
+    },
+    "f0dd_successor": {
+      "source_commit": "f0dd9f62adc8bf0a8eaaf9babc1fcfef9f3241ea",
+      "player_tree": "0229b2bb3ad0c514fc4dca18c32fd544b9ba7d72",
+      "asset_inventory_readback": {
+        "path": "spec/evidence/current-assets-f0dd9f62-root-readback.json",
+        "sha256": "2BF5793D92C16ABD17F507884FE190BA74E1182F9979C8FBA2DA68E7BD10B121"
+      },
+      "archive": "more-infinite-research_5.0.01400.zip",
+      "version": "5.0.01400",
+      "sha256": "E276483E6E51B67915881DEBAAD7EE15A8DE4C0F764A570A8B415C354067B0A4",
+      "bytes": 453597,
+      "profile_path": "tests/profiles/historical-transition-mir5-f014.json",
+      "profile_sha256": "354D6449177C1C9C7446387C639E980BC17EB986EBE0BA8F4E491931C7A9D219"
+    },
+    "fixture": {
+      "name": "mir-fixture-mir5-historical-transition",
+      "version": "0.1.0",
+      "metadata_sha256": "633F34471E5F84E08ED03BFF1DFE0F58EBCCAC6B16D3D12AC16C04CDABEC4247",
+      "published_source_archive": {
+        "sha256": "40BE9595628F780D7F463A04F4EE99BC275F7E084D1EA0B47D552EEBF454D08E",
+        "bytes": 6814,
+        "zip_members": 6,
+        "projection_members": 7
+      },
+      "successor_archive": {
+        "sha256": "44114C5F2F0F70A3207245A3490EB3C9472BD1641707803B232F28E85B278017",
+        "bytes": 6806,
+        "zip_members": 6,
+        "projection_members": 7
+      },
+      "required_info": {
+        "title": "MIR historical save-transition fixture",
+        "author": "MIR maintainers"
+      }
+    }
+  },
+  "accepted_stages": [
+    {
+      "id": "r01-published-source",
+      "status": "passed-private-native-fixture",
+      "result": {
+        "path": "build/qualification/historical-473-f014-owned-inputs-r01/native-output/native-output/result.json",
+        "sha256": "0F8673128672F707DE554BD6500DE86AE74DF364D7E88379474A21300D2EEF93",
+        "bytes": 43577
+      },
+      "terminal": {
+        "path": "build/qualification/historical-473-f014-owned-inputs-r01/native-output/terminal.json",
+        "sha256": "85D366CABE9FF8C49F71F7A6FB8EE908DE5ADD2093946C3F0A7ACC1DDCA67B6C"
+      },
+      "caller": {
+        "path": "build/qualification/historical-473-f014-owned-inputs-r01/native-output/caller.ps1",
+        "sha256": "B6454A9A2D6BBBA04DA1E062BC3E4C47D197410580D165ABBE511A582D5257A7"
+      },
+      "prepared_packet": {
+        "path": "build/qualification/historical-473-f014-owned-inputs-r01/prepared-inputs-r01.json",
+        "sha256": "258B4CA3D41953381C9A05879C848150347E51D63FF1765A76E8DB5D535807BE"
+      },
+      "source_laboratory_completions": 1,
+      "successor_laboratory_completions": 0,
+      "earned_mining_bonus": 0.05,
+      "protected_save": {
+        "path": "build/qualification/historical-473-f014-owned-inputs-r01/native-output/native-output/write-data/saves/mir5-native-complete.zip",
+        "sha256": "A4DB5ACD358BA2A8DA40D8BA84D19F0C88D84A26B0FA19BBF9303D907FC172C8",
+        "bytes": 668106
+      },
+      "process_runs": 4,
+      "pure_byte_identical_cold_reloads": 2,
+      "primary_custody": {
+        "root": "build/qualification/historical-473-f014-owned-inputs-r01/native-output",
+        "native_output_members": 65,
+        "native_output_bytes": 2384536,
+        "outer_execution_records": 3,
+        "outer_execution_record_bytes": 24824,
+        "all_custody_members": 68,
+        "all_custody_bytes": 2409360,
+        "independent_readback_path": "build/qualification/historical-473-f014-owned-inputs-r01/root-native-source-readback-r01.json",
+        "independent_readback_sha256": "BBDAF4EA39B70F92B845ACF9EC768CBDB2B31E2F79E3BDED76EE8A2D4015AE19"
+      }
+    },
+    {
+      "id": "r01-f0dd-successor",
+      "status": "passed-private-native-fixture",
+      "result": {
+        "path": "build/qualification/historical-473-f014-mir5-successor-r01/native-output/native-output/result.json",
+        "sha256": "FB47B8EBB6FE7DADD439A462DA3F8D0EC9DE3B5307F75E477F9C6A795ED8EF99",
+        "bytes": 35262
+      },
+      "terminal": {
+        "path": "build/qualification/historical-473-f014-mir5-successor-r01/native-output/terminal.json",
+        "sha256": "B1ADFF49B627FC51A3BE76DF04126A07E7772FC72CCCA5924CE8BE1E19112748"
+      },
+      "caller": {
+        "path": "build/qualification/historical-473-f014-mir5-successor-r01/native-output/caller.ps1",
+        "sha256": "84C05C869354DE8662D13C0BB7E16A9B02396CA0113D67BC2A73FEC24F4F8F48"
+      },
+      "prepared_packet": {
+        "path": "build/qualification/historical-473-f014-mir5-successor-r01/prepared-inputs-r01.json",
+        "sha256": "93484F16DB73CB20F2D8E99F568808DF5337C02C230F43A03C336A201E746E20"
+      },
+      "input_save": {
+        "path": "build/qualification/historical-473-f014-owned-inputs-r01/native-output/native-output/write-data/saves/mir5-native-complete.zip",
+        "sha256": "A4DB5ACD358BA2A8DA40D8BA84D19F0C88D84A26B0FA19BBF9303D907FC172C8",
+        "byte_identical_to_protected_source_save": true
+      },
+      "carried_source_laboratory_completions": 1,
+      "new_successor_laboratory_completions": 0,
+      "preserved_mining_bonus": 0.05,
+      "successor_save": {
+        "path": "build/qualification/historical-473-f014-mir5-successor-r01/native-output/native-output/write-data/saves/mir5-native-complete.zip",
+        "sha256": "91EE7E7E0BE9774EC55047B76AE8148F8910F2945B4884426915910DEC97D6CB",
+        "bytes": 667896
+      },
+      "process_runs": 3,
+      "pure_byte_identical_cold_reloads": 2,
+      "primary_custody": {
+        "root": "build/qualification/historical-473-f014-mir5-successor-r01/native-output",
+        "native_output_members": 59,
+        "native_output_bytes": 1697601,
+        "outer_execution_records": 3,
+        "outer_execution_record_bytes": 25138,
+        "all_custody_members": 62,
+        "all_custody_bytes": 1722739,
+        "independent_readback_path": "build/qualification/historical-473-f014-mir5-successor-r01/root-native-successor-readback-r01.json",
+        "independent_readback_sha256": "0E037217D62FDE8020C6B6AC199BBAE59C212F883C2B9106922FA28287C919A9"
+      }
+    }
+  ],
+  "chain_accounting": {
+    "published_source_laboratory_completions": 1,
+    "new_successor_laboratory_completions": 0,
+    "accepted_process_runs": 7,
+    "accepted_pure_cold_reloads": 4,
+    "completed_saves": 2,
+    "source_save_reused_directly_for_successor": true,
+    "controls_restored": true
+  },
+  "errata": [
+    {
+      "record": "build/qualification/historical-473-f014-owned-inputs-r01/prepared-inputs-r01.json",
+      "field": "published_mir.official_asset_id",
+      "original_value": 672267870,
+      "correction": "The official F014 asset id is 672267840. Asset id 672267870 belongs to F013. The immutable packet and its actual 85C7 archive bytes remain unchanged."
+    }
+  ],
+  "receipts": {
+    "path": "spec/evidence/historical-473-f014-f0dd-native-receipts-r01.json.gz",
+    "sha256": "C379D92478232B2EB0F3D0A07FA5A5EA92E816EFEEB3CF2E4EB28A754923C0D1",
+    "bytes": 15682,
+    "uncompressed_sha256": "7307A86D7389B0E33FDDECBA2262896F05D307AE041ADC00A809C02ED37416ED",
+    "uncompressed_bytes": 106244,
+    "exact_original_raw_native_result_receipts": 2,
+    "strict_utf8_decode_roundtrip_verified": true,
+    "base64_roundtrip_verified": true,
+    "gzip_mtime_zero": true,
+    "exclusions": "Saves, full logs, runtime configuration, player data, preflight payloads, library-control payloads, archive payloads, and outer terminal payloads remain private."
+  },
+  "claims": {
+    "bounded_f014_published_to_f0dd_preservation_chain": true,
+    "complete_catalogue": false,
+    "modpack": false,
+    "api": false,
+    "multiplayer": false,
+    "performance": false,
+    "release_qualification": false,
+    "other_origins_or_targets": false
+  },
+  "limitations": "This evidence names only the F014 published 4.7.01403 source and the f0dd 5.0.01400 successor with their exact fixture, engine, profile, caller and protected-save inputs. It does not qualify a general 4.7.3 transition, F013 or F015/F016, other historical targets, new laboratory work in the successor, arbitrary saves, current packages, or release behavior."
+}

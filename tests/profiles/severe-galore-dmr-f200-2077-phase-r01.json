@@ -1,0 +1,66 @@
+{
+  "schema": 1,
+  "kind": "mir5-severe-galore-f200-phase-diagnostic-selection",
+  "target": "f200",
+  "factorio_line": "2.0",
+  "engine": {
+    "version": "2.0.77",
+    "sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B"
+  },
+  "settings_mode": "Defaults",
+  "mods": [
+    {
+      "name": "base",
+      "version": "2.0.77",
+      "enabled": true
+    },
+    {
+      "name": "elevated-rails",
+      "version": "2.0.77",
+      "enabled": true
+    },
+    {
+      "name": "quality",
+      "version": "2.0.77",
+      "enabled": true
+    },
+    {
+      "name": "space-age",
+      "version": "2.0.77",
+      "enabled": true
+    },
+    {
+      "name": "galore_lib",
+      "version": "2.2.0",
+      "enabled": true
+    },
+    {
+      "name": "vanilla_galore_continued",
+      "version": "1.4.2",
+      "enabled": true
+    },
+    {
+      "name": "space_age_galore",
+      "version": "1.6.3",
+      "enabled": true
+    },
+    {
+      "name": "dark-matter-replicators-reborn",
+      "version": "3.7.1",
+      "enabled": true
+    },
+    {
+      "name": "mir-fixture-mir5-active-mods-observer",
+      "version": "0.1.0",
+      "enabled": true
+    }
+  ],
+  "archive_sha256": {
+    "galore_lib_2.2.0.zip": "D473E10294091F45D77F181907FC777CEE181B18EB57B8B914D02E0D2C1C3FE2",
+    "vanilla_galore_continued_1.4.2.zip": "18ECF427C4671B7036C2AE278C19FF4E7853E68428D515F7A52095CB6D5DCF0C",
+    "space_age_galore_1.6.3.zip": "0C758F793E783082258F62705A17F40E917B9BBFC3B1D77ABF2A32E954CDE3B4",
+    "dark-matter-replicators-reborn_3.7.1.zip": "AB1AA6FFB5DE93009F9F3087FC627E0BAAE381B149FAC0689A2360A487FCF276",
+    "mir-fixture-mir5-active-mods-observer_0.1.0.zip": "723D1E7721449FC26040E5E6629416767BDC20AD79CF8723115846DB662A1F87"
+  },
+  "scope": "Fixed upstream-validity and data-stage phase diagnostic for the publicly named Galore/DMR ingredients. Full reporter313-mod/settings closure is unknown. This9-row selection is a grounded reduced proxy,not exact reporter reproduction,menu timing,gameplay,save continuity or scored performance acceptance."
+}

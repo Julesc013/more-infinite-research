@@ -1,0 +1,42 @@
+{
+  "schema": 1,
+  "kind": "authored-private-gear-upgrade-custody-index-not-runner-receipt",
+  "release_qualification": false,
+  "engine": "Factorio 2.1.23, FE4A1DA30F322A0D0B8AEB3DF7276332222BAAA143E2352569B723E84B2B9060",
+  "seed": {
+    "receipt": "spec/mir5/evidence/gear-upgrade-published-seed.json",
+    "receipt_sha256": "FE00E939C2191C8A6AFE690DC6680D5877B92D4FBECE19C7ADFB7CFF9DE07655",
+    "archive": "dist/4.7.0/more-infinite-research_4.7.21000.zip",
+    "archive_sha256": "708A529F1F6D649E0A732216CD8D8FEFE68F2C6C2DF2B40DA030C2C4C51558D1",
+    "save_sha256": "7080EB050770EE5BB5C0525C23F4B25E573A6055E76DFBE6292AD69A4AB627A0",
+    "native_completion": "Two native researched=true setters complete levels 1 and 2; this is earned-state continuity, not a lab-consumption observation."
+  },
+  "candidate": {
+    "receipt": "spec/mir5/evidence/gear-upgrade-native.json",
+    "receipt_sha256": "01BC35C7C832F91ACAFA4D178EF05F40086FAD6B995B27A680F3A7C1A2B51196",
+    "archive_sha256": "6F6817697CDA52C2D8B9576BD308E546FDCFBD9FFD795B63BADC9043592AC3C8",
+    "source_commit": "deb16bbe3934502e6520d3a6e308db1db614dd5d",
+    "fixture_sha256": "D3A63215434FE1F4BE6A21E6D5E8E0D46EC085A1633DF83DA1293EB836538A5A",
+    "observed": {
+      "seeded_mir_version": "4.7.21000",
+      "next_level": 3,
+      "productivity_bonus": 0.2,
+      "native_infinite_maximum": 4294967295,
+      "cap": 2,
+      "above_cap_disabled_and_visible": true,
+      "unrelated_automation_research_preserved": true,
+      "foreign_disable_and_visibility_preserved": true,
+      "public_api_read_only": true,
+      "two_cold_reloads": true,
+      "original_seed_byte_identical": true
+    },
+    "completed_save_sha256": "27CBB1DBC2B952240C0325EC77AC79E4F18A81EF928F8A1AC79343594F31AF3E",
+    "both_reloads_leave_completed_save_byte_identical": true
+  },
+  "limitations": [
+    "Only gear, named unrelated research and the declared foreign-force witnesses are qualified.",
+    "The incomplete private candidate omits the rest of MIR 4's generated catalogue; this is not a supported whole-product upgrade.",
+    "MIR 4 cap ownership import and later cap relaxation, Library state, scripted effects, other historical versions and multiplayer remain separate requirements.",
+    "The runner records exact archive/harness hashes and dirty development checkouts; final release qualification requires the complete frozen source."
+  ]
+}

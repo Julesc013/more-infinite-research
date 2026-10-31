@@ -1,0 +1,90 @@
+{
+  "schema": 1,
+  "kind": "MIR5LiteralProductNativeCatalogueChainV1",
+  "status": "literal-target-batch-compares-equal-on-five-named-inputs",
+  "profiles": [
+    {
+      "profile": "base-f200",
+      "source_commit": "7a2cc5fe94b777476439ac2319e24f749d84fd82",
+      "capture_custody": "build/tmp/mir5-product-targets-base-f200-native-r01",
+      "records": {
+        "native": {
+          "path": "spec/mir5/evidence/product-targets-base-f200-native.json",
+          "sha256": "0AF8550A000D92107AC665999A1142FE7583E545A3E834FEC8BA131F585DB1A0"
+        },
+        "comparison": {
+          "path": "spec/mir5/evidence/product-targets-base-f200-comparison.json",
+          "sha256": "79DC1D4356D11DFE7A26DFAD5CF5918412EE4806C8B35031C19F835374E22D91"
+        }
+      }
+    },
+    {
+      "profile": "space-age-f200",
+      "source_commit": "7a2cc5fe94b777476439ac2319e24f749d84fd82",
+      "capture_custody": "build/tmp/mir5-product-targets-space-age-f200-native-r01",
+      "records": {
+        "native": {
+          "path": "spec/mir5/evidence/product-targets-space-age-f200-native.json",
+          "sha256": "331E48D17122C4738FB26BA9A751686ED8273ECABAFD3BEB1BABD4E46C4837EB"
+        },
+        "comparison": {
+          "path": "spec/mir5/evidence/product-targets-space-age-f200-comparison.json",
+          "sha256": "40E4D5D172E7B42EF1956364003DD5B1A89EC09B6CD916ABFE9EE52D923141BB"
+        }
+      }
+    },
+    {
+      "profile": "base-f210",
+      "source_commit": "7a2cc5fe94b777476439ac2319e24f749d84fd82",
+      "capture_custody": "build/tmp/mir5-product-targets-base-f210-native-r01",
+      "records": {
+        "native": {
+          "path": "spec/mir5/evidence/product-targets-base-f210-native.json",
+          "sha256": "F4097292F4F2DF83DE25A7BB8D4B4CB5DCBFC092DC7AF7266A78CC20E9429F17"
+        },
+        "comparison": {
+          "path": "spec/mir5/evidence/product-targets-base-f210-comparison.json",
+          "sha256": "A5431CA2EAF62E6396C2ECC9FB371210B7818E1623820D360A57F35DA769F5F6"
+        }
+      }
+    },
+    {
+      "profile": "space-age-f210",
+      "source_commit": "7a2cc5fe94b777476439ac2319e24f749d84fd82",
+      "capture_custody": "build/tmp/mir5-product-targets-space-age-f210-native-r01",
+      "records": {
+        "native": {
+          "path": "spec/mir5/evidence/product-targets-space-age-f210-native.json",
+          "sha256": "64DCD85C30F919D06FE79C6B8E3853DF946931E148C33D40E34890189C3EDD03"
+        },
+        "comparison": {
+          "path": "spec/mir5/evidence/product-targets-space-age-f210-comparison.json",
+          "sha256": "4E3F72B021232FDB76D15AB19693635405B1966C7D23B8D1094B2D7E0A30158E"
+        }
+      }
+    },
+    {
+      "profile": "k2so-f210",
+      "source_commit": "7eb452af09f1b6c26e432743fa08fc7deac7e143",
+      "capture_custody": "build/tmp/mir5-product-targets-k2so-f210-native-r02",
+      "records": {
+        "native": {
+          "path": "spec/mir5/evidence/product-targets-k2so-f210-native.json",
+          "sha256": "EABCA9F4D72AD14443848548F171F9D3E067500076345A5C46560C0D70A299D0"
+        },
+        "comparison": {
+          "path": "spec/mir5/evidence/product-targets-k2so-f210-comparison.json",
+          "sha256": "2693278B8EBCB81F76E5B4674811D90B9074BCF3DCDF2BB42DD62D22D44B35B1"
+        }
+      }
+    }
+  ],
+  "ordering_correction": "K2SO rerun uses restored published target dependency ordering. Four other observations retain their original pre-correction source and package identities; they are not relabeled as executions of the later source.",
+  "preserved_adverse": "spec/mir5/evidence/product-targets-load-order-adverse-chain.json",
+  "limits": [
+    "Complete data/settings comparison only; no physical production, save, GUI, multiplayer, performance or release claim.",
+    "Pattern/module/place-result selectors, native-owner expansion and absent mod materials remain open.",
+    "The source after pipeline-extent or other subsequent edits is not qualified by these earlier executions."
+  ],
+  "release_qualification": false
+}

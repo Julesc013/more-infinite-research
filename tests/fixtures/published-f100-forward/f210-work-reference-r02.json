@@ -1,0 +1,57 @@
+{
+  "schema": 1,
+  "kind": "MIRF210ForwardWorkNativeReferenceV1",
+  "status": "observed-counterevidence-not-an-accepted-forward-result",
+  "prior_expectation_reference": "tests/fixtures/published-f100-forward/f210-plain-science-reference-r01.json",
+  "counterevidence": {
+    "packet": {
+      "path": "D:/Projects/Factorio/more-infinite-research/build/qualification/published473-f100-f210-native-r04-controller/packet-r04.json",
+      "bytes": 18432,
+      "sha256": "50ECA871CF66E93C3A8F96C6D764BEAF864837700CF8A0BACE1A4E2B6B523364"
+    },
+    "result": {
+      "path": "D:/Projects/Factorio/more-infinite-research/build/qualification/published473-f100-f210-native-r04-controller/native-captures/result.json",
+      "bytes": 5974,
+      "sha256": "9D2F98AE81406B48C9D64B2AF0FA438D1F380DB6A385132C7A35644ECAB21E7F"
+    },
+    "stdout": {
+      "path": "D:/Projects/Factorio/more-infinite-research/build/qualification/published473-f100-f210-native-r04-controller/native-captures/process-1.stdout.txt",
+      "bytes": 15810,
+      "sha256": "797152710F8E56C124CCE128EBCE09FCAD1221E792AFDB256F3F287CA59D5468"
+    },
+    "root_readback": {
+      "path": "D:/Projects/Factorio/more-infinite-research/build/qualification/published473-f100-f210-native-r04-controller/root-science-work-adverse-r04.json",
+      "bytes": 2295,
+      "sha256": "9F3F8E6DF30213D819BFE1000456D1668350066CFF17765029951D5464AED6C4"
+    },
+    "engine_sha256": "8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38",
+    "protected_input_sha256": "0381F33BAC7F229D9697C486B68B6F14D975B1D79FE5C88D7EE663EBFEE4ACA9",
+    "native_prefix": "[MIR5_FORWARD_SCIENCE] military-science-pack count=31 stored=0.42 capacity=1",
+    "actual_pack": "military-science-pack",
+    "initial_inventory": 32,
+    "remaining_inventory": 31,
+    "remaining_stored_durability": 0.42,
+    "science_capacity": 1,
+    "consumed_equivalents": 0.58,
+    "inference": "32 - (31 + 0.42 / 1) = 0.58,matching the remaining 1 - 0.42 research investment. F210 does not charge the legacy 35/60 tick-rounded quantity for this completion."
+  },
+  "targets": {
+    "f210": {
+      "units": 0.58,
+      "stored_remainder": 0.42,
+      "rounding": "exact remaining investment"
+    },
+    "f110": {
+      "units": 0.5833333333333334,
+      "stored_remainder": 0.4166666666666667,
+      "rounding": "unchanged accepted legacy tick-rounded tool consumption",
+      "accepted_chain": "spec/evidence/published473-f100-f110-native-chain-r01.json"
+    }
+  },
+  "limits": [
+    "R04 remains failed with zero accepted successor saves/colds. The original 35/60 F210 assertion is disproven,not retrospectively passed.",
+    "Only military science was logged by R04 before its first assertion failure;utility is still a strict equal-cost/default-capacity expectation requiring the next actual native check.",
+    "The new fixture must retain both actual pack observations before assertions and require one exact target-specific quantity;never accept both old and new quantities.",
+    "All progression/effects/queue/foreign/lab/source-preservation checks and two read-only destination cold reloads remain required."
+  ]
+}

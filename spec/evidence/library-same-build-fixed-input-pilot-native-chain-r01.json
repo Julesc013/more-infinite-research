@@ -1,0 +1,557 @@
+{
+  "schema": 1,
+  "kind": "MIRLibrarySameBuildFixedInputPilotNativeChainV1",
+  "status": "native-protocol-complete-three-original-memory-controls-failed-not-acceptance",
+  "source_commit": "d471a2d733ef5b85d35213ec3fe75cab69b0f57f",
+  "player_tree": "7b0ede663e6fbcf486cd863e7d3719653aedc07a",
+  "controller": {
+    "commit": "1704ae8039f8e30d3cec7ecc4b20e7ccbde8e67c",
+    "driver_sha256": "21BD0175AEAAD9795B49E2EA0B2D46981F07DE29580C6C1548E81F52A3139380",
+    "system_sampler_sha256": "0E8658AB15FB8CA9B9F94F38A16C6BF8B2E9080209B07CA6704575FE717C4D6D"
+  },
+  "inputs": {
+    "engine": {
+      "version": "2.0.77",
+      "path": "D:/Games/Factorio/2.0/bin/x64/factorio.exe",
+      "sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B"
+    },
+    "published": {
+      "version": "4.7.20002",
+      "path": "D:/Projects/Factorio/testmods/2.0/more-infinite-research_4.7.20002.zip",
+      "sha256": "F3943EB4D69CCDAC41BD9F922AD03A5C78F34F22D8E7FA5A88A7A658AB1010B7",
+      "bytes": 1449338
+    },
+    "candidate": {
+      "version": "5.0.20000",
+      "source_commit": "a95dbc6b35c165b46aa9991d2a0ef7274d4ec04a",
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\packages\\7b0-all17-r01\\more-infinite-research_5.0.20000.zip",
+      "sha256": "1D45A54DB6F911F665A019897518E46D6614AE7E56903B067F93E116DFC2554F",
+      "bytes": 692743
+    },
+    "profiles": {
+      "published": {
+        "path": "tests/profiles/library-paired-browser-published-f200-2077.json",
+        "sha256": "3CB271B67FCF73D9FB84EF0A5E8E366272288D20DB59159F509BAAEC7007B560"
+      },
+      "candidate": {
+        "path": "tests/profiles/library-paired-browser-native-names-f200-2077.json",
+        "sha256": "0D589D92F3ECFA62A99A4FE7101A607B07FD4F12B1C3E0A87FEB6A0033081C94"
+      }
+    }
+  },
+  "plan": {
+    "path": "spec/evidence/library-same-build-fixed-input-pilot-plan-r01.json",
+    "sha256": "1B925291F22155A60AE820D2BF698AE9E1FB5FB4BE2908658DCFB63715A745CE"
+  },
+  "packet": {
+    "primary_custody": "build/qualification/library-same-build-fixed-input-pilot-r01-controller",
+    "sha256": "49CB8FDB8943633E1235BAFDBBAEF99A461D8866D111F13B3A467606FA28DCD9"
+  },
+  "prepared_sha256": "9AC2D4ABF98AA355D94EFD31D5267DFFFBD097FA0A927485A56C9A41F722B298",
+  "root_readback": {
+    "path": "build/qualification/library-same-build-fixed-input-pilot-r01-controller/root-readback.json",
+    "sha256": "5680E7F601F0DC85988628F1AA8093F73EDC2A6C21F273BB9CEF0A2054549B11",
+    "reader_sha256": "F437CA0B07824F26EEB2DFA20B91E25DEC9A6ED4BB7B4B183DC56FB56ECCE4FA",
+    "files": 636,
+    "bytes_per_copy": 79538523
+  },
+  "receipt_capsule": {
+    "path": "spec/evidence/library-same-build-fixed-input-pilot-native-receipts-r01.json.gz",
+    "sha256": "C9984C53FB1C39798656DC939C01731D77B2018D717A755FB89BE3DC7FAC94B8",
+    "bytes": 421277,
+    "bodies": 53,
+    "round_trip": "All53 exact bodies verified,including all21 native stdout logs,full map witnesses,periodic/OS/system observations,26 raw endpoints percase and all38 pair decisions. Six already-private RCON placeholders;zero exposed/unparsed values."
+  },
+  "counts": {
+    "native_processes": 21,
+    "worlds": 3,
+    "two_real_client_sessions": 3,
+    "actual_join_events": 12,
+    "cold_host_restarts": 3,
+    "lab_completions": 0,
+    "screenshots": 36,
+    "externally_viewed_screenshots": 12,
+    "memory_samples": 1976,
+    "system_samples": 230,
+    "owned_os_peak_records": 18
+  },
+  "canonical_map_settings_sha256": "1A50F14879100043DEA9BC6EA35D5749D0E2BE1396AD1081E1BE8483512D1CAC",
+  "schedule": [
+    {
+      "ordinal": 1,
+      "id": "00-published-warmup",
+      "arm": "published",
+      "role": "unscored-warmup"
+    },
+    {
+      "ordinal": 2,
+      "id": "01-published-control",
+      "arm": "published",
+      "role": "unscored-identical-build-control",
+      "pair": 1
+    },
+    {
+      "ordinal": 3,
+      "id": "02-published-control",
+      "arm": "published",
+      "role": "unscored-identical-build-control",
+      "pair": 1
+    }
+  ],
+  "control_decisions": [
+    {
+      "group": "original26",
+      "endpoint": "library/server/first_open",
+      "first": 25.5896,
+      "second": 23.7253,
+      "difference": -1.8643,
+      "absolute_difference": 1.8643,
+      "allowance": 5,
+      "passed": true
+    },
+    {
+      "group": "original26",
+      "endpoint": "library/server/search",
+      "first": 4.0506,
+      "second": 3.9164,
+      "difference": -0.13420000000000032,
+      "absolute_difference": 0.13420000000000032,
+      "allowance": 5,
+      "passed": true
+    },
+    {
+      "group": "original26",
+      "endpoint": "library/server/refresh",
+      "first": 3.6517,
+      "second": 3.9595,
+      "difference": 0.30779999999999985,
+      "absolute_difference": 0.30779999999999985,
+      "allowance": 5,
+      "passed": true
+    },
+    {
+      "group": "original26",
+      "endpoint": "library/server/reopen",
+      "first": 19.6512,
+      "second": 19.9134,
+      "difference": 0.2622,
+      "absolute_difference": 0.2622,
+      "allowance": 5,
+      "passed": true
+    },
+    {
+      "group": "original26",
+      "endpoint": "library/en/first_open",
+      "first": 26.3218,
+      "second": 25.3755,
+      "difference": -0.9463000000000008,
+      "absolute_difference": 0.9463000000000008,
+      "allowance": 5,
+      "passed": true
+    },
+    {
+      "group": "original26",
+      "endpoint": "library/en/search",
+      "first": 4.8416,
+      "second": 3.8757,
+      "difference": -0.9658999999999995,
+      "absolute_difference": 0.9658999999999995,
+      "allowance": 5,
+      "passed": true
+    },
+    {
+      "group": "original26",
+      "endpoint": "library/en/refresh",
+      "first": 3.9553,
+      "second": 4.5828,
+      "difference": 0.6275,
+      "absolute_difference": 0.6275,
+      "allowance": 5,
+      "passed": true
+    },
+    {
+      "group": "original26",
+      "endpoint": "library/en/reopen",
+      "first": 19.3714,
+      "second": 19.4617,
+      "difference": 0.09029999999999916,
+      "absolute_difference": 0.09029999999999916,
+      "allowance": 5,
+      "passed": true
+    },
+    {
+      "group": "original26",
+      "endpoint": "library/de/first_open",
+      "first": 24.6609,
+      "second": 24.3543,
+      "difference": -0.3066000000000031,
+      "absolute_difference": 0.3066000000000031,
+      "allowance": 5,
+      "passed": true
+    },
+    {
+      "group": "original26",
+      "endpoint": "library/de/search",
+      "first": 4.2184,
+      "second": 6.2686,
+      "difference": 2.0502000000000002,
+      "absolute_difference": 2.0502000000000002,
+      "allowance": 5,
+      "passed": true
+    },
+    {
+      "group": "original26",
+      "endpoint": "library/de/refresh",
+      "first": 3.7648,
+      "second": 4.3737,
+      "difference": 0.6089000000000002,
+      "absolute_difference": 0.6089000000000002,
+      "allowance": 5,
+      "passed": true
+    },
+    {
+      "group": "original26",
+      "endpoint": "library/de/reopen",
+      "first": 20.2842,
+      "second": 19.7396,
+      "difference": -0.5445999999999991,
+      "absolute_difference": 0.5445999999999991,
+      "allowance": 5,
+      "passed": true
+    },
+    {
+      "group": "original26",
+      "endpoint": "save_ready/initial",
+      "first": 2.124,
+      "second": 2.231,
+      "difference": 0.10699999999999976,
+      "absolute_difference": 0.10699999999999976,
+      "allowance": 0.25,
+      "passed": true
+    },
+    {
+      "group": "original26",
+      "endpoint": "save_ready/restart",
+      "first": 2.121,
+      "second": 2.189,
+      "difference": 0.06800000000000006,
+      "absolute_difference": 0.06800000000000006,
+      "allowance": 0.25,
+      "passed": true
+    },
+    {
+      "group": "original26",
+      "endpoint": "memory/initial/client-de/working_set_bytes",
+      "first": 1818804224,
+      "second": 1860714496,
+      "difference": 41910272,
+      "absolute_difference": 41910272,
+      "allowance": 183975936.0,
+      "passed": true
+    },
+    {
+      "group": "original26",
+      "endpoint": "memory/initial/client-de/private_bytes",
+      "first": 3809218560,
+      "second": 3915653120,
+      "difference": 106434560,
+      "absolute_difference": 106434560,
+      "allowance": 386243584.0,
+      "passed": true
+    },
+    {
+      "group": "original26",
+      "endpoint": "memory/initial/client-en/working_set_bytes",
+      "first": 1713442816,
+      "second": 1731039232,
+      "difference": 17596416,
+      "absolute_difference": 17596416,
+      "allowance": 172224102.4,
+      "passed": true
+    },
+    {
+      "group": "original26",
+      "endpoint": "memory/initial/client-en/private_bytes",
+      "first": 3889049600,
+      "second": 3857006592,
+      "difference": -32043008,
+      "absolute_difference": 32043008,
+      "allowance": 387302809.6,
+      "passed": true
+    },
+    {
+      "group": "original26",
+      "endpoint": "memory/initial/server/working_set_bytes",
+      "first": 369901568,
+      "second": 275214336,
+      "difference": -94687232,
+      "absolute_difference": 94687232,
+      "allowance": 67108864,
+      "passed": false
+    },
+    {
+      "group": "original26",
+      "endpoint": "memory/initial/server/private_bytes",
+      "first": 364285952,
+      "second": 272855040,
+      "difference": -91430912,
+      "absolute_difference": 91430912,
+      "allowance": 67108864,
+      "passed": false
+    },
+    {
+      "group": "original26",
+      "endpoint": "memory/restart/client-de/working_set_bytes",
+      "first": 1676460032,
+      "second": 1867333632,
+      "difference": 190873600,
+      "absolute_difference": 190873600,
+      "allowance": 177189683.20000002,
+      "passed": false
+    },
+    {
+      "group": "original26",
+      "endpoint": "memory/restart/client-de/private_bytes",
+      "first": 3949727744,
+      "second": 3932561408,
+      "difference": -17166336,
+      "absolute_difference": 17166336,
+      "allowance": 394114457.6,
+      "passed": true
+    },
+    {
+      "group": "original26",
+      "endpoint": "memory/restart/client-en/working_set_bytes",
+      "first": 1651531776,
+      "second": 1526927360,
+      "difference": -124604416,
+      "absolute_difference": 124604416,
+      "allowance": 158922956.8,
+      "passed": true
+    },
+    {
+      "group": "original26",
+      "endpoint": "memory/restart/client-en/private_bytes",
+      "first": 3850465280,
+      "second": 3716186112,
+      "difference": -134279168,
+      "absolute_difference": 134279168,
+      "allowance": 378332569.6,
+      "passed": true
+    },
+    {
+      "group": "original26",
+      "endpoint": "memory/restart/server/working_set_bytes",
+      "first": 283316224,
+      "second": 289763328,
+      "difference": 6447104,
+      "absolute_difference": 6447104,
+      "allowance": 67108864,
+      "passed": true
+    },
+    {
+      "group": "original26",
+      "endpoint": "memory/restart/server/private_bytes",
+      "first": 276869120,
+      "second": 284835840,
+      "difference": 7966720,
+      "absolute_difference": 7966720,
+      "allowance": 67108864,
+      "passed": true
+    },
+    {
+      "group": "additional12-os-diagnostic",
+      "endpoint": "memory_os/initial/server/working_set_peak_bytes",
+      "first": 389922816,
+      "second": 336568320,
+      "difference": -53354496,
+      "absolute_difference": 53354496,
+      "allowance": 67108864,
+      "passed": true
+    },
+    {
+      "group": "additional12-os-diagnostic",
+      "endpoint": "memory_os/initial/server/paged_memory_peak_bytes",
+      "first": 380141568,
+      "second": 326201344,
+      "difference": -53940224,
+      "absolute_difference": 53940224,
+      "allowance": 67108864,
+      "passed": true
+    },
+    {
+      "group": "additional12-os-diagnostic",
+      "endpoint": "memory_os/initial/client-en/working_set_peak_bytes",
+      "first": 1963905024,
+      "second": 1945559040,
+      "difference": -18345984,
+      "absolute_difference": 18345984,
+      "allowance": 195473203.20000002,
+      "passed": true
+    },
+    {
+      "group": "additional12-os-diagnostic",
+      "endpoint": "memory_os/initial/client-en/paged_memory_peak_bytes",
+      "first": 4147376128,
+      "second": 4086366208,
+      "difference": -61009920,
+      "absolute_difference": 61009920,
+      "allowance": 411687116.8,
+      "passed": true
+    },
+    {
+      "group": "additional12-os-diagnostic",
+      "endpoint": "memory_os/initial/client-de/working_set_peak_bytes",
+      "first": 1981779968,
+      "second": 1896357888,
+      "difference": -85422080,
+      "absolute_difference": 85422080,
+      "allowance": 193906892.8,
+      "passed": true
+    },
+    {
+      "group": "additional12-os-diagnostic",
+      "endpoint": "memory_os/initial/client-de/paged_memory_peak_bytes",
+      "first": 4004343808,
+      "second": 4041519104,
+      "difference": 37175296,
+      "absolute_difference": 37175296,
+      "allowance": 402293145.6,
+      "passed": true
+    },
+    {
+      "group": "additional12-os-diagnostic",
+      "endpoint": "memory_os/restart/server/working_set_peak_bytes",
+      "first": 333774848,
+      "second": 388808704,
+      "difference": 55033856,
+      "absolute_difference": 55033856,
+      "allowance": 67108864,
+      "passed": true
+    },
+    {
+      "group": "additional12-os-diagnostic",
+      "endpoint": "memory_os/restart/server/paged_memory_peak_bytes",
+      "first": 323313664,
+      "second": 379121664,
+      "difference": 55808000,
+      "absolute_difference": 55808000,
+      "allowance": 67108864,
+      "passed": true
+    },
+    {
+      "group": "additional12-os-diagnostic",
+      "endpoint": "memory_os/restart/client-en/working_set_peak_bytes",
+      "first": 1984204800,
+      "second": 1935446016,
+      "difference": -48758784,
+      "absolute_difference": 48758784,
+      "allowance": 195982540.8,
+      "passed": true
+    },
+    {
+      "group": "additional12-os-diagnostic",
+      "endpoint": "memory_os/restart/client-en/paged_memory_peak_bytes",
+      "first": 4104163328,
+      "second": 3995070464,
+      "difference": -109092864,
+      "absolute_difference": 109092864,
+      "allowance": 404961689.6,
+      "passed": true
+    },
+    {
+      "group": "additional12-os-diagnostic",
+      "endpoint": "memory_os/restart/client-de/working_set_peak_bytes",
+      "first": 1960517632,
+      "second": 1951784960,
+      "difference": -8732672,
+      "absolute_difference": 8732672,
+      "allowance": 195615129.60000002,
+      "passed": true
+    },
+    {
+      "group": "additional12-os-diagnostic",
+      "endpoint": "memory_os/restart/client-de/paged_memory_peak_bytes",
+      "first": 4099166208,
+      "second": 4113674240,
+      "difference": 14508032,
+      "absolute_difference": 14508032,
+      "allowance": 410642022.40000004,
+      "passed": true
+    }
+  ],
+  "failed_controls": [
+    {
+      "group": "original26",
+      "endpoint": "memory/initial/server/working_set_bytes",
+      "first": 369901568,
+      "second": 275214336,
+      "difference": -94687232,
+      "absolute_difference": 94687232,
+      "allowance": 67108864,
+      "passed": false
+    },
+    {
+      "group": "original26",
+      "endpoint": "memory/initial/server/private_bytes",
+      "first": 364285952,
+      "second": 272855040,
+      "difference": -91430912,
+      "absolute_difference": 91430912,
+      "allowance": 67108864,
+      "passed": false
+    },
+    {
+      "group": "original26",
+      "endpoint": "memory/restart/client-de/working_set_bytes",
+      "first": 1676460032,
+      "second": 1867333632,
+      "difference": 190873600,
+      "absolute_difference": 190873600,
+      "allowance": 177189683.20000002,
+      "passed": false
+    }
+  ],
+  "visual_observations": [
+    "Twelve actual delayed first-open/reopen EN/DE frames viewed across three published sessions. All retain original gears/mining query,selected localized title and All scope.",
+    "All six late cold-reopen views are unobscured by final-save modal. The bounded final grace remains effective.",
+    "All nine actual complete parsed map_gen_settings records across create/initial/cold phases and three published sessions are equal,seed424242. This establishes map input equality,not whole-save/entity/timing equality."
+  ],
+  "private_image_custody": {
+    "repository": "Julesc013/mir-native-worker",
+    "commit": "1e237e754b33e372e8346849dcdd0f778a043c75",
+    "path": "evidence/library-same-build-fixed-input-pilot-views-r01",
+    "images": 12,
+    "image_bytes": 14669390,
+    "manifest_sha256": "6051A087E26C1359F0CFB8F57F5D647B55AD392C6D8AF3905A249C1386792D48",
+    "transformed": false
+  },
+  "independent_readback_refusal": {
+    "primary_custody": "build/qualification/library-same-build-fixed-input-pilot-r01-controller",
+    "files": [
+      "initial-reader-before-count-correction.py",
+      "initial-reader-refusal.txt"
+    ],
+    "reason": "Inherited two-case expected424 custody count refused before any readback/capsule. Exact three-case terminal inventory is636. Correct only full expected-count expression;one preliminary text-replacement count assertion also refused before edits because424 is a prefix of seed424242. No native rerun or raw-data change."
+  },
+  "interpretation": [
+    "All14 original UI/load controls pass. Three of12 original periodic-memory controls fail between identical published builds under unchanged allowances. The original26 group therefore fails repeatability;retain every raw value and failed verdict.",
+    "All12 additional separately named OS lifetime-peak controls pass the same memory allowance. This establishes this one pair only;it neither proves sampling caused prior differences nor authorizes metric substitution or a performance verdict.",
+    "All nine complete parsed map_gen_settings agree,seed424242. All36 PNGs decode and twelve delayed EN/DE first-open/reopen frames are viewed with original query/selection/All and no final-save modal.",
+    "First phase uses one excluded published warmup;remaining pair is analyzed once. Zero candidate observations,extensions or scored samples. Installed candidate fixture inputs are custody only."
+  ],
+  "prior_preflight": "spec/evidence/library-fixed-map-render-preflight-native-chain-r01.json",
+  "prior_failures_retained": [
+    "spec/evidence/library-current-e9-r01-native-chain.json",
+    "spec/evidence/library-repeatability-diagnostic-r02-native-chain.json"
+  ],
+  "controls_restored": true,
+  "dependency_payload_bytes_copied": 0,
+  "archive_links_created": 0,
+  "archive_extractions": 0,
+  "candidate_observations": 0,
+  "extensions": 0,
+  "metric_substitution_authorized": false,
+  "performance_acceptance": false,
+  "release_qualification": false
+}

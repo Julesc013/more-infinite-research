@@ -1,0 +1,17 @@
+{
+  "name": "mir-fixture-mir5-legacy-preference-transition",
+  "version": "0.1.0",
+  "title": "MIR 4.7 false-preference seed",
+  "author": "MIR maintainers",
+  "description": "Private F200 Space Age legacy competing-preference continuity fixture.",
+  "factorio_version": "2.0",
+  "dependencies": [
+    "base >= 2.0.77",
+    "space-age = 2.0.77",
+    "more-infinite-research = 4.7.20002",
+    "plates-n-circuit-productivity = 0.0.2",
+    "Science_packs_productivity = 0.0.1",
+    "bioflux-productivity = 0.1.0",
+    "fish-productivity = 1.0.0"
+  ]
+}

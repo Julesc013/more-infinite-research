@@ -1,0 +1,78 @@
+{
+  "schema": 1,
+  "kind": "MIR5F210Q010Menu58fMetadataReceiptCapsuleV1",
+  "scope": "Small metadata-only index for the two completed data/settings captures; full dump payloads remain in the original and primary custody roots.",
+  "outer_terminal": {
+    "path": "build/mir5/recovery-historical/f210-q010-menu58f-native-r01/terminal.json",
+    "sha256": "DA1F4036F8F13867B25846B00111C8A0AE10C6770F0DAAD9A94FC00BC0D9B3C0",
+    "status": "adverse-or-refused",
+    "failure": "fresh replay dump equality differs from retained B6 bytes"
+  },
+  "preflight": {
+    "path": "build/mir5/recovery-historical/f210-q010-menu58f-native-r01/preflight.json",
+    "sha256": "B92C7722CEC7117107F68E55DD2F555CF04653EA522388BB5B387867032D997F",
+    "kind": "MIR5F210Q010Menu58fNativePreflightV1"
+  },
+  "current_intent_comparison": {
+    "path": "build/mir5/recovery-historical/f210-q010-menu58f-native-r01/current-intent-comparison-r01.json",
+    "sha256": "72B36B3203B6EF8E9587C9846B1AC9177A03FAD5D858F9231DA35DB8902618E6",
+    "status": "equal-intended-native-output",
+    "reviewed_differences": 160,
+    "unresolved_differences": 0
+  },
+  "primary_custody_readback": {
+    "path": "build/mir5/recovery-historical/f210-q010-menu58f-native-r01/primary-custody-readback.json",
+    "sha256": "212B398AAFEB5347AA98586095857C0A8E03C928A7FC0882D05BDC84DB06C9A0",
+    "custody_manifest_sha256": "226AEB518BEE86FF15ABFE80BCC211D782A6BF1FD738B4D1800EE61FFBCB4E23"
+  },
+  "capture_groups": [
+    {
+      "role": "current-58f-intent-capture",
+      "original_root": "D:/Projects/Factorio/mir5-q010-58f-9c38-r01/build/tmp/f210-q010-menu58f-native-r01/current-capture",
+      "primary_root": "build/mir5/recovery-historical/f210-q010-menu58f-native-r01/current-capture-native-output",
+      "member_count": 9,
+      "bytes": 68379501,
+      "members": [
+        { "path": "config.ini", "bytes": 278, "sha256": "3F9819000DAD78826498E3804F7A6B51488E1B4F19CD0A27AEA71B65FB01F82E" },
+        { "path": "process-1.resources.jsonl", "bytes": 13606, "sha256": "AD9D7C6519880345368F52D36006DF1F52FC9538BE35E0811C5C7AF237268E57" },
+        { "path": "process-1.stderr.txt", "bytes": 0, "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855" },
+        { "path": "process-1.stdout.txt", "bytes": 17990, "sha256": "F13B11183FC95BCBACD4FBB1040395147C7186045FFA97E754DFED5EF983A71D" },
+        { "path": "result.json", "bytes": 39566, "sha256": "04E927345533769A5236EF674ECC73CB28A486DAE86CC652604DECE523D4D6A2" },
+        { "path": "selection.json", "bytes": 3833, "sha256": "6B8538CAEC4BC027ACACBF4353F885FE4BA1C069C7BB8C4BB0926F0D52D87086" },
+        { "path": "write-data/factorio-current.log", "bytes": 17763, "sha256": "65418148C80B0441A4ACF8DB902E07520430AB17A597AE9AD963A52052F28AD4" },
+        { "path": "write-data/script-output/data-raw-dump.json", "bytes": 67502534, "sha256": "F63D209A868B21BBBE67C1C675EFCF6697774E40383D87C2E000AA48CEEFB849" },
+        { "path": "write-data/script-output/mod-settings-dump.json", "bytes": 783931, "sha256": "83C3A4166488BFEF80225DE9818810DE4CE0DDD37760C6B17BEC810AC8162D17" }
+      ]
+    },
+    {
+      "role": "fresh-b6-replay-capture",
+      "original_root": "D:/Projects/Factorio/mir5-q010-58f-9c38-r01/build/tmp/f210-q010-menu58f-native-r01/replay-capture",
+      "primary_root": "build/mir5/recovery-historical/f210-q010-menu58f-native-r01/replay-capture-native-output",
+      "member_count": 9,
+      "bytes": 69118239,
+      "members": [
+        { "path": "config.ini", "bytes": 277, "sha256": "793133689AD35379CF23DEC52550B8ABD97DAAA6BED042D4DCBCC60ACA150AA0" },
+        { "path": "process-1.resources.jsonl", "bytes": 6292, "sha256": "7C4672B2B86898AA8D2ED457EEB9946E0825A12179833776BF724F69782F6C02" },
+        { "path": "process-1.stderr.txt", "bytes": 0, "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855" },
+        { "path": "process-1.stdout.txt", "bytes": 18239, "sha256": "A7B1F494C69C050948633DF1F1DBE2DCCC064748E32648D540BD5DDFC241FBE0" },
+        { "path": "result.json", "bytes": 39563, "sha256": "93077E7C22B1FBCE7D156FA9E28B820327E47EC81E0A05067778E1E675363CDF" },
+        { "path": "selection.json", "bytes": 3833, "sha256": "7A04137A1DFD6D1ECBC61FE1294C7052A2E6F991FA286F5F3A568827C1478EF1" },
+        { "path": "write-data/factorio-current.log", "bytes": 18009, "sha256": "F21C7A754C800F118EB2CA2FC245DD8B5AC16FEB6EC7C62752C97B8BADEF97E6" },
+        { "path": "write-data/script-output/data-raw-dump.json", "bytes": 67953508, "sha256": "D5514C623EB1925282D7F2950A00A77372C58815A73D9E32A00334E232E57F90" },
+        { "path": "write-data/script-output/mod-settings-dump.json", "bytes": 1078518, "sha256": "BCC7E49EDA26DCACE46EC21A7E747FA999CC4042763B76D9403EDB595130F044" }
+      ]
+    }
+  ],
+  "aggregate_custody": {
+    "member_count": 18,
+    "bytes": 137497740,
+    "original_and_primary_hashes_equal": true,
+    "missing_count": 0,
+    "mismatch_count": 0,
+    "unsafe_count": 0
+  },
+  "excludes": [
+    "The two full data-raw dumps and the two full mod-settings dumps are represented by exact member hashes and sizes above, not duplicated in Git.",
+    "No saves, player-data, direct-library archive payloads, or full configuration payloads are copied into this metadata capsule."
+  ]
+}

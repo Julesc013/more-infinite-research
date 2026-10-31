@@ -1,0 +1,228 @@
+{
+  "schema": 1,
+  "kind": "mir5-whole-product-heavy-space-age-native-selection",
+  "target": "f200",
+  "factorio_line": "2.0",
+  "engine": {
+    "version": "2.0.77",
+    "sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B"
+  },
+  "settings_mode": "Defaults",
+  "mods": [
+    {
+      "name": "base",
+      "version": "2.0.77",
+      "enabled": true
+    },
+    {
+      "name": "elevated-rails",
+      "version": "2.0.77",
+      "enabled": true
+    },
+    {
+      "name": "quality",
+      "version": "2.0.77",
+      "enabled": true
+    },
+    {
+      "name": "space-age",
+      "version": "2.0.77",
+      "enabled": true
+    },
+    {
+      "name": "angelsaddons-mobility",
+      "version": "2.0.1",
+      "enabled": true
+    },
+    {
+      "name": "angelsaddons-mobility-graphics-crawler",
+      "version": "2.0.0",
+      "enabled": true
+    },
+    {
+      "name": "angelsaddons-mobility-graphics-petro",
+      "version": "2.0.0",
+      "enabled": true
+    },
+    {
+      "name": "angelsaddons-mobility-graphics-smelting",
+      "version": "2.0.0",
+      "enabled": true
+    },
+    {
+      "name": "angelsaddons-storage",
+      "version": "2.0.1",
+      "enabled": true
+    },
+    {
+      "name": "angelsbioprocessing",
+      "version": "2.0.3",
+      "enabled": true
+    },
+    {
+      "name": "angelsbioprocessinggraphics",
+      "version": "2.0.0",
+      "enabled": true
+    },
+    {
+      "name": "angelsinfiniteores",
+      "version": "2.0.3",
+      "enabled": true
+    },
+    {
+      "name": "angelspetrochem",
+      "version": "2.0.3",
+      "enabled": true
+    },
+    {
+      "name": "angelspetrochemgraphics",
+      "version": "2.0.1",
+      "enabled": true
+    },
+    {
+      "name": "angelsrefining",
+      "version": "2.0.4",
+      "enabled": true
+    },
+    {
+      "name": "angelsrefininggraphics",
+      "version": "2.0.0",
+      "enabled": true
+    },
+    {
+      "name": "angelssmelting",
+      "version": "2.0.5",
+      "enabled": true
+    },
+    {
+      "name": "angelssmeltinggraphics",
+      "version": "2.0.0",
+      "enabled": true
+    },
+    {
+      "name": "bobassembly",
+      "version": "2.1.0",
+      "enabled": true
+    },
+    {
+      "name": "bobelectronics",
+      "version": "2.1.1",
+      "enabled": true
+    },
+    {
+      "name": "bobenemies",
+      "version": "2.1.0",
+      "enabled": true
+    },
+    {
+      "name": "bobequipment",
+      "version": "2.1.0",
+      "enabled": true
+    },
+    {
+      "name": "bobgreenhouse",
+      "version": "2.1.0",
+      "enabled": true
+    },
+    {
+      "name": "bobinserters",
+      "version": "2.0.3",
+      "enabled": true
+    },
+    {
+      "name": "boblibrary",
+      "version": "2.1.0",
+      "enabled": true
+    },
+    {
+      "name": "boblogistics",
+      "version": "2.1.1",
+      "enabled": true
+    },
+    {
+      "name": "bobmining",
+      "version": "2.1.0",
+      "enabled": true
+    },
+    {
+      "name": "bobmodules",
+      "version": "2.1.0",
+      "enabled": true
+    },
+    {
+      "name": "bobores",
+      "version": "2.1.2",
+      "enabled": true
+    },
+    {
+      "name": "bobplates",
+      "version": "2.1.1",
+      "enabled": true
+    },
+    {
+      "name": "bobpower",
+      "version": "2.1.0",
+      "enabled": true
+    },
+    {
+      "name": "bobrevamp",
+      "version": "2.1.1",
+      "enabled": true
+    },
+    {
+      "name": "bobtech",
+      "version": "2.1.0",
+      "enabled": true
+    },
+    {
+      "name": "bobvehicleequipment",
+      "version": "2.1.1",
+      "enabled": true
+    },
+    {
+      "name": "bobwarfare",
+      "version": "2.1.0",
+      "enabled": true
+    },
+    {
+      "name": "mir-fixture-mir5-active-mods-observer",
+      "version": "0.1.0",
+      "enabled": true
+    }
+  ],
+  "archive_sha256": {
+    "angelsaddons-mobility_2.0.1.zip": "F596F3E0FF0322DCD7008F4EBDC173671E26967BDF8E3390FC4FBDEA9E414D88",
+    "angelsaddons-mobility-graphics-crawler_2.0.0.zip": "2876A3B426C895A474EF5B7BFA6C6DDAD5AC9AA48AD4B8AE46485C449CCE2745",
+    "angelsaddons-mobility-graphics-petro_2.0.0.zip": "F4C7FD4097DEDB728D881C130FE77C78E36094859E4254FFCFF709452F6E13C7",
+    "angelsaddons-mobility-graphics-smelting_2.0.0.zip": "3D3347F7FB0BB607D873E45A2A0568021CC16174DEE301455F4177751A733BB2",
+    "angelsaddons-storage_2.0.1.zip": "F8D2AA584EE344B9E74903AF5CED05A3A00B04C976F20C87F5128C0BD180A7EF",
+    "angelsbioprocessing_2.0.3.zip": "766B5784C3EB7A0B43D1B2C58ABCEC47EA69E4677129DC5C9255BEB66DC86B1B",
+    "angelsbioprocessinggraphics_2.0.0.zip": "8C4DCBBF61772C4276A9B655FB9173A4D3B0FCE0872D8F60FD8600225A16AB66",
+    "angelsinfiniteores_2.0.3.zip": "3AFBA78BAD970A6244208B348FC30B362E37C61043F78709772EB06868176C63",
+    "angelspetrochem_2.0.3.zip": "DFEBBC1F4E9F13016006071CBB064FF6289EFBAF92A7290D716C0D1E8C20430D",
+    "angelspetrochemgraphics_2.0.1.zip": "B8D877865D50E1157EED80CCE56F21174A69D81453075A825A837AB375CF3262",
+    "angelsrefining_2.0.4.zip": "8E78BA1FE453BA90999F6FECED81F9DBF41F1EF49EEB423BA6C4CE08C1DCDC42",
+    "angelsrefininggraphics_2.0.0.zip": "0B09E4335640DC580F742B04F9C109ED544F74A685C11CB1878B33DB36D7AF25",
+    "angelssmelting_2.0.5.zip": "6DDF5D7BAF4BACDE0398E47BF29EF3AECE41A34F33210439AD0C60C7ADE7FBB4",
+    "angelssmeltinggraphics_2.0.0.zip": "D638AA7A67405811279F96370BF5FC026CCE476048FDF16D91261354A858C6EF",
+    "bobassembly_2.1.0.zip": "CB839BB8381D26C9DA23109A31FB59AD8191068A3589D05AC8F051EC59ABBBDD",
+    "bobelectronics_2.1.1.zip": "BF11C8AB53F732564770DB0E7AAD24C07AF30196DA49394FA6E03E85939B38F3",
+    "bobenemies_2.1.0.zip": "FAB90D7B0C57D4E35323D4036C5B1B0046BF30A9BCAFC8687F42270497DEDD62",
+    "bobequipment_2.1.0.zip": "046EB8090849A521F6A4740401E20111AEAC494FC4FE0610ABE5786D65A00304",
+    "bobgreenhouse_2.1.0.zip": "3DBFF76267D97ECFC73BD83F32B95EFB55159FA8B46DDCD4EFD0274D08DCBE3D",
+    "bobinserters_2.0.3.zip": "FC2A6FB6B9816FF1D37E304A0A714270839E3366C93D4859AEE0AB9A9AECF765",
+    "boblibrary_2.1.0.zip": "1CB971B7A39F0805F14DD0F27F17CC832B7FFC6608CB2234E182062FC8DBF62B",
+    "boblogistics_2.1.1.zip": "07297FA72B1792C4483D30EA1705ECD4C7390B246E24B6B58663862445E500E5",
+    "bobmining_2.1.0.zip": "4E6296035852433362705E7CB02E5CE5A8E4F48F4139A606B868AE56D5698782",
+    "bobmodules_2.1.0.zip": "36E676ED16F67E01F4737778F8359CB72D04F0316ED21279138511935447CE60",
+    "bobores_2.1.2.zip": "BB0916DC28C1DD2E4A62E3F102298F7C47B5E07930FA5C84302B0879D983DF94",
+    "bobplates_2.1.1.zip": "A6DBCA13C579E6E65E2A8E2D605AC97C789771F3C6E2660AA0F19AE1049FC77B",
+    "bobpower_2.1.0.zip": "5D9E82962B8F1780416B6759E583C674982CB000B578A286B60A75D072D49B5B",
+    "bobrevamp_2.1.1.zip": "CF9AD291B6135125E29CDF452DC363101FDDAAB759DC9F713FE51DC29F1B9EEB",
+    "bobtech_2.1.0.zip": "7F721AFB56C7CF56D16DAF03E4582C7650381719C63F6DD7C714BE7FF83F2D25",
+    "bobvehicleequipment_2.1.1.zip": "81D91ADCD36C6721BB3EB83D155901953F6BF42D481D823533FB2F27978A92B1",
+    "bobwarfare_2.1.0.zip": "071C8DC3EBAE6D624A8E47BDDBA2C9432E1E2BF9D7E2EF151E95DF36788E9545",
+    "mir-fixture-mir5-active-mods-observer_0.1.0.zip": "723D1E7721449FC26040E5E6629416767BDC20AD79CF8723115846DB662A1F87"
+  },
+  "scope": "Declared heavy SpaceAge F200 selection:4 official2.0.77 rows,31 existing Bob/Angel mods at their actual2.0-family archive versions,and sole723D observer. Upstream declared metadata/dependencies pass using the existing library validator. NoMIR baseline;each later arm adds only its exact MIR archive. No dependency copying,links or disk extraction. Metadata preparation only;data/menu/gameplay/performance/native admission remains unexecuted."
+}

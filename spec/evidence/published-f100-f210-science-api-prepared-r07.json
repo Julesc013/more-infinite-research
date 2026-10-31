@@ -1,0 +1,168 @@
+{
+  "schema": 1,
+  "kind": "MIRPublishedF100F210ScienceAPICorrectionPreparedV1",
+  "status": "host-verified-fixture-correction-no-replacement-native",
+  "implementation_commit": "b47d81f2d7edcb676a564e35e0fffca071efd375",
+  "reason": "The actual R03 direct load reaches InGame and the corrected lab-disable API,then fails Item is not tool while the fixture reads plain F210 science ItemStack.durability. No successor result/save/cold is accepted.",
+  "independent_reference": {
+    "path": "tests/fixtures/published-f100-forward/f210-plain-science-reference-r01.json",
+    "bytes": 4971,
+    "sha256": "362BDAD66D9CAFAC33CD2AB4E7BE18C145B205B5E6DCD34029B8FFBD2EE178F3"
+  },
+  "fixture": {
+    "stage": "f210",
+    "name": "mir-fixture-mir5-historical-transition",
+    "version": "0.5.0",
+    "archive": {
+      "path": "D:/Projects/Factorio/mir5-published-f100-f210-science-fixture-r01/build/tmp/published-f100-f210-science-api-correction-r07-inputs/mir-fixture-mir5-historical-transition_0.5.0.zip",
+      "bytes": 7446,
+      "sha256": "F9E9B59B294507DBB6E65955469A80CB4900C0D173A042563C12A49BF4C40583"
+    },
+    "members": [
+      {
+        "source_commit": "b47d81f2d7edcb676a564e35e0fffca071efd375",
+        "source": "tests/fixtures/published-f100-forward/f210/control.lua",
+        "destination": "control.lua",
+        "bytes": 27,
+        "sha256": "1A0ED8A26C09447C61170923210BCCE255293A01A18F5D9174A31E90A27B7B03"
+      },
+      {
+        "source_commit": "b47d81f2d7edcb676a564e35e0fffca071efd375",
+        "source": "tests/fixtures/published-f100-forward/f210/data-final-fixes.lua",
+        "destination": "data-final-fixes.lua",
+        "bytes": 30,
+        "sha256": "B193C566BDC17949E9082C258018BD57DADC37063377B0C12971988E9513E588"
+      },
+      {
+        "source_commit": "b47d81f2d7edcb676a564e35e0fffca071efd375",
+        "source": "tests/fixtures/published-f100-forward/shared/control.lua",
+        "destination": "fixture_control.lua",
+        "bytes": 16764,
+        "sha256": "9B41E935CC90B94492CC29F1E01960287DD78EBB14B9469FC121E59FEB883CFB"
+      },
+      {
+        "source_commit": "b47d81f2d7edcb676a564e35e0fffca071efd375",
+        "source": "tests/fixtures/published-f100-forward/shared/data-final-fixes.lua",
+        "destination": "fixture_data_final.lua",
+        "bytes": 1552,
+        "sha256": "8047C6115C51B5B00B32E125F44647494EF0E22CF4DF7752E2E8E501323B03E6"
+      },
+      {
+        "source_commit": "b47d81f2d7edcb676a564e35e0fffca071efd375",
+        "source": "tests/fixtures/published-f100-forward/f210/info.json",
+        "destination": "info.json",
+        "bytes": 277,
+        "sha256": "55B1FFFDD1F8C468D3340D01EA810974A743E72BB255149060EE3DCF883AF3B5"
+      },
+      {
+        "source_commit": "b47d81f2d7edcb676a564e35e0fffca071efd375",
+        "source": "tests/fixtures/published-f100-forward/f210/settings-updates.lua",
+        "destination": "settings-updates.lua",
+        "bytes": 73,
+        "sha256": "0C3C400CA97DF5B2A636FC77D16441E320EFF836C7787084F5E0CE3BCB9F1E30"
+      },
+      {
+        "source_commit": "b47d81f2d7edcb676a564e35e0fffca071efd375",
+        "source": "tests/fixtures/published-f100-forward/f210/stage.lua",
+        "destination": "stage.lua",
+        "bytes": 142,
+        "sha256": "14A5598FAE0289B1F250479AA1E8DEB99CBD0B2270703E0A3CF1675490DBDF61"
+      }
+    ],
+    "projection": "D:/Projects/Factorio/mir5-published-f100-f210-science-fixture-r01/build/tmp/published-f100-f210-science-api-correction-r07-inputs/source"
+  },
+  "science_contract": {
+    "f210_data": "Both exact military/utility rows are items;omitted science_capacity has shipped2.1.23 default1. Reject changed type or capacity before acceleration.",
+    "f210_runtime": "Require item prototypes/capacity1,inventory31each and lab-held finite durability25/60each through LuaEntity.get_stored_durability. Never read ItemStack.durability on this target.",
+    "useful_work_units": "35/60 remains the strict declared expected work under the existing zero-modifier/tick contract;it was not observed by R03 and must pass a new actual native observation.",
+    "f110": "Unchanged tool stack fractional durability reader,32-35/60 equivalents.",
+    "observability": "F210 native fixture logs actual count/stored/capacity for both packs before the strict assertions. A disagreement remains adverse;do not accept alternate quantities."
+  },
+  "unchanged_semantics": [
+    "F100 source,F110 bridge and accepted F110 destination retain legacy behavior. All23 retained rows,effects,queues,foreign forces,source-lab checks and read-only on_load requirements remain exact.",
+    "F210 retains its reviewed disabled_by_script=true and zero-energy freeze,one useful successor completion and two read-only cold reload requirements.",
+    "Player packages,settings and protected0381 source are unchanged;reuse accepted B7F29 source qualification without reseeding or source production."
+  ],
+  "retained_adverse": {
+    "schema": 1,
+    "kind": "MIRPublishedF100F210ScienceAPIAdverseRootReadbackV1",
+    "status": "failed-fixture-science-api-after-direct-save-load",
+    "packet": {
+      "path": "D:/Projects/Factorio/more-infinite-research/build/qualification/published473-f100-f210-native-r03-controller/packet-r03.json",
+      "bytes": 16049,
+      "sha256": "F4700E81F3B8368CA218950F55FA708DCF8CF2314864E54B05BC648572CD7695"
+    },
+    "caller": {
+      "path": "D:/Projects/Factorio/more-infinite-research/build/qualification/published473-f100-f210-native-r03-controller/Invoke-Owned.ps1",
+      "bytes": 22527,
+      "sha256": "81FBD939F45DE9D3E1260017E4626954DEB69E44F046A9D7FF8F5090756B8BBC"
+    },
+    "terminal": {
+      "path": "D:/Projects/Factorio/more-infinite-research/build/qualification/published473-f100-f210-native-r03-controller/execution-record/terminal.json",
+      "bytes": 4810,
+      "sha256": "BCE14D9DFC6D743B39DD7B0086C23E7F5AD953B672122424A663F6BFA4D7CE6D"
+    },
+    "native_result": {
+      "path": "D:/Projects/Factorio/more-infinite-research/build/qualification/published473-f100-f210-native-r03-controller/native-captures/result.json",
+      "bytes": 5934,
+      "sha256": "64A68FB7DB5F44E92372745FC9E5C55D6411616B1B5B3ACE142081628C7E12C0"
+    },
+    "custody": {
+      "native_custody": {
+        "files": 9,
+        "bytes": 57129,
+        "all_original_copy_hashes_equal": true
+      },
+      "controller_custody": {
+        "files": 2,
+        "bytes": 569561,
+        "all_original_copy_hashes_equal": true
+      }
+    },
+    "actual_engine_pids": [
+      87936
+    ],
+    "actual_engines": 1,
+    "error": "Item is not tool.",
+    "location": "fixture_control.lua:122",
+    "direct_original_save_loaded": true,
+    "in_game_reached": true,
+    "accepted_successor_labs": 0,
+    "completed_successor_saves": 0,
+    "accepted_cold_reloads": 0,
+    "source_input_unchanged": true,
+    "library_restoration_verified": true,
+    "factorio_processes": 0,
+    "bridge_authority": false,
+    "performance_acceptance": false,
+    "release_qualification": false
+  },
+  "receipt_capsule": {
+    "path": "spec/evidence/published-f100-f210-science-api-adverse-receipts-r03.json.gz",
+    "bytes": 31208,
+    "sha256": "25582B280B2CB44AA7CE4196B977F8A65E140F10CFBDEFF3E3219079CD624145",
+    "bodies": 12
+  },
+  "host_controls": {
+    "command": "python -X utf8 -B tests/test_published_f100_forward_fixture.py --lua-runtime-dir D:/Projects/Factorio/more-infinite-research/build/tmp/mir421-lua-runtime",
+    "tests": 8,
+    "status": "passed",
+    "scope": "F210 plain-item durability reads reject,stored science positive and missing/nonfinite/negative/wrong-count/wrong-capacity opponents plus independent raw-data type/capacity opponents. Both native science-prefix records are asserted. All previous source/lifecycle/runner/disabled-lab controls remain. No Factorio process.",
+    "driver_plan": "Existing selected published-F100 host-control plan inspected before these controls."
+  },
+  "old_failed_fixture": {
+    "sha256": "663DDA5DFEFF96908E1E9FC452DE9471021CB4A2F670D3116200D8C0577C9D00",
+    "bytes": 7142,
+    "source_commit": "48aee3825d5cf2a15f78e24cd4620a86b0ffdbe1",
+    "disposition": "Keep exact R03 packet/caller/native result/full restoration;zero accepted successor save/colds. Earlier R01 formula and R02 lab-API adverses remain unchanged."
+  },
+  "remaining": [
+    "Independent declaration/capsule review and all four required exact-head checks.",
+    "Fresh packet must freeze the later clean declaration HEAD separately from consumed implementation b47d81,plus seven raw members/container/profile/caller/governor and new output.",
+    "Execute only a separately reviewed direct F100\u2192F210 attempt with strict science/state checks;prior direct loads grant no bridge authority."
+  ],
+  "bridge_authority": false,
+  "replacement_native_execution": false,
+  "performance_acceptance": false,
+  "release_qualification": false
+}

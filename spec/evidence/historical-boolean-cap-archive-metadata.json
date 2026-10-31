@@ -1,0 +1,251 @@
+{
+  "schema": "mir-historical-cap-archive-metadata-probe-r01",
+  "scope": "Six named public original MIR ZIPs only. Each ZIP was fetched into memory, hash-checked, inspected through an in-memory ZIP stream, and discarded; no archive was persisted or executed.",
+  "status": "archive-bytes-verified; metadata-and-controller-body-read-only; no-native-claim",
+  "limits": [
+    "This is not a save, engine, compatibility, migration, or native qualification result.",
+    "Only sole info.json metadata and the sole player maximum_level_control.lua entry were examined for each stated ZIP.",
+    "The four Git bodies are comparison candidates. The observed archive member, rather than the tag source body, establishes the recorded composed-controller cohort."
+  ],
+  "input_metadata": {
+    "migration_origins_path": "spec/inventory/migration-origins.json",
+    "migration_origins_git_blob": "bb13dec6b847ac90c233bec45a454fcb0c67665c",
+    "migration_origins_sha256": "82B383268A9AE7560F2EB963B7A01F050325ED7DBB95AAC6E63B29B86960A98E",
+    "public_release_asset_audit_path": "build/mir5/aero-modern-migration-history-audit-r01/public-release-asset-inventory.json",
+    "public_release_asset_audit_sha256": "0D36B7F5D11EF17FEA4C8FDB2062993A8EA5627633F98298F034EC8F4CB0892C"
+  },
+  "candidate_git_bodies": [
+    {
+      "label": "e01",
+      "source_commit": "9c78a2b6abf281fdcfc0449b2768f0f293a78225",
+      "source_member": "prototypes/mir/runtime/maximum_level_control.lua",
+      "git_blob": "e01bd8828e0a09d7918cc4966cab55b071b3f928",
+      "bytes": 7637,
+      "sha256": "0B498CF69738E2388101876A882A408399E7935A8CD13D8225C9428CA22179D9"
+    },
+    {
+      "label": "e6df",
+      "source_commit": "19ddb7db4c960f77aef53d2bb47d23e0f311918f",
+      "source_member": "prototypes/mir/runtime/maximum_level_control.lua",
+      "git_blob": "e6df945a7d5da6e34e07305723638c56cf3baddd",
+      "bytes": 5298,
+      "sha256": "26CDF46CD6728F949A765D23F7C876846662E67E49FA6FA98BB6B498E5226CFE"
+    },
+    {
+      "label": "09eb",
+      "source_commit": "ddb8120c3375e859df63763918e00b6c93208ad1",
+      "source_member": "prototypes/mir/runtime/maximum_level_control.lua",
+      "git_blob": "09eb6ece484c8e3c1bcdafaea31451ce84a27108",
+      "bytes": 9606,
+      "sha256": "687E2EB214C7097C1691562ECE206AA69FDE24194164A8EF33F48AF14405C0EA"
+    },
+    {
+      "label": "67c3",
+      "source_commit": "ea5b37983e4f682c841eba662a87276f082d4afd",
+      "source_member": "prototypes/mir/runtime/maximum_level_control.lua",
+      "git_blob": "67c3f06c0af3de8193548e1716e7aba8d5380135",
+      "bytes": 11628,
+      "sha256": "F89FDA0D1126F78AC9B79EE780F4E12AD6892F43B117F61D114BA14DE2090930"
+    }
+  ],
+  "observations": [
+    {
+      "release_tag": "3.2.10",
+      "edition": "f210",
+      "asset_id": 516809271,
+      "filename": "more-infinite-research_3.2.10.zip",
+      "public_download_url": "https://github.com/Julesc013/more-infinite-research/releases/download/3.2.10/more-infinite-research_3.2.10.zip",
+      "archive": {
+        "expected_bytes": 1065178,
+        "observed_bytes": 1065178,
+        "expected_sha256": "5D88F2F971622E04846F6FC26859777F429C71FE34ECD9250AB2BA56B9A4C1B7",
+        "observed_sha256": "5D88F2F971622E04846F6FC26859777F429C71FE34ECD9250AB2BA56B9A4C1B7",
+        "verified": true
+      },
+      "info_json": {
+        "entry": "more-infinite-research_3.2.10/info.json",
+        "name": "more-infinite-research",
+        "version": "3.2.10",
+        "factorio_version": "2.1"
+      },
+      "maximum_level_control": {
+        "entry": "more-infinite-research_3.2.10/prototypes/mir/runtime/maximum_level_control.lua",
+        "raw_bytes": 5298,
+        "raw_sha256": "26CDF46CD6728F949A765D23F7C876846662E67E49FA6FA98BB6B498E5226CFE",
+        "normalized_lf_bytes": 5298,
+        "normalized_lf_sha256": "26CDF46CD6728F949A765D23F7C876846662E67E49FA6FA98BB6B498E5226CFE",
+        "matched_git_body": "e6df",
+        "normalized_lf_matches_matched_git_blob": true,
+        "tag_source_git_blob": "e6df945a7d5da6e34e07305723638c56cf3baddd",
+        "tag_source_bytes": 5298,
+        "tag_source_sha256": "26CDF46CD6728F949A765D23F7C876846662E67E49FA6FA98BB6B498E5226CFE",
+        "normalized_lf_matches_tag_source": true
+      }
+    },
+    {
+      "release_tag": "3.2.11",
+      "edition": "f210",
+      "asset_id": 518275792,
+      "filename": "more-infinite-research_3.2.11.zip",
+      "public_download_url": "https://github.com/Julesc013/more-infinite-research/releases/download/3.2.11/more-infinite-research_3.2.11.zip",
+      "archive": {
+        "expected_bytes": 1067720,
+        "observed_bytes": 1067720,
+        "expected_sha256": "5B0252C3E1B8A20FF8E31F408F0217DDC77D2DF0D1C15F59653E948472870A5A",
+        "observed_sha256": "5B0252C3E1B8A20FF8E31F408F0217DDC77D2DF0D1C15F59653E948472870A5A",
+        "verified": true
+      },
+      "info_json": {
+        "entry": "more-infinite-research_3.2.11/info.json",
+        "name": "more-infinite-research",
+        "version": "3.2.11",
+        "factorio_version": "2.1"
+      },
+      "maximum_level_control": {
+        "entry": "more-infinite-research_3.2.11/prototypes/mir/runtime/maximum_level_control.lua",
+        "raw_bytes": 9606,
+        "raw_sha256": "687E2EB214C7097C1691562ECE206AA69FDE24194164A8EF33F48AF14405C0EA",
+        "normalized_lf_bytes": 9606,
+        "normalized_lf_sha256": "687E2EB214C7097C1691562ECE206AA69FDE24194164A8EF33F48AF14405C0EA",
+        "matched_git_body": "09eb",
+        "normalized_lf_matches_matched_git_blob": true,
+        "tag_source_git_blob": "09eb6ece484c8e3c1bcdafaea31451ce84a27108",
+        "tag_source_bytes": 9606,
+        "tag_source_sha256": "687E2EB214C7097C1691562ECE206AA69FDE24194164A8EF33F48AF14405C0EA",
+        "normalized_lf_matches_tag_source": true
+      }
+    },
+    {
+      "release_tag": "v4.0.0",
+      "edition": "f200",
+      "asset_id": 536164432,
+      "filename": "more-infinite-research_4.0.20000.zip",
+      "public_download_url": "https://github.com/Julesc013/more-infinite-research/releases/download/v4.0.0/more-infinite-research_4.0.20000.zip",
+      "archive": {
+        "expected_bytes": 1067014,
+        "observed_bytes": 1067014,
+        "expected_sha256": "5C0E299D78C4EE545958448DAE48D87BE5FE1B959875D4CB93A264D95D3DB0AE",
+        "observed_sha256": "5C0E299D78C4EE545958448DAE48D87BE5FE1B959875D4CB93A264D95D3DB0AE",
+        "verified": true
+      },
+      "info_json": {
+        "entry": "more-infinite-research_4.0.20000/info.json",
+        "name": "more-infinite-research",
+        "version": "4.0.20000",
+        "factorio_version": "2.0"
+      },
+      "maximum_level_control": {
+        "entry": "more-infinite-research_4.0.20000/prototypes/mir/runtime/maximum_level_control.lua",
+        "raw_bytes": 9606,
+        "raw_sha256": "687E2EB214C7097C1691562ECE206AA69FDE24194164A8EF33F48AF14405C0EA",
+        "normalized_lf_bytes": 9606,
+        "normalized_lf_sha256": "687E2EB214C7097C1691562ECE206AA69FDE24194164A8EF33F48AF14405C0EA",
+        "matched_git_body": "09eb",
+        "normalized_lf_matches_matched_git_blob": true,
+        "tag_source_git_blob": "67c3f06c0af3de8193548e1716e7aba8d5380135",
+        "tag_source_bytes": 11628,
+        "tag_source_sha256": "F89FDA0D1126F78AC9B79EE780F4E12AD6892F43B117F61D114BA14DE2090930",
+        "normalized_lf_matches_tag_source": false
+      }
+    },
+    {
+      "release_tag": "v4.0.0",
+      "edition": "f210",
+      "asset_id": 536164425,
+      "filename": "more-infinite-research_4.0.21000.zip",
+      "public_download_url": "https://github.com/Julesc013/more-infinite-research/releases/download/v4.0.0/more-infinite-research_4.0.21000.zip",
+      "archive": {
+        "expected_bytes": 1069552,
+        "observed_bytes": 1069552,
+        "expected_sha256": "38541A7ED0A4181811A1E94231FF58A1268F91E7B89C7CA3D9D5F682242094B1",
+        "observed_sha256": "38541A7ED0A4181811A1E94231FF58A1268F91E7B89C7CA3D9D5F682242094B1",
+        "verified": true
+      },
+      "info_json": {
+        "entry": "more-infinite-research_4.0.21000/info.json",
+        "name": "more-infinite-research",
+        "version": "4.0.21000",
+        "factorio_version": "2.1"
+      },
+      "maximum_level_control": {
+        "entry": "more-infinite-research_4.0.21000/prototypes/mir/runtime/maximum_level_control.lua",
+        "raw_bytes": 9606,
+        "raw_sha256": "687E2EB214C7097C1691562ECE206AA69FDE24194164A8EF33F48AF14405C0EA",
+        "normalized_lf_bytes": 9606,
+        "normalized_lf_sha256": "687E2EB214C7097C1691562ECE206AA69FDE24194164A8EF33F48AF14405C0EA",
+        "matched_git_body": "09eb",
+        "normalized_lf_matches_matched_git_blob": true,
+        "tag_source_git_blob": "67c3f06c0af3de8193548e1716e7aba8d5380135",
+        "tag_source_bytes": 11628,
+        "tag_source_sha256": "F89FDA0D1126F78AC9B79EE780F4E12AD6892F43B117F61D114BA14DE2090930",
+        "normalized_lf_matches_tag_source": false
+      }
+    },
+    {
+      "release_tag": "v4.1.0",
+      "edition": "f200",
+      "asset_id": 545663038,
+      "filename": "more-infinite-research_4.1.20000.zip",
+      "public_download_url": "https://github.com/Julesc013/more-infinite-research/releases/download/v4.1.0/more-infinite-research_4.1.20000.zip",
+      "archive": {
+        "expected_bytes": 1059713,
+        "observed_bytes": 1059713,
+        "expected_sha256": "7E4EEB5D0E42152F7416CAA0BCA6274A4FDDA242AFBEDAFBAD8788CEDA2ECF34",
+        "observed_sha256": "7E4EEB5D0E42152F7416CAA0BCA6274A4FDDA242AFBEDAFBAD8788CEDA2ECF34",
+        "verified": true
+      },
+      "info_json": {
+        "entry": "more-infinite-research_4.1.20000/info.json",
+        "name": "more-infinite-research",
+        "version": "4.1.20000",
+        "factorio_version": "2.0"
+      },
+      "maximum_level_control": {
+        "entry": "more-infinite-research_4.1.20000/prototypes/mir/runtime/maximum_level_control.lua",
+        "raw_bytes": 9606,
+        "raw_sha256": "687E2EB214C7097C1691562ECE206AA69FDE24194164A8EF33F48AF14405C0EA",
+        "normalized_lf_bytes": 9606,
+        "normalized_lf_sha256": "687E2EB214C7097C1691562ECE206AA69FDE24194164A8EF33F48AF14405C0EA",
+        "matched_git_body": "09eb",
+        "normalized_lf_matches_matched_git_blob": true,
+        "tag_source_git_blob": "67c3f06c0af3de8193548e1716e7aba8d5380135",
+        "tag_source_bytes": 11628,
+        "tag_source_sha256": "F89FDA0D1126F78AC9B79EE780F4E12AD6892F43B117F61D114BA14DE2090930",
+        "normalized_lf_matches_tag_source": false
+      }
+    },
+    {
+      "release_tag": "v4.1.0",
+      "edition": "f210",
+      "asset_id": 545662993,
+      "filename": "more-infinite-research_4.1.21000.zip",
+      "public_download_url": "https://github.com/Julesc013/more-infinite-research/releases/download/v4.1.0/more-infinite-research_4.1.21000.zip",
+      "archive": {
+        "expected_bytes": 1062500,
+        "observed_bytes": 1062500,
+        "expected_sha256": "6E77FC9A2DEF9C3B58A2D85A4A113F9F3DE19A5712EB1EB6BBF93C14A238E0D1",
+        "observed_sha256": "6E77FC9A2DEF9C3B58A2D85A4A113F9F3DE19A5712EB1EB6BBF93C14A238E0D1",
+        "verified": true
+      },
+      "info_json": {
+        "entry": "more-infinite-research_4.1.21000/info.json",
+        "name": "more-infinite-research",
+        "version": "4.1.21000",
+        "factorio_version": "2.1"
+      },
+      "maximum_level_control": {
+        "entry": "more-infinite-research_4.1.21000/prototypes/mir/runtime/maximum_level_control.lua",
+        "raw_bytes": 9606,
+        "raw_sha256": "687E2EB214C7097C1691562ECE206AA69FDE24194164A8EF33F48AF14405C0EA",
+        "normalized_lf_bytes": 9606,
+        "normalized_lf_sha256": "687E2EB214C7097C1691562ECE206AA69FDE24194164A8EF33F48AF14405C0EA",
+        "matched_git_body": "09eb",
+        "normalized_lf_matches_matched_git_blob": true,
+        "tag_source_git_blob": "67c3f06c0af3de8193548e1716e7aba8d5380135",
+        "tag_source_bytes": 11628,
+        "tag_source_sha256": "F89FDA0D1126F78AC9B79EE780F4E12AD6892F43B117F61D114BA14DE2090930",
+        "normalized_lf_matches_tag_source": false
+      }
+    }
+  ]
+}

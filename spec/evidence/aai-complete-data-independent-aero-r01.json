@@ -1,0 +1,181 @@
+{
+  "schema": 1,
+  "kind": "MIRAAICompleteDataIndependentAeroReadbackV1",
+  "status": "complete-captured-technology-and-settings-comparison-not-full-family-acceptance",
+  "input_transport": {
+    "commit": "ea05e282d0a83698b99f807ae45ccc2474a10e16",
+    "path": "spec/evidence/aai-q043-q044-complete-captures-r01.json.gz",
+    "sha256": "9CF43317033E05244017E71FA75FFF96589A91EC9D87D0CCECAFF557C2BBDEF7",
+    "bodies_verified": 27,
+    "derivation": "Entire technology objects are explicitly serialized projections;settings/results/stdout/profiles/root-readback bodies retain original exact bytes. Producer rehashes undisclosed full data-parent dumps;Aero independently verifies transported projections and their original receipt identities."
+  },
+  "original_execution": {
+    "source_commit": "575e418c72eff2970fa5f6274956f6e8944d4e19",
+    "player_sha256": "A8D0A4590154F3106E59BDB269F1AEB3ED8CC523F18F00ED7D76DC89059F5B8D",
+    "engine": "2.1.23",
+    "engine_sha256": "FE4A1DA30F322A0D0B8AEB3DF7276332222BAAA143E2352569B723E84B2B9060",
+    "source_chain": "spec/evidence/broad-ecosystem-f210-575e-native-chain-r01.json",
+    "aai_industry_version": "0.7.5"
+  },
+  "method": [
+    "Compare every complete published technology object,including hidden fields,against the candidate;retain exact numeric/key/type meanings.",
+    "When an effect array changes,compare complete effect objects as a multiplicity-preserving multiset;do not discard duplicate effects or silently call reordered arrays exact.",
+    "Compare every setting identity and field;separate retired targets metadata from the adopted maximum1000 and reject any undisposed field change.",
+    "Review current data consumed paths independently from runtime/client behavior;execute no historical audit or candidate Generator as the expectation."
+  ],
+  "cases": [
+    {
+      "case": "q043",
+      "mode": "Base",
+      "technology_counts": {
+        "upstream": 216,
+        "published": 269,
+        "candidate": 294
+      },
+      "published_missing": 0,
+      "published_common_exact": 267,
+      "changed_technologies": {
+        "recipe-prod-research_mining_drill-1": {
+          "fields": [
+            "localised_name"
+          ],
+          "localised_name": {
+            "published": [
+              "technology-name.more-infinite-research.research_mining_drill",
+              [
+                "item-name.electric-mining-drill"
+              ]
+            ],
+            "candidate": [
+              "technology-name.more-infinite-research.research_mining_drill"
+            ]
+          }
+        },
+        "recipe-prod-research_walls-1": {
+          "fields": [
+            "localised_name"
+          ],
+          "localised_name": {
+            "published": [
+              "technology-name.more-infinite-research.research_walls",
+              [
+                "item-name.stone-wall"
+              ]
+            ],
+            "candidate": [
+              "technology-name.more-infinite-research.research_walls"
+            ]
+          }
+        }
+      },
+      "added_hidden_disabled_technologies": 24,
+      "added_public_technologies": [
+        "recipe-prod-research_science_pack_productivity-1"
+      ],
+      "public_additions_present_upstream": [],
+      "settings": {
+        "published_identities": 900,
+        "candidate_identities": 900,
+        "missing": 0,
+        "added": 0,
+        "unchanged": 11,
+        "targets_metadata_only": 766,
+        "targets_removed_and_maximum_1000": 123,
+        "other_changed_fields": 0
+      }
+    },
+    {
+      "case": "q044",
+      "mode": "SpaceAge",
+      "technology_counts": {
+        "upstream": 297,
+        "published": 368,
+        "candidate": 396
+      },
+      "published_missing": 0,
+      "published_common_exact": 366,
+      "changed_technologies": {
+        "recipe-prod-research_mining_drill-1": {
+          "fields": [
+            "effects",
+            "localised_name"
+          ],
+          "effects_complete_multiset_equal": true,
+          "localised_name": {
+            "published": [
+              "technology-name.more-infinite-research.research_mining_drill",
+              [
+                "item-name.electric-mining-drill"
+              ]
+            ],
+            "candidate": [
+              "technology-name.more-infinite-research.research_mining_drill"
+            ]
+          }
+        },
+        "recipe-prod-research_walls-1": {
+          "fields": [
+            "localised_name"
+          ],
+          "localised_name": {
+            "published": [
+              "technology-name.more-infinite-research.research_walls",
+              [
+                "item-name.stone-wall"
+              ]
+            ],
+            "candidate": [
+              "technology-name.more-infinite-research.research_walls"
+            ]
+          }
+        }
+      },
+      "added_hidden_disabled_technologies": 28,
+      "added_public_technologies": [],
+      "public_additions_present_upstream": [],
+      "settings": {
+        "published_identities": 900,
+        "candidate_identities": 900,
+        "missing": 0,
+        "added": 0,
+        "unchanged": 11,
+        "targets_metadata_only": 766,
+        "targets_removed_and_maximum_1000": 123,
+        "other_changed_fields": 0
+      }
+    }
+  ],
+  "current_data_applicability": {
+    "original_player_tree": "5ba53a8514b4641c749e91c0a68f32521fb3fee7",
+    "current_player_source": "a95dbc6b35c165b46aa9991d2a0ef7274d4ec04a",
+    "current_player_tree": "7b0ede663e6fbcf486cd863e7d3719653aedc07a",
+    "changed_paths": [
+      "changelog.txt",
+      "locale/de/mir-library.cfg",
+      "presentation/library_model.lua",
+      "research/catalogue.lua",
+      "runtime/caps.lua",
+      "runtime/library.lua",
+      "runtime/lifecycle.lua"
+    ],
+    "existing_data_stage_catalogue_bodies_exact": true,
+    "new_accessor_consumed_only_at_runtime": true,
+    "new_native_result": false
+  },
+  "independent_local_custody": {
+    "path": "build/qualification/aai-complete-capture-aero-review-r01",
+    "comparison": "independent-comparison.json",
+    "reader_sha256": "7D6061692DEEC3AE8E3DFF695F032D00164F569426C5AFFE3029F835C5431DA8",
+    "applicability_reader_sha256": "FB2B159D2DA58F995624EA2FA840EF7657C413E7EB9792BBE14BB9EE4938484D"
+  },
+  "limits": [
+    "This closes the complete existing q043/q044 technology/settings comparison with explicit dispositions below;it does not close CONT-12/full-family acceptance.",
+    "Current7b0 data applicability retains original575e/A8/FE4/profile execution identities;no new2DDD/8DC native result is claimed.",
+    "Two localized-name forms remain presentation changes;the SpaceAge mining effect array is a complete permutation. New private holders remain separate earned-state/Library obligations;Base science productivity is a public addition,not a retained published identity.",
+    "Named E3 AAI source/successor lab/save evidence and its adverse terminal retain their original identities and inherited physical counters. No new successor crafting batch,full AAI suite,combined/DLC route,settings/runtime/client or release acceptance follows."
+  ],
+  "new_native_execution": false,
+  "gameplay_qualification": false,
+  "performance_acceptance": false,
+  "release_qualification": false
+}

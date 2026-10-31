@@ -1,0 +1,76 @@
+{
+  "schema": 1,
+  "kind": "MIRPublishedF100ForwardExactFormatRunnerPreparationV1",
+  "status": "review-finding-corrected-host-only-not-native-refusal",
+  "review_finding": "Black Glass exact709457 review on PR1427,2026-10-29T16:19:16Z",
+  "runner": {
+    "path": "tools/Invoke-NativeFixture.ps1",
+    "bytes": 92235,
+    "sha256": "61F391350E06E866AF02BEAE854695C69B192F80067C0EF134F4FF7C1276EA04",
+    "revision": "fa455038bfdfad24d33533d25ac53e71d5f5a9df"
+  },
+  "previous_preparation": {
+    "path": "spec/evidence/published-f100-forward-runner-format-aero-r03.json",
+    "bytes": 3901,
+    "sha256": "8BE04131C2A818C4F714784D8C5397B10F97DA408730989C94639B51025861EB"
+  },
+  "correction": "Remove inline ignore-case and post-period wildcard;use PowerShell -cmatch and permit only the exact installed message final period followed by optional CR/end. Preserve all existing native retained-body/source/engine/archive/process bindings.",
+  "red_control": {
+    "command": "python -B tests/test_published_f100_forward_fixture.py --lua-runtime-dir build/tmp/mir421-lua-runtime PublishedF100ForwardControls.test_runner_preflight_binds_four_exact_stages_and_rejects_opposing_inputs",
+    "prior_runner_revision": "c776a8b971a75d60eb8de780f3ae098b023b7995",
+    "observed": "FAIL: unexpected preflight result bridge/bridge-format-suffix;the old runner accepted the invented suffix."
+  },
+  "host_validation": {
+    "host_plan_materialized": "build/qualification/published-f100-forward-prepared-aero-r04/host-plan.json",
+    "forward_lua52_controls": 7,
+    "ast_accepted_transactions": 5,
+    "ast_refused_transactions": 50,
+    "new_positive": "exact CRLF native message alongside existing LF message",
+    "new_opponents": [
+      "invented post-period suffix",
+      "trailing post-period space",
+      "lowercase Map token"
+    ],
+    "existing_f110_runner_controls": 5,
+    "repository_static": "pass:74 Markdown/1393 JSON/732 links before adding this record",
+    "whitespace": "pass"
+  },
+  "unchanged_source_profile": {
+    "path": "tests/profiles/published473-f100-forward-source-r02.json",
+    "bytes": 1334,
+    "sha256": "973631B91A105D56EEB2890CA4F2A6B9571CA5FBE2E1EAAB3A6501ACD3512509"
+  },
+  "unchanged_fixture_archives_rehashed": [
+    {
+      "stage": "source",
+      "name": "mir-fixture-mir5-historical-transition_0.2.0.zip",
+      "sha256": "E2F1D24D3C878F6A3B58A6F38ADD045FB942C31599079FD837CAB5FCBB291280",
+      "bytes": 7081
+    },
+    {
+      "stage": "bridge",
+      "name": "mir-fixture-mir5-historical-transition_0.3.0.zip",
+      "sha256": "F2246B8A62B2968F00DC2213F12AC89D55E85ABACCD7C231BA339055543F2735",
+      "bytes": 7086
+    },
+    {
+      "stage": "f110",
+      "name": "mir-fixture-mir5-historical-transition_0.4.0.zip",
+      "sha256": "D391C8D431297979BC671CC873315B13294DBD44BA4C7889BDA81602D2C126AC",
+      "bytes": 7086
+    },
+    {
+      "stage": "f210",
+      "name": "mir-fixture-mir5-historical-transition_0.5.0.zip",
+      "sha256": "2276C67A15CED1B3E0607AE83AE83A8ABE67961ECD0099FE24DA10B408696B5E",
+      "bytes": 7089
+    }
+  ],
+  "fixture_payload_delta": [],
+  "player_source_delta": [],
+  "native_owner_required": "Independently review the exact R04 runner/test change and freeze its new executing source/harness before a future native stage. Preserve R01/R02/R03 receipts,protected219E and any accepted enhanced source;do not swap an active packet or recreate predecessor inputs.",
+  "new_native_processes": 0,
+  "actual_engine_format_refusals": 0,
+  "bridge_authorized": false,
+  "release_qualification": false
+}

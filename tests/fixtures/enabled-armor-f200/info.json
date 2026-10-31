@@ -1,0 +1,9 @@
+{
+  "name": "mir-fixture-mir5-enabled-armor-f200",
+  "version": "0.1.0",
+  "title": "MIR F200 enabled armor recipe witness",
+  "author": "MIR maintainers",
+  "description": "Private one-field activation variation for the existing combined Bob/Angel profile.",
+  "factorio_version": "2.0",
+  "dependencies": ["base >= 2.0.77", "? more-infinite-research"]
+}

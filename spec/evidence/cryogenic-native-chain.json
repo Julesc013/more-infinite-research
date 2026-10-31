@@ -1,0 +1,136 @@
+{
+  "schema": 1,
+  "kind": "MIR5CryogenicNativeUnitChainV1",
+  "status": "native-data-stage-regression-passes",
+  "source_commit": "7cb0b8b2c0a9630875c19c2e97a3b26477d9c40f",
+  "engine": {
+    "path": "C:\\Program Files\\Steam\\steamapps\\common\\Factorio\\bin\\x64\\factorio.exe",
+    "sha256": "FE4A1DA30F322A0D0B8AEB3DF7276332222BAAA143E2352569B723E84B2B9060",
+    "base_version": "2.1.23",
+    "factorio_version": "2.1"
+  },
+  "player_archive_sha256": "27B566CDA48A2783FD3379FCBD3650B9B0B7605714505D47662FEF7A2A138708",
+  "fixture_archive_sha256": "F60D84A5426FB5E3129D370C59BA59AAC63EDC8BEA07A18413E17DF2543B9A32",
+  "native_record": {
+    "path": "spec/mir5/evidence/cryogenic-native-f210-data.json",
+    "sha256": "BCA26027E8830DE289720C12B3FDDFD66A645909C383BD4AF64D2FF4FD1E6FD3"
+  },
+  "raw_custody": "build/tmp/mir5-cryogenic-native-f210-r02",
+  "preserved_cryogenic_research": [
+    "recipe-prod-research_advanced_circuit-1",
+    "recipe-prod-research_agricultural_growth_speed-1",
+    "recipe-prod-research_artificial_soil-1",
+    "recipe-prod-research_bacteria_cultivation-1",
+    "recipe-prod-research_batteries-1",
+    "recipe-prod-research_belts-1",
+    "recipe-prod-research_bioflux-1",
+    "recipe-prod-research_breeding-1",
+    "recipe-prod-research_bullets-1",
+    "recipe-prod-research_cannon_shooting_speed-1",
+    "recipe-prod-research_capture_robot_rockets-1",
+    "recipe-prod-research_carbon-1",
+    "recipe-prod-research_carbon_fiber-1",
+    "recipe-prod-research_cargo_bay_unloading_distance-1",
+    "recipe-prod-research_cargo_landing_pad_count-1",
+    "recipe-prod-research_character_crafting_speed-1",
+    "recipe-prod-research_character_mining_speed-1",
+    "recipe-prod-research_character_reach-1",
+    "recipe-prod-research_character_walking_speed-1",
+    "recipe-prod-research_concrete-1",
+    "recipe-prod-research_copper-1",
+    "recipe-prod-research_copper_cable-1",
+    "recipe-prod-research_electric_energy-1",
+    "recipe-prod-research_electric_engine-1",
+    "recipe-prod-research_electric_shooting_speed-1",
+    "recipe-prod-research_electronic_circuit-1",
+    "recipe-prod-research_engine-1",
+    "recipe-prod-research_explosives-1",
+    "recipe-prod-research_flamethrower_shooting_speed-1",
+    "recipe-prod-research_flying_robot_frame-1",
+    "recipe-prod-research_furnace-1",
+    "recipe-prod-research_gears-1",
+    "recipe-prod-research_grenades-1",
+    "recipe-prod-research_heavy_ammo-1",
+    "recipe-prod-research_holmium-1",
+    "recipe-prod-research_ice-1",
+    "recipe-prod-research_inserters-1",
+    "recipe-prod-research_inventory_capacity-1",
+    "recipe-prod-research_iron-1",
+    "recipe-prod-research_iron_sticks-1",
+    "recipe-prod-research_landfill-1",
+    "recipe-prod-research_lithium-1",
+    "recipe-prod-research_lubricant_productivity-1",
+    "recipe-prod-research_mining_drill-1",
+    "recipe-prod-research_modules-1",
+    "recipe-prod-research_molten_metals-1",
+    "recipe-prod-research_nutrients-1",
+    "recipe-prod-research_oil_cracking_productivity-1",
+    "recipe-prod-research_oil_processing_productivity-1",
+    "recipe-prod-research_platform-1",
+    "recipe-prod-research_quantum_processor-1",
+    "recipe-prod-research_rails-1",
+    "recipe-prod-research_robot_battery-1",
+    "recipe-prod-research_rocket_shooting_speed-1",
+    "recipe-prod-research_rockets-1",
+    "recipe-prod-research_science_pack_productivity-1",
+    "recipe-prod-research_spoilage_preservation-1",
+    "recipe-prod-research_sulfur-1",
+    "recipe-prod-research_sulfuric_acid_productivity-1",
+    "recipe-prod-research_supercapacitor-1",
+    "recipe-prod-research_superconductor-1",
+    "recipe-prod-research_thruster_fuel_productivity-1",
+    "recipe-prod-research_thruster_oxidizer_productivity-1",
+    "recipe-prod-research_tungsten-1",
+    "recipe-prod-research_walls-1"
+  ],
+  "preserved_count": 65,
+  "native_owner_unit": {
+    "count": 1,
+    "time": 1,
+    "ingredients": [
+      [
+        "mir5-cryogenic-native-science",
+        1
+      ]
+    ]
+  },
+  "native_owner_prerequisites": [
+    "cryogenic-plant"
+  ],
+  "resource_source_preserved": true,
+  "library_controls_restored": true,
+  "memory_budget_basis": {
+    "kind": "MIR5NativeCaptureBudgetBasisV1",
+    "purpose": "One same-engine Space Age data-only capture plus a two-prototype fixture",
+    "prior_exact_observations": [
+      {
+        "path": "spec/mir5/evidence/product-targets-space-age-f210-native.json",
+        "sha256": "64DCD85C30F919D06FE79C6B8E3853DF946931E148C33D40E34890189C3EDD03",
+        "engine_sha256": "FE4A1DA30F322A0D0B8AEB3DF7276332222BAAA143E2352569B723E84B2B9060",
+        "peak_working_set_bytes": 552525824,
+        "peak_sampled_private_bytes": 551047168
+      },
+      {
+        "path": "spec/mir5/evidence/science-space-age-f210-native.json",
+        "sha256": "5DCCF1A8C328B2768BBD8D6415870DD81F6F89F884BED4E0D32FF4673967D360",
+        "engine_sha256": "FE4A1DA30F322A0D0B8AEB3DF7276332222BAAA143E2352569B723E84B2B9060",
+        "peak_working_set_bytes": 533729280,
+        "peak_sampled_private_bytes": 532140032
+      }
+    ],
+    "estimated_peak_memory_mib": 768,
+    "observed_max_mib": 526.9296875,
+    "reason": "768MiB retains over45percent headroom above both observed peaks; fixture adds one native tool and one resource. This changes the declared task estimate, not governor reserves/watchdog/admission. If actual usage exceeds estimate, retain failure and revise from evidence.",
+    "prior_refusal": "The generic1024MiB capture estimate was refused for commit headroom before launch. No native sample/result exists for that refusal.",
+    "native_execution": false,
+    "release_qualification": false
+  },
+  "actual_peak_working_set_bytes": 550408192,
+  "actual_peak_sampled_private_bytes": 550473728,
+  "limits": [
+    "Representative failure class, not the unknown reporter modpack.",
+    "Data-stage observation only: no lab gameplay, earned-state upgrade, multiplayer, menu performance or final release qualification."
+  ],
+  "native_execution": true,
+  "release_qualification": false
+}

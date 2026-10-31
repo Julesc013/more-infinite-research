@@ -1,0 +1,285 @@
+{
+  "schema": 1,
+  "kind": "MIRPublished473F110F210NativeChainV1",
+  "status": "passed-exact-native-functional-case-root-and-independent-readback",
+  "source_commit": "b2e9243dacf8c10f623fe90ddac957329fbf1d9e",
+  "packet": {
+    "path": "D:/Projects/Factorio/more-infinite-research/build/qualification/published473-f110-f210-native-r01-controller/packet.json",
+    "bytes": 9507,
+    "sha256": "A804461E0BB850FDDD90D532192B9626BD08A1C2E37EB9A6B8A8FEABBC051815"
+  },
+  "caller": {
+    "path": "D:/Projects/Factorio/more-infinite-research/build/qualification/published473-f110-f210-native-r01-controller/Invoke-Owned.ps1",
+    "bytes": 17020,
+    "sha256": "5D240B1C298AFEA54C9AF150B9EE9930704E22B94A9EFC9FCAE1D58EA1AE6091"
+  },
+  "engine": {
+    "path": "D:/Games/Factorio/2.1/bin/x64/factorio.exe",
+    "bytes": 49398736,
+    "sha256": "8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38"
+  },
+  "profile": {
+    "path": "D:/Projects/Factorio/mir5-api-boundary-f210-native-r01/tests/profiles/published473-f110-f210-support-exports-base-r01.json",
+    "bytes": 1453,
+    "sha256": "B473BABB93A54857ADE9E3773668F9F17E13CC2A1AD0EE198CB0D70360EB62C6",
+    "repo": "D:/Projects/Factorio/mir5-api-boundary-f210-native-r01",
+    "commit": "b2e9243dacf8c10f623fe90ddac957329fbf1d9e",
+    "relative_path": "tests/profiles/published473-f110-f210-support-exports-base-r01.json"
+  },
+  "candidate": {
+    "path": "D:/Projects/Factorio/more-infinite-research/build/packages/support-exports-all17-r01/more-infinite-research_5.0.21000.zip",
+    "bytes": 696972,
+    "sha256": "B63743C36432E4C41CC0F56D5A48CABE81924D426EF11045095A9D5ED0430D7B"
+  },
+  "protected_source": {
+    "path": "D:/Projects/Factorio/more-infinite-research/build/mir5/recovery-historical/f110-f200-transition-published-f110-source-r05/native-output/write-data/saves/mir5-native-complete.zip",
+    "bytes": 821571,
+    "sha256": "D524AA78440F242B179A1E9BC40BF89B87C1A66E99F64C14D3250DEAEBB69253"
+  },
+  "fixture": {
+    "role": "f110-f210-successor",
+    "name": "mir-fixture-mir5-f110-f200-transition",
+    "version": "0.4.0",
+    "source_commit": "cb45d0326404fc3cbd0617fdb7d7095001aa7899",
+    "source_directory": "D:/Projects/Factorio/mir5-api-boundary-f210-native-r01/build/qualification/published473-f110-f210-native-r01-inputs/source",
+    "members": [
+      {
+        "source_commit": "cb45d0326404fc3cbd0617fdb7d7095001aa7899",
+        "source": "tests/fixtures/f110-f200-transition/f210/successor/catalogue.lua",
+        "destination": "catalogue.lua",
+        "bytes": 892,
+        "sha256": "541F5C73F77D46C9272C9692E167D2FAC52AEAF28B33D42712A7310907664E83"
+      },
+      {
+        "source_commit": "cb45d0326404fc3cbd0617fdb7d7095001aa7899",
+        "source": "tests/fixtures/f110-f200-transition/f210/successor/control.lua",
+        "destination": "control.lua",
+        "bytes": 69,
+        "sha256": "241F2A3287C9FCF7C32C0A1C85553E1D3FEC674234CFD1FB1809FFE0D2D12A35"
+      },
+      {
+        "source_commit": "cb45d0326404fc3cbd0617fdb7d7095001aa7899",
+        "source": "tests/fixtures/f110-f200-transition/f210/successor/data-final-fixes.lua",
+        "destination": "data-final-fixes.lua",
+        "bytes": 1657,
+        "sha256": "1FE25258DC1DCC683C88A6EF065C800E042970AA3C7FF7F9F24BD3B474627921"
+      },
+      {
+        "source_commit": "cb45d0326404fc3cbd0617fdb7d7095001aa7899",
+        "source": "tests/fixtures/f110-f200-transition/shared/control.lua",
+        "destination": "fixture_control.lua",
+        "bytes": 23531,
+        "sha256": "EBC76313FB0E8A106DDF7291F3117C1EE15F042B021EB24A6BCB4BED11231149"
+      },
+      {
+        "source_commit": "cb45d0326404fc3cbd0617fdb7d7095001aa7899",
+        "source": "tests/fixtures/f110-f200-transition/shared/data-final-fixes.lua",
+        "destination": "fixture_data_final.lua",
+        "bytes": 233,
+        "sha256": "7800724E366BB792AA4EDA0CE834C943463A83AA439D91F6B2A1F2D900ED6426"
+      },
+      {
+        "source_commit": "cb45d0326404fc3cbd0617fdb7d7095001aa7899",
+        "source": "tests/fixtures/f110-f200-transition/f210/successor/info.json",
+        "destination": "info.json",
+        "bytes": 391,
+        "sha256": "FC0DF3EA5B4E82D18C395367A9BA17AF9292D9472565472622298F00B20C51A5"
+      },
+      {
+        "source_commit": "cb45d0326404fc3cbd0617fdb7d7095001aa7899",
+        "source": "tests/fixtures/f110-f200-transition/f210/successor/settings-updates.lua",
+        "destination": "settings-updates.lua",
+        "bytes": 152,
+        "sha256": "1B70E46CD61363FA15BEFC179124E14A4355A659BFE72FEBA6B93D69C279458C"
+      }
+    ],
+    "archive": {
+      "path": "D:/Projects/Factorio/more-infinite-research/build/qualification/published473-f110-f210-native-r01-controller/mir-fixture-mir5-f110-f200-transition_0.4.0.zip",
+      "bytes": 8274,
+      "sha256": "F0F852BCC4F48F12DDA0792B36828497C1CCDDF11FF216C3CAEFA16A7A21E49C"
+    }
+  },
+  "mode": "Direct endpoint first; no historical/create-only/source-seed/observer modes. A real engine format refusal alone permits separate bridge preparation.",
+  "native_processes": 3,
+  "native_process_ids": [
+    47184,
+    58592,
+    32040
+  ],
+  "new_laboratory_completions": 1,
+  "source_laboratory_completions_reused_once": 1,
+  "source_seeded_rows": 16,
+  "retained_rows": 17,
+  "bridge_used": false,
+  "actual_initial_witness": {
+    "case": "f110-f200-transition",
+    "stage": "initial",
+    "status": "passed",
+    "source_direct_lab_completions": 1,
+    "successor_direct_lab_completions": 1,
+    "seeded_catalogue_rows": 16,
+    "retained_catalogue_rows": 17,
+    "queued_progress": 0.42,
+    "suspended_progress": 0.27,
+    "foreign_disabled": true,
+    "inserter_stack_size_bonus": 2,
+    "bulk_inserter_capacity_bonus": 4,
+    "target": "f210",
+    "base_version": "2.1.23",
+    "origin": "published-f110-4.7.11003",
+    "on_load_read_only": false
+  },
+  "actual_cold_witnesses": [
+    {
+      "case": "f110-f200-transition",
+      "stage": "reload",
+      "status": "passed",
+      "source_direct_lab_completions": 1,
+      "successor_direct_lab_completions": 1,
+      "seeded_catalogue_rows": 16,
+      "retained_catalogue_rows": 17,
+      "queued_progress": 0.42,
+      "suspended_progress": 0.27,
+      "foreign_disabled": true,
+      "inserter_stack_size_bonus": 2,
+      "bulk_inserter_capacity_bonus": 4,
+      "target": "f210",
+      "base_version": "2.1.23",
+      "origin": "published-f110-4.7.11003",
+      "on_load_read_only": true
+    },
+    {
+      "case": "f110-f200-transition",
+      "stage": "reload",
+      "status": "passed",
+      "source_direct_lab_completions": 1,
+      "successor_direct_lab_completions": 1,
+      "seeded_catalogue_rows": 16,
+      "retained_catalogue_rows": 17,
+      "queued_progress": 0.42,
+      "suspended_progress": 0.27,
+      "foreign_disabled": true,
+      "inserter_stack_size_bonus": 2,
+      "bulk_inserter_capacity_bonus": 4,
+      "target": "f210",
+      "base_version": "2.1.23",
+      "origin": "published-f110-4.7.11003",
+      "on_load_read_only": true
+    }
+  ],
+  "queued_progress": 0.42,
+  "suspended_progress": 0.27,
+  "foreign_disabled": true,
+  "inserter_capacity": 2,
+  "bulk_inserter_capacity": 4,
+  "new_mining_total_effect": 0.1,
+  "completed_save": {
+    "sha256": "B60A5F0F1147CB4AEFB3C55572FFC5F360BC2B8C00455F8CDE570B5EEB021202",
+    "bytes": 819069,
+    "crc_entries": 57,
+    "cold_reloads": 2,
+    "both_reload_bytes_unchanged": true
+  },
+  "protected_source_crc_entries": 57,
+  "protected_source_unchanged": true,
+  "custody": {
+    "native": {
+      "files": 19,
+      "bytes": 941045,
+      "original_and_copy_rehashed": true
+    },
+    "controller": {
+      "files": 2,
+      "bytes": 569560,
+      "original_and_copy_rehashed": true
+    }
+  },
+  "root_readback": {
+    "path": "D:/Projects/Factorio/more-infinite-research/build/qualification/published473-f110-f210-native-r01-controller/native-root-readback.json",
+    "bytes": 2989,
+    "sha256": "B60716CEF08BEE8E5C644D2C57FCC956A28679336FBD0FC70AB3E0EDE2A23543"
+  },
+  "root_reader": {
+    "path": "D:/Projects/Factorio/more-infinite-research/build/qualification/read-published473-f110-f210-native-r01.py",
+    "bytes": 5822,
+    "sha256": "A98FE5E81FAED1D0E3F943BF0E8418088607D955A390C4BD89F00B7016703B28"
+  },
+  "terminal_sha256": "8BC1375C6158E242D131D8F069854869AF498C12B6F347BFEDED4DF680BC4F74",
+  "public_runner_status": "passed-private-native-fixture",
+  "controller_exit_code": 0,
+  "controller_exception": null,
+  "actual_process_exit_codes": [
+    -1,
+    0,
+    0
+  ],
+  "production_completion_predicate_observed": true,
+  "original_library_states_restored": 5,
+  "factorio_processes_after": 0,
+  "receipt_capsule": {
+    "path": "spec/evidence/published473-f110-f210-native-receipts-r01.json.gz",
+    "bytes": 49256,
+    "sha256": "CF4979E7397CB0B29F631DC515A99A7B1CD3290C88253F3DA202B22B9F2C3488",
+    "bodies": 28
+  },
+  "omitted_private_native_members": [
+    {
+      "relative_path": "config.ini",
+      "bytes": 278,
+      "sha256": "57B64B3C7A3AA42E711B57CA29535CE5502C5D30D27EF50FE5B3F3C21CBF249B"
+    },
+    {
+      "relative_path": "server-settings.json",
+      "bytes": 3679,
+      "sha256": "2FB3E97FE934B92B6C4CCC2403A90A16C357BEC9183E9BC7E550822AC57504E4"
+    },
+    {
+      "relative_path": "write-data/player-data.json",
+      "bytes": 10851,
+      "sha256": "285ED61F8778CFF44FA173F8EDCC5E417F4DF8C1019A3DDD02814729CEE56EF9"
+    },
+    {
+      "relative_path": "write-data/saves/mir5-native-complete.zip",
+      "bytes": 819069,
+      "sha256": "B60A5F0F1147CB4AEFB3C55572FFC5F360BC2B8C00455F8CDE570B5EEB021202"
+    }
+  ],
+  "controls": {
+    "public_fixture": 7,
+    "public_runner": 5,
+    "private_caller_cases": 6,
+    "actual_retained_postguard_positive_runs": 4,
+    "postguard_adverse_variants": 3,
+    "helper_exact_reuse": "65C8F23A4D9AA872CF0D6BD2BCCC35960162B358E1B87465303BF5658FEE2356"
+  },
+  "prelaunch_guard_note": "An initial root process-list check matched its own PowerShell command text and refused before caller/staging/native. Excluding the current PID passes the same frozen-member readback and VerifyOnly; the packet/caller and all native inputs remain unchanged.",
+  "limits": [
+    "One direct protected published4.7.3 F110 to B F210 Base journey only;no intermediate engine/MIR bridge was needed.",
+    "Sixteen source rows were explicitly fixture-seeded and one source mining lab was already earned;count that original lab once. This successor adds one actual lab and two read-only cold reloads.",
+    "The production process uses its documented supervised closed-save completion stop (exit-1,predicateobserved);both cold processes exit0.",
+    "All original/copied saves,prior archives,player-data and configuration remain locally retained;the public capsule contains only the28 explicitly selected text bodies.",
+    "No F100-origin route,arbitrary DLC/provider/settings combination,real-player imported earnings,GUI/input,performance or release verdict follows."
+  ],
+  "performance_acceptance": false,
+  "release_qualification": false,
+  "independent_actual_data_review": {
+    "reviewer": "/root/review_pending_evidence",
+    "mode": "read-only exact actual-data review",
+    "verdict": "PASS for this named direct route only",
+    "native_source_and_copy_members": 19,
+    "native_bytes_per_copy": 941045,
+    "controller_preterminal_members": 2,
+    "controller_preterminal_bytes_per_copy": 569560,
+    "process_ids": [
+      47184,
+      58592,
+      32040
+    ],
+    "protected_source_sha_and_crc_verified": true,
+    "successor_sha_and_crc_verified": true,
+    "both_cold_reload_bytes_unchanged": true,
+    "restoration_and_factorio_zero_verified": true,
+    "github_approval": false,
+    "performance_or_release_verdict": false
+  }
+}

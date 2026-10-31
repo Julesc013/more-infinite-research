@@ -1,0 +1,162 @@
+{
+  "schema": 1,
+  "kind": "MIRPublishedOriginArchiveReadbackV1",
+  "scope": "Exact official3.2.0 and3.2.1 release ZIP bytes verified against official GitHub asset digests and inspected without extracting, repackaging or executing. Runtime and migration member bytes are compared to their exact tags; archive recovery does not qualify native source saves, API behavior or migration.",
+  "archives": [
+    {
+      "tag": "3.2.0",
+      "source_commit": "c8f3d8248cc89b8636cf1ee485fd8889422c6124",
+      "archive_path": "build/qualification/migration-origins/f210-discovery-origin-archives-r01/inputs/more-infinite-research_3.2.0.zip",
+      "archive_sha256": "35372EE6D16DA6765E8C30AEAAF5DA4A5D300F02C0A0A03648C80893A5394F32",
+      "archive_bytes": 1029464,
+      "official_asset_url": "https://github.com/Julesc013/more-infinite-research/releases/download/3.2.0/more-infinite-research_3.2.0.zip",
+      "official_asset_id": 489486059,
+      "official_asset_digest": "sha256:35372ee6d16da6765e8c30aeaaf5da4a5d300f02c0a0a03648c80893a5394f32",
+      "archive_root": "more-infinite-research_3.2.0",
+      "info": {
+        "name": "more-infinite-research",
+        "version": "3.2.0",
+        "title": "More Infinite Research",
+        "author": "Julesc013",
+        "description": "Adds configurable infinite productivity and bonus researches for intermediates, logistics, combat, player bonuses, and Space Age gaps.",
+        "factorio_version": "2.1",
+        "dependencies": [
+          "base >= 2.1.11",
+          "(?) elevated-rails",
+          "? recycler >= 2.1.11",
+          "(?) quality",
+          "(?) Krastorio2",
+          "(?) Krastorio2-spaced-out",
+          "(?) space-exploration",
+          "? space-age >= 2.1.11"
+        ]
+      },
+      "player_members": 290,
+      "control_lua_present": true,
+      "migrations": [
+        "migrations/more-infinite-research_2.0.5.json",
+        "migrations/more-infinite-research_2.1.0.json"
+      ],
+      "tag_member_byte_differences": [],
+      "archive_members_missing_from_tag": [],
+      "selected_runtime_and_migration_members": [
+        {
+          "path": "control.lua",
+          "sha256": "91EC8A63FFEC27AACDDC9F6EC841A64E782EA923214AC5FB37C367A716E4ACE9",
+          "bytes": 46,
+          "tag_blob": "e2aa90fa4bc0b96f9f6d6d667f6dd6f5a7265758",
+          "equals_tag": true
+        },
+        {
+          "path": "migrations/more-infinite-research_2.0.5.json",
+          "sha256": "07A2759B963321A87B1047029AE426C7B2784033BC7C4F899D2640C037C5EEE2",
+          "bytes": 142,
+          "tag_blob": "014ca09a8864fab28275dafcf02f0295c8cac229",
+          "equals_tag": true
+        },
+        {
+          "path": "migrations/more-infinite-research_2.1.0.json",
+          "sha256": "F427B215D77BC86608010ADC1D0D1A1C98BE61F0D7140EF716D77E46DAB8092D",
+          "bytes": 125,
+          "tag_blob": "0faf1db024013eab38164432037b51c37d052f00",
+          "equals_tag": true
+        },
+        {
+          "path": "prototypes/mir/runtime/scripted_techs.lua",
+          "sha256": "796EEACD4E50D575520EA4DBDE1E1F55E61618858B962DAE588FE6E3AFAC2E8C",
+          "bytes": 2536,
+          "tag_blob": "09d7a0c0c1cbd46b764022517d2794d76a66e3db",
+          "equals_tag": true
+        },
+        {
+          "path": "prototypes/mir/stage/control.lua",
+          "sha256": "F672C7C05F7AE0F916A08FF501DB841A2BB513B9358852BA641C9BB7DC04C0F3",
+          "bytes": 752,
+          "tag_blob": "94c9dc0cbe2c2bddfd967d8b95dcd2c16379b156",
+          "equals_tag": true
+        }
+      ],
+      "native_status": "not_run"
+    },
+    {
+      "tag": "3.2.1",
+      "source_commit": "666bf1c24795036e934db2d31ae93b84b2e4cacf",
+      "archive_path": "build/qualification/migration-origins/f210-discovery-origin-archives-r01/inputs/more-infinite-research_3.2.1.zip",
+      "archive_sha256": "4CE24BE8550CB76EADC2B076747277025E9FD3E7BAAE3E4A996EDD36F78005A6",
+      "archive_bytes": 1029716,
+      "official_asset_url": "https://github.com/Julesc013/more-infinite-research/releases/download/3.2.1/more-infinite-research_3.2.1.zip",
+      "official_asset_id": 490413244,
+      "official_asset_digest": "sha256:4ce24be8550cb76eadc2b076747277025e9fd3e7baae3e4a996edd36f78005a6",
+      "archive_root": "more-infinite-research_3.2.1",
+      "info": {
+        "name": "more-infinite-research",
+        "version": "3.2.1",
+        "title": "More Infinite Research",
+        "author": "Julesc013",
+        "description": "Adds configurable infinite productivity and bonus researches for intermediates, logistics, combat, player bonuses, and Space Age gaps.",
+        "factorio_version": "2.1",
+        "dependencies": [
+          "base >= 2.1.8",
+          "(?) elevated-rails",
+          "? recycler >= 2.1.8",
+          "(?) quality",
+          "(?) Krastorio2",
+          "(?) Krastorio2-spaced-out",
+          "(?) space-exploration",
+          "? space-age >= 2.1.8"
+        ]
+      },
+      "player_members": 290,
+      "control_lua_present": true,
+      "migrations": [
+        "migrations/more-infinite-research_2.0.5.json",
+        "migrations/more-infinite-research_2.1.0.json"
+      ],
+      "tag_member_byte_differences": [],
+      "archive_members_missing_from_tag": [],
+      "selected_runtime_and_migration_members": [
+        {
+          "path": "control.lua",
+          "sha256": "91EC8A63FFEC27AACDDC9F6EC841A64E782EA923214AC5FB37C367A716E4ACE9",
+          "bytes": 46,
+          "tag_blob": "e2aa90fa4bc0b96f9f6d6d667f6dd6f5a7265758",
+          "equals_tag": true
+        },
+        {
+          "path": "migrations/more-infinite-research_2.0.5.json",
+          "sha256": "07A2759B963321A87B1047029AE426C7B2784033BC7C4F899D2640C037C5EEE2",
+          "bytes": 142,
+          "tag_blob": "014ca09a8864fab28275dafcf02f0295c8cac229",
+          "equals_tag": true
+        },
+        {
+          "path": "migrations/more-infinite-research_2.1.0.json",
+          "sha256": "F427B215D77BC86608010ADC1D0D1A1C98BE61F0D7140EF716D77E46DAB8092D",
+          "bytes": 125,
+          "tag_blob": "0faf1db024013eab38164432037b51c37d052f00",
+          "equals_tag": true
+        },
+        {
+          "path": "prototypes/mir/runtime/scripted_techs.lua",
+          "sha256": "796EEACD4E50D575520EA4DBDE1E1F55E61618858B962DAE588FE6E3AFAC2E8C",
+          "bytes": 2536,
+          "tag_blob": "09d7a0c0c1cbd46b764022517d2794d76a66e3db",
+          "equals_tag": true
+        },
+        {
+          "path": "prototypes/mir/stage/control.lua",
+          "sha256": "F672C7C05F7AE0F916A08FF501DB841A2BB513B9358852BA641C9BB7DC04C0F3",
+          "bytes": 752,
+          "tag_blob": "94c9dc0cbe2c2bddfd967d8b95dcd2c16379b156",
+          "equals_tag": true
+        }
+      ],
+      "native_status": "not_run"
+    }
+  ],
+  "limits": [
+    "These are immutable published originals, not reconstructions from their tags.",
+    "No Factorio process was launched and no test-library control or archive was changed.",
+    "The direct MIR3.2 discovery-recovery routes still require source saves, candidate execution, saved successors and two cold reloads."
+  ]
+}

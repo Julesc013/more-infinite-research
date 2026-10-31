@@ -1,0 +1,34 @@
+{
+  "schema": 1,
+  "kind": "MIR5CompetingFixedGameplayInputAdverseChainV1",
+  "runs": [
+    {
+      "id": 40024007221,
+      "url": "https://github.com/Julesc013/mir-native-worker/actions/runs/40024007221",
+      "manifest_members_verified": 97,
+      "custody": "build/mir5/black-glass/incoming/40024007221/black-glass-competing-fixed-gameplay-40024007221-1",
+      "cases": [
+        {
+          "path": "gameplay/published/result.json",
+          "status": "failed",
+          "source": "c0044a92ff248ed271202d5bfc8c10f1b6e992a0",
+          "receipt": {
+            "gzip": "spec/mir5/evidence/competing-fixed-gameplay-input-adverse-40024007221-gameplay-published-native.json.gz",
+            "uncompressed_sha256": "2E0C97B397CB10562E47DA2CCC03ECC4D135533FFC7D47FBE0CC736449D5A737"
+          },
+          "native_log": {
+            "gzip": "spec/mir5/evidence/competing-fixed-gameplay-input-adverse-40024007221-gameplay-published-factorio.log.gz",
+            "uncompressed_sha256": "740DC47EAEA86C0C6ABE53A5674263DC2199234916A39940CD6C7C2E84C15178"
+          }
+        }
+      ]
+    }
+  ],
+  "scope": [
+    "Published predecessor fixture failed its earned automation-science bonus assertion before any MIR5 upgrade.",
+    "The fixture measured its baseline before prerequisite completion; those prerequisites independently earn finite science bonuses.",
+    "The changed fixture measures the baseline after all player prerequisites. Product expectations and four required actual lab completions remain unchanged.",
+    "No MIR5 gameplay or preservation result is established by this failed run."
+  ],
+  "release_qualification": false
+}

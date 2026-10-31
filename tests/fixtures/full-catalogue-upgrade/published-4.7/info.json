@@ -1,0 +1,15 @@
+{
+  "name": "mir-fixture-mir5-full-catalogue-upgrade",
+  "version": "0.1.0",
+  "title": "MIR 5 private full catalogue published seed",
+  "author": "MIR maintainers",
+  "description": "Disposable F200 4.7.2 full catalogue seed for one MIR5 upgrade scenario; not player content.",
+  "factorio_version": "2.0",
+  "dependencies": [
+    "base = 2.0.77",
+    "? elevated-rails = 2.0.77",
+    "? quality = 2.0.77",
+    "? space-age = 2.0.77",
+    "more-infinite-research = 4.7.20002"
+  ]
+}

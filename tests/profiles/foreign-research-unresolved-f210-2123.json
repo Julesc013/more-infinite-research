@@ -1,0 +1,43 @@
+{
+  "schema": 1,
+  "kind": "mir5-foreign-research-unresolved-startup",
+  "target": "f210",
+  "factorio_line": "2.1",
+  "engine": {
+    "version": "2.1.23",
+    "sha256": "FE4A1DA30F322A0D0B8AEB3DF7276332222BAAA143E2352569B723E84B2B9060"
+  },
+  "settings_mode": "Defaults",
+  "mods": [
+    {
+      "name": "base",
+      "version": "2.1.23",
+      "enabled": true
+    },
+    {
+      "name": "more-infinite-research",
+      "version": "5.0.21000",
+      "enabled": true
+    },
+    {
+      "name": "mir-fixture-mir5-foreign-research-preservation",
+      "version": "0.3.0",
+      "enabled": true
+    }
+  ],
+  "fixture": {
+    "root": "tests/fixtures/foreign-research-preservation/successor-unresolved",
+    "included_members": [
+      "info.json",
+      "data.lua",
+      "data-updates.lua",
+      "data-final-fixes.lua",
+      "control.lua"
+    ]
+  },
+  "case": "SCI-RESEARCH-01-unresolved",
+  "consumer_markers": [
+    "MIR5_FOREIGN_UNRESOLVED"
+  ],
+  "scope": "Prepared CreateOnly representative startup/data case with foreign Space-Lab-Research-61/62 and a declared science item without its fixture producer. No exact reporter, researchability, effects-earned, save-upgrade/reload, multiplayer or release acceptance."
+}

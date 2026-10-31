@@ -120,9 +120,10 @@ try {
   $futureWorktree = (& $checker -RepoRoot $fixture -Mode Hook -AsJson -OldWorktreeDays 7 -NowUtc ([datetime]'2026-11-27T00:00:00Z') | ConvertFrom-Json -Depth 16)
   if (@($futureWorktree.git.worktrees.rows | Where-Object { -not $_.current -and $_.review_needed }).Count -ne 1 -or @($futureWorktree.checkpoint_reasons | Where-Object { $_ -match '^worktrees:review-' }).Count -ne 1) { throw '[mir-development-health-old-worktree-checkpoint]' }
   if (@($report.actions | Where-Object { $_.command -match 'Remove-Item|git clean|worktree remove|branch -D' }).Count -ne 0) { throw '[mir-development-health-unsafe-action]' }
-  if (@($report.actions | Where-Object kind -ceq 'safe-storage-audit').Count -ne 1) { throw '[mir-development-health-named-cleanup-authority]' }
+  $auditAction = @($report.actions | Where-Object kind -ceq 'safe-storage-audit')
+  if ($auditAction.Count -ne 1 -or [string]$auditAction[0].command -cne '.\\tools\\commands\\workspace\\Remove-MIRStaleArtifacts.ps1 -RepoRoot . -AllWorktrees -OlderThanDays 7 -PassThru' -or [bool]$auditAction[0].automatic) { throw '[mir-development-health-named-cleanup-authority]' }
   $cleanAction = @($report.actions | Where-Object kind -ceq 'safe-storage-clean-after-audit')
-  if ($cleanAction.Count -ne 1 -or [string]$cleanAction[0].command -notmatch 'storage clean .* --apply$' -or [bool]$cleanAction[0].automatic) { throw '[mir-development-health-explicit-cleanup]' }
+  if ($cleanAction.Count -ne 1 -or [string]$cleanAction[0].command -cne '.\\tools\\commands\\workspace\\Remove-MIRStaleArtifacts.ps1 -RepoRoot . -AllWorktrees -OlderThanDays 7 -Apply' -or [bool]$cleanAction[0].automatic) { throw '[mir-development-health-explicit-cleanup]' }
   if ([IO.File]::ReadAllText((Join-Path $fixture 'tracked.txt')) -cne $trackedBefore -or [IO.File]::ReadAllText((Join-Path $linked 'linked-uncommitted.txt')) -cne $linkedBefore) { throw '[mir-development-health-report-mutated-worktree]' }
 
   $hookReport = (& $checker -RepoRoot $fixture -Mode Hook -AsJson -MaxScanSeconds 60 -MaxEntriesPerRoot 100000 -MaxWorktrees 128 -MaxBranches 512 -NowUtc ([datetime]'2026-09-27T00:00:00Z') | ConvertFrom-Json -Depth 16)

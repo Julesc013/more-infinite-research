@@ -1,0 +1,177 @@
+{
+  "schema": 1,
+  "kind": "MIRF200NativeNamesPrivateCreditNativeChainV1",
+  "status": "passed-named-current-f200-functional-and-rendered-case",
+  "source_commit": "9995b64d0ca08240a44cb1e5bd4f40ff5bba19f6",
+  "candidate": {
+    "source_commit": "a95dbc6b35c165b46aa9991d2a0ef7274d4ec04a",
+    "version": "5.0.20000",
+    "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\packages\\7b0-all17-r01\\more-infinite-research_5.0.20000.zip",
+    "sha256": "1D45A54DB6F911F665A019897518E46D6614AE7E56903B067F93E116DFC2554F",
+    "bytes": 692743,
+    "player_tree": "7b0ede663e6fbcf486cd863e7d3719653aedc07a"
+  },
+  "engine": {
+    "version": "2.0.77",
+    "path": "D:/Games/Factorio/2.0/bin/x64/factorio.exe",
+    "sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B"
+  },
+  "profile": {
+    "path": "tests/profiles/library-private-credits-current-f200-2077.json",
+    "sha256": "41CC64C317772C9837CE241960B54113BCCE7F4DA2ECD26BA94A971B509073AA"
+  },
+  "prepared_input_record": {
+    "path": "spec/evidence/library-f200-private-credits-prepared-inputs-r02.json",
+    "sha256": "A6FE2835808BE0898450C9B36ACB35E867CB83D0279DE238A3D67CCCB4DEE3B4"
+  },
+  "private_controller": {
+    "commit": "485b496e4bc7c8bb2456159a4fafc881172e322d",
+    "driver_sha256": "5BB8C97EB0E111EA297277CEA49A95B8BC9F8B18406A1374D9167A3B65300D2C",
+    "file": "Invoke-F200LibraryPrivateCredits.ps1"
+  },
+  "packet": {
+    "primary_custody": "build/qualification/library-f200-private-native-names-r01-controller",
+    "sha256": "9D5DABD14B412880D00284BF63C266F6C93C5FA906C7D8F4D3F8F385ACC314FF"
+  },
+  "prepared_sha256": "30FF06E30F70BF02BAD3CCB4290913C7D8DC6C39B790A85D77DE4FB49D0E555B",
+  "raw_native_result_sha256": "80A78483411916C5B0D21D13C0833644A59F96D2D7B89E71DCB6563A07A6A7AA",
+  "root_readback": {
+    "path": "build/qualification/library-f200-private-native-names-r01-controller/root-readback.json",
+    "sha256": "66712FA5B9329C348DEC5C8ACBF932AF1211AF91F64EB13038721090968618DF",
+    "reader_sha256": "922C257520F372953B7D5D38796570A9CEF78ACB20528F13B38F9E83478F6947",
+    "files": 211,
+    "bytes_per_copy": 19890031
+  },
+  "receipt_capsule": {
+    "path": "spec/evidence/library-f200-native-names-private-native-receipts-r01.json.gz",
+    "sha256": "4300C7F6667447EE249DBCB9D91629A5D3FE81D2BC2C2B8E80AC18A38EBE2E68",
+    "bytes": 74987,
+    "bodies": 19,
+    "round_trip": "All original exact bodies verified;all9 actual native stdout logs included;two native RCON argument literals already private placeholders;zero unparsed/unredacted arguments."
+  },
+  "counts": {
+    "native_processes": 9,
+    "worlds": 1,
+    "two_real_client_sessions": 1,
+    "real_laboratory_completions": 2,
+    "actual_join_events": 6,
+    "cold_host_restarts": 1,
+    "screenshots": 10,
+    "api_client_load_phase_witnesses": 6
+  },
+  "verified_behaviors": [
+    "Two genuine accelerated Gear laboratory completions reach level3/native+20%,with actual start/finish/cancel and foreign-force events;ordinary tuning remains separate.",
+    "Four exact private credits are absent from public All/External query/details/action paths;native before/after holder and research/queue/recipe state is unchanged;positive Gear/All and Automation/External controls and personal views survive.",
+    "Both independent API consumers provide actual read-only load-query witnesses on both real EN/DE clients at initial,rejoin,cold-host-restart phases.",
+    "All ten actual1280x720 screenshots pass CRC/decompression and external root inspection. Native localized titles,groups,science/prerequisites render on first-open,settled,rejoin and cold restart."
+  ],
+  "visual_observations": [
+    "All10 actual1280x720 frames inspected. EN gear/DE mining names and science/prerequisite names render in native languages on first open,settled,rejoin and cold-host restart;no rawID fallback in those displayed captions/details.",
+    "Distinct original ID queries/group/order remain;terminal unavailable DLC labels are localized.",
+    "Initial/settled EN achievement toasts obscure part of the details. Rejoin/restart frames show those details unobscured. No broader language quality,scroll/actual keyboard/drag/private positive earnings claim."
+  ],
+  "private_holder_state": "All four begin/end level1,research false,enabled false,visible_when_disabled false;fresh zero-credit case only.",
+  "saves": [
+    {
+      "role": "seed_sha256",
+      "sha256": "7D7AE884D6D33515C4DD7FB1BFF0B0C9A04C14D69290A8D86C6E9E4A7BE360E5",
+      "bytes": 532977
+    },
+    {
+      "role": "restart_save_sha256",
+      "sha256": "ED9A0ECB3C662E8D24763652F68FA93E716B3FA7C543BDF451B020E65645041C",
+      "bytes": 610863
+    },
+    {
+      "role": "final_save_sha256",
+      "sha256": "2E90C86E7084BC679F538F24E8C77A95D33AD582862F80C0EB6DD8292F22E274",
+      "bytes": 615635
+    }
+  ],
+  "screenshots": [
+    {
+      "path": "D:\\Projects\\Factorio\\mir5-legacy-cannon-credit-r01\\build\\tmp\\library-f200-private-native-names-r01\\session\\client-en\\script-output\\mir5-library-multiplayer\\availability-1.png",
+      "sha256": "CF107E7E5DE646716E9D6E6C777FF692E80A5CD8E63B2ADACBAFE1FD950EE9A2",
+      "bytes": 1026065,
+      "crc_and_decompression": true,
+      "externally_inspected": true
+    },
+    {
+      "path": "D:\\Projects\\Factorio\\mir5-legacy-cannon-credit-r01\\build\\tmp\\library-f200-private-native-names-r01\\session\\client-en\\script-output\\mir5-library-multiplayer\\initial-1.png",
+      "sha256": "C197A89B034A9DECBEC0891ED00D26E21EA1F241AA7223483F36C0A8A511FE81",
+      "bytes": 1105223,
+      "crc_and_decompression": true,
+      "externally_inspected": true
+    },
+    {
+      "path": "D:\\Projects\\Factorio\\mir5-legacy-cannon-credit-r01\\build\\tmp\\library-f200-private-native-names-r01\\session\\client-en\\script-output\\mir5-library-multiplayer\\settled-1.png",
+      "sha256": "1F40F5EB14F47A4B6021D5AFEE49F43EE171311E505E3C0EC9897BE22D077D8E",
+      "bytes": 1112039,
+      "crc_and_decompression": true,
+      "externally_inspected": true
+    },
+    {
+      "path": "D:\\Projects\\Factorio\\mir5-legacy-cannon-credit-r01\\build\\tmp\\library-f200-private-native-names-r01\\session\\client-en\\script-output\\mir5-library-multiplayer\\rejoin-1.png",
+      "sha256": "500B5D0BEAC62B9AAE14EF391D9524074B5E44F78FD66FCC53EDD5C821E2E975",
+      "bytes": 1022049,
+      "crc_and_decompression": true,
+      "externally_inspected": true
+    },
+    {
+      "path": "D:\\Projects\\Factorio\\mir5-legacy-cannon-credit-r01\\build\\tmp\\library-f200-private-native-names-r01\\session\\client-en\\script-output\\mir5-library-multiplayer\\restart-1.png",
+      "sha256": "09C3AF3E51C47E4E8E468CF0E65407E23F5DBAAEA905A800019B43897AA656A7",
+      "bytes": 1018335,
+      "crc_and_decompression": true,
+      "externally_inspected": true
+    },
+    {
+      "path": "D:\\Projects\\Factorio\\mir5-legacy-cannon-credit-r01\\build\\tmp\\library-f200-private-native-names-r01\\session\\client-de\\script-output\\mir5-library-multiplayer\\availability-2.png",
+      "sha256": "202F561E10EFB3254A6C900C1B9C02E1F739FB36E03183FB1D5DFC142B3F3831",
+      "bytes": 1034691,
+      "crc_and_decompression": true,
+      "externally_inspected": true
+    },
+    {
+      "path": "D:\\Projects\\Factorio\\mir5-legacy-cannon-credit-r01\\build\\tmp\\library-f200-private-native-names-r01\\session\\client-de\\script-output\\mir5-library-multiplayer\\initial-2.png",
+      "sha256": "87B0375EB700C8EC4874039B72EB0FF20A6D53ADEBACFCC5C9B95836B5262A25",
+      "bytes": 1055355,
+      "crc_and_decompression": true,
+      "externally_inspected": true
+    },
+    {
+      "path": "D:\\Projects\\Factorio\\mir5-legacy-cannon-credit-r01\\build\\tmp\\library-f200-private-native-names-r01\\session\\client-de\\script-output\\mir5-library-multiplayer\\settled-2.png",
+      "sha256": "22F7FEE7BEE6CA544A3D1CA595A35D74057915D99641668269AC0AC992BF07B2",
+      "bytes": 1059283,
+      "crc_and_decompression": true,
+      "externally_inspected": true
+    },
+    {
+      "path": "D:\\Projects\\Factorio\\mir5-legacy-cannon-credit-r01\\build\\tmp\\library-f200-private-native-names-r01\\session\\client-de\\script-output\\mir5-library-multiplayer\\rejoin-2.png",
+      "sha256": "9E840D37EC031C9A032CECD3AB901F7C8E7F9618CBA0115BEA2E54D1898BBCB6",
+      "bytes": 1032227,
+      "crc_and_decompression": true,
+      "externally_inspected": true
+    },
+    {
+      "path": "D:\\Projects\\Factorio\\mir5-legacy-cannon-credit-r01\\build\\tmp\\library-f200-private-native-names-r01\\session\\client-de\\script-output\\mir5-library-multiplayer\\restart-2.png",
+      "sha256": "AFF4BEF85546002300C1A9BB92C679827D9D64B1F4425858ED96C8F3B521588F",
+      "bytes": 1023582,
+      "crc_and_decompression": true,
+      "externally_inspected": true
+    }
+  ],
+  "controls_restored": true,
+  "dependency_payload_bytes_copied": 0,
+  "archive_links_created": 0,
+  "archive_extractions": 0,
+  "limits": [
+    "Fresh0.3 holder state only;no imported historical earnings,persisted private selections or foreign-hidden inspection claim.",
+    "No actual Esc/E/drag input,retained/churn memory,comparative performance,other target/modpack or full API/release acceptance.",
+    "F210 original0.3 native observations keep their exact older source/archive identities. New source broadens only the explicit F200 six-mod admission;ordinary F200 API-only and malformed/unknown inputs still refuse.",
+    "This is F2002.0.77/D3 only;F2102.1.23 and affected paired-performance/rendering preflight retain their own outstanding scope.",
+    "One cold host restart with both clients reconnecting is observed;no claim of two migration cold reloads.",
+    "Visual names in these two selected researched views are qualified;no universal language/third-party translation guarantee."
+  ],
+  "performance_acceptance": false,
+  "release_qualification": false
+}

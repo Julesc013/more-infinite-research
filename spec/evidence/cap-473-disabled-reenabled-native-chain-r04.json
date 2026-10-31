@@ -1,0 +1,231 @@
+{
+  "schema": 1,
+  "kind": "MIRCapDisabledReenableNativeChainV1",
+  "status": "disabled-passed-reenable-enabled-false-release-blocker",
+  "scope": "Exact473 source81AF to current005D/8DC disabled0.6 now saves/reloads; later enabled0.7 fails before newlab/save. One read-only log probe isolates enabledfalse despite enabled settingtrue while all other expected fields match. Preserve every source,successful stage and adverse; no guessed repair or weaker expectation.",
+  "controller_commit": "9c17ab875540e2972fca5ed6bbac344f3d3ddbd7",
+  "candidate_source": "7a2f93224c846b86261b2da709f50ea683fc708d",
+  "player_tree": "5058373348e9049f8b67ec4dbb79b400a904acd6",
+  "packet": {
+    "path": "build/qualification/cap-473-current7a2-successors-r04-controller/packet.json",
+    "bytes": 12441,
+    "sha256": "7AA7F4D60A142BA4617E81B434CC99CDEF47734931166F8CC9348DE20D08FB66"
+  },
+  "caller": {
+    "path": "build/qualification/cap-473-current7a2-successors-r04-controller/Invoke-OwnedCap473.ps1",
+    "bytes": 7207,
+    "sha256": "4C921A4114935EA2AC0005EA86C66E6BE8A0F2972E466D752C2BE98AE10A29DF"
+  },
+  "terminal": {
+    "path": "build/qualification/cap-473-current7a2-successors-r04-controller/execution-record/terminal.json",
+    "bytes": 8967,
+    "sha256": "3883D92D3D62F1043612DFA0EB3FF7AC1F603C3D4AB76FAD02048DBE465E73BB"
+  },
+  "diagnostic_packet": {
+    "path": "build/qualification/cap-reenable-current7a2-diagnostic-r06-controller/packet.json",
+    "bytes": 9672,
+    "sha256": "F46E50A91E9177006B678D417EA432C30F5D297B3ADCE053E1BE529031D2E02C"
+  },
+  "diagnostic_caller": {
+    "path": "build/qualification/cap-reenable-current7a2-diagnostic-r06-controller/Invoke-OwnedCap473.ps1",
+    "bytes": 7207,
+    "sha256": "1F3CF2920312014967B1A53B1E0BCE51C18C2977137E4D3F261BC37E8A4B5A49"
+  },
+  "diagnostic_terminal": {
+    "path": "build/qualification/cap-reenable-current7a2-diagnostic-r06-controller/execution-record/terminal.json",
+    "bytes": 4031,
+    "sha256": "F3BAD7E36DF66EFF52362ACA1850CEA2453611A85645733C097C689764FC2079"
+  },
+  "readback": {
+    "path": "build/qualification/cap-473-current7a2-successors-r04-controller/root-readback-r01.json",
+    "bytes": 13058,
+    "sha256": "F7AFAE7A17A334B5C9B2E16797589AA4824FBA043DF652F00DC1AC0B06719A3A",
+    "files": 34,
+    "bytes_per_copy": 1159643
+  },
+  "receipt_capsule": {
+    "path": "spec/evidence/cap-473-disabled-reenabled-native-receipts-r04.json.gz",
+    "sha256": "876DD0C680BE3340ED5650B05F88906697652EB96AA2D2CFFEE058E4212BCE2D",
+    "bytes": 18562,
+    "records": 6,
+    "original_exact_bytes_round_trip": true
+  },
+  "observations": [
+    {
+      "root": "build/qualification/cap-473-current7a2-successors-r04-controller",
+      "id": "disabled",
+      "result": {
+        "path": "build/qualification/cap-473-current7a2-successors-r04-controller/native-disabled/result.json",
+        "bytes": 34988,
+        "sha256": "D59D85B1DC37681002F9901EEA9B9100A8866BA7652D2BC350AD5ADDBC6A00A6"
+      },
+      "input_save": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\cap-473-current7a2-r02-controller\\native-published\\write-data\\saves\\mir5-native-complete.zip",
+        "sha256": "81AFD312CB2391C7B0CF92C82CD022F93751E9E3FC99D181795078FC9651E4F9"
+      },
+      "fixture_sha256": "7FBDAC7EC3C1080F97E9B7CA14D29E6CC4EA2DA7E42195E3EF2ED393EA01FA13",
+      "profile_sha256": "F9E03D02EFE11F1D769083C4CB300E91B481D63EB73CE98D219A69FCFA22C05A",
+      "files": 18,
+      "bytes_per_copy": 1056207,
+      "status": "passed-disabled-save-and-two-cold-reloads",
+      "initial": {
+        "stage": "initial",
+        "case": "f200-f210-positive-legacy-cap-disabled",
+        "status": "passed",
+        "qualification": "native-runner-readback-required",
+        "witnesses": {
+          "source_mir": "4.7.20003",
+          "destination_mir": "5.0.21000",
+          "source_actual_lab_completions": 2,
+          "destination_actual_lab_completions": 0,
+          "disabled_intermediate_observed": true,
+          "next_level": 3,
+          "productivity_bonus": 0.02,
+          "player_enabled": false,
+          "player_visible_when_disabled": true,
+          "saved_progress": 0.27,
+          "foreign_queue_progress": 0.42000000000000004,
+          "foreign_disabled": true,
+          "on_load_read_only": false
+        }
+      },
+      "completed_save": {
+        "path": "build/qualification/cap-473-current7a2-successors-r04-controller/native-disabled/write-data/saves/mir5-native-complete.zip",
+        "bytes": 935265,
+        "sha256": "DBF98BA371BB21894617C2BECB6FAE1E0EC556953D4FA9C069ED35F12733BBF0"
+      },
+      "cold_reloads": [
+        {
+          "ordinal": 1,
+          "save_sha256": "DBF98BA371BB21894617C2BECB6FAE1E0EC556953D4FA9C069ED35F12733BBF0",
+          "save_byte_identical": true,
+          "observation": {
+            "stage": "reload",
+            "case": "f200-f210-positive-legacy-cap-disabled",
+            "status": "passed",
+            "qualification": "native-runner-readback-required",
+            "witnesses": {
+              "source_mir": "4.7.20003",
+              "destination_mir": "5.0.21000",
+              "source_actual_lab_completions": 2,
+              "destination_actual_lab_completions": 0,
+              "disabled_intermediate_observed": true,
+              "next_level": 3,
+              "productivity_bonus": 0.02,
+              "player_enabled": false,
+              "player_visible_when_disabled": true,
+              "saved_progress": 0.27,
+              "foreign_queue_progress": 0.42000000000000004,
+              "foreign_disabled": true,
+              "on_load_read_only": true
+            }
+          }
+        },
+        {
+          "ordinal": 2,
+          "save_sha256": "DBF98BA371BB21894617C2BECB6FAE1E0EC556953D4FA9C069ED35F12733BBF0",
+          "save_byte_identical": true,
+          "observation": {
+            "stage": "reload",
+            "case": "f200-f210-positive-legacy-cap-disabled",
+            "status": "passed",
+            "qualification": "native-runner-readback-required",
+            "witnesses": {
+              "source_mir": "4.7.20003",
+              "destination_mir": "5.0.21000",
+              "source_actual_lab_completions": 2,
+              "destination_actual_lab_completions": 0,
+              "disabled_intermediate_observed": true,
+              "next_level": 3,
+              "productivity_bonus": 0.02,
+              "player_enabled": false,
+              "player_visible_when_disabled": true,
+              "saved_progress": 0.27,
+              "foreign_queue_progress": 0.42000000000000004,
+              "foreign_disabled": true,
+              "on_load_read_only": true
+            }
+          }
+        }
+      ]
+    },
+    {
+      "root": "build/qualification/cap-473-current7a2-successors-r04-controller",
+      "id": "reenabled",
+      "result": {
+        "path": "build/qualification/cap-473-current7a2-successors-r04-controller/native-reenabled/result.json",
+        "bytes": 6844,
+        "sha256": "69067052762CAA4CED4AFD7FC1E8F0F899DFEC96688EE456E76943C1F2FC2AC2"
+      },
+      "input_save": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\cap-473-current7a2-successors-r04-controller\\native-disabled\\write-data\\saves\\mir5-native-complete.zip",
+        "sha256": "DBF98BA371BB21894617C2BECB6FAE1E0EC556953D4FA9C069ED35F12733BBF0"
+      },
+      "fixture_sha256": "E09154A329CB52CD31FCD6A3FFEB56F42301C59160EBF0F16514AF46CA2571A5",
+      "profile_sha256": "16CD545778394A6A8EFE6A5BB45574659936DDD3BCC0EBD259CC50D30810E657",
+      "files": 8,
+      "bytes_per_copy": 51193,
+      "status": "failed-restored-player-gear-state-before-new-lab-save",
+      "native_log": {
+        "path": "build/qualification/cap-473-current7a2-successors-r04-controller/native-reenabled/write-data/factorio-current.log",
+        "bytes": 13687,
+        "sha256": "7D8B36036D6BFCEEBA56A2386AFA472170616064DA81418B7F59A325E3FA1628"
+      }
+    },
+    {
+      "root": "build/qualification/cap-reenable-current7a2-diagnostic-r06-controller",
+      "id": "reenabled",
+      "result": {
+        "path": "build/qualification/cap-reenable-current7a2-diagnostic-r06-controller/native-reenabled/result.json",
+        "bytes": 6865,
+        "sha256": "41BE8574765ED067F2EEA740B349D67A99A2681EFAFD54B1E4699EF84086A387"
+      },
+      "input_save": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\cap-473-current7a2-successors-r04-controller\\native-disabled\\write-data\\saves\\mir5-native-complete.zip",
+        "sha256": "DBF98BA371BB21894617C2BECB6FAE1E0EC556953D4FA9C069ED35F12733BBF0"
+      },
+      "fixture_sha256": "BF2E13F7D76372614B9B9A201E523A2E131730002F7655251D32B8B2D05AAB90",
+      "profile_sha256": "D53A7AD7F05E31E762DB71F680F97CF2892269C960B2D01CEFF476FB1951121D",
+      "files": 8,
+      "bytes_per_copy": 52243,
+      "status": "failed-restored-player-gear-state-before-new-lab-save",
+      "native_log": {
+        "path": "build/qualification/cap-reenable-current7a2-diagnostic-r06-controller/native-reenabled/write-data/factorio-current.log",
+        "bytes": 14198,
+        "sha256": "C1D7168D6458744E1A85C4C16A8D02D7525A91759E72545D38B69A954EE6330E"
+      },
+      "diagnostic_actual_expected": {
+        "actual": {
+          "level": 3,
+          "researched": false,
+          "enabled": false,
+          "visible": true,
+          "maximum": 4294967295,
+          "bonus": 0.02,
+          "saved_progress": 0.27
+        },
+        "expected": {
+          "level": 3,
+          "researched": false,
+          "enabled": true,
+          "visible": true,
+          "maximum": 4294967295,
+          "bonus": 0.02,
+          "saved_progress": 0.27
+        },
+        "enabled_setting": true
+      }
+    }
+  ],
+  "actual_native_processes": 5,
+  "actual_new_laboratories": 0,
+  "actual_read_only_cold_reloads": 2,
+  "source_actual_labs_reused_not_new": 2,
+  "factorio_processes_after_restoration": 0,
+  "limits": [
+    "R03 directpass,earlier E920 timeout and original tool-only3F3F failure keep their distinct fixture/controller/results. Neither source nor directpass is recreated.",
+    "First diagnosticR05 mistakenly included profile JSON in its fixture source; existing strict membership guard refused before native receipt/output/engine after temporary own-archive staging. All inputs restore,zero native launches. R06 keeps the exact same BF2E log-only payload and moves profile outside the six-member projection.",
+    "No product cause/repair is established by generic assertion alone; raw read-only probe isolates current native enabled=false as the sole mismatched field. Startup settingtrue and preserved level/bonus/visibility/max/work are directly observed.",
+    "Reenable/ownership is an unresolved required current route. F200 same-engine,earlierV3/worker,other settings/profiles/clients/performance and release qualification remain separate."
+  ]
+}

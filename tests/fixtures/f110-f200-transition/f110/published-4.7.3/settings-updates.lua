@@ -1,0 +1,2 @@
+-- Published F110 settings remain untouched. The source data-final preflight
+-- alone performs its isolated direct-lab acceleration.

@@ -1,0 +1,209 @@
+{
+  "schema": 1,
+  "kind": "MIR5ArmorPyCandidateDataStageChainV1",
+  "runs": [
+    {
+      "run": 40055337075,
+      "url": "https://github.com/Julesc013/mir-native-worker/actions/runs/40055337075",
+      "source": "5e1018e303f578b3716d4bd0b0d37ff4be943c72",
+      "control_source": "245ac932c6820c0eb7548b9f7aabb8f92cf5d15b",
+      "manifest_members_verified": 37,
+      "manifest_sha256": "4E82FFA3409A39FF7CC48D2BB939A0123C3347979EA92BE21D1AEE0BEEA94B7B",
+      "mir_archive_sha256": "A8B3760AEB26554505FBAAB4A50B8CE1B82F47870BAC2A5789A6BD3914133C50",
+      "candidate_failures": {
+        "path": "candidate-failures.json",
+        "uncompressed_sha256": "A5338D2B021B297C3D4CB2E3B70F39CBA0F9DD8D5F639D910174278FED3F932F",
+        "value": []
+      },
+      "cases": [
+        {
+          "profile": "armor-bobwarfare",
+          "receipt": {
+            "gzip": "spec/mir5/evidence/armor-py-candidate-40055337075-armor-bobwarfare-native.json.gz",
+            "gzip_sha256": "3301D2DDBD62D226309148896F5759DEA0FC556B6114329E652ACBE99EF65494",
+            "uncompressed_sha256": "18643E81FD76AB9425684228C37F7892001D716CAFC070480A6C02E9B2BE7761"
+          }
+        },
+        {
+          "profile": "py-coal",
+          "receipt": {
+            "gzip": "spec/mir5/evidence/armor-py-candidate-40055337075-py-coal-native.json.gz",
+            "gzip_sha256": "2F4106DCDCEAB7C7303E0ED27AFF75211BD3F808B8E3FA67B709A47087B91ABD",
+            "uncompressed_sha256": "0FAE3E0D55932C8226314C9C8BD1569923633D5D340DEF4F4F437DA000910464"
+          }
+        },
+        {
+          "profile": "py-alienlife-hightech",
+          "receipt": {
+            "gzip": "spec/mir5/evidence/armor-py-candidate-40055337075-py-alienlife-hightech-native.json.gz",
+            "gzip_sha256": "6C8E7175110B56880B95A46FC74057B316A57175C5E4B5B297594AE93B53FC50",
+            "uncompressed_sha256": "357531A05BBDDC99AD6956AE7EC90ED55CD4B1B90342F6D4296CF0C47EB249B3"
+          }
+        }
+      ]
+    },
+    {
+      "run": 40056021636,
+      "url": "https://github.com/Julesc013/mir-native-worker/actions/runs/40056021636",
+      "source": "0612af568aa76fd78ff492b527340fdc45214dc2",
+      "control_source": "245ac932c6820c0eb7548b9f7aabb8f92cf5d15b",
+      "manifest_members_verified": 37,
+      "manifest_sha256": "97CB552ABDED63A1889E7DD48B96C0CF03F1BBB7981DB6B921A8DC4EF855232D",
+      "mir_archive_sha256": "C0F1B1C9C7BD67E367255089132E5266784254340A8902DFCB21D535450BEE02",
+      "candidate_failures": {
+        "path": "candidate-failures.json",
+        "uncompressed_sha256": "A5338D2B021B297C3D4CB2E3B70F39CBA0F9DD8D5F639D910174278FED3F932F",
+        "value": []
+      },
+      "cases": [
+        {
+          "profile": "armor-bobwarfare",
+          "receipt": {
+            "gzip": "spec/mir5/evidence/armor-py-candidate-40056021636-armor-bobwarfare-native.json.gz",
+            "gzip_sha256": "52E3CB898C949CF11849A0ED4AEFB097C2400A905A2DBD86962FB6EAD29CE631",
+            "uncompressed_sha256": "4BB4E8CCAEC24AA60C5E2B6BE89FC4A74DD2115CDABCA146984DB727C184443B"
+          }
+        },
+        {
+          "profile": "py-coal",
+          "receipt": {
+            "gzip": "spec/mir5/evidence/armor-py-candidate-40056021636-py-coal-native.json.gz",
+            "gzip_sha256": "C8EEB7473B40589C833FF31DB4542D2CFAC172A984565B4D003CAF26C557C873",
+            "uncompressed_sha256": "F4ECB2E6B8B0150D0C5D921720F18D583D2A028EB8C76B1F8E58C5F917A55D83"
+          }
+        },
+        {
+          "profile": "py-alienlife-hightech",
+          "receipt": {
+            "gzip": "spec/mir5/evidence/armor-py-candidate-40056021636-py-alienlife-hightech-native.json.gz",
+            "gzip_sha256": "78136BBEF76CF3527FE538810F6FB722E6AE9CF84969324A4CA6AB0E90A931AC",
+            "uncompressed_sha256": "7FEDD8119C9520B84D136A23611410123B00782600867E390102EE452ABF2F18"
+          }
+        }
+      ]
+    }
+  ],
+  "engine": {
+    "path": "D:\\Games\\Factorio\\2.0\\bin\\x64\\factorio.exe",
+    "sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B",
+    "base_version": "2.0.77",
+    "factorio_version": "2.0"
+  },
+  "independent_control": {
+    "source": "0612af568aa76fd78ff492b527340fdc45214dc2",
+    "command": "python .\\tests\\mir5\\test_armor_py_catalogue.py --lua-runtime-dir ..\\..\\..\\mir421-lua-runtime",
+    "result": "passed",
+    "tests": 11,
+    "scope": "Bounded authored-row and preflight checks; not a comparison of the complete native dumps."
+  },
+  "comparison": {
+    "status": "different-intended-native-output",
+    "historical_scratch": {
+      "path": "remaining-integrations-40051640723-recovery.json",
+      "kind": "MIR5RemainingIntegrationsF200RecoveryScratchV1",
+      "sha256": "0D967AB39F48331FBDF4AEA48C2E53476A787AC6A69246E1539B947A98A067F1",
+      "status": "not-retained"
+    },
+    "recovery": {
+      "gzip": "spec/mir5/evidence/armor-py-independent-published-recovery-40051640723-r02.json.gz",
+      "gzip_sha256": "004F27CCBCC2D16CBDCE08B56DDAF9DAD1B08A4A5B1E63A66974790860D425D2",
+      "uncompressed_sha256": "34ECC7FBA71C455EF7E62185D8F6495CD06039A577EDBBF51310415FF0A38296",
+      "artifact_manifest_sha256": "3BE77F3D29D794E0665D5BF3849CA77DA9FA085DA241B4EDDC33DE9CCEF69EF9",
+      "extractor": "committed tools/mir5/recover_modern_catalogue.py recovery primitives; the F200-absent optional maximum-level policy is omitted from this comparison-only recovery",
+      "extractor_blob": "637c6cdeeb9190f0fd3cb03cd234025bd00b34bd",
+      "candidate_output_used": false
+    },
+    "recovery_helper": {
+      "bytes": 5475,
+      "execution": "Decompress and verify original bytes in a disposable local script, then python <script.py> --repo . --reference-run-root <verified40051640723-artifact-root> --output <new-recovery.json>",
+      "gzip": "spec/mir5/evidence/armor-py-independent-recovery-helper.py.gz",
+      "gzip_sha256": "00BDA50C08C327F2492175258FF38623A1DBFF6DB6A82928477A8EF6C3A2AA71",
+      "uncompressed_sha256": "DD92A52DFFEFCFB428A5F6971095D9D3E541521FA981C74DCF866EF909055B83",
+      "original_path": "spec/mir5/evidence/armor-py-independent-recovery-helper.py"
+    },
+    "helper": {
+      "gzip": "spec/mir5/evidence/integration-candidate-baseline-comparison-helper.py.gz",
+      "gzip_sha256": "B5661DAF89D72F40E1F1AC846058AEE6927E2343968ADCC0FCEC7FD3C13F21B8",
+      "uncompressed_sha256": "9534B49ED6B622937BC3078BBF1BB7CA5CB282307D870DA864D195474C24D3D5"
+    },
+    "result": {
+      "gzip": "spec/mir5/evidence/armor-py-independent-comparison-40051640723-40056021636-r02.json.gz",
+      "gzip_sha256": "C725B94E8CBCFA96E0D03AE1C7FCF6CC0958DCB94C78196EE46AAE21F95E3341",
+      "uncompressed_sha256": "8C1638933689465278DDD4C5221979AF5B80B4F9A170D6435A1CF4C460D48E3C",
+      "candidate_run": 40056021636,
+      "complete_difference_occurrences": 48,
+      "native_credit_carrier_occurrences": 48,
+      "native_credit_carrier_unique_ids": 20,
+      "unresolved_delta_occurrences": 0
+    },
+    "named_native_credit_carriers": {
+      "treatment": "These rows remain complete reported differences and are not a generic ignored technology/type allowance or an equality claim.",
+      "armor-bobwarfare": [
+        "mir-native-credit-research_bullets-firearm-magazine-negative",
+        "mir-native-credit-research_bullets-firearm-magazine-positive",
+        "mir-native-credit-research_concrete-stone-brick-negative",
+        "mir-native-credit-research_concrete-stone-brick-positive",
+        "mir-native-credit-research_copper-copper-plate-negative",
+        "mir-native-credit-research_copper-copper-plate-positive",
+        "mir-native-credit-research_grenades-grenade-negative",
+        "mir-native-credit-research_grenades-grenade-positive",
+        "mir-native-credit-research_iron-iron-plate-negative",
+        "mir-native-credit-research_iron-iron-plate-positive",
+        "mir-native-credit-research_lubricant_productivity-lubricant-negative",
+        "mir-native-credit-research_lubricant_productivity-lubricant-positive",
+        "mir-native-credit-research_oil_processing_productivity-advanced-oil-processing-negative",
+        "mir-native-credit-research_oil_processing_productivity-advanced-oil-processing-positive",
+        "mir-native-credit-research_oil_processing_productivity-basic-oil-processing-negative",
+        "mir-native-credit-research_oil_processing_productivity-basic-oil-processing-positive",
+        "mir-native-credit-research_oil_processing_productivity-coal-liquefaction-negative",
+        "mir-native-credit-research_oil_processing_productivity-coal-liquefaction-positive",
+        "mir-native-credit-research_sulfuric_acid_productivity-sulfuric-acid-negative",
+        "mir-native-credit-research_sulfuric_acid_productivity-sulfuric-acid-positive"
+      ],
+      "py-coal": [
+        "mir-native-credit-research_bullets-firearm-magazine-negative",
+        "mir-native-credit-research_bullets-firearm-magazine-positive",
+        "mir-native-credit-research_concrete-stone-brick-negative",
+        "mir-native-credit-research_concrete-stone-brick-positive",
+        "mir-native-credit-research_copper-copper-plate-negative",
+        "mir-native-credit-research_copper-copper-plate-positive",
+        "mir-native-credit-research_grenades-grenade-negative",
+        "mir-native-credit-research_grenades-grenade-positive",
+        "mir-native-credit-research_iron-iron-plate-negative",
+        "mir-native-credit-research_iron-iron-plate-positive",
+        "mir-native-credit-research_lubricant_productivity-lubricant-negative",
+        "mir-native-credit-research_lubricant_productivity-lubricant-positive",
+        "mir-native-credit-research_sulfuric_acid_productivity-sulfuric-acid-negative",
+        "mir-native-credit-research_sulfuric_acid_productivity-sulfuric-acid-positive"
+      ],
+      "py-alienlife-hightech": [
+        "mir-native-credit-research_bullets-firearm-magazine-negative",
+        "mir-native-credit-research_bullets-firearm-magazine-positive",
+        "mir-native-credit-research_concrete-stone-brick-negative",
+        "mir-native-credit-research_concrete-stone-brick-positive",
+        "mir-native-credit-research_copper-copper-plate-negative",
+        "mir-native-credit-research_copper-copper-plate-positive",
+        "mir-native-credit-research_grenades-grenade-negative",
+        "mir-native-credit-research_grenades-grenade-positive",
+        "mir-native-credit-research_iron-iron-plate-negative",
+        "mir-native-credit-research_iron-iron-plate-positive",
+        "mir-native-credit-research_lubricant_productivity-lubricant-negative",
+        "mir-native-credit-research_lubricant_productivity-lubricant-positive",
+        "mir-native-credit-research_sulfuric_acid_productivity-sulfuric-acid-negative",
+        "mir-native-credit-research_sulfuric_acid_productivity-sulfuric-acid-positive"
+      ]
+    },
+    "regeneration_input": "The verified run40051640723 upstream and published data/settings dumps, processed only with committed extraction logic and independently captured published facts. Candidate output is not an input to the expected world."
+  },
+  "scope": [
+    "The three exact dependency-valid F200 profiles complete native data and settings capture with exit code zero, no timeout and direct-library controls restored. Each artifact manifest member was verified before receipt recovery.",
+    "The source 0612af568aa76fd78ff492b527340fdc45214dc2 recheck retains identical PyCoal and PyAlienLife/HighTech dump hashes from the prior authored capture. BobWarfare changes only with the separately reviewed source revision; its settings dump remains identical.",
+    "The direct-native duration measurements have a changed scope from historical governed wrapper measurements and establish no product speedup or latency claim."
+  ],
+  "limits": [
+    "The independent complete comparison records 48 carrier occurrences and no other unresolved delta. Carrier additions remain unequal to the independently derived intended output and retain their separate native-credit preservation obligation.",
+    "No gameplay, save or migration, menu, performance, multiplayer, arbitrary-modpack or release qualification follows from these data-stage observations."
+  ],
+  "native_qualification": false,
+  "release_qualification": false
+}

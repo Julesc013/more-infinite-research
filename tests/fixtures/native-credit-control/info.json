@@ -1,0 +1,15 @@
+{
+  "name": "mir-fixture-mir5-native-credit-control",
+  "version": "0.1.0",
+  "title": "MIR 5 private native credit mechanism control",
+  "author": "MIR maintainers",
+  "description": "Disposable F200 Space Age native-carrier experiment for earned recipe-productivity credit; it does not qualify MIR migration behavior.",
+  "factorio_version": "2.0",
+  "dependencies": [
+    "base = 2.0.77",
+    "elevated-rails = 2.0.77",
+    "quality = 2.0.77",
+    "space-age = 2.0.77",
+    "more-infinite-research = 5.0.20000"
+  ]
+}

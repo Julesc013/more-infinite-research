@@ -1,0 +1,152 @@
+{
+  "schema": 1,
+  "kind": "MIRContributorLocalBuildWalkthroughV1",
+  "status": "passed-public-clone-local-package-build-not-native-or-release-qualification",
+  "observed_at_utc": "2026-10-26T13:10:55.2497082Z",
+  "public_clone": {
+    "repository": "https://github.com/Julesc013/more-infinite-research.git",
+    "clone_command": "git clone https://github.com/Julesc013/more-infinite-research.git C:/Projects/Factorio/more-infinite-research-contributor-walkthrough-r01",
+    "default_checkout_commit": "4080f73d6af200fb19068f6c1e165ca0a5a67f37",
+    "selected_branch": "dev",
+    "selected_commit": "cca3147432f4443a45b7f6ab8eead7be4bc1eff8",
+    "selected_tree": "ea33b0f52ab9a47e4498252c1f8e85a755bcf897",
+    "local_branch": "fix/contributor-local-walkthrough-r01",
+    "is_shallow_repository": false,
+    "working_files_bytes": 215534840
+  },
+  "controller": {
+    "development_guide": {
+      "path": "docs/development.md",
+      "blob": "4889d21c3e5c5df2e405e779994634929f218814",
+      "sha256": "74C695BA5E1F42D9D02282BFE1E94A42BF7A46772050652A6070A3A45F612A5E"
+    },
+    "package_tool": {
+      "path": "tools/package.py",
+      "blob": "898bc4230bfffafc9db48332507221021a1ddfa3",
+      "sha256": "00ED00D66BD558554068405C8882419F852FC2F66646088052888D70E25DA61E"
+    },
+    "target_record": {
+      "path": "targets/editions.json",
+      "blob": "b7c2a789e17b6726c341f8a3ff97d6a27d43c0d6",
+      "sha256": "2A2E2A7E9C54224AECE72366A1BB3EF7D9007A7BEC92BB53C4D9B0276B6E33F6",
+      "selected_target": "f210",
+      "selected_factorio_version": "2.1",
+      "selected_minimum_base": "2.1.23"
+    },
+    "runtime": {
+      "implementation": "CPython",
+      "version": "3.14.7"
+    }
+  },
+  "private_source_metadata_edit": {
+    "path": "source/info.json",
+    "original_blob": "873bb362a277bbfd860a94875f29607d19adc49e",
+    "original_sha256": "9CC55B47FBFB826971831DBC9A43CCD2B08C787BAC25F4363C441EC79AB090DC",
+    "local_sha256": "2C4034CED4230FC85312EB0E4CE7B7F32DFB315461C9B76DEDE71E28315E29F2",
+    "changed_fields": {
+      "title": "More Infinite Research (local walkthrough)",
+      "description": "Private local contributor walkthrough build; not an official release or qualification result."
+    },
+    "unchanged_fields": [
+      "name",
+      "version",
+      "author",
+      "factorio_version",
+      "dependencies"
+    ],
+    "clone_dirty_path_count": 1,
+    "clone_dirty_path": "source/info.json"
+  },
+  "commands": [
+    "git clone https://github.com/Julesc013/more-infinite-research.git C:/Projects/Factorio/more-infinite-research-contributor-walkthrough-r01",
+    "git switch dev",
+    "git switch -c fix/contributor-local-walkthrough-r01",
+    "python tools/package.py --source source --target f210 --output C:/Projects/Factorio/mir-local-contributor-walkthrough-r01/more-infinite-research_5.0.21000.zip",
+    "python tools/package.py --source source --version 5.0.21001 --output C:/Projects/Factorio/mir-local-contributor-walkthrough-r01/more-infinite-research_5.0.21001.zip"
+  ],
+  "output_verification": {
+    "method": "Import the cloned tools/package.py, recompute members(source, version, target), and require exact path-and-byte equality with every ZIP member. The member-list SHA256 is sorted UTF-8 member paths joined by a single LF without a trailing LF.",
+    "excluded_prefixes_checked": [
+      "docs/",
+      "tools/",
+      "tests/",
+      "spec/",
+      "sdk/",
+      ".github/"
+    ],
+    "outputs": [
+      {
+        "command_mode": "selected-target",
+        "target": "f210",
+        "archive": "more-infinite-research_5.0.21000.zip",
+        "bytes": 602200,
+        "sha256": "556BB819EF05294DFAD3E132A07E05C528364CF6A1CE7277452862114771BED4",
+        "zip_root": "more-infinite-research_5.0.21000",
+        "info_name": "more-infinite-research",
+        "info_version": "5.0.21000",
+        "info_factorio_version": "2.1",
+        "info_sha256": "2C4034CED4230FC85312EB0E4CE7B7F32DFB315461C9B76DEDE71E28315E29F2",
+        "changelog_sha256": "0F89CA81FCBB7725971630C11ABBDC753EC176A99EC08CB04B249C5622343306",
+        "member_count": 215,
+        "member_list_sha256": "CF0D2C0F890D1E534AE20A609319C8BD033250DFB6E542AF33D77F1EF649DFD8",
+        "complete_admitted_member_set_match": true,
+        "excluded_members_found": []
+      },
+      {
+        "command_mode": "explicit-version-no-target",
+        "version": "5.0.21001",
+        "archive": "more-infinite-research_5.0.21001.zip",
+        "bytes": 619878,
+        "sha256": "150121FF7CCB1252977B931BC6C752A5015645CE3E6AE9F9CB3B500A5EA414CB",
+        "zip_root": "more-infinite-research_5.0.21001",
+        "info_name": "more-infinite-research",
+        "info_version": "5.0.21001",
+        "info_factorio_version": "2.1",
+        "info_sha256": "08548FE2B213020D46AF9E7D94B36DF9DFBDFFBA69EECBACF06FAA9A265D15FC",
+        "changelog_sha256": "E218DA3C84729DF2FE8D0917D85D270BFDBDFB5BFA5C947680C60FCA898EBC98",
+        "member_count": 227,
+        "member_list_sha256": "B409F0002BB605AA80FEFAA6D7E0465E1A4874904DDE792D147F28EE93BB0682",
+        "complete_admitted_member_set_match": true,
+        "excluded_members_found": []
+      }
+    ]
+  },
+  "custody": {
+    "external_output_directory": "C:/Projects/Factorio/mir-local-contributor-walkthrough-r01",
+    "primary_ignored_directory": "build/mir5/contributor-local-build-walkthrough-r01",
+    "primary_copy_hashes_match": true,
+    "preserved_files": [
+      {
+        "path": "source-info-local.json",
+        "bytes": 677,
+        "sha256": "2C4034CED4230FC85312EB0E4CE7B7F32DFB315461C9B76DEDE71E28315E29F2"
+      },
+      {
+        "path": "more-infinite-research_5.0.21000.zip",
+        "bytes": 602200,
+        "sha256": "556BB819EF05294DFAD3E132A07E05C528364CF6A1CE7277452862114771BED4"
+      },
+      {
+        "path": "more-infinite-research_5.0.21001.zip",
+        "bytes": 619878,
+        "sha256": "150121FF7CCB1252977B931BC6C752A5015645CE3E6AE9F9CB3B500A5EA414CB"
+      }
+    ]
+  },
+  "claims": {
+    "public_clone_and_dev_switch": true,
+    "metadata_only_local_source_edit": true,
+    "documented_target_and_version_package_commands_succeeded": true,
+    "complete_admitted_member_sets_verified": true,
+    "native_execution": false,
+    "save_compatibility": false,
+    "library_or_game_mutation": false,
+    "release_qualification": false,
+    "publication": false
+  },
+  "limits": [
+    "This is a local package-build walkthrough from the public dev checkout, not a native load, save, gameplay, API, performance, support or release-qualification result.",
+    "The local clone retains only its deliberately modified source/info.json and was not committed, published or used to alter a game installation, dependency library or account.",
+    "The selected target and explicit-version ZIPs use the same official mod name, so they demonstrate an upgrade-style private replacement build rather than side-by-side fork coexistence."
+  ]
+}

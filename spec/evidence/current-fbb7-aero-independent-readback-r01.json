@@ -1,0 +1,170 @@
+{
+  "schema": 1,
+  "kind": "MIRIndependentCurrentCoherent17AssetReadbackV1",
+  "status": "passed-independent-aero-reproduction-and-primary-readback",
+  "reference": {
+    "path": "spec/evidence/current-fbb7-coherent17-package-chain-r01.json",
+    "sha256": "008D0779BC9385BC858339959556BF8A48BD2D8CDD48E80DB1354B5804BE88A5"
+  },
+  "source": {
+    "commit": "b3bbd8d37b37bfee2e258b3e8a2f223dcf3860b3",
+    "mod_name": "more-infinite-research",
+    "mod_title": "More Infinite Research",
+    "path": "source",
+    "source_distribution_version": "5.0.21000",
+    "source_tree": "fbb7e9135280ce7f69692e9b0c4a44d743793f45",
+    "tree": "0565f7bea3468badde4a46afcf8ccdc577cef5e8"
+  },
+  "controller": {
+    "package_tool": {
+      "path": "tools/package.py",
+      "sha256": "32bdbe5e0d8b776a57bc8df63dd536dd81aedf54141ac6ec6b1bef4044c90674"
+    },
+    "release_tool": {
+      "path": "tools/release.py",
+      "sha256": "07972040468b3646c8d85d5b238a8c0a920664ebfd540237b84cc9d44d698377"
+    },
+    "runtime": {
+      "implementation": "cpython",
+      "version": [
+        3,
+        14,
+        7
+      ],
+      "zlib_build_version": "1.3.1.zlib-ng",
+      "zlib_runtime_version": "1.3.1.zlib-ng"
+    },
+    "zip_policy": {
+      "compression": "ZIP_DEFLATED",
+      "compresslevel": 9,
+      "member_create_system": 3,
+      "member_external_attr": 2175008768,
+      "member_timestamp": [
+        1980,
+        1,
+        1,
+        0,
+        0,
+        0
+      ]
+    }
+  },
+  "host": "AERO-15X-WIN10",
+  "build_command": "python -X utf8 -B tools/release.py --source source --revision b3bbd8d37b37bfee2e258b3e8a2f223dcf3860b3 --output C:/Projects/Factorio/.task-builds/mir5-fbb7-aero-r01 --early-target-record targets/early-editions.json",
+  "verify_command": "python -X utf8 -B tools/release.py --source source --output C:/Projects/Factorio/.task-builds/mir5-fbb7-aero-r01 --verify",
+  "native_execution": false,
+  "release_qualification": false,
+  "primary_custody": "build/packages/fbb7-aero-independent-r01",
+  "files": [
+    {
+      "name": "MIR5ReleaseAssetInventoryV1.json",
+      "bytes": 209701,
+      "sha256": "5EEE95F927897C3743B091F8930B60A96DAE516B36D704870C3CBE10EF66DFBD"
+    },
+    {
+      "name": "more-infinite-research_5.0.00600.zip",
+      "bytes": 136307,
+      "sha256": "6E1C6040D54FDBE66B4086AF3949D05C938E43E4E8CD603948055E201BF22793"
+    },
+    {
+      "name": "more-infinite-research_5.0.00700.zip",
+      "bytes": 136307,
+      "sha256": "140F4C2F786FD47EBC8978AD2C9F8208BF83F8AB2EABAC734051E6AF6A98D11C"
+    },
+    {
+      "name": "more-infinite-research_5.0.00800.zip",
+      "bytes": 136305,
+      "sha256": "1E25D61D5FF8853921E9BC196254ADDDB74F050195F127DCDF9965023B07C5E2"
+    },
+    {
+      "name": "more-infinite-research_5.0.00900.zip",
+      "bytes": 136307,
+      "sha256": "AC17F56F93854E2BE480370D399286E8F8B5433A251240B5E2D715A26DF62E70"
+    },
+    {
+      "name": "more-infinite-research_5.0.01000.zip",
+      "bytes": 136307,
+      "sha256": "BAD7BFE20693C3FA8363CBCA08BFBF8EE9BC03F5EDAEF901B658266AFBD13B0E"
+    },
+    {
+      "name": "more-infinite-research_5.0.01100.zip",
+      "bytes": 136307,
+      "sha256": "4302C14E38C374A4AAC0FE28B363A1C08B8A2A317A0EE166DB6E3ED9190A5138"
+    },
+    {
+      "name": "more-infinite-research_5.0.01200.zip",
+      "bytes": 136309,
+      "sha256": "C6CFB3343167EFA3A3D4CF0B48A3F543C7EFF705556F091669734603CFBBF681"
+    },
+    {
+      "name": "more-infinite-research_5.0.01300.zip",
+      "bytes": 453785,
+      "sha256": "2F1B7BC042552496D9E8C866C07A650B759A3FF18448FD52E0AEE1050A2DB535"
+    },
+    {
+      "name": "more-infinite-research_5.0.01400.zip",
+      "bytes": 453787,
+      "sha256": "934BBCA5F6CD00E88D6AA29C8BEACA784A1CD711658E244F5E3D5521B3F8E44D"
+    },
+    {
+      "name": "more-infinite-research_5.0.01500.zip",
+      "bytes": 453786,
+      "sha256": "8F216BA01566375BF2843CA6EA9AE5E92047154B6057D29812162F4B50BEF699"
+    },
+    {
+      "name": "more-infinite-research_5.0.01600.zip",
+      "bytes": 453788,
+      "sha256": "832C28BD073391951E43BDB0577BCEAF2A35B2E4D5CB05399BAA14553A46C718"
+    },
+    {
+      "name": "more-infinite-research_5.0.01700.zip",
+      "bytes": 453787,
+      "sha256": "545A3A2C72D3C3B7A9600ED7267434DA2DBC77BB9F446EFB9BF399DEA5134370"
+    },
+    {
+      "name": "more-infinite-research_5.0.01800.zip",
+      "bytes": 453788,
+      "sha256": "8476B7228C3175942272024EC1131E01B1C6CB70B2F7CA5202538CC880B2EEC8"
+    },
+    {
+      "name": "more-infinite-research_5.0.10000.zip",
+      "bytes": 453779,
+      "sha256": "BA0D9F519CEEA7557892912BFF6EF3CAC5E480DA5D8AF2FC288A0E01605266B2"
+    },
+    {
+      "name": "more-infinite-research_5.0.11000.zip",
+      "bytes": 454090,
+      "sha256": "2C2B1C011A0806809AAD1B8769E8548DB20159F1DCAEA3BD11431CCC6D48A7D2"
+    },
+    {
+      "name": "more-infinite-research_5.0.20000.zip",
+      "bytes": 692375,
+      "sha256": "E9D349931E082AD77057C150E3D6093490E4086E84F0FAFECB0ED1257FD5ED4F"
+    },
+    {
+      "name": "more-infinite-research_5.0.21000.zip",
+      "bytes": 692759,
+      "sha256": "38C84CCBC4BFDA62FCB078772C4690AB81228484744A36D9EA303F5A75B16447"
+    },
+    {
+      "name": "SHA256SUMS-early.txt",
+      "bytes": 721,
+      "sha256": "C1AAC54E3975D59FABA1F75A25F91CAB534BC3993F90D55F264025ACFD535970"
+    },
+    {
+      "name": "SHA256SUMS.txt",
+      "bytes": 1030,
+      "sha256": "3BE4A95A7F41BF349BEFA96AC036CEF966B3E32E5FBEF2B9350A4C4450528878"
+    }
+  ],
+  "archive_count": 17,
+  "archive_bytes": 5969873,
+  "member_reads": 1524,
+  "comparison": "All20 names,lengths and SHA256 values including inventory and both checksum files exactly match Black Glass. Every ZIP member independently read and decompressed length/hash/CRC checked;all declared info fields,roots,minimums,versions,authors,license and ZIP metadata checked.",
+  "support": "Nine stable editions retain applicable acceptance gates;F018 is experimental and F006-F012 are best effort. No native,target/client/performance or release verdict follows from package reproduction.",
+  "preparation_correction": "An initial local extraction assertion incorrectly compared full info.json equality with its deliberately partial inventory projection. Comparing every declared field while separately checking additional author/description metadata corrects that local readback assumption;all original20 file hashes already match and no package bytes change.",
+  "limits": [
+    "E9/38C and BA0D/2C2B are unchanged recorded player packages;no native result is relabelled.",
+    "No tag,publication,Portal export or dist delivery. Accepted GitHub inputs remain unchanged."
+  ]
+}

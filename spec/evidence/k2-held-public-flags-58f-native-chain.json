@@ -1,0 +1,366 @@
+{
+  "schema": 1,
+  "kind": "MIR5K2HeldFlagsNativeReadbackV1",
+  "status": "retained-native-source-adopted-fixed-successor-saved-and-cold-reloaded",
+  "controller_commit": "aa5da8e588c247fd2ee4189e71e834ce1d6d4126",
+  "source": {
+    "commit": "b251ae7a54104ace87cb0da4cf531cf53f03c93d",
+    "player_tree": "79b73a6a8e68987737e69bf2d95ec6555b49f901",
+    "archive_sha256": "E3A65C08AC7798A66FB1BE30D24307B17C8B366DD901953BDE2A09BD6939C8CE"
+  },
+  "candidate": {
+    "commit": "98fbdd33fe47eb678a5e1aaf17fee903eba2a22a",
+    "player_tree": "ffc5f2e3359de4f326a184cf6a3c29a55941150a",
+    "archive_sha256": "58F04FB9D417F2726835F4A6740490DE3C1841665DAC81C2BA3DFA94050D9457"
+  },
+  "engine": {
+    "version": "2.1.23",
+    "sha256": "FE4A1DA30F322A0D0B8AEB3DF7276332222BAAA143E2352569B723E84B2B9060"
+  },
+  "prepared_inputs": {
+    "path": "spec/evidence/k2-held-public-flags-58f-prepared-inputs.json",
+    "sha256": "F15BA1C03DF57DB8FC8A4623634B0C6BEBCAE98FFC409BA13C7EF849C84AEB14"
+  },
+  "stages": [
+    {
+      "stage": "retained-source",
+      "status": "passed-private-native-fixture",
+      "native_result_sha256": "3991AE6A3A6FD7C7189D48A7949E6D04BAB5895A8338398F57D8F0DEC02AC21E",
+      "mir_archive_sha256": "E3A65C08AC7798A66FB1BE30D24307B17C8B366DD901953BDE2A09BD6939C8CE",
+      "profile_sha256": "582634A08D30D0CFA21C1F1914BC121DCF9E0A2196671C7DDDB4F560C5D9F79A",
+      "input_save_sha256": null,
+      "completed_save_sha256": "004DCDAD1CBC076A7C105A75B359DBEDDEBA5B5B820C37647CC671735F2CFFAD",
+      "cold_reloads": 2,
+      "initial_witness": {
+        "actual_lab_completions": 0,
+        "native_state_seeded": true,
+        "no_public_queue": true,
+        "player_early_level": 0,
+        "player_tail_level": 0,
+        "player_tail_saved_progress": 0,
+        "player_powder_bonus": 0.06,
+        "player_early_enabled": false,
+        "player_tail_enabled": false,
+        "foreign_early_enabled": false,
+        "foreign_tail_enabled": false,
+        "foreign_early_visible": false,
+        "foreign_tail_visible": true,
+        "on_load_read_only": false
+      },
+      "reload_witness": {
+        "actual_lab_completions": 0,
+        "native_state_seeded": true,
+        "no_public_queue": true,
+        "player_early_level": 0,
+        "player_tail_level": 0,
+        "player_tail_saved_progress": 0,
+        "player_powder_bonus": 0.06,
+        "player_early_enabled": false,
+        "player_tail_enabled": false,
+        "foreign_early_enabled": false,
+        "foreign_tail_enabled": false,
+        "foreign_early_visible": false,
+        "foreign_tail_visible": true,
+        "on_load_read_only": true
+      },
+      "custody": {
+        "original_root": "D:\\Projects\\Factorio\\mir5-k2-held-public-flags-aa5-r01\\build\\tmp\\k2-held-public-flags-58f-r01\\source",
+        "primary_root": "build/mir5/recovery-historical/k2-held-public-flags-58f-r01/source-native-output",
+        "members": [
+          {
+            "path": "config.ini",
+            "bytes": 299,
+            "sha256": "6C24A8A53B2AB25DAE2ADE10C6E594C231C44AAF8A95DCE1DC47B446771A6072"
+          },
+          {
+            "path": "create.factorio.log",
+            "bytes": 13884,
+            "sha256": "46C4F71D5E955FA9DCE845B7E51B08BD8F378F788A3CEF8C406E1E147AE18B7F"
+          },
+          {
+            "path": "process-1.resources.jsonl",
+            "bytes": 3228,
+            "sha256": "723277F27EFEFF436006EFF6A4551FD13AEBD8D0789BC7B4FBAA0D72AA492BD8"
+          },
+          {
+            "path": "process-1.stderr.txt",
+            "bytes": 0,
+            "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+          },
+          {
+            "path": "process-1.stdout.txt",
+            "bytes": 14042,
+            "sha256": "BFDC5DB4D84737C67819324F39DF347FA5AB014E94542615EEBEEF2E8CFCFF07"
+          },
+          {
+            "path": "process-2.resources.jsonl",
+            "bytes": 2626,
+            "sha256": "4B7BD350A1ECEE4A6BAF709FA1980B2D6D6C87D13D2FE647A59CEF0E0A442E36"
+          },
+          {
+            "path": "process-2.stderr.txt",
+            "bytes": 0,
+            "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+          },
+          {
+            "path": "process-2.stdout.txt",
+            "bytes": 15924,
+            "sha256": "C06CD46EBA46EDE155EE46D386AEF15021D5511A8EF813FB502EBEF5709B35E4"
+          },
+          {
+            "path": "process-3.resources.jsonl",
+            "bytes": 2618,
+            "sha256": "E3FDCDFF75F842C306B843AD6E6C8C3F1151CEB8EEBBD94C695F51F8CC23AF62"
+          },
+          {
+            "path": "process-3.stderr.txt",
+            "bytes": 0,
+            "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+          },
+          {
+            "path": "process-3.stdout.txt",
+            "bytes": 106,
+            "sha256": "83F13F804BA74CE2D9D2768500272373DE8EC70E06490C8A53230356A49D18AF"
+          },
+          {
+            "path": "process-4.resources.jsonl",
+            "bytes": 2610,
+            "sha256": "28461F44A683EE27A1EDB594A52D8B4060041F25DEF2A72781DA4C1F77BB079A"
+          },
+          {
+            "path": "process-4.stderr.txt",
+            "bytes": 0,
+            "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+          },
+          {
+            "path": "process-4.stdout.txt",
+            "bytes": 106,
+            "sha256": "678499CB96E9059E47AFDCA3142CD1B5AFB670C03F1FDA1301449AB0F00FF532"
+          },
+          {
+            "path": "production.factorio.log",
+            "bytes": 15763,
+            "sha256": "BAA3DEAAE6D4AA2B703649E78579A91B4545277EA7A338322C1B33D1DD7C1BCB"
+          },
+          {
+            "path": "reload-1.factorio.log",
+            "bytes": 14661,
+            "sha256": "C2B995738075CE7C9745113B039795E00CDE8033EEC43CE1725846D627E7A111"
+          },
+          {
+            "path": "reload-2.factorio.log",
+            "bytes": 14661,
+            "sha256": "BCD5ADBA162139FD69FFDA8E43FBEDF529FBB5D4C0290241E51A2F47DDA46E48"
+          },
+          {
+            "path": "result.json",
+            "bytes": 48873,
+            "sha256": "3991AE6A3A6FD7C7189D48A7949E6D04BAB5895A8338398F57D8F0DEC02AC21E"
+          },
+          {
+            "path": "server-settings.json",
+            "bytes": 3679,
+            "sha256": "2FB3E97FE934B92B6C4CCC2403A90A16C357BEC9183E9BC7E550822AC57504E4"
+          },
+          {
+            "path": "write-data/factorio-current.log",
+            "bytes": 14661,
+            "sha256": "BCD5ADBA162139FD69FFDA8E43FBEDF529FBB5D4C0290241E51A2F47DDA46E48"
+          },
+          {
+            "path": "write-data/saves/mir5-native-complete.zip",
+            "bytes": 860652,
+            "sha256": "004DCDAD1CBC076A7C105A75B359DBEDDEBA5B5B820C37647CC671735F2CFFAD"
+          },
+          {
+            "path": "write-data/saves/seed.zip",
+            "bytes": 858464,
+            "sha256": "AEE8267AFAE7C5AFB21BBA97959E97CAB9A4779E559BF56D54A8BFF679462326"
+          }
+        ],
+        "mismatches": []
+      }
+    },
+    {
+      "stage": "fixed-successor",
+      "status": "passed-private-native-fixture",
+      "native_result_sha256": "E2BDD85B39E0AFD5EB5FFE27DD9125F433E957E8F3CEBD32A36B5E4B03CABD14",
+      "mir_archive_sha256": "58F04FB9D417F2726835F4A6740490DE3C1841665DAC81C2BA3DFA94050D9457",
+      "profile_sha256": "0BFFED656EAAB364094348251491B4491DE423EF10ADAA65F81E1B5EF4DE3732",
+      "input_save_sha256": "004DCDAD1CBC076A7C105A75B359DBEDDEBA5B5B820C37647CC671735F2CFFAD",
+      "completed_save_sha256": "1C9C17861E90A1F87C10E331A83AFECB38D12D547DE3E18545D7F52C46139C02",
+      "cold_reloads": 2,
+      "initial_witness": {
+        "actual_lab_completions": 0,
+        "native_state_seeded": true,
+        "no_public_queue": true,
+        "player_early_level": 3,
+        "player_tail_level": 4,
+        "player_tail_saved_progress": 0.27,
+        "player_powder_bonus": 0.06,
+        "player_early_enabled": false,
+        "player_tail_enabled": false,
+        "foreign_early_enabled": false,
+        "foreign_tail_enabled": false,
+        "foreign_early_visible": false,
+        "foreign_tail_visible": true,
+        "on_load_read_only": false
+      },
+      "reload_witness": {
+        "actual_lab_completions": 0,
+        "native_state_seeded": true,
+        "no_public_queue": true,
+        "player_early_level": 3,
+        "player_tail_level": 4,
+        "player_tail_saved_progress": 0.27,
+        "player_powder_bonus": 0.06,
+        "player_early_enabled": false,
+        "player_tail_enabled": false,
+        "foreign_early_enabled": false,
+        "foreign_tail_enabled": false,
+        "foreign_early_visible": false,
+        "foreign_tail_visible": true,
+        "on_load_read_only": true
+      },
+      "custody": {
+        "original_root": "D:\\Projects\\Factorio\\mir5-k2-held-public-flags-aa5-r01\\build\\tmp\\k2-held-public-flags-58f-r04-successor\\fixed-successor",
+        "primary_root": "build/mir5/recovery-historical/k2-held-public-flags-58f-r04-successor/fixed-successor-native-output",
+        "members": [
+          {
+            "path": "config.ini",
+            "bytes": 318,
+            "sha256": "0624F81A8CBCEEDE315A51A76755444E2831F56C4DE34ADB6027DE0FDFD2109A"
+          },
+          {
+            "path": "process-1.resources.jsonl",
+            "bytes": 7504,
+            "sha256": "2E834DB3F612A762A14458CE33DA5D4FAEAEB9F18E6A8152530F0D343EAF2F90"
+          },
+          {
+            "path": "process-1.stderr.txt",
+            "bytes": 0,
+            "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+          },
+          {
+            "path": "process-1.stdout.txt",
+            "bytes": 16152,
+            "sha256": "AC05982E1D8904592FCE8277F12483E53A8ACA133F58C9F135ACF1381B43DF4F"
+          },
+          {
+            "path": "process-2.resources.jsonl",
+            "bytes": 2618,
+            "sha256": "3269B6CE0035A67187D72063F9CA87BB338E14D285FE19D1A2C3654E069BE541"
+          },
+          {
+            "path": "process-2.stderr.txt",
+            "bytes": 0,
+            "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+          },
+          {
+            "path": "process-2.stdout.txt",
+            "bytes": 106,
+            "sha256": "7E6A1EAB5E8D8143D9A561F1C7B0A3B56E725DEE9F1C259A00E5E078C377108C"
+          },
+          {
+            "path": "process-3.resources.jsonl",
+            "bytes": 2618,
+            "sha256": "E991F3D4DB5A689287FEFF2EE82A0DB6AFEA17167FE4B97A490DA6DDC00F4678"
+          },
+          {
+            "path": "process-3.stderr.txt",
+            "bytes": 0,
+            "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+          },
+          {
+            "path": "process-3.stdout.txt",
+            "bytes": 106,
+            "sha256": "8C3855BC5DA89CD4989FA2AF23E331C156D8DB9F6F3E118663D5ED255BBB2FDF"
+          },
+          {
+            "path": "production.factorio.log",
+            "bytes": 15991,
+            "sha256": "EC1C1DB9F857473ABCD6437A1FE307899D563866291E7596599A785E181067A2"
+          },
+          {
+            "path": "reload-1.factorio.log",
+            "bytes": 14809,
+            "sha256": "5EB71195B89E8B812E6B7D453EDA2EF79C4EF44AA001A0500AB7736A7651064C"
+          },
+          {
+            "path": "reload-2.factorio.log",
+            "bytes": 14809,
+            "sha256": "AD159127E663340C77D4B9E19E9A949B2E80A5E9658829534E24F74969867DBF"
+          },
+          {
+            "path": "result.json",
+            "bytes": 40808,
+            "sha256": "E2BDD85B39E0AFD5EB5FFE27DD9125F433E957E8F3CEBD32A36B5E4B03CABD14"
+          },
+          {
+            "path": "server-settings.json",
+            "bytes": 3679,
+            "sha256": "5B4C546FFCA63E1AEC8F67FFA5C32F3108CBC334DFA5AB1C5E2C212005639610"
+          },
+          {
+            "path": "write-data/factorio-current.log",
+            "bytes": 14809,
+            "sha256": "AD159127E663340C77D4B9E19E9A949B2E80A5E9658829534E24F74969867DBF"
+          },
+          {
+            "path": "write-data/saves/mir5-native-complete.zip",
+            "bytes": 861202,
+            "sha256": "1C9C17861E90A1F87C10E331A83AFECB38D12D547DE3E18545D7F52C46139C02"
+          }
+        ],
+        "mismatches": []
+      }
+    }
+  ],
+  "independent_custody": {
+    "original_and_primary_members": 39,
+    "file_hash_checks": 78,
+    "bytes_per_copy": 2882386,
+    "mismatches": []
+  },
+  "original_outer_adverse": {
+    "path": "build/mir5/recovery-historical/k2-held-public-flags-58f-r01/terminal.json",
+    "sha256": "A4AC22440947C7BDD4E797C5650A01C8EE91A6D65F72C13D23F21B61EADF0BD6",
+    "status": "adverse",
+    "failure": "[aai-parity-e3-base-r02] pre-install more-infinite-research_5.0.21000.zip byte count differs",
+    "correction": "Its empty stages array is not a native-execution registry. The actual source result and four native process/log sets completed before the outer archive-handoff refusal. Original bytes remain unchanged; the source was adopted, not replayed."
+  },
+  "diagnostic_receipts": [
+    {
+      "path": "build/mir5/recovery-historical/k2-held-public-flags-58f-r02-binding-diagnostic/first-install-binding-diagnostic.json",
+      "sha256": "5F70464BC50D948D7B59529E890BFD474323421D7C03C993AD87350EC7EA850E"
+    },
+    {
+      "path": "build/mir5/recovery-historical/k2-held-public-flags-58f-r03-binding-diagnostic/first-install-binding-core.json",
+      "sha256": "0E7A77D7BF1C5CE53D228D6D4B5003DC1DAFA27E99C1AE923BA3978E702BD01C"
+    },
+    {
+      "path": "build/mir5/recovery-historical/k2-held-public-flags-58f-r03-binding-diagnostic/first-install-binding-diagnostic.json",
+      "sha256": "02D21A572E2085F564A044D2DC4842E6AC01AB84E7EC64FCB9EE18EC6CE3885B"
+    }
+  ],
+  "restoration": {
+    "successor_terminal_sha256": "01DDFF1DB4F5423496F570A82BFC9BED15C06ADFF0CB571A25AB8388527FA93A",
+    "restore_failures": [],
+    "factorio_processes_after": 0,
+    "checkpoint_scope": "Original C563/A15 and prior fixed-fixture absence restored after successor; source restoration is separately evidenced by r01 backups/readback."
+  },
+  "receipts": {
+    "path": "spec/evidence/k2-held-public-flags-58f-native-receipts.json.gz",
+    "bytes": 121723,
+    "sha256": "6E6FC46F144DE9351B1B7CF879062A746C5C428778DAFF807394EEA3F67BADA3",
+    "uncompressed_sha256": "193797FE816EC9CAD62FBB60E7B75E4F1F1F4E4373CC7D07860F4E5364DA3FF6",
+    "members": 18
+  },
+  "limits": [
+    "This is a seeded E3 MIR5 private-holder to fixed MIR5 public-state handoff, not a published MIR4 or full queued K2SO/K2SE upgrade.",
+    "Actual laboratory completions are zero; 6% earned powder productivity and27% private-to-public saved work are seeded and checked.",
+    "Only the selected exact K2SO/nulls-fork closure and no-public-queue disablement/visibility route are qualified.",
+    "No foreign-writer, other engine/modpack, physical production, performance, client or release verdict is claimed.",
+    "Retain all failed caller and contained diagnostic receipts; do not relabel them as passing or zero-native merely from a terminal counter."
+  ]
+}

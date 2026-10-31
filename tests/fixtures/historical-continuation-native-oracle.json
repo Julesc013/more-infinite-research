@@ -1,0 +1,1773 @@
+{
+  "schema": 1,
+  "kind": "MIR5HistoricalContinuationNativeCharacterizationV1",
+  "status": "historical-characterization-not-mir5-native-qualification",
+  "limits": {
+    "captured_fields_only": true,
+    "definition_source": "seven hash-verified published 4.7-era native full-state snapshots also cited by historical-direct-native-oracle.json",
+    "f013_f014": "The two observed numeric continuations preserve their captured numeric units and do not prove formula, level, upgrade, or maximum fields.",
+    "later_target_projection": "F015+ observations support the named emitted subset only; absent standard chains are not inferred.",
+    "retained_disabled_identity": "MIR5 intentionally retains an enabled=false identity when a historical enabled=false or below-first finite-cap setting would have omitted it; this is an upgrade-preservation correction requiring future native upgrade qualification."
+  },
+  "admission_evidence": {
+    "kind": "hash-verified-local-engine-base-prototype-and-archived-planner-evidence",
+    "finite_predecessor_policy": "Every named finite predecessor and previous record below omits raw max_level; Factorio supplies the finite default. An omitted field is admitted, while an explicit field must be the exact named finite level and infinite is refused.",
+    "named_predecessor_facts": {
+      "braking-force-8": {
+        "predecessor": {
+          "id": "braking-force-7",
+          "unit_count": 650,
+          "order": "b-f-g"
+        },
+        "previous": {
+          "id": "braking-force-6",
+          "unit_count": 550
+        },
+        "raw_max_level": "omitted-native-finite-default"
+      },
+      "inserter-capacity-bonus-8": {
+        "predecessor": {
+          "id": "inserter-capacity-bonus-7",
+          "unit_count": 600,
+          "order": "c-o-h"
+        },
+        "previous": {
+          "id": "inserter-capacity-bonus-6",
+          "unit_count": 400
+        },
+        "raw_max_level": "omitted-native-finite-default"
+      },
+      "research-speed-7": {
+        "predecessor": {
+          "id": "research-speed-6",
+          "unit_count": 500,
+          "order": "c-m-d"
+        },
+        "previous": {
+          "id": "research-speed-5",
+          "unit_count": 500
+        },
+        "raw_max_level": "omitted-native-finite-default"
+      },
+      "weapon-shooting-speed-7": {
+        "predecessor": {
+          "id": "weapon-shooting-speed-6",
+          "unit_count": 600,
+          "order": "e-l-f"
+        },
+        "previous": {
+          "id": "weapon-shooting-speed-5",
+          "unit_count": 500
+        },
+        "raw_max_level": "omitted-native-finite-default"
+      },
+      "worker-robots-storage-4": {
+        "predecessor": {
+          "id": "worker-robots-storage-3",
+          "unit_count": 450,
+          "order": "c-k-g-c"
+        },
+        "previous": {
+          "id": "worker-robots-storage-2",
+          "unit_count": 300
+        },
+        "raw_max_level": "omitted-native-finite-default"
+      },
+      "laser-shooting-speed-8": {
+        "predecessor": {
+          "id": "laser-shooting-speed-7",
+          "unit_count": 450,
+          "order": "e-n-n"
+        },
+        "previous": {
+          "id": "laser-shooting-speed-6",
+          "unit_count": 350
+        },
+        "raw_max_level": "omitted-native-finite-default"
+      }
+    },
+    "engine_sources": [
+      {
+        "target": "f013",
+        "factorio_version": "0.13",
+        "files": [
+          {
+            "path": "D:\\Programs\\Factorio\\0.13\\data\\base\\prototypes\\technology\\technology.lua",
+            "sha256": "AE4B6FBC491A3B742E8ED923AEE1C405D6D950100E903CAB16A6B3EA4F64772D"
+          },
+          {
+            "path": "D:\\Programs\\Factorio\\0.13\\data\\base\\prototypes\\technology\\inserter.lua",
+            "sha256": "70B1F86925BDB3B31BDE8A1915B3B4796D951BE87D41DD3261BCDC941E8FA052"
+          }
+        ]
+      },
+      {
+        "target": "f014",
+        "factorio_version": "0.14",
+        "files": [
+          {
+            "path": "D:\\Programs\\Factorio\\0.14\\data\\base\\prototypes\\technology\\technology.lua",
+            "sha256": "0629CBA1A3B90C0D8F160CC22AF98AE246D64CCA7C6AE2455F460906D8C8F46D"
+          },
+          {
+            "path": "D:\\Programs\\Factorio\\0.14\\data\\base\\prototypes\\technology\\inserter.lua",
+            "sha256": "70B1F86925BDB3B31BDE8A1915B3B4796D951BE87D41DD3261BCDC941E8FA052"
+          }
+        ]
+      },
+      {
+        "target": "f015",
+        "factorio_version": "0.15",
+        "files": [
+          {
+            "path": "D:\\Programs\\Factorio\\0.15\\data\\base\\prototypes\\technology\\technology.lua",
+            "sha256": "63C930F05930E16776371B7B8C5B1B694E2E26CC935FB8E57B89441B2BA7946B"
+          },
+          {
+            "path": "D:\\Programs\\Factorio\\0.15\\data\\base\\prototypes\\technology\\inserter.lua",
+            "sha256": "82778D57FC384602CF46381BFAA304C4E0AA40DC113A338E4ACE5D6796A4D147"
+          }
+        ]
+      },
+      {
+        "target": "f016",
+        "factorio_version": "0.16",
+        "files": [
+          {
+            "path": "D:\\Programs\\Factorio\\0.16\\data\\base\\prototypes\\technology\\technology.lua",
+            "sha256": "987D677BD7775A3E583949696B3BDD4EA51F77021D728C9E937BB8B52A97F40C"
+          },
+          {
+            "path": "D:\\Programs\\Factorio\\0.16\\data\\base\\prototypes\\technology\\inserter.lua",
+            "sha256": "78B05E17E9938207CF82D4658649A1EBD5F5F37678B1486AB208F535C74E7DE3"
+          }
+        ]
+      },
+      {
+        "target": "f017",
+        "factorio_version": "0.17",
+        "files": [
+          {
+            "path": "D:\\Programs\\Factorio\\0.17\\data\\base\\prototypes\\technology\\technology.lua",
+            "sha256": "95454497BB11BD7083368E869562E81E195D0B8BBE98CAFCDA25FDF57D37F5AD"
+          },
+          {
+            "path": "D:\\Programs\\Factorio\\0.17\\data\\base\\prototypes\\technology\\inserter.lua",
+            "sha256": "7FBC5C38F811DA782E716705AB88C639934A5B8366DE3C36717BE119141E0DE6"
+          },
+          {
+            "path": "D:\\Programs\\Factorio\\0.17\\data\\base\\prototypes\\technology\\military-upgrades.lua",
+            "sha256": "2E9A17B9DB654157099633384694F756F2E0F385E0BBEA4708FFBDDECE3367AB"
+          }
+        ]
+      },
+      {
+        "target": "f100",
+        "factorio_version": "1.0",
+        "files": [
+          {
+            "path": "D:\\Programs\\Factorio\\1.0\\data\\base\\prototypes\\technology\\technology.lua",
+            "sha256": "AEF1D698AD309BEA96ED3A66AB7337FAD3A5F952685E627BCF6D016F75A38383"
+          },
+          {
+            "path": "D:\\Programs\\Factorio\\1.0\\data\\base\\prototypes\\technology\\inserter.lua",
+            "sha256": "7FBC5C38F811DA782E716705AB88C639934A5B8366DE3C36717BE119141E0DE6"
+          },
+          {
+            "path": "D:\\Programs\\Factorio\\1.0\\data\\base\\prototypes\\technology\\military-upgrades.lua",
+            "sha256": "AB29F48E6E126891334878E74674CBD3719BCD90DC78F557FB1A20E715A1FEB5"
+          }
+        ]
+      },
+      {
+        "target": "f110",
+        "factorio_version": "1.1",
+        "files": [
+          {
+            "path": "D:\\Programs\\Factorio\\1.1\\data\\base\\prototypes\\technology.lua",
+            "sha256": "45DAE20B5945E956770DEEA09342A2587C150000215B98E232C150D0009AADBA"
+          }
+        ]
+      }
+    ],
+    "archived_formula_resolver": {
+      "archive_path": "C:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\mir442-postrelease-r22-qualification-r01\\prior-f110-r20.zip",
+      "archive_sha256": "5DFAF4C905513FB2993A3B53F191FF5BE3A190BD91005CDB56A020F6F882FFB9",
+      "member": "more-infinite-research_4.4.11002/prototypes/mir/planner/base_continuations/plan.lua",
+      "rules": [
+        "growth setting 0 uses predecessor/previous named-chain inheritance before the nondecreasing floor of 1",
+        "configured growth below 1 reaches the same floor of 1",
+        "base setting 0 inherits predecessor_count / growth^(first_level - 1)",
+        "the inherited positive L=1 base coefficient is not independently floored at 1"
+      ]
+    }
+  },
+  "captures": [
+    {
+      "target": "f013",
+      "source": {
+        "kind": "hash-verified-published-4.7-era-native-full-state-snapshot",
+        "path": "C:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\mir442-postrelease-r22-qualification-r01\\native-f013-direct422-r02\\work\\u-1738c4d8c6d64c1a\\userdata\\script-output\\mir-upgrade-full-state-upgrade.json",
+        "sha256": "82EBAABA878F17E0C9489265A8D0278C3990E2C01A9E609A7BE8885E3FBBE2D5",
+        "force": "player",
+        "selection": "forces.player.technologies entries with one of six named base-continuation identities"
+      },
+      "technologies": [
+        {
+          "definition": {
+            "effects": {
+              "1": {
+                "modifier": 2,
+                "type": "inserter-stack-size-bonus"
+              },
+              "2": {
+                "modifier": 4,
+                "type": "stack-inserter-capacity-bonus"
+              }
+            },
+            "ingredients": {
+              "1": {
+                "amount": 2,
+                "name": "alien-science-pack"
+              },
+              "2": {
+                "amount": 4,
+                "name": "science-pack-1"
+              },
+              "3": {
+                "amount": 4,
+                "name": "science-pack-2"
+              },
+              "4": {
+                "amount": 3,
+                "name": "science-pack-3"
+              }
+            },
+            "order": "c-o-h",
+            "prerequisites": {
+              "1": "advanced-electronics",
+              "2": "alien-technology",
+              "3": "battery",
+              "4": "inserter-capacity-bonus-6",
+              "5": "inserter-capacity-bonus-7",
+              "6": "logistics"
+            },
+            "unit_count": 914489,
+            "unit_energy": 3600
+          },
+          "enabled": true,
+          "researched": false,
+          "id": "inserter-capacity-bonus-8"
+        },
+        {
+          "definition": {
+            "effects": {
+              "1": {
+                "modifier": 1,
+                "type": "worker-robot-storage"
+              }
+            },
+            "ingredients": {
+              "1": {
+                "amount": 1,
+                "name": "alien-science-pack"
+              },
+              "2": {
+                "amount": 1,
+                "name": "science-pack-1"
+              },
+              "3": {
+                "amount": 1,
+                "name": "science-pack-2"
+              },
+              "4": {
+                "amount": 1,
+                "name": "science-pack-3"
+              }
+            },
+            "order": "c-k-g-c",
+            "prerequisites": {
+              "1": "advanced-electronics",
+              "2": "alien-technology",
+              "3": "battery",
+              "4": "logistics",
+              "5": "worker-robots-storage-2",
+              "6": "worker-robots-storage-3"
+            },
+            "unit_count": 675,
+            "unit_energy": 3600
+          },
+          "enabled": true,
+          "researched": false,
+          "id": "worker-robots-storage-4"
+        }
+      ]
+    },
+    {
+      "target": "f014",
+      "source": {
+        "kind": "hash-verified-published-4.7-era-native-full-state-snapshot",
+        "path": "C:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\mir442-postrelease-r22-qualification-r01\\native-f014-direct422-r02\\work\\u-236bb1b1af224cbf\\userdata\\script-output\\mir-upgrade-full-state-upgrade.json",
+        "sha256": "C346F4A15E976D22393C10A1951AFE2D3AE33C142D36B0C6640B1ABA8403A847",
+        "force": "player",
+        "selection": "forces.player.technologies entries with one of six named base-continuation identities"
+      },
+      "technologies": [
+        {
+          "definition": {
+            "effects": {
+              "1": {
+                "modifier": 2,
+                "type": "inserter-stack-size-bonus"
+              },
+              "2": {
+                "modifier": 4,
+                "type": "stack-inserter-capacity-bonus"
+              }
+            },
+            "ingredients": {
+              "1": {
+                "amount": 2,
+                "name": "alien-science-pack"
+              },
+              "2": {
+                "amount": 4,
+                "name": "science-pack-1"
+              },
+              "3": {
+                "amount": 4,
+                "name": "science-pack-2"
+              },
+              "4": {
+                "amount": 3,
+                "name": "science-pack-3"
+              }
+            },
+            "order": "c-o-h",
+            "prerequisites": {
+              "1": "advanced-electronics",
+              "2": "alien-technology",
+              "3": "battery",
+              "4": "inserter-capacity-bonus-6",
+              "5": "inserter-capacity-bonus-7",
+              "6": "logistics"
+            },
+            "unit_count": 914489,
+            "unit_energy": 3600
+          },
+          "enabled": true,
+          "researched": false,
+          "id": "inserter-capacity-bonus-8"
+        },
+        {
+          "definition": {
+            "effects": {
+              "1": {
+                "modifier": 1,
+                "type": "worker-robot-storage"
+              }
+            },
+            "ingredients": {
+              "1": {
+                "amount": 1,
+                "name": "alien-science-pack"
+              },
+              "2": {
+                "amount": 1,
+                "name": "science-pack-1"
+              },
+              "3": {
+                "amount": 1,
+                "name": "science-pack-2"
+              },
+              "4": {
+                "amount": 1,
+                "name": "science-pack-3"
+              }
+            },
+            "order": "c-k-g-c",
+            "prerequisites": {
+              "1": "advanced-electronics",
+              "2": "alien-technology",
+              "3": "battery",
+              "4": "logistics",
+              "5": "worker-robots-storage-2",
+              "6": "worker-robots-storage-3"
+            },
+            "unit_count": 675,
+            "unit_energy": 3600
+          },
+          "enabled": true,
+          "researched": false,
+          "id": "worker-robots-storage-4"
+        }
+      ]
+    },
+    {
+      "target": "f015",
+      "source": {
+        "kind": "hash-verified-published-4.7-era-native-full-state-snapshot",
+        "path": "C:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\mir442-postrelease-r22-qualification-r01\\native-f015-direct422-r01\\4.4.01502-upgrade-base-default-from-4.2.01502-full-state-upgrade.json",
+        "sha256": "5ACB802A1CDD7F8086C846178E9DDF9D359D417F0107006AB114624E9EB1BA42",
+        "force": "player",
+        "selection": "forces.player.technologies entries with one of six named base-continuation identities"
+      },
+      "technologies": [
+        {
+          "definition": {
+            "effects": {
+              "1": {
+                "modifier": 0.15,
+                "type": "train-braking-force-bonus"
+              }
+            },
+            "ingredients": {
+              "1": {
+                "amount": 1,
+                "name": "high-tech-science-pack"
+              },
+              "2": {
+                "amount": 1,
+                "name": "production-science-pack"
+              },
+              "3": {
+                "amount": 1,
+                "name": "science-pack-1"
+              },
+              "4": {
+                "amount": 1,
+                "name": "science-pack-2"
+              },
+              "5": {
+                "amount": 1,
+                "name": "science-pack-3"
+              }
+            },
+            "max_level": 4294967295,
+            "order": "b-f-g",
+            "prerequisites": {
+              "1": "advanced-electronics",
+              "10": "speed-module",
+              "2": "advanced-electronics-2",
+              "3": "advanced-material-processing-2",
+              "4": "automation-2",
+              "5": "battery",
+              "6": "braking-force-6",
+              "7": "braking-force-7",
+              "8": "electric-engine",
+              "9": "engine"
+            },
+            "unit_count": 861,
+            "unit_count_formula": "1*(861.51212960553*1.33333^(L-8))",
+            "unit_energy": 3600
+          },
+          "enabled": true,
+          "level": 8,
+          "researched": false,
+          "id": "braking-force-8"
+        },
+        {
+          "definition": {
+            "effects": {
+              "1": {
+                "modifier": 2,
+                "type": "inserter-stack-size-bonus"
+              },
+              "2": {
+                "modifier": 4,
+                "type": "stack-inserter-capacity-bonus"
+              }
+            },
+            "ingredients": {
+              "1": {
+                "amount": 1,
+                "name": "high-tech-science-pack"
+              },
+              "2": {
+                "amount": 1,
+                "name": "production-science-pack"
+              },
+              "3": {
+                "amount": 1,
+                "name": "science-pack-1"
+              },
+              "4": {
+                "amount": 1,
+                "name": "science-pack-2"
+              },
+              "5": {
+                "amount": 1,
+                "name": "science-pack-3"
+              }
+            },
+            "max_level": 4294967295,
+            "order": "c-o-h",
+            "prerequisites": {
+              "1": "advanced-electronics",
+              "10": "speed-module",
+              "2": "advanced-electronics-2",
+              "3": "advanced-material-processing-2",
+              "4": "automation-2",
+              "5": "battery",
+              "6": "electric-engine",
+              "7": "engine",
+              "8": "inserter-capacity-bonus-6",
+              "9": "inserter-capacity-bonus-7"
+            },
+            "unit_count": 914488,
+            "unit_count_formula": "1*(914488.340211249*3.33333^(L-8))",
+            "unit_energy": 3600
+          },
+          "enabled": true,
+          "level": 8,
+          "researched": false,
+          "id": "inserter-capacity-bonus-8"
+        },
+        {
+          "definition": {
+            "effects": {
+              "1": {
+                "modifier": 0.6,
+                "type": "laboratory-speed"
+              }
+            },
+            "ingredients": {
+              "1": {
+                "amount": 1,
+                "name": "high-tech-science-pack"
+              },
+              "2": {
+                "amount": 1,
+                "name": "military-science-pack"
+              },
+              "3": {
+                "amount": 1,
+                "name": "production-science-pack"
+              },
+              "4": {
+                "amount": 1,
+                "name": "science-pack-1"
+              },
+              "5": {
+                "amount": 1,
+                "name": "science-pack-2"
+              },
+              "6": {
+                "amount": 1,
+                "name": "science-pack-3"
+              }
+            },
+            "max_level": 4294967295,
+            "order": "c-m-d",
+            "prerequisites": {
+              "1": "advanced-electronics",
+              "10": "research-speed-6",
+              "11": "speed-module",
+              "12": "turrets",
+              "2": "advanced-electronics-2",
+              "3": "advanced-material-processing-2",
+              "4": "automation-2",
+              "5": "battery",
+              "6": "electric-engine",
+              "7": "engine",
+              "8": "military-2",
+              "9": "research-speed-5"
+            },
+            "unit_count": 683,
+            "unit_count_formula": "1*(683.4375*1.5^(L-7))",
+            "unit_energy": 7200
+          },
+          "enabled": true,
+          "level": 7,
+          "researched": false,
+          "id": "research-speed-7"
+        },
+        {
+          "definition": {
+            "effects": {
+              "1": {
+                "modifier": 1,
+                "type": "worker-robot-storage"
+              }
+            },
+            "ingredients": {
+              "1": {
+                "amount": 1,
+                "name": "high-tech-science-pack"
+              },
+              "2": {
+                "amount": 1,
+                "name": "production-science-pack"
+              },
+              "3": {
+                "amount": 1,
+                "name": "science-pack-1"
+              },
+              "4": {
+                "amount": 1,
+                "name": "science-pack-2"
+              },
+              "5": {
+                "amount": 1,
+                "name": "science-pack-3"
+              }
+            },
+            "max_level": 4294967295,
+            "order": "c-k-g-c",
+            "prerequisites": {
+              "1": "advanced-electronics",
+              "10": "worker-robots-storage-3",
+              "2": "advanced-electronics-2",
+              "3": "advanced-material-processing-2",
+              "4": "automation-2",
+              "5": "battery",
+              "6": "electric-engine",
+              "7": "engine",
+              "8": "speed-module",
+              "9": "worker-robots-storage-2"
+            },
+            "unit_count": 675,
+            "unit_count_formula": "1*(675*1.5^(L-4))",
+            "unit_energy": 3600
+          },
+          "enabled": true,
+          "level": 4,
+          "researched": false,
+          "id": "worker-robots-storage-4"
+        }
+      ]
+    },
+    {
+      "target": "f016",
+      "source": {
+        "kind": "hash-verified-published-4.7-era-native-full-state-snapshot",
+        "path": "C:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\mir442-postrelease-r22-qualification-r01\\native-f016-direct422-r02\\4.4.01602-upgrade-base-default-from-4.2.01602-full-state-upgrade.json",
+        "sha256": "2036786CB20F9B9FE728CB42468BA4C61E58A9840651A1099849B1A9B3F63E87",
+        "force": "player",
+        "selection": "forces.player.technologies entries with one of six named base-continuation identities"
+      },
+      "technologies": [
+        {
+          "definition": {
+            "effects": {
+              "1": {
+                "modifier": 0.15,
+                "type": "train-braking-force-bonus"
+              }
+            },
+            "ingredients": {
+              "1": {
+                "amount": 1,
+                "name": "high-tech-science-pack"
+              },
+              "2": {
+                "amount": 1,
+                "name": "production-science-pack"
+              },
+              "3": {
+                "amount": 1,
+                "name": "science-pack-1"
+              },
+              "4": {
+                "amount": 1,
+                "name": "science-pack-2"
+              },
+              "5": {
+                "amount": 1,
+                "name": "science-pack-3"
+              }
+            },
+            "max_level": 4294967295,
+            "order": "b-f-g",
+            "prerequisites": {
+              "1": "advanced-electronics",
+              "10": "speed-module",
+              "2": "advanced-electronics-2",
+              "3": "advanced-material-processing-2",
+              "4": "automation-2",
+              "5": "battery",
+              "6": "braking-force-6",
+              "7": "braking-force-7",
+              "8": "electric-engine",
+              "9": "engine"
+            },
+            "unit_count": 861,
+            "unit_count_formula": "1*(861.51212960553*1.33333^(L-8))",
+            "unit_energy": 3600
+          },
+          "enabled": true,
+          "level": 8,
+          "researched": false,
+          "id": "braking-force-8"
+        },
+        {
+          "definition": {
+            "effects": {
+              "1": {
+                "modifier": 2,
+                "type": "inserter-stack-size-bonus"
+              },
+              "2": {
+                "modifier": 4,
+                "type": "stack-inserter-capacity-bonus"
+              }
+            },
+            "ingredients": {
+              "1": {
+                "amount": 1,
+                "name": "high-tech-science-pack"
+              },
+              "2": {
+                "amount": 1,
+                "name": "production-science-pack"
+              },
+              "3": {
+                "amount": 1,
+                "name": "science-pack-1"
+              },
+              "4": {
+                "amount": 1,
+                "name": "science-pack-2"
+              },
+              "5": {
+                "amount": 1,
+                "name": "science-pack-3"
+              }
+            },
+            "max_level": 4294967295,
+            "order": "c-o-h",
+            "prerequisites": {
+              "1": "advanced-electronics",
+              "10": "speed-module",
+              "2": "advanced-electronics-2",
+              "3": "advanced-material-processing-2",
+              "4": "automation-2",
+              "5": "battery",
+              "6": "electric-engine",
+              "7": "engine",
+              "8": "inserter-capacity-bonus-6",
+              "9": "inserter-capacity-bonus-7"
+            },
+            "unit_count": 914488,
+            "unit_count_formula": "1*(914488.340211249*3.33333^(L-8))",
+            "unit_energy": 3600
+          },
+          "enabled": true,
+          "level": 8,
+          "researched": false,
+          "id": "inserter-capacity-bonus-8"
+        },
+        {
+          "definition": {
+            "effects": {
+              "1": {
+                "modifier": 0.6,
+                "type": "laboratory-speed"
+              }
+            },
+            "ingredients": {
+              "1": {
+                "amount": 1,
+                "name": "high-tech-science-pack"
+              },
+              "2": {
+                "amount": 1,
+                "name": "military-science-pack"
+              },
+              "3": {
+                "amount": 1,
+                "name": "production-science-pack"
+              },
+              "4": {
+                "amount": 1,
+                "name": "science-pack-1"
+              },
+              "5": {
+                "amount": 1,
+                "name": "science-pack-2"
+              },
+              "6": {
+                "amount": 1,
+                "name": "science-pack-3"
+              }
+            },
+            "max_level": 4294967295,
+            "order": "c-m-d",
+            "prerequisites": {
+              "1": "advanced-electronics",
+              "10": "research-speed-6",
+              "11": "speed-module",
+              "12": "turrets",
+              "2": "advanced-electronics-2",
+              "3": "advanced-material-processing-2",
+              "4": "automation-2",
+              "5": "battery",
+              "6": "electric-engine",
+              "7": "engine",
+              "8": "military-2",
+              "9": "research-speed-5"
+            },
+            "unit_count": 683,
+            "unit_count_formula": "1*(683.4375*1.5^(L-7))",
+            "unit_energy": 7200
+          },
+          "enabled": true,
+          "level": 7,
+          "researched": false,
+          "id": "research-speed-7"
+        },
+        {
+          "definition": {
+            "effects": {
+              "1": {
+                "modifier": 1,
+                "type": "worker-robot-storage"
+              }
+            },
+            "ingredients": {
+              "1": {
+                "amount": 1,
+                "name": "high-tech-science-pack"
+              },
+              "2": {
+                "amount": 1,
+                "name": "production-science-pack"
+              },
+              "3": {
+                "amount": 1,
+                "name": "science-pack-1"
+              },
+              "4": {
+                "amount": 1,
+                "name": "science-pack-2"
+              },
+              "5": {
+                "amount": 1,
+                "name": "science-pack-3"
+              }
+            },
+            "max_level": 4294967295,
+            "order": "c-k-g-c",
+            "prerequisites": {
+              "1": "advanced-electronics",
+              "10": "worker-robots-storage-3",
+              "2": "advanced-electronics-2",
+              "3": "advanced-material-processing-2",
+              "4": "automation-2",
+              "5": "battery",
+              "6": "electric-engine",
+              "7": "engine",
+              "8": "speed-module",
+              "9": "worker-robots-storage-2"
+            },
+            "unit_count": 675,
+            "unit_count_formula": "1*(675*1.5^(L-4))",
+            "unit_energy": 3600
+          },
+          "enabled": true,
+          "level": 4,
+          "researched": false,
+          "id": "worker-robots-storage-4"
+        }
+      ]
+    },
+    {
+      "target": "f017",
+      "source": {
+        "kind": "hash-verified-published-4.7-era-native-full-state-snapshot",
+        "path": "C:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\mir442-postrelease-r22-qualification-r01\\native-f017-published441-r02\\4.4.01702-upgrade-base-default-from-4.4.01701-full-state-upgrade.json",
+        "sha256": "E432FBE57BCC1A226D15CD1D337173CA1D8E72107D4DD58452016B7D33363830",
+        "force": "player",
+        "selection": "forces.player.technologies entries with one of six named base-continuation identities"
+      },
+      "technologies": [
+        {
+          "definition": {
+            "effects": {
+              "1": {
+                "modifier": 0.15,
+                "type": "train-braking-force-bonus"
+              }
+            },
+            "hidden": false,
+            "ingredients": {
+              "1": {
+                "amount": 1,
+                "name": "automation-science-pack"
+              },
+              "2": {
+                "amount": 1,
+                "name": "chemical-science-pack"
+              },
+              "3": {
+                "amount": 1,
+                "name": "logistic-science-pack"
+              },
+              "4": {
+                "amount": 1,
+                "name": "production-science-pack"
+              },
+              "5": {
+                "amount": 1,
+                "name": "utility-science-pack"
+              }
+            },
+            "max_level": 4294967295,
+            "order": "b-f-g",
+            "prerequisites": {
+              "1": "braking-force-6",
+              "2": "braking-force-7",
+              "3": "chemical-science-pack",
+              "4": "logistic-science-pack",
+              "5": "production-science-pack",
+              "6": "utility-science-pack"
+            },
+            "unit_count": 861,
+            "unit_count_formula": "1*(861.51212960553*1.33333^(L-8))",
+            "unit_energy": 3600
+          },
+          "enabled": true,
+          "level": 8,
+          "researched": false,
+          "visible_when_disabled": false,
+          "id": "braking-force-8"
+        },
+        {
+          "definition": {
+            "effects": {
+              "1": {
+                "modifier": 2,
+                "type": "inserter-stack-size-bonus"
+              },
+              "2": {
+                "modifier": 4,
+                "type": "stack-inserter-capacity-bonus"
+              }
+            },
+            "hidden": false,
+            "ingredients": {
+              "1": {
+                "amount": 1,
+                "name": "automation-science-pack"
+              },
+              "2": {
+                "amount": 1,
+                "name": "chemical-science-pack"
+              },
+              "3": {
+                "amount": 1,
+                "name": "logistic-science-pack"
+              },
+              "4": {
+                "amount": 1,
+                "name": "production-science-pack"
+              },
+              "5": {
+                "amount": 1,
+                "name": "utility-science-pack"
+              }
+            },
+            "max_level": 4294967295,
+            "order": "c-o-h",
+            "prerequisites": {
+              "1": "chemical-science-pack",
+              "2": "inserter-capacity-bonus-6",
+              "3": "inserter-capacity-bonus-7",
+              "4": "logistic-science-pack",
+              "5": "production-science-pack",
+              "6": "utility-science-pack"
+            },
+            "unit_count": 914488,
+            "unit_count_formula": "1*(914488.340211249*3.33333^(L-8))",
+            "unit_energy": 3600
+          },
+          "enabled": true,
+          "level": 8,
+          "researched": false,
+          "visible_when_disabled": false,
+          "id": "inserter-capacity-bonus-8"
+        },
+        {
+          "definition": {
+            "effects": {
+              "1": {
+                "modifier": 0.6,
+                "type": "laboratory-speed"
+              }
+            },
+            "hidden": false,
+            "ingredients": {
+              "1": {
+                "amount": 1,
+                "name": "automation-science-pack"
+              },
+              "2": {
+                "amount": 1,
+                "name": "chemical-science-pack"
+              },
+              "3": {
+                "amount": 1,
+                "name": "logistic-science-pack"
+              },
+              "4": {
+                "amount": 1,
+                "name": "military-science-pack"
+              },
+              "5": {
+                "amount": 1,
+                "name": "production-science-pack"
+              },
+              "6": {
+                "amount": 1,
+                "name": "utility-science-pack"
+              }
+            },
+            "max_level": 4294967295,
+            "order": "c-m-d",
+            "prerequisites": {
+              "1": "chemical-science-pack",
+              "2": "logistic-science-pack",
+              "3": "military-science-pack",
+              "4": "production-science-pack",
+              "5": "research-speed-5",
+              "6": "research-speed-6",
+              "7": "utility-science-pack"
+            },
+            "unit_count": 683,
+            "unit_count_formula": "1*(683.4375*1.5^(L-7))",
+            "unit_energy": 7200
+          },
+          "enabled": true,
+          "level": 7,
+          "researched": false,
+          "visible_when_disabled": false,
+          "id": "research-speed-7"
+        },
+        {
+          "definition": {
+            "effects": {
+              "1": {
+                "ammo_category": "bullet",
+                "modifier": 0.4,
+                "type": "gun-speed"
+              },
+              "2": {
+                "ammo_category": "shotgun-shell",
+                "modifier": 0.4,
+                "type": "gun-speed"
+              }
+            },
+            "hidden": false,
+            "ingredients": {
+              "1": {
+                "amount": 1,
+                "name": "automation-science-pack"
+              },
+              "2": {
+                "amount": 1,
+                "name": "chemical-science-pack"
+              },
+              "3": {
+                "amount": 1,
+                "name": "logistic-science-pack"
+              },
+              "4": {
+                "amount": 1,
+                "name": "military-science-pack"
+              },
+              "5": {
+                "amount": 1,
+                "name": "utility-science-pack"
+              }
+            },
+            "max_level": 4294967295,
+            "order": "e-l-f",
+            "prerequisites": {
+              "1": "chemical-science-pack",
+              "2": "logistic-science-pack",
+              "3": "military-science-pack",
+              "4": "utility-science-pack",
+              "5": "weapon-shooting-speed-5",
+              "6": "weapon-shooting-speed-6"
+            },
+            "unit_count": 683,
+            "unit_count_formula": "1*(683.4375*1.5^(L-7))",
+            "unit_energy": 7200
+          },
+          "enabled": true,
+          "level": 7,
+          "researched": false,
+          "visible_when_disabled": false,
+          "id": "weapon-shooting-speed-7"
+        },
+        {
+          "definition": {
+            "effects": {
+              "1": {
+                "modifier": 1,
+                "type": "worker-robot-storage"
+              }
+            },
+            "hidden": false,
+            "ingredients": {
+              "1": {
+                "amount": 1,
+                "name": "automation-science-pack"
+              },
+              "2": {
+                "amount": 1,
+                "name": "chemical-science-pack"
+              },
+              "3": {
+                "amount": 1,
+                "name": "logistic-science-pack"
+              },
+              "4": {
+                "amount": 1,
+                "name": "production-science-pack"
+              },
+              "5": {
+                "amount": 1,
+                "name": "utility-science-pack"
+              }
+            },
+            "max_level": 4294967295,
+            "order": "c-k-g-c",
+            "prerequisites": {
+              "1": "chemical-science-pack",
+              "2": "logistic-science-pack",
+              "3": "production-science-pack",
+              "4": "utility-science-pack",
+              "5": "worker-robots-storage-2",
+              "6": "worker-robots-storage-3"
+            },
+            "unit_count": 675,
+            "unit_count_formula": "1*(675*1.5^(L-4))",
+            "unit_energy": 3600
+          },
+          "enabled": true,
+          "level": 4,
+          "researched": false,
+          "visible_when_disabled": false,
+          "id": "worker-robots-storage-4"
+        }
+      ]
+    },
+    {
+      "target": "f100",
+      "source": {
+        "kind": "hash-verified-published-4.7-era-native-full-state-snapshot",
+        "path": "C:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\mir442-postrelease-r22-qualification-r01\\f100-upgrade-422\\4.4.10002-upgrade-base-default-from-4.2.10002-full-state-upgrade.json",
+        "sha256": "7CE16492153276E76D94419169E5DFA4D14A33E6DF7294ACB6E8B1221B7F5CA6",
+        "force": "player",
+        "selection": "forces.player.technologies entries with one of six named base-continuation identities"
+      },
+      "technologies": [
+        {
+          "definition": {
+            "effects": {
+              "1": {
+                "modifier": 0.15,
+                "type": "train-braking-force-bonus"
+              }
+            },
+            "hidden": false,
+            "ingredients": {
+              "1": {
+                "amount": 1,
+                "name": "automation-science-pack"
+              },
+              "2": {
+                "amount": 1,
+                "name": "chemical-science-pack"
+              },
+              "3": {
+                "amount": 1,
+                "name": "logistic-science-pack"
+              },
+              "4": {
+                "amount": 1,
+                "name": "production-science-pack"
+              },
+              "5": {
+                "amount": 1,
+                "name": "utility-science-pack"
+              }
+            },
+            "max_level": 4294967295,
+            "order": "b-f-g",
+            "prerequisites": {
+              "1": "braking-force-6",
+              "2": "braking-force-7",
+              "3": "chemical-science-pack",
+              "4": "logistic-science-pack",
+              "5": "production-science-pack",
+              "6": "utility-science-pack"
+            },
+            "unit_count": 1148,
+            "unit_count_formula": "1*(861.51212960553*1.33333^(L-8))",
+            "unit_energy": 3600
+          },
+          "enabled": true,
+          "level": 9,
+          "researched": false,
+          "visible_when_disabled": false,
+          "id": "braking-force-8"
+        },
+        {
+          "definition": {
+            "effects": {
+              "1": {
+                "modifier": 2,
+                "type": "inserter-stack-size-bonus"
+              },
+              "2": {
+                "modifier": 4,
+                "type": "stack-inserter-capacity-bonus"
+              }
+            },
+            "hidden": false,
+            "ingredients": {
+              "1": {
+                "amount": 1,
+                "name": "automation-science-pack"
+              },
+              "2": {
+                "amount": 1,
+                "name": "chemical-science-pack"
+              },
+              "3": {
+                "amount": 1,
+                "name": "logistic-science-pack"
+              },
+              "4": {
+                "amount": 1,
+                "name": "production-science-pack"
+              },
+              "5": {
+                "amount": 1,
+                "name": "utility-science-pack"
+              }
+            },
+            "max_level": 4294967295,
+            "order": "c-o-h",
+            "prerequisites": {
+              "1": "chemical-science-pack",
+              "2": "inserter-capacity-bonus-6",
+              "3": "inserter-capacity-bonus-7",
+              "4": "logistic-science-pack",
+              "5": "production-science-pack",
+              "6": "utility-science-pack"
+            },
+            "unit_count": 3048291,
+            "unit_count_formula": "1*(914488.340211249*3.33333^(L-8))",
+            "unit_energy": 3600
+          },
+          "enabled": true,
+          "level": 9,
+          "researched": false,
+          "visible_when_disabled": false,
+          "id": "inserter-capacity-bonus-8"
+        },
+        {
+          "definition": {
+            "effects": {
+              "1": {
+                "modifier": 0.6,
+                "type": "laboratory-speed"
+              }
+            },
+            "hidden": false,
+            "ingredients": {
+              "1": {
+                "amount": 1,
+                "name": "automation-science-pack"
+              },
+              "2": {
+                "amount": 1,
+                "name": "chemical-science-pack"
+              },
+              "3": {
+                "amount": 1,
+                "name": "logistic-science-pack"
+              },
+              "4": {
+                "amount": 1,
+                "name": "military-science-pack"
+              },
+              "5": {
+                "amount": 1,
+                "name": "production-science-pack"
+              },
+              "6": {
+                "amount": 1,
+                "name": "utility-science-pack"
+              }
+            },
+            "max_level": 4294967295,
+            "order": "c-m-d",
+            "prerequisites": {
+              "1": "chemical-science-pack",
+              "2": "logistic-science-pack",
+              "3": "military-science-pack",
+              "4": "production-science-pack",
+              "5": "research-speed-5",
+              "6": "research-speed-6",
+              "7": "utility-science-pack"
+            },
+            "unit_count": 1025,
+            "unit_count_formula": "1*(683.4375*1.5^(L-7))",
+            "unit_energy": 7200
+          },
+          "enabled": true,
+          "level": 8,
+          "researched": false,
+          "visible_when_disabled": false,
+          "id": "research-speed-7"
+        },
+        {
+          "definition": {
+            "effects": {
+              "1": {
+                "ammo_category": "bullet",
+                "modifier": 0.4,
+                "type": "gun-speed"
+              },
+              "2": {
+                "ammo_category": "shotgun-shell",
+                "modifier": 0.4,
+                "type": "gun-speed"
+              }
+            },
+            "hidden": false,
+            "ingredients": {
+              "1": {
+                "amount": 1,
+                "name": "automation-science-pack"
+              },
+              "2": {
+                "amount": 1,
+                "name": "chemical-science-pack"
+              },
+              "3": {
+                "amount": 1,
+                "name": "logistic-science-pack"
+              },
+              "4": {
+                "amount": 1,
+                "name": "military-science-pack"
+              },
+              "5": {
+                "amount": 1,
+                "name": "utility-science-pack"
+              }
+            },
+            "max_level": 4294967295,
+            "order": "e-l-f",
+            "prerequisites": {
+              "1": "chemical-science-pack",
+              "2": "logistic-science-pack",
+              "3": "military-science-pack",
+              "4": "utility-science-pack",
+              "5": "weapon-shooting-speed-5",
+              "6": "weapon-shooting-speed-6"
+            },
+            "unit_count": 1025,
+            "unit_count_formula": "1*(683.4375*1.5^(L-7))",
+            "unit_energy": 7200
+          },
+          "enabled": true,
+          "level": 8,
+          "researched": false,
+          "visible_when_disabled": false,
+          "id": "weapon-shooting-speed-7"
+        },
+        {
+          "definition": {
+            "effects": {
+              "1": {
+                "modifier": 1,
+                "type": "worker-robot-storage"
+              }
+            },
+            "hidden": false,
+            "ingredients": {
+              "1": {
+                "amount": 1,
+                "name": "automation-science-pack"
+              },
+              "2": {
+                "amount": 1,
+                "name": "chemical-science-pack"
+              },
+              "3": {
+                "amount": 1,
+                "name": "logistic-science-pack"
+              },
+              "4": {
+                "amount": 1,
+                "name": "production-science-pack"
+              },
+              "5": {
+                "amount": 1,
+                "name": "utility-science-pack"
+              }
+            },
+            "max_level": 4294967295,
+            "order": "c-k-g-c",
+            "prerequisites": {
+              "1": "chemical-science-pack",
+              "2": "logistic-science-pack",
+              "3": "production-science-pack",
+              "4": "utility-science-pack",
+              "5": "worker-robots-storage-2",
+              "6": "worker-robots-storage-3"
+            },
+            "unit_count": 1012,
+            "unit_count_formula": "1*(675*1.5^(L-4))",
+            "unit_energy": 3600
+          },
+          "enabled": true,
+          "level": 5,
+          "researched": false,
+          "visible_when_disabled": false,
+          "id": "worker-robots-storage-4"
+        }
+      ]
+    },
+    {
+      "target": "f110",
+      "source": {
+        "kind": "hash-verified-published-4.7-era-native-full-state-snapshot",
+        "path": "C:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\mir442-postrelease-r22-qualification-r01\\f110-upgrade-422\\4.4.11002-upgrade-base-default-from-4.2.11002-full-state-upgrade.json",
+        "sha256": "E61B752FB08FC385413C5614A49D813D4423FE0528F5D11272C84BAF80B5210A",
+        "force": "player",
+        "selection": "forces.player.technologies entries with one of six named base-continuation identities"
+      },
+      "technologies": [
+        {
+          "definition": {
+            "effects": {
+              "1": {
+                "modifier": 0.15,
+                "type": "train-braking-force-bonus"
+              }
+            },
+            "hidden": false,
+            "ingredients": {
+              "1": {
+                "amount": 1,
+                "name": "automation-science-pack"
+              },
+              "2": {
+                "amount": 1,
+                "name": "chemical-science-pack"
+              },
+              "3": {
+                "amount": 1,
+                "name": "logistic-science-pack"
+              },
+              "4": {
+                "amount": 1,
+                "name": "production-science-pack"
+              },
+              "5": {
+                "amount": 1,
+                "name": "utility-science-pack"
+              }
+            },
+            "max_level": 4294967295,
+            "order": "b-f-g",
+            "prerequisites": {
+              "1": "braking-force-6",
+              "2": "braking-force-7",
+              "3": "chemical-science-pack",
+              "4": "logistic-science-pack",
+              "5": "production-science-pack",
+              "6": "utility-science-pack"
+            },
+            "unit_count": 1148,
+            "unit_count_formula": "1*(861.51212960553*1.33333^(L-8))",
+            "unit_energy": 3600
+          },
+          "enabled": true,
+          "level": 9,
+          "researched": false,
+          "visible_when_disabled": false,
+          "id": "braking-force-8"
+        },
+        {
+          "definition": {
+            "effects": {
+              "1": {
+                "modifier": 2,
+                "type": "inserter-stack-size-bonus"
+              },
+              "2": {
+                "modifier": 4,
+                "type": "stack-inserter-capacity-bonus"
+              }
+            },
+            "hidden": false,
+            "ingredients": {
+              "1": {
+                "amount": 1,
+                "name": "automation-science-pack"
+              },
+              "2": {
+                "amount": 1,
+                "name": "chemical-science-pack"
+              },
+              "3": {
+                "amount": 1,
+                "name": "logistic-science-pack"
+              },
+              "4": {
+                "amount": 1,
+                "name": "production-science-pack"
+              },
+              "5": {
+                "amount": 1,
+                "name": "utility-science-pack"
+              }
+            },
+            "max_level": 4294967295,
+            "order": "c-o-h",
+            "prerequisites": {
+              "1": "chemical-science-pack",
+              "2": "inserter-capacity-bonus-6",
+              "3": "inserter-capacity-bonus-7",
+              "4": "logistic-science-pack",
+              "5": "production-science-pack",
+              "6": "utility-science-pack"
+            },
+            "unit_count": 3048291,
+            "unit_count_formula": "1*(914488.340211249*3.33333^(L-8))",
+            "unit_energy": 3600
+          },
+          "enabled": true,
+          "level": 9,
+          "researched": false,
+          "visible_when_disabled": false,
+          "id": "inserter-capacity-bonus-8"
+        },
+        {
+          "definition": {
+            "effects": {
+              "1": {
+                "ammo_category": "laser",
+                "modifier": 0.5,
+                "type": "gun-speed"
+              }
+            },
+            "hidden": false,
+            "ingredients": {
+              "1": {
+                "amount": 1,
+                "name": "automation-science-pack"
+              },
+              "2": {
+                "amount": 1,
+                "name": "chemical-science-pack"
+              },
+              "3": {
+                "amount": 1,
+                "name": "logistic-science-pack"
+              },
+              "4": {
+                "amount": 1,
+                "name": "military-science-pack"
+              },
+              "5": {
+                "amount": 1,
+                "name": "utility-science-pack"
+              }
+            },
+            "max_level": 4294967295,
+            "order": "e-n-n",
+            "prerequisites": {
+              "1": "chemical-science-pack",
+              "2": "laser-shooting-speed-6",
+              "3": "laser-shooting-speed-7",
+              "4": "logistic-science-pack",
+              "5": "military-science-pack",
+              "6": "utility-science-pack"
+            },
+            "unit_count": 1537,
+            "unit_count_formula": "1*(1025.15625*1.5^(L-8))",
+            "unit_energy": 7200
+          },
+          "enabled": true,
+          "level": 9,
+          "researched": false,
+          "visible_when_disabled": false,
+          "id": "laser-shooting-speed-8"
+        },
+        {
+          "definition": {
+            "effects": {
+              "1": {
+                "modifier": 0.6,
+                "type": "laboratory-speed"
+              }
+            },
+            "hidden": false,
+            "ingredients": {
+              "1": {
+                "amount": 1,
+                "name": "automation-science-pack"
+              },
+              "2": {
+                "amount": 1,
+                "name": "chemical-science-pack"
+              },
+              "3": {
+                "amount": 1,
+                "name": "logistic-science-pack"
+              },
+              "4": {
+                "amount": 1,
+                "name": "military-science-pack"
+              },
+              "5": {
+                "amount": 1,
+                "name": "production-science-pack"
+              },
+              "6": {
+                "amount": 1,
+                "name": "utility-science-pack"
+              }
+            },
+            "max_level": 4294967295,
+            "order": "c-m-d",
+            "prerequisites": {
+              "1": "chemical-science-pack",
+              "2": "logistic-science-pack",
+              "3": "military-science-pack",
+              "4": "production-science-pack",
+              "5": "research-speed-5",
+              "6": "research-speed-6",
+              "7": "utility-science-pack"
+            },
+            "unit_count": 1025,
+            "unit_count_formula": "1*(683.4375*1.5^(L-7))",
+            "unit_energy": 7200
+          },
+          "enabled": true,
+          "level": 8,
+          "researched": false,
+          "visible_when_disabled": false,
+          "id": "research-speed-7"
+        },
+        {
+          "definition": {
+            "effects": {
+              "1": {
+                "ammo_category": "bullet",
+                "modifier": 0.4,
+                "type": "gun-speed"
+              },
+              "2": {
+                "ammo_category": "shotgun-shell",
+                "modifier": 0.4,
+                "type": "gun-speed"
+              }
+            },
+            "hidden": false,
+            "ingredients": {
+              "1": {
+                "amount": 1,
+                "name": "automation-science-pack"
+              },
+              "2": {
+                "amount": 1,
+                "name": "chemical-science-pack"
+              },
+              "3": {
+                "amount": 1,
+                "name": "logistic-science-pack"
+              },
+              "4": {
+                "amount": 1,
+                "name": "military-science-pack"
+              },
+              "5": {
+                "amount": 1,
+                "name": "utility-science-pack"
+              }
+            },
+            "max_level": 4294967295,
+            "order": "e-l-f",
+            "prerequisites": {
+              "1": "chemical-science-pack",
+              "2": "logistic-science-pack",
+              "3": "military-science-pack",
+              "4": "utility-science-pack",
+              "5": "weapon-shooting-speed-5",
+              "6": "weapon-shooting-speed-6"
+            },
+            "unit_count": 1025,
+            "unit_count_formula": "1*(683.4375*1.5^(L-7))",
+            "unit_energy": 7200
+          },
+          "enabled": true,
+          "level": 8,
+          "researched": false,
+          "visible_when_disabled": false,
+          "id": "weapon-shooting-speed-7"
+        },
+        {
+          "definition": {
+            "effects": {
+              "1": {
+                "modifier": 1,
+                "type": "worker-robot-storage"
+              }
+            },
+            "hidden": false,
+            "ingredients": {
+              "1": {
+                "amount": 1,
+                "name": "automation-science-pack"
+              },
+              "2": {
+                "amount": 1,
+                "name": "chemical-science-pack"
+              },
+              "3": {
+                "amount": 1,
+                "name": "logistic-science-pack"
+              },
+              "4": {
+                "amount": 1,
+                "name": "production-science-pack"
+              },
+              "5": {
+                "amount": 1,
+                "name": "utility-science-pack"
+              }
+            },
+            "max_level": 4294967295,
+            "order": "c-k-g-c",
+            "prerequisites": {
+              "1": "chemical-science-pack",
+              "2": "logistic-science-pack",
+              "3": "production-science-pack",
+              "4": "utility-science-pack",
+              "5": "worker-robots-storage-2",
+              "6": "worker-robots-storage-3"
+            },
+            "unit_count": 1012,
+            "unit_count_formula": "1*(675*1.5^(L-4))",
+            "unit_energy": 3600
+          },
+          "enabled": true,
+          "level": 5,
+          "researched": false,
+          "visible_when_disabled": false,
+          "id": "worker-robots-storage-4"
+        }
+      ]
+    }
+  ]
+}

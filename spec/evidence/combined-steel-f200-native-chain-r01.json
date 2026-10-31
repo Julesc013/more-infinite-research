@@ -1,0 +1,209 @@
+{
+  "schema": 1,
+  "kind": "MIRCombinedSteelF200NativeGameplayChainV1",
+  "status": "completed-unscored-gameplay-fixture-independent-data-review-passed",
+  "scope": "Exact F200/2.0.77 combined Bob/Angel candidate8C93 gameplay fixture at publicf34/privateef3: one real research completion, physical steel output, completed save, and two read-only cold reloads. This is unscored functional evidence only.",
+  "execution": {
+    "controller": "build/qualification/combined-steel-gameplay-r06-controller",
+    "packet": {
+      "path": "build/qualification/combined-steel-gameplay-r06-controller/packet.json",
+      "bytes": 31556,
+      "sha256": "C797CE52E67C502E162D4FEE78A9F9C63C59B7B2E0ACA47AB11504CD887881F3"
+    },
+    "preparation": {
+      "path": "build/qualification/combined-steel-gameplay-r06-controller/preparation.json",
+      "bytes": 3863,
+      "sha256": "4518E376A84264427A4F36638DFCE2A369BC7D96178FBA0C0054CDCD785E2744"
+    },
+    "materialization": {
+      "path": "build/qualification/combined-steel-gameplay-r06-controller/input-materialization.json",
+      "bytes": 13928,
+      "sha256": "F1EF827D8614F3570B958EFE334BB4449FD25E115D20A3A11C0F08397606D216",
+      "dependency_archives_copied": false,
+      "archive_links_created": false,
+      "archives_extracted": false
+    },
+    "freeze": {
+      "path": "build/qualification/combined-steel-gameplay-r06-controller/freeze-manifest-r06.json",
+      "bytes": 12020,
+      "sha256": "357FF61474C5A91038221C86E3A218A864F1BC39E4BD43A87D2AC1F25FFA98A8"
+    },
+    "terminal": {
+      "path": "build/qualification/combined-steel-gameplay-r06-controller/execution-record/terminal.json",
+      "bytes": 73962,
+      "sha256": "191E35C1E743011EEC36CE3C85F81760FA6C2B060AEE10910C975D60A930AB41",
+      "status": "completed-unscored-gameplay-fixture",
+      "exception": null,
+      "factorio_processes_after": 0
+    },
+    "result": {
+      "path": "build/tmp/combined-steel-gameplay-r06/result.json",
+      "bytes": 61593,
+      "sha256": "79D9A1C8D4E458BBA6AE280C5DAF4273B25A95C481E1712E7D1DE4445C545BBA",
+      "status": "passed-private-native-fixture"
+    }
+  },
+  "inputs": {
+    "public_head": "f34e6f24fad72e6213d8d1b84b72fd4217533e0e",
+    "private_head": "ef3d38eec2cc166be28084667f2f9fbc03cdecbe",
+    "engine": {
+      "version": "2.0.77",
+      "sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B"
+    },
+    "candidate": {
+      "bytes": 704721,
+      "sha256": "8C93C7063B75E0811D1D27036F3596C05EE0A5A965BC259D276160F91D6274BB"
+    },
+    "active_mods_observer": {
+      "bytes": 834,
+      "sha256": "723D1E7721449FC26040E5E6629416767BDC20AD79CF8723115846DB662A1F87"
+    },
+    "fixture": {
+      "bytes": 6823,
+      "sha256": "6EA55BF8F3986481123941E618F49F3EA743C8C24134C0F01CBC0423CD7FAD29",
+      "control_lua": {
+        "bytes": 23236,
+        "sha256": "FB7C3EFC67AC2326EC850901855CF1B92DED6A54E874DE2E2627749060A92F9E"
+      },
+      "info_json": {
+        "bytes": 1552,
+        "sha256": "72184B5B7DD178895B624D06723509B20E9ABD25BFE9BEDF9CAB68F599354E5D"
+      }
+    },
+    "profile": "f200-space-age-bobtech-combined-defaults",
+    "selected_profile_rows": 38,
+    "resources": {
+      "peak_mib": 4096,
+      "reserve_mib": 128,
+      "timeout_seconds": 600,
+      "admission_wait_seconds": 30,
+      "reserve_percent": 20
+    }
+  },
+  "actual_execution": {
+    "native_processes": [
+      { "index": 1, "role": "create", "exit_code": 0, "timed_out": false },
+      { "index": 2, "role": "production", "exit_code": -1, "timed_out": false, "completion_predicate_observed": true },
+      { "index": 3, "role": "cold-reload-1", "exit_code": 0, "timed_out": false },
+      { "index": 4, "role": "cold-reload-2", "exit_code": 0, "timed_out": false }
+    ],
+    "initial_witnesses": {
+      "target": "recipe-prod-research_steel-1",
+      "actual_native_lab_completions": 1,
+      "level_before": 1,
+      "level_after": 2,
+      "biolab_count": 100,
+      "biolab_science_pack_drain_rate_percent": 50,
+      "science_consumed": {
+        "automation-science-pack": 4000,
+        "logistic-science-pack": 4000
+      },
+      "physical_recipe": "angels-plate-steel-2",
+      "physical_roll_batch": 100,
+      "physical_steel_plate_output": 440,
+      "expected_native_recipe_productivity": 0.1,
+      "native_recipe_productivity": 0.10000000149011612,
+      "native_entity_productivity": 0,
+      "native_bonus_progress": 1.490116541269515e-7,
+      "expected_native_bonus_progress": 1.4901161193847656e-7
+    },
+    "completed_save": {
+      "bytes": 872074,
+      "sha256": "6F7D1E228F5D2322130D317FE28E26154407D3532BCDF7662715CCF59C8B2323",
+      "cold_reload_1_byte_identical": true,
+      "cold_reload_2_byte_identical": true,
+      "cold_reload_1_on_load_read_only": true,
+      "cold_reload_2_on_load_read_only": true
+    }
+  },
+  "custody_and_restoration": {
+    "native": {
+      "original_and_copy_members_verified": 23,
+      "bytes_per_copy": 2046361,
+      "source": "build/tmp/combined-steel-gameplay-r06",
+      "destination": "build/qualification/combined-steel-gameplay-r06-controller/native-captures"
+    },
+    "controller": {
+      "preterminal_original_and_copy_members_verified": 2,
+      "bytes_per_copy": 554373,
+      "terminal_excluded_from_controller_custody": true
+    },
+    "restoration": {
+      "mod_list_sha256": "9A4983B5929B116BCD5909E9B75E6EEB9B79A881637A583E4EC2504E9FA57073",
+      "mod_settings_absent_before_and_after": true,
+      "active_profile_absent_before_and_after": true,
+      "observer_restored_sha256": "723D1E7721449FC26040E5E6629416767BDC20AD79CF8723115846DB662A1F87",
+      "prior_mir_restored_sha256": "B67FF048860F2707579CF582C933ED46D7BF52769F5ABE1B0279DDCC2A0323BD",
+      "temporary_fixture_absent_after": true
+    }
+  },
+  "independent_readback": {
+    "root": {
+      "path": "build/qualification/combined-steel-gameplay-r06-controller/root-native-readback-r01.json",
+      "bytes": 2623,
+      "sha256": "39C1B0B3814F648D9F7BC5BD736134CECAD2525E092F49FC1ABDDA31ED5F87EB",
+      "native_members": 23,
+      "controller_members": 2,
+      "native_process_ids": [72132, 57008, 85572, 78000],
+      "completed_save_zip_entries": 56,
+      "timestamp_note": {
+        "path": "build/qualification/combined-steel-gameplay-r06-controller/root-reader-timestamp-note-r01.json",
+        "bytes": 1077,
+        "sha256": "6D4FF7CBD6DA08B16D865A860260BBC154DFE429EC1113627CA681F5815732BD",
+        "meaning": "The read-only reader compares equivalent terminal timestamps at exact UTC seconds and seven fractional digits; raw terminal bytes and hashes are unchanged."
+      }
+    },
+    "independent_actual_data_review": "passed-scoped-unscored-gameplay-fixture-data-custody-and-restoration"
+  },
+  "preserved_predecessors": {
+    "r01_zero_native_superseded_freeze": {
+      "path": "build/qualification/combined-steel-gameplay-r01-controller/pre-active-observer-prestage-assertion-r01/manifest.json",
+      "sha256": "B62FD3C26CDD3A77CBDC3547B71C6E7903387B5C70395B5255969A2B8A106E3E"
+    },
+    "r02_zero_native_observer_order_refusal": {
+      "path": "build/qualification/combined-steel-gameplay-r02-controller/retained-active-observer-readonly.receipt.json",
+      "sha256": "2A2667933EA599AB9AC376B8DED42792B1A3CC629EAF55BA932DAC4CCB9599E1"
+    },
+    "r03_adverse": {
+      "path": "build/qualification/combined-steel-gameplay-r03-controller/execution-record/terminal.json",
+      "sha256": "910BB9077B86BF4A29A96AA4C9F5D2D14A7992FA007EC0BB6073AC2703503098",
+      "reason": "first fixture guard rejected the complete steel technology row"
+    },
+    "r04_adverse": {
+      "path": "build/qualification/combined-steel-gameplay-r04-controller/execution-record/terminal.json",
+      "sha256": "143EE58A6DA8CA48AC16310E894729CC97E22C53FAF21388B72065A7ACE42421",
+      "reason": "physical-output assertion failed after the real research completion"
+    },
+    "r05_adverse": {
+      "path": "build/qualification/combined-steel-gameplay-r05-controller/execution-record/terminal.json",
+      "sha256": "D32EC9AC8E1D54517BFFF93B39D8DAED9E6B8BA4334FB2192AA89696C50EF6EA",
+      "reason": "fixture treated the observed native float residual as a generic fixed tolerance failure"
+    }
+  },
+  "receipt_capsule": {
+    "path": "spec/evidence/combined-steel-f200-native-receipts-r01.json.gz",
+    "bytes": 87881,
+    "sha256": "44B17BFEBA8ECF07DAF943A4A2EC8C7A2D8F25FA431EABFB8AC5DD55C170F2FD",
+    "records": 22,
+    "schema": 1,
+    "gzip_mtime": 0,
+    "round_trip_verified": true,
+    "contains": "Exact text packet, preparation, materialization, freeze, terminal, root readbacks, result, create/production/reload logs, resource ledgers, and process stdout."
+  },
+  "omitted_from_capsule": [
+    "Seed and completed save ZIP binaries remain original and copied local custody; their hashes and completed-save byte identity are recorded above.",
+    "The prior incumbent MIR archive remains copied local controller custody; its hash is recorded above.",
+    "Runtime configuration, server settings, and stderr/configuration bodies remain local custody and are not projected."
+  ],
+  "limits": [
+    "This names only the exact F200/2.0.77 combined Bob/Angel source, profile, candidate, fixture, one real research completion, physical output, completed save, and two cold reloads.",
+    "The production process used a documented completion-predicate supervised stop; no elapsed-time or memory comparison is accepted.",
+    "The fixture records Library as pending fresh English/German observations and input simulation false. No client or Library verdict follows.",
+    "No general Bob/Angel compatibility, migration, arbitrary-modpack, performance, release, or stable-release qualification follows."
+  ],
+  "gameplay_acceptance": false,
+  "menu_acceptance": false,
+  "client_library_acceptance": false,
+  "performance_acceptance": false,
+  "release_qualification": false
+}

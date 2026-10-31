@@ -1,0 +1,13 @@
+{
+  "schema": 1,
+  "qualification": "best-effort-early-data-only-distributions-not-native-qualified",
+  "targets": {
+    "f006": {"factorio_version": "0.6", "minimum_base": "0.6.4", "source_available": true, "delivery": "extract-to-folder"},
+    "f007": {"factorio_version": "0.7", "minimum_base": "0.7.5", "source_available": true, "delivery": "extract-to-folder"},
+    "f008": {"factorio_version": "0.8", "minimum_base": "0.8.8", "source_available": true, "delivery": "extract-to-folder"},
+    "f009": {"factorio_version": "0.9", "minimum_base": "0.9.8", "source_available": true, "delivery": "zip"},
+    "f010": {"factorio_version": "0.10", "minimum_base": "0.10.12", "source_available": true, "delivery": "zip"},
+    "f011": {"factorio_version": "0.11", "minimum_base": "0.11.22", "source_available": true, "delivery": "zip"},
+    "f012": {"factorio_version": "0.12", "minimum_base": "0.12.35", "source_available": true, "delivery": "zip"}
+  }
+}

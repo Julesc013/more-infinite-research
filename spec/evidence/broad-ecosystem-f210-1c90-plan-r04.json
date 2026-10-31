@@ -1,0 +1,265 @@
+{
+  "schema": 1,
+  "kind": "MIR5BroadEcosystemF210PrototypeCapturePlanV1",
+  "claims": {
+    "data_stage_only": true,
+    "settings_and_prototype_observation_only": true,
+    "gameplay": false,
+    "research": false,
+    "save": false,
+    "performance": false,
+    "release_qualification": false
+  },
+  "engine": {
+    "factorio_version": "2.1.23",
+    "sha256": "FE4A1DA30F322A0D0B8AEB3DF7276332222BAAA143E2352569B723E84B2B9060"
+  },
+  "resources_per_launch": {
+    "timeout_seconds": 240,
+    "expected_peak_memory_mib": 4096,
+    "max_new_output_mib": 512,
+    "admission_wait_seconds": 30,
+    "heavy_expected_peak_memory_mib": 8192
+  },
+  "continuation_policy": {
+    "arm_order": [
+      "upstream",
+      "published",
+      "candidate"
+    ],
+    "upstream_failure": "retain a complete controls-restored adverse and skip published/candidate for that case",
+    "published_failure": "retain a complete controls-restored adverse and continue candidate for that case",
+    "candidate_failure": "retain a controls-restored actual native adverse and continue the next independent profile",
+    "resource_lock_restoration_or_unclassified_failure": "stop the batch",
+    "valid_upstream_requirement": "only run MIR arms after an upstream completed-data-stage observation",
+    "historical_reuse": "No native-arm reuse in this focused retry. Retain EA41 failures and exact old results separately. All three arms are new actual invocations.",
+    "control_custody": "Persist pre-run control hashes before every arm; require authoritative restoration status and equal post-run hashes before continuing. A missing result cannot establish restoration."
+  },
+  "status": "ready-for-frozen-corrected-package-regression-admission-not-executed",
+  "source": {
+    "commit": "13283e85115ac460380b872a20242dffa71d5d6c",
+    "profile_commit": "13283e85115ac460380b872a20242dffa71d5d6c",
+    "player_tree": "9e669e6ffea27dda3f9f17dfb2873daf23a8e187",
+    "frozen_package_source_commit": "1c90ceb7f0096fa6ccbcb9fc369fae699889c866"
+  },
+  "inputs": {
+    "active_mods_observer_sha256": "A15A7D628D66953D2E0C4D4FA288F47CBF9C5678327C7EB3D23ADB5DC78331C0",
+    "published": {
+      "version": "4.7.21003",
+      "sha256": "B6EB9430056ABD384DB00F94929FE7DAC0A37441ACF4BC277946689682628852",
+      "bytes": 1463293
+    },
+    "candidate": {
+      "version": "5.0.21000",
+      "sha256": "C563CB5B96C9E64CB3373BDB60CF5C8B7D3C97E93EADB8F924443C703CDC024D",
+      "bytes": 568598,
+      "inventory_sha256": "951066760A1C1372AE9FD16B11BEE7CF11D10FC44A87E85A7DD70FABD765CA8E",
+      "primary_custody": "build/mir5/assets/1c90ceb7-r01/more-infinite-research_5.0.21000.zip"
+    }
+  },
+  "batch_limits": {
+    "case_count": 12,
+    "maximum_launches": 36,
+    "sequential_only": true,
+    "maximum_runtime_seconds": 1800,
+    "maximum_new_output_mib": 6144,
+    "note": "Thirty-minute aggregate cap including admission/preparation, one active engine, six-GiB aggregate output; no performance inference."
+  },
+  "purpose": [
+    "Six distinct Bob startup failures exercise full Bob, full Bob/Angel and individual Bob Logistics in Base and Space Age.",
+    "Native K2 with Space Age and K2 with Space Exploration exercise admission and private save-identity prototypes.",
+    "Py full suite with and without the separately selected productivity addon exercises the corrected 49-row/six-continuation authoring.",
+    "Angel Base and Space Age remain explicit independent parity diagnostics; no unimplemented gap is declared resolved."
+  ],
+  "input_signature_definition": "SHA256 of ASCII sorted compact JSON containing engine, settings_mode, enabled_mods and archive_sha256 from each committed profile; this new signature is not relabelled as an EA41 signature.",
+  "observer_provenance": {
+    "actual_container_sha256": "A15A7D628D66953D2E0C4D4FA288F47CBF9C5678327C7EB3D23ADB5DC78331C0",
+    "original_container_equality_receipts": "spec/evidence/broad-ea41-observer-correction-receipts-r01.json.gz",
+    "policy": "Current profiles bind the actual runtime container directly; no runtime hash override or arbitrary observer substitution."
+  },
+  "cases": [
+    {
+      "id": "q001",
+      "profile": "tests/profiles/py-suite-base-f210-2123.json",
+      "profile_sha256": "3706BBD447A445ECD072FA6E13B7453BF1C566092D19E88AB933E3FF178938AF",
+      "profile_git_blob_sha1": "6747ec9b7c9586d27196329a05fcf85feea37c41",
+      "input_signature_sha256": "4FCBFB04F7D79A6AC5CBDAF958F19A2E16204C0F24F1702C07569BBE04981570",
+      "heavy": true,
+      "prior_observation_case": {
+        "source": "ea41cbc6d27626283db9d8bbf6211b2171b6e36a",
+        "id": "q001",
+        "chain": "spec/evidence/broad-ecosystem-f210-ea41-native-chain-r01.json"
+      }
+    },
+    {
+      "id": "q003",
+      "profile": "tests/profiles/py-suite-with-productivity-base-f210-2123.json",
+      "profile_sha256": "BCA125D265CBA75527ACDCCC109B98AC032DB16E7363A268AC6822EAC9B55355",
+      "profile_git_blob_sha1": "c55503f751a25946bf594119e7514a1c0f8279c0",
+      "input_signature_sha256": "4A2EF6CC1DFE26F664F423C01DCC5C0D96FA38C816B42317C09B4A7083A4370D",
+      "heavy": true,
+      "prior_observation_case": {
+        "source": "ea41cbc6d27626283db9d8bbf6211b2171b6e36a",
+        "id": "q003",
+        "chain": "spec/evidence/broad-ecosystem-f210-ea41-native-chain-r01.json"
+      }
+    },
+    {
+      "id": "q005",
+      "profile": "tests/profiles/bob-full-base-f210-2123.json",
+      "profile_sha256": "A5017E19A99B8240D8671DD9D88F03F055492C7E764159DB167221568FD90AA7",
+      "profile_git_blob_sha1": "5fbfef08f5285ea9da729623b03d3303a469181d",
+      "input_signature_sha256": "D5FA8F8D503B8A7B693523A5B253502C5632E52D20D7336414BAEC3140C76875",
+      "heavy": true,
+      "prior_observation_case": {
+        "source": "ea41cbc6d27626283db9d8bbf6211b2171b6e36a",
+        "id": "q005",
+        "chain": "spec/evidence/broad-ecosystem-f210-ea41-native-chain-r01.json"
+      }
+    },
+    {
+      "id": "q006",
+      "profile": "tests/profiles/bob-full-space-age-f210-2123.json",
+      "profile_sha256": "47A538A60B8B9446FA525B5FEFE2E7C2AA4D32C357BE45276748FC2F28C9A1D4",
+      "profile_git_blob_sha1": "fd0fba2aab947dc297e670c4d7b586e26b9756c4",
+      "input_signature_sha256": "1B8F43009DCD0A06AAE1FFD325E7EBE6D2352E442209C2141F1BC9BD8F8CA24A",
+      "heavy": true,
+      "prior_observation_case": {
+        "source": "ea41cbc6d27626283db9d8bbf6211b2171b6e36a",
+        "id": "q006",
+        "chain": "spec/evidence/broad-ecosystem-f210-ea41-native-chain-r01.json"
+      }
+    },
+    {
+      "id": "q007",
+      "profile": "tests/profiles/angel-full-base-f210-2123.json",
+      "profile_sha256": "ADFE6B262232E7C296BA591BFBA5812B62B2E45761A78F1E9588D141B7AABF00",
+      "profile_git_blob_sha1": "91f43804753bb25d069941767e96019fd019aef3",
+      "input_signature_sha256": "0D8628FA0A0EE31044B2202CCEA66DFCFA421189DDCCB68BEBE37A3D2FFC0840",
+      "heavy": true,
+      "prior_observation_case": {
+        "source": "ea41cbc6d27626283db9d8bbf6211b2171b6e36a",
+        "id": "q007",
+        "chain": "spec/evidence/broad-ecosystem-f210-ea41-native-chain-r01.json"
+      }
+    },
+    {
+      "id": "q008",
+      "profile": "tests/profiles/angel-full-space-age-f210-2123.json",
+      "profile_sha256": "4CAD1401B56D8BE7B09B9CC2EAB045773FC4DE9C11C37BF283A51C3E11758B49",
+      "profile_git_blob_sha1": "495d0b21474d62cce2e5fcf60fbe216640babd44",
+      "input_signature_sha256": "2D464E14CC1425CE0AE40A5AAE32F6034E3221B612E2AA675CD5420BBBD192A5",
+      "heavy": true,
+      "prior_observation_case": {
+        "source": "ea41cbc6d27626283db9d8bbf6211b2171b6e36a",
+        "id": "q008",
+        "chain": "spec/evidence/broad-ecosystem-f210-ea41-native-chain-r01.json"
+      }
+    },
+    {
+      "id": "q009",
+      "profile": "tests/profiles/bob-angel-full-base-f210-2123.json",
+      "profile_sha256": "760945672E7D5F03BEBE25CA477A68C95D54AA359C62D34AE69D55BF9161372F",
+      "profile_git_blob_sha1": "934003ae4adb7675f9ab33f1887fb8621594c9d6",
+      "input_signature_sha256": "5CE5F59BC903E26B98D5CE6E8EEA0D11014AC873D41F4BAE2E7DED2D51F086AC",
+      "heavy": true,
+      "prior_observation_case": {
+        "source": "ea41cbc6d27626283db9d8bbf6211b2171b6e36a",
+        "id": "q009",
+        "chain": "spec/evidence/broad-ecosystem-f210-ea41-native-chain-r01.json"
+      }
+    },
+    {
+      "id": "q010",
+      "profile": "tests/profiles/bob-angel-full-space-age-f210-2123.json",
+      "profile_sha256": "79C589FDFC329CDCE8C204ABD4E939E60759792ACF4A9C7CEF8D326A5CC124B1",
+      "profile_git_blob_sha1": "0c17845173ee30d14c85ca58418651ea760b258f",
+      "input_signature_sha256": "D22C417309BD7413C259BF1B6A48EFECE58BB4F926398280ECACD63B31A8F861",
+      "heavy": true,
+      "prior_observation_case": {
+        "source": "ea41cbc6d27626283db9d8bbf6211b2171b6e36a",
+        "id": "q010",
+        "chain": "spec/evidence/broad-ecosystem-f210-ea41-native-chain-r01.json"
+      }
+    },
+    {
+      "id": "q013",
+      "profile": "tests/profiles/k2se-base-f210-2123.json",
+      "profile_sha256": "FA586BDDE8C0914BB536CDE19909C56762CE009459366730BC9C36CCAF389B16",
+      "profile_git_blob_sha1": "b6e7ab08205953f1ba8443cfc0dce02e975e5053",
+      "input_signature_sha256": "5A4D074686DC7357EC0A9D4A410D93E0EB4012E9E34659D5E3FADACC2B8108E2",
+      "heavy": true,
+      "prior_observation_case": {
+        "source": "ea41cbc6d27626283db9d8bbf6211b2171b6e36a",
+        "id": "q013",
+        "chain": "spec/evidence/broad-ecosystem-f210-ea41-native-chain-r01.json"
+      }
+    },
+    {
+      "id": "q062",
+      "profile": "tests/profiles/popular-krastorio2-space-age-f210-2123.json",
+      "profile_sha256": "616AF92086506996F0C934CEED2076E5EBB5975A9C6FF2A9C0E26AB2DB0EC215",
+      "profile_git_blob_sha1": "47e403a70c667a86f863a9c781e7ca50e8f0ca2a",
+      "input_signature_sha256": "99FD9D8D6EEFB96599CDB87F8A991DBBAE41E74306D6F7EA7C1D225C9927B38D",
+      "heavy": false,
+      "prior_observation_case": {
+        "source": "ea41cbc6d27626283db9d8bbf6211b2171b6e36a",
+        "id": "q062",
+        "chain": "spec/evidence/broad-ecosystem-f210-ea41-native-chain-r01.json"
+      }
+    },
+    {
+      "id": "q073",
+      "profile": "tests/profiles/popular-boblogistics-base-f210-2123.json",
+      "profile_sha256": "BCABC502848BE49ECD6B33C3AA45BFEBA3BC59750D94342249D0ADD2D4AC0CFD",
+      "profile_git_blob_sha1": "c2c505fa50fde68f477e9ec2a9aeae24c8e69051",
+      "input_signature_sha256": "6F6A79F0F7457678D407D81F29C7317380B83C04749F7897BF1FD901B8E262B9",
+      "heavy": true,
+      "prior_observation_case": {
+        "source": "ea41cbc6d27626283db9d8bbf6211b2171b6e36a",
+        "id": "q073",
+        "chain": "spec/evidence/broad-ecosystem-f210-ea41-native-chain-r01.json"
+      }
+    },
+    {
+      "id": "q074",
+      "profile": "tests/profiles/popular-boblogistics-space-age-f210-2123.json",
+      "profile_sha256": "338D799BE5FD4FA9E70CCD8577926D3ECDDDEB9E143DD6F874D24E416E329B16",
+      "profile_git_blob_sha1": "dabfc755e0bd841728916bd8c8392077451a860c",
+      "input_signature_sha256": "31DA47B7C3B40328FF679151ADA5A882EE028BA859F0545DD7AF01DA0502F02B",
+      "heavy": true,
+      "prior_observation_case": {
+        "source": "ea41cbc6d27626283db9d8bbf6211b2171b6e36a",
+        "id": "q074",
+        "chain": "spec/evidence/broad-ecosystem-f210-ea41-native-chain-r01.json"
+      }
+    }
+  ],
+  "heavy_case_ids": [
+    "q001",
+    "q003",
+    "q005",
+    "q006",
+    "q007",
+    "q008",
+    "q009",
+    "q010",
+    "q013",
+    "q073",
+    "q074"
+  ],
+  "execution_order": [
+    "q001",
+    "q003",
+    "q005",
+    "q006",
+    "q007",
+    "q008",
+    "q009",
+    "q010",
+    "q013",
+    "q062",
+    "q073",
+    "q074"
+  ]
+}

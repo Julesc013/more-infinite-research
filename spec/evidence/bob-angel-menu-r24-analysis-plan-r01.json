@@ -1,0 +1,633 @@
+{
+  "schema": 1,
+  "kind": "MIR5ResponsiveMenuR24AnalysisPlanV1",
+  "status": "frozen-before-result-inspection",
+  "raw_plan": {
+    "path": "spec/evidence/bob-angel-menu-plan-r24.json",
+    "sha256": "31E6FE88F890414EED00059885CB31948582EB642BE830157B6B000C84FE4235",
+    "schema": 1,
+    "kind": "MIR5PredeclaredResponsiveMenuExperimentV1",
+    "source_reference": "a6fd208fe17909225b78112a77d97d1160047b19"
+  },
+  "result_contract": {
+    "schema": 1,
+    "kind": "MIR5ResponsiveMenuComparisonObservationV1",
+    "status": "completed-observation-only",
+    "endpoint_class": "ordinary-responsive-menu",
+    "required_observation_status": "validated-recorded-menu-interaction-response",
+    "result_sha256_required_at_invocation": true,
+    "library_controls_restored": true
+  },
+  "identity": {
+    "source_reference": "1ab5cf97f4d1c6593fcde0600c420cf195f947f1",
+    "source_tree": "25442a5bd7838f124952507854426e3b8e868475",
+    "engine": {
+      "version": "2.0.77",
+      "sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B"
+    },
+    "profile": {
+      "path": "tests/profiles/bob-angel-f200-2077.json",
+      "sha256": "A2F235B7CE1F18968E1D7D7913362694EA1916095852C1673300C68BA26DDE90"
+    },
+    "published": {
+      "version": "4.7.20002",
+      "sha256": "F3943EB4D69CCDAC41BD9F922AD03A5C78F34F22D8E7FA5A88A7A658AB1010B7",
+      "name": "more-infinite-research",
+      "root": "more-infinite-research_4.7.20002",
+      "factorio_version": "2.0"
+    },
+    "candidate": {
+      "sha256": "B67FF048860F2707579CF582C933ED46D7BF52769F5ABE1B0279DDCC2A0323BD",
+      "bytes": 553231,
+      "asset_inventory_sha256": "325F6E6E202E02CEF606959C6EFEB2C2FEDD0E13F4BC2ACA15EA188A851A5AAC",
+      "name": "more-infinite-research",
+      "version": "5.0.20000",
+      "root": "more-infinite-research_5.0.20000",
+      "factorio_version": "2.0"
+    },
+    "ordinary_config_sha256": "DA9A92AB9047EBD9F9640B34DC9EF6C084801DF85B8F75B1A490E786F40DD510",
+    "player_data_sha256": "B2BF04AD4E46C306BB9CFB2BFACF549307FD1E611B760C79F68080D79AC532A9"
+  },
+  "schedule": {
+    "total_rows": 262,
+    "warmups": [
+      "control-without-mir",
+      "published-4.7",
+      "replay",
+      "candidate-mir5"
+    ],
+    "same_version_aa_arm": "published-4.7",
+    "same_version_aa_observations": 2,
+    "counterbalanced_blocks": 64,
+    "arms": [
+      "control-without-mir",
+      "published-4.7",
+      "replay",
+      "candidate-mir5"
+    ],
+    "latin_rotations": [
+      [
+        "control-without-mir",
+        "published-4.7",
+        "replay",
+        "candidate-mir5"
+      ],
+      [
+        "published-4.7",
+        "replay",
+        "candidate-mir5",
+        "control-without-mir"
+      ],
+      [
+        "replay",
+        "candidate-mir5",
+        "control-without-mir",
+        "published-4.7"
+      ],
+      [
+        "candidate-mir5",
+        "control-without-mir",
+        "published-4.7",
+        "replay"
+      ],
+      [
+        "control-without-mir",
+        "published-4.7",
+        "replay",
+        "candidate-mir5"
+      ],
+      [
+        "published-4.7",
+        "replay",
+        "candidate-mir5",
+        "control-without-mir"
+      ],
+      [
+        "replay",
+        "candidate-mir5",
+        "control-without-mir",
+        "published-4.7"
+      ],
+      [
+        "candidate-mir5",
+        "control-without-mir",
+        "published-4.7",
+        "replay"
+      ],
+      [
+        "control-without-mir",
+        "published-4.7",
+        "replay",
+        "candidate-mir5"
+      ],
+      [
+        "published-4.7",
+        "replay",
+        "candidate-mir5",
+        "control-without-mir"
+      ],
+      [
+        "replay",
+        "candidate-mir5",
+        "control-without-mir",
+        "published-4.7"
+      ],
+      [
+        "candidate-mir5",
+        "control-without-mir",
+        "published-4.7",
+        "replay"
+      ],
+      [
+        "control-without-mir",
+        "published-4.7",
+        "replay",
+        "candidate-mir5"
+      ],
+      [
+        "published-4.7",
+        "replay",
+        "candidate-mir5",
+        "control-without-mir"
+      ],
+      [
+        "replay",
+        "candidate-mir5",
+        "control-without-mir",
+        "published-4.7"
+      ],
+      [
+        "candidate-mir5",
+        "control-without-mir",
+        "published-4.7",
+        "replay"
+      ],
+      [
+        "control-without-mir",
+        "published-4.7",
+        "replay",
+        "candidate-mir5"
+      ],
+      [
+        "published-4.7",
+        "replay",
+        "candidate-mir5",
+        "control-without-mir"
+      ],
+      [
+        "replay",
+        "candidate-mir5",
+        "control-without-mir",
+        "published-4.7"
+      ],
+      [
+        "candidate-mir5",
+        "control-without-mir",
+        "published-4.7",
+        "replay"
+      ],
+      [
+        "control-without-mir",
+        "published-4.7",
+        "replay",
+        "candidate-mir5"
+      ],
+      [
+        "published-4.7",
+        "replay",
+        "candidate-mir5",
+        "control-without-mir"
+      ],
+      [
+        "replay",
+        "candidate-mir5",
+        "control-without-mir",
+        "published-4.7"
+      ],
+      [
+        "candidate-mir5",
+        "control-without-mir",
+        "published-4.7",
+        "replay"
+      ],
+      [
+        "control-without-mir",
+        "published-4.7",
+        "replay",
+        "candidate-mir5"
+      ],
+      [
+        "published-4.7",
+        "replay",
+        "candidate-mir5",
+        "control-without-mir"
+      ],
+      [
+        "replay",
+        "candidate-mir5",
+        "control-without-mir",
+        "published-4.7"
+      ],
+      [
+        "candidate-mir5",
+        "control-without-mir",
+        "published-4.7",
+        "replay"
+      ],
+      [
+        "control-without-mir",
+        "published-4.7",
+        "replay",
+        "candidate-mir5"
+      ],
+      [
+        "published-4.7",
+        "replay",
+        "candidate-mir5",
+        "control-without-mir"
+      ],
+      [
+        "replay",
+        "candidate-mir5",
+        "control-without-mir",
+        "published-4.7"
+      ],
+      [
+        "candidate-mir5",
+        "control-without-mir",
+        "published-4.7",
+        "replay"
+      ],
+      [
+        "control-without-mir",
+        "published-4.7",
+        "replay",
+        "candidate-mir5"
+      ],
+      [
+        "published-4.7",
+        "replay",
+        "candidate-mir5",
+        "control-without-mir"
+      ],
+      [
+        "replay",
+        "candidate-mir5",
+        "control-without-mir",
+        "published-4.7"
+      ],
+      [
+        "candidate-mir5",
+        "control-without-mir",
+        "published-4.7",
+        "replay"
+      ],
+      [
+        "control-without-mir",
+        "published-4.7",
+        "replay",
+        "candidate-mir5"
+      ],
+      [
+        "published-4.7",
+        "replay",
+        "candidate-mir5",
+        "control-without-mir"
+      ],
+      [
+        "replay",
+        "candidate-mir5",
+        "control-without-mir",
+        "published-4.7"
+      ],
+      [
+        "candidate-mir5",
+        "control-without-mir",
+        "published-4.7",
+        "replay"
+      ],
+      [
+        "control-without-mir",
+        "published-4.7",
+        "replay",
+        "candidate-mir5"
+      ],
+      [
+        "published-4.7",
+        "replay",
+        "candidate-mir5",
+        "control-without-mir"
+      ],
+      [
+        "replay",
+        "candidate-mir5",
+        "control-without-mir",
+        "published-4.7"
+      ],
+      [
+        "candidate-mir5",
+        "control-without-mir",
+        "published-4.7",
+        "replay"
+      ],
+      [
+        "control-without-mir",
+        "published-4.7",
+        "replay",
+        "candidate-mir5"
+      ],
+      [
+        "published-4.7",
+        "replay",
+        "candidate-mir5",
+        "control-without-mir"
+      ],
+      [
+        "replay",
+        "candidate-mir5",
+        "control-without-mir",
+        "published-4.7"
+      ],
+      [
+        "candidate-mir5",
+        "control-without-mir",
+        "published-4.7",
+        "replay"
+      ],
+      [
+        "control-without-mir",
+        "published-4.7",
+        "replay",
+        "candidate-mir5"
+      ],
+      [
+        "published-4.7",
+        "replay",
+        "candidate-mir5",
+        "control-without-mir"
+      ],
+      [
+        "replay",
+        "candidate-mir5",
+        "control-without-mir",
+        "published-4.7"
+      ],
+      [
+        "candidate-mir5",
+        "control-without-mir",
+        "published-4.7",
+        "replay"
+      ],
+      [
+        "control-without-mir",
+        "published-4.7",
+        "replay",
+        "candidate-mir5"
+      ],
+      [
+        "published-4.7",
+        "replay",
+        "candidate-mir5",
+        "control-without-mir"
+      ],
+      [
+        "replay",
+        "candidate-mir5",
+        "control-without-mir",
+        "published-4.7"
+      ],
+      [
+        "candidate-mir5",
+        "control-without-mir",
+        "published-4.7",
+        "replay"
+      ],
+      [
+        "control-without-mir",
+        "published-4.7",
+        "replay",
+        "candidate-mir5"
+      ],
+      [
+        "published-4.7",
+        "replay",
+        "candidate-mir5",
+        "control-without-mir"
+      ],
+      [
+        "replay",
+        "candidate-mir5",
+        "control-without-mir",
+        "published-4.7"
+      ],
+      [
+        "candidate-mir5",
+        "control-without-mir",
+        "published-4.7",
+        "replay"
+      ],
+      [
+        "control-without-mir",
+        "published-4.7",
+        "replay",
+        "candidate-mir5"
+      ],
+      [
+        "published-4.7",
+        "replay",
+        "candidate-mir5",
+        "control-without-mir"
+      ],
+      [
+        "replay",
+        "candidate-mir5",
+        "control-without-mir",
+        "published-4.7"
+      ],
+      [
+        "candidate-mir5",
+        "control-without-mir",
+        "published-4.7",
+        "replay"
+      ]
+    ]
+  },
+  "tolerance_policy": {
+    "aa_absolute_seconds": 0.5,
+    "aa_relative_percent": 5,
+    "control_regression_seconds": 0.5,
+    "minimum_mir_added_time_reduction_percent": 50
+  },
+  "analysis": {
+    "scored_blocks": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16,
+      17,
+      18,
+      19,
+      20,
+      21,
+      22,
+      23,
+      24,
+      25,
+      26,
+      27,
+      28,
+      29,
+      30,
+      31,
+      32,
+      33,
+      34,
+      35,
+      36,
+      37,
+      38,
+      39,
+      40,
+      41,
+      42,
+      43,
+      44,
+      45,
+      46,
+      47,
+      48,
+      49,
+      50,
+      51,
+      52,
+      53,
+      54,
+      55,
+      56,
+      57,
+      58,
+      59,
+      60,
+      61,
+      62,
+      63,
+      64
+    ],
+    "early_control_blocks": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16,
+      17,
+      18,
+      19,
+      20,
+      21,
+      22,
+      23,
+      24,
+      25,
+      26,
+      27,
+      28,
+      29,
+      30,
+      31,
+      32
+    ],
+    "late_control_blocks": [
+      33,
+      34,
+      35,
+      36,
+      37,
+      38,
+      39,
+      40,
+      41,
+      42,
+      43,
+      44,
+      45,
+      46,
+      47,
+      48,
+      49,
+      50,
+      51,
+      52,
+      53,
+      54,
+      55,
+      56,
+      57,
+      58,
+      59,
+      60,
+      61,
+      62,
+      63,
+      64
+    ],
+    "student_t_95_two_sided": 1.9983405425207417,
+    "student_t_degrees_of_freedom": 63,
+    "assumption": "The64 paired blocks are treated as independent and roughly symmetric for this Student-t interval. Serial/cache/desktop variation can violate that assumption; fixed counterbalancing and the control drift diagnostic do not prove independence. Report all observations and sample spread. This experiment makes no bootstrap or equivalence inference and does not pool the earlier R23 samples.",
+    "same_version_aa_rule": "abs(first-second) <= max(0.5 seconds, 5 percent of their arithmetic mean)",
+    "control_rule": "late control arithmetic mean minus early control arithmetic mean <= 0.5 seconds",
+    "objective_rule": "Report 100*(1-mean_d5/mean_d4) only when mean_d4 and its 95-percent lower interval bound are positive. Support the at-least-50-percent objective only when the 95-percent upper interval bound of q=d5-0.5*d4 is <= 0."
+  },
+  "claims": {
+    "native_execution": false,
+    "performance_measurement": false,
+    "performance_comparison": false,
+    "release_qualification": false
+  },
+  "limitations": [
+    "This is a separately frozen analysis protocol before any R24 execution or result inspection, not an observation or result. It binds the new fixed262-row R24 raw plan. R23 retains its original execution identity, eight-block data and inconclusive analysis; no samples are reused or pooled.",
+    "Its verdict is limited to the ordinary responsive-menu endpoint on one Black Glass machine. It is not a release, runtime, UI fidelity, save-load, Library latency or memory verdict.",
+    "An incomplete or identity-mismatched run refuses analysis. A nonpositive or unresolved published-minus-control denominator yields a null percentage. Supporting the at-least50-percent objective requires both a strictly positive lower95-percent denominator bound and a nonpositive upper95-percent q bound, with passing A/A and control guards. Do not treat failure to support the objective as proof of equivalence."
+  ],
+  "freeze": {
+    "before_r24_execution": true,
+    "before_r24_result_inspection": true,
+    "r24_observations_started": 0,
+    "extension_or_early_stopping": false,
+    "r23_samples_pooled": false,
+    "raw_plan_reference": "a6fd208fe17909225b78112a77d97d1160047b19",
+    "analysis_reader": {
+      "source_reference": "1ab5cf97f4d1c6593fcde0600c420cf195f947f1",
+      "path": "tools/analyze_menu_comparison.py",
+      "sha256": "FD039BCA76CFA2447BD151875BDEE1B70D0FBAFF63536703EDCDC03CF387B176"
+    },
+    "critical_value_reference": {
+      "expression": "N[InverseCDF[StudentTDistribution[63],39/40],18]",
+      "result": "1.99834054252074158",
+      "url": "https://www.wolframalpha.com/input?i=N%5BInverseCDF%5BStudentTDistribution%5B63%5D%2C+39%2F40%5D%2C+18%5D",
+      "runtime_dependency_added": false
+    }
+  }
+}

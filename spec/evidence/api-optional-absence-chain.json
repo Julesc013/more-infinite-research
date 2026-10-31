@@ -1,0 +1,28 @@
+{
+  "schema": 1,
+  "kind": "MIR5APIOptionalAbsenceNativeChainV1",
+  "runs": [
+    {
+      "run": 40024807687,
+      "url": "https://github.com/Julesc013/mir-native-worker/actions/runs/40024807687",
+      "manifest_members_verified": 22,
+      "manifest_sha256": "72CCE5152AA434E7F82DBD1E7702EFF06AC7A68FF5C4A2C5A5087595A6F95210",
+      "cases": [
+        {
+          "path": "gameplay/result.json",
+          "status": "passed-private-native-runtime-load-only",
+          "source": "f0c67eb98c70a22cd8e942534a3d91980fd2b73d",
+          "receipt": {
+            "gzip": "spec/mir5/evidence/api-optional-absence-40024807687-gameplay-native.json.gz",
+            "uncompressed_sha256": "18992A4C247CC94F033C00FD857FD4DFDE7A0727D146DC9EF635292C1BC5FBAD"
+          }
+        }
+      ]
+    }
+  ],
+  "scope": [
+    "F200 CreateOnly profile loads the independent optional consumer without MIR installed. It never invokes absent data/runtime API surfaces and exposes no invented MIR capability.",
+    "This is native load/absence evidence only; it establishes no save, research, production or multiplayer result."
+  ],
+  "release_qualification": false
+}

@@ -1,0 +1,67 @@
+{
+  "schema": 1,
+  "kind": "authored-private-scenario-custody-index-not-runner-receipt",
+  "scope": "F210 private unrestricted-module permission maps at data stage and runtime create/load",
+  "release_qualification": false,
+  "player": {
+    "archive": "build/mir5/runtime-continuity-r03/packages/more-infinite-research_5.0.21000.zip",
+    "sha256": "8A4F7120E01C2902C60725CF0353AA46FFD6BE55A1E4795AD0A261D9BEE22D08",
+    "bytes": 209321,
+    "members": 128,
+    "source_commit": "5d4ddd91ebf0a4fb34ac5c408c6b4be7823470b7",
+    "package_record": "build/mir5/runtime-continuity-r03/packages/player.json",
+    "package_record_sha256": "7EAB1FBA73BFD27D3556932B215C3559D0C5ED753ACAC30AE48F368F9604E87C",
+    "package_record_kind": "native-package-members-not-gameplay-qualification"
+  },
+  "runner_receipts": {
+    "raw_receipt": {
+      "path": "spec/mir5/evidence/module-permissions-native.json",
+      "sha256": "909F3546EB79A91D5BD463FF5F047B03B414F8B544C1BD460362F26B8A405369"
+    },
+    "result": {
+      "path": "build/tmp/mir5-module-permissions-native-r02/result.json",
+      "sha256": "909F3546EB79A91D5BD463FF5F047B03B414F8B544C1BD460362F26B8A405369"
+    },
+    "prior_adverse_receipt": {
+      "path": "spec/mir5/evidence/module-permissions-effect-mask-adverse.json",
+      "sha256": "60020BA4D296FAD0193DF6F7918110012CC07B55ECD7E23091B8B0BF04FFECFC"
+    }
+  },
+  "exact_inputs": {
+    "runner_source_commit": "5e3d6579718fb057948b18d09c6c0455c187040a",
+    "runner_source_dirty": true,
+    "engine": {
+      "family": "Factorio 2.1.23",
+      "sha256": "FE4A1DA30F322A0D0B8AEB3DF7276332222BAAA143E2352569B723E84B2B9060"
+    },
+    "profile": {
+      "path": "tests/mir5/profiles/module-permissions-f210.json",
+      "sha256": "A5228C6646B452CF46C703DC817910AC1876B754A1CA056078D313D885C766B3"
+    },
+    "fixture_archive": {
+      "name": "mir-fixture-mir5-module-permissions_0.1.0.zip",
+      "sha256": "A0280B83ABC569CA108F3CA66881FD213C520A63B4EE519F6B9E012449F4402A"
+    },
+    "harness_sha256": "00738675D162FDDE0F53567225A2022531C694FA87A14C59EC87F8CEE41ED050",
+    "native_probe_sha256": "FF8E62687A8AA05080E3F9AFF45DED34BA7FCFDF1F309542A66893380B7D51E3",
+    "governor_sha256": "9E27C4DDCCC10028246F89A09A7663F7FCA1D7BD26444681A7A8635F74D9BE96"
+  },
+  "observed": {
+    "status": "passed-private-native-runtime-load-only",
+    "observation": "native-create-runtime-load-only",
+    "create_process_natural_exit_zero": true,
+    "fixture_init_marker": "MIR5_NATIVE_FIXTURE",
+    "fixture_case": "module-permissions",
+    "public_runtime_recipe_permission_maps": true,
+    "public_runtime_receiver_permission_maps": true,
+    "public_runtime_category_map": true,
+    "data_stage_parameter_skip_required": true,
+    "direct_library_controls": "restored-direct-library-controls"
+  },
+  "limitations": [
+    "The player archive is the committed 5d4ddd91e package, while the runner checkout recorded 5e3d6579 with dirty source; this observation is not a frozen candidate qualification.",
+    "This was create/runtime-load-only. It makes no gameplay, production, save, migration, reload, multiplayer or performance claim.",
+    "The prior false-effect-mask failure remains adverse evidence; r02 covers the corrected fixture archive only.",
+    "This is a private, exact-input scenario, not full-product qualification."
+  ]
+}

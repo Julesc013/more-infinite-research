@@ -1,0 +1,15 @@
+{
+  "name": "mir-fixture-mir5-override-interactions",
+  "version": "0.1.0",
+  "title": "MIR 5 override interaction fixture",
+  "author": "MIR maintainers",
+  "description": "Private F210 CreateOnly and deterministic production witness for selected MIR 5 prototype overrides.",
+  "factorio_version": "2.1",
+  "dependencies": [
+    "base >= 2.1.23",
+    "quality >= 2.1.23",
+    "recycler >= 2.1.23",
+    "space-age >= 2.1.23",
+    "more-infinite-research = 5.0.21000"
+  ]
+}

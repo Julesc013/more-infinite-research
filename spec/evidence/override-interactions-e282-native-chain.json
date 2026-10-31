@@ -1,0 +1,87 @@
+{
+  "schema": 1,
+  "kind": "MIR5OverrideInteractionsE282NativeChainV1",
+  "status": "changed-controller-e282-native-pass-preengine-adverse-preserved",
+  "release_qualification": false,
+  "native_run": {
+    "id": 40141491740,
+    "url": "https://github.com/Julesc013/mir-native-worker/actions/runs/40141491740",
+    "controller_commit": "941b4f7b84d6277d09f99cd3fd4d2e332d1629a8",
+    "source_commit": "e282b572050a9f8c1c5a0a9b887d5e05218c0413",
+    "trusted_branch": "feat/mir5-canonical-cutover-r01"
+  },
+  "inputs": {
+    "player": {
+      "target": "f210",
+      "version": "5.0.21000",
+      "sha256": "4F70FFE6E0585B27E58F7385D23B4727613A330604F2877B34B1CBAABC9081B7",
+      "bytes": 548001
+    },
+    "engine": {
+      "base_version": "2.1.23",
+      "sha256": "FE4A1DA30F322A0D0B8AEB3DF7276332222BAAA143E2352569B723E84B2B9060"
+    },
+    "profile": {
+      "raw_git_path": "tests/profiles/override-interactions-f210-2123.json",
+      "raw_sha256": "2291780B8E071F6C9650599D16AF8B83BEE89B685D66E0A696453CADF4E66780"
+    },
+    "asset_inventory_sha256": "813A997343A29A0290CCDB8169965FEE4C297664D90616FF066C1E1BB9121B97"
+  },
+  "native": {
+    "status": "passed-private-native-fixture",
+    "observation": "native-fixture-production-and-two-cold-reloads",
+    "physical_craft": {
+      "iron_plates_consumed": 10,
+      "productivity_modules": 2,
+      "iron_gears_produced": 6
+    },
+    "runtime": {
+      "productivity_cap": 1,
+      "recycling_probability": 0.2,
+      "energy_joules_per_tick": 0.016666666666666666
+    },
+    "data_stage": {
+      "utility_extent": 640,
+      "implicit_inherited_extent": 960,
+      "explicit_later_extent": 480,
+      "receiver_ranges": true
+    },
+    "cold_reloads": {
+      "count": 2,
+      "all_save_byte_identical": true,
+      "save_sha256": "738C24BC0F742FFA9A9B73AA62E9D7CD32DBD3619B3C3B1C41A26B5D2F656AAD"
+    },
+    "controls": "restored-direct-library-controls",
+    "result_sha256": "05708F9AF825F617D4A8C496585D2F33B1014FD7E9BFB9E5EA41E50E1754F080"
+  },
+  "independent_readback": {
+    "finding": "All 36 manifest members were rehashed. Create, production, reload-1, and reload-2 each contain exactly one data marker with 640 utility extent, 960 implicit inherited extent, and 480 explicit later extent; player, physical craft, two reloads, and direct-library restoration were independently read back.",
+    "manifest_sha256": "008789BB5104A5372D560C5E889D0FB48C9FEA3DEC38A1FE303228B9039C8305",
+    "members_verified": 36
+  },
+  "retained_preengine_adverse": {
+    "id": 40140723061,
+    "url": "https://github.com/Julesc013/mir-native-worker/actions/runs/40140723061",
+    "controller_commit": "64348d0ca9916436eb3ff2d8d0f7f2198ff88da3",
+    "source_commit": "e282b572050a9f8c1c5a0a9b887d5e05218c0413",
+    "artifact_manifest": {
+      "path": "build/mir5/recovery-historical/override-interactions/40140723061/black-glass-override-interactions-40140723061-1/artifact-manifest.json",
+      "sha256": "6D0CA9296CED9C2C55F12325948CAB195EDD28AF589D2DE93A535075E240E65F",
+      "members": 2
+    },
+    "disposition": "Preserved unchanged: the worker-created parent was passed directly to a driver that requires a new output root. No Factorio process, staging, library mutation, active profile, or native gameplay began."
+  },
+  "raw_evidence": {
+    "path": "spec/evidence/override-interactions-e282-native-receipts.json.gz",
+    "members": 7,
+    "uncompressed_bytes": 101305,
+    "uncompressed_sha256": "769F3AE76F9A484B35CD1E2399F503424A9CA2D5EFA951DA770A8F13C832ED0B",
+    "gzip_bytes": 20392,
+    "gzip_sha256": "FBF3E3DC3846C15C625A77DE316000CEB616A6B985C480072E4EC988696775C8"
+  },
+  "limits": [
+    "One F210 override-interactions fixture only; it does not qualify other settings, targets, multiplayer, performance, or release publication.",
+    "The preserved 40140723061 pre-engine failure is not relabelled as a native pass and the successful run does not erase it.",
+    "The public capsule excludes saves, raw Factorio logs, server settings, process output, player data, and credential-bearing classes; full originals remain in named primary custody."
+  ]
+}

@@ -1,0 +1,274 @@
+{
+  "schema": 1,
+  "kind": "MIRSevereGaloreF200PhaseDiagnosticNativeChainV1",
+  "status": "completed-unscored-reduced-proxy-severe-symptom-not-reproduced",
+  "declaration": {
+    "path": "spec/evidence/severe-galore-f200-phase-diagnostic-declaration-r01.json",
+    "bytes": 14573,
+    "sha256": "5A2C1F51ED271A33660ADCDF4DBA6A7FEAACE8F19B1615E0CCC76923609793ED",
+    "public_declaration_head": "e45f6904668d7fee5133228fa4cf37a38df05d70",
+    "consumed_public_helpers_source_commit": "44cf71d5c73e1ebb60f08c1ef49dcd7b5ba667b7",
+    "profile": {
+      "path": "tests/profiles/severe-galore-dmr-f200-2077-phase-r01.json",
+      "bytes": 2057,
+      "sha256": "3EC1EB674D269D6BF15AC18BE296E2FF11F634854848864E0E423BB96AFA2192",
+      "rows": 9
+    },
+    "report": {
+      "url": "https://mods.factorio.com/mod/more-infinite-research/discussion/6acabc9e1ccfd8621529e70e",
+      "full_reporter_modset_versions_settings_and_native_log_available": false
+    }
+  },
+  "execution": {
+    "packet": {
+      "path": "controller/packet.json",
+      "bytes": 10302,
+      "sha256": "39516521736C35A1C162680F0E6F24CBB8103A37304E432FEE94A8C5309321B4",
+      "kind": "MIRSevereGaloreF200PhaseDiagnosticPacketV1"
+    },
+    "prepared_input_freeze": {
+      "path": "controller/prepared-input-freeze.json",
+      "bytes": 7326,
+      "sha256": "7880CB35C1BD81FA858A181E98E352359F7253027B32E76F4E740B1AC8AD6480"
+    },
+    "input_materialization": {
+      "path": "controller/input-materialization.json",
+      "bytes": 7908,
+      "sha256": "DC719FAAA35DB61E50B2D410CBA7FAB1EB30EAE8BF00C42B4F228D8C2C30A983"
+    },
+    "caller": {
+      "bytes": 23145,
+      "sha256": "46A38362ADF20E3D5DA45146E514E21D79005ED454A8616578F1C0F3AD907D37",
+      "private_head": "d54c430a288996edebfaf8fbf14dc4e1fc7997c1"
+    },
+    "public_helpers": {
+      "count": 21,
+      "source_commit": "44cf71d5c73e1ebb60f08c1ef49dcd7b5ba667b7"
+    },
+    "engine": {
+      "version": "2.0.77",
+      "sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B"
+    },
+    "resources": {
+      "expected_peak_memory_mib": 8192,
+      "max_new_output_mib_per_arm": 512,
+      "timeout_seconds": 300,
+      "admission_wait_seconds": 30,
+      "physical_reserve_fraction": 0.2,
+      "exclusive_direct_library": true
+    }
+  },
+  "terminal": {
+    "path": "controller/execution-record/terminal.json",
+    "bytes": 14202,
+    "sha256": "F9170DD82FA1EFF1D0517E2897B43DFF3EEEC97810306730220467456ED533E7",
+    "status": "completed-unscored-diagnostic-only",
+    "factorio_processes_after": 0,
+    "controller_custody_excludes_terminal": true
+  },
+  "observations": [
+    {
+      "arm": "control-without-mir",
+      "status": "completed-data-stage-observation-only",
+      "native_processes": 1,
+      "natural_exit_code": 0,
+      "completion_predicate_observed": false,
+      "diagnostic_elapsed_seconds": 20.208337,
+      "diagnostic_peak_working_set_bytes": 478310400,
+      "diagnostic_peak_sampled_private_bytes": 470073344,
+      "result": {
+        "path": "native-captures/control-without-mir/result.json",
+        "bytes": 16907,
+        "sha256": "DED740BF24E56DABB6B579E88A2E290C23071991562D50D41F79FD2F2C0B243B"
+      },
+      "dumps": {
+        "data_raw": {
+          "path": "write-data/script-output/data-raw-dump.json",
+          "bytes": 29310154,
+          "sha256": "8461DDB0A7AEB104153F3E1A5B8E7C543326A895E50862051587788B74889D1F"
+        },
+        "mod_settings": {
+          "path": "write-data/script-output/mod-settings-dump.json",
+          "bytes": 13145,
+          "sha256": "66F660DC0CE3DBAC89CD870BFF3010C6120DAB56C14561FC4CD49062D454A4C3"
+        }
+      }
+    },
+    {
+      "arm": "candidate-mir5",
+      "status": "completed-data-stage-observation-only",
+      "native_processes": 1,
+      "natural_exit_code": 0,
+      "completion_predicate_observed": false,
+      "diagnostic_elapsed_seconds": 4.145212,
+      "diagnostic_peak_working_set_bytes": 502697984,
+      "diagnostic_peak_sampled_private_bytes": 500043776,
+      "result": {
+        "path": "native-captures/candidate-mir5/result.json",
+        "bytes": 18047,
+        "sha256": "0E85C0E71675040FA07B8B9F8D76E2F49008D9A3830F6F8AC7E6D529AEB4FCDC"
+      },
+      "dumps": {
+        "data_raw": {
+          "path": "write-data/script-output/data-raw-dump.json",
+          "bytes": 29529648,
+          "sha256": "1F41AF1EEC875123A471EA7BF50C7415FC61839B1E2FBE6A8DB64FDFA147F1E3"
+        },
+        "mod_settings": {
+          "path": "write-data/script-output/mod-settings-dump.json",
+          "bytes": 751166,
+          "sha256": "66E5ED8A19F999D2BAF418A9E3F4742850C28D7C0486406676D6EF4749CB372F"
+        }
+      }
+    },
+    {
+      "arm": "reported-mir4.2.2",
+      "status": "completed-data-stage-observation-only",
+      "native_processes": 1,
+      "natural_exit_code": 0,
+      "completion_predicate_observed": false,
+      "diagnostic_elapsed_seconds": 17.089562,
+      "diagnostic_peak_working_set_bytes": 702382080,
+      "diagnostic_peak_sampled_private_bytes": 702132224,
+      "result": {
+        "path": "native-captures/reported-mir4.2.2/result.json",
+        "bytes": 18060,
+        "sha256": "8DE50B16FA1107557ED0246C9B7E4382181A7D87A4DF501FB9BF87B6028F7E28"
+      },
+      "dumps": {
+        "data_raw": {
+          "path": "write-data/script-output/data-raw-dump.json",
+          "bytes": 29513910,
+          "sha256": "5729D82AABF8F469CA1C6A838D273628D75A6A8ECA9A8E1888482B7B1556C777"
+        },
+        "mod_settings": {
+          "path": "write-data/script-output/mod-settings-dump.json",
+          "bytes": 1038244,
+          "sha256": "CE7F306FBCB10D2878AB5FEEC2D6BD38BD1BA4826E88BCD35535102E17F860F6"
+        }
+      }
+    },
+    {
+      "arm": "reported-followup-mir4.3",
+      "status": "completed-data-stage-observation-only",
+      "native_processes": 1,
+      "natural_exit_code": 0,
+      "completion_predicate_observed": false,
+      "diagnostic_elapsed_seconds": 6.222978,
+      "diagnostic_peak_working_set_bytes": 736595968,
+      "diagnostic_peak_sampled_private_bytes": 740327424,
+      "result": {
+        "path": "native-captures/reported-followup-mir4.3/result.json",
+        "bytes": 18079,
+        "sha256": "1BE60D5946C8D93A48CF6A53240F3DEFED8468FCFAC9D06B4DB8C1244169F9EF"
+      },
+      "dumps": {
+        "data_raw": {
+          "path": "write-data/script-output/data-raw-dump.json",
+          "bytes": 29513910,
+          "sha256": "5729D82AABF8F469CA1C6A838D273628D75A6A8ECA9A8E1888482B7B1556C777"
+        },
+        "mod_settings": {
+          "path": "write-data/script-output/mod-settings-dump.json",
+          "bytes": 1038852,
+          "sha256": "B34C263D770D1350F7BD51337271FA0B7D6090D9CB555D3F536B7C590EB2F8CE"
+        }
+      }
+    }
+  ],
+  "result_records": {
+    "process_id_and_start_tuples_recorded": false,
+    "interpretation": "Result records do not contain PID/start tuples."
+  },
+  "custody": {
+    "native": {
+      "original_and_copy_members_verified": 36,
+      "bytes_per_copy": 121653136,
+      "transported_text_bodies": 32,
+      "omitted_full_data_raw_bodies": [
+        {
+          "path": "native-captures/candidate-mir5/write-data/script-output/data-raw-dump.json",
+          "bytes": 29529648,
+          "sha256": "1F41AF1EEC875123A471EA7BF50C7415FC61839B1E2FBE6A8DB64FDFA147F1E3",
+          "reason": "full data-raw dump retained locally in original and copied custody; excluded from this text-only capsule"
+        },
+        {
+          "path": "native-captures/control-without-mir/write-data/script-output/data-raw-dump.json",
+          "bytes": 29310154,
+          "sha256": "8461DDB0A7AEB104153F3E1A5B8E7C543326A895E50862051587788B74889D1F",
+          "reason": "full data-raw dump retained locally in original and copied custody; excluded from this text-only capsule"
+        },
+        {
+          "path": "native-captures/reported-followup-mir4.3/write-data/script-output/data-raw-dump.json",
+          "bytes": 29513910,
+          "sha256": "5729D82AABF8F469CA1C6A838D273628D75A6A8ECA9A8E1888482B7B1556C777",
+          "reason": "full data-raw dump retained locally in original and copied custody; excluded from this text-only capsule"
+        },
+        {
+          "path": "native-captures/reported-mir4.2.2/write-data/script-output/data-raw-dump.json",
+          "bytes": 29513910,
+          "sha256": "5729D82AABF8F469CA1C6A838D273628D75A6A8ECA9A8E1888482B7B1556C777",
+          "reason": "full data-raw dump retained locally in original and copied custody; excluded from this text-only capsule"
+        }
+      ]
+    },
+    "controller": {
+      "original_and_copy_members_verified": 9,
+      "bytes_per_copy": 3438309,
+      "transported_non_zip_bodies": 6,
+      "omitted_prior_archive_bodies": [
+        {
+          "path": "controller-captures/prior-archives-severe-galore-f200-phase-r02/more-infinite-research_4.2.20002.zip.14C2B23E0F4657F9F79585A982639463678D640C04916FEECC365D93B6894A65.zip",
+          "bytes": 1421262,
+          "sha256": "14C2B23E0F4657F9F79585A982639463678D640C04916FEECC365D93B6894A65",
+          "reason": "original prior archive retained locally in original and copied custody; excluded from this text-only capsule"
+        },
+        {
+          "path": "controller-captures/prior-archives-severe-galore-f200-phase-r02/more-infinite-research_4.3.20000.zip.856D81ACD0B25F24EB1DCC8B0FA4BCD68FE1A66DAFC8011A8807EF1F77F05C65.zip",
+          "bytes": 1456776,
+          "sha256": "856D81ACD0B25F24EB1DCC8B0FA4BCD68FE1A66DAFC8011A8807EF1F77F05C65",
+          "reason": "original prior archive retained locally in original and copied custody; excluded from this text-only capsule"
+        },
+        {
+          "path": "controller-captures/prior-archives-severe-galore-f200-phase-r02/more-infinite-research_5.0.20000.zip.B67FF048860F2707579CF582C933ED46D7BF52769F5ABE1B0279DDCC2A0323BD.zip",
+          "bytes": 553231,
+          "sha256": "B67FF048860F2707579CF582C933ED46D7BF52769F5ABE1B0279DDCC2A0323BD",
+          "reason": "original prior archive retained locally in original and copied custody; excluded from this text-only capsule"
+        }
+      ]
+    },
+    "root_readback": {
+      "path": "controller/root-readback.json",
+      "bytes": 6550,
+      "sha256": "42D33C1CC127EDF30E1E2F75B486BB436DF163E31E9022271BC1BBABDAC9CC5E",
+      "status": "reviewed complete original/copied custody and restoration"
+    }
+  },
+  "receipt_capsule": {
+    "path": "spec/evidence/severe-galore-f200-phase-native-receipts-r02.json.gz",
+    "bytes": 331958,
+    "sha256": "5E1883C370687D3DDC22A858D7163E34C6614AA83E481AB458E7E93C188A91AA",
+    "bodies": 45,
+    "schema": 1,
+    "round_trip_verified": true
+  },
+  "interpretation": {
+    "severe_symptom": "not-reproduced-in-this-nine-row-proxy",
+    "scope": "Four serial unscored data-stage phase observations only.",
+    "diagnostic_elapsed_overlap_utc_until": "2026-10-30T11:05:02.6939483Z",
+    "performance_comparison_valid": false,
+    "performance_invalidation": [
+      "diagnostic elapsed overlapped an owned release-test process until the recorded UTC instant",
+      "cache conditions were unmatched"
+    ],
+    "independent_actual_data_review": "passed-limited-scope"
+  },
+  "limits": [
+    "The reduced nine-row proxy does not reproduce or substitute for the reporter full 313-mod closure, exact versions, settings, native phase log, cache state or original save.",
+    "No performance ratio, comparison, semantic-parity, responsive-menu, save, gameplay, release or product-acceptance verdict follows.",
+    "Diagnostic elapsed and memory fields are retained raw evidence only and are not a valid performance comparison.",
+    "Existing adverse records remain unchanged."
+  ],
+  "performance_acceptance": false,
+  "release_qualification": false
+}

@@ -1,0 +1,45 @@
+{
+  "schema": 1,
+  "kind": "MIRF200ConditionalCannonNativeReferenceV1",
+  "no_mir_raw_sha256": "AD702CC98FA30A672C8A358305D0F562A5965E51F28CED8D0EFC8ABD26F5F487",
+  "ammo_category": {
+    "type": "ammo-category",
+    "name": "cannon-shell",
+    "icon": "__base__/graphics/icons/ammo-category/cannon-shell.png",
+    "subgroup": "ammo-category",
+    "bonus_gui_order": "q"
+  },
+  "old_Base_B_raw_sha256": "4E75AC09EC59E3A77EB2EEF9D58B1EC39D28A361D11445CA5B0F6CA49C36B75A",
+  "old_Base_B_cannon_row": {
+    "type": "technology",
+    "name": "mir-legacy-cannon-credit-rocket-shooting-speed",
+    "icon": "__base__/graphics/technology/automation-1.png",
+    "icon_size": 256,
+    "level": 1,
+    "upgrade": true,
+    "hidden": true,
+    "enabled": false,
+    "visible_when_disabled": false,
+    "max_level": "infinite",
+    "order": "zz[mir-legacy-cannon-credit]-rocket-shooting-speed",
+    "effects": [
+      {
+        "type": "gun-speed",
+        "ammo_category": "cannon-shell",
+        "modifier": 0.1
+      }
+    ],
+    "unit": {
+      "count": 1,
+      "time": 1,
+      "ingredients": [
+        [
+          "automation-science-pack",
+          1
+        ]
+      ]
+    }
+  },
+  "old_Base_B_cannon_canonical_sha256": "F1A6B498F19F5F7FB275A3ABDC66A8776E9489A78475B6F7F23CB2BFE2BE6A6C",
+  "scope": "Finite actual-shape host input complements unchanged compactC5 context. Conditional data-final cannon holder requires selected public rocket and cannon-shell category. No new native execution or universal28 count."
+}

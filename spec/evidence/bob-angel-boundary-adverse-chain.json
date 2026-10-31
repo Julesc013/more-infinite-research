@@ -1,0 +1,43 @@
+{
+  "schema": 1,
+  "kind": "MIR5BobAngelBoundaryAdverseChainV1",
+  "source": "167dc79b123e2f7bd2c8bab8aed28e462613f7e0",
+  "run": {
+    "id": 39987490261,
+    "url": "https://github.com/Julesc013/mir-native-worker/actions/runs/39987490261",
+    "conclusion": "failure"
+  },
+  "custody": "build/mir5/black-glass/incoming/39987490261/black-glass-bob-angel-boundary-39987490261-1",
+  "manifest_members_verified": 62,
+  "published_seed": {
+    "receipt": "spec/mir5/evidence/bob-angel-boundary-published-native.json",
+    "status": "passed-private-native-fixture",
+    "witnesses": {
+      "source_mir": "4.7.20002",
+      "finite_tail_level": 150,
+      "finite_tail_effect_percent": 2,
+      "seeded_boundary_levels": true,
+      "historical_lab_completed_levels": 0,
+      "no_fabricated_150_completion_claim": true,
+      "native_recipe_bonus": 3,
+      "foreign_disabled": true,
+      "foreign_queue": "mir5-ba-continuity-queue-probe",
+      "foreign_progress": 0.42000000000000004,
+      "on_load_read_only": false,
+      "qualification": "native-runner-readback-required"
+    },
+    "cold_reloads": 2
+  },
+  "upgrade": {
+    "receipt": "spec/mir5/evidence/bob-angel-boundary-upgrade-adverse-native.json",
+    "status": "failed",
+    "failure": "[mir441-process-exit] 1",
+    "input_save_byte_identical": true
+  },
+  "limits": [
+    "The source fixture seeded finite level 150 through native API, not 150 actual lab completions.",
+    "Upgrade failed a foreign-boundary state assertion; no historical-save upgrade pass is claimed.",
+    "The source did not witness the enabled state immediately before its foreign disable write. Strengthened source-witness and detailed destination diagnostics require a new native run."
+  ],
+  "release_qualification": false
+}

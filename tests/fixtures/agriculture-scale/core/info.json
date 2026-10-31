@@ -1,0 +1,13 @@
+{
+  "name": "mir-fixture-mir5-agriculture-scale",
+  "version": "0.1.0",
+  "title": "MIR 5 private agriculture scale witness",
+  "author": "MIR maintainers",
+  "description": "Disposable F210 agricultural tower scale fixture with real laboratories, native planting events, spoilable stacks, and cold reload witnesses.",
+  "factorio_version": "2.1",
+  "dependencies": [
+    "base = 2.1.23",
+    "space-age = 2.1.23",
+    "more-infinite-research >= 4.7.21002"
+  ]
+}

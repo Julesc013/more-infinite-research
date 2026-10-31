@@ -1,0 +1,214 @@
+{
+  "schema": 1,
+  "kind": "MIRHistoricalPlayerPackageMetricsV1",
+  "status": "read-only static player-product inventory",
+  "scope": "One-off static comparison input for NoMIR, MIR1, MIR2, MIR3, MIR4.7.3, and the frozen MIR5 beta across their declared F200/F210 edition arms. This record does not measure runtime, cold or warm performance, functional parity, gameplay, memory, or release acceptance.",
+  "source": {
+    "frozen_mir5_commit": "125fc7464414dbbe769fee160399e0cb5a9c9eed",
+    "frozen_mir5_tree": "0f5f0c63083e1aa15a1976494c83fb404fcc9d2c",
+    "mir5_inventory": {
+      "path": "D:/Projects/Factorio/mir5-freeze/v5.0.0-beta-00-r01/MIR5ReleaseAssetInventoryV1.json",
+      "sha256": "2e263ef28aaba4660bfb490abd4f4cd5ce5ab2ab875f3323dedc4e9fb862ffbf"
+    },
+    "historical_metadata": [
+      {
+        "path": "spec/evidence/migration-origins-remaining-modern-archive-readback.json",
+        "sha256": "4bca5f55a06f7c64123e9ba45e7f52a8e3dfd319d71d65326206080890a83a72"
+      },
+      {
+        "path": "spec/evidence/historical-boolean-cap-f200-archive-metadata.json",
+        "sha256": "370dd37bce5003f819c2d2f0671582529ce4a6047a89ff23eb9e9146405cafa1"
+      },
+      {
+        "path": "spec/evidence/historical-boolean-cap-archive-metadata.json",
+        "sha256": "f56981d287f8ba9e21b06c7238078fa17d14bb307e2700346904815fce74617b"
+      },
+      {
+        "path": "spec/evidence/historical-remaining-cap-archive-metadata.json",
+        "sha256": "92b6a83a887b615394cd4ab9c1a26ae737261657f98f530d8325c4d998dcfda5"
+      }
+    ]
+  },
+  "method": {
+    "archive_identity": "SHA-256 and byte length of the complete selected player ZIP.",
+    "player_code_selection": "All and only non-directory ZIP entries whose path ends in .lua, case-insensitively. Documentation, tests, tools, locale, images, JSON, configuration, and non-Lua player members are excluded from code metrics.",
+    "archive_validation": "Each selected ZIP had one root, no duplicate file-entry names, and no selected Lua entry outside that root.",
+    "lua_uncompressed_bytes": "Sum of selected ZIP-entry uncompressed byte lengths.",
+    "lua_physical_lines": "For each selected Lua member, count byte 0x0A and add one only when the member is nonempty and its final byte is not 0x0A; sum the results.",
+    "collector": "Read-only PowerShell using Get-FileHash and System.IO.Compression.ZipArchive; no ZIP was built, modified, extracted, or installed.",
+    "complexity_limit": "Lua module count and physical lines are structural inventory metrics only. This record deliberately contains no claimed universal complexity, cyclomatic-complexity, latency, memory, or maintainability score."
+  },
+  "comparison_arm_rows": 11,
+  "player_archive_rows": 9,
+  "no_mir_rows": 2,
+  "rows": [
+    {
+      "id": "no-mir-f200",
+      "family": "NoMIR",
+      "edition": "F200",
+      "factorio_version": "2.0",
+      "player_archive": null,
+      "metric_status": "not_applicable_no_MIR_player_archive"
+    },
+    {
+      "id": "no-mir-f210",
+      "family": "NoMIR",
+      "edition": "F210",
+      "factorio_version": "2.1",
+      "player_archive": null,
+      "metric_status": "not_applicable_no_MIR_player_archive"
+    },
+    {
+      "id": "mir1-f200",
+      "family": "MIR1",
+      "edition": "F200",
+      "factorio_version": "2.0",
+      "version": "1.2.9",
+      "source_tag": "1.2.9",
+      "source_commit": "e0f081e4cad7121c1bddedbfadbd3b83d42c438c",
+      "archive": "more-infinite-research_1.2.9.zip",
+      "archive_bytes": 95351,
+      "archive_sha256": "6006c08e4d1f60b88306f8750f26fc3efc3b7bac1c3fd0cc214f52bb80d94ac4",
+      "archive_root": "more-infinite-research_1.2.9",
+      "lua_members": 10,
+      "lua_uncompressed_bytes": 54640,
+      "lua_physical_lines": 1505
+    },
+    {
+      "id": "mir2-f200",
+      "family": "MIR2",
+      "edition": "F200",
+      "factorio_version": "2.0",
+      "version": "1.9.2",
+      "source_tag": "1.9.2",
+      "source_commit": "4a56169922c1472bbf8ef1947b8eaa18d8ad992f",
+      "archive": "more-infinite-research_1.9.2.zip",
+      "archive_bytes": 236144,
+      "archive_sha256": "ba15f2402d05b314af515183a43dafc53e69fb6978f22b347596d649506e251d",
+      "archive_root": "more-infinite-research_1.9.2",
+      "lua_members": 46,
+      "lua_uncompressed_bytes": 251327,
+      "lua_physical_lines": 7439
+    },
+    {
+      "id": "mir2-f210",
+      "family": "MIR2",
+      "edition": "F210",
+      "factorio_version": "2.1",
+      "version": "2.2.0",
+      "source_tag": "2.2.0",
+      "source_commit": "62a0015abe1a5dd4560c3e7a9a8c24b5a8609d1b",
+      "archive": "more-infinite-research_2.2.0.zip",
+      "archive_bytes": 236643,
+      "archive_sha256": "b4e49460734868c3cc56476ef319916bbf2fa929c55e05eaa64cc67eb589691c",
+      "archive_root": "more-infinite-research_2.2.0",
+      "lua_members": 46,
+      "lua_uncompressed_bytes": 252485,
+      "lua_physical_lines": 7473
+    },
+    {
+      "id": "mir3-f200",
+      "family": "MIR3",
+      "edition": "F200",
+      "factorio_version": "2.0",
+      "version": "2.5.11",
+      "source_tag": "2.5.11",
+      "source_commit": "e08e6b0a8c054c8e9d09a7081cec3bd65de0e3af",
+      "archive": "more-infinite-research_2.5.11.zip",
+      "archive_bytes": 1065193,
+      "archive_sha256": "4ae3da83c4f8cb7d084891065387b78032bb25b8e4ed3948058d9b773070847c",
+      "archive_root": "more-infinite-research_2.5.11",
+      "lua_members": 244,
+      "lua_uncompressed_bytes": 1160824,
+      "lua_physical_lines": 31420
+    },
+    {
+      "id": "mir3-f210",
+      "family": "MIR3",
+      "edition": "F210",
+      "factorio_version": "2.1",
+      "version": "3.2.11",
+      "source_tag": "3.2.11",
+      "source_commit": "e3d787deb35ff30157bb2013fa1cc745a445e629",
+      "archive": "more-infinite-research_3.2.11.zip",
+      "archive_bytes": 1067720,
+      "archive_sha256": "5b0252c3e1b8a20ff8e31f408f0217ddc77d2df0d1c15f59653e948472870a5a",
+      "archive_root": "more-infinite-research_3.2.11",
+      "lua_members": 246,
+      "lua_uncompressed_bytes": 1167542,
+      "lua_physical_lines": 31638
+    },
+    {
+      "id": "mir4-f200",
+      "family": "MIR4",
+      "edition": "F200",
+      "factorio_version": "2.0",
+      "version": "4.7.20003",
+      "source_tag": "v4.7.3",
+      "source_commit": "8643cc91bc915e008556a5315dbb0a743247e7ab",
+      "archive": "more-infinite-research_4.7.20003.zip",
+      "archive_bytes": 1449475,
+      "archive_sha256": "fbba844dd04011a12bb6da885745b0733ad37fab181eaad9ee4346b9b0d32647",
+      "archive_root": "more-infinite-research_4.7.20003",
+      "lua_members": 283,
+      "lua_uncompressed_bytes": 1879070,
+      "lua_physical_lines": 46493
+    },
+    {
+      "id": "mir4-f210",
+      "family": "MIR4",
+      "edition": "F210",
+      "factorio_version": "2.1",
+      "version": "4.7.21003",
+      "source_tag": "v4.7.3",
+      "source_commit": "8643cc91bc915e008556a5315dbb0a743247e7ab",
+      "archive": "more-infinite-research_4.7.21003.zip",
+      "archive_bytes": 1463293,
+      "archive_sha256": "b6eb9430056abd384db00f94929fe7dac0a37441acf4bc277946689682628852",
+      "archive_root": "more-infinite-research_4.7.21003",
+      "lua_members": 287,
+      "lua_uncompressed_bytes": 1932083,
+      "lua_physical_lines": 47755
+    },
+    {
+      "id": "mir5-f200",
+      "family": "MIR5",
+      "edition": "F200",
+      "factorio_version": "2.0",
+      "version": "5.0.20000",
+      "source_tag": "v5.0.0-beta-00",
+      "source_commit": "125fc7464414dbbe769fee160399e0cb5a9c9eed",
+      "source_tree": "0f5f0c63083e1aa15a1976494c83fb404fcc9d2c",
+      "archive": "more-infinite-research_5.0.20000.zip",
+      "archive_bytes": 704588,
+      "archive_sha256": "54650cb19c3bae3c2dd7fe8d728a3fe8104648c8e99b68e14cbfc3f92a0ab3a9",
+      "archive_root": "more-infinite-research_5.0.20000",
+      "lua_members": 114,
+      "lua_uncompressed_bytes": 1230164,
+      "lua_physical_lines": 28105
+    },
+    {
+      "id": "mir5-f210",
+      "family": "MIR5",
+      "edition": "F210",
+      "factorio_version": "2.1",
+      "version": "5.0.21000",
+      "source_tag": "v5.0.0-beta-00",
+      "source_commit": "125fc7464414dbbe769fee160399e0cb5a9c9eed",
+      "source_tree": "0f5f0c63083e1aa15a1976494c83fb404fcc9d2c",
+      "archive": "more-infinite-research_5.0.21000.zip",
+      "archive_bytes": 704972,
+      "archive_sha256": "b49d7bbb99ea51c7a90af9f72dde5d5c0120f80e492fce0917d96d4159c32407",
+      "archive_root": "more-infinite-research_5.0.21000",
+      "lua_members": 114,
+      "lua_uncompressed_bytes": 1230174,
+      "lua_physical_lines": 28105
+    }
+  ],
+  "comparison_limitations": [
+    "NoMIR rows are baseline scenarios, not zero-byte packages or functionality-equivalent products.",
+    "Base, Space Age, and heavy are runtime-profile/scenario rows that reuse the selected edition ZIP; they do not create distinct product-package metrics.",
+    "Cold and warm results must remain separately observed runtime evidence and must not be inferred from these static values.",
+    "Archive bytes and source-inventory metrics do not prove gameplay benefit, performance, memory use, or feature parity."
+  ]
+}

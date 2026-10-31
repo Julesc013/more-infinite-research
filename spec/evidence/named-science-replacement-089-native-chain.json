@@ -1,0 +1,103 @@
+{
+  "schema": 1,
+  "kind": "MIR5NamedScienceReplacement089NativeChainV1",
+  "status": "published-and-corrected-current-create-only-pass-original-current143-startup-adverse-preserved",
+  "native_execution": true,
+  "release_qualification": false,
+  "run": {
+    "id": 40202491981,
+    "url": "https://github.com/Julesc013/mir-native-worker/actions/runs/40202491981",
+    "workflow_conclusion": "success",
+    "frozen_controller_ref": "test/corrected089-r22-named-r01",
+    "controller_commit": "99201f950f67bcbb0f92e8f6f98c4f1d76224aca",
+    "controller_tree": "417ca414d669c33ef55f860c1f9ec16d57f371ee",
+    "controller_provenance": {
+      "source": "GitHub Actions workflow head readback; the controller identity is external to the 30 native artifact members.",
+      "artifact_attested": false
+    }
+  },
+  "inputs": {
+    "fixture_source_commit": "e5b3a3ece4f9640e5830e8cbe70be52b1a0a7414",
+    "actual_player_source": "089e6e25c6c28e229d3b28c13b7c2cedaf2b4d0a",
+    "actual_player_source_tree": "24699ffab82952ce5b3b3a09ef5e8c9ed2c1d43a",
+    "asset_inventory_sha256": "8991F67521D96641A77429F0FD02DB61DC94EE6236E89D89098F6C4131895138",
+    "current_f210": {
+      "version": "5.0.21000",
+      "bytes": 553639,
+      "sha256": "83CA2487DAD623FCA2D0E9AE80C222782A095FB8F501279A6E1C611714CBE4FE"
+    },
+    "published_f210": {
+      "version": "4.7.21003",
+      "sha256": "B6EB9430056ABD384DB00F94929FE7DAC0A37441ACF4BC277946689682628852"
+    },
+    "engine": {
+      "version": "2.1.23",
+      "sha256": "FE4A1DA30F322A0D0B8AEB3DF7276332222BAAA143E2352569B723E84B2B9060"
+    },
+    "active_mods_observer_sha256": "2E1BE5952D2A4CC5C74A0D149E075D247BA110A3FAE5B6768D3EAEBABCEF989C"
+  },
+  "artifact_manifest": {
+    "path": "build/mir5/recovery-historical/named-science-replacement-f210/40202491981/black-glass-named-science-replacement-f210-canonical-40202491981-1/artifact-manifest.json",
+    "sha256": "80490063A1EBCA6F7F80F682BA8E51F0CC7D12EA01DDE4D25D19E3607637ED46",
+    "members": 30,
+    "verified_members": 30,
+    "file_set": "All declared member paths, byte counts, and SHA-256 values match; artifact-manifest.json is the expected self-excluded file."
+  },
+  "preparation": {
+    "status": "passed-named-science-replacement-canonical",
+    "result_path": "named-science-replacement-f210-canonical/named-science-replacement-prepare.json",
+    "result_sha256": "9D8DEC2A998AD0FAA6FDFF14829F5392FC8CB8E8C472EFDC48759B39888E284F",
+    "native_results": 2,
+    "library_mutation": true,
+    "disposition": "The guarded direct-library setup ran for both CreateOnly arms; both native results attest restored direct-library controls."
+  },
+  "stages": [
+    {
+      "stage": "published",
+      "player_sha256": "B6EB9430056ABD384DB00F94929FE7DAC0A37441ACF4BC277946689682628852",
+      "result_path": "named-science-replacement-f210-canonical/native/published/result.json",
+      "result_sha256": "16636A84248B1214A94B7A5D85F1A71D8795963A733366E7300970F005380F7F",
+      "create_log_sha256": "6679C13E2B05C63C650EEAB03CABD852C2DEF65557472A705BF2AE80CBEA038D",
+      "status": "passed-private-native-runtime-load-only",
+      "observation": "native-create-runtime-load-only",
+      "marker": {
+        "target": "recipe-prod-research_gears-1",
+        "seeded_owner": "z-mir473-seeded-electromagnetic-owner",
+        "stage": "data-final"
+      },
+      "direct_library_controls_restored": true
+    },
+    {
+      "stage": "mir5",
+      "player_sha256": "83CA2487DAD623FCA2D0E9AE80C222782A095FB8F501279A6E1C611714CBE4FE",
+      "result_path": "named-science-replacement-f210-canonical/native/mir5/result.json",
+      "result_sha256": "5EC474922908DAAD89F12764238FD21CB91FD3C34F6058295278C68BE81CFA09",
+      "create_log_sha256": "96F557B50B7295A22204E377AD6AA388028BE6CF78B595185B85E88287D91F90",
+      "status": "passed-private-native-runtime-load-only",
+      "observation": "native-create-runtime-load-only",
+      "marker": {
+        "target": "recipe-prod-research_gears-1",
+        "seeded_owner": "z-mir473-seeded-electromagnetic-owner",
+        "stage": "data-final"
+      },
+      "direct_library_controls_restored": true
+    }
+  ],
+  "retained_original_adverse": {
+    "path": "spec/evidence/named-science-replacement-143-adverse-chain.json",
+    "run": 40198978389,
+    "artifact_manifest_sha256": "D9BA8CA66C792208B81E4AA6A8D8AFC0FDE40D42129E240743AD3BF0695A500A",
+    "disposition": "The original current143/428 startup adverse remains unchanged. This corrected089/83CA execution does not relabel its published pass, current startup failure, controller, or cancelled R21 timing state."
+  },
+  "r22_timing": {
+    "status": "cancelled-before-native-timing",
+    "timing_samples": 0,
+    "reason": "Aero977 introduced an essential Generator malformed-effect preservation change after this exact089 CreateOnly pair; R22 requires a later coherent accepted freeze."
+  },
+  "primary_custody": "build/mir5/recovery-historical/named-science-replacement-f210/40202491981",
+  "limits": [
+    "Each arm proves one exact Factorio2.1.23 CreateOnly data-final marker under its recorded fixture, player, profile, observer, and direct-library inputs.",
+    "The two arms do not establish gameplay, laboratory progression, save migration, reload, client, timing, performance, full effect parity, catalogue parity, release qualification, or publication readiness.",
+    "No public capsule embeds full logs, saves, configurations, or other raw artifact bytes; the complete originals remain in the recorded primary custody path."
+  ]
+}

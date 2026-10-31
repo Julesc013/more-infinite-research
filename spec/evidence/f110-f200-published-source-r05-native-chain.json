@@ -1,0 +1,144 @@
+{
+  "schema": 1,
+  "kind": "MIR5F110PublishedSourceR05NativeChainV1",
+  "status": "passed-exact-published-f110-source-stage",
+  "scope": "One exact Factorio 1.1.110 source-stage fixture using published MIR 4.7.11003. This is not an F110-to-F200 transition acceptance result.",
+  "execution_source": "0aad86ed85d59935daef4afee79397c36c132f5d",
+  "source_clean": true,
+  "engine": {
+    "path": "D:\\Games\\Factorio\\1.1\\bin\\x64\\factorio.exe",
+    "sha256": "B7B4B834FCA2E32AFA9D3476EB42CC09B02F1205BE97F688DC6FC6ACE7BA8FE1",
+    "file_version": "1.1.110.62357",
+    "product_version": "1.1.110",
+    "base_version": "1.1.110"
+  },
+  "published_mir": {
+    "version": "4.7.11003",
+    "archive_sha256": "66C127D8BFC1919FA88F19D2D9B3047316A1B90401CAA05A6D05979B7A099D1E",
+    "bytes": 709749,
+    "profile_sha256": "71E65087FF85D94EBA62FD9B7EFC96D05762365F92ED7E72BDE2DB3CB452D4D4"
+  },
+  "fixture": {
+    "name": "mir-fixture-mir5-f110-f200-transition",
+    "version": "0.1.0",
+    "archive_sha256": "DDE2B3ADD1D0231E9BEC07B510FEC85D41615FCA49912607108F28F2B59A93C7",
+    "raw_members": {
+      "catalogue.lua": "A358C983C3328CBABE2CF83A87F22FBA02EEAB61A8CABAD23FD9FDAC3FD08ACD",
+      "control.lua": "241F2A3287C9FCF7C32C0A1C85553E1D3FEC674234CFD1FB1809FFE0D2D12A35",
+      "data-final-fixes.lua": "50F77BAB1D3C6A769B195254A10D8CECD4B10648879E87DE4CE7913108FC0A3D",
+      "fixture_control.lua": "520E234E7C7DBDCE35BC0A1926D5E317FAB8812713042661C1F695714D7F7E12",
+      "fixture_data_final.lua": "7800724E366BB792AA4EDA0CE834C943463A83AA439D91F6B2A1F2D900ED6426",
+      "info.json": "D47B86573654B1DDA5E4362F97101CCEB01100521E9209762B939772AF3F4412",
+      "settings-updates.lua": "CFCD79ABBB2234F91E5A9685C76855F39B2B86EBF665EBF620E8545CE4EE6854"
+    }
+  },
+  "native_observation": {
+    "result_sha256": "F25611E6DAA4E2E4AD07DFD9BAE3415F073CFB392718FCD456BFC9C4278DF6DE",
+    "status": "passed-private-native-fixture",
+    "create": "passed",
+    "production": "passed",
+    "initial": {
+      "source_direct_lab_completions": 1,
+      "successor_direct_lab_completions": 0,
+      "seeded_catalogue_rows": 16,
+      "retained_catalogue_rows": 17,
+      "queued_progress": 0.42,
+      "suspended_progress": 0.27,
+      "foreign_disabled": true,
+      "inserter_stack_size_bonus": 2,
+      "stack_inserter_capacity_bonus": 4,
+      "on_load_read_only": false
+    },
+    "saved_source": {
+      "sha256": "D524AA78440F242B179A1E9BC40BF89B87C1A66E99F64C14D3250DEAEBB69253",
+      "preserved_primary_path": "build/mir5/recovery-historical/f110-f200-transition-published-f110-source-r05/native-output/write-data/saves/mir5-native-complete.zip"
+    },
+    "cold_reloads": [
+      {
+        "ordinal": 1,
+        "status": "passed",
+        "save_byte_identical": true,
+        "save_sha256": "D524AA78440F242B179A1E9BC40BF89B87C1A66E99F64C14D3250DEAEBB69253",
+        "on_load_read_only": true
+      },
+      {
+        "ordinal": 2,
+        "status": "passed",
+        "save_byte_identical": true,
+        "save_sha256": "D524AA78440F242B179A1E9BC40BF89B87C1A66E99F64C14D3250DEAEBB69253",
+        "on_load_read_only": true
+      }
+    ]
+  },
+  "controls": {
+    "limits": {
+      "total_seconds": 720,
+      "expected_peak_mib": 4096,
+      "per_stage_timeout_seconds": 180,
+      "per_stage_max_new_output_mib": 128,
+      "aggregate_max_output_mib": 512,
+      "admission_wait_seconds": 30
+    },
+    "library_controls_restored": true,
+    "library_archive_restoration": "temporary fixture archive removed",
+    "factorio_processes_after_terminal": 0
+  },
+  "custody": {
+    "primary_root": "build/mir5/recovery-historical/f110-f200-transition-published-f110-source-r05",
+    "manifest_path": "build/mir5/recovery-historical/f110-f200-transition-published-f110-source-r05/primary-custody-manifest-r01.json",
+    "manifest_sha256": "C61E37A38F50790C58F114A25A3F84D2B5B4E31C6F2607B435E11E3C27EE5630",
+    "members": 88,
+    "bytes": 3212797,
+    "unsafe_members": 0,
+    "public_validation_path": "build/mir5/recovery-historical/f110-f200-transition-published-f110-source-r05/public-evidence-validation-r01.json",
+    "public_validation_sha256": "C72FE7C6F6A46E52407C74BA7E2E688FDC52904CC75AAE5F881D097D8FF2FE5F"
+  },
+  "receipts": {
+    "path": "spec/evidence/f110-f200-published-source-r05-native-receipts-r01.json.gz",
+    "sha256": "B47C074ECB28CDBFC099F22681B16768D3F77F1357BDD15A2A684424D6CA8B4A",
+    "bytes": 71428,
+    "lossless_safe_records": 29,
+    "excluded_primary_members": 59,
+    "roundtrip_verified": true,
+    "exclusions": "Original and intermediate save binaries, player data, runtime configuration and write-data payloads are deliberately absent from the public capsule."
+  },
+  "adverses_preserved": [
+    {
+      "run": "r01",
+      "status": "adverse",
+      "native_exception": "[mir441-process-exit] 1",
+      "terminal_path": "build/mir5/recovery-historical/f110-f200-transition-published-f110-source-r01-launch/terminal.json",
+      "terminal_sha256": "5441C56AEEDE40594F49C2A203D1C002ACDA40BB8C57A38363B1BF98982217C9"
+    },
+    {
+      "run": "r02",
+      "status": "adverse",
+      "native_exception": "[mir441-process-exit] 1",
+      "terminal_path": "build/mir5/recovery-historical/f110-f200-transition-published-f110-source-r02-launch/terminal.json",
+      "terminal_sha256": "22018D88C5A1C6AA74D6F9C56D37BB6E6434293F98A369D98489712447219AA0"
+    },
+    {
+      "run": "r03",
+      "status": "adverse",
+      "native_exception": "[mir441-process-timeout]",
+      "terminal_path": "build/mir5/recovery-historical/f110-f200-transition-published-f110-source-r03-launch/terminal.json",
+      "terminal_sha256": "FD021E87652E2C1163BC44263CFCC93DD52B66DF82D876D2DF8429B05EF14C23"
+    },
+    {
+      "run": "r04",
+      "status": "adverse",
+      "native_exception": "[mir441-process-timeout]",
+      "terminal_path": "build/mir5/recovery-historical/f110-f200-transition-published-f110-source-r04-launch/terminal.json",
+      "terminal_sha256": "CEBC79001BD93F30D3318A304F2AF3BEA9FC528310FBD3590C6792E4E8468F85"
+    }
+  ],
+  "claims": {
+    "published_f110_source_stage": true,
+    "f110_to_f200_transition_acceptance": false,
+    "f200_successor_execution": false,
+    "multiplayer": false,
+    "performance": false,
+    "release_qualification": false
+  },
+  "limitations": "The result qualifies only the retained published F110 source-stage lab, state, saved-source and two cold-reload observations with the exact listed inputs. The protected D524 source save remains custody only until a separately pinned F200 successor executes."
+}

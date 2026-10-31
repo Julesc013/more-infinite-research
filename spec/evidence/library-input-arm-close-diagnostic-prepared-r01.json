@@ -1,0 +1,316 @@
+{
+  "schema": 1,
+  "kind": "MIRLibraryClientIdentityPreparedInputsV1",
+  "status": "fixture-prepared-not-native-qualified",
+  "fixture_source": "ec271cb1634c820e940d73e4edd231ef1dbfd918",
+  "fixture_base": "e5b5d3c36bda62e3c1b0eadd95d7619ef9d7d0e1",
+  "player_source": "42032477d45ced683e72736a4fe30a7a3195b995",
+  "player_tree": "5a6adf0aab4e945aeca13420ddd045ad45f050a0",
+  "changed_player_members": [],
+  "previous_preparation": {
+    "path": "spec/evidence/library-input-native-close-prepared-r01.json",
+    "bytes": 12158,
+    "sha256": "B7E21FACFE55FB750C35337BBD993FB89F52F5CA2C4FFB9A071701DB8E002C7B",
+    "disposition": "The r07 close protocol, protected source saves, candidate archives, preservation fixtures, and export0.4 pins remain frozen inputs."
+  },
+  "q24_before_esc_adverse": {
+    "terminal": {
+      "path": "build/qualification/imported-library-native-input-runtime-r24-controller/execution-record/terminal.json",
+      "sha256": "F567092425439C2757637FB037765EC7CA8B388A03F832668B8402B661A1DB4B"
+    },
+    "root_readback": {
+      "path": "build/qualification/imported-library-native-input-runtime-r24-controller/root-adverse-pre-key-readback-r01.json",
+      "sha256": "A6F5793F1CBB89CF5AA1DBEDCBD65A70087D4D90326C2B2B5E7C3D6CA87AFB8C"
+    },
+    "scope": "Q24 reached the retained drag/readback boundary and then refused arm_close before the Esc action because the fixture observed no EN-owned opened Library. It is retained adverse evidence, not a native input, close, gameplay, or product verdict."
+  },
+  "diagnostic_guard": {
+    "control": {
+      "source": "tests/fixtures/library-native-input/control.lua",
+      "source_revision": "ec271cb1634c820e940d73e4edd231ef1dbfd918",
+      "bytes": 25807,
+      "sha256": "883078F766BA546946D9921A65EEED4A2CDDE9E8EC0E5F13141F98CB1C1294A1"
+    },
+    "behavior": "The arm_close predicate, state/event sequencing, native ownership requirement, and action refusal remain unchanged. Only a refusal appends pcall-safe opened kind, current-root equality, and optional name/mod scalar observations; those observations neither establish the state at the earlier assertion nor turn a refusal into a pass.",
+    "native_execution": false
+  },
+  "profiles": [
+    {
+      "target": "f200",
+      "mode": "input",
+      "version": "0.3.0",
+      "profile": {
+        "path": "tests/profiles/library-native-input-imported110-f200-2077-r08.json",
+        "bytes": 3329,
+        "sha256": "C3393D7925298C1304085C9FF3E31B91CDA27DFB5BD79538A8E3121A1845CB66"
+      },
+      "engine": {
+        "version": "2.0.77",
+        "sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B"
+      },
+      "protected_input_save": {
+        "sha256": "029AA881F739457047B1E8318FA9A77508B28112757176B64CD0C3C31530638C",
+        "bytes": 811812,
+        "original_chain": "spec/evidence/migration-origin-110-7a2-direct-native-chain-r01.json"
+      },
+      "archive_sha256": {
+        "more-infinite-research_5.0.20000.zip": "7CAC54475107736106D84AF98D50A8622E095B6658F1E3682643FE0CBA8BAEF0",
+        "mir-fixture-mir5-active-mods-observer_0.1.0.zip": "723D1E7721449FC26040E5E6629416767BDC20AD79CF8723115846DB662A1F87",
+        "mir-fixture-mir5-migration-origin-f200-110-source_0.3.0.zip": "D30D00A0D57A2A8195565E52DCEFDF94B92DCBA37DC85A83B37245336157E9C0",
+        "mir-fixture-mir5-library-native-input_0.3.0.zip": "7FC460636DA34744A3CAE0ADA439DC394762F59BC8BC94292D1965FA6A2E9CDA"
+      },
+      "owned_fixture": {
+        "name": "mir-fixture-mir5-library-native-input_0.3.0.zip",
+        "bytes": 7456,
+        "sha256": "7FC460636DA34744A3CAE0ADA439DC394762F59BC8BC94292D1965FA6A2E9CDA",
+        "local_custody": "build/qualification/library-input-arm-close-diagnostic-r08/f200/input/mir-fixture-mir5-library-native-input_0.3.0.zip",
+        "members": [
+          {
+            "source": "tests/fixtures/library-native-input/control.lua",
+            "source_revision": "ec271cb1634c820e940d73e4edd231ef1dbfd918",
+            "destination": "control.lua",
+            "bytes": 25807,
+            "sha256": "883078F766BA546946D9921A65EEED4A2CDDE9E8EC0E5F13141F98CB1C1294A1"
+          },
+          {
+            "source": "tests/fixtures/library-native-input/info-input-identity-f200.json",
+            "source_revision": "d9e6dd74427763b09d8f21da585b17e059dedd08",
+            "destination": "info.json",
+            "bytes": 345,
+            "sha256": "CC35B55624B2F95EAA2B198048C2C413D787F4EB3FD62EB0938E68CA2B5A7F81"
+          }
+        ]
+      }
+    },
+    {
+      "target": "f200",
+      "mode": "exports",
+      "version": "0.4.0",
+      "profile": {
+        "path": "tests/profiles/library-support-exports-imported110-f200-2077-r04.json",
+        "bytes": 2597,
+        "sha256": "11F56F05563F9DEE90F6CAC1CC8003C5A87784EFEA8209261AA1EFF41051811F"
+      },
+      "protected_input_save": {
+        "sha256": "029AA881F739457047B1E8318FA9A77508B28112757176B64CD0C3C31530638C",
+        "bytes": 811812,
+        "original_chain": "spec/evidence/migration-origin-110-7a2-direct-native-chain-r01.json"
+      },
+      "engine": {
+        "version": "2.0.77",
+        "sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B"
+      },
+      "archive_sha256": {
+        "more-infinite-research_5.0.20000.zip": "7CAC54475107736106D84AF98D50A8622E095B6658F1E3682643FE0CBA8BAEF0",
+        "mir-fixture-mir5-active-mods-observer_0.1.0.zip": "723D1E7721449FC26040E5E6629416767BDC20AD79CF8723115846DB662A1F87",
+        "mir-fixture-mir5-migration-origin-f200-110-source_0.3.0.zip": "D30D00A0D57A2A8195565E52DCEFDF94B92DCBA37DC85A83B37245336157E9C0",
+        "mir-fixture-mir5-library-native-input_0.4.0.zip": "6D6362DF9998F54B71D0BBCDC5DF82A800C5BE802CF8279E86C2ADA6A469845C"
+      },
+      "owned_fixture": {
+        "name": "mir-fixture-mir5-library-native-input_0.4.0.zip",
+        "bytes": 10918,
+        "sha256": "6D6362DF9998F54B71D0BBCDC5DF82A800C5BE802CF8279E86C2ADA6A469845C",
+        "local_custody": "build/qualification/library-fixture-client-identity-aero-r01/f200/exports/mir-fixture-mir5-library-native-input_0.4.0.zip",
+        "members": [
+          {
+            "source": "tests/fixtures/library-native-input/control.lua",
+            "source_revision": "d9e6dd74427763b09d8f21da585b17e059dedd08",
+            "destination": "control.lua",
+            "bytes": 21557,
+            "sha256": "C4FF383DA0CB163DF8C721B96DE97F2AB74BB70ECC5A6E76F9D08D7CE7D24971"
+          },
+          {
+            "source": "tests/fixtures/library-native-input/info-exports-identity-f200.json",
+            "source_revision": "d9e6dd74427763b09d8f21da585b17e059dedd08",
+            "destination": "info.json",
+            "bytes": 348,
+            "sha256": "CB5FC6B73C0F6E8C45EA5046F3334EFC03B0518EBEEA24C2FD9A02B595CCAD74"
+          },
+          {
+            "source": "tests/fixtures/library-native-input/support-exports.lua",
+            "source_revision": "d9e6dd74427763b09d8f21da585b17e059dedd08",
+            "destination": "support-exports.lua",
+            "bytes": 14591,
+            "sha256": "EF6EE15F0DFB790171323374EE0BB572606D16474AE2099004542EF70877FB9F"
+          }
+        ]
+      }
+    },
+    {
+      "target": "f210",
+      "mode": "input",
+      "version": "0.3.0",
+      "profile": {
+        "path": "tests/profiles/library-native-input-imported110-f210-2123-r08.json",
+        "bytes": 3329,
+        "sha256": "8AD110BFA0010B6D092C55A4ECC81113EEBD9561E44BA873574799E52BF30055"
+      },
+      "engine": {
+        "version": "2.1.23",
+        "sha256": "8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38"
+      },
+      "protected_input_save": {
+        "sha256": "8DCFC16FF929766D2E5CFEC4F7BC81367A9632CEB4B39558E40330FA43BD7F0C",
+        "bytes": 814068,
+        "original_chain": "spec/evidence/migration-origin-110-7a2-direct-native-chain-r01.json"
+      },
+      "archive_sha256": {
+        "more-infinite-research_5.0.21000.zip": "B63743C36432E4C41CC0F56D5A48CABE81924D426EF11045095A9D5ED0430D7B",
+        "mir-fixture-mir5-active-mods-observer_0.1.0.zip": "A15A7D628D66953D2E0C4D4FA288F47CBF9C5678327C7EB3D23ADB5DC78331C0",
+        "mir-fixture-mir5-migration-origin-f200-110-source_0.4.0.zip": "E07DF42B2FBFACEA5BA32F3E616AF5BBFAB4E355B116187DC023252CFCD09B43",
+        "mir-fixture-mir5-library-native-input_0.3.0.zip": "ADDA563A5625AE57A390A5A079D36AF5BB5EB8009B8CDB73B0922E5168468C7E"
+      },
+      "owned_fixture": {
+        "name": "mir-fixture-mir5-library-native-input_0.3.0.zip",
+        "bytes": 7459,
+        "sha256": "ADDA563A5625AE57A390A5A079D36AF5BB5EB8009B8CDB73B0922E5168468C7E",
+        "local_custody": "build/qualification/library-input-arm-close-diagnostic-r08/f210/input/mir-fixture-mir5-library-native-input_0.3.0.zip",
+        "members": [
+          {
+            "source": "tests/fixtures/library-native-input/control.lua",
+            "source_revision": "ec271cb1634c820e940d73e4edd231ef1dbfd918",
+            "destination": "control.lua",
+            "bytes": 25807,
+            "sha256": "883078F766BA546946D9921A65EEED4A2CDDE9E8EC0E5F13141F98CB1C1294A1"
+          },
+          {
+            "source": "tests/fixtures/library-native-input/info-input-identity-f210.json",
+            "source_revision": "d9e6dd74427763b09d8f21da585b17e059dedd08",
+            "destination": "info.json",
+            "bytes": 345,
+            "sha256": "A9B20176471FF3D329306D199EEB02CB99492AC299FEDB63DA27C9429C0524B5"
+          }
+        ]
+      }
+    },
+    {
+      "target": "f210",
+      "mode": "exports",
+      "version": "0.4.0",
+      "profile": {
+        "path": "tests/profiles/library-support-exports-imported110-f210-2123-r04.json",
+        "bytes": 2597,
+        "sha256": "50988621122FF6B25725793EEED79D9198BC541B8F6BDCF877C508125B220AC5"
+      },
+      "protected_input_save": {
+        "sha256": "8DCFC16FF929766D2E5CFEC4F7BC81367A9632CEB4B39558E40330FA43BD7F0C",
+        "bytes": 814068,
+        "original_chain": "spec/evidence/migration-origin-110-7a2-direct-native-chain-r01.json"
+      },
+      "engine": {
+        "version": "2.1.23",
+        "sha256": "8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38"
+      },
+      "archive_sha256": {
+        "more-infinite-research_5.0.21000.zip": "B63743C36432E4C41CC0F56D5A48CABE81924D426EF11045095A9D5ED0430D7B",
+        "mir-fixture-mir5-active-mods-observer_0.1.0.zip": "A15A7D628D66953D2E0C4D4FA288F47CBF9C5678327C7EB3D23ADB5DC78331C0",
+        "mir-fixture-mir5-migration-origin-f200-110-source_0.4.0.zip": "E07DF42B2FBFACEA5BA32F3E616AF5BBFAB4E355B116187DC023252CFCD09B43",
+        "mir-fixture-mir5-library-native-input_0.4.0.zip": "20504B66CC353C6BBC9C60A1E99DB583654B3A9B9E4D1A958B9991CA142B44A1"
+      },
+      "owned_fixture": {
+        "name": "mir-fixture-mir5-library-native-input_0.4.0.zip",
+        "bytes": 10917,
+        "sha256": "20504B66CC353C6BBC9C60A1E99DB583654B3A9B9E4D1A958B9991CA142B44A1",
+        "local_custody": "build/qualification/library-fixture-client-identity-aero-r01/f210/exports/mir-fixture-mir5-library-native-input_0.4.0.zip",
+        "members": [
+          {
+            "source": "tests/fixtures/library-native-input/control.lua",
+            "source_revision": "d9e6dd74427763b09d8f21da585b17e059dedd08",
+            "destination": "control.lua",
+            "bytes": 21557,
+            "sha256": "C4FF383DA0CB163DF8C721B96DE97F2AB74BB70ECC5A6E76F9D08D7CE7D24971"
+          },
+          {
+            "source": "tests/fixtures/library-native-input/info-exports-identity-f210.json",
+            "source_revision": "d9e6dd74427763b09d8f21da585b17e059dedd08",
+            "destination": "info.json",
+            "bytes": 348,
+            "sha256": "53401B449105C11B80FF69667665EAB03E6FBC3D68A855D353D172A28D0FD78D"
+          },
+          {
+            "source": "tests/fixtures/library-native-input/support-exports.lua",
+            "source_revision": "d9e6dd74427763b09d8f21da585b17e059dedd08",
+            "destination": "support-exports.lua",
+            "bytes": 14591,
+            "sha256": "EF6EE15F0DFB790171323374EE0BB572606D16474AE2099004542EF70877FB9F"
+          }
+        ]
+      }
+    }
+  ],
+  "unchanged_export_observer": {
+    "scope": "Export0.4 is not rebuilt or retargeted by this input-only diagnostic. Its raw members and prepared container pins remain the r07 values below.",
+    "f200": {
+      "profile": {
+        "path": "tests/profiles/library-support-exports-imported110-f200-2077-r04.json",
+        "bytes": 2597,
+        "sha256": "11F56F05563F9DEE90F6CAC1CC8003C5A87784EFEA8209261AA1EFF41051811F"
+      },
+      "archive": {
+        "bytes": 10918,
+        "sha256": "6D6362DF9998F54B71D0BBCDC5DF82A800C5BE802CF8279E86C2ADA6A469845C"
+      },
+      "members": [
+        {
+          "source": "tests/fixtures/library-native-input/control.lua",
+          "source_revision": "d9e6dd74427763b09d8f21da585b17e059dedd08",
+          "bytes": 21557,
+          "sha256": "C4FF383DA0CB163DF8C721B96DE97F2AB74BB70ECC5A6E76F9D08D7CE7D24971"
+        },
+        {
+          "source": "tests/fixtures/library-native-input/support-exports.lua",
+          "source_revision": "d9e6dd74427763b09d8f21da585b17e059dedd08",
+          "bytes": 14591,
+          "sha256": "EF6EE15F0DFB790171323374EE0BB572606D16474AE2099004542EF70877FB9F"
+        },
+        {
+          "source": "tests/fixtures/library-native-input/info-exports-identity-f200.json",
+          "source_revision": "d9e6dd74427763b09d8f21da585b17e059dedd08",
+          "bytes": 348,
+          "sha256": "CB5FC6B73C0F6E8C45EA5046F3334EFC03B0518EBEEA24C2FD9A02B595CCAD74"
+        }
+      ]
+    },
+    "f210": {
+      "profile": {
+        "path": "tests/profiles/library-support-exports-imported110-f210-2123-r04.json",
+        "bytes": 2597,
+        "sha256": "50988621122FF6B25725793EEED79D9198BC541B8F6BDCF877C508125B220AC5"
+      },
+      "archive": {
+        "bytes": 10917,
+        "sha256": "20504B66CC353C6BBC9C60A1E99DB583654B3A9B9E4D1A958B9991CA142B44A1"
+      },
+      "members": [
+        {
+          "source": "tests/fixtures/library-native-input/control.lua",
+          "source_revision": "d9e6dd74427763b09d8f21da585b17e059dedd08",
+          "bytes": 21557,
+          "sha256": "C4FF383DA0CB163DF8C721B96DE97F2AB74BB70ECC5A6E76F9D08D7CE7D24971"
+        },
+        {
+          "source": "tests/fixtures/library-native-input/support-exports.lua",
+          "source_revision": "d9e6dd74427763b09d8f21da585b17e059dedd08",
+          "bytes": 14591,
+          "sha256": "EF6EE15F0DFB790171323374EE0BB572606D16474AE2099004542EF70877FB9F"
+        },
+        {
+          "source": "tests/fixtures/library-native-input/info-exports-identity-f210.json",
+          "source_revision": "d9e6dd74427763b09d8f21da585b17e059dedd08",
+          "bytes": 348,
+          "sha256": "53401B449105C11B80FF69667665EAB03E6FBC3D68A855D353D172A28D0FD78D"
+        }
+      ]
+    }
+  },
+  "validation": {
+    "raw_control": "Both r08 archives contain the exact ec271 raw control blob and the unchanged target-specific raw metadata blob.",
+    "archive_reproduction": "The checkout-local two-member projections use the ordinary fixed 1980 timestamp, Unix0644, and DEFLATE9 package policy. No dependency archive was copied, extracted, linked, or replaced.",
+    "native_execution": false,
+    "release_qualification": false
+  },
+  "limits": [
+    "This record prepares only the refusal-only input diagnostic. It does not rerun Q24, establish a close event, explain the Q24 opened-state mismatch, or qualify GUI input, gameplay, support exports, saves, performance, or release.",
+    "No packet, private caller, direct-library staging, archive installation, or Factorio process is authorized by this prepared record."
+  ]
+}

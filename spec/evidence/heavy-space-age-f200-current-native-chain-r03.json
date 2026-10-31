@@ -1,0 +1,540 @@
+{
+  "schema": 1,
+  "kind": "MIRHeavyF200CorrectedCandidateNativeChainV1",
+  "status": "passed-scoped-native-prototype-settings-readback-original-declaration-failures-retained",
+  "scope": "Exact F2002.0.77/D3 +SpaceAge/BobTech combined36-row common profile61CBE. One fresh corrected candidate8C93 data capture;three retained completed EAD7 noncandidate arms reused without relaunch. No game save is loaded.",
+  "source_head": "0369bb2fa5ed2e3f2d3b88cd03a5e7e935c7149b",
+  "candidate": {
+    "archive": {
+      "path": "D:/Projects/Factorio/mir5-heavy-space-age-f200-corrected-r01/build/tmp/whole-product-heavy-space-age-f200-corrected-r01/more-infinite-research_5.0.20000.zip",
+      "bytes": 704721,
+      "sha256": "8C93C7063B75E0811D1D27036F3596C05EE0A5A965BC259D276160F91D6274BB"
+    },
+    "record": {
+      "path": "D:/Projects/Factorio/mir5-heavy-space-age-f200-corrected-r01/build/tmp/whole-product-heavy-space-age-f200-corrected-r01/package-record.json",
+      "bytes": 37630,
+      "sha256": "888030168DCA99145AEFF2408A47FBCAD5D8D1197A0057DF9EA8CF4F73FCE2D9"
+    },
+    "source_commit": "0369bb2fa5ed2e3f2d3b88cd03a5e7e935c7149b",
+    "target": "f200",
+    "members": [
+      {
+        "path": "source/compatibility/bob_angel_f200_combined_profile.lua",
+        "bytes": 1254,
+        "sha256": "1394CB3B3A133A56D0413CC77FAB65FE6B7E211078C847F5C4E33872C560ECF8",
+        "source_commit": "0369bb2fa5ed2e3f2d3b88cd03a5e7e935c7149b",
+        "package_path": "compatibility/bob_angel_f200_combined_profile.lua"
+      },
+      {
+        "path": "source/compatibility/modern_catalogue.lua",
+        "bytes": 62272,
+        "sha256": "93B79AB9BB59D9BA319233A9C662EF0225D2344759D78FBFFD8218755441D818",
+        "source_commit": "0369bb2fa5ed2e3f2d3b88cd03a5e7e935c7149b",
+        "package_path": "compatibility/modern_catalogue.lua"
+      },
+      {
+        "path": "source/compatibility/modern_catalogue/bob_angel_f200_combined.lua",
+        "bytes": 30978,
+        "sha256": "344766AEB75FF4CFC30554030CEB3504C80E46BF4DD8EECDB7F5E5069CEFF35E",
+        "source_commit": "0369bb2fa5ed2e3f2d3b88cd03a5e7e935c7149b",
+        "package_path": "compatibility/modern_catalogue/bob_angel_f200_combined.lua"
+      },
+      {
+        "path": "source/data-final-fixes.lua",
+        "bytes": 13849,
+        "sha256": "9046EC538420178BBBD9926B6D7FD0B4E83E2798A576C3B0D6F69CC37CA4F543",
+        "source_commit": "0369bb2fa5ed2e3f2d3b88cd03a5e7e935c7149b",
+        "package_path": "data-final-fixes.lua"
+      }
+    ]
+  },
+  "engine": {
+    "path": "D:/Games/Factorio/2.0/bin/x64/factorio.exe",
+    "bytes": 43530192,
+    "sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B",
+    "version": "2.0.77"
+  },
+  "profile": {
+    "path": "D:/Projects/Factorio/mir5-heavy-space-age-f200-corrected-r01/tests/profiles/bob-angel-full-space-age-f200-2077.json",
+    "bytes": 7511,
+    "sha256": "61CBE6299DD2708079EA80FB3871AC980C6FF7281DD126C61B3126A7FF294857"
+  },
+  "profile_rows": [
+    {
+      "name": "base",
+      "version": "2.0.77",
+      "enabled": true
+    },
+    {
+      "name": "elevated-rails",
+      "version": "2.0.77",
+      "enabled": true
+    },
+    {
+      "name": "quality",
+      "version": "2.0.77",
+      "enabled": true
+    },
+    {
+      "name": "space-age",
+      "version": "2.0.77",
+      "enabled": true
+    },
+    {
+      "name": "angelsaddons-mobility",
+      "version": "2.0.1",
+      "enabled": true
+    },
+    {
+      "name": "angelsaddons-mobility-graphics-crawler",
+      "version": "2.0.0",
+      "enabled": true
+    },
+    {
+      "name": "angelsaddons-mobility-graphics-petro",
+      "version": "2.0.0",
+      "enabled": true
+    },
+    {
+      "name": "angelsaddons-mobility-graphics-smelting",
+      "version": "2.0.0",
+      "enabled": true
+    },
+    {
+      "name": "angelsaddons-storage",
+      "version": "2.0.1",
+      "enabled": true
+    },
+    {
+      "name": "angelsbioprocessing",
+      "version": "2.0.3",
+      "enabled": true
+    },
+    {
+      "name": "angelsbioprocessinggraphics",
+      "version": "2.0.0",
+      "enabled": true
+    },
+    {
+      "name": "angelsinfiniteores",
+      "version": "2.0.3",
+      "enabled": true
+    },
+    {
+      "name": "angelspetrochem",
+      "version": "2.0.3",
+      "enabled": true
+    },
+    {
+      "name": "angelspetrochemgraphics",
+      "version": "2.0.1",
+      "enabled": true
+    },
+    {
+      "name": "angelsrefining",
+      "version": "2.0.4",
+      "enabled": true
+    },
+    {
+      "name": "angelsrefininggraphics",
+      "version": "2.0.0",
+      "enabled": true
+    },
+    {
+      "name": "angelssmelting",
+      "version": "2.0.5",
+      "enabled": true
+    },
+    {
+      "name": "angelssmeltinggraphics",
+      "version": "2.0.0",
+      "enabled": true
+    },
+    {
+      "name": "bobassembly",
+      "version": "2.1.0",
+      "enabled": true
+    },
+    {
+      "name": "bobelectronics",
+      "version": "2.1.1",
+      "enabled": true
+    },
+    {
+      "name": "bobenemies",
+      "version": "2.1.0",
+      "enabled": true
+    },
+    {
+      "name": "bobequipment",
+      "version": "2.1.0",
+      "enabled": true
+    },
+    {
+      "name": "bobgreenhouse",
+      "version": "2.1.0",
+      "enabled": true
+    },
+    {
+      "name": "bobinserters",
+      "version": "2.0.3",
+      "enabled": true
+    },
+    {
+      "name": "boblibrary",
+      "version": "2.1.0",
+      "enabled": true
+    },
+    {
+      "name": "boblogistics",
+      "version": "2.1.1",
+      "enabled": true
+    },
+    {
+      "name": "bobmining",
+      "version": "2.1.0",
+      "enabled": true
+    },
+    {
+      "name": "bobmodules",
+      "version": "2.1.0",
+      "enabled": true
+    },
+    {
+      "name": "bobores",
+      "version": "2.1.2",
+      "enabled": true
+    },
+    {
+      "name": "bobplates",
+      "version": "2.1.1",
+      "enabled": true
+    },
+    {
+      "name": "bobpower",
+      "version": "2.1.0",
+      "enabled": true
+    },
+    {
+      "name": "bobrevamp",
+      "version": "2.1.1",
+      "enabled": true
+    },
+    {
+      "name": "bobtech",
+      "version": "2.1.0",
+      "enabled": true
+    },
+    {
+      "name": "bobvehicleequipment",
+      "version": "2.1.1",
+      "enabled": true
+    },
+    {
+      "name": "bobwarfare",
+      "version": "2.1.0",
+      "enabled": true
+    },
+    {
+      "name": "mir-fixture-mir5-active-mods-observer",
+      "version": "0.1.0",
+      "enabled": true
+    }
+  ],
+  "packet": {
+    "path": "D:/Projects/Factorio/more-infinite-research/build/qualification/whole-product-heavy-space-age-f200-candidate-r03-controller/packet.json",
+    "bytes": 30098,
+    "sha256": "DAAD798D2FF4B563521B6423E4DD9EAB8A43CE9302EF8586FEA2772CBC07C917"
+  },
+  "caller": {
+    "path": "D:/Projects/Factorio/more-infinite-research/build/qualification/whole-product-heavy-space-age-f200-candidate-r03-controller/Invoke-OwnedCandidate.ps1",
+    "bytes": 20444,
+    "sha256": "8A0A5D540907E63CF04B2AE893B9E5D99C6ABCA3B902323CC66E2E31EF05607A"
+  },
+  "terminal": {
+    "path": "D:/Projects/Factorio/more-infinite-research/build/qualification/whole-product-heavy-space-age-f200-candidate-r03-controller/execution-record/terminal.json",
+    "bytes": 46939,
+    "sha256": "1538784CAAFE5979D50D3BA32D1C8CA209E086131FC029A0D3AB0E142B8C31F9"
+  },
+  "result": {
+    "path": "D:/Projects/Factorio/more-infinite-research/build/qualification/whole-product-heavy-space-age-f200-candidate-r03-controller/native-captures/result.json",
+    "bytes": 38983,
+    "sha256": "586A245D483FA47060384428C8A1244538F594BE4C57243039114FD403B09681"
+  },
+  "actual_new_engines": 1,
+  "actual_engine_pid": 74264,
+  "native_process": {
+    "status": "passed",
+    "exit_code": 0,
+    "timed_out": false,
+    "passed": true,
+    "completion_predicate_observed": false,
+    "duration_seconds": 17.599916,
+    "peak_working_set_bytes": 1033019392,
+    "peak_sampled_private_bytes": 1048428544,
+    "admission": {
+      "observed_at": "2026-10-30T04:18:02.5745238+00:00",
+      "memory": {
+        "total_bytes": 34045980672,
+        "free_bytes": 15346270208,
+        "committed_bytes": 25081470976,
+        "commit_limit_bytes": 44388642816
+      },
+      "work_volume": {
+        "name": "D:\\",
+        "free_bytes": 159196897280,
+        "total_bytes": 1500099112960
+      },
+      "system_volume": {
+        "name": "C:\\",
+        "free_bytes": 195584126976,
+        "total_bytes": 599395090432
+      }
+    },
+    "duration_measurement": {
+      "scope": "direct-native-executable-start-to-exit",
+      "historical_scope": "governed-powershell-wrapper-tree-start-to-exit",
+      "comparability": "scope-changed; compare only fresh direct-native measurements; no product-speedup claim"
+    },
+    "admission_wait": {
+      "phase": "prototype-capture-engine",
+      "admission_wait_seconds": 30,
+      "status": "admitted-without-wait",
+      "attempt_count": 2,
+      "refusal_count": 0,
+      "elapsed_seconds": 0.093,
+      "first_refusal": null,
+      "last_refusal": null,
+      "last_error": null,
+      "started_at": "2026-10-30T04:18:02.4820240+00:00",
+      "deadline_at": "2026-10-30T04:18:32.4820240+00:00",
+      "admission": {
+        "observed_at": "2026-10-30T04:18:02.5745238+00:00",
+        "memory": {
+          "total_bytes": 34045980672,
+          "free_bytes": 15346270208,
+          "committed_bytes": 25081470976,
+          "commit_limit_bytes": 44388642816
+        },
+        "work_volume": {
+          "name": "D:\\",
+          "free_bytes": 159196897280,
+          "total_bytes": 1500099112960
+        },
+        "system_volume": {
+          "name": "C:\\",
+          "free_bytes": 195584126976,
+          "total_bytes": 599395090432
+        }
+      }
+    }
+  },
+  "measurement_scope": "The process duration/peaks describe this data-stage dump only;they are not responsive-menu timings or MIR-attributed resource costs.",
+  "retained_arms": [
+    {
+      "id": "control-without-mir",
+      "result": {
+        "path": "D:/Projects/Factorio/more-infinite-research/build/qualification/whole-product-heavy-space-age-f200-admission-r01-controller/native-captures/control-without-mir/result.json",
+        "bytes": 37818,
+        "sha256": "41FC040FD8E919870B7C98EB792BD49D654A8CD87492568349D1AAE191DEF2A9"
+      }
+    },
+    {
+      "id": "legacy-mir2.5.11",
+      "result": {
+        "path": "D:/Projects/Factorio/more-infinite-research/build/qualification/whole-product-heavy-space-age-f200-admission-r01-controller/native-captures/legacy-mir2.5.11/result.json",
+        "bytes": 38940,
+        "sha256": "51B4D20203E9F09B10CCB3B99AC50D2FBD7905393420DAA1FC8DEFA09A48EED1"
+      }
+    },
+    {
+      "id": "published-mir4.7",
+      "result": {
+        "path": "D:/Projects/Factorio/more-infinite-research/build/qualification/whole-product-heavy-space-age-f200-admission-r01-controller/native-captures/published-mir4.7/result.json",
+        "bytes": 38968,
+        "sha256": "6A095D0AC64A4AB9213A8F61206664A909FD20AF0DF6DCC95BB02AB8987098AC"
+      }
+    }
+  ],
+  "prior_four_arm_adverse": {
+    "path": "spec/evidence/whole-product-heavy-space-age-f200-data-adverse-chain-r01.json",
+    "bytes": 11237,
+    "sha256": "05B2B7C327A24B203B27CC9AE9B868CD9158F20DDADCE6394CD7F7E72073ADA9"
+  },
+  "prior_zero_native_controller_import_refusal": {
+    "path": "D:/Projects/Factorio/more-infinite-research/build/qualification/whole-product-heavy-space-age-f200-candidate-r02-controller/root-controller-import-refusal-r01.json",
+    "bytes": 2017,
+    "sha256": "8657C96ABA67915C2C29FED305EAF125CBD353C61A23BA0CECF709A87FDCD12B"
+  },
+  "readback": {
+    "path": "D:/Projects/Factorio/more-infinite-research/build/qualification/whole-product-heavy-space-age-f200-candidate-r03-controller/root-scoped-readback-r03.json",
+    "bytes": 6353,
+    "sha256": "D585D957850692B439331330B22EF683377850374655646254C1F89D36189100"
+  },
+  "independent_actual_data_review": {
+    "status": "passed",
+    "scope": "Native/copy custody,input/selection identity,canonical69public+28private,875settings and full unchanged-NoMIR rows,conditional cannon prior/source evidence,source/reader provenance and restoration."
+  },
+  "original_failed_readback": {
+    "path": "D:/Projects/Factorio/more-infinite-research/build/qualification/whole-product-heavy-space-age-f200-candidate-r03-controller/root-readback-r01.json",
+    "bytes": 5283,
+    "sha256": "C7705D8F6011231F8B6639E777CFAA6AC12DD72F374911C6D6B9ADA4C09626F4"
+  },
+  "reader_declaration": {
+    "path": "D:/Projects/Factorio/more-infinite-research/build/qualification/whole-product-heavy-space-age-f200-candidate-r03-controller/semantic-readback-declaration-r02.json",
+    "bytes": 4279,
+    "sha256": "B7862CDBF2CAE581E64B2A9E4D49A3122256D353B41E06A59EB4D243EC372FC8"
+  },
+  "prior_unbound_oracle_reader": {
+    "path": "D:/Projects/Factorio/more-infinite-research/build/qualification/whole-product-heavy-space-age-f200-candidate-r03-controller/root-scoped-readback-r02.json",
+    "bytes": 5971,
+    "sha256": "AECFB6A39606C73622C35B106ADBEA116E18B21A8654C3FF97116E9C0050626C"
+  },
+  "reader_binding_correction": "Preserve the earlier actual-value readback. The final reader first pins declarationB786,checks private oracle00123 bytes and declared0369 raw Git before import,and requires equality of all four top-level setting types. No native replay.",
+  "verified_semantics": {
+    "public_rows": 69,
+    "full_public_canonical_differences": 0,
+    "private_rows": 28,
+    "full_private_canonical_differences": 0,
+    "private_groups": {
+      "native": 24,
+      "legacy_module": 3,
+      "conditional_cannon": 1
+    },
+    "settings_rows": 875,
+    "full_settings_canonical_differences": 0,
+    "control_technologies": 947,
+    "current_technologies": 1044,
+    "removed_or_changed_control_technologies": 0,
+    "removed_or_changed_control_settings": 0,
+    "cannon_preconditions": {
+      "selected_rocket_public_row": true,
+      "actual_cannon_shell_category": true
+    },
+    "prior_base_B_cannon": {
+      "result": {
+        "path": "D:/Projects/Factorio/more-infinite-research/build/qualification/whole-product-base-f200-admission-r02-controller/native-captures/candidate-mir5/result.json",
+        "bytes": 12711,
+        "sha256": "7A1C67F1F9B0285026A1B8088CAB70E0CD6052EE3E3B21D75EB38A5EC0B1143A"
+      },
+      "raw": {
+        "path": "write-data/script-output/data-raw-dump.json",
+        "bytes": 13379856,
+        "sha256": "4E75AC09EC59E3A77EB2EEF9D58B1EC39D28A361D11445CA5B0F6CA49C36B75A"
+      },
+      "canonical_sha256": "F1A6B498F19F5F7FB275A3ABDC66A8776E9489A78475B6F7F23CB2BFE2BE6A6C"
+    },
+    "independent_private_oracle": {
+      "path": "D:/Projects/Factorio/mir5-heavy-space-age-f200-corrected-r01/tests/native_credit_oracle.py",
+      "bytes": 8946,
+      "sha256": "00123BC8496365EBA50B542FAAE62275D7FD4DCCCDA550E262077EDD8D3D6E1D"
+    }
+  },
+  "original_declaration_failures": {
+    "private_carriers": {
+      "expected": 27,
+      "actual": 28,
+      "status": "failed",
+      "additional_name": "mir-legacy-cannon-credit-rocket-shooting-speed"
+    },
+    "multiplicity": [
+      {
+        "name": "laser-shooting-speed-8",
+        "declared": 1,
+        "actual": 2,
+        "status": "failed"
+      },
+      {
+        "name": "recipe-prod-research_carbon-1",
+        "declared": 3,
+        "actual": 2,
+        "status": "failed"
+      },
+      {
+        "name": "recipe-prod-research_lubricant_productivity-1",
+        "declared": 4,
+        "actual": 3,
+        "status": "failed"
+      },
+      {
+        "name": "recipe-prod-research_oil_processing_productivity-1",
+        "declared": 4,
+        "actual": 1,
+        "status": "failed"
+      },
+      {
+        "name": "recipe-prod-research_plastic-1",
+        "declared": 2,
+        "actual": 1,
+        "status": "failed"
+      },
+      {
+        "name": "recipe-prod-research_steel-1",
+        "declared": 3,
+        "actual": 2,
+        "status": "failed"
+      },
+      {
+        "name": "recipe-prod-research_sulfur-1",
+        "declared": 5,
+        "actual": 4,
+        "status": "failed"
+      },
+      {
+        "name": "recipe-prod-research_sulfuric_acid_productivity-1",
+        "declared": 3,
+        "actual": 2,
+        "status": "failed"
+      },
+      {
+        "name": "recipe-prod-research_tungsten-1",
+        "declared": 3,
+        "actual": 2,
+        "status": "failed"
+      }
+    ],
+    "disposition": "Preserve both failed original declarations. Their corrected independent scope requires a separate declaration/readback,not a relabelled original pass."
+  },
+  "multiplicity_disposition": "The old nine-entry map only overwrote a local test dictionary;none of its nine values was compared with emitted rows. All nine fail against actual/B80. Remove that unsupported current-test claim while retaining original packet/check failures;full69 independent B80 vectors remain the binding contract.",
+  "conditional_cannon": "The data-final append requires a selected public rocket stream and actual cannon-shell category. Its exact row matches pre-existing Base/F200 B7CAC native data and unchanged definition blob2bb421ef. CompactC5 lacks the category and correctly emits27;the new separate actual-shape control exercises28 and missing-rocket refusal without changing compactC5.",
+  "host_controls": {
+    "command": "python -X utf8 -B tests/test_bob_angel_f200_combined_profile.py --lua-runtime-dir D:/Projects/Factorio/more-infinite-research/build/tmp/mir421-lua-runtime",
+    "passed": 7,
+    "scope": "Independent full public/settings controls plus exact actual-shape conditional cannon/private rows;host-only.",
+    "independent_conditional_reference": {
+      "path": "tests/fixtures/bob-angel-f200-conditional-cannon-native-reference-r01.json",
+      "bytes": 1513,
+      "sha256": "B571648F3C073098AE22069A87F041FDAB98E5CAA7B00E694CC3DFBC988C4A01"
+    }
+  },
+  "custody": {
+    "native_custody": {
+      "files": 9,
+      "bytes": 65197751,
+      "all_original_copy_hashes_equal": true
+    },
+    "controller_custody": {
+      "files": 3,
+      "bytes": 554392,
+      "all_original_copy_hashes_equal": true
+    }
+  },
+  "restoration_verified": true,
+  "factorio_processes": 0,
+  "capsule": {
+    "path": "spec/evidence/heavy-space-age-f200-current-native-receipts-r03.json.gz",
+    "bytes": 545069,
+    "sha256": "A9A212D748AF3996F966C2C2CB17E1586E430DCFBC7539408C39AF723FE0408E",
+    "bodies": 40
+  },
+  "public_transport": "Exact small controller/native/settings bodies plus explicitly derived complete947/1016/1044 technology serializations and NoMIR recipe-name listing. Complete original data-raw dumps remain hash-bound in local custody. No configs,save,prior-player ZIP or binary dependency payload is carried.",
+  "remaining": [
+    "Owned responsive-menu graphical readiness and separately frozen timed startup observations for this candidate/profile.",
+    "Affected physical/gameplay/save/client/runtime and final coherent-package applicability review;this data capture is not those outcomes.",
+    "Keep all earlier resource/startup/adverse records under their exact identities;no pooling or universal mod-support claim."
+  ],
+  "menu_acceptance": false,
+  "gameplay_acceptance": false,
+  "performance_acceptance": false,
+  "release_qualification": false
+}

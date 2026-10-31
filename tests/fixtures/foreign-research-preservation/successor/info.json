@@ -1,0 +1,12 @@
+{
+  "name": "mir-fixture-mir5-foreign-research-preservation",
+  "version": "0.2.0",
+  "title": "MIR 5 foreign research preservation destination fixture",
+  "author": "MIR maintainers",
+  "description": "Representative MIR 5 destination for foreign Space-Lab-Research-61 continuity; native runner readback required.",
+  "factorio_version": "2.1",
+  "dependencies": [
+    "base = 2.1.23",
+    "more-infinite-research = 5.0.21000"
+  ]
+}

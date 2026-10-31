@@ -1,0 +1,12 @@
+{
+  "name": "mir-fixture-mir5-bob-angel-continuity",
+  "version": "0.1.0",
+  "title": "MIR 5 private Bob/Angel published boundary fixture",
+  "author": "MIR maintainers",
+  "description": "Disposable published 4.7.2 finite-150 material boundary seed; it does not claim 150 lab completions.",
+  "factorio_version": "2.0",
+  "dependencies": [
+    "base >= 2.0.77",
+    "more-infinite-research = 4.7.20002"
+  ]
+}

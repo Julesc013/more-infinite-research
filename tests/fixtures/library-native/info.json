@@ -1,0 +1,12 @@
+{
+  "name": "mir-fixture-mir5-library-native",
+  "version": "0.1.0",
+  "title": "MIR 5 native Library object fixture",
+  "author": "MIR maintainers",
+  "description": "Private input-save fixture for the MIR 5 Research Library native GUI object slice.",
+  "factorio_version": "2.1",
+  "dependencies": [
+    "base >= 2.1.23",
+    "more-infinite-research = 5.0.21000"
+  ]
+}

@@ -1,0 +1,108 @@
+{
+  "schema": 1,
+  "kind": "MIR5MigrationOrigin100F200SourceNativeChainV1",
+  "status": "passed-exact-published-mir1-f200-source-stage",
+  "scope": "One exact published MIR 1.0.0 source-stage fixture on Factorio 2.0.77. It establishes the protected published source save and its two read-only cold reloads only; it is not a MIR5 upgrade, current-candidate, multiplayer, performance, or release-qualification result.",
+  "origin": {
+    "tag": "1.0.0",
+    "tag_commit": "f0057a96847512b50acdd6e23fc21b5b41e75adb",
+    "edition": "F200",
+    "engine": {
+      "product_version": "2.0.77",
+      "file_version": "2.0.77.84539",
+      "sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B"
+    },
+    "published_mir": {
+      "version": "1.0.0",
+      "archive_sha256": "C328D8F958BEC2A44297E94E83B1A956D76BEA5E333601A42FDDE60F4155472F",
+      "bytes": 61208,
+      "profile_sha256": "9BD14575FEEC4CBB10A237460B6DD732B7CAA0A1B3BD154ACFCFF099164FCA85"
+    }
+  },
+  "r02_controller_and_fixture": {
+    "fixture_source_commit": "b6ba8d716fbb54cd95cb2d77c4a7994720b71995",
+    "caller_sha256": "48F2B56CAFA529341D962B4887C0CD0DB851BF7A5E4B0419A109637659D4FE2A",
+    "fixture_archive_sha256": "99205E8C4E071781526748A39F14CF5E39D1BAE5E92A685F9B14C5900C60878A",
+    "fixture_archive_bytes": 7833,
+    "preflight_sha256": "CA7CDFBCBB4BC461E5B3DB474AE546ECD6BD5A8D9B53F451966F25B574C0FB44",
+    "terminal_sha256": "BB03BE4A4EC7538B93011271FC2CA2BB3E8F334355FB005DCA58706EEAE8822A"
+  },
+  "native_observation": {
+    "status": "passed-private-native-fixture",
+    "result_sha256": "156DB224E0042D8D988E2CF127641E9AAE0FCF7430402A645F93A2BE41BC8A30",
+    "source_roster_rows": 21,
+    "player_seeded_rows": 20,
+    "real_source_gear_laboratory_completions": 1,
+    "source_gear_level": 2,
+    "source_gear_productivity_bonus": 0.1,
+    "mir_gears_queue_progress": 0.42,
+    "separate_forced_detached_progress": 0.27,
+    "manual_mining_speed_modifier_offset": 0.125,
+    "breeding_setting_value": false,
+    "breeding_setting_scope": "Owned fixture default for this F200 source stage; it is not evidence of an arbitrary persisted user override.",
+    "fixture_asserted_absent_slots": true,
+    "protected_source_save": {
+      "sha256": "F8B38209DA632C8B2EFA049C8F69CDB3E3EC01F6BEE0C5D03BAFF03C27989C54",
+      "bytes": 424681,
+      "primary_path": "build/qualification/migration-origins/migration-origin-100-f200-source-r02/native-output/write-data/saves/mir5-native-complete.zip"
+    },
+    "cold_reloads": [
+      {
+        "ordinal": 1,
+        "status": "passed",
+        "on_load_read_only": true,
+        "save_byte_identical": true,
+        "save_sha256": "F8B38209DA632C8B2EFA049C8F69CDB3E3EC01F6BEE0C5D03BAFF03C27989C54"
+      },
+      {
+        "ordinal": 2,
+        "status": "passed",
+        "on_load_read_only": true,
+        "save_byte_identical": true,
+        "save_sha256": "F8B38209DA632C8B2EFA049C8F69CDB3E3EC01F6BEE0C5D03BAFF03C27989C54"
+      }
+    ]
+  },
+  "controls": {
+    "direct_library_controls": "restored-direct-library-controls",
+    "factorio_processes_after_terminal": 0,
+    "archive_extractions": 0,
+    "archive_links_created": 0,
+    "dependency_payload_bytes_copied": 0
+  },
+  "custody": {
+    "primary_root": "build/qualification/migration-origins/migration-origin-100-f200-source-r02/native-output",
+    "original_root": "D:\\Projects\\Factorio\\mir5-migration-origin-100-f200-r01\\build\\tmp\\migration-origin-1.0.0-f200-source-native-r02",
+    "members": 23,
+    "bytes": 960762,
+    "original_and_primary_file_hashes_checked": 46,
+    "all_member_hashes_matched": true
+  },
+  "receipts": {
+    "path": "spec/evidence/migration-origin-100-f200-source-native-receipts-r02.json.gz",
+    "sha256": "97667AAD90EDEAABDDD7875171BBAEEA5B257E364FFE5D86DC7081F2305369E3",
+    "bytes": 102171,
+    "lossless_safe_records": 8,
+    "roundtrip_verified": true,
+    "exclusions": "Saves, player data, runtime configuration, server settings and other write-data payloads are excluded from the public capsule."
+  },
+  "retained_r01_adverse": {
+    "status": "failed-before-native-gameplay",
+    "fixture_source_commit": "639344d31891b007f12b8bff8acc62b42dfd00df",
+    "fixture_archive_sha256": "F57AC82FC0907E6A61EC1D0D31D102480246CDFA3BDAD23DB31CA28DEB16B5C1",
+    "caller_sha256": "8697B1837B412291908D962D1BFE2B5C282126D93C150F851402013DB7AC9467",
+    "result_sha256": "6D5CD2C92F6FC82BF283FFD877ECA6E3F22FCDD539A4E0E034E3C69817BC5156",
+    "terminal_sha256": "F25FC5676860C91242CE6A51D4B16857BA704B96D4D0C7E3C2E929DF67DC41B3",
+    "factorio_log_sha256": "5822212BE1C217A3D014EE1F45E55DF2B510B6A8A2733D0BCA19A510513177CE",
+    "disposition": "The r01 data-stage fixture guard rejected C328's omitted raw level on recipe-prod-research_plastic-1 even though Factorio parses the effective level as 1. The r02 fixture accepts a nil raw level while still requiring parsed level 1; the science and prerequisite corrections occurred before the first native execution and are not gameplay results."
+  },
+  "claims": {
+    "exact_published_mir1_f200_source_stage": true,
+    "mir5_successor_execution": false,
+    "current_candidate_execution": false,
+    "multiplayer": false,
+    "performance": false,
+    "release_qualification": false
+  },
+  "limitations": "A separately pinned MIR5 successor must consume the protected F8B38209 source save before any upgrade claim. This source-only result does not establish ordinary tuning, arbitrary settings persistence, physical science production, or the complete migration-origin matrix."
+}

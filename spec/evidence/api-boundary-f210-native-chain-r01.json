@@ -1,0 +1,147 @@
+{
+  "schema": 1,
+  "kind": "MIRApiBoundaryF210NativeChainV1",
+  "status": "passed-fresh-create-init-boundary-only",
+  "source_commit": "b2e9243dacf8c10f623fe90ddac957329fbf1d9e",
+  "fixture_implementation_commits": [
+    "4686af91b2b156ea974954bad8ca63a119c937f8",
+    "47da556972a58a71bd490f2937d0d0c28cdac11b"
+  ],
+  "packet_sha256": "D93AD21DF26F9E29438CA88E5E3E98DCBD5B3426753BB81060FE3BC978CBF424",
+  "caller_sha256": "8557E2D0B2BB7E669B75958D123C7E917CAA34F2A1F2BCDF7116BCE8DAF39914",
+  "terminal_sha256": "302323740E88F385AEE34C4F8A813DED70C65F73D0D595E7AC797DDC9B909A0C",
+  "root_readback_sha256": "C6572F949746FFAFD23C7C65B554B38180F51BB3AD1E8ACA538A9D945EDCF21A",
+  "engine": {
+    "path": "D:\\Games\\Factorio\\2.1\\bin\\x64\\factorio.exe",
+    "sha256": "8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38",
+    "file_version": "2.1.23.87750",
+    "product_version": "2.1.23",
+    "base_version": "2.1.23"
+  },
+  "candidate": {
+    "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\packages\\support-exports-all17-r01\\more-infinite-research_5.0.21000.zip",
+    "bytes": 696972,
+    "sha256": "B63743C36432E4C41CC0F56D5A48CABE81924D426EF11045095A9D5ED0430D7B"
+  },
+  "profile": {
+    "repo": "D:\\Projects\\Factorio\\mir5-api-boundary-f210-native-r01",
+    "commit": "b2e9243dacf8c10f623fe90ddac957329fbf1d9e",
+    "relative_path": "tests/profiles/api-boundary-support-exports-f210-r01-r02.json",
+    "path": "D:\\Projects\\Factorio\\mir5-api-boundary-f210-native-r01\\tests\\profiles\\api-boundary-support-exports-f210-r01-r02.json",
+    "bytes": 1911,
+    "sha256": "01C61C89463D43863A1D579C790FC114427BBDAEF6F4860E18F6B8D28B43CF85"
+  },
+  "native_processes": 1,
+  "native_pid": 70472,
+  "loaded_selection": [
+    "base@2.1.23",
+    "mir-fixture-mir5-active-mods-observer@0.1.0",
+    "mir-fixture-mir5-api-alpha@0.1.0",
+    "mir-fixture-mir5-api-beta@0.1.0",
+    "mir-fixture-mir5-api-boundary@0.1.0",
+    "more-infinite-research@5.0.21000"
+  ],
+  "data_boundary_cases": [
+    "single-immediate-publication",
+    "input-isolation",
+    "duplicate-identity-refusal",
+    "invalid-family-refusal-without-partial-emission",
+    "family-order",
+    "detached-return",
+    "fixed-named-prototype-field-snapshots"
+  ],
+  "consumers": {
+    "MIR5_API_ALPHA": {
+      "stage": "init",
+      "force_index": 1,
+      "researched": true,
+      "level": 1,
+      "max_level": 1,
+      "manual_crafting_speed_modifier": 0.05,
+      "tick": 0,
+      "reload_researched": true,
+      "reload_level": 1,
+      "reload_manual_crafting_speed_modifier": 0.05
+    },
+    "MIR5_API_BETA": {
+      "stage": "init",
+      "force_index": 1,
+      "researched": false,
+      "level": 1,
+      "max_level": 1,
+      "manual_crafting_speed_modifier": 0.05,
+      "tick": 0,
+      "reload_level": 1,
+      "reload_researched": false,
+      "reload_manual_crafting_speed_modifier": 0.05
+    },
+    "MIR5_API_BOUNDARY": {
+      "case": "api-boundary",
+      "stage": "init",
+      "status": "passed",
+      "base_version": "2.1.23",
+      "mir_version": "5.0.21000",
+      "native_rows": 3,
+      "single_effect": 0.03125,
+      "researched": false,
+      "refused_family_absent": true,
+      "native_query_detached": true,
+      "modifier_unchanged": true,
+      "qualification": "fresh-native-boundary-only",
+      "release_qualification": false
+    }
+  },
+  "custody": {
+    "native_custody": {
+      "members": 9,
+      "bytes_per_copy": 783584,
+      "all_source_and_copy_sha256_equal": true,
+      "physically_distinct": true
+    },
+    "controller_custody": {
+      "members": 5,
+      "bytes_per_copy": 576632,
+      "all_source_and_copy_sha256_equal": true,
+      "physically_distinct": true
+    }
+  },
+  "seed": {
+    "bytes": 711181,
+    "sha256": "AE5FAD8A5EF54E7503B558381DB07768280DC2AF38ED1F61689F5E5C7747F0B0",
+    "crc_verified": true,
+    "disposable_new_output_only": true
+  },
+  "ledger_rows": 9,
+  "library_before_after_equal": true,
+  "library_control_count": 8,
+  "raw_git_fixture_members_verified": 13,
+  "receipt_capsule": {
+    "path": "spec/evidence/api-boundary-f210-native-receipts-r01.json.gz",
+    "sha256": "4C91C71D00F49A8E29B26EB3648A26867FC2B3421333914539B524360CB00728",
+    "bytes": 58209,
+    "bodies": 26
+  },
+  "limits": [
+    "Alpha/Beta deliberately set fresh fixture research/modifiers; only the Boundary runtime observer is query-only.",
+    "Alpha/Beta reload-named scalar fields in init payloads are not cold-reload observations.",
+    "No protected/input save, persistence, physical/lab, performance, API-stability or release verdict.",
+    "F200 and F210 fresh-boundary cases are now separately observed; Space Age physical-production cases on both modern engines remain pending.",
+    "The runner result label passed-private-native-runtime-load-only is retained verbatim; CreateOnly here writes one new disposable seed ZIP, not an imported or persisted historical save.",
+    "Seed/player-data and incumbent archive binary bodies remain in original and primary hash-verified custody; they are not public assets.",
+    "Earlier preparation/refusal bodies and all original output remain unchanged."
+  ],
+  "preparation_adverse": {
+    "kind": "unintended-live-observer-stage-in-host-restoration-control",
+    "native_processes": 0,
+    "original_observer_restored_sha256": "A15A7D628D66953D2E0C4D4FA288F47CBF9C5678327C7EB3D23ADB5DC78331C0",
+    "original_observer_bytes": 835,
+    "root_eight_state_restoration_readback": {
+      "path": "build/qualification/api-boundary-f210-restoration-root-readback-r01.json",
+      "sha256": "29E3C2B84CDF30B539C203E61FB52875320E509160370647DCCB1FD2E9C7709E"
+    },
+    "corrected_control": "r03 explicitly binds controller-local library, installs/restores20B sentinel and verifies liveA15 unchanged;originalr02failure is retained."
+  },
+  "performance_acceptance": false,
+  "api_stability_verdict": false,
+  "release_qualification": false
+}

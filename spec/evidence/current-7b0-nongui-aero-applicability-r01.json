@@ -1,0 +1,281 @@
+{
+  "schema": 1,
+  "kind": "MIRCurrent7b0NonGraphicalApplicabilityAeroV1",
+  "status": "scoped-functional-and-active-handler-applicability-original-measurements-retained",
+  "prior_player_source": "b3bbd8d37b37bfee2e258b3e8a2f223dcf3860b3",
+  "prior_player_tree": "fbb7e9135280ce7f69692e9b0c4a44d743793f45",
+  "current_player_source": "a95dbc6b35c165b46aa9991d2a0ef7274d4ec04a",
+  "current_player_tree": "7b0ede663e6fbcf486cd863e7d3719653aedc07a",
+  "package_readback": "spec/evidence/current-7b0-aero-independent-readback-r01.json",
+  "stable_package_deltas_independently_rechecked": [
+    {
+      "edition": "F013",
+      "old_zip_sha256": "2F1B7BC042552496D9E8C866C07A650B759A3FF18448FD52E0AEE1050A2DB535",
+      "current_zip_sha256": "AF2BA29D8F7EBE1CC01312840CEC38D8B5D13185C9B8CA1016D93445AFF8A5C6",
+      "members": 127,
+      "unchanged_payloads": 125,
+      "changed_members": [
+        "changelog.txt",
+        "locale/de/mir-library.cfg"
+      ]
+    },
+    {
+      "edition": "F014",
+      "old_zip_sha256": "934BBCA5F6CD00E88D6AA29C8BEACA784A1CD711658E244F5E3D5521B3F8E44D",
+      "current_zip_sha256": "FE73C6D47FC04C744FE776F7DA7C55485E7E105E18272AA1BB04BE901ACFD86E",
+      "members": 127,
+      "unchanged_payloads": 125,
+      "changed_members": [
+        "changelog.txt",
+        "locale/de/mir-library.cfg"
+      ]
+    },
+    {
+      "edition": "F015",
+      "old_zip_sha256": "8F216BA01566375BF2843CA6EA9AE5E92047154B6057D29812162F4B50BEF699",
+      "current_zip_sha256": "8BD09EC57D54EF684259AD5940236DAD0EE1F56D3949FC1A7EE088BC67EEDA97",
+      "members": 127,
+      "unchanged_payloads": 125,
+      "changed_members": [
+        "changelog.txt",
+        "locale/de/mir-library.cfg"
+      ]
+    },
+    {
+      "edition": "F016",
+      "old_zip_sha256": "832C28BD073391951E43BDB0577BCEAF2A35B2E4D5CB05399BAA14553A46C718",
+      "current_zip_sha256": "50A1CE57F039180F1C9D873D383A7D11CF6C3F67B2B79F9D5D3DDA7B63DDE54C",
+      "members": 127,
+      "unchanged_payloads": 125,
+      "changed_members": [
+        "changelog.txt",
+        "locale/de/mir-library.cfg"
+      ]
+    },
+    {
+      "edition": "F017",
+      "old_zip_sha256": "545A3A2C72D3C3B7A9600ED7267434DA2DBC77BB9F446EFB9BF399DEA5134370",
+      "current_zip_sha256": "CDBA1ED214671F3FB5827D3C283E3640E79344641ACC59DBDAA25D42050ED960",
+      "members": 127,
+      "unchanged_payloads": 125,
+      "changed_members": [
+        "changelog.txt",
+        "locale/de/mir-library.cfg"
+      ]
+    },
+    {
+      "edition": "F100",
+      "old_zip_sha256": "BA0D9F519CEEA7557892912BFF6EF3CAC5E480DA5D8AF2FC288A0E01605266B2",
+      "current_zip_sha256": "814910605AB023182BEE1FF30139E98C9A242572C3CFD0AC8D4DA86A147E9928",
+      "members": 127,
+      "unchanged_payloads": 125,
+      "changed_members": [
+        "changelog.txt",
+        "locale/de/mir-library.cfg"
+      ]
+    },
+    {
+      "edition": "F110",
+      "old_zip_sha256": "2C2B1C011A0806809AAD1B8769E8548DB20159F1DCAEA3BD11431CCC6D48A7D2",
+      "current_zip_sha256": "E709E0915CC3E679606852CF006B84BFCC6926DF99CAE0EA5515AA766BC5FF66",
+      "members": 128,
+      "unchanged_payloads": 126,
+      "changed_members": [
+        "changelog.txt",
+        "locale/de/mir-library.cfg"
+      ]
+    },
+    {
+      "edition": "F200",
+      "old_zip_sha256": "E9D349931E082AD77057C150E3D6093490E4086E84F0FAFECB0ED1257FD5ED4F",
+      "current_zip_sha256": "1D45A54DB6F911F665A019897518E46D6614AE7E56903B067F93E116DFC2554F",
+      "members": 218,
+      "unchanged_payloads": 215,
+      "changed_members": [
+        "changelog.txt",
+        "locale/de/mir-library.cfg",
+        "runtime/library.lua"
+      ]
+    },
+    {
+      "edition": "F210",
+      "old_zip_sha256": "38C84CCBC4BFDA62FCB078772C4690AB81228484744A36D9EA303F5A75B16447",
+      "current_zip_sha256": "2DDD2A4C967BEF07830218442AE4441BEECD5B9ECE0AC86B09A5F6586BBA80E5",
+      "members": 219,
+      "unchanged_payloads": 216,
+      "changed_members": [
+        "changelog.txt",
+        "locale/de/mir-library.cfg",
+        "runtime/library.lua"
+      ]
+    }
+  ],
+  "unchanged_library_boundaries": {
+    "all_public_functions_and_callbacks_from_composition_owner_comment_to_module_return": {
+      "bytes": 27302,
+      "sha256": "9CDC1AE1E2BF3E19B3608A6385D9E2C2D3C346F6B67A627BCCF99213F7F4B40E"
+    },
+    "render_dispatch_and_connected_player_guard": {
+      "bytes": 2827,
+      "sha256": "3DF5A990AB8C4FD3858C57867FA1766F3B855986382219C56C5EEDF2E2253D1C"
+    },
+    "changed_calls": "Only research list/detail caption helpers gain native localized-name reads. The exact render dispatcher returns before those helpers for a disconnected or invalid player. No event binding, lifecycle, cap, migration, repair or agriculture implementation changes.",
+    "historical_editions": "The seven stable historical editions do not ship the changed modern runtime/library.lua. Their only new non-changelog payload is three unused German Library strings."
+  },
+  "migration_queue_extension": {
+    "inventory": "spec/inventory/migration-origins.json",
+    "prior_reviewed_commit": "740a571b32e87c59beecbea3fb54c60fcc4ac911",
+    "scope": "Extend the accepted fbb7 applicability boundary only for existing headless/non-GUI named routes. Original engines, mod/settings closure, source saves, fixtures, commands, successor observations and cold reloads retain their identities.",
+    "same_edition_cases": [
+      {
+        "edition": "f013",
+        "prior_status": "closed",
+        "inventory_pointer": "migration_execution_matrix.published_4_7_3_origins.cases/current_completion",
+        "scope": "Named character-mining preservation without invented continuation, saved successor and two unchanged-byte cold reloads. Not full catalogue/modpack/client/performance or release qualification."
+      },
+      {
+        "edition": "f014",
+        "prior_status": "closed",
+        "inventory_pointer": "migration_execution_matrix.published_4_7_3_origins.cases/current_completion",
+        "scope": "Named character-mining preservation without invented continuation, saved successor and two unchanged-byte cold reloads. Not full catalogue/modpack/client/performance or release qualification."
+      },
+      {
+        "edition": "f015",
+        "prior_status": "closed",
+        "inventory_pointer": "migration_execution_matrix.published_4_7_3_origins.cases/current_completion",
+        "scope": "Named character-mining preservation, one new successor lab and partial-work checks, saved successor and two unchanged-byte cold reloads. Not full catalogue/modpack/client/performance or release qualification."
+      },
+      {
+        "edition": "f016",
+        "prior_status": "closed",
+        "inventory_pointer": "migration_execution_matrix.published_4_7_3_origins.cases/current_completion",
+        "scope": "Named character-mining preservation, one new successor lab and partial-work checks, saved successor and two unchanged-byte cold reloads. Not full catalogue/modpack/client/performance or release qualification."
+      },
+      {
+        "edition": "f017",
+        "prior_status": "closed",
+        "inventory_pointer": "migration_execution_matrix.published_4_7_3_origins.cases/current_completion",
+        "scope": "The named exact4.7.3 source/current7a2 successor route now passes with one distinct source and successor mining lab, queue/partial-work checks and two unchanged-byte cold reloads at each stage."
+      },
+      {
+        "edition": "f100",
+        "prior_status": "closed",
+        "inventory_pointer": "migration_execution_matrix.published_4_7_3_origins.cases/current_completion",
+        "scope": "The named exact4.7.3 source/current7a2 successor route now passes with one distinct source and successor mining lab, queue/partial-work checks and two unchanged-byte cold reloads at each stage."
+      },
+      {
+        "edition": "f110",
+        "prior_status": "closed",
+        "inventory_pointer": "migration_execution_matrix.published_4_7_3_origins.cases/current_completion",
+        "scope": "Actual current1C3D same-edition successor passes all17 retained rows/effects, source42-percent investment/27-percent detached work, foreign disablement, one new mining lab/capacity2-and4, save and two read-only unchanged-byte cold reloads on1.1.110/B7B4."
+      },
+      {
+        "edition": "f200",
+        "prior_status": "closed",
+        "inventory_pointer": "migration_execution_matrix.published_4_7_3_origins.cases/current_completion",
+        "scope": "Named Base same-edition and selected Space Age/four-provider4.7.3 routes pass current65FC. Separate complete catalogue/scripted/ordinary-tuning/GUI/physical/performance acceptance remains independent."
+      },
+      {
+        "edition": "f210",
+        "prior_status": "closed",
+        "inventory_pointer": "migration_execution_matrix.published_4_7_3_origins.cases/current_completion",
+        "scope": "Complete declared level-backed snapshots and source-read native owners for these two profiles. Scripted Space Age rows are presence-only and their earned/runtime migration remains a separate required subject."
+      }
+    ],
+    "older_selected_groups": [
+      {
+        "boundary": "MIR1.0 data-only identities",
+        "prior_status": "closed"
+      },
+      {
+        "boundary": "MIR1.1 module credits and disabled public row",
+        "prior_status": "closed"
+      },
+      {
+        "boundary": "MIR1.2 combined rocket/cannon credit",
+        "prior_status": "closed"
+      },
+      {
+        "boundary": "Policy-v1 literal-boolean cap ownership",
+        "prior_status": "closed"
+      },
+      {
+        "boundary": "Structured-V3 cap ownership and F200/F210 label collision",
+        "prior_status": "closed"
+      },
+      {
+        "boundary": "MIR3.2 researched discovery and foreign locks",
+        "prior_status": "closed"
+      },
+      {
+        "boundary": "K2 Imersite public/carrier identities",
+        "prior_status": "closed"
+      }
+    ],
+    "additional_routes": [
+      {
+        "boundary": "F1104.7.3 to F200",
+        "prior_status": "closed"
+      },
+      {
+        "boundary": "F100 to F110 legacy-laser rename",
+        "prior_status": "closed-at-recorded-inputs"
+      },
+      {
+        "boundary": "Published F2004.7.3 Base to F210 Base",
+        "prior_status": "closed"
+      },
+      {
+        "boundary": "Published F200 cap disabled/re-enabled and V3 F210 worker tails",
+        "prior_status": "closed"
+      },
+      {
+        "boundary": "F200 Space Age first-upgrade provider/preference",
+        "prior_status": "closed"
+      }
+    ],
+    "decision": "No changed earned-state, research/effect, cap, configuration, migration or non-GUI lifecycle path is consumed. Retain named closures; no broad migration rerun for the display-name correction. This does not qualify a connected saved-open Library, imported credit presentation or an unselected engine/DLC/provider route."
+  },
+  "active_runtime_extension": {
+    "original_chain": "spec/evidence/runtime-current38c-complete-native-chain-r01.json",
+    "original_engine": {
+      "version": "2.1.23",
+      "sha256": "8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38"
+    },
+    "original_candidate": {
+      "source_commit": "b3bbd8d37b37bfee2e258b3e8a2f223dcf3860b3",
+      "player_tree": "fbb7e9135280ce7f69692e9b0c4a44d743793f45",
+      "archive_sha256": "38C84CCBC4BFDA62FCB078772C4690AB81228484744A36D9EA303F5A75B16447",
+      "bytes": 692759
+    },
+    "original_capsule_sha256": "D499884F0FE7A548F8F391EE1DCA0874F7269E0030383143E391DD9686FD3FEF",
+    "independent_analysis_sha256": "29D6093F76C826E8FC7D72C160008F9A173BFC4CF56B9AE7B4D45391AB6C89DA",
+    "already_independently_verified": {
+      "bodies": 145,
+      "actual_native_logs": 136,
+      "comparisons": 16,
+      "all_original_limits_passed": true
+    },
+    "fixture_member_pins_independently_rechecked": 26,
+    "scope": "Repair-active and agriculture-active tiers1/32/128 do not create a player or call the Library. Runtime work, schedules, configuration, event bindings, effects and physical fixture paths are byte-identical across the player delta. Unchanged active-handler behavior retains applicability under the original benchmark identities.",
+    "measurement_limit": "No fresh 2DDD elapsed time or peak-memory value is asserted. Changed Library code is still parsed during save loading and has a changed static footprint. Original process-memory measurements retain 38C identity; current Library/save-load/peak/retained/churn qualification remains separately required. This review cannot replace those measurements."
+  },
+  "startup_extension": {
+    "original_chain": "spec/evidence/f210-current38c-menu-native-chain-r01.json",
+    "scope": "Prototype entrypoints, Generator, settings, compatibility adapters and intended outputs are byte-identical. The original named high-cost startup improvement remains evidence of the same construction implementation; no new 2DDD responsive-menu timing is asserted.",
+    "measurement_limit": "Archive and three German locale strings differ. Do not relabel the old full-startup observation as a newly measured final package; final publication claims name the tested scope and undergo independent verdict review."
+  },
+  "affected_paths_still_required": [
+    "Positive/imported and persisted private state plus foreign-hidden inspection",
+    "Actual input/focus/retired-root/removed-player lifecycle",
+    "Current Library/save-load performance and peak/retained/churn memory"
+  ],
+  "native_execution": false,
+  "new_scored_dataset": false,
+  "release_qualification": false,
+  "corrected_fresh_client_results": {
+    "f200": "spec/evidence/library-f200-native-names-private-native-chain-r01.json",
+    "f210": "https://github.com/Julesc013/more-infinite-research/pull/1402",
+    "independent_visual_readback": "Aero has verified and viewed all10 F200/all20 F210 original PNGs; fresh zero-credit scopes only."
+  }
+}

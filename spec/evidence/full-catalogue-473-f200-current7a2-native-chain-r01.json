@@ -1,0 +1,345 @@
+{
+  "schema": 1,
+  "kind": "MIRF200473CurrentSameAndForwardNativeChainV1",
+  "status": "passed-current-f200-same-edition-and-f210-forward-engine-base-successors",
+  "scope": "Protected exact published4.7.20003/2.0.77 Base original9D39 directly to current7a2/player505 F20065FC/2.0.77 and F210005D/standalone2.1.23. All54 level-backed rows, recipe/force/gun effects,20 zero-credit holders and queued42-percent/paused27-percent work survive one new native gear lab, save and two read-only unchanged-byte cold reloads per destination. Base only; no complete stable-edition, Space Age/provider, GUI, physical output, performance or release verdict.",
+  "candidate_source": "7a2f93224c846b86261b2da709f50ea683fc708d",
+  "player_tree": "5058373348e9049f8b67ec4dbb79b400a904acd6",
+  "controller_commit": "cb1a22d8941eb5e629a82dc88e12f698ab21aafc",
+  "packet": {
+    "path": "build/qualification/full-catalogue-473-f200-current7a2-r01-controller/packet.json",
+    "bytes": 10769,
+    "sha256": "3A66DF48F8EF5B00B8FF02707D1C2F16BA932631DE5275874571C594F353CA31"
+  },
+  "caller": {
+    "path": "build/qualification/full-catalogue-473-f200-current7a2-r01-controller/Invoke-OwnedF200FullCataloguePair.ps1",
+    "bytes": 4850,
+    "sha256": "FCF88574E148CF79496AC40C2951C6E9AC470A01577E4DE3CF38E62E02EAC326"
+  },
+  "terminal": {
+    "path": "build/qualification/full-catalogue-473-f200-current7a2-r01-controller/execution-record/terminal.json",
+    "bytes": 9554,
+    "sha256": "A692CDA225063A1EB04D87ABCAB81B631F2D91E3549DA6D7266344839891AA25"
+  },
+  "protected_original_source": {
+    "path": "build/mir5/recovery-historical/published-source-saves-da93-r01/source-output-c125-r03/full-catalogue-f200-cross/write-data/saves/mir5-native-complete.zip",
+    "bytes": 646247,
+    "sha256": "9D391DB311DA3C82E43648FAE5E6FE9C08D00F0592880B3160F35EE822FECA09"
+  },
+  "original_source_actual_lab_completions_counted_once": 1,
+  "original_source_chain": {
+    "path": "spec/evidence/full-catalogue-f200-f210-c563-native-chain-r01.json",
+    "sha256": "A13845A1EF36739185CFBD13B4066EE842ECC1AF7DD8734F3337B8FF4BAEF27F"
+  },
+  "preparation": {
+    "path": "spec/evidence/full-catalogue-473-f200-current7a2-preparation-r01.json",
+    "sha256": "5CDFF7C33097E41037FF5003CD7B776DCAFDD705EB6E0439D8F8BB397CFC9430"
+  },
+  "fixture_consumption": {
+    "all_selected_members_raw_git_verified": true,
+    "host_controls_passed": 12,
+    "f200_fixture_archive_sha256": "010EBE8BC6012C9436237CE8A57685175AE691A1155C2D223592CACAF5A892C2",
+    "f210_fixture_container_comparison": {
+      "schema": 1,
+      "old_archive_sha256": "F1DD5D7571295EF4FBFB5AE361DCF123121A81A4143A78B7C51B901980B324C6",
+      "current_archive_sha256": "3CED94B4C39F95EB40413A4CAA89AD86269B5C0DB41FABC54F95DB0DC0F0E72A",
+      "member_sets_and_all_seven_member_bytes_equal": true,
+      "old_capsule": "spec/evidence/full-catalogue-f200-f210-c563-native-receipts-r01.json.gz",
+      "scope": "Current packager container bytes differ from the original container. Payload comparison supports unchanged fixture assertions, not archive identity. Actual new profile pins the new archive. First preparation hash-expectation refusal occurred before native execution or library mutation."
+    }
+  },
+  "readback": {
+    "path": "build/qualification/full-catalogue-473-f200-current7a2-r01-controller/root-readback-r01.json",
+    "bytes": 7077,
+    "sha256": "D1D695E972A6215A0879765FC2317E8A5026F6FC04136F8B426689DC3F897CEE",
+    "files": 36,
+    "bytes_per_copy": 1517698
+  },
+  "receipt_capsule": {
+    "path": "spec/evidence/full-catalogue-473-f200-current7a2-native-receipts-r01.json.gz",
+    "bytes": 15411,
+    "sha256": "3D93E03930E1437A911130968673118622DC1E7849A408589EED482DDC862556",
+    "records": 2,
+    "uncompressed_bytes": 93889,
+    "all_original_exact_bytes_round_trip": true
+  },
+  "stages": [
+    {
+      "target": "f200",
+      "route": "same-edition",
+      "result": {
+        "path": "build/qualification/full-catalogue-473-f200-current7a2-r01-controller/native-f200/result.json",
+        "bytes": 35013,
+        "sha256": "E13759F58F3E28A54C05E1BA37276E49564C8A52E0AD96321C98305D59032460"
+      },
+      "engine": {
+        "path": "D:\\Games\\Factorio\\2.0\\bin\\x64\\factorio.exe",
+        "sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B",
+        "file_version": "2.0.77.84539",
+        "product_version": "2.0.77",
+        "base_version": "2.0.77"
+      },
+      "profile": {
+        "path": "D:\\Projects\\Factorio\\mir5-legacy-cannon-credit-r01\\build\\qualification\\full-catalogue-473-f200-current7a2-r01-inputs\\profile-f200.json",
+        "sha256": "BE0CEAD19DFF8E457498375E3D6C3FFDE8CC4006BB147D3906BE7B34B10B13A4"
+      },
+      "fixtures": [
+        {
+          "sha256": "010EBE8BC6012C9436237CE8A57685175AE691A1155C2D223592CACAF5A892C2",
+          "archive": "D:\\Projects\\Factorio\\testmods\\2.0\\mir-fixture-mir5-full-catalogue-upgrade_0.2.0.zip",
+          "source": "D:\\Projects\\Factorio\\mir5-legacy-cannon-credit-r01\\build\\qualification\\full-catalogue-473-f200-current7a2-r01-inputs\\fixture-source"
+        },
+        {
+          "sha256": "723D1E7721449FC26040E5E6629416767BDC20AD79CF8723115846DB662A1F87",
+          "archive": "D:\\Projects\\Factorio\\testmods\\2.0\\mir-fixture-mir5-active-mods-observer_0.1.0.zip",
+          "source": "D:\\Projects\\Factorio\\mir5-legacy-cannon-credit-r01\\build\\qualification\\full-catalogue-473-f200-current7a2-r01-inputs\\observer-f200"
+        }
+      ],
+      "candidate_sha256": "65FC7E907FE3198B7290167989FE2564C1474190D06DAD49860063BEC418EC60",
+      "initial_observation": {
+        "case": "full-catalogue-upgrade",
+        "stage": "initial",
+        "status": "passed",
+        "profile": "base",
+        "qualification": "native-runner-readback-required",
+        "witnesses": {
+          "public_rows": 54,
+          "level_backed_rows": 54,
+          "native_owner_rows": 0,
+          "scripted_rows_not_seeded": 0,
+          "zero_credit_rows": 20,
+          "source_gear_lab": 1,
+          "successor_gear_lab": 1,
+          "queued_progress": 0.42000000000000004,
+          "paused_progress": 0.27,
+          "save_name": "mir5-native-complete",
+          "on_load_read_only": false
+        }
+      },
+      "completed_save": {
+        "path": "build/qualification/full-catalogue-473-f200-current7a2-r01-controller/native-f200/write-data/saves/mir5-native-complete.zip",
+        "bytes": 647263,
+        "sha256": "8C7B58DCDEE677FC59A9B6E332BD1F6C6DC538B8B0D943F59D611E0E7431916D"
+      },
+      "cold_reloads": [
+        {
+          "ordinal": 1,
+          "save_sha256": "8C7B58DCDEE677FC59A9B6E332BD1F6C6DC538B8B0D943F59D611E0E7431916D",
+          "save_byte_identical": true,
+          "observation": {
+            "case": "full-catalogue-upgrade",
+            "stage": "reload",
+            "status": "passed",
+            "profile": "base",
+            "qualification": "native-runner-readback-required",
+            "witnesses": {
+              "public_rows": 54,
+              "level_backed_rows": 54,
+              "native_owner_rows": 0,
+              "scripted_rows_not_seeded": 0,
+              "zero_credit_rows": 20,
+              "source_gear_lab": 1,
+              "successor_gear_lab": 1,
+              "queued_progress": 0.42000000000000004,
+              "paused_progress": 0.27,
+              "save_name": "mir5-native-complete",
+              "on_load_read_only": true
+            }
+          }
+        },
+        {
+          "ordinal": 2,
+          "save_sha256": "8C7B58DCDEE677FC59A9B6E332BD1F6C6DC538B8B0D943F59D611E0E7431916D",
+          "save_byte_identical": true,
+          "observation": {
+            "case": "full-catalogue-upgrade",
+            "stage": "reload",
+            "status": "passed",
+            "profile": "base",
+            "qualification": "native-runner-readback-required",
+            "witnesses": {
+              "public_rows": 54,
+              "level_backed_rows": 54,
+              "native_owner_rows": 0,
+              "scripted_rows_not_seeded": 0,
+              "zero_credit_rows": 20,
+              "source_gear_lab": 1,
+              "successor_gear_lab": 1,
+              "queued_progress": 0.42000000000000004,
+              "paused_progress": 0.27,
+              "save_name": "mir5-native-complete",
+              "on_load_read_only": true
+            }
+          }
+        }
+      ],
+      "native_startup_logs": [
+        {
+          "path": "build/qualification/full-catalogue-473-f200-current7a2-r01-controller/native-f200/production.factorio.log",
+          "bytes": 9743,
+          "sha256": "EDC54695004CD8066635191276733146E9BECE0FAE47B45C4E929723065D9F1F",
+          "actual_native_startup": "   0.000 2026-10-29 00:36:13; Factorio 2.0.77 (build 84539, win64, full, space-age)"
+        },
+        {
+          "path": "build/qualification/full-catalogue-473-f200-current7a2-r01-controller/native-f200/reload-1.factorio.log",
+          "bytes": 7765,
+          "sha256": "87F01A555103364B9E344F2FFBE3A3C90ABD14F91DF3BB7A6F814E78AC80AB60",
+          "actual_native_startup": "   0.000 2026-10-29 00:36:17; Factorio 2.0.77 (build 84539, win64, full, space-age)"
+        },
+        {
+          "path": "build/qualification/full-catalogue-473-f200-current7a2-r01-controller/native-f200/reload-2.factorio.log",
+          "bytes": 7765,
+          "sha256": "05A28BE3BBFF52B542A406B215FA9845E41C231301D4046914AC6FE0D6E3D174",
+          "actual_native_startup": "   0.000 2026-10-29 00:36:19; Factorio 2.0.77 (build 84539, win64, full, space-age)"
+        }
+      ],
+      "actual_native_processes": 3,
+      "actual_new_candidate_labs": 1,
+      "reused_original_source_labs_not_new": 1
+    },
+    {
+      "target": "f210",
+      "route": "forward-engine",
+      "result": {
+        "path": "build/qualification/full-catalogue-473-f200-current7a2-r01-controller/native-f210/result.json",
+        "bytes": 35017,
+        "sha256": "80B57B134B0FCEE08B42E0AE019D1B82DCDEB073BEEEE20E10466BC8F347FD38"
+      },
+      "engine": {
+        "path": "D:\\Games\\Factorio\\2.1\\bin\\x64\\factorio.exe",
+        "sha256": "8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38",
+        "file_version": "2.1.23.87750",
+        "product_version": "2.1.23",
+        "base_version": "2.1.23"
+      },
+      "profile": {
+        "path": "D:\\Projects\\Factorio\\mir5-legacy-cannon-credit-r01\\build\\qualification\\full-catalogue-473-f200-current7a2-r01-inputs\\profile-f210.json",
+        "sha256": "BD41943BCFCC2BB9E78FD52F44C50D58B173E47BA4AE01CFC5B74C8B87455411"
+      },
+      "fixtures": [
+        {
+          "sha256": "3CED94B4C39F95EB40413A4CAA89AD86269B5C0DB41FABC54F95DB0DC0F0E72A",
+          "archive": "D:\\Projects\\Factorio\\testmods\\2.1\\mir-fixture-mir5-full-catalogue-upgrade_0.3.0.zip",
+          "source": "D:\\Projects\\Factorio\\mir5-legacy-cannon-credit-r01\\build\\qualification\\full-catalogue-473-f200-current7a2-r01-inputs\\cross-fixture-source"
+        },
+        {
+          "sha256": "A15A7D628D66953D2E0C4D4FA288F47CBF9C5678327C7EB3D23ADB5DC78331C0",
+          "archive": "D:\\Projects\\Factorio\\testmods\\2.1\\mir-fixture-mir5-active-mods-observer_0.1.0.zip",
+          "source": "D:\\Projects\\Factorio\\mir5-legacy-cannon-credit-r01\\build\\qualification\\full-catalogue-473-f200-current7a2-r01-inputs\\observer-f210"
+        }
+      ],
+      "candidate_sha256": "005D420671270306155CB4AC25E9CF77541202DFA16B206DCC016237619C9AA2",
+      "initial_observation": {
+        "case": "full-catalogue-upgrade",
+        "stage": "initial",
+        "status": "passed",
+        "profile": "base",
+        "qualification": "native-runner-readback-required",
+        "witnesses": {
+          "public_rows": 54,
+          "level_backed_rows": 54,
+          "native_owner_rows": 0,
+          "scripted_rows_not_seeded": 0,
+          "zero_credit_rows": 20,
+          "source_gear_lab": 1,
+          "successor_gear_lab": 1,
+          "queued_progress": 0.42000000000000004,
+          "paused_progress": 0.27,
+          "save_name": "mir5-native-complete",
+          "on_load_read_only": false
+        }
+      },
+      "completed_save": {
+        "path": "build/qualification/full-catalogue-473-f200-current7a2-r01-controller/native-f210/write-data/saves/mir5-native-complete.zip",
+        "bytes": 649606,
+        "sha256": "8B5B8AE6F77542722D87FF793C56EB0213BD5D62D7BC722D259CB52F296DC9CB"
+      },
+      "cold_reloads": [
+        {
+          "ordinal": 1,
+          "save_sha256": "8B5B8AE6F77542722D87FF793C56EB0213BD5D62D7BC722D259CB52F296DC9CB",
+          "save_byte_identical": true,
+          "observation": {
+            "case": "full-catalogue-upgrade",
+            "stage": "reload",
+            "status": "passed",
+            "profile": "base",
+            "qualification": "native-runner-readback-required",
+            "witnesses": {
+              "public_rows": 54,
+              "level_backed_rows": 54,
+              "native_owner_rows": 0,
+              "scripted_rows_not_seeded": 0,
+              "zero_credit_rows": 20,
+              "source_gear_lab": 1,
+              "successor_gear_lab": 1,
+              "queued_progress": 0.42000000000000004,
+              "paused_progress": 0.27,
+              "save_name": "mir5-native-complete",
+              "on_load_read_only": true
+            }
+          }
+        },
+        {
+          "ordinal": 2,
+          "save_sha256": "8B5B8AE6F77542722D87FF793C56EB0213BD5D62D7BC722D259CB52F296DC9CB",
+          "save_byte_identical": true,
+          "observation": {
+            "case": "full-catalogue-upgrade",
+            "stage": "reload",
+            "status": "passed",
+            "profile": "base",
+            "qualification": "native-runner-readback-required",
+            "witnesses": {
+              "public_rows": 54,
+              "level_backed_rows": 54,
+              "native_owner_rows": 0,
+              "scripted_rows_not_seeded": 0,
+              "zero_credit_rows": 20,
+              "source_gear_lab": 1,
+              "successor_gear_lab": 1,
+              "queued_progress": 0.42000000000000004,
+              "paused_progress": 0.27,
+              "save_name": "mir5-native-complete",
+              "on_load_read_only": true
+            }
+          }
+        }
+      ],
+      "native_startup_logs": [
+        {
+          "path": "build/qualification/full-catalogue-473-f200-current7a2-r01-controller/native-f210/production.factorio.log",
+          "bytes": 14412,
+          "sha256": "AD597BBE968C8CC996478ED3707FC3F700E09616696BD22E1AF60471D04AF493",
+          "actual_native_startup": "   0.000 2026-10-29 00:36:25; Factorio 2.1.23 (build 87750, win64, full, space-age)"
+        },
+        {
+          "path": "build/qualification/full-catalogue-473-f200-current7a2-r01-controller/native-f210/reload-1.factorio.log",
+          "bytes": 12288,
+          "sha256": "B7E0F7D56B4394BC0C411454279B5FB5C42432EBF955B7BBE634164F8DEC2846",
+          "actual_native_startup": "   0.000 2026-10-29 00:36:28; Factorio 2.1.23 (build 87750, win64, full, space-age)"
+        },
+        {
+          "path": "build/qualification/full-catalogue-473-f200-current7a2-r01-controller/native-f210/reload-2.factorio.log",
+          "bytes": 12288,
+          "sha256": "2CB806A89E3DCECDC06AEC068A44A043E8F84FF8D0648AB7BE9A22CB9C9E7B0F",
+          "actual_native_startup": "   0.000 2026-10-29 00:36:31; Factorio 2.1.23 (build 87750, win64, full, space-age)"
+        }
+      ],
+      "actual_native_processes": 3,
+      "actual_new_candidate_labs": 1,
+      "reused_original_source_labs_not_new": 1
+    }
+  ],
+  "actual_native_processes": 6,
+  "actual_new_candidate_lab_completions": 2,
+  "actual_read_only_cold_reloads": 4,
+  "factorio_processes_after_restoration": 0,
+  "limits": [
+    "The F200 Base result does not close its remaining same-edition Space Age/provider or affected configuration cases. It closes the named Base route only.",
+    "The same original9D39 source is used twice; its one historical laboratory completion is counted once, not once per carried marker.",
+    "The F210 cross fixture has a new3CED container whose seven member names/bytes exactly match the oldF1DD container. Native profile pins3CED explicitly; no archive-identity equivalence is asserted.",
+    "The fixture accelerates only the gear lab after exact native cost/science/effect preflight. Ordinary tuning, physical manufacturing, scripted earned rows, multiplayer and comparative performance remain independent.",
+    "This adds current actual runs; older C563/8F routes and their original adverse receipts retain their actual identities."
+  ]
+}

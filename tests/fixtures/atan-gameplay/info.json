@@ -1,0 +1,17 @@
+{
+  "name": "mir-fixture-mir5-atan-gameplay",
+  "version": "0.1.0",
+  "title": "MIR 5 private ATAN gameplay fixture",
+  "author": "MIR maintainers",
+  "description": "Disposable F200 Base/Space Age ATAN productivity gameplay scenario; it does not establish broad compatibility support.",
+  "factorio_version": "2.0",
+  "dependencies": [
+    "base = 2.0.77",
+    "? elevated-rails = 2.0.77",
+    "? quality = 2.0.77",
+    "? space-age = 2.0.77",
+    "atan-air-scrubbing = 0.2.8",
+    "atan-ash = 2.2.1",
+    "more-infinite-research = 5.0.20000"
+  ]
+}

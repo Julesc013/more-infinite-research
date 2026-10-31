@@ -1,0 +1,1 @@
+-- Keep F110 startup defaults; accelerate only the verified direct lab row.

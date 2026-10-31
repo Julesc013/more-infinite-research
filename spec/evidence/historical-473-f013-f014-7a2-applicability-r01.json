@@ -1,0 +1,55 @@
+{
+  "kind": "MIRMigrationMemberApplicabilityReadbackV1",
+  "native_executed": false,
+  "rows": [
+    {
+      "target": "f013",
+      "native_chain": "spec/evidence/historical-473-f013-f0dd-native-chain-r01.json",
+      "native_chain_sha256": "08D8CDAD2D1CB7AAECE3847F46A94A975C8B40FB0C05D884DF34CC2255E7FCFD",
+      "executed_archive": {
+        "sha256": "C4E36AE31F5ED4F6F521FB389968C124C0178927B549409AAD8DAEE6D8CD8455",
+        "bytes": 453595,
+        "source_commit": "f0dd9f62adc8bf0a8eaaf9babc1fcfef9f3241ea"
+      },
+      "current_archive": {
+        "sha256": "4DB2D8848EBD2B4EECBF6D91CBEF8F69F5C31F634432496BB26AC40A3FC8964A",
+        "bytes": 453709,
+        "source_commit": "7a2f93224c846b86261b2da709f50ea683fc708d"
+      },
+      "members": 127,
+      "changed_members": [
+        "changelog.txt"
+      ],
+      "identical_other_members": 126,
+      "identical_payload_map_sha256": "30824696847175B0DB4FAF5DA55EB0077C4CECABB04EF26F0831AA9560237CF9",
+      "scope": "Reconstructed executed ZIP exactly matches original receipt hash. Every current metadata/entrypoint/import/migration/asset/locale payload is identical; only changelog/container bytes differ. Original engine, protected save, fixtures, settings, harness and execution identity remain in the native chain. Applicability is preservation-only, no new candidate lab or full-edition claim."
+    },
+    {
+      "target": "f014",
+      "native_chain": "spec/evidence/historical-473-f014-f0dd-native-chain-r01.json",
+      "native_chain_sha256": "FB053A1208DD2D0410EC90D71B0953985CD9C1D4A9D9EB2E9056C89E31B03C7B",
+      "executed_archive": {
+        "sha256": "E276483E6E51B67915881DEBAAD7EE15A8DE4C0F764A570A8B415C354067B0A4",
+        "bytes": 453597,
+        "source_commit": "f0dd9f62adc8bf0a8eaaf9babc1fcfef9f3241ea"
+      },
+      "current_archive": {
+        "sha256": "0A2BE7297D09DCCF084B8A10734651C1499FDE218FA3E2635873329F36250834",
+        "bytes": 453711,
+        "source_commit": "7a2f93224c846b86261b2da709f50ea683fc708d"
+      },
+      "members": 127,
+      "changed_members": [
+        "changelog.txt"
+      ],
+      "identical_other_members": 126,
+      "identical_payload_map_sha256": "A3DC8A3DCB0E66AE1CB5E05574BBF685EA8482AD216907B4B770615018A249F9",
+      "scope": "Reconstructed executed ZIP exactly matches original receipt hash. Every current metadata/entrypoint/import/migration/asset/locale payload is identical; only changelog/container bytes differ. Original engine, protected save, fixtures, settings, harness and execution identity remain in the native chain. Applicability is preservation-only, no new candidate lab or full-edition claim."
+    }
+  ],
+  "schema": 1,
+  "reviewed_against_commit": "22c2f9a8e49047a03ea8d1d844d68a79c11bc749",
+  "player_tree": "5058373348e9049f8b67ec4dbb79b400a904acd6",
+  "method": "Rebuild each executed f0dd and current7a2 edition with tools/package.py, match both original chain and current freeze SHA256, then compare every uncompressed member. No native execution or receipt rewrite.",
+  "capability_boundary": "targets/editions.json has research_levels:false for F013/F014; metadata-473-f013-f016.json deliberately selects preservation-only. The real source lab/.05 plus unchanged earned state and two successor reloads close only this named no-continuation route, not a level-capable successor or whole-edition verdict."
+}

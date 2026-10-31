@@ -1,0 +1,105 @@
+{
+  "schema": 1,
+  "kind": "MIRF210NativeNamesPreparedInputsV1",
+  "status": "prepared-not-native-acceptance",
+  "controller_commit": "c1f1ce94fe9cec518ffd1bf53882f682b8737ec1",
+  "player_source_commit": "a95dbc6b35c165b46aa9991d2a0ef7274d4ec04a",
+  "player_tree": "7b0ede663e6fbcf486cd863e7d3719653aedc07a",
+  "engine": {
+    "version": "2.1.23",
+    "sha256": "8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38"
+  },
+  "candidate": {
+    "version": "5.0.21000",
+    "sha256": "2DDD2A4C967BEF07830218442AE4441BEECD5B9ECE0AC86B09A5F6586BBA80E5",
+    "bytes": 693127
+  },
+  "packet_primary_custody": "build/qualification/library-f210-native-names-r01-controller/packet.json",
+  "packet_sha256": "91A96DBE155382AD855676744B9894D5583AF85F41247ACEEA5D1340559F6A73",
+  "caller_sha256": "084EB274659351C0BD3CCC0408E89BEB3AF736BBE623C62F72E375FD51778E53",
+  "custody_helper_sha256": "00663A92257B33C40BBA654BA37B7EFA08E05F276AED0774A0EB0F1F1BD7BD46",
+  "cases": [
+    {
+      "id": "f210-native-names-base",
+      "name": "base",
+      "profile": "tests/profiles/library-api-consumers-private-credits-standalone-f210-2123.json",
+      "profile_sha256": "93E0805C4AC3B161C44145E76A1F64AE8C638B15281D45A8AB1DE9AC652EC8E3",
+      "fixture_archive": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\library-f210-native-names-r01-controller\\archives\\mir-fixture-mir5-library-multiplayer_0.3.0.zip",
+      "fixture_archive_sha256": "CE03916A1320D6DDF9D9D3EFFD450112E7FDC691763F999A7A4C5182D8CEE23E",
+      "session_expected_peak_memory_mib": 7168,
+      "output": "D:\\Projects\\Factorio\\mir5-legacy-cannon-credit-r01\\build\\tmp\\library-f210-native-names-base-r01"
+    },
+    {
+      "id": "f210-native-names-space-age",
+      "name": "space-age",
+      "profile": "tests/profiles/library-api-consumers-private-credits-space-age-standalone-f210-2123.json",
+      "profile_sha256": "EF8A763CBBDCD4C9CC80DAD3E9E3EF39124F0E033E2461EF3B97CC1322E6DA70",
+      "fixture_archive": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\library-f210-native-names-r01-controller\\archives\\mir-fixture-mir5-library-multiplayer_0.3.0.zip",
+      "fixture_archive_sha256": "CE03916A1320D6DDF9D9D3EFFD450112E7FDC691763F999A7A4C5182D8CEE23E",
+      "session_expected_peak_memory_mib": 8192,
+      "output": "D:\\Projects\\Factorio\\mir5-legacy-cannon-credit-r01\\build\\tmp\\library-f210-native-names-space-age-r01"
+    }
+  ],
+  "public_helpers": {
+    "tools/Invoke-MultiplayerFixture.ps1": "375847D5DEA656E6EC1C9724F7BC76DDC98EE538D708D1F5B85CF113F1E38AD8",
+    "tools/Invoke-MultiplayerSession.ps1": "984F7667BC1CFDF5030D59A8035881C079F448BAA9FA897B4E578F8AF3CA521B",
+    "tools/Invoke-NativeFixture.ps1": "2BA98D7AC02030E9E170714C2C153A198BD45900DE9C35F66F19080B2C4529AC",
+    "tools/commands/workspace/Invoke-MIRDevelopmentHealthHook.ps1": "3C9D435EA1A592570AFB2A609705D54747D76FF127FCE05FBE43E10D1A9E21E2",
+    "tools/commands/workspace/Optimize-MIRArtifactStorage.ps1": "069D52E62E57249451E23F048BFC3C0DE7A3376F1460F2458A4E0DBDD0C76151",
+    "tools/commands/workspace/Remove-MIRStaleArtifacts.ps1": "5120FAF2D8435D801F8A5252A8FF93756468CE9F6DCC39234E6D81DBA152F80C",
+    "tools/commands/workspace/Test-MIRDevelopmentHealth.ps1": "D610BE142BF948C2CE5C5BAE4FE29822D84C75114EC5A7BF0A9D6F719CB7CDE1",
+    "tools/lib/compatibility/LibraryActivation.ps1": "123A2241B895B57217AA969A677FF21BBFB268FE55E9734287883B4D6AE25099",
+    "tools/lib/compatibility/ModPortal.ps1": "A16344F66A9124C0792614AAD83702603D4C0AD4FE977392C73710B745E74B08",
+    "tools/lib/validation/DirectLibraryStartupMeasurement.ps1": "D069C014D74E883C249928E812A258E2A2CB34AFE499219CB46A513345C2EC34",
+    "tools/lib/validation/ImmutableInputStaging.ps1": "B5FBFAC8537B08F9790BD3EE8ACEAAB38EE5CBB8EF005E67E8375DE568BBC12C",
+    "tools/lib/validation/NativeProbeCommon.ps1": "CC8462A39DE12D0746C8F985D1F86F761CF3EF261B4FA551CFFD092F76D64D71",
+    "tools/lib/validation/NativeProbeResources.ps1": "A34BD5FE79466B3EDA96F46EC132562192E6A70280901381C8AF560E7AB23328",
+    "tools/lib/validation/OwnedProcessMemorySampler.ps1": "8786DC06671A7B6ED6F48BD211275C4DA783F65BBB0FCDCE5562104BC3B28124",
+    "tools/lib/validation/ResourceGovernor.ps1": "B811A1548A6D789F2A7E618999D5087C70E0151E751CCF4C51635D54E6BF04ED",
+    "tools/lib/validation/ResponsiveMenuRecord.ps1": "7F74EF416DC4C06B85B3479C02DEF13837F9D69420BBE2F88ADAFB8E5E18DFFB",
+    "tools/lib/validation/responsive-menu/Invoke-MIRResponsiveMenuActor.ps1": "DC4816352962EC14ED443E5865F71FF3F2A989B47DCF4F45916048F1B5A55D55",
+    "tools/lib/validation/responsive-menu/MenuObservation.ps1": "8423C41478F7AB329E7A385BBD13BB39490E42FB4F98B1D53AA508B583DEC2EC",
+    "tools/lib/validation/responsive-menu/OwnedMenuWindow.ps1": "554324FF12A7EAC51DAA5438B48CE79A10FC095E546844127F02590A7772ED43",
+    "tools/read_library_profiles.py": "2C99D50668AB90E3329649447FD156578F1377DA95E6998699D6D401DF583292"
+  },
+  "fixture_members": [
+    {
+      "source": "tests/fixtures/library-multiplayer/info-f210-private-credits.json",
+      "destination": "info.json",
+      "sha256": "0D6B79A05748573B3E8693804E8A3289BB9434364374774AE0906EB5D12D68F5",
+      "bytes": 417
+    },
+    {
+      "source": "tests/fixtures/library-multiplayer/control.lua",
+      "destination": "control.lua",
+      "sha256": "0D0ACF26C79671A8F92C4192DA63B344A7C6766CFA009ADB00FD64285DC80307",
+      "bytes": 57534
+    },
+    {
+      "source": "tests/fixtures/library-multiplayer/settings-updates.lua",
+      "destination": "settings-updates.lua",
+      "sha256": "AA3C818050FD927BEADBA7FEBC483FB4BC42668911888852E4CF6996B7F5C0FD",
+      "bytes": 1678
+    }
+  ],
+  "fixture_archive_sha256": "CE03916A1320D6DDF9D9D3EFFD450112E7FDC691763F999A7A4C5182D8CEE23E",
+  "expected_behaviors": [
+    "Existing two realEN/DEclient0.3 private-credit/native research/action state machine,initial/rejoin/cold-host-restart,ten actual rendered frames and six independent two-consumer load-phase witnesses percase.",
+    "Inspect actual localized first-open/settled/rejoin/restart names and science/prerequisites on corrected7b0.",
+    "Exact original native/foreign/queue/work snapshots unchanged;two accelerated native Gear labs percase;all original controls/archives restored."
+  ],
+  "host_validation": {
+    "initial_invocation": "Direct test script rejected method arguments before tests;exit2. Originalc1f commit message test-pass statement premature and corrected here without rewriting history.",
+    "corrected_invocation": "Module import with pinned Lua52 and explicit selected unittest suite;three affected profile/prelaunch/actual-marker controls pass.",
+    "corrected_log_sha256": "A42FF29216B620820AA71097F99996E90699358318CC2DF592AAC237E02218DC",
+    "first_refusal_sha256": "0CEF63A6CBB17CCA25E0C6C75C88487B92E7DD659A9BC14BB34CE7A9B80DC61C"
+  },
+  "limits": [
+    "Fresh zero-credit holders only;no imported/persisted positive credits,foreign-hidden inspection,actual keyboard/drag,retained/churn memory or comparative-performance acceptance.",
+    "F200 new9-process/two-lab/ten-PNG result remains separately recorded;these prepared F210 inputs do not inherit its native pass.",
+    "Base first,SpaceAge sole pending case;stop on any first failure. No architecture/product/scenario/assertion/graphics/budget change."
+  ],
+  "native_processes": 0,
+  "performance_acceptance": false,
+  "release_qualification": false
+}

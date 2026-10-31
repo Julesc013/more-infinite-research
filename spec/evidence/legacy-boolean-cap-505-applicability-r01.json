@@ -1,0 +1,243 @@
+{
+  "schema": 1,
+  "kind": "MIRLegacyBooleanCapCurrentApplicabilityV1",
+  "status": "reviewed-scoped-VER06-reuse-no-new-native",
+  "scope": "Only the published Base MIR4.0.20000 policy-v1 gear-cap ownership/progress source and its direct F200/F210 successors. This does not qualify other policy-v1 archives, the full MIR4 catalogue, Space Age, Library, hidden-credit migration, arbitrary settings, performance, or release publication.",
+  "method": {
+    "source_comparison": "Compared the prior candidate source subtree at a575a4198807b6aea9e26963e3d9970fc5c068ae:source to current player tree5058373348e9049f8b67ec4dbb79b400a904acd6. This is a static Git/object and tracked-receipt review only; it neither opened a Factorio process nor ran a host test.",
+    "hash_taxonomy": "Fields named git_blob_oid_sha1 are Git object identifiers, not SHA-256 content claims. Fields named sha256 are SHA-256 identities from tracked evidence or native receipts.",
+    "ver06_conclusion": "The decoder, current candidate admission, gear construction, cap reconciliation and configuration transport consumed by the named policy-v1 scenario are unchanged. The changed paths either add distinct 1.1/1.2 credit carriers whose event selectors reject source version4.0.20000 before force access, extend a Library that this fixture never opens, or add a reset/force-event path outside the fixture protocol. No changed consumed input was identified that requires repeating this named native route.",
+    "independent_review": "Separate read-only review reproduced the eight unchanged consumed blobs and complete eleven-path difference, verified package-helper continuity and original/current identities, and approved only this representative Base route. The published-source create/reset happens under unchanged MIR4; it is not a candidate reset observation."
+  },
+  "prior_observed_execution": {
+    "chain": {
+      "path": "spec/evidence/legacy-boolean-cap-a575-native-chain.json",
+      "sha256": "C9BCCAC54903586119169F5628DA2819185B401022E319E34805A79DAD9CB0C3",
+      "git_blob_oid_sha1": "20ea800c5591c86d3d375890e79bdb819eff5548",
+      "receipt_capsule_path": "spec/evidence/legacy-boolean-cap-a575-native-receipts-r01.json.gz",
+      "receipt_capsule_sha256": "8CD3D77CE5DE40C2AB8B17439FD7E9CFB0946F151FBC96DC4DA75C5C37810983"
+    },
+    "published_source": {
+      "stage_id": "published-source",
+      "role": "published-4.0.20000-source",
+      "result_sha256": "A9B9E522DD9B208016E263330132169CBE9DC11E98570F80AA82BBEE2966784F",
+      "published_archive_sha256": "5C0E299D78C4EE545958448DAE48D87BE5FE1B959875D4CB93A264D95D3DB0AE",
+      "engine_sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B",
+      "fixture_raw_commit": "9ef64ff41e0c7140467df044dfe20837f1fa5a40",
+      "fixture_archive_sha256": "A33E86829C63B995228E79CEA7421E669A4D2C5F7F76BDAF8F2D7F2B742F4C3D",
+      "profile_sha256": "F7619DBCE379714DE885B52C986C9E226F41CE2D7E01657F474D5622FFA32094",
+      "protected_save_sha256": "CEEB858FA19CC763EC09B83B23FD1640BECAD64A9A880405AD5D3B0C92E05602",
+      "accepted_source_labs": 2,
+      "cold_reload_count": 2
+    },
+    "direct_successors": [
+      {
+        "stage_id": "current-f200-r04",
+        "role": "direct-original-ceeb-to-current-f200-five-second-duration-pass",
+        "result_sha256": "2C001CA77A1E1DD7B3356D2168FD3ABF5C5159B46CEAC37AE2A724F87AE4BADD",
+        "candidate_archive_sha256": "8DB28D2DE45F26033B5F54E176902A3138A903AF0F4B48EAB6B9971466021B4F",
+        "engine_sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B",
+        "fixture_raw_commit": "31fa55badd9547a845315d2bf20864efc4b541a6",
+        "fixture_archive_sha256": "A19D6A6C33FF4C1234BE229508AF7A6178321B4844E83323A05DB59ABBAD937D",
+        "profile_sha256": "489A47E717EC6CD082CF0D4A5A21778783FAFF57AF5CB6F790051EFDE140D2CE",
+        "input_save_sha256": "CEEB858FA19CC763EC09B83B23FD1640BECAD64A9A880405AD5D3B0C92E05602",
+        "completed_save_sha256": "DA6321B2FE863C69EA23A926BE942CD5ECDBEBC44C97E3CD0006D739BA683CBE",
+        "accepted_new_labs": 1,
+        "cold_reload_count": 2
+      },
+      {
+        "stage_id": "current-f210-direct",
+        "role": "direct-original-ceeb-to-current-f210",
+        "result_sha256": "37EC12494648A2E48229DC851FF6B29FF5124F22A9805A2504C129287BB5D902",
+        "candidate_archive_sha256": "7CE6A4DF78019F6B98237E638A1C927C5FDB538D4A1442EE22D846DD962DDCDC",
+        "engine_sha256": "FE4A1DA30F322A0D0B8AEB3DF7276332222BAAA143E2352569B723E84B2B9060",
+        "fixture_raw_commit": "9ef64ff41e0c7140467df044dfe20837f1fa5a40",
+        "fixture_archive_sha256": "D1BDF52D254F6C1DE051117293D9F731295BFC8E3C1909DFFA8F2DA15413F876",
+        "profile_sha256": "F6F3C0135A8AE9830EFE780D3E74E248A726A195822367F607C8015C9EA6C85B",
+        "input_save_sha256": "CEEB858FA19CC763EC09B83B23FD1640BECAD64A9A880405AD5D3B0C92E05602",
+        "completed_save_sha256": "6CD9F72B5A45DDDCA77D189277C08FDA009505CE7AF1E687BD26D7779B42AFC6",
+        "accepted_new_labs": 1,
+        "cold_reload_count": 2
+      }
+    ],
+    "retained_adverses": [
+      "AEEE9F6BE1645188EC28A3C498DC89B7F6B4AAB6C0BA84BB2E92C5E78092AAB6",
+      "041C4085099D488398F848667ACA4B5D1A48ACA754EB90F7DF26F4B7D700A3A2",
+      "F709B94DE2DEA7C0B9841CA0DBC08BA895A503C37CA1BDC91F6ACAA9CBA42E5B"
+    ]
+  },
+  "current_505_inputs": {
+    "source_commit": "7a2f93224c846b86261b2da709f50ea683fc708d",
+    "player_tree_git_oid_sha1": "5058373348e9049f8b67ec4dbb79b400a904acd6",
+    "previous_source_tree_git_oid_sha1": "398c79c687d2bc662c976355ced1436201c43f11",
+    "asset_readback": {
+      "path": "spec/evidence/current-assets-7a2f9322-root-readback.json",
+      "sha256": "286D2523C8489184171AEB3306338820BBE1634720D64CE3052CCB8FF5548084",
+      "git_blob_oid_sha1": "1d4dbc74935f6a0a88906de2f50a691ab345115e",
+      "local_archive_rehash_performed_by_this_proposal": false,
+      "independent_aero_readback": {
+        "path": "spec/evidence/current-assets-7a2-aero-independent-readback-r01.json",
+        "sha256": "8CA61C20CFF15C4B33E86C6498C775020E7F42FB9ACAEA2FCF5149CBF4D9ADFD",
+        "scope": "Existing independent17-ZIP/20-file exact-byte reproduction; no new build or archive rehash is claimed by this applicability record."
+      }
+    },
+    "packages": [
+      {
+        "target": "f200",
+        "archive_name": "more-infinite-research_5.0.20000.zip",
+        "sha256": "65FC7E907FE3198B7290167989FE2564C1474190D06DAD49860063BEC418EC60",
+        "bytes": 691666
+      },
+      {
+        "target": "f210",
+        "archive_name": "more-infinite-research_5.0.21000.zip",
+        "sha256": "005D420671270306155CB4AC25E9CF77541202DFA16B206DCC016237619C9AA2",
+        "bytes": 692050
+      }
+    ]
+  },
+  "consumed_path_comparison": {
+    "unchanged_git_blob_sha1": [
+      {
+        "path": "runtime/legacy_caps.lua",
+        "git_blob_oid_sha1": "b77321635721e5b81152cf407cf0abef273997fa",
+        "reason": "Policy-v1 positive-true versus absent/false/foreign marker decoder is byte-identical."
+      },
+      {
+        "path": "runtime/caps.lua",
+        "git_blob_oid_sha1": "c840940658f54dd76fe170e5d09e4e5350ece520",
+        "reason": "Current cap reconciliation and restoration engine is byte-identical."
+      },
+      {
+        "path": "runtime/configuration.lua",
+        "git_blob_oid_sha1": "8464ea23f0b9c7695295efd1996eb66dd4230d9a",
+        "reason": "Resolved startup-value input to the cap lifecycle is byte-identical."
+      },
+      {
+        "path": "research/generator.lua",
+        "git_blob_oid_sha1": "a202cb8a086fcf29281f682eba4f55701fcf90c8",
+        "reason": "Authored generated technology construction is byte-identical."
+      },
+      {
+        "path": "research/settings.lua",
+        "git_blob_oid_sha1": "6c4d4415d0831c26b214ab1adfe33475a9eed0fa",
+        "reason": "Gear setting resolution is byte-identical."
+      },
+      {
+        "path": "compatibility/gear_bindings.lua",
+        "git_blob_oid_sha1": "cfc3ac5cd2ec4203d96c64b80ba2d0ebeca383df",
+        "reason": "Base gear binding selection is byte-identical."
+      },
+      {
+        "path": "compatibility/gear_bindings/vanilla.lua",
+        "git_blob_oid_sha1": "07a307b192be59d0d69ef8796fa83c716ca58f2b",
+        "reason": "The named iron-gear-wheel effect binding is byte-identical."
+      },
+      {
+        "path": "control.lua",
+        "git_blob_oid_sha1": "156afee4152a7a5feb263230aa2ab25c99c21a87",
+        "reason": "Top-level control registration is byte-identical."
+      }
+    ],
+    "changed_paths_proven_outside_named_consumption": [
+      {
+        "path": "data-final-fixes.lua",
+        "previous_git_blob_oid_sha1": "31a8005fab6120530d0e7d7f6f2b0843b5e9c529",
+        "current_git_blob_oid_sha1": "1a562cbcc0b708c05be50cbea6d14140556faf59",
+        "reason": "Adds detached MIR1.1 module and MIR1.2 cannon credit holders after the ordinary technology batch; it does not modify the generated gear row or its effect/unit/settings."
+      },
+      {
+        "path": "research/catalogue.lua",
+        "previous_git_blob_oid_sha1": "e549460a6d3f937909cb873f984c5a4a06c56d5a",
+        "current_git_blob_oid_sha1": "e33c074e11363945f5df0f6d8a7f95f53a158a7e",
+        "reason": "Adds an internal-credit identity accessor only. catalogue.declared(), the source of legacy candidate admission, is unchanged."
+      },
+      {
+        "path": "runtime/bootstrap.lua",
+        "previous_git_blob_oid_sha1": "dabfbcdddab7561787c5d0ca489fef459c7c9662",
+        "current_git_blob_oid_sha1": "a541a01a3caf18fbc580221ff8fc92aaf978adeb",
+        "reason": "Adds module/cannon migration preflight/apply and reset callbacks. Their selectors admit only old_version1.1.0 and1.2.0/1.2.5/1.2.9; fixed source old_version4.0.20000 returns nil before force access, and apply(nil) is no-op."
+      },
+      {
+        "path": "runtime/lifecycle.lua",
+        "previous_git_blob_oid_sha1": "c4cca51c324bb4230268d840e3bd1c6f6a344df4",
+        "current_git_blob_oid_sha1": "53bc8993e1fbb07a964d9f0b182db4b61a2211a2",
+        "reason": "The configuration-time legacy import/allowlist/candidate path is unchanged. The diff is authored-prototype reconciliation on effects-reset and force boundaries; the candidate/successor fixture does not invoke reset, force-create, force-reset or force-merge. The unchanged published-source control separately creates and resets its foreign force under MIR4 before the protected CEEB save."
+      },
+      {
+        "path": "research/legacy_module_credit_definitions.lua",
+        "current_git_blob_oid_sha1": "081a89e5e7e443c7b273c1b92699ee573f64d2a7",
+        "reason": "New detached 1.1-only holder definitions; not a policy-v1 candidate."
+      },
+      {
+        "path": "research/legacy_cannon_credit_definitions.lua",
+        "current_git_blob_oid_sha1": "2bb421efc07b71421e147a135aeba13ff9306fc7",
+        "reason": "New detached 1.2-only holder definition; not a policy-v1 candidate."
+      },
+      {
+        "path": "runtime/legacy_module_credits.lua",
+        "current_git_blob_oid_sha1": "ae6ed867b3b073d97dd9b3babcc99d76cad2c97c",
+        "reason": "New 1.1.0 exact-event reader; fixed4.0.20000 cannot select it."
+      },
+      {
+        "path": "runtime/legacy_cannon_credits.lua",
+        "current_git_blob_oid_sha1": "f287c62bfe4039b4341615980ad4a68fce411acf",
+        "reason": "New 1.2.0/1.2.5/1.2.9 exact-event reader; fixed4.0.20000 cannot select it."
+      },
+      {
+        "path": "presentation/library_model.lua",
+        "previous_git_blob_oid_sha1": "08723ddcb0aa8643c9b782c44fc7dfedb218f445",
+        "current_git_blob_oid_sha1": "387fd5a29b74a84cf232bca07689df55bcd644cb",
+        "reason": "Filters four exact private-credit IDs only from Library presentation."
+      },
+      {
+        "path": "runtime/library.lua",
+        "previous_git_blob_oid_sha1": "4c282cf5bc918fa92a711bc3833f5cfde2101fde",
+        "current_git_blob_oid_sha1": "97cf1b560382eb2975e2ab8d2653c4480b7445f5",
+        "reason": "Private-credit presentation, translation and GUI-action filtering only; the policy-v1 fixture opens no Library view or action."
+      },
+      {
+        "path": "changelog.txt",
+        "reason": "Authored release text is not a runtime, migration or prototype input for this fixture."
+      }
+    ]
+  },
+  "metadata_only_rebind": {
+    "status": "not-materialized-not-executed-not-a-profile-or-native-result",
+    "purpose": "Permit a later reviewer to point the already accepted named route at current505 package identities without overwriting or relabelling its original observed profiles.",
+    "retain_unchanged": {
+      "published_source_archive_sha256": "5C0E299D78C4EE545958448DAE48D87BE5FE1B959875D4CB93A264D95D3DB0AE",
+      "protected_source_save_sha256": "CEEB858FA19CC763EC09B83B23FD1640BECAD64A9A880405AD5D3B0C92E05602",
+      "f200_engine_sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B",
+      "f210_engine_sha256": "FE4A1DA30F322A0D0B8AEB3DF7276332222BAAA143E2352569B723E84B2B9060",
+      "f210_engine_scope": "The retained direct-F210 execution uses its original Steam FE4 engine identity, not standalone8DC.",
+      "fixture_protocol": "existing Base-only source plus direct-successor cap/foreign/queue/lab/two-cold-reload scenario"
+    },
+    "proposed_candidate_replacements": [
+      {
+        "target": "f200",
+        "old_observed_candidate_sha256": "8DB28D2DE45F26033B5F54E176902A3138A903AF0F4B48EAB6B9971466021B4F",
+        "current505_candidate_sha256": "65FC7E907FE3198B7290167989FE2564C1474190D06DAD49860063BEC418EC60"
+      },
+      {
+        "target": "f210",
+        "old_observed_candidate_sha256": "7CE6A4DF78019F6B98237E638A1C927C5FDB538D4A1442EE22D846DD962DDCDC",
+        "current505_candidate_sha256": "005D420671270306155CB4AC25E9CF77541202DFA16B206DCC016237619C9AA2"
+      }
+    ],
+    "profile_boundary": "No profile was created or edited here. The historical profile SHA-256 values above remain the identities of the native executions; any later profile that names65FC or005D must be newly hashed and labelled prepared/applicability-only, never observed."
+  },
+  "limits": [
+    "This proposal does not open or rehash the current65FC/005D ZIPs; their identities are cited from the tracked current-assets-7a2f9322 root readback.",
+    "This proposal does not rehash or reproduce the private CEEB source-save/other owner custody, and it does not inspect save, terminal, PNG, configuration or player-data bodies omitted by the existing capsule.",
+    "Static non-selection of the new 1.1/1.2 paths does not qualify those migrations, their reset behavior, hidden-credit persistence, or Library behavior.",
+    "The old a575 native execution remains the only native result. This proposal supplies a narrow consumed-path argument for reuse, not a new 505 execution, save, laboratory, cold-reload, engine, performance or release claim."
+  ],
+  "claims": {
+    "native_execution_added": false,
+    "original_execution_relabelled": false,
+    "whole_product_acceptance": false,
+    "performance_acceptance": false,
+    "release_acceptance": false
+  }
+}

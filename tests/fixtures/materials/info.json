@@ -1,0 +1,9 @@
+{
+  "name": "mir-fixture-mir5-materials",
+  "version": "0.1.0",
+  "title": "MIR 5 private native material fixture",
+  "author": "MIR maintainers",
+  "description": "Disposable K2SO material lab completions with native recipe-productivity effects and cold reload witnesses.",
+  "factorio_version": "2.1",
+  "dependencies": ["base >= 2.1.23", "space-age", "Krastorio2-spaced-out", "more-infinite-research = 5.0.21000"]
+}

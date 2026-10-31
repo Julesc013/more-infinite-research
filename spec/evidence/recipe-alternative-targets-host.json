@@ -1,0 +1,153 @@
+{
+  "schema": 1,
+  "kind": "MIR5RecipeAlternativeTargetHostControlsV1",
+  "status": "fifteen-collector-eleven-extension-thirty-generator-controls-pass",
+  "input_members": [
+    {
+      "path": "source/mir5/compatibility/product_bindings.lua",
+      "sha256": "4CF330B01B62B810497C06251D6CCD888717A6CD881C89D25AEF6D7FFDE7538C"
+    },
+    {
+      "path": "source/mir5/compatibility/product_targets.lua",
+      "sha256": "40CDC453E0537032FE3277551AEE3A243BA8F41F1CA5733B372726FBCF779785"
+    },
+    {
+      "path": "tests/mir5/test_product_targets.py",
+      "sha256": "625F70591CD0DA647DCA8C5973526224048F0590D0848098B99599627F7DA838"
+    },
+    {
+      "path": "tests/mir5/test_product_target_extension.py",
+      "sha256": "EB07A1F285B2189F39B5B129E9584162A8031926CFF1091E749D30161650212B"
+    }
+  ],
+  "published_declaration_source": {
+    "archive": "dist/4.7.0/more-infinite-research_4.7.21000.zip",
+    "archive_sha256": "708A529F1F6D649E0A732216CD8D8FEFE68F2C6C2DF2B40DA030C2C4C51558D1",
+    "member": "more-infinite-research_4.7.21000/prototypes/streams/productivity.lua",
+    "member_sha256": "EA66B64C03943A99B877847FD6E3903A099C83AB0333A441A29957C1C2142853",
+    "current_read_only_member_equal": true
+  },
+  "semantics": "Finite exact recipe names use a direct index and union with declared typed outputs. The retained breeding name patterns share the existing recipe pass. First-admitted group, local positive-yield checks and exclusions remain active. Only named asteroid/scrap native effect owners are inspected, once each, without enumerating foreign research or reading prerequisites/science.",
+  "adverse_development_probe": {
+    "custody": "build/mir5/product-targets-probe-r05.json",
+    "sha256": "1B324864E1AD540D07B4843A79CDA302E11548763A003DB12AD087F8C8A12A62",
+    "status": "draft host probe found duplicate asteroid/scrap candidates before native ownership filter; no frozen draft/source qualification",
+    "resolution": "Named native effect rows suppress new duplicate targets. Existing authored MIR effects are never deleted; unfamiliar foreign graphs are not traversed."
+  },
+  "captured_native_input_probe": [
+    {
+      "profile": "base-f210",
+      "differences": [],
+      "work": {
+        "items": 252,
+        "ingredients": 523,
+        "recipes": 217,
+        "recipe_pattern_tests": 576,
+        "owners": 0,
+        "pattern_tests": 9547,
+        "matches": 87,
+        "products": 219
+      }
+    },
+    {
+      "profile": "space-age-f210",
+      "differences": [],
+      "work": {
+        "items": 342,
+        "owners": 2,
+        "products": 1092,
+        "ingredients": 1173,
+        "matches": 711,
+        "recipes": 662,
+        "recipe_pattern_tests": 1622,
+        "pattern_tests": 13625
+      }
+    },
+    {
+      "profile": "k2so-f210",
+      "differences": [
+        {
+          "family": "research_belts",
+          "missing": [
+            "kr-advanced-loader",
+            "kr-loader",
+            "kr-superior-loader",
+            "kr-superior-splitter",
+            "kr-superior-transport-belt",
+            "kr-superior-underground-belt"
+          ],
+          "extra": [],
+          "weights": []
+        },
+        {
+          "family": "research_inserters",
+          "missing": [
+            "kr-superior-inserter",
+            "kr-superior-long-inserter"
+          ],
+          "extra": [],
+          "weights": []
+        },
+        {
+          "family": "research_science_pack_productivity",
+          "missing": [
+            "kr-advanced-tech-card",
+            "kr-advanced-tech-card-cooling",
+            "kr-matter-tech-card",
+            "kr-matter-tech-card-cooling",
+            "kr-singularity-tech-card",
+            "kr-singularity-tech-card-cooling"
+          ],
+          "extra": [],
+          "weights": []
+        }
+      ],
+      "work": {
+        "owners": 2,
+        "recipe_pattern_tests": 3356,
+        "pattern_tests": 23623,
+        "ingredients": 2948,
+        "items": 592,
+        "matches": 905,
+        "products": 2166,
+        "recipes": 1883
+      }
+    },
+    {
+      "profile": "base-f200",
+      "differences": [],
+      "work": {
+        "products": 219,
+        "items": 251,
+        "matches": 87,
+        "owners": 0,
+        "recipes": 217,
+        "ingredients": 523,
+        "recipe_pattern_tests": 576,
+        "pattern_tests": 9509
+      }
+    },
+    {
+      "profile": "space-age-f200",
+      "differences": [],
+      "work": {
+        "matches": 707,
+        "recipe_pattern_tests": 1619,
+        "owners": 2,
+        "recipes": 659,
+        "products": 1084,
+        "items": 340,
+        "ingredients": 1167,
+        "pattern_tests": 13545
+      }
+    }
+  ],
+  "scope": "Host replay of actual captured native inputs; no new Factorio launch. Missing K2 structural/science collector routes remain existing named effects.",
+  "limits": [
+    "Native effect/production/save qualification remains pending MIR4.7.2 handback.",
+    "Structural fallback, additional native-owner expansion, competing-owner settings and undeclared material integrations remain open.",
+    "This is not release or performance qualification."
+  ],
+  "native_execution": false,
+  "release_qualification": false
+}

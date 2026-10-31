@@ -1,0 +1,85 @@
+{
+  "schema": 1,
+  "kind": "MIR5ModernCatalogueNativeEqualityChainV1",
+  "status": "equal-intended-native-output-for-three-private-profiles",
+  "source_commit": "da02530c972d755a03f2641e937e22791255e7a7",
+  "archive": {
+    "path": "build/mir5/k2-catalogue-r01/packages/more-infinite-research_5.0.21000.zip",
+    "sha256": "22A95340965E05885842E136918190862EB4841BFA4900C793E20E0E331504D8",
+    "bytes": 320267,
+    "member_count": 155
+  },
+  "engine": {
+    "version": "2.1.23",
+    "sha256": "FE4A1DA30F322A0D0B8AEB3DF7276332222BAAA143E2352569B723E84B2B9060"
+  },
+  "independent_oracle": {
+    "path": "spec/mir5/inventory/modern-f210-470.json",
+    "sha256": "C37027F17D4F02C50C664739B242D62E29AAE0C68079450FCBA95499DC7EFB79"
+  },
+  "profiles": [
+    {
+      "profile": "base-f210",
+      "added_technologies": 53,
+      "setting_descriptors": 889,
+      "capture_custody": "build/tmp/mir5-modern-base-native-r03",
+      "records": {
+        "native": {
+          "path": "spec/mir5/evidence/modern-base-native.json",
+          "sha256": "5D00D1E81370DF4A3322F9950AE08CC6BE61A584DC37E93D013115BE24A27E8D"
+        },
+        "comparison": {
+          "path": "spec/mir5/evidence/modern-base-comparison.json",
+          "sha256": "162AA713F163925BB51139596DEC9D6E660B7E1A46598CABEE5D03547FB3D550"
+        }
+      }
+    },
+    {
+      "profile": "space-age-f210",
+      "added_technologies": 71,
+      "setting_descriptors": 889,
+      "capture_custody": "build/tmp/mir5-modern-space-age-native-r01",
+      "records": {
+        "native": {
+          "path": "spec/mir5/evidence/modern-space-age-native.json",
+          "sha256": "31112BD02678CE82F2897C454790B2EBA209D54AC13331C28A74795D4D47B7C4"
+        },
+        "comparison": {
+          "path": "spec/mir5/evidence/modern-space-age-comparison.json",
+          "sha256": "62CD92DD12B29E90577024BC0E04EA1356592C30C28FF623BD6295A02CE66F66"
+        }
+      }
+    },
+    {
+      "profile": "k2so-f210",
+      "added_technologies": 75,
+      "setting_descriptors": 889,
+      "capture_custody": "build/tmp/mir5-modern-k2so-native-r01",
+      "records": {
+        "native": {
+          "path": "spec/mir5/evidence/modern-k2so-native.json",
+          "sha256": "1C859D7075254D9B22AC0949D889F4209AF51CC7B95FFFE41AE957EA6FDB08E7"
+        },
+        "comparison": {
+          "path": "spec/mir5/evidence/modern-k2so-comparison.json",
+          "sha256": "2FB637C557EAFB5CABB8CA9A064A9E1655CB2C21B89CF9FD641A851D72E228F9"
+        }
+      }
+    }
+  ],
+  "claims": {
+    "complete_data_settings_comparison": true,
+    "gameplay": false,
+    "save_upgrade": false,
+    "runtime": false,
+    "multiplayer": false,
+    "responsive_menu_performance": false,
+    "release_qualification": false
+  },
+  "limits": [
+    "Exact frozen archive and observed dependency/settings inputs only.",
+    "Eight MIR4 compiler-private mod-data rows and individually identified retired setting targets metadata follow the independent oracle dispositions.",
+    "No gameplay, migrations, runtime, GUI, multiplayer, normal-cost balance or menu performance is established.",
+    "Historical engine editions and other mod profiles remain unqualified."
+  ]
+}

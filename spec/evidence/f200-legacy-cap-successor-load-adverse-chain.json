@@ -1,0 +1,31 @@
+{
+  "schema": 1,
+  "kind": "MIR5NativeContinuityAdverseChainV1",
+  "source": "b7bb54ad897575aec43cc5ad2707810e4d7ca777",
+  "run": {
+    "id": 40005986316,
+    "url": "https://github.com/Julesc013/mir-native-worker/actions/runs/40005986316",
+    "conclusion": "failure"
+  },
+  "custody": "build/mir5/black-glass/incoming/40005986316/black-glass-f200-legacy-caps-40005986316-1",
+  "manifest_members_verified": 53,
+  "published_source_receipt": {
+    "gzip": "spec/mir5/evidence/f200-legacy-cap-successor-load-adverse-published.json.gz",
+    "uncompressed_sha256": "5F1C4FE348176829E667FBCCACA825BED69D4A717E926442938F95DFDEA13FD6"
+  },
+  "failed_upgrade_receipt": {
+    "gzip": "spec/mir5/evidence/f200-legacy-cap-successor-load-adverse-upgrade.json.gz",
+    "uncompressed_sha256": "21C16CD476D983958D41EAE796A4F7A7EDE5DA8CF2DCAEA1E64529DEBE49F0E3"
+  },
+  "failed_upgrade_log": {
+    "gzip": "spec/mir5/evidence/f200-legacy-cap-successor-load-adverse-upgrade.log.gz",
+    "uncompressed_sha256": "DC253B7AEBE9DCC9FA6115E69BEB8D96B1819FF4388559FFC6FDE968405A3846"
+  },
+  "diagnosis": [
+    "Published predecessor completed two native lab levels, saved and passed both byte-identical cold reloads under the unchanged native harness.",
+    "Successor fixture on_load saw the predecessor completed phase before on_configuration_changed and tried to copy a missing successor_player snapshot.",
+    "The revised fixture reconstructs that local witness only when the successor snapshot exists; host controls now invoke successor on_load before configuration_changed.",
+    "This is a fixture lifecycle error, not a demonstrated production migration failure or a successful MIR5 upgrade."
+  ],
+  "release_qualification": false
+}

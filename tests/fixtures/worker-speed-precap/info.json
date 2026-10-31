@@ -1,0 +1,9 @@
+{
+  "name": "mir-fixture-mir5-worker-speed-cap",
+  "version": "0.0.1",
+  "title": "MIR 5 uncapped worker baseline fixture",
+  "author": "MIR maintainers",
+  "description": "Disposable native worker baseline before finite-cap ownership exists.",
+  "factorio_version": "2.1",
+  "dependencies": ["base >= 2.1.23", "more-infinite-research = 5.0.21000"]
+}

@@ -1,0 +1,12 @@
+{
+  "name": "mir-fixture-mir5-library-multiplayer",
+  "version": "0.3.0",
+  "title": "MIR 5 F200 private-credit Library fixture",
+  "author": "MIR maintainers",
+  "description": "F200 metadata for the shared public Library private-credit fixture; use the canonical shared control and settings members.",
+  "factorio_version": "2.0",
+  "dependencies": [
+    "base >= 2.0.77",
+    "more-infinite-research = 5.0.20000"
+  ]
+}

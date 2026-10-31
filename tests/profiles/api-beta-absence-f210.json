@@ -1,0 +1,6 @@
+{
+  "mods": [
+    {"name": "base", "version": "2.1.23", "enabled": true},
+    {"name": "mir-fixture-mir5-api-beta", "version": "0.1.0", "enabled": true}
+  ]
+}

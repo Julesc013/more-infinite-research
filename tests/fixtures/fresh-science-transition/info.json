@@ -1,0 +1,14 @@
+{
+  "name": "mir-fixture-mir5-fresh-science-transition",
+  "version": "0.1.0",
+  "title": "MIR 5 fresh science transition fixture",
+  "author": "MIR maintainers",
+  "description": "Private F210 published-4.7.3 to MIR5 earned science-productivity transition witness.",
+  "factorio_version": "2.1",
+  "dependencies": [
+    "base >= 2.1.23",
+    "space-age",
+    "more-infinite-research >= 4.7.21003",
+    "mir-fixture-mir5-fresh-science-sources = 0.1.0"
+  ]
+}

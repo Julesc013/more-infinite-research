@@ -1,0 +1,12 @@
+{
+  "name": "mir-fixture-mir5-gear-upgrade",
+  "version": "0.2.0",
+  "title": "MIR 5 private relaxed gear upgrade fixture",
+  "author": "MIR maintainers",
+  "description": "Private disposable-save observation of relaxed MIR-owned gear cap state after a published MIR 4.7 seed.",
+  "factorio_version": "2.1",
+  "dependencies": [
+    "base >= 2.1.23",
+    "more-infinite-research = 5.0.21000"
+  ]
+}

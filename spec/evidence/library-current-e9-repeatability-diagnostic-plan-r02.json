@@ -1,0 +1,456 @@
+{
+  "schema": 1,
+  "kind": "MIRBoundedLibraryRepeatabilityDiagnosticPlanV2",
+  "status": "requires-independent-review-not-a-native-result",
+  "review_base_commit": "45733697715eae41039f4cbb317039399ae7b491",
+  "prior_plan": "spec/evidence/library-current-e9-paired-plan-r01.json",
+  "prior_result": "spec/evidence/library-current-e9-r01-native-chain.json",
+  "required_outcome": "Explain or narrow the original same-build UI/resident-memory discrepancies, observe actual cold readiness and compare immediate/60-tick settled rendering before deciding a replacement acceptance protocol.",
+  "host": "BLACKGLASS-WIN1",
+  "engine": {
+    "version": "2.0.77",
+    "path": "D:/Games/Factorio/2.0/bin/x64/factorio.exe",
+    "sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B"
+  },
+  "library": "D:/Projects/Factorio/testmods/2.0",
+  "published": {
+    "version": "4.7.20002",
+    "path": "D:/Projects/Factorio/testmods/2.0/more-infinite-research_4.7.20002.zip",
+    "sha256": "F3943EB4D69CCDAC41BD9F922AD03A5C78F34F22D8E7FA5A88A7A658AB1010B7",
+    "bytes": 1449338
+  },
+  "candidate": {
+    "version": "5.0.20000",
+    "source_commit": "b3bbd8d37b37bfee2e258b3e8a2f223dcf3860b3",
+    "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\packages\\fbb7-all17-r01\\more-infinite-research_5.0.20000.zip",
+    "sha256": "E9D349931E082AD77057C150E3D6093490E4086E84F0FAFECB0ED1257FD5ED4F",
+    "bytes": 692375
+  },
+  "observer": {
+    "name": "mir-fixture-mir5-active-mods-observer_0.1.0.zip",
+    "sha256": "723D1E7721449FC26040E5E6629416767BDC20AD79CF8723115846DB662A1F87"
+  },
+  "profiles": {
+    "published": {
+      "path": "tests/profiles/library-paired-browser-published-f200-2077.json",
+      "sha256": "3CB271B67FCF73D9FB84EF0A5E8E366272288D20DB59159F509BAAEC7007B560"
+    },
+    "candidate": {
+      "path": "tests/profiles/library-paired-browser-current-f200-2077.json",
+      "sha256": "EC0DB58E217CE0D150D316F324F00C7B63D86575DE80DB44450E1E73EEEB8682"
+    }
+  },
+  "public_helpers": [
+    {
+      "path": "tools/Invoke-MultiplayerFixture.ps1",
+      "sha256": "9923F3D0762DD79ACE0C273268EE68E9C19FEA6DED9234570C66270DD58FA6DE"
+    },
+    {
+      "path": "tools/Invoke-MultiplayerSession.ps1",
+      "sha256": "12EA74493D82E5C95B98017722DA967484E99C847001DAF83C1DB9A0F26F5E02"
+    },
+    {
+      "path": "tools/Invoke-NativeFixture.ps1",
+      "sha256": "2BA98D7AC02030E9E170714C2C153A198BD45900DE9C35F66F19080B2C4529AC"
+    },
+    {
+      "path": "tools/commands/workspace/Invoke-MIRDevelopmentHealthHook.ps1",
+      "sha256": "3C9D435EA1A592570AFB2A609705D54747D76FF127FCE05FBE43E10D1A9E21E2"
+    },
+    {
+      "path": "tools/commands/workspace/Optimize-MIRArtifactStorage.ps1",
+      "sha256": "069D52E62E57249451E23F048BFC3C0DE7A3376F1460F2458A4E0DBDD0C76151"
+    },
+    {
+      "path": "tools/commands/workspace/Remove-MIRStaleArtifacts.ps1",
+      "sha256": "5120FAF2D8435D801F8A5252A8FF93756468CE9F6DCC39234E6D81DBA152F80C"
+    },
+    {
+      "path": "tools/commands/workspace/Test-MIRDevelopmentHealth.ps1",
+      "sha256": "D610BE142BF948C2CE5C5BAE4FE29822D84C75114EC5A7BF0A9D6F719CB7CDE1"
+    },
+    {
+      "path": "tools/lib/compatibility/LibraryActivation.ps1",
+      "sha256": "123A2241B895B57217AA969A677FF21BBFB268FE55E9734287883B4D6AE25099"
+    },
+    {
+      "path": "tools/lib/compatibility/ModPortal.ps1",
+      "sha256": "A16344F66A9124C0792614AAD83702603D4C0AD4FE977392C73710B745E74B08"
+    },
+    {
+      "path": "tools/lib/validation/DirectLibraryStartupMeasurement.ps1",
+      "sha256": "D069C014D74E883C249928E812A258E2A2CB34AFE499219CB46A513345C2EC34"
+    },
+    {
+      "path": "tools/lib/validation/ImmutableInputStaging.ps1",
+      "sha256": "B5FBFAC8537B08F9790BD3EE8ACEAAB38EE5CBB8EF005E67E8375DE568BBC12C"
+    },
+    {
+      "path": "tools/lib/validation/NativeProbeCommon.ps1",
+      "sha256": "CC8462A39DE12D0746C8F985D1F86F761CF3EF261B4FA551CFFD092F76D64D71"
+    },
+    {
+      "path": "tools/lib/validation/NativeProbeResources.ps1",
+      "sha256": "A34BD5FE79466B3EDA96F46EC132562192E6A70280901381C8AF560E7AB23328"
+    },
+    {
+      "path": "tools/lib/validation/OwnedProcessMemorySampler.ps1",
+      "sha256": "8786DC06671A7B6ED6F48BD211275C4DA783F65BBB0FCDCE5562104BC3B28124"
+    },
+    {
+      "path": "tools/lib/validation/ResourceGovernor.ps1",
+      "sha256": "B811A1548A6D789F2A7E618999D5087C70E0151E751CCF4C51635D54E6BF04ED"
+    },
+    {
+      "path": "tools/lib/validation/ResponsiveMenuRecord.ps1",
+      "sha256": "7F74EF416DC4C06B85B3479C02DEF13837F9D69420BBE2F88ADAFB8E5E18DFFB"
+    },
+    {
+      "path": "tools/lib/validation/responsive-menu/Invoke-MIRResponsiveMenuActor.ps1",
+      "sha256": "DC4816352962EC14ED443E5865F71FF3F2A989B47DCF4F45916048F1B5A55D55"
+    },
+    {
+      "path": "tools/lib/validation/responsive-menu/MenuObservation.ps1",
+      "sha256": "8423C41478F7AB329E7A385BBD13BB39490E42FB4F98B1D53AA508B583DEC2EC"
+    },
+    {
+      "path": "tools/lib/validation/responsive-menu/OwnedMenuWindow.ps1",
+      "sha256": "554324FF12A7EAC51DAA5438B48CE79A10FC095E546844127F02590A7772ED43"
+    },
+    {
+      "path": "tools/read_library_profiles.py",
+      "sha256": "2C99D50668AB90E3329649447FD156578F1377DA95E6998699D6D401DF583292"
+    }
+  ],
+  "fixture_sources": [
+    {
+      "role": "paired",
+      "name": "mir-fixture-mir5-library-paired-browser",
+      "version": "0.1.0",
+      "canonical_library_archive": false,
+      "members": [
+        {
+          "source": "tests/fixtures/library-paired-browser/info.json",
+          "destination": "info.json",
+          "sha256": "8904B01C651A43C6516B6A91882CD2FCBA09FAE81CB3E0927E3983A59B6C66E1"
+        },
+        {
+          "source": "tests/fixtures/library-paired-browser/settings.lua",
+          "destination": "settings.lua",
+          "sha256": "7AF8A501629784AE7ADC90CDA3D5D3C19BB1C9ADC6EF337698A8CA86FD80C747"
+        },
+        {
+          "source": "tests/fixtures/library-paired-browser/control.lua",
+          "destination": "control.lua",
+          "sha256": "1C5FB2FC558CB0AF7609F41AD92EE96395EC49C0AAA51812B750B3884C6D2E1F"
+        }
+      ]
+    },
+    {
+      "role": "arm-published",
+      "name": "mir-fixture-mir5-library-paired-browser-arm-published",
+      "version": "0.1.0",
+      "canonical_library_archive": false,
+      "members": [
+        {
+          "source": "tests/fixtures/library-paired-browser/arm-published/info.json",
+          "destination": "info.json",
+          "sha256": "DE1C333CE7820FCEEB4B87F69E4AA04607D36D577C45D839ED9E368C26C4AE16"
+        },
+        {
+          "source": "tests/fixtures/library-paired-browser/arm-published/settings-updates.lua",
+          "destination": "settings-updates.lua",
+          "sha256": "317C2D0CC253CA9261154F1A1BFDCB314B81ED5E1436AA27B55ECBF46AECC6DC"
+        }
+      ]
+    },
+    {
+      "role": "arm-mir5",
+      "name": "mir-fixture-mir5-library-paired-browser-arm-mir5",
+      "version": "0.1.0",
+      "canonical_library_archive": false,
+      "members": [
+        {
+          "source": "tests/fixtures/library-paired-browser/arm-mir5/info.json",
+          "destination": "info.json",
+          "sha256": "2BC58CCFD9CF778F664A4C19BD8139C02D4E40C5FD0217C7DDF586DBA9B20D7B"
+        },
+        {
+          "source": "tests/fixtures/library-paired-browser/arm-mir5/settings-updates.lua",
+          "destination": "settings-updates.lua",
+          "sha256": "A6A5D43F245AA94456929FCA57FFBC5D1F81E441EB45011E8E4E1A6F3FD46F00"
+        }
+      ]
+    },
+    {
+      "role": "observer",
+      "name": "mir-fixture-mir5-active-mods-observer",
+      "version": "0.1.0",
+      "canonical_library_archive": true,
+      "members": [
+        {
+          "source": "tests/fixtures/active-mods-observer/info-f200.json",
+          "destination": "info.json",
+          "sha256": "5C4A351958060F5FED504AA86E8C201A2F50A36C2732E624727B5697F216475A"
+        },
+        {
+          "source": "tests/fixtures/active-mods-observer/data-final-fixes.lua",
+          "destination": "data-final-fixes.lua",
+          "sha256": "89D364F0033A7EE036998E6C29A3558099C25AD2707CB24914790C49FB21555C"
+        }
+      ]
+    }
+  ],
+  "schedule": [
+    {
+      "ordinal": 1,
+      "id": "01-warmup-published",
+      "arm": "published",
+      "role": "warmup"
+    },
+    {
+      "ordinal": 2,
+      "id": "02-diagnostic-published",
+      "arm": "published",
+      "role": "diagnostic-control",
+      "pair": 1
+    },
+    {
+      "ordinal": 3,
+      "id": "03-diagnostic-published",
+      "arm": "published",
+      "role": "diagnostic-control",
+      "pair": 1
+    },
+    {
+      "ordinal": 4,
+      "id": "04-diagnostic-published",
+      "arm": "published",
+      "role": "diagnostic-control",
+      "pair": 2
+    },
+    {
+      "ordinal": 5,
+      "id": "05-diagnostic-published",
+      "arm": "published",
+      "role": "diagnostic-control",
+      "pair": 2
+    },
+    {
+      "ordinal": 6,
+      "id": "06-functional-current",
+      "arm": "candidate",
+      "role": "functional-observation-only"
+    }
+  ],
+  "existing_command": {
+    "path": "tools/Invoke-MultiplayerFixture.ps1",
+    "fixed_parameters": {
+      "ArchiveLibrary": "D:/Projects/Factorio/testmods/2.0",
+      "FactorioBin": "D:/Games/Factorio/2.0/bin/x64/factorio.exe",
+      "FixtureCase": "library-paired-browser",
+      "CollectProcessMemoryObservations": true,
+      "SessionExpectedPeakMemoryMiB": 8192
+    },
+    "per_session": "Use the matching exact profile/package and canonical own-archive projections above, with fresh separate output below the one owner packet. Existing private caller is adapted/frozen by Black Glass before native launch. Keep the original preparation, EN-then-DE client order, 120-tick join settlement, graphics/config/cache policy and auto_pause=false. No system cache flushing or forced garbage collection."
+  },
+  "endpoints": {
+    "library": {
+      "roles": [
+        "server",
+        "en",
+        "de"
+      ],
+      "actions": [
+        "first_open",
+        "search",
+        "refresh",
+        "reopen"
+      ],
+      "unit": "milliseconds",
+      "definition": "One native LuaProfiler surrounds two actual public Browser.open calls (one English,one German) per action on each peer. This is native GUI-construction Lua time,not end-to-end input or frame latency.",
+      "reader": "tools/read_library_profiles.py",
+      "logs": "Explicit six per-process stdout logs:initial/restart for server/client-en/client-de. Require all four distinct actions exactly once per role."
+    },
+    "save_ready": {
+      "phases": [
+        "initial",
+        "restart"
+      ],
+      "role": "server",
+      "unit": "seconds",
+      "definition": "Native engine log elapsed seconds at its one ready marker on the first post-load runtime event for the exact prepared seed or closed restart save. This includes engine startup/load to readiness,not menu response or client join time.",
+      "marker": "MIR5_LIBRARY_PAIRED_BROWSER",
+      "required_stage": "ready"
+    },
+    "process_memory": {
+      "phases": [
+        "initial",
+        "restart"
+      ],
+      "roles": [
+        "server",
+        "client-en",
+        "client-de"
+      ],
+      "metrics": [
+        "working_set_bytes",
+        "private_bytes"
+      ],
+      "reduction": "Per-session maximum observed value separately for every phase/role/metric.",
+      "target_interval_milliseconds": 250,
+      "required_status": "complete-observation",
+      "limits": "Observed maxima are not instantaneous OS-proven peaks or retained-memory/leak verdicts."
+    }
+  },
+  "rules": {
+    "diagnostic_control": "Compute all 26 original endpoints for each new session. Compare 02 vs03 and04 vs05 separately using abs(A-B)<=max(.10*mean(A,B),original_absolute_floor). No pooling, exclusions, new tolerance or selective retry.",
+    "absolute_floors": {
+      "library_milliseconds": 5.0,
+      "save_ready_seconds": 0.25,
+      "process_memory_bytes": 67108864
+    },
+    "extensions": 0,
+    "release_qualification": false,
+    "scope": "All six sessions are diagnostic/functional observations. No current-versus-published performance acceptance dataset is collected or claimed by this plan."
+  },
+  "rendering": {
+    "expected_pngs_per_session": 12,
+    "immediate_stages": [
+      "first-open",
+      "search",
+      "refresh",
+      "reopen"
+    ],
+    "additional_stages": [
+      "first-open-settled",
+      "reopen-settled"
+    ],
+    "delay_ticks": 60,
+    "requirements": "Both clients retain the same valid GUI root, original queries/selected details and exact native snapshot. Capture late frames outside every profiler and before the next public action. Native owner visually reviews immediate/settled EN/DE pairs and preserves all hashes. Do not infer settled localization from file existence."
+  },
+  "system_diagnostics": {
+    "cadence_seconds": 1,
+    "maximum_seconds_per_session": 900,
+    "scope": "Diagnostic only; record sampling overhead and missing counters. Freeze the owner collector before launch; no new product instrumentation or general tooling framework.",
+    "required": [
+      "Actual Windows user/host, power-plan identifier and AC/battery status before/after the block.",
+      "Actual engine/observer/profile/archive/helper/fixture/config hashes, wall-clock and monotonic process starts/stops, launch order and phase boundaries.",
+      "At most one lightweight native system sample per second: available/total physical memory, committed memory/commit limit and system CPU time; owned-process CPU time/page-fault counts if supported. Preserve units and actual interval; do not label total page faults as hard faults.",
+      "Read-only process-name/PID/CPU snapshots before/after each session to identify competing work, without credentials, full command lines or environment values.",
+      "Record thermal/clock state only if an existing trustworthy counter is available; otherwise explicitly unavailable."
+    ],
+    "interpretation": "Original traces lack system/power/thermal counters, so no original cause is established. New counter association is evidence for a bounded hypothesis, not proof of causal mechanism. Added diagnostic observation changes the collector and cannot silently become acceptance data."
+  },
+  "quiet_conditions": [
+    "One owned native session at a time;no other Factorio jobs.",
+    "Prepare own fixture archives and run host/build controls before the timed block.",
+    "No local builds,host suites,inference or unrelated heavy work during the complete six-session diagnostic block.",
+    "Keep graphics,observer,engine,Defaults and existing per-client config template behavior unchanged."
+  ],
+  "resources": {
+    "session_expected_peak_memory_mib": 8192,
+    "preparation_peak_memory_mib": 4096,
+    "existing_resource_governor": true,
+    "exclusive_direct_library": true
+  },
+  "existing_diagnosis": {
+    "independent_review": "https://github.com/Julesc013/more-infinite-research/pull/1389#pullrequestreview-5692576976",
+    "verified_raw_bodies": 103,
+    "reconstructed_metric_values": 300,
+    "memory_samples": 7907,
+    "original_missing_endpoint": "save_ready/restart",
+    "original_failed_controls": {
+      "library/server/refresh": {
+        "published": 4.1665,
+        "candidate": 9.8134,
+        "allowance": 5.0,
+        "difference": 5.6469,
+        "within": false,
+        "published_range": [
+          4.1665,
+          4.1665
+        ],
+        "candidate_range": [
+          9.8134,
+          9.8134
+        ]
+      },
+      "library/server/reopen": {
+        "published": 3.5732,
+        "candidate": 21.1248,
+        "allowance": 5.0,
+        "difference": 17.5516,
+        "within": false,
+        "published_range": [
+          3.5732,
+          3.5732
+        ],
+        "candidate_range": [
+          21.1248,
+          21.1248
+        ]
+      },
+      "memory/initial/client-de/working_set_bytes": {
+        "published": 1951870976,
+        "candidate": 1684504576,
+        "allowance": 181818777.60000002,
+        "difference": -267366400,
+        "within": false,
+        "published_range": [
+          1951870976,
+          1951870976
+        ],
+        "candidate_range": [
+          1684504576,
+          1684504576
+        ]
+      },
+      "memory/initial/client-en/working_set_bytes": {
+        "published": 1986506752,
+        "candidate": 1693511680,
+        "allowance": 184000921.60000002,
+        "difference": -292995072,
+        "within": false,
+        "published_range": [
+          1986506752,
+          1986506752
+        ],
+        "candidate_range": [
+          1693511680,
+          1693511680
+        ]
+      }
+    },
+    "published_server_reopen_milliseconds": {
+      "01-warmup-published": 4.0431,
+      "03-control-published": 3.5732,
+      "04-control-published": 21.1248,
+      "05-scored-published": 3.672,
+      "08-scored-published": 21.9912,
+      "09-scored-published": 26.9288,
+      "12-scored-published": 20.6502
+    },
+    "memory_peak_timing": "Failed initial EN/DE resident maxima occur during client loading before the first Browser calls. DE private maximum rises while its resident maximum falls. No inference of a MIR regression follows from identical-published controls."
+  },
+  "failure_path": [
+    "Retain all observations and stop after this six-session schedule or an actual fatal/refused session; no automatic extension or full comparison retry.",
+    "If any endpoint remains missing, fix its narrow observer/reader cause and separately review the changed protocol before later data.",
+    "If either same-build pair fails, use the retained phase/counter/window/load traces to propose one explained conditions or method correction for independent review. Do not lower the original limits or optimize MIR from predecessor-versus-itself noise.",
+    "If settled frames retain incorrect technology titles or other materially required presentation, preserve the defect and make a bounded affected-path correction with native retest.",
+    "Only after independent diagnostic readback may a separate final acceptance schedule be declared. Original R01 failures and all new failures remain discoverable."
+  ],
+  "release_obligations": [
+    "PERF-03/04 repeatability and matched Library/load/process-memory method",
+    "CONT-10 immediate versus settled translation observation"
+  ],
+  "not_closed": [
+    "Retained/churn memory",
+    "F210/Space Age/client/API applicability",
+    "Any current complete release verdict",
+    "Tagging or publication"
+  ],
+  "comparability_limit": "The original R01 public Browser.open calls omit group;the retained screenshots show published All research versus candidate MIR research. Preserve this actual default/scope discrepancy. Do not retrospectively claim matched view/output or accept R01 comparisons. This six-session schedule diagnoses same-published repeatability and observes one current functional case only;any later acceptance protocol must explicitly match and assert the intended view scope before collecting its new dataset.",
+  "prior_diagnostic_adverse": "spec/evidence/library-repeatability-diagnostic-r01-adverse-chain.json",
+  "retry_boundary": "R01 stopped in its first published warmup because immediate/settled wildcard names collide. R02 changes only exact-stage capture matching and its helper pin;same six-session schedule/endpoints/floors/zero extensions. Previous incomplete observations remain adverse and are not pooled."
+}

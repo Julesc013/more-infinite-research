@@ -1,0 +1,290 @@
+{
+  "schema": 1,
+  "kind": "MIR5NativeOwnerCapOrderPreDisabledSourcePreparedInputsV1",
+  "status": "exact-source-fixtures-built-not-native-qualified",
+  "fixture_source_commit": "09a66acc9c613617f95074f23f3fd9a4aab4765b",
+  "fixture_source_tree": "cc99ed1e5a9bb9b392ee5431edf03d92e2d135c2",
+  "package_tool": {
+    "path": "tools/package.py",
+    "sha256": "00ED00D66BD558554068405C8882419F852FC2F66646088052888D70E25DA61E"
+  },
+  "runtime": {
+    "implementation": "cpython",
+    "version": [
+      3,
+      14,
+      7
+    ],
+    "zlib_build_version": "1.3.1.zlib-ng",
+    "zlib_runtime_version": "1.3.1.zlib-ng"
+  },
+  "custody_root": "build/mir5/native-owner-cap-order-pre-disabled-source-09a66acc9-r04",
+  "native_execution": false,
+  "library_mutation": false,
+  "lab_completion": false,
+  "saved_input_hashes": "pending source, canonical, permuted and relaxed server saves",
+  "release_qualification": false,
+  "profiles": [
+    {
+      "stage": "source",
+      "path": "tests/profiles/native-owner-cap-order-source-space-age-f210.json",
+      "sha256": "042D00BAACC4FDEF74B206A889D972CC46574531B01D8862FCEAD5CFCF68CF36",
+      "bytes": 1878
+    },
+    {
+      "stage": "canonical",
+      "path": "tests/profiles/native-owner-cap-order-canonical-space-age-f210.json",
+      "sha256": "2AEA821FCA6F1003EBEA70FDFA635E8A7C2D7F272DE3403D73015A9B9242482D",
+      "bytes": 1881
+    },
+    {
+      "stage": "permuted",
+      "path": "tests/profiles/native-owner-cap-order-permuted-space-age-f210.json",
+      "sha256": "ED9C2455D14804DD6A5E512B93CB92F35332175931DBDDC6324AEB3AE0A39AE3",
+      "bytes": 1851
+    },
+    {
+      "stage": "relaxed",
+      "path": "tests/profiles/native-owner-cap-order-relaxed-space-age-f210.json",
+      "sha256": "5EE6499CE3B0F97B8595438AB3922AD20C745069D74BAB4927EE16CED335B80E",
+      "bytes": 1855
+    }
+  ],
+  "stages": [
+    {
+      "stage": "source",
+      "version": "0.0.1",
+      "archive": "build/mir5/native-owner-cap-order-pre-disabled-source-09a66acc9-r04/fixtures/mir-fixture-mir5-native-owner-cap-order_0.0.1.zip",
+      "sha256": "510626DA637A34BA760DF1D3752CA137E8CC65116A9BD83423FEDC2328A01907",
+      "bytes": 7088,
+      "projection": "build/mir5/native-owner-cap-order-pre-disabled-source-09a66acc9-r04/sources/source",
+      "members": [
+        {
+          "path": "control.lua",
+          "source_path": "tests/fixtures/native-owner-cap-order/source/control.lua",
+          "sha256": "D059A9867574BB746C0F94656552DC97D78CA7BDD3C4EB687E3C60FABF37BF73",
+          "bytes": 87
+        },
+        {
+          "path": "data-final-fixes.lua",
+          "source_path": "tests/fixtures/native-owner-cap-order/source/data-final-fixes.lua",
+          "sha256": "433C79E96E7FF1E7C8FAA54223C964C7C8491A2FA21D2FA9C8D0042E041B5F76",
+          "bytes": 90
+        },
+        {
+          "path": "fixture_control.lua",
+          "source_path": "tests/fixtures/native-owner-cap-order/fixture_control.lua",
+          "sha256": "87F74AE7A4AB6531C06FD9AA0B534501778A48B5A3587B737198CB32DC7F5643",
+          "bytes": 14098
+        },
+        {
+          "path": "fixture_data_final.lua",
+          "source_path": "tests/fixtures/native-owner-cap-order/fixture_data_final.lua",
+          "sha256": "2A1170D98FF2BD22C7B651A12028108CE2956EB99CB7086859EFED63730812F6",
+          "bytes": 2742
+        },
+        {
+          "path": "fixture_settings.lua",
+          "source_path": "tests/fixtures/native-owner-cap-order/fixture_settings.lua",
+          "sha256": "2258FFDD0C105FA2B182BC641014C7D097D597BCC49C4D26DB644493BE9A059D",
+          "bytes": 793
+        },
+        {
+          "path": "info.json",
+          "source_path": "tests/fixtures/native-owner-cap-order/source/info.json",
+          "sha256": "EB96437FF29A2A21ABA2E017590BC393AB461F4BA0ED5340C74583D125D613F7",
+          "bytes": 420
+        },
+        {
+          "path": "settings-updates.lua",
+          "source_path": "tests/fixtures/native-owner-cap-order/source/settings-updates.lua",
+          "sha256": "FB6BDC10640914165E9F493A65E055DAB42D987B3654D275CEDAB83B862F9C5B",
+          "bytes": 88
+        }
+      ]
+    },
+    {
+      "stage": "canonical",
+      "version": "0.1.0",
+      "archive": "build/mir5/native-owner-cap-order-pre-disabled-source-09a66acc9-r04/fixtures/mir-fixture-mir5-native-owner-cap-order_0.1.0.zip",
+      "sha256": "C903D4B2AC0A98AF4CC28B8BB737C07B19CAC72BBB27C8E3B5DC9E780069482D",
+      "bytes": 7085,
+      "projection": "build/mir5/native-owner-cap-order-pre-disabled-source-09a66acc9-r04/sources/canonical",
+      "members": [
+        {
+          "path": "control.lua",
+          "source_path": "tests/fixtures/native-owner-cap-order/canonical/control.lua",
+          "sha256": "9CF81FC24F1FBF81A840B3B83452F047ED93CB0C15460D0ABFA6CC41C88DA168",
+          "bytes": 90
+        },
+        {
+          "path": "data-final-fixes.lua",
+          "source_path": "tests/fixtures/native-owner-cap-order/canonical/data-final-fixes.lua",
+          "sha256": "C4A51DFE3A1094CB27EEFB3A8AE19DED77DB67151D8BB21649799008251203CF",
+          "bytes": 93
+        },
+        {
+          "path": "fixture_control.lua",
+          "source_path": "tests/fixtures/native-owner-cap-order/fixture_control.lua",
+          "sha256": "87F74AE7A4AB6531C06FD9AA0B534501778A48B5A3587B737198CB32DC7F5643",
+          "bytes": 14098
+        },
+        {
+          "path": "fixture_data_final.lua",
+          "source_path": "tests/fixtures/native-owner-cap-order/fixture_data_final.lua",
+          "sha256": "2A1170D98FF2BD22C7B651A12028108CE2956EB99CB7086859EFED63730812F6",
+          "bytes": 2742
+        },
+        {
+          "path": "fixture_settings.lua",
+          "source_path": "tests/fixtures/native-owner-cap-order/fixture_settings.lua",
+          "sha256": "2258FFDD0C105FA2B182BC641014C7D097D597BCC49C4D26DB644493BE9A059D",
+          "bytes": 793
+        },
+        {
+          "path": "info.json",
+          "source_path": "tests/fixtures/native-owner-cap-order/canonical/info.json",
+          "sha256": "18C5D70916C16EA8D5E07FC4144B809361565CD06E547846F5040726195382DE",
+          "bytes": 408
+        },
+        {
+          "path": "settings-updates.lua",
+          "source_path": "tests/fixtures/native-owner-cap-order/canonical/settings-updates.lua",
+          "sha256": "15E941BF99A32F2594AA196F3E9FFC7A61EE919380021F2056E78EBC88030EA8",
+          "bytes": 91
+        }
+      ]
+    },
+    {
+      "stage": "permuted",
+      "version": "0.2.0",
+      "archive": "build/mir5/native-owner-cap-order-pre-disabled-source-09a66acc9-r04/fixtures/mir-fixture-mir5-native-owner-cap-order_0.2.0.zip",
+      "sha256": "DF603E559893BD6DCDE11CCB7AD637A18470457F95EB9476CCB3347B2A0840B7",
+      "bytes": 7091,
+      "projection": "build/mir5/native-owner-cap-order-pre-disabled-source-09a66acc9-r04/sources/permuted",
+      "members": [
+        {
+          "path": "control.lua",
+          "source_path": "tests/fixtures/native-owner-cap-order/permuted/control.lua",
+          "sha256": "2E0D0132924CAA1038445F816425EDA916C3C4FE0201405F5C676B7C500A5049",
+          "bytes": 89
+        },
+        {
+          "path": "data-final-fixes.lua",
+          "source_path": "tests/fixtures/native-owner-cap-order/permuted/data-final-fixes.lua",
+          "sha256": "69836C8813F73CBB55390777883DBEA502A66CA224713761244A782D45651F6A",
+          "bytes": 92
+        },
+        {
+          "path": "fixture_control.lua",
+          "source_path": "tests/fixtures/native-owner-cap-order/fixture_control.lua",
+          "sha256": "87F74AE7A4AB6531C06FD9AA0B534501778A48B5A3587B737198CB32DC7F5643",
+          "bytes": 14098
+        },
+        {
+          "path": "fixture_data_final.lua",
+          "source_path": "tests/fixtures/native-owner-cap-order/fixture_data_final.lua",
+          "sha256": "2A1170D98FF2BD22C7B651A12028108CE2956EB99CB7086859EFED63730812F6",
+          "bytes": 2742
+        },
+        {
+          "path": "fixture_settings.lua",
+          "source_path": "tests/fixtures/native-owner-cap-order/fixture_settings.lua",
+          "sha256": "2258FFDD0C105FA2B182BC641014C7D097D597BCC49C4D26DB644493BE9A059D",
+          "bytes": 793
+        },
+        {
+          "path": "info.json",
+          "source_path": "tests/fixtures/native-owner-cap-order/permuted/info.json",
+          "sha256": "1F1BC79DCA06FE20EFD3232142F2572B96351652C1829288A4C2D62E852652B4",
+          "bytes": 413
+        },
+        {
+          "path": "settings-updates.lua",
+          "source_path": "tests/fixtures/native-owner-cap-order/permuted/settings-updates.lua",
+          "sha256": "66A876A5E6106CD01F994D0C47CD8A15B63546966FEF8757131D32D2F529E2CD",
+          "bytes": 90
+        }
+      ]
+    },
+    {
+      "stage": "relaxed",
+      "version": "0.3.0",
+      "archive": "build/mir5/native-owner-cap-order-pre-disabled-source-09a66acc9-r04/fixtures/mir-fixture-mir5-native-owner-cap-order_0.3.0.zip",
+      "sha256": "4B6D90A3A53F946AE349A35F9F76F75FB7226FECF0ED0D9FCED798C9043FD354",
+      "bytes": 7082,
+      "projection": "build/mir5/native-owner-cap-order-pre-disabled-source-09a66acc9-r04/sources/relaxed",
+      "members": [
+        {
+          "path": "control.lua",
+          "source_path": "tests/fixtures/native-owner-cap-order/relaxed/control.lua",
+          "sha256": "425072E8A3CA1780ACDE8FA78DA6B46BB9822AA2455ECECA942E87D049F70DAB",
+          "bytes": 88
+        },
+        {
+          "path": "data-final-fixes.lua",
+          "source_path": "tests/fixtures/native-owner-cap-order/relaxed/data-final-fixes.lua",
+          "sha256": "EFE48D4CFE1AB0426AF547E014A4D50FFAD64EC48A51F1DCD8E53E0DE601D4D0",
+          "bytes": 91
+        },
+        {
+          "path": "fixture_control.lua",
+          "source_path": "tests/fixtures/native-owner-cap-order/fixture_control.lua",
+          "sha256": "87F74AE7A4AB6531C06FD9AA0B534501778A48B5A3587B737198CB32DC7F5643",
+          "bytes": 14098
+        },
+        {
+          "path": "fixture_data_final.lua",
+          "source_path": "tests/fixtures/native-owner-cap-order/fixture_data_final.lua",
+          "sha256": "2A1170D98FF2BD22C7B651A12028108CE2956EB99CB7086859EFED63730812F6",
+          "bytes": 2742
+        },
+        {
+          "path": "fixture_settings.lua",
+          "source_path": "tests/fixtures/native-owner-cap-order/fixture_settings.lua",
+          "sha256": "2258FFDD0C105FA2B182BC641014C7D097D597BCC49C4D26DB644493BE9A059D",
+          "bytes": 793
+        },
+        {
+          "path": "info.json",
+          "source_path": "tests/fixtures/native-owner-cap-order/relaxed/info.json",
+          "sha256": "C9EEBD9681F7B96D4551008A6AE1B45755E6A5DEB8543D9F5CCA3D11CBF540FD",
+          "bytes": 399
+        },
+        {
+          "path": "settings-updates.lua",
+          "source_path": "tests/fixtures/native-owner-cap-order/relaxed/settings-updates.lua",
+          "sha256": "99C1C65A98B73117AE2BE3EDA694C9362DE2DD66987C1520C0BB3AA26666369C",
+          "bytes": 89
+        }
+      ]
+    }
+  ],
+  "archive_guard": {
+    "status": "all-four-raw-git-source-projections-pass-real-guard",
+    "command": "Assert-MIRLibraryFixtureArchive -Archive <selected archive> -SourceDirectory <seven-member raw Git projection>",
+    "helpers": [
+      {
+        "path": "tools/lib/validation/ImmutableInputStaging.ps1",
+        "committed_sha256": "B5FBFAC8537B08F9790BD3EE8ACEAAB38EE5CBB8EF005E67E8375DE568BBC12C",
+        "executed_worktree_sha256": "B5FBFAC8537B08F9790BD3EE8ACEAAB38EE5CBB8EF005E67E8375DE568BBC12C"
+      },
+      {
+        "path": "tools/lib/compatibility/LibraryActivation.ps1",
+        "committed_sha256": "123A2241B895B57217AA969A677FF21BBFB268FE55E9734287883B4D6AE25099",
+        "executed_worktree_sha256": "123A2241B895B57217AA969A677FF21BBFB268FE55E9734287883B4D6AE25099"
+      }
+    ]
+  },
+  "historical_prepared_inputs": [
+    "spec/evidence/native-owner-cap-order-inputs-5a469182.json",
+    "spec/evidence/native-owner-cap-order-inputs-0ddeb251.json"
+  ],
+  "prior_native_adverse": {
+    "fixture_source": "0ddeb251984d166b075afb6f69367837ffd34dc7",
+    "native_result_sha256": "0A33DF4141BE12D36950606781B34CDAD4D9EF474DC9A3FBB1E010F8AD971D49",
+    "failure": "relaxed foreign foreign native state differs",
+    "primary_terminal": "build/mir5/recovery-historical/native-owner-cap-order-e3-r03/terminal.json",
+    "disposition": "Historical adverse retained separately. The new uncapped source stage is prepared input only and has no claimed native retry outcome."
+  }
+}
