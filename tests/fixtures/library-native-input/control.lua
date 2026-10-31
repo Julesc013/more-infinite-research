@@ -210,6 +210,7 @@ local function report()
   return {schema=1,case="library-native-input-imported110",phase=s.phase,tick=game.tick,
     actual_joins=s.joins,actual_text_events=s.text_events,actual_library_closed_events=s.closed_events,
     actual_library_close_observations=s.close_observations,
+    close_expected=s.close_expected and {phase=s.close_expected.phase,player_index=s.close_expected.player_index,ordinal=s.close_expected.ordinal} or false,
     actual_drag_events=s.drag_events,actual_effect_reset_events=s.reset_events,requested_native_resets=s.requested_resets,actual_removed_events=s.removed_events,
     initial_location=s.initial_location,drag_baseline=s.drag_baseline,drag_events_before=s.drag_events_before,
     private_queries=s.private_queries,en_index=s.en_index or false,de_index=s.de_index or false,
@@ -242,6 +243,12 @@ local function opened_scalar(value, getter)
   if result==nil then return "<absent>" end
   if type(result)=="string" then return result end
   return "<"..type(result)..">"
+end
+local function close_scalar(value)
+  local kind=type(value)
+  if value==nil then return false end
+  if kind=="string" or kind=="number" or kind=="boolean" then return value end
+  return "<"..kind..">"
 end
 local function opened_diagnostic(en, root)
   local opened_ok, opened=pcall(function()return en.opened end)
@@ -405,21 +412,27 @@ script.on_event(defines.events.on_gui_location_changed,function(event)
 end)
 script.on_event(defines.events.on_gui_closed,function(event)
   local s=state();local armed=s.close_expected
-  if not armed or event.player_index~=s.en_index or event.player_index~=armed.player_index
-      or s.phase~=armed.phase or event.gui_type~=defines.gui_type.custom then return end
+  if not armed then return end
   -- The owning mod may have destroyed its root before this observer runs.
-  -- Retain the actual custom-close event before any optional element getter;
-  -- root disappearance without this armed same-player event cannot pass.
-  local row={phase=s.phase,player_index=event.player_index,gui_type=event.gui_type,ordinal=armed.ordinal,
-    element_present=event.element~=nil,accepted=false}
+  -- Retain every armed close event before the original player/phase/type
+  -- admission predicate. Root disappearance alone or an unrelated close cannot
+  -- pass; this row only makes an early rejection native-readable.
+  local actual_player_ok,actual_player=pcall(function()return game.get_player(event.player_index)end)
+  local player_name_ok,player_name=pcall(function()return actual_player and actual_player.name end)
+  local name_ok,name=pcall(function()return event.element and event.element.name end)
+  local row={phase=s.phase,armed_phase=armed.phase,player_index=close_scalar(event.player_index),
+    player_lookup_ok=actual_player_ok,player_name=actual_player_ok and player_name_ok and close_scalar(player_name) or "<getter-error>",armed_player_index=close_scalar(armed.player_index),
+    ordinal=armed.ordinal,tick=game.tick,gui_type=close_scalar(event.gui_type),expected_gui_type=close_scalar(defines.gui_type.custom),element_present=event.element~=nil,
+    element_type=type(event.element),element_name=name_ok and close_scalar(name) or "<getter-error>",accepted=false}
   if #s.close_observations>=8 then fail("declared close observation bound exceeded") end
   s.close_observations[#s.close_observations+1]=row
+  if event.player_index~=s.en_index or event.player_index~=armed.player_index
+      or s.phase~=armed.phase then return end
+  if event.gui_type~=defines.gui_type.custom then return end
   local ok,element_valid=pcall(function()return valid(event.element)end)
   row.element_valid=ok and element_valid==true
   local same_ok,same=pcall(function()return event.element==refs.en_root end)
   row.same_root=same_ok and same==true
-  local name_ok,name=pcall(function()return event.element and event.element.name end)
-  row.element_name=name_ok and type(name)=="string" and name or false
   if row.element_valid and not row.same_root then return end
   local en=player(s.en_index)
   if not row.element_valid and (valid(refs.en_root) or valid(refs.en_query) or valid(en.gui.screen[ROOT])) then return end

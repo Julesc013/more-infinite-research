@@ -1,9 +1,13 @@
 """Independent input-observer controls with native-shaped doubles, not native input evidence."""
 import argparse
+import hashlib
 import json
 from pathlib import Path
+import subprocess
 import sys
+import tempfile
 import unittest
+import zipfile
 
 ROOT = Path(__file__).resolve().parents[1]
 FIXTURE = ROOT / "tests/fixtures/library-native-input"
@@ -19,6 +23,171 @@ def plain(value):
 
 
 class LibraryNativeInputFixtureControls(unittest.TestCase):
+    def test_input_metadata_keeps_required_versions_without_mir_runtime_order_edges(self):
+        historical = "mir-fixture-mir5-migration-origin-f200-110-source"
+        fixture = "mir-fixture-mir5-library-native-input"
+        cases = {
+            "f200": ("2.0.77", "5.0.20000", "0.3.0",
+                      ROOT / "tests/profiles/library-native-input-imported110-f200-2077-r12.json",
+                      FIXTURE / "info-input-identity-f200.json"),
+            "f210": ("2.1.23", "5.0.21000", "0.4.0",
+                      ROOT / "tests/profiles/library-native-input-imported110-f210-2123-r12.json",
+                      FIXTURE / "info-input-identity-f210.json"),
+        }
+        control = (FIXTURE / "control.lua").read_text(encoding="utf-8")
+        self.assertIn(f'require("__{historical}__/catalogue")', control)
+        self.assertIn('script.active_mods["more-infinite-research"]', control)
+        self.assertIn("script.active_mods[historical.fixture]", control)
+        parser = ROOT / "tools/lib/compatibility/LibraryActivation.ps1"
+
+        for target, (base, mir, source_version, profile_path, info_path) in cases.items():
+            with self.subTest(target=target):
+                info = json.loads(info_path.read_text(encoding="utf-8"))
+                profile = json.loads(profile_path.read_text(encoding="utf-8"))
+                expected_dependencies = [
+                    f"base = {base}",
+                    f"~ more-infinite-research = {mir}",
+                    f"~ {historical} = {source_version}",
+                ]
+                self.assertEqual(info["dependencies"], expected_dependencies)
+                self.assertEqual(
+                    [(row["name"], row["version"], row["enabled"]) for row in profile["mods"]],
+                    [
+                        ("base", base, True),
+                        ("mir-fixture-mir5-active-mods-observer", "0.1.0", True),
+                        ("more-infinite-research", mir, True),
+                        (historical, source_version, True),
+                        (fixture, "0.3.0", True),
+                    ],
+                )
+                # Factorio orders runtime handlers by dependency depth then natural
+                # mod name.  The two order-neutral required rows leave this observer
+                # at base depth, before MIR and the historical fixture.
+                order = [
+                    "base",
+                    "mir-fixture-mir5-active-mods-observer",
+                    fixture,
+                    "more-infinite-research",
+                    historical,
+                ]
+                self.assertLess(order.index(fixture), order.index("more-infinite-research"))
+                self.assertLess(order.index(fixture), order.index(historical))
+
+                def quote(path):
+                    return str(path).replace("'", "''")
+
+                command = f"""
+                    $ErrorActionPreference = 'Stop'
+                    . '{quote(parser)}'
+                    $info = Get-Content -Raw -LiteralPath '{quote(info_path)}' | ConvertFrom-Json -AsHashtable
+                    $profile = Get-Content -Raw -LiteralPath '{quote(profile_path)}' | ConvertFrom-Json -AsHashtable
+                    $rows = @($info.dependencies | ForEach-Object {{ ConvertFrom-MIRDependencyString -Dependency $_ }})
+                    if ($rows.Count -ne 3 -or $rows[0].kind -cne 'required' -or -not $rows[0].required) {{ throw 'base dependency is not required' }}
+                    foreach ($row in @($rows[1], $rows[2])) {{
+                      if ($row.kind -cne 'no_order' -or -not $row.required) {{ throw 'order-neutral dependency is not required' }}
+                    }}
+                    $selected = [Collections.Generic.List[object]]::new()
+                    foreach ($row in @($profile.mods)) {{
+                      $metadata = if ($row.name -ceq '{fixture}') {{ $info }} else {{ @{{ dependencies = @() }} }}
+                      $selected.Add([pscustomobject]@{{ name = $row.name; version = $row.version; info = $metadata }})
+                    }}
+                    Assert-MIRLibraryDependencies -Selected $selected.ToArray()
+                """
+                completed = subprocess.run(
+                    ["pwsh", "-NoProfile", "-NonInteractive", "-Command", command],
+                    capture_output=True,
+                    text=True,
+                    check=False,
+                )
+                self.assertEqual(completed.returncode, 0, completed.stdout + completed.stderr)
+
+    def test_order_neutral_input_archives_use_the_canonical_two_member_policy(self):
+        record = json.loads(
+            (ROOT / "spec/evidence/library-input-order-neutral-prepared-r01.json").read_text(encoding="utf-8")
+        )
+        fixture = "mir-fixture-mir5-library-native-input_0.3.0"
+        cases = {
+            "f200": "tests/fixtures/library-native-input/info-input-identity-f200.json",
+            "f210": "tests/fixtures/library-native-input/info-input-identity-f210.json",
+        }
+        revision = subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=ROOT, text=True).strip()
+
+        def raw_git_head(path):
+            return subprocess.check_output(["git", "show", f"{revision}:{path}"], cwd=ROOT)
+
+        def write_archive(output, members):
+            with zipfile.ZipFile(
+                output, "w", compression=zipfile.ZIP_DEFLATED, compresslevel=9
+            ) as archive:
+                for destination, contents in members:
+                    entry = zipfile.ZipInfo(
+                        f"{fixture}/{destination}", date_time=(1980, 1, 1, 0, 0, 0)
+                    )
+                    entry.create_system = 3
+                    entry.external_attr = 0o100644 << 16
+                    entry.compress_type = zipfile.ZIP_DEFLATED
+                    archive.writestr(entry, contents, compresslevel=9)
+
+        with tempfile.TemporaryDirectory() as temporary:
+            temporary = Path(temporary)
+            for target, info_source in cases.items():
+                with self.subTest(target=target):
+                    profile = next(
+                        row
+                        for row in record["profiles"]
+                        if row["target"] == target and row["mode"] == "input"
+                    )
+                    members = {row["destination"]: row for row in profile["owned_fixture"]["members"]}
+                    self.assertEqual(set(members), {"control.lua", "info.json"})
+                    self.assertEqual(members["control.lua"]["source"], "tests/fixtures/library-native-input/control.lua")
+                    self.assertEqual(members["info.json"]["source"], info_source)
+                    control = raw_git_head(members["control.lua"]["source"])
+                    info = raw_git_head(members["info.json"]["source"])
+                    for destination, contents in (("control.lua", control), ("info.json", info)):
+                        self.assertEqual(len(contents), members[destination]["bytes"])
+                        self.assertEqual(
+                            hashlib.sha256(contents).hexdigest().upper(),
+                            members[destination]["sha256"],
+                        )
+
+                    output = temporary / f"{target}.zip"
+                    write_archive(output, (("control.lua", control), ("info.json", info)))
+                    raw = output.read_bytes()
+                    self.assertEqual(len(raw), profile["owned_fixture"]["bytes"])
+                    self.assertEqual(
+                        hashlib.sha256(raw).hexdigest().upper(), profile["owned_fixture"]["sha256"]
+                    )
+                    self.assertEqual(
+                        profile["archive_sha256"]["mir-fixture-mir5-library-native-input_0.3.0.zip"],
+                        profile["owned_fixture"]["sha256"],
+                    )
+                    with zipfile.ZipFile(output) as archive:
+                        infos = archive.infolist()
+                        self.assertEqual(
+                            [entry.filename for entry in infos],
+                            [f"{fixture}/control.lua", f"{fixture}/info.json"],
+                        )
+                        for entry in infos:
+                            self.assertEqual(entry.date_time, (1980, 1, 1, 0, 0, 0))
+                            self.assertEqual(entry.create_system, 3)
+                            self.assertEqual(entry.external_attr, 0o100644 << 16)
+                            self.assertEqual(entry.compress_type, zipfile.ZIP_DEFLATED)
+                    if target == "f200":
+                        self.assertEqual(len(raw), 7996)
+                        self.assertEqual(
+                            hashlib.sha256(raw).hexdigest().upper(),
+                            "6BD418D9EE0B6DE418B1C6BD8835B8E405779F250EB637221AED2B5F451B9C38",
+                        )
+                        crlf_checkout = temporary / "crlf-checkout-control.lua"
+                        crlf_checkout.write_bytes(control.replace(b"\n", b"\r\n"))
+                        self.assertNotEqual(crlf_checkout.read_bytes(), control)
+                        crlf_output = temporary / "f200-crlf-checkout.zip"
+                        write_archive(
+                            crlf_output,
+                            (("control.lua", crlf_checkout.read_bytes()), ("info.json", info)),
+                        )
+                        self.assertNotEqual(crlf_output.read_bytes(), raw)
+
     def setUp(self):
         self.lua = LuaRuntime(unpack_returned_tuples=True)
         self.lua.globals().observer_path = (FIXTURE / "control.lua").as_posix()
@@ -437,6 +606,30 @@ class LibraryNativeInputFixtureControls(unittest.TestCase):
                     self.assertFalse(result["ok"], result["message"])
                     self.assertIn("actual key did not retire", result["message"])
                     self.assertEqual(result["saves"], {})
+
+    def test_armed_close_retains_raw_scalars_before_player_phase_and_custom_type_filters(self):
+        for target in ("f200", "f210"):
+            for opponent, actual_player, actual_name, actual_type in (
+                ("wrong-close-type", 0, "MIR5English", 1),
+                ("wrong-close-player", 2, "MIR5Deutsch", 99),
+            ):
+                with self.subTest(target=target, opponent=opponent):
+                    result = self.run_case(target, opponent)
+                    self.assertFalse(result["ok"], result["message"])
+                    self.assertEqual(result["final"]["phase"], "escape")
+                    self.assertEqual(result["final"]["close_expected"], {"phase": "escape", "player_index": 0, "ordinal": 1})
+                    observations = result["final"]["actual_library_close_observations"]
+                    self.assertEqual(len(observations), 1)
+                    row = observations[0]
+                    self.assertEqual(
+                        (row["phase"], row["armed_phase"], row["player_index"], row["player_lookup_ok"], row["player_name"], row["armed_player_index"], row["ordinal"]),
+                        ("escape", "escape", actual_player, True, actual_name, 0, 1),
+                    )
+                    self.assertIsInstance(row["tick"], int)
+                    self.assertEqual((row["gui_type"], row["expected_gui_type"], row["element_type"], row["element_name"]),
+                                     (actual_type, 99, "table", "mir_research_browser"))
+                    self.assertTrue(row["element_present"])
+                    self.assertFalse(row["accepted"])
 
     def test_arm_close_retains_safe_opened_scalars_when_ownership_is_absent(self):
         expected = {
