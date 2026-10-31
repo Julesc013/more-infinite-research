@@ -342,6 +342,36 @@ function Start-MIRPackageLibraryActivation {
   return Start-MIRLibraryActivation @activation
 }
 
+function Test-MIRLibraryJsonElementEquivalent {
+  param([Parameter(Mandatory)][System.Text.Json.JsonElement]$Left,[Parameter(Mandatory)][System.Text.Json.JsonElement]$Right)
+  if($Left.ValueKind-ne$Right.ValueKind){return $false}
+  switch($Left.ValueKind){
+    Object {
+      $leftProperties=@($Left.EnumerateObject());$rightProperties=@($Right.EnumerateObject())
+      if($leftProperties.Count-ne$rightProperties.Count){return $false}
+      $leftValues=[Collections.Generic.Dictionary[string,System.Text.Json.JsonElement]]::new([StringComparer]::Ordinal)
+      foreach($property in $leftProperties){if($leftValues.ContainsKey($property.Name)){return $false};$leftValues.Add($property.Name,$property.Value)}
+      $rightNames=[Collections.Generic.HashSet[string]]::new([StringComparer]::Ordinal)
+      foreach($property in $rightProperties){
+        if(-not$rightNames.Add($property.Name)-or-not$leftValues.ContainsKey($property.Name)){return $false}
+        if(-not(Test-MIRLibraryJsonElementEquivalent -Left $leftValues[$property.Name] -Right $property.Value)){return $false}
+      }
+      return $true
+    }
+    Array {
+      if($Left.GetArrayLength()-ne$Right.GetArrayLength()){return $false}
+      for($index=0;$index-lt$Left.GetArrayLength();$index++){if(-not(Test-MIRLibraryJsonElementEquivalent -Left $Left[$index] -Right $Right[$index])){return $false}}
+      return $true
+    }
+    String {return [StringComparer]::Ordinal.Equals($Left.GetString(),$Right.GetString())}
+    Number {return $Left.GetRawText()-ceq$Right.GetRawText()}
+    True {return $true}
+    False {return $true}
+    Null {return $true}
+    default {return $false}
+  }
+}
+
 function Assert-MIRLibraryFixtureArchive {
   param([Parameter(Mandatory)][string]$Archive,[Parameter(Mandatory)][string]$SourceDirectory)
   Assert-MIRLibraryPath $SourceDirectory
@@ -356,7 +386,23 @@ function Assert-MIRLibraryFixtureArchive {
       Assert-MIRLibraryPath $file.FullName
       $relative=[IO.Path]::GetRelativePath($SourceDirectory,$file.FullName).Replace('\','/')
       $entry=$zip.GetEntry($info.name+'_'+$info.version+'/'+$relative)
-      if($null-eq$entry-or$entry.Length-ne$file.Length){throw "[mir-library-fixture-member] $relative"}
+      if($null-eq$entry){throw "[mir-library-fixture-member] $relative"}
+      if($relative-ceq'info.json'){
+        if($entry.Length-gt1048576-or$file.Length-gt1048576){throw "[mir-library-fixture-member] $relative"}
+        $sourceStream=$null;$archiveStream=$null;$sourceDocument=$null;$archiveDocument=$null
+        $metadataMatches=$false
+        try{
+          $sourceStream=[IO.File]::OpenRead($file.FullName);$archiveStream=$entry.Open()
+          $sourceDocument=[System.Text.Json.JsonDocument]::Parse($sourceStream);$archiveDocument=[System.Text.Json.JsonDocument]::Parse($archiveStream)
+          $metadataMatches=Test-MIRLibraryJsonElementEquivalent -Left $sourceDocument.RootElement -Right $archiveDocument.RootElement
+        }catch{throw "[mir-library-fixture-json] $relative"}finally{
+          if($null-ne$sourceDocument){$sourceDocument.Dispose()};if($null-ne$archiveDocument){$archiveDocument.Dispose()}
+          if($null-ne$sourceStream){$sourceStream.Dispose()};if($null-ne$archiveStream){$archiveStream.Dispose()}
+        }
+        if(-not$metadataMatches){throw "[mir-library-fixture-metadata] $relative"}
+        continue
+      }
+      if($entry.Length-ne$file.Length){throw "[mir-library-fixture-member] $relative"}
       $stream=$entry.Open()
       try{$hash=[Convert]::ToHexString([Security.Cryptography.SHA256]::HashData($stream))}finally{$stream.Dispose()}
       if($hash-cne(Get-MIRImmutableInputSha256 $file.FullName)){throw "[mir-library-fixture-source] $relative"}
