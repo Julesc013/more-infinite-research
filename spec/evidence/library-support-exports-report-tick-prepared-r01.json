@@ -1,7 +1,8 @@
 {
   "schema": 1,
-  "kind": "MIRLibrarySupportExportsReportTickPreparedV1",
-  "status": "prepared-not-native-qualified",
+  "kind": "MIRLibraryClientIdentityPreparedInputsV1",
+  "status": "fixture-prepared-not-native-qualified",
+  "fixture_source": "7122f73ee9ae50dc395e7b6d295ea7fda3e24117",
   "fixture_implementation_commit": "7122f73ee9ae50dc395e7b6d295ea7fda3e24117",
   "fixture_base": "1828efee31e39937e82a21d47483d83a85c98e33",
   "player_source_commit": "42032477d45ced683e72736a4fe30a7a3195b995",
@@ -13,6 +14,16 @@
     ],
     "disposition": "The r04 profiles and all earlier support-export records remain historical inputs. This separate report-clock preparation neither alters them nor qualifies a native result."
   },
+  "superseded_static_preparation": {
+    "commit": "8e2f71200e66e3c4116c0672b6ecfbae1292f2fd",
+    "record_sha256": "068001905A1CE231D1E737F8B1111AC091A0A3F239E4F074D0FF0B41807787D8",
+    "record_bytes": 7673,
+    "archive_sha256": {
+      "f200": "4D0DBC5592E687B5E8C502BC8D45BCA11801D23CC9B2F44E65313D41168C4376",
+      "f210": "B073CCE296F160B3AA2B99389B20462812521E7712293C5090E6D96830652C48"
+    },
+    "disposition": "The original static record and its canonical raw-Git archive hashes remain retained at the prior commit. This forward correction changes only the compatible prepared-record header and the established control/info/support-exports member order."
+  },
   "prior_adverse": {
     "case": "library-support-exports-f210-r06",
     "controller": "build/qualification/library-support-exports-f210-r06-controller",
@@ -21,8 +32,8 @@
   "canonical_archive_policy": {
     "member_order": [
       "control.lua",
-      "support-exports.lua",
-      "info.json"
+      "info.json",
+      "support-exports.lua"
     ],
     "compression": "DEFLATE level 9",
     "timestamp": "1980-01-01T00:00:00",
@@ -37,7 +48,7 @@
       "profile": {
         "path": "tests/profiles/library-support-exports-imported110-f200-2077-r05.json",
         "bytes": 2598,
-        "sha256": "F801D58BECDADF99E37871AD3B386CDFD0EA2E7E9BF6690A103603A08FB136CD"
+        "sha256": "44E677291F8D1A28D4552111741BD4DE1341F8EECDA9E332092881231F0C675A"
       },
       "engine": {
         "version": "2.0.77",
@@ -52,12 +63,12 @@
         "more-infinite-research_5.0.20000.zip": "7CAC54475107736106D84AF98D50A8622E095B6658F1E3682643FE0CBA8BAEF0",
         "mir-fixture-mir5-active-mods-observer_0.1.0.zip": "723D1E7721449FC26040E5E6629416767BDC20AD79CF8723115846DB662A1F87",
         "mir-fixture-mir5-migration-origin-f200-110-source_0.3.0.zip": "D30D00A0D57A2A8195565E52DCEFDF94B92DCBA37DC85A83B37245336157E9C0",
-        "mir-fixture-mir5-library-native-input_0.4.0.zip": "4D0DBC5592E687B5E8C502BC8D45BCA11801D23CC9B2F44E65313D41168C4376"
+        "mir-fixture-mir5-library-native-input_0.4.0.zip": "EA0BCAB6E79964151B4C6D3A7312753259E52475C2EC189B3C7F7FB1A97E04E4"
       },
       "owned_fixture": {
         "name": "mir-fixture-mir5-library-native-input_0.4.0.zip",
         "bytes": 12541,
-        "sha256": "4D0DBC5592E687B5E8C502BC8D45BCA11801D23CC9B2F44E65313D41168C4376",
+        "sha256": "EA0BCAB6E79964151B4C6D3A7312753259E52475C2EC189B3C7F7FB1A97E04E4",
         "members": [
           {
             "source": "tests/fixtures/library-native-input/control.lua",
@@ -68,20 +79,20 @@
             "sha256": "5A4E9CC8C5E52C2E0AFF2388528DA5922A6529CB70A512CCD5ED16250C078DD6"
           },
           {
-            "source": "tests/fixtures/library-native-input/support-exports.lua",
-            "source_revision": "7122f73ee9ae50dc395e7b6d295ea7fda3e24117",
-            "git_blob": "3a09e7976d0687046587321782dd5da45e0fa758",
-            "destination": "support-exports.lua",
-            "bytes": 14606,
-            "sha256": "E0D6104B42EBD5EC4217D55889C6527D7243A78BDAE0D5F1F3EE79BB11B0E88C"
-          },
-          {
             "source": "tests/fixtures/library-native-input/info-exports-identity-f200.json",
             "source_revision": "7122f73ee9ae50dc395e7b6d295ea7fda3e24117",
             "git_blob": "fa89f13f89c4542c7c8ada9606b57d384614c7d8",
             "destination": "info.json",
             "bytes": 348,
             "sha256": "CB5FC6B73C0F6E8C45EA5046F3334EFC03B0518EBEEA24C2FD9A02B595CCAD74"
+          },
+          {
+            "source": "tests/fixtures/library-native-input/support-exports.lua",
+            "source_revision": "7122f73ee9ae50dc395e7b6d295ea7fda3e24117",
+            "git_blob": "3a09e7976d0687046587321782dd5da45e0fa758",
+            "destination": "support-exports.lua",
+            "bytes": 14606,
+            "sha256": "E0D6104B42EBD5EC4217D55889C6527D7243A78BDAE0D5F1F3EE79BB11B0E88C"
           }
         ]
       }
@@ -92,7 +103,7 @@
       "profile": {
         "path": "tests/profiles/library-support-exports-imported110-f210-2123-r05.json",
         "bytes": 2598,
-        "sha256": "C6C3B5EC1202640D7506118A844BFF3DE50E6BFA9D14B785D77341DCB6BE268D"
+        "sha256": "2516353273AF4CC097F6448309D4E0C9C492ACD4B5C0E91BDBCFCB5F7303A105"
       },
       "engine": {
         "version": "2.1.23",
@@ -107,12 +118,12 @@
         "more-infinite-research_5.0.21000.zip": "B63743C36432E4C41CC0F56D5A48CABE81924D426EF11045095A9D5ED0430D7B",
         "mir-fixture-mir5-active-mods-observer_0.1.0.zip": "A15A7D628D66953D2E0C4D4FA288F47CBF9C5678327C7EB3D23ADB5DC78331C0",
         "mir-fixture-mir5-migration-origin-f200-110-source_0.4.0.zip": "E07DF42B2FBFACEA5BA32F3E616AF5BBFAB4E355B116187DC023252CFCD09B43",
-        "mir-fixture-mir5-library-native-input_0.4.0.zip": "B073CCE296F160B3AA2B99389B20462812521E7712293C5090E6D96830652C48"
+        "mir-fixture-mir5-library-native-input_0.4.0.zip": "6607A34C90CD4771EF0CD65A32AC7045CBB64F46B2FE70A6BAE7D6F2924DDE3B"
       },
       "owned_fixture": {
         "name": "mir-fixture-mir5-library-native-input_0.4.0.zip",
         "bytes": 12540,
-        "sha256": "B073CCE296F160B3AA2B99389B20462812521E7712293C5090E6D96830652C48",
+        "sha256": "6607A34C90CD4771EF0CD65A32AC7045CBB64F46B2FE70A6BAE7D6F2924DDE3B",
         "members": [
           {
             "source": "tests/fixtures/library-native-input/control.lua",
@@ -123,20 +134,20 @@
             "sha256": "5A4E9CC8C5E52C2E0AFF2388528DA5922A6529CB70A512CCD5ED16250C078DD6"
           },
           {
-            "source": "tests/fixtures/library-native-input/support-exports.lua",
-            "source_revision": "7122f73ee9ae50dc395e7b6d295ea7fda3e24117",
-            "git_blob": "3a09e7976d0687046587321782dd5da45e0fa758",
-            "destination": "support-exports.lua",
-            "bytes": 14606,
-            "sha256": "E0D6104B42EBD5EC4217D55889C6527D7243A78BDAE0D5F1F3EE79BB11B0E88C"
-          },
-          {
             "source": "tests/fixtures/library-native-input/info-exports-identity-f210.json",
             "source_revision": "7122f73ee9ae50dc395e7b6d295ea7fda3e24117",
             "git_blob": "e8095aa968f42beaf9fa72fbc78cb6ec7b7b2fcf",
             "destination": "info.json",
             "bytes": 348,
             "sha256": "53401B449105C11B80FF69667665EAB03E6FBC3D68A855D353D172A28D0FD78D"
+          },
+          {
+            "source": "tests/fixtures/library-native-input/support-exports.lua",
+            "source_revision": "7122f73ee9ae50dc395e7b6d295ea7fda3e24117",
+            "git_blob": "3a09e7976d0687046587321782dd5da45e0fa758",
+            "destination": "support-exports.lua",
+            "bytes": 14606,
+            "sha256": "E0D6104B42EBD5EC4217D55889C6527D7243A78BDAE0D5F1F3EE79BB11B0E88C"
           }
         ]
       }

@@ -222,7 +222,7 @@ class LibraryNativeInputFixtureControls(unittest.TestCase):
                     self.assertEqual(profile["archive_sha256"], row["archive_sha256"])
                     self.assertEqual(profile["archive_sha256"][owned["name"]], owned["sha256"])
                     self.assertEqual([member["destination"] for member in owned["members"]], [
-                        "control.lua", "support-exports.lua", "info.json"
+                        "control.lua", "info.json", "support-exports.lua"
                     ])
                     contents = []
                     for member in owned["members"]:
