@@ -310,8 +310,15 @@ class LibraryTests(unittest.TestCase):
         self.lua.execute(r'''
           boot_native_events()
           assert(native_handlers.events[1] == nil and native_ticks[1] == nil)
+          local model = require("presentation.library_model")
+          local original_rows, row_calls = model.rows, 0
+          model.rows = function(...)
+            row_calls = row_calls + 1
+            return original_rows(...)
+          end
           local root = open_routed({status=4,selected=gear.name})
           assert(queued_rows() == 1)
+          local initial_rows = row_calls
           assert(type(native_handlers.events[1]) == "function", "open Library did not subscribe to native research")
           local query = root["mir_library_filters"]["mir_library_query"]
           -- The callback can precede the final native queue transition.
@@ -319,18 +326,24 @@ class LibraryTests(unittest.TestCase):
           native_handlers.events[3]({research=gear})
           native_handlers.events[7]({force=player.force})
           assert(queued_rows() == 1 and type(native_ticks[1]) == "function")
+          assert(row_calls == initial_rows,
+            "research-event bursts must defer catalogue work until the coalesced refresh tick")
           gear.level = 4
           player.force.research_queue, player.force.current_research, player.force.research_progress = {},nil,0
           local queue = player.force.research_queue
           native_ticks[1]({tick=1})
           assert(queued_rows() == 0 and native_ticks[1] == nil)
+          assert(row_calls == initial_rows + 1,
+            "one coalesced research-event burst must rebuild the catalogue only once")
           assert(player.gui.screen["mir_research_browser"] == root
             and root["mir_library_filters"]["mir_library_query"] == query and query.valid)
           assert(player.force.research_queue == queue and player.force.current_research == nil
             and player.force.research_progress == 0 and gear.level == 4)
           native_handlers.events[2]({player_index=1,element=root})
           for _, id in ipairs({1,3,4,5,6,7}) do assert(native_handlers.events[id] == nil) end
-          assert(native_ticks[1] == nil and not library.native_subscription_needs())
+          assert(native_ticks[1] == nil and not library.native_subscription_needs()
+            and row_calls == initial_rows + 1,
+            "closing a settled view must leave no recurring catalogue work")
         ''')
 
     def test_pending_native_view_refresh_reconstructs_after_cold_load_without_game_or_save_writes(self):
