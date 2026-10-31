@@ -438,6 +438,30 @@ class LibraryNativeInputFixtureControls(unittest.TestCase):
                     self.assertIn("actual key did not retire", result["message"])
                     self.assertEqual(result["saves"], {})
 
+    def test_armed_close_retains_raw_scalars_before_player_phase_and_custom_type_filters(self):
+        for target in ("f200", "f210"):
+            for opponent, actual_player, actual_name, actual_type in (
+                ("wrong-close-type", 0, "MIR5English", 1),
+                ("wrong-close-player", 2, "MIR5Deutsch", 99),
+            ):
+                with self.subTest(target=target, opponent=opponent):
+                    result = self.run_case(target, opponent)
+                    self.assertFalse(result["ok"], result["message"])
+                    self.assertEqual(result["final"]["phase"], "escape")
+                    self.assertEqual(result["final"]["close_expected"], {"phase": "escape", "player_index": 0, "ordinal": 1})
+                    observations = result["final"]["actual_library_close_observations"]
+                    self.assertEqual(len(observations), 1)
+                    row = observations[0]
+                    self.assertEqual(
+                        (row["phase"], row["armed_phase"], row["player_index"], row["player_lookup_ok"], row["player_name"], row["armed_player_index"], row["ordinal"]),
+                        ("escape", "escape", actual_player, True, actual_name, 0, 1),
+                    )
+                    self.assertIsInstance(row["tick"], int)
+                    self.assertEqual((row["gui_type"], row["expected_gui_type"], row["element_type"], row["element_name"]),
+                                     (actual_type, 99, "table", "mir_research_browser"))
+                    self.assertTrue(row["element_present"])
+                    self.assertFalse(row["accepted"])
+
     def test_arm_close_retains_safe_opened_scalars_when_ownership_is_absent(self):
         expected = {
             "opened-nil": (("opened_type=nil", "opened_is_root=false", "opened_name=<absent>", "opened_mod=<absent>"),
