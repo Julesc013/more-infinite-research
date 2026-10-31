@@ -64,9 +64,22 @@ function Get-PreviewControls([string]$Library) {
 }
 function Assert-PreviewBuildPath([string]$Path,[string]$Context) {
   $full=[IO.Path]::GetFullPath($Path)
-  $buildRoot=[IO.Path]::GetFullPath((Join-Path $repo 'build/qualification')).TrimEnd('\','/')
-  $prefix=$buildRoot+[IO.Path]::DirectorySeparatorChar
-  if(-not$full.StartsWith($prefix,[StringComparison]::OrdinalIgnoreCase)){throw "$Context must be a unique path below build/qualification: $full"}
+  $allowedRoots=if($Context-ceq'InputRoot'){@([IO.Path]::GetFullPath((Join-Path $repo 'build/qualification')).TrimEnd('\','/'))}
+    elseif($Context-ceq'OutputRoot'){@([IO.Path]::GetFullPath((Join-Path $repo 'build/tmp')).TrimEnd('\','/'),[IO.Path]::GetFullPath((Join-Path $repo 'build/p')).TrimEnd('\','/'))}
+    else{throw "Unknown preview path context: $Context"}
+  $buildRoot=$null
+  foreach($candidateRoot in $allowedRoots){
+    if($full.StartsWith($candidateRoot+[IO.Path]::DirectorySeparatorChar,[StringComparison]::OrdinalIgnoreCase)){$buildRoot=$candidateRoot;break}
+  }
+  if(-not$buildRoot){
+    $allowedText=if($Context-ceq'InputRoot'){'build/qualification'}else{'build/tmp or build/p'}
+    throw "$Context must be a unique path below ${allowedText}: $full"
+  }
+  $existingTarget=Get-Item -LiteralPath $full -Force -ErrorAction SilentlyContinue
+  if($null-ne$existingTarget){
+    if(-not$existingTarget.PSIsContainer){throw "$Context must be a directory when it already exists: $full"}
+    Assert-MIRLibraryPath $full
+  }
   $parent=[IO.Path]::GetDirectoryName($full)
   while($parent -and $parent.StartsWith($buildRoot,[StringComparison]::OrdinalIgnoreCase)){
     if(Test-Path -LiteralPath $parent -PathType Container){Assert-MIRLibraryPath $parent}
@@ -232,7 +245,7 @@ $leaseSources=@(
   [ordered]@{file_name='mir-fixture-mir5-api-beta_0.1.0.zip';source_path=$apiBeta;sha256=[string]$plan.api_beta.sha256},
   [ordered]@{file_name=$fixtureName+'_0.3.0.zip';source_path=$fixtureArchive;sha256=[string]$plan.library_fixture.sha256}
 )
-$result=[ordered]@{schema=1;kind='MIRLibraryRestorationPreviewNativeResultV1';status='started';plan_sha256=$ExpectedPlanSha256.ToUpperInvariant();source_head=$sourceHead;engine=$plan.engine;profile=$plan.profile;native_execution=$true;release_qualification=$false;visual_review=$false;archive_lease=$null;runner_status=$null;failure=$null}
+$result=[ordered]@{schema=1;kind='MIRLibraryRestorationPreviewNativeResultV1';status='started';plan_sha256=$ExpectedPlanSha256.ToUpperInvariant();source_head=$sourceHead;engine=$plan.engine;profile=$plan.profile;runner_invoked=$false;native_execution_succeeded=$false;release_qualification=$false;visual_review=$false;archive_lease=$null;runner_status=$null;failure=$null}
 $lease=$null;$failure=$null
 try{
   $lease=Start-MIRNativeArchiveLease -LibraryDirectory $library -OutputRoot $inputRoot -ArchiveSources $leaseSources
@@ -243,11 +256,13 @@ try{
     (Join-Path $repo 'tests/fixtures/api-alpha'),
     (Join-Path $repo 'tests/fixtures/api-beta')
   )
+  $result.runner_invoked=$true
   $runnerResult=& $runner -ArchiveLibrary $library -FactorioBin $engine -ProfilePath $profile -FixtureSources $fixtureSources `
     -ExpectedMIRArchiveSha256 ([string]$plan.package.sha256) -OutputRoot $outputRoot -FixtureCase 'library-multiplayer' `
     -SessionExpectedPeakMemoryMiB 8192 -RepoRoot $repo
   $result.runner_status=[string]$runnerResult.status
   Assert-Preview ($result.runner_status-ceq'passed-private-two-client-fixture') 'native wrapper did not report the expected private preview status'
+  $result.native_execution_succeeded=$true
   $result.status='completed-private-preview'
 }catch{$failure=$_.Exception;$result.failure=$_.Exception.Message;$result.status='failed'}
 finally{
