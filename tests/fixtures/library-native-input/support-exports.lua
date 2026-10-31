@@ -78,7 +78,7 @@ function M.register(context)
           location=valid(root) and root.location or false}
       end
     end
-    return {case=s.case,phase=s.phase,cursor=s.cursor,expected=actions[s.cursor] and actions[s.cursor][1] or false,
+    return {case=s.case,phase=s.phase,cursor=s.cursor,tick=game.tick,expected=actions[s.cursor] and actions[s.cursor][1] or false,
       actual_clicks=s.clicks,actual_joins=s.joins,joins_by_phase=s.joins_by_phase,
       server_commands=s.server_commands,server_command_counts=s.server_command_counts,completed=s.completed,
       native_and_settings_unchanged=true,geometry=geometry,load_observed=loaded,

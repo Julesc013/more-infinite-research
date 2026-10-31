@@ -713,7 +713,7 @@ class LibrarySupportExportObserverControls(unittest.TestCase):
             local native,logs,saves,write_calls=1,0,0,0
             local env={storage=store,settings={startup={disabled={value=false},zero={value=0},normal={value=15}}}}
             env._G=env;setmetatable(env,{__index=_G})
-            local game={players={},connected_players={},forces={player={}}}
+            local game={players={},connected_players={},forces={player={}},tick=0}
             env.game=game
             function game.get_player(index)assert(index~=nil);return players[index]end
             function game.server_save(name)assert(name=="mir5-library-support-exports-restart"or name=="mir5-native-complete");saves=saves+1 end
@@ -844,13 +844,17 @@ class LibrarySupportExportObserverControls(unittest.TestCase):
               if opponent=="duplicate-click"then callbacks[2]({element=button,player_index=p.index})end
               api.check(action)
             end
-            local before=fingerprint(store);local result=api.report();assert(fingerprint(store)==before)
+            local before=fingerprint(store);local result=api.report();local first_tick=result.tick
+            game.tick=game.tick+1
+            local second=api.report();assert(fingerprint(store)==before)
+            assert(type(first_tick)=="number" and type(second.tick)=="number" and second.tick==first_tick+1)
             assert(result.phase=="completed"and result.actual_clicks==13 and result.actual_joins==5 and saves==2 and logs==13 and write_calls==0)
             assert(result.server_commands==2 and result.server_command_counts["mir-settings-export"]==1
               and result.server_command_counts["mir-diagnostics-export"]==1)
             assert(result.joins_by_phase.initial.en==1 and result.joins_by_phase.initial.de==1
               and result.joins_by_phase.rejoin.en==0 and result.joins_by_phase.rejoin.de==1
               and result.joins_by_phase.restart.en==1 and result.joins_by_phase.restart.de==1)
+            if opponent=="report-clock" then return first_tick,second.tick end
             return result.actual_clicks,result.actual_joins,saves,write_calls
           end
         ''')
@@ -859,6 +863,11 @@ class LibrarySupportExportObserverControls(unittest.TestCase):
         for target in ("f200", "f210"):
             with self.subTest(target=target):
                 self.assertEqual(self.lua.globals().run_export_observer(target, ""), (13, 5, 2, 0))
+
+    def test_export_report_tick_is_monotonic_and_read_only(self):
+        for target in ("f200", "f210"):
+            with self.subTest(target=target):
+                self.assertEqual(self.lua.globals().run_export_observer(target, "report-clock"), (0, 1))
 
     def test_initial_and_restart_roles_can_arrive_in_either_order(self):
         for target in ("f200", "f210"):
