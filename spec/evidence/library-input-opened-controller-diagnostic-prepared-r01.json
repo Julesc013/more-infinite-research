@@ -2,8 +2,8 @@
   "schema": 1,
   "kind": "MIRLibraryClientIdentityPreparedInputsV1",
   "status": "fixture-prepared-not-native-qualified",
-  "fixture_source": "1a4f0651f0f4f00f33b16952298647d9096a2e69",
-  "fixture_base": "65f5414ac41212fa3193cf56ed3a5686c948a66c",
+  "fixture_source": "dc22313cd580c5b8b87242efbd50f6ae639fa25f",
+  "fixture_base": "1a4f0651f0f4f00f33b16952298647d9096a2e69",
   "player_source": "42032477d45ced683e72736a4fe30a7a3195b995",
   "player_tree": "5a6adf0aab4e945aeca13420ddd045ad45f050a0",
   "changed_player_members": [],
@@ -51,18 +51,19 @@
   "diagnostic_observer": {
     "control": {
       "source": "tests/fixtures/library-native-input/control.lua",
-      "source_revision": "1a4f0651f0f4f00f33b16952298647d9096a2e69",
-      "bytes": 27014,
-      "sha256": "A4EFC43E7FA1F9F5E99B9F7ED7E6712F68AACEE8E50C5D32B83D0B20E8B92C17"
+      "source_revision": "dc22313cd580c5b8b87242efbd50f6ae639fa25f",
+      "bytes": 27439,
+      "sha256": "27864F73812F89FBFC95FF28309F96F02575DB9135946D5F0A39C70D9F00CBF5"
     },
     "fields": {
       "opened_kind": "Per-role pcall-safe Lua opened value type, including getter-error.",
       "opened_is_library_root": "Per-role strict boolean equality of the opened value with the valid Library root.",
       "inspect_opened_snapshots": "Three transient local input-state/controller snapshots after the existing exclusion probe, final EN open, and final DE open; each includes the current game tick.",
       "en_controller_type": "Current EN LuaPlayer controller type only when the getter yields a numeric scalar; otherwise false.",
-      "de_controller_type": "Current DE LuaPlayer controller type only when the getter yields a numeric scalar; otherwise false."
+      "de_controller_type": "Current DE LuaPlayer controller type only when the getter yields a numeric scalar; otherwise false.",
+      "controller_constants": "Safe top-level numeric character/cutscene values read from defines.controllers, or false if unavailable, nonnumeric, or equal; these bind the per-player scalar observations without assuming an enum order."
     },
-    "behavior": "The arm_close predicate, state/event sequencing, native ownership requirement, and action refusal remain unchanged. Existing read-only report state adds the original opened diagnostics, safe current controller scalars, and three transient local snapshots during inspect; it neither adds an open, event, retry, persistent save history, controller action, or state write, nor turns a refusal into a pass.",
+    "behavior": "The arm_close predicate, state/event sequencing, native ownership requirement, and action refusal remain unchanged. Existing read-only report state adds the original opened diagnostics, safe current controller scalars, safe top-level controller enum constants, and three transient local snapshots during inspect; it neither adds an open, event, retry, persistent save history, controller action, or state write, nor turns a refusal into a pass.",
     "native_execution": false
   },
   "profiles": [
@@ -72,8 +73,8 @@
       "version": "0.3.0",
       "profile": {
         "path": "tests/profiles/library-native-input-imported110-f200-2077-r11.json",
-        "bytes": 3527,
-        "sha256": "E1405DBA7B1C1CF42D02BF70B007744410DBECCE7903B2E1792B698C5726C59C"
+        "bytes": 3601,
+        "sha256": "643459A048AF2FEFDBB8E8589F904275D3D682C91D35A3B816354CA7EC654D97"
       },
       "engine": {
         "version": "2.0.77",
@@ -88,20 +89,20 @@
         "more-infinite-research_5.0.20000.zip": "7CAC54475107736106D84AF98D50A8622E095B6658F1E3682643FE0CBA8BAEF0",
         "mir-fixture-mir5-active-mods-observer_0.1.0.zip": "723D1E7721449FC26040E5E6629416767BDC20AD79CF8723115846DB662A1F87",
         "mir-fixture-mir5-migration-origin-f200-110-source_0.3.0.zip": "D30D00A0D57A2A8195565E52DCEFDF94B92DCBA37DC85A83B37245336157E9C0",
-        "mir-fixture-mir5-library-native-input_0.3.0.zip": "A899FC9C92A82FFD944965785CF4BFAF7C20101DF62769DBFF2D606DC43FFEB0"
+        "mir-fixture-mir5-library-native-input_0.3.0.zip": "46155E3963927EF1F2038692BB91447FAE691989AA6BB92BE3B60B0B4F71591B"
       },
       "owned_fixture": {
         "name": "mir-fixture-mir5-library-native-input_0.3.0.zip",
-        "bytes": 7686,
-        "sha256": "A899FC9C92A82FFD944965785CF4BFAF7C20101DF62769DBFF2D606DC43FFEB0",
+        "bytes": 7774,
+        "sha256": "46155E3963927EF1F2038692BB91447FAE691989AA6BB92BE3B60B0B4F71591B",
         "local_custody": "build/qualification/library-input-opened-controller-diagnostic-r11/f200/input/mir-fixture-mir5-library-native-input_0.3.0.zip",
         "members": [
           {
             "source": "tests/fixtures/library-native-input/control.lua",
-            "source_revision": "1a4f0651f0f4f00f33b16952298647d9096a2e69",
+            "source_revision": "dc22313cd580c5b8b87242efbd50f6ae639fa25f",
             "destination": "control.lua",
-            "bytes": 27014,
-            "sha256": "A4EFC43E7FA1F9F5E99B9F7ED7E6712F68AACEE8E50C5D32B83D0B20E8B92C17"
+            "bytes": 27439,
+            "sha256": "27864F73812F89FBFC95FF28309F96F02575DB9135946D5F0A39C70D9F00CBF5"
           },
           {
             "source": "tests/fixtures/library-native-input/info-input-identity-f200.json",
@@ -173,8 +174,8 @@
       "version": "0.3.0",
       "profile": {
         "path": "tests/profiles/library-native-input-imported110-f210-2123-r11.json",
-        "bytes": 3527,
-        "sha256": "E014092BDE8F1D3DEBBD62D3488DB146BE04AE0888F1E5FC75AE4DDDCD52C992"
+        "bytes": 3601,
+        "sha256": "B8BE4B742B09129497B4D0F8013D2F4C017F049707D3EF7B5E0BCCE51D17426A"
       },
       "engine": {
         "version": "2.1.23",
@@ -189,20 +190,20 @@
         "more-infinite-research_5.0.21000.zip": "B63743C36432E4C41CC0F56D5A48CABE81924D426EF11045095A9D5ED0430D7B",
         "mir-fixture-mir5-active-mods-observer_0.1.0.zip": "A15A7D628D66953D2E0C4D4FA288F47CBF9C5678327C7EB3D23ADB5DC78331C0",
         "mir-fixture-mir5-migration-origin-f200-110-source_0.4.0.zip": "E07DF42B2FBFACEA5BA32F3E616AF5BBFAB4E355B116187DC023252CFCD09B43",
-        "mir-fixture-mir5-library-native-input_0.3.0.zip": "CA136FED50E942B46FF308799496FCF2DDD4C484E4494183676BA57E11CBFA6A"
+        "mir-fixture-mir5-library-native-input_0.3.0.zip": "5D44556AB44ECAE5FCDD654A0F9A4336CE98C5F41D04629F7021C83F96F1E4AF"
       },
       "owned_fixture": {
         "name": "mir-fixture-mir5-library-native-input_0.3.0.zip",
-        "bytes": 7689,
-        "sha256": "CA136FED50E942B46FF308799496FCF2DDD4C484E4494183676BA57E11CBFA6A",
+        "bytes": 7777,
+        "sha256": "5D44556AB44ECAE5FCDD654A0F9A4336CE98C5F41D04629F7021C83F96F1E4AF",
         "local_custody": "build/qualification/library-input-opened-controller-diagnostic-r11/f210/input/mir-fixture-mir5-library-native-input_0.3.0.zip",
         "members": [
           {
             "source": "tests/fixtures/library-native-input/control.lua",
-            "source_revision": "1a4f0651f0f4f00f33b16952298647d9096a2e69",
+            "source_revision": "dc22313cd580c5b8b87242efbd50f6ae639fa25f",
             "destination": "control.lua",
-            "bytes": 27014,
-            "sha256": "A4EFC43E7FA1F9F5E99B9F7ED7E6712F68AACEE8E50C5D32B83D0B20E8B92C17"
+            "bytes": 27439,
+            "sha256": "27864F73812F89FBFC95FF28309F96F02575DB9135946D5F0A39C70D9F00CBF5"
           },
           {
             "source": "tests/fixtures/library-native-input/info-input-identity-f210.json",
@@ -270,7 +271,7 @@
     }
   ],
   "validation": {
-    "raw_control": "Both r11 archives contain the exact 1a4 raw control blob and the unchanged target-specific d9e raw metadata blob.",
+    "raw_control": "Both r11 archives contain the exact dc223 raw control blob and the unchanged target-specific d9e raw metadata blob.",
     "archive_reproduction": "The checkout-local two-member projections use the ordinary fixed 1980 timestamp, Unix0644, and DEFLATE9 package policy. No dependency archive was copied, extracted, linked, or replaced.",
     "export_rows": "The two export0.4 rows are byte-identical r10 inputs; their profiles and archive pins above are unchanged.",
     "native_execution": false,

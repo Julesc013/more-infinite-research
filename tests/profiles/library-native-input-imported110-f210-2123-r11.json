@@ -45,7 +45,7 @@
     "more-infinite-research_5.0.21000.zip": "B63743C36432E4C41CC0F56D5A48CABE81924D426EF11045095A9D5ED0430D7B",
     "mir-fixture-mir5-active-mods-observer_0.1.0.zip": "A15A7D628D66953D2E0C4D4FA288F47CBF9C5678327C7EB3D23ADB5DC78331C0",
     "mir-fixture-mir5-migration-origin-f200-110-source_0.4.0.zip": "E07DF42B2FBFACEA5BA32F3E616AF5BBFAB4E355B116187DC023252CFCD09B43",
-    "mir-fixture-mir5-library-native-input_0.3.0.zip": "CA136FED50E942B46FF308799496FCF2DDD4C484E4494183676BA57E11CBFA6A"
+    "mir-fixture-mir5-library-native-input_0.3.0.zip": "5D44556AB44ECAE5FCDD654A0F9A4336CE98C5F41D04629F7021C83F96F1E4AF"
   },
   "display": {
     "requested_window": "1280x720",
@@ -61,7 +61,7 @@
     "drag_baseline": "Latest native root location and event count at successful suffix, not initial inspect.",
     "minimum_new_location_events": 1
   },
-  "scope": "Fresh r11 refusal-only transient opened-state/controller diagnostic input. It retains the r07 protocol, protected imported110 save, candidateB, and original drag/text/lifecycle contract. The fixture arm_close guard, action, and event predicates are unchanged; report-only transient snapshots add per-role input state and safe controller-type scalars after the existing exclusion probe and each final open. Q24 and Q28 remain adverse and Q29 remains declined evidence; this prepared input establishes no native pass, replay, close event, cause, controller readiness, or lifecycle acceptance.",
+  "scope": "Fresh r11 refusal-only transient opened-state/controller diagnostic input. It retains the r07 protocol, protected imported110 save, candidateB, and original drag/text/lifecycle contract. The fixture arm_close guard, action, and event predicates are unchanged; report-only transient snapshots add per-role input state and safe controller-type scalars after the existing exclusion probe and each final open, while top-level constants bind the native character/cutscene enum values. Q24 and Q28 remain adverse and Q29 remains declined evidence; this prepared input establishes no native pass, replay, close event, cause, controller readiness, or lifecycle acceptance.",
   "client_identity": {
     "en": "MIR5English",
     "de": "MIR5Deutsch",
