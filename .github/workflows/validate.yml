@@ -150,7 +150,7 @@ jobs:
           git fetch --no-tags --depth=1 origin 7cf634060cde6441031e744c7d155b0647fa0851
           if ($LASTEXITCODE -ne 0) { throw 'Exact removal operand fixture-source fetch failed.' }
       - name: Restore the bound host-control plan
-        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333
         with:
           name: ${{ needs.verification-plan.outputs.plan_artifact }}
           path: build/host-gate
