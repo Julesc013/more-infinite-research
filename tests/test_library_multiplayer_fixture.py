@@ -391,7 +391,7 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
                   detail[present and DETAIL_TITLE or DETAIL_EMPTY]=element("label",present and DETAIL_TITLE or DETAIL_EMPTY)
                   content[DETAIL]=detail
                   local actions=element("flow",ACTIONS)
-                  actions[OPEN_NATIVE]=element("button",OPEN_NATIVE);actions[OPEN_NATIVE].enabled=present
+                  actions[OPEN_NATIVE]=element("sprite-button",OPEN_NATIVE);actions[OPEN_NATIVE].enabled=present
                   content[ACTIONS]=actions
                   target.gui.screen[ROOT_NAME]=root
                   return
@@ -412,7 +412,7 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
                 detail[DETAIL_EMPTY]=element("label",DETAIL_EMPTY)
                 content[DETAIL]=detail
                 local actions=element("flow",ACTIONS)
-                actions[OPEN_NATIVE]=element("button",OPEN_NATIVE)
+                actions[OPEN_NATIVE]=element("sprite-button",OPEN_NATIVE)
                 actions[OPEN_NATIVE].enabled=opponent=="private-credit-action-enabled"
                 content[ACTIONS]=actions
                 target.gui.screen[ROOT_NAME]=root
@@ -436,7 +436,7 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
                 detail[DETAIL_EMPTY]=element("label",DETAIL_EMPTY)
                 content[DETAIL]=detail
                 local actions=element("flow",ACTIONS)
-                actions[OPEN_NATIVE]=element("button",OPEN_NATIVE)
+                actions[OPEN_NATIVE]=element("sprite-button",OPEN_NATIVE)
                 actions[OPEN_NATIVE].enabled=false
                 content[ACTIONS]=actions
                 target.gui.screen[ROOT_NAME]=root
@@ -458,7 +458,7 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
               content[DETAIL]=detail
               if ordinary_private_query then
                 local actions=element("flow",ACTIONS)
-                actions[OPEN_NATIVE]=element("button",OPEN_NATIVE)
+                actions[OPEN_NATIVE]=element("sprite-button",OPEN_NATIVE)
                 actions[OPEN_NATIVE].enabled=true
                 content[ACTIONS]=actions
               end
@@ -3177,6 +3177,11 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
 
     def test_fixture_uses_only_public_browser_and_native_gui_witnesses(self):
         source = CONTROL.read_text(encoding="utf-8")
+        library = (ROOT / "source/runtime/library.lua").read_text(encoding="utf-8")
+        harness = Path(__file__).read_text(encoding="utf-8")
+        self.assertIn('type = "sprite-button", name = PREFIX .. "open_native"', library)
+        self.assertIn('native_open.type ~= "sprite-button"', source)
+        self.assertIn('actions[OPEN_NATIVE]=element("sprite-button",OPEN_NATIVE)', harness)
         self.assertIn('remote.call(BROWSER, "open", player.index', source)
         self.assertIn('{tab="availability", search=""}', source)
         self.assertIn('tab="research", visibility=1', source)

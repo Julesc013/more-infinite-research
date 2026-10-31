@@ -312,7 +312,7 @@ local function assert_private_credit_empty_view(player, family, id)
       or not valid(family_picker) or family_picker.type ~= "drop-down" or family_picker.selected_index ~= family_index
       or not valid(results) or results.type ~= "list-box" or #results.items ~= 0 or results.selected_index ~= 0
       or not valid(detail) or valid(detail[DETAIL_TITLE]) or not valid(detail[DETAIL_EMPTY])
-      or not valid(native_open) or native_open.type ~= "button" or native_open.enabled ~= false then
+      or not valid(native_open) or native_open.type ~= "sprite-button" or native_open.enabled ~= false then
     fail("private credit query exposed a public result or native action: " .. family .. "/" .. id)
   end
 end
@@ -347,7 +347,7 @@ local function assert_public_browser_result(player, family, query)
       or not valid(family_picker) or family_picker.type ~= "drop-down" or family_picker.selected_index ~= family_index
       or not valid(results) or results.type ~= "list-box" or #results.items < 1 or results.selected_index < 1
       or not valid(detail) or not valid(detail[DETAIL_TITLE])
-      or not valid(native_open) or native_open.type ~= "button" or native_open.enabled ~= true then
+      or not valid(native_open) or native_open.type ~= "sprite-button" or native_open.enabled ~= true then
     fail("public Library " .. family .. " query did not expose a selected ordinary result: " .. query)
   end
 end
