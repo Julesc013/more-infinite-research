@@ -23,6 +23,7 @@ CURRENT_STANDALONE_F210_API_CONSUMERS_PROFILE = ROOT / "tests/profiles/library-a
 CURRENT_STANDALONE_F210_SPACE_AGE_API_CONSUMERS_PROFILE = ROOT / "tests/profiles/library-api-consumers-current-space-age-standalone-f210-2123.json"
 PRIVATE_CREDITS_BASE_PROFILE = ROOT / "tests/profiles/library-api-consumers-private-credits-standalone-f210-2123.json"
 PRIVATE_CREDITS_SPACE_AGE_PROFILE = ROOT / "tests/profiles/library-api-consumers-private-credits-space-age-standalone-f210-2123.json"
+RESTORATION_PREVIEW_PROFILE = ROOT / "tests/profiles/library-restoration-cfeac3-space-age-standalone-f210-2123.json"
 PRIVATE_CREDITS_INFO = ROOT / "tests/fixtures/library-multiplayer/info-f210-private-credits.json"
 F200_PRIVATE_CREDITS_PROFILE = ROOT / "tests/profiles/library-private-credits-current-f200-2077.json"
 F200_PRIVATE_CREDITS_INFO = ROOT / "tests/fixtures/library-private-credits-f200/info.json"
@@ -940,6 +941,85 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
                         "690004F145E8B0DD52B4030BD8B27F7B581495EEFAAC5CB3A2F30A23FCA08951",
                 })
                 self.assertNotIn("mir-fixture-mir5-api-beta-production", {row["name"] for row in profile["mods"]})
+
+    def test_restored_library_preview_pins_its_exact_space_age_package_and_rejects_drift(self):
+        profile = json.loads(RESTORATION_PREVIEW_PROFILE.read_text(encoding="utf-8"))
+        self.assertEqual((profile["kind"], profile["target"], profile["factorio_line"],
+                          profile["settings_mode"], profile["session_expected_peak_memory_mib"]),
+                         ("mir5-library-restoration-cfeac3-space-age-standalone-f210-native-selection",
+                          "f210-standalone", "2.1", "Defaults", 8192))
+        self.assertEqual(profile["engine"], {
+            "version": "2.1.23",
+            "sha256": "8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38",
+        })
+        self.assertTrue(profile["space_age_library"])
+        self.assertTrue(profile["api_client_consumers"])
+        self.assertTrue(profile["private_credit_checks"])
+        self.assertEqual([(row["name"], row["version"], row["enabled"]) for row in profile["mods"]], [
+            ("base", "2.1.23", True),
+            ("elevated-rails", "2.1.23", True),
+            ("quality", "2.1.23", True),
+            ("recycler", "2.1.23", True),
+            ("space-age", "2.1.23", True),
+            ("mir-fixture-mir5-active-mods-observer", "0.1.0", True),
+            ("more-infinite-research", "5.0.21000", True),
+            ("mir-fixture-mir5-library-multiplayer", "0.3.0", True),
+            ("mir-fixture-mir5-api-alpha", "0.1.0", True),
+            ("mir-fixture-mir5-api-beta", "0.1.0", True),
+        ])
+        self.assertEqual(profile["archive_sha256"], {
+            "mir-fixture-mir5-active-mods-observer_0.1.0.zip":
+                "A15A7D628D66953D2E0C4D4FA288F47CBF9C5678327C7EB3D23ADB5DC78331C0",
+            "more-infinite-research_5.0.21000.zip":
+                "6AFD86ABB0678B025D1DA3F44F5A8047458C29271F0CC3A9D7473D6ADC9E4C4C",
+            "mir-fixture-mir5-api-alpha_0.1.0.zip":
+                "DB5ED843FA9D85A1ABDC22595E62D315CA1A2191C846208079F85D4D016CE904",
+            "mir-fixture-mir5-api-beta_0.1.0.zip":
+                "0E48351A5D515506B133ED16FE265119D72EB781FA2A4473D1771C451C3EB633",
+        })
+        self.assertIn("cfeac3e8a6583576f6d0165a9f5cf6a9087b441e", profile["scope"])
+        self.assertIn("does not replace or qualify the published beta", profile["scope"])
+
+        script = r'''
+          $ErrorActionPreference='Stop';Set-StrictMode -Version Latest
+          function Assert-Session([bool]$Condition,[string]$Message){if(-not $Condition){throw $Message}}
+          $tokens=$null;$errors=$null
+          $ast=[Management.Automation.Language.Parser]::ParseFile($env:MIR_TEST_WRAPPER,[ref]$tokens,[ref]$errors)
+          if($errors.Count){throw $errors[0].Message}
+          $node=@($ast.FindAll({param($candidate)
+            $candidate -is [Management.Automation.Language.FunctionDefinitionAst] -and $candidate.Name -ceq 'Assert-MultiplayerFixtureSelection'
+          },$true))
+          if($node.Count-ne1){throw 'selection function is absent or ambiguous'}
+          Invoke-Expression $node[0].Extent.Text
+          $profile=Get-Content -LiteralPath $env:MIR_TEST_RESTORATION_PROFILE -Raw|ConvertFrom-Json -AsHashtable
+          $mir='6AFD86ABB0678B025D1DA3F44F5A8047458C29271F0CC3A9D7473D6ADC9E4C4C'
+          $engine='8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38'
+          $target=Assert-MultiplayerFixtureSelection -Selection $profile -EngineSha256 $engine -FixtureCase 'library-multiplayer' -ExpectedMIRArchiveSha256 $mir -SessionExpectedPeakMemoryMiB 8192
+          if($target.kind-cne'mir5-library-restoration-cfeac3-space-age-standalone-f210-native-selection' -or
+             $target.mir_archive_sha256-cne$mir -or -not$target.space_age_library -or -not$target.private_credit_checks -or -not$target.api_client_consumers){
+            throw 'restored Library preview target differs'
+          }
+          function Assert-Rejected([string]$Name,[scriptblock]$Mutate,[string]$Expected=$mir,[int]$Budget=8192){
+            $bad=$profile|ConvertTo-Json -Depth 16|ConvertFrom-Json -AsHashtable
+            &$Mutate $bad
+            try{$null=Assert-MultiplayerFixtureSelection -Selection $bad -EngineSha256 $engine -FixtureCase 'library-multiplayer' -ExpectedMIRArchiveSha256 $Expected -SessionExpectedPeakMemoryMiB $Budget}catch{return}
+            throw "restored Library preview admitted drift: $Name"
+          }
+          Assert-Rejected 'wrong candidate package' {param($s)$s.archive_sha256['more-infinite-research_5.0.21000.zip']='A'*64}
+          Assert-Rejected 'wrong beta consumer archive' {param($s)$s.archive_sha256['mir-fixture-mir5-api-beta_0.1.0.zip']='C'*64}
+          Assert-Rejected 'wrong expected package' {} ('B'*64)
+          Assert-Rejected 'wrong Space Age closure' {param($s)$s.mods=@($s.mods|Where-Object {$_.name-cne'space-age'})}
+          Assert-Rejected 'missing private credit mode' {param($s)$s.Remove('private_credit_checks')|Out-Null}
+          Assert-Rejected 'wrong session admission' {} $mir 7168
+        '''
+        result = subprocess.run(
+            ["pwsh", "-NoLogo", "-NoProfile", "-Command", script],
+            capture_output=True, text=True,
+            env=dict(os.environ, MIR_TEST_WRAPPER=str(WRAPPER),
+                     MIR_TEST_RESTORATION_PROFILE=str(RESTORATION_PREVIEW_PROFILE)),
+            check=False,
+        )
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
 
     def test_f200_private_profile_and_prelaunch_guards_require_exact_six_mod_inputs(self):
         selection = json.loads(F200_PRIVATE_CREDITS_PROFILE.read_text(encoding='utf-8'))
