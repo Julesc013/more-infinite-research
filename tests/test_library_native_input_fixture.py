@@ -334,6 +334,33 @@ class LibraryNativeInputFixtureControls(unittest.TestCase):
                 self.assertEqual(restored, {"library_open": True, "library_query": "gears", "foreign_open": False, "foreign_query": False,
                                             "opened_kind": "table", "opened_is_library_root": True})
 
+    def test_inspect_opened_snapshots_are_transient_readonly_observations(self):
+        expected_private_query = "mir-legacy-cannon-credit-rocket-shooting-speed"
+        expected_input = lambda query: {
+            "library_open": True,
+            "library_query": query,
+            "foreign_open": False,
+            "foreign_query": False,
+            "opened_kind": "table",
+            "opened_is_library_root": True,
+        }
+        for target in ("f200", "f210"):
+            with self.subTest(target=target):
+                result = self.run_case(target)
+                self.assertTrue(result["ok"], result["message"])
+                inspect = next(row for row in result["trace"] if row["phase"] == "text-prefix")
+                snapshots = inspect["inspect_opened_snapshots"]
+                self.assertEqual(
+                    snapshots,
+                    {
+                        "after_exclusion_probe": {"tick": 0, "en_input": expected_input(expected_private_query), "de_input": expected_input(expected_private_query)},
+                        "after_final_open_en": {"tick": 0, "en_input": expected_input(""), "de_input": expected_input(expected_private_query)},
+                        "after_final_open_de": {"tick": 0, "en_input": expected_input(""), "de_input": expected_input("recipe-prod-research_mining_drill-1")},
+                    },
+                )
+                self.assertIs(result["final"]["inspect_opened_snapshots"], False)
+                self.assertEqual((result["final"]["private_queries"], result["calls"]), (48, 69))
+
     def test_report_distinguishes_missing_textfield_and_foreign_open_identity(self):
         for target in ("f200", "f210"):
             with self.subTest(target=target):

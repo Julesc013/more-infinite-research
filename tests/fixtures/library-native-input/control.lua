@@ -188,6 +188,9 @@ local function input_state(p)
     foreign_query=valid(other_query) and other_query.type=="textfield" and other_query.text or false,
     opened_kind=opened_kind,opened_is_library_root=opened_is_library_root}
 end
+local function inspect_opened_snapshot(en,de)
+  return {tick=game.tick,en_input=input_state(en),de_input=input_state(de)}
+end
 local function report()
   local s=storage[KEY];if type(s)~="table" then return nil end
   local en=s.en_index~=nil and game.get_player(s.en_index) or nil
@@ -202,6 +205,7 @@ local function report()
     en_locale=valid(en) and en.locale or false,de_locale=valid(de) and de.locale or false,
     en_connected=valid(en) and en.connected or false,de_connected=valid(de) and de.connected or false,
     en_input=input_state(en),de_input=input_state(de),
+    inspect_opened_snapshots=refs.inspect_opened_snapshots or false,
     removed_index=s.removed_index or false,readonly_imported_probe=s.imported_probe_verified==true,
     imported_earnings=true,fixture_seeds_credit=false,load_observed=loaded_restart,
     en_geometry=s.en_index and geometry(game.get_player(s.en_index)) or nil,
@@ -255,7 +259,9 @@ local function advance(step)
   local s=state()
   if step=="inspect" then
     phase("waiting-clients");local en,de=pair();assert_world();check_imported_literals()
-    exclusion_probe(en,de);open(en,"",GEAR);open(de,MINING,MINING,"native")
+    exclusion_probe(en,de);refs.inspect_opened_snapshots={after_exclusion_probe=inspect_opened_snapshot(en,de)}
+    open(en,"",GEAR);refs.inspect_opened_snapshots.after_final_open_en=inspect_opened_snapshot(en,de)
+    open(de,MINING,MINING,"native");refs.inspect_opened_snapshots.after_final_open_de=inspect_opened_snapshot(en,de)
     refs.en_root,refs.en_query,refs.de_root,refs.de_query=personal(en,de,"")
     s.initial_location=location(refs.en_root);s.imported_probe_verified=true;s.phase="text-prefix"
   elseif step=="prefix" then
