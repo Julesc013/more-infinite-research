@@ -23,6 +23,7 @@ CURRENT_STANDALONE_F210_API_CONSUMERS_PROFILE = ROOT / "tests/profiles/library-a
 CURRENT_STANDALONE_F210_SPACE_AGE_API_CONSUMERS_PROFILE = ROOT / "tests/profiles/library-api-consumers-current-space-age-standalone-f210-2123.json"
 PRIVATE_CREDITS_BASE_PROFILE = ROOT / "tests/profiles/library-api-consumers-private-credits-standalone-f210-2123.json"
 PRIVATE_CREDITS_SPACE_AGE_PROFILE = ROOT / "tests/profiles/library-api-consumers-private-credits-space-age-standalone-f210-2123.json"
+RESTORATION_PREVIEW_PROFILE = ROOT / "tests/profiles/library-restoration-cfeac3-space-age-standalone-f210-2123.json"
 PRIVATE_CREDITS_INFO = ROOT / "tests/fixtures/library-multiplayer/info-f210-private-credits.json"
 F200_PRIVATE_CREDITS_PROFILE = ROOT / "tests/profiles/library-private-credits-current-f200-2077.json"
 F200_PRIVATE_CREDITS_INFO = ROOT / "tests/fixtures/library-private-credits-f200/info.json"
@@ -941,6 +942,85 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
                 })
                 self.assertNotIn("mir-fixture-mir5-api-beta-production", {row["name"] for row in profile["mods"]})
 
+    def test_restored_library_preview_pins_its_exact_space_age_package_and_rejects_drift(self):
+        profile = json.loads(RESTORATION_PREVIEW_PROFILE.read_text(encoding="utf-8"))
+        self.assertEqual((profile["kind"], profile["target"], profile["factorio_line"],
+                          profile["settings_mode"], profile["session_expected_peak_memory_mib"]),
+                         ("mir5-library-restoration-cfeac3-space-age-standalone-f210-native-selection",
+                          "f210-standalone", "2.1", "Defaults", 8192))
+        self.assertEqual(profile["engine"], {
+            "version": "2.1.23",
+            "sha256": "8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38",
+        })
+        self.assertTrue(profile["space_age_library"])
+        self.assertTrue(profile["api_client_consumers"])
+        self.assertTrue(profile["private_credit_checks"])
+        self.assertEqual([(row["name"], row["version"], row["enabled"]) for row in profile["mods"]], [
+            ("base", "2.1.23", True),
+            ("elevated-rails", "2.1.23", True),
+            ("quality", "2.1.23", True),
+            ("recycler", "2.1.23", True),
+            ("space-age", "2.1.23", True),
+            ("mir-fixture-mir5-active-mods-observer", "0.1.0", True),
+            ("more-infinite-research", "5.0.21000", True),
+            ("mir-fixture-mir5-library-multiplayer", "0.3.0", True),
+            ("mir-fixture-mir5-api-alpha", "0.1.0", True),
+            ("mir-fixture-mir5-api-beta", "0.1.0", True),
+        ])
+        self.assertEqual(profile["archive_sha256"], {
+            "mir-fixture-mir5-active-mods-observer_0.1.0.zip":
+                "A15A7D628D66953D2E0C4D4FA288F47CBF9C5678327C7EB3D23ADB5DC78331C0",
+            "more-infinite-research_5.0.21000.zip":
+                "6AFD86ABB0678B025D1DA3F44F5A8047458C29271F0CC3A9D7473D6ADC9E4C4C",
+            "mir-fixture-mir5-api-alpha_0.1.0.zip":
+                "DB5ED843FA9D85A1ABDC22595E62D315CA1A2191C846208079F85D4D016CE904",
+            "mir-fixture-mir5-api-beta_0.1.0.zip":
+                "0E48351A5D515506B133ED16FE265119D72EB781FA2A4473D1771C451C3EB633",
+        })
+        self.assertIn("cfeac3e8a6583576f6d0165a9f5cf6a9087b441e", profile["scope"])
+        self.assertIn("does not replace or qualify the published beta", profile["scope"])
+
+        script = r'''
+          $ErrorActionPreference='Stop';Set-StrictMode -Version Latest
+          function Assert-Session([bool]$Condition,[string]$Message){if(-not $Condition){throw $Message}}
+          $tokens=$null;$errors=$null
+          $ast=[Management.Automation.Language.Parser]::ParseFile($env:MIR_TEST_WRAPPER,[ref]$tokens,[ref]$errors)
+          if($errors.Count){throw $errors[0].Message}
+          $node=@($ast.FindAll({param($candidate)
+            $candidate -is [Management.Automation.Language.FunctionDefinitionAst] -and $candidate.Name -ceq 'Assert-MultiplayerFixtureSelection'
+          },$true))
+          if($node.Count-ne1){throw 'selection function is absent or ambiguous'}
+          Invoke-Expression $node[0].Extent.Text
+          $profile=Get-Content -LiteralPath $env:MIR_TEST_RESTORATION_PROFILE -Raw|ConvertFrom-Json -AsHashtable
+          $mir='6AFD86ABB0678B025D1DA3F44F5A8047458C29271F0CC3A9D7473D6ADC9E4C4C'
+          $engine='8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38'
+          $target=Assert-MultiplayerFixtureSelection -Selection $profile -EngineSha256 $engine -FixtureCase 'library-multiplayer' -ExpectedMIRArchiveSha256 $mir -SessionExpectedPeakMemoryMiB 8192
+          if($target.kind-cne'mir5-library-restoration-cfeac3-space-age-standalone-f210-native-selection' -or
+             $target.mir_archive_sha256-cne$mir -or -not$target.space_age_library -or -not$target.private_credit_checks -or -not$target.api_client_consumers){
+            throw 'restored Library preview target differs'
+          }
+          function Assert-Rejected([string]$Name,[scriptblock]$Mutate,[string]$Expected=$mir,[int]$Budget=8192){
+            $bad=$profile|ConvertTo-Json -Depth 16|ConvertFrom-Json -AsHashtable
+            &$Mutate $bad
+            try{$null=Assert-MultiplayerFixtureSelection -Selection $bad -EngineSha256 $engine -FixtureCase 'library-multiplayer' -ExpectedMIRArchiveSha256 $Expected -SessionExpectedPeakMemoryMiB $Budget}catch{return}
+            throw "restored Library preview admitted drift: $Name"
+          }
+          Assert-Rejected 'wrong candidate package' {param($s)$s.archive_sha256['more-infinite-research_5.0.21000.zip']='A'*64}
+          Assert-Rejected 'wrong beta consumer archive' {param($s)$s.archive_sha256['mir-fixture-mir5-api-beta_0.1.0.zip']='C'*64}
+          Assert-Rejected 'wrong expected package' {} ('B'*64)
+          Assert-Rejected 'wrong Space Age closure' {param($s)$s.mods=@($s.mods|Where-Object {$_.name-cne'space-age'})}
+          Assert-Rejected 'missing private credit mode' {param($s)$s.Remove('private_credit_checks')|Out-Null}
+          Assert-Rejected 'wrong session admission' {} $mir 7168
+        '''
+        result = subprocess.run(
+            ["pwsh", "-NoLogo", "-NoProfile", "-Command", script],
+            capture_output=True, text=True,
+            env=dict(os.environ, MIR_TEST_WRAPPER=str(WRAPPER),
+                     MIR_TEST_RESTORATION_PROFILE=str(RESTORATION_PREVIEW_PROFILE)),
+            check=False,
+        )
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+
     def test_f200_private_profile_and_prelaunch_guards_require_exact_six_mod_inputs(self):
         selection = json.loads(F200_PRIVATE_CREDITS_PROFILE.read_text(encoding='utf-8'))
         info = json.loads(F200_PRIVATE_CREDITS_INFO.read_text(encoding='utf-8'))
@@ -1497,7 +1577,7 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
           $ast=[Management.Automation.Language.Parser]::ParseFile($env:MIR_TEST_WRAPPER,[ref]$tokens,[ref]$errors)
           if($errors.Count){throw $errors[0].Message}
           function Assert-Session([bool]$Condition,[string]$Message){if(-not$Condition){throw $Message}}
-          foreach($name in @('New-StandaloneF210LibraryFixtureSourceProjection','New-StandaloneIdentityObserverSourceProjection','Get-StandaloneIdentityFixtureSources','Invoke-MultiplayerFixturePreparation')){
+          foreach($name in @('Resolve-StandaloneF210ApiConsumerSourceRevision','Get-StandaloneF210NativeFixtureGitMembers','Get-StandaloneF210NativeFixtureRawGitMemberBytes','New-StandaloneF210LibraryFixtureSourceProjection','New-StandaloneIdentityObserverSourceProjection','Get-StandaloneIdentityFixtureSources','Invoke-MultiplayerFixturePreparation')){
             $node=@($ast.FindAll({param($candidate) $candidate -is [Management.Automation.Language.FunctionDefinitionAst] -and $candidate.Name -ceq $name},$true))
             if($node.Count-ne1){throw "standalone normal function is absent or ambiguous: $name"}
             Invoke-Expression $node[0].Extent.Text
@@ -1528,21 +1608,24 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
             $rejected=$false;try{Invoke-ActualNormalPreparation -Library $Library -Sources @($Source) -Root $Root|Out-Null}catch{$rejected=$true};if(-not$rejected){throw "actual normal preparation accepted opponent: $Name"}
           }
           $root=$env:MIR_TEST_WORK;$repo=$env:MIR_TEST_REPO;$library=Join-Path $root 'library';$null=New-Item -ItemType Directory -Path $library
-          $normal=New-StandaloneF210LibraryFixtureSourceProjection -RepoRoot $repo -OutputRoot (Join-Path $root 'normal-output')
+          $sourceRevision=Resolve-StandaloneF210ApiConsumerSourceRevision -RepoRoot $repo
+          $normal=New-StandaloneF210LibraryFixtureSourceProjection -RepoRoot $repo -OutputRoot (Join-Path $root 'normal-output') -SourceRevision $sourceRevision
           $normalInfo=Get-Content -LiteralPath (Join-Path $normal.source 'info.json') -Raw|ConvertFrom-Json -AsHashtable
           if($normal.members.Count-ne3 -or $normal.source_metadata-cne'info-f210.json' -or ((@($normal.excluded_canonical_members)-join'|')-cne'info-f210-private-credits.json|info-f210-space-age.json|info.json|README.md') -or [string]$normalInfo.factorio_version-cne'2.1' -or [string]$normalInfo.version-cne'0.1.0' -or ((@($normalInfo.dependencies)-join'|')-cne'base >= 2.1.23|more-infinite-research = 5.0.21000')){throw 'normal F210 projection metadata differs'}
           $fixtureArchive=New-SourceArchive -Library $library -Source $normal.source -Members @('control.lua','info.json','settings-updates.lua')
-          $spaceAge=New-StandaloneF210LibraryFixtureSourceProjection -RepoRoot $repo -OutputRoot (Join-Path $root 'space-age-output') -SpaceAgeLibrary
+          $spaceAge=New-StandaloneF210LibraryFixtureSourceProjection -RepoRoot $repo -OutputRoot (Join-Path $root 'space-age-output') -SourceRevision $sourceRevision -SpaceAgeLibrary
           $spaceAgeInfo=Get-Content -LiteralPath (Join-Path $spaceAge.source 'info.json') -Raw|ConvertFrom-Json -AsHashtable
           if($spaceAge.members.Count-ne3 -or $spaceAge.source_metadata-cne'info-f210-space-age.json' -or ((@($spaceAge.excluded_canonical_members)-join'|')-cne'info-f210-private-credits.json|info-f210.json|info.json|README.md') -or [string]$spaceAgeInfo.factorio_version-cne'2.1' -or [string]$spaceAgeInfo.version-cne'0.2.0' -or ((@($spaceAgeInfo.dependencies)-join'|')-cne'base >= 2.1.23|space-age >= 2.1.23|more-infinite-research = 5.0.21000')){throw 'Space Age F210 projection metadata differs'}
           $spaceAgeArchive=New-SourceArchive -Library $library -Source $spaceAge.source -Members @('control.lua','info.json','settings-updates.lua')
-          $private=New-StandaloneF210LibraryFixtureSourceProjection -RepoRoot $repo -OutputRoot (Join-Path $root 'private-credit-output') -PrivateCreditChecks
+          $private=New-StandaloneF210LibraryFixtureSourceProjection -RepoRoot $repo -OutputRoot (Join-Path $root 'private-credit-output') -SourceRevision $sourceRevision -PrivateCreditChecks
           $privateInfo=Get-Content -LiteralPath (Join-Path $private.source 'info.json') -Raw|ConvertFrom-Json -AsHashtable
           if($private.members.Count-ne3 -or $private.source_metadata-cne'info-f210-private-credits.json' -or ((@($private.excluded_canonical_members)-join'|')-cne'info-f210-space-age.json|info-f210.json|info.json|README.md') -or [string]$privateInfo.factorio_version-cne'2.1' -or [string]$privateInfo.version-cne'0.3.0' -or ((@($privateInfo.dependencies)-join'|')-cne'base >= 2.1.23|? space-age >= 2.1.23|more-infinite-research = 5.0.21000')){throw 'private-credit F210 projection metadata differs'}
           $privateArchive=New-SourceArchive -Library $library -Source $private.source -Members @('control.lua','info.json','settings-updates.lua')
-          $canonicalObserver=Join-Path $repo 'tests/fixtures/active-mods-observer';$observerArchive=New-SourceArchive -Library $library -Source $canonicalObserver -Members @('data-final-fixes.lua','info.json')
+          $canonicalObserver=Join-Path $repo 'tests/fixtures/active-mods-observer';$observerRaw=Join-Path $root 'observer-raw';$null=New-Item -ItemType Directory -Path $observerRaw
+          foreach($member in @('data-final-fixes.lua','info.json')){[IO.File]::WriteAllBytes((Join-Path $observerRaw $member),(Get-StandaloneF210NativeFixtureRawGitMemberBytes -RepoRoot $repo -SourceRevision $sourceRevision -FixtureDirectory 'active-mods-observer' -Member $member))}
+          $observerArchive=New-SourceArchive -Library $library -Source $observerRaw -Members @('data-final-fixes.lua','info.json')
           $observerHash=(Get-FileHash -LiteralPath $observerArchive -Algorithm SHA256).Hash
-          $observer=New-StandaloneIdentityObserverSourceProjection -RepoRoot $repo -ArchiveLibrary $library -OutputRoot (Join-Path $root 'observer-output') -ExpectedArchiveSha256 $observerHash
+          $observer=New-StandaloneIdentityObserverSourceProjection -RepoRoot $repo -ArchiveLibrary $library -OutputRoot (Join-Path $root 'observer-output') -SourceRevision $sourceRevision -ExpectedArchiveSha256 $observerHash
           $canonicalLibrary=Join-Path $repo 'tests/fixtures/library-multiplayer'
           $sources=@(Get-StandaloneIdentityFixtureSources -Sources @($canonicalLibrary,$canonicalObserver) -LibraryFixtureSource $canonicalLibrary -StagedLibraryFixtureSource $normal.source -StagedObserverSource $observer.source -RepoRoot $repo)
           $prepared=Invoke-ActualNormalPreparation -Library $library -Sources $sources -Root (Join-Path $root 'positive')
@@ -1560,13 +1643,13 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
           Assert-PreparationRejects 'changed runtime Lua' $changedLibrary $changedSource (Join-Path $root 'changed')
           $wrongRepo=Join-Path $root 'wrong-target-repo';$wrongFixture=Join-Path $wrongRepo 'tests/fixtures/library-multiplayer';$null=New-Item -ItemType Directory -Path (Split-Path -Parent $wrongFixture) -Force;Copy-Item -LiteralPath $canonicalLibrary -Destination $wrongFixture -Recurse
           $wrongInfo=Get-Content -LiteralPath (Join-Path $wrongFixture 'info-f210.json') -Raw|ConvertFrom-Json -AsHashtable;$wrongInfo.factorio_version='2.0';[IO.File]::WriteAllText((Join-Path $wrongFixture 'info-f210.json'),($wrongInfo|ConvertTo-Json -Depth 8)+[Environment]::NewLine,[Text.UTF8Encoding]::new($false))
-          $wrongRejected=$false;try{New-StandaloneF210LibraryFixtureSourceProjection -RepoRoot $wrongRepo -OutputRoot (Join-Path $root 'wrong-output')|Out-Null}catch{$wrongRejected=$true};if(-not$wrongRejected){throw 'F200 fixture metadata was accepted for standalone F210 projection'}
+          $wrongRejected=$false;try{New-StandaloneF210LibraryFixtureSourceProjection -RepoRoot $wrongRepo -OutputRoot (Join-Path $root 'wrong-output') -SourceRevision $sourceRevision|Out-Null}catch{$wrongRejected=$true};if(-not$wrongRejected){throw 'F200 fixture metadata was accepted for standalone F210 projection'}
           $wrongSpaceAgeRepo=Join-Path $root 'wrong-space-age-repository';$wrongSpaceAgeFixture=Join-Path $wrongSpaceAgeRepo 'tests/fixtures/library-multiplayer';$null=New-Item -ItemType Directory -Path (Split-Path -Parent $wrongSpaceAgeFixture) -Force;Copy-Item -LiteralPath $canonicalLibrary -Destination $wrongSpaceAgeFixture -Recurse
           $wrongSpaceAgeInfo=Get-Content -LiteralPath (Join-Path $wrongSpaceAgeFixture 'info-f210-space-age.json') -Raw|ConvertFrom-Json -AsHashtable;$wrongSpaceAgeInfo.version='0.1.0';[IO.File]::WriteAllText((Join-Path $wrongSpaceAgeFixture 'info-f210-space-age.json'),($wrongSpaceAgeInfo|ConvertTo-Json -Depth 8)+[Environment]::NewLine,[Text.UTF8Encoding]::new($false))
-          $wrongSpaceAgeRejected=$false;try{New-StandaloneF210LibraryFixtureSourceProjection -RepoRoot $wrongSpaceAgeRepo -OutputRoot (Join-Path $root 'wrong-space-age-output') -SpaceAgeLibrary|Out-Null}catch{$wrongSpaceAgeRejected=$true};if(-not$wrongSpaceAgeRejected){throw 'Base metadata was accepted for standalone F210 Space Age projection'}
+          $wrongSpaceAgeRejected=$false;try{New-StandaloneF210LibraryFixtureSourceProjection -RepoRoot $wrongSpaceAgeRepo -OutputRoot (Join-Path $root 'wrong-space-age-output') -SourceRevision $sourceRevision -SpaceAgeLibrary|Out-Null}catch{$wrongSpaceAgeRejected=$true};if(-not$wrongSpaceAgeRejected){throw 'Base metadata was accepted for standalone F210 Space Age projection'}
           $wrongPrivateRepo=Join-Path $root 'wrong-private-credit-repository';$wrongPrivateFixture=Join-Path $wrongPrivateRepo 'tests/fixtures/library-multiplayer';$null=New-Item -ItemType Directory -Path (Split-Path -Parent $wrongPrivateFixture) -Force;Copy-Item -LiteralPath $canonicalLibrary -Destination $wrongPrivateFixture -Recurse
           $wrongPrivateInfo=Get-Content -LiteralPath (Join-Path $wrongPrivateFixture 'info-f210-private-credits.json') -Raw|ConvertFrom-Json -AsHashtable;$wrongPrivateInfo.dependencies=@('base >= 2.1.23','more-infinite-research = 5.0.21000');[IO.File]::WriteAllText((Join-Path $wrongPrivateFixture 'info-f210-private-credits.json'),($wrongPrivateInfo|ConvertTo-Json -Depth 8)+[Environment]::NewLine,[Text.UTF8Encoding]::new($false))
-          $wrongPrivateRejected=$false;try{New-StandaloneF210LibraryFixtureSourceProjection -RepoRoot $wrongPrivateRepo -OutputRoot (Join-Path $root 'wrong-private-credit-output') -PrivateCreditChecks|Out-Null}catch{$wrongPrivateRejected=$true};if(-not$wrongPrivateRejected){throw 'private-credit fixture metadata accepted missing optional Space Age dependency'}
+          $wrongPrivateRejected=$false;try{New-StandaloneF210LibraryFixtureSourceProjection -RepoRoot $wrongPrivateRepo -OutputRoot (Join-Path $root 'wrong-private-credit-output') -SourceRevision $sourceRevision -PrivateCreditChecks|Out-Null}catch{$wrongPrivateRejected=$true};if(-not$wrongPrivateRejected){throw 'private-credit fixture metadata accepted missing optional Space Age dependency'}
           'PASS actual normal standalone F210 preparation and projection opponents'
         '''
         with tempfile.TemporaryDirectory(prefix="mir5-standalone-normal-preparation-") as work:
@@ -1650,13 +1733,15 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
           }
           $tokens=$null;$errors=$null;$ast=[Management.Automation.Language.Parser]::ParseFile($env:MIR_TEST_WRAPPER,[ref]$tokens,[ref]$errors);if($errors.Count){throw $errors[0].Message}
           . $env:MIR_TEST_LIBRARY_ACTIVATION
-          foreach($name in @('Resolve-StandaloneF210ApiConsumerSourceRevision','Get-StandaloneF210ApiConsumerRawGitMemberBytes','New-StandaloneF210ApiConsumerSourceProjection')){
+          foreach($name in @('Resolve-StandaloneF210ApiConsumerSourceRevision','Get-StandaloneF210NativeFixtureGitMembers','Get-StandaloneF210NativeFixtureRawGitMemberBytes','Get-StandaloneF210ApiConsumerRawGitMemberBytes','New-StandaloneF210LibraryFixtureSourceProjection','New-StandaloneIdentityObserverSourceProjection','New-StandaloneF210ApiConsumerSourceProjection')){
             $node=@($ast.FindAll({param($candidate) $candidate -is [Management.Automation.Language.FunctionDefinitionAst] -and $candidate.Name -ceq $name},$true));if($node.Count-ne1){throw "raw Git projection function is absent or ambiguous: $name"};Invoke-Expression $node[0].Extent.Text
           }
           $root=$env:MIR_TEST_WORK;$repo=$env:MIR_TEST_REPO;$sourceRevision=@(& git -C $repo rev-parse --verify 'HEAD^{commit}');if($LASTEXITCODE-ne0-or$sourceRevision.Count-ne1){throw 'source test revision is unavailable'}
           $fixtures=@{
             'api-alpha'=@('control.lua','data.lua','graphics/icon.png','info.json','info-f200.json')
             'api-beta'=@('control.lua','data-final-fixes.lua','graphics/icon.png','info.json','info-f200.json')
+            'library-multiplayer'=@('README.md','control.lua','info-f210-private-credits.json','info-f210-space-age.json','info-f210.json','info.json','settings-updates.lua')
+            'active-mods-observer'=@('data-final-fixes.lua','info-f200.json','info.json')
           }
           function New-FixtureGitRepository([string]$Destination,[scriptblock]$Mutation){
             foreach($fixture in $fixtures.Keys){foreach($member in $fixtures[$fixture]){$destinationPath=Join-Path $Destination ('tests/fixtures/'+$fixture+'/'+$member);$null=New-Item -ItemType Directory -Path (Split-Path -Parent $destinationPath) -Force;[IO.File]::WriteAllBytes($destinationPath,(Get-GitBytes $repo $sourceRevision[0] ('tests/fixtures/'+$fixture+'/'+$member)))}}
@@ -1678,6 +1763,12 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
           function Convert-TextMembersToCrlf([string]$RepoRoot){
             foreach($fixture in $fixtures.Keys){foreach($member in $fixtures[$fixture]){if($member-notmatch'\.(lua|json)$'){continue};$path=Join-Path $RepoRoot ('tests/fixtures/'+$fixture+'/'+$member);$text=[Text.Encoding]::UTF8.GetString([IO.File]::ReadAllBytes($path));if($text.Contains("`r")){throw "fixture source was not raw LF: $fixture/$member"};[IO.File]::WriteAllText($path,$text.Replace("`n","`r`n"),[Text.UTF8Encoding]::new($false))}}
           }
+          function New-SourceArchive([string]$Library,[string]$Source,[string[]]$Members){
+            $info=Get-Content -LiteralPath (Join-Path $Source 'info.json') -Raw|ConvertFrom-Json -AsHashtable
+            $archive=Join-Path $Library ($info.name+'_'+$info.version+'.zip');$stream=[IO.File]::Open($archive,[IO.FileMode]::CreateNew,[IO.FileAccess]::Write,[IO.FileShare]::None)
+            try{$zip=[IO.Compression.ZipArchive]::new($stream,[IO.Compression.ZipArchiveMode]::Create,$false);try{foreach($member in $Members){$entry=$zip.CreateEntry($info.name+'_'+$info.version+'/'+$member,[IO.Compression.CompressionLevel]::Optimal);$entryStream=$entry.Open();$input=[IO.File]::OpenRead((Join-Path $Source $member));try{$input.CopyTo($entryStream)}finally{$input.Dispose();$entryStream.Dispose()}}}finally{$zip.Dispose()}}finally{$stream.Dispose()}
+            return $archive
+          }
           $baselineRepo=Join-Path $root 'baseline-repository';$baselineRevision=New-FixtureGitRepository $baselineRepo $null
           $resolvedRevision=Resolve-StandaloneF210ApiConsumerSourceRevision -RepoRoot $baselineRepo;if($resolvedRevision-cne$baselineRevision){throw 'API consumers did not resolve one committed source revision'}
           $library=Join-Path $root 'library';$null=New-Item -ItemType Directory -Path $library
@@ -1690,6 +1781,24 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
           $beta=New-StandaloneF210ApiConsumerSourceProjection -RepoRoot $baselineRepo -ArchiveLibrary $library -OutputRoot (Join-Path $root 'beta') -FixtureName 'mir-fixture-mir5-api-beta' -ExpectedArchiveSha256 (Get-FileHash -LiteralPath $betaArchive -Algorithm SHA256).Hash -SourceRevision $resolvedRevision
           foreach($fixture in @($alpha,$beta)){if($fixture.source_revision-cne$resolvedRevision-or$fixture.members.Count-ne4){throw 'raw Git projection did not retain its selected source revision and four runtime members'};Assert-MIRLibraryFixtureArchive -Archive $fixture.archive -SourceDirectory $fixture.source}
           foreach($fixtureSpec in @(@{name='mir-fixture-mir5-api-alpha';short='api-alpha';projection=$alpha},@{name='mir-fixture-mir5-api-beta';short='api-beta';projection=$beta})){foreach($member in $fixtureSpec.projection.members){$expected=[Convert]::ToHexString([Security.Cryptography.SHA256]::HashData((Get-GitBytes $baselineRepo $resolvedRevision ('tests/fixtures/'+$fixtureSpec.short+'/'+$member.path))));$actual=(Get-FileHash -LiteralPath (Join-Path $fixtureSpec.projection.source $member.path) -Algorithm SHA256).Hash.ToUpperInvariant();if($actual-cne$expected){throw "raw Git member bytes differ: $($fixtureSpec.short)/$($member.path)"}}}
+          $libraryProjection=New-StandaloneF210LibraryFixtureSourceProjection -RepoRoot $baselineRepo -OutputRoot (Join-Path $root 'library-fixture') -SourceRevision $resolvedRevision
+          $libraryArchive=New-SourceArchive -Library $library -Source $libraryProjection.source -Members @('control.lua','info.json','settings-updates.lua')
+          Assert-MIRLibraryFixtureArchive -Archive $libraryArchive -SourceDirectory $libraryProjection.source
+          if($libraryProjection.source_revision-cne$resolvedRevision-or$libraryProjection.members.Count-ne3){throw 'Library projection did not retain the selected raw Git revision and exact runtime members'}
+          $legacyLibrary=Join-Path $root 'legacy-library-crlf';$null=New-Item -ItemType Directory -Path $legacyLibrary
+          foreach($member in @(@{source='control.lua';destination='control.lua'},@{source='settings-updates.lua';destination='settings-updates.lua'},@{source='info-f210.json';destination='info.json'})){[IO.File]::Copy((Join-Path $baselineRepo ('tests/fixtures/library-multiplayer/'+$member.source)),(Join-Path $legacyLibrary $member.destination),$false)}
+          Assert-Rejects 'legacy CRLF Library worktree projection' {Assert-MIRLibraryFixtureArchive -Archive $libraryArchive -SourceDirectory $legacyLibrary}
+          foreach($member in $libraryProjection.members){$sourceName=[string]$member.source;$expected=[Convert]::ToHexString([Security.Cryptography.SHA256]::HashData((Get-GitBytes $baselineRepo $resolvedRevision ('tests/fixtures/library-multiplayer/'+$sourceName))));$actual=(Get-FileHash -LiteralPath (Join-Path $libraryProjection.source $member.path) -Algorithm SHA256).Hash.ToUpperInvariant();if($actual-cne$expected){throw "raw Git member bytes differ: library-multiplayer/$($member.path)"}}
+          $observerSource=Join-Path $root 'observer-raw';$null=New-Item -ItemType Directory -Path $observerSource
+          foreach($member in @('data-final-fixes.lua','info.json')){[IO.File]::WriteAllBytes((Join-Path $observerSource $member),(Get-StandaloneF210NativeFixtureRawGitMemberBytes -RepoRoot $baselineRepo -SourceRevision $resolvedRevision -FixtureDirectory 'active-mods-observer' -Member $member))}
+          $observerArchive=New-SourceArchive -Library $library -Source $observerSource -Members @('data-final-fixes.lua','info.json')
+          $observer=New-StandaloneIdentityObserverSourceProjection -RepoRoot $baselineRepo -ArchiveLibrary $library -OutputRoot (Join-Path $root 'observer-fixture') -SourceRevision $resolvedRevision -ExpectedArchiveSha256 (Get-FileHash -LiteralPath $observerArchive -Algorithm SHA256).Hash
+          Assert-MIRLibraryFixtureArchive -Archive $observer.archive -SourceDirectory $observer.source
+          if($observer.source_revision-cne$resolvedRevision-or$observer.members.Count-ne2){throw 'observer projection did not retain the selected raw Git revision and exact runtime members'}
+          $legacyObserver=Join-Path $root 'legacy-observer-crlf';$null=New-Item -ItemType Directory -Path $legacyObserver
+          foreach($member in @('data-final-fixes.lua','info.json')){[IO.File]::Copy((Join-Path $baselineRepo ('tests/fixtures/active-mods-observer/'+$member)),(Join-Path $legacyObserver $member),$false)}
+          Assert-Rejects 'legacy CRLF observer worktree projection' {Assert-MIRLibraryFixtureArchive -Archive $observerArchive -SourceDirectory $legacyObserver}
+          foreach($member in $observer.members){$expected=[Convert]::ToHexString([Security.Cryptography.SHA256]::HashData((Get-GitBytes $baselineRepo $resolvedRevision ('tests/fixtures/active-mods-observer/'+$member.path))));$actual=(Get-FileHash -LiteralPath (Join-Path $observer.source $member.path) -Algorithm SHA256).Hash.ToUpperInvariant();if($actual-cne$expected){throw "raw Git member bytes differ: active-mods-observer/$($member.path)"}}
           $validAlphaHash=(Get-FileHash -LiteralPath $alphaArchive -Algorithm SHA256).Hash;$validBetaHash=(Get-FileHash -LiteralPath $betaArchive -Algorithm SHA256).Hash
           $tamperedRepo=Join-Path $root 'tampered-repository';$tamperedRevision=New-FixtureGitRepository $tamperedRepo {param($path)[IO.File]::AppendAllText((Join-Path $path 'tests/fixtures/api-alpha/control.lua'),'-- changed',[Text.UTF8Encoding]::new($false))}
           Assert-Rejects 'tampered committed selected member' {New-StandaloneF210ApiConsumerSourceProjection -RepoRoot $tamperedRepo -ArchiveLibrary $library -OutputRoot (Join-Path $root 'tampered-output') -FixtureName 'mir-fixture-mir5-api-alpha' -ExpectedArchiveSha256 $validAlphaHash -SourceRevision $tamperedRevision|Out-Null}
@@ -1699,7 +1808,7 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
           Assert-Rejects 'extra committed runtime member' {New-StandaloneF210ApiConsumerSourceProjection -RepoRoot $extraRepo -ArchiveLibrary $library -OutputRoot (Join-Path $root 'extra-output') -FixtureName 'mir-fixture-mir5-api-beta' -ExpectedArchiveSha256 $validBetaHash -SourceRevision $extraRevision|Out-Null}
           $metadataRepo=Join-Path $root 'metadata-repository';$metadataRevision=New-FixtureGitRepository $metadataRepo {param($path)$metadata=Join-Path $path 'tests/fixtures/api-beta/info.json';$text=[Text.Encoding]::UTF8.GetString([IO.File]::ReadAllBytes($metadata));[IO.File]::WriteAllText($metadata,$text.Replace('"factorio_version": "2.1"','"factorio_version": "2.0"'),[Text.UTF8Encoding]::new($false))}
           Assert-Rejects 'committed F210 metadata drift' {New-StandaloneF210ApiConsumerSourceProjection -RepoRoot $metadataRepo -ArchiveLibrary $library -OutputRoot (Join-Path $root 'metadata-output') -FixtureName 'mir-fixture-mir5-api-beta' -ExpectedArchiveSha256 $validBetaHash -SourceRevision $metadataRevision|Out-Null}
-          'PASS raw Git API consumer projection and CRLF/tamper/membership/metadata opponents'
+          'PASS raw Git API, Library and observer projections with CRLF/tamper/membership/metadata controls'
         '''
         with tempfile.TemporaryDirectory(prefix="mir5-standalone-api-raw-git-") as work:
             result = subprocess.run(
@@ -1791,10 +1900,12 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
             $names=@(Get-ChildItem -LiteralPath $SourceDirectory -Recurse -File|ForEach-Object {[IO.Path]::GetRelativePath($SourceDirectory,$_.FullName).Replace('\','/')}|Sort-Object)
             if(($names-join'|')-cne'data-final-fixes.lua|info.json'){throw 'projection is not the exact two-member source'}
           }
-          $node=@($ast.FindAll({param($candidate) $candidate -is [Management.Automation.Language.FunctionDefinitionAst] -and $candidate.Name -ceq 'New-StandaloneIdentityObserverSourceProjection'},$true))
-          if($node.Count-ne1){throw 'observer projection function is absent or ambiguous'}
-          Invoke-Expression $node[0].Extent.Text
-          $repo=$env:MIR_TEST_REPO
+          foreach($name in @('Resolve-StandaloneF210ApiConsumerSourceRevision','Get-StandaloneF210NativeFixtureGitMembers','Get-StandaloneF210NativeFixtureRawGitMemberBytes','New-StandaloneIdentityObserverSourceProjection')){
+            $node=@($ast.FindAll({param($candidate) $candidate -is [Management.Automation.Language.FunctionDefinitionAst] -and $candidate.Name -ceq $name},$true))
+            if($node.Count-ne1){throw "observer projection function is absent or ambiguous: $name"}
+            Invoke-Expression $node[0].Extent.Text
+          }
+          $repo=$env:MIR_TEST_REPO;$sourceRevision=Resolve-StandaloneF210ApiConsumerSourceRevision -RepoRoot $repo
           $library=Join-Path $env:MIR_TEST_WORK 'library';$null=New-Item -ItemType Directory -Path $library
           $canonical=Join-Path $repo 'tests/fixtures/active-mods-observer'
           $archive=Join-Path $library 'mir-fixture-mir5-active-mods-observer_0.1.0.zip'
@@ -1804,25 +1915,25 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
             try {
               foreach($name in @('data-final-fixes.lua','info.json')){
                 $entry=$zip.CreateEntry('mir-fixture-mir5-active-mods-observer_0.1.0/'+$name,[IO.Compression.CompressionLevel]::Optimal)
-                $entryStream=$entry.Open();$input=[IO.File]::OpenRead((Join-Path $canonical $name))
-                try{$input.CopyTo($entryStream)}finally{$input.Dispose();$entryStream.Dispose()}
+                $entryStream=$entry.Open();$bytes=Get-StandaloneF210NativeFixtureRawGitMemberBytes -RepoRoot $repo -SourceRevision $sourceRevision -FixtureDirectory 'active-mods-observer' -Member $name
+                try{$entryStream.Write($bytes,0,$bytes.Length)}finally{$entryStream.Dispose()}
               }
             } finally {$zip.Dispose()}
           } finally {$stream.Dispose()}
           $hash=(Get-FileHash -LiteralPath $archive -Algorithm SHA256).Hash.ToUpperInvariant()
           $positiveRoot=Join-Path $env:MIR_TEST_WORK 'positive';$null=New-Item -ItemType Directory -Path $positiveRoot
-          $projection=New-StandaloneIdentityObserverSourceProjection -RepoRoot $repo -ArchiveLibrary $library -OutputRoot $positiveRoot -ExpectedArchiveSha256 $hash
+          $projection=New-StandaloneIdentityObserverSourceProjection -RepoRoot $repo -ArchiveLibrary $library -OutputRoot $positiveRoot -SourceRevision $sourceRevision -ExpectedArchiveSha256 $hash
           if($projection.sha256-cne$hash -or $projection.alternate_metadata-cne'info-f200.json' -or $projection.members.Count-ne2){throw 'projection lost hash-bound canonical observer facts'}
           function Assert-Rejects([string]$Name,[scriptblock]$Block){$rejected=$false;try{&$Block}catch{$rejected=$true};if(-not$rejected){throw "observer projection accepted opponent: $Name"}}
           $changedRepo=Join-Path $env:MIR_TEST_WORK 'changed-repo';$changedSource=Join-Path $changedRepo 'tests/fixtures/active-mods-observer';$null=New-Item -ItemType Directory -Path (Split-Path -Parent $changedSource) -Force;Copy-Item -LiteralPath (Join-Path $repo 'tests/fixtures/active-mods-observer') -Destination $changedSource -Recurse
           [IO.File]::AppendAllText((Join-Path $changedSource 'data-final-fixes.lua'),'-- altered',[Text.UTF8Encoding]::new($false))
-          Assert-Rejects 'altered canonical member' {New-StandaloneIdentityObserverSourceProjection -RepoRoot $changedRepo -ArchiveLibrary $library -OutputRoot (Join-Path $env:MIR_TEST_WORK 'changed-output') -ExpectedArchiveSha256 $hash|Out-Null}
+          Assert-Rejects 'source repository without committed members' {New-StandaloneIdentityObserverSourceProjection -RepoRoot $changedRepo -ArchiveLibrary $library -OutputRoot (Join-Path $env:MIR_TEST_WORK 'changed-output') -SourceRevision $sourceRevision -ExpectedArchiveSha256 $hash|Out-Null}
           $missingRepo=Join-Path $env:MIR_TEST_WORK 'missing-repo';$missingSource=Join-Path $missingRepo 'tests/fixtures/active-mods-observer';$null=New-Item -ItemType Directory -Path (Split-Path -Parent $missingSource) -Force;Copy-Item -LiteralPath (Join-Path $repo 'tests/fixtures/active-mods-observer') -Destination $missingSource -Recurse;Remove-Item -LiteralPath (Join-Path $missingSource 'data-final-fixes.lua') -Force
-          Assert-Rejects 'missing canonical member' {New-StandaloneIdentityObserverSourceProjection -RepoRoot $missingRepo -ArchiveLibrary $library -OutputRoot (Join-Path $env:MIR_TEST_WORK 'missing-output') -ExpectedArchiveSha256 $hash|Out-Null}
+          Assert-Rejects 'source repository without committed members' {New-StandaloneIdentityObserverSourceProjection -RepoRoot $missingRepo -ArchiveLibrary $library -OutputRoot (Join-Path $env:MIR_TEST_WORK 'missing-output') -SourceRevision $sourceRevision -ExpectedArchiveSha256 $hash|Out-Null}
           $extraLibrary=Join-Path $env:MIR_TEST_WORK 'extra-library';$null=New-Item -ItemType Directory -Path $extraLibrary;$extraArchive=Join-Path $extraLibrary 'mir-fixture-mir5-active-mods-observer_0.1.0.zip';Copy-Item -LiteralPath $archive -Destination $extraArchive
           $zip=[IO.Compression.ZipFile]::Open($extraArchive,[IO.Compression.ZipArchiveMode]::Update);try{$writer=[IO.StreamWriter]::new($zip.CreateEntry('mir-fixture-mir5-active-mods-observer_0.1.0/unexpected.lua').Open());try{$writer.Write('-- unexpected')}finally{$writer.Dispose()}}finally{$zip.Dispose()}
           $extraHash=(Get-FileHash -LiteralPath $extraArchive -Algorithm SHA256).Hash
-          Assert-Rejects 'extra archive member' {New-StandaloneIdentityObserverSourceProjection -RepoRoot $repo -ArchiveLibrary $extraLibrary -OutputRoot (Join-Path $env:MIR_TEST_WORK 'extra-output') -ExpectedArchiveSha256 $extraHash|Out-Null}
+          Assert-Rejects 'extra archive member' {New-StandaloneIdentityObserverSourceProjection -RepoRoot $repo -ArchiveLibrary $extraLibrary -OutputRoot (Join-Path $env:MIR_TEST_WORK 'extra-output') -SourceRevision $sourceRevision -ExpectedArchiveSha256 $extraHash|Out-Null}
           'PASS standalone identity observer projection members'
         '''
         with tempfile.TemporaryDirectory(prefix="mir5-identity-observer-projection-") as work:
