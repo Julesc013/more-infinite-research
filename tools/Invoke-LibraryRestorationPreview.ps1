@@ -75,6 +75,18 @@ function Assert-PreviewBuildPath([string]$Path,[string]$Context) {
   }
   return $full
 }
+function Assert-PreviewRootsDisjoint([string]$InputRoot,[string]$OutputRoot) {
+  $inputFull=[IO.Path]::GetFullPath($InputRoot).TrimEnd('\','/')
+  $outputFull=[IO.Path]::GetFullPath($OutputRoot).TrimEnd('\','/')
+  $separator=[IO.Path]::DirectorySeparatorChar
+  $inputPrefix=$inputFull+$separator
+  $outputPrefix=$outputFull+$separator
+  if($inputFull-ceq$outputFull -or
+     $inputFull.StartsWith($outputPrefix,[StringComparison]::OrdinalIgnoreCase) -or
+     $outputFull.StartsWith($inputPrefix,[StringComparison]::OrdinalIgnoreCase)) {
+    throw '[mir-library-restoration-preview] prepared input and native output roots must be separate, non-nested directories'
+  }
+}
 
 $profile=Join-Path $repo 'tests/profiles/library-restoration-cfeac3-space-age-standalone-f210-2123.json'
 $profileHash=(Get-MIRImmutableInputSha256 -Path $profile)
@@ -85,7 +97,7 @@ $mir=(Resolve-Path -LiteralPath $MIRArchive).Path
 $apiBeta=(Resolve-Path -LiteralPath $APIBetaArchive).Path
 $inputRoot=Assert-PreviewBuildPath -Path $InputRoot -Context 'InputRoot'
 $outputRoot=Assert-PreviewBuildPath -Path $OutputRoot -Context 'OutputRoot'
-Assert-Preview ($inputRoot-cne$outputRoot) 'input and native output roots must be distinct'
+Assert-PreviewRootsDisjoint -InputRoot $inputRoot -OutputRoot $outputRoot
 $engineSha=(Get-MIRImmutableInputSha256 -Path $engine)
 $sourceHeadRows=@(& git -C $repo rev-parse --verify 'HEAD^{commit}')
 Assert-Preview ($LASTEXITCODE-eq0-and$sourceHeadRows.Count-eq1-and[string]$sourceHeadRows[0]-cmatch'^[0-9a-f]{40}$') 'source HEAD is not one committed revision'

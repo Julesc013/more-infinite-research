@@ -24,6 +24,7 @@ CURRENT_STANDALONE_F210_SPACE_AGE_API_CONSUMERS_PROFILE = ROOT / "tests/profiles
 PRIVATE_CREDITS_BASE_PROFILE = ROOT / "tests/profiles/library-api-consumers-private-credits-standalone-f210-2123.json"
 PRIVATE_CREDITS_SPACE_AGE_PROFILE = ROOT / "tests/profiles/library-api-consumers-private-credits-space-age-standalone-f210-2123.json"
 RESTORATION_PREVIEW_PROFILE = ROOT / "tests/profiles/library-restoration-cfeac3-space-age-standalone-f210-2123.json"
+RESTORATION_PREVIEW_CALLER = ROOT / "tools/Invoke-LibraryRestorationPreview.ps1"
 PRIVATE_CREDITS_INFO = ROOT / "tests/fixtures/library-multiplayer/info-f210-private-credits.json"
 F200_PRIVATE_CREDITS_PROFILE = ROOT / "tests/profiles/library-private-credits-current-f200-2077.json"
 F200_PRIVATE_CREDITS_INFO = ROOT / "tests/fixtures/library-private-credits-f200/info.json"
@@ -1021,6 +1022,42 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
         )
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
 
+    def test_restored_library_preview_rejects_nested_input_and_output_roots_before_mode_work(self):
+        caller = RESTORATION_PREVIEW_CALLER.read_text(encoding="utf-8")
+        guard_position = caller.index("Assert-PreviewRootsDisjoint -InputRoot")
+        prepare_position = caller.index("if($Mode-ceq'Prepare')")
+        self.assertLess(guard_position, prepare_position)
+        self.assertLess(guard_position, caller.index("Start-MIRNativeArchiveLease -LibraryDirectory"))
+        script = r'''
+          $ErrorActionPreference='Stop';Set-StrictMode -Version Latest
+          $tokens=$null;$errors=$null
+          $ast=[Management.Automation.Language.Parser]::ParseFile($env:MIR_TEST_PREVIEW_CALLER,[ref]$tokens,[ref]$errors)
+          if($errors.Count){throw $errors[0].Message}
+          $node=@($ast.FindAll({param($candidate)
+            $candidate -is [Management.Automation.Language.FunctionDefinitionAst] -and $candidate.Name -ceq 'Assert-PreviewRootsDisjoint'
+          },$true))
+          if($node.Count-ne1){throw 'input/output root guard is absent or ambiguous'}
+          Invoke-Expression $node[0].Extent.Text
+          $root=$env:MIR_TEST_WORK
+          $packet=Join-Path $root 'packet';$native=Join-Path $packet 'native';$parent=Join-Path $root 'parent';$child=Join-Path $parent 'child'
+          function Assert-OverlapRejected([string]$InputRoot,[string]$OutputRoot){
+            $rejected=$false;try{Assert-PreviewRootsDisjoint -InputRoot $InputRoot -OutputRoot $OutputRoot}catch{$rejected=$_.Exception.Message -like '*must be separate, non-nested directories*'}
+            if(-not$rejected){throw "overlapping roots were admitted: $InputRoot | $OutputRoot"}
+            if((Test-Path -LiteralPath $InputRoot)-or(Test-Path -LiteralPath $OutputRoot)){throw 'path guard created an input or output root'}
+          }
+          Assert-OverlapRejected $packet $native
+          Assert-OverlapRejected $child $parent
+          Assert-PreviewRootsDisjoint -InputRoot (Join-Path $root 'input') -OutputRoot (Join-Path $root 'output')
+        '''
+        with tempfile.TemporaryDirectory(prefix="mir5-preview-roots-") as work:
+            result = subprocess.run(
+                ["pwsh", "-NoLogo", "-NoProfile", "-Command", script],
+                capture_output=True, text=True,
+                env=dict(os.environ, MIR_TEST_PREVIEW_CALLER=str(RESTORATION_PREVIEW_CALLER), MIR_TEST_WORK=work),
+                check=False,
+            )
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+
     def test_f200_private_profile_and_prelaunch_guards_require_exact_six_mod_inputs(self):
         selection = json.loads(F200_PRIVATE_CREDITS_PROFILE.read_text(encoding='utf-8'))
         info = json.loads(F200_PRIVATE_CREDITS_INFO.read_text(encoding='utf-8'))
@@ -1748,6 +1785,35 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
              (Get-MIRImmutableInputSha256 -Path $badBackup)-cne$badOriginalHash -or
              (Get-MIRImmutableInputFileIdentity -Path $badBackup)-cne$badOriginalIdentity -or
              (Get-MIRImmutableInputSha256 -Path (Join-Path $badLibrary $names[1]))-ceq$badLease.record.entries[1].candidate_sha256){throw 'changed target or recovery copy was overwritten'}
+
+          $faultLibrary=Join-Path $root 'fault-library';$faultOutput=Join-Path $root 'fault-output'
+          [IO.Directory]::CreateDirectory($faultLibrary)|Out-Null;[IO.Directory]::CreateDirectory($faultOutput)|Out-Null
+          [IO.File]::WriteAllBytes((Join-Path $faultLibrary $names[0]),[Text.UTF8Encoding]::new($false).GetBytes('fault-original'))
+          $faultOriginal=Join-Path $faultLibrary $names[0]
+          $faultOriginalHash=Get-MIRImmutableInputSha256 -Path $faultOriginal
+          $faultOriginalIdentity=Get-MIRImmutableInputFileIdentity -Path $faultOriginal
+          $script:originalLeaseWriter=(Get-Command Write-MIRNativeArchiveLeaseRecord -CommandType Function).ScriptBlock
+          function Write-MIRNativeArchiveLeaseRecord {
+            param([Collections.IDictionary]$Record,[string]$Path)
+            if(@($Record.entries|Where-Object state -CEQ 'installed').Count){throw 'injected setup failure after candidate install'}
+            & $script:originalLeaseWriter -Record $Record -Path $Path
+          }
+          function Restore-MIRNativeArchiveLeaseRecord {
+            param([Collections.IDictionary]$Record,[string]$JournalPath,[string]$LibraryDirectory,[switch]$KeepLock)
+            throw 'injected restoration failure'
+          }
+          $failureMessage='';try{Start-MIRNativeArchiveLease -LibraryDirectory $faultLibrary -OutputRoot $faultOutput -ArchiveSources $sources|Out-Null}catch{$failureMessage=$_.Exception.Message}
+          if(-not$failureMessage.Contains('[mir-native-archive-lease-restoration-failed]') -or
+             -not$failureMessage.Contains('injected setup failure after candidate install') -or
+             -not$failureMessage.Contains('injected restoration failure')) {throw "combined setup/restoration failure was not reported: $failureMessage"}
+          $faultJournal=Join-Path $faultLibrary '.mir-library-preview-archive.json'
+          if(-not(Test-Path -LiteralPath $faultJournal -PathType Leaf)){throw 'recovery journal was discarded after failed restoration'}
+          $faultRecord=Get-MIRNativeArchiveLeaseRecord -Path $faultJournal
+          $faultBackup=[string](@($faultRecord.entries|Where-Object file_name -CEQ $names[0])[0].backup_path)
+          if(-not(Test-Path -LiteralPath $faultBackup -PathType Leaf) -or
+             (Get-MIRImmutableInputSha256 -Path $faultBackup)-cne$faultOriginalHash -or
+             (Get-MIRImmutableInputFileIdentity -Path $faultBackup)-cne$faultOriginalIdentity -or
+             (Get-MIRImmutableInputSha256 -Path $faultOriginal)-cne[string](@($faultRecord.entries|Where-Object file_name -CEQ $names[0])[0].candidate_sha256)) {throw 'original backup or installed candidate was not preserved after failed restoration'}
           'PASS direct-library archive lease restoration and changed-target refusal'
         '''
         temporary_parent = ROOT / "build" / "tmp"

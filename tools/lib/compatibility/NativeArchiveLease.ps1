@@ -274,8 +274,18 @@ function Start-MIRNativeArchiveLease {
     Write-MIRNativeArchiveLeaseRecord -Record $record -Path (Join-Path $output 'direct-library-archive-lease-prepared.json')
     return $lease
   } catch {
+    $setupFailure = $_.Exception
     if ($null -ne $lease) {
-      try { Restore-MIRNativeArchiveLeaseRecord -Record $lease.record -JournalPath $journalPath -LibraryDirectory $library } catch { $_ | Out-Null }
+      try { Restore-MIRNativeArchiveLeaseRecord -Record $lease.record -JournalPath $journalPath -LibraryDirectory $library }
+      catch {
+        $restoreFailure = $_.Exception
+        foreach ($handle in $sourceHandles) { $handle.Dispose() }
+        $lock.Dispose()
+        throw [InvalidOperationException]::new(
+          "[mir-native-archive-lease-restoration-failed] setup failed: $($setupFailure.Message); restoration failed: $($restoreFailure.Message). The journal and verified backups were retained.",
+          $restoreFailure
+        )
+      }
     } else {
       foreach ($staged in $preStaged) {
         if ((Test-Path -LiteralPath $staged.path -PathType Leaf) -and
@@ -287,7 +297,7 @@ function Start-MIRNativeArchiveLease {
     }
     foreach ($handle in $sourceHandles) { $handle.Dispose() }
     $lock.Dispose()
-    throw
+    throw $setupFailure
   }
 }
 
