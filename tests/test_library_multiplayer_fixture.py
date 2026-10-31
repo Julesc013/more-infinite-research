@@ -1863,20 +1863,20 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
             if($node.Count-ne1){throw "standalone API projection function is absent or ambiguous: $name"}
             Invoke-Expression $node[0].Extent.Text
           }
-          function New-SourceArchive([string]$Library,[string]$RepoRoot,[string]$Revision,[string]$FixtureName,[string[]]$Members){
+          function New-SourceArchive([string]$Library,[string]$RepoRoot,[string]$Revision,[string]$FixtureName,[string[]]$Members,[switch]$ReformattedInfo,[switch]$MutatedInfo,[switch]$DuplicatedInfo){
             $info=[Text.Encoding]::UTF8.GetString((Get-StandaloneF210ApiConsumerRawGitMemberBytes -RepoRoot $RepoRoot -SourceRevision $Revision -FixtureName $FixtureName -Member 'info.json'))|ConvertFrom-Json -AsHashtable
             $archive=Join-Path $Library ($info.name+'_'+$info.version+'.zip')
             $stream=[IO.File]::Open($archive,[IO.FileMode]::CreateNew,[IO.FileAccess]::Write,[IO.FileShare]::None)
             try{
               $zip=[IO.Compression.ZipArchive]::new($stream,[IO.Compression.ZipArchiveMode]::Create,$false)
-              try{foreach($name in $Members){$entry=$zip.CreateEntry($info.name+'_'+$info.version+'/'+$name,[IO.Compression.CompressionLevel]::Optimal);$entryStream=$entry.Open();try{$raw=Get-StandaloneF210ApiConsumerRawGitMemberBytes -RepoRoot $RepoRoot -SourceRevision $Revision -FixtureName $FixtureName -Member $name;$entryStream.Write($raw,0,$raw.Length)}finally{$entryStream.Dispose()}}}finally{$zip.Dispose()}
+              try{foreach($name in $Members){$entry=$zip.CreateEntry($info.name+'_'+$info.version+'/'+$name,[IO.Compression.CompressionLevel]::Optimal);$entryStream=$entry.Open();try{$raw=Get-StandaloneF210ApiConsumerRawGitMemberBytes -RepoRoot $RepoRoot -SourceRevision $Revision -FixtureName $FixtureName -Member $name;if($name-ceq'info.json'-and($ReformattedInfo-or$MutatedInfo)){$memberInfo=[Text.Encoding]::UTF8.GetString($raw)|ConvertFrom-Json -AsHashtable;if($MutatedInfo){$memberInfo.factorio_version='2.0'};$raw=[Text.Encoding]::UTF8.GetBytes(($memberInfo|ConvertTo-Json -Depth 16)+[Environment]::NewLine)};if($name-ceq'info.json'-and$DuplicatedInfo){$text=[Text.Encoding]::UTF8.GetString($raw);$text=$text.Replace('"factorio_version": "2.1",','"factorio_version": "2.1",'+[Environment]::NewLine+'  "factorio_version": "2.1",');$raw=[Text.Encoding]::UTF8.GetBytes($text)};$entryStream.Write($raw,0,$raw.Length)}finally{$entryStream.Dispose()}}}finally{$zip.Dispose()}
             }finally{$stream.Dispose()}
             return $archive
           }
           $root=$env:MIR_TEST_WORK;$repo=$env:MIR_TEST_REPO;$revision=@(& git -C $repo rev-parse --verify 'HEAD^{commit}');if($LASTEXITCODE-ne0-or$revision.Count-ne1){throw 'test source revision is unavailable'};$library=Join-Path $root 'library';$null=New-Item -ItemType Directory -Path $library
           $alphaSource=Join-Path $repo 'tests/fixtures/api-alpha';$betaSource=Join-Path $repo 'tests/fixtures/api-beta'
           $alphaArchive=New-SourceArchive -Library $library -RepoRoot $repo -Revision $revision[0] -FixtureName 'mir-fixture-mir5-api-alpha' -Members @('control.lua','data.lua','graphics/icon.png','info.json')
-          $betaArchive=New-SourceArchive -Library $library -RepoRoot $repo -Revision $revision[0] -FixtureName 'mir-fixture-mir5-api-beta' -Members @('control.lua','data-final-fixes.lua','graphics/icon.png','info.json')
+          $betaArchive=New-SourceArchive -Library $library -RepoRoot $repo -Revision $revision[0] -FixtureName 'mir-fixture-mir5-api-beta' -Members @('control.lua','data-final-fixes.lua','graphics/icon.png','info.json') -ReformattedInfo
           $alpha=New-StandaloneF210ApiConsumerSourceProjection -RepoRoot $repo -ArchiveLibrary $library -OutputRoot (Join-Path $root 'alpha') -FixtureName 'mir-fixture-mir5-api-alpha' -ExpectedArchiveSha256 (Get-MIRImmutableInputSha256 $alphaArchive) -SourceRevision $revision[0]
           $beta=New-StandaloneF210ApiConsumerSourceProjection -RepoRoot $repo -ArchiveLibrary $library -OutputRoot (Join-Path $root 'beta') -FixtureName 'mir-fixture-mir5-api-beta' -ExpectedArchiveSha256 (Get-MIRImmutableInputSha256 $betaArchive) -SourceRevision $revision[0]
           if(
@@ -1887,6 +1887,13 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
           ){throw 'standalone API runtime projection member set differs'}
           Assert-MIRLibraryFixtureArchive -Archive $alpha.archive -SourceDirectory $alpha.source
           Assert-MIRLibraryFixtureArchive -Archive $beta.archive -SourceDirectory $beta.source
+          $sourceInfoBytes=(Get-Item -LiteralPath (Join-Path $beta.source 'info.json')).Length;$archiveInfo=[IO.Compression.ZipFile]::OpenRead($beta.archive);try{$entry=$archiveInfo.GetEntry('mir-fixture-mir5-api-beta_0.1.0/info.json');if($null-eq$entry-or$entry.Length-eq$sourceInfoBytes){throw 'test archive did not reformat fixture metadata'}}finally{$archiveInfo.Dispose()}
+          $mutatedLibrary=Join-Path $root 'mutated-metadata-library';$null=New-Item -ItemType Directory -Path $mutatedLibrary;$mutatedArchive=New-SourceArchive -Library $mutatedLibrary -RepoRoot $repo -Revision $revision[0] -FixtureName 'mir-fixture-mir5-api-beta' -Members @('control.lua','data-final-fixes.lua','graphics/icon.png','info.json') -MutatedInfo
+          $metadataRejected=$false;try{Assert-MIRLibraryFixtureArchive -Archive $mutatedArchive -SourceDirectory $beta.source}catch{$metadataRejected=$_.Exception.Message.Contains('[mir-library-fixture-metadata] info.json');if(-not$metadataRejected){throw}}
+          if(-not$metadataRejected){throw 'archive metadata drift was accepted'}
+          $duplicateLibrary=Join-Path $root 'duplicate-metadata-library';$null=New-Item -ItemType Directory -Path $duplicateLibrary;$duplicateArchive=New-SourceArchive -Library $duplicateLibrary -RepoRoot $repo -Revision $revision[0] -FixtureName 'mir-fixture-mir5-api-beta' -Members @('control.lua','data-final-fixes.lua','graphics/icon.png','info.json') -DuplicatedInfo
+          $duplicateRejected=$false;try{Assert-MIRLibraryFixtureArchive -Archive $duplicateArchive -SourceDirectory $beta.source}catch{$duplicateRejected=$_.Exception.Message.Contains('[mir-library-fixture-metadata] info.json');if(-not$duplicateRejected){throw}}
+          if(-not$duplicateRejected){throw 'duplicate archive metadata keys were accepted'}
           $canonicalLibrary=Join-Path $repo 'tests/fixtures/library-multiplayer';$canonicalObserver=Join-Path $repo 'tests/fixtures/active-mods-observer'
           $sources=@(Get-StandaloneIdentityFixtureSources -Sources @($canonicalLibrary,$canonicalObserver,$alphaSource,$betaSource) -LibraryFixtureSource $canonicalLibrary -StagedLibraryFixtureSource $canonicalLibrary -StagedObserverSource $canonicalObserver -RepoRoot $repo -StagedApiConsumerSources @{'mir-fixture-mir5-api-alpha'=$alpha.source;'mir-fixture-mir5-api-beta'=$beta.source})
           if($sources.Count-ne4-or$sources[2]-ine$alpha.source-or$sources[3]-ine$beta.source){throw 'standalone API consumer sources were not projected through the actual source binder'}
