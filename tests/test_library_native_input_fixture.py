@@ -2,6 +2,7 @@
 import argparse
 import json
 from pathlib import Path
+import subprocess
 import sys
 import unittest
 
@@ -19,6 +20,84 @@ def plain(value):
 
 
 class LibraryNativeInputFixtureControls(unittest.TestCase):
+    def test_input_metadata_keeps_required_versions_without_mir_runtime_order_edges(self):
+        historical = "mir-fixture-mir5-migration-origin-f200-110-source"
+        fixture = "mir-fixture-mir5-library-native-input"
+        cases = {
+            "f200": ("2.0.77", "5.0.20000", "0.3.0",
+                      ROOT / "tests/profiles/library-native-input-imported110-f200-2077-r11.json",
+                      FIXTURE / "info-input-identity-f200.json"),
+            "f210": ("2.1.23", "5.0.21000", "0.4.0",
+                      ROOT / "tests/profiles/library-native-input-imported110-f210-2123-r11.json",
+                      FIXTURE / "info-input-identity-f210.json"),
+        }
+        control = (FIXTURE / "control.lua").read_text(encoding="utf-8")
+        self.assertIn(f'require("__{historical}__/catalogue")', control)
+        self.assertIn('script.active_mods["more-infinite-research"]', control)
+        self.assertIn("script.active_mods[historical.fixture]", control)
+        parser = ROOT / "tools/lib/compatibility/LibraryActivation.ps1"
+
+        for target, (base, mir, source_version, profile_path, info_path) in cases.items():
+            with self.subTest(target=target):
+                info = json.loads(info_path.read_text(encoding="utf-8"))
+                profile = json.loads(profile_path.read_text(encoding="utf-8"))
+                expected_dependencies = [
+                    f"base = {base}",
+                    f"~ more-infinite-research = {mir}",
+                    f"~ {historical} = {source_version}",
+                ]
+                self.assertEqual(info["dependencies"], expected_dependencies)
+                self.assertEqual(
+                    [(row["name"], row["version"], row["enabled"]) for row in profile["mods"]],
+                    [
+                        ("base", base, True),
+                        ("mir-fixture-mir5-active-mods-observer", "0.1.0", True),
+                        ("more-infinite-research", mir, True),
+                        (historical, source_version, True),
+                        (fixture, "0.3.0", True),
+                    ],
+                )
+                # Factorio orders runtime handlers by dependency depth then natural
+                # mod name.  The two order-neutral required rows leave this observer
+                # at base depth, before MIR and the historical fixture.
+                order = [
+                    "base",
+                    "mir-fixture-mir5-active-mods-observer",
+                    fixture,
+                    "more-infinite-research",
+                    historical,
+                ]
+                self.assertLess(order.index(fixture), order.index("more-infinite-research"))
+                self.assertLess(order.index(fixture), order.index(historical))
+
+                def quote(path):
+                    return str(path).replace("'", "''")
+
+                command = f"""
+                    $ErrorActionPreference = 'Stop'
+                    . '{quote(parser)}'
+                    $info = Get-Content -Raw -LiteralPath '{quote(info_path)}' | ConvertFrom-Json -AsHashtable
+                    $profile = Get-Content -Raw -LiteralPath '{quote(profile_path)}' | ConvertFrom-Json -AsHashtable
+                    $rows = @($info.dependencies | ForEach-Object {{ ConvertFrom-MIRDependencyString -Dependency $_ }})
+                    if ($rows.Count -ne 3 -or $rows[0].kind -cne 'required' -or -not $rows[0].required) {{ throw 'base dependency is not required' }}
+                    foreach ($row in @($rows[1], $rows[2])) {{
+                      if ($row.kind -cne 'no_order' -or -not $row.required) {{ throw 'order-neutral dependency is not required' }}
+                    }}
+                    $selected = [Collections.Generic.List[object]]::new()
+                    foreach ($row in @($profile.mods)) {{
+                      $metadata = if ($row.name -ceq '{fixture}') {{ $info }} else {{ @{{ dependencies = @() }} }}
+                      $selected.Add([pscustomobject]@{{ name = $row.name; version = $row.version; info = $metadata }})
+                    }}
+                    Assert-MIRLibraryDependencies -Selected $selected.ToArray()
+                """
+                completed = subprocess.run(
+                    ["pwsh", "-NoProfile", "-NonInteractive", "-Command", command],
+                    capture_output=True,
+                    text=True,
+                    check=False,
+                )
+                self.assertEqual(completed.returncode, 0, completed.stdout + completed.stderr)
+
     def setUp(self):
         self.lua = LuaRuntime(unpack_returned_tuples=True)
         self.lua.globals().observer_path = (FIXTURE / "control.lua").as_posix()
