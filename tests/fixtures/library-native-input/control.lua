@@ -126,8 +126,12 @@ local function exclusion_probe(en,de)
       local ordinary=family=="all" and GEAR or "automation"
       if remote.call(BROWSER,"open",p.index,{search=ordinary,selected=ordinary,family=family,visibility=1,tab="research"})~=true then fail("ordinary positive query failed") end
       local ordinary_content=p.gui.screen[ROOT].mir_library_tabs.mir_library_research_content
-      if not valid(ordinary_content.mir_library_results) or #ordinary_content.mir_library_results.items<1
+      if not valid(ordinary_content) or not valid(ordinary_content.mir_library_results) or #ordinary_content.mir_library_results.items<1
           or ordinary_content.mir_library_results.selected_index<1
+          or (ordinary_content.type=="table" and ordinary_content.column_count~=2)
+          or (ordinary_content.type=="scroll-pane" and ordinary_content.vertical_scroll_policy~="auto")
+          or (ordinary_content.type~="table" and ordinary_content.type~="scroll-pane")
+          or ordinary_content.mir_library_detail.type~="scroll-pane"
           or not valid(ordinary_content.mir_library_detail.mir_library_detail_title)
           or ordinary_content.mir_library_actions.mir_library_open_native.enabled~=true then fail("ordinary inspection positive control failed") end
       for _, id in ipairs(IDS) do
@@ -139,9 +143,12 @@ local function exclusion_probe(en,de)
         local detail=valid(content) and content.mir_library_detail
         local actions=valid(content) and content.mir_library_actions
         local button=valid(actions) and actions.mir_library_open_native
-        if not valid(filters) or filters[QUERY].text~=id or filters.mir_library_family.selected_index~=(family=="all" and 2 or 3)
+        if not valid(filters) or not valid(content) or filters[QUERY].text~=id or filters.mir_library_family.selected_index~=(family=="all" and 2 or 3)
+            or (content.type=="table" and content.column_count~=2)
+            or (content.type=="scroll-pane" and content.vertical_scroll_policy~="auto")
+            or (content.type~="table" and content.type~="scroll-pane")
             or not valid(results) or #results.items~=0 or results.selected_index~=0
-            or not valid(detail) or valid(detail.mir_library_detail_title) or not valid(detail.mir_library_detail_empty)
+            or not valid(detail) or detail.type~="scroll-pane" or valid(detail.mir_library_detail_title) or not valid(detail.mir_library_detail_empty)
             or not valid(button) or button.enabled~=false then fail("imported private research/action exposed") end
       end
     end

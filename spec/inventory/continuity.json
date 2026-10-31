@@ -634,11 +634,11 @@
               "source/presentation/library_model.lua"
             ],
             "current_host_controls": [
-              "tests/test_library.py::test_default_closed_then_query_selection_location_native_navigation_and_reload_rebuild"
+              "tests/test_library.py::test_default_closed_then_query_selection_location_native_navigation_and_reload_rebuild",
+              "tests/test_library.py::test_filter_click_is_inert_and_native_selection_updates_the_retained_window"
             ],
             "verification_status": "partial-host-mapping-not-restored-ui-acceptance",
             "remaining_verification": [
-              "Add known-bad handler/rebuild negative controls grounded in the historical handler regression.",
               "Use real click/type/select input, not only direct callback invocation, to prove controls survive and results update."
             ]
           },
@@ -764,11 +764,12 @@
               "source/presentation/library_model.lua"
             ],
             "current_host_controls": [
-              "tests/test_library.py::test_translation_dispatch_is_open_connected_only_and_closed_callbacks_only_release"
+              "tests/test_library.py::test_translation_dispatch_is_open_connected_only_and_closed_callbacks_only_release",
+              "tests/test_library.py::test_native_research_events_refresh_once_after_engine_state_settles_and_unsubscribe_on_close"
             ],
             "verification_status": "partial-host-mapping-not-restored-ui-acceptance",
             "remaining_verification": [
-              "Add a current burst regression that fails repeated catalogue/frame rebuilds; observe closed/open cases and completed work.",
+              "Measure open/closed Library cost and useful work on an active gameplay workload; the host control proves one model evaluation per coalesced event burst only.",
               "Repeat only affected rendering/interaction/retained-memory checks for the changed UI; existing startup and unchanged migration evidence retain their original scope."
             ]
           }

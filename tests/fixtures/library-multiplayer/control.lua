@@ -259,14 +259,19 @@ local function frame_parts(player)
   local detail = valid(content) and content[DETAIL] or nil
   if not valid(query) or query.type ~= "textfield" or not valid(sort) or sort.type ~= "drop-down"
       or not valid(tabs) or tabs.type ~= "tabbed-pane" or not valid(results) or results.type ~= "list-box"
-      or not valid(detail) or not valid(detail[DETAIL_TITLE]) then
+      or not valid(content) or content.type ~= "table" or content.column_count ~= 2
+      or not valid(detail) or detail.type ~= "scroll-pane" or not valid(detail[DETAIL_TITLE]) then
     fail("native public browser GUI tree is incomplete")
   end
   local content_width = content.style and content.style.maximal_width
+  local results_style = results.style
   local detail_style = detail.style
-  if type(content_width) ~= "number" or content_width <= 0 or detail_style == nil
-      or detail_style.minimal_width ~= content_width or detail_style.maximal_width ~= content_width then
-    fail("native public browser detail width differs")
+  if type(content_width) ~= "number" or content_width <= 0 or results_style == nil or detail_style == nil
+      or type(results_style.minimal_width) ~= "number" or results_style.minimal_width < 200
+      or type(detail_style.minimal_width) ~= "number" or detail_style.minimal_width < 280
+      or results_style.minimal_width >= detail_style.minimal_width
+      or results_style.minimal_width + detail_style.minimal_width > content_width then
+    fail("native public browser list/detail pane geometry differs")
   end
   return root, query, sort, results, detail
 end
